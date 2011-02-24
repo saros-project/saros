@@ -75,19 +75,20 @@ public class TestChatViewFunctions extends STFTest {
     @Test
     public void testChat() throws RemoteException {
 
-        alice.chatV.sendChatMessage(message);
+        alice.sarosBot().chatView().sendChatMessage(message);
 
         // System.out.println(alice.bot
         // .getUserNameOnChatLinePartnerChangeSeparator());
         // System.out.println(alice.bot.getTextOfChatLine());
         // System.out.println(alice.bot.getTextOfChatLine(".*joined the chat.*"));
         alice.bot().sleep(1000);
-        String messageByAlice = alice.chatV.getTextOfLastChatLine();
+        String messageByAlice = alice.sarosBot().chatView()
+            .getTextOfLastChatLine();
 
         bob.bot().sleep(1000);
-        String messageByBob = bob.chatV.getTextOfLastChatLine();
+        String messageByBob = bob.sarosBot().chatView().getTextOfLastChatLine();
         assertEquals(messageByAlice, messageByBob);
-        System.out.println(bob.chatV
+        System.out.println(bob.sarosBot().chatView()
             .getUserNameOnChatLinePartnerChangeSeparator(alice.getBaseJid()));
 
         // bob.bot.waitUntilGetChatMessage(alice.getName(), message);

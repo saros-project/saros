@@ -33,10 +33,11 @@ public class TestChangingNameInRosterView extends STFTest {
 
     @After
     public void runAfterEveryTest() throws RemoteException {
-        if (alice.sarosBuddiesV.hasBuddyNickNameNoGUI(bob.jid)) {
-            alice.sarosBuddiesV.renameBuddy(bob.jid, bob.jid.getBase());
+        if (alice.sarosBot().buddiesView().hasBuddyNickNameNoGUI(bob.jid)) {
+            alice.sarosBot().buddiesView()
+                .renameBuddy(bob.jid, bob.jid.getBase());
         }
-        if (!alice.sarosBuddiesV.hasBuddyNoGUI(bob.jid)) {
+        if (!alice.sarosBot().buddiesView().hasBuddyNoGUI(bob.jid)) {
             addBuddies(alice, bob);
         }
     }
@@ -58,16 +59,16 @@ public class TestChangingNameInRosterView extends STFTest {
      */
     @Test
     public void renameBuddyInRosterView() throws RemoteException {
-        assertTrue(alice.sarosBuddiesV.hasBuddyNoGUI(bob.jid));
-        alice.sarosBuddiesV.renameBuddy(bob.jid, bob.getName());
-        assertTrue(alice.sarosBuddiesV.hasBuddyNoGUI(bob.jid));
-        assertTrue(alice.sarosBuddiesV.getBuddyNickNameNoGUI(bob.jid).equals(
-            bob.getName()));
+        assertTrue(alice.sarosBot().buddiesView().hasBuddyNoGUI(bob.jid));
+        alice.sarosBot().buddiesView().renameBuddy(bob.jid, bob.getName());
+        assertTrue(alice.sarosBot().buddiesView().hasBuddyNoGUI(bob.jid));
+        assertTrue(alice.sarosBot().buddiesView()
+            .getBuddyNickNameNoGUI(bob.jid).equals(bob.getName()));
         // assertTrue(alice.sessionV.isContactInSessionView(bob.jid));
-        alice.sarosBuddiesV.renameBuddy(bob.jid, "new bob");
-        assertTrue(alice.sarosBuddiesV.hasBuddyNoGUI(bob.jid));
-        assertTrue(alice.sarosBuddiesV.getBuddyNickNameNoGUI(bob.jid).equals(
-            "new bob"));
+        alice.sarosBot().buddiesView().renameBuddy(bob.jid, "new bob");
+        assertTrue(alice.sarosBot().buddiesView().hasBuddyNoGUI(bob.jid));
+        assertTrue(alice.sarosBot().buddiesView()
+            .getBuddyNickNameNoGUI(bob.jid).equals("new bob"));
         // assertTrue(alice.sessionV.isContactInSessionView(bob.jid));
     }
 

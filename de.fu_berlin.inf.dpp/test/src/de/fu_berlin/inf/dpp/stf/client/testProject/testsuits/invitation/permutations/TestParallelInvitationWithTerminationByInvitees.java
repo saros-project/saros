@@ -66,7 +66,7 @@ public class TestParallelInvitationWithTerminationByInvitees extends STFTest {
     @Test
     public void parallelInvitationWihtTerminationByInvitees()
         throws IOException, CoreException, InterruptedException {
-        alice.fileM.newJavaProjectWithClasses(PROJECT1, PKG1, CLS1);
+        alice.sarosBot().file().newJavaProjectWithClasses(PROJECT1, PKG1, CLS1);
 
         /*
          * build session with bob, carl and dave simultaneously
@@ -112,8 +112,9 @@ public class TestParallelInvitationWithTerminationByInvitees extends STFTest {
         edna.bot().shell(SHELL_SESSION_INVITATION).activate();
         edna.sarosC.confirmShellSessionnInvitation();
         edna.sarosC.confirmShellAddProjectWithNewProject(PROJECT1);
-        edna.sarosSessionV.leaveTheSessionByPeer();
-        assertFalse(edna.sarosSessionV.isInSession());
-        assertFalse(alice.sarosSessionV.hasReadOnlyAccessNoGUI(edna.jid));
+        edna.sarosBot().sessionView().leaveTheSessionByPeer();
+        assertFalse(edna.sarosBot().sessionView().isInSession());
+        assertFalse(alice.sarosBot().sessionView()
+            .hasReadOnlyAccessNoGUI(edna.jid));
     }
 }

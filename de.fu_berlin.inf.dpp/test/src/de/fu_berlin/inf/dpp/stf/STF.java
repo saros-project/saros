@@ -15,12 +15,16 @@ import org.apache.log4j.Logger;
 import org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences;
 
 import de.fu_berlin.inf.dpp.Saros;
+import de.fu_berlin.inf.dpp.net.JID;
 
 public class STF {
 
     protected static final transient Logger log = Logger.getLogger(STF.class);
 
     public static Saros saros;
+
+    // local JID
+    public static JID localJID;
 
     protected final static String CONFIRM_DELETE = "Confirm Delete";
     protected final static String SHELL_COPY_PROJECT = "Copy Project";

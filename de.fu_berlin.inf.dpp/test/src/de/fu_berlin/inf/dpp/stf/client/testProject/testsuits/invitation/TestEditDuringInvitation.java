@@ -28,7 +28,7 @@ public class TestEditDuringInvitation extends STFTest {
         initTesters(TypeOfTester.ALICE, TypeOfTester.BOB, TypeOfTester.CARL);
         setUpWorkbench();
         setUpSaros();
-        alice.fileM.newJavaProjectWithClasses(PROJECT1, PKG1, CLS1);
+        alice.sarosBot().file().newJavaProjectWithClasses(PROJECT1, PKG1, CLS1);
     }
 
     /**
@@ -56,9 +56,10 @@ public class TestEditDuringInvitation extends STFTest {
             TypeOfShareProject.SHARE_PROJECT, TypeOfCreateProject.NEW_PROJECT,
             alice, bob);
 
-        assertTrue(bob.sarosSessionV.hasWriteAccessNoGUI());
+        assertTrue(bob.sarosBot().sessionView().hasWriteAccessNoGUI());
 
-        alice.sarosSessionV.openInvitationInterface(carl.getBaseJid());
+        alice.sarosBot().sessionView()
+            .openInvitationInterface(carl.getBaseJid());
         carl.sarosC.confirmShellSessionnInvitation();
 
         bob.openC.openClass(VIEW_PACKAGE_EXPLORER, PROJECT1, PKG1, CLS1);

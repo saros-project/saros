@@ -1,9 +1,6 @@
 package de.fu_berlin.inf.dpp.stf.client.wrapper;
 
-import java.rmi.RemoteException;
-
 import de.fu_berlin.inf.dpp.stf.client.Tester;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.STFBot;
 
 public class Bot extends Wrapper {
 
@@ -22,7 +19,7 @@ public class Bot extends Wrapper {
     // return tester.shell;
     // }
 
-    public STFBot bot() throws RemoteException {
-        return tester.bot;
-    }
+    // public STFBot bot() throws RemoteException {
+    // return tester.bot;
+    // }
 }

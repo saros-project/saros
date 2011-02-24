@@ -65,7 +65,7 @@ public class TestParallelInvitationWithTerminationByHost extends STFTest {
     @Test
     public void parallelInvitationWithTerminationByHost() throws IOException,
         CoreException, InterruptedException {
-        alice.fileM.newJavaProjectWithClasses(PROJECT1, PKG1, CLS1);
+        alice.sarosBot().file().newJavaProjectWithClasses(PROJECT1, PKG1, CLS1);
 
         /*
          * build session with bob, carl and dave simultaneously
@@ -75,7 +75,7 @@ public class TestParallelInvitationWithTerminationByHost extends STFTest {
 
         bob.bot().waitUntilShellIsOpen(SHELL_SESSION_INVITATION);
         bob.bot().shell(SHELL_SESSION_INVITATION).activate();
-        alice.progressV.removeProcess(0);
+        alice.sarosBot().progressView().removeProcess(0);
         bob.bot().waitUntilShellIsOpen(SHELL_INVITATION_CANCELLED);
         bob.bot().shell(SHELL_INVITATION_CANCELLED).activate();
         bob.sarosC.closeShellInvitationCancelled();
@@ -83,7 +83,7 @@ public class TestParallelInvitationWithTerminationByHost extends STFTest {
         carl.bot().waitUntilShellIsOpen(SHELL_SESSION_INVITATION);
         carl.bot().shell(SHELL_SESSION_INVITATION).activate();
         carl.sarosC.confirmShellSessionnInvitation();
-        alice.progressV.removeProcess(0);
+        alice.sarosBot().progressView().removeProcess(0);
         carl.sarosC.waitUntilIsShellInvitationCnacelledActive();
         assertTrue(carl.sarosC.isShellInvitationCancelledActive());
         carl.sarosC.closeShellInvitationCancelled();
@@ -93,7 +93,7 @@ public class TestParallelInvitationWithTerminationByHost extends STFTest {
         dave.sarosC.confirmShellSessionnInvitation();
 
         // dave.button.clickButton(FINISH);
-        alice.progressV.removeProcess(0);
+        alice.sarosBot().progressView().removeProcess(0);
         // FIXME Timeout exception by MAC OS X, the building session under
         // MAS
         // is so fast that the session process is already done after

@@ -42,15 +42,15 @@ public class TestWriteAccessChangeAndImmediateWrite extends STFTest {
     @Test
     public void testFollowModeByOpenClassbyAlice() throws RemoteException {
 
-        alice.sarosSessionV.restrictToReadOnlyAccess(bob.jid);
+        alice.sarosBot().sessionView().restrictToReadOnlyAccess(bob.jid);
         bob.openC.openClass(VIEW_PACKAGE_EXPLORER, PROJECT1, PKG1, CLS1);
         bob.bot().editor(CLS1_SUFFIX).setTextWithoutSave(CP1);
-        bob.sarosSessionV.waitUntilIsInconsistencyDetected();
+        bob.sarosBot().sessionView().waitUntilIsInconsistencyDetected();
         assertTrue(bob.bot().view(VIEW_SAROS_SESSION)
             .toolbarButton(TB_INCONSISTENCY_DETECTED).isEnabled());
-        bob.sarosSessionV.inconsistencyDetected();
+        bob.sarosBot().sessionView().inconsistencyDetected();
 
-        alice.sarosSessionV.grantWriteAccess(bob.jid);
+        alice.sarosBot().sessionView().grantWriteAccess(bob.jid);
         bob.bot().editor(CLS1_SUFFIX).setTextWithoutSave(CP2);
         bob.bot().sleep(5000);
         assertFalse(bob.bot().view(VIEW_SAROS_SESSION)

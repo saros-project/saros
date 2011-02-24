@@ -30,14 +30,14 @@ public class TestStrictSequentialInvitationWithoutTermination extends STFTest {
         initTesters(TypeOfTester.ALICE, TypeOfTester.BOB, TypeOfTester.CARL);
         setUpWorkbench();
         setUpSaros();
-        alice.fileM.newJavaProjectWithClasses(PROJECT1, PKG1, CLS1);
+        alice.sarosBot().file().newJavaProjectWithClasses(PROJECT1, PKG1, CLS1);
     }
 
     @After
     public void runAfterEveryTest() throws RemoteException {
-        carl.windowM.setNewTextFileLineDelimiter("Default");
-        bob.windowM.setNewTextFileLineDelimiter("Default");
-        alice.windowM.setNewTextFileLineDelimiter("Default");
+        carl.sarosBot().window().setNewTextFileLineDelimiter("Default");
+        bob.sarosBot().window().setNewTextFileLineDelimiter("Default");
+        alice.sarosBot().window().setNewTextFileLineDelimiter("Default");
     }
 
     /**
@@ -68,15 +68,18 @@ public class TestStrictSequentialInvitationWithoutTermination extends STFTest {
     @Test
     public void testSetLineDelimiter() throws RemoteException,
         InterruptedException {
-        alice.windowM.setNewTextFileLineDelimiter("Unix");
+        alice.sarosBot().window().setNewTextFileLineDelimiter("Unix");
 
         buildSessionSequentially(VIEW_PACKAGE_EXPLORER, PROJECT1,
             TypeOfShareProject.SHARE_PROJECT, TypeOfCreateProject.NEW_PROJECT,
             carl, alice, bob);
 
-        String delimiterByAlice = alice.windowM.getTextFileLineDelimiter();
-        String delimiterByCarl = carl.windowM.getTextFileLineDelimiter();
-        String delimiterByBob = bob.windowM.getTextFileLineDelimiter();
+        String delimiterByAlice = alice.sarosBot().window()
+            .getTextFileLineDelimiter();
+        String delimiterByCarl = carl.sarosBot().window()
+            .getTextFileLineDelimiter();
+        String delimiterByBob = bob.sarosBot().window()
+            .getTextFileLineDelimiter();
 
         log.debug("delimiter by alice: " + delimiterByAlice
             + "delimiter by bob: " + delimiterByBob + "delimiter by carl: "

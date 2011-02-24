@@ -55,55 +55,55 @@ public class TestSessionView extends STFTest {
 
     @Test
     public void testRestrictToReadOnlyAccess() throws RemoteException {
-        assertTrue(alice.sarosSessionV.hasWriteAccessBy(bob.jid));
-        assertTrue(bob.sarosSessionV.hasWriteAccess());
+        assertTrue(alice.sarosBot().sessionView().hasWriteAccessBy(bob.jid));
+        assertTrue(bob.sarosBot().sessionView().hasWriteAccess());
 
-        assertFalse(alice.sarosSessionV.hasReadOnlyAccessBy(bob.jid));
-        assertFalse(bob.sarosSessionV.hasReadOnlyAccess());
+        assertFalse(alice.sarosBot().sessionView().hasReadOnlyAccessBy(bob.jid));
+        assertFalse(bob.sarosBot().sessionView().hasReadOnlyAccess());
 
-        alice.sarosSessionV.restrictToReadOnlyAccess(bob.jid);
+        alice.sarosBot().sessionView().restrictToReadOnlyAccess(bob.jid);
 
-        assertFalse(alice.sarosSessionV.hasWriteAccessBy(bob.jid));
-        assertFalse(bob.sarosSessionV.hasWriteAccess());
+        assertFalse(alice.sarosBot().sessionView().hasWriteAccessBy(bob.jid));
+        assertFalse(bob.sarosBot().sessionView().hasWriteAccess());
 
-        assertTrue(alice.sarosSessionV.hasReadOnlyAccessBy(bob.jid));
-        assertTrue(bob.sarosSessionV.hasReadOnlyAccess());
+        assertTrue(alice.sarosBot().sessionView().hasReadOnlyAccessBy(bob.jid));
+        assertTrue(bob.sarosBot().sessionView().hasReadOnlyAccess());
     }
 
     @Test
     public void testGrantWriteAccess() throws RemoteException {
-        assertTrue(alice.sarosSessionV.hasWriteAccessBy(bob.jid));
-        assertTrue(bob.sarosSessionV.hasWriteAccess());
+        assertTrue(alice.sarosBot().sessionView().hasWriteAccessBy(bob.jid));
+        assertTrue(bob.sarosBot().sessionView().hasWriteAccess());
 
-        alice.sarosSessionV.restrictToReadOnlyAccess(bob.jid);
+        alice.sarosBot().sessionView().restrictToReadOnlyAccess(bob.jid);
 
-        assertFalse(bob.sarosSessionV.hasWriteAccess());
-        assertFalse(alice.sarosSessionV.hasWriteAccessBy(bob.jid));
+        assertFalse(bob.sarosBot().sessionView().hasWriteAccess());
+        assertFalse(alice.sarosBot().sessionView().hasWriteAccessBy(bob.jid));
 
-        alice.sarosSessionV.grantWriteAccess(bob.jid);
+        alice.sarosBot().sessionView().grantWriteAccess(bob.jid);
 
-        assertTrue(bob.sarosSessionV.hasWriteAccess());
-        assertTrue(alice.sarosSessionV.hasWriteAccessBy(bob.jid));
+        assertTrue(bob.sarosBot().sessionView().hasWriteAccess());
+        assertTrue(alice.sarosBot().sessionView().hasWriteAccessBy(bob.jid));
 
-        assertFalse(alice.sarosSessionV.hasReadOnlyAccessBy(bob.jid));
-        assertFalse(bob.sarosSessionV.hasReadOnlyAccess());
+        assertFalse(alice.sarosBot().sessionView().hasReadOnlyAccessBy(bob.jid));
+        assertFalse(bob.sarosBot().sessionView().hasReadOnlyAccess());
 
     }
 
     @Test
     public void testFollowMode() throws RemoteException {
-        assertFalse(alice.sarosSessionV.isFollowingBuddy(bob.jid));
-        assertFalse(bob.sarosSessionV.isFollowingBuddy(alice.jid));
+        assertFalse(alice.sarosBot().sessionView().isFollowingBuddy(bob.jid));
+        assertFalse(bob.sarosBot().sessionView().isFollowingBuddy(alice.jid));
 
-        bob.sarosSessionV.followThisBuddy(alice.jid);
-        assertTrue(bob.sarosSessionV.isFollowingBuddy(alice.jid));
+        bob.sarosBot().sessionView().followThisBuddy(alice.jid);
+        assertTrue(bob.sarosBot().sessionView().isFollowingBuddy(alice.jid));
 
         alice.openC.openClass(VIEW_PACKAGE_EXPLORER, PROJECT1, PKG1, CLS1);
         bob.bot().waitUntilEditorOpen(CLS1_SUFFIX);
         assertTrue(bob.bot().isEditorOpen(CLS1_SUFFIX));
 
-        alice.sarosSessionV.followThisBuddy(bob.jid);
-        assertTrue(alice.sarosSessionV.isFollowingBuddy(bob.jid));
+        alice.sarosBot().sessionView().followThisBuddy(bob.jid);
+        assertTrue(alice.sarosBot().sessionView().isFollowingBuddy(bob.jid));
 
         bob.bot().editor(CLS1 + SUFFIX_JAVA).closeWithSave();
         alice.bot().waitUntilEditorClosed(CLS1_SUFFIX);
@@ -112,14 +112,14 @@ public class TestSessionView extends STFTest {
 
     @Test
     public void testStopFollowing() throws RemoteException {
-        assertFalse(alice.sarosSessionV.isFollowingBuddy(bob.jid));
-        assertFalse(bob.sarosSessionV.isFollowingBuddy(alice.jid));
+        assertFalse(alice.sarosBot().sessionView().isFollowingBuddy(bob.jid));
+        assertFalse(bob.sarosBot().sessionView().isFollowingBuddy(alice.jid));
 
-        bob.sarosSessionV.followThisBuddy(alice.jid);
-        assertTrue(bob.sarosSessionV.isFollowingBuddy(alice.jid));
+        bob.sarosBot().sessionView().followThisBuddy(alice.jid);
+        assertTrue(bob.sarosBot().sessionView().isFollowingBuddy(alice.jid));
 
-        bob.sarosSessionV.stopFollowingThisBuddy(alice.jid);
-        assertFalse(bob.sarosSessionV.isFollowingBuddy(alice.jid));
+        bob.sarosBot().sessionView().stopFollowingThisBuddy(alice.jid);
+        assertFalse(bob.sarosBot().sessionView().isFollowingBuddy(alice.jid));
 
     }
 
@@ -134,13 +134,13 @@ public class TestSessionView extends STFTest {
      */
     @Test
     public void jumpToSelectedBuddy() throws RemoteException {
-        alice.fileM.newClass(PROJECT1, PKG1, CLS2);
+        alice.sarosBot().file().newClass(PROJECT1, PKG1, CLS2);
         alice.bot().waitUntilEditorOpen(CLS2_SUFFIX);
         assertTrue(alice.bot().isEditorOpen(CLS2_SUFFIX));
         assertFalse(bob.bot().isEditorOpen(CLS2_SUFFIX));
         bob.bot().captureScreenshot(
             bob.bot().getPathToScreenShot() + "/vor_jump_to_position.png");
-        bob.sarosSessionV.jumpToPositionOfSelectedBuddy(alice.jid);
+        bob.sarosBot().sessionView().jumpToPositionOfSelectedBuddy(alice.jid);
         bob.bot().captureScreenshot(
             bob.bot().getPathToScreenShot() + "/after_jump_to_position.png");
         assertTrue(bob.bot().editor(CLS2_SUFFIX).isActive());
@@ -149,7 +149,7 @@ public class TestSessionView extends STFTest {
         alice.bot().editor(CLS1 + SUFFIX_JAVA).activate();
         assertTrue(alice.bot().editor(CLS1_SUFFIX).isActive());
         assertFalse(bob.bot().isEditorOpen(CLS1_SUFFIX));
-        bob.sarosSessionV.jumpToPositionOfSelectedBuddy(alice.jid);
+        bob.sarosBot().sessionView().jumpToPositionOfSelectedBuddy(alice.jid);
         assertTrue(bob.bot().editor(CLS1_SUFFIX).isActive());
     }
 
@@ -159,22 +159,22 @@ public class TestSessionView extends STFTest {
     public void sharedYourScreenWithSelectedUserGUI() throws RemoteException {
         // alice.mainMenu.setupSettingForScreensharing(1, 0, -1, -1);
         shareYourScreen(alice, bob);
-        bob.rSV.waitUntilRemoteScreenViewIsActive();
+        bob.sarosBot().remoteScreenView().waitUntilRemoteScreenViewIsActive();
         assertTrue(bob.bot().view(VIEW_REMOTE_SCREEN).isActive());
-        alice.sarosSessionV.stopSessionWithBuddy(bob.jid);
+        alice.sarosBot().sessionView().stopSessionWithBuddy(bob.jid);
     }
 
     @Test
     public void inconsistencyDetectedGUI() throws RemoteException {
         alice.openC.openClass(VIEW_PACKAGE_EXPLORER, PROJECT1, PKG1, CLS1);
         String editorTextOfAlice = alice.bot().editor(CLS1_SUFFIX).getText();
-        alice.sarosSessionV.restrictToReadOnlyAccess(bob.jid);
+        alice.sarosBot().sessionView().restrictToReadOnlyAccess(bob.jid);
         bob.openC.openClass(VIEW_PACKAGE_EXPLORER, PROJECT1, PKG1, CLS1);
         bob.bot().editor(CLS1_SUFFIX).setTextWithoutSave(CP1);
         String editorTextOfBob = bob.bot().editor(CLS1_SUFFIX).getText();
         assertFalse(editorTextOfAlice.equals(editorTextOfBob));
-        bob.sarosSessionV.waitUntilIsInconsistencyDetected();
-        bob.sarosSessionV.inconsistencyDetected();
+        bob.sarosBot().sessionView().waitUntilIsInconsistencyDetected();
+        bob.sarosBot().sessionView().inconsistencyDetected();
         editorTextOfAlice = alice.bot().editor(CLS1_SUFFIX).getText();
         editorTextOfBob = bob.bot().editor(CLS1_SUFFIX).getText();
         assertTrue(editorTextOfAlice.equals(editorTextOfBob));
@@ -183,7 +183,7 @@ public class TestSessionView extends STFTest {
     @Test
     public void testRestrictInviteesToReadOnlyAccessGUI()
         throws RemoteException {
-        assertTrue(alice.sarosSessionV.isHost());
+        assertTrue(alice.sarosBot().sessionView().isHost());
         assertTrue(alice.bot().view(VIEW_SAROS_SESSION)
             .toolbarButton(TB_RESTRICT_INVITEES_TO_READ_ONLY_ACCESS)
             .isEnabled());
@@ -191,12 +191,12 @@ public class TestSessionView extends STFTest {
             .toolbarButton(TB_RESTRICT_INVITEES_TO_READ_ONLY_ACCESS)
             .isEnabled());
 
-        assertTrue(alice.sarosSessionV.hasWriteAccess());
-        assertTrue(bob.sarosSessionV.hasWriteAccess());
+        assertTrue(alice.sarosBot().sessionView().hasWriteAccess());
+        assertTrue(bob.sarosBot().sessionView().hasWriteAccess());
 
-        alice.sarosSessionV.restrictInviteesToReadOnlyAccess();
-        assertFalse(bob.sarosSessionV.hasWriteAccess());
-        assertTrue(alice.sarosSessionV.hasWriteAccess());
+        alice.sarosBot().sessionView().restrictInviteesToReadOnlyAccess();
+        assertFalse(bob.sarosBot().sessionView().hasWriteAccess());
+        assertTrue(alice.sarosBot().sessionView().hasWriteAccess());
 
     }
 
@@ -210,11 +210,11 @@ public class TestSessionView extends STFTest {
     @Test
     public void leaveSessionProcessDonebyAllUsersWithHostFirstLeave()
         throws RemoteException, InterruptedException {
-        assertTrue(alice.sarosSessionV.isInSession());
-        assertTrue(bob.sarosSessionV.isInSession());
+        assertTrue(alice.sarosBot().sessionView().isInSession());
+        assertTrue(bob.sarosBot().sessionView().isInSession());
         leaveSessionHostFirst();
-        assertFalse(alice.sarosSessionV.isInSession());
-        assertFalse(bob.sarosSessionV.isInSession());
+        assertFalse(alice.sarosBot().sessionView().isInSession());
+        assertFalse(bob.sarosBot().sessionView().isInSession());
     }
 
     /**
@@ -226,40 +226,40 @@ public class TestSessionView extends STFTest {
     @Test
     public void leaveSessionProcessDonebyAllUsersWithPeersFirstLeave()
         throws RemoteException, InterruptedException {
-        assertFalse(alice.sarosSessionV.existsLabelInSessionView());
-        assertFalse(bob.sarosSessionV.existsLabelInSessionView());
-        assertTrue(alice.sarosSessionV.isInSession());
-        assertTrue(bob.sarosSessionV.isInSession());
+        assertFalse(alice.sarosBot().sessionView().existsLabelInSessionView());
+        assertFalse(bob.sarosBot().sessionView().existsLabelInSessionView());
+        assertTrue(alice.sarosBot().sessionView().isInSession());
+        assertTrue(bob.sarosBot().sessionView().isInSession());
         leaveSessionPeersFirst();
-        assertFalse(alice.sarosSessionV.isInSession());
-        assertFalse(bob.sarosSessionV.isInSession());
-        assertTrue(alice.sarosSessionV.existsLabelInSessionView());
-        assertTrue(bob.sarosSessionV.existsLabelInSessionView());
+        assertFalse(alice.sarosBot().sessionView().isInSession());
+        assertFalse(bob.sarosBot().sessionView().isInSession());
+        assertTrue(alice.sarosBot().sessionView().existsLabelInSessionView());
+        assertTrue(bob.sarosBot().sessionView().existsLabelInSessionView());
     }
 
     @Test
     public void testIsInSession() throws RemoteException, InterruptedException {
-        assertTrue(alice.sarosSessionV.isInSessionNoGUI());
-        assertTrue(alice.sarosSessionV.isInSession());
-        assertTrue(bob.sarosSessionV.isInSessionNoGUI());
-        assertTrue(bob.sarosSessionV.isInSession());
+        assertTrue(alice.sarosBot().sessionView().isInSessionNoGUI());
+        assertTrue(alice.sarosBot().sessionView().isInSession());
+        assertTrue(bob.sarosBot().sessionView().isInSessionNoGUI());
+        assertTrue(bob.sarosBot().sessionView().isInSession());
         leaveSessionHostFirst();
-        assertFalse(alice.sarosSessionV.isInSessionNoGUI());
-        assertFalse(bob.sarosSessionV.isInSessionNoGUI());
-        assertFalse(alice.sarosSessionV.isInSession());
-        assertFalse(bob.sarosSessionV.isInSession());
+        assertFalse(alice.sarosBot().sessionView().isInSessionNoGUI());
+        assertFalse(bob.sarosBot().sessionView().isInSessionNoGUI());
+        assertFalse(alice.sarosBot().sessionView().isInSession());
+        assertFalse(bob.sarosBot().sessionView().isInSession());
     }
 
     @Test
     public void inviteUsersInSession() throws RemoteException,
         InterruptedException {
-        bob.sarosSessionV.leaveTheSessionByPeer();
-        bob.editM.deleteProjectNoGUI(PROJECT1);
-        assertFalse(bob.sarosSessionV.isInSession());
+        bob.sarosBot().sessionView().leaveTheSessionByPeer();
+        bob.sarosBot().edit().deleteProjectNoGUI(PROJECT1);
+        assertFalse(bob.sarosBot().sessionView().isInSession());
         inviteBuddies(PROJECT1, TypeOfCreateProject.NEW_PROJECT, alice, bob,
             carl);
-        assertTrue(carl.sarosSessionV.isInSession());
-        assertTrue(bob.sarosSessionV.isInSession());
+        assertTrue(carl.sarosBot().sessionView().isInSession());
+        assertTrue(bob.sarosBot().sessionView().isInSession());
     }
 
 }

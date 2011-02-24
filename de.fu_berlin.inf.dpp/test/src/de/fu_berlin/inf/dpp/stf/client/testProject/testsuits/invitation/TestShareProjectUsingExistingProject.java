@@ -33,8 +33,8 @@ public class TestShareProjectUsingExistingProject extends STFTest {
 
     @Before
     public void runBeforeEveryTest() throws RemoteException {
-        alice.fileM.newJavaProjectWithClasses(PROJECT1, PKG1, CLS1);
-        bob.fileM.newJavaProjectWithClasses(PROJECT1, PKG1, CLS2);
+        alice.sarosBot().file().newJavaProjectWithClasses(PROJECT1, PKG1, CLS1);
+        bob.sarosBot().file().newJavaProjectWithClasses(PROJECT1, PKG1, CLS2);
     }
 
     @After
@@ -47,21 +47,24 @@ public class TestShareProjectUsingExistingProject extends STFTest {
 
     @Test
     public void shareProjectUsingExistingProject() throws RemoteException {
-        assertFalse(bob.fileM.existsClassNoGUI(PROJECT1, PKG1, CLS1));
-        assertTrue(bob.fileM.existsClassNoGUI(PROJECT1, PKG1, CLS2));
+        assertFalse(bob.sarosBot().file()
+            .existsClassNoGUI(PROJECT1, PKG1, CLS1));
+        assertTrue(bob.sarosBot().file().existsClassNoGUI(PROJECT1, PKG1, CLS2));
         buildSessionSequentially(VIEW_PACKAGE_EXPLORER, PROJECT1,
             TypeOfShareProject.SHARE_PROJECT,
             TypeOfCreateProject.EXIST_PROJECT, alice, bob);
-        bob.fileM.waitUntilClassExists(PROJECT1, PKG1, CLS1);
-        assertTrue(bob.fileM.existsClassNoGUI(PROJECT1, PKG1, CLS1));
-        assertFalse(bob.fileM.existsClassNoGUI(PROJECT1, PKG1, CLS2));
+        bob.sarosBot().file().waitUntilClassExists(PROJECT1, PKG1, CLS1);
+        assertTrue(bob.sarosBot().file().existsClassNoGUI(PROJECT1, PKG1, CLS1));
+        assertFalse(bob.sarosBot().file()
+            .existsClassNoGUI(PROJECT1, PKG1, CLS2));
     }
 
     @Test
     public void shareProjectUsingExistProjectWithCopyAfterCancelLocalChange()
         throws RemoteException {
-        assertFalse(bob.fileM.existsClassNoGUI(PROJECT1, PKG1, CLS1));
-        assertTrue(bob.fileM.existsClassNoGUI(PROJECT1, PKG1, CLS2));
+        assertFalse(bob.sarosBot().file()
+            .existsClassNoGUI(PROJECT1, PKG1, CLS1));
+        assertTrue(bob.sarosBot().file().existsClassNoGUI(PROJECT1, PKG1, CLS2));
 
         buildSessionSequentially(
             VIEW_PACKAGE_EXPLORER,
@@ -73,11 +76,12 @@ public class TestShareProjectUsingExistingProject extends STFTest {
         // bob.sarosC
         // .confirmProjectSharingWizardUsingExistProjectWithCopy(PROJECT1);
 
-        assertTrue(bob.fileM.existsProjectNoGUI(PROJECT1));
-        assertTrue(bob.fileM.existsClassNoGUI(PROJECT1, PKG1, CLS2));
-        assertTrue(bob.fileM.existsProjectNoGUI(PROJECT1_NEXT));
-        assertTrue(bob.fileM.existsClassNoGUI(PROJECT1_NEXT, PKG1, CLS1));
-        bob.editM.deleteProjectNoGUI(PROJECT1_NEXT);
+        assertTrue(bob.sarosBot().file().existsProjectNoGUI(PROJECT1));
+        assertTrue(bob.sarosBot().file().existsClassNoGUI(PROJECT1, PKG1, CLS2));
+        assertTrue(bob.sarosBot().file().existsProjectNoGUI(PROJECT1_NEXT));
+        assertTrue(bob.sarosBot().file()
+            .existsClassNoGUI(PROJECT1_NEXT, PKG1, CLS1));
+        bob.sarosBot().edit().deleteProjectNoGUI(PROJECT1_NEXT);
     }
 
     @Test
@@ -86,11 +90,12 @@ public class TestShareProjectUsingExistingProject extends STFTest {
         buildSessionSequentially(VIEW_PACKAGE_EXPLORER, PROJECT1,
             TypeOfShareProject.SHARE_PROJECT,
             TypeOfCreateProject.EXIST_PROJECT_WITH_COPY, alice, bob);
-        assertTrue(bob.fileM.existsProjectNoGUI(PROJECT1));
-        assertTrue(bob.fileM.existsClassNoGUI(PROJECT1, PKG1, CLS2));
-        assertTrue(bob.fileM.existsProjectNoGUI(PROJECT1_NEXT));
-        assertTrue(bob.fileM.existsClassNoGUI(PROJECT1_NEXT, PKG1, CLS1));
-        bob.editM.deleteProjectNoGUI(PROJECT1_NEXT);
+        assertTrue(bob.sarosBot().file().existsProjectNoGUI(PROJECT1));
+        assertTrue(bob.sarosBot().file().existsClassNoGUI(PROJECT1, PKG1, CLS2));
+        assertTrue(bob.sarosBot().file().existsProjectNoGUI(PROJECT1_NEXT));
+        assertTrue(bob.sarosBot().file()
+            .existsClassNoGUI(PROJECT1_NEXT, PKG1, CLS1));
+        bob.sarosBot().edit().deleteProjectNoGUI(PROJECT1_NEXT);
 
     }
 }

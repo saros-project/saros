@@ -32,7 +32,7 @@ public class TestBasicWidgetTree extends STFTest {
         alice.bot().menu(MENU_WINDOW).menu(MENU_SHOW_VIEW).menu(MENU_OTHER)
             .click();
         alice.bot().waitUntilShellIsOpen(SHELL_SHOW_VIEW);
-        STFBotShell shell = alice.bot.shell(SHELL_SHOW_VIEW);
+        STFBotShell shell = alice.bot().shell(SHELL_SHOW_VIEW);
         shell.activate();
         assertTrue(shell.bot_().tree().selectTreeItem(NODE_GENERAL)
             .existsSubItem(NODE_CONSOLE));
@@ -64,44 +64,46 @@ public class TestBasicWidgetTree extends STFTest {
 
     @Test
     public void existsTreeItemInView() throws RemoteException {
-        alice.fileM.newJavaProjectWithClasses(PROJECT1, PKG1, CLS1);
+        alice.sarosBot().file().newJavaProjectWithClasses(PROJECT1, PKG1, CLS1);
         STFBotView view = alice.bot().view(VIEW_PACKAGE_EXPLORER);
         view.setFocus();
         assertTrue(view.bot_().tree().existsSubItem(PROJECT1));
 
-        assertTrue(alice.fileM.existsProjectNoGUI(PROJECT1));
+        assertTrue(alice.sarosBot().file().existsProjectNoGUI(PROJECT1));
         assertTrue(view.bot_().tree().selectTreeItem(PROJECT1, SRC, PKG1)
             .existsSubItem(CLS1 + SUFFIX_JAVA));
-        alice.fileM.existsClassNoGUI(PROJECT1, PKG1, CLS1);
+        alice.sarosBot().file().existsClassNoGUI(PROJECT1, PKG1, CLS1);
     }
 
     @Test
     public void existsTreeItemWithRegexsInView() throws RemoteException {
-        alice.fileM.newJavaProjectWithClasses(PROJECT1, PKG1, CLS1);
+        alice.sarosBot().file().newJavaProjectWithClasses(PROJECT1, PKG1, CLS1);
         STFBotView view = alice.bot().view(VIEW_PACKAGE_EXPLORER);
         view.setFocus();
 
         assertTrue(view.bot_().tree()
             .existsSubItemWithRegexs(changeToRegex(PROJECT1)));
-        assertTrue(alice.fileM.existsProjectNoGUI(PROJECT1));
+        assertTrue(alice.sarosBot().file().existsProjectNoGUI(PROJECT1));
         assertTrue(view.bot_().tree().selectTreeItem(PROJECT1, SRC)
             .existsSubItemWithRegex(changeToRegex(PKG1)));
 
-        assertTrue(alice.fileM.existsPkgNoGUI(PROJECT1, PKG1));
+        assertTrue(alice.sarosBot().file().existsPkgNoGUI(PROJECT1, PKG1));
         assertTrue(view.bot_().tree().selectTreeItem(PROJECT1, SRC, PKG1)
             .existsSubItemWithRegex(changeToRegex(CLS1)));
 
-        assertTrue(alice.fileM.existsClassNoGUI(PROJECT1, PKG1, CLS1));
-        alice.fileM.newClass(PROJECT1, PKG1, CLS2);
+        assertTrue(alice.sarosBot().file()
+            .existsClassNoGUI(PROJECT1, PKG1, CLS1));
+        alice.sarosBot().file().newClass(PROJECT1, PKG1, CLS2);
 
         assertTrue(view.bot_().tree().selectTreeItem(PROJECT1, SRC, PKG1)
             .existsSubItemWithRegex(changeToRegex(CLS2)));
-        assertTrue(alice.fileM.existsClassNoGUI(PROJECT1, PKG1, CLS2));
+        assertTrue(alice.sarosBot().file()
+            .existsClassNoGUI(PROJECT1, PKG1, CLS2));
     }
 
     @Test
     public void existsTreeItemWithRegexsInView2() throws RemoteException {
-        alice.sarosBuddiesV.connectNoGUI(alice.jid, alice.password);
+        alice.sarosBot().buddiesView().connectNoGUI(alice.jid, alice.password);
         assertTrue(alice.bot().view(VIEW_SAROS_BUDDIES).bot_().tree()
             .existsSubItemWithRegexs(changeToRegex(NODE_BUDDIES)));
         assertTrue(alice.bot().view(VIEW_SAROS_BUDDIES).bot_().tree()
@@ -111,7 +113,7 @@ public class TestBasicWidgetTree extends STFTest {
 
     @Test
     public void selectTreeItemInView() throws RemoteException {
-        alice.fileM.newJavaProjectWithClasses(PROJECT1, PKG1, CLS1);
+        alice.sarosBot().file().newJavaProjectWithClasses(PROJECT1, PKG1, CLS1);
         alice.bot().view(VIEW_PACKAGE_EXPLORER).setFocus();
         assertTrue(alice.bot().isEditorOpen(CLS1_SUFFIX));
         alice.bot().view(VIEW_PACKAGE_EXPLORER)
@@ -128,7 +130,7 @@ public class TestBasicWidgetTree extends STFTest {
         alice.bot().menu(MENU_SAROS).menu(MENU_PREFERENCES).click();
 
         alice.bot().waitUntilShellIsOpen(SHELL_PREFERNCES);
-        STFBotShell shell = alice.bot.shell(SHELL_PREFERNCES);
+        STFBotShell shell = alice.bot().shell(SHELL_PREFERNCES);
         shell.activate();
         shell.bot_().tree().selectTreeItem(NODE_SAROS);
         assertTrue(shell
@@ -139,7 +141,7 @@ public class TestBasicWidgetTree extends STFTest {
 
     @Test
     public void selectTreeItemWithRegexs() throws RemoteException {
-        alice.fileM.newJavaProject(SVN_PROJECT_COPY);
+        alice.sarosBot().file().newJavaProject(SVN_PROJECT_COPY);
         alice.team.shareProjectWithSVNUsingSpecifiedFolderName(
             VIEW_PACKAGE_EXPLORER, SVN_PROJECT_COPY, SVN_REPOSITORY_URL,
             SVN_PROJECT_PATH);
@@ -154,7 +156,7 @@ public class TestBasicWidgetTree extends STFTest {
 
     @Test
     public void selectTreeItemWithRegexsInView() throws RemoteException {
-        alice.fileM.newJavaProject(SVN_PROJECT_COPY);
+        alice.sarosBot().file().newJavaProject(SVN_PROJECT_COPY);
         alice.team.shareProjectWithSVNUsingSpecifiedFolderName(
             VIEW_PACKAGE_EXPLORER, SVN_PROJECT_COPY, SVN_REPOSITORY_URL,
             SVN_PROJECT_PATH);
@@ -179,7 +181,7 @@ public class TestBasicWidgetTree extends STFTest {
 
     @Test
     public void existsContextOfTreeItemInView() throws RemoteException {
-        alice.sarosBuddiesV.connectNoGUI(alice.jid, alice.password);
+        alice.sarosBot().buddiesView().connectNoGUI(alice.jid, alice.password);
         assertTrue(alice.bot().view(VIEW_SAROS_BUDDIES).bot_().tree()
             .selectTreeItemWithRegex(NODE_BUDDIES, "bob_stf.*")
             .existsContextMenu(CM_RENAME));
@@ -187,7 +189,7 @@ public class TestBasicWidgetTree extends STFTest {
 
     @Test
     public void existsSubmenuOfContextOfTreeItemInView() throws RemoteException {
-        alice.fileM.newJavaProject(PROJECT1);
+        alice.sarosBot().file().newJavaProject(PROJECT1);
         String[] contextNames = { CM_SAROS, CM_SHARE_PROJECT };
         assertTrue(alice.bot().view(VIEW_PACKAGE_EXPLORER).bot_().tree()
             .selectTreeItem(PROJECT1).existsContextMenu(contextNames));
@@ -196,7 +198,7 @@ public class TestBasicWidgetTree extends STFTest {
 
     @Test
     public void isContextOfTreeItemInViewEnabled() throws RemoteException {
-        alice.sarosBuddiesV.connectNoGUI(alice.jid, alice.password);
+        alice.sarosBot().buddiesView().connectNoGUI(alice.jid, alice.password);
         assertTrue(alice.bot().view(VIEW_SAROS_BUDDIES).bot_().tree()
             .selectTreeItemWithRegex(NODE_BUDDIES, "bob_stf.*")
             .isContextMenuEnabled(CM_RENAME));
@@ -209,7 +211,7 @@ public class TestBasicWidgetTree extends STFTest {
     @Test
     public void isSubmenuOfContextOfTreeItemInViewEnabled()
         throws RemoteException {
-        alice.fileM.newJavaProject(PROJECT1);
+        alice.sarosBot().file().newJavaProject(PROJECT1);
         String[] contextNames1 = { CM_SAROS, CM_SHARE_PROJECT };
         String[] contextNames2 = { CM_SAROS, CM_ADD_TO_SESSION };
         assertTrue(alice.bot().view(VIEW_PACKAGE_EXPLORER).bot_().tree()
@@ -221,7 +223,7 @@ public class TestBasicWidgetTree extends STFTest {
 
     @Test
     public void clickContextsOfTreeItemInView() throws RemoteException {
-        alice.sarosBuddiesV.connectNoGUI(alice.jid, alice.password);
+        alice.sarosBot().buddiesView().connectNoGUI(alice.jid, alice.password);
         alice.bot().view(VIEW_SAROS_BUDDIES).bot_().tree()
             .selectTreeItemWithRegex(NODE_BUDDIES, "bob_stf.*")
             .contextMenu(CM_RENAME).click();
@@ -230,7 +232,7 @@ public class TestBasicWidgetTree extends STFTest {
 
     @Test
     public void clickSubMenuOfContextsOfTreeItemInView() throws RemoteException {
-        alice.fileM.newJavaProject(PROJECT1);
+        alice.sarosBot().file().newJavaProject(PROJECT1);
 
         alice.bot().view(VIEW_PACKAGE_EXPLORER).bot_().tree()
             .selectTreeItem(PROJECT1).contextMenu(CM_SAROS, CM_SHARE_PROJECT)

@@ -36,10 +36,10 @@ public class TestFolderOperations extends STFTest {
 
     @Before
     public void runBeforeEveryTest() throws RemoteException {
-        if (!alice.fileM.existsClassNoGUI(PROJECT1, PKG1, CLS1))
-            alice.fileM.newClass(PROJECT1, PKG1, CLS1);
-        if (!alice.fileM.existsFolderNoGUI(PROJECT1, FOLDER1))
-            alice.fileM.newFolder(PROJECT1, FOLDER1);
+        if (!alice.sarosBot().file().existsClassNoGUI(PROJECT1, PKG1, CLS1))
+            alice.sarosBot().file().newClass(PROJECT1, PKG1, CLS1);
+        if (!alice.sarosBot().file().existsFolderNoGUI(PROJECT1, FOLDER1))
+            alice.sarosBot().file().newFolder(PROJECT1, FOLDER1);
     }
 
     /**
@@ -58,10 +58,11 @@ public class TestFolderOperations extends STFTest {
     @Test
     public void testRenameFolder() throws RemoteException {
         final String newFolderName = FOLDER1 + "New";
-        alice.pEV.selectFolder(PROJECT1, FOLDER1);
-        alice.refactorM.renameFolder(newFolderName);
-        bob.fileM.waitUntilFolderExists(PROJECT1, newFolderName);
-        assertTrue(bob.fileM.existsFolderNoGUI(PROJECT1, newFolderName));
-        assertFalse(bob.fileM.existsFolderNoGUI(PROJECT1, FOLDER1));
+        alice.sarosBot().packageExplorerView().selectFolder(PROJECT1, FOLDER1);
+        alice.sarosBot().refactor().renameFolder(newFolderName);
+        bob.sarosBot().file().waitUntilFolderExists(PROJECT1, newFolderName);
+        assertTrue(bob.sarosBot().file()
+            .existsFolderNoGUI(PROJECT1, newFolderName));
+        assertFalse(bob.sarosBot().file().existsFolderNoGUI(PROJECT1, FOLDER1));
     }
 }

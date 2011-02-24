@@ -267,7 +267,7 @@ public interface SessionView extends SarosComponent {
      * @param localJID
      * @throws RemoteException
      */
-    public void setJID(JID localJID) throws RemoteException;
+    // public void setJID(JID localJID) throws RemoteException;
 
     /**
      * This function do same as the

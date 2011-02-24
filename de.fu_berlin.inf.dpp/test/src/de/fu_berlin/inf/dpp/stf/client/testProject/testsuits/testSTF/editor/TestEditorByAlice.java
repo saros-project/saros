@@ -32,10 +32,10 @@ public class TestEditorByAlice extends STFTest {
 
     @Test
     public void testTypeInEditor() throws RemoteException {
-        alice.fileM.newProject(PROJECT1);
+        alice.sarosBot().file().newProject(PROJECT1);
         String fileName = "test.txt";
         String[] path = { PROJECT1, fileName };
-        alice.fileM.newFile(path);
+        alice.sarosBot().file().newFile(path);
         alice.bot().editor(fileName).waitUntilIsActive();
 
         String expected = "Hello World";
@@ -45,7 +45,7 @@ public class TestEditorByAlice extends STFTest {
 
     @Test
     public void testDeleteInEditor() throws RemoteException {
-        alice.fileM.newJavaProjectWithClasses(PROJECT1, PKG1, CLS1);
+        alice.sarosBot().file().newJavaProjectWithClasses(PROJECT1, PKG1, CLS1);
         alice.openC.openClass(VIEW_PACKAGE_EXPLORER, PROJECT1, PKG1, CLS1);
         alice.bot().editor(CLS1_SUFFIX).waitUntilIsActive();
         String fileName = CLS1 + ".java";
@@ -59,7 +59,7 @@ public class TestEditorByAlice extends STFTest {
 
     @Test
     public void testEnterInEditor() throws RemoteException {
-        alice.fileM.newJavaProjectWithClasses(PROJECT1, PKG1, CLS1);
+        alice.sarosBot().file().newJavaProjectWithClasses(PROJECT1, PKG1, CLS1);
         alice.openC.openClass(VIEW_PACKAGE_EXPLORER, PROJECT1, PKG1, CLS1);
         alice.bot().editor(CLS1_SUFFIX).waitUntilIsActive();
         String fileName = CLS1 + ".java";
@@ -72,7 +72,7 @@ public class TestEditorByAlice extends STFTest {
 
     @Test
     public void autoComplateProposal() throws RemoteException {
-        alice.fileM.newJavaProjectWithClasses(PROJECT1, PKG1, CLS1);
+        alice.sarosBot().file().newJavaProjectWithClasses(PROJECT1, PKG1, CLS1);
         alice.openC.openClass(VIEW_PACKAGE_EXPLORER, PROJECT1, PKG1, CLS1);
         alice.bot().editor(CLS1_SUFFIX).waitUntilIsActive();
         alice.bot().editor(CLS1_SUFFIX).navigateTo(3, 0);
@@ -86,7 +86,7 @@ public class TestEditorByAlice extends STFTest {
 
     @Test
     public void getAutoComplateProposal() throws RemoteException {
-        alice.fileM.newJavaProjectWithClasses(PROJECT1, PKG1, CLS1);
+        alice.sarosBot().file().newJavaProjectWithClasses(PROJECT1, PKG1, CLS1);
         alice.openC.openClass(VIEW_PACKAGE_EXPLORER, PROJECT1, PKG1, CLS1);
         alice.bot().editor(CLS1_SUFFIX).waitUntilIsActive();
         alice.bot().editor(CLS1_SUFFIX).navigateTo(3, 0);
@@ -102,7 +102,7 @@ public class TestEditorByAlice extends STFTest {
 
     @Test
     public void pressShortCutSave() throws RemoteException {
-        alice.fileM.newJavaProjectWithClasses(PROJECT1, PKG1, CLS1);
+        alice.sarosBot().file().newJavaProjectWithClasses(PROJECT1, PKG1, CLS1);
         alice.openC.openClass(VIEW_PACKAGE_EXPLORER, PROJECT1, PKG1, CLS1);
         alice.bot().editor(CLS1_SUFFIX).waitUntilIsActive();
         alice.bot().editor(CLS1_SUFFIX).navigateTo(3, 0);
@@ -115,8 +115,9 @@ public class TestEditorByAlice extends STFTest {
 
     @Test
     public void quickFix() throws RemoteException {
-        alice.fileM.newJavaProject(PROJECT1);
-        alice.fileM.newClassImplementsRunnable(PROJECT1, PKG1, CLS1);
+        alice.sarosBot().file().newJavaProject(PROJECT1);
+        alice.sarosBot().file()
+            .newClassImplementsRunnable(PROJECT1, PKG1, CLS1);
         alice.bot().editor(CLS1_SUFFIX).pressShortCutNextAnnotation();
         alice.bot().editor(CLS1_SUFFIX).quickfix("Add unimplemented methods");
         assertContains("public void run()", alice.bot().editor(CLS1_SUFFIX)
@@ -129,8 +130,8 @@ public class TestEditorByAlice extends STFTest {
 
     @Test
     public void getSelection() throws RemoteException {
-        alice.fileM.newProject(PROJECT1);
-        alice.fileM.newFile(PROJECT1, FILE1);
+        alice.sarosBot().file().newProject(PROJECT1);
+        alice.sarosBot().file().newFile(PROJECT1, FILE1);
         alice.bot().editor(FILE1).navigateTo(0, 0);
         alice.bot().editor(FILE1).typeText("pleese");
         alice.bot().editor(FILE1).selectRange(0, 0, 6);
@@ -140,8 +141,8 @@ public class TestEditorByAlice extends STFTest {
 
     @Test
     public void quickFixWithSpellChecker() throws RemoteException {
-        alice.fileM.newProject(PROJECT1);
-        alice.fileM.newFile(PROJECT1, FILE1);
+        alice.sarosBot().file().newProject(PROJECT1);
+        alice.sarosBot().file().newFile(PROJECT1, FILE1);
         alice.bot().editor(FILE1).typeText("pleese open the window");
         alice.bot().editor(FILE1).selectLine(0);
         alice.bot().editor(FILE1).quickfix(0);
@@ -151,8 +152,9 @@ public class TestEditorByAlice extends STFTest {
 
     @Test
     public void allTogether() throws RemoteException {
-        alice.fileM.newJavaProject(PROJECT1);
-        alice.fileM.newClassImplementsRunnable(PROJECT1, PKG1, CLS1);
+        alice.sarosBot().file().newJavaProject(PROJECT1);
+        alice.sarosBot().file()
+            .newClassImplementsRunnable(PROJECT1, PKG1, CLS1);
         alice.bot().editor(CLS1_SUFFIX).pressShortCutNextAnnotation();
         alice.bot().editor(CLS1_SUFFIX).quickfix("Add unimplemented methods");
         assertContains("public void run()", alice.bot().editor(CLS1_SUFFIX)
@@ -192,8 +194,9 @@ public class TestEditorByAlice extends STFTest {
         assertFalse(alice.bot().editor(CLS1_SUFFIX).isDirty());
         alice.bot().sleep(100);
         alice.bot().editor(CLS1_SUFFIX).pressShortRunAsJavaApplication();
-        alice.consoleV.waitUntilTextInViewConsoleExists();
-        assertContains("Hello World", alice.consoleV.getTextInConsole());
+        alice.sarosBot().consoleView().waitUntilTextInViewConsoleExists();
+        assertContains("Hello World", alice.sarosBot().consoleView()
+            .getTextInConsole());
 
     }
 }

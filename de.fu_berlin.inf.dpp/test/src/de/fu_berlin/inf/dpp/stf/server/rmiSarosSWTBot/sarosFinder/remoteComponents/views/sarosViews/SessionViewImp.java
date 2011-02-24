@@ -386,9 +386,9 @@ public class SessionViewImp extends SarosComponentImp implements SessionView {
         return allParticipantsName;
     }
 
-    public void setJID(JID jid) throws RemoteException {
-        localJID = jid;
-    }
+    // public void setJID(JID jid) throws RemoteException {
+    // localJID = jid;
+    // }
 
     /**********************************************
      * 

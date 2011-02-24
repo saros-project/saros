@@ -37,9 +37,9 @@ public class TestFollowMode extends STFTest {
     public void testBobFollowAlice() throws IOException, CoreException {
         alice.openC.openClass(VIEW_PACKAGE_EXPLORER, PROJECT1, PKG1, CLS1);
         alice.bot().editor(CLS1_SUFFIX).setTexWithSave(CP1);
-        bob.sarosSessionV.followThisBuddy(alice.jid);
+        bob.sarosBot().sessionView().followThisBuddy(alice.jid);
         bob.bot().editor(CLS1_SUFFIX).waitUntilIsActive();
-        assertTrue(bob.sarosSessionV.isInFollowModeNoGUI());
+        assertTrue(bob.sarosBot().sessionView().isInFollowModeNoGUI());
         assertTrue(bob.bot().editor(CLS1_SUFFIX).isActive());
 
         String clsContentOfAlice = alice.noBot().getFileContent(
@@ -51,17 +51,17 @@ public class TestFollowMode extends STFTest {
             getClassPath(PROJECT1, PKG1, CLS1));
         assertTrue(clsContentOfBob.equals(clsContentOfAlice));
 
-        alice.fileM.newClass(PROJECT1, PKG1, CLS2);
+        alice.sarosBot().file().newClass(PROJECT1, PKG1, CLS2);
         bob.bot().editor(CLS2_SUFFIX).waitUntilIsActive();
         assertTrue(bob.bot().editor(CLS2_SUFFIX).isActive());
 
-        alice.sarosSessionV.followThisBuddy(bob.jid);
+        alice.sarosBot().sessionView().followThisBuddy(bob.jid);
         bob.bot().editor(CLS1_SUFFIX).activate();
         alice.bot().editor(CLS1_SUFFIX).waitUntilIsActive();
-        assertTrue(alice.sarosSessionV.isInFollowModeNoGUI());
+        assertTrue(alice.sarosBot().sessionView().isInFollowModeNoGUI());
         assertTrue(alice.bot().editor(CLS1_SUFFIX).isActive());
 
-        // bob.sarosSessionV.followThisBuddy(alice.jid);
+        // bob.sarosBot().sessionView().followThisBuddy(alice.jid);
         // alice.fileM.newClass(PROJECT1, PKG1, CLS3);
         // alice.editor.waitUntilJavaEditorActive(CLS3);
         // alice.bot().editor(CLS3_SUFFIX).setTextAndSave(CP3);

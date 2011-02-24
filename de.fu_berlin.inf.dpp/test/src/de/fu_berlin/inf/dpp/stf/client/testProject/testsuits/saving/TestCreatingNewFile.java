@@ -46,12 +46,14 @@ public class TestCreatingNewFile extends STFTest {
 
     @Test
     public void testCarlCreateANewFile() throws IOException, CoreException {
-        carl.fileM.newFolder(PROJECT1, FOLDER1);
-        carl.fileM.newFile(PROJECT1, FOLDER1, FILE1);
-        alice.fileM.waitUntilFileExists(PROJECT1, FOLDER1, FILE1);
-        assertTrue(alice.fileM.existsFileNoGUI(PROJECT1, FOLDER1, FILE1));
-        bob.fileM.waitUntilFileExists(PROJECT1, FOLDER1, FILE1);
-        assertTrue(bob.fileM.existsFileNoGUI(PROJECT1, FOLDER1, FILE1));
+        carl.sarosBot().file().newFolder(PROJECT1, FOLDER1);
+        carl.sarosBot().file().newFile(PROJECT1, FOLDER1, FILE1);
+        alice.sarosBot().file().waitUntilFileExists(PROJECT1, FOLDER1, FILE1);
+        assertTrue(alice.sarosBot().file()
+            .existsFileNoGUI(PROJECT1, FOLDER1, FILE1));
+        bob.sarosBot().file().waitUntilFileExists(PROJECT1, FOLDER1, FILE1);
+        assertTrue(bob.sarosBot().file()
+            .existsFileNoGUI(PROJECT1, FOLDER1, FILE1));
     }
 
     /**
@@ -82,26 +84,30 @@ public class TestCreatingNewFile extends STFTest {
     public void testCarlGrantWriteAccess() throws IOException, CoreException,
         InterruptedException {
 
-        carl.sarosSessionV.restrictToReadOnlyAccess(carl.jid);
-        assertFalse(carl.sarosSessionV.hasWriteAccessNoGUI());
-        assertTrue(alice.sarosSessionV.hasWriteAccessNoGUI());
+        carl.sarosBot().sessionView().restrictToReadOnlyAccess(carl.jid);
+        assertFalse(carl.sarosBot().sessionView().hasWriteAccessNoGUI());
+        assertTrue(alice.sarosBot().sessionView().hasWriteAccessNoGUI());
 
-        carl.fileM.newFolder(PROJECT1, FOLDER1);
-        carl.fileM.newFile(PROJECT1, FOLDER1, FILE1);
+        carl.sarosBot().file().newFolder(PROJECT1, FOLDER1);
+        carl.sarosBot().file().newFile(PROJECT1, FOLDER1, FILE1);
         waitsUntilTransferedDataIsArrived(alice);
-        assertFalse(alice.fileM.existsFileNoGUI(PROJECT1, FOLDER1, FILE1));
+        assertFalse(alice.sarosBot().file()
+            .existsFileNoGUI(PROJECT1, FOLDER1, FILE1));
         waitsUntilTransferedDataIsArrived(bob);
-        assertFalse(bob.fileM.existsFileNoGUI(PROJECT1, FOLDER1, FILE1));
+        assertFalse(bob.sarosBot().file()
+            .existsFileNoGUI(PROJECT1, FOLDER1, FILE1));
 
         setFollowMode(alice, carl, bob);
 
-        alice.fileM.newFolder(PROJECT1, FOLDER2);
-        alice.fileM.newFile(PROJECT1, FOLDER2, FILE2);
+        alice.sarosBot().file().newFolder(PROJECT1, FOLDER2);
+        alice.sarosBot().file().newFile(PROJECT1, FOLDER2, FILE2);
 
-        carl.fileM.waitUntilFileExists(PROJECT1, FOLDER2, FILE2);
-        assertTrue(carl.fileM.existsFileNoGUI(PROJECT1, FOLDER2, FILE2));
-        bob.fileM.waitUntilFileExists(PROJECT1, FOLDER2, FILE2);
-        assertTrue(bob.fileM.existsFileNoGUI(PROJECT1, FOLDER2, FILE2));
+        carl.sarosBot().file().waitUntilFileExists(PROJECT1, FOLDER2, FILE2);
+        assertTrue(carl.sarosBot().file()
+            .existsFileNoGUI(PROJECT1, FOLDER2, FILE2));
+        bob.sarosBot().file().waitUntilFileExists(PROJECT1, FOLDER2, FILE2);
+        assertTrue(bob.sarosBot().file()
+            .existsFileNoGUI(PROJECT1, FOLDER2, FILE2));
 
         alice.bot().editor(FILE2).setTexWithSave(CP1);
 

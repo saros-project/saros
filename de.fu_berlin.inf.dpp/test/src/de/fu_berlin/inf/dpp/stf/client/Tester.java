@@ -6,27 +6,14 @@ import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 
-import org.apache.log4j.Logger;
-
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.stf.STF;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.STFWorkbenchBot;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.noFinder.NoBot;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.SarosBot;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.contextMenu.OpenC;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.contextMenu.SarosC;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.contextMenu.TeamC;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.menuBar.EditM;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.menuBar.FileM;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.menuBar.RefactorM;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.menuBar.SarosM;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.menuBar.WindowM;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.views.ConsoleView;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.views.PEView;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.views.ProgressView;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.views.sarosViews.ChatView;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.views.sarosViews.RSView;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.views.sarosViews.RosterView;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.views.sarosViews.SessionView;
 
 /**
  * Tester encapsulates a test instance of Saros. It takes use of all RMI
@@ -34,25 +21,10 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponen
  * for Sandor's Test Framework.
  */
 public class Tester extends STF {
-    private static final Logger log = Logger.getLogger(Tester.class);
 
-    public PEView pEV;
-    public ProgressView progressV;
-    public RosterView sarosBuddiesV;
-    public SessionView sarosSessionV;
-    public RSView rSV;
-    public ChatView chatV;
-    public ConsoleView consoleV;
-
-    public STFWorkbenchBot bot;
-    public NoBot noBot;
-
-    // menuBar
-    public FileM fileM;
-    public EditM editM;
-    public RefactorM refactorM;
-    public WindowM windowM;
-    public SarosM sarosM;
+    private STFWorkbenchBot bot;
+    private NoBot noBot;
+    private SarosBot sarosBot;
 
     // contextMenu
     public TeamC team;
@@ -87,26 +59,7 @@ public class Tester extends STF {
 
             bot = (STFWorkbenchBot) registry.lookup("bot");
             noBot = (NoBot) registry.lookup("noBot");
-
-            chatV = (ChatView) registry.lookup("chatView");
-            sarosBuddiesV = (RosterView) registry.lookup("rosterView");
-            sarosSessionV = (SessionView) registry.lookup("sessionView");
-            /*
-             * TODO i am not sure, if i can pass the local value to remote
-             * object. It worked for the local tests, but i don't know if it
-             * work for the remote tests too.
-             */
-            sarosSessionV.setJID(jid);
-            rSV = (RSView) registry.lookup("remoteScreenView");
-            pEV = (PEView) registry.lookup("packageExplorerView");
-            progressV = (ProgressView) registry.lookup("progressView");
-            consoleV = (ConsoleView) registry.lookup("consoleView");
-
-            fileM = (FileM) registry.lookup("fileM");
-            editM = (EditM) registry.lookup("editM");
-            refactorM = (RefactorM) registry.lookup("refactorM");
-            windowM = (WindowM) registry.lookup("windowM");
-            sarosM = (SarosM) registry.lookup("sarosM");
+            sarosBot = (SarosBot) registry.lookup("sarosBot");
 
             // contextMenu
             team = (TeamC) registry.lookup("team");
@@ -151,5 +104,10 @@ public class Tester extends STF {
 
     public NoBot noBot() {
         return noBot;
+    }
+
+    public SarosBot sarosBot() throws RemoteException {
+        sarosBot.setJID(jid);
+        return sarosBot;
     }
 }

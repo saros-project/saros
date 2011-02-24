@@ -34,8 +34,10 @@ public class TestHostInvitesBelatedly extends STFTest {
         initTesters(TypeOfTester.ALICE, TypeOfTester.BOB, TypeOfTester.CARL);
         setUpWorkbench();
         setUpSaros();
-        alice.fileM.newJavaProjectWithClasses(PROJECT1, PKG1, CLS1, CLS2);
-        bob.fileM.newJavaProjectWithClasses(PROJECT1, PKG1, CLS1, CLS2);
+        alice.sarosBot().file()
+            .newJavaProjectWithClasses(PROJECT1, PKG1, CLS1, CLS2);
+        bob.sarosBot().file()
+            .newJavaProjectWithClasses(PROJECT1, PKG1, CLS1, CLS2);
 
         /*
          * alice build session only with carl and is followed by carl.
@@ -95,10 +97,8 @@ public class TestHostInvitesBelatedly extends STFTest {
 
         inviteBuddies(PROJECT1, TypeOfCreateProject.EXIST_PROJECT, alice, bob);
 
-        bob.bot().editor(CLS1_SUFFIX)
-            .waitUntilIsTextSame(dirtyContent1ByAlice);
-        bob.bot().editor(CLS2_SUFFIX)
-            .waitUntilIsTextSame(dirtyContent2ByAlice);
+        bob.bot().editor(CLS1_SUFFIX).waitUntilIsTextSame(dirtyContent1ByAlice);
+        bob.bot().editor(CLS2_SUFFIX).waitUntilIsTextSame(dirtyContent2ByAlice);
 
         String CLSContentOfAlice = alice.bot().editor(CLS1_SUFFIX).getText();
         String CLS2ContentOfAlice = alice.bot().editor(CLS2_SUFFIX).getText();

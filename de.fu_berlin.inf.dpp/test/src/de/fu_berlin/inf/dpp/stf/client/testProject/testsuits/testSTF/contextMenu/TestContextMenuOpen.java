@@ -32,64 +32,68 @@ public class TestContextMenuOpen extends STFTest {
      **********************************************/
     @Test
     public void testOpenFile() throws RemoteException {
-        alice.fileM.newJavaProject(PROJECT1);
-        alice.fileM.newFolder(PROJECT1, FOLDER1);
-        alice.fileM.newFile(PROJECT1, FOLDER1, FILE1);
+        alice.sarosBot().file().newJavaProject(PROJECT1);
+        alice.sarosBot().file().newFolder(PROJECT1, FOLDER1);
+        alice.sarosBot().file().newFile(PROJECT1, FOLDER1, FILE1);
         assertTrue(alice.bot().isEditorOpen(FILE1));
         alice.bot().editor(FILE1).closeWithSave();
         assertFalse(alice.bot().isEditorOpen(FILE1));
         alice.openC.openFile(VIEW_PACKAGE_EXPLORER, PROJECT1, FOLDER1, FILE1);
         assertTrue(alice.bot().isEditorOpen(FILE1));
-        alice.pEV.selectFile(PROJECT1, FOLDER1, FILE1);
-        alice.editM.deleteFile();
+        alice.sarosBot().packageExplorerView()
+            .selectFile(PROJECT1, FOLDER1, FILE1);
+        alice.sarosBot().edit().deleteFile();
         assertFalse(alice.bot().isEditorOpen(FILE1));
     }
 
     @Test
     public void testOpenClass() throws RemoteException {
-        alice.fileM.newJavaProjectWithClasses(PROJECT1, PKG1, CLS1);
+        alice.sarosBot().file().newJavaProjectWithClasses(PROJECT1, PKG1, CLS1);
         assertTrue(alice.bot().isEditorOpen(CLS1_SUFFIX));
         alice.bot().editor(CLS1 + SUFFIX_JAVA).closeWithSave();
         assertFalse(alice.bot().isEditorOpen(CLS1_SUFFIX));
         alice.openC.openClass(VIEW_PACKAGE_EXPLORER, PROJECT1, PKG1, CLS1);
         assertTrue(alice.bot().isEditorOpen(CLS1_SUFFIX));
-        alice.pEV.selectClass(PROJECT1, PKG1, CLS1);
-        alice.editM.deleteFile();
+        alice.sarosBot().packageExplorerView()
+            .selectClass(PROJECT1, PKG1, CLS1);
+        alice.sarosBot().edit().deleteFile();
         assertFalse(alice.bot().isEditorOpen(CLS1_SUFFIX));
     }
 
     @Test
     public void testOpenClassWith() throws RemoteException {
-        alice.fileM.newJavaProjectWithClasses(PROJECT1, PKG1, CLS1);
+        alice.sarosBot().file().newJavaProjectWithClasses(PROJECT1, PKG1, CLS1);
         assertTrue(alice.bot().isEditorOpen(CLS1_SUFFIX));
         alice.bot().editor(CLS1 + SUFFIX_JAVA).closeWithSave();
         assertFalse(alice.bot().isEditorOpen(CLS1_SUFFIX));
         alice.openC.openClassWith(VIEW_PACKAGE_EXPLORER,
             CM_OPEN_WITH_TEXT_EDITOR, PROJECT1, PKG1, CLS1);
         assertTrue(alice.bot().isEditorOpen(CLS1_SUFFIX));
-        alice.pEV.selectClass(PROJECT1, PKG1, CLS1);
-        alice.editM.deleteFile();
+        alice.sarosBot().packageExplorerView()
+            .selectClass(PROJECT1, PKG1, CLS1);
+        alice.sarosBot().edit().deleteFile();
         assertFalse(alice.bot().isEditorOpen(CLS1_SUFFIX));
     }
 
     @Test
     public void testOpenFileWith() throws RemoteException {
-        alice.fileM.newJavaProject(PROJECT1);
-        alice.fileM.newFolder(PROJECT1, FOLDER1);
-        alice.fileM.newFile(PROJECT1, FOLDER1, FILE1);
+        alice.sarosBot().file().newJavaProject(PROJECT1);
+        alice.sarosBot().file().newFolder(PROJECT1, FOLDER1);
+        alice.sarosBot().file().newFile(PROJECT1, FOLDER1, FILE1);
         alice.bot().editor(FILE1).closeWithSave();
         alice.openC.openFileWith(VIEW_PACKAGE_EXPLORER,
             CM_OPEN_WITH_TEXT_EDITOR, PROJECT1, FOLDER1, FILE1);
         assertTrue(alice.bot().isEditorOpen(FILE1));
-        alice.pEV.selectFile(PROJECT1, FOLDER1, FILE1);
-        alice.editM.deleteFile();
+        alice.sarosBot().packageExplorerView()
+            .selectFile(PROJECT1, FOLDER1, FILE1);
+        alice.sarosBot().edit().deleteFile();
         assertFalse(alice.bot().isEditorOpen(FILE1));
     }
 
     @Test
     @Ignore("Can't close the external editor")
     public void testOpenFileWithSystemEditor() throws RemoteException {
-        alice.fileM.newJavaProjectWithClasses(PROJECT1, PKG1, CLS1);
+        alice.sarosBot().file().newJavaProjectWithClasses(PROJECT1, PKG1, CLS1);
         alice.openC.openClassWith(VIEW_PACKAGE_EXPLORER,
             CM_OPEN_WITH_TEXT_EDITOR, PROJECT1, PKG1, CLS1);
         alice.openC.openClassWithSystemEditorNoGUI(PROJECT1, PKG1, CLS1);

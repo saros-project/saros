@@ -81,42 +81,42 @@ public class TestRosterView extends STFTest {
      */
     @Test
     public void renameBuddyWithGUI() throws RemoteException {
-        assertTrue(alice.sarosBuddiesV.hasBuddyNoGUI(bob.jid));
-        alice.sarosBuddiesV.renameBuddy(bob.jid, bob.getName());
-        assertTrue(alice.sarosBuddiesV.hasBuddyNoGUI(bob.jid));
-        assertTrue(alice.sarosBuddiesV.getBuddyNickNameNoGUI(bob.jid).equals(
-            bob.getName()));
+        assertTrue(alice.sarosBot().buddiesView().hasBuddyNoGUI(bob.jid));
+        alice.sarosBot().buddiesView().renameBuddy(bob.jid, bob.getName());
+        assertTrue(alice.sarosBot().buddiesView().hasBuddyNoGUI(bob.jid));
+        assertTrue(alice.sarosBot().buddiesView()
+            .getBuddyNickNameNoGUI(bob.jid).equals(bob.getName()));
         // assertTrue(alice.sessionV.isContactInSessionView(bob.jid));
-        alice.sarosBuddiesV.renameBuddy(bob.jid, "new bob");
-        assertTrue(alice.sarosBuddiesV.hasBuddyNoGUI(bob.jid));
-        assertTrue(alice.sarosBuddiesV.getBuddyNickNameNoGUI(bob.jid).equals(
-            "new bob"));
+        alice.sarosBot().buddiesView().renameBuddy(bob.jid, "new bob");
+        assertTrue(alice.sarosBot().buddiesView().hasBuddyNoGUI(bob.jid));
+        assertTrue(alice.sarosBot().buddiesView()
+            .getBuddyNickNameNoGUI(bob.jid).equals("new bob"));
         // assertTrue(alice.sessionV.isContactInSessionView(bob.jid));
     }
 
     @Test
     public void renameBuddyWithoutGUI() throws RemoteException {
-        assertTrue(alice.sarosBuddiesV.hasBuddyNoGUI(bob.jid));
-        alice.sarosBuddiesV.renameBuddyNoGUI(bob.jid, bob.getName());
-        assertTrue(alice.sarosBuddiesV.hasBuddyNoGUI(bob.jid));
-        assertTrue(alice.sarosBuddiesV.getBuddyNickNameNoGUI(bob.jid).equals(
-            bob.getName()));
+        assertTrue(alice.sarosBot().buddiesView().hasBuddyNoGUI(bob.jid));
+        alice.sarosBot().buddiesView().renameBuddyNoGUI(bob.jid, bob.getName());
+        assertTrue(alice.sarosBot().buddiesView().hasBuddyNoGUI(bob.jid));
+        assertTrue(alice.sarosBot().buddiesView()
+            .getBuddyNickNameNoGUI(bob.jid).equals(bob.getName()));
         // assertTrue(alice.sessionV.isContactInSessionView(bob.jid));
-        alice.sarosBuddiesV.renameBuddyNoGUI(bob.jid, "new bob");
-        assertTrue(alice.sarosBuddiesV.hasBuddyNoGUI(bob.jid));
-        assertTrue(alice.sarosBuddiesV.getBuddyNickNameNoGUI(bob.jid).equals(
-            "new bob"));
+        alice.sarosBot().buddiesView().renameBuddyNoGUI(bob.jid, "new bob");
+        assertTrue(alice.sarosBot().buddiesView().hasBuddyNoGUI(bob.jid));
+        assertTrue(alice.sarosBot().buddiesView()
+            .getBuddyNickNameNoGUI(bob.jid).equals("new bob"));
         // assertTrue(alice.sessionV.isContactInSessionView(bob.jid));
     }
 
     @Test
     public void addBuddyWithGUI() throws RemoteException {
         deleteBuddies(alice, bob);
-        assertFalse(alice.sarosBuddiesV.hasBuddyNoGUI(bob.jid));
-        assertFalse(bob.sarosBuddiesV.hasBuddyNoGUI(alice.jid));
+        assertFalse(alice.sarosBot().buddiesView().hasBuddyNoGUI(bob.jid));
+        assertFalse(bob.sarosBot().buddiesView().hasBuddyNoGUI(alice.jid));
         addBuddies(alice, bob);
-        assertTrue(alice.sarosBuddiesV.hasBuddyNoGUI(bob.jid));
-        assertTrue(bob.sarosBuddiesV.hasBuddyNoGUI(alice.jid));
+        assertTrue(alice.sarosBot().buddiesView().hasBuddyNoGUI(bob.jid));
+        assertTrue(bob.sarosBot().buddiesView().hasBuddyNoGUI(alice.jid));
     }
 
     /**
@@ -130,11 +130,11 @@ public class TestRosterView extends STFTest {
     @Ignore
     public void addBuddyWithoutGUI() throws RemoteException, XMPPException {
         deleteBuddies(alice, bob);
-        assertFalse(alice.sarosBuddiesV.hasBuddyNoGUI(bob.jid));
-        assertFalse(bob.sarosBuddiesV.hasBuddyNoGUI(alice.jid));
+        assertFalse(alice.sarosBot().buddiesView().hasBuddyNoGUI(bob.jid));
+        assertFalse(bob.sarosBot().buddiesView().hasBuddyNoGUI(alice.jid));
         addBuddies(alice, bob);
-        assertTrue(alice.sarosBuddiesV.hasBuddyNoGUI(bob.jid));
-        assertTrue(bob.sarosBuddiesV.hasBuddyNoGUI(alice.jid));
+        assertTrue(alice.sarosBot().buddiesView().hasBuddyNoGUI(bob.jid));
+        assertTrue(bob.sarosBot().buddiesView().hasBuddyNoGUI(alice.jid));
     }
 
     /**
@@ -152,18 +152,18 @@ public class TestRosterView extends STFTest {
      */
     @Test
     public void deleteBuddy() throws RemoteException {
-        assertTrue(alice.sarosBuddiesV.hasBuddyNoGUI(bob.jid));
+        assertTrue(alice.sarosBot().buddiesView().hasBuddyNoGUI(bob.jid));
         deleteBuddies(alice, bob);
-        assertFalse(alice.sarosBuddiesV.hasBuddyNoGUI(bob.jid));
-        assertFalse(bob.sarosBuddiesV.hasBuddyNoGUI(alice.jid));
+        assertFalse(alice.sarosBot().buddiesView().hasBuddyNoGUI(bob.jid));
+        assertFalse(bob.sarosBot().buddiesView().hasBuddyNoGUI(alice.jid));
     }
 
     @Test
     public void deleteBuddyNoGUI() throws RemoteException, XMPPException {
-        assertTrue(alice.sarosBuddiesV.hasBuddyNoGUI(bob.jid));
+        assertTrue(alice.sarosBot().buddiesView().hasBuddyNoGUI(bob.jid));
         deleteBuddiesNoGUI(alice, bob);
-        assertFalse(alice.sarosBuddiesV.hasBuddyNoGUI(bob.jid));
-        assertFalse(bob.sarosBuddiesV.hasBuddyNoGUI(alice.jid));
+        assertFalse(alice.sarosBot().buddiesView().hasBuddyNoGUI(bob.jid));
+        assertFalse(bob.sarosBot().buddiesView().hasBuddyNoGUI(alice.jid));
     }
 
     /**
@@ -184,12 +184,12 @@ public class TestRosterView extends STFTest {
     public void inviteBuddyWithGUI() throws RemoteException,
         InterruptedException {
         setUpSessionWithAJavaProjectAndAClass(alice, bob);
-        assertFalse(carl.sarosSessionV.isInSession());
-        alice.sarosBuddiesV.inviteBuddy(carl.jid);
+        assertFalse(carl.sarosBot().sessionView().isInSession());
+        alice.sarosBot().buddiesView().inviteBuddy(carl.jid);
         carl.sarosC.confirmShellSessionnInvitation();
         carl.sarosC.confirmShellAddProjectWithNewProject(PROJECT1);
-        carl.sarosSessionV.waitUntilIsInSession();
-        assertTrue(carl.sarosSessionV.isInSession());
+        carl.sarosBot().sessionView().waitUntilIsInSession();
+        assertTrue(carl.sarosBot().sessionView().isInSession());
 
     }
 

@@ -32,82 +32,95 @@ public class TestMenuFile extends STFTest {
      **********************************************/
     @Test
     public void testNewProject() throws RemoteException {
-        alice.fileM.newProject(PROJECT1);
-        assertTrue(alice.fileM.existsProjectNoGUI(PROJECT1));
+        alice.sarosBot().file().newProject(PROJECT1);
+        assertTrue(alice.sarosBot().file().existsProjectNoGUI(PROJECT1));
     }
 
     @Test
     public void testNewJavaProject() throws RemoteException {
-        alice.fileM.newJavaProject(PROJECT1);
-        assertTrue(alice.fileM.existsProjectNoGUI(PROJECT1));
+        alice.sarosBot().file().newJavaProject(PROJECT1);
+        assertTrue(alice.sarosBot().file().existsProjectNoGUI(PROJECT1));
     }
 
     @Test
     public void testNewFolder() throws RemoteException {
-        alice.fileM.newJavaProject(PROJECT1);
-        alice.fileM.newFolder(PROJECT1, FOLDER1);
-        alice.fileM.newFolder(PROJECT1, FOLDER1, FOLDER2);
-        assertTrue(alice.fileM.existsFolderNoGUI(PROJECT1, FOLDER1));
-        assertTrue(alice.fileM.existsFolderNoGUI(PROJECT1, FOLDER1, FOLDER2));
-        alice.editM.deleteFolderNoGUI(PROJECT1, FOLDER1, FOLDER2);
-        assertFalse(alice.fileM.existsFolderNoGUI(PROJECT1, FOLDER1, FOLDER2));
-        alice.editM.deleteFolderNoGUI(PROJECT1, FOLDER1);
-        assertFalse(alice.fileM.existsFolderNoGUI(PROJECT1, FOLDER1));
+        alice.sarosBot().file().newJavaProject(PROJECT1);
+        alice.sarosBot().file().newFolder(PROJECT1, FOLDER1);
+        alice.sarosBot().file().newFolder(PROJECT1, FOLDER1, FOLDER2);
+        assertTrue(alice.sarosBot().file().existsFolderNoGUI(PROJECT1, FOLDER1));
+        assertTrue(alice.sarosBot().file()
+            .existsFolderNoGUI(PROJECT1, FOLDER1, FOLDER2));
+        alice.sarosBot().edit().deleteFolderNoGUI(PROJECT1, FOLDER1, FOLDER2);
+        assertFalse(alice.sarosBot().file()
+            .existsFolderNoGUI(PROJECT1, FOLDER1, FOLDER2));
+        alice.sarosBot().edit().deleteFolderNoGUI(PROJECT1, FOLDER1);
+        assertFalse(alice.sarosBot().file()
+            .existsFolderNoGUI(PROJECT1, FOLDER1));
     }
 
     @Test
     public void testNewPackage() throws RemoteException {
-        alice.fileM.newJavaProject(PROJECT1);
-        alice.fileM.newPackage(PROJECT1, PKG1);
-        alice.fileM.newPackage(PROJECT1, PKG1 + ".subpkg");
-        assertTrue(alice.fileM.existsPkgNoGUI(PROJECT1, PKG1));
-        assertTrue(alice.fileM.existsPkgNoGUI(PROJECT1, PKG1 + ".subpkg"));
-        alice.editM.deletePkgNoGUI(PROJECT1, PKG1 + ".subpkg");
-        assertFalse(alice.fileM.existsPkgNoGUI(PROJECT1, PKG1 + ".subpkg"));
-        alice.editM.deletePkgNoGUI(PROJECT1, PKG1);
-        assertFalse(alice.fileM.existsPkgNoGUI(PROJECT1, PKG1));
+        alice.sarosBot().file().newJavaProject(PROJECT1);
+        alice.sarosBot().file().newPackage(PROJECT1, PKG1);
+        alice.sarosBot().file().newPackage(PROJECT1, PKG1 + ".subpkg");
+        assertTrue(alice.sarosBot().file().existsPkgNoGUI(PROJECT1, PKG1));
+        assertTrue(alice.sarosBot().file()
+            .existsPkgNoGUI(PROJECT1, PKG1 + ".subpkg"));
+        alice.sarosBot().edit().deletePkgNoGUI(PROJECT1, PKG1 + ".subpkg");
+        assertFalse(alice.sarosBot().file()
+            .existsPkgNoGUI(PROJECT1, PKG1 + ".subpkg"));
+        alice.sarosBot().edit().deletePkgNoGUI(PROJECT1, PKG1);
+        assertFalse(alice.sarosBot().file().existsPkgNoGUI(PROJECT1, PKG1));
     }
 
     @Test
     public void testNewFile() throws RemoteException {
-        alice.fileM.newProject(PROJECT1);
-        alice.fileM.newFolder(PROJECT1, FOLDER1);
-        alice.fileM.newFile(PROJECT1, FOLDER1, FILE1);
-        assertTrue(alice.fileM.existsFileNoGUI(PROJECT1, FOLDER1, FILE1));
+        alice.sarosBot().file().newProject(PROJECT1);
+        alice.sarosBot().file().newFolder(PROJECT1, FOLDER1);
+        alice.sarosBot().file().newFile(PROJECT1, FOLDER1, FILE1);
+        assertTrue(alice.sarosBot().file()
+            .existsFileNoGUI(PROJECT1, FOLDER1, FILE1));
     }
 
     @Test
     public void testNewClass() throws RemoteException {
-        alice.fileM.newJavaProject(PROJECT1);
-        alice.fileM.newClass(PROJECT1, PKG1, CLS1);
-        assertTrue(alice.fileM.existsClassNoGUI(PROJECT1, PKG1, CLS1));
+        alice.sarosBot().file().newJavaProject(PROJECT1);
+        alice.sarosBot().file().newClass(PROJECT1, PKG1, CLS1);
+        assertTrue(alice.sarosBot().file()
+            .existsClassNoGUI(PROJECT1, PKG1, CLS1));
     }
 
     @Test
     @Ignore
     public void test_newProjectWithClass() throws RemoteException {
-        assertFalse(alice.fileM.existsProjectNoGUI(PROJECT1));
-        alice.fileM.newJavaProjectWithClasses(PROJECT1, "pkg", "Cls");
-        assertTrue(alice.fileM.existsProjectNoGUI(PROJECT1));
-        assertTrue(alice.fileM.existsClassNoGUI(PROJECT1, "pkg", "Cls"));
+        assertFalse(alice.sarosBot().file().existsProjectNoGUI(PROJECT1));
+        alice.sarosBot().file()
+            .newJavaProjectWithClasses(PROJECT1, "pkg", "Cls");
+        assertTrue(alice.sarosBot().file().existsProjectNoGUI(PROJECT1));
+        assertTrue(alice.sarosBot().file()
+            .existsClassNoGUI(PROJECT1, "pkg", "Cls"));
     }
 
     @Test
     @Ignore
     public void test_newProjectWithClass_2() throws RemoteException {
-        assertFalse(alice.fileM.existsProjectNoGUI(PROJECT1));
-        alice.fileM.newJavaProjectWithClasses(PROJECT1, "pkg", "Cls");
-        assertTrue(alice.fileM.existsProjectNoGUI(PROJECT1));
-        assertTrue(alice.fileM.existsClassNoGUI(PROJECT1, "pkg", "Cls"));
+        assertFalse(alice.sarosBot().file().existsProjectNoGUI(PROJECT1));
+        alice.sarosBot().file()
+            .newJavaProjectWithClasses(PROJECT1, "pkg", "Cls");
+        assertTrue(alice.sarosBot().file().existsProjectNoGUI(PROJECT1));
+        assertTrue(alice.sarosBot().file()
+            .existsClassNoGUI(PROJECT1, "pkg", "Cls"));
     }
 
     @Test
     @Ignore
     public void test_newProjectWithClass_3() throws RemoteException {
-        assertFalse(alice.fileM.existsProjectNoGUI(PROJECT1));
-        alice.fileM.newJavaProjectWithClasses(PROJECT1, "pkg", "Cls");
-        assertTrue(alice.fileM.existsProjectNoGUI(PROJECT1));
-        assertTrue(alice.fileM.existsClassNoGUI(PROJECT1, "pkg", "Cls"));
+        assertFalse(alice.sarosBot().file().existsProjectNoGUI(PROJECT1));
+        alice.sarosBot().file()
+            .newJavaProjectWithClasses(PROJECT1, "pkg", "Cls");
+        assertTrue(alice.sarosBot().file().existsProjectNoGUI(PROJECT1));
+        assertTrue(alice.sarosBot().file()
+            .existsClassNoGUI(PROJECT1, "pkg", "Cls"));
     }
 
     @Test
@@ -117,38 +130,41 @@ public class TestMenuFile extends STFTest {
         final String className = "Cls";
 
         log.trace("alice.isJavaProjectExist()");
-        assertFalse(alice.fileM.existsProjectNoGUI(PROJECT1));
+        assertFalse(alice.sarosBot().file().existsProjectNoGUI(PROJECT1));
         log.trace("alice.newProjectWithClass()");
 
-        alice.fileM.newJavaProject(PROJECT1);
-        alice.fileM.newClass(PROJECT1, pkg, className);
+        alice.sarosBot().file().newJavaProject(PROJECT1);
+        alice.sarosBot().file().newClass(PROJECT1, pkg, className);
         log.trace("alice.isJavaProjectExist()");
-        assertTrue(alice.fileM.existsProjectNoGUI(PROJECT1));
+        assertTrue(alice.sarosBot().file().existsProjectNoGUI(PROJECT1));
         log.trace("alice.isJavaClassExist()");
-        assertTrue(alice.fileM.existsClassNoGUI(PROJECT1, pkg, className));
+        assertTrue(alice.sarosBot().file()
+            .existsClassNoGUI(PROJECT1, pkg, className));
 
         log.trace("alice.isJavaClassExist()");
         final String className2 = "Cls2";
-        assertFalse(alice.fileM.existsClassNoGUI(PROJECT1, pkg, className2));
+        assertFalse(alice.sarosBot().file()
+            .existsClassNoGUI(PROJECT1, pkg, className2));
         log.trace("alice.newJavaClassInProject()");
-        alice.fileM.newClass(PROJECT1, pkg, className2);
+        alice.sarosBot().file().newClass(PROJECT1, pkg, className2);
 
         log.trace("alice.isJavaClassExist()");
-        assertTrue(alice.fileM.existsClassNoGUI(PROJECT1, pkg, className2));
+        assertTrue(alice.sarosBot().file()
+            .existsClassNoGUI(PROJECT1, pkg, className2));
 
         log.trace("deleteResource()");
-        alice.editM.deleteProjectNoGUI(PROJECT1);
+        alice.sarosBot().edit().deleteProjectNoGUI(PROJECT1);
         log.trace("alice.isJavaProjectExist()");
-        assertFalse(alice.fileM.existsProjectNoGUI(PROJECT1));
+        assertFalse(alice.sarosBot().file().existsProjectNoGUI(PROJECT1));
     }
 
     @Test
     @Ignore
     public void testNewFolderInEmptyJavaProject() throws RemoteException {
-        alice.fileM.newJavaProject(PROJECT1);
+        alice.sarosBot().file().newJavaProject(PROJECT1);
         // alice.buildSessionSequential(PROJECT,
         // SarosConstant.CONTEXT_MENU_SHARE_PROJECT, bob);
-        alice.fileM.newFolder(PROJECT1, FOLDER1);
+        alice.sarosBot().file().newFolder(PROJECT1, FOLDER1);
         // bob.bot.waitUntilFolderExist(PROJECT, FOLDER);
         // assertTrue(bob.bot.isFolderExist(PROJECT, FOLDER));
     }
@@ -156,14 +172,14 @@ public class TestMenuFile extends STFTest {
     @Test
     @Ignore
     public void testNewFileNewFolderInEmptyProject() throws RemoteException {
-        alice.fileM.newProject(PROJECT1);
-        assertTrue(alice.fileM.existsProjectNoGUI(PROJECT1));
+        alice.sarosBot().file().newProject(PROJECT1);
+        assertTrue(alice.sarosBot().file().existsProjectNoGUI(PROJECT1));
         // alice.buildSessionSequential(PROJECT,
         // SarosConstant.CONTEXT_MENU_SHARE_PROJECT, bob);
-        alice.fileM.newFolder(PROJECT1, FOLDER1);
+        alice.sarosBot().file().newFolder(PROJECT1, FOLDER1);
         // bob.bot.waitUntilFolderExist(PROJECT, FOLDER);
         // assertTrue(bob.bot.isFolderExist(PROJECT, FOLDER));
-        alice.fileM.newFile(PROJECT1, FOLDER1, FILE1);
+        alice.sarosBot().file().newFile(PROJECT1, FOLDER1, FILE1);
         // bob.bot.waitUntilFileExist(PROJECT, FOLDER, FILE);
         // assertTrue(bob.bot.isFileExist(PROJECT, FOLDER, FILE));
     }

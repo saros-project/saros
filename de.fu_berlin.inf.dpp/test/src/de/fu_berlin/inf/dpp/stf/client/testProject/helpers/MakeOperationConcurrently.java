@@ -61,8 +61,9 @@ public class MakeOperationConcurrently {
                      * Need to check for {@link User.Permission#WRITE_ACCESS}
                      * before leaving.
                      */
-                    musician.sarosSessionV.leaveTheSessionByPeer();
-                    return musician.sarosSessionV.isParticipantNoGUI(musician.jid);
+                    musician.sarosBot().sessionView().leaveTheSessionByPeer();
+                    return musician.sarosBot().sessionView()
+                        .isParticipantNoGUI(musician.jid);
                 }
             });
         }

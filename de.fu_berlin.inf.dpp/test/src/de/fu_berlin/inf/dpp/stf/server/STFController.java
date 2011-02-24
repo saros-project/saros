@@ -35,6 +35,7 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBo
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotTreeItemImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotViewImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.noFinder.NoBotImp;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.SarosBotImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.EclipseComponentImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.contextMenu.OpenCImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.contextMenu.SarosCImp;
@@ -96,6 +97,7 @@ public class STFController {
         exportObject(STFBotImp.getInstance(), "stfBot");
         exportObject(STFWorkbenchBotImp.getInstance(), "bot");
         exportObject(NoBotImp.getInstance(), "noBot");
+        exportObject(SarosBotImp.getInstance(), "sarosBot");
         exportObject(STFBotShellImp.getInstance(), "shell");
         exportObject(STFBotTableImp.getInstance(), "table");
         exportObject(STFBotTableItemImp.getInstance(), "tableItem");

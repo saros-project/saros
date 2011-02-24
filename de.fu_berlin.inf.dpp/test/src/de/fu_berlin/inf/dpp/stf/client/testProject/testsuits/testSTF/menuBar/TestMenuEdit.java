@@ -28,38 +28,42 @@ public class TestMenuEdit extends STFTest {
     @Test
     @Ignore
     public void testDeleteProjectUsingGUI() throws RemoteException {
-        alice.fileM.newJavaProject(PROJECT1);
-        assertTrue(alice.fileM.existsProjectNoGUI(PROJECT1));
-        alice.editM.deleteProjectNoGUI(PROJECT1);
-        assertFalse(alice.fileM.existsProjectNoGUI(PROJECT1));
+        alice.sarosBot().file().newJavaProject(PROJECT1);
+        assertTrue(alice.sarosBot().file().existsProjectNoGUI(PROJECT1));
+        alice.sarosBot().edit().deleteProjectNoGUI(PROJECT1);
+        assertFalse(alice.sarosBot().file().existsProjectNoGUI(PROJECT1));
     }
 
     @Test
     public void testDeleteFileUsingGUI() throws RemoteException {
-        alice.fileM.newJavaProject(PROJECT1);
-        alice.fileM.newClass(PROJECT1, "pkg", "Cls");
-        assertTrue(alice.fileM.existsClassNoGUI(PROJECT1, "pkg", "Cls"));
-        alice.pEV.selectClass(PROJECT1, "pkg", "Cls");
-        alice.editM.deleteFile();
-        assertFalse(alice.fileM.existsClassNoGUI(PROJECT1, "pkg", "Cls"));
+        alice.sarosBot().file().newJavaProject(PROJECT1);
+        alice.sarosBot().file().newClass(PROJECT1, "pkg", "Cls");
+        assertTrue(alice.sarosBot().file()
+            .existsClassNoGUI(PROJECT1, "pkg", "Cls"));
+        alice.sarosBot().packageExplorerView()
+            .selectClass(PROJECT1, "pkg", "Cls");
+        alice.sarosBot().edit().deleteFile();
+        assertFalse(alice.sarosBot().file()
+            .existsClassNoGUI(PROJECT1, "pkg", "Cls"));
     }
 
     @Test
     public void testCopyProject() throws RemoteException {
-        alice.fileM.newProject(PROJECT1);
-        assertFalse(alice.fileM.existsProjectNoGUI(PROJECT2));
-        alice.pEV.selectProject(PROJECT1);
-        alice.editM.copyProject(PROJECT2);
-        assertTrue(alice.fileM.existsProjectNoGUI(PROJECT2));
+        alice.sarosBot().file().newProject(PROJECT1);
+        assertFalse(alice.sarosBot().file().existsProjectNoGUI(PROJECT2));
+        alice.sarosBot().packageExplorerView().selectProject(PROJECT1);
+        alice.sarosBot().edit().copyProject(PROJECT2);
+        assertTrue(alice.sarosBot().file().existsProjectNoGUI(PROJECT2));
     }
 
     @Test
     public void testDeleteFolder() throws RemoteException {
-        alice.fileM.newJavaProject(PROJECT1);
-        alice.fileM.newFolder(PROJECT1, FOLDER1);
-        assertTrue(alice.fileM.existsFolderNoGUI(PROJECT1, FOLDER1));
-        alice.editM.deleteFolderNoGUI(PROJECT1, FOLDER1);
-        assertFalse(alice.fileM.existsFolderNoGUI(PROJECT1, FOLDER1));
+        alice.sarosBot().file().newJavaProject(PROJECT1);
+        alice.sarosBot().file().newFolder(PROJECT1, FOLDER1);
+        assertTrue(alice.sarosBot().file().existsFolderNoGUI(PROJECT1, FOLDER1));
+        alice.sarosBot().edit().deleteFolderNoGUI(PROJECT1, FOLDER1);
+        assertFalse(alice.sarosBot().file()
+            .existsFolderNoGUI(PROJECT1, FOLDER1));
     }
 
 }

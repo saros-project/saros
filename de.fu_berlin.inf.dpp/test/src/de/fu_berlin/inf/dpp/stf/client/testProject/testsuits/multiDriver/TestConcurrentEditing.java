@@ -35,10 +35,10 @@ public class TestConcurrentEditing extends STFTest {
     @Test
     public void testBugInconsistencyConcurrentEditing() throws RemoteException,
         InterruptedException {
-        alice.fileM.newProject(PROJECT1);
+        alice.sarosBot().file().newProject(PROJECT1);
         // cool trick, no need to always use PROJECT1, PKG1, CLS1 as arguments
         String[] path = { PROJECT1, FILE };
-        alice.fileM.newFile(path);
+        alice.sarosBot().file().newFile(path);
         alice.bot().waitUntilEditorOpen(FILE);
         alice.bot().editor(FILE).setTexWithSave("test/STF/lorem.txt");
         alice.bot().editor(FILE).navigateTo(0, 6);
@@ -92,7 +92,7 @@ public class TestConcurrentEditing extends STFTest {
     @Test(expected = AssertionError.class)
     public void AliceAndBobeditInSameLine() throws RemoteException,
         InterruptedException {
-        alice.fileM.newJavaProjectWithClasses(PROJECT1, PKG1, CLS1);
+        alice.sarosBot().file().newJavaProjectWithClasses(PROJECT1, PKG1, CLS1);
         buildSessionConcurrently(VIEW_PACKAGE_EXPLORER, PROJECT1,
             TypeOfShareProject.SHARE_PROJECT, TypeOfCreateProject.NEW_PROJECT,
             alice, bob);

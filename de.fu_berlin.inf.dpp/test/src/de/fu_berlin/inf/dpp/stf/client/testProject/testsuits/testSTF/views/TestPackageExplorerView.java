@@ -28,22 +28,26 @@ public class TestPackageExplorerView extends STFTest {
     @Test
     @Ignore
     public void testIsFileExist() throws RemoteException {
-        alice.fileM.newJavaProject(PROJECT1);
-        alice.fileM.newClass(PROJECT1, "pkg", "Cls");
-        assertTrue(alice.fileM.existsClassNoGUI(PROJECT1, "pkg", "Cls"));
-        alice.editM.deleteClassNoGUI(PROJECT1, "pkg", "Cls");
-        assertFalse(alice.fileM.existsClassNoGUI(PROJECT1, "pkg", "Cls"));
+        alice.sarosBot().file().newJavaProject(PROJECT1);
+        alice.sarosBot().file().newClass(PROJECT1, "pkg", "Cls");
+        assertTrue(alice.sarosBot().file()
+            .existsClassNoGUI(PROJECT1, "pkg", "Cls"));
+        alice.sarosBot().edit().deleteClassNoGUI(PROJECT1, "pkg", "Cls");
+        assertFalse(alice.sarosBot().file()
+            .existsClassNoGUI(PROJECT1, "pkg", "Cls"));
     }
 
     @Test
     @Ignore
     // this test fails, but it doesn't really matter...
     public void testIsFileExistWithGUI() throws RemoteException {
-        alice.fileM.newJavaProject(PROJECT1);
-        alice.fileM.newClass(PROJECT1, "pkg", "Cls");
-        assertTrue(alice.fileM.existsFile(PROJECT1, "src", "pkg", "Cls.java"));
-        alice.editM.deleteClassNoGUI(PROJECT1, "pkg", "Cls");
-        assertFalse(alice.fileM.existsFile(PROJECT1, "src", "pkg", "Cls.java"));
+        alice.sarosBot().file().newJavaProject(PROJECT1);
+        alice.sarosBot().file().newClass(PROJECT1, "pkg", "Cls");
+        assertTrue(alice.sarosBot().file()
+            .existsFile(PROJECT1, "src", "pkg", "Cls.java"));
+        alice.sarosBot().edit().deleteClassNoGUI(PROJECT1, "pkg", "Cls");
+        assertFalse(alice.sarosBot().file()
+            .existsFile(PROJECT1, "src", "pkg", "Cls.java"));
     }
 
 }
