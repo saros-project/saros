@@ -158,7 +158,8 @@ public class XMPPAccountStore {
          * Google Talk users have to keep their server portion in the username;
          * see http://code.google.com/apis/talk/talk_developers_home.html
          */
-        if (server.equals("gmail.com") || server.equals("googlemail.com")) {
+        if (server.equalsIgnoreCase("gmail.com")
+            || server.equalsIgnoreCase("googlemail.com")) {
             if (!username.contains("@")) {
                 username += "@" + server;
             }
