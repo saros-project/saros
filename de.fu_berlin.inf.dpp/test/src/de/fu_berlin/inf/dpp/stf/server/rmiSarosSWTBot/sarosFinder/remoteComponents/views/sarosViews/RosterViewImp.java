@@ -106,14 +106,13 @@ public class RosterViewImp extends SarosComponentImp implements RosterView {
         if (!hasBuddyNoGUI(buddyJID))
             return;
         try {
-
-            bot()
+            STFBotTreeItem item = bot()
                 .view(VIEW_SAROS_BUDDIES)
                 .bot()
                 .tree()
                 .selectTreeItemWithRegex(NODE_BUDDIES + ".*",
-                    buddyNickName + ".*").contextMenu(CM_DELETE).click();
-
+                    buddyNickName + ".*");
+            item.contextMenu(CM_DELETE).click();
             bot().waitUntilShellIsOpen(CONFIRM_DELETE);
             bot().shell(CONFIRM_DELETE).activate();
             bot().shell(CONFIRM_DELETE).bot().button(YES).click();
@@ -410,6 +409,8 @@ public class RosterViewImp extends SarosComponentImp implements RosterView {
 
     protected boolean isToolbarButtonEnabled(String tooltip)
         throws RemoteException {
+        if (!bot().view(VIEW_SAROS_BUDDIES).existsToolbarButton(tooltip))
+            return false;
         return bot().view(VIEW_SAROS_BUDDIES).existsToolbarButton(tooltip)
             && bot().view(VIEW_SAROS_BUDDIES).toolbarButton(tooltip)
                 .isEnabled();

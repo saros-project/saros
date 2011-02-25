@@ -76,11 +76,11 @@ public class SessionViewImp extends SarosComponentImp implements SessionView {
         }
         precondition();
         String contactLabel = getParticipantLabel(participantJID);
-        bot().view(VIEW_SAROS_SESSION).bot().table()
-            .getTableItem(contactLabel)
+        bot().view(VIEW_SAROS_SESSION).bot().table().getTableItem(contactLabel)
             .contextMenu(CM_RESTRICT_TO_READ_ONLY_ACCESS).click();
 
         waitUntilHasReadOnlyAccessBy(participantJID);
+        bot().sleep(300);
     }
 
     public void followThisBuddy(JID jidOfFollowedUser) throws RemoteException {
@@ -105,8 +105,7 @@ public class SessionViewImp extends SarosComponentImp implements SessionView {
         log.debug(" JID of the followed user: " + followedUserJID.getBase());
         precondition();
         String contactLabel = getParticipantLabel(followedUserJID);
-        bot().view(VIEW_SAROS_SESSION).bot().table()
-            .getTableItem(contactLabel)
+        bot().view(VIEW_SAROS_SESSION).bot().table().getTableItem(contactLabel)
             .contextMenu(CM_STOP_FOLLOWING_THIS_BUDDY).click();
 
         bot().waitUntil(new DefaultCondition() {
@@ -183,6 +182,7 @@ public class SessionViewImp extends SarosComponentImp implements SessionView {
             clickToolbarButtonWithTooltip(TB_RESTRICT_INVITEES_TO_READ_ONLY_ACCESS);
             for (JID invitee : getInvitees())
                 waitUntilHasReadOnlyAccessBy(invitee);
+            bot().sleep(300);
         }
     }
 
@@ -702,8 +702,8 @@ public class SessionViewImp extends SarosComponentImp implements SessionView {
             bot().getPathToScreenShot()
                 + "/serverside_vor_jump_to_position.png");
 
-        bot().view(VIEW_SAROS_SESSION).bot().table()
-            .getTableItem(contactLabel).contextMenu(context).click();
+        bot().view(VIEW_SAROS_SESSION).bot().table().getTableItem(contactLabel)
+            .contextMenu(context).click();
     }
 
     private void selectParticipant(JID jidOfSelectedUser, String message)
@@ -713,8 +713,8 @@ public class SessionViewImp extends SarosComponentImp implements SessionView {
         }
         precondition();
         String contactLabel = getParticipantLabel(jidOfSelectedUser);
-        bot().view(VIEW_SAROS_SESSION).bot().table()
-            .getTableItem(contactLabel).select();
+        bot().view(VIEW_SAROS_SESSION).bot().table().getTableItem(contactLabel)
+            .select();
     }
 
     private boolean isToolbarButtonEnabled(String tooltip)
