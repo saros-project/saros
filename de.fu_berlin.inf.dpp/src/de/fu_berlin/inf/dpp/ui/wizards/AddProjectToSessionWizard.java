@@ -203,6 +203,14 @@ public class AddProjectToSessionWizard extends Wizard {
 
     @Override
     public boolean performCancel() {
+        if (!Utils
+            .popUpYesNoQuestion(
+                "Leaving the Session",
+                "The session participants must remain synchronised at all times."
+                    + " Declining an invitation will therefore eject you from the session. "
+                    + " Are you sure you want to leave?", false)) {
+            return false;
+        }
         Utils.runSafeAsync(log, new Runnable() {
             public void run() {
                 process.localCancel(null, CancelOption.NOTIFY_PEER);
