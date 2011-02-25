@@ -296,7 +296,6 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
         } catch (UnsupportedEncodingException e) {
             fileListAsString = new String(data);
         }
-        log.debug(fileListAsString);
 
         // We disassemble the complete fileListString to an array of
         // fileListStrings...
