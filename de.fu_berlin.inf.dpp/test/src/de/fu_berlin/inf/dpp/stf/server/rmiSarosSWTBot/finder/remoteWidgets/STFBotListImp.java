@@ -8,7 +8,7 @@ public class STFBotListImp extends AbstractRmoteWidget implements STFBotList {
 
     private static transient STFBotListImp listImp;
 
-    private SWTBotList list;
+    private SWTBotList widget;
 
     /**
      * {@link STFBotListImp} is a singleton, but inheritance is possible.
@@ -20,8 +20,9 @@ public class STFBotListImp extends AbstractRmoteWidget implements STFBotList {
         return listImp;
     }
 
-    public void setWidget(SWTBotList list) {
-        this.list = list;
+    public STFBotList setWidget(SWTBotList list) {
+        this.widget = list;
+        return this;
     }
 
     /**************************************************************
@@ -30,50 +31,42 @@ public class STFBotListImp extends AbstractRmoteWidget implements STFBotList {
      * 
      **************************************************************/
 
+    public STFBotMenu contextMenu(String text) throws RemoteException {
+        return stfBotMenu.setWidget(widget.contextMenu(text));
+    }
+
     /**********************************************
      * 
      * actions
      * 
      **********************************************/
 
-    public String itemAt(int index) throws RemoteException {
-        return list.itemAt(index);
-    }
-
-    public int itemCount() throws RemoteException {
-        return list.itemCount();
-    }
-
-    public int indexOf(String item) throws RemoteException {
-        return list.indexOf(item);
-    }
-
     public void select(String item) throws RemoteException {
-        list.select(item);
+        widget.select(item);
     }
 
     public void select(int... indices) throws RemoteException {
-        list.select(indices);
+        widget.select(indices);
     }
 
     public void select(int index) throws RemoteException {
-        list.select(index);
+        widget.select(index);
     }
 
     public void select(String... items) throws RemoteException {
-        list.select(items);
+        widget.select(items);
     }
 
     public void selectionCount() throws RemoteException {
-        list.selectionCount();
+        widget.selectionCount();
     }
 
     public void unselect() throws RemoteException {
-        list.unselect();
+        widget.unselect();
     }
 
     public void setFocus() throws RemoteException {
-        list.setFocus();
+        widget.setFocus();
     }
 
     /**********************************************
@@ -81,29 +74,40 @@ public class STFBotListImp extends AbstractRmoteWidget implements STFBotList {
      * states
      * 
      **********************************************/
+    public String itemAt(int index) throws RemoteException {
+        return widget.itemAt(index);
+    }
+
+    public int itemCount() throws RemoteException {
+        return widget.itemCount();
+    }
+
+    public int indexOf(String item) throws RemoteException {
+        return widget.indexOf(item);
+    }
 
     public String[] getItems() throws RemoteException {
-        return list.getItems();
+        return widget.getItems();
     }
 
     public boolean isEnabled() throws RemoteException {
-        return list.isEnabled();
+        return widget.isEnabled();
     }
 
     public boolean isVisible() throws RemoteException {
-        return list.isVisible();
+        return widget.isVisible();
     }
 
     public boolean isActive() throws RemoteException {
-        return list.isActive();
+        return widget.isActive();
     }
 
     public String getText() throws RemoteException {
-        return list.getText();
+        return widget.getText();
     }
 
     public String getToolTipText() throws RemoteException {
-        return list.getText();
+        return widget.getText();
     }
 
 }

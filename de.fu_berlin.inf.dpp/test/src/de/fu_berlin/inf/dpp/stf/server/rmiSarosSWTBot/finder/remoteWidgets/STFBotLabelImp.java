@@ -8,7 +8,7 @@ public class STFBotLabelImp extends AbstractRmoteWidget implements STFBotLabel {
 
     private static transient STFBotLabelImp self;
 
-    private SWTBotLabel swtBotLabel;
+    private SWTBotLabel widget;
 
     /**
      * {@link STFBotTableImp} is a singleton, but inheritance is possible.
@@ -20,8 +20,9 @@ public class STFBotLabelImp extends AbstractRmoteWidget implements STFBotLabel {
         return self;
     }
 
-    public void setSwtBotLabel(SWTBotLabel label) {
-        this.swtBotLabel = label;
+    public STFBotLabel setWidget(SWTBotLabel label) {
+        this.widget = label;
+        return this;
     }
 
     /**************************************************************
@@ -32,12 +33,21 @@ public class STFBotLabelImp extends AbstractRmoteWidget implements STFBotLabel {
 
     /**********************************************
      * 
+     * finders
+     * 
+     **********************************************/
+    public STFBotMenu contextMenu(String text) throws RemoteException {
+        return stfBotMenu.setWidget(widget.contextMenu(text));
+    }
+
+    /**********************************************
+     * 
      * actions
      * 
      **********************************************/
 
     public void setFocus() throws RemoteException {
-        swtBotLabel.setFocus();
+        widget.setFocus();
     }
 
     /**********************************************
@@ -46,24 +56,28 @@ public class STFBotLabelImp extends AbstractRmoteWidget implements STFBotLabel {
      * 
      **********************************************/
 
+    public int alignment() throws RemoteException {
+        return widget.alignment();
+    }
+
     public boolean isEnabled() throws RemoteException {
-        return swtBotLabel.isEnabled();
+        return widget.isEnabled();
     }
 
     public boolean isVisible() throws RemoteException {
-        return swtBotLabel.isVisible();
+        return widget.isVisible();
     }
 
     public boolean isActive() throws RemoteException {
-        return swtBotLabel.isActive();
+        return widget.isActive();
     }
 
     public String getToolTipText() throws RemoteException {
-        return swtBotLabel.getText();
+        return widget.getText();
     }
 
     public String getText() throws RemoteException {
-        return swtBotLabel.getText();
+        return widget.getText();
     }
 
 }

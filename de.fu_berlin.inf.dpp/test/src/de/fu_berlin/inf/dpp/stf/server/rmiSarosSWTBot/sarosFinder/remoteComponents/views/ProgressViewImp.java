@@ -35,7 +35,7 @@ public class ProgressViewImp extends EclipseComponentImp implements
 
     public void removeProgress() throws RemoteException {
         preCondition();
-        bot().view(VIEW_PROGRESS).bot_().toolbarButton().click();
+        bot().view(VIEW_PROGRESS).bot().toolbarButton().click();
 
     }
 
@@ -43,7 +43,7 @@ public class ProgressViewImp extends EclipseComponentImp implements
         preCondition();
         bot().view(VIEW_PROGRESS)
             .toolbarButton(TB_REMOVE_ALL_FINISHED_OPERATIONS).click();
-        bot().view(VIEW_PROGRESS).bot_().toolbarButton(index).click();
+        bot().view(VIEW_PROGRESS).bot().toolbarButton(index).click();
 
     }
 
@@ -51,7 +51,7 @@ public class ProgressViewImp extends EclipseComponentImp implements
         preCondition();
         bot().view(VIEW_PROGRESS)
             .toolbarButton(TB_REMOVE_ALL_FINISHED_OPERATIONS).click();
-        return bot().view(VIEW_PROGRESS).bot_().existsToolbarButton();
+        return bot().view(VIEW_PROGRESS).bot().existsToolbarButton();
     }
 
     /**********************************************
@@ -81,7 +81,7 @@ public class ProgressViewImp extends EclipseComponentImp implements
 
     private void preCondition() throws RemoteException {
         bot().openViewById(VIEW_PROGRESS_ID);
-        bot().view(VIEW_PROGRESS).setFocus();
+        bot().view(VIEW_PROGRESS).show();
     }
 
 }

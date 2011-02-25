@@ -10,7 +10,7 @@ public class STFBotButtonImp extends AbstractRmoteWidget implements
 
     private static transient STFBotButtonImp self;
 
-    private SWTBotButton swtBotButton;
+    private SWTBotButton widget;
 
     /**
      * {@link STFBotButtonImp} is a singleton, but inheritance is possible.
@@ -22,8 +22,9 @@ public class STFBotButtonImp extends AbstractRmoteWidget implements
         return self;
     }
 
-    public void setSwtBotButton(SWTBotButton button) {
-        this.swtBotButton = button;
+    public STFBotButton setWidget(SWTBotButton button) {
+        this.widget = button;
+        return this;
     }
 
     /**************************************************************
@@ -34,11 +35,20 @@ public class STFBotButtonImp extends AbstractRmoteWidget implements
 
     /**********************************************
      * 
+     * finders
+     * 
+     **********************************************/
+    public STFBotMenu contextMenu(String text) throws RemoteException {
+        return stfBotMenu.setWidget(widget.contextMenu(text));
+    }
+
+    /**********************************************
+     * 
      * actions
      * 
      **********************************************/
     public void click() throws RemoteException {
-        swtBotButton.click();
+        widget.click();
     }
 
     public void clickAndWait() throws RemoteException {
@@ -47,7 +57,7 @@ public class STFBotButtonImp extends AbstractRmoteWidget implements
     }
 
     public void setFocus() throws RemoteException {
-        swtBotButton.setFocus();
+        widget.setFocus();
     }
 
     /**********************************************
@@ -56,23 +66,23 @@ public class STFBotButtonImp extends AbstractRmoteWidget implements
      * 
      **********************************************/
     public boolean isEnabled() throws RemoteException {
-        return swtBotButton.isEnabled();
+        return widget.isEnabled();
     }
 
     public boolean isVisible() throws RemoteException {
-        return swtBotButton.isVisible();
+        return widget.isVisible();
     }
 
     public boolean isActive() throws RemoteException {
-        return swtBotButton.isActive();
+        return widget.isActive();
     }
 
     public String getText() throws RemoteException {
-        return swtBotButton.getText();
+        return widget.getText();
     }
 
     public String getToolTipText() throws RemoteException {
-        return swtBotButton.getText();
+        return widget.getText();
     }
 
     /**********************************************
@@ -81,7 +91,7 @@ public class STFBotButtonImp extends AbstractRmoteWidget implements
      * 
      **********************************************/
     public void waitUntilIsEnabled() throws RemoteException {
-        stfBot.waitUntil(Conditions.widgetIsEnabled(swtBotButton));
+        stfBot.waitUntil(Conditions.widgetIsEnabled(widget));
     }
 
 }

@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
+import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotViewMenu;
 import org.eclipse.swtbot.swt.finder.waits.DefaultCondition;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotToolbarButton;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotToolbarDropDownButton;
@@ -18,35 +19,21 @@ public class STFBotViewImp extends AbstractRmoteWidget implements STFBotView {
 
     private static transient STFBotViewImp self;
 
-    private SWTBotView swtbotView;
-
-    private static STFBotViewMenuImp stfViewMenu;
-    private static STFBotToolbarDropDownButtonImp stfToolbarDropDownButton;
-    private static STFBotToolbarPushButtonImp stfToolbarPushButton;
-    private static STFBotToolbarRadioButtonImp stfToolbarRadioButton;
-    private static STFBotToolbarToggleButtonImp stfToolbarToggleButton;
-    public static STFBotToolbarButtonImp stfToolbarButton;
+    private SWTBotView widget;
 
     /**
-     * {@link STFBotTableImp} is a singleton, but inheritance is possible.
+     * {@link STFBotViewImp} is a singleton, but inheritance is possible.
      */
     public static STFBotViewImp getInstance() {
         if (self != null)
             return self;
         self = new STFBotViewImp();
-        stfViewMenu = STFBotViewMenuImp.getInstance();
-        stfToolbarDropDownButton = STFBotToolbarDropDownButtonImp.getInstance();
-        stfToolbarPushButton = STFBotToolbarPushButtonImp.getInstance();
-        stfToolbarRadioButton = STFBotToolbarRadioButtonImp.getInstance();
-        stfToolbarToggleButton = STFBotToolbarToggleButtonImp.getInstance();
-        stfToolbarButton = STFBotToolbarButtonImp.getInstance();
         return self;
     }
 
-    public void setWidget(SWTBotView view) {
-
-        swtbotView = view;
-
+    public STFBotView setWidget(SWTBotView view) {
+        widget = view;
+        return this;
     }
 
     /**************************************************************
@@ -60,25 +47,35 @@ public class STFBotViewImp extends AbstractRmoteWidget implements STFBotView {
      * Finders
      * 
      **********************************************/
-    public STFBot bot_() {
-        stfBot.setBot(swtbotView.bot());
+    public STFBot bot() {
+        stfBot.setBot(widget.bot());
         return stfBot;
     }
 
+    // menu
     public STFBotViewMenu menu(String label) throws RemoteException {
-        stfViewMenu.setSwtBotViewMenu(swtbotView.menu(label));
+        stfViewMenu.setWidget(widget.menu(label));
         return stfViewMenu;
     }
 
     public STFBotViewMenu menu(String label, int index) throws RemoteException {
-        stfViewMenu.setSwtBotViewMenu(swtbotView.menu(label, index));
+        stfViewMenu.setWidget(widget.menu(label, index));
         return stfViewMenu;
     }
 
+    public List<STFBotViewMenu> menus() throws RemoteException {
+        List<STFBotViewMenu> menus = new ArrayList<STFBotViewMenu>();
+        for (SWTBotViewMenu menu : widget.menus()) {
+            menus.add(stfViewMenu.setWidget(menu));
+        }
+        return menus;
+    }
+
+    // toolbarButton
     public STFBotToolbarButton toolbarButton(String tooltip)
         throws RemoteException {
-        SWTBotToolbarButton toolbarButton = swtbotView.toolbarButton(tooltip);
-        stfToolbarButton.setSwtBotToolbarButton(toolbarButton);
+        SWTBotToolbarButton toolbarButton = widget.toolbarButton(tooltip);
+        stfToolbarButton.setWidget(toolbarButton);
 
         return stfToolbarButton;
     }
@@ -88,44 +85,56 @@ public class STFBotViewImp extends AbstractRmoteWidget implements STFBotView {
         for (String tooltip : getToolTipTextOfToolbarButtons()) {
             System.out.println(tooltip + ":");
             if (tooltip.matches(regex)) {
-                SWTBotToolbarButton toolbarButton = swtbotView
+                SWTBotToolbarButton toolbarButton = widget
                     .toolbarButton(tooltip);
-                stfToolbarButton.setSwtBotToolbarButton(toolbarButton);
+                stfToolbarButton.setWidget(toolbarButton);
                 return stfToolbarButton;
             }
         }
         return null;
     }
 
+    public List<STFBotToolbarButton> getToolbarButtons() throws RemoteException {
+        List<STFBotToolbarButton> toolbarButtons = new ArrayList<STFBotToolbarButton>();
+        for (SWTBotToolbarButton button : widget.getToolbarButtons()) {
+            toolbarButtons.add(stfToolbarButton.setWidget(button));
+        }
+        return toolbarButtons;
+    }
+
+    // toolbarDropDownButton
     public STFBotToolbarDropDownButton toolbarDropDownButton(String tooltip)
         throws RemoteException {
-        SWTBotToolbarDropDownButton toolbarButton = swtbotView
+        SWTBotToolbarDropDownButton toolbarButton = widget
             .toolbarDropDownButton(tooltip);
-        stfToolbarDropDownButton.setSwtBotToolbarDropDownButton(toolbarButton);
+        stfToolbarDropDownButton.setWidget(toolbarButton);
         return stfToolbarDropDownButton;
     }
 
+    // toolbarRadioButton
     public STFBotToolbarRadioButton toolbarRadioButton(String tooltip)
         throws RemoteException {
-        SWTBotToolbarRadioButton toolbarButton = swtbotView
+        SWTBotToolbarRadioButton toolbarButton = widget
             .toolbarRadioButton(tooltip);
-        stfToolbarRadioButton.setSwtBotToolbarRadioButton(toolbarButton);
+        stfToolbarRadioButton.setWidget(toolbarButton);
         return stfToolbarRadioButton;
     }
 
+    // toolbarPushButton
     public STFBotToolbarPushButton toolbarPushButton(String tooltip)
         throws RemoteException {
-        SWTBotToolbarPushButton toolbarButton = swtbotView
+        SWTBotToolbarPushButton toolbarButton = widget
             .toolbarPushButton(tooltip);
-        stfToolbarPushButton.setSwtBotToolbarPushButton(toolbarButton);
+        stfToolbarPushButton.setWidget(toolbarButton);
         return stfToolbarPushButton;
     }
 
+    // toolbarToggleButton
     public STFBotToolbarToggleButton toolbarToggleButton(String tooltip)
         throws RemoteException {
-        SWTBotToolbarToggleButton toolbarButton = swtbotView
+        SWTBotToolbarToggleButton toolbarButton = widget
             .toolbarToggleButton(tooltip);
-        stfToolbarToggleButton.setSwtBotToolbarToggleButton(toolbarButton);
+        stfToolbarToggleButton.setWidget(toolbarButton);
         return stfToolbarToggleButton;
     }
 
@@ -136,13 +145,15 @@ public class STFBotViewImp extends AbstractRmoteWidget implements STFBotView {
      **********************************************/
 
     public void close() throws RemoteException {
-        swtbotView.close();
+        widget.close();
+    }
+
+    public void show() throws RemoteException {
+        widget.show();
     }
 
     public void setFocus() throws RemoteException {
-        swtbotView.show();
-        // swtbotView.setFocus();
-        // waitUntilIsActive();
+        widget.setFocus();
     }
 
     /**********************************************
@@ -150,9 +161,10 @@ public class STFBotViewImp extends AbstractRmoteWidget implements STFBotView {
      * states
      * 
      **********************************************/
+
     public List<String> getToolTipOfAllToolbarbuttons() throws RemoteException {
         List<String> tooltips = new ArrayList<String>();
-        for (SWTBotToolbarButton button : swtbotView.getToolbarButtons()) {
+        for (SWTBotToolbarButton button : widget.getToolbarButtons()) {
             tooltips.add(button.getToolTipText());
         }
         return tooltips;
@@ -163,16 +175,16 @@ public class STFBotViewImp extends AbstractRmoteWidget implements STFBotView {
     }
 
     public boolean isActive() throws RemoteException {
-        return swtbotView.isActive();
+        return widget.isActive();
     }
 
     public String getTitle() throws RemoteException {
-        return swtbotView.getTitle();
+        return widget.getTitle();
     }
 
     public List<String> getToolTipTextOfToolbarButtons() throws RemoteException {
         List<String> toolbarButtons = new ArrayList<String>();
-        for (SWTBotToolbarButton toolbarButton : swtbotView.getToolbarButtons()) {
+        for (SWTBotToolbarButton toolbarButton : widget.getToolbarButtons()) {
             toolbarButtons.add(toolbarButton.getToolTipText());
         }
         return toolbarButtons;

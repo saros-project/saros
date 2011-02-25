@@ -82,7 +82,7 @@ public class TestEditorByAliceAndBob extends STFTest {
         assertTrue(bob.bot().editor(CLS2_SUFFIX).isActive());
         assertFalse(bob.bot().editor(CLS1_SUFFIX).isActive());
 
-        alice.bot().editor(CLS1_SUFFIX).activate();
+        alice.bot().editor(CLS1_SUFFIX).show();
         alice.bot().editor(CLS1_SUFFIX).waitUntilIsActive();
         assertTrue(alice.bot().editor(CLS1_SUFFIX).isActive());
         bob.bot().editor(CLS1_SUFFIX).waitUntilIsActive();

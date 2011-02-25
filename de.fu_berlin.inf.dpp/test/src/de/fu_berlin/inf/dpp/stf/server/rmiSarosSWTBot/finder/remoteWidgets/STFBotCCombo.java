@@ -7,41 +7,47 @@ public interface STFBotCCombo extends Remote {
 
     /**********************************************
      * 
+     * finders
+     * 
+     **********************************************/
+    public STFBotMenu contextMenu(String text) throws RemoteException;
+
+    /**********************************************
+     * 
      * actions
      * 
      **********************************************/
 
-    public abstract void setSelection(int indexOfSelection)
-        throws RemoteException;
+    public void setSelection(int indexOfSelection) throws RemoteException;
 
-    public abstract void selection() throws RemoteException;
+    public String selection() throws RemoteException;
 
-    public abstract void selectionIndex() throws RemoteException;
+    public int selectionIndex() throws RemoteException;
 
-    public abstract void setSelection(String text) throws RemoteException;
+    public void setSelection(String text) throws RemoteException;
 
-    public abstract void setText(String text) throws RemoteException;
+    public void setText(String text) throws RemoteException;
 
-    public abstract void setFocus() throws RemoteException;
+    public void setFocus() throws RemoteException;
 
     /**********************************************
      * 
      * states
      * 
      **********************************************/
-    public abstract boolean isEnabled() throws RemoteException;
+    public boolean isEnabled() throws RemoteException;
 
-    public abstract boolean isVisible() throws RemoteException;
+    public boolean isVisible() throws RemoteException;
 
-    public abstract boolean isActive() throws RemoteException;
+    public boolean isActive() throws RemoteException;
 
-    public abstract String getText() throws RemoteException;
+    public String getText() throws RemoteException;
 
-    public abstract String getToolTipText() throws RemoteException;
+    public String getToolTipText() throws RemoteException;
 
-    public abstract int itemCount() throws RemoteException;
+    public int itemCount() throws RemoteException;
 
-    public abstract String[] items() throws RemoteException;
+    public String[] items() throws RemoteException;
 
-    public abstract int textLimit() throws RemoteException;
+    public int textLimit() throws RemoteException;
 }

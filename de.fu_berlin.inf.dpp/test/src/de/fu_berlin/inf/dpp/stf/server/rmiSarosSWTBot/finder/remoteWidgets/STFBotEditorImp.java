@@ -16,11 +16,7 @@ public class STFBotEditorImp extends AbstractRmoteWidget implements
 
     private static transient STFBotEditorImp self;
 
-    private SWTBotEclipseEditor editor;
-
-    /* error messages */
-    private static String ERROR_MESSAGE_FOR_INVALID_FILENAME = "the passed fileName has no suffix, you should pass a fileName like e.g myFile.xml or if you want to open a java editor, please use the method isJavaEditorOpen";
-    private static String ERROR_MESSAGE_FOR_INVALID_CLASSNAME = "You need to only pass the className without sufix like e.g MyClass";
+    private SWTBotEclipseEditor widget;
 
     /**
      * {@link STFBotEditorImp} is a singleton, but inheritance is possible.
@@ -32,8 +28,8 @@ public class STFBotEditorImp extends AbstractRmoteWidget implements
         return self;
     }
 
-    public void setTitle(SWTBotEclipseEditor editor) {
-        this.editor = editor;
+    public void setWidget(SWTBotEclipseEditor editor) {
+        this.widget = editor;
     }
 
     /***********************************************************************
@@ -47,23 +43,25 @@ public class STFBotEditorImp extends AbstractRmoteWidget implements
      * actions
      * 
      **********************************************/
-    public void activate() throws RemoteException {
-        editor.setFocus();
-        editor.show();
-        editor.setFocus();
+    public void show() throws RemoteException {
+        widget.show();
+    }
+
+    public void setFocus() throws RemoteException {
+        widget.setFocus();
     }
 
     public void closeWithSave() throws RemoteException {
-        editor.save();
-        editor.close();
+        widget.save();
+        widget.close();
     }
 
     public void save() throws RemoteException {
-        editor.save();
+        widget.save();
     }
 
     public void closeWithoutSave() throws RemoteException {
-        editor.close();
+        widget.close();
         if (stfBot.isShellOpen(SHELL_SAVE_RESOURCE)
             && stfBot.shell(SHELL_SAVE_RESOURCE).isActive())
             stfBot.shell(SHELL_SAVE_RESOURCE).confirm(NO);
@@ -71,34 +69,34 @@ public class STFBotEditorImp extends AbstractRmoteWidget implements
 
     public void setTexWithSave(String contentPath) throws RemoteException {
         String contents = getFileContentNoGUI(contentPath);
-        editor.setText(contents);
-        editor.save();
+        widget.setText(contents);
+        widget.save();
     }
 
     public void setTextWithoutSave(String contentPath) throws RemoteException {
         String contents = getFileContentNoGUI(contentPath);
-        editor.setText(contents);
+        widget.setText(contents);
     }
 
     public void typeText(String text) throws RemoteException {
-        editor.setFocus();
-        editor.typeText(text);
+        widget.setFocus();
+        widget.typeText(text);
     }
 
     public void navigateTo(int line, int column) throws RemoteException {
-        editor.setFocus();
-        editor.navigateTo(line, column);
+        widget.setFocus();
+        widget.navigateTo(line, column);
     }
 
     public void selectCurrentLine() throws RemoteException {
-        editor.selectCurrentLine();
+        widget.selectCurrentLine();
         // It's is necessary to sleep a litte time so that the following
         // operation like quickfix will be successfully performed.
         stfBot.sleep(500);
     }
 
     public void selectLine(int line) throws RemoteException {
-        editor.selectLine(line);
+        widget.selectLine(line);
         // It's is necessary to sleep a litte time so that the following
         // operation like quickfix will be successfully performed.
         stfBot.sleep(1000);
@@ -107,17 +105,17 @@ public class STFBotEditorImp extends AbstractRmoteWidget implements
 
     public void selectRange(int line, int column, int length)
         throws RemoteException {
-        editor.selectRange(line, column, length);
+        widget.selectRange(line, column, length);
         // It's is necessary to sleep a litte time so that the following
         // operation like quickfix will be successfully performed.
         stfBot.sleep(800);
     }
 
     public void pressShortcut(String... keys) throws RemoteException {
-        editor.setFocus();
+        widget.setFocus();
         for (String key : keys) {
             try {
-                editor.pressShortcut(KeyStroke.getInstance(key));
+                widget.pressShortcut(KeyStroke.getInstance(key));
             } catch (ParseException e) {
                 throw new RemoteException("Could not parse \"" + key + "\"", e);
             }
@@ -126,7 +124,7 @@ public class STFBotEditorImp extends AbstractRmoteWidget implements
 
     public void pressShortCut(int modificationKeys, char c)
         throws RemoteException {
-        editor.pressShortcut(modificationKeys, c);
+        widget.pressShortcut(modificationKeys, c);
     }
 
     public void pressShortCutDelete() throws RemoteException {
@@ -139,25 +137,25 @@ public class STFBotEditorImp extends AbstractRmoteWidget implements
 
     public void pressShortCutSave() throws RemoteException {
         if (getOS() == TypeOfOS.MAC)
-            editor.pressShortcut(SWT.COMMAND, 's');
+            widget.pressShortcut(SWT.COMMAND, 's');
         else
-            editor.pressShortcut(SWT.CTRL, 's');
+            widget.pressShortcut(SWT.CTRL, 's');
     }
 
     public void pressShortRunAsJavaApplication() throws RemoteException {
         if (getOS() == TypeOfOS.MAC)
-            editor.pressShortcut(SWT.ALT | SWT.COMMAND, 'x');
+            widget.pressShortcut(SWT.ALT | SWT.COMMAND, 'x');
         else
-            editor.pressShortcut(SWT.ALT | SWT.SHIFT, 'x');
+            widget.pressShortcut(SWT.ALT | SWT.SHIFT, 'x');
         stfBot.sleep(1000);
-        editor.pressShortcut(SWT.NONE, 'j');
+        widget.pressShortcut(SWT.NONE, 'j');
     }
 
     public void pressShortCutNextAnnotation() throws RemoteException {
         if (getOS() == TypeOfOS.MAC)
-            editor.pressShortcut(SWT.COMMAND, '.');
+            widget.pressShortcut(SWT.COMMAND, '.');
         else
-            editor.pressShortcut(SWT.CTRL, '.');
+            widget.pressShortcut(SWT.CTRL, '.');
 
         stfBot.sleep(20);
     }
@@ -165,25 +163,25 @@ public class STFBotEditorImp extends AbstractRmoteWidget implements
     public void pressShortCutQuickAssignToLocalVariable()
         throws RemoteException {
         if (getOS() == TypeOfOS.MAC)
-            editor.pressShortcut(SWT.COMMAND, '2');
+            widget.pressShortcut(SWT.COMMAND, '2');
         else
-            editor.pressShortcut(SWT.CTRL, '2');
+            widget.pressShortcut(SWT.CTRL, '2');
         stfBot.sleep(1000);
-        editor.pressShortcut(SWT.NONE, 'l');
+        widget.pressShortcut(SWT.NONE, 'l');
 
     }
 
     public void autoCompleteProposal(String insertText, String proposalText)
         throws RemoteException {
-        editor.autoCompleteProposal(checkInputText(insertText), proposalText);
+        widget.autoCompleteProposal(checkInputText(insertText), proposalText);
     }
 
     public void quickfix(String quickFixName) throws RemoteException {
-        editor.quickfix(quickFixName);
+        widget.quickfix(quickFixName);
     }
 
     public void quickfix(int index) throws RemoteException {
-        editor.quickfix(index);
+        widget.quickfix(index);
     }
 
     /**********************************************
@@ -193,41 +191,45 @@ public class STFBotEditorImp extends AbstractRmoteWidget implements
      **********************************************/
 
     public String getText() throws RemoteException {
-        return editor.getText();
+        return widget.getText();
     }
 
     public String getTextOnCurrentLine() throws RemoteException {
-        return editor.getTextOnCurrentLine();
+        return widget.getTextOnCurrentLine();
     }
 
     public String getTextOnLine(int line) throws RemoteException {
-        return editor.getTextOnLine(line);
+        return widget.getTextOnLine(line);
     }
 
     public int getCursorLine() throws RemoteException {
-        return editor.cursorPosition().line;
+        return widget.cursorPosition().line;
     }
 
     public int getCursorColumn() throws RemoteException {
-        return editor.cursorPosition().column;
+        return widget.cursorPosition().column;
     }
 
     public RGB getLineBackground(int line) throws RemoteException {
-        return editor.getLineBackground(line);
+        return widget.getLineBackground(line);
     }
 
     public boolean isDirty() throws RemoteException {
-        return editor.isDirty();
+        return widget.isDirty();
     }
 
     public String getSelection() throws RemoteException {
 
-        return editor.getSelection();
+        return widget.getSelection();
     }
 
     public List<String> getAutoCompleteProposals(String insertText)
         throws RemoteException {
-        return editor.getAutoCompleteProposals(insertText);
+        return widget.getAutoCompleteProposals(insertText);
+    }
+
+    public boolean isActive() throws RemoteException {
+        return widget.isActive();
     }
 
     /**********************************************
@@ -246,10 +248,6 @@ public class STFBotEditorImp extends AbstractRmoteWidget implements
                 return "The editor is not open.";
             }
         });
-    }
-
-    public boolean isActive() throws RemoteException {
-        return editor.isActive();
     }
 
     public void waitUntilIsTextSame(final String otherText)

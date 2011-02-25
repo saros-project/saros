@@ -120,21 +120,21 @@ public class FileMImp extends EclipseComponentImp implements FileM {
             bot().menu(MENU_FILE).menu(MENU_NEW).menu(MENU_CLASS).click();
             STFBotShell shell_new = bot().shell(SHELL_NEW_JAVA_CLASS);
             shell_new.activate();
-            shell_new.bot_().textWithLabel(LABEL_SOURCE_FOLDER)
+            shell_new.bot().textWithLabel(LABEL_SOURCE_FOLDER)
                 .setText(projectName + "/" + SRC);
-            shell_new.bot_().textWithLabel(LABEL_PACKAGE).setText(pkg);
-            shell_new.bot_().textWithLabel(LABEL_NAME).setText(className);
-            shell_new.bot_().button("Add...").click();
+            shell_new.bot().textWithLabel(LABEL_PACKAGE).setText(pkg);
+            shell_new.bot().textWithLabel(LABEL_NAME).setText(className);
+            shell_new.bot().button("Add...").click();
             bot().waitUntilShellIsOpen("Implemented Interfaces Selection");
             STFBotShell shell = bot().shell("Implemented Interfaces Selection");
             shell.activate();
-            shell.bot_().textWithLabel("Choose interfaces:")
+            shell.bot().textWithLabel("Choose interfaces:")
                 .setText("java.lang.Runnable");
-            shell.bot_().table().waitUntilTableHasRows(1);
-            shell.bot_().button(OK).click();
+            shell.bot().table().waitUntilTableHasRows(1);
+            shell.bot().button(OK).click();
             bot().shell(SHELL_NEW_JAVA_CLASS).activate();
-            shell.bot_().checkBox("Inherited abstract methods").click();
-            shell.bot_().button(FINISH).click();
+            shell.bot().checkBox("Inherited abstract methods").click();
+            shell.bot().button(FINISH).click();
             bot().waitsUntilShellIsClosed(SHELL_NEW_JAVA_CLASS);
         }
     }
@@ -161,20 +161,20 @@ public class FileMImp extends EclipseComponentImp implements FileM {
         String className) throws RemoteException {
         STFBotShell shell = bot().shell(SHELL_NEW_JAVA_CLASS);
         shell.activate();
-        shell.bot_().textWithLabel(LABEL_SOURCE_FOLDER)
+        shell.bot().textWithLabel(LABEL_SOURCE_FOLDER)
             .setText(projectName + "/" + SRC);
-        shell.bot_().textWithLabel(LABEL_PACKAGE).setText(pkg);
-        shell.bot_().textWithLabel(LABEL_NAME).setText(className);
-        shell.bot_().button(FINISH).click();
+        shell.bot().textWithLabel(LABEL_PACKAGE).setText(pkg);
+        shell.bot().textWithLabel(LABEL_NAME).setText(className);
+        shell.bot().button(FINISH).click();
         bot().waitsUntilShellIsClosed(SHELL_NEW_JAVA_CLASS);
     }
 
     private void confirmWizardNewProject(String projectName)
         throws RemoteException {
         STFBotShell shell = bot().shell(SHELL_NEW_PROJECT);
-        shell.confirmShellWithTree(NEXT, NODE_GENERAL, NODE_PROJECT);
-        shell.bot_().textWithLabel(LABEL_PROJECT_NAME).setText(projectName);
-        shell.bot_().button(FINISH).click();
+        shell.confirmWithTree(NEXT, NODE_GENERAL, NODE_PROJECT);
+        shell.bot().textWithLabel(LABEL_PROJECT_NAME).setText(projectName);
+        shell.bot().button(FINISH).click();
         bot().waitsUntilShellIsClosed(SHELL_NEW_PROJECT);
         // bot.sleep(50);
     }
@@ -183,13 +183,13 @@ public class FileMImp extends EclipseComponentImp implements FileM {
         throws RemoteException {
         STFBotShell shell = bot().shell(SHELL_NEW_FILE);
         shell.activate();
-        shell.bot_().textWithLabel(LABEL_ENTER_OR_SELECT_THE_PARENT_FOLDER)
+        shell.bot().textWithLabel(LABEL_ENTER_OR_SELECT_THE_PARENT_FOLDER)
             .setText(getPath(getParentNodes(fileNodes)));
 
-        shell.bot_().textWithLabel(LABEL_FILE_NAME)
+        shell.bot().textWithLabel(LABEL_FILE_NAME)
             .setText(getLastNode(fileNodes));
-        shell.bot_().button(FINISH).waitUntilIsEnabled();
-        shell.bot_().button(FINISH).click();
+        shell.bot().button(FINISH).waitUntilIsEnabled();
+        shell.bot().button(FINISH).click();
         bot().waitsUntilShellIsClosed(SHELL_NEW_FILE);
     }
 
@@ -197,10 +197,10 @@ public class FileMImp extends EclipseComponentImp implements FileM {
         throws RemoteException {
         STFBotShell shell = bot().shell(SHELL_NEW_JAVA_PACKAGE);
         shell.activate();
-        shell.bot_().textWithLabel(LABEL_SOURCE_FOLDER)
+        shell.bot().textWithLabel(LABEL_SOURCE_FOLDER)
             .setText((projectName + "/" + SRC));
-        shell.bot_().textWithLabel(LABEL_NAME).setText(pkg);
-        shell.bot_().button(FINISH).click();
+        shell.bot().textWithLabel(LABEL_NAME).setText(pkg);
+        shell.bot().button(FINISH).click();
         if (bot().isShellOpen(SHELL_CREATE_NEW_XMPP_ACCOUNT))
             bot().waitsUntilShellIsClosed(SHELL_CREATE_NEW_XMPP_ACCOUNT);
     }
@@ -209,13 +209,13 @@ public class FileMImp extends EclipseComponentImp implements FileM {
         throws RemoteException {
         STFBotShell shell = bot().shell(SHELL_NEW_FOLDER);
         shell.activate();
-        shell.bot_().textWithLabel(LABEL_ENTER_OR_SELECT_THE_PARENT_FOLDER)
+        shell.bot().textWithLabel(LABEL_ENTER_OR_SELECT_THE_PARENT_FOLDER)
             .setText(getPath(getParentNodes(folderNodes)));
 
-        shell.bot_().textWithLabel(LABEL_FOLDER_NAME)
+        shell.bot().textWithLabel(LABEL_FOLDER_NAME)
             .setText(getLastNode(folderNodes));
 
-        shell.bot_().button(FINISH).click();
+        shell.bot().button(FINISH).click();
         bot().waitsUntilShellIsClosed(SHELL_NEW_FOLDER);
     }
 
@@ -223,10 +223,10 @@ public class FileMImp extends EclipseComponentImp implements FileM {
         throws RemoteException {
         STFBotShell shell = bot().shell(SHELL_NEW_JAVA_PROJECT);
         shell.activate();
-        shell.bot_().textWithLabel(LABEL_PROJECT_NAME).setText(projectName);
+        shell.bot().textWithLabel(LABEL_PROJECT_NAME).setText(projectName);
 
         // bot.button(FINISH).click();
-        shell.bot_().button(FINISH).click();
+        shell.bot().button(FINISH).click();
         bot().waitsUntilShellIsClosed(SHELL_NEW_JAVA_PROJECT);
     }
 }

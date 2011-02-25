@@ -1,6 +1,7 @@
 package de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets;
 
 import java.rmi.RemoteException;
+import java.util.List;
 
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotStyledText;
 
@@ -9,10 +10,10 @@ public class STFBotStyledTextImp extends AbstractRmoteWidget implements
 
     private static transient STFBotStyledTextImp self;
 
-    private SWTBotStyledText swtBotStyledText;
+    private SWTBotStyledText widget;
 
     /**
-     * {@link STFBotTableImp} is a singleton, but inheritance is possible.
+     * {@link STFBotStyledTextImp} is a singleton, but inheritance is possible.
      */
     public static STFBotStyledTextImp getInstance() {
         if (self != null)
@@ -21,12 +22,55 @@ public class STFBotStyledTextImp extends AbstractRmoteWidget implements
         return self;
     }
 
-    public void setSwtBotStyledText(SWTBotStyledText styledText) {
-        this.swtBotStyledText = styledText;
+    public STFBotStyledText setWidget(SWTBotStyledText styledText) {
+        this.widget = styledText;
+        return this;
     }
+
+    /**************************************************************
+     * 
+     * exported functions
+     * 
+     **************************************************************/
+
+    /**********************************************
+     * 
+     * finders
+     * 
+     **********************************************/
+
+    public STFBotMenu contextMenu(String text) throws RemoteException {
+        return stfBotMenu.setWidget(widget.contextMenu(text));
+    }
+
+    /**********************************************
+     * 
+     * states
+     * 
+     **********************************************/
 
     public String getText() throws RemoteException {
-        return swtBotStyledText.getText();
+
+        return widget.getText();
     }
 
+    public String getToolTipText() throws RemoteException {
+        return widget.getToolTipText();
+    }
+
+    public String getTextOnCurrentLine() throws RemoteException {
+        return widget.getTextOnCurrentLine();
+    }
+
+    public String getSelection() throws RemoteException {
+        return widget.getSelection();
+    }
+
+    public List<String> getLines() throws RemoteException {
+        return widget.getLines();
+    }
+
+    public int getLineCount() throws RemoteException {
+        return widget.getLineCount();
+    }
 }

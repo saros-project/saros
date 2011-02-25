@@ -34,22 +34,22 @@ public class WindowMImp extends SarosPreferencesImp implements WindowM {
     public void setNewTextFileLineDelimiter(String OS) throws RemoteException {
         clickMenuPreferences();
         STFBotShell shell = bot().shell(SHELL_PREFERNCES);
-        STFBotTree tree = shell.bot_().tree();
+        STFBotTree tree = shell.bot().tree();
         tree.expandNode(TREE_ITEM_GENERAL_IN_PRFERENCES).select(
             TREE_ITEM_WORKSPACE_IN_PREFERENCES);
 
         if (OS.equals("Default")) {
-            shell.bot_()
+            shell.bot()
                 .radioInGroup("Default", "New text file line delimiter")
                 .click();
         } else {
-            shell.bot_().radioInGroup("Other:", "New text file line delimiter")
+            shell.bot().radioInGroup("Other:", "New text file line delimiter")
                 .click();
-            shell.bot_().comboBoxInGroup("New text file line delimiter")
+            shell.bot().comboBoxInGroup("New text file line delimiter")
                 .setSelection(OS);
         }
-        shell.bot_().button(APPLY).click();
-        shell.bot_().button(OK).click();
+        shell.bot().button(APPLY).click();
+        shell.bot().button(OK).click();
         bot().waitsUntilShellIsClosed(SHELL_PREFERNCES);
     }
 
@@ -74,7 +74,7 @@ public class WindowMImp extends SarosPreferencesImp implements WindowM {
         throws RemoteException {
         bot().activateWorkbench();
         bot().menu(MENU_WINDOW).menu(MENU_SHOW_VIEW).menu(MENU_OTHER).click();
-        bot().shell(SHELL_SHOW_VIEW).confirmShellWithTreeWithFilterText(
+        bot().shell(SHELL_SHOW_VIEW).confirmWithTreeWithFilterText(
             parentNode, node, OK);
     }
 
@@ -115,18 +115,18 @@ public class WindowMImp extends SarosPreferencesImp implements WindowM {
     public String getTextFileLineDelimiter() throws RemoteException {
         clickMenuPreferences();
         STFBotShell shell = bot().shell(SHELL_PREFERNCES);
-        STFBotTree tree = shell.bot_().tree();
+        STFBotTree tree = shell.bot().tree();
         tree.expandNode(TREE_ITEM_GENERAL_IN_PRFERENCES).select(
             TREE_ITEM_WORKSPACE_IN_PREFERENCES);
-        if (shell.bot_()
+        if (shell.bot()
             .radioInGroup("Default", "New text file line delimiter")
             .isSelected()) {
             shell.close();
             return "Default";
-        } else if (shell.bot_()
+        } else if (shell.bot()
             .radioInGroup("Other:", "New text file line delimiter")
             .isSelected()) {
-            STFBotCombo combo = shell.bot_().comboBoxInGroup(
+            STFBotCombo combo = shell.bot().comboBoxInGroup(
                 "New text file line delimiter");
             String itemName = combo.items()[combo.selectionIndex()];
             bot().shell(SHELL_PREFERNCES).close();

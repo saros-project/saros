@@ -57,7 +57,7 @@ public class TestFollowMode extends STFTest {
         assertTrue(bob.bot().editor(CLS2_SUFFIX).isActive());
 
         alice.sarosBot().sessionView().followThisBuddy(bob.jid);
-        bob.bot().editor(CLS1_SUFFIX).activate();
+        bob.bot().editor(CLS1_SUFFIX).show();
         alice.bot().editor(CLS1_SUFFIX).waitUntilIsActive();
         assertTrue(alice.sarosBot().sessionView().isInFollowModeNoGUI());
         assertTrue(alice.bot().editor(CLS1_SUFFIX).isActive());

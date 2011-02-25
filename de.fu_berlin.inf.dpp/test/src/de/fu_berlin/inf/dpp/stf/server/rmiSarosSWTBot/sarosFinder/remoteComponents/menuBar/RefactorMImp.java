@@ -68,11 +68,11 @@ public class RefactorMImp extends EclipseComponentImp implements RefactorM {
 
         STFBotShell shell = bot().shell(shellTitle);
         shell.activate();
-        shell.bot_().textWithLabel(LABEL_NEW_NAME).setText(newName);
-        bot().shell(shellTitle).bot_().button(buttonName).waitUntilIsEnabled();
-        shell.bot_().button(buttonName).click();
+        shell.bot().textWithLabel(LABEL_NEW_NAME).setText(newName);
+        bot().shell(shellTitle).bot().button(buttonName).waitUntilIsEnabled();
+        shell.bot().button(buttonName).click();
         if (bot().isShellOpen("Rename Compilation Unit")) {
-            bot().shell("Rename Compilation Unit").bot_().button(buttonName)
+            bot().shell("Rename Compilation Unit").bot().button(buttonName)
                 .click();
         }
         if (bot().isShellOpen(shellTitle))
@@ -84,7 +84,7 @@ public class RefactorMImp extends EclipseComponentImp implements RefactorM {
         precondition();
         bot().menu(MENU_REFACTOR).menu(MENU_MOVE).click();
         // bot().shell(shellTitle).waitUntilActive();
-        bot().shell(shellTitle).confirmShellWithTree(buttonName, nodes);
+        bot().shell(shellTitle).confirmWithTree(buttonName, nodes);
         bot().waitsUntilShellIsClosed(shellTitle);
     }
 

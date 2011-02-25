@@ -54,13 +54,13 @@ public class TestRosterView extends STFTest {
     @Test
     public void setFocusOnRosterView() throws RemoteException {
         STFBotView view_buddies = alice.bot().view(VIEW_SAROS_BUDDIES);
-        view_buddies.setFocus();
+        view_buddies.show();
         assertTrue(view_buddies.isActive());
         view_buddies.close();
         assertFalse(view_buddies.isActive());
         alice.bot().openViewById(VIEW_SAROS_BUDDIES_ID);
         assertTrue(alice.bot().isViewOpen(VIEW_SAROS_BUDDIES));
-        alice.bot().view(VIEW_SAROS_SESSION).setFocus();
+        alice.bot().view(VIEW_SAROS_SESSION).show();
         assertFalse(alice.bot().view(VIEW_SAROS_BUDDIES).isActive());
     }
 

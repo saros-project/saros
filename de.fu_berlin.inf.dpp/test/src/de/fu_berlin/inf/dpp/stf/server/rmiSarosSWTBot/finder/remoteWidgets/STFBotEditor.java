@@ -47,7 +47,9 @@ public interface STFBotEditor extends Remote {
      *            the filename on the editor tab
      * @throws RemoteException
      */
-    public void activate() throws RemoteException;
+    public void show() throws RemoteException;
+
+    public void setFocus() throws RemoteException;
 
     /**
      * waits until the editor specified with the given fileName is active

@@ -9,24 +9,23 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotTableItem;
 public class STFBotTableItemImp extends AbstractRmoteWidget implements
     STFBotTableItem {
 
-    private static transient STFBotTableItemImp tableItemImp;
-    private static STFBotMenuImp stfBotMenu;
+    private static transient STFBotTableItemImp self;
 
-    private SWTBotTableItem tableItem;
+    private SWTBotTableItem widget;
 
     /**
-     * {@link STFBotTableImp} is a singleton, but inheritance is possible.
+     * {@link STFBotTableItemImp} is a singleton, but inheritance is possible.
      */
     public static STFBotTableItemImp getInstance() {
-        if (tableItemImp != null)
-            return tableItemImp;
-        tableItemImp = new STFBotTableItemImp();
-        stfBotMenu = STFBotMenuImp.getInstance();
-        return tableItemImp;
+        if (self != null)
+            return self;
+        self = new STFBotTableItemImp();
+        return self;
     }
 
-    public void setSwtBotTable(SWTBotTableItem tableItem) {
-        this.tableItem = tableItem;
+    public STFBotTableItem setWidget(SWTBotTableItem tableItem) {
+        this.widget = tableItem;
+        return this;
     }
 
     /**************************************************************
@@ -37,33 +36,39 @@ public class STFBotTableItemImp extends AbstractRmoteWidget implements
 
     /**********************************************
      * 
-     * actions
+     * finders
      * 
      **********************************************/
 
     public STFBotMenu contextMenu(String text) throws RemoteException {
-        stfBotMenu.setWidget(tableItem.contextMenu(text));
+        stfBotMenu.setWidget(widget.contextMenu(text));
         return stfBotMenu;
     }
 
+    /**********************************************
+     * 
+     * actions
+     * 
+     **********************************************/
+
     public void select() throws RemoteException {
-        tableItem.select();
+        widget.select();
     }
 
     public void check() throws RemoteException {
-        tableItem.check();
+        widget.check();
     }
 
     public void uncheck() throws RemoteException {
-        tableItem.uncheck();
+        widget.uncheck();
     }
 
     public void toggleCheck() throws RemoteException {
-        tableItem.toggleCheck();
+        widget.toggleCheck();
     }
 
     public void click() throws RemoteException {
-        tableItem.click();
+        widget.click();
     }
 
     public void clickAndWait() throws RemoteException {
@@ -72,7 +77,7 @@ public class STFBotTableItemImp extends AbstractRmoteWidget implements
     }
 
     public void setFocus() throws RemoteException {
-        tableItem.setFocus();
+        widget.setFocus();
     }
 
     /**********************************************
@@ -82,7 +87,7 @@ public class STFBotTableItemImp extends AbstractRmoteWidget implements
      **********************************************/
     public boolean existsContextMenu(String contextName) throws RemoteException {
         try {
-            tableItem.contextMenu(contextName);
+            widget.contextMenu(contextName);
 
             return true;
         } catch (WidgetNotFoundException e) {
@@ -92,35 +97,35 @@ public class STFBotTableItemImp extends AbstractRmoteWidget implements
     }
 
     public boolean isEnabled() throws RemoteException {
-        return tableItem.isEnabled();
+        return widget.isEnabled();
     }
 
     public boolean isVisible() throws RemoteException {
-        return tableItem.isVisible();
+        return widget.isVisible();
     }
 
     public boolean isActive() throws RemoteException {
-        return tableItem.isActive();
+        return widget.isActive();
     }
 
     public boolean isChecked() throws RemoteException {
-        return tableItem.isChecked();
+        return widget.isChecked();
     }
 
     public boolean isGrayed() throws RemoteException {
-        return tableItem.isGrayed();
+        return widget.isGrayed();
     }
 
     public String getText(int index) throws RemoteException {
-        return tableItem.getText(index);
+        return widget.getText(index);
     }
 
     public String getText() throws RemoteException {
-        return tableItem.getText();
+        return widget.getText();
     }
 
     public String getToolTipText() throws RemoteException {
-        return tableItem.getText();
+        return widget.getText();
     }
 
     /**********************************************
@@ -129,6 +134,6 @@ public class STFBotTableItemImp extends AbstractRmoteWidget implements
      * 
      **********************************************/
     public void waitUntilIsEnabled() throws RemoteException {
-        stfBot.waitUntil(Conditions.widgetIsEnabled(tableItem));
+        stfBot.waitUntil(Conditions.widgetIsEnabled(widget));
     }
 }

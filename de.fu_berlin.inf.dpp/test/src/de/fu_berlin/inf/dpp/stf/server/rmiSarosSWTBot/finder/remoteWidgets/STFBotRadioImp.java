@@ -20,8 +20,10 @@ public class STFBotRadioImp extends AbstractRmoteWidget implements STFBotRadio {
         return self;
     }
 
-    public void setWidget(SWTBotRadio radio) {
+    public STFBotRadio setWidget(SWTBotRadio radio) {
         this.swtBotRadio = radio;
+        return this;
+
     }
 
     /**************************************************************
@@ -29,6 +31,11 @@ public class STFBotRadioImp extends AbstractRmoteWidget implements STFBotRadio {
      * exported functions
      * 
      **************************************************************/
+
+    public STFBotMenu contextMenu(String text) throws RemoteException {
+        return stfBotMenu.setWidget(swtBotRadio.contextMenu(text));
+
+    }
 
     /**********************************************
      * 

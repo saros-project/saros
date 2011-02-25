@@ -10,27 +10,35 @@ public interface STFBotTree extends Remote {
 
     /**********************************************
      * 
-     * actions with basic widget: {@link SWTBotTree}.
+     * finders
      * 
      **********************************************/
 
-    /***************** select tree item ****************** */
+    public STFBotTreeItem[] getAllItems() throws RemoteException;
 
-    /**
-     * Selects the treeItem matching the given nodes in the tree: bot.tree().
-     * This method is suitable for STFBotShell widget.
+    public STFBotMenu contextMenu(String text) throws RemoteException;
+
+    /**********************************************
      * 
-     * @param nodes
-     *            node path to expand. Attempts to expand all nodes along the
-     *            path specified by the node array parameter.
-     * @throws RemoteException
-     */
-    public STFBotTreeItem selectTreeItem(String... nodes)
+     * actions
+     * 
+     **********************************************/
+
+    public STFBotTreeItem collapseNode(String nodeText) throws RemoteException;
+
+    public STFBotTreeItem expandNode(String nodeText, boolean recursive)
         throws RemoteException;
 
     public STFBotTreeItem expandNode(String... nodes) throws RemoteException;
 
-    /***************** select tree item with regexs ******************/
+    public STFBotTree select(int... indices) throws RemoteException;
+
+    public STFBotTree select(String... items) throws RemoteException;
+
+    public STFBotTree unselect() throws RemoteException;
+
+    public STFBotTreeItem selectTreeItem(String... nodes)
+        throws RemoteException;
 
     /**
      * Selects the treeItem matching the given Regexnodes in the tree:
@@ -47,7 +55,6 @@ public interface STFBotTree extends Remote {
     public STFBotTreeItem selectTreeItemWithRegex(String... regexNodes)
         throws RemoteException;
 
-    /***************** select tree item with waiting expand ****************** */
     /**
      * Selects the treeItem matching the given nodes in the tree: bot.tree()
      * with waiting until the parentTreeItem is expanded. This method is
@@ -59,11 +66,23 @@ public interface STFBotTree extends Remote {
      * @throws RemoteException
      */
     public STFBotTreeItem selectTreeItemAndWait(String... nodes)
-        throws RemoteException;;
+        throws RemoteException;
 
-    /***************** exist tree item with regexs ****************** */
+    public boolean hasItems() throws RemoteException;
 
-    /***************** exists tree item ****************** */
+    public int rowCount() throws RemoteException;
+
+    public int selectionCount() throws RemoteException;
+
+    public int columnCount() throws RemoteException;
+
+    public List<String> columns() throws RemoteException;
+
+    /**********************************************
+     * 
+     * states
+     * 
+     **********************************************/
     /**
      * This method is suitable for shell widget.
      * 
@@ -76,20 +95,20 @@ public interface STFBotTree extends Remote {
 
     public boolean existsSubItemWithRegexs(String regex) throws RemoteException;
 
-    /***************** is context of tree item enabled****************** */
-
-    /***************** get allItems in treeNode ****************** */
-
-    /***************** get allItems in tree ****************** */
-
     /**
      * This method is suitable for shell widget.
      * 
      * @return all the treeItem'name of the bot.tree().
      * @throws RemoteException
      */
-    public List<String> getSubtems() throws RemoteException;
+    public List<String> getTextOfItems() throws RemoteException;
 
-    public void waitUntilSubItemExists(String nodeName) throws RemoteException;
+    /**********************************************
+     * 
+     * wait until
+     * 
+     **********************************************/
+
+    public void waitUntilItemExists(String nodeName) throws RemoteException;
 
 }

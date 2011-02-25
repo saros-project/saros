@@ -45,15 +45,15 @@ public class EditMImp extends EclipseComponentImp implements EditM {
 
     public void deleteAllProjects(String viewTitle) throws RemoteException {
         precondition();
-        STFBotTree tree = bot().view(VIEW_PACKAGE_EXPLORER).bot_().tree();
-        List<String> allTreeItems = tree.getSubtems();
+        STFBotTree tree = bot().view(VIEW_PACKAGE_EXPLORER).bot().tree();
+        List<String> allTreeItems = tree.getTextOfItems();
 
         if (allTreeItems != null) {
             for (String item : allTreeItems) {
                 tree.selectTreeItem(item).contextMenu(MENU_DELETE).click();
                 STFBotShell shell = bot().shell(SHELL_DELETE_RESOURCE);
 
-                shell.confirmWindowWithCheckBox(OK, true);
+                shell.confirmWithCheckBox(OK, true);
                 bot().waitsUntilShellIsClosed(SHELL_DELETE_RESOURCE);
             }
         }
@@ -62,23 +62,23 @@ public class EditMImp extends EclipseComponentImp implements EditM {
     public void deleteProject() throws RemoteException {
         precondition();
         bot().menu(MENU_EDIT).menu(MENU_DELETE).click();
-        bot().shell(SHELL_DELETE_RESOURCE).confirmWindowWithCheckBox(OK, true);
+        bot().shell(SHELL_DELETE_RESOURCE).confirmWithCheckBox(OK, true);
         bot().waitsUntilShellIsClosed(SHELL_DELETE_RESOURCE);
     }
 
     public void deleteAllItemsOfJavaProject(String viewTitle, String projectName)
         throws RemoteException {
 
-        STFBotTreeItem treeItem = bot().view(viewTitle).bot_().tree()
+        STFBotTreeItem treeItem = bot().view(viewTitle).bot().tree()
             .selectTreeItem(projectName, SRC);
-        for (String item : treeItem.getSubItems()) {
-            bot().view(viewTitle).bot_().tree()
+        for (String item : treeItem.getTextOfItems()) {
+            bot().view(viewTitle).bot().tree()
                 .selectTreeItem(projectName, SRC, item).contextMenu(CM_DELETE)
                 .click();
 
             bot().waitUntilShellIsOpen(CONFIRM_DELETE);
             bot().shell(CONFIRM_DELETE).activate();
-            bot().shell(CONFIRM_DELETE).bot_().button(OK).click();
+            bot().shell(CONFIRM_DELETE).bot().button(OK).click();
         }
     }
 
@@ -87,7 +87,7 @@ public class EditMImp extends EclipseComponentImp implements EditM {
         bot().menu(MENU_EDIT).menu(MENU_DELETE).click();
         bot().waitUntilShellIsOpen(CONFIRM_DELETE);
         bot().shell(CONFIRM_DELETE).activate();
-        bot().shell(CONFIRM_DELETE).bot_().button(OK).click();
+        bot().shell(CONFIRM_DELETE).bot().button(OK).click();
         bot().sleep(300);
     }
 
@@ -101,8 +101,8 @@ public class EditMImp extends EclipseComponentImp implements EditM {
         bot().menu(MENU_EDIT).menu(MENU_PASTE).click();
         STFBotShell shell = bot().shell(SHELL_COPY_PROJECT);
         shell.activate();
-        shell.bot_().textWithLabel("Project name:").setText(target);
-        shell.bot_().button(OK).click();
+        shell.bot().textWithLabel("Project name:").setText(target);
+        shell.bot().button(OK).click();
         bot().waitsUntilShellIsClosed(SHELL_COPY_PROJECT);
         bot().sleep(1000);
     }

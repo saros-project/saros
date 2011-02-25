@@ -13,26 +13,23 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.conditions.SarosConditions
 
 public class STFBotTableImp extends AbstractRmoteWidget implements STFBotTable {
 
-    private static transient STFBotTableImp tableImp;
-    private static STFBotMenuImp stfBotMenu;
-    private static STFBotTableItemImp stfBotTableItem;
+    private static transient STFBotTableImp self;
 
-    private SWTBotTable table;
+    private SWTBotTable widget;
 
     /**
      * {@link STFBotTableImp} is a singleton, but inheritance is possible.
      */
     public static STFBotTableImp getInstance() {
-        if (tableImp != null)
-            return tableImp;
-        tableImp = new STFBotTableImp();
-        stfBotMenu = STFBotMenuImp.getInstance();
-        stfBotTableItem = STFBotTableItemImp.getInstance();
-        return tableImp;
+        if (self != null)
+            return self;
+        self = new STFBotTableImp();
+        return self;
     }
 
-    public void setSwtBotTable(SWTBotTable table) {
-        this.table = table;
+    public STFBotTable setWidget(SWTBotTable table) {
+        this.widget = table;
+        return this;
     }
 
     /**************************************************************
@@ -43,40 +40,40 @@ public class STFBotTableImp extends AbstractRmoteWidget implements STFBotTable {
 
     /**********************************************
      * 
-     * states
-     * 
-     **********************************************/
-    public boolean existsTableItem(String itemText) throws RemoteException {
-        return table.containsItem(itemText);
-    }
-
-    public List<String> getTableColumns() throws RemoteException {
-        return table.columns();
-    }
-
-    public boolean containsItem(String item) throws RemoteException {
-        return table.containsItem(item);
-    }
-
-    /**********************************************
-     * 
      * finder
      * 
      **********************************************/
 
     public STFBotMenu contextMenu(String text) throws RemoteException {
-        stfBotMenu.setWidget(table.contextMenu(text));
+        stfBotMenu.setWidget(widget.contextMenu(text));
         return stfBotMenu;
     }
 
     public STFBotTableItem getTableItem(String itemText) throws RemoteException {
-        stfBotTableItem.setSwtBotTable(table.getTableItem(itemText));
+        stfBotTableItem.setWidget(widget.getTableItem(itemText));
         return stfBotTableItem;
     }
 
     public STFBotTableItem getTableItem(int row) throws RemoteException {
-        stfBotTableItem.setSwtBotTable(table.getTableItem(row));
+        stfBotTableItem.setWidget(widget.getTableItem(row));
         return stfBotTableItem;
+    }
+
+    /**********************************************
+     * 
+     * states
+     * 
+     **********************************************/
+    public boolean existsTableItem(String itemText) throws RemoteException {
+        return widget.containsItem(itemText);
+    }
+
+    public List<String> getTableColumns() throws RemoteException {
+        return widget.columns();
+    }
+
+    public boolean containsItem(String item) throws RemoteException {
+        return widget.containsItem(item);
     }
 
     /**********************************************
@@ -86,31 +83,31 @@ public class STFBotTableImp extends AbstractRmoteWidget implements STFBotTable {
      **********************************************/
 
     public void select(String... items) throws RemoteException {
-        table.select(items);
+        widget.select(items);
     }
 
     public void click(int row, int column) throws RemoteException {
-        table.click(row, column);
+        widget.click(row, column);
     }
 
     public void unselect() throws RemoteException {
-        table.unselect();
+        widget.unselect();
     }
 
     public void selectionCount() throws RemoteException {
-        table.selectionCount();
+        widget.selectionCount();
     }
 
     public void check(int row, int column) throws RemoteException {
-        table.cell(row, column);
+        widget.cell(row, column);
     }
 
     public void check(int row, String columnName) throws RemoteException {
-        table.cell(row, columnName);
+        widget.cell(row, columnName);
     }
 
     public void setFocus() throws RemoteException {
-        table.setFocus();
+        widget.setFocus();
     }
 
     /**********************************************
@@ -119,37 +116,37 @@ public class STFBotTableImp extends AbstractRmoteWidget implements STFBotTable {
      * 
      **********************************************/
     public int indexOfColumn(String column) throws RemoteException {
-        return table.indexOfColumn(column);
+        return widget.indexOfColumn(column);
     }
 
     public int indexOf(String item) throws RemoteException {
-        return table.indexOf(item);
+        return widget.indexOf(item);
     }
 
     public int indexOf(String item, int column) throws RemoteException {
-        return table.indexOf(item, column);
+        return widget.indexOf(item, column);
     }
 
     public int indexOf(String item, String column) throws RemoteException {
-        return table.indexOf(item, column);
+        return widget.indexOf(item, column);
     }
 
     public int rowCount() throws RemoteException {
-        return table.rowCount();
+        return widget.rowCount();
     }
 
     public int columnCount() throws RemoteException {
-        return table.columnCount();
+        return widget.columnCount();
     }
 
     public List<String> columns() throws RemoteException {
-        return table.columns();
+        return widget.columns();
     }
 
     // FIXME this method doesn't work.
     public boolean existsContextMenu(String contextName) throws RemoteException {
         try {
-            table.contextMenu(contextName);
+            widget.contextMenu(contextName);
             return true;
         } catch (WidgetNotFoundException e) {
             return false;
@@ -157,23 +154,23 @@ public class STFBotTableImp extends AbstractRmoteWidget implements STFBotTable {
     }
 
     public boolean isEnabled() throws RemoteException {
-        return table.isEnabled();
+        return widget.isEnabled();
     }
 
     public boolean isVisible() throws RemoteException {
-        return table.isVisible();
+        return widget.isVisible();
     }
 
     public boolean isActive() throws RemoteException {
-        return table.isActive();
+        return widget.isActive();
     }
 
     public String getText() throws RemoteException {
-        return table.getText();
+        return widget.getText();
     }
 
     public String getToolTipText() throws RemoteException {
-        return table.getText();
+        return widget.getText();
     }
 
     /**********************************************
@@ -182,11 +179,11 @@ public class STFBotTableImp extends AbstractRmoteWidget implements STFBotTable {
      * 
      **********************************************/
     public void waitUntilIsEnabled() throws RemoteException {
-        stfBot.waitUntil(Conditions.widgetIsEnabled(table));
+        stfBot.waitUntil(Conditions.widgetIsEnabled(widget));
     }
 
     public void waitUntilTableHasRows(int row) throws RemoteException {
-        stfBot.waitUntil(tableHasRows(table, row));
+        stfBot.waitUntil(tableHasRows(widget, row));
     }
 
     public void waitUntilTableItemExists(String itemText)

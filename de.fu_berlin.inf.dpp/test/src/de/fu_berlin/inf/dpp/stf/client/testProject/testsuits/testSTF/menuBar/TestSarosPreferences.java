@@ -67,9 +67,9 @@ public class TestSarosPreferences extends STFTest {
             SHELL_CREATE_NEW_XMPP_ACCOUNT);
         shell_alice.confirmWithTextFieldAndWait(labelsAndTexts, FINISH);
         // wait a minute,so that bot can get the error message.
-        shell_alice.bot_().button(FINISH).waitUntilIsEnabled();
+        shell_alice.bot().button(FINISH).waitUntilIsEnabled();
         assertTrue(shell_alice.isActive());
-        String errorMessage = shell_alice.getErrorMessageInShell();
+        String errorMessage = shell_alice.getErrorMessage();
         assertTrue(errorMessage.matches(ERROR_MESSAGE_ACCOUNT_ALREADY_EXISTS
             + STRING_REGEX_WITH_LINE_BREAK));
         shell_alice.confirm(CANCEL);
@@ -84,16 +84,16 @@ public class TestSarosPreferences extends STFTest {
         STFBotShell shell_alice = alice.bot().shell(
             SHELL_CREATE_NEW_XMPP_ACCOUNT);
         shell_alice.activate();
-        shell_alice.bot_().textWithLabel(LABEL_XMPP_JABBER_SERVER)
+        shell_alice.bot().textWithLabel(LABEL_XMPP_JABBER_SERVER)
             .setText(SERVER);
-        shell_alice.bot_().textWithLabel(LABEL_USER_NAME)
+        shell_alice.bot().textWithLabel(LABEL_USER_NAME)
             .setText(NEW_USER_NAME);
-        shell_alice.bot_().textWithLabel(LABEL_PASSWORD).setText(PASSWORD);
-        shell_alice.bot_().textWithLabel(LABEL_REPEAT_PASSWORD)
+        shell_alice.bot().textWithLabel(LABEL_PASSWORD).setText(PASSWORD);
+        shell_alice.bot().textWithLabel(LABEL_REPEAT_PASSWORD)
             .setText(NO_MATCHED_REPEAT_PASSWORD);
 
-        assertFalse(shell_alice.bot_().button(FINISH).isEnabled());
-        String errorMessage = shell_alice.getErrorMessageInShell();
+        assertFalse(shell_alice.bot().button(FINISH).isEnabled());
+        String errorMessage = shell_alice.getErrorMessage();
         assertTrue(errorMessage.equals(ERROR_MESSAGE_PASSWORDS_NOT_MATCH));
         shell_alice.confirm(CANCEL);
         assertFalse(alice.bot().isShellOpen(SHELL_CREATE_NEW_XMPP_ACCOUNT));
@@ -115,8 +115,8 @@ public class TestSarosPreferences extends STFTest {
 
         shell_alice.confirmWithTextFieldAndWait(labelsAndTexts, FINISH);
 
-        shell_alice.bot_().button(FINISH).waitUntilIsEnabled();
-        String errorMessage = shell_alice.getErrorMessageInShell();
+        shell_alice.bot().button(FINISH).waitUntilIsEnabled();
+        String errorMessage = shell_alice.getErrorMessage();
         assertTrue(errorMessage.matches(ERROR_MESSAGE_COULD_NOT_CONNECT));
         shell_alice.confirm(CANCEL);
         assertFalse(alice.bot().isShellOpen(SHELL_CREATE_NEW_XMPP_ACCOUNT));

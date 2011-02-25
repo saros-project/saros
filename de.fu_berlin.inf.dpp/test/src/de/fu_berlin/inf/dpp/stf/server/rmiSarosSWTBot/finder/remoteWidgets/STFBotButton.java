@@ -9,6 +9,16 @@ public interface STFBotButton extends Remote {
 
     /**********************************************
      * 
+     * finders
+     * 
+     **********************************************/
+    /**
+     * @see SWTBotButton#contextMenu(String)
+     */
+    public STFBotMenu contextMenu(String text) throws RemoteException;
+
+    /**********************************************
+     * 
      * actions
      * 
      **********************************************/

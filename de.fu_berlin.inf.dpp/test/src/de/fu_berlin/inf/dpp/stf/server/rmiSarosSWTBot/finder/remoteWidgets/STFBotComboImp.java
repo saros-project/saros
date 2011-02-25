@@ -8,10 +8,10 @@ public class STFBotComboImp extends AbstractRmoteWidget implements STFBotCombo {
 
     private static transient STFBotComboImp self;
 
-    private SWTBotCombo swtBotCombo;
+    private SWTBotCombo widget;
 
     /**
-     * {@link STFBotButtonImp} is a singleton, but inheritance is possible.
+     * {@link STFBotComboImp} is a singleton, but inheritance is possible.
      */
     public static STFBotComboImp getInstance() {
         if (self != null)
@@ -20,8 +20,9 @@ public class STFBotComboImp extends AbstractRmoteWidget implements STFBotCombo {
         return self;
     }
 
-    public void setSwtBotCombo(SWTBotCombo ccomb) {
-        this.swtBotCombo = ccomb;
+    public STFBotCombo setWidget(SWTBotCombo ccomb) {
+        this.widget = ccomb;
+        return this;
     }
 
     /**************************************************************
@@ -32,33 +33,42 @@ public class STFBotComboImp extends AbstractRmoteWidget implements STFBotCombo {
 
     /**********************************************
      * 
+     * finders
+     * 
+     **********************************************/
+    public STFBotMenu contextMenu(String text) throws RemoteException {
+        return stfBotMenu.setWidget(widget.contextMenu(text));
+    }
+
+    /**********************************************
+     * 
      * actions
      * 
      **********************************************/
 
     public void typeText(String text) throws RemoteException {
-        swtBotCombo.typeText(text);
+        widget.typeText(text);
 
     }
 
     public void typeText(String text, int interval) throws RemoteException {
-        swtBotCombo.typeText(text, interval);
+        widget.typeText(text, interval);
     }
 
     public void setFocus() throws RemoteException {
-        swtBotCombo.setFocus();
+        widget.setFocus();
     }
 
     public void setText(String text) throws RemoteException {
-        swtBotCombo.setText(text);
+        widget.setText(text);
     }
 
     public void setSelection(String text) throws RemoteException {
-        swtBotCombo.setSelection(text);
+        widget.setSelection(text);
     }
 
     public void setSelection(int index) throws RemoteException {
-        swtBotCombo.setSelection(index);
+        widget.setSelection(index);
     }
 
     /**********************************************
@@ -67,39 +77,39 @@ public class STFBotComboImp extends AbstractRmoteWidget implements STFBotCombo {
      * 
      **********************************************/
     public int itemCount() throws RemoteException {
-        return swtBotCombo.itemCount();
+        return widget.itemCount();
     }
 
     public String[] items() throws RemoteException {
-        return swtBotCombo.items();
+        return widget.items();
     }
 
     public String selection() throws RemoteException {
-        return swtBotCombo.selection();
+        return widget.selection();
     }
 
     public int selectionIndex() throws RemoteException {
-        return swtBotCombo.selectionIndex();
+        return widget.selectionIndex();
     }
 
     public boolean isEnabled() throws RemoteException {
-        return swtBotCombo.isEnabled();
+        return widget.isEnabled();
     }
 
     public boolean isVisible() throws RemoteException {
-        return swtBotCombo.isVisible();
+        return widget.isVisible();
     }
 
     public boolean isActive() throws RemoteException {
-        return swtBotCombo.isActive();
+        return widget.isActive();
     }
 
     public String getText() throws RemoteException {
-        return swtBotCombo.getText();
+        return widget.getText();
     }
 
     public String getToolTipText() throws RemoteException {
-        return swtBotCombo.getText();
+        return widget.getText();
     }
 
 }

@@ -4,6 +4,15 @@ import java.rmi.Remote;
 import java.rmi.RemoteException;
 
 public interface STFBotCombo extends Remote {
+
+    /**********************************************
+     * 
+     * finders
+     * 
+     **********************************************/
+
+    public STFBotMenu contextMenu(String text) throws RemoteException;
+
     /**********************************************
      * 
      * actions

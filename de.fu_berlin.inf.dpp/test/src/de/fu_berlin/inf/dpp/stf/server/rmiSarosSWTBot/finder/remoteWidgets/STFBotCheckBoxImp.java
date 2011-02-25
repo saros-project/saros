@@ -9,10 +9,10 @@ public class STFBotCheckBoxImp extends AbstractRmoteWidget implements
 
     private static transient STFBotCheckBoxImp self;
 
-    private SWTBotCheckBox swtBotCheckBox;
+    private SWTBotCheckBox widget;
 
     /**
-     * {@link STFBotButtonImp} is a singleton, but inheritance is possible.
+     * {@link STFBotCheckBoxImp} is a singleton, but inheritance is possible.
      */
     public static STFBotCheckBoxImp getInstance() {
         if (self != null)
@@ -21,8 +21,9 @@ public class STFBotCheckBoxImp extends AbstractRmoteWidget implements
         return self;
     }
 
-    public void setSWTBotWidget(SWTBotCheckBox checkBox) {
-        this.swtBotCheckBox = checkBox;
+    public STFBotCheckBox setWidget(SWTBotCheckBox checkBox) {
+        this.widget = checkBox;
+        return this;
     }
 
     /**************************************************************
@@ -33,25 +34,34 @@ public class STFBotCheckBoxImp extends AbstractRmoteWidget implements
 
     /**********************************************
      * 
+     * finders
+     * 
+     **********************************************/
+    public STFBotMenu contextMenu(String text) throws RemoteException {
+        return stfBotMenu.setWidget(widget.contextMenu(text));
+    }
+
+    /**********************************************
+     * 
      * actions
      * 
      **********************************************/
 
     public void click() throws RemoteException {
-        swtBotCheckBox.click();
+        widget.click();
     }
 
     public void select() throws RemoteException {
-        swtBotCheckBox.select();
+        widget.select();
     }
 
     public void deselect() throws RemoteException {
-        swtBotCheckBox.deselect();
+        widget.deselect();
 
     }
 
     public void setFocus() throws RemoteException {
-        swtBotCheckBox.setFocus();
+        widget.setFocus();
     }
 
     /**********************************************
@@ -60,27 +70,27 @@ public class STFBotCheckBoxImp extends AbstractRmoteWidget implements
      * 
      **********************************************/
     public boolean isEnabled() throws RemoteException {
-        return swtBotCheckBox.isEnabled();
+        return widget.isEnabled();
     }
 
     public boolean isVisible() throws RemoteException {
-        return swtBotCheckBox.isVisible();
+        return widget.isVisible();
     }
 
     public boolean isActive() throws RemoteException {
-        return swtBotCheckBox.isActive();
+        return widget.isActive();
     }
 
     public boolean isChecked() throws RemoteException {
-        return swtBotCheckBox.isChecked();
+        return widget.isChecked();
     }
 
     public String getText() throws RemoteException {
-        return swtBotCheckBox.getText();
+        return widget.getText();
     }
 
     public String getToolTipText() throws RemoteException {
-        return swtBotCheckBox.getText();
+        return widget.getText();
     }
 
 }

@@ -189,13 +189,13 @@ public class STFWorkbenchBotImp extends STFBotImp implements STFWorkbenchBot {
      **********************************************/
 
     public STFBotEditor editor(String fileName) throws RemoteException {
-        stfBotEditor.setTitle(sarosSwtBot.editorByTitle(fileName)
+        stfBotEditor.setWidget(sarosSwtBot.editorByTitle(fileName)
             .toTextEditor());
         return stfBotEditor;
     }
 
     public STFBotEditor editorById(String id) throws RemoteException {
-        stfBotEditor.setTitle(sarosSwtBot.editorById(id).toTextEditor());
+        stfBotEditor.setWidget(sarosSwtBot.editorById(id).toTextEditor());
         return stfBotEditor;
     }
 

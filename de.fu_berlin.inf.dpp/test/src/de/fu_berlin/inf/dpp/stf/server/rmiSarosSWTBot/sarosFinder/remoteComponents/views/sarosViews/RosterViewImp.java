@@ -17,7 +17,6 @@ import org.eclipse.swtbot.eclipse.finder.matchers.WidgetMatcherFactory;
 import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
 import org.eclipse.swtbot.swt.finder.keyboard.Keystrokes;
 import org.eclipse.swtbot.swt.finder.waits.DefaultCondition;
-import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.hamcrest.Matcher;
 import org.jivesoftware.smack.Roster;
 import org.jivesoftware.smack.RosterEntry;
@@ -29,6 +28,7 @@ import de.fu_berlin.inf.dpp.net.util.RosterUtils;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotMenu;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotShell;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotToolbarDropDownButton;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotTreeItem;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.SarosComponentImp;
 
 /**
@@ -90,13 +90,13 @@ public class RosterViewImp extends SarosComponentImp implements RosterView {
     }
 
     public void selectBuddy(String baseJID) throws RemoteException {
-        bot().view(VIEW_SAROS_BUDDIES).bot_().tree()
+        bot().view(VIEW_SAROS_BUDDIES).bot().tree()
             .selectTreeItem(NODE_BUDDIES, baseJID);
     }
 
     public boolean hasBuddy(String buddyNickName) throws RemoteException {
         precondition();
-        return bot().view(VIEW_SAROS_BUDDIES).bot_().tree()
+        return bot().view(VIEW_SAROS_BUDDIES).bot().tree()
             .selectTreeItem(NODE_BUDDIES)
             .existsSubItemWithRegex(buddyNickName + ".*");
     }
@@ -109,14 +109,14 @@ public class RosterViewImp extends SarosComponentImp implements RosterView {
 
             bot()
                 .view(VIEW_SAROS_BUDDIES)
-                .bot_()
+                .bot()
                 .tree()
                 .selectTreeItemWithRegex(NODE_BUDDIES + ".*",
                     buddyNickName + ".*").contextMenu(CM_DELETE).click();
 
             bot().waitUntilShellIsOpen(CONFIRM_DELETE);
             bot().shell(CONFIRM_DELETE).activate();
-            bot().shell(CONFIRM_DELETE).bot_().button(YES).click();
+            bot().shell(CONFIRM_DELETE).bot().button(YES).click();
         } catch (WidgetNotFoundException e) {
             log.info("Contact not found: " + buddyJID.getBase(), e);
         }
@@ -137,7 +137,7 @@ public class RosterViewImp extends SarosComponentImp implements RosterView {
             throw new RuntimeException(
                 "the buddy dones't exist, which you want to rename.");
 
-        bot().view(VIEW_SAROS_BUDDIES).bot_().tree()
+        bot().view(VIEW_SAROS_BUDDIES).bot().tree()
             .selectTreeItemWithRegex(NODE_BUDDIES + ".*", buddyNickName + ".*")
             .contextMenu(CM_RENAME).click();
 
@@ -145,8 +145,8 @@ public class RosterViewImp extends SarosComponentImp implements RosterView {
         if (!shell.activate()) {
             shell.waitUntilActive();
         }
-        shell.bot_().text(buddyNickName).setText(newBuddyName);
-        shell.bot_().button(OK).click();
+        shell.bot().text(buddyNickName).setText(newBuddyName);
+        shell.bot().button(OK).click();
     }
 
     public void inviteBuddy(JID buddyJID) throws RemoteException {
@@ -156,9 +156,8 @@ public class RosterViewImp extends SarosComponentImp implements RosterView {
             throw new RuntimeException(
                 "the buddy dones't exist, which you want to invite.");
 
-        SWTBotTreeItem item = bot().view(VIEW_SAROS_BUDDIES).bot_().tree()
-            .selectTreeItemWithRegex(NODE_BUDDIES + ".*", buddyNickName + ".*")
-            .getSwtBotTreeItem();
+        STFBotTreeItem item = bot().view(VIEW_SAROS_BUDDIES).bot().tree()
+            .selectTreeItemWithRegex(NODE_BUDDIES + ".*", buddyNickName + ".*");
 
         if (!item.isEnabled()) {
             throw new RuntimeException("You can't invite this user "
@@ -406,7 +405,7 @@ public class RosterViewImp extends SarosComponentImp implements RosterView {
      */
     protected void precondition() throws RemoteException {
         bot().openViewById(VIEW_SAROS_BUDDIES_ID);
-        bot().view(VIEW_SAROS_BUDDIES).setFocus();
+        bot().view(VIEW_SAROS_BUDDIES).show();
     }
 
     protected boolean isToolbarButtonEnabled(String tooltip)

@@ -45,14 +45,14 @@ public class PEViewImp extends EclipseComponentImp implements PEView {
      **********************************************/
     public void selectProject(String projectName) throws RemoteException {
         precondition();
-        bot().view(VIEW_PACKAGE_EXPLORER).bot_().tree()
+        bot().view(VIEW_PACKAGE_EXPLORER).bot().tree()
             .selectTreeItemWithRegex(changeToRegex(projectName));
     }
 
     public void selectPkg(String projectName, String pkg)
         throws RemoteException {
         String[] nodes = { projectName, SRC, pkg };
-        bot().view(VIEW_PACKAGE_EXPLORER).bot_().tree()
+        bot().view(VIEW_PACKAGE_EXPLORER).bot().tree()
             .selectTreeItemWithRegex(changeToRegex(nodes));
     }
 
@@ -60,19 +60,19 @@ public class PEViewImp extends EclipseComponentImp implements PEView {
         throws RemoteException {
         precondition();
         String[] nodes = getClassNodes(projectName, pkg, className);
-        bot().view(VIEW_PACKAGE_EXPLORER).bot_().tree()
+        bot().view(VIEW_PACKAGE_EXPLORER).bot().tree()
             .selectTreeItemWithRegex(changeToRegex(nodes));
     }
 
     public void selectFolder(String... folderNodes) throws RemoteException {
 
-        bot().view(VIEW_PACKAGE_EXPLORER).bot_().tree()
+        bot().view(VIEW_PACKAGE_EXPLORER).bot().tree()
             .selectTreeItemWithRegex(changeToRegex(folderNodes));
     }
 
     public void selectFile(String... fileNodes) throws RemoteException {
 
-        bot().view(VIEW_PACKAGE_EXPLORER).bot_().tree()
+        bot().view(VIEW_PACKAGE_EXPLORER).bot().tree()
             .selectTreeItemWithRegex(changeToRegex(fileNodes));
     }
 
@@ -96,7 +96,7 @@ public class PEViewImp extends EclipseComponentImp implements PEView {
 
     protected void precondition() throws RemoteException {
         bot().openViewById(VIEW_PACKAGE_EXPLORER_ID);
-        bot().view(VIEW_PACKAGE_EXPLORER).setFocus();
+        bot().view(VIEW_PACKAGE_EXPLORER).show();
     }
 
 }

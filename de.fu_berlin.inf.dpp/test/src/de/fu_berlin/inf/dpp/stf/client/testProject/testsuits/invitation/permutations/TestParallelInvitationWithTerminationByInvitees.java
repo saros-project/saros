@@ -81,40 +81,40 @@ public class TestParallelInvitationWithTerminationByInvitees extends STFTest {
         bob.bot().waitUntilShellIsOpen(SHELL_SESSION_INVITATION);
         STFBotShell shell_bob = bob.bot().shell(SHELL_SESSION_INVITATION);
         shell_bob.activate();
-        shell_bob.bot_().button(CANCEL).click();
+        shell_bob.bot().button(CANCEL).click();
 
         STFBotShell shell_alice = alice.bot().shell(SHELL_PROBLEM_OCCURRED);
         shell_alice.waitUntilActive();
         assertTrue(alice.sarosBot().packageExplorerView().saros()
             .getSecondLabelOfShellProblemOccurred()
             .matches(bob.getName() + ".*"));
-        shell_alice.bot_().button(OK).click();
+        shell_alice.bot().button(OK).click();
 
         STFBotShell shell_carl = carl.bot().shell(SHELL_SESSION_INVITATION);
         carl.bot().waitUntilShellIsOpen(SHELL_SESSION_INVITATION);
         shell_carl.activate();
         carl.sarosBot().packageExplorerView().saros()
             .confirmShellSessionnInvitation();
-        shell_carl.bot_().button(CANCEL).click();
+        shell_carl.bot().button(CANCEL).click();
 
         shell_alice.waitUntilActive();
         assertTrue(alice.sarosBot().packageExplorerView().saros()
             .getSecondLabelOfShellProblemOccurred()
             .matches(carl.getName() + ".*"));
-        shell_alice.bot_().button(OK).click();
+        shell_alice.bot().button(OK).click();
 
         dave.bot().waitsUntilShellIsClosed(SHELL_SESSION_INVITATION);
         STFBotShell shell_dave = dave.bot().shell(SHELL_SESSION_INVITATION);
         shell_dave.activate();
         dave.sarosBot().packageExplorerView().saros()
             .confirmShellSessionnInvitation();
-        shell_dave.bot_().button(CANCEL).click();
+        shell_dave.bot().button(CANCEL).click();
 
         shell_alice.waitUntilActive();
         assertTrue(alice.sarosBot().packageExplorerView().saros()
             .getSecondLabelOfShellProblemOccurred()
             .matches(dave.getName() + ".*"));
-        shell_alice.bot_().button(OK).click();
+        shell_alice.bot().button(OK).click();
 
         edna.bot().waitUntilShellIsOpen(SHELL_SESSION_INVITATION);
         edna.bot().shell(SHELL_SESSION_INVITATION).activate();

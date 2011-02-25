@@ -104,7 +104,7 @@ public class EclipseComponentImp extends STF implements EclipseComponent {
     public boolean existsFile(String viewTitle, String... fileNodes)
         throws RemoteException {
 
-        return bot().view(viewTitle).bot_().tree()
+        return bot().view(viewTitle).bot().tree()
             .selectTreeItem(getParentNodes(fileNodes))
             .existsSubItemWithRegex(getLastNode(fileNodes + ".*"));
     }

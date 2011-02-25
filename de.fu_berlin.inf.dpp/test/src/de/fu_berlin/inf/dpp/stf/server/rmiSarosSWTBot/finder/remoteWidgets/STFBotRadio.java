@@ -6,6 +6,13 @@ public interface STFBotRadio {
 
     /**********************************************
      * 
+     * finders
+     * 
+     **********************************************/
+    public STFBotMenu contextMenu(String text) throws RemoteException;
+
+    /**********************************************
+     * 
      * actions
      * 
      **********************************************/

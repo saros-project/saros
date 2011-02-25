@@ -58,14 +58,14 @@ public class TestConcurrentEditing extends STFTest {
         alice.bot().activateWorkbench();
         int waitActivate = 100;
         alice.bot().sleep(waitActivate);
-        alice.bot().editor(FILE).activate();
+        alice.bot().editor(FILE).show();
 
         alice.bot().editor(FILE).waitUntilIsActive();
         alice.bot().editor(FILE).pressShortcut("DELETE");
         // at the same time, Bob enters L at 0,30
         bob.bot().activateWorkbench();
         bob.bot().sleep(waitActivate);
-        bob.bot().editor(FILE).activate();
+        bob.bot().editor(FILE).show();
         bob.bot().editor(FILE).waitUntilIsActive();
         bob.bot().editor(FILE).typeText("L");
         // both sleep for less than 1000ms
@@ -74,13 +74,13 @@ public class TestConcurrentEditing extends STFTest {
         // Alice hits Delete again
         alice.bot().activateWorkbench();
         alice.bot().sleep(waitActivate);
-        alice.bot().editor(FILE).activate();
+        alice.bot().editor(FILE).show();
         alice.bot().editor(FILE).waitUntilIsActive();
         alice.bot().editor(FILE).pressShortcut("DELETE");
         // Bob enters o
         bob.bot().activateWorkbench();
         bob.bot().sleep(waitActivate);
-        bob.bot().editor(FILE).activate();
+        bob.bot().editor(FILE).show();
         bob.bot().editor(FILE).waitUntilIsActive();
         bob.bot().editor(FILE).typeText("o");
 

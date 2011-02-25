@@ -20,7 +20,7 @@ public class STFBotShellImp extends AbstractRmoteWidget implements STFBotShell {
 
     public final static String TEXT_FIELD_TYPE_FILTER_TEXT = "type filter text";
 
-    private SWTBotShell swtBotShell;
+    private SWTBotShell widget;
 
     /**
      * {@link SessionViewImp} is a singleton, but inheritance is possible.
@@ -32,8 +32,9 @@ public class STFBotShellImp extends AbstractRmoteWidget implements STFBotShell {
         return self;
     }
 
-    public void setWidget(SWTBotShell shell) {
-        this.swtBotShell = shell;
+    public STFBotShell setWidget(SWTBotShell shell) {
+        this.widget = shell;
+        return this;
     }
 
     /**************************************************************
@@ -44,42 +45,58 @@ public class STFBotShellImp extends AbstractRmoteWidget implements STFBotShell {
 
     /**********************************************
      * 
+     * finders
+     * 
+     **********************************************/
+    public STFBot bot() {
+        STFBotImp botImp = STFBotImp.getInstance();
+        // botImp.setBot(swtBotShell.bot());
+        botImp.setBot(SarosSWTBot.getInstance());
+        return botImp;
+    }
+
+    public STFBotMenu contextMenu(String text) throws RemoteException {
+        return stfBotMenu.setWidget(widget.contextMenu(text));
+    }
+
+    /**********************************************
+     * 
      * actions
      * 
      **********************************************/
     public void setFocus() throws RemoteException {
-        swtBotShell.setFocus();
+        widget.setFocus();
     }
 
     public boolean activate() throws RemoteException {
-        swtBotShell.activate();
+        widget.activate();
         return true;
     }
 
     public void close() throws RemoteException {
-        swtBotShell.close();
+        widget.close();
     }
 
     public void confirm(String buttonText) throws RemoteException {
         activate();
-        bot_().button(buttonText).click();
+        bot().button(buttonText).click();
     }
 
-    public void confirmShellWithTree(String buttonText, String... nodes)
+    public void confirmWithTree(String buttonText, String... nodes)
         throws RemoteException {
         activate();
-        bot_().tree().selectTreeItem(nodes);
-        bot_().button(buttonText).waitUntilIsEnabled();
-        bot_().button(buttonText).click();
+        bot().tree().selectTreeItem(nodes);
+        bot().button(buttonText).waitUntilIsEnabled();
+        bot().button(buttonText).click();
     }
 
-    public void confirmShellWithTextField(String textLabel, String text,
+    public void confirmWithTextField(String textLabel, String text,
         String buttonText) throws RemoteException {
         activate();
-        bot_().textWithLabel(textLabel).setText(text);
+        bot().textWithLabel(textLabel).setText(text);
 
-        bot_().button(buttonText).waitUntilIsEnabled();
-        bot_().button(buttonText).click();
+        bot().button(buttonText).waitUntilIsEnabled();
+        bot().button(buttonText).click();
     }
 
     public void confirmWithTextFieldAndWait(Map<String, String> labelsAndTexts,
@@ -87,62 +104,59 @@ public class STFBotShellImp extends AbstractRmoteWidget implements STFBotShell {
         activate();
         for (String label : labelsAndTexts.keySet()) {
             String text = labelsAndTexts.get(label);
-            bot_().textWithLabel(label).setText(text);
+            bot().textWithLabel(label).setText(text);
         }
-        bot_().button(buttonText).waitUntilIsEnabled();
-        bot_().button(buttonText).click();
+        bot().button(buttonText).waitUntilIsEnabled();
+        bot().button(buttonText).click();
 
     }
 
-    public void confirmShellWithTreeWithWaitingExpand(String buttonText,
+    public void confirmWithTreeWithWaitingExpand(String buttonText,
         String... nodes) throws RemoteException {
-        bot_().tree().selectTreeItemAndWait(nodes);
-        bot_().button(buttonText).click();
+        bot().tree().selectTreeItemAndWait(nodes);
+        bot().button(buttonText).click();
     }
 
-    public void confirmWindowWithCheckBox(String buttonText, boolean isChecked)
+    public void confirmWithCheckBox(String buttonText, boolean isChecked)
         throws RemoteException {
         activate();
         if (isChecked)
-            bot_().checkBox().click();
-        bot_().button(buttonText).click();
+            bot().checkBox().click();
+        bot().button(buttonText).click();
 
     }
 
-    public void confirmShellithCheckBoxs(String buttonText, String... itemNames)
+    public void confirmWithCheckBoxs(String buttonText, String... itemNames)
         throws RemoteException {
         waitUntilActive();
         for (String itemName : itemNames) {
-            bot_().table().getTableItem(itemName).check();
+            bot().table().getTableItem(itemName).check();
         }
-        bot_().button(buttonText).waitUntilIsEnabled();
-        bot_().button(buttonText).click();
+        bot().button(buttonText).waitUntilIsEnabled();
+        bot().button(buttonText).click();
     }
 
-    public void confirmShellWithTable(String itemName, String buttonText)
+    public void confirmWithTable(String itemName, String buttonText)
         throws RemoteException {
-        // waitUntilShellActive(shellName);
+        waitUntilActive();
         try {
-            bot_().table().select(itemName);
-            bot_().button(buttonText).waitUntilIsEnabled();
-            bot_().button(buttonText).click();
+            bot().table().select(itemName);
+            bot().button(buttonText).waitUntilIsEnabled();
+            bot().button(buttonText).click();
             // waitUntilShellCloses(shellName);
         } catch (WidgetNotFoundException e) {
             log.error("tableItem" + itemName + "can not be fund!");
         }
     }
 
-    public void confirmShellWithTreeWithFilterText(String rootOfTreeNode,
+    public void confirmWithTreeWithFilterText(String rootOfTreeNode,
         String teeNode, String buttonText) throws RemoteException {
-        // waitUntilShellActive(shellName);
-        bot_().text(TEXT_FIELD_TYPE_FILTER_TEXT).setText(teeNode);
-        bot_().tree().waitUntilSubItemExists(rootOfTreeNode);
-        // SWTBotTreeItem treeItem = bot.tree(0).getTreeItem(rootOfTreeNode);
-        // bot_().tree().waitUntilSubItemExists(teeNode);
-        // treeItem.getNode(teeNode).select();
-        bot_().tree().selectTreeItem(rootOfTreeNode, teeNode);
-        bot_().button(buttonText).waitUntilIsEnabled();
-        bot_().button(buttonText).click();
+        waitUntilActive();
+        bot().text(TEXT_FIELD_TYPE_FILTER_TEXT).setText(teeNode);
+        bot().tree().waitUntilItemExists(rootOfTreeNode);
+        bot().tree().selectTreeItem(rootOfTreeNode, teeNode);
+        bot().button(buttonText).waitUntilIsEnabled();
+        bot().button(buttonText).click();
         // waitUntilShellCloses(shellName);
     }
 
@@ -152,31 +166,31 @@ public class STFBotShellImp extends AbstractRmoteWidget implements STFBotShell {
      * 
      **********************************************/
     public boolean isActive() throws RemoteException {
-        return swtBotShell.isActive();
+        return widget.isActive();
     }
 
     public boolean isEnabled() throws RemoteException {
-        return swtBotShell.isEnabled();
+        return widget.isEnabled();
     }
 
     public boolean isVisible() throws RemoteException {
-        return swtBotShell.isVisible();
+        return widget.isVisible();
     }
 
     public String getText() throws RemoteException {
-        return swtBotShell.getText();
+        return widget.getText();
     }
 
     public String getToolTipText() throws RemoteException {
-        return swtBotShell.getText();
+        return widget.getText();
     }
 
-    public String getErrorMessageInShell() throws RemoteException {
-
+    public String getErrorMessage() throws RemoteException {
+        activate();
         final String errorMessage = UIThreadRunnable
             .syncExec(new StringResult() {
                 public String run() {
-                    WizardDialog dialog = (WizardDialog) swtBotShell.widget
+                    WizardDialog dialog = (WizardDialog) widget.widget
                         .getData();
                     return dialog.getErrorMessage();
                 }
@@ -187,10 +201,9 @@ public class STFBotShellImp extends AbstractRmoteWidget implements STFBotShell {
         return errorMessage;
     }
 
-    public boolean existsTableItemInShell(String label) throws RemoteException {
+    public boolean existsTableItem(String label) throws RemoteException {
         activate();
-        // return bo_t()..stfTable.existsTableItem(label);
-        return false;
+        return bot().table().existsTableItem(label);
     }
 
     /**********************************************
@@ -200,25 +213,15 @@ public class STFBotShellImp extends AbstractRmoteWidget implements STFBotShell {
      **********************************************/
 
     public void waitUntilActive() throws RemoteException {
-        stfBot.waitUntil(SarosConditions.ShellActive(swtBotShell));
-        // if (!isShellActive(title))
-        // throw new RemoteException("Couldn't activate shell \"" + title
-        // + "\"");
+        stfBot.waitUntil(SarosConditions.ShellActive(widget));
     }
 
-    public void waitShortUntilIsShellClosed() throws RemoteException {
-        stfBot.waitShortUntil(SarosConditions.isShellClosed(swtBotShell));
+    public void waitShortUntilIsClosed() throws RemoteException {
+        stfBot.waitShortUntil(SarosConditions.isShellClosed(widget));
     }
 
-    public void waitLongUntilShellClosed() throws RemoteException {
-        stfBot.waitLongUntil(SarosConditions.isShellClosed(swtBotShell));
-    }
-
-    public STFBot bot_() {
-        STFBotImp botImp = STFBotImp.getInstance();
-        // botImp.setBot(swtBotShell.bot());
-        botImp.setBot(SarosSWTBot.getInstance());
-        return botImp;
+    public void waitLongUntilIsClosed() throws RemoteException {
+        stfBot.waitLongUntil(SarosConditions.isShellClosed(widget));
     }
 
 }

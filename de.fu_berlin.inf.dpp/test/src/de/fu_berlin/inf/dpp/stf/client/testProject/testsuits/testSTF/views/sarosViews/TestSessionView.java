@@ -38,7 +38,7 @@ public class TestSessionView extends STFTest {
     @Test
     public void testSetFocusOnSessionView() throws RemoteException {
         log.trace("alice set focus on session view.");
-        alice.bot().view(VIEW_SAROS_SESSION).setFocus();
+        alice.bot().view(VIEW_SAROS_SESSION).show();
         assertTrue(alice.bot().view(VIEW_SAROS_SESSION).isActive());
         log.trace("alice close session view.");
 
@@ -48,7 +48,7 @@ public class TestSessionView extends STFTest {
         alice.bot().openViewById(VIEW_SAROS_SESSION_ID);
         assertTrue(alice.bot().isViewOpen(VIEW_SAROS_SESSION));
         log.trace("alice focus on saros buddies view.");
-        alice.bot().view(VIEW_SAROS_BUDDIES).setFocus();
+        alice.bot().view(VIEW_SAROS_BUDDIES).show();
         assertFalse(alice.bot().view(VIEW_SAROS_SESSION).isActive());
         log.trace("testSetFocusOnSessionView is done.");
     }
@@ -148,7 +148,7 @@ public class TestSessionView extends STFTest {
 
         alice.sarosBot().packageExplorerView().open()
             .openClass(VIEW_PACKAGE_EXPLORER, PROJECT1, PKG1, CLS1);
-        alice.bot().editor(CLS1 + SUFFIX_JAVA).activate();
+        alice.bot().editor(CLS1 + SUFFIX_JAVA).show();
         assertTrue(alice.bot().editor(CLS1_SUFFIX).isActive());
         assertFalse(bob.bot().isEditorOpen(CLS1_SUFFIX));
         bob.sarosBot().sessionView().jumpToPositionOfSelectedBuddy(alice.jid);

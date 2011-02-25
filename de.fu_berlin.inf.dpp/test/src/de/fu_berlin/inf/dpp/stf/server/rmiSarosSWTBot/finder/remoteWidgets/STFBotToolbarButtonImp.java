@@ -22,8 +22,9 @@ public class STFBotToolbarButtonImp extends AbstractRmoteWidget implements
         return ToolbarButtonImp;
     }
 
-    public void setSwtBotToolbarButton(SWTBotToolbarButton toolbarButton) {
+    public STFBotToolbarButton setWidget(SWTBotToolbarButton toolbarButton) {
         this.toolbarButton = toolbarButton;
+        return this;
     }
 
     /**************************************************************
@@ -31,6 +32,11 @@ public class STFBotToolbarButtonImp extends AbstractRmoteWidget implements
      * exported functions
      * 
      **************************************************************/
+
+    public STFBotMenu contextMenu(String text) throws RemoteException {
+        return stfBotMenu.setWidget(toolbarButton.contextMenu(text));
+
+    }
 
     /**********************************************
      * 

@@ -34,7 +34,7 @@ public class ConsoleViewImp extends EclipseComponentImp implements ConsoleView {
      * 
      **********************************************/
     public String getTextInConsole() throws RemoteException {
-        return bot().view(VIEW_CONSOLE).bot_().styledText().getText();
+        return bot().view(VIEW_CONSOLE).bot().styledText().getText();
     }
 
     /**********************************************
@@ -47,7 +47,7 @@ public class ConsoleViewImp extends EclipseComponentImp implements ConsoleView {
             public boolean test() throws Exception {
                 try {
                     STFBotStyledText styledText = bot().view(VIEW_CONSOLE)
-                        .bot_().styledText();
+                        .bot().styledText();
                     if (styledText != null && styledText.getText() != null
                         && !styledText.getText().equals(""))
                         return true;

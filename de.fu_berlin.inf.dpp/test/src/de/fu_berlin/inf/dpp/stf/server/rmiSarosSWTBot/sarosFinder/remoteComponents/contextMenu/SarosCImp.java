@@ -63,11 +63,11 @@ public class SarosCImp extends SarosComponentImp implements SarosC {
         STFBotShell shell = bot().shell(SHELL_SHELL_ADD_PROJECT);
         if (!shell.activate())
             shell.waitUntilActive();
-        shell.bot_().radio(RADIO_CREATE_NEW_PROJECT).click();
-        shell.bot_().button(FINISH).click();
+        shell.bot().radio(RADIO_CREATE_NEW_PROJECT).click();
+        shell.bot().button(FINISH).click();
 
         try {
-            bot().shell(SHELL_SHELL_ADD_PROJECT).waitLongUntilShellClosed();
+            bot().shell(SHELL_SHELL_ADD_PROJECT).waitLongUntilIsClosed();
         } catch (Exception e) {
             /*
              * sometimes session can not be completely builded because of
@@ -81,7 +81,7 @@ public class SarosCImp extends SarosComponentImp implements SarosC {
                 bot().getPathToScreenShot()
                     + "/sessionInvitationFailedUsingNewProject.png");
             if (bot().activeShell().getText().equals(SHELL_SHELL_ADD_PROJECT)) {
-                bot().activeShell().bot_().toggleButton().click();
+                bot().activeShell().bot().toggleButton().click();
             }
             throw new RuntimeException("session invitation is failed!");
         }
@@ -93,15 +93,15 @@ public class SarosCImp extends SarosComponentImp implements SarosC {
         bot().waitUntilShellIsOpen(SHELL_SHELL_ADD_PROJECT);
         STFBotShell shell = bot().shell(SHELL_SHELL_ADD_PROJECT);
         shell.activate();
-        shell.bot_().radio(RADIO_USING_EXISTING_PROJECT).click();
+        shell.bot().radio(RADIO_USING_EXISTING_PROJECT).click();
 
         // bot.button(BUTTON_BROWSE).click();
         // windowPart.activateShellWithText(FOLDER_SELECTION);
         // windowPart.confirmWindowWithTree(FOLDER_SELECTION, OK,
         // helperPart.changeToRegex(projectName));
         // windowPart.waitUntilShellCloses(FOLDER_SELECTION);
-        shell.bot_().textWithLabel("Project name", 1).setText(projectName);
-        shell.bot_().button(FINISH).click();
+        shell.bot().textWithLabel("Project name", 1).setText(projectName);
+        shell.bot().button(FINISH).click();
         /*
          * if there are some files locally, which are not saved yet, you will
          * get a popup window with the title "Save Resource" after you comfirm
@@ -137,14 +137,14 @@ public class SarosCImp extends SarosComponentImp implements SarosC {
          */
         if (bot().isShellOpen(SHELL_SHELL_ADD_PROJECT)) {
             try {
-                bot().shell(SHELL_SHELL_ADD_PROJECT).waitLongUntilShellClosed();
+                bot().shell(SHELL_SHELL_ADD_PROJECT).waitLongUntilIsClosed();
             } catch (Exception e) {
                 bot().captureScreenshot(
                     bot().getPathToScreenShot()
                         + "/sessionInvitationFailedUsingExistProject.png");
                 if (bot().activeShell().getText()
                     .equals(SHELL_SHELL_ADD_PROJECT)) {
-                    bot().activeShell().bot_().toggleButton().click();
+                    bot().activeShell().bot().toggleButton().click();
                 }
             }
         }
@@ -155,9 +155,9 @@ public class SarosCImp extends SarosComponentImp implements SarosC {
         bot().waitUntilShellIsOpen(SHELL_SHELL_ADD_PROJECT);
         STFBotShell shell = bot().shell(SHELL_SHELL_ADD_PROJECT);
         shell.activate();
-        shell.bot_().radio("Use existing project").click();
-        shell.bot_().textWithLabel("Project name", 1).setText(projectName);
-        shell.bot_().button(FINISH).click();
+        shell.bot().radio("Use existing project").click();
+        shell.bot().textWithLabel("Project name", 1).setText(projectName);
+        shell.bot().button(FINISH).click();
         bot().shell(SHELL_WARNING_LOCAL_CHANGES_DELETED).confirm(NO);
 
         confirmShellAddProjectUsingExistProjectWithCopy(projectName);
@@ -169,26 +169,26 @@ public class SarosCImp extends SarosComponentImp implements SarosC {
         if (!shell.activate())
             shell.waitUntilActive();
 
-        shell.bot_().radio("Use existing project").click();
-        shell.bot_()
+        shell.bot().radio("Use existing project").click();
+        shell.bot()
             .checkBox("Create copy for working distributed. New project name:")
             .click();
-        shell.bot_().button(FINISH).click();
-        bot().shell(SHELL_SHELL_ADD_PROJECT).waitLongUntilShellClosed();
+        shell.bot().button(FINISH).click();
+        bot().shell(SHELL_SHELL_ADD_PROJECT).waitLongUntilIsClosed();
     }
 
     public void confirmShellSessionnInvitation() throws RemoteException {
         STFBotShell shell = bot().shell(SHELL_SESSION_INVITATION);
         if (!shell.activate())
             shell.waitUntilActive();
-        shell.bot_().button(FINISH).click();
+        shell.bot().button(FINISH).click();
     }
 
     public void confirmWindowInvitationCancelled() throws RemoteException {
         STFBotShell shell = bot().shell(SHELL_INVITATION_CANCELLED);
         shell.activate();
         shell.setFocus();
-        shell.bot_().button().click();
+        shell.bot().button().click();
     }
 
     public void confirmShellAddProjectUsingWhichProject(String projectName,
@@ -226,7 +226,7 @@ public class SarosCImp extends SarosComponentImp implements SarosC {
         precondition(viewTitle);
         String matchTexts = changeToRegex(projectName);
 
-        bot().view(viewTitle).bot_().tree().selectTreeItemWithRegex(matchTexts)
+        bot().view(viewTitle).bot().tree().selectTreeItemWithRegex(matchTexts)
             .contextMenu(CM_SAROS, CM_SHARE_PROJECT).click();
 
     }
@@ -245,7 +245,7 @@ public class SarosCImp extends SarosComponentImp implements SarosC {
     }
 
     public String getSecondLabelOfShellProblemOccurred() throws RemoteException {
-        return bot().shell(SHELL_PROBLEM_OCCURRED).bot_().label(2).getText();
+        return bot().shell(SHELL_PROBLEM_OCCURRED).bot().label(2).getText();
     }
 
     /**********************************************
@@ -313,12 +313,12 @@ public class SarosCImp extends SarosComponentImp implements SarosC {
         String contextName) throws RemoteException {
         String matchTexts = changeToRegex(projectName);
 
-        bot().view(viewTitle).bot_().tree().selectTreeItemWithRegex(matchTexts)
+        bot().view(viewTitle).bot().tree().selectTreeItemWithRegex(matchTexts)
             .contextMenu(CM_SAROS, contextName).click();
     }
 
     protected void precondition(String viewTitle) throws RemoteException {
         bot().openViewById(viewTitlesAndIDs.get(viewTitle));
-        bot().view(viewTitle).setFocus();
+        bot().view(viewTitle).show();
     }
 }

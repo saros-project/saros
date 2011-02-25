@@ -5,13 +5,15 @@ import java.rmi.RemoteException;
 import org.eclipse.swtbot.swt.finder.waits.Conditions;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotToggleButton;
 
-public class STFBotToggleButtonImp extends AbstractRmoteWidget implements STFBotToggleButton {
+public class STFBotToggleButtonImp extends AbstractRmoteWidget implements
+    STFBotToggleButton {
     private static transient STFBotToggleButtonImp self;
 
-    private SWTBotToggleButton swtBotToggleButton;
+    private SWTBotToggleButton widget;
 
     /**
-     * {@link STFBotButtonImp} is a singleton, but inheritance is possible.
+     * {@link STFBotToggleButtonImp} is a singleton, but inheritance is
+     * possible.
      */
     public static STFBotToggleButtonImp getInstance() {
         if (self != null)
@@ -20,8 +22,9 @@ public class STFBotToggleButtonImp extends AbstractRmoteWidget implements STFBot
         return self;
     }
 
-    public void setWidget(SWTBotToggleButton toggleButton) {
-        this.swtBotToggleButton = toggleButton;
+    public STFBotToggleButton setWidget(SWTBotToggleButton toggleButton) {
+        this.widget = toggleButton;
+        return this;
     }
 
     /**************************************************************
@@ -36,11 +39,11 @@ public class STFBotToggleButtonImp extends AbstractRmoteWidget implements STFBot
      * 
      **********************************************/
     public void click() throws RemoteException {
-        swtBotToggleButton.click();
+        widget.click();
     }
 
     public void press() throws RemoteException {
-        swtBotToggleButton.press();
+        widget.press();
     }
 
     public void clickAndWait() throws RemoteException {
@@ -49,7 +52,7 @@ public class STFBotToggleButtonImp extends AbstractRmoteWidget implements STFBot
     }
 
     public void setFocus() throws RemoteException {
-        swtBotToggleButton.setFocus();
+        widget.setFocus();
     }
 
     /**********************************************
@@ -59,27 +62,27 @@ public class STFBotToggleButtonImp extends AbstractRmoteWidget implements STFBot
      **********************************************/
 
     public boolean isPressed() throws RemoteException {
-        return swtBotToggleButton.isPressed();
+        return widget.isPressed();
     }
 
     public boolean isEnabled() throws RemoteException {
-        return swtBotToggleButton.isEnabled();
+        return widget.isEnabled();
     }
 
     public boolean isVisible() throws RemoteException {
-        return swtBotToggleButton.isVisible();
+        return widget.isVisible();
     }
 
     public boolean isActive() throws RemoteException {
-        return swtBotToggleButton.isActive();
+        return widget.isActive();
     }
 
     public String getText() throws RemoteException {
-        return swtBotToggleButton.getText();
+        return widget.getText();
     }
 
     public String getToolTipText() throws RemoteException {
-        return swtBotToggleButton.getText();
+        return widget.getText();
     }
 
     /**********************************************
@@ -88,7 +91,7 @@ public class STFBotToggleButtonImp extends AbstractRmoteWidget implements STFBot
      * 
      **********************************************/
     public void waitUntilIsEnabled() throws RemoteException {
-        stfBot.waitUntil(Conditions.widgetIsEnabled(swtBotToggleButton));
+        stfBot.waitUntil(Conditions.widgetIsEnabled(widget));
     }
 
 }

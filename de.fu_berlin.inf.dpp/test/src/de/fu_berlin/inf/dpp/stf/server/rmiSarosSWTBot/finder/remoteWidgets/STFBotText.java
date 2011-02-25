@@ -3,27 +3,41 @@ package de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 
-import org.eclipse.swtbot.swt.finder.widgets.SWTBotText;
-
 public interface STFBotText extends Remote {
 
-    /**
-     * set the given text into the {@link SWTBotText} with the specified
+    /**********************************************
      * 
-     * @param text
-     *            the text which you want to insert into the text field
-     * @param label
-     *            the label on the widget.
-     * @throws RemoteException
-     */
-    public void setText(String text) throws RemoteException;
+     * finders
+     * 
+     **********************************************/
 
-    /**
+    public STFBotMenu contextMenu(String text) throws RemoteException;
+
+    /**********************************************
      * 
-     * @param label
-     *            the label on the widget.
-     * @return the text in the given {@link SWTBotText}
-     * @throws RemoteException
-     */
+     * actions
+     * 
+     **********************************************/
+    public STFBotText selectAll() throws RemoteException;
+
+    public void setFocus() throws RemoteException;
+
+    public STFBotText setText(String text) throws RemoteException;
+
+    public STFBotText typeText(String text) throws RemoteException;
+
+    /**********************************************
+     * 
+     * states
+     * 
+     **********************************************/
     public String getText() throws RemoteException;
+
+    public boolean isEnabled() throws RemoteException;
+
+    public boolean isVisible() throws RemoteException;
+
+    public boolean isActive() throws RemoteException;
+
+    public String getToolTipText() throws RemoteException;
 }

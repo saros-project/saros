@@ -12,7 +12,7 @@ public class STFBotMenuImp extends AbstractRmoteWidget implements STFBotMenu {
     private SWTBotMenu widget;
 
     /**
-     * {@link STFBotTableImp} is a singleton, but inheritance is possible.
+     * {@link STFBotMenuImp} is a singleton, but inheritance is possible.
      */
     public static STFBotMenuImp getInstance() {
         if (menuImp != null)
@@ -21,8 +21,9 @@ public class STFBotMenuImp extends AbstractRmoteWidget implements STFBotMenu {
         return menuImp;
     }
 
-    public void setWidget(SWTBotMenu widget) {
+    public STFBotMenu setWidget(SWTBotMenu widget) {
         this.widget = widget;
+        return this;
     }
 
     /**************************************************************

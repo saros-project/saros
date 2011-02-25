@@ -7,6 +7,13 @@ public interface STFBotToolbarButton extends Remote {
 
     /**********************************************
      * 
+     * finders
+     * 
+     **********************************************/
+    public STFBotMenu contextMenu(String text) throws RemoteException;
+
+    /**********************************************
+     * 
      * actions
      * 
      **********************************************/

@@ -31,20 +31,20 @@ public class TestBasicWidgetsTable extends STFTest {
     @Test
     public void existsTableItemInView() throws RemoteException {
         STFBotView view = alice.bot().view(VIEW_SAROS_SESSION);
-        view.setFocus();
+        view.show();
 
-        assertTrue(view.bot_().table().existsTableItem(OWN_PARTICIPANT_NAME));
+        assertTrue(view.bot().table().existsTableItem(OWN_PARTICIPANT_NAME));
     }
 
     @Test
     public void selectTableItemInView() throws RemoteException {
         STFBotView view = alice.bot().view(VIEW_SAROS_SESSION);
-        view.setFocus();
-        view.bot_().table().getTableItem(bob.getBaseJid()).select();
+        view.show();
+        view.bot().table().getTableItem(bob.getBaseJid()).select();
 
         assertTrue(view.toolbarButton(TB_SHARE_SCREEN_WITH_BUDDY).isEnabled());
 
-        view.bot_().table().getTableItem(OWN_PARTICIPANT_NAME).select();
+        view.bot().table().getTableItem(OWN_PARTICIPANT_NAME).select();
 
         assertFalse(view.toolbarButton(TB_SHARE_SCREEN_WITH_BUDDY).isEnabled());
     }
@@ -52,8 +52,8 @@ public class TestBasicWidgetsTable extends STFTest {
     @Test
     public void clickContextMenuOfTableInView() throws RemoteException {
         STFBotView view = alice.bot().view(VIEW_SAROS_SESSION);
-        view.setFocus();
-        view.bot_().table().getTableItem(bob.getBaseJid())
+        view.show();
+        view.bot().table().getTableItem(bob.getBaseJid())
             .contextMenu(CM_RESTRICT_TO_READ_ONLY_ACCESS).click();
 
         bob.sarosBot().sessionView().waitUntilHasReadOnlyAccess();
@@ -63,23 +63,23 @@ public class TestBasicWidgetsTable extends STFTest {
     @Test
     public void isContextMenuOfTableVisibleInView() throws RemoteException {
         STFBotView view = alice.bot().view(VIEW_SAROS_SESSION);
-        view.setFocus();
+        view.show();
 
-        assertTrue(view.bot_().table().getTableItem(bob.getBaseJid())
+        assertTrue(view.bot().table().getTableItem(bob.getBaseJid())
             .contextMenu(CM_RESTRICT_TO_READ_ONLY_ACCESS).isVisible());
 
-        assertTrue(view.bot_().table().getTableItem(bob.getBaseJid())
+        assertTrue(view.bot().table().getTableItem(bob.getBaseJid())
             .contextMenu(CM_CHANGE_COLOR).isVisible());
     }
 
     @Test
     public void isContextMenuOfTableEnabledInView() throws RemoteException {
         STFBotView view = alice.bot().view(VIEW_SAROS_SESSION);
-        view.setFocus();
+        view.show();
 
-        assertTrue(view.bot_().table().getTableItem(bob.getBaseJid())
+        assertTrue(view.bot().table().getTableItem(bob.getBaseJid())
             .contextMenu(CM_RESTRICT_TO_READ_ONLY_ACCESS).isEnabled());
-        assertFalse(view.bot_().table().getTableItem(bob.getBaseJid())
+        assertFalse(view.bot().table().getTableItem(bob.getBaseJid())
             .contextMenu(CM_CHANGE_COLOR).isEnabled());
     }
 }

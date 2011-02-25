@@ -6,22 +6,23 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotText;
 
 public class STFBotTextImp extends AbstractRmoteWidget implements STFBotText {
 
-    private static transient STFBotTextImp textImp;
+    private static transient STFBotTextImp self;
 
-    private SWTBotText swtBotText;
+    private SWTBotText widget;
 
     /**
-     * {@link STFBotTableImp} is a singleton, but inheritance is possible.
+     * {@link STFBotTextImp} is a singleton, but inheritance is possible.
      */
     public static STFBotTextImp getInstance() {
-        if (textImp != null)
-            return textImp;
-        textImp = new STFBotTextImp();
-        return textImp;
+        if (self != null)
+            return self;
+        self = new STFBotTextImp();
+        return self;
     }
 
-    public void setSwtBotText(SWTBotText text) {
-        this.swtBotText = text;
+    public STFBotText setWidget(SWTBotText text) {
+        this.widget = text;
+        return this;
     }
 
     /**************************************************************
@@ -32,12 +33,35 @@ public class STFBotTextImp extends AbstractRmoteWidget implements STFBotText {
 
     /**********************************************
      * 
+     * finders
+     * 
+     **********************************************/
+
+    public STFBotMenu contextMenu(String text) throws RemoteException {
+        return stfBotMenu.setWidget(widget.contextMenu(text));
+
+    }
+
+    /**********************************************
+     * 
      * actions
      * 
      **********************************************/
 
-    public void setText(String text) throws RemoteException {
-        swtBotText.setText(text);
+    public STFBotText selectAll() throws RemoteException {
+        return setWidget(widget.selectAll());
+    }
+
+    public void setFocus() throws RemoteException {
+        widget.setFocus();
+    }
+
+    public STFBotText setText(String text) throws RemoteException {
+        return setWidget(widget.setText(text));
+    }
+
+    public STFBotText typeText(String text) throws RemoteException {
+        return setWidget(widget.typeText(text));
     }
 
     /**********************************************
@@ -45,8 +69,25 @@ public class STFBotTextImp extends AbstractRmoteWidget implements STFBotText {
      * states
      * 
      **********************************************/
+
     public String getText() throws RemoteException {
-        return swtBotText.getText();
+        return widget.getText();
+    }
+
+    public boolean isEnabled() throws RemoteException {
+        return widget.isEnabled();
+    }
+
+    public boolean isVisible() throws RemoteException {
+        return widget.isVisible();
+    }
+
+    public boolean isActive() throws RemoteException {
+        return widget.isActive();
+    }
+
+    public String getToolTipText() throws RemoteException {
+        return widget.getText();
     }
 
 }

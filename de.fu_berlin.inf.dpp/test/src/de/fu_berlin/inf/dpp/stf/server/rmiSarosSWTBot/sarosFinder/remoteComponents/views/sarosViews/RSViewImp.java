@@ -77,7 +77,7 @@ public class RSViewImp extends SarosComponentImp implements RSView {
 
     private void preCondition() throws RemoteException {
         bot().openViewById(VIEW_REMOTE_SCREEN_ID);
-        bot().view(VIEW_REMOTE_SCREEN).setFocus();
+        bot().view(VIEW_REMOTE_SCREEN).show();
 
     }
 }

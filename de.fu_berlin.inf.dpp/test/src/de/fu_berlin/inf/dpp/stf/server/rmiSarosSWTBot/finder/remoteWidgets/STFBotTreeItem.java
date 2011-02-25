@@ -4,25 +4,81 @@ import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.util.List;
 
-import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
-import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
-
 public interface STFBotTreeItem extends Remote {
-    public void setSWTBotTreeItem(SWTBotTreeItem item) throws RemoteException;
-
-    public void setSWTBotTree(SWTBotTree tree) throws RemoteException;
+    /**********************************************
+     * 
+     * finder
+     * 
+     **********************************************/
 
     public STFBotMenu contextMenu(String text) throws RemoteException;
 
     public STFBotMenu contextMenu(String... texts) throws RemoteException;
 
-    public List<String> getSubItems() throws RemoteException;
+    /**********************************************
+     * 
+     * actions
+     * 
+     **********************************************/
+
+    public void toggleCheck() throws RemoteException;
+
+    public void uncheck() throws RemoteException;
+
+    public STFBotTreeItem select(String... items) throws RemoteException;
+
+    public STFBotTreeItem select() throws RemoteException;
+
+    public STFBotTreeItem doubleClick() throws RemoteException;
+
+    public STFBotTreeItem expand() throws RemoteException;
+
+    public STFBotTreeItem expandNode(String... nodes) throws RemoteException;
+
+    public void check() throws RemoteException;
+
+    public STFBotTreeItem collapse() throws RemoteException;
+
+    public STFBotTreeItem collapseNode(String nodeText) throws RemoteException;
+
+    public STFBotTreeItem select(String item) throws RemoteException;
+
+    public void click() throws RemoteException;
+
+    public void setFocus() throws RemoteException;
+
+    /**********************************************
+     * 
+     * states
+     * 
+     **********************************************/
+    public boolean isSelected() throws RemoteException;
+
+    public boolean isChecked() throws RemoteException;
+
+    public boolean isExpanded() throws RemoteException;
+
+    public int rowCount() throws RemoteException;
+
+    public STFBotTreeItem getNode(int row) throws RemoteException;
+
+    public STFBotTreeItem getNode(String nodeText) throws RemoteException;
+
+    public STFBotTreeItem getNode(String nodeText, int index)
+        throws RemoteException;
+
+    public List<String> getNodes() throws RemoteException;
+
+    public List<STFBotTreeItem> getNodes(String nodeText)
+        throws RemoteException;
+
+    public List<String> getTextOfItems() throws RemoteException;
+
+    public STFBotTreeItem[] getItems() throws RemoteException;
 
     public boolean existsSubItem(String text) throws RemoteException;
 
     public boolean existsSubItemWithRegex(String regex) throws RemoteException;
-
-    public void waitUntilSubItemExists(String itemText) throws RemoteException;
 
     public boolean isContextMenuEnabled(String... contextNames)
         throws RemoteException;
@@ -30,11 +86,22 @@ public interface STFBotTreeItem extends Remote {
     public boolean existsContextMenu(String... contextNames)
         throws RemoteException;
 
-    public SWTBotTreeItem getSwtBotTreeItem() throws RemoteException;
+    public boolean isEnabled() throws RemoteException;
 
-    public void select() throws RemoteException;
+    public boolean isVisible() throws RemoteException;
 
-    public void select(String item) throws RemoteException;
+    public boolean isActive() throws RemoteException;
 
-    public void select(String... items) throws RemoteException;
+    public String getText() throws RemoteException;
+
+    public String getToolTipText() throws RemoteException;
+
+    /**********************************************
+     * 
+     * wait until
+     * 
+     **********************************************/
+
+    public void waitUntilSubItemExists(final String subItemText)
+        throws RemoteException;
 }

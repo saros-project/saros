@@ -9,7 +9,7 @@ public final class STFBotPerspectiveImp extends AbstractRmoteWidget implements
 
     private static transient STFBotPerspectiveImp self;
 
-    private SWTBotPerspective swtbotPerspective;
+    private SWTBotPerspective widget;
 
     /**
      * {@link STFBotPerspectiveImp} is a singleton, but inheritance is possible.
@@ -21,8 +21,9 @@ public final class STFBotPerspectiveImp extends AbstractRmoteWidget implements
         return self;
     }
 
-    public void setWidget(SWTBotPerspective pers) {
-        this.swtbotPerspective = pers;
+    public STFBotPerspective setWidget(SWTBotPerspective pers) {
+        this.widget = pers;
+        return this;
     }
 
     /**************************************************************
@@ -38,7 +39,7 @@ public final class STFBotPerspectiveImp extends AbstractRmoteWidget implements
      **********************************************/
 
     public void activate() throws RemoteException {
-        swtbotPerspective.activate();
+        widget.activate();
     }
 
     /**********************************************
@@ -48,10 +49,10 @@ public final class STFBotPerspectiveImp extends AbstractRmoteWidget implements
      **********************************************/
 
     public String getLabel() throws RemoteException {
-        return swtbotPerspective.getLabel();
+        return widget.getLabel();
     }
 
     public boolean isActive() throws RemoteException {
-        return swtbotPerspective.isActive();
+        return widget.isActive();
     }
 }

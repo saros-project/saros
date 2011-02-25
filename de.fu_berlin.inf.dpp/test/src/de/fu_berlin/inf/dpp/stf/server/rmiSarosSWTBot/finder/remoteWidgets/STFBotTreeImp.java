@@ -12,24 +12,23 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 
 public class STFBotTreeImp extends AbstractRmoteWidget implements STFBotTree {
 
-    private static transient STFBotTreeImp treeImp;
+    private static transient STFBotTreeImp self;
 
-    private SWTBotTree swtBotTree;
-    private static STFBotTreeItemImp stfBotTreeItem;
+    private SWTBotTree widget;
 
     /**
      * {@link STFBotTableImp} is a singleton, but inheritance is possible.
      */
     public static STFBotTreeImp getInstance() {
-        if (treeImp != null)
-            return treeImp;
-        treeImp = new STFBotTreeImp();
-        stfBotTreeItem = STFBotTreeItemImp.getInstance();
-        return treeImp;
+        if (self != null)
+            return self;
+        self = new STFBotTreeImp();
+        return self;
     }
 
-    public void setSWTBotTree(SWTBotTree tree) {
-        swtBotTree = tree;
+    public STFBotTree setWidget(SWTBotTree tree) {
+        widget = tree;
+        return this;
     }
 
     /**************************************************************
@@ -40,39 +39,68 @@ public class STFBotTreeImp extends AbstractRmoteWidget implements STFBotTree {
 
     /**********************************************
      * 
+     * finders
+     * 
+     **********************************************/
+
+    public STFBotTreeItem[] getAllItems() throws RemoteException {
+        STFBotTreeItem[] items = new STFBotTreeItem[widget.getAllItems().length];
+        for (int i = 0; i < widget.getAllItems().length; i++) {
+            items[i] = stfBotTreeItem.setWidget(widget.getAllItems()[i]);
+        }
+        return items;
+    }
+
+    public STFBotMenu contextMenu(String text) throws RemoteException {
+        return stfBotMenu.setWidget(widget.contextMenu(text));
+    }
+
+    /**********************************************
+     * 
      * actions
      * 
      **********************************************/
 
+    public STFBotTreeItem collapseNode(String nodeText) throws RemoteException {
+        return stfBotTreeItem.setWidget(widget.collapseNode(nodeText));
+    }
+
+    public STFBotTreeItem expandNode(String nodeText, boolean recursive)
+        throws RemoteException {
+        return stfBotTreeItem.setWidget(widget.expandNode(nodeText, recursive));
+    }
+
     public STFBotTreeItem expandNode(String... nodes) throws RemoteException {
-        stfBotTreeItem.setSWTBotTreeItem(swtBotTree.expandNode(nodes));
-        return stfBotTreeItem;
+        return stfBotTreeItem.setWidget(widget.expandNode(nodes));
+    }
+
+    public STFBotTree select(int... indices) throws RemoteException {
+        return setWidget(widget.select(indices));
+    }
+
+    public STFBotTree select(String... items) throws RemoteException {
+        return setWidget(widget.select(items));
+    }
+
+    public STFBotTree unselect() throws RemoteException {
+        return setWidget(widget.unselect());
     }
 
     public STFBotTreeItem selectTreeItem(String... pathToTreeItem)
         throws RemoteException {
-        try {
-            SWTBotTreeItem item = swtBotTree.expandNode(pathToTreeItem)
-                .select();
-            STFBotTreeItem treeItem = STFBotTreeItemImp.getInstance();
-            treeItem.setSWTBotTreeItem(item);
-            treeItem.setSWTBotTree(swtBotTree);
-            return treeItem;
-
-        } catch (WidgetNotFoundException e) {
-            log.warn("tree item can't be found.", e);
-        }
-        return null;
+        stfBotTreeItem.setWidget(widget.expandNode(pathToTreeItem).select());
+        stfBotTreeItem.setSWTBotTree(widget);
+        return stfBotTreeItem;
     }
 
     public STFBotTreeItem selectTreeItemWithRegex(String... regexNodes)
         throws RemoteException {
-        assert swtBotTree != null : "the passed tree is null.";
+        assert widget != null : "the passed tree is null.";
         SWTBotTreeItem currentItem = null;
         SWTBotTreeItem[] allChildrenOfCurrentItem;
         for (String regex : regexNodes) {
             if (currentItem == null) {
-                allChildrenOfCurrentItem = swtBotTree.getAllItems();
+                allChildrenOfCurrentItem = widget.getAllItems();
             } else {
                 allChildrenOfCurrentItem = currentItem.getItems();
             }
@@ -95,10 +123,9 @@ public class STFBotTreeImp extends AbstractRmoteWidget implements STFBotTree {
         }
         if (currentItem != null) {
             SWTBotTreeItem item = currentItem.select();
-            STFBotTreeItem treeItem = STFBotTreeItemImp.getInstance();
-            treeItem.setSWTBotTreeItem(item);
-            treeItem.setSWTBotTree(swtBotTree);
-            return treeItem;
+            stfBotTreeItem.setWidget(item);
+            stfBotTreeItem.setSWTBotTree(widget);
+            return stfBotTreeItem;
         }
         return null;
     }
@@ -109,14 +136,15 @@ public class STFBotTreeImp extends AbstractRmoteWidget implements STFBotTree {
         for (String node : pathToTreeItem) {
             try {
                 if (selectedTreeItem == null) {
-                    waitUntilSubItemExists(node);
-                    selectedTreeItem = swtBotTree.expandNode(node);
+                    waitUntilItemExists(node);
+                    selectedTreeItem = widget.expandNode(node);
                     log.info("treeItem name: " + selectedTreeItem.getText());
                 } else {
 
-                    STFBotTreeItem treeItem = STFBotTreeItemImp.getInstance();
-                    treeItem.setSWTBotTreeItem(selectedTreeItem);
-                    treeItem.setSWTBotTree(swtBotTree);
+                    STFBotTreeItemImp treeItem = STFBotTreeItemImp
+                        .getInstance();
+                    treeItem.setWidget(selectedTreeItem);
+                    treeItem.setSWTBotTree(widget);
                     treeItem.waitUntilSubItemExists(node);
                     selectedTreeItem = selectedTreeItem.expandNode(node);
                     log.info("treeItem name: " + selectedTreeItem.getText());
@@ -129,10 +157,9 @@ public class STFBotTreeImp extends AbstractRmoteWidget implements STFBotTree {
             log.info("treeItem name: " + selectedTreeItem.getText());
 
             SWTBotTreeItem item = selectedTreeItem.select();
-            STFBotTreeItem treeItem = STFBotTreeItemImp.getInstance();
-            treeItem.setSWTBotTreeItem(item);
-            treeItem.setSWTBotTree(swtBotTree);
-            return treeItem;
+            stfBotTreeItem.setWidget(item);
+            stfBotTreeItem.setSWTBotTree(widget);
+            return stfBotTreeItem;
         }
         return null;
     }
@@ -142,10 +169,29 @@ public class STFBotTreeImp extends AbstractRmoteWidget implements STFBotTree {
      * states
      * 
      **********************************************/
+    public boolean hasItems() throws RemoteException {
+        return widget.hasItems();
+    }
 
-    public List<String> getSubtems() throws RemoteException {
+    public int rowCount() throws RemoteException {
+        return widget.rowCount();
+    }
+
+    public int selectionCount() throws RemoteException {
+        return widget.selectionCount();
+    }
+
+    public int columnCount() throws RemoteException {
+        return widget.columnCount();
+    }
+
+    public List<String> columns() throws RemoteException {
+        return widget.columns();
+    }
+
+    public List<String> getTextOfItems() throws RemoteException {
         List<String> allItemTexts = new ArrayList<String>();
-        for (SWTBotTreeItem item : swtBotTree.getAllItems()) {
+        for (SWTBotTreeItem item : widget.getAllItems()) {
             allItemTexts.add(item.getText());
             log.info("existed treeItem of the tree: " + item.getText());
         }
@@ -153,11 +199,11 @@ public class STFBotTreeImp extends AbstractRmoteWidget implements STFBotTree {
     }
 
     public boolean existsSubItem(String treeItemText) throws RemoteException {
-        return getSubtems().contains(treeItemText);
+        return getTextOfItems().contains(treeItemText);
     }
 
     public boolean existsSubItemWithRegexs(String regex) throws RemoteException {
-        for (String subItem : getSubtems()) {
+        for (String subItem : getTextOfItems()) {
             if (subItem.matches(regex))
                 return true;
         }
@@ -169,7 +215,7 @@ public class STFBotTreeImp extends AbstractRmoteWidget implements STFBotTree {
      * waits until
      * 
      **********************************************/
-    public void waitUntilSubItemExists(final String itemText)
+    public void waitUntilItemExists(final String itemText)
         throws RemoteException {
 
         stfBot.waitUntil(new DefaultCondition() {

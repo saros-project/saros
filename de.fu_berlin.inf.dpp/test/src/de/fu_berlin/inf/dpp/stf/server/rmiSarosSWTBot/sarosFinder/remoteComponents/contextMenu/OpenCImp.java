@@ -41,7 +41,7 @@ public class OpenCImp extends EclipseComponentImp implements OpenC {
     public void openFile(String viewTitle, String... fileNodes)
         throws RemoteException {
         precondition(viewTitle);
-        bot().view(viewTitle).bot_().tree()
+        bot().view(viewTitle).bot().tree()
             .selectTreeItemWithRegex(changeToRegex(fileNodes))
             .contextMenu(CM_OPEN).click();
 
@@ -66,15 +66,15 @@ public class OpenCImp extends EclipseComponentImp implements OpenC {
         String... fileNodes) throws RemoteException {
         precondition(viewTitle);
 
-        bot().view(viewTitle).bot_().tree().selectTreeItem(fileNodes)
+        bot().view(viewTitle).bot().tree().selectTreeItem(fileNodes)
             .contextMenu(CM_OPEN_WITH, CM_OTHER).click();
 
         bot().waitUntilShellIsOpen(SHELL_EDITOR_SELECTION);
         STFBotShell shell_bob = bot().shell(SHELL_EDITOR_SELECTION);
         // shell_bob.waitUntilActive();
         shell_bob.activate();
-        shell_bob.bot_().table().getTableItem(whichEditor).select();
-        shell_bob.bot_().button(OK).waitUntilIsEnabled();
+        shell_bob.bot().table().getTableItem(whichEditor).select();
+        shell_bob.bot().button(OK).waitUntilIsEnabled();
         shell_bob.confirm(OK);
     }
 
@@ -100,6 +100,6 @@ public class OpenCImp extends EclipseComponentImp implements OpenC {
     protected void precondition(String viewTitle) throws RemoteException {
 
         bot().openViewById(viewTitlesAndIDs.get(viewTitle));
-        bot().view(viewTitle).setFocus();
+        bot().view(viewTitle).show();
     }
 }

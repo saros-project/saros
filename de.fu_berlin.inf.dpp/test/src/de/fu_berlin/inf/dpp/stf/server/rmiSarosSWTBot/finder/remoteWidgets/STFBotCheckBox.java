@@ -7,32 +7,39 @@ public interface STFBotCheckBox extends Remote {
 
     /**********************************************
      * 
+     * finders
+     * 
+     **********************************************/
+    public STFBotMenu contextMenu(String text) throws RemoteException;
+
+    /**********************************************
+     * 
      * actions
      * 
      **********************************************/
 
-    public abstract void click() throws RemoteException;
+    public void click() throws RemoteException;
 
-    public abstract void select() throws RemoteException;
+    public void select() throws RemoteException;
 
-    public abstract void deselect() throws RemoteException;
+    public void deselect() throws RemoteException;
 
-    public abstract void setFocus() throws RemoteException;
+    public void setFocus() throws RemoteException;
 
     /**********************************************
      * 
      * states
      * 
      **********************************************/
-    public abstract boolean isEnabled() throws RemoteException;
+    public boolean isEnabled() throws RemoteException;
 
-    public abstract boolean isVisible() throws RemoteException;
+    public boolean isVisible() throws RemoteException;
 
-    public abstract boolean isActive() throws RemoteException;
+    public boolean isActive() throws RemoteException;
 
-    public abstract boolean isChecked() throws RemoteException;
+    public boolean isChecked() throws RemoteException;
 
-    public abstract String getText() throws RemoteException;
+    public String getText() throws RemoteException;
 
-    public abstract String getToolTipText() throws RemoteException;
+    public String getToolTipText() throws RemoteException;
 }

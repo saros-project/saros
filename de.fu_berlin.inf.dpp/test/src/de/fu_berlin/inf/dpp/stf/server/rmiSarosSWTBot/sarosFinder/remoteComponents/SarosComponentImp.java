@@ -25,17 +25,17 @@ public class SarosComponentImp extends EclipseComponentImp implements
         bot().waitUntilShellIsOpen(SHELL_CREATE_NEW_XMPP_ACCOUNT);
         STFBotShell shell = bot().shell(SHELL_CREATE_NEW_XMPP_ACCOUNT);
         shell.activate();
-        shell.bot_().textWithLabel(LABEL_XMPP_JABBER_SERVER)
+        shell.bot().textWithLabel(LABEL_XMPP_JABBER_SERVER)
             .setText(jid.getDomain());
-        shell.bot_().textWithLabel(LABEL_USER_NAME).setText(jid.getName());
-        shell.bot_().textWithLabel(LABEL_PASSWORD).setText(password);
-        shell.bot_().textWithLabel(LABEL_REPEAT_PASSWORD).setText(password);
+        shell.bot().textWithLabel(LABEL_USER_NAME).setText(jid.getName());
+        shell.bot().textWithLabel(LABEL_PASSWORD).setText(password);
+        shell.bot().textWithLabel(LABEL_REPEAT_PASSWORD).setText(password);
 
-        shell.bot_().button(FINISH).click();
+        shell.bot().button(FINISH).click();
         try {
-            shell.waitShortUntilIsShellClosed();
+            shell.waitShortUntilIsClosed();
         } catch (TimeoutException e) {
-            String errorMessage = shell.getErrorMessageInShell();
+            String errorMessage = shell.getErrorMessage();
             if (errorMessage.matches(ERROR_MESSAGE_TOO_FAST_REGISTER_ACCOUNTS
                 + ".*"))
                 throw new RuntimeException(
@@ -52,13 +52,13 @@ public class SarosComponentImp extends EclipseComponentImp implements
         bot().waitUntilShellIsOpen(SHELL_SAROS_CONFIGURATION);
         STFBotShell shell = bot().shell(SHELL_SAROS_CONFIGURATION);
         shell.activate();
-        shell.bot_().textWithLabel(LABEL_XMPP_JABBER_SERVER)
+        shell.bot().textWithLabel(LABEL_XMPP_JABBER_SERVER)
             .setText(jid.getDomain());
-        shell.bot_().textWithLabel(LABEL_USER_NAME).setText(jid.getName());
-        shell.bot_().textWithLabel(LABEL_PASSWORD).setText(password);
+        shell.bot().textWithLabel(LABEL_USER_NAME).setText(jid.getName());
+        shell.bot().textWithLabel(LABEL_PASSWORD).setText(password);
 
-        shell.bot_().button(NEXT).click();
-        shell.bot_().button(FINISH).click();
+        shell.bot().button(NEXT).click();
+        shell.bot().button(FINISH).click();
     }
 
     public void confirmShellInvitation(String... baseJIDOfinvitees)
@@ -66,6 +66,6 @@ public class SarosComponentImp extends EclipseComponentImp implements
         bot().waitUntilShellIsOpen(SHELL_INVITATION);
         STFBotShell shell = bot().shell(SHELL_INVITATION);
         shell.activate();
-        shell.confirmShellithCheckBoxs(FINISH, baseJIDOfinvitees);
+        shell.confirmWithCheckBoxs(FINISH, baseJIDOfinvitees);
     }
 }

@@ -704,14 +704,14 @@ public class STFTest extends STF {
                     SHELL_REQUEST_OF_SUBSCRIPTION_RECEIVED);
                 peer.bot().shell(SHELL_REQUEST_OF_SUBSCRIPTION_RECEIVED)
                     .activate();
-                peer.bot().shell(SHELL_REQUEST_OF_SUBSCRIPTION_RECEIVED).bot_()
+                peer.bot().shell(SHELL_REQUEST_OF_SUBSCRIPTION_RECEIVED).bot()
                     .button(OK).click();
 
                 host.bot().waitUntilShellIsOpen(
                     SHELL_REQUEST_OF_SUBSCRIPTION_RECEIVED);
                 host.bot().shell(SHELL_REQUEST_OF_SUBSCRIPTION_RECEIVED)
                     .activate();
-                host.bot().shell(SHELL_REQUEST_OF_SUBSCRIPTION_RECEIVED).bot_()
+                host.bot().shell(SHELL_REQUEST_OF_SUBSCRIPTION_RECEIVED).bot()
                     .button(OK).click();
 
             }
@@ -755,7 +755,7 @@ public class STFTest extends STF {
             .shareYourScreenWithSelectedBuddy(selectedBuddy.jid);
         selectedBuddy.bot().waitUntilShellIsOpen(
             SHELL_INCOMING_SCREENSHARING_SESSION);
-        selectedBuddy.bot().shell(SHELL_INCOMING_SCREENSHARING_SESSION).bot_()
+        selectedBuddy.bot().shell(SHELL_INCOMING_SCREENSHARING_SESSION).bot()
             .button(YES).click();
     }
 

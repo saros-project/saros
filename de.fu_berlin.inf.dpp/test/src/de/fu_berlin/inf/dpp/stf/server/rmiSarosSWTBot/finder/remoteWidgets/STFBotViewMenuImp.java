@@ -1,5 +1,7 @@
 package de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets;
 
+import java.rmi.RemoteException;
+
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotViewMenu;
 
 public class STFBotViewMenuImp extends AbstractRmoteWidget implements
@@ -7,10 +9,10 @@ public class STFBotViewMenuImp extends AbstractRmoteWidget implements
 
     private static transient STFBotViewMenuImp self;
 
-    private SWTBotViewMenu viewMenu;
+    private SWTBotViewMenu widget;
 
     /**
-     * {@link STFBotButtonImp} is a singleton, but inheritance is possible.
+     * {@link STFBotViewMenuImp} is a singleton, but inheritance is possible.
      */
     public static STFBotViewMenuImp getInstance() {
         if (self != null)
@@ -19,8 +21,10 @@ public class STFBotViewMenuImp extends AbstractRmoteWidget implements
         return self;
     }
 
-    public void setSwtBotViewMenu(SWTBotViewMenu viewMenu) {
-        this.viewMenu = viewMenu;
+    public STFBotViewMenu setWidget(SWTBotViewMenu viewMenu) {
+        this.widget = viewMenu;
+        return this;
+
     }
 
     /**************************************************************
@@ -34,5 +38,26 @@ public class STFBotViewMenuImp extends AbstractRmoteWidget implements
      * actions
      * 
      **********************************************/
+    public void click() throws RemoteException {
+        widget.click();
+    }
+
+    /**********************************************
+     * 
+     * states
+     * 
+     **********************************************/
+
+    public String getToolTipText() throws RemoteException {
+        return widget.getText();
+    }
+
+    public String getText() throws RemoteException {
+        return widget.getText();
+    }
+
+    public boolean isChecked() throws RemoteException {
+        return widget.isChecked();
+    }
 
 }
