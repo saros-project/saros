@@ -1208,6 +1208,12 @@ public class Utils {
      * 
      */
     public static String join(String seperator, List<String> strings) {
-        return join(seperator, (String[]) strings.toArray());
+        String[] strArray = new String[strings.size()];
+        int i = 0;
+        for (String str : strings) {
+            strArray[i] = str;
+            i++;
+        }
+        return join(seperator, strArray);
     }
 }
