@@ -437,8 +437,6 @@ public class STF {
         .getString("cm_saros");
     protected final static String CM_SHARE_PROJECT = SarosMessages
         .getString("cm_share_project");
-    protected final static String CM_SHARE_PROJECT_PARTIALLY = SarosMessages
-        .getString("cm_share_project_partially");
     protected final static String CM_ADD_TO_SESSION = SarosMessages
         .getString("cm_add_to_session");
 

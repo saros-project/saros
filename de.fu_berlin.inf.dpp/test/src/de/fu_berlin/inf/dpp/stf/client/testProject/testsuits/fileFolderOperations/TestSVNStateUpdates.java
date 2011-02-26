@@ -101,8 +101,7 @@ public class TestSVNStateUpdates extends STFTest {
         MakeOperationConcurrently.workAll(initTasks, numberOfThreads);
 
         buildSessionSequentially(VIEW_PACKAGE_EXPLORER, SVN_PROJECT,
-            TypeOfShareProject.SHARE_PROJECT,
-            TypeOfCreateProject.EXIST_PROJECT, alice, bob);
+            CM_SHARE_PROJECT, TypeOfCreateProject.EXIST_PROJECT, alice, bob);
         alice.sarosBot().sessionView()
             .waitUntilIsInviteeInSession(bob.sarosBot().sessionView());
     }

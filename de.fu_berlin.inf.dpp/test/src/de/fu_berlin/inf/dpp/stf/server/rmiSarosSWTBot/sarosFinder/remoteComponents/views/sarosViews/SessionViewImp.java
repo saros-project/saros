@@ -215,7 +215,7 @@ public class SessionViewImp extends SarosComponentImp implements SessionView {
         throws RemoteException {
         precondition();
         clickToolbarButtonWithTooltip(TB_OPEN_INVITATION_INTERFACE);
-        confirmShellInvitation(jidOfInvitees);
+        sarosBot().confirmShellInvitation(jidOfInvitees);
     }
 
     public void inconsistencyDetected() throws RemoteException {

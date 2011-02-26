@@ -6,8 +6,6 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBo
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotTree;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotTreeItem;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.EclipseComponentImp;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.contextMenu.SarosC;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.contextMenu.SarosCImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.contextMenu.TeamC;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.contextMenu.TeamCImp;
 
@@ -16,7 +14,6 @@ public class PEViewImp extends EclipseComponentImp implements PEView {
     private STFBotTree tree;
     private static transient PEViewImp pEViewImp;
 
-    private static SarosCImp sarosC;
     private static TeamCImp teamC;
 
     /**
@@ -27,7 +24,6 @@ public class PEViewImp extends EclipseComponentImp implements PEView {
             return pEViewImp;
         pEViewImp = new PEViewImp();
 
-        sarosC = SarosCImp.getInstance();
         teamC = TeamCImp.getInstance();
 
         return pEViewImp;
@@ -49,9 +45,10 @@ public class PEViewImp extends EclipseComponentImp implements PEView {
      * actions
      * 
      **********************************************/
-    public void selectProject(String projectName) throws RemoteException {
+    public STFBotTreeItem selectProject(String projectName)
+        throws RemoteException {
 
-        tree.selectTreeItemWithRegex(changeToRegex(projectName));
+        return tree.selectTreeItemWithRegex(changeToRegex(projectName));
     }
 
     public void selectPkg(String projectName, String pkg)
@@ -74,10 +71,6 @@ public class PEViewImp extends EclipseComponentImp implements PEView {
     public STFBotTreeItem selectFile(String... fileNodes)
         throws RemoteException {
         return tree.selectTreeItemWithRegex(changeToRegex(fileNodes));
-    }
-
-    public SarosC saros() throws RemoteException {
-        return sarosC;
     }
 
     public TeamC team() throws RemoteException {

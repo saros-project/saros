@@ -53,15 +53,13 @@ public class TestEditDuringInvitation extends STFTest {
     @Test
     public void testEditDuringInvitation() throws RemoteException {
         buildSessionSequentially(VIEW_PACKAGE_EXPLORER, PROJECT1,
-            TypeOfShareProject.SHARE_PROJECT, TypeOfCreateProject.NEW_PROJECT,
-            alice, bob);
+            CM_SHARE_PROJECT, TypeOfCreateProject.NEW_PROJECT, alice, bob);
 
         assertTrue(bob.sarosBot().sessionView().hasWriteAccessNoGUI());
 
         alice.sarosBot().sessionView()
             .openInvitationInterface(carl.getBaseJid());
-        carl.sarosBot().packageExplorerView().saros()
-            .confirmShellSessionnInvitation();
+        carl.sarosBot().confirmShellSessionnInvitation();
 
         bob.sarosBot().packageExplorerView().selectClass(PROJECT1, PKG1, CLS1)
             .contextMenu(CM_OPEN).click();
@@ -69,8 +67,7 @@ public class TestEditDuringInvitation extends STFTest {
         String texByBob = bob.bot().editor(CLS1_SUFFIX).getText();
         // System.out.println(texByBob);
 
-        carl.sarosBot().packageExplorerView().saros()
-            .confirmShellAddProjectWithNewProject(PROJECT1);
+        carl.sarosBot().confirmShellAddProjectWithNewProject(PROJECT1);
         carl.sarosBot().packageExplorerView().selectClass(PROJECT1, PKG1, CLS1)
             .contextMenu(CM_OPEN).click();
 

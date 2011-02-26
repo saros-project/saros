@@ -43,8 +43,7 @@ public class TestHostInvitesBelatedly extends STFTest {
          * alice build session only with carl and is followed by carl.
          */
         buildSessionConcurrently(VIEW_PACKAGE_EXPLORER, PROJECT1,
-            TypeOfShareProject.SHARE_PROJECT, TypeOfCreateProject.NEW_PROJECT,
-            alice, carl);
+            CM_SHARE_PROJECT, TypeOfCreateProject.NEW_PROJECT, alice, carl);
         setFollowMode(alice, carl);
     }
 

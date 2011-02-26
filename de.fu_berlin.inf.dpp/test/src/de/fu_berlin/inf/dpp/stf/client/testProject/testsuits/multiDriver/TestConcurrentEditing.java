@@ -44,8 +44,7 @@ public class TestConcurrentEditing extends STFTest {
         alice.bot().editor(FILE).navigateTo(0, 6);
 
         buildSessionSequentially(VIEW_PACKAGE_EXPLORER, PROJECT1,
-            TypeOfShareProject.SHARE_PROJECT, TypeOfCreateProject.NEW_PROJECT,
-            alice, bob);
+            CM_SHARE_PROJECT, TypeOfCreateProject.NEW_PROJECT, alice, bob);
         bob.sarosBot().packageExplorerView().selectFile(path)
             .contextMenu(CM_OPEN).click();
 
@@ -95,8 +94,7 @@ public class TestConcurrentEditing extends STFTest {
         InterruptedException {
         alice.sarosBot().file().newJavaProjectWithClasses(PROJECT1, PKG1, CLS1);
         buildSessionConcurrently(VIEW_PACKAGE_EXPLORER, PROJECT1,
-            TypeOfShareProject.SHARE_PROJECT, TypeOfCreateProject.NEW_PROJECT,
-            alice, bob);
+            CM_SHARE_PROJECT, TypeOfCreateProject.NEW_PROJECT, alice, bob);
         bob.sarosBot().packageExplorerView().selectClass(PROJECT1, PKG1, CLS1)
             .contextMenu(CM_OPEN).click();
         bob.bot().editor(CLS1_SUFFIX).waitUntilIsActive();
