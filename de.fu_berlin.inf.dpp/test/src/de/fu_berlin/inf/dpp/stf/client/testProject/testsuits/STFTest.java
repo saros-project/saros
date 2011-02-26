@@ -340,7 +340,7 @@ public class STFTest extends STF {
     public static void resetSaros() throws RemoteException {
         for (Tester tester : activeTesters) {
             if (tester != null) {
-                tester.sarosBot().buddiesView().resetAllBuddyNameNoGUI();
+                // tester.sarosBot().buddiesView().resetAllBuddyNameNoGUI();
                 tester.sarosBot().buddiesView().disconnect();
                 tester.sarosBot().edit().deleteAllProjectsNoGUI();
             }
@@ -374,17 +374,12 @@ public class STFTest extends STF {
     public static void resetDefaultAccount() throws RemoteException {
         for (Tester tester : activeTesters) {
             if (tester != null) {
-                // if (!tester.sarosBot().saros().isAccountExist(tester.jid))
-                // tester.sarosBot().saros().addAccount(tester.jid,
-                // tester.password);
-                // if (!tester.sarosBot().saros().isAccountActive(tester.jid))
-                // tester.sarosBot().saros().activateAccount(tester.jid);
-                tester.sarosBot().saros().deleteAllNoActiveAccounts();
                 if (!tester.sarosBot().saros().isAccountExist(tester.jid))
                     tester.sarosBot().saros()
                         .addAccount(tester.jid, tester.password);
                 if (!tester.sarosBot().saros().isAccountActive(tester.jid))
                     tester.sarosBot().saros().activateAccount(tester.jid);
+                tester.sarosBot().saros().deleteAllNoActiveAccounts();
 
             }
         }
@@ -459,6 +454,7 @@ public class STFTest extends STF {
         host.sarosBot().edit()
             .deleteAllItemsOfJavaProject(VIEW_PACKAGE_EXPLORER, PROJECT1);
         host.sarosBot().file().newClass(PROJECT1, PKG1, CLS1);
+        // host.bot().sleep(1000);
     }
 
     /**********************************************

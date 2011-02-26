@@ -6,7 +6,6 @@ import org.junit.runners.Suite.SuiteClasses;
 
 import de.fu_berlin.inf.dpp.stf.client.testProject.testsuits.testSTF.basicWidgets.AllTestsForBasicWidgets;
 import de.fu_berlin.inf.dpp.stf.client.testProject.testsuits.testSTF.contextMenu.AllTestsForContextMenu;
-import de.fu_berlin.inf.dpp.stf.client.testProject.testsuits.testSTF.editor.AllTestsForEditor;
 import de.fu_berlin.inf.dpp.stf.client.testProject.testsuits.testSTF.menuBar.AllTestsForMenuBar;
 import de.fu_berlin.inf.dpp.stf.client.testProject.testsuits.testSTF.views.sarosViews.AllTestsForSarosViews;
 
@@ -17,7 +16,7 @@ import de.fu_berlin.inf.dpp.stf.client.testProject.testsuits.testSTF.views.saros
 @SuiteClasses(//
 { AllTestsForBasicWidgets.class,//
     AllTestsForContextMenu.class,//
-    AllTestsForEditor.class, //
+    // AllTestsForEditor.class, //
     AllTestsForMenuBar.class, //
     AllTestsForSarosViews.class //
 })

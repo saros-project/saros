@@ -7,7 +7,7 @@ import java.io.IOException;
 import java.rmi.RemoteException;
 
 import org.eclipse.core.runtime.CoreException;
-import org.junit.Before;
+import org.junit.After;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -37,11 +37,9 @@ public class TestFileOperations extends STFTest {
         setFollowMode(alice, carl);
     }
 
-    @Before
+    @After
     public void runBeforeEveryTest() throws RemoteException {
-
         resetSharedProject(alice);
-
     }
 
     /**

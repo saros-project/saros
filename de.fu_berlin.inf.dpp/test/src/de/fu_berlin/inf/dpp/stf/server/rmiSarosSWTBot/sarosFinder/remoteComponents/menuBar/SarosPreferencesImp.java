@@ -144,9 +144,12 @@ public class SarosPreferencesImp extends SarosComponentImp implements
                 continue;
             }
         }
+        assert shell.bot().listInGroup(GROUP_TITLE_XMPP_JABBER_ACCOUNTS)
+            .itemCount() == 1;
         bot().shell(SHELL_PREFERNCES).bot().button(APPLY).click();
         bot().shell(SHELL_PREFERNCES).bot().button(OK).click();
         bot().waitsUntilShellIsClosed(SHELL_PREFERNCES);
+        bot().sleep(300);
     }
 
     public void setupSettingForScreensharing(int encoder, int videoResolution,
@@ -156,8 +159,7 @@ public class SarosPreferencesImp extends SarosComponentImp implements
         STFBotShell shell = bot().shell(SHELL_PREFERNCES);
         shell.activate();
 
-        shell.bot().tree()
-            .selectTreeItem(NODE_SAROS, NODE_SAROS_SCREENSHARING);
+        shell.bot().tree().selectTreeItem(NODE_SAROS, NODE_SAROS_SCREENSHARING);
         shell.bot().ccomboBox(0).setSelection(encoder);
         shell.bot().ccomboBox(1).setSelection(videoResolution);
 

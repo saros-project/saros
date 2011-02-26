@@ -92,4 +92,6 @@ public interface STFBotButton extends Remote {
      */
     public void waitUntilIsEnabled() throws RemoteException;
 
+    public void waitLongUntilIsEnabled() throws RemoteException;
+
 }

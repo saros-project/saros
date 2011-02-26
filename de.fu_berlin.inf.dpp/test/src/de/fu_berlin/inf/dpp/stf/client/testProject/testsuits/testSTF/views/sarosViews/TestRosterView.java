@@ -39,8 +39,8 @@ public class TestRosterView extends STFTest {
 
     @After
     public void runAfterEveryTest() throws RemoteException {
-        resetBuddies();
         resetBuddiesName();
+        resetBuddies();
     }
 
     @Test
@@ -106,7 +106,6 @@ public class TestRosterView extends STFTest {
         assertTrue(alice.sarosBot().buddiesView().hasBuddyNoGUI(bob.jid));
         assertTrue(alice.sarosBot().buddiesView()
             .getBuddyNickNameNoGUI(bob.jid).equals("new bob"));
-        // assertTrue(alice.sessionV.isContactInSessionView(bob.jid));
     }
 
     @Test

@@ -193,6 +193,8 @@ public class STF {
         .getString("error_message_passwords_not_match");
     protected final static String ERROR_MESSAGE_COULD_NOT_CONNECT = SarosMessages
         .getString("error_message_could_not_connect");
+    protected final static String ERROR_MESSAGE_NOT_CONNECTED_TO_SERVER = SarosMessages
+        .getString("error_message_not_connected_to_server");
     protected final static String ERROR_MESSAGE_ACCOUNT_ALREADY_EXISTS = SarosMessages
         .getString("error_message_account_already_exists");
 

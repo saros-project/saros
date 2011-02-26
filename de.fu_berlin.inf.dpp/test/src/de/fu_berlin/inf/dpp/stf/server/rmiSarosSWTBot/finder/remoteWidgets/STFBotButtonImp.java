@@ -94,4 +94,8 @@ public class STFBotButtonImp extends AbstractRmoteWidget implements
         stfBot.waitUntil(Conditions.widgetIsEnabled(widget));
     }
 
+    public void waitLongUntilIsEnabled() throws RemoteException {
+        stfBot.waitLongUntil(Conditions.widgetIsEnabled(widget));
+    }
+
 }
