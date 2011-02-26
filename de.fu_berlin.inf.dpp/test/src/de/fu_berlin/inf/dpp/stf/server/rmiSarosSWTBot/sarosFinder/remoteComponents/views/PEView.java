@@ -4,7 +4,6 @@ import java.rmi.RemoteException;
 
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotTreeItem;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.EclipseComponent;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.contextMenu.TeamC;
 
 /**
  * This interface contains only APIs to select treeItems in the package explorer
@@ -80,5 +79,4 @@ public interface PEView extends EclipseComponent {
     public STFBotTreeItem selectFile(String... fileNodes)
         throws RemoteException;
 
-    public TeamC team() throws RemoteException;
 }

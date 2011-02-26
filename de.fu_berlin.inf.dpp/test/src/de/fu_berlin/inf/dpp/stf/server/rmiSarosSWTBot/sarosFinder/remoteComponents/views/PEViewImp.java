@@ -6,15 +6,11 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBo
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotTree;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotTreeItem;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.EclipseComponentImp;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.contextMenu.TeamC;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.contextMenu.TeamCImp;
 
 public class PEViewImp extends EclipseComponentImp implements PEView {
 
     private STFBotTree tree;
     private static transient PEViewImp pEViewImp;
-
-    private static TeamCImp teamC;
 
     /**
      * {@link STFBotTableImp} is a singleton, but inheritance is possible.
@@ -23,8 +19,6 @@ public class PEViewImp extends EclipseComponentImp implements PEView {
         if (pEViewImp != null)
             return pEViewImp;
         pEViewImp = new PEViewImp();
-
-        teamC = TeamCImp.getInstance();
 
         return pEViewImp;
     }
@@ -73,9 +67,7 @@ public class PEViewImp extends EclipseComponentImp implements PEView {
         return tree.selectTreeItemWithRegex(changeToRegex(fileNodes));
     }
 
-    public TeamC team() throws RemoteException {
-        return teamC;
-    }
+   
 
     /**************************************************************
      * 

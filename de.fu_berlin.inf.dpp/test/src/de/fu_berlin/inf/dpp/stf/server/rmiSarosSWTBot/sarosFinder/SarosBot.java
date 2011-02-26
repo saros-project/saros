@@ -147,4 +147,105 @@ public interface SarosBot extends Remote {
     public void confirmShellAddProjectUsingWhichProject(String projectName,
         TypeOfCreateProject usingWhichProject) throws RemoteException;
 
+    public void confirmShellShareProject(String repositoryURL)
+        throws RemoteException;
+
+    public void confirmShellImport(String repositoryURL) throws RemoteException;
+
+    public void confirmShellRevert() throws RemoteException;
+
+    public void confirmShellSwitch(String versionID) throws RemoteException;
+
+    /**
+     * waits until the window with the title "Saros running VCS operation" is
+     * closed
+     * 
+     * @throws RemoteException
+     */
+    public void waitUntilWindowSarosRunningVCSOperationClosed()
+        throws RemoteException;
+
+    /**
+     * waits until the given project is in SVN control
+     * 
+     * @param projectName
+     *            the name of the project
+     * @throws RemoteException
+     */
+    public void waitUntilProjectInSVN(String projectName)
+        throws RemoteException;
+
+    /**
+     * waits until the given project is not under SVN control
+     * 
+     * @param projectName
+     *            the name of the project
+     * @throws RemoteException
+     */
+    public void waitUntilProjectNotInSVN(String projectName)
+        throws RemoteException;
+
+    /**
+     * 
+     * @param fullPath
+     *            the full path of the local resource, e.g.
+     *            "example_project/src/org/eclipsecon/swtbot/example/MyFirstTest01.java"
+     * @param revisionID
+     *            the expected revision.
+     * @throws RemoteException
+     */
+    public void waitUntilRevisionIsSame(String fullPath, String revisionID)
+        throws RemoteException;
+
+    /**
+     * 
+     * @param fullPath
+     *            the full path of the local resource, e.g.
+     *            "example_project/src/org/eclipsecon/swtbot/example/MyFirstTest01.java"
+     * @param url
+     *            the expected URL of the remote resource, e.g.
+     *            "http://myhost.com/svn/trunk/.../MyFirstTest01.java".
+     * @throws RemoteException
+     */
+    public void waitUntilUrlIsSame(String fullPath, String url)
+        throws RemoteException;
+
+    /**
+     * using this method you can import a project from SVN (Other variant to
+     * import a project from SVN is in the method
+     * {@link PEView#importProjectFromSVN(String)} defined). which should be
+     * done with the following steps:
+     * 
+     * <ol>
+     * <li>Select the given project and click "Team" > "Share project"</li>
+     * <li>Select the repository type "SVN" and click next</li>
+     * <li>In the next page select the repositoryURL if the repositoryURL
+     * already exists,otherwise create a new one and click the next button</li>
+     * <li>In the next page activate the radio button
+     * "Use specified folder name", insert the given folder name in the text
+     * field and click finish to confirm the import prorject with SVN process.</li>
+     * </ol>
+     * <p>
+     * <b>Attention:</b>
+     * <ol>
+     * <li>Makes sure, the package explorer view is open and active.</li>
+     * <li>The function should treat all the recursive following actions, which
+     * are activated or indirectly activated by clicking the sub menu
+     * "share project" . I mean, after clicking the sub menu you need to treat
+     * the following popup window too.</li>
+     * 
+     * @param projectName
+     *            the name of the project located in the package explorer view,
+     *            which will be shared under SVN.
+     * @param repositoryURL
+     *            the repository location
+     * @param specifiedFolderName
+     *            the name of the folder, which already exists in the
+     *            repository, e.g. trunk/examples
+     * @throws RemoteException
+     */
+    public void shareProjectWithSVNUsingSpecifiedFolderName(String viewTitle,
+        String projectName, String repositoryURL, String specifiedFolderName)
+        throws RemoteException;
+
 }
