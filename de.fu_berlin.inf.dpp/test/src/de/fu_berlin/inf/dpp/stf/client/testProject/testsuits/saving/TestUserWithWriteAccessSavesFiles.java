@@ -142,11 +142,9 @@ public class TestUserWithWriteAccessSavesFiles extends STFTest {
         alice.bot().editor(CLS2_SUFFIX).setTextWithoutSave(CP1);
         String dirtyCls2ContentOfAlice = alice.bot().editor(CLS2_SUFFIX)
             .getText();
-        carl.sarosBot()
-            .packageExplorerView()
-            .open()
-            .openClassWith(VIEW_PACKAGE_EXPLORER, "Text Editor", PROJECT1,
-                PKG1, CLS2);
+        carl.sarosBot().packageExplorerView().selectClass(PROJECT1, PKG1, CLS2)
+            .contextMenu(CM_OPEN_WITH, CM_OTHER).click();
+        carl.sarosBot().confirmShellEditorSelection(TEXT_EDITOR);
 
         carl.bot().editor(CLS2_SUFFIX)
             .waitUntilIsTextSame(dirtyCls2ContentOfAlice);
@@ -180,11 +178,10 @@ public class TestUserWithWriteAccessSavesFiles extends STFTest {
     @Test
     public void testChangingInClosedFile() throws IOException, CoreException {
         alice.bot().editor(CLS2_SUFFIX).setTextWithoutSave(CP1);
-        carl.sarosBot()
-            .packageExplorerView()
-            .open()
-            .openClassWith(VIEW_PACKAGE_EXPLORER, "Text Editor", PROJECT1,
-                PKG1, CLS2);
+        carl.sarosBot().packageExplorerView().selectClass(PROJECT1, PKG1, CLS2)
+            .contextMenu(CM_OPEN_WITH, CM_OTHER).click();
+        carl.sarosBot().confirmShellEditorSelection(TEXT_EDITOR);
+
         carl.bot().editor(CLS2 + SUFFIX_JAVA).closeWithSave();
 
         alice.bot().editor(CLS2_SUFFIX).setTexWithSave(CP2_CHANGE);

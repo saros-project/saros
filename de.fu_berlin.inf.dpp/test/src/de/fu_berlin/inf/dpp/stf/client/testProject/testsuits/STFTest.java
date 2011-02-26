@@ -268,7 +268,8 @@ public class STFTest extends STF {
             tester.sarosBot().saros().disableAutomaticReminderNoGUI();
             openSarosViews(tester);
             tester.sarosBot().buddiesView()
-                .connectNoGUI(tester.jid, tester.password);
+                .connectWith(tester.jid, tester.password);
+
         }
         resetBuddies();
     }

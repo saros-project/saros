@@ -9,6 +9,7 @@ import java.util.Map;
 
 import org.junit.After;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import de.fu_berlin.inf.dpp.stf.client.testProject.testsuits.STFTest;
@@ -170,6 +171,7 @@ public class TestHandleContacts extends STFTest {
      * @throws RemoteException
      */
     @Test
+    @Ignore
     public void testAddExistedContact() throws RemoteException {
         alice.bot().view(VIEW_SAROS_BUDDIES)
             .toolbarButton(TB_ADD_A_NEW_CONTACT).click();

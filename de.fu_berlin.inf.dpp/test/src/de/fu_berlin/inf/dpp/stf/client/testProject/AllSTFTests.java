@@ -8,7 +8,6 @@ import de.fu_berlin.inf.dpp.stf.client.testProject.testsuits.RosterViewBehaviour
 import de.fu_berlin.inf.dpp.stf.client.testProject.testsuits.fileFolderOperations.TestFileOperations;
 import de.fu_berlin.inf.dpp.stf.client.testProject.testsuits.fileFolderOperations.TestFolderOperations;
 import de.fu_berlin.inf.dpp.stf.client.testProject.testsuits.fileFolderOperations.TestSVNStateUpdates;
-import de.fu_berlin.inf.dpp.stf.client.testProject.testsuits.initialising.TestHandleContacts;
 import de.fu_berlin.inf.dpp.stf.client.testProject.testsuits.invitation.TestEditDuringInvitation;
 import de.fu_berlin.inf.dpp.stf.client.testProject.testsuits.invitation.TestSVNStateInitialization;
 import de.fu_berlin.inf.dpp.stf.client.testProject.testsuits.invitation.TestShare2UsersSequentially;
@@ -19,7 +18,7 @@ import de.fu_berlin.inf.dpp.stf.client.testProject.testsuits.testSTF.TestBasicSa
 
 @RunWith(Suite.class)
 @SuiteClasses({ TestBasicSarosElements.class,
-    TestChangingNameInRosterView.class, TestHandleContacts.class,
+    TestChangingNameInRosterView.class, /* TestHandleContacts.class, */
     TestShare2UsersSequentially.class, TestShare3UsersSequentially.class,
     TestShare3UsersConcurrently.class,
     TestShareProjectUsingExistingProject.class, TestEditDuringInvitation.class,

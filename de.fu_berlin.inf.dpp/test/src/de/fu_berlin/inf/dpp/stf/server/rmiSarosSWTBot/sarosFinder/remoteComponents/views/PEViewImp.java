@@ -6,8 +6,6 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBo
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotTree;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotTreeItem;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.EclipseComponentImp;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.contextMenu.OpenC;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.contextMenu.OpenCImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.contextMenu.SarosC;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.contextMenu.SarosCImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.contextMenu.TeamC;
@@ -17,7 +15,7 @@ public class PEViewImp extends EclipseComponentImp implements PEView {
 
     private STFBotTree tree;
     private static transient PEViewImp pEViewImp;
-    private static OpenCImp openC;
+
     private static SarosCImp sarosC;
     private static TeamCImp teamC;
 
@@ -28,7 +26,7 @@ public class PEViewImp extends EclipseComponentImp implements PEView {
         if (pEViewImp != null)
             return pEViewImp;
         pEViewImp = new PEViewImp();
-        openC = OpenCImp.getInstance();
+
         sarosC = SarosCImp.getInstance();
         teamC = TeamCImp.getInstance();
 
@@ -76,10 +74,6 @@ public class PEViewImp extends EclipseComponentImp implements PEView {
     public STFBotTreeItem selectFile(String... fileNodes)
         throws RemoteException {
         return tree.selectTreeItemWithRegex(changeToRegex(fileNodes));
-    }
-
-    public OpenC open() throws RemoteException {
-        return openC;
     }
 
     public SarosC saros() throws RemoteException {

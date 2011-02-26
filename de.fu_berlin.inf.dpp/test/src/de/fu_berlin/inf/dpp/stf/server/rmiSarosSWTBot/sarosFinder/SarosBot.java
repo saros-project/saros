@@ -50,4 +50,12 @@ public interface SarosBot extends Remote {
 
     public void setJID(JID jid) throws RemoteException;
 
+    /**********************************************
+     * 
+     * shells
+     * 
+     **********************************************/
+    public void confirmShellEditorSelection(String editorType)
+        throws RemoteException;
+
 }

@@ -15,12 +15,8 @@ public class TestBasicSarosElements extends STFTest {
     public static void runBeforeClass() throws RemoteException {
         initTesters(TypeOfTester.ALICE);
         setUpWorkbench();
+        setUpSaros();
     }
-
-    // @After
-    // public void runAfterEveryTest() throws RemoteException {
-    // disConnectByActiveTesters();
-    // }
 
     @Test
     public void testSessionView() throws RemoteException {

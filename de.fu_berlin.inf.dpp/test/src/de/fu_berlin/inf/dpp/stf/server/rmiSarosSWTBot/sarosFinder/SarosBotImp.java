@@ -6,7 +6,7 @@ import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.stf.STF;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.STFWorkbenchBot;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.STFWorkbenchBotImp;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.contextMenu.OpenCImp;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotShell;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.contextMenu.SarosCImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.contextMenu.TeamCImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.menuBar.EditM;
@@ -39,7 +39,7 @@ public class SarosBotImp extends STF implements SarosBot {
     private static transient SarosBotImp self;
 
     private static STFWorkbenchBot bot;
-    private static OpenCImp openC;
+
     private static SarosCImp sarosC;
     private static TeamCImp teamC;
     private static EditMImp editM;
@@ -64,7 +64,7 @@ public class SarosBotImp extends STF implements SarosBot {
             return self;
         self = new SarosBotImp();
         bot = STFWorkbenchBotImp.getInstance();
-        openC = OpenCImp.getInstance();
+
         sarosC = SarosCImp.getInstance();
         teamC = TeamCImp.getInstance();
         editM = EditMImp.getInstance();
@@ -146,6 +146,21 @@ public class SarosBotImp extends STF implements SarosBot {
 
     public void setJID(JID jid) throws RemoteException {
         localJID = jid;
+    }
+
+    /**********************************************
+     * 
+     * finders
+     * 
+     **********************************************/
+    public void confirmShellEditorSelection(String editorType)
+        throws RemoteException {
+        bot.waitUntilShellIsOpen(SHELL_EDITOR_SELECTION);
+        STFBotShell shell_bob = bot.shell(SHELL_EDITOR_SELECTION);
+        shell_bob.activate();
+        shell_bob.bot().table().getTableItem(editorType).select();
+        shell_bob.bot().button(OK).waitUntilIsEnabled();
+        shell_bob.confirm(OK);
     }
 
 }
