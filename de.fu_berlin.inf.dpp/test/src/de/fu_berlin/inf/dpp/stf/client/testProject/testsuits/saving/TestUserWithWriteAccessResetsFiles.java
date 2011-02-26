@@ -66,8 +66,8 @@ public class TestUserWithWriteAccessResetsFiles extends STFTest {
     public void testAliceResetsFile() throws IOException, CoreException {
         dave.sarosBot().sessionView().followThisBuddy(alice.jid);
         edna.sarosBot().sessionView().followThisBuddy(alice.jid);
-        alice.sarosBot().packageExplorerView().open()
-            .openClass(VIEW_PACKAGE_EXPLORER, PROJECT1, PKG1, CLS1);
+        alice.sarosBot().packageExplorerView()
+            .selectClass(PROJECT1, PKG1, CLS1).contextMenu(CM_OPEN).click();
         alice.bot().editor(CLS1_SUFFIX).setTextWithoutSave(CP1);
         alice.bot().editor(CLS1 + SUFFIX_JAVA).closeWithoutSave();
 

@@ -3,6 +3,8 @@ package de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteCompone
 import java.rmi.RemoteException;
 
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotTableImp;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotTree;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotTreeItem;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.EclipseComponentImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.contextMenu.OpenC;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.contextMenu.OpenCImp;
@@ -13,6 +15,7 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponen
 
 public class PEViewImp extends EclipseComponentImp implements PEView {
 
+    private STFBotTree tree;
     private static transient PEViewImp pEViewImp;
     private static OpenCImp openC;
     private static SarosCImp sarosC;
@@ -32,6 +35,11 @@ public class PEViewImp extends EclipseComponentImp implements PEView {
         return pEViewImp;
     }
 
+    public PEView setWidget(STFBotTree tree) {
+        this.tree = tree;
+        return this;
+    }
+
     /**************************************************************
      * 
      * exported functions
@@ -44,36 +52,30 @@ public class PEViewImp extends EclipseComponentImp implements PEView {
      * 
      **********************************************/
     public void selectProject(String projectName) throws RemoteException {
-        precondition();
-        bot().view(VIEW_PACKAGE_EXPLORER).bot().tree()
-            .selectTreeItemWithRegex(changeToRegex(projectName));
+
+        tree.selectTreeItemWithRegex(changeToRegex(projectName));
     }
 
     public void selectPkg(String projectName, String pkg)
         throws RemoteException {
         String[] nodes = { projectName, SRC, pkg };
-        bot().view(VIEW_PACKAGE_EXPLORER).bot().tree()
-            .selectTreeItemWithRegex(changeToRegex(nodes));
+        tree.selectTreeItemWithRegex(changeToRegex(nodes));
     }
 
-    public void selectClass(String projectName, String pkg, String className)
-        throws RemoteException {
-        precondition();
+    public STFBotTreeItem selectClass(String projectName, String pkg,
+        String className) throws RemoteException {
+
         String[] nodes = getClassNodes(projectName, pkg, className);
-        bot().view(VIEW_PACKAGE_EXPLORER).bot().tree()
-            .selectTreeItemWithRegex(changeToRegex(nodes));
+        return tree.selectTreeItemWithRegex(changeToRegex(nodes));
     }
 
     public void selectFolder(String... folderNodes) throws RemoteException {
-
-        bot().view(VIEW_PACKAGE_EXPLORER).bot().tree()
-            .selectTreeItemWithRegex(changeToRegex(folderNodes));
+        tree.selectTreeItemWithRegex(changeToRegex(folderNodes));
     }
 
-    public void selectFile(String... fileNodes) throws RemoteException {
-
-        bot().view(VIEW_PACKAGE_EXPLORER).bot().tree()
-            .selectTreeItemWithRegex(changeToRegex(fileNodes));
+    public STFBotTreeItem selectFile(String... fileNodes)
+        throws RemoteException {
+        return tree.selectTreeItemWithRegex(changeToRegex(fileNodes));
     }
 
     public OpenC open() throws RemoteException {
@@ -93,10 +95,5 @@ public class PEViewImp extends EclipseComponentImp implements PEView {
      * Inner functions
      * 
      **************************************************************/
-
-    protected void precondition() throws RemoteException {
-        bot().openViewById(VIEW_PACKAGE_EXPLORER_ID);
-        bot().view(VIEW_PACKAGE_EXPLORER).show();
-    }
 
 }

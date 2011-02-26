@@ -290,8 +290,8 @@ public class TestSVNStateInitialization extends STFTest {
     public void testCheckoutWithModification() throws RemoteException {
         assertTrue(alice.sarosBot().file()
             .existsClassNoGUI(SVN_PROJECT, SVN_PKG, SVN_CLS1));
-        alice.sarosBot().packageExplorerView().open()
-            .openClass(VIEW_PACKAGE_EXPLORER, SVN_PROJECT, SVN_PKG, SVN_CLS1);
+        alice.sarosBot().packageExplorerView()
+            .selectClass(SVN_PROJECT, SVN_PKG, SVN_CLS1).contextMenu(CM_OPEN).click();
 
         String cls1_content_before = alice.bot().editor(SVN_CLS1_SUFFIX)
             .getText();
@@ -309,8 +309,9 @@ public class TestSVNStateInitialization extends STFTest {
 
         assertTrue(bob.sarosBot().packageExplorerView().team()
             .isProjectManagedBySVN(SVN_PROJECT));
-        bob.sarosBot().packageExplorerView().open()
-            .openClass(VIEW_PACKAGE_EXPLORER, SVN_PROJECT, SVN_PKG, SVN_CLS1);
+        bob.sarosBot().packageExplorerView()
+            .selectClass(SVN_PROJECT, SVN_PKG, SVN_CLS1).contextMenu(CM_OPEN)
+            .click();
         assertEquals(cls1_content_after, bob.bot().editor(SVN_CLS1_SUFFIX)
             .getText());
     }

@@ -46,8 +46,8 @@ public class TestEditorByAlice extends STFTest {
     @Test
     public void testDeleteInEditor() throws RemoteException {
         alice.sarosBot().file().newJavaProjectWithClasses(PROJECT1, PKG1, CLS1);
-        alice.sarosBot().packageExplorerView().open()
-            .openClass(VIEW_PACKAGE_EXPLORER, PROJECT1, PKG1, CLS1);
+        alice.sarosBot().packageExplorerView()
+            .selectClass(PROJECT1, PKG1, CLS1).contextMenu(CM_OPEN).click();
         alice.bot().editor(CLS1_SUFFIX).waitUntilIsActive();
         String fileName = CLS1 + ".java";
         alice.bot().editor(fileName).navigateTo(3, 0);
@@ -61,8 +61,8 @@ public class TestEditorByAlice extends STFTest {
     @Test
     public void testEnterInEditor() throws RemoteException {
         alice.sarosBot().file().newJavaProjectWithClasses(PROJECT1, PKG1, CLS1);
-        alice.sarosBot().packageExplorerView().open()
-            .openClass(VIEW_PACKAGE_EXPLORER, PROJECT1, PKG1, CLS1);
+        alice.sarosBot().packageExplorerView()
+            .selectClass(PROJECT1, PKG1, CLS1).contextMenu(CM_OPEN).click();
         alice.bot().editor(CLS1_SUFFIX).waitUntilIsActive();
         String fileName = CLS1 + ".java";
         alice.bot().editor(fileName).navigateTo(3, 0);
@@ -75,8 +75,8 @@ public class TestEditorByAlice extends STFTest {
     @Test
     public void autoComplateProposal() throws RemoteException {
         alice.sarosBot().file().newJavaProjectWithClasses(PROJECT1, PKG1, CLS1);
-        alice.sarosBot().packageExplorerView().open()
-            .openClass(VIEW_PACKAGE_EXPLORER, PROJECT1, PKG1, CLS1);
+        alice.sarosBot().packageExplorerView()
+            .selectClass(PROJECT1, PKG1, CLS1).contextMenu(CM_OPEN).click();
         alice.bot().editor(CLS1_SUFFIX).waitUntilIsActive();
         alice.bot().editor(CLS1_SUFFIX).navigateTo(3, 0);
         assertDoesNotContain("public static void main",
@@ -90,8 +90,8 @@ public class TestEditorByAlice extends STFTest {
     @Test
     public void getAutoComplateProposal() throws RemoteException {
         alice.sarosBot().file().newJavaProjectWithClasses(PROJECT1, PKG1, CLS1);
-        alice.sarosBot().packageExplorerView().open()
-            .openClass(VIEW_PACKAGE_EXPLORER, PROJECT1, PKG1, CLS1);
+        alice.sarosBot().packageExplorerView()
+            .selectClass(PROJECT1, PKG1, CLS1).contextMenu(CM_OPEN).click();
         alice.bot().editor(CLS1_SUFFIX).waitUntilIsActive();
         alice.bot().editor(CLS1_SUFFIX).navigateTo(3, 0);
         List<String> autoCompleteProposals = alice.bot().editor(CLS1_SUFFIX)
@@ -107,8 +107,8 @@ public class TestEditorByAlice extends STFTest {
     @Test
     public void pressShortCutSave() throws RemoteException {
         alice.sarosBot().file().newJavaProjectWithClasses(PROJECT1, PKG1, CLS1);
-        alice.sarosBot().packageExplorerView().open()
-            .openClass(VIEW_PACKAGE_EXPLORER, PROJECT1, PKG1, CLS1);
+        alice.sarosBot().packageExplorerView()
+            .selectClass(PROJECT1, PKG1, CLS1).contextMenu(CM_OPEN).click();
         alice.bot().editor(CLS1_SUFFIX).waitUntilIsActive();
         alice.bot().editor(CLS1_SUFFIX).navigateTo(3, 0);
         alice.bot().editor(CLS1_SUFFIX)

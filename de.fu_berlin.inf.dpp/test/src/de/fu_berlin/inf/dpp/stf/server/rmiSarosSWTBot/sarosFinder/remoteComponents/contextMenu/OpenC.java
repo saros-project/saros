@@ -29,8 +29,8 @@ public interface OpenC extends EclipseComponent {
      *            myFolder, myFile.xml}
      * @throws RemoteException
      */
-    public void openFile(String viewTitle, String... fileNodes)
-        throws RemoteException;
+    // public void openFile(String viewTitle, String... fileNodes)
+    // throws RemoteException;
 
     /**
      * 
@@ -51,8 +51,8 @@ public interface OpenC extends EclipseComponent {
      *            name of the class, e.g. MyClass
      * @throws RemoteException
      */
-    public void openClass(String viewTitle, String projectName, String pkg,
-        String className) throws RemoteException;
+    // public void openClass(String viewTitle, String projectName, String pkg,
+    // String className) throws RemoteException;
 
     /**
      * 

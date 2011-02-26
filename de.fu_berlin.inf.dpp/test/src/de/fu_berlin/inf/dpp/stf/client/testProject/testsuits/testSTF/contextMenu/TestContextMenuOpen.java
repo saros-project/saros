@@ -38,8 +38,10 @@ public class TestContextMenuOpen extends STFTest {
         assertTrue(alice.bot().isEditorOpen(FILE1));
         alice.bot().editor(FILE1).closeWithSave();
         assertFalse(alice.bot().isEditorOpen(FILE1));
-        alice.sarosBot().packageExplorerView().open()
-            .openFile(VIEW_PACKAGE_EXPLORER, PROJECT1, FOLDER1, FILE1);
+        alice.sarosBot().packageExplorerView()
+            .selectFile(PROJECT1, FOLDER1, FILE1).contextMenu(CM_OPEN).click();
+
+        // .openFile(VIEW_PACKAGE_EXPLORER, PROJECT1, FOLDER1, FILE1);
         assertTrue(alice.bot().isEditorOpen(FILE1));
         alice.sarosBot().packageExplorerView()
             .selectFile(PROJECT1, FOLDER1, FILE1);
@@ -53,8 +55,8 @@ public class TestContextMenuOpen extends STFTest {
         assertTrue(alice.bot().isEditorOpen(CLS1_SUFFIX));
         alice.bot().editor(CLS1 + SUFFIX_JAVA).closeWithSave();
         assertFalse(alice.bot().isEditorOpen(CLS1_SUFFIX));
-        alice.sarosBot().packageExplorerView().open()
-            .openClass(VIEW_PACKAGE_EXPLORER, PROJECT1, PKG1, CLS1);
+        alice.sarosBot().packageExplorerView()
+            .selectClass(PROJECT1, PKG1, CLS1).contextMenu(CM_OPEN).click();
         assertTrue(alice.bot().isEditorOpen(CLS1_SUFFIX));
         alice.sarosBot().packageExplorerView()
             .selectClass(PROJECT1, PKG1, CLS1);

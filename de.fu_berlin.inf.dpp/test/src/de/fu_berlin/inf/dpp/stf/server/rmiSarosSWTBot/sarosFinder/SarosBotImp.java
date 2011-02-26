@@ -4,6 +4,8 @@ import java.rmi.RemoteException;
 
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.stf.STF;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.STFWorkbenchBot;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.STFWorkbenchBotImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.contextMenu.OpenCImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.contextMenu.SarosCImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.contextMenu.TeamCImp;
@@ -36,6 +38,7 @@ public class SarosBotImp extends STF implements SarosBot {
 
     private static transient SarosBotImp self;
 
+    private static STFWorkbenchBot bot;
     private static OpenCImp openC;
     private static SarosCImp sarosC;
     private static TeamCImp teamC;
@@ -60,7 +63,7 @@ public class SarosBotImp extends STF implements SarosBot {
         if (self != null)
             return self;
         self = new SarosBotImp();
-
+        bot = STFWorkbenchBotImp.getInstance();
         openC = OpenCImp.getInstance();
         sarosC = SarosCImp.getInstance();
         teamC = TeamCImp.getInstance();
@@ -132,7 +135,9 @@ public class SarosBotImp extends STF implements SarosBot {
     }
 
     public PEView packageExplorerView() throws RemoteException {
-        return pEV;
+        bot.openViewById(VIEW_PACKAGE_EXPLORER_ID);
+        bot.view(VIEW_PACKAGE_EXPLORER).show();
+        return pEV.setWidget(bot.view(VIEW_PACKAGE_EXPLORER).bot().tree());
     }
 
     public ProgressView progressView() throws RemoteException {

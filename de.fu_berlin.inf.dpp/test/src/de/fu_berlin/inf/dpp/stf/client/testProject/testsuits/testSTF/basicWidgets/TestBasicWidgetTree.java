@@ -167,12 +167,10 @@ public class TestBasicWidgetTree extends STFTest {
             .shareProjectWithSVNUsingSpecifiedFolderName(VIEW_PACKAGE_EXPLORER,
                 SVN_PROJECT_COPY, SVN_REPOSITORY_URL, SVN_PROJECT_PATH);
         alice.bot().view(VIEW_PACKAGE_EXPLORER).show();
-        alice
-            .sarosBot()
-            .packageExplorerView()
-            .open()
-            .openClass(VIEW_PACKAGE_EXPLORER, SVN_PROJECT_COPY, SVN_PKG,
-                SVN_CLS1);
+        alice.sarosBot().packageExplorerView()
+            .selectClass(SVN_PROJECT_COPY, SVN_PKG, SVN_CLS1)
+            .contextMenu(CM_OPEN).click();
+
         alice.bot().editor(SVN_CLS1_SUFFIX).setTextWithoutSave(CP1);
         assertTrue(alice.bot().editor(SVN_CLS1_SUFFIX).isDirty());
         alice.bot().view(VIEW_PACKAGE_EXPLORER)

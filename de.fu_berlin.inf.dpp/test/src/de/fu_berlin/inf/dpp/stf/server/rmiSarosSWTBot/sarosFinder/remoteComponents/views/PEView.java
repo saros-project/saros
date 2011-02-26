@@ -2,6 +2,7 @@ package de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteCompone
 
 import java.rmi.RemoteException;
 
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotTreeItem;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.EclipseComponent;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.contextMenu.OpenC;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.contextMenu.SarosC;
@@ -54,8 +55,8 @@ public interface PEView extends EclipseComponent {
      * @throws RemoteException
      * 
      */
-    public void selectClass(String projectName, String pkg, String className)
-        throws RemoteException;
+    public STFBotTreeItem selectClass(String projectName, String pkg,
+        String className) throws RemoteException;
 
     /**
      * select the given folder
@@ -77,7 +78,8 @@ public interface PEView extends EclipseComponent {
      *            {"Foo-saros","myFolder", "myFile.xml"}
      * @throws RemoteException
      */
-    public void selectFile(String... fileNodes) throws RemoteException;
+    public STFBotTreeItem selectFile(String... fileNodes)
+        throws RemoteException;
 
     public OpenC open() throws RemoteException;
 

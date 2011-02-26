@@ -38,21 +38,22 @@ public class OpenCImp extends EclipseComponentImp implements OpenC {
      * 
      **********************************************/
 
-    public void openFile(String viewTitle, String... fileNodes)
-        throws RemoteException {
-        precondition(viewTitle);
-        bot().view(viewTitle).bot().tree()
-            .selectTreeItemWithRegex(changeToRegex(fileNodes))
-            .contextMenu(CM_OPEN).click();
+    // public void openFile(String viewTitle, String... fileNodes)
+    // throws RemoteException {
+    // precondition(viewTitle);
+    // bot().view(viewTitle).bot().tree()
+    // .selectTreeItemWithRegex(changeToRegex(fileNodes))
+    // .contextMenu(CM_OPEN).click();
+    //
+    // }
 
-    }
-
-    public void openClass(String viewTitle, String projectName, String pkg,
-        String className) throws RemoteException {
-        assert isValidClassPath(projectName, pkg, className) : "The given classPath is not invalid!";
-        String[] classNodes = getClassNodes(projectName, pkg, className);
-        openFile(viewTitle, classNodes);
-    }
+    // public void openClass(String viewTitle, String projectName, String pkg,
+    // String className) throws RemoteException {
+    // assert isValidClassPath(projectName, pkg, className) :
+    // "The given classPath is not invalid!";
+    // String[] classNodes = getClassNodes(projectName, pkg, className);
+    // openFile(viewTitle, classNodes);
+    // }
 
     public void openClassWith(String viewTitle, String whichEditor,
         String projectName, String pkg, String className)

@@ -98,8 +98,9 @@ public class TestSessionView extends STFTest {
         bob.sarosBot().sessionView().followThisBuddy(alice.jid);
         assertTrue(bob.sarosBot().sessionView().isFollowingBuddy(alice.jid));
 
-        alice.sarosBot().packageExplorerView().open()
-            .openClass(VIEW_PACKAGE_EXPLORER, PROJECT1, PKG1, CLS1);
+        alice.sarosBot().packageExplorerView()
+            .selectClass(PROJECT1, PKG1, CLS1).contextMenu(CM_OPEN).click();
+
         bob.bot().waitUntilEditorOpen(CLS1_SUFFIX);
         assertTrue(bob.bot().isEditorOpen(CLS1_SUFFIX));
 
@@ -146,8 +147,8 @@ public class TestSessionView extends STFTest {
             bob.bot().getPathToScreenShot() + "/after_jump_to_position.png");
         assertTrue(bob.bot().editor(CLS2_SUFFIX).isActive());
 
-        alice.sarosBot().packageExplorerView().open()
-            .openClass(VIEW_PACKAGE_EXPLORER, PROJECT1, PKG1, CLS1);
+        alice.sarosBot().packageExplorerView()
+            .selectClass(PROJECT1, PKG1, CLS1).contextMenu(CM_OPEN).click();
         alice.bot().editor(CLS1 + SUFFIX_JAVA).show();
         assertTrue(alice.bot().editor(CLS1_SUFFIX).isActive());
         assertFalse(bob.bot().isEditorOpen(CLS1_SUFFIX));
@@ -168,12 +169,12 @@ public class TestSessionView extends STFTest {
 
     @Test
     public void inconsistencyDetectedGUI() throws RemoteException {
-        alice.sarosBot().packageExplorerView().open()
-            .openClass(VIEW_PACKAGE_EXPLORER, PROJECT1, PKG1, CLS1);
+        alice.sarosBot().packageExplorerView()
+            .selectClass(PROJECT1, PKG1, CLS1).contextMenu(CM_OPEN).click();
         String editorTextOfAlice = alice.bot().editor(CLS1_SUFFIX).getText();
         alice.sarosBot().sessionView().restrictToReadOnlyAccess(bob.jid);
-        bob.sarosBot().packageExplorerView().open()
-            .openClass(VIEW_PACKAGE_EXPLORER, PROJECT1, PKG1, CLS1);
+        bob.sarosBot().packageExplorerView().selectClass(PROJECT1, PKG1, CLS1)
+            .contextMenu(CM_OPEN).click();
         bob.bot().editor(CLS1_SUFFIX).setTextWithoutSave(CP1);
         String editorTextOfBob = bob.bot().editor(CLS1_SUFFIX).getText();
         assertFalse(editorTextOfAlice.equals(editorTextOfBob));
