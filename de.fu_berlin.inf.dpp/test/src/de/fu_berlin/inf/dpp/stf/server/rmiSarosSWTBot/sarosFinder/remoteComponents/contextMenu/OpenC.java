@@ -3,7 +3,6 @@ package de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteCompone
 import java.rmi.RemoteException;
 
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.EclipseComponent;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.views.PEView;
 
 public interface OpenC extends EclipseComponent {
 
@@ -67,8 +66,8 @@ public interface OpenC extends EclipseComponent {
      * @throws RemoteException
      * @see PEView#openFileWith(String, String...)
      */
-    public void openClassWith(String whichEditor, String projectName,
-        String pkg, String className) throws RemoteException;
+    // public void openClassWith(String whichEditor, String projectName,
+    // String pkg, String className) throws RemoteException;
 
     /**
      * Performs the action "open file with" which should be done with the
@@ -90,8 +89,8 @@ public interface OpenC extends EclipseComponent {
      * 
      * @throws RemoteException
      */
-    public void openFileWith(String whichEditor, String... fileNodes)
-        throws RemoteException;
+    // public void openFileWith(String whichEditor, String... fileNodes)
+    // throws RemoteException;
 
     /**
      * open class with system editor using

@@ -36,7 +36,7 @@ public class TestFollowMode extends STFTest {
     @Test
     public void testBobFollowAlice() throws IOException, CoreException {
         alice.sarosBot().packageExplorerView()
-            .selectClass(PROJECT1, PKG1, CLS1).contextMenu(CM_OPEN).click();
+            .selectClass(PROJECT1, PKG1, CLS1).open();
         alice.bot().editor(CLS1_SUFFIX).setTexWithSave(CP1);
         bob.sarosBot().sessionView().followThisBuddy(alice.jid);
         bob.bot().editor(CLS1_SUFFIX).waitUntilIsActive();

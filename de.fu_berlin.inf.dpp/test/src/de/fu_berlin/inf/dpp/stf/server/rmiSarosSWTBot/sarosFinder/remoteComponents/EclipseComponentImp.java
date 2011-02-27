@@ -29,6 +29,10 @@ public class EclipseComponentImp extends STF implements EclipseComponent {
 
     // Picocontainer initiated by STFController.
 
+    public enum treeItemType {
+        PROJECT, FILE, CLASS, PKG, FOLDER
+    };
+
     public static SarosSessionManager sessionManager;
     public static DataTransferManager dataTransferManager;
     public static EditorManager editorManager;

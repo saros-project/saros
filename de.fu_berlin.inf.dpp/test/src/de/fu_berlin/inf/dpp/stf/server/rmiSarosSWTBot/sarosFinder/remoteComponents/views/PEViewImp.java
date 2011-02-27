@@ -2,35 +2,31 @@ package de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteCompone
 
 import java.rmi.RemoteException;
 
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotTableImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotTree;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotTreeItem;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.EclipseComponentImp;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.contextMenu.ContextMenuWrapper;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.contextMenu.ContextMenuWrapperImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.contextMenu.OpenC;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.contextMenu.OpenCImp;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.contextMenu.SarosC;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.contextMenu.SarosCImp;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.contextMenu.TeamC;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.contextMenu.TeamCImp;
 
 public class PEViewImp extends EclipseComponentImp implements PEView {
 
     private STFBotTree tree;
     private static transient PEViewImp pEViewImp;
     private static OpenCImp openC;
-    private static SarosCImp sarosC;
-    private static TeamCImp teamC;
+
+    private static ContextMenuWrapperImp contextMenu;
 
     /**
-     * {@link STFBotTableImp} is a singleton, but inheritance is possible.
+     * {@link PEViewImp} is a singleton, but inheritance is possible.
      */
     public static PEViewImp getInstance() {
         if (pEViewImp != null)
             return pEViewImp;
         pEViewImp = new PEViewImp();
         openC = OpenCImp.getInstance();
-        sarosC = SarosCImp.getInstance();
-        teamC = TeamCImp.getInstance();
+
+        contextMenu = ContextMenuWrapperImp.getInstance();
 
         return pEViewImp;
     }
@@ -56,48 +52,71 @@ public class PEViewImp extends EclipseComponentImp implements PEView {
         return openC;
     }
 
-    public SarosC saros() throws RemoteException {
-        sarosC.setView(this);
-        return sarosC;
-    }
-
-    public TeamC team() throws RemoteException {
-        teamC.setView(this);
-        return teamC;
-    }
+    // public SarosC saros() throws RemoteException {
+    // sarosC.setView(tree);
+    // return sarosC;
+    // }
+    //
+    // public TeamC team() throws RemoteException {
+    // teamC.setView(tree);
+    // return teamC;
+    // }
 
     /**********************************************
      * 
      * actions
      * 
      **********************************************/
-    public STFBotTreeItem selectProject(String projectName)
-        throws RemoteException {
 
-        return tree.selectTreeItemWithRegex(changeToRegex(projectName));
+    public ContextMenuWrapper tree() throws RemoteException {
+        contextMenu.setTree(tree);
+        return contextMenu;
     }
 
-    public STFBotTreeItem selectPkg(String projectName, String pkg)
+    public ContextMenuWrapper selectProject(String projectName) throws RemoteException {
+        contextMenu.setTreeItem(tree
+            .selectTreeItemWithRegex(changeToRegex(projectName)));
+        contextMenu.setTreeItemType(treeItemType.PROJECT);
+        return contextMenu;
+
+    }
+
+    public ContextMenuWrapper selectPkg(String projectName, String pkg)
         throws RemoteException {
         String[] nodes = { projectName, SRC, pkg };
-        return tree.selectTreeItemWithRegex(changeToRegex(nodes));
+        contextMenu.setTreeItem(tree
+            .selectTreeItemWithRegex(changeToRegex(nodes)));
+        contextMenu.setTreeItemType(treeItemType.PKG);
+        return contextMenu;
     }
 
-    public STFBotTreeItem selectClass(String projectName, String pkg,
+    public ContextMenuWrapper selectClass(String projectName, String pkg,
         String className) throws RemoteException {
 
         String[] nodes = getClassNodes(projectName, pkg, className);
-        return tree.selectTreeItemWithRegex(changeToRegex(nodes));
+        contextMenu.setTreeItem(tree
+            .selectTreeItemWithRegex(changeToRegex(nodes)));
+        contextMenu.setTreeItemType(treeItemType.CLASS);
+        return contextMenu;
     }
 
-    public STFBotTreeItem selectFolder(String... folderNodes)
+    public ContextMenuWrapper selectFolder(String... folderNodes)
         throws RemoteException {
-        return tree.selectTreeItemWithRegex(changeToRegex(folderNodes));
+        contextMenu.setTreeItem(tree
+            .selectTreeItemWithRegex(changeToRegex(folderNodes)));
+        contextMenu.setTreeItemType(treeItemType.FOLDER);
+        return contextMenu;
     }
 
-    public STFBotTreeItem selectFile(String... fileNodes)
-        throws RemoteException {
-        return tree.selectTreeItemWithRegex(changeToRegex(fileNodes));
+    public ContextMenuWrapper selectFile(String... fileNodes) throws RemoteException {
+        contextMenu.setTreeItem(tree
+            .selectTreeItemWithRegex(changeToRegex(fileNodes)));
+        contextMenu.setTreeItemType(treeItemType.FILE);
+        return contextMenu;
+    }
+
+    public String getTitle() throws RemoteException {
+        return VIEW_PACKAGE_EXPLORER;
     }
 
     /**************************************************************

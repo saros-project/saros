@@ -50,10 +50,10 @@ public class TestMenuFile extends STFTest {
         assertTrue(alice.sarosBot().file().existsFolderNoGUI(PROJECT1, FOLDER1));
         assertTrue(alice.sarosBot().file()
             .existsFolderNoGUI(PROJECT1, FOLDER1, FOLDER2));
-        alice.sarosBot().edit().deleteFolderNoGUI(PROJECT1, FOLDER1, FOLDER2);
+        alice.sarosBot().deleteFolderNoGUI(PROJECT1, FOLDER1, FOLDER2);
         assertFalse(alice.sarosBot().file()
             .existsFolderNoGUI(PROJECT1, FOLDER1, FOLDER2));
-        alice.sarosBot().edit().deleteFolderNoGUI(PROJECT1, FOLDER1);
+        alice.sarosBot().deleteFolderNoGUI(PROJECT1, FOLDER1);
         assertFalse(alice.sarosBot().file()
             .existsFolderNoGUI(PROJECT1, FOLDER1));
     }
@@ -66,10 +66,10 @@ public class TestMenuFile extends STFTest {
         assertTrue(alice.sarosBot().file().existsPkgNoGUI(PROJECT1, PKG1));
         assertTrue(alice.sarosBot().file()
             .existsPkgNoGUI(PROJECT1, PKG1 + ".subpkg"));
-        alice.sarosBot().edit().deletePkgNoGUI(PROJECT1, PKG1 + ".subpkg");
+        alice.sarosBot().deletePkgNoGUI(PROJECT1, PKG1 + ".subpkg");
         assertFalse(alice.sarosBot().file()
             .existsPkgNoGUI(PROJECT1, PKG1 + ".subpkg"));
-        alice.sarosBot().edit().deletePkgNoGUI(PROJECT1, PKG1);
+        alice.sarosBot().deletePkgNoGUI(PROJECT1, PKG1);
         assertFalse(alice.sarosBot().file().existsPkgNoGUI(PROJECT1, PKG1));
     }
 
@@ -153,7 +153,7 @@ public class TestMenuFile extends STFTest {
             .existsClassNoGUI(PROJECT1, pkg, className2));
 
         log.trace("deleteResource()");
-        alice.sarosBot().edit().deleteProjectNoGUI(PROJECT1);
+        alice.sarosBot().deleteProjectNoGUI(PROJECT1);
         log.trace("alice.isJavaProjectExist()");
         assertFalse(alice.sarosBot().file().existsProjectNoGUI(PROJECT1));
     }

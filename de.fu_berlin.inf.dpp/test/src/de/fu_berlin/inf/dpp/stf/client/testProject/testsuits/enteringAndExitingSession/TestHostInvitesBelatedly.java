@@ -79,24 +79,23 @@ public class TestHostInvitesBelatedly extends STFTest {
     public void testFollowModeByOpenClassbyAlice() throws IOException,
         CoreException, InterruptedException {
         alice.sarosBot().packageExplorerView()
-            .selectClass(PROJECT1, PKG1, CLS1).contextMenu(CM_OPEN).click();
-
+            .selectClass(PROJECT1, PKG1, CLS1).open();
         alice.bot().editor(CLS1_SUFFIX).setTextWithoutSave(CP1);
         String dirtyContent1ByAlice = alice.bot().editor(CLS1_SUFFIX).getText();
 
         bob.sarosBot().packageExplorerView().selectClass(PROJECT1, PKG1, CLS1)
-            .contextMenu(CM_OPEN).click();
+            .open();
 
         bob.bot().editor(CLS1_SUFFIX).setTexWithSave(CP1_CHANGE);
 
         alice.sarosBot().packageExplorerView()
-            .selectClass(PROJECT1, PKG1, CLS2).contextMenu(CM_OPEN).click();
+            .selectClass(PROJECT1, PKG1, CLS2).open();
 
         alice.bot().editor(CLS2_SUFFIX).setTextWithoutSave(CP2);
         String dirtyContent2ByAlice = alice.bot().editor(CLS2_SUFFIX).getText();
 
         bob.sarosBot().packageExplorerView().selectClass(PROJECT1, PKG1, CLS2)
-            .contextMenu(CM_OPEN).click();
+            .open();
 
         bob.bot().editor(CLS2_SUFFIX).setTextWithoutSave(CP2_CHANGE);
         // bob.editor.closeJavaEditorWithSave(CLS1);

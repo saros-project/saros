@@ -80,7 +80,7 @@ public class TestShareProjectUsingExistingProject extends STFTest {
         assertTrue(bob.sarosBot().file().existsProjectNoGUI(PROJECT1_NEXT));
         assertTrue(bob.sarosBot().file()
             .existsClassNoGUI(PROJECT1_NEXT, PKG1, CLS1));
-        bob.sarosBot().edit().deleteProjectNoGUI(PROJECT1_NEXT);
+        bob.sarosBot().deleteProjectNoGUI(PROJECT1_NEXT);
     }
 
     @Test
@@ -93,7 +93,7 @@ public class TestShareProjectUsingExistingProject extends STFTest {
         assertTrue(bob.sarosBot().file().existsProjectNoGUI(PROJECT1_NEXT));
         assertTrue(bob.sarosBot().file()
             .existsClassNoGUI(PROJECT1_NEXT, PKG1, CLS1));
-        bob.sarosBot().edit().deleteProjectNoGUI(PROJECT1_NEXT);
+        bob.sarosBot().deleteProjectNoGUI(PROJECT1_NEXT);
 
     }
 }

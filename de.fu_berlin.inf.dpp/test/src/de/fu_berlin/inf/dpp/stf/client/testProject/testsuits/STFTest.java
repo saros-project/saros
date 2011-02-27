@@ -229,7 +229,7 @@ public class STFTest extends STF {
             tester.sarosBot().window().openPerspective();
             closeUnnecessaryViews(tester);
             tester.bot().resetWorkbench();
-            tester.sarosBot().edit().deleteAllProjectsNoGUI();
+            tester.sarosBot().deleteAllProjectsNoGUI();
             tester.sarosBot().edit().deleteAllProjects(VIEW_PACKAGE_EXPLORER);
         }
     }
@@ -341,7 +341,7 @@ public class STFTest extends STF {
             if (tester != null) {
                 // tester.sarosBot().buddiesView().resetAllBuddyNameNoGUI();
                 tester.sarosBot().buddiesView().disconnect();
-                tester.sarosBot().edit().deleteAllProjectsNoGUI();
+                tester.sarosBot().deleteAllProjectsNoGUI();
             }
         }
         resetAllBots();
@@ -352,7 +352,7 @@ public class STFTest extends STF {
             if (tester != null) {
                 tester.sarosBot().buddiesView().resetAllBuddyNameNoGUI();
                 tester.sarosBot().buddiesView().disconnect();
-                tester.sarosBot().edit().deleteAllProjectsNoGUI();
+                tester.sarosBot().deleteAllProjectsNoGUI();
             }
         }
         resetAllBots();
@@ -492,7 +492,7 @@ public class STFTest extends STF {
     public static void deleteAllProjectsByActiveTesters()
         throws RemoteException {
         for (Tester tester : activeTesters) {
-            tester.sarosBot().edit().deleteAllProjectsNoGUI();
+            tester.sarosBot().deleteAllProjectsNoGUI();
         }
     }
 
@@ -510,8 +510,7 @@ public class STFTest extends STF {
             for (String folder : folders) {
                 if (tester.sarosBot().file()
                     .existsFolderNoGUI(PROJECT1, folder))
-                    tester.sarosBot().edit()
-                        .deleteFolderNoGUI(PROJECT1, folder);
+                    tester.sarosBot().deleteFolderNoGUI(PROJECT1, folder);
             }
         }
     }
@@ -521,20 +520,12 @@ public class STFTest extends STF {
         Tester inviter, Tester... invitees) throws RemoteException {
         String[] baseJIDOfInvitees = getPeersBaseJID(invitees);
 
-        inviter
-            .sarosBot()
-            .packageExplorerView()
-            .saros()
-            .shareProjectWith(projectName, howToShareProject, baseJIDOfInvitees);
+        inviter.sarosBot().packageExplorerView().selectProject(projectName)
+            .saros().shareProjectWith(howToShareProject, baseJIDOfInvitees);
         for (Tester invitee : invitees) {
-            invitee.sarosBot().packageExplorerView().saros()
-                .confirmShellSessionnInvitation();
-            invitee
-                .sarosBot()
-                .packageExplorerView()
-                .saros()
-                .confirmShellAddProjectUsingWhichProject(projectName,
-                    usingWhichProject);
+            invitee.sarosBot().confirmShellSessionnInvitation();
+            invitee.sarosBot().confirmShellAddProjectUsingWhichProject(
+                projectName, usingWhichProject);
         }
     }
 
@@ -546,25 +537,17 @@ public class STFTest extends STF {
         InterruptedException {
 
         log.trace("alice.shareProjectParallel");
-        inviter
-            .sarosBot()
-            .packageExplorerView()
+        inviter.sarosBot().packageExplorerView().selectProject(projectName)
             .saros()
-            .shareProjectWith(projectName, howToShareProject,
-                getPeersBaseJID(invitees));
+            .shareProjectWith(howToShareProject, getPeersBaseJID(invitees));
 
         List<Callable<Void>> joinSessionTasks = new ArrayList<Callable<Void>>();
         for (final Tester invitee : invitees) {
             joinSessionTasks.add(new Callable<Void>() {
                 public Void call() throws Exception {
-                    invitee.sarosBot().packageExplorerView().saros()
-                        .confirmShellSessionnInvitation();
-                    invitee
-                        .sarosBot()
-                        .packageExplorerView()
-                        .saros()
-                        .confirmShellAddProjectUsingWhichProject(projectName,
-                            usingWhichProject);
+                    invitee.sarosBot().confirmShellSessionnInvitation();
+                    invitee.sarosBot().confirmShellAddProjectUsingWhichProject(
+                        projectName, usingWhichProject);
                     invitee.sarosBot().sessionView().waitUntilIsInSession();
                     return null;
                 }
@@ -774,14 +757,9 @@ public class STFTest extends STF {
         for (final Tester tester : invitees) {
             joinSessionTasks.add(new Callable<Void>() {
                 public Void call() throws Exception {
-                    tester.sarosBot().packageExplorerView().saros()
-                        .confirmShellSessionnInvitation();
-                    tester
-                        .sarosBot()
-                        .packageExplorerView()
-                        .saros()
-                        .confirmShellAddProjectUsingWhichProject(projectName,
-                            usingWhichProject);
+                    tester.sarosBot().confirmShellSessionnInvitation();
+                    tester.sarosBot().confirmShellAddProjectUsingWhichProject(
+                        projectName, usingWhichProject);
                     return null;
                 }
             });

@@ -59,19 +59,17 @@ public class TestEditDuringInvitation extends STFTest {
 
         alice.sarosBot().sessionView()
             .openInvitationInterface(carl.getBaseJid());
-        carl.sarosBot().packageExplorerView().saros()
-            .confirmShellSessionnInvitation();
+        carl.sarosBot().confirmShellSessionnInvitation();
 
         bob.sarosBot().packageExplorerView().selectClass(PROJECT1, PKG1, CLS1)
-            .contextMenu(CM_OPEN).click();
+            .open();
         bob.bot().editor(CLS1_SUFFIX).setTexWithSave(CP1);
         String texByBob = bob.bot().editor(CLS1_SUFFIX).getText();
         // System.out.println(texByBob);
 
-        carl.sarosBot().packageExplorerView().saros()
-            .confirmShellAddProjectWithNewProject(PROJECT1);
+        carl.sarosBot().confirmShellAddProjectWithNewProject(PROJECT1);
         carl.sarosBot().packageExplorerView().selectClass(PROJECT1, PKG1, CLS1)
-            .contextMenu(CM_OPEN).click();
+            .open();
 
         alice.bot().editor(CLS1_SUFFIX).waitUntilIsTextSame(texByBob);
         String textByAlice = alice.bot().editor(CLS1_SUFFIX).getText();

@@ -45,8 +45,7 @@ public class TestConcurrentEditing extends STFTest {
 
         buildSessionSequentially(PROJECT1, CM_SHARE_PROJECT,
             TypeOfCreateProject.NEW_PROJECT, alice, bob);
-        bob.sarosBot().packageExplorerView().selectFile(path)
-            .contextMenu(CM_OPEN).click();
+        bob.sarosBot().packageExplorerView().selectFile(path).open();
 
         bob.bot().waitUntilEditorOpen(FILE);
         bob.bot().editor(FILE).navigateTo(0, 30);
@@ -96,7 +95,7 @@ public class TestConcurrentEditing extends STFTest {
         buildSessionConcurrently(PROJECT1, CM_SHARE_PROJECT,
             TypeOfCreateProject.NEW_PROJECT, alice, bob);
         bob.sarosBot().packageExplorerView().selectClass(PROJECT1, PKG1, CLS1)
-            .contextMenu(CM_OPEN).click();
+            .open();
         bob.bot().editor(CLS1_SUFFIX).waitUntilIsActive();
 
         alice.bot().editor(CLS1_SUFFIX).navigateTo(3, 0);

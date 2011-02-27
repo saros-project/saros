@@ -99,7 +99,7 @@ public class TestSessionView extends STFTest {
         assertTrue(bob.sarosBot().sessionView().isFollowingBuddy(alice.jid));
 
         alice.sarosBot().packageExplorerView()
-            .selectClass(PROJECT1, PKG1, CLS1).contextMenu(CM_OPEN).click();
+            .selectClass(PROJECT1, PKG1, CLS1).open();
 
         bob.bot().waitUntilEditorOpen(CLS1_SUFFIX);
         assertTrue(bob.bot().isEditorOpen(CLS1_SUFFIX));
@@ -148,7 +148,7 @@ public class TestSessionView extends STFTest {
         assertTrue(bob.bot().editor(CLS2_SUFFIX).isActive());
 
         alice.sarosBot().packageExplorerView()
-            .selectClass(PROJECT1, PKG1, CLS1).contextMenu(CM_OPEN).click();
+            .selectClass(PROJECT1, PKG1, CLS1).open();
         alice.bot().editor(CLS1 + SUFFIX_JAVA).show();
         assertTrue(alice.bot().editor(CLS1_SUFFIX).isActive());
         assertFalse(bob.bot().isEditorOpen(CLS1_SUFFIX));
@@ -170,11 +170,11 @@ public class TestSessionView extends STFTest {
     @Test
     public void inconsistencyDetectedGUI() throws RemoteException {
         alice.sarosBot().packageExplorerView()
-            .selectClass(PROJECT1, PKG1, CLS1).contextMenu(CM_OPEN).click();
+            .selectClass(PROJECT1, PKG1, CLS1).open();
         String editorTextOfAlice = alice.bot().editor(CLS1_SUFFIX).getText();
         alice.sarosBot().sessionView().restrictToReadOnlyAccess(bob.jid);
         bob.sarosBot().packageExplorerView().selectClass(PROJECT1, PKG1, CLS1)
-            .contextMenu(CM_OPEN).click();
+            .open();
         bob.bot().editor(CLS1_SUFFIX).setTextWithoutSave(CP1);
         String editorTextOfBob = bob.bot().editor(CLS1_SUFFIX).getText();
         assertFalse(editorTextOfAlice.equals(editorTextOfBob));
@@ -259,7 +259,7 @@ public class TestSessionView extends STFTest {
     public void inviteUsersInSession() throws RemoteException,
         InterruptedException {
         bob.sarosBot().sessionView().leaveTheSessionByPeer();
-        bob.sarosBot().edit().deleteProjectNoGUI(PROJECT1);
+        bob.sarosBot().deleteProjectNoGUI(PROJECT1);
         assertFalse(bob.sarosBot().sessionView().isInSession());
         inviteBuddies(PROJECT1, TypeOfCreateProject.NEW_PROJECT, alice, bob,
             carl);

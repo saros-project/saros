@@ -30,7 +30,7 @@ public class TestMenuEdit extends STFTest {
     public void testDeleteProjectUsingGUI() throws RemoteException {
         alice.sarosBot().file().newJavaProject(PROJECT1);
         assertTrue(alice.sarosBot().file().existsProjectNoGUI(PROJECT1));
-        alice.sarosBot().edit().deleteProjectNoGUI(PROJECT1);
+        alice.sarosBot().deleteProjectNoGUI(PROJECT1);
         assertFalse(alice.sarosBot().file().existsProjectNoGUI(PROJECT1));
     }
 
@@ -41,8 +41,7 @@ public class TestMenuEdit extends STFTest {
         assertTrue(alice.sarosBot().file()
             .existsClassNoGUI(PROJECT1, "pkg", "Cls"));
         alice.sarosBot().packageExplorerView()
-            .selectClass(PROJECT1, "pkg", "Cls");
-        alice.sarosBot().edit().deleteFile();
+            .selectClass(PROJECT1, "pkg", "Cls").delete();
         assertFalse(alice.sarosBot().file()
             .existsClassNoGUI(PROJECT1, "pkg", "Cls"));
     }
@@ -51,8 +50,8 @@ public class TestMenuEdit extends STFTest {
     public void testCopyProject() throws RemoteException {
         alice.sarosBot().file().newProject(PROJECT1);
         assertFalse(alice.sarosBot().file().existsProjectNoGUI(PROJECT2));
-        alice.sarosBot().packageExplorerView().selectProject(PROJECT1);
-        alice.sarosBot().edit().copyProject(PROJECT2);
+        alice.sarosBot().packageExplorerView().selectProject(PROJECT1).copy();
+        alice.sarosBot().packageExplorerView().tree().paste(PROJECT2);
         assertTrue(alice.sarosBot().file().existsProjectNoGUI(PROJECT2));
     }
 
@@ -61,7 +60,7 @@ public class TestMenuEdit extends STFTest {
         alice.sarosBot().file().newJavaProject(PROJECT1);
         alice.sarosBot().file().newFolder(PROJECT1, FOLDER1);
         assertTrue(alice.sarosBot().file().existsFolderNoGUI(PROJECT1, FOLDER1));
-        alice.sarosBot().edit().deleteFolderNoGUI(PROJECT1, FOLDER1);
+        alice.sarosBot().deleteFolderNoGUI(PROJECT1, FOLDER1);
         assertFalse(alice.sarosBot().file()
             .existsFolderNoGUI(PROJECT1, FOLDER1));
     }

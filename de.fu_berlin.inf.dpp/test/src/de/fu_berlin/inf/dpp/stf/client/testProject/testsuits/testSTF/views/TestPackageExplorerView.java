@@ -32,7 +32,7 @@ public class TestPackageExplorerView extends STFTest {
         alice.sarosBot().file().newClass(PROJECT1, "pkg", "Cls");
         assertTrue(alice.sarosBot().file()
             .existsClassNoGUI(PROJECT1, "pkg", "Cls"));
-        alice.sarosBot().edit().deleteClassNoGUI(PROJECT1, "pkg", "Cls");
+        alice.sarosBot().deleteClassNoGUI(PROJECT1, "pkg", "Cls");
         assertFalse(alice.sarosBot().file()
             .existsClassNoGUI(PROJECT1, "pkg", "Cls"));
     }
@@ -45,7 +45,7 @@ public class TestPackageExplorerView extends STFTest {
         alice.sarosBot().file().newClass(PROJECT1, "pkg", "Cls");
         assertTrue(alice.sarosBot().file()
             .existsFile(PROJECT1, "src", "pkg", "Cls.java"));
-        alice.sarosBot().edit().deleteClassNoGUI(PROJECT1, "pkg", "Cls");
+        alice.sarosBot().deleteClassNoGUI(PROJECT1, "pkg", "Cls");
         assertFalse(alice.sarosBot().file()
             .existsFile(PROJECT1, "src", "pkg", "Cls.java"));
     }

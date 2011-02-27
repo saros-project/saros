@@ -73,6 +73,7 @@ public class TestParallelInvitationWithTerminationByHost extends STFTest {
         alice
             .sarosBot()
             .packageExplorerView()
+            .selectProject(PROJECT1)
             .saros()
             .shareProject(VIEW_PACKAGE_EXPLORER, PROJECT1, bob.getBaseJid(),
                 dave.getBaseJid(), carl.getBaseJid());
@@ -87,8 +88,7 @@ public class TestParallelInvitationWithTerminationByHost extends STFTest {
 
         carl.bot().waitUntilShellIsOpen(SHELL_SESSION_INVITATION);
         carl.bot().shell(SHELL_SESSION_INVITATION).activate();
-        carl.sarosBot().packageExplorerView().saros()
-            .confirmShellSessionnInvitation();
+        carl.sarosBot().confirmShellSessionnInvitation();
         alice.sarosBot().progressView().removeProcess(0);
         carl.bot().shell(SHELL_INVITATION_CANCELLED).waitUntilActive();
         assertTrue(carl.bot().shell(SHELL_INVITATION_CANCELLED).isActive());
@@ -97,8 +97,7 @@ public class TestParallelInvitationWithTerminationByHost extends STFTest {
 
         dave.bot().waitUntilShellIsOpen(SHELL_SESSION_INVITATION);
         dave.bot().shell(SHELL_SESSION_INVITATION).activate();
-        dave.sarosBot().packageExplorerView().saros()
-            .confirmShellSessionnInvitation();
+        dave.sarosBot().confirmShellSessionnInvitation();
 
         // dave.button.clickButton(FINISH);
         alice.sarosBot().progressView().removeProcess(0);

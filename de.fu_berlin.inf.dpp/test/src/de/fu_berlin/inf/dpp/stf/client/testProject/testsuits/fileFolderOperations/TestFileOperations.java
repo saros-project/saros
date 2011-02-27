@@ -94,7 +94,7 @@ public class TestFileOperations extends STFTest {
      */
     @Test
     public void testDeleteFile() throws RemoteException {
-        alice.sarosBot().edit().deleteClassNoGUI(PROJECT1, PKG1, CLS1);
+        alice.sarosBot().deleteClassNoGUI(PROJECT1, PKG1, CLS1);
         bob.sarosBot().packageExplorerView()
             .waitUntilClassNotExists(PROJECT1, PKG1, CLS1);
         assertFalse(bob.sarosBot().packageExplorerView()
@@ -246,7 +246,7 @@ public class TestFileOperations extends STFTest {
      */
     @Test
     public void testDeletePkg() throws RemoteException {
-        alice.sarosBot().edit().deletePkgNoGUI(PROJECT1, PKG1);
+        alice.sarosBot().deletePkgNoGUI(PROJECT1, PKG1);
         bob.sarosBot().packageExplorerView()
             .waitUntilPkgNotExists(PROJECT1, PKG1);
         carl.sarosBot().packageExplorerView()

@@ -2,11 +2,9 @@ package de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteCompone
 
 import java.rmi.RemoteException;
 
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotTreeItem;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.EclipseComponent;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.contextMenu.ContextMenuWrapper;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.contextMenu.OpenC;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.contextMenu.SarosC;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.contextMenu.TeamC;
 
 /**
  * This interface contains only APIs to select treeItems in the package explorer
@@ -22,6 +20,8 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponen
  */
 public interface PEView extends EclipseComponent {
 
+    public ContextMenuWrapper tree() throws RemoteException;
+
     /**
      * select the given project.
      * 
@@ -29,8 +29,7 @@ public interface PEView extends EclipseComponent {
      *            the name of the project
      * @throws RemoteException
      */
-    public STFBotTreeItem selectProject(String projectName)
-        throws RemoteException;
+    public ContextMenuWrapper selectProject(String projectName) throws RemoteException;
 
     /**
      * select the given package
@@ -41,7 +40,7 @@ public interface PEView extends EclipseComponent {
      *            the name of the package, e.g. my.pkg
      * @throws RemoteException
      */
-    public STFBotTreeItem selectPkg(String projectName, String pkg)
+    public ContextMenuWrapper selectPkg(String projectName, String pkg)
         throws RemoteException;
 
     /**
@@ -56,7 +55,7 @@ public interface PEView extends EclipseComponent {
      * @throws RemoteException
      * 
      */
-    public STFBotTreeItem selectClass(String projectName, String pkg,
+    public ContextMenuWrapper selectClass(String projectName, String pkg,
         String className) throws RemoteException;
 
     /**
@@ -68,7 +67,7 @@ public interface PEView extends EclipseComponent {
      *            {"Foo-saros","myFolder"}
      * @throws RemoteException
      */
-    public STFBotTreeItem selectFolder(String... folderNodes)
+    public ContextMenuWrapper selectFolder(String... folderNodes)
         throws RemoteException;
 
     /**
@@ -80,12 +79,13 @@ public interface PEView extends EclipseComponent {
      *            {"Foo-saros","myFolder", "myFile.xml"}
      * @throws RemoteException
      */
-    public STFBotTreeItem selectFile(String... fileNodes)
-        throws RemoteException;
+    public ContextMenuWrapper selectFile(String... fileNodes) throws RemoteException;
 
     public OpenC open() throws RemoteException;
 
-    public SarosC saros() throws RemoteException;
+    // public SarosC saros() throws RemoteException;
+    //
+    // public TeamC team() throws RemoteException;
 
-    public TeamC team() throws RemoteException;
+    public String getTitle() throws RemoteException;
 }
