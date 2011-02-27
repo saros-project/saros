@@ -71,7 +71,8 @@ public class TestStrictSequentialInvitationWithoutTermination extends STFTest {
         alice.sarosBot().window().setNewTextFileLineDelimiter("Unix");
 
         buildSessionSequentially(VIEW_PACKAGE_EXPLORER, PROJECT1,
-            CM_SHARE_PROJECT, TypeOfCreateProject.NEW_PROJECT, carl, alice, bob);
+            TypeOfShareProject.SHARE_PROJECT, TypeOfCreateProject.NEW_PROJECT,
+            carl, alice, bob);
 
         String delimiterByAlice = alice.sarosBot().window()
             .getTextFileLineDelimiter();

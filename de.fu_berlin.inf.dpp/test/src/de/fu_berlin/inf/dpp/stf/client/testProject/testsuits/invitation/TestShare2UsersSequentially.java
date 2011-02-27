@@ -51,7 +51,8 @@ public class TestShare2UsersSequentially extends STFTest {
         InterruptedException {
         alice.sarosBot().file().newJavaProjectWithClasses(PROJECT1, PKG1, CLS1);
         buildSessionSequentially(VIEW_PACKAGE_EXPLORER, PROJECT1,
-            CM_SHARE_PROJECT, TypeOfCreateProject.NEW_PROJECT, alice, bob);
+            TypeOfShareProject.SHARE_PROJECT, TypeOfCreateProject.NEW_PROJECT,
+            alice, bob);
         bob.bot()
             .captureScreenshot(
                 (bob.bot().getPathToScreenShot() + "/invitee_in_sharedproject.png"));

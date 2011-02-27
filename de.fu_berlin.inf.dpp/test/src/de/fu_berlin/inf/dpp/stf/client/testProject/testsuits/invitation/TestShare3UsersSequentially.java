@@ -51,7 +51,8 @@ public class TestShare3UsersSequentially extends STFTest {
         InterruptedException {
         alice.sarosBot().file().newJavaProjectWithClasses(PROJECT1, PKG1, CLS1);
         buildSessionSequentially(VIEW_PACKAGE_EXPLORER, PROJECT1,
-            CM_SHARE_PROJECT, TypeOfCreateProject.NEW_PROJECT, alice, carl, bob);
+            TypeOfShareProject.SHARE_PROJECT, TypeOfCreateProject.NEW_PROJECT,
+            alice, carl, bob);
 
         assertTrue(carl.sarosBot().sessionView().isParticipantNoGUI());
         assertFalse(carl.sarosBot().sessionView().hasReadOnlyAccessNoGUI());

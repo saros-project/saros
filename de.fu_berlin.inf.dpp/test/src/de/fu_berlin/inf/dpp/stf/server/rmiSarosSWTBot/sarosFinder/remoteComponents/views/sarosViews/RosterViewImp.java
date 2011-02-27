@@ -68,7 +68,8 @@ public class RosterViewImp extends SarosComponentImp implements RosterView {
         if (!isConnected()) {
             log.trace("click the toolbar button \"Connect\" in the r�oster view");
             if (!sarosBot().saros().isAccountExistNoGUI(jid, password))
-                sarosBot().saros().addAccount(jid, password);
+                sarosBot().saros().createAccountInShellSarosPeferences(jid,
+                    password);
 
             if (!sarosBot().saros().isAccountActiveNoGUI(jid))
                 sarosBot().saros().activateAccount(jid);
@@ -217,7 +218,7 @@ public class RosterViewImp extends SarosComponentImp implements RosterView {
 
     public void waitUntilIsConnected() throws RemoteException {
         precondition();
-        bot().waitLongUntil(new DefaultCondition() {
+        bot().waitUntil(new DefaultCondition() {
             public boolean test() throws Exception {
                 return isConnected();
             }

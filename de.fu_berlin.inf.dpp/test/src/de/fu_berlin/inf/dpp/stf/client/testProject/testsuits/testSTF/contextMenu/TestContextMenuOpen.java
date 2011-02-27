@@ -7,6 +7,7 @@ import java.rmi.RemoteException;
 
 import org.junit.After;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import de.fu_berlin.inf.dpp.stf.client.testProject.testsuits.STFTest;
@@ -69,11 +70,12 @@ public class TestContextMenuOpen extends STFTest {
         assertTrue(alice.bot().isEditorOpen(CLS1_SUFFIX));
         alice.bot().editor(CLS1 + SUFFIX_JAVA).closeWithSave();
         assertFalse(alice.bot().isEditorOpen(CLS1_SUFFIX));
-        alice.sarosBot().packageExplorerView()
-            .selectClass(PROJECT1, PKG1, CLS1)
-            .contextMenu(CM_OPEN_WITH, CM_OTHER).click();
-        alice.sarosBot().confirmShellEditorSelection(TEXT_EDITOR);
-
+        alice
+            .sarosBot()
+            .packageExplorerView()
+            .open()
+            .openClassWith(VIEW_PACKAGE_EXPLORER, CM_OPEN_WITH_TEXT_EDITOR,
+                PROJECT1, PKG1, CLS1);
         assertTrue(alice.bot().isEditorOpen(CLS1_SUFFIX));
         alice.sarosBot().packageExplorerView()
             .selectClass(PROJECT1, PKG1, CLS1);
@@ -87,11 +89,12 @@ public class TestContextMenuOpen extends STFTest {
         alice.sarosBot().file().newFolder(PROJECT1, FOLDER1);
         alice.sarosBot().file().newFile(PROJECT1, FOLDER1, FILE1);
         alice.bot().editor(FILE1).closeWithSave();
-        alice.sarosBot().packageExplorerView()
-            .selectFile(PROJECT1, FOLDER1, FILE1)
-            .contextMenu(CM_OPEN_WITH, CM_OTHER).click();
-        alice.sarosBot().confirmShellEditorSelection(TEXT_EDITOR);
-
+        alice
+            .sarosBot()
+            .packageExplorerView()
+            .open()
+            .openFileWith(VIEW_PACKAGE_EXPLORER, CM_OPEN_WITH_TEXT_EDITOR,
+                PROJECT1, FOLDER1, FILE1);
         assertTrue(alice.bot().isEditorOpen(FILE1));
         alice.sarosBot().packageExplorerView()
             .selectFile(PROJECT1, FOLDER1, FILE1);
@@ -100,16 +103,17 @@ public class TestContextMenuOpen extends STFTest {
     }
 
     @Test
-    // @Ignore("Can't close the external editor")
+    @Ignore("Can't close the external editor")
     public void testOpenFileWithSystemEditor() throws RemoteException {
         alice.sarosBot().file().newJavaProjectWithClasses(PROJECT1, PKG1, CLS1);
-        alice.sarosBot().packageExplorerView()
-            .selectClass(PROJECT1, PKG1, CLS1)
-            .contextMenu(CM_OPEN_WITH, CM_OTHER).click();
-        alice.sarosBot().confirmShellEditorSelection(TEXT_EDITOR);
-
-        alice.sarosBot().packageExplorerView()
-            .selectClass(PROJECT1, PKG1, CLS1)
-            .contextMenu(CM_OPEN_WITH, SYSTEM_EDITOR).click();
+        alice
+            .sarosBot()
+            .packageExplorerView()
+            .open()
+            .openClassWith(VIEW_PACKAGE_EXPLORER, CM_OPEN_WITH_TEXT_EDITOR,
+                PROJECT1, PKG1, CLS1);
+        alice.sarosBot().packageExplorerView().open()
+            .openClassWithSystemEditorNoGUI(PROJECT1, PKG1, CLS1);
     }
+
 }

@@ -437,6 +437,8 @@ public class STF {
         .getString("cm_saros");
     protected final static String CM_SHARE_PROJECT = SarosMessages
         .getString("cm_share_project");
+    protected final static String CM_SHARE_PROJECT_PARTIALLY = SarosMessages
+        .getString("cm_share_project_partially");
     protected final static String CM_ADD_TO_SESSION = SarosMessages
         .getString("cm_add_to_session");
 
@@ -457,8 +459,8 @@ public class STF {
     protected final static String CM_OPEN = "Open";
     protected final static String CM_OPEN_WITH = "Open With";
     protected final static String CM_OTHER = "Other...";
-    protected final static String TEXT_EDITOR = "Text Editor";
-    protected final static String SYSTEM_EDITOR = "System Editor";
+    protected final static String CM_OPEN_WITH_TEXT_EDITOR = "Text Editor";
+
     /**********************************************
      * 
      * STFBotEditor

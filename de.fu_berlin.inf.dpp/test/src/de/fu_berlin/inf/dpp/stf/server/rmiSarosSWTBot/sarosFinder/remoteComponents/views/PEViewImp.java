@@ -6,11 +6,20 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBo
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotTree;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotTreeItem;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.EclipseComponentImp;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.contextMenu.OpenC;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.contextMenu.OpenCImp;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.contextMenu.SarosC;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.contextMenu.SarosCImp;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.contextMenu.TeamC;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.contextMenu.TeamCImp;
 
 public class PEViewImp extends EclipseComponentImp implements PEView {
 
     private STFBotTree tree;
     private static transient PEViewImp pEViewImp;
+    private static OpenCImp openC;
+    private static SarosCImp sarosC;
+    private static TeamCImp teamC;
 
     /**
      * {@link STFBotTableImp} is a singleton, but inheritance is possible.
@@ -19,6 +28,9 @@ public class PEViewImp extends EclipseComponentImp implements PEView {
         if (pEViewImp != null)
             return pEViewImp;
         pEViewImp = new PEViewImp();
+        openC = OpenCImp.getInstance();
+        sarosC = SarosCImp.getInstance();
+        teamC = TeamCImp.getInstance();
 
         return pEViewImp;
     }
@@ -39,10 +51,9 @@ public class PEViewImp extends EclipseComponentImp implements PEView {
      * actions
      * 
      **********************************************/
-    public STFBotTreeItem selectProject(String projectName)
-        throws RemoteException {
+    public void selectProject(String projectName) throws RemoteException {
 
-        return tree.selectTreeItemWithRegex(changeToRegex(projectName));
+        tree.selectTreeItemWithRegex(changeToRegex(projectName));
     }
 
     public void selectPkg(String projectName, String pkg)
@@ -67,7 +78,17 @@ public class PEViewImp extends EclipseComponentImp implements PEView {
         return tree.selectTreeItemWithRegex(changeToRegex(fileNodes));
     }
 
-   
+    public OpenC open() throws RemoteException {
+        return openC;
+    }
+
+    public SarosC saros() throws RemoteException {
+        return sarosC;
+    }
+
+    public TeamC team() throws RemoteException {
+        return teamC;
+    }
 
     /**************************************************************
      * 

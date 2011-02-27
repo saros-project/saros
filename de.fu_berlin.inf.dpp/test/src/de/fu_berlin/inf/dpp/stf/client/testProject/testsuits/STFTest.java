@@ -35,6 +35,10 @@ public class STFTest extends STF {
         NEW_PROJECT, EXIST_PROJECT, EXIST_PROJECT_WITH_COPY, EXIST_PROJECT_WITH_COPY_AFTER_CANCEL_LOCAL_CHANGE
     }
 
+    public enum TypeOfShareProject {
+        SHARE_PROJECT, SHARE_PROJECT_PARTICALLY, ADD_SESSION
+    }
+
     /**********************************************
      * 
      * Tester
@@ -264,8 +268,7 @@ public class STFTest extends STF {
             tester.sarosBot().saros().disableAutomaticReminderNoGUI();
             openSarosViews(tester);
             tester.sarosBot().buddiesView()
-                .connectWith(tester.jid, tester.password);
-
+                .connectNoGUI(tester.jid, tester.password);
         }
         resetBuddies();
     }
@@ -302,8 +305,8 @@ public class STFTest extends STF {
         inviter.sarosBot().file()
             .newJavaProjectWithClasses(PROJECT1, PKG1, CLS1);
         buildSessionConcurrently(VIEW_PACKAGE_EXPLORER, PROJECT1,
-            CM_SHARE_PROJECT, TypeOfCreateProject.NEW_PROJECT, inviter,
-            invitees);
+            TypeOfShareProject.SHARE_PROJECT, TypeOfCreateProject.NEW_PROJECT,
+            inviter, invitees);
     }
 
     public static void setUpSessionWithJavaProjects(
@@ -465,8 +468,8 @@ public class STFTest extends STF {
         if (!host.sarosBot().sessionView().isInSessionNoGUI()) {
             for (Tester tester : invitees) {
                 buildSessionSequentially(VIEW_PACKAGE_EXPLORER, PROJECT1,
-                    CM_SHARE_PROJECT, TypeOfCreateProject.EXIST_PROJECT, host,
-                    tester);
+                    TypeOfShareProject.SHARE_PROJECT,
+                    TypeOfCreateProject.EXIST_PROJECT, host, tester);
             }
         }
     }
@@ -516,43 +519,56 @@ public class STFTest extends STF {
     }
 
     public static void buildSessionSequentially(String viewTitle,
-        String projectName, String howToShareProject,
+        String projectName, TypeOfShareProject howToShareProject,
         TypeOfCreateProject usingWhichProject, Tester inviter,
         Tester... invitees) throws RemoteException {
         String[] baseJIDOfInvitees = getPeersBaseJID(invitees);
 
-        inviter.sarosBot().packageExplorerView().selectProject(projectName)
-            .contextMenu(CM_SAROS, howToShareProject).click();
-        inviter.sarosBot().confirmShellInvitation(baseJIDOfInvitees);
+        inviter
+            .sarosBot()
+            .packageExplorerView()
+            .saros()
+            .shareProjectWith(viewTitle, projectName, howToShareProject,
+                baseJIDOfInvitees);
         for (Tester invitee : invitees) {
-            invitee.sarosBot().confirmShellSessionnInvitation();
-            invitee.sarosBot().confirmShellAddProjectUsingWhichProject(
-                projectName, usingWhichProject);
+            invitee.sarosBot().packageExplorerView().saros()
+                .confirmShellSessionnInvitation();
+            invitee
+                .sarosBot()
+                .packageExplorerView()
+                .saros()
+                .confirmShellAddProjectUsingWhichProject(projectName,
+                    usingWhichProject);
         }
     }
 
     // ********** Component, which consist of other simple functions ***********
 
     public static void buildSessionConcurrently(String viewTitle,
-        final String projectName, String howToShareProject,
+        final String projectName, TypeOfShareProject howToShareProject,
         final TypeOfCreateProject usingWhichProject, Tester inviter,
         Tester... invitees) throws RemoteException, InterruptedException {
 
         log.trace("alice.shareProjectParallel");
-        inviter.sarosBot().packageExplorerView().selectProject(projectName)
-            .contextMenu(howToShareProject).click();
-
-        inviter.sarosBot().confirmShellInvitation(getPeersBaseJID(invitees));
-        // .shareProjectWith(viewTitle, projectName, howToShareProject,
-        // getPeersBaseJID(invitees));
+        inviter
+            .sarosBot()
+            .packageExplorerView()
+            .saros()
+            .shareProjectWith(viewTitle, projectName, howToShareProject,
+                getPeersBaseJID(invitees));
 
         List<Callable<Void>> joinSessionTasks = new ArrayList<Callable<Void>>();
         for (final Tester invitee : invitees) {
             joinSessionTasks.add(new Callable<Void>() {
                 public Void call() throws Exception {
-                    invitee.sarosBot().confirmShellSessionnInvitation();
-                    invitee.sarosBot().confirmShellAddProjectUsingWhichProject(
-                        projectName, usingWhichProject);
+                    invitee.sarosBot().packageExplorerView().saros()
+                        .confirmShellSessionnInvitation();
+                    invitee
+                        .sarosBot()
+                        .packageExplorerView()
+                        .saros()
+                        .confirmShellAddProjectUsingWhichProject(projectName,
+                            usingWhichProject);
                     invitee.sarosBot().sessionView().waitUntilIsInSession();
                     return null;
                 }
@@ -762,9 +778,14 @@ public class STFTest extends STF {
         for (final Tester tester : invitees) {
             joinSessionTasks.add(new Callable<Void>() {
                 public Void call() throws Exception {
-                    tester.sarosBot().confirmShellSessionnInvitation();
-                    tester.sarosBot().confirmShellAddProjectUsingWhichProject(
-                        projectName, usingWhichProject);
+                    tester.sarosBot().packageExplorerView().saros()
+                        .confirmShellSessionnInvitation();
+                    tester
+                        .sarosBot()
+                        .packageExplorerView()
+                        .saros()
+                        .confirmShellAddProjectUsingWhichProject(projectName,
+                            usingWhichProject);
                     return null;
                 }
             });
