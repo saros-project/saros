@@ -39,6 +39,9 @@ import de.fu_berlin.inf.dpp.util.ColorUtils;
  * 
  */
 public class RoundedComposite extends Composite {
+    /**
+     * style constants not passed to parent constructor
+     */
     protected static final int STYLES = SWT.SEPARATOR | SWT.BORDER
         | SWT.NO_BACKGROUND;
     protected int style;
