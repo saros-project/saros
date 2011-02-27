@@ -6,7 +6,6 @@ import de.fu_berlin.inf.dpp.stf.client.Tester;
 import de.fu_berlin.inf.dpp.stf.client.testProject.helpers.TestPattern;
 import de.fu_berlin.inf.dpp.stf.client.testProject.testsuits.STFTest.TypeOfCreateProject;
 import de.fu_berlin.inf.dpp.stf.client.testProject.testsuits.STFTest.TypeOfShareProject;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotShellImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.SarosComponent;
 
 /**
@@ -72,9 +71,8 @@ public interface SarosC extends SarosComponent {
      * @see Tester#buildSessionDoneSequentially(String, TypeOfShareProject,
      *      TypeOfCreateProject, Tester...)
      */
-    public void shareProjectWith(String viewTitle, String projectName,
-        TypeOfShareProject howToshareProject, String[] inviteeBaseJIDs)
-        throws RemoteException;
+    public void shareProjectWith(String projectName, String howToshareProject,
+        String[] inviteeBaseJIDs) throws RemoteException;
 
     /**
      * Perform the action "Share project" which should be activated by clicking
@@ -106,60 +104,7 @@ public interface SarosC extends SarosComponent {
      * @throws RemoteException
      * @see Tester#buildSessionSequentially(String, String, Tester...)
      */
-    public void shareProject(String viewTitle, String projectName,
-        String... inviteeBaseJIDS) throws RemoteException;
-
-    /**
-     * 
-     * @return <tt>true</tr>, if the popup window with the title "Invitation cancel" is active
-     * @throws RemoteException
-     * @see STFBotShellImp#isShellActive(String)
-     */
-    public boolean isShellInvitationCancelledActive() throws RemoteException;
-
-    /**
-     * close the popup window with the title "Invitation cancel".
-     * 
-     * @throws RemoteException
-     * @see STFBotShellImp#closeShell(String)
-     */
-    public void closeShellInvitationCancelled() throws RemoteException;
-
-    /**
-     * waits until the popup window with the title "Invitation cancel" is
-     * active.
-     * 
-     * @throws RemoteException
-     * @see STFBotShellImp#waitUntilShellActive(String)
-     */
-    public void waitUntilIsShellInvitationCnacelledActive()
-        throws RemoteException;
-
-    /**
-     * 
-     * @return <tt><true</tt>, if the popup window with the title
-     *         "Session Invitation" is active
-     * @throws RemoteException
-     * @see STFBotShellImp#isShellActive(String)
-     */
-    public boolean isShellSessionInvitationActive() throws RemoteException;
-
-    /**
-     * close the popup window with the title "Session Invitation".
-     * 
-     * @throws RemoteException
-     * @see STFBotShellImp#closeShell(String)
-     */
-    public void closeShellSessionInvitation() throws RemoteException;
-
-    /**
-     * waits until the popup window with the title "Session Invitation" is
-     * active.
-     * 
-     * @throws RemoteException
-     * @see STFBotShellImp#waitUntilShellActive(String)
-     */
-    public void waitUntilIsShellSessionInvitationActive()
+    public void shareProject(String projectName, String... inviteeBaseJIDS)
         throws RemoteException;
 
     /**
@@ -237,22 +182,4 @@ public interface SarosC extends SarosComponent {
     public void confirmShellAddProjectUsingWhichProject(String projectName,
         TypeOfCreateProject usingWhichProject) throws RemoteException;
 
-    /**
-     * 
-     * @return the second label text of the popup window "Problem occurredss"
-     * @throws RemoteException
-     */
-    public String getSecondLabelOfShellProblemOccurred() throws RemoteException;
-
-    /**
-     * Clicks the sub menu "Share project" of the context menu "Saros" of the
-     * given project in the package explorer view.
-     * 
-     * @param projectName
-     *            the name of the project, which you want to share with other
-     *            peoples.
-     * @throws RemoteException
-     */
-    public void clickContextMenushareProject(String viewTitle,
-        String projectName) throws RemoteException;
 }

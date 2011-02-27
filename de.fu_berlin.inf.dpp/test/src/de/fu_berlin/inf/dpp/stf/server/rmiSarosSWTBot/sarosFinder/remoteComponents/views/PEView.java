@@ -29,7 +29,8 @@ public interface PEView extends EclipseComponent {
      *            the name of the project
      * @throws RemoteException
      */
-    public void selectProject(String projectName) throws RemoteException;
+    public STFBotTreeItem selectProject(String projectName)
+        throws RemoteException;
 
     /**
      * select the given package
@@ -40,7 +41,7 @@ public interface PEView extends EclipseComponent {
      *            the name of the package, e.g. my.pkg
      * @throws RemoteException
      */
-    public void selectPkg(String projectName, String pkg)
+    public STFBotTreeItem selectPkg(String projectName, String pkg)
         throws RemoteException;
 
     /**
@@ -67,7 +68,8 @@ public interface PEView extends EclipseComponent {
      *            {"Foo-saros","myFolder"}
      * @throws RemoteException
      */
-    public void selectFolder(String... folderNodes) throws RemoteException;
+    public STFBotTreeItem selectFolder(String... folderNodes)
+        throws RemoteException;
 
     /**
      * select the given file

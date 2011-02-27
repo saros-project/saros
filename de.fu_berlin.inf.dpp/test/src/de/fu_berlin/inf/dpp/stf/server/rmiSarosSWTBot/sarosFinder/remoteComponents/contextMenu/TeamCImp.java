@@ -15,21 +15,28 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBo
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotTable;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotView;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.EclipseComponentImp;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.views.PEView;
 import de.fu_berlin.inf.dpp.vcs.VCSAdapter;
 import de.fu_berlin.inf.dpp.vcs.VCSResourceInfo;
 
 public class TeamCImp extends EclipseComponentImp implements TeamC {
 
-    private static transient TeamCImp teamImp;
+    private static transient TeamCImp self;
+
+    private PEView view;
 
     /**
      * {@link TeamCImp} is a singleton, but inheritance is possible.
      */
     public static TeamCImp getInstance() {
-        if (teamImp != null)
-            return teamImp;
-        teamImp = new TeamCImp();
-        return teamImp;
+        if (self != null)
+            return self;
+        self = new TeamCImp();
+        return self;
+    }
+
+    public void setView(PEView view) {
+        this.view = view;
     }
 
     /**************************************************************
@@ -43,11 +50,10 @@ public class TeamCImp extends EclipseComponentImp implements TeamC {
      * actions
      * 
      **********************************************/
-    public void shareProjectWithSVN(String viewTitle, String projectName,
-        String repositoryURL) throws RemoteException {
+    public void shareProjectWithSVN(String projectName, String repositoryURL)
+        throws RemoteException {
 
-        bot().view(viewTitle).bot().tree()
-            .selectTreeItemWithRegex(changeToRegex(projectName))
+        view.selectProject(projectName)
             .contextMenu(CM_TEAM, CM_SHARE_PROJECT_OF_TEAM).click();
 
         STFBotShell shell = bot().shell(SHELL_SHARE_PROJECT);
@@ -66,14 +72,11 @@ public class TeamCImp extends EclipseComponentImp implements TeamC {
     }
 
     public void shareProjectWithSVNWhichIsConfiguredWithSVNInfos(
-        String viewTitle, String projectName, String repositoryURL)
-        throws RemoteException {
+        String projectName, String repositoryURL) throws RemoteException {
 
         String[] contexts = { CM_TEAM, CM_SHARE_PROJECT_OF_TEAM };
 
-        bot().view(viewTitle).bot().tree()
-            .selectTreeItemWithRegex(changeToRegex(projectName))
-            .contextMenu(contexts).click();
+        view.selectProject(projectName).contextMenu(contexts).click();
 
         STFBotShell shell = bot().shell(SHELL_SHARE_PROJECT);
         shell.confirmWithTable(TABLE_ITEM_REPOSITORY_TYPE_SVN, NEXT);
@@ -83,16 +86,12 @@ public class TeamCImp extends EclipseComponentImp implements TeamC {
         bot().waitsUntilShellIsClosed(SHELL_SHARE_PROJECT);
     }
 
-    public void shareProjectWithSVNUsingSpecifiedFolderName(String viewTitle,
-        String projectName, String repositoryURL, String specifiedFolderName)
+    public void shareProjectWithSVNUsingSpecifiedFolderName(String projectName,
+        String repositoryURL, String specifiedFolderName)
         throws RemoteException {
-        precondition(viewTitle);
-
         String[] contexts = { CM_TEAM, CM_SHARE_PROJECT_OF_TEAM };
 
-        bot().view(viewTitle).bot().tree()
-            .selectTreeItemWithRegex(changeToRegex(projectName))
-            .contextMenu(contexts).click();
+        view.selectProject(projectName).contextMenu(contexts).click();
 
         bot().shell(SHELL_SHARE_PROJECT).confirmWithTable(
             TABLE_ITEM_REPOSITORY_TYPE_SVN, NEXT);
@@ -122,13 +121,12 @@ public class TeamCImp extends EclipseComponentImp implements TeamC {
             if (!viewWasOpen)
                 bot().view(VIEW_SVN_REPOSITORIES).close();
             // recur...
-            shareProjectWithSVNUsingSpecifiedFolderName(viewTitle, projectName,
+            shareProjectWithSVNUsingSpecifiedFolderName(projectName,
                 repositoryURL, specifiedFolderName);
             return;
         }
 
-        bot().shell(SHELL_SHARE_PROJECT).confirmWithTable(repositoryURL,
-            NEXT);
+        bot().shell(SHELL_SHARE_PROJECT).confirmWithTable(repositoryURL, NEXT);
         STFBotShell shell3 = bot().shell(SHELL_SHARE_PROJECT);
         shell3.bot().radio("Use specified folder name:").click();
         shell3.bot().text().setText(specifiedFolderName);
@@ -148,11 +146,11 @@ public class TeamCImp extends EclipseComponentImp implements TeamC {
         throws RemoteException {
         bot().menu(MENU_FILE).menu("Import...").click();
         STFBotShell shell = bot().shell(SHELL_IMPORT);
-        shell.confirmWithTreeWithFilterText(
-            TABLE_ITEM_REPOSITORY_TYPE_SVN, "Checkout Projects from SVN", NEXT);
+        shell.confirmWithTreeWithFilterText(TABLE_ITEM_REPOSITORY_TYPE_SVN,
+            "Checkout Projects from SVN", NEXT);
         if (shell.bot().table().containsItem(repositoryURL)) {
-            bot().shell("Checkout from SVN").confirmWithTable(
-                repositoryURL, NEXT);
+            bot().shell("Checkout from SVN").confirmWithTable(repositoryURL,
+                NEXT);
         } else {
             shell.bot().radio("Create a new repository location").click();
             shell.bot().button(NEXT).click();
@@ -166,54 +164,44 @@ public class TeamCImp extends EclipseComponentImp implements TeamC {
         bot().waitsUntilShellIsClosed("SVN Checkout");
     }
 
-    public void disConnect(String viewTitle, String projectName)
-        throws RemoteException {
+    public void disConnect(String projectName) throws RemoteException {
 
         String[] contexts = { CM_TEAM, CM_DISCONNECT };
 
-        bot().view(viewTitle).bot().tree()
-            .selectTreeItemWithRegex(changeToRegex(projectName))
-            .contextMenu(contexts).click();
+        view.selectProject(projectName).contextMenu(contexts).click();
 
         bot().shell(SHELL_CONFIRM_DISCONNECT_FROM_SVN).confirm(YES);
     }
 
-    public void revertProject(String viewTitle, String projectName)
-        throws RemoteException {
-        precondition(viewTitle);
+    public void revertProject(String projectName) throws RemoteException {
 
         String[] contexts = { CM_TEAM, CM_REVERT };
 
-        bot().view(viewTitle).bot().tree()
-            .selectTreeItemWithRegex(changeToRegex(projectName))
-            .contextMenu(contexts).click();
+        view.selectProject(projectName).contextMenu(contexts).click();
 
         bot().shell(SHELL_REVERT).confirm(OK);
         bot().waitsUntilShellIsClosed(SHELL_REVERT);
     }
 
-    public void updateProject(String viewTitle, String projectName,
-        String versionID) throws RemoteException {
-        String[] nodes = { projectName + ".*" };
-        switchToAnotherRevision(viewTitle, nodes, versionID);
+    public void updateProject(String projectName, String versionID)
+        throws RemoteException {
+        String[] nodes = { projectName };
+        switchToAnotherRevision(nodes, versionID);
     }
 
-    public void updateClass(String viewTitle, String projectName, String pkg,
-        String className, String revision) throws RemoteException {
+    public void updateClass(String projectName, String pkg, String className,
+        String revision) throws RemoteException {
         String[] nodes = getClassNodes(projectName, pkg, className);
-        nodes = changeToRegex(nodes);
-        switchToAnotherRevision(viewTitle, nodes, revision);
+
+        switchToAnotherRevision(nodes, revision);
     }
 
-    public void switchProjectWithGui(String viewTitle, String projectName,
-        String url) throws RemoteException {
-        precondition(viewTitle);
+    public void switchProjectWithGui(String projectName, String url)
+        throws RemoteException {
 
         String[] contexts = { CM_TEAM, CM_SWITCH_TO_ANOTHER_BRANCH_TAG_REVISION };
 
-        bot().view(viewTitle).bot().tree()
-            .selectTreeItem(changeToRegex(projectName)).contextMenu(contexts)
-            .click();
+        view.selectProject(projectName).contextMenu(contexts).click();
         STFBotShell shell = bot().shell(SHELL_SWITCH);
 
         shell.waitUntilActive();
@@ -251,13 +239,11 @@ public class TeamCImp extends EclipseComponentImp implements TeamC {
         vcs.switch_(resource, url, revision, new NullProgressMonitor());
     }
 
-    private void switchToAnotherRevision(String viewTitle, String[] matchTexts,
-        String versionID) throws RemoteException {
-        precondition(viewTitle);
+    private void switchToAnotherRevision(String[] nodes, String versionID)
+        throws RemoteException {
         String[] contexts = { CM_TEAM, CM_SWITCH_TO_ANOTHER_BRANCH_TAG_REVISION };
 
-        bot().view(viewTitle).bot().tree().selectTreeItemWithRegex(matchTexts)
-            .contextMenu(contexts).click();
+        view.selectFile(nodes).contextMenu(contexts).click();
 
         STFBotShell shell = bot().shell(SHELL_SWITCH);
         shell.waitUntilActive();
@@ -344,8 +330,4 @@ public class TeamCImp extends EclipseComponentImp implements TeamC {
         bot().waitUntil(SarosConditions.isUrlSame(fullPath, url));
     }
 
-    protected void precondition(String viewTitle) throws RemoteException {
-        bot().openViewById(viewTitlesAndIDs.get(viewTitle));
-        bot().view(viewTitle).show();
-    }
 }

@@ -67,9 +67,8 @@ public interface OpenC extends EclipseComponent {
      * @throws RemoteException
      * @see PEView#openFileWith(String, String...)
      */
-    public void openClassWith(String viewTitle, String whichEditor,
-        String projectName, String pkg, String className)
-        throws RemoteException;
+    public void openClassWith(String whichEditor, String projectName,
+        String pkg, String className) throws RemoteException;
 
     /**
      * Performs the action "open file with" which should be done with the
@@ -91,8 +90,8 @@ public interface OpenC extends EclipseComponent {
      * 
      * @throws RemoteException
      */
-    public void openFileWith(String viewTitle, String whichEditor,
-        String... fileNodes) throws RemoteException;
+    public void openFileWith(String whichEditor, String... fileNodes)
+        throws RemoteException;
 
     /**
      * open class with system editor using

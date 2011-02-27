@@ -85,9 +85,8 @@ public class TestParallelInvitationWithTerminationByInvitees extends STFTest {
 
         STFBotShell shell_alice = alice.bot().shell(SHELL_PROBLEM_OCCURRED);
         shell_alice.waitUntilActive();
-        assertTrue(alice.sarosBot().packageExplorerView().saros()
-            .getSecondLabelOfShellProblemOccurred()
-            .matches(bob.getName() + ".*"));
+        assertTrue(alice.bot().shell(SHELL_PROBLEM_OCCURRED).bot().label(2)
+            .getText().matches(bob.getName() + ".*"));
         shell_alice.bot().button(OK).click();
 
         STFBotShell shell_carl = carl.bot().shell(SHELL_SESSION_INVITATION);
@@ -98,9 +97,8 @@ public class TestParallelInvitationWithTerminationByInvitees extends STFTest {
         shell_carl.bot().button(CANCEL).click();
 
         shell_alice.waitUntilActive();
-        assertTrue(alice.sarosBot().packageExplorerView().saros()
-            .getSecondLabelOfShellProblemOccurred()
-            .matches(carl.getName() + ".*"));
+        assertTrue(alice.bot().shell(SHELL_PROBLEM_OCCURRED).bot().label(2)
+            .getText().matches(carl.getName() + ".*"));
         shell_alice.bot().button(OK).click();
 
         dave.bot().waitsUntilShellIsClosed(SHELL_SESSION_INVITATION);
@@ -111,9 +109,8 @@ public class TestParallelInvitationWithTerminationByInvitees extends STFTest {
         shell_dave.bot().button(CANCEL).click();
 
         shell_alice.waitUntilActive();
-        assertTrue(alice.sarosBot().packageExplorerView().saros()
-            .getSecondLabelOfShellProblemOccurred()
-            .matches(dave.getName() + ".*"));
+        assertTrue(alice.bot().shell(SHELL_PROBLEM_OCCURRED).bot().label(2)
+            .getText().matches(dave.getName() + ".*"));
         shell_alice.bot().button(OK).click();
 
         edna.bot().waitUntilShellIsOpen(SHELL_SESSION_INVITATION);

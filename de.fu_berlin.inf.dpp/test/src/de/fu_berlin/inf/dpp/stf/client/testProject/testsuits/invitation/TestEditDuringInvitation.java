@@ -52,9 +52,8 @@ public class TestEditDuringInvitation extends STFTest {
      */
     @Test
     public void testEditDuringInvitation() throws RemoteException {
-        buildSessionSequentially(VIEW_PACKAGE_EXPLORER, PROJECT1,
-            TypeOfShareProject.SHARE_PROJECT, TypeOfCreateProject.NEW_PROJECT,
-            alice, bob);
+        buildSessionSequentially(PROJECT1, CM_SHARE_PROJECT,
+            TypeOfCreateProject.NEW_PROJECT, alice, bob);
 
         assertTrue(bob.sarosBot().sessionView().hasWriteAccessNoGUI());
 

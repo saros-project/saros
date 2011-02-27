@@ -101,8 +101,8 @@ public class TestMenuRefactor extends STFTest {
             .sarosBot()
             .packageExplorerView()
             .team()
-            .shareProjectWithSVNUsingSpecifiedFolderName(VIEW_PACKAGE_EXPLORER,
-                PROJECT1, SVN_REPOSITORY_URL, SVN_PROJECT_PATH);
+            .shareProjectWithSVNUsingSpecifiedFolderName(PROJECT1,
+                SVN_REPOSITORY_URL, SVN_PROJECT_PATH);
         assertTrue(alice.sarosBot().packageExplorerView().team()
             .isProjectManagedBySVN(PROJECT1));
     }

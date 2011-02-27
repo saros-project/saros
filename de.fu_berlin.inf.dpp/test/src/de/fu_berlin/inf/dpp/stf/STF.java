@@ -421,7 +421,7 @@ public class STF {
         .getString("shell_invitation_cancelled");
     protected final static String SHELL_SESSION_INVITATION = SarosMessages
         .getString("shell_session_invitation");
-    protected final static String SHELL_SHELL_ADD_PROJECT = SarosMessages
+    protected final static String SHELL_ADD_PROJECT = SarosMessages
         .getString("shell_add_project");
     protected final static String SHELL_PROBLEM_OCCURRED = SarosMessages
         .getString("shell_problem_occurred");
@@ -437,8 +437,6 @@ public class STF {
         .getString("cm_saros");
     protected final static String CM_SHARE_PROJECT = SarosMessages
         .getString("cm_share_project");
-    protected final static String CM_SHARE_PROJECT_PARTIALLY = SarosMessages
-        .getString("cm_share_project_partially");
     protected final static String CM_ADD_TO_SESSION = SarosMessages
         .getString("cm_add_to_session");
 

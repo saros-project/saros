@@ -11,10 +11,13 @@ import org.eclipse.swt.program.Program;
 
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotShell;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.EclipseComponentImp;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.views.PEView;
 
 public class OpenCImp extends EclipseComponentImp implements OpenC {
 
     private static transient OpenCImp self;
+
+    private PEView view;
 
     /**
      * {@link OpenCImp} is a singleton, but inheritance is possible.
@@ -24,6 +27,10 @@ public class OpenCImp extends EclipseComponentImp implements OpenC {
             return self;
         self = new OpenCImp();
         return self;
+    }
+
+    public void setView(PEView view) {
+        this.view = view;
     }
 
     /**************************************************************
@@ -38,41 +45,17 @@ public class OpenCImp extends EclipseComponentImp implements OpenC {
      * 
      **********************************************/
 
-    // public void openFile(String viewTitle, String... fileNodes)
-    // throws RemoteException {
-    // precondition(viewTitle);
-    // bot().view(viewTitle).bot().tree()
-    // .selectTreeItemWithRegex(changeToRegex(fileNodes))
-    // .contextMenu(CM_OPEN).click();
-    //
-    // }
-
-    // public void openClass(String viewTitle, String projectName, String pkg,
-    // String className) throws RemoteException {
-    // assert isValidClassPath(projectName, pkg, className) :
-    // "The given classPath is not invalid!";
-    // String[] classNodes = getClassNodes(projectName, pkg, className);
-    // openFile(viewTitle, classNodes);
-    // }
-
-    public void openClassWith(String viewTitle, String whichEditor,
-        String projectName, String pkg, String className)
-        throws RemoteException {
+    public void openClassWith(String whichEditor, String projectName,
+        String pkg, String className) throws RemoteException {
         assert isValidClassPath(projectName, pkg, className) : "The given classPath is not invalid!";
-        openFileWith(viewTitle, whichEditor,
-            getClassNodes(projectName, pkg, className));
+        openFileWith(whichEditor, getClassNodes(projectName, pkg, className));
     }
 
-    public void openFileWith(String viewTitle, String whichEditor,
-        String... fileNodes) throws RemoteException {
-        precondition(viewTitle);
-
-        bot().view(viewTitle).bot().tree().selectTreeItem(fileNodes)
-            .contextMenu(CM_OPEN_WITH, CM_OTHER).click();
-
+    public void openFileWith(String whichEditor, String... fileNodes)
+        throws RemoteException {
+        view.selectFile(fileNodes).contextMenu(CM_OPEN_WITH, CM_OTHER).click();
         bot().waitUntilShellIsOpen(SHELL_EDITOR_SELECTION);
         STFBotShell shell_bob = bot().shell(SHELL_EDITOR_SELECTION);
-        // shell_bob.waitUntilActive();
         shell_bob.activate();
         shell_bob.bot().table().getTableItem(whichEditor).select();
         shell_bob.bot().button(OK).waitUntilIsEnabled();
@@ -92,15 +75,4 @@ public class OpenCImp extends EclipseComponentImp implements OpenC {
         Program.launch(resource.getLocation().toString());
     }
 
-    /**************************************************************
-     * 
-     * Inner functions
-     * 
-     **************************************************************/
-
-    protected void precondition(String viewTitle) throws RemoteException {
-
-        bot().openViewById(viewTitlesAndIDs.get(viewTitle));
-        bot().view(viewTitle).show();
-    }
 }

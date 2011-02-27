@@ -3,13 +3,16 @@ package de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteCompone
 import java.rmi.RemoteException;
 
 import de.fu_berlin.inf.dpp.stf.client.testProject.testsuits.STFTest.TypeOfCreateProject;
-import de.fu_berlin.inf.dpp.stf.client.testProject.testsuits.STFTest.TypeOfShareProject;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotShell;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.SarosComponentImp;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.views.PEView;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.views.PEViewImp;
 
 public class SarosCImp extends SarosComponentImp implements SarosC {
 
     private static transient SarosCImp self;
+
+    private PEView view;
 
     /**
      * {@link SarosCImp} is a singleton, but inheritance is possible.
@@ -19,6 +22,10 @@ public class SarosCImp extends SarosComponentImp implements SarosC {
             return self;
         self = new SarosCImp();
         return self;
+    }
+
+    public void setView(PEViewImp view) {
+        this.view = view;
     }
 
     /**************************************************************
@@ -33,41 +40,30 @@ public class SarosCImp extends SarosComponentImp implements SarosC {
      * 
      **********************************************/
 
-    public void shareProjectWith(String viewTitle, String projectName,
-        TypeOfShareProject howToshareProject, String[] baseJIDOfInvitees)
-        throws RemoteException {
-        switch (howToshareProject) {
-        case SHARE_PROJECT:
-            clickContextMenushareProject(viewTitle, projectName);
-            break;
-        case SHARE_PROJECT_PARTICALLY:
-            clickContextMemnuShareProjectPartically(viewTitle, projectName);
-            break;
-        case ADD_SESSION:
-            clickContextMenuAddToSession(viewTitle, projectName);
-            break;
-        default:
-            break;
-        }
+    public void shareProjectWith(String projectName, String howToshareProject,
+        String[] baseJIDOfInvitees) throws RemoteException {
+        view.selectProject(projectName)
+            .contextMenu(CM_SAROS, howToshareProject).click();
         confirmShellInvitation(baseJIDOfInvitees);
     }
 
-    public void shareProject(String viewTitle, String projectName,
-        String... baseJIDOfInvitees) throws RemoteException {
-        clickContextMenushareProject(viewTitle, projectName);
+    public void shareProject(String projectName, String... baseJIDOfInvitees)
+        throws RemoteException {
+        view.selectProject(projectName).contextMenu(CM_SAROS, CM_SHARE_PROJECT)
+            .click();
         confirmShellInvitation(baseJIDOfInvitees);
     }
 
     public void confirmShellAddProjectWithNewProject(String projectname)
         throws RemoteException {
-        STFBotShell shell = bot().shell(SHELL_SHELL_ADD_PROJECT);
+        STFBotShell shell = bot().shell(SHELL_ADD_PROJECT);
         if (!shell.activate())
             shell.waitUntilActive();
         shell.bot().radio(RADIO_CREATE_NEW_PROJECT).click();
         shell.bot().button(FINISH).click();
 
         try {
-            bot().shell(SHELL_SHELL_ADD_PROJECT).waitLongUntilIsClosed();
+            bot().shell(SHELL_ADD_PROJECT).waitLongUntilIsClosed();
         } catch (Exception e) {
             /*
              * sometimes session can not be completely builded because of
@@ -80,7 +76,7 @@ public class SarosCImp extends SarosComponentImp implements SarosC {
             bot().captureScreenshot(
                 bot().getPathToScreenShot()
                     + "/sessionInvitationFailedUsingNewProject.png");
-            if (bot().activeShell().getText().equals(SHELL_SHELL_ADD_PROJECT)) {
+            if (bot().activeShell().getText().equals(SHELL_ADD_PROJECT)) {
                 bot().activeShell().bot().toggleButton().click();
             }
             throw new RuntimeException("session invitation is failed!");
@@ -90,8 +86,8 @@ public class SarosCImp extends SarosComponentImp implements SarosC {
 
     public void confirmShellAddProjectUsingExistProject(String projectName)
         throws RemoteException {
-        bot().waitUntilShellIsOpen(SHELL_SHELL_ADD_PROJECT);
-        STFBotShell shell = bot().shell(SHELL_SHELL_ADD_PROJECT);
+        bot().waitUntilShellIsOpen(SHELL_ADD_PROJECT);
+        STFBotShell shell = bot().shell(SHELL_ADD_PROJECT);
         shell.activate();
         shell.bot().radio(RADIO_USING_EXISTING_PROJECT).click();
 
@@ -135,15 +131,14 @@ public class SarosCImp extends SarosComponentImp implements SarosC {
          * Before waitUntil it would be better to first check, whether the
          * window "Session Invitation" is still open at all.
          */
-        if (bot().isShellOpen(SHELL_SHELL_ADD_PROJECT)) {
+        if (bot().isShellOpen(SHELL_ADD_PROJECT)) {
             try {
-                bot().shell(SHELL_SHELL_ADD_PROJECT).waitLongUntilIsClosed();
+                bot().shell(SHELL_ADD_PROJECT).waitLongUntilIsClosed();
             } catch (Exception e) {
                 bot().captureScreenshot(
                     bot().getPathToScreenShot()
                         + "/sessionInvitationFailedUsingExistProject.png");
-                if (bot().activeShell().getText()
-                    .equals(SHELL_SHELL_ADD_PROJECT)) {
+                if (bot().activeShell().getText().equals(SHELL_ADD_PROJECT)) {
                     bot().activeShell().bot().toggleButton().click();
                 }
             }
@@ -152,8 +147,8 @@ public class SarosCImp extends SarosComponentImp implements SarosC {
 
     public void confirmShellAddProjectUsingExistProjectWithCopyAfterCancelLocalChange(
         String projectName) throws RemoteException {
-        bot().waitUntilShellIsOpen(SHELL_SHELL_ADD_PROJECT);
-        STFBotShell shell = bot().shell(SHELL_SHELL_ADD_PROJECT);
+        bot().waitUntilShellIsOpen(SHELL_ADD_PROJECT);
+        STFBotShell shell = bot().shell(SHELL_ADD_PROJECT);
         shell.activate();
         shell.bot().radio("Use existing project").click();
         shell.bot().textWithLabel("Project name", 1).setText(projectName);
@@ -165,7 +160,7 @@ public class SarosCImp extends SarosComponentImp implements SarosC {
 
     public void confirmShellAddProjectUsingExistProjectWithCopy(
         String projectName) throws RemoteException {
-        STFBotShell shell = bot().shell(SHELL_SHELL_ADD_PROJECT);
+        STFBotShell shell = bot().shell(SHELL_ADD_PROJECT);
         if (!shell.activate())
             shell.waitUntilActive();
 
@@ -174,7 +169,7 @@ public class SarosCImp extends SarosComponentImp implements SarosC {
             .checkBox("Create copy for working distributed. New project name:")
             .click();
         shell.bot().button(FINISH).click();
-        bot().shell(SHELL_SHELL_ADD_PROJECT).waitLongUntilIsClosed();
+        bot().shell(SHELL_ADD_PROJECT).waitLongUntilIsClosed();
     }
 
     public void confirmShellSessionnInvitation() throws RemoteException {
@@ -193,8 +188,8 @@ public class SarosCImp extends SarosComponentImp implements SarosC {
 
     public void confirmShellAddProjectUsingWhichProject(String projectName,
         TypeOfCreateProject usingWhichProject) throws RemoteException {
-        bot().waitUntilShellIsOpen(SHELL_SHELL_ADD_PROJECT);
-        bot().shell(SHELL_SHELL_ADD_PROJECT).activate();
+        bot().waitUntilShellIsOpen(SHELL_ADD_PROJECT);
+        bot().shell(SHELL_ADD_PROJECT).activate();
         switch (usingWhichProject) {
         case NEW_PROJECT:
             confirmShellAddProjectWithNewProject(projectName);
@@ -213,112 +208,4 @@ public class SarosCImp extends SarosComponentImp implements SarosC {
         }
     }
 
-    public void closeShellInvitationCancelled() throws RemoteException {
-        bot().shell(SHELL_INVITATION_CANCELLED).close();
-    }
-
-    public void closeShellSessionInvitation() throws RemoteException {
-        bot().shell(SHELL_SESSION_INVITATION).close();
-    }
-
-    public void clickContextMenushareProject(String viewTitle,
-        String projectName) throws RemoteException {
-        precondition(viewTitle);
-        String matchTexts = changeToRegex(projectName);
-
-        bot().view(viewTitle).bot().tree().selectTreeItemWithRegex(matchTexts)
-            .contextMenu(CM_SAROS, CM_SHARE_PROJECT).click();
-
-    }
-
-    /**********************************************
-     * 
-     * states
-     * 
-     **********************************************/
-    public boolean isShellInvitationCancelledActive() throws RemoteException {
-        return bot().shell(SHELL_INVITATION_CANCELLED).isActive();
-    }
-
-    public boolean isShellSessionInvitationActive() throws RemoteException {
-        return bot().shell(SHELL_SESSION_INVITATION).isActive();
-    }
-
-    public String getSecondLabelOfShellProblemOccurred() throws RemoteException {
-        return bot().shell(SHELL_PROBLEM_OCCURRED).bot().label(2).getText();
-    }
-
-    /**********************************************
-     * 
-     * waits until
-     * 
-     **********************************************/
-
-    public void waitUntilIsShellInvitationCnacelledActive()
-        throws RemoteException {
-        bot().shell(SHELL_INVITATION_CANCELLED).waitUntilActive();
-    }
-
-    public void waitUntilIsShellSessionInvitationActive()
-        throws RemoteException {
-        bot().shell(SHELL_SESSION_INVITATION).waitUntilActive();
-    }
-
-    /**************************************************************
-     * 
-     * Inner functions
-     * 
-     **************************************************************/
-
-    /**
-     * Clicks the sub menu "Share project partically" of the context menu
-     * "Saros" of the given project in the package explorer view.
-     * 
-     * @param projectName
-     *            the name of the project, which you want to share with other
-     *            peoples.
-     * @throws RemoteException
-     */
-    private void clickContextMemnuShareProjectPartically(String viewTitle,
-        String projectName) throws RemoteException {
-        precondition(viewTitle);
-        clickContextMenuOfSaros(viewTitle, projectName,
-            CM_SHARE_PROJECT_PARTIALLY);
-    }
-
-    /**
-     * Clicks the sub menu "Add to session" of the context menu "Saros" of the
-     * given project in the package explorer view.
-     * 
-     * @param projectName
-     *            the name of the project, which you want to share with other
-     *            peoples.
-     */
-    private void clickContextMenuAddToSession(String viewTitle,
-        String projectName) throws RemoteException {
-        precondition(viewTitle);
-        clickContextMenuOfSaros(viewTitle, projectName, CM_ADD_TO_SESSION);
-    }
-
-    /**
-     * Clicks the given sub menu of the context menu "Saros" of the given
-     * project in the package explorer view.
-     * 
-     * @param projectName
-     *            the name of the project, which you want to share with other
-     *            peoples.
-     * @throws RemoteException
-     */
-    private void clickContextMenuOfSaros(String viewTitle, String projectName,
-        String contextName) throws RemoteException {
-        String matchTexts = changeToRegex(projectName);
-
-        bot().view(viewTitle).bot().tree().selectTreeItemWithRegex(matchTexts)
-            .contextMenu(CM_SAROS, contextName).click();
-    }
-
-    protected void precondition(String viewTitle) throws RemoteException {
-        bot().openViewById(viewTitlesAndIDs.get(viewTitle));
-        bot().view(viewTitle).show();
-    }
 }

@@ -38,8 +38,8 @@ public interface TeamC extends EclipseComponent {
      *            the repository location
      * @throws RemoteException
      */
-    public void shareProjectWithSVN(String viewTitle, String projectName,
-        String repositoryURL) throws RemoteException;
+    public void shareProjectWithSVN(String projectName, String repositoryURL)
+        throws RemoteException;
 
     /**
      * Perform the action
@@ -70,8 +70,7 @@ public interface TeamC extends EclipseComponent {
      * @throws RemoteException
      */
     public void shareProjectWithSVNWhichIsConfiguredWithSVNInfos(
-        String viewTitle, String projectName, String repositoryURL)
-        throws RemoteException;
+        String projectName, String repositoryURL) throws RemoteException;
 
     /**
      * using this method you can import a project from SVN (Other variant to
@@ -107,8 +106,8 @@ public interface TeamC extends EclipseComponent {
      *            repository, e.g. trunk/examples
      * @throws RemoteException
      */
-    public void shareProjectWithSVNUsingSpecifiedFolderName(String viewTitle,
-        String projectName, String repositoryURL, String specifiedFolderName)
+    public void shareProjectWithSVNUsingSpecifiedFolderName(String projectName,
+        String repositoryURL, String specifiedFolderName)
         throws RemoteException;
 
     /**
@@ -162,8 +161,7 @@ public interface TeamC extends EclipseComponent {
      * 
      * @throws RemoteException
      */
-    public void disConnect(String viewTitle, String projectName)
-        throws RemoteException;
+    public void disConnect(String projectName) throws RemoteException;
 
     /**
      * Perform the action "revert" which should be done with the following
@@ -186,8 +184,7 @@ public interface TeamC extends EclipseComponent {
      * 
      * @throws RemoteException
      */
-    public void revertProject(String viewTitle, String projectName)
-        throws RemoteException;
+    public void revertProject(String projectName) throws RemoteException;
 
     /**
      * Perform the action "switch to another revision" which should be done with
@@ -219,8 +216,8 @@ public interface TeamC extends EclipseComponent {
      *            the ID of the revision to which you want to switch
      * @throws RemoteException
      */
-    public void updateProject(String viewTitle, String projectName,
-        String versionID) throws RemoteException;
+    public void updateProject(String projectName, String versionID)
+        throws RemoteException;
 
     /**
      * Perform the action "switch to another revision" which should be done with
@@ -256,8 +253,8 @@ public interface TeamC extends EclipseComponent {
      *            the ID of the revision to which you want to switch
      * @throws RemoteException
      */
-    public void updateClass(String viewTitle, String projectName, String pkg,
-        String className, String versionID) throws RemoteException;
+    public void updateClass(String projectName, String pkg, String className,
+        String versionID) throws RemoteException;
 
     /**
      * Perform the action "switch to another Branch/Tag" which should be done

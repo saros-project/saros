@@ -146,8 +146,8 @@ public class TestBasicWidgetTree extends STFTest {
             .sarosBot()
             .packageExplorerView()
             .team()
-            .shareProjectWithSVNUsingSpecifiedFolderName(VIEW_PACKAGE_EXPLORER,
-                SVN_PROJECT_COPY, SVN_REPOSITORY_URL, SVN_PROJECT_PATH);
+            .shareProjectWithSVNUsingSpecifiedFolderName(SVN_PROJECT_COPY,
+                SVN_REPOSITORY_URL, SVN_PROJECT_PATH);
 
         STFBotView view = alice.bot().view(VIEW_PACKAGE_EXPLORER);
         view.show();
@@ -164,8 +164,8 @@ public class TestBasicWidgetTree extends STFTest {
             .sarosBot()
             .packageExplorerView()
             .team()
-            .shareProjectWithSVNUsingSpecifiedFolderName(VIEW_PACKAGE_EXPLORER,
-                SVN_PROJECT_COPY, SVN_REPOSITORY_URL, SVN_PROJECT_PATH);
+            .shareProjectWithSVNUsingSpecifiedFolderName(SVN_PROJECT_COPY,
+                SVN_REPOSITORY_URL, SVN_PROJECT_PATH);
         alice.bot().view(VIEW_PACKAGE_EXPLORER).show();
         alice.sarosBot().packageExplorerView()
             .selectClass(SVN_PROJECT_COPY, SVN_PKG, SVN_CLS1)

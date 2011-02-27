@@ -304,9 +304,8 @@ public class STFTest extends STF {
         Tester... invitees) throws RemoteException, InterruptedException {
         inviter.sarosBot().file()
             .newJavaProjectWithClasses(PROJECT1, PKG1, CLS1);
-        buildSessionConcurrently(VIEW_PACKAGE_EXPLORER, PROJECT1,
-            TypeOfShareProject.SHARE_PROJECT, TypeOfCreateProject.NEW_PROJECT,
-            inviter, invitees);
+        buildSessionConcurrently(PROJECT1, CM_SHARE_PROJECT,
+            TypeOfCreateProject.NEW_PROJECT, inviter, invitees);
     }
 
     public static void setUpSessionWithJavaProjects(
@@ -467,8 +466,7 @@ public class STFTest extends STF {
         throws RemoteException {
         if (!host.sarosBot().sessionView().isInSessionNoGUI()) {
             for (Tester tester : invitees) {
-                buildSessionSequentially(VIEW_PACKAGE_EXPLORER, PROJECT1,
-                    TypeOfShareProject.SHARE_PROJECT,
+                buildSessionSequentially(PROJECT1, CM_SHARE_PROJECT,
                     TypeOfCreateProject.EXIST_PROJECT, host, tester);
             }
         }
@@ -518,18 +516,16 @@ public class STFTest extends STF {
         }
     }
 
-    public static void buildSessionSequentially(String viewTitle,
-        String projectName, TypeOfShareProject howToShareProject,
-        TypeOfCreateProject usingWhichProject, Tester inviter,
-        Tester... invitees) throws RemoteException {
+    public static void buildSessionSequentially(String projectName,
+        String howToShareProject, TypeOfCreateProject usingWhichProject,
+        Tester inviter, Tester... invitees) throws RemoteException {
         String[] baseJIDOfInvitees = getPeersBaseJID(invitees);
 
         inviter
             .sarosBot()
             .packageExplorerView()
             .saros()
-            .shareProjectWith(viewTitle, projectName, howToShareProject,
-                baseJIDOfInvitees);
+            .shareProjectWith(projectName, howToShareProject, baseJIDOfInvitees);
         for (Tester invitee : invitees) {
             invitee.sarosBot().packageExplorerView().saros()
                 .confirmShellSessionnInvitation();
@@ -544,17 +540,17 @@ public class STFTest extends STF {
 
     // ********** Component, which consist of other simple functions ***********
 
-    public static void buildSessionConcurrently(String viewTitle,
-        final String projectName, TypeOfShareProject howToShareProject,
-        final TypeOfCreateProject usingWhichProject, Tester inviter,
-        Tester... invitees) throws RemoteException, InterruptedException {
+    public static void buildSessionConcurrently(final String projectName,
+        String howToShareProject, final TypeOfCreateProject usingWhichProject,
+        Tester inviter, Tester... invitees) throws RemoteException,
+        InterruptedException {
 
         log.trace("alice.shareProjectParallel");
         inviter
             .sarosBot()
             .packageExplorerView()
             .saros()
-            .shareProjectWith(viewTitle, projectName, howToShareProject,
+            .shareProjectWith(projectName, howToShareProject,
                 getPeersBaseJID(invitees));
 
         List<Callable<Void>> joinSessionTasks = new ArrayList<Callable<Void>>();

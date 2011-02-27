@@ -48,18 +48,39 @@ public class PEViewImp extends EclipseComponentImp implements PEView {
 
     /**********************************************
      * 
+     * finders
+     * 
+     **********************************************/
+    public OpenC open() throws RemoteException {
+        openC.setView(this);
+        return openC;
+    }
+
+    public SarosC saros() throws RemoteException {
+        sarosC.setView(this);
+        return sarosC;
+    }
+
+    public TeamC team() throws RemoteException {
+        teamC.setView(this);
+        return teamC;
+    }
+
+    /**********************************************
+     * 
      * actions
      * 
      **********************************************/
-    public void selectProject(String projectName) throws RemoteException {
+    public STFBotTreeItem selectProject(String projectName)
+        throws RemoteException {
 
-        tree.selectTreeItemWithRegex(changeToRegex(projectName));
+        return tree.selectTreeItemWithRegex(changeToRegex(projectName));
     }
 
-    public void selectPkg(String projectName, String pkg)
+    public STFBotTreeItem selectPkg(String projectName, String pkg)
         throws RemoteException {
         String[] nodes = { projectName, SRC, pkg };
-        tree.selectTreeItemWithRegex(changeToRegex(nodes));
+        return tree.selectTreeItemWithRegex(changeToRegex(nodes));
     }
 
     public STFBotTreeItem selectClass(String projectName, String pkg,
@@ -69,25 +90,14 @@ public class PEViewImp extends EclipseComponentImp implements PEView {
         return tree.selectTreeItemWithRegex(changeToRegex(nodes));
     }
 
-    public void selectFolder(String... folderNodes) throws RemoteException {
-        tree.selectTreeItemWithRegex(changeToRegex(folderNodes));
+    public STFBotTreeItem selectFolder(String... folderNodes)
+        throws RemoteException {
+        return tree.selectTreeItemWithRegex(changeToRegex(folderNodes));
     }
 
     public STFBotTreeItem selectFile(String... fileNodes)
         throws RemoteException {
         return tree.selectTreeItemWithRegex(changeToRegex(fileNodes));
-    }
-
-    public OpenC open() throws RemoteException {
-        return openC;
-    }
-
-    public SarosC saros() throws RemoteException {
-        return sarosC;
-    }
-
-    public TeamC team() throws RemoteException {
-        return teamC;
     }
 
     /**************************************************************
