@@ -67,7 +67,7 @@ import de.fu_berlin.inf.dpp.ui.widgets.explanation.SimpleExplanationComposite.Si
  * 
  */
 public class SimpleExplanatoryComposite extends ExplanatoryComposite {
-    protected SimpleExplanationComposite explanationComposite;
+    protected SimpleExplanationComposite simpleExplanationComposite;
 
     /**
      * Constructs a new {@link SimpleExplanatoryComposite} with a given parent
@@ -79,23 +79,23 @@ public class SimpleExplanatoryComposite extends ExplanatoryComposite {
     public SimpleExplanatoryComposite(Composite parent, int style) {
         super(parent, style & ~(SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER));
 
-        this.explanationComposite = new SimpleExplanationComposite(this, style
-            & (SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER));
+        this.simpleExplanationComposite = new SimpleExplanationComposite(this,
+            style & (SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER));
     }
 
     /**
      * Hides the content and displays an explanation.
      * 
-     * @param simpleExplanation
+     * @param explanation
      *            The explanation to be displayed; if null the explanation gets
      *            hidden
      */
-    public void showExplanation(SimpleExplanation simpleExplanation) {
-        if (simpleExplanation == null) {
+    public void showExplanation(SimpleExplanation explanation) {
+        if (explanation == null) {
             super.hideExplanation();
         } else {
-            this.explanationComposite.setExplanation(simpleExplanation);
-            super.showExplanation(this.explanationComposite);
+            this.simpleExplanationComposite.setExplanation(explanation);
+            super.showExplanation(this.simpleExplanationComposite);
         }
     }
 
@@ -104,6 +104,6 @@ public class SimpleExplanatoryComposite extends ExplanatoryComposite {
      */
     @Override
     public void hideExplanation() {
-        super.showExplanation(null);
+        super.showExplanation((SimpleExplanationComposite) null);
     }
 }

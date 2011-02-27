@@ -104,14 +104,14 @@ public class ExplanatoryComposite extends Composite {
     /**
      * Hides the content and displays an explanation.
      * 
-     * @param explanationComposite
+     * @param composite
      *            The explanation to be displayed; if null the explanation gets
      *            hidden
      */
-    public void showExplanation(ExplanationComposite explanationComposite)
+    public void showExplanation(ExplanationComposite composite)
         throws ContentControlInvalidException {
 
-        if (explanationComposite == null) {
+        if (composite == null) {
             Control contentControl = this.getContentControl();
             if (contentControl == null)
                 throw new ContentControlInvalidException(
@@ -122,7 +122,7 @@ public class ExplanatoryComposite extends Composite {
                 ((Composite) contentControl).layout();
             }
         } else {
-            this.stackLayout.topControl = explanationComposite;
+            this.stackLayout.topControl = composite;
         }
 
         ExplanatoryComposite.this

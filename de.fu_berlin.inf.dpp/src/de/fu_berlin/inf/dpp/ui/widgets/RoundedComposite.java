@@ -19,7 +19,7 @@ import de.fu_berlin.inf.dpp.util.ColorUtils;
  * 
  * <dl>
  * <dt><b>Styles:</b></dt>
- * <dd>SEPARATOR, BORDER and those supported by Composite</dd>
+ * <dd>SEPARATOR, BORDER, NO_BACKGROUND and those supported by Composite</dd>
  * <dt><b>Events:</b></dt>
  * <dd>(none)</dd>
  * </dl>
@@ -39,32 +39,33 @@ import de.fu_berlin.inf.dpp.util.ColorUtils;
  * 
  */
 public class RoundedComposite extends Composite {
+    protected static final int STYLES = SWT.SEPARATOR | SWT.BORDER
+        | SWT.NO_BACKGROUND;
+    protected int style;
+
     /**
      * Scale by which the background color's lightness should be modified for
      * use as the border color.
      */
     private static final float BORDER_LIGHTNESS_SCALE = 0.85f;
+
+    /**
+     * Scale by which the background color's lightness should be modified for
+     * use as the border color.
+     */
     public static final int ARC = 15;
     protected static final int LINE_WEIGHT = 1;
-    protected boolean isSeparator;
-    protected boolean hasBorder;
     protected Color backgroundColor;
     protected Color borderColor;
 
-    public RoundedComposite(Composite parent, int style) {
-        super(parent, style & ~(SWT.SEPARATOR | SWT.BORDER));
-
-        /*
-         * Checks whether to display as a separator
-         */
-        isSeparator = ((style & SWT.SEPARATOR) == SWT.SEPARATOR);
-        style = style & ~SWT.SEPARATOR;
+    public RoundedComposite(Composite parent, final int style) {
+        super(parent, style & ~STYLES);
+        this.style = style & STYLES;
 
         /*
          * Checks whether to display a border
          */
-        hasBorder = ((style & SWT.BORDER) == SWT.BORDER);
-        style = style & ~SWT.BORDER;
+        this.style = style & ~SWT.BORDER;
 
         /*
          * Make sure child widgets respect transparency
@@ -85,14 +86,16 @@ public class RoundedComposite extends Composite {
                 /*
                  * Draws the rounded background
                  */
-                e.gc.setBackground(RoundedComposite.this.backgroundColor);
-                e.gc.fillRoundRectangle(clientArea.x, clientArea.y,
-                    clientArea.width, clientArea.height, ARC, ARC);
+                if ((style & SWT.NO_BACKGROUND) == 0) {
+                    e.gc.setBackground(RoundedComposite.this.backgroundColor);
+                    e.gc.fillRoundRectangle(clientArea.x, clientArea.y,
+                        clientArea.width, clientArea.height, ARC, ARC);
+                }
 
                 /*
                  * Draws the border
                  */
-                if (hasBorder) {
+                if ((style & SWT.BORDER) != 0) {
                     if (borderColor == null || borderColor.isDisposed())
                         borderColor = getDisplay().getSystemColor(
                             SWT.COLOR_BLACK);
@@ -108,7 +111,7 @@ public class RoundedComposite extends Composite {
                  * If the control shall be displayed as a separator, we draw a
                  * horizontal line
                  */
-                if (isSeparator) {
+                if ((style & SWT.SEPARATOR) != 0) {
                     e.gc.setLineWidth(LINE_WEIGHT);
                     e.gc.setForeground(RoundedComposite.this.backgroundColor);
                     int top = (bounds.height - LINE_WEIGHT) / 2;
@@ -131,7 +134,7 @@ public class RoundedComposite extends Composite {
          * If rendered as a separator compute the minimal width need width to
          * display the contents
          */
-        if (isSeparator) {
+        if ((style & SWT.SEPARATOR) != 0) {
             int neededWidth = this.computeSize(SWT.DEFAULT, SWT.DEFAULT).x;
             int reduceBy = clientArea.width - neededWidth;
             clientArea.x += reduceBy;

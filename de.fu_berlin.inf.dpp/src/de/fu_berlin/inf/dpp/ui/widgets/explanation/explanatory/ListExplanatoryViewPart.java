@@ -5,7 +5,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.part.ViewPart;
 
 import de.fu_berlin.inf.dpp.ui.widgets.explanation.ListExplanationComposite.ListExplanation;
-import de.fu_berlin.inf.dpp.ui.widgets.explanation.SimpleExplanationComposite.SimpleExplanation;
 
 public abstract class ListExplanatoryViewPart extends ViewPart {
     protected ListExplanatoryComposite explanatoryComposite;
@@ -27,7 +26,7 @@ public abstract class ListExplanatoryViewPart extends ViewPart {
     abstract public void createContentPartControl(Composite parent);
 
     /**
-     * @see SimpleExplanatoryComposite#showExplanation(SimpleExplanation)
+     * @see ListExplanatoryComposite#showExplanation(ListExplanation)
      */
     public void showExplanation(ListExplanation listExplanation) {
         if (this.explanatoryComposite != null)

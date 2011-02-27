@@ -1,106 +1,114 @@
 package de.fu_berlin.inf.dpp.ui.widgets.explanation.note;
 
+import java.util.ResourceBundle.Control;
+
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Layout;
 
 import de.fu_berlin.inf.dpp.ui.util.LayoutUtils;
+import de.fu_berlin.inf.dpp.ui.widgets.IllustratedComposite;
 import de.fu_berlin.inf.dpp.ui.widgets.RoundedComposite;
-import de.fu_berlin.inf.dpp.ui.widgets.explanation.ExplanationComposite;
-import de.fu_berlin.inf.dpp.ui.widgets.explanation.SimpleExplanationComposite;
-import de.fu_berlin.inf.dpp.ui.widgets.explanation.SimpleExplanationComposite.SimpleExplanation;
 
 /**
- * A {@link RoundedComposite} that contains a {@link SimpleExplanationComposite}
- * .
+ * A {@link RoundedComposite} that contains an easily extendible
+ * {@link IllustratedComposite}.
  * <p>
- * There are 2 possibilities to set the content:
+ * In order to add your own {@link Control}s you need to:
  * <ol>
- * <li>For textual content use {@link #setExplanation(SimpleExplanation)}</li>
- * <li>For complex content use
- * <ol>
- * <li>{@link #setExplanationImage(int)} or {@link #setExplanationImage(Image)}
- * to set the image</li>
- * <li>
- * {@link #getClientComposite()} to get the {@link Composite} that can exactly
- * hold one {@link Composite} containing your explanation.</li>
+ * <li>Extend this class</li>
+ * <li>Implement {@link #createContent(Composite)}</li>
  * </ol>
- * </li>
- * </ol>
+ * 
+ * <dl>
+ * <dt><b>Styles:</b></dt>
+ * <dd>All styles supported by {@link IllustratedComposite} and
+ * {@link RoundedComposite}</dd>
+ * <dt><b>Events:</b></dt>
+ * <dd>(none)</dd>
+ * </dl>
  */
-public class NoteComposite extends RoundedComposite {
+public abstract class NoteComposite extends RoundedComposite {
 
     public static final int SPACING = 10;
 
-    protected SimpleExplanationComposite explanationComposite;
+    protected IllustratedComposite illustratedComposite;
 
     public NoteComposite(Composite parent, int style) {
-        super(parent, style);
-        super.setLayout(LayoutUtils.createGridLayout(SPACING, 0));
+        super(parent, style & ~IllustratedComposite.STYLES);
 
-        explanationComposite = new SimpleExplanationComposite(this, SWT.NONE);
-        explanationComposite.setLayoutData(new GridData(SWT.BEGINNING,
-            SWT.CENTER, false, true));
-        explanationComposite.setSpacing(SPACING);
+        this.illustratedComposite = new IllustratedComposite(this, style
+            & IllustratedComposite.STYLES, null);
+        this.illustratedComposite.setLayoutData(new GridData(SWT.FILL,
+            SWT.FILL, true, true));
+        this.illustratedComposite.setLayout(getContentLayout());
 
-        this.setForeground(parent.getDisplay().getSystemColor(SWT.COLOR_WHITE));
-        this.setBackground(parent.getDisplay().getSystemColor(
-            SWT.COLOR_DARK_GRAY));
-    }
+        createContent(this.illustratedComposite);
 
-    /**
-     * @see SimpleExplanationComposite#setExplanation(SimpleExplanation)
-     */
-    public void setExplanation(SimpleExplanation simpleExplanation) {
-        this.explanationComposite.setExplanation(simpleExplanation);
+        /*
+         * If no background should be drawn we still need to set the background
+         * color on the RoundedComposite in order to get the correct border
+         * color.
+         */
+        if ((style & SWT.NO_BACKGROUND) == 0) {
+            // this.setForeground(this.getDisplay()
+            // .getSystemColor(SWT.COLOR_WHITE));
+            this.setBackground(this.getDisplay().getSystemColor(SWT.COLOR_GRAY));
+        } else {
+            super.setBackground(this.getDisplay()
+                .getSystemColor(SWT.COLOR_GRAY));
+        }
+
+        this.setSpacing(SPACING);
         this.layout();
     }
 
     /**
-     * Returns the {@link Composite} that is intended to <b>exactly one</b>
-     * child {@link Control}.
-     * <p>
-     * If you only wish to set textual content, please use
-     * {@link #setExplanation(SimpleExplanation)}.
+     * Returns the {@link Layout} used to arrange the inner composite's child
+     * {@link Control}s.
      * 
      * @return
      */
-    public Composite getClientComposite() {
-        return this.explanationComposite;
-    }
+    public abstract Layout getContentLayout();
 
     /**
-     * @see ExplanationComposite#setExplanationImage(int)
+     * This method fills the inner composite with child {@link Control}s.
+     * 
+     * @param parent
      */
-    public void setExplanationImage(int systemImage) {
-        this.explanationComposite.setExplanationImage(systemImage);
+    public abstract void createContent(Composite parent);
+
+    public void setImage(int systemImage) {
+        this.illustratedComposite.setImage(systemImage);
     }
 
-    /**
-     * @see ExplanationComposite#setExplanationImage(Image)
-     */
-    public void setExplanationImage(Image explanationImage) {
-        this.explanationComposite.setExplanationImage(explanationImage);
+    public void setImage(Image image) {
+        this.illustratedComposite.setImage(image);
     }
 
     @Override
     public void setForeground(Color color) {
         super.setForeground(color);
-        this.explanationComposite.setForeground(color);
+        this.illustratedComposite.setForeground(color);
     }
 
     @Override
     public void setBackground(Color color) {
         super.setBackground(color);
-        this.explanationComposite.setBackground(color);
+        this.illustratedComposite.setBackground(color);
+    }
+
+    public void setSpacing(int spacing) {
+        super.setLayout(LayoutUtils.createGridLayout(spacing, 0));
+        this.illustratedComposite.setSpacing(spacing);
+        this.layout();
     }
 
     @Override
     public void setLayout(Layout layout) {
-        // this composite controls its layout itself
+        // do nothing
     }
 }

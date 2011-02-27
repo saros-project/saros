@@ -189,7 +189,7 @@ public class ListExplanationComposite extends ExplanationComposite {
      */
     public void setExplanation(ListExplanation listExplanation) {
 
-        this.setExplanationImage((listExplanation != null) ? listExplanation.explanationImage
+        this.setImage((listExplanation != null) ? listExplanation.explanationImage
             : null);
 
         if (this.contentComposite != null

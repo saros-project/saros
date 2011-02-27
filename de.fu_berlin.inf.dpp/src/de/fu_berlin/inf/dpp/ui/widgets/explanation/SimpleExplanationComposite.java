@@ -145,7 +145,7 @@ public class SimpleExplanationComposite extends ExplanationComposite {
      *            {@link SimpleExplanationComposite}
      */
     public void setExplanation(SimpleExplanation simpleExplanation) {
-        this.setExplanationImage((simpleExplanation != null) ? simpleExplanation.explanationImage
+        this.setImage((simpleExplanation != null) ? simpleExplanation.explanationImage
             : null);
         if (this.explanationLabel != null
             && !this.explanationLabel.isDisposed()) {

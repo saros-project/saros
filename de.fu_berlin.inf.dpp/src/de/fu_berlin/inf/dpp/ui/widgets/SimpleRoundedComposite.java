@@ -35,7 +35,6 @@ public class SimpleRoundedComposite extends RoundedComposite {
 
     public SimpleRoundedComposite(Composite parent, int style) {
         super(parent, style);
-        this.setBackgroundMode(SWT.INHERIT_DEFAULT);
     }
 
     /**
