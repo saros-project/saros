@@ -6,21 +6,21 @@ import org.picocontainer.annotations.Inject;
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.accountManagement.XMPPAccount;
 import de.fu_berlin.inf.dpp.accountManagement.XMPPAccountStore;
-import de.fu_berlin.inf.dpp.ui.wizards.pages.AccountPage;
+import de.fu_berlin.inf.dpp.ui.wizards.pages.EditXMPPAccountWizardPage;
 
 /**
  * An wizard that is used to change accounts.
  * 
  * @author Sebastian Schlaak
  */
-public class ChangeWizard extends Wizard {
+public class EditXMPPAccountWizard extends Wizard {
 
     @Inject
     XMPPAccountStore service;
     XMPPAccount accountToChange;
-    AccountPage accountPage;
+    EditXMPPAccountWizardPage accountPage;
 
-    public ChangeWizard(XMPPAccount account) {
+    public EditXMPPAccountWizard(XMPPAccount account) {
         Saros.injectDependenciesOnly(this);
         this.accountToChange = account;
         addPageToWizard();
@@ -28,7 +28,7 @@ public class ChangeWizard extends Wizard {
     }
 
     protected void addPageToWizard() {
-        this.accountPage = new AccountPage();
+        this.accountPage = new EditXMPPAccountWizardPage();
         this.accountPage.setPageTitle("Change XMPP Account");
         this.accountPage.setJabberAccount(accountToChange);
         addPage(accountPage);

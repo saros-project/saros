@@ -19,7 +19,7 @@ import de.fu_berlin.inf.dpp.util.LinkListener;
  * 
  * @author Sebastian Schlaak
  */
-public class AccountPage extends WizardPage {
+public class EditXMPPAccountWizardPage extends WizardPage {
 
     public static final String LIST_OF_XMPP_SERVERS = "http://www.saros-project.org/#PublicServers";
     public static final String DONT_MATCH_LABEL = "Passwords don't match";
@@ -37,7 +37,7 @@ public class AccountPage extends WizardPage {
     Composite parent;
     GridData data = new GridData(GridData.FILL_HORIZONTAL);
 
-    public AccountPage() {
+    public EditXMPPAccountWizardPage() {
         super("AccountManagement");
     }
 

@@ -49,7 +49,7 @@ import de.fu_berlin.inf.dpp.accountManagement.XMPPAccountStore;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
 import de.fu_berlin.inf.dpp.ui.ImageManager;
-import de.fu_berlin.inf.dpp.ui.wizards.ChangeWizard;
+import de.fu_berlin.inf.dpp.ui.wizards.EditXMPPAccountWizard;
 import de.fu_berlin.inf.dpp.ui.wizards.ConfigurationWizard;
 
 /**
@@ -267,7 +267,7 @@ public class GeneralPreferencePage extends FieldEditorPreferencePage implements
 
     protected void changeAccountData() {
         WizardDialog changeWizard = new WizardDialog(parent.getShell(),
-            new ChangeWizard(getSelectedAccount()));
+            new EditXMPPAccountWizard(getSelectedAccount()));
         if (Window.OK == changeWizard.open()) {
             updateInfoLabel();
             updateList();
