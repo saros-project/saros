@@ -389,6 +389,13 @@ public class EditorManager implements IActivityProvider, Disposable {
         @Override
         public void activeEditorChanged(User user, SPath path) {
 
+            // #2707089 We must clear annotations from shared editors that are
+            // not commonly viewed
+
+            // We only need to react to remote users changing editor
+            if (user.isLocal())
+                return;
+
             Predicate<SarosAnnotation> p = new Predicate<SarosAnnotation>() {
                 public boolean evaluate(SarosAnnotation annotation) {
                     return annotation instanceof ViewportAnnotation;

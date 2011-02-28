@@ -117,21 +117,7 @@ public class AddToSessionAction implements IObjectActionDelegate {
     }
 
     protected void runSafe() {
-        if (this.selectedProjects.size() > 1) {
-            String message = "You selected the Projects:\n";
-            for (IProject p : this.selectedProjects) {
-                message += "- " + p.getName() + "\n";
-            }
-            message += "\nAdding multiple projects is not supported yet.\nIf you continue only project "
-                + this.selectedProjects.get(0) + " will be added to session.";
-            if (!Utils.popUpYesNoQuestion("Multiple Projects marked", message,
-                false)) {
-                return;
-            }
-        }
-        List<IProject> projectsToAdd = new ArrayList<IProject>();
-        projectsToAdd.add(this.selectedProjects.get(0));
-        sessionManager.addProjectsToSession(projectsToAdd);
+        sessionManager.addProjectsToSession(this.selectedProjects);
     }
 
     public void run(IAction action) {

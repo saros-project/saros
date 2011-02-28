@@ -151,6 +151,7 @@ public class SarosSessionManager implements IConnectionListener,
 
     public SarosSessionManager(Saros saros) {
         this.saros = saros;
+        this.prefStore = saros.getPreferenceStore();
         saros.addListener(this);
     }
 
@@ -165,8 +166,6 @@ public class SarosSessionManager implements IConnectionListener,
         this.sessionID.setValue(String.valueOf(sessionRandom
             .nextInt(Integer.MAX_VALUE)));
         this.partialProjectResources = partialProjectResources;
-
-        this.prefStore = saros.getPreferenceStore();
 
         SarosSession sarosSession = new SarosSession(this.transmitter,
             dispatchThreadContext, new DateTime());

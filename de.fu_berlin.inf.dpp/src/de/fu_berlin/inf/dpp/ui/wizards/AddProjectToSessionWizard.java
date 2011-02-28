@@ -106,6 +106,7 @@ public class AddProjectToSessionWizard extends Wizard {
          * are supposed to be overwritten based on the synchronization options
          * and if there are differences between the remote and local project.
          */
+        Map<String, FileListDiff> projectsToOverrideWithDiff = new HashMap<String, FileListDiff>();
         for (String projectID : sources.keySet()) {
             if (namePage.overwriteProjectResources(projectID)
                 && !preferenceUtils.isAutoReuseExisting()) {
@@ -131,13 +132,14 @@ public class AddProjectToSessionWizard extends Wizard {
                     return false;
                 }
                 if (diff.getRemovedPaths().size() > 0
-                    || diff.getAlteredPaths().size() > 0)
-                    if (!confirmOverwritingProjectResources(
-                        sources.get(projectID).getName(), diff))
-                        return false;
+                    || diff.getAlteredPaths().size() > 0) {
+                    projectsToOverrideWithDiff.put(sources.get(projectID)
+                        .getName(), diff);
+                }
             }
         }
-
+        if (!confirmOverwritingProjectResources(projectsToOverrideWithDiff))
+            return false;
         try {
             getContainer().run(true, true, new IRunnableWithProgress() {
                 public void run(IProgressMonitor monitor)
@@ -203,6 +205,14 @@ public class AddProjectToSessionWizard extends Wizard {
 
     @Override
     public boolean performCancel() {
+        if (!Utils
+            .popUpYesNoQuestion(
+                "Leaving the Session",
+                "The session participants must remain synchronised at all times."
+                    + " Declining an invitation will therefore eject you from the session. "
+                    + " Are you sure you want to leave?", false)) {
+            return false;
+        }
         Utils.runSafeAsync(log, new Runnable() {
             public void run() {
                 process.localCancel(null, CancelOption.NOTIFY_PEER);
@@ -211,33 +221,41 @@ public class AddProjectToSessionWizard extends Wizard {
         return true;
     }
 
-    public boolean confirmOverwritingProjectResources(final String projectName,
-        final FileListDiff diff) {
+    public boolean confirmOverwritingProjectResources(
+        final Map<String, FileListDiff> everyThing) {
         try {
             return Utils.runSWTSync(new Callable<Boolean>() {
                 public Boolean call() {
 
-                    String message = "The selected project '"
-                        + projectName
-                        + "' will be used as a target project to carry out the synchronization.\n\n"
-                        + "All local changes in the project will be overwritten using the inviter's project and additional files will be deleted!\n\n"
-                        + "Press No and select 'Create copy...' in the invitation dialog if you are unsure.\n\n"
+                    String message = "Each project you are accepting will be synchronised with the inviter's copy. It has been found that some of your local files differ from those of the inviter.\n\n"
+                        + "All local differences will be overwritten!\n\n"
+                        + "Press \"No\" and then select \"Create copy...\" if you are unsure.\n"
+                        + "Press \"Details\" to find out what changes will occur if you proceed.\n\n"
                         + "Do you want to proceed?";
 
                     String PID = Saros.SAROS;
                     MultiStatus info = new MultiStatus(PID, 1, message, null);
-                    for (IPath path : diff.getRemovedPaths()) {
-                        info.add(new Status(IStatus.WARNING, PID, 1,
-                            "File will be removed: " + path.toOSString(), null));
-                    }
-                    for (IPath path : diff.getAlteredPaths()) {
-                        info.add(new Status(IStatus.WARNING, PID, 1,
-                            "File will be overwritten: " + path.toOSString(),
-                            null));
-                    }
-                    for (IPath path : diff.getAddedPaths()) {
+                    for (String projectName : everyThing.keySet()) {
+                        FileListDiff diff = everyThing.get(projectName);
                         info.add(new Status(IStatus.INFO, PID, 1,
-                            "File will be added: " + path.toOSString(), null));
+                            "Following files in project '" + projectName
+                                + "' are affected:", null));
+                        for (IPath path : diff.getRemovedPaths()) {
+                            info.add(new Status(IStatus.WARNING, PID, 1,
+                                "  File will be removed: " + path.toOSString(),
+                                null));
+                        }
+                        for (IPath path : diff.getAlteredPaths()) {
+                            info.add(new Status(IStatus.WARNING, PID, 1,
+                                "  File will be overwritten: "
+                                    + path.toOSString(), null));
+                        }
+                        for (IPath path : diff.getAddedPaths()) {
+                            info.add(new Status(IStatus.INFO, PID, 1,
+                                "  File will be added: " + path.toOSString(),
+                                null));
+                        }
+                        info.add(new Status(IStatus.INFO, PID, 1, "", null));
                     }
                     return new OverwriteErrorDialog(getShell(),
                         "Warning: Local changes will be deleted", null, info)

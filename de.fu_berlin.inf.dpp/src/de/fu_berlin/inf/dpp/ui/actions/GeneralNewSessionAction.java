@@ -77,6 +77,15 @@ public abstract class GeneralNewSessionAction implements IObjectActionDelegate {
             }
             if (sessionManager.getSarosSession() != null) {
                 // we already have a session
+                for (IProject selectedProject : selectedProjects) {
+                    if (sessionManager.getSarosSession().isShared(
+                        selectedProject)) {
+                        Utils.popUpFailureMessage("Project already in Session",
+                            "You already have an ongoing Saros session that contains the project "
+                                + selectedProject.getName() + ".", false);
+                        return;
+                    }
+                }
                 sessionManager.addProjectsToSession(this.selectedProjects);
             } else {
                 // we want to start a new session

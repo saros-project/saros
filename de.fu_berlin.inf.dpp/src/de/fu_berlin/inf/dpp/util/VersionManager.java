@@ -134,6 +134,12 @@ public class VersionManager {
     static {
 
         /**
+         * Version 11.2.25.r3105
+         */
+        compatibilityChart.put(new Version("11.2.25.r3105"),
+            Arrays.asList(new Version("11.2.25.r3105")));
+
+        /**
          * Version 11.1.28.r2959
          */
         compatibilityChart.put(new Version("11.1.28.r2959"),
