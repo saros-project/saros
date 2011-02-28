@@ -73,12 +73,20 @@ public class PEViewImp extends EclipseComponentImp implements PEView {
         return contextMenu;
     }
 
-    public ContextMenuWrapper selectProject(String projectName) throws RemoteException {
+    public ContextMenuWrapper selectJavaProject(String projectName)
+        throws RemoteException {
+        contextMenu.setTreeItem(tree
+            .selectTreeItemWithRegex(changeToRegex(projectName)));
+        contextMenu.setTreeItemType(treeItemType.JAVA_PROJECT);
+        return contextMenu;
+    }
+
+    public ContextMenuWrapper selectProject(String projectName)
+        throws RemoteException {
         contextMenu.setTreeItem(tree
             .selectTreeItemWithRegex(changeToRegex(projectName)));
         contextMenu.setTreeItemType(treeItemType.PROJECT);
         return contextMenu;
-
     }
 
     public ContextMenuWrapper selectPkg(String projectName, String pkg)
@@ -108,7 +116,8 @@ public class PEViewImp extends EclipseComponentImp implements PEView {
         return contextMenu;
     }
 
-    public ContextMenuWrapper selectFile(String... fileNodes) throws RemoteException {
+    public ContextMenuWrapper selectFile(String... fileNodes)
+        throws RemoteException {
         contextMenu.setTreeItem(tree
             .selectTreeItemWithRegex(changeToRegex(fileNodes)));
         contextMenu.setTreeItemType(treeItemType.FILE);
@@ -118,11 +127,5 @@ public class PEViewImp extends EclipseComponentImp implements PEView {
     public String getTitle() throws RemoteException {
         return VIEW_PACKAGE_EXPLORER;
     }
-
-    /**************************************************************
-     * 
-     * Inner functions
-     * 
-     **************************************************************/
 
 }

@@ -29,39 +29,40 @@ public class TestMenuEdit extends STFTest {
     @Ignore
     public void testDeleteProjectUsingGUI() throws RemoteException {
         alice.sarosBot().file().newJavaProject(PROJECT1);
-        assertTrue(alice.sarosBot().file().existsProjectNoGUI(PROJECT1));
-        alice.sarosBot().deleteProjectNoGUI(PROJECT1);
-        assertFalse(alice.sarosBot().file().existsProjectNoGUI(PROJECT1));
+        assertTrue(alice.sarosBot().state().existsProjectNoGUI(PROJECT1));
+        alice.noBot().deleteProjectNoGUI(PROJECT1);
+        assertFalse(alice.sarosBot().state().existsProjectNoGUI(PROJECT1));
     }
 
     @Test
     public void testDeleteFileUsingGUI() throws RemoteException {
         alice.sarosBot().file().newJavaProject(PROJECT1);
         alice.sarosBot().file().newClass(PROJECT1, "pkg", "Cls");
-        assertTrue(alice.sarosBot().file()
+        assertTrue(alice.sarosBot().state()
             .existsClassNoGUI(PROJECT1, "pkg", "Cls"));
         alice.sarosBot().packageExplorerView()
             .selectClass(PROJECT1, "pkg", "Cls").delete();
-        assertFalse(alice.sarosBot().file()
+        assertFalse(alice.sarosBot().state()
             .existsClassNoGUI(PROJECT1, "pkg", "Cls"));
     }
 
     @Test
     public void testCopyProject() throws RemoteException {
         alice.sarosBot().file().newProject(PROJECT1);
-        assertFalse(alice.sarosBot().file().existsProjectNoGUI(PROJECT2));
+        assertFalse(alice.sarosBot().state().existsProjectNoGUI(PROJECT2));
         alice.sarosBot().packageExplorerView().selectProject(PROJECT1).copy();
         alice.sarosBot().packageExplorerView().tree().paste(PROJECT2);
-        assertTrue(alice.sarosBot().file().existsProjectNoGUI(PROJECT2));
+        assertTrue(alice.sarosBot().state().existsProjectNoGUI(PROJECT2));
     }
 
     @Test
     public void testDeleteFolder() throws RemoteException {
         alice.sarosBot().file().newJavaProject(PROJECT1);
         alice.sarosBot().file().newFolder(PROJECT1, FOLDER1);
-        assertTrue(alice.sarosBot().file().existsFolderNoGUI(PROJECT1, FOLDER1));
-        alice.sarosBot().deleteFolderNoGUI(PROJECT1, FOLDER1);
-        assertFalse(alice.sarosBot().file()
+        assertTrue(alice.sarosBot().state()
+            .existsFolderNoGUI(PROJECT1, FOLDER1));
+        alice.noBot().deleteFolderNoGUI(PROJECT1, FOLDER1);
+        assertFalse(alice.sarosBot().state()
             .existsFolderNoGUI(PROJECT1, FOLDER1));
     }
 

@@ -16,6 +16,8 @@ public interface ContextMenuWrapper extends EclipseComponent {
 
     public TeamC team() throws RemoteException;
 
+    public RefactorC refactor() throws RemoteException;
+
     public void copy() throws RemoteException;
 
     public void paste(String target) throws RemoteException;

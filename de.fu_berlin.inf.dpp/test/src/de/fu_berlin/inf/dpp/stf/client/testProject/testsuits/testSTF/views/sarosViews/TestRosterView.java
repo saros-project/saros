@@ -185,7 +185,7 @@ public class TestRosterView extends STFTest {
         setUpSessionWithAJavaProjectAndAClass(alice, bob);
         assertFalse(carl.sarosBot().sessionView().isInSession());
         alice.sarosBot().buddiesView().inviteBuddy(carl.jid);
-        carl.sarosBot().confirmShellSessionnInvitation();
+        carl.bot().shell(SHELL_SESSION_INVITATION).confirm(FINISH);
         carl.sarosBot().confirmShellAddProjectWithNewProject(PROJECT1);
         carl.sarosBot().sessionView().waitUntilIsInSession();
         assertTrue(carl.sarosBot().sessionView().isInSession());

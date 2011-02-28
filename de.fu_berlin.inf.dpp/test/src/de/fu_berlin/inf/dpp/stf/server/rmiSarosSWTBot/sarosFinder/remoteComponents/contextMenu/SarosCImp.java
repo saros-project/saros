@@ -21,7 +21,7 @@ public class SarosCImp extends SarosComponentImp implements SarosC {
         return self;
     }
 
-    public void setView(STFBotTreeItem view) {
+    public void setTreeItem(STFBotTreeItem view) {
         this.view = view;
     }
 
@@ -40,13 +40,13 @@ public class SarosCImp extends SarosComponentImp implements SarosC {
     public void shareProjectWith(String howToshareProject,
         String[] baseJIDOfInvitees) throws RemoteException {
         view.contextMenu(CM_SAROS, howToshareProject).click();
-        confirmShellInvitation(baseJIDOfInvitees);
+        sarosBot().confirmShellInvitation(baseJIDOfInvitees);
     }
 
     public void shareProject(String... baseJIDOfInvitees)
         throws RemoteException {
         view.contextMenu(CM_SAROS, CM_SHARE_PROJECT).click();
-        confirmShellInvitation(baseJIDOfInvitees);
+        sarosBot().confirmShellInvitation(baseJIDOfInvitees);
     }
 
 }

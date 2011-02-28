@@ -259,7 +259,7 @@ public class TestSessionView extends STFTest {
     public void inviteUsersInSession() throws RemoteException,
         InterruptedException {
         bob.sarosBot().sessionView().leaveTheSessionByPeer();
-        bob.sarosBot().deleteProjectNoGUI(PROJECT1);
+        bob.noBot().deleteProjectNoGUI(PROJECT1);
         assertFalse(bob.sarosBot().sessionView().isInSession());
         inviteBuddies(PROJECT1, TypeOfCreateProject.NEW_PROJECT, alice, bob,
             carl);

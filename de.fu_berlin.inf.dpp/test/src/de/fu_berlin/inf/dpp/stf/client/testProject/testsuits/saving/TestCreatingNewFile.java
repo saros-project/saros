@@ -48,11 +48,13 @@ public class TestCreatingNewFile extends STFTest {
     public void testCarlCreateANewFile() throws IOException, CoreException {
         carl.sarosBot().file().newFolder(PROJECT1, FOLDER1);
         carl.sarosBot().file().newFile(PROJECT1, FOLDER1, FILE1);
-        alice.sarosBot().file().waitUntilFileExists(PROJECT1, FOLDER1, FILE1);
-        assertTrue(alice.sarosBot().file()
+        alice.sarosBot().condition()
+            .waitUntilFileExists(PROJECT1, FOLDER1, FILE1);
+        assertTrue(alice.sarosBot().state()
             .existsFileNoGUI(PROJECT1, FOLDER1, FILE1));
-        bob.sarosBot().file().waitUntilFileExists(PROJECT1, FOLDER1, FILE1);
-        assertTrue(bob.sarosBot().file()
+        bob.sarosBot().condition()
+            .waitUntilFileExists(PROJECT1, FOLDER1, FILE1);
+        assertTrue(bob.sarosBot().state()
             .existsFileNoGUI(PROJECT1, FOLDER1, FILE1));
     }
 
@@ -91,10 +93,10 @@ public class TestCreatingNewFile extends STFTest {
         carl.sarosBot().file().newFolder(PROJECT1, FOLDER1);
         carl.sarosBot().file().newFile(PROJECT1, FOLDER1, FILE1);
         waitsUntilTransferedDataIsArrived(alice);
-        assertFalse(alice.sarosBot().file()
+        assertFalse(alice.sarosBot().state()
             .existsFileNoGUI(PROJECT1, FOLDER1, FILE1));
         waitsUntilTransferedDataIsArrived(bob);
-        assertFalse(bob.sarosBot().file()
+        assertFalse(bob.sarosBot().state()
             .existsFileNoGUI(PROJECT1, FOLDER1, FILE1));
 
         setFollowMode(alice, carl, bob);
@@ -102,11 +104,13 @@ public class TestCreatingNewFile extends STFTest {
         alice.sarosBot().file().newFolder(PROJECT1, FOLDER2);
         alice.sarosBot().file().newFile(PROJECT1, FOLDER2, FILE2);
 
-        carl.sarosBot().file().waitUntilFileExists(PROJECT1, FOLDER2, FILE2);
-        assertTrue(carl.sarosBot().file()
+        carl.sarosBot().condition()
+            .waitUntilFileExists(PROJECT1, FOLDER2, FILE2);
+        assertTrue(carl.sarosBot().state()
             .existsFileNoGUI(PROJECT1, FOLDER2, FILE2));
-        bob.sarosBot().file().waitUntilFileExists(PROJECT1, FOLDER2, FILE2);
-        assertTrue(bob.sarosBot().file()
+        bob.sarosBot().condition()
+            .waitUntilFileExists(PROJECT1, FOLDER2, FILE2);
+        assertTrue(bob.sarosBot().state()
             .existsFileNoGUI(PROJECT1, FOLDER2, FILE2));
 
         alice.bot().editor(FILE2).setTexWithSave(CP1);

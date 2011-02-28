@@ -88,7 +88,7 @@ public class TestParallelInvitationWithTerminationByHost extends STFTest {
 
         carl.bot().waitUntilShellIsOpen(SHELL_SESSION_INVITATION);
         carl.bot().shell(SHELL_SESSION_INVITATION).activate();
-        carl.sarosBot().confirmShellSessionnInvitation();
+        carl.bot().shell(SHELL_SESSION_INVITATION).confirm(FINISH);
         alice.sarosBot().progressView().removeProcess(0);
         carl.bot().shell(SHELL_INVITATION_CANCELLED).waitUntilActive();
         assertTrue(carl.bot().shell(SHELL_INVITATION_CANCELLED).isActive());
@@ -97,7 +97,7 @@ public class TestParallelInvitationWithTerminationByHost extends STFTest {
 
         dave.bot().waitUntilShellIsOpen(SHELL_SESSION_INVITATION);
         dave.bot().shell(SHELL_SESSION_INVITATION).activate();
-        dave.sarosBot().confirmShellSessionnInvitation();
+        dave.bot().shell(SHELL_SESSION_INVITATION).confirm(FINISH);
 
         // dave.button.clickButton(FINISH);
         alice.sarosBot().progressView().removeProcess(0);

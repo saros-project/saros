@@ -77,6 +77,11 @@ public class STFBotShellImp extends AbstractRmoteWidget implements STFBotShell {
         widget.close();
     }
 
+    public void confirm() throws RemoteException {
+        activate();
+        bot().button().click();
+    }
+
     public void confirm(String buttonText) throws RemoteException {
         activate();
         bot().button(buttonText).click();

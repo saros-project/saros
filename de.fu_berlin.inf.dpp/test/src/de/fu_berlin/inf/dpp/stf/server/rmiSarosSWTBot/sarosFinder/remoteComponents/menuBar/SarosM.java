@@ -3,8 +3,11 @@ package de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteCompone
 import java.rmi.RemoteException;
 
 import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.SarosComponent;
 
-public interface SarosM extends SarosPreferences {
+public interface SarosM extends SarosComponent {
+
+    public SarosPreferences preferences() throws RemoteException;
 
     /**
      * Creates an account with GUI, which should be done with the following

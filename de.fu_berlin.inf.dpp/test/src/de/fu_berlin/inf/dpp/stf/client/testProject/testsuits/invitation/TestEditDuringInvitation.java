@@ -59,7 +59,7 @@ public class TestEditDuringInvitation extends STFTest {
 
         alice.sarosBot().sessionView()
             .openInvitationInterface(carl.getBaseJid());
-        carl.sarosBot().confirmShellSessionnInvitation();
+        carl.bot().shell(SHELL_SESSION_INVITATION).confirm(FINISH);
 
         bob.sarosBot().packageExplorerView().selectClass(PROJECT1, PKG1, CLS1)
             .open();

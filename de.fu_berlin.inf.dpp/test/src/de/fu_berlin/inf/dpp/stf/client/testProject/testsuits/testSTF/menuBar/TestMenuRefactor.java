@@ -35,11 +35,11 @@ public class TestMenuRefactor extends STFTest {
         alice.sarosBot().file().newClass(PROJECT1, PKG1, CLS1);
         alice.sarosBot().file().newPackage(PROJECT1, PKG2);
         alice.sarosBot().packageExplorerView()
-            .selectClass(PROJECT1, PKG1, CLS1);
-        alice.sarosBot().refactor().moveClassTo(PROJECT1, PKG2);
-        assertFalse(alice.sarosBot().file()
+            .selectClass(PROJECT1, PKG1, CLS1).refactor()
+            .moveClassTo(PROJECT1, PKG2);
+        assertFalse(alice.sarosBot().state()
             .existsClassNoGUI(PROJECT1, PKG1, CLS1));
-        assertTrue(alice.sarosBot().file()
+        assertTrue(alice.sarosBot().state()
             .existsClassNoGUI(PROJECT1, PKG2, CLS1));
     }
 
@@ -48,11 +48,11 @@ public class TestMenuRefactor extends STFTest {
         alice.sarosBot().file().newJavaProject(PROJECT1);
         alice.sarosBot().file().newClass(PROJECT1, PKG1, CLS1);
         alice.sarosBot().packageExplorerView()
-            .selectClass(PROJECT1, PKG1, CLS1);
-        alice.sarosBot().refactor().renameClass(CLS2);
-        assertFalse(alice.sarosBot().file()
+            .selectClass(PROJECT1, PKG1, CLS1).refactor().rename(CLS2);
+
+        assertFalse(alice.sarosBot().state()
             .existsClassNoGUI(PROJECT1, PKG1, CLS1));
-        assertTrue(alice.sarosBot().file()
+        assertTrue(alice.sarosBot().state()
             .existsClassNoGUI(PROJECT1, PKG1, CLS2));
     }
 
@@ -62,11 +62,11 @@ public class TestMenuRefactor extends STFTest {
         alice.sarosBot().file().newFolder(PROJECT1, FOLDER1);
         alice.sarosBot().file().newFile(PROJECT1, FOLDER1, FILE1);
         alice.sarosBot().packageExplorerView()
-            .selectFile(PROJECT1, FOLDER1, FILE1);
-        alice.sarosBot().refactor().renameFile(FILE2);
-        assertFalse(alice.sarosBot().file()
+            .selectFile(PROJECT1, FOLDER1, FILE1).refactor().rename(FILE2);
+
+        assertFalse(alice.sarosBot().state()
             .existsFileNoGUI(PROJECT1, FOLDER1, FILE1));
-        assertTrue(alice.sarosBot().file()
+        assertTrue(alice.sarosBot().state()
             .existsFileNoGUI(PROJECT1, FOLDER1, FILE2));
     }
 
@@ -74,28 +74,31 @@ public class TestMenuRefactor extends STFTest {
     public void testRenameFolder() throws RemoteException {
         alice.sarosBot().file().newProject(PROJECT1);
         alice.sarosBot().file().newFolder(PROJECT1, FOLDER1);
-        alice.sarosBot().packageExplorerView().selectFolder(PROJECT1, FOLDER1);
-        alice.sarosBot().refactor().renameFolder(FOLDER2);
-        assertFalse(alice.sarosBot().file()
+        alice.sarosBot().packageExplorerView().selectFolder(PROJECT1, FOLDER1)
+            .refactor().rename(FOLDER2);
+
+        assertFalse(alice.sarosBot().state()
             .existsFolderNoGUI(PROJECT1, FOLDER1));
-        assertTrue(alice.sarosBot().file().existsFolderNoGUI(PROJECT1, FOLDER2));
+        assertTrue(alice.sarosBot().state()
+            .existsFolderNoGUI(PROJECT1, FOLDER2));
     }
 
     @Test
     public void testRenamePackage() throws RemoteException {
         alice.sarosBot().file().newJavaProject(PROJECT1);
         alice.sarosBot().file().newPackage(PROJECT1, PKG1);
-        alice.sarosBot().packageExplorerView().selectPkg(PROJECT1, PKG1);
-        alice.sarosBot().refactor().renamePkg(PKG2);
+        alice.sarosBot().packageExplorerView().selectPkg(PROJECT1, PKG1)
+            .refactor().rename(PKG2);
+
         alice.bot().sleep(500);
-        assertFalse(alice.sarosBot().file().existsPkgNoGUI(PROJECT1, PKG1));
-        assertTrue(alice.sarosBot().file().existsPkgNoGUI(PROJECT1, PKG2));
+        assertFalse(alice.sarosBot().state().existsPkgNoGUI(PROJECT1, PKG1));
+        assertTrue(alice.sarosBot().state().existsPkgNoGUI(PROJECT1, PKG2));
     }
 
     @Test
     public void testShareProjectWithSVN() throws RemoteException {
         alice.sarosBot().file().newJavaProject(PROJECT1);
-        assertFalse(alice.sarosBot().isProjectManagedBySVN(PROJECT1));
+        assertFalse(alice.sarosBot().state().isProjectManagedBySVN(PROJECT1));
         alice
             .sarosBot()
             .packageExplorerView()
@@ -103,7 +106,7 @@ public class TestMenuRefactor extends STFTest {
             .team()
             .shareProjectUsingSpecifiedFolderName(SVN_REPOSITORY_URL,
                 SVN_PROJECT_PATH);
-        assertTrue(alice.sarosBot().isProjectManagedBySVN(PROJECT1));
+        assertTrue(alice.sarosBot().state().isProjectManagedBySVN(PROJECT1));
     }
 
     /**
@@ -113,12 +116,12 @@ public class TestMenuRefactor extends STFTest {
     public void testRenameProject() throws Exception {
         alice.sarosBot().file().newJavaProject(PROJECT1);
 
-        assertTrue(alice.sarosBot().file().existsProjectNoGUI(PROJECT1));
-        assertFalse(alice.sarosBot().file().existsProjectNoGUI(PROJECT2));
-        alice.sarosBot().packageExplorerView().selectProject(PROJECT1);
-        alice.sarosBot().refactor().renameJavaProject(PROJECT2);
+        assertTrue(alice.sarosBot().state().existsProjectNoGUI(PROJECT1));
+        assertFalse(alice.sarosBot().state().existsProjectNoGUI(PROJECT2));
+        alice.sarosBot().packageExplorerView().selectJavaProject(PROJECT1)
+            .refactor().rename(PROJECT2);
 
-        assertFalse(alice.sarosBot().file().existsProjectNoGUI(PROJECT1));
-        assertTrue(alice.sarosBot().file().existsProjectNoGUI(PROJECT2));
+        assertFalse(alice.sarosBot().state().existsProjectNoGUI(PROJECT1));
+        assertTrue(alice.sarosBot().state().existsProjectNoGUI(PROJECT2));
     }
 }

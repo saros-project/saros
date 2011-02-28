@@ -7,19 +7,22 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBo
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotTreeItem;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.EclipseComponentImp;
 
-public class ContextMenuWrapperImp extends EclipseComponentImp implements ContextMenuWrapper {
+public class ContextMenuWrapperImp extends EclipseComponentImp implements
+    ContextMenuWrapper {
 
     private static transient ContextMenuWrapperImp self;
 
     private static SarosCImp sarosC;
     private static TeamCImp teamC;
+    private static RefactorCImp reafactorC;
 
     private STFBotTreeItem treeItem;
     private STFBotTree tree;
     private treeItemType type;
 
     /**
-     * {@link ContextMenuWrapperImp} is a singleton, but inheritance is possible.
+     * {@link ContextMenuWrapperImp} is a singleton, but inheritance is
+     * possible.
      */
     public static ContextMenuWrapperImp getInstance() {
         if (self != null)
@@ -27,7 +30,7 @@ public class ContextMenuWrapperImp extends EclipseComponentImp implements Contex
         self = new ContextMenuWrapperImp();
         sarosC = SarosCImp.getInstance();
         teamC = TeamCImp.getInstance();
-
+        reafactorC = RefactorCImp.getInstance();
         return self;
     }
 
@@ -84,6 +87,10 @@ public class ContextMenuWrapperImp extends EclipseComponentImp implements Contex
             bot().shell(SHELL_DELETE_RESOURCE).confirmWithCheckBox(OK, true);
             bot().waitsUntilShellIsClosed(SHELL_DELETE_RESOURCE);
             break;
+        case JAVA_PROJECT:
+            bot().shell(SHELL_DELETE_RESOURCE).confirmWithCheckBox(OK, true);
+            bot().waitsUntilShellIsClosed(SHELL_DELETE_RESOURCE);
+            break;
         default:
             bot().waitUntilShellIsOpen(CONFIRM_DELETE);
             bot().shell(CONFIRM_DELETE).activate();
@@ -94,12 +101,18 @@ public class ContextMenuWrapperImp extends EclipseComponentImp implements Contex
     }
 
     public SarosC saros() throws RemoteException {
-        sarosC.setView(treeItem);
+        sarosC.setTreeItem(treeItem);
         return sarosC;
     }
 
     public TeamC team() throws RemoteException {
         teamC.setTreeItem(treeItem);
         return teamC;
+    }
+
+    public RefactorC refactor() throws RemoteException {
+        reafactorC.setTreeItem(treeItem);
+        reafactorC.setTreeItemType(type);
+        return reafactorC;
     }
 }

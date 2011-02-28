@@ -1,22 +1,35 @@
-package de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.menuBar;
+package de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.contextMenu;
 
 import java.rmi.RemoteException;
 
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotShell;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotTreeItem;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.EclipseComponentImp;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.menuBar.FileMImp;
 
-public class RefactorMImp extends EclipseComponentImp implements RefactorM {
+public class RefactorCImp extends EclipseComponentImp implements RefactorC {
 
-    private static transient RefactorMImp refactorImp;
+    private static transient RefactorCImp refactorImp;
+
+    private STFBotTreeItem treeItem;
+    private treeItemType type;
 
     /**
      * {@link FileMImp} is a singleton, but inheritance is possible.
      */
-    public static RefactorMImp getInstance() {
+    public static RefactorCImp getInstance() {
         if (refactorImp != null)
             return refactorImp;
-        refactorImp = new RefactorMImp();
+        refactorImp = new RefactorCImp();
         return refactorImp;
+    }
+
+    public void setTreeItem(STFBotTreeItem treeItem) {
+        this.treeItem = treeItem;
+    }
+
+    public void setTreeItemType(treeItemType type) {
+        this.type = type;
     }
 
     /**************************************************************
@@ -36,24 +49,21 @@ public class RefactorMImp extends EclipseComponentImp implements RefactorM {
         moveTo(SHELL_MOVE, OK, getPkgNodes(targetProject, targetPkg));
     }
 
-    public void renameClass(String newName) throws RemoteException {
-        rename(SHELL_RENAME_COMPiIATION_UNIT, FINISH, newName);
-    }
-
-    public void renameFile(String newName) throws RemoteException {
-        rename(SHELL_RENAME_RESOURCE, OK, newName);
-    }
-
-    public void renameFolder(String newName) throws RemoteException {
-        rename(SHELL_RENAME_RESOURCE, OK, newName);
-    }
-
-    public void renameJavaProject(String newName) throws RemoteException {
-        rename("Rename Java Project", OK, newName);
-    }
-
-    public void renamePkg(String newName) throws RemoteException {
-        rename(SHELL_RENAME_PACKAGE, OK, newName);
+    public void rename(String newName) throws RemoteException {
+        switch (type) {
+        case JAVA_PROJECT:
+            rename("Rename Java Project", OK, newName);
+            break;
+        case PKG:
+            rename(SHELL_RENAME_PACKAGE, OK, newName);
+            break;
+        case CLASS:
+            rename(SHELL_RENAME_COMPiIATION_UNIT, FINISH, newName);
+            break;
+        default:
+            rename(SHELL_RENAME_RESOURCE, OK, newName);
+            break;
+        }
     }
 
     /**************************************************************
@@ -63,9 +73,7 @@ public class RefactorMImp extends EclipseComponentImp implements RefactorM {
      **************************************************************/
     private void rename(String shellTitle, String buttonName, String newName)
         throws RemoteException {
-        precondition();
         bot().menu(MENU_REFACTOR).menu(MENU_RENAME).click();
-
         STFBotShell shell = bot().shell(shellTitle);
         shell.activate();
         shell.bot().textWithLabel(LABEL_NEW_NAME).setText(newName);
@@ -81,15 +89,9 @@ public class RefactorMImp extends EclipseComponentImp implements RefactorM {
 
     private void moveTo(String shellTitle, String buttonName, String... nodes)
         throws RemoteException {
-        precondition();
         bot().menu(MENU_REFACTOR).menu(MENU_MOVE).click();
-        // bot().shell(shellTitle).waitUntilActive();
         bot().shell(shellTitle).confirmWithTree(buttonName, nodes);
         bot().waitsUntilShellIsClosed(shellTitle);
-    }
-
-    private void precondition() throws RemoteException {
-        bot().activateWorkbench();
     }
 
 }

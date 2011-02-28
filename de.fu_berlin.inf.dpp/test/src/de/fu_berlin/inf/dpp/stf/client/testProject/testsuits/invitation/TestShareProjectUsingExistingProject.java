@@ -47,23 +47,26 @@ public class TestShareProjectUsingExistingProject extends STFTest {
 
     @Test
     public void shareProjectUsingExistingProject() throws RemoteException {
-        assertFalse(bob.sarosBot().file()
+        assertFalse(bob.sarosBot().state()
             .existsClassNoGUI(PROJECT1, PKG1, CLS1));
-        assertTrue(bob.sarosBot().file().existsClassNoGUI(PROJECT1, PKG1, CLS2));
+        assertTrue(bob.sarosBot().state()
+            .existsClassNoGUI(PROJECT1, PKG1, CLS2));
         buildSessionSequentially(PROJECT1, CM_SHARE_PROJECT,
             TypeOfCreateProject.EXIST_PROJECT, alice, bob);
-        bob.sarosBot().file().waitUntilClassExists(PROJECT1, PKG1, CLS1);
-        assertTrue(bob.sarosBot().file().existsClassNoGUI(PROJECT1, PKG1, CLS1));
-        assertFalse(bob.sarosBot().file()
+        bob.sarosBot().condition().waitUntilClassExists(PROJECT1, PKG1, CLS1);
+        assertTrue(bob.sarosBot().state()
+            .existsClassNoGUI(PROJECT1, PKG1, CLS1));
+        assertFalse(bob.sarosBot().state()
             .existsClassNoGUI(PROJECT1, PKG1, CLS2));
     }
 
     @Test
     public void shareProjectUsingExistProjectWithCopyAfterCancelLocalChange()
         throws RemoteException {
-        assertFalse(bob.sarosBot().file()
+        assertFalse(bob.sarosBot().state()
             .existsClassNoGUI(PROJECT1, PKG1, CLS1));
-        assertTrue(bob.sarosBot().file().existsClassNoGUI(PROJECT1, PKG1, CLS2));
+        assertTrue(bob.sarosBot().state()
+            .existsClassNoGUI(PROJECT1, PKG1, CLS2));
 
         buildSessionSequentially(
 
@@ -75,12 +78,13 @@ public class TestShareProjectUsingExistingProject extends STFTest {
         // bob.sarosC
         // .confirmProjectSharingWizardUsingExistProjectWithCopy(PROJECT1);
 
-        assertTrue(bob.sarosBot().file().existsProjectNoGUI(PROJECT1));
-        assertTrue(bob.sarosBot().file().existsClassNoGUI(PROJECT1, PKG1, CLS2));
-        assertTrue(bob.sarosBot().file().existsProjectNoGUI(PROJECT1_NEXT));
-        assertTrue(bob.sarosBot().file()
+        assertTrue(bob.sarosBot().state().existsProjectNoGUI(PROJECT1));
+        assertTrue(bob.sarosBot().state()
+            .existsClassNoGUI(PROJECT1, PKG1, CLS2));
+        assertTrue(bob.sarosBot().state().existsProjectNoGUI(PROJECT1_NEXT));
+        assertTrue(bob.sarosBot().state()
             .existsClassNoGUI(PROJECT1_NEXT, PKG1, CLS1));
-        bob.sarosBot().deleteProjectNoGUI(PROJECT1_NEXT);
+        bob.noBot().deleteProjectNoGUI(PROJECT1_NEXT);
     }
 
     @Test
@@ -88,12 +92,13 @@ public class TestShareProjectUsingExistingProject extends STFTest {
         throws RemoteException {
         buildSessionSequentially(PROJECT1, CM_SHARE_PROJECT,
             TypeOfCreateProject.EXIST_PROJECT_WITH_COPY, alice, bob);
-        assertTrue(bob.sarosBot().file().existsProjectNoGUI(PROJECT1));
-        assertTrue(bob.sarosBot().file().existsClassNoGUI(PROJECT1, PKG1, CLS2));
-        assertTrue(bob.sarosBot().file().existsProjectNoGUI(PROJECT1_NEXT));
-        assertTrue(bob.sarosBot().file()
+        assertTrue(bob.sarosBot().state().existsProjectNoGUI(PROJECT1));
+        assertTrue(bob.sarosBot().state()
+            .existsClassNoGUI(PROJECT1, PKG1, CLS2));
+        assertTrue(bob.sarosBot().state().existsProjectNoGUI(PROJECT1_NEXT));
+        assertTrue(bob.sarosBot().state()
             .existsClassNoGUI(PROJECT1_NEXT, PKG1, CLS1));
-        bob.sarosBot().deleteProjectNoGUI(PROJECT1_NEXT);
+        bob.noBot().deleteProjectNoGUI(PROJECT1_NEXT);
 
     }
 }

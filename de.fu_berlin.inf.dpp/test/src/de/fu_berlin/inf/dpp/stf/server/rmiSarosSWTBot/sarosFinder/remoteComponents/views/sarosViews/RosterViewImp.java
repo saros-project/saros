@@ -67,12 +67,11 @@ public class RosterViewImp extends SarosComponentImp implements RosterView {
         log.trace("connectedByXMPP");
         if (!isConnected()) {
             log.trace("click the toolbar button \"Connect\" in the r�oster view");
-            if (!sarosBot().saros().isAccountExistNoGUI(jid, password))
-                sarosBot().saros().createAccountInShellSarosPeferences(jid,
-                    password);
+            if (!sarosBot().state().isAccountExistNoGUI(jid, password))
+                sarosBot().saros().preferences().createAccount(jid, password);
 
-            if (!sarosBot().saros().isAccountActiveNoGUI(jid))
-                sarosBot().saros().activateAccount(jid);
+            if (!sarosBot().state().isAccountActiveNoGUI(jid))
+                sarosBot().saros().preferences().activateAccount(jid);
             clickToolbarButtonWithTooltip(TB_CONNECT);
 
             waitUntilIsConnected();
@@ -253,12 +252,12 @@ public class RosterViewImp extends SarosComponentImp implements RosterView {
         log.trace("connectedByXMPP");
         if (!isConnectedNoGUI()) {
             log.trace("click the toolbar button \"Connect\" in the roster view");
-            if (!sarosBot().saros().isAccountExistNoGUI(jid, password)) {
-                sarosBot().saros().createAccountNoGUI(jid.getDomain(),
-                    jid.getName(), password);
+            if (!sarosBot().state().isAccountExistNoGUI(jid, password)) {
+                noBot().createAccountNoGUI(jid.getDomain(), jid.getName(),
+                    password);
             }
-            if (!sarosBot().saros().isAccountActiveNoGUI(jid))
-                sarosBot().saros().activateAccountNoGUI(jid);
+            if (!sarosBot().state().isAccountActiveNoGUI(jid))
+                noBot().activateAccountNoGUI(jid);
             saros.connect(true);
             bot().waitUntil(new DefaultCondition() {
                 public boolean test() throws Exception {

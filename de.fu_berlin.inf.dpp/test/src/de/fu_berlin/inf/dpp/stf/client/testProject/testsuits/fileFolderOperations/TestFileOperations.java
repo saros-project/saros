@@ -58,24 +58,21 @@ public class TestFileOperations extends STFTest {
     @Test
     public void testRenameFile() throws RemoteException {
 
-        assertTrue(bob.sarosBot().packageExplorerView()
+        assertTrue(bob.sarosBot().state()
             .existsClassNoGUI(PROJECT1, PKG1, CLS1));
         alice.sarosBot().packageExplorerView()
-            .selectClass(PROJECT1, PKG1, CLS1);
-        alice.sarosBot().refactor().renameClass(CLS2);
+            .selectClass(PROJECT1, PKG1, CLS1).refactor().rename(CLS2);
 
-        bob.sarosBot().packageExplorerView()
-            .waitUntilClassExists(PROJECT1, PKG1, CLS2);
-        assertFalse(bob.sarosBot().packageExplorerView()
+        bob.sarosBot().condition().waitUntilClassExists(PROJECT1, PKG1, CLS2);
+        assertFalse(bob.sarosBot().state()
             .existsClassNoGUI(PROJECT1, PKG1, CLS1));
-        assertTrue(bob.sarosBot().packageExplorerView()
+        assertTrue(bob.sarosBot().state()
             .existsClassNoGUI(PROJECT1, PKG1, CLS2));
 
-        carl.sarosBot().packageExplorerView()
-            .waitUntilClassExists(PROJECT1, PKG1, CLS2);
-        assertFalse(carl.sarosBot().packageExplorerView()
+        carl.sarosBot().condition().waitUntilClassExists(PROJECT1, PKG1, CLS2);
+        assertFalse(carl.sarosBot().state()
             .existsClassNoGUI(PROJECT1, PKG1, CLS1));
-        assertTrue(carl.sarosBot().packageExplorerView()
+        assertTrue(carl.sarosBot().state()
             .existsClassNoGUI(PROJECT1, PKG1, CLS2));
     }
 
@@ -94,14 +91,14 @@ public class TestFileOperations extends STFTest {
      */
     @Test
     public void testDeleteFile() throws RemoteException {
-        alice.sarosBot().deleteClassNoGUI(PROJECT1, PKG1, CLS1);
-        bob.sarosBot().packageExplorerView()
+        alice.noBot().deleteClassNoGUI(PROJECT1, PKG1, CLS1);
+        bob.sarosBot().condition()
             .waitUntilClassNotExists(PROJECT1, PKG1, CLS1);
-        assertFalse(bob.sarosBot().packageExplorerView()
+        assertFalse(bob.sarosBot().state()
             .existsClassNoGUI(PROJECT1, PKG1, CLS1));
-        carl.sarosBot().packageExplorerView()
+        carl.sarosBot().condition()
             .waitUntilClassNotExists(PROJECT1, PKG1, CLS1);
-        assertFalse(carl.sarosBot().packageExplorerView()
+        assertFalse(carl.sarosBot().state()
             .existsClassNoGUI(PROJECT1, PKG1, CLS1));
     }
 
@@ -125,22 +122,17 @@ public class TestFileOperations extends STFTest {
     @Test
     public void testNewPkgAndClass() throws CoreException, IOException {
         alice.sarosBot().file().newPackage(PROJECT1, PKG2);
-        bob.sarosBot().packageExplorerView().waitUntilPkgExists(PROJECT1, PKG2);
-        carl.sarosBot().packageExplorerView()
-            .waitUntilPkgExists(PROJECT1, PKG2);
-        assertTrue(bob.sarosBot().packageExplorerView()
-            .existsPkgNoGUI(PROJECT1, PKG2));
-        assertTrue(carl.sarosBot().packageExplorerView()
-            .existsPkgNoGUI(PROJECT1, PKG2));
+        bob.sarosBot().condition().waitUntilPkgExists(PROJECT1, PKG2);
+        carl.sarosBot().condition().waitUntilPkgExists(PROJECT1, PKG2);
+        assertTrue(bob.sarosBot().state().existsPkgNoGUI(PROJECT1, PKG2));
+        assertTrue(carl.sarosBot().state().existsPkgNoGUI(PROJECT1, PKG2));
 
         alice.sarosBot().file().newClass(PROJECT1, PKG2, CLS1);
-        bob.sarosBot().packageExplorerView()
-            .waitUntilClassExists(PROJECT1, PKG2, CLS1);
-        carl.sarosBot().packageExplorerView()
-            .waitUntilClassExists(PROJECT1, PKG2, CLS1);
-        assertTrue(bob.sarosBot().packageExplorerView()
+        bob.sarosBot().condition().waitUntilClassExists(PROJECT1, PKG2, CLS1);
+        carl.sarosBot().condition().waitUntilClassExists(PROJECT1, PKG2, CLS1);
+        assertTrue(bob.sarosBot().state()
             .existsClassNoGUI(PROJECT1, PKG2, CLS1));
-        assertTrue(carl.sarosBot().packageExplorerView()
+        assertTrue(carl.sarosBot().state()
             .existsClassNoGUI(PROJECT1, PKG2, CLS1));
 
         alice.bot().editor(CLS1_SUFFIX).setTexWithSave(CP1);
@@ -180,19 +172,18 @@ public class TestFileOperations extends STFTest {
         alice.sarosBot().file().newPackage(PROJECT1, PKG2);
         alice.sarosBot().file().newClass(PROJECT1, PKG2, CLS2);
         alice.sarosBot().packageExplorerView()
-            .selectClass(PROJECT1, PKG2, CLS2);
-        alice.sarosBot().refactor().moveClassTo(PROJECT1, PKG1);
-        bob.sarosBot().packageExplorerView()
-            .waitUntilClassExists(PROJECT1, PKG1, CLS2);
-        carl.sarosBot().packageExplorerView()
-            .waitUntilClassExists(PROJECT1, PKG1, CLS2);
-        assertTrue(bob.sarosBot().packageExplorerView()
+            .selectClass(PROJECT1, PKG2, CLS2).refactor()
+            .moveClassTo(PROJECT1, PKG1);
+
+        bob.sarosBot().condition().waitUntilClassExists(PROJECT1, PKG1, CLS2);
+        carl.sarosBot().condition().waitUntilClassExists(PROJECT1, PKG1, CLS2);
+        assertTrue(bob.sarosBot().state()
             .existsClassNoGUI(PROJECT1, PKG1, CLS2));
-        assertFalse(bob.sarosBot().packageExplorerView()
+        assertFalse(bob.sarosBot().state()
             .existsClassNoGUI(PROJECT1, PKG2, CLS2));
-        assertTrue(carl.sarosBot().packageExplorerView()
+        assertTrue(carl.sarosBot().state()
             .existsClassNoGUI(PROJECT1, PKG1, CLS2));
-        assertFalse(carl.sarosBot().packageExplorerView()
+        assertFalse(carl.sarosBot().state()
             .existsClassNoGUI(PROJECT1, PKG2, CLS2));
     }
 
@@ -211,24 +202,18 @@ public class TestFileOperations extends STFTest {
      */
     @Test
     public void testRenamePkg() throws RemoteException {
-        alice.sarosBot().packageExplorerView().selectPkg(PROJECT1, PKG1);
-        alice.sarosBot().refactor().renamePkg(PKG2);
-        bob.sarosBot().packageExplorerView().waitUntilPkgExists(PROJECT1, PKG2);
-        bob.sarosBot().packageExplorerView()
-            .waitUntilPkgNotExists(PROJECT1, PKG1);
-        assertFalse(bob.sarosBot().packageExplorerView()
-            .existsPkgNoGUI(PROJECT1, PKG1));
-        assertTrue(bob.sarosBot().packageExplorerView()
-            .existsPkgNoGUI(PROJECT1, PKG2));
+        alice.sarosBot().packageExplorerView().selectPkg(PROJECT1, PKG1)
+            .refactor().rename(PKG2);
 
-        carl.sarosBot().packageExplorerView()
-            .waitUntilPkgExists(PROJECT1, PKG2);
-        carl.sarosBot().packageExplorerView()
-            .waitUntilPkgNotExists(PROJECT1, PKG1);
-        assertFalse(carl.sarosBot().packageExplorerView()
-            .existsPkgNoGUI(PROJECT1, PKG1));
-        assertTrue(carl.sarosBot().packageExplorerView()
-            .existsPkgNoGUI(PROJECT1, PKG2));
+        bob.sarosBot().condition().waitUntilPkgExists(PROJECT1, PKG2);
+        bob.sarosBot().condition().waitUntilPkgNotExists(PROJECT1, PKG1);
+        assertFalse(bob.sarosBot().state().existsPkgNoGUI(PROJECT1, PKG1));
+        assertTrue(bob.sarosBot().state().existsPkgNoGUI(PROJECT1, PKG2));
+
+        carl.sarosBot().condition().waitUntilPkgExists(PROJECT1, PKG2);
+        carl.sarosBot().condition().waitUntilPkgNotExists(PROJECT1, PKG1);
+        assertFalse(carl.sarosBot().state().existsPkgNoGUI(PROJECT1, PKG1));
+        assertTrue(carl.sarosBot().state().existsPkgNoGUI(PROJECT1, PKG2));
     }
 
     /**
@@ -246,14 +231,10 @@ public class TestFileOperations extends STFTest {
      */
     @Test
     public void testDeletePkg() throws RemoteException {
-        alice.sarosBot().deletePkgNoGUI(PROJECT1, PKG1);
-        bob.sarosBot().packageExplorerView()
-            .waitUntilPkgNotExists(PROJECT1, PKG1);
-        carl.sarosBot().packageExplorerView()
-            .waitUntilPkgNotExists(PROJECT1, PKG1);
-        assertFalse(bob.sarosBot().packageExplorerView()
-            .existsPkgNoGUI(PROJECT1, PKG1));
-        assertFalse(carl.sarosBot().packageExplorerView()
-            .existsPkgNoGUI(PROJECT1, PKG1));
+        alice.noBot().deletePkgNoGUI(PROJECT1, PKG1);
+        bob.sarosBot().condition().waitUntilPkgNotExists(PROJECT1, PKG1);
+        carl.sarosBot().condition().waitUntilPkgNotExists(PROJECT1, PKG1);
+        assertFalse(bob.sarosBot().state().existsPkgNoGUI(PROJECT1, PKG1));
+        assertFalse(carl.sarosBot().state().existsPkgNoGUI(PROJECT1, PKG1));
     }
 }

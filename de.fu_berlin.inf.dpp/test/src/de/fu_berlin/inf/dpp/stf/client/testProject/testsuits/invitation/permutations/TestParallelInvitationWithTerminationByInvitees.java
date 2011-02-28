@@ -93,7 +93,7 @@ public class TestParallelInvitationWithTerminationByInvitees extends STFTest {
         STFBotShell shell_carl = carl.bot().shell(SHELL_SESSION_INVITATION);
         carl.bot().waitUntilShellIsOpen(SHELL_SESSION_INVITATION);
         shell_carl.activate();
-        carl.sarosBot().confirmShellSessionnInvitation();
+        carl.bot().shell(SHELL_SESSION_INVITATION).confirm(FINISH);
         shell_carl.bot().button(CANCEL).click();
 
         shell_alice.waitUntilActive();
@@ -104,7 +104,7 @@ public class TestParallelInvitationWithTerminationByInvitees extends STFTest {
         dave.bot().waitsUntilShellIsClosed(SHELL_SESSION_INVITATION);
         STFBotShell shell_dave = dave.bot().shell(SHELL_SESSION_INVITATION);
         shell_dave.activate();
-        dave.sarosBot().confirmShellSessionnInvitation();
+        dave.bot().shell(SHELL_SESSION_INVITATION).confirm(FINISH);
         shell_dave.bot().button(CANCEL).click();
 
         shell_alice.waitUntilActive();
@@ -114,7 +114,7 @@ public class TestParallelInvitationWithTerminationByInvitees extends STFTest {
 
         edna.bot().waitUntilShellIsOpen(SHELL_SESSION_INVITATION);
         edna.bot().shell(SHELL_SESSION_INVITATION).activate();
-        edna.sarosBot().confirmShellSessionnInvitation();
+        edna.bot().shell(SHELL_SESSION_INVITATION).confirm(FINISH);
         edna.sarosBot().confirmShellAddProjectWithNewProject(PROJECT1);
         edna.sarosBot().sessionView().leaveTheSessionByPeer();
         assertFalse(edna.sarosBot().sessionView().isInSession());

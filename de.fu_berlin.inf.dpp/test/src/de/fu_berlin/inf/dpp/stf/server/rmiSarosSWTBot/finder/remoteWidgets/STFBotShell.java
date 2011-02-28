@@ -28,6 +28,8 @@ public interface STFBotShell extends Remote {
 
     public void close() throws RemoteException;
 
+    public void confirm() throws RemoteException;
+
     /**
      * confirm a pop-up window.
      * 

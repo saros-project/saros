@@ -47,8 +47,8 @@ public class TestSarosPreferences extends STFTest {
     @Ignore
     public void createAccountWithButtonAddAccountInShellSarosPeferences()
         throws RemoteException {
-        alice.sarosBot().saros()
-            .createAccountInShellSarosPeferences(JID_TO_CREATE, PASSWORD);
+        alice.sarosBot().saros().preferences()
+            .createAccount(JID_TO_CREATE, PASSWORD);
     }
 
     @Test
@@ -134,56 +134,68 @@ public class TestSarosPreferences extends STFTest {
 
     @Test
     public void addAndActivateAccountNoGUI() throws RemoteException {
-        assertFalse(alice.sarosBot().saros()
+        assertFalse(alice.sarosBot().state()
             .isAccountExistNoGUI(JID_TO_ADD, PASSWORD));
-        alice.sarosBot().saros().addAccount(JID_TO_ADD, PASSWORD);
-        assertTrue(alice.sarosBot().saros()
+        alice.sarosBot().saros().preferences().addAccount(JID_TO_ADD, PASSWORD);
+        assertTrue(alice.sarosBot().state()
             .isAccountExistNoGUI(JID_TO_ADD, PASSWORD));
-        assertTrue(alice.sarosBot().saros().isAccountActiveNoGUI(alice.jid));
-        assertFalse(alice.sarosBot().saros().isAccountActiveNoGUI(JID_TO_ADD));
-        alice.sarosBot().saros().activateAccountNoGUI(JID_TO_ADD);
-        assertTrue(alice.sarosBot().saros().isAccountActiveNoGUI(JID_TO_ADD));
-        assertFalse(alice.sarosBot().saros().isAccountActiveNoGUI(alice.jid));
+        assertTrue(alice.sarosBot().state().isAccountActiveNoGUI(alice.jid));
+        assertFalse(alice.sarosBot().state().isAccountActiveNoGUI(JID_TO_ADD));
+        alice.noBot().activateAccountNoGUI(JID_TO_ADD);
+        assertTrue(alice.sarosBot().state().isAccountActiveNoGUI(JID_TO_ADD));
+        assertFalse(alice.sarosBot().state().isAccountActiveNoGUI(alice.jid));
     }
 
     @Test
     public void addAndActivateAcount() throws RemoteException {
-        assertFalse(alice.sarosBot().saros().isAccountExist(JID_TO_ADD));
-        alice.sarosBot().saros().addAccount(JID_TO_ADD, PASSWORD);
-        assertTrue(alice.sarosBot().saros().isAccountExist(JID_TO_ADD));
-        assertTrue(alice.sarosBot().saros().isAccountActive(alice.jid));
-        assertFalse(alice.sarosBot().saros().isAccountActive(JID_TO_ADD));
-        alice.sarosBot().saros().activateAccount(JID_TO_ADD);
-        assertTrue(alice.sarosBot().saros().isAccountActive(JID_TO_ADD));
-        assertFalse(alice.sarosBot().saros().isAccountActive(alice.jid));
+        assertFalse(alice.sarosBot().saros().preferences()
+            .isAccountExist(JID_TO_ADD));
+        alice.sarosBot().saros().preferences().addAccount(JID_TO_ADD, PASSWORD);
+        assertTrue(alice.sarosBot().saros().preferences()
+            .isAccountExist(JID_TO_ADD));
+        assertTrue(alice.sarosBot().saros().preferences()
+            .isAccountActive(alice.jid));
+        assertFalse(alice.sarosBot().saros().preferences()
+            .isAccountActive(JID_TO_ADD));
+        alice.sarosBot().saros().preferences().activateAccount(JID_TO_ADD);
+        assertTrue(alice.sarosBot().saros().preferences()
+            .isAccountActive(JID_TO_ADD));
+        assertFalse(alice.sarosBot().saros().preferences()
+            .isAccountActive(alice.jid));
     }
 
     @Test
     public void changeAccountNoGUI() throws RemoteException {
-        assertTrue(alice.sarosBot().saros()
+        assertTrue(alice.sarosBot().state()
             .isAccountExistNoGUI(alice.jid, alice.password));
-        assertTrue(alice.sarosBot().saros().isAccountActiveNoGUI(alice.jid));
-        alice.sarosBot().saros()
-            .changeAccountNoGUI(alice.jid, NEW_USER_NAME, PASSWORD, SERVER);
-        assertFalse(alice.sarosBot().saros()
+        assertTrue(alice.sarosBot().state().isAccountActiveNoGUI(alice.jid));
+        alice.noBot().changeAccountNoGUI(alice.jid, NEW_USER_NAME, PASSWORD,
+            SERVER);
+        assertFalse(alice.sarosBot().state()
             .isAccountExistNoGUI(alice.jid, alice.password));
-        assertFalse(alice.sarosBot().saros().isAccountActiveNoGUI(alice.jid));
-        assertTrue(alice.sarosBot().saros()
+        assertFalse(alice.sarosBot().state().isAccountActiveNoGUI(alice.jid));
+        assertTrue(alice.sarosBot().state()
             .isAccountExistNoGUI(JID_TO_CHANGE, PASSWORD));
-        assertTrue(alice.sarosBot().saros().isAccountActiveNoGUI(JID_TO_CHANGE));
+        assertTrue(alice.sarosBot().state().isAccountActiveNoGUI(JID_TO_CHANGE));
 
     }
 
     @Test
     public void changeAccount() throws RemoteException {
-        assertTrue(alice.sarosBot().saros().isAccountExist(alice.jid));
-        assertTrue(alice.sarosBot().saros().isAccountActive(alice.jid));
-        alice.sarosBot().saros()
+        assertTrue(alice.sarosBot().saros().preferences()
+            .isAccountExist(alice.jid));
+        assertTrue(alice.sarosBot().saros().preferences()
+            .isAccountActive(alice.jid));
+        alice.sarosBot().saros().preferences()
             .changeAccount(alice.jid, NEW_USER_NAME, PASSWORD, SERVER);
-        assertFalse(alice.sarosBot().saros().isAccountExist(alice.jid));
-        assertFalse(alice.sarosBot().saros().isAccountActive(alice.jid));
-        assertTrue(alice.sarosBot().saros().isAccountExist(JID_TO_CHANGE));
-        assertTrue(alice.sarosBot().saros().isAccountActive(JID_TO_CHANGE));
+        assertFalse(alice.sarosBot().saros().preferences()
+            .isAccountExist(alice.jid));
+        assertFalse(alice.sarosBot().saros().preferences()
+            .isAccountActive(alice.jid));
+        assertTrue(alice.sarosBot().saros().preferences()
+            .isAccountExist(JID_TO_CHANGE));
+        assertTrue(alice.sarosBot().saros().preferences()
+            .isAccountActive(JID_TO_CHANGE));
     }
 
     /*
@@ -194,28 +206,36 @@ public class TestSarosPreferences extends STFTest {
     @Test
     @Ignore("There may be some bugs existed.")
     public void deleteActiveAccountNoGUI() throws RemoteException {
-        assertTrue(alice.sarosBot().saros()
+        assertTrue(alice.sarosBot().state()
             .isAccountExistNoGUI(alice.jid, alice.password));
-        alice.sarosBot().saros().deleteAccountNoGUI(alice.jid);
-        assertFalse(alice.sarosBot().saros()
+        alice.noBot().deleteAccountNoGUI(alice.jid);
+        assertFalse(alice.sarosBot().state()
             .isAccountExistNoGUI(alice.jid, alice.password));
     }
 
     @Test(expected = RuntimeException.class)
     @Ignore
     public void deleteActiveAccount() throws RemoteException {
-        assertTrue(alice.sarosBot().saros().isAccountExist(alice.jid));
-        alice.sarosBot().saros().deleteAccount(alice.jid, alice.password);
-        assertTrue(alice.sarosBot().saros().isAccountActive(alice.jid));
-        assertTrue(alice.sarosBot().saros().isAccountExist(alice.jid));
+        assertTrue(alice.sarosBot().saros().preferences()
+            .isAccountExist(alice.jid));
+        alice.sarosBot().saros().preferences()
+            .deleteAccount(alice.jid, alice.password);
+        assertTrue(alice.sarosBot().saros().preferences()
+            .isAccountActive(alice.jid));
+        assertTrue(alice.sarosBot().saros().preferences()
+            .isAccountExist(alice.jid));
     }
 
     @Test
     public void deleteInactiveAccount() throws RemoteException {
-        assertFalse(alice.sarosBot().saros().isAccountExist(JID_TO_ADD));
-        alice.sarosBot().saros().addAccount(JID_TO_ADD, PASSWORD);
-        assertTrue(alice.sarosBot().saros().isAccountExist(JID_TO_ADD));
-        alice.sarosBot().saros().deleteAccount(JID_TO_ADD, PASSWORD);
-        assertFalse(alice.sarosBot().saros().isAccountExist(JID_TO_ADD));
+        assertFalse(alice.sarosBot().saros().preferences()
+            .isAccountExist(JID_TO_ADD));
+        alice.sarosBot().saros().preferences().addAccount(JID_TO_ADD, PASSWORD);
+        assertTrue(alice.sarosBot().saros().preferences()
+            .isAccountExist(JID_TO_ADD));
+        alice.sarosBot().saros().preferences()
+            .deleteAccount(JID_TO_ADD, PASSWORD);
+        assertFalse(alice.sarosBot().saros().preferences()
+            .isAccountExist(JID_TO_ADD));
     }
 }

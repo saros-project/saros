@@ -69,10 +69,10 @@ public class TestBasicWidgetTree extends STFTest {
         view.show();
         assertTrue(view.bot().tree().existsSubItem(PROJECT1));
 
-        assertTrue(alice.sarosBot().file().existsProjectNoGUI(PROJECT1));
+        assertTrue(alice.sarosBot().state().existsProjectNoGUI(PROJECT1));
         assertTrue(view.bot().tree().selectTreeItem(PROJECT1, SRC, PKG1)
             .existsSubItem(CLS1 + SUFFIX_JAVA));
-        alice.sarosBot().file().existsClassNoGUI(PROJECT1, PKG1, CLS1);
+        alice.sarosBot().state().existsClassNoGUI(PROJECT1, PKG1, CLS1);
     }
 
     @Test
@@ -83,21 +83,21 @@ public class TestBasicWidgetTree extends STFTest {
 
         assertTrue(view.bot().tree()
             .existsSubItemWithRegexs(changeToRegex(PROJECT1)));
-        assertTrue(alice.sarosBot().file().existsProjectNoGUI(PROJECT1));
+        assertTrue(alice.sarosBot().state().existsProjectNoGUI(PROJECT1));
         assertTrue(view.bot().tree().selectTreeItem(PROJECT1, SRC)
             .existsSubItemWithRegex(changeToRegex(PKG1)));
 
-        assertTrue(alice.sarosBot().file().existsPkgNoGUI(PROJECT1, PKG1));
+        assertTrue(alice.sarosBot().state().existsPkgNoGUI(PROJECT1, PKG1));
         assertTrue(view.bot().tree().selectTreeItem(PROJECT1, SRC, PKG1)
             .existsSubItemWithRegex(changeToRegex(CLS1)));
 
-        assertTrue(alice.sarosBot().file()
+        assertTrue(alice.sarosBot().state()
             .existsClassNoGUI(PROJECT1, PKG1, CLS1));
         alice.sarosBot().file().newClass(PROJECT1, PKG1, CLS2);
 
         assertTrue(view.bot().tree().selectTreeItem(PROJECT1, SRC, PKG1)
             .existsSubItemWithRegex(changeToRegex(CLS2)));
-        assertTrue(alice.sarosBot().file()
+        assertTrue(alice.sarosBot().state()
             .existsClassNoGUI(PROJECT1, PKG1, CLS2));
     }
 

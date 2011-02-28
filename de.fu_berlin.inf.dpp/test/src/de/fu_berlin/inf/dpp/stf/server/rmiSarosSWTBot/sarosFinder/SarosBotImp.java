@@ -2,19 +2,11 @@ package de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder;
 
 import java.rmi.RemoteException;
 
-import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.IResource;
-import org.eclipse.core.resources.IWorkspaceRoot;
-import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.core.runtime.Path;
+import org.eclipse.swtbot.swt.finder.widgets.TimeoutException;
 
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.stf.STF;
 import de.fu_berlin.inf.dpp.stf.client.testProject.testsuits.STFTest.TypeOfCreateProject;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.conditions.SarosConditions;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.STFWorkbenchBot;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.STFWorkbenchBotImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotShell;
@@ -22,8 +14,6 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponen
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.menuBar.EditMImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.menuBar.FileM;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.menuBar.FileMImp;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.menuBar.RefactorM;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.menuBar.RefactorMImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.menuBar.SarosM;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.menuBar.SarosMImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.menuBar.WindowM;
@@ -42,9 +32,6 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponen
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.views.sarosViews.RosterViewImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.views.sarosViews.SessionView;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.views.sarosViews.SessionViewImp;
-import de.fu_berlin.inf.dpp.util.FileUtils;
-import de.fu_berlin.inf.dpp.vcs.VCSAdapter;
-import de.fu_berlin.inf.dpp.vcs.VCSResourceInfo;
 
 public class SarosBotImp extends STF implements SarosBot {
 
@@ -54,7 +41,9 @@ public class SarosBotImp extends STF implements SarosBot {
 
     private static EditMImp editM;
     private static FileMImp fileM;
-    private static RefactorMImp refactorM;
+
+    private static StateImp state;
+    private static WaitImp wait;
     private static SarosMImp sarosM;
 
     private static WindowMImp windowM;
@@ -75,9 +64,10 @@ public class SarosBotImp extends STF implements SarosBot {
         self = new SarosBotImp();
         bot = STFWorkbenchBotImp.getInstance();
 
+        wait = WaitImp.getInstance();
+        state = StateImp.getInstance();
         editM = EditMImp.getInstance();
         fileM = FileMImp.getInstance();
-        refactorM = RefactorMImp.getInstance();
         sarosM = SarosMImp.getInstance();
         windowM = WindowMImp.getInstance();
         chatV = ChatViewImp.getInstance();
@@ -107,6 +97,14 @@ public class SarosBotImp extends STF implements SarosBot {
         return bot;
     }
 
+    public State state() throws RemoteException {
+        return state;
+    }
+
+    public Wait condition() throws RemoteException {
+        return wait;
+    }
+
     public FileM file() throws RemoteException {
         bot.activateWorkbench();
         return fileM;
@@ -115,10 +113,6 @@ public class SarosBotImp extends STF implements SarosBot {
     public EditM edit() throws RemoteException {
         bot.activateWorkbench();
         return editM;
-    }
-
-    public RefactorM refactor() throws RemoteException {
-        return refactorM;
     }
 
     public SarosM saros() throws RemoteException {
@@ -167,81 +161,6 @@ public class SarosBotImp extends STF implements SarosBot {
 
     /**********************************************
      * 
-     * states
-     * 
-     **********************************************/
-    public boolean isProjectManagedBySVN(String projectName)
-        throws RemoteException {
-        IProject project = ResourcesPlugin.getWorkspace().getRoot()
-            .getProject(projectName);
-        final VCSAdapter vcs = VCSAdapter.getAdapter(project);
-        if (vcs == null)
-            return false;
-        return true;
-    }
-
-    public String getRevision(String fullPath) throws RemoteException {
-        IPath path = new Path(fullPath);
-        IResource resource = ResourcesPlugin.getWorkspace().getRoot()
-            .findMember(path);
-        if (resource == null)
-            throw new RemoteException("Resource \"" + fullPath
-                + "\" not found.");
-        final VCSAdapter vcs = VCSAdapter.getAdapter(resource.getProject());
-        if (vcs == null)
-            return null;
-        VCSResourceInfo info = vcs.getCurrentResourceInfo(resource);
-        String result = info != null ? info.revision : null;
-        return result;
-    }
-
-    public String getURLOfRemoteResource(String fullPath)
-        throws RemoteException {
-        IPath path = new Path(fullPath);
-        IResource resource = ResourcesPlugin.getWorkspace().getRoot()
-            .findMember(path);
-        if (resource == null)
-            throw new RemoteException("Resource not found at \"" + fullPath
-                + "\"");
-        final VCSAdapter vcs = VCSAdapter.getAdapter(resource.getProject());
-        if (vcs == null)
-            return null;
-        final VCSResourceInfo info = vcs.getResourceInfo(resource);
-        return info.url;
-    }
-
-    /**********************************************
-     * 
-     * waits until
-     * 
-     **********************************************/
-    public void waitUntilWindowSarosRunningVCSOperationClosed()
-        throws RemoteException {
-        bot().waitsUntilShellIsClosed(SHELL_SAROS_RUNNING_VCS_OPERATION);
-    }
-
-    public void waitUntilProjectInSVN(String projectName)
-        throws RemoteException {
-        bot().waitUntil(SarosConditions.isInSVN(projectName));
-    }
-
-    public void waitUntilProjectNotInSVN(String projectName)
-        throws RemoteException {
-        bot().waitUntil(SarosConditions.isNotInSVN(projectName));
-    }
-
-    public void waitUntilRevisionIsSame(String fullPath, String revision)
-        throws RemoteException {
-        bot().waitUntil(SarosConditions.isRevisionSame(fullPath, revision));
-    }
-
-    public void waitUntilUrlIsSame(String fullPath, String url)
-        throws RemoteException {
-        bot().waitUntil(SarosConditions.isUrlSame(fullPath, url));
-    }
-
-    /**********************************************
-     * 
      * shells
      * 
      **********************************************/
@@ -281,28 +200,9 @@ public class SarosBotImp extends STF implements SarosBot {
         STFBotShell shell = bot().shell(SHELL_ADD_PROJECT);
         shell.activate();
         shell.bot().radio(RADIO_USING_EXISTING_PROJECT).click();
-
-        // bot.button(BUTTON_BROWSE).click();
-        // windowPart.activateShellWithText(FOLDER_SELECTION);
-        // windowPart.confirmWindowWithTree(FOLDER_SELECTION, OK,
-        // helperPart.changeToRegex(projectName));
-        // windowPart.waitUntilShellCloses(FOLDER_SELECTION);
         shell.bot().textWithLabel("Project name", 1).setText(projectName);
         shell.bot().button(FINISH).click();
-        /*
-         * if there are some files locally, which are not saved yet, you will
-         * get a popup window with the title "Save Resource" after you comfirm
-         * the window "Warning: Local changes will be deleted" with YES.
-         */
 
-        // if (windowPart.isShellActive(SHELL_SAVE_RESOURCE)) {
-        // windowPart.confirmWindow(SHELL_SAVE_RESOURCE, YES);
-        /*
-         * If there are local unsaved files, it take more time for the session
-         * invitation to complete. So waitUntilShellCloses is necessary here.
-         */
-        // windowPart.waitUntilShellCloses(bot.shell(SHELL_SAVE_RESOURCE));
-        // }
         if (bot().isShellOpen(SHELL_WARNING_LOCAL_CHANGES_DELETED))
             bot().shell(SHELL_WARNING_LOCAL_CHANGES_DELETED).confirm(YES);
 
@@ -310,8 +210,6 @@ public class SarosBotImp extends STF implements SarosBot {
             && bot().shell(SHELL_SAVE_RESOURCE).isActive()) {
             bot().shell(SHELL_SAVE_RESOURCE).confirm(YES);
         }
-
-        // windowPart.confirmWindow(WARNING_LOCAL_CHANGES_DELETED, YES);
 
         /*
          * after the release 10.10.28 it take less time for the session
@@ -363,20 +261,6 @@ public class SarosBotImp extends STF implements SarosBot {
         bot().shell(SHELL_ADD_PROJECT).waitLongUntilIsClosed();
     }
 
-    public void confirmShellSessionnInvitation() throws RemoteException {
-        STFBotShell shell = bot().shell(SHELL_SESSION_INVITATION);
-        if (!shell.activate())
-            shell.waitUntilActive();
-        shell.bot().button(FINISH).click();
-    }
-
-    public void confirmWindowInvitationCancelled() throws RemoteException {
-        STFBotShell shell = bot().shell(SHELL_INVITATION_CANCELLED);
-        shell.activate();
-        shell.setFocus();
-        shell.bot().button().click();
-    }
-
     public void confirmShellAddProjectUsingWhichProject(String projectName,
         TypeOfCreateProject usingWhichProject) throws RemoteException {
         bot().waitUntilShellIsOpen(SHELL_ADD_PROJECT);
@@ -399,101 +283,65 @@ public class SarosBotImp extends STF implements SarosBot {
         }
     }
 
-    /**********************************************
-     * 
-     * No Gui
-     * 
-     **********************************************/
-    public void switchProject(String projectName, String url)
+    public void confirmShellChangeXMPPAccount(String newServer,
+        String newUserName, String newPassword) throws RemoteException {
+        bot().waitUntilShellIsOpen(SHELL_CHANGE_ACCOUNT);
+        STFBotShell shell = bot().shell(SHELL_CHANGE_ACCOUNT);
+        shell.activate();
+        shell.bot().textWithLabel("Server").setText(newServer);
+        shell.bot().textWithLabel("Username:").setText(newUserName);
+        shell.bot().textWithLabel("Password:").setText(newPassword);
+        shell.bot().textWithLabel("Confirm:").setText(newPassword);
+
+        shell.bot().button(FINISH).click();
+    }
+
+    public void confirmShellCreateNewXMPPAccount(JID jid, String password)
         throws RemoteException {
-        switchResource(projectName, url, "HEAD");
+        bot().waitUntilShellIsOpen(SHELL_CREATE_NEW_XMPP_ACCOUNT);
+        STFBotShell shell = bot().shell(SHELL_CREATE_NEW_XMPP_ACCOUNT);
+        shell.activate();
+        shell.bot().textWithLabel(LABEL_XMPP_JABBER_SERVER)
+            .setText(jid.getDomain());
+        shell.bot().textWithLabel(LABEL_USER_NAME).setText(jid.getName());
+        shell.bot().textWithLabel(LABEL_PASSWORD).setText(password);
+        shell.bot().textWithLabel(LABEL_REPEAT_PASSWORD).setText(password);
+
+        shell.bot().button(FINISH).click();
+        try {
+            shell.waitShortUntilIsClosed();
+        } catch (TimeoutException e) {
+            String errorMessage = shell.getErrorMessage();
+            if (errorMessage.matches(ERROR_MESSAGE_TOO_FAST_REGISTER_ACCOUNTS
+                + ".*"))
+                throw new RuntimeException(
+                    "You are not allowed to register accounts so fast!");
+            else if (errorMessage.matches(ERROR_MESSAGE_ACCOUNT_ALREADY_EXISTS
+                + ".*\n*.*"))
+                throw new RuntimeException("The Account " + jid.getBase()
+                    + " is already existed!");
+        }
     }
 
-    public void switchResource(String fullPath, String url)
+    public void confirmWizardSarosConfiguration(JID jid, String password)
         throws RemoteException {
-        switchResource(fullPath, url, "HEAD");
+        bot().waitUntilShellIsOpen(SHELL_SAROS_CONFIGURATION);
+        STFBotShell shell = bot().shell(SHELL_SAROS_CONFIGURATION);
+        shell.activate();
+        shell.bot().textWithLabel(LABEL_XMPP_JABBER_SERVER)
+            .setText(jid.getDomain());
+        shell.bot().textWithLabel(LABEL_USER_NAME).setText(jid.getName());
+        shell.bot().textWithLabel(LABEL_PASSWORD).setText(password);
+
+        shell.bot().button(NEXT).click();
+        shell.bot().button(FINISH).click();
     }
 
-    public void switchResource(String fullPath, String url, String revision)
+    public void confirmShellInvitation(String... baseJIDOfinvitees)
         throws RemoteException {
-
-        final IPath path = new Path(fullPath);
-        final IResource resource = ResourcesPlugin.getWorkspace().getRoot()
-            .findMember(path);
-        if (resource == null)
-            throw new RemoteException("Resource \"" + path + "\" not found.");
-
-        final IProject project = resource.getProject();
-        VCSAdapter vcs = VCSAdapter.getAdapter(project);
-        if (vcs == null) {
-            throw new RemoteException("No VCSAdapter found for \""
-                + project.getName() + "\".");
-        }
-
-        vcs.switch_(resource, url, revision, new NullProgressMonitor());
+        bot().waitUntilShellIsOpen(SHELL_INVITATION);
+        STFBotShell shell = bot().shell(SHELL_INVITATION);
+        shell.activate();
+        shell.confirmWithCheckBoxs(FINISH, baseJIDOfinvitees);
     }
-
-    public void deleteProjectNoGUI(String projectName) throws RemoteException {
-        IPath path = new Path(projectName);
-        deleteNoGUI(path);
-    }
-
-    public void deleteFolderNoGUI(String... folderNodes) throws RemoteException {
-        IPath path = new Path(getPath(folderNodes));
-        deleteNoGUI(path);
-    }
-
-    public void deletePkgNoGUI(String projectName, String pkg)
-        throws RemoteException {
-        if (pkg.matches("[\\w*\\.]*\\w*")) {
-            IPath path = new Path(getPkgPath(projectName, pkg));
-            deleteNoGUI(path);
-        } else {
-            throw new RuntimeException(
-                "The passed parameter \"pkg\" isn't valid, the package name should corresponds to the pattern [\\w\\.]*\\w+ e.g. PKG1.PKG2.PKG3");
-        }
-    }
-
-    public void deleteClassNoGUI(String projectName, String pkg,
-        String className) throws RemoteException {
-        IPath path = new Path(getClassPath(projectName, pkg, className));
-        deleteNoGUI(path);
-    }
-
-    public void deleteAllProjectsNoGUI() throws RemoteException {
-        final IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
-        IProject[] projects = root.getProjects();
-        for (int i = 0; i < projects.length; i++) {
-            try {
-                FileUtils.delete(projects[i]);
-                root.refreshLocal(IResource.DEPTH_INFINITE, null);
-            } catch (CoreException e) {
-                log.debug("Couldn't delete files ", e);
-            }
-        }
-    }
-
-    /**************************************************************
-     * 
-     * inner functions
-     * 
-     **************************************************************/
-
-    private void deleteNoGUI(IPath path) {
-        final IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
-        IResource resource = root.findMember(path);
-        if (resource == null) {
-            log.debug(" Can't find resource");
-            return;
-        }
-        if (resource.isAccessible()) {
-            try {
-                FileUtils.delete(resource);
-                root.refreshLocal(IResource.DEPTH_INFINITE, null);
-            } catch (CoreException e) {
-                log.debug("Couldn't delete the resource", e);
-            }
-        }
-    }
-
 }

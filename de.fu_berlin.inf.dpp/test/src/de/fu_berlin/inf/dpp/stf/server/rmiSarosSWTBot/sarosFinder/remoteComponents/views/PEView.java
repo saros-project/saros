@@ -22,6 +22,9 @@ public interface PEView extends EclipseComponent {
 
     public ContextMenuWrapper tree() throws RemoteException;
 
+    public ContextMenuWrapper selectJavaProject(String projectName)
+        throws RemoteException;
+
     /**
      * select the given project.
      * 
@@ -29,7 +32,8 @@ public interface PEView extends EclipseComponent {
      *            the name of the project
      * @throws RemoteException
      */
-    public ContextMenuWrapper selectProject(String projectName) throws RemoteException;
+    public ContextMenuWrapper selectProject(String projectName)
+        throws RemoteException;
 
     /**
      * select the given package
@@ -79,7 +83,8 @@ public interface PEView extends EclipseComponent {
      *            {"Foo-saros","myFolder", "myFile.xml"}
      * @throws RemoteException
      */
-    public ContextMenuWrapper selectFile(String... fileNodes) throws RemoteException;
+    public ContextMenuWrapper selectFile(String... fileNodes)
+        throws RemoteException;
 
     public OpenC open() throws RemoteException;
 

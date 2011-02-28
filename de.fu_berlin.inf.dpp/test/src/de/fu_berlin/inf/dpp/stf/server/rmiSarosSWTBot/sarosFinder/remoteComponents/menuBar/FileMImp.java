@@ -5,11 +5,14 @@ import java.rmi.RemoteException;
 import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
 
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotShell;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotTreeItem;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.EclipseComponentImp;
 
 public class FileMImp extends EclipseComponentImp implements FileM {
 
     private static transient FileMImp fileImp;
+
+    private STFBotTreeItem treeItem;
 
     /**
      * {@link FileMImp} is a singleton, but inheritance is possible.
@@ -19,6 +22,10 @@ public class FileMImp extends EclipseComponentImp implements FileM {
             return fileImp;
         fileImp = new FileMImp();
         return fileImp;
+    }
+
+    public void setTreeItem(STFBotTreeItem treeItem) {
+        this.treeItem = treeItem;
     }
 
     /**************************************************************
@@ -33,7 +40,7 @@ public class FileMImp extends EclipseComponentImp implements FileM {
      * 
      **********************************************/
     public void newProject(String projectName) throws RemoteException {
-        if (!existsProjectNoGUI(projectName)) {
+        if (!sarosBot().state().existsProjectNoGUI(projectName)) {
             precondition();
             bot().menu(MENU_FILE).menu(MENU_NEW).menu(MENU_PROJECT).click();
 
@@ -42,7 +49,7 @@ public class FileMImp extends EclipseComponentImp implements FileM {
     }
 
     public void newJavaProject(String projectName) throws RemoteException {
-        if (!existsProjectNoGUI(projectName)) {
+        if (!sarosBot().state().existsProjectNoGUI(projectName)) {
             precondition();
             bot().menu(MENU_FILE).menu(MENU_NEW).menu(MENU_JAVA_PROJECT)
                 .click();
@@ -53,7 +60,7 @@ public class FileMImp extends EclipseComponentImp implements FileM {
 
     public void newFolder(String... folderNodes) throws RemoteException {
         precondition();
-        if (!existsFolderNoGUI(folderNodes)) {
+        if (!sarosBot().state().existsFolderNoGUI(folderNodes)) {
             try {
                 bot().menu(MENU_FILE).menu(MENU_NEW).menu(MENU_FOLDER).click();
                 confirmShellNewFolder(folderNodes);
@@ -68,7 +75,7 @@ public class FileMImp extends EclipseComponentImp implements FileM {
     public void newPackage(String projectName, String pkg)
         throws RemoteException {
         if (pkg.matches(PKG_REGEX)) {
-            if (!existsPkgNoGUI(projectName, pkg))
+            if (!sarosBot().state().existsPkgNoGUI(projectName, pkg))
                 try {
                     precondition();
                     bot().menu(MENU_FILE).menu(MENU_NEW).menu(MENU_PACKAGE)
@@ -86,7 +93,7 @@ public class FileMImp extends EclipseComponentImp implements FileM {
     }
 
     public void newFile(String... fileNodes) throws RemoteException {
-        if (!existsFileNoGUI(getPath(fileNodes)))
+        if (!sarosBot().state().existsFileNoGUI(getPath(fileNodes)))
             try {
                 precondition();
                 bot().menu(MENU_FILE).menu(MENU_NEW).menu(MENU_FILE).click();
@@ -100,7 +107,8 @@ public class FileMImp extends EclipseComponentImp implements FileM {
 
     public void newClass(String projectName, String pkg, String className)
         throws RemoteException {
-        if (!existsFileNoGUI(getClassPath(projectName, pkg, className))) {
+        if (!sarosBot().state().existsFileNoGUI(
+            getClassPath(projectName, pkg, className))) {
             try {
                 precondition();
                 bot().menu(MENU_FILE).menu(MENU_NEW).menu(MENU_CLASS).click();
@@ -115,7 +123,8 @@ public class FileMImp extends EclipseComponentImp implements FileM {
 
     public void newClassImplementsRunnable(String projectName, String pkg,
         String className) throws RemoteException {
-        if (!existsFileNoGUI(getClassPath(projectName, pkg, className))) {
+        if (!sarosBot().state().existsFileNoGUI(
+            getClassPath(projectName, pkg, className))) {
             precondition();
             bot().menu(MENU_FILE).menu(MENU_NEW).menu(MENU_CLASS).click();
             STFBotShell shell_new = bot().shell(SHELL_NEW_JAVA_CLASS);
