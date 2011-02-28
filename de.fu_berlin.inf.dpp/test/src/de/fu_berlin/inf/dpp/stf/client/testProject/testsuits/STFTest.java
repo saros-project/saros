@@ -408,24 +408,29 @@ public class STFTest extends STF {
     public static void resetWriteAccess(Tester host, Tester... invitees)
         throws RemoteException {
         for (Tester tester : invitees) {
-            if (tester.sarosBot().sessionView().isInSession()
-                && tester.sarosBot().sessionView().hasReadOnlyAccess()) {
-                host.sarosBot().sessionView().grantWriteAccess(tester.jid);
+            if (tester.sarosBot().state().isInSession()
+                && tester.sarosBot().state().hasReadOnlyAccess()) {
+                host.sarosBot().sessionView().selectBuddy(tester.jid)
+                    .grantWriteAccess();
             }
         }
 
-        if (host.sarosBot().sessionView().isInSessionNoGUI()
-            && !host.sarosBot().sessionView().hasWriteAccessNoGUI()) {
-            host.sarosBot().sessionView().grantWriteAccess(host.jid);
+        if (host.sarosBot().state().isInSessionNoGUI()
+            && !host.sarosBot().state().hasWriteAccessNoGUI()) {
+            host.sarosBot().sessionView().selectBuddy(host.jid)
+                .grantWriteAccess();
         }
     }
 
     public static void resetFollowModeSequentially(Tester... buddiesFollowing)
         throws RemoteException {
         for (Tester tester : buddiesFollowing) {
-            if (tester.sarosBot().sessionView().isInSessionNoGUI()
-                && tester.sarosBot().sessionView().isFollowing()) {
-                tester.sarosBot().sessionView().stopFollowing();
+            if (tester.sarosBot().state().isInSessionNoGUI()
+                && tester.sarosBot().state().isFollowing()) {
+                JID followedBuddyJID = tester.sarosBot().state()
+                    .getFollowedBuddyJIDNoGUI();
+                tester.sarosBot().sessionView().selectBuddy(followedBuddyJID)
+                    .stopFollowingThisBuddy();
             }
         }
     }
@@ -445,7 +450,10 @@ public class STFTest extends STF {
             final Tester tester = buddiesFollowing[i];
             stopFollowTasks.add(new Callable<Void>() {
                 public Void call() throws Exception {
-                    tester.sarosBot().sessionView().stopFollowing();
+                    JID followedBuddyJID = tester.sarosBot().state()
+                        .getFollowedBuddyJIDNoGUI();
+                    tester.sarosBot().sessionView()
+                        .selectBuddy(followedBuddyJID).stopFollowingThisBuddy();
                     return null;
                 }
             });
@@ -468,7 +476,7 @@ public class STFTest extends STF {
 
     public static void reBuildSession(Tester host, Tester... invitees)
         throws RemoteException {
-        if (!host.sarosBot().sessionView().isInSessionNoGUI()) {
+        if (!host.sarosBot().state().isInSessionNoGUI()) {
             for (Tester tester : invitees) {
                 buildSessionSequentially(PROJECT1, CM_SHARE_PROJECT,
                     TypeOfCreateProject.EXIST_PROJECT, host, tester);
@@ -553,7 +561,7 @@ public class STFTest extends STF {
                         .confirm(FINISH);
                     invitee.sarosBot().confirmShellAddProjectUsingWhichProject(
                         projectName, usingWhichProject);
-                    invitee.sarosBot().sessionView().waitUntilIsInSession();
+                    invitee.sarosBot().condition().waitUntilIsInSession();
                     return null;
                 }
             });
@@ -578,15 +586,14 @@ public class STFTest extends STF {
         Tester host = null;
         List<Callable<Void>> closeSessionTasks = new ArrayList<Callable<Void>>();
         for (final Tester tester : activeTesters) {
-            if (tester.sarosBot().sessionView().isHostNoGUI()) {
+            if (tester.sarosBot().state().isHostNoGUI()) {
                 host = tester;
             } else {
-                if (tester.sarosBot().sessionView().isInSessionNoGUI()) {
+                if (tester.sarosBot().state().isInSessionNoGUI()) {
                     closeSessionTasks.add(new Callable<Void>() {
                         public Void call() throws Exception {
                             // Need to check for isDriver before leaving.
-                            tester.sarosBot().sessionView()
-                                .confirmShellClosingTheSession();
+                            tester.sarosBot().confirmShellClosingTheSession();
                             return null;
                         }
                     });
@@ -594,7 +601,7 @@ public class STFTest extends STF {
             }
         }
         if (host != null)
-            host.sarosBot().sessionView().leaveTheSessionByHost();
+            host.sarosBot().sessionView().leaveTheSessionByPeer();
         MakeOperationConcurrently.workAll(closeSessionTasks);
     }
 
@@ -618,7 +625,7 @@ public class STFTest extends STF {
         List<Callable<Void>> leaveTasks = new ArrayList<Callable<Void>>();
         for (final Tester tester : activeTesters) {
 
-            if (tester.sarosBot().sessionView().isHostNoGUI()) {
+            if (tester.sarosBot().state().isHostNoGUI()) {
                 host = tester;
             } else {
                 peerJIDs.add(tester.jid);
@@ -633,11 +640,10 @@ public class STFTest extends STF {
 
         MakeOperationConcurrently.workAll(leaveTasks);
         if (host != null) {
-            host.sarosBot().sessionView()
-                .waitUntilAllPeersLeaveSession(peerJIDs);
+            host.sarosBot().condition().waitUntilAllPeersLeaveSession(peerJIDs);
             host.bot().view(VIEW_SAROS_SESSION)
                 .toolbarButton(TB_LEAVE_THE_SESSION).click();
-            host.sarosBot().sessionView().waitUntilIsNotInSession();
+            host.sarosBot().condition().waitUntilIsNotInSession();
         }
 
     }
@@ -658,7 +664,7 @@ public class STFTest extends STF {
             followTasks.add(new Callable<Void>() {
                 public Void call() throws Exception {
                     tester.sarosBot().sessionView()
-                        .followThisBuddy(followedBuddy.jid);
+                        .selectBuddy(followedBuddy.jid).followThisBuddy();
                     return null;
                 }
             });

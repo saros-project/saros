@@ -152,4 +152,12 @@ public interface SarosBot extends Remote {
     public void confirmShellInvitation(String... inviteesBaseJIDs)
         throws RemoteException;
 
+    /**
+     * Confirm the popUp window "Closing the session", which would be triggered,
+     * when host try to leave a session.
+     * 
+     * @throws RemoteException
+     */
+    public void confirmShellClosingTheSession() throws RemoteException;
+
 }

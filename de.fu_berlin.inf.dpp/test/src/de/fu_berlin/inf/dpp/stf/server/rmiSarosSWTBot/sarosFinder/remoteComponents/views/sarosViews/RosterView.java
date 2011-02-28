@@ -293,6 +293,8 @@ public interface RosterView extends SarosComponent {
      */
     public void resetAllBuddyNameNoGUI() throws RemoteException;
 
+    public void resetBuddiesName(JID... jids) throws RemoteException;
+
     /**
      * rename the buddy'name specified with the given baseJID to the given
      * newName

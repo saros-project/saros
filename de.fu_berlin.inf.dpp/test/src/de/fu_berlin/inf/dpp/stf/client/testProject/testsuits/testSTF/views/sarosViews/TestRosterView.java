@@ -41,6 +41,7 @@ public class TestRosterView extends STFTest {
     public void runAfterEveryTest() throws RemoteException {
         resetBuddiesName();
         resetBuddies();
+
     }
 
     @Test
@@ -183,12 +184,12 @@ public class TestRosterView extends STFTest {
     public void inviteBuddyWithGUI() throws RemoteException,
         InterruptedException {
         setUpSessionWithAJavaProjectAndAClass(alice, bob);
-        assertFalse(carl.sarosBot().sessionView().isInSession());
+        assertFalse(carl.sarosBot().state().isInSession());
         alice.sarosBot().buddiesView().inviteBuddy(carl.jid);
         carl.bot().shell(SHELL_SESSION_INVITATION).confirm(FINISH);
         carl.sarosBot().confirmShellAddProjectWithNewProject(PROJECT1);
-        carl.sarosBot().sessionView().waitUntilIsInSession();
-        assertTrue(carl.sarosBot().sessionView().isInSession());
+        carl.sarosBot().condition().waitUntilIsInSession();
+        assertTrue(carl.sarosBot().state().isInSession());
 
     }
 }

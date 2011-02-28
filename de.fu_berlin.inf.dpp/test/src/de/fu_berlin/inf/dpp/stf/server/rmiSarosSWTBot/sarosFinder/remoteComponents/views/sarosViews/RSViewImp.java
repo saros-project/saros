@@ -2,12 +2,13 @@ package de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteCompone
 
 import java.rmi.RemoteException;
 
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotView;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.SarosComponentImp;
 
 public class RSViewImp extends SarosComponentImp implements RSView {
-    // public static RemoteScreenViewObjectImp classVariable;
 
     private static transient RSViewImp self;
+    private STFBotView view;
 
     /**
      * {@link ChatViewImp} is a singleton, but inheritance is possible.
@@ -17,6 +18,11 @@ public class RSViewImp extends SarosComponentImp implements RSView {
             return self;
         self = new RSViewImp();
         return self;
+    }
+
+    public RSView setView(STFBotView view) {
+        this.view = view;
+        return this;
     }
 
     /**************************************************************
@@ -33,8 +39,7 @@ public class RSViewImp extends SarosComponentImp implements RSView {
     public void clickTBChangeModeOfImageSource() throws RemoteException {
         preCondition();
         bot().view(VIEW_REMOTE_SCREEN)
-            .toolbarButton(TB_CHANGE_MODE_IMAGE_SOURCE)
-            .click();
+            .toolbarButton(TB_CHANGE_MODE_IMAGE_SOURCE).click();
     }
 
     public void clickTBStopRunningSession() throws RemoteException {
@@ -45,14 +50,12 @@ public class RSViewImp extends SarosComponentImp implements RSView {
 
     public void clickTBResume() throws RemoteException {
         preCondition();
-        bot().view(VIEW_REMOTE_SCREEN).toolbarButton(TB_RESUME)
-            .click();
+        bot().view(VIEW_REMOTE_SCREEN).toolbarButton(TB_RESUME).click();
     }
 
     public void clickTBPause() throws RemoteException {
         preCondition();
-        bot().view(VIEW_REMOTE_SCREEN).toolbarButton(TB_PAUSE)
-            .click();
+        bot().view(VIEW_REMOTE_SCREEN).toolbarButton(TB_PAUSE).click();
     }
 
     public void confirmShellIncomingScreensharingSession(String YesOrNot)

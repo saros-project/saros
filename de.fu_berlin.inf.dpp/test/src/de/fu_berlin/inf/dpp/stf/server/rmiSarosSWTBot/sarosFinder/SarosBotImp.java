@@ -93,7 +93,7 @@ public class SarosBotImp extends STF implements SarosBot {
      * 
      **********************************************/
 
-    public STFWorkbenchBot bot() {
+    private STFWorkbenchBot bot() {
         return bot;
     }
 
@@ -126,19 +126,27 @@ public class SarosBotImp extends STF implements SarosBot {
     }
 
     public ChatView chatView() throws RemoteException {
-        return chatV;
+        bot.openViewById(VIEW_SAROS_CHAT_ID);
+        bot.view(VIEW_SAROS_CHAT).show();
+        return chatV.setView(bot.view(VIEW_SAROS_CHAT));
     }
 
     public RosterView buddiesView() throws RemoteException {
-        return rosterV;
+        bot.openViewById(VIEW_SAROS_BUDDIES_ID);
+        bot.view(VIEW_SAROS_BUDDIES).show();
+        return rosterV.setView(bot.view(VIEW_SAROS_BUDDIES));
     }
 
     public RSView remoteScreenView() throws RemoteException {
-        return rsV;
+        bot.openViewById(VIEW_REMOTE_SCREEN_ID);
+        bot.view(VIEW_REMOTE_SCREEN).show();
+        return rsV.setView(bot.view(VIEW_REMOTE_SCREEN));
     }
 
     public SessionView sessionView() throws RemoteException {
-        return sessionV;
+        bot.openViewById(VIEW_SAROS_SESSION_ID);
+        bot.view(VIEW_SAROS_SESSION).show();
+        return sessionV.setView(bot.view(VIEW_SAROS_SESSION));
     }
 
     public ConsoleView consoleView() throws RemoteException {
@@ -148,11 +156,13 @@ public class SarosBotImp extends STF implements SarosBot {
     public PEView packageExplorerView() throws RemoteException {
         bot.openViewById(VIEW_PACKAGE_EXPLORER_ID);
         bot.view(VIEW_PACKAGE_EXPLORER).show();
-        return pEV.setWidget(bot.view(VIEW_PACKAGE_EXPLORER).bot().tree());
+        return pEV.setView(bot.view(VIEW_PACKAGE_EXPLORER));
     }
 
     public ProgressView progressView() throws RemoteException {
-        return progressvV;
+        bot.openViewById(VIEW_PROGRESS_ID);
+        bot.view(VIEW_PROGRESS).show();
+        return progressvV.setView(bot.view(VIEW_PROGRESS));
     }
 
     public void setJID(JID jid) throws RemoteException {
@@ -343,5 +353,12 @@ public class SarosBotImp extends STF implements SarosBot {
         STFBotShell shell = bot().shell(SHELL_INVITATION);
         shell.activate();
         shell.confirmWithCheckBoxs(FINISH, baseJIDOfinvitees);
+    }
+
+    public void confirmShellClosingTheSession() throws RemoteException {
+        bot().waitUntilShellIsOpen(SHELL_CLOSING_THE_SESSION);
+        bot().shell(SHELL_CLOSING_THE_SESSION).activate();
+        bot().shell(SHELL_CLOSING_THE_SESSION).confirm(OK);
+        bot().waitsUntilShellIsClosed(SHELL_CLOSING_THE_SESSION);
     }
 }

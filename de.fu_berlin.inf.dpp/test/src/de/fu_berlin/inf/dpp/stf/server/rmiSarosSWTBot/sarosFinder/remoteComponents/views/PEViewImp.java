@@ -3,19 +3,21 @@ package de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteCompone
 import java.rmi.RemoteException;
 
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotTree;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotView;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.EclipseComponentImp;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.contextMenu.ContextMenuWrapper;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.contextMenu.ContextMenuWrapperImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.contextMenu.OpenC;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.contextMenu.OpenCImp;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.contextMenu.SarosContextMenuWrapper;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.contextMenu.SarosContextMenuWrapperImp;
 
 public class PEViewImp extends EclipseComponentImp implements PEView {
 
+    private STFBotView view;
     private STFBotTree tree;
     private static transient PEViewImp pEViewImp;
     private static OpenCImp openC;
 
-    private static ContextMenuWrapperImp contextMenu;
+    private static SarosContextMenuWrapperImp contextMenu;
 
     /**
      * {@link PEViewImp} is a singleton, but inheritance is possible.
@@ -25,14 +27,13 @@ public class PEViewImp extends EclipseComponentImp implements PEView {
             return pEViewImp;
         pEViewImp = new PEViewImp();
         openC = OpenCImp.getInstance();
-
-        contextMenu = ContextMenuWrapperImp.getInstance();
-
+        contextMenu = SarosContextMenuWrapperImp.getInstance();
         return pEViewImp;
     }
 
-    public PEView setWidget(STFBotTree tree) {
-        this.tree = tree;
+    public PEView setView(STFBotView view) throws RemoteException {
+        this.view = view;
+        tree = view.bot().tree();
         return this;
     }
 
@@ -52,28 +53,18 @@ public class PEViewImp extends EclipseComponentImp implements PEView {
         return openC;
     }
 
-    // public SarosC saros() throws RemoteException {
-    // sarosC.setView(tree);
-    // return sarosC;
-    // }
-    //
-    // public TeamC team() throws RemoteException {
-    // teamC.setView(tree);
-    // return teamC;
-    // }
-
     /**********************************************
      * 
      * actions
      * 
      **********************************************/
 
-    public ContextMenuWrapper tree() throws RemoteException {
+    public SarosContextMenuWrapper tree() throws RemoteException {
         contextMenu.setTree(tree);
         return contextMenu;
     }
 
-    public ContextMenuWrapper selectJavaProject(String projectName)
+    public SarosContextMenuWrapper selectJavaProject(String projectName)
         throws RemoteException {
         contextMenu.setTreeItem(tree
             .selectTreeItemWithRegex(changeToRegex(projectName)));
@@ -81,7 +72,7 @@ public class PEViewImp extends EclipseComponentImp implements PEView {
         return contextMenu;
     }
 
-    public ContextMenuWrapper selectProject(String projectName)
+    public SarosContextMenuWrapper selectProject(String projectName)
         throws RemoteException {
         contextMenu.setTreeItem(tree
             .selectTreeItemWithRegex(changeToRegex(projectName)));
@@ -89,7 +80,7 @@ public class PEViewImp extends EclipseComponentImp implements PEView {
         return contextMenu;
     }
 
-    public ContextMenuWrapper selectPkg(String projectName, String pkg)
+    public SarosContextMenuWrapper selectPkg(String projectName, String pkg)
         throws RemoteException {
         String[] nodes = { projectName, SRC, pkg };
         contextMenu.setTreeItem(tree
@@ -98,7 +89,7 @@ public class PEViewImp extends EclipseComponentImp implements PEView {
         return contextMenu;
     }
 
-    public ContextMenuWrapper selectClass(String projectName, String pkg,
+    public SarosContextMenuWrapper selectClass(String projectName, String pkg,
         String className) throws RemoteException {
 
         String[] nodes = getClassNodes(projectName, pkg, className);
@@ -108,7 +99,7 @@ public class PEViewImp extends EclipseComponentImp implements PEView {
         return contextMenu;
     }
 
-    public ContextMenuWrapper selectFolder(String... folderNodes)
+    public SarosContextMenuWrapper selectFolder(String... folderNodes)
         throws RemoteException {
         contextMenu.setTreeItem(tree
             .selectTreeItemWithRegex(changeToRegex(folderNodes)));
@@ -116,7 +107,7 @@ public class PEViewImp extends EclipseComponentImp implements PEView {
         return contextMenu;
     }
 
-    public ContextMenuWrapper selectFile(String... fileNodes)
+    public SarosContextMenuWrapper selectFile(String... fileNodes)
         throws RemoteException {
         contextMenu.setTreeItem(tree
             .selectTreeItemWithRegex(changeToRegex(fileNodes)));

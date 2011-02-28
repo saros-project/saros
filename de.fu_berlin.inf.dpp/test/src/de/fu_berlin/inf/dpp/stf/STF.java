@@ -347,6 +347,8 @@ public class STF {
         .getString("tb_send_a_file_to_selected_buddy");
     protected final static String TB_START_VOIP_SESSION = SarosMessages
         .getString("tb_start_a_voip_session");
+    protected final static String TB_NO_INCONSISTENCIES = SarosMessages
+        .getString("tb_no_inconsistencies");
     protected final static String TB_INCONSISTENCY_DETECTED = SarosMessages
         .getString("tb_inconsistency_detected_in");
     protected final static String TB_OPEN_INVITATION_INTERFACE = SarosMessages

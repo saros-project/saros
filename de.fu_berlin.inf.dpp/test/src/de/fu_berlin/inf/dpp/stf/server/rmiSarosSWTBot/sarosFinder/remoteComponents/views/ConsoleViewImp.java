@@ -6,11 +6,15 @@ import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
 import org.eclipse.swtbot.swt.finder.waits.DefaultCondition;
 
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotStyledText;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotTree;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotView;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.EclipseComponentImp;
 
 public class ConsoleViewImp extends EclipseComponentImp implements ConsoleView {
 
     private static transient ConsoleViewImp consoleViewObject;
+    private STFBotView view;
+    private STFBotTree tree;
 
     /**
      * {@link ConsoleViewImp} is a singleton, but inheritance is possible.
@@ -20,6 +24,12 @@ public class ConsoleViewImp extends EclipseComponentImp implements ConsoleView {
             return consoleViewObject;
         consoleViewObject = new ConsoleViewImp();
         return consoleViewObject;
+    }
+
+    public ConsoleView setView(STFBotView view) throws RemoteException {
+        this.view = view;
+        tree = view.bot().tree();
+        return this;
     }
 
     /**************************************************************

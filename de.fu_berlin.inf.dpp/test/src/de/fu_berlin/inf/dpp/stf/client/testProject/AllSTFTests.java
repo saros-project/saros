@@ -15,6 +15,8 @@ import de.fu_berlin.inf.dpp.stf.client.testProject.testsuits.invitation.TestShar
 import de.fu_berlin.inf.dpp.stf.client.testProject.testsuits.invitation.TestShare3UsersConcurrently;
 import de.fu_berlin.inf.dpp.stf.client.testProject.testsuits.invitation.TestShare3UsersSequentially;
 import de.fu_berlin.inf.dpp.stf.client.testProject.testsuits.invitation.TestShareProjectUsingExistingProject;
+import de.fu_berlin.inf.dpp.stf.client.testProject.testsuits.permissionsAndFollowmode.TestWriteAccessChangeAndImmediateWrite;
+import de.fu_berlin.inf.dpp.stf.client.testProject.testsuits.saving.TestCreatingNewFile;
 import de.fu_berlin.inf.dpp.stf.client.testProject.testsuits.testSTF.TestBasicSarosElements;
 
 @RunWith(Suite.class)
@@ -24,9 +26,8 @@ import de.fu_berlin.inf.dpp.stf.client.testProject.testsuits.testSTF.TestBasicSa
     TestShare3UsersConcurrently.class,
     TestShareProjectUsingExistingProject.class, TestEditDuringInvitation.class,
     TestSVNStateInitialization.class, TestFileOperations.class,
-    TestFolderOperations.class,
-
-    TestSVNStateUpdates.class })
+    TestFolderOperations.class, TestWriteAccessChangeAndImmediateWrite.class,
+    TestCreatingNewFile.class, TestSVNStateUpdates.class })
 public class AllSTFTests {
     /**
      * Run AllTests in the list of SuiteClasses annotation

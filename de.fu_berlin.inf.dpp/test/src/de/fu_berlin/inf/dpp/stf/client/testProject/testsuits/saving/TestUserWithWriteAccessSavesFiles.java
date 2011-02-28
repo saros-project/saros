@@ -47,8 +47,8 @@ public class TestUserWithWriteAccessSavesFiles extends STFTest {
             TypeOfCreateProject.NEW_PROJECT, alice, edna, bob, carl, dave);
         // alice.bot.waitUntilNoInvitationProgress();
         setFollowMode(alice, dave, edna);
-        dave.sarosBot().sessionView().waitUntilIsFollowingBuddy(alice.jid);
-        edna.sarosBot().sessionView().waitUntilIsFollowingBuddy(alice.jid);
+        dave.sarosBot().condition().waitUntilIsFollowingBuddy(alice.jid);
+        edna.sarosBot().condition().waitUntilIsFollowingBuddy(alice.jid);
 
     }
 
@@ -111,6 +111,8 @@ public class TestUserWithWriteAccessSavesFiles extends STFTest {
     @Test
     public void testNoChangeByExternalEditorByBob() throws IOException,
         CoreException {
+        alice.sarosBot().packageExplorerView()
+            .selectClass(PROJECT1, PKG1, CLS2).open();
         alice.bot().editor(CLS2_SUFFIX).setTextWithoutSave(CP1);
         String dirtyCls2ContentOfAlice = alice.bot().editor(CLS2_SUFFIX)
             .getText();
@@ -138,6 +140,8 @@ public class TestUserWithWriteAccessSavesFiles extends STFTest {
      */
     @Test
     public void testChangeByEclipseEditorByCarl() throws RemoteException {
+        alice.sarosBot().packageExplorerView()
+            .selectClass(PROJECT1, PKG1, CLS2).open();
         alice.bot().editor(CLS2_SUFFIX).setTextWithoutSave(CP1);
         String dirtyCls2ContentOfAlice = alice.bot().editor(CLS2_SUFFIX)
             .getText();
@@ -233,8 +237,10 @@ public class TestUserWithWriteAccessSavesFiles extends STFTest {
         IOException, CoreException {
         String clsConentofBob = bob.noBot().getFileContent(
             getClassPath(PROJECT1, PKG1, CLS1));
+        alice.sarosBot().packageExplorerView()
+            .selectClass(PROJECT1, PKG1, CLS1).open();
         alice.bot().editor(CLS1_SUFFIX).setTextWithoutSave(CP1);
-        alice.bot().editor(CLS1 + SUFFIX_JAVA).closeWithSave();
+        alice.bot().editor(CLS1_SUFFIX).closeWithSave();
         String clsConentOfAlice = alice.noBot().getFileContent(
             getClassPath(PROJECT1, PKG1, CLS1));
 

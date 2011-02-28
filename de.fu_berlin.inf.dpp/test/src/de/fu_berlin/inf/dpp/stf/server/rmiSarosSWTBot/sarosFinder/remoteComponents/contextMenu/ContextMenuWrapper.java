@@ -12,8 +12,6 @@ public interface ContextMenuWrapper extends EclipseComponent {
 
     public void delete() throws RemoteException;
 
-    public SarosC saros() throws RemoteException;
-
     public TeamC team() throws RemoteException;
 
     public RefactorC refactor() throws RemoteException;

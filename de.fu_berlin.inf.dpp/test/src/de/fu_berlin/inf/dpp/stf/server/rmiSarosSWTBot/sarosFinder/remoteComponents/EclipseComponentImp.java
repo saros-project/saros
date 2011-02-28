@@ -26,6 +26,10 @@ public class EclipseComponentImp extends STF implements EclipseComponent {
         JAVA_PROJECT, PROJECT, FILE, CLASS, PKG, FOLDER
     }
 
+    public enum BuddyRole {
+        HOST, PEER
+    }
+
     public static SarosSessionManager sessionManager;
     public static DataTransferManager dataTransferManager;
     public static EditorManager editorManager;

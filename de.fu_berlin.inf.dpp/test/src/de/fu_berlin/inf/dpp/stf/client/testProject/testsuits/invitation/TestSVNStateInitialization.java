@@ -129,13 +129,13 @@ public class TestSVNStateInitialization extends STFTest {
     public void testSimpleCheckout() throws RemoteException {
         buildSessionSequentially(SVN_PROJECT, CM_SHARE_PROJECT,
             TypeOfCreateProject.NEW_PROJECT, alice, bob);
-        alice.sarosBot().sessionView()
-            .waitUntilIsInviteeInSession(bob.sarosBot().sessionView());
+        alice.sarosBot().condition()
+            .waitUntilIsInviteeInSession(bob.sarosBot());
         assertTrue(bob.sarosBot().state().isProjectManagedBySVN(SVN_PROJECT));
 
-        assertTrue(alice.sarosBot().sessionView().hasWriteAccessNoGUI());
-        assertTrue(alice.sarosBot().sessionView().isParticipantNoGUI(bob.jid));
-        assertTrue(bob.sarosBot().sessionView().hasWriteAccessNoGUI());
+        assertTrue(alice.sarosBot().state().hasWriteAccessNoGUI());
+        assertTrue(alice.sarosBot().state().isParticipantNoGUI(bob.jid));
+        assertTrue(bob.sarosBot().state().hasWriteAccessNoGUI());
     }
 
     /**
@@ -165,8 +165,8 @@ public class TestSVNStateInitialization extends STFTest {
             alice.sarosBot().state().getRevision(SVN_CLS1_FULL_PATH));
         buildSessionSequentially(SVN_PROJECT, CM_SHARE_PROJECT,
             TypeOfCreateProject.NEW_PROJECT, alice, bob);
-        alice.sarosBot().sessionView()
-            .waitUntilIsInviteeInSession(bob.sarosBot().sessionView());
+        alice.sarosBot().condition()
+            .waitUntilIsInviteeInSession(bob.sarosBot());
 
         assertTrue(bob.sarosBot().state().isProjectManagedBySVN(SVN_PROJECT));
         assertEquals(SVN_CLS1_REV1,
@@ -198,9 +198,9 @@ public class TestSVNStateInitialization extends STFTest {
             .getURLOfRemoteResource(SVN_CLS1_FULL_PATH));
         buildSessionSequentially(SVN_PROJECT, CM_SHARE_PROJECT,
             TypeOfCreateProject.NEW_PROJECT, alice, bob);
-        alice.sarosBot().sessionView()
-            .waitUntilIsInviteeInSession(bob.sarosBot().sessionView());
-        bob.sarosBot().sessionView().waitUntilIsInSession();
+        alice.sarosBot().condition()
+            .waitUntilIsInviteeInSession(bob.sarosBot());
+        bob.sarosBot().condition().waitUntilIsInSession();
 
         assertTrue(bob.sarosBot().state().isProjectManagedBySVN(SVN_PROJECT));
         assertEquals(SVN_CLS1_SWITCHED_URL, bob.sarosBot().state()
@@ -235,9 +235,9 @@ public class TestSVNStateInitialization extends STFTest {
             alice.sarosBot().state().getRevision(SVN_CLS1_FULL_PATH));
         buildSessionSequentially(SVN_PROJECT, CM_SHARE_PROJECT,
             TypeOfCreateProject.NEW_PROJECT, alice, bob);
-        alice.sarosBot().sessionView()
-            .waitUntilIsInviteeInSession(bob.sarosBot().sessionView());
-        bob.sarosBot().sessionView().waitUntilIsInSession();
+        alice.sarosBot().condition()
+            .waitUntilIsInviteeInSession(bob.sarosBot());
+        bob.sarosBot().condition().waitUntilIsInSession();
 
         assertTrue(bob.sarosBot().state().isProjectManagedBySVN(SVN_PROJECT));
         assertEquals(SVN_CLS1_SWITCHED_URL, bob.sarosBot().state()
@@ -279,9 +279,9 @@ public class TestSVNStateInitialization extends STFTest {
 
         buildSessionSequentially(SVN_PROJECT, CM_SHARE_PROJECT,
             TypeOfCreateProject.NEW_PROJECT, alice, bob);
-        alice.sarosBot().sessionView()
-            .waitUntilIsInviteeInSession(bob.sarosBot().sessionView());
-        bob.sarosBot().sessionView().waitUntilIsInSession();
+        alice.sarosBot().condition()
+            .waitUntilIsInviteeInSession(bob.sarosBot());
+        bob.sarosBot().condition().waitUntilIsInSession();
 
         assertTrue(bob.sarosBot().state().isProjectManagedBySVN(SVN_PROJECT));
         bob.sarosBot().packageExplorerView()

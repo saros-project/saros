@@ -28,7 +28,9 @@ import de.fu_berlin.inf.dpp.net.util.RosterUtils;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotMenu;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotShell;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotToolbarDropDownButton;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotTree;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotTreeItem;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotView;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.SarosComponentImp;
 
 /**
@@ -39,6 +41,8 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponen
 public class RosterViewImp extends SarosComponentImp implements RosterView {
 
     private static transient RosterViewImp self;
+    private STFBotView view;
+    private STFBotTree tree;
 
     /**
      * {@link RosterViewImp} is a singleton, but inheritance is possible.
@@ -48,6 +52,12 @@ public class RosterViewImp extends SarosComponentImp implements RosterView {
             return self;
         self = new RosterViewImp();
         return self;
+    }
+
+    public RosterView setView(STFBotView view) throws RemoteException {
+        this.view = view;
+        tree = view.bot().tree();
+        return this;
     }
 
     /**************************************************************
@@ -125,6 +135,12 @@ public class RosterViewImp extends SarosComponentImp implements RosterView {
             bot().waitUntilShellIsOpen(SHELL_REMOVAL_OF_SUBSCRIPTION);
         bot().shell(SHELL_REMOVAL_OF_SUBSCRIPTION).activate();
         bot().shell(SHELL_REMOVAL_OF_SUBSCRIPTION).confirm(OK);
+    }
+
+    public void resetBuddiesName(JID... jids) throws RemoteException {
+        for (JID jid : jids) {
+            renameBuddy(jid, jid.getBase());
+        }
     }
 
     public void renameBuddy(JID buddyJID, String newBuddyName)
@@ -288,6 +304,10 @@ public class RosterViewImp extends SarosComponentImp implements RosterView {
             for (String buddyName : allBuddies) {
                 renameBuddyNoGUI(buddyName, buddyName);
             }
+    }
+
+    public List<String> getAllBuddies() throws RemoteException {
+        return tree.getTextOfItems();
     }
 
     public void deleteBuddyNoGUI(JID buddyJID) throws RemoteException,

@@ -3,6 +3,7 @@ package de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteCompone
 import java.rmi.RemoteException;
 
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotShell;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotTableItem;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotTree;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotTreeItem;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.EclipseComponentImp;
@@ -10,32 +11,21 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponen
 public class ContextMenuWrapperImp extends EclipseComponentImp implements
     ContextMenuWrapper {
 
-    private static transient ContextMenuWrapperImp self;
+    protected static TeamCImp teamC;
+    protected static RefactorCImp reafactorC;
 
-    private static SarosCImp sarosC;
-    private static TeamCImp teamC;
-    private static RefactorCImp reafactorC;
+    protected STFBotTreeItem treeItem;
+    protected STFBotTree tree;
+    protected treeItemType type;
 
-    private STFBotTreeItem treeItem;
-    private STFBotTree tree;
-    private treeItemType type;
-
-    /**
-     * {@link ContextMenuWrapperImp} is a singleton, but inheritance is
-     * possible.
-     */
-    public static ContextMenuWrapperImp getInstance() {
-        if (self != null)
-            return self;
-        self = new ContextMenuWrapperImp();
-        sarosC = SarosCImp.getInstance();
-        teamC = TeamCImp.getInstance();
-        reafactorC = RefactorCImp.getInstance();
-        return self;
-    }
+    protected STFBotTableItem tableItem;
 
     public void setTreeItem(STFBotTreeItem treeItem) {
         this.treeItem = treeItem;
+    }
+
+    public void setTableItem(STFBotTableItem tableItem) {
+        this.tableItem = tableItem;
     }
 
     public void setTreeItemType(treeItemType type) {
@@ -98,11 +88,6 @@ public class ContextMenuWrapperImp extends EclipseComponentImp implements
             bot().sleep(300);
             break;
         }
-    }
-
-    public SarosC saros() throws RemoteException {
-        sarosC.setTreeItem(treeItem);
-        return sarosC;
     }
 
     public TeamC team() throws RemoteException {
