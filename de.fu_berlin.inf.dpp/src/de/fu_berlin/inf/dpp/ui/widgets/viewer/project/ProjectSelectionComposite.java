@@ -1,20 +1,27 @@
 package de.fu_berlin.inf.dpp.ui.widgets.viewer.project;
 
+import java.util.List;
+
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IWorkspace;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.jface.viewers.StructuredViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 
 import de.fu_berlin.inf.dpp.ui.util.LayoutUtils;
+import de.fu_berlin.inf.dpp.ui.util.WizardUtils;
 import de.fu_berlin.inf.dpp.ui.widgets.viewer.project.events.BaseProjectSelectionListener;
 import de.fu_berlin.inf.dpp.ui.widgets.viewer.project.events.FilterClosedProjectsChangedEvent;
+import de.fu_berlin.inf.dpp.ui.widgets.viewer.project.events.NewProjectListener;
 import de.fu_berlin.inf.dpp.ui.widgets.viewer.project.events.ProjectSelectionListener;
 
 /**
@@ -39,7 +46,6 @@ public class ProjectSelectionComposite extends BaseProjectSelectionComposite {
     protected boolean filterClosedProjects;
     protected Button filterClosedProjectsButton;
     protected ViewerFilter closedProjectsFilter = new ViewerFilter() {
-
         @Override
         public boolean select(Viewer viewer, Object parentElement,
             Object element) {
@@ -73,9 +79,11 @@ public class ProjectSelectionComposite extends BaseProjectSelectionComposite {
     protected void createControls() {
         Composite controlComposite = new Composite(this, SWT.NONE);
         controlComposite.setLayoutData(LayoutUtils.createFillHGrabGridData());
-        controlComposite.setLayout(new GridLayout(1, false));
+        controlComposite.setLayout(new GridLayout(2, false));
 
         filterClosedProjectsButton = new Button(controlComposite, SWT.CHECK);
+        filterClosedProjectsButton.setLayoutData(new GridData(SWT.BEGINNING,
+            SWT.CENTER, false, false));
         filterClosedProjectsButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -84,6 +92,17 @@ public class ProjectSelectionComposite extends BaseProjectSelectionComposite {
             }
         });
         filterClosedProjectsButton.setText("Hide closed projects");
+
+        Button newProjectButton = new Button(controlComposite, SWT.PUSH);
+        newProjectButton.setLayoutData(new GridData(SWT.END, SWT.CENTER, true,
+            false));
+        newProjectButton.setText("New Project...");
+        newProjectButton.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                newProject();
+            }
+        });
     }
 
     /**
@@ -111,6 +130,26 @@ public class ProjectSelectionComposite extends BaseProjectSelectionComposite {
         }
 
         notifyProjectSelectionListener(filterClosedProjects);
+    }
+
+    /**
+     * Opens a wizard for {@link IProject} creation and sets the new project as
+     * the selected one.
+     */
+    protected void newProject() {
+        NewProjectListener listener = new NewProjectListener();
+        IWorkspace workspace = ResourcesPlugin.getWorkspace();
+
+        workspace.addResourceChangeListener(listener);
+        WizardUtils.openNewProjectWizard();
+        workspace.removeResourceChangeListener(listener);
+
+        IProject newProject = listener.getNewProject();
+        if (newProject != null) {
+            List<IProject> selectedProjects = this.getSelectedProjects();
+            selectedProjects.add(newProject);
+            this.setSelectedProjects(selectedProjects);
+        }
     }
 
     /**

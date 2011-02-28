@@ -1,12 +1,15 @@
 package de.fu_berlin.inf.dpp.ui.widgets.viewer.project;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.jface.viewers.CheckStateChangedEvent;
 import org.eclipse.jface.viewers.CheckboxTableViewer;
 import org.eclipse.jface.viewers.ICheckStateListener;
+import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.StructuredViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.DisposeEvent;
@@ -17,6 +20,7 @@ import org.eclipse.swt.widgets.Table;
 
 import de.fu_berlin.inf.dpp.ui.widgets.viewer.project.events.BaseProjectSelectionListener;
 import de.fu_berlin.inf.dpp.ui.widgets.viewer.project.events.ProjectSelectionChangedEvent;
+import de.fu_berlin.inf.dpp.util.ArrayUtils;
 
 /**
  * This {@link Composite} extends {@link ProjectDisplayComposite} and allows to
@@ -71,8 +75,64 @@ public class BaseProjectSelectionComposite extends ProjectDisplayComposite {
      * @param projects
      */
     public void setSelectedProjects(List<IProject> projects) {
-        ((CheckboxTableViewer) this.viewer).setCheckedElements(projects
-            .toArray());
+        CheckboxTableViewer checkboxTableViewer = (CheckboxTableViewer) this.viewer;
+        IStructuredContentProvider structuredContentProvider = (IStructuredContentProvider) checkboxTableViewer
+            .getContentProvider();
+
+        Object[] allElements = structuredContentProvider
+            .getElements(checkboxTableViewer.getInput());
+        Object[] checkedElements = checkboxTableViewer.getCheckedElements();
+
+        List<IProject> allProjects = ArrayUtils.getAdaptableObjects(
+            allElements, IProject.class);
+        List<IProject> checkedProjects = ArrayUtils.getAdaptableObjects(
+            checkedElements, IProject.class);
+
+        Map<IProject, Boolean> checkStatesChanges = calculateCheckStateDiff(
+            allProjects, checkedProjects, projects);
+
+        /*
+         * Does not fire events...
+         */
+        checkboxTableViewer.setCheckedElements(projects.toArray());
+
+        /*
+         * ... therefore we have to fire them.
+         */
+        for (IProject project : checkStatesChanges.keySet()) {
+            notifyProjectSelectionChanged(project,
+                checkStatesChanges.get(project));
+        }
+    }
+
+    /**
+     * Calculates from a given set of {@link IProject}s which {@link IProject}s
+     * change their check state.
+     * 
+     * @param allProjects
+     * @param checkedProjects
+     *            {@link IProject}s which are already checked
+     * @param projectsToCheck
+     *            {@link IProject}s which have to be exclusively checked
+     * @return {@link Map} of {@link IProject} that must change their check
+     *         state
+     */
+    protected static Map<IProject, Boolean> calculateCheckStateDiff(
+        List<IProject> allProjects, List<IProject> checkedProjects,
+        List<IProject> projectsToCheck) {
+
+        Map<IProject, Boolean> checkStatesChanges = new HashMap<IProject, Boolean>();
+        for (IProject project : allProjects) {
+            if (projectsToCheck.contains(project)
+                && !checkedProjects.contains(project)) {
+                checkStatesChanges.put(project, true);
+            } else if (!projectsToCheck.contains(project)
+                && checkedProjects.contains(project)) {
+                checkStatesChanges.put(project, false);
+            }
+        }
+
+        return checkStatesChanges;
     }
 
     /**

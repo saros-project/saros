@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.graphics.Image;
 import org.jivesoftware.smack.Roster;
@@ -12,7 +13,7 @@ import org.jivesoftware.smack.RosterGroup;
 
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.ui.ImageManager;
-import de.fu_berlin.inf.dpp.ui.model.CheckBoxTreeElement;
+import de.fu_berlin.inf.dpp.ui.model.TreeElement;
 
 /**
  * Wrapper for {@link RosterGroup RosterGroups} in use with {@link Viewer
@@ -20,7 +21,7 @@ import de.fu_berlin.inf.dpp.ui.model.CheckBoxTreeElement;
  * 
  * @author bkahlert
  */
-public class RosterGroupElement extends CheckBoxTreeElement {
+public class RosterGroupElement extends TreeElement {
     protected Roster roster;
     protected RosterGroup rosterGroup;
 
@@ -30,8 +31,8 @@ public class RosterGroupElement extends CheckBoxTreeElement {
     }
 
     @Override
-    public String getText() {
-        return this.rosterGroup.getName();
+    public StyledString getStyledText() {
+        return new StyledString(this.rosterGroup.getName());
     }
 
     @Override
@@ -53,11 +54,6 @@ public class RosterGroupElement extends CheckBoxTreeElement {
     @Override
     public boolean hasChildren() {
         return rosterGroup.getEntryCount() > 0;
-    }
-
-    @Override
-    public boolean isGrayed() {
-        return true;
     }
 
     @Override

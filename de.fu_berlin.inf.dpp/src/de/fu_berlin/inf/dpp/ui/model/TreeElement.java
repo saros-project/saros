@@ -1,7 +1,7 @@
 package de.fu_berlin.inf.dpp.ui.model;
 
-import org.eclipse.core.runtime.IAdapterManager;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.swt.graphics.Image;
 
 /**
@@ -11,7 +11,7 @@ import org.eclipse.swt.graphics.Image;
  */
 public abstract class TreeElement implements ITreeElement {
 
-    public String getText() {
+    public StyledString getStyledText() {
         return null;
     }
 
@@ -33,8 +33,7 @@ public abstract class TreeElement implements ITreeElement {
 
     @SuppressWarnings("rawtypes")
     public Object getAdapter(Class adapter) {
-        IAdapterManager manager = Platform.getAdapterManager();
-        return manager.getAdapter(this, adapter);
+        return Platform.getAdapterManager().getAdapter(this, adapter);
     }
 
 }

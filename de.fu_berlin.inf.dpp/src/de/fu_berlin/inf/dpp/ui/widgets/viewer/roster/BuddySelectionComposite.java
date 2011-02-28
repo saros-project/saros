@@ -91,7 +91,7 @@ public class BuddySelectionComposite extends BaseBuddySelectionComposite {
 
         filterNonSarosBuddiesButton = new Button(controlComposite, SWT.CHECK);
         filterNonSarosBuddiesButton.setLayoutData(new GridData(SWT.BEGINNING,
-            SWT.BEGINNING, false, false));
+            SWT.CENTER, false, false));
         filterNonSarosBuddiesButton
             .setText("Hide buddies without Saros support");
         filterNonSarosBuddiesButton

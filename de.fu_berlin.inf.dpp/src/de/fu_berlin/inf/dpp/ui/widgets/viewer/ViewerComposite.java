@@ -51,4 +51,11 @@ public abstract class ViewerComposite extends Composite {
     public StructuredViewer getViewer() {
         return this.viewer;
     }
+
+    @Override
+    public boolean setFocus() {
+        if (this.viewer == null || this.viewer.getControl() == null)
+            return false;
+        return this.viewer.getControl().setFocus();
+    }
 }

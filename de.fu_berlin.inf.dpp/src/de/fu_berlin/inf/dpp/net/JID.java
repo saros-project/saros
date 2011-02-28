@@ -20,8 +20,10 @@
 package de.fu_berlin.inf.dpp.net;
 
 import java.io.Serializable;
+import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
+import org.jivesoftware.smack.RosterEntry;
 import org.jivesoftware.smack.util.StringUtils;
 import org.jivesoftware.smackx.muc.MultiUserChat;
 
@@ -39,6 +41,9 @@ public class JID implements Serializable {
     private static final Logger log = Logger.getLogger(JID.class.getName());
 
     private static final long serialVersionUID = 4830741516870940459L;
+
+    protected static final Pattern userAtHostPattern = Pattern.compile(
+        "^[A-Z0-9._%+-]+@[A-Z0-9.-]+$", Pattern.CASE_INSENSITIVE);
 
     private final String jid;
 
@@ -71,9 +76,42 @@ public class JID implements Serializable {
      */
     public JID(String jid) {
         if (jid == null)
-            throw new IllegalArgumentException("JID cannot be null");
+            throw new IllegalArgumentException(JID.class.getSimpleName()
+                + " cannot be null");
 
         this.jid = jid;
+    }
+
+    /**
+     * Construct a new JID
+     * 
+     * @param rosterEntry
+     */
+    public JID(RosterEntry rosterEntry) {
+        if (rosterEntry == null || rosterEntry.getUser() == null)
+            throw new IllegalArgumentException(
+                RosterEntry.class.getSimpleName() + " cannot be null");
+
+        this.jid = rosterEntry.getUser();
+    }
+
+    /**
+     * Checks whether the {@link #getBase() base} portion is correctly formated.
+     * 
+     * @param jid
+     * @return
+     */
+    public static boolean isValid(JID jid) {
+        return userAtHostPattern.matcher(jid.getBase()).matches();
+    }
+
+    /**
+     * Checks whether the {@link #getBase() base} portion is correctly formated.
+     * 
+     * @return
+     */
+    public boolean isValid() {
+        return isValid(this);
     }
 
     /**
@@ -158,6 +196,14 @@ public class JID implements Serializable {
         return false;
     }
 
+    /**
+     * Returns true if this JID and the given JID are completely identical (this
+     * includes the resource unlike equals)
+     */
+    public boolean strictlyEquals(JID other) {
+        return this.jid.equals(other.jid);
+    }
+
     @Override
     public int hashCode() {
         return getBase().hashCode();
@@ -169,13 +215,5 @@ public class JID implements Serializable {
     @Override
     public String toString() {
         return this.jid;
-    }
-
-    /**
-     * Returns true if this JID and the given JID are completely identical (this
-     * includes the resource unlike equals)
-     */
-    public boolean strictlyEquals(JID other) {
-        return this.jid.equals(other.jid);
     }
 }

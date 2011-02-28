@@ -3,7 +3,6 @@ package de.fu_berlin.inf.dpp.ui.util.selection;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ui.IEditorReference;
@@ -11,6 +10,8 @@ import org.eclipse.ui.ISelectionService;
 import org.eclipse.ui.IViewReference;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PlatformUI;
+
+import de.fu_berlin.inf.dpp.util.ArrayUtils;
 
 /**
  * Utility class for a convenient work with the {@link ISelectionService}
@@ -93,52 +94,23 @@ public class SelectionUtils {
      *            to adapt each object to
      * @return
      */
-    public static <AdapterType> List<AdapterType> getAdaptableObjects(
-        ISelection selection, Class<? extends AdapterType> adapter) {
-        List<AdapterType> objects = new ArrayList<AdapterType>();
+    public static <Adapter> List<Adapter> getAdaptableObjects(
+        ISelection selection, Class<? extends Adapter> adapter) {
+        List<Object> objectsToAdapt = new ArrayList<Object>();
 
-        if (selection == null)
-            return objects;
-
-        if (selection instanceof IStructuredSelection) {
+        if (selection == null) {
+            // do nothing
+        } else if (selection instanceof IStructuredSelection) {
             IStructuredSelection structuredSelection = (IStructuredSelection) selection;
             for (Object structuredSelectionItem : structuredSelection.toArray()) {
-                AdapterType object = getAdapter(structuredSelectionItem,
-                    adapter);
-
-                if (object != null && !objects.contains(object)) {
-                    objects.add(object);
-                }
+                objectsToAdapt.add(structuredSelectionItem);
             }
         } else {
-            AdapterType object = getAdapter(selection, adapter);
-
-            if (object != null && !objects.contains(object)) {
-                objects.add(object);
-            }
+            objectsToAdapt.add(objectsToAdapt);
         }
 
-        return objects;
-    }
-
-    /**
-     * Tries to adapt a given object to adapter.
-     * 
-     * @param adaptable
-     *            object to adapt
-     * @param adapter
-     *            to adapt the adaptable to
-     * @return null if object is not adaptable or not adapter is available;
-     *         adapted object otherwise
-     */
-    @SuppressWarnings("unchecked")
-    protected static <AdapterType> AdapterType getAdapter(Object adaptable,
-        Class<? extends AdapterType> adapter) {
-        try {
-            return (AdapterType) ((IAdaptable) adaptable).getAdapter(adapter);
-        } catch (Exception e) {
-            return null;
-        }
+        return ArrayUtils
+            .getAdaptableObjects(objectsToAdapt.toArray(), adapter);
     }
 
 }

@@ -1,8 +1,10 @@
 package de.fu_berlin.inf.dpp.ui.model;
 
 import org.eclipse.core.runtime.IAdaptable;
+import org.eclipse.jface.viewers.DelegatingStyledCellLabelProvider.IStyledLabelProvider;
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.ITreeContentProvider;
+import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.swt.graphics.Image;
 
 /**
@@ -12,10 +14,11 @@ import org.eclipse.swt.graphics.Image;
  * @author bkahlert
  */
 public interface ITreeElement extends IAdaptable {
+
     /**
-     * @see ILabelProvider#getText(Object)
+     * @see IStyledLabelProvider#getStyledText(Object)
      */
-    public String getText();
+    public StyledString getStyledText();
 
     /**
      * @see ILabelProvider#getImage(Object)
@@ -36,4 +39,5 @@ public interface ITreeElement extends IAdaptable {
      * @see ITreeContentProvider#hasChildren(Object)
      */
     public boolean hasChildren();
+
 }

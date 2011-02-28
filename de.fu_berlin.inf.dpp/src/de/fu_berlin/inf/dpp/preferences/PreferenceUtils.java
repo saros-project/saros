@@ -27,6 +27,10 @@ public class PreferenceUtils {
         this.mixerManager = mixerManager;
     }
 
+    public boolean isDebugEnabled() {
+        return saros.getPreferenceStore().getBoolean(PreferenceConstants.DEBUG);
+    }
+
     public List<JID> getAutoInviteUsers() {
 
         String autoInvite = saros.getPreferenceStore().getString(

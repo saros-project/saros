@@ -1,11 +1,15 @@
 package de.fu_berlin.inf.dpp.ui.widgets.viewer.roster;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.viewers.CheckStateChangedEvent;
 import org.eclipse.jface.viewers.CheckboxTreeViewer;
 import org.eclipse.jface.viewers.ICheckStateListener;
+import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.StructuredViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.DisposeEvent;
@@ -16,12 +20,12 @@ import org.eclipse.swt.widgets.Tree;
 import org.jivesoftware.smack.RosterEntry;
 
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.ui.model.CheckStateProvider;
 import de.fu_berlin.inf.dpp.ui.model.ITreeElement;
+import de.fu_berlin.inf.dpp.ui.model.roster.RosterCheckStateProvider;
 import de.fu_berlin.inf.dpp.ui.model.roster.RosterEntryElement;
-import de.fu_berlin.inf.dpp.ui.model.workaround.CheckStatePreservingCheckboxTreeViewer;
 import de.fu_berlin.inf.dpp.ui.widgets.viewer.roster.events.BaseBuddySelectionListener;
 import de.fu_berlin.inf.dpp.ui.widgets.viewer.roster.events.BuddySelectionChangedEvent;
+import de.fu_berlin.inf.dpp.util.ArrayUtils;
 
 /**
  * This {@link Composite} extends {@link BuddyDisplayComposite} and allows to
@@ -42,12 +46,21 @@ import de.fu_berlin.inf.dpp.ui.widgets.viewer.roster.events.BuddySelectionChange
  */
 public class BaseBuddySelectionComposite extends BuddyDisplayComposite {
 
+    RosterCheckStateProvider checkStateProvider;
+
     protected List<BaseBuddySelectionListener> buddySelectionListeners = new ArrayList<BaseBuddySelectionListener>();
 
     protected ICheckStateListener checkStateListener = new ICheckStateListener() {
         public void checkStateChanged(CheckStateChangedEvent event) {
-            JID jid = (JID) ((ITreeElement) event.getElement())
-                .getAdapter(JID.class);
+            // Update the check state
+            if (checkStateProvider != null) {
+                checkStateProvider.setChecked(event.getElement(),
+                    event.getChecked());
+            }
+
+            // Fire selection event
+            JID jid = (JID) Platform.getAdapterManager().getAdapter(
+                event.getElement(), JID.class);
             if (jid != null)
                 notifyBuddySelectionChanged(jid, event.getChecked());
         }
@@ -75,15 +88,15 @@ public class BaseBuddySelectionComposite extends BuddyDisplayComposite {
          * The normal CheckboxTreeViewer does not preserve the checkbox states.
          * We therefore use a workaround class.
          */
-        this.viewer = new CheckStatePreservingCheckboxTreeViewer(new Tree(this,
-            style));
+        this.viewer = new CheckboxTreeViewer(new Tree(this, style));
     }
 
     @Override
     protected void configureViewer() {
         super.configureViewer();
+        this.checkStateProvider = new RosterCheckStateProvider();
         ((CheckboxTreeViewer) this.viewer)
-            .setCheckStateProvider(new CheckStateProvider());
+            .setCheckStateProvider(this.checkStateProvider);
     }
 
     /**
@@ -92,13 +105,121 @@ public class BaseBuddySelectionComposite extends BuddyDisplayComposite {
      * @param buddies
      */
     public void setSelectedBuddies(List<JID> buddies) {
-        List<RosterEntryElement> rosterEntryElements = new ArrayList<RosterEntryElement>();
+        CheckboxTreeViewer treeViewer = (CheckboxTreeViewer) this.viewer;
+
+        List<RosterEntryElement> allElements = collectAllRosterEntryElement(treeViewer);
+        List<RosterEntryElement> checkedElements = ArrayUtils
+            .getAdaptableObjects(treeViewer.getCheckedElements(),
+                RosterEntryElement.class);
+        List<RosterEntryElement> elementsToCheck = new ArrayList<RosterEntryElement>();
         for (JID buddy : buddies) {
-            rosterEntryElements.add(new RosterEntryElement(this.saros
-                .getRoster(), buddy));
+            elementsToCheck.add(new RosterEntryElement(this.saros.getRoster(),
+                buddy));
         }
-        ((CheckboxTreeViewer) this.viewer)
-            .setCheckedElements(rosterEntryElements.toArray());
+
+        Map<RosterEntryElement, Boolean> checkStatesChanges = calculateCheckStateDiff(
+            allElements, checkedElements, elementsToCheck);
+
+        /*
+         * Update the check state in the RosterCheckStateProvider and fire
+         * events.
+         */
+        for (RosterEntryElement rosterEntryElement : checkStatesChanges
+            .keySet()) {
+            boolean checked = checkStatesChanges.get(rosterEntryElement);
+            this.checkStateProvider.setChecked(rosterEntryElement, checked);
+            this.notifyBuddySelectionChanged(
+                (JID) rosterEntryElement.getAdapter(JID.class), checked);
+        }
+
+        /*
+         * Refresh the viewer in order to reflect the new check states.
+         */
+        treeViewer.refresh();
+    }
+
+    /**
+     * Gathers the checked states of the given widget and its descendants,
+     * following a pre-order traversal of the {@link ITreeContentProvider}.
+     * 
+     * @param checkboxTreeViewer
+     *            to be traversed
+     * @return
+     */
+    protected static List<RosterEntryElement> collectAllRosterEntryElement(
+        CheckboxTreeViewer checkboxTreeViewer) {
+        ITreeContentProvider treeContentProvider = (ITreeContentProvider) checkboxTreeViewer
+            .getContentProvider();
+
+        List<Object> collectedObjects = new ArrayList<Object>();
+
+        Object[] objects = treeContentProvider.getElements(checkboxTreeViewer
+            .getInput());
+        for (Object object : objects) {
+            collectedObjects.add(object);
+            collectAllRosterEntryElement(collectedObjects, checkboxTreeViewer,
+                object);
+        }
+
+        return ArrayUtils.getInstances(collectedObjects.toArray(),
+            RosterEntryElement.class);
+    }
+
+    /**
+     * Gathers the checked states of the given widget and its descendants,
+     * following a pre-order traversal of the {@link ITreeContentProvider}.
+     * 
+     * @param collectedObjects
+     *            a writable list of elements (element type: <code>Object</code>
+     *            )
+     * @param checkboxTreeViewer
+     *            to be traversed
+     * @param parentElement
+     *            of which to determine the child nodes
+     */
+    protected static void collectAllRosterEntryElement(
+        List<Object> collectedObjects, CheckboxTreeViewer checkboxTreeViewer,
+        Object parentElement) {
+        ITreeContentProvider treeContentProvider = (ITreeContentProvider) checkboxTreeViewer
+            .getContentProvider();
+        Object[] objects = treeContentProvider.getChildren(parentElement);
+        for (Object object : objects) {
+            collectedObjects.add(object);
+            collectAllRosterEntryElement(collectedObjects, checkboxTreeViewer,
+                object);
+        }
+    }
+
+    /**
+     * Calculates from a given set of {@link RosterEntryElement}s which
+     * {@link RosterEntryElement}s change their check state.
+     * 
+     * @param allRosterEntryElements
+     * @param checkedRosterEntryElement
+     *            {@link RosterEntryElement}s which are already checked
+     * @param rosterEntryElementToCheck
+     *            {@link RosterEntryElement}s which have to be exclusively
+     *            checked
+     * @return {@link Map} of {@link RosterEntryElement} that must change their
+     *         check state
+     */
+    protected Map<RosterEntryElement, Boolean> calculateCheckStateDiff(
+        List<RosterEntryElement> allRosterEntryElements,
+        List<RosterEntryElement> checkedRosterEntryElement,
+        List<RosterEntryElement> rosterEntryElementToCheck) {
+
+        Map<RosterEntryElement, Boolean> checkStatesChanges = new HashMap<RosterEntryElement, Boolean>();
+        for (RosterEntryElement rosterEntryElement : allRosterEntryElements) {
+            if (rosterEntryElementToCheck.contains(rosterEntryElement)
+                && !checkedRosterEntryElement.contains(rosterEntryElement)) {
+                checkStatesChanges.put(rosterEntryElement, true);
+            } else if (!rosterEntryElementToCheck.contains(rosterEntryElement)
+                && checkedRosterEntryElement.contains(rosterEntryElement)) {
+                checkStatesChanges.put(rosterEntryElement, false);
+            }
+        }
+
+        return checkStatesChanges;
     }
 
     /**

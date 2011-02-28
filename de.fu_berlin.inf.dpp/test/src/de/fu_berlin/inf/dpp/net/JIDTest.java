@@ -22,6 +22,7 @@ package de.fu_berlin.inf.dpp.net;
 
 import static org.junit.Assert.assertEquals;
 
+import org.jivesoftware.smack.RosterEntry;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -47,7 +48,15 @@ public class JIDTest {
      */
     @Test(expected = IllegalArgumentException.class)
     public void testMalformatedJID() {
-        new JID(null);
+        new JID((String) null);
+    }
+
+    /**
+     * TODO Test also other malformatted JID formats.
+     */
+    @Test(expected = IllegalArgumentException.class)
+    public void testMalformatedJID2() {
+        new JID((RosterEntry) null);
     }
 
     @Test

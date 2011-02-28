@@ -647,6 +647,11 @@
       </command>
       <command
             categoryId="org.eclipse.ui.category.project"
+            id="de.fu_berlin.inf.dpp.ui.commands.AddBuddy"
+            name="Add Buddy...">
+      </command>
+      <command
+            categoryId="org.eclipse.ui.category.project"
             id="de.fu_berlin.inf.dpp.ui.commands.OpenSarosPreferences"
             name="Preferences...">
       </command>
@@ -656,6 +661,10 @@
       <handler
             class="de.fu_berlin.inf.dpp.ui.commandHandlers.CreateXMPPAccountHandler"
             commandId="de.fu_berlin.inf.dpp.ui.commands.CreateXMPPAccount">
+      </handler>
+      <handler
+            class="de.fu_berlin.inf.dpp.ui.commandHandlers.AddBuddyHandler"
+            commandId="de.fu_berlin.inf.dpp.ui.commands.AddBuddy">
       </handler>
       <handler
             class="de.fu_berlin.inf.dpp.ui.commandHandlers.OpenSarosPreferencesHandler"
@@ -679,6 +688,12 @@
             <command
                   commandId="de.fu_berlin.inf.dpp.ui.commands.CreateXMPPAccount"
                   icon="icons/elcl16/xmpp_create_account_tsk.png"
+                  style="push">
+            </command>
+            <command
+                  commandId="de.fu_berlin.inf.dpp.ui.commands.AddBuddy"
+                  disabledIcon="icons/dlcl16/buddy_add_tsk.png"
+                  icon="icons/elcl16/buddy_add_tsk.png"
                   style="push">
             </command>
             <separator

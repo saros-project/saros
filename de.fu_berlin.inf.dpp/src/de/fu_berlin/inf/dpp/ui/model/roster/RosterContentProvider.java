@@ -16,7 +16,11 @@ import org.jivesoftware.smack.packet.Presence;
 import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.Saros;
+import de.fu_berlin.inf.dpp.net.ITransferModeListener;
 import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
+import de.fu_berlin.inf.dpp.net.internal.DataTransferManager.IBytestreamConnection;
+import de.fu_berlin.inf.dpp.net.internal.DataTransferManager.NetTransferMode;
 import de.fu_berlin.inf.dpp.net.internal.discoveryManager.DiscoveryManager;
 import de.fu_berlin.inf.dpp.net.internal.discoveryManager.events.DiscoveryManagerListener;
 import de.fu_berlin.inf.dpp.ui.model.TreeContentProvider;
@@ -35,6 +39,24 @@ public class RosterContentProvider extends TreeContentProvider {
         .getLogger(RosterContentProvider.class);
 
     protected Viewer viewer;
+
+    @Inject
+    protected DataTransferManager dataTransferManager;
+    protected ITransferModeListener transferModeListener = new ITransferModeListener() {
+        public void transferFinished(JID jid, NetTransferMode newMode,
+            boolean incoming, long size, long transmissionMillisecs) {
+            // do nothing
+        }
+
+        public void connectionChanged(JID jid, IBytestreamConnection connection) {
+            ViewerUtils.update(viewer, new RosterEntryElement(roster, jid),
+                null);
+        }
+
+        public void clear() {
+            ViewerUtils.refresh(viewer, true);
+        }
+    };
 
     @Inject
     protected DiscoveryManager discoveryManager;
@@ -85,7 +107,10 @@ public class RosterContentProvider extends TreeContentProvider {
     public RosterContentProvider() {
         super();
         Saros.injectDependenciesOnly(this);
-        discoveryManager.addDiscoveryManagerListener(discoveryManagerListener);
+        this.dataTransferManager.getTransferModeDispatch().add(
+            this.transferModeListener);
+        this.discoveryManager
+            .addDiscoveryManagerListener(this.discoveryManagerListener);
     }
 
     @Override
@@ -93,12 +118,12 @@ public class RosterContentProvider extends TreeContentProvider {
         this.viewer = viewer;
 
         if (oldInput != null && oldInput instanceof Roster) {
-            ((Roster) oldInput).removeRosterListener(rosterListener);
+            ((Roster) oldInput).removeRosterListener(this.rosterListener);
         }
 
         if (newInput != null && newInput instanceof Roster) {
             this.roster = (Roster) newInput;
-            this.roster.addRosterListener(rosterListener);
+            this.roster.addRosterListener(this.rosterListener);
         } else {
             this.roster = null;
         }
@@ -107,10 +132,12 @@ public class RosterContentProvider extends TreeContentProvider {
     @Override
     public void dispose() {
         if (this.roster != null) {
-            this.roster.removeRosterListener(rosterListener);
+            this.roster.removeRosterListener(this.rosterListener);
         }
-        discoveryManager
-            .removeDiscoveryManagerListener(discoveryManagerListener);
+        this.discoveryManager
+            .removeDiscoveryManagerListener(this.discoveryManagerListener);
+        this.dataTransferManager.getTransferModeDispatch().remove(
+            transferModeListener);
     }
 
     /**
@@ -119,7 +146,8 @@ public class RosterContentProvider extends TreeContentProvider {
      */
     @Override
     public Object[] getElements(Object inputElement) {
-        if (roster != null) {
+        if (inputElement != null && inputElement instanceof Roster) {
+            Roster roster = (Roster) inputElement;
             List<Object> elements = new ArrayList<Object>();
 
             for (RosterGroup rosterGroup : roster.getGroups())

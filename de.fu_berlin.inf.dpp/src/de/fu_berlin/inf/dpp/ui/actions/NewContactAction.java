@@ -21,16 +21,13 @@ package de.fu_berlin.inf.dpp.ui.actions;
 
 import org.apache.log4j.Logger;
 import org.eclipse.jface.action.Action;
-import org.eclipse.jface.wizard.WizardDialog;
-import org.eclipse.swt.widgets.Shell;
 import org.jivesoftware.smack.XMPPConnection;
 
 import de.fu_berlin.inf.dpp.Saros;
-import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.net.ConnectionState;
 import de.fu_berlin.inf.dpp.net.IConnectionListener;
 import de.fu_berlin.inf.dpp.ui.ImageManager;
-import de.fu_berlin.inf.dpp.ui.wizards.AddBuddyWizard;
+import de.fu_berlin.inf.dpp.ui.util.WizardUtils;
 import de.fu_berlin.inf.dpp.util.Utils;
 
 public class NewContactAction extends Action {
@@ -69,10 +66,7 @@ public class NewContactAction extends Action {
     }
 
     public void runNewContact() {
-        Shell shell = EditorAPI.getShell();
-        WizardDialog wd = new WizardDialog(shell, new AddBuddyWizard(saros));
-        wd.setHelpAvailable(false);
-        wd.open();
+        WizardUtils.openAddBuddyWizard();
     }
 
     protected void updateEnablement() {
