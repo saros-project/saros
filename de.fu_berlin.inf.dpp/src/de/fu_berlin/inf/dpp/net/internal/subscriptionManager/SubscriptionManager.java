@@ -23,7 +23,7 @@ import de.fu_berlin.inf.dpp.net.ConnectionState;
 import de.fu_berlin.inf.dpp.net.IConnectionListener;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.internal.SafePacketListener;
-import de.fu_berlin.inf.dpp.net.internal.subscriptionManager.events.SubscriptionReceivedEvent;
+import de.fu_berlin.inf.dpp.net.internal.subscriptionManager.events.IncomingSubscriptionEvent;
 import de.fu_berlin.inf.dpp.net.internal.subscriptionManager.events.SubscriptionManagerListener;
 import de.fu_berlin.inf.dpp.util.Utils;
 
@@ -32,7 +32,7 @@ import de.fu_berlin.inf.dpp.util.Utils;
  * 
  * If a request for subscription is received (when a buddy added the local user)
  * all {@link SubscriptionManagerListener}s are notified. If at least one set
- * the {@link SubscriptionReceivedEvent#autoSubscribe} flag to true the
+ * the {@link IncomingSubscriptionEvent#autoSubscribe} flag to true the
  * subscription request is automatically confirmed. Otherwise a dialog is shown
  * to the user asking him/her to confirm the request. If he accepts the request
  * a new entry in the {@link Roster} will be created and a subscribed-message
@@ -252,7 +252,7 @@ public class SubscriptionManager {
     public boolean notifySubscriptionReceived(JID jid) {
         boolean autoSubscribe = false;
         for (SubscriptionManagerListener subscriptionManagerListener : this.subscriptionManagerListeners) {
-            SubscriptionReceivedEvent event = new SubscriptionReceivedEvent(jid);
+            IncomingSubscriptionEvent event = new IncomingSubscriptionEvent(jid);
             subscriptionManagerListener.subscriptionReceived(event);
             if (event.autoSubscribe)
                 autoSubscribe = true;

@@ -11,5 +11,5 @@ public interface SubscriptionManagerListener {
      * 
      * @param event
      */
-    public void subscriptionReceived(SubscriptionReceivedEvent event);
+    public void subscriptionReceived(IncomingSubscriptionEvent event);
 }

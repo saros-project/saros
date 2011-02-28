@@ -8,7 +8,7 @@ import de.fu_berlin.inf.dpp.net.internal.subscriptionManager.SubscriptionManager
  * 
  * @author bkahlert
  */
-public class SubscriptionReceivedEvent {
+public class IncomingSubscriptionEvent {
     /**
      * The buddy who sent the subscription request
      */
@@ -20,7 +20,7 @@ public class SubscriptionReceivedEvent {
      */
     public boolean autoSubscribe = false;
 
-    public SubscriptionReceivedEvent(JID buddy) {
+    public IncomingSubscriptionEvent(JID buddy) {
         super();
         this.buddy = buddy;
     }

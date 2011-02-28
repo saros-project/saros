@@ -36,7 +36,7 @@ import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.internal.subscriptionManager.SubscriptionManager;
 import de.fu_berlin.inf.dpp.net.internal.subscriptionManager.events.SubscriptionManagerListener;
-import de.fu_berlin.inf.dpp.net.internal.subscriptionManager.events.SubscriptionReceivedEvent;
+import de.fu_berlin.inf.dpp.net.internal.subscriptionManager.events.IncomingSubscriptionEvent;
 import de.fu_berlin.inf.dpp.net.util.RosterUtils;
 import de.fu_berlin.inf.dpp.ui.ImageManager;
 import de.fu_berlin.inf.dpp.ui.wizards.pages.AddBuddyWizardPage;
@@ -95,7 +95,7 @@ public class AddBuddyWizard extends Wizard {
          * from the subscriptionManager.
          */
         final SubscriptionManagerListener subscriptionManagerListener = new SubscriptionManagerListener() {
-            public void subscriptionReceived(SubscriptionReceivedEvent event) {
+            public void subscriptionReceived(IncomingSubscriptionEvent event) {
                 if (jid.equals(event.getBuddy()))
                     event.autoSubscribe = true;
                 subscriptionManager.removeSubscriptionManagerListener(this);
