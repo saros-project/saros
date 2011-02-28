@@ -21,8 +21,8 @@ public class ChatDemoContainer extends DemoContainer {
 		 * automatically leading to multiple connections with the same
 		 * credentials.
 		 */
-		// new ChatDemo(this, "Chat");
-		open(new MultiUserChatDemo(this, "MultiUserChat"));
+		new ChatDemo(this, "Chat");
+		// open(new MultiUserChatDemo(this, "MultiUserChat"));
 	}
 
 }

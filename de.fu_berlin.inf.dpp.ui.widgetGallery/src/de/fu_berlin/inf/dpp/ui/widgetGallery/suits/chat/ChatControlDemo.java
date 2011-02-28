@@ -7,12 +7,13 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 
+import de.fu_berlin.inf.dpp.editor.annotations.SarosAnnotation;
+import de.fu_berlin.inf.dpp.ui.util.LayoutUtils;
 import de.fu_berlin.inf.dpp.ui.widgetGallery.demos.Demo;
 import de.fu_berlin.inf.dpp.ui.widgetGallery.demos.DemoContainer;
 import de.fu_berlin.inf.dpp.ui.widgets.chatControl.ChatControl;
@@ -42,13 +43,14 @@ public class ChatControlDemo extends Demo {
 		super(demoContainer, title);
 	}
 
-	@Override
 	public void createPartControls(Composite parent) {
 		Color red = new Color(parent.getDisplay(), 255, 128, 128);
-		Color lightRed = ColorUtils.scaleColor(red, .75);
+		Color lightRed = ColorUtils.scaleColorBy(red,
+				SarosAnnotation.LIGHT_COLOR_SCALE);
 
 		Color green = new Color(Display.getDefault(), 128, 255, 128);
-		Color lightGreen = ColorUtils.scaleColor(green, .75);
+		Color lightGreen = ColorUtils.scaleColorBy(green,
+				SarosAnnotation.LIGHT_COLOR_SCALE);
 
 		user1 = "bkahlert@saros-con.imp.fu-berlin.de/Saros";
 		user1_color = lightRed;
@@ -57,7 +59,7 @@ public class ChatControlDemo extends Demo {
 		user2_color = lightGreen;
 
 		Composite root = new Composite(parent, SWT.NONE);
-		root.setLayout(new GridLayout(1, false));
+		root.setLayout(LayoutUtils.createGridLayout());
 
 		Composite demoControls = createDemoControls(root, SWT.NONE);
 		demoControls
@@ -79,7 +81,6 @@ public class ChatControlDemo extends Demo {
 		newLine.setText("new short line");
 		newLine.addSelectionListener(new SelectionListener() {
 
-			@Override
 			public void widgetSelected(SelectionEvent e) {
 				ChatControlDemo.this.chatControl
 						.addChatLine(
@@ -89,7 +90,6 @@ public class ChatControlDemo extends Demo {
 								new Date());
 			}
 
-			@Override
 			public void widgetDefaultSelected(SelectionEvent e) {
 
 			}
@@ -99,7 +99,6 @@ public class ChatControlDemo extends Demo {
 		newLongLine.setText("new long line");
 		newLongLine.addSelectionListener(new SelectionListener() {
 
-			@Override
 			public void widgetSelected(SelectionEvent e) {
 				ChatControlDemo.this.chatControl
 						.addChatLine(
@@ -109,7 +108,6 @@ public class ChatControlDemo extends Demo {
 								new Date());
 			}
 
-			@Override
 			public void widgetDefaultSelected(SelectionEvent e) {
 
 			}
@@ -119,7 +117,6 @@ public class ChatControlDemo extends Demo {
 		expl.setText("show explanation");
 		expl.addSelectionListener(new SelectionListener() {
 
-			@Override
 			public void widgetSelected(SelectionEvent e) {
 				SimpleExplanation howToExplanation = new SimpleExplanation(
 						SWT.ICON_INFORMATION,
@@ -128,7 +125,6 @@ public class ChatControlDemo extends Demo {
 						.showExplanation(howToExplanation);
 			}
 
-			@Override
 			public void widgetDefaultSelected(SelectionEvent e) {
 
 			}
@@ -138,12 +134,10 @@ public class ChatControlDemo extends Demo {
 		explHide.setText("hide explanation");
 		explHide.addSelectionListener(new SelectionListener() {
 
-			@Override
 			public void widgetSelected(SelectionEvent e) {
 				ChatControlDemo.this.explanatoryComposite.hideExplanation();
 			}
 
-			@Override
 			public void widgetDefaultSelected(SelectionEvent e) {
 
 			}
@@ -153,12 +147,10 @@ public class ChatControlDemo extends Demo {
 		setFocus.setText("set focus on control");
 		setFocus.addSelectionListener(new SelectionListener() {
 
-			@Override
 			public void widgetSelected(SelectionEvent e) {
 				ChatControlDemo.this.chatControl.setFocus();
 			}
 
-			@Override
 			public void widgetDefaultSelected(SelectionEvent e) {
 
 			}
@@ -181,17 +173,15 @@ public class ChatControlDemo extends Demo {
 
 		this.chatControl.addChatControlListener(new IChatControlListener() {
 			public void messageEntered(MessageEnteredEvent event) {
-				System.out.println("Message entered: "
+				addConsoleMessage("Message entered: "
 						+ event.getEnteredMessage());
 			}
 
-			@Override
 			public void characterEntered(CharacterEnteredEvent event) {
-				System.out.println("Character entered: "
+				addConsoleMessage("Character entered: "
 						+ event.getEnteredCharacter());
 			}
 
-			@Override
 			public void chatCleared(ChatClearedEvent event) {
 				System.out.println("Chat cleared");
 			}

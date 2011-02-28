@@ -6,7 +6,8 @@ import de.fu_berlin.inf.dpp.ui.widgetGallery.demos.DemoContainer;
 
 public class SimpleExplanationDemoContainer extends DemoContainer {
 
-	public SimpleExplanationDemoContainer(DemoContainer demoContainer, String title) {
+	public SimpleExplanationDemoContainer(DemoContainer demoContainer,
+			String title) {
 		super(demoContainer, title);
 	}
 
@@ -15,10 +16,11 @@ public class SimpleExplanationDemoContainer extends DemoContainer {
 		super.createPartControls(parent);
 
 		new SimpleExplanationCompositeDemo(this, "Normal");
-		new ExplanationOnlySimpleExplanationCompositeDemo(this, "Explication only");
+		new ExplanationOnlySimpleExplanationCompositeDemo(this,
+				"Explication only");
 		new IconOnlySimpleExplanationCompositeDemo(this, "Icon only");
 		new HugeSimpleExplanationCompositeDemo(this, "Much content");
-		
+
 	}
 
 }

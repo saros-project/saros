@@ -6,7 +6,8 @@ import de.fu_berlin.inf.dpp.ui.widgetGallery.demos.DemoContainer;
 
 public class NormalExplanationDemoContainer extends DemoContainer {
 
-	public NormalExplanationDemoContainer(DemoContainer demoContainer, String title) {
+	public NormalExplanationDemoContainer(DemoContainer demoContainer,
+			String title) {
 		super(demoContainer, title);
 	}
 
@@ -17,7 +18,7 @@ public class NormalExplanationDemoContainer extends DemoContainer {
 		new ExplanationCompositeDemo(this, "Normal");
 		new ExplanationOnlyExplanationCompositeDemo(this, "Explication only");
 		new IconOnlyExplanationCompositeDemo(this, "Icon only");
-		
+		new HugeExplanationCompositeDemo(this, "Much content");
 	}
 
 }

@@ -3,6 +3,8 @@ package de.fu_berlin.inf.dpp.ui.widgetGallery.suits.basic;
 import org.eclipse.swt.widgets.Composite;
 
 import de.fu_berlin.inf.dpp.ui.widgetGallery.demos.DemoContainer;
+import de.fu_berlin.inf.dpp.ui.widgetGallery.suits.basic.illustrated.IllustratedCompositeDemoContainer;
+import de.fu_berlin.inf.dpp.ui.widgetGallery.suits.basic.rounded.RoundedCompositeDemoContainer;
 
 public class BasicDemoContainer extends DemoContainer {
 
@@ -13,11 +15,8 @@ public class BasicDemoContainer extends DemoContainer {
 	@Override
 	public void createPartControls(Composite parent) {
 		super.createPartControls(parent);
-		
-		DemoContainer roundedCompositeDemoContainer = new DemoContainer(this, "RoundedComposite");
 
-		new SimpleRoundedCompositeDemo(roundedCompositeDemoContainer, "Simple");
-		new RoundedCompositeDemo(roundedCompositeDemoContainer, "Normal");
+		new RoundedCompositeDemoContainer(this, "Rounded");
+		new IllustratedCompositeDemoContainer(this, "Illustrated");
 	}
-
 }

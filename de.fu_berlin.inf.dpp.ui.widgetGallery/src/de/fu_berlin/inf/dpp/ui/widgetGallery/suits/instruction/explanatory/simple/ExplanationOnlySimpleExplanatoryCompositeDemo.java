@@ -13,11 +13,11 @@ import de.fu_berlin.inf.dpp.ui.widgets.explanation.SimpleExplanationComposite.Si
 import de.fu_berlin.inf.dpp.ui.widgets.explanation.explanatory.SimpleExplanatoryComposite;
 
 public class ExplanationOnlySimpleExplanatoryCompositeDemo extends Demo {
-	public ExplanationOnlySimpleExplanatoryCompositeDemo(DemoContainer demoContainer, String title) {
+	public ExplanationOnlySimpleExplanatoryCompositeDemo(
+			DemoContainer demoContainer, String title) {
 		super(demoContainer, title);
 	}
 
-	@Override
 	public void createPartControls(Composite parent) {
 		final SimpleExplanatoryComposite explanatoryComposite = new SimpleExplanatoryComposite(
 				parent, SWT.NONE);
@@ -27,7 +27,6 @@ public class ExplanationOnlySimpleExplanatoryCompositeDemo extends Demo {
 		contentControl.setText("Show the simple explanation...");
 		contentControl.addSelectionListener(new SelectionAdapter() {
 
-			@Override
 			public void widgetSelected(SelectionEvent e) {
 				String text = "I tell you how to use this composite.\n"
 						+ "This message closes in 5 seconds.";
@@ -36,7 +35,6 @@ public class ExplanationOnlySimpleExplanatoryCompositeDemo extends Demo {
 
 				Display.getCurrent().timerExec(5000, new Runnable() {
 
-					@Override
 					public void run() {
 						explanatoryComposite.hideExplanation();
 					}

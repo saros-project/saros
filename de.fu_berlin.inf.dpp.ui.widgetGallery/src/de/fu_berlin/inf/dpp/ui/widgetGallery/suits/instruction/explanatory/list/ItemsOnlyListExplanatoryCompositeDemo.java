@@ -13,28 +13,27 @@ import de.fu_berlin.inf.dpp.ui.widgets.explanation.ListExplanationComposite.List
 import de.fu_berlin.inf.dpp.ui.widgets.explanation.explanatory.ListExplanatoryComposite;
 
 public class ItemsOnlyListExplanatoryCompositeDemo extends Demo {
-	public ItemsOnlyListExplanatoryCompositeDemo(DemoContainer demoContainer, String title) {
+	public ItemsOnlyListExplanatoryCompositeDemo(DemoContainer demoContainer,
+			String title) {
 		super(demoContainer, title);
 	}
 
-	@Override
 	public void createPartControls(Composite parent) {
 		final ListExplanatoryComposite explanatoryComposite = new ListExplanatoryComposite(
 				parent, SWT.NONE);
 
 		Button contentControl = new Button(explanatoryComposite, SWT.NONE);
 		explanatoryComposite.setContentControl(contentControl);
-		contentControl.setText("Show the simple explanation...");
+		contentControl.setText("Show the list explanation...");
 		contentControl.addSelectionListener(new SelectionAdapter() {
 
-			@Override
 			public void widgetSelected(SelectionEvent e) {
-				ListExplanation expl = new ListExplanation((String)null, "List item #1", "List item #2", "List item #3");
+				ListExplanation expl = new ListExplanation((String) null,
+						"List item #1", "List item #2", "List item #3");
 				explanatoryComposite.showExplanation(expl);
 
 				Display.getCurrent().timerExec(5000, new Runnable() {
 
-					@Override
 					public void run() {
 						explanatoryComposite.hideExplanation();
 					}

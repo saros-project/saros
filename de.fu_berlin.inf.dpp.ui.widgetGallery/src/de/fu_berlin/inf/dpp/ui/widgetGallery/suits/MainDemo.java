@@ -1,11 +1,16 @@
 package de.fu_berlin.inf.dpp.ui.widgetGallery.suits;
 
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 
 import de.fu_berlin.inf.dpp.ui.widgetGallery.demos.DemoContainer;
 import de.fu_berlin.inf.dpp.ui.widgetGallery.suits.basic.BasicDemoContainer;
 import de.fu_berlin.inf.dpp.ui.widgetGallery.suits.chat.ChatDemoContainer;
+import de.fu_berlin.inf.dpp.ui.widgetGallery.suits.decoration.DecorationDemoContainer;
 import de.fu_berlin.inf.dpp.ui.widgetGallery.suits.instruction.InstructionDemoContainer;
+import de.fu_berlin.inf.dpp.ui.widgetGallery.suits.project.ProjectDemoContainer;
+import de.fu_berlin.inf.dpp.ui.widgetGallery.suits.roster.RosterDemoContainer;
+import de.fu_berlin.inf.dpp.ui.widgetGallery.suits.wizard.WizardDemoContainer;
 
 public class MainDemo extends DemoContainer {
 
@@ -13,12 +18,20 @@ public class MainDemo extends DemoContainer {
 		super(parent);
 	}
 
+	public Control getControl() {
+		return this.control;
+	}
+
 	@Override
 	public void createPartControls(Composite parent) {
 		super.createPartControls(parent);
 
-		new BasicDemoContainer(this, "RoundedComposite");
+		new DecorationDemoContainer(this, "Decoration");
+		new BasicDemoContainer(this, "Composite");
 		new InstructionDemoContainer(this, "Explanation");
-		open(new ChatDemoContainer(this, "Chat"));
+		new ChatDemoContainer(this, "Chat");
+		new RosterDemoContainer(this, "Roster");
+		new ProjectDemoContainer(this, "Project");
+		open(new WizardDemoContainer(this, "Wizard"));
 	}
 }

@@ -24,21 +24,24 @@ public class ExplanatoryCompositeDemo extends Demo {
 		final ExplanatoryComposite explanatoryComposite = new ExplanatoryComposite(
 				parent, SWT.NONE);
 
-		// explanation
+		/*
+		 * explanation
+		 */
 		final ExplanationComposite explanationComposite = new ExplanationComposite(
 				explanatoryComposite, SWT.NONE, SWT.ICON_INFORMATION);
 		explanationComposite.setLayout(new GridLayout(1, false));
-		
-		Composite explanationContent = new Composite(explanationComposite, SWT.NONE);
+
+		Composite explanationContent = new Composite(explanationComposite,
+				SWT.NONE);
 		explanationContent.setLayout(new GridLayout(1, false));
 		explanationContent.setLayoutData(new GridData(SWT.BEGINNING,
 				SWT.CENTER, true, true));
-		
+
 		Label explanationLabel = new Label(explanationContent, SWT.NONE);
 		explanationLabel.setLayoutData(new GridData(SWT.BEGINNING,
 				SWT.BEGINNING, false, false));
 		explanationLabel.setText("I'm the explanation.");
-		
+
 		Button explanationButton = new Button(explanationContent, SWT.PUSH);
 		explanationButton.setLayoutData(new GridData(SWT.BEGINNING,
 				SWT.BEGINNING, false, false));
@@ -49,7 +52,9 @@ public class ExplanatoryCompositeDemo extends Demo {
 			}
 		});
 
-		// content
+		/*
+		 * content
+		 */
 		Button contentControl = new Button(explanatoryComposite, SWT.PUSH);
 		explanatoryComposite.setContentControl(contentControl);
 		contentControl.setText("Show the explanation...");

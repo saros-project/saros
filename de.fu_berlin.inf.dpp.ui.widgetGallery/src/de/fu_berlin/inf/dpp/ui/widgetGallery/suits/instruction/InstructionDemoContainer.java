@@ -5,6 +5,7 @@ import org.eclipse.swt.widgets.Composite;
 import de.fu_berlin.inf.dpp.ui.widgetGallery.demos.DemoContainer;
 import de.fu_berlin.inf.dpp.ui.widgetGallery.suits.instruction.explanation.ExplanationDemoContainer;
 import de.fu_berlin.inf.dpp.ui.widgetGallery.suits.instruction.explanatory.ExplanatoryDemoContainer;
+import de.fu_berlin.inf.dpp.ui.widgetGallery.suits.instruction.note.NoteCompositeDemoContainer;
 
 public class InstructionDemoContainer extends DemoContainer {
 
@@ -17,9 +18,7 @@ public class InstructionDemoContainer extends DemoContainer {
 		super.createPartControls(parent);
 
 		new ExplanationDemoContainer(this, "ExplanationComposite");
-		
+		new NoteCompositeDemoContainer(this, "NoteComposite");
 		new ExplanatoryDemoContainer(this, "ExplanatoryComposite");
-
 	}
-
 }

@@ -7,6 +7,7 @@ import org.eclipse.ui.IPerspectiveFactory;
 import de.fu_berlin.inf.dpp.ui.widgetGallery.views.WidgetGalleryView;
 
 public class Perspective implements IPerspectiveFactory {
+	public static String ID = "de.fu_berlin.inf.dpp.ui.widgetGallery.perspective";
 
 	public void createInitialLayout(IPageLayout layout) {
 		String editorArea = layout.getEditorArea();
@@ -15,5 +16,6 @@ public class Perspective implements IPerspectiveFactory {
 		IFolderLayout left = layout.createFolder("left", IPageLayout.LEFT,
 				(float) 1.00, editorArea);
 		left.addView(WidgetGalleryView.ID);
+		left.addView("org.eclipse.jdt.ui.PackageExplorer");
 	}
 }

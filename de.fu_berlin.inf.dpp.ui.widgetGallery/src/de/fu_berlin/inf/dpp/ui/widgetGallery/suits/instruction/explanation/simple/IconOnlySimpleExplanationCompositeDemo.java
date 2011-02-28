@@ -9,7 +9,8 @@ import de.fu_berlin.inf.dpp.ui.widgets.explanation.SimpleExplanationComposite;
 import de.fu_berlin.inf.dpp.ui.widgets.explanation.SimpleExplanationComposite.SimpleExplanation;
 
 public class IconOnlySimpleExplanationCompositeDemo extends Demo {
-	public IconOnlySimpleExplanationCompositeDemo(DemoContainer demoContainer, String title) {
+	public IconOnlySimpleExplanationCompositeDemo(DemoContainer demoContainer,
+			String title) {
 		super(demoContainer, title);
 	}
 
@@ -17,7 +18,8 @@ public class IconOnlySimpleExplanationCompositeDemo extends Demo {
 	public void createPartControls(Composite parent) {
 		SimpleExplanationComposite simpleExplanationComposite = new SimpleExplanationComposite(
 				parent, SWT.NONE);
-		SimpleExplanation simpleExplanation = new SimpleExplanation(SWT.ICON_INFORMATION);
+		SimpleExplanation simpleExplanation = new SimpleExplanation(
+				SWT.ICON_INFORMATION);
 		simpleExplanationComposite.setExplanation(simpleExplanation);
 	}
 }

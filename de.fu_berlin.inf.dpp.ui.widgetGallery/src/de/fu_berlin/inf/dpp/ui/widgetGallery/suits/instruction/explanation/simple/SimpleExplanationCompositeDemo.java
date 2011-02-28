@@ -9,7 +9,8 @@ import de.fu_berlin.inf.dpp.ui.widgets.explanation.SimpleExplanationComposite;
 import de.fu_berlin.inf.dpp.ui.widgets.explanation.SimpleExplanationComposite.SimpleExplanation;
 
 public class SimpleExplanationCompositeDemo extends Demo {
-	public SimpleExplanationCompositeDemo(DemoContainer demoContainer, String title) {
+	public SimpleExplanationCompositeDemo(DemoContainer demoContainer,
+			String title) {
 		super(demoContainer, title);
 	}
 

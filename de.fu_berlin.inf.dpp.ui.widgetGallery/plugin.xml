@@ -5,7 +5,8 @@
    <extension
          id="application"
          point="org.eclipse.core.runtime.applications">
-      <application>
+      <application
+            icon="icons/view16/widget_gallery_misc.png">
          <run
                class="de.fu_berlin.inf.dpp.ui.widgetGallery.application.Application">
          </run>
@@ -14,20 +15,33 @@
    <extension
          point="org.eclipse.ui.perspectives">
       <perspective
-            name="RCP Perspective"
+            name="Widget Gallery"
             class="de.fu_berlin.inf.dpp.ui.widgetGallery.application.Perspective"
-            id="de.fu.perspective">
+            id="de.fu_berlin.inf.dpp.ui.widgetGallery.perspective">
       </perspective>
    </extension>
    <extension
          point="org.eclipse.ui.views">
       <view
             allowMultiple="false"
+            category="de.fu_berlin.inf.dpp.Developer"
             class="de.fu_berlin.inf.dpp.ui.widgetGallery.views.WidgetGalleryView"
-            id="de.fu_berlin.inf.dpp.ui.widgetGallery.views.WidgetGalleryView"
-            name="Demo"
+            icon="icons/view16/widget_gallery_misc.png"
+            id="de.fu_berlin.inf.dpp.ui.widgetGallery.WidgetGalleryView"
+            name="Saros Widget Gallery"
             restorable="true">
       </view>
+   </extension>
+   <extension
+         point="org.eclipse.ui.perspectiveExtensions">
+      <perspectiveExtension
+            targetID="*">
+         <view
+               id="de.fu_berlin.inf.dpp.ui.widgetGallery.WidgetGalleryView"
+               minimized="false"
+               relationship="left">
+         </view>
+      </perspectiveExtension>
    </extension>
 
 </plugin>

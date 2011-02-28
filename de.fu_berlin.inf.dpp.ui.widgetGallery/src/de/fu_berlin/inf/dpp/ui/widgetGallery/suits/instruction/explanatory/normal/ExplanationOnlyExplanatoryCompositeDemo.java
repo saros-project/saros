@@ -15,7 +15,8 @@ import de.fu_berlin.inf.dpp.ui.widgets.explanation.ExplanationComposite;
 import de.fu_berlin.inf.dpp.ui.widgets.explanation.explanatory.ExplanatoryComposite;
 
 public class ExplanationOnlyExplanatoryCompositeDemo extends Demo {
-	public ExplanationOnlyExplanatoryCompositeDemo(DemoContainer demoContainer, String title) {
+	public ExplanationOnlyExplanatoryCompositeDemo(DemoContainer demoContainer,
+			String title) {
 		super(demoContainer, title);
 	}
 
@@ -28,17 +29,18 @@ public class ExplanationOnlyExplanatoryCompositeDemo extends Demo {
 		final ExplanationComposite explanationComposite = new ExplanationComposite(
 				explanatoryComposite, SWT.NONE, null);
 		explanationComposite.setLayout(new GridLayout(1, false));
-		
-		Composite explanationContent = new Composite(explanationComposite, SWT.NONE);
+
+		Composite explanationContent = new Composite(explanationComposite,
+				SWT.NONE);
 		explanationContent.setLayout(new GridLayout(1, false));
 		explanationContent.setLayoutData(new GridData(SWT.BEGINNING,
 				SWT.CENTER, true, true));
-		
+
 		Label explanationLabel = new Label(explanationContent, SWT.NONE);
 		explanationLabel.setLayoutData(new GridData(SWT.BEGINNING,
 				SWT.BEGINNING, false, false));
 		explanationLabel.setText("I'm the explanation.");
-		
+
 		Button explanationButton = new Button(explanationContent, SWT.PUSH);
 		explanationButton.setLayoutData(new GridData(SWT.BEGINNING,
 				SWT.BEGINNING, false, false));
