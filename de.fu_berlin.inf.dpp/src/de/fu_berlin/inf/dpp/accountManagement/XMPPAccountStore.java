@@ -16,10 +16,10 @@ import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
 @Component(module = "accountManagement")
 public class XMPPAccountStore {
 
-    private ArrayList<XMPPAccount> accounts;
+    private List<XMPPAccount> accounts;
     private XMPPAccount activeAccount;
     private IPreferenceStore preferenceStore;
-    private Integer maxId = 0;
+    private Integer maxId;
 
     public XMPPAccountStore(Saros saros) {
         this.preferenceStore = saros.getPreferenceStore();
@@ -38,19 +38,19 @@ public class XMPPAccountStore {
         int i = 1;
         for (XMPPAccount account : accounts) {
             if (!account.isActive) {
-                this.preferenceStore.setValue("username" + i,
+                this.preferenceStore.setValue(PreferenceConstants.USERNAME + i,
                     account.getUsername());
-                this.preferenceStore.setValue("password" + i,
+                this.preferenceStore.setValue(PreferenceConstants.PASSWORD + i,
                     account.getPassword());
-                this.preferenceStore
-                    .setValue("server" + i, account.getServer());
+                this.preferenceStore.setValue(PreferenceConstants.SERVER + i,
+                    account.getServer());
                 i++;
             }
         }
         // set end-entry (empty string)
-        this.preferenceStore.setValue("username" + i, "");
-        this.preferenceStore.setValue("password" + i, "");
-        this.preferenceStore.setValue("server" + i, "");
+        this.preferenceStore.setValue(PreferenceConstants.USERNAME + i, "");
+        this.preferenceStore.setValue(PreferenceConstants.PASSWORD + i, "");
+        this.preferenceStore.setValue(PreferenceConstants.SERVER + i, "");
     }
 
     /**
@@ -58,10 +58,15 @@ public class XMPPAccountStore {
      */
     public void loadAccounts() {
         accounts.clear();
+        maxId = 0;
+
         // load default account (keys: username, password, server)
-        String defaultUsername = preferenceStore.getString("username");
-        String defaultPassword = preferenceStore.getString("password");
-        String defaultServer = preferenceStore.getString("server");
+        String defaultUsername = preferenceStore
+            .getString(PreferenceConstants.USERNAME);
+        String defaultPassword = preferenceStore
+            .getString(PreferenceConstants.PASSWORD);
+        String defaultServer = preferenceStore
+            .getString(PreferenceConstants.SERVER);
 
         // no default account exist
         if (defaultUsername.length() < 1) {
@@ -76,9 +81,12 @@ public class XMPPAccountStore {
         int i = 1;
         boolean noMoreUserFound = false;
         do {
-            String username = preferenceStore.getString("username" + i);
-            String password = preferenceStore.getString("password" + i);
-            String server = preferenceStore.getString("server" + i);
+            String username = preferenceStore
+                .getString(PreferenceConstants.USERNAME + i);
+            String password = preferenceStore
+                .getString(PreferenceConstants.PASSWORD + i);
+            String server = preferenceStore
+                .getString(PreferenceConstants.SERVER + i);
             i++;
             if (username.length() < 1) {
                 noMoreUserFound = true;
@@ -103,19 +111,77 @@ public class XMPPAccountStore {
     }
 
     /**
-     * Checks if the managers state is valid.
+     * Returns a list containing all accounts.
+     * 
+     * @return
      */
-    protected void checkInvariants() {
-        boolean isValid = (activeAccount != null) && (accounts.size() > 0)
-            && (preferenceStore != null);
-
-        if (!isValid)
-            throw new IllegalStateException(
-                "XMPPAccountManager has invalid state!");
+    public List<XMPPAccount> getAllAccounts() {
+        Collections.sort(this.accounts);
+        return Collections.unmodifiableList(this.accounts);
     }
 
-    public List<XMPPAccount> getAllAccounts() {
-        return Collections.unmodifiableList(this.accounts);
+    /**
+     * Returns a list of all used domains.
+     * <p>
+     * <b>Example:</b><br/>
+     * If the {@link XMPPAccountStore} contains users
+     * <ul>
+     * <li>alice@jabber.org</li>
+     * <li>bob@xyz.com [googlemail.com]</li>
+     * <li>carl@saros-con.imp.fu-berlin.de</li>
+     * </ul>
+     * the server list contains
+     * <ul>
+     * <li>jabber.org</li>
+     * <li>xyz.com</li>
+     * <li>saros-con.imp.fu-berlin.de</li>
+     * </ul>.
+     * 
+     * @return
+     */
+    public List<String> getDomains() {
+        List<String> domains = new ArrayList<String>();
+        for (XMPPAccount account : this.accounts) {
+            String username = account.getUsername();
+            String domain;
+            if (username.contains("@")) {
+                domain = username.split("@")[1];
+            } else {
+                domain = account.getServer();
+            }
+            if (!domains.contains(domain))
+                domains.add(domain);
+        }
+        return domains;
+    }
+
+    /**
+     * Returns a list of all used servers.
+     * <p>
+     * <b>Example:</b><br/>
+     * If the {@link XMPPAccountStore} contains users
+     * <ul>
+     * <li>alice@jabber.org</li>
+     * <li>bob@xyz.com [googlemail.com]</li>
+     * <li>carl@saros-con.imp.fu-berlin.de</li>
+     * </ul>
+     * the server list contains
+     * <ul>
+     * <li>jabber.org</li>
+     * <li>googlemail.com</li>
+     * <li>saros-con.imp.fu-berlin.de</li>
+     * </ul>.
+     * 
+     * @return
+     */
+    public List<String> getServers() {
+        List<String> servers = new ArrayList<String>();
+        for (XMPPAccount account : this.accounts) {
+            String server = account.getServer();
+            if (!servers.contains(server))
+                servers.add(server);
+        }
+        return servers;
     }
 
     /**
@@ -210,9 +276,9 @@ public class XMPPAccountStore {
      */
     public XMPPAccount createNewAccount(String username, String password,
         String server) {
-        XMPPAccount newAccount = new XMPPAccount(username, password, server);
+        XMPPAccount newAccount = new XMPPAccount(createNewId(), username,
+            password, server);
         newAccount.setActive(false);
-        newAccount.setId(createNewId());
         this.accounts.add(newAccount);
         return newAccount;
     }

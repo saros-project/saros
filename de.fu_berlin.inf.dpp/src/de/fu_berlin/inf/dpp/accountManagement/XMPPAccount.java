@@ -7,27 +7,24 @@ import java.io.Serializable;
  * 
  * @author Sebastian Schlaak
  */
-public class XMPPAccount implements Serializable {
+public class XMPPAccount implements Comparable<XMPPAccount>, Serializable {
 
     private static final long serialVersionUID = 3710620029882513026L;
     public static final int NOT_INITIALIZED = -1;
 
-    int id;
-    String username;
-    String password;
-    String server;
+    protected final int id;
+    protected String username;
+    protected String password;
+    protected String server;
     boolean isActive;
 
-    public XMPPAccount(String username, String password, String server) {
+    public XMPPAccount(int id, String username, String password, String server) {
+        this.id = id;
         this.username = username;
         this.password = password;
         this.server = server;
         this.isActive = false;
         id = NOT_INITIALIZED;
-    }
-
-    public XMPPAccount() {
-        // default constructor
     }
 
     public String getUsername() {
@@ -64,10 +61,6 @@ public class XMPPAccount implements Serializable {
 
     public int getId() {
         return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
     }
 
     @Override
@@ -116,5 +109,9 @@ public class XMPPAccount implements Serializable {
         } else if (!username.equals(other.username))
             return false;
         return true;
+    }
+
+    public int compareTo(XMPPAccount xmppAccount) {
+        return this.getUsername().compareTo(xmppAccount.getUsername());
     }
 }
