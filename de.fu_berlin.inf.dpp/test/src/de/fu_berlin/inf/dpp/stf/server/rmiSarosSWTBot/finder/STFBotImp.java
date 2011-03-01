@@ -197,7 +197,13 @@ public class STFBotImp extends STF implements STFBot {
     }
 
     public boolean isShellOpen(String title) throws RemoteException {
-        return getTitlesOfOpenedShells().contains(title);
+        try {
+            swtBot.shell(title);
+            return true;
+        } catch (WidgetNotFoundException e) {
+            return false;
+        }
+        // return getTitlesOfOpenedShells().contains(title);
     }
 
     public void waitsUntilShellIsClosed(final String title)
@@ -216,6 +222,19 @@ public class STFBotImp extends STF implements STFBot {
 
     public void waitUntilShellIsOpen(final String title) throws RemoteException {
         swtBot.waitUntil(new DefaultCondition() {
+            public boolean test() throws Exception {
+                return isShellOpen(title);
+            }
+
+            public String getFailureMessage() {
+                return null;
+            }
+        });
+    }
+
+    public void waitLongUntilShellIsOpen(final String title)
+        throws RemoteException {
+        waitLongUntil(new DefaultCondition() {
             public boolean test() throws Exception {
                 return isShellOpen(title);
             }

@@ -131,7 +131,7 @@ public class ConfigTester {
 
     public final static boolean DEVELOPMODE = true;
 
-    public final static accountType WHICH_ACCOUNT = accountType.USER_STF_WITH_SAROS_CON_SERVER;
+    public final static accountType WHICH_ACCOUNT = accountType.USER1_FU_WITH_JABBER_CCC_SERVER;
 
     public enum accountType {
         USER1_FU_WITH_JABBER_CCC_SERVER, USER_STF_WITH_SAROS_CON_SERVER, USER1_FU_WITH_SAROS_CON_SERVER

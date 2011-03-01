@@ -115,13 +115,8 @@ public class RosterViewImp extends SarosComponentImp implements RosterView {
         if (!hasBuddyNoGUI(buddyJID))
             return;
         try {
-            STFBotTreeItem item = bot()
-                .view(VIEW_SAROS_BUDDIES)
-                .bot()
-                .tree()
-                .selectTreeItemWithRegex(NODE_BUDDIES + ".*",
-                    buddyNickName + ".*");
-            item.contextMenu(CM_DELETE).click();
+            tree.selectTreeItemWithRegex(NODE_BUDDIES + ".*",
+                buddyNickName + ".*").contextMenu(CM_DELETE).click();
             bot().waitUntilShellIsOpen(CONFIRM_DELETE);
             bot().shell(CONFIRM_DELETE).activate();
             bot().shell(CONFIRM_DELETE).bot().button(YES).click();
@@ -131,8 +126,8 @@ public class RosterViewImp extends SarosComponentImp implements RosterView {
     }
 
     public void confirmShellRemovelOfSubscription() throws RemoteException {
-        if (!bot().isShellOpen(SHELL_REMOVAL_OF_SUBSCRIPTION))
-            bot().waitUntilShellIsOpen(SHELL_REMOVAL_OF_SUBSCRIPTION);
+
+        bot().waitUntilShellIsOpen(SHELL_REMOVAL_OF_SUBSCRIPTION);
         bot().shell(SHELL_REMOVAL_OF_SUBSCRIPTION).activate();
         bot().shell(SHELL_REMOVAL_OF_SUBSCRIPTION).confirm(OK);
     }
@@ -159,7 +154,7 @@ public class RosterViewImp extends SarosComponentImp implements RosterView {
         if (!shell.activate()) {
             shell.waitUntilActive();
         }
-        shell.bot().text(buddyNickName).setText(newBuddyName);
+        shell.bot().text().setText(newBuddyName);
         shell.bot().button(OK).click();
     }
 
@@ -192,8 +187,16 @@ public class RosterViewImp extends SarosComponentImp implements RosterView {
             Map<String, String> labelsAndTexts = new HashMap<String, String>();
             labelsAndTexts.put("XMPP/Jabber ID", jid.getBase());
 
-            bot().shell(SHELL_NEW_BUDDY).confirmWithTextFieldAndWait(
-                labelsAndTexts, FINISH);
+            bot().shell(SHELL_NEW_BUDDY).bot().textWithLabel("XMPP/Jabber ID")
+                .setText(jid.getBase());
+            bot().shell(SHELL_NEW_BUDDY).bot().button(FINISH)
+                .waitUntilIsEnabled();
+            bot().shell(SHELL_NEW_BUDDY).bot().button(FINISH).click();
+
+            bot().sleep(500);
+            if (bot().isShellOpen("Unknown Buddy Status")) {
+                bot().shell("Unknown Buddy Status").confirm(YES);
+            }
         }
     }
 
@@ -318,8 +321,12 @@ public class RosterViewImp extends SarosComponentImp implements RosterView {
 
     public String getBuddyNickNameNoGUI(JID buddyJID) throws RemoteException {
         Roster roster = saros.getRoster();
-        if (roster.getEntry(buddyJID.getBase()) == null)
-            return null;
+        if (roster.getEntry(buddyJID.getBase()) == null) {
+            throw new RuntimeException("The buddy doesn't exist.");
+        }
+        if (roster.getEntry(buddyJID.getBase()).getName() == null) {
+            return buddyJID.getBase();
+        }
         return roster.getEntry(buddyJID.getBase()).getName();
     }
 

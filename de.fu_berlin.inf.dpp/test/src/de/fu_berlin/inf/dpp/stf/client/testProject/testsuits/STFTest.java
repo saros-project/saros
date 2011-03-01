@@ -389,18 +389,23 @@ public class STFTest extends STF {
     }
 
     public static void resetBuddiesName() throws RemoteException {
-        for (Tester tester : activeTesters) {
-            tester.sarosBot().buddiesView().resetAllBuddyNameNoGUI();
+        for (int i = 0; i < activeTesters.size(); i++) {
+            for (int j = i + 1; j < activeTesters.size(); j++) {
+                activeTesters
+                    .get(i)
+                    .sarosBot()
+                    .buddiesView()
+                    .renameBuddy(activeTesters.get(j).jid,
+                        activeTesters.get(j).getBaseJid());
+            }
         }
     }
 
     public static void resetBuddies() throws RemoteException {
         // check buddy lists.
-        for (Tester tester : activeTesters) {
-            for (Tester otherTester : activeTesters) {
-                if (tester != otherTester) {
-                    addBuddies(tester, otherTester);
-                }
+        for (int i = 0; i < activeTesters.size(); i++) {
+            for (int j = i + 1; j < activeTesters.size(); j++) {
+                addBuddies(activeTesters.get(i), activeTesters.get(j));
             }
         }
     }
@@ -692,14 +697,7 @@ public class STFTest extends STF {
                     .activate();
                 peer.bot().shell(SHELL_REQUEST_OF_SUBSCRIPTION_RECEIVED).bot()
                     .button(OK).click();
-
-                host.bot().waitUntilShellIsOpen(
-                    SHELL_REQUEST_OF_SUBSCRIPTION_RECEIVED);
-                host.bot().shell(SHELL_REQUEST_OF_SUBSCRIPTION_RECEIVED)
-                    .activate();
-                host.bot().shell(SHELL_REQUEST_OF_SUBSCRIPTION_RECEIVED).bot()
-                    .button(OK).click();
-
+                peer.bot().sleep(500);
             }
         }
     }

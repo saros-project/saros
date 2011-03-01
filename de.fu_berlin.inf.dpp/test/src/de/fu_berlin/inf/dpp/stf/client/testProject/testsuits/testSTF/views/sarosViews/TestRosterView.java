@@ -39,9 +39,8 @@ public class TestRosterView extends STFTest {
 
     @After
     public void runAfterEveryTest() throws RemoteException {
-        resetBuddiesName();
         resetBuddies();
-
+        resetBuddiesName();
     }
 
     @Test
@@ -79,23 +78,28 @@ public class TestRosterView extends STFTest {
      * </ol>
      * 
      * @throws RemoteException
+     * 
+     *             TODO: This test isn't stable, sometime it is successful,
+     *             sometime not. I think, there are some little bugs in this
+     *             test case.
      */
     @Test
-    public void renameBuddyWithGUI() throws RemoteException {
+    public void renameBuddy() throws RemoteException {
         assertTrue(alice.sarosBot().buddiesView().hasBuddyNoGUI(bob.jid));
         alice.sarosBot().buddiesView().renameBuddy(bob.jid, bob.getName());
         assertTrue(alice.sarosBot().buddiesView().hasBuddyNoGUI(bob.jid));
         assertTrue(alice.sarosBot().buddiesView()
             .getBuddyNickNameNoGUI(bob.jid).equals(bob.getName()));
-        // assertTrue(alice.sessionV.isContactInSessionView(bob.jid));
-        alice.sarosBot().buddiesView().renameBuddy(bob.jid, "new bob");
+
+        alice.sarosBot().buddiesView().renameBuddy(bob.jid, "new name");
         assertTrue(alice.sarosBot().buddiesView().hasBuddyNoGUI(bob.jid));
+        alice.bot().sleep(500);
         assertTrue(alice.sarosBot().buddiesView()
-            .getBuddyNickNameNoGUI(bob.jid).equals("new bob"));
-        // assertTrue(alice.sessionV.isContactInSessionView(bob.jid));
+            .getBuddyNickNameNoGUI(bob.jid).equals("new name"));
     }
 
     @Test
+    @Ignore
     public void renameBuddyWithoutGUI() throws RemoteException {
         assertTrue(alice.sarosBot().buddiesView().hasBuddyNoGUI(bob.jid));
         alice.sarosBot().buddiesView().renameBuddyNoGUI(bob.jid, bob.getName());
@@ -110,7 +114,7 @@ public class TestRosterView extends STFTest {
     }
 
     @Test
-    public void addBuddyWithGUI() throws RemoteException {
+    public void addBuddy() throws RemoteException {
         deleteBuddies(alice, bob);
         assertFalse(alice.sarosBot().buddiesView().hasBuddyNoGUI(bob.jid));
         assertFalse(bob.sarosBot().buddiesView().hasBuddyNoGUI(alice.jid));
@@ -168,9 +172,10 @@ public class TestRosterView extends STFTest {
 
     /**
      * Steps:
-     * <ol>
-     * <li>alice invite bob</li>
-     * </ol>
+     * 
+     * 1. Alice share session with bob.
+     * 
+     * 2. Alice invite carl.
      * 
      * Result:
      * <ol>
@@ -181,11 +186,12 @@ public class TestRosterView extends STFTest {
      * @throws InterruptedException
      */
     @Test
-    public void inviteBuddyWithGUI() throws RemoteException,
-        InterruptedException {
+    public void inviteBuddy() throws RemoteException, InterruptedException {
         setUpSessionWithAJavaProjectAndAClass(alice, bob);
+
         assertFalse(carl.sarosBot().state().isInSession());
         alice.sarosBot().buddiesView().inviteBuddy(carl.jid);
+
         carl.bot().shell(SHELL_SESSION_INVITATION).confirm(FINISH);
         carl.sarosBot().confirmShellAddProjectWithNewProject(PROJECT1);
         carl.sarosBot().condition().waitUntilIsInSession();

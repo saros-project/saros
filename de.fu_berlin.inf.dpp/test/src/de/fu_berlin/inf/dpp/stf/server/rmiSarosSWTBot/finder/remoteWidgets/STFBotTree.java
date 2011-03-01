@@ -111,4 +111,7 @@ public interface STFBotTree extends Remote {
 
     public void waitUntilItemExists(String nodeName) throws RemoteException;
 
+    public void waitUntilItemNotExists(final String itemText)
+        throws RemoteException;
+
 }

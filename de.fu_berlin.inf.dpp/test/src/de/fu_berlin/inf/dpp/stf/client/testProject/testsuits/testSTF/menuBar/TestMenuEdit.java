@@ -27,7 +27,7 @@ public class TestMenuEdit extends STFTest {
 
     @Test
     @Ignore
-    public void testDeleteProjectUsingGUI() throws RemoteException {
+    public void testDeleteProject() throws RemoteException {
         alice.sarosBot().file().newJavaProject(PROJECT1);
         assertTrue(alice.sarosBot().state().existsProjectNoGUI(PROJECT1));
         alice.noBot().deleteProjectNoGUI(PROJECT1);
@@ -35,7 +35,7 @@ public class TestMenuEdit extends STFTest {
     }
 
     @Test
-    public void testDeleteFileUsingGUI() throws RemoteException {
+    public void testDeleteFile() throws RemoteException {
         alice.sarosBot().file().newJavaProject(PROJECT1);
         alice.sarosBot().file().newClass(PROJECT1, "pkg", "Cls");
         assertTrue(alice.sarosBot().state()

@@ -199,6 +199,9 @@ public interface STFBot extends Remote {
      */
     public void waitUntilShellIsOpen(final String title) throws RemoteException;
 
+    public void waitLongUntilShellIsOpen(final String title)
+        throws RemoteException;
+
     /**********************************************
      * 
      * Widget button

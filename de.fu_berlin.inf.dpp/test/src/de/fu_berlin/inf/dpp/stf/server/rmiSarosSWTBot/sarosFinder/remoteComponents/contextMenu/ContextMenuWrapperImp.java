@@ -88,6 +88,7 @@ public class ContextMenuWrapperImp extends EclipseComponentImp implements
             bot().sleep(300);
             break;
         }
+        tree.waitUntilItemNotExists(treeItem.getText());
     }
 
     public TeamC team() throws RemoteException {

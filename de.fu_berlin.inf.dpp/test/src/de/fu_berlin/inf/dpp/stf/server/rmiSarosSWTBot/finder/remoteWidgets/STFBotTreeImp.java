@@ -229,6 +229,19 @@ public class STFBotTreeImp extends AbstractRmoteWidget implements STFBotTree {
         });
     }
 
+    public void waitUntilItemNotExists(final String itemText)
+        throws RemoteException {
+        stfBot.waitUntil(new DefaultCondition() {
+            public boolean test() throws Exception {
+                return !existsSubItem(itemText);
+            }
+
+            public String getFailureMessage() {
+                return "Tree " + "doesn't contain the treeItem" + itemText;
+            }
+        });
+    }
+
     /**************************************************************
      * 
      * inner functions

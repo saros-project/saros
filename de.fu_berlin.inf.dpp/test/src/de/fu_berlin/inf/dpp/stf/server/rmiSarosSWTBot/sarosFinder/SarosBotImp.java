@@ -176,9 +176,10 @@ public class SarosBotImp extends STF implements SarosBot {
      **********************************************/
     public void confirmShellAddProjectWithNewProject(String projectname)
         throws RemoteException {
+
+        bot().waitLongUntilShellIsOpen(SHELL_ADD_PROJECT);
         STFBotShell shell = bot().shell(SHELL_ADD_PROJECT);
-        if (!shell.activate())
-            shell.waitUntilActive();
+        shell.activate();
         shell.bot().radio(RADIO_CREATE_NEW_PROJECT).click();
         shell.bot().button(FINISH).click();
 
@@ -206,7 +207,7 @@ public class SarosBotImp extends STF implements SarosBot {
 
     public void confirmShellAddProjectUsingExistProject(String projectName)
         throws RemoteException {
-        bot().waitUntilShellIsOpen(SHELL_ADD_PROJECT);
+        bot().waitLongUntilShellIsOpen(SHELL_ADD_PROJECT);
         STFBotShell shell = bot().shell(SHELL_ADD_PROJECT);
         shell.activate();
         shell.bot().radio(RADIO_USING_EXISTING_PROJECT).click();
@@ -246,7 +247,7 @@ public class SarosBotImp extends STF implements SarosBot {
 
     public void confirmShellAddProjectUsingExistProjectWithCopyAfterCancelLocalChange(
         String projectName) throws RemoteException {
-        bot().waitUntilShellIsOpen(SHELL_ADD_PROJECT);
+        bot().waitLongUntilShellIsOpen(SHELL_ADD_PROJECT);
         STFBotShell shell = bot().shell(SHELL_ADD_PROJECT);
         shell.activate();
         shell.bot().radio("Use existing project").click();
@@ -259,10 +260,9 @@ public class SarosBotImp extends STF implements SarosBot {
 
     public void confirmShellAddProjectUsingExistProjectWithCopy(
         String projectName) throws RemoteException {
+        bot().waitLongUntilShellIsOpen(SHELL_ADD_PROJECT);
         STFBotShell shell = bot().shell(SHELL_ADD_PROJECT);
-        if (!shell.activate())
-            shell.waitUntilActive();
-
+        shell.activate();
         shell.bot().radio("Use existing project").click();
         shell.bot()
             .checkBox("Create copy for working distributed. New project name:")
@@ -273,7 +273,7 @@ public class SarosBotImp extends STF implements SarosBot {
 
     public void confirmShellAddProjectUsingWhichProject(String projectName,
         TypeOfCreateProject usingWhichProject) throws RemoteException {
-        bot().waitUntilShellIsOpen(SHELL_ADD_PROJECT);
+        bot().waitLongUntilShellIsOpen(SHELL_ADD_PROJECT);
         bot().shell(SHELL_ADD_PROJECT).activate();
         switch (usingWhichProject) {
         case NEW_PROJECT:
