@@ -113,7 +113,9 @@ public class TestContextMenuOpen extends STFTest {
         alice.sarosBot().packageExplorerView()
             .selectClass(PROJECT1, PKG1, CLS1)
             .openWith(CM_OPEN_WITH_TEXT_EDITOR);
-        alice.sarosBot().packageExplorerView().open()
-            .openClassWithSystemEditorNoGUI(PROJECT1, PKG1, CLS1);
+        alice.sarosBot().packageExplorerView()
+            .selectClass(PROJECT1, PKG1, CLS1)
+            .openWith(CM_OPEN_WITH_SYSTEM_EDITOR);
+
     }
 }

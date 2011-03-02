@@ -6,8 +6,6 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBo
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotTreeItem;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotView;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.EclipseComponentImp;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.contextMenu.OpenC;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.contextMenu.OpenCImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.contextMenu.SarosContextMenuWrapper;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.contextMenu.SarosContextMenuWrapperImp;
 
@@ -17,7 +15,6 @@ public class PEViewImp extends EclipseComponentImp implements PEView {
     private STFBotTree tree;
     private STFBotTreeItem treeItem;
     private static transient PEViewImp pEViewImp;
-    private static OpenCImp openC;
 
     private static SarosContextMenuWrapperImp contextMenu;
 
@@ -28,7 +25,7 @@ public class PEViewImp extends EclipseComponentImp implements PEView {
         if (pEViewImp != null)
             return pEViewImp;
         pEViewImp = new PEViewImp();
-        openC = OpenCImp.getInstance();
+
         contextMenu = SarosContextMenuWrapperImp.getInstance();
         return pEViewImp;
     }
@@ -48,16 +45,6 @@ public class PEViewImp extends EclipseComponentImp implements PEView {
 
     /**********************************************
      * 
-     * finders
-     * 
-     **********************************************/
-    public OpenC open() throws RemoteException {
-        openC.setView(this);
-        return openC;
-    }
-
-    /**********************************************
-     * 
      * actions
      * 
      **********************************************/
@@ -73,7 +60,7 @@ public class PEViewImp extends EclipseComponentImp implements PEView {
         throws RemoteException {
         initContextMenuWrapper(
             tree.selectTreeItemWithRegex(changeToRegex(projectName), SRC),
-            treeItemType.JAVA_PROJECT);
+            TreeItemType.JAVA_PROJECT);
         return contextMenu;
     }
 
@@ -81,7 +68,7 @@ public class PEViewImp extends EclipseComponentImp implements PEView {
         throws RemoteException {
         initContextMenuWrapper(
             tree.selectTreeItemWithRegex(changeToRegex(projectName)),
-            treeItemType.JAVA_PROJECT);
+            TreeItemType.JAVA_PROJECT);
         return contextMenu;
     }
 
@@ -89,7 +76,7 @@ public class PEViewImp extends EclipseComponentImp implements PEView {
         throws RemoteException {
         initContextMenuWrapper(
             tree.selectTreeItemWithRegex(changeToRegex(projectName)),
-            treeItemType.PROJECT);
+            TreeItemType.PROJECT);
         return contextMenu;
     }
 
@@ -98,7 +85,7 @@ public class PEViewImp extends EclipseComponentImp implements PEView {
         String[] nodes = { projectName, SRC, pkg };
         initContextMenuWrapper(
             tree.selectTreeItemWithRegex(changeToRegex(nodes)),
-            treeItemType.PKG);
+            TreeItemType.PKG);
 
         return contextMenu;
     }
@@ -109,7 +96,7 @@ public class PEViewImp extends EclipseComponentImp implements PEView {
 
         initContextMenuWrapper(
             tree.selectTreeItemWithRegex(changeToRegex(nodes)),
-            treeItemType.CLASS);
+            TreeItemType.CLASS);
 
         return contextMenu;
     }
@@ -118,7 +105,7 @@ public class PEViewImp extends EclipseComponentImp implements PEView {
         throws RemoteException {
         initContextMenuWrapper(
             tree.selectTreeItemWithRegex(changeToRegex(folderNodes)),
-            treeItemType.FOLDER);
+            TreeItemType.FOLDER);
 
         return contextMenu;
     }
@@ -127,7 +114,7 @@ public class PEViewImp extends EclipseComponentImp implements PEView {
         throws RemoteException {
         initContextMenuWrapper(
             tree.selectTreeItemWithRegex(changeToRegex(fileNodes)),
-            treeItemType.FILE);
+            TreeItemType.FILE);
 
         return contextMenu;
     }
@@ -137,7 +124,7 @@ public class PEViewImp extends EclipseComponentImp implements PEView {
     }
 
     private void initContextMenuWrapper(STFBotTreeItem treeItem,
-        treeItemType type) {
+        TreeItemType type) {
         this.treeItem = treeItem;
         contextMenu.setTree(tree);
         contextMenu.setTreeItem(treeItem);

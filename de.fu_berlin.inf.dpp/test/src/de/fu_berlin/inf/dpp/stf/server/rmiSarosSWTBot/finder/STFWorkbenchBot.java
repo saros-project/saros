@@ -37,7 +37,7 @@ public interface STFWorkbenchBot extends STFBot {
      * @param label
      *            the "human readable" label for the perspective
      * @return a perspective with the specified <code>label</code>
-     * @see #perspective(Matcher)
+     * 
      * @see WidgetMatcherFactory#withPerspectiveLabel(Matcher)
      */
     public STFBotPerspective perspectiveByLabel(String label)
@@ -70,7 +70,6 @@ public interface STFWorkbenchBot extends STFBot {
      * @param fileName
      *            the the filename on the editor tab
      * @return the editor with the specified title
-     * @see #editor(Matcher)
      */
     public STFBotEditor editor(String fileName) throws RemoteException;
 
@@ -80,7 +79,6 @@ public interface STFWorkbenchBot extends STFBot {
      * @param id
      *            the the id on the editor tab
      * @return the editor with the specified title
-     * @see #editor(Matcher)
      */
     public STFBotEditor editorById(String id) throws RemoteException;
 

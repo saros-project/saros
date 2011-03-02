@@ -23,7 +23,7 @@ public interface SarosM extends SarosComponent {
      *            network, more about it please see {@link JID}.
      * @param password
      *            the password of the new account.
-     * @param usesThisAccountNow
+     * 
      *            TODO not implement yet.
      * @throws RemoteException
      */

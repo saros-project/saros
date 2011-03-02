@@ -4,7 +4,6 @@ import java.rmi.RemoteException;
 
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.EclipseComponent;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.contextMenu.ContextMenuWrapper;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.contextMenu.OpenC;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.contextMenu.SarosContextMenuWrapper;
 
 /**
@@ -89,8 +88,6 @@ public interface PEView extends EclipseComponent {
      */
     public SarosContextMenuWrapper selectFile(String... fileNodes)
         throws RemoteException;
-
-    public OpenC open() throws RemoteException;
 
     public String getTitle() throws RemoteException;
 }

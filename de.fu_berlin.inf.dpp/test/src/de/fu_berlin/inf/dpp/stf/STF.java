@@ -460,6 +460,7 @@ public class STF {
     protected final static String CM_OPEN_WITH = "Open With";
     protected final static String CM_OTHER = "Other...";
     protected final static String CM_OPEN_WITH_TEXT_EDITOR = "Text Editor";
+    protected final static String CM_OPEN_WITH_SYSTEM_EDITOR = "System Editor";
 
     /**********************************************
      * 

@@ -1,6 +1,7 @@
 package de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.contextMenu;
 
 import java.rmi.RemoteException;
+import java.util.List;
 
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotShell;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotTableItem;
@@ -17,7 +18,7 @@ public class ContextMenuWrapperImp extends EclipseComponentImp implements
 
     protected STFBotTreeItem treeItem;
     protected STFBotTree tree;
-    protected treeItemType type;
+    protected TreeItemType type;
 
     protected STFBotTableItem tableItem;
 
@@ -29,7 +30,7 @@ public class ContextMenuWrapperImp extends EclipseComponentImp implements
         this.tableItem = tableItem;
     }
 
-    public void setTreeItemType(treeItemType type) {
+    public void setTreeItemType(TreeItemType type) {
         this.type = type;
     }
 
@@ -98,7 +99,6 @@ public class ContextMenuWrapperImp extends EclipseComponentImp implements
     public NewC newC() throws RemoteException {
         newC.setTree(tree);
         newC.setTreeItem(treeItem);
-        newC.setTreeItemType(type);
         return newC;
     }
 
@@ -134,6 +134,28 @@ public class ContextMenuWrapperImp extends EclipseComponentImp implements
             return tree.getTextOfItems().contains(name);
         } else {
             return treeItem.getTextOfItems().contains(name);
+        }
+    }
+
+    public void deleteAllProjects() throws RemoteException {
+        List<String> allTreeItems = tree.getTextOfItems();
+        if (allTreeItems != null) {
+            for (String item : allTreeItems) {
+                tree.selectTreeItem(item).contextMenu(MENU_DELETE).click();
+                STFBotShell shell = bot().shell(SHELL_DELETE_RESOURCE);
+
+                shell.confirmWithCheckBox(OK, true);
+                bot().waitsUntilShellIsClosed(SHELL_DELETE_RESOURCE);
+            }
+        }
+    }
+
+    public void deleteAllItems() throws RemoteException {
+        for (STFBotTreeItem subItem : treeItem.getItems()) {
+            subItem.contextMenu(CM_DELETE).click();
+            bot().waitUntilShellIsOpen(CONFIRM_DELETE);
+            bot().shell(CONFIRM_DELETE).activate();
+            bot().shell(CONFIRM_DELETE).bot().button(OK).click();
         }
     }
 }

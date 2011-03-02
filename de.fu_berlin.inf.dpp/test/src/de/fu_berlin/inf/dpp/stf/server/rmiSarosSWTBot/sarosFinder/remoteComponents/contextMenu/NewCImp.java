@@ -15,7 +15,6 @@ public class NewCImp extends EclipseComponentImp implements NewC {
 
     private STFBotTreeItem treeItem;
     private STFBotTree tree;
-    private treeItemType type;
 
     /**
      * {@link NewCImp} is a singleton, but inheritance is possible.
@@ -29,10 +28,6 @@ public class NewCImp extends EclipseComponentImp implements NewC {
 
     public void setTreeItem(STFBotTreeItem treeItem) {
         this.treeItem = treeItem;
-    }
-
-    public void setTreeItemType(treeItemType type) {
-        this.type = type;
     }
 
     public void setTree(STFBotTree tree) {
@@ -77,8 +72,7 @@ public class NewCImp extends EclipseComponentImp implements NewC {
         }
     }
 
-    public void okg(String projectName, String pkg)
-        throws RemoteException {
+    public void okg(String projectName, String pkg) throws RemoteException {
         if (pkg.matches(PKG_REGEX)) {
             // if (!sarosBot().state().existsPkgNoGUI(projectName, pkg))
             try {
@@ -138,8 +132,7 @@ public class NewCImp extends EclipseComponentImp implements NewC {
         // }
     }
 
-    public void clsImplementsRunnable(String className)
-        throws RemoteException {
+    public void clsImplementsRunnable(String className) throws RemoteException {
         if (!exists(className)) {
             bot().menu(MENU_FILE).menu(MENU_NEW).menu(MENU_CLASS).click();
             STFBotShell shell_new = bot().shell(SHELL_NEW_JAVA_CLASS);

@@ -43,8 +43,6 @@ public interface STFBotEditor extends Remote {
     /**
      * activate the editor specified with the given fileName
      * 
-     * @param fileName
-     *            the filename on the editor tab
      * @throws RemoteException
      */
     public void show() throws RemoteException;
@@ -54,8 +52,7 @@ public interface STFBotEditor extends Remote {
     /**
      * waits until the editor specified with the given fileName is active
      * 
-     * @param fileName
-     *            the filename on the editor tab
+     * 
      * @throws RemoteException
      */
     public void waitUntilIsActive() throws RemoteException;
@@ -63,8 +60,7 @@ public interface STFBotEditor extends Remote {
     /**
      * Saves and closes the given editor.
      * 
-     * @param fileName
-     *            the filename on the editor tab
+     * 
      * @throws RemoteException
      */
     public void closeWithSave() throws RemoteException;
@@ -78,8 +74,6 @@ public interface STFBotEditor extends Remote {
      * Any unsaved changes are discard, if the editor has unsaved content.
      * </p>
      * 
-     * @param fileName
-     *            the filename on the editor tab
      * @throws RemoteException
      */
     public void closeWithoutSave() throws RemoteException;
@@ -91,10 +85,7 @@ public interface STFBotEditor extends Remote {
      **********************************************/
     /**
      * 
-     * @param filenodes
-     *            node path to expand. Attempts to expand all nodes along the
-     *            path specified by the node array parameter.e.g.
-     *            {"Foo-saros","parentFolder" ,"myFolder"}.
+     * 
      * @return the content of the editor specified with the last element of the
      *         given array, which my be dirty.
      * @throws RemoteException
@@ -111,8 +102,6 @@ public interface STFBotEditor extends Remote {
 
     /**
      * 
-     * @param className
-     *            the name of the java file without the suffix ".java".
      * @param line
      *            the line number, 0 based.
      * @return the color of the background on the specified line.
@@ -133,10 +122,7 @@ public interface STFBotEditor extends Remote {
      *            the path to the test file whose content should be inserted in
      *            the text editor. All such test files are located in the
      *            directory [Saros]/test/STF.
-     * @param fileNodes
-     *            node path to expand. Attempts to expand all nodes along the
-     *            path specified by the node array parameter.e.g.
-     *            {"Foo-saros","parentFolder" ,"myFolder"}.
+     * 
      * @throws RemoteException
      */
     public void setTexWithSave(String contentPath) throws RemoteException;
@@ -147,18 +133,10 @@ public interface STFBotEditor extends Remote {
      * transfer delay Bob need to wait a minute to see the changes. So it will
      * be a good idea that you give bob some time before you compare the two
      * files between Alice and Bob.
-     * <p>
-     * <b>Note:</b> the method is different from
-     * {@link STFBotEditor#waitUntilClassContentsSame(String, String, String, String)}
-     * , which compare the contents of the class files which isn't dirty.
-     * </p>
+     * 
      * 
      * @param otherClassContent
      *            the content of another class, to which you want to compare.
-     * @param fileNodes
-     *            node path to expand. Attempts to expand all nodes along the
-     *            path specified by the node array parameter.e.g.
-     *            {"Foo-saros","parentFolder" ,"myFolder"}.
      */
     public void waitUntilIsTextSame(String otherClassContent)
         throws RemoteException;
@@ -171,10 +149,7 @@ public interface STFBotEditor extends Remote {
      *            the path to the test file whose content should be set in the
      *            text editor. All such test files are located in the directory
      *            [Saros]/test/STF.
-     * @param fileNodes
-     *            node path to expand. Attempts to expand all nodes along the
-     *            path specified by the node array parameter.e.g.
-     *            {"Foo-saros","parentFolder" ,"myFolder"}.
+     * 
      * @throws RemoteException
      */
     public void setTextWithoutSave(String contentPath) throws RemoteException;
@@ -187,10 +162,7 @@ public interface STFBotEditor extends Remote {
      * 
      * @param text
      *            the text to type.
-     * @param fileNodes
-     *            node path to expand. Attempts to expand all nodes along the
-     *            path specified by the node array parameter.e.g.
-     *            {"Foo-saros","parentFolder" ,"myFolder"}.
+     * 
      * @throws RemoteException
      */
     public void typeText(String text) throws RemoteException;
@@ -216,8 +188,7 @@ public interface STFBotEditor extends Remote {
     /**
      * Changes the cursor position in editor.
      * 
-     * @param fileName
-     *            name of the file with suffix, e.g. myFile.xml
+     * 
      * @param line
      *            the line number, 0 based.
      * @param column
@@ -230,8 +201,7 @@ public interface STFBotEditor extends Remote {
     /**
      * Presses the shortcut specified by the given keys.
      * 
-     * @param fileName
-     *            name of the file with suffix, e.g. myFile.xml
+     * 
      * @param keys
      *            the formal representation for key strokes
      * @throws RemoteException
@@ -242,7 +212,7 @@ public interface STFBotEditor extends Remote {
 
     /**
      * 
-     * @param fileName
+     * 
      * @param insertText
      * @param proposalText
      * @throws RemoteException
@@ -267,11 +237,6 @@ public interface STFBotEditor extends Remote {
 
     public String getSelection() throws RemoteException;
 
-    /**
-     * 
-     * @param fileName
-     * @throws RemoteException
-     */
     public void pressShortCutDelete() throws RemoteException;
 
     public void pressShortCutEnter() throws RemoteException;

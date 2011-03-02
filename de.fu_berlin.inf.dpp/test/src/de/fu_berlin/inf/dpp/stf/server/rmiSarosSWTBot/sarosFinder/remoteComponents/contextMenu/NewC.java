@@ -67,14 +67,6 @@ public interface NewC extends EclipseComponent {
      * the sub menu's name "Folder" on the package Explorer view.</li>
      * </ol>
      * 
-     * @param newFolderName
-     *            the name of the new created folder which should be located in
-     *            the parent folder specified by the parentNodes array
-     *            parameter. e.g. "myFolder"
-     * @param parentNodes
-     *            node path to expand. Attempts to expand all parent nodes along
-     *            the path specified by the parent node array parameter.e.g.
-     *            {"Foo-saros","parentFolder" }
      */
     public void folder(String folderName) throws RemoteException;
 
@@ -103,8 +95,7 @@ public interface NewC extends EclipseComponent {
      *            name of the package, e.g. my.pkg.
      * 
      */
-    public void okg(String projectName, String pkg)
-        throws RemoteException;
+    public void okg(String projectName, String pkg) throws RemoteException;
 
     /**
      * Performs the action "create a new file" which should be done with the
@@ -123,10 +114,6 @@ public interface NewC extends EclipseComponent {
      * the sub menu's name "File" on the package Explorer view.</li>
      * </ol>
      * 
-     * @param fileNodes
-     *            node path to expand. Attempts to expand all nodes along the
-     *            path specified by the node array parameter.e.g.
-     *            {"Foo-saros","parentFolder" ,"myFolder", "myFile.xml"}
      * 
      */
     public void file(String fileName) throws RemoteException;
@@ -149,10 +136,6 @@ public interface NewC extends EclipseComponent {
      * the sub menu's name "Class" on the package Explorer view.</li>
      * </ol>
      * 
-     * @param projectName
-     *            name of the project, e.g. Foo_Saros.
-     * @param pkg
-     *            name of the package, e.g. my.pkg.
      * @param className
      *            name of the class, e.g. myClass.
      * 
@@ -181,16 +164,12 @@ public interface NewC extends EclipseComponent {
      * </li>
      * </ol>
      * 
-     * @param projectName
-     *            name of the project, e.g. Foo_Saros.
-     * @param pkg
-     *            name of the package, e.g. my.pkg.
+     * 
      * @param className
      *            name of the class, e.g. myClass.
      * 
      */
-    public void clsImplementsRunnable(String className)
-        throws RemoteException;
+    public void clsImplementsRunnable(String className) throws RemoteException;
 
     /**
      * Create a java project and a class in the project. The two functions

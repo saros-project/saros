@@ -14,7 +14,6 @@ import org.junit.Test;
 
 import de.fu_berlin.inf.dpp.stf.client.testProject.testsuits.STFTest;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotView;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.views.sarosViews.RosterView;
 
 public class TestRosterView extends STFTest {
 
@@ -123,16 +122,9 @@ public class TestRosterView extends STFTest {
         assertTrue(bob.sarosBot().buddiesView().hasBuddyNoGUI(alice.jid));
     }
 
-    /**
-     * FIXME the method
-     * {@link RosterView#addANewContact(de.fu_berlin.inf.dpp.net.JID)}
-     * 
-     * @throws RemoteException
-     * @throws XMPPException
-     */
     @Test
     @Ignore
-    public void addBuddyWithoutGUI() throws RemoteException, XMPPException {
+    public void addBuddyWithoutGUI() throws RemoteException {
         deleteBuddies(alice, bob);
         assertFalse(alice.sarosBot().buddiesView().hasBuddyNoGUI(bob.jid));
         assertFalse(bob.sarosBot().buddiesView().hasBuddyNoGUI(alice.jid));

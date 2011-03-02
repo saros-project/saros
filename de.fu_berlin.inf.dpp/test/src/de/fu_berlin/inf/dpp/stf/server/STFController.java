@@ -40,12 +40,10 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.StateImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.WaitImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.EclipseComponentImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.contextMenu.NewCImp;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.contextMenu.OpenCImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.contextMenu.RefactorCImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.contextMenu.SarosCImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.contextMenu.SarosContextMenuWrapperImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.contextMenu.TeamCImp;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.menuBar.EditMImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.menuBar.SarosMImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.menuBar.SarosPreferencesImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.menuBar.WindowMImp;
@@ -123,13 +121,13 @@ public class STFController {
         exportObject(ChatViewImp.getInstance(), "chatView");
         exportObject(ConsoleViewImp.getInstance(), "consoleView");
         exportObject(NewCImp.getInstance(), "fileM");
-        exportObject(EditMImp.getInstance(), "editM");
+
         exportObject(RefactorCImp.getInstance(), "refactorM");
         exportObject(WindowMImp.getInstance(), "windowM");
         exportObject(SarosMImp.getInstance(), "sarosM");
         exportObject(TeamCImp.getInstance(), "team");
         exportObject(SarosCImp.getInstance(), "saros");
-        exportObject(OpenCImp.getInstance(), "open");
+
         exportObject(SarosContextMenuWrapperImp.getInstance(), "contextMenu");
         exportObject(SarosPreferencesImp.getInstance(), "sarosPreferences");
         exportObject(StateImp.getInstance(), "state");

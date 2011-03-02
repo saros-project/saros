@@ -22,8 +22,8 @@ public class EclipseComponentImp extends STF implements EclipseComponent {
 
     // Picocontainer initiated by STFController.
 
-    public enum treeItemType {
-        JAVA_PROJECT, PROJECT, FILE, CLASS, PKG, FOLDER
+    public enum TreeItemType {
+        JAVA_PROJECT, PROJECT, FILE, CLASS, PKG, FOLDER, NULL
     }
 
     public enum BuddyRole {

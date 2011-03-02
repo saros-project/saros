@@ -11,7 +11,7 @@ public class RefactorCImp extends EclipseComponentImp implements RefactorC {
     private static transient RefactorCImp refactorImp;
 
     private STFBotTreeItem treeItem;
-    private treeItemType type;
+    private TreeItemType type;
 
     /**
      * {@link NewCImp} is a singleton, but inheritance is possible.
@@ -27,7 +27,7 @@ public class RefactorCImp extends EclipseComponentImp implements RefactorC {
         this.treeItem = treeItem;
     }
 
-    public void setTreeItemType(treeItemType type) {
+    public void setTreeItemType(TreeItemType type) {
         this.type = type;
     }
 

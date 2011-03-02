@@ -26,4 +26,13 @@ public interface ContextMenuWrapper extends EclipseComponent {
 
     public boolean exists(String name) throws RemoteException;
 
+    /**
+     * Delete all the projects existed in the package explorer view.
+     * 
+     * @throws RemoteException
+     */
+    public void deleteAllProjects() throws RemoteException;
+
+    public void deleteAllItems() throws RemoteException;
+
 }

@@ -32,7 +32,7 @@ public class STFBotTreeItemImp extends AbstractRmoteWidget implements
         return this;
     }
 
-    public void setSWTBotTree(SWTBotTree tree) throws RemoteException {
+    public void setSWTBotTree(SWTBotTree tree) {
         this.swtBotTree = tree;
     }
 

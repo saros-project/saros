@@ -3,7 +3,6 @@ package de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteCompone
 import java.rmi.RemoteException;
 
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.EclipseComponent;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.views.PEView;
 
 public interface TeamC extends EclipseComponent {
 
@@ -31,9 +30,7 @@ public interface TeamC extends EclipseComponent {
      * "share project" . I mean, after clicking the sub menu you need to treat
      * the following popup window too.</li>
      * 
-     * @param projectName
-     *            the name of the project located in the package explorer view,
-     *            which will be shared under SVN.
+     * 
      * @param repositoryURL
      *            the repository location
      * @throws RemoteException
@@ -61,21 +58,18 @@ public interface TeamC extends EclipseComponent {
      * <li>this method is only suitable for such project, which still include
      * the SVN meta information.</li>
      * 
-     * @param projectName
-     *            the name of the project located in the package explorer view,
-     *            which will be shared under SVN.
+     * 
      * @param repositoryURL
      *            the repository location
      * @throws RemoteException
      */
-    public void shareProjectConfiguredWithSVNInfos(
-        String repositoryURL) throws RemoteException;
+    public void shareProjectConfiguredWithSVNInfos(String repositoryURL)
+        throws RemoteException;
 
     /**
      * using this method you can import a project from SVN (Other variant to
-     * import a project from SVN is in the method
-     * {@link PEView#importProjectFromSVN(String)} defined). which should be
-     * done with the following steps:
+     * import a project from SVN is in the method which should be done with the
+     * following steps:
      * 
      * <ol>
      * <li>Select the given project and click "Team" > "Share project"</li>
@@ -95,9 +89,7 @@ public interface TeamC extends EclipseComponent {
      * "share project" . I mean, after clicking the sub menu you need to treat
      * the following popup window too.</li>
      * 
-     * @param projectName
-     *            the name of the project located in the package explorer view,
-     *            which will be shared under SVN.
+     * 
      * @param repositoryURL
      *            the repository location
      * @param specifiedFolderName
@@ -105,15 +97,13 @@ public interface TeamC extends EclipseComponent {
      *            repository, e.g. trunk/examples
      * @throws RemoteException
      */
-    public void shareProjectUsingSpecifiedFolderName(
-        String repositoryURL, String specifiedFolderName)
-        throws RemoteException;
+    public void shareProjectUsingSpecifiedFolderName(String repositoryURL,
+        String specifiedFolderName) throws RemoteException;
 
     /**
      * Using this method you can import a project from SVN (Other variant to
-     * import a project from SVN is in the method
-     * {@link PEView#shareProjectWithSVNUsingSpecifiedFolderName(String, String, String)}
-     * defined). which should be done with the following steps:
+     * import a project from SVN is in the method . which should be done with
+     * the following steps:
      * 
      * <ol>
      * <li>Clicks main menu "File" > "Import..."</li>
@@ -208,9 +198,6 @@ public interface TeamC extends EclipseComponent {
      * "switch to another revision" . I mean, after clicking the sub menu you
      * need to treat the following popup window too.</li>
      * 
-     * 
-     * @param projectName
-     *            name of the java project, e.g. Foo-Saros.
      * @param versionID
      *            the ID of the revision to which you want to switch
      * @throws RemoteException

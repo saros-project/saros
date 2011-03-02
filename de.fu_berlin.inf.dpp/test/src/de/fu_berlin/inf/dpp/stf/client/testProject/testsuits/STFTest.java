@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
 
-import org.apache.log4j.Logger;
 import org.jivesoftware.smack.XMPPException;
 import org.junit.After;
 import org.junit.AfterClass;
@@ -25,8 +24,6 @@ import de.fu_berlin.inf.dpp.stf.client.Tester;
 import de.fu_berlin.inf.dpp.stf.client.testProject.helpers.MakeOperationConcurrently;
 
 public class STFTest extends STF {
-
-    protected final static Logger log = Logger.getLogger(STFTest.class);
 
     @Rule
     public TestName name = new TestName();
@@ -230,7 +227,7 @@ public class STFTest extends STF {
             closeUnnecessaryViews(tester);
             tester.bot().resetWorkbench();
             tester.noBot().deleteAllProjectsNoGUI();
-            tester.sarosBot().edit().deleteAllProjects(VIEW_PACKAGE_EXPLORER);
+            tester.sarosBot().packageExplorerView().tree().deleteAllProjects();
         }
     }
 
@@ -469,8 +466,8 @@ public class STFTest extends STF {
     }
 
     public static void resetSharedProject(Tester host) throws RemoteException {
-        host.sarosBot().edit()
-            .deleteAllItemsOfJavaProject(VIEW_PACKAGE_EXPLORER, PROJECT1);
+        host.sarosBot().packageExplorerView().selectSrc(PROJECT1)
+            .deleteAllItems();
         host.sarosBot().packageExplorerView().tree().newC()
             .cls(PROJECT1, PKG1, CLS1);
         // host.bot().sleep(1000);

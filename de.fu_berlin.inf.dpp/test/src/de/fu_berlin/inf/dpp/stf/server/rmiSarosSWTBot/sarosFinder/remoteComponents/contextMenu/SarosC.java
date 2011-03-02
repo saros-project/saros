@@ -4,8 +4,6 @@ import java.rmi.RemoteException;
 
 import de.fu_berlin.inf.dpp.stf.client.Tester;
 import de.fu_berlin.inf.dpp.stf.client.testProject.helpers.TestPattern;
-import de.fu_berlin.inf.dpp.stf.client.testProject.testsuits.STFTest.TypeOfCreateProject;
-import de.fu_berlin.inf.dpp.stf.client.testProject.testsuits.STFTest.TypeOfShareProject;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.SarosComponent;
 
 /**
@@ -46,19 +44,10 @@ public interface SarosC extends SarosComponent {
      * by host side, which are activated or indirectly activated by the clicking
      * one of the sub menus . I mean, after clicking the sub menu e.g.
      * "Share project" you need to treat the following popup window too.</li>
-     * <li>The share session process is only completely done after host first
-     * run {@link SarosC#shareProjectWith(String, TypeOfShareProject, String[])}
-     * , and then the invited users confirm the popup window
-     * {@link SarosC#confirmShellAddProjectUsingWhichProject(String, TypeOfCreateProject)}
-     * . Since the share session process is very often used, so a convenient
-     * method
-     * {@link Tester#buildSessionDoneSequentially(String, TypeOfShareProject, TypeOfCreateProject, Tester...)}
-     * is defined, which build the sharing session completely.</li>
+     * 
      * </ol>
      * 
-     * @param projectName
-     *            the name of the project located in the package explorer view,
-     *            which you want to share with other peers.
+     * 
      * @param howToshareProject
      *            with the parameter you can tell the method how to share your
      *            project with "Share project",
@@ -68,8 +57,7 @@ public interface SarosC extends SarosComponent {
      *            the base JIDs of the users with whom you want to share your
      *            project.
      * @throws RemoteException
-     * @see Tester#buildSessionDoneSequentially(String, TypeOfShareProject,
-     *      TypeOfCreateProject, Tester...)
+     * 
      */
     public void shareProjectWith(String howToshareProject,
         String[] inviteeBaseJIDs) throws RemoteException;
@@ -86,23 +74,15 @@ public interface SarosC extends SarosComponent {
      * by host side, which are activated or indirectly activated by the clicking
      * one of the sub menus . I mean, after clicking the sub menu
      * "Share project" you need to treat the following popup window too.</li>
-     * <li>The share session process is only completely done after host first
-     * run {@link SarosC#shareProject(String, String...)}, and then the invited
-     * users confirm the popup window
-     * {@link SarosC#confirmWizardSessionInvitationUsingWhichProject(String, String, int)}
-     * . Since the share session process is very often used, so a convenient
-     * method {@link Tester#buildSessionSequentially(String, String, Tester...)}
-     * is defined, which build the sharing session completely.</li>
+     * 
      * </ol>
      * 
-     * @param projectName
-     *            the name of the project located in the package explorer view,
-     *            which you want to share with other peers.
+     * 
      * @param inviteeBaseJIDS
      *            the base JIDs of the users with whom you want to share your
      *            project.
      * @throws RemoteException
-     * @see Tester#buildSessionSequentially(String, String, Tester...)
+     * 
      */
     public void shareProject(String... inviteeBaseJIDS) throws RemoteException;
 

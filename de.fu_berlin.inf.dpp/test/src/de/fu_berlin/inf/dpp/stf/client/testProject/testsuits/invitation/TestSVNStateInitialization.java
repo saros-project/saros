@@ -111,9 +111,10 @@ public class TestSVNStateInitialization extends STFTest {
     public void tearDown() throws RemoteException, InterruptedException {
         leaveSessionHostFirst();
 
-        if (alice.sarosBot().packageExplorerView().tree().existsWithRegex(SVN_PROJECT))
+        if (alice.sarosBot().packageExplorerView().tree()
+            .existsWithRegex(SVN_PROJECT))
             alice.noBot().deleteProjectNoGUI(SVN_PROJECT);
-        bob.sarosBot().edit().deleteAllProjects(VIEW_PACKAGE_EXPLORER);
+        bob.sarosBot().packageExplorerView().tree().deleteAllProjects();
     }
 
     /**
@@ -272,7 +273,8 @@ public class TestSVNStateInitialization extends STFTest {
     @Test
     public void testCheckoutWithModification() throws RemoteException {
         assertTrue(alice.sarosBot().packageExplorerView()
-            .selectPkg(SVN_PROJECT, SVN_PKG).existsWithRegex(SVN_CLS1 + SUFFIX_JAVA));
+            .selectPkg(SVN_PROJECT, SVN_PKG)
+            .existsWithRegex(SVN_CLS1 + SUFFIX_JAVA));
         alice.sarosBot().packageExplorerView()
             .selectClass(SVN_PROJECT, SVN_PKG, SVN_CLS1).open();
         String cls1_content_before = alice.bot().editor(SVN_CLS1_SUFFIX)
