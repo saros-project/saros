@@ -39,6 +39,7 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.SarosBotImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.StateImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.WaitImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.Component;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.contextMenu.ContextMenuWrapperImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.contextMenu.NewCImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.contextMenu.RefactorCImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.contextMenu.SarosCImp;
@@ -51,9 +52,9 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponen
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.views.PEViewImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.views.ProgressViewImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.views.ViewsImp;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.views.sarosViews.BuddiesViewImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.views.sarosViews.ChatViewImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.views.sarosViews.RSViewImp;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.views.sarosViews.SarosBuddiesViewImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.views.sarosViews.SessionViewImp;
 
 /**
@@ -116,7 +117,7 @@ public class STFController {
         exportObject(PEViewImp.getInstance(), "packageExplorerView");
         exportObject(ProgressViewImp.getInstance(), "progressView");
         exportObject(STFBotEditorImp.getInstance(), "eclipseEditor");
-        exportObject(SarosBuddiesViewImp.getInstance(), "rosterView");
+        exportObject(BuddiesViewImp.getInstance(), "rosterView");
         exportObject(SessionViewImp.getInstance(), "sessionView");
         exportObject(RSViewImp.getInstance(), "remoteScreenView");
         exportObject(ChatViewImp.getInstance(), "chatView");
@@ -129,7 +130,9 @@ public class STFController {
         exportObject(TeamCImp.getInstance(), "team");
         exportObject(SarosCImp.getInstance(), "saros");
 
-        exportObject(SarosContextMenuWrapperImp.getInstance(), "contextMenu");
+        exportObject(ContextMenuWrapperImp.getInstance(), "contextMenu");
+        exportObject(SarosContextMenuWrapperImp.getInstance(),
+            "sarosContextMenu");
         exportObject(SarosPreferencesImp.getInstance(), "sarosPreferences");
         exportObject(StateImp.getInstance(), "state");
         exportObject(WaitImp.getInstance(), "wait");

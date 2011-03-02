@@ -3,12 +3,15 @@ package de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteCompone
 import java.rmi.RemoteException;
 
 import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotShell;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotTableItem;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotTree;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotTreeItem;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.Component;
 
-public class SarosContextMenuWrapperImp extends ContextMenuWrapperImp implements
+public class SarosContextMenuWrapperImp extends Component implements
     SarosContextMenuWrapper {
     private static transient SarosContextMenuWrapperImp self;
-    private static SarosCImp sarosC;
-    protected JID participantJID;
 
     /**
      * {@link SarosContextMenuWrapperImp} is a singleton, but inheritance is
@@ -18,22 +21,32 @@ public class SarosContextMenuWrapperImp extends ContextMenuWrapperImp implements
         if (self != null)
             return self;
         self = new SarosContextMenuWrapperImp();
-        sarosC = SarosCImp.getInstance();
-        teamC = TeamCImp.getInstance();
-        reafactorC = RefactorCImp.getInstance();
-        newC = NewCImp.getInstance();
+
         return self;
+    }
+
+    protected JID participantJID;
+    protected STFBotTreeItem treeItem;
+    protected STFBotTree tree;
+    protected STFBotTableItem tableItem;
+
+    public void setTreeItem(STFBotTreeItem treeItem) {
+        this.treeItem = treeItem;
+    }
+
+    public void setTableItem(STFBotTableItem tableItem) {
+        this.tableItem = tableItem;
+    }
+
+    public void setTree(STFBotTree tree) {
+        this.tree = tree;
     }
 
     public void setParticipantJID(JID jid) {
         this.participantJID = jid;
     }
 
-    public SarosC saros() throws RemoteException {
-        sarosC.setTreeItem(treeItem);
-        return sarosC;
-    }
-
+    // Session View
     public void grantWriteAccess() throws RemoteException {
         if (sarosBot().state().hasWriteAccessBy(tableItem.getText())) {
             throw new RuntimeException("User \"" + tableItem.getText()
@@ -79,6 +92,37 @@ public class SarosContextMenuWrapperImp extends ContextMenuWrapperImp implements
                 "Hi guy, you can't jump to the position of youself, it makes no sense! Please pass a correct parameter to the method.");
         }
         tableItem.contextMenu(CM_JUMP_TO_POSITION_SELECTED_BUDDY).click();
+    }
+
+    // Buddies View
+
+    public void delete() throws RemoteException {
+        treeItem.contextMenu(CM_DELETE).click();
+        bot().waitUntilShellIsOpen(CONFIRM_DELETE);
+        bot().shell(CONFIRM_DELETE).activate();
+        bot().shell(CONFIRM_DELETE).bot().button(YES).click();
+    }
+
+    public void rename(String newBuddyName) throws RemoteException {
+        treeItem.contextMenu(CM_RENAME).click();
+        STFBotShell shell = bot().shell(SHELL_SET_NEW_NICKNAME);
+        if (!shell.activate()) {
+            shell.waitUntilActive();
+        }
+        shell.bot().text().setText(newBuddyName);
+        shell.bot().button(OK).click();
+    }
+
+    public void inviteBuddy() throws RemoteException {
+        if (!treeItem.isEnabled()) {
+            throw new RuntimeException(
+                "You can't invite this user, he isn't conntected yet");
+        }
+        if (!treeItem.contextMenu(CM_RENAME).isEnabled()) {
+            throw new RuntimeException(
+                "You can't invite this user. Are you sure that you haven't invited him?");
+        }
+        treeItem.contextMenu(CM_INVITE_BUDDY).click();
     }
 
 }

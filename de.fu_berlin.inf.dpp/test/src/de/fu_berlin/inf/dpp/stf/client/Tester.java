@@ -87,4 +87,5 @@ public class Tester {
         sarosBot.setJID(jid);
         return sarosBot;
     }
+
 }

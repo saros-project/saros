@@ -1,18 +1,20 @@
 package de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.views;
 
 import java.rmi.RemoteException;
+import java.util.List;
 
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotTree;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotTreeItem;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotView;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.Component;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.contextMenu.ContextMenuWrapperImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.contextMenu.SarosContextMenuWrapperImp;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.views.sarosViews.BuddiesView;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.views.sarosViews.BuddiesViewImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.views.sarosViews.ChatView;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.views.sarosViews.ChatViewImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.views.sarosViews.RSView;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.views.sarosViews.RSViewImp;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.views.sarosViews.SarosBuddiesView;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.views.sarosViews.SarosBuddiesViewImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.views.sarosViews.SessionView;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.views.sarosViews.SessionViewImp;
 
@@ -24,9 +26,12 @@ public class ViewsImp extends Component implements Views {
     protected STFBotTree tree;
     protected STFBotTreeItem treeItem;
 
-    protected static SarosContextMenuWrapperImp contextMenu;
+    protected static ContextMenuWrapperImp contextMenu;
+    protected static SarosContextMenuWrapperImp sarosContextMenu = SarosContextMenuWrapperImp
+        .getInstance();
+
     private static ChatViewImp chatV;
-    private static SarosBuddiesViewImp rosterV;
+    private static BuddiesViewImp rosterV;
     private static RSViewImp rsV;
     private static SessionViewImp sessionV;
     private static ConsoleViewImp consoleV;
@@ -41,7 +46,7 @@ public class ViewsImp extends Component implements Views {
             return self;
         self = new ViewsImp();
         chatV = ChatViewImp.getInstance();
-        rosterV = SarosBuddiesViewImp.getInstance();
+        rosterV = BuddiesViewImp.getInstance();
         rsV = RSViewImp.getInstance();
         sessionV = SessionViewImp.getInstance();
         consoleV = ConsoleViewImp.getInstance();
@@ -57,7 +62,7 @@ public class ViewsImp extends Component implements Views {
         return chatV.setView(bot().view(VIEW_SAROS_CHAT));
     }
 
-    public SarosBuddiesView buddiesView() throws RemoteException {
+    public BuddiesView buddiesView() throws RemoteException {
         bot().openViewById(VIEW_SAROS_BUDDIES_ID);
         bot().view(VIEW_SAROS_BUDDIES).show();
         return rosterV.setView(bot().view(VIEW_SAROS_BUDDIES));
@@ -91,11 +96,11 @@ public class ViewsImp extends Component implements Views {
         return progressvV.setView(bot().view(VIEW_PROGRESS));
     }
 
-    protected static void init() {
-        contextMenu = SarosContextMenuWrapperImp.getInstance();
+    protected static void setContextMenu() {
+        contextMenu = ContextMenuWrapperImp.getInstance();
     }
 
-    protected void initWidget(STFBotView view) throws RemoteException {
+    protected void setWidgets(STFBotView view) throws RemoteException {
         this.view = view;
         tree = view.bot().tree();
         treeItem = null;
@@ -113,6 +118,33 @@ public class ViewsImp extends Component implements Views {
         this.treeItem = treeItem;
         contextMenu.setTree(tree);
         contextMenu.setTreeItem(treeItem);
+    }
+
+    protected void initSarosContextMenuWrapper(STFBotTreeItem treeItem) {
+        this.treeItem = treeItem;
+        sarosContextMenu.setTree(tree);
+        sarosContextMenu.setTreeItem(treeItem);
+    }
+
+    protected void clickToolbarButtonWithTooltip(String tooltipText)
+        throws RemoteException {
+        if (!view.existsToolbarButton(tooltipText))
+            throw new RuntimeException("The toolbarbutton " + tooltipText
+                + " doesn't exist!");
+        view.toolbarButton(tooltipText).click();
+    }
+
+    protected boolean isToolbarButtonEnabled(String tooltip)
+        throws RemoteException {
+        if (!view.existsToolbarButton(tooltip))
+            return false;
+        return view.toolbarButton(tooltip).isEnabled();
+
+    }
+
+    protected List<String> getToolTipTextOfToolbarButtons()
+        throws RemoteException {
+        return view.getToolTipTextOfToolbarButtons();
     }
 
 }

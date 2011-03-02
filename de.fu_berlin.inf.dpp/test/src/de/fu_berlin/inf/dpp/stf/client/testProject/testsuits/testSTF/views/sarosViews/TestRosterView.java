@@ -6,7 +6,6 @@ import static org.junit.Assert.assertTrue;
 
 import java.rmi.RemoteException;
 
-import org.jivesoftware.smack.XMPPException;
 import org.junit.After;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
@@ -84,70 +83,40 @@ public class TestRosterView extends STFTest {
      */
     @Test
     public void renameBuddy() throws RemoteException {
-        assertTrue(alice.sarosBot().views().buddiesView()
-            .hasBuddyNoGUI(bob.jid));
-        alice.sarosBot().views().buddiesView()
-            .renameBuddy(bob.jid, bob.getName());
-        assertTrue(alice.sarosBot().views().buddiesView()
-            .hasBuddyNoGUI(bob.jid));
-        assertTrue(alice.sarosBot().views().buddiesView()
-            .getBuddyNickNameNoGUI(bob.jid).equals(bob.getName()));
+        assertTrue(alice.sarosBot().views().buddiesView().hasBuddy(bob.jid));
+        alice.sarosBot().views().buddiesView().selectBuddy(bob.jid)
+            .rename(bob.getName());
+        assertTrue(alice.sarosBot().views().buddiesView().hasBuddy(bob.jid));
+        assertTrue(alice.sarosBot().views().buddiesView().getNickName(bob.jid)
+            .equals(bob.getName()));
 
-        alice.sarosBot().views().buddiesView().renameBuddy(bob.jid, "new name");
-        assertTrue(alice.sarosBot().views().buddiesView()
-            .hasBuddyNoGUI(bob.jid));
+        alice.sarosBot().views().buddiesView().selectBuddy(bob.jid)
+            .rename("new name");
+        assertTrue(alice.sarosBot().views().buddiesView().hasBuddy(bob.jid));
         alice.bot().sleep(500);
-        assertTrue(alice.sarosBot().views().buddiesView()
-            .getBuddyNickNameNoGUI(bob.jid).equals("new name"));
-    }
-
-    @Test
-    @Ignore
-    public void renameBuddyWithoutGUI() throws RemoteException {
-        assertTrue(alice.sarosBot().views().buddiesView()
-            .hasBuddyNoGUI(bob.jid));
-        alice.sarosBot().views().buddiesView()
-            .renameBuddyNoGUI(bob.jid, bob.getName());
-        assertTrue(alice.sarosBot().views().buddiesView()
-            .hasBuddyNoGUI(bob.jid));
-        assertTrue(alice.sarosBot().views().buddiesView()
-            .getBuddyNickNameNoGUI(bob.jid).equals(bob.getName()));
-        // assertTrue(alice.sessionV.isContactInSessionView(bob.jid));
-        alice.sarosBot().views().buddiesView()
-            .renameBuddyNoGUI(bob.jid, "new bob");
-        assertTrue(alice.sarosBot().views().buddiesView()
-            .hasBuddyNoGUI(bob.jid));
-        assertTrue(alice.sarosBot().views().buddiesView()
-            .getBuddyNickNameNoGUI(bob.jid).equals("new bob"));
+        assertTrue(alice.sarosBot().views().buddiesView().getNickName(bob.jid)
+            .equals("new name"));
     }
 
     @Test
     public void addBuddy() throws RemoteException {
         deleteBuddies(alice, bob);
-        assertFalse(alice.sarosBot().views().buddiesView()
-            .hasBuddyNoGUI(bob.jid));
-        assertFalse(bob.sarosBot().views().buddiesView()
-            .hasBuddyNoGUI(alice.jid));
+        assertFalse(alice.sarosBot().views().buddiesView().hasBuddy(bob.jid));
+        assertFalse(bob.sarosBot().views().buddiesView().hasBuddy(alice.jid));
         addBuddies(alice, bob);
-        assertTrue(alice.sarosBot().views().buddiesView()
-            .hasBuddyNoGUI(bob.jid));
-        assertTrue(bob.sarosBot().views().buddiesView()
-            .hasBuddyNoGUI(alice.jid));
+        assertTrue(alice.sarosBot().views().buddiesView().hasBuddy(bob.jid));
+        assertTrue(bob.sarosBot().views().buddiesView().hasBuddy(alice.jid));
     }
 
     @Test
     @Ignore
     public void addBuddyWithoutGUI() throws RemoteException {
         deleteBuddies(alice, bob);
-        assertFalse(alice.sarosBot().views().buddiesView()
-            .hasBuddyNoGUI(bob.jid));
-        assertFalse(bob.sarosBot().views().buddiesView()
-            .hasBuddyNoGUI(alice.jid));
+        assertFalse(alice.sarosBot().views().buddiesView().hasBuddy(bob.jid));
+        assertFalse(bob.sarosBot().views().buddiesView().hasBuddy(alice.jid));
         addBuddies(alice, bob);
-        assertTrue(alice.sarosBot().views().buddiesView()
-            .hasBuddyNoGUI(bob.jid));
-        assertTrue(bob.sarosBot().views().buddiesView()
-            .hasBuddyNoGUI(alice.jid));
+        assertTrue(alice.sarosBot().views().buddiesView().hasBuddy(bob.jid));
+        assertTrue(bob.sarosBot().views().buddiesView().hasBuddy(alice.jid));
     }
 
     /**
@@ -165,24 +134,10 @@ public class TestRosterView extends STFTest {
      */
     @Test
     public void deleteBuddy() throws RemoteException {
-        assertTrue(alice.sarosBot().views().buddiesView()
-            .hasBuddyNoGUI(bob.jid));
+        assertTrue(alice.sarosBot().views().buddiesView().hasBuddy(bob.jid));
         deleteBuddies(alice, bob);
-        assertFalse(alice.sarosBot().views().buddiesView()
-            .hasBuddyNoGUI(bob.jid));
-        assertFalse(bob.sarosBot().views().buddiesView()
-            .hasBuddyNoGUI(alice.jid));
-    }
-
-    @Test
-    public void deleteBuddyNoGUI() throws RemoteException, XMPPException {
-        assertTrue(alice.sarosBot().views().buddiesView()
-            .hasBuddyNoGUI(bob.jid));
-        deleteBuddiesNoGUI(alice, bob);
-        assertFalse(alice.sarosBot().views().buddiesView()
-            .hasBuddyNoGUI(bob.jid));
-        assertFalse(bob.sarosBot().views().buddiesView()
-            .hasBuddyNoGUI(alice.jid));
+        assertFalse(alice.sarosBot().views().buddiesView().hasBuddy(bob.jid));
+        assertFalse(bob.sarosBot().views().buddiesView().hasBuddy(alice.jid));
     }
 
     /**
@@ -205,7 +160,8 @@ public class TestRosterView extends STFTest {
         setUpSessionWithAJavaProjectAndAClass(alice, bob);
 
         assertFalse(carl.sarosBot().state().isInSession());
-        alice.sarosBot().views().buddiesView().inviteBuddy(carl.jid);
+        alice.sarosBot().views().buddiesView().selectBuddy(carl.jid)
+            .inviteBuddy();
 
         carl.bot().shell(SHELL_SESSION_INVITATION).confirm(FINISH);
         carl.sarosBot().confirmShellAddProjectWithNewProject(PROJECT1);

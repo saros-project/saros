@@ -111,7 +111,7 @@ public class TestBasicWidgetTree extends STFTest {
     @Test
     public void existsTreeItemWithRegexsInView2() throws RemoteException {
         alice.sarosBot().views().buddiesView()
-            .connectNoGUI(alice.jid, alice.password);
+            .connectWith(alice.jid, alice.password);
         assertTrue(alice.bot().view(VIEW_SAROS_BUDDIES).bot().tree()
             .existsSubItemWithRegexs(changeToRegex(NODE_BUDDIES)));
         assertTrue(alice.bot().view(VIEW_SAROS_BUDDIES).bot().tree()
@@ -204,7 +204,7 @@ public class TestBasicWidgetTree extends STFTest {
     @Test
     public void existsContextOfTreeItemInView() throws RemoteException {
         alice.sarosBot().views().buddiesView()
-            .connectNoGUI(alice.jid, alice.password);
+            .connectWith(alice.jid, alice.password);
         assertTrue(alice.bot().view(VIEW_SAROS_BUDDIES).bot().tree()
             .selectTreeItemWithRegex(NODE_BUDDIES, "bob_stf.*")
             .existsContextMenu(CM_RENAME));
@@ -223,7 +223,7 @@ public class TestBasicWidgetTree extends STFTest {
     @Test
     public void isContextOfTreeItemInViewEnabled() throws RemoteException {
         alice.sarosBot().views().buddiesView()
-            .connectNoGUI(alice.jid, alice.password);
+            .connectWith(alice.jid, alice.password);
         assertTrue(alice.bot().view(VIEW_SAROS_BUDDIES).bot().tree()
             .selectTreeItemWithRegex(NODE_BUDDIES, "bob_stf.*")
             .isContextMenuEnabled(CM_RENAME));
@@ -250,7 +250,7 @@ public class TestBasicWidgetTree extends STFTest {
     @Test
     public void clickContextsOfTreeItemInView() throws RemoteException {
         alice.sarosBot().views().buddiesView()
-            .connectNoGUI(alice.jid, alice.password);
+            .connectWith(alice.jid, alice.password);
         alice.bot().view(VIEW_SAROS_BUDDIES).bot().tree()
             .selectTreeItemWithRegex(NODE_BUDDIES, "bob_stf.*")
             .contextMenu(CM_RENAME).click();

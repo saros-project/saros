@@ -3,7 +3,7 @@ package de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteCompone
 import java.rmi.RemoteException;
 
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotView;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.contextMenu.SarosContextMenuWrapper;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.contextMenu.ContextMenuWrapper;
 
 public class PEViewImp extends ViewsImp implements PEView {
     private static transient PEViewImp pEViewImp;
@@ -15,12 +15,12 @@ public class PEViewImp extends ViewsImp implements PEView {
         if (pEViewImp != null)
             return pEViewImp;
         pEViewImp = new PEViewImp();
-        init();
+        setContextMenu();
         return pEViewImp;
     }
 
     public PEView setView(STFBotView view) throws RemoteException {
-        initWidget(view);
+        setWidgets(view);
         return this;
     }
 
@@ -36,14 +36,14 @@ public class PEViewImp extends ViewsImp implements PEView {
      * 
      **********************************************/
 
-    public SarosContextMenuWrapper tree() throws RemoteException {
+    public ContextMenuWrapper tree() throws RemoteException {
         contextMenu.setTree(tree);
         contextMenu.setTreeItem(null);
         contextMenu.setTreeItemType(null);
         return contextMenu;
     }
 
-    public SarosContextMenuWrapper selectSrc(String projectName)
+    public ContextMenuWrapper selectSrc(String projectName)
         throws RemoteException {
         initContextMenuWrapper(
             tree.selectTreeItemWithRegex(changeToRegex(projectName), SRC),
@@ -51,7 +51,7 @@ public class PEViewImp extends ViewsImp implements PEView {
         return contextMenu;
     }
 
-    public SarosContextMenuWrapper selectJavaProject(String projectName)
+    public ContextMenuWrapper selectJavaProject(String projectName)
         throws RemoteException {
         initContextMenuWrapper(
             tree.selectTreeItemWithRegex(changeToRegex(projectName)),
@@ -59,7 +59,7 @@ public class PEViewImp extends ViewsImp implements PEView {
         return contextMenu;
     }
 
-    public SarosContextMenuWrapper selectProject(String projectName)
+    public ContextMenuWrapper selectProject(String projectName)
         throws RemoteException {
         initContextMenuWrapper(
             tree.selectTreeItemWithRegex(changeToRegex(projectName)),
@@ -67,7 +67,7 @@ public class PEViewImp extends ViewsImp implements PEView {
         return contextMenu;
     }
 
-    public SarosContextMenuWrapper selectPkg(String projectName, String pkg)
+    public ContextMenuWrapper selectPkg(String projectName, String pkg)
         throws RemoteException {
         String[] nodes = { projectName, SRC, pkg };
         initContextMenuWrapper(
@@ -77,7 +77,7 @@ public class PEViewImp extends ViewsImp implements PEView {
         return contextMenu;
     }
 
-    public SarosContextMenuWrapper selectClass(String projectName, String pkg,
+    public ContextMenuWrapper selectClass(String projectName, String pkg,
         String className) throws RemoteException {
         String[] nodes = getClassNodes(projectName, pkg, className);
 
@@ -88,7 +88,7 @@ public class PEViewImp extends ViewsImp implements PEView {
         return contextMenu;
     }
 
-    public SarosContextMenuWrapper selectFolder(String... folderNodes)
+    public ContextMenuWrapper selectFolder(String... folderNodes)
         throws RemoteException {
         initContextMenuWrapper(
             tree.selectTreeItemWithRegex(changeToRegex(folderNodes)),
@@ -97,7 +97,7 @@ public class PEViewImp extends ViewsImp implements PEView {
         return contextMenu;
     }
 
-    public SarosContextMenuWrapper selectFile(String... fileNodes)
+    public ContextMenuWrapper selectFile(String... fileNodes)
         throws RemoteException {
         initContextMenuWrapper(
             tree.selectTreeItemWithRegex(changeToRegex(fileNodes)),

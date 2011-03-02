@@ -326,14 +326,14 @@ public class StateImp extends Component implements State {
             else
                 contactLabel = OWN_PARTICIPANT_NAME + " " + PERMISSION_NAME;
         } else if (sarosBot().views().buddiesView()
-            .hasBuddyNickNameNoGUI(participantJID)) {
+            .hasNickName(participantJID)) {
             if (hasWriteAccessByNoGUI(participantJID))
                 contactLabel = sarosBot().views().buddiesView()
-                    .getBuddyNickNameNoGUI(participantJID)
+                    .getNickName(participantJID)
                     + " (" + participantJID.getBase() + ")";
             else
                 contactLabel = sarosBot().views().buddiesView()
-                    .getBuddyNickNameNoGUI(participantJID)
+                    .getNickName(participantJID)
                     + " ("
                     + participantJID.getBase()
                     + ")"

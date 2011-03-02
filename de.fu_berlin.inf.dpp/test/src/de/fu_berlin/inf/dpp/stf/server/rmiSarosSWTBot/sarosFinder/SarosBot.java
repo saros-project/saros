@@ -4,6 +4,7 @@ import java.rmi.Remote;
 import java.rmi.RemoteException;
 
 import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.stf.client.Tester;
 import de.fu_berlin.inf.dpp.stf.client.testProject.testsuits.STFTest.TypeOfCreateProject;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.contextMenu.SarosC;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.menuBar.SarosM;
@@ -133,5 +134,15 @@ public interface SarosBot extends Remote {
      * @throws RemoteException
      */
     public void confirmShellClosingTheSession() throws RemoteException;
+
+    /**
+     * This popup window should be appeared by you, after someone else deleted
+     * your contact from his buddies.
+     * 
+     * This method should be called by {@link Tester#deleteBuddyGUIDone(Tester)}
+     * 
+     * @throws RemoteException
+     */
+    public void confirmShellRemovelOfSubscription() throws RemoteException;
 
 }

@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
 
-import org.jivesoftware.smack.XMPPException;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -353,10 +352,9 @@ public class STFTest extends STF {
     }
 
     public static void resetSaros(Tester... testers) throws RemoteException {
+        resetBuddiesName();
         for (Tester tester : testers) {
             if (tester != null) {
-                tester.sarosBot().views().buddiesView()
-                    .resetAllBuddyNameNoGUI();
                 tester.sarosBot().views().buddiesView().disconnect();
                 tester.noBot().deleteAllProjectsNoGUI();
             }
@@ -395,15 +393,21 @@ public class STFTest extends STF {
     }
 
     public static void resetBuddiesName() throws RemoteException {
+        // for (int i = 0; i < activeTesters.size(); i++) {
+        // List<Tester> testers = activeTesters;
+        // testers.remove(i);
+        // for (Tester tester : testers) {
+        // activeTesters.get(i).sarosBot().views().buddiesView()
+        // .selectBuddy(tester.jid).rename(tester.jid.getBase());
+        // }
+        // // activeTesters.get(i).resetBuddiesName((Tester[])
+        // // testers.toArray());
+        // }
         for (int i = 0; i < activeTesters.size(); i++) {
             for (int j = i + 1; j < activeTesters.size(); j++) {
-                activeTesters
-                    .get(i)
-                    .sarosBot()
-                    .views()
-                    .buddiesView()
-                    .renameBuddy(activeTesters.get(j).jid,
-                        activeTesters.get(j).getBaseJid());
+                activeTesters.get(i).sarosBot().views().buddiesView()
+                    .selectBuddy(activeTesters.get(j).jid)
+                    .rename(activeTesters.get(j).getBaseJid());
             }
         }
     }
@@ -698,7 +702,7 @@ public class STFTest extends STF {
     public static void addBuddies(Tester host, Tester... peers)
         throws RemoteException {
         for (Tester peer : peers) {
-            if (!host.sarosBot().views().buddiesView().hasBuddyNoGUI(peer.jid)) {
+            if (!host.sarosBot().views().buddiesView().hasBuddy(peer.jid)) {
                 host.sarosBot().views().buddiesView().addANewBuddy(peer.jid);
                 peer.bot().waitUntilShellIsOpen(
                     SHELL_REQUEST_OF_SUBSCRIPTION_RECEIVED);
@@ -711,23 +715,24 @@ public class STFTest extends STF {
         }
     }
 
-    /**
-     * Remove given contact from Roster without GUI, if contact was added before
-     * 
-     * @throws XMPPException
-     */
-    public static void deleteBuddiesNoGUI(Tester buddy,
-        Tester... deletedBuddies) throws RemoteException, XMPPException {
-        for (Tester deletedBuddy : deletedBuddies) {
-            if (!buddy.sarosBot().views().buddiesView()
-                .hasBuddyNoGUI(deletedBuddy.jid))
-                return;
-            buddy.sarosBot().views().buddiesView()
-                .deleteBuddyNoGUI(deletedBuddy.jid);
-            deletedBuddy.sarosBot().views().buddiesView()
-                .confirmShellRemovelOfSubscription();
-        }
-    }
+    // /**
+    // * Remove given contact from Roster without GUI, if contact was added
+    // before
+    // *
+    // * @throws XMPPException
+    // */
+    // public static void deleteBuddiesNoGUI(Tester buddy,
+    // Tester... deletedBuddies) throws RemoteException, XMPPException {
+    // for (Tester deletedBuddy : deletedBuddies) {
+    // if (!buddy.sarosBot().views().buddiesView()
+    // .hasBuddyNoGUI(deletedBuddy.jid))
+    // return;
+    // buddy.sarosBot().views().buddiesView()
+    // .selectBuddy(deletedBuddy.jid).delete();
+    // deletedBuddy.sarosBot().views().buddiesView()
+    // .confirmShellRemovelOfSubscription();
+    // }
+    // }
 
     /**
      * Remove given contact from Roster with GUI, if contact was added before.
@@ -736,12 +741,11 @@ public class STFTest extends STF {
         throws RemoteException {
         for (Tester deletedBuddy : deletedBuddies) {
             if (!buddy.sarosBot().views().buddiesView()
-                .hasBuddyNoGUI(deletedBuddy.jid))
+                .hasBuddy(deletedBuddy.jid))
                 return;
             buddy.sarosBot().views().buddiesView()
-                .deleteBuddy(deletedBuddy.jid);
-            deletedBuddy.sarosBot().views().buddiesView()
-                .confirmShellRemovelOfSubscription();
+                .selectBuddy(deletedBuddy.jid).delete();
+            deletedBuddy.sarosBot().confirmShellRemovelOfSubscription();
         }
 
     }

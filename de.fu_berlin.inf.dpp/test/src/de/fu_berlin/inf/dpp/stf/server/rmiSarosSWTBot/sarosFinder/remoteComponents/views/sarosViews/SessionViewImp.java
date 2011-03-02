@@ -56,6 +56,15 @@ public class SessionViewImp extends Component implements SessionView {
 
     public SarosContextMenuWrapper selectBuddy(final JID participantJID)
         throws RemoteException {
+
+        // if (localJID == participantJID) {
+        // participantLabel = OWN_PARTICIPANT_NAME;
+        // } else {
+        // participantLabel = participantJID.getBase();
+        // }
+        // if (!sarosBot().state().hasWriteAccessByNoGUI(participantJID)) {
+        // participantLabel += " " + PERMISSION_NAME;
+        // }
         String participantLabel = sarosBot().state().getParticipantLabel(
             participantJID);
         contextMenu.setTableItem(table.getTableItem(participantLabel));

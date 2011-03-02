@@ -283,4 +283,10 @@ public class SarosBotImp extends STF implements SarosBot {
         bot().shell(SHELL_CLOSING_THE_SESSION).confirm(OK);
         bot().waitsUntilShellIsClosed(SHELL_CLOSING_THE_SESSION);
     }
+
+    public void confirmShellRemovelOfSubscription() throws RemoteException {
+        bot().waitUntilShellIsOpen(SHELL_REMOVAL_OF_SUBSCRIPTION);
+        bot().shell(SHELL_REMOVAL_OF_SUBSCRIPTION).activate();
+        bot().shell(SHELL_REMOVAL_OF_SUBSCRIPTION).confirm(OK);
+    }
 }

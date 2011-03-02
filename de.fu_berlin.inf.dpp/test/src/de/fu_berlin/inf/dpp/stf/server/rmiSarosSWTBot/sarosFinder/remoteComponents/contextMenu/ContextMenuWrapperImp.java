@@ -11,16 +11,32 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponen
 
 public class ContextMenuWrapperImp extends Component implements
     ContextMenuWrapper {
+    private static transient ContextMenuWrapperImp self;
 
     protected static TeamCImp teamC;
     protected static NewCImp newC;
     protected static RefactorCImp reafactorC;
+    private static SarosCImp sarosC;
 
     protected STFBotTreeItem treeItem;
     protected STFBotTree tree;
     protected TreeItemType type;
-
     protected STFBotTableItem tableItem;
+
+    /**
+     * {@link ContextMenuWrapperImp} is a singleton, but inheritance is
+     * possible.
+     */
+    public static ContextMenuWrapperImp getInstance() {
+        if (self != null)
+            return self;
+        self = new ContextMenuWrapperImp();
+        teamC = TeamCImp.getInstance();
+        reafactorC = RefactorCImp.getInstance();
+        newC = NewCImp.getInstance();
+        sarosC = SarosCImp.getInstance();
+        return self;
+    }
 
     public void setTreeItem(STFBotTreeItem treeItem) {
         this.treeItem = treeItem;
@@ -36,6 +52,28 @@ public class ContextMenuWrapperImp extends Component implements
 
     public void setTree(STFBotTree tree) {
         this.tree = tree;
+    }
+
+    public SarosC saros() throws RemoteException {
+        sarosC.setTreeItem(treeItem);
+        return sarosC;
+    }
+
+    public NewC newC() throws RemoteException {
+        newC.setTree(tree);
+        newC.setTreeItem(treeItem);
+        return newC;
+    }
+
+    public TeamC team() throws RemoteException {
+        teamC.setTreeItem(treeItem);
+        return teamC;
+    }
+
+    public RefactorC refactor() throws RemoteException {
+        reafactorC.setTreeItem(treeItem);
+        reafactorC.setTreeItemType(type);
+        return reafactorC;
     }
 
     public void open() throws RemoteException {
@@ -94,23 +132,6 @@ public class ContextMenuWrapperImp extends Component implements
             break;
         }
         tree.waitUntilItemNotExists(treeItem.getText());
-    }
-
-    public NewC newC() throws RemoteException {
-        newC.setTree(tree);
-        newC.setTreeItem(treeItem);
-        return newC;
-    }
-
-    public TeamC team() throws RemoteException {
-        teamC.setTreeItem(treeItem);
-        return teamC;
-    }
-
-    public RefactorC refactor() throws RemoteException {
-        reafactorC.setTreeItem(treeItem);
-        reafactorC.setTreeItemType(type);
-        return reafactorC;
     }
 
     public boolean existsWithRegex(String name) throws RemoteException {

@@ -4,7 +4,6 @@ import java.rmi.Remote;
 import java.rmi.RemoteException;
 
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.contextMenu.ContextMenuWrapper;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.contextMenu.SarosContextMenuWrapper;
 
 /**
  * This interface contains only APIs to select treeItems in the package explorer
@@ -22,10 +21,10 @@ public interface PEView extends Remote {
 
     public ContextMenuWrapper tree() throws RemoteException;
 
-    public SarosContextMenuWrapper selectSrc(String projectName)
+    public ContextMenuWrapper selectSrc(String projectName)
         throws RemoteException;
 
-    public SarosContextMenuWrapper selectJavaProject(String projectName)
+    public ContextMenuWrapper selectJavaProject(String projectName)
         throws RemoteException;
 
     /**
@@ -35,7 +34,7 @@ public interface PEView extends Remote {
      *            the name of the project
      * @throws RemoteException
      */
-    public SarosContextMenuWrapper selectProject(String projectName)
+    public ContextMenuWrapper selectProject(String projectName)
         throws RemoteException;
 
     /**
@@ -47,7 +46,7 @@ public interface PEView extends Remote {
      *            the name of the package, e.g. my.pkg
      * @throws RemoteException
      */
-    public SarosContextMenuWrapper selectPkg(String projectName, String pkg)
+    public ContextMenuWrapper selectPkg(String projectName, String pkg)
         throws RemoteException;
 
     /**
@@ -62,7 +61,7 @@ public interface PEView extends Remote {
      * @throws RemoteException
      * 
      */
-    public SarosContextMenuWrapper selectClass(String projectName, String pkg,
+    public ContextMenuWrapper selectClass(String projectName, String pkg,
         String className) throws RemoteException;
 
     /**
@@ -74,7 +73,7 @@ public interface PEView extends Remote {
      *            {"Foo-saros","myFolder"}
      * @throws RemoteException
      */
-    public SarosContextMenuWrapper selectFolder(String... folderNodes)
+    public ContextMenuWrapper selectFolder(String... folderNodes)
         throws RemoteException;
 
     /**
@@ -86,7 +85,7 @@ public interface PEView extends Remote {
      *            {"Foo-saros","myFolder", "myFile.xml"}
      * @throws RemoteException
      */
-    public SarosContextMenuWrapper selectFile(String... fileNodes)
+    public ContextMenuWrapper selectFile(String... fileNodes)
         throws RemoteException;
 
     public String getTitle() throws RemoteException;

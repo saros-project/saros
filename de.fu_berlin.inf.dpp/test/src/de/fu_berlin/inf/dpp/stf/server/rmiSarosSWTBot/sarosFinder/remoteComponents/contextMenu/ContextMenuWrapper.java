@@ -4,6 +4,7 @@ import java.rmi.Remote;
 import java.rmi.RemoteException;
 
 public interface ContextMenuWrapper extends Remote {
+    public SarosC saros() throws RemoteException;
 
     public void open() throws RemoteException;
 
