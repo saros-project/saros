@@ -12,6 +12,7 @@ public class ContextMenuWrapperImp extends EclipseComponentImp implements
     ContextMenuWrapper {
 
     protected static TeamCImp teamC;
+    protected static NewCImp newC;
     protected static RefactorCImp reafactorC;
 
     protected STFBotTreeItem treeItem;
@@ -45,19 +46,22 @@ public class ContextMenuWrapperImp extends EclipseComponentImp implements
     }
 
     public void paste(String target) throws RemoteException {
-        tree.contextMenu(MENU_PASTE).click();
-        switch (type) {
-        case PROJECT:
+        if (treeItem == null) {
+            tree.contextMenu(MENU_PASTE).click();
             STFBotShell shell = bot().shell(SHELL_COPY_PROJECT);
             shell.activate();
             shell.bot().textWithLabel("Project name:").setText(target);
             shell.bot().button(OK).click();
             bot().waitsUntilShellIsClosed(SHELL_COPY_PROJECT);
             bot().sleep(1000);
-            break;
-        default:
-            break;
         }
+        // switch (type) {
+        // case PROJECT:
+
+        // break;
+        // default:
+        // break;
+        // }
     }
 
     public void openWith(String editorType) throws RemoteException {
@@ -91,6 +95,13 @@ public class ContextMenuWrapperImp extends EclipseComponentImp implements
         tree.waitUntilItemNotExists(treeItem.getText());
     }
 
+    public NewC newC() throws RemoteException {
+        newC.setTree(tree);
+        newC.setTreeItem(treeItem);
+        newC.setTreeItemType(type);
+        return newC;
+    }
+
     public TeamC team() throws RemoteException {
         teamC.setTreeItem(treeItem);
         return teamC;
@@ -100,5 +111,29 @@ public class ContextMenuWrapperImp extends EclipseComponentImp implements
         reafactorC.setTreeItem(treeItem);
         reafactorC.setTreeItemType(type);
         return reafactorC;
+    }
+
+    public boolean existsWithRegex(String name) throws RemoteException {
+        if (treeItem == null) {
+            for (String item : tree.getTextOfItems()) {
+                if (item.matches(name + ".*"))
+                    return true;
+            }
+            return false;
+        } else {
+            for (String item : treeItem.getTextOfItems()) {
+                if (item.matches(name + ".*"))
+                    return true;
+            }
+            return false;
+        }
+    }
+
+    public boolean exists(String name) throws RemoteException {
+        if (treeItem == null) {
+            return tree.getTextOfItems().contains(name);
+        } else {
+            return treeItem.getTextOfItems().contains(name);
+        }
     }
 }

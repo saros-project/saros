@@ -9,7 +9,7 @@ public class SarosCImp extends SarosComponentImp implements SarosC {
 
     private static transient SarosCImp self;
 
-    private STFBotTreeItem view;
+    private STFBotTreeItem treeItem;
 
     /**
      * {@link SarosCImp} is a singleton, but inheritance is possible.
@@ -21,8 +21,8 @@ public class SarosCImp extends SarosComponentImp implements SarosC {
         return self;
     }
 
-    public void setTreeItem(STFBotTreeItem view) {
-        this.view = view;
+    public void setTreeItem(STFBotTreeItem treeItem) {
+        this.treeItem = treeItem;
     }
 
     /**************************************************************
@@ -39,13 +39,13 @@ public class SarosCImp extends SarosComponentImp implements SarosC {
 
     public void shareProjectWith(String howToshareProject,
         String[] baseJIDOfInvitees) throws RemoteException {
-        view.contextMenu(CM_SAROS, howToshareProject).click();
+        treeItem.contextMenu(CM_SAROS, howToshareProject).click();
         sarosBot().confirmShellInvitation(baseJIDOfInvitees);
     }
 
     public void shareProject(String... baseJIDOfInvitees)
         throws RemoteException {
-        view.contextMenu(CM_SAROS, CM_SHARE_PROJECT).click();
+        treeItem.contextMenu(CM_SAROS, CM_SHARE_PROJECT).click();
         sarosBot().confirmShellInvitation(baseJIDOfInvitees);
     }
 

@@ -49,7 +49,8 @@ public class TestShare3UsersSequentially extends STFTest {
     @Test
     public void testShareProject3UsersSequentially() throws RemoteException,
         InterruptedException {
-        alice.sarosBot().file().newJavaProjectWithClasses(PROJECT1, PKG1, CLS1);
+        alice.sarosBot().packageExplorerView().tree().newC()
+            .javaProjectWithClasses(PROJECT1, PKG1, CLS1);
         buildSessionSequentially(PROJECT1, CM_SHARE_PROJECT,
             TypeOfCreateProject.NEW_PROJECT, alice, carl, bob);
 

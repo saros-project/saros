@@ -197,13 +197,13 @@ public class STFBotImp extends STF implements STFBot {
     }
 
     public boolean isShellOpen(String title) throws RemoteException {
-        try {
-            swtBot.shell(title);
-            return true;
-        } catch (WidgetNotFoundException e) {
-            return false;
-        }
-        // return getTitlesOfOpenedShells().contains(title);
+        // try {
+        // swtBot.shell(title);
+        // return true;
+        // } catch (WidgetNotFoundException e) {
+        // return false;
+        // }
+        return getTitlesOfOpenedShells().contains(title);
     }
 
     public void waitsUntilShellIsClosed(final String title)

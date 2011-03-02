@@ -45,9 +45,10 @@ public class TestSVNStateUpdates extends STFTest {
         for (final Tester t : activeTesters) {
             initTasks.add(new Callable<Void>() {
                 public Void call() throws Exception {
-                    if (!t.sarosBot().state()
-                        .existsProjectNoGUI(SVN_PROJECT_COPY)) {
-                        t.sarosBot().file().newJavaProject(SVN_PROJECT_COPY);
+                    if (!t.sarosBot().packageExplorerView().tree()
+                        .existsWithRegex(SVN_PROJECT_COPY)) {
+                        t.sarosBot().packageExplorerView().tree().newC()
+                            .javaProject(SVN_PROJECT_COPY);
                         t.sarosBot()
                             .packageExplorerView()
                             .selectProject(SVN_PROJECT_COPY)
@@ -87,13 +88,15 @@ public class TestSVNStateUpdates extends STFTest {
                         .selectProject(SVN_PROJECT_COPY).copy();
                     tester.sarosBot().packageExplorerView().tree()
                         .paste(SVN_PROJECT);
-                    assertTrue(tester.sarosBot().state()
-                        .existsProjectNoGUI(SVN_PROJECT));
+                    assertTrue(tester.sarosBot().packageExplorerView().tree()
+                        .existsWithRegex(SVN_PROJECT));
                     assertTrue(tester.sarosBot().state()
                         .isProjectManagedBySVN(SVN_PROJECT));
-                    assertTrue(tester.sarosBot().state()
-                        .existsFileNoGUI(SVN_CLS1_FULL_PATH));
+                    assertTrue(tester.sarosBot().packageExplorerView()
+                        .selectPkg("stf_test_project", "pkg")
+                        .existsWithRegex("Test.java"));
                     return null;
+
                 }
             });
         }
@@ -110,10 +113,10 @@ public class TestSVNStateUpdates extends STFTest {
     @After
     public void runAfterEveryTest() throws Exception {
         leaveSessionHostFirst();
-        if (bob.sarosBot().state().existsProjectNoGUI(SVN_PROJECT))
+        if (bob.sarosBot().packageExplorerView().tree().existsWithRegex(SVN_PROJECT))
             bob.noBot().deleteProjectNoGUI(SVN_PROJECT);
 
-        if (alice.sarosBot().state().existsProjectNoGUI(SVN_PROJECT))
+        if (alice.sarosBot().packageExplorerView().tree().existsWithRegex(SVN_PROJECT))
             alice.noBot().deleteProjectNoGUI(SVN_PROJECT);
     }
 
@@ -152,8 +155,8 @@ public class TestSVNStateUpdates extends STFTest {
 
         alice.sarosBot().condition()
             .waitUntilClassExists(SVN_PROJECT, SVN_PKG, "Asdf");
-        assertTrue(alice.sarosBot().state()
-            .existsClassNoGUI(SVN_PROJECT, SVN_PKG, "Asdf"));
+        assertTrue(alice.sarosBot().packageExplorerView()
+            .selectPkg(SVN_PROJECT, SVN_PKG).existsWithRegex("Asdf" + SUFFIX_JAVA));
     }
 
     /**
@@ -176,7 +179,8 @@ public class TestSVNStateUpdates extends STFTest {
     public void testGrantWriteAccessAndMoveClass() throws Exception {
 
         assertTrue(bob.sarosBot().state().hasWriteAccessNoGUI());
-        bob.sarosBot().file().newPackage(SVN_PROJECT, "new_package");
+        bob.sarosBot().packageExplorerView().tree().newC()
+            .okg(SVN_PROJECT, "new_package");
         alice.sarosBot().condition()
             .waitUntilPkgExists(SVN_PROJECT, "new_package");
         bob.bot().sleep(1000);
@@ -186,8 +190,9 @@ public class TestSVNStateUpdates extends STFTest {
 
         alice.sarosBot().condition()
             .waitUntilClassExists(SVN_PROJECT, "new_package", SVN_CLS1);
-        assertTrue(alice.sarosBot().state()
-            .existsClassNoGUI(SVN_PROJECT, "new_package", SVN_CLS1));
+        assertTrue(alice.sarosBot().packageExplorerView()
+            .selectPkg(SVN_PROJECT, "new_package")
+            .existsWithRegex(SVN_CLS1 + SUFFIX_JAVA));
     }
 
     /**
@@ -332,14 +337,13 @@ public class TestSVNStateUpdates extends STFTest {
         alice.noBot().deleteProjectNoGUI(STFTest.SVN_CLS1_FULL_PATH);
         bob.sarosBot().condition()
             .waitUntilClassNotExists(SVN_PROJECT, SVN_PKG, SVN_CLS1);
-        assertFalse(bob.sarosBot().state()
-            .existsFileNoGUI(STFTest.SVN_CLS1_FULL_PATH));
+        assertFalse(bob.sarosBot().packageExplorerView()
+            .selectPkg("stf_test_project", "pkg").existsWithRegex("Test.java"));
         alice.sarosBot().packageExplorerView().selectProject(SVN_PROJECT)
             .team().revert();
         bob.sarosBot().condition()
             .waitUntilClassExists(SVN_PROJECT, SVN_PKG, SVN_CLS1);
-        assertTrue(bob.sarosBot().state()
-            .existsFileNoGUI(STFTest.SVN_CLS1_FULL_PATH));
+        assertTrue(bob.sarosBot().packageExplorerView()
+            .selectPkg("stf_test_project", "pkg").existsWithRegex("Test.java"));
     }
-
 }

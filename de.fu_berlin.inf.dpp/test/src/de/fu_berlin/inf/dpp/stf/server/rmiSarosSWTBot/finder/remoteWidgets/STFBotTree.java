@@ -18,6 +18,8 @@ public interface STFBotTree extends Remote {
 
     public STFBotMenu contextMenu(String text) throws RemoteException;
 
+    public STFBotMenu contextMenu(String... texts) throws RemoteException;
+
     /**********************************************
      * 
      * actions

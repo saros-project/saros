@@ -6,13 +6,14 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBo
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotShell;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotTree;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.Perspective;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.contextMenu.NewCImp;
 
 public class WindowMImp extends SarosPreferencesImp implements WindowM {
 
     private static transient WindowMImp windowImp;
 
     /**
-     * {@link FileMImp} is a singleton, but inheritance is possible.
+     * {@link NewCImp} is a singleton, but inheritance is possible.
      */
     public static WindowMImp getInstance() {
         if (windowImp != null)

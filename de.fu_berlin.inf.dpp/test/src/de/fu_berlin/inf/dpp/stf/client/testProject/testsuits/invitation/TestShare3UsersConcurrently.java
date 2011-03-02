@@ -50,7 +50,8 @@ public class TestShare3UsersConcurrently extends STFTest {
     @Test
     public void testShareProjectConcurrently() throws RemoteException,
         InterruptedException {
-        alice.sarosBot().file().newJavaProjectWithClasses(PROJECT1, PKG1, CLS1);
+        alice.sarosBot().packageExplorerView().tree().newC()
+            .javaProjectWithClasses(PROJECT1, PKG1, CLS1);
         buildSessionConcurrently(PROJECT1, CM_SHARE_PROJECT,
             TypeOfCreateProject.NEW_PROJECT, alice, bob, carl);
         assertTrue(carl.sarosBot().state().isParticipantNoGUI());

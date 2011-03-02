@@ -12,8 +12,6 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.STFWorkbenchBotImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotShell;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.menuBar.EditM;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.menuBar.EditMImp;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.menuBar.FileM;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.menuBar.FileMImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.menuBar.SarosM;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.menuBar.SarosMImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.menuBar.WindowM;
@@ -40,7 +38,7 @@ public class SarosBotImp extends STF implements SarosBot {
     private static STFWorkbenchBot bot;
 
     private static EditMImp editM;
-    private static FileMImp fileM;
+    // private static FileMImp fileM;
 
     private static StateImp state;
     private static WaitImp wait;
@@ -67,7 +65,7 @@ public class SarosBotImp extends STF implements SarosBot {
         wait = WaitImp.getInstance();
         state = StateImp.getInstance();
         editM = EditMImp.getInstance();
-        fileM = FileMImp.getInstance();
+        // fileM = FileMImp.getInstance();
         sarosM = SarosMImp.getInstance();
         windowM = WindowMImp.getInstance();
         chatV = ChatViewImp.getInstance();
@@ -105,10 +103,10 @@ public class SarosBotImp extends STF implements SarosBot {
         return wait;
     }
 
-    public FileM file() throws RemoteException {
-        bot.activateWorkbench();
-        return fileM;
-    }
+    // public FileM file() throws RemoteException {
+    // bot.activateWorkbench();
+    // return fileM;
+    // }
 
     public EditM edit() throws RemoteException {
         bot.activateWorkbench();

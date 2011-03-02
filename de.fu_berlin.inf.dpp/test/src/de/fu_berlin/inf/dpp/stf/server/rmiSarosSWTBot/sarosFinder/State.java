@@ -80,8 +80,8 @@ public interface State extends SarosComponent {
      *         exists
      * @throws RemoteException
      */
-    public boolean existsFile(String viewTitle, String... fileNodes)
-        throws RemoteException;
+    // public boolean existsFile(String viewTitle, String... fileNodes)
+    // throws RemoteException;
 
     /**
      * @param folderNodes
@@ -90,16 +90,16 @@ public interface State extends SarosComponent {
      *            {"Foo-saros","parentFolder" ,"myFolder"}
      * @return <tt>true</tt>, if the given folder already exists.
      */
-    public boolean existsFolderNoGUI(String... folderNodes)
-        throws RemoteException;
+    // public boolean existsFolderNoGUI(String... folderNodes)
+    // throws RemoteException;
 
     /**
      * @param projectName
      *            name of the project, e.g. Foo_Saros.
      * @return <tt>true</tt>, if the given project exists
      */
-    public boolean existsProjectNoGUI(String projectName)
-        throws RemoteException;
+    // public boolean existsProjectNoGUI(String projectName)
+    // throws RemoteException;
 
     /**
      * 
@@ -110,8 +110,8 @@ public interface State extends SarosComponent {
      * @return <tt>true</tt>, if the specified package already exists.
      * @throws RemoteException
      */
-    public boolean existsPkgNoGUI(String projectName, String pkg)
-        throws RemoteException;
+    // public boolean existsPkgNoGUI(String projectName, String pkg)
+    // throws RemoteException;
 
     /**
      * @param filePath
@@ -120,7 +120,7 @@ public interface State extends SarosComponent {
      * @return <tt>true</tt>, if the file specified by the passed parameter
      *         "filePath" exists.
      */
-    public boolean existsFileNoGUI(String filePath) throws RemoteException;
+    // public boolean existsFileNoGUI(String filePath) throws RemoteException;
 
     /**
      * 
@@ -132,7 +132,8 @@ public interface State extends SarosComponent {
      *                       exists.
      * @throws RemoteException
      */
-    public boolean existsFileNoGUI(String... fileNodes) throws RemoteException;
+    // public boolean existsFileNoGUI(String... fileNodes) throws
+    // RemoteException;
 
     /**
      * 
@@ -146,8 +147,8 @@ public interface State extends SarosComponent {
      *         parameters exists.
      * @throws RemoteException
      */
-    public boolean existsClassNoGUI(String projectName, String pkg,
-        String className) throws RemoteException;
+    // public boolean existsClassNoGUI(String projectName, String pkg,
+    // String className) throws RemoteException;
 
     /**********************************************
      * 

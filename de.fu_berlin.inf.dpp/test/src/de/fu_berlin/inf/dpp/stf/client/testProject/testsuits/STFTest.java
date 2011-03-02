@@ -302,8 +302,8 @@ public class STFTest extends STF {
      */
     public static void setUpSessionWithAJavaProjectAndAClass(Tester inviter,
         Tester... invitees) throws RemoteException, InterruptedException {
-        inviter.sarosBot().file()
-            .newJavaProjectWithClasses(PROJECT1, PKG1, CLS1);
+        inviter.sarosBot().packageExplorerView().tree().newC()
+            .javaProjectWithClasses(PROJECT1, PKG1, CLS1);
         buildSessionConcurrently(PROJECT1, CM_SHARE_PROJECT,
             TypeOfCreateProject.NEW_PROJECT, inviter, invitees);
     }
@@ -317,10 +317,12 @@ public class STFTest extends STF {
             String key = i.next();
             if (!createdProjects.contains(key)) {
                 createdProjects.add(key);
-                inviter.sarosBot().file().newJavaProject(key);
+                inviter.sarosBot().packageExplorerView().tree().newC()
+                    .javaProject(key);
                 List<String> pkgAndclass = projectsPkgsClasses.get(key);
-                inviter.sarosBot().file()
-                    .newClass(key, pkgAndclass.get(0), pkgAndclass.get(1));
+                inviter.sarosBot().packageExplorerView()
+                    .selectPkg(key, pkgAndclass.get(0)).newC()
+                    .cls(key, pkgAndclass.get(0), pkgAndclass.get(1));
             }
         }
     }
@@ -469,7 +471,8 @@ public class STFTest extends STF {
     public static void resetSharedProject(Tester host) throws RemoteException {
         host.sarosBot().edit()
             .deleteAllItemsOfJavaProject(VIEW_PACKAGE_EXPLORER, PROJECT1);
-        host.sarosBot().file().newClass(PROJECT1, PKG1, CLS1);
+        host.sarosBot().packageExplorerView().tree().newC()
+            .cls(PROJECT1, PKG1, CLS1);
         // host.bot().sleep(1000);
     }
 
@@ -492,16 +495,18 @@ public class STFTest extends STF {
     public static void createSameJavaProjectByActiveTesters()
         throws RemoteException {
         for (Tester tester : activeTesters) {
-            tester.sarosBot().file()
-                .newJavaProjectWithClasses(PROJECT1, PKG1, CLS1);
+            tester.sarosBot().packageExplorerView().tree().newC()
+                .javaProjectWithClasses(PROJECT1, PKG1, CLS1);
         }
     }
 
     public static void createProjectWithFileBy(Tester... testers)
         throws RemoteException {
         for (Tester tester : testers) {
-            tester.sarosBot().file().newProject(PROJECT1);
-            tester.sarosBot().file().newFile(path);
+            tester.sarosBot().packageExplorerView().tree().newC()
+                .project(PROJECT1);
+            tester.sarosBot().packageExplorerView().selectFolder(PROJECT1)
+                .newC().file(FILE3);
             tester.bot().waitUntilEditorOpen(FILE3);
         }
     }
@@ -525,8 +530,8 @@ public class STFTest extends STF {
         throws RemoteException {
         for (Tester tester : activeTesters) {
             for (String folder : folders) {
-                if (tester.sarosBot().state()
-                    .existsFolderNoGUI(PROJECT1, folder))
+                if (tester.sarosBot().packageExplorerView()
+                    .selectProject(PROJECT1).existsWithRegex(folder))
                     tester.noBot().deleteFolderNoGUI(PROJECT1, folder);
             }
         }

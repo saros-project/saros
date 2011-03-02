@@ -23,6 +23,9 @@ public interface PEView extends EclipseComponent {
 
     public ContextMenuWrapper tree() throws RemoteException;
 
+    public SarosContextMenuWrapper selectSrc(String projectName)
+        throws RemoteException;
+
     public SarosContextMenuWrapper selectJavaProject(String projectName)
         throws RemoteException;
 

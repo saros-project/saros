@@ -36,9 +36,12 @@ public class TestUserWithWriteAccessSavesFiles extends STFTest {
             TypeOfTester.DAVE, TypeOfTester.EDNA);
         setUpWorkbench();
         setUpSaros();
-        alice.sarosBot().file().newJavaProjectWithClasses(PROJECT1, PKG1, CLS1);
-        alice.sarosBot().file().newClass(PROJECT1, PKG1, CLS2);
-        alice.sarosBot().file().newClass(PROJECT1, PKG1, CLS3);
+        alice.sarosBot().packageExplorerView().tree().newC()
+            .javaProjectWithClasses(PROJECT1, PKG1, CLS1);
+        alice.sarosBot().packageExplorerView().tree().newC()
+            .cls(PROJECT1, PKG1, CLS2);
+        alice.sarosBot().packageExplorerView().tree().newC()
+            .cls(PROJECT1, PKG1, CLS3);
 
         /*
          * build session with bob, carl, dave and edna simultaneously

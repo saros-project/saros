@@ -15,6 +15,7 @@ public class PEViewImp extends EclipseComponentImp implements PEView {
 
     private STFBotView view;
     private STFBotTree tree;
+    private STFBotTreeItem treeItem;
     private static transient PEViewImp pEViewImp;
     private static OpenCImp openC;
 
@@ -35,6 +36,7 @@ public class PEViewImp extends EclipseComponentImp implements PEView {
     public PEView setView(STFBotView view) throws RemoteException {
         this.view = view;
         tree = view.bot().tree();
+        treeItem = null;
         return this;
     }
 
@@ -62,6 +64,16 @@ public class PEViewImp extends EclipseComponentImp implements PEView {
 
     public SarosContextMenuWrapper tree() throws RemoteException {
         contextMenu.setTree(tree);
+        contextMenu.setTreeItem(null);
+        contextMenu.setTreeItemType(null);
+        return contextMenu;
+    }
+
+    public SarosContextMenuWrapper selectSrc(String projectName)
+        throws RemoteException {
+        initContextMenuWrapper(
+            tree.selectTreeItemWithRegex(changeToRegex(projectName), SRC),
+            treeItemType.JAVA_PROJECT);
         return contextMenu;
     }
 
@@ -126,8 +138,10 @@ public class PEViewImp extends EclipseComponentImp implements PEView {
 
     private void initContextMenuWrapper(STFBotTreeItem treeItem,
         treeItemType type) {
+        this.treeItem = treeItem;
         contextMenu.setTree(tree);
         contextMenu.setTreeItem(treeItem);
         contextMenu.setTreeItemType(type);
     }
+
 }

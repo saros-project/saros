@@ -57,8 +57,10 @@ public class TestSVNStateInitialization extends STFTest {
         initTesters(TypeOfTester.ALICE, TypeOfTester.BOB);
         setUpWorkbench();
         setUpSaros();
-        if (!alice.sarosBot().state().existsProjectNoGUI(SVN_PROJECT_COPY)) {
-            alice.sarosBot().file().newJavaProject(SVN_PROJECT_COPY);
+        if (!alice.sarosBot().packageExplorerView().tree()
+            .existsWithRegex(SVN_PROJECT_COPY)) {
+            alice.sarosBot().packageExplorerView().tree().newC()
+                .javaProject(SVN_PROJECT_COPY);
             alice
                 .sarosBot()
                 .packageExplorerView()
@@ -97,16 +99,19 @@ public class TestSVNStateInitialization extends STFTest {
         alice.sarosBot().packageExplorerView().selectProject(SVN_PROJECT_COPY)
             .copy();
         alice.sarosBot().packageExplorerView().tree().paste(SVN_PROJECT);
-        assertTrue(alice.sarosBot().state().existsProjectNoGUI(SVN_PROJECT));
+
+        assertTrue(alice.sarosBot().packageExplorerView().tree()
+            .existsWithRegex(SVN_PROJECT));
         assertTrue(alice.sarosBot().state().isProjectManagedBySVN(SVN_PROJECT));
-        assertTrue(alice.sarosBot().state().existsFileNoGUI(SVN_CLS1_FULL_PATH));
+        assertTrue(alice.sarosBot().packageExplorerView()
+            .selectPkg("stf_test_project", "pkg").existsWithRegex("Test.java"));
     }
 
     @After
     public void tearDown() throws RemoteException, InterruptedException {
         leaveSessionHostFirst();
 
-        if (alice.sarosBot().state().existsProjectNoGUI(SVN_PROJECT))
+        if (alice.sarosBot().packageExplorerView().tree().existsWithRegex(SVN_PROJECT))
             alice.noBot().deleteProjectNoGUI(SVN_PROJECT);
         bob.sarosBot().edit().deleteAllProjects(VIEW_PACKAGE_EXPLORER);
     }
@@ -266,8 +271,8 @@ public class TestSVNStateInitialization extends STFTest {
      */
     @Test
     public void testCheckoutWithModification() throws RemoteException {
-        assertTrue(alice.sarosBot().state()
-            .existsClassNoGUI(SVN_PROJECT, SVN_PKG, SVN_CLS1));
+        assertTrue(alice.sarosBot().packageExplorerView()
+            .selectPkg(SVN_PROJECT, SVN_PKG).existsWithRegex(SVN_CLS1 + SUFFIX_JAVA));
         alice.sarosBot().packageExplorerView()
             .selectClass(SVN_PROJECT, SVN_PKG, SVN_CLS1).open();
         String cls1_content_before = alice.bot().editor(SVN_CLS1_SUFFIX)

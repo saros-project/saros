@@ -36,10 +36,14 @@ public class TestFolderOperations extends STFTest {
 
     @Before
     public void runBeforeEveryTest() throws RemoteException {
-        if (!alice.sarosBot().state().existsClassNoGUI(PROJECT1, PKG1, CLS1))
-            alice.sarosBot().file().newClass(PROJECT1, PKG1, CLS1);
-        if (!alice.sarosBot().state().existsFolderNoGUI(PROJECT1, FOLDER1))
-            alice.sarosBot().file().newFolder(PROJECT1, FOLDER1);
+        if (!alice.sarosBot().packageExplorerView().selectPkg(PROJECT1, PKG1)
+            .existsWithRegex(CLS1))
+            alice.sarosBot().packageExplorerView().tree().newC()
+                .cls(PROJECT1, PKG1, CLS1);
+        if (!alice.sarosBot().packageExplorerView().selectProject(PROJECT1)
+            .existsWithRegex(FOLDER1))
+            alice.sarosBot().packageExplorerView().selectProject(PROJECT1)
+                .newC().folder(FOLDER1);
     }
 
     /**
@@ -63,8 +67,9 @@ public class TestFolderOperations extends STFTest {
 
         bob.sarosBot().condition()
             .waitUntilFolderExists(PROJECT1, newFolderName);
-        assertTrue(bob.sarosBot().state()
-            .existsFolderNoGUI(PROJECT1, newFolderName));
-        assertFalse(bob.sarosBot().state().existsFolderNoGUI(PROJECT1, FOLDER1));
+        assertTrue(bob.sarosBot().packageExplorerView().selectProject(PROJECT1)
+            .existsWithRegex(newFolderName));
+        assertFalse(bob.sarosBot().packageExplorerView()
+            .selectProject(PROJECT1).exists(FOLDER1));
     }
 }

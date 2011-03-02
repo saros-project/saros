@@ -7,7 +7,6 @@ import java.rmi.RemoteException;
 
 import org.junit.After;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import de.fu_berlin.inf.dpp.stf.client.testProject.testsuits.STFTest;
@@ -26,28 +25,32 @@ public class TestPackageExplorerView extends STFTest {
     }
 
     @Test
-    @Ignore
     public void testIsFileExist() throws RemoteException {
-        alice.sarosBot().file().newJavaProject(PROJECT1);
-        alice.sarosBot().file().newClass(PROJECT1, "pkg", "Cls");
-        assertTrue(alice.sarosBot().state()
-            .existsClassNoGUI(PROJECT1, "pkg", "Cls"));
-        alice.noBot().deleteClassNoGUI(PROJECT1, "pkg", "Cls");
-        assertFalse(alice.sarosBot().state()
-            .existsClassNoGUI(PROJECT1, "pkg", "Cls"));
+        alice.sarosBot().packageExplorerView().tree().newC()
+            .javaProject(PROJECT1);
+        alice.sarosBot().packageExplorerView().tree().newC()
+            .cls(PROJECT1, PKG1, CLS1);
+        assertTrue(alice.sarosBot().packageExplorerView()
+            .selectPkg(PROJECT1, PKG1).existsWithRegex(CLS1_SUFFIX));
+        alice.noBot().deleteClassNoGUI(PROJECT1, PKG1, CLS1);
+        assertFalse(alice.sarosBot().packageExplorerView()
+            .selectPkg(PROJECT1, PKG1).existsWithRegex(CLS1_SUFFIX));
     }
 
     @Test
-    @Ignore
+    // @Ignore
     // this test fails, but it doesn't really matter...
     public void testIsFileExistWithGUI() throws RemoteException {
-        alice.sarosBot().file().newJavaProject(PROJECT1);
-        alice.sarosBot().file().newClass(PROJECT1, "pkg", "Cls");
-        assertTrue(alice.sarosBot().state()
-            .existsFile(PROJECT1, "src", "pkg", "Cls.java"));
-        alice.noBot().deleteClassNoGUI(PROJECT1, "pkg", "Cls");
-        assertFalse(alice.sarosBot().state()
-            .existsFile(PROJECT1, "src", "pkg", "Cls.java"));
-    }
+        alice.sarosBot().packageExplorerView().tree().newC()
+            .javaProject(PROJECT1);
+        alice.sarosBot().packageExplorerView().tree().newC()
+            .cls(PROJECT1, PKG1, CLS1);
+        assertTrue(alice.sarosBot().packageExplorerView()
+            .selectPkg(PROJECT1, PKG1).existsWithRegex(CLS1_SUFFIX));
 
+        alice.noBot().deleteClassNoGUI(PROJECT1, PKG1, CLS1);
+        assertFalse(alice.sarosBot().packageExplorerView()
+            .selectPkg(PROJECT1, PKG1).existsWithRegex(CLS1_SUFFIX));
+
+    }
 }

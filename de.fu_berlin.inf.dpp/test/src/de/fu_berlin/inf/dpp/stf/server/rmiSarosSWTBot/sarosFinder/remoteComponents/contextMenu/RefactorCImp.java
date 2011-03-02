@@ -5,7 +5,6 @@ import java.rmi.RemoteException;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotShell;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotTreeItem;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.EclipseComponentImp;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.menuBar.FileMImp;
 
 public class RefactorCImp extends EclipseComponentImp implements RefactorC {
 
@@ -15,7 +14,7 @@ public class RefactorCImp extends EclipseComponentImp implements RefactorC {
     private treeItemType type;
 
     /**
-     * {@link FileMImp} is a singleton, but inheritance is possible.
+     * {@link NewCImp} is a singleton, but inheritance is possible.
      */
     public static RefactorCImp getInstance() {
         if (refactorImp != null)
@@ -73,7 +72,7 @@ public class RefactorCImp extends EclipseComponentImp implements RefactorC {
      **************************************************************/
     private void rename(String shellTitle, String buttonName, String newName)
         throws RemoteException {
-        bot().menu(MENU_REFACTOR).menu(MENU_RENAME).click();
+        treeItem.contextMenu(MENU_REFACTOR, MENU_RENAME).click();
         STFBotShell shell = bot().shell(shellTitle);
         shell.activate();
         shell.bot().textWithLabel(LABEL_NEW_NAME).setText(newName);

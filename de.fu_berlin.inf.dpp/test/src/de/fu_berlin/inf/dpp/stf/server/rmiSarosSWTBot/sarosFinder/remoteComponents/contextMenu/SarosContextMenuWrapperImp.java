@@ -21,6 +21,7 @@ public class SarosContextMenuWrapperImp extends ContextMenuWrapperImp implements
         sarosC = SarosCImp.getInstance();
         teamC = TeamCImp.getInstance();
         reafactorC = RefactorCImp.getInstance();
+        newC = NewCImp.getInstance();
         return self;
     }
 

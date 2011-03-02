@@ -31,73 +31,87 @@ public class TestMenuRefactor extends STFTest {
      **********************************************/
     @Test
     public void testMoveClassTo() throws RemoteException {
-        alice.sarosBot().file().newJavaProject(PROJECT1);
-        alice.sarosBot().file().newClass(PROJECT1, PKG1, CLS1);
-        alice.sarosBot().file().newPackage(PROJECT1, PKG2);
+        alice.sarosBot().packageExplorerView().tree().newC()
+            .javaProject(PROJECT1);
+        alice.sarosBot().packageExplorerView().tree().newC()
+            .cls(PROJECT1, PKG1, CLS1);
+        alice.sarosBot().packageExplorerView().tree().newC()
+            .okg(PROJECT1, PKG2);
         alice.sarosBot().packageExplorerView()
             .selectClass(PROJECT1, PKG1, CLS1).refactor()
             .moveClassTo(PROJECT1, PKG2);
-        assertFalse(alice.sarosBot().state()
-            .existsClassNoGUI(PROJECT1, PKG1, CLS1));
-        assertTrue(alice.sarosBot().state()
-            .existsClassNoGUI(PROJECT1, PKG2, CLS1));
+        assertFalse(alice.sarosBot().packageExplorerView()
+            .selectPkg(PROJECT1, PKG1).existsWithRegex(CLS1_SUFFIX));
+
+        assertTrue(alice.sarosBot().packageExplorerView()
+            .selectPkg(PROJECT1, PKG2).existsWithRegex(CLS1_SUFFIX));
     }
 
     @Test
     public void testRenameClass() throws RemoteException {
-        alice.sarosBot().file().newJavaProject(PROJECT1);
-        alice.sarosBot().file().newClass(PROJECT1, PKG1, CLS1);
+        alice.sarosBot().packageExplorerView().tree().newC()
+            .javaProject(PROJECT1);
+        alice.sarosBot().packageExplorerView().tree().newC()
+            .cls(PROJECT1, PKG1, CLS1);
         alice.sarosBot().packageExplorerView()
             .selectClass(PROJECT1, PKG1, CLS1).refactor().rename(CLS2);
 
-        assertFalse(alice.sarosBot().state()
-            .existsClassNoGUI(PROJECT1, PKG1, CLS1));
-        assertTrue(alice.sarosBot().state()
-            .existsClassNoGUI(PROJECT1, PKG1, CLS2));
+        assertFalse(alice.sarosBot().packageExplorerView()
+            .selectPkg(PROJECT1, PKG1).existsWithRegex(CLS1_SUFFIX));
+        assertTrue(alice.sarosBot().packageExplorerView()
+            .selectPkg(PROJECT1, PKG1).existsWithRegex(CLS2_SUFFIX));
     }
 
     @Test
     public void testRenameFile() throws RemoteException {
-        alice.sarosBot().file().newProject(PROJECT1);
-        alice.sarosBot().file().newFolder(PROJECT1, FOLDER1);
-        alice.sarosBot().file().newFile(PROJECT1, FOLDER1, FILE1);
+        alice.sarosBot().packageExplorerView().tree().newC().project(PROJECT1);
+        alice.sarosBot().packageExplorerView().selectProject(PROJECT1).newC()
+            .folder(FOLDER1);
+        alice.sarosBot().packageExplorerView().selectFolder(PROJECT1, FOLDER1)
+            .newC().file(FILE1);
         alice.sarosBot().packageExplorerView()
             .selectFile(PROJECT1, FOLDER1, FILE1).refactor().rename(FILE2);
 
-        assertFalse(alice.sarosBot().state()
-            .existsFileNoGUI(PROJECT1, FOLDER1, FILE1));
-        assertTrue(alice.sarosBot().state()
-            .existsFileNoGUI(PROJECT1, FOLDER1, FILE2));
+        assertFalse(alice.sarosBot().packageExplorerView()
+            .selectFolder(PROJECT1, FOLDER1).existsWithRegex(FILE1));
+        assertTrue(alice.sarosBot().packageExplorerView()
+            .selectFolder(PROJECT1, FOLDER1).existsWithRegex(FILE2));
     }
 
     @Test
     public void testRenameFolder() throws RemoteException {
-        alice.sarosBot().file().newProject(PROJECT1);
-        alice.sarosBot().file().newFolder(PROJECT1, FOLDER1);
+        alice.sarosBot().packageExplorerView().tree().newC().project(PROJECT1);
+        alice.sarosBot().packageExplorerView().selectProject(PROJECT1).newC()
+            .folder(FOLDER1);
         alice.sarosBot().packageExplorerView().selectFolder(PROJECT1, FOLDER1)
             .refactor().rename(FOLDER2);
 
-        assertFalse(alice.sarosBot().state()
-            .existsFolderNoGUI(PROJECT1, FOLDER1));
-        assertTrue(alice.sarosBot().state()
-            .existsFolderNoGUI(PROJECT1, FOLDER2));
+        assertFalse(alice.sarosBot().packageExplorerView()
+            .selectProject(PROJECT1).existsWithRegex(FOLDER1));
+        assertTrue(alice.sarosBot().packageExplorerView()
+            .selectProject(PROJECT1).existsWithRegex(FOLDER2));
     }
 
     @Test
     public void testRenamePackage() throws RemoteException {
-        alice.sarosBot().file().newJavaProject(PROJECT1);
-        alice.sarosBot().file().newPackage(PROJECT1, PKG1);
+        alice.sarosBot().packageExplorerView().tree().newC()
+            .javaProject(PROJECT1);
+        alice.sarosBot().packageExplorerView().tree().newC()
+            .okg(PROJECT1, PKG1);
         alice.sarosBot().packageExplorerView().selectPkg(PROJECT1, PKG1)
             .refactor().rename(PKG2);
 
         alice.bot().sleep(500);
-        assertFalse(alice.sarosBot().state().existsPkgNoGUI(PROJECT1, PKG1));
-        assertTrue(alice.sarosBot().state().existsPkgNoGUI(PROJECT1, PKG2));
+        assertFalse(alice.sarosBot().packageExplorerView()
+            .selectProject(PROJECT1).existsWithRegex(PKG1));
+        assertTrue(alice.sarosBot().packageExplorerView().selectSrc(PROJECT1)
+            .existsWithRegex(PKG2));
     }
 
     @Test
     public void testShareProjectWithSVN() throws RemoteException {
-        alice.sarosBot().file().newJavaProject(PROJECT1);
+        alice.sarosBot().packageExplorerView().tree().newC()
+            .javaProject(PROJECT1);
         assertFalse(alice.sarosBot().state().isProjectManagedBySVN(PROJECT1));
         alice
             .sarosBot()
@@ -114,14 +128,19 @@ public class TestMenuRefactor extends STFTest {
      */
     @Test
     public void testRenameProject() throws Exception {
-        alice.sarosBot().file().newJavaProject(PROJECT1);
+        alice.sarosBot().packageExplorerView().tree().newC()
+            .javaProject(PROJECT1);
 
-        assertTrue(alice.sarosBot().state().existsProjectNoGUI(PROJECT1));
-        assertFalse(alice.sarosBot().state().existsProjectNoGUI(PROJECT2));
+        assertTrue(alice.sarosBot().packageExplorerView().tree()
+            .existsWithRegex(PROJECT1));
+        assertFalse(alice.sarosBot().packageExplorerView().tree()
+            .existsWithRegex(PROJECT2));
         alice.sarosBot().packageExplorerView().selectJavaProject(PROJECT1)
             .refactor().rename(PROJECT2);
 
-        assertFalse(alice.sarosBot().state().existsProjectNoGUI(PROJECT1));
-        assertTrue(alice.sarosBot().state().existsProjectNoGUI(PROJECT2));
+        assertFalse(alice.sarosBot().packageExplorerView().tree()
+            .existsWithRegex(PROJECT1));
+        assertTrue(alice.sarosBot().packageExplorerView().tree()
+            .existsWithRegex(PROJECT2));
     }
 }

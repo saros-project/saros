@@ -6,6 +6,7 @@ import static org.junit.Assert.assertTrue;
 import java.rmi.RemoteException;
 
 import org.eclipse.jface.bindings.keys.IKeyLookup;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -17,6 +18,11 @@ public class TestConcurrentEditing extends STFTest {
         initTesters(TypeOfTester.ALICE, TypeOfTester.BOB);
         setUpWorkbench();
         setUpSaros();
+    }
+
+    @Before
+    public void beforeEachMethod() throws RemoteException {
+        deleteAllProjectsByActiveTesters();
     }
 
     static final String FILE = "file.txt";
@@ -35,10 +41,11 @@ public class TestConcurrentEditing extends STFTest {
     @Test
     public void testBugInconsistencyConcurrentEditing() throws RemoteException,
         InterruptedException {
-        alice.sarosBot().file().newProject(PROJECT1);
+        alice.sarosBot().packageExplorerView().tree().newC().project(PROJECT1);
         // cool trick, no need to always use PROJECT1, PKG1, CLS1 as arguments
-        String[] path = { PROJECT1, FILE };
-        alice.sarosBot().file().newFile(path);
+
+        alice.sarosBot().packageExplorerView().selectProject(PROJECT1).newC()
+            .file(FILE);
         alice.bot().waitUntilEditorOpen(FILE);
         alice.bot().editor(FILE).setTexWithSave("test/STF/lorem.txt");
         alice.bot().editor(FILE).navigateTo(0, 6);
@@ -91,7 +98,9 @@ public class TestConcurrentEditing extends STFTest {
     @Test(expected = AssertionError.class)
     public void AliceAndBobeditInSameLine() throws RemoteException,
         InterruptedException {
-        alice.sarosBot().file().newJavaProjectWithClasses(PROJECT1, PKG1, CLS1);
+
+        alice.sarosBot().packageExplorerView().tree().newC()
+            .javaProjectWithClasses(PROJECT1, PKG1, CLS1);
         buildSessionConcurrently(PROJECT1, CM_SHARE_PROJECT,
             TypeOfCreateProject.NEW_PROJECT, alice, bob);
         bob.sarosBot().packageExplorerView().selectClass(PROJECT1, PKG1, CLS1)
@@ -120,7 +129,7 @@ public class TestConcurrentEditing extends STFTest {
         assertEquals(aliceText, bobText);
         bob.bot().sleep(5000);
         assertTrue(bob.bot().view(VIEW_SAROS_SESSION)
-            .toolbarButton(TB_INCONSISTENCY_DETECTED).isEnabled());
+            .existsToolbarButton(TB_INCONSISTENCY_DETECTED));
 
     }
 }

@@ -19,10 +19,9 @@ public class TestEditorByAliceAndBob extends STFTest {
         initTesters(TypeOfTester.ALICE, TypeOfTester.BOB);
         setUpWorkbench();
         setUpSaros();
-        alice.sarosBot().file().newJavaProjectWithClasses(PROJECT1, PKG1, CLS1);
+        setUpSessionWithAJavaProjectAndAClass(alice, bob);
         if (alice.bot().isEditorOpen(CLS1 + SUFFIX_JAVA))
             alice.bot().editor(CLS1 + SUFFIX_JAVA).closeWithSave();
-        setUpSessionWithAJavaProjectAndAClass(alice, bob);
     }
 
     @After
@@ -77,7 +76,8 @@ public class TestEditorByAliceAndBob extends STFTest {
         assertTrue(bob.sarosBot().state().isInFollowModeNoGUI());
         assertTrue(bob.bot().editor(CLS1_SUFFIX).isActive());
 
-        alice.sarosBot().file().newClass(PROJECT1, PKG1, CLS2);
+        alice.sarosBot().packageExplorerView().tree().newC()
+            .cls(PROJECT1, PKG1, CLS2);
         bob.bot().editor(CLS2_SUFFIX).waitUntilIsActive();
         assertTrue(bob.bot().editor(CLS2_SUFFIX).isActive());
         assertFalse(bob.bot().editor(CLS1_SUFFIX).isActive());

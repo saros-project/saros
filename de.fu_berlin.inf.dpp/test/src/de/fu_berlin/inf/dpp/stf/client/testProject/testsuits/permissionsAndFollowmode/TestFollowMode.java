@@ -52,7 +52,8 @@ public class TestFollowMode extends STFTest {
             getClassPath(PROJECT1, PKG1, CLS1));
         assertTrue(clsContentOfBob.equals(clsContentOfAlice));
 
-        alice.sarosBot().file().newClass(PROJECT1, PKG1, CLS2);
+        alice.sarosBot().packageExplorerView().tree().newC()
+            .cls(PROJECT1, PKG1, CLS2);
         bob.bot().editor(CLS2_SUFFIX).waitUntilIsActive();
         assertTrue(bob.bot().editor(CLS2_SUFFIX).isActive());
 

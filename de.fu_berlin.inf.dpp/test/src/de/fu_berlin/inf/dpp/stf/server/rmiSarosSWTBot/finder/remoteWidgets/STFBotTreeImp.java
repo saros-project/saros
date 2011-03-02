@@ -10,6 +10,8 @@ import org.eclipse.swtbot.swt.finder.waits.DefaultCondition;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 
+import de.fu_berlin.inf.dpp.stf.server.sarosSWTBot.widgets.ContextMenuHelper;
+
 public class STFBotTreeImp extends AbstractRmoteWidget implements STFBotTree {
 
     private static transient STFBotTreeImp self;
@@ -53,6 +55,11 @@ public class STFBotTreeImp extends AbstractRmoteWidget implements STFBotTree {
 
     public STFBotMenu contextMenu(String text) throws RemoteException {
         return stfBotMenu.setWidget(widget.contextMenu(text));
+    }
+
+    public STFBotMenu contextMenu(String... texts) throws RemoteException {
+        stfBotMenu.setWidget(ContextMenuHelper.getContextMenu(widget, texts));
+        return stfBotMenu;
     }
 
     /**********************************************

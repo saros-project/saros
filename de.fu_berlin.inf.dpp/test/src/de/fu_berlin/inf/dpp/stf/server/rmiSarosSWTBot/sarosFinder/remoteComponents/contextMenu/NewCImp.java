@@ -1,31 +1,42 @@
-package de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.menuBar;
+package de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.contextMenu;
 
 import java.rmi.RemoteException;
 
 import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
 
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotShell;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotTree;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotTreeItem;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.EclipseComponentImp;
 
-public class FileMImp extends EclipseComponentImp implements FileM {
+public class NewCImp extends EclipseComponentImp implements NewC {
 
-    private static transient FileMImp fileImp;
+    private static transient NewCImp self;
 
     private STFBotTreeItem treeItem;
+    private STFBotTree tree;
+    private treeItemType type;
 
     /**
-     * {@link FileMImp} is a singleton, but inheritance is possible.
+     * {@link NewCImp} is a singleton, but inheritance is possible.
      */
-    public static FileMImp getInstance() {
-        if (fileImp != null)
-            return fileImp;
-        fileImp = new FileMImp();
-        return fileImp;
+    public static NewCImp getInstance() {
+        if (self != null)
+            return self;
+        self = new NewCImp();
+        return self;
     }
 
     public void setTreeItem(STFBotTreeItem treeItem) {
         this.treeItem = treeItem;
+    }
+
+    public void setTreeItemType(treeItemType type) {
+        this.type = type;
+    }
+
+    public void setTree(STFBotTree tree) {
+        this.tree = tree;
     }
 
     /**************************************************************
@@ -39,31 +50,25 @@ public class FileMImp extends EclipseComponentImp implements FileM {
      * actions
      * 
      **********************************************/
-    public void newProject(String projectName) throws RemoteException {
-        if (!sarosBot().state().existsProjectNoGUI(projectName)) {
-            precondition();
-            bot().menu(MENU_FILE).menu(MENU_NEW).menu(MENU_PROJECT).click();
-
+    public void project(String projectName) throws RemoteException {
+        if (!exists(projectName)) {
+            tree.contextMenu(MENU_NEW, MENU_PROJECT).click();
             confirmWizardNewProject(projectName);
         }
     }
 
-    public void newJavaProject(String projectName) throws RemoteException {
-        if (!sarosBot().state().existsProjectNoGUI(projectName)) {
-            precondition();
-            bot().menu(MENU_FILE).menu(MENU_NEW).menu(MENU_JAVA_PROJECT)
-                .click();
-
+    public void javaProject(String projectName) throws RemoteException {
+        if (!exists(projectName)) {
+            tree.contextMenu(MENU_NEW, MENU_JAVA_PROJECT).click();
             confirmShellNewJavaProject(projectName);
         }
     }
 
-    public void newFolder(String... folderNodes) throws RemoteException {
-        precondition();
-        if (!sarosBot().state().existsFolderNoGUI(folderNodes)) {
+    public void folder(String folderName) throws RemoteException {
+        if (!exists(folderName)) {
             try {
-                bot().menu(MENU_FILE).menu(MENU_NEW).menu(MENU_FOLDER).click();
-                confirmShellNewFolder(folderNodes);
+                treeItem.contextMenu(MENU_NEW, MENU_FOLDER).click();
+                confirmShellNewFolder(folderName);
             } catch (WidgetNotFoundException e) {
                 final String cause = "Error creating new folder";
                 log.error(cause, e);
@@ -72,32 +77,31 @@ public class FileMImp extends EclipseComponentImp implements FileM {
         }
     }
 
-    public void newPackage(String projectName, String pkg)
+    public void okg(String projectName, String pkg)
         throws RemoteException {
         if (pkg.matches(PKG_REGEX)) {
-            if (!sarosBot().state().existsPkgNoGUI(projectName, pkg))
-                try {
-                    precondition();
-                    bot().menu(MENU_FILE).menu(MENU_NEW).menu(MENU_PACKAGE)
-                        .click();
-                    confirmShellNewJavaPackage(projectName, pkg);
-                } catch (WidgetNotFoundException e) {
-                    final String cause = "error creating new package";
-                    log.error(cause, e);
-                    throw new RemoteException(cause, e);
-                }
-        } else {
-            throw new RuntimeException(
-                "The passed parameter \"pkg\" isn't valid, the package name should corresponds to the pattern [\\w\\.]*\\w+ e.g. PKG1.PKG2.PKG3");
-        }
-    }
-
-    public void newFile(String... fileNodes) throws RemoteException {
-        if (!sarosBot().state().existsFileNoGUI(getPath(fileNodes)))
+            // if (!sarosBot().state().existsPkgNoGUI(projectName, pkg))
             try {
                 precondition();
-                bot().menu(MENU_FILE).menu(MENU_NEW).menu(MENU_FILE).click();
-                confirmShellNewFile(fileNodes);
+                bot().menu(MENU_FILE).menu(MENU_NEW).menu(MENU_PACKAGE).click();
+                confirmShellNewJavaPackage(projectName, pkg);
+            } catch (WidgetNotFoundException e) {
+                final String cause = "error creating new package";
+                log.error(cause, e);
+                throw new RemoteException(cause, e);
+            }
+        }
+        // else {
+        // throw new RuntimeException(
+        // "The passed parameter \"pkg\" isn't valid, the package name should corresponds to the pattern [\\w\\.]*\\w+ e.g. PKG1.PKG2.PKG3");
+        // }
+    }
+
+    public void file(String fileName) throws RemoteException {
+        if (!exists(fileName))
+            try {
+                treeItem.contextMenu(MENU_NEW, MENU_FILE).click();
+                confirmShellNewFile(fileName);
             } catch (WidgetNotFoundException e) {
                 final String cause = "error creating new file.";
                 log.error(cause, e);
@@ -105,14 +109,11 @@ public class FileMImp extends EclipseComponentImp implements FileM {
             }
     }
 
-    public void newClass(String projectName, String pkg, String className)
-        throws RemoteException {
-        if (!sarosBot().state().existsFileNoGUI(
-            getClassPath(projectName, pkg, className))) {
+    public void cls(String className) throws RemoteException {
+        if (!exists(className)) {
             try {
-                precondition();
-                bot().menu(MENU_FILE).menu(MENU_NEW).menu(MENU_CLASS).click();
-                confirmShellNewJavaClass(projectName, pkg, className);
+                treeItem.contextMenu(MENU_NEW, MENU_CLASS).click();
+                confirmShellNewJavaClass(className);
             } catch (WidgetNotFoundException e) {
                 final String cause = "error creating new Java Class";
                 log.error(cause, e);
@@ -121,17 +122,29 @@ public class FileMImp extends EclipseComponentImp implements FileM {
         }
     }
 
-    public void newClassImplementsRunnable(String projectName, String pkg,
-        String className) throws RemoteException {
-        if (!sarosBot().state().existsFileNoGUI(
-            getClassPath(projectName, pkg, className))) {
+    public void cls(String projectName, String pkg, String className)
+        throws RemoteException {
+        // if (!sarosBot().state().existsFileNoGUI(
+        // getClassPath(projectName, pkg, className))) {
+        try {
             precondition();
+            bot().menu(MENU_FILE).menu(MENU_NEW).menu(MENU_CLASS).click();
+            confirmShellNewJavaClass(projectName, pkg, className);
+        } catch (WidgetNotFoundException e) {
+            final String cause = "error creating new Java Class";
+            log.error(cause, e);
+            throw new RemoteException(cause, e);
+        }
+        // }
+    }
+
+    public void clsImplementsRunnable(String className)
+        throws RemoteException {
+        if (!exists(className)) {
             bot().menu(MENU_FILE).menu(MENU_NEW).menu(MENU_CLASS).click();
             STFBotShell shell_new = bot().shell(SHELL_NEW_JAVA_CLASS);
             shell_new.activate();
-            shell_new.bot().textWithLabel(LABEL_SOURCE_FOLDER)
-                .setText(projectName + "/" + SRC);
-            shell_new.bot().textWithLabel(LABEL_PACKAGE).setText(pkg);
+
             shell_new.bot().textWithLabel(LABEL_NAME).setText(className);
             shell_new.bot().button("Add...").click();
             bot().waitUntilShellIsOpen("Implemented Interfaces Selection");
@@ -148,11 +161,11 @@ public class FileMImp extends EclipseComponentImp implements FileM {
         }
     }
 
-    public void newJavaProjectWithClasses(String projectName, String pkg,
+    public void javaProjectWithClasses(String projectName, String pkg,
         String... classNames) throws RemoteException {
-        newJavaProject(projectName);
+        javaProject(projectName);
         for (String className : classNames) {
-            newClass(projectName, pkg, className);
+            cls(projectName, pkg, className);
         }
 
     }
@@ -164,6 +177,15 @@ public class FileMImp extends EclipseComponentImp implements FileM {
      **************************************************************/
     protected void precondition() throws RemoteException {
         bot().activateWorkbench();
+    }
+
+    private void confirmShellNewJavaClass(String className)
+        throws RemoteException {
+        STFBotShell shell = bot().shell(SHELL_NEW_JAVA_CLASS);
+        shell.activate();
+        shell.bot().textWithLabel(LABEL_NAME).setText(className);
+        shell.bot().button(FINISH).click();
+        bot().waitsUntilShellIsClosed(SHELL_NEW_JAVA_CLASS);
     }
 
     private void confirmShellNewJavaClass(String projectName, String pkg,
@@ -188,15 +210,10 @@ public class FileMImp extends EclipseComponentImp implements FileM {
         // bot.sleep(50);
     }
 
-    private void confirmShellNewFile(String... fileNodes)
-        throws RemoteException {
+    private void confirmShellNewFile(String fileName) throws RemoteException {
         STFBotShell shell = bot().shell(SHELL_NEW_FILE);
         shell.activate();
-        shell.bot().textWithLabel(LABEL_ENTER_OR_SELECT_THE_PARENT_FOLDER)
-            .setText(getPath(getParentNodes(fileNodes)));
-
-        shell.bot().textWithLabel(LABEL_FILE_NAME)
-            .setText(getLastNode(fileNodes));
+        shell.bot().textWithLabel(LABEL_FILE_NAME).setText(fileName);
         shell.bot().button(FINISH).waitUntilIsEnabled();
         shell.bot().button(FINISH).click();
         bot().waitsUntilShellIsClosed(SHELL_NEW_FILE);
@@ -214,15 +231,12 @@ public class FileMImp extends EclipseComponentImp implements FileM {
             bot().waitsUntilShellIsClosed(SHELL_CREATE_NEW_XMPP_ACCOUNT);
     }
 
-    private void confirmShellNewFolder(String... folderNodes)
+    private void confirmShellNewFolder(String folderName)
         throws RemoteException {
         STFBotShell shell = bot().shell(SHELL_NEW_FOLDER);
         shell.activate();
-        shell.bot().textWithLabel(LABEL_ENTER_OR_SELECT_THE_PARENT_FOLDER)
-            .setText(getPath(getParentNodes(folderNodes)));
 
-        shell.bot().textWithLabel(LABEL_FOLDER_NAME)
-            .setText(getLastNode(folderNodes));
+        shell.bot().textWithLabel(LABEL_FOLDER_NAME).setText(folderName);
 
         shell.bot().button(FINISH).click();
         bot().waitsUntilShellIsClosed(SHELL_NEW_FOLDER);
@@ -238,4 +252,13 @@ public class FileMImp extends EclipseComponentImp implements FileM {
         shell.bot().button(FINISH).click();
         bot().waitsUntilShellIsClosed(SHELL_NEW_JAVA_PROJECT);
     }
+
+    private boolean exists(String name) throws RemoteException {
+        if (treeItem == null) {
+            return tree.getTextOfItems().contains(name);
+        } else
+            return treeItem.getTextOfItems().contains(name);
+        // return false;
+    }
+
 }

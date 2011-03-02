@@ -1,10 +1,10 @@
-package de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.menuBar;
+package de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.contextMenu;
 
 import java.rmi.RemoteException;
 
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.EclipseComponent;
 
-public interface FileM extends EclipseComponent {
+public interface NewC extends EclipseComponent {
     /**
      * Performs the action "create a project" which should be done with the
      * following steps:
@@ -27,7 +27,7 @@ public interface FileM extends EclipseComponent {
      *            name of the project, e.g. Foo_Saros.
      * 
      */
-    public void newProject(String projectName) throws RemoteException;
+    public void project(String projectName) throws RemoteException;
 
     /**
      * Performs the action "create a java project" which should be done with the
@@ -49,7 +49,7 @@ public interface FileM extends EclipseComponent {
      * @param projectName
      *            name of the project, e.g. Foo_Saros.
      */
-    public void newJavaProject(String projectName) throws RemoteException;
+    public void javaProject(String projectName) throws RemoteException;
 
     /**
      * Performs the action "create a new folder" which should be done with the
@@ -76,7 +76,9 @@ public interface FileM extends EclipseComponent {
      *            the path specified by the parent node array parameter.e.g.
      *            {"Foo-saros","parentFolder" }
      */
-    public void newFolder(String... folderNodes) throws RemoteException;
+    public void folder(String folderName) throws RemoteException;
+
+    // public boolean exists(String folderName) throws RemoteException;
 
     /**
      * Performs the action "create a new package" which should be done with the
@@ -101,7 +103,7 @@ public interface FileM extends EclipseComponent {
      *            name of the package, e.g. my.pkg.
      * 
      */
-    public void newPackage(String projectName, String pkg)
+    public void okg(String projectName, String pkg)
         throws RemoteException;
 
     /**
@@ -127,7 +129,7 @@ public interface FileM extends EclipseComponent {
      *            {"Foo-saros","parentFolder" ,"myFolder", "myFile.xml"}
      * 
      */
-    public void newFile(String... fileNodes) throws RemoteException;
+    public void file(String fileName) throws RemoteException;
 
     /**
      * Performs the action "create a new class" which should be done with the
@@ -155,7 +157,9 @@ public interface FileM extends EclipseComponent {
      *            name of the class, e.g. myClass.
      * 
      */
-    public void newClass(String projectName, String pkg, String className)
+    public void cls(String className) throws RemoteException;
+
+    public void cls(String projectName, String pkg, String className)
         throws RemoteException;
 
     /**
@@ -185,8 +189,8 @@ public interface FileM extends EclipseComponent {
      *            name of the class, e.g. myClass.
      * 
      */
-    public void newClassImplementsRunnable(String projectName, String pkg,
-        String className) throws RemoteException;
+    public void clsImplementsRunnable(String className)
+        throws RemoteException;
 
     /**
      * Create a java project and a class in the project. The two functions
@@ -205,7 +209,7 @@ public interface FileM extends EclipseComponent {
      * @param className
      *            name of the class, e.g. MyClass
      */
-    public void newJavaProjectWithClasses(String projectName, String pkg,
+    public void javaProjectWithClasses(String projectName, String pkg,
         String... className) throws RemoteException;
 
 }

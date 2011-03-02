@@ -14,10 +14,16 @@ public interface ContextMenuWrapper extends EclipseComponent {
 
     public TeamC team() throws RemoteException;
 
+    public NewC newC() throws RemoteException;
+
     public RefactorC refactor() throws RemoteException;
 
     public void copy() throws RemoteException;
 
     public void paste(String target) throws RemoteException;
+
+    public boolean existsWithRegex(String name) throws RemoteException;
+
+    public boolean exists(String name) throws RemoteException;
 
 }

@@ -139,7 +139,8 @@ public class TestSessionView extends STFTest {
      */
     @Test
     public void jumpToSelectedBuddy() throws RemoteException {
-        alice.sarosBot().file().newClass(PROJECT1, PKG1, CLS2);
+        alice.sarosBot().packageExplorerView().tree().newC()
+            .cls(PROJECT1, PKG1, CLS2);
         alice.bot().waitUntilEditorOpen(CLS2_SUFFIX);
         assertTrue(alice.bot().isEditorOpen(CLS2_SUFFIX));
         assertFalse(bob.bot().isEditorOpen(CLS2_SUFFIX));

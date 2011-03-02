@@ -168,6 +168,8 @@ public class TeamCImp extends EclipseComponentImp implements TeamC {
         switchToAnotherRevision(versionID);
     }
 
+   
+
     private void switchToAnotherRevision(String versionID)
         throws RemoteException {
         String[] contexts = { CM_TEAM, CM_SWITCH_TO_ANOTHER_BRANCH_TAG_REVISION };
