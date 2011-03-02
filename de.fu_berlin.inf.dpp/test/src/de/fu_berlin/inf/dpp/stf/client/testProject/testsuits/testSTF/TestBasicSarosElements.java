@@ -61,27 +61,33 @@ public class TestBasicSarosElements extends STFTest {
     @Test
     public void connectWithoutGUI() throws RemoteException {
         log.trace("xmppConnect");
-        alice.sarosBot().buddiesView().connectNoGUI(alice.jid, alice.password);
+        alice.sarosBot().views().buddiesView()
+            .connectNoGUI(alice.jid, alice.password);
         log.trace("captureScreenshot");
         alice.bot().captureScreenshot(
             (alice.bot().getPathToScreenShot() + "/xmpp_connected.png"));
-        assertEquals(true, alice.sarosBot().buddiesView().isConnectedNoGUI());
+        assertEquals(true, alice.sarosBot().views().buddiesView()
+            .isConnectedNoGUI());
     }
 
     @Test
     public void disconnectWithoutGUI() throws RemoteException {
-        alice.sarosBot().buddiesView().connectNoGUI(alice.jid, alice.password);
-        alice.sarosBot().buddiesView().disconnectNoGUI();
-        assertEquals(false, alice.sarosBot().buddiesView().isConnectedNoGUI());
+        alice.sarosBot().views().buddiesView()
+            .connectNoGUI(alice.jid, alice.password);
+        alice.sarosBot().views().buddiesView().disconnectNoGUI();
+        assertEquals(false, alice.sarosBot().views().buddiesView()
+            .isConnectedNoGUI());
     }
 
     @Test
     public void disconnectGUI() throws RemoteException {
-        alice.sarosBot().buddiesView().connectNoGUI(alice.jid, alice.password);
-        alice.sarosBot().buddiesView().disconnect();
+        alice.sarosBot().views().buddiesView()
+            .connectNoGUI(alice.jid, alice.password);
+        alice.sarosBot().views().buddiesView().disconnect();
         alice.bot().captureScreenshot(
             (alice.bot().getPathToScreenShot() + "/xmpp_disconnected.png"));
-        assertEquals(false, alice.sarosBot().buddiesView().isConnectedNoGUI());
+        assertEquals(false, alice.sarosBot().views().buddiesView()
+            .isConnectedNoGUI());
     }
 
 }

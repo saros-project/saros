@@ -1,11 +1,11 @@
 package de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.menuBar;
 
+import java.rmi.Remote;
 import java.rmi.RemoteException;
 
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.SarosComponent;
 
-public interface SarosPreferences extends SarosComponent {
+public interface SarosPreferences extends Remote {
 
     /**********************************************
      * setting for Account.
@@ -156,6 +156,8 @@ public interface SarosPreferences extends SarosComponent {
      */
     public boolean isAccountActive(JID jid) throws RemoteException;
 
+    public boolean existsAccount() throws RemoteException;
+
     /**
      * 
      * 
@@ -167,6 +169,6 @@ public interface SarosPreferences extends SarosComponent {
      *         saros-preferences-page.
      * @throws RemoteException
      */
-    public boolean isAccountExist(JID jid) throws RemoteException;
+    public boolean existsAccount(JID jid) throws RemoteException;
 
 }

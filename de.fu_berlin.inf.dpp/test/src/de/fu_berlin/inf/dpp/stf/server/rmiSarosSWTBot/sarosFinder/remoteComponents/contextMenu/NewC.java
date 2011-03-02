@@ -1,10 +1,9 @@
 package de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.contextMenu;
 
+import java.rmi.Remote;
 import java.rmi.RemoteException;
 
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.EclipseComponent;
-
-public interface NewC extends EclipseComponent {
+public interface NewC extends Remote {
     /**
      * Performs the action "create a project" which should be done with the
      * following steps:
@@ -95,7 +94,7 @@ public interface NewC extends EclipseComponent {
      *            name of the package, e.g. my.pkg.
      * 
      */
-    public void okg(String projectName, String pkg) throws RemoteException;
+    public void pkg(String projectName, String pkg) throws RemoteException;
 
     /**
      * Performs the action "create a new file" which should be done with the

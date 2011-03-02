@@ -36,11 +36,11 @@ public class TestUserWithWriteAccessSavesFiles extends STFTest {
             TypeOfTester.DAVE, TypeOfTester.EDNA);
         setUpWorkbench();
         setUpSaros();
-        alice.sarosBot().packageExplorerView().tree().newC()
+        alice.sarosBot().views().packageExplorerView().tree().newC()
             .javaProjectWithClasses(PROJECT1, PKG1, CLS1);
-        alice.sarosBot().packageExplorerView().tree().newC()
+        alice.sarosBot().views().packageExplorerView().tree().newC()
             .cls(PROJECT1, PKG1, CLS2);
-        alice.sarosBot().packageExplorerView().tree().newC()
+        alice.sarosBot().views().packageExplorerView().tree().newC()
             .cls(PROJECT1, PKG1, CLS3);
 
         /*
@@ -84,14 +84,14 @@ public class TestUserWithWriteAccessSavesFiles extends STFTest {
         String dirtyClsContentOfAlice = alice.bot().editor(CLS1_SUFFIX)
             .getText();
 
-        dave.sarosBot().packageExplorerView().selectClass(PROJECT1, PKG1, CLS1)
-            .open();
+        dave.sarosBot().views().packageExplorerView()
+            .selectClass(PROJECT1, PKG1, CLS1).open();
         dave.bot().editor(CLS1_SUFFIX)
             .waitUntilIsTextSame(dirtyClsContentOfAlice);
         assertTrue(dave.bot().editor(CLS1_SUFFIX).isDirty());
 
-        edna.sarosBot().packageExplorerView().selectClass(PROJECT1, PKG1, CLS1)
-            .open();
+        edna.sarosBot().views().packageExplorerView()
+            .selectClass(PROJECT1, PKG1, CLS1).open();
         edna.bot().editor(CLS1_SUFFIX)
             .waitUntilIsTextSame(dirtyClsContentOfAlice);
         assertTrue(edna.bot().editor(CLS1_SUFFIX).isDirty());
@@ -114,7 +114,7 @@ public class TestUserWithWriteAccessSavesFiles extends STFTest {
     @Test
     public void testNoChangeByExternalEditorByBob() throws IOException,
         CoreException {
-        alice.sarosBot().packageExplorerView()
+        alice.sarosBot().views().packageExplorerView()
             .selectClass(PROJECT1, PKG1, CLS2).open();
         alice.bot().editor(CLS2_SUFFIX).setTextWithoutSave(CP1);
         String dirtyCls2ContentOfAlice = alice.bot().editor(CLS2_SUFFIX)
@@ -143,12 +143,13 @@ public class TestUserWithWriteAccessSavesFiles extends STFTest {
      */
     @Test
     public void testChangeByEclipseEditorByCarl() throws RemoteException {
-        alice.sarosBot().packageExplorerView()
+        alice.sarosBot().views().packageExplorerView()
             .selectClass(PROJECT1, PKG1, CLS2).open();
         alice.bot().editor(CLS2_SUFFIX).setTextWithoutSave(CP1);
         String dirtyCls2ContentOfAlice = alice.bot().editor(CLS2_SUFFIX)
             .getText();
-        carl.sarosBot().packageExplorerView().selectClass(PROJECT1, PKG1, CLS2)
+        carl.sarosBot().views().packageExplorerView()
+            .selectClass(PROJECT1, PKG1, CLS2)
             .openWith(CM_OPEN_WITH_TEXT_EDITOR);
 
         carl.bot().editor(CLS2_SUFFIX)
@@ -183,21 +184,22 @@ public class TestUserWithWriteAccessSavesFiles extends STFTest {
     @Test
     public void testChangingInClosedFile() throws IOException, CoreException {
         alice.bot().editor(CLS2_SUFFIX).setTextWithoutSave(CP1);
-        carl.sarosBot().packageExplorerView().selectClass(PROJECT1, PKG1, CLS2)
+        carl.sarosBot().views().packageExplorerView()
+            .selectClass(PROJECT1, PKG1, CLS2)
             .openWith(CM_OPEN_WITH_TEXT_EDITOR);
         carl.bot().editor(CLS2 + SUFFIX_JAVA).closeWithSave();
 
         alice.bot().editor(CLS2_SUFFIX).setTexWithSave(CP2_CHANGE);
         String dirtyCls2ChangeContentOfAlice = alice.bot().editor(CLS2_SUFFIX)
             .getText();
-        dave.sarosBot().packageExplorerView().selectClass(PROJECT1, PKG1, CLS2)
-            .open();
+        dave.sarosBot().views().packageExplorerView()
+            .selectClass(PROJECT1, PKG1, CLS2).open();
         dave.bot().editor(CLS2_SUFFIX)
             .waitUntilIsTextSame(dirtyCls2ChangeContentOfAlice);
         assertFalse(dave.bot().editor(CLS2_SUFFIX).isDirty());
 
-        edna.sarosBot().packageExplorerView().selectClass(PROJECT1, PKG1, CLS2)
-            .open();
+        edna.sarosBot().views().packageExplorerView()
+            .selectClass(PROJECT1, PKG1, CLS2).open();
         edna.bot().editor(CLS2_SUFFIX)
             .waitUntilIsTextSame(dirtyCls2ChangeContentOfAlice);
         assertFalse(edna.bot().editor(CLS2_SUFFIX).isDirty());
@@ -210,8 +212,8 @@ public class TestUserWithWriteAccessSavesFiles extends STFTest {
         System.out.println(dirtyCls2ChangeContentOfAlice);
         assertTrue(contentChangeOfBob.equals(dirtyCls2ChangeContentOfAlice));
 
-        carl.sarosBot().packageExplorerView().selectClass(PROJECT1, PKG1, CLS2)
-            .open();
+        carl.sarosBot().views().packageExplorerView()
+            .selectClass(PROJECT1, PKG1, CLS2).open();
         carl.bot().editor(CLS2_SUFFIX)
             .waitUntilIsTextSame(dirtyCls2ChangeContentOfAlice);
         String contentOfCarl = carl.bot().editor(CLS2_SUFFIX).getText();
@@ -240,31 +242,31 @@ public class TestUserWithWriteAccessSavesFiles extends STFTest {
         IOException, CoreException {
         String clsConentofBob = bob.noBot().getFileContent(
             getClassPath(PROJECT1, PKG1, CLS1));
-        alice.sarosBot().packageExplorerView()
+        alice.sarosBot().views().packageExplorerView()
             .selectClass(PROJECT1, PKG1, CLS1).open();
         alice.bot().editor(CLS1_SUFFIX).setTextWithoutSave(CP1);
         alice.bot().editor(CLS1_SUFFIX).closeWithSave();
         String clsConentOfAlice = alice.noBot().getFileContent(
             getClassPath(PROJECT1, PKG1, CLS1));
 
-        dave.sarosBot().packageExplorerView().selectClass(PROJECT1, PKG1, CLS1)
-            .open();
+        dave.sarosBot().views().packageExplorerView()
+            .selectClass(PROJECT1, PKG1, CLS1).open();
         dave.noBot().waitUntilFileContentSame(clsConentOfAlice,
             getClassPath(PROJECT1, PKG1, CLS1));
         assertFalse(dave.bot().editor(CLS1_SUFFIX).isDirty());
 
-        edna.sarosBot().packageExplorerView().selectClass(PROJECT1, PKG1, CLS1)
-            .open();
+        edna.sarosBot().views().packageExplorerView()
+            .selectClass(PROJECT1, PKG1, CLS1).open();
         edna.bot().editor(CLS1_SUFFIX).waitUntilIsTextSame(clsConentOfAlice);
         assertFalse(edna.bot().editor(CLS1_SUFFIX).isDirty());
 
-        bob.sarosBot().packageExplorerView().selectClass(PROJECT1, PKG1, CLS1)
-            .open();
+        bob.sarosBot().views().packageExplorerView()
+            .selectClass(PROJECT1, PKG1, CLS1).open();
         String clsContentChangeOfBob = bob.bot().editor(CLS1_SUFFIX).getText();
         assertFalse(clsContentChangeOfBob.equals(clsConentofBob));
 
-        carl.sarosBot().packageExplorerView().selectClass(PROJECT1, PKG1, CLS1)
-            .open();
+        carl.sarosBot().views().packageExplorerView()
+            .selectClass(PROJECT1, PKG1, CLS1).open();
         String clsContentChangeOfCarl = carl.bot().editor(CLS1_SUFFIX)
             .getText();
         assertTrue(clsContentChangeOfCarl.equals(clsConentOfAlice));

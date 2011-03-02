@@ -30,7 +30,7 @@ public class TestStrictSequentialInvitationWithoutTermination extends STFTest {
         initTesters(TypeOfTester.ALICE, TypeOfTester.BOB, TypeOfTester.CARL);
         setUpWorkbench();
         setUpSaros();
-        alice.sarosBot().packageExplorerView().tree().newC()
+        alice.sarosBot().views().packageExplorerView().tree().newC()
             .javaProjectWithClasses(PROJECT1, PKG1, CLS1);
     }
 

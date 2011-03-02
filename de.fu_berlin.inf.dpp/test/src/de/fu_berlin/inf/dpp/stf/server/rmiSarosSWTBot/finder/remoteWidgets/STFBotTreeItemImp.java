@@ -15,6 +15,7 @@ public class STFBotTreeItemImp extends AbstractRmoteWidget implements
     private static transient STFBotTreeItemImp self;
 
     private SWTBotTreeItem widget;
+
     private SWTBotTree swtBotTree;
 
     /**
@@ -28,6 +29,7 @@ public class STFBotTreeItemImp extends AbstractRmoteWidget implements
     }
 
     public STFBotTreeItem setWidget(SWTBotTreeItem item) {
+
         this.widget = item;
         return this;
     }
@@ -174,13 +176,14 @@ public class STFBotTreeItemImp extends AbstractRmoteWidget implements
         return allItemTexts;
     }
 
-    public STFBotTreeItem[] getItems() throws RemoteException {
-        STFBotTreeItem[] items = new STFBotTreeItem[widget.getItems().length];
-        for (int i = 0; i < widget.getItems().length; i++) {
-            items[i] = setWidget(widget.getItems()[i]);
-        }
-        return items;
-    }
+    // public STFBotTreeItem[] getItems() throws RemoteException {
+    // subItems = widget.getItems();
+    // STFBotTreeItem[] items = new STFBotTreeItem[widget.getItems().length];
+    // for (int i = 0; i < widget.getItems().length; i++) {
+    // items[i] = setWidget(widget.getItems()[i]);
+    // }
+    // return items;
+    // }
 
     public boolean existsSubItem(String text) throws RemoteException {
         return getTextOfItems().contains(text);

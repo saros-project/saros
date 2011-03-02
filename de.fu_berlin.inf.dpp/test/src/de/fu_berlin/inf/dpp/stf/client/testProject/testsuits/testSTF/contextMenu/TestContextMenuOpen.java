@@ -32,75 +32,75 @@ public class TestContextMenuOpen extends STFTest {
      **********************************************/
     @Test
     public void testOpenFile() throws RemoteException {
-        alice.sarosBot().packageExplorerView().tree().newC()
+        alice.sarosBot().views().packageExplorerView().tree().newC()
             .javaProject(PROJECT1);
-        alice.sarosBot().packageExplorerView().selectProject(PROJECT1).newC()
-            .folder(FOLDER1);
-        alice.sarosBot().packageExplorerView().selectFolder(PROJECT1, FOLDER1)
-            .newC().file(FILE1);
+        alice.sarosBot().views().packageExplorerView().selectProject(PROJECT1)
+            .newC().folder(FOLDER1);
+        alice.sarosBot().views().packageExplorerView()
+            .selectFolder(PROJECT1, FOLDER1).newC().file(FILE1);
         assertTrue(alice.bot().isEditorOpen(FILE1));
         alice.bot().editor(FILE1).closeWithSave();
         assertFalse(alice.bot().isEditorOpen(FILE1));
-        alice.sarosBot().packageExplorerView()
+        alice.sarosBot().views().packageExplorerView()
             .selectFile(PROJECT1, FOLDER1, FILE1).open();
 
         assertTrue(alice.bot().isEditorOpen(FILE1));
 
-        alice.sarosBot().packageExplorerView()
+        alice.sarosBot().views().packageExplorerView()
             .selectFile(PROJECT1, FOLDER1, FILE1).delete();
         assertFalse(alice.bot().isEditorOpen(FILE1));
     }
 
     @Test
     public void testOpenClass() throws RemoteException {
-        alice.sarosBot().packageExplorerView().tree().newC()
+        alice.sarosBot().views().packageExplorerView().tree().newC()
             .javaProjectWithClasses(PROJECT1, PKG1, CLS1);
         assertTrue(alice.bot().isEditorOpen(CLS1_SUFFIX));
         alice.bot().editor(CLS1 + SUFFIX_JAVA).closeWithSave();
         assertFalse(alice.bot().isEditorOpen(CLS1_SUFFIX));
-        alice.sarosBot().packageExplorerView()
+        alice.sarosBot().views().packageExplorerView()
             .selectClass(PROJECT1, PKG1, CLS1).open();
         assertTrue(alice.bot().isEditorOpen(CLS1_SUFFIX));
 
-        alice.sarosBot().packageExplorerView()
+        alice.sarosBot().views().packageExplorerView()
             .selectClass(PROJECT1, PKG1, CLS1).delete();
         assertFalse(alice.bot().isEditorOpen(CLS1_SUFFIX));
     }
 
     @Test
     public void testOpenClassWith() throws RemoteException {
-        alice.sarosBot().packageExplorerView().tree().newC()
+        alice.sarosBot().views().packageExplorerView().tree().newC()
             .javaProjectWithClasses(PROJECT1, PKG1, CLS1);
         assertTrue(alice.bot().isEditorOpen(CLS1_SUFFIX));
         alice.bot().editor(CLS1 + SUFFIX_JAVA).closeWithSave();
         assertFalse(alice.bot().isEditorOpen(CLS1_SUFFIX));
-        alice.sarosBot().packageExplorerView()
+        alice.sarosBot().views().packageExplorerView()
             .selectClass(PROJECT1, PKG1, CLS1)
             .openWith(CM_OPEN_WITH_TEXT_EDITOR);
 
         assertTrue(alice.bot().isEditorOpen(CLS1_SUFFIX));
 
-        alice.sarosBot().packageExplorerView()
+        alice.sarosBot().views().packageExplorerView()
             .selectClass(PROJECT1, PKG1, CLS1).delete();
         assertFalse(alice.bot().isEditorOpen(CLS1_SUFFIX));
     }
 
     @Test
     public void testOpenFileWith() throws RemoteException {
-        alice.sarosBot().packageExplorerView().tree().newC()
+        alice.sarosBot().views().packageExplorerView().tree().newC()
             .javaProject(PROJECT1);
-        alice.sarosBot().packageExplorerView().selectProject(PROJECT1).newC()
-            .folder(FOLDER1);
-        alice.sarosBot().packageExplorerView().selectFolder(PROJECT1, FOLDER1)
-            .newC().file(FILE1);
+        alice.sarosBot().views().packageExplorerView().selectProject(PROJECT1)
+            .newC().folder(FOLDER1);
+        alice.sarosBot().views().packageExplorerView()
+            .selectFolder(PROJECT1, FOLDER1).newC().file(FILE1);
         alice.bot().editor(FILE1).closeWithSave();
-        alice.sarosBot().packageExplorerView()
+        alice.sarosBot().views().packageExplorerView()
             .selectFile(PROJECT1, FOLDER1, FILE1)
             .openWith(CM_OPEN_WITH_TEXT_EDITOR);
 
         assertTrue(alice.bot().isEditorOpen(FILE1));
 
-        alice.sarosBot().packageExplorerView()
+        alice.sarosBot().views().packageExplorerView()
             .selectFile(PROJECT1, FOLDER1, FILE1).delete();
         assertFalse(alice.bot().isEditorOpen(FILE1));
     }
@@ -108,12 +108,12 @@ public class TestContextMenuOpen extends STFTest {
     @Test
     @Ignore("Can't close the external editor")
     public void testOpenFileWithSystemEditor() throws RemoteException {
-        alice.sarosBot().packageExplorerView().tree().newC()
+        alice.sarosBot().views().packageExplorerView().tree().newC()
             .javaProjectWithClasses(PROJECT1, PKG1, CLS1);
-        alice.sarosBot().packageExplorerView()
+        alice.sarosBot().views().packageExplorerView()
             .selectClass(PROJECT1, PKG1, CLS1)
             .openWith(CM_OPEN_WITH_TEXT_EDITOR);
-        alice.sarosBot().packageExplorerView()
+        alice.sarosBot().views().packageExplorerView()
             .selectClass(PROJECT1, PKG1, CLS1)
             .openWith(CM_OPEN_WITH_SYSTEM_EDITOR);
 

@@ -26,14 +26,14 @@ public class TestPackageExplorerView extends STFTest {
 
     @Test
     public void testIsFileExist() throws RemoteException {
-        alice.sarosBot().packageExplorerView().tree().newC()
+        alice.sarosBot().views().packageExplorerView().tree().newC()
             .javaProject(PROJECT1);
-        alice.sarosBot().packageExplorerView().tree().newC()
+        alice.sarosBot().views().packageExplorerView().tree().newC()
             .cls(PROJECT1, PKG1, CLS1);
-        assertTrue(alice.sarosBot().packageExplorerView()
+        assertTrue(alice.sarosBot().views().packageExplorerView()
             .selectPkg(PROJECT1, PKG1).existsWithRegex(CLS1_SUFFIX));
         alice.noBot().deleteClassNoGUI(PROJECT1, PKG1, CLS1);
-        assertFalse(alice.sarosBot().packageExplorerView()
+        assertFalse(alice.sarosBot().views().packageExplorerView()
             .selectPkg(PROJECT1, PKG1).existsWithRegex(CLS1_SUFFIX));
     }
 
@@ -41,15 +41,15 @@ public class TestPackageExplorerView extends STFTest {
     // @Ignore
     // this test fails, but it doesn't really matter...
     public void testIsFileExistWithGUI() throws RemoteException {
-        alice.sarosBot().packageExplorerView().tree().newC()
+        alice.sarosBot().views().packageExplorerView().tree().newC()
             .javaProject(PROJECT1);
-        alice.sarosBot().packageExplorerView().tree().newC()
+        alice.sarosBot().views().packageExplorerView().tree().newC()
             .cls(PROJECT1, PKG1, CLS1);
-        assertTrue(alice.sarosBot().packageExplorerView()
+        assertTrue(alice.sarosBot().views().packageExplorerView()
             .selectPkg(PROJECT1, PKG1).existsWithRegex(CLS1_SUFFIX));
 
         alice.noBot().deleteClassNoGUI(PROJECT1, PKG1, CLS1);
-        assertFalse(alice.sarosBot().packageExplorerView()
+        assertFalse(alice.sarosBot().views().packageExplorerView()
             .selectPkg(PROJECT1, PKG1).existsWithRegex(CLS1_SUFFIX));
 
     }

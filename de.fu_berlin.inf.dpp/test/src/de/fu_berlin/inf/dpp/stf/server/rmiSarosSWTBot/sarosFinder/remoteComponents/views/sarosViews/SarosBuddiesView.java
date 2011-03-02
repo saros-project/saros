@@ -1,5 +1,6 @@
 package de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.views.sarosViews;
 
+import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.util.List;
 
@@ -9,7 +10,7 @@ import org.jivesoftware.smack.XMPPException;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.stf.client.Tester;
 import de.fu_berlin.inf.dpp.stf.client.testProject.helpers.TestPattern;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.SarosComponent;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.contextMenu.SarosContextMenuWrapper;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.menuBar.SarosM;
 
 /**
@@ -32,7 +33,7 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponen
  * 
  * @author Lin
  */
-public interface RosterView extends SarosComponent {
+public interface SarosBuddiesView extends Remote {
 
     /**********************************************
      * 
@@ -74,6 +75,8 @@ public interface RosterView extends SarosComponent {
      * @throws RemoteException
      */
     public void connectWith(JID jid, String password) throws RemoteException;
+
+    public void connectWithActiveAccount() throws RemoteException;
 
     /**
      * @return <tt>true</tt>, if Saros is connected to a XMPP server.
@@ -179,7 +182,8 @@ public interface RosterView extends SarosComponent {
      *            want to select
      * @throws RemoteException
      */
-    public void selectBuddy(String baseJID) throws RemoteException;
+    public SarosContextMenuWrapper selectBuddy(String baseJID)
+        throws RemoteException;
 
     /**
      * 

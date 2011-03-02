@@ -75,7 +75,7 @@ public class TestChangingUserWithWriteAccessWhileOtherFollow extends STFTest {
         // bob.bot.waitUntilFollowed(carl.getBaseJid());
         // dave.bot.waitUntilFollowed(carl.getBaseJid());
 
-        alice.sarosBot().packageExplorerView()
+        alice.sarosBot().views().packageExplorerView()
             .selectClass(PROJECT1, PKG1, CLS1).open();
         alice.bot().editor(CLS1_SUFFIX).setTextWithoutSave(CP1);
         String dirtyClsContentOfAlice = alice.bot().editor(CLS1_SUFFIX)

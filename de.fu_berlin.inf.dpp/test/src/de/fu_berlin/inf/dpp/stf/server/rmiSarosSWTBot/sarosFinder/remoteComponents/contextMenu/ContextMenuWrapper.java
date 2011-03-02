@@ -1,10 +1,9 @@
 package de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.contextMenu;
 
+import java.rmi.Remote;
 import java.rmi.RemoteException;
 
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.EclipseComponent;
-
-public interface ContextMenuWrapper extends EclipseComponent {
+public interface ContextMenuWrapper extends Remote {
 
     public void open() throws RemoteException;
 
@@ -33,6 +32,6 @@ public interface ContextMenuWrapper extends EclipseComponent {
      */
     public void deleteAllProjects() throws RemoteException;
 
-    public void deleteAllItems() throws RemoteException;
+    // public void deleteAllItems() throws RemoteException;
 
 }

@@ -1,10 +1,9 @@
 package de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.views.sarosViews;
 
+import java.rmi.Remote;
 import java.rmi.RemoteException;
 
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.SarosComponent;
-
-public interface ChatView extends SarosComponent {
+public interface ChatView extends Remote {
 
     public void waitUntilGetChatMessage(String jid, String message)
         throws RemoteException;

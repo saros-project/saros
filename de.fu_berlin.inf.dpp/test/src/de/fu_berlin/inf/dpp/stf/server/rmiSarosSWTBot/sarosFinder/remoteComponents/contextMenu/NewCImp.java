@@ -7,9 +7,9 @@ import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotShell;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotTree;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotTreeItem;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.EclipseComponentImp;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.Component;
 
-public class NewCImp extends EclipseComponentImp implements NewC {
+public class NewCImp extends Component implements NewC {
 
     private static transient NewCImp self;
 
@@ -72,7 +72,7 @@ public class NewCImp extends EclipseComponentImp implements NewC {
         }
     }
 
-    public void okg(String projectName, String pkg) throws RemoteException {
+    public void pkg(String projectName, String pkg) throws RemoteException {
         if (pkg.matches(PKG_REGEX)) {
             // if (!sarosBot().state().existsPkgNoGUI(projectName, pkg))
             try {

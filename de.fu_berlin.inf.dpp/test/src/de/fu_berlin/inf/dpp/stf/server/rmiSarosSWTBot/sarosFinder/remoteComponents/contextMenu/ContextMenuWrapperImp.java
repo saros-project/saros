@@ -7,9 +7,9 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBo
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotTableItem;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotTree;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotTreeItem;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.EclipseComponentImp;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.Component;
 
-public class ContextMenuWrapperImp extends EclipseComponentImp implements
+public class ContextMenuWrapperImp extends Component implements
     ContextMenuWrapper {
 
     protected static TeamCImp teamC;
@@ -150,13 +150,13 @@ public class ContextMenuWrapperImp extends EclipseComponentImp implements
         }
     }
 
-    public void deleteAllItems() throws RemoteException {
-
-        for (String text : treeItem.getTextOfItems()) {
-            treeItem.expandNode(text).contextMenu(CM_DELETE).click();
-            bot().waitUntilShellIsOpen(CONFIRM_DELETE);
-            bot().shell(CONFIRM_DELETE).activate();
-            bot().shell(CONFIRM_DELETE).bot().button(OK).click();
-        }
-    }
+    // public void deleteAllItems() throws RemoteException {
+    // for (String text : treeItem.getTextOfItems()) {
+    // treeItem.select(text).contextMenu(CM_DELETE).click();
+    // bot().waitUntilShellIsOpen(CONFIRM_DELETE);
+    // bot().shell(CONFIRM_DELETE).activate();
+    // bot().shell(CONFIRM_DELETE).bot().button(OK).click();
+    // bot().sleep(500);
+    // }
+    // }
 }

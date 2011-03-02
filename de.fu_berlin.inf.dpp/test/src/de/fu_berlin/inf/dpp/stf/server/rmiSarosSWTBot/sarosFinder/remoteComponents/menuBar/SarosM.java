@@ -1,11 +1,11 @@
 package de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.menuBar;
 
+import java.rmi.Remote;
 import java.rmi.RemoteException;
 
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.SarosComponent;
 
-public interface SarosM extends SarosComponent {
+public interface SarosM extends Remote {
 
     public SarosPreferences preferences() throws RemoteException;
 

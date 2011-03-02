@@ -16,11 +16,11 @@ import de.fu_berlin.inf.dpp.accountManagement.XMPPAccount;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotTable;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.SarosComponentImp;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.Component;
 import de.fu_berlin.inf.dpp.vcs.VCSAdapter;
 import de.fu_berlin.inf.dpp.vcs.VCSResourceInfo;
 
-public class StateImp extends SarosComponentImp implements State {
+public class StateImp extends Component implements State {
 
     private static transient StateImp self;
 
@@ -325,15 +325,15 @@ public class StateImp extends SarosComponentImp implements State {
                 contactLabel = OWN_PARTICIPANT_NAME;
             else
                 contactLabel = OWN_PARTICIPANT_NAME + " " + PERMISSION_NAME;
-        } else if (sarosBot().buddiesView().hasBuddyNickNameNoGUI(
-            participantJID)) {
+        } else if (sarosBot().views().buddiesView()
+            .hasBuddyNickNameNoGUI(participantJID)) {
             if (hasWriteAccessByNoGUI(participantJID))
-                contactLabel = sarosBot().buddiesView().getBuddyNickNameNoGUI(
-                    participantJID)
+                contactLabel = sarosBot().views().buddiesView()
+                    .getBuddyNickNameNoGUI(participantJID)
                     + " (" + participantJID.getBase() + ")";
             else
-                contactLabel = sarosBot().buddiesView().getBuddyNickNameNoGUI(
-                    participantJID)
+                contactLabel = sarosBot().views().buddiesView()
+                    .getBuddyNickNameNoGUI(participantJID)
                     + " ("
                     + participantJID.getBase()
                     + ")"

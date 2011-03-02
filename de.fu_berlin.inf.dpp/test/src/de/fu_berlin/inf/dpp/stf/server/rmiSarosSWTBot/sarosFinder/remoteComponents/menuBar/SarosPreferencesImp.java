@@ -5,10 +5,10 @@ import java.rmi.RemoteException;
 import de.fu_berlin.inf.dpp.feedback.Messages;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotShell;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.SarosComponentImp;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.Component;
 import de.fu_berlin.inf.dpp.ui.preferencePages.GeneralPreferencePage;
 
-public class SarosPreferencesImp extends SarosComponentImp implements
+public class SarosPreferencesImp extends Component implements
     SarosPreferences {
 
     private static transient SarosPreferencesImp self;
@@ -67,7 +67,7 @@ public class SarosPreferencesImp extends SarosComponentImp implements
     }
 
     public void activateAccount(JID jid) throws RemoteException {
-        assert isAccountExist(jid) : "the account (" + jid.getBase()
+        assert existsAccount(jid) : "the account (" + jid.getBase()
             + ") doesn't exist yet!";
         if (sarosBot().state().isAccountActiveNoGUI(jid))
             return;
@@ -185,7 +185,17 @@ public class SarosPreferencesImp extends SarosComponentImp implements
         }
     }
 
-    public boolean isAccountExist(JID jid) throws RemoteException {
+    public boolean existsAccount() throws RemoteException {
+        STFBotShell shell = preCondition();
+        String[] items = shell.bot()
+            .listInGroup(GROUP_TITLE_XMPP_JABBER_ACCOUNTS).getItems();
+        if (items == null || items.length == 0)
+            return false;
+        else
+            return true;
+    }
+
+    public boolean existsAccount(JID jid) throws RemoteException {
         STFBotShell shell = preCondition();
 
         String[] items = shell.bot()

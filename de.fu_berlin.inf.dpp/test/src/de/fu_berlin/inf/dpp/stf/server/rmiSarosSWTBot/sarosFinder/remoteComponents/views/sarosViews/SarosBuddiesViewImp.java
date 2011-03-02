@@ -28,35 +28,33 @@ import de.fu_berlin.inf.dpp.net.util.RosterUtils;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotMenu;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotShell;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotToolbarDropDownButton;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotTree;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotTreeItem;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotView;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.SarosComponentImp;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.contextMenu.SarosContextMenuWrapper;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.views.ViewsImp;
 
 /**
- * This implementation of {@link RosterView}
+ * This implementation of {@link SarosBuddiesView}
  * 
  * @author Lin
  */
-public class RosterViewImp extends SarosComponentImp implements RosterView {
+public class SarosBuddiesViewImp extends ViewsImp implements SarosBuddiesView {
 
-    private static transient RosterViewImp self;
-    private STFBotView view;
-    private STFBotTree tree;
+    private static transient SarosBuddiesViewImp self;
 
     /**
-     * {@link RosterViewImp} is a singleton, but inheritance is possible.
+     * {@link SarosBuddiesViewImp} is a singleton, but inheritance is possible.
      */
-    public static RosterViewImp getInstance() {
+    public static SarosBuddiesViewImp getInstance() {
         if (self != null)
             return self;
-        self = new RosterViewImp();
+        self = new SarosBuddiesViewImp();
+        init();
         return self;
     }
 
-    public RosterView setView(STFBotView view) throws RemoteException {
-        this.view = view;
-        tree = view.bot().tree();
+    public SarosBuddiesView setView(STFBotView view) throws RemoteException {
+        initWidget(view);
         return this;
     }
 
@@ -76,35 +74,35 @@ public class RosterViewImp extends SarosComponentImp implements RosterView {
         precondition();
         log.trace("connectedByXMPP");
         if (!isConnected()) {
-            log.trace("click the toolbar button \"Connect\" in the r�oster view");
-            if (!sarosBot().state().isAccountExistNoGUI(jid, password))
-                sarosBot().saros().preferences().createAccount(jid, password);
+            log.trace("click the toolbar button \"Connect\" in the buddies view");
+            if (!sarosBot().saros().preferences().existsAccount(jid))
+                sarosBot().saros().preferences().addAccount(jid, password);
 
-            if (!sarosBot().state().isAccountActiveNoGUI(jid))
+            if (!sarosBot().saros().preferences().isAccountActive(jid))
                 sarosBot().saros().preferences().activateAccount(jid);
             clickToolbarButtonWithTooltip(TB_CONNECT);
-
             waitUntilIsConnected();
         }
     }
 
-    public void connectWithCurrentActiveAccount() throws RemoteException {
-        precondition();
+    public void connectWithActiveAccount() throws RemoteException {
         if (!isConnected()) {
-            // assert isAccountExistNoGUI(jid, password) : "the account ("
-            // + jid.getBase() + ") doesn't exist yet!";
+            if (!sarosBot().saros().preferences().existsAccount()) {
+                throw new RuntimeException(
+                    "You need to at first add a account!");
+            }
             clickToolbarButtonWithTooltip(TB_CONNECT);
             waitUntilIsConnected();
         }
     }
 
-    public void selectBuddy(String baseJID) throws RemoteException {
-        bot().view(VIEW_SAROS_BUDDIES).bot().tree()
-            .selectTreeItem(NODE_BUDDIES, baseJID);
+    public SarosContextMenuWrapper selectBuddy(String buddyName)
+        throws RemoteException {
+        initContextMenuWrapper(tree.selectTreeItem(NODE_BUDDIES, buddyName));
+        return contextMenu;
     }
 
     public boolean hasBuddy(String buddyNickName) throws RemoteException {
-        precondition();
         return bot().view(VIEW_SAROS_BUDDIES).bot().tree()
             .selectTreeItem(NODE_BUDDIES)
             .existsSubItemWithRegex(buddyNickName + ".*");
@@ -219,12 +217,10 @@ public class RosterViewImp extends SarosComponentImp implements RosterView {
     }
 
     public boolean isConnected() throws RemoteException {
-        precondition();
         return isToolbarButtonEnabled(TB_DISCONNECT);
     }
 
     public boolean isDisConnected() throws RemoteException {
-        precondition();
         return isToolbarButtonEnabled(TB_CONNECT);
     }
 

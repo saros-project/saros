@@ -46,17 +46,17 @@ public class TestCreatingNewFile extends STFTest {
 
     @Test
     public void testCarlCreateANewFile() throws IOException, CoreException {
-        carl.sarosBot().packageExplorerView().selectProject(PROJECT1).newC()
-            .folder(FOLDER1);
-        carl.sarosBot().packageExplorerView().selectFolder(PROJECT1, FOLDER1)
-            .newC().file(FILE1);
+        carl.sarosBot().views().packageExplorerView().selectProject(PROJECT1)
+            .newC().folder(FOLDER1);
+        carl.sarosBot().views().packageExplorerView()
+            .selectFolder(PROJECT1, FOLDER1).newC().file(FILE1);
         alice.sarosBot().condition()
             .waitUntilFileExists(PROJECT1, FOLDER1, FILE1);
-        assertTrue(alice.sarosBot().packageExplorerView()
+        assertTrue(alice.sarosBot().views().packageExplorerView()
             .selectFolder(PROJECT1, FOLDER1).existsWithRegex(FILE1));
         bob.sarosBot().condition()
             .waitUntilFileExists(PROJECT1, FOLDER1, FILE1);
-        assertTrue(bob.sarosBot().packageExplorerView()
+        assertTrue(bob.sarosBot().views().packageExplorerView()
             .selectFolder(PROJECT1, FOLDER1).existsWithRegex(FILE1));
     }
 
@@ -88,36 +88,36 @@ public class TestCreatingNewFile extends STFTest {
     public void testCarlGrantWriteAccess() throws IOException, CoreException,
         InterruptedException {
 
-        carl.sarosBot().sessionView().selectBuddy(carl.jid)
+        carl.sarosBot().views().sessionView().selectBuddy(carl.jid)
             .restrictToReadOnlyAccess();
         assertFalse(carl.sarosBot().state().hasWriteAccessNoGUI());
         assertTrue(alice.sarosBot().state().hasWriteAccessNoGUI());
 
-        carl.sarosBot().packageExplorerView().selectProject(PROJECT1).newC()
-            .folder(FOLDER1);
-        carl.sarosBot().packageExplorerView().selectFolder(PROJECT1, FOLDER1)
-            .newC().file(FILE1);
+        carl.sarosBot().views().packageExplorerView().selectProject(PROJECT1)
+            .newC().folder(FOLDER1);
+        carl.sarosBot().views().packageExplorerView()
+            .selectFolder(PROJECT1, FOLDER1).newC().file(FILE1);
         waitsUntilTransferedDataIsArrived(alice);
-        assertFalse(alice.sarosBot().packageExplorerView()
+        assertFalse(alice.sarosBot().views().packageExplorerView()
             .selectProject(PROJECT1).existsWithRegex(FOLDER1));
         waitsUntilTransferedDataIsArrived(bob);
-        assertFalse(bob.sarosBot().packageExplorerView()
+        assertFalse(bob.sarosBot().views().packageExplorerView()
             .selectProject(PROJECT1).existsWithRegex(FOLDER1));
 
         setFollowMode(alice, carl, bob);
 
-        alice.sarosBot().packageExplorerView().selectProject(PROJECT1).newC()
-            .folder(FOLDER2);
-        alice.sarosBot().packageExplorerView().selectFolder(PROJECT1, FOLDER2)
-            .newC().file(FILE2);
+        alice.sarosBot().views().packageExplorerView().selectProject(PROJECT1)
+            .newC().folder(FOLDER2);
+        alice.sarosBot().views().packageExplorerView()
+            .selectFolder(PROJECT1, FOLDER2).newC().file(FILE2);
 
         carl.sarosBot().condition()
             .waitUntilFileExists(PROJECT1, FOLDER2, FILE2);
-        assertTrue(carl.sarosBot().packageExplorerView()
+        assertTrue(carl.sarosBot().views().packageExplorerView()
             .selectFolder(PROJECT1, FOLDER2).existsWithRegex(FILE2));
         bob.sarosBot().condition()
             .waitUntilFileExists(PROJECT1, FOLDER2, FILE2);
-        assertTrue(bob.sarosBot().packageExplorerView()
+        assertTrue(bob.sarosBot().views().packageExplorerView()
             .selectFolder(PROJECT1, FOLDER2).existsWithRegex(FILE2));
 
         alice.bot().editor(FILE2).setTexWithSave(CP1);

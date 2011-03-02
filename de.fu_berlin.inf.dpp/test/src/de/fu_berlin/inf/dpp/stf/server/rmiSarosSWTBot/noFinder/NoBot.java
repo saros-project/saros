@@ -1,6 +1,7 @@
 package de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.noFinder;
 
 import java.io.IOException;
+import java.rmi.Remote;
 import java.rmi.RemoteException;
 
 import org.eclipse.core.runtime.CoreException;
@@ -10,9 +11,8 @@ import de.fu_berlin.inf.dpp.accountManagement.XMPPAccountStore;
 import de.fu_berlin.inf.dpp.feedback.FeedbackManager;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotEditor;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.EclipseComponent;
 
-public interface NoBot extends EclipseComponent {
+public interface NoBot extends Remote {
 
     /**
      * 

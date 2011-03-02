@@ -14,20 +14,8 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponen
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.menuBar.SarosMImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.menuBar.WindowM;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.menuBar.WindowMImp;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.views.ConsoleView;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.views.ConsoleViewImp;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.views.PEView;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.views.PEViewImp;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.views.ProgressView;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.views.ProgressViewImp;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.views.sarosViews.ChatView;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.views.sarosViews.ChatViewImp;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.views.sarosViews.RSView;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.views.sarosViews.RSViewImp;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.views.sarosViews.RosterView;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.views.sarosViews.RosterViewImp;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.views.sarosViews.SessionView;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.views.sarosViews.SessionViewImp;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.views.Views;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.views.ViewsImp;
 
 public class SarosBotImp extends STF implements SarosBot {
 
@@ -40,13 +28,8 @@ public class SarosBotImp extends STF implements SarosBot {
     private static SarosMImp sarosM;
 
     private static WindowMImp windowM;
-    private static ChatViewImp chatV;
-    private static RosterViewImp rosterV;
-    private static RSViewImp rsV;
-    private static SessionViewImp sessionV;
-    private static ConsoleViewImp consoleV;
-    private static PEViewImp pEV;
-    private static ProgressViewImp progressvV;
+
+    private static ViewsImp views;
 
     /**
      * {@link SarosBotImp} is a singleton, but inheritance is possible.
@@ -59,16 +42,9 @@ public class SarosBotImp extends STF implements SarosBot {
 
         wait = WaitImp.getInstance();
         state = StateImp.getInstance();
-        // fileM = FileMImp.getInstance();
         sarosM = SarosMImp.getInstance();
         windowM = WindowMImp.getInstance();
-        chatV = ChatViewImp.getInstance();
-        rosterV = RosterViewImp.getInstance();
-        rsV = RSViewImp.getInstance();
-        sessionV = SessionViewImp.getInstance();
-        consoleV = ConsoleViewImp.getInstance();
-        pEV = PEViewImp.getInstance();
-        progressvV = ProgressViewImp.getInstance();
+        views = ViewsImp.getInstance();
 
         return self;
     }
@@ -107,44 +83,8 @@ public class SarosBotImp extends STF implements SarosBot {
         return windowM;
     }
 
-    public ChatView chatView() throws RemoteException {
-        bot.openViewById(VIEW_SAROS_CHAT_ID);
-        bot.view(VIEW_SAROS_CHAT).show();
-        return chatV.setView(bot.view(VIEW_SAROS_CHAT));
-    }
-
-    public RosterView buddiesView() throws RemoteException {
-        bot.openViewById(VIEW_SAROS_BUDDIES_ID);
-        bot.view(VIEW_SAROS_BUDDIES).show();
-        return rosterV.setView(bot.view(VIEW_SAROS_BUDDIES));
-    }
-
-    public RSView remoteScreenView() throws RemoteException {
-        bot.openViewById(VIEW_REMOTE_SCREEN_ID);
-        bot.view(VIEW_REMOTE_SCREEN).show();
-        return rsV.setView(bot.view(VIEW_REMOTE_SCREEN));
-    }
-
-    public SessionView sessionView() throws RemoteException {
-        bot.openViewById(VIEW_SAROS_SESSION_ID);
-        bot.view(VIEW_SAROS_SESSION).show();
-        return sessionV.setView(bot.view(VIEW_SAROS_SESSION));
-    }
-
-    public ConsoleView consoleView() throws RemoteException {
-        return consoleV;
-    }
-
-    public PEView packageExplorerView() throws RemoteException {
-        bot.openViewById(VIEW_PACKAGE_EXPLORER_ID);
-        bot.view(VIEW_PACKAGE_EXPLORER).show();
-        return pEV.setView(bot.view(VIEW_PACKAGE_EXPLORER));
-    }
-
-    public ProgressView progressView() throws RemoteException {
-        bot.openViewById(VIEW_PROGRESS_ID);
-        bot.view(VIEW_PROGRESS).show();
-        return progressvV.setView(bot.view(VIEW_PROGRESS));
+    public Views views() throws RemoteException {
+        return views;
     }
 
     public void setJID(JID jid) throws RemoteException {

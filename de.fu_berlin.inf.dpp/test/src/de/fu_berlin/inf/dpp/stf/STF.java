@@ -12,15 +12,35 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.eclipse.swtbot.swt.finder.utils.FileUtils;
 import org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences;
+import org.osgi.framework.Bundle;
 
 import de.fu_berlin.inf.dpp.Saros;
+import de.fu_berlin.inf.dpp.accountManagement.XMPPAccountStore;
+import de.fu_berlin.inf.dpp.editor.EditorManager;
+import de.fu_berlin.inf.dpp.feedback.FeedbackManager;
 import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
+import de.fu_berlin.inf.dpp.project.SarosSessionManager;
 
 public class STF {
 
     protected static final transient Logger log = Logger.getLogger(STF.class);
 
+    public enum TreeItemType {
+        JAVA_PROJECT, PROJECT, FILE, CLASS, PKG, FOLDER, NULL
+    }
+
+    public enum BuddyRole {
+        HOST, PEER
+    }
+
+    public static SarosSessionManager sessionManager;
+    public static DataTransferManager dataTransferManager;
+    public static EditorManager editorManager;
+    public static XMPPAccountStore xmppAccountStore;
+    public static FeedbackManager feedbackManager;
     public static Saros saros;
 
     // local JID
@@ -728,6 +748,17 @@ public class STF {
 
     public String[] splitPkg(String pkg) {
         return pkg.split(".");
+    }
+
+    public String getFileContentNoGUI(String filePath) {
+        Bundle bundle = saros.getBundle();
+        String content;
+        try {
+            content = FileUtils.read(bundle.getEntry(filePath));
+        } catch (NullPointerException e) {
+            throw new RuntimeException("Could not open " + filePath);
+        }
+        return content;
     }
 
 }

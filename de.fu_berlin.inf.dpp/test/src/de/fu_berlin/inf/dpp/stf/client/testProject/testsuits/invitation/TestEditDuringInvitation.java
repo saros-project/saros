@@ -28,7 +28,7 @@ public class TestEditDuringInvitation extends STFTest {
         initTesters(TypeOfTester.ALICE, TypeOfTester.BOB, TypeOfTester.CARL);
         setUpWorkbench();
         setUpSaros();
-        alice.sarosBot().packageExplorerView().tree().newC()
+        alice.sarosBot().views().packageExplorerView().tree().newC()
             .javaProjectWithClasses(PROJECT1, PKG1, CLS1);
     }
 
@@ -58,19 +58,19 @@ public class TestEditDuringInvitation extends STFTest {
 
         assertTrue(bob.sarosBot().state().hasWriteAccessNoGUI());
 
-        alice.sarosBot().sessionView()
+        alice.sarosBot().views().sessionView()
             .openInvitationInterface(carl.getBaseJid());
         carl.bot().shell(SHELL_SESSION_INVITATION).confirm(FINISH);
 
-        bob.sarosBot().packageExplorerView().selectClass(PROJECT1, PKG1, CLS1)
-            .open();
+        bob.sarosBot().views().packageExplorerView()
+            .selectClass(PROJECT1, PKG1, CLS1).open();
         bob.bot().editor(CLS1_SUFFIX).setTexWithSave(CP1);
         String texByBob = bob.bot().editor(CLS1_SUFFIX).getText();
         // System.out.println(texByBob);
 
         carl.sarosBot().confirmShellAddProjectWithNewProject(PROJECT1);
-        carl.sarosBot().packageExplorerView().selectClass(PROJECT1, PKG1, CLS1)
-            .open();
+        carl.sarosBot().views().packageExplorerView()
+            .selectClass(PROJECT1, PKG1, CLS1).open();
 
         alice.bot().editor(CLS1_SUFFIX).waitUntilIsTextSame(texByBob);
         String textByAlice = alice.bot().editor(CLS1_SUFFIX).getText();

@@ -36,14 +36,14 @@ public class TestFolderOperations extends STFTest {
 
     @Before
     public void runBeforeEveryTest() throws RemoteException {
-        if (!alice.sarosBot().packageExplorerView().selectPkg(PROJECT1, PKG1)
-            .existsWithRegex(CLS1))
-            alice.sarosBot().packageExplorerView().tree().newC()
+        if (!alice.sarosBot().views().packageExplorerView()
+            .selectPkg(PROJECT1, PKG1).existsWithRegex(CLS1))
+            alice.sarosBot().views().packageExplorerView().tree().newC()
                 .cls(PROJECT1, PKG1, CLS1);
-        if (!alice.sarosBot().packageExplorerView().selectProject(PROJECT1)
-            .existsWithRegex(FOLDER1))
-            alice.sarosBot().packageExplorerView().selectProject(PROJECT1)
-                .newC().folder(FOLDER1);
+        if (!alice.sarosBot().views().packageExplorerView()
+            .selectProject(PROJECT1).existsWithRegex(FOLDER1))
+            alice.sarosBot().views().packageExplorerView()
+                .selectProject(PROJECT1).newC().folder(FOLDER1);
     }
 
     /**
@@ -62,14 +62,14 @@ public class TestFolderOperations extends STFTest {
     @Test
     public void testRenameFolder() throws RemoteException {
         final String newFolderName = FOLDER1 + "New";
-        alice.sarosBot().packageExplorerView().selectFolder(PROJECT1, FOLDER1)
-            .refactor().rename(newFolderName);
+        alice.sarosBot().views().packageExplorerView()
+            .selectFolder(PROJECT1, FOLDER1).refactor().rename(newFolderName);
 
         bob.sarosBot().condition()
             .waitUntilFolderExists(PROJECT1, newFolderName);
-        assertTrue(bob.sarosBot().packageExplorerView().selectProject(PROJECT1)
-            .existsWithRegex(newFolderName));
-        assertFalse(bob.sarosBot().packageExplorerView()
+        assertTrue(bob.sarosBot().views().packageExplorerView()
+            .selectProject(PROJECT1).existsWithRegex(newFolderName));
+        assertFalse(bob.sarosBot().views().packageExplorerView()
             .selectProject(PROJECT1).exists(FOLDER1));
     }
 }

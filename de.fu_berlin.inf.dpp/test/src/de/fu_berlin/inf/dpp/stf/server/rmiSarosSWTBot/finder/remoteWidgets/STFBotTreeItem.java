@@ -74,7 +74,7 @@ public interface STFBotTreeItem extends Remote {
 
     public List<String> getTextOfItems() throws RemoteException;
 
-    public STFBotTreeItem[] getItems() throws RemoteException;
+    // public STFBotTreeItem[] getItems() throws RemoteException;
 
     public boolean existsSubItem(String text) throws RemoteException;
 

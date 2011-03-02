@@ -8,9 +8,9 @@ import org.eclipse.swtbot.swt.finder.waits.DefaultCondition;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotStyledText;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotTree;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotView;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.EclipseComponentImp;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.Component;
 
-public class ConsoleViewImp extends EclipseComponentImp implements ConsoleView {
+public class ConsoleViewImp extends Component implements ConsoleView {
 
     private static transient ConsoleViewImp consoleViewObject;
     private STFBotView view;

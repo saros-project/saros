@@ -1,10 +1,9 @@
 package de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.contextMenu;
 
+import java.rmi.Remote;
 import java.rmi.RemoteException;
 
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.EclipseComponent;
-
-public interface TeamC extends EclipseComponent {
+public interface TeamC extends Remote {
 
     /**
      * Perform the action "share project with SVN" which should be done with the

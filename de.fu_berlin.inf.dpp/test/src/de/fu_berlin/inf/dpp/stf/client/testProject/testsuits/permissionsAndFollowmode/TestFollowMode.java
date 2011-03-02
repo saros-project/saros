@@ -35,10 +35,11 @@ public class TestFollowMode extends STFTest {
      */
     @Test
     public void testBobFollowAlice() throws IOException, CoreException {
-        alice.sarosBot().packageExplorerView()
+        alice.sarosBot().views().packageExplorerView()
             .selectClass(PROJECT1, PKG1, CLS1).open();
         alice.bot().editor(CLS1_SUFFIX).setTexWithSave(CP1);
-        bob.sarosBot().sessionView().selectBuddy(alice.jid).followThisBuddy();
+        bob.sarosBot().views().sessionView().selectBuddy(alice.jid)
+            .followThisBuddy();
         bob.bot().editor(CLS1_SUFFIX).waitUntilIsActive();
         assertTrue(bob.sarosBot().state().isInFollowModeNoGUI());
         assertTrue(bob.bot().editor(CLS1_SUFFIX).isActive());
@@ -52,12 +53,13 @@ public class TestFollowMode extends STFTest {
             getClassPath(PROJECT1, PKG1, CLS1));
         assertTrue(clsContentOfBob.equals(clsContentOfAlice));
 
-        alice.sarosBot().packageExplorerView().tree().newC()
+        alice.sarosBot().views().packageExplorerView().tree().newC()
             .cls(PROJECT1, PKG1, CLS2);
         bob.bot().editor(CLS2_SUFFIX).waitUntilIsActive();
         assertTrue(bob.bot().editor(CLS2_SUFFIX).isActive());
 
-        alice.sarosBot().sessionView().selectBuddy(bob.jid).followThisBuddy();
+        alice.sarosBot().views().sessionView().selectBuddy(bob.jid)
+            .followThisBuddy();
         bob.bot().editor(CLS1_SUFFIX).show();
         alice.bot().editor(CLS1_SUFFIX).waitUntilIsActive();
         assertTrue(alice.sarosBot().state().isInFollowModeNoGUI());

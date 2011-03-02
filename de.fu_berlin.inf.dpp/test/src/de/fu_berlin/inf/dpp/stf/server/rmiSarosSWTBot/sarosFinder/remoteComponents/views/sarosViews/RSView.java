@@ -1,10 +1,9 @@
 package de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.views.sarosViews;
 
+import java.rmi.Remote;
 import java.rmi.RemoteException;
 
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.SarosComponent;
-
-public interface RSView extends SarosComponent {
+public interface RSView extends Remote {
 
     public void clickTBChangeModeOfImageSource() throws RemoteException;
 

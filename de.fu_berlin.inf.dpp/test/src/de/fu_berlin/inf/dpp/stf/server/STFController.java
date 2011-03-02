@@ -38,7 +38,7 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.noFinder.NoBotImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.SarosBotImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.StateImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.WaitImp;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.EclipseComponentImp;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.Component;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.contextMenu.NewCImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.contextMenu.RefactorCImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.contextMenu.SarosCImp;
@@ -50,9 +50,10 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponen
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.views.ConsoleViewImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.views.PEViewImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.views.ProgressViewImp;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.views.ViewsImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.views.sarosViews.ChatViewImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.views.sarosViews.RSViewImp;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.views.sarosViews.RosterViewImp;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.views.sarosViews.SarosBuddiesViewImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.views.sarosViews.SessionViewImp;
 
 /**
@@ -85,11 +86,11 @@ public class STFController {
         throws RemoteException {
 
         STF.saros = saros;
-        EclipseComponentImp.sessionManager = sessionManager;
-        EclipseComponentImp.dataTransferManager = dataTransferManager;
-        EclipseComponentImp.editorManager = editorManager;
-        EclipseComponentImp.xmppAccountStore = xmppAccountStore;
-        EclipseComponentImp.feedbackManager = feedbackManager;
+        Component.sessionManager = sessionManager;
+        Component.dataTransferManager = dataTransferManager;
+        Component.editorManager = editorManager;
+        Component.xmppAccountStore = xmppAccountStore;
+        Component.feedbackManager = feedbackManager;
         try {
             registry = LocateRegistry.createRegistry(port);
         } catch (RemoteException e) {
@@ -115,7 +116,7 @@ public class STFController {
         exportObject(PEViewImp.getInstance(), "packageExplorerView");
         exportObject(ProgressViewImp.getInstance(), "progressView");
         exportObject(STFBotEditorImp.getInstance(), "eclipseEditor");
-        exportObject(RosterViewImp.getInstance(), "rosterView");
+        exportObject(SarosBuddiesViewImp.getInstance(), "rosterView");
         exportObject(SessionViewImp.getInstance(), "sessionView");
         exportObject(RSViewImp.getInstance(), "remoteScreenView");
         exportObject(ChatViewImp.getInstance(), "chatView");
@@ -132,6 +133,7 @@ public class STFController {
         exportObject(SarosPreferencesImp.getInstance(), "sarosPreferences");
         exportObject(StateImp.getInstance(), "state");
         exportObject(WaitImp.getInstance(), "wait");
+        exportObject(ViewsImp.getInstance(), "views");
     }
 
     /**

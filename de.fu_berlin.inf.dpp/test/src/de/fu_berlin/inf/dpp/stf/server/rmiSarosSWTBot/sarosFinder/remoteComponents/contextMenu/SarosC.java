@@ -1,10 +1,10 @@
 package de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.contextMenu;
 
+import java.rmi.Remote;
 import java.rmi.RemoteException;
 
 import de.fu_berlin.inf.dpp.stf.client.Tester;
 import de.fu_berlin.inf.dpp.stf.client.testProject.helpers.TestPattern;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.SarosComponent;
 
 /**
  * This interface contains convenience API to perform a action using the
@@ -28,7 +28,7 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponen
  * 
  * @author Lin
  */
-public interface SarosC extends SarosComponent {
+public interface SarosC extends Remote {
 
     /**
      * Perform one of the actions "Share project",
