@@ -1,10 +1,12 @@
 package de.fu_berlin.inf.dpp.ui.actions;
 
 import org.apache.log4j.Logger;
+import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.text.Region;
 import org.eclipse.jface.text.hyperlink.URLHyperlink;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.ui.actions.SelectionProviderAction;
 import org.jivesoftware.smack.RosterEntry;
 import org.picocontainer.annotations.Inject;
@@ -33,14 +35,19 @@ public class SkypeAction extends SelectionProviderAction {
     protected SkypeManager skypeManager;
 
     public SkypeAction(ISelectionProvider provider) {
-        super(provider, "Skype this buddy");
+        super(provider, "Skype Buddy");
 
         Saros.injectDependenciesOnly(this);
 
         setEnabled(false);
 
-        setToolTipText("Start a Skype-VoIP session with this buddy");
-        setImageDescriptor(ImageManager.getImageDescriptor("icons/telephone.png"));
+        setToolTipText("Start a Skype VoIP Session With Buddy");
+        setImageDescriptor(new ImageDescriptor() {
+            @Override
+            public ImageData getImageData() {
+                return ImageManager.ELCL_BUDDY_SKYPE_CALL.getImageData();
+            }
+        });
     }
 
     /**
