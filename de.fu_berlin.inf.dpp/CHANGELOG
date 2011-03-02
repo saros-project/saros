@@ -1,7 +1,667 @@
+11.2.25
+=======
+[FEATURE] Disable broken partial sharing temporarily until its issues can be resolved.
+[FEATURE] Multiple Project Support. Now we have full multiple project support. 
+	Any user with write access to the session can add projects to the session. 
+	Also a session can be started with more than one project.
+[FEATURE] This implements the suggestion from #2707089 to show only viewport 
+	annotations for a user on their active editor. The result is the viewport 
+	annotations	appear/disappear as a driver activates/deactivates an editor, 
+	enabling their peer to be more aware of where they are.
+	
+[FIX] Google Talk support Users with a Google account (*@gmail.com, 
+	*@googlemail.com) can log in using Saros.
+[FIX] #3168457. RosterView now displays Saros support immediately after connection.
 
-Saros CHANGELOG
+
+
+11.1.28
+=======
+[REFACTOR, UI] New Wording - Shared Project Session, Host, Driver, Observer, 
+	Roster, Jabber, Contact
+[FIX] #3124951. When attempting to delete a roster entry, we test if that 
+	person is currently in session and throw an error message if so.
+[FIX] Theoretical negative integer overflow risk.
+[FIX] Send activity immediately after it was added to the outgoing queue, 
+	not only at fixed points in time. The minimum interval between sending 
+	activities remains the same.
+[FIX] Use different kinds of SVN revisions for detecting and replicating changes.
+
+
+11.1.7
+======
+[FEATURE] Removed "Share with VCS support..." action, added a 
+	setting "Disable VCS support" in the Prefs, default is false. This setting 
+	can also be set in the incoming invitation dialog. If the local user has 
+	VCS support disabled, VCS operations are completely ignored by Saros 
+	(local or remote), whether she's the host or not. If e.g. just one of 
+	three participants in a session has problems with the repository, the 
+	others could still use it with no real disadvantage.
+[FEATURE] Duration between sending of edits is now configurable via 
+	the advanced prefs. It has also been reduced to 300ms, which should 
+	greatly improve perceived latency.
+[FEATURE] Saros now displays an warning when the user tries to 
+	delete a shared project. 
+
+[FIX] Use the actual revision (last changed revision) of resources, 
+	instead of the latest revision. 
+[FIX] #3115698. Only send to observers if there are any.
+[FIX] The discovery manager is called when inviting to check if 
+	the user supports Saros. If we're not connected, we just quit that check 
+	before going to the discovery service. 
+[FIX] #3121271: it was possible to rename/delete contacts when 
+	disconnected (this failed of course). Now, those options are only enabled 
+	when the roster is connected. 
+[FIX] Only need the additional \t (or @) when calling 
+	Action#setText(). This fixes these weird box characters that were 
+	displayed in the account list. 
+[FIX] EncodingManipulator error "Could not set encoding on project", 
+	PreferenceManager bug.
+[FIX] #3133023 Disable "Remove all driver roles" when no driver 
+	exists.
+[FIX] #3098992 - Inconsistency when concurrently writing at same 
+	position. This patch fixes the broken operational transformation. A bunch 
+	of received activities was not executed consecutively anymore in the SWT 
+	thread and local actions could be executed in between - milliseconds after 
+	the transformation but before the execution of the transformation. 
+
+
+10.11.26
+========
+[FEATURE/FIX] Fallback mechanism for VCS activities.
+
+[FIX] Bug #3110837; refactored into one account creation wizard; 
+	by patrick and christian
+[FIX] 3090390: SharedProject + role changes.
+[FIX] Updating/switching individual resources didn't work during the invitation.
+[FIX] Use the actual revision (last changed revision) of resources, instead of 
+	the latest revision.
+[FIX] 2894573: Inconsistencies because of unsaved files during the invitation.
+[FIX] If more than one person is in the session, it should not be closed when an 
+	invitation is begun, because we are adding to an existing session not 
+	abandoning our attempt to set one up.
+[FIX] BUG 3096658, 
+	http://sourceforge.net/tracker/?func=detail&aid=3096658&group_id=167540&atid=843359
+[FIX] BUG 3096585, 
+	http://sourceforge.net/tracker/?func=detail&aid=3096585&group_id=167540&atid=843359
+[FIX] BUG 3102956 - 
+	https://sourceforge.net/tracker/index.php?func=detail&aid=3102956&group_id=167540&atid=843359
+	I have climbed a first step to deliver message to follow the launching of the 
+	debugger from host on peer site. What now to do is to create Proxy Virtual 
+	Machine and proxy Request Objects on peer side.
+[FIX] #3101594: SessionView explanation stays visible; 
+	https://sourceforge.net/tracker/?group_id=167540&atid=843359
+
+
+10.10.29
+========
+[Feature] Participants get notified when a chat user composes a message. 
+	In that case the other's ChatView icon changes. 
+[Feature] The ChatView is redesigned and new GUI elements
+[Feature] You can now store and manage multiple XMPP accounts, as well as switch
+	between them in the roster view.
+[Feature] Changing your color during session is now possible.
+[UI] Initial invitation page for invitee now lists to which projects they're invited.
+[Feature] You can now start a session from Roster View
+[FIX] Invitation on non Windows systems is much faster
+[FIX] If a user is selected in the session view and then the view loses focus, 
+	no user will remain selected.
+[FIX] You can now switch the SVN URL during invitation process.
+
+
+10.10.1
+=======
+[FEATURE] (k_beecher) Roster now adds an icon to users who have Saros support
+[FEATURE] (k_beecher) Pop-up balloon message when an
+observer tries to type. Committed on behalf of the Softwareprojekt teams.
+[FEATURE] (ahaferburg) Detect (and replicate) SVN update and switch on any
+resource in a shared project, not only the project itself.
+
+[FIX] (ahaferburg) Disposing the Images stored in static
+variables, what a terrible, terrible bug.
+[FIX] (k_beecher) #3033055 If using an existing project, it is opened
+before used.
+        Committed on behalf of Softwareprojekt teams.
+[FIX] (ahaferburg) r22516 Don't try to access a disposed widget.
+[FIX] (k_beecher) #3057396 Server details checked before attempting to connect.
+[FIX] (k_beecher) Make all contacts appear off-line after disconnecting from roster
+        Submitted on behalf of the Softwareprojekt teams.
+[FIX] (k_beecher) Stop a user from adding themselves to their own roster
+        Submitted on behalf of the Softwareprojekt teams.
+[FIX] (ahaferburg) Team API doesn't return the revision we need. :/
+[FIX] (ahaferburg) Ignore requests to update to revision "0".
+Seems to be used for added files.
+[FIX] (ahaferburg) After joining a session, check if the session was
+canceled by the host before trying to enable follow mode.
+[FIX] (ahaferburg) I see to have checked in the wrong .launch
+configs.
+[FIX] (ahaferburg) No need to throw a NPE if the the resource doesn't
+exist. Just work with IPaths, not IFile.
+[FIX] (ahaferburg) Check if balloon notification is disposed before
+trying to close it.
+[FIX] (k_beecher) Fixed problem where the msg entry textbox had a
+linefeed at the beginning after sending a msg
+        Committed on behalf of the Softwareprojekt Teams
+[FIX] (ahaferburg) Default to no VCS support when sharing partially.
+[FIX] (ahaferburg) Don't ask if the invitee wants to overwrite the
+project if Auto-reuse is enabled in the preferences.
+[FIX] (ahaferburg) Open Roster View in
+SarosRmiSWTWorkbenchBot#isContactInRosterView(), not Session View.
+[FIX] (ahaferburg) Synchronize the steps for file deletion (exists,
+setReadonly, delete) in the IWorkspaceRunnable.
+[FIX] (ahaferburg) Join chat in the background when starting a session. 
+		Otherwise it would block the SWT thread for ~5s when the chat server is unreachable.
+[FIX] (ahaferburg) First try to join the chat room before creating it.
+[FIX] (k_beecher) #3033055 Renaming a user in roster broken - a refresh problem
+        Committed on behalf of the Softwareprojekt teams
+[FIX] (k_beecher) #3041943 An explanatory message added for the screen-sharing view.
+        Committed on behalf of the Softwareprojekt teams.
+[FIX] (k_beecher) #2992178 When incorrect credentials were
+supplied, the dialog to enter new details is now populated with the existing details.
+        Committed on behalf of the Softwareprojekt teams.
+[FIX] (k_beecher) #2832598 Invitation blinks on taskbar when state
+changes (tested on Windows and Ubuntu)
+        Committed on behalf of the Softwareprojekt teams.
+[FIX] (ahaferburg) (not in tracker) Don't append the '\n'
+character to the chat input field after sending a message.
+[FIX] (ahaferburg) Don't try to close a closed dialog.
+[UI] (k_beecher) Share project is now selectable when not connected to the roster. In such a case, a connection to the roster is forced.
+[UI] (k_beecher) When choosing to accept invitation into an existing project, automatically suggest a project with the same name (if it exists).
+Submitted on behalf of the Softwareprojekt teams.
+[UI] (k_beecher) Grouped all Saros commands into a Saros submenu (with the lovely Saros logo)
+
+
+10.8.27
+=======
+[FEATURE] Synchronize file modifications outside of editors: When a 
+	file which is not currently open in any editor is modified by 
+	a driver (e.g. SVN update), the file contents are now sent to 
+	all participants.
+
+[FIX] #3038164 URL in Saros Configuration Form not working
+[FIX] #2668791 SVN in SharedProjects loses Diff. (Can't reproduce anymore)
+[FIX] #2978161 Editor closes on follower side (logs errors, too)
+[FIX] Removed minimum version requirements from the plug-in dependencies.
+[FIX] BinaryChannelTest#testBinaryChannelMultiSend() and #testShutdown() 
+	don't throw errors anymore because of unresolved concurrency issues.
+[FIX]  Updated XMPPConnectionTest#testXMPPConnectionStringServerName().
+
+
+
+10.7.30
+=======
+[FEATURE] (k_beecher) Chat View now features a system beep when your peers 
+	sends a chat message (configurable to on/off).
+[FEATURE] (ahaferburg) Saros now automatically connects to the chat room 
+	as soon as the following conditions are met: The XMPP connection is up, 
+	we're in a session, and we have a ChatView open. If you don't want to 
+	use Saros' chat feature simply close the Chat View. There is no 
+	connect/disconnect button anymore.
+[FEATURE] (ahaferburg) Peers automatically check out a new project from SVN 
+	when using "Share project with VCS support...". Note that SVN operations
+	like Update etc are still not detected by Saros.
+[FEATURE] Direct link to Saros preferences added to Saros drop-down menu
+
+[FIX] (k_beecher) #3024765: When streaming invitations, cancelling now 
+	cancels the process properly.
+[FIX] (k_beecher) #3020805 Images are now created only once when the RosterView 
+	and SessionView are created.
+[FIX] (ahaferburg) 3023512: InvitationWizardUserSelection causing SWTException.
+[FIX] (Arbosh) IBB invitation after reconnect fails once (bug 3023491) 
+	Detailed: A roster listener is added and connections are removed on 
+	unavailability.
+[FIX] (Arbosh) 2983158: Chat not properly disconnecting
+	https://sourceforge.net/tracker/index.php?func=detail&aid=2983158&group_id=167540&atid=843359
+[FIX] (Arbosh) 3015146: Chat disconnect/reconnect doesn't work 
+	https://sourceforge.net/tracker/?func=detail&atid=843359&aid=3015146&group_id=167540
+[FIX] (ahaferburg) 3020865: AssertionError when reconnecting.
+[FIX] (ahaferburg) 3020152: Session not closed/left when disconnecting.
+[FIX] (ahaferburg) 2746945: Connection States violate ConnectionSessionListener 
+	contract.
+[FIX] (Arbosh) This patch fixes bug 3020135. SOCKS5 descriptions are added 
+	respectively to IBB.
+[FIX/INTERNAL] (Arbosh) Interruption stack trace when establishing SOCK5 
+	bytestream connections. Detailed: With SOCKS5, both peer try to establish 
+	a connection. When achieving a working SOCKS5 bytestream connection the 
+	establishing of the other one gets cancelled if still in progress. 
+	However, SMACK has no support for this interruption - the exception is 
+	caught causing a strack trace to standard output. This patch uses a 
+	separate Thread to wait until connection establishment and close it afterward. 
+[FIX] (k_beecher) #2894542: When the host cannot determine the version of 
+	the peer, the current behaviour defaults to reporting the versions as 
+	incompatible regardless of the truth. This patch makes Saros report that 
+	compatibility cannot be established in such an event.
+[FIX] (ahaferburg) (not in tracker) IllegalStateException in Saros.stop() 
+	caused by SessionView.container getting dispose()d twice.
+[FIX] (ahaferburg) (not in tracker) ChatView caused NullPointerException.
+
+[UI] (k_beecher) Prefix in chat view is bold to separate messages from each other, and also to separate message sender from content
+[UI] (k_beecher) Cannot send whitespace (empty chars, tabs etc.) in chat view
+[UI] (k_beecher) Saros stays silent when versions are compatible
+
+
+10.6.25
+=======
+[FEATURE] Stream project archive during invitation.
+
+[FIX] #2894613:inconsistency if tab is pressed as observer
+[FIX] removed @inject annotation in favor of the constructor injection.
+[FIX] Fix for mediated connections (confusing error output only)
+
+
+10.6.16
+=======
+Merging of the net_refactoring branch into trunk. 
+	Contains many changes, mostly refactoring, too numerous to mention. 
+	Individual change descriptions can be found in the net_refactoring 
+	branch commits.
+[FIX] #2894613:inconsistency if tab is pressed as observer.
+
+
+10.5.28
+=======
+[FEATURE] screensharing among two users in a saros-session
+[FEATURE] Connection Test Action
+
+[FIX] Synchronize DispatchingRosterListener operations against each other
+	      	properly.
+[FIX] Dirty State Listener is lost when closing editors
+[FIX] When in follow mode, closing of dirty files by Saros caused data loss
+[FIX] Renaming files causes inconsistencies if dirty state is incorrect
+[FIX] Synchronize JingleFileTransferManager initialization against
+		pre-mature getting by getJingleManager (might return NULL although
+		initialization was already started)
+[FIX] Set status to "connecting" earlier so that DNS delays do not corrupt
+		user experience
+[FIX] ExecutorService not disposed, would cause thread leak
+[FIX] Reject incoming JingleSession request if already in a session
+[FIX] Close connection if sending fails
+[FIX] Reject incoming FileTransfer if transferdescription cannot be parsed
+[FIX] Prevent an NPE in StartupSaros
+[FIX] Improved BinaryChannel to not wait for missing confirmation package
+		if BinaryChannel was closed
+[FIX] 2737353 [CW-client] Doesn't close when recovery failed
+[FIX] Consistency Recovery shows no progress
+[FIX] #2994713: Register the Saros views with the following perspectives:
+		Java, Java Browsing, Plug-in Development, Python, C/C++, and PHP. Removed
+		the views from the Resource perspective.
+
+
+10.4.14
+=======
+[FEATURE] respect preference "File transfer port"
+[FEATURE] TextEditCollector: Added accumulation of remote characters 
+	received within edits and a collection of paste events
+[FEATURE] Added: VoIPCollector which collects basic information of VoIP 
+	sessions (total sessions established, duration or sessions)
+[FEATURE] SessionStatistics: Rearranged the order of some getter/setter 
+	functions and added some getter methods and comments.
+[FEATURE] Added a collector which collects information about remote 
+	observer selections and possible gestures.
+[FEATURE] Added listening capabilities to the VoIP feature.
+
+[FIX] error while changing force chat preference while connection is not 
+	initialized
+[FIX] use patched Smack version with improved SOCKS5 implementation
+[FIX] lower timeout for establishing SOCKS5 connection
+[FIX] Bug-Fix (ID 2767864): "Follow Mode is lost when renaming files". 
+	Now the follow mode is maintained in this case.
+[FIX] Bug-Fix (ID 2746974): "Log-in shows confusing message if jabber id 
+	doesn't exist". Now there is a question about Jabber configuration instead.
+[FIX] Bug-Fix for ID 2958630. Bug: "Confusing err msg when trying to add
+	contact already present" Now a sound error message is shown, when a user 
+	tries to add a contact already present in his contact list.
+[FIX] [QUICKFIX] [INTERNAL] Resurrect build.xml which got lost on merge of 
+	10.3.26 branch.
+
+
+10.3.26
+=======
+[FIX] replaced .isEmpty() by .length() == 0 (undefined in java1.5)
+[FIX] several bugs in streaming-framework
+[FIX] Remove unsatisfied dependencies on SWTBot libraries.
+[FIX] don't register StreamServiceManager as no StreamService is available
+[FIX] Inviting user is not informed by a pop-up if if the
+	invited user cancels an invitation or is occupied by another session.
+	- the job returns a new Status object accordingly. isModal() functionality 
+	removed. Manual dialogs removed. Documentation updated
+	- OutgoingInvitationProcess is not a static class anymore
+[FIX] Closing a session doesn't cancel running invitations (bug #2958625)
+[FIX] register Saros feature after XMPP login
+[FIX] register Jingle feature after XMPP login
+[FIX] enable/disable Jingle feature if preference is changes
+[FIX] documentation of preference FORCE_FILETRANSFER_BY_CHAT
+	states that a session restart is required
+[FIX] correctly set progress in Utils#toByteArray used in invitation
+[FIX] get ServiceDiscoveryManager instance in Saros#isJIDonServer
+[FIX] Failing service discovery should not crash adding contacts. User is 
+	asked instead.
+[FIX] ConsistencyAction did show internal data representation of SPath 
+	rather than full OS paths.
+
+[FEATURE] experimental VoIP function added. Two users of a shared
+	project can start a simple VoIP session now.
+[FEATURE] MultiUserChat added, but it should be marked experimental.
+[FEATURE] SendFile: a StreamService for sending a file to another Saros-user
+[FEATURE] STF (Sandor's Test Framework)
+[FEATURE] introduced StreamServices-framework: session-based
+	streaming among two participants in a shared project
+
+
+
+
+10.2.26
+=======
+[FIX] Reverting a file in a project, which is NOT shared and uses the same path as a file which is shared, causes inconsistencies
+[FIX] Moving files from or to the shared project would fail in many cases
+[FIX] UndoManager compared IPaths' references (using ==) instead of testing for equality
+[FIX] #2958602 On the first screen of an invitation there is a small mistake: "You have been invited to a Saros session by You"
+
+10.1.29
+=======
+[FIX] #2863406: Warn about removing files Ask the user for confirmation before project synchronization if some resources are supposed to be overwritten
+[FIX] avoid endless loop in BinaryChannel when socket closed during transmission
+[FIX] remove data for stopped session
+[FIX] improved sending file
+[FIX] Make BinaryChannel more robust for multiple reading threads
+[FIX] ByteBuffer.array is not supported on some platforms.
+[FIX] BinaryChannel::getData() returned byte Array padded with NUL bytes.
+[FIX] Race condition in ConnectDisconnectAction#run while connecting.
+
+
+9.12.4
+======
+[FIX] File operations (rename, delete, move) now work as expected 
+#2894606 and #2894583
+[FIX] Discovery of Saros support is unreliable, so the filter is 
+deactivated by default in the invitation wizard.
+[FIX] NPEs originating in paths in ''SPath'', ''EditorActivity'', 
+''FileActivity'' and corresponding ''*DataObject''s.
+[FIX] ''UndoManager.isLocal()'' always returned '''false'''.
+[FIX] In the ''ConsistencyWatchdogClient'' paths where never removed 
+from the ''latestChecksums'' and ''pathsWithWrongChecksums'' sets. The 
+recovery then hangs for the client.
+[FIX] progressbar was out of sync on the sender site.
+[FIX] off by one using "do while" instead of "while" loop.
+[FIX] renaming of folders in project root
+[FIX] File operations (rename, delete, move) now work as expected
+[FIX] Forgot to add the ''SPath'' class. :-)
+[FIX] NPE in ''SPathDataObject''.
+
+
+
+9.10.30
+=======
+[FEATURE] InvitationWizard replaced InvitationDialog
+[FEATURE] Using Eclipse Jobs instead of InvitationDialog => Host can work
+during invitations
+
+[FIX] #2869752 Viewport follows refactoring
+[FIX] #2871830: Driver can't write after other client used CW recovery
+[FIX] #2871841 Renaming contact in roster does not always work
+[FIX] #2872930: Simultaneous running of ConsistencyRecovery is error-prone
+[FIX] Cancellation revisited in Incoming- and OutgoingInvitationProcess
+[FIX] CancellationException replaced by LocalCancellationException in the
+network layer
+[FIX] Removed all invitation states
+[FIX] exception handling in Saros#connect
+[FIX] exception handling in ibb#transferObject#accept
+[FIX] improved patch exception handling in Saros#connect()
+[FIX] protected sendMessage() queues messages like sendMessageToAll() done
+before
+[FIX] sendMessageToAll() makes use of public sendMessage() now
+
+
+9.10.2
+======
+[FEATURE] DataTransferManager can now track progress during incoming  
+file transfers
+[FEATURE] Start of Session is now communicated between all peers.
+
+[FIX] #2809044 Renaming or deleting files may causes file zombies
+[FIX] #2841957 Deleting dirty files
+[FIX] #2707354 Closing dirty files as observers causes undefined state
+[FIX] #2808943 Possible problem with ActivitySequencer for first  
+messsages
+[FIX] #2847664 CW Should only report inconsistencies if they are certain
+[FIX] #2672532 CW Sometimes warning window does not close quickly
+[FIX] #2256164 Problems with different character encodings.
+[FIX] #2863403 Multi-Driver the default option.
+[FIX] #2808854 Receiving Data via DataTransferManager was not  
+cancellable.
+[FIX] #2847756 Selecting a user in session view doesn't work in whole  
+line
+[FIX] #2849925 Contribution annotation doesn't work with PDT
+[FIX] Cursor annotation was not visible except at last position of  
+lines.
+[FIX] Version check returned false compatability values
+[FIX] Removed timeout for XMPP FileTransfer connections, because it is  
+too short when peers cannot connect directly to each other.
+[FIX] Caught a threading violation when deleting a dirty file
+[FIX] EditorManager did not disconnect correctly from DocumentProviders
+
+[FEATURE] Ping Pong can now be disabled in the preferences (default:  
+disabled)
+
+
+
+9.9.11
+======
+[FEATURE] Show icon in roster and session view for remote users switching
+away from Eclipse application window for some time.
+[FEATURE] Saros sends presence updates if Eclipse Window is
+deactivated/activated
+[FEATURE] Feedback statistic system can now communicate a pseudonym so we
+can identify users if they choose to reveal their identity
+[FEATURE] Local start time of session is collected as a statistic
+[FEATURE] Added stand-alone script for aggregating Statistics files
+
+[FIX] #2809044: Renaming or deleting files may causes file zombies
+[FIX] #2828917 Unwanted automatic conversion of line delimiters
+[FIX] Canceling the CW on the server leaves un-started handles
+[FIX] String comparisons with "==" in "Saros".
+[FIX] Removed broken line
+[FIX] Catch a NPE in DateFormatFileAppender if Eclipse is not started.
+[FIX] If JingleFileTransferSession fails, close the session.
+[FIX] !EXPERIMENTAL! Changed synchronization between dispatch and SWT
+threads to use runSWTAsync
+
+
+9.8.21
+======
+[FEATURE] #2812129: Compress all data for higher performance
+[FEATURE] Activities can skip the XMPP server and be sent via a direct
+           P2P connection for higher performance
+[FEATURE] Saros checks during an invitation whether the version of
+           inviter is compatible with the version of the invitee.
+
+[REGRESSION] Copy, paste, undo, redo, etc. are possible for the
+observer in Java and C++ files! Such changes are not send to the
+other project participants and thus will cause inconsistencies.
+
+[FIX] #2825223: Transfering files fails via servers where SOCKS5 is used
+                 (Was: IBB fails on jabber.no)
+[FIX] #2788261: Login supports SASL PLAIN only
+[FIX] #2836302: Saros doesn't work with Eclipse Plugin dev3
+[FIX] #2833139: Saros doesn't work with Eclipse Plugin PDT
+[FIX] #2810119: ActivitySequencer and Duplicate Messages
+[FIX] #2744354: ActivitySequencer cannot catch up
+[FIX] #2832598: Invitation User Interface should blink when user action
+                 is required
+[FIX] #2790049: Missing FileDecorations when new user joins
+[FIX] #2707202: Nickname changes do not change Shared Session View
+[FIX] #2707354: Closing dirty files as observers causes undefined state
+[FIX] #2727883: Files are readonly after a session crashed
+[FIX] #2525975: Dirty flag of certain file types missing
+[FIX] #2836964: Invitation fails for JabberIDs with less than 3
+                 characters (Was: Prefix string too short)
+[FIX] Get messages only from users in the same Session
+[FIX] Saros Session View can only be opened once
+[FIX] User leaving does not reset follow mode
+[FIX] #2833176: Two subsequent redos don't work
+[FIX] #2810108: Consistency Recovery does not stop project properly
+[FIX] Cannot paste files larger than 100kb
+[FIX] EditorManager is stopped when file replacement is in progress
+[FIX] #2811452: RosterView shows inconsistent tooltip messages
+[FIX] #2787093: Text selections are not removed in some cases
+[FIX] #2808945: Inconsistency Warning Triangle should not be shown for host
+[FIX] #2668794: Synchronize Role actions
+[FIX] #2707215: Sort order in Shared Session View is unpredictable
+
+
+
+9.7.10
+======
+[FIX] Improve Account Creation in case a server does not support
+    In-Band Registration (like jabber.org)
+[FEATURE] Added a link to a list of public XMPP servers to the account
+    creation wizard
+[FIX] StopManager works only in the first session
+[FIX] StopManager doesn't unblock SharedResourcesManager (caused
+    problems concerning file activities)
+[FEATURE] StopManager is cancellable and doesn't use timeouts any more
+[API] StopManager can stop more than one user concurrently
+[FEATURE] Statistic: Added a class that collects local text edit
+    activities and compares them in relation to concurrency with
+    remote text events.
+[FEATURE] Adding a contact is now run in a cancelable background task
+[FIX] #2795240 New Contact Page doesn't have a progress dialog
+[FIX] Eclipse window sometimes didn't respond when creating a new
+    account because the operation was running in the SWT thread as well
+[FIX] #2808894 New Contact Action fails on Jabber.org
+[FIX] #2706878: Add Buddy fails silently in server federation
+    If ServiceDisco failed during Adding Contacts then a user was
+    never added.  Fixed adding contacts to Gmail.com which used to
+    throw an 503 service unavailable.
+[FIX] #2800616 Always send sync data as an archive
+[FIX] #2808850 Prevent delay for IBB if Jingle is disabled
+[FIX] Outgoing Invitation now uses a Java temp-file instead of a file
+    inside the Eclipse directory.
+[FIX] Creating Folder fails when parents do not exist
+[FIX] SarosRosterListener did not handle presence changes correctly.
+[FIX] #2707190 receiver thread crashed if Saros-Session is closed by
+    remote peer
+[BUILD] Make Saros build under Eclipse 3.5
+[FIX] Error on bare JIDs in Invite Action
+[FEATURE] There is no server recommendation made anymore when creating
+    an account. The user is supposed to pick one from the list of
+    public XMPP servers that is accessible over the link.
+
+
+
+9.6.23
+======
+
+[FEATURE] Synchronize Role Change
+[FEATURE] Partial project sharing dialog: Offers the possibility to 
+select only part of the project to be shared with the client (experimental)
+[FEATURE] Statistic collection which was introduced in the last version now
+actually is enabled (if chosen by the user) for the following data:
+  * Role changes of the local user and the times s/he stayed in each role
+  * Number of users in each session, and how long they were present in 
+the same session
+  * General platform infos, feedback settings and session data (session 
+time and ID)
+  * File Transfer statistics such as bandwidth during invitation
+[FEATURE] Improved follow mode heuristic on driver change for exclusive 
+driver case
+
+[FIX] #2808862: Joining a Session can cause wrong driver information
+[FIX] #2808904: Wrong use of HTTPClient
+[FIX] #2808839: Outgoing Invitation tries to send directories as files
+[FIX] #1609227: Can invite peers that don't use Saros. Saros now checks 
+during an invitation whether the remote user supports Saros and shows this 
+information to the user in the invitation dialog.
+[FIX] #2707197: Renaming contacts needs to be done twice to work
+[FIX] #2801628: FileList.match() doesn't work properly
+[FIX] Make sure that an archive is used when IBB is the out-bound data 
+transfer method
+[FIX] Prevent that consistency recovery triggers resource changes
+[FIX] More robust handling of a NPE in the invitation dialog observed 
+during testing on 2009-06-18
+[FIX] A NPE when the project selection dialog was canceled when joining 
+a session
+[FIX] Race Condition in Consistency Watchdog: Checksum arriving in between
+recovery operations could cause the CW-dialog to hang.
+[FIX] Support for file transfer using IBB of file size 0 (files of 
+length 0 are not supported by OpenFire (raising 405))
+[FIX] Sending via archive never switches to last state in invitation 
+progress
+[FIX] ConnectionSessionManager currently uses wrong state transitions,
+which caused a assertion error in the RosterTracker. This fix, makes the
+RosterTracker more robust until the CSM is fixed.
+
+[WORKAROUND] #2807689: Editors are opened externally erroneously:
+Workaround surpresses files which would have been opened externally
+[WORKAROUND] Prevent Saros from reconnecting infinitely if the 
+connection to the XMPP server is down
+
+[API] Introduce ProgressMonitoring API in many places to allow 
+cancellation and progress.
+
+[INTERNAL] Saros is now aware internally that one Jabber-ID might have 
+several presences online
+
+
+9.5.29
+======
+[FIX] Cannot create files for consistency recovery under MacOS/Linux
+[FIX] Yes button of FeedbackDialog doesn't have the initial keyboard focus
+[FIX] Roster view is maximized when Eclipse's welcome screen appears
+[FIX] #2556663 - [Synchronisation] Should be possible to skip
+synchronisation: Needs to be enabled in the advanced preferences.
+[FIX] FileUtil.writeFile makes sure parent directories do exist before
+writing.
+[FIX] Do not try to open editors of files which do not exist (catches
+ugly Window error message)
+[FIX] #2794436: Logs created in user home: Now they are created in the
+directory which contains the Eclipse log (usually .metadata in the
+workspace)
+[FIX] Can't follow when debugging: Changing the active editor when
+debugging was not correctly captured by our IPartListener2.
+[FIX] Remove Viewport Annotations at end of session: Annotations were
+removed based on an empty editorPool (which was cleared one line before)
+[FIX] The Auto-Next feature did not check for disabled button to press
+[FIX] #2794319: NullPointerException trying to share a project
+[FIX] #2767873: Saros views not visible after plugin installation
+[FIX] #2596378: Autoclose of invitation dialog
+[FIX] Auto-Next on second page was broken by "[FIX] Handle a race
+condition if auto-next is enabled in JoinSessionWizard, but the user
+clicks faster than 1s."
+[FIX] #2789375: SharedProjectFileDecorations not updated / removed
+[FIX] #2789102: InvitationDialog cannot be closed initially
+
+[FEEDBACK] Activated our first survey targetting fast user feedback.
+
+[FEATURE] Improved GUI of the ConfigurationWizard, added links to the
+Saros project website in all feedback GUI elements, added contact
+information to the feedback preference page, added more information
+about the statistic submission (link to Wiki-Website)
+[FEATURE] Added a feedback system that asks the user to participate in
+an online survey. The interval in which the feedback reminder is shown
+is customizable or can be disabled completely in the Preferences
+[FEATURE] A wizard to configure Saros settings is shown when the plugin
+is installed or updated and some user preferences are missing.
+[FEATURE] Manually connecting from the Roster View is now always
+possible. If configuration details for Jabber are missing a wizard is
+shown to enter them right away.
+[FEATURE] added StatisticManager which can gather information about the
+session. Currently only data about the number of sessions is gathered
+and not transmitted at all.
+[FEATURE] Added a check button in the invitation dialog that lets the
+user specify whether he wants the dialog to close automatically if all
+invitations are completed or not.
+[FEATURE] Performance: Optimize Operations when transforming to TextEdits
+[FEATURE] Added Action to follow a selected person in the SessionView
+(FollowThisPersonAction)
+[FEATURE] Enable TLS for logging into server (but don't require it,
+because we need UI)
+[FEATURE] New JIDFileAppender creates log files with the JID of user
+currently connected
+
  
 1.0.1
+=====
 	New Features
 		- Better selection support for both driver and observer.
 	
@@ -22,12 +682,15 @@ Saros CHANGELOG
 		- Fixed [ 1607387 ] Invitation dialog fails if project already exists
  	
 1.0
+===
 	- added skype support
  
 0.8.2
+=====
 	- Fixed severe bug in project synchronization
 	- Fixed severe bug in account creation
 	- Show invitee name without XMPP-Resource on invitation wizard
  
 0.8.1
+=====
 	- First beta release
