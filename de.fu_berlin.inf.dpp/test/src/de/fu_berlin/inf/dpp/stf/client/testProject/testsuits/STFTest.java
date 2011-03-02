@@ -265,7 +265,7 @@ public class STFTest extends STF {
             tester.noBot().disableAutomaticReminderNoGUI();
             openSarosViews(tester);
             tester.sarosBot().buddiesView()
-                .connectNoGUI(tester.jid, tester.password);
+                .connectWith(tester.jid, tester.password);
         }
         resetBuddies();
     }
@@ -588,14 +588,11 @@ public class STFTest extends STF {
      * @throws RemoteException
      * @throws InterruptedException
      */
-    public static void leaveSessionHostFirst() throws RemoteException,
-        InterruptedException {
-        Tester host = null;
+    public static void leaveSessionHostFirst(Tester host)
+        throws RemoteException, InterruptedException {
         List<Callable<Void>> closeSessionTasks = new ArrayList<Callable<Void>>();
         for (final Tester tester : activeTesters) {
-            if (tester.sarosBot().state().isHostNoGUI()) {
-                host = tester;
-            } else {
+            if (tester != host) {
                 if (tester.sarosBot().state().isInSessionNoGUI()) {
                     closeSessionTasks.add(new Callable<Void>() {
                         public Void call() throws Exception {
@@ -607,8 +604,7 @@ public class STFTest extends STF {
                 }
             }
         }
-        if (host != null)
-            host.sarosBot().sessionView().leaveTheSessionByPeer();
+ host.sarosBot().sessionView().leaveTheSession();
         MakeOperationConcurrently.workAll(closeSessionTasks);
     }
 
@@ -638,7 +634,7 @@ public class STFTest extends STF {
                 peerJIDs.add(tester.jid);
                 leaveTasks.add(new Callable<Void>() {
                     public Void call() throws Exception {
-                        tester.sarosBot().sessionView().leaveTheSessionByPeer();
+                        tester.sarosBot().sessionView().leaveTheSession();
                         return null;
                     }
                 });

@@ -224,7 +224,7 @@ public class TestSessionView extends STFTest {
         throws RemoteException, InterruptedException {
         assertTrue(alice.sarosBot().state().isInSession());
         assertTrue(bob.sarosBot().state().isInSession());
-        leaveSessionHostFirst();
+        leaveSessionHostFirst(alice);
         assertFalse(alice.sarosBot().state().isInSession());
         assertFalse(bob.sarosBot().state().isInSession());
     }
@@ -255,7 +255,7 @@ public class TestSessionView extends STFTest {
         assertTrue(alice.sarosBot().state().isInSession());
         assertTrue(bob.sarosBot().state().isInSessionNoGUI());
         assertTrue(bob.sarosBot().state().isInSession());
-        leaveSessionHostFirst();
+        leaveSessionHostFirst(alice);
         assertFalse(alice.sarosBot().state().isInSessionNoGUI());
         assertFalse(bob.sarosBot().state().isInSessionNoGUI());
         assertFalse(alice.sarosBot().state().isInSession());
@@ -265,7 +265,7 @@ public class TestSessionView extends STFTest {
     @Test
     public void inviteUsersInSession() throws RemoteException,
         InterruptedException {
-        bob.sarosBot().sessionView().leaveTheSessionByPeer();
+        bob.sarosBot().sessionView().leaveTheSession();
         bob.noBot().deleteProjectNoGUI(PROJECT1);
         assertFalse(bob.sarosBot().state().isInSession());
         inviteBuddies(PROJECT1, TypeOfCreateProject.NEW_PROJECT, alice, bob,

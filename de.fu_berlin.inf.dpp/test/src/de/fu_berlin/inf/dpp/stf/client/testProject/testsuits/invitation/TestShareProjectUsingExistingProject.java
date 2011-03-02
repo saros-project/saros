@@ -42,7 +42,7 @@ public class TestShareProjectUsingExistingProject extends STFTest {
     @After
     public void runAfterEveryTest() throws RemoteException,
         InterruptedException {
-        leaveSessionHostFirst();
+        leaveSessionHostFirst(alice);
         deleteAllProjectsByActiveTesters();
 
     }
@@ -80,7 +80,8 @@ public class TestShareProjectUsingExistingProject extends STFTest {
         // bob.sarosC
         // .confirmProjectSharingWizardUsingExistProjectWithCopy(PROJECT1);
 
-        assertTrue(bob.sarosBot().packageExplorerView().tree().existsWithRegex(PROJECT1));
+        assertTrue(bob.sarosBot().packageExplorerView().tree()
+            .existsWithRegex(PROJECT1));
         assertTrue(bob.sarosBot().packageExplorerView()
             .selectPkg(PROJECT1, PKG1).existsWithRegex(CLS2));
         assertTrue(bob.sarosBot().packageExplorerView().tree()
@@ -95,7 +96,8 @@ public class TestShareProjectUsingExistingProject extends STFTest {
         throws RemoteException {
         buildSessionSequentially(PROJECT1, CM_SHARE_PROJECT,
             TypeOfCreateProject.EXIST_PROJECT_WITH_COPY, alice, bob);
-        assertTrue(bob.sarosBot().packageExplorerView().tree().existsWithRegex(PROJECT1));
+        assertTrue(bob.sarosBot().packageExplorerView().tree()
+            .existsWithRegex(PROJECT1));
         assertTrue(bob.sarosBot().packageExplorerView()
             .selectPkg(PROJECT1, PKG1).existsWithRegex(CLS2));
         assertTrue(bob.sarosBot().packageExplorerView().tree()

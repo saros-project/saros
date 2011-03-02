@@ -171,7 +171,7 @@ public interface SessionView extends SarosComponent {
      * 
      * @throws RemoteException
      */
-    public void leaveTheSessionByPeer() throws RemoteException;
+    public void leaveTheSession() throws RemoteException;
 
     /**
      * Perform the action "Grant write access" which should be activated by

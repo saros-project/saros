@@ -22,12 +22,18 @@ public class TestShare3UsersConcurrently extends STFTest {
      * </ol>
      * 
      * @throws RemoteException
+     * @throws InterruptedException
      */
     @BeforeClass
-    public static void runBeforeClass() throws RemoteException {
+    public static void runBeforeClass() throws RemoteException,
+        InterruptedException {
         initTesters(TypeOfTester.ALICE, TypeOfTester.BOB, TypeOfTester.CARL);
         setUpWorkbench();
         setUpSaros();
+        alice.sarosBot().packageExplorerView().tree().newC()
+            .javaProjectWithClasses(PROJECT1, PKG1, CLS1);
+        buildSessionConcurrently(PROJECT1, CM_SHARE_PROJECT,
+            TypeOfCreateProject.NEW_PROJECT, alice, bob, carl);
     }
 
     /**
@@ -50,10 +56,7 @@ public class TestShare3UsersConcurrently extends STFTest {
     @Test
     public void testShareProjectConcurrently() throws RemoteException,
         InterruptedException {
-        alice.sarosBot().packageExplorerView().tree().newC()
-            .javaProjectWithClasses(PROJECT1, PKG1, CLS1);
-        buildSessionConcurrently(PROJECT1, CM_SHARE_PROJECT,
-            TypeOfCreateProject.NEW_PROJECT, alice, bob, carl);
+
         assertTrue(carl.sarosBot().state().isParticipantNoGUI());
         assertFalse(carl.sarosBot().state().hasReadOnlyAccessNoGUI());
         assertTrue(carl.sarosBot().state().hasWriteAccessNoGUI());

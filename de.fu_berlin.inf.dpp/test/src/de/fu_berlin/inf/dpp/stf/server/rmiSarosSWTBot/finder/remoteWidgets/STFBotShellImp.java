@@ -206,6 +206,20 @@ public class STFBotShellImp extends AbstractRmoteWidget implements STFBotShell {
         return errorMessage;
     }
 
+    public String getMessage() throws RemoteException {
+        activate();
+        final String message = UIThreadRunnable.syncExec(new StringResult() {
+            public String run() {
+                WizardDialog dialog = (WizardDialog) widget.widget.getData();
+                return dialog.getMessage();
+            }
+        });
+        if (message == null) {
+            throw new WidgetNotFoundException("Could not find message!");
+        }
+        return message;
+    }
+
     public boolean existsTableItem(String label) throws RemoteException {
         activate();
         return bot().table().existsTableItem(label);

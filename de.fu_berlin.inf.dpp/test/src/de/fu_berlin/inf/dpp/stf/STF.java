@@ -266,6 +266,8 @@ public class STF {
         .getString("shell_new_buddy");
     protected final static String SHELL_BUDDY_LOOKUP_FAILED = SarosMessages
         .getString("shell_buddy_look_up_failed");
+    protected final static String SHELL_SERVER_NOT_FOUND = SarosMessages
+        .getString("shell_server_not_found");
     protected final static String SHELL_REMOVAL_OF_SUBSCRIPTION = SarosMessages
         .getString("shell_removal_of_subscription");
 

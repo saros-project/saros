@@ -148,10 +148,9 @@ public class TestHandleContacts extends STFTest {
 
         alice.bot().shell(SHELL_NEW_BUDDY)
             .confirmWithTextFieldAndWait(labelsAndTexts, FINISH);
-
-        alice.bot().shell(SHELL_BUDDY_LOOKUP_FAILED).waitUntilActive();
-        assertTrue(alice.bot().shell(SHELL_BUDDY_LOOKUP_FAILED).isActive());
-        alice.bot().shell(SHELL_BUDDY_LOOKUP_FAILED).confirm(NO);
+        alice.bot().waitUntilShellIsOpen(SHELL_SERVER_NOT_FOUND);
+        assertTrue(alice.bot().shell(SHELL_SERVER_NOT_FOUND).isActive());
+        alice.bot().shell(SHELL_SERVER_NOT_FOUND).confirm(NO);
 
     }
 
@@ -168,6 +167,7 @@ public class TestHandleContacts extends STFTest {
      * </ol>
      * 
      * @throws RemoteException
+     *             TODO: @Björn: how to access the warning message in a shell.
      */
     @Test
     public void testAddExistedContact() throws RemoteException {
@@ -175,11 +175,9 @@ public class TestHandleContacts extends STFTest {
             .toolbarButton(TB_ADD_A_NEW_CONTACT).click();
         Map<String, String> labelsAndTexts = new HashMap<String, String>();
         labelsAndTexts.put("XMPP/Jabber ID", bob.getBaseJid());
+        String label = "The buddy is already in your buddy list.Finishing the wizard will have no effect.";
+        assertTrue(alice.bot().shell(SHELL_NEW_BUDDY).getMessage()
+            .equals(label));
 
-        alice.bot().shell(SHELL_NEW_BUDDY)
-            .confirmWithTextFieldAndWait(labelsAndTexts, FINISH);
-        alice.bot().shell(SHELL_BUDDY_ALREADY_ADDED).waitUntilActive();
-        assertTrue(alice.bot().shell(SHELL_BUDDY_ALREADY_ADDED).isActive());
-        alice.bot().shell(SHELL_BUDDY_ALREADY_ADDED).close();
     }
 }

@@ -108,13 +108,15 @@ public class SessionViewImp extends SarosComponentImp implements SessionView {
         }
     }
 
-    public void leaveTheSessionByPeer() throws RemoteException {
-        clickToolbarButtonWithTooltip(TB_LEAVE_THE_SESSION);
+    public void leaveTheSession() throws RemoteException {
+
         if (!sarosBot().state().isHost()) {
+            clickToolbarButtonWithTooltip(TB_LEAVE_THE_SESSION);
             bot().waitUntilShellIsOpen(SHELL_CONFIRM_LEAVING_SESSION);
             bot().shell(SHELL_CONFIRM_LEAVING_SESSION).activate();
             bot().shell(SHELL_CONFIRM_LEAVING_SESSION).confirm(YES);
         } else {
+            clickToolbarButtonWithTooltip(TB_LEAVE_THE_SESSION);
             bot().waitUntilShellIsOpen(SHELL_CONFIRM_CLOSING_SESSION);
             bot().shell(SHELL_CONFIRM_CLOSING_SESSION).activate();
             bot().shell(SHELL_CONFIRM_CLOSING_SESSION).confirm(YES);

@@ -8,6 +8,7 @@ import java.rmi.RemoteException;
 
 import org.eclipse.core.runtime.CoreException;
 import org.junit.After;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -33,14 +34,34 @@ public class TestFileOperations extends STFTest {
         initTesters(TypeOfTester.ALICE, TypeOfTester.BOB, TypeOfTester.CARL);
         setUpWorkbench();
         setUpSaros();
+
+    }
+
+    @Before
+    public void runBeforeEveryMethod() throws RemoteException,
+        InterruptedException {
         setUpSessionWithAJavaProjectAndAClass(alice, bob, carl);
         setFollowMode(alice, carl);
     }
 
     @After
-    public void runBeforeEveryTest() throws RemoteException {
-        resetSharedProject(alice);
+    public void runAfterEveryMethod() throws RemoteException,
+        InterruptedException {
+        leaveSessionHostFirst(alice);
+        alice.noBot().deleteAllProjectsNoGUI();
+
+        bob.noBot().deleteAllProjectsNoGUI();
+
+        carl.noBot().deleteAllProjectsNoGUI();
     }
+
+    // @After
+    // public void runBeforeEveryTest() throws RemoteException {
+    // alice.bot().saveAllEditors();
+    // bob.bot().saveAllEditors();
+    // carl.bot().saveAllEditors();
+    // resetSharedProject(alice);
+    // }
 
     /**
      * Steps:
@@ -127,8 +148,8 @@ public class TestFileOperations extends STFTest {
         carl.sarosBot().condition().waitUntilPkgExists(PROJECT1, PKG2);
         assertTrue(bob.sarosBot().packageExplorerView().selectSrc(PROJECT1)
             .exists(PKG2));
-        assertTrue(carl.sarosBot().packageExplorerView()
-            .selectJavaProject(PROJECT1).exists(PKG2));
+        assertTrue(carl.sarosBot().packageExplorerView().selectSrc(PROJECT1)
+            .exists(PKG2));
 
         alice.sarosBot().packageExplorerView().tree().newC()
             .cls(PROJECT1, PKG2, CLS1);
@@ -222,8 +243,8 @@ public class TestFileOperations extends STFTest {
         carl.sarosBot().condition().waitUntilPkgNotExists(PROJECT1, PKG1);
         assertFalse(carl.sarosBot().packageExplorerView()
             .selectProject(PROJECT1).exists(PKG1));
-        assertTrue(carl.sarosBot().packageExplorerView()
-            .selectJavaProject(PROJECT1).exists(PKG2));
+        assertTrue(carl.sarosBot().packageExplorerView().selectSrc(PROJECT1)
+            .exists(PKG2));
     }
 
     /**

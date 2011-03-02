@@ -109,7 +109,7 @@ public class TestSVNStateInitialization extends STFTest {
 
     @After
     public void tearDown() throws RemoteException, InterruptedException {
-        leaveSessionHostFirst();
+        leaveSessionHostFirst(alice);
 
         if (alice.sarosBot().packageExplorerView().tree()
             .existsWithRegex(SVN_PROJECT))

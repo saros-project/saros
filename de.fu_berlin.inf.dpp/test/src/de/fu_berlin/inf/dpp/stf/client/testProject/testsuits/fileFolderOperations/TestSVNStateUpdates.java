@@ -112,11 +112,13 @@ public class TestSVNStateUpdates extends STFTest {
 
     @After
     public void runAfterEveryTest() throws Exception {
-        leaveSessionHostFirst();
-        if (bob.sarosBot().packageExplorerView().tree().existsWithRegex(SVN_PROJECT))
+        leaveSessionHostFirst(alice);
+        if (bob.sarosBot().packageExplorerView().tree()
+            .existsWithRegex(SVN_PROJECT))
             bob.noBot().deleteProjectNoGUI(SVN_PROJECT);
 
-        if (alice.sarosBot().packageExplorerView().tree().existsWithRegex(SVN_PROJECT))
+        if (alice.sarosBot().packageExplorerView().tree()
+            .existsWithRegex(SVN_PROJECT))
             alice.noBot().deleteProjectNoGUI(SVN_PROJECT);
     }
 
@@ -156,7 +158,8 @@ public class TestSVNStateUpdates extends STFTest {
         alice.sarosBot().condition()
             .waitUntilClassExists(SVN_PROJECT, SVN_PKG, "Asdf");
         assertTrue(alice.sarosBot().packageExplorerView()
-            .selectPkg(SVN_PROJECT, SVN_PKG).existsWithRegex("Asdf" + SUFFIX_JAVA));
+            .selectPkg(SVN_PROJECT, SVN_PKG)
+            .existsWithRegex("Asdf" + SUFFIX_JAVA));
     }
 
     /**

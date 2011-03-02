@@ -41,10 +41,10 @@ public class TestMenuRefactor extends STFTest {
             .selectClass(PROJECT1, PKG1, CLS1).refactor()
             .moveClassTo(PROJECT1, PKG2);
         assertFalse(alice.sarosBot().packageExplorerView()
-            .selectPkg(PROJECT1, PKG1).existsWithRegex(CLS1_SUFFIX));
+            .selectPkg(PROJECT1, PKG1).exists(CLS1_SUFFIX));
 
         assertTrue(alice.sarosBot().packageExplorerView()
-            .selectPkg(PROJECT1, PKG2).existsWithRegex(CLS1_SUFFIX));
+            .selectPkg(PROJECT1, PKG2).exists(CLS1_SUFFIX));
     }
 
     @Test
@@ -57,9 +57,9 @@ public class TestMenuRefactor extends STFTest {
             .selectClass(PROJECT1, PKG1, CLS1).refactor().rename(CLS2);
 
         assertFalse(alice.sarosBot().packageExplorerView()
-            .selectPkg(PROJECT1, PKG1).existsWithRegex(CLS1_SUFFIX));
+            .selectPkg(PROJECT1, PKG1).exists(CLS1_SUFFIX));
         assertTrue(alice.sarosBot().packageExplorerView()
-            .selectPkg(PROJECT1, PKG1).existsWithRegex(CLS2_SUFFIX));
+            .selectPkg(PROJECT1, PKG1).exists(CLS2_SUFFIX));
     }
 
     @Test
@@ -73,9 +73,9 @@ public class TestMenuRefactor extends STFTest {
             .selectFile(PROJECT1, FOLDER1, FILE1).refactor().rename(FILE2);
 
         assertFalse(alice.sarosBot().packageExplorerView()
-            .selectFolder(PROJECT1, FOLDER1).existsWithRegex(FILE1));
+            .selectFolder(PROJECT1, FOLDER1).exists(FILE1));
         assertTrue(alice.sarosBot().packageExplorerView()
-            .selectFolder(PROJECT1, FOLDER1).existsWithRegex(FILE2));
+            .selectFolder(PROJECT1, FOLDER1).exists(FILE2));
     }
 
     @Test
@@ -87,9 +87,9 @@ public class TestMenuRefactor extends STFTest {
             .refactor().rename(FOLDER2);
 
         assertFalse(alice.sarosBot().packageExplorerView()
-            .selectProject(PROJECT1).existsWithRegex(FOLDER1));
+            .selectProject(PROJECT1).exists(FOLDER1));
         assertTrue(alice.sarosBot().packageExplorerView()
-            .selectProject(PROJECT1).existsWithRegex(FOLDER2));
+            .selectProject(PROJECT1).exists(FOLDER2));
     }
 
     @Test
@@ -103,9 +103,9 @@ public class TestMenuRefactor extends STFTest {
 
         alice.bot().sleep(500);
         assertFalse(alice.sarosBot().packageExplorerView()
-            .selectProject(PROJECT1).existsWithRegex(PKG1));
+            .selectProject(PROJECT1).exists(PKG1));
         assertTrue(alice.sarosBot().packageExplorerView().selectSrc(PROJECT1)
-            .existsWithRegex(PKG2));
+            .exists(PKG2));
     }
 
     @Test
@@ -132,15 +132,15 @@ public class TestMenuRefactor extends STFTest {
             .javaProject(PROJECT1);
 
         assertTrue(alice.sarosBot().packageExplorerView().tree()
-            .existsWithRegex(PROJECT1));
+            .exists(PROJECT1));
         assertFalse(alice.sarosBot().packageExplorerView().tree()
-            .existsWithRegex(PROJECT2));
+            .exists(PROJECT2));
         alice.sarosBot().packageExplorerView().selectJavaProject(PROJECT1)
             .refactor().rename(PROJECT2);
 
         assertFalse(alice.sarosBot().packageExplorerView().tree()
-            .existsWithRegex(PROJECT1));
+            .exists(PROJECT1));
         assertTrue(alice.sarosBot().packageExplorerView().tree()
-            .existsWithRegex(PROJECT2));
+            .exists(PROJECT2));
     }
 }

@@ -151,8 +151,9 @@ public class ContextMenuWrapperImp extends EclipseComponentImp implements
     }
 
     public void deleteAllItems() throws RemoteException {
-        for (STFBotTreeItem subItem : treeItem.getItems()) {
-            subItem.contextMenu(CM_DELETE).click();
+
+        for (String text : treeItem.getTextOfItems()) {
+            treeItem.expandNode(text).contextMenu(CM_DELETE).click();
             bot().waitUntilShellIsOpen(CONFIRM_DELETE);
             bot().shell(CONFIRM_DELETE).activate();
             bot().shell(CONFIRM_DELETE).bot().button(OK).click();

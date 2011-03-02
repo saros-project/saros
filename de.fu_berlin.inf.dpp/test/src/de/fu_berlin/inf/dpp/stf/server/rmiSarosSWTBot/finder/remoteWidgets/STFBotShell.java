@@ -136,6 +136,8 @@ public interface STFBotShell extends Remote {
 
     public String getErrorMessage() throws RemoteException;
 
+    public String getMessage() throws RemoteException;
+
     /**
      * 
      * @param tableItemName
