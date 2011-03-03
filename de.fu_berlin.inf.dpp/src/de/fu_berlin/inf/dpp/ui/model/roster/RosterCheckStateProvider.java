@@ -33,7 +33,7 @@ public class RosterCheckStateProvider implements ICheckStateProvider {
             return false;
         }
 
-        return false;
+        return true;
     }
 
     public void setChecked(Object element, boolean checked) {

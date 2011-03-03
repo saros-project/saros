@@ -112,6 +112,7 @@ public class XMPPAccount implements Comparable<XMPPAccount>, Serializable {
     }
 
     public int compareTo(XMPPAccount xmppAccount) {
-        return this.getUsername().compareTo(xmppAccount.getUsername());
+        return this.getUsername()
+            .compareToIgnoreCase(xmppAccount.getUsername());
     }
 }

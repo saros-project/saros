@@ -7,172 +7,196 @@ import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Link;
-import org.eclipse.swt.widgets.Text;
+import org.picocontainer.annotations.Inject;
 
+import de.fu_berlin.inf.dpp.Saros;
+import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.accountManagement.XMPPAccount;
-import de.fu_berlin.inf.dpp.util.LinkListener;
+import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.ui.widgets.wizard.EnterXMPPAccountComposite;
+import de.fu_berlin.inf.dpp.ui.widgets.wizard.events.EnterXMPPAccountCompositeListener;
+import de.fu_berlin.inf.dpp.ui.widgets.wizard.events.IsSarosXMPPServerChangedEvent;
+import de.fu_berlin.inf.dpp.ui.widgets.wizard.events.XMPPServerChangedEvent;
 
 /**
- * Simple WizardPage for creating and changing XMPP-Accounts.
+ * Allows the user to edit a given {@link XMPPAccount}.
  * 
- * @author Sebastian Schlaak
+ * @author bkahlert
  */
 public class EditXMPPAccountWizardPage extends WizardPage {
+    public static final String TITLE = "Enter XMPP/Jabber ID";
+    public static final String DESCRIPTION = "Please enter you XMPP/Jabber ID and password.";
 
-    public static final String LIST_OF_XMPP_SERVERS = "http://www.saros-project.org/#PublicServers";
-    public static final String DONT_MATCH_LABEL = "Passwords don't match";
+    @Inject
+    protected Saros saros;
 
-    Label usernameLabel;
-    Label passwordLabel;
-    Label serverLabel;
-    Label passwordConfirmLabel;
-    Label passwordDontMatchLabel;
-    Text userNameInput;
-    Text passwordInput;
-    Text passwordConfirmInput;
-    Text serverTextInput;
-    XMPPAccount account;
-    Composite parent;
-    GridData data = new GridData(GridData.FILL_HORIZONTAL);
+    protected EnterXMPPAccountComposite enterXMPPAccountComposite;
 
-    public EditXMPPAccountWizardPage() {
-        super("AccountManagement");
-    }
+    /**
+     * This flag is true if {@link JID} was already valid.
+     */
+    protected boolean wasJIDValid = false;
 
-    public void setJabberAccount(XMPPAccount account) {
-        this.account = account;
-    }
+    /**
+     * This flag is true if the password was already valid.
+     */
+    protected boolean wasPasswordValid = false;
 
-    public void setPageTitle(String text) {
-        setTitle(text);
+    /**
+     * This flag is true if the server was already valid.
+     */
+    protected boolean wasXMPPServerValid = false;
+    protected boolean isXMPPServerValid = false;
+
+    protected final JID initialJID;
+    protected final String initialPassword;
+    protected final String initialServer;
+
+    /**
+     * This flag is ture if Saros's Jabber server restriction should be
+     * displayed.
+     */
+    protected boolean showSarosXMPPRestriction = false;
+
+    public EditXMPPAccountWizardPage(JID initialJID, String initialPassword,
+        String initialServer) {
+        super(EditXMPPAccountWizardPage.class.getName());
+
+        SarosPluginContext.initComponent(this);
+        setTitle(TITLE);
+        setDescription(DESCRIPTION);
+
+        this.initialJID = initialJID;
+        this.initialPassword = initialPassword;
+        this.initialServer = initialServer;
     }
 
     public void createControl(Composite parent) {
-        this.parent = parent;
-        layoutParent();
-        createServerLink();
-        createServerForm();
-        createUserNameForm();
-        createPasswordForm();
-        createConfirmPasswordLabel();
-        createPasswordDontMatchLabel();
-        fillInputs();
+        Composite composite = new Composite(parent, SWT.NONE);
+        setControl(composite);
+
+        composite.setLayout(new GridLayout(1, false));
+
+        this.enterXMPPAccountComposite = new EnterXMPPAccountComposite(
+            composite, SWT.NONE);
+        this.enterXMPPAccountComposite.setLayoutData(new GridData(SWT.FILL,
+            SWT.FILL, true, true));
+
+        this.isXMPPServerValid = this.enterXMPPAccountComposite
+            .isXMPPServerValid();
+
+        setInitialValues();
+        hookListeners();
+        updatePageCompletion();
     }
 
-    private void createServerLink() {
-        Label label = new Label(parent, SWT.NONE);
-        label.setText("Info:");
-        Link link = new Link(parent, SWT.NONE);
-        link.setText("For a list of public XMPP/Jabber servers click <a href=\""
-            + LIST_OF_XMPP_SERVERS + "\">here</a>");
-        link.addListener(SWT.Selection, new LinkListener());
+    protected void setInitialValues() {
+        this.enterXMPPAccountComposite.setJID(this.initialJID);
+        this.enterXMPPAccountComposite.setPassword(this.initialPassword);
+        this.enterXMPPAccountComposite.setServer(this.initialServer);
     }
 
-    private void layoutParent() {
-        this.parent.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true,
-            false));
-        this.parent.setLayout(new GridLayout(2, false));
-    }
-
-    private void createUserNameForm() {
-        this.usernameLabel = createStyledLabel("Username:");
-        this.userNameInput = createStyledInputText();
-    }
-
-    private void createServerForm() {
-        this.serverLabel = createStyledLabel("Server");
-        this.serverTextInput = createStyledInputText();
-    }
-
-    private void createPasswordForm() {
-        this.passwordLabel = createStyledLabel("Password:");
-        this.passwordInput = createStyledPasswordInput();
-    }
-
-    private void createConfirmPasswordLabel() {
-        this.passwordConfirmLabel = createStyledLabel("Confirm:");
-        this.passwordConfirmInput = createStyledPasswordInput();
-    }
-
-    private Label createStyledLabel(String labelText) {
-        Label label = new Label(this.parent, SWT.NONE);
-        label.setText(labelText);
-        setControl(label);
-        return label;
-    }
-
-    private Text createStyledInputText() {
-        Text input = new Text(parent, SWT.SINGLE | SWT.BORDER);
-        input.setText("");
-        input.setLayoutData(data);
-        return input;
-    }
-
-    private Text createStyledPasswordInput() {
-        Text input = new Text(parent, SWT.SINGLE | SWT.BORDER);
-        input.setEchoChar('*');
-        input.setLayoutData(data);
-        input.addModifyListener(new PasswordConfirmListener());
-        return input;
-    }
-
-    class PasswordConfirmListener implements ModifyListener {
-        public void modifyText(ModifyEvent e) {
-            if (isPasswordsMatch()) {
-                hidePassWordDontMatchLabel();
-            } else {
-                showPassWordDontMatchLabel();
+    protected void hookListeners() {
+        this.enterXMPPAccountComposite.addModifyListener(new ModifyListener() {
+            public void modifyText(ModifyEvent e) {
+                updatePageCompletion();
             }
+        });
+
+        this.enterXMPPAccountComposite
+            .addEnterXMPPAccountCompositeListener(new EnterXMPPAccountCompositeListener() {
+                public void xmppServerValidityChanged(
+                    XMPPServerChangedEvent event) {
+                    isXMPPServerValid = event.isXMPPServerValid();
+                    updatePageCompletion();
+                }
+
+                public void isSarosXMPPServerChanged(
+                    IsSarosXMPPServerChangedEvent event) {
+                    showSarosXMPPRestriction = event.isSarosXMPPServer();
+                    updatePageCompletion();
+                }
+            });
+    }
+
+    protected void updatePageCompletion() {
+        boolean isJIDValid = this.getJID().isValid();
+        boolean isPasswordNotEmpty = !this.getPassword().isEmpty();
+
+        if (isJIDValid)
+            wasJIDValid = true;
+        if (isPasswordNotEmpty)
+            wasPasswordValid = true;
+        if (getServer().isEmpty() || isXMPPServerValid) {
+            wasXMPPServerValid = true;
+        }
+
+        /*
+         * Saros XMPP restriction message
+         */
+        if (showSarosXMPPRestriction) {
+            setMessage(Messages.xmpp_saros_restriction_short, WARNING);
+        }
+
+        if (isJIDValid && isPasswordNotEmpty && isXMPPServerValid) {
+            /*
+             * TODO Connect and login attempt to new server Not done because
+             * Saros.connect holds the whole connection code. Few reusable code.
+             * 2011/02/19 bkahlert
+             */
+            setErrorMessage(null);
+            setPageComplete(true);
+        } else {
+            if (!isJIDValid && wasJIDValid) {
+                setErrorMessage(Messages.jid_format_errorMessage);
+            } else if (!isPasswordNotEmpty && wasPasswordValid) {
+                setErrorMessage(Messages.password_empty_errorMessage);
+            } else if (!isXMPPServerValid && wasXMPPServerValid) {
+                setErrorMessage(Messages.server_unresolvable_errorMessage);
+            } else {
+                setErrorMessage(null);
+            }
+            setPageComplete(false);
         }
     }
 
-    private boolean isPasswordsMatch() {
-        return this.passwordInput.getText().equals(
-            this.passwordConfirmInput.getText());
-    }
-
-    private void showPassWordDontMatchLabel() {
-        this.passwordDontMatchLabel.setVisible(true);
-        this.passwordDontMatchLabel.setText(DONT_MATCH_LABEL);
-    }
-
-    private void hidePassWordDontMatchLabel() {
-        this.passwordDontMatchLabel.setVisible(false);
-    }
-
-    protected void fillInputs() {
-        if (isNoAccountToChange()) {
+    @Override
+    public void setVisible(boolean visible) {
+        super.setVisible(visible);
+        if (!visible)
             return;
-        }
-        this.userNameInput.setText(this.account.getUsername());
-        this.serverTextInput.setText(this.account.getServer());
+
+        this.enterXMPPAccountComposite.setFocus();
     }
 
-    private void createPasswordDontMatchLabel() {
-        new Label(parent, SWT.NONE);
-        passwordDontMatchLabel = new Label(parent, SWT.NONE);
-        passwordDontMatchLabel.setText("");
-        passwordDontMatchLabel.setForeground(parent.getDisplay()
-            .getSystemColor(SWT.COLOR_RED));
-        GridData data = new GridData(GridData.FILL_HORIZONTAL);
-        passwordDontMatchLabel.setLayoutData(data);
+    /*
+     * WizardPage Results
+     */
+
+    /**
+     * Returns the entered {@link XMPPAccount}.
+     * 
+     * @return
+     */
+    public JID getJID() {
+        return this.enterXMPPAccountComposite.getJID();
     }
 
-    private boolean isNoAccountToChange() {
-        return this.account == null;
-    }
-
-    public String getUserName() {
-        return this.userNameInput.getText();
-    }
-
+    /**
+     * Returns the entered password.
+     * 
+     * @return
+     */
     public String getPassword() {
-        return this.passwordInput.getText();
+        return this.enterXMPPAccountComposite.getPassword();
     }
 
+    /**
+     * Returns the entered server.
+     * 
+     * @return empty string if no server has been provided
+     */
     public String getServer() {
-        return this.serverTextInput.getText();
+        return this.enterXMPPAccountComposite.getServer();
     }
 }

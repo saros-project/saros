@@ -1,6 +1,9 @@
 package de.fu_berlin.inf.dpp.ui.widgets.viewer.roster;
 
-import de.fu_berlin.inf.dpp.SarosPluginContext;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.StructuredViewer;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.events.DisposeEvent;
@@ -15,14 +18,18 @@ import org.jivesoftware.smack.XMPPConnection;
 import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.Saros;
+import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.net.ConnectionState;
 import de.fu_berlin.inf.dpp.net.IConnectionListener;
+import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.ui.model.TreeLabelProvider;
 import de.fu_berlin.inf.dpp.ui.model.roster.RosterComparator;
 import de.fu_berlin.inf.dpp.ui.model.roster.RosterContentProvider;
+import de.fu_berlin.inf.dpp.ui.model.roster.RosterEntryElement;
 import de.fu_berlin.inf.dpp.ui.util.LayoutUtils;
 import de.fu_berlin.inf.dpp.ui.util.ViewerUtils;
 import de.fu_berlin.inf.dpp.ui.widgets.viewer.ViewerComposite;
+import de.fu_berlin.inf.dpp.util.ArrayUtils;
 
 /**
  * This {@link Composite} displays the {@link Roster} with its
@@ -70,7 +77,7 @@ public class BuddyDisplayComposite extends ViewerComposite {
         super(parent, style);
 
         SarosPluginContext.initComponent(this);
-        
+
         super.setLayout(LayoutUtils.createGridLayout());
         this.viewer.getControl()
             .setLayoutData(LayoutUtils.createFillGridData());
@@ -99,6 +106,85 @@ public class BuddyDisplayComposite extends ViewerComposite {
         this.viewer.setLabelProvider(new TreeLabelProvider());
         this.viewer.setComparator(new RosterComparator());
         this.viewer.setUseHashlookup(true);
+    }
+
+    /**
+     * Returns the displayed {@link JID}s.
+     * 
+     * @return
+     */
+    public List<JID> getBuddies() {
+        List<RosterEntryElement> objects = collectAllRosterEntryElement((TreeViewer) this.viewer);
+        return ArrayUtils.getAdaptableObjects(objects.toArray(), JID.class);
+    }
+
+    /**
+     * Returns the displayed {@link JID}s that support Saros.
+     * 
+     * @return
+     */
+    public List<JID> getBuddiesWithSarosSupport() {
+        List<JID> buddies = new ArrayList<JID>();
+        List<RosterEntryElement> objects = collectAllRosterEntryElement((TreeViewer) this.viewer);
+        for (RosterEntryElement rosterEntryElement : objects) {
+            if (rosterEntryElement.isSarosSupported()) {
+                JID jid = (JID) rosterEntryElement.getAdapter(JID.class);
+                if (jid != null && !buddies.contains(jid)) {
+                    buddies.add(jid);
+                }
+            }
+        }
+        return buddies;
+    }
+
+    /**
+     * Gathers the checked states of the given widget and its descendants,
+     * following a pre-order traversal of the {@link ITreeContentProvider}.
+     * 
+     * @param treeViewer
+     *            to be traversed
+     * @return
+     */
+    protected static List<RosterEntryElement> collectAllRosterEntryElement(
+        TreeViewer treeViewer) {
+        ITreeContentProvider treeContentProvider = (ITreeContentProvider) treeViewer
+            .getContentProvider();
+
+        List<Object> collectedObjects = new ArrayList<Object>();
+
+        Object[] objects = treeContentProvider.getElements(treeViewer
+            .getInput());
+        for (Object object : objects) {
+            collectedObjects.add(object);
+            collectAllRosterEntryElement(collectedObjects, treeViewer, object);
+        }
+
+        return ArrayUtils.getInstances(collectedObjects.toArray(),
+            RosterEntryElement.class);
+    }
+
+    /**
+     * Gathers the checked states of the given widget and its descendants,
+     * following a pre-order traversal of the {@link ITreeContentProvider}.
+     * 
+     * @param collectedObjects
+     *            a writable list of elements (element type: <code>Object</code>
+     *            )
+     * @param treeViewer
+     *            to be traversed
+     * @param parentElement
+     *            of which to determine the child nodes
+     */
+    protected static void collectAllRosterEntryElement(
+        List<Object> collectedObjects, TreeViewer treeViewer,
+        Object parentElement) {
+        ITreeContentProvider treeContentProvider = (ITreeContentProvider) treeViewer
+            .getContentProvider();
+        Object[] objects = treeContentProvider.getChildren(parentElement);
+        for (Object object : objects) {
+            collectedObjects.add(object);
+            collectAllRosterEntryElement(collectedObjects, treeViewer, object);
+        }
     }
 
     @Override

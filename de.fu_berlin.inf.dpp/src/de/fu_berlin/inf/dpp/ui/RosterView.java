@@ -105,17 +105,6 @@ public class RosterView extends ViewPart {
 
     private static final Logger log = Logger.getLogger(RosterView.class);
 
-    public static final Image groupImage = ImageManager
-        .getImage("icons/obj16/group.png");
-    public static final Image personImage = ImageManager
-        .getImage("icons/obj16/user.png");
-    public static final Image personImage_saros = ImageManager
-        .getImage("icons/obj16/sarosuser.png");
-    public static final Image personAwayImage = ImageManager
-        .getImage("icons/elcl16/away.png");
-    public static final Image personOfflineImage = new Image(
-        Display.getDefault(), personImage, SWT.IMAGE_DISABLE);
-
     protected TreeViewer viewer;
 
     protected Composite composite;
@@ -351,12 +340,14 @@ public class RosterView extends ViewPart {
 
             if (presence.isAvailable() && saros.isConnected()) {
                 if (presence.isAway()) {
-                    return personAwayImage;
+                    return rqPeer == false ? ImageManager.ICON_BUDDY_AWAY
+                        : ImageManager.ICON_BUDDY_SAROS_AWAY;
                 } else {
-                    return rqPeer == false ? personImage : personImage_saros;
+                    return rqPeer == false ? ImageManager.ICON_BUDDY
+                        : ImageManager.ICON_BUDDY_SAROS;
                 }
             } else {
-                return personOfflineImage;
+                return ImageManager.ICON_BUDDY_OFFLINE;
             }
         }
 
@@ -456,7 +447,7 @@ public class RosterView extends ViewPart {
         }
 
         public Image getImage() {
-            return groupImage;
+            return ImageManager.ICON_GROUP;
         }
 
         @Override
@@ -571,7 +562,7 @@ public class RosterView extends ViewPart {
     /**
      * Provide tree content. Elements are of type {@link TreeItem}.
      */
-    protected class TreeContentProvider implements IStructuredContentProvider,
+    public class TreeContentProvider implements IStructuredContentProvider,
         ITreeContentProvider {
 
         public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
@@ -609,7 +600,7 @@ public class RosterView extends ViewPart {
         }
     }
 
-    protected static class ViewLabelProvider extends LabelProvider implements
+    public static class ViewLabelProvider extends LabelProvider implements
         IStyledLabelProvider {
 
         @Override
@@ -629,7 +620,7 @@ public class RosterView extends ViewPart {
         }
     }
 
-    protected static class RosterComparator extends ViewerComparator {
+    public static class RosterComparator extends ViewerComparator {
         @Override
         public int category(Object element) {
             return ((TreeItem) element).getCategory();

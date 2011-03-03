@@ -1,7 +1,8 @@
 package de.fu_berlin.inf.dpp.ui.actions;
 
-import org.apache.log4j.Logger;
 import org.eclipse.jface.action.Action;
+import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.swt.graphics.ImageData;
 
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.project.AbstractSarosSessionListener;
@@ -9,16 +10,13 @@ import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ISarosSessionListener;
 import de.fu_berlin.inf.dpp.project.SarosSessionManager;
 import de.fu_berlin.inf.dpp.ui.ImageManager;
-import de.fu_berlin.inf.dpp.util.Utils;
+import de.fu_berlin.inf.dpp.ui.util.WizardUtils;
 
 /**
  * Rename to OpenInvitationDialogAction
  */
 @Component(module = "action")
 public class OpenInviteInterface extends Action {
-
-    private static final Logger log = Logger
-        .getLogger(OpenInviteInterface.class.getName());
 
     protected ISarosSessionListener sessionListener = new AbstractSarosSessionListener() {
         @Override
@@ -38,9 +36,14 @@ public class OpenInviteInterface extends Action {
         super();
         this.sessionManager = sessionManager;
 
-        setImageDescriptor(ImageManager
-            .getImageDescriptor("/icons/elcl16/project_share_tsk.png"));
-        setToolTipText("Open invitation interface");
+        setImageDescriptor(new ImageDescriptor() {
+            @Override
+            public ImageData getImageData() {
+                return ImageManager.ELCL_PROJECT_SHARE_ADD_BUDDIES
+                    .getImageData();
+            }
+        });
+        setToolTipText("Add Buddy(s) to Session");
 
         sessionManager.addSarosSessionListener(sessionListener);
 
@@ -49,16 +52,9 @@ public class OpenInviteInterface extends Action {
         setEnabled((sarosSession != null) && sarosSession.isHost());
     }
 
-    /**
-     * @review runSafe OK
-     */
     @Override
     public void run() {
-        Utils.runSafeSync(log, new Runnable() {
-            public void run() {
-                sessionManager.openInviteDialog(null);
-            }
-        });
+        WizardUtils.openShareProjectAddBuddiesWizard();
     }
 
 }

@@ -1,6 +1,7 @@
 package de.fu_berlin.inf.dpp.ui.widgets.viewer.project;
 
-import de.fu_berlin.inf.dpp.SarosPluginContext;
+import java.util.List;
+
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.jface.viewers.StructuredViewer;
@@ -9,13 +10,16 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Layout;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.ui.IWorkbench;
+import org.eclipse.ui.model.WorkbenchContentProvider;
 import org.eclipse.ui.model.WorkbenchLabelProvider;
 import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.Saros;
+import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.ui.model.project.ProjectOnlyWorkbenchContentProvider;
 import de.fu_berlin.inf.dpp.ui.util.LayoutUtils;
 import de.fu_berlin.inf.dpp.ui.widgets.viewer.ViewerComposite;
+import de.fu_berlin.inf.dpp.util.ArrayUtils;
 
 /**
  * This {@link Composite} displays all {@link IProject}s within the
@@ -68,6 +72,19 @@ public class ProjectDisplayComposite extends ViewerComposite {
         this.viewer.setLabelProvider(WorkbenchLabelProvider
             .getDecoratingWorkbenchLabelProvider());
         this.viewer.setUseHashlookup(true);
+    }
+
+    /**
+     * Returns the displayed {@link IProject}s.
+     * 
+     * @return
+     */
+    public List<IProject> getProjects() {
+        WorkbenchContentProvider contentProvider = (WorkbenchContentProvider) this.viewer
+            .getContentProvider();
+        Object[] objects = contentProvider
+            .getElements(((TableViewer) this.viewer).getInput());
+        return ArrayUtils.getAdaptableObjects(objects, IProject.class);
     }
 
     @Override

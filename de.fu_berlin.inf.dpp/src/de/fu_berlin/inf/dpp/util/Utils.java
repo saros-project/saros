@@ -46,9 +46,6 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.jface.window.Window;
-import org.eclipse.jface.wizard.Wizard;
-import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.swt.SWTException;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IViewPart;
@@ -73,7 +70,6 @@ import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.ui.wizards.ConfigurationWizard;
 
 /**
  * Static Utility functions
@@ -1075,43 +1071,6 @@ public class Utils {
         }
 
         return o;
-    }
-
-    /**
-     * Opens the ConfigurationWizard to let the user specify his account
-     * settings and the agreement for statistic and error log submissions.
-     * 
-     * @param askForAccount
-     * @param askAboutStatisticTransfer
-     * @return true if the user finished the wizard successfully, false if he
-     *         canceled the dialog or an error occurred
-     */
-    public static boolean showConfigurationWizard(final boolean askForAccount,
-        final boolean askAboutStatisticTransfer) {
-
-        try {
-            return Utils.runSWTSync(new Callable<Boolean>() {
-
-                public Boolean call() {
-                    /*
-                     * showUseNowButton is set to false because this method is
-                     * called only by Saros.connect(), and if the connection
-                     * failed you sure want to use your new settings now.
-                     */
-                    Wizard wiz = new ConfigurationWizard(askForAccount,
-                        askAboutStatisticTransfer, false);
-                    WizardDialog dialog = new WizardDialog(
-                        EditorAPI.getShell(), wiz);
-                    dialog.setHelpAvailable(false);
-                    int status = dialog.open();
-                    return (status == Window.OK);
-                }
-
-            });
-        } catch (Exception e) {
-            log.error("Unable to open the ConfigurationWizard", e);
-            return false;
-        }
     }
 
     /**

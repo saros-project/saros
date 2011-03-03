@@ -19,18 +19,16 @@
  */
 package de.fu_berlin.inf.dpp.ui.actions;
 
-import org.apache.log4j.Logger;
 import org.eclipse.jface.action.Action;
-import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.swt.widgets.Shell;
+import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.swt.graphics.ImageData;
 
 import de.fu_berlin.inf.dpp.annotations.Component;
-import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.project.AbstractSarosSessionListener;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.SarosSessionManager;
 import de.fu_berlin.inf.dpp.ui.ImageManager;
-import de.fu_berlin.inf.dpp.util.Utils;
+import de.fu_berlin.inf.dpp.ui.util.CollaborationUtils;
 
 /**
  * Leaves the current Saros session. Is deactivated if there is no running
@@ -42,18 +40,19 @@ import de.fu_berlin.inf.dpp.util.Utils;
 @Component(module = "action")
 public class LeaveSessionAction extends Action {
 
-    private static final Logger log = Logger.getLogger(LeaveSessionAction.class
-        .getName());
-
     protected SarosSessionManager sessionManager;
 
     public LeaveSessionAction(SarosSessionManager sessionManager) {
 
         this.sessionManager = sessionManager;
 
-        setToolTipText("Leave the session");
-        setImageDescriptor(ImageManager
-            .getImageDescriptor("/icons/elcl16/leavesession.png"));
+        setToolTipText("Leave Session");
+        setImageDescriptor(new ImageDescriptor() {
+            @Override
+            public ImageData getImageData() {
+                return ImageManager.ELCL_PROJECT_SHARE_LEAVE.getImageData();
+            }
+        });
 
         sessionManager
             .addSarosSessionListener(new AbstractSarosSessionListener() {
@@ -76,57 +75,35 @@ public class LeaveSessionAction extends Action {
      */
     @Override
     public void run() {
-        Shell shell = EditorAPI.getShell();
-        if (shell == null) {
-            return;
-        }
-
-        ISarosSession sarosSession = sessionManager.getSarosSession();
-
-        if (sarosSession == null) {
-            log.warn("ISarosSession does no longer exist!");
-            return;
-        }
-
-        boolean reallyLeave;
-
-        if (sarosSession.isHost()) {
-            if (sarosSession.getParticipants().size() == 1) {
-                // Do not ask when host is alone...
-                reallyLeave = true;
-            } else {
-                reallyLeave = MessageDialog
-                    .openQuestion(
-                        shell,
-                        "Confirm Closing Session",
-                        "Are you sure that you want to close this Saros session? Since you are the creator of this session, it will be closed for all participants.");
-            }
-        } else {
-            reallyLeave = MessageDialog.openQuestion(shell,
-                "Confirm Leaving Session",
-                "Are you sure that you want to leave this Saros session?");
-        }
-
-        if (!reallyLeave)
-            return;
-
-        Utils.runSafeAsync(log, new Runnable() {
-            public void run() {
-                runLeaveSession();
-            }
-        });
-    }
-
-    protected void runLeaveSession() {
-        try {
-            sessionManager.stopSarosSession();
-        } catch (Exception e) {
-            log.error("Session could not be left: ", e);
-        }
+        CollaborationUtils.leaveSession(sessionManager);
     }
 
     protected void updateEnablement() {
-        setEnabled(sessionManager.getSarosSession() != null);
+        if (sessionManager.getSarosSession() != null) {
+            if (sessionManager.getSarosSession().isHost()) {
+                setToolTipText("Stop Session");
+                setImageDescriptor(new ImageDescriptor() {
+                    @Override
+                    public ImageData getImageData() {
+                        return ImageManager.ELCL_PROJECT_SHARE_TERMINATE
+                            .getImageData();
+                    }
+                });
+            } else {
+                setToolTipText("Leave Session");
+                setImageDescriptor(new ImageDescriptor() {
+                    @Override
+                    public ImageData getImageData() {
+                        return ImageManager.ELCL_PROJECT_SHARE_LEAVE
+                            .getImageData();
+                    }
+                });
+            }
+            setEnabled(true);
+        } else {
+            setEnabled(false);
+        }
+
     }
 
 }

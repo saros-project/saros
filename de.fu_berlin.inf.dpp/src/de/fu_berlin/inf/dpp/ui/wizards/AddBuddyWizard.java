@@ -1,7 +1,6 @@
 /*
  * DPP - Serious Distributed Pair Programming
- * (c) Freie Universitaet Berlin - Fachbereich Mathematik und Informatik - 2006
- * (c) Riad Djemili - 2006
+ * (c) Freie Universitaet Berlin - Fachbereich Mathematik und Informatik - 2011
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -36,8 +35,8 @@ import org.picocontainer.annotations.Inject;
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.internal.subscriptionManager.SubscriptionManager;
-import de.fu_berlin.inf.dpp.net.internal.subscriptionManager.events.SubscriptionManagerListener;
 import de.fu_berlin.inf.dpp.net.internal.subscriptionManager.events.IncomingSubscriptionEvent;
+import de.fu_berlin.inf.dpp.net.internal.subscriptionManager.events.SubscriptionManagerListener;
 import de.fu_berlin.inf.dpp.net.util.RosterUtils;
 import de.fu_berlin.inf.dpp.ui.ImageManager;
 import de.fu_berlin.inf.dpp.ui.wizards.pages.AddBuddyWizardPage;
@@ -102,7 +101,6 @@ public class AddBuddyWizard extends Wizard {
                 subscriptionManager.removeSubscriptionManagerListener(this);
             }
         };
-
         try {
             getContainer().run(true, true, new IRunnableWithProgress() {
                 public void run(IProgressMonitor monitor)

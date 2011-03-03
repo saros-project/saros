@@ -24,8 +24,6 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.preference.BooleanFieldEditor;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
 import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.jface.window.Window;
-import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
@@ -50,8 +48,7 @@ import de.fu_berlin.inf.dpp.accountManagement.XMPPAccountStore;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
 import de.fu_berlin.inf.dpp.ui.ImageManager;
-import de.fu_berlin.inf.dpp.ui.wizards.EditXMPPAccountWizard;
-import de.fu_berlin.inf.dpp.ui.wizards.ConfigurationWizard;
+import de.fu_berlin.inf.dpp.ui.util.WizardUtils;
 
 /**
  * Contains the basic preferences for Saros.
@@ -267,9 +264,7 @@ public class GeneralPreferencePage extends FieldEditorPreferencePage implements
     }
 
     protected void changeAccountData() {
-        WizardDialog changeWizard = new WizardDialog(parent.getShell(),
-            new EditXMPPAccountWizard(getSelectedAccount()));
-        if (Window.OK == changeWizard.open()) {
+        if (WizardUtils.openEditXMPPAccountWizard(this.getSelectedAccount()) != null) {
             updateInfoLabel();
             updateList();
         }
@@ -306,51 +301,35 @@ public class GeneralPreferencePage extends FieldEditorPreferencePage implements
 
     protected void createAddAccountBtn(Composite composite) {
         createAccountGroupButton(composite, ADD_IMAGE, ADD_BTN_TEXT,
-            new AddAccountHandler());
-    }
-
-    class AddAccountHandler implements Listener {
-        public void handleEvent(Event event) {
-            if (event.type == SWT.Selection) {
-                openNewAccountWizard();
-            }
-        }
-    }
-
-    protected void openNewAccountWizard() {
-        ConfigurationWizard wiz = new ConfigurationWizard(true, false, true);
-        WizardDialog wizard = new WizardDialog(parent.getShell(), wiz);
-        wizard.setHelpAvailable(false);
-        if (Window.OK == wizard.open()) {
-            updateInfoLabel();
-            updateList();
-        }
+            new Listener() {
+                public void handleEvent(Event event) {
+                    if (event.type == SWT.Selection) {
+                        WizardUtils.openAddXMPPAccountWizard();
+                        updateInfoLabel();
+                        updateList();
+                    }
+                }
+            });
     }
 
     protected void createDeleteBtn(Composite composite) {
         createAccountGroupButton(composite, DELETE_IMAGE, DELETE_BTN_TEXT,
-            new DeleteHandler());
-    }
-
-    class DeleteHandler implements Listener {
-        public void handleEvent(Event e) {
-            if (isEntrySelected()) {
-                deleteBtnPressend();
-            } else {
-                warnNothingSelected();
-            }
-        }
-    }
-
-    protected void deleteBtnPressend() {
-        int selectedEntryId = getSelectedEntryID();
-        if (hasActiveAccountDeleted()) {
-            handleActiveAccountDeleted();
-        } else {
-            accountStore
-                .deleteAccount(accountStore.getAccount(selectedEntryId));
-        }
-        updateList();
+            new Listener() {
+                public void handleEvent(Event event) {
+                    if (isEntrySelected()) {
+                        int selectedEntryId = getSelectedEntryID();
+                        if (hasActiveAccountDeleted()) {
+                            handleActiveAccountDeleted();
+                        } else {
+                            accountStore.deleteAccount(accountStore
+                                .getAccount(selectedEntryId));
+                        }
+                        updateList();
+                    } else {
+                        warnNothingSelected();
+                    }
+                }
+            });
     }
 
     protected boolean hasActiveAccountDeleted() {

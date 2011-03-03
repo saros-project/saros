@@ -30,7 +30,7 @@ public class RosterComparator extends ViewerComparator {
             && e2 instanceof RosterGroupElement) {
             String groupName1 = ((RosterGroupElement) e1).rosterGroup.getName();
             String groupName2 = ((RosterGroupElement) e2).rosterGroup.getName();
-            return groupName1.compareTo(groupName2);
+            return groupName1.compareToIgnoreCase(groupName2);
         }
 
         return super.compare(viewer, e1, e2);

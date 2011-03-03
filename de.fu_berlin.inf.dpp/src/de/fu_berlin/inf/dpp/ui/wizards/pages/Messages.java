@@ -10,6 +10,7 @@ public class Messages extends NLS {
     public static String jid_longform;
     public static String password_empty_errorMessage;
     public static String xmpp_saros_restriction;
+    public static String xmpp_saros_restriction_short;
     public static String roster_addself_errorMessage;
     public static String roster_alreadyadded_errorMessage;
     public static String wizard_finish_noeffect;

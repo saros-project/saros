@@ -88,11 +88,7 @@ public class JID implements Serializable {
      * @param rosterEntry
      */
     public JID(RosterEntry rosterEntry) {
-        if (rosterEntry == null || rosterEntry.getUser() == null)
-            throw new IllegalArgumentException(
-                RosterEntry.class.getSimpleName() + " cannot be null");
-
-        this.jid = rosterEntry.getUser();
+        this(rosterEntry.getUser());
     }
 
     /**

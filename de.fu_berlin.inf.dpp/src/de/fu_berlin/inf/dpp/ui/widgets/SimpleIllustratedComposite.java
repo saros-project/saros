@@ -17,6 +17,8 @@ import de.fu_berlin.inf.dpp.util.FontUtils;
  * <p>
  * This composite does <strong>NOT</strong> handle setting the layout and adding
  * sub {@link Control}s correctly.
+ * <p>
+ * <img src="doc-files/SimpleIllustratedComposite-1.png"/>
  * 
  * <dl>
  * <dt><b>Styles:</b></dt>

@@ -55,10 +55,16 @@ public class ImageManager {
     public static Image DLCL_BUDDY_ADD = getImage("icons/dlcl16/buddy_add_tsk.png");
     public static Image ELCL_PROJECT_SHARE = getImage("icons/elcl16/project_share_tsk.png");
     public static Image DLCL_PROJECT_SHARE = getImage("icons/dlcl16/project_share_tsk.png");
+    public static Image ELCL_PROJECT_SHARE_LEAVE = getImage("icons/elcl16/project_share_leave_tsk.png");
+    public static Image DLCL_PROJECT_SHARE_LEAVE = getImage("icons/dlcl16/project_share_leave_tsk.png");
+    public static Image ELCL_PROJECT_SHARE_TERMINATE = getImage("icons/elcl16/project_share_terminate_tsk.png");
+    public static Image DLCL_PROJECT_SHARE_TERMINATE = getImage("icons/dlcl16/project_share_terminate_tsk.png");
     public static Image ELCL_PROJECT_SHARE_ADD_PROJECTS = getImage("icons/elcl16/project_share_add_projects_tsk.png");
     public static Image DLCL_PROJECT_SHARE_ADD_PROJECTS = getImage("icons/dlcl16/project_share_add_projects_tsk.png");
     public static Image ELCL_PROJECT_SHARE_ADD_BUDDIES = getImage("icons/elcl16/project_share_add_buddies_tsk.png");
     public static Image DLCL_PROJECT_SHARE_ADD_BUDDIES = getImage("icons/dlcl16/project_share_add_buddies_tsk.png");
+    public static Image ELCL_SAROS_SESSION_STOP_PROCESS = getImage("icons/elcl16/saros_session_stop_process_tsk.png");
+    public static Image DLCL_SAROS_SESSION_STOP_PROCESS = getImage("icons/dlcl16/saros_session_stop_process_tsk.png");
 
     /*
      * objects

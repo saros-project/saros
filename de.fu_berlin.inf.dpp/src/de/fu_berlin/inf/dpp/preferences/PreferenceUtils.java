@@ -19,7 +19,7 @@ import de.fu_berlin.inf.dpp.net.JID;
 @Component(module = "prefs")
 public class PreferenceUtils {
 
-    Saros saros;
+    protected Saros saros;
     protected MixerManager mixerManager;
 
     public PreferenceUtils(Saros saros, MixerManager mixerManager) {
@@ -68,13 +68,32 @@ public class PreferenceUtils {
     }
 
     /**
+     * Returns true if the user has specified a server for a XMPP account.
+     * 
+     * @return true if there is a user name that is not equal to the empty
+     *         string
+     */
+    public boolean hasServer() {
+        return getServer().length() > 0;
+    }
+
+    /**
+     * Returns Saros's XMPP/Jabber server dns address.
+     * 
+     * @return
+     */
+    public String getSarosXMPPServer() {
+        return "saros-con.imp.fu-berlin.de";
+    }
+
+    /**
      * Returns the default server.<br/>
      * Is never empty or null.
      * 
      * @return
      */
     public String getDefaultServer() {
-        return "saros-con.imp.fu-berlin.de";
+        return getSarosXMPPServer();
     }
 
     /**
@@ -96,6 +115,17 @@ public class PreferenceUtils {
      */
     public boolean hasUserName() {
         return getUserName().length() > 0;
+    }
+
+    /**
+     * Returns the user's password from the {@link PreferenceStore}.<br/>
+     * Might be an empty string but never null.
+     * 
+     * @return
+     */
+    public String getPassword() {
+        return saros.getPreferenceStore().getString(
+            PreferenceConstants.PASSWORD);
     }
 
     /**

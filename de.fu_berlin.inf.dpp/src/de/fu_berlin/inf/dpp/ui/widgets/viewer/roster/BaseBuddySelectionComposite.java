@@ -9,7 +9,6 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.viewers.CheckStateChangedEvent;
 import org.eclipse.jface.viewers.CheckboxTreeViewer;
 import org.eclipse.jface.viewers.ICheckStateListener;
-import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.StructuredViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.DisposeEvent;
@@ -121,72 +120,27 @@ public class BaseBuddySelectionComposite extends BuddyDisplayComposite {
             allElements, checkedElements, elementsToCheck);
 
         /*
-         * Update the check state in the RosterCheckStateProvider and fire
-         * events.
+         * Update the check state in the RosterCheckStateProvider
          */
         for (RosterEntryElement rosterEntryElement : checkStatesChanges
             .keySet()) {
             boolean checked = checkStatesChanges.get(rosterEntryElement);
             this.checkStateProvider.setChecked(rosterEntryElement, checked);
-            this.notifyBuddySelectionChanged(
-                (JID) rosterEntryElement.getAdapter(JID.class), checked);
         }
 
         /*
          * Refresh the viewer in order to reflect the new check states.
          */
         treeViewer.refresh();
-    }
 
-    /**
-     * Gathers the checked states of the given widget and its descendants,
-     * following a pre-order traversal of the {@link ITreeContentProvider}.
-     * 
-     * @param checkboxTreeViewer
-     *            to be traversed
-     * @return
-     */
-    protected static List<RosterEntryElement> collectAllRosterEntryElement(
-        CheckboxTreeViewer checkboxTreeViewer) {
-        ITreeContentProvider treeContentProvider = (ITreeContentProvider) checkboxTreeViewer
-            .getContentProvider();
-
-        List<Object> collectedObjects = new ArrayList<Object>();
-
-        Object[] objects = treeContentProvider.getElements(checkboxTreeViewer
-            .getInput());
-        for (Object object : objects) {
-            collectedObjects.add(object);
-            collectAllRosterEntryElement(collectedObjects, checkboxTreeViewer,
-                object);
-        }
-
-        return ArrayUtils.getInstances(collectedObjects.toArray(),
-            RosterEntryElement.class);
-    }
-
-    /**
-     * Gathers the checked states of the given widget and its descendants,
-     * following a pre-order traversal of the {@link ITreeContentProvider}.
-     * 
-     * @param collectedObjects
-     *            a writable list of elements (element type: <code>Object</code>
-     *            )
-     * @param checkboxTreeViewer
-     *            to be traversed
-     * @param parentElement
-     *            of which to determine the child nodes
-     */
-    protected static void collectAllRosterEntryElement(
-        List<Object> collectedObjects, CheckboxTreeViewer checkboxTreeViewer,
-        Object parentElement) {
-        ITreeContentProvider treeContentProvider = (ITreeContentProvider) checkboxTreeViewer
-            .getContentProvider();
-        Object[] objects = treeContentProvider.getChildren(parentElement);
-        for (Object object : objects) {
-            collectedObjects.add(object);
-            collectAllRosterEntryElement(collectedObjects, checkboxTreeViewer,
-                object);
+        /*
+         * Fire events
+         */
+        for (RosterEntryElement rosterEntryElement : checkStatesChanges
+            .keySet()) {
+            boolean checked = checkStatesChanges.get(rosterEntryElement);
+            this.notifyBuddySelectionChanged(
+                (JID) rosterEntryElement.getAdapter(JID.class), checked);
         }
     }
 

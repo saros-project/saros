@@ -37,22 +37,20 @@ import org.apache.log4j.PropertyConfigurator;
 import org.apache.log4j.helpers.LogLog;
 import org.eclipse.core.net.proxy.IProxyData;
 import org.eclipse.core.net.proxy.IProxyService;
-import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.preferences.ConfigurationScope;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.wizard.IWizard;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
-import org.jivesoftware.smack.AccountManager;
 import org.jivesoftware.smack.Connection;
 import org.jivesoftware.smack.ConnectionConfiguration;
 import org.jivesoftware.smack.ConnectionCreationListener;
 import org.jivesoftware.smack.ConnectionListener;
 import org.jivesoftware.smack.Roster;
+import org.jivesoftware.smack.Roster.SubscriptionMode;
 import org.jivesoftware.smack.SmackConfiguration;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
-import org.jivesoftware.smack.Roster.SubscriptionMode;
-import org.jivesoftware.smack.packet.Registration;
 import org.jivesoftware.smack.proxy.ProxyInfo;
 import org.jivesoftware.smackx.ServiceDiscoveryManager;
 import org.jivesoftware.smackx.jingle.JingleManager;
@@ -66,6 +64,8 @@ import org.picocontainer.PicoContainer;
 import org.picocontainer.annotations.Inject;
 import org.picocontainer.injectors.Reinjector;
 
+import de.fu_berlin.inf.dpp.accountManagement.XMPPAccount;
+import de.fu_berlin.inf.dpp.accountManagement.XMPPAccountStore;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.feedback.ErrorLogManager;
@@ -73,10 +73,11 @@ import de.fu_berlin.inf.dpp.feedback.StatisticManager;
 import de.fu_berlin.inf.dpp.net.ConnectionState;
 import de.fu_berlin.inf.dpp.net.IConnectionListener;
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.net.XMPPUtil;
 import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
 import de.fu_berlin.inf.dpp.project.SarosSessionManager;
+import de.fu_berlin.inf.dpp.ui.util.WizardUtils;
+import de.fu_berlin.inf.dpp.ui.wizards.ConfigurationWizard;
 import de.fu_berlin.inf.dpp.util.StackTrace;
 import de.fu_berlin.inf.dpp.util.Utils;
 import de.fu_berlin.inf.dpp.util.pico.DotGraphMonitor;
@@ -187,8 +188,8 @@ public class Saros extends AbstractUIPlugin {
         setInitialized(false);
         setDefault(this);
 
-        sarosContext = SarosContext.getContextForSaros(this).withDotMonitor(
-            dotMonitor).build();
+        sarosContext = SarosContext.getContextForSaros(this)
+            .withDotMonitor(dotMonitor).build();
 
         SarosPluginContext.setSarosContext(sarosContext);
     }
@@ -466,6 +467,8 @@ public class Saros extends AbstractUIPlugin {
     StatisticManager statisticManager;
     @Inject
     ErrorLogManager errorLogManager;
+    @Inject
+    XMPPAccountStore xmppAccountStore;
 
     /**
      * Connects using the credentials from the preferences. If no credentials
@@ -477,49 +480,32 @@ public class Saros extends AbstractUIPlugin {
      * @blocking
      */
     public void connect(boolean failSilently) {
-        // check if we need to do a reinject
+        // check if we need to do a re-inject
         if (preferenceUtils == null || statisticManager == null
             || errorLogManager == null)
             sarosContext.reinject(this);
 
         /*
-         * see if we have a user name and an agreement to submitting user
-         * statistics and the error log, if not, show wizard before connecting
+         * Check if we have a user name; if not show wizard before connecting
          */
-        boolean hasUsername = preferenceUtils.hasUserName();
-        boolean hasAgreement = statisticManager.hasStatisticAgreement()
-            && errorLogManager.hasErrorLogAgreement();
-
-        if (!hasUsername || !hasAgreement) {
-            boolean ok = Utils.showConfigurationWizard(!hasUsername,
-                !hasAgreement);
-            if (!ok)
+        if (!preferenceUtils.hasUserName() || !preferenceUtils.hasServer()) {
+            if (!configureXMPPAccount())
                 return;
         }
 
-        IPreferenceStore prefStore = getPreferenceStore();
-
-        String server = prefStore.getString(PreferenceConstants.SERVER);
-        String username = prefStore.getString(PreferenceConstants.USERNAME);
+        String username = preferenceUtils.getUserName();
+        String password = preferenceUtils.getPassword();
 
         try {
+            ConnectionConfiguration connectionConfiguration = this
+                .getConnectionConfiguration();
+
             if (isConnected()) {
                 disconnect();
             }
 
-            /**
-             * Infinite connecting state: when providing an empty server address
-             * and connecting via Roster view.
-             */
-
-            while (prefStore.getString(PreferenceConstants.SERVER).equals("")) {
-                boolean ok = Utils.showConfigurationWizard(true, false);
-                if (!ok)
-                    return;
-            }
-
-            setConnectionState(ConnectionState.CONNECTING, null);
-            this.connection = new XMPPConnection(getConnectionConfiguration());
+            this.setConnectionState(ConnectionState.CONNECTING, null);
+            this.connection = new XMPPConnection(connectionConfiguration);
             this.connection.connect();
 
             // add connection listener so we get notified if it will be closed
@@ -531,7 +517,6 @@ public class Saros extends AbstractUIPlugin {
 
             Roster.setDefaultSubscriptionMode(Roster.SubscriptionMode.manual);
 
-            String password = prefStore.getString(PreferenceConstants.PASSWORD);
             /*
              * TODO SS Possible race condition, as our packet listeners are
              * registered only after the login (in CONNECTED Connection State),
@@ -562,36 +547,39 @@ public class Saros extends AbstractUIPlugin {
             setConnectionState(ConnectionState.ERROR, cause);
 
             if (cause instanceof SaslException) {
-                Utils.popUpFailureMessage("Error Connecting via SASL", cause
-                    .getMessage(), failSilently);
+                Utils.popUpFailureMessage("Error Connecting via SASL",
+                    cause.getMessage(), failSilently);
             } else {
                 String question;
                 if (cause instanceof UnknownHostException) {
                     log.info("Unknown host: " + cause);
 
-                    question = "Error Connecting to XMPP/Jabber server: '"
-                        + server + "'.\n\nDo you want to use other parameters?";
+                    question = "The XMPP/Jabber server '"
+                        + this.connection.getHost()
+                        + "' could not be found.\n\n"
+                        + "Do you want edit your XMPP/Jabber account?";
                 } else {
                     log.info("xmpp: " + cause.getMessage(), cause);
 
-                    question = "Could not connect to server '" + server
-                        + "' as user '" + username
-                        + "'. Do You want to use other parameters?";
+                    question = "Could not connect to XMPP/Jabber server.\n"
+                        + "Server: " + this.connection.getHost() + "\n"
+                        + "User: " + username + "\n\n"
+                        + "Do you want edit your XMPP/Jabber account?";
                 }
-                boolean showConfigurationWizard = Utils.popUpYesNoQuestion(
-                    "Error Connecting", question, failSilently);
-                if (showConfigurationWizard) {
-                    if (Utils.showConfigurationWizard(true, false))
+                if (Utils.popUpYesNoQuestion("Connecting Error", question,
+                    failSilently)) {
+                    if (configureXMPPAccount())
                         connect(failSilently);
                 }
             }
         } catch (Exception e) {
             log.warn("Unhandled exception:", e);
             setConnectionState(ConnectionState.ERROR, e);
-            Utils.popUpFailureMessage("Error Connecting",
-                "Could not connect to server '" + server + "' as user '"
-                    + username + "'.\nErrorMessage was:\n" + e.getMessage(),
-                failSilently);
+            Utils.popUpFailureMessage(
+                "Error Connecting",
+                "Could not connect to server '" + connection.getHost()
+                    + "' as user '" + username + "'.\nErrorMessage was:\n"
+                    + e.getMessage(), failSilently);
         }
     }
 
@@ -623,8 +611,8 @@ public class Saros extends AbstractUIPlugin {
 
         String server = uri.getHost();
         if (server == null) {
-            throw new URISyntaxException(prefStore
-                .getString(PreferenceConstants.SERVER),
+            throw new URISyntaxException(
+                prefStore.getString(PreferenceConstants.SERVER),
                 "The XMPP/Jabber server address is invalid: " + serverString);
         }
 
@@ -632,13 +620,13 @@ public class Saros extends AbstractUIPlugin {
         ConnectionConfiguration conConfig = null;
 
         if (uri.getPort() < 0) {
-            conConfig = proxyInfo == null ? new ConnectionConfiguration(uri
-                .getHost()) : new ConnectionConfiguration(uri.getHost(),
+            conConfig = proxyInfo == null ? new ConnectionConfiguration(
+                uri.getHost()) : new ConnectionConfiguration(uri.getHost(),
                 proxyInfo);
         } else {
-            conConfig = proxyInfo == null ? new ConnectionConfiguration(uri
-                .getHost(), uri.getPort()) : new ConnectionConfiguration(uri
-                .getHost(), uri.getPort(), proxyInfo);
+            conConfig = proxyInfo == null ? new ConnectionConfiguration(
+                uri.getHost(), uri.getPort()) : new ConnectionConfiguration(
+                uri.getHost(), uri.getPort(), proxyInfo);
         }
 
         /*
@@ -693,11 +681,11 @@ public class Saros extends AbstractUIPlugin {
 
         for (IProxyData pd : ips.getProxyDataForHost(host)) {
             if (IProxyData.HTTP_PROXY_TYPE.equals(pd.getType())) {
-                return ProxyInfo.forHttpProxy(pd.getHost(), pd.getPort(), pd
-                    .getUserId(), pd.getPassword());
+                return ProxyInfo.forHttpProxy(pd.getHost(), pd.getPort(),
+                    pd.getUserId(), pd.getPassword());
             } else if (IProxyData.SOCKS_PROXY_TYPE.equals(pd.getType())) {
-                return ProxyInfo.forSocks5Proxy(pd.getHost(), pd.getPort(), pd
-                    .getUserId(), pd.getPassword());
+                return ProxyInfo.forSocks5Proxy(pd.getHost(), pd.getPort(),
+                    pd.getUserId(), pd.getPassword());
             }
         }
 
@@ -746,71 +734,6 @@ public class Saros extends AbstractUIPlugin {
         }
     }
 
-    /**
-     * Creates the given account on the given XMPP server.
-     * 
-     * @blocking
-     * 
-     * @param server
-     *            the server on which to create the account.
-     * @param username
-     *            the username for the new account.
-     * @param password
-     *            the password for the new account.
-     * @param monitor
-     *            the progressmonitor for the operation.
-     * @throws XMPPException
-     *             exception that occurs while registering.
-     */
-    public void createAccount(String server, String username, String password,
-        IProgressMonitor monitor) throws XMPPException {
-
-        monitor.beginTask("Registering account", 3);
-
-        try {
-            XMPPConnection connection = new XMPPConnection(server);
-            monitor.worked(1);
-
-            connection.connect();
-            monitor.worked(1);
-
-            Registration registration = null;
-            try {
-                registration = XMPPUtil.getRegistrationInfo(username,
-                    connection);
-            } catch (XMPPException e) {
-                log.error("Server " + server + " does not support XEP-0077"
-                    + " (In-Band Registration) properly:", e);
-            }
-            if (registration != null) {
-                if (registration.getAttributes().containsKey("registered")) {
-                    throw new XMPPException("Account " + username
-                        + " already exists on server");
-                }
-                if (!registration.getAttributes().containsKey("username")) {
-                    String instructions = registration.getInstructions();
-                    if (instructions != null) {
-                        throw new XMPPException(
-                            "Registration via Saros not possible. Please follow these instructions:\n"
-                                + instructions);
-                    } else {
-                        throw new XMPPException(
-                            "Registration via Saros not supported by Server. Please see the server web site for informations for how to create an account");
-                    }
-                }
-            }
-            monitor.worked(1);
-
-            AccountManager manager = connection.getAccountManager();
-            manager.createAccount(username, password);
-            monitor.worked(1);
-
-            connection.disconnect();
-        } finally {
-            monitor.done();
-        }
-    }
-
     public boolean isConnected() {
         return this.connectionState == ConnectionState.CONNECTED;
     }
@@ -837,6 +760,25 @@ public class Saros extends AbstractUIPlugin {
      */
     public XMPPConnection getConnection() {
         return this.connection;
+    }
+
+    /**
+     * Opens the appropriate {@link IWizard} to configure the active
+     * {@link XMPPAccount}.<br/>
+     * If no active {@link XMPPAccount} exists the {@link ConfigurationWizard}
+     * is used instead.
+     * 
+     * @return
+     */
+    public boolean configureXMPPAccount() {
+        if (xmppAccountStore == null)
+            SarosPluginContext.initComponent(this);
+        XMPPAccount xmppAccount = xmppAccountStore.getActiveAccount();
+        if (xmppAccount == null) {
+            return (WizardUtils.openSarosConfigurationWizard() != null);
+        } else {
+            return (WizardUtils.openEditXMPPAccountWizard(xmppAccount) != null);
+        }
     }
 
     public void addListener(IConnectionListener listener) {
@@ -916,13 +858,12 @@ public class Saros extends AbstractUIPlugin {
 
                 Utils.runSafeSWTSync(log, new Runnable() {
                     public void run() {
-                        MessageDialog
-                            .openError(
-                                EditorAPI.getShell(),
-                                "Connection error",
-                                "You have been disconnected from XMPP/Jabber, because of a resource conflict.\n"
-                                    + "This indicates that you might have logged on again using the same XMPP/Jabber account"
-                                    + " and XMPP resource, for instance using Saros or an other instant messaging client.");
+                        MessageDialog.openError(
+                            EditorAPI.getShell(),
+                            "Connection error",
+                            "You have been disconnected from XMPP/Jabber, because of a resource conflict.\n"
+                                + "This indicates that you might have logged on again using the same XMPP/Jabber account"
+                                + " and XMPP resource, for instance using Saros or an other instant messaging client.");
                     }
                 });
                 return;
@@ -967,8 +908,7 @@ public class Saros extends AbstractUIPlugin {
                             Thread.currentThread().interrupt();
                             return;
                         } catch (UnknownHostException e) {
-                            log
-                                .info("Could not get localhost, maybe the network interface is down.");
+                            log.info("Could not get localhost, maybe the network interface is down.");
                         }
                     }
 

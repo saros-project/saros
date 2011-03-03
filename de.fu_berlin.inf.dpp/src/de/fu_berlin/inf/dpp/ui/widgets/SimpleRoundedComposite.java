@@ -17,6 +17,8 @@ import de.fu_berlin.inf.dpp.util.FontUtils;
  * Instead of manually adding {@link Label}s to the {@link Composite} and
  * manually laying them out, a single call to <code>setTexts</code> is
  * sufficient.
+ * <p>
+ * <img src="doc-files/SimpleRoundedComposite-1.png"/>
  * 
  * @see RoundedComposite
  * @see Composite

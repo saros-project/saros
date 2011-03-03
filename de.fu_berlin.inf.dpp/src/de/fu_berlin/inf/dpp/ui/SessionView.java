@@ -105,15 +105,6 @@ public class SessionView extends ListExplanatoryViewPart {
     private static final Logger log = Logger.getLogger(SessionView.class
         .getName());
 
-    public static final Image awayImage = ImageManager
-        .getImage("icons/elcl16/away.png");
-    public static final Image userImage = ImageManager
-        .getImage("icons/obj16/user.png");
-    public static final Image participantImage = ImageManager
-        .getImage("icons/obj16/participant.png");
-    public static final Image participantReadOnlyImage = ImageManager
-        .getImage("icons/obj16/participant_readonly.png");
-
     protected IRosterListener rosterListener;
 
     protected ListExplanation howTo = new ListExplanation(
@@ -327,16 +318,26 @@ public class SessionView extends ListExplanatoryViewPart {
         @Override
         public Image getImage(Object obj) {
             User user = (User) obj;
-            if (user.isAway()) {
-                return awayImage;
-            } else {
-                if (user.hasWriteAccess())
-                    return participantImage;
-                else if (user.hasReadOnlyAccess())
-                    return participantReadOnlyImage;
-            }
 
-            return userImage;
+            boolean following = false; // FIXME
+            boolean readOnly = user.hasReadOnlyAccess();
+            boolean away = user.isAway();
+
+            if (following && readOnly && away) {
+                return ImageManager.ICON_BUDDY_SAROS_FOLLOWMODE_READONLY_AWAY;
+            } else if (following && readOnly) {
+                return ImageManager.ICON_BUDDY_SAROS_FOLLOWMODE_READONLY;
+            } else if (following && away) {
+                return ImageManager.ICON_BUDDY_SAROS_FOLLOWMODE_AWAY;
+            } else if (readOnly && away) {
+                return ImageManager.ICON_BUDDY_SAROS_READONLY_AWAY;
+            } else if (readOnly) {
+                return ImageManager.ICON_BUDDY_SAROS_READONLY;
+            } else if (away) {
+                return ImageManager.ICON_BUDDY_SAROS_AWAY;
+            } else {
+                return ImageManager.ICON_BUDDY_SAROS;
+            }
         }
 
         public Image getColumnImage(Object obj, int index) {

@@ -16,6 +16,8 @@ import de.fu_berlin.inf.dpp.util.ColorUtils;
  * <p>
  * The composite's content is surrounded by a rounded rectangle if a background
  * is set.
+ * <p>
+ * <img src="doc-files/RoundedComposite-1.png"/>
  * 
  * <dl>
  * <dt><b>Styles:</b></dt>

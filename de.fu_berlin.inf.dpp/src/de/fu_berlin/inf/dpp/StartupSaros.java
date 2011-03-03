@@ -3,8 +3,6 @@ package de.fu_berlin.inf.dpp;
 import java.rmi.RemoteException;
 
 import org.apache.log4j.Logger;
-import org.eclipse.jface.wizard.Wizard;
-import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.ui.IStartup;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.intro.IIntroManager;
@@ -14,7 +12,6 @@ import org.picocontainer.annotations.Inject;
 import de.fu_berlin.inf.dpp.accountManagement.XMPPAccountStore;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
-import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.feedback.ErrorLogManager;
 import de.fu_berlin.inf.dpp.feedback.FeedbackManager;
 import de.fu_berlin.inf.dpp.feedback.StatisticManager;
@@ -24,7 +21,7 @@ import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
 import de.fu_berlin.inf.dpp.project.SarosSessionManager;
 import de.fu_berlin.inf.dpp.stf.server.STFController;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
-import de.fu_berlin.inf.dpp.ui.wizards.ConfigurationWizard;
+import de.fu_berlin.inf.dpp.ui.util.WizardUtils;
 import de.fu_berlin.inf.dpp.util.Utils;
 
 /**
@@ -110,7 +107,7 @@ public class StartupSaros implements IStartup {
         saros.saveConfigPrefs();
 
         showRoster();
-        showConfigurationWizard();
+        WizardUtils.openSarosConfigurationWizard();
     }
 
     protected void startRmiBot(final int port, final int time) {
@@ -143,26 +140,6 @@ public class StartupSaros implements IStartup {
                 if (i != null)
                     return;
                 sarosUI.activateRosterView();
-            }
-        });
-    }
-
-    protected void showConfigurationWizard() {
-        Utils.runSafeSWTSync(log, new Runnable() {
-            public void run() {
-                // determine which pages have to be shown
-                boolean hasUsername = preferenceUtils.hasUserName();
-                boolean hasAgreement = statisticManager.hasStatisticAgreement()
-                    && errorLogManager.hasErrorLogAgreement();
-
-                if (!hasUsername || !hasAgreement) {
-                    Wizard wiz = new ConfigurationWizard(!hasUsername,
-                        !hasAgreement, false);
-                    WizardDialog dialog = new WizardDialog(
-                        EditorAPI.getShell(), wiz);
-                    dialog.setHelpAvailable(false);
-                    dialog.open();
-                }
             }
         });
     }

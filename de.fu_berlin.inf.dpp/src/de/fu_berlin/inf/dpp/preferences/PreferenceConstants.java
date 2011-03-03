@@ -226,4 +226,9 @@ public class PreferenceConstants {
     public static final String SCREEN_MOUSE_AREA_HEIGHT = "vs.source.screen.mouse_area_height";
     public static final String SCREEN_SHOW_MOUSEPOINTER = "vs.source.screen.show_mouse_pointer";
 
+    /*
+     * Wizard options that need to be permanently saved
+     */
+    public static final String PROJECTSELECTION_FILTERCLOSEDPROJECTS = "projectselection.filterClosedProjects";
+    public static final String BUDDYSELECTION_FILTERNONSAROSBUDDIES = "projectselection.filterNonSarosBuddies";
 }

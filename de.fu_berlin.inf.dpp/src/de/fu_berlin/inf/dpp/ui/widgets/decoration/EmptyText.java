@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.ui.widgets.enhancer;
+package de.fu_berlin.inf.dpp.ui.widgets.decoration;
 
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
@@ -9,16 +9,17 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Text;
 
 import de.fu_berlin.inf.dpp.util.ColorUtils;
+import de.fu_berlin.inf.dpp.util.Utils;
 
 /**
  * Class which displays a default text if the user has not entered own input.
  */
 public class EmptyText {
     protected Text control;
-    protected String defaultText;
+    protected String emptyText;
 
     protected Color foregroundColor;
-    protected Color defaultTextForegroundColor;
+    protected Color emptyTextForegroundColor;
 
     /**
      * Construct an {@link EmptyText} field on the specified control, whose
@@ -32,10 +33,10 @@ public class EmptyText {
      */
     public EmptyText(Text control, String defaultText) {
         this.control = control;
-        this.defaultText = defaultText;
+        this.emptyText = defaultText;
 
         this.foregroundColor = this.control.getForeground();
-        this.defaultTextForegroundColor = ColorUtils.addLightness(
+        this.emptyTextForegroundColor = ColorUtils.addLightness(
             this.foregroundColor, 0.55f);
 
         update();
@@ -55,9 +56,9 @@ public class EmptyText {
 
         this.control.addDisposeListener(new DisposeListener() {
             public void widgetDisposed(DisposeEvent e) {
-                if (defaultTextForegroundColor != null
-                    && !defaultTextForegroundColor.isDisposed()) {
-                    defaultTextForegroundColor.dispose();
+                if (emptyTextForegroundColor != null
+                    && !emptyTextForegroundColor.isDisposed()) {
+                    emptyTextForegroundColor.dispose();
                 }
             }
         });
@@ -77,7 +78,7 @@ public class EmptyText {
      */
     protected void update(boolean hasFocus) {
         if (hasFocus) {
-            if (this.control.getText().equals(this.defaultText)) {
+            if (this.control.getText().equals(this.emptyText)) {
                 this.control.setText("");
             } else {
                 this.control.selectAll();
@@ -85,8 +86,18 @@ public class EmptyText {
             this.control.setForeground(foregroundColor);
         } else {
             if (this.control.getText().trim().isEmpty()) {
-                this.control.setText(this.defaultText);
-                this.control.setForeground(defaultTextForegroundColor);
+                /*
+                 * Modifying the control's test while the focus out occurs does
+                 * not seem to work. We therefore defer the text change.
+                 */
+                Utils.runSafeSWTAsync(null, new Runnable() {
+                    public void run() {
+                        control.setText(emptyText);
+                        control.setForeground(emptyTextForegroundColor);
+                    }
+                });
+            } else {
+                this.control.setForeground(foregroundColor);
             }
         }
     }
@@ -104,16 +115,20 @@ public class EmptyText {
      * @see Text#getText()
      */
     public String getText() {
-        return (this.control.getText().equals(this.defaultText)) ? ""
+        return (this.control.getText().equals(this.emptyText)) ? ""
             : this.control.getText();
     }
 
     /**
      * @see Text#setText(String)
      */
-    public void setText(String string) {
-        this.control.setText(string);
-        update();
+    public void setText(final String string) {
+        Utils.runSafeSWTAsync(null, new Runnable() {
+            public void run() {
+                control.setText(string);
+                update();
+            }
+        });
     }
 
     /**
@@ -126,7 +141,7 @@ public class EmptyText {
     /**
      * @see Text#setFocus()
      */
-    public void setFocus() {
-        this.control.setFocus();
+    public boolean setFocus() {
+        return this.control.setFocus();
     }
 }

@@ -19,8 +19,9 @@
  */
 package de.fu_berlin.inf.dpp.ui.actions;
 
-import org.apache.log4j.Logger;
 import org.eclipse.jface.action.Action;
+import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.swt.graphics.ImageData;
 import org.jivesoftware.smack.XMPPConnection;
 
 import de.fu_berlin.inf.dpp.Saros;
@@ -28,19 +29,19 @@ import de.fu_berlin.inf.dpp.net.ConnectionState;
 import de.fu_berlin.inf.dpp.net.IConnectionListener;
 import de.fu_berlin.inf.dpp.ui.ImageManager;
 import de.fu_berlin.inf.dpp.ui.util.WizardUtils;
-import de.fu_berlin.inf.dpp.util.Utils;
 
 public class NewContactAction extends Action {
-
-    private static final Logger log = Logger.getLogger(NewContactAction.class
-        .getName());
 
     protected Saros saros;
 
     public NewContactAction(Saros saros) {
         setToolTipText("Add a New Buddy");
-        setImageDescriptor(ImageManager
-            .getImageDescriptor("/icons/elcl16/buddy_add_tsk.png"));
+        setImageDescriptor(new ImageDescriptor() {
+            @Override
+            public ImageData getImageData() {
+                return ImageManager.ELCL_BUDDY_ADD.getImageData();
+            }
+        });
 
         this.saros = saros;
 
@@ -53,19 +54,8 @@ public class NewContactAction extends Action {
         updateEnablement();
     }
 
-    /**
-     * @review runSafe OK
-     */
     @Override
     public void run() {
-        Utils.runSafeSync(log, new Runnable() {
-            public void run() {
-                runNewContact();
-            }
-        });
-    }
-
-    public void runNewContact() {
         WizardUtils.openAddBuddyWizard();
     }
 

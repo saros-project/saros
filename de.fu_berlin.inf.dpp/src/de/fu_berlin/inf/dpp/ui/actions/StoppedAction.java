@@ -2,11 +2,12 @@ package de.fu_berlin.inf.dpp.ui.actions;
 
 import org.apache.log4j.Logger;
 import org.eclipse.jface.action.Action;
-import org.eclipse.ui.ISharedImages;
-import org.eclipse.ui.PlatformUI;
+import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.swt.graphics.ImageData;
 
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.synchronize.StopManager;
+import de.fu_berlin.inf.dpp.ui.ImageManager;
 import de.fu_berlin.inf.dpp.util.ObservableValue;
 import de.fu_berlin.inf.dpp.util.ValueChangeListener;
 
@@ -27,9 +28,14 @@ public class StoppedAction extends Action {
     protected ObservableValue<Boolean> isBlockedObservable;
 
     public StoppedAction(StopManager stopManager) {
-        // TODO A small stop traffic sign would look better. IMHO.
-        setImageDescriptor(PlatformUI.getWorkbench().getSharedImages()
-            .getImageDescriptor(ISharedImages.IMG_ELCL_STOP));
+        setText("Stop Running Process");
+        setImageDescriptor(new ImageDescriptor() {
+            @Override
+            public ImageData getImageData() {
+                return ImageManager.ELCL_SAROS_SESSION_STOP_PROCESS
+                    .getImageData();
+            }
+        });
         this.stopManager = stopManager;
         this.isBlockedObservable = stopManager.getBlockedObservable();
 

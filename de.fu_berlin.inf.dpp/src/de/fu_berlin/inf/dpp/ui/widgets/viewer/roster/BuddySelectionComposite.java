@@ -1,5 +1,7 @@
 package de.fu_berlin.inf.dpp.ui.widgets.viewer.roster;
 
+import java.util.List;
+
 import org.eclipse.jface.viewers.StructuredViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerFilter;
@@ -12,13 +14,16 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 
+import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.ui.model.roster.RosterEntryElement;
 import de.fu_berlin.inf.dpp.ui.model.roster.RosterGroupElement;
 import de.fu_berlin.inf.dpp.ui.util.LayoutUtils;
 import de.fu_berlin.inf.dpp.ui.util.ViewerUtils;
+import de.fu_berlin.inf.dpp.ui.util.WizardUtils;
 import de.fu_berlin.inf.dpp.ui.widgets.viewer.roster.events.BaseBuddySelectionListener;
 import de.fu_berlin.inf.dpp.ui.widgets.viewer.roster.events.BuddySelectionListener;
 import de.fu_berlin.inf.dpp.ui.widgets.viewer.roster.events.FilterNonSarosBuddiesChangedEvent;
+import de.fu_berlin.inf.dpp.ui.wizards.AddBuddyWizard;
 
 /**
  * This {@link Composite} extends {@link BaseBuddySelectionComposite} and
@@ -69,6 +74,7 @@ public class BuddySelectionComposite extends BaseBuddySelectionComposite {
                 RosterEntryElement rosterEntryElement = (RosterEntryElement) element;
                 return rosterEntryElement.isSarosSupported();
             }
+
             return false;
         }
     };
@@ -102,6 +108,23 @@ public class BuddySelectionComposite extends BaseBuddySelectionComposite {
                         .getSelection());
                 }
             });
+
+        Button addBuddyButton = new Button(controlComposite, SWT.PUSH);
+        addBuddyButton.setLayoutData(new GridData(SWT.END, SWT.CENTER, true,
+            false));
+        addBuddyButton.setText("Add Buddy...");
+        addBuddyButton.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                AddBuddyWizard addBuddyWizard = WizardUtils
+                    .openAddBuddyWizard();
+                if (addBuddyWizard != null) {
+                    List<JID> selectedBuddies = getSelectedBuddies();
+                    selectedBuddies.add(addBuddyWizard.getBuddy());
+                    setSelectedBuddies(selectedBuddies);
+                }
+            }
+        });
     }
 
     /**
