@@ -11,7 +11,7 @@ import org.eclipse.ui.actions.SelectionProviderAction;
 import org.jivesoftware.smack.RosterEntry;
 import org.picocontainer.annotations.Inject;
 
-import de.fu_berlin.inf.dpp.Saros;
+import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.SkypeManager;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.ui.ImageManager;
@@ -37,7 +37,7 @@ public class SkypeAction extends SelectionProviderAction {
     public SkypeAction(ISelectionProvider provider) {
         super(provider, "Skype Buddy");
 
-        Saros.injectDependenciesOnly(this);
+        SarosPluginContext.initComponent(this);
 
         setEnabled(false);
 

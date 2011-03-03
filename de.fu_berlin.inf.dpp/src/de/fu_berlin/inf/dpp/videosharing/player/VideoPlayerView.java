@@ -37,6 +37,7 @@ import java.io.ObjectOutputStream;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 
+import de.fu_berlin.inf.dpp.SarosPluginContext;
 import org.apache.log4j.Logger;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IToolBarManager;
@@ -135,7 +136,7 @@ public class VideoPlayerView extends ListExplanatoryViewPart implements
     protected Rectangle clientArea;
 
     public VideoPlayerView() {
-        Saros.injectDependenciesOnly(this);
+        SarosPluginContext.initComponent(this);
 
         preferences = saros.getPreferenceStore();
         updateResample();

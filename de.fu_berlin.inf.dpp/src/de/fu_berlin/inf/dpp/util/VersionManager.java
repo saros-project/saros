@@ -302,9 +302,6 @@ public class VersionManager {
             Arrays.asList(new Version("9.8.21.DEVEL")));
     }
 
-    /**
-     * @Inject
-     */
     protected Bundle bundle;
 
     /**
@@ -320,10 +317,10 @@ public class VersionManager {
     protected XStreamExtensionProvider<VersionInfo> versionProvider = new XStreamExtensionProvider<VersionInfo>(
         "sarosVersion", VersionInfo.class, Version.class, Compatibility.class);
 
-    public VersionManager(Bundle bundle, final Saros saros,
+    public VersionManager(final Saros saros,
         final XMPPReceiver receiver, XMPPTransmitter transmitter) {
 
-        this.bundle = bundle;
+        this.bundle = saros.getBundle();
         this.saros = saros;
         this.transmitter = transmitter;
 

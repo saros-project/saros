@@ -6,6 +6,7 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
+import de.fu_berlin.inf.dpp.SarosPluginContext;
 import org.apache.log4j.FileAppender;
 import org.apache.log4j.helpers.LogLog;
 import org.apache.log4j.spi.LoggingEvent;
@@ -82,7 +83,7 @@ public class JIDFileAppender extends FileAppender {
     }
 
     protected void initialize() {
-        Saros.injectDependenciesOnly(this);
+        SarosPluginContext.initComponent(this);
 
         saros.addListener(new IConnectionListener() {
 

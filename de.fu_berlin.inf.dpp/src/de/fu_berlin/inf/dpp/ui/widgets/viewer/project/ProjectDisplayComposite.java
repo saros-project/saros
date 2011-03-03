@@ -1,5 +1,6 @@
 package de.fu_berlin.inf.dpp.ui.widgets.viewer.project;
 
+import de.fu_berlin.inf.dpp.SarosPluginContext;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.jface.viewers.StructuredViewer;
@@ -39,7 +40,7 @@ public class ProjectDisplayComposite extends ViewerComposite {
     public ProjectDisplayComposite(Composite parent, int style) {
         super(parent, style);
 
-        Saros.injectDependenciesOnly(this);
+        SarosPluginContext.initComponent(this);
 
         super.setLayout(LayoutUtils.createGridLayout());
         this.viewer.getControl()

@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import de.fu_berlin.inf.dpp.SarosContext;
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -87,8 +88,8 @@ public class OutgoingSessionNegotiation extends InvitationProcess {
         int colorID, InvitationProcessObservable invitationProcesses,
         ISarosSession sarosSession, String description,
         VersionManager versionManager, DiscoveryManager discoveryManager,
-        MUCSessionPreferencesNegotiatingManager comNegotiatingManager) {
-        super(transmitter, peer, description, colorID, invitationProcesses);
+        MUCSessionPreferencesNegotiatingManager comNegotiatingManager, SarosContext sarosContext) {
+        super(transmitter, peer, description, colorID, invitationProcesses, sarosContext);
 
         this.sarosSession = sarosSession;
         this.versionManager = versionManager;

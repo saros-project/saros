@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import de.fu_berlin.inf.dpp.SarosPluginContext;
 import org.apache.commons.lang.ObjectUtils;
 import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IFile;
@@ -200,7 +201,7 @@ public class SharedProjectFileDecorator implements ILightweightLabelDecorator {
 
     public SharedProjectFileDecorator() {
 
-        Saros.injectDependenciesOnly(this);
+        SarosPluginContext.initComponent(this);
 
         this.decoratedElements = new HashSet<Object>();
 

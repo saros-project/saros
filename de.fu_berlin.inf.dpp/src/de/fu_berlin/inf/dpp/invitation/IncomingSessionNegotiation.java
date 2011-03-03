@@ -3,6 +3,7 @@ package de.fu_berlin.inf.dpp.invitation;
 import java.io.IOException;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import de.fu_berlin.inf.dpp.SarosContext;
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.SubMonitor;
 import org.joda.time.DateTime;
@@ -57,8 +58,8 @@ public class IncomingSessionNegotiation extends InvitationProcess {
         InvitationProcessObservable invitationProcesses,
         VersionManager versionManager, VersionInfo remoteVersionInfo,
         DateTime sessionStart, SarosUI sarosUI, String invitationID,
-        Saros saros, String description) {
-        super(transmitter, from, description, colorID, invitationProcesses);
+        Saros saros, String description, SarosContext sarosContext) {
+        super(transmitter, from, description, colorID, invitationProcesses, sarosContext);
 
         this.versionInfo = determineVersion(remoteVersionInfo);
         this.sessionStart = sessionStart;

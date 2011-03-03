@@ -22,7 +22,7 @@ package de.fu_berlin.inf.dpp.invitation;
 import org.apache.log4j.Logger;
 import org.picocontainer.annotations.Inject;
 
-import de.fu_berlin.inf.dpp.Saros;
+import de.fu_berlin.inf.dpp.SarosContext;
 import de.fu_berlin.inf.dpp.exceptions.StreamException;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.JID;
@@ -73,7 +73,8 @@ public abstract class InvitationProcess {
 
     public InvitationProcess(ITransmitter transmitter, JID peer,
         String description, int colorID,
-        InvitationProcessObservable invitationProcesses) {
+        InvitationProcessObservable invitationProcesses,
+        SarosContext sarosContext) {
         this.transmitter = transmitter;
         this.peer = peer;
         this.description = description;
@@ -81,7 +82,7 @@ public abstract class InvitationProcess {
         this.invitationProcesses = invitationProcesses;
         this.invitationProcesses.addInvitationProcess(this);
 
-        Saros.injectDependenciesOnly(this);
+        sarosContext.initComponent(this);
     }
 
     /**

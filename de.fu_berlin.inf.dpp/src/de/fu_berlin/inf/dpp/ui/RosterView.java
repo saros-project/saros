@@ -25,6 +25,7 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
+import de.fu_berlin.inf.dpp.SarosPluginContext;
 import org.apache.log4j.Logger;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
@@ -639,7 +640,7 @@ public class RosterView extends ViewPart {
         super();
 
         // Make sure that we get all dependencies injected
-        Saros.injectDependenciesOnly(this);
+        SarosPluginContext.initComponent(this);
 
         dataTransferManager.getTransferModeDispatch().add(transferModeListener);
     }

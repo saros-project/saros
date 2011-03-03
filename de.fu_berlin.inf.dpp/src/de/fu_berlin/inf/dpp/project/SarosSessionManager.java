@@ -28,6 +28,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
+import de.fu_berlin.inf.dpp.SarosContext;
 import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
@@ -136,6 +137,9 @@ public class SarosSessionManager implements IConnectionListener,
     @Inject
     protected ProjectNegotiationObservable projectExchangeProcesses;
 
+    @Inject
+    protected SarosContext sarosContext;
+
     private final List<ISarosSessionListener> sarosSessionListeners = new CopyOnWriteArrayList<ISarosSessionListener>();
 
     protected Saros saros;
@@ -168,7 +172,7 @@ public class SarosSessionManager implements IConnectionListener,
         this.partialProjectResources = partialProjectResources;
 
         SarosSession sarosSession = new SarosSession(this.transmitter,
-            dispatchThreadContext, new DateTime());
+            dispatchThreadContext, new DateTime(), sarosContext);
 
         this.sarosSessionObservable.setValue(sarosSession);
 
@@ -193,7 +197,7 @@ public class SarosSessionManager implements IConnectionListener,
         DateTime sessionStart) {
 
         SarosSession sarosSession = new SarosSession(transmitter,
-            dispatchThreadContext, host, colorID, sessionStart);
+            dispatchThreadContext, host, colorID, sessionStart, sarosContext);
 
         this.sarosSessionObservable.setValue(sarosSession);
 
@@ -272,7 +276,7 @@ public class SarosSessionManager implements IConnectionListener,
         final IncomingSessionNegotiation process = new IncomingSessionNegotiation(
             this, transmitter, from, colorID, invitationProcesses,
             versionManager, versionInfo, sessionStart, sarosUI, invitationID,
-            saros, description);
+            saros, description, sarosContext);
         comNegotiatingManager.setSessionPreferences(comPrefs);
 
         Utils.runSafeSWTAsync(log, new Runnable() {
@@ -303,7 +307,7 @@ public class SarosSessionManager implements IConnectionListener,
         boolean doStream) {
         final IncomingProjectNegotiation process = new IncomingProjectNegotiation(
             transmitter, from, projectExchangeProcesses, processID,
-            projectInfos, doStream);
+            projectInfos, doStream, sarosContext);
 
         Utils.runSafeSWTAsync(log, new Runnable() {
 
@@ -380,7 +384,7 @@ public class SarosSessionManager implements IConnectionListener,
         OutgoingSessionNegotiation result = new OutgoingSessionNegotiation(
             (transmitter), toInvite, sarosSession.getFreeColor(),
             invitationProcesses, sarosSession, description, versionManager,
-            discoveryManager, comNegotiatingManager);
+            discoveryManager, comNegotiatingManager, sarosContext);
 
         OutgoingInvitationJob outgoingInvitationJob = new OutgoingInvitationJob(
             result);
@@ -521,7 +525,7 @@ public class SarosSessionManager implements IConnectionListener,
             OutgoingProjectNegotiation out = new OutgoingProjectNegotiation(
                 transmitter, user.getJID(), this.getSarosSession(),
                 projectsToAdd, projectExchangeProcesses, stopManager,
-                sessionID, doStream);
+                sessionID, doStream, sarosContext);
             OutgoingProjectJob job = new OutgoingProjectJob(out);
             job.schedule();
         }
@@ -544,7 +548,7 @@ public class SarosSessionManager implements IConnectionListener,
         if (!projectsToShare.isEmpty()) {
             OutgoingProjectNegotiation out = new OutgoingProjectNegotiation(
                 transmitter, user, this.getSarosSession(), projectsToShare,
-                projectExchangeProcesses, stopManager, sessionID, doStream);
+                projectExchangeProcesses, stopManager, sessionID, doStream, sarosContext);
             OutgoingProjectJob job = new OutgoingProjectJob(out);
             job.schedule();
         }

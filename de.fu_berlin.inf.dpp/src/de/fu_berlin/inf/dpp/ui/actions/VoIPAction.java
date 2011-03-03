@@ -12,7 +12,7 @@ import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.picocontainer.annotations.Inject;
 
-import de.fu_berlin.inf.dpp.Saros;
+import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.communication.audio.AudioServiceManager;
 import de.fu_berlin.inf.dpp.net.internal.StreamServiceManager;
@@ -21,10 +21,10 @@ import de.fu_berlin.inf.dpp.observables.VoIPSessionObservable;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.SarosSessionManager;
 import de.fu_berlin.inf.dpp.ui.ImageManager;
+import de.fu_berlin.inf.dpp.ui.SessionViewToolBar;
 import de.fu_berlin.inf.dpp.ui.SessionView.SessionViewTableViewer;
 import de.fu_berlin.inf.dpp.ui.dialogs.ErrorMessageDialog;
 import de.fu_berlin.inf.dpp.ui.dialogs.WarningMessageDialog;
-import de.fu_berlin.inf.dpp.ui.SessionViewToolBar;
 import de.fu_berlin.inf.dpp.util.ValueChangeListener;
 
 /**
@@ -64,7 +64,7 @@ public class VoIPAction extends Action {
 
     public VoIPAction(SessionViewTableViewer viewer) {
         super();
-        Saros.injectDependenciesOnly(this);
+        SarosPluginContext.initComponent(this);
         changeButton();
         setId(ACTION_ID);
         setEnabled(false);
@@ -125,8 +125,8 @@ public class VoIPAction extends Action {
                 protected IStatus run(IProgressMonitor monitor) {
                     log.info("Trying to invite " + selectedUser
                         + " to a new VoIP Session");
-                    return audioServiceManager.invite(selectedUser,
-                        SubMonitor.convert(monitor));
+                    return audioServiceManager.invite(selectedUser, SubMonitor
+                        .convert(monitor));
                 }
             };
             voipCreate.schedule();

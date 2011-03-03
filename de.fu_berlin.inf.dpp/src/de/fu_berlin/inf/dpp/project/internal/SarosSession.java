@@ -32,6 +32,7 @@ import java.util.concurrent.CancellationException;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.LinkedBlockingQueue;
 
+import de.fu_berlin.inf.dpp.SarosContext;
 import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.SubMonitor;
@@ -222,9 +223,9 @@ public class SarosSession implements ISarosSession, Disposable {
      */
     protected SarosSession(ITransmitter transmitter,
         DispatchThreadContext threadContext, int myColorID,
-        DateTime sessionStart) {
+        DateTime sessionStart, SarosContext sarosContext) {
 
-        Saros.injectDependenciesOnly(this);
+        sarosContext.initComponent(this);
 
         assert transmitter != null;
         assert saros.getMyJID() != null;
@@ -248,9 +249,9 @@ public class SarosSession implements ISarosSession, Disposable {
      * Constructor called for SarosSession of the host
      */
     public SarosSession(ITransmitter transmitter,
-        DispatchThreadContext threadContext, DateTime sessionStart) {
+        DispatchThreadContext threadContext, DateTime sessionStart, SarosContext sarosContext) {
 
-        this(transmitter, threadContext, 0, sessionStart);
+        this(transmitter, threadContext, 0, sessionStart, sarosContext);
 
         freeColors = new FreeColors(MAX_USERCOLORS - 1);
         host = localUser;
@@ -268,9 +269,9 @@ public class SarosSession implements ISarosSession, Disposable {
      */
     public SarosSession(ITransmitter transmitter,
         DispatchThreadContext threadContext, JID hostID, int myColorID,
-        DateTime sessionStart) {
+        DateTime sessionStart, SarosContext sarosContext) {
 
-        this(transmitter, threadContext, myColorID, sessionStart);
+        this(transmitter, threadContext, myColorID, sessionStart, sarosContext);
 
         host = new User(this, hostID, 0);
         host.invitationCompleted();

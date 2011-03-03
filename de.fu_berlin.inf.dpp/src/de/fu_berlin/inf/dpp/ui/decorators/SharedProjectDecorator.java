@@ -31,7 +31,7 @@ import org.eclipse.jface.viewers.ILightweightLabelDecorator;
 import org.eclipse.jface.viewers.LabelProviderChangedEvent;
 import org.picocontainer.annotations.Inject;
 
-import de.fu_berlin.inf.dpp.Saros;
+import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.project.AbstractSarosSessionListener;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
@@ -87,7 +87,7 @@ public class SharedProjectDecorator implements ILightweightLabelDecorator {
 
     public SharedProjectDecorator() {
 
-        Saros.injectDependenciesOnly(this);
+        SarosPluginContext.initComponent(this);
 
         sessionManager.addSarosSessionListener(sessionListener);
 

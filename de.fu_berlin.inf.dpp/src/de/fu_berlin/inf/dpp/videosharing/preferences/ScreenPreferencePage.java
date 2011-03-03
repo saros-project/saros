@@ -19,6 +19,7 @@
  */
 package de.fu_berlin.inf.dpp.videosharing.preferences;
 
+import de.fu_berlin.inf.dpp.SarosPluginContext;
 import org.eclipse.jface.preference.BooleanFieldEditor;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
 import org.eclipse.jface.preference.IntegerFieldEditor;
@@ -48,7 +49,7 @@ public class ScreenPreferencePage extends FieldEditorPreferencePage implements
 
     public ScreenPreferencePage() {
         super(FieldEditorPreferencePage.GRID);
-        Saros.injectDependenciesOnly(this);
+        SarosPluginContext.initComponent(this);
 
         setPreferenceStore(saros.getPreferenceStore());
         setDescription("Set up how the desktop is captured in a session");

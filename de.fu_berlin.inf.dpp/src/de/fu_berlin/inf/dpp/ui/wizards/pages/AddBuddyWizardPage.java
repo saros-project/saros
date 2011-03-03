@@ -1,5 +1,6 @@
 package de.fu_berlin.inf.dpp.ui.wizards.pages;
 
+import de.fu_berlin.inf.dpp.SarosPluginContext;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
@@ -58,7 +59,7 @@ public class AddBuddyWizardPage extends WizardPage {
 
     public AddBuddyWizardPage() {
         super(AddBuddyWizardPage.class.getName());
-        Saros.injectDependenciesOnly(this);
+        SarosPluginContext.initComponent(this);
         setTitle(TITLE);
         setDescription(DESCRIPTION);
     }

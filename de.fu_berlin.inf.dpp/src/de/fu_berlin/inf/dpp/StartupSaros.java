@@ -73,7 +73,7 @@ public class StartupSaros implements IStartup {
     protected FeedbackManager feedbackManager;
 
     public StartupSaros() {
-        Saros.reinject(this);
+        SarosPluginContext.reinject(this);
     }
 
     public void earlyStartup() {
@@ -117,7 +117,7 @@ public class StartupSaros implements IStartup {
         log.info("start RMI Bot");
         Utils.runSafeAsync("RmiSWTWorkbenchBot-", log, new Runnable() {
             public void run() {
-                log.debug("Util.isSWT(): " + Utils.isSWT());
+                log.debug("Util.isSWT(): " + Utils.isSWT()); 
                 STFController.sleepTime = time;
                 try {
                     STFController.exportedObjects(port, saros, sessionManager,

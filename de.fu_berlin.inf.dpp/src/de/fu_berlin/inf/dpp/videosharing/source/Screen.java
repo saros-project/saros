@@ -32,6 +32,7 @@ import java.awt.Robot;
 import java.awt.Toolkit;
 import java.awt.image.BufferedImage;
 
+import de.fu_berlin.inf.dpp.SarosPluginContext;
 import org.apache.log4j.Logger;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.picocontainer.annotations.Inject;
@@ -109,7 +110,7 @@ public class Screen implements ImageSource {
      */
     public Screen(VideoSharingSession videoSharingSession)
         throws InitializationException {
-        Saros.injectDependenciesOnly(this);
+        SarosPluginContext.initComponent(this);
         preferences = saros.getPreferenceStore();
         mode = Enum.valueOf(Mode.class, preferences
             .getString(PreferenceConstants.SCREEN_INITIAL_MODE));

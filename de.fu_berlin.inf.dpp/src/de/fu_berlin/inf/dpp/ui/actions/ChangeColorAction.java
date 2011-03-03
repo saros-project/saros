@@ -3,6 +3,7 @@ package de.fu_berlin.inf.dpp.ui.actions;
 import java.util.Collection;
 import java.util.Vector;
 
+import de.fu_berlin.inf.dpp.SarosPluginContext;
 import org.apache.log4j.Logger;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.ISelectionProvider;
@@ -50,7 +51,7 @@ public class ChangeColorAction extends SelectionProviderAction implements
 
     public ChangeColorAction(ISelectionProvider provider) {
         super(provider, "Change Color");
-        Saros.injectDependenciesOnly(this);
+        SarosPluginContext.initComponent(this);
 
         setToolTipText("changes your session colour");
         setImageDescriptor(ImageManager

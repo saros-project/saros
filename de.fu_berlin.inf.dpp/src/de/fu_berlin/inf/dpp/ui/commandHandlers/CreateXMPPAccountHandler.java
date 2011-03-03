@@ -1,5 +1,6 @@
 package de.fu_berlin.inf.dpp.ui.commandHandlers;
 
+import de.fu_berlin.inf.dpp.SarosPluginContext;
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
@@ -24,7 +25,7 @@ public class CreateXMPPAccountHandler extends AbstractHandler {
     protected PreferenceUtils preferenceUtils;
 
     public CreateXMPPAccountHandler() {
-        Saros.injectDependenciesOnly(this);
+        SarosPluginContext.initComponent(this);
     }
 
     public Object execute(ExecutionEvent event) throws ExecutionException {

@@ -1,5 +1,6 @@
 package de.fu_berlin.inf.dpp.ui.wizards;
 
+import de.fu_berlin.inf.dpp.SarosPluginContext;
 import org.eclipse.jface.wizard.Wizard;
 import org.picocontainer.annotations.Inject;
 
@@ -21,7 +22,7 @@ public class EditXMPPAccountWizard extends Wizard {
     EditXMPPAccountWizardPage accountPage;
 
     public EditXMPPAccountWizard(XMPPAccount account) {
-        Saros.injectDependenciesOnly(this);
+        SarosPluginContext.initComponent(this);
         this.accountToChange = account;
         addPageToWizard();
         setWindowTitle("Change XMPP Account");

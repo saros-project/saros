@@ -19,6 +19,7 @@
  */
 package de.fu_berlin.inf.dpp.videosharing.preferences;
 
+import de.fu_berlin.inf.dpp.SarosPluginContext;
 import org.eclipse.jface.preference.BooleanFieldEditor;
 import org.eclipse.jface.preference.FieldEditor;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
@@ -51,7 +52,7 @@ public class VideoPlayerPreferencePage extends FieldEditorPreferencePage
 
     public VideoPlayerPreferencePage() {
         super(FieldEditorPreferencePage.GRID);
-        Saros.injectDependenciesOnly(this);
+        SarosPluginContext.initComponent(this);
 
         setPreferenceStore(saros.getPreferenceStore());
         setDescription("Settings for displaying the video in the view");

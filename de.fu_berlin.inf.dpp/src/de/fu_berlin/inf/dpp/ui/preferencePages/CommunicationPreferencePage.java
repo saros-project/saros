@@ -2,6 +2,7 @@ package de.fu_berlin.inf.dpp.ui.preferencePages;
 
 import javax.sound.sampled.Mixer;
 
+import de.fu_berlin.inf.dpp.SarosPluginContext;
 import org.eclipse.jface.preference.BooleanFieldEditor;
 import org.eclipse.jface.preference.ComboFieldEditor;
 import org.eclipse.jface.preference.FieldEditor;
@@ -41,7 +42,7 @@ public class CommunicationPreferencePage extends FieldEditorPreferencePage
 
     public CommunicationPreferencePage() {
         super(FieldEditorPreferencePage.GRID);
-        Saros.injectDependenciesOnly(this);
+        SarosPluginContext.initComponent(this);
         setPreferenceStore(saros.getPreferenceStore());
         setDescription("Settings for Chat and VoIP Functionality.");
         this.prefs = saros.getPreferenceStore();

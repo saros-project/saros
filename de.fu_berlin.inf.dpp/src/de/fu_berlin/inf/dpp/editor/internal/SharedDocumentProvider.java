@@ -5,7 +5,7 @@ import org.eclipse.ui.IFileEditorInput;
 import org.eclipse.ui.editors.text.TextFileDocumentProvider;
 import org.picocontainer.annotations.Inject;
 
-import de.fu_berlin.inf.dpp.Saros;
+import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.project.AbstractSarosSessionListener;
@@ -55,7 +55,8 @@ public class SharedDocumentProvider extends TextFileDocumentProvider {
             if (sarosSession != null) {
                 hasWriteAccess = sarosSession.hasWriteAccess();
             } else {
-                log.warn("Internal error: Shared project null in permissionChanged!");
+                log
+                    .warn("Internal error: Shared project null in permissionChanged!");
             }
         }
     };
@@ -77,7 +78,7 @@ public class SharedDocumentProvider extends TextFileDocumentProvider {
 
         log.debug("SharedDocumentProvider created by Eclipse");
 
-        Saros.reinject(this);
+        SarosPluginContext.reinject(this);
 
         if (sessionManager.getSarosSession() != null) {
             sessionListener.sessionStarted(sessionManager.getSarosSession());

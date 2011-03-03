@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
+import de.fu_berlin.inf.dpp.SarosPluginContext;
 import org.apache.log4j.Logger;
 import org.eclipse.jface.viewers.IContentProvider;
 import org.eclipse.jface.viewers.Viewer;
@@ -106,7 +107,7 @@ public class RosterContentProvider extends TreeContentProvider {
 
     public RosterContentProvider() {
         super();
-        Saros.injectDependenciesOnly(this);
+        SarosPluginContext.initComponent(this);
         this.dataTransferManager.getTransferModeDispatch().add(
             this.transferModeListener);
         this.discoveryManager

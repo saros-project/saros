@@ -5,7 +5,7 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.picocontainer.annotations.Inject;
 
-import de.fu_berlin.inf.dpp.Saros;
+import de.fu_berlin.inf.dpp.SarosContext;
 import de.fu_berlin.inf.dpp.exceptions.StreamException;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.JID;
@@ -66,13 +66,14 @@ public abstract class ProjectNegotiation {
     };
 
     public ProjectNegotiation(ITransmitter transmitter, JID peer,
-        ProjectNegotiationObservable projectExchangeProcesses) {
+        ProjectNegotiationObservable projectExchangeProcesses,
+        SarosContext sarosContext) {
         this.transmitter = transmitter;
         this.peer = peer;
         this.projectExchangeProcesses = projectExchangeProcesses;
         this.projectExchangeProcesses.addProjectExchangeProcess(this);
 
-        Saros.injectDependenciesOnly(this);
+        sarosContext.initComponent(this);
     }
 
     /**

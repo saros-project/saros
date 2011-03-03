@@ -32,6 +32,7 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
 
+import de.fu_berlin.inf.dpp.SarosPluginContext;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -118,7 +119,7 @@ public class SendFileAction extends Action {
                 }
             }
         });
-        Saros.injectDependenciesOnly(this);
+        SarosPluginContext.initComponent(this);
     }
 
     protected void updateEnablement() {

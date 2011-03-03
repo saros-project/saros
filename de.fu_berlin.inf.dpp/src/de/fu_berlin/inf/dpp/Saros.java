@@ -48,10 +48,10 @@ import org.jivesoftware.smack.ConnectionConfiguration;
 import org.jivesoftware.smack.ConnectionCreationListener;
 import org.jivesoftware.smack.ConnectionListener;
 import org.jivesoftware.smack.Roster;
-import org.jivesoftware.smack.Roster.SubscriptionMode;
 import org.jivesoftware.smack.SmackConfiguration;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
+import org.jivesoftware.smack.Roster.SubscriptionMode;
 import org.jivesoftware.smack.packet.Registration;
 import org.jivesoftware.smack.proxy.ProxyInfo;
 import org.jivesoftware.smackx.ServiceDiscoveryManager;
@@ -62,111 +62,24 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.prefs.BackingStoreException;
 import org.osgi.service.prefs.Preferences;
-import org.picocontainer.Characteristics;
-import org.picocontainer.ComponentAdapter;
-import org.picocontainer.MutablePicoContainer;
-import org.picocontainer.PicoBuilder;
-import org.picocontainer.PicoCompositionException;
 import org.picocontainer.PicoContainer;
 import org.picocontainer.annotations.Inject;
-import org.picocontainer.injectors.AnnotatedFieldInjection;
-import org.picocontainer.injectors.CompositeInjection;
-import org.picocontainer.injectors.ConstructorInjection;
-import org.picocontainer.injectors.ProviderAdapter;
 import org.picocontainer.injectors.Reinjector;
 
-import de.fu_berlin.inf.dpp.accountManagement.XMPPAccountStore;
 import de.fu_berlin.inf.dpp.annotations.Component;
-import de.fu_berlin.inf.dpp.communication.audio.AudioService;
-import de.fu_berlin.inf.dpp.communication.audio.AudioServiceManager;
-import de.fu_berlin.inf.dpp.communication.audio.MixerManager;
-import de.fu_berlin.inf.dpp.communication.muc.MUCManager;
-import de.fu_berlin.inf.dpp.communication.muc.negotiation.MUCSessionPreferencesNegotiatingManager;
-import de.fu_berlin.inf.dpp.communication.muc.singleton.MUCManagerSingletonWrapperChatView;
-import de.fu_berlin.inf.dpp.concurrent.undo.UndoManager;
-import de.fu_berlin.inf.dpp.concurrent.watchdog.ConsistencyWatchdogClient;
-import de.fu_berlin.inf.dpp.concurrent.watchdog.ConsistencyWatchdogServer;
-import de.fu_berlin.inf.dpp.concurrent.watchdog.IsInconsistentObservable;
-import de.fu_berlin.inf.dpp.concurrent.watchdog.SessionViewOpener;
-import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
-import de.fu_berlin.inf.dpp.feedback.DataTransferCollector;
 import de.fu_berlin.inf.dpp.feedback.ErrorLogManager;
-import de.fu_berlin.inf.dpp.feedback.FeedbackManager;
-import de.fu_berlin.inf.dpp.feedback.FollowModeCollector;
-import de.fu_berlin.inf.dpp.feedback.JumpFeatureUsageCollector;
-import de.fu_berlin.inf.dpp.feedback.ParticipantCollector;
-import de.fu_berlin.inf.dpp.feedback.PermissionChangeCollector;
-import de.fu_berlin.inf.dpp.feedback.SelectionCollector;
-import de.fu_berlin.inf.dpp.feedback.SessionDataCollector;
 import de.fu_berlin.inf.dpp.feedback.StatisticManager;
-import de.fu_berlin.inf.dpp.feedback.TextEditCollector;
-import de.fu_berlin.inf.dpp.feedback.VoIPCollector;
-import de.fu_berlin.inf.dpp.invitation.ArchiveStreamService;
 import de.fu_berlin.inf.dpp.net.ConnectionState;
 import de.fu_berlin.inf.dpp.net.IConnectionListener;
-import de.fu_berlin.inf.dpp.net.IncomingTransferObject.IncomingTransferObjectExtensionProvider;
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.net.RosterTracker;
 import de.fu_berlin.inf.dpp.net.XMPPUtil;
-import de.fu_berlin.inf.dpp.net.business.ActivitiesHandler;
-import de.fu_berlin.inf.dpp.net.business.CancelInviteHandler;
-import de.fu_berlin.inf.dpp.net.business.CancelProjectSharingHandler;
-import de.fu_berlin.inf.dpp.net.business.ConsistencyWatchdogHandler;
-import de.fu_berlin.inf.dpp.net.business.DispatchThreadContext;
-import de.fu_berlin.inf.dpp.net.business.InvitationHandler;
-import de.fu_berlin.inf.dpp.net.business.LeaveHandler;
-import de.fu_berlin.inf.dpp.net.business.RequestForActivityHandler;
-import de.fu_berlin.inf.dpp.net.business.UserListHandler;
-import de.fu_berlin.inf.dpp.net.internal.ActivitiesExtensionProvider;
-import de.fu_berlin.inf.dpp.net.internal.ConnectionTestManager;
-import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
-import de.fu_berlin.inf.dpp.net.internal.DefaultInvitationInfo;
-import de.fu_berlin.inf.dpp.net.internal.DefaultInvitationInfo.InvitationAcknowledgementExtensionProvider;
-import de.fu_berlin.inf.dpp.net.internal.InvitationInfo;
-import de.fu_berlin.inf.dpp.net.internal.StreamServiceManager;
-import de.fu_berlin.inf.dpp.net.internal.UserListInfo;
-import de.fu_berlin.inf.dpp.net.internal.XMPPReceiver;
-import de.fu_berlin.inf.dpp.net.internal.XMPPTransmitter;
-import de.fu_berlin.inf.dpp.net.internal.discoveryManager.DiscoveryManager;
-import de.fu_berlin.inf.dpp.net.internal.extensions.CancelInviteExtension;
-import de.fu_berlin.inf.dpp.net.internal.extensions.CancelProjectSharingExtension;
-import de.fu_berlin.inf.dpp.net.internal.extensions.LeaveExtension;
-import de.fu_berlin.inf.dpp.net.internal.extensions.RequestActivityExtension;
-import de.fu_berlin.inf.dpp.net.internal.extensions.UserListExtension;
-import de.fu_berlin.inf.dpp.net.internal.subscriptionManager.SubscriptionManager;
-import de.fu_berlin.inf.dpp.observables.FileReplacementInProgressObservable;
-import de.fu_berlin.inf.dpp.observables.InvitationProcessObservable;
-import de.fu_berlin.inf.dpp.observables.JingleFileTransferManagerObservable;
-import de.fu_berlin.inf.dpp.observables.ProjectNegotiationObservable;
-import de.fu_berlin.inf.dpp.observables.SarosSessionObservable;
-import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
-import de.fu_berlin.inf.dpp.observables.VideoSessionObservable;
-import de.fu_berlin.inf.dpp.observables.VoIPSessionObservable;
-import de.fu_berlin.inf.dpp.optional.jdt.JDTFacade;
 import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
-import de.fu_berlin.inf.dpp.preferences.PreferenceManager;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
-import de.fu_berlin.inf.dpp.project.PingPongCentral;
-import de.fu_berlin.inf.dpp.project.SarosRosterListener;
 import de.fu_berlin.inf.dpp.project.SarosSessionManager;
-import de.fu_berlin.inf.dpp.project.SharedResourcesManager;
-import de.fu_berlin.inf.dpp.project.internal.ChangeColorManager;
-import de.fu_berlin.inf.dpp.project.internal.PermissionManager;
-import de.fu_berlin.inf.dpp.project.internal.ProjectsAddedManager;
-import de.fu_berlin.inf.dpp.synchronize.StopManager;
-import de.fu_berlin.inf.dpp.ui.LocalPresenceTracker;
-import de.fu_berlin.inf.dpp.ui.RemoteProgressManager;
-import de.fu_berlin.inf.dpp.ui.SarosUI;
-import de.fu_berlin.inf.dpp.ui.actions.SendFileAction;
 import de.fu_berlin.inf.dpp.util.StackTrace;
 import de.fu_berlin.inf.dpp.util.Utils;
-import de.fu_berlin.inf.dpp.util.VersionManager;
-import de.fu_berlin.inf.dpp.util.pico.ChildContainer;
-import de.fu_berlin.inf.dpp.util.pico.ChildContainerProvider;
 import de.fu_berlin.inf.dpp.util.pico.DotGraphMonitor;
-import de.fu_berlin.inf.dpp.videosharing.VideoSharing;
-import de.fu_berlin.inf.dpp.videosharing.VideoSharingService;
 
 /**
  * The main plug-in of Saros.
@@ -217,13 +130,6 @@ public class Saros extends AbstractUIPlugin {
     protected SarosSessionManager sessionManager;
 
     /**
-     * A caching container which holds all the singletons in Saros. This
-     * container has plug-in scope: The objects it manages are created when the
-     * plug-in is started, and disposed when the plug-in is stopped.
-     */
-    protected MutablePicoContainer container;
-
-    /**
      * The reinjector used to inject dependencies into those objects that are
      * created by Eclipse and not by our PicoContainer.
      */
@@ -264,6 +170,8 @@ public class Saros extends AbstractUIPlugin {
 
     protected Logger log;
 
+    private SarosContext sarosContext;
+
     static {
         Roster.setDefaultSubscriptionMode(SubscriptionMode.accept_all);
     }
@@ -279,201 +187,14 @@ public class Saros extends AbstractUIPlugin {
         setInitialized(false);
         setDefault(this);
 
-        PicoBuilder picoBuilder = new PicoBuilder(new CompositeInjection(
-            new ConstructorInjection(), new AnnotatedFieldInjection()))
-            .withCaching().withLifecycle();
+        sarosContext = SarosContext.getContextForSaros(this).withDotMonitor(
+            dotMonitor).build();
 
-        /*
-         * If given, the dotMonitor is used to capture an architecture diagram
-         * of the application
-         */
-        if (dotMonitor != null) {
-            picoBuilder = picoBuilder.withMonitor(dotMonitor);
-        }
-
-        // Initialize our dependency injection container
-        this.container = picoBuilder.build();
-
-        // Add Adapter which creates ChildContainers
-        this.container.as(Characteristics.NO_CACHE).addAdapter(
-            new ProviderAdapter(new ChildContainerProvider(this.container)));
-        /*
-         * All singletons which exist for the whole plug-in life-cycle are
-         * managed by PicoContainer for us.
-         * 
-         * The addComponent() calls are sorted alphabetically according to the
-         * first argument. This makes it easier to search for a class without
-         * tool support.
-         */
-        this.container.addComponent(Saros.class, this);
-
-        // Thread Context
-        this.container.addComponent(DispatchThreadContext.class);
-
-        // Core Managers
-        this.container.addComponent(ChangeColorManager.class);
-        this.container.addComponent(ConsistencyWatchdogClient.class);
-        this.container.addComponent(ConsistencyWatchdogServer.class);
-        this.container.addComponent(DataTransferManager.class);
-        this.container.addComponent(DiscoveryManager.class);
-        this.container.addComponent(EditorAPI.class);
-        this.container.addComponent(EditorManager.class);
-        this.container.addComponent(ErrorLogManager.class);
-        this.container.addComponent(FeedbackManager.class);
-        this.container.addComponent(JDTFacade.class);
-        this.container.addComponent(LocalPresenceTracker.class);
-        this.container.addComponent(MUCManager.class);
-        this.container.addComponent(MUCManagerSingletonWrapperChatView.class);
-        this.container.addComponent(PingPongCentral.class);
-        this.container.addComponent(PreferenceManager.class);
-        this.container.addComponent(PreferenceUtils.class);
-        this.container.addComponent(PermissionManager.class);
-        this.container.addComponent(RosterTracker.class);
-        this.container.addComponent(SarosRosterListener.class);
-        this.container.addComponent(SarosUI.class);
-        this.container.addComponent(SarosSessionManager.class);
-        this.container.addComponent(SessionViewOpener.class);
-        this.container.addComponent(SharedResourcesManager.class);
-        this.container.addComponent(SkypeManager.class);
-        this.container.addComponent(StatisticManager.class);
-        this.container.addComponent(StopManager.class);
-        this.container.addComponent(StreamServiceManager.class);
-        this.container.addComponent(AudioServiceManager.class);
-        this.container.addComponent(MixerManager.class);
-        this.container.addComponent(SubscriptionManager.class);
-        this.container.addComponent(UndoManager.class);
-        this.container.addComponent(VideoSharing.class);
-        this.container.addComponent(VersionManager.class);
-        this.container
-            .addComponent(MUCSessionPreferencesNegotiatingManager.class);
-        this.container.addComponent(XMPPReceiver.class);
-        this.container.addComponent(XMPPTransmitter.class);
-        this.container.addComponent(RemoteProgressManager.class);
-        this.container.addComponent(XMPPAccountStore.class);
-        this.container.addComponent(ProjectsAddedManager.class);
-
-        // Observables
-        this.container.addComponent(FileReplacementInProgressObservable.class);
-        this.container.addComponent(InvitationProcessObservable.class);
-        this.container.addComponent(ProjectNegotiationObservable.class);
-        this.container.addComponent(IsInconsistentObservable.class);
-        this.container.addComponent(JingleFileTransferManagerObservable.class);
-        this.container.addComponent(SessionIDObservable.class);
-        this.container.addComponent(SarosSessionObservable.class);
-        this.container.addComponent(VoIPSessionObservable.class);
-        this.container.addComponent(VideoSessionObservable.class);
-
-        // Handlers
-        this.container.addComponent(CancelInviteHandler.class);
-        this.container.addComponent(CancelProjectSharingHandler.class);
-        this.container.addComponent(UserListHandler.class);
-        this.container.addComponent(InvitationHandler.class);
-        this.container.addComponent(LeaveHandler.class);
-        this.container.addComponent(RequestForActivityHandler.class);
-        this.container.addComponent(ConsistencyWatchdogHandler.class);
-        this.container.addComponent(ActivitiesHandler.class);
-        this.container.addComponent(ConnectionTestManager.class);
-
-        // Extensions
-        this.container.addComponent(CancelInviteExtension.class);
-        this.container.addComponent(CancelProjectSharingExtension.class);
-        this.container.addComponent(UserListExtension.class);
-        this.container.addComponent(RequestActivityExtension.class);
-        this.container.addComponent(LeaveExtension.class);
-
-        // Extension Providers
-        this.container.addComponent(ActivitiesExtensionProvider.class);
-        this.container
-            .addComponent(InvitationInfo.InvitationExtensionProvider.class);
-        this.container
-            .addComponent(IncomingTransferObjectExtensionProvider.class);
-        this.container
-            .addComponent(InvitationAcknowledgementExtensionProvider.class);
-        this.container
-            .addComponent(DefaultInvitationInfo.FileListRequestExtensionProvider.class);
-        this.container.addComponent(UserListInfo.JoinExtensionProvider.class);
-        this.container
-            .addComponent(DefaultInvitationInfo.UserListConfirmationExtensionProvider.class);
-        this.container
-            .addComponent(DefaultInvitationInfo.InvitationCompleteExtensionProvider.class);
-
-        // Statistic collectors
-        this.container.addComponent(DataTransferCollector.class);
-        this.container.addComponent(PermissionChangeCollector.class);
-        this.container.addComponent(ParticipantCollector.class);
-        this.container.addComponent(SessionDataCollector.class);
-        this.container.addComponent(TextEditCollector.class);
-        this.container.addComponent(JumpFeatureUsageCollector.class);
-        this.container.addComponent(FollowModeCollector.class);
-        this.container.addComponent(SelectionCollector.class);
-        this.container.addComponent(VoIPCollector.class);
-
-        // streaming services
-        this.container.addComponent(SendFileAction.SendFileStreamService.class);
-        this.container.addComponent(AudioService.class);
-        this.container.addComponent(VideoSharingService.class);
-        this.container.addComponent(ArchiveStreamService.class);
-        /*
-         * The following classes are initialized by the re-injector because they
-         * are created by Eclipse:
-         * 
-         * All User interface classes like all Views, but also
-         * SharedDocumentProvider.
-         * 
-         * CAUTION: Classes from which duplicates can exists, should not be
-         * managed by PicoContainer.
-         */
-        reinjector = new Reinjector(this.container);
+        SarosPluginContext.setSarosContext(sarosContext);
     }
 
     protected static void setInitialized(boolean initialized) {
         isInitialized = initialized;
-    }
-
-    /**
-     * Adds the object to Saros' container, and injects dependencies into the
-     * annotated fields of the given object. It should only be used for objects
-     * that were created by Eclipse, which have the same life cycle as the Saros
-     * plug-in, e.g. the popup menu actions.
-     */
-    public static synchronized void reinject(Object toInjectInto) {
-        checkInitialized();
-
-        try {
-            // Remove the component if an instance of it was already registered
-            Class<? extends Object> clazz = toInjectInto.getClass();
-            ComponentAdapter<Object> removed = plugin.container
-                .removeComponent(clazz);
-            if (removed != null && clazz != Saros.class) {
-                LogLog.warn(clazz.toString() + " added more than once!",
-                    new StackTrace());
-            }
-
-            // Add the given instance to the container
-            plugin.container.addComponent(clazz, toInjectInto);
-
-            /*
-             * Ask PicoContainer to inject into the component via fields
-             * annotated with @Inject
-             */
-            plugin.reinjector.reinject(clazz, new AnnotatedFieldInjection());
-        } catch (PicoCompositionException e) {
-            LogLog.error("Internal error in reinjection:", e);
-        }
-    }
-
-    /**
-     * Injects dependencies into the annotated fields of the given object. This
-     * method should be used for objects that were created by Eclipse, which
-     * have a different life cycle than the Saros plug-in.
-     */
-    public static synchronized void injectDependenciesOnly(Object toInjectInto) {
-        checkInitialized();
-
-        ChildContainer dummyContainer = plugin.container
-            .getComponent(ChildContainer.class);
-        dummyContainer.reinject(toInjectInto);
-        plugin.container.removeChildContainer(dummyContainer);
     }
 
     protected static void checkInitialized() {
@@ -485,7 +206,7 @@ public class Saros extends AbstractUIPlugin {
 
     /**
      * Returns true if the Saros instance has been initialized so that calling
-     * {@link #reinject(Object)} will be well defined.
+     * {@link SarosContext#reinject(Object)} will be well defined.
      */
     public static boolean isInitialized() {
         return isInitialized;
@@ -493,7 +214,7 @@ public class Saros extends AbstractUIPlugin {
 
     protected void setBytestreamConnectionProperties() {
         boolean settingsChanged = false;
-        int port = container.getComponent(PreferenceUtils.class)
+        int port = sarosContext.getComponent(PreferenceUtils.class)
             .getFileTransferPort();
         boolean proxyEnabled = !getPreferenceStore().getBoolean(
             PreferenceConstants.LOCAL_SOCKS5_PROXY_DISABLED);
@@ -580,14 +301,15 @@ public class Saros extends AbstractUIPlugin {
             + Utils.getPlatformInfo());
 
         // Remove the Bundle if an instance of it was already registered
-        container.removeComponent(Bundle.class);
-        container.addComponent(Bundle.class, getBundle());
+        sarosContext.removeComponent(Bundle.class);
+        sarosContext.addComponent(Bundle.class, getBundle());
 
         // Make sure that all components in the container are
         // instantiated
-        container.getComponents(Object.class);
+        sarosContext.getComponents(Object.class);
 
-        this.sessionManager = container.getComponent(SarosSessionManager.class);
+        this.sessionManager = sarosContext
+            .getComponent(SarosSessionManager.class);
 
         isInitialized = true;
 
@@ -598,15 +320,15 @@ public class Saros extends AbstractUIPlugin {
         if (!autoConnect)
             return;
 
-        StatisticManager statisticManager = container
+        StatisticManager statisticManager = sarosContext
             .getComponent(StatisticManager.class);
-        ErrorLogManager errorLogManager = container
+        ErrorLogManager errorLogManager = sarosContext
             .getComponent(ErrorLogManager.class);
 
         // we need at least a user name, but also the agreement to the
         // statistic and error log submission
-        boolean hasUserName = this.container
-            .getComponent(PreferenceUtils.class).hasUserName();
+        boolean hasUserName = this.sarosContext.getComponent(
+            PreferenceUtils.class).hasUserName();
         boolean hasAgreement = statisticManager.hasStatisticAgreement()
             && errorLogManager.hasErrorLogAgreement();
 
@@ -653,7 +375,7 @@ public class Saros extends AbstractUIPlugin {
              * This will cause dispose() to be called on all components managed
              * by PicoContainer which implement {@link Disposable}.
              */
-            container.dispose();
+            sarosContext.dispose();
         } finally {
             super.stop(context);
         }
@@ -663,7 +385,7 @@ public class Saros extends AbstractUIPlugin {
     }
 
     public void removeChildContainer(PicoContainer child) {
-        container.removeChildContainer(child);
+        sarosContext.removeChildContainer(child);
     }
 
     public static void setDefault(Saros newPlugin) {
@@ -758,7 +480,7 @@ public class Saros extends AbstractUIPlugin {
         // check if we need to do a reinject
         if (preferenceUtils == null || statisticManager == null
             || errorLogManager == null)
-            Saros.reinject(this);
+            sarosContext.reinject(this);
 
         /*
          * see if we have a user name and an agreement to submitting user
@@ -840,8 +562,8 @@ public class Saros extends AbstractUIPlugin {
             setConnectionState(ConnectionState.ERROR, cause);
 
             if (cause instanceof SaslException) {
-                Utils.popUpFailureMessage("Error Connecting via SASL",
-                    cause.getMessage(), failSilently);
+                Utils.popUpFailureMessage("Error Connecting via SASL", cause
+                    .getMessage(), failSilently);
             } else {
                 String question;
                 if (cause instanceof UnknownHostException) {
@@ -901,8 +623,8 @@ public class Saros extends AbstractUIPlugin {
 
         String server = uri.getHost();
         if (server == null) {
-            throw new URISyntaxException(
-                prefStore.getString(PreferenceConstants.SERVER),
+            throw new URISyntaxException(prefStore
+                .getString(PreferenceConstants.SERVER),
                 "The XMPP/Jabber server address is invalid: " + serverString);
         }
 
@@ -910,13 +632,13 @@ public class Saros extends AbstractUIPlugin {
         ConnectionConfiguration conConfig = null;
 
         if (uri.getPort() < 0) {
-            conConfig = proxyInfo == null ? new ConnectionConfiguration(
-                uri.getHost()) : new ConnectionConfiguration(uri.getHost(),
+            conConfig = proxyInfo == null ? new ConnectionConfiguration(uri
+                .getHost()) : new ConnectionConfiguration(uri.getHost(),
                 proxyInfo);
         } else {
-            conConfig = proxyInfo == null ? new ConnectionConfiguration(
-                uri.getHost(), uri.getPort()) : new ConnectionConfiguration(
-                uri.getHost(), uri.getPort(), proxyInfo);
+            conConfig = proxyInfo == null ? new ConnectionConfiguration(uri
+                .getHost(), uri.getPort()) : new ConnectionConfiguration(uri
+                .getHost(), uri.getPort(), proxyInfo);
         }
 
         /*
@@ -971,11 +693,11 @@ public class Saros extends AbstractUIPlugin {
 
         for (IProxyData pd : ips.getProxyDataForHost(host)) {
             if (IProxyData.HTTP_PROXY_TYPE.equals(pd.getType())) {
-                return ProxyInfo.forHttpProxy(pd.getHost(), pd.getPort(),
-                    pd.getUserId(), pd.getPassword());
+                return ProxyInfo.forHttpProxy(pd.getHost(), pd.getPort(), pd
+                    .getUserId(), pd.getPassword());
             } else if (IProxyData.SOCKS_PROXY_TYPE.equals(pd.getType())) {
-                return ProxyInfo.forSocks5Proxy(pd.getHost(), pd.getPort(),
-                    pd.getUserId(), pd.getPassword());
+                return ProxyInfo.forSocks5Proxy(pd.getHost(), pd.getPort(), pd
+                    .getUserId(), pd.getPassword());
             }
         }
 
@@ -1194,12 +916,13 @@ public class Saros extends AbstractUIPlugin {
 
                 Utils.runSafeSWTSync(log, new Runnable() {
                     public void run() {
-                        MessageDialog.openError(
-                            EditorAPI.getShell(),
-                            "Connection error",
-                            "You have been disconnected from XMPP/Jabber, because of a resource conflict.\n"
-                                + "This indicates that you might have logged on again using the same XMPP/Jabber account"
-                                + " and XMPP resource, for instance using Saros or an other instant messaging client.");
+                        MessageDialog
+                            .openError(
+                                EditorAPI.getShell(),
+                                "Connection error",
+                                "You have been disconnected from XMPP/Jabber, because of a resource conflict.\n"
+                                    + "This indicates that you might have logged on again using the same XMPP/Jabber account"
+                                    + " and XMPP resource, for instance using Saros or an other instant messaging client.");
                     }
                 });
                 return;
@@ -1244,7 +967,8 @@ public class Saros extends AbstractUIPlugin {
                             Thread.currentThread().interrupt();
                             return;
                         } catch (UnknownHostException e) {
-                            log.info("Could not get localhost, maybe the network interface is down.");
+                            log
+                                .info("Could not get localhost, maybe the network interface is down.");
                         }
                     }
 

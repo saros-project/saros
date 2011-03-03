@@ -16,6 +16,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
+import de.fu_berlin.inf.dpp.SarosContext;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IContainer;
@@ -87,8 +88,8 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
     public IncomingProjectNegotiation(ITransmitter transmitter, JID peer,
         ProjectNegotiationObservable projectExchangeProcesses,
         String processID, List<ProjectExchangeInfo> projectInfos,
-        boolean doStream) {
-        super(transmitter, peer, projectExchangeProcesses);
+        boolean doStream, SarosContext sarosContext) {
+        super(transmitter, peer, projectExchangeProcesses, sarosContext);
 
         this.processID = processID;
         this.projectInfos = projectInfos;

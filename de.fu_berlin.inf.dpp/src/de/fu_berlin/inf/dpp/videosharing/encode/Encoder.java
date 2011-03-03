@@ -25,6 +25,7 @@ import java.io.OutputStream;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.locks.LockSupport;
 
+import de.fu_berlin.inf.dpp.SarosPluginContext;
 import org.apache.log4j.Logger;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.picocontainer.annotations.Inject;
@@ -83,7 +84,7 @@ public abstract class Encoder implements Runnable {
         this.videoSharingSession = videoSharingSession;
         assert videoSharingSession != null;
 
-        Saros.injectDependenciesOnly(this);
+        SarosPluginContext.initComponent(this);
 
         preferences = saros.getPreferenceStore();
         width = preferences.getInt(PreferenceConstants.ENCODING_VIDEO_WIDTH);

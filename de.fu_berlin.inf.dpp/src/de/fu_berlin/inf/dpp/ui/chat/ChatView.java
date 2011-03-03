@@ -14,7 +14,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.jivesoftware.smackx.ChatState;
 import org.picocontainer.annotations.Inject;
 
-import de.fu_berlin.inf.dpp.Saros;
+import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.communication.muc.events.IMUCManagerListener;
@@ -219,7 +219,7 @@ public class ChatView extends SimpleExplanatoryViewPart {
     };
 
     public ChatView() {
-        Saros.injectDependenciesOnly(this);
+        SarosPluginContext.initComponent(this);
         editorManager.addSharedEditorListener(sharedEditorListener);
         mucManager.addMUCManagerListener(mucManagerListener);
     }

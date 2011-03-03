@@ -19,6 +19,7 @@
  */
 package de.fu_berlin.inf.dpp.videosharing.preferences;
 
+import de.fu_berlin.inf.dpp.SarosPluginContext;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
 import org.eclipse.jface.preference.IntegerFieldEditor;
 import org.eclipse.jface.util.PropertyChangeEvent;
@@ -48,7 +49,7 @@ public class EncoderPreferencePage extends FieldEditorPreferencePage implements
 
     public EncoderPreferencePage() {
         super(FieldEditorPreferencePage.GRID);
-        Saros.injectDependenciesOnly(this);
+        SarosPluginContext.initComponent(this);
 
         setPreferenceStore(saros.getPreferenceStore());
         setDescription("General settings for encoding");

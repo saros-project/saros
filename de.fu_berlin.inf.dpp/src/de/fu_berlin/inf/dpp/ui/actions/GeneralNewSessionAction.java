@@ -21,6 +21,7 @@ package de.fu_berlin.inf.dpp.ui.actions;
 
 import java.util.List;
 
+import de.fu_berlin.inf.dpp.SarosPluginContext;
 import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
@@ -64,7 +65,7 @@ public abstract class GeneralNewSessionAction implements IObjectActionDelegate {
 
     public GeneralNewSessionAction() {
         super();
-        Saros.injectDependenciesOnly(this);
+        SarosPluginContext.initComponent(this);
     }
 
     /**

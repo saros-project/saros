@@ -7,6 +7,7 @@ import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
 
+import de.fu_berlin.inf.dpp.SarosPluginContext;
 import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
@@ -83,7 +84,7 @@ public class FeedbackPreferencePage extends PreferencePage implements
     protected boolean isPseudonymAllowed;
 
     public FeedbackPreferencePage() {
-        Saros.injectDependenciesOnly(this);
+        SarosPluginContext.initComponent(this);
         setPreferenceStore(saros.getPreferenceStore());
         setDescription(Messages.getString("feedback.page.description")); //$NON-NLS-1$
     }

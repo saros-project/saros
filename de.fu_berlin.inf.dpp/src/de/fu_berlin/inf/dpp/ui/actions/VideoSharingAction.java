@@ -27,7 +27,7 @@ import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.picocontainer.annotations.Inject;
 
-import de.fu_berlin.inf.dpp.Saros;
+import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
@@ -64,7 +64,7 @@ public class VideoSharingAction extends Action {
 
     public VideoSharingAction(SessionViewTableViewer viewer) {
         super();
-        Saros.injectDependenciesOnly(this);
+        SarosPluginContext.initComponent(this);
         setId(ACTION_ID);
         changeButton();
         setEnabled(false);

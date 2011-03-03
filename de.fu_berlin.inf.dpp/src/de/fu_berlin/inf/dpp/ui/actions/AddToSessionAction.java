@@ -22,6 +22,7 @@ package de.fu_berlin.inf.dpp.ui.actions;
 import java.util.ArrayList;
 import java.util.List;
 
+import de.fu_berlin.inf.dpp.SarosPluginContext;
 import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
@@ -60,7 +61,7 @@ public class AddToSessionAction implements IObjectActionDelegate {
 
     public AddToSessionAction() {
         super();
-        Saros.injectDependenciesOnly(this);
+        SarosPluginContext.initComponent(this);
     }
 
     public void selectionChanged(IAction action, ISelection selection) {

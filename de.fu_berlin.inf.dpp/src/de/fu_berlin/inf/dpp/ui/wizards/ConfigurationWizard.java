@@ -22,6 +22,7 @@ package de.fu_berlin.inf.dpp.ui.wizards;
 import java.util.LinkedList;
 import java.util.List;
 
+import de.fu_berlin.inf.dpp.SarosPluginContext;
 import org.eclipse.jface.wizard.Wizard;
 import org.picocontainer.annotations.Inject;
 
@@ -72,7 +73,7 @@ public class ConfigurationWizard extends Wizard {
          * HACK Changing UI components like the configuration wizard should not
          * use PicoContainer directly.
          */
-        Saros.injectDependenciesOnly(this);
+        SarosPluginContext.initComponent(this);
 
         if (askForAccount) {
             this.pages.add(new CreateXMPPAccountWizardPage(saros, false,

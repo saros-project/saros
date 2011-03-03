@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
+import de.fu_berlin.inf.dpp.SarosPluginContext;
 import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.graphics.Image;
@@ -62,7 +63,7 @@ public class RosterEntryElement extends TreeElement {
     }
 
     public RosterEntryElement(Roster roster, JID jid) {
-        Saros.injectDependenciesOnly(this);
+        SarosPluginContext.initComponent(this);
 
         this.roster = roster;
         this.jid = jid;

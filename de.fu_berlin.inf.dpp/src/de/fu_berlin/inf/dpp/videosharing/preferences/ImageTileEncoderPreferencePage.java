@@ -19,6 +19,7 @@
  */
 package de.fu_berlin.inf.dpp.videosharing.preferences;
 
+import de.fu_berlin.inf.dpp.SarosPluginContext;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.preference.BooleanFieldEditor;
 import org.eclipse.jface.preference.ComboFieldEditor;
@@ -51,7 +52,7 @@ public class ImageTileEncoderPreferencePage extends FieldEditorPreferencePage
 
     public ImageTileEncoderPreferencePage() {
         super(FieldEditorPreferencePage.GRID);
-        Saros.injectDependenciesOnly(this);
+        SarosPluginContext.initComponent(this);
 
         setPreferenceStore(saros.getPreferenceStore());
         setDescription("Set up the image tile encoder.\nNote: Changing values here does not affect compression.");

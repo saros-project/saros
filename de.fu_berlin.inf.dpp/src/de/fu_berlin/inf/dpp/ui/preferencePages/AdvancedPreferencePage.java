@@ -1,5 +1,6 @@
 package de.fu_berlin.inf.dpp.ui.preferencePages;
 
+import de.fu_berlin.inf.dpp.SarosPluginContext;
 import org.eclipse.jface.preference.BooleanFieldEditor;
 import org.eclipse.jface.preference.FieldEditor;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
@@ -36,7 +37,7 @@ public class AdvancedPreferencePage extends FieldEditorPreferencePage implements
     public AdvancedPreferencePage() {
         super(FieldEditorPreferencePage.GRID);
 
-        Saros.injectDependenciesOnly(this);
+        SarosPluginContext.initComponent(this);
 
         setPreferenceStore(saros.getPreferenceStore());
         setDescription("Advanced settings geared toward developers and power users.");

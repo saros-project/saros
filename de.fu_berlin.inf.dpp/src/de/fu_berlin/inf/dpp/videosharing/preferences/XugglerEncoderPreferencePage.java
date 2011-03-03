@@ -19,6 +19,7 @@
  */
 package de.fu_berlin.inf.dpp.videosharing.preferences;
 
+import de.fu_berlin.inf.dpp.SarosPluginContext;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.preference.BooleanFieldEditor;
 import org.eclipse.jface.preference.ComboFieldEditor;
@@ -48,7 +49,7 @@ public class XugglerEncoderPreferencePage extends FieldEditorPreferencePage
 
     public XugglerEncoderPreferencePage() {
         super(FieldEditorPreferencePage.GRID);
-        Saros.injectDependenciesOnly(this);
+        SarosPluginContext.initComponent(this);
 
         setPreferenceStore(saros.getPreferenceStore());
         setDescription("Settings for the videostream Xuggler produces");

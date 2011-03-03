@@ -6,7 +6,7 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ui.actions.SelectionProviderAction;
 import org.picocontainer.annotations.Inject;
 
-import de.fu_berlin.inf.dpp.Saros;
+import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.User.Permission;
 import de.fu_berlin.inf.dpp.annotations.Component;
@@ -63,7 +63,7 @@ public class GiveWriteAccessAction extends SelectionProviderAction {
             .getImageDescriptor("icons/elcl16/grantwriteaccess.png"));
         setToolTipText("Grant write access to this buddy");
 
-        Saros.injectDependenciesOnly(this);
+        SarosPluginContext.initComponent(this);
         /*
          * if SessionView is not "visible" on session start up this constructor
          * will be called after session started (and the user uses this view)

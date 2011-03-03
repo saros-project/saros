@@ -5,6 +5,7 @@ package de.fu_berlin.inf.dpp.ui.wizards.pages;
 
 import java.lang.reflect.InvocationTargetException;
 
+import de.fu_berlin.inf.dpp.SarosPluginContext;
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.operation.IRunnableWithProgress;
@@ -91,7 +92,7 @@ public class CreateXMPPAccountWizardPage extends WizardPage implements IWizardPa
         this.saros = saros;
         this.preferenceUtils = preferenceUtils;
 
-        Saros.injectDependenciesOnly(this);
+        SarosPluginContext.initComponent(this);
     }
 
     public void createControl(Composite parent) {

@@ -1,5 +1,6 @@
 package de.fu_berlin.inf.dpp.ui.widgets.viewer.roster;
 
+import de.fu_berlin.inf.dpp.SarosPluginContext;
 import org.eclipse.jface.viewers.StructuredViewer;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.events.DisposeEvent;
@@ -68,8 +69,8 @@ public class BuddyDisplayComposite extends ViewerComposite {
     public BuddyDisplayComposite(Composite parent, int style) {
         super(parent, style);
 
-        Saros.injectDependenciesOnly(this);
-
+        SarosPluginContext.initComponent(this);
+        
         super.setLayout(LayoutUtils.createGridLayout());
         this.viewer.getControl()
             .setLayoutData(LayoutUtils.createFillGridData());

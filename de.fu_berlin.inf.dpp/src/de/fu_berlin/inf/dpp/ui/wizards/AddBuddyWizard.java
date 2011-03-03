@@ -22,6 +22,7 @@ package de.fu_berlin.inf.dpp.ui.wizards;
 import java.lang.reflect.InvocationTargetException;
 import java.util.concurrent.CancellationException;
 
+import de.fu_berlin.inf.dpp.SarosPluginContext;
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
@@ -68,7 +69,7 @@ public class AddBuddyWizard extends Wizard {
     protected JID cachedBuddy;
 
     public AddBuddyWizard() {
-        Saros.injectDependenciesOnly(this);
+        SarosPluginContext.initComponent(this);
         this.setWindowTitle(TITLE);
         this.setDefaultPageImageDescriptor(IMAGE);
 

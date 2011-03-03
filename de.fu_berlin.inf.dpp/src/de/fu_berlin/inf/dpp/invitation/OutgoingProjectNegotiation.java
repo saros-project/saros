@@ -16,6 +16,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
+import de.fu_berlin.inf.dpp.SarosContext;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IFile;
@@ -76,8 +77,8 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
     public OutgoingProjectNegotiation(ITransmitter transmitter, JID to,
         ISarosSession sarosSession, List<IProject> projects,
         ProjectNegotiationObservable projectExchangeProcesses,
-        StopManager stopManager, SessionIDObservable sessionID, boolean doStream) {
-        super(transmitter, to, projectExchangeProcesses);
+        StopManager stopManager, SessionIDObservable sessionID, boolean doStream, SarosContext sarosContext) {
+        super(transmitter, to, projectExchangeProcesses, sarosContext);
 
         this.processID = String.valueOf(INVITATION_RAND.nextLong());
         this.projectExchangeProcesses = projectExchangeProcesses;

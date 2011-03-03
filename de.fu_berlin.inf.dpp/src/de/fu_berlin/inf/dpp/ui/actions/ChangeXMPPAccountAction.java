@@ -2,6 +2,7 @@ package de.fu_berlin.inf.dpp.ui.actions;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import de.fu_berlin.inf.dpp.SarosPluginContext;
 import org.apache.log4j.Logger;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ActionContributionItem;
@@ -43,7 +44,7 @@ public class ChangeXMPPAccountAction extends Action implements IMenuCreator {
     };
 
     public ChangeXMPPAccountAction() {
-        Saros.injectDependenciesOnly(this);
+        SarosPluginContext.initComponent(this);
         this.setText("Connect");
         saros.addListener(connectionListener);
         setMenuCreator(this);

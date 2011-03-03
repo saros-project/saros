@@ -3,6 +3,7 @@ package de.fu_berlin.inf.dpp.util.log;
 import java.util.LinkedList;
 import java.util.List;
 
+import de.fu_berlin.inf.dpp.SarosPluginContext;
 import org.apache.log4j.AppenderSkeleton;
 import org.apache.log4j.Level;
 import org.apache.log4j.Priority;
@@ -62,7 +63,7 @@ public class EclipseLogAppender extends AppenderSkeleton {
         if (saros == null && Saros.isInitialized()) {
 
             // Initialize
-            Saros.injectDependenciesOnly(this);
+            SarosPluginContext.initComponent(this);
 
             // Flush Cache
             for (LoggingEvent cached : cache) {
