@@ -58,7 +58,7 @@ public class TestEditorByAliceAndBob extends STFTest {
     @Test
     public void waitUntilBobJavaEditorOpen() throws RemoteException {
 
-        bob.sarosBot().views().sessionView().selectBuddy(alice.jid)
+        bob.sarosBot().views().sessionView().selectParticipant(alice.jid)
             .followThisBuddy();
         assertTrue(bob.sarosBot().views().sessionView().isInFollowModeNoGUI());
         alice.sarosBot().views().packageExplorerView()

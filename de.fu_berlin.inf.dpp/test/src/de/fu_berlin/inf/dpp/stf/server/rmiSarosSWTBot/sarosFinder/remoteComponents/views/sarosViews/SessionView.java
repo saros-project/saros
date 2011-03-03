@@ -37,7 +37,7 @@ import de.fu_berlin.inf.dpp.ui.actions.RestrictInviteesToReadOnlyAccessAction;
  * @author Lin
  */
 public interface SessionView extends Remote {
-    public SarosContextMenuWrapper selectBuddy(final JID participantJID)
+    public SarosContextMenuWrapper selectParticipant(final JID participantJID)
         throws RemoteException;
 
     public void shareYourScreenWithSelectedBuddy(JID jidOfPeer)
@@ -331,7 +331,7 @@ public interface SessionView extends Remote {
      * @return<tt>true</tt>, if you have write access.
      * @throws RemoteException
      */
-    public boolean hasWriteAccess() throws RemoteException;
+    // public boolean hasWriteAccess() throws RemoteException;
 
     /**
      * 
@@ -340,17 +340,11 @@ public interface SessionView extends Remote {
      * @return<tt>true</tt>, if the given buddies have write access.
      * @throws RemoteException
      */
-    public boolean hasWriteAccessBy(JID... buddiesJIDs) throws RemoteException;
+    // public boolean hasWriteAccessBy(JID... buddiesJIDs) throws
+    // RemoteException;
 
-    public boolean hasWriteAccessBy(String... tableItemTexts)
-        throws RemoteException;
-
-    /**
-     * 
-     * @return<tt>true</tt>, if the you have read only access.
-     * @throws RemoteException
-     */
-    public boolean hasReadOnlyAccess() throws RemoteException;
+    // public boolean hasWriteAccessBy(String... tableItemTexts)
+    // throws RemoteException;
 
     /**
      * 
@@ -360,10 +354,11 @@ public interface SessionView extends Remote {
      *                       isn't enabled by given participants
      * @throws RemoteException
      */
-    public boolean hasReadOnlyAccessBy(JID... buddiesJIDs)
-        throws RemoteException;
+    // public boolean hasReadOnlyAccessBy(JID... buddiesJIDs)
+    // throws RemoteException;
 
-    public boolean hasReadOnlyAccessBy(String... jids) throws RemoteException;
+    // public boolean hasReadOnlyAccessBy(String... jids) throws
+    // RemoteException;
 
     /**
      * Test if you are now in a session. <br>
@@ -447,8 +442,6 @@ public interface SessionView extends Remote {
         throws RemoteException;
 
     public boolean isFollowing() throws RemoteException;
-
-    public boolean isFollowingBuddy(JID buddyJID) throws RemoteException;
 
     /**
      * 
@@ -667,55 +660,11 @@ public interface SessionView extends Remote {
     public void waitUntilIsInviteeNotInSession(SarosBot sarosBot)
         throws RemoteException;
 
-    /**
-     * waits until the local user has {@link User.Permission#WRITE_ACCESS} after
-     * host grants him {@link User.Permission#WRITE_ACCESS}. This method should
-     * be used after performing the action
-     * {@link SessionView#grantWriteAccess(SessionView)} to guarantee the
-     * invitee has really got {@link User.Permission#WRITE_ACCESS}.
-     * 
-     * @throws RemoteException
-     */
-    public void waitUntilHasWriteAccess() throws RemoteException;
+    // public void waitUntilHasWriteAccessBy(final String tableItemText)
+    // throws RemoteException;
 
-    /**
-     * waits until the given user has {@link User.Permission#WRITE_ACCESS} after
-     * host grant him {@link User.Permission#WRITE_ACCESS}. This method should
-     * be used after performing the action
-     * {@link SessionView#grantWriteAccess(SessionView)} to guarantee the
-     * invitee has really got the {@link User.Permission#WRITE_ACCESS}.
-     * 
-     * @throws RemoteException
-     */
-    public void waitUntilHasWriteAccessBy(final JID jid) throws RemoteException;
-
-    public void waitUntilHasWriteAccessBy(final String tableItemText)
-        throws RemoteException;
-
-    /**
-     * waits until the local user has no more
-     * {@link User.Permission#WRITE_ACCESS} after host has
-     * {@link User.Permission#READONLY_ACCESS}. This method should be used after
-     * performing the action
-     * {@link SessionView#restrictToReadOnlyAccess(SessionView)} or
-     * {@link SessionView#restrictInviteesToReadOnlyAccess()} to guarantee the
-     * invitee's {@link User.Permission#WRITE_ACCESS} is really removed
-     * 
-     * @throws RemoteException
-     */
-    public void waitUntilHasReadOnlyAccess() throws RemoteException;
-
-    public void waitUntilHasReadOnlyAccessBy(final JID jid)
-        throws RemoteException;
-
-    public void waitUntilHasReadOnlyAccessBy(final String tableItemText)
-        throws RemoteException;
-
-    public void waitUntilIsFollowingBuddy(final JID followedBuddyJID)
-        throws RemoteException;
-
-    public void waitUntilIsNotFollowingBuddy(final JID foolowedBuddyJID)
-        throws RemoteException;
+    // public void waitUntilHasReadOnlyAccessBy(final JID jid)
+    // throws RemoteException;
 
     public void waitUntilAllPeersLeaveSession(
         final List<JID> jidsOfAllParticipants) throws RemoteException;

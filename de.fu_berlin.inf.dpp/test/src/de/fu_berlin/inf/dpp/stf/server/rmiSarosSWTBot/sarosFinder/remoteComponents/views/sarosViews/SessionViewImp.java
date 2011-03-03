@@ -57,7 +57,7 @@ public class SessionViewImp extends ViewsImp implements SessionView {
      * 
      **********************************************/
 
-    public SarosContextMenuWrapper selectBuddy(final JID participantJID)
+    public SarosContextMenuWrapper selectParticipant(final JID participantJID)
         throws RemoteException {
         String participantLabel = getParticipantLabel(participantJID);
         sarosContextMenu.setTableItem(table.getTableItem(participantLabel));
@@ -106,7 +106,7 @@ public class SessionViewImp extends ViewsImp implements SessionView {
         if (isToolbarButtonEnabled(TB_RESTRICT_INVITEES_TO_READ_ONLY_ACCESS)) {
             clickToolbarButtonWithTooltip(TB_RESTRICT_INVITEES_TO_READ_ONLY_ACCESS);
             for (JID invitee : getInvitees())
-                waitUntilHasReadOnlyAccessBy(invitee);
+                selectParticipant(invitee).waitUntilHasReadOnlyAccess();
             bot().sleep(300);
         }
     }
@@ -137,23 +137,11 @@ public class SessionViewImp extends ViewsImp implements SessionView {
         bot().waitsUntilShellIsClosed(SHELL_PROGRESS_INFORMATION);
     }
 
-    private void selectParticipant(JID jidOfSelectedUser, String message)
-        throws RemoteException {
-        if (localJID.equals(jidOfSelectedUser)) {
-            throw new RuntimeException(message);
-        }
-        selectBuddy(jidOfSelectedUser);
-    }
-
-    public List<JID> getInvitees() {
-        List<JID> invitees = new ArrayList<JID>();
-        ISarosSession sarosSession = sessionManager.getSarosSession();
-        for (User user : sarosSession.getParticipants()) {
-            if (!user.isHost())
-                invitees.add(user.getJID());
-        }
-        return invitees;
-    }
+    /**********************************************
+     * 
+     * States
+     * 
+     **********************************************/
 
     public String getParticipantLabel(JID participantJID)
         throws RemoteException {
@@ -186,7 +174,7 @@ public class SessionViewImp extends ViewsImp implements SessionView {
     }
 
     public boolean isInSession() throws RemoteException {
-        return isToolbarButtonEnabled(TB_LEAVE_THE_SESSION);
+        return isInSessionNoGUI();
     }
 
     public boolean existsParticipant(JID participantJID) throws RemoteException {
@@ -202,59 +190,46 @@ public class SessionViewImp extends ViewsImp implements SessionView {
         return view.bot().existsLabel();
     }
 
-    public boolean hasWriteAccess() throws RemoteException {
-        return !getParticipantLabel(localJID).contains(PERMISSION_NAME);
-    }
+    // public boolean hasWriteAccessBy(String... tableItemTexts)
+    // throws RemoteException {
+    // boolean result = true;
+    // for (String text : tableItemTexts) {
+    // result &= !table.getTableItem(text)
+    // .contextMenu(CM_GRANT_WRITE_ACCESS).isEnabled()
+    // && !text.contains(PERMISSION_NAME);
+    // }
+    // return result;
+    // }
 
-    public boolean hasWriteAccessBy(JID... jids) throws RemoteException {
-        boolean result = true;
-        for (JID jid : jids) {
-            result &= !table.getTableItem(getParticipantLabel(jid))
-                .contextMenu(CM_GRANT_WRITE_ACCESS).isEnabled()
-                && !getParticipantLabel(jid).contains(PERMISSION_NAME);
-        }
-        return result;
-    }
-
-    public boolean hasWriteAccessBy(String... tableItemTexts)
-        throws RemoteException {
-        boolean result = true;
-        for (String text : tableItemTexts) {
-            result &= !table.getTableItem(text)
-                .contextMenu(CM_GRANT_WRITE_ACCESS).isEnabled()
-                && !text.contains(PERMISSION_NAME);
-        }
-        return result;
-    }
-
-    public boolean hasReadOnlyAccess() throws RemoteException {
-        return getParticipantLabel(localJID).contains(PERMISSION_NAME);
-    }
-
-    public boolean hasReadOnlyAccessBy(JID... jids) throws RemoteException {
-
-        boolean result = true;
-        for (JID jid : jids) {
-            boolean isEnabled = table.getTableItem(getParticipantLabel(jid))
-                .contextMenu(CM_RESTRICT_TO_READ_ONLY_ACCESS).isEnabled();
-            result &= !isEnabled
-                && getParticipantLabel(jid).contains(PERMISSION_NAME);
-        }
-        return result;
-    }
-
-    public boolean hasReadOnlyAccessBy(String... jids) throws RemoteException {
-
-        boolean result = true;
-        for (String jid : jids) {
-            boolean isEnabled = table.getTableItem(jid)
-                .contextMenu(CM_RESTRICT_TO_READ_ONLY_ACCESS).isEnabled();
-            result &= !isEnabled && jid.contains(PERMISSION_NAME);
-        }
-        return result;
-    }
+    // public boolean hasReadOnlyAccessBy(JID... jids) throws RemoteException {
+    // if (!isInSession())
+    // return false;
+    // boolean result = true;
+    // for (JID jid : jids) {
+    // boolean isEnabled = table.getTableItem(getParticipantLabel(jid))
+    // .contextMenu(CM_RESTRICT_TO_READ_ONLY_ACCESS).isEnabled();
+    // result &= !isEnabled
+    // && getParticipantLabel(jid).contains(PERMISSION_NAME);
+    // }
+    // return result;
+    // }
+    //
+    // public boolean hasReadOnlyAccessBy(String... jids) throws RemoteException
+    // {
+    // if (!isInSession())
+    // return false;
+    // boolean result = true;
+    // for (String jid : jids) {
+    // boolean isEnabled = table.getTableItem(jid)
+    // .contextMenu(CM_RESTRICT_TO_READ_ONLY_ACCESS).isEnabled();
+    // result &= !isEnabled && jid.contains(PERMISSION_NAME);
+    // }
+    // return result;
+    // }
 
     public boolean isHost() throws RemoteException {
+        if (!isInSession())
+            return false;
         String ownLabelsInSessionView = getParticipantLabel(localJID);
         String talbeItem = table.getTableItem(0).getText();
         if (ownLabelsInSessionView.equals(talbeItem))
@@ -263,6 +238,8 @@ public class SessionViewImp extends ViewsImp implements SessionView {
     }
 
     public boolean isHost(JID jidOfParticipant) throws RemoteException {
+        if (!isInSession())
+            return false;
         String participantLabelsInSessionView = getParticipantLabel(jidOfParticipant);
         String talbeItem = table.getTableItem(0).getText();
         if (participantLabelsInSessionView.equals(talbeItem))
@@ -271,15 +248,21 @@ public class SessionViewImp extends ViewsImp implements SessionView {
     }
 
     public boolean isParticipant() throws RemoteException {
+        if (!isInSession())
+            return false;
         return existsParticipant(getJID());
     }
 
     public boolean isParticipant(JID jid) throws RemoteException {
+        if (!isInSession())
+            return false;
         return existsParticipant(jid);
     }
 
     public boolean areParticipants(List<JID> jidOfParticipants)
         throws RemoteException {
+        if (!isInSession())
+            return false;
         boolean result = true;
         for (JID jid : jidOfParticipants) {
             result &= existsParticipant(jid);
@@ -288,6 +271,8 @@ public class SessionViewImp extends ViewsImp implements SessionView {
     }
 
     public boolean isFollowing() throws RemoteException {
+        if (!isInSession())
+            return false;
         JID followedBuddy = getFollowedBuddyJIDNoGUI();
         if (followedBuddy == null)
             return false;
@@ -295,21 +280,16 @@ public class SessionViewImp extends ViewsImp implements SessionView {
 
     }
 
-    public boolean isFollowingBuddy(JID buddyJID) throws RemoteException {
-        // STFBotTableItem tableItem = bot().view(VIEW_SAROS_SESSION).bot_()
-        // .table().getTableItem(getParticipantLabel(buddyJID));
-        // return tableItem.existsContextMenu(CM_STOP_FOLLOWING_THIS_BUDDY);
-        return isFollowingBuddyNoGUI(buddyJID.getBase());
-    }
-
     public String getFirstLabelTextInSessionview() throws RemoteException {
         if (existsLabelInSessionView())
             return view.bot().label().getText();
-        return null;
+        throw new RuntimeException("There are no label in the session view.");
     }
 
     public List<String> getAllParticipantsInSessionView()
         throws RemoteException {
+        if (!isInSession())
+            throw new RuntimeException("Session is not open yet!");
         List<String> allParticipantsName = new ArrayList<String>();
         for (int i = 0; i < table.rowCount(); i++) {
             allParticipantsName.add(table.getTableItem(i).getText());
@@ -504,111 +484,18 @@ public class SessionViewImp extends ViewsImp implements SessionView {
         waitUntilIsNotInSession();
     }
 
-    public void waitUntilHasWriteAccess() throws RemoteException {
-        bot().waitUntil(new DefaultCondition() {
-            public boolean test() throws Exception {
-                return hasWriteAccess();
-            }
-
-            public String getFailureMessage() {
-                return "can't grant " + localJID.getBase()
-                    + " the write access.";
-            }
-        });
-    }
-
-    public void waitUntilHasWriteAccessBy(final JID jid) throws RemoteException {
-        bot().waitUntil(new DefaultCondition() {
-            public boolean test() throws Exception {
-                return hasWriteAccessBy(jid);
-            }
-
-            public String getFailureMessage() {
-                return "can't grant " + jid.getBase() + " the write accesss.";
-            }
-        });
-    }
-
-    public void waitUntilHasWriteAccessBy(final String tableItemText)
-        throws RemoteException {
-        bot().waitUntil(new DefaultCondition() {
-            public boolean test() throws Exception {
-                return hasWriteAccessBy(tableItemText);
-            }
-
-            public String getFailureMessage() {
-                return "can't grant " + tableItemText + " the write accesss.";
-            }
-        });
-    }
-
-    public void waitUntilHasReadOnlyAccess() throws RemoteException {
-        bot().waitUntil(new DefaultCondition() {
-            public boolean test() throws Exception {
-                return !hasWriteAccess();
-            }
-
-            public String getFailureMessage() {
-                return "can't restrict " + localJID.getBase()
-                    + " to read-only access";
-            }
-        });
-    }
-
-    public void waitUntilHasReadOnlyAccessBy(final JID jid)
-        throws RemoteException {
-        bot().waitUntil(new DefaultCondition() {
-            public boolean test() throws Exception {
-                return !hasWriteAccessBy(jid);
-            }
-
-            public String getFailureMessage() {
-                return "can't restrict " + jid.getBase()
-                    + " to read-only access.";
-            }
-        });
-    }
-
-    public void waitUntilHasReadOnlyAccessBy(final String tableItemText)
-        throws RemoteException {
-        bot().waitUntil(new DefaultCondition() {
-            public boolean test() throws Exception {
-                return hasReadOnlyAccessBy(tableItemText);
-            }
-
-            public String getFailureMessage() {
-                return "can't restrict " + tableItemText
-                    + " to read-only access.";
-            }
-        });
-    }
-
-    public void waitUntilIsFollowingBuddy(final JID followedBuddyJID)
-        throws RemoteException {
-        bot().waitUntil(new DefaultCondition() {
-            public boolean test() throws Exception {
-                return isFollowingBuddy(followedBuddyJID);
-            }
-
-            public String getFailureMessage() {
-                return localJID.getBase() + " is not folloing the user "
-                    + followedBuddyJID.getName();
-            }
-        });
-    }
-
-    public void waitUntilIsNotFollowingBuddy(final JID foolowedBuddyJID)
-        throws RemoteException {
-        bot().waitUntil(new DefaultCondition() {
-            public boolean test() throws Exception {
-                return !isFollowingBuddy(foolowedBuddyJID);
-            }
-
-            public String getFailureMessage() {
-                return foolowedBuddyJID.getBase() + " is still followed.";
-            }
-        });
-    }
+    // public void waitUntilHasWriteAccessBy(final String tableItemText)
+    // throws RemoteException {
+    // bot().waitUntil(new DefaultCondition() {
+    // public boolean test() throws Exception {
+    // return hasWriteAccessBy(tableItemText);
+    // }
+    //
+    // public String getFailureMessage() {
+    // return "can't grant " + tableItemText + " the write accesss.";
+    // }
+    // });
+    // }
 
     public void waitUntilAllPeersLeaveSession(
         final List<JID> jidsOfAllParticipants) throws RemoteException {
@@ -652,6 +539,24 @@ public class SessionViewImp extends ViewsImp implements SessionView {
         if (!view.existsToolbarButton(tooltip))
             return false;
         return view.toolbarButton(tooltip).isEnabled();
+    }
+
+    private void selectParticipant(JID jidOfSelectedUser, String message)
+        throws RemoteException {
+        if (localJID.equals(jidOfSelectedUser)) {
+            throw new RuntimeException(message);
+        }
+        selectParticipant(jidOfSelectedUser);
+    }
+
+    private List<JID> getInvitees() {
+        List<JID> invitees = new ArrayList<JID>();
+        ISarosSession sarosSession = sessionManager.getSarosSession();
+        for (User user : sarosSession.getParticipants()) {
+            if (!user.isHost())
+                invitees.add(user.getJID());
+        }
+        return invitees;
     }
 
 }

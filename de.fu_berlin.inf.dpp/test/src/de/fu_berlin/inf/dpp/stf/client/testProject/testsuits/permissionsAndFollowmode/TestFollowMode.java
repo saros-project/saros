@@ -38,7 +38,7 @@ public class TestFollowMode extends STFTest {
         alice.sarosBot().views().packageExplorerView()
             .selectClass(PROJECT1, PKG1, CLS1).open();
         alice.bot().editor(CLS1_SUFFIX).setTexWithSave(CP1);
-        bob.sarosBot().views().sessionView().selectBuddy(alice.jid)
+        bob.sarosBot().views().sessionView().selectParticipant(alice.jid)
             .followThisBuddy();
         bob.bot().editor(CLS1_SUFFIX).waitUntilIsActive();
         assertTrue(bob.sarosBot().views().sessionView().isInFollowModeNoGUI());
@@ -58,7 +58,7 @@ public class TestFollowMode extends STFTest {
         bob.bot().editor(CLS2_SUFFIX).waitUntilIsActive();
         assertTrue(bob.bot().editor(CLS2_SUFFIX).isActive());
 
-        alice.sarosBot().views().sessionView().selectBuddy(bob.jid)
+        alice.sarosBot().views().sessionView().selectParticipant(bob.jid)
             .followThisBuddy();
         bob.bot().editor(CLS1_SUFFIX).show();
         alice.bot().editor(CLS1_SUFFIX).waitUntilIsActive();

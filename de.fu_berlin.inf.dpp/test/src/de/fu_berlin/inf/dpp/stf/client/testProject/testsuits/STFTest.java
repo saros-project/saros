@@ -425,15 +425,16 @@ public class STFTest extends STF {
         throws RemoteException {
         for (Tester tester : invitees) {
             if (tester.sarosBot().views().sessionView().isInSession()
-                && tester.sarosBot().views().sessionView().hasReadOnlyAccess()) {
-                host.sarosBot().views().sessionView().selectBuddy(tester.jid)
-                    .grantWriteAccess();
+                && tester.sarosBot().views().sessionView()
+                    .selectParticipant(tester.jid).hasReadOnlyAccess()) {
+                host.sarosBot().views().sessionView()
+                    .selectParticipant(tester.jid).grantWriteAccess();
             }
         }
 
         if (host.sarosBot().views().sessionView().isInSessionNoGUI()
             && !host.sarosBot().views().sessionView().hasWriteAccessNoGUI()) {
-            host.sarosBot().views().sessionView().selectBuddy(host.jid)
+            host.sarosBot().views().sessionView().selectParticipant(host.jid)
                 .grantWriteAccess();
         }
     }
@@ -446,7 +447,8 @@ public class STFTest extends STF {
                 JID followedBuddyJID = tester.sarosBot().views().sessionView()
                     .getFollowedBuddyJIDNoGUI();
                 tester.sarosBot().views().sessionView()
-                    .selectBuddy(followedBuddyJID).stopFollowingThisBuddy();
+                    .selectParticipant(followedBuddyJID)
+                    .stopFollowingThisBuddy();
             }
         }
     }
@@ -469,7 +471,8 @@ public class STFTest extends STF {
                     JID followedBuddyJID = tester.sarosBot().views()
                         .sessionView().getFollowedBuddyJIDNoGUI();
                     tester.sarosBot().views().sessionView()
-                        .selectBuddy(followedBuddyJID).stopFollowingThisBuddy();
+                        .selectParticipant(followedBuddyJID)
+                        .stopFollowingThisBuddy();
                     return null;
                 }
             });
@@ -684,7 +687,7 @@ public class STFTest extends STF {
             followTasks.add(new Callable<Void>() {
                 public Void call() throws Exception {
                     tester.sarosBot().views().sessionView()
-                        .selectBuddy(followedBuddy.jid).followThisBuddy();
+                        .selectParticipant(followedBuddy.jid).followThisBuddy();
                     return null;
                 }
             });
