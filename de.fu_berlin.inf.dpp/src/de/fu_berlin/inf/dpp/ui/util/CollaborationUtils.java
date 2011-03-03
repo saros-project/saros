@@ -148,8 +148,10 @@ public class CollaborationUtils {
                                 }
                             }
 
-                            sarosSessionManager
-                                .addProjectsToSession(projectsToAdd);
+                            if (projectsToAdd.size() > 0) {
+                                sarosSessionManager
+                                    .addProjectsToSession(projectsToAdd);
+                            }
                         }
                     });
                 } else {
@@ -193,8 +195,10 @@ public class CollaborationUtils {
                                 sarosSession.getHost().getJID(), sarosSession
                                     .getProjects().toArray(new IProject[0]));
 
-                            sarosSessionManager.invite(buddiesToAdd,
-                                description);
+                            if (buddiesToAdd.size() > 0) {
+                                sarosSessionManager.invite(buddiesToAdd,
+                                    description);
+                            }
                         }
                     });
                 } else {
