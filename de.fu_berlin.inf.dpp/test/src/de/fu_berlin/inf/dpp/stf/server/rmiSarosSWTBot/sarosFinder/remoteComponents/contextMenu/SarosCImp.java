@@ -43,9 +43,10 @@ public class SarosCImp extends Component implements SarosC {
         sarosBot().confirmShellInvitation(baseJIDOfInvitees);
     }
 
-    public void shareProject(String... baseJIDOfInvitees)
+    public void multipleBuddies(String... baseJIDOfInvitees)
         throws RemoteException {
-        treeItem.contextMenu(CM_SAROS, CM_SHARE_PROJECT).click();
+        // treeItem.contextMenu(CM_SAROS).contextMenu(CM_SHARE_PROJECT).click();
+        treeItem.contextMenu(CM_SAROS, baseJIDOfInvitees[0]).click();
         sarosBot().confirmShellInvitation(baseJIDOfInvitees);
     }
 

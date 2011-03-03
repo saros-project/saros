@@ -274,6 +274,7 @@ public class SarosBotImp extends STF implements SarosBot {
         bot().waitUntilShellIsOpen(SHELL_INVITATION);
         STFBotShell shell = bot().shell(SHELL_INVITATION);
         shell.activate();
+        shell.bot().button(NEXT).click();
         shell.confirmWithCheckBoxs(FINISH, baseJIDOfinvitees);
     }
 

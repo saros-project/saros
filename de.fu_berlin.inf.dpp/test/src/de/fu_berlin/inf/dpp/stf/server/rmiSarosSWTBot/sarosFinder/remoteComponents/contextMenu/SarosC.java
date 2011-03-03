@@ -84,6 +84,6 @@ public interface SarosC extends Remote {
      * @throws RemoteException
      * 
      */
-    public void shareProject(String... inviteeBaseJIDS) throws RemoteException;
+    public void multipleBuddies(String... inviteeBaseJIDS) throws RemoteException;
 
 }

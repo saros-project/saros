@@ -54,7 +54,7 @@ public class ContextMenuWrapperImp extends Component implements
         this.tree = tree;
     }
 
-    public SarosC saros() throws RemoteException {
+    public SarosC shareWith() throws RemoteException {
         sarosC.setTreeItem(treeItem);
         return sarosC;
     }

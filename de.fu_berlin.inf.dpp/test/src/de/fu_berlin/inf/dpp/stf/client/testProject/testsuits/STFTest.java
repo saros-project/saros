@@ -557,7 +557,7 @@ public class STFTest extends STF {
         String[] baseJIDOfInvitees = getPeersBaseJID(invitees);
 
         inviter.sarosBot().views().packageExplorerView()
-            .selectProject(projectName).saros()
+            .selectProject(projectName).shareWith()
             .shareProjectWith(howToShareProject, baseJIDOfInvitees);
         for (Tester invitee : invitees) {
             invitee.bot().shell(SHELL_SESSION_INVITATION).confirm(FINISH);
@@ -575,7 +575,7 @@ public class STFTest extends STF {
 
         log.trace("alice.shareProjectParallel");
         inviter.sarosBot().views().packageExplorerView()
-            .selectProject(projectName).saros()
+            .selectProject(projectName).shareWith()
             .shareProjectWith(howToShareProject, getPeersBaseJID(invitees));
 
         List<Callable<Void>> joinSessionTasks = new ArrayList<Callable<Void>>();

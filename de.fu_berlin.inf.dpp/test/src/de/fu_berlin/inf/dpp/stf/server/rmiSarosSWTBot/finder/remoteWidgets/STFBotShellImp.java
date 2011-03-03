@@ -135,7 +135,8 @@ public class STFBotShellImp extends AbstractRmoteWidget implements STFBotShell {
         throws RemoteException {
         waitUntilActive();
         for (String itemName : itemNames) {
-            bot().table().getTableItem(itemName).check();
+            bot().tree().selectTreeItem(itemName).check();
+            // bot().table().getTableItem(itemName).check();
         }
         bot().button(buttonText).waitUntilIsEnabled();
         bot().button(buttonText).click();

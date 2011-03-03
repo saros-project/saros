@@ -77,8 +77,8 @@ public class TestParallelInvitationWithTerminationByInvitees extends STFTest {
             .views()
             .packageExplorerView()
             .selectProject(PROJECT1)
-            .saros()
-            .shareProject(VIEW_PACKAGE_EXPLORER, PROJECT1, bob.getBaseJid(),
+            .shareWith()
+            .multipleBuddies(VIEW_PACKAGE_EXPLORER, PROJECT1, bob.getBaseJid(),
                 dave.getBaseJid(), carl.getBaseJid(), edna.getBaseJid());
 
         bob.bot().waitUntilShellIsOpen(SHELL_SESSION_INVITATION);
