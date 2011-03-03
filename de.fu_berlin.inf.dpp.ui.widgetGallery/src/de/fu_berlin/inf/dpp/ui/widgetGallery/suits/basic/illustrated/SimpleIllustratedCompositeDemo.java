@@ -28,7 +28,7 @@ public class SimpleIllustratedCompositeDemo extends DescriptiveDemo {
 		IllustratedText content = new IllustratedText(iconId, text);
 
 		SimpleIllustratedComposite illustratedComposite = new SimpleIllustratedComposite(
-				parent, SWT.BORDER | position);
+				parent, SWT.NONE | position);
 		illustratedComposite.setContent(content);
 
 		return illustratedComposite;

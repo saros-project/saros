@@ -28,7 +28,7 @@ public class IllustratedCompositeDemo extends DescriptiveDemo {
 	protected IllustratedComposite createIllustratedComposite(
 			final Composite parent, int iconId, int position, String text) {
 		IllustratedComposite illustratedComposite = new IllustratedComposite(
-				parent, SWT.BORDER | position, iconId);
+				parent, SWT.NONE | position, iconId);
 		illustratedComposite.setLayout(LayoutUtils.createGridLayout(2, false,
 				0, 10));
 

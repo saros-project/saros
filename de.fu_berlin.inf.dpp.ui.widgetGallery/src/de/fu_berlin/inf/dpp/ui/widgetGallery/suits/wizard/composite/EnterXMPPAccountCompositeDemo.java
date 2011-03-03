@@ -30,7 +30,7 @@ public class EnterXMPPAccountCompositeDemo extends DescriptiveDemo {
 
 		EnterXMPPAccountComposite enterXMPPAccountComposite = new EnterXMPPAccountComposite(
 				parent, SWT.NONE);
-		enterXMPPAccountComposite.setLayoutData(new GridData(SWT.CENTER,
+		enterXMPPAccountComposite.setLayoutData(new GridData(SWT.FILL,
 				SWT.CENTER, true, true));
 		enterXMPPAccountComposite
 				.addEnterXMPPAccountCompositeListener(new EnterXMPPAccountCompositeListener() {

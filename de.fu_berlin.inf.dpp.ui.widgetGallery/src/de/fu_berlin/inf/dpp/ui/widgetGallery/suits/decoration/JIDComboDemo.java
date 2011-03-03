@@ -6,7 +6,7 @@ import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.picocontainer.annotations.Inject;
 
-import de.fu_berlin.inf.dpp.Saros;
+import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.accountManagement.XMPPAccount;
 import de.fu_berlin.inf.dpp.accountManagement.XMPPAccountStore;
 import de.fu_berlin.inf.dpp.ui.util.LayoutUtils;
@@ -40,7 +40,7 @@ public class JIDComboDemo extends DescriptiveDemo {
 	}
 
 	protected void showXMPPAccounts() {
-		Saros.injectDependenciesOnly(this);
+		SarosPluginContext.initComponent(this);
 		addConsoleMessage("XMPPAccounts:");
 		for (XMPPAccount xmppAccount : xmppAccountStore.getAllAccounts()) {
 			addConsoleMessage("- " + xmppAccount.toString());

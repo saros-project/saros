@@ -58,9 +58,19 @@ public class AllWizardsDemo extends DescriptiveDemo {
 				WizardUtils.openAddBuddyWizard();
 			}
 		});
-		wizards.put("CollaborationWizard", new Runnable() {
+		wizards.put("ShareProjectWizard", new Runnable() {
 			public void run() {
 				WizardUtils.openShareProjectWizard();
+			}
+		});
+		wizards.put("ShareProjectAddProjectWizard", new Runnable() {
+			public void run() {
+				WizardUtils.openShareProjectAddProjectsWizard();
+			}
+		});
+		wizards.put("ShareProjectAddBuddiesWizard", new Runnable() {
+			public void run() {
+				WizardUtils.openShareProjectAddBuddiesWizard();
 			}
 		});
 
