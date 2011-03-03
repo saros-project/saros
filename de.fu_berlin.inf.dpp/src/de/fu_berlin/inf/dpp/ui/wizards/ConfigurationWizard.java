@@ -19,32 +19,25 @@
  */
 package de.fu_berlin.inf.dpp.ui.wizards;
 
-import java.util.LinkedList;
-import java.util.List;
-
-import de.fu_berlin.inf.dpp.SarosPluginContext;
-import org.eclipse.jface.wizard.Wizard;
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.picocontainer.annotations.Inject;
 
-import de.fu_berlin.inf.dpp.Saros;
+import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.feedback.ErrorLogManager;
 import de.fu_berlin.inf.dpp.feedback.StatisticManager;
+import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
 import de.fu_berlin.inf.dpp.ui.ImageManager;
-import de.fu_berlin.inf.dpp.ui.wizards.pages.StatisticSubmissionWizardPage;
-import de.fu_berlin.inf.dpp.ui.wizards.pages.CreateXMPPAccountWizardPage;
 import de.fu_berlin.inf.dpp.ui.wizards.pages.ConfigurationSettingsWizardPage;
-import de.fu_berlin.inf.dpp.ui.wizards.pages.IWizardPage2;
+import de.fu_berlin.inf.dpp.ui.wizards.pages.ConfigurationSummaryWizardPage;
 
 /**
  * A wizard to configure Saros (XMPP account, network settings, statistic
  * submission).
  * 
+ * @author bkahlert
  */
-public class ConfigurationWizard extends Wizard {
-
-    @Inject
-    protected Saros saros;
+public class ConfigurationWizard extends AddXMPPAccountWizard {
 
     @Inject
     protected PreferenceUtils preferenceUtils;
@@ -55,71 +48,58 @@ public class ConfigurationWizard extends Wizard {
     @Inject
     protected ErrorLogManager errorLogManager;
 
-    /**
-     * We keep our own list of IWizardPage2s so we can call performFinish on
-     * them.
-     */
-    protected List<IWizardPage2> pages = new LinkedList<IWizardPage2>();
+    ConfigurationSettingsWizardPage configurationSettingsWizardPage = new ConfigurationSettingsWizardPage();
 
-    public ConfigurationWizard(boolean askForAccount,
-        boolean askAboutStatisticSubmission, boolean showUseNowButton) {
-
-        setWindowTitle("Saros Configuration");
-        setHelpAvailable(false);
-        setNeedsProgressMonitor(true);
-        setDefaultPageImageDescriptor(ImageManager.WIZBAN_CONFIGURATION);
-
-        /*
-         * HACK Changing UI components like the configuration wizard should not
-         * use PicoContainer directly.
-         */
+    public ConfigurationWizard() {
         SarosPluginContext.initComponent(this);
 
-        if (askForAccount) {
-            this.pages.add(new CreateXMPPAccountWizardPage(saros, false,
-                showUseNowButton, !showUseNowButton, preferenceUtils));
-            this.pages
-                .add(new ConfigurationSettingsWizardPage(saros, preferenceUtils));
-        }
-        if (askAboutStatisticSubmission) {
-            this.pages.add(new StatisticSubmissionWizardPage(statisticManager,
-                errorLogManager));
-        }
+        setWindowTitle("Saros Configuration");
+        setDefaultPageImageDescriptor(ImageManager.WIZBAN_CONFIGURATION);
     }
 
     @Override
     public void addPages() {
-        for (IWizardPage2 page : this.pages) {
-            addPage(page);
-        }
+        super.addPages();
+        addPage(configurationSettingsWizardPage);
+        addPage(new ConfigurationSummaryWizardPage());
     }
 
     @Override
     public boolean performFinish() {
-
-        for (IWizardPage2 page : this.pages) {
-            if (!page.performFinish()) {
-                getContainer().showPage(page);
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    @Override
-    public boolean performCancel() {
+        if (!super.performFinish())
+            return false;
+        setConfiguration();
         return true;
     }
 
     /**
-     * We override this method, because we only want to allow to finish when the
-     * last page is displayed (to make sure that the user saw/confirmed all
-     * pages)
+     * Sets the Saros configuration on the base of the
+     * {@link ConfigurationSettingsWizardPage}.
      */
-    @Override
-    public boolean canFinish() {
-        return getContainer().getCurrentPage().getNextPage() == null;
+    protected void setConfiguration() {
+        IPreferenceStore preferences = saros.getPreferenceStore();
+
+        /*
+         * network
+         */
+        boolean autoConnect = this.configurationSettingsWizardPage
+            .isAutoConnect();
+        String skypeUsername = (this.configurationSettingsWizardPage
+            .isSkypeUsage()) ? this.configurationSettingsWizardPage
+            .getSkypeUsername() : "";
+        preferences.setValue(PreferenceConstants.AUTO_CONNECT, autoConnect);
+        preferences.setValue(PreferenceConstants.SKYPE_USERNAME, skypeUsername);
+
+        /*
+         * statistic
+         */
+        boolean statisticSubmissionAllowed = this.configurationSettingsWizardPage
+            .isStatisticSubmissionAllowed();
+        boolean errorLogSubmissionAllowed = this.configurationSettingsWizardPage
+            .isErrorLogSubmissionAllowed();
+        statisticManager
+            .setStatisticSubmissionAllowed(statisticSubmissionAllowed);
+        errorLogManager.setErrorLogSubmissionAllowed(errorLogSubmissionAllowed);
     }
 
 }
