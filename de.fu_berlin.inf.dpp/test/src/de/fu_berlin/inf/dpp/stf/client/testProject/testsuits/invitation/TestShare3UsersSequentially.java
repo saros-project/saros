@@ -56,36 +56,41 @@ public class TestShare3UsersSequentially extends STFTest {
 
         assertTrue(carl.sarosBot().views().sessionView().isParticipantNoGUI());
         assertFalse(carl.sarosBot().views().sessionView()
-            .hasReadOnlyAccessNoGUI());
-        assertTrue(carl.sarosBot().views().sessionView().hasWriteAccessNoGUI());
+            .selectParticipant(carl.jid).hasReadOnlyAccess());
+        assertTrue(carl.sarosBot().views().sessionView()
+            .selectParticipant(carl.jid).hasWriteAccess());
 
         assertTrue(bob.sarosBot().views().sessionView().isParticipantNoGUI());
         assertFalse(bob.sarosBot().views().sessionView()
-            .hasReadOnlyAccessNoGUI());
-        assertTrue(bob.sarosBot().views().sessionView().hasWriteAccessNoGUI());
+            .selectParticipant(bob.jid).hasReadOnlyAccess());
+        assertTrue(bob.sarosBot().views().sessionView()
+            .selectParticipant(bob.jid).hasWriteAccess());
 
         assertTrue(alice.sarosBot().views().sessionView().isParticipantNoGUI());
         assertFalse(alice.sarosBot().views().sessionView()
-            .hasReadOnlyAccessNoGUI());
-        assertTrue(alice.sarosBot().views().sessionView().hasWriteAccessNoGUI());
+            .selectParticipant(alice.jid).hasReadOnlyAccess());
+        assertTrue(alice.sarosBot().views().sessionView()
+            .selectParticipant(alice.jid).hasWriteAccess());
 
         leaveSessionPeersFirst();
 
         assertFalse(carl.sarosBot().views().sessionView().isParticipantNoGUI());
         assertFalse(carl.sarosBot().views().sessionView()
-            .hasReadOnlyAccessNoGUI());
-        assertFalse(carl.sarosBot().views().sessionView().hasWriteAccessNoGUI());
+            .selectParticipant(carl.jid).hasReadOnlyAccess());
+        assertFalse(carl.sarosBot().views().sessionView()
+            .selectParticipant(carl.jid).hasWriteAccess());
 
         assertFalse(bob.sarosBot().views().sessionView().isParticipantNoGUI());
         assertFalse(bob.sarosBot().views().sessionView()
-            .hasReadOnlyAccessNoGUI());
-        assertFalse(bob.sarosBot().views().sessionView().hasWriteAccessNoGUI());
+            .selectParticipant(bob.jid).hasReadOnlyAccess());
+        assertFalse(bob.sarosBot().views().sessionView()
+            .selectParticipant(bob.jid).hasWriteAccess());
 
         assertFalse(alice.sarosBot().views().sessionView().isParticipantNoGUI());
         assertFalse(alice.sarosBot().views().sessionView()
-            .hasReadOnlyAccessNoGUI());
+            .selectParticipant(alice.jid).hasReadOnlyAccess());
         assertFalse(alice.sarosBot().views().sessionView()
-            .hasWriteAccessNoGUI());
+            .selectParticipant(alice.jid).hasWriteAccess());
 
     }
 }

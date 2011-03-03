@@ -65,12 +65,14 @@ public class TestShare2UsersSequentially extends STFTest {
         assertTrue(alice.sarosBot().views().sessionView().isParticipantNoGUI());
 
         assertFalse(bob.sarosBot().views().sessionView()
-            .hasReadOnlyAccessNoGUI());
+            .selectParticipant(bob.jid).hasReadOnlyAccess());
         assertFalse(alice.sarosBot().views().sessionView()
-            .hasReadOnlyAccessNoGUI());
+            .selectParticipant(alice.jid).hasReadOnlyAccess());
 
-        assertTrue(alice.sarosBot().views().sessionView().hasWriteAccessNoGUI());
-        assertTrue(bob.sarosBot().views().sessionView().hasWriteAccessNoGUI());
+        assertTrue(alice.sarosBot().views().sessionView()
+            .selectParticipant(alice.jid).hasWriteAccess());
+        assertTrue(bob.sarosBot().views().sessionView()
+            .selectParticipant(bob.jid).hasWriteAccess());
 
         leaveSessionPeersFirst();
 
@@ -78,13 +80,14 @@ public class TestShare2UsersSequentially extends STFTest {
         assertFalse(alice.sarosBot().views().sessionView().isParticipantNoGUI());
 
         assertFalse(bob.sarosBot().views().sessionView()
-            .hasReadOnlyAccessNoGUI());
+            .selectParticipant(bob.jid).hasReadOnlyAccess());
         assertFalse(alice.sarosBot().views().sessionView()
-            .hasReadOnlyAccessNoGUI());
+            .selectParticipant(alice.jid).hasReadOnlyAccess());
 
         assertFalse(alice.sarosBot().views().sessionView()
-            .hasWriteAccessNoGUI());
-        assertFalse(bob.sarosBot().views().sessionView().hasWriteAccessNoGUI());
+            .selectParticipant(alice.jid).hasWriteAccess());
+        assertFalse(bob.sarosBot().views().sessionView()
+            .selectParticipant(bob.jid).hasWriteAccess());
 
     }
 }

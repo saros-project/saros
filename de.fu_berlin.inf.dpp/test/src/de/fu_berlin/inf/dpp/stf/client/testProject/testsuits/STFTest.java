@@ -433,7 +433,8 @@ public class STFTest extends STF {
         }
 
         if (host.sarosBot().views().sessionView().isInSessionNoGUI()
-            && !host.sarosBot().views().sessionView().hasWriteAccessNoGUI()) {
+            && !host.sarosBot().views().sessionView()
+                .selectParticipant(host.jid).hasWriteAccess()) {
             host.sarosBot().views().sessionView().selectParticipant(host.jid)
                 .grantWriteAccess();
         }

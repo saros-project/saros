@@ -190,46 +190,7 @@ public class SessionViewImp extends ViewsImp implements SessionView {
         return view.bot().existsLabel();
     }
 
-    // public boolean hasWriteAccessBy(String... tableItemTexts)
-    // throws RemoteException {
-    // boolean result = true;
-    // for (String text : tableItemTexts) {
-    // result &= !table.getTableItem(text)
-    // .contextMenu(CM_GRANT_WRITE_ACCESS).isEnabled()
-    // && !text.contains(PERMISSION_NAME);
-    // }
-    // return result;
-    // }
-
-    // public boolean hasReadOnlyAccessBy(JID... jids) throws RemoteException {
-    // if (!isInSession())
-    // return false;
-    // boolean result = true;
-    // for (JID jid : jids) {
-    // boolean isEnabled = table.getTableItem(getParticipantLabel(jid))
-    // .contextMenu(CM_RESTRICT_TO_READ_ONLY_ACCESS).isEnabled();
-    // result &= !isEnabled
-    // && getParticipantLabel(jid).contains(PERMISSION_NAME);
-    // }
-    // return result;
-    // }
-    //
-    // public boolean hasReadOnlyAccessBy(String... jids) throws RemoteException
-    // {
-    // if (!isInSession())
-    // return false;
-    // boolean result = true;
-    // for (String jid : jids) {
-    // boolean isEnabled = table.getTableItem(jid)
-    // .contextMenu(CM_RESTRICT_TO_READ_ONLY_ACCESS).isEnabled();
-    // result &= !isEnabled && jid.contains(PERMISSION_NAME);
-    // }
-    // return result;
-    // }
-
     public boolean isHost() throws RemoteException {
-        if (!isInSession())
-            return false;
         String ownLabelsInSessionView = getParticipantLabel(localJID);
         String talbeItem = table.getTableItem(0).getText();
         if (ownLabelsInSessionView.equals(talbeItem))
@@ -238,8 +199,7 @@ public class SessionViewImp extends ViewsImp implements SessionView {
     }
 
     public boolean isHost(JID jidOfParticipant) throws RemoteException {
-        if (!isInSession())
-            return false;
+
         String participantLabelsInSessionView = getParticipantLabel(jidOfParticipant);
         String talbeItem = table.getTableItem(0).getText();
         if (participantLabelsInSessionView.equals(talbeItem))
@@ -271,8 +231,7 @@ public class SessionViewImp extends ViewsImp implements SessionView {
     }
 
     public boolean isFollowing() throws RemoteException {
-        if (!isInSession())
-            return false;
+
         JID followedBuddy = getFollowedBuddyJIDNoGUI();
         if (followedBuddy == null)
             return false;
@@ -288,32 +247,11 @@ public class SessionViewImp extends ViewsImp implements SessionView {
 
     public List<String> getAllParticipantsInSessionView()
         throws RemoteException {
-        if (!isInSession())
-            throw new RuntimeException("Session is not open yet!");
         List<String> allParticipantsName = new ArrayList<String>();
         for (int i = 0; i < table.rowCount(); i++) {
             allParticipantsName.add(table.getTableItem(i).getText());
         }
         return allParticipantsName;
-    }
-
-    public boolean hasWriteAccessNoGUI() throws RemoteException {
-        ISarosSession sarosSession = sessionManager.getSarosSession();
-        if (sarosSession == null)
-            return false;
-        return sarosSession.hasWriteAccess();
-    }
-
-    public boolean hasWriteAccessByNoGUI(JID jid) throws RemoteException {
-        ISarosSession sarosSession = sessionManager.getSarosSession();
-        if (sarosSession == null)
-            return false;
-        User user = sarosSession.getUser(jid);
-        if (user == null)
-            return false;
-        log.debug("isDriver(" + jid.toString() + ") == "
-            + sarosSession.getUsersWithWriteAccess().contains(user));
-        return sarosSession.getUsersWithWriteAccess().contains(user);
     }
 
     public boolean haveWriteAccessByNoGUI(List<JID> jids) {
@@ -438,11 +376,6 @@ public class SessionViewImp extends ViewsImp implements SessionView {
         return localJID;
     }
 
-    /**
-     * @return the JID of the followed user or null if currently no user is
-     *         followed.
-     * 
-     */
     public JID getFollowedBuddyJIDNoGUI() throws RemoteException {
         if (editorManager.getFollowedUser() != null)
             return editorManager.getFollowedUser().getJID();
@@ -484,19 +417,6 @@ public class SessionViewImp extends ViewsImp implements SessionView {
         waitUntilIsNotInSession();
     }
 
-    // public void waitUntilHasWriteAccessBy(final String tableItemText)
-    // throws RemoteException {
-    // bot().waitUntil(new DefaultCondition() {
-    // public boolean test() throws Exception {
-    // return hasWriteAccessBy(tableItemText);
-    // }
-    //
-    // public String getFailureMessage() {
-    // return "can't grant " + tableItemText + " the write accesss.";
-    // }
-    // });
-    // }
-
     public void waitUntilAllPeersLeaveSession(
         final List<JID> jidsOfAllParticipants) throws RemoteException {
         bot().waitUntil(new DefaultCondition() {
@@ -529,6 +449,11 @@ public class SessionViewImp extends ViewsImp implements SessionView {
         });
     }
 
+    /**************************************************************
+     * 
+     * Inner functions
+     * 
+     **************************************************************/
     private void clickToolbarButtonWithTooltip(String tooltipText)
         throws RemoteException {
         view.toolbarButtonWithRegex(tooltipText + ".*").click();
@@ -559,4 +484,22 @@ public class SessionViewImp extends ViewsImp implements SessionView {
         return invitees;
     }
 
+    private boolean hasWriteAccessNoGUI() {
+        ISarosSession sarosSession = sessionManager.getSarosSession();
+        if (sarosSession == null)
+            return false;
+        return sarosSession.hasWriteAccess();
+    }
+
+    private boolean hasWriteAccessByNoGUI(JID jid) {
+        ISarosSession sarosSession = sessionManager.getSarosSession();
+        if (sarosSession == null)
+            return false;
+        User user = sarosSession.getUser(jid);
+        if (user == null)
+            return false;
+        log.debug("isDriver(" + jid.toString() + ") == "
+            + sarosSession.getUsersWithWriteAccess().contains(user));
+        return sarosSession.getUsersWithWriteAccess().contains(user);
+    }
 }

@@ -141,10 +141,12 @@ public class TestSVNStateInitialization extends STFTest {
             .waitUntilIsInviteeInSession(bob.sarosBot());
         assertTrue(bob.sarosBot().state().isProjectManagedBySVN(SVN_PROJECT));
 
-        assertTrue(alice.sarosBot().views().sessionView().hasWriteAccessNoGUI());
+        assertTrue(alice.sarosBot().views().sessionView()
+            .selectParticipant(alice.jid).hasWriteAccess());
         assertTrue(alice.sarosBot().views().sessionView()
             .isParticipantNoGUI(bob.jid));
-        assertTrue(bob.sarosBot().views().sessionView().hasWriteAccessNoGUI());
+        assertTrue(bob.sarosBot().views().sessionView()
+            .selectParticipant(bob.jid).hasWriteAccess());
     }
 
     /**

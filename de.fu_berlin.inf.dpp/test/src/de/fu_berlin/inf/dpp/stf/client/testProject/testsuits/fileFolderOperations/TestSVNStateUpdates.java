@@ -151,7 +151,8 @@ public class TestSVNStateUpdates extends STFTest {
     @Test
     public void testGrantWriteAccessAndRenameClass() throws Exception {
 
-        assertTrue(bob.sarosBot().views().sessionView().hasWriteAccessNoGUI());
+        assertTrue(bob.sarosBot().views().sessionView()
+            .selectParticipant(bob.jid).hasWriteAccess());
         bob.sarosBot().views().packageExplorerView()
             .selectClass(SVN_PROJECT, SVN_PKG, SVN_CLS1).refactor()
             .rename("Asdf");
@@ -182,7 +183,8 @@ public class TestSVNStateUpdates extends STFTest {
     @Test
     public void testGrantWriteAccessAndMoveClass() throws Exception {
 
-        assertTrue(bob.sarosBot().views().sessionView().hasWriteAccessNoGUI());
+        assertTrue(bob.sarosBot().views().sessionView()
+            .selectParticipant(bob.jid).hasWriteAccess());
         bob.sarosBot().views().packageExplorerView().tree().newC()
             .pkg(SVN_PROJECT, "new_package");
         alice.sarosBot().condition()

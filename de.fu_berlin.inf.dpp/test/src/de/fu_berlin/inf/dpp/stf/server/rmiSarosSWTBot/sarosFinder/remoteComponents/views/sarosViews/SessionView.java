@@ -415,7 +415,7 @@ public interface SessionView extends Remote {
      *                       participant.
      * @throws RemoteException
      */
-    public boolean isHost(JID jidOfParticipant) throws RemoteException;
+    // public boolean isHost(JID jidOfParticipant) throws RemoteException;
 
     /**
      * 
@@ -494,7 +494,7 @@ public interface SessionView extends Remote {
      *         false otherwise.
      * @throws RemoteException
      */
-    public boolean hasWriteAccessNoGUI() throws RemoteException;
+    // public boolean hasWriteAccessNoGUI() throws RemoteException;
 
     /**
      * @return <tt>true</tt> if the given {@link JID} has
@@ -502,7 +502,7 @@ public interface SessionView extends Remote {
      *         {@link SharedProject}.
      * @throws RemoteException
      */
-    public boolean hasWriteAccessByNoGUI(JID jid) throws RemoteException;
+    // public boolean hasWriteAccessByNoGUI(JID jid) throws RemoteException;
 
     /**
      * @return <tt>true</tt>, if all given {@link JID}s have
@@ -533,7 +533,7 @@ public interface SessionView extends Remote {
      * @return <tt>true</tt>, if the local user has read-only access in this
      *         {@link SharedProject}.
      */
-    public boolean hasReadOnlyAccessNoGUI() throws RemoteException;
+    // public boolean hasReadOnlyAccessNoGUI() throws RemoteException;
 
     /**
      * @return <tt>true</tt>, if the given {@link JID} has read-only access in
