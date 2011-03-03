@@ -47,9 +47,7 @@ public class JIDCombo {
     }
 
     protected void update() {
-        String jid = this.control.getText();
         JIDComboUtils.updateJIDCombo(this.control);
-        this.control.setText(jid);
     }
 
     protected void registerListeners() {
