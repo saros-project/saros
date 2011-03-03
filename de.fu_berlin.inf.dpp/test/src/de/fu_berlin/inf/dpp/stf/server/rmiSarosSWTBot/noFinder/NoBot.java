@@ -21,9 +21,8 @@ public interface NoBot extends Remote {
      *            path specified by the node array parameter.e.g.
      *            {"Foo-saros","parentFolder" ,"myFolder"}.
      * @return only the saved content of the specified file, if it is dirty.
-     *         This method is different from
-     *         {@link STFBotEditor#getTextOfEditor(String...)}, which can return
-     *         a not saved content.
+     *         This method is different from {@link STFBotEditor#getText()
+     *         (String...)}, which can return a not saved content.
      * @throws RemoteException
      * @throws IOException
      * @throws CoreException
@@ -40,8 +39,8 @@ public interface NoBot extends Remote {
      * 
      * <p>
      * <b>Note:</b> the mothod is different from
-     * {@link STFBotEditor#waitUntilEditorContentSame(String, String...)}, which
-     * compare the contents which may be dirty.
+     * {@link STFBotEditor#waitUntilIsTextSame(String)} which compare the
+     * contents which may be dirty.
      * </p>
      * 
      * @param otherFileContent

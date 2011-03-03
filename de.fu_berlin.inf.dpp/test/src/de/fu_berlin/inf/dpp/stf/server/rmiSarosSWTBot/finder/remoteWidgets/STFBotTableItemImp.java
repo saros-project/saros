@@ -2,9 +2,10 @@ package de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets;
 
 import java.rmi.RemoteException;
 
-import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
+import org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences;
 import org.eclipse.swtbot.swt.finder.waits.Conditions;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTableItem;
+import org.eclipse.swtbot.swt.finder.widgets.TimeoutException;
 
 public class STFBotTableItemImp extends AbstractRmoteWidget implements
     STFBotTableItem {
@@ -86,11 +87,16 @@ public class STFBotTableItemImp extends AbstractRmoteWidget implements
      * 
      **********************************************/
     public boolean existsContextMenu(String contextName) throws RemoteException {
+        long oldTimeout = SWTBotPreferences.TIMEOUT;
+        // increase the timeout
+        SWTBotPreferences.TIMEOUT = 1000;
+
         try {
             widget.contextMenu(contextName);
-
+            SWTBotPreferences.TIMEOUT = oldTimeout;
             return true;
-        } catch (WidgetNotFoundException e) {
+        } catch (TimeoutException e) {
+            SWTBotPreferences.TIMEOUT = oldTimeout;
             return false;
         }
 

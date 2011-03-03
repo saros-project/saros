@@ -37,7 +37,6 @@ public class BuddiesViewImp extends ViewsImp implements BuddiesView {
 
     private STFBotView view;
     private STFBotTree tree;
-    private STFBotTreeItem treeItem;
 
     /**
      * {@link BuddiesViewImp} is a singleton, but inheritance is possible.
@@ -252,11 +251,9 @@ public class BuddiesViewImp extends ViewsImp implements BuddiesView {
     private void setViewWithTree(STFBotView view) throws RemoteException {
         this.view = view;
         tree = view.bot().tree();
-        treeItem = null;
     }
 
     private void initSarosContextMenuWrapper(STFBotTreeItem treeItem) {
-        this.treeItem = treeItem;
         sarosContextMenu.setTree(tree);
         sarosContextMenu.setTreeItem(treeItem);
     }

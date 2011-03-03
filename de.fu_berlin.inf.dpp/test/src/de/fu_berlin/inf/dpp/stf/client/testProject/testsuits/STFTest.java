@@ -431,8 +431,8 @@ public class STFTest extends STF {
             }
         }
 
-        if (host.sarosBot().views().sessionView().isInSessionNoGUI()
-            && !host.sarosBot().views().sessionView().hasWriteAccessNoGUI()) {
+        if (host.sarosBot().views().sessionView().isInSession()
+            && !host.sarosBot().views().sessionView().hasWriteAccess()) {
             host.sarosBot().views().sessionView().selectBuddy(host.jid)
                 .grantWriteAccess();
         }
@@ -441,10 +441,10 @@ public class STFTest extends STF {
     public static void resetFollowModeSequentially(Tester... buddiesFollowing)
         throws RemoteException {
         for (Tester tester : buddiesFollowing) {
-            if (tester.sarosBot().views().sessionView().isInSessionNoGUI()
+            if (tester.sarosBot().views().sessionView().isInSession()
                 && tester.sarosBot().views().sessionView().isFollowing()) {
                 JID followedBuddyJID = tester.sarosBot().views().sessionView()
-                    .getFollowedBuddyJIDNoGUI();
+                    .getFollowedBuddy();
                 tester.sarosBot().views().sessionView()
                     .selectBuddy(followedBuddyJID).stopFollowingThisBuddy();
             }
@@ -467,7 +467,7 @@ public class STFTest extends STF {
             stopFollowTasks.add(new Callable<Void>() {
                 public Void call() throws Exception {
                     JID followedBuddyJID = tester.sarosBot().views()
-                        .sessionView().getFollowedBuddyJIDNoGUI();
+                        .sessionView().getFollowedBuddy();
                     tester.sarosBot().views().sessionView()
                         .selectBuddy(followedBuddyJID).stopFollowingThisBuddy();
                     return null;
@@ -494,7 +494,7 @@ public class STFTest extends STF {
 
     public static void reBuildSession(Tester host, Tester... invitees)
         throws RemoteException {
-        if (!host.sarosBot().views().sessionView().isInSessionNoGUI()) {
+        if (!host.sarosBot().views().sessionView().isInSession()) {
             for (Tester tester : invitees) {
                 buildSessionSequentially(PROJECT1, CM_SHARE_PROJECT,
                     TypeOfCreateProject.EXIST_PROJECT, host, tester);
@@ -643,7 +643,7 @@ public class STFTest extends STF {
         List<Callable<Void>> leaveTasks = new ArrayList<Callable<Void>>();
         for (final Tester tester : activeTesters) {
 
-            if (tester.sarosBot().views().sessionView().isHostNoGUI()) {
+            if (tester.sarosBot().views().sessionView().isHost()) {
                 host = tester;
             } else {
                 peerJIDs.add(tester.jid);

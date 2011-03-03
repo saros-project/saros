@@ -12,8 +12,6 @@ import de.fu_berlin.inf.dpp.stf.server.sarosSWTBot.SarosSWTBot;
 
 public class Component extends STF {
 
-    // Picocontainer initiated by STFController.
-
     // // SWTBot framework
     public static SarosSWTBot bot = SarosSWTBot.getInstance();
     public static int sleepTime = STFController.sleepTime;

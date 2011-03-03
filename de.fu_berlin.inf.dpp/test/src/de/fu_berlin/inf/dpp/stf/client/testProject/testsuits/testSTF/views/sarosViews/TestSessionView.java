@@ -260,30 +260,24 @@ public class TestSessionView extends STFTest {
     @Test
     public void leaveSessionProcessDonebyAllUsersWithPeersFirstLeave()
         throws RemoteException, InterruptedException {
-        assertFalse(alice.sarosBot().views().sessionView()
-            .existsLabelInSessionView());
-        assertFalse(bob.sarosBot().views().sessionView()
-            .existsLabelInSessionView());
+        assertTrue(alice.bot().existsTable());
+        assertTrue(bob.bot().existsTable());
         assertTrue(alice.sarosBot().views().sessionView().isInSession());
         assertTrue(bob.sarosBot().views().sessionView().isInSession());
         leaveSessionPeersFirst();
         assertFalse(alice.sarosBot().views().sessionView().isInSession());
         assertFalse(bob.sarosBot().views().sessionView().isInSession());
-        assertTrue(alice.sarosBot().views().sessionView()
-            .existsLabelInSessionView());
-        assertTrue(bob.sarosBot().views().sessionView()
-            .existsLabelInSessionView());
+        assertTrue(alice.bot().existsLabel());
+        assertTrue(bob.bot().existsLabel());
     }
 
     @Test
     public void testIsInSession() throws RemoteException, InterruptedException {
-        assertTrue(alice.sarosBot().views().sessionView().isInSessionNoGUI());
         assertTrue(alice.sarosBot().views().sessionView().isInSession());
-        assertTrue(bob.sarosBot().views().sessionView().isInSessionNoGUI());
+
         assertTrue(bob.sarosBot().views().sessionView().isInSession());
         leaveSessionHostFirst(alice);
-        assertFalse(alice.sarosBot().views().sessionView().isInSessionNoGUI());
-        assertFalse(bob.sarosBot().views().sessionView().isInSessionNoGUI());
+
         assertFalse(alice.sarosBot().views().sessionView().isInSession());
         assertFalse(bob.sarosBot().views().sessionView().isInSession());
     }

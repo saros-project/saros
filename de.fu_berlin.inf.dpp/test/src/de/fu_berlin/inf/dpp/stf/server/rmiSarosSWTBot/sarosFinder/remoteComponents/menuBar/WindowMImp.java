@@ -40,8 +40,7 @@ public class WindowMImp extends SarosPreferencesImp implements WindowM {
             TREE_ITEM_WORKSPACE_IN_PREFERENCES);
 
         if (OS.equals("Default")) {
-            shell.bot()
-                .radioInGroup("Default", "New text file line delimiter")
+            shell.bot().radioInGroup("Default", "New text file line delimiter")
                 .click();
         } else {
             shell.bot().radioInGroup("Other:", "New text file line delimiter")
@@ -75,8 +74,8 @@ public class WindowMImp extends SarosPreferencesImp implements WindowM {
         throws RemoteException {
         bot().activateWorkbench();
         bot().menu(MENU_WINDOW).menu(MENU_SHOW_VIEW).menu(MENU_OTHER).click();
-        bot().shell(SHELL_SHOW_VIEW).confirmWithTreeWithFilterText(
-            parentNode, node, OK);
+        bot().shell(SHELL_SHOW_VIEW).confirmWithTreeWithFilterText(parentNode,
+            node, OK);
     }
 
     public void openPerspective() throws RemoteException {
@@ -119,8 +118,7 @@ public class WindowMImp extends SarosPreferencesImp implements WindowM {
         STFBotTree tree = shell.bot().tree();
         tree.expandNode(TREE_ITEM_GENERAL_IN_PRFERENCES).select(
             TREE_ITEM_WORKSPACE_IN_PREFERENCES);
-        if (shell.bot()
-            .radioInGroup("Default", "New text file line delimiter")
+        if (shell.bot().radioInGroup("Default", "New text file line delimiter")
             .isSelected()) {
             shell.close();
             return "Default";
@@ -143,15 +141,6 @@ public class WindowMImp extends SarosPreferencesImp implements WindowM {
 
     public boolean isDebugPerspectiveActive() throws RemoteException {
         return bot().isPerspectiveActive(ID_DEBUG_PERSPECTIVE);
-    }
-
-    /**********************************************
-     * 
-     * inner functions
-     * 
-     **********************************************/
-    private void precondition() throws RemoteException {
-        bot().activateWorkbench();
     }
 
 }

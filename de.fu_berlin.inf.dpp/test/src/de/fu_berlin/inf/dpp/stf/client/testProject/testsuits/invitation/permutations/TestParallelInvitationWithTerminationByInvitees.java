@@ -121,6 +121,6 @@ public class TestParallelInvitationWithTerminationByInvitees extends STFTest {
         edna.sarosBot().views().sessionView().leaveTheSession();
         assertFalse(edna.sarosBot().views().sessionView().isInSession());
         assertFalse(alice.sarosBot().views().sessionView()
-            .hasReadOnlyAccessNoGUI(edna.jid));
+            .hasReadOnlyAccessBy(edna.jid));
     }
 }

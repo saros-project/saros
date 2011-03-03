@@ -90,8 +90,8 @@ public class TestCreatingNewFile extends STFTest {
 
         carl.sarosBot().views().sessionView().selectBuddy(carl.jid)
             .restrictToReadOnlyAccess();
-        assertFalse(carl.sarosBot().views().sessionView().hasWriteAccessNoGUI());
-        assertTrue(alice.sarosBot().views().sessionView().hasWriteAccessNoGUI());
+        assertFalse(carl.sarosBot().views().sessionView().hasWriteAccess());
+        assertTrue(alice.sarosBot().views().sessionView().hasWriteAccess());
 
         carl.sarosBot().views().packageExplorerView().selectProject(PROJECT1)
             .newC().folder(FOLDER1);

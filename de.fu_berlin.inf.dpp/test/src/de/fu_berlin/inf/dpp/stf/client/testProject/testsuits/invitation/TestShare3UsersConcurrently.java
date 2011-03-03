@@ -57,37 +57,25 @@ public class TestShare3UsersConcurrently extends STFTest {
     public void testShareProjectConcurrently() throws RemoteException,
         InterruptedException {
 
-        assertTrue(carl.sarosBot().views().sessionView().isParticipantNoGUI());
-        assertFalse(carl.sarosBot().views().sessionView()
-            .hasReadOnlyAccessNoGUI());
-        assertTrue(carl.sarosBot().views().sessionView().hasWriteAccessNoGUI());
+        assertTrue(carl.sarosBot().views().sessionView().isParticipant());
+        assertFalse(carl.sarosBot().views().sessionView().hasReadOnlyAccess());
+        assertTrue(carl.sarosBot().views().sessionView().hasWriteAccess());
 
-        assertTrue(bob.sarosBot().views().sessionView().isParticipantNoGUI());
-        assertFalse(bob.sarosBot().views().sessionView()
-            .hasReadOnlyAccessNoGUI());
-        assertTrue(bob.sarosBot().views().sessionView().hasWriteAccessNoGUI());
+        assertTrue(bob.sarosBot().views().sessionView().isParticipant());
+        assertFalse(bob.sarosBot().views().sessionView().hasReadOnlyAccess());
+        assertTrue(bob.sarosBot().views().sessionView().hasWriteAccess());
 
-        assertTrue(alice.sarosBot().views().sessionView().isParticipantNoGUI());
-        assertFalse(alice.sarosBot().views().sessionView()
-            .hasReadOnlyAccessNoGUI());
-        assertTrue(alice.sarosBot().views().sessionView().hasWriteAccessNoGUI());
+        assertTrue(alice.sarosBot().views().sessionView().isParticipant());
+        assertFalse(alice.sarosBot().views().sessionView().hasReadOnlyAccess());
+        assertTrue(alice.sarosBot().views().sessionView().hasWriteAccess());
 
         leaveSessionPeersFirst();
 
-        assertFalse(carl.sarosBot().views().sessionView().isParticipantNoGUI());
-        assertFalse(carl.sarosBot().views().sessionView()
-            .hasReadOnlyAccessNoGUI());
-        assertFalse(carl.sarosBot().views().sessionView().hasWriteAccessNoGUI());
+        assertFalse(carl.sarosBot().views().sessionView().isInSession());
 
-        assertFalse(bob.sarosBot().views().sessionView().isParticipantNoGUI());
-        assertFalse(bob.sarosBot().views().sessionView()
-            .hasReadOnlyAccessNoGUI());
-        assertFalse(bob.sarosBot().views().sessionView().hasWriteAccessNoGUI());
+        assertFalse(bob.sarosBot().views().sessionView().isInSession());
 
-        assertFalse(alice.sarosBot().views().sessionView().isParticipantNoGUI());
-        assertFalse(alice.sarosBot().views().sessionView()
-            .hasReadOnlyAccessNoGUI());
-        assertFalse(alice.sarosBot().views().sessionView()
-            .hasWriteAccessNoGUI());
+        assertFalse(alice.sarosBot().views().sessionView().isInSession());
+
     }
 }

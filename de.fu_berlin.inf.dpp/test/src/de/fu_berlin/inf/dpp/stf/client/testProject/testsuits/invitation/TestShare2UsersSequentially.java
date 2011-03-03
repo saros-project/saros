@@ -61,30 +61,18 @@ public class TestShare2UsersSequentially extends STFTest {
             .captureScreenshot(
                 (alice.bot().getPathToScreenShot() + "/inviter_in_sharedproject.png"));
 
-        assertTrue(bob.sarosBot().views().sessionView().isParticipantNoGUI());
-        assertTrue(alice.sarosBot().views().sessionView().isParticipantNoGUI());
+        assertTrue(bob.sarosBot().views().sessionView().isParticipant());
+        assertTrue(alice.sarosBot().views().sessionView().isParticipant());
 
-        assertFalse(bob.sarosBot().views().sessionView()
-            .hasReadOnlyAccessNoGUI());
-        assertFalse(alice.sarosBot().views().sessionView()
-            .hasReadOnlyAccessNoGUI());
+        assertFalse(bob.sarosBot().views().sessionView().hasReadOnlyAccess());
+        assertFalse(alice.sarosBot().views().sessionView().hasReadOnlyAccess());
 
-        assertTrue(alice.sarosBot().views().sessionView().hasWriteAccessNoGUI());
-        assertTrue(bob.sarosBot().views().sessionView().hasWriteAccessNoGUI());
+        assertTrue(alice.sarosBot().views().sessionView().hasWriteAccess());
+        assertTrue(bob.sarosBot().views().sessionView().hasWriteAccess());
 
         leaveSessionPeersFirst();
 
-        assertFalse(bob.sarosBot().views().sessionView().isParticipantNoGUI());
-        assertFalse(alice.sarosBot().views().sessionView().isParticipantNoGUI());
-
-        assertFalse(bob.sarosBot().views().sessionView()
-            .hasReadOnlyAccessNoGUI());
-        assertFalse(alice.sarosBot().views().sessionView()
-            .hasReadOnlyAccessNoGUI());
-
-        assertFalse(alice.sarosBot().views().sessionView()
-            .hasWriteAccessNoGUI());
-        assertFalse(bob.sarosBot().views().sessionView().hasWriteAccessNoGUI());
-
+        assertFalse(bob.sarosBot().views().sessionView().isInSession());
+        assertFalse(alice.sarosBot().views().sessionView().isInSession());
     }
 }
