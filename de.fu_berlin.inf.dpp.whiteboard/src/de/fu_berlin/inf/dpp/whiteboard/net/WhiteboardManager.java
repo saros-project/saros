@@ -5,7 +5,7 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
 import org.picocontainer.annotations.Inject;
 
-import de.fu_berlin.inf.dpp.Saros;
+import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.project.AbstractSarosSessionListener;
 import de.fu_berlin.inf.dpp.project.AbstractSharedProjectListener;
@@ -105,7 +105,7 @@ public class WhiteboardManager {
 
 	private WhiteboardManager() {
 
-		Saros.reinject(this);
+		SarosPluginContext.reinject(this);
 
 		sessionManager.addSarosSessionListener(sessionListener);
 

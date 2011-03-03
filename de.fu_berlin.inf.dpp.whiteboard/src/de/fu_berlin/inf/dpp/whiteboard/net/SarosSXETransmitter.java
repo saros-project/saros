@@ -14,7 +14,7 @@ import org.jivesoftware.smack.filter.PacketFilter;
 import org.jivesoftware.smack.packet.Packet;
 import org.picocontainer.annotations.Inject;
 
-import de.fu_berlin.inf.dpp.Saros;
+import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
 import de.fu_berlin.inf.dpp.net.JID;
@@ -65,7 +65,7 @@ public class SarosSXETransmitter implements ISXETransmitter {
 	private final ISarosSession sarosSession;
 
 	public SarosSXETransmitter(ISarosSession sarosSession) {
-		Saros.reinject(this);
+		SarosPluginContext.reinject(this);
 		this.sarosSession = sarosSession;
 	}
 

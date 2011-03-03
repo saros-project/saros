@@ -2,7 +2,7 @@ package de.fu_berlin.inf.dpp.whiteboard.gef.editor;
 
 import org.picocontainer.annotations.Inject;
 
-import de.fu_berlin.inf.dpp.Saros;
+import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.project.AbstractSarosSessionListener;
 import de.fu_berlin.inf.dpp.project.AbstractSharedProjectListener;
@@ -59,7 +59,7 @@ public abstract class SarosPermissionsGraphicalEditor extends
 	private SarosSessionManager sessionManager;
 
 	public SarosPermissionsGraphicalEditor() {
-		Saros.reinject(this);
+		SarosPluginContext.reinject(this);
 		sessionManager.addSarosSessionListener(sessionListener);
 	}
 
