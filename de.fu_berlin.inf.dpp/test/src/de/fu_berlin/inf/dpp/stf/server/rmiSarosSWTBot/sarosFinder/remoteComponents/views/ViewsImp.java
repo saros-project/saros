@@ -1,11 +1,7 @@
 package de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.views;
 
 import java.rmi.RemoteException;
-import java.util.List;
 
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotTree;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotTreeItem;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotView;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.Component;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.contextMenu.ContextMenuWrapperImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.contextMenu.SarosContextMenuWrapperImp;
@@ -22,11 +18,8 @@ public class ViewsImp extends Component implements Views {
 
     private static transient ViewsImp self;
 
-    protected STFBotView view;
-    protected STFBotTree tree;
-    protected STFBotTreeItem treeItem;
-
-    protected static ContextMenuWrapperImp contextMenu;
+    protected static ContextMenuWrapperImp contextMenu = ContextMenuWrapperImp
+        .getInstance();
     protected static SarosContextMenuWrapperImp sarosContextMenu = SarosContextMenuWrapperImp
         .getInstance();
 
@@ -94,57 +87,6 @@ public class ViewsImp extends Component implements Views {
         bot().openViewById(VIEW_PROGRESS_ID);
         bot().view(VIEW_PROGRESS).show();
         return progressvV.setView(bot().view(VIEW_PROGRESS));
-    }
-
-    protected static void setContextMenu() {
-        contextMenu = ContextMenuWrapperImp.getInstance();
-    }
-
-    protected void setWidgets(STFBotView view) throws RemoteException {
-        this.view = view;
-        tree = view.bot().tree();
-        treeItem = null;
-    }
-
-    protected void initContextMenuWrapper(STFBotTreeItem treeItem,
-        TreeItemType type) {
-        this.treeItem = treeItem;
-        contextMenu.setTree(tree);
-        contextMenu.setTreeItem(treeItem);
-        contextMenu.setTreeItemType(type);
-    }
-
-    protected void initContextMenuWrapper(STFBotTreeItem treeItem) {
-        this.treeItem = treeItem;
-        contextMenu.setTree(tree);
-        contextMenu.setTreeItem(treeItem);
-    }
-
-    protected void initSarosContextMenuWrapper(STFBotTreeItem treeItem) {
-        this.treeItem = treeItem;
-        sarosContextMenu.setTree(tree);
-        sarosContextMenu.setTreeItem(treeItem);
-    }
-
-    protected void clickToolbarButtonWithTooltip(String tooltipText)
-        throws RemoteException {
-        if (!view.existsToolbarButton(tooltipText))
-            throw new RuntimeException("The toolbarbutton " + tooltipText
-                + " doesn't exist!");
-        view.toolbarButton(tooltipText).click();
-    }
-
-    protected boolean isToolbarButtonEnabled(String tooltip)
-        throws RemoteException {
-        if (!view.existsToolbarButton(tooltip))
-            return false;
-        return view.toolbarButton(tooltip).isEnabled();
-
-    }
-
-    protected List<String> getToolTipTextOfToolbarButtons()
-        throws RemoteException {
-        return view.getToolTipTextOfToolbarButtons();
     }
 
 }

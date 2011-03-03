@@ -424,15 +424,15 @@ public class STFTest extends STF {
     public static void resetWriteAccess(Tester host, Tester... invitees)
         throws RemoteException {
         for (Tester tester : invitees) {
-            if (tester.sarosBot().state().isInSession()
-                && tester.sarosBot().state().hasReadOnlyAccess()) {
+            if (tester.sarosBot().views().sessionView().isInSession()
+                && tester.sarosBot().views().sessionView().hasReadOnlyAccess()) {
                 host.sarosBot().views().sessionView().selectBuddy(tester.jid)
                     .grantWriteAccess();
             }
         }
 
-        if (host.sarosBot().state().isInSessionNoGUI()
-            && !host.sarosBot().state().hasWriteAccessNoGUI()) {
+        if (host.sarosBot().views().sessionView().isInSessionNoGUI()
+            && !host.sarosBot().views().sessionView().hasWriteAccessNoGUI()) {
             host.sarosBot().views().sessionView().selectBuddy(host.jid)
                 .grantWriteAccess();
         }
@@ -441,9 +441,9 @@ public class STFTest extends STF {
     public static void resetFollowModeSequentially(Tester... buddiesFollowing)
         throws RemoteException {
         for (Tester tester : buddiesFollowing) {
-            if (tester.sarosBot().state().isInSessionNoGUI()
-                && tester.sarosBot().state().isFollowing()) {
-                JID followedBuddyJID = tester.sarosBot().state()
+            if (tester.sarosBot().views().sessionView().isInSessionNoGUI()
+                && tester.sarosBot().views().sessionView().isFollowing()) {
+                JID followedBuddyJID = tester.sarosBot().views().sessionView()
                     .getFollowedBuddyJIDNoGUI();
                 tester.sarosBot().views().sessionView()
                     .selectBuddy(followedBuddyJID).stopFollowingThisBuddy();
@@ -466,8 +466,8 @@ public class STFTest extends STF {
             final Tester tester = buddiesFollowing[i];
             stopFollowTasks.add(new Callable<Void>() {
                 public Void call() throws Exception {
-                    JID followedBuddyJID = tester.sarosBot().state()
-                        .getFollowedBuddyJIDNoGUI();
+                    JID followedBuddyJID = tester.sarosBot().views()
+                        .sessionView().getFollowedBuddyJIDNoGUI();
                     tester.sarosBot().views().sessionView()
                         .selectBuddy(followedBuddyJID).stopFollowingThisBuddy();
                     return null;
@@ -494,7 +494,7 @@ public class STFTest extends STF {
 
     public static void reBuildSession(Tester host, Tester... invitees)
         throws RemoteException {
-        if (!host.sarosBot().state().isInSessionNoGUI()) {
+        if (!host.sarosBot().views().sessionView().isInSessionNoGUI()) {
             for (Tester tester : invitees) {
                 buildSessionSequentially(PROJECT1, CM_SHARE_PROJECT,
                     TypeOfCreateProject.EXIST_PROJECT, host, tester);
@@ -582,7 +582,8 @@ public class STFTest extends STF {
                         .confirm(FINISH);
                     invitee.sarosBot().confirmShellAddProjectUsingWhichProject(
                         projectName, usingWhichProject);
-                    invitee.sarosBot().condition().waitUntilIsInSession();
+                    invitee.sarosBot().views().sessionView()
+                        .waitUntilIsInSession();
                     return null;
                 }
             });
@@ -607,7 +608,7 @@ public class STFTest extends STF {
         List<Callable<Void>> closeSessionTasks = new ArrayList<Callable<Void>>();
         for (final Tester tester : activeTesters) {
             if (tester != host) {
-                if (tester.sarosBot().state().isInSessionNoGUI()) {
+                if (tester.sarosBot().views().sessionView().isInSession()) {
                     closeSessionTasks.add(new Callable<Void>() {
                         public Void call() throws Exception {
                             // Need to check for isDriver before leaving.
@@ -642,7 +643,7 @@ public class STFTest extends STF {
         List<Callable<Void>> leaveTasks = new ArrayList<Callable<Void>>();
         for (final Tester tester : activeTesters) {
 
-            if (tester.sarosBot().state().isHostNoGUI()) {
+            if (tester.sarosBot().views().sessionView().isHostNoGUI()) {
                 host = tester;
             } else {
                 peerJIDs.add(tester.jid);
@@ -658,10 +659,11 @@ public class STFTest extends STF {
 
         MakeOperationConcurrently.workAll(leaveTasks);
         if (host != null) {
-            host.sarosBot().condition().waitUntilAllPeersLeaveSession(peerJIDs);
+            host.sarosBot().views().sessionView()
+                .waitUntilAllPeersLeaveSession(peerJIDs);
             host.bot().view(VIEW_SAROS_SESSION)
                 .toolbarButton(TB_LEAVE_THE_SESSION).click();
-            host.sarosBot().condition().waitUntilIsNotInSession();
+            host.sarosBot().views().sessionView().waitUntilIsNotInSession();
         }
 
     }

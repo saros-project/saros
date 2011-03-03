@@ -61,25 +61,30 @@ public class TestShare2UsersSequentially extends STFTest {
             .captureScreenshot(
                 (alice.bot().getPathToScreenShot() + "/inviter_in_sharedproject.png"));
 
-        assertTrue(bob.sarosBot().state().isParticipantNoGUI());
-        assertTrue(alice.sarosBot().state().isParticipantNoGUI());
+        assertTrue(bob.sarosBot().views().sessionView().isParticipantNoGUI());
+        assertTrue(alice.sarosBot().views().sessionView().isParticipantNoGUI());
 
-        assertFalse(bob.sarosBot().state().hasReadOnlyAccessNoGUI());
-        assertFalse(alice.sarosBot().state().hasReadOnlyAccessNoGUI());
+        assertFalse(bob.sarosBot().views().sessionView()
+            .hasReadOnlyAccessNoGUI());
+        assertFalse(alice.sarosBot().views().sessionView()
+            .hasReadOnlyAccessNoGUI());
 
-        assertTrue(alice.sarosBot().state().hasWriteAccessNoGUI());
-        assertTrue(bob.sarosBot().state().hasWriteAccessNoGUI());
+        assertTrue(alice.sarosBot().views().sessionView().hasWriteAccessNoGUI());
+        assertTrue(bob.sarosBot().views().sessionView().hasWriteAccessNoGUI());
 
         leaveSessionPeersFirst();
 
-        assertFalse(bob.sarosBot().state().isParticipantNoGUI());
-        assertFalse(alice.sarosBot().state().isParticipantNoGUI());
+        assertFalse(bob.sarosBot().views().sessionView().isParticipantNoGUI());
+        assertFalse(alice.sarosBot().views().sessionView().isParticipantNoGUI());
 
-        assertFalse(bob.sarosBot().state().hasReadOnlyAccessNoGUI());
-        assertFalse(alice.sarosBot().state().hasReadOnlyAccessNoGUI());
+        assertFalse(bob.sarosBot().views().sessionView()
+            .hasReadOnlyAccessNoGUI());
+        assertFalse(alice.sarosBot().views().sessionView()
+            .hasReadOnlyAccessNoGUI());
 
-        assertFalse(alice.sarosBot().state().hasWriteAccessNoGUI());
-        assertFalse(bob.sarosBot().state().hasWriteAccessNoGUI());
+        assertFalse(alice.sarosBot().views().sessionView()
+            .hasWriteAccessNoGUI());
+        assertFalse(bob.sarosBot().views().sessionView().hasWriteAccessNoGUI());
 
     }
 }

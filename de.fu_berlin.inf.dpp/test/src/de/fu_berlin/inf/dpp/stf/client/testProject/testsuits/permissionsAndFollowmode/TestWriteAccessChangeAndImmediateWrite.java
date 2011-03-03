@@ -47,7 +47,7 @@ public class TestWriteAccessChangeAndImmediateWrite extends STFTest {
         bob.sarosBot().views().packageExplorerView()
             .selectClass(PROJECT1, PKG1, CLS1).open();
         bob.bot().editor(CLS1_SUFFIX).setTextWithoutSave(CP1);
-        bob.sarosBot().condition().waitUntilIsInconsistencyDetected();
+        bob.sarosBot().views().sessionView().waitUntilIsInconsistencyDetected();
 
         assertTrue(bob.bot().view(VIEW_SAROS_SESSION)
             .toolbarButtonWithRegex(TB_INCONSISTENCY_DETECTED + ".*")

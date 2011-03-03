@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.eclipse.swtbot.swt.finder.SWTBot;
 import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
+import org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences;
 import org.eclipse.swtbot.swt.finder.waits.DefaultCondition;
 import org.eclipse.swtbot.swt.finder.waits.ICondition;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
@@ -782,11 +783,20 @@ public class STFBotImp extends STF implements STFBot {
     }
 
     public boolean existsToolbarButton() throws RemoteException {
+
+        long oldTimeout = SWTBotPreferences.TIMEOUT;
+        // increase the timeout
+        SWTBotPreferences.TIMEOUT = 500;
+
         try {
             swtBot.toolbarButton();
+            SWTBotPreferences.TIMEOUT = oldTimeout;
             return true;
+
         } catch (WidgetNotFoundException e) {
+            SWTBotPreferences.TIMEOUT = oldTimeout;
             return false;
+
         }
     }
 
@@ -1024,15 +1034,32 @@ public class STFBotImp extends STF implements STFBot {
 
     }
 
+    public STFBotText textWithTooltipInGroup(String tooltip, String inGroup,
+        int index) throws RemoteException {
+        text.setWidget(swtBot.textWithTooltipInGroup(tooltip, inGroup, index));
+        return text;
+    }
+
     /**********************************************
      * 
      * Widget table
      * 
      **********************************************/
-    public STFBotText textWithTooltipInGroup(String tooltip, String inGroup,
-        int index) throws RemoteException {
-        text.setWidget(swtBot.textWithTooltipInGroup(tooltip, inGroup, index));
-        return text;
+
+    public boolean existsTable() throws RemoteException {
+
+        long oldTimeout = SWTBotPreferences.TIMEOUT;
+        // increase the timeout
+        SWTBotPreferences.TIMEOUT = 500;
+
+        try {
+            swtBot.table();
+            SWTBotPreferences.TIMEOUT = oldTimeout;
+            return true;
+        } catch (WidgetNotFoundException e) {
+            SWTBotPreferences.TIMEOUT = oldTimeout;
+            return false;
+        }
     }
 
     public STFBotTable tableWithLabel(String label) throws RemoteException {

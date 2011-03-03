@@ -8,6 +8,8 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBo
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotTree;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotTreeItem;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.Component;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.views.sarosViews.BuddiesView;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.views.sarosViews.SessionView;
 
 public class SarosContextMenuWrapperImp extends Component implements
     SarosContextMenuWrapper {
@@ -29,6 +31,8 @@ public class SarosContextMenuWrapperImp extends Component implements
     protected STFBotTreeItem treeItem;
     protected STFBotTree tree;
     protected STFBotTableItem tableItem;
+    protected SessionView sessionView;
+    protected BuddiesView buddiesView;
 
     public void setTreeItem(STFBotTreeItem treeItem) {
         this.treeItem = treeItem;
@@ -46,29 +50,37 @@ public class SarosContextMenuWrapperImp extends Component implements
         this.participantJID = jid;
     }
 
+    public void setSessionView(SessionView sessionView) {
+        this.sessionView = sessionView;
+    }
+
+    public void setBuddiesView(BuddiesView buddiesView) {
+        this.buddiesView = buddiesView;
+    }
+
     // Session View
     public void grantWriteAccess() throws RemoteException {
-        if (sarosBot().state().hasWriteAccessBy(tableItem.getText())) {
+        if (sessionView.hasWriteAccessBy(tableItem.getText())) {
             throw new RuntimeException("User \"" + tableItem.getText()
                 + "\" already has write access!.");
         }
         tableItem.contextMenu(CM_GRANT_WRITE_ACCESS).click();
-        sarosBot().condition().waitUntilHasWriteAccessBy(participantJID);
+        sessionView.waitUntilHasWriteAccessBy(participantJID);
         bot().sleep(300);
     }
 
     public void restrictToReadOnlyAccess() throws RemoteException {
-        if (!sarosBot().state().hasWriteAccessBy(tableItem.getText())) {
+        if (!sessionView.hasWriteAccessBy(tableItem.getText())) {
             throw new RuntimeException("User \"" + tableItem.getText()
                 + "\" already has read-only access!");
         }
         tableItem.contextMenu(CM_RESTRICT_TO_READ_ONLY_ACCESS).click();
-        sarosBot().condition().waitUntilHasReadOnlyAccessBy(participantJID);
+        sessionView.waitUntilHasReadOnlyAccessBy(participantJID);
         bot().sleep(300);
     }
 
     public void followThisBuddy() throws RemoteException {
-        if (sarosBot().state().isFollowingBuddy(participantJID)) {
+        if (sessionView.isFollowingBuddy(participantJID)) {
             log.debug(participantJID.getBase() + " is already followed by you.");
             return;
         }
@@ -77,13 +89,13 @@ public class SarosContextMenuWrapperImp extends Component implements
                 "Hi guy, you can't follow youself, it makes no sense! Please pass a correct parameter to the method.");
         }
         tableItem.contextMenu(CM_FOLLOW_THIS_BUDDY).click();
-        sarosBot().condition().waitUntilIsFollowingBuddy(participantJID);
+        sessionView.waitUntilIsFollowingBuddy(participantJID);
     }
 
     public void stopFollowingThisBuddy() throws RemoteException {
         log.debug(" JID of the followed user: " + participantJID.getBase());
         tableItem.contextMenu(CM_STOP_FOLLOWING_THIS_BUDDY).click();
-        sarosBot().condition().waitUntilIsNotFollowingBuddy(participantJID);
+        sessionView.waitUntilIsNotFollowingBuddy(participantJID);
     }
 
     public void jumpToPositionOfSelectedBuddy() throws RemoteException {

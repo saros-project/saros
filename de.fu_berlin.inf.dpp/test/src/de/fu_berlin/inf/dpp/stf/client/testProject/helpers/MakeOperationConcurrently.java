@@ -1,6 +1,5 @@
 package de.fu_berlin.inf.dpp.stf.client.testProject.helpers;
 
-import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -47,7 +46,7 @@ public class MakeOperationConcurrently {
     }
 
     public static List<Boolean> leaveSessionConcurrently(Tester... invitees)
-        throws RemoteException, InterruptedException {
+        throws InterruptedException {
         List<Tester> peers = new LinkedList<Tester>();
         for (Tester invitee : invitees) {
             peers.add(invitee);
@@ -62,7 +61,7 @@ public class MakeOperationConcurrently {
                      * before leaving.
                      */
                     musician.sarosBot().views().sessionView().leaveTheSession();
-                    return musician.sarosBot().state()
+                    return musician.sarosBot().views().sessionView()
                         .isParticipantNoGUI(musician.jid);
                 }
             });

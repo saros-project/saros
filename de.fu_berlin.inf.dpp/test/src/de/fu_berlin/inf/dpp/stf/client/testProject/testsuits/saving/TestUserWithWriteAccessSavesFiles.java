@@ -50,8 +50,10 @@ public class TestUserWithWriteAccessSavesFiles extends STFTest {
             TypeOfCreateProject.NEW_PROJECT, alice, edna, bob, carl, dave);
         // alice.bot.waitUntilNoInvitationProgress();
         setFollowMode(alice, dave, edna);
-        dave.sarosBot().condition().waitUntilIsFollowingBuddy(alice.jid);
-        edna.sarosBot().condition().waitUntilIsFollowingBuddy(alice.jid);
+        dave.sarosBot().views().sessionView()
+            .waitUntilIsFollowingBuddy(alice.jid);
+        edna.sarosBot().views().sessionView()
+            .waitUntilIsFollowingBuddy(alice.jid);
 
     }
 

@@ -90,8 +90,8 @@ public class TestCreatingNewFile extends STFTest {
 
         carl.sarosBot().views().sessionView().selectBuddy(carl.jid)
             .restrictToReadOnlyAccess();
-        assertFalse(carl.sarosBot().state().hasWriteAccessNoGUI());
-        assertTrue(alice.sarosBot().state().hasWriteAccessNoGUI());
+        assertFalse(carl.sarosBot().views().sessionView().hasWriteAccessNoGUI());
+        assertTrue(alice.sarosBot().views().sessionView().hasWriteAccessNoGUI());
 
         carl.sarosBot().views().packageExplorerView().selectProject(PROJECT1)
             .newC().folder(FOLDER1);
@@ -123,6 +123,7 @@ public class TestCreatingNewFile extends STFTest {
         alice.bot().editor(FILE2).setTexWithSave(CP1);
 
         String file2ContentOfAlice = alice.bot().editor(FILE2).getText();
+
         carl.bot().editor(FILE2).waitUntilIsTextSame(file2ContentOfAlice);
         String file2ContentOfCarl = carl.bot().editor(FILE2).getText();
         assertTrue(file2ContentOfAlice.equals(file2ContentOfCarl));

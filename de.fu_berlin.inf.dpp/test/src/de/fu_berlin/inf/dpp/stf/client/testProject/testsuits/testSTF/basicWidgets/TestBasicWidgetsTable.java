@@ -56,8 +56,8 @@ public class TestBasicWidgetsTable extends STFTest {
         view.bot().table().getTableItem(bob.getBaseJid())
             .contextMenu(CM_RESTRICT_TO_READ_ONLY_ACCESS).click();
 
-        bob.sarosBot().condition().waitUntilHasReadOnlyAccess();
-        assertTrue(bob.sarosBot().state().hasReadOnlyAccess());
+        bob.sarosBot().views().sessionView().waitUntilHasReadOnlyAccess();
+        assertTrue(bob.sarosBot().views().sessionView().hasReadOnlyAccess());
     }
 
     @Test

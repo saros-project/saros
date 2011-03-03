@@ -20,6 +20,8 @@ import org.jivesoftware.smack.Roster;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotMenu;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotToolbarDropDownButton;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotTree;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotTreeItem;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotView;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.contextMenu.SarosContextMenuWrapper;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.views.ViewsImp;
@@ -33,6 +35,10 @@ public class BuddiesViewImp extends ViewsImp implements BuddiesView {
 
     private static transient BuddiesViewImp self;
 
+    private STFBotView view;
+    private STFBotTree tree;
+    private STFBotTreeItem treeItem;
+
     /**
      * {@link BuddiesViewImp} is a singleton, but inheritance is possible.
      */
@@ -44,7 +50,7 @@ public class BuddiesViewImp extends ViewsImp implements BuddiesView {
     }
 
     public BuddiesView setView(STFBotView view) throws RemoteException {
-        setWidgets(view);
+        setViewWithTree(view);
         return this;
     }
 
@@ -93,6 +99,7 @@ public class BuddiesViewImp extends ViewsImp implements BuddiesView {
         }
         initSarosContextMenuWrapper(tree.selectTreeItemWithRegex(NODE_BUDDIES
             + ".*", getNickName(buddyJID) + ".*"));
+        sarosContextMenu.setBuddiesView(this);
         return sarosContextMenu;
     }
 
@@ -109,7 +116,9 @@ public class BuddiesViewImp extends ViewsImp implements BuddiesView {
             clickToolbarButtonWithTooltip(TB_ADD_A_NEW_CONTACT);
             Map<String, String> labelsAndTexts = new HashMap<String, String>();
             labelsAndTexts.put("XMPP/Jabber ID", jid.getBase());
-
+            if (!bot().isShellOpen(SHELL_NEW_BUDDY))
+                bot().waitUntilShellIsOpen(SHELL_NEW_BUDDY);
+            bot().shell(SHELL_NEW_BUDDY).activate();
             bot().shell(SHELL_NEW_BUDDY).bot().textWithLabel("XMPP/Jabber ID")
                 .setText(jid.getBase());
             bot().shell(SHELL_NEW_BUDDY).bot().button(FINISH)
@@ -193,7 +202,7 @@ public class BuddiesViewImp extends ViewsImp implements BuddiesView {
     public boolean hasNickName(JID buddyJID) throws RemoteException {
         if (getNickName(buddyJID) == null)
             return false;
-        if (!getNickName(buddyJID).equals(buddyJID))
+        if (!getNickName(buddyJID).equals(buddyJID.getBase()))
             return true;
         return false;
     }
@@ -231,6 +240,33 @@ public class BuddiesViewImp extends ViewsImp implements BuddiesView {
                 return "Can't disconnect.";
             }
         });
+    }
+
+    protected boolean isToolbarButtonEnabled(String tooltip)
+        throws RemoteException {
+        if (!view.existsToolbarButton(tooltip))
+            return false;
+        return view.toolbarButton(tooltip).isEnabled();
+    }
+
+    private void setViewWithTree(STFBotView view) throws RemoteException {
+        this.view = view;
+        tree = view.bot().tree();
+        treeItem = null;
+    }
+
+    private void initSarosContextMenuWrapper(STFBotTreeItem treeItem) {
+        this.treeItem = treeItem;
+        sarosContextMenu.setTree(tree);
+        sarosContextMenu.setTreeItem(treeItem);
+    }
+
+    private void clickToolbarButtonWithTooltip(String tooltipText)
+        throws RemoteException {
+        if (!view.existsToolbarButton(tooltipText))
+            throw new RuntimeException("The toolbarbutton " + tooltipText
+                + " doesn't exist!");
+        view.toolbarButton(tooltipText).click();
     }
 
 }

@@ -107,7 +107,7 @@ public class TestSVNStateUpdates extends STFTest {
 
         buildSessionSequentially(SVN_PROJECT, CM_SHARE_PROJECT,
             TypeOfCreateProject.EXIST_PROJECT, alice, bob);
-        alice.sarosBot().condition()
+        alice.sarosBot().views().sessionView()
             .waitUntilIsInviteeInSession(bob.sarosBot());
     }
 
@@ -151,7 +151,7 @@ public class TestSVNStateUpdates extends STFTest {
     @Test
     public void testGrantWriteAccessAndRenameClass() throws Exception {
 
-        assertTrue(bob.sarosBot().state().hasWriteAccessNoGUI());
+        assertTrue(bob.sarosBot().views().sessionView().hasWriteAccessNoGUI());
         bob.sarosBot().views().packageExplorerView()
             .selectClass(SVN_PROJECT, SVN_PKG, SVN_CLS1).refactor()
             .rename("Asdf");
@@ -182,7 +182,7 @@ public class TestSVNStateUpdates extends STFTest {
     @Test
     public void testGrantWriteAccessAndMoveClass() throws Exception {
 
-        assertTrue(bob.sarosBot().state().hasWriteAccessNoGUI());
+        assertTrue(bob.sarosBot().views().sessionView().hasWriteAccessNoGUI());
         bob.sarosBot().views().packageExplorerView().tree().newC()
             .pkg(SVN_PROJECT, "new_package");
         alice.sarosBot().condition()

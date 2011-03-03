@@ -2,11 +2,17 @@ package de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteCompone
 
 import java.rmi.RemoteException;
 
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotTree;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotTreeItem;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotView;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.contextMenu.ContextMenuWrapper;
 
 public class PEViewImp extends ViewsImp implements PEView {
     private static transient PEViewImp pEViewImp;
+
+    private STFBotView view;
+    private STFBotTree tree;
+    private STFBotTreeItem treeItem;
 
     /**
      * {@link PEViewImp} is a singleton, but inheritance is possible.
@@ -15,12 +21,11 @@ public class PEViewImp extends ViewsImp implements PEView {
         if (pEViewImp != null)
             return pEViewImp;
         pEViewImp = new PEViewImp();
-        setContextMenu();
         return pEViewImp;
     }
 
     public PEView setView(STFBotView view) throws RemoteException {
-        setWidgets(view);
+        setViewWithTree(view);
         return this;
     }
 
@@ -108,6 +113,20 @@ public class PEViewImp extends ViewsImp implements PEView {
 
     public String getTitle() throws RemoteException {
         return VIEW_PACKAGE_EXPLORER;
+    }
+
+    private void setViewWithTree(STFBotView view) throws RemoteException {
+        this.view = view;
+        tree = view.bot().tree();
+        treeItem = null;
+    }
+
+    private void initContextMenuWrapper(STFBotTreeItem treeItem,
+        TreeItemType type) {
+        this.treeItem = treeItem;
+        contextMenu.setTree(tree);
+        contextMenu.setTreeItem(treeItem);
+        contextMenu.setTreeItemType(type);
     }
 
 }

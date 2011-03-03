@@ -8,7 +8,6 @@ import java.rmi.RemoteException;
 
 import org.junit.After;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import de.fu_berlin.inf.dpp.stf.client.testProject.testsuits.STFTest;
@@ -108,17 +107,6 @@ public class TestRosterView extends STFTest {
         assertTrue(bob.sarosBot().views().buddiesView().hasBuddy(alice.jid));
     }
 
-    @Test
-    @Ignore
-    public void addBuddyWithoutGUI() throws RemoteException {
-        deleteBuddies(alice, bob);
-        assertFalse(alice.sarosBot().views().buddiesView().hasBuddy(bob.jid));
-        assertFalse(bob.sarosBot().views().buddiesView().hasBuddy(alice.jid));
-        addBuddies(alice, bob);
-        assertTrue(alice.sarosBot().views().buddiesView().hasBuddy(bob.jid));
-        assertTrue(bob.sarosBot().views().buddiesView().hasBuddy(alice.jid));
-    }
-
     /**
      * Steps:
      * <ol>
@@ -159,14 +147,14 @@ public class TestRosterView extends STFTest {
     public void inviteBuddy() throws RemoteException, InterruptedException {
         setUpSessionWithAJavaProjectAndAClass(alice, bob);
 
-        assertFalse(carl.sarosBot().state().isInSession());
+        assertFalse(carl.sarosBot().views().sessionView().isInSession());
         alice.sarosBot().views().buddiesView().selectBuddy(carl.jid)
             .inviteBuddy();
 
         carl.bot().shell(SHELL_SESSION_INVITATION).confirm(FINISH);
         carl.sarosBot().confirmShellAddProjectWithNewProject(PROJECT1);
-        carl.sarosBot().condition().waitUntilIsInSession();
-        assertTrue(carl.sarosBot().state().isInSession());
+        carl.sarosBot().views().sessionView().waitUntilIsInSession();
+        assertTrue(carl.sarosBot().views().sessionView().isInSession());
 
     }
 }

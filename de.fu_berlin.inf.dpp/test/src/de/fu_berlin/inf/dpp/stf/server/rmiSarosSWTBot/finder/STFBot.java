@@ -1271,6 +1271,8 @@ public interface STFBot extends Remote {
      * Widget table
      * 
      **********************************************/
+    public boolean existsTable() throws RemoteException;
+
     /**
      * @param label
      *            the label on the widget.
