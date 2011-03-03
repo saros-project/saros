@@ -142,6 +142,14 @@ public class SessionViewImp extends ViewsImp implements SessionView {
      * States
      * 
      **********************************************/
+    public boolean existsParticipant(JID participantJID) throws RemoteException {
+        String participantLabel = getParticipantLabel(participantJID);
+        for (int i = 0; i < table.rowCount(); i++) {
+            if (table.getTableItem(i).getText().equals(participantLabel))
+                return true;
+        }
+        return false;
+    }
 
     public String getParticipantLabel(JID participantJID)
         throws RemoteException {
@@ -177,15 +185,6 @@ public class SessionViewImp extends ViewsImp implements SessionView {
         return isInSessionNoGUI();
     }
 
-    public boolean existsParticipant(JID participantJID) throws RemoteException {
-        String participantLabel = getParticipantLabel(participantJID);
-        for (int i = 0; i < table.rowCount(); i++) {
-            if (table.getTableItem(i).getText().equals(participantLabel))
-                return true;
-        }
-        return false;
-    }
-
     public boolean existsLabelInSessionView() throws RemoteException {
         return view.bot().existsLabel();
     }
@@ -198,45 +197,41 @@ public class SessionViewImp extends ViewsImp implements SessionView {
         return false;
     }
 
-    public boolean isHost(JID jidOfParticipant) throws RemoteException {
+    // public boolean isHost(JID jidOfParticipant) throws RemoteException {
+    //
+    // String participantLabelsInSessionView =
+    // getParticipantLabel(jidOfParticipant);
+    // String talbeItem = table.getTableItem(0).getText();
+    // if (participantLabelsInSessionView.equals(talbeItem))
+    // return true;
+    // return false;
+    // }
 
-        String participantLabelsInSessionView = getParticipantLabel(jidOfParticipant);
-        String talbeItem = table.getTableItem(0).getText();
-        if (participantLabelsInSessionView.equals(talbeItem))
-            return true;
-        return false;
-    }
+    // public boolean isParticipant() throws RemoteException {
+    // return existsParticipant(getJID());
+    // }
 
-    public boolean isParticipant() throws RemoteException {
-        if (!isInSession())
-            return false;
-        return existsParticipant(getJID());
-    }
+    // public boolean isParticipant(JID jid) throws RemoteException {
+    // if (!isInSession())
+    // return false;
+    // return existsParticipant(jid);
+    // }
 
-    public boolean isParticipant(JID jid) throws RemoteException {
-        if (!isInSession())
-            return false;
-        return existsParticipant(jid);
-    }
-
-    public boolean areParticipants(List<JID> jidOfParticipants)
-        throws RemoteException {
-        if (!isInSession())
-            return false;
-        boolean result = true;
-        for (JID jid : jidOfParticipants) {
-            result &= existsParticipant(jid);
-        }
-        return result;
-    }
+    // public boolean areParticipants(List<JID> jidOfParticipants)
+    // throws RemoteException {
+    //
+    // boolean result = true;
+    // for (JID jid : jidOfParticipants) {
+    // result &= existsParticipant(jid);
+    // }
+    // return result;
+    // }
 
     public boolean isFollowing() throws RemoteException {
-
         JID followedBuddy = getFollowedBuddyJIDNoGUI();
         if (followedBuddy == null)
             return false;
         return isFollowingBuddyNoGUI(followedBuddy.getBase());
-
     }
 
     public String getFirstLabelTextInSessionview() throws RemoteException {
@@ -245,8 +240,7 @@ public class SessionViewImp extends ViewsImp implements SessionView {
         throw new RuntimeException("There are no label in the session view.");
     }
 
-    public List<String> getAllParticipantsInSessionView()
-        throws RemoteException {
+    public List<String> getAllParticipants() throws RemoteException {
         List<String> allParticipantsName = new ArrayList<String>();
         for (int i = 0; i < table.rowCount(); i++) {
             allParticipantsName.add(table.getTableItem(i).getText());
@@ -254,25 +248,25 @@ public class SessionViewImp extends ViewsImp implements SessionView {
         return allParticipantsName;
     }
 
-    public boolean haveWriteAccessByNoGUI(List<JID> jids) {
-        boolean result = true;
-        ISarosSession sarosSession = sessionManager.getSarosSession();
-        if (sarosSession == null)
-            return false;
-        for (JID jid : jids) {
-            try {
-                User user = sarosSession.getUser(jid);
-                result &= sarosSession.getUsersWithWriteAccess().contains(user);
-            } catch (Exception e) {
-                return false;
-            }
-        }
-        return result;
-    }
+    // public boolean haveWriteAccessByNoGUI(List<JID> jids) {
+    // boolean result = true;
+    // ISarosSession sarosSession = sessionManager.getSarosSession();
+    // if (sarosSession == null)
+    // return false;
+    // for (JID jid : jids) {
+    // try {
+    // User user = sarosSession.getUser(jid);
+    // result &= sarosSession.getUsersWithWriteAccess().contains(user);
+    // } catch (Exception e) {
+    // return false;
+    // }
+    // }
+    // return result;
+    // }
 
-    public boolean isInFollowModeNoGUI() throws RemoteException {
-        return editorManager.isFollowing();
-    }
+    // public boolean isInFollowModeNoGUI() throws RemoteException {
+    // return editorManager.isFollowing();
+    // }
 
     public boolean isInSessionNoGUI() {
         log.debug("isInSession() == " + sessionManager.getSarosSession() != null);

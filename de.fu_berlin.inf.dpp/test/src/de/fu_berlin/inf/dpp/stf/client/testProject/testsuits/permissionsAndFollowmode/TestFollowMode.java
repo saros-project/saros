@@ -41,7 +41,8 @@ public class TestFollowMode extends STFTest {
         bob.sarosBot().views().sessionView().selectParticipant(alice.jid)
             .followThisBuddy();
         bob.bot().editor(CLS1_SUFFIX).waitUntilIsActive();
-        assertTrue(bob.sarosBot().views().sessionView().isInFollowModeNoGUI());
+        assertTrue(bob.sarosBot().views().sessionView()
+            .selectParticipant(alice.jid).isFollowingThisBuddy());
         assertTrue(bob.bot().editor(CLS1_SUFFIX).isActive());
 
         String clsContentOfAlice = alice.noBot().getFileContent(
@@ -62,7 +63,8 @@ public class TestFollowMode extends STFTest {
             .followThisBuddy();
         bob.bot().editor(CLS1_SUFFIX).show();
         alice.bot().editor(CLS1_SUFFIX).waitUntilIsActive();
-        assertTrue(alice.sarosBot().views().sessionView().isInFollowModeNoGUI());
+        assertTrue(alice.sarosBot().views().sessionView()
+            .selectParticipant(bob.jid).isFollowingThisBuddy());
         assertTrue(alice.bot().editor(CLS1_SUFFIX).isActive());
 
         // bob.sarosBot().sessionView().followThisBuddy(alice.jid);

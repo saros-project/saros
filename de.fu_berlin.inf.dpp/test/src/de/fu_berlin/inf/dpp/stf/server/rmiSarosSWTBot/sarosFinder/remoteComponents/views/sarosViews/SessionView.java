@@ -5,7 +5,6 @@ import java.rmi.RemoteException;
 import java.util.List;
 
 import de.fu_berlin.inf.dpp.User;
-import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.project.SarosSessionManager;
 import de.fu_berlin.inf.dpp.project.SharedProject;
@@ -422,14 +421,14 @@ public interface SessionView extends Remote {
      * @return <tt>true</tt>, if the local user is in the session view
      * @throws RemoteException
      */
-    public boolean isParticipant() throws RemoteException;
+    // public boolean isParticipant() throws RemoteException;
 
     /**
      * @return <tt>true</tt>, if the participant with the given JID exists in
      *         the session view
      * 
      */
-    public boolean isParticipant(JID jid) throws RemoteException;
+    // public boolean isParticipant(JID jid) throws RemoteException;
 
     /**
      * 
@@ -438,8 +437,8 @@ public interface SessionView extends Remote {
      *         the session view
      * @throws RemoteException
      */
-    public boolean areParticipants(List<JID> jidOfParticipants)
-        throws RemoteException;
+    // public boolean areParticipants(List<JID> jidOfParticipants)
+    // throws RemoteException;
 
     public boolean isFollowing() throws RemoteException;
 
@@ -450,8 +449,7 @@ public interface SessionView extends Remote {
      * @return list, which contain all the contact names.
      * @throws RemoteException
      */
-    public List<String> getAllParticipantsInSessionView()
-        throws RemoteException;
+    public List<String> getAllParticipants() throws RemoteException;
 
     /**
      * 
@@ -510,8 +508,8 @@ public interface SessionView extends Remote {
      *         {@link SharedProject}.
      * @throws RemoteException
      */
-    public boolean haveWriteAccessByNoGUI(List<JID> jids)
-        throws RemoteException;
+    // public boolean haveWriteAccessByNoGUI(List<JID> jids)
+    // throws RemoteException;
 
     /**
      * 
@@ -572,7 +570,7 @@ public interface SessionView extends Remote {
      * @throws RemoteException
      * @see EditorManager#isFollowing
      */
-    public boolean isInFollowModeNoGUI() throws RemoteException;
+    // public boolean isInFollowModeNoGUI() throws RemoteException;
 
     /**
      * 

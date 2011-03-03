@@ -77,22 +77,11 @@ public class TestShare3UsersConcurrently extends STFTest {
 
         leaveSessionPeersFirst();
 
-        assertFalse(carl.sarosBot().views().sessionView().isParticipantNoGUI());
-        assertFalse(carl.sarosBot().views().sessionView()
-            .selectParticipant(carl.jid).hasReadOnlyAccess());
-        assertFalse(carl.sarosBot().views().sessionView()
-            .selectParticipant(carl.jid).hasWriteAccess());
+        assertFalse(carl.sarosBot().views().sessionView().isInSession());
 
-        assertFalse(bob.sarosBot().views().sessionView().isParticipantNoGUI());
-        assertFalse(bob.sarosBot().views().sessionView()
-            .selectParticipant(bob.jid).hasReadOnlyAccess());
-        assertFalse(bob.sarosBot().views().sessionView()
-            .selectParticipant(bob.jid).hasWriteAccess());
+        assertFalse(bob.sarosBot().views().sessionView().isInSession());
 
-        assertFalse(alice.sarosBot().views().sessionView().isParticipantNoGUI());
-        assertFalse(alice.sarosBot().views().sessionView()
-            .selectParticipant(alice.jid).hasReadOnlyAccess());
-        assertFalse(alice.sarosBot().views().sessionView()
-            .selectParticipant(alice.jid).hasWriteAccess());
+        assertFalse(alice.sarosBot().views().sessionView().isInSession());
+
     }
 }
