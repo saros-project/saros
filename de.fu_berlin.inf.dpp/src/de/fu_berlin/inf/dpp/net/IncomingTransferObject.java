@@ -61,4 +61,14 @@ public interface IncomingTransferObject {
         }
     }
 
+    /**
+     * Returns the size of the transferred data in bytes.
+     */
+    public long getTransferredSize();
+
+    /**
+     * Returns the size of the data in bytes after decompression.
+     */
+    public long getUncompressedSize();
+
 }

@@ -180,11 +180,13 @@ public interface ITransmitter {
      * @param processID
      *            ID to separate the project exchanging processes from one
      *            another
+     * @param peer {@link JID} of the peer receiving from
      * @param forceWait
      * @return The archive as an {@link InputStream}
      */
-    public InputStream receiveArchive(String processID, SubMonitor monitor,
-        boolean forceWait) throws IOException, SarosCancellationException;
+    public InputStream receiveArchive(String processID, JID peer,
+        SubMonitor monitor, boolean forceWait) throws IOException,
+        SarosCancellationException;
 
     /**
      * a generic receive method

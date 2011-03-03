@@ -29,15 +29,19 @@ public class DataTransferCollector extends AbstractStatisticCollector {
 
         protected boolean incoming;
 
-        protected long size;
+        protected long sizeTransferred;
+
+        protected long sizeUncompressed;
 
         protected long transmissionMillisecs;
 
         public TransferEvent(NetTransferMode newMode, boolean incoming,
-            long size, long transmissionMillisecs) {
+            long sizeTransferred, long sizeUncompressed,
+            long transmissionMillisecs) {
             this.mode = newMode;
             this.incoming = incoming;
-            this.size = size;
+            this.sizeTransferred = sizeTransferred;
+            this.sizeUncompressed = sizeUncompressed;
             this.transmissionMillisecs = transmissionMillisecs;
         }
 
@@ -45,8 +49,25 @@ public class DataTransferCollector extends AbstractStatisticCollector {
             return transmissionMillisecs;
         }
 
-        public long getSize() {
-            return size;
+        /**
+         * Returns size of the transferred data for this {@link TransferEvent}
+         * 
+         * @return transferred data size in bytes
+         */
+        public long getTransferredSize() {
+            return sizeTransferred;
+        }
+
+        /**
+         * Transfered data may be uncompressed after reception. This function
+         * returns the data size of the data of this {@link TransferEvent} after
+         * decompression. If the data was not compressed, this value equals the
+         * {@link #getTransferredSize()} call.
+         * 
+         * @return uncompressed data size in bytes
+         */
+        public long getUncompressedSize() {
+            return sizeUncompressed;
         }
 
         public boolean isIncoming() {
@@ -63,7 +84,8 @@ public class DataTransferCollector extends AbstractStatisticCollector {
     protected List<TransferEvent> transferEvents = new ArrayList<TransferEvent>();
 
     public DataTransferCollector(StatisticManager statisticManager,
-        SarosSessionManager sessionManager, DataTransferManager dataTransferManager) {
+        SarosSessionManager sessionManager,
+        DataTransferManager dataTransferManager) {
         super(statisticManager, sessionManager);
         this.dataTransferManager = dataTransferManager;
 
@@ -75,9 +97,11 @@ public class DataTransferCollector extends AbstractStatisticCollector {
                 }
 
                 public void transferFinished(JID jid, NetTransferMode newMode,
-                    boolean incoming, long size, long transmissionMillisecs) {
+                    boolean incoming, long sizeTransferred,
+                    long sizeUncompressed, long transmissionMillisecs) {
                     transferEvents.add(new TransferEvent(newMode, incoming,
-                        size, transmissionMillisecs));
+                        sizeTransferred, sizeUncompressed,
+                        transmissionMillisecs));
                 }
 
                 public void connectionChanged(JID jid,
@@ -106,7 +130,7 @@ public class DataTransferCollector extends AbstractStatisticCollector {
             long totalTransferTime = 0;
             int nTransferEvents = 0;
             for (TransferEvent event : transferClass.v) {
-                totalSize += event.getSize();
+                totalSize += event.getTransferredSize();
                 totalTransferTime += event.getTransmissionMillisecs();
                 nTransferEvents++;
             }

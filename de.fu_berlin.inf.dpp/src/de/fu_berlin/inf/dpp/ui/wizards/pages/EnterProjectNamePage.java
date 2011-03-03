@@ -193,12 +193,25 @@ public class EnterProjectNamePage extends WizardPage {
         case HANDMADE:
         case IBB:
         default:
+            String speedInfo = "";
+
+            if (dataTransferManager.getIncomingIBBTransferSpeed(this.peer) != 0) {
+                // Show throughput of recent IBB transfer in warning
+                speedInfo = "("
+                    + Math.round(dataTransferManager
+                        .getIncomingIBBTransferSpeed(this.peer) / 1024 * 10.)
+                    / 10. + " KiB/s only!)";
+            }
+
             if (preferenceUtils.forceFileTranserByChat()) {
-                setDescription("Attention: Direct file transfer connections are deactivated. Using IBB instead!"
+
+                setDescription("Warning: Direct file transfer deactivated. Using slow IBB instead! "
+                    + speedInfo
                     + '\n'
                     + "To activate uncheck 'Force file transfer over XMPP network' in Saros preferences.");
             } else {
-                setDescription("Attention: No direct file transfer connection available! Using IBB instead!"
+                setDescription("Warning : Direct file transfer not available! Using slow IBB instead! "
+                    + speedInfo
                     + '\n'
                     + "Suggestions: Update an existing project or copy resources from another project.");
             }

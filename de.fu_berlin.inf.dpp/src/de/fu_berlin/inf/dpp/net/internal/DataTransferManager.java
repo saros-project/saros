@@ -51,6 +51,8 @@ public class DataTransferManager implements IConnectionListener,
 
     protected Map<JID, List<TransferDescription>> incomingTransfers = new HashMap<JID, List<TransferDescription>>();
 
+    protected Map<JID, Double> incomingIBBTransferSpeeds = new HashMap<JID, Double>();
+
     protected TransferModeDispatch transferModeDispatch = new TransferModeDispatch();
 
     protected ConcurrentLinkedQueue<TransferData> fileTransferQueue;
@@ -84,6 +86,7 @@ public class DataTransferManager implements IConnectionListener,
         this.initTransports();
         addRosterListener(rosterTracker);
         saros.addListener(this);
+        transferModeDispatch.add(new TransferCompleteListener());
     }
 
     /**
@@ -127,7 +130,6 @@ public class DataTransferManager implements IConnectionListener,
             }
 
         });
-
     }
 
     private final class LoggingTransferObject implements IncomingTransferObject {
@@ -166,12 +168,14 @@ public class DataTransferManager implements IConnectionListener,
                     log,
                     "[" + getTransferMode().toString()
                         + "] Finished incoming data transfer: "
-                        + description.toString() + ", size: "
-                        + Utils.throughput(content.length, duration),
+                        + description.toString() + ", Throughput: "
+                        + Utils.throughput(getTransferredSize(), duration),
                     description.logToDebug);
 
                 transferModeDispatch.transferFinished(description.getSender(),
-                    getTransferMode(), true, content.length, duration);
+                    getTransferMode(), true,
+                    transferObject.getTransferredSize(),
+                    transferObject.getUncompressedSize(), duration);
 
                 return content;
 
@@ -194,6 +198,15 @@ public class DataTransferManager implements IConnectionListener,
         public NetTransferMode getTransferMode() {
             return transferObject.getTransferMode();
         }
+
+        public long getTransferredSize() {
+            return transferObject.getTransferredSize();
+        }
+
+        public long getUncompressedSize() {
+            return transferObject.getUncompressedSize();
+        }
+
     }
 
     private static final Logger log = Logger
@@ -306,6 +319,8 @@ public class DataTransferManager implements IConnectionListener,
         try {
             StopWatch watch = new StopWatch().start();
 
+            long sizeUncompressed = input.length;
+
             if (transferData.compressInDataTransferManager()) {
                 input = Utils.deflate(input, progress.newChild(15));
             }
@@ -315,13 +330,16 @@ public class DataTransferManager implements IConnectionListener,
             watch.stop();
 
             transferModeDispatch.transferFinished(recipient,
-                connection.getMode(), false, input.length, watch.getTime());
+                connection.getMode(), false, input.length, sizeUncompressed,
+                watch.getTime());
+
         } catch (SarosCancellationException e) {
-            throw e; // Rethrow to circumvrent the Exception catch below
+            throw e; // Rethrow to circumvent the Exception catch below
         } catch (IOException e) {
+            e.printStackTrace();
             log.error(Utils.prefix(transferData.recipient) + "Failed to send "
                 + transferData + " with " + connection.getMode().toString()
-                + ":", e.getCause());
+                + ":" + e.getMessage() + ":", e.getCause());
             throw e;
         }
     }
@@ -424,6 +442,32 @@ public class DataTransferManager implements IConnectionListener,
         return connection.getMode();
     }
 
+    // Listens for completed transfers to store speed of incoming IBB transfers
+    protected class TransferCompleteListener implements ITransferModeListener {
+        protected DataTransferManager dataTransferManager;
+
+        // store transfer speed for incoming IBB transfers, user specific
+        public void transferFinished(JID jid, NetTransferMode newMode,
+            boolean incoming, long sizeTransferred, long sizeUncompressed,
+            long transmissionMillisecs) {
+            if (newMode == NetTransferMode.IBB && incoming) {
+
+                double ibbSpeed = sizeTransferred
+                    / ((double) transmissionMillisecs / 1000);
+
+                setIncomingIBBTransferSpeed(jid, ibbSpeed);
+            }
+        }
+
+        public void connectionChanged(JID jid, IBytestreamConnection connection) {
+            // do nothing
+        }
+
+        public void clear() {
+            // do nothing
+        }
+    }
+
     public static class TransferModeDispatch implements ITransferModeListener {
 
         protected List<ITransferModeListener> listeners = new ArrayList<ITransferModeListener>();
@@ -447,12 +491,13 @@ public class DataTransferManager implements IConnectionListener,
         }
 
         public synchronized void transferFinished(JID jid,
-            NetTransferMode newMode, boolean incoming, long size,
-            long transmissionMillisecs) {
+            NetTransferMode newMode, boolean incoming, long sizeTransferred,
+            long sizeUncompressed, long transmissionMillisecs) {
 
             for (ITransferModeListener listener : listeners) {
                 try {
-                    listener.transferFinished(jid, newMode, incoming, size,
+                    listener.transferFinished(jid, newMode, incoming,
+                        sizeTransferred, sizeUncompressed,
                         transmissionMillisecs);
                 } catch (RuntimeException e) {
                     log.error("Listener crashed: ", e);
@@ -686,6 +731,36 @@ public class DataTransferManager implements IConnectionListener,
             List<TransferDescription> transfers = getIncomingTransfers(from);
             transfers.add(transferDescription);
         }
+    }
+
+    /**
+     * Returns the last known speed of incoming IBB transfer for the given
+     * {@link JID}.
+     * 
+     * @param jid
+     *            The {@link JID} of the peer to get the throughput information
+     *            about
+     * @return speed in bytes/second, or 0 if not known
+     */
+    public double getIncomingIBBTransferSpeed(JID jid) {
+        Double value = incomingIBBTransferSpeeds.get(jid);
+
+        if (value == null)
+            return 0;
+        else
+            return value.doubleValue();
+    }
+
+    /**
+     * Sets a speed value for a given {@link JID}
+     * 
+     * @param jid
+     *            {@link JID} of the transfer source peer
+     * @param value
+     *            transfer speed in bytes/second
+     */
+    protected void setIncomingIBBTransferSpeed(JID jid, double value) {
+        incomingIBBTransferSpeeds.put(jid, value);
     }
 
 }

@@ -22,11 +22,15 @@ public interface ITransferModeListener {
      *            The JID of the user to which data was sent (outgoing) or from
      *            which data was received (incoming)
      * 
-     * @param size
-     *            The size of the received data in byte
+     * @param sizeTransferred
+     *            The size of the transferred data in byte
+     * @param sizeUncompressed
+     *            The size of the received data after (potentially)
+     *            decompression in byte
      */
     public void transferFinished(JID jid, NetTransferMode newMode,
-        boolean incoming, long size, long transmissionMillisecs);
+        boolean incoming, long sizeTransferred, long sizeUncompressed,
+        long transmissionMillisecs);
 
     /**
      * Method called when the DataTransfer connection changed.

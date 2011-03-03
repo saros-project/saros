@@ -34,6 +34,9 @@ public class BinaryChannelTransferObject implements IncomingTransferObject {
 
     protected final int objectid;
 
+    protected long transferredSize;
+    protected long uncompressedSize;
+
     protected AtomicBoolean acceptedOrRejected = new AtomicBoolean(false);
 
     public BinaryChannelTransferObject(BinaryChannel binaryChannel,
@@ -42,6 +45,8 @@ public class BinaryChannelTransferObject implements IncomingTransferObject {
         this.binaryChannel = binaryChannel;
         this.transferDescription = transferDescription;
         this.objectid = objectid;
+        transferredSize = 0;
+        uncompressedSize = 0;
     }
 
     public byte[] accept(SubMonitor progress)
@@ -83,7 +88,8 @@ public class BinaryChannelTransferObject implements IncomingTransferObject {
                 }
 
                 if (first) {
-                    progress.beginTask("Receiving",
+                    progress.beginTask(
+                        "Receiving",
                         packet.getRemaining()
                             + (transferDescription
                                 .compressInDataTransferManager() ? 1 : 0));
@@ -100,8 +106,12 @@ public class BinaryChannelTransferObject implements IncomingTransferObject {
                 PacketType.FINISHED, objectid));
             byte[] data = BinaryChannel.getData(resultList);
 
+            transferredSize = data.length;
+
             if (transferDescription.compressInDataTransferManager())
                 data = Utils.inflate(data, progress.newChild(1));
+
+            uncompressedSize = data.length;
 
             return data;
         } finally {
@@ -126,4 +136,13 @@ public class BinaryChannelTransferObject implements IncomingTransferObject {
     public NetTransferMode getTransferMode() {
         return this.binaryChannel.transferMode;
     }
+
+    public long getTransferredSize() {
+        return transferredSize;
+    }
+
+    public long getUncompressedSize() {
+        return uncompressedSize;
+    }
+
 }

@@ -137,11 +137,11 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
         throws SarosCancellationException {
 
         this.monitor = subMonitor;
-        SubMonitor monitor = this.monitor.newChild(100);
         IWorkspace ws = ResourcesPlugin.getWorkspace();
         IWorkspaceDescription desc = ws.getDescription();
         boolean wasAutobuilding = desc.isAutoBuilding();
 
+        subMonitor.beginTask("Initializing shared project", 100);
         try {
             if (wasAutobuilding) {
                 desc.setAutoBuilding(false);
@@ -149,18 +149,18 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
             }
 
             List<FileList> missingFiles = calculateMissingFiles(projectNames,
-                skipSyncs, useVersionControl, monitor.newChild(30));
+                skipSyncs, useVersionControl, subMonitor.newChild(10));
 
             transmitter.sendFileLists(peer, processID, missingFiles,
-                monitor.newChild(5));
+                subMonitor.newChild(10));
             checkCancellation();
 
             if (this.doStream) {
                 // Host/Inviter decided to transmit files via stream
-                acceptStream(monitor.newChild(65));
+                acceptStream(subMonitor.newChild(80));
             } else {
                 // Host/Inviter decided to transmit files with one big archive
-                acceptArchive(localProjects.size());
+                acceptArchive(localProjects.size(), subMonitor.newChild(80));
             }
             // We are finished with the exchanging process. Add all projects to
             // the session.
@@ -184,7 +184,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
                 }
             }
             this.projectExchangeProcesses.removeProjectExchangeProcess(this);
-            monitor.done();
+            subMonitor.done();
         }
     }
 
@@ -195,16 +195,22 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
      * @param numberOfLoops
      *            how many projects will be in the big archive
      */
-    private void acceptArchive(int numberOfLoops) throws IOException,
-        SarosCancellationException, CoreException {
+    private void acceptArchive(int numberOfLoops, SubMonitor submonitor)
+        throws IOException, SarosCancellationException, CoreException {
+
         // waiting for the big archive to come in
+
+        submonitor.beginTask(null, 100);
+        submonitor.subTask("Receiving archive");
+
         InputStream archiveStream = transmitter.receiveArchive(processID,
-            monitor.newChild(35), false);
+            getPeer(), submonitor.newChild(70), false);
         checkCancellation();
+
         ZipInputStream zipStream = new ZipInputStream(archiveStream);
         ZipEntry zipEntry;
         // unpacking the big archive
-        SubMonitor zipStreamLoopMonitor = monitor.newChild(30);
+        SubMonitor zipStreamLoopMonitor = submonitor.newChild(30);
         while ((zipEntry = zipStream.getNextEntry()) != null) {
             // Every zipEntry is (again) a ZipArchive, which contains all
             // missing files for one project.
@@ -241,6 +247,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
             zipStream.closeEntry();
             file.delete(true, false, lMonitor.newChild(10));
         }
+        submonitor.done();
     }
 
     /**
@@ -254,6 +261,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
         boolean useVersionControl, SubMonitor subMonitor)
         throws SarosCancellationException, IOException {
 
+        subMonitor.beginTask(null, 100);
         Set<String> projectNamesKeySet = projectNames.keySet();
         int numberOfLoops = projectNamesKeySet.size();
         List<FileList> missingFiles = new ArrayList<FileList>();
@@ -678,8 +686,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
     private FileList computeRequiredFiles(IProject currentLocalProject,
         FileList remoteFileList, boolean skipSync, VCSAdapter vcs,
         SubMonitor monitor) throws LocalCancellationException, IOException {
-        monitor.beginTask("Synchronizing", 100);
-        monitor.subTask("Preparing project for synchronization...");
+        monitor.beginTask(null, 100);
 
         if (skipSync) {
             return new FileList();
@@ -734,7 +741,9 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
         FileList remoteFileList, IProject currentLocalProject,
         SubMonitor monitor) throws LocalCancellationException {
         log.debug("Inv" + Utils.prefix(peer) + ": Computing file list diff...");
-        monitor.beginTask("Preparing local project for incoming files", 100);
+
+        monitor.beginTask(null, 100);
+
         try {
             monitor.subTask("Calculating Diff");
             FileListDiff diff = FileListDiff
@@ -749,12 +758,13 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
             diff = diff.addAllFolders(currentLocalProject,
                 monitor.newChild(40, SubMonitor.SUPPRESS_ALL_LABELS));
 
-            monitor.done();
             return diff;
         } catch (CoreException e) {
             throw new LocalCancellationException(
                 "Could not create diff file list: " + e.getMessage(),
                 CancelOption.NOTIFY_PEER);
+        } finally {
+            monitor.done();
         }
     }
 
@@ -790,7 +800,8 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
         try {
 
             ZipEntry zipEntry = null;
-            monitor.beginTask("Receiving project files...", 100);
+            monitor.beginTask(null, 100);
+            monitor.subTask("Receiving project files...");
 
             if (numOfFiles >= 1) {
                 increment = (double) 100 / numOfFiles;

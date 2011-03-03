@@ -75,17 +75,25 @@ public class BinaryChannelConnection implements IBytestreamConnection {
                         close();
                         return;
                     } catch (SocketException e) {
-                        log.debug(prefix() + "Connection was closed by me. ");
+                        log.debug(prefix() + "Connection was closed by me. "
+                            + e.getMessage());
                         close();
                         return;
                     } catch (EOFException e) {
-                        log.debug(prefix() + "Connection was closed by peer.");
+                        e.printStackTrace();
+
+                        log.debug(prefix() + "Connection was closed by peer. "
+                            + e.getMessage());
                         close();
                         return;
                     } catch (IOException e) {
+                        log.error(
+                            prefix() + "Network IO Exception: "
+                                + e.getMessage(), e);
+
                         if (e.getMessage().contains("Socket already disposed"))
                             return;
-                        log.error(prefix() + "Crashed", e);
+
                         close();
                         return;
                     } catch (ClassNotFoundException e) {

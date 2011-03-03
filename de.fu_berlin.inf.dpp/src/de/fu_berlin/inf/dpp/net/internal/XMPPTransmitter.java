@@ -70,6 +70,7 @@ import de.fu_berlin.inf.dpp.net.IncomingTransferObject.IncomingTransferObjectExt
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.TimedActivityDataObject;
 import de.fu_berlin.inf.dpp.net.business.DispatchThreadContext;
+import de.fu_berlin.inf.dpp.net.internal.DataTransferManager.NetTransferMode;
 import de.fu_berlin.inf.dpp.net.internal.DefaultInvitationInfo.FileListRequestExtensionProvider;
 import de.fu_berlin.inf.dpp.net.internal.DefaultInvitationInfo.InvitationAcknowledgementExtensionProvider;
 import de.fu_berlin.inf.dpp.net.internal.DefaultInvitationInfo.InvitationCompleteExtensionProvider;
@@ -324,31 +325,88 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
         return installReceiver(filter);
     }
 
-    public InputStream receiveArchive(String processID, SubMonitor monitor,
-        boolean forceWait) throws IOException, SarosCancellationException {
+    public InputStream receiveArchive(String processID, final JID peer,
+        final SubMonitor monitor, boolean forceWait) throws IOException,
+        SarosCancellationException {
 
-        monitor.beginTask("Receiving archive", 100);
+        monitor.beginTask(null, 100);
         log.debug("Receiving archive");
-        PacketFilter filter = PacketExtensionUtils
+        final PacketFilter filter = PacketExtensionUtils
             .getIncomingTransferObjectFilter(incomingExtProv, sessionID,
                 processID, FileTransferType.ARCHIVE_TRANSFER);
 
         SarosPacketCollector collector = installReceiver(filter);
 
+        // provide visual feedback of ongoing IBB transfer
+        PacketListener packetListenerIBB = null;
+        if (dataManager.getTransferMode(peer) == NetTransferMode.IBB) {
+            packetListenerIBB = createIBBTransferProgressPacketListener(peer,
+                monitor);
+        }
+
         try {
             IncomingTransferObject result = incomingExtProv.getPayload(receive(
-                monitor.newChild(10), collector, 10000, forceWait));
+                monitor.newChild(packetListenerIBB == null ? 10 : 1),
+                collector, 10000, forceWait));
 
             if (monitor.isCanceled()) {
                 result.reject();
                 throw new LocalCancellationException();
             }
-            byte[] data = result.accept(monitor.newChild(90));
+            byte[] data = result.accept(monitor
+                .newChild(packetListenerIBB == null ? 90 : 9));
 
             return new ByteArrayInputStream(data);
         } finally {
             monitor.done();
+            if (packetListenerIBB != null)
+                receiver.removePacketListener(packetListenerIBB);
         }
+    }
+
+    /**
+     * Initializes a {@link PacketListener} to visualize incoming packets as
+     * progress in the given {@link SubMonitor}. This is an infinite,
+     * logarithmic progress display.
+     * 
+     * @param peer
+     *            The source {@link JID} of packets to show progress for
+     * @param monitor
+     *            The {@link SubMonitor} of the progress
+     */
+    protected PacketListener createIBBTransferProgressPacketListener(
+        final JID peer, final SubMonitor monitor) {
+
+        PacketListener packetListener = new PacketListener() {
+
+            public void processPacket(Packet packet) {
+                // we dont process
+            }
+        };
+
+        receiver.addPacketListener(packetListener, new PacketFilter() {
+
+            public boolean accept(Packet packet) {
+
+                if (packet.getClass().equals((IQ.class)))
+                    return false;
+
+                if (packet.getFrom() == null)
+                    return false;
+
+                JID fromJid = new JID(packet.getFrom());
+                if (peer.equals(fromJid) == false)
+                    return false;
+
+                // increase infinite (logarithmic) progress
+                monitor.setWorkRemaining(100);
+                monitor.worked(5);
+
+                // we dont process
+                return false;
+            }
+        });
+        return packetListener;
     }
 
     /**
@@ -371,6 +429,7 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
             do {
                 if (monitor.isCanceled())
                     throw new LocalCancellationException();
+                monitor.worked(1);
                 // Wait up to [timeout] seconds for a result.
                 result = collector.nextResult(timeout);
             } while (forceWait && result == null);

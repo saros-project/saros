@@ -239,7 +239,8 @@ public class RosterView extends ViewPart {
         }
 
         public void transferFinished(JID jid, NetTransferMode newMode,
-            boolean incoming, long size, long transmissionMillisecs) {
+            boolean incoming, long sizeTransferred, long sizeUncompressed,
+            long transmissionMillisecs) {
             // we are not interested in transfer statistics
         }
 

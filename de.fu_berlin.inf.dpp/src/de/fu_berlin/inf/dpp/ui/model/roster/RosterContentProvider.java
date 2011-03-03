@@ -45,7 +45,8 @@ public class RosterContentProvider extends TreeContentProvider {
     protected DataTransferManager dataTransferManager;
     protected ITransferModeListener transferModeListener = new ITransferModeListener() {
         public void transferFinished(JID jid, NetTransferMode newMode,
-            boolean incoming, long size, long transmissionMillisecs) {
+            boolean incoming, long sizeTransferred, long sizeUncompressed,
+            long transmissionMillisecs) {
             // do nothing
         }
 
