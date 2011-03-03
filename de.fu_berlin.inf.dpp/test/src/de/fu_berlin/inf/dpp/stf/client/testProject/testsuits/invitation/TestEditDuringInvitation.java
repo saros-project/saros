@@ -56,7 +56,7 @@ public class TestEditDuringInvitation extends STFTest {
         buildSessionSequentially(PROJECT1, CM_SHARE_PROJECT,
             TypeOfCreateProject.NEW_PROJECT, alice, bob);
 
-        assertTrue(bob.sarosBot().views().sessionView().hasWriteAccess());
+        assertTrue(bob.sarosBot().views().sessionView().hasWriteAccessNoGUI());
 
         alice.sarosBot().views().sessionView()
             .openInvitationInterface(carl.getBaseJid());

@@ -11,7 +11,7 @@ public class RSViewImp extends Component implements RSView {
     private STFBotView view;
 
     /**
-     * {@link RSViewImp} is a singleton, but inheritance is possible.
+     * {@link ChatViewImp} is a singleton, but inheritance is possible.
      */
     public static RSViewImp getInstance() {
         if (self != null)
@@ -37,19 +37,25 @@ public class RSViewImp extends Component implements RSView {
      * 
      **********************************************/
     public void clickTBChangeModeOfImageSource() throws RemoteException {
-        view.toolbarButton(TB_CHANGE_MODE_IMAGE_SOURCE).click();
+        preCondition();
+        bot().view(VIEW_REMOTE_SCREEN)
+            .toolbarButton(TB_CHANGE_MODE_IMAGE_SOURCE).click();
     }
 
     public void clickTBStopRunningSession() throws RemoteException {
-        view.toolbarButton(TB_STOP_RUNNING_SESSION).click();
+        preCondition();
+        bot().view(VIEW_REMOTE_SCREEN).toolbarButton(TB_STOP_RUNNING_SESSION)
+            .click();
     }
 
     public void clickTBResume() throws RemoteException {
-        view.toolbarButton(TB_RESUME).click();
+        preCondition();
+        bot().view(VIEW_REMOTE_SCREEN).toolbarButton(TB_RESUME).click();
     }
 
     public void clickTBPause() throws RemoteException {
-        view.toolbarButton(TB_PAUSE).click();
+        preCondition();
+        bot().view(VIEW_REMOTE_SCREEN).toolbarButton(TB_PAUSE).click();
     }
 
     public void confirmShellIncomingScreensharingSession(String YesOrNot)
@@ -63,7 +69,18 @@ public class RSViewImp extends Component implements RSView {
      * 
      **********************************************/
     public void waitUntilRemoteScreenViewIsActive() throws RemoteException {
-        view.waitUntilIsActive();
+        bot().view(VIEW_REMOTE_SCREEN).waitUntilIsActive();
     }
 
+    /**************************************************************
+     * 
+     * inner functions
+     * 
+     **************************************************************/
+
+    private void preCondition() throws RemoteException {
+        bot().openViewById(VIEW_REMOTE_SCREEN_ID);
+        bot().view(VIEW_REMOTE_SCREEN).show();
+
+    }
 }

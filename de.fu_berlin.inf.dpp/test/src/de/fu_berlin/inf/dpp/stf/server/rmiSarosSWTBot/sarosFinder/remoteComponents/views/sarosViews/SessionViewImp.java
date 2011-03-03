@@ -137,12 +137,6 @@ public class SessionViewImp extends ViewsImp implements SessionView {
         bot().waitsUntilShellIsClosed(SHELL_PROGRESS_INFORMATION);
     }
 
-    /**********************************************
-     * 
-     * States
-     * 
-     **********************************************/
-
     private void selectParticipant(JID jidOfSelectedUser, String message)
         throws RemoteException {
         if (localJID.equals(jidOfSelectedUser)) {
@@ -165,12 +159,12 @@ public class SessionViewImp extends ViewsImp implements SessionView {
         throws RemoteException {
         String contactLabel;
         if (localJID.equals(participantJID)) {
-            if (hasWriteAccess())
+            if (hasWriteAccessNoGUI())
                 contactLabel = OWN_PARTICIPANT_NAME;
             else
                 contactLabel = OWN_PARTICIPANT_NAME + " " + PERMISSION_NAME;
         } else if (sarosBot().views().buddiesView().hasNickName(participantJID)) {
-            if (hasWriteAccessBy(participantJID))
+            if (hasWriteAccessByNoGUI(participantJID))
                 contactLabel = sarosBot().views().buddiesView()
                     .getNickName(participantJID)
                     + " (" + participantJID.getBase() + ")";
@@ -183,7 +177,7 @@ public class SessionViewImp extends ViewsImp implements SessionView {
                     + " "
                     + PERMISSION_NAME;
         } else {
-            if (hasWriteAccessBy(participantJID))
+            if (hasWriteAccessByNoGUI(participantJID))
                 contactLabel = participantJID.getBase();
             else
                 contactLabel = participantJID.getBase() + " " + PERMISSION_NAME;
@@ -193,7 +187,6 @@ public class SessionViewImp extends ViewsImp implements SessionView {
 
     public boolean isInSession() throws RemoteException {
         return isToolbarButtonEnabled(TB_LEAVE_THE_SESSION);
-
     }
 
     public boolean existsParticipant(JID participantJID) throws RemoteException {
@@ -203,6 +196,10 @@ public class SessionViewImp extends ViewsImp implements SessionView {
                 return true;
         }
         return false;
+    }
+
+    public boolean existsLabelInSessionView() throws RemoteException {
+        return view.bot().existsLabel();
     }
 
     public boolean hasWriteAccess() throws RemoteException {
@@ -247,6 +244,7 @@ public class SessionViewImp extends ViewsImp implements SessionView {
     }
 
     public boolean hasReadOnlyAccessBy(String... jids) throws RemoteException {
+
         boolean result = true;
         for (String jid : jids) {
             boolean isEnabled = table.getTableItem(jid)
@@ -290,20 +288,22 @@ public class SessionViewImp extends ViewsImp implements SessionView {
     }
 
     public boolean isFollowing() throws RemoteException {
-        JID followedBuddy = getFollowedBuddy();
+        JID followedBuddy = getFollowedBuddyJIDNoGUI();
         if (followedBuddy == null)
             return false;
-        return isFollowingBuddy(followedBuddy);
+        return isFollowingBuddyNoGUI(followedBuddy.getBase());
 
     }
 
     public boolean isFollowingBuddy(JID buddyJID) throws RemoteException {
-        return table.getTableItem(getParticipantLabel(buddyJID))
-            .existsContextMenu(CM_STOP_FOLLOWING_THIS_BUDDY);
+        // STFBotTableItem tableItem = bot().view(VIEW_SAROS_SESSION).bot_()
+        // .table().getTableItem(getParticipantLabel(buddyJID));
+        // return tableItem.existsContextMenu(CM_STOP_FOLLOWING_THIS_BUDDY);
+        return isFollowingBuddyNoGUI(buddyJID.getBase());
     }
 
-    public String getFirstLabelTextInViewContent() throws RemoteException {
-        if (view.bot().existsLabel())
+    public String getFirstLabelTextInSessionview() throws RemoteException {
+        if (existsLabelInSessionView())
             return view.bot().label().getText();
         return null;
     }
@@ -317,13 +317,105 @@ public class SessionViewImp extends ViewsImp implements SessionView {
         return allParticipantsName;
     }
 
-    // public boolean isInSessionNoGUI() {
-    // log.debug("isInSession() == " + sessionManager.getSarosSession() !=
-    // null);
-    // return sessionManager.getSarosSession() != null;
-    // }
+    public boolean hasWriteAccessNoGUI() throws RemoteException {
+        ISarosSession sarosSession = sessionManager.getSarosSession();
+        if (sarosSession == null)
+            return false;
+        return sarosSession.hasWriteAccess();
+    }
 
-    public boolean isParticipantNoGUI(JID jid) {
+    public boolean hasWriteAccessByNoGUI(JID jid) throws RemoteException {
+        ISarosSession sarosSession = sessionManager.getSarosSession();
+        if (sarosSession == null)
+            return false;
+        User user = sarosSession.getUser(jid);
+        if (user == null)
+            return false;
+        log.debug("isDriver(" + jid.toString() + ") == "
+            + sarosSession.getUsersWithWriteAccess().contains(user));
+        return sarosSession.getUsersWithWriteAccess().contains(user);
+    }
+
+    public boolean haveWriteAccessByNoGUI(List<JID> jids) {
+        boolean result = true;
+        ISarosSession sarosSession = sessionManager.getSarosSession();
+        if (sarosSession == null)
+            return false;
+        for (JID jid : jids) {
+            try {
+                User user = sarosSession.getUser(jid);
+                result &= sarosSession.getUsersWithWriteAccess().contains(user);
+            } catch (Exception e) {
+                return false;
+            }
+        }
+        return result;
+    }
+
+    public boolean isInFollowModeNoGUI() throws RemoteException {
+        return editorManager.isFollowing();
+    }
+
+    public boolean isInSessionNoGUI() {
+        log.debug("isInSession() == " + sessionManager.getSarosSession() != null);
+        return sessionManager.getSarosSession() != null;
+    }
+
+    public boolean isHostNoGUI() throws RemoteException {
+        return isHostNoGUI(getJID());
+    }
+
+    public boolean isHostNoGUI(JID jid) throws RemoteException {
+        ISarosSession sarosSession = sessionManager.getSarosSession();
+        if (sarosSession == null)
+            return false;
+        User user = sarosSession.getUser(jid);
+        if (user == null)
+            return false;
+        final boolean result = user == sarosSession.getHost();
+        log.debug("isHost(" + jid.toString() + ") == " + result);
+        return result;
+    }
+
+    public boolean hasReadOnlyAccessNoGUI() throws RemoteException {
+        return hasReadOnlyAccessNoGUI(getJID());
+    }
+
+    public boolean hasReadOnlyAccessNoGUI(JID jid) throws RemoteException {
+        ISarosSession sarosSession = sessionManager.getSarosSession();
+        if (sarosSession == null)
+            return false;
+        User user = sarosSession.getUser(jid);
+        if (user == null)
+            return false;
+        log.debug("hasReadOnlyAccess(" + jid.toString() + ") == "
+            + sarosSession.getUsersWithReadOnlyAccess().contains(user));
+        return sarosSession.getUsersWithReadOnlyAccess().contains(user);
+    }
+
+    public boolean haveReadOnlyAccessNoGUI(List<JID> jids)
+        throws RemoteException {
+        boolean result = true;
+        ISarosSession sarosSession = sessionManager.getSarosSession();
+        if (sarosSession == null)
+            return false;
+        for (JID jid : jids) {
+            try {
+                User user = sarosSession.getUser(jid);
+                result &= sarosSession.getUsersWithReadOnlyAccess().contains(
+                    user);
+            } catch (Exception e) {
+                return false;
+            }
+        }
+        return result;
+    }
+
+    public boolean isParticipantNoGUI() throws RemoteException {
+        return isParticipantNoGUI(getJID());
+    }
+
+    public boolean isParticipantNoGUI(JID jid) throws RemoteException {
         try {
             ISarosSession sarosSession = sessionManager.getSarosSession();
             if (sarosSession == null)
@@ -339,6 +431,29 @@ public class SessionViewImp extends ViewsImp implements SessionView {
         }
     }
 
+    public boolean areParticipantsNoGUI(List<JID> jids) throws RemoteException {
+        boolean result = true;
+        ISarosSession sarosSession = sessionManager.getSarosSession();
+        if (sarosSession == null)
+            return false;
+        for (JID jid : jids) {
+            try {
+                result &= sarosSession.getParticipants().contains(
+                    sarosSession.getUser(jid));
+            } catch (Exception e) {
+                return false;
+            }
+        }
+        return result;
+    }
+
+    public boolean isFollowingBuddyNoGUI(String baseJID) throws RemoteException {
+        if (getFollowedBuddyJIDNoGUI() == null)
+            return false;
+        else
+            return getFollowedBuddyJIDNoGUI().getBase().equals(baseJID);
+    }
+
     public JID getJID() throws RemoteException {
         return localJID;
     }
@@ -348,7 +463,7 @@ public class SessionViewImp extends ViewsImp implements SessionView {
      *         followed.
      * 
      */
-    public JID getFollowedBuddy() throws RemoteException {
+    public JID getFollowedBuddyJIDNoGUI() throws RemoteException {
         if (editorManager.getFollowedUser() != null)
             return editorManager.getFollowedUser().getJID();
         else
@@ -513,6 +628,7 @@ public class SessionViewImp extends ViewsImp implements SessionView {
     }
 
     public void waitUntilIsInconsistencyDetected() throws RemoteException {
+
         bot().waitUntil(new DefaultCondition() {
             public boolean test() throws Exception {
                 return view.toolbarButtonWithRegex(

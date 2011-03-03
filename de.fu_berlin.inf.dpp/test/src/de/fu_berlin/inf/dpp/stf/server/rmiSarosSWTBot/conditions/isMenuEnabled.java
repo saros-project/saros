@@ -4,12 +4,13 @@ import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.swt.finder.waits.DefaultCondition;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotMenu;
 
-public class IsMenuEnabled extends DefaultCondition {
+public class isMenuEnabled extends DefaultCondition {
 
     private SWTWorkbenchBot bot;
     private String[] labels;
 
-    IsMenuEnabled(SWTWorkbenchBot bot, String... labels) {
+    isMenuEnabled(SWTWorkbenchBot bot, String... labels) {
+
         this.bot = bot;
         this.labels = labels;
 
@@ -21,15 +22,13 @@ public class IsMenuEnabled extends DefaultCondition {
     }
 
     public boolean test() throws Exception {
-        SWTBotMenu menu = null;
         try {
-
+            SWTBotMenu menu = null;
             for (String label : labels) {
-                SWTBotMenu menu2 = menu;
-                if (menu2 == null)
+                if (menu == null)
                     bot.menu(label);
                 else
-                    menu2.menu(label);
+                    menu.menu(label);
             }
         } catch (Exception e) {
             return false;

@@ -461,31 +461,19 @@ public class STFBotImp extends STF implements STFBot {
     }
 
     public boolean existsLabel() throws RemoteException {
-        long oldTimeout = SWTBotPreferences.TIMEOUT;
-        // increase the timeout
-        SWTBotPreferences.TIMEOUT = 1000;
-
         try {
             swtBot.label();
-            SWTBotPreferences.TIMEOUT = oldTimeout;
             return true;
         } catch (WidgetNotFoundException e) {
-            SWTBotPreferences.TIMEOUT = oldTimeout;
             return false;
         }
     }
 
     public boolean existsLabel(String text) throws RemoteException {
-        long oldTimeout = SWTBotPreferences.TIMEOUT;
-        // increase the timeout
-        SWTBotPreferences.TIMEOUT = 1000;
-
         try {
             swtBot.label(text);
-            SWTBotPreferences.TIMEOUT = oldTimeout;
             return true;
         } catch (WidgetNotFoundException e) {
-            SWTBotPreferences.TIMEOUT = oldTimeout;
             return false;
         }
     }
@@ -798,7 +786,7 @@ public class STFBotImp extends STF implements STFBot {
 
         long oldTimeout = SWTBotPreferences.TIMEOUT;
         // increase the timeout
-        SWTBotPreferences.TIMEOUT = 1000;
+        SWTBotPreferences.TIMEOUT = 500;
 
         try {
             swtBot.toolbarButton();
@@ -1059,9 +1047,10 @@ public class STFBotImp extends STF implements STFBot {
      **********************************************/
 
     public boolean existsTable() throws RemoteException {
+
         long oldTimeout = SWTBotPreferences.TIMEOUT;
         // increase the timeout
-        SWTBotPreferences.TIMEOUT = 1000;
+        SWTBotPreferences.TIMEOUT = 500;
 
         try {
             swtBot.table();

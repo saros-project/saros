@@ -126,7 +126,8 @@ public interface WindowM extends SarosPreferences {
      *            example: "General"
      * @param nodeName
      *            example: "Console"
-     * 
+     * @see WorkbenchImp#activateWorkbench()
+     * @see MainMenuComponent#clickMenuWithTexts(String...)
      * 
      */
     public void showViewWithName(String category, String nodeName)
