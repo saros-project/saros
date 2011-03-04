@@ -246,7 +246,7 @@ public class EnterXMPPAccountWizardPage extends WizardPage {
         /*
          * Saros XMPP restriction message
          */
-        if (showSarosXMPPRestriction) {
+        if (showSarosXMPPRestriction && isJIDValid) {
             setMessage(Messages.xmpp_saros_restriction, WARNING);
         } else {
             setMessage(null);
