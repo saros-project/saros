@@ -68,11 +68,14 @@ public class BuddiesViewImp extends ViewsImp implements BuddiesView {
         log.trace("connectedByXMPP");
         if (!isConnected()) {
             log.trace("click the toolbar button \"Connect\" in the buddies view");
-            if (!sarosBot().saros().preferences().existsAccount(jid)) {
-                sarosBot().saros().preferences().addAccount(jid, password);
+            if (!sarosBot().menuBar().saros().preferences().existsAccount(jid)) {
+                sarosBot().menuBar().saros().preferences()
+                    .addAccount(jid, password);
             } else {
-                if (!sarosBot().saros().preferences().isAccountActive(jid)) {
-                    sarosBot().saros().preferences().activateAccount(jid);
+                if (!sarosBot().menuBar().saros().preferences()
+                    .isAccountActive(jid)) {
+                    sarosBot().menuBar().saros().preferences()
+                        .activateAccount(jid);
                 }
             }
             if (!isConnected()) {
@@ -84,7 +87,7 @@ public class BuddiesViewImp extends ViewsImp implements BuddiesView {
 
     public void connectWithActiveAccount() throws RemoteException {
         if (!isConnected()) {
-            if (!sarosBot().saros().preferences().existsAccount()) {
+            if (!sarosBot().menuBar().saros().preferences().existsAccount()) {
                 throw new RuntimeException(
                     "You need to at first add a account!");
             }

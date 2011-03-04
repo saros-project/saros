@@ -144,6 +144,7 @@ public class STF {
     /* shell titles */
     protected final static String SHELL_MOVE = "Move";
     protected final static String SHELL_RENAME_PACKAGE = "Rename Package";
+    protected final static String SHELL_RENAME_JAVA_PROJECT = "Rename Java Project";
     protected final static String SHELL_RENAME_RESOURCE = "Rename Resource";
     protected final static String SHELL_RENAME_COMPiIATION_UNIT = "Rename Compilation Unit";
     protected final static String LABEL_NEW_NAME = "New name:";

@@ -49,7 +49,8 @@ public class TestMenuSaros extends STFTest {
     public void testShareProjectsWithSuperBot() throws RemoteException {
         alice.sarosBot().views().packageExplorerView().tree().newC()
             .javaProject(PROJECT1);
-        alice.sarosBot().saros().shareProjects(PROJECT1, bob.getJID());
+        alice.sarosBot().menuBar().saros()
+            .shareProjects(PROJECT1, bob.getJID());
         bob.sarosBot().confirmShellSessionInvitationAndAddProject(PROJECT1,
             TypeOfCreateProject.NEW_PROJECT);
     }

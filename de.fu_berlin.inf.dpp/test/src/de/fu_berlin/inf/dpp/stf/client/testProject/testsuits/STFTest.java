@@ -229,7 +229,7 @@ public class STFTest extends STF {
             tester.bot().activateWorkbench();
             if (tester.bot().isViewOpen("Welcome"))
                 tester.bot().view("Welcome").close();
-            tester.sarosBot().window().openPerspective();
+            tester.sarosBot().menuBar().window().openPerspective();
             closeUnnecessaryViews(tester);
             tester.bot().resetWorkbench();
             tester.noBot().deleteAllProjectsNoGUI();
@@ -290,19 +290,19 @@ public class STFTest extends STF {
     public static void openSarosViews(AbstractTester tester)
         throws RemoteException {
         if (!tester.bot().isViewOpen(VIEW_SAROS_BUDDIES)) {
-            tester.sarosBot().window()
+            tester.sarosBot().menuBar().window()
                 .showViewWithName(NODE_SAROS, VIEW_SAROS_BUDDIES);
         }
         if (!tester.bot().isViewOpen(VIEW_SAROS_SESSION))
-            tester.sarosBot().window()
+            tester.sarosBot().menuBar().window()
                 .showViewWithName(NODE_SAROS, VIEW_SAROS_SESSION);
 
         if (!tester.bot().isViewOpen(VIEW_REMOTE_SCREEN))
-            tester.sarosBot().window()
+            tester.sarosBot().menuBar().window()
                 .showViewWithName(NODE_SAROS, VIEW_REMOTE_SCREEN);
 
         if (!tester.bot().isViewOpen(VIEW_SAROS_CHAT))
-            tester.sarosBot().window()
+            tester.sarosBot().menuBar().window()
                 .showViewWithName(NODE_SAROS, VIEW_SAROS_CHAT);
     }
 
@@ -392,15 +392,15 @@ public class STFTest extends STF {
     public static void resetDefaultAccount() throws RemoteException {
         for (AbstractTester tester : activeTesters) {
             if (tester != null) {
-                if (!tester.sarosBot().saros().preferences()
+                if (!tester.sarosBot().menuBar().saros().preferences()
                     .existsAccount(tester.getJID()))
-                    tester.sarosBot().saros().preferences()
+                    tester.sarosBot().menuBar().saros().preferences()
                         .addAccount(tester.getJID(), tester.getPassword());
-                if (!tester.sarosBot().saros().preferences()
+                if (!tester.sarosBot().menuBar().saros().preferences()
                     .isAccountActive(tester.getJID()))
-                    tester.sarosBot().saros().preferences()
+                    tester.sarosBot().menuBar().saros().preferences()
                         .activateAccount(tester.getJID());
-                tester.sarosBot().saros().preferences()
+                tester.sarosBot().menuBar().saros().preferences()
                     .deleteAllNoActiveAccounts();
 
             }
@@ -571,7 +571,8 @@ public class STFTest extends STF {
         TypeOfCreateProject usingWhichProject, AbstractTester inviter,
         AbstractTester... invitees) throws RemoteException {
         JID[] inviteesJID = getPeerJID(invitees);
-        inviter.sarosBot().saros().shareProjects(projectName, inviteesJID);
+        inviter.sarosBot().menuBar().saros()
+            .shareProjects(projectName, inviteesJID);
         for (AbstractTester invitee : invitees) {
             invitee.bot().shell(SHELL_SESSION_INVITATION).confirm(FINISH);
             invitee.sarosBot().confirmShellAddProjectUsingWhichProject(
@@ -587,7 +588,7 @@ public class STFTest extends STF {
         InterruptedException {
 
         log.trace("alice.shareProjectParallel");
-        inviter.sarosBot().saros()
+        inviter.sarosBot().menuBar().saros()
             .shareProjects(projectName, getPeerJID(invitees));
 
         List<Callable<Void>> joinSessionTasks = new ArrayList<Callable<Void>>();

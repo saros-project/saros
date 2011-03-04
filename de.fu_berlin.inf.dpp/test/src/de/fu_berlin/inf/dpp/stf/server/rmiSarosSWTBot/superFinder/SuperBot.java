@@ -7,8 +7,7 @@ import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.stf.client.AbstractTester;
 import de.fu_berlin.inf.dpp.stf.client.testProject.testsuits.STFTest.TypeOfCreateProject;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.contextMenu.ShareWithC;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.menuBar.SarosM;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.menuBar.WindowM;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.menuBar.MenuBar;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.views.Views;
 
 public interface SuperBot extends Remote {
@@ -22,11 +21,9 @@ public interface SuperBot extends Remote {
 
     public Wait condition() throws RemoteException;
 
-    public SarosM saros() throws RemoteException;
-
-    public WindowM window() throws RemoteException;
-
     public Views views() throws RemoteException;
+
+    public MenuBar menuBar() throws RemoteException;
 
     public void setJID(JID jid) throws RemoteException;
 

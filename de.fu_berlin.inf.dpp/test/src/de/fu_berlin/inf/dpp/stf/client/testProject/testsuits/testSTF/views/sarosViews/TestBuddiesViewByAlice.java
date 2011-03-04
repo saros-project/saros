@@ -21,7 +21,7 @@ public class TestBuddiesViewByAlice extends STFTest {
     @Test
     public void testConnectWith() throws RemoteException {
         alice.sarosBot().views().buddiesView().connectWith(TEST_JID, PASSWORD);
-        assertTrue(alice.sarosBot().saros().preferences()
+        assertTrue(alice.sarosBot().menuBar().saros().preferences()
             .isAccountActive(bob.getJID()));
     }
 

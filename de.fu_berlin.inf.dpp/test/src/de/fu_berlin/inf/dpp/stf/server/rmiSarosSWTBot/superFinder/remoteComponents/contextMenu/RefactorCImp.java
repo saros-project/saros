@@ -51,7 +51,7 @@ public class RefactorCImp extends Component implements RefactorC {
     public void rename(String newName) throws RemoteException {
         switch (type) {
         case JAVA_PROJECT:
-            rename("Rename Java Project", OK, newName);
+            rename(SHELL_RENAME_JAVA_PROJECT, OK, newName);
             break;
         case PKG:
             rename(SHELL_RENAME_PACKAGE, OK, newName);

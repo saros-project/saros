@@ -10,10 +10,8 @@ import de.fu_berlin.inf.dpp.stf.client.testProject.testsuits.STFTest.TypeOfCreat
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.STFWorkbenchBot;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.STFWorkbenchBotImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotShell;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.menuBar.SarosM;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.menuBar.SarosMImp;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.menuBar.WindowM;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.menuBar.WindowMImp;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.menuBar.MenuBar;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.menuBar.MenuBarImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.views.Views;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.views.ViewsImp;
 
@@ -25,11 +23,10 @@ public class SuperBotImp extends STF implements SuperBot {
 
     private static StateImp state;
     private static WaitImp wait;
-    private static SarosMImp sarosM;
-
-    private static WindowMImp windowM;
 
     private static ViewsImp views;
+
+    private static MenuBarImp menuBar;
 
     /**
      * {@link SuperBotImp} is a singleton, but inheritance is possible.
@@ -42,9 +39,9 @@ public class SuperBotImp extends STF implements SuperBot {
 
         wait = WaitImp.getInstance();
         state = StateImp.getInstance();
-        sarosM = SarosMImp.getInstance();
-        windowM = WindowMImp.getInstance();
+
         views = ViewsImp.getInstance();
+        menuBar = MenuBarImp.getInstance();
 
         return self;
     }
@@ -73,18 +70,13 @@ public class SuperBotImp extends STF implements SuperBot {
         return wait;
     }
 
-    public SarosM saros() throws RemoteException {
-        bot.activateWorkbench();
-        return sarosM;
-    }
-
-    public WindowM window() throws RemoteException {
-        bot.activateWorkbench();
-        return windowM;
-    }
-
     public Views views() throws RemoteException {
         return views;
+    }
+
+    public MenuBar menuBar() throws RemoteException {
+        bot().activateWorkbench();
+        return menuBar;
     }
 
     public void setJID(JID jid) throws RemoteException {
@@ -333,4 +325,5 @@ public class SuperBotImp extends STF implements SuperBot {
         confirmShellAddProjectUsingWhichProject(projectName, usingWhichProject);
         views().sessionView().waitUntilIsInSession();
     }
+
 }
