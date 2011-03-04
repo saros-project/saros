@@ -60,7 +60,7 @@ public class MakeOperationConcurrently {
                      * Need to check for {@link User.Permission#WRITE_ACCESS}
                      * before leaving.
                      */
-                    musician.sarosBot().views().sessionView().leaveTheSession();
+                    musician.sarosBot().views().sessionView().leaveSession();
                     return musician.sarosBot().views().sessionView()
                         .isParticipantNoGUI(musician.jid);
                 }

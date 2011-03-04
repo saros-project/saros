@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotViewMenu;
+import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
 import org.eclipse.swtbot.swt.finder.waits.DefaultCondition;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotToolbarButton;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotToolbarDropDownButton;
@@ -91,7 +92,7 @@ public class STFBotViewImp extends AbstractRmoteWidget implements STFBotView {
                 return stfToolbarButton;
             }
         }
-        return null;
+        throw new WidgetNotFoundException("The toolBarButton doesn't exist!");
     }
 
     public List<STFBotToolbarButton> getToolbarButtons() throws RemoteException {

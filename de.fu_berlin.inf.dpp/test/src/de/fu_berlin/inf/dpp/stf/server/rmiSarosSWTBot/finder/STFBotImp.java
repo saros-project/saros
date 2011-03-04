@@ -207,7 +207,7 @@ public class STFBotImp extends STF implements STFBot {
         return getTitlesOfOpenedShells().contains(title);
     }
 
-    public void waitsUntilShellIsClosed(final String title)
+    public void waitUntilShellIsClosed(final String title)
         throws RemoteException {
         swtBot.waitUntil(new DefaultCondition() {
             public boolean test() throws Exception {

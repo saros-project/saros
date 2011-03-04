@@ -150,7 +150,7 @@ public class NewCImp extends Component implements NewC {
             bot().shell(SHELL_NEW_JAVA_CLASS).activate();
             shell.bot().checkBox("Inherited abstract methods").click();
             shell.bot().button(FINISH).click();
-            bot().waitsUntilShellIsClosed(SHELL_NEW_JAVA_CLASS);
+            bot().waitUntilShellIsClosed(SHELL_NEW_JAVA_CLASS);
         }
     }
 
@@ -178,7 +178,7 @@ public class NewCImp extends Component implements NewC {
         shell.activate();
         shell.bot().textWithLabel(LABEL_NAME).setText(className);
         shell.bot().button(FINISH).click();
-        bot().waitsUntilShellIsClosed(SHELL_NEW_JAVA_CLASS);
+        bot().waitUntilShellIsClosed(SHELL_NEW_JAVA_CLASS);
     }
 
     private void confirmShellNewJavaClass(String projectName, String pkg,
@@ -190,7 +190,7 @@ public class NewCImp extends Component implements NewC {
         shell.bot().textWithLabel(LABEL_PACKAGE).setText(pkg);
         shell.bot().textWithLabel(LABEL_NAME).setText(className);
         shell.bot().button(FINISH).click();
-        bot().waitsUntilShellIsClosed(SHELL_NEW_JAVA_CLASS);
+        bot().waitUntilShellIsClosed(SHELL_NEW_JAVA_CLASS);
     }
 
     private void confirmWizardNewProject(String projectName)
@@ -199,7 +199,7 @@ public class NewCImp extends Component implements NewC {
         shell.confirmWithTree(NEXT, NODE_GENERAL, NODE_PROJECT);
         shell.bot().textWithLabel(LABEL_PROJECT_NAME).setText(projectName);
         shell.bot().button(FINISH).click();
-        bot().waitsUntilShellIsClosed(SHELL_NEW_PROJECT);
+        bot().waitUntilShellIsClosed(SHELL_NEW_PROJECT);
         // bot.sleep(50);
     }
 
@@ -209,7 +209,7 @@ public class NewCImp extends Component implements NewC {
         shell.bot().textWithLabel(LABEL_FILE_NAME).setText(fileName);
         shell.bot().button(FINISH).waitUntilIsEnabled();
         shell.bot().button(FINISH).click();
-        bot().waitsUntilShellIsClosed(SHELL_NEW_FILE);
+        bot().waitUntilShellIsClosed(SHELL_NEW_FILE);
     }
 
     private void confirmShellNewJavaPackage(String projectName, String pkg)
@@ -221,7 +221,7 @@ public class NewCImp extends Component implements NewC {
         shell.bot().textWithLabel(LABEL_NAME).setText(pkg);
         shell.bot().button(FINISH).click();
         if (bot().isShellOpen(SHELL_CREATE_NEW_XMPP_ACCOUNT))
-            bot().waitsUntilShellIsClosed(SHELL_CREATE_NEW_XMPP_ACCOUNT);
+            bot().waitUntilShellIsClosed(SHELL_CREATE_NEW_XMPP_ACCOUNT);
     }
 
     private void confirmShellNewFolder(String folderName)
@@ -232,7 +232,7 @@ public class NewCImp extends Component implements NewC {
         shell.bot().textWithLabel(LABEL_FOLDER_NAME).setText(folderName);
 
         shell.bot().button(FINISH).click();
-        bot().waitsUntilShellIsClosed(SHELL_NEW_FOLDER);
+        bot().waitUntilShellIsClosed(SHELL_NEW_FOLDER);
     }
 
     private void confirmShellNewJavaProject(String projectName)
@@ -243,7 +243,7 @@ public class NewCImp extends Component implements NewC {
 
         // bot.button(FINISH).click();
         shell.bot().button(FINISH).click();
-        bot().waitsUntilShellIsClosed(SHELL_NEW_JAVA_PROJECT);
+        bot().waitUntilShellIsClosed(SHELL_NEW_JAVA_PROJECT);
     }
 
     private boolean exists(String name) throws RemoteException {

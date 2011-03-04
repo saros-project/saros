@@ -71,14 +71,8 @@ public class TestParallelInvitationWithTerminationByHost extends STFTest {
         /*
          * build session with bob, carl and dave simultaneously
          */
-        alice
-            .sarosBot()
-            .views()
-            .packageExplorerView()
-            .selectProject(PROJECT1)
-            .shareWith()
-            .multipleBuddies(VIEW_PACKAGE_EXPLORER, PROJECT1, bob.getBaseJid(),
-                dave.getBaseJid(), carl.getBaseJid());
+        alice.sarosBot().views().packageExplorerView().selectProject(PROJECT1)
+            .shareWith().multipleBuddies(PROJECT1, bob.jid, dave.jid, carl.jid);
 
         bob.bot().waitUntilShellIsOpen(SHELL_SESSION_INVITATION);
         bob.bot().shell(SHELL_SESSION_INVITATION).activate();

@@ -2,22 +2,23 @@ package de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteCompone
 
 import java.rmi.RemoteException;
 
+import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotTreeItem;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.Component;
 
-public class SarosCImp extends Component implements SarosC {
+public class ShareWithCImp extends Component implements ShareWithC {
 
-    private static transient SarosCImp self;
+    private static transient ShareWithCImp self;
 
     private STFBotTreeItem treeItem;
 
     /**
-     * {@link SarosCImp} is a singleton, but inheritance is possible.
+     * {@link ShareWithCImp} is a singleton, but inheritance is possible.
      */
-    public static SarosCImp getInstance() {
+    public static ShareWithCImp getInstance() {
         if (self != null)
             return self;
-        self = new SarosCImp();
+        self = new ShareWithCImp();
         return self;
     }
 
@@ -37,17 +38,18 @@ public class SarosCImp extends Component implements SarosC {
      * 
      **********************************************/
 
-    public void shareProjectWith(String howToshareProject,
-        String[] baseJIDOfInvitees) throws RemoteException {
-        treeItem.contextMenu(CM_SAROS, howToshareProject).click();
-        sarosBot().confirmShellInvitation(baseJIDOfInvitees);
-    }
+    // public void shareProjectWith(String howToshareProject,
+    // String[] baseJIDOfInvitees) throws RemoteException {
+    // treeItem.contextMenu(CM_SHARE_WITH, howToshareProject).click();
+    // sarosBot().confirmShellInvitation(baseJIDOfInvitees);
+    // }
 
-    public void multipleBuddies(String... baseJIDOfInvitees)
+    /**
+     * FIXME can not click the context menu.
+     */
+    public void multipleBuddies(String projectName, JID... baseJIDOfInvitees)
         throws RemoteException {
-        // treeItem.contextMenu(CM_SAROS).contextMenu(CM_SHARE_PROJECT).click();
-        treeItem.contextMenu(CM_SAROS, baseJIDOfInvitees[0]).click();
-        sarosBot().confirmShellInvitation(baseJIDOfInvitees);
+        treeItem.contextMenu(CM_SHARE_WITH, CM_MULTIPLE_BUDDIES).click();
+        sarosBot().confirmWizardShareProject(projectName, baseJIDOfInvitees);
     }
-
 }

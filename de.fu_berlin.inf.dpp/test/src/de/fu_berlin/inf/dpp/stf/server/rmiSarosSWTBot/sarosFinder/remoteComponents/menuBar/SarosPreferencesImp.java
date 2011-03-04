@@ -8,8 +8,7 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBo
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.Component;
 import de.fu_berlin.inf.dpp.ui.preferencePages.GeneralPreferencePage;
 
-public class SarosPreferencesImp extends Component implements
-    SarosPreferences {
+public class SarosPreferencesImp extends Component implements SarosPreferences {
 
     private static transient SarosPreferencesImp self;
 
@@ -48,7 +47,7 @@ public class SarosPreferencesImp extends Component implements
         shell.bot().button(FINISH).click();
         shell.bot().button(APPLY).click();
         shell.bot().button(OK).click();
-        bot().waitsUntilShellIsClosed(SHELL_PREFERNCES);
+        bot().waitUntilShellIsClosed(SHELL_PREFERNCES);
     }
 
     public void addAccount(JID jid, String password) throws RemoteException {
@@ -57,13 +56,10 @@ public class SarosPreferencesImp extends Component implements
             .bot()
             .buttonInGroup(GeneralPreferencePage.ADD_BTN_TEXT,
                 GeneralPreferencePage.ACCOUNT_GROUP_TITLE).click();
-        bot().waitUntilShellIsOpen(SHELL_SAROS_CONFIGURATION);
-        STFBotShell shell = bot().shell(SHELL_SAROS_CONFIGURATION);
-        shell.activate();
-        sarosBot().confirmWizardSarosConfiguration(jid, password);
+        sarosBot().confirmWizardAddXMPPJabberAccount(jid, password);
         bot().shell(SHELL_PREFERNCES).bot().button(APPLY).click();
         bot().shell(SHELL_PREFERNCES).bot().button(OK).click();
-        bot().waitsUntilShellIsClosed(SHELL_PREFERNCES);
+        bot().waitUntilShellIsClosed(SHELL_PREFERNCES);
     }
 
     public void activateAccount(JID jid) throws RemoteException {
@@ -82,7 +78,7 @@ public class SarosPreferencesImp extends Component implements
         assert shell.bot().existsLabel("Active: " + jid.getBase());
         shell.bot().button(APPLY).click();
         shell.bot().button(OK).click();
-        bot().waitsUntilShellIsClosed(SHELL_PREFERNCES);
+        bot().waitUntilShellIsClosed(SHELL_PREFERNCES);
     }
 
     public void changeAccount(JID jid, String newUserName, String newPassword,
@@ -99,7 +95,7 @@ public class SarosPreferencesImp extends Component implements
             newPassword);
         shell.bot().button(APPLY).click();
         shell.bot().button(OK).click();
-        bot().waitsUntilShellIsClosed(SHELL_PREFERNCES);
+        bot().waitUntilShellIsClosed(SHELL_PREFERNCES);
     }
 
     public void deleteAccount(JID jid, String password) throws RemoteException {
@@ -122,7 +118,7 @@ public class SarosPreferencesImp extends Component implements
         }
         shell.bot().button(APPLY).click();
         shell.bot().button(OK).click();
-        bot().waitsUntilShellIsClosed(SHELL_PREFERNCES);
+        bot().waitUntilShellIsClosed(SHELL_PREFERNCES);
     }
 
     public void deleteAllNoActiveAccounts() throws RemoteException {
@@ -147,7 +143,7 @@ public class SarosPreferencesImp extends Component implements
             .itemCount() == 1;
         bot().shell(SHELL_PREFERNCES).bot().button(APPLY).click();
         bot().shell(SHELL_PREFERNCES).bot().button(OK).click();
-        bot().waitsUntilShellIsClosed(SHELL_PREFERNCES);
+        bot().waitUntilShellIsClosed(SHELL_PREFERNCES);
         bot().sleep(300);
     }
 
@@ -164,7 +160,7 @@ public class SarosPreferencesImp extends Component implements
 
         shell.bot().button(APPLY).click();
         shell.bot().button(OK).click();
-        bot().waitsUntilShellIsClosed(SHELL_PREFERNCES);
+        bot().waitUntilShellIsClosed(SHELL_PREFERNCES);
     }
 
     public void disableAutomaticReminder() throws RemoteException {
@@ -181,7 +177,7 @@ public class SarosPreferencesImp extends Component implements
                     Messages.getString("feedback.page.group.interval")).click();
             shell.bot().button(APPLY).click();
             shell.bot().button(OK).click();
-            bot().waitsUntilShellIsClosed(SHELL_PREFERNCES);
+            bot().waitUntilShellIsClosed(SHELL_PREFERNCES);
         }
     }
 
@@ -207,7 +203,7 @@ public class SarosPreferencesImp extends Component implements
             }
         }
         shell.bot().button(CANCEL).click();
-        bot().waitsUntilShellIsClosed(SHELL_PREFERNCES);
+        bot().waitUntilShellIsClosed(SHELL_PREFERNCES);
         return false;
     }
 
@@ -220,7 +216,7 @@ public class SarosPreferencesImp extends Component implements
         if (activeAccount.equals("Active: " + jid.getBase()))
             isActive = true;
         shell.bot().button(CANCEL).click();
-        bot().waitsUntilShellIsClosed(SHELL_PREFERNCES);
+        bot().waitUntilShellIsClosed(SHELL_PREFERNCES);
         return isActive;
     }
 

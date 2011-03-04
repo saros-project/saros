@@ -6,12 +6,13 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import de.fu_berlin.inf.dpp.stf.client.testProject.testsuits.STFTest;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotShell;
 
 public class TestMenuSaros extends STFTest {
 
     @BeforeClass
     public static void runBeforeClass() throws RemoteException {
-        initTesters(TypeOfTester.ALICE);
+        initTesters(TypeOfTester.ALICE, TypeOfTester.BOB);
         setUpWorkbench();
         setUpSaros();
     }
@@ -22,10 +23,35 @@ public class TestMenuSaros extends STFTest {
     // }
 
     @Test
-    public void toolbarButton() throws RemoteException {
-
+    public void testShareProjectWithBot() throws RemoteException {
         alice.sarosBot().views().packageExplorerView().tree().newC()
             .javaProject(PROJECT1);
-        alice.bot().menu(MENU_SAROS).menu("Share Project(s)...").click();
+        alice.bot().menu(MENU_SAROS).menu(MENU_SHARE_PROJECTS).click();
+        if (!alice.bot().isShellOpen(SHELL_SHARE_PROJECT)) {
+            alice.bot().waitUntilShellIsOpen(SHELL_SHARE_PROJECT);
+        }
+        STFBotShell shell = alice.bot().shell(SHELL_SHARE_PROJECT);
+        shell.activate();
+        shell.bot().table().getTableItem(PROJECT1).check();
+        shell.bot().button(NEXT).click();
+        shell.bot().tree().selectTreeItem(bob.getBaseJid()).check();
+        shell.bot().button(FINISH).click();
+        bob.bot().waitUntilShellIsOpen(SHELL_SESSION_INVITATION);
+        STFBotShell shell2 = bob.bot().shell(SHELL_SESSION_INVITATION);
+        shell2.activate();
+        shell2.bot().shell(SHELL_SESSION_INVITATION).confirm(FINISH);
+        bob.sarosBot().confirmShellAddProjectUsingWhichProject(PROJECT1,
+            TypeOfCreateProject.NEW_PROJECT);
+        bob.sarosBot().views().sessionView().waitUntilIsInSession();
+    }
+
+    @Test
+    public void testShareProjectWithSuperBot() throws RemoteException {
+        alice.sarosBot().views().packageExplorerView().tree().newC()
+            .javaProject(PROJECT1);
+        alice.sarosBot().saros().shareProjects(PROJECT1, bob.jid);
+        bob.sarosBot().confirmShellSessionInvitationAndAddProject(PROJECT1,
+            TypeOfCreateProject.NEW_PROJECT);
+
     }
 }

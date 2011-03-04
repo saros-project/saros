@@ -16,7 +16,7 @@ public class ContextMenuWrapperImp extends Component implements
     protected static TeamCImp teamC;
     protected static NewCImp newC;
     protected static RefactorCImp reafactorC;
-    private static SarosCImp sarosC;
+    private static ShareWithCImp shareWithC;
 
     protected STFBotTreeItem treeItem;
     protected STFBotTree tree;
@@ -34,7 +34,7 @@ public class ContextMenuWrapperImp extends Component implements
         teamC = TeamCImp.getInstance();
         reafactorC = RefactorCImp.getInstance();
         newC = NewCImp.getInstance();
-        sarosC = SarosCImp.getInstance();
+        shareWithC = ShareWithCImp.getInstance();
         return self;
     }
 
@@ -54,9 +54,9 @@ public class ContextMenuWrapperImp extends Component implements
         this.tree = tree;
     }
 
-    public SarosC shareWith() throws RemoteException {
-        sarosC.setTreeItem(treeItem);
-        return sarosC;
+    public ShareWithC shareWith() throws RemoteException {
+        shareWithC.setTreeItem(treeItem);
+        return shareWithC;
     }
 
     public NewC newC() throws RemoteException {
@@ -91,7 +91,7 @@ public class ContextMenuWrapperImp extends Component implements
             shell.activate();
             shell.bot().textWithLabel("Project name:").setText(target);
             shell.bot().button(OK).click();
-            bot().waitsUntilShellIsClosed(SHELL_COPY_PROJECT);
+            bot().waitUntilShellIsClosed(SHELL_COPY_PROJECT);
             bot().sleep(1000);
         }
         // switch (type) {
@@ -118,11 +118,11 @@ public class ContextMenuWrapperImp extends Component implements
         switch (type) {
         case PROJECT:
             bot().shell(SHELL_DELETE_RESOURCE).confirmWithCheckBox(OK, true);
-            bot().waitsUntilShellIsClosed(SHELL_DELETE_RESOURCE);
+            bot().waitUntilShellIsClosed(SHELL_DELETE_RESOURCE);
             break;
         case JAVA_PROJECT:
             bot().shell(SHELL_DELETE_RESOURCE).confirmWithCheckBox(OK, true);
-            bot().waitsUntilShellIsClosed(SHELL_DELETE_RESOURCE);
+            bot().waitUntilShellIsClosed(SHELL_DELETE_RESOURCE);
             break;
         default:
             bot().waitUntilShellIsOpen(CONFIRM_DELETE);
@@ -166,7 +166,7 @@ public class ContextMenuWrapperImp extends Component implements
                 STFBotShell shell = bot().shell(SHELL_DELETE_RESOURCE);
 
                 shell.confirmWithCheckBox(OK, true);
-                bot().waitsUntilShellIsClosed(SHELL_DELETE_RESOURCE);
+                bot().waitUntilShellIsClosed(SHELL_DELETE_RESOURCE);
             }
         }
     }

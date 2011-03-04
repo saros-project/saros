@@ -186,7 +186,7 @@ public interface STFBot extends Remote {
      * @throws RemoteException
      *             ;;
      */
-    public void waitsUntilShellIsClosed(final String title)
+    public void waitUntilShellIsClosed(final String title)
         throws RemoteException;
 
     /**

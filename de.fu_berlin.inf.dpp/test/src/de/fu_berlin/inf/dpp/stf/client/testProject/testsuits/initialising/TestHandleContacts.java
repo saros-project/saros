@@ -142,7 +142,7 @@ public class TestHandleContacts extends STFTest {
     @Test
     public void testAddNoValidContact() throws RemoteException {
         alice.bot().view(VIEW_SAROS_BUDDIES)
-            .toolbarButton(TB_ADD_A_NEW_CONTACT).click();
+            .toolbarButton(TB_ADD_A_NEW_BUDDY).click();
         Map<String, String> labelsAndTexts = new HashMap<String, String>();
         labelsAndTexts.put("XMPP/Jabber ID", "bob@bla");
 
@@ -172,7 +172,7 @@ public class TestHandleContacts extends STFTest {
     @Test
     public void testAddExistedContact() throws RemoteException {
         alice.bot().view(VIEW_SAROS_BUDDIES)
-            .toolbarButton(TB_ADD_A_NEW_CONTACT).click();
+            .toolbarButton(TB_ADD_A_NEW_BUDDY).click();
         Map<String, String> labelsAndTexts = new HashMap<String, String>();
         labelsAndTexts.put("XMPP/Jabber ID", bob.getBaseJid());
         String label = "The buddy is already in your buddy list.Finishing the wizard will have no effect.";

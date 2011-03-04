@@ -56,7 +56,7 @@ public class TeamCImp extends Component implements TeamC {
         }
         shell.bot().button(FINISH).waitUntilIsEnabled();
         shell.bot().button(FINISH).click();
-        bot().waitsUntilShellIsClosed(SHELL_SHARE_PROJECT);
+        bot().waitUntilShellIsClosed(SHELL_SHARE_PROJECT);
     }
 
     public void shareProjectConfiguredWithSVNInfos(String repositoryURL)
@@ -71,7 +71,7 @@ public class TeamCImp extends Component implements TeamC {
         log.debug("SVN share project text: " + shell.bot().text());
         shell.bot().button(FINISH).waitUntilIsEnabled();
         shell.bot().button(FINISH).click();
-        bot().waitsUntilShellIsClosed(SHELL_SHARE_PROJECT);
+        bot().waitUntilShellIsClosed(SHELL_SHARE_PROJECT);
     }
 
     public void shareProjectUsingSpecifiedFolderName(String repositoryURL,
@@ -104,7 +104,7 @@ public class TeamCImp extends Component implements TeamC {
             shell2.activate();
             shell2.bot().comboBoxWithLabel(LABEL_URL).setText(repositoryURL);
             shell2.bot().button(FINISH).click();
-            bot().waitsUntilShellIsClosed("Add SVN Repository");
+            bot().waitUntilShellIsClosed("Add SVN Repository");
             if (!viewWasOpen)
                 bot().view(VIEW_SVN_REPOSITORIES).close();
             // recur...
@@ -148,7 +148,7 @@ public class TeamCImp extends Component implements TeamC {
         bot().shell("Checkout from SVN").confirmWithTreeWithWaitingExpand(
             "Checkout from SVN", FINISH, repositoryURL, "trunk", "examples");
         bot().shell("SVN Checkout").waitUntilActive();
-        bot().waitsUntilShellIsClosed("SVN Checkout");
+        bot().waitUntilShellIsClosed("SVN Checkout");
     }
 
     public void disConnect() throws RemoteException {
@@ -161,7 +161,7 @@ public class TeamCImp extends Component implements TeamC {
         String[] contexts = { CM_TEAM, CM_REVERT };
         treeItem.contextMenu(contexts).click();
         bot().shell(SHELL_REVERT).confirm(OK);
-        bot().waitsUntilShellIsClosed(SHELL_REVERT);
+        bot().waitUntilShellIsClosed(SHELL_REVERT);
     }
 
     public void update(String versionID) throws RemoteException {
@@ -183,7 +183,7 @@ public class TeamCImp extends Component implements TeamC {
         shell.bot().textWithLabel(LABEL_REVISION).setText(versionID);
         shell.bot().button(OK).click();
         if (bot().isShellOpen(SHELL_SVN_SWITCH))
-            bot().waitsUntilShellIsClosed(SHELL_SVN_SWITCH);
+            bot().waitUntilShellIsClosed(SHELL_SVN_SWITCH);
     }
 
 }

@@ -13,7 +13,7 @@ import org.junit.Test;
 import de.fu_berlin.inf.dpp.stf.client.testProject.testsuits.STFTest;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotView;
 
-public class TestRosterView extends STFTest {
+public class TestBuddiesView extends STFTest {
 
     /**
      * Preconditions:

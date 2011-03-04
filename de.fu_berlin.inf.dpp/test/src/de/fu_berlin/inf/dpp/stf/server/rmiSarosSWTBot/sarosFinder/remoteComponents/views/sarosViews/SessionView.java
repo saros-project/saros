@@ -176,7 +176,7 @@ public interface SessionView extends Remote {
      * 
      * @throws RemoteException
      */
-    public void leaveTheSession() throws RemoteException;
+    public void leaveSession() throws RemoteException;
 
     /**
      * Perform the action "Grant write access" which should be activated by
@@ -236,7 +236,7 @@ public interface SessionView extends Remote {
      *            the buddies whom you want to invite to your session.
      * @throws RemoteException
      */
-    public void openInvitationInterface(String... inviteesJIDs)
+    public void addBuddyToSession(String... inviteesJIDs)
         throws RemoteException;
 
     /**
@@ -623,7 +623,7 @@ public interface SessionView extends Remote {
      * true/false or perform a following action which based on that the current
      * performed action is completely finished, e.g. alice.state.isInSession is
      * false after alice leave the session by running the
-     * {@link SessionViewImp#leaveTheSession()} and confirming the appeared pop
+     * {@link SessionViewImp#leaveSession()} and confirming the appeared pop
      * up window without this waitUntil. In this case, you may get the
      * AssertException, because alice should not really leave the session yet
      * during asserting the condition or performing a following action. So it is
@@ -642,7 +642,7 @@ public interface SessionView extends Remote {
      * true/false or perform a following action which based on that the current
      * performed action is completely finished, e.g.
      * assertFalse(alice.state.hasWriteAccess(bob.jid)) after bob leave the
-     * session by running the {@link SessionViewImp#leaveTheSession()} and
+     * session by running the {@link SessionViewImp#leaveSession()} and
      * confirming the appeared pop up window without this waitUntil. In this
      * case, you may get the AssertException, because bob should not really
      * leave the session yet during asserting a condition or performing a

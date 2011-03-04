@@ -29,4 +29,9 @@ public interface SarosM extends Remote {
      */
     public void creatAccount(JID jid, String password) throws RemoteException;
 
+    public void addBuddy(JID jid) throws RemoteException;
+
+    public void shareProjects(String projectName, JID... jids)
+        throws RemoteException;
+
 }

@@ -25,7 +25,7 @@ public class WaitImp extends Component implements Wait {
      **********************************************/
     public void waitUntilWindowSarosRunningVCSOperationClosed()
         throws RemoteException {
-        bot().waitsUntilShellIsClosed(SHELL_SAROS_RUNNING_VCS_OPERATION);
+        bot().waitUntilShellIsClosed(SHELL_SAROS_RUNNING_VCS_OPERATION);
     }
 
     public void waitUntilProjectInSVN(String projectName)

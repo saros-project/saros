@@ -113,22 +113,8 @@ public class BuddiesViewImp extends ViewsImp implements BuddiesView {
 
     public void addANewBuddy(JID jid) throws RemoteException {
         if (!hasBuddy(jid)) {
-            clickToolbarButtonWithTooltip(TB_ADD_A_NEW_CONTACT);
-            Map<String, String> labelsAndTexts = new HashMap<String, String>();
-            labelsAndTexts.put("XMPP/Jabber ID", jid.getBase());
-            if (!bot().isShellOpen(SHELL_NEW_BUDDY))
-                bot().waitUntilShellIsOpen(SHELL_NEW_BUDDY);
-            bot().shell(SHELL_NEW_BUDDY).activate();
-            bot().shell(SHELL_NEW_BUDDY).bot().textWithLabel("XMPP/Jabber ID")
-                .setText(jid.getBase());
-            bot().shell(SHELL_NEW_BUDDY).bot().button(FINISH)
-                .waitUntilIsEnabled();
-            bot().shell(SHELL_NEW_BUDDY).bot().button(FINISH).click();
-
-            bot().sleep(500);
-            if (bot().isShellOpen("Unknown Buddy Status")) {
-                bot().shell("Unknown Buddy Status").confirm(YES);
-            }
+            clickToolbarButtonWithTooltip(TB_ADD_A_NEW_BUDDY);
+            sarosBot().confirmShellAddBuddy(jid);
         }
     }
 

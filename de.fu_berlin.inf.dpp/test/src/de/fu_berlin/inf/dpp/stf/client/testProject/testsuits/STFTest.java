@@ -554,11 +554,8 @@ public class STFTest extends STF {
     public static void buildSessionSequentially(String projectName,
         String howToShareProject, TypeOfCreateProject usingWhichProject,
         Tester inviter, Tester... invitees) throws RemoteException {
-        String[] baseJIDOfInvitees = getPeersBaseJID(invitees);
-
-        inviter.sarosBot().views().packageExplorerView()
-            .selectProject(projectName).shareWith()
-            .shareProjectWith(howToShareProject, baseJIDOfInvitees);
+        JID[] inviteesJID = getPeerJID(invitees);
+        inviter.sarosBot().saros().shareProjects(projectName, inviteesJID);
         for (Tester invitee : invitees) {
             invitee.bot().shell(SHELL_SESSION_INVITATION).confirm(FINISH);
             invitee.sarosBot().confirmShellAddProjectUsingWhichProject(
@@ -574,20 +571,16 @@ public class STFTest extends STF {
         InterruptedException {
 
         log.trace("alice.shareProjectParallel");
-        inviter.sarosBot().views().packageExplorerView()
-            .selectProject(projectName).shareWith()
-            .shareProjectWith(howToShareProject, getPeersBaseJID(invitees));
+        inviter.sarosBot().saros()
+            .shareProjects(projectName, getPeerJID(invitees));
 
         List<Callable<Void>> joinSessionTasks = new ArrayList<Callable<Void>>();
         for (final Tester invitee : invitees) {
             joinSessionTasks.add(new Callable<Void>() {
                 public Void call() throws Exception {
-                    invitee.bot().shell(SHELL_SESSION_INVITATION)
-                        .confirm(FINISH);
-                    invitee.sarosBot().confirmShellAddProjectUsingWhichProject(
-                        projectName, usingWhichProject);
-                    invitee.sarosBot().views().sessionView()
-                        .waitUntilIsInSession();
+                    invitee.sarosBot()
+                        .confirmShellSessionInvitationAndAddProject(
+                            projectName, usingWhichProject);
                     return null;
                 }
             });
@@ -623,7 +616,7 @@ public class STFTest extends STF {
                 }
             }
         }
-        host.sarosBot().views().sessionView().leaveTheSession();
+        host.sarosBot().views().sessionView().leaveSession();
         MakeOperationConcurrently.workAll(closeSessionTasks);
     }
 
@@ -653,8 +646,7 @@ public class STFTest extends STF {
                 peerJIDs.add(tester.jid);
                 leaveTasks.add(new Callable<Void>() {
                     public Void call() throws Exception {
-                        tester.sarosBot().views().sessionView()
-                            .leaveTheSession();
+                        tester.sarosBot().views().sessionView().leaveSession();
                         return null;
                     }
                 });
@@ -665,8 +657,8 @@ public class STFTest extends STF {
         if (host != null) {
             host.sarosBot().views().sessionView()
                 .waitUntilAllPeersLeaveSession(peerJIDs);
-            host.bot().view(VIEW_SAROS_SESSION)
-                .toolbarButton(TB_LEAVE_THE_SESSION).click();
+            host.bot().view(VIEW_SAROS_SESSION).toolbarButton(TB_STOP_SESSION)
+                .click();
             host.sarosBot().views().sessionView().waitUntilIsNotInSession();
         }
 
@@ -784,7 +776,7 @@ public class STFTest extends STF {
         final TypeOfCreateProject usingWhichProject, Tester inviter,
         Tester... invitees) throws RemoteException, InterruptedException {
         inviter.sarosBot().views().sessionView()
-            .openInvitationInterface(getPeersBaseJID(invitees));
+            .addBuddyToSession(getPeersBaseJID(invitees));
         List<Callable<Void>> joinSessionTasks = new ArrayList<Callable<Void>>();
         for (final Tester tester : invitees) {
             joinSessionTasks.add(new Callable<Void>() {
@@ -821,6 +813,14 @@ public class STFTest extends STF {
         String[] peerBaseJIDs = new String[peers.length];
         for (int i = 0; i < peers.length; i++) {
             peerBaseJIDs[i] = peers[i].getBaseJid();
+        }
+        return peerBaseJIDs;
+    }
+
+    private static JID[] getPeerJID(Tester... peers) {
+        JID[] peerBaseJIDs = new JID[peers.length];
+        for (int i = 0; i < peers.length; i++) {
+            peerBaseJIDs[i] = peers[i].jid;
         }
         return peerBaseJIDs;
     }

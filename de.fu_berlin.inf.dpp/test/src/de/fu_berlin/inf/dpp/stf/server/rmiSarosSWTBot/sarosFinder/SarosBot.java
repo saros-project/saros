@@ -6,7 +6,7 @@ import java.rmi.RemoteException;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.stf.client.Tester;
 import de.fu_berlin.inf.dpp.stf.client.testProject.testsuits.STFTest.TypeOfCreateProject;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.contextMenu.SarosC;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.contextMenu.ShareWithC;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.menuBar.SarosM;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.menuBar.WindowM;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.views.Views;
@@ -31,7 +31,7 @@ public interface SarosBot extends Remote {
     public void setJID(JID jid) throws RemoteException;
 
     /**
-     * After the {@link SarosC#confirmShellInvitation(String...)} the popup
+     * After the {@link ShareWithC#confirmShellAddBuddyToSession(String...)} the popup
      * wizard with the title "Session Invitation" should be appeared by the
      * invitees' side. This method confirm the wizard "Session Invitation" using
      * a new project.
@@ -42,7 +42,7 @@ public interface SarosBot extends Remote {
         throws RemoteException;
 
     /**
-     * After the {@link SarosC#confirmShellInvitation(String...)} the popup
+     * After the {@link ShareWithC#confirmShellAddBuddyToSession(String...)} the popup
      * wizard with the title "Session Invitation" should be appeared by the
      * invitees' side. This method confirm the wizard "Session Invitation" using
      * a exist project.
@@ -53,7 +53,7 @@ public interface SarosBot extends Remote {
         throws RemoteException;
 
     /**
-     * After the {@link SarosC#confirmShellInvitation(String...)} the popup
+     * After the {@link ShareWithC#confirmShellAddBuddyToSession(String...)} the popup
      * wizard with the title "Session Invitation" should be appeared by the
      * invitees' side. This method confirm the wizard "Session Invitation" using
      * a exist project with clicking the button browser->confirming popup window
@@ -65,7 +65,7 @@ public interface SarosBot extends Remote {
         String projectName) throws RemoteException;
 
     /**
-     * After the {@link SarosC#confirmShellInvitation(String...)} the popup
+     * After the {@link ShareWithC#confirmShellAddBuddyToSession(String...)} the popup
      * wizard with the title "Session Invitation" should be appeared by the
      * invitees' side. This method confirm the wizard "Session Invitation" using
      * a exist project with copy
@@ -76,7 +76,7 @@ public interface SarosBot extends Remote {
         String projectName) throws RemoteException;
 
     /**
-     * After the {@link SarosC#confirmShellInvitation(String...)} the popup
+     * After the {@link ShareWithC#confirmShellAddBuddyToSession(String...)} the popup
      * wizard with the title "Session Invitation" should be appeared by the
      * invitees' side. This method confirm the wizard "Session Invitation" using
      * a new project or a existed project according the passed parameter
@@ -111,7 +111,7 @@ public interface SarosBot extends Remote {
      *            password of the new XMPP account
      * @throws RemoteException
      */
-    public void confirmWizardSarosConfiguration(JID jid, String password)
+    public void confirmWizardAddXMPPJabberAccount(JID jid, String password)
         throws RemoteException;
 
     /**
@@ -124,7 +124,7 @@ public interface SarosBot extends Remote {
      *            project.
      * @throws RemoteException
      */
-    public void confirmShellInvitation(String... inviteesBaseJIDs)
+    public void confirmShellAddBuddyToSession(String... inviteesBaseJIDs)
         throws RemoteException;
 
     /**
@@ -144,5 +144,13 @@ public interface SarosBot extends Remote {
      * @throws RemoteException
      */
     public void confirmShellRemovelOfSubscription() throws RemoteException;
+
+    public void confirmShellAddBuddy(JID jid) throws RemoteException;
+
+    public void confirmWizardShareProject(String projectName, JID... jids)
+        throws RemoteException;
+
+    public void confirmShellSessionInvitationAndAddProject(String projectName,
+        TypeOfCreateProject usingWhichProject) throws RemoteException;
 
 }

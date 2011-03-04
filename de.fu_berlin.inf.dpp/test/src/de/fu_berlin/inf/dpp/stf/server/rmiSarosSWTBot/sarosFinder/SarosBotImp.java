@@ -1,6 +1,8 @@
 package de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder;
 
 import java.rmi.RemoteException;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.eclipse.swtbot.swt.finder.widgets.TimeoutException;
 
@@ -255,39 +257,86 @@ public class SarosBotImp extends STF implements SarosBot {
         }
     }
 
-    public void confirmWizardSarosConfiguration(JID jid, String password)
+    public void confirmWizardAddXMPPJabberAccount(JID jid, String password)
         throws RemoteException {
-        bot().waitUntilShellIsOpen(SHELL_SAROS_CONFIGURATION);
-        STFBotShell shell = bot().shell(SHELL_SAROS_CONFIGURATION);
+        if (bot().isShellOpen(SHELL_ADD_XMPP_JABBER_ACCOUNT))
+            bot().waitUntilShellIsOpen(SHELL_ADD_XMPP_JABBER_ACCOUNT);
+        STFBotShell shell = bot().shell(SHELL_ADD_XMPP_JABBER_ACCOUNT);
         shell.activate();
-        shell.bot().textWithLabel(LABEL_XMPP_JABBER_SERVER)
-            .setText(jid.getDomain());
-        shell.bot().textWithLabel(LABEL_USER_NAME).setText(jid.getName());
-        shell.bot().textWithLabel(LABEL_PASSWORD).setText(password);
+        /*
+         * FIXME with comboBoxInGroup(GROUP_EXISTING_ACCOUNT) you wil get
+         * WidgetNoFoundException.
+         */
+        shell.bot().comboBoxWithLabel(LABEL_XMPP_JABBER_ID)
+            .setText(jid.getBase());
 
-        shell.bot().button(NEXT).click();
+        shell.bot().textWithLabel(LABEL_PASSWORD).setText(password);
         shell.bot().button(FINISH).click();
     }
 
-    public void confirmShellInvitation(String... baseJIDOfinvitees)
+    public void confirmShellAddBuddyToSession(String... baseJIDOfinvitees)
         throws RemoteException {
-        bot().waitUntilShellIsOpen(SHELL_INVITATION);
-        STFBotShell shell = bot().shell(SHELL_INVITATION);
+        bot().waitUntilShellIsOpen(SHELL_ADD_BUDDY_TO_SESSION);
+        STFBotShell shell = bot().shell(SHELL_ADD_BUDDY_TO_SESSION);
         shell.activate();
-        shell.bot().button(NEXT).click();
-        shell.confirmWithCheckBoxs(FINISH, baseJIDOfinvitees);
+        for (String baseJID : baseJIDOfinvitees) {
+            shell.bot().tree().selectTreeItem(baseJID).check();
+        }
+        shell.bot().button(FINISH).click();
     }
 
     public void confirmShellClosingTheSession() throws RemoteException {
         bot().waitUntilShellIsOpen(SHELL_CLOSING_THE_SESSION);
         bot().shell(SHELL_CLOSING_THE_SESSION).activate();
         bot().shell(SHELL_CLOSING_THE_SESSION).confirm(OK);
-        bot().waitsUntilShellIsClosed(SHELL_CLOSING_THE_SESSION);
+        bot().waitUntilShellIsClosed(SHELL_CLOSING_THE_SESSION);
     }
 
     public void confirmShellRemovelOfSubscription() throws RemoteException {
         bot().waitUntilShellIsOpen(SHELL_REMOVAL_OF_SUBSCRIPTION);
         bot().shell(SHELL_REMOVAL_OF_SUBSCRIPTION).activate();
         bot().shell(SHELL_REMOVAL_OF_SUBSCRIPTION).confirm(OK);
+    }
+
+    public void confirmShellAddBuddy(JID jid) throws RemoteException {
+        Map<String, String> labelsAndTexts = new HashMap<String, String>();
+        labelsAndTexts.put("XMPP/Jabber ID", jid.getBase());
+        if (!bot().isShellOpen(SHELL_NEW_BUDDY))
+            bot().waitUntilShellIsOpen(SHELL_NEW_BUDDY);
+        bot().shell(SHELL_NEW_BUDDY).activate();
+        bot().shell(SHELL_NEW_BUDDY).bot().textWithLabel(LABEL_XMPP_JABBER_ID)
+            .setText(jid.getBase());
+        bot().shell(SHELL_NEW_BUDDY).bot().button(FINISH).waitUntilIsEnabled();
+        bot().shell(SHELL_NEW_BUDDY).bot().button(FINISH).click();
+
+        bot().sleep(500);
+        if (bot().isShellOpen("Unknown Buddy Status")) {
+            bot().shell("Unknown Buddy Status").confirm(YES);
+        }
+    }
+
+    public void confirmWizardShareProject(String projectName, JID... jids)
+        throws RemoteException {
+        if (!bot().isShellOpen(SHELL_SHARE_PROJECT)) {
+            bot().waitUntilShellIsOpen(SHELL_SHARE_PROJECT);
+        }
+        STFBotShell shell = bot().shell(SHELL_SHARE_PROJECT);
+        shell.activate();
+        shell.bot().table().getTableItem(projectName).check();
+        shell.bot().button(NEXT).click();
+        for (JID jid : jids) {
+            shell.bot().tree().selectTreeItem(jid.getBase()).check();
+        }
+        shell.bot().button(FINISH).click();
+    }
+
+    public void confirmShellSessionInvitationAndAddProject(String projectName,
+        TypeOfCreateProject usingWhichProject) throws RemoteException {
+        if (!bot().isShellOpen(SHELL_SESSION_INVITATION)) {
+            bot().waitUntilShellIsOpen(SHELL_SESSION_INVITATION);
+        }
+        bot().shell(SHELL_SESSION_INVITATION).confirm(FINISH);
+        confirmShellAddProjectUsingWhichProject(projectName, usingWhichProject);
+        views().sessionView().waitUntilIsInSession();
     }
 }

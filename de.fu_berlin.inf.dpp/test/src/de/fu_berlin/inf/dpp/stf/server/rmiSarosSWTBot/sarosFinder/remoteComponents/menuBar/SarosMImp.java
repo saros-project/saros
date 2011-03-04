@@ -40,6 +40,17 @@ public class SarosMImp extends Component implements SarosM {
         sarosBot().confirmShellCreateNewXMPPAccount(jid, password);
     }
 
+    public void addBuddy(JID jid) throws RemoteException {
+        bot().menu(MENU_SAROS).menu(MENU_ADD_BUDDY).click();
+        sarosBot().confirmShellAddBuddy(jid);
+    }
+
+    public void shareProjects(String projectName, JID... jids)
+        throws RemoteException {
+        bot().menu(MENU_SAROS).menu(MENU_SHARE_PROJECTS).click();
+        sarosBot().confirmWizardShareProject(projectName, jids);
+    }
+
     public SarosPreferences preferences() throws RemoteException {
         return pref;
     }

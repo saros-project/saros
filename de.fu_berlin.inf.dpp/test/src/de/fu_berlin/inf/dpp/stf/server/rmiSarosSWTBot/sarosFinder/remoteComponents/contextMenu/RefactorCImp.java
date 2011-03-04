@@ -83,14 +83,14 @@ public class RefactorCImp extends Component implements RefactorC {
                 .click();
         }
         if (bot().isShellOpen(shellTitle))
-            bot().waitsUntilShellIsClosed(shellTitle);
+            bot().waitUntilShellIsClosed(shellTitle);
     }
 
     private void moveTo(String shellTitle, String buttonName, String... nodes)
         throws RemoteException {
         bot().menu(MENU_REFACTOR).menu(MENU_MOVE).click();
         bot().shell(shellTitle).confirmWithTree(buttonName, nodes);
-        bot().waitsUntilShellIsClosed(shellTitle);
+        bot().waitUntilShellIsClosed(shellTitle);
     }
 
 }

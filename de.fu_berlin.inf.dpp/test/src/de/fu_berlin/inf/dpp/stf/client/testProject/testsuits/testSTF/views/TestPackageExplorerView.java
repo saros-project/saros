@@ -15,8 +15,9 @@ public class TestPackageExplorerView extends STFTest {
 
     @BeforeClass
     public static void runBeforeClass() throws RemoteException {
-        initTesters(TypeOfTester.ALICE);
+        initTesters(TypeOfTester.ALICE, TypeOfTester.BOB);
         setUpWorkbench();
+        setUpSaros();
     }
 
     @After
@@ -52,5 +53,13 @@ public class TestPackageExplorerView extends STFTest {
         assertFalse(alice.sarosBot().views().packageExplorerView()
             .selectPkg(PROJECT1, PKG1).existsWithRegex(CLS1_SUFFIX));
 
+    }
+
+    @Test
+    public void testShareWith() throws RemoteException {
+        alice.sarosBot().views().packageExplorerView().tree().newC()
+            .javaProject(PROJECT1);
+        alice.sarosBot().views().packageExplorerView().selectProject(PROJECT1)
+            .shareWith().multipleBuddies(PROJECT1, bob.jid);
     }
 }

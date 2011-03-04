@@ -185,8 +185,14 @@ public class STF {
 
     protected final static String MENU_SAROS = SarosMessages
         .getString("menu_saros");
+    protected final static String MENU_START_SAROS_CONFIGURATION = SarosMessages
+        .getString("menu_start_saros_configuration");
     protected final static String MENU_CREATE_ACCOUNT = SarosMessages
         .getString("menu_create_account");
+    protected final static String MENU_ADD_BUDDY = SarosMessages
+        .getString("menu_add_buddy");
+    protected final static String MENU_SHARE_PROJECTS = SarosMessages
+        .getString("menu_share_projects");
     protected final static String MENU_PREFERENCES = SarosMessages
         .getString("menu_preferences");
 
@@ -197,9 +203,14 @@ public class STF {
     protected final static String SHELL_SAROS_CONFIGURATION = SarosMessages
         .getString("shell_saros_configuration");
 
+    protected final static String SHELL_ADD_XMPP_JABBER_ACCOUNT = SarosMessages
+        .getString("shell_add_xmpp_jabber_account");
+
     protected final static String SHELL_CHANGE_ACCOUNT = SarosMessages
         .getString("shell_change_xmpp_account");
 
+    protected final static String LABEL_XMPP_JABBER_ID = SarosMessages
+        .getString("text_label_xmpp_jabber_id");
     protected final static String LABEL_XMPP_JABBER_SERVER = SarosMessages
         .getString("text_label_xmpp_jabber_server");
     protected final static String LABEL_USER_NAME = SarosMessages
@@ -221,6 +232,8 @@ public class STF {
     protected final static String ERROR_MESSAGE_TOO_FAST_REGISTER_ACCOUNTS = SarosMessages
         .getString("error_message_too_fast_register_accounts");
 
+    protected final static String GROUP_EXISTING_ACCOUNT = SarosMessages
+        .getString("group_existing_account");
     static protected final String GROUP_TITLE_XMPP_JABBER_ACCOUNTS = SarosMessages
         .getString("group_title_xmpp_jabber_accounts_in_shell-saros-preferences");
 
@@ -296,7 +309,7 @@ public class STF {
 
     protected final static String TB_DISCONNECT = SarosMessages
         .getString("tb_disconnect");
-    protected final static String TB_ADD_A_NEW_CONTACT = SarosMessages
+    protected final static String TB_ADD_A_NEW_BUDDY = SarosMessages
         .getString("tb_add_a_new_buddy");
     protected final static String TB_CONNECT = SarosMessages
         .getString("tb_connect");
@@ -351,6 +364,9 @@ public class STF {
         .getString("shell_screensharing_an_error_occured");
     protected final static String SHELL_INVITATION = SarosMessages
         .getString("shell_invitation");
+    protected final static String SHELL_ADD_BUDDY_TO_SESSION = SarosMessages
+        .getString("shell_add_buddy_to_session");
+
     protected final static String SHELL_ERROR_IN_SAROS_PLUGIN = SarosMessages
         .getString("shell_error_in_saros_plugin");
     protected final static String SHELL_CLOSING_THE_SESSION = SarosMessages
@@ -373,14 +389,16 @@ public class STF {
         .getString("tb_no_inconsistencies");
     protected final static String TB_INCONSISTENCY_DETECTED = SarosMessages
         .getString("tb_inconsistency_detected_in");
-    protected final static String TB_OPEN_INVITATION_INTERFACE = SarosMessages
-        .getString("tb_open_invitation_interface");
+    protected final static String TB_ADD_BUDDY_TO_SESSION = SarosMessages
+        .getString("tb_add_buddy_to_session");
     protected final static String TB_RESTRICT_INVITEES_TO_READ_ONLY_ACCESS = SarosMessages
         .getString("tb_restrict_invitees_to_read_only_access");
     protected final static String TB_ENABLE_DISABLE_FOLLOW_MODE = SarosMessages
         .getString("tb_enable_disable_follow_mode");
-    protected final static String TB_LEAVE_THE_SESSION = SarosMessages
-        .getString("tb_leave_the_session");
+    protected final static String TB_LEAVE_SESSION = SarosMessages
+        .getString("tb_leave_session");
+    protected final static String TB_STOP_SESSION = SarosMessages
+        .getString("tb_stop_session");
 
     // Context menu's name of the table on the view
     protected final static String CM_GRANT_WRITE_ACCESS = SarosMessages
@@ -457,8 +475,10 @@ public class STF {
         .getString("shell_save_all_files_now");
 
     /* Context menu of a selected tree item on the package explorer view */
-    protected final static String CM_SAROS = SarosMessages
-        .getString("cm_saros");
+    protected final static String CM_SHARE_WITH = SarosMessages
+        .getString("cm_share_with");
+    protected final static String CM_MULTIPLE_BUDDIES = SarosMessages
+        .getString("cm_multiple_buddies");
     protected final static String CM_SHARE_PROJECT = SarosMessages
         .getString("cm_share_project");
     protected final static String CM_ADD_TO_SESSION = SarosMessages

@@ -214,7 +214,7 @@ public class TestBasicWidgetTree extends STFTest {
     public void existsSubmenuOfContextOfTreeItemInView() throws RemoteException {
         alice.sarosBot().views().packageExplorerView().tree().newC()
             .javaProject(PROJECT1);
-        String[] contextNames = { CM_SAROS, CM_SHARE_PROJECT };
+        String[] contextNames = { CM_SHARE_WITH, CM_SHARE_PROJECT };
         assertTrue(alice.bot().view(VIEW_PACKAGE_EXPLORER).bot().tree()
             .selectTreeItem(PROJECT1).existsContextMenu(contextNames));
 
@@ -238,8 +238,8 @@ public class TestBasicWidgetTree extends STFTest {
         throws RemoteException {
         alice.sarosBot().views().packageExplorerView().tree().newC()
             .javaProject(PROJECT1);
-        String[] contextNames1 = { CM_SAROS, CM_SHARE_PROJECT };
-        String[] contextNames2 = { CM_SAROS, CM_ADD_TO_SESSION };
+        String[] contextNames1 = { CM_SHARE_WITH, CM_SHARE_PROJECT };
+        String[] contextNames2 = { CM_SHARE_WITH, CM_ADD_TO_SESSION };
         assertTrue(alice.bot().view(VIEW_PACKAGE_EXPLORER).bot().tree()
             .selectTreeItem(PROJECT1).isContextMenuEnabled(contextNames1));
 
@@ -263,7 +263,7 @@ public class TestBasicWidgetTree extends STFTest {
             .javaProject(PROJECT1);
 
         alice.bot().view(VIEW_PACKAGE_EXPLORER).bot().tree()
-            .selectTreeItem(PROJECT1).contextMenu(CM_SAROS, CM_SHARE_PROJECT)
+            .selectTreeItem(PROJECT1).contextMenu(CM_SHARE_WITH, CM_SHARE_PROJECT)
             .click();
 
         alice.bot().waitUntilShellIsOpen(SHELL_INVITATION);

@@ -111,14 +111,14 @@ public class SessionViewImp extends ViewsImp implements SessionView {
         }
     }
 
-    public void leaveTheSession() throws RemoteException {
+    public void leaveSession() throws RemoteException {
         if (!isHost()) {
-            clickToolbarButtonWithTooltip(TB_LEAVE_THE_SESSION);
+            clickToolbarButtonWithTooltip(TB_LEAVE_SESSION);
             bot().waitUntilShellIsOpen(SHELL_CONFIRM_LEAVING_SESSION);
             bot().shell(SHELL_CONFIRM_LEAVING_SESSION).activate();
             bot().shell(SHELL_CONFIRM_LEAVING_SESSION).confirm(YES);
         } else {
-            clickToolbarButtonWithTooltip(TB_LEAVE_THE_SESSION);
+            clickToolbarButtonWithTooltip(TB_STOP_SESSION);
             bot().waitUntilShellIsOpen(SHELL_CONFIRM_CLOSING_SESSION);
             bot().shell(SHELL_CONFIRM_CLOSING_SESSION).activate();
             bot().shell(SHELL_CONFIRM_CLOSING_SESSION).confirm(YES);
@@ -126,15 +126,15 @@ public class SessionViewImp extends ViewsImp implements SessionView {
         waitUntilIsNotInSession();
     }
 
-    public void openInvitationInterface(String... jidOfInvitees)
+    public void addBuddyToSession(String... jidOfInvitees)
         throws RemoteException {
-        clickToolbarButtonWithTooltip(TB_OPEN_INVITATION_INTERFACE);
-        sarosBot().confirmShellInvitation(jidOfInvitees);
+        view.toolbarButton(TB_ADD_BUDDY_TO_SESSION).click();
+        sarosBot().confirmShellAddBuddyToSession(jidOfInvitees);
     }
 
     public void inconsistencyDetected() throws RemoteException {
         clickToolbarButtonWithTooltip(TB_INCONSISTENCY_DETECTED);
-        bot().waitsUntilShellIsClosed(SHELL_PROGRESS_INFORMATION);
+        bot().waitUntilShellIsClosed(SHELL_PROGRESS_INFORMATION);
     }
 
     /**********************************************

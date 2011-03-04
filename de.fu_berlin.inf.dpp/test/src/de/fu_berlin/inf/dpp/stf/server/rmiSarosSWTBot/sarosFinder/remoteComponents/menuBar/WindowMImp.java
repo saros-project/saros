@@ -51,7 +51,7 @@ public class WindowMImp extends SarosPreferencesImp implements WindowM {
         }
         shell.bot().button(APPLY).click();
         shell.bot().button(OK).click();
-        bot().waitsUntilShellIsClosed(SHELL_PREFERNCES);
+        bot().waitUntilShellIsClosed(SHELL_PREFERNCES);
     }
 
     public void clickMenuPreferences() throws RemoteException {

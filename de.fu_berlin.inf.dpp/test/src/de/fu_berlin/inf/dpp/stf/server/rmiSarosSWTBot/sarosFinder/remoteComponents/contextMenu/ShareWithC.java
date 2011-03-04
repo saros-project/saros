@@ -3,6 +3,7 @@ package de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteCompone
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 
+import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.stf.client.Tester;
 import de.fu_berlin.inf.dpp.stf.client.testProject.helpers.TestPattern;
 
@@ -28,7 +29,7 @@ import de.fu_berlin.inf.dpp.stf.client.testProject.helpers.TestPattern;
  * 
  * @author Lin
  */
-public interface SarosC extends Remote {
+public interface ShareWithC extends Remote {
 
     /**
      * Perform one of the actions "Share project",
@@ -59,8 +60,8 @@ public interface SarosC extends Remote {
      * @throws RemoteException
      * 
      */
-    public void shareProjectWith(String howToshareProject,
-        String[] inviteeBaseJIDs) throws RemoteException;
+    // public void shareProjectWith(String howToshareProject,
+    // String[] inviteeBaseJIDs) throws RemoteException;
 
     /**
      * Perform the action "Share project" which should be activated by clicking
@@ -84,6 +85,7 @@ public interface SarosC extends Remote {
      * @throws RemoteException
      * 
      */
-    public void multipleBuddies(String... inviteeBaseJIDS) throws RemoteException;
+    public void multipleBuddies(String projectName, JID... inviteeBaseJIDS)
+        throws RemoteException;
 
 }

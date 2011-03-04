@@ -72,14 +72,9 @@ public class TestParallelInvitationWithTerminationByInvitees extends STFTest {
         /*
          * build session with bob, carl and dave simultaneously
          */
-        alice
-            .sarosBot()
-            .views()
-            .packageExplorerView()
-            .selectProject(PROJECT1)
+        alice.sarosBot().views().packageExplorerView().selectProject(PROJECT1)
             .shareWith()
-            .multipleBuddies(VIEW_PACKAGE_EXPLORER, PROJECT1, bob.getBaseJid(),
-                dave.getBaseJid(), carl.getBaseJid(), edna.getBaseJid());
+            .multipleBuddies(PROJECT1, bob.jid, dave.jid, carl.jid, edna.jid);
 
         bob.bot().waitUntilShellIsOpen(SHELL_SESSION_INVITATION);
         STFBotShell shell_bob = bob.bot().shell(SHELL_SESSION_INVITATION);
@@ -103,7 +98,7 @@ public class TestParallelInvitationWithTerminationByInvitees extends STFTest {
             .getText().matches(carl.getName() + ".*"));
         shell_alice.bot().button(OK).click();
 
-        dave.bot().waitsUntilShellIsClosed(SHELL_SESSION_INVITATION);
+        dave.bot().waitUntilShellIsClosed(SHELL_SESSION_INVITATION);
         STFBotShell shell_dave = dave.bot().shell(SHELL_SESSION_INVITATION);
         shell_dave.activate();
         dave.bot().shell(SHELL_SESSION_INVITATION).confirm(FINISH);
@@ -118,7 +113,7 @@ public class TestParallelInvitationWithTerminationByInvitees extends STFTest {
         edna.bot().shell(SHELL_SESSION_INVITATION).activate();
         edna.bot().shell(SHELL_SESSION_INVITATION).confirm(FINISH);
         edna.sarosBot().confirmShellAddProjectWithNewProject(PROJECT1);
-        edna.sarosBot().views().sessionView().leaveTheSession();
+        edna.sarosBot().views().sessionView().leaveSession();
         assertFalse(edna.sarosBot().views().sessionView().isInSession());
         assertFalse(alice.sarosBot().views().sessionView()
             .hasReadOnlyAccessNoGUI(edna.jid));
