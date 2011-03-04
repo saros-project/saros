@@ -7,7 +7,7 @@ import java.rmi.RemoteException;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.STFWorkbenchBot;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.noFinder.NoBot;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.SarosBot;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.SuperBot;
 
 /**
  * DummyTester is responsible to check if a tester is already initialized.
@@ -71,7 +71,7 @@ public class DummyTester extends AbstractTester {
     }
 
     @Override
-    public SarosBot sarosBot() throws RemoteException {
+    public SuperBot sarosBot() throws RemoteException {
         throwException();
         return null;
     }

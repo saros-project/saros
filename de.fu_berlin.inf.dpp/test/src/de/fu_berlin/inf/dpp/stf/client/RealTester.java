@@ -10,19 +10,19 @@ import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.STFBot;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.STFWorkbenchBot;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.noFinder.NoBot;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.SarosBot;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.SuperBot;
 
 /**
  * Tester simulate a real saros-tester. He/She can takes use of all RMI
  * interfaces to help testwriters with Bot {@link STFBot} and SuperBot
- * {@link SarosBot}to write their STF tests nicely. STF is short for Saros Test
+ * {@link SuperBot}to write their STF tests nicely. STF is short for Saros Test
  * Framework.
  */
 public class RealTester extends AbstractTester {
 
     private STFWorkbenchBot bot;
     private NoBot noBot;
-    private SarosBot sarosBot;
+    private SuperBot sarosBot;
 
     private JID jid;
     private String password;
@@ -45,7 +45,7 @@ public class RealTester extends AbstractTester {
         try {
             bot = (STFWorkbenchBot) registry.lookup("bot");
             noBot = (NoBot) registry.lookup("noBot");
-            sarosBot = (SarosBot) registry.lookup("sarosBot");
+            sarosBot = (SuperBot) registry.lookup("sarosBot");
 
         } catch (java.rmi.ConnectException e) {
             throw new RuntimeException("Could not connect to RMI of bot " + jid
@@ -85,7 +85,7 @@ public class RealTester extends AbstractTester {
     }
 
     @Override
-    public SarosBot sarosBot() throws RemoteException {
+    public SuperBot sarosBot() throws RemoteException {
         sarosBot.setJID(jid);
         return sarosBot;
     }

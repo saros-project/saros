@@ -8,7 +8,7 @@ import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.STFBot;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.STFWorkbenchBot;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.noFinder.NoBot;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.SarosBot;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.SuperBot;
 
 /**
  * SuperClass of {@link DummyTester} and {@link RealTester}. It define all
@@ -22,7 +22,7 @@ public abstract class AbstractTester {
 
     /**
      * get remote registered objects bot {@link STFBot} and superBot
-     * {@link SarosBot}
+     * {@link SuperBot}
      * 
      * @throws RemoteException
      * @throws NotBoundException
@@ -75,11 +75,11 @@ public abstract class AbstractTester {
 
     /**
      * 
-     * @return the super {@link SarosBot}, which encapsulate some often used
+     * @return the super {@link SuperBot}, which encapsulate some often used
      *         actions e.g. shareProject, connect, leaveSession.., which can be
      *         also done with {@link STFBot}
      * @throws RemoteException
      */
-    public abstract SarosBot sarosBot() throws RemoteException;
+    public abstract SuperBot sarosBot() throws RemoteException;
 
 }
