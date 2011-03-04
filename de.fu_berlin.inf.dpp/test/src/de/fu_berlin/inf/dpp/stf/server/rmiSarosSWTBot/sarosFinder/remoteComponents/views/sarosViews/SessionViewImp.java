@@ -197,36 +197,6 @@ public class SessionViewImp extends ViewsImp implements SessionView {
         return false;
     }
 
-    // public boolean isHost(JID jidOfParticipant) throws RemoteException {
-    //
-    // String participantLabelsInSessionView =
-    // getParticipantLabel(jidOfParticipant);
-    // String talbeItem = table.getTableItem(0).getText();
-    // if (participantLabelsInSessionView.equals(talbeItem))
-    // return true;
-    // return false;
-    // }
-
-    // public boolean isParticipant() throws RemoteException {
-    // return existsParticipant(getJID());
-    // }
-
-    // public boolean isParticipant(JID jid) throws RemoteException {
-    // if (!isInSession())
-    // return false;
-    // return existsParticipant(jid);
-    // }
-
-    // public boolean areParticipants(List<JID> jidOfParticipants)
-    // throws RemoteException {
-    //
-    // boolean result = true;
-    // for (JID jid : jidOfParticipants) {
-    // result &= existsParticipant(jid);
-    // }
-    // return result;
-    // }
-
     public boolean isFollowing() throws RemoteException {
         JID followedBuddy = getFollowedBuddyJIDNoGUI();
         if (followedBuddy == null)

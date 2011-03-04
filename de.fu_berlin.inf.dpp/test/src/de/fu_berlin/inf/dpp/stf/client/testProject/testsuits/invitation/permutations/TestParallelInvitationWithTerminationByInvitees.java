@@ -72,9 +72,14 @@ public class TestParallelInvitationWithTerminationByInvitees extends STFTest {
         /*
          * build session with bob, carl and dave simultaneously
          */
-        alice.sarosBot().views().packageExplorerView().selectProject(PROJECT1)
+        alice
+            .sarosBot()
+            .views()
+            .packageExplorerView()
+            .selectProject(PROJECT1)
             .shareWith()
-            .multipleBuddies(PROJECT1, bob.jid, dave.jid, carl.jid, edna.jid);
+            .multipleBuddies(PROJECT1, bob.getJID(), dave.getJID(),
+                carl.getJID(), edna.getJID());
 
         bob.bot().waitUntilShellIsOpen(SHELL_SESSION_INVITATION);
         STFBotShell shell_bob = bob.bot().shell(SHELL_SESSION_INVITATION);
@@ -116,6 +121,6 @@ public class TestParallelInvitationWithTerminationByInvitees extends STFTest {
         edna.sarosBot().views().sessionView().leaveSession();
         assertFalse(edna.sarosBot().views().sessionView().isInSession());
         assertFalse(alice.sarosBot().views().sessionView()
-            .hasReadOnlyAccessNoGUI(edna.jid));
+            .hasReadOnlyAccessNoGUI(edna.getJID()));
     }
 }

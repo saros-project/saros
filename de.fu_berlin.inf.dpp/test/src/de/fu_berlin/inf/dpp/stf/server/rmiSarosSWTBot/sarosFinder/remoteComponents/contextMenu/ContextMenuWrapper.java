@@ -2,6 +2,7 @@ package de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteCompone
 
 import java.rmi.Remote;
 import java.rmi.RemoteException;
+import java.util.List;
 
 public interface ContextMenuWrapper extends Remote {
     public ShareWithC shareWith() throws RemoteException;
@@ -31,8 +32,10 @@ public interface ContextMenuWrapper extends Remote {
      * 
      * @throws RemoteException
      */
-    public void deleteAllProjects() throws RemoteException;
+    // public void deleteAllProjects() throws RemoteException;
 
     // public void deleteAllItems() throws RemoteException;
+
+    public List<String> getTextOfTreeItems() throws RemoteException;
 
 }

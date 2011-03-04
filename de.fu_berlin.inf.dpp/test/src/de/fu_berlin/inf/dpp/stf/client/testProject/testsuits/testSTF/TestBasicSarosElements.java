@@ -62,7 +62,7 @@ public class TestBasicSarosElements extends STFTest {
     public void connect() throws RemoteException {
         log.trace("xmppConnect");
         alice.sarosBot().views().buddiesView()
-            .connectWith(alice.jid, alice.password);
+            .connectWith(alice.getJID(), alice.getPassword());
         log.trace("captureScreenshot");
         alice.bot().captureScreenshot(
             (alice.bot().getPathToScreenShot() + "/xmpp_connected.png"));
@@ -72,7 +72,7 @@ public class TestBasicSarosElements extends STFTest {
     @Test
     public void disconnect() throws RemoteException {
         alice.sarosBot().views().buddiesView()
-            .connectWith(alice.jid, alice.password);
+            .connectWith(alice.getJID(), alice.getPassword());
         alice.sarosBot().views().buddiesView().disconnect();
         alice.bot().captureScreenshot(
             (alice.bot().getPathToScreenShot() + "/xmpp_disconnected.png"));

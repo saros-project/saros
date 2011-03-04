@@ -1,8 +1,6 @@
 package de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder;
 
 import java.rmi.RemoteException;
-import java.util.HashMap;
-import java.util.Map;
 
 import org.eclipse.swtbot.swt.finder.widgets.TimeoutException;
 
@@ -299,15 +297,12 @@ public class SarosBotImp extends STF implements SarosBot {
     }
 
     public void confirmShellAddBuddy(JID jid) throws RemoteException {
-        Map<String, String> labelsAndTexts = new HashMap<String, String>();
-        labelsAndTexts.put("XMPP/Jabber ID", jid.getBase());
-        if (!bot().isShellOpen(SHELL_NEW_BUDDY))
-            bot().waitUntilShellIsOpen(SHELL_NEW_BUDDY);
-        bot().shell(SHELL_NEW_BUDDY).activate();
-        bot().shell(SHELL_NEW_BUDDY).bot().textWithLabel(LABEL_XMPP_JABBER_ID)
-            .setText(jid.getBase());
-        bot().shell(SHELL_NEW_BUDDY).bot().button(FINISH).waitUntilIsEnabled();
-        bot().shell(SHELL_NEW_BUDDY).bot().button(FINISH).click();
+        bot().waitUntilShellIsOpen(SHELL_ADD_BUDDY);
+        bot().shell(SHELL_ADD_BUDDY).activate();
+        bot().shell(SHELL_ADD_BUDDY).bot()
+            .comboBoxWithLabel(LABEL_XMPP_JABBER_ID).setText(jid.getBase());
+        bot().shell(SHELL_ADD_BUDDY).bot().button(FINISH).waitUntilIsEnabled();
+        bot().shell(SHELL_ADD_BUDDY).bot().button(FINISH).click();
 
         bot().sleep(500);
         if (bot().isShellOpen("Unknown Buddy Status")) {

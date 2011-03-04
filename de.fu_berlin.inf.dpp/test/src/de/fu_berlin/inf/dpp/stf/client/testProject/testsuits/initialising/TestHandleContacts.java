@@ -54,11 +54,15 @@ public class TestHandleContacts extends STFTest {
      */
     @Test
     public void testBobRemoveBuddyAlice() throws RemoteException {
-        assertTrue(alice.sarosBot().views().buddiesView().hasBuddy(bob.jid));
-        assertTrue(bob.sarosBot().views().buddiesView().hasBuddy(alice.jid));
+        assertTrue(alice.sarosBot().views().buddiesView()
+            .hasBuddy(bob.getJID()));
+        assertTrue(bob.sarosBot().views().buddiesView()
+            .hasBuddy(alice.getJID()));
         deleteBuddies(bob, alice);
-        assertFalse(bob.sarosBot().views().buddiesView().hasBuddy(alice.jid));
-        assertFalse(alice.sarosBot().views().buddiesView().hasBuddy(bob.jid));
+        assertFalse(bob.sarosBot().views().buddiesView()
+            .hasBuddy(alice.getJID()));
+        assertFalse(alice.sarosBot().views().buddiesView()
+            .hasBuddy(bob.getJID()));
     }
 
     /**
@@ -76,11 +80,15 @@ public class TestHandleContacts extends STFTest {
      */
     @Test
     public void testAliceRemoveBuddyBob() throws RemoteException {
-        assertTrue(alice.sarosBot().views().buddiesView().hasBuddy(bob.jid));
-        assertTrue(bob.sarosBot().views().buddiesView().hasBuddy(alice.jid));
+        assertTrue(alice.sarosBot().views().buddiesView()
+            .hasBuddy(bob.getJID()));
+        assertTrue(bob.sarosBot().views().buddiesView()
+            .hasBuddy(alice.getJID()));
         deleteBuddies(alice, bob);
-        assertFalse(bob.sarosBot().views().buddiesView().hasBuddy(alice.jid));
-        assertFalse(alice.sarosBot().views().buddiesView().hasBuddy(bob.jid));
+        assertFalse(bob.sarosBot().views().buddiesView()
+            .hasBuddy(alice.getJID()));
+        assertFalse(alice.sarosBot().views().buddiesView()
+            .hasBuddy(bob.getJID()));
     }
 
     /**
@@ -100,8 +108,10 @@ public class TestHandleContacts extends STFTest {
     public void testAliceAddBuddyBob() throws RemoteException {
         deleteBuddies(alice, bob);
         addBuddies(alice, bob);
-        assertTrue(bob.sarosBot().views().buddiesView().hasBuddy(alice.jid));
-        assertTrue(alice.sarosBot().views().buddiesView().hasBuddy(bob.jid));
+        assertTrue(bob.sarosBot().views().buddiesView()
+            .hasBuddy(alice.getJID()));
+        assertTrue(alice.sarosBot().views().buddiesView()
+            .hasBuddy(bob.getJID()));
     }
 
     /**
@@ -121,8 +131,10 @@ public class TestHandleContacts extends STFTest {
     public void testBobAddBuddyAlice() throws RemoteException {
         deleteBuddies(bob, alice);
         addBuddies(bob, alice);
-        assertTrue(bob.sarosBot().views().buddiesView().hasBuddy(alice.jid));
-        assertTrue(alice.sarosBot().views().buddiesView().hasBuddy(bob.jid));
+        assertTrue(bob.sarosBot().views().buddiesView()
+            .hasBuddy(alice.getJID()));
+        assertTrue(alice.sarosBot().views().buddiesView()
+            .hasBuddy(bob.getJID()));
     }
 
     /**
@@ -141,12 +153,12 @@ public class TestHandleContacts extends STFTest {
      */
     @Test
     public void testAddNoValidContact() throws RemoteException {
-        alice.bot().view(VIEW_SAROS_BUDDIES)
-            .toolbarButton(TB_ADD_A_NEW_BUDDY).click();
+        alice.bot().view(VIEW_SAROS_BUDDIES).toolbarButton(TB_ADD_A_NEW_BUDDY)
+            .click();
         Map<String, String> labelsAndTexts = new HashMap<String, String>();
         labelsAndTexts.put("XMPP/Jabber ID", "bob@bla");
 
-        alice.bot().shell(SHELL_NEW_BUDDY)
+        alice.bot().shell(SHELL_ADD_BUDDY)
             .confirmWithTextFieldAndWait(labelsAndTexts, FINISH);
         alice.bot().waitUntilShellIsOpen(SHELL_SERVER_NOT_FOUND);
         assertTrue(alice.bot().shell(SHELL_SERVER_NOT_FOUND).isActive());
@@ -171,12 +183,12 @@ public class TestHandleContacts extends STFTest {
      */
     @Test
     public void testAddExistedContact() throws RemoteException {
-        alice.bot().view(VIEW_SAROS_BUDDIES)
-            .toolbarButton(TB_ADD_A_NEW_BUDDY).click();
+        alice.bot().view(VIEW_SAROS_BUDDIES).toolbarButton(TB_ADD_A_NEW_BUDDY)
+            .click();
         Map<String, String> labelsAndTexts = new HashMap<String, String>();
         labelsAndTexts.put("XMPP/Jabber ID", bob.getBaseJid());
         String label = "The buddy is already in your buddy list.Finishing the wizard will have no effect.";
-        assertTrue(alice.bot().shell(SHELL_NEW_BUDDY).getMessage()
+        assertTrue(alice.bot().shell(SHELL_ADD_BUDDY).getMessage()
             .equals(label));
 
     }

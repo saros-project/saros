@@ -7,27 +7,30 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 
 import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.STFBot;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.STFWorkbenchBot;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.noFinder.NoBot;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.SarosBot;
 
 /**
- * Tester encapsulates a test instance of Saros. It takes use of all RMI
- * interfaces to help testwriters to write their STF tests nicely. STF is short
- * for Sandor's Test Framework.
+ * Tester simulate a real saros-tester. He/She can takes use of all RMI
+ * interfaces to help testwriters with Bot {@link STFBot} and SuperBot
+ * {@link SarosBot}to write their STF tests nicely. STF is short for Saros Test
+ * Framework.
  */
-public class Tester {
+public class RealTester extends AbstractTester {
 
     private STFWorkbenchBot bot;
     private NoBot noBot;
     private SarosBot sarosBot;
 
-    public JID jid;
-    public String password;
-    public String host;
-    public int port;
+    private JID jid;
+    private String password;
 
-    public Tester(JID jid, String password, String host, int port) {
+    private String host;
+    private int port;
+
+    public RealTester(JID jid, String password, String host, int port) {
         super();
         this.jid = jid;
         this.password = password;
@@ -35,6 +38,7 @@ public class Tester {
         this.port = port;
     }
 
+    @Override
     public void getRegistriedRmiObject() throws RemoteException,
         NotBoundException, AccessException {
         Registry registry = LocateRegistry.getRegistry(host, port);
@@ -50,42 +54,50 @@ public class Tester {
 
     }
 
-    /**
-     * @Return the name segment of {@link JID}.
-     */
+    @Override
     public String getName() {
         return jid.getName();
     }
 
-    /**
-     * @Return the JID without resource qualifier.
-     */
+    @Override
     public String getBaseJid() {
         return jid.getBase();
     }
 
-    /**
-     * @Return the resource qualified {@link JID}.
-     */
+    @Override
     public String getRQjid() {
         return jid.toString();
     }
 
-    public String getXmppServer() {
+    @Override
+    public String getDomain() {
         return jid.getDomain();
     }
 
+    @Override
     public STFWorkbenchBot bot() {
         return bot;
     }
 
+    @Override
     public NoBot noBot() {
         return noBot;
     }
 
+    @Override
     public SarosBot sarosBot() throws RemoteException {
         sarosBot.setJID(jid);
         return sarosBot;
+    }
+
+    @Override
+    public JID getJID() {
+        return jid;
+    }
+
+    @Override
+    public String getPassword() {
+        return password;
     }
 
 }

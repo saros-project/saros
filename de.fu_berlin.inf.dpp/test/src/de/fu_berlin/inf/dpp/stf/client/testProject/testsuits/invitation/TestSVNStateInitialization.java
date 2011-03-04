@@ -116,7 +116,7 @@ public class TestSVNStateInitialization extends STFTest {
         if (alice.sarosBot().views().packageExplorerView().tree()
             .existsWithRegex(SVN_PROJECT))
             alice.noBot().deleteProjectNoGUI(SVN_PROJECT);
-        bob.sarosBot().views().packageExplorerView().tree().deleteAllProjects();
+        deleteAllProjects(bob);
     }
 
     /**
@@ -142,11 +142,11 @@ public class TestSVNStateInitialization extends STFTest {
         assertTrue(bob.sarosBot().state().isProjectManagedBySVN(SVN_PROJECT));
 
         assertTrue(alice.sarosBot().views().sessionView()
-            .selectParticipant(alice.jid).hasWriteAccess());
+            .selectParticipant(alice.getJID()).hasWriteAccess());
         assertTrue(alice.sarosBot().views().sessionView()
-            .isParticipantNoGUI(bob.jid));
+            .isParticipantNoGUI(bob.getJID()));
         assertTrue(bob.sarosBot().views().sessionView()
-            .selectParticipant(bob.jid).hasWriteAccess());
+            .selectParticipant(bob.getJID()).hasWriteAccess());
     }
 
     /**

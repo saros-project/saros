@@ -65,14 +65,14 @@ public class TestShare2UsersSequentially extends STFTest {
         assertTrue(alice.sarosBot().views().sessionView().isParticipantNoGUI());
 
         assertFalse(bob.sarosBot().views().sessionView()
-            .selectParticipant(bob.jid).hasReadOnlyAccess());
+            .selectParticipant(bob.getJID()).hasReadOnlyAccess());
         assertFalse(alice.sarosBot().views().sessionView()
-            .selectParticipant(alice.jid).hasReadOnlyAccess());
+            .selectParticipant(alice.getJID()).hasReadOnlyAccess());
 
         assertTrue(alice.sarosBot().views().sessionView()
-            .selectParticipant(alice.jid).hasWriteAccess());
+            .selectParticipant(alice.getJID()).hasWriteAccess());
         assertTrue(bob.sarosBot().views().sessionView()
-            .selectParticipant(bob.jid).hasWriteAccess());
+            .selectParticipant(bob.getJID()).hasWriteAccess());
 
         leaveSessionPeersFirst();
 

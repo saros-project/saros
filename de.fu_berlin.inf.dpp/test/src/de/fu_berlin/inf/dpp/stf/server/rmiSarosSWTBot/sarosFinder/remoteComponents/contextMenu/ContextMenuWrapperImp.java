@@ -114,7 +114,11 @@ public class ContextMenuWrapperImp extends Component implements
     }
 
     public void delete() throws RemoteException {
-        treeItem.contextMenu(CM_DELETE).click();
+        bot().menu(MENU_EDIT).menu(MENU_DELETE).click();
+        /*
+         * FIXME can't find the contextMenu Delete
+         */
+        // treeItem.contextMenu(CM_DELETE).click();
         switch (type) {
         case PROJECT:
             bot().shell(SHELL_DELETE_RESOURCE).confirmWithCheckBox(OK, true);
@@ -158,16 +162,24 @@ public class ContextMenuWrapperImp extends Component implements
         }
     }
 
-    public void deleteAllProjects() throws RemoteException {
-        List<String> allTreeItems = tree.getTextOfItems();
-        if (allTreeItems != null) {
-            for (String item : allTreeItems) {
-                tree.selectTreeItem(item).contextMenu(MENU_DELETE).click();
-                STFBotShell shell = bot().shell(SHELL_DELETE_RESOURCE);
+    // public void deleteAllProjects() throws RemoteException {
+    // List<String> allTreeItems = tree.getTextOfItems();
+    // if (allTreeItems != null) {
+    // for (String item : allTreeItems) {
+    // tree.selectTreeItem(item).contextMenu(MENU_DELETE).click();
+    // STFBotShell shell = bot().shell(SHELL_DELETE_RESOURCE);
+    //
+    // shell.confirmWithCheckBox(OK, true);
+    // bot().waitUntilShellIsClosed(SHELL_DELETE_RESOURCE);
+    // }
+    // }
+    // }
 
-                shell.confirmWithCheckBox(OK, true);
-                bot().waitUntilShellIsClosed(SHELL_DELETE_RESOURCE);
-            }
+    public List<String> getTextOfTreeItems() throws RemoteException {
+        if (treeItem == null) {
+            return tree.getTextOfItems();
+        } else {
+            return treeItem.getTextOfItems();
         }
     }
 

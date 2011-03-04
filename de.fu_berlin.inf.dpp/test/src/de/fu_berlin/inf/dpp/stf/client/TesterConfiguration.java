@@ -13,13 +13,13 @@ import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.stf.client.testProject.helpers.MakeOperationConcurrently;
 
-public class ConfigTester {
-    private final static Logger log = Logger.getLogger(ConfigTester.class);
+public class TesterConfiguration {
+    private final static Logger log = Logger.getLogger(TesterConfiguration.class);
 
-    protected static Tester newTester(String name, String jid, String pw,
+    protected static AbstractTester newTester(String name, String jid, String pw,
         String host, int port) throws RemoteException {
         log.trace("new " + name);
-        Tester tester = new Tester(new JID(jid), pw, host, port);
+        AbstractTester tester = new RealTester(new JID(jid), pw, host, port);
         try {
             log.trace("initBot");
             tester.getRegistriedRmiObject();
@@ -31,40 +31,40 @@ public class ConfigTester {
         return tester;
     }
 
-    public final static Tester newAlice() throws RemoteException {
+    public final static AbstractTester newAlice() throws RemoteException {
         return newTester("alice", JID_ALICE, PASSWORD_ALICE, HOST_ALICE,
             PORT_ALICE);
     }
 
-    public final static Tester newBob() throws RemoteException {
+    public final static AbstractTester newBob() throws RemoteException {
         return newTester("bob", JID_BOB, PASSWORD_BOB, HOST_BOB, PORT_BOB);
     }
 
-    public final static Tester newCarl() throws RemoteException {
+    public final static AbstractTester newCarl() throws RemoteException {
         return newTester("carl", JID_CARL, PASSWORD_CARL, HOST_CARL, PORT_CARL);
     }
 
-    public final static Tester newDave() throws RemoteException {
+    public final static AbstractTester newDave() throws RemoteException {
         return newTester("dave", JID_DAVE, PASSWORD_DAVE, HOST_DAVE, PORT_DAVE);
     }
 
-    public final static Tester newEdna() throws RemoteException {
+    public final static AbstractTester newEdna() throws RemoteException {
         return newTester("edna", JID_EDNA, PASSWORD_EDNA, HOST_EDNA, PORT_EDNA);
     }
 
-    public static List<Tester> initAliceBobCarlConcurrently()
+    public static List<AbstractTester> initAliceBobCarlConcurrently()
         throws InterruptedException {
         // pool = Executors.newFixedThreadPool(3);
-        List<Callable<Tester>> initTasks = new ArrayList<Callable<Tester>>();
+        List<Callable<AbstractTester>> initTasks = new ArrayList<Callable<AbstractTester>>();
         initTasks.add(newAliceCallable());
         initTasks.add(newBobCallable());
         initTasks.add(newCarlCallable());
         return MakeOperationConcurrently.workAll(initTasks);
     }
 
-    public static List<Tester> initMusiciansConcurrently(int... ports)
+    public static List<AbstractTester> initMusiciansConcurrently(int... ports)
         throws InterruptedException {
-        List<Callable<Tester>> initTasks = new ArrayList<Callable<Tester>>();
+        List<Callable<AbstractTester>> initTasks = new ArrayList<Callable<AbstractTester>>();
         for (int port : ports) {
             switch (port) {
             case 12345:
@@ -89,41 +89,41 @@ public class ConfigTester {
         return MakeOperationConcurrently.workAll(initTasks);
     }
 
-    public static Callable<Tester> newAliceCallable() {
-        return new Callable<Tester>() {
-            public Tester call() throws Exception {
+    public static Callable<AbstractTester> newAliceCallable() {
+        return new Callable<AbstractTester>() {
+            public AbstractTester call() throws Exception {
                 return newAlice();
             }
         };
     }
 
-    public static Callable<Tester> newBobCallable() {
-        return new Callable<Tester>() {
-            public Tester call() throws Exception {
+    public static Callable<AbstractTester> newBobCallable() {
+        return new Callable<AbstractTester>() {
+            public AbstractTester call() throws Exception {
                 return newBob();
             }
         };
     }
 
-    public static Callable<Tester> newCarlCallable() {
-        return new Callable<Tester>() {
-            public Tester call() throws Exception {
+    public static Callable<AbstractTester> newCarlCallable() {
+        return new Callable<AbstractTester>() {
+            public AbstractTester call() throws Exception {
                 return newCarl();
             }
         };
     }
 
-    public static Callable<Tester> newDaveCallable() {
-        return new Callable<Tester>() {
-            public Tester call() throws Exception {
+    public static Callable<AbstractTester> newDaveCallable() {
+        return new Callable<AbstractTester>() {
+            public AbstractTester call() throws Exception {
                 return newDave();
             }
         };
     }
 
-    public static Callable<Tester> newEdnaCallable() {
-        return new Callable<Tester>() {
-            public Tester call() throws Exception {
+    public static Callable<AbstractTester> newEdnaCallable() {
+        return new Callable<AbstractTester>() {
+            public AbstractTester call() throws Exception {
                 return newEdna();
             }
         };

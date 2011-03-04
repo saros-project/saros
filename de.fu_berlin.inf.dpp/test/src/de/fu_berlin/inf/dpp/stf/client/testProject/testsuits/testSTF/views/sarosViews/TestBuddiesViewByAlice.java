@@ -13,14 +13,16 @@ public class TestBuddiesViewByAlice extends STFTest {
     @BeforeClass
     public static void runBeforeClass() throws RemoteException {
         initTesters(TypeOfTester.ALICE);
+
         setUpWorkbench();
+        setUpSaros();
     }
 
     @Test
     public void testConnectWith() throws RemoteException {
         alice.sarosBot().views().buddiesView().connectWith(TEST_JID, PASSWORD);
         assertTrue(alice.sarosBot().saros().preferences()
-            .isAccountActive(TEST_JID));
+            .isAccountActive(bob.getJID()));
     }
 
     @Test
@@ -28,4 +30,12 @@ public class TestBuddiesViewByAlice extends STFTest {
         alice.sarosBot().views().buddiesView().connectWithActiveAccount();
         assertTrue(alice.sarosBot().views().buddiesView().isConnected());
     }
+
+    @Test
+    public void testAddExistedBuddy() throws RemoteException {
+        assertTrue(alice.sarosBot().views().buddiesView().hasBuddy(TEST_JID));
+        alice.sarosBot().views().buddiesView().addANewBuddy(TEST_JID);
+        assertTrue(alice.sarosBot().views().buddiesView().hasBuddy(TEST_JID));
+    }
+
 }

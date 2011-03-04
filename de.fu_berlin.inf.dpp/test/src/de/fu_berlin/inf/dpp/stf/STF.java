@@ -295,8 +295,8 @@ public class STF {
         .getString("shell_request_of_subscription_received");
     protected final static String SHELL_BUDDY_ALREADY_ADDED = SarosMessages
         .getString("shell_buddy_already_added");
-    protected final static String SHELL_NEW_BUDDY = SarosMessages
-        .getString("shell_new_buddy");
+    protected final static String SHELL_ADD_BUDDY = SarosMessages
+        .getString("shell_add_buddy");
     protected final static String SHELL_BUDDY_LOOKUP_FAILED = SarosMessages
         .getString("shell_buddy_look_up_failed");
     protected final static String SHELL_SERVER_NOT_FOUND = SarosMessages

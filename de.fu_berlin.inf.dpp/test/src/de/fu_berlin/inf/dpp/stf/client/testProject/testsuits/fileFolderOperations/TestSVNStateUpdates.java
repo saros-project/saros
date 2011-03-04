@@ -16,8 +16,8 @@ import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import de.fu_berlin.inf.dpp.stf.client.ConfigTester;
-import de.fu_berlin.inf.dpp.stf.client.Tester;
+import de.fu_berlin.inf.dpp.stf.client.AbstractTester;
+import de.fu_berlin.inf.dpp.stf.client.TesterConfiguration;
 import de.fu_berlin.inf.dpp.stf.client.testProject.helpers.MakeOperationConcurrently;
 import de.fu_berlin.inf.dpp.stf.client.testProject.testsuits.STFTest;
 
@@ -42,7 +42,7 @@ public class TestSVNStateUpdates extends STFTest {
         setUpSaros();
 
         List<Callable<Void>> initTasks = new ArrayList<Callable<Void>>();
-        for (final Tester t : activeTesters) {
+        for (final AbstractTester t : activeTesters) {
             initTasks.add(new Callable<Void>() {
                 public Void call() throws Exception {
                     if (!t.sarosBot().views().packageExplorerView().tree()
@@ -81,7 +81,7 @@ public class TestSVNStateUpdates extends STFTest {
     @Before
     public void runBeforeEveryTest() throws Exception {
         List<Callable<Void>> initTasks = new ArrayList<Callable<Void>>();
-        for (final Tester tester : activeTesters) {
+        for (final AbstractTester tester : activeTesters) {
             initTasks.add(new Callable<Void>() {
                 public Void call() throws Exception {
                     tester.bot().resetWorkbench();
@@ -125,7 +125,7 @@ public class TestSVNStateUpdates extends STFTest {
 
     @AfterClass
     public static void runAfterClass() throws RemoteException {
-        if (ConfigTester.DEVELOPMODE) {
+        if (TesterConfiguration.DEVELOPMODE) {
             // don't delete SVN_PROJECT_COPY
             alice.sarosBot().views().buddiesView().disconnect();
             bob.sarosBot().views().buddiesView().disconnect();
@@ -152,7 +152,7 @@ public class TestSVNStateUpdates extends STFTest {
     public void testGrantWriteAccessAndRenameClass() throws Exception {
 
         assertTrue(bob.sarosBot().views().sessionView()
-            .selectParticipant(bob.jid).hasWriteAccess());
+            .selectParticipant(bob.getJID()).hasWriteAccess());
         bob.sarosBot().views().packageExplorerView()
             .selectClass(SVN_PROJECT, SVN_PKG, SVN_CLS1).refactor()
             .rename("Asdf");
@@ -184,7 +184,7 @@ public class TestSVNStateUpdates extends STFTest {
     public void testGrantWriteAccessAndMoveClass() throws Exception {
 
         assertTrue(bob.sarosBot().views().sessionView()
-            .selectParticipant(bob.jid).hasWriteAccess());
+            .selectParticipant(bob.getJID()).hasWriteAccess());
         bob.sarosBot().views().packageExplorerView().tree().newC()
             .pkg(SVN_PROJECT, "new_package");
         alice.sarosBot().condition()

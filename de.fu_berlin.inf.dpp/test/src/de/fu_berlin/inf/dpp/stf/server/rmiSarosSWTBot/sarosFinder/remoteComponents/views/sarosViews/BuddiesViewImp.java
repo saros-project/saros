@@ -4,9 +4,7 @@ import static org.eclipse.swtbot.swt.finder.matchers.WidgetMatcherFactory.allOf;
 import static org.eclipse.swtbot.swt.finder.matchers.WidgetMatcherFactory.widgetOfType;
 
 import java.rmi.RemoteException;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.eclipse.jface.bindings.keys.KeyStroke;
 import org.eclipse.jface.bindings.keys.ParseException;
@@ -70,13 +68,17 @@ public class BuddiesViewImp extends ViewsImp implements BuddiesView {
         log.trace("connectedByXMPP");
         if (!isConnected()) {
             log.trace("click the toolbar button \"Connect\" in the buddies view");
-            if (!sarosBot().saros().preferences().existsAccount(jid))
+            if (!sarosBot().saros().preferences().existsAccount(jid)) {
                 sarosBot().saros().preferences().addAccount(jid, password);
-
-            if (!sarosBot().saros().preferences().isAccountActive(jid))
-                sarosBot().saros().preferences().activateAccount(jid);
-            clickToolbarButtonWithTooltip(TB_CONNECT);
-            waitUntilIsConnected();
+            } else {
+                if (!sarosBot().saros().preferences().isAccountActive(jid)) {
+                    sarosBot().saros().preferences().activateAccount(jid);
+                }
+            }
+            if (!isConnected()) {
+                clickToolbarButtonWithTooltip(TB_CONNECT);
+                waitUntilIsConnected();
+            }
         }
     }
 

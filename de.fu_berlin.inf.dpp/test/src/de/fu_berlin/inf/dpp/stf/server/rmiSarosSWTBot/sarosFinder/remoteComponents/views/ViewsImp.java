@@ -18,8 +18,7 @@ public class ViewsImp extends Component implements Views {
 
     private static transient ViewsImp self;
 
-    protected static ContextMenuWrapperImp contextMenu = ContextMenuWrapperImp
-        .getInstance();
+    protected static ContextMenuWrapperImp contextMenu;
     protected static SarosContextMenuWrapperImp sarosContextMenu = SarosContextMenuWrapperImp
         .getInstance();
 
@@ -45,7 +44,7 @@ public class ViewsImp extends Component implements Views {
         consoleV = ConsoleViewImp.getInstance();
         pEV = PEViewImp.getInstance();
         progressvV = ProgressViewImp.getInstance();
-
+        contextMenu = ContextMenuWrapperImp.getInstance();
         return self;
     }
 

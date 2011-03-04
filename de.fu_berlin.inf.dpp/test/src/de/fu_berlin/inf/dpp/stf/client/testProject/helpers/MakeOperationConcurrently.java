@@ -11,7 +11,7 @@ import java.util.concurrent.Future;
 
 import org.apache.log4j.Logger;
 
-import de.fu_berlin.inf.dpp.stf.client.Tester;
+import de.fu_berlin.inf.dpp.stf.client.AbstractTester;
 
 public class MakeOperationConcurrently {
     private final static Logger log = Logger
@@ -45,15 +45,15 @@ public class MakeOperationConcurrently {
         return result;
     }
 
-    public static List<Boolean> leaveSessionConcurrently(Tester... invitees)
+    public static List<Boolean> leaveSessionConcurrently(AbstractTester... invitees)
         throws InterruptedException {
-        List<Tester> peers = new LinkedList<Tester>();
-        for (Tester invitee : invitees) {
+        List<AbstractTester> peers = new LinkedList<AbstractTester>();
+        for (AbstractTester invitee : invitees) {
             peers.add(invitee);
         }
         List<Callable<Boolean>> leaveTasks = new ArrayList<Callable<Boolean>>();
         for (int i = 0; i < peers.size(); i++) {
-            final Tester musician = peers.get(i);
+            final AbstractTester musician = peers.get(i);
             leaveTasks.add(new Callable<Boolean>() {
                 public Boolean call() throws Exception {
                     /**
@@ -62,7 +62,7 @@ public class MakeOperationConcurrently {
                      */
                     musician.sarosBot().views().sessionView().leaveSession();
                     return musician.sarosBot().views().sessionView()
-                        .isParticipantNoGUI(musician.jid);
+                        .isParticipantNoGUI(musician.getJID());
                 }
             });
         }

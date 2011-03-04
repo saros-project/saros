@@ -57,7 +57,7 @@ public class TestEditDuringInvitation extends STFTest {
             TypeOfCreateProject.NEW_PROJECT, alice, bob);
 
         assertTrue(bob.sarosBot().views().sessionView()
-            .selectParticipant(bob.jid).hasWriteAccess());
+            .selectParticipant(bob.getJID()).hasWriteAccess());
 
         alice.sarosBot().views().sessionView()
             .addBuddyToSession(carl.getBaseJid());

@@ -88,12 +88,12 @@ public class TestCreatingNewFile extends STFTest {
     public void testCarlGrantWriteAccess() throws IOException, CoreException,
         InterruptedException {
 
-        carl.sarosBot().views().sessionView().selectParticipant(carl.jid)
+        carl.sarosBot().views().sessionView().selectParticipant(carl.getJID())
             .restrictToReadOnlyAccess();
         assertFalse(carl.sarosBot().views().sessionView()
-            .selectParticipant(carl.jid).hasWriteAccess());
+            .selectParticipant(carl.getJID()).hasWriteAccess());
         assertTrue(alice.sarosBot().views().sessionView()
-            .selectParticipant(alice.jid).hasWriteAccess());
+            .selectParticipant(alice.getJID()).hasWriteAccess());
 
         carl.sarosBot().views().packageExplorerView().selectProject(PROJECT1)
             .newC().folder(FOLDER1);

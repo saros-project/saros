@@ -5,7 +5,7 @@ import java.rmi.RemoteException;
 import java.util.List;
 
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.stf.client.Tester;
+import de.fu_berlin.inf.dpp.stf.client.AbstractTester;
 import de.fu_berlin.inf.dpp.stf.client.testProject.helpers.TestPattern;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponents.contextMenu.SarosContextMenuWrapper;
 
@@ -14,11 +14,11 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteComponen
  * the Saros Buddies view. then you can start off as follows:
  * <ol>
  * <li>
- * At first you need to create a {@link Tester} object in your junit-test. (How
+ * At first you need to create a {@link AbstractTester} object in your junit-test. (How
  * to do it please look at the javadoc in class {@link TestPattern} or read the
  * user guide in TWiki https://www.inf.fu-berlin.de/w/SE/SarosSTFTests).</li>
  * <li>
- * after then you can use the object rosterV initialized in {@link Tester} to
+ * after then you can use the object rosterV initialized in {@link AbstractTester} to
  * access the API :), e.g.
  * 
  * <pre>

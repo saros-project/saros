@@ -3,7 +3,7 @@ package de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.sarosFinder.remoteCompone
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 
-import de.fu_berlin.inf.dpp.stf.client.Tester;
+import de.fu_berlin.inf.dpp.stf.client.AbstractTester;
 import de.fu_berlin.inf.dpp.stf.client.testProject.helpers.TestPattern;
 
 /**
@@ -11,11 +11,11 @@ import de.fu_berlin.inf.dpp.stf.client.testProject.helpers.TestPattern;
  * view widgets. You can start off as follows:
  * <ol>
  * <li>
- * At first you need to create a {@link Tester} object in your junit-test. (How
+ * At first you need to create a {@link AbstractTester} object in your junit-test. (How
  * to do it please look at the javadoc in class {@link TestPattern} or read the
  * user guide.</li>
  * <li>
- * then you can use the object basic initialized in {@link Tester} to access the
+ * then you can use the object basic initialized in {@link AbstractTester} to access the
  * API :), e.g.
  * 
  * <pre>

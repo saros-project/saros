@@ -60,6 +60,6 @@ public class TestPackageExplorerView extends STFTest {
         alice.sarosBot().views().packageExplorerView().tree().newC()
             .javaProject(PROJECT1);
         alice.sarosBot().views().packageExplorerView().selectProject(PROJECT1)
-            .shareWith().multipleBuddies(PROJECT1, bob.jid);
+            .shareWith().multipleBuddies(PROJECT1, bob.getJID());
     }
 }

@@ -59,21 +59,21 @@ public class TestShare3UsersConcurrently extends STFTest {
 
         assertTrue(carl.sarosBot().views().sessionView().isParticipantNoGUI());
         assertFalse(carl.sarosBot().views().sessionView()
-            .selectParticipant(carl.jid).hasReadOnlyAccess());
+            .selectParticipant(carl.getJID()).hasReadOnlyAccess());
         assertTrue(carl.sarosBot().views().sessionView()
-            .selectParticipant(carl.jid).hasWriteAccess());
+            .selectParticipant(carl.getJID()).hasWriteAccess());
 
         assertTrue(bob.sarosBot().views().sessionView().isParticipantNoGUI());
         assertFalse(bob.sarosBot().views().sessionView()
-            .selectParticipant(bob.jid).hasReadOnlyAccess());
+            .selectParticipant(bob.getJID()).hasReadOnlyAccess());
         assertTrue(bob.sarosBot().views().sessionView()
-            .selectParticipant(bob.jid).hasWriteAccess());
+            .selectParticipant(bob.getJID()).hasWriteAccess());
 
         assertTrue(alice.sarosBot().views().sessionView().isParticipantNoGUI());
         assertFalse(alice.sarosBot().views().sessionView()
-            .selectParticipant(alice.jid).hasReadOnlyAccess());
+            .selectParticipant(alice.getJID()).hasReadOnlyAccess());
         assertTrue(alice.sarosBot().views().sessionView()
-            .selectParticipant(alice.jid).hasWriteAccess());
+            .selectParticipant(alice.getJID()).hasWriteAccess());
 
         leaveSessionPeersFirst();
 

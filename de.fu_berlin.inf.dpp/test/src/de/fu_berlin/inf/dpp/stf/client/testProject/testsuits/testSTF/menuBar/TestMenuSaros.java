@@ -23,7 +23,7 @@ public class TestMenuSaros extends STFTest {
     // }
 
     @Test
-    public void testShareProjectWithBot() throws RemoteException {
+    public void testShareProjectsWithBot() throws RemoteException {
         alice.sarosBot().views().packageExplorerView().tree().newC()
             .javaProject(PROJECT1);
         alice.bot().menu(MENU_SAROS).menu(MENU_SHARE_PROJECTS).click();
@@ -46,12 +46,17 @@ public class TestMenuSaros extends STFTest {
     }
 
     @Test
-    public void testShareProjectWithSuperBot() throws RemoteException {
+    public void testShareProjectsWithSuperBot() throws RemoteException {
         alice.sarosBot().views().packageExplorerView().tree().newC()
             .javaProject(PROJECT1);
-        alice.sarosBot().saros().shareProjects(PROJECT1, bob.jid);
+        alice.sarosBot().saros().shareProjects(PROJECT1, bob.getJID());
         bob.sarosBot().confirmShellSessionInvitationAndAddProject(PROJECT1,
             TypeOfCreateProject.NEW_PROJECT);
+    }
 
+    @Test
+    public void testAddBuddy() throws RemoteException {
+        alice.bot().menu(MENU_SAROS).menu(MENU_ADD_BUDDY).click();
+        alice.sarosBot().confirmShellAddBuddy(bob.getJID());
     }
 }
