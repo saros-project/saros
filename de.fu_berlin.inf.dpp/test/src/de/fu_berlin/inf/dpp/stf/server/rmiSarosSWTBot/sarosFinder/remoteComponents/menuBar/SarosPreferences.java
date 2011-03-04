@@ -75,16 +75,14 @@ public interface SarosPreferences extends Remote {
      * @param jid
      *            a JID which is used to identify the users of the Jabber
      *            network, more about it please see {@link JID}.
-     * @param newUserName
-     *            the new username
+     * 
      * @param newPassword
      *            the new password
-     * @param newServer
-     *            the new server
+     * 
      * @throws RemoteException
      */
-    public void changeAccount(JID jid, String newUserName, String newPassword,
-        String newServer) throws RemoteException;
+    public void changeAccount(JID jid, String newXmppJabberID,
+        String newPassword) throws RemoteException;
 
     /**
      * delete the account specified by the given jid with GUI, which should be

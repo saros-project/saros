@@ -16,7 +16,7 @@ public interface STFBotTree extends Remote {
 
     public STFBotTreeItem[] getAllItems() throws RemoteException;
 
-    public STFBotMenu contextMenu(String text) throws RemoteException;
+    // public STFBotMenu contextMenu(String text) throws RemoteException;
 
     public STFBotMenu contextMenu(String... texts) throws RemoteException;
 

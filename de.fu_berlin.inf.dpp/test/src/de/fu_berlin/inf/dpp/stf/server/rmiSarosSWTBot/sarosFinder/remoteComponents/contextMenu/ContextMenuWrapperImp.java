@@ -18,10 +18,10 @@ public class ContextMenuWrapperImp extends Component implements
     protected static RefactorCImp reafactorC;
     private static ShareWithCImp shareWithC;
 
-    protected STFBotTreeItem treeItem;
-    protected STFBotTree tree;
-    protected TreeItemType type;
-    protected STFBotTableItem tableItem;
+    private STFBotTreeItem treeItem;
+    private STFBotTree tree;
+    private TreeItemType type;
+    private STFBotTableItem tableItem;
 
     /**
      * {@link ContextMenuWrapperImp} is a singleton, but inheritance is
@@ -114,11 +114,7 @@ public class ContextMenuWrapperImp extends Component implements
     }
 
     public void delete() throws RemoteException {
-        bot().menu(MENU_EDIT).menu(MENU_DELETE).click();
-        /*
-         * FIXME can't find the contextMenu Delete
-         */
-        // treeItem.contextMenu(CM_DELETE).click();
+        treeItem.contextMenu(CM_DELETE).click();
         switch (type) {
         case PROJECT:
             bot().shell(SHELL_DELETE_RESOURCE).confirmWithCheckBox(OK, true);

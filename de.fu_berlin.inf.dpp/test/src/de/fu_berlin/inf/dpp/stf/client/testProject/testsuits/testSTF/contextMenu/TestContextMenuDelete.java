@@ -25,10 +25,8 @@ public class TestContextMenuDelete extends STFTest {
     public void testDeleteProject() throws RemoteException {
         alice.sarosBot().views().packageExplorerView().tree().newC()
             .project(PROJECT1);
-        // alice.sarosBot().views().packageExplorerView().tree().newC()
-        // .pkg(PROJECT1, PKG1);
-        alice.sarosBot().views().packageExplorerView().selectProject(PROJECT1)
-            .copy();
+        alice.sarosBot().views().packageExplorerView()
+            .selectJavaProject(PROJECT1).delete();
     }
 
     @Test

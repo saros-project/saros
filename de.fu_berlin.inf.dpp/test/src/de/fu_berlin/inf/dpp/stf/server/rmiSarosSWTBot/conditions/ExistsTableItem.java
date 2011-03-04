@@ -20,6 +20,6 @@ public class ExistsTableItem extends DefaultCondition {
     }
 
     public boolean test() throws Exception {
-        return table.existsTableItem(itemText);
+        return table.containsItem(itemText);
     }
 }

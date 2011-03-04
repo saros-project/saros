@@ -12,7 +12,8 @@ public class PEViewImp extends ViewsImp implements PEView {
 
     private STFBotView view;
     private STFBotTree tree;
-    private STFBotTreeItem treeItem;
+
+    // private STFBotTreeItem treeItem;
 
     /**
      * {@link PEViewImp} is a singleton, but inheritance is possible.
@@ -25,7 +26,9 @@ public class PEViewImp extends ViewsImp implements PEView {
     }
 
     public PEView setView(STFBotView view) throws RemoteException {
-        setViewWithTree(view);
+        this.view = view;
+        tree = view.bot().tree();
+        // treeItem = null;
         return this;
     }
 
@@ -50,6 +53,7 @@ public class PEViewImp extends ViewsImp implements PEView {
 
     public ContextMenuWrapper selectSrc(String projectName)
         throws RemoteException {
+
         initContextMenuWrapper(
             tree.selectTreeItemWithRegex(changeToRegex(projectName), SRC),
             TreeItemType.JAVA_PROJECT);
@@ -115,15 +119,9 @@ public class PEViewImp extends ViewsImp implements PEView {
         return VIEW_PACKAGE_EXPLORER;
     }
 
-    private void setViewWithTree(STFBotView view) throws RemoteException {
-        this.view = view;
-        tree = view.bot().tree();
-        treeItem = null;
-    }
-
     private void initContextMenuWrapper(STFBotTreeItem treeItem,
         TreeItemType type) {
-        this.treeItem = treeItem;
+        // this.treeItem = treeItem;
         contextMenu.setTree(tree);
         contextMenu.setTreeItem(treeItem);
         contextMenu.setTreeItemType(type);

@@ -198,16 +198,16 @@ public class STF {
 
     protected final static String SHELL_PREFERNCES = SarosMessages
         .getString("shell_preferences");
-    protected final static String SHELL_CREATE_NEW_XMPP_ACCOUNT = SarosMessages
-        .getString("shell_create_new_xmpp_account");
+    protected final static String SHELL_CREATE_XMPP_JABBER_ACCOUNT = SarosMessages
+        .getString("shell_create_xmpp_jabber_account");
     protected final static String SHELL_SAROS_CONFIGURATION = SarosMessages
         .getString("shell_saros_configuration");
 
     protected final static String SHELL_ADD_XMPP_JABBER_ACCOUNT = SarosMessages
         .getString("shell_add_xmpp_jabber_account");
 
-    protected final static String SHELL_CHANGE_ACCOUNT = SarosMessages
-        .getString("shell_change_xmpp_account");
+    protected final static String SHELL_EDIT_XMPP_JABBER_ACCOUNT = SarosMessages
+        .getString("shell_edit_xmpp_jabber_account");
 
     protected final static String LABEL_XMPP_JABBER_ID = SarosMessages
         .getString("text_label_xmpp_jabber_id");
@@ -479,8 +479,8 @@ public class STF {
         .getString("cm_share_with");
     protected final static String CM_MULTIPLE_BUDDIES = SarosMessages
         .getString("cm_multiple_buddies");
-    protected final static String CM_SHARE_PROJECT = SarosMessages
-        .getString("cm_share_project");
+    // protected final static String CM_SHARE_PROJECT = SarosMessages
+    // .getString("cm_share_project");
     protected final static String CM_ADD_TO_SESSION = SarosMessages
         .getString("cm_add_to_session");
 

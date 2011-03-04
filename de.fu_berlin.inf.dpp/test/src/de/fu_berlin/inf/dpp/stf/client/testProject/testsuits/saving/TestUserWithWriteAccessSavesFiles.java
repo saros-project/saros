@@ -46,8 +46,8 @@ public class TestUserWithWriteAccessSavesFiles extends STFTest {
         /*
          * build session with bob, carl, dave and edna simultaneously
          */
-        buildSessionConcurrently(PROJECT1, CM_SHARE_PROJECT,
-            TypeOfCreateProject.NEW_PROJECT, alice, edna, bob, carl, dave);
+        buildSessionConcurrently(PROJECT1, TypeOfCreateProject.NEW_PROJECT,
+            alice, edna, bob, carl, dave);
         // alice.bot.waitUntilNoInvitationProgress();
         setFollowMode(alice, dave, edna);
         dave.sarosBot().views().sessionView().selectParticipant(alice.getJID())

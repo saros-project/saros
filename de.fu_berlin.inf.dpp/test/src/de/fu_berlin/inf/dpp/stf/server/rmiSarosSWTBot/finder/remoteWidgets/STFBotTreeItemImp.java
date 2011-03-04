@@ -50,11 +50,6 @@ public class STFBotTreeItemImp extends AbstractRmoteWidget implements
      * 
      **********************************************/
 
-    public STFBotMenu contextMenu(String text) throws RemoteException {
-        stfBotMenu.setWidget(widget.contextMenu(text));
-        return stfBotMenu;
-    }
-
     public STFBotMenu contextMenu(String... texts) throws RemoteException {
         stfBotMenu.setWidget(ContextMenuHelper
             .getContextMenu(swtBotTree, texts));

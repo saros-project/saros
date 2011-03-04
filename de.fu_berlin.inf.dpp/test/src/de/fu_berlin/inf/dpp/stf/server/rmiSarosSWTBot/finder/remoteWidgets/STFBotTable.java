@@ -10,7 +10,6 @@ public interface STFBotTable extends Remote {
      * states
      * 
      **********************************************/
-    public boolean existsTableItem(String itemText) throws RemoteException;
 
     public List<String> getTableColumns() throws RemoteException;
 

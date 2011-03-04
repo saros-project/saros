@@ -39,8 +39,8 @@ public class SarosPreferencesImp extends Component implements SarosPreferences {
         shell_preferences.bot()
             .buttonInGroup(GROUP_TITLE_CREATE_NEW_XMPP_JABBER_ACCOUNT).click();
 
-        bot().waitUntilShellIsOpen(SHELL_CREATE_NEW_XMPP_ACCOUNT);
-        STFBotShell shell = bot().shell(SHELL_CREATE_NEW_XMPP_ACCOUNT);
+        bot().waitUntilShellIsOpen(SHELL_CREATE_XMPP_JABBER_ACCOUNT);
+        STFBotShell shell = bot().shell(SHELL_CREATE_XMPP_JABBER_ACCOUNT);
         shell.activate();
         sarosBot().confirmShellCreateNewXMPPAccount(jid, password);
         shell.bot().button(NEXT).click();
@@ -81,8 +81,8 @@ public class SarosPreferencesImp extends Component implements SarosPreferences {
         bot().waitUntilShellIsClosed(SHELL_PREFERNCES);
     }
 
-    public void changeAccount(JID jid, String newUserName, String newPassword,
-        String newServer) throws RemoteException {
+    public void changeAccount(JID jid, String newXmppJabberID,
+        String newPassword) throws RemoteException {
         STFBotShell shell = preCondition();
         shell.bot().listInGroup(GeneralPreferencePage.ACCOUNT_GROUP_TITLE)
             .select(jid.getBase());
@@ -91,8 +91,7 @@ public class SarosPreferencesImp extends Component implements SarosPreferences {
             .bot()
             .buttonInGroup(GeneralPreferencePage.CHANGE_BTN_TEXT,
                 GeneralPreferencePage.ACCOUNT_GROUP_TITLE).click();
-        sarosBot().confirmShellChangeXMPPAccount(newServer, newUserName,
-            newPassword);
+        sarosBot().confirmShellChangeXMPPAccount(newXmppJabberID, newPassword);
         shell.bot().button(APPLY).click();
         shell.bot().button(OK).click();
         bot().waitUntilShellIsClosed(SHELL_PREFERNCES);

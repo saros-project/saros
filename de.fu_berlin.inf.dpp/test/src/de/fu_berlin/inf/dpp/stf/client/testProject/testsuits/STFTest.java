@@ -98,7 +98,7 @@ public class STFTest extends STF {
 
     /* test data for modifying account */
     public final static String SERVER = "saros-con.imp.fu-berlin.de";
-    public final static String NEW_USER_NAME = "new_alice_stf";
+    public final static String NEW_XMPP_JABBER_ID = "new_alice_stf@" + SERVER;
 
     public final static String REGISTERED_USER_NAME = "bob_stf";
 
@@ -111,11 +111,11 @@ public class STFTest extends STF {
     public final static JID JID_TO_ADD = new JID(
         ("bob_stf@" + SERVER + "/" + Saros.RESOURCE));
 
-    public final static JID JID_TO_CHANGE = new JID((NEW_USER_NAME + "@"
-        + SERVER + "/" + Saros.RESOURCE));
+    public final static JID JID_TO_CHANGE = new JID(
+        (NEW_XMPP_JABBER_ID + "/" + Saros.RESOURCE));
 
     public static String PASSWORD = "dddfffggg";
-    public static String NO_MATCHED_REPEAT_PASSWORD = "dd";
+    public static String NO_MATCHED_REPEAT_PASSWORD = "dddfffggggg";
 
     /* Project name */
     public static final String PROJECT1 = "Foo_Saros1";
@@ -163,6 +163,7 @@ public class STFTest extends STF {
     protected static final String SVN_REPOSITORY_URL = "http://saros-build.imp.fu-berlin.de/svn/saros";
     protected static final String SVN_PROJECT = "stf_test_project";
     protected static final String SVN_PROJECT_COPY = "copy_of_stf_test_project";
+    protected static final String SVN_SUFFIX = "[stf_test/stf_test_project]";
     protected static String SVN_PROJECT_PATH = getOS() == TypeOfOS.MAC ? "stf_tests/stf_test_project"
         : "/stf_tests/stf_test_project";
 
@@ -319,8 +320,8 @@ public class STFTest extends STF {
         throws RemoteException, InterruptedException {
         inviter.sarosBot().views().packageExplorerView().tree().newC()
             .javaProjectWithClasses(PROJECT1, PKG1, CLS1);
-        buildSessionConcurrently(PROJECT1, CM_SHARE_PROJECT,
-            TypeOfCreateProject.NEW_PROJECT, inviter, invitees);
+        buildSessionConcurrently(PROJECT1, TypeOfCreateProject.NEW_PROJECT,
+            inviter, invitees);
     }
 
     public static void setUpSessionWithJavaProjects(
@@ -515,7 +516,7 @@ public class STFTest extends STF {
         AbstractTester... invitees) throws RemoteException {
         if (!host.sarosBot().views().sessionView().isInSessionNoGUI()) {
             for (AbstractTester tester : invitees) {
-                buildSessionSequentially(PROJECT1, CM_SHARE_PROJECT,
+                buildSessionSequentially(PROJECT1,
                     TypeOfCreateProject.EXIST_PROJECT, host, tester);
             }
         }
@@ -567,9 +568,8 @@ public class STFTest extends STF {
     }
 
     public static void buildSessionSequentially(String projectName,
-        String howToShareProject, TypeOfCreateProject usingWhichProject,
-        AbstractTester inviter, AbstractTester... invitees)
-        throws RemoteException {
+        TypeOfCreateProject usingWhichProject, AbstractTester inviter,
+        AbstractTester... invitees) throws RemoteException {
         JID[] inviteesJID = getPeerJID(invitees);
         inviter.sarosBot().saros().shareProjects(projectName, inviteesJID);
         for (AbstractTester invitee : invitees) {
@@ -582,9 +582,9 @@ public class STFTest extends STF {
     // ********** Component, which consist of other simple functions ***********
 
     public static void buildSessionConcurrently(final String projectName,
-        String howToShareProject, final TypeOfCreateProject usingWhichProject,
-        AbstractTester inviter, AbstractTester... invitees)
-        throws RemoteException, InterruptedException {
+        final TypeOfCreateProject usingWhichProject, AbstractTester inviter,
+        AbstractTester... invitees) throws RemoteException,
+        InterruptedException {
 
         log.trace("alice.shareProjectParallel");
         inviter.sarosBot().saros()

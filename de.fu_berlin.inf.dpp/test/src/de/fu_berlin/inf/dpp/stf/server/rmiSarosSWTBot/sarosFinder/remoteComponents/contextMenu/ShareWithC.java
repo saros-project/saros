@@ -14,12 +14,13 @@ import de.fu_berlin.inf.dpp.stf.client.testProject.helpers.TestPattern;
  * as follows:
  * <ol>
  * <li>
- * At first you need to create a {@link AbstractTester} object in your junit-test. (How
- * to do it please look at the javadoc in class {@link TestPattern} or read the
- * user guide in TWiki https://www.inf.fu-berlin.de/w/SE/SarosSTFTests).</li>
+ * At first you need to create a {@link AbstractTester} object in your
+ * junit-test. (How to do it please look at the javadoc in class
+ * {@link TestPattern} or read the user guide in TWiki
+ * https://www.inf.fu-berlin.de/w/SE/SarosSTFTests).</li>
  * <li>
- * then you can use the object pEV initialized in {@link AbstractTester} to access the
- * API :), e.g.
+ * then you can use the object pEV initialized in {@link AbstractTester} to
+ * access the API :), e.g.
  * 
  * <pre>
  * alice.pEV.shareProject();
@@ -32,60 +33,43 @@ import de.fu_berlin.inf.dpp.stf.client.testProject.helpers.TestPattern;
 public interface ShareWithC extends Remote {
 
     /**
-     * Perform one of the actions "Share project",
-     * "Share project partially (experimental)..." and "Add to session
-     * (experimental)..." according to the passed parameter "howToShareProject"
-     * which should be activated by clicking the corresponding sub menu of the
-     * context menu "Saros" of the given project in the package explorer view.
-     * <p>
-     * <b>Attention:</b>
-     * <ol>
-     * <li>Makes sure, the package explorer view is open and active.</li>
-     * <li>The function should treat all the recursive following actions showed
-     * by host side, which are activated or indirectly activated by the clicking
-     * one of the sub menus . I mean, after clicking the sub menu e.g.
-     * "Share project" you need to treat the following popup window too.</li>
-     * 
-     * </ol>
-     * 
-     * 
-     * @param howToshareProject
-     *            with the parameter you can tell the method how to share your
-     *            project with "Share project",
-     *            "Share project partially (experimental)..." or "Add to session
-     *            (experimental)...".
-     * @param inviteeBaseJIDs
-     *            the base JIDs of the users with whom you want to share your
-     *            project.
-     * @throws RemoteException
-     * 
-     */
-    // public void shareProjectWith(String howToshareProject,
-    // String[] inviteeBaseJIDs) throws RemoteException;
-
-    /**
-     * Perform the action "Share project" which should be activated by clicking
-     * the corresponding sub menu "Share project" of the context menu "Saros" of
+     * Perform the action share project with multiple buddies which should be
+     * activated by clicking the contextMenu Share With-> multiple buddies of
      * the given project in the package explorer view.
      * <p>
      * <b>Attention:</b>
      * <ol>
      * <li>Makes sure, the package explorer view is open and active.</li>
-     * <li>The function should treat all the recursive following actions showed
-     * by host side, which are activated or indirectly activated by the clicking
-     * one of the sub menus . I mean, after clicking the sub menu
-     * "Share project" you need to treat the following popup window too.</li>
-     * 
+     * <li>The function treat also the event e.g. popUpWindow activated by
+     * clicking the contextMenut</li>
      * </ol>
-     * 
      * 
      * @param inviteeBaseJIDS
      *            the base JIDs of the users with whom you want to share your
      *            project.
      * @throws RemoteException
      * 
+     * @Deprecated
+     * 
+     *             FIXME: Can't click the contextMenu
      */
     public void multipleBuddies(String projectName, JID... inviteeBaseJIDS)
         throws RemoteException;
 
+    /**
+     * Perform the action share project with the given user which should be
+     * activated by clicking the contextMenu Share With-> [user's account] of
+     * the given project in the package explorer view.
+     * <p>
+     * <b>Attention:</b>
+     * <ol>
+     * <li>Makes sure, the package explorer view is open and active.</li>
+     * <li>The function treat also the event e.g. popUpWindow activated by
+     * clicking the contextMenut</li>
+     * </ol>
+     * 
+     * @param jid
+     * @throws RemoteException
+     */
+    public void buddy(JID jid) throws RemoteException;
 }

@@ -220,8 +220,8 @@ public class NewCImp extends Component implements NewC {
             .setText((projectName + "/" + SRC));
         shell.bot().textWithLabel(LABEL_NAME).setText(pkg);
         shell.bot().button(FINISH).click();
-        if (bot().isShellOpen(SHELL_CREATE_NEW_XMPP_ACCOUNT))
-            bot().waitUntilShellIsClosed(SHELL_CREATE_NEW_XMPP_ACCOUNT);
+        if (bot().isShellOpen(SHELL_CREATE_XMPP_JABBER_ACCOUNT))
+            bot().waitUntilShellIsClosed(SHELL_CREATE_XMPP_JABBER_ACCOUNT);
     }
 
     private void confirmShellNewFolder(String folderName)

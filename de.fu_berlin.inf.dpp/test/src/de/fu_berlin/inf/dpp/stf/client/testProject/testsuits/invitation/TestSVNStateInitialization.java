@@ -135,8 +135,20 @@ public class TestSVNStateInitialization extends STFTest {
      */
     @Test
     public void testSimpleCheckout() throws RemoteException {
-        buildSessionSequentially(SVN_PROJECT, CM_SHARE_PROJECT,
-            TypeOfCreateProject.NEW_PROJECT, alice, bob);
+
+        /**
+         * FIXME: by shareProjects Wizard there are tableItem need to be
+         * selected, which can not be found with regexText by SWTBot
+         */
+        // buildSessionSequentially(SVN_PROJECT,
+        // TypeOfCreateProject.NEW_PROJECT,
+        // alice, bob);
+
+        alice.sarosBot().views().packageExplorerView()
+            .selectJavaProject(SVN_PROJECT).shareWith().buddy(bob.getJID());
+        bob.sarosBot().confirmShellSessionInvitationAndAddProject(SVN_PROJECT,
+            TypeOfCreateProject.NEW_PROJECT);
+
         alice.sarosBot().views().sessionView()
             .waitUntilIsInviteeInSession(bob.sarosBot());
         assertTrue(bob.sarosBot().state().isProjectManagedBySVN(SVN_PROJECT));
@@ -174,8 +186,14 @@ public class TestSVNStateInitialization extends STFTest {
             .update(SVN_CLS1_REV1);
         assertEquals(SVN_CLS1_REV1,
             alice.sarosBot().state().getRevision(SVN_CLS1_FULL_PATH));
-        buildSessionSequentially(SVN_PROJECT, CM_SHARE_PROJECT,
-            TypeOfCreateProject.NEW_PROJECT, alice, bob);
+        // buildSessionSequentially(SVN_PROJECT,
+        // TypeOfCreateProject.NEW_PROJECT,
+        // alice, bob);
+        alice.sarosBot().views().packageExplorerView()
+            .selectJavaProject(SVN_PROJECT).shareWith().buddy(bob.getJID());
+        bob.sarosBot().confirmShellSessionInvitationAndAddProject(SVN_PROJECT,
+            TypeOfCreateProject.NEW_PROJECT);
+
         alice.sarosBot().views().sessionView()
             .waitUntilIsInviteeInSession(bob.sarosBot());
 
@@ -207,8 +225,14 @@ public class TestSVNStateInitialization extends STFTest {
         alice.noBot().switchResource(SVN_CLS1_FULL_PATH, SVN_CLS1_SWITCHED_URL);
         assertEquals(SVN_CLS1_SWITCHED_URL, alice.sarosBot().state()
             .getURLOfRemoteResource(SVN_CLS1_FULL_PATH));
-        buildSessionSequentially(SVN_PROJECT, CM_SHARE_PROJECT,
-            TypeOfCreateProject.NEW_PROJECT, alice, bob);
+        // buildSessionSequentially(SVN_PROJECT,
+        // TypeOfCreateProject.NEW_PROJECT,
+        // alice, bob);
+        alice.sarosBot().views().packageExplorerView()
+            .selectJavaProject(SVN_PROJECT).shareWith().buddy(bob.getJID());
+        bob.sarosBot().confirmShellSessionInvitationAndAddProject(SVN_PROJECT,
+            TypeOfCreateProject.NEW_PROJECT);
+
         alice.sarosBot().views().sessionView()
             .waitUntilIsInviteeInSession(bob.sarosBot());
         bob.sarosBot().views().sessionView().waitUntilIsInSession();
@@ -244,8 +268,14 @@ public class TestSVNStateInitialization extends STFTest {
             .getURLOfRemoteResource(SVN_CLS1_FULL_PATH));
         assertEquals(SVN_CLS1_REV3,
             alice.sarosBot().state().getRevision(SVN_CLS1_FULL_PATH));
-        buildSessionSequentially(SVN_PROJECT, CM_SHARE_PROJECT,
-            TypeOfCreateProject.NEW_PROJECT, alice, bob);
+        // buildSessionSequentially(SVN_PROJECT,
+        // TypeOfCreateProject.NEW_PROJECT,
+        // alice, bob);
+        alice.sarosBot().views().packageExplorerView()
+            .selectJavaProject(SVN_PROJECT).shareWith().buddy(bob.getJID());
+        bob.sarosBot().confirmShellSessionInvitationAndAddProject(SVN_PROJECT,
+            TypeOfCreateProject.NEW_PROJECT);
+
         alice.sarosBot().views().sessionView()
             .waitUntilIsInviteeInSession(bob.sarosBot());
         bob.sarosBot().views().sessionView().waitUntilIsInSession();
@@ -289,8 +319,14 @@ public class TestSVNStateInitialization extends STFTest {
             .getText();
         assertFalse(cls1_content_after.equals(cls1_content_before));
 
-        buildSessionSequentially(SVN_PROJECT, CM_SHARE_PROJECT,
-            TypeOfCreateProject.NEW_PROJECT, alice, bob);
+        // buildSessionSequentially(SVN_PROJECT,
+        // TypeOfCreateProject.NEW_PROJECT,
+        // alice, bob);
+        alice.sarosBot().views().packageExplorerView()
+            .selectJavaProject(SVN_PROJECT).shareWith().buddy(bob.getJID());
+        bob.sarosBot().confirmShellSessionInvitationAndAddProject(SVN_PROJECT,
+            TypeOfCreateProject.NEW_PROJECT);
+
         alice.sarosBot().views().sessionView()
             .waitUntilIsInviteeInSession(bob.sarosBot());
         bob.sarosBot().views().sessionView().waitUntilIsInSession();

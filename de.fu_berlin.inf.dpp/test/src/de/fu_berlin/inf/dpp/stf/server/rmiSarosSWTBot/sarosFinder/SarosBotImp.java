@@ -215,23 +215,21 @@ public class SarosBotImp extends STF implements SarosBot {
         }
     }
 
-    public void confirmShellChangeXMPPAccount(String newServer,
-        String newUserName, String newPassword) throws RemoteException {
-        bot().waitUntilShellIsOpen(SHELL_CHANGE_ACCOUNT);
-        STFBotShell shell = bot().shell(SHELL_CHANGE_ACCOUNT);
+    public void confirmShellChangeXMPPAccount(String xmppJabberID,
+        String newPassword) throws RemoteException {
+        bot().waitUntilShellIsOpen(SHELL_EDIT_XMPP_JABBER_ACCOUNT);
+        STFBotShell shell = bot().shell(SHELL_EDIT_XMPP_JABBER_ACCOUNT);
         shell.activate();
-        shell.bot().textWithLabel("Server").setText(newServer);
-        shell.bot().textWithLabel("Username:").setText(newUserName);
-        shell.bot().textWithLabel("Password:").setText(newPassword);
-        shell.bot().textWithLabel("Confirm:").setText(newPassword);
-
+        shell.bot().comboBoxWithLabel(LABEL_XMPP_JABBER_ID)
+            .setText(xmppJabberID);
+        shell.bot().textWithLabel(LABEL_PASSWORD).setText(newPassword);
         shell.bot().button(FINISH).click();
     }
 
     public void confirmShellCreateNewXMPPAccount(JID jid, String password)
         throws RemoteException {
-        bot().waitUntilShellIsOpen(SHELL_CREATE_NEW_XMPP_ACCOUNT);
-        STFBotShell shell = bot().shell(SHELL_CREATE_NEW_XMPP_ACCOUNT);
+        bot().waitUntilShellIsOpen(SHELL_CREATE_XMPP_JABBER_ACCOUNT);
+        STFBotShell shell = bot().shell(SHELL_CREATE_XMPP_JABBER_ACCOUNT);
         shell.activate();
         shell.bot().textWithLabel(LABEL_XMPP_JABBER_SERVER)
             .setText(jid.getDomain());
@@ -317,6 +315,7 @@ public class SarosBotImp extends STF implements SarosBot {
         }
         STFBotShell shell = bot().shell(SHELL_SHARE_PROJECT);
         shell.activate();
+
         shell.bot().table().getTableItem(projectName).check();
         shell.bot().button(NEXT).click();
         for (JID jid : jids) {

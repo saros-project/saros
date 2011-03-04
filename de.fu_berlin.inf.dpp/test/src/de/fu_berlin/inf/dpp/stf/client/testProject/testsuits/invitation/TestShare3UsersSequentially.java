@@ -29,8 +29,8 @@ public class TestShare3UsersSequentially extends STFTest {
         setUpSaros();
         alice.sarosBot().views().packageExplorerView().tree().newC()
             .javaProjectWithClasses(PROJECT1, PKG1, CLS1);
-        buildSessionSequentially(PROJECT1, CM_SHARE_PROJECT,
-            TypeOfCreateProject.NEW_PROJECT, alice, carl, bob);
+        buildSessionSequentially(PROJECT1, TypeOfCreateProject.NEW_PROJECT,
+            alice, carl, bob);
     }
 
     /**

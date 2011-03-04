@@ -51,8 +51,8 @@ public class TestConcurrentEditing extends STFTest {
         alice.bot().editor(FILE).setTexWithSave("test/STF/lorem.txt");
         alice.bot().editor(FILE).navigateTo(0, 6);
 
-        buildSessionSequentially(PROJECT1, CM_SHARE_PROJECT,
-            TypeOfCreateProject.NEW_PROJECT, alice, bob);
+        buildSessionSequentially(PROJECT1, TypeOfCreateProject.NEW_PROJECT,
+            alice, bob);
         bob.sarosBot().views().packageExplorerView().selectFile(path).open();
 
         bob.bot().waitUntilEditorOpen(FILE);
@@ -102,8 +102,8 @@ public class TestConcurrentEditing extends STFTest {
 
         alice.sarosBot().views().packageExplorerView().tree().newC()
             .javaProjectWithClasses(PROJECT1, PKG1, CLS1);
-        buildSessionConcurrently(PROJECT1, CM_SHARE_PROJECT,
-            TypeOfCreateProject.NEW_PROJECT, alice, bob);
+        buildSessionConcurrently(PROJECT1, TypeOfCreateProject.NEW_PROJECT,
+            alice, bob);
         bob.sarosBot().views().packageExplorerView()
             .selectClass(PROJECT1, PKG1, CLS1).open();
         bob.bot().editor(CLS1_SUFFIX).waitUntilIsActive();

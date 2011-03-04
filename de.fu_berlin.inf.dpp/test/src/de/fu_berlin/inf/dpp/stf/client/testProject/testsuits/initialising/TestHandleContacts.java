@@ -12,6 +12,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import de.fu_berlin.inf.dpp.stf.client.testProject.testsuits.STFTest;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotShell;
 
 public class TestHandleContacts extends STFTest {
 
@@ -158,38 +159,15 @@ public class TestHandleContacts extends STFTest {
         Map<String, String> labelsAndTexts = new HashMap<String, String>();
         labelsAndTexts.put("XMPP/Jabber ID", "bob@bla");
 
-        alice.bot().shell(SHELL_ADD_BUDDY)
-            .confirmWithTextFieldAndWait(labelsAndTexts, FINISH);
+        alice.bot().waitUntilShellIsOpen(SHELL_ADD_BUDDY);
+        STFBotShell shell = alice.bot().shell(SHELL_ADD_BUDDY);
+        shell.activate();
+        shell.bot().comboBoxWithLabel(LABEL_XMPP_JABBER_ID).setText("bob@bla");
+        shell.bot().button(FINISH).click();
         alice.bot().waitUntilShellIsOpen(SHELL_SERVER_NOT_FOUND);
         assertTrue(alice.bot().shell(SHELL_SERVER_NOT_FOUND).isActive());
         alice.bot().shell(SHELL_SERVER_NOT_FOUND).confirm(NO);
 
     }
 
-    /**
-     * Steps:
-     * <ol>
-     * <li>alice click toolbar button "Add a new contact".</li>
-     * <li>alice enter a existed contact name in the popup window "New contact"</li>
-     * </ol>
-     * 
-     * Result:
-     * <ol>
-     * <li>alice should get error message "Contact already added".</li>
-     * </ol>
-     * 
-     * @throws RemoteException
-     *             TODO: @Björn: how to access the warning message in a shell.
-     */
-    @Test
-    public void testAddExistedContact() throws RemoteException {
-        alice.bot().view(VIEW_SAROS_BUDDIES).toolbarButton(TB_ADD_A_NEW_BUDDY)
-            .click();
-        Map<String, String> labelsAndTexts = new HashMap<String, String>();
-        labelsAndTexts.put("XMPP/Jabber ID", bob.getBaseJid());
-        String label = "The buddy is already in your buddy list.Finishing the wizard will have no effect.";
-        assertTrue(alice.bot().shell(SHELL_ADD_BUDDY).getMessage()
-            .equals(label));
-
-    }
 }

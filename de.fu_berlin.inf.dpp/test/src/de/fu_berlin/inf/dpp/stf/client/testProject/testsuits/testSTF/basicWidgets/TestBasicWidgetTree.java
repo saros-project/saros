@@ -214,7 +214,7 @@ public class TestBasicWidgetTree extends STFTest {
     public void existsSubmenuOfContextOfTreeItemInView() throws RemoteException {
         alice.sarosBot().views().packageExplorerView().tree().newC()
             .javaProject(PROJECT1);
-        String[] contextNames = { CM_SHARE_WITH, CM_SHARE_PROJECT };
+        String[] contextNames = { MENU_NEW, MENU_PACKAGE };
         assertTrue(alice.bot().view(VIEW_PACKAGE_EXPLORER).bot().tree()
             .selectTreeItem(PROJECT1).existsContextMenu(contextNames));
 
@@ -233,19 +233,19 @@ public class TestBasicWidgetTree extends STFTest {
             .isContextMenuEnabled(CM_INVITE_BUDDY));
     }
 
-    @Test
-    public void isSubmenuOfContextOfTreeItemInViewEnabled()
-        throws RemoteException {
-        alice.sarosBot().views().packageExplorerView().tree().newC()
-            .javaProject(PROJECT1);
-        String[] contextNames1 = { CM_SHARE_WITH, CM_SHARE_PROJECT };
-        String[] contextNames2 = { CM_SHARE_WITH, CM_ADD_TO_SESSION };
-        assertTrue(alice.bot().view(VIEW_PACKAGE_EXPLORER).bot().tree()
-            .selectTreeItem(PROJECT1).isContextMenuEnabled(contextNames1));
-
-        assertFalse(alice.bot().view(VIEW_PACKAGE_EXPLORER).bot().tree()
-            .selectTreeItem(PROJECT1).isContextMenuEnabled(contextNames2));
-    }
+    // @Test
+    // public void isSubmenuOfContextOfTreeItemInViewEnabled()
+    // throws RemoteException {
+    // alice.sarosBot().views().packageExplorerView().tree().newC()
+    // .javaProject(PROJECT1);
+    // String[] contextNames1 = { CM_SHARE_WITH, CM_SHARE_PROJECT };
+    // String[] contextNames2 = { CM_SHARE_WITH, CM_ADD_TO_SESSION };
+    // assertTrue(alice.bot().view(VIEW_PACKAGE_EXPLORER).bot().tree()
+    // .selectTreeItem(PROJECT1).isContextMenuEnabled(contextNames1));
+    //
+    // assertFalse(alice.bot().view(VIEW_PACKAGE_EXPLORER).bot().tree()
+    // .selectTreeItem(PROJECT1).isContextMenuEnabled(contextNames2));
+    // }
 
     @Test
     public void clickContextsOfTreeItemInView() throws RemoteException {
@@ -263,10 +263,10 @@ public class TestBasicWidgetTree extends STFTest {
             .javaProject(PROJECT1);
 
         alice.bot().view(VIEW_PACKAGE_EXPLORER).bot().tree()
-            .selectTreeItem(PROJECT1)
-            .contextMenu(CM_SHARE_WITH, CM_SHARE_PROJECT).click();
+            .selectTreeItem(PROJECT1).contextMenu(MENU_NEW, MENU_PACKAGE)
+            .click();
 
-        alice.bot().waitUntilShellIsOpen(SHELL_INVITATION);
-        assertTrue(alice.bot().shell(SHELL_INVITATION).activate());
+        alice.bot().waitUntilShellIsOpen(SHELL_NEW_JAVA_PACKAGE);
+        assertTrue(alice.bot().shell(SHELL_NEW_JAVA_PACKAGE).activate());
     }
 }

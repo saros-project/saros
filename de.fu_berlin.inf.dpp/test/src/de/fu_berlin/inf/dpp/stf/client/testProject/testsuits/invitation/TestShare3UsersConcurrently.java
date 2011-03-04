@@ -32,8 +32,8 @@ public class TestShare3UsersConcurrently extends STFTest {
         setUpSaros();
         alice.sarosBot().views().packageExplorerView().tree().newC()
             .javaProjectWithClasses(PROJECT1, PKG1, CLS1);
-        buildSessionConcurrently(PROJECT1, CM_SHARE_PROJECT,
-            TypeOfCreateProject.NEW_PROJECT, alice, bob, carl);
+        buildSessionConcurrently(PROJECT1, TypeOfCreateProject.NEW_PROJECT,
+            alice, bob, carl);
     }
 
     /**

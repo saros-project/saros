@@ -38,12 +38,6 @@ public class ShareWithCImp extends Component implements ShareWithC {
      * 
      **********************************************/
 
-    // public void shareProjectWith(String howToshareProject,
-    // String[] baseJIDOfInvitees) throws RemoteException {
-    // treeItem.contextMenu(CM_SHARE_WITH, howToshareProject).click();
-    // sarosBot().confirmShellInvitation(baseJIDOfInvitees);
-    // }
-
     /**
      * FIXME can not click the context menu.
      */
@@ -52,4 +46,20 @@ public class ShareWithCImp extends Component implements ShareWithC {
         treeItem.contextMenu(CM_SHARE_WITH, CM_MULTIPLE_BUDDIES).click();
         sarosBot().confirmWizardShareProject(projectName, baseJIDOfInvitees);
     }
+
+    public void buddy(JID jid) throws RemoteException {
+        treeItem.contextMenu(CM_SHARE_WITH, jid.getBase()).click();
+    }
+
+    public void addToSarosSession() throws RemoteException {
+        /*
+         * The menu is only activated if there are project existed in the
+         * package explorer view, which is not in the session.
+         */
+    }
+
+    public void stopToSarosSession() throws RemoteException {
+        //
+    }
+
 }

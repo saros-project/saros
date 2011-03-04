@@ -53,8 +53,8 @@ public class TestShareProjectUsingExistingProject extends STFTest {
             .selectPkg(PROJECT1, PKG1).existsWithRegex(CLS1_SUFFIX));
         assertTrue(bob.sarosBot().views().packageExplorerView()
             .selectPkg(PROJECT1, PKG1).existsWithRegex(CLS2));
-        buildSessionSequentially(PROJECT1, CM_SHARE_PROJECT,
-            TypeOfCreateProject.EXIST_PROJECT, alice, bob);
+        buildSessionSequentially(PROJECT1, TypeOfCreateProject.EXIST_PROJECT,
+            alice, bob);
         bob.sarosBot().condition().waitUntilClassExists(PROJECT1, PKG1, CLS1);
         assertTrue(bob.sarosBot().views().packageExplorerView()
             .selectPkg(PROJECT1, PKG1).existsWithRegex(CLS1));
@@ -73,7 +73,6 @@ public class TestShareProjectUsingExistingProject extends STFTest {
         buildSessionSequentially(
 
             PROJECT1,
-            CM_SHARE_PROJECT,
             TypeOfCreateProject.EXIST_PROJECT_WITH_COPY_AFTER_CANCEL_LOCAL_CHANGE,
             alice, bob);
         // assertTrue(bob.sarosC.isWIndowSessionInvitationActive());
@@ -94,7 +93,7 @@ public class TestShareProjectUsingExistingProject extends STFTest {
     @Test
     public void testShareProjectUsingExistingProjectWithCopy()
         throws RemoteException {
-        buildSessionSequentially(PROJECT1, CM_SHARE_PROJECT,
+        buildSessionSequentially(PROJECT1,
             TypeOfCreateProject.EXIST_PROJECT_WITH_COPY, alice, bob);
         assertTrue(bob.sarosBot().views().packageExplorerView().tree()
             .existsWithRegex(PROJECT1));

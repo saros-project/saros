@@ -31,10 +31,10 @@ public interface SarosBot extends Remote {
     public void setJID(JID jid) throws RemoteException;
 
     /**
-     * After the {@link ShareWithC#confirmShellAddBuddyToSession(String...)} the popup
-     * wizard with the title "Session Invitation" should be appeared by the
-     * invitees' side. This method confirm the wizard "Session Invitation" using
-     * a new project.
+     * After the {@link ShareWithC#confirmShellAddBuddyToSession(String...)} the
+     * popup wizard with the title "Session Invitation" should be appeared by
+     * the invitees' side. This method confirm the wizard "Session Invitation"
+     * using a new project.
      * 
      * @throws RemoteException
      */
@@ -42,10 +42,10 @@ public interface SarosBot extends Remote {
         throws RemoteException;
 
     /**
-     * After the {@link ShareWithC#confirmShellAddBuddyToSession(String...)} the popup
-     * wizard with the title "Session Invitation" should be appeared by the
-     * invitees' side. This method confirm the wizard "Session Invitation" using
-     * a exist project.
+     * After the {@link ShareWithC#confirmShellAddBuddyToSession(String...)} the
+     * popup wizard with the title "Session Invitation" should be appeared by
+     * the invitees' side. This method confirm the wizard "Session Invitation"
+     * using a exist project.
      * 
      * @throws RemoteException
      */
@@ -53,11 +53,11 @@ public interface SarosBot extends Remote {
         throws RemoteException;
 
     /**
-     * After the {@link ShareWithC#confirmShellAddBuddyToSession(String...)} the popup
-     * wizard with the title "Session Invitation" should be appeared by the
-     * invitees' side. This method confirm the wizard "Session Invitation" using
-     * a exist project with clicking the button browser->confirming popup window
-     * -> clicking the button "finish" -> conforming the local change
+     * After the {@link ShareWithC#confirmShellAddBuddyToSession(String...)} the
+     * popup wizard with the title "Session Invitation" should be appeared by
+     * the invitees' side. This method confirm the wizard "Session Invitation"
+     * using a exist project with clicking the button browser->confirming popup
+     * window -> clicking the button "finish" -> conforming the local change
      * 
      * @throws RemoteException
      */
@@ -65,10 +65,10 @@ public interface SarosBot extends Remote {
         String projectName) throws RemoteException;
 
     /**
-     * After the {@link ShareWithC#confirmShellAddBuddyToSession(String...)} the popup
-     * wizard with the title "Session Invitation" should be appeared by the
-     * invitees' side. This method confirm the wizard "Session Invitation" using
-     * a exist project with copy
+     * After the {@link ShareWithC#confirmShellAddBuddyToSession(String...)} the
+     * popup wizard with the title "Session Invitation" should be appeared by
+     * the invitees' side. This method confirm the wizard "Session Invitation"
+     * using a exist project with copy
      * 
      * @throws RemoteException
      */
@@ -76,10 +76,10 @@ public interface SarosBot extends Remote {
         String projectName) throws RemoteException;
 
     /**
-     * After the {@link ShareWithC#confirmShellAddBuddyToSession(String...)} the popup
-     * wizard with the title "Session Invitation" should be appeared by the
-     * invitees' side. This method confirm the wizard "Session Invitation" using
-     * a new project or a existed project according the passed parameter
+     * After the {@link ShareWithC#confirmShellAddBuddyToSession(String...)} the
+     * popup wizard with the title "Session Invitation" should be appeared by
+     * the invitees' side. This method confirm the wizard "Session Invitation"
+     * using a new project or a existed project according the passed parameter
      * "usingWhichProject".
      * 
      * @throws RemoteException
@@ -87,8 +87,8 @@ public interface SarosBot extends Remote {
     public void confirmShellAddProjectUsingWhichProject(String projectName,
         TypeOfCreateProject usingWhichProject) throws RemoteException;
 
-    public void confirmShellChangeXMPPAccount(String newServer,
-        String newUserName, String newPassword) throws RemoteException;
+    public void confirmShellChangeXMPPAccount(String xmppJabberID,
+        String newPassword) throws RemoteException;
 
     /**
      * Confirm the popUp window "create new XMPP account".
@@ -139,7 +139,8 @@ public interface SarosBot extends Remote {
      * This popup window should be appeared by you, after someone else deleted
      * your contact from his buddies.
      * 
-     * This method should be called by {@link AbstractTester#deleteBuddyGUIDone(AbstractTester)}
+     * This method should be called by
+     * {@link AbstractTester#deleteBuddyGUIDone(AbstractTester)}
      * 
      * @throws RemoteException
      */

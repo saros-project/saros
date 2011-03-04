@@ -33,7 +33,7 @@ public class TestBasicWidgetsTable extends STFTest {
         STFBotView view = alice.bot().view(VIEW_SAROS_SESSION);
         view.show();
 
-        assertTrue(view.bot().table().existsTableItem(OWN_PARTICIPANT_NAME));
+        assertTrue(view.bot().table().containsItem(OWN_PARTICIPANT_NAME));
     }
 
     @Test
@@ -83,5 +83,6 @@ public class TestBasicWidgetsTable extends STFTest {
             .contextMenu(CM_RESTRICT_TO_READ_ONLY_ACCESS).isEnabled());
         assertFalse(view.bot().table().getTableItem(bob.getBaseJid())
             .contextMenu(CM_CHANGE_COLOR).isEnabled());
+
     }
 }

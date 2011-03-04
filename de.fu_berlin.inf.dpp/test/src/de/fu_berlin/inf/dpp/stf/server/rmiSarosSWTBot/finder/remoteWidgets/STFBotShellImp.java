@@ -223,7 +223,7 @@ public class STFBotShellImp extends AbstractRmoteWidget implements STFBotShell {
 
     public boolean existsTableItem(String label) throws RemoteException {
         activate();
-        return bot().table().existsTableItem(label);
+        return bot().table().containsItem(label);
     }
 
     /**********************************************
