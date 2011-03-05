@@ -7,7 +7,6 @@ import java.rmi.RemoteException;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.STFBot;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.STFWorkbenchBot;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.noFinder.NoBot;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.SuperBot;
 
 /**
@@ -71,8 +70,6 @@ public abstract class AbstractTester {
      */
     public abstract STFWorkbenchBot bot();
 
-    public abstract NoBot noBot();
-
     /**
      * 
      * @return the super {@link SuperBot}, which encapsulate some often used
@@ -80,6 +77,6 @@ public abstract class AbstractTester {
      *         also done with {@link STFBot}
      * @throws RemoteException
      */
-    public abstract SuperBot sarosBot() throws RemoteException;
+    public abstract SuperBot superBot() throws RemoteException;
 
 }

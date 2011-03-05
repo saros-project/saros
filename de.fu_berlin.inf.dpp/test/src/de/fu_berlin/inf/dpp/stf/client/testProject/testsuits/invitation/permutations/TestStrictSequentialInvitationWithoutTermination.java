@@ -30,17 +30,17 @@ public class TestStrictSequentialInvitationWithoutTermination extends STFTest {
         initTesters(TypeOfTester.ALICE, TypeOfTester.BOB, TypeOfTester.CARL);
         setUpWorkbench();
         setUpSaros();
-        alice.sarosBot().views().packageExplorerView().tree().newC()
+        alice.superBot().views().packageExplorerView().tree().newC()
             .javaProjectWithClasses(PROJECT1, PKG1, CLS1);
     }
 
     @After
     public void runAfterEveryTest() throws RemoteException {
-        carl.sarosBot().menuBar().window()
+        carl.superBot().menuBar().window()
             .setNewTextFileLineDelimiter("Default");
-        bob.sarosBot().menuBar().window()
+        bob.superBot().menuBar().window()
             .setNewTextFileLineDelimiter("Default");
-        alice.sarosBot().menuBar().window()
+        alice.superBot().menuBar().window()
             .setNewTextFileLineDelimiter("Default");
     }
 
@@ -72,16 +72,16 @@ public class TestStrictSequentialInvitationWithoutTermination extends STFTest {
     @Test
     public void testSetLineDelimiter() throws RemoteException,
         InterruptedException {
-        alice.sarosBot().menuBar().window().setNewTextFileLineDelimiter("Unix");
+        alice.superBot().menuBar().window().setNewTextFileLineDelimiter("Unix");
 
         buildSessionSequentially(PROJECT1, TypeOfCreateProject.NEW_PROJECT,
             carl, alice, bob);
 
-        String delimiterByAlice = alice.sarosBot().menuBar().window()
+        String delimiterByAlice = alice.superBot().menuBar().window()
             .getTextFileLineDelimiter();
-        String delimiterByCarl = carl.sarosBot().menuBar().window()
+        String delimiterByCarl = carl.superBot().menuBar().window()
             .getTextFileLineDelimiter();
-        String delimiterByBob = bob.sarosBot().menuBar().window()
+        String delimiterByBob = bob.superBot().menuBar().window()
             .getTextFileLineDelimiter();
 
         log.debug("delimiter by alice: " + delimiterByAlice

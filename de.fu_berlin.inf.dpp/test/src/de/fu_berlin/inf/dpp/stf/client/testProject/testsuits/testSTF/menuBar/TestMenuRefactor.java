@@ -32,101 +32,101 @@ public class TestMenuRefactor extends STFTest {
      **********************************************/
     @Test
     public void testMoveClassTo() throws RemoteException {
-        alice.sarosBot().views().packageExplorerView().tree().newC()
+        alice.superBot().views().packageExplorerView().tree().newC()
             .javaProject(PROJECT1);
-        alice.sarosBot().views().packageExplorerView().tree().newC()
+        alice.superBot().views().packageExplorerView().tree().newC()
             .cls(PROJECT1, PKG1, CLS1);
-        alice.sarosBot().views().packageExplorerView().tree().newC()
+        alice.superBot().views().packageExplorerView().tree().newC()
             .pkg(PROJECT1, PKG2);
-        alice.sarosBot().views().packageExplorerView()
+        alice.superBot().views().packageExplorerView()
             .selectClass(PROJECT1, PKG1, CLS1).refactor()
             .moveClassTo(PROJECT1, PKG2);
-        assertFalse(alice.sarosBot().views().packageExplorerView()
+        assertFalse(alice.superBot().views().packageExplorerView()
             .selectPkg(PROJECT1, PKG1).exists(CLS1_SUFFIX));
 
-        assertTrue(alice.sarosBot().views().packageExplorerView()
+        assertTrue(alice.superBot().views().packageExplorerView()
             .selectPkg(PROJECT1, PKG2).exists(CLS1_SUFFIX));
     }
 
     @Test
     public void testRenameClass() throws RemoteException {
-        alice.sarosBot().views().packageExplorerView().tree().newC()
+        alice.superBot().views().packageExplorerView().tree().newC()
             .javaProject(PROJECT1);
-        alice.sarosBot().views().packageExplorerView().tree().newC()
+        alice.superBot().views().packageExplorerView().tree().newC()
             .cls(PROJECT1, PKG1, CLS1);
-        alice.sarosBot().views().packageExplorerView()
+        alice.superBot().views().packageExplorerView()
             .selectClass(PROJECT1, PKG1, CLS1).refactor().rename(CLS2);
 
-        assertFalse(alice.sarosBot().views().packageExplorerView()
+        assertFalse(alice.superBot().views().packageExplorerView()
             .selectPkg(PROJECT1, PKG1).exists(CLS1_SUFFIX));
-        assertTrue(alice.sarosBot().views().packageExplorerView()
+        assertTrue(alice.superBot().views().packageExplorerView()
             .selectPkg(PROJECT1, PKG1).exists(CLS2_SUFFIX));
     }
 
     @Test
     public void testRenameFile() throws RemoteException {
-        alice.sarosBot().views().packageExplorerView().tree().newC()
+        alice.superBot().views().packageExplorerView().tree().newC()
             .project(PROJECT1);
-        alice.sarosBot().views().packageExplorerView().selectProject(PROJECT1)
+        alice.superBot().views().packageExplorerView().selectProject(PROJECT1)
             .newC().folder(FOLDER1);
-        alice.sarosBot().views().packageExplorerView()
+        alice.superBot().views().packageExplorerView()
             .selectFolder(PROJECT1, FOLDER1).newC().file(FILE1);
-        alice.sarosBot().views().packageExplorerView()
+        alice.superBot().views().packageExplorerView()
             .selectFile(PROJECT1, FOLDER1, FILE1).refactor().rename(FILE2);
 
-        assertFalse(alice.sarosBot().views().packageExplorerView()
+        assertFalse(alice.superBot().views().packageExplorerView()
             .selectFolder(PROJECT1, FOLDER1).exists(FILE1));
-        assertTrue(alice.sarosBot().views().packageExplorerView()
+        assertTrue(alice.superBot().views().packageExplorerView()
             .selectFolder(PROJECT1, FOLDER1).exists(FILE2));
     }
 
     @Test
     public void testRenameFolder() throws RemoteException {
-        alice.sarosBot().views().packageExplorerView().tree().newC()
+        alice.superBot().views().packageExplorerView().tree().newC()
             .project(PROJECT1);
-        alice.sarosBot().views().packageExplorerView().selectProject(PROJECT1)
+        alice.superBot().views().packageExplorerView().selectProject(PROJECT1)
             .newC().folder(FOLDER1);
-        alice.sarosBot().views().packageExplorerView()
+        alice.superBot().views().packageExplorerView()
             .selectFolder(PROJECT1, FOLDER1).refactor().rename(FOLDER2);
 
-        assertFalse(alice.sarosBot().views().packageExplorerView()
+        assertFalse(alice.superBot().views().packageExplorerView()
             .selectProject(PROJECT1).exists(FOLDER1));
-        assertTrue(alice.sarosBot().views().packageExplorerView()
+        assertTrue(alice.superBot().views().packageExplorerView()
             .selectProject(PROJECT1).exists(FOLDER2));
     }
 
     @Test
     public void testRenamePackage() throws RemoteException {
-        alice.sarosBot().views().packageExplorerView().tree().newC()
+        alice.superBot().views().packageExplorerView().tree().newC()
             .javaProject(PROJECT1);
-        alice.sarosBot().views().packageExplorerView().tree().newC()
+        alice.superBot().views().packageExplorerView().tree().newC()
             .pkg(PROJECT1, PKG1);
-        alice.sarosBot().views().packageExplorerView()
+        alice.superBot().views().packageExplorerView()
             .selectPkg(PROJECT1, PKG1).refactor().rename(PKG2);
 
         alice.bot().sleep(500);
-        assertFalse(alice.sarosBot().views().packageExplorerView()
+        assertFalse(alice.superBot().views().packageExplorerView()
             .selectProject(PROJECT1).exists(PKG1));
-        assertTrue(alice.sarosBot().views().packageExplorerView()
+        assertTrue(alice.superBot().views().packageExplorerView()
             .selectSrc(PROJECT1).exists(PKG2));
     }
 
     @Test
     @Ignore("need to fix")
     public void testShareProjectWithSVN() throws RemoteException {
-        alice.sarosBot().views().packageExplorerView().tree().newC()
+        alice.superBot().views().packageExplorerView().tree().newC()
             .javaProject(PROJECT1);
-        assertFalse(alice.sarosBot().views().packageExplorerView()
+        assertFalse(alice.superBot().views().packageExplorerView()
             .isProjectManagedBySVN(PROJECT1));
         alice
-            .sarosBot()
+            .superBot()
             .views()
             .packageExplorerView()
             .selectProject(PROJECT1)
             .team()
             .shareProjectUsingSpecifiedFolderName(SVN_REPOSITORY_URL,
                 SVN_PROJECT_PATH);
-        assertTrue(alice.sarosBot().views().packageExplorerView()
+        assertTrue(alice.superBot().views().packageExplorerView()
             .isProjectManagedBySVN(PROJECT1));
     }
 
@@ -135,19 +135,19 @@ public class TestMenuRefactor extends STFTest {
      */
     @Test
     public void testRenameProject() throws Exception {
-        alice.sarosBot().views().packageExplorerView().tree().newC()
+        alice.superBot().views().packageExplorerView().tree().newC()
             .javaProject(PROJECT1);
 
-        assertTrue(alice.sarosBot().views().packageExplorerView().tree()
+        assertTrue(alice.superBot().views().packageExplorerView().tree()
             .exists(PROJECT1));
-        assertFalse(alice.sarosBot().views().packageExplorerView().tree()
+        assertFalse(alice.superBot().views().packageExplorerView().tree()
             .exists(PROJECT2));
-        alice.sarosBot().views().packageExplorerView()
+        alice.superBot().views().packageExplorerView()
             .selectJavaProject(PROJECT1).refactor().rename(PROJECT2);
 
-        assertFalse(alice.sarosBot().views().packageExplorerView().tree()
+        assertFalse(alice.superBot().views().packageExplorerView().tree()
             .exists(PROJECT1));
-        assertTrue(alice.sarosBot().views().packageExplorerView().tree()
+        assertTrue(alice.superBot().views().packageExplorerView().tree()
             .exists(PROJECT2));
     }
 }

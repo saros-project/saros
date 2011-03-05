@@ -44,7 +44,6 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBo
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotTreeItemImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotViewImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotViewMenuImp;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.noFinder.NoBotImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.SuperBotImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.Component;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.contextMenu.ContextMenuWrapperImp;
@@ -109,10 +108,9 @@ public class STFController {
         /*
          * bots' family
          */
-        exportObject(STFBotImp.getInstance(), "stfBot");
-        exportObject(STFWorkbenchBotImp.getInstance(), "bot");
-        exportObject(NoBotImp.getInstance(), "noBot");
-        exportObject(SuperBotImp.getInstance(), "sarosBot");
+        exportObject(STFBotImp.getInstance(), "bot");
+        exportObject(STFWorkbenchBotImp.getInstance(), "workbenchBot");
+        exportObject(SuperBotImp.getInstance(), "superBot");
 
         /*
          * export remoteWidgets

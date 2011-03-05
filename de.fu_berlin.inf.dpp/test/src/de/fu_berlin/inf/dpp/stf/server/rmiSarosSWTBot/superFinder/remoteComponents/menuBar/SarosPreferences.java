@@ -3,6 +3,7 @@ package de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteCompone
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 
+import de.fu_berlin.inf.dpp.feedback.FeedbackManager;
 import de.fu_berlin.inf.dpp.net.JID;
 
 public interface SarosPreferences extends Remote {
@@ -168,5 +169,16 @@ public interface SarosPreferences extends Remote {
      * @throws RemoteException
      */
     public boolean existsAccount(JID jid) throws RemoteException;
+
+    /**
+     * Set feeback disabled without GUI.<br/>
+     * To simplify Testing you can disable the automatic reminder, so that you
+     * will never get the feedback popup window.
+     * 
+     * @see FeedbackManager#setFeedbackDisabled(boolean)
+     * 
+     * @throws RemoteException
+     */
+    public void disableAutomaticReminderNoGUI() throws RemoteException;
 
 }

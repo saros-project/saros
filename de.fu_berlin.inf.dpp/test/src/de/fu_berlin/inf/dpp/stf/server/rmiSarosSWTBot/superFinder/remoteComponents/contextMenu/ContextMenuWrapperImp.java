@@ -158,19 +158,6 @@ public class ContextMenuWrapperImp extends Component implements
         }
     }
 
-    // public void deleteAllProjects() throws RemoteException {
-    // List<String> allTreeItems = tree.getTextOfItems();
-    // if (allTreeItems != null) {
-    // for (String item : allTreeItems) {
-    // tree.selectTreeItem(item).contextMenu(MENU_DELETE).click();
-    // STFBotShell shell = bot().shell(SHELL_DELETE_RESOURCE);
-    //
-    // shell.confirmWithCheckBox(OK, true);
-    // bot().waitUntilShellIsClosed(SHELL_DELETE_RESOURCE);
-    // }
-    // }
-    // }
-
     public List<String> getTextOfTreeItems() throws RemoteException {
         if (treeItem == null) {
             return tree.getTextOfItems();
@@ -179,13 +166,4 @@ public class ContextMenuWrapperImp extends Component implements
         }
     }
 
-    // public void deleteAllItems() throws RemoteException {
-    // for (String text : treeItem.getTextOfItems()) {
-    // treeItem.select(text).contextMenu(CM_DELETE).click();
-    // bot().waitUntilShellIsOpen(CONFIRM_DELETE);
-    // bot().shell(CONFIRM_DELETE).activate();
-    // bot().shell(CONFIRM_DELETE).bot().button(OK).click();
-    // bot().sleep(500);
-    // }
-    // }
 }

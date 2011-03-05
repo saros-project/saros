@@ -55,14 +55,14 @@ public class TestHandleContacts extends STFTest {
      */
     @Test
     public void testBobRemoveBuddyAlice() throws RemoteException {
-        assertTrue(alice.sarosBot().views().buddiesView()
+        assertTrue(alice.superBot().views().buddiesView()
             .hasBuddy(bob.getJID()));
-        assertTrue(bob.sarosBot().views().buddiesView()
+        assertTrue(bob.superBot().views().buddiesView()
             .hasBuddy(alice.getJID()));
         deleteBuddies(bob, alice);
-        assertFalse(bob.sarosBot().views().buddiesView()
+        assertFalse(bob.superBot().views().buddiesView()
             .hasBuddy(alice.getJID()));
-        assertFalse(alice.sarosBot().views().buddiesView()
+        assertFalse(alice.superBot().views().buddiesView()
             .hasBuddy(bob.getJID()));
     }
 
@@ -81,14 +81,14 @@ public class TestHandleContacts extends STFTest {
      */
     @Test
     public void testAliceRemoveBuddyBob() throws RemoteException {
-        assertTrue(alice.sarosBot().views().buddiesView()
+        assertTrue(alice.superBot().views().buddiesView()
             .hasBuddy(bob.getJID()));
-        assertTrue(bob.sarosBot().views().buddiesView()
+        assertTrue(bob.superBot().views().buddiesView()
             .hasBuddy(alice.getJID()));
         deleteBuddies(alice, bob);
-        assertFalse(bob.sarosBot().views().buddiesView()
+        assertFalse(bob.superBot().views().buddiesView()
             .hasBuddy(alice.getJID()));
-        assertFalse(alice.sarosBot().views().buddiesView()
+        assertFalse(alice.superBot().views().buddiesView()
             .hasBuddy(bob.getJID()));
     }
 
@@ -109,9 +109,9 @@ public class TestHandleContacts extends STFTest {
     public void testAliceAddBuddyBob() throws RemoteException {
         deleteBuddies(alice, bob);
         addBuddies(alice, bob);
-        assertTrue(bob.sarosBot().views().buddiesView()
+        assertTrue(bob.superBot().views().buddiesView()
             .hasBuddy(alice.getJID()));
-        assertTrue(alice.sarosBot().views().buddiesView()
+        assertTrue(alice.superBot().views().buddiesView()
             .hasBuddy(bob.getJID()));
     }
 
@@ -132,9 +132,9 @@ public class TestHandleContacts extends STFTest {
     public void testBobAddBuddyAlice() throws RemoteException {
         deleteBuddies(bob, alice);
         addBuddies(bob, alice);
-        assertTrue(bob.sarosBot().views().buddiesView()
+        assertTrue(bob.superBot().views().buddiesView()
             .hasBuddy(alice.getJID()));
-        assertTrue(alice.sarosBot().views().buddiesView()
+        assertTrue(alice.superBot().views().buddiesView()
             .hasBuddy(bob.getJID()));
     }
 

@@ -34,9 +34,9 @@ public class TestHostInvitesBelatedly extends STFTest {
         initTesters(TypeOfTester.ALICE, TypeOfTester.BOB, TypeOfTester.CARL);
         setUpWorkbench();
         setUpSaros();
-        alice.sarosBot().views().packageExplorerView().tree().newC()
+        alice.superBot().views().packageExplorerView().tree().newC()
             .javaProjectWithClasses(PROJECT1, PKG1, CLS1, CLS2);
-        bob.sarosBot().views().packageExplorerView().tree().newC()
+        bob.superBot().views().packageExplorerView().tree().newC()
             .javaProjectWithClasses(PROJECT1, PKG1, CLS1, CLS2);
 
         /*
@@ -78,23 +78,23 @@ public class TestHostInvitesBelatedly extends STFTest {
     @Test
     public void testFollowModeByOpenClassbyAlice() throws IOException,
         CoreException, InterruptedException {
-        alice.sarosBot().views().packageExplorerView()
+        alice.superBot().views().packageExplorerView()
             .selectClass(PROJECT1, PKG1, CLS1).open();
         alice.bot().editor(CLS1_SUFFIX).setTextWithoutSave(CP1);
         String dirtyContent1ByAlice = alice.bot().editor(CLS1_SUFFIX).getText();
 
-        bob.sarosBot().views().packageExplorerView()
+        bob.superBot().views().packageExplorerView()
             .selectClass(PROJECT1, PKG1, CLS1).open();
 
         bob.bot().editor(CLS1_SUFFIX).setTexWithSave(CP1_CHANGE);
 
-        alice.sarosBot().views().packageExplorerView()
+        alice.superBot().views().packageExplorerView()
             .selectClass(PROJECT1, PKG1, CLS2).open();
 
         alice.bot().editor(CLS2_SUFFIX).setTextWithoutSave(CP2);
         String dirtyContent2ByAlice = alice.bot().editor(CLS2_SUFFIX).getText();
 
-        bob.sarosBot().views().packageExplorerView()
+        bob.superBot().views().packageExplorerView()
             .selectClass(PROJECT1, PKG1, CLS2).open();
 
         bob.bot().editor(CLS2_SUFFIX).setTextWithoutSave(CP2_CHANGE);

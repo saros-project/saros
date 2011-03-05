@@ -24,7 +24,7 @@ public class TestMenuSaros extends STFTest {
 
     @Test
     public void testShareProjectsWithBot() throws RemoteException {
-        alice.sarosBot().views().packageExplorerView().tree().newC()
+        alice.superBot().views().packageExplorerView().tree().newC()
             .javaProject(PROJECT1);
         alice.bot().menu(MENU_SAROS).menu(MENU_SHARE_PROJECTS).click();
         if (!alice.bot().isShellOpen(SHELL_SHARE_PROJECT)) {
@@ -40,24 +40,24 @@ public class TestMenuSaros extends STFTest {
         STFBotShell shell2 = bob.bot().shell(SHELL_SESSION_INVITATION);
         shell2.activate();
         shell2.bot().shell(SHELL_SESSION_INVITATION).confirm(FINISH);
-        bob.sarosBot().confirmShellAddProjectUsingWhichProject(PROJECT1,
+        bob.superBot().confirmShellAddProjectUsingWhichProject(PROJECT1,
             TypeOfCreateProject.NEW_PROJECT);
-        bob.sarosBot().views().sessionView().waitUntilIsInSession();
+        bob.superBot().views().sessionView().waitUntilIsInSession();
     }
 
     @Test
     public void testShareProjectsWithSuperBot() throws RemoteException {
-        alice.sarosBot().views().packageExplorerView().tree().newC()
+        alice.superBot().views().packageExplorerView().tree().newC()
             .javaProject(PROJECT1);
-        alice.sarosBot().menuBar().saros()
+        alice.superBot().menuBar().saros()
             .shareProjects(PROJECT1, bob.getJID());
-        bob.sarosBot().confirmShellSessionInvitationAndShellAddProject(PROJECT1,
+        bob.superBot().confirmShellSessionInvitationAndShellAddProject(PROJECT1,
             TypeOfCreateProject.NEW_PROJECT);
     }
 
     @Test
     public void testAddBuddy() throws RemoteException {
         alice.bot().menu(MENU_SAROS).menu(MENU_ADD_BUDDY).click();
-        alice.sarosBot().confirmShellAddBuddy(bob.getJID());
+        alice.superBot().confirmShellAddBuddy(bob.getJID());
     }
 }

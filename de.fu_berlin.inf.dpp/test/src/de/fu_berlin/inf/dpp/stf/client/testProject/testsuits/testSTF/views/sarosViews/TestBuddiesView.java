@@ -82,35 +82,35 @@ public class TestBuddiesView extends STFTest {
      */
     @Test
     public void renameBuddy() throws RemoteException {
-        assertTrue(alice.sarosBot().views().buddiesView()
+        assertTrue(alice.superBot().views().buddiesView()
             .hasBuddy(bob.getJID()));
-        alice.sarosBot().views().buddiesView().selectBuddy(bob.getJID())
+        alice.superBot().views().buddiesView().selectBuddy(bob.getJID())
             .rename(bob.getName());
-        assertTrue(alice.sarosBot().views().buddiesView()
+        assertTrue(alice.superBot().views().buddiesView()
             .hasBuddy(bob.getJID()));
-        assertTrue(alice.sarosBot().views().buddiesView()
+        assertTrue(alice.superBot().views().buddiesView()
             .getNickName(bob.getJID()).equals(bob.getName()));
 
-        alice.sarosBot().views().buddiesView().selectBuddy(bob.getJID())
+        alice.superBot().views().buddiesView().selectBuddy(bob.getJID())
             .rename("new name");
-        assertTrue(alice.sarosBot().views().buddiesView()
+        assertTrue(alice.superBot().views().buddiesView()
             .hasBuddy(bob.getJID()));
         alice.bot().sleep(500);
-        assertTrue(alice.sarosBot().views().buddiesView()
+        assertTrue(alice.superBot().views().buddiesView()
             .getNickName(bob.getJID()).equals("new name"));
     }
 
     @Test
     public void addBuddy() throws RemoteException {
         deleteBuddies(alice, bob);
-        assertFalse(alice.sarosBot().views().buddiesView()
+        assertFalse(alice.superBot().views().buddiesView()
             .hasBuddy(bob.getJID()));
-        assertFalse(bob.sarosBot().views().buddiesView()
+        assertFalse(bob.superBot().views().buddiesView()
             .hasBuddy(alice.getJID()));
         addBuddies(alice, bob);
-        assertTrue(alice.sarosBot().views().buddiesView()
+        assertTrue(alice.superBot().views().buddiesView()
             .hasBuddy(bob.getJID()));
-        assertTrue(bob.sarosBot().views().buddiesView()
+        assertTrue(bob.superBot().views().buddiesView()
             .hasBuddy(alice.getJID()));
     }
 
@@ -129,12 +129,12 @@ public class TestBuddiesView extends STFTest {
      */
     @Test
     public void deleteBuddy() throws RemoteException {
-        assertTrue(alice.sarosBot().views().buddiesView()
+        assertTrue(alice.superBot().views().buddiesView()
             .hasBuddy(bob.getJID()));
         deleteBuddies(alice, bob);
-        assertFalse(alice.sarosBot().views().buddiesView()
+        assertFalse(alice.superBot().views().buddiesView()
             .hasBuddy(bob.getJID()));
-        assertFalse(bob.sarosBot().views().buddiesView()
+        assertFalse(bob.superBot().views().buddiesView()
             .hasBuddy(alice.getJID()));
     }
 
@@ -157,14 +157,14 @@ public class TestBuddiesView extends STFTest {
     public void inviteBuddy() throws RemoteException, InterruptedException {
         setUpSessionWithAJavaProjectAndAClass(alice, bob);
 
-        assertFalse(carl.sarosBot().views().sessionView().isInSession());
-        alice.sarosBot().views().buddiesView().selectBuddy(carl.getJID())
+        assertFalse(carl.superBot().views().sessionView().isInSession());
+        alice.superBot().views().buddiesView().selectBuddy(carl.getJID())
             .inviteBuddy();
 
         carl.bot().shell(SHELL_SESSION_INVITATION).confirm(FINISH);
-        carl.sarosBot().confirmShellAddProjectWithNewProject(PROJECT1);
-        carl.sarosBot().views().sessionView().waitUntilIsInSession();
-        assertTrue(carl.sarosBot().views().sessionView().isInSession());
+        carl.superBot().confirmShellAddProjectWithNewProject(PROJECT1);
+        carl.superBot().views().sessionView().waitUntilIsInSession();
+        assertTrue(carl.superBot().views().sessionView().isInSession());
 
     }
 }

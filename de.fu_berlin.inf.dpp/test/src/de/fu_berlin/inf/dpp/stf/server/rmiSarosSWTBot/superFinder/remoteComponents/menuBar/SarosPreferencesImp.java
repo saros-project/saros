@@ -92,7 +92,8 @@ public class SarosPreferencesImp extends Component implements SarosPreferences {
             .bot()
             .buttonInGroup(GeneralPreferencePage.CHANGE_BTN_TEXT,
                 GeneralPreferencePage.ACCOUNT_GROUP_TITLE).click();
-        sarosBot().confirmShellEditXMPPJabberAccount(newXmppJabberID, newPassword);
+        sarosBot().confirmShellEditXMPPJabberAccount(newXmppJabberID,
+            newPassword);
         shell.bot().button(APPLY).click();
         shell.bot().button(OK).click();
         bot().waitUntilShellIsClosed(SHELL_PREFERNCES);
@@ -178,6 +179,12 @@ public class SarosPreferencesImp extends Component implements SarosPreferences {
             shell.bot().button(APPLY).click();
             shell.bot().button(OK).click();
             bot().waitUntilShellIsClosed(SHELL_PREFERNCES);
+        }
+    }
+
+    public void disableAutomaticReminderNoGUI() throws RemoteException {
+        if (!feedbackManager.isFeedbackDisabled()) {
+            feedbackManager.setFeedbackDisabled(true);
         }
     }
 

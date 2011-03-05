@@ -65,14 +65,14 @@ public class TestParallelInvitationWithTerminationByHost extends STFTest {
     @Test
     public void parallelInvitationWithTerminationByHost() throws IOException,
         CoreException, InterruptedException {
-        alice.sarosBot().views().packageExplorerView().tree().newC()
+        alice.superBot().views().packageExplorerView().tree().newC()
             .javaProjectWithClasses(PROJECT1, PKG1, CLS1);
 
         /*
          * build session with bob, carl and dave simultaneously
          */
         alice
-            .sarosBot()
+            .superBot()
             .views()
             .packageExplorerView()
             .selectProject(PROJECT1)
@@ -82,7 +82,7 @@ public class TestParallelInvitationWithTerminationByHost extends STFTest {
 
         bob.bot().waitUntilShellIsOpen(SHELL_SESSION_INVITATION);
         bob.bot().shell(SHELL_SESSION_INVITATION).activate();
-        alice.sarosBot().views().progressView().removeProcess(0);
+        alice.superBot().views().progressView().removeProcess(0);
         bob.bot().waitUntilShellIsOpen(SHELL_INVITATION_CANCELLED);
         bob.bot().shell(SHELL_INVITATION_CANCELLED).activate();
 
@@ -91,7 +91,7 @@ public class TestParallelInvitationWithTerminationByHost extends STFTest {
         carl.bot().waitUntilShellIsOpen(SHELL_SESSION_INVITATION);
         carl.bot().shell(SHELL_SESSION_INVITATION).activate();
         carl.bot().shell(SHELL_SESSION_INVITATION).confirm(FINISH);
-        alice.sarosBot().views().progressView().removeProcess(0);
+        alice.superBot().views().progressView().removeProcess(0);
         carl.bot().shell(SHELL_INVITATION_CANCELLED).waitUntilActive();
         assertTrue(carl.bot().shell(SHELL_INVITATION_CANCELLED).isActive());
 
@@ -102,7 +102,7 @@ public class TestParallelInvitationWithTerminationByHost extends STFTest {
         dave.bot().shell(SHELL_SESSION_INVITATION).confirm(FINISH);
 
         // dave.button.clickButton(FINISH);
-        alice.sarosBot().views().progressView().removeProcess(0);
+        alice.superBot().views().progressView().removeProcess(0);
         // FIXME Timeout exception by MAC OS X, the building session under
         // MAS
         // is so fast that the session process is already done after

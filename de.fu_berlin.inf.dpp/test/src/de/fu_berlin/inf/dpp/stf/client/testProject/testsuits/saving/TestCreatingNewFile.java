@@ -46,17 +46,17 @@ public class TestCreatingNewFile extends STFTest {
 
     @Test
     public void testCarlCreateANewFile() throws IOException, CoreException {
-        carl.sarosBot().views().packageExplorerView().selectProject(PROJECT1)
+        carl.superBot().views().packageExplorerView().selectProject(PROJECT1)
             .newC().folder(FOLDER1);
-        carl.sarosBot().views().packageExplorerView()
+        carl.superBot().views().packageExplorerView()
             .selectFolder(PROJECT1, FOLDER1).newC().file(FILE1);
-        alice.sarosBot().views().packageExplorerView()
+        alice.superBot().views().packageExplorerView()
             .waitUntilFileExists(PROJECT1, FOLDER1, FILE1);
-        assertTrue(alice.sarosBot().views().packageExplorerView()
+        assertTrue(alice.superBot().views().packageExplorerView()
             .selectFolder(PROJECT1, FOLDER1).existsWithRegex(FILE1));
-        bob.sarosBot().views().packageExplorerView()
+        bob.superBot().views().packageExplorerView()
             .waitUntilFileExists(PROJECT1, FOLDER1, FILE1);
-        assertTrue(bob.sarosBot().views().packageExplorerView()
+        assertTrue(bob.superBot().views().packageExplorerView()
             .selectFolder(PROJECT1, FOLDER1).existsWithRegex(FILE1));
     }
 
@@ -88,38 +88,38 @@ public class TestCreatingNewFile extends STFTest {
     public void testCarlGrantWriteAccess() throws IOException, CoreException,
         InterruptedException {
 
-        carl.sarosBot().views().sessionView().selectParticipant(carl.getJID())
+        carl.superBot().views().sessionView().selectParticipant(carl.getJID())
             .restrictToReadOnlyAccess();
-        assertFalse(carl.sarosBot().views().sessionView()
+        assertFalse(carl.superBot().views().sessionView()
             .selectParticipant(carl.getJID()).hasWriteAccess());
-        assertTrue(alice.sarosBot().views().sessionView()
+        assertTrue(alice.superBot().views().sessionView()
             .selectParticipant(alice.getJID()).hasWriteAccess());
 
-        carl.sarosBot().views().packageExplorerView().selectProject(PROJECT1)
+        carl.superBot().views().packageExplorerView().selectProject(PROJECT1)
             .newC().folder(FOLDER1);
-        carl.sarosBot().views().packageExplorerView()
+        carl.superBot().views().packageExplorerView()
             .selectFolder(PROJECT1, FOLDER1).newC().file(FILE1);
         waitsUntilTransferedDataIsArrived(alice);
-        assertFalse(alice.sarosBot().views().packageExplorerView()
+        assertFalse(alice.superBot().views().packageExplorerView()
             .selectProject(PROJECT1).existsWithRegex(FOLDER1));
         waitsUntilTransferedDataIsArrived(bob);
-        assertFalse(bob.sarosBot().views().packageExplorerView()
+        assertFalse(bob.superBot().views().packageExplorerView()
             .selectProject(PROJECT1).existsWithRegex(FOLDER1));
 
         setFollowMode(alice, carl, bob);
 
-        alice.sarosBot().views().packageExplorerView().selectProject(PROJECT1)
+        alice.superBot().views().packageExplorerView().selectProject(PROJECT1)
             .newC().folder(FOLDER2);
-        alice.sarosBot().views().packageExplorerView()
+        alice.superBot().views().packageExplorerView()
             .selectFolder(PROJECT1, FOLDER2).newC().file(FILE2);
 
-        carl.sarosBot().views().packageExplorerView()
+        carl.superBot().views().packageExplorerView()
             .waitUntilFileExists(PROJECT1, FOLDER2, FILE2);
-        assertTrue(carl.sarosBot().views().packageExplorerView()
+        assertTrue(carl.superBot().views().packageExplorerView()
             .selectFolder(PROJECT1, FOLDER2).existsWithRegex(FILE2));
-        bob.sarosBot().views().packageExplorerView()
+        bob.superBot().views().packageExplorerView()
             .waitUntilFileExists(PROJECT1, FOLDER2, FILE2);
-        assertTrue(bob.sarosBot().views().packageExplorerView()
+        assertTrue(bob.superBot().views().packageExplorerView()
             .selectFolder(PROJECT1, FOLDER2).existsWithRegex(FILE2));
 
         alice.bot().editor(FILE2).setTexWithSave(CP1);

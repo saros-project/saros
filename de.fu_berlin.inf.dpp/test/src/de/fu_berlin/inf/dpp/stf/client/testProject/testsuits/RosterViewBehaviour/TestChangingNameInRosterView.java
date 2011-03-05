@@ -40,7 +40,7 @@ public class TestChangingNameInRosterView extends STFTest {
         // .renameBuddy(bob.jid, bob.jid.getBase());
         // }
         resetBuddiesName();
-        if (!alice.sarosBot().views().buddiesView().hasBuddy(bob.getJID())) {
+        if (!alice.superBot().views().buddiesView().hasBuddy(bob.getJID())) {
             addBuddies(alice, bob);
         }
     }
@@ -62,20 +62,20 @@ public class TestChangingNameInRosterView extends STFTest {
      */
     @Test
     public void renameBuddyInRosterView() throws RemoteException {
-        assertTrue(alice.sarosBot().views().buddiesView()
+        assertTrue(alice.superBot().views().buddiesView()
             .hasBuddy(bob.getJID()));
-        alice.sarosBot().views().buddiesView().selectBuddy(bob.getJID())
+        alice.superBot().views().buddiesView().selectBuddy(bob.getJID())
             .rename(bob.getName());
-        assertTrue(alice.sarosBot().views().buddiesView()
+        assertTrue(alice.superBot().views().buddiesView()
             .hasBuddy(bob.getJID()));
-        assertTrue(alice.sarosBot().views().buddiesView()
+        assertTrue(alice.superBot().views().buddiesView()
             .getNickName(bob.getJID()).equals(bob.getName()));
         // assertTrue(alice.sessionV.isContactInSessionView(bob.getJID()));
-        alice.sarosBot().views().buddiesView().selectBuddy(bob.getJID())
+        alice.superBot().views().buddiesView().selectBuddy(bob.getJID())
             .rename("new bob");
-        assertTrue(alice.sarosBot().views().buddiesView()
+        assertTrue(alice.superBot().views().buddiesView()
             .hasBuddy(bob.getJID()));
-        assertTrue(alice.sarosBot().views().buddiesView()
+        assertTrue(alice.superBot().views().buddiesView()
             .getNickName(bob.getJID()).equals("new bob"));
         // assertTrue(alice.sessionV.isContactInSessionView(bob.getJID()));
     }

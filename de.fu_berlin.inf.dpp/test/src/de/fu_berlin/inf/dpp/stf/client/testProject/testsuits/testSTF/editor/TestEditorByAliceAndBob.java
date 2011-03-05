@@ -32,7 +32,7 @@ public class TestEditorByAliceAndBob extends STFTest {
 
     @Test
     public void isJavaEditorOpen() throws RemoteException {
-        alice.sarosBot().views().packageExplorerView()
+        alice.superBot().views().packageExplorerView()
             .selectClass(PROJECT1, PKG1, CLS1).open();
         assertTrue(alice.bot().isEditorOpen(CLS1_SUFFIX));
         alice.bot().editor(CLS1 + SUFFIX_JAVA).closeWithSave();
@@ -41,14 +41,14 @@ public class TestEditorByAliceAndBob extends STFTest {
 
     @Test(expected = AssertionError.class)
     public void isJavaEditorOpenWithAssertError() throws RemoteException {
-        alice.sarosBot().views().packageExplorerView()
+        alice.superBot().views().packageExplorerView()
             .selectClass(PROJECT1, PKG1, CLS1).open();
         assertFalse(alice.bot().isEditorOpen(CLS1_SUFFIX));
     }
 
     @Test
     public void isEditorOpen() throws RemoteException {
-        alice.sarosBot().views().packageExplorerView()
+        alice.superBot().views().packageExplorerView()
             .selectClass(PROJECT1, PKG1, CLS1).open();
         assertTrue(alice.bot().isEditorOpen(CLS1 + SUFFIX_JAVA));
         alice.bot().editor(CLS1 + SUFFIX_JAVA).closeWithSave();
@@ -58,11 +58,11 @@ public class TestEditorByAliceAndBob extends STFTest {
     @Test
     public void waitUntilBobJavaEditorOpen() throws RemoteException {
 
-        bob.sarosBot().views().sessionView().selectParticipant(alice.getJID())
+        bob.superBot().views().sessionView().selectParticipant(alice.getJID())
             .followThisBuddy();
-        assertTrue(bob.sarosBot().views().sessionView()
+        assertTrue(bob.superBot().views().sessionView()
             .selectParticipant(alice.getJID()).isFollowingThisBuddy());
-        alice.sarosBot().views().packageExplorerView()
+        alice.superBot().views().packageExplorerView()
             .selectClass(PROJECT1, PKG1, CLS1).open();
         bob.bot().waitUntilEditorOpen(CLS1_SUFFIX);
         assertTrue(bob.bot().isEditorOpen(CLS1_SUFFIX));
@@ -71,14 +71,14 @@ public class TestEditorByAliceAndBob extends STFTest {
     @Test
     public void waitUntilBobJavaEditorActive() throws RemoteException,
         InterruptedException {
-        alice.sarosBot().views().packageExplorerView()
+        alice.superBot().views().packageExplorerView()
             .selectClass(PROJECT1, PKG1, CLS1).open();
         setFollowMode(alice, bob);
-        assertTrue(bob.sarosBot().views().sessionView()
+        assertTrue(bob.superBot().views().sessionView()
             .selectParticipant(alice.getJID()).isFollowingThisBuddy());
         assertTrue(bob.bot().editor(CLS1_SUFFIX).isActive());
 
-        alice.sarosBot().views().packageExplorerView().tree().newC()
+        alice.superBot().views().packageExplorerView().tree().newC()
             .cls(PROJECT1, PKG1, CLS2);
         bob.bot().editor(CLS2_SUFFIX).waitUntilIsActive();
         assertTrue(bob.bot().editor(CLS2_SUFFIX).isActive());
@@ -96,7 +96,7 @@ public class TestEditorByAliceAndBob extends STFTest {
     public void waitUntilBobJavaEditorClosed() throws RemoteException,
         InterruptedException {
         setFollowMode(alice, bob);
-        alice.sarosBot().views().packageExplorerView()
+        alice.superBot().views().packageExplorerView()
             .selectClass(PROJECT1, PKG1, CLS1).open();
         bob.bot().editor(CLS1_SUFFIX).waitUntilIsActive();
         assertTrue(bob.bot().editor(CLS1_SUFFIX).isActive());

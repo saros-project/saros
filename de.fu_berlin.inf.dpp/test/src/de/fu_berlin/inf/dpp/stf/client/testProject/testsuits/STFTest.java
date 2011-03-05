@@ -229,20 +229,20 @@ public class STFTest extends STF {
             tester.bot().activateWorkbench();
             if (tester.bot().isViewOpen("Welcome"))
                 tester.bot().view("Welcome").close();
-            tester.sarosBot().menuBar().window().openPerspective();
+            tester.superBot().menuBar().window().openPerspective();
             closeUnnecessaryViews(tester);
             tester.bot().resetWorkbench();
-            tester.noBot().deleteAllProjectsNoGUI();
+            deleteAllProjects(tester);
             deleteAllProjects(tester);
         }
     }
 
     public static void deleteAllProjects(AbstractTester tester)
         throws RemoteException {
-        List<String> treeItems = tester.sarosBot().views()
+        List<String> treeItems = tester.superBot().views()
             .packageExplorerView().tree().getTextOfTreeItems();
         for (String treeItem : treeItems) {
-            tester.sarosBot().views().packageExplorerView()
+            tester.superBot().views().packageExplorerView()
                 .selectProject(treeItem).delete();
         }
 
@@ -279,9 +279,10 @@ public class STFTest extends STF {
      */
     public static void setUpSaros() throws RemoteException {
         for (AbstractTester tester : activeTesters) {
-            tester.noBot().disableAutomaticReminderNoGUI();
+            tester.superBot().menuBar().saros().preferences()
+                .disableAutomaticReminder();
             openSarosViews(tester);
-            tester.sarosBot().views().buddiesView()
+            tester.superBot().views().buddiesView()
                 .connectWith(tester.getJID(), tester.getPassword());
         }
         resetBuddies();
@@ -290,19 +291,19 @@ public class STFTest extends STF {
     public static void openSarosViews(AbstractTester tester)
         throws RemoteException {
         if (!tester.bot().isViewOpen(VIEW_SAROS_BUDDIES)) {
-            tester.sarosBot().menuBar().window()
+            tester.superBot().menuBar().window()
                 .showViewWithName(NODE_SAROS, VIEW_SAROS_BUDDIES);
         }
         if (!tester.bot().isViewOpen(VIEW_SAROS_SESSION))
-            tester.sarosBot().menuBar().window()
+            tester.superBot().menuBar().window()
                 .showViewWithName(NODE_SAROS, VIEW_SAROS_SESSION);
 
         if (!tester.bot().isViewOpen(VIEW_REMOTE_SCREEN))
-            tester.sarosBot().menuBar().window()
+            tester.superBot().menuBar().window()
                 .showViewWithName(NODE_SAROS, VIEW_REMOTE_SCREEN);
 
         if (!tester.bot().isViewOpen(VIEW_SAROS_CHAT))
-            tester.sarosBot().menuBar().window()
+            tester.superBot().menuBar().window()
                 .showViewWithName(NODE_SAROS, VIEW_SAROS_CHAT);
     }
 
@@ -318,7 +319,7 @@ public class STFTest extends STF {
     public static void setUpSessionWithAJavaProjectAndAClass(
         AbstractTester inviter, AbstractTester... invitees)
         throws RemoteException, InterruptedException {
-        inviter.sarosBot().views().packageExplorerView().tree().newC()
+        inviter.superBot().views().packageExplorerView().tree().newC()
             .javaProjectWithClasses(PROJECT1, PKG1, CLS1);
         buildSessionConcurrently(PROJECT1, TypeOfCreateProject.NEW_PROJECT,
             inviter, invitees);
@@ -333,10 +334,10 @@ public class STFTest extends STF {
             String key = i.next();
             if (!createdProjects.contains(key)) {
                 createdProjects.add(key);
-                inviter.sarosBot().views().packageExplorerView().tree().newC()
+                inviter.superBot().views().packageExplorerView().tree().newC()
                     .javaProject(key);
                 List<String> pkgAndclass = projectsPkgsClasses.get(key);
-                inviter.sarosBot().views().packageExplorerView()
+                inviter.superBot().views().packageExplorerView()
                     .selectPkg(key, pkgAndclass.get(0)).newC()
                     .cls(key, pkgAndclass.get(0), pkgAndclass.get(1));
             }
@@ -358,8 +359,8 @@ public class STFTest extends STF {
         for (AbstractTester tester : activeTesters) {
             if (tester != null) {
                 // tester.sarosBot().views().buddiesView().resetAllBuddyNameNoGUI();
-                tester.sarosBot().views().buddiesView().disconnect();
-                tester.noBot().deleteAllProjectsNoGUI();
+                tester.superBot().views().buddiesView().disconnect();
+                deleteAllProjects(tester);
             }
         }
         resetAllBots();
@@ -370,8 +371,8 @@ public class STFTest extends STF {
         resetBuddiesName();
         for (AbstractTester tester : testers) {
             if (tester != null) {
-                tester.sarosBot().views().buddiesView().disconnect();
-                tester.noBot().deleteAllProjectsNoGUI();
+                tester.superBot().views().buddiesView().disconnect();
+                deleteAllProjects(tester);
             }
         }
         resetAllBots();
@@ -392,15 +393,15 @@ public class STFTest extends STF {
     public static void resetDefaultAccount() throws RemoteException {
         for (AbstractTester tester : activeTesters) {
             if (tester != null) {
-                if (!tester.sarosBot().menuBar().saros().preferences()
+                if (!tester.superBot().menuBar().saros().preferences()
                     .existsAccount(tester.getJID()))
-                    tester.sarosBot().menuBar().saros().preferences()
+                    tester.superBot().menuBar().saros().preferences()
                         .addAccount(tester.getJID(), tester.getPassword());
-                if (!tester.sarosBot().menuBar().saros().preferences()
+                if (!tester.superBot().menuBar().saros().preferences()
                     .isAccountActive(tester.getJID()))
-                    tester.sarosBot().menuBar().saros().preferences()
+                    tester.superBot().menuBar().saros().preferences()
                         .activateAccount(tester.getJID());
-                tester.sarosBot().menuBar().saros().preferences()
+                tester.superBot().menuBar().saros().preferences()
                     .deleteAllNoActiveAccounts();
 
             }
@@ -420,7 +421,7 @@ public class STFTest extends STF {
         // }
         for (int i = 0; i < activeTesters.size(); i++) {
             for (int j = i + 1; j < activeTesters.size(); j++) {
-                activeTesters.get(i).sarosBot().views().buddiesView()
+                activeTesters.get(i).superBot().views().buddiesView()
                     .selectBuddy(activeTesters.get(j).getJID())
                     .rename(activeTesters.get(j).getBaseJid());
             }
@@ -439,18 +440,18 @@ public class STFTest extends STF {
     public static void resetWriteAccess(AbstractTester host,
         AbstractTester... invitees) throws RemoteException {
         for (AbstractTester tester : invitees) {
-            if (tester.sarosBot().views().sessionView().isInSession()
-                && tester.sarosBot().views().sessionView()
+            if (tester.superBot().views().sessionView().isInSession()
+                && tester.superBot().views().sessionView()
                     .selectParticipant(tester.getJID()).hasReadOnlyAccess()) {
-                host.sarosBot().views().sessionView()
+                host.superBot().views().sessionView()
                     .selectParticipant(tester.getJID()).grantWriteAccess();
             }
         }
 
-        if (host.sarosBot().views().sessionView().isInSession()
-            && !host.sarosBot().views().sessionView()
+        if (host.superBot().views().sessionView().isInSession()
+            && !host.superBot().views().sessionView()
                 .selectParticipant(host.getJID()).hasWriteAccess()) {
-            host.sarosBot().views().sessionView()
+            host.superBot().views().sessionView()
                 .selectParticipant(host.getJID()).grantWriteAccess();
         }
     }
@@ -458,11 +459,11 @@ public class STFTest extends STF {
     public static void resetFollowModeSequentially(
         AbstractTester... buddiesFollowing) throws RemoteException {
         for (AbstractTester tester : buddiesFollowing) {
-            if (tester.sarosBot().views().sessionView().isInSession()
-                && tester.sarosBot().views().sessionView().isFollowing()) {
-                JID followedBuddyJID = tester.sarosBot().views().sessionView()
+            if (tester.superBot().views().sessionView().isInSession()
+                && tester.superBot().views().sessionView().isFollowing()) {
+                JID followedBuddyJID = tester.superBot().views().sessionView()
                     .getFollowedBuddy();
-                tester.sarosBot().views().sessionView()
+                tester.superBot().views().sessionView()
                     .selectParticipant(followedBuddyJID)
                     .stopFollowingThisBuddy();
             }
@@ -485,9 +486,9 @@ public class STFTest extends STF {
             final AbstractTester tester = buddiesFollowing[i];
             stopFollowTasks.add(new Callable<Void>() {
                 public Void call() throws Exception {
-                    JID followedBuddyJID = tester.sarosBot().views()
+                    JID followedBuddyJID = tester.superBot().views()
                         .sessionView().getFollowedBuddy();
-                    tester.sarosBot().views().sessionView()
+                    tester.superBot().views().sessionView()
                         .selectParticipant(followedBuddyJID)
                         .stopFollowingThisBuddy();
                     return null;
@@ -514,7 +515,7 @@ public class STFTest extends STF {
 
     public static void reBuildSession(AbstractTester host,
         AbstractTester... invitees) throws RemoteException {
-        if (!host.sarosBot().views().sessionView().isInSession()) {
+        if (!host.superBot().views().sessionView().isInSession()) {
             for (AbstractTester tester : invitees) {
                 buildSessionSequentially(PROJECT1,
                     TypeOfCreateProject.EXIST_PROJECT, host, tester);
@@ -525,7 +526,7 @@ public class STFTest extends STF {
     public static void createSameJavaProjectByActiveTesters()
         throws RemoteException {
         for (AbstractTester tester : activeTesters) {
-            tester.sarosBot().views().packageExplorerView().tree().newC()
+            tester.superBot().views().packageExplorerView().tree().newC()
                 .javaProjectWithClasses(PROJECT1, PKG1, CLS1);
         }
     }
@@ -533,9 +534,9 @@ public class STFTest extends STF {
     public static void createProjectWithFileBy(AbstractTester... testers)
         throws RemoteException {
         for (AbstractTester tester : testers) {
-            tester.sarosBot().views().packageExplorerView().tree().newC()
+            tester.superBot().views().packageExplorerView().tree().newC()
                 .project(PROJECT1);
-            tester.sarosBot().views().packageExplorerView()
+            tester.superBot().views().packageExplorerView()
                 .selectFolder(PROJECT1).newC().file(FILE3);
             tester.bot().waitUntilEditorOpen(FILE3);
         }
@@ -544,14 +545,14 @@ public class STFTest extends STF {
     public static void deleteAllProjectsByActiveTesters()
         throws RemoteException {
         for (AbstractTester tester : activeTesters) {
-            tester.noBot().deleteAllProjectsNoGUI();
+            deleteAllProjects(tester);
         }
     }
 
     public static void disConnectByActiveTesters() throws RemoteException {
         for (AbstractTester tester : activeTesters) {
             if (tester != null) {
-                tester.sarosBot().views().buddiesView().disconnect();
+                tester.superBot().views().buddiesView().disconnect();
             }
         }
     }
@@ -560,9 +561,10 @@ public class STFTest extends STF {
         throws RemoteException {
         for (AbstractTester tester : activeTesters) {
             for (String folder : folders) {
-                if (tester.sarosBot().views().packageExplorerView()
+                if (tester.superBot().views().packageExplorerView()
                     .selectProject(PROJECT1).existsWithRegex(folder))
-                    tester.noBot().deleteFolderNoGUI(PROJECT1, folder);
+                    tester.superBot().views().packageExplorerView()
+                        .selectFolder(PROJECT1, folder).delete();
             }
         }
     }
@@ -571,11 +573,11 @@ public class STFTest extends STF {
         TypeOfCreateProject usingWhichProject, AbstractTester inviter,
         AbstractTester... invitees) throws RemoteException {
         JID[] inviteesJID = getPeerJID(invitees);
-        inviter.sarosBot().menuBar().saros()
+        inviter.superBot().menuBar().saros()
             .shareProjects(projectName, inviteesJID);
         for (AbstractTester invitee : invitees) {
             invitee.bot().shell(SHELL_SESSION_INVITATION).confirm(FINISH);
-            invitee.sarosBot().confirmShellAddProjectUsingWhichProject(
+            invitee.superBot().confirmShellAddProjectUsingWhichProject(
                 projectName, usingWhichProject);
         }
     }
@@ -588,14 +590,14 @@ public class STFTest extends STF {
         InterruptedException {
 
         log.trace("alice.shareProjectParallel");
-        inviter.sarosBot().menuBar().saros()
+        inviter.superBot().menuBar().saros()
             .shareProjects(projectName, getPeerJID(invitees));
 
         List<Callable<Void>> joinSessionTasks = new ArrayList<Callable<Void>>();
         for (final AbstractTester invitee : invitees) {
             joinSessionTasks.add(new Callable<Void>() {
                 public Void call() throws Exception {
-                    invitee.sarosBot()
+                    invitee.superBot()
                         .confirmShellSessionInvitationAndShellAddProject(
                             projectName, usingWhichProject);
                     return null;
@@ -622,18 +624,18 @@ public class STFTest extends STF {
         List<Callable<Void>> closeSessionTasks = new ArrayList<Callable<Void>>();
         for (final AbstractTester tester : activeTesters) {
             if (tester != host) {
-                if (tester.sarosBot().views().sessionView().isInSession()) {
+                if (tester.superBot().views().sessionView().isInSession()) {
                     closeSessionTasks.add(new Callable<Void>() {
                         public Void call() throws Exception {
                             // Need to check for isDriver before leaving.
-                            tester.sarosBot().confirmShellClosingTheSession();
+                            tester.superBot().confirmShellClosingTheSession();
                             return null;
                         }
                     });
                 }
             }
         }
-        host.sarosBot().views().sessionView().leaveSession();
+        host.superBot().views().sessionView().leaveSession();
         MakeOperationConcurrently.workAll(closeSessionTasks);
     }
 
@@ -657,13 +659,13 @@ public class STFTest extends STF {
         List<Callable<Void>> leaveTasks = new ArrayList<Callable<Void>>();
         for (final AbstractTester tester : activeTesters) {
 
-            if (tester.sarosBot().views().sessionView().isHost()) {
+            if (tester.superBot().views().sessionView().isHost()) {
                 host = tester;
             } else {
                 peerJIDs.add(tester.getJID());
                 leaveTasks.add(new Callable<Void>() {
                     public Void call() throws Exception {
-                        tester.sarosBot().views().sessionView().leaveSession();
+                        tester.superBot().views().sessionView().leaveSession();
                         return null;
                     }
                 });
@@ -672,11 +674,11 @@ public class STFTest extends STF {
 
         MakeOperationConcurrently.workAll(leaveTasks);
         if (host != null) {
-            host.sarosBot().views().sessionView()
+            host.superBot().views().sessionView()
                 .waitUntilAllPeersLeaveSession(peerJIDs);
             host.bot().view(VIEW_SAROS_SESSION).toolbarButton(TB_STOP_SESSION)
                 .click();
-            host.sarosBot().views().sessionView().waitUntilIsNotInSession();
+            host.superBot().views().sessionView().waitUntilIsNotInSession();
         }
 
     }
@@ -697,7 +699,7 @@ public class STFTest extends STF {
             final AbstractTester tester = buddiesTofollow[i];
             followTasks.add(new Callable<Void>() {
                 public Void call() throws Exception {
-                    tester.sarosBot().views().sessionView()
+                    tester.superBot().views().sessionView()
                         .selectParticipant(followedBuddy.getJID())
                         .isFollowingThisBuddy();
                     return null;
@@ -719,8 +721,8 @@ public class STFTest extends STF {
     public static void addBuddies(AbstractTester host, AbstractTester... peers)
         throws RemoteException {
         for (AbstractTester peer : peers) {
-            if (!host.sarosBot().views().buddiesView().hasBuddy(peer.getJID())) {
-                host.sarosBot().views().buddiesView()
+            if (!host.superBot().views().buddiesView().hasBuddy(peer.getJID())) {
+                host.superBot().views().buddiesView()
                     .addANewBuddy(peer.getJID());
                 peer.bot().waitUntilShellIsOpen(
                     SHELL_REQUEST_OF_SUBSCRIPTION_RECEIVED);
@@ -758,19 +760,19 @@ public class STFTest extends STF {
     public static void deleteBuddies(AbstractTester buddy,
         AbstractTester... deletedBuddies) throws RemoteException {
         for (AbstractTester deletedBuddy : deletedBuddies) {
-            if (!buddy.sarosBot().views().buddiesView()
+            if (!buddy.superBot().views().buddiesView()
                 .hasBuddy(deletedBuddy.getJID()))
                 return;
-            buddy.sarosBot().views().buddiesView()
+            buddy.superBot().views().buddiesView()
                 .selectBuddy(deletedBuddy.getJID()).delete();
-            deletedBuddy.sarosBot().confirmShellRemovelOfSubscription();
+            deletedBuddy.superBot().confirmShellRemovelOfSubscription();
         }
 
     }
 
     public static void shareYourScreen(AbstractTester buddy,
         AbstractTester selectedBuddy) throws RemoteException {
-        buddy.sarosBot().views().sessionView()
+        buddy.superBot().views().sessionView()
             .shareYourScreenWithSelectedBuddy(selectedBuddy.getJID());
         selectedBuddy.bot().waitUntilShellIsOpen(
             SHELL_INCOMING_SCREENSHARING_SESSION);
@@ -796,7 +798,7 @@ public class STFTest extends STF {
         final TypeOfCreateProject usingWhichProject, AbstractTester inviter,
         AbstractTester... invitees) throws RemoteException,
         InterruptedException {
-        inviter.sarosBot().views().sessionView()
+        inviter.superBot().views().sessionView()
             .addBuddyToSession(getPeersBaseJID(invitees));
         List<Callable<Void>> joinSessionTasks = new ArrayList<Callable<Void>>();
         for (final AbstractTester tester : invitees) {
@@ -804,7 +806,7 @@ public class STFTest extends STF {
                 public Void call() throws Exception {
                     tester.bot().shell(SHELL_SESSION_INVITATION)
                         .confirm(FINISH);
-                    tester.sarosBot().confirmShellAddProjectUsingWhichProject(
+                    tester.superBot().confirmShellAddProjectUsingWhichProject(
                         projectName, usingWhichProject);
                     return null;
                 }

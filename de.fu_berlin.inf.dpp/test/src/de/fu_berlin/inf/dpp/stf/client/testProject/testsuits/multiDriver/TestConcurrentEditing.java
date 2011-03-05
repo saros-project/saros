@@ -41,11 +41,11 @@ public class TestConcurrentEditing extends STFTest {
     @Test
     public void testBugInconsistencyConcurrentEditing() throws RemoteException,
         InterruptedException {
-        alice.sarosBot().views().packageExplorerView().tree().newC()
+        alice.superBot().views().packageExplorerView().tree().newC()
             .project(PROJECT1);
         // cool trick, no need to always use PROJECT1, PKG1, CLS1 as arguments
 
-        alice.sarosBot().views().packageExplorerView().selectProject(PROJECT1)
+        alice.superBot().views().packageExplorerView().selectProject(PROJECT1)
             .newC().file(FILE);
         alice.bot().waitUntilEditorOpen(FILE);
         alice.bot().editor(FILE).setTexWithSave("test/STF/lorem.txt");
@@ -53,7 +53,7 @@ public class TestConcurrentEditing extends STFTest {
 
         buildSessionSequentially(PROJECT1, TypeOfCreateProject.NEW_PROJECT,
             alice, bob);
-        bob.sarosBot().views().packageExplorerView().selectFile(path).open();
+        bob.superBot().views().packageExplorerView().selectFile(path).open();
 
         bob.bot().waitUntilEditorOpen(FILE);
         bob.bot().editor(FILE).navigateTo(0, 30);
@@ -100,11 +100,11 @@ public class TestConcurrentEditing extends STFTest {
     public void AliceAndBobeditInSameLine() throws RemoteException,
         InterruptedException {
 
-        alice.sarosBot().views().packageExplorerView().tree().newC()
+        alice.superBot().views().packageExplorerView().tree().newC()
             .javaProjectWithClasses(PROJECT1, PKG1, CLS1);
         buildSessionConcurrently(PROJECT1, TypeOfCreateProject.NEW_PROJECT,
             alice, bob);
-        bob.sarosBot().views().packageExplorerView()
+        bob.superBot().views().packageExplorerView()
             .selectClass(PROJECT1, PKG1, CLS1).open();
         bob.bot().editor(CLS1_SUFFIX).waitUntilIsActive();
 

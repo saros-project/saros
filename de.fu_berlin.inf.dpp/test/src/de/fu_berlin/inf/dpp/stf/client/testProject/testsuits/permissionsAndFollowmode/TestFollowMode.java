@@ -35,35 +35,39 @@ public class TestFollowMode extends STFTest {
      */
     @Test
     public void testBobFollowAlice() throws IOException, CoreException {
-        alice.sarosBot().views().packageExplorerView()
+        alice.superBot().views().packageExplorerView()
             .selectClass(PROJECT1, PKG1, CLS1).open();
         alice.bot().editor(CLS1_SUFFIX).setTexWithSave(CP1);
-        bob.sarosBot().views().sessionView().selectParticipant(alice.getJID())
+        bob.superBot().views().sessionView().selectParticipant(alice.getJID())
             .followThisBuddy();
         bob.bot().editor(CLS1_SUFFIX).waitUntilIsActive();
-        assertTrue(bob.sarosBot().views().sessionView()
+        assertTrue(bob.superBot().views().sessionView()
             .selectParticipant(alice.getJID()).isFollowingThisBuddy());
         assertTrue(bob.bot().editor(CLS1_SUFFIX).isActive());
 
-        String clsContentOfAlice = alice.noBot().getFileContent(
-            getClassPath(PROJECT1, PKG1, CLS1));
+        String clsContentOfAlice = alice.superBot().views()
+            .packageExplorerView()
+            .getFileContent(getClassPath(PROJECT1, PKG1, CLS1));
 
-        bob.noBot().waitUntilFileContentSame(clsContentOfAlice,
-            getClassPath(PROJECT1, PKG1, CLS1));
-        String clsContentOfBob = bob.noBot().getFileContent(
-            getClassPath(PROJECT1, PKG1, CLS1));
+        bob.superBot()
+            .views()
+            .packageExplorerView()
+            .waitUntilFileContentSame(clsContentOfAlice,
+                getClassPath(PROJECT1, PKG1, CLS1));
+        String clsContentOfBob = bob.superBot().views().packageExplorerView()
+            .getFileContent(getClassPath(PROJECT1, PKG1, CLS1));
         assertTrue(clsContentOfBob.equals(clsContentOfAlice));
 
-        alice.sarosBot().views().packageExplorerView().tree().newC()
+        alice.superBot().views().packageExplorerView().tree().newC()
             .cls(PROJECT1, PKG1, CLS2);
         bob.bot().editor(CLS2_SUFFIX).waitUntilIsActive();
         assertTrue(bob.bot().editor(CLS2_SUFFIX).isActive());
 
-        alice.sarosBot().views().sessionView().selectParticipant(bob.getJID())
+        alice.superBot().views().sessionView().selectParticipant(bob.getJID())
             .followThisBuddy();
         bob.bot().editor(CLS1_SUFFIX).show();
         alice.bot().editor(CLS1_SUFFIX).waitUntilIsActive();
-        assertTrue(alice.sarosBot().views().sessionView()
+        assertTrue(alice.superBot().views().sessionView()
             .selectParticipant(bob.getJID()).isFollowingThisBuddy());
         assertTrue(alice.bot().editor(CLS1_SUFFIX).isActive());
 

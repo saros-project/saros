@@ -20,22 +20,22 @@ public class TestBuddiesViewByAlice extends STFTest {
 
     @Test
     public void testConnectWith() throws RemoteException {
-        alice.sarosBot().views().buddiesView().connectWith(TEST_JID, PASSWORD);
-        assertTrue(alice.sarosBot().menuBar().saros().preferences()
+        alice.superBot().views().buddiesView().connectWith(TEST_JID, PASSWORD);
+        assertTrue(alice.superBot().menuBar().saros().preferences()
             .isAccountActive(bob.getJID()));
     }
 
     @Test
     public void testConnectWithActiveAccount() throws RemoteException {
-        alice.sarosBot().views().buddiesView().connectWithActiveAccount();
-        assertTrue(alice.sarosBot().views().buddiesView().isConnected());
+        alice.superBot().views().buddiesView().connectWithActiveAccount();
+        assertTrue(alice.superBot().views().buddiesView().isConnected());
     }
 
     @Test
     public void testAddExistedBuddy() throws RemoteException {
-        assertTrue(alice.sarosBot().views().buddiesView().hasBuddy(TEST_JID));
-        alice.sarosBot().views().buddiesView().addANewBuddy(TEST_JID);
-        assertTrue(alice.sarosBot().views().buddiesView().hasBuddy(TEST_JID));
+        assertTrue(alice.superBot().views().buddiesView().hasBuddy(TEST_JID));
+        alice.superBot().views().buddiesView().addANewBuddy(TEST_JID);
+        assertTrue(alice.superBot().views().buddiesView().hasBuddy(TEST_JID));
     }
 
 }

@@ -64,11 +64,11 @@ public class TestUserWithWriteAccessResetsFiles extends STFTest {
      */
     @Test
     public void testAliceResetsFile() throws IOException, CoreException {
-        dave.sarosBot().views().sessionView().selectParticipant(alice.getJID())
+        dave.superBot().views().sessionView().selectParticipant(alice.getJID())
             .followThisBuddy();
-        edna.sarosBot().views().sessionView().selectParticipant(alice.getJID())
+        edna.superBot().views().sessionView().selectParticipant(alice.getJID())
             .followThisBuddy();
-        alice.sarosBot().views().packageExplorerView()
+        alice.superBot().views().packageExplorerView()
             .selectClass(PROJECT1, PKG1, CLS1).open();
         alice.bot().editor(CLS1_SUFFIX).setTextWithoutSave(CP1);
         alice.bot().editor(CLS1 + SUFFIX_JAVA).closeWithoutSave();
@@ -76,16 +76,16 @@ public class TestUserWithWriteAccessResetsFiles extends STFTest {
         dave.bot().shell(SHELL_SAVE_RESOURCE).confirm(NO);
         edna.bot().shell(SHELL_SAVE_RESOURCE).confirm(NO);
 
-        String contentOfAlice = alice.noBot().getFileContent(
-            getClassPath(PROJECT1, PKG1, CLS1));
-        String contentOfDave = dave.noBot().getFileContent(
-            getClassPath(PROJECT1, PKG1, CLS1));
+        String contentOfAlice = alice.superBot().views().packageExplorerView()
+            .getFileContent(getClassPath(PROJECT1, PKG1, CLS1));
+        String contentOfDave = dave.superBot().views().packageExplorerView()
+            .getFileContent(getClassPath(PROJECT1, PKG1, CLS1));
 
-        String contentOfEdna = edna.noBot().getFileContent(
-            getClassPath(PROJECT1, PKG1, CLS1));
+        String contentOfEdna = edna.superBot().views().packageExplorerView()
+            .getFileContent(getClassPath(PROJECT1, PKG1, CLS1));
 
-        String contentOfBob = bob.noBot().getFileContent(
-            getClassPath(PROJECT1, PKG1, CLS1));
+        String contentOfBob = bob.superBot().views().packageExplorerView()
+            .getFileContent(getClassPath(PROJECT1, PKG1, CLS1));
 
         assertTrue(contentOfAlice.equals(contentOfDave));
         assertTrue(contentOfAlice.equals(contentOfEdna));

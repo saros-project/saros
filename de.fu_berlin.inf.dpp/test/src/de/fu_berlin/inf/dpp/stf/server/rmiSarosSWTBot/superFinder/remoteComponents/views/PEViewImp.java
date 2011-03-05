@@ -1,12 +1,16 @@
 package de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.views;
 
+import java.io.IOException;
 import java.rmi.RemoteException;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.swtbot.swt.finder.waits.DefaultCondition;
 
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.conditions.SarosConditions;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotTree;
@@ -68,6 +72,7 @@ public class PEViewImp extends ViewsImp implements PEView {
 
     public ContextMenuWrapper selectJavaProject(String projectName)
         throws RemoteException {
+
         initContextMenuWrapper(
             tree.selectTreeItemWithRegex(changeToRegex(projectName)),
             TreeItemType.JAVA_PROJECT);
@@ -121,6 +126,12 @@ public class PEViewImp extends ViewsImp implements PEView {
         return contextMenu;
     }
 
+    /**********************************************
+     * 
+     * States
+     * 
+     **********************************************/
+
     public String getTitle() throws RemoteException {
         return VIEW_PACKAGE_EXPLORER;
     }
@@ -165,6 +176,23 @@ public class PEViewImp extends ViewsImp implements PEView {
         return info.url;
     }
 
+    public String getFileContent(String... nodes) throws RemoteException,
+        IOException, CoreException {
+        IPath path = new Path(getPath(nodes));
+        log.info("Checking existence of file \"" + path + "\"");
+        final IFile file = ResourcesPlugin.getWorkspace().getRoot()
+            .getFile(path);
+
+        log.info("Checking full path: \"" + file.getFullPath().toOSString()
+            + "\"");
+        return ConvertStreamToString(file.getContents());
+    }
+
+    /**********************************************
+     * 
+     * wait until
+     * 
+     **********************************************/
     public void waitUntilFolderExists(String... folderNodes)
         throws RemoteException {
         String fullPath = getPath(folderNodes);
@@ -235,6 +263,26 @@ public class PEViewImp extends ViewsImp implements PEView {
         throws RemoteException {
         bot().waitUntil(SarosConditions.isUrlSame(fullPath, url));
     }
+
+    public void waitUntilFileContentSame(final String otherClassContent,
+        final String... fileNodes) throws RemoteException {
+
+        bot().waitUntil(new DefaultCondition() {
+            public boolean test() throws Exception {
+                return getFileContent(fileNodes).equals(otherClassContent);
+            }
+
+            public String getFailureMessage() {
+                return "The both contents are not" + " same.";
+            }
+        });
+    }
+
+    /**********************************************
+     * 
+     * innner function
+     * 
+     **********************************************/
 
     private void initContextMenuWrapper(STFBotTreeItem treeItem,
         TreeItemType type) {

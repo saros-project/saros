@@ -6,7 +6,6 @@ import java.rmi.RemoteException;
 
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.STFWorkbenchBot;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.noFinder.NoBot;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.SuperBot;
 
 /**
@@ -65,13 +64,7 @@ public class DummyTester extends AbstractTester {
     }
 
     @Override
-    public NoBot noBot() {
-        throwException();
-        return null;
-    }
-
-    @Override
-    public SuperBot sarosBot() throws RemoteException {
+    public SuperBot superBot() throws RemoteException {
         throwException();
         return null;
     }

@@ -9,7 +9,6 @@ import java.rmi.registry.Registry;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.STFBot;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.STFWorkbenchBot;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.noFinder.NoBot;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.SuperBot;
 
 /**
@@ -21,8 +20,8 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.SuperBot;
 public class RealTester extends AbstractTester {
 
     private STFWorkbenchBot bot;
-    private NoBot noBot;
-    private SuperBot sarosBot;
+
+    private SuperBot superBot;
 
     private JID jid;
     private String password;
@@ -43,9 +42,9 @@ public class RealTester extends AbstractTester {
         NotBoundException, AccessException {
         Registry registry = LocateRegistry.getRegistry(host, port);
         try {
-            bot = (STFWorkbenchBot) registry.lookup("bot");
-            noBot = (NoBot) registry.lookup("noBot");
-            sarosBot = (SuperBot) registry.lookup("sarosBot");
+            bot = (STFWorkbenchBot) registry.lookup("workbenchBot");
+
+            superBot = (SuperBot) registry.lookup("superBot");
 
         } catch (java.rmi.ConnectException e) {
             throw new RuntimeException("Could not connect to RMI of bot " + jid
@@ -80,14 +79,9 @@ public class RealTester extends AbstractTester {
     }
 
     @Override
-    public NoBot noBot() {
-        return noBot;
-    }
-
-    @Override
-    public SuperBot sarosBot() throws RemoteException {
-        sarosBot.setJID(jid);
-        return sarosBot;
+    public SuperBot superBot() throws RemoteException {
+        superBot.setJID(jid);
+        return superBot;
     }
 
     @Override

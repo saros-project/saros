@@ -25,10 +25,11 @@ public class isMenuEnabled extends DefaultCondition {
         try {
             SWTBotMenu menu = null;
             for (String label : labels) {
-                if (menu == null)
+                SWTBotMenu menu2 = menu;
+                if (menu2 == null)
                     bot.menu(label);
                 else
-                    menu.menu(label);
+                    menu2.menu(label);
             }
         } catch (Exception e) {
             return false;

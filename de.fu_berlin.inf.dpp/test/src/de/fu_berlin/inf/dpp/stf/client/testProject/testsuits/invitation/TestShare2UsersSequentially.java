@@ -49,7 +49,7 @@ public class TestShare2UsersSequentially extends STFTest {
     @Test
     public void aliceShareProjectWithBobSequentially() throws RemoteException,
         InterruptedException {
-        alice.sarosBot().views().packageExplorerView().tree().newC()
+        alice.superBot().views().packageExplorerView().tree().newC()
             .javaProjectWithClasses(PROJECT1, PKG1, CLS1);
         buildSessionSequentially(PROJECT1, TypeOfCreateProject.NEW_PROJECT,
             alice, bob);
@@ -61,23 +61,23 @@ public class TestShare2UsersSequentially extends STFTest {
             .captureScreenshot(
                 (alice.bot().getPathToScreenShot() + "/inviter_in_sharedproject.png"));
 
-        assertTrue(bob.sarosBot().views().sessionView().isInSession());
-        assertTrue(alice.sarosBot().views().sessionView().isInSession());
+        assertTrue(bob.superBot().views().sessionView().isInSession());
+        assertTrue(alice.superBot().views().sessionView().isInSession());
 
-        assertFalse(bob.sarosBot().views().sessionView()
+        assertFalse(bob.superBot().views().sessionView()
             .selectParticipant(bob.getJID()).hasReadOnlyAccess());
-        assertFalse(alice.sarosBot().views().sessionView()
+        assertFalse(alice.superBot().views().sessionView()
             .selectParticipant(alice.getJID()).hasReadOnlyAccess());
 
-        assertTrue(alice.sarosBot().views().sessionView()
+        assertTrue(alice.superBot().views().sessionView()
             .selectParticipant(alice.getJID()).hasWriteAccess());
-        assertTrue(bob.sarosBot().views().sessionView()
+        assertTrue(bob.superBot().views().sessionView()
             .selectParticipant(bob.getJID()).hasWriteAccess());
 
         leaveSessionPeersFirst();
 
-        assertFalse(bob.sarosBot().views().sessionView().isInSession());
-        assertFalse(alice.sarosBot().views().sessionView().isInSession());
+        assertFalse(bob.superBot().views().sessionView().isInSession());
+        assertFalse(alice.superBot().views().sessionView().isInSession());
 
     }
 }

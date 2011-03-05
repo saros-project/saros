@@ -23,21 +23,21 @@ public class TestContextMenuDelete extends STFTest {
 
     @Test
     public void testDeleteProject() throws RemoteException {
-        alice.sarosBot().views().packageExplorerView().tree().newC()
+        alice.superBot().views().packageExplorerView().tree().newC()
             .project(PROJECT1);
-        alice.sarosBot().views().packageExplorerView()
+        alice.superBot().views().packageExplorerView()
             .selectJavaProject(PROJECT1).delete();
     }
 
     @Test
     public void testDeleteAllItems() throws RemoteException {
-        alice.sarosBot().views().packageExplorerView().tree().newC()
+        alice.superBot().views().packageExplorerView().tree().newC()
             .javaProjectWithClasses(PROJECT1, PKG1, CLS1);
-        alice.sarosBot().views().packageExplorerView()
+        alice.superBot().views().packageExplorerView()
             .selectPkg(PROJECT1, PKG1).newC().cls(CLS2);
-        alice.sarosBot().views().packageExplorerView().tree().newC()
+        alice.superBot().views().packageExplorerView().tree().newC()
             .pkg(PROJECT1, PKG2);
-        alice.sarosBot().views().packageExplorerView()
+        alice.superBot().views().packageExplorerView()
             .selectPkg(PROJECT1, PKG1).delete();
 
     }

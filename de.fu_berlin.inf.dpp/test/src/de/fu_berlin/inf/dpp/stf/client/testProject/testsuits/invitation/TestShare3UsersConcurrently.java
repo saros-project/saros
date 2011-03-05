@@ -30,7 +30,7 @@ public class TestShare3UsersConcurrently extends STFTest {
         initTesters(TypeOfTester.ALICE, TypeOfTester.BOB, TypeOfTester.CARL);
         setUpWorkbench();
         setUpSaros();
-        alice.sarosBot().views().packageExplorerView().tree().newC()
+        alice.superBot().views().packageExplorerView().tree().newC()
             .javaProjectWithClasses(PROJECT1, PKG1, CLS1);
         buildSessionConcurrently(PROJECT1, TypeOfCreateProject.NEW_PROJECT,
             alice, bob, carl);
@@ -57,31 +57,31 @@ public class TestShare3UsersConcurrently extends STFTest {
     public void testShareProjectConcurrently() throws RemoteException,
         InterruptedException {
 
-        assertTrue(carl.sarosBot().views().sessionView().isInSession());
-        assertFalse(carl.sarosBot().views().sessionView()
+        assertTrue(carl.superBot().views().sessionView().isInSession());
+        assertFalse(carl.superBot().views().sessionView()
             .selectParticipant(carl.getJID()).hasReadOnlyAccess());
-        assertTrue(carl.sarosBot().views().sessionView()
+        assertTrue(carl.superBot().views().sessionView()
             .selectParticipant(carl.getJID()).hasWriteAccess());
 
-        assertTrue(bob.sarosBot().views().sessionView().isInSession());
-        assertFalse(bob.sarosBot().views().sessionView()
+        assertTrue(bob.superBot().views().sessionView().isInSession());
+        assertFalse(bob.superBot().views().sessionView()
             .selectParticipant(bob.getJID()).hasReadOnlyAccess());
-        assertTrue(bob.sarosBot().views().sessionView()
+        assertTrue(bob.superBot().views().sessionView()
             .selectParticipant(bob.getJID()).hasWriteAccess());
 
-        assertTrue(alice.sarosBot().views().sessionView().isInSession());
-        assertFalse(alice.sarosBot().views().sessionView()
+        assertTrue(alice.superBot().views().sessionView().isInSession());
+        assertFalse(alice.superBot().views().sessionView()
             .selectParticipant(alice.getJID()).hasReadOnlyAccess());
-        assertTrue(alice.sarosBot().views().sessionView()
+        assertTrue(alice.superBot().views().sessionView()
             .selectParticipant(alice.getJID()).hasWriteAccess());
 
         leaveSessionPeersFirst();
 
-        assertFalse(carl.sarosBot().views().sessionView().isInSession());
+        assertFalse(carl.superBot().views().sessionView().isInSession());
 
-        assertFalse(bob.sarosBot().views().sessionView().isInSession());
+        assertFalse(bob.superBot().views().sessionView().isInSession());
 
-        assertFalse(alice.sarosBot().views().sessionView().isInSession());
+        assertFalse(alice.superBot().views().sessionView().isInSession());
 
     }
 }

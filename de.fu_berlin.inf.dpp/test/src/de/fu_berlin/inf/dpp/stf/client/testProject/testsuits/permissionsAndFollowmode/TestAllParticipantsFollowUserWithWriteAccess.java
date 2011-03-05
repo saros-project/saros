@@ -70,7 +70,7 @@ public class TestAllParticipantsFollowUserWithWriteAccess extends STFTest {
         assertFalse(carl.bot().isEditorOpen(CLS1_SUFFIX));
         assertFalse(dave.bot().isEditorOpen(CLS1_SUFFIX));
 
-        alice.sarosBot().views().packageExplorerView()
+        alice.superBot().views().packageExplorerView()
             .selectClass(PROJECT1, PKG1, CLS1).open();
 
         bob.bot().waitUntilEditorOpen(CLS1_SUFFIX);
@@ -151,7 +151,7 @@ public class TestAllParticipantsFollowUserWithWriteAccess extends STFTest {
     @Test
     public void testFollowModeByClosingEditorByAlice() throws IOException,
         CoreException {
-        alice.sarosBot().views().packageExplorerView()
+        alice.superBot().views().packageExplorerView()
             .selectClass(PROJECT1, PKG1, CLS1).open();
         bob.bot().waitUntilEditorOpen(CLS1_SUFFIX);
         carl.bot().waitUntilEditorOpen(CLS1_SUFFIX);
@@ -162,8 +162,9 @@ public class TestAllParticipantsFollowUserWithWriteAccess extends STFTest {
 
         alice.bot().editor(CLS1_SUFFIX).setTextWithoutSave(CP1_CHANGE);
         alice.bot().editor(CLS1 + SUFFIX_JAVA).closeWithSave();
-        String clsContentOfAlice = alice.noBot().getFileContent(
-            getClassPath(PROJECT1, PKG1, CLS1));
+        String clsContentOfAlice = alice.superBot().views()
+            .packageExplorerView()
+            .getFileContent(getClassPath(PROJECT1, PKG1, CLS1));
 
         bob.bot().waitUntilEditorClosed(CLS1_SUFFIX);
         carl.bot().waitUntilEditorClosed(CLS1_SUFFIX);
@@ -172,13 +173,13 @@ public class TestAllParticipantsFollowUserWithWriteAccess extends STFTest {
         assertFalse(carl.bot().isEditorOpen(CLS1_SUFFIX));
         assertFalse(dave.bot().isEditorOpen(CLS1_SUFFIX));
 
-        assertTrue(bob.noBot()
+        assertTrue(bob.superBot().views().packageExplorerView()
             .getFileContent(getClassPath(PROJECT1, PKG1, CLS1))
             .equals(clsContentOfAlice));
-        assertTrue(carl.noBot()
+        assertTrue(carl.superBot().views().packageExplorerView()
             .getFileContent(getClassPath(PROJECT1, PKG1, CLS1))
             .equals(clsContentOfAlice));
-        assertTrue(bob.noBot()
+        assertTrue(bob.superBot().views().packageExplorerView()
             .getFileContent(getClassPath(PROJECT1, PKG1, CLS1))
             .equals(clsContentOfAlice));
     }

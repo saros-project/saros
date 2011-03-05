@@ -644,6 +644,12 @@ public class STF {
     }
 
     public String changeToRegex(String text) {
+        // the name of project in SVN_control contains special characters, which
+        // should be filtered.
+        String[] names = text.split(" ");
+        if (names.length > 1) {
+            text = names[0];
+        }
         return text + ".*";
     }
 

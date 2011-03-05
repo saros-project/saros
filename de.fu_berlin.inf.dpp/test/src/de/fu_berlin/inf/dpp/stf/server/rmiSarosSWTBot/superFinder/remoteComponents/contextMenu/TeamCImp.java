@@ -2,6 +2,12 @@ package de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteCompone
 
 import java.rmi.RemoteException;
 
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.swtbot.swt.finder.widgets.TimeoutException;
 
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotShell;
@@ -9,6 +15,7 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBo
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotTreeItem;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotView;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.Component;
+import de.fu_berlin.inf.dpp.vcs.VCSAdapter;
 
 public class TeamCImp extends Component implements TeamC {
 
@@ -120,6 +127,7 @@ public class TeamCImp extends Component implements TeamC {
         shell3.bot().button(FINISH).click();
         bot().shell("Remote Project Exists").waitUntilActive();
         bot().shell("Remote Project Exists").confirm(YES);
+        bot().waitUntilShellIsClosed(SHELL_SHARE_PROJECT);
         try {
             bot().sleep(1000);
             if (bot().isShellOpen("Confirm Open Perspective"))
@@ -127,7 +135,7 @@ public class TeamCImp extends Component implements TeamC {
         } catch (TimeoutException e) {
             // ignore
         }
-        // bot().shell(SHELL_SHARE_PROJECT).waitsUntilIsShellClosed();
+
     }
 
     public void importProjectFromSVN(String repositoryURL)
@@ -185,6 +193,34 @@ public class TeamCImp extends Component implements TeamC {
             bot().waitUntilShellIsClosed(SHELL_SVN_SWITCH);
     }
 
+    public void switchProject(String projectName, String url)
+        throws RemoteException {
+        switchResource(projectName, url, "HEAD");
+    }
+
+    public void switchResource(String fullPath, String url)
+        throws RemoteException {
+        switchResource(fullPath, url, "HEAD");
+    }
+
+    public void switchResource(String fullPath, String url, String revision)
+        throws RemoteException {
+
+        final IPath path = new Path(fullPath);
+        final IResource resource = ResourcesPlugin.getWorkspace().getRoot()
+            .findMember(path);
+        if (resource == null)
+            throw new RemoteException("Resource \"" + path + "\" not found.");
+
+        final IProject project = resource.getProject();
+        VCSAdapter vcs = VCSAdapter.getAdapter(project);
+        if (vcs == null) {
+            throw new RemoteException("No VCSAdapter found for \""
+                + project.getName() + "\".");
+        }
+
+        vcs.switch_(resource, url, revision, new NullProgressMonitor());
+    }
     /**********************************************
      * 
      * States

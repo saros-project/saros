@@ -36,13 +36,13 @@ public class TestFolderOperations extends STFTest {
 
     @Before
     public void runBeforeEveryTest() throws RemoteException {
-        if (!alice.sarosBot().views().packageExplorerView()
+        if (!alice.superBot().views().packageExplorerView()
             .selectPkg(PROJECT1, PKG1).existsWithRegex(CLS1))
-            alice.sarosBot().views().packageExplorerView().tree().newC()
+            alice.superBot().views().packageExplorerView().tree().newC()
                 .cls(PROJECT1, PKG1, CLS1);
-        if (!alice.sarosBot().views().packageExplorerView()
+        if (!alice.superBot().views().packageExplorerView()
             .selectProject(PROJECT1).existsWithRegex(FOLDER1))
-            alice.sarosBot().views().packageExplorerView()
+            alice.superBot().views().packageExplorerView()
                 .selectProject(PROJECT1).newC().folder(FOLDER1);
     }
 
@@ -62,14 +62,14 @@ public class TestFolderOperations extends STFTest {
     @Test
     public void testRenameFolder() throws RemoteException {
         final String newFolderName = FOLDER1 + "New";
-        alice.sarosBot().views().packageExplorerView()
+        alice.superBot().views().packageExplorerView()
             .selectFolder(PROJECT1, FOLDER1).refactor().rename(newFolderName);
 
-        bob.sarosBot().views().packageExplorerView()
+        bob.superBot().views().packageExplorerView()
             .waitUntilFolderExists(PROJECT1, newFolderName);
-        assertTrue(bob.sarosBot().views().packageExplorerView()
+        assertTrue(bob.superBot().views().packageExplorerView()
             .selectProject(PROJECT1).existsWithRegex(newFolderName));
-        assertFalse(bob.sarosBot().views().packageExplorerView()
+        assertFalse(bob.superBot().views().packageExplorerView()
             .selectProject(PROJECT1).exists(FOLDER1));
     }
 }

@@ -15,12 +15,8 @@ public class TestBasicSarosElements extends STFTest {
     public static void runBeforeClass() throws RemoteException {
         initTesters(TypeOfTester.ALICE);
         setUpWorkbench();
+        setUpSaros();
     }
-
-    // @After
-    // public void runAfterEveryTest() throws RemoteException {
-    // disConnectByActiveTesters();
-    // }
 
     @Test
     public void testSessionView() throws RemoteException {
@@ -61,22 +57,22 @@ public class TestBasicSarosElements extends STFTest {
     @Test
     public void connect() throws RemoteException {
         log.trace("xmppConnect");
-        alice.sarosBot().views().buddiesView()
+        alice.superBot().views().buddiesView()
             .connectWith(alice.getJID(), alice.getPassword());
         log.trace("captureScreenshot");
         alice.bot().captureScreenshot(
             (alice.bot().getPathToScreenShot() + "/xmpp_connected.png"));
-        assertEquals(true, alice.sarosBot().views().buddiesView().isConnected());
+        assertEquals(true, alice.superBot().views().buddiesView().isConnected());
     }
 
     @Test
     public void disconnect() throws RemoteException {
-        alice.sarosBot().views().buddiesView()
+        alice.superBot().views().buddiesView()
             .connectWith(alice.getJID(), alice.getPassword());
-        alice.sarosBot().views().buddiesView().disconnect();
+        alice.superBot().views().buddiesView().disconnect();
         alice.bot().captureScreenshot(
             (alice.bot().getPathToScreenShot() + "/xmpp_disconnected.png"));
-        assertEquals(false, alice.sarosBot().views().buddiesView()
+        assertEquals(false, alice.superBot().views().buddiesView()
             .isConnected());
     }
 

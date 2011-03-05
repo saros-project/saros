@@ -18,11 +18,11 @@ public class TestContextMenuShareWith extends STFTest {
 
     @Test
     public void testShareWithMultipleBuddies() throws RemoteException {
-        alice.sarosBot().views().packageExplorerView().tree().newC()
+        alice.superBot().views().packageExplorerView().tree().newC()
             .javaProject(PROJECT1);
-        alice.sarosBot().views().packageExplorerView()
+        alice.superBot().views().packageExplorerView()
             .selectJavaProject(PROJECT1).shareWith().buddy(bob.getJID());
-        bob.sarosBot().confirmShellSessionInvitationAndShellAddProject(PROJECT1,
+        bob.superBot().confirmShellSessionInvitationAndShellAddProject(PROJECT1,
             TypeOfCreateProject.NEW_PROJECT);
     }
 }

@@ -33,9 +33,9 @@ public class TestShareProjectUsingExistingProject extends STFTest {
 
     @Before
     public void runBeforeEveryTest() throws RemoteException {
-        alice.sarosBot().views().packageExplorerView().tree().newC()
+        alice.superBot().views().packageExplorerView().tree().newC()
             .javaProjectWithClasses(PROJECT1, PKG1, CLS1);
-        bob.sarosBot().views().packageExplorerView().tree().newC()
+        bob.superBot().views().packageExplorerView().tree().newC()
             .javaProjectWithClasses(PROJECT1, PKG1, CLS2);
     }
 
@@ -49,26 +49,26 @@ public class TestShareProjectUsingExistingProject extends STFTest {
 
     @Test
     public void shareProjectUsingExistingProject() throws RemoteException {
-        assertFalse(bob.sarosBot().views().packageExplorerView()
+        assertFalse(bob.superBot().views().packageExplorerView()
             .selectPkg(PROJECT1, PKG1).existsWithRegex(CLS1_SUFFIX));
-        assertTrue(bob.sarosBot().views().packageExplorerView()
+        assertTrue(bob.superBot().views().packageExplorerView()
             .selectPkg(PROJECT1, PKG1).existsWithRegex(CLS2));
         buildSessionSequentially(PROJECT1, TypeOfCreateProject.EXIST_PROJECT,
             alice, bob);
-        bob.sarosBot().views().packageExplorerView()
+        bob.superBot().views().packageExplorerView()
             .waitUntilClassExists(PROJECT1, PKG1, CLS1);
-        assertTrue(bob.sarosBot().views().packageExplorerView()
+        assertTrue(bob.superBot().views().packageExplorerView()
             .selectPkg(PROJECT1, PKG1).existsWithRegex(CLS1));
-        assertFalse(bob.sarosBot().views().packageExplorerView()
+        assertFalse(bob.superBot().views().packageExplorerView()
             .selectPkg(PROJECT1, PKG1).existsWithRegex(CLS2));
     }
 
     @Test
     public void shareProjectUsingExistProjectWithCopyAfterCancelLocalChange()
         throws RemoteException {
-        assertFalse(bob.sarosBot().views().packageExplorerView()
+        assertFalse(bob.superBot().views().packageExplorerView()
             .selectPkg(PROJECT1, PKG1).existsWithRegex(CLS1_SUFFIX));
-        assertTrue(bob.sarosBot().views().packageExplorerView()
+        assertTrue(bob.superBot().views().packageExplorerView()
             .selectPkg(PROJECT1, PKG1).existsWithRegex(CLS2));
 
         buildSessionSequentially(
@@ -80,15 +80,16 @@ public class TestShareProjectUsingExistingProject extends STFTest {
         // bob.sarosC
         // .confirmProjectSharingWizardUsingExistProjectWithCopy(PROJECT1);
 
-        assertTrue(bob.sarosBot().views().packageExplorerView().tree()
+        assertTrue(bob.superBot().views().packageExplorerView().tree()
             .existsWithRegex(PROJECT1));
-        assertTrue(bob.sarosBot().views().packageExplorerView()
+        assertTrue(bob.superBot().views().packageExplorerView()
             .selectPkg(PROJECT1, PKG1).existsWithRegex(CLS2));
-        assertTrue(bob.sarosBot().views().packageExplorerView().tree()
+        assertTrue(bob.superBot().views().packageExplorerView().tree()
             .existsWithRegex(PROJECT1_NEXT));
-        assertTrue(bob.sarosBot().views().packageExplorerView()
+        assertTrue(bob.superBot().views().packageExplorerView()
             .selectPkg(PROJECT1_NEXT, PKG1).existsWithRegex(CLS1));
-        bob.noBot().deleteProjectNoGUI(PROJECT1_NEXT);
+        // bob.superBot().views().packageExplorerView()
+        // .selectJavaProject(PROJECT1_NEXT).delete();
     }
 
     @Test
@@ -96,15 +97,16 @@ public class TestShareProjectUsingExistingProject extends STFTest {
         throws RemoteException {
         buildSessionSequentially(PROJECT1,
             TypeOfCreateProject.EXIST_PROJECT_WITH_COPY, alice, bob);
-        assertTrue(bob.sarosBot().views().packageExplorerView().tree()
+        assertTrue(bob.superBot().views().packageExplorerView().tree()
             .existsWithRegex(PROJECT1));
-        assertTrue(bob.sarosBot().views().packageExplorerView()
+        assertTrue(bob.superBot().views().packageExplorerView()
             .selectPkg(PROJECT1, PKG1).existsWithRegex(CLS2));
-        assertTrue(bob.sarosBot().views().packageExplorerView().tree()
+        assertTrue(bob.superBot().views().packageExplorerView().tree()
             .existsWithRegex(PROJECT1_NEXT));
-        assertTrue(bob.sarosBot().views().packageExplorerView()
+        assertTrue(bob.superBot().views().packageExplorerView()
             .selectPkg(PROJECT1_NEXT, PKG1).existsWithRegex(CLS1));
-        bob.noBot().deleteProjectNoGUI(PROJECT1_NEXT);
+        // bob.superBot().views().packageExplorerView()
+        // .selectJavaProject(PROJECT1_NEXT).delete();
 
     }
 }
