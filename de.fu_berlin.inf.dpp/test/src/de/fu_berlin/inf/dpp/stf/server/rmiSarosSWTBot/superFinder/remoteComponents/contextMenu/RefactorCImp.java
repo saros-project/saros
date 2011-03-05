@@ -80,6 +80,8 @@ public class RefactorCImp extends Component implements RefactorC {
         shell.bot().button(buttonName).click();
         if (bot().isShellOpen("Rename Compilation Unit")) {
             bot().shell("Rename Compilation Unit").bot().button(buttonName)
+                .waitUntilIsEnabled();
+            bot().shell("Rename Compilation Unit").bot().button(buttonName)
                 .click();
         }
         if (bot().isShellOpen(shellTitle))

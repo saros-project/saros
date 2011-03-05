@@ -121,8 +121,9 @@ public class TeamCImp extends Component implements TeamC {
         bot().shell("Remote Project Exists").waitUntilActive();
         bot().shell("Remote Project Exists").confirm(YES);
         try {
-            bot().shell("Confirm Open Perspective").waitUntilActive();
-            bot().shell("Confirm Open Perspective").confirm(NO);
+            bot().sleep(1000);
+            if (bot().isShellOpen("Confirm Open Perspective"))
+                bot().shell("Confirm Open Perspective").confirm(NO);
         } catch (TimeoutException e) {
             // ignore
         }
@@ -167,8 +168,6 @@ public class TeamCImp extends Component implements TeamC {
     public void update(String versionID) throws RemoteException {
         switchToAnotherRevision(versionID);
     }
-
-   
 
     private void switchToAnotherRevision(String versionID)
         throws RemoteException {

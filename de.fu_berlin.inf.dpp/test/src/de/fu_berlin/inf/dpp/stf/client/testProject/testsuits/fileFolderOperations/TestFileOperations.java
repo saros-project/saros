@@ -40,6 +40,11 @@ public class TestFileOperations extends STFTest {
     @Before
     public void runBeforeEveryMethod() throws RemoteException,
         InterruptedException {
+        /*
+         * NOTE: The session sharing by Version 11.3.25.DEVEL is not stable,
+         * sometime the invitation process can not be completed, so it's
+         * possible that all tests are failed.
+         */
         setUpSessionWithAJavaProjectAndAClass(alice, bob, carl);
         setFollowMode(alice, carl);
     }

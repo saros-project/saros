@@ -7,6 +7,7 @@ import java.rmi.RemoteException;
 
 import org.junit.After;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import de.fu_berlin.inf.dpp.stf.client.testProject.testsuits.STFTest;
@@ -111,6 +112,7 @@ public class TestMenuRefactor extends STFTest {
     }
 
     @Test
+    @Ignore("need to fix")
     public void testShareProjectWithSVN() throws RemoteException {
         alice.sarosBot().views().packageExplorerView().tree().newC()
             .javaProject(PROJECT1);

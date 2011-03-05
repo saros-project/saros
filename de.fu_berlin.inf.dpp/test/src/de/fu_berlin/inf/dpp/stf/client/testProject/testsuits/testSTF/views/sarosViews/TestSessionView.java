@@ -202,8 +202,7 @@ public class TestSessionView extends STFTest {
         bob.sarosBot().views().remoteScreenView()
             .waitUntilRemoteScreenViewIsActive();
         assertTrue(bob.bot().view(VIEW_REMOTE_SCREEN).isActive());
-        alice.sarosBot().views().sessionView()
-            .stopSessionWithBuddy(bob.getJID());
+
     }
 
     @Test

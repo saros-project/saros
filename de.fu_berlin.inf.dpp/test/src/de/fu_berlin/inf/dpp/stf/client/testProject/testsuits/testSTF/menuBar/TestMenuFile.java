@@ -32,6 +32,7 @@ public class TestMenuFile extends STFTest {
      **********************************************/
     @Test
     public void testNewProject() throws RemoteException {
+
         alice.sarosBot().views().packageExplorerView().tree().newC()
             .project(PROJECT1);
         assertTrue(alice.sarosBot().views().packageExplorerView().tree()

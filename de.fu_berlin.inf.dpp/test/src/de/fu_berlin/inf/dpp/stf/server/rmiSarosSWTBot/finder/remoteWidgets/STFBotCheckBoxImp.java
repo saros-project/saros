@@ -37,6 +37,11 @@ public class STFBotCheckBoxImp extends AbstractRmoteWidget implements
      * finders
      * 
      **********************************************/
+
+    /**
+     * 
+     * @see SWTBotCheckBox#contextMenu(String)
+     */
     public STFBotMenu contextMenu(String text) throws RemoteException {
         return stfBotMenu.setWidget(widget.contextMenu(text));
     }
@@ -46,20 +51,35 @@ public class STFBotCheckBoxImp extends AbstractRmoteWidget implements
      * actions
      * 
      **********************************************/
-
+    /**
+     * 
+     * @see SWTBotCheckBox#click()
+     */
     public void click() throws RemoteException {
         widget.click();
     }
 
+    /**
+     * 
+     * @see SWTBotCheckBox#select()
+     */
     public void select() throws RemoteException {
         widget.select();
     }
 
+    /**
+     * 
+     * @see SWTBotCheckBox#deselect()
+     */
     public void deselect() throws RemoteException {
         widget.deselect();
 
     }
 
+    /**
+     * 
+     * @see SWTBotCheckBox#setFocus()
+     */
     public void setFocus() throws RemoteException {
         widget.setFocus();
     }
@@ -69,26 +89,51 @@ public class STFBotCheckBoxImp extends AbstractRmoteWidget implements
      * states
      * 
      **********************************************/
+
+    /**
+     * 
+     * @see SWTBotCheckBox#isEnabled()
+     */
     public boolean isEnabled() throws RemoteException {
         return widget.isEnabled();
     }
 
+    /**
+     * 
+     * @see SWTBotCheckBox#isVisible()
+     */
     public boolean isVisible() throws RemoteException {
         return widget.isVisible();
     }
 
+    /**
+     * 
+     * @see SWTBotCheckBox#isActive()
+     */
     public boolean isActive() throws RemoteException {
         return widget.isActive();
     }
 
+    /**
+     * 
+     * @see SWTBotCheckBox#isChecked()
+     */
     public boolean isChecked() throws RemoteException {
         return widget.isChecked();
     }
 
+    /**
+     * 
+     * @see SWTBotCheckBox#getText()
+     */
     public String getText() throws RemoteException {
         return widget.getText();
     }
 
+    /**
+     * 
+     * @see SWTBotCheckBox#getToolTipText()
+     */
     public String getToolTipText() throws RemoteException {
         return widget.getText();
     }

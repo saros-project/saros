@@ -156,7 +156,7 @@ public class TestSVNStateInitialization extends STFTest {
         assertTrue(alice.sarosBot().views().sessionView()
             .selectParticipant(alice.getJID()).hasWriteAccess());
         assertTrue(alice.sarosBot().views().sessionView()
-            .isParticipantNoGUI(bob.getJID()));
+            .existsParticipant(bob.getJID()));
         assertTrue(bob.sarosBot().views().sessionView()
             .selectParticipant(bob.getJID()).hasWriteAccess());
     }

@@ -1,7 +1,6 @@
 package de.fu_berlin.inf.dpp.stf.client.testProject.helpers;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
@@ -10,8 +9,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 import org.apache.log4j.Logger;
-
-import de.fu_berlin.inf.dpp.stf.client.AbstractTester;
 
 public class MakeOperationConcurrently {
     private final static Logger log = Logger
@@ -45,30 +42,30 @@ public class MakeOperationConcurrently {
         return result;
     }
 
-    public static List<Boolean> leaveSessionConcurrently(AbstractTester... invitees)
-        throws InterruptedException {
-        List<AbstractTester> peers = new LinkedList<AbstractTester>();
-        for (AbstractTester invitee : invitees) {
-            peers.add(invitee);
-        }
-        List<Callable<Boolean>> leaveTasks = new ArrayList<Callable<Boolean>>();
-        for (int i = 0; i < peers.size(); i++) {
-            final AbstractTester musician = peers.get(i);
-            leaveTasks.add(new Callable<Boolean>() {
-                public Boolean call() throws Exception {
-                    /**
-                     * Need to check for {@link User.Permission#WRITE_ACCESS}
-                     * before leaving.
-                     */
-                    musician.sarosBot().views().sessionView().leaveSession();
-                    return musician.sarosBot().views().sessionView()
-                        .isParticipantNoGUI(musician.getJID());
-                }
-            });
-        }
-        log.trace("workAll(leaveTasks)");
-        final List<Boolean> workAll = workAll(leaveTasks);
-
-        return workAll;
-    }
+    // public static List<Boolean> leaveSessionConcurrently(
+    // AbstractTester... invitees) throws InterruptedException {
+    // List<AbstractTester> peers = new LinkedList<AbstractTester>();
+    // for (AbstractTester invitee : invitees) {
+    // peers.add(invitee);
+    // }
+    // List<Callable<Boolean>> leaveTasks = new ArrayList<Callable<Boolean>>();
+    // for (int i = 0; i < peers.size(); i++) {
+    // final AbstractTester musician = peers.get(i);
+    // leaveTasks.add(new Callable<Boolean>() {
+    // public Boolean call() throws Exception {
+    // /**
+    // * Need to check for {@link User.Permission#WRITE_ACCESS}
+    // * before leaving.
+    // */
+    // musician.sarosBot().views().sessionView().leaveSession();
+    // return musician.sarosBot().views().sessionView()
+    // .existsParticipant(musician.getJID());
+    // }
+    // });
+    // }
+    // log.trace("workAll(leaveTasks)");
+    // final List<Boolean> workAll = workAll(leaveTasks);
+    //
+    // return workAll;
+    // }
 }

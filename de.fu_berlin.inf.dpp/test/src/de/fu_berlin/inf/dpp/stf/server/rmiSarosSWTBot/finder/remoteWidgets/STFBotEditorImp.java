@@ -43,6 +43,7 @@ public class STFBotEditorImp extends AbstractRmoteWidget implements
      * actions
      * 
      **********************************************/
+
     public void show() throws RemoteException {
         widget.show();
     }

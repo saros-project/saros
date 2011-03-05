@@ -319,7 +319,7 @@ public class SuperBotImp extends STF implements SuperBot {
     public void confirmShellSessionInvitationAndAddProject(String projectName,
         TypeOfCreateProject usingWhichProject) throws RemoteException {
         if (!bot().isShellOpen(SHELL_SESSION_INVITATION)) {
-            bot().waitUntilShellIsOpen(SHELL_SESSION_INVITATION);
+            bot().waitLongUntilShellIsOpen(SHELL_SESSION_INVITATION);
         }
         bot().shell(SHELL_SESSION_INVITATION).confirm(FINISH);
         confirmShellAddProjectUsingWhichProject(projectName, usingWhichProject);

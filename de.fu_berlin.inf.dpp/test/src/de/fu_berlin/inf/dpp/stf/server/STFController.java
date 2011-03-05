@@ -18,23 +18,32 @@ import de.fu_berlin.inf.dpp.feedback.FeedbackManager;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
 import de.fu_berlin.inf.dpp.project.SarosSessionManager;
 import de.fu_berlin.inf.dpp.stf.STF;
-import de.fu_berlin.inf.dpp.stf.client.AbstractTester;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.STFBotImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.STFWorkbenchBotImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotButtonImp;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotCComboImp;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotCheckBoxImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotComboImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotEditorImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotLabelImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotListImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotMenuImp;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotPerspectiveImp;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotRadioImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotShellImp;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotStyledTextImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotTableImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotTableItemImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotTextImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotToolbarButtonImp;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotToolbarDropDownButtonImp;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotToolbarPushButtonImp;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotToolbarRadioButtonImp;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotToolbarToggleButtonImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotTreeImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotTreeItemImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotViewImp;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotViewMenuImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.noFinder.NoBotImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.StateImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.SuperBotImp;
@@ -60,9 +69,7 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponen
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.views.sarosViews.SessionViewImp;
 
 /**
- * SarosRmiSWTWorkbenchBot controls Eclipse Saros from the GUI perspective. It
- * exports {@link SarosState} via RMI. You should not use this within tests.
- * Have a look at {@link AbstractTester} if you want to write tests.
+ * STFController is responsible to register all exported objects.
  * 
  */
 public class STFController {
@@ -94,50 +101,80 @@ public class STFController {
         Component.editorManager = editorManager;
         Component.xmppAccountStore = xmppAccountStore;
         Component.feedbackManager = feedbackManager;
+
         try {
             registry = LocateRegistry.createRegistry(port);
         } catch (RemoteException e) {
             registry = LocateRegistry.getRegistry(port);
         }
 
+        /*
+         * bots' family
+         */
         exportObject(STFBotImp.getInstance(), "stfBot");
         exportObject(STFWorkbenchBotImp.getInstance(), "bot");
         exportObject(NoBotImp.getInstance(), "noBot");
         exportObject(SuperBotImp.getInstance(), "sarosBot");
+
+        /*
+         * export remoteWidgets
+         */
+        exportObject(STFBotButtonImp.getInstance(), "button");
+        exportObject(STFBotCComboImp.getInstance(), "ccombo");
+        exportObject(STFBotCheckBoxImp.getInstance(), "checkBox");
+        exportObject(STFBotComboImp.getInstance(), "combo");
+        exportObject(STFBotEditorImp.getInstance(), "eclipseEditor");
+        exportObject(STFBotLabelImp.getInstance(), "label");
+        exportObject(STFBotListImp.getInstance(), "list");
+        exportObject(STFBotMenuImp.getInstance(), "menu");
+        exportObject(STFBotPerspectiveImp.getInstance(), "perspective");
+        exportObject(STFBotRadioImp.getInstance(), "radio");
         exportObject(STFBotShellImp.getInstance(), "shell");
+        exportObject(STFBotStyledTextImp.getInstance(), "styledText");
         exportObject(STFBotTableImp.getInstance(), "table");
         exportObject(STFBotTableItemImp.getInstance(), "tableItem");
+        exportObject(STFBotTextImp.getInstance(), "text");
+        exportObject(STFBotToolbarButtonImp.getInstance(), "toggleButton");
+        exportObject(STFBotToolbarButtonImp.getInstance(), "toolbarButton");
+        exportObject(STFBotToolbarDropDownButtonImp.getInstance(),
+            "toolbarDropDownButton");
+        exportObject(STFBotToolbarPushButtonImp.getInstance(),
+            "toolbarPushButon");
+        exportObject(STFBotToolbarRadioButtonImp.getInstance(),
+            "toolbarRadioButton");
+        exportObject(STFBotToolbarToggleButtonImp.getInstance(),
+            "toolbarToggleButton");
         exportObject(STFBotTreeImp.getInstance(), "tree");
         exportObject(STFBotTreeItemImp.getInstance(), "treeItem");
-        exportObject(STFBotButtonImp.getInstance(), "button");
-        exportObject(STFBotToolbarButtonImp.getInstance(), "toolbarButton");
         exportObject(STFBotViewImp.getInstance(), "view");
-        exportObject(STFBotMenuImp.getInstance(), "menu");
-        exportObject(STFBotLabelImp.getInstance(), "label");
-        exportObject(STFBotTextImp.getInstance(), "text");
-        exportObject(STFBotListImp.getInstance(), "list");
+        exportObject(STFBotViewMenuImp.getInstance(), "viewMenu");
+
+        /*
+         * remote eclipse components
+         */
         exportObject(PEViewImp.getInstance(), "packageExplorerView");
         exportObject(ProgressViewImp.getInstance(), "progressView");
-        exportObject(STFBotEditorImp.getInstance(), "eclipseEditor");
         exportObject(BuddiesViewImp.getInstance(), "rosterView");
         exportObject(SessionViewImp.getInstance(), "sessionView");
         exportObject(RSViewImp.getInstance(), "remoteScreenView");
         exportObject(ChatViewImp.getInstance(), "chatView");
         exportObject(ConsoleViewImp.getInstance(), "consoleView");
+
         exportObject(NewCImp.getInstance(), "fileM");
-        exportObject(STFBotComboImp.getInstance(), "combo");
         exportObject(RefactorCImp.getInstance(), "refactorM");
         exportObject(WindowMImp.getInstance(), "windowM");
         exportObject(SarosMImp.getInstance(), "sarosM");
-        exportObject(TeamCImp.getInstance(), "team");
-        exportObject(ShareWithCImp.getInstance(), "saros");
 
+        exportObject(TeamCImp.getInstance(), "teamC");
+        exportObject(ShareWithCImp.getInstance(), "shareWithC");
         exportObject(ContextMenuWrapperImp.getInstance(), "contextMenu");
         exportObject(SarosContextMenuWrapperImp.getInstance(),
             "sarosContextMenu");
+
         exportObject(SarosPreferencesImp.getInstance(), "sarosPreferences");
         exportObject(StateImp.getInstance(), "state");
         exportObject(WaitImp.getInstance(), "wait");
+
         exportObject(ViewsImp.getInstance(), "views");
         exportObject(MenuBarImp.getInstance(), "menuBar");
     }

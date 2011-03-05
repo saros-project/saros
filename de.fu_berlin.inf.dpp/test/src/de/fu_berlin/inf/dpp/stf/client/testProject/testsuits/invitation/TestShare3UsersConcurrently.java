@@ -57,19 +57,19 @@ public class TestShare3UsersConcurrently extends STFTest {
     public void testShareProjectConcurrently() throws RemoteException,
         InterruptedException {
 
-        assertTrue(carl.sarosBot().views().sessionView().isParticipantNoGUI());
+        assertTrue(carl.sarosBot().views().sessionView().isInSession());
         assertFalse(carl.sarosBot().views().sessionView()
             .selectParticipant(carl.getJID()).hasReadOnlyAccess());
         assertTrue(carl.sarosBot().views().sessionView()
             .selectParticipant(carl.getJID()).hasWriteAccess());
 
-        assertTrue(bob.sarosBot().views().sessionView().isParticipantNoGUI());
+        assertTrue(bob.sarosBot().views().sessionView().isInSession());
         assertFalse(bob.sarosBot().views().sessionView()
             .selectParticipant(bob.getJID()).hasReadOnlyAccess());
         assertTrue(bob.sarosBot().views().sessionView()
             .selectParticipant(bob.getJID()).hasWriteAccess());
 
-        assertTrue(alice.sarosBot().views().sessionView().isParticipantNoGUI());
+        assertTrue(alice.sarosBot().views().sessionView().isInSession());
         assertFalse(alice.sarosBot().views().sessionView()
             .selectParticipant(alice.getJID()).hasReadOnlyAccess());
         assertTrue(alice.sarosBot().views().sessionView()

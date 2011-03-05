@@ -61,8 +61,8 @@ public class TestShare2UsersSequentially extends STFTest {
             .captureScreenshot(
                 (alice.bot().getPathToScreenShot() + "/inviter_in_sharedproject.png"));
 
-        assertTrue(bob.sarosBot().views().sessionView().isParticipantNoGUI());
-        assertTrue(alice.sarosBot().views().sessionView().isParticipantNoGUI());
+        assertTrue(bob.sarosBot().views().sessionView().isInSession());
+        assertTrue(alice.sarosBot().views().sessionView().isInSession());
 
         assertFalse(bob.sarosBot().views().sessionView()
             .selectParticipant(bob.getJID()).hasReadOnlyAccess());
