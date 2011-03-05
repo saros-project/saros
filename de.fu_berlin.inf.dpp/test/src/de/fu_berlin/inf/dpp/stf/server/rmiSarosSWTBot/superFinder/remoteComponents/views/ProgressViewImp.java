@@ -4,16 +4,13 @@ import java.rmi.RemoteException;
 
 import org.eclipse.swtbot.swt.finder.waits.DefaultCondition;
 
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotTree;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotView;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.Component;
 
-public class ProgressViewImp extends Component implements
-    ProgressView {
+public class ProgressViewImp extends Component implements ProgressView {
     private static transient ProgressViewImp self;
 
     private STFBotView view;
-    private STFBotTree tree;
 
     /**
      * {@link ProgressViewImp} is a singleton, but inheritance is possible.
@@ -25,9 +22,9 @@ public class ProgressViewImp extends Component implements
         return self;
     }
 
-    public ProgressView setView(STFBotView view) throws RemoteException {
+    public ProgressView setView(STFBotView view) {
         this.view = view;
-        tree = view.bot().tree();
+
         return this;
     }
 
@@ -44,24 +41,19 @@ public class ProgressViewImp extends Component implements
      **********************************************/
 
     public void removeProgress() throws RemoteException {
-        preCondition();
-        bot().view(VIEW_PROGRESS).bot().toolbarButton().click();
+        view.bot().toolbarButton().click();
 
     }
 
     public void removeProcess(int index) throws RemoteException {
-        preCondition();
-        bot().view(VIEW_PROGRESS)
-            .toolbarButton(TB_REMOVE_ALL_FINISHED_OPERATIONS).click();
-        bot().view(VIEW_PROGRESS).bot().toolbarButton(index).click();
+        view.toolbarButton(TB_REMOVE_ALL_FINISHED_OPERATIONS).click();
+        view.bot().toolbarButton(index).click();
 
     }
 
-    public boolean existPorgress() throws RemoteException {
-        preCondition();
-        bot().view(VIEW_PROGRESS)
-            .toolbarButton(TB_REMOVE_ALL_FINISHED_OPERATIONS).click();
-        return bot().view(VIEW_PROGRESS).bot().existsToolbarButton();
+    public boolean existsPorgress() throws RemoteException {
+        view.toolbarButton(TB_REMOVE_ALL_FINISHED_OPERATIONS).click();
+        return view.bot().existsToolbarButton();
     }
 
     /**********************************************
@@ -69,29 +61,17 @@ public class ProgressViewImp extends Component implements
      * waits until
      * 
      **********************************************/
-    public void waitUntilProgressNotExists() throws RemoteException {
-        preCondition();
+    public void waitUntilNotExistsProgress() throws RemoteException {
         bot().waitUntil(new DefaultCondition() {
             public boolean test() throws Exception {
-                return !existPorgress();
+                return !existsPorgress();
             }
 
             public String getFailureMessage() {
-                return "There are still some progresses";
+                return "There are still some progresses existed";
             }
         });
 
-    }
-
-    /**************************************************************
-     * 
-     * Inner functions
-     * 
-     **************************************************************/
-
-    private void preCondition() throws RemoteException {
-        bot().openViewById(VIEW_PROGRESS_ID);
-        bot().view(VIEW_PROGRESS).show();
     }
 
 }

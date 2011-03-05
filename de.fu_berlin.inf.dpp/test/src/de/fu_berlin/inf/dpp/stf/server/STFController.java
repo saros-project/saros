@@ -45,9 +45,7 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBo
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotViewImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotViewMenuImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.noFinder.NoBotImp;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.StateImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.SuperBotImp;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.WaitImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.Component;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.contextMenu.ContextMenuWrapperImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.contextMenu.NewCImp;
@@ -172,8 +170,6 @@ public class STFController {
             "sarosContextMenu");
 
         exportObject(SarosPreferencesImp.getInstance(), "sarosPreferences");
-        exportObject(StateImp.getInstance(), "state");
-        exportObject(WaitImp.getInstance(), "wait");
 
         exportObject(ViewsImp.getInstance(), "views");
         exportObject(MenuBarImp.getInstance(), "menuBar");

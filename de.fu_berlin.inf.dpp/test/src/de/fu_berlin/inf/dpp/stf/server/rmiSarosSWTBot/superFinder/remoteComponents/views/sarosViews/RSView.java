@@ -13,5 +13,5 @@ public interface RSView extends Remote {
 
     public void clickTBPause() throws RemoteException;
 
-    public void waitUntilRemoteScreenViewIsActive() throws RemoteException;
+    // public void waitUntilRemoteScreenViewIsActive() throws RemoteException;
 }

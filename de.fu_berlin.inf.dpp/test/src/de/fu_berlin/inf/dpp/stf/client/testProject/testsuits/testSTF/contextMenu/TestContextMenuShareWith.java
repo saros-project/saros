@@ -22,7 +22,7 @@ public class TestContextMenuShareWith extends STFTest {
             .javaProject(PROJECT1);
         alice.sarosBot().views().packageExplorerView()
             .selectJavaProject(PROJECT1).shareWith().buddy(bob.getJID());
-        bob.sarosBot().confirmShellSessionInvitationAndAddProject(PROJECT1,
+        bob.sarosBot().confirmShellSessionInvitationAndShellAddProject(PROJECT1,
             TypeOfCreateProject.NEW_PROJECT);
     }
 }

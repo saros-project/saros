@@ -4,9 +4,8 @@ import java.rmi.Remote;
 import java.rmi.RemoteException;
 
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.stf.client.AbstractTester;
+import de.fu_berlin.inf.dpp.stf.STF;
 import de.fu_berlin.inf.dpp.stf.client.testProject.testsuits.STFTest.TypeOfCreateProject;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.contextMenu.ShareWithC;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.menuBar.MenuBar;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.views.Views;
 
@@ -17,9 +16,6 @@ public interface SuperBot extends Remote {
      * finders
      * 
      **********************************************/
-    public State state() throws RemoteException;
-
-    public Wait condition() throws RemoteException;
 
     public Views views() throws RemoteException;
 
@@ -27,11 +23,16 @@ public interface SuperBot extends Remote {
 
     public void setJID(JID jid) throws RemoteException;
 
+    /**********************************************
+     * 
+     * Shells
+     * 
+     **********************************************/
+
     /**
-     * After the {@link ShareWithC#confirmShellAddBuddyToSession(String...)} the
-     * popup wizard with the title "Session Invitation" should be appeared by
-     * the invitees' side. This method confirm the wizard "Session Invitation"
-     * using a new project.
+     * The shell with the title {@link STF#SHELL_ADD_PROJECT} should be appeared
+     * by the invitees' side during sharing session. This method confirm the
+     * shell using a new project.
      * 
      * @throws RemoteException
      */
@@ -39,10 +40,9 @@ public interface SuperBot extends Remote {
         throws RemoteException;
 
     /**
-     * After the {@link ShareWithC#confirmShellAddBuddyToSession(String...)} the
-     * popup wizard with the title "Session Invitation" should be appeared by
-     * the invitees' side. This method confirm the wizard "Session Invitation"
-     * using a exist project.
+     * The shell with the title {@link STF#SHELL_ADD_PROJECT} should be appeared
+     * by the invitees' side during sharing session. This method confirm the
+     * shell using an existed project.
      * 
      * @throws RemoteException
      */
@@ -50,11 +50,9 @@ public interface SuperBot extends Remote {
         throws RemoteException;
 
     /**
-     * After the {@link ShareWithC#confirmShellAddBuddyToSession(String...)} the
-     * popup wizard with the title "Session Invitation" should be appeared by
-     * the invitees' side. This method confirm the wizard "Session Invitation"
-     * using a exist project with clicking the button browser->confirming popup
-     * window -> clicking the button "finish" -> conforming the local change
+     * The shell with the title {@link STF#SHELL_ADD_PROJECT} should be appeared
+     * by the invitees' side during sharing session. This method confirm the
+     * shell using an existed project.
      * 
      * @throws RemoteException
      */
@@ -62,10 +60,9 @@ public interface SuperBot extends Remote {
         String projectName) throws RemoteException;
 
     /**
-     * After the {@link ShareWithC#confirmShellAddBuddyToSession(String...)} the
-     * popup wizard with the title "Session Invitation" should be appeared by
-     * the invitees' side. This method confirm the wizard "Session Invitation"
-     * using a exist project with copy
+     * The shell with the title {@link STF#SHELL_ADD_PROJECT} should be appeared
+     * by the invitees' side during sharing session. This method confirm the
+     * shell using an existed project with copy.
      * 
      * @throws RemoteException
      */
@@ -73,82 +70,111 @@ public interface SuperBot extends Remote {
         String projectName) throws RemoteException;
 
     /**
-     * After the {@link ShareWithC#confirmShellAddBuddyToSession(String...)} the
-     * popup wizard with the title "Session Invitation" should be appeared by
-     * the invitees' side. This method confirm the wizard "Session Invitation"
-     * using a new project or a existed project according the passed parameter
-     * "usingWhichProject".
+     * The shell with the title {@link STF#SHELL_ADD_PROJECT} should be appeared
+     * by the invitees' side during sharing session. This method confirm the
+     * shell. with the passed parameter "usingWhichProject" to decide using
+     * which project.
      * 
      * @throws RemoteException
      */
     public void confirmShellAddProjectUsingWhichProject(String projectName,
         TypeOfCreateProject usingWhichProject) throws RemoteException;
 
-    public void confirmShellChangeXMPPAccount(String xmppJabberID,
+    /**
+     * Confirm the shell with title {@link STF#SHELL_EDIT_XMPP_JABBER_ACCOUNT}
+     * activated by clicking button {@link STF#BUTTON_EDIT_ACCOUNT} in saros
+     * preference.
+     * 
+     * @param newXmppJabberID
+     * @param newPassword
+     * @throws RemoteException
+     */
+    public void confirmShellEditXMPPJabberAccount(String newXmppJabberID,
         String newPassword) throws RemoteException;
 
     /**
-     * Confirm the popUp window "create new XMPP account".
+     * Confirm the shell with title {@link STF#SHELL_CREATE_XMPP_JABBER_ACCOUNT}
      * 
      * @param jid
-     *            jid of the new XMPP account
+     *            {@link JID}
      * @param password
-     *            password of the new XMPP account
+     *            password of the new XMPP/Jabber account
      * @throws RemoteException
      */
-    public void confirmShellCreateNewXMPPAccount(JID jid, String password)
+    public void confirmShellCreateNewXMPPJabberAccount(JID jid, String password)
         throws RemoteException;
 
     /**
-     * confirm the wizard "Saros configuration".
+     * confirm the shell with title {@link STF#SHELL_ADD_XMPP_JABBER_ACCOUNT}
      * 
      * @param jid
-     *            jid of the new XMPP account
+     *            {@link JID}
      * @param password
-     *            password of the new XMPP account
+     *            password of the new XMPP/Jabber account
      * @throws RemoteException
      */
-    public void confirmWizardAddXMPPJabberAccount(JID jid, String password)
+    public void confirmShellAddXMPPJabberAccount(JID jid, String password)
         throws RemoteException;
 
     /**
-     * After clicking one of the sub menu of the context menu "Saros" in the
-     * package explorer view host will get the popup window with the title
-     * "Invitation". This method confirm the popup window.
+     * confirm the shell with title {@link STF#SHELL_ADD_BUDDY_TO_SESSION}
      * 
-     * @param inviteesBaseJIDs
-     *            the base JID of the users with whom you want to share your
-     *            project.
+     * @param inviteesXMPPJabberID
      * @throws RemoteException
      */
-    public void confirmShellAddBuddyToSession(String... inviteesBaseJIDs)
+    public void confirmShellAddBuddyToSession(String... inviteesXMPPJabberID)
         throws RemoteException;
 
     /**
-     * Confirm the popUp window "Closing the session", which would be triggered,
-     * when host try to leave a session.
+     * Confirm the shell with title {@link STF#SHELL_CLOSING_THE_SESSION}
      * 
      * @throws RemoteException
      */
     public void confirmShellClosingTheSession() throws RemoteException;
 
     /**
-     * This popup window should be appeared by you, after someone else deleted
-     * your contact from his buddies.
-     * 
-     * This method should be called by
-     * {@link AbstractTester#deleteBuddyGUIDone(AbstractTester)}
+     * Confirm the shell with title {@link STF#SHELL_REMOVAL_OF_SUBSCRIPTION}
+     * which would be appeared if someone delete your contact from his buddies
+     * list.
      * 
      * @throws RemoteException
      */
     public void confirmShellRemovelOfSubscription() throws RemoteException;
 
+    /**
+     * Confirm the shell with title {@link STF#SHELL_ADD_BUDDY}
+     * 
+     * @param jid
+     *            {@link JID}
+     * @throws RemoteException
+     */
     public void confirmShellAddBuddy(JID jid) throws RemoteException;
 
-    public void confirmWizardShareProject(String projectName, JID... jids)
+    /**
+     * confirm the shell with title {@link STF#SHELL_SHARE_PROJECT}
+     * 
+     * @param projectName
+     *            the name of shared project
+     * @param jids
+     *            {@link JID}s of all invitees
+     * @throws RemoteException
+     */
+    public void confirmShellShareProject(String projectName, JID... jids)
         throws RemoteException;
 
-    public void confirmShellSessionInvitationAndAddProject(String projectName,
-        TypeOfCreateProject usingWhichProject) throws RemoteException;
+    /**
+     * confirm the shell with title {@link STF#SHELL_SESSION_INVITATION} and
+     * also the following shell with title {@link STF#SHELL_ADD_PROJECT}
+     * 
+     * @param projectName
+     *            the name of shared project
+     * @param usingWhichProject
+     *            if invitee has same project locally, he can decide use new or
+     *            existed project.
+     * @throws RemoteException
+     */
+    public void confirmShellSessionInvitationAndShellAddProject(
+        String projectName, TypeOfCreateProject usingWhichProject)
+        throws RemoteException;
 
 }

@@ -21,9 +21,6 @@ public class SuperBotImp extends STF implements SuperBot {
 
     private static STFWorkbenchBot bot;
 
-    private static StateImp state;
-    private static WaitImp wait;
-
     private static ViewsImp views;
 
     private static MenuBarImp menuBar;
@@ -36,9 +33,6 @@ public class SuperBotImp extends STF implements SuperBot {
             return self;
         self = new SuperBotImp();
         bot = STFWorkbenchBotImp.getInstance();
-
-        wait = WaitImp.getInstance();
-        state = StateImp.getInstance();
 
         views = ViewsImp.getInstance();
         menuBar = MenuBarImp.getInstance();
@@ -60,14 +54,6 @@ public class SuperBotImp extends STF implements SuperBot {
 
     private STFWorkbenchBot bot() {
         return bot;
-    }
-
-    public State state() throws RemoteException {
-        return state;
-    }
-
-    public Wait condition() throws RemoteException {
-        return wait;
     }
 
     public Views views() throws RemoteException {
@@ -207,7 +193,7 @@ public class SuperBotImp extends STF implements SuperBot {
         }
     }
 
-    public void confirmShellChangeXMPPAccount(String xmppJabberID,
+    public void confirmShellEditXMPPJabberAccount(String xmppJabberID,
         String newPassword) throws RemoteException {
         bot().waitUntilShellIsOpen(SHELL_EDIT_XMPP_JABBER_ACCOUNT);
         STFBotShell shell = bot().shell(SHELL_EDIT_XMPP_JABBER_ACCOUNT);
@@ -218,7 +204,7 @@ public class SuperBotImp extends STF implements SuperBot {
         shell.bot().button(FINISH).click();
     }
 
-    public void confirmShellCreateNewXMPPAccount(JID jid, String password)
+    public void confirmShellCreateNewXMPPJabberAccount(JID jid, String password)
         throws RemoteException {
         bot().waitUntilShellIsOpen(SHELL_CREATE_XMPP_JABBER_ACCOUNT);
         STFBotShell shell = bot().shell(SHELL_CREATE_XMPP_JABBER_ACCOUNT);
@@ -245,7 +231,7 @@ public class SuperBotImp extends STF implements SuperBot {
         }
     }
 
-    public void confirmWizardAddXMPPJabberAccount(JID jid, String password)
+    public void confirmShellAddXMPPJabberAccount(JID jid, String password)
         throws RemoteException {
         if (bot().isShellOpen(SHELL_ADD_XMPP_JABBER_ACCOUNT))
             bot().waitUntilShellIsOpen(SHELL_ADD_XMPP_JABBER_ACCOUNT);
@@ -300,7 +286,7 @@ public class SuperBotImp extends STF implements SuperBot {
         }
     }
 
-    public void confirmWizardShareProject(String projectName, JID... jids)
+    public void confirmShellShareProject(String projectName, JID... jids)
         throws RemoteException {
         if (!bot().isShellOpen(SHELL_SHARE_PROJECT)) {
             bot().waitUntilShellIsOpen(SHELL_SHARE_PROJECT);
@@ -316,8 +302,9 @@ public class SuperBotImp extends STF implements SuperBot {
         shell.bot().button(FINISH).click();
     }
 
-    public void confirmShellSessionInvitationAndAddProject(String projectName,
-        TypeOfCreateProject usingWhichProject) throws RemoteException {
+    public void confirmShellSessionInvitationAndShellAddProject(
+        String projectName, TypeOfCreateProject usingWhichProject)
+        throws RemoteException {
         if (!bot().isShellOpen(SHELL_SESSION_INVITATION)) {
             bot().waitLongUntilShellIsOpen(SHELL_SESSION_INVITATION);
         }

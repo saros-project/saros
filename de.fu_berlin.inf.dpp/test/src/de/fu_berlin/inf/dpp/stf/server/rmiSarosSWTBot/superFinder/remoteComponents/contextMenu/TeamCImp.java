@@ -185,4 +185,10 @@ public class TeamCImp extends Component implements TeamC {
             bot().waitUntilShellIsClosed(SHELL_SVN_SWITCH);
     }
 
+    /**********************************************
+     * 
+     * States
+     * 
+     **********************************************/
+
 }

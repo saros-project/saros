@@ -460,6 +460,21 @@ public class STFBotImp extends STF implements STFBot {
 
     }
 
+    public boolean existsStyledText() throws RemoteException {
+        long oldTimeout = SWTBotPreferences.TIMEOUT;
+        // increase the timeout
+        SWTBotPreferences.TIMEOUT = 1000;
+
+        try {
+            swtBot.styledText();
+            SWTBotPreferences.TIMEOUT = oldTimeout;
+            return true;
+        } catch (WidgetNotFoundException e) {
+            SWTBotPreferences.TIMEOUT = oldTimeout;
+            return false;
+        }
+    }
+
     public boolean existsLabel() throws RemoteException {
         long oldTimeout = SWTBotPreferences.TIMEOUT;
         // increase the timeout

@@ -199,8 +199,7 @@ public class TestSessionView extends STFTest {
     public void sharedYourScreenWithSelectedUserGUI() throws RemoteException {
         // alice.mainMenu.setupSettingForScreensharing(1, 0, -1, -1);
         shareYourScreen(alice, bob);
-        bob.sarosBot().views().remoteScreenView()
-            .waitUntilRemoteScreenViewIsActive();
+        bob.bot().view(VIEW_REMOTE_SCREEN).waitUntilIsActive();
         assertTrue(bob.bot().view(VIEW_REMOTE_SCREEN).isActive());
 
     }

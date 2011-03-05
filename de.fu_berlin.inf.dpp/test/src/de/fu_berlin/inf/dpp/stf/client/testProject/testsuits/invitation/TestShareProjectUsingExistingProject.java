@@ -55,7 +55,8 @@ public class TestShareProjectUsingExistingProject extends STFTest {
             .selectPkg(PROJECT1, PKG1).existsWithRegex(CLS2));
         buildSessionSequentially(PROJECT1, TypeOfCreateProject.EXIST_PROJECT,
             alice, bob);
-        bob.sarosBot().condition().waitUntilClassExists(PROJECT1, PKG1, CLS1);
+        bob.sarosBot().views().packageExplorerView()
+            .waitUntilClassExists(PROJECT1, PKG1, CLS1);
         assertTrue(bob.sarosBot().views().packageExplorerView()
             .selectPkg(PROJECT1, PKG1).existsWithRegex(CLS1));
         assertFalse(bob.sarosBot().views().packageExplorerView()

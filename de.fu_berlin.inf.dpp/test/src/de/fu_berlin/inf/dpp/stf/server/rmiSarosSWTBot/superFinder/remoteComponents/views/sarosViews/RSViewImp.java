@@ -37,50 +37,19 @@ public class RSViewImp extends Component implements RSView {
      * 
      **********************************************/
     public void clickTBChangeModeOfImageSource() throws RemoteException {
-        preCondition();
-        bot().view(VIEW_REMOTE_SCREEN)
-            .toolbarButton(TB_CHANGE_MODE_IMAGE_SOURCE).click();
+        view.toolbarButton(TB_CHANGE_MODE_IMAGE_SOURCE).click();
     }
 
     public void clickTBStopRunningSession() throws RemoteException {
-        preCondition();
-        bot().view(VIEW_REMOTE_SCREEN).toolbarButton(TB_STOP_RUNNING_SESSION)
-            .click();
+        view.toolbarButton(TB_STOP_RUNNING_SESSION).click();
     }
 
     public void clickTBResume() throws RemoteException {
-        preCondition();
-        bot().view(VIEW_REMOTE_SCREEN).toolbarButton(TB_RESUME).click();
+        view.toolbarButton(TB_RESUME).click();
     }
 
     public void clickTBPause() throws RemoteException {
-        preCondition();
-        bot().view(VIEW_REMOTE_SCREEN).toolbarButton(TB_PAUSE).click();
+        view.toolbarButton(TB_PAUSE).click();
     }
 
-    public void confirmShellIncomingScreensharingSession(String YesOrNot)
-        throws RemoteException {
-        bot().shell(SHELL_INCOMING_SCREENSHARING_SESSION).confirm(YesOrNot);
-    }
-
-    /**********************************************
-     * 
-     * Waits until
-     * 
-     **********************************************/
-    public void waitUntilRemoteScreenViewIsActive() throws RemoteException {
-        bot().view(VIEW_REMOTE_SCREEN).waitUntilIsActive();
-    }
-
-    /**************************************************************
-     * 
-     * inner functions
-     * 
-     **************************************************************/
-
-    private void preCondition() throws RemoteException {
-        bot().openViewById(VIEW_REMOTE_SCREEN_ID);
-        bot().view(VIEW_REMOTE_SCREEN).show();
-
-    }
 }

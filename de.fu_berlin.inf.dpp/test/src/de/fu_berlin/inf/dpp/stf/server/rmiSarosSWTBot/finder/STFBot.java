@@ -444,6 +444,8 @@ public interface STFBot extends Remote {
     public STFBotLabel labelInGroup(String mnemonicText, String inGroup,
         int index) throws RemoteException;
 
+    public boolean existsStyledText() throws RemoteException;
+
     public boolean existsLabel() throws RemoteException;
 
     public boolean existsLabel(String text) throws RemoteException;

@@ -217,9 +217,9 @@ public class TestEditorByAlice extends STFTest {
         alice.bot().sleep(100);
         alice.bot().editor(CLS1_SUFFIX).pressShortRunAsJavaApplication();
         alice.sarosBot().views().consoleView()
-            .waitUntilTextInViewConsoleExists();
+            .waitUntilExistsTextInConsole();
         assertContains("Hello World", alice.sarosBot().views().consoleView()
-            .getTextInConsole());
+            .getFirstTextInConsole());
 
     }
 }

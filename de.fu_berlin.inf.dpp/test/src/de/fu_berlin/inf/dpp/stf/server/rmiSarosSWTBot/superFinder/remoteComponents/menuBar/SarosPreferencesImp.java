@@ -2,6 +2,7 @@ package de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteCompone
 
 import java.rmi.RemoteException;
 
+import de.fu_berlin.inf.dpp.accountManagement.XMPPAccount;
 import de.fu_berlin.inf.dpp.feedback.Messages;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotShell;
@@ -42,7 +43,7 @@ public class SarosPreferencesImp extends Component implements SarosPreferences {
         bot().waitUntilShellIsOpen(SHELL_CREATE_XMPP_JABBER_ACCOUNT);
         STFBotShell shell = bot().shell(SHELL_CREATE_XMPP_JABBER_ACCOUNT);
         shell.activate();
-        sarosBot().confirmShellCreateNewXMPPAccount(jid, password);
+        sarosBot().confirmShellCreateNewXMPPJabberAccount(jid, password);
         shell.bot().button(NEXT).click();
         shell.bot().button(FINISH).click();
         shell.bot().button(APPLY).click();
@@ -56,7 +57,7 @@ public class SarosPreferencesImp extends Component implements SarosPreferences {
             .bot()
             .buttonInGroup(GeneralPreferencePage.ADD_BTN_TEXT,
                 GeneralPreferencePage.ACCOUNT_GROUP_TITLE).click();
-        sarosBot().confirmWizardAddXMPPJabberAccount(jid, password);
+        sarosBot().confirmShellAddXMPPJabberAccount(jid, password);
         bot().shell(SHELL_PREFERNCES).bot().button(APPLY).click();
         bot().shell(SHELL_PREFERNCES).bot().button(OK).click();
         bot().waitUntilShellIsClosed(SHELL_PREFERNCES);
@@ -65,7 +66,7 @@ public class SarosPreferencesImp extends Component implements SarosPreferences {
     public void activateAccount(JID jid) throws RemoteException {
         assert existsAccount(jid) : "the account (" + jid.getBase()
             + ") doesn't exist yet!";
-        if (sarosBot().state().isAccountActiveNoGUI(jid))
+        if (isAccountActiveNoGUI(jid))
             return;
         STFBotShell shell = preCondition();
         shell.bot().listInGroup(GeneralPreferencePage.ACCOUNT_GROUP_TITLE)
@@ -91,14 +92,14 @@ public class SarosPreferencesImp extends Component implements SarosPreferences {
             .bot()
             .buttonInGroup(GeneralPreferencePage.CHANGE_BTN_TEXT,
                 GeneralPreferencePage.ACCOUNT_GROUP_TITLE).click();
-        sarosBot().confirmShellChangeXMPPAccount(newXmppJabberID, newPassword);
+        sarosBot().confirmShellEditXMPPJabberAccount(newXmppJabberID, newPassword);
         shell.bot().button(APPLY).click();
         shell.bot().button(OK).click();
         bot().waitUntilShellIsClosed(SHELL_PREFERNCES);
     }
 
     public void deleteAccount(JID jid, String password) throws RemoteException {
-        if (!sarosBot().state().isAccountExistNoGUI(jid, password))
+        if (!isAccountExistNoGUI(jid, password))
             return;
         STFBotShell shell = preCondition();
         shell.bot().listInGroup(GeneralPreferencePage.ACCOUNT_GROUP_TITLE)
@@ -108,7 +109,7 @@ public class SarosPreferencesImp extends Component implements SarosPreferences {
             .bot()
             .buttonInGroup(GeneralPreferencePage.DELETE_BTN_TEXT,
                 GeneralPreferencePage.ACCOUNT_GROUP_TITLE).click();
-        if (sarosBot().state().isAccountActiveNoGUI(jid)) {
+        if (isAccountActiveNoGUI(jid)) {
             bot().waitUntilShellIsOpen(SHELL_DELETING_ACTIVE_ACCOUNT);
             bot().shell(SHELL_DELETING_ACTIVE_ACCOUNT).activate();
             assert bot().shell(SHELL_DELETING_ACTIVE_ACCOUNT).isActive();
@@ -245,6 +246,45 @@ public class SarosPreferencesImp extends Component implements SarosPreferences {
     private void clickMenuSarosPreferences() throws RemoteException {
         bot().activateWorkbench();
         bot().menu(MENU_SAROS).menu(MENU_PREFERENCES).click();
+    }
+
+    private boolean isAccountActiveNoGUI(JID jid) {
+        XMPPAccount account = getXMPPAccount(jid);
+        if (account == null)
+            return false;
+        return account.isActive();
+    }
+
+    /**
+     * 
+     * @param jid
+     *            a JID which is used to identify the users of the Jabber
+     *            network, more about it please see {@link JID}.
+     * @return {@link XMPPAccount} of the given jid.
+     */
+    private XMPPAccount getXMPPAccount(JID jid) {
+        for (XMPPAccount account : xmppAccountStore.getAllAccounts()) {
+            if (jid.getName().equals(account.getUsername())
+                && jid.getDomain().equals(account.getServer())) {
+                return account;
+            }
+        }
+        return null;
+    }
+
+    private boolean isAccountExistNoGUI(JID jid, String password) {
+        for (XMPPAccount account : xmppAccountStore.getAllAccounts()) {
+            log.debug("account id: " + account.getId());
+            log.debug("account username: " + account.getUsername());
+            log.debug("account password: " + account.getPassword());
+            log.debug("account server: " + account.getServer());
+            if (jid.getName().equals(account.getUsername())
+                && jid.getDomain().equals(account.getServer())
+                && password.equals(account.getPassword())) {
+                return true;
+            }
+        }
+        return false;
     }
 
 }

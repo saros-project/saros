@@ -45,7 +45,7 @@ public class SarosMImp extends Component implements SarosM {
     public void creatAccount(JID jid, String password) throws RemoteException {
         precondition();
         menu.menu(MENU_CREATE_ACCOUNT).click();
-        sarosBot().confirmShellCreateNewXMPPAccount(jid, password);
+        sarosBot().confirmShellCreateNewXMPPJabberAccount(jid, password);
     }
 
     public void addBuddy(JID jid) throws RemoteException {
@@ -56,7 +56,7 @@ public class SarosMImp extends Component implements SarosM {
     public void shareProjects(String projectName, JID... jids)
         throws RemoteException {
         menu.menu(MENU_SHARE_PROJECTS).click();
-        sarosBot().confirmWizardShareProject(projectName, jids);
+        sarosBot().confirmShellShareProject(projectName, jids);
     }
 
     public SarosPreferences preferences() throws RemoteException {

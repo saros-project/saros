@@ -65,7 +65,7 @@ public class TestFolderOperations extends STFTest {
         alice.sarosBot().views().packageExplorerView()
             .selectFolder(PROJECT1, FOLDER1).refactor().rename(newFolderName);
 
-        bob.sarosBot().condition()
+        bob.sarosBot().views().packageExplorerView()
             .waitUntilFolderExists(PROJECT1, newFolderName);
         assertTrue(bob.sarosBot().views().packageExplorerView()
             .selectProject(PROJECT1).existsWithRegex(newFolderName));

@@ -231,8 +231,8 @@ public class STF {
     static public final String BUTTON_ACTIVATE_ACCOUNT = SarosMessages
         .getString("button_text_activate_account_in_shell-saros-preferences");
 
-    static public final String BUTTON_CHANGE_ACCOUNT = SarosMessages
-        .getString("button_text_change_account_in_shell-saros-preferences");
+    static public final String BUTTON_EDIT_ACCOUNT = SarosMessages
+        .getString("button_edit_account");
     static public final String BUTTON_ADD_ACCOUNT = SarosMessages
         .getString("button_text_add_account_in_shell-saros-preferences");
     static public final String BUTTON_DELETE_ACCOUNT = SarosMessages

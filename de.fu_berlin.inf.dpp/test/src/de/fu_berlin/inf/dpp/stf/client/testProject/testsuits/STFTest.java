@@ -596,7 +596,7 @@ public class STFTest extends STF {
             joinSessionTasks.add(new Callable<Void>() {
                 public Void call() throws Exception {
                     invitee.sarosBot()
-                        .confirmShellSessionInvitationAndAddProject(
+                        .confirmShellSessionInvitationAndShellAddProject(
                             projectName, usingWhichProject);
                     return null;
                 }

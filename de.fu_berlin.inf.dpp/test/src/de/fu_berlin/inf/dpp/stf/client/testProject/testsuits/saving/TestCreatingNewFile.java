@@ -50,11 +50,11 @@ public class TestCreatingNewFile extends STFTest {
             .newC().folder(FOLDER1);
         carl.sarosBot().views().packageExplorerView()
             .selectFolder(PROJECT1, FOLDER1).newC().file(FILE1);
-        alice.sarosBot().condition()
+        alice.sarosBot().views().packageExplorerView()
             .waitUntilFileExists(PROJECT1, FOLDER1, FILE1);
         assertTrue(alice.sarosBot().views().packageExplorerView()
             .selectFolder(PROJECT1, FOLDER1).existsWithRegex(FILE1));
-        bob.sarosBot().condition()
+        bob.sarosBot().views().packageExplorerView()
             .waitUntilFileExists(PROJECT1, FOLDER1, FILE1);
         assertTrue(bob.sarosBot().views().packageExplorerView()
             .selectFolder(PROJECT1, FOLDER1).existsWithRegex(FILE1));
@@ -113,11 +113,11 @@ public class TestCreatingNewFile extends STFTest {
         alice.sarosBot().views().packageExplorerView()
             .selectFolder(PROJECT1, FOLDER2).newC().file(FILE2);
 
-        carl.sarosBot().condition()
+        carl.sarosBot().views().packageExplorerView()
             .waitUntilFileExists(PROJECT1, FOLDER2, FILE2);
         assertTrue(carl.sarosBot().views().packageExplorerView()
             .selectFolder(PROJECT1, FOLDER2).existsWithRegex(FILE2));
-        bob.sarosBot().condition()
+        bob.sarosBot().views().packageExplorerView()
             .waitUntilFileExists(PROJECT1, FOLDER2, FILE2);
         assertTrue(bob.sarosBot().views().packageExplorerView()
             .selectFolder(PROJECT1, FOLDER2).existsWithRegex(FILE2));

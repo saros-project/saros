@@ -139,23 +139,6 @@ public class TestSarosPreferences extends STFTest {
     }
 
     @Test
-    public void addAndActivateAccountNoGUI() throws RemoteException {
-        assertFalse(alice.sarosBot().state()
-            .isAccountExistNoGUI(JID_TO_ADD, PASSWORD));
-        alice.sarosBot().menuBar().saros().preferences()
-            .addAccount(JID_TO_ADD, PASSWORD);
-        assertTrue(alice.sarosBot().state()
-            .isAccountExistNoGUI(JID_TO_ADD, PASSWORD));
-        assertTrue(alice.sarosBot().state()
-            .isAccountActiveNoGUI(alice.getJID()));
-        assertFalse(alice.sarosBot().state().isAccountActiveNoGUI(JID_TO_ADD));
-        alice.noBot().activateAccountNoGUI(JID_TO_ADD);
-        assertTrue(alice.sarosBot().state().isAccountActiveNoGUI(JID_TO_ADD));
-        assertFalse(alice.sarosBot().state()
-            .isAccountActiveNoGUI(alice.getJID()));
-    }
-
-    @Test
     public void addAndActivateAcount() throws RemoteException {
         assertFalse(alice.sarosBot().menuBar().saros().preferences()
             .existsAccount(JID_TO_ADD));
@@ -191,21 +174,6 @@ public class TestSarosPreferences extends STFTest {
             .existsAccount(JID_TO_CHANGE));
         assertTrue(alice.sarosBot().menuBar().saros().preferences()
             .isAccountActive(JID_TO_CHANGE));
-    }
-
-    /*
-     * FIXME After running the test the single active account would be deleted.
-     * But you can still connect with the deleted account by clicking the
-     * toolbar buton "connect".
-     */
-    @Test
-    @Ignore("There may be some bugs existed.")
-    public void deleteActiveAccountNoGUI() throws RemoteException {
-        assertTrue(alice.sarosBot().state()
-            .isAccountExistNoGUI(alice.getJID(), alice.getPassword()));
-        alice.noBot().deleteAccountNoGUI(alice.getJID());
-        assertFalse(alice.sarosBot().state()
-            .isAccountExistNoGUI(alice.getJID(), alice.getPassword()));
     }
 
     @Test(expected = RuntimeException.class)

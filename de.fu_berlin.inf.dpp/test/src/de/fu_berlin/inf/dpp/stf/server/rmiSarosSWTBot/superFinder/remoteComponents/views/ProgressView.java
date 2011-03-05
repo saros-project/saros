@@ -5,7 +5,7 @@ import java.rmi.RemoteException;
 
 public interface ProgressView extends Remote {
 
-    public boolean existPorgress() throws RemoteException;
+    public boolean existsPorgress() throws RemoteException;
 
     /**
      * remove the progress. ie. Click the gray clubs delete icon.
@@ -22,5 +22,5 @@ public interface ProgressView extends Remote {
      * finished yet. In this case, you can use this method to guarantee, that
      * host wait so long until all the invitation Processes are finished.
      */
-    public void waitUntilProgressNotExists() throws RemoteException;
+    public void waitUntilNotExistsProgress() throws RemoteException;
 }

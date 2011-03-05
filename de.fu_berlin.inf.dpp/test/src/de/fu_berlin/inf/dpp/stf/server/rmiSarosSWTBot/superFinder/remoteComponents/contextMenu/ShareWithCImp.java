@@ -44,7 +44,7 @@ public class ShareWithCImp extends Component implements ShareWithC {
     public void multipleBuddies(String projectName, JID... baseJIDOfInvitees)
         throws RemoteException {
         treeItem.contextMenu(CM_SHARE_WITH, CM_MULTIPLE_BUDDIES).click();
-        sarosBot().confirmWizardShareProject(projectName, baseJIDOfInvitees);
+        sarosBot().confirmShellShareProject(projectName, baseJIDOfInvitees);
     }
 
     public void buddy(JID jid) throws RemoteException {
