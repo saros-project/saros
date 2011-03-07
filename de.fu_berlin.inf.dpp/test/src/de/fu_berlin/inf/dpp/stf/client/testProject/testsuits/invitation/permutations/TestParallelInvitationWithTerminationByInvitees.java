@@ -12,7 +12,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import de.fu_berlin.inf.dpp.stf.client.testProject.testsuits.STFTest;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotShell;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.RemoteBotShell;
 
 public class TestParallelInvitationWithTerminationByInvitees extends STFTest {
 
@@ -82,17 +82,17 @@ public class TestParallelInvitationWithTerminationByInvitees extends STFTest {
                 carl.getJID(), edna.getJID());
 
         bob.bot().waitUntilShellIsOpen(SHELL_SESSION_INVITATION);
-        STFBotShell shell_bob = bob.bot().shell(SHELL_SESSION_INVITATION);
+        RemoteBotShell shell_bob = bob.bot().shell(SHELL_SESSION_INVITATION);
         shell_bob.activate();
         shell_bob.bot().button(CANCEL).click();
 
-        STFBotShell shell_alice = alice.bot().shell(SHELL_PROBLEM_OCCURRED);
+        RemoteBotShell shell_alice = alice.bot().shell(SHELL_PROBLEM_OCCURRED);
         shell_alice.waitUntilActive();
         assertTrue(alice.bot().shell(SHELL_PROBLEM_OCCURRED).bot().label(2)
             .getText().matches(bob.getName() + ".*"));
         shell_alice.bot().button(OK).click();
 
-        STFBotShell shell_carl = carl.bot().shell(SHELL_SESSION_INVITATION);
+        RemoteBotShell shell_carl = carl.bot().shell(SHELL_SESSION_INVITATION);
         carl.bot().waitUntilShellIsOpen(SHELL_SESSION_INVITATION);
         shell_carl.activate();
         carl.bot().shell(SHELL_SESSION_INVITATION).confirm(FINISH);
@@ -104,7 +104,7 @@ public class TestParallelInvitationWithTerminationByInvitees extends STFTest {
         shell_alice.bot().button(OK).click();
 
         dave.bot().waitUntilShellIsClosed(SHELL_SESSION_INVITATION);
-        STFBotShell shell_dave = dave.bot().shell(SHELL_SESSION_INVITATION);
+        RemoteBotShell shell_dave = dave.bot().shell(SHELL_SESSION_INVITATION);
         shell_dave.activate();
         dave.bot().shell(SHELL_SESSION_INVITATION).confirm(FINISH);
         shell_dave.bot().button(CANCEL).click();

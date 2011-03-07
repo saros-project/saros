@@ -3,14 +3,14 @@ package de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteCompone
 import java.rmi.RemoteException;
 
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotTreeItem;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.RemoteBotTreeItem;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.Component;
 
 public class ShareWithCImp extends Component implements ShareWithC {
 
     private static transient ShareWithCImp self;
 
-    private STFBotTreeItem treeItem;
+    private RemoteBotTreeItem treeItem;
 
     /**
      * {@link ShareWithCImp} is a singleton, but inheritance is possible.
@@ -22,7 +22,7 @@ public class ShareWithCImp extends Component implements ShareWithC {
         return self;
     }
 
-    public void setTreeItem(STFBotTreeItem treeItem) {
+    public void setTreeItem(RemoteBotTreeItem treeItem) {
         this.treeItem = treeItem;
     }
 
@@ -51,14 +51,14 @@ public class ShareWithCImp extends Component implements ShareWithC {
         treeItem.contextMenu(CM_SHARE_WITH, jid.getBase()).click();
     }
 
-    public void addToSarosSession() throws RemoteException {
+    public void addToSarosSession() {
         /*
          * The menu is only activated if there are project existed in the
          * package explorer view, which is not in the session.
          */
     }
 
-    public void stopToSarosSession() throws RemoteException {
+    public void stopToSarosSession() {
         //
     }
 

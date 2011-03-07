@@ -14,7 +14,7 @@ import org.junit.Test;
 
 import de.fu_berlin.inf.dpp.stf.STF;
 import de.fu_berlin.inf.dpp.stf.client.testProject.testsuits.STFTest;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotShell;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.RemoteBotShell;
 
 public class TestSarosPreferences extends STFTest {
 
@@ -57,7 +57,7 @@ public class TestSarosPreferences extends STFTest {
         alice.bot().menu(MENU_SAROS).menu(MENU_CREATE_ACCOUNT).click();
 
         alice.bot().waitUntilShellIsOpen(SHELL_CREATE_XMPP_JABBER_ACCOUNT);
-        STFBotShell shell = alice.bot().shell(SHELL_CREATE_XMPP_JABBER_ACCOUNT);
+        RemoteBotShell shell = alice.bot().shell(SHELL_CREATE_XMPP_JABBER_ACCOUNT);
         shell.activate();
         shell.bot().comboBoxWithLabel(LABEL_XMPP_JABBER_SERVER).setText(SERVER);
         shell.bot().textWithLabel(LABEL_USER_NAME)
@@ -87,7 +87,7 @@ public class TestSarosPreferences extends STFTest {
         alice.bot().menu(MENU_SAROS).menu(MENU_CREATE_ACCOUNT).click();
 
         alice.bot().waitUntilShellIsOpen(SHELL_CREATE_XMPP_JABBER_ACCOUNT);
-        STFBotShell shell_alice = alice.bot().shell(
+        RemoteBotShell shell_alice = alice.bot().shell(
             SHELL_CREATE_XMPP_JABBER_ACCOUNT);
         shell_alice.activate();
         shell_alice.bot().comboBoxWithLabel(LABEL_XMPP_JABBER_SERVER)
@@ -118,7 +118,7 @@ public class TestSarosPreferences extends STFTest {
     public void createAccountWithInvalidServer() throws RemoteException {
         alice.bot().menu(MENU_SAROS).menu(MENU_CREATE_ACCOUNT).click();
         alice.bot().waitUntilShellIsOpen(SHELL_CREATE_XMPP_JABBER_ACCOUNT);
-        STFBotShell shell_alice = alice.bot().shell(
+        RemoteBotShell shell_alice = alice.bot().shell(
             SHELL_CREATE_XMPP_JABBER_ACCOUNT);
         shell_alice.activate();
 

@@ -10,9 +10,9 @@ import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.stf.STF;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotTable;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotView;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.SuperBot;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.RemoteBotTable;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.RemoteBotView;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.SuperRemoteBot;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.contextMenu.SarosContextMenuWrapper;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.views.ViewsImp;
 
@@ -25,9 +25,9 @@ public class SessionViewImp extends ViewsImp implements SessionView {
 
     private static transient SessionViewImp self;
 
-    private STFBotView view;
+    private RemoteBotView view;
 
-    private STFBotTable table;
+    private RemoteBotTable table;
 
     /**
      * {@link SessionViewImp} is a singleton, but inheritance is possible.
@@ -39,7 +39,7 @@ public class SessionViewImp extends ViewsImp implements SessionView {
         return self;
     }
 
-    public SessionView setView(STFBotView view) throws RemoteException {
+    public SessionView setView(RemoteBotView view) throws RemoteException {
         this.view = view;
         if (this.view.bot().existsTable())
             this.table = this.view.bot().table();
@@ -130,7 +130,7 @@ public class SessionViewImp extends ViewsImp implements SessionView {
     }
 
     /**
-     * TODO: With {@link STFBotView#toolbarButtonWithRegex(String)} to perform
+     * TODO: With {@link RemoteBotView#toolbarButtonWithRegex(String)} to perform
      * this action you will get WidgetNotFoundException.
      */
     public void addBuddyToSession(String... jidOfInvitees)
@@ -141,7 +141,7 @@ public class SessionViewImp extends ViewsImp implements SessionView {
 
     /**
      * Note: {@link STF#TB_INCONSISTENCY_DETECTED} is not complete toolbarName,
-     * so we need to use {@link STFBotView#toolbarButtonWithRegex(String)} to
+     * so we need to use {@link RemoteBotView#toolbarButtonWithRegex(String)} to
      * perform this action.
      */
     public void inconsistencyDetected() throws RemoteException {
@@ -265,7 +265,7 @@ public class SessionViewImp extends ViewsImp implements SessionView {
         });
     }
 
-    public void waitUntilIsInviteeInSession(SuperBot sarosBot)
+    public void waitUntilIsInviteeInSession(SuperRemoteBot sarosBot)
         throws RemoteException {
         sarosBot.views().sessionView().waitUntilIsInSession();
     }
@@ -282,7 +282,7 @@ public class SessionViewImp extends ViewsImp implements SessionView {
         });
     }
 
-    public void waitUntilIsInviteeNotInSession(SuperBot sarosBot)
+    public void waitUntilIsInviteeNotInSession(SuperRemoteBot sarosBot)
         throws RemoteException {
         sarosBot.views().sessionView().waitUntilIsNotInSession();
     }

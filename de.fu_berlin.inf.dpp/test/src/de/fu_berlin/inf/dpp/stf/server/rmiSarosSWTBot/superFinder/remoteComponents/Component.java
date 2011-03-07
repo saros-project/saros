@@ -7,10 +7,10 @@ import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
 import de.fu_berlin.inf.dpp.project.SarosSessionManager;
 import de.fu_berlin.inf.dpp.stf.STF;
 import de.fu_berlin.inf.dpp.stf.server.STFController;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.STFWorkbenchBot;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.STFWorkbenchBotImp;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.SuperBot;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.SuperBotImp;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.RemoteWorkbenchBot;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.RemoteWorkbenchBotImp;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.SuperRemoteBot;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.SuperRemoteBotImp;
 import de.fu_berlin.inf.dpp.stf.server.sarosSWTBot.SarosSWTBot;
 
 public class Component extends STF {
@@ -25,13 +25,13 @@ public class Component extends STF {
     public static SarosSWTBot bot = SarosSWTBot.getInstance();
     public static int sleepTime = STFController.sleepTime;
 
-    protected STFWorkbenchBot bot() {
-        STFWorkbenchBotImp stfBot = STFWorkbenchBotImp.getInstance();
+    protected RemoteWorkbenchBot bot() {
+        RemoteWorkbenchBotImp stfBot = RemoteWorkbenchBotImp.getInstance();
         return stfBot;
     }
 
-    protected SuperBot sarosBot() {
-        return SuperBotImp.getInstance();
+    protected SuperRemoteBot sarosBot() {
+        return SuperRemoteBotImp.getInstance();
     }
 
 }

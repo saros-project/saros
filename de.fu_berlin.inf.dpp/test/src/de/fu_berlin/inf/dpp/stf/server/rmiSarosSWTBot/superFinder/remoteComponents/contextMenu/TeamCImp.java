@@ -10,10 +10,10 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.swtbot.swt.finder.widgets.TimeoutException;
 
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotShell;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotTable;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotTreeItem;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotView;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.RemoteBotShell;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.RemoteBotTable;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.RemoteBotTreeItem;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.RemoteBotView;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.Component;
 import de.fu_berlin.inf.dpp.vcs.VCSAdapter;
 
@@ -21,7 +21,7 @@ public class TeamCImp extends Component implements TeamC {
 
     private static transient TeamCImp self;
 
-    private STFBotTreeItem treeItem;
+    private RemoteBotTreeItem treeItem;
 
     /**
      * {@link TeamCImp} is a singleton, but inheritance is possible.
@@ -33,7 +33,7 @@ public class TeamCImp extends Component implements TeamC {
         return self;
     }
 
-    public void setTreeItem(STFBotTreeItem view) {
+    public void setTreeItem(RemoteBotTreeItem view) {
         this.treeItem = view;
     }
 
@@ -51,7 +51,7 @@ public class TeamCImp extends Component implements TeamC {
     public void shareProject(String repositoryURL) throws RemoteException {
         treeItem.contextMenu(CM_TEAM, CM_SHARE_PROJECT_OF_TEAM).click();
 
-        STFBotShell shell = bot().shell(SHELL_SHARE_PROJECT);
+        RemoteBotShell shell = bot().shell(SHELL_SHARE_PROJECT);
         shell.confirmWithTable(TABLE_ITEM_REPOSITORY_TYPE_SVN, NEXT);
 
         if (shell.bot().table().containsItem(repositoryURL)) {
@@ -73,7 +73,7 @@ public class TeamCImp extends Component implements TeamC {
 
         treeItem.contextMenu(contexts).click();
 
-        STFBotShell shell = bot().shell(SHELL_SHARE_PROJECT);
+        RemoteBotShell shell = bot().shell(SHELL_SHARE_PROJECT);
         shell.confirmWithTable(TABLE_ITEM_REPOSITORY_TYPE_SVN, NEXT);
         log.debug("SVN share project text: " + shell.bot().text());
         shell.bot().button(FINISH).waitUntilIsEnabled();
@@ -90,8 +90,8 @@ public class TeamCImp extends Component implements TeamC {
         bot().shell(SHELL_SHARE_PROJECT).confirmWithTable(
             TABLE_ITEM_REPOSITORY_TYPE_SVN, NEXT);
 
-        STFBotShell shell = bot().shell(SHELL_SHARE_PROJECT);
-        STFBotTable table = shell.bot().table();
+        RemoteBotShell shell = bot().shell(SHELL_SHARE_PROJECT);
+        RemoteBotTable table = shell.bot().table();
 
         if (table == null || !table.containsItem(repositoryURL)) {
             // close window
@@ -99,7 +99,7 @@ public class TeamCImp extends Component implements TeamC {
             // in svn repos view: enter url
 
             bot().openViewById(VIEW_SVN_REPOSITORIES_ID);
-            STFBotView view = bot().view(VIEW_SVN_REPOSITORIES);
+            RemoteBotView view = bot().view(VIEW_SVN_REPOSITORIES);
 
             view.show();
             final boolean viewWasOpen = bot().isViewOpen(VIEW_SVN_REPOSITORIES);
@@ -107,7 +107,7 @@ public class TeamCImp extends Component implements TeamC {
                 .toolbarButton("Add SVN Repository").click();
 
             bot().waitUntilShellIsOpen("Add SVN Repository");
-            STFBotShell shell2 = bot().shell("Add SVN Repository");
+            RemoteBotShell shell2 = bot().shell("Add SVN Repository");
             shell2.activate();
             shell2.bot().comboBoxWithLabel(LABEL_URL).setText(repositoryURL);
             shell2.bot().button(FINISH).click();
@@ -121,7 +121,7 @@ public class TeamCImp extends Component implements TeamC {
         }
 
         bot().shell(SHELL_SHARE_PROJECT).confirmWithTable(repositoryURL, NEXT);
-        STFBotShell shell3 = bot().shell(SHELL_SHARE_PROJECT);
+        RemoteBotShell shell3 = bot().shell(SHELL_SHARE_PROJECT);
         shell3.bot().radio("Use specified folder name:").click();
         shell3.bot().text().setText(specifiedFolderName);
         shell3.bot().button(FINISH).click();
@@ -141,7 +141,7 @@ public class TeamCImp extends Component implements TeamC {
     public void importProjectFromSVN(String repositoryURL)
         throws RemoteException {
         bot().menu(MENU_FILE).menu("Import...").click();
-        STFBotShell shell = bot().shell(SHELL_IMPORT);
+        RemoteBotShell shell = bot().shell(SHELL_IMPORT);
         shell.confirmWithTreeWithFilterText(TABLE_ITEM_REPOSITORY_TYPE_SVN,
             "Checkout Projects from SVN", NEXT);
         if (shell.bot().table().containsItem(repositoryURL)) {
@@ -183,7 +183,7 @@ public class TeamCImp extends Component implements TeamC {
 
         treeItem.contextMenu(contexts).click();
 
-        STFBotShell shell = bot().shell(SHELL_SWITCH);
+        RemoteBotShell shell = bot().shell(SHELL_SWITCH);
         shell.waitUntilActive();
         if (shell.bot().checkBox(LABEL_SWITCH_TOHEAD_REVISION).isChecked())
             shell.bot().checkBox(LABEL_SWITCH_TOHEAD_REVISION).click();

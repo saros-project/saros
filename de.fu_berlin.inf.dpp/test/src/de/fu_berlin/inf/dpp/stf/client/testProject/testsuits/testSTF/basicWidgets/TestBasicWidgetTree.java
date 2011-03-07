@@ -10,8 +10,8 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import de.fu_berlin.inf.dpp.stf.client.testProject.testsuits.STFTest;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotShell;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotView;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.RemoteBotShell;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.RemoteBotView;
 import de.fu_berlin.inf.dpp.ui.preferencePages.GeneralPreferencePage;
 
 public class TestBasicWidgetTree extends STFTest {
@@ -32,7 +32,7 @@ public class TestBasicWidgetTree extends STFTest {
         alice.bot().menu(MENU_WINDOW).menu(MENU_SHOW_VIEW).menu(MENU_OTHER)
             .click();
         alice.bot().waitUntilShellIsOpen(SHELL_SHOW_VIEW);
-        STFBotShell shell = alice.bot().shell(SHELL_SHOW_VIEW);
+        RemoteBotShell shell = alice.bot().shell(SHELL_SHOW_VIEW);
         shell.activate();
         assertTrue(shell.bot().tree().selectTreeItem(NODE_GENERAL)
             .existsSubItem(NODE_CONSOLE));
@@ -43,7 +43,7 @@ public class TestBasicWidgetTree extends STFTest {
     public void existsTreeItemInShell2() throws RemoteException {
         alice.bot().menu(MENU_SAROS).menu(MENU_PREFERENCES).click();
         alice.bot().waitUntilShellIsOpen(SHELL_PREFERNCES);
-        STFBotShell shell = alice.bot().shell(SHELL_PREFERNCES);
+        RemoteBotShell shell = alice.bot().shell(SHELL_PREFERNCES);
         shell.activate();
         assertTrue(shell.bot().tree()
             .selectTreeItem(NODE_GENERAL, NODE_EDITORS, NODE_TEXT_EDITORS)
@@ -55,7 +55,7 @@ public class TestBasicWidgetTree extends STFTest {
         alice.bot().menu(MENU_SAROS).menu(MENU_PREFERENCES).click();
 
         alice.bot().waitUntilShellIsOpen(SHELL_PREFERNCES);
-        STFBotShell shell = alice.bot().shell(SHELL_PREFERNCES);
+        RemoteBotShell shell = alice.bot().shell(SHELL_PREFERNCES);
         shell.activate();
         assertTrue(shell.bot().tree()
             .selectTreeItem(NODE_GENERAL, NODE_EDITORS, NODE_TEXT_EDITORS)
@@ -66,7 +66,7 @@ public class TestBasicWidgetTree extends STFTest {
     public void existsTreeItemInView() throws RemoteException {
         alice.superBot().views().packageExplorerView().tree().newC()
             .javaProjectWithClasses(PROJECT1, PKG1, CLS1);
-        STFBotView view = alice.bot().view(VIEW_PACKAGE_EXPLORER);
+        RemoteBotView view = alice.bot().view(VIEW_PACKAGE_EXPLORER);
         view.show();
         assertTrue(view.bot().tree().existsSubItem(PROJECT1));
 
@@ -82,7 +82,7 @@ public class TestBasicWidgetTree extends STFTest {
     public void existsTreeItemWithRegexsInView() throws RemoteException {
         alice.superBot().views().packageExplorerView().tree().newC()
             .javaProjectWithClasses(PROJECT1, PKG1, CLS1);
-        STFBotView view = alice.bot().view(VIEW_PACKAGE_EXPLORER);
+        RemoteBotView view = alice.bot().view(VIEW_PACKAGE_EXPLORER);
         view.show();
 
         assertTrue(view.bot().tree()
@@ -139,7 +139,7 @@ public class TestBasicWidgetTree extends STFTest {
         alice.bot().menu(MENU_SAROS).menu(MENU_PREFERENCES).click();
 
         alice.bot().waitUntilShellIsOpen(SHELL_PREFERNCES);
-        STFBotShell shell = alice.bot().shell(SHELL_PREFERNCES);
+        RemoteBotShell shell = alice.bot().shell(SHELL_PREFERNCES);
         shell.activate();
         shell.bot().tree().selectTreeItem(NODE_SAROS);
         assertTrue(shell
@@ -161,7 +161,7 @@ public class TestBasicWidgetTree extends STFTest {
             .shareProjectUsingSpecifiedFolderName(SVN_REPOSITORY_URL,
                 SVN_PROJECT_PATH);
 
-        STFBotView view = alice.bot().view(VIEW_PACKAGE_EXPLORER);
+        RemoteBotView view = alice.bot().view(VIEW_PACKAGE_EXPLORER);
         view.show();
         view.bot()
             .tree()

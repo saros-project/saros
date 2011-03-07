@@ -724,13 +724,7 @@ public class STFTest extends STF {
             if (!host.superBot().views().buddiesView().hasBuddy(peer.getJID())) {
                 host.superBot().views().buddiesView()
                     .addANewBuddy(peer.getJID());
-                peer.bot().waitUntilShellIsOpen(
-                    SHELL_REQUEST_OF_SUBSCRIPTION_RECEIVED);
-                peer.bot().shell(SHELL_REQUEST_OF_SUBSCRIPTION_RECEIVED)
-                    .activate();
-                peer.bot().shell(SHELL_REQUEST_OF_SUBSCRIPTION_RECEIVED).bot()
-                    .button(OK).click();
-                peer.bot().sleep(500);
+                peer.superBot().confirmShellRequestOfSubscriptionReceived();
             }
         }
     }

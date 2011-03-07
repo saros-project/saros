@@ -2,9 +2,9 @@ package de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteCompone
 
 import java.rmi.RemoteException;
 
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotCombo;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotShell;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotTree;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.RemoteBotCombo;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.RemoteBotShell;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.RemoteBotTree;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.Perspective;
 
 public class WindowMImp extends SarosPreferencesImp implements WindowM {
@@ -33,8 +33,8 @@ public class WindowMImp extends SarosPreferencesImp implements WindowM {
      **********************************************/
     public void setNewTextFileLineDelimiter(String OS) throws RemoteException {
         clickMenuPreferences();
-        STFBotShell shell = bot().shell(SHELL_PREFERNCES);
-        STFBotTree tree = shell.bot().tree();
+        RemoteBotShell shell = bot().shell(SHELL_PREFERNCES);
+        RemoteBotTree tree = shell.bot().tree();
         tree.expandNode(TREE_ITEM_GENERAL_IN_PRFERENCES).select(
             TREE_ITEM_WORKSPACE_IN_PREFERENCES);
 
@@ -113,8 +113,8 @@ public class WindowMImp extends SarosPreferencesImp implements WindowM {
      **********************************************/
     public String getTextFileLineDelimiter() throws RemoteException {
         clickMenuPreferences();
-        STFBotShell shell = bot().shell(SHELL_PREFERNCES);
-        STFBotTree tree = shell.bot().tree();
+        RemoteBotShell shell = bot().shell(SHELL_PREFERNCES);
+        RemoteBotTree tree = shell.bot().tree();
         tree.expandNode(TREE_ITEM_GENERAL_IN_PRFERENCES).select(
             TREE_ITEM_WORKSPACE_IN_PREFERENCES);
         if (shell.bot().radioInGroup("Default", "New text file line delimiter")
@@ -124,7 +124,7 @@ public class WindowMImp extends SarosPreferencesImp implements WindowM {
         } else if (shell.bot()
             .radioInGroup("Other:", "New text file line delimiter")
             .isSelected()) {
-            STFBotCombo combo = shell.bot().comboBoxInGroup(
+            RemoteBotCombo combo = shell.bot().comboBoxInGroup(
                 "New text file line delimiter");
             String itemName = combo.items()[combo.selectionIndex()];
             bot().shell(SHELL_PREFERNCES).close();

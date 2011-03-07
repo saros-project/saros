@@ -9,7 +9,7 @@ import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.stf.STF;
 import de.fu_berlin.inf.dpp.stf.client.AbstractTester;
 import de.fu_berlin.inf.dpp.stf.client.testProject.helpers.TestPattern;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.SuperBot;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.SuperRemoteBot;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.contextMenu.SarosContextMenuWrapper;
 import de.fu_berlin.inf.dpp.ui.actions.RestrictInviteesToReadOnlyAccessAction;
 
@@ -302,11 +302,11 @@ public interface SessionView extends Remote {
      * is true.
      * 
      * @param superBot
-     *            {@link SuperBot} of the invitee, whose session status you want
+     *            {@link SuperRemoteBot} of the invitee, whose session status you want
      *            to know.
      * @throws RemoteException
      */
-    public void waitUntilIsInviteeInSession(SuperBot superBot)
+    public void waitUntilIsInviteeInSession(SuperRemoteBot superBot)
         throws RemoteException;
 
     /**
@@ -332,11 +332,11 @@ public interface SessionView extends Remote {
      * 
      * 
      * @param superBot
-     *            {@link SuperBot} of the invitee, whose session status you want
+     *            {@link SuperRemoteBot} of the invitee, whose session status you want
      *            to know.
      * @throws RemoteException
      */
-    public void waitUntilIsInviteeNotInSession(SuperBot superBot)
+    public void waitUntilIsInviteeNotInSession(SuperRemoteBot superBot)
         throws RemoteException;
 
     /**

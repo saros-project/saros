@@ -4,17 +4,17 @@ import java.rmi.RemoteException;
 
 import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
 
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotShell;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotTree;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotTreeItem;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.RemoteBotShell;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.RemoteBotTree;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.RemoteBotTreeItem;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.Component;
 
 public class NewCImp extends Component implements NewC {
 
     private static transient NewCImp self;
 
-    private STFBotTreeItem treeItem;
-    private STFBotTree tree;
+    private RemoteBotTreeItem treeItem;
+    private RemoteBotTree tree;
 
     /**
      * {@link NewCImp} is a singleton, but inheritance is possible.
@@ -26,11 +26,11 @@ public class NewCImp extends Component implements NewC {
         return self;
     }
 
-    public void setTreeItem(STFBotTreeItem treeItem) {
+    public void setTreeItem(RemoteBotTreeItem treeItem) {
         this.treeItem = treeItem;
     }
 
-    public void setTree(STFBotTree tree) {
+    public void setTree(RemoteBotTree tree) {
         this.tree = tree;
     }
 
@@ -135,13 +135,13 @@ public class NewCImp extends Component implements NewC {
     public void clsImplementsRunnable(String className) throws RemoteException {
         if (!exists(className)) {
             bot().menu(MENU_FILE).menu(MENU_NEW).menu(MENU_CLASS).click();
-            STFBotShell shell_new = bot().shell(SHELL_NEW_JAVA_CLASS);
+            RemoteBotShell shell_new = bot().shell(SHELL_NEW_JAVA_CLASS);
             shell_new.activate();
 
             shell_new.bot().textWithLabel(LABEL_NAME).setText(className);
             shell_new.bot().button("Add...").click();
             bot().waitUntilShellIsOpen("Implemented Interfaces Selection");
-            STFBotShell shell = bot().shell("Implemented Interfaces Selection");
+            RemoteBotShell shell = bot().shell("Implemented Interfaces Selection");
             shell.activate();
             shell.bot().textWithLabel("Choose interfaces:")
                 .setText("java.lang.Runnable");
@@ -174,7 +174,7 @@ public class NewCImp extends Component implements NewC {
 
     private void confirmShellNewJavaClass(String className)
         throws RemoteException {
-        STFBotShell shell = bot().shell(SHELL_NEW_JAVA_CLASS);
+        RemoteBotShell shell = bot().shell(SHELL_NEW_JAVA_CLASS);
         shell.activate();
         shell.bot().textWithLabel(LABEL_NAME).setText(className);
         shell.bot().button(FINISH).click();
@@ -183,7 +183,7 @@ public class NewCImp extends Component implements NewC {
 
     private void confirmShellNewJavaClass(String projectName, String pkg,
         String className) throws RemoteException {
-        STFBotShell shell = bot().shell(SHELL_NEW_JAVA_CLASS);
+        RemoteBotShell shell = bot().shell(SHELL_NEW_JAVA_CLASS);
         shell.activate();
         shell.bot().textWithLabel(LABEL_SOURCE_FOLDER)
             .setText(projectName + "/" + SRC);
@@ -195,7 +195,7 @@ public class NewCImp extends Component implements NewC {
 
     private void confirmWizardNewProject(String projectName)
         throws RemoteException {
-        STFBotShell shell = bot().shell(SHELL_NEW_PROJECT);
+        RemoteBotShell shell = bot().shell(SHELL_NEW_PROJECT);
         shell.confirmWithTree(NEXT, NODE_GENERAL, NODE_PROJECT);
         shell.bot().textWithLabel(LABEL_PROJECT_NAME).setText(projectName);
         shell.bot().button(FINISH).click();
@@ -204,7 +204,7 @@ public class NewCImp extends Component implements NewC {
     }
 
     private void confirmShellNewFile(String fileName) throws RemoteException {
-        STFBotShell shell = bot().shell(SHELL_NEW_FILE);
+        RemoteBotShell shell = bot().shell(SHELL_NEW_FILE);
         shell.activate();
         shell.bot().textWithLabel(LABEL_FILE_NAME).setText(fileName);
         shell.bot().button(FINISH).waitUntilIsEnabled();
@@ -214,7 +214,7 @@ public class NewCImp extends Component implements NewC {
 
     private void confirmShellNewJavaPackage(String projectName, String pkg)
         throws RemoteException {
-        STFBotShell shell = bot().shell(SHELL_NEW_JAVA_PACKAGE);
+        RemoteBotShell shell = bot().shell(SHELL_NEW_JAVA_PACKAGE);
         shell.activate();
         shell.bot().textWithLabel(LABEL_SOURCE_FOLDER)
             .setText((projectName + "/" + SRC));
@@ -226,7 +226,7 @@ public class NewCImp extends Component implements NewC {
 
     private void confirmShellNewFolder(String folderName)
         throws RemoteException {
-        STFBotShell shell = bot().shell(SHELL_NEW_FOLDER);
+        RemoteBotShell shell = bot().shell(SHELL_NEW_FOLDER);
         shell.activate();
 
         shell.bot().textWithLabel(LABEL_FOLDER_NAME).setText(folderName);
@@ -237,7 +237,7 @@ public class NewCImp extends Component implements NewC {
 
     private void confirmShellNewJavaProject(String projectName)
         throws RemoteException {
-        STFBotShell shell = bot().shell(SHELL_NEW_JAVA_PROJECT);
+        RemoteBotShell shell = bot().shell(SHELL_NEW_JAVA_PROJECT);
         shell.activate();
         shell.bot().textWithLabel(LABEL_PROJECT_NAME).setText(projectName);
 

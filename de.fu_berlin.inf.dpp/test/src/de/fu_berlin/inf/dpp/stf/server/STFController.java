@@ -18,33 +18,33 @@ import de.fu_berlin.inf.dpp.feedback.FeedbackManager;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
 import de.fu_berlin.inf.dpp.project.SarosSessionManager;
 import de.fu_berlin.inf.dpp.stf.STF;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.STFBotImp;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.STFWorkbenchBotImp;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotButtonImp;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotCComboImp;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotCheckBoxImp;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotComboImp;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotEditorImp;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotLabelImp;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotListImp;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotMenuImp;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotPerspectiveImp;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotRadioImp;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotShellImp;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotStyledTextImp;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotTableImp;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotTableItemImp;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotTextImp;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotToolbarButtonImp;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotToolbarDropDownButtonImp;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotToolbarPushButtonImp;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotToolbarRadioButtonImp;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotToolbarToggleButtonImp;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotTreeImp;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotTreeItemImp;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotViewImp;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotViewMenuImp;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.SuperBotImp;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.RemoteBotImp;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.RemoteWorkbenchBotImp;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.RemoteBotButtonImp;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.RemoteBotCComboImp;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.RemoteBotCheckBoxImp;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.RemoteBotComboImp;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.RemoteBotEditorImp;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.RemoteBotLabelImp;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.RemoteBotListImp;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.RemoteBotMenuImp;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.RemoteBotPerspectiveImp;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.RemoteBotRadioImp;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.RemoteBotShellImp;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.RemoteBotStyledTextImp;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.RemoteBotTableImp;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.RemoteBotTableItemImp;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.RemoteBotTextImp;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.RemoteBotToolbarButtonImp;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.RemoteBotToolbarDropDownButtonImp;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.RemoteBotToolbarPushButtonImp;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.RemoteBotToolbarRadioButtonImp;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.RemoteBotToolbarToggleButtonImp;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.RemoteBotTreeImp;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.RemoteBotTreeItemImp;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.RemoteBotViewImp;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.RemoteBotViewMenuImp;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.SuperRemoteBotImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.Component;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.contextMenu.ContextMenuWrapperImp;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.contextMenu.NewCImp;
@@ -108,42 +108,42 @@ public class STFController {
         /*
          * bots' family
          */
-        exportObject(STFBotImp.getInstance(), "bot");
-        exportObject(STFWorkbenchBotImp.getInstance(), "workbenchBot");
-        exportObject(SuperBotImp.getInstance(), "superBot");
+        exportObject(RemoteBotImp.getInstance(), "bot");
+        exportObject(RemoteWorkbenchBotImp.getInstance(), "workbenchBot");
+        exportObject(SuperRemoteBotImp.getInstance(), "superBot");
 
         /*
          * export remoteWidgets
          */
-        exportObject(STFBotButtonImp.getInstance(), "button");
-        exportObject(STFBotCComboImp.getInstance(), "ccombo");
-        exportObject(STFBotCheckBoxImp.getInstance(), "checkBox");
-        exportObject(STFBotComboImp.getInstance(), "combo");
-        exportObject(STFBotEditorImp.getInstance(), "eclipseEditor");
-        exportObject(STFBotLabelImp.getInstance(), "label");
-        exportObject(STFBotListImp.getInstance(), "list");
-        exportObject(STFBotMenuImp.getInstance(), "menu");
-        exportObject(STFBotPerspectiveImp.getInstance(), "perspective");
-        exportObject(STFBotRadioImp.getInstance(), "radio");
-        exportObject(STFBotShellImp.getInstance(), "shell");
-        exportObject(STFBotStyledTextImp.getInstance(), "styledText");
-        exportObject(STFBotTableImp.getInstance(), "table");
-        exportObject(STFBotTableItemImp.getInstance(), "tableItem");
-        exportObject(STFBotTextImp.getInstance(), "text");
-        exportObject(STFBotToolbarButtonImp.getInstance(), "toggleButton");
-        exportObject(STFBotToolbarButtonImp.getInstance(), "toolbarButton");
-        exportObject(STFBotToolbarDropDownButtonImp.getInstance(),
+        exportObject(RemoteBotButtonImp.getInstance(), "button");
+        exportObject(RemoteBotCComboImp.getInstance(), "ccombo");
+        exportObject(RemoteBotCheckBoxImp.getInstance(), "checkBox");
+        exportObject(RemoteBotComboImp.getInstance(), "combo");
+        exportObject(RemoteBotEditorImp.getInstance(), "eclipseEditor");
+        exportObject(RemoteBotLabelImp.getInstance(), "label");
+        exportObject(RemoteBotListImp.getInstance(), "list");
+        exportObject(RemoteBotMenuImp.getInstance(), "menu");
+        exportObject(RemoteBotPerspectiveImp.getInstance(), "perspective");
+        exportObject(RemoteBotRadioImp.getInstance(), "radio");
+        exportObject(RemoteBotShellImp.getInstance(), "shell");
+        exportObject(RemoteBotStyledTextImp.getInstance(), "styledText");
+        exportObject(RemoteBotTableImp.getInstance(), "table");
+        exportObject(RemoteBotTableItemImp.getInstance(), "tableItem");
+        exportObject(RemoteBotTextImp.getInstance(), "text");
+        exportObject(RemoteBotToolbarButtonImp.getInstance(), "toggleButton");
+        exportObject(RemoteBotToolbarButtonImp.getInstance(), "toolbarButton");
+        exportObject(RemoteBotToolbarDropDownButtonImp.getInstance(),
             "toolbarDropDownButton");
-        exportObject(STFBotToolbarPushButtonImp.getInstance(),
+        exportObject(RemoteBotToolbarPushButtonImp.getInstance(),
             "toolbarPushButon");
-        exportObject(STFBotToolbarRadioButtonImp.getInstance(),
+        exportObject(RemoteBotToolbarRadioButtonImp.getInstance(),
             "toolbarRadioButton");
-        exportObject(STFBotToolbarToggleButtonImp.getInstance(),
+        exportObject(RemoteBotToolbarToggleButtonImp.getInstance(),
             "toolbarToggleButton");
-        exportObject(STFBotTreeImp.getInstance(), "tree");
-        exportObject(STFBotTreeItemImp.getInstance(), "treeItem");
-        exportObject(STFBotViewImp.getInstance(), "view");
-        exportObject(STFBotViewMenuImp.getInstance(), "viewMenu");
+        exportObject(RemoteBotTreeImp.getInstance(), "tree");
+        exportObject(RemoteBotTreeItemImp.getInstance(), "treeItem");
+        exportObject(RemoteBotViewImp.getInstance(), "view");
+        exportObject(RemoteBotViewMenuImp.getInstance(), "viewMenu");
 
         /*
          * remote eclipse components

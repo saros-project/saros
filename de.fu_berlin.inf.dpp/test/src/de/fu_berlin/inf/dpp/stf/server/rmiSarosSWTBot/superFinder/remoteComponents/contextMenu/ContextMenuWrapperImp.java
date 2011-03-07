@@ -3,10 +3,10 @@ package de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteCompone
 import java.rmi.RemoteException;
 import java.util.List;
 
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotShell;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotTableItem;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotTree;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotTreeItem;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.RemoteBotShell;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.RemoteBotTableItem;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.RemoteBotTree;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.RemoteBotTreeItem;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.Component;
 
 public class ContextMenuWrapperImp extends Component implements
@@ -18,10 +18,10 @@ public class ContextMenuWrapperImp extends Component implements
     protected static RefactorCImp reafactorC;
     private static ShareWithCImp shareWithC;
 
-    private STFBotTreeItem treeItem;
-    private STFBotTree tree;
+    private RemoteBotTreeItem treeItem;
+    private RemoteBotTree tree;
     private TreeItemType type;
-    private STFBotTableItem tableItem;
+    private RemoteBotTableItem tableItem;
 
     /**
      * {@link ContextMenuWrapperImp} is a singleton, but inheritance is
@@ -38,11 +38,11 @@ public class ContextMenuWrapperImp extends Component implements
         return self;
     }
 
-    public void setTreeItem(STFBotTreeItem treeItem) {
+    public void setTreeItem(RemoteBotTreeItem treeItem) {
         this.treeItem = treeItem;
     }
 
-    public void setTableItem(STFBotTableItem tableItem) {
+    public void setTableItem(RemoteBotTableItem tableItem) {
         this.tableItem = tableItem;
     }
 
@@ -50,9 +50,15 @@ public class ContextMenuWrapperImp extends Component implements
         this.type = type;
     }
 
-    public void setTree(STFBotTree tree) {
+    public void setTree(RemoteBotTree tree) {
         this.tree = tree;
     }
+
+    /**************************************************************
+     * 
+     * exported functions
+     * 
+     **************************************************************/
 
     public ShareWithC shareWith() throws RemoteException {
         shareWithC.setTreeItem(treeItem);
@@ -87,7 +93,7 @@ public class ContextMenuWrapperImp extends Component implements
     public void paste(String target) throws RemoteException {
         if (treeItem == null) {
             tree.contextMenu(MENU_PASTE).click();
-            STFBotShell shell = bot().shell(SHELL_COPY_PROJECT);
+            RemoteBotShell shell = bot().shell(SHELL_COPY_PROJECT);
             shell.activate();
             shell.bot().textWithLabel("Project name:").setText(target);
             shell.bot().button(OK).click();
@@ -106,7 +112,7 @@ public class ContextMenuWrapperImp extends Component implements
     public void openWith(String editorType) throws RemoteException {
         treeItem.contextMenu(CM_OPEN_WITH, CM_OTHER).click();
         bot().waitUntilShellIsOpen(SHELL_EDITOR_SELECTION);
-        STFBotShell shell_bob = bot().shell(SHELL_EDITOR_SELECTION);
+        RemoteBotShell shell_bob = bot().shell(SHELL_EDITOR_SELECTION);
         shell_bob.activate();
         shell_bob.bot().table().getTableItem(editorType).select();
         shell_bob.bot().button(OK).waitUntilIsEnabled();

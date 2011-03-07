@@ -4,13 +4,13 @@ import java.rmi.RemoteException;
 
 import org.eclipse.swtbot.swt.finder.waits.DefaultCondition;
 
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotView;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.RemoteBotView;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.Component;
 
 public class ConsoleViewImp extends Component implements ConsoleView {
 
     private static transient ConsoleViewImp consoleViewObject;
-    private STFBotView view;
+    private RemoteBotView view;
 
     /**
      * {@link ConsoleViewImp} is a singleton, but inheritance is possible.
@@ -22,7 +22,7 @@ public class ConsoleViewImp extends Component implements ConsoleView {
         return consoleViewObject;
     }
 
-    public ConsoleView setView(STFBotView view) {
+    public ConsoleView setView(RemoteBotView view) {
         this.view = view;
         return this;
     }

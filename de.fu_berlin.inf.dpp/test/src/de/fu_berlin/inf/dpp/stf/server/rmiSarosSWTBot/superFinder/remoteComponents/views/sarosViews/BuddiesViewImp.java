@@ -16,11 +16,11 @@ import org.hamcrest.Matcher;
 import org.jivesoftware.smack.Roster;
 
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotMenu;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotToolbarDropDownButton;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotTree;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotTreeItem;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotView;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.RemoteBotMenu;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.RemoteBotToolbarDropDownButton;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.RemoteBotTree;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.RemoteBotTreeItem;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.RemoteBotView;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.contextMenu.SarosContextMenuWrapper;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.views.ViewsImp;
 
@@ -33,8 +33,8 @@ public class BuddiesViewImp extends ViewsImp implements BuddiesView {
 
     private static transient BuddiesViewImp self;
 
-    private STFBotView view;
-    private STFBotTree tree;
+    private RemoteBotView view;
+    private RemoteBotTree tree;
 
     // private STFBotTreeItem treeItem;
 
@@ -48,7 +48,7 @@ public class BuddiesViewImp extends ViewsImp implements BuddiesView {
         return self;
     }
 
-    public BuddiesView setView(STFBotView view) throws RemoteException {
+    public BuddiesView setView(RemoteBotView view) throws RemoteException {
         setViewWithTree(view);
         return this;
     }
@@ -136,7 +136,7 @@ public class BuddiesViewImp extends ViewsImp implements BuddiesView {
      */
     @SuppressWarnings("unused")
     private void selectConnectAccount(String baseJID) throws RemoteException {
-        STFBotToolbarDropDownButton b = view.toolbarDropDownButton(TB_CONNECT);
+        RemoteBotToolbarDropDownButton b = view.toolbarDropDownButton(TB_CONNECT);
         @SuppressWarnings("static-access")
         Matcher<MenuItem> withRegex = WidgetMatcherFactory.withRegex(baseJID
             + ".*");
@@ -155,10 +155,10 @@ public class BuddiesViewImp extends ViewsImp implements BuddiesView {
     private boolean isConnectAccountExist(String baseJID)
         throws RemoteException {
         Matcher matcher = allOf(widgetOfType(MenuItem.class));
-        STFBotToolbarDropDownButton b = view.toolbarDropDownButton(TB_CONNECT);
-        List<? extends STFBotMenu> accounts = b.menuItems(matcher);
+        RemoteBotToolbarDropDownButton b = view.toolbarDropDownButton(TB_CONNECT);
+        List<? extends RemoteBotMenu> accounts = b.menuItems(matcher);
         b.pressShortcut(Keystrokes.ESC);
-        for (STFBotMenu account : accounts) {
+        for (RemoteBotMenu account : accounts) {
             log.debug("existed account: " + account.getText() + "hier");
             if (account.getText().trim().equals(baseJID)) {
                 return true;
@@ -241,13 +241,13 @@ public class BuddiesViewImp extends ViewsImp implements BuddiesView {
         return view.toolbarButton(tooltip).isEnabled();
     }
 
-    private void setViewWithTree(STFBotView view) throws RemoteException {
+    private void setViewWithTree(RemoteBotView view) throws RemoteException {
         this.view = view;
         tree = view.bot().tree();
         // treeItem = null;
     }
 
-    private void initSarosContextMenuWrapper(STFBotTreeItem treeItem) {
+    private void initSarosContextMenuWrapper(RemoteBotTreeItem treeItem) {
         // this.treeItem = treeItem;
         sarosContextMenu.setTree(tree);
         sarosContextMenu.setTreeItem(treeItem);

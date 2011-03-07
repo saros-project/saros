@@ -4,13 +4,13 @@ import java.rmi.RemoteException;
 
 import org.eclipse.swtbot.swt.finder.waits.DefaultCondition;
 
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotView;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.RemoteBotView;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.Component;
 
 public class ProgressViewImp extends Component implements ProgressView {
     private static transient ProgressViewImp self;
 
-    private STFBotView view;
+    private RemoteBotView view;
 
     /**
      * {@link ProgressViewImp} is a singleton, but inheritance is possible.
@@ -22,7 +22,7 @@ public class ProgressViewImp extends Component implements ProgressView {
         return self;
     }
 
-    public ProgressView setView(STFBotView view) {
+    public ProgressView setView(RemoteBotView view) {
         this.view = view;
 
         return this;

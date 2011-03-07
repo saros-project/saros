@@ -3,7 +3,7 @@ package de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteCompone
 import java.rmi.RemoteException;
 
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotMenu;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.RemoteBotMenu;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.Component;
 
 public class SarosMImp extends Component implements SarosM {
@@ -12,7 +12,7 @@ public class SarosMImp extends Component implements SarosM {
 
     private static SarosPreferencesImp pref;
 
-    private STFBotMenu menu;
+    private RemoteBotMenu menu;
 
     /**
      * {@link SarosMImp} is a singleton, but inheritance is possible.
@@ -25,7 +25,7 @@ public class SarosMImp extends Component implements SarosM {
         return self;
     }
 
-    public SarosM setMenu(STFBotMenu menu) {
+    public SarosM setMenu(RemoteBotMenu menu) {
         this.menu = menu;
         return this;
     }

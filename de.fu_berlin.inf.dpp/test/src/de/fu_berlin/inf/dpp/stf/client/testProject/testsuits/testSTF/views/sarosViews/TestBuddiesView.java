@@ -11,7 +11,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import de.fu_berlin.inf.dpp.stf.client.testProject.testsuits.STFTest;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotView;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.RemoteBotView;
 
 public class TestBuddiesView extends STFTest {
 
@@ -50,7 +50,7 @@ public class TestBuddiesView extends STFTest {
 
     @Test
     public void setFocusOnRosterView() throws RemoteException {
-        STFBotView view_buddies = alice.bot().view(VIEW_SAROS_BUDDIES);
+        RemoteBotView view_buddies = alice.bot().view(VIEW_SAROS_BUDDIES);
         view_buddies.show();
         assertTrue(view_buddies.isActive());
         view_buddies.close();

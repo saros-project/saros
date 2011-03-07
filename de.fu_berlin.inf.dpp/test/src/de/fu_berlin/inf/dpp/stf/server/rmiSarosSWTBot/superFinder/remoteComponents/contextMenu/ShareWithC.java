@@ -4,31 +4,45 @@ import java.rmi.Remote;
 import java.rmi.RemoteException;
 
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.stf.client.AbstractTester;
-import de.fu_berlin.inf.dpp.stf.client.testProject.helpers.TestPattern;
+import de.fu_berlin.inf.dpp.stf.STF;
 
 /**
- * This interface contains convenience API to perform a action using the
- * submenus of the contextmenu "Saros" by right clicking on a treeItem(ie,
- * project, class, file...)in the package explorer view. then you can start off
- * as follows:
- * <ol>
- * <li>
- * At first you need to create a {@link AbstractTester} object in your
- * junit-test. (How to do it please look at the javadoc in class
- * {@link TestPattern} or read the user guide in TWiki
- * https://www.inf.fu-berlin.de/w/SE/SarosSTFTests).</li>
- * <li>
- * then you can use the object pEV initialized in {@link AbstractTester} to
- * access the API :), e.g.
+ * This interface contains convenience API to perform actions activated by
+ * clicking subMenus of contextMenu {@link STF#CM_SHARE_WITH} in the package
+ * explorer view. STF users would start off as follows:
  * 
  * <pre>
- * alice.pEV.shareProject();
+ * //
+ * // init alice and bob
+ * //
+ * initTesters(TypeOfTester.ALICE, Tester.BOB);
+ * 
+ * //
+ * // clean up workbench
+ * //
+ * setUpWorkbench();
+ * 
+ * //
+ * // open sarosViews, connect...
+ * //
+ * setUpSaros();
+ * 
+ * //
+ * // alice create a new java project with name Foo_bar
+ * //
+ * alice.superBot().views().packageExplorerView().tree().newC()
+ *     .javaProject(&quot;Foo_bar&quot;);
+ * 
+ * //
+ * // alice share the project Foo_bar with bob
+ * //
+ * alice.superBot().views().packageExplorerView().selectProject(&quot;Foo_bar&quot;)
+ *     .shareWith().buddy(bob.getJID());
  * </pre>
  * 
- * </li>
+ * More informations about how to write STF-Tests please read the user guide.
  * 
- * @author Lin
+ * @author lchen
  */
 public interface ShareWithC extends Remote {
 

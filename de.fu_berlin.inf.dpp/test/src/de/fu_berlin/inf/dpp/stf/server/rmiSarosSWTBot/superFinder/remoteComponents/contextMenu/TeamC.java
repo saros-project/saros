@@ -3,6 +3,55 @@ package de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteCompone
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 
+import de.fu_berlin.inf.dpp.stf.STF;
+
+/**
+ * This interface contains convenience API to perform actions activated by
+ * clicking subMenus of contextMenu {@link STF#CM_TEAM} in the package explorer
+ * view. STF users would start off as follows:
+ * 
+ * <pre>
+ * //
+ * // init alice and bob
+ * //
+ * initTesters(TypeOfTester.ALICE, Tester.BOB);
+ * 
+ * //
+ * // clean up workbench
+ * //
+ * setUpWorkbench();
+ * 
+ * //
+ * // open sarosViews, connect...
+ * //
+ * setUpSaros();
+ * 
+ * //
+ * // alice create a new java project with name Foo_bar
+ * //
+ * alice.superBot().views().packageExplorerView().tree().newC()
+ *     .javaProject(&quot;Foo_bar&quot;);
+ * 
+ * //
+ * // alice check out a project with SVN and update its reversion to 115.
+ * //
+ * alice
+ *     .superBot()
+ *     .views()
+ *     .packageExplorerView()
+ *     .selectProject(&quot;Foo_bar&quot;)
+ *     .team()
+ *     .shareProjectUsingSpecifiedFolderName(
+ *         &quot;http://saros-build.imp.fu-berlin.de/svn/saros&quot;,
+ *         &quot;stf_tests/stf_test_project&quot;);
+ * alice.superBot().views().packageExplorerView().selectProject((&quot;Foo_bar&quot;)
+ *     .team().update(&quot;115&quot;);
+ * </pre>
+ * 
+ * More informations about how to write STF-Tests please read the user guide.
+ * 
+ * @author lchen
+ */
 public interface TeamC extends Remote {
 
     /**

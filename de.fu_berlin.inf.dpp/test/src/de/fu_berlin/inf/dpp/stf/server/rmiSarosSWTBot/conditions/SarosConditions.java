@@ -8,7 +8,7 @@ import org.eclipse.swtbot.swt.finder.waits.ICondition;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotToolbarButton;
 
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotTable;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.RemoteBotTable;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.views.sarosViews.ChatViewImp;
 
 /**
@@ -34,7 +34,7 @@ public class SarosConditions extends Conditions {
         return new IsShellOpen(bot, title);
     }
 
-    public static ICondition existTableItem(STFBotTable table,
+    public static ICondition existTableItem(RemoteBotTable table,
         String tableItemName) {
         return new ExistsTableItem(table, tableItemName);
     }

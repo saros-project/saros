@@ -2,15 +2,15 @@ package de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteCompone
 
 import java.rmi.RemoteException;
 
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotShell;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotTreeItem;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.RemoteBotShell;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.RemoteBotTreeItem;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.Component;
 
 public class RefactorCImp extends Component implements RefactorC {
 
     private static transient RefactorCImp refactorImp;
 
-    private STFBotTreeItem treeItem;
+    private RemoteBotTreeItem treeItem;
     private TreeItemType type;
 
     /**
@@ -23,7 +23,7 @@ public class RefactorCImp extends Component implements RefactorC {
         return refactorImp;
     }
 
-    public void setTreeItem(STFBotTreeItem treeItem) {
+    public void setTreeItem(RemoteBotTreeItem treeItem) {
         this.treeItem = treeItem;
     }
 
@@ -73,7 +73,7 @@ public class RefactorCImp extends Component implements RefactorC {
     private void rename(String shellTitle, String buttonName, String newName)
         throws RemoteException {
         treeItem.contextMenu(MENU_REFACTOR, MENU_RENAME).click();
-        STFBotShell shell = bot().shell(shellTitle);
+        RemoteBotShell shell = bot().shell(shellTitle);
         shell.activate();
         shell.bot().textWithLabel(LABEL_NEW_NAME).setText(newName);
         bot().shell(shellTitle).bot().button(buttonName).waitUntilIsEnabled();

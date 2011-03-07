@@ -2,13 +2,13 @@ package de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteCompone
 
 import java.rmi.RemoteException;
 
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotView;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.RemoteBotView;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.Component;
 
 public class RSViewImp extends Component implements RSView {
 
     private static transient RSViewImp self;
-    private STFBotView view;
+    private RemoteBotView view;
 
     /**
      * {@link ChatViewImp} is a singleton, but inheritance is possible.
@@ -20,7 +20,7 @@ public class RSViewImp extends Component implements RSView {
         return self;
     }
 
-    public RSView setView(STFBotView view) {
+    public RSView setView(RemoteBotView view) {
         this.view = view;
         return this;
     }

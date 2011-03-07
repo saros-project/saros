@@ -13,9 +13,9 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.swtbot.swt.finder.waits.DefaultCondition;
 
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.conditions.SarosConditions;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotTree;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotTreeItem;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotView;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.RemoteBotTree;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.RemoteBotTreeItem;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.RemoteBotView;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.contextMenu.ContextMenuWrapper;
 import de.fu_berlin.inf.dpp.vcs.VCSAdapter;
 import de.fu_berlin.inf.dpp.vcs.VCSResourceInfo;
@@ -23,8 +23,8 @@ import de.fu_berlin.inf.dpp.vcs.VCSResourceInfo;
 public class PEViewImp extends ViewsImp implements PEView {
     private static transient PEViewImp pEViewImp;
 
-    private STFBotView view;
-    private STFBotTree tree;
+    private RemoteBotView view;
+    private RemoteBotTree tree;
 
     /**
      * {@link PEViewImp} is a singleton, but inheritance is possible.
@@ -36,7 +36,7 @@ public class PEViewImp extends ViewsImp implements PEView {
         return pEViewImp;
     }
 
-    public PEView setView(STFBotView view) throws RemoteException {
+    public PEView setView(RemoteBotView view) throws RemoteException {
         this.view = view;
         tree = this.view.bot().tree();
         return this;
@@ -284,7 +284,7 @@ public class PEViewImp extends ViewsImp implements PEView {
      * 
      **********************************************/
 
-    private void initContextMenuWrapper(STFBotTreeItem treeItem,
+    private void initContextMenuWrapper(RemoteBotTreeItem treeItem,
         TreeItemType type) {
         contextMenu.setTree(tree);
         contextMenu.setTreeItem(treeItem);

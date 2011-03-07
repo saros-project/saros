@@ -5,7 +5,7 @@ import java.rmi.RemoteException;
 import de.fu_berlin.inf.dpp.accountManagement.XMPPAccount;
 import de.fu_berlin.inf.dpp.feedback.Messages;
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.STFBotShell;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.RemoteBotShell;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.Component;
 import de.fu_berlin.inf.dpp.ui.preferencePages.GeneralPreferencePage;
 
@@ -30,7 +30,7 @@ public class SarosPreferencesImp extends Component implements SarosPreferences {
      * 
      **********************************************/
     public void createAccount(JID jid, String password) throws RemoteException {
-        STFBotShell shell_preferences = preCondition();
+        RemoteBotShell shell_preferences = preCondition();
         shell_preferences
             .bot()
             .buttonInGroup(BUTTON_ADD_ACCOUNT, GROUP_TITLE_XMPP_JABBER_ACCOUNTS)
@@ -41,7 +41,7 @@ public class SarosPreferencesImp extends Component implements SarosPreferences {
             .buttonInGroup(GROUP_TITLE_CREATE_NEW_XMPP_JABBER_ACCOUNT).click();
 
         bot().waitUntilShellIsOpen(SHELL_CREATE_XMPP_JABBER_ACCOUNT);
-        STFBotShell shell = bot().shell(SHELL_CREATE_XMPP_JABBER_ACCOUNT);
+        RemoteBotShell shell = bot().shell(SHELL_CREATE_XMPP_JABBER_ACCOUNT);
         shell.activate();
         sarosBot().confirmShellCreateNewXMPPJabberAccount(jid, password);
         shell.bot().button(NEXT).click();
@@ -52,7 +52,7 @@ public class SarosPreferencesImp extends Component implements SarosPreferences {
     }
 
     public void addAccount(JID jid, String password) throws RemoteException {
-        STFBotShell shell_pref = preCondition();
+        RemoteBotShell shell_pref = preCondition();
         shell_pref
             .bot()
             .buttonInGroup(GeneralPreferencePage.ADD_BTN_TEXT,
@@ -68,7 +68,7 @@ public class SarosPreferencesImp extends Component implements SarosPreferences {
             + ") doesn't exist yet!";
         if (isAccountActiveNoGUI(jid))
             return;
-        STFBotShell shell = preCondition();
+        RemoteBotShell shell = preCondition();
         shell.bot().listInGroup(GeneralPreferencePage.ACCOUNT_GROUP_TITLE)
             .select(jid.getBase());
 
@@ -84,7 +84,7 @@ public class SarosPreferencesImp extends Component implements SarosPreferences {
 
     public void changeAccount(JID jid, String newXmppJabberID,
         String newPassword) throws RemoteException {
-        STFBotShell shell = preCondition();
+        RemoteBotShell shell = preCondition();
         shell.bot().listInGroup(GeneralPreferencePage.ACCOUNT_GROUP_TITLE)
             .select(jid.getBase());
 
@@ -102,7 +102,7 @@ public class SarosPreferencesImp extends Component implements SarosPreferences {
     public void deleteAccount(JID jid, String password) throws RemoteException {
         if (!isAccountExistNoGUI(jid, password))
             return;
-        STFBotShell shell = preCondition();
+        RemoteBotShell shell = preCondition();
         shell.bot().listInGroup(GeneralPreferencePage.ACCOUNT_GROUP_TITLE)
             .select(jid.getBase());
 
@@ -123,7 +123,7 @@ public class SarosPreferencesImp extends Component implements SarosPreferences {
     }
 
     public void deleteAllNoActiveAccounts() throws RemoteException {
-        STFBotShell shell = preCondition();
+        RemoteBotShell shell = preCondition();
         String[] items = shell.bot()
             .listInGroup(GROUP_TITLE_XMPP_JABBER_ACCOUNTS).getItems();
         for (String item : items) {
@@ -152,7 +152,7 @@ public class SarosPreferencesImp extends Component implements SarosPreferences {
         int bandWidth, int capturedArea) throws RemoteException {
         clickMenuSarosPreferences();
         bot().waitUntilShellIsOpen(SHELL_PREFERNCES);
-        STFBotShell shell = bot().shell(SHELL_PREFERNCES);
+        RemoteBotShell shell = bot().shell(SHELL_PREFERNCES);
         shell.activate();
 
         shell.bot().tree().selectTreeItem(NODE_SAROS, NODE_SAROS_SCREENSHARING);
@@ -168,7 +168,7 @@ public class SarosPreferencesImp extends Component implements SarosPreferences {
         if (feedbackManager.isFeedbackDisabled()) {
             clickMenuSarosPreferences();
             bot().waitUntilShellIsOpen(SHELL_PREFERNCES);
-            STFBotShell shell = bot().shell(SHELL_PREFERNCES);
+            RemoteBotShell shell = bot().shell(SHELL_PREFERNCES);
             shell.activate();
             shell.bot().tree().selectTreeItem(NODE_SAROS, NODE_SAROS_FEEDBACK);
             shell
@@ -189,7 +189,7 @@ public class SarosPreferencesImp extends Component implements SarosPreferences {
     }
 
     public boolean existsAccount() throws RemoteException {
-        STFBotShell shell = preCondition();
+        RemoteBotShell shell = preCondition();
         String[] items = shell.bot()
             .listInGroup(GROUP_TITLE_XMPP_JABBER_ACCOUNTS).getItems();
         if (items == null || items.length == 0)
@@ -199,7 +199,7 @@ public class SarosPreferencesImp extends Component implements SarosPreferences {
     }
 
     public boolean existsAccount(JID jid) throws RemoteException {
-        STFBotShell shell = preCondition();
+        RemoteBotShell shell = preCondition();
 
         String[] items = shell.bot()
             .listInGroup(GROUP_TITLE_XMPP_JABBER_ACCOUNTS).getItems();
@@ -216,7 +216,7 @@ public class SarosPreferencesImp extends Component implements SarosPreferences {
 
     public boolean isAccountActive(JID jid) throws RemoteException {
 
-        STFBotShell shell = preCondition();
+        RemoteBotShell shell = preCondition();
         String activeAccount = shell.bot()
             .labelInGroup(GROUP_TITLE_XMPP_JABBER_ACCOUNTS).getText();
         boolean isActive = false;
@@ -236,10 +236,10 @@ public class SarosPreferencesImp extends Component implements SarosPreferences {
      * This is a convenient function to show the right setting-page of saros
      * item in the preferences dialog.
      */
-    private STFBotShell preCondition() throws RemoteException {
+    private RemoteBotShell preCondition() throws RemoteException {
         clickMenuSarosPreferences();
         bot().waitUntilShellIsOpen(SHELL_PREFERNCES);
-        STFBotShell shell = bot().shell(SHELL_PREFERNCES);
+        RemoteBotShell shell = bot().shell(SHELL_PREFERNCES);
         shell.activate();
         shell.bot().tree().selectTreeItem(NODE_SAROS);
         return shell;

@@ -5,9 +5,9 @@ import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.STFBot;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.STFWorkbenchBot;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.SuperBot;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.RemoteBot;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.RemoteWorkbenchBot;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.SuperRemoteBot;
 
 /**
  * SuperClass of {@link DummyTester} and {@link RealTester}. It define all
@@ -20,8 +20,8 @@ public abstract class AbstractTester {
     }
 
     /**
-     * get remote registered objects bot {@link STFBot} and superBot
-     * {@link SuperBot}
+     * get remote registered objects bot {@link RemoteBot} and superBot
+     * {@link SuperRemoteBot}
      * 
      * @throws RemoteException
      * @throws NotBoundException
@@ -65,18 +65,18 @@ public abstract class AbstractTester {
 
     /**
      * 
-     * @return the simple {@link STFBot}, with which tester can remotely access
+     * @return the simple {@link RemoteBot}, with which tester can remotely access
      *         widgets of saros-instance
      */
-    public abstract STFWorkbenchBot bot();
+    public abstract RemoteWorkbenchBot bot();
 
     /**
      * 
-     * @return the super {@link SuperBot}, which encapsulate some often used
+     * @return the super {@link SuperRemoteBot}, which encapsulate some often used
      *         actions e.g. shareProject, connect, leaveSession.., which can be
-     *         also done with {@link STFBot}
+     *         also done with {@link RemoteBot}
      * @throws RemoteException
      */
-    public abstract SuperBot superBot() throws RemoteException;
+    public abstract SuperRemoteBot superBot() throws RemoteException;
 
 }
