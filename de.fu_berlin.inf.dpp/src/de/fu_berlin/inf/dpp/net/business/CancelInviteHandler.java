@@ -39,7 +39,7 @@ public class CancelInviteHandler extends CancelInviteExtension {
                 + ": Received invitation cancel message");
             process.remoteCancel(errorMsg);
         } else {
-            log.warn("Inv[unkown buddy]: Received invitation cancel message");
+            log.warn("Inv[unkown buddy]: Received invitation cancel message for unknown invitation process. Ignoring...");
         }
     }
 }
