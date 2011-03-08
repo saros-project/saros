@@ -1,294 +1,230 @@
 package de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.contextMenu;
 
-import java.rmi.Remote;
 import java.rmi.RemoteException;
 
-import de.fu_berlin.inf.dpp.stf.STF;
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.Path;
+import org.eclipse.swtbot.swt.finder.widgets.TimeoutException;
 
-/**
- * This interface contains convenience API to perform actions activated by
- * clicking subMenus of contextMenu {@link STF#CM_TEAM} in the package explorer
- * view. STF users would start off as follows:
- * 
- * <pre>
- * //
- * // init alice and bob
- * //
- * initTesters(TypeOfTester.ALICE, Tester.BOB);
- * 
- * //
- * // clean up workbench
- * //
- * setUpWorkbench();
- * 
- * //
- * // open sarosViews, connect...
- * //
- * setUpSaros();
- * 
- * //
- * // alice create a new java project with name Foo_bar
- * //
- * alice.superBot().views().packageExplorerView().tree().newC()
- *     .javaProject(&quot;Foo_bar&quot;);
- * 
- * //
- * // alice check out a project with SVN and update its reversion to 115.
- * //
- * alice
- *     .superBot()
- *     .views()
- *     .packageExplorerView()
- *     .selectProject(&quot;Foo_bar&quot;)
- *     .team()
- *     .shareProjectUsingSpecifiedFolderName(
- *         &quot;http://saros-build.imp.fu-berlin.de/svn/saros&quot;,
- *         &quot;stf_tests/stf_test_project&quot;);
- * alice.superBot().views().packageExplorerView().selectProject((&quot;Foo_bar&quot;)
- *     .team().update(&quot;115&quot;);
- * </pre>
- * 
- * More informations about how to write STF-Tests please read the user guide.
- * 
- * @author lchen
- */
-public interface TeamC extends Remote {
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.IRemoteBotShell;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.IRemoteBotTable;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.IRemoteBotTreeItem;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.IRemoteBotView;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.Component;
+import de.fu_berlin.inf.dpp.vcs.VCSAdapter;
+
+public class TeamC extends Component implements ITeamC {
+
+    private static transient TeamC self;
+
+    private IRemoteBotTreeItem treeItem;
 
     /**
-     * Perform the action "share project with SVN" which should be done with the
-     * following steps:
-     * 
-     * <ol>
-     * <li>Select the given project and click "Team" > "Share project"</li>
-     * <li>Select the repository type "SVN"</li>
-     * <li>If the given repository URL is already existed, then select the URL
-     * and confirm the popup window</li>
-     * <li>Otherwise check the checkbox "Create a new repository location",
-     * enter the given repository URL and click "Finish" to confirm the share
-     * project process</li>
-     * <li>Waits until the shell is closed. It guarantee that the share project
-     * action is completely done.</li>
-     * </ol>
-     * <p>
-     * <b>Attention:</b>
-     * <ol>
-     * <li>Makes sure, the package explorer view is open and active.</li>
-     * <li>The function should treat all the recursive following actions, which
-     * are activated or indirectly activated by clicking the sub menu
-     * "share project" . I mean, after clicking the sub menu you need to treat
-     * the following popup window too.</li>
-     * 
-     * 
-     * @param repositoryURL
-     *            the repository location
-     * @throws RemoteException
+     * {@link TeamC} is a singleton, but inheritance is possible.
      */
-    public void shareProject(String repositoryURL) throws RemoteException;
+    public static TeamC getInstance() {
+        if (self != null)
+            return self;
+        self = new TeamC();
+        return self;
+    }
 
-    /**
-     * Perform the action
-     * "share project with SVN, which is already configured with SVN repository information"
-     * which should be done with the following steps:
+    public void setTreeItem(IRemoteBotTreeItem view) {
+        this.treeItem = view;
+    }
+
+    /**************************************************************
      * 
-     * <ol>
-     * <li>Select the given project and click "Team" > "Share project"</li>
-     * <li>Select the repository type "SVN"</li>
-     * <li>click "Finish" to confirm the share proejct process</li>
-     * </ol>
-     * <p>
-     * <b>Attention:</b>
-     * <ol>
-     * <li>Makes sure, the package explorer view is open and active.</li>
-     * <li>The function should treat all the recursive following actions, which
-     * are activated or indirectly activated by clicking the sub menu
-     * "share project" . I mean, after clicking the sub menu you need to treat
-     * the following popup window too.</li>
-     * <li>this method is only suitable for such project, which still include
-     * the SVN meta information.</li>
+     * exported functions
      * 
+     **************************************************************/
+
+    /**********************************************
      * 
-     * @param repositoryURL
-     *            the repository location
-     * @throws RemoteException
-     */
+     * actions
+     * 
+     **********************************************/
+    public void shareProject(String repositoryURL) throws RemoteException {
+        treeItem.contextMenu(CM_TEAM, CM_SHARE_PROJECT_OF_TEAM).click();
+
+        IRemoteBotShell shell = bot().shell(SHELL_SHARE_PROJECT);
+        shell.confirmWithTable(TABLE_ITEM_REPOSITORY_TYPE_SVN, NEXT);
+
+        if (shell.bot().table().containsItem(repositoryURL)) {
+            shell.confirmWithTable(repositoryURL, NEXT);
+        } else {
+            shell.bot().radio(LABEL_CREATE_A_NEW_REPOSITORY_LOCATION).click();
+            shell.bot().button(NEXT).click();
+            shell.bot().comboBoxWithLabel(LABEL_URL).setText(repositoryURL);
+        }
+        shell.bot().button(FINISH).waitUntilIsEnabled();
+        shell.bot().button(FINISH).click();
+        bot().waitUntilShellIsClosed(SHELL_SHARE_PROJECT);
+    }
+
     public void shareProjectConfiguredWithSVNInfos(String repositoryURL)
-        throws RemoteException;
+        throws RemoteException {
 
-    /**
-     * using this method you can import a project from SVN (Other variant to
-     * import a project from SVN is in the method which should be done with the
-     * following steps:
-     * 
-     * <ol>
-     * <li>Select the given project and click "Team" > "Share project"</li>
-     * <li>Select the repository type "SVN" and click next</li>
-     * <li>In the next page select the repositoryURL if the repositoryURL
-     * already exists,otherwise create a new one and click the next button</li>
-     * <li>In the next page activate the radio button
-     * "Use specified folder name", insert the given folder name in the text
-     * field and click finish to confirm the import prorject with SVN process.</li>
-     * </ol>
-     * <p>
-     * <b>Attention:</b>
-     * <ol>
-     * <li>Makes sure, the package explorer view is open and active.</li>
-     * <li>The function should treat all the recursive following actions, which
-     * are activated or indirectly activated by clicking the sub menu
-     * "share project" . I mean, after clicking the sub menu you need to treat
-     * the following popup window too.</li>
-     * 
-     * 
-     * @param repositoryURL
-     *            the repository location
-     * @param specifiedFolderName
-     *            the name of the folder, which already exists in the
-     *            repository, e.g. trunk/examples
-     * @throws RemoteException
-     */
+        String[] contexts = { CM_TEAM, CM_SHARE_PROJECT_OF_TEAM };
+
+        treeItem.contextMenu(contexts).click();
+
+        IRemoteBotShell shell = bot().shell(SHELL_SHARE_PROJECT);
+        shell.confirmWithTable(TABLE_ITEM_REPOSITORY_TYPE_SVN, NEXT);
+        log.debug("SVN share project text: " + shell.bot().text());
+        shell.bot().button(FINISH).waitUntilIsEnabled();
+        shell.bot().button(FINISH).click();
+        bot().waitUntilShellIsClosed(SHELL_SHARE_PROJECT);
+    }
+
     public void shareProjectUsingSpecifiedFolderName(String repositoryURL,
-        String specifiedFolderName) throws RemoteException;
+        String specifiedFolderName) throws RemoteException {
+        String[] contexts = { CM_TEAM, CM_SHARE_PROJECT_OF_TEAM };
 
-    /**
-     * Using this method you can import a project from SVN (Other variant to
-     * import a project from SVN is in the method . which should be done with
-     * the following steps:
-     * 
-     * <ol>
-     * <li>Clicks main menu "File" > "Import..."</li>
-     * <li>Selects SVN -> checkout projects from SVN and click the button "next"
-     * </li>
-     * <li>In the next page select the repositoryURL if the repositoryURL
-     * already exists,otherwise create a new one and click the next button</li>
-     * <li>In the next page select the folder to be checked out from SVN and
-     * click finish to confirm the import project with SVN process.</li>
-     * </ol>
-     * <p>
-     * <b>Attention:</b>
-     * <ol>
-     * <li>Makes sure, the package explorer view is open and active.</li>
-     * <li>The function should treat all the recursive following actions, which
-     * are activated or indirectly activated by clicking the sub menu
-     * "share project" . I mean, after clicking the sub menu you need to treat
-     * the following popup window too.</li>
-     * 
-     * @param repositoryURL
-     *            the repository location
-     * 
-     * @throws RemoteException
-     */
+        treeItem.contextMenu(contexts).click();
+
+        bot().shell(SHELL_SHARE_PROJECT).confirmWithTable(
+            TABLE_ITEM_REPOSITORY_TYPE_SVN, NEXT);
+
+        IRemoteBotShell shell = bot().shell(SHELL_SHARE_PROJECT);
+        IRemoteBotTable table = shell.bot().table();
+
+        if (table == null || !table.containsItem(repositoryURL)) {
+            // close window
+            shell.close();
+            // in svn repos view: enter url
+
+            bot().openViewById(VIEW_SVN_REPOSITORIES_ID);
+            IRemoteBotView view = bot().view(VIEW_SVN_REPOSITORIES);
+
+            view.show();
+            final boolean viewWasOpen = bot().isViewOpen(VIEW_SVN_REPOSITORIES);
+            bot().view(VIEW_SVN_REPOSITORIES)
+                .toolbarButton("Add SVN Repository").click();
+
+            bot().waitUntilShellIsOpen("Add SVN Repository");
+            IRemoteBotShell shell2 = bot().shell("Add SVN Repository");
+            shell2.activate();
+            shell2.bot().comboBoxWithLabel(LABEL_URL).setText(repositoryURL);
+            shell2.bot().button(FINISH).click();
+            bot().waitUntilShellIsClosed("Add SVN Repository");
+            if (!viewWasOpen)
+                bot().view(VIEW_SVN_REPOSITORIES).close();
+            // recur...
+            shareProjectUsingSpecifiedFolderName(repositoryURL,
+                specifiedFolderName);
+            return;
+        }
+
+        bot().shell(SHELL_SHARE_PROJECT).confirmWithTable(repositoryURL, NEXT);
+        IRemoteBotShell shell3 = bot().shell(SHELL_SHARE_PROJECT);
+        shell3.bot().radio("Use specified folder name:").click();
+        shell3.bot().text().setText(specifiedFolderName);
+        shell3.bot().button(FINISH).click();
+        bot().shell("Remote Project Exists").waitUntilActive();
+        bot().shell("Remote Project Exists").confirm(YES);
+        bot().waitUntilShellIsClosed(SHELL_SHARE_PROJECT);
+        try {
+            bot().sleep(1000);
+            if (bot().isShellOpen("Confirm Open Perspective"))
+                bot().shell("Confirm Open Perspective").confirm(NO);
+        } catch (TimeoutException e) {
+            // ignore
+        }
+
+    }
+
     public void importProjectFromSVN(String repositoryURL)
-        throws RemoteException;
+        throws RemoteException {
+        bot().menu(MENU_FILE).menu("Import...").click();
+        IRemoteBotShell shell = bot().shell(SHELL_IMPORT);
+        shell.confirmWithTreeWithFilterText(TABLE_ITEM_REPOSITORY_TYPE_SVN,
+            "Checkout Projects from SVN", NEXT);
+        if (shell.bot().table().containsItem(repositoryURL)) {
+            bot().shell("Checkout from SVN").confirmWithTable(repositoryURL,
+                NEXT);
+        } else {
+            shell.bot().radio("Create a new repository location").click();
+            shell.bot().button(NEXT).click();
+            shell.bot().comboBoxWithLabel("Url:").setText(repositoryURL);
+            shell.bot().button(NEXT).click();
+            bot().shell("Checkout from SVN").waitUntilActive();
+        }
+        bot().shell("Checkout from SVN").confirmWithTreeWithWaitingExpand(
+            "Checkout from SVN", FINISH, repositoryURL, "trunk", "examples");
+        bot().shell("SVN Checkout").waitUntilActive();
+        bot().waitUntilShellIsClosed("SVN Checkout");
+    }
 
-    /**
-     * Perform the action "Disconnect from SVN" which should be done with the
-     * following steps:
-     * 
-     * <ol>
-     * <li>Select the given project and click "Team" > "Disconnect..."</li>
-     * <li>click "Yes" to confirm the disconnect</li>
-     * </ol>
-     * <p>
-     * <b>Attention:</b>
-     * <ol>
-     * <li>Makes sure, the package explorer view is open and active.</li>
-     * <li>The function should treat all the recursive following actions, which
-     * are activated or indirectly activated by clicking the sub menu
-     * "Disconnect..." . I mean, after clicking the sub menu you need to treat
-     * the following popup window too.</li>
-     * 
-     * @throws RemoteException
-     */
-    public void disConnect() throws RemoteException;
+    public void disConnect() throws RemoteException {
+        String[] contexts = { CM_TEAM, CM_DISCONNECT };
+        treeItem.contextMenu(contexts).click();
+        bot().shell(SHELL_CONFIRM_DISCONNECT_FROM_SVN).confirm(YES);
+    }
 
-    /**
-     * Perform the action "revert" which should be done with the following
-     * steps:
-     * 
-     * <ol>
-     * <li>Select the given project and click "Team" > "Revert..."</li>
-     * <li>click "OK" to confirm the revert</li>
-     * <li>Waits until the shell "Revert" is closed. It guarantee that the
-     * "Revert" action is completely done.</li>
-     * </ol>
-     * <p>
-     * <b>Attention:</b>
-     * <ol>
-     * <li>Makes sure, the package explorer view is open and active.</li>
-     * <li>The function should treat all the recursive following actions, which
-     * are activated or indirectly activated by clicking the sub menu
-     * "Revert..." . I mean, after clicking the sub menu you need to treat the
-     * following popup window too.</li>
-     * 
-     * @throws RemoteException
-     */
-    public void revert() throws RemoteException;
+    public void revert() throws RemoteException {
+        String[] contexts = { CM_TEAM, CM_REVERT };
+        treeItem.contextMenu(contexts).click();
+        bot().shell(SHELL_REVERT).confirm(OK);
+        bot().waitUntilShellIsClosed(SHELL_REVERT);
+    }
 
-    /**
-     * Perform the action "switch to another revision" which should be done with
-     * the following steps:
-     * 
-     * <ol>
-     * <li>Select the given project and click "Team" >
-     * "Switch to another Branch/Tag/Revision..."</li>
-     * <li>uncheckt the checkbox with the title "Switch to HEAD version"</li>
-     * <li>Enter the given versionID to the text field with the title
-     * "Revision:"</li>
-     * <li>click "OK" to confirm the switch</li>
-     * <li>Waits until the shell "SVN Switch" is closed. It guarantee that the
-     * "switch to another revision" action is completely done.</li>
-     * </ol>
-     * <p>
-     * <b>Attention:</b>
-     * <ol>
-     * <li>Makes sure, the package explorer view is open and active.</li>
-     * <li>The function should treat all the recursive following actions, which
-     * are activated or indirectly activated by clicking the sub menu
-     * "switch to another revision" . I mean, after clicking the sub menu you
-     * need to treat the following popup window too.</li>
-     * 
-     * @param versionID
-     *            the ID of the revision to which you want to switch
-     * @throws RemoteException
-     */
-    public void update(String versionID) throws RemoteException;
+    public void update(String versionID) throws RemoteException {
+        switchToAnotherRevision(versionID);
+    }
 
-    /**
-     * Perform the action "switch to another Branch/Tag" which should be done
-     * with the following steps:
-     * 
-     * <ol>
-     * <li>Select the given project and click "Team" >
-     * "Switch to another Branch/Tag/Revision..."</li>
-     * <li>Enter the given URL to the combobox text field with the title
-     * "To URL:"</li>
-     * <li>click "OK" to confirm the switch</li>
-     * <li>Waits until the shell "SVN Switch" is closed. It guarantee that the
-     * "switch to another Branch/Tag/revision" action is completely done.</li>
-     * </ol>
-     * <p>
-     * <b>Attention:</b>
-     * <ol>
-     * <li>Makes sure, the package explorer view is open and active.</li>
-     * <li>The function should treat all the recursive following actions, which
-     * are activated or indirectly activated by clicking the sub menu
-     * "switch to another Branch/Tag" . I mean, after clicking the sub menu you
-     * need to treat the following popup window too.</li>
-     * 
-     * 
-     * @param projectName
-     *            the name of the project located in the package explorer view,
-     *            which you want to share with other peers.
-     * @param url
-     *            Update working copy to the url.
-     * @throws RemoteException
-     */
+    private void switchToAnotherRevision(String versionID)
+        throws RemoteException {
+        String[] contexts = { CM_TEAM, CM_SWITCH_TO_ANOTHER_BRANCH_TAG_REVISION };
+
+        treeItem.contextMenu(contexts).click();
+
+        IRemoteBotShell shell = bot().shell(SHELL_SWITCH);
+        shell.waitUntilActive();
+        if (shell.bot().checkBox(LABEL_SWITCH_TOHEAD_REVISION).isChecked())
+            shell.bot().checkBox(LABEL_SWITCH_TOHEAD_REVISION).click();
+        shell.bot().textWithLabel(LABEL_REVISION).setText(versionID);
+        shell.bot().button(OK).click();
+        if (bot().isShellOpen(SHELL_SVN_SWITCH))
+            bot().waitUntilShellIsClosed(SHELL_SVN_SWITCH);
+    }
+
     public void switchProject(String projectName, String url)
-        throws RemoteException;
-
-    public void switchResource(String fullPath, String url, String revision)
-        throws RemoteException;
+        throws RemoteException {
+        switchResource(projectName, url, "HEAD");
+    }
 
     public void switchResource(String fullPath, String url)
-        throws RemoteException;
+        throws RemoteException {
+        switchResource(fullPath, url, "HEAD");
+    }
+
+    public void switchResource(String fullPath, String url, String revision)
+        throws RemoteException {
+
+        final IPath path = new Path(fullPath);
+        final IResource resource = ResourcesPlugin.getWorkspace().getRoot()
+            .findMember(path);
+        if (resource == null)
+            throw new RemoteException("Resource \"" + path + "\" not found.");
+
+        final IProject project = resource.getProject();
+        VCSAdapter vcs = VCSAdapter.getAdapter(project);
+        if (vcs == null) {
+            throw new RemoteException("No VCSAdapter found for \""
+                + project.getName() + "\".");
+        }
+
+        vcs.switch_(resource, url, revision, new NullProgressMonitor());
+    }
+    /**********************************************
+     * 
+     * States
+     * 
+     **********************************************/
 
 }

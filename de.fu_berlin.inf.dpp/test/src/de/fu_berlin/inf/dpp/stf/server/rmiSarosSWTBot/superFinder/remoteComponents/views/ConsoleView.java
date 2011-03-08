@@ -1,52 +1,69 @@
 package de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.views;
 
-import java.rmi.Remote;
 import java.rmi.RemoteException;
 
-import de.fu_berlin.inf.dpp.stf.client.AbstractTester;
-import de.fu_berlin.inf.dpp.stf.client.testProject.helpers.TestPattern;
+import org.eclipse.swtbot.swt.finder.waits.DefaultCondition;
 
-/**
- * This interface contains convenience API to perform a action using console
- * view widgets. You can start off as follows:
- * <ol>
- * <li>
- * At first you need to create a {@link AbstractTester} object in your
- * junit-test. (How to do it please look at the javadoc in class
- * {@link TestPattern} or read the user guide.</li>
- * <li>
- * then you can use the object basic initialized in {@link AbstractTester} to
- * access the API :), e.g.
- * 
- * <pre>
- * alice.consoleV.getTextInConsole();
- * </pre>
- * 
- * </li>
- * 
- * @author lchen
- */
-public interface ConsoleView extends Remote {
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.IRemoteBotView;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.Component;
+
+public class ConsoleView extends Component implements IConsoleView {
+
+    private static transient ConsoleView consoleViewObject;
+    private IRemoteBotView view;
 
     /**
-     * 
-     * @return<tt>true</tt>, if there are text existed in the console.
-     * @throws RemoteException
+     * {@link ConsoleView} is a singleton, but inheritance is possible.
      */
-    public boolean existTextInConsole() throws RemoteException;
+    public static ConsoleView getInstance() {
+        if (consoleViewObject != null)
+            return consoleViewObject;
+        consoleViewObject = new ConsoleView();
+        return consoleViewObject;
+    }
 
-    /**
+    public IConsoleView setView(IRemoteBotView view) {
+        this.view = view;
+        return this;
+    }
+
+    /**************************************************************
      * 
-     * @return the first styledText in the view Console
-     * @throws RemoteException
-     */
-    public String getFirstTextInConsole() throws RemoteException;
-
-    /**
-     * Wait until the condition {@link ConsoleView#existTextInConsole()} is true
+     * exported functions
      * 
-     * @throws RemoteException
-     */
-    public void waitUntilExistsTextInConsole() throws RemoteException;
+     **************************************************************/
 
+    /**********************************************
+     * 
+     * states
+     * 
+     **********************************************/
+    public String getFirstTextInConsole() throws RemoteException {
+        return view.bot().styledText().getText();
+    }
+
+    public boolean existTextInConsole() throws RemoteException {
+        if (!view.bot().existsStyledText())
+            return false;
+        if (view.bot().styledText().getText().equals(""))
+            return false;
+        return true;
+    }
+
+    /**********************************************
+     * 
+     * waits until
+     * 
+     **********************************************/
+    public void waitUntilExistsTextInConsole() throws RemoteException {
+        bot().waitUntil(new DefaultCondition() {
+            public boolean test() throws Exception {
+                return existTextInConsole();
+            }
+
+            public String getFailureMessage() {
+                return "in the console view contains no text.";
+            }
+        });
+    }
 }

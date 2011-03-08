@@ -1,10 +1,37 @@
 package de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets;
 
-import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.util.List;
 
-public interface RemoteBotStyledText extends Remote {
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotStyledText;
+
+public class RemoteBotStyledText extends AbstractRmoteWidget implements
+    IRemoteBotStyledText {
+
+    private static transient RemoteBotStyledText self;
+
+    private SWTBotStyledText widget;
+
+    /**
+     * {@link RemoteBotStyledText} is a singleton, but inheritance is possible.
+     */
+    public static RemoteBotStyledText getInstance() {
+        if (self != null)
+            return self;
+        self = new RemoteBotStyledText();
+        return self;
+    }
+
+    public IRemoteBotStyledText setWidget(SWTBotStyledText styledText) {
+        this.widget = styledText;
+        return this;
+    }
+
+    /**************************************************************
+     * 
+     * exported functions
+     * 
+     **************************************************************/
 
     /**********************************************
      * 
@@ -12,22 +39,38 @@ public interface RemoteBotStyledText extends Remote {
      * 
      **********************************************/
 
-    public RemoteBotMenu contextMenu(String text) throws RemoteException;
+    public IRemoteBotMenu contextMenu(String text) throws RemoteException {
+        return stfBotMenu.setWidget(widget.contextMenu(text));
+    }
 
     /**********************************************
      * 
      * states
      * 
      **********************************************/
-    public String getText() throws RemoteException;
 
-    public String getToolTipText() throws RemoteException;
+    public String getText() throws RemoteException {
 
-    public String getTextOnCurrentLine() throws RemoteException;
+        return widget.getText();
+    }
 
-    public String getSelection() throws RemoteException;
+    public String getToolTipText() throws RemoteException {
+        return widget.getToolTipText();
+    }
 
-    public List<String> getLines() throws RemoteException;
+    public String getTextOnCurrentLine() throws RemoteException {
+        return widget.getTextOnCurrentLine();
+    }
 
-    public int getLineCount() throws RemoteException;
+    public String getSelection() throws RemoteException {
+        return widget.getSelection();
+    }
+
+    public List<String> getLines() throws RemoteException {
+        return widget.getLines();
+    }
+
+    public int getLineCount() throws RemoteException {
+        return widget.getLineCount();
+    }
 }

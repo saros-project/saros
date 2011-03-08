@@ -1,171 +1,247 @@
 package de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets;
 
-import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.util.Map;
 
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.RemoteBot;
+import org.eclipse.jface.wizard.WizardDialog;
+import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
+import org.eclipse.swtbot.swt.finder.finders.UIThreadRunnable;
+import org.eclipse.swtbot.swt.finder.results.StringResult;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 
-public interface RemoteBotShell extends Remote {
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.conditions.SarosConditions;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.IRemoteBot;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.RemoteBot;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.views.sarosViews.SessionView;
+import de.fu_berlin.inf.dpp.stf.server.sarosSWTBot.SarosSWTBot;
+
+public class RemoteBotShell extends AbstractRmoteWidget implements IRemoteBotShell {
+    private static transient RemoteBotShell self;
+
+    public final static String TEXT_FIELD_TYPE_FILTER_TEXT = "type filter text";
+
+    private SWTBotShell widget;
+
+    /**
+     * {@link SessionView} is a singleton, but inheritance is possible.
+     */
+    public static RemoteBotShell getInstance() {
+        if (self != null)
+            return self;
+        self = new RemoteBotShell();
+        return self;
+    }
+
+    public IRemoteBotShell setWidget(SWTBotShell shell) {
+        this.widget = shell;
+        return this;
+    }
+
+    /**************************************************************
+     * 
+     * exported functions
+     * 
+     **************************************************************/
 
     /**********************************************
      * 
      * finders
      * 
      **********************************************/
-    public RemoteBot bot() throws RemoteException;
+    public IRemoteBot bot() {
+        RemoteBot botImp = RemoteBot.getInstance();
+        // botImp.setBot(swtBotShell.bot());
+        botImp.setBot(SarosSWTBot.getInstance());
+        return botImp;
+    }
 
-    public RemoteBotMenu contextMenu(String text) throws RemoteException;
+    public IRemoteBotMenu contextMenu(String text) throws RemoteException {
+        return stfBotMenu.setWidget(widget.contextMenu(text));
+    }
 
     /**********************************************
      * 
      * actions
      * 
      **********************************************/
-    public void setFocus() throws RemoteException;
+    public void setFocus() throws RemoteException {
+        widget.setFocus();
+    }
 
-    public boolean activate() throws RemoteException;
+    public boolean activate() throws RemoteException {
+        widget.activate();
+        return true;
+    }
 
-    public void close() throws RemoteException;
+    public void close() throws RemoteException {
+        widget.close();
+    }
 
-    public void confirm() throws RemoteException;
+    public void confirm() throws RemoteException {
+        activate();
+        bot().button().click();
+    }
 
-    /**
-     * confirm a pop-up window.
-     * 
-     * @param buttonText
-     *            text of the button in the shell.
-     * 
-     */
-    public void confirm(String buttonText) throws RemoteException;
+    public void confirm(String buttonText) throws RemoteException {
+        activate();
+        bot().button(buttonText).click();
+    }
 
-    /**
-     * confirm a pop-up window with a tree. You should first select a tree node
-     * and then confirm with button.
-     * 
-     * 
-     * @param buttonText
-     *            text of the button
-     * @param nodes
-     *            node path to expand. Attempts to expand all nodes along the
-     *            path specified by the node array parameter.
-     * 
-     */
     public void confirmWithTree(String buttonText, String... nodes)
-        throws RemoteException;
+        throws RemoteException {
+        activate();
+        bot().tree().selectTreeItem(nodes);
+        bot().button(buttonText).waitUntilIsEnabled();
+        bot().button(buttonText).click();
+    }
 
     public void confirmWithTextField(String textLabel, String text,
-        String buttonText) throws RemoteException;
+        String buttonText) throws RemoteException {
+        activate();
+        bot().textWithLabel(textLabel).setText(text);
+
+        bot().button(buttonText).waitUntilIsEnabled();
+        bot().button(buttonText).click();
+    }
 
     public void confirmWithTextFieldAndWait(Map<String, String> labelsAndTexts,
-        String buttonText) throws RemoteException;
+        String buttonText) throws RemoteException {
+        activate();
+        for (String label : labelsAndTexts.keySet()) {
+            String text = labelsAndTexts.get(label);
+            bot().textWithLabel(label).setText(text);
+        }
+        bot().button(buttonText).waitUntilIsEnabled();
+        bot().button(buttonText).click();
+
+    }
 
     public void confirmWithTreeWithWaitingExpand(String buttonText,
-        String... nodes) throws RemoteException;
+        String... nodes) throws RemoteException {
+        bot().tree().selectTreeItemAndWait(nodes);
+        bot().button(buttonText).click();
+    }
 
-    /**
-     * confirm a pop-up window with a checkbox.
-     * 
-     * @param buttonText
-     *            text of the button
-     * @param isChecked
-     *            if the checkbox selected or not.
-     * @throws RemoteException
-     */
     public void confirmWithCheckBox(String buttonText, boolean isChecked)
-        throws RemoteException;
+        throws RemoteException {
+        activate();
+        if (isChecked)
+            bot().checkBox().click();
+        bot().button(buttonText).click();
 
-    /**
-     * confirm a pop-up window with more than one checkbox.
-     * 
-     * 
-     * @param buttonText
-     *            text of the button
-     * @param itemNames
-     *            the labels of the checkboxs, which you want to select.
-     * 
-     */
+    }
+
     public void confirmWithCheckBoxs(String buttonText, String... itemNames)
-        throws RemoteException;
+        throws RemoteException {
+        waitUntilActive();
+        for (String itemName : itemNames) {
+            bot().tree().selectTreeItem(itemName).check();
+            // bot().table().getTableItem(itemName).check();
+        }
+        bot().button(buttonText).waitUntilIsEnabled();
+        bot().button(buttonText).click();
+    }
 
-    /**
-     * confirm a pop-up window with a table. You should first select a table
-     * item and then confirm with button.
-     * 
-     * @param buttonText
-     *            text of the button
-     * @param itemName
-     *            the name of the table item, which you want to select.
-     * @throws RemoteException
-     */
     public void confirmWithTable(String itemName, String buttonText)
-        throws RemoteException;
+        throws RemoteException {
+        waitUntilActive();
+        try {
+            bot().table().select(itemName);
+            bot().button(buttonText).waitUntilIsEnabled();
+            bot().button(buttonText).click();
+            // waitUntilShellCloses(shellName);
+        } catch (WidgetNotFoundException e) {
+            log.error("tableItem" + itemName + "can not be fund!");
+        }
+    }
 
-    /**
-     * confirm a pop-up window with a tree using filter text. You should first
-     * input a filter text in the text field and then select a tree node,
-     * confirm with button.
-     * 
-     * 
-     * @param buttonText
-     *            text of the button
-     * @param teeNode
-     *            tree node, which you want to select.
-     * @param rootOfTreeNode
-     *            root of the tree node.
-     * @throws RemoteException
-     */
     public void confirmWithTreeWithFilterText(String rootOfTreeNode,
-        String teeNode, String buttonText) throws RemoteException;
+        String teeNode, String buttonText) throws RemoteException {
+        waitUntilActive();
+        bot().text(TEXT_FIELD_TYPE_FILTER_TEXT).setText(teeNode);
+        bot().tree().waitUntilItemExists(rootOfTreeNode);
+        bot().tree().selectTreeItem(rootOfTreeNode, teeNode);
+        bot().button(buttonText).waitUntilIsEnabled();
+        bot().button(buttonText).click();
+        // waitUntilShellCloses(shellName);
+    }
 
     /**********************************************
      * 
      * states
      * 
      **********************************************/
+    public boolean isActive() throws RemoteException {
+        return widget.isActive();
+    }
 
-    public boolean isActive() throws RemoteException;
+    public boolean isEnabled() throws RemoteException {
+        return widget.isEnabled();
+    }
 
-    public boolean isEnabled() throws RemoteException;
+    public boolean isVisible() throws RemoteException {
+        return widget.isVisible();
+    }
 
-    public boolean isVisible() throws RemoteException;
+    public String getText() throws RemoteException {
+        return widget.getText();
+    }
 
-    public String getText() throws RemoteException;
+    public String getToolTipText() throws RemoteException {
+        return widget.getText();
+    }
 
-    public String getToolTipText() throws RemoteException;
+    public String getErrorMessage() throws RemoteException {
+        activate();
+        final String errorMessage = UIThreadRunnable
+            .syncExec(new StringResult() {
+                public String run() {
+                    WizardDialog dialog = (WizardDialog) widget.widget
+                        .getData();
+                    return dialog.getErrorMessage();
+                }
+            });
+        if (errorMessage == null) {
+            throw new WidgetNotFoundException("Could not find errorMessage!");
+        }
+        return errorMessage;
+    }
 
-    public String getErrorMessage() throws RemoteException;
+    public String getMessage() throws RemoteException {
+        activate();
+        final String message = UIThreadRunnable.syncExec(new StringResult() {
+            public String run() {
+                WizardDialog dialog = (WizardDialog) widget.widget.getData();
+                return dialog.getMessage();
+            }
+        });
+        if (message == null) {
+            throw new WidgetNotFoundException("Could not find message!");
+        }
+        return message;
+    }
 
-    public String getMessage() throws RemoteException;
-
-    /**
-     * 
-     * @param tableItemName
-     *            the name of the tableItem.
-     * @return <tt>true</tt>, if the given tableItem is existed in the shell.
-     * @throws RemoteException
-     */
-    public boolean existsTableItem(String tableItemName) throws RemoteException;
+    public boolean existsTableItem(String label) throws RemoteException {
+        activate();
+        return bot().table().containsItem(label);
+    }
 
     /**********************************************
      * 
-     * wait until
+     * waits until
      * 
      **********************************************/
-    /**
-     * waits until the given STFBotShell is active.
-     * 
-     * @throws RemoteException
-     */
-    public void waitUntilActive() throws RemoteException;
 
-    public void waitShortUntilIsClosed() throws RemoteException;
+    public void waitUntilActive() throws RemoteException {
+        stfBot.waitUntil(SarosConditions.ShellActive(widget));
+    }
 
-    /**
-     * waits until the given STFBotShell is closed.
-     * 
-     * @throws RemoteException
-     */
-    public void waitLongUntilIsClosed() throws RemoteException;
+    public void waitShortUntilIsClosed() throws RemoteException {
+        stfBot.waitShortUntil(SarosConditions.isShellClosed(widget));
+    }
+
+    public void waitLongUntilIsClosed() throws RemoteException {
+        stfBot.waitLongUntil(SarosConditions.isShellClosed(widget));
+    }
 
 }

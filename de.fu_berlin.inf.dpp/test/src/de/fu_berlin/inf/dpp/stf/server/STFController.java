@@ -18,52 +18,52 @@ import de.fu_berlin.inf.dpp.feedback.FeedbackManager;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
 import de.fu_berlin.inf.dpp.project.SarosSessionManager;
 import de.fu_berlin.inf.dpp.stf.STF;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.RemoteBotImp;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.RemoteWorkbenchBotImp;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.RemoteBotButtonImp;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.RemoteBotCComboImp;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.RemoteBotCheckBoxImp;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.RemoteBotComboImp;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.RemoteBotEditorImp;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.RemoteBotLabelImp;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.RemoteBotListImp;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.RemoteBotMenuImp;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.RemoteBotPerspectiveImp;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.RemoteBotRadioImp;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.RemoteBotShellImp;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.RemoteBotStyledTextImp;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.RemoteBotTableImp;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.RemoteBotTableItemImp;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.RemoteBotTextImp;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.RemoteBotToolbarButtonImp;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.RemoteBotToolbarDropDownButtonImp;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.RemoteBotToolbarPushButtonImp;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.RemoteBotToolbarRadioButtonImp;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.RemoteBotToolbarToggleButtonImp;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.RemoteBotTreeImp;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.RemoteBotTreeItemImp;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.RemoteBotViewImp;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.RemoteBotViewMenuImp;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.SuperRemoteBotImp;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.RemoteBot;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.RemoteWorkbenchBot;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.RemoteBotButton;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.RemoteBotCCombo;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.RemoteBotCheckBox;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.RemoteBotCombo;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.RemoteBotEditor;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.RemoteBotLabel;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.RemoteBotList;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.RemoteBotMenu;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.RemoteBotPerspective;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.RemoteBotRadio;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.RemoteBotShell;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.RemoteBotStyledText;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.RemoteBotTable;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.RemoteBotTableItem;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.RemoteBotText;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.RemoteBotToolbarButton;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.RemoteBotToolbarDropDownButton;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.RemoteBotToolbarPushButton;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.RemoteBotToolbarRadioButton;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.RemoteBotToolbarToggleButton;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.RemoteBotTree;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.RemoteBotTreeItem;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.RemoteBotView;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.RemoteBotViewMenu;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.SuperBot;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.Component;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.contextMenu.ContextMenuWrapperImp;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.contextMenu.NewCImp;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.contextMenu.RefactorCImp;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.contextMenu.SarosContextMenuWrapperImp;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.contextMenu.ShareWithCImp;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.contextMenu.TeamCImp;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.menuBar.MenuBarImp;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.menuBar.SarosMImp;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.menuBar.SarosPreferencesImp;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.menuBar.WindowMImp;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.views.ConsoleViewImp;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.views.PEViewImp;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.views.ProgressViewImp;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.views.ViewsImp;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.views.sarosViews.BuddiesViewImp;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.views.sarosViews.ChatViewImp;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.views.sarosViews.RSViewImp;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.views.sarosViews.SessionViewImp;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.contextMenu.ContextMenuWrapper;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.contextMenu.NewC;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.contextMenu.RefactorC;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.contextMenu.SarosContextMenuWrapper;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.contextMenu.ShareWithC;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.contextMenu.TeamC;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.menuBar.MenuBar;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.menuBar.SarosM;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.menuBar.SarosPreferences;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.menuBar.WindowM;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.views.ConsoleView;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.views.PEView;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.views.ProgressView;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.views.Views;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.views.sarosViews.BuddiesView;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.views.sarosViews.ChatView;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.views.sarosViews.RSView;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.views.sarosViews.SessionView;
 
 /**
  * STFController is responsible to register all exported objects.
@@ -108,69 +108,69 @@ public class STFController {
         /*
          * bots' family
          */
-        exportObject(RemoteBotImp.getInstance(), "bot");
-        exportObject(RemoteWorkbenchBotImp.getInstance(), "workbenchBot");
-        exportObject(SuperRemoteBotImp.getInstance(), "superBot");
+        exportObject(RemoteBot.getInstance(), "bot");
+        exportObject(RemoteWorkbenchBot.getInstance(), "workbenchBot");
+        exportObject(SuperBot.getInstance(), "superBot");
 
         /*
          * export remoteWidgets
          */
-        exportObject(RemoteBotButtonImp.getInstance(), "button");
-        exportObject(RemoteBotCComboImp.getInstance(), "ccombo");
-        exportObject(RemoteBotCheckBoxImp.getInstance(), "checkBox");
-        exportObject(RemoteBotComboImp.getInstance(), "combo");
-        exportObject(RemoteBotEditorImp.getInstance(), "eclipseEditor");
-        exportObject(RemoteBotLabelImp.getInstance(), "label");
-        exportObject(RemoteBotListImp.getInstance(), "list");
-        exportObject(RemoteBotMenuImp.getInstance(), "menu");
-        exportObject(RemoteBotPerspectiveImp.getInstance(), "perspective");
-        exportObject(RemoteBotRadioImp.getInstance(), "radio");
-        exportObject(RemoteBotShellImp.getInstance(), "shell");
-        exportObject(RemoteBotStyledTextImp.getInstance(), "styledText");
-        exportObject(RemoteBotTableImp.getInstance(), "table");
-        exportObject(RemoteBotTableItemImp.getInstance(), "tableItem");
-        exportObject(RemoteBotTextImp.getInstance(), "text");
-        exportObject(RemoteBotToolbarButtonImp.getInstance(), "toggleButton");
-        exportObject(RemoteBotToolbarButtonImp.getInstance(), "toolbarButton");
-        exportObject(RemoteBotToolbarDropDownButtonImp.getInstance(),
+        exportObject(RemoteBotButton.getInstance(), "button");
+        exportObject(RemoteBotCCombo.getInstance(), "ccombo");
+        exportObject(RemoteBotCheckBox.getInstance(), "checkBox");
+        exportObject(RemoteBotCombo.getInstance(), "combo");
+        exportObject(RemoteBotEditor.getInstance(), "eclipseEditor");
+        exportObject(RemoteBotLabel.getInstance(), "label");
+        exportObject(RemoteBotList.getInstance(), "list");
+        exportObject(RemoteBotMenu.getInstance(), "menu");
+        exportObject(RemoteBotPerspective.getInstance(), "perspective");
+        exportObject(RemoteBotRadio.getInstance(), "radio");
+        exportObject(RemoteBotShell.getInstance(), "shell");
+        exportObject(RemoteBotStyledText.getInstance(), "styledText");
+        exportObject(RemoteBotTable.getInstance(), "table");
+        exportObject(RemoteBotTableItem.getInstance(), "tableItem");
+        exportObject(RemoteBotText.getInstance(), "text");
+        exportObject(RemoteBotToolbarButton.getInstance(), "toggleButton");
+        exportObject(RemoteBotToolbarButton.getInstance(), "toolbarButton");
+        exportObject(RemoteBotToolbarDropDownButton.getInstance(),
             "toolbarDropDownButton");
-        exportObject(RemoteBotToolbarPushButtonImp.getInstance(),
+        exportObject(RemoteBotToolbarPushButton.getInstance(),
             "toolbarPushButon");
-        exportObject(RemoteBotToolbarRadioButtonImp.getInstance(),
+        exportObject(RemoteBotToolbarRadioButton.getInstance(),
             "toolbarRadioButton");
-        exportObject(RemoteBotToolbarToggleButtonImp.getInstance(),
+        exportObject(RemoteBotToolbarToggleButton.getInstance(),
             "toolbarToggleButton");
-        exportObject(RemoteBotTreeImp.getInstance(), "tree");
-        exportObject(RemoteBotTreeItemImp.getInstance(), "treeItem");
-        exportObject(RemoteBotViewImp.getInstance(), "view");
-        exportObject(RemoteBotViewMenuImp.getInstance(), "viewMenu");
+        exportObject(RemoteBotTree.getInstance(), "tree");
+        exportObject(RemoteBotTreeItem.getInstance(), "treeItem");
+        exportObject(RemoteBotView.getInstance(), "view");
+        exportObject(RemoteBotViewMenu.getInstance(), "viewMenu");
 
         /*
          * remote eclipse components
          */
-        exportObject(PEViewImp.getInstance(), "packageExplorerView");
-        exportObject(ProgressViewImp.getInstance(), "progressView");
-        exportObject(BuddiesViewImp.getInstance(), "rosterView");
-        exportObject(SessionViewImp.getInstance(), "sessionView");
-        exportObject(RSViewImp.getInstance(), "remoteScreenView");
-        exportObject(ChatViewImp.getInstance(), "chatView");
-        exportObject(ConsoleViewImp.getInstance(), "consoleView");
+        exportObject(PEView.getInstance(), "packageExplorerView");
+        exportObject(ProgressView.getInstance(), "progressView");
+        exportObject(BuddiesView.getInstance(), "rosterView");
+        exportObject(SessionView.getInstance(), "sessionView");
+        exportObject(RSView.getInstance(), "remoteScreenView");
+        exportObject(ChatView.getInstance(), "chatView");
+        exportObject(ConsoleView.getInstance(), "consoleView");
 
-        exportObject(NewCImp.getInstance(), "fileM");
-        exportObject(RefactorCImp.getInstance(), "refactorM");
-        exportObject(WindowMImp.getInstance(), "windowM");
-        exportObject(SarosMImp.getInstance(), "sarosM");
+        exportObject(NewC.getInstance(), "fileM");
+        exportObject(RefactorC.getInstance(), "refactorM");
+        exportObject(WindowM.getInstance(), "windowM");
+        exportObject(SarosM.getInstance(), "sarosM");
 
-        exportObject(TeamCImp.getInstance(), "teamC");
-        exportObject(ShareWithCImp.getInstance(), "shareWithC");
-        exportObject(ContextMenuWrapperImp.getInstance(), "contextMenu");
-        exportObject(SarosContextMenuWrapperImp.getInstance(),
+        exportObject(TeamC.getInstance(), "teamC");
+        exportObject(ShareWithC.getInstance(), "shareWithC");
+        exportObject(ContextMenuWrapper.getInstance(), "contextMenu");
+        exportObject(SarosContextMenuWrapper.getInstance(),
             "sarosContextMenu");
 
-        exportObject(SarosPreferencesImp.getInstance(), "sarosPreferences");
+        exportObject(SarosPreferences.getInstance(), "sarosPreferences");
 
-        exportObject(ViewsImp.getInstance(), "views");
-        exportObject(MenuBarImp.getInstance(), "menuBar");
+        exportObject(Views.getInstance(), "views");
+        exportObject(MenuBar.getInstance(), "menuBar");
     }
 
     /**

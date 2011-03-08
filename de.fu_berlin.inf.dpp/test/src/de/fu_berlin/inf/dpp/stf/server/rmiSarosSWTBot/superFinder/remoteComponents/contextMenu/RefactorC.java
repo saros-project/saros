@@ -1,55 +1,98 @@
 package de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.contextMenu;
 
-import java.rmi.Remote;
 import java.rmi.RemoteException;
 
-public interface RefactorC extends Remote {
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.IRemoteBotShell;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.IRemoteBotTreeItem;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.Component;
+
+public class RefactorC extends Component implements IRefactorC {
+
+    private static transient RefactorC refactorImp;
+
+    private IRemoteBotTreeItem treeItem;
+    private TreeItemType type;
 
     /**
-     * Performs the action "move class to another package" which should be done
-     * with the following steps:
-     * 
-     * <ol>
-     * <li>selects menu "Refactor -> Move..."</li>
-     * <li>choose the package specified by the passed parameter "targetPkg"</li>
-     * <li>click "OK" to confirm the move</li>
-     * </ol>
-     * 
-     * 
-     * 
-     * @param targetProject
-     * @param targetPkg
-     * @throws RemoteException
+     * {@link NewC} is a singleton, but inheritance is possible.
      */
+    public static RefactorC getInstance() {
+        if (refactorImp != null)
+            return refactorImp;
+        refactorImp = new RefactorC();
+        return refactorImp;
+    }
+
+    public void setTreeItem(IRemoteBotTreeItem treeItem) {
+        this.treeItem = treeItem;
+    }
+
+    public void setTreeItemType(TreeItemType type) {
+        this.type = type;
+    }
+
+    /**************************************************************
+     * 
+     * exported functions
+     * 
+     **************************************************************/
+
+    /**********************************************
+     * 
+     * actions
+     * 
+     **********************************************/
+
     public void moveClassTo(String targetProject, String targetPkg)
-        throws RemoteException;
+        throws RemoteException {
+        moveTo(SHELL_MOVE, OK, getPkgNodes(targetProject, targetPkg));
+    }
 
-    /**
-     * Perform the action "rename class" which should be done with the following
-     * steps:
-     * <ol>
-     * <li>click menu "Refactor" > "Rename..."</li>
-     * <li>Enter the given new name to the text field with the title "New name:"
-     * </li>
-     * <li>click "OK" to confirm the rename</li>
-     * <li>Waits until the shell "Rename Compilation Unit" is closed. It
-     * guarantee that the "rename file" action is completely done.</li>
-     * </ol>
-     * <p>
-     * <b>Attention:</b>
-     * <ol>
-     * <li>Makes sure, the package explorer view is open and active.</li>
-     * <li>The function should treat all the recursive following actions, which
-     * are activated or indirectly activated by clicking the sub menu
-     * "rename..." . I mean, after clicking the sub menu you need to treat the
-     * following popup window too.</li>
+    public void rename(String newName) throws RemoteException {
+        switch (type) {
+        case JAVA_PROJECT:
+            rename(SHELL_RENAME_JAVA_PROJECT, OK, newName);
+            break;
+        case PKG:
+            rename(SHELL_RENAME_PACKAGE, OK, newName);
+            break;
+        case CLASS:
+            rename(SHELL_RENAME_COMPiIATION_UNIT, FINISH, newName);
+            break;
+        default:
+            rename(SHELL_RENAME_RESOURCE, OK, newName);
+            break;
+        }
+    }
+
+    /**************************************************************
      * 
+     * inner functions
      * 
-     * @param newName
-     *            the new name of the given class.
-     * 
-     * @throws RemoteException
-     */
-    public void rename(String newName) throws RemoteException;
+     **************************************************************/
+    private void rename(String shellTitle, String buttonName, String newName)
+        throws RemoteException {
+        treeItem.contextMenu(MENU_REFACTOR, MENU_RENAME).click();
+        IRemoteBotShell shell = bot().shell(shellTitle);
+        shell.activate();
+        shell.bot().textWithLabel(LABEL_NEW_NAME).setText(newName);
+        bot().shell(shellTitle).bot().button(buttonName).waitUntilIsEnabled();
+        shell.bot().button(buttonName).click();
+        if (bot().isShellOpen("Rename Compilation Unit")) {
+            bot().shell("Rename Compilation Unit").bot().button(buttonName)
+                .waitUntilIsEnabled();
+            bot().shell("Rename Compilation Unit").bot().button(buttonName)
+                .click();
+        }
+        if (bot().isShellOpen(shellTitle))
+            bot().waitUntilShellIsClosed(shellTitle);
+    }
+
+    private void moveTo(String shellTitle, String buttonName, String... nodes)
+        throws RemoteException {
+        bot().menu(MENU_REFACTOR).menu(MENU_MOVE).click();
+        bot().shell(shellTitle).confirmWithTree(buttonName, nodes);
+        bot().waitUntilShellIsClosed(shellTitle);
+    }
 
 }

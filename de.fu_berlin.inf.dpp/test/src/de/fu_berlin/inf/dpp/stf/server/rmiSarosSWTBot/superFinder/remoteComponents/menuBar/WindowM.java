@@ -2,179 +2,144 @@ package de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteCompone
 
 import java.rmi.RemoteException;
 
-import de.fu_berlin.inf.dpp.stf.client.AbstractTester;
-import de.fu_berlin.inf.dpp.stf.client.testProject.helpers.TestPattern;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.IRemoteBotCombo;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.IRemoteBotShell;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.IRemoteBotTree;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.Perspective;
 
-/**
- * This interface contains convenience API to perform a action using main menu
- * widgets. You can start off as follows:
- * <ol>
- * <li>
- * At first you need to create a {@link AbstractTester} object in your junit-test. (How
- * to do it please look at the javadoc in class {@link TestPattern} or read the
- * user guide in TWiki https://www.inf.fu-berlin.de/w/SE/SarosSTFTests).</li>
- * <li>
- * then you can use the object mainMenu initialized in {@link AbstractTester} to access
- * the APIs :), e.g.
- * 
- * <pre>
- * alice.mainMenu.clickMenuPreferences();
- * </pre>
- * 
- * </li>
- * 
- * @author Lin
- */
-public interface WindowM extends SarosPreferences {
+public class WindowM extends SarosPreferences implements IWindowM {
+
+    private static transient WindowM self;
+
+    /**
+     * {@link WindowM} is a singleton, but inheritance is possible.
+     */
+    public static WindowM getInstance() {
+        if (self != null)
+            return self;
+        self = new WindowM();
+        return self;
+    }
+
+    /**************************************************************
+     * 
+     * exported functions
+     * 
+     **************************************************************/
+    /**********************************************
+     * 
+     * actions
+     * 
+     **********************************************/
+    public void setNewTextFileLineDelimiter(String OS) throws RemoteException {
+        clickMenuPreferences();
+        IRemoteBotShell shell = bot().shell(SHELL_PREFERNCES);
+        IRemoteBotTree tree = shell.bot().tree();
+        tree.expandNode(TREE_ITEM_GENERAL_IN_PRFERENCES).select(
+            TREE_ITEM_WORKSPACE_IN_PREFERENCES);
+
+        if (OS.equals("Default")) {
+            shell.bot().radioInGroup("Default", "New text file line delimiter")
+                .click();
+        } else {
+            shell.bot().radioInGroup("Other:", "New text file line delimiter")
+                .click();
+            shell.bot().comboBoxInGroup("New text file line delimiter")
+                .setSelection(OS);
+        }
+        shell.bot().button(APPLY).click();
+        shell.bot().button(OK).click();
+        bot().waitUntilShellIsClosed(SHELL_PREFERNCES);
+    }
+
+    public void clickMenuPreferences() throws RemoteException {
+        if (getOS() == TypeOfOS.MAC)
+            bot().menu("Eclipse").menu(MENU_PREFERENCES).click();
+        else
+            bot().menu(MENU_WINDOW).menu(MENU_PREFERENCES).click();
+    }
+
+    public void showViewProblems() throws RemoteException {
+        showViewWithName(TREE_ITEM_GENERAL_IN_SHELL_SHOW_VIEW,
+            TREE_ITEM_PROBLEM_IN_SHELL_SHOW_VIEW);
+    }
+
+    public void showViewProjectExplorer() throws RemoteException {
+        showViewWithName(TREE_ITEM_GENERAL_IN_SHELL_SHOW_VIEW,
+            TREE_ITEM_PROJECT_EXPLORER_IN_SHELL_SHOW_VIEW);
+    }
+
+    public void showViewWithName(String parentNode, String node)
+        throws RemoteException {
+        bot().activateWorkbench();
+        bot().menu(MENU_WINDOW).menu(MENU_SHOW_VIEW).menu(MENU_OTHER).click();
+        bot().shell(SHELL_SHOW_VIEW).confirmWithTreeWithFilterText(parentNode,
+            node, OK);
+    }
+
+    public void openPerspective() throws RemoteException {
+        switch (Perspective.WHICH_PERSPECTIVE) {
+        case JAVA:
+            openPerspectiveJava();
+            break;
+        case DEBUG:
+            openPerspectiveDebug();
+            break;
+        case RESOURCE:
+            openPerspectiveResource();
+            break;
+        default:
+            openPerspectiveJava();
+            break;
+        }
+    }
+
+    public void openPerspectiveResource() throws RemoteException {
+        bot().openPerspectiveWithId(ID_RESOURCE_PERSPECTIVE);
+    }
+
+    public void openPerspectiveJava() throws RemoteException {
+        bot().openPerspectiveWithId(ID_JAVA_PERSPECTIVE);
+    }
+
+    public void openPerspectiveDebug() throws RemoteException {
+        bot().openPerspectiveWithId(ID_DEBUG_PERSPECTIVE);
+    }
 
     /**********************************************
      * 
-     * change setting with preferences dialog
+     * states
      * 
      **********************************************/
+    public String getTextFileLineDelimiter() throws RemoteException {
+        clickMenuPreferences();
+        IRemoteBotShell shell = bot().shell(SHELL_PREFERNCES);
+        IRemoteBotTree tree = shell.bot().tree();
+        tree.expandNode(TREE_ITEM_GENERAL_IN_PRFERENCES).select(
+            TREE_ITEM_WORKSPACE_IN_PREFERENCES);
+        if (shell.bot().radioInGroup("Default", "New text file line delimiter")
+            .isSelected()) {
+            shell.close();
+            return "Default";
+        } else if (shell.bot()
+            .radioInGroup("Other:", "New text file line delimiter")
+            .isSelected()) {
+            IRemoteBotCombo combo = shell.bot().comboBoxInGroup(
+                "New text file line delimiter");
+            String itemName = combo.items()[combo.selectionIndex()];
+            bot().shell(SHELL_PREFERNCES).close();
+            return itemName;
+        }
+        shell.close();
+        return "";
+    }
 
-    /**
-     * selects a new text file line delimiter on the preference page which
-     * should be done with the following steps:
-     * <ol>
-     * <li>Click menu "Window" -> "Preferences"</li>
-     * <li>In the preference dialog select "General" -> "Workspace"</li>
-     * <li>modify the text file line delimiter with the passed parameter "OS"</li>
-     * </ol>
-     * <p>
-     * <b>Attention:</b>
-     * <ol>
-     * <li>Makes sure, the saros-instance is active.</li>
-     * </ol>
-     * 
-     * @param whichOS
-     *            the name of the OS, which you want to select.
-     * 
-     */
-    public void setNewTextFileLineDelimiter(String whichOS)
-        throws RemoteException;
+    public boolean isJavaPerspectiveActive() throws RemoteException {
+        return bot().isPerspectiveActive(ID_JAVA_PERSPECTIVE);
+    }
 
-    /**
-     * 
-     * @return the used text file line delimiter
-     * @throws RemoteException
-     */
-    public String getTextFileLineDelimiter() throws RemoteException;
+    public boolean isDebugPerspectiveActive() throws RemoteException {
+        return bot().isPerspectiveActive(ID_DEBUG_PERSPECTIVE);
+    }
 
-    /**
-     * if OS is windows: click menu "Window" -> "Preferences".<br/>
-     * if OS is MAC: click menu "Eclipse" -> "Preferences".
-     * 
-     * @throws RemoteException
-     */
-    public void clickMenuPreferences() throws RemoteException;
-
-    /**********************************************
-     * 
-     * show view with main menu
-     * 
-     **********************************************/
-    /**
-     * Open the view "Problems" using GUI which should be done with the
-     * following steps:
-     * <ol>
-     * <li>Click menu "Window" -> "show view" -> "other..."</li>
-     * <li>Select "Gernaral" -> "Problems" and click "Finish" to confirm the
-     * action</li>
-     * </ol>
-     * <p>
-     * <b>Attention:</b>
-     * <ol>
-     * <li>Makes sure, the saros-instance is active.</li>
-     * </ol>
-     * 
-     * @throws RemoteException
-     */
-    public void showViewProblems() throws RemoteException;
-
-    /**
-     * Open the view "Project Explorer" using GUI which should be done with the
-     * following steps:
-     * <ol>
-     * <li>Click menu "Window" -> "show view" -> "other..."</li>
-     * <li>Select "Gernaral" -> "Project Explorer" and click "Finish" to confirm
-     * the action</li>
-     * </ol>
-     * <p>
-     * <b>Attention:</b>
-     * <ol>
-     * <li>Makes sure, the saros-instance is active.</li>
-     * </ol>
-     * 
-     * @throws RemoteException
-     */
-    public void showViewProjectExplorer() throws RemoteException;
-
-    /**
-     * Open a view using menus Window->Show View->Other... . which should be
-     * done with the following steps:
-     * <ol>
-     * <li>If the view is already open, return.</li>
-     * <li>Activate the saros-instance workbench(alice / bob / carl). If the
-     * workbench isn't active, bot can't find the main menus.</li>
-     * <li>Click main menus Window -> Show View -> Other...</li>
-     * <li>Confirm the pop-up window "Show View".</li>
-     * </ol>
-     * 
-     * @param category
-     *            example: "General"
-     * @param nodeName
-     *            example: "Console"
-     * @see WorkbenchImp#activateWorkbench()
-     * @see MainMenuComponent#clickMenuWithTexts(String...)
-     * 
-     */
-    public void showViewWithName(String category, String nodeName)
-        throws RemoteException;
-
-    /**********************************************
-     * 
-     * open perspectives
-     * 
-     **********************************************/
-
-    /**
-     * open the default perspective which is defined in
-     * {@link Perspective#WHICH_PERSPECTIVE}.
-     */
-    public void openPerspective() throws RemoteException;
-
-    /**
-     * Open the perspective "Resource" with id
-     * 
-     * @throws RemoteException
-     */
-    public void openPerspectiveResource() throws RemoteException;
-
-    /**
-     * Open the perspective "Java" with id
-     * 
-     * @throws RemoteException
-     */
-    public void openPerspectiveJava() throws RemoteException;
-
-    /**
-     * @return <tt>true</tt>, if the java perspective is active.
-     * @throws RemoteException
-     */
-    public boolean isJavaPerspectiveActive() throws RemoteException;
-
-    /**
-     * Open the perspective "Debug" with Id
-     * 
-     * @throws RemoteException
-     */
-    public void openPerspectiveDebug() throws RemoteException;
-
-    /**
-     * @return <tt>true</tt>, if the debug perspective is active.
-     * @throws RemoteException
-     */
-    public boolean isDebugPerspectiveActive() throws RemoteException;
 }

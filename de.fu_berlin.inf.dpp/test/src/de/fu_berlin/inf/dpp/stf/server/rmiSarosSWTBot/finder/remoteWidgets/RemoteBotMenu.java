@@ -1,30 +1,108 @@
 package de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets;
 
-import java.rmi.Remote;
 import java.rmi.RemoteException;
 
-public interface RemoteBotMenu extends Remote {
+import org.eclipse.swtbot.swt.finder.waits.Conditions;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotMenu;
 
-    public void click() throws RemoteException;
+public class RemoteBotMenu extends AbstractRmoteWidget implements IRemoteBotMenu {
 
-    public RemoteBotMenuImp contextMenu(String text) throws RemoteException;
+    private static transient RemoteBotMenu menuImp;
 
-    public void waitUntilIsEnabled() throws RemoteException;
+    private SWTBotMenu widget;
 
-    public String getToolTipText() throws RemoteException;
+    /**
+     * {@link RemoteBotMenu} is a singleton, but inheritance is possible.
+     */
+    public static RemoteBotMenu getInstance() {
+        if (menuImp != null)
+            return menuImp;
+        menuImp = new RemoteBotMenu();
+        return menuImp;
+    }
 
-    public String getText() throws RemoteException;
+    public IRemoteBotMenu setWidget(SWTBotMenu widget) {
+        this.widget = widget;
+        return this;
+    }
 
-    public boolean isChecked() throws RemoteException;
+    /**************************************************************
+     * 
+     * exported functions
+     * 
+     **************************************************************/
 
-    public boolean isActive() throws RemoteException;
+    /**********************************************
+     * 
+     * finder
+     * 
+     **********************************************/
 
-    public boolean isVisible() throws RemoteException;
+    public RemoteBotMenu contextMenu(String text) throws RemoteException {
+        widget = widget.contextMenu(text);
+        return this;
 
-    public boolean isEnabled() throws RemoteException;
+    }
 
-    public void setFocus() throws RemoteException;
+    public IRemoteBotMenu menu(String menuName) throws RemoteException {
+        widget = widget.menu(menuName);
+        return this;
+    }
 
-    public RemoteBotMenu menu(String menuName) throws RemoteException;
+    /**********************************************
+     * 
+     * actions
+     * 
+     **********************************************/
 
+    public void click() throws RemoteException {
+        widget.click();
+    }
+
+    public void clickAndWait() throws RemoteException {
+        waitUntilIsEnabled();
+        click();
+    }
+
+    public void setFocus() throws RemoteException {
+        widget.setFocus();
+    }
+
+    /**********************************************
+     * 
+     * states
+     * 
+     **********************************************/
+    public boolean isEnabled() throws RemoteException {
+        return widget.isEnabled();
+    }
+
+    public boolean isVisible() throws RemoteException {
+        return widget.isVisible();
+    }
+
+    public boolean isActive() throws RemoteException {
+        return widget.isActive();
+    }
+
+    public boolean isChecked() throws RemoteException {
+        return widget.isChecked();
+    }
+
+    public String getText() throws RemoteException {
+        return widget.getText();
+    }
+
+    public String getToolTipText() throws RemoteException {
+        return widget.getText();
+    }
+
+    /**********************************************
+     * 
+     * waits until
+     * 
+     **********************************************/
+    public void waitUntilIsEnabled() throws RemoteException {
+        stfBot.waitUntil(Conditions.widgetIsEnabled(widget));
+    }
 }

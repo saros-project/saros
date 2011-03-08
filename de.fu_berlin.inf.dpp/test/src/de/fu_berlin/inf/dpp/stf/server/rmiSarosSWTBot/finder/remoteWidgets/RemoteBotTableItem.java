@@ -1,61 +1,145 @@
 package de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets;
 
-import java.rmi.Remote;
 import java.rmi.RemoteException;
 
-public interface RemoteBotTableItem extends Remote {
+import org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences;
+import org.eclipse.swtbot.swt.finder.waits.Conditions;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotTableItem;
+import org.eclipse.swtbot.swt.finder.widgets.TimeoutException;
+
+public class RemoteBotTableItem extends AbstractRmoteWidget implements
+    IRemoteBotTableItem {
+
+    private static transient RemoteBotTableItem self;
+
+    private SWTBotTableItem widget;
+
+    /**
+     * {@link RemoteBotTableItem} is a singleton, but inheritance is possible.
+     */
+    public static RemoteBotTableItem getInstance() {
+        if (self != null)
+            return self;
+        self = new RemoteBotTableItem();
+        return self;
+    }
+
+    public IRemoteBotTableItem setWidget(SWTBotTableItem tableItem) {
+        this.widget = tableItem;
+        return this;
+    }
+
+    /**************************************************************
+     * 
+     * exported functions
+     * 
+     **************************************************************/
+
+    /**********************************************
+     * 
+     * finders
+     * 
+     **********************************************/
+
+    public IRemoteBotMenu contextMenu(String text) throws RemoteException {
+        stfBotMenu.setWidget(widget.contextMenu(text));
+        return stfBotMenu;
+    }
+
+    /**********************************************
+     * 
+     * actions
+     * 
+     **********************************************/
+
+    public void select() throws RemoteException {
+        widget.select();
+    }
+
+    public void check() throws RemoteException {
+        widget.check();
+    }
+
+    public void uncheck() throws RemoteException {
+        widget.uncheck();
+    }
+
+    public void toggleCheck() throws RemoteException {
+        widget.toggleCheck();
+    }
+
+    public void click() throws RemoteException {
+        widget.click();
+    }
+
+    public void clickAndWait() throws RemoteException {
+        waitUntilIsEnabled();
+        click();
+    }
+
+    public void setFocus() throws RemoteException {
+        widget.setFocus();
+    }
 
     /**********************************************
      * 
      * states
      * 
      **********************************************/
+    public boolean existsContextMenu(String contextName) throws RemoteException {
+        long oldTimeout = SWTBotPreferences.TIMEOUT;
+        // increase the timeout
+        SWTBotPreferences.TIMEOUT = 1000;
 
-    public abstract RemoteBotMenu contextMenu(String text) throws RemoteException;
+        try {
+            widget.contextMenu(contextName);
+            SWTBotPreferences.TIMEOUT = oldTimeout;
+            return true;
 
-    public abstract void select() throws RemoteException;
+        } catch (TimeoutException e) {
+            SWTBotPreferences.TIMEOUT = oldTimeout;
+            return false;
+        }
+    }
 
-    public abstract void check() throws RemoteException;
+    public boolean isEnabled() throws RemoteException {
+        return widget.isEnabled();
+    }
 
-    public abstract void uncheck() throws RemoteException;
+    public boolean isVisible() throws RemoteException {
+        return widget.isVisible();
+    }
 
-    public abstract void toggleCheck() throws RemoteException;
+    public boolean isActive() throws RemoteException {
+        return widget.isActive();
+    }
 
-    public abstract void click() throws RemoteException;
+    public boolean isChecked() throws RemoteException {
+        return widget.isChecked();
+    }
 
-    public abstract void clickAndWait() throws RemoteException;
+    public boolean isGrayed() throws RemoteException {
+        return widget.isGrayed();
+    }
 
-    public abstract void setFocus() throws RemoteException;
+    public String getText(int index) throws RemoteException {
+        return widget.getText(index);
+    }
 
-    /**********************************************
-     * 
-     * states
-     * 
-     **********************************************/
-    public abstract boolean existsContextMenu(String contextName)
-        throws RemoteException;
+    public String getText() throws RemoteException {
+        return widget.getText();
+    }
 
-    public abstract boolean isEnabled() throws RemoteException;
-
-    public abstract boolean isVisible() throws RemoteException;
-
-    public abstract boolean isActive() throws RemoteException;
-
-    public abstract boolean isChecked() throws RemoteException;
-
-    public abstract boolean isGrayed() throws RemoteException;
-
-    public abstract String getText(int index) throws RemoteException;
-
-    public abstract String getText() throws RemoteException;
-
-    public abstract String getToolTipText() throws RemoteException;
+    public String getToolTipText() throws RemoteException {
+        return widget.getText();
+    }
 
     /**********************************************
      * 
      * waits until
      * 
      **********************************************/
-    public abstract void waitUntilIsEnabled() throws RemoteException;
-
+    public void waitUntilIsEnabled() throws RemoteException {
+        stfBot.waitUntil(Conditions.widgetIsEnabled(widget));
+    }
 }

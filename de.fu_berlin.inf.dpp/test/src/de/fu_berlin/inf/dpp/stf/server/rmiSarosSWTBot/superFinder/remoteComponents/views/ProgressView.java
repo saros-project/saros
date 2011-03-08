@@ -1,26 +1,77 @@
 package de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.views;
 
-import java.rmi.Remote;
 import java.rmi.RemoteException;
 
-public interface ProgressView extends Remote {
+import org.eclipse.swtbot.swt.finder.waits.DefaultCondition;
 
-    public boolean existsPorgress() throws RemoteException;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.IRemoteBotView;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.Component;
+
+public class ProgressView extends Component implements IProgressView {
+    private static transient ProgressView self;
+
+    private IRemoteBotView view;
 
     /**
-     * remove the progress. ie. Click the gray clubs delete icon.
+     * {@link ProgressView} is a singleton, but inheritance is possible.
+     */
+    public static ProgressView getInstance() {
+        if (self != null)
+            return self;
+        self = new ProgressView();
+        return self;
+    }
+
+    public IProgressView setView(IRemoteBotView view) {
+        this.view = view;
+
+        return this;
+    }
+
+    /**************************************************************
      * 
-     * @throws RemoteException
-     */
-    public void removeProgress() throws RemoteException;
+     * exported functions
+     * 
+     **************************************************************/
 
-    public void removeProcess(int index) throws RemoteException;
+    /**********************************************
+     * 
+     * actions
+     * 
+     **********************************************/
 
-    /**
-     * For some tests a host need to invite many peers concurrently and some
-     * operations should not be performed if the invitation processes aren't
-     * finished yet. In this case, you can use this method to guarantee, that
-     * host wait so long until all the invitation Processes are finished.
-     */
-    public void waitUntilNotExistsProgress() throws RemoteException;
+    public void removeProgress() throws RemoteException {
+        view.bot().toolbarButton().click();
+
+    }
+
+    public void removeProcess(int index) throws RemoteException {
+        view.toolbarButton(TB_REMOVE_ALL_FINISHED_OPERATIONS).click();
+        view.bot().toolbarButton(index).click();
+
+    }
+
+    public boolean existsPorgress() throws RemoteException {
+        view.toolbarButton(TB_REMOVE_ALL_FINISHED_OPERATIONS).click();
+        return view.bot().existsToolbarButton();
+    }
+
+    /**********************************************
+     * 
+     * waits until
+     * 
+     **********************************************/
+    public void waitUntilNotExistsProgress() throws RemoteException {
+        bot().waitUntil(new DefaultCondition() {
+            public boolean test() throws Exception {
+                return !existsPorgress();
+            }
+
+            public String getFailureMessage() {
+                return "There are still some progresses existed";
+            }
+        });
+
+    }
+
 }

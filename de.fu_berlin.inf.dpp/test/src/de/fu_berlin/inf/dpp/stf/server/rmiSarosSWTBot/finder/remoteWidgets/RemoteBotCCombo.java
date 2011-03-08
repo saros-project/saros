@@ -1,31 +1,45 @@
 package de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets;
 
-import java.rmi.Remote;
 import java.rmi.RemoteException;
 
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotCCombo;
 
-public interface RemoteBotCCombo extends Remote {
+public class RemoteBotCCombo extends AbstractRmoteWidget implements
+    IRemoteBotCCombo {
+
+    private static transient RemoteBotCCombo self;
+
+    private SWTBotCCombo widget;
+
+    /**
+     * {@link RemoteBotCCombo} is a singleton, but inheritance is possible.
+     */
+    public static RemoteBotCCombo getInstance() {
+        if (self != null)
+            return self;
+        self = new RemoteBotCCombo();
+        return self;
+    }
+
+    public IRemoteBotCCombo setWidget(SWTBotCCombo ccomb) {
+        this.widget = ccomb;
+        return this;
+    }
+
+    /**************************************************************
+     * 
+     * exported functions
+     * 
+     **************************************************************/
 
     /**********************************************
      * 
      * finders
      * 
      **********************************************/
-
-    /**
-     * Gets the context menu matching the text.
-     * 
-     * @Parameters: text the text on the context menu.
-     * @Returns: the menu that has the given text.
-     * 
-     * @see SWTBotCCombo#contextMenu(String)
-     * 
-     * @Throws: WidgetNotFoundException - if the widget is not found.
-     * 
-     * 
-     */
-    public RemoteBotMenu contextMenu(String text) throws RemoteException;
+    public IRemoteBotMenu contextMenu(String text) throws RemoteException {
+        return stfBotMenu.setWidget(widget.contextMenu(text));
+    }
 
     /**********************************************
      * 
@@ -33,114 +47,65 @@ public interface RemoteBotCCombo extends Remote {
      * 
      **********************************************/
 
-    /**
-     * Sets the selection to the specified index.
-     * 
-     * @Parameters: index the zero based index.
-     * 
-     * @see SWTBotCCombo#setSelection(int)
-     */
-    public void setSelection(int index) throws RemoteException;
+    public void setSelection(int indexOfSelection) throws RemoteException {
+        widget.setSelection(indexOfSelection);
+    }
 
-    /**
-     * Gets the current selection in the combo.
-     * 
-     * @Returns: the current selection in the combo box or null if no item is
-     *           selected.
-     * @see SWTBotCCombo#selection()
-     * @throws RemoteException
-     * 
-     */
-    public String selection() throws RemoteException;
+    public String selection() throws RemoteException {
+        return widget.selection();
+    }
 
-    /**
-     * 
-     * Gets the current selection index.
-     * 
-     * @Returns: the zero based index of the current selection.
-     * @see SWTBotCCombo#selectionIndex()
-     * @throws RemoteException
-     * 
-     */
-    public int selectionIndex() throws RemoteException;
+    public int selectionIndex() throws RemoteException {
+        return widget.selectionIndex();
+    }
 
-    /**
-     * Gets the current selection index.
-     * 
-     * Set the selection to the specified text.
-     * 
-     * @param text
-     *            the text to set into the combo.
-     * 
-     * @see SWTBotCCombo#setSelection(String)
-     * @throws RemoteException
-     * 
-     */
-    public void setSelection(String text) throws RemoteException;
+    public void setSelection(String text) throws RemoteException {
+        widget.setSelection(text);
+    }
 
-    /**
-     * 
-     * @see SWTBotCCombo#setText(String)
-     */
-    public void setText(String text) throws RemoteException;
+    public void setText(String text) throws RemoteException {
+        widget.setText(text);
+    }
 
-    /**
-     * 
-     * @see SWTBotCCombo#setFocus()
-     */
-    public void setFocus() throws RemoteException;
+    public void setFocus() throws RemoteException {
+        widget.setFocus();
+    }
 
     /**********************************************
      * 
      * states
      * 
      **********************************************/
+    public boolean isEnabled() throws RemoteException {
+        return widget.isEnabled();
+    }
 
-    /**
-     * 
-     * @see SWTBotCCombo#isEnabled()
-     */
-    public boolean isEnabled() throws RemoteException;
+    public boolean isVisible() throws RemoteException {
+        return widget.isVisible();
+    }
 
-    /**
-     * 
-     * @see SWTBotCCombo#isVisible()
-     */
-    public boolean isVisible() throws RemoteException;
+    public boolean isActive() throws RemoteException {
+        return widget.isActive();
+    }
 
-    /**
-     * 
-     * @see SWTBotCCombo#isActive()
-     */
-    public boolean isActive() throws RemoteException;
+    public String getText() throws RemoteException {
+        return widget.getText();
+    }
 
-    /**
-     * 
-     * @see SWTBotCCombo#getText()
-     */
-    public String getText() throws RemoteException;
+    public String getToolTipText() throws RemoteException {
+        return widget.getText();
+    }
 
-    /**
-     * 
-     * @see SWTBotCCombo#getToolTipText()
-     */
-    public String getToolTipText() throws RemoteException;
+    public int itemCount() throws RemoteException {
+        return widget.itemCount();
+    }
 
-    /**
-     * 
-     * @see SWTBotCCombo#itemCount()
-     */
-    public int itemCount() throws RemoteException;
+    public String[] items() throws RemoteException {
+        return widget.items();
+    }
 
-    /**
-     * 
-     * @see SWTBotCCombo#items()
-     */
-    public String[] items() throws RemoteException;
+    public int textLimit() throws RemoteException {
+        return widget.textLimit();
+    }
 
-    /**
-     * 
-     * @see SWTBotCCombo#textLimit()
-     */
-    public int textLimit() throws RemoteException;
 }

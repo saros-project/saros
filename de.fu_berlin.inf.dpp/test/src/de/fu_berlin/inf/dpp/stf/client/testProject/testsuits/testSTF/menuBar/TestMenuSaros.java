@@ -6,7 +6,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import de.fu_berlin.inf.dpp.stf.client.testProject.testsuits.STFTest;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.RemoteBotShell;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.IRemoteBotShell;
 
 public class TestMenuSaros extends STFTest {
 
@@ -30,14 +30,14 @@ public class TestMenuSaros extends STFTest {
         if (!alice.bot().isShellOpen(SHELL_SHARE_PROJECT)) {
             alice.bot().waitUntilShellIsOpen(SHELL_SHARE_PROJECT);
         }
-        RemoteBotShell shell = alice.bot().shell(SHELL_SHARE_PROJECT);
+        IRemoteBotShell shell = alice.bot().shell(SHELL_SHARE_PROJECT);
         shell.activate();
         shell.bot().table().getTableItem(PROJECT1).check();
         shell.bot().button(NEXT).click();
         shell.bot().tree().selectTreeItem(bob.getBaseJid()).check();
         shell.bot().button(FINISH).click();
         bob.bot().waitUntilShellIsOpen(SHELL_SESSION_INVITATION);
-        RemoteBotShell shell2 = bob.bot().shell(SHELL_SESSION_INVITATION);
+        IRemoteBotShell shell2 = bob.bot().shell(SHELL_SESSION_INVITATION);
         shell2.activate();
         shell2.bot().shell(SHELL_SESSION_INVITATION).confirm(FINISH);
         bob.superBot().confirmShellAddProjectUsingWhichProject(PROJECT1,

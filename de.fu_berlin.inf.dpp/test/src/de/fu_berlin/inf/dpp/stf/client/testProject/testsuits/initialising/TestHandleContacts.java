@@ -12,7 +12,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import de.fu_berlin.inf.dpp.stf.client.testProject.testsuits.STFTest;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.RemoteBotShell;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.IRemoteBotShell;
 
 public class TestHandleContacts extends STFTest {
 
@@ -160,7 +160,7 @@ public class TestHandleContacts extends STFTest {
         labelsAndTexts.put("XMPP/Jabber ID", "bob@bla");
 
         alice.bot().waitUntilShellIsOpen(SHELL_ADD_BUDDY);
-        RemoteBotShell shell = alice.bot().shell(SHELL_ADD_BUDDY);
+        IRemoteBotShell shell = alice.bot().shell(SHELL_ADD_BUDDY);
         shell.activate();
         shell.bot().comboBoxWithLabel(LABEL_XMPP_JABBER_ID).setText("bob@bla");
         shell.bot().button(FINISH).click();

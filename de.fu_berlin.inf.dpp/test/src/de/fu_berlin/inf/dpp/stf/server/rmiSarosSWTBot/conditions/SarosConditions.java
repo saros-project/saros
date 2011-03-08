@@ -8,8 +8,8 @@ import org.eclipse.swtbot.swt.finder.waits.ICondition;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotToolbarButton;
 
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.RemoteBotTable;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.views.sarosViews.ChatViewImp;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.IRemoteBotTable;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.views.sarosViews.ChatView;
 
 /**
  * This is a factory class to create some conditions provided with STF.
@@ -34,7 +34,7 @@ public class SarosConditions extends Conditions {
         return new IsShellOpen(bot, title);
     }
 
-    public static ICondition existTableItem(RemoteBotTable table,
+    public static ICondition existTableItem(IRemoteBotTable table,
         String tableItemName) {
         return new ExistsTableItem(table, tableItemName);
     }
@@ -59,7 +59,7 @@ public class SarosConditions extends Conditions {
         return new ExistsNoResource(resourcePath);
     }
 
-    public static ICondition isChatMessageExist(ChatViewImp chatV, String jid,
+    public static ICondition isChatMessageExist(ChatView chatV, String jid,
         String message) {
         return new ExistsChatMessage(chatV, jid, message);
     }

@@ -1,16 +1,39 @@
 package de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets;
 
-import java.rmi.Remote;
 import java.rmi.RemoteException;
 
-public interface RemoteBotList extends Remote {
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotList;
 
-    /**********************************************
+public class RemoteBotList extends AbstractRmoteWidget implements IRemoteBotList {
+
+    private static transient RemoteBotList listImp;
+
+    private SWTBotList widget;
+
+    /**
+     * {@link RemoteBotList} is a singleton, but inheritance is possible.
+     */
+    public static RemoteBotList getInstance() {
+        if (listImp != null)
+            return listImp;
+        listImp = new RemoteBotList();
+        return listImp;
+    }
+
+    public IRemoteBotList setWidget(SWTBotList list) {
+        this.widget = list;
+        return this;
+    }
+
+    /**************************************************************
      * 
-     * finders
+     * exported functions
      * 
-     **********************************************/
-    public RemoteBotMenu contextMenu(String text) throws RemoteException;
+     **************************************************************/
+
+    public IRemoteBotMenu contextMenu(String text) throws RemoteException {
+        return stfBotMenu.setWidget(widget.contextMenu(text));
+    }
 
     /**********************************************
      * 
@@ -18,41 +41,73 @@ public interface RemoteBotList extends Remote {
      * 
      **********************************************/
 
-    public String itemAt(int index) throws RemoteException;
+    public void select(String item) throws RemoteException {
+        widget.select(item);
+    }
 
-    public int itemCount() throws RemoteException;
+    public void select(int... indices) throws RemoteException {
+        widget.select(indices);
+    }
 
-    public int indexOf(String item) throws RemoteException;
+    public void select(int index) throws RemoteException {
+        widget.select(index);
+    }
 
-    public void select(String item) throws RemoteException;
+    public void select(String... items) throws RemoteException {
+        widget.select(items);
+    }
 
-    public void select(int... indices) throws RemoteException;
+    public void selectionCount() throws RemoteException {
+        widget.selectionCount();
+    }
 
-    public void select(int index) throws RemoteException;
+    public void unselect() throws RemoteException {
+        widget.unselect();
+    }
 
-    public void select(String... items) throws RemoteException;
-
-    public void selectionCount() throws RemoteException;
-
-    public void unselect() throws RemoteException;
-
-    public void setFocus() throws RemoteException;
+    public void setFocus() throws RemoteException {
+        widget.setFocus();
+    }
 
     /**********************************************
      * 
      * states
      * 
      **********************************************/
+    public String itemAt(int index) throws RemoteException {
+        return widget.itemAt(index);
+    }
 
-    public String[] getItems() throws RemoteException;
+    public int itemCount() throws RemoteException {
+        return widget.itemCount();
+    }
 
-    public boolean isEnabled() throws RemoteException;
+    public int indexOf(String item) throws RemoteException {
+        return widget.indexOf(item);
+    }
 
-    public boolean isVisible() throws RemoteException;
+    public String[] getItems() throws RemoteException {
+        return widget.getItems();
+    }
 
-    public boolean isActive() throws RemoteException;
+    public boolean isEnabled() throws RemoteException {
+        return widget.isEnabled();
+    }
 
-    public String getText() throws RemoteException;
+    public boolean isVisible() throws RemoteException {
+        return widget.isVisible();
+    }
 
-    public String getToolTipText() throws RemoteException;
+    public boolean isActive() throws RemoteException {
+        return widget.isActive();
+    }
+
+    public String getText() throws RemoteException {
+        return widget.getText();
+    }
+
+    public String getToolTipText() throws RemoteException {
+        return widget.getText();
+    }
+
 }

@@ -1,13 +1,58 @@
 package de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets;
 
-import java.rmi.Remote;
 import java.rmi.RemoteException;
 
-public interface RemoteBotPerspective extends Remote {
+import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotPerspective;
 
-    public void activate() throws RemoteException;
+public final class RemoteBotPerspective extends AbstractRmoteWidget implements
+    IRemoteBotPerspective {
 
-    public String getLabel() throws RemoteException;
+    private static transient RemoteBotPerspective self;
 
-    public boolean isActive() throws RemoteException;
+    private SWTBotPerspective widget;
+
+    /**
+     * {@link RemoteBotPerspective} is a singleton, but inheritance is possible.
+     */
+    public static RemoteBotPerspective getInstance() {
+        if (self != null)
+            return self;
+        self = new RemoteBotPerspective();
+        return self;
+    }
+
+    public IRemoteBotPerspective setWidget(SWTBotPerspective pers) {
+        this.widget = pers;
+        return this;
+    }
+
+    /**************************************************************
+     * 
+     * exported functions
+     * 
+     **************************************************************/
+
+    /**********************************************
+     * 
+     * actions
+     * 
+     **********************************************/
+
+    public void activate() throws RemoteException {
+        widget.activate();
+    }
+
+    /**********************************************
+     * 
+     * states
+     * 
+     **********************************************/
+
+    public String getLabel() throws RemoteException {
+        return widget.getLabel();
+    }
+
+    public boolean isActive() throws RemoteException {
+        return widget.isActive();
+    }
 }

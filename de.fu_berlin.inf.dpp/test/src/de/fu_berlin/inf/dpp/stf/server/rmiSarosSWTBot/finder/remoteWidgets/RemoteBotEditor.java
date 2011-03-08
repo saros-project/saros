@@ -1,304 +1,268 @@
 package de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets;
 
-import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.util.List;
 
 import org.eclipse.jface.bindings.keys.IKeyLookup;
+import org.eclipse.jface.bindings.keys.KeyStroke;
+import org.eclipse.jface.bindings.keys.ParseException;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotEclipseEditor;
-import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotEditor;
-import org.eclipse.swtbot.swt.finder.widgets.SWTBotStyledText;
+import org.eclipse.swtbot.swt.finder.waits.DefaultCondition;
 
-import de.fu_berlin.inf.dpp.stf.client.AbstractTester;
-import de.fu_berlin.inf.dpp.stf.client.testProject.helpers.TestPattern;
+public class RemoteBotEditor extends AbstractRmoteWidget implements
+    IRemoteBotEditor {
 
-/**
- * This interface contains convenience API to perform actions in the editor
- * area, then you can start off as follows:
- * <ol>
- * <li>
- * At first you need to create a {@link AbstractTester} object in your
- * junit-test. (How to do it please look at the javadoc in class
- * {@link TestPattern} or read the user guide in TWiki
- * https://www.inf.fu-berlin.de/w/SE/SarosSTFTests).</li>
- * <li>
- * then you can use the object editor initialized in {@link AbstractTester} to
- * access the API :), e.g.
- * 
- * <pre>
- * alice.editor.isEditorOpen(&quot;MyClass.java&quot;);
- * </pre>
- * 
- * </li>
- * 
- * @author Lin
- */
-public interface RemoteBotEditor extends Remote {
+    private static transient RemoteBotEditor self;
+
+    private SWTBotEclipseEditor widget;
+
+    /**
+     * {@link RemoteBotEditor} is a singleton, but inheritance is possible.
+     */
+    public static RemoteBotEditor getInstance() {
+        if (self != null)
+            return self;
+        self = new RemoteBotEditor();
+        return self;
+    }
+
+    public void setWidget(SWTBotEclipseEditor editor) {
+        this.widget = editor;
+    }
+
+    /***********************************************************************
+     * 
+     * exported functions
+     * 
+     ***********************************************************************/
 
     /**********************************************
      * 
-     * Actions
+     * actions
      * 
      **********************************************/
 
-    /**
-     * @see SWTBotEditor#show()
-     */
-    public void show() throws RemoteException;
+    public void show() throws RemoteException {
+        widget.show();
+    }
 
-    /**
-     * @see SWTBotEditor#setFocus()
-     */
-    public void setFocus() throws RemoteException;
+    public void setFocus() throws RemoteException {
+        widget.setFocus();
+    }
 
-    /**
-     * Saves and closes the given editor.
-     * 
-     * @throws RemoteException
-     */
-    public void closeWithSave() throws RemoteException;
+    public void closeWithSave() throws RemoteException {
+        widget.save();
+        widget.close();
+    }
 
-    /**
-     * @see SWTBotEditor#save()
-     */
-    public void save() throws RemoteException;
+    public void save() throws RemoteException {
+        widget.save();
+    }
 
-    /**
-     * close the editor without saving it. The editor must belong to this
-     * workbench page.
-     * <p>
-     * Any unsaved changes are discard, if the editor has unsaved content.
-     * </p>
-     * 
-     * @throws RemoteException
-     */
-    public void closeWithoutSave() throws RemoteException;
+    public void closeWithoutSave() throws RemoteException {
+        widget.close();
+        if (stfBot.isShellOpen(SHELL_SAVE_RESOURCE)
+            && stfBot.shell(SHELL_SAVE_RESOURCE).isActive())
+            stfBot.shell(SHELL_SAVE_RESOURCE).confirm(NO);
+    }
 
-    /**
-     * sets text in the editor without save
-     * 
-     * @param contentPath
-     *            the path to the test file whose content should be inserted in
-     *            the text editor. All such test files are located in the
-     *            directory [Saros]/test/STF.
-     * 
-     * @throws RemoteException
-     */
-    public void setTexWithSave(String contentPath) throws RemoteException;
+    public void setTexWithSave(String contentPath) throws RemoteException {
+        String contents = getFileContentNoGUI(contentPath);
+        widget.setText(contents);
+        widget.save();
+    }
 
-    /**
-     * sets the given contents to the editor without saving.
-     * 
-     * @param contentPath
-     *            the path to the test file whose content should be set in the
-     *            text editor. All such test files are located in the directory
-     *            [Saros]/test/STF.
-     * 
-     * @throws RemoteException
-     */
-    public void setTextWithoutSave(String contentPath) throws RemoteException;
+    public void setTextWithoutSave(String contentPath) throws RemoteException {
+        String contents = getFileContentNoGUI(contentPath);
+        widget.setText(contents);
+    }
 
-    /**
-     * 
-     * TODO: This function doesn't work exactly. It may be happen that the text
-     * isn't typed in the right editor, When your saros-instances are fresh
-     * started.
-     * 
-     * @param text
-     *            the text to type.
-     * 
-     * @throws RemoteException
-     */
-    public void typeText(String text) throws RemoteException;
+    public void typeText(String text) throws RemoteException {
+        widget.setFocus();
+        widget.typeText(text);
+    }
 
-    /**
-     * Changes the cursor position in editor.
-     * 
-     * @param line
-     *            the line number, 0 based.
-     * @param column
-     *            the column number, 0 based.
-     * @see SWTBotStyledText#navigateTo(int, int)
-     * @throws RemoteException
-     */
-    public void navigateTo(int line, int column) throws RemoteException;
+    public void navigateTo(int line, int column) throws RemoteException {
+        widget.setFocus();
+        widget.navigateTo(line, column);
+    }
 
-    /**
-     * Presses the shortcut specified by the given keys.
-     * 
-     * @param keys
-     *            the formal representation for key strokes
-     * @throws RemoteException
-     * @see IKeyLookup
-     * @see SWTBotEclipseEditor#pressShortcut(org.eclipse.jface.bindings.keys.KeyStroke...)
-     */
-    public void pressShortcut(String... keys) throws RemoteException;
+    public void selectCurrentLine() throws RemoteException {
+        widget.selectCurrentLine();
+        // It's is necessary to sleep a litte time so that the following
+        // operation like quickfix will be successfully performed.
+        stfBot.sleep(500);
+    }
 
-    /**
-     * @see SWTBotEclipseEditor#autoCompleteProposal(String, String)
-     */
-    public void autoCompleteProposal(String insertText, String proposalText)
-        throws RemoteException;
+    public void selectLine(int line) throws RemoteException {
+        widget.selectLine(line);
+        // It's is necessary to sleep a litte time so that the following
+        // operation like quickfix will be successfully performed.
+        stfBot.sleep(1000);
 
-    /**
-     * @see SWTBotEclipseEditor#quickfix(String)
-     */
-    public void quickfix(String quickFixName) throws RemoteException;
+    }
 
-    /**
-     * @see SWTBotEclipseEditor#quickfix(int)
-     */
-    public void quickfix(int index) throws RemoteException;
-
-    /**
-     * @see SWTBotEclipseEditor#selectCurrentLine()
-     */
-    public void selectCurrentLine() throws RemoteException;
-
-    /**
-     * @see SWTBotEclipseEditor#selectLine(int)
-     */
-    public void selectLine(int line) throws RemoteException;
-
-    /**
-     * @see SWTBotEclipseEditor#selectRange(int, int, int)
-     */
     public void selectRange(int line, int column, int length)
-        throws RemoteException;
+        throws RemoteException {
+        widget.selectRange(line, column, length);
+        // It's is necessary to sleep a litte time so that the following
+        // operation like quickfix will be successfully performed.
+        stfBot.sleep(800);
+    }
 
-    /**
-     * press short cut "Delete"
-     * 
-     * @see SWTBotEclipseEditor#pressShortcut(int, char)
-     */
-    public void pressShortCutDelete() throws RemoteException;
+    public void pressShortcut(String... keys) throws RemoteException {
+        widget.setFocus();
+        for (String key : keys) {
+            try {
+                widget.pressShortcut(KeyStroke.getInstance(key));
+            } catch (ParseException e) {
+                throw new RemoteException("Could not parse \"" + key + "\"", e);
+            }
+        }
+    }
 
-    /**
-     * press short cut "Enter"
-     * 
-     * @see SWTBotEclipseEditor#pressShortcut(int, char)
-     */
-    public void pressShortCutEnter() throws RemoteException;
-
-    /**
-     * press short cut "Save"
-     * 
-     * @see SWTBotEclipseEditor#pressShortcut(int, char)
-     */
-    public void pressShortCutSave() throws RemoteException;
-
-    /**
-     * press short cut "Run as java application"
-     * 
-     * @see SWTBotEclipseEditor#pressShortcut(int, char)
-     */
-    public void pressShortRunAsJavaApplication() throws RemoteException;
-
-    /**
-     * press short cut "Next annotation"
-     * 
-     * @see SWTBotEclipseEditor#pressShortcut(int, char)
-     */
-    public void pressShortCutNextAnnotation() throws RemoteException;
-
-    /**
-     * press short cut "Assign to local variable"
-     * 
-     * @see SWTBotEclipseEditor#pressShortcut(int, char)
-     */
-    public void pressShortCutQuickAssignToLocalVariable()
-        throws RemoteException;
-
-    /**
-     * 
-     * @see SWTBotEclipseEditor#pressShortcut(int, char)
-     */
     public void pressShortCut(int modificationKeys, char c)
-        throws RemoteException;
+        throws RemoteException {
+        widget.pressShortcut(modificationKeys, c);
+    }
+
+    public void pressShortCutDelete() throws RemoteException {
+        pressShortcut(IKeyLookup.DELETE_NAME);
+    }
+
+    public void pressShortCutEnter() throws RemoteException {
+        pressShortcut(IKeyLookup.LF_NAME);
+    }
+
+    public void pressShortCutSave() throws RemoteException {
+        if (getOS() == TypeOfOS.MAC)
+            widget.pressShortcut(SWT.COMMAND, 's');
+        else
+            widget.pressShortcut(SWT.CTRL, 's');
+    }
+
+    public void pressShortRunAsJavaApplication() throws RemoteException {
+        if (getOS() == TypeOfOS.MAC)
+            widget.pressShortcut(SWT.ALT | SWT.COMMAND, 'x');
+        else
+            widget.pressShortcut(SWT.ALT | SWT.SHIFT, 'x');
+        stfBot.sleep(1000);
+        widget.pressShortcut(SWT.NONE, 'j');
+    }
+
+    public void pressShortCutNextAnnotation() throws RemoteException {
+        if (getOS() == TypeOfOS.MAC)
+            widget.pressShortcut(SWT.COMMAND, '.');
+        else
+            widget.pressShortcut(SWT.CTRL, '.');
+
+        stfBot.sleep(20);
+    }
+
+    public void pressShortCutQuickAssignToLocalVariable()
+        throws RemoteException {
+        if (getOS() == TypeOfOS.MAC)
+            widget.pressShortcut(SWT.COMMAND, '2');
+        else
+            widget.pressShortcut(SWT.CTRL, '2');
+        stfBot.sleep(1000);
+        widget.pressShortcut(SWT.NONE, 'l');
+
+    }
+
+    public void autoCompleteProposal(String insertText, String proposalText)
+        throws RemoteException {
+        widget.autoCompleteProposal(checkInputText(insertText), proposalText);
+    }
+
+    public void quickfix(String quickFixName) throws RemoteException {
+        widget.quickfix(quickFixName);
+    }
+
+    public void quickfix(int index) throws RemoteException {
+        widget.quickfix(index);
+    }
 
     /**********************************************
      * 
-     * States
+     * states
      * 
      **********************************************/
 
-    /**
-     * @return the content of the editor specified with the last element of the
-     *         given array, which my be dirty.
-     * @throws RemoteException
-     */
-    public String getText() throws RemoteException;
+    public String getText() throws RemoteException {
+        return widget.getText();
+    }
 
-    /**
-     * @see SWTBotEclipseEditor#getTextOnCurrentLine()
-     */
-    public String getTextOnCurrentLine() throws RemoteException;
+    public String getTextOnCurrentLine() throws RemoteException {
+        return widget.getTextOnCurrentLine();
+    }
 
-    /**
-     * @see SWTBotEclipseEditor#getTextOnLine(int)
-     */
-    public String getTextOnLine(int line) throws RemoteException;
+    public String getTextOnLine(int line) throws RemoteException {
+        return widget.getTextOnLine(line);
+    }
 
-    /**
-     * @see SWTBotEclipseEditor#cursorPosition
-     */
-    public int getCursorLine() throws RemoteException;
+    public int getCursorLine() throws RemoteException {
+        return widget.cursorPosition().line;
+    }
 
-    /**
-     * @see SWTBotEclipseEditor#cursorPosition
-     */
-    public int getCursorColumn() throws RemoteException;
+    public int getCursorColumn() throws RemoteException {
+        return widget.cursorPosition().column;
+    }
 
-    /**
-     * @see SWTBotEclipseEditor#getLineBackground(int)
-     */
-    public RGB getLineBackground(int line) throws RemoteException;
+    public RGB getLineBackground(int line) throws RemoteException {
+        return widget.getLineBackground(line);
+    }
 
-    /**
-     * @see SWTBotEclipseEditor#isActive()
-     */
-    public boolean isActive() throws RemoteException;
+    public boolean isDirty() throws RemoteException {
+        return widget.isDirty();
+    }
 
-    /**
-     * 
-     * 
-     * @return <code>true</code> if the contents have been modified and need
-     *         saving, and <code>false</code> if they have not changed since the
-     *         last save.
-     */
-    public boolean isDirty() throws RemoteException;
+    public String getSelection() throws RemoteException {
+
+        return widget.getSelection();
+    }
 
     public List<String> getAutoCompleteProposals(String insertText)
-        throws RemoteException;
+        throws RemoteException {
+        return widget.getAutoCompleteProposals(insertText);
+    }
 
-    public String getSelection() throws RemoteException;
+    public boolean isActive() throws RemoteException {
+        return widget.isActive();
+    }
 
     /**********************************************
      * 
-     * States
+     * waits until
      * 
      **********************************************/
 
-    /**
-     * waits until the editor specified with the given fileName is active
-     * 
-     * @throws RemoteException
-     */
-    public void waitUntilIsActive() throws RemoteException;
+    public void waitUntilIsActive() throws RemoteException {
+        stfBot.waitUntil(new DefaultCondition() {
+            public boolean test() throws Exception {
+                return isActive();
+            }
 
-    /**
-     * Sometimes you want to know, if a peer(e.g. Bob) can see the changes of
-     * file, which is modified by another peer (e.g. Alice). Because of data
-     * transfer delay Bob need to wait a minute to see the changes. So it will
-     * be a good idea that you give bob some time before you compare the two
-     * files between Alice and Bob.
-     * 
-     * 
-     * @param otherClassContent
-     *            the content of another class, to which you want to compare.
-     */
-    public void waitUntilIsTextSame(String otherClassContent)
-        throws RemoteException;
+            public String getFailureMessage() {
+                return "The editor is not open.";
+            }
+        });
+    }
+
+    public void waitUntilIsTextSame(final String otherText)
+        throws RemoteException {
+        stfBot.waitUntil(new DefaultCondition() {
+            public boolean test() throws Exception {
+                return getText().equals(otherText);
+            }
+
+            public String getFailureMessage() {
+                return "The both contents are not" + " same.";
+            }
+        });
+
+    }
 
 }

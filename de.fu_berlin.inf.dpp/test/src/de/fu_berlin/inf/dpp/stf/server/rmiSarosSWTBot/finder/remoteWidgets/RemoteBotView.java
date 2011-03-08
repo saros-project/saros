@@ -1,57 +1,212 @@
 package de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets;
 
-import java.rmi.Remote;
 import java.rmi.RemoteException;
+import java.util.ArrayList;
 import java.util.List;
 
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.RemoteBot;
+import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
+import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotViewMenu;
+import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
+import org.eclipse.swtbot.swt.finder.waits.DefaultCondition;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotToolbarButton;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotToolbarDropDownButton;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotToolbarPushButton;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotToolbarRadioButton;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotToolbarToggleButton;
 
-public interface RemoteBotView extends Remote {
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.IRemoteBot;
 
-    public void waitUntilIsActive() throws RemoteException;
+public class RemoteBotView extends AbstractRmoteWidget implements IRemoteBotView {
 
-    public void show() throws RemoteException;
+    private static transient RemoteBotView self;
 
-    public boolean isActive() throws RemoteException;
+    private SWTBotView widget;
 
-    public void close() throws RemoteException;
+    /**
+     * {@link RemoteBotView} is a singleton, but inheritance is possible.
+     */
+    public static RemoteBotView getInstance() {
+        if (self != null)
+            return self;
+        self = new RemoteBotView();
+        return self;
+    }
 
-    public void setFocus() throws RemoteException;
+    public IRemoteBotView setWidget(SWTBotView view) {
+        widget = view;
+        return this;
+    }
 
-    public RemoteBot bot() throws RemoteException;
+    /**************************************************************
+     * 
+     * exported functions
+     * 
+     **************************************************************/
 
-    public RemoteBotViewMenu menu(String label) throws RemoteException;
+    /**********************************************
+     * 
+     * Finders
+     * 
+     **********************************************/
+    public IRemoteBot bot() {
+        stfBot.setBot(widget.bot());
+        return stfBot;
+    }
 
-    public RemoteBotViewMenu menu(String label, int index) throws RemoteException;
+    // menu
+    public IRemoteBotViewMenu menu(String label) throws RemoteException {
+        stfViewMenu.setWidget(widget.menu(label));
+        return stfViewMenu;
+    }
 
-    public RemoteBotToolbarButton toolbarButton(String tooltip)
-        throws RemoteException;
+    public IRemoteBotViewMenu menu(String label, int index) throws RemoteException {
+        stfViewMenu.setWidget(widget.menu(label, index));
+        return stfViewMenu;
+    }
 
-    public boolean existsToolbarButton(String tooltip) throws RemoteException;
+    public List<IRemoteBotViewMenu> menus() throws RemoteException {
+        List<IRemoteBotViewMenu> menus = new ArrayList<IRemoteBotViewMenu>();
+        for (SWTBotViewMenu menu : widget.menus()) {
+            menus.add(stfViewMenu.setWidget(menu));
+        }
+        return menus;
+    }
 
-    public List<String> getToolTipOfAllToolbarbuttons() throws RemoteException;
+    // toolbarButton
+    public IRemoteBotToolbarButton toolbarButton(String tooltip)
+        throws RemoteException {
+        SWTBotToolbarButton toolbarButton = widget.toolbarButton(tooltip);
+        stfToolbarButton.setWidget(toolbarButton);
 
-    public RemoteBotToolbarButton toolbarButtonWithRegex(String regex)
-        throws RemoteException;
+        return stfToolbarButton;
+    }
 
-    public RemoteBotToolbarDropDownButton toolbarDropDownButton(String tooltip)
-        throws RemoteException;
+    public IRemoteBotToolbarButton toolbarButtonWithRegex(String regex)
+        throws RemoteException {
+        for (String tooltip : getToolTipTextOfToolbarButtons()) {
+            System.out.println(tooltip + ":");
+            if (tooltip.matches(regex)) {
+                SWTBotToolbarButton toolbarButton = widget
+                    .toolbarButton(tooltip);
+                stfToolbarButton.setWidget(toolbarButton);
+                return stfToolbarButton;
+            }
+        }
+        throw new WidgetNotFoundException("The toolBarButton doesn't exist!");
+    }
 
-    public RemoteBotToolbarRadioButton toolbarRadioButton(String tooltip)
-        throws RemoteException;
+    public List<IRemoteBotToolbarButton> getToolbarButtons() throws RemoteException {
+        List<IRemoteBotToolbarButton> toolbarButtons = new ArrayList<IRemoteBotToolbarButton>();
+        for (SWTBotToolbarButton button : widget.getToolbarButtons()) {
+            toolbarButtons.add(stfToolbarButton.setWidget(button));
+        }
+        return toolbarButtons;
+    }
 
-    public RemoteBotToolbarPushButton toolbarPushButton(String tooltip)
-        throws RemoteException;
+    // toolbarDropDownButton
+    public IRemoteBotToolbarDropDownButton toolbarDropDownButton(String tooltip)
+        throws RemoteException {
+        SWTBotToolbarDropDownButton toolbarButton = widget
+            .toolbarDropDownButton(tooltip);
+        stfToolbarDropDownButton.setWidget(toolbarButton);
+        return stfToolbarDropDownButton;
+    }
 
-    public RemoteBotToolbarToggleButton toolbarToggleButton(String tooltip)
-        throws RemoteException;
+    // toolbarRadioButton
+    public IRemoteBotToolbarRadioButton toolbarRadioButton(String tooltip)
+        throws RemoteException {
+        SWTBotToolbarRadioButton toolbarButton = widget
+            .toolbarRadioButton(tooltip);
+        stfToolbarRadioButton.setWidget(toolbarButton);
+        return stfToolbarRadioButton;
+    }
 
-    public List<RemoteBotViewMenu> menus() throws RemoteException;
+    // toolbarPushButton
+    public IRemoteBotToolbarPushButton toolbarPushButton(String tooltip)
+        throws RemoteException {
+        SWTBotToolbarPushButton toolbarButton = widget
+            .toolbarPushButton(tooltip);
+        stfToolbarPushButton.setWidget(toolbarButton);
+        return stfToolbarPushButton;
+    }
 
-    public List<RemoteBotToolbarButton> getToolbarButtons() throws RemoteException;
+    // toolbarToggleButton
+    public IRemoteBotToolbarToggleButton toolbarToggleButton(String tooltip)
+        throws RemoteException {
+        SWTBotToolbarToggleButton toolbarButton = widget
+            .toolbarToggleButton(tooltip);
+        stfToolbarToggleButton.setWidget(toolbarButton);
+        return stfToolbarToggleButton;
+    }
 
-    public String getTitle() throws RemoteException;
+    /**********************************************
+     * 
+     * actions
+     * 
+     **********************************************/
 
-    public List<String> getToolTipTextOfToolbarButtons() throws RemoteException;
+    public void close() throws RemoteException {
+        widget.close();
+    }
+
+    public void show() throws RemoteException {
+        widget.show();
+    }
+
+    public void setFocus() throws RemoteException {
+        widget.setFocus();
+    }
+
+    /**********************************************
+     * 
+     * states
+     * 
+     **********************************************/
+
+    public List<String> getToolTipOfAllToolbarbuttons() throws RemoteException {
+        List<String> tooltips = new ArrayList<String>();
+        for (SWTBotToolbarButton button : widget.getToolbarButtons()) {
+            tooltips.add(button.getToolTipText());
+        }
+        return tooltips;
+    }
+
+    public boolean existsToolbarButton(String tooltip) throws RemoteException {
+        return getToolTipOfAllToolbarbuttons().contains(tooltip);
+    }
+
+    public boolean isActive() throws RemoteException {
+        return widget.isActive();
+    }
+
+    public String getTitle() throws RemoteException {
+        return widget.getTitle();
+    }
+
+    public List<String> getToolTipTextOfToolbarButtons() throws RemoteException {
+        List<String> toolbarButtons = new ArrayList<String>();
+        for (SWTBotToolbarButton toolbarButton : widget.getToolbarButtons()) {
+            toolbarButtons.add(toolbarButton.getToolTipText());
+        }
+        return toolbarButtons;
+    }
+
+    /**********************************************
+     * 
+     * waits until
+     * 
+     **********************************************/
+    public void waitUntilIsActive() throws RemoteException {
+
+        stfBot.waitUntil(new DefaultCondition() {
+            public boolean test() throws Exception {
+                return isActive();
+            }
+
+            public String getFailureMessage() {
+                return "Can't activate this view.";
+            }
+        });
+    }
 
 }

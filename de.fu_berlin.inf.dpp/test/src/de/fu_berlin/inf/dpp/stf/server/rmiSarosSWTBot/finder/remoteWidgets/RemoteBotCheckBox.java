@@ -1,45 +1,141 @@
 package de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets;
 
-import java.rmi.Remote;
 import java.rmi.RemoteException;
 
-public interface RemoteBotCheckBox extends Remote {
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotCheckBox;
+
+public class RemoteBotCheckBox extends AbstractRmoteWidget implements
+    IRemoteBotCheckBox {
+
+    private static transient RemoteBotCheckBox self;
+
+    private SWTBotCheckBox widget;
+
+    /**
+     * {@link RemoteBotCheckBox} is a singleton, but inheritance is possible.
+     */
+    public static RemoteBotCheckBox getInstance() {
+        if (self != null)
+            return self;
+        self = new RemoteBotCheckBox();
+        return self;
+    }
+
+    public IRemoteBotCheckBox setWidget(SWTBotCheckBox checkBox) {
+        this.widget = checkBox;
+        return this;
+    }
+
+    /**************************************************************
+     * 
+     * exported functions
+     * 
+     **************************************************************/
 
     /**********************************************
      * 
      * finders
      * 
      **********************************************/
-    public RemoteBotMenu contextMenu(String text) throws RemoteException;
+
+    /**
+     * 
+     * @see SWTBotCheckBox#contextMenu(String)
+     */
+    public IRemoteBotMenu contextMenu(String text) throws RemoteException {
+        return stfBotMenu.setWidget(widget.contextMenu(text));
+    }
 
     /**********************************************
      * 
      * actions
      * 
      **********************************************/
+    /**
+     * 
+     * @see SWTBotCheckBox#click()
+     */
+    public void click() throws RemoteException {
+        widget.click();
+    }
 
-    public void click() throws RemoteException;
+    /**
+     * 
+     * @see SWTBotCheckBox#select()
+     */
+    public void select() throws RemoteException {
+        widget.select();
+    }
 
-    public void select() throws RemoteException;
+    /**
+     * 
+     * @see SWTBotCheckBox#deselect()
+     */
+    public void deselect() throws RemoteException {
+        widget.deselect();
 
-    public void deselect() throws RemoteException;
+    }
 
-    public void setFocus() throws RemoteException;
+    /**
+     * 
+     * @see SWTBotCheckBox#setFocus()
+     */
+    public void setFocus() throws RemoteException {
+        widget.setFocus();
+    }
 
     /**********************************************
      * 
      * states
      * 
      **********************************************/
-    public boolean isEnabled() throws RemoteException;
 
-    public boolean isVisible() throws RemoteException;
+    /**
+     * 
+     * @see SWTBotCheckBox#isEnabled()
+     */
+    public boolean isEnabled() throws RemoteException {
+        return widget.isEnabled();
+    }
 
-    public boolean isActive() throws RemoteException;
+    /**
+     * 
+     * @see SWTBotCheckBox#isVisible()
+     */
+    public boolean isVisible() throws RemoteException {
+        return widget.isVisible();
+    }
 
-    public boolean isChecked() throws RemoteException;
+    /**
+     * 
+     * @see SWTBotCheckBox#isActive()
+     */
+    public boolean isActive() throws RemoteException {
+        return widget.isActive();
+    }
 
-    public String getText() throws RemoteException;
+    /**
+     * 
+     * @see SWTBotCheckBox#isChecked()
+     */
+    public boolean isChecked() throws RemoteException {
+        return widget.isChecked();
+    }
 
-    public String getToolTipText() throws RemoteException;
+    /**
+     * 
+     * @see SWTBotCheckBox#getText()
+     */
+    public String getText() throws RemoteException {
+        return widget.getText();
+    }
+
+    /**
+     * 
+     * @see SWTBotCheckBox#getToolTipText()
+     */
+    public String getToolTipText() throws RemoteException {
+        return widget.getText();
+    }
+
 }

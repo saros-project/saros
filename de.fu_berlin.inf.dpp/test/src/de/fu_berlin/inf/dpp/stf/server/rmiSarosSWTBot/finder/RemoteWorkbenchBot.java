@@ -1,185 +1,290 @@
 package de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder;
 
 import java.rmi.RemoteException;
+import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
-import org.eclipse.swtbot.eclipse.finder.matchers.WidgetMatcherFactory;
-import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
-import org.hamcrest.Matcher;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotEditor;
+import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotPerspective;
+import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
+import org.eclipse.swtbot.swt.finder.waits.DefaultCondition;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
+import org.eclipse.ui.IPerspectiveDescriptor;
+import org.eclipse.ui.IViewReference;
+import org.eclipse.ui.IWorkbench;
+import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.WorkbenchException;
 
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.IRemoteBotEditor;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.RemoteBotEditor;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.IRemoteBotPerspective;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.RemoteBotPerspective;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.IRemoteBotView;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.RemoteBotView;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.views.sarosViews.ChatView;
+import de.fu_berlin.inf.dpp.stf.server.sarosSWTBot.SarosSWTBot;
 
-public interface RemoteWorkbenchBot extends RemoteBot {
-    public RemoteBotView view(String viewTitle) throws RemoteException;
+public class RemoteWorkbenchBot extends RemoteBot implements IRemoteWorkbenchBot {
 
-    /**
-     * @return the title list of all the views which are opened currently.
-     * @see SWTWorkbenchBot#views()
-     */
-    public List<String> getTitlesOfOpenedViews() throws RemoteException;
+    private static transient RemoteWorkbenchBot self;
 
-    public boolean isViewOpen(String title) throws RemoteException;
+    private static RemoteBotView view;
+    private static RemoteBotPerspective stfBotPers;
+    private static RemoteBotEditor stfBotEditor;
 
-    /**
-     * open the given view specified with the viewId.
-     * 
-     * @param viewId
-     *            the id of the view, which you want to open.
-     */
-    public void openViewById(String viewId) throws RemoteException;
+    private static SarosSWTBot sarosSwtBot;
 
     /**
-     * Shortcut for perspective(withPerspectiveLabel(label))
-     * 
-     * @param label
-     *            the "human readable" label for the perspective
-     * @return a perspective with the specified <code>label</code>
-     * 
-     * @see WidgetMatcherFactory#withPerspectiveLabel(Matcher)
+     * {@link ChatView} is a singleton, but inheritance is possible.
      */
-    public RemoteBotPerspective perspectiveByLabel(String label)
-        throws RemoteException;
+    public static RemoteWorkbenchBot getInstance() {
+        if (self != null)
+            return self;
+        self = new RemoteWorkbenchBot();
+        view = RemoteBotView.getInstance();
+        stfBotPers = RemoteBotPerspective.getInstance();
+        stfBotEditor = RemoteBotEditor.getInstance();
+        sarosSwtBot = SarosSWTBot.getInstance();
+        return self;
+    }
 
-    public RemoteBotPerspective perspectiveById(String id) throws RemoteException;
+    /**********************************************
+     * 
+     * view
+     * 
+     **********************************************/
+    public IRemoteBotView view(String viewTitle) throws RemoteException {
+        view.setWidget(sarosSwtBot.viewByTitle(viewTitle));
+        return view;
+    }
 
-    /**
-     * Shortcut for view(withPartId(id))
-     * 
-     * @param id
-     *            the view id
-     * @return the view with the specified id
-     * @see WidgetMatcherFactory#withPartId(String)
-     */
-    public RemoteBotView viewById(String id) throws RemoteException;
+    public void openViewById(final String viewId) throws RemoteException {
+        try {
+            Display.getDefault().syncExec(new Runnable() {
+                public void run() {
+                    final IWorkbench wb = PlatformUI.getWorkbench();
+                    final IWorkbenchWindow win = wb.getActiveWorkbenchWindow();
 
-    /**
-     * Returns the active workbench view part
-     * 
-     * @return the active view, if any
-     * @throws WidgetNotFoundException
-     *             if there is no active view
-     */
-    public RemoteBotView activeView() throws RemoteException;
+                    IWorkbenchPage page = win.getActivePage();
+                    try {
+                        IViewReference[] registeredViews = page
+                            .getViewReferences();
+                        for (IViewReference registeredView : registeredViews) {
+                            log.debug("registered view ID: "
+                                + registeredView.getId());
+                        }
 
-    /**
-     * Shortcut for editor(withPartName(title))
-     * 
-     * @param fileName
-     *            the the filename on the editor tab
-     * @return the editor with the specified title
-     */
-    public RemoteBotEditor editor(String fileName) throws RemoteException;
+                        page.showView(viewId);
+                    } catch (PartInitException e) {
+                        throw new IllegalArgumentException(e);
+                    }
+                }
+            });
+        } catch (IllegalArgumentException e) {
+            log.debug("Couldn't initialize " + viewId, e.getCause());
+        }
+    }
 
-    /**
-     * Shortcut for editor(withPartId(id))
-     * 
-     * @param id
-     *            the the id on the editor tab
-     * @return the editor with the specified title
-     */
-    public RemoteBotEditor editorById(String id) throws RemoteException;
+    public List<String> getTitlesOfOpenedViews() throws RemoteException {
+        ArrayList<String> list = new ArrayList<String>();
+        for (SWTBotView view : sarosSwtBot.views())
+            list.add(view.getTitle());
+        return list;
+    }
 
-    public boolean isEditorOpen(String fileName) throws RemoteException;
+    public boolean isViewOpen(String title) throws RemoteException {
+        return getTitlesOfOpenedViews().contains(title);
+    }
 
-    /**
-     * Returns the active workbench editor part
-     * 
-     * @return the active editor, if any
-     * @throws WidgetNotFoundException
-     *             if there is no active view
-     */
-    public RemoteBotEditor activeEditor() throws RemoteException;
+    public IRemoteBotView viewById(String id) throws RemoteException {
+        view.setWidget(sarosSwtBot.viewById(id));
+        return view;
+    }
 
-    /**
-     * 
-     * @param title
-     *            the title of a perspective.
-     * @return<tt>true</tt>, if the perspective specified with the given title
-     *                       is open.
-     */
-    public boolean isPerspectiveOpen(String title) throws RemoteException;
+    public IRemoteBotView activeView() throws RemoteException {
+        return view(sarosSwtBot.activeView().getTitle());
+    }
 
-    /**
+    /**********************************************
      * 
-     * @param id
-     *            id which identify a perspective
-     * @return<tt>true</tt>, if the perspective specified with the given id is
-     *                       active.
-     */
-    public boolean isPerspectiveActive(String id) throws RemoteException;
+     * perspective
+     * 
+     **********************************************/
 
-    /**
-     * 
-     * @return titles of all available perspectives.
-     */
-    public List<String> getPerspectiveTitles() throws RemoteException;
+    public boolean isPerspectiveOpen(String title) throws RemoteException {
+        return getPerspectiveTitles().contains(title);
+    }
 
-    /**
-     * Open a perspective using Window->Open Perspective->Other... The method is
-     * defined as helper method for other openPerspective* methods and should
-     * not be exported using rmi.
-     * 
-     * 1. if the perspective already exist, return.
-     * 
-     * 2. activate the saros-instance-window(alice / bob / carl). If the
-     * workbench isn't active, delegate can't find the main menus.
-     * 
-     * 3. click main menus Window -> Open perspective -> Other....
-     * 
-     * 4. confirm the pop-up window "Open Perspective".
-     * 
-     * @param persID
-     *            example: "org.eclipse.jdt.ui.JavaPerspective"
-     */
+    public boolean isPerspectiveActive(String id) throws RemoteException {
+        return sarosSwtBot.perspectiveById(id).isActive();
+    }
+
+    public List<String> getPerspectiveTitles() throws RemoteException {
+        ArrayList<String> list = new ArrayList<String>();
+        for (SWTBotPerspective perspective : sarosSwtBot.perspectives())
+            list.add(perspective.getLabel());
+        return list;
+    }
+
     public void openPerspectiveWithId(final String persID)
-        throws RemoteException;
+        throws RemoteException {
+        if (!isPerspectiveActive(persID)) {
+            try {
+                Display.getDefault().syncExec(new Runnable() {
+                    public void run() {
+                        final IWorkbench wb = PlatformUI.getWorkbench();
+                        IPerspectiveDescriptor[] descriptors = wb
+                            .getPerspectiveRegistry().getPerspectives();
+                        for (IPerspectiveDescriptor per : descriptors) {
+                            log.debug("installed perspective id:" + per.getId());
+                        }
+                        final IWorkbenchWindow win = wb
+                            .getActiveWorkbenchWindow();
+                        try {
+                            wb.showPerspective(persID, win);
+                        } catch (WorkbenchException e) {
+                            log.debug("couldn't open perspective wit ID"
+                                + persID, e);
+                        }
+                    }
+                });
+            } catch (IllegalArgumentException e) {
+                log.debug("Couldn't initialize perspective with ID" + persID,
+                    e.getCause());
+            }
+        }
+    }
 
-    /**
-     * @return the active perspective in the active workbench page
-     */
-    public RemoteBotPerspective activePerspective() throws RemoteException;
+    public IRemoteBotPerspective perspectiveByLabel(String label)
+        throws RemoteException {
+        stfBotPers.setWidget(sarosSwtBot.perspectiveByLabel(label));
+        return stfBotPers;
+    }
 
-    /**
-     * Does a <em>best effort</em> to reset the workbench. This method attempts
-     * to:
-     * <ul>
-     * <li>close all non-workbench windows</li>
-     * <li>save and close all open editors</li>
-     * <li>reset the <em>active</em> perspective</li>
-     * <li>switch to the default perspective for the workbench</li>
-     * <li>reset the <em>default</em> perspective for the workbench</li>
-     * <ul>
-     */
-    public void resetWorkbench() throws RemoteException;
+    public IRemoteBotPerspective perspectiveById(String id) throws RemoteException {
+        stfBotPers.setWidget(sarosSwtBot.perspectiveById(id));
+        return stfBotPers;
+    }
 
-    /**
-     * Activate the saros-instance.This method is very useful, wenn you test
-     * saros under MAC
+    public IRemoteBotPerspective activePerspective() throws RemoteException {
+        return perspectiveByLabel(sarosSwtBot.activePerspective().getLabel());
+    }
+
+    public IRemoteBotPerspective defaultPerspective() throws RemoteException {
+        return perspectiveByLabel(sarosSwtBot.defaultPerspective().getLabel());
+    }
+
+    public void resetActivePerspective() throws RemoteException {
+        sarosSwtBot.resetActivePerspective();
+    }
+
+    /**********************************************
      * 
-     * @throws RemoteException
-     */
-    public void activateWorkbench() throws RemoteException;
+     * editor
+     * 
+     **********************************************/
 
-    /**
-     * Returns the default perspective as defined in the WorkbenchAdvisor of the
-     * application.
-     */
-    public RemoteBotPerspective defaultPerspective() throws RemoteException;
+    public IRemoteBotEditor editor(String fileName) throws RemoteException {
+        stfBotEditor.setWidget(sarosSwtBot.editorByTitle(fileName)
+            .toTextEditor());
+        return stfBotEditor;
+    }
 
-    public void closeAllEditors() throws RemoteException;
+    public IRemoteBotEditor editorById(String id) throws RemoteException {
+        stfBotEditor.setWidget(sarosSwtBot.editorById(id).toTextEditor());
+        return stfBotEditor;
+    }
 
-    public void saveAllEditors() throws RemoteException;
+    public boolean isEditorOpen(String fileName) throws RemoteException {
+        for (SWTBotEditor editor : sarosSwtBot.editors()) {
+            if (editor.getTitle().equals(fileName))
+                return true;
+        }
+        return false;
+    }
 
-    public void resetActivePerspective() throws RemoteException;
+    public IRemoteBotEditor activeEditor() throws RemoteException {
+        return editor(sarosSwtBot.activeEditor().getTitle());
 
-    public void waitUntilEditorOpen(final String title) throws RemoteException;
+    }
+
+    public void closeAllEditors() throws RemoteException {
+        sarosSwtBot.closeAllEditors();
+    }
+
+    public void saveAllEditors() throws RemoteException {
+        sarosSwtBot.saveAllEditors();
+    }
+
+    public void waitUntilEditorOpen(final String title) throws RemoteException {
+
+        sarosSwtBot.waitUntil(new DefaultCondition() {
+            public boolean test() throws Exception {
+                return isEditorOpen(title);
+            }
+
+            public String getFailureMessage() {
+                return "The editor " + title + "is not open.";
+            }
+        });
+    }
 
     public void waitUntilEditorClosed(final String title)
-        throws RemoteException;
+        throws RemoteException {
+        sarosSwtBot.waitUntil(new DefaultCondition() {
+            public boolean test() throws Exception {
+                return !isEditorOpen(title);
+            }
 
-    public void closeAllShells() throws RemoteException;
+            public String getFailureMessage() {
+                return "The editor is not open.";
+            }
+        });
+    }
+
+    /**********************************************
+     * 
+     * workbench
+     * 
+     **********************************************/
+
+    public void resetWorkbench() throws RemoteException {
+        closeAllShells();
+        // saveAllEditors();
+        closeAllEditors();
+        openPerspectiveWithId(ID_JAVA_PERSPECTIVE);
+    }
+
+    public void activateWorkbench() throws RemoteException {
+        getWorkbench().activate().setFocus();
+    }
+
+    public SWTBotShell getWorkbench() throws RemoteException {
+        SWTBotShell[] shells = sarosSwtBot.shells();
+        for (SWTBotShell shell : shells) {
+            if (shell.getText().matches(".+? - .+")) {
+                log.debug("shell found matching \"" + ".+? - .+" + "\"");
+                return shell;
+            }
+        }
+        final String message = "No shell found matching \"" + ".+? - .+"
+            + "\"!";
+        log.error(message);
+        throw new RemoteException(message);
+    }
+
+    /**********************************************
+     * 
+     * shell
+     * 
+     **********************************************/
+
+    public void closeAllShells() throws RemoteException {
+        sarosSwtBot.closeAllShells();
+    }
 
 }

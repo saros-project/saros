@@ -1,16 +1,44 @@
 package de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets;
 
-import java.rmi.Remote;
 import java.rmi.RemoteException;
 
-public interface RemoteBotLabel extends Remote {
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotLabel;
+
+public class RemoteBotLabel extends AbstractRmoteWidget implements IRemoteBotLabel {
+
+    private static transient RemoteBotLabel self;
+
+    private SWTBotLabel widget;
+
+    /**
+     * {@link RemoteBotTable} is a singleton, but inheritance is possible.
+     */
+    public static RemoteBotLabel getInstance() {
+        if (self != null)
+            return self;
+        self = new RemoteBotLabel();
+        return self;
+    }
+
+    public IRemoteBotLabel setWidget(SWTBotLabel label) {
+        this.widget = label;
+        return this;
+    }
+
+    /**************************************************************
+     * 
+     * exported functions
+     * 
+     **************************************************************/
 
     /**********************************************
      * 
      * finders
      * 
      **********************************************/
-    public RemoteBotMenu contextMenu(String text) throws RemoteException;
+    public IRemoteBotMenu contextMenu(String text) throws RemoteException {
+        return stfBotMenu.setWidget(widget.contextMenu(text));
+    }
 
     /**********************************************
      * 
@@ -18,23 +46,38 @@ public interface RemoteBotLabel extends Remote {
      * 
      **********************************************/
 
-    public void setFocus() throws RemoteException;
+    public void setFocus() throws RemoteException {
+        widget.setFocus();
+    }
 
     /**********************************************
      * 
      * states
      * 
      **********************************************/
-    public int alignment() throws RemoteException;
 
-    public boolean isEnabled() throws RemoteException;
+    public int alignment() throws RemoteException {
+        return widget.alignment();
+    }
 
-    public boolean isVisible() throws RemoteException;
+    public boolean isEnabled() throws RemoteException {
+        return widget.isEnabled();
+    }
 
-    public boolean isActive() throws RemoteException;
+    public boolean isVisible() throws RemoteException {
+        return widget.isVisible();
+    }
 
-    public String getToolTipText() throws RemoteException;
+    public boolean isActive() throws RemoteException {
+        return widget.isActive();
+    }
 
-    public String getText() throws RemoteException;
+    public String getToolTipText() throws RemoteException {
+        return widget.getText();
+    }
+
+    public String getText() throws RemoteException {
+        return widget.getText();
+    }
 
 }

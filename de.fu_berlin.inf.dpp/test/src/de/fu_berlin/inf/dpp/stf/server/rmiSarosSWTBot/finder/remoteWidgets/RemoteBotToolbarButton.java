@@ -1,16 +1,42 @@
 package de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets;
 
-import java.rmi.Remote;
 import java.rmi.RemoteException;
 
-public interface RemoteBotToolbarButton extends Remote {
+import org.eclipse.swtbot.swt.finder.waits.Conditions;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotToolbarButton;
 
-    /**********************************************
+public class RemoteBotToolbarButton extends AbstractRmoteWidget implements
+    IRemoteBotToolbarButton {
+
+    private static transient RemoteBotToolbarButton ToolbarButtonImp;
+    private SWTBotToolbarButton toolbarButton;
+
+    /**
+     * {@link RemoteBotToolbarButton} is a singleton, but inheritance is
+     * possible.
+     */
+    public static RemoteBotToolbarButton getInstance() {
+        if (ToolbarButtonImp != null)
+            return ToolbarButtonImp;
+        ToolbarButtonImp = new RemoteBotToolbarButton();
+        return ToolbarButtonImp;
+    }
+
+    public IRemoteBotToolbarButton setWidget(SWTBotToolbarButton toolbarButton) {
+        this.toolbarButton = toolbarButton;
+        return this;
+    }
+
+    /**************************************************************
      * 
-     * finders
+     * exported functions
      * 
-     **********************************************/
-    public RemoteBotMenu contextMenu(String text) throws RemoteException;
+     **************************************************************/
+
+    public IRemoteBotMenu contextMenu(String text) throws RemoteException {
+        return stfBotMenu.setWidget(toolbarButton.contextMenu(text));
+
+    }
 
     /**********************************************
      * 
@@ -18,11 +44,18 @@ public interface RemoteBotToolbarButton extends Remote {
      * 
      **********************************************/
 
-    public abstract void click() throws RemoteException;
+    public void click() throws RemoteException {
+        toolbarButton.click();
+    }
 
-    public abstract void clickAndWait() throws RemoteException;
+    public void clickAndWait() throws RemoteException {
+        waitUntilIsEnabled();
+        click();
+    }
 
-    public abstract void setFocus() throws RemoteException;
+    public void setFocus() throws RemoteException {
+        toolbarButton.setFocus();
+    }
 
     /**********************************************
      * 
@@ -30,21 +63,33 @@ public interface RemoteBotToolbarButton extends Remote {
      * 
      **********************************************/
 
-    public abstract boolean isEnabled() throws RemoteException;
+    public boolean isEnabled() throws RemoteException {
+        return toolbarButton.isEnabled();
+    }
 
-    public abstract boolean isVisible() throws RemoteException;
+    public boolean isVisible() throws RemoteException {
+        return toolbarButton.isVisible();
+    }
 
-    public abstract boolean isActive() throws RemoteException;
+    public boolean isActive() throws RemoteException {
+        return toolbarButton.isActive();
+    }
 
-    public abstract String getText() throws RemoteException;
+    public String getText() throws RemoteException {
+        return toolbarButton.getText();
+    }
 
-    public abstract String getToolTipText() throws RemoteException;
+    public String getToolTipText() throws RemoteException {
+        return toolbarButton.getToolTipText();
+    }
 
     /**********************************************
      * 
      * waits until
      * 
      **********************************************/
-    public abstract void waitUntilIsEnabled() throws RemoteException;
+    public void waitUntilIsEnabled() throws RemoteException {
+        stfBot.waitUntil(Conditions.widgetIsEnabled(toolbarButton));
+    }
 
 }

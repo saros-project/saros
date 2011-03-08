@@ -1,129 +1,101 @@
 package de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets;
 
-import java.rmi.Remote;
 import java.rmi.RemoteException;
 
-import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
+import org.eclipse.swtbot.swt.finder.waits.Conditions;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotButton;
 
-public interface RemoteBotButton extends Remote {
+public class RemoteBotButton extends AbstractRmoteWidget implements
+    IRemoteBotButton {
+
+    private static transient RemoteBotButton self;
+
+    private SWTBotButton widget;
+
+    /**
+     * {@link RemoteBotButton} is a singleton, but inheritance is possible.
+     */
+    public static RemoteBotButton getInstance() {
+        if (self != null)
+            return self;
+        self = new RemoteBotButton();
+        return self;
+    }
+
+    public IRemoteBotButton setWidget(SWTBotButton button) {
+        this.widget = button;
+        return this;
+    }
+
+    /**************************************************************
+     * 
+     * exported functions
+     * 
+     **************************************************************/
 
     /**********************************************
      * 
      * finders
      * 
      **********************************************/
-    /**
-     * 
-     * Gets the context menu matching the text.
-     * 
-     * @param text
-     *            the text on the context menu.
-     * @return the menu that has the given text.
-     * @throws WidgetNotFoundException
-     *             if the widget is not found.
-     * 
-     * @see SWTBotButton#contextMenu(String)
-     */
-    public RemoteBotMenu contextMenu(String text) throws RemoteException;
+    public IRemoteBotMenu contextMenu(String text) throws RemoteException {
+        return stfBotMenu.setWidget(widget.contextMenu(text));
+    }
 
     /**********************************************
      * 
      * actions
      * 
      **********************************************/
+    public void click() throws RemoteException {
+        widget.click();
+    }
 
-    /**
-     * Click on the button.
-     * 
-     * @see SWTBotButton#click()
-     */
-    public void click() throws RemoteException;
+    public void clickAndWait() throws RemoteException {
+        waitUntilIsEnabled();
+        click();
+    }
 
-    /**
-     * Click the button until it is enabled
-     * 
-     * @throws RemoteException
-     */
-    public void clickAndWait() throws RemoteException;
-
-    /**
-     * Sets the focus on this control.
-     * 
-     * @see SWTBotButton#setFocus()
-     * @throws RemoteException
-     */
-    public void setFocus() throws RemoteException;
+    public void setFocus() throws RemoteException {
+        widget.setFocus();
+    }
 
     /**********************************************
      * 
      * states
      * 
      **********************************************/
+    public boolean isEnabled() throws RemoteException {
+        return widget.isEnabled();
+    }
 
-    /**
-     * Gets if the object's widget is enabled.
-     * 
-     * @Returns: true if the widget is enabled.
-     * 
-     * @see SWTBotButton#isEnabled()
-     * @throws RemoteException
-     */
-    public boolean isEnabled() throws RemoteException;
+    public boolean isVisible() throws RemoteException {
+        return widget.isVisible();
+    }
 
-    /**
-     * Checks if the widget is visible.
-     * 
-     * @Returns: true if the widget is visible, false otherwise.
-     * 
-     * @see SWTBotButton#isVisible()
-     * @throws RemoteException
-     */
-    public boolean isVisible() throws RemoteException;
+    public boolean isActive() throws RemoteException {
+        return widget.isActive();
+    }
 
-    /**
-     * @Returns: true if this widget has focus.
-     * 
-     * @see SWTBotButton#isActive()
-     * @throws RemoteException
-     */
-    public boolean isActive() throws RemoteException;
+    public String getText() throws RemoteException {
+        return widget.getText();
+    }
 
-    /**
-     * Gets the text of this object's widget.
-     * 
-     * @Returns: the text on the widget.
-     * 
-     * @see SWTBotButton#getText()
-     * @throws RemoteException
-     */
-    public String getText() throws RemoteException;
-
-    /**
-     * Gets the tooltip of this object's widget.
-     * 
-     * @Returns: the tooltip on the widget.
-     * 
-     * @see SWTBotButton#getToolTipText()
-     * @throws RemoteException
-     */
-    public String getToolTipText() throws RemoteException;
+    public String getToolTipText() throws RemoteException {
+        return widget.getText();
+    }
 
     /**********************************************
      * 
      * waits until
      * 
      **********************************************/
-    /**
-     * Wait until the button is enabled.
-     */
-    public void waitUntilIsEnabled() throws RemoteException;
+    public void waitUntilIsEnabled() throws RemoteException {
+        stfBot.waitUntil(Conditions.widgetIsEnabled(widget));
+    }
 
-    /**
-     * Wait long until the button is enabled.
-     * 
-     * @throws RemoteException
-     */
-    public void waitLongUntilIsEnabled() throws RemoteException;
+    public void waitLongUntilIsEnabled() throws RemoteException {
+        stfBot.waitLongUntil(Conditions.widgetIsEnabled(widget));
+    }
 
 }

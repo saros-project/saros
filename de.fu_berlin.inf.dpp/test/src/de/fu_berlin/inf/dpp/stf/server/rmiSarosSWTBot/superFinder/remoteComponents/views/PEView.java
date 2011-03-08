@@ -1,302 +1,294 @@
 package de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.views;
 
 import java.io.IOException;
-import java.rmi.Remote;
 import java.rmi.RemoteException;
 
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.Path;
+import org.eclipse.swtbot.swt.finder.waits.DefaultCondition;
 
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.RemoteBotEditor;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.contextMenu.ContextMenuWrapper;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.conditions.SarosConditions;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.IRemoteBotTree;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.IRemoteBotTreeItem;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.IRemoteBotView;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.contextMenu.IContextMenuWrapper;
+import de.fu_berlin.inf.dpp.vcs.VCSAdapter;
+import de.fu_berlin.inf.dpp.vcs.VCSResourceInfo;
 
-/**
- * This interface contains only APIs to select treeItems in the package explorer
- * view e.g.
- * 
- * <pre>
- * alice.pEV.selectProject(...)
- * </pre>
- * 
- * </li>
- * 
- * @author lchen
- */
-public interface PEView extends Remote {
+public class PEView extends Views implements IPEView {
+    private static transient PEView pEViewImp;
 
-    public ContextMenuWrapper tree() throws RemoteException;
-
-    public ContextMenuWrapper selectSrc(String projectName)
-        throws RemoteException;
-
-    public ContextMenuWrapper selectJavaProject(String projectName)
-        throws RemoteException;
+    private IRemoteBotView view;
+    private IRemoteBotTree tree;
 
     /**
-     * select the given project.
-     * 
-     * @param projectName
-     *            the name of the project
-     * @throws RemoteException
+     * {@link PEView} is a singleton, but inheritance is possible.
      */
-    public ContextMenuWrapper selectProject(String projectName)
-        throws RemoteException;
+    public static PEView getInstance() {
+        if (pEViewImp != null)
+            return pEViewImp;
+        pEViewImp = new PEView();
+        return pEViewImp;
+    }
 
-    /**
-     * select the given package
-     * 
-     * @param projectName
-     *            the name of the project, e.g.foo_bar
-     * @param pkg
-     *            the name of the package, e.g. my.pkg
-     * @throws RemoteException
-     */
-    public ContextMenuWrapper selectPkg(String projectName, String pkg)
-        throws RemoteException;
+    public IPEView setView(IRemoteBotView view) throws RemoteException {
+        this.view = view;
+        tree = this.view.bot().tree();
+        return this;
+    }
 
-    /**
-     * select the given class
+    /**************************************************************
      * 
-     * @param projectName
-     *            the name of the project, e.g.foo_bar
-     * @param pkg
-     *            the name of the package, e.g. my.pkg
-     * @param className
-     *            the name of the class, e.g. myClass
-     * @throws RemoteException
+     * exported functions
      * 
-     */
-    public ContextMenuWrapper selectClass(String projectName, String pkg,
-        String className) throws RemoteException;
+     **************************************************************/
 
-    /**
-     * select the given folder
+    /**********************************************
      * 
-     * @param folderNodes
-     *            node path to expand. Attempts to expand all nodes along the
-     *            path specified by the node array parameter.e.g.
-     *            {"Foo-saros","myFolder"}
-     * @throws RemoteException
-     */
-    public ContextMenuWrapper selectFolder(String... folderNodes)
-        throws RemoteException;
-
-    /**
-     * select the given file
+     * actions
      * 
-     * @param fileNodes
-     *            node path to expand. Attempts to expand all nodes along the
-     *            path specified by the node array parameter.e.g.
-     *            {"Foo-saros","myFolder", "myFile.xml"}
-     * @throws RemoteException
-     */
-    public ContextMenuWrapper selectFile(String... fileNodes)
-        throws RemoteException;
+     **********************************************/
 
-    public String getTitle() throws RemoteException;
+    public IContextMenuWrapper tree() throws RemoteException {
+        contextMenu.setTree(tree);
+        contextMenu.setTreeItem(null);
+        contextMenu.setTreeItemType(null);
+        return contextMenu;
+    }
 
-    /**
+    public IContextMenuWrapper selectSrc(String projectName)
+        throws RemoteException {
+
+        initContextMenuWrapper(
+            tree.selectTreeItemWithRegex(changeToRegex(projectName), SRC),
+            TreeItemType.JAVA_PROJECT);
+        return contextMenu;
+    }
+
+    public IContextMenuWrapper selectJavaProject(String projectName)
+        throws RemoteException {
+
+        initContextMenuWrapper(
+            tree.selectTreeItemWithRegex(changeToRegex(projectName)),
+            TreeItemType.JAVA_PROJECT);
+        return contextMenu;
+    }
+
+    public IContextMenuWrapper selectProject(String projectName)
+        throws RemoteException {
+        initContextMenuWrapper(
+            tree.selectTreeItemWithRegex(changeToRegex(projectName)),
+            TreeItemType.PROJECT);
+        return contextMenu;
+    }
+
+    public IContextMenuWrapper selectPkg(String projectName, String pkg)
+        throws RemoteException {
+        String[] nodes = { projectName, SRC, pkg };
+        initContextMenuWrapper(
+            tree.selectTreeItemWithRegex(changeToRegex(nodes)),
+            TreeItemType.PKG);
+
+        return contextMenu;
+    }
+
+    public IContextMenuWrapper selectClass(String projectName, String pkg,
+        String className) throws RemoteException {
+        String[] nodes = getClassNodes(projectName, pkg, className);
+
+        initContextMenuWrapper(
+            tree.selectTreeItemWithRegex(changeToRegex(nodes)),
+            TreeItemType.CLASS);
+
+        return contextMenu;
+    }
+
+    public IContextMenuWrapper selectFolder(String... folderNodes)
+        throws RemoteException {
+        initContextMenuWrapper(
+            tree.selectTreeItemWithRegex(changeToRegex(folderNodes)),
+            TreeItemType.FOLDER);
+
+        return contextMenu;
+    }
+
+    public IContextMenuWrapper selectFile(String... fileNodes)
+        throws RemoteException {
+        initContextMenuWrapper(
+            tree.selectTreeItemWithRegex(changeToRegex(fileNodes)),
+            TreeItemType.FILE);
+
+        return contextMenu;
+    }
+
+    /**********************************************
      * 
-     * @param prjectName
-     *            the name of the project
-     * @return <tt>true</tt>, if the given project is under SVN control
-     * @throws RemoteException
-     */
-    public boolean isProjectManagedBySVN(String prjectName)
-        throws RemoteException;
-
-    /**
+     * States
      * 
-     * @param fullPath
-     *            the full path of the local resource, e.g.
-     *            "example_project/src/org/eclipsecon/swtbot/example/MyFirstTest01.java"
-     * @return the revision id of the given resource.
-     * @throws RemoteException
-     */
-    public String getRevision(String fullPath) throws RemoteException;
+     **********************************************/
 
-    /**
-     * @param fullPath
-     *            the full path of the local resource, e.g.
-     *            "example_project/src/org/eclipsecon/swtbot/example/MyFirstTest01.java"
-     * 
-     * @return the VCS specific URL information for the given resource specified
-     *         by the passed parameter"fullPath".
-     * @throws RemoteException
-     */
+    public String getTitle() throws RemoteException {
+        return VIEW_PACKAGE_EXPLORER;
+    }
+
+    public boolean isProjectManagedBySVN(String projectName)
+        throws RemoteException {
+        IProject project = ResourcesPlugin.getWorkspace().getRoot()
+            .getProject(projectName);
+        final VCSAdapter vcs = VCSAdapter.getAdapter(project);
+        if (vcs == null)
+            return false;
+        return true;
+    }
+
+    public String getRevision(String fullPath) throws RemoteException {
+        IPath path = new Path(fullPath);
+        IResource resource = ResourcesPlugin.getWorkspace().getRoot()
+            .findMember(path);
+        if (resource == null)
+            throw new RemoteException("Resource \"" + fullPath
+                + "\" not found.");
+        final VCSAdapter vcs = VCSAdapter.getAdapter(resource.getProject());
+        if (vcs == null)
+            return null;
+        VCSResourceInfo info = vcs.getCurrentResourceInfo(resource);
+        String result = info != null ? info.revision : null;
+        return result;
+    }
+
     public String getURLOfRemoteResource(String fullPath)
-        throws RemoteException;
+        throws RemoteException {
+        IPath path = new Path(fullPath);
+        IResource resource = ResourcesPlugin.getWorkspace().getRoot()
+            .findMember(path);
+        if (resource == null)
+            throw new RemoteException("Resource not found at \"" + fullPath
+                + "\"");
+        final VCSAdapter vcs = VCSAdapter.getAdapter(resource.getProject());
+        if (vcs == null)
+            return null;
+        final VCSResourceInfo info = vcs.getResourceInfo(resource);
+        return info.url;
+    }
 
-    /**
-     * Wait until the specified folder exists
+    public String getFileContent(String... nodes) throws RemoteException,
+        IOException, CoreException {
+        IPath path = new Path(getPath(nodes));
+        log.info("Checking existence of file \"" + path + "\"");
+        final IFile file = ResourcesPlugin.getWorkspace().getRoot()
+            .getFile(path);
+
+        log.info("Checking full path: \"" + file.getFullPath().toOSString()
+            + "\"");
+        return ConvertStreamToString(file.getContents());
+    }
+
+    /**********************************************
      * 
-     * @param folderNodes
-     *            node path to expand. Attempts to expand all nodes along the
-     *            path specified by the node array parameter.e.g.
-     *            {"Foo-saros","parentFolder" ,"myFolder"}
-     */
+     * wait until
+     * 
+     **********************************************/
     public void waitUntilFolderExists(String... folderNodes)
-        throws RemoteException;
+        throws RemoteException {
+        String fullPath = getPath(folderNodes);
+        bot().waitUntil(SarosConditions.isResourceExist(fullPath));
+    }
 
-    /**
-     * wait until the given package exists
-     * 
-     * @param projectName
-     *            name of the java project, e.g. Foo-Saros.
-     * @param pkg
-     *            name of the package, e.g. my.pkg.
-     * @throws RemoteException
-     */
     public void waitUntilPkgExists(String projectName, String pkg)
-        throws RemoteException;
+        throws RemoteException {
+        if (pkg.matches(PKG_REGEX)) {
+            bot().waitUntil(
+                SarosConditions.isResourceExist(getPkgPath(projectName, pkg)));
+        } else {
+            throw new RuntimeException(
+                "The passed parameter \"pkg\" isn't valid, the package name should corresponds to the pattern [\\w\\.]*\\w+ e.g. PKG1.PKG2.PKG3");
+        }
+    }
 
-    /**
-     * Wait until the given package not exists. This method would be used, if
-     * you want to check if a shared package exists or not which is deleted by
-     * another session_participant.
-     * 
-     * @param projectName
-     *            name of the java project, e.g. Foo-Saros.
-     * @param pkg
-     *            name of the package, e.g. my.pkg.
-     * @throws RemoteException
-     */
     public void waitUntilPkgNotExists(String projectName, String pkg)
-        throws RemoteException;
+        throws RemoteException {
+        if (pkg.matches(PKG_REGEX)) {
+            bot().waitUntil(
+                SarosConditions
+                    .isResourceNotExist(getPkgPath(projectName, pkg)));
+        } else {
+            throw new RuntimeException(
+                "The passed parameter \"pkg\" isn't valid, the package name should corresponds to the pattern [\\w\\.]*\\w+ e.g. PKG1.PKG2.PKG3");
+        }
+    }
 
-    /**
-     * 
-     * Wait until the specified class exists. This method would be used, if you
-     * want to check if a shared class exists or not which is created by another
-     * session_participant.
-     * 
-     * @param projectName
-     *            name of the project, e.g. Foo_Saros.
-     * @param pkg
-     *            name of the package, e.g. my.pkg.
-     * @param className
-     *            name of the class, e.g. myClass.
-     * @throws RemoteException
-     */
+    public void waitUntilFileExists(String... fileNodes) throws RemoteException {
+        String fullPath = getPath(fileNodes);
+        bot().waitUntil(SarosConditions.isResourceExist(fullPath));
+    }
+
     public void waitUntilClassExists(String projectName, String pkg,
-        String className) throws RemoteException;
+        String className) throws RemoteException {
+        String path = getClassPath(projectName, pkg, className);
+        bot().waitUntil(SarosConditions.isResourceExist(path));
+    }
 
-    /**
-     * Wait until the specified class not exists.This method would be used, if
-     * you want to check if a shared class exists or not which is deleted by
-     * another session_participant.
-     * 
-     * @param projectName
-     *            name of the project, e.g. Foo_Saros.
-     * @param pkg
-     *            name of the package, e.g. my.pkg.
-     * @param className
-     *            name of the class, e.g. myClass.
-     * @throws RemoteException
-     */
     public void waitUntilClassNotExists(String projectName, String pkg,
-        String className) throws RemoteException;
+        String className) throws RemoteException {
+        String path = getClassPath(projectName, pkg, className);
+        bot().waitUntil(SarosConditions.isResourceNotExist(path));
+    }
 
-    /**
-     * Wait until the file exists.
-     * 
-     * @param fileNodes
-     *            node path to expand. Attempts to expand all nodes along the
-     *            path specified by the node array parameter.e.g. {"Foo-saros",
-     *            "myFolder", "myFile.xml"}
-     */
-    public void waitUntilFileExists(String... fileNodes) throws RemoteException;
-
-    /**
-     * waits until the window with the title "Saros running VCS operation" is
-     * closed
-     * 
-     * @throws RemoteException
-     */
     public void waitUntilWindowSarosRunningVCSOperationClosed()
-        throws RemoteException;
+        throws RemoteException {
+        bot().waitUntilShellIsClosed(SHELL_SAROS_RUNNING_VCS_OPERATION);
+    }
 
-    /**
-     * waits until the given project is in SVN control
-     * 
-     * @param projectName
-     *            the name of the project
-     * @throws RemoteException
-     */
     public void waitUntilProjectInSVN(String projectName)
-        throws RemoteException;
+        throws RemoteException {
+        bot().waitUntil(SarosConditions.isInSVN(projectName));
+    }
 
-    /**
-     * waits until the given project is not under SVN control
-     * 
-     * @param projectName
-     *            the name of the project
-     * @throws RemoteException
-     */
     public void waitUntilProjectNotInSVN(String projectName)
-        throws RemoteException;
+        throws RemoteException {
+        bot().waitUntil(SarosConditions.isNotInSVN(projectName));
+    }
 
-    /**
-     * 
-     * @param fullPath
-     *            the full path of the local resource, e.g.
-     *            "example_project/src/org/eclipsecon/swtbot/example/MyFirstTest01.java"
-     * @param revisionID
-     *            the expected revision.
-     * @throws RemoteException
-     */
-    public void waitUntilRevisionIsSame(String fullPath, String revisionID)
-        throws RemoteException;
+    public void waitUntilRevisionIsSame(String fullPath, String revision)
+        throws RemoteException {
+        bot().waitUntil(SarosConditions.isRevisionSame(fullPath, revision));
+    }
 
-    /**
-     * 
-     * @param fullPath
-     *            the full path of the local resource, e.g.
-     *            "example_project/src/org/eclipsecon/swtbot/example/MyFirstTest01.java"
-     * @param url
-     *            the expected URL of the remote resource, e.g.
-     *            "http://myhost.com/svn/trunk/.../MyFirstTest01.java".
-     * @throws RemoteException
-     */
     public void waitUntilUrlIsSame(String fullPath, String url)
-        throws RemoteException;
+        throws RemoteException {
+        bot().waitUntil(SarosConditions.isUrlSame(fullPath, url));
+    }
 
-    /**
-     * 
-     * @param fileNodes
-     *            node path to expand. Attempts to expand all nodes along the
-     *            path specified by the node array parameter.e.g.
-     *            {"Foo-saros","parentFolder" ,"myFolder"}.
-     * @return the saved content of the given file. This method is different
-     *         from {@link RemoteBotEditor#getText()} , which return the text of
-     *         editor, which may be not saved.
-     * @throws RemoteException
-     * @throws IOException
-     * @throws CoreException
-     */
-    public String getFileContent(String... fileNodes) throws RemoteException,
-        IOException, CoreException;
+    public void waitUntilFileContentSame(final String otherClassContent,
+        final String... fileNodes) throws RemoteException {
 
-    /**
-     * Sometimes you want to know, if a peer(e.g. Bob) can see the changes of
-     * file, which is modified by another peer (e.g. Alice). Because of data
-     * transfer delay Bob need to wait a little to see the changes . So it will
-     * be a good idea that you give bob some time before you compare the two
-     * files from Alice and Bob.
+        bot().waitUntil(new DefaultCondition() {
+            public boolean test() throws Exception {
+                return getFileContent(fileNodes).equals(otherClassContent);
+            }
+
+            public String getFailureMessage() {
+                return "The both contents are not" + " same.";
+            }
+        });
+    }
+
+    /**********************************************
      * 
-     * <p>
-     * <b>Note:</b> the mothod is different from
-     * {@link RemoteBotEditor#waitUntilIsTextSame(String)}, which compare only the
-     * text of editor which may be dirty.
-     * </p>
+     * innner function
      * 
-     * @param otherFileContent
-     *            the file content of another peer, with which you want to
-     *            compare your file content.
-     * @param fileNodes
-     *            node path to expand. Attempts to expand all nodes along the
-     *            path specified by the node array parameter.e.g.
-     *            {"Foo-saros","parentFolder" ,"myFolder"}.
-     */
-    public void waitUntilFileContentSame(String otherFileContent,
-        String... fileNodes) throws RemoteException;
+     **********************************************/
+
+    private void initContextMenuWrapper(IRemoteBotTreeItem treeItem,
+        TreeItemType type) {
+        contextMenu.setTree(tree);
+        contextMenu.setTreeItem(treeItem);
+        contextMenu.setTreeItemType(type);
+    }
+
 }

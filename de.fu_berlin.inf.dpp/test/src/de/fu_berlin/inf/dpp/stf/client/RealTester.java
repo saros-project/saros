@@ -7,21 +7,21 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.RemoteBot;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.RemoteWorkbenchBot;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.SuperRemoteBot;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.IRemoteBot;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.IRemoteWorkbenchBot;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.ISuperBot;
 
 /**
  * Tester simulate a real saros-tester. He/She can takes use of all RMI
- * interfaces to help testwriters with Bot {@link RemoteBot} and SuperBot
- * {@link SuperRemoteBot}to write their STF tests nicely. STF is short for Saros Test
+ * interfaces to help testwriters with Bot {@link IRemoteBot} and SuperBot
+ * {@link ISuperBot}to write their STF tests nicely. STF is short for Saros Test
  * Framework.
  */
 public class RealTester extends AbstractTester {
 
-    private RemoteWorkbenchBot bot;
+    private IRemoteWorkbenchBot bot;
 
-    private SuperRemoteBot superBot;
+    private ISuperBot superBot;
 
     private JID jid;
     private String password;
@@ -42,9 +42,9 @@ public class RealTester extends AbstractTester {
         NotBoundException, AccessException {
         Registry registry = LocateRegistry.getRegistry(host, port);
         try {
-            bot = (RemoteWorkbenchBot) registry.lookup("workbenchBot");
+            bot = (IRemoteWorkbenchBot) registry.lookup("workbenchBot");
 
-            superBot = (SuperRemoteBot) registry.lookup("superBot");
+            superBot = (ISuperBot) registry.lookup("superBot");
 
         } catch (java.rmi.ConnectException e) {
             throw new RuntimeException("Could not connect to RMI of bot " + jid
@@ -74,12 +74,12 @@ public class RealTester extends AbstractTester {
     }
 
     @Override
-    public RemoteWorkbenchBot bot() {
+    public IRemoteWorkbenchBot bot() {
         return bot;
     }
 
     @Override
-    public SuperRemoteBot superBot() throws RemoteException {
+    public ISuperBot superBot() throws RemoteException {
         superBot.setJID(jid);
         return superBot;
     }

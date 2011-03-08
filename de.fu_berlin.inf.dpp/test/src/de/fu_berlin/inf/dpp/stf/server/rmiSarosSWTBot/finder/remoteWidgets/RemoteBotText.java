@@ -1,9 +1,35 @@
 package de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets;
 
-import java.rmi.Remote;
 import java.rmi.RemoteException;
 
-public interface RemoteBotText extends Remote {
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotText;
+
+public class RemoteBotText extends AbstractRmoteWidget implements IRemoteBotText {
+
+    private static transient RemoteBotText self;
+
+    private SWTBotText widget;
+
+    /**
+     * {@link RemoteBotText} is a singleton, but inheritance is possible.
+     */
+    public static RemoteBotText getInstance() {
+        if (self != null)
+            return self;
+        self = new RemoteBotText();
+        return self;
+    }
+
+    public IRemoteBotText setWidget(SWTBotText text) {
+        this.widget = text;
+        return this;
+    }
+
+    /**************************************************************
+     * 
+     * exported functions
+     * 
+     **************************************************************/
 
     /**********************************************
      * 
@@ -11,33 +37,57 @@ public interface RemoteBotText extends Remote {
      * 
      **********************************************/
 
-    public RemoteBotMenu contextMenu(String text) throws RemoteException;
+    public IRemoteBotMenu contextMenu(String text) throws RemoteException {
+        return stfBotMenu.setWidget(widget.contextMenu(text));
+
+    }
 
     /**********************************************
      * 
      * actions
      * 
      **********************************************/
-    public RemoteBotText selectAll() throws RemoteException;
 
-    public void setFocus() throws RemoteException;
+    public IRemoteBotText selectAll() throws RemoteException {
+        return setWidget(widget.selectAll());
+    }
 
-    public RemoteBotText setText(String text) throws RemoteException;
+    public void setFocus() throws RemoteException {
+        widget.setFocus();
+    }
 
-    public RemoteBotText typeText(String text) throws RemoteException;
+    public IRemoteBotText setText(String text) throws RemoteException {
+        return setWidget(widget.setText(text));
+    }
+
+    public IRemoteBotText typeText(String text) throws RemoteException {
+        return setWidget(widget.typeText(text));
+    }
 
     /**********************************************
      * 
      * states
      * 
      **********************************************/
-    public String getText() throws RemoteException;
 
-    public boolean isEnabled() throws RemoteException;
+    public String getText() throws RemoteException {
+        return widget.getText();
+    }
 
-    public boolean isVisible() throws RemoteException;
+    public boolean isEnabled() throws RemoteException {
+        return widget.isEnabled();
+    }
 
-    public boolean isActive() throws RemoteException;
+    public boolean isVisible() throws RemoteException {
+        return widget.isVisible();
+    }
 
-    public String getToolTipText() throws RemoteException;
+    public boolean isActive() throws RemoteException {
+        return widget.isActive();
+    }
+
+    public String getToolTipText() throws RemoteException {
+        return widget.getText();
+    }
+
 }

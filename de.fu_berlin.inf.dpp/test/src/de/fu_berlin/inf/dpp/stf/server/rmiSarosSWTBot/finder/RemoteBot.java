@@ -1,153 +1,183 @@
 package de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder;
 
-import java.rmi.Remote;
 import java.rmi.RemoteException;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.swtbot.swt.finder.SWTBot;
+import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
+import org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences;
+import org.eclipse.swtbot.swt.finder.waits.DefaultCondition;
 import org.eclipse.swtbot.swt.finder.waits.ICondition;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
+import org.osgi.framework.Bundle;
 
+import de.fu_berlin.inf.dpp.stf.STF;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.conditions.SarosSWTBotPreferences;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.IRemoteBotButton;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.RemoteBotButton;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.IRemoteBotCCombo;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.RemoteBotCCombo;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.IRemoteBotCheckBox;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.RemoteBotCheckBox;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.IRemoteBotCombo;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.RemoteBotCombo;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.IRemoteBotLabel;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.RemoteBotLabel;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.IRemoteBotList;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.RemoteBotList;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.IRemoteBotMenu;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.RemoteBotMenu;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.IRemoteBotRadio;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.RemoteBotRadio;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.IRemoteBotShell;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.RemoteBotShell;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.IRemoteBotStyledText;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.RemoteBotStyledText;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.IRemoteBotTable;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.RemoteBotTable;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.IRemoteBotText;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.RemoteBotText;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.IRemoteBotToggleButton;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.RemoteBotToggleButton;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.IRemoteBotToolbarButton;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.RemoteBotToolbarButton;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.IRemoteBotTree;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.RemoteBotTree;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.views.sarosViews.ChatView;
+import de.fu_berlin.inf.dpp.stf.server.sarosSWTBot.SarosSWTBot;
 
-public interface RemoteBot extends Remote {
+public class RemoteBot extends STF implements IRemoteBot {
+
+    private static transient RemoteBot self;
+
+    private static SWTBot swtBot;
+
+    private static RemoteBotShell shell;
+    private static RemoteBotButton button;
+    private static RemoteBotTree tree;
+    private static RemoteBotLabel label;
+    private static RemoteBotStyledText styledText;
+    private static RemoteBotCombo comboBox;
+    private static RemoteBotCCombo ccomboBox;
+    private static RemoteBotToolbarButton toolbarButton;
+    private static RemoteBotText text;
+    private static RemoteBotTable table;
+    private static RemoteBotMenu menu;
+    private static RemoteBotList list;
+    private static RemoteBotCheckBox checkbox;
+    private static RemoteBotRadio radio;
+    private static RemoteBotToggleButton toggleButton;
+
+    /**
+     * {@link ChatView} is a singleton, but inheritance is possible.
+     */
+    public static RemoteBot getInstance() {
+        if (self != null)
+            return self;
+        self = new RemoteBot();
+        swtBot = SarosSWTBot.getInstance();
+
+        shell = RemoteBotShell.getInstance();
+        button = RemoteBotButton.getInstance();
+        tree = RemoteBotTree.getInstance();
+        label = RemoteBotLabel.getInstance();
+        styledText = RemoteBotStyledText.getInstance();
+        comboBox = RemoteBotCombo.getInstance();
+        ccomboBox = RemoteBotCCombo.getInstance();
+        toolbarButton = RemoteBotToolbarButton.getInstance();
+        text = RemoteBotText.getInstance();
+        table = RemoteBotTable.getInstance();
+        menu = RemoteBotMenu.getInstance();
+        list = RemoteBotList.getInstance();
+        checkbox = RemoteBotCheckBox.getInstance();
+        radio = RemoteBotRadio.getInstance();
+
+        return self;
+    }
+
+    public void setBot(SWTBot bot) {
+        swtBot = bot;
+    }
+
+    /**************************************************************
+     * 
+     * exported functions
+     * 
+     **************************************************************/
 
     /**********************************************
      * 
      * Widget tree
      * 
      **********************************************/
-    /**
-     * @see SWTBot#tree()
-     */
-    public RemoteBotTree tree() throws RemoteException;
 
-    /**
-     * @param label
-     *            the label on the widget.
-     * @return a {@link RemoteBotTree} with the specified <code>label</code>.
-     */
-    public RemoteBotTree treeWithLabel(String label) throws RemoteException;
+    public IRemoteBotTree tree() throws RemoteException {
+        tree.setWidget(swtBot.tree());
+        return tree;
+    }
 
-    /**
-     * @param label
-     *            the label on the widget.
-     * @param index
-     *            the index of the widget.
-     * @return a {@link RemoteBotTree} with the specified <code>label</code>.
-     */
+    public IRemoteBotTree treeWithLabel(String label) throws RemoteException {
+        tree.setWidget(swtBot.treeWithLabel(label));
+        return tree;
+    }
 
-    public RemoteBotTree treeWithLabel(String label, int index)
-        throws RemoteException;
+    public IRemoteBotTree treeWithLabel(String label, int index)
+        throws RemoteException {
+        tree.setWidget(swtBot.treeWithLabel(label, index));
+        return tree;
+    }
 
-    /**
-     * @param key
-     *            the key set on the widget.
-     * @param value
-     *            the value for the key.
-     * @return a {@link RemoteBotTree} with the specified <code>key/value</code>.
-     */
-    public RemoteBotTree treeWithId(String key, String value)
-        throws RemoteException;
+    public IRemoteBotTree treeWithId(String key, String value)
+        throws RemoteException {
+        tree.setWidget(swtBot.treeWithId(key, value));
+        return tree;
+    }
 
-    /**
-     * @param key
-     *            the key set on the widget.
-     * @param value
-     *            the value for the key.
-     * @param index
-     *            the index of the widget.
-     * @return a {@link RemoteBotTree} with the specified <code>key/value</code>.
-     */
+    public IRemoteBotTree treeWithId(String key, String value, int index)
+        throws RemoteException {
+        tree.setWidget(swtBot.treeWithId(key, value, index));
+        return tree;
+    }
 
-    public RemoteBotTree treeWithId(String key, String value, int index)
-        throws RemoteException;
+    public IRemoteBotTree treeWithId(String value) throws RemoteException {
+        tree.setWidget(swtBot.treeWithId(value));
+        return tree;
+    }
 
-    /**
-     * @param value
-     *            the value for the key
-     *            {@link org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences#DEFAULT_KEY}
-     *            .
-     * @return a {@link RemoteBotTree} with the specified <code>value</code>.
-     */
-    public RemoteBotTree treeWithId(String value) throws RemoteException;
+    public IRemoteBotTree treeWithId(String value, int index)
+        throws RemoteException {
+        tree.setWidget(swtBot.treeWithId(value, index));
+        return tree;
+    }
 
-    /**
-     * @param value
-     *            the value for the key
-     *            {@link org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences#DEFAULT_KEY}
-     *            .
-     * @param index
-     *            the index of the widget.
-     * @return a {@link RemoteBotTree} with the specified <code>value</code>.
-     */
+    public IRemoteBotTree treeInGroup(String inGroup) throws RemoteException {
+        tree.setWidget(swtBot.treeInGroup(inGroup));
+        return tree;
+    }
 
-    public RemoteBotTree treeWithId(String value, int index)
-        throws RemoteException;
+    public IRemoteBotTree treeInGroup(String inGroup, int index)
+        throws RemoteException {
+        tree.setWidget(swtBot.treeInGroup(inGroup, index));
+        return tree;
+    }
 
-    /**
-     * @param inGroup
-     *            the inGroup on the widget.
-     * @return a {@link RemoteBotTree} with the specified <code>inGroup</code>.
-     */
-    public RemoteBotTree treeInGroup(String inGroup) throws RemoteException;
+    public IRemoteBotTree tree(int index) throws RemoteException {
+        tree.setWidget(swtBot.tree(index));
+        return tree;
+    }
 
-    /**
-     * @param inGroup
-     *            the inGroup on the widget.
-     * @param index
-     *            the index of the widget.
-     * @return a {@link RemoteBotTree} with the specified <code>inGroup</code>.
-     */
+    public IRemoteBotTree treeWithLabelInGroup(String label, String inGroup)
+        throws RemoteException {
+        tree.setWidget(swtBot.treeWithLabelInGroup(label, inGroup));
+        return tree;
+    }
 
-    public RemoteBotTree treeInGroup(String inGroup, int index)
-        throws RemoteException;
-
-    /**
-     * @param index
-     *            the index of the widget.
-     * @return a {@link RemoteBotTree} with the specified <code>none</code>.
-     */
-
-    public RemoteBotTree tree(int index) throws RemoteException;
-
-    /**
-     * @param label
-     *            the label on the widget.
-     * @param inGroup
-     *            the inGroup on the widget.
-     * @return a {@link RemoteBotTree} with the specified <code>label</code> with
-     *         the specified <code>inGroup</code>.
-     */
-    public RemoteBotTree treeWithLabelInGroup(String label, String inGroup)
-        throws RemoteException;
-
-    /**
-     * @param label
-     *            the label on the widget.
-     * @param inGroup
-     *            the inGroup on the widget.
-     * @param index
-     *            the index of the widget.
-     * @return a {@link RemoteBotTree} with the specified <code>label</code> with
-     *         the specified <code>inGroup</code>.
-     */
-
-    public RemoteBotTree treeWithLabelInGroup(String label, String inGroup,
-        int index) throws RemoteException;
+    public IRemoteBotTree treeWithLabelInGroup(String label, String inGroup,
+        int index) throws RemoteException {
+        tree.setWidget(swtBot.treeWithLabelInGroup(label, inGroup, index));
+        return tree;
+    }
 
     /**********************************************
      * 
@@ -155,2111 +185,1481 @@ public interface RemoteBot extends Remote {
      * 
      **********************************************/
 
-    /**
-     * 
-     * @see SWTBot#shell(String)
-     * @throws RemoteException
-     */
-    public RemoteBotShell shell(String title) throws RemoteException;
+    public IRemoteBotShell shell(String title) throws RemoteException {
+        return shell.setWidget(swtBot.shell(title));
 
-    /**
-     * 
-     * @return list of titles of all opened shells
-     * @throws RemoteException
-     */
-    public List<String> getTitlesOfOpenedShells() throws RemoteException;
+    }
 
-    /**
-     * 
-     * @param title
-     *            the title of the shell
-     * @return<tt>true</tt>, if the given shell is open.
-     * @throws RemoteException
-     */
-    public boolean isShellOpen(String title) throws RemoteException;
+    public List<String> getTitlesOfOpenedShells() throws RemoteException {
+        ArrayList<String> list = new ArrayList<String>();
+        for (SWTBotShell shell : swtBot.shells())
+            list.add(shell.getText());
+        return list;
+    }
 
-    /**
-     * waits until the given Shell is closed.
-     * 
-     * @param title
-     *            the title of the shell.
-     * @throws RemoteException
-     *             ;;
-     */
+    public boolean isShellOpen(String title) throws RemoteException {
+        // try {
+        // swtBot.shell(title);
+        // return true;
+        // } catch (WidgetNotFoundException e) {
+        // return false;
+        // }
+        return getTitlesOfOpenedShells().contains(title);
+    }
+
     public void waitUntilShellIsClosed(final String title)
-        throws RemoteException;
+        throws RemoteException {
+        swtBot.waitUntil(new DefaultCondition() {
+            public boolean test() throws Exception {
+                return !isShellOpen(title);
+            }
 
-    /**
-     * waits until the given Shell is open.
-     * 
-     * @param title
-     *            the title of the shell.
-     * @throws RemoteException
-     *             ;;
-     */
-    public void waitUntilShellIsOpen(final String title) throws RemoteException;
+            public String getFailureMessage() {
+                return null;
+            }
+        });
+        swtBot.sleep(10);
+    }
+
+    public void waitUntilShellIsOpen(final String title) throws RemoteException {
+        swtBot.waitUntil(new DefaultCondition() {
+            public boolean test() throws Exception {
+                return isShellOpen(title);
+            }
+
+            public String getFailureMessage() {
+                return null;
+            }
+        });
+    }
 
     public void waitLongUntilShellIsOpen(final String title)
-        throws RemoteException;
+        throws RemoteException {
+        waitLongUntil(new DefaultCondition() {
+            public boolean test() throws Exception {
+                return isShellOpen(title);
+            }
+
+            public String getFailureMessage() {
+                return null;
+            }
+        });
+    }
+
+    public IRemoteBotShell activeShell() throws RemoteException {
+        return shell.setWidget(swtBot.activeShell());
+
+    }
+
+    public String getTextOfActiveShell() throws RemoteException {
+        final SWTBotShell activeShell = swtBot.activeShell();
+        return activeShell == null ? null : activeShell.getText();
+    }
 
     /**********************************************
      * 
      * Widget button
      * 
      **********************************************/
-    /**
-     * @see SWTBot#buttonWithLabel(String)
-     */
-    public RemoteBotButton buttonWithLabel(String label) throws RemoteException;
 
-    /**
-     * @see SWTBot#buttonWithLabelInGroup(String, String, int)
-     */
-    public RemoteBotButton buttonWithLabel(String label, int index)
-        throws RemoteException;
+    public IRemoteBotButton buttonWithLabel(String label) throws RemoteException {
+        button.setWidget(swtBot.buttonWithLabel(label, 0));
+        return button;
+    }
 
-    /**
-     * @see SWTBot#button(String)
-     */
-    public RemoteBotButton button(String mnemonicText) throws RemoteException;
+    public IRemoteBotButton buttonWithLabel(String label, int index)
+        throws RemoteException {
+        button.setWidget(swtBot.buttonWithLabel(label, index));
+        return button;
+    }
 
-    /**
-     * @see SWTBot#button(String, int)
-     */
-    public RemoteBotButton button(String mnemonicText, int index)
-        throws RemoteException;
+    public IRemoteBotButton button(String mnemonicText) throws RemoteException {
+        button.setWidget(swtBot.button(mnemonicText, 0));
+        return button;
+    }
 
-    /**
-     * @see SWTBot#buttonWithTooltip(String)
-     */
-    public RemoteBotButton buttonWithTooltip(String tooltip)
-        throws RemoteException;
+    public IRemoteBotButton button(String mnemonicText, int index)
+        throws RemoteException {
+        button.setWidget(swtBot.button(mnemonicText, index));
+        return button;
+    }
 
-    public RemoteBotButton buttonWithTooltip(String tooltip, int index)
-        throws RemoteException;
+    public IRemoteBotButton buttonWithTooltip(String tooltip)
+        throws RemoteException {
+        button.setWidget(swtBot.buttonWithTooltip(tooltip, 0));
+        return button;
+    }
 
-    /**
-     * @see SWTBot#buttonWithId(String, String)
-     */
-    public RemoteBotButton buttonWithId(String key, String value)
-        throws RemoteException;
+    public IRemoteBotButton buttonWithTooltip(String tooltip, int index)
+        throws RemoteException {
+        button.setWidget(swtBot.buttonWithTooltip(tooltip, index));
+        return button;
+    }
 
-    /**
-     * @see SWTBot#buttonWithId(String, String, int)
-     */
-    public RemoteBotButton buttonWithId(String key, String value, int index)
-        throws RemoteException;
+    public IRemoteBotButton buttonWithId(String key, String value)
+        throws RemoteException {
+        button.setWidget(swtBot.buttonWithId(key, value));
+        return button;
+    }
 
-    /**
-     * @see SWTBot#buttonWithId(String)
-     */
-    public RemoteBotButton buttonWithId(String value) throws RemoteException;
+    public IRemoteBotButton buttonWithId(String key, String value, int index)
+        throws RemoteException {
+        button.setWidget(swtBot.buttonWithId(key, value, index));
+        return button;
+    }
 
-    /**
-     * @see SWTBot#buttonWithId(String,int)
-     */
-    public RemoteBotButton buttonWithId(String value, int index)
-        throws RemoteException;
+    public IRemoteBotButton buttonWithId(String value) throws RemoteException {
+        button.setWidget(swtBot.buttonWithId(value));
+        return button;
+    }
 
-    /**
-     * @see SWTBot#buttonInGroup(String)
-     */
-    public RemoteBotButton buttonInGroup(String inGroup) throws RemoteException;
+    public IRemoteBotButton buttonWithId(String value, int index)
+        throws RemoteException {
+        button.setWidget(swtBot.buttonWithId(value, index));
+        return button;
+    }
 
-    /**
-     * @see SWTBot#buttonInGroup(String,int)
-     */
-    public RemoteBotButton buttonInGroup(String inGroup, int index)
-        throws RemoteException;
+    public IRemoteBotButton buttonInGroup(String inGroup) throws RemoteException {
+        button.setWidget(swtBot.buttonInGroup(inGroup));
+        return button;
+    }
 
-    /**
-     * @see SWTBot#button()
-     */
-    public RemoteBotButton button() throws RemoteException;
+    public IRemoteBotButton buttonInGroup(String inGroup, int index)
+        throws RemoteException {
+        button.setWidget(swtBot.buttonInGroup(inGroup, index));
+        return button;
+    }
 
-    /**
-     * @see SWTBot#button(int)
-     */
-    public RemoteBotButton button(int index) throws RemoteException;
+    public IRemoteBotButton button() throws RemoteException {
+        button.setWidget(swtBot.button());
+        return button;
+    }
 
-    /**
-     * @see SWTBot#buttonWithLabelInGroup(String, String)
-     */
-    public RemoteBotButton buttonWithLabelInGroup(String label, String inGroup)
-        throws RemoteException;
+    public IRemoteBotButton button(int index) throws RemoteException {
+        button.setWidget(swtBot.button(index));
+        return button;
+    }
 
-    /**
-     * @see SWTBot#buttonWithLabelInGroup(String, String,int)
-     */
-    public RemoteBotButton buttonWithLabelInGroup(String label, String inGroup,
-        int index) throws RemoteException;
+    public IRemoteBotButton buttonWithLabelInGroup(String label, String inGroup)
+        throws RemoteException {
+        button.setWidget(swtBot.buttonWithLabelInGroup(label, inGroup));
+        return button;
+    }
 
-    /**
-     * @see SWTBot#buttonInGroup(String, String)
-     */
-    public RemoteBotButton buttonInGroup(String mnemonicText, String inGroup)
-        throws RemoteException;
+    public IRemoteBotButton buttonWithLabelInGroup(String label, String inGroup,
+        int index) throws RemoteException {
+        button.setWidget(swtBot.buttonWithLabelInGroup(label, inGroup, index));
+        return button;
+    }
 
-    /**
-     * @see SWTBot#buttonInGroup(String, String, int) .
-     */
-    public RemoteBotButton buttonInGroup(String mnemonicText, String inGroup,
-        int index) throws RemoteException;
+    public IRemoteBotButton buttonInGroup(String mnemonicText, String inGroup)
+        throws RemoteException {
+        button.setWidget(swtBot.buttonInGroup(mnemonicText, inGroup));
+        return button;
+    }
 
-    /**
-     * @see SWTBot#buttonWithTooltipInGroup(String, String)
-     */
-    public RemoteBotButton buttonWithTooltipInGroup(String tooltip, String inGroup)
-        throws RemoteException;
+    public IRemoteBotButton buttonInGroup(String mnemonicText, String inGroup,
+        int index) throws RemoteException {
+        button.setWidget(swtBot.buttonInGroup(mnemonicText, inGroup, index));
+        return button;
+    }
 
-    /**
-     * @see SWTBot#buttonWithTooltipInGroup(String, String, int)
-     */
-    public RemoteBotButton buttonWithTooltipInGroup(String tooltip,
-        String inGroup, int index) throws RemoteException;
+    public IRemoteBotButton buttonWithTooltipInGroup(String tooltip, String inGroup)
+        throws RemoteException {
+        button.setWidget(swtBot.buttonWithTooltipInGroup(tooltip, inGroup));
+        return button;
+    }
+
+    public IRemoteBotButton buttonWithTooltipInGroup(String tooltip,
+        String inGroup, int index) throws RemoteException {
+        button.setWidget(swtBot.buttonWithTooltipInGroup(tooltip, inGroup,
+            index));
+        return button;
+    }
 
     /**********************************************
      * 
      * Widget label
      * 
      **********************************************/
+    public IRemoteBotLabel label() throws RemoteException {
+        label.setWidget(swtBot.label());
+        return label;
+    }
 
-    public RemoteBotLabel label() throws RemoteException;
+    public IRemoteBotLabel label(String mnemonicText) throws RemoteException {
+        label.setWidget(swtBot.label(mnemonicText));
+        return label;
 
-    /**
-     * @param mnemonicText
-     *            the mnemonicText on the widget.
-     * @return a {@link RemoteBotLabel} with the specified
-     *         <code>mnemonicText</code>.
-     */
-    public RemoteBotLabel label(String mnemonicText) throws RemoteException;
+    }
 
-    /**
-     * @param mnemonicText
-     *            the mnemonicText on the widget.
-     * @param index
-     *            the index of the widget.
-     * @return a {@link RemoteBotLabel} with the specified
-     *         <code>mnemonicText</code>.
-     */
+    public IRemoteBotLabel label(String mnemonicText, int index)
+        throws RemoteException {
+        label.setWidget(swtBot.label(mnemonicText, index));
+        return label;
 
-    public RemoteBotLabel label(String mnemonicText, int index)
-        throws RemoteException;
+    }
 
-    /**
-     * @param key
-     *            the key set on the widget.
-     * @param value
-     *            the value for the key.
-     * @return a {@link RemoteBotLabel} with the specified <code>key/value</code>.
-     */
-    public RemoteBotLabel labelWithId(String key, String value)
-        throws RemoteException;
+    public IRemoteBotLabel labelWithId(String key, String value)
+        throws RemoteException {
+        label.setWidget(swtBot.labelWithId(key, value));
+        return label;
 
-    /**
-     * @param key
-     *            the key set on the widget.
-     * @param value
-     *            the value for the key.
-     * @param index
-     *            the index of the widget.
-     * @return a {@link RemoteBotLabel} with the specified <code>key/value</code>.
-     */
+    }
 
-    public RemoteBotLabel labelWithId(String key, String value, int index)
-        throws RemoteException;
+    public IRemoteBotLabel labelWithId(String key, String value, int index)
+        throws RemoteException {
+        label.setWidget(swtBot.labelWithId(key, value, index));
+        return label;
 
-    /**
-     * @param value
-     *            the value for the key
-     *            {@link org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences#DEFAULT_KEY}
-     *            .
-     * @return a {@link RemoteBotLabel} with the specified <code>value</code>.
-     */
-    public RemoteBotLabel labelWithId(String value) throws RemoteException;
+    }
 
-    /**
-     * @param value
-     *            the value for the key
-     *            {@link org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences#DEFAULT_KEY}
-     *            .
-     * @param index
-     *            the index of the widget.
-     * @return a {@link RemoteBotLabel} with the specified <code>value</code>.
-     */
+    public IRemoteBotLabel labelWithId(String value) throws RemoteException {
+        label.setWidget(swtBot.labelWithId(value));
+        return label;
 
-    public RemoteBotLabel labelWithId(String value, int index)
-        throws RemoteException;
+    }
 
-    /**
-     * @param inGroup
-     *            the inGroup on the widget.
-     * @return a {@link RemoteBotLabel} with the specified <code>inGroup</code>.
-     */
-    public RemoteBotLabel labelInGroup(String inGroup) throws RemoteException;
+    public IRemoteBotLabel labelWithId(String value, int index)
+        throws RemoteException {
+        label.setWidget(swtBot.labelWithId(value, index));
+        return label;
 
-    /**
-     * @param inGroup
-     *            the inGroup on the widget.
-     * @param index
-     *            the index of the widget.
-     * @return a {@link RemoteBotLabel} with the specified <code>inGroup</code>.
-     */
+    }
 
-    public RemoteBotLabel labelInGroup(String inGroup, int index)
-        throws RemoteException;
+    public IRemoteBotLabel labelInGroup(String inGroup) throws RemoteException {
+        label.setWidget(swtBot.labelInGroup(inGroup));
+        return label;
 
-    /**
-     * @param index
-     *            the index of the widget.
-     * @return a {@link RemoteBotLabel} with the specified <code>none</code>.
-     */
+    }
 
-    public RemoteBotLabel label(int index) throws RemoteException;
+    public IRemoteBotLabel labelInGroup(String inGroup, int index)
+        throws RemoteException {
+        label.setWidget(swtBot.labelInGroup(inGroup, index));
+        return label;
 
-    /**
-     * @param mnemonicText
-     *            the mnemonicText on the widget.
-     * @param inGroup
-     *            the inGroup on the widget.
-     * @return a {@link RemoteBotLabel} with the specified
-     *         <code>mnemonicText</code> with the specified <code>inGroup</code>
-     *         .
-     */
-    public RemoteBotLabel labelInGroup(String mnemonicText, String inGroup)
-        throws RemoteException;
+    }
 
-    /**
-     * @param mnemonicText
-     *            the mnemonicText on the widget.
-     * @param inGroup
-     *            the inGroup on the widget.
-     * @param index
-     *            the index of the widget.
-     * @return a {@link RemoteBotLabel} with the specified
-     *         <code>mnemonicText</code> with the specified <code>inGroup</code>
-     *         .
-     */
+    public IRemoteBotLabel label(int index) throws RemoteException {
+        label.setWidget(swtBot.label(index));
+        return label;
 
-    public RemoteBotLabel labelInGroup(String mnemonicText, String inGroup,
-        int index) throws RemoteException;
+    }
 
-    public boolean existsStyledText() throws RemoteException;
+    public IRemoteBotLabel labelInGroup(String mnemonicText, String inGroup)
+        throws RemoteException {
+        label.setWidget(swtBot.labelInGroup(MENU_CLASS, inGroup));
+        return label;
 
-    public boolean existsLabel() throws RemoteException;
+    }
 
-    public boolean existsLabel(String text) throws RemoteException;
+    public IRemoteBotLabel labelInGroup(String mnemonicText, String inGroup,
+        int index) throws RemoteException {
+        label.setWidget(swtBot.labelInGroup(mnemonicText, inGroup, index));
+        return label;
+
+    }
+
+    public boolean existsStyledText() throws RemoteException {
+        long oldTimeout = SWTBotPreferences.TIMEOUT;
+        // increase the timeout
+        SWTBotPreferences.TIMEOUT = 1000;
+
+        try {
+            swtBot.styledText();
+            SWTBotPreferences.TIMEOUT = oldTimeout;
+            return true;
+        } catch (WidgetNotFoundException e) {
+            SWTBotPreferences.TIMEOUT = oldTimeout;
+            return false;
+        }
+    }
+
+    public boolean existsLabel() throws RemoteException {
+        long oldTimeout = SWTBotPreferences.TIMEOUT;
+        // increase the timeout
+        SWTBotPreferences.TIMEOUT = 1000;
+
+        try {
+            swtBot.label();
+            SWTBotPreferences.TIMEOUT = oldTimeout;
+            return true;
+        } catch (WidgetNotFoundException e) {
+            SWTBotPreferences.TIMEOUT = oldTimeout;
+            return false;
+        }
+    }
+
+    public boolean existsLabel(String text) throws RemoteException {
+        long oldTimeout = SWTBotPreferences.TIMEOUT;
+        // increase the timeout
+        SWTBotPreferences.TIMEOUT = 1000;
+
+        try {
+            swtBot.label(text);
+            SWTBotPreferences.TIMEOUT = oldTimeout;
+            return true;
+        } catch (WidgetNotFoundException e) {
+            SWTBotPreferences.TIMEOUT = oldTimeout;
+            return false;
+        }
+    }
 
     /**********************************************
      * 
      * Widget styledText
      * 
      **********************************************/
-    /**
-     * @see SWTBot#styledText(String)
-     */
-    public RemoteBotStyledText styledTextWithLabel(String label)
-        throws RemoteException;
 
-    /**
-     * @see SWTBot#styledTextWithLabel(String, int)
-     */
-    public RemoteBotStyledText styledTextWithLabel(String label, int index)
-        throws RemoteException;
+    public IRemoteBotStyledText styledTextWithLabel(String label)
+        throws RemoteException {
+        styledText.setWidget(swtBot.styledTextWithLabel(label, 0));
+        return styledText;
+    }
 
-    /**
-     * @see SWTBot#styledText(String)
-     */
-    public RemoteBotStyledText styledText(String text) throws RemoteException;
+    public IRemoteBotStyledText styledTextWithLabel(String label, int index)
+        throws RemoteException {
+        styledText.setWidget(swtBot.styledTextWithLabel(label, index));
+        return styledText;
+    }
 
-    /**
-     * @see SWTBot#styledText(String, int)
-     */
-    public RemoteBotStyledText styledText(String text, int index)
-        throws RemoteException;
+    public IRemoteBotStyledText styledText(String text) throws RemoteException {
+        styledText.setWidget(swtBot.styledText(text));
+        return styledText;
+    }
 
-    /**
-     * @see SWTBot#styledTextWithId(String, String)
-     */
-    public RemoteBotStyledText styledTextWithId(String key, String value)
-        throws RemoteException;
+    public IRemoteBotStyledText styledText(String text, int index)
+        throws RemoteException {
+        styledText.setWidget(swtBot.styledText(text, index));
+        return styledText;
+    }
 
-    /**
-     * @see SWTBot#styledTextWithId(String, String, int)
-     */
-    public RemoteBotStyledText styledTextWithId(String key, String value, int index)
-        throws RemoteException;
+    public IRemoteBotStyledText styledTextWithId(String key, String value)
+        throws RemoteException {
+        styledText.setWidget(swtBot.styledTextWithId(key, value));
+        return styledText;
+    }
 
-    /**
-     * @see SWTBot#styledTextWithId(String)
-     */
-    public RemoteBotStyledText styledTextWithId(String value)
-        throws RemoteException;
+    public IRemoteBotStyledText styledTextWithId(String key, String value, int index)
+        throws RemoteException {
+        styledText.setWidget(swtBot.styledTextWithId(key, value, index));
+        return styledText;
+    }
 
-    /**
-     * @see SWTBot#styledTextWithId(String, int)
-     */
-    public RemoteBotStyledText styledTextWithId(String value, int index)
-        throws RemoteException;
+    public IRemoteBotStyledText styledTextWithId(String value)
+        throws RemoteException {
+        styledText.setWidget(swtBot.styledTextWithId(value));
+        return styledText;
+    }
 
-    /**
-     * @see SWTBot#styledTextInGroup(String)
-     */
-    public RemoteBotStyledText styledTextInGroup(String inGroup)
-        throws RemoteException;
+    public IRemoteBotStyledText styledTextWithId(String value, int index)
+        throws RemoteException {
+        styledText.setWidget(swtBot.styledTextWithId(value, index));
+        return styledText;
+    }
 
-    /**
-     * @see SWTBot#styledTextInGroup(String, int)
-     */
-    public RemoteBotStyledText styledTextInGroup(String inGroup, int index)
-        throws RemoteException;
+    public IRemoteBotStyledText styledTextInGroup(String inGroup)
+        throws RemoteException {
+        styledText.setWidget(swtBot.styledTextInGroup(inGroup));
+        return styledText;
+    }
 
-    /**
-     * @see SWTBot#styledText()
-     */
-    public RemoteBotStyledText styledText() throws RemoteException;
+    public IRemoteBotStyledText styledTextInGroup(String inGroup, int index)
+        throws RemoteException {
+        styledText.setWidget(swtBot.styledTextInGroup(inGroup, index));
+        return styledText;
+    }
 
-    /**
-     * @see SWTBot#styledText(int)
-     */
-    public RemoteBotStyledText styledText(int index) throws RemoteException;
+    public IRemoteBotStyledText styledText() throws RemoteException {
+        return styledText(0);
+    }
 
-    /**
-     * @see SWTBot#styledTextWithLabelInGroup(String, String)
-     */
-    public RemoteBotStyledText styledTextWithLabelInGroup(String label,
-        String inGroup) throws RemoteException;
+    public IRemoteBotStyledText styledText(int index) throws RemoteException {
+        styledText.setWidget(swtBot.styledText(index));
+        return styledText;
+    }
 
-    /**
-     * @see SWTBot#styledTextWithLabelInGroup(String, String, int)
-     */
-    public RemoteBotStyledText styledTextWithLabelInGroup(String label,
-        String inGroup, int index) throws RemoteException;
+    public IRemoteBotStyledText styledTextWithLabelInGroup(String label,
+        String inGroup) throws RemoteException {
+        return styledTextWithLabelInGroup(label, inGroup, 0);
+    }
 
-    /**
-     * @see SWTBot#styledTextInGroup(String, String)
-     */
-    public RemoteBotStyledText styledTextInGroup(String text, String inGroup)
-        throws RemoteException;
+    public IRemoteBotStyledText styledTextWithLabelInGroup(String label,
+        String inGroup, int index) throws RemoteException {
+        styledText.setWidget(swtBot.styledTextWithLabelInGroup(label, inGroup,
+            index));
+        return styledText;
+    }
 
-    /**
-     * @see SWTBot#styledTextInGroup(String, String, int)
-     */
-    public RemoteBotStyledText styledTextInGroup(String text, String inGroup,
-        int index) throws RemoteException;
+    public IRemoteBotStyledText styledTextInGroup(String text, String inGroup)
+        throws RemoteException {
+        return styledTextInGroup(text, inGroup, 0);
+    }
+
+    public IRemoteBotStyledText styledTextInGroup(String text, String inGroup,
+        int index) throws RemoteException {
+        styledText.setWidget(swtBot.styledTextInGroup(text, inGroup, index));
+        return styledText;
+    }
 
     /**********************************************
      * 
      * Widget comboBox
      * 
      **********************************************/
-    /**
-     * @param label
-     *            the label on the widget.
-     * @return a {@link RemoteBotCombo} with the specified <code>label</code>.
-     */
-    public RemoteBotCombo comboBoxWithLabel(String label) throws RemoteException;
-
-    /**
-     * @param label
-     *            the label on the widget.
-     * @param index
-     *            the index of the widget.
-     * @return a {@link RemoteBotCombo} with the specified <code>label</code>.
-     */
-
-    public RemoteBotCombo comboBoxWithLabel(String label, int index)
-        throws RemoteException;
-
-    /**
-     * @param text
-     *            the text on the widget.
-     * @return a {@link RemoteBotCombo} with the specified <code>text</code>.
-     */
-    public RemoteBotCombo comboBox(String text) throws RemoteException;
-
-    /**
-     * @param text
-     *            the text on the widget.
-     * @param index
-     *            the index of the widget.
-     * @return a {@link RemoteBotCombo} with the specified <code>text</code>.
-     */
-
-    public RemoteBotCombo comboBox(String text, int index) throws RemoteException;
-
-    /**
-     * @param key
-     *            the key set on the widget.
-     * @param value
-     *            the value for the key.
-     * @return a {@link RemoteBotCombo} with the specified <code>key/value</code>.
-     */
-    public RemoteBotCombo comboBoxWithId(String key, String value)
-        throws RemoteException;
-
-    /**
-     * @param key
-     *            the key set on the widget.
-     * @param value
-     *            the value for the key.
-     * @param index
-     *            the index of the widget.
-     * @return a {@link RemoteBotCombo} with the specified <code>key/value</code>.
-     */
-
-    public RemoteBotCombo comboBoxWithId(String key, String value, int index)
-        throws RemoteException;
-
-    /**
-     * @param value
-     *            the value for the key
-     *            {@link org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences#DEFAULT_KEY}
-     *            .
-     * @return a {@link RemoteBotCombo} with the specified <code>value</code>.
-     */
-    public RemoteBotCombo comboBoxWithId(String value) throws RemoteException;
-
-    /**
-     * @param value
-     *            the value for the key
-     *            {@link org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences#DEFAULT_KEY}
-     *            .
-     * @param index
-     *            the index of the widget.
-     * @return a {@link RemoteBotCombo} with the specified <code>value</code>.
-     */
-
-    public RemoteBotCombo comboBoxWithId(String value, int index)
-        throws RemoteException;
-
-    /**
-     * @param inGroup
-     *            the inGroup on the widget.
-     * @return a {@link RemoteBotCombo} with the specified <code>inGroup</code>.
-     */
-    public RemoteBotCombo comboBoxInGroup(String inGroup) throws RemoteException;
-
-    /**
-     * @param inGroup
-     *            the inGroup on the widget.
-     * @param index
-     *            the index of the widget.
-     * @return a {@link RemoteBotCombo} with the specified <code>inGroup</code>.
-     */
-
-    public RemoteBotCombo comboBoxInGroup(String inGroup, int index)
-        throws RemoteException;
-
-    /**
-     * @return a {@link RemoteBotCombo} with the specified <code>none</code>.
-     */
-    public RemoteBotCombo comboBox() throws RemoteException;
-
-    /**
-     * @param index
-     *            the index of the widget.
-     * @return a {@link RemoteBotCombo} with the specified <code>none</code>.
-     */
-
-    public RemoteBotCombo comboBox(int index) throws RemoteException;
-
-    /**
-     * @param label
-     *            the label on the widget.
-     * @param inGroup
-     *            the inGroup on the widget.
-     * @return a {@link RemoteBotCombo} with the specified <code>label</code> with
-     *         the specified <code>inGroup</code>.
-     */
-    public RemoteBotCombo comboBoxWithLabelInGroup(String label, String inGroup)
-        throws RemoteException;
-
-    /**
-     * @param label
-     *            the label on the widget.
-     * @param inGroup
-     *            the inGroup on the widget.
-     * @param index
-     *            the index of the widget.
-     * @return a {@link RemoteBotCombo} with the specified <code>label</code> with
-     *         the specified <code>inGroup</code>.
-     */
-
-    public RemoteBotCombo comboBoxWithLabelInGroup(String label, String inGroup,
-        int index) throws RemoteException;
-
-    /**
-     * @param text
-     *            the text on the widget.
-     * @param inGroup
-     *            the inGroup on the widget.
-     * @return a {@link RemoteBotCombo} with the specified <code>text</code> with
-     *         the specified <code>inGroup</code>.
-     */
-    public RemoteBotCombo comboBoxInGroup(String text, String inGroup)
-        throws RemoteException;
-
-    /**
-     * @param text
-     *            the text on the widget.
-     * @param inGroup
-     *            the inGroup on the widget.
-     * @param index
-     *            the index of the widget.
-     * @return a {@link RemoteBotCombo} with the specified <code>text</code> with
-     *         the specified <code>inGroup</code>.
-     */
-
-    public RemoteBotCombo comboBoxInGroup(String text, String inGroup, int index)
-        throws RemoteException;
-
-    /**
-     * @param text
-     *            the text on the widget.
-     * @return a {@link RemoteBotCCombo} with the specified <code>text</code>.
-     */
-    public RemoteBotCCombo ccomboBox(String text) throws RemoteException;
-
-    /**
-     * @param text
-     *            the text on the widget.
-     * @param index
-     *            the index of the widget.
-     * @return a {@link RemoteBotCCombo} with the specified <code>text</code>.
-     */
-
-    public RemoteBotCCombo ccomboBox(String text, int index)
-        throws RemoteException;
-
-    /**
-     * @param label
-     *            the label on the widget.
-     * @return a {@link RemoteBotCCombo} with the specified <code>label</code>.
-     */
-    public RemoteBotCCombo ccomboBoxWithLabel(String label) throws RemoteException;
-
-    /**
-     * @param label
-     *            the label on the widget.
-     * @param index
-     *            the index of the widget.
-     * @return a {@link RemoteBotCCombo} with the specified <code>label</code>.
-     */
-    public RemoteBotCCombo ccomboBoxWithLabel(String label, int index)
-        throws RemoteException;
-
-    /**
-     * @param key
-     *            the key set on the widget.
-     * @param value
-     *            the value for the key.
-     * @return a {@link RemoteBotCCombo} with the specified <code>key/value</code>.
-     */
-    public RemoteBotCCombo ccomboBoxWithId(String key, String value)
-        throws RemoteException;
-
-    /**
-     * @param key
-     *            the key set on the widget.
-     * @param value
-     *            the value for the key.
-     * @param index
-     *            the index of the widget.
-     * @return a {@link RemoteBotCCombo} with the specified <code>key/value</code>.
-     */
-    public RemoteBotCCombo ccomboBoxWithId(String key, String value, int index)
-        throws RemoteException;
-
-    /**
-     * @param value
-     *            the value for the key
-     *            {@link org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences#DEFAULT_KEY}
-     *            .
-     * @return a {@link RemoteBotCCombo} with the specified <code>value</code>.
-     */
-    public RemoteBotCCombo ccomboBoxWithId(String value) throws RemoteException;
-
-    /**
-     * @param value
-     *            the value for the key
-     *            {@link org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences#DEFAULT_KEY}
-     *            .
-     * @param index
-     *            the index of the widget.
-     * @return a {@link RemoteBotCCombo} with the specified <code>value</code>.
-     */
-    public RemoteBotCCombo ccomboBoxWithId(String value, int index)
-        throws RemoteException;
-
-    /**
-     * @param inGroup
-     *            the inGroup on the widget.
-     * @return a {@link RemoteBotCCombo} with the specified <code>inGroup</code>.
-     */
-    public RemoteBotCCombo ccomboBoxInGroup(String inGroup) throws RemoteException;
-
-    /**
-     * @param inGroup
-     *            the inGroup on the widget.
-     * @param index
-     *            the index of the widget.
-     * @return a {@link RemoteBotCCombo} with the specified <code>inGroup</code>.
-     */
-    public RemoteBotCCombo ccomboBoxInGroup(String inGroup, int index)
-        throws RemoteException;
-
-    /**
-     * @return a {@link RemoteBotCCombo} with the specified <code>none</code>.
-     */
-    public RemoteBotCCombo ccomboBox() throws RemoteException;
-
-    /**
-     * @param index
-     *            the index of the widget.
-     * @return a {@link RemoteBotCCombo} with the specified <code>none</code>.
-     */
-    public RemoteBotCCombo ccomboBox(int index) throws RemoteException;
-
-    /**
-     * @param text
-     *            the text on the widget.
-     * @param inGroup
-     *            the inGroup on the widget.
-     * @return a {@link RemoteBotCCombo} with the specified <code>text</code> with
-     *         the specified <code>inGroup</code>.
-     */
-    public RemoteBotCCombo ccomboBoxInGroup(String text, String inGroup)
-        throws RemoteException;
-
-    /**
-     * @param text
-     *            the text on the widget.
-     * @param inGroup
-     *            the inGroup on the widget.
-     * @param index
-     *            the index of the widget.
-     * @return a {@link RemoteBotCCombo} with the specified <code>text</code> with
-     *         the specified <code>inGroup</code>.
-     */
-    public RemoteBotCCombo ccomboBoxInGroup(String text, String inGroup, int index)
-        throws RemoteException;
-
-    /**
-     * @param label
-     *            the label on the widget.
-     * @param inGroup
-     *            the inGroup on the widget.
-     * @return a {@link RemoteBotCCombo} with the specified <code>label</code> with
-     *         the specified <code>inGroup</code>.
-     */
-    public RemoteBotCCombo ccomboBoxWithLabelInGroup(String label, String inGroup)
-        throws RemoteException;
-
-    /**
-     * @param label
-     *            the label on the widget.
-     * @param inGroup
-     *            the inGroup on the widget.
-     * @param index
-     *            the index of the widget.
-     * @return a {@link RemoteBotCCombo} with the specified <code>label</code> with
-     *         the specified <code>inGroup</code>.
-     */
-
-    public RemoteBotCCombo ccomboBoxWithLabelInGroup(String label, String inGroup,
-        int index) throws RemoteException;
-
-    public RemoteBotToolbarButton toolbarButton() throws RemoteException;
-
-    public RemoteBotToolbarButton toolbarButton(int index) throws RemoteException;
-
-    public boolean existsToolbarButton() throws RemoteException;
-
-    /**
-     * @param mnemonicText
-     *            the mnemonicText on the widget.
-     * @return a {@link RemoteBotToolbarButton} with the specified
-     *         <code>mnemonicText</code>.
-     */
-    public RemoteBotToolbarButton toolbarButton(String mnemonicText)
-        throws RemoteException;
-
-    /**
-     * @param mnemonicText
-     *            the mnemonicText on the widget.
-     * @param index
-     *            the index of the widget.
-     * @return a {@link RemoteBotToolbarButton} with the specified
-     *         <code>mnemonicText</code>.
-     */
-
-    public RemoteBotToolbarButton toolbarButton(String mnemonicText, int index)
-        throws RemoteException;
-
-    /**
-     * @param tooltip
-     *            the tooltip on the widget.
-     * @return a {@link RemoteBotToolbarButton} with the specified
-     *         <code>tooltip</code>.
-     */
-    public RemoteBotToolbarButton toolbarButtonWithTooltip(String tooltip)
-        throws RemoteException;
-
-    /**
-     * @param tooltip
-     *            the tooltip on the widget.
-     * @param index
-     *            the index of the widget.
-     * @return a {@link RemoteBotToolbarButton} with the specified
-     *         <code>tooltip</code>.
-     */
-
-    public RemoteBotToolbarButton toolbarButtonWithTooltip(String tooltip,
-        int index) throws RemoteException;
-
-    /**
-     * @param key
-     *            the key set on the widget.
-     * @param value
-     *            the value for the key.
-     * @return a {@link RemoteBotToolbarButton} with the specified
-     *         <code>key/value</code>.
-     */
-    public RemoteBotToolbarButton toolbarButtonWithId(String key, String value)
-        throws RemoteException;
-
-    /**
-     * @param key
-     *            the key set on the widget.
-     * @param value
-     *            the value for the key.
-     * @param index
-     *            the index of the widget.
-     * @return a {@link RemoteBotToolbarButton} with the specified
-     *         <code>key/value</code>.
-     */
-
-    public RemoteBotToolbarButton toolbarButtonWithId(String key, String value,
-        int index) throws RemoteException;
-
-    /**
-     * @param value
-     *            the value for the key
-     *            {@link org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences#DEFAULT_KEY}
-     *            .
-     * @return a {@link RemoteBotToolbarButton} with the specified
-     *         <code>value</code>.
-     */
-    public RemoteBotToolbarButton toolbarButtonWithId(String value)
-        throws RemoteException;
-
-    /**
-     * @param value
-     *            the value for the key
-     *            {@link org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences#DEFAULT_KEY}
-     *            .
-     * @param index
-     *            the index of the widget.
-     * @return a {@link RemoteBotToolbarButton} with the specified
-     *         <code>value</code>.
-     */
-
-    public RemoteBotToolbarButton toolbarButtonWithId(String value, int index)
-        throws RemoteException;
-
-    /**
-     * @param inGroup
-     *            the inGroup on the widget.
-     * @return a {@link RemoteBotToolbarButton} with the specified
-     *         <code>inGroup</code>.
-     */
-    public RemoteBotToolbarButton toolbarButtonInGroup(String inGroup)
-        throws RemoteException;
-
-    /**
-     * @param inGroup
-     *            the inGroup on the widget.
-     * @param index
-     *            the index of the widget.
-     * @return a {@link RemoteBotToolbarButton} with the specified
-     *         <code>inGroup</code>.
-     */
-
-    public RemoteBotToolbarButton toolbarButtonInGroup(String inGroup, int index)
-        throws RemoteException;
-
-    /**
-     * @param mnemonicText
-     *            the mnemonicText on the widget.
-     * @param inGroup
-     *            the inGroup on the widget.
-     * @return a {@link RemoteBotToolbarButton} with the specified
-     *         <code>mnemonicText</code> with the specified <code>inGroup</code>
-     *         .
-     */
-    public RemoteBotToolbarButton toolbarButtonInGroup(String mnemonicText,
-        String inGroup) throws RemoteException;
-
-    /**
-     * @param mnemonicText
-     *            the mnemonicText on the widget.
-     * @param inGroup
-     *            the inGroup on the widget.
-     * @param index
-     *            the index of the widget.
-     * @return a {@link RemoteBotToolbarButton} with the specified
-     *         <code>mnemonicText</code> with the specified <code>inGroup</code>
-     *         .
-     */
-
-    public RemoteBotToolbarButton toolbarButtonInGroup(String mnemonicText,
-        String inGroup, int index) throws RemoteException;
-
-    /**
-     * @param tooltip
-     *            the tooltip on the widget.
-     * @param inGroup
-     *            the inGroup on the widget.
-     * @return a {@link RemoteBotToolbarButton} with the specified
-     *         <code>tooltip</code> with the specified <code>inGroup</code>.
-     */
-    public RemoteBotToolbarButton toolbarButtonWithTooltipInGroup(String tooltip,
-        String inGroup) throws RemoteException;
-
-    /**
-     * @param tooltip
-     *            the tooltip on the widget.
-     * @param inGroup
-     *            the inGroup on the widget.
-     * @param index
-     *            the index of the widget.
-     * @return a {@link RemoteBotToolbarButton} with the specified
-     *         <code>tooltip</code> with the specified <code>inGroup</code>.
-     */
-
-    public RemoteBotToolbarButton toolbarButtonWithTooltipInGroup(String tooltip,
-        String inGroup, int index) throws RemoteException;
+    public IRemoteBotCombo comboBoxWithLabel(String label) throws RemoteException {
+        comboBox.setWidget(swtBot.comboBoxWithLabel(label));
+        return comboBox;
+    }
+
+    public IRemoteBotCombo comboBoxWithLabel(String label, int index)
+        throws RemoteException {
+        comboBox.setWidget(swtBot.comboBoxWithLabel(label, index));
+        return comboBox;
+    }
+
+    public IRemoteBotCombo comboBox(String text) throws RemoteException {
+        comboBox.setWidget(swtBot.comboBox(text));
+        return comboBox;
+    }
+
+    public IRemoteBotCombo comboBox(String text, int index) throws RemoteException {
+        comboBox.setWidget(swtBot.comboBox(text, index));
+        return comboBox;
+    }
+
+    public IRemoteBotCombo comboBoxWithId(String key, String value)
+        throws RemoteException {
+        comboBox.setWidget(swtBot.comboBoxWithId(key, value));
+        return comboBox;
+    }
+
+    public IRemoteBotCombo comboBoxWithId(String key, String value, int index)
+        throws RemoteException {
+        comboBox.setWidget(swtBot.comboBoxWithId(key, value, index));
+        return comboBox;
+    }
+
+    public IRemoteBotCombo comboBoxWithId(String value) throws RemoteException {
+        comboBox.setWidget(swtBot.comboBoxWithId(value));
+        return comboBox;
+    }
+
+    public IRemoteBotCombo comboBoxWithId(String value, int index)
+        throws RemoteException {
+        comboBox.setWidget(swtBot.comboBoxWithId(value, index));
+        return comboBox;
+    }
+
+    public IRemoteBotCombo comboBoxInGroup(String inGroup) throws RemoteException {
+        comboBox.setWidget(swtBot.comboBoxInGroup(inGroup));
+        return comboBox;
+    }
+
+    public IRemoteBotCombo comboBoxInGroup(String inGroup, int index)
+        throws RemoteException {
+        comboBox.setWidget(swtBot.comboBoxInGroup(inGroup, index));
+        return comboBox;
+    }
+
+    public IRemoteBotCombo comboBox() throws RemoteException {
+        comboBox.setWidget(swtBot.comboBox());
+        return comboBox;
+    }
+
+    public IRemoteBotCombo comboBox(int index) throws RemoteException {
+        comboBox.setWidget(swtBot.comboBox(index));
+        return comboBox;
+    }
+
+    public IRemoteBotCombo comboBoxWithLabelInGroup(String label, String inGroup)
+        throws RemoteException {
+        comboBox.setWidget(swtBot.comboBoxWithLabelInGroup(label, inGroup));
+        return comboBox;
+    }
+
+    public IRemoteBotCombo comboBoxWithLabelInGroup(String label, String inGroup,
+        int index) throws RemoteException {
+        comboBox.setWidget(swtBot.comboBoxWithLabelInGroup(label, inGroup,
+            index));
+        return comboBox;
+    }
+
+    public IRemoteBotCombo comboBoxInGroup(String text, String inGroup)
+        throws RemoteException {
+        comboBox.setWidget(swtBot.comboBoxInGroup(text, inGroup));
+        return comboBox;
+    }
+
+    public IRemoteBotCombo comboBoxInGroup(String text, String inGroup, int index)
+        throws RemoteException {
+        comboBox.setWidget(swtBot.comboBoxInGroup(text, inGroup, index));
+        return comboBox;
+    }
+
+    /**********************************************
+     * 
+     * Widget ccomboBox
+     * 
+     **********************************************/
+    public IRemoteBotCCombo ccomboBox(String text) throws RemoteException {
+        ccomboBox.setWidget(swtBot.ccomboBox(text));
+        return ccomboBox;
+    }
+
+    public IRemoteBotCCombo ccomboBox(String text, int index)
+        throws RemoteException {
+        ccomboBox.setWidget(swtBot.ccomboBox(text, index));
+        return ccomboBox;
+    }
+
+    public IRemoteBotCCombo ccomboBoxWithLabel(String label) throws RemoteException {
+        ccomboBox.setWidget(swtBot.ccomboBoxWithLabel(label));
+        return ccomboBox;
+    }
+
+    public IRemoteBotCCombo ccomboBoxWithLabel(String label, int index)
+        throws RemoteException {
+        ccomboBox.setWidget(swtBot.ccomboBoxWithLabel(label, index));
+        return ccomboBox;
+    }
+
+    public IRemoteBotCCombo ccomboBoxWithId(String key, String value)
+        throws RemoteException {
+        ccomboBox.setWidget(swtBot.ccomboBoxWithId(key, value));
+        return ccomboBox;
+    }
+
+    public IRemoteBotCCombo ccomboBoxWithId(String key, String value, int index)
+        throws RemoteException {
+        ccomboBox.setWidget(swtBot.ccomboBoxWithId(key, value, index));
+        return ccomboBox;
+    }
+
+    public IRemoteBotCCombo ccomboBoxWithId(String value) throws RemoteException {
+        ccomboBox.setWidget(swtBot.ccomboBoxWithId(value));
+        return ccomboBox;
+    }
+
+    public IRemoteBotCCombo ccomboBoxWithId(String value, int index)
+        throws RemoteException {
+        ccomboBox.setWidget(swtBot.ccomboBoxWithId(value, index));
+        return ccomboBox;
+    }
+
+    public IRemoteBotCCombo ccomboBoxInGroup(String inGroup) throws RemoteException {
+        ccomboBox.setWidget(swtBot.ccomboBoxInGroup(inGroup));
+        return ccomboBox;
+    }
+
+    public IRemoteBotCCombo ccomboBoxInGroup(String inGroup, int index)
+        throws RemoteException {
+        ccomboBox.setWidget(swtBot.ccomboBoxInGroup(inGroup, index));
+        return ccomboBox;
+    }
+
+    public IRemoteBotCCombo ccomboBox() throws RemoteException {
+        ccomboBox.setWidget(swtBot.ccomboBox());
+        return ccomboBox;
+    }
+
+    public IRemoteBotCCombo ccomboBox(int index) throws RemoteException {
+        ccomboBox.setWidget(swtBot.ccomboBox(index));
+        return ccomboBox;
+
+    }
+
+    public IRemoteBotCCombo ccomboBoxInGroup(String text, String inGroup)
+        throws RemoteException {
+        ccomboBox.setWidget(swtBot.ccomboBoxInGroup(text, inGroup));
+        return ccomboBox;
+    }
+
+    public IRemoteBotCCombo ccomboBoxInGroup(String text, String inGroup, int index)
+        throws RemoteException {
+        ccomboBox.setWidget(swtBot.ccomboBoxInGroup(text, inGroup, index));
+        return ccomboBox;
+    }
+
+    public IRemoteBotCCombo ccomboBoxWithLabelInGroup(String label, String inGroup)
+        throws RemoteException {
+        ccomboBox.setWidget(swtBot.ccomboBoxWithLabelInGroup(label, inGroup));
+        return ccomboBox;
+    }
+
+    public IRemoteBotCCombo ccomboBoxWithLabelInGroup(String label, String inGroup,
+        int index) throws RemoteException {
+        ccomboBox.setWidget(swtBot.ccomboBoxWithLabelInGroup(label, inGroup,
+            index));
+        return ccomboBox;
+    }
+
+    /**********************************************
+     * 
+     * Widget toolbarButton
+     * 
+     **********************************************/
+    public IRemoteBotToolbarButton toolbarButton() throws RemoteException {
+        return toolbarButton.setWidget(swtBot.toolbarButton());
+
+    }
+
+    public IRemoteBotToolbarButton toolbarButton(int index) throws RemoteException {
+        return toolbarButton.setWidget(swtBot.toolbarButton(index));
+
+    }
+
+    public boolean existsToolbarButton() throws RemoteException {
+        long oldTimeout = SWTBotPreferences.TIMEOUT;
+        // increase the timeout
+        SWTBotPreferences.TIMEOUT = 1000;
+
+        try {
+            swtBot.toolbarButton();
+            SWTBotPreferences.TIMEOUT = oldTimeout;
+            return true;
+
+        } catch (WidgetNotFoundException e) {
+            SWTBotPreferences.TIMEOUT = oldTimeout;
+            return false;
+
+        }
+    }
+
+    public IRemoteBotToolbarButton toolbarButton(String mnemonicText)
+        throws RemoteException {
+        return toolbarButton.setWidget(swtBot.toolbarButton(mnemonicText));
+
+    }
+
+    public IRemoteBotToolbarButton toolbarButton(String mnemonicText, int index)
+        throws RemoteException {
+        return toolbarButton.setWidget(swtBot
+            .toolbarButton(mnemonicText, index));
+
+    }
+
+    public IRemoteBotToolbarButton toolbarButtonWithTooltip(String tooltip)
+        throws RemoteException {
+        return toolbarButton
+            .setWidget(swtBot.toolbarButtonWithTooltip(tooltip));
+
+    }
+
+    public IRemoteBotToolbarButton toolbarButtonWithTooltip(String tooltip,
+        int index) throws RemoteException {
+        return toolbarButton.setWidget(swtBot.toolbarButtonWithTooltip(tooltip,
+            index));
+
+    }
+
+    public IRemoteBotToolbarButton toolbarButtonWithId(String key, String value)
+        throws RemoteException {
+        return toolbarButton.setWidget(swtBot.toolbarButtonWithId(key, value));
+
+    }
+
+    public IRemoteBotToolbarButton toolbarButtonWithId(String key, String value,
+        int index) throws RemoteException {
+        return toolbarButton.setWidget(swtBot.toolbarButtonWithId(key, value,
+            index));
+
+    }
+
+    public IRemoteBotToolbarButton toolbarButtonWithId(String value)
+        throws RemoteException {
+        return toolbarButton.setWidget(swtBot.toolbarButtonWithId(value));
+
+    }
+
+    public IRemoteBotToolbarButton toolbarButtonWithId(String value, int index)
+        throws RemoteException {
+        return toolbarButton
+            .setWidget(swtBot.toolbarButtonWithId(value, index));
+
+    }
+
+    public IRemoteBotToolbarButton toolbarButtonInGroup(String inGroup)
+        throws RemoteException {
+        return toolbarButton.setWidget(swtBot.toolbarButtonInGroup(inGroup));
+
+    }
+
+    public IRemoteBotToolbarButton toolbarButtonInGroup(String inGroup, int index)
+        throws RemoteException {
+        return toolbarButton.setWidget(swtBot.toolbarButtonInGroup(inGroup,
+            index));
+
+    }
+
+    public IRemoteBotToolbarButton toolbarButtonInGroup(String mnemonicText,
+        String inGroup) throws RemoteException {
+        return toolbarButton.setWidget(swtBot.toolbarButtonInGroup(
+            mnemonicText, inGroup));
+
+    }
+
+    public IRemoteBotToolbarButton toolbarButtonInGroup(String mnemonicText,
+        String inGroup, int index) throws RemoteException {
+        return toolbarButton.setWidget(swtBot.toolbarButtonInGroup(
+            mnemonicText, inGroup, index));
+
+    }
+
+    public IRemoteBotToolbarButton toolbarButtonWithTooltipInGroup(String tooltip,
+        String inGroup) throws RemoteException {
+        return toolbarButton.setWidget(swtBot.toolbarButtonWithTooltipInGroup(
+            tooltip, inGroup));
+
+    }
+
+    public IRemoteBotToolbarButton toolbarButtonWithTooltipInGroup(String tooltip,
+        String inGroup, int index) throws RemoteException {
+        return toolbarButton.setWidget(swtBot.toolbarButtonWithTooltipInGroup(
+            tooltip, inGroup, index));
+
+    }
 
     /**********************************************
      * 
      * Widget text
      * 
      **********************************************/
+    public IRemoteBotText textWithLabel(String label) throws RemoteException {
+        text.setWidget(swtBot.textWithLabel(label));
+        return text;
+    }
 
-    /**
-     * @param label
-     *            the label on the widget.
-     * @return a {@link RemoteBotText} with the specified <code>label</code>.
-     */
-    public RemoteBotText textWithLabel(String label) throws RemoteException;
+    public IRemoteBotText textWithLabel(String label, int index)
+        throws RemoteException {
+        text.setWidget(swtBot.textWithLabel(label, index));
+        return text;
+    }
 
-    /**
-     * @param label
-     *            the label on the widget.
-     * @param index
-     *            the index of the widget.
-     * @return a {@link RemoteBotText} with the specified <code>label</code>.
-     */
+    public IRemoteBotText text(String txt) throws RemoteException {
+        text.setWidget(swtBot.text(txt));
+        return text;
+    }
 
-    public RemoteBotText textWithLabel(String label, int index)
-        throws RemoteException;
+    public IRemoteBotText text(String txt, int index) throws RemoteException {
+        text.setWidget(swtBot.text(txt, index));
+        return text;
 
-    /**
-     * @param text
-     *            the text on the widget.
-     * @return a {@link RemoteBotText} with the specified <code>text</code>.
-     */
-    public RemoteBotText text(String text) throws RemoteException;
+    }
 
-    /**
-     * @param text
-     *            the text on the widget.
-     * @param index
-     *            the index of the widget.
-     * @return a {@link RemoteBotText} with the specified <code>text</code>.
-     */
+    public IRemoteBotText textWithTooltip(String tooltip) throws RemoteException {
+        text.setWidget(swtBot.textWithTooltip(tooltip));
+        return text;
 
-    public RemoteBotText text(String text, int index) throws RemoteException;
+    }
 
-    /**
-     * @param tooltip
-     *            the tooltip on the widget.
-     * @return a {@link RemoteBotText} with the specified <code>tooltip</code>.
-     */
-    public RemoteBotText textWithTooltip(String tooltip) throws RemoteException;
+    public IRemoteBotText textWithTooltip(String tooltip, int index)
+        throws RemoteException {
+        text.setWidget(swtBot.textWithTooltip(tooltip, index));
+        return text;
 
-    /**
-     * @param tooltip
-     *            the tooltip on the widget.
-     * @param index
-     *            the index of the widget.
-     * @return a {@link RemoteBotText} with the specified <code>tooltip</code>.
-     */
+    }
 
-    public RemoteBotText textWithTooltip(String tooltip, int index)
-        throws RemoteException;
+    public IRemoteBotText textWithMessage(String message) throws RemoteException {
+        text.setWidget(swtBot.textWithMessage(message));
+        return text;
 
-    /**
-     * @param message
-     *            the message on the widget.
-     * @return a {@link RemoteBotText} with the specified <code>message</code>.
-     */
-    public RemoteBotText textWithMessage(String message) throws RemoteException;
+    }
 
-    /**
-     * @param message
-     *            the message on the widget.
-     * @param index
-     *            the index of the widget.
-     * @return a {@link RemoteBotText} with the specified <code>message</code>.
-     */
+    public IRemoteBotText textWithMessage(String message, int index)
+        throws RemoteException {
+        text.setWidget(swtBot.textWithMessage(message, index));
+        return text;
 
-    public RemoteBotText textWithMessage(String message, int index)
-        throws RemoteException;
+    }
 
-    /**
-     * @param key
-     *            the key set on the widget.
-     * @param value
-     *            the value for the key.
-     * @return a {@link RemoteBotText} with the specified <code>key/value</code>.
-     */
-    public RemoteBotText textWithId(String key, String value)
-        throws RemoteException;
+    public IRemoteBotText textWithId(String key, String value)
+        throws RemoteException {
+        text.setWidget(swtBot.textWithId(key, value));
+        return text;
 
-    /**
-     * @param key
-     *            the key set on the widget.
-     * @param value
-     *            the value for the key.
-     * @param index
-     *            the index of the widget.
-     * @return a {@link RemoteBotText} with the specified <code>key/value</code>.
-     */
+    }
 
-    public RemoteBotText textWithId(String key, String value, int index)
-        throws RemoteException;
+    public IRemoteBotText textWithId(String key, String value, int index)
+        throws RemoteException {
+        text.setWidget(swtBot.textWithId(key, value, index));
+        return text;
 
-    /**
-     * @param value
-     *            the value for the key
-     *            {@link org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences#DEFAULT_KEY}
-     *            .
-     * @return a {@link RemoteBotText} with the specified <code>value</code>.
-     */
-    public RemoteBotText textWithId(String value) throws RemoteException;
+    }
 
-    /**
-     * @param value
-     *            the value for the key
-     *            {@link org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences#DEFAULT_KEY}
-     *            .
-     * @param index
-     *            the index of the widget.
-     * @return a {@link RemoteBotText} with the specified <code>value</code>.
-     */
+    public IRemoteBotText textWithId(String value) throws RemoteException {
+        text.setWidget(swtBot.textWithId(value));
+        return text;
 
-    public RemoteBotText textWithId(String value, int index)
-        throws RemoteException;
+    }
 
-    /**
-     * @param inGroup
-     *            the inGroup on the widget.
-     * @return a {@link RemoteBotText} with the specified <code>inGroup</code>.
-     */
-    public RemoteBotText textInGroup(String inGroup) throws RemoteException;
+    public IRemoteBotText textWithId(String value, int index)
+        throws RemoteException {
+        text.setWidget(swtBot.textWithId(value, index));
+        return text;
 
-    /**
-     * @param inGroup
-     *            the inGroup on the widget.
-     * @param index
-     *            the index of the widget.
-     * @return a {@link RemoteBotText} with the specified <code>inGroup</code>.
-     */
+    }
 
-    public RemoteBotText textInGroup(String inGroup, int index)
-        throws RemoteException;
+    public IRemoteBotText textInGroup(String inGroup) throws RemoteException {
+        text.setWidget(swtBot.textInGroup(inGroup));
+        return text;
 
-    /**
-     * @return a {@link RemoteBotText} with the specified <code>none</code>.
-     */
-    public RemoteBotText text() throws RemoteException;
+    }
 
-    /**
-     * @param index
-     *            the index of the widget.
-     * @return a {@link RemoteBotText} with the specified <code>none</code>.
-     */
+    public IRemoteBotText textInGroup(String inGroup, int index)
+        throws RemoteException {
+        text.setWidget(swtBot.textInGroup(inGroup, index));
+        return text;
 
-    public RemoteBotText text(int index) throws RemoteException;
+    }
 
-    /**
-     * @param label
-     *            the label on the widget.
-     * @param inGroup
-     *            the inGroup on the widget.
-     * @return a {@link RemoteBotText} with the specified <code>label</code> with
-     *         the specified <code>inGroup</code>.
-     */
-    public RemoteBotText textWithLabelInGroup(String label, String inGroup)
-        throws RemoteException;
+    public IRemoteBotText text() throws RemoteException {
+        text.setWidget(swtBot.text());
+        return text;
 
-    /**
-     * @param label
-     *            the label on the widget.
-     * @param inGroup
-     *            the inGroup on the widget.
-     * @param index
-     *            the index of the widget.
-     * @return a {@link RemoteBotText} with the specified <code>label</code> with
-     *         the specified <code>inGroup</code>.
-     */
+    }
 
-    public RemoteBotText textWithLabelInGroup(String label, String inGroup,
-        int index) throws RemoteException;
+    public IRemoteBotText text(int index) throws RemoteException {
+        text.setWidget(swtBot.text(index));
+        return text;
 
-    /**
-     * @param text
-     *            the text on the widget.
-     * @param inGroup
-     *            the inGroup on the widget.
-     * @return a {@link RemoteBotText} with the specified <code>text</code> with
-     *         the specified <code>inGroup</code>.
-     */
-    public RemoteBotText textInGroup(String text, String inGroup)
-        throws RemoteException;
+    }
 
-    /**
-     * @param text
-     *            the text on the widget.
-     * @param inGroup
-     *            the inGroup on the widget.
-     * @param index
-     *            the index of the widget.
-     * @return a {@link RemoteBotText} with the specified <code>text</code> with
-     *         the specified <code>inGroup</code>.
-     */
+    public IRemoteBotText textWithLabelInGroup(String label, String inGroup)
+        throws RemoteException {
+        text.setWidget(swtBot.textWithLabel(label));
+        return text;
 
-    public RemoteBotText textInGroup(String text, String inGroup, int index)
-        throws RemoteException;
+    }
 
-    /**
-     * @param tooltip
-     *            the tooltip on the widget.
-     * @param inGroup
-     *            the inGroup on the widget.
-     * @return a {@link RemoteBotText} with the specified <code>tooltip</code> with
-     *         the specified <code>inGroup</code>.
-     */
-    public RemoteBotText textWithTooltipInGroup(String tooltip, String inGroup)
-        throws RemoteException;
+    public IRemoteBotText textWithLabelInGroup(String label, String inGroup,
+        int index) throws RemoteException {
+        text.setWidget(swtBot.textWithLabelInGroup(label, inGroup, index));
+        return text;
 
-    /**
-     * @param tooltip
-     *            the tooltip on the widget.
-     * @param inGroup
-     *            the inGroup on the widget.
-     * @param index
-     *            the index of the widget.
-     * @return a {@link RemoteBotText} with the specified <code>tooltip</code> with
-     *         the specified <code>inGroup</code>.
-     */
-    public RemoteBotText textWithTooltipInGroup(String tooltip, String inGroup,
-        int index) throws RemoteException;
+    }
+
+    public IRemoteBotText textInGroup(String txt, String inGroup)
+        throws RemoteException {
+        text.setWidget(swtBot.textInGroup(txt, inGroup));
+        return text;
+
+    }
+
+    public IRemoteBotText textInGroup(String txt, String inGroup, int index)
+        throws RemoteException {
+        text.setWidget(swtBot.textInGroup(txt, inGroup, index));
+        return text;
+
+    }
+
+    public IRemoteBotText textWithTooltipInGroup(String tooltip, String inGroup)
+        throws RemoteException {
+        text.setWidget(swtBot.textWithTooltipInGroup(tooltip, inGroup));
+        return text;
+
+    }
+
+    public IRemoteBotText textWithTooltipInGroup(String tooltip, String inGroup,
+        int index) throws RemoteException {
+        text.setWidget(swtBot.textWithTooltipInGroup(tooltip, inGroup, index));
+        return text;
+    }
 
     /**********************************************
      * 
      * Widget table
      * 
      **********************************************/
-    public boolean existsTable() throws RemoteException;
 
-    /**
-     * @param label
-     *            the label on the widget.
-     * @return a {@link RemoteBotTable} with the specified <code>label</code>.
-     */
-    public RemoteBotTable tableWithLabel(String label) throws RemoteException;
+    public boolean existsTable() throws RemoteException {
+        long oldTimeout = SWTBotPreferences.TIMEOUT;
+        // increase the timeout
+        SWTBotPreferences.TIMEOUT = 1000;
+        try {
+            swtBot.table();
+            SWTBotPreferences.TIMEOUT = oldTimeout;
+            return true;
+        } catch (WidgetNotFoundException e) {
+            SWTBotPreferences.TIMEOUT = oldTimeout;
+            return false;
+        }
+    }
 
-    /**
-     * @param label
-     *            the label on the widget.
-     * @param index
-     *            the index of the widget.
-     * @return a {@link RemoteBotTable} with the specified <code>label</code>.
-     */
+    public IRemoteBotTable tableWithLabel(String label) throws RemoteException {
+        return table.setWidget(swtBot.tableWithLabel(label));
+    }
 
-    public RemoteBotTable tableWithLabel(String label, int index)
-        throws RemoteException;
+    public IRemoteBotTable tableWithLabel(String label, int index)
+        throws RemoteException {
+        table.setWidget(swtBot.tableWithLabel(label, index));
+        return table;
+    }
 
-    /**
-     * @param key
-     *            the key set on the widget.
-     * @param value
-     *            the value for the key.
-     * @return a {@link RemoteBotTable} with the specified <code>key/value</code>.
-     */
-    public RemoteBotTable tableWithId(String key, String value)
-        throws RemoteException;
+    public IRemoteBotTable tableWithId(String key, String value)
+        throws RemoteException {
+        table.setWidget(swtBot.tableWithId(key, value));
+        return table;
+    }
 
-    /**
-     * @param key
-     *            the key set on the widget.
-     * @param value
-     *            the value for the key.
-     * @param index
-     *            the index of the widget.
-     * @return a {@link RemoteBotTable} with the specified <code>key/value</code>.
-     */
+    public IRemoteBotTable tableWithId(String key, String value, int index)
+        throws RemoteException {
+        table.setWidget(swtBot.tableWithId(key, value, index));
+        return table;
+    }
 
-    public RemoteBotTable tableWithId(String key, String value, int index)
-        throws RemoteException;
+    public IRemoteBotTable tableWithId(String value) throws RemoteException {
+        table.setWidget(swtBot.tableWithId(value));
+        return table;
+    }
 
-    /**
-     * @param value
-     *            the value for the key
-     *            {@link org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences#DEFAULT_KEY}
-     *            .
-     * @return a {@link RemoteBotTable} with the specified <code>value</code>.
-     */
-    public RemoteBotTable tableWithId(String value) throws RemoteException;
+    public IRemoteBotTable tableWithId(String value, int index)
+        throws RemoteException {
+        return table.setWidget(swtBot.tableWithId(value, index));
 
-    /**
-     * @param value
-     *            the value for the key
-     *            {@link org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences#DEFAULT_KEY}
-     *            .
-     * @param index
-     *            the index of the widget.
-     * @return a {@link RemoteBotTable} with the specified <code>value</code>.
-     */
+    }
 
-    public RemoteBotTable tableWithId(String value, int index)
-        throws RemoteException;
+    public IRemoteBotTable tableInGroup(String inGroup) throws RemoteException {
+        return table.setWidget(swtBot.tableInGroup(inGroup));
 
-    /**
-     * @param inGroup
-     *            the inGroup on the widget.
-     * @return a {@link RemoteBotTable} with the specified <code>inGroup</code>.
-     */
-    public RemoteBotTable tableInGroup(String inGroup) throws RemoteException;
+    }
 
-    /**
-     * @param inGroup
-     *            the inGroup on the widget.
-     * @param index
-     *            the index of the widget.
-     * @return a {@link RemoteBotTable} with the specified <code>inGroup</code>.
-     */
+    public IRemoteBotTable tableInGroup(String inGroup, int index)
+        throws RemoteException {
+        return table.setWidget(swtBot.tableInGroup(inGroup, index));
 
-    public RemoteBotTable tableInGroup(String inGroup, int index)
-        throws RemoteException;
+    }
 
-    /**
-     * @return a {@link RemoteBotTable} with the specified <code>none</code>.
-     */
-    public RemoteBotTable table() throws RemoteException;
+    public IRemoteBotTable table() throws RemoteException {
+        return table.setWidget(swtBot.table());
 
-    /**
-     * @param index
-     *            the index of the widget.
-     * @return a {@link RemoteBotTable} with the specified <code>none</code>.
-     */
+    }
 
-    public RemoteBotTable table(int index) throws RemoteException;
+    public IRemoteBotTable table(int index) throws RemoteException {
+        return table.setWidget(swtBot.table(index));
 
-    /**
-     * @param label
-     *            the label on the widget.
-     * @param inGroup
-     *            the inGroup on the widget.
-     * @return a {@link RemoteBotTable} with the specified <code>label</code> with
-     *         the specified <code>inGroup</code>.
-     */
-    public RemoteBotTable tableWithLabelInGroup(String label, String inGroup)
-        throws RemoteException;
+    }
+
+    public IRemoteBotTable tableWithLabelInGroup(String label, String inGroup)
+        throws RemoteException {
+        return table.setWidget(swtBot.tableWithLabelInGroup(label, inGroup));
+
+    }
+
+    public IRemoteBotMenu menu(String text) throws RemoteException {
+        return menu.setWidget(swtBot.menu(text));
+
+    }
+
+    public IRemoteBotMenu menu(String text, int index) throws RemoteException {
+        return menu.setWidget(swtBot.menu(text, index));
+    }
+
+    public IRemoteBotMenu menuWithId(String value) throws RemoteException {
+        return menu.setWidget(swtBot.menuWithId(value));
+    }
+
+    public IRemoteBotMenu menuWithId(String value, int index)
+        throws RemoteException {
+        return menu.setWidget(swtBot.menuWithId(value, index));
+    }
+
+    public IRemoteBotMenu menuWithId(String key, String value)
+        throws RemoteException {
+        return menu.setWidget(swtBot.menuWithId(key, value));
+    }
+
+    public IRemoteBotMenu menuWithId(String key, String value, int index)
+        throws RemoteException {
+        return menu.setWidget(swtBot.menuWithId(key, value, index));
+
+    }
 
     /**********************************************
      * 
-     * Widget menu
+     * Widget table
      * 
      **********************************************/
 
-    /**
-     * @param text
-     *            the text on the menu.
-     * @return a menu item that matches the specified text.
-     */
-    public RemoteBotMenu menu(String text) throws RemoteException;
+    public IRemoteBotList listWithLabel(String label) throws RemoteException {
+        list.setWidget(swtBot.listWithLabel(label));
+        return list;
+    }
 
-    /**
-     * @param text
-     *            the text on the menu.
-     * @param index
-     *            the index of the menu, in case there are multiple menus with
-     *            the same text.
-     * @return a menu item that matches the specified text.
-     */
-    public RemoteBotMenu menu(String text, int index) throws RemoteException;
+    public IRemoteBotList listWithLabel(String label, int index)
+        throws RemoteException {
+        list.setWidget(swtBot.listWithLabel(label, index));
+        return list;
+    }
 
-    /**
-     * @param value
-     *            the value of the id.
-     * @return a wrapper around a @{link Menu} with the specified key/value pair
-     *         for its id.
-     */
-    public RemoteBotMenu menuWithId(String value) throws RemoteException;
+    public IRemoteBotList listWithId(String key, String value)
+        throws RemoteException {
+        list.setWidget(swtBot.listWithId(key, value));
+        return list;
+    }
 
-    /**
-     * @param value
-     *            the value of the id.
-     * @param index
-     *            the index of the menu item, in case there are multiple shells
-     *            with the same text.
-     * @return a wrapper around a @{link Menu} with the specified key/value pair
-     *         for its id.
-     */
-    public RemoteBotMenu menuWithId(String value, int index)
-        throws RemoteException;
+    public IRemoteBotList listWithId(String key, String value, int index)
+        throws RemoteException {
+        list.setWidget(swtBot.listWithId(key, value, index));
+        return list;
+    }
 
-    /**
-     * @param key
-     *            the key of the id.
-     * @param value
-     *            the value of the id.
-     * @return a wrapper around a @{link Menu} with the specified key/value pair
-     *         for its id.
-     */
-    public RemoteBotMenu menuWithId(String key, String value)
-        throws RemoteException;
+    public IRemoteBotList listWithId(String value) throws RemoteException {
+        list.setWidget(swtBot.listWithId(value));
+        return list;
+    }
 
-    /**
-     * @param key
-     *            the key of the id.
-     * @param value
-     *            the value of the id.
-     * @param index
-     *            the index of the menu item, in case there are multiple shells
-     *            with the same text.
-     * @return a wrapper around a @{link Menu} with the specified key/value pair
-     *         for its id.
-     */
-    public RemoteBotMenu menuWithId(String key, String value, int index)
-        throws RemoteException;
+    public IRemoteBotList listWithId(String value, int index)
+        throws RemoteException {
+        list.setWidget(swtBot.listWithId(value, index));
+        return list;
+    }
+
+    public IRemoteBotList listInGroup(String inGroup) throws RemoteException {
+        list.setWidget(swtBot.listInGroup(inGroup));
+        return list;
+    }
+
+    public IRemoteBotList listInGroup(String inGroup, int index)
+        throws RemoteException {
+        list.setWidget(swtBot.listInGroup(inGroup, index));
+        return list;
+    }
+
+    public IRemoteBotList list() throws RemoteException {
+        list.setWidget(swtBot.list());
+        return list;
+    }
+
+    public IRemoteBotList list(int index) throws RemoteException {
+        list.setWidget(swtBot.list(index));
+        return list;
+    }
+
+    public IRemoteBotList listWithLabelInGroup(String label, String inGroup)
+        throws RemoteException {
+        list.setWidget(swtBot.listWithLabelInGroup(label, inGroup));
+        return list;
+    }
+
+    public IRemoteBotList listWithLabelInGroup(String label, String inGroup,
+        int index) throws RemoteException {
+        list.setWidget(swtBot.listWithLabelInGroup(label, inGroup, index));
+        return list;
+    }
 
     /**********************************************
      * 
-     * Widget list
+     * Widget table
      * 
      **********************************************/
-    /**
-     * @param label
-     *            the label on the widget.
-     * @return a {@link RemoteBotList} with the specified <code>label</code>.
-     */
-    public RemoteBotList listWithLabel(String label) throws RemoteException;
+    public IRemoteBotCheckBox checkBoxWithLabel(String label)
+        throws RemoteException {
+        checkbox.setWidget(swtBot.checkBoxWithLabel(label));
+        return checkbox;
+    }
 
-    /**
-     * @param label
-     *            the label on the widget.
-     * @param index
-     *            the index of the widget.
-     * @return a {@link RemoteBotList} with the specified <code>label</code>.
-     */
+    public IRemoteBotCheckBox checkBoxWithLabel(String label, int index)
+        throws RemoteException {
+        checkbox.setWidget(swtBot.checkBoxWithLabel(label, index));
+        return checkbox;
+    }
 
-    public RemoteBotList listWithLabel(String label, int index)
-        throws RemoteException;
+    public IRemoteBotCheckBox checkBox(String mnemonicText) throws RemoteException {
+        checkbox.setWidget(swtBot.checkBox(mnemonicText));
+        return checkbox;
+    }
 
-    /**
-     * @param key
-     *            the key set on the widget.
-     * @param value
-     *            the value for the key.
-     * @return a {@link RemoteBotList} with the specified <code>key/value</code>.
-     */
-    public RemoteBotList listWithId(String key, String value)
-        throws RemoteException;
+    public IRemoteBotCheckBox checkBox(String mnemonicText, int index)
+        throws RemoteException {
+        checkbox.setWidget(swtBot.checkBox(mnemonicText, index));
+        return checkbox;
+    }
 
-    /**
-     * @param key
-     *            the key set on the widget.
-     * @param value
-     *            the value for the key.
-     * @param index
-     *            the index of the widget.
-     * @return a {@link RemoteBotList} with the specified <code>key/value</code>.
-     */
+    public IRemoteBotCheckBox checkBoxWithTooltip(String tooltip)
+        throws RemoteException {
+        checkbox.setWidget(swtBot.checkBoxWithTooltip(tooltip));
+        return checkbox;
+    }
 
-    public RemoteBotList listWithId(String key, String value, int index)
-        throws RemoteException;
+    public IRemoteBotCheckBox checkBoxWithTooltip(String tooltip, int index)
+        throws RemoteException {
+        checkbox.setWidget(swtBot.checkBoxWithTooltip(tooltip, index));
+        return checkbox;
+    }
 
-    /**
-     * @param value
-     *            the value for the key
-     *            {@link org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences#DEFAULT_KEY}
-     *            .
-     * @return a {@link RemoteBotList} with the specified <code>value</code>.
-     */
-    public RemoteBotList listWithId(String value) throws RemoteException;
+    public IRemoteBotCheckBox checkBoxWithId(String key, String value)
+        throws RemoteException {
+        checkbox.setWidget(swtBot.checkBoxWithId(key, value));
+        return checkbox;
+    }
 
-    /**
-     * @param value
-     *            the value for the key
-     *            {@link org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences#DEFAULT_KEY}
-     *            .
-     * @param index
-     *            the index of the widget.
-     * @return a {@link RemoteBotList} with the specified <code>value</code>.
-     */
+    public IRemoteBotCheckBox checkBoxWithId(String key, String value, int index)
+        throws RemoteException {
+        checkbox.setWidget(swtBot.checkBoxWithId(key, value, index));
+        return checkbox;
+    }
 
-    public RemoteBotList listWithId(String value, int index)
-        throws RemoteException;
+    public IRemoteBotCheckBox checkBoxWithId(String value) throws RemoteException {
+        checkbox.setWidget(swtBot.checkBoxWithId(value));
+        return checkbox;
+    }
 
-    /**
-     * @param inGroup
-     *            the inGroup on the widget.
-     * @return a {@link RemoteBotList} with the specified <code>inGroup</code>.
-     */
-    public RemoteBotList listInGroup(String inGroup) throws RemoteException;
+    public IRemoteBotCheckBox checkBoxWithId(String value, int index)
+        throws RemoteException {
+        checkbox.setWidget(swtBot.checkBoxWithId(value, index));
+        return checkbox;
+    }
 
-    /**
-     * @param inGroup
-     *            the inGroup on the widget.
-     * @param index
-     *            the index of the widget.
-     * @return a {@link RemoteBotList} with the specified <code>inGroup</code>.
-     */
+    public IRemoteBotCheckBox checkBoxInGroup(String inGroup)
+        throws RemoteException {
+        checkbox.setWidget(swtBot.checkBoxInGroup(inGroup));
+        return checkbox;
+    }
 
-    public RemoteBotList listInGroup(String inGroup, int index)
-        throws RemoteException;
+    public IRemoteBotCheckBox checkBoxInGroup(String inGroup, int index)
+        throws RemoteException {
+        checkbox.setWidget(swtBot.checkBoxInGroup(inGroup, index));
+        return checkbox;
+    }
 
-    /**
-     * @return a {@link RemoteBotList} with the specified <code>none</code>.
-     */
-    public RemoteBotList list() throws RemoteException;
+    public IRemoteBotCheckBox checkBox() throws RemoteException {
+        checkbox.setWidget(swtBot.checkBox());
+        return checkbox;
+    }
 
-    /**
-     * @param index
-     *            the index of the widget.
-     * @return a {@link RemoteBotList} with the specified <code>none</code>.
-     */
+    public IRemoteBotCheckBox checkBox(int index) throws RemoteException {
+        checkbox.setWidget(swtBot.checkBox(index));
+        return checkbox;
+    }
 
-    public RemoteBotList list(int index) throws RemoteException;
+    public IRemoteBotCheckBox checkBoxWithLabelInGroup(String label, String inGroup)
+        throws RemoteException {
+        checkbox.setWidget(swtBot.checkBoxWithLabelInGroup(label, inGroup));
+        return checkbox;
+    }
 
-    /**
-     * @param label
-     *            the label on the widget.
-     * @param inGroup
-     *            the inGroup on the widget.
-     * @return a {@link RemoteBotList} with the specified <code>label</code> with
-     *         the specified <code>inGroup</code>.
-     */
-    public RemoteBotList listWithLabelInGroup(String label, String inGroup)
-        throws RemoteException;
+    public IRemoteBotCheckBox checkBoxWithLabelInGroup(String label,
+        String inGroup, int index) throws RemoteException {
+        checkbox.setWidget(swtBot.checkBoxWithLabelInGroup(label, inGroup,
+            index));
+        return checkbox;
+    }
 
-    /**
-     * @param label
-     *            the label on the widget.
-     * @param inGroup
-     *            the inGroup on the widget.
-     * @param index
-     *            the index of the widget.
-     * @return a {@link RemoteBotList} with the specified <code>label</code> with
-     *         the specified <code>inGroup</code>.
-     */
+    public IRemoteBotCheckBox checkBoxInGroup(String mnemonicText, String inGroup)
+        throws RemoteException {
+        checkbox.setWidget(swtBot.checkBoxInGroup(mnemonicText, inGroup));
+        return checkbox;
+    }
 
-    public RemoteBotList listWithLabelInGroup(String label, String inGroup,
-        int index) throws RemoteException;
+    public IRemoteBotCheckBox checkBoxInGroup(String mnemonicText, String inGroup,
+        int index) throws RemoteException {
+        checkbox
+            .setWidget(swtBot.checkBoxInGroup(mnemonicText, inGroup, index));
+        return checkbox;
+    }
 
-    /**
+    public IRemoteBotCheckBox checkBoxWithTooltipInGroup(String tooltip,
+        String inGroup) throws RemoteException {
+        checkbox.setWidget(swtBot.checkBoxWithTooltipInGroup(tooltip, inGroup));
+        return checkbox;
+    }
+
+    public IRemoteBotCheckBox checkBoxWithTooltipInGroup(String tooltip,
+        String inGroup, int index) throws RemoteException {
+        checkbox.setWidget(swtBot.checkBoxWithTooltipInGroup(tooltip, inGroup,
+            index));
+        return checkbox;
+    }
+
+    /**********************************************
      * 
-     * @return the title of the active shell.
-     * @throws RemoteException
-     */
-    public String getTextOfActiveShell() throws RemoteException;
+     * Widget: Radio
+     * 
+     **********************************************/
+    public IRemoteBotRadio radioWithLabel(String label) throws RemoteException {
+        radio.setWidget(swtBot.radioWithLabel(label));
+        return radio;
+    }
 
-    public RemoteBotShell activeShell() throws RemoteException;
+    public IRemoteBotRadio radioWithLabel(String label, int index)
+        throws RemoteException {
+        radio.setWidget(swtBot.radioWithLabel(label));
+        return radio;
+    }
 
-    /**
-     * @param label
-     *            the label on the widget.
-     * @return a {@link RemoteBotCheckBox} with the specified <code>label</code>.
-     */
-    public RemoteBotCheckBox checkBoxWithLabel(String label)
-        throws RemoteException;
+    public IRemoteBotRadio radio(String mnemonicText) throws RemoteException {
+        radio.setWidget(SarosSWTBot.getInstance().radio(mnemonicText));
+        return radio;
+    }
 
-    /**
-     * @param label
-     *            the label on the widget.
-     * @param index
-     *            the index of the widget.
-     * @return a {@link RemoteBotCheckBox} with the specified <code>label</code>.
-     */
+    public IRemoteBotRadio radio(String mnemonicText, int index)
+        throws RemoteException {
+        radio.setWidget(swtBot.radio(mnemonicText, index));
+        return radio;
+    }
 
-    public RemoteBotCheckBox checkBoxWithLabel(String label, int index)
-        throws RemoteException;
+    public IRemoteBotRadio radioWithTooltip(String tooltip) throws RemoteException {
+        radio.setWidget(swtBot.radioWithTooltip(tooltip));
+        return radio;
+    }
 
-    /**
-     * @param mnemonicText
-     *            the mnemonicText on the widget.
-     * @return a {@link RemoteBotCheckBox} with the specified
-     *         <code>mnemonicText</code>.
-     */
-    public RemoteBotCheckBox checkBox(String mnemonicText) throws RemoteException;
+    public IRemoteBotRadio radioWithTooltip(String tooltip, int index)
+        throws RemoteException {
+        radio.setWidget(swtBot.radioWithTooltip(tooltip, index));
+        return radio;
+    }
 
-    /**
-     * @param mnemonicText
-     *            the mnemonicText on the widget.
-     * @param index
-     *            the index of the widget.
-     * @return a {@link RemoteBotCheckBox} with the specified
-     *         <code>mnemonicText</code>.
-     */
+    public IRemoteBotRadio radioWithId(String key, String value)
+        throws RemoteException {
+        radio.setWidget(swtBot.radioWithId(key, value));
+        return radio;
+    }
 
-    public RemoteBotCheckBox checkBox(String mnemonicText, int index)
-        throws RemoteException;
+    public IRemoteBotRadio radioWithId(String key, String value, int index)
+        throws RemoteException {
+        radio.setWidget(swtBot.radioWithId(key, value, index));
+        return radio;
+    }
 
-    /**
-     * @param tooltip
-     *            the tooltip on the widget.
-     * @return a {@link RemoteBotCheckBox} with the specified <code>tooltip</code>.
-     */
-    public RemoteBotCheckBox checkBoxWithTooltip(String tooltip)
-        throws RemoteException;
+    public IRemoteBotRadio radioWithId(String value) throws RemoteException {
+        radio.setWidget(swtBot.radioWithId(value));
+        return radio;
+    }
 
-    /**
-     * @param tooltip
-     *            the tooltip on the widget.
-     * @param index
-     *            the index of the widget.
-     * @return a {@link RemoteBotCheckBox} with the specified <code>tooltip</code>.
-     */
+    public IRemoteBotRadio radioWithId(String value, int index)
+        throws RemoteException {
+        radio.setWidget(swtBot.radioWithId(value, index));
+        return radio;
+    }
 
-    public RemoteBotCheckBox checkBoxWithTooltip(String tooltip, int index)
-        throws RemoteException;
+    public IRemoteBotRadio radioInGroup(String inGroup) throws RemoteException {
+        radio.setWidget(swtBot.radioInGroup(inGroup));
+        return radio;
+    }
 
-    /**
-     * @param key
-     *            the key set on the widget.
-     * @param value
-     *            the value for the key.
-     * @return a {@link RemoteBotCheckBox} with the specified
-     *         <code>key/value</code>.
-     */
-    public RemoteBotCheckBox checkBoxWithId(String key, String value)
-        throws RemoteException;
+    public IRemoteBotRadio radioInGroup(String inGroup, int index)
+        throws RemoteException {
+        radio.setWidget(swtBot.radioInGroup(inGroup, index));
+        return radio;
+    }
 
-    /**
-     * @param key
-     *            the key set on the widget.
-     * @param value
-     *            the value for the key.
-     * @param index
-     *            the index of the widget.
-     * @return a {@link RemoteBotCheckBox} with the specified
-     *         <code>key/value</code>.
-     */
+    public IRemoteBotRadio radio() throws RemoteException {
+        radio.setWidget(swtBot.radio());
+        return radio;
+    }
 
-    public RemoteBotCheckBox checkBoxWithId(String key, String value, int index)
-        throws RemoteException;
+    public IRemoteBotRadio radio(int index) throws RemoteException {
+        radio.setWidget(swtBot.radio(index));
+        return radio;
+    }
 
-    /**
-     * @param value
-     *            the value for the key
-     *            {@link org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences#DEFAULT_KEY}
-     *            .
-     * @return a {@link RemoteBotCheckBox} with the specified <code>value</code>.
-     */
-    public RemoteBotCheckBox checkBoxWithId(String value) throws RemoteException;
+    public IRemoteBotRadio radioWithLabelInGroup(String label, String inGroup)
+        throws RemoteException {
+        radio.setWidget(swtBot.radioWithLabelInGroup(label, inGroup));
+        return radio;
+    }
 
-    /**
-     * @param value
-     *            the value for the key
-     *            {@link org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences#DEFAULT_KEY}
-     *            .
-     * @param index
-     *            the index of the widget.
-     * @return a {@link RemoteBotCheckBox} with the specified <code>value</code>.
-     */
+    public IRemoteBotRadio radioWithLabelInGroup(String label, String inGroup,
+        int index) throws RemoteException {
+        radio.setWidget(swtBot.radioWithLabelInGroup(label, inGroup, index));
+        return radio;
+    }
 
-    public RemoteBotCheckBox checkBoxWithId(String value, int index)
-        throws RemoteException;
+    public IRemoteBotRadio radioInGroup(String mnemonicText, String inGroup)
+        throws RemoteException {
+        radio.setWidget(swtBot.radioInGroup(mnemonicText, inGroup));
+        return radio;
+    }
 
-    /**
-     * @param inGroup
-     *            the inGroup on the widget.
-     * @return a {@link RemoteBotCheckBox} with the specified <code>inGroup</code>.
-     */
-    public RemoteBotCheckBox checkBoxInGroup(String inGroup)
-        throws RemoteException;
+    public IRemoteBotRadio radioInGroup(String mnemonicText, String inGroup,
+        int index) throws RemoteException {
+        radio.setWidget(swtBot.radioInGroup(mnemonicText, inGroup, index));
+        return radio;
+    }
 
-    /**
-     * @param inGroup
-     *            the inGroup on the widget.
-     * @param index
-     *            the index of the widget.
-     * @return a {@link RemoteBotCheckBox} with the specified <code>inGroup</code>.
-     */
+    public IRemoteBotRadio radioWithTooltipInGroup(String tooltip, String inGroup)
+        throws RemoteException {
+        radio.setWidget(swtBot.radioWithTooltipInGroup(tooltip, inGroup));
+        return radio;
+    }
 
-    public RemoteBotCheckBox checkBoxInGroup(String inGroup, int index)
-        throws RemoteException;
-
-    /**
-     * @return a {@link RemoteBotCheckBox} with the specified <code>none</code>.
-     */
-    public RemoteBotCheckBox checkBox() throws RemoteException;
-
-    /**
-     * @param index
-     *            the index of the widget.
-     * @return a {@link RemoteBotCheckBox} with the specified <code>none</code>.
-     */
-
-    public RemoteBotCheckBox checkBox(int index) throws RemoteException;
-
-    /**
-     * @param label
-     *            the label on the widget.
-     * @param inGroup
-     *            the inGroup on the widget.
-     * @return a {@link RemoteBotCheckBox} with the specified <code>label</code>
-     *         with the specified <code>inGroup</code>.
-     */
-    public RemoteBotCheckBox checkBoxWithLabelInGroup(String label, String inGroup)
-        throws RemoteException;
-
-    /**
-     * @param label
-     *            the label on the widget.
-     * @param inGroup
-     *            the inGroup on the widget.
-     * @param index
-     *            the index of the widget.
-     * @return a {@link RemoteBotCheckBox} with the specified <code>label</code>
-     *         with the specified <code>inGroup</code>.
-     */
-
-    public RemoteBotCheckBox checkBoxWithLabelInGroup(String label,
-        String inGroup, int index) throws RemoteException;
-
-    /**
-     * @param mnemonicText
-     *            the mnemonicText on the widget.
-     * @param inGroup
-     *            the inGroup on the widget.
-     * @return a {@link RemoteBotCheckBox} with the specified
-     *         <code>mnemonicText</code> with the specified <code>inGroup</code>
-     *         .
-     */
-    public RemoteBotCheckBox checkBoxInGroup(String mnemonicText, String inGroup)
-        throws RemoteException;
-
-    /**
-     * @param mnemonicText
-     *            the mnemonicText on the widget.
-     * @param inGroup
-     *            the inGroup on the widget.
-     * @param index
-     *            the index of the widget.
-     * @return a {@link RemoteBotCheckBox} with the specified
-     *         <code>mnemonicText</code> with the specified <code>inGroup</code>
-     *         .
-     */
-
-    public RemoteBotCheckBox checkBoxInGroup(String mnemonicText, String inGroup,
-        int index) throws RemoteException;
-
-    /**
-     * @param tooltip
-     *            the tooltip on the widget.
-     * @param inGroup
-     *            the inGroup on the widget.
-     * @return a {@link RemoteBotCheckBox} with the specified <code>tooltip</code>
-     *         with the specified <code>inGroup</code>.
-     */
-    public RemoteBotCheckBox checkBoxWithTooltipInGroup(String tooltip,
-        String inGroup) throws RemoteException;
-
-    /**
-     * @param tooltip
-     *            the tooltip on the widget.
-     * @param inGroup
-     *            the inGroup on the widget.
-     * @param index
-     *            the index of the widget.
-     * @return a {@link RemoteBotCheckBox} with the specified <code>tooltip</code>
-     *         with the specified <code>inGroup</code>.
-     */
-
-    public RemoteBotCheckBox checkBoxWithTooltipInGroup(String tooltip,
-        String inGroup, int index) throws RemoteException;
-
-    /**
-     * @param label
-     *            the label on the widget.
-     * @return a {@link RemoteBotRadio} with the specified <code>label</code>.
-     */
-    public RemoteBotRadio radioWithLabel(String label) throws RemoteException;
-
-    /**
-     * @param label
-     *            the label on the widget.
-     * @param index
-     *            the index of the widget.
-     * @return a {@link RemoteBotRadio} with the specified <code>label</code>.
-     */
-
-    public RemoteBotRadio radioWithLabel(String label, int index)
-        throws RemoteException;
-
-    /**
-     * @param mnemonicText
-     *            the mnemonicText on the widget.
-     * @return a {@link RemoteBotRadio} with the specified
-     *         <code>mnemonicText</code>.
-     */
-    public RemoteBotRadio radio(String mnemonicText) throws RemoteException;
-
-    /**
-     * @param mnemonicText
-     *            the mnemonicText on the widget.
-     * @param index
-     *            the index of the widget.
-     * @return a {@link RemoteBotRadio} with the specified
-     *         <code>mnemonicText</code>.
-     */
-
-    public RemoteBotRadio radio(String mnemonicText, int index)
-        throws RemoteException;
-
-    /**
-     * @param tooltip
-     *            the tooltip on the widget.
-     * @return a {@link RemoteBotRadio} with the specified <code>tooltip</code>.
-     */
-    public RemoteBotRadio radioWithTooltip(String tooltip) throws RemoteException;
-
-    /**
-     * @param tooltip
-     *            the tooltip on the widget.
-     * @param index
-     *            the index of the widget.
-     * @return a {@link RemoteBotRadio} with the specified <code>tooltip</code>.
-     */
-
-    public RemoteBotRadio radioWithTooltip(String tooltip, int index)
-        throws RemoteException;
-
-    /**
-     * @param key
-     *            the key set on the widget.
-     * @param value
-     *            the value for the key.
-     * @return a {@link RemoteBotRadio} with the specified <code>key/value</code>.
-     */
-    public RemoteBotRadio radioWithId(String key, String value)
-        throws RemoteException;
-
-    /**
-     * @param key
-     *            the key set on the widget.
-     * @param value
-     *            the value for the key.
-     * @param index
-     *            the index of the widget.
-     * @return a {@link RemoteBotRadio} with the specified <code>key/value</code>.
-     */
-
-    public RemoteBotRadio radioWithId(String key, String value, int index)
-        throws RemoteException;
-
-    /**
-     * @param value
-     *            the value for the key
-     *            {@link org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences#DEFAULT_KEY}
-     *            .
-     * @return a {@link RemoteBotRadio} with the specified <code>value</code>.
-     */
-    public RemoteBotRadio radioWithId(String value) throws RemoteException;
-
-    /**
-     * @param value
-     *            the value for the key
-     *            {@link org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences#DEFAULT_KEY}
-     *            .
-     * @param index
-     *            the index of the widget.
-     * @return a {@link RemoteBotRadio} with the specified <code>value</code>.
-     */
-
-    public RemoteBotRadio radioWithId(String value, int index)
-        throws RemoteException;
-
-    /**
-     * @param inGroup
-     *            the inGroup on the widget.
-     * @return a {@link RemoteBotRadio} with the specified <code>inGroup</code>.
-     */
-    public RemoteBotRadio radioInGroup(String inGroup) throws RemoteException;
-
-    /**
-     * @param inGroup
-     *            the inGroup on the widget.
-     * @param index
-     *            the index of the widget.
-     * @return a {@link RemoteBotRadio} with the specified <code>inGroup</code>.
-     */
-
-    public RemoteBotRadio radioInGroup(String inGroup, int index)
-        throws RemoteException;
-
-    /**
-     * @return a {@link RemoteBotRadio} with the specified <code>none</code>.
-     */
-    public RemoteBotRadio radio() throws RemoteException;
-
-    /**
-     * @param index
-     *            the index of the widget.
-     * @return a {@link RemoteBotRadio} with the specified <code>none</code>.
-     */
-
-    public RemoteBotRadio radio(int index) throws RemoteException;
-
-    /**
-     * @param label
-     *            the label on the widget.
-     * @param inGroup
-     *            the inGroup on the widget.
-     * @return a {@link RemoteBotRadio} with the specified <code>label</code> with
-     *         the specified <code>inGroup</code>.
-     */
-    public RemoteBotRadio radioWithLabelInGroup(String label, String inGroup)
-        throws RemoteException;
-
-    /**
-     * @param label
-     *            the label on the widget.
-     * @param inGroup
-     *            the inGroup on the widget.
-     * @param index
-     *            the index of the widget.
-     * @return a {@link RemoteBotRadio} with the specified <code>label</code> with
-     *         the specified <code>inGroup</code>.
-     */
-
-    public RemoteBotRadio radioWithLabelInGroup(String label, String inGroup,
-        int index) throws RemoteException;
-
-    /**
-     * @param mnemonicText
-     *            the mnemonicText on the widget.
-     * @param inGroup
-     *            the inGroup on the widget.
-     * @return a {@link RemoteBotRadio} with the specified
-     *         <code>mnemonicText</code> with the specified <code>inGroup</code>
-     *         .
-     */
-    public RemoteBotRadio radioInGroup(String mnemonicText, String inGroup)
-        throws RemoteException;
-
-    /**
-     * @param mnemonicText
-     *            the mnemonicText on the widget.
-     * @param inGroup
-     *            the inGroup on the widget.
-     * @param index
-     *            the index of the widget.
-     * @return a {@link RemoteBotRadio} with the specified
-     *         <code>mnemonicText</code> with the specified <code>inGroup</code>
-     *         .
-     */
-
-    public RemoteBotRadio radioInGroup(String mnemonicText, String inGroup,
-        int index) throws RemoteException;
-
-    /**
-     * @param tooltip
-     *            the tooltip on the widget.
-     * @param inGroup
-     *            the inGroup on the widget.
-     * @return a {@link RemoteBotRadio} with the specified <code>tooltip</code>
-     *         with the specified <code>inGroup</code>.
-     */
-    public RemoteBotRadio radioWithTooltipInGroup(String tooltip, String inGroup)
-        throws RemoteException;
-
-    /**
-     * @param tooltip
-     *            the tooltip on the widget.
-     * @param inGroup
-     *            the inGroup on the widget.
-     * @param index
-     *            the index of the widget.
-     * @return a {@link RemoteBotRadio} with the specified <code>tooltip</code>
-     *         with the specified <code>inGroup</code>.
-     */
-
-    public RemoteBotRadio radioWithTooltipInGroup(String tooltip, String inGroup,
-        int index) throws RemoteException;
+    public IRemoteBotRadio radioWithTooltipInGroup(String tooltip, String inGroup,
+        int index) throws RemoteException {
+        radio
+            .setWidget(swtBot.radioWithTooltipInGroup(tooltip, inGroup, index));
+        return radio;
+    }
 
     /**********************************************
      * 
      * Widget toggleButton
      * 
      **********************************************/
-    /**
-     * @param label
-     *            the label on the widget.
-     * @return a {@link RemoteBotToggleButton} with the specified
-     *         <code>label</code>.
-     */
-    public RemoteBotToggleButton toggleButtonWithLabel(String label)
-        throws RemoteException;
+    public IRemoteBotToggleButton toggleButtonWithLabel(String label)
+        throws RemoteException {
+        toggleButton.setWidget(swtBot.toggleButtonWithLabel(label));
+        return toggleButton;
+    }
 
-    /**
-     * @param label
-     *            the label on the widget.
-     * @param index
-     *            the index of the widget.
-     * @return a {@link RemoteBotToggleButton} with the specified
-     *         <code>label</code>.
-     */
+    public IRemoteBotToggleButton toggleButtonWithLabel(String label, int index)
+        throws RemoteException {
+        toggleButton.setWidget(swtBot.toggleButtonWithLabel(label));
+        return toggleButton;
+    }
 
-    public RemoteBotToggleButton toggleButtonWithLabel(String label, int index)
-        throws RemoteException;
+    public IRemoteBotToggleButton toggleButton(String mnemonicText)
+        throws RemoteException {
+        toggleButton.setWidget(swtBot.toggleButton(mnemonicText));
+        return toggleButton;
+    }
 
-    /**
-     * @param mnemonicText
-     *            the mnemonicText on the widget.
-     * @return a {@link RemoteBotToggleButton} with the specified
-     *         <code>mnemonicText</code>.
-     */
-    public RemoteBotToggleButton toggleButton(String mnemonicText)
-        throws RemoteException;
+    public IRemoteBotToggleButton toggleButton(String mnemonicText, int index)
+        throws RemoteException {
+        toggleButton.setWidget(swtBot.toggleButton(mnemonicText, index));
+        return toggleButton;
+    }
 
-    /**
-     * @param mnemonicText
-     *            the mnemonicText on the widget.
-     * @param index
-     *            the index of the widget.
-     * @return a {@link RemoteBotToggleButton} with the specified
-     *         <code>mnemonicText</code>.
-     */
+    public IRemoteBotToggleButton toggleButtonWithTooltip(String tooltip)
+        throws RemoteException {
+        toggleButton.setWidget(swtBot.toggleButtonWithTooltip(tooltip));
+        return toggleButton;
+    }
 
-    public RemoteBotToggleButton toggleButton(String mnemonicText, int index)
-        throws RemoteException;
+    public IRemoteBotToggleButton toggleButtonWithTooltip(String tooltip, int index)
+        throws RemoteException {
+        toggleButton.setWidget(swtBot.toggleButtonWithTooltip(tooltip, index));
+        return toggleButton;
+    }
 
-    /**
-     * @param tooltip
-     *            the tooltip on the widget.
-     * @return a {@link RemoteBotToggleButton} with the specified
-     *         <code>tooltip</code>.
-     */
-    public RemoteBotToggleButton toggleButtonWithTooltip(String tooltip)
-        throws RemoteException;
+    public IRemoteBotToggleButton toggleButtonWithId(String key, String value)
+        throws RemoteException {
+        toggleButton.setWidget(swtBot.toggleButtonWithId(key, value));
+        return toggleButton;
+    }
 
-    /**
-     * @param tooltip
-     *            the tooltip on the widget.
-     * @param index
-     *            the index of the widget.
-     * @return a {@link RemoteBotToggleButton} with the specified
-     *         <code>tooltip</code>.
-     */
+    public IRemoteBotToggleButton toggleButtonWithId(String key, String value,
+        int index) throws RemoteException {
+        toggleButton.setWidget(swtBot.toggleButtonWithId(key, value));
+        return toggleButton;
+    }
 
-    public RemoteBotToggleButton toggleButtonWithTooltip(String tooltip, int index)
-        throws RemoteException;
+    public IRemoteBotToggleButton toggleButtonWithId(String value)
+        throws RemoteException {
+        toggleButton.setWidget(swtBot.toggleButtonWithId(value));
+        return toggleButton;
+    }
 
-    /**
-     * @param key
-     *            the key set on the widget.
-     * @param value
-     *            the value for the key.
-     * @return a {@link RemoteBotToggleButton} with the specified
-     *         <code>key/value</code>.
-     */
-    public RemoteBotToggleButton toggleButtonWithId(String key, String value)
-        throws RemoteException;
+    public IRemoteBotToggleButton toggleButtonWithId(String value, int index)
+        throws RemoteException {
+        toggleButton.setWidget(swtBot.toggleButtonWithId(value, index));
+        return toggleButton;
+    }
 
-    /**
-     * @param key
-     *            the key set on the widget.
-     * @param value
-     *            the value for the key.
-     * @param index
-     *            the index of the widget.
-     * @return a {@link RemoteBotToggleButton} with the specified
-     *         <code>key/value</code>.
-     */
+    public IRemoteBotToggleButton toggleButtonInGroup(String inGroup)
+        throws RemoteException {
+        toggleButton.setWidget(swtBot.toggleButtonInGroup(inGroup));
+        return toggleButton;
+    }
 
-    public RemoteBotToggleButton toggleButtonWithId(String key, String value,
-        int index) throws RemoteException;
+    public IRemoteBotToggleButton toggleButtonInGroup(String inGroup, int index)
+        throws RemoteException {
+        toggleButton.setWidget(swtBot.toggleButtonInGroup(inGroup, index));
+        return toggleButton;
+    }
 
-    /**
-     * @param value
-     *            the value for the key
-     *            {@link org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences#DEFAULT_KEY}
-     *            .
-     * @return a {@link RemoteBotToggleButton} with the specified
-     *         <code>value</code>.
-     */
-    public RemoteBotToggleButton toggleButtonWithId(String value)
-        throws RemoteException;
+    public IRemoteBotToggleButton toggleButton() throws RemoteException {
+        toggleButton.setWidget(swtBot.toggleButton());
+        return toggleButton;
+    }
 
-    /**
-     * @param value
-     *            the value for the key
-     *            {@link org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences#DEFAULT_KEY}
-     *            .
-     * @param index
-     *            the index of the widget.
-     * @return a {@link RemoteBotToggleButton} with the specified
-     *         <code>value</code>.
-     */
+    public IRemoteBotToggleButton toggleButton(int index) throws RemoteException {
+        toggleButton.setWidget(swtBot.toggleButton(index));
+        return toggleButton;
+    }
 
-    public RemoteBotToggleButton toggleButtonWithId(String value, int index)
-        throws RemoteException;
+    public IRemoteBotToggleButton toggleButtonWithLabelInGroup(String label,
+        String inGroup) throws RemoteException {
+        toggleButton.setWidget(swtBot.toggleButtonWithLabelInGroup(label,
+            inGroup));
+        return toggleButton;
+    }
 
-    /**
-     * @param inGroup
-     *            the inGroup on the widget.
-     * @return a {@link RemoteBotToggleButton} with the specified
-     *         <code>inGroup</code>.
-     */
-    public RemoteBotToggleButton toggleButtonInGroup(String inGroup)
-        throws RemoteException;
+    public IRemoteBotToggleButton toggleButtonWithLabelInGroup(String label,
+        String inGroup, int index) throws RemoteException {
+        toggleButton.setWidget(swtBot.toggleButtonWithLabelInGroup(label,
+            inGroup, index));
+        return toggleButton;
+    }
 
-    /**
-     * @param inGroup
-     *            the inGroup on the widget.
-     * @param index
-     *            the index of the widget.
-     * @return a {@link RemoteBotToggleButton} with the specified
-     *         <code>inGroup</code>.
-     */
+    public IRemoteBotToggleButton toggleButtonInGroup(String mnemonicText,
+        String inGroup) throws RemoteException {
+        toggleButton.setWidget(swtBot
+            .toggleButtonInGroup(mnemonicText, inGroup));
+        return toggleButton;
+    }
 
-    public RemoteBotToggleButton toggleButtonInGroup(String inGroup, int index)
-        throws RemoteException;
+    public IRemoteBotToggleButton toggleButtonInGroup(String mnemonicText,
+        String inGroup, int index) throws RemoteException {
+        toggleButton.setWidget(swtBot.toggleButtonInGroup(mnemonicText,
+            inGroup, index));
+        return toggleButton;
+    }
 
-    /**
-     * @return a {@link RemoteBotToggleButton} with the specified <code>none</code>
-     *         .
-     */
-    public RemoteBotToggleButton toggleButton() throws RemoteException;
+    public IRemoteBotToggleButton toggleButtonWithTooltipInGroup(String tooltip,
+        String inGroup) throws RemoteException {
+        toggleButton.setWidget(swtBot.toggleButtonWithTooltipInGroup(tooltip,
+            inGroup));
+        return toggleButton;
+    }
 
-    /**
-     * @param index
-     *            the index of the widget.
-     * @return a {@link RemoteBotToggleButton} with the specified <code>none</code>
-     *         .
-     */
-
-    public RemoteBotToggleButton toggleButton(int index) throws RemoteException;
-
-    /**
-     * @param label
-     *            the label on the widget.
-     * @param inGroup
-     *            the inGroup on the widget.
-     * @return a {@link RemoteBotToggleButton} with the specified
-     *         <code>label</code> with the specified <code>inGroup</code>.
-     */
-    public RemoteBotToggleButton toggleButtonWithLabelInGroup(String label,
-        String inGroup) throws RemoteException;
-
-    /**
-     * @param label
-     *            the label on the widget.
-     * @param inGroup
-     *            the inGroup on the widget.
-     * @param index
-     *            the index of the widget.
-     * @return a {@link RemoteBotToggleButton} with the specified
-     *         <code>label</code> with the specified <code>inGroup</code>.
-     */
-
-    public RemoteBotToggleButton toggleButtonWithLabelInGroup(String label,
-        String inGroup, int index) throws RemoteException;
-
-    /**
-     * @param mnemonicText
-     *            the mnemonicText on the widget.
-     * @param inGroup
-     *            the inGroup on the widget.
-     * @return a {@link RemoteBotToggleButton} with the specified
-     *         <code>mnemonicText</code> with the specified <code>inGroup</code>
-     *         .
-     */
-    public RemoteBotToggleButton toggleButtonInGroup(String mnemonicText,
-        String inGroup) throws RemoteException;
-
-    /**
-     * @param mnemonicText
-     *            the mnemonicText on the widget.
-     * @param inGroup
-     *            the inGroup on the widget.
-     * @param index
-     *            the index of the widget.
-     * @return a {@link RemoteBotToggleButton} with the specified
-     *         <code>mnemonicText</code> with the specified <code>inGroup</code>
-     *         .
-     */
-
-    public RemoteBotToggleButton toggleButtonInGroup(String mnemonicText,
-        String inGroup, int index) throws RemoteException;
-
-    /**
-     * @param tooltip
-     *            the tooltip on the widget.
-     * @param inGroup
-     *            the inGroup on the widget.
-     * @return a {@link RemoteBotToggleButton} with the specified
-     *         <code>tooltip</code> with the specified <code>inGroup</code>.
-     */
-    public RemoteBotToggleButton toggleButtonWithTooltipInGroup(String tooltip,
-        String inGroup) throws RemoteException;
-
-    /**
-     * @param tooltip
-     *            the tooltip on the widget.
-     * @param inGroup
-     *            the inGroup on the widget.
-     * @param index
-     *            the index of the widget.
-     * @return a {@link RemoteBotToggleButton} with the specified
-     *         <code>tooltip</code> with the specified <code>inGroup</code>.
-     */
-
-    public RemoteBotToggleButton toggleButtonWithTooltipInGroup(String tooltip,
-        String inGroup, int index) throws RemoteException;
+    public IRemoteBotToggleButton toggleButtonWithTooltipInGroup(String tooltip,
+        String inGroup, int index) throws RemoteException {
+        toggleButton.setWidget(swtBot.toggleButtonWithTooltipInGroup(tooltip,
+            inGroup, index));
+        return toggleButton;
+    }
 
     /**********************************************
      * 
      * Wait until
      * 
      **********************************************/
-    public void waitUntil(ICondition condition) throws RemoteException;
+    public void waitUntil(ICondition condition) throws RemoteException {
+        swtBot.waitUntil(condition, SarosSWTBotPreferences.SAROS_TIMEOUT);
+    }
 
-    public void waitLongUntil(ICondition condition) throws RemoteException;
+    public void waitLongUntil(ICondition condition) throws RemoteException {
+        swtBot.waitUntil(condition, SarosSWTBotPreferences.SAROS_LONG_TIMEOUT);
+    }
 
-    public void waitShortUntil(ICondition condition) throws RemoteException;
+    public void waitShortUntil(ICondition condition) throws RemoteException {
+        swtBot.waitUntil(condition, SarosSWTBotPreferences.SAROS_SHORT_TIMEOUT);
+    }
 
     /**********************************************
      * 
      * Others
      * 
      **********************************************/
+    public void sleep(long millis) throws RemoteException {
+        swtBot.sleep(millis);
+    }
 
-    public void sleep(long millis) throws RemoteException;
+    public void captureScreenshot(String fileName) throws RemoteException {
+        swtBot.captureScreenshot(fileName);
+    }
 
-    /**
-     * @see SWTBot#captureScreenshot(String)
-     * @throws RemoteException
-     */
-    public void captureScreenshot(String fileName) throws RemoteException;
-
-    public String getPathToScreenShot() throws RemoteException;
+    public String getPathToScreenShot() throws RemoteException {
+        Bundle bundle = saros.getBundle();
+        log.debug("screenshot's directory: "
+            + bundle.getLocation().substring(16) + SCREENSHOTDIR);
+        if (getOS() == TypeOfOS.WINDOW)
+            return bundle.getLocation().substring(16) + SCREENSHOTDIR;
+        else if (getOS() == TypeOfOS.MAC) {
+            return "/" + bundle.getLocation().substring(16) + SCREENSHOTDIR;
+        }
+        return bundle.getLocation().substring(16) + SCREENSHOTDIR;
+    }
 
 }

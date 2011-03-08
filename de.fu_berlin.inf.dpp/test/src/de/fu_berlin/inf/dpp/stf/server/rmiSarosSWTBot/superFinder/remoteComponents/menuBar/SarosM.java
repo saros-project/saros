@@ -1,37 +1,75 @@
 package de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.menuBar;
 
-import java.rmi.Remote;
 import java.rmi.RemoteException;
 
 import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.IRemoteBotMenu;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.Component;
 
-public interface SarosM extends Remote {
+public class SarosM extends Component implements ISarosM {
 
-    public SarosPreferences preferences() throws RemoteException;
+    private static transient SarosM self;
+
+    private static SarosPreferences pref;
+
+    private IRemoteBotMenu menu;
 
     /**
-     * Creates an account with GUI, which should be done with the following
-     * steps:
-     * <ol>
-     * <li>Click menu "Saros" -> "Create Account"</li>
-     * <li>confirm the popup window "Create New User Account" with the given
-     * parameters</li>
-     * </ol>
-     * 
-     * @param jid
-     *            a JID which is used to identify the users of the Jabber
-     *            network, more about it please see {@link JID}.
-     * @param password
-     *            the password of the new account.
-     * 
-     *            TODO not implement yet.
-     * @throws RemoteException
+     * {@link SarosM} is a singleton, but inheritance is possible.
      */
-    public void creatAccount(JID jid, String password) throws RemoteException;
+    public static SarosM getInstance() {
+        if (self != null)
+            return self;
+        self = new SarosM();
+        pref = SarosPreferences.getInstance();
+        return self;
+    }
 
-    public void addBuddy(JID jid) throws RemoteException;
+    public ISarosM setMenu(IRemoteBotMenu menu) {
+        this.menu = menu;
+        return this;
+    }
+
+    /**************************************************************
+     * 
+     * exported functions
+     * 
+     **************************************************************/
+
+    /**********************************************
+     * 
+     * actions
+     * 
+     **********************************************/
+
+    public void creatAccount(JID jid, String password) throws RemoteException {
+        precondition();
+        menu.menu(MENU_CREATE_ACCOUNT).click();
+        sarosBot().confirmShellCreateNewXMPPJabberAccount(jid, password);
+    }
+
+    public void addBuddy(JID jid) throws RemoteException {
+        menu.menu(MENU_ADD_BUDDY).click();
+        sarosBot().confirmShellAddBuddy(jid);
+    }
 
     public void shareProjects(String projectName, JID... jids)
-        throws RemoteException;
+        throws RemoteException {
+        menu.menu(MENU_SHARE_PROJECTS).click();
+        sarosBot().confirmShellShareProject(projectName, jids);
+    }
 
+    public ISarosPreferences preferences() throws RemoteException {
+        return pref;
+    }
+
+    /**********************************************
+     * 
+     * Inner functions
+     * 
+     **********************************************/
+
+    protected void precondition() throws RemoteException {
+        bot().activateWorkbench();
+    }
 }

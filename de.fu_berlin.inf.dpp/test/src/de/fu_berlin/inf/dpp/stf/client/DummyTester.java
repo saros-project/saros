@@ -5,8 +5,8 @@ import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.RemoteWorkbenchBot;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.SuperRemoteBot;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.IRemoteWorkbenchBot;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.ISuperBot;
 
 /**
  * DummyTester is responsible to check if a tester is already initialized.
@@ -58,13 +58,13 @@ public class DummyTester extends AbstractTester {
     }
 
     @Override
-    public RemoteWorkbenchBot bot() {
+    public IRemoteWorkbenchBot bot() {
         throwException();
         return null;
     }
 
     @Override
-    public SuperRemoteBot superBot() throws RemoteException {
+    public ISuperBot superBot() throws RemoteException {
         throwException();
         return null;
     }

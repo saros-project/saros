@@ -1,12 +1,34 @@
 package de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.menuBar;
 
-import java.rmi.Remote;
 import java.rmi.RemoteException;
 
-public interface MenuBar extends Remote {
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.Component;
 
-    public SarosM saros() throws RemoteException;
+public class MenuBar extends Component implements IMenuBar {
 
-    public WindowM window() throws RemoteException;
+    private static transient MenuBar self;
+
+    private static SarosM sarosM;
+    private static WindowM windowM;
+
+    /**
+     * {@link MenuBar} is a singleton, but inheritance is possible.
+     */
+    public static MenuBar getInstance() {
+        if (self != null)
+            return self;
+        self = new MenuBar();
+        sarosM = SarosM.getInstance();
+        windowM = WindowM.getInstance();
+        return self;
+    }
+
+    public ISarosM saros() throws RemoteException {
+        return sarosM.setMenu(bot().menu(MENU_SAROS));
+    }
+
+    public IWindowM window() throws RemoteException {
+        return windowM;
+    }
 
 }

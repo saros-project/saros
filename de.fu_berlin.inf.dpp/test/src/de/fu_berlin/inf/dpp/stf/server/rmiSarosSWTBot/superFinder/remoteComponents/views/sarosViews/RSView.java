@@ -1,17 +1,55 @@
 package de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.views.sarosViews;
 
-import java.rmi.Remote;
 import java.rmi.RemoteException;
 
-public interface RSView extends Remote {
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.IRemoteBotView;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.Component;
 
-    public void clickTBChangeModeOfImageSource() throws RemoteException;
+public class RSView extends Component implements IRSView {
 
-    public void clickTBStopRunningSession() throws RemoteException;
+    private static transient RSView self;
+    private IRemoteBotView view;
 
-    public void clickTBResume() throws RemoteException;
+    /**
+     * {@link ChatView} is a singleton, but inheritance is possible.
+     */
+    public static RSView getInstance() {
+        if (self != null)
+            return self;
+        self = new RSView();
+        return self;
+    }
 
-    public void clickTBPause() throws RemoteException;
+    public IRSView setView(IRemoteBotView view) {
+        this.view = view;
+        return this;
+    }
 
-    // public void waitUntilRemoteScreenViewIsActive() throws RemoteException;
+    /**************************************************************
+     * 
+     * exported functions
+     * 
+     **************************************************************/
+
+    /**********************************************
+     * 
+     * actions
+     * 
+     **********************************************/
+    public void clickTBChangeModeOfImageSource() throws RemoteException {
+        view.toolbarButton(TB_CHANGE_MODE_IMAGE_SOURCE).click();
+    }
+
+    public void clickTBStopRunningSession() throws RemoteException {
+        view.toolbarButton(TB_STOP_RUNNING_SESSION).click();
+    }
+
+    public void clickTBResume() throws RemoteException {
+        view.toolbarButton(TB_RESUME).click();
+    }
+
+    public void clickTBPause() throws RemoteException {
+        view.toolbarButton(TB_PAUSE).click();
+    }
+
 }

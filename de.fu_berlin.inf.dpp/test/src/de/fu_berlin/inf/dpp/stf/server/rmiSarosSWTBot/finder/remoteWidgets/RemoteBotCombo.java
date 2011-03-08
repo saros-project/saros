@@ -1,9 +1,35 @@
 package de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets;
 
-import java.rmi.Remote;
 import java.rmi.RemoteException;
 
-public interface RemoteBotCombo extends Remote {
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotCombo;
+
+public class RemoteBotCombo extends AbstractRmoteWidget implements IRemoteBotCombo {
+
+    private static transient RemoteBotCombo self;
+
+    private SWTBotCombo widget;
+
+    /**
+     * {@link RemoteBotCombo} is a singleton, but inheritance is possible.
+     */
+    public static RemoteBotCombo getInstance() {
+        if (self != null)
+            return self;
+        self = new RemoteBotCombo();
+        return self;
+    }
+
+    public IRemoteBotCombo setWidget(SWTBotCombo ccomb) {
+        this.widget = ccomb;
+        return this;
+    }
+
+    /**************************************************************
+     * 
+     * exported functions
+     * 
+     **************************************************************/
 
     /**********************************************
      * 
@@ -11,46 +37,128 @@ public interface RemoteBotCombo extends Remote {
      * 
      **********************************************/
 
-    public RemoteBotMenu contextMenu(String text) throws RemoteException;
+    /**
+     * @see SWTBotCombo#contextMenu(String)
+     */
+    public IRemoteBotMenu contextMenu(String text) throws RemoteException {
+        return stfBotMenu.setWidget(widget.contextMenu(text));
+    }
 
     /**********************************************
      * 
      * actions
      * 
      **********************************************/
+    /**
+     * @see SWTBotCombo#typeText(String)
+     */
+    public void typeText(String text) throws RemoteException {
+        widget.typeText(text);
 
-    public void typeText(String text) throws RemoteException;
+    }
 
-    public void typeText(String text, int interval) throws RemoteException;
+    /**
+     * @see SWTBotCombo#typeText(String, int)
+     */
+    public void typeText(String text, int interval) throws RemoteException {
+        widget.typeText(text, interval);
+    }
 
-    public void setFocus() throws RemoteException;
+    /**
+     * @see SWTBotCombo#setFocus()
+     */
+    public void setFocus() throws RemoteException {
+        widget.setFocus();
+    }
 
-    public void setText(String text) throws RemoteException;
+    /**
+     * @see SWTBotCombo#setText(String)
+     */
+    public void setText(String text) throws RemoteException {
+        widget.setText(text);
+    }
 
-    public void setSelection(String text) throws RemoteException;
+    /**
+     * @see SWTBotCombo#setSelection(String)
+     */
+    public void setSelection(String text) throws RemoteException {
+        widget.setSelection(text);
+    }
 
-    public void setSelection(int index) throws RemoteException;
+    /**
+     * @see SWTBotCombo#setSelection(int)
+     */
+    public void setSelection(int index) throws RemoteException {
+        widget.setSelection(index);
+    }
 
     /**********************************************
      * 
      * states
      * 
      **********************************************/
-    public int itemCount() throws RemoteException;
 
-    public String[] items() throws RemoteException;
+    /**
+     * @see SWTBotCombo#itemCount()
+     */
+    public int itemCount() throws RemoteException {
+        return widget.itemCount();
+    }
 
-    public String selection() throws RemoteException;
+    /**
+     * @see SWTBotCombo#items()
+     */
+    public String[] items() throws RemoteException {
+        return widget.items();
+    }
 
-    public int selectionIndex() throws RemoteException;
+    /**
+     * @see SWTBotCombo#selection()
+     */
+    public String selection() throws RemoteException {
+        return widget.selection();
+    }
 
-    public boolean isEnabled() throws RemoteException;
+    /**
+     * @see SWTBotCombo#selectionIndex()
+     */
+    public int selectionIndex() throws RemoteException {
+        return widget.selectionIndex();
+    }
 
-    public boolean isVisible() throws RemoteException;
+    /**
+     * @see SWTBotCombo#isEnabled()
+     */
+    public boolean isEnabled() throws RemoteException {
+        return widget.isEnabled();
+    }
 
-    public boolean isActive() throws RemoteException;
+    /**
+     * @see SWTBotCombo#isVisible()
+     */
+    public boolean isVisible() throws RemoteException {
+        return widget.isVisible();
+    }
 
-    public String getText() throws RemoteException;
+    /**
+     * @see SWTBotCombo#isActive()
+     */
+    public boolean isActive() throws RemoteException {
+        return widget.isActive();
+    }
 
-    public String getToolTipText() throws RemoteException;
+    /**
+     * @see SWTBotCombo#getText()
+     */
+    public String getText() throws RemoteException {
+        return widget.getText();
+    }
+
+    /**
+     * @see SWTBotCombo#getToolTipText()
+     */
+    public String getToolTipText() throws RemoteException {
+        return widget.getText();
+    }
+
 }

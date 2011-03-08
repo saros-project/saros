@@ -1,89 +1,65 @@
 package de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.contextMenu;
 
-import java.rmi.Remote;
 import java.rmi.RemoteException;
 
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.stf.STF;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.IRemoteBotTreeItem;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.Component;
 
-/**
- * This interface contains convenience API to perform actions activated by
- * clicking subMenus of contextMenu {@link STF#CM_SHARE_WITH} in the package
- * explorer view. STF users would start off as follows:
- * 
- * <pre>
- * //
- * // init alice and bob
- * //
- * initTesters(TypeOfTester.ALICE, Tester.BOB);
- * 
- * //
- * // clean up workbench
- * //
- * setUpWorkbench();
- * 
- * //
- * // open sarosViews, connect...
- * //
- * setUpSaros();
- * 
- * //
- * // alice create a new java project with name Foo_bar
- * //
- * alice.superBot().views().packageExplorerView().tree().newC()
- *     .javaProject(&quot;Foo_bar&quot;);
- * 
- * //
- * // alice share the project Foo_bar with bob
- * //
- * alice.superBot().views().packageExplorerView().selectProject(&quot;Foo_bar&quot;)
- *     .shareWith().buddy(bob.getJID());
- * </pre>
- * 
- * More informations about how to write STF-Tests please read the user guide.
- * 
- * @author lchen
- */
-public interface ShareWithC extends Remote {
+public class ShareWithC extends Component implements IShareWithC {
+
+    private static transient ShareWithC self;
+
+    private IRemoteBotTreeItem treeItem;
 
     /**
-     * Perform the action share project with multiple buddies which should be
-     * activated by clicking the contextMenu Share With-> multiple buddies of
-     * the given project in the package explorer view.
-     * <p>
-     * <b>Attention:</b>
-     * <ol>
-     * <li>Makes sure, the package explorer view is open and active.</li>
-     * <li>The function treat also the event e.g. popUpWindow activated by
-     * clicking the contextMenut</li>
-     * </ol>
-     * 
-     * @param inviteeBaseJIDS
-     *            the base JIDs of the users with whom you want to share your
-     *            project.
-     * @throws RemoteException
-     * 
-     * @Deprecated
-     * 
-     *             FIXME: Can't click the contextMenu
+     * {@link ShareWithC} is a singleton, but inheritance is possible.
      */
-    public void multipleBuddies(String projectName, JID... inviteeBaseJIDS)
-        throws RemoteException;
+    public static ShareWithC getInstance() {
+        if (self != null)
+            return self;
+        self = new ShareWithC();
+        return self;
+    }
+
+    public void setTreeItem(IRemoteBotTreeItem treeItem) {
+        this.treeItem = treeItem;
+    }
+
+    /**************************************************************
+     * 
+     * exported functions
+     * 
+     **************************************************************/
+
+    /**********************************************
+     * 
+     * actions
+     * 
+     **********************************************/
 
     /**
-     * Perform the action share project with the given user which should be
-     * activated by clicking the contextMenu Share With-> [user's account] of
-     * the given project in the package explorer view.
-     * <p>
-     * <b>Attention:</b>
-     * <ol>
-     * <li>Makes sure, the package explorer view is open and active.</li>
-     * <li>The function treat also the event e.g. popUpWindow activated by
-     * clicking the contextMenut</li>
-     * </ol>
-     * 
-     * @param jid
-     * @throws RemoteException
+     * FIXME can not click the context menu.
      */
-    public void buddy(JID jid) throws RemoteException;
+    public void multipleBuddies(String projectName, JID... baseJIDOfInvitees)
+        throws RemoteException {
+        treeItem.contextMenu(CM_SHARE_WITH, CM_MULTIPLE_BUDDIES).click();
+        sarosBot().confirmShellShareProject(projectName, baseJIDOfInvitees);
+    }
+
+    public void buddy(JID jid) throws RemoteException {
+        treeItem.contextMenu(CM_SHARE_WITH, jid.getBase()).click();
+    }
+
+    public void addToSarosSession() {
+        /*
+         * The menu is only activated if there are project existed in the
+         * package explorer view, which is not in the session.
+         */
+    }
+
+    public void stopToSarosSession() {
+        //
+    }
+
 }
