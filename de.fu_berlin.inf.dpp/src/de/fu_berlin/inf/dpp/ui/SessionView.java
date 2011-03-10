@@ -24,7 +24,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 
-import de.fu_berlin.inf.dpp.SarosPluginContext;
 import org.apache.log4j.Logger;
 import org.eclipse.jface.layout.TableColumnLayout;
 import org.eclipse.jface.util.IPropertyChangeListener;
@@ -61,6 +60,7 @@ import org.jivesoftware.smack.packet.Presence;
 import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.Saros;
+import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.editor.AbstractSharedEditorListener;
@@ -595,8 +595,8 @@ public class SessionView extends ListExplanatoryViewPart {
                 Control control = (sessionView == null) ? Display.getDefault()
                     .getFocusControl() : ((SessionView) sessionView).viewer
                     .getTable();
-                BalloonNotification
-                    .showNotification(control, title, text, 5000);
+                BalloonNotification.showNotification(control, title, text,
+                    15000);
             }
         });
     }

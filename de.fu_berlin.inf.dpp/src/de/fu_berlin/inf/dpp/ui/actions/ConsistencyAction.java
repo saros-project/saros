@@ -22,6 +22,7 @@ import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.project.AbstractSarosSessionListener;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.SarosSessionManager;
+import de.fu_berlin.inf.dpp.ui.SessionView;
 import de.fu_berlin.inf.dpp.util.Utils;
 import de.fu_berlin.inf.dpp.util.ValueChangeListener;
 
@@ -102,22 +103,24 @@ public class ConsistencyAction extends Action {
                 Utils.runSafeSWTAsync(log, new Runnable() {
                     public void run() {
 
+                        String files = Utils.toOSString(paths);
+
                         // set tooltip
-                        setToolTipText("Inconsistency Detected in file/s "
-                            + Utils.toOSString(paths));
+                        setToolTipText("Inconsistency Detected in file(s): "
+                            + files);
 
                         // TODO Balloon is too aggressive at the moment, when
                         // the host is slow in sending changes (for instance
                         // when refactoring)
 
                         // show balloon notification
-                        /*
-                         * BalloonNotification.showNotification(
-                         * ((ToolBarManager) toolBar).getControl(),
-                         * "Inconsistency Detected!",
-                         * "Inconsistencies detected in: " +
-                         * pathsOfInconsistencies, 5000);
-                         */
+                        SessionView
+                            .showNotification(
+                                "Inconsistencies detected",
+                                "These files have become unsynchronised with the host:\n"
+                                    + files
+                                    + "\n\nPress the inconsistency recovery button to synchronise your project."
+                                    + " \nYou may wish to backup those file(s) in case important changes are overwritten.");
                     }
                 });
 

@@ -43,8 +43,11 @@ public class BalloonNotification {
             control = null;
         }
 
-        Shell parentShell = (control != null ? control.getShell() : null);
-        parentShell.forceActive();
+        Shell parentShell = null;
+        if (control != null) {
+            parentShell = control.getShell();
+            parentShell.forceActive();
+        }
 
         final BalloonWindow window = new BalloonWindow(parentShell, SWT.ON_TOP
             | SWT.TOOL | SWT.CLOSE | SWT.TITLE);
