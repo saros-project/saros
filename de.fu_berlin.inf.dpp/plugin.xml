@@ -58,47 +58,6 @@
       </perspectiveExtension>
    </extension>
    <extension
-         point="org.eclipse.ui.popupMenus">
-      <objectContribution
-            adaptable="true"
-            id="de.fu_berlin.inf.dpp.ui.popupMenus"
-            objectClass="org.eclipse.core.resources.IResource"
-            sibling_order="&lt;action&#x0A;               class=&quot;de.fu_berlin.inf.dpp.ui.actions.NewSessionAction&quot;&#x0A;               icon=&quot;icons/transmit.png&quot;&#x0A;               id=&quot;Saros.action1&quot;&#x0A;               label=&quot;Share project...&quot;&gt;&#x0A;         &lt;/action&gt;">
-         <menu
-               icon="icons/etool16/saros_menu.png"
-               id="sarosSubMenu"
-               label="Saros">
-               <separator name="Saros"/>
-         </menu>
-         <action
-               class="de.fu_berlin.inf.dpp.ui.actions.AddToSessionAction"
-               icon="icons/transmit.png"
-               id="Saros.action4"
-               label="Add to session (experimental)..."
-               menubarPath="sarosSubMenu/group1">
-         </action>
-         <!---
-         <action
-               class="de.fu_berlin.inf.dpp.ui.actions.PartialNewSessionAction"
-               icon="icons/transmit.png"
-               id="Saros.action3"
-               label="Share project partially (experimental)..."
-               menubarPath="sarosSubMenu/group1">
-         </action>
-         -->
-         <action
-               class="de.fu_berlin.inf.dpp.ui.actions.NewSessionAction"
-               icon="icons/transmit.png"
-               id="Saros.action1"
-               label="Share project..."
-               menubarPath="sarosSubMenu/group1">
-         </action>
-         <visibility>
-               <objectClass name="org.eclipse.core.resources.IProject"/>
-         </visibility>
-      </objectContribution>
-   </extension>
-   <extension
          point="org.eclipse.ui.decorators">
       <decorator
             adaptable="true"
