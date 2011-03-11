@@ -29,9 +29,10 @@
    <extension
          point="org.eclipse.ui.perspectives">
       <perspective
-            name="RCP Perspective"
             class="de.fu_berlin.inf.dpp.whiteboard.standalone.Perspective"
-            id="de.fu_berlin.inf.dpp.whiteboard.standalone.perspective">
+            icon="icons/view16/whiteboard_misc.png"
+            id="de.fu_berlin.inf.dpp.whiteboard.standalone.perspective"
+            name="Saros Whiteboard">
       </perspective>
    </extension>
    <extension
