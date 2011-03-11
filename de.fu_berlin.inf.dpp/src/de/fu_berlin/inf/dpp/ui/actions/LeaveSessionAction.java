@@ -81,7 +81,7 @@ public class LeaveSessionAction extends Action {
     protected void updateEnablement() {
         if (sessionManager.getSarosSession() != null) {
             if (sessionManager.getSarosSession().isHost()) {
-                setToolTipText("Stop Session");
+                setToolTipText("Stop Session...");
                 setImageDescriptor(new ImageDescriptor() {
                     @Override
                     public ImageData getImageData() {
@@ -90,7 +90,7 @@ public class LeaveSessionAction extends Action {
                     }
                 });
             } else {
-                setToolTipText("Leave Session");
+                setToolTipText("Leave Session...");
                 setImageDescriptor(new ImageDescriptor() {
                     @Override
                     public ImageData getImageData() {
