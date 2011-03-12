@@ -51,7 +51,7 @@ import de.fu_berlin.inf.dpp.util.Utils;
 public class SharedProjectDecorator implements ILightweightLabelDecorator {
 
     private static final Logger log = Logger
-        .getLogger(SharedProjectDecorator.class.getName());
+        .getLogger(SharedProjectDecorator.class);
 
     public static final ImageDescriptor projectDescriptor = ImageManager
         .getImageDescriptor("icons/ovr16/shared.png"); // NON-NLS-1
@@ -78,7 +78,7 @@ public class SharedProjectDecorator implements ILightweightLabelDecorator {
         @Override
         public void projectAdded(String projectID) {
             log.debug("PROJECT ADDED: " + projectID);
-            updateDecoratorsAsync(sarosSession.getProjects());
+            updateDecoratorsAsync(sarosSession.getProjects().toArray());
         }
     };
 
@@ -86,63 +86,53 @@ public class SharedProjectDecorator implements ILightweightLabelDecorator {
     protected SarosSessionManager sessionManager;
 
     public SharedProjectDecorator() {
-
         SarosPluginContext.initComponent(this);
 
         sessionManager.addSarosSessionListener(sessionListener);
-
         if (sessionManager.getSarosSession() != null) {
             sessionListener.sessionStarted(sessionManager.getSarosSession());
         }
-    }
-
-    public void decorate(Object element, IDecoration decoration) {
-
-        if (this.sarosSession == null) {
-            return;
-        }
-
-        // Enablement in the Plugin.xml ensures that we only get IProjects
-
-        if (element instanceof IProject) {
-            if (!this.sarosSession.isShared((IProject) element))
-                return;
-
-            decoration.addOverlay(SharedProjectDecorator.projectDescriptor,
-                IDecoration.TOP_LEFT);
-            return;
-        }
-    }
-
-    public void removeListener(ILabelProviderListener listener) {
-        listeners.remove(listener);
-    }
-
-    public void addListener(ILabelProviderListener listener) {
-        listeners.add(listener);
     }
 
     public void dispose() {
         sessionManager.removeSarosSessionListener(sessionListener);
     }
 
+    public void decorate(Object element, IDecoration decoration) {
+        if (this.sarosSession == null) {
+            return;
+        }
+
+        if (element instanceof IProject) {
+            IProject project = (IProject) element;
+
+            if (this.sarosSession.isShared(project)) {
+                decoration.addOverlay(SharedProjectDecorator.projectDescriptor,
+                    IDecoration.TOP_LEFT);
+            }
+        }
+    }
+
     public boolean isLabelProperty(Object element, String property) {
         return false;
     }
 
-    /**
-     * Will tell Eclipse to refresh the decorators of the given elements in the
-     * workspace.
-     */
-    protected void updateDecoratorsAsync(final Object... projects) {
-        log.debug("LETS REPAINT THE DECORATOR");
+    public void addListener(ILabelProviderListener listener) {
+        listeners.add(listener);
+    }
+
+    public void removeListener(ILabelProviderListener listener) {
+        listeners.remove(listener);
+    }
+
+    protected void updateDecoratorsAsync(final Object[] objects) {
+        log.debug("Decoration update");
         Utils.runSafeSWTAsync(log, new Runnable() {
             public void run() {
                 LabelProviderChangedEvent event = new LabelProviderChangedEvent(
-                    SharedProjectDecorator.this, projects);
+                    SharedProjectDecorator.this, objects);
 
                 for (ILabelProviderListener listener : listeners) {
-                    log.debug("NOTIFY THE CHANGE");
                     listener.labelProviderChanged(event);
                 }
             }
