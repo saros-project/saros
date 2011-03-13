@@ -5,7 +5,6 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
-import de.fu_berlin.inf.dpp.SarosPluginContext;
 import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.graphics.Image;
@@ -18,6 +17,7 @@ import org.jivesoftware.smack.packet.RosterPacket;
 import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.Saros;
+import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager.NetTransferMode;
@@ -103,8 +103,7 @@ public class RosterEntryElement extends TreeElement {
         /*
          * Append DataTransfer state information if debug mode is enabled.
          */
-        if (preferenceUtils.isDebugEnabled() && presence != null
-            && presence.isAvailable()) {
+        if (presence != null && presence.isAvailable()) {
             final NetTransferMode transferMode = dataTransferManager
                 .getTransferMode(jid);
 
