@@ -52,6 +52,7 @@ public class PublicXMPPServerComposite extends NoteComposite {
         StyledText quickStartText = new StyledText(composite, SWT.WRAP);
         quickStartText.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING,
             true, false));
+        quickStartText.setEnabled(false);
         quickStartText.setForeground(this.getForeground());
         quickStartText.setBackground(this.getBackground());
         quickStartText
