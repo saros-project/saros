@@ -1,0 +1,154 @@
+Saros Connectivity Diagnosis 
+---------------------------- 
+Version: 0.4 
+Date: 2011-03-16 
+Time: 03:06:29 
+ 
+ipconfig /all 
+------------- 
+
+Windows IP Configuration
+
+        Host Name . . . . . . . . . . . . : vpn-meetyoo
+        Primary Dns Suffix  . . . . . . . : 
+        Node Type . . . . . . . . . . . . : Unknown
+        IP Routing Enabled. . . . . . . . : No
+        WINS Proxy Enabled. . . . . . . . : No
+        DNS Suffix Search List. . . . . . : localdomain
+
+Ethernet adapter Local Area Connection:
+
+        Connection-specific DNS Suffix  . : localdomain
+        Description . . . . . . . . . . . : VMware Accelerated AMD PCNet Adapter
+        Physical Address. . . . . . . . . : 00-0C-29-47-30-8B
+        Dhcp Enabled. . . . . . . . . . . : Yes
+        Autoconfiguration Enabled . . . . : Yes
+        IP Address. . . . . . . . . . . . : 192.168.188.129
+        Subnet Mask . . . . . . . . . . . : 255.255.255.0
+        Default Gateway . . . . . . . . . : 192.168.188.2
+        DHCP Server . . . . . . . . . . . : 192.168.188.254
+        DNS Servers . . . . . . . . . . . : 192.168.188.2
+        Lease Obtained. . . . . . . . . . : Mittwoch, 16. März 2011 02:59:18
+        Lease Expires . . . . . . . . . . : Mittwoch, 16. März 2011 03:29:18
+
+Ethernet adapter VPN Connection:
+
+        Media State . . . . . . . . . . . : Media disconnected
+        Description . . . . . . . . . . . : NCP Secure Client Virtual Adapter
+        Physical Address. . . . . . . . . : 02-00-4E-43-50-49
+ 
+ 
+nslookup saros-project.org 
+-------------------------- 
+*** Can't find server name for address 192.168.188.2: Non-existent domain
+*** Default servers are not available
+Server:  UnKnown
+Address:  192.168.188.2
+
+Name:    saros-project.org.localdomain
+Address:  160.45.117.193
+
+ 
+ 
+nslookup -type=SRV _xmpp-server._tcp.saros-con.imp.fu-berlin.de 
+--------------------------------------------------------------- 
+*** Can't find server name for address 192.168.188.2: Non-existent domain
+*** Default servers are not available
+Non-authoritative answer:
+Server:  UnKnown
+Address:  192.168.188.2
+
+_xmpp-server._tcp.saros-con.imp.fu-berlin.de	SRV service location:
+	  priority       = 5
+	  weight         = 0
+	  port           = 5269
+	  svr hostname   = saros-con.imp.fu-berlin.de
+ 
+ 
+ping -w 3600 -n 3 saros-project.org 
+----------------------------------- 
+
+Pinging saros-project.org [160.45.117.193] with 32 bytes of data:
+
+Reply from 160.45.117.193: bytes=32 time=11ms TTL=128
+Reply from 160.45.117.193: bytes=32 time=12ms TTL=128
+Reply from 160.45.117.193: bytes=32 time=12ms TTL=128
+
+Ping statistics for 160.45.117.193:
+    Packets: Sent = 3, Received = 3, Lost = 0 (0% loss),
+Approximate round trip times in milli-seconds:
+    Minimum = 11ms, Maximum = 12ms, Average = 11ms
+ 
+ 
+ping -w 3600 -n 3 saros-con.imp.fu-berlin.de 
+-------------------------------------------- 
+
+Pinging saros-build.imp.fu-berlin.de [160.45.111.17] with 32 bytes of data:
+
+Reply from 160.45.111.17: bytes=32 time=14ms TTL=128
+Reply from 160.45.111.17: bytes=32 time=13ms TTL=128
+Reply from 160.45.111.17: bytes=32 time=13ms TTL=128
+
+Ping statistics for 160.45.111.17:
+    Packets: Sent = 3, Received = 3, Lost = 0 (0% loss),
+Approximate round trip times in milli-seconds:
+    Minimum = 13ms, Maximum = 14ms, Average = 13ms
+ 
+ 
+tracert -w 1000 -h 32 saros-project.org 
+--------------------------------------- 
+
+Tracing route to saros-project.org [160.45.117.193]
+over a maximum of 32 hops:
+
+  1    <1 ms    <1 ms    <1 ms  192.168.188.2 
+  2     *        *        *     Request timed out.
+  3     *        *        *     Request timed out.
+  4     *        *        *     Request timed out.
+  5     *        *        *     Request timed out.
+  6     *        *        *     Request timed out.
+  7     *        *        *     Request timed out.
+  8     *        *        *     Request timed out.
+  9     *        *        *     Request timed out.
+ 10     *        *        *     Request timed out.
+ 11     *        *        *     Request timed out.
+ 12     *        *        *     Request timed out.
+ 13    13 ms    11 ms    15 ms  virtualhost.mi.fu-berlin.de [160.45.117.193] 
+
+Trace complete.
+ 
+ 
+tracert -w 1000 -h 32 saros-con.imp.fu-berlin.de 
+------------------------------------------------ 
+
+Tracing route to saros-build.imp.fu-berlin.de [160.45.111.17]
+over a maximum of 32 hops:
+
+  1    <1 ms    <1 ms    <1 ms  192.168.188.2 
+  2     *        *        *     Request timed out.
+  3     *        *        *     Request timed out.
+  4     *        *        *     Request timed out.
+  5     *        *        *     Request timed out.
+  6     *        *        *     Request timed out.
+  7     *        *        *     Request timed out.
+  8     *        *        *     Request timed out.
+  9     *        *        *     Request timed out.
+ 10     *        *        *     Request timed out.
+ 11     *        *        *     Request timed out.
+ 12     *        *        *     Request timed out.
+ 13     *        *        *     Request timed out.
+ 14    11 ms    12 ms    16 ms  saros-build.imp.fu-berlin.de [160.45.111.17] 
+
+Trace complete.
+ 
+ 
+nc.exe -vz saros-con.imp.fu-berlin.de 5222 
+------------------------------------------ 
+saros-build.imp.fu-berlin.de [160.45.111.17] 5222 (?) open
+ 
+ 
+nc.exe -vz saros-con.imp.fu-berlin.de 5269 
+------------------------------------------ 
+saros-build.imp.fu-berlin.de [160.45.111.17] 5269 (?) open
+ 
+ 

@@ -5,11 +5,18 @@ This script is used to determine connectivity problems with the XMPP server
 
 Usage
 -----
-1) Place the script "saros-connectivity-diagnosis_X_Y.sh" in a writeable
+1.a) Linux / Unix / Mac OS users
+   Place the script "saros-connectivity-diagnosis_X_Y.sh" in a writeable
    directory. (X and Y correspond to the script's version number)
 
-2) Run "sh saros-connectivity-diagnosis_X_X.sh" in the command line / 
-   terminal.
+1.b) Windows users
+   Place the script "saros-connectivity-diagnosis_X_Y.bat" and the netcat
+   application nc.exe in a writeable directory. You're free to replace
+   nc.exe by another netcat implementation.
+   (X and Y correspond to the script's version number)
+
+2) Run "sh saros-connectivity-diagnosis_X_Y.sh" resp.
+   "saros-connectivity-diagnosis_X_Y.bat" in your command line.
    This generates a diagnosis file named
    "[DATE]T[TIME]-saros-connectivity-diagnosis.txt" in the working
    directory.
