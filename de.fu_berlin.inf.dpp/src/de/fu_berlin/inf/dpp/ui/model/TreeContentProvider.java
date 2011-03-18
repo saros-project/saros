@@ -3,6 +3,7 @@ package de.fu_berlin.inf.dpp.ui.model;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.Viewer;
 
+
 /**
  * Instances of this class are used in conjunction with {@link ITreeElement}s as
  * generic {@link ITreeContentProvider}s

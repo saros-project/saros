@@ -20,11 +20,12 @@
 package de.fu_berlin.inf.dpp.ui.actions;
 
 import org.apache.log4j.Logger;
-import org.eclipse.jface.action.Action;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
+import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
+import org.eclipse.ui.actions.SelectionProviderAction;
 import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.SarosPluginContext;
@@ -33,7 +34,7 @@ import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
 import de.fu_berlin.inf.dpp.observables.VideoSessionObservable;
 import de.fu_berlin.inf.dpp.ui.ImageManager;
-import de.fu_berlin.inf.dpp.ui.SessionView.SessionViewTableViewer;
+import de.fu_berlin.inf.dpp.ui.sarosView.SessionViewTableViewer;
 import de.fu_berlin.inf.dpp.util.Utils;
 import de.fu_berlin.inf.dpp.util.ValueChangeListener;
 import de.fu_berlin.inf.dpp.videosharing.VideoSharing;
@@ -44,7 +45,7 @@ import de.fu_berlin.inf.dpp.videosharing.VideoSharing.VideoSharingSession;
  */
 
 @Component(module = "action")
-public class VideoSharingAction extends Action {
+public class VideoSharingAction extends SelectionProviderAction {
 
     private static final Logger log = Logger
         .getLogger(VideoSharingAction.class);
@@ -62,8 +63,9 @@ public class VideoSharingAction extends Action {
     protected SessionViewTableViewer viewer;
     protected User selectedUser = null;
 
-    public VideoSharingAction(SessionViewTableViewer viewer) {
-        super();
+    public VideoSharingAction(SessionViewTableViewer viewer,
+        ISelectionProvider provider) {
+        super(provider, "Share your screen");
         SarosPluginContext.initComponent(this);
         setId(ACTION_ID);
         changeButton();

@@ -1,22 +1,25 @@
-package de.fu_berlin.inf.dpp.ui.chat;
+package de.fu_berlin.inf.dpp.ui.widgets.session;
 
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.CTabFolder;
+import org.eclipse.swt.custom.CTabItem;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.jivesoftware.smackx.ChatState;
 import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.User;
-import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.communication.muc.events.IMUCManagerListener;
 import de.fu_berlin.inf.dpp.communication.muc.events.MUCManagerAdapter;
 import de.fu_berlin.inf.dpp.communication.muc.session.MUCSession;
@@ -29,30 +32,33 @@ import de.fu_berlin.inf.dpp.communication.muc.session.history.elements.MUCSessio
 import de.fu_berlin.inf.dpp.communication.muc.singleton.MUCManagerSingletonWrapperChatView;
 import de.fu_berlin.inf.dpp.editor.AbstractSharedEditorListener;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
-import de.fu_berlin.inf.dpp.editor.ISharedEditorListener;
 import de.fu_berlin.inf.dpp.editor.annotations.SarosAnnotation;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.SarosSessionManager;
 import de.fu_berlin.inf.dpp.ui.ImageManager;
-import de.fu_berlin.inf.dpp.ui.actions.IMBeepAction;
+import de.fu_berlin.inf.dpp.ui.sarosView.SarosView;
+import de.fu_berlin.inf.dpp.ui.sounds.SoundManager;
+import de.fu_berlin.inf.dpp.ui.sounds.SoundPlayer;
 import de.fu_berlin.inf.dpp.ui.widgets.chatControl.ChatControl;
 import de.fu_berlin.inf.dpp.ui.widgets.chatControl.events.CharacterEnteredEvent;
 import de.fu_berlin.inf.dpp.ui.widgets.chatControl.events.ChatClearedEvent;
 import de.fu_berlin.inf.dpp.ui.widgets.chatControl.events.IChatControlListener;
 import de.fu_berlin.inf.dpp.ui.widgets.chatControl.events.MessageEnteredEvent;
-import de.fu_berlin.inf.dpp.ui.widgets.explanation.SimpleExplanationComposite.SimpleExplanation;
-import de.fu_berlin.inf.dpp.ui.widgets.explanation.explanatory.SimpleExplanatoryViewPart;
+import de.fu_berlin.inf.dpp.ui.widgets.explanation.ListExplanationComposite.ListExplanation;
+import de.fu_berlin.inf.dpp.ui.widgets.explanation.explanatory.ListExplanatoryComposite;
 import de.fu_berlin.inf.dpp.util.Utils;
 
 /**
- * Saros' {@link ChatView}.
+ * This component shows chat he right side of the {@link SarosView}
  * 
- * @author bkahlert
+ * @author patbit
  */
-@Component(module = "ui")
-public class ChatView extends SimpleExplanatoryViewPart {
-    private static Logger log = Logger.getLogger(ChatView.class);
+
+public class ChatRoomsComposite extends ListExplanatoryComposite {
+
+    private static final Logger log = Logger
+        .getLogger(ChatRoomsComposite.class);
 
     /**
      * Default image for ChatView.
@@ -66,32 +72,23 @@ public class ChatView extends SimpleExplanatoryViewPart {
     public static final Image composingImage = ImageManager
         .getImage("icons/view16/cmpsg_misc.png");
 
-    protected SimpleExplanation howtoExplanation = new SimpleExplanation(
-        SWT.ICON_INFORMATION,
-        "To use this chat you need to be connected to a Saros session.");
-
-    protected SimpleExplanation refreshExplanation = new SimpleExplanation(
-        SWT.ICON_INFORMATION, "Refreshing...");
-
-    protected ChatControl chatControl;
-
-    @Inject
-    protected MUCManagerSingletonWrapperChatView mucManager;
-
-    @Inject
-    protected SarosSessionManager sessionManager;
-
-    protected IMBeepAction imBeepAction;
+    protected ListExplanation howTo = new ListExplanation(SWT.ICON_INFORMATION,
+        "How to begin a Saros session you can either:",
+        "Right-click on a project in the Package Explorer",
+        "then select \"Share project\" from Saros sub-menu or",
+        "Right-click on a user from the buddy-list",
+        "then select \"Invite user...\"",
+        "this tab will be replaced by the groupchat");
 
     @Inject
     // TODO: see
     // https://sourceforge.net/tracker/?func=detail&aid=3102858&group_id=167540&atid=843362
     protected EditorManager editorManager;
-    protected ISharedEditorListener sharedEditorListener = new AbstractSharedEditorListener() {
+    protected AbstractSharedEditorListener sharedEditorListener = new AbstractSharedEditorListener() {
         @Override
         public void colorChanged() {
             if (chatControl != null && !chatControl.isDisposed()) {
-                ChatView.this.refreshFromHistory();
+                refreshFromHistory();
             }
         }
     };
@@ -103,12 +100,12 @@ public class ChatView extends SimpleExplanatoryViewPart {
     protected IMUCManagerListener mucManagerListener = new MUCManagerAdapter() {
         @Override
         public void mucSessionJoined(MUCSession mucSession) {
-            ChatView.this.attachToMUCSession(mucSession);
+            attachToMUCSession(mucSession);
         }
 
         @Override
         public void mucSessionLeft(MUCSession mucSession) {
-            ChatView.this.detachFromMUCSession(mucSession);
+            detachFromMUCSession(mucSession);
         }
     };
 
@@ -117,50 +114,59 @@ public class ChatView extends SimpleExplanatoryViewPart {
      */
     protected IMUCSessionListener mucSessionListener = new IMUCSessionListener() {
         public void joined(final JID jid) {
-            ChatView.this.addChatLine(new MUCSessionHistoryJoinElement(jid,
-                new Date()));
+            addChatLine(new MUCSessionHistoryJoinElement(jid, new Date()));
 
-            if (ChatView.this.isOwnJID(jid)) {
+            if (isOwnJID(jid)) {
                 Utils.runSafeSWTAsync(log, new Runnable() {
                     public void run() {
-                        ChatView.this.hideExplanation();
+
+                        hideExplanation();
+                        chatRoom1 = new CTabItem(chatRooms, SWT.NONE);
+                        chatRoom1.setText("Chatroom 1");
+                        chatRoom1.setImage(chatViewImage);
+                        chatRoom1.setControl(chatControl);
+                        chatRooms.setSelection(0);
                     }
                 });
             }
         }
 
         public void left(final JID jid) {
-            ChatView.this.addChatLine(new MUCSessionHistoryLeaveElement(jid,
-                new Date()));
+            addChatLine(new MUCSessionHistoryLeaveElement(jid, new Date()));
 
-            if (ChatView.this.isOwnJID(jid)) {
+            if (isOwnJID(jid)) {
                 Utils.runSafeSWTAsync(log, new Runnable() {
                     public void run() {
-                        ChatView.this.showExplanation(howtoExplanation);
+                        showExplanation(howTo);
+                        chatRoom1.dispose();
+
+                        chatRooms.setSelection(0);
                     }
                 });
             }
         }
 
         public void messageReceived(final JID jid, final String message) {
-            ChatView.this
-                .addChatLine(new MUCSessionHistoryMessageReceptionElement(jid,
-                    new Date(), message));
+            addChatLine(new MUCSessionHistoryMessageReceptionElement(jid,
+                new Date(), message));
 
-            /*
-             * Beep when receiving a FOREIGN message
-             */
-            if (!ChatView.this.isOwnJID(jid)) {
+            if (!isOwnJID(jid)) {
                 Utils.runSafeSWTAsync(log, new Runnable() {
                     public void run() {
-                        imBeepAction.beep();
+                        SoundPlayer.playSound(SoundManager.MESSAGE_RECEIVED);
+                    }
+                });
+            } else {
+                Utils.runSafeSWTAsync(log, new Runnable() {
+                    public void run() {
+                        SoundPlayer.playSound(SoundManager.MESSAGE_SENT);
                     }
                 });
             }
         }
 
         public void stateChanged(final JID sender, final ChatState state) {
-            ChatView.log.debug("Received ChatState from " + sender + ": "
+            log.debug("Received ChatState from " + sender + ": "
                 + state.toString());
 
             Utils.runSafeSWTAsync(log, new Runnable() {
@@ -168,9 +174,9 @@ public class ChatView extends SimpleExplanatoryViewPart {
                     if (mucManager.getMUCSession() != null) {
                         if (mucManager.getMUCSession().getForeignStatesCount(
                             ChatState.composing) > 0) {
-                            ChatView.this.setTitleImage(composingImage);
+                            chatRooms.getSelection().setImage(composingImage);
                         } else {
-                            ChatView.this.setTitleImage(chatViewImage);
+                            chatRooms.getSelection().setImage(chatViewImage);
                         }
                     }
                 }
@@ -187,7 +193,7 @@ public class ChatView extends SimpleExplanatoryViewPart {
          */
         public void characterEntered(CharacterEnteredEvent event) {
 
-            if (ChatView.this.chatControl.getInputText().isEmpty()) {
+            if (chatControl.getInputText().isEmpty()) {
                 mucManager.getMUCSession().setState(ChatState.inactive);
             } else {
                 mucManager.getMUCSession().setState(ChatState.composing);
@@ -214,52 +220,20 @@ public class ChatView extends SimpleExplanatoryViewPart {
                 mucManager.getMUCSession().clearHistory();
             }
 
-            // TODO: Dispose used light colors here
         }
     };
 
-    public ChatView() {
-        SarosPluginContext.initComponent(this);
-        editorManager.addSharedEditorListener(sharedEditorListener);
-        mucManager.addMUCManagerListener(mucManagerListener);
-    }
+    @Inject
+    protected SarosSessionManager sessionManager;
+    @Inject
+    protected MUCManagerSingletonWrapperChatView mucManager;
 
-    public void attachToMUCSession(MUCSession mucSession) {
-        mucSession.addMUCSessionListener(mucSessionListener);
-    }
+    Color white = Display.getDefault().getSystemColor(SWT.COLOR_WHITE);
 
-    public void detachFromMUCSession(MUCSession mucSession) {
-        mucSession.removeMUCSessionListener(mucSessionListener);
-    }
+    CTabFolder chatRooms;
+    ChatControl chatControl;
 
-    @Override
-    public void createContentPartControl(Composite parent) {
-        parent.setLayout(new FillLayout());
-
-        this.chatControl = new ChatControl(parent, SWT.BORDER, parent
-            .getDisplay().getSystemColor(SWT.COLOR_WHITE), parent.getDisplay()
-            .getSystemColor(SWT.COLOR_WHITE), 2);
-
-        this.chatControl.addChatControlListener(chatControlListener);
-
-        /*
-         * IMPORTANT: The user can open and close Views as he wishes. This means
-         * that the live cycle of this ChatView is completely independent of the
-         * global MUCSession. Therefore we need to correctly validate the
-         * MUCSession's state when this ChatView is reopened.
-         */
-        if (this.joinedSession()) {
-            this.attachToMUCSession(mucManager.getMUCSession());
-        } else {
-            this.showExplanation(howtoExplanation);
-        }
-
-        IToolBarManager mgr = getViewSite().getActionBars().getToolBarManager();
-        mgr.add(this.imBeepAction = new IMBeepAction());
-
-        // Show already received messages
-        this.refreshFromHistory();
-    }
+    protected CTabItem chatRoom1;
 
     /**
      * Used to cache the sender names belonging to a {@link JID} determined
@@ -272,6 +246,71 @@ public class ChatView extends SimpleExplanatoryViewPart {
      * {@link User}
      */
     protected Map<JID, Color> colorCache = new HashMap<JID, Color>();
+
+    public ChatRoomsComposite(Composite parent, int style) {
+        super(parent, style);
+
+        SarosPluginContext.initComponent(this);
+
+        this.editorManager.addSharedEditorListener(sharedEditorListener);
+        this.mucManager.addMUCManagerListener(mucManagerListener);
+
+        this.setLayout(new FillLayout());
+
+        this.chatRooms = new CTabFolder(this, SWT.BOTTOM);
+        this.setContentControl(this.chatRooms);
+
+        this.chatRooms.setSimple(true);
+        this.chatRooms.setBorderVisible(true);
+
+        this.chatControl = new ChatControl(this.chatRooms, SWT.BORDER, white,
+            white, 2);
+        this.chatControl.addChatControlListener(chatControlListener);
+
+        /*
+         * IMPORTANT: The user can open and close Views as he wishes. This means
+         * that the live cycle of this ChatView is completely independent of the
+         * global MUCSession. Therefore we need to correctly validate the
+         * MUCSession's state when this ChatView is reopened.
+         */
+        if (this.joinedSession()) {
+            this.attachToMUCSession(mucManager.getMUCSession());
+            chatRoom1 = new CTabItem(chatRooms, SWT.NONE);
+            chatRoom1.setText("Chatroom 1");
+            chatRoom1.setImage(chatViewImage);
+            chatRoom1.setControl(chatControl);
+            chatRooms.setSelection(0);
+            hideExplanation();
+        } else {
+            showExplanation(howTo);
+        }
+
+        // Show already received messages
+        this.refreshFromHistory();
+        chatRooms.setSelection(0);
+
+        this.addDisposeListener(new DisposeListener() {
+
+            public void widgetDisposed(DisposeEvent e) {
+
+                chatControl.removeChatControlListener(chatControlListener);
+                if (mucManager.getMUCSession() != null) {
+                    detachFromMUCSession(mucManager.getMUCSession());
+                }
+                mucManager.removeMUCManagerListener(mucManagerListener);
+                editorManager.removeSharedEditorListener(sharedEditorListener);
+            }
+        });
+
+    }
+
+    public void attachToMUCSession(MUCSession mucSession) {
+        mucSession.addMUCSessionListener(mucSessionListener);
+    }
+
+    public void detachFromMUCSession(MUCSession mucSession) {
+        mucSession.removeMUCSessionListener(mucSessionListener);
+    }
 
     /**
      * Adds a new line to the chat control
@@ -301,12 +340,11 @@ public class ChatView extends SimpleExplanatoryViewPart {
 
         Utils.runSafeSWTAsync(log, new Runnable() {
             public void run() {
-                if (ChatView.this.chatControl == null
-                    || ChatView.this.chatControl.isDisposed())
+                if (chatControl == null || chatControl.isDisposed())
                     return;
-
-                ChatView.this.chatControl.addChatLine(sender, color, message,
-                    receivedOn);
+                log.debug("Sender: " + sender);
+                log.debug("Color: " + color);
+                chatControl.addChatLine(sender, color, message, receivedOn);
             }
         });
     }
@@ -374,21 +412,4 @@ public class ChatView extends SimpleExplanatoryViewPart {
             .getMUCSession().isJoined());
     }
 
-    @Override
-    public void setFocus() {
-        this.chatControl.setFocus();
-    }
-
-    @Override
-    public void dispose() {
-        this.chatControl.removeChatControlListener(chatControlListener);
-        if (mucManager.getMUCSession() != null) {
-            detachFromMUCSession(mucManager.getMUCSession());
-        }
-        mucManager.removeMUCManagerListener(mucManagerListener);
-        editorManager.removeSharedEditorListener(sharedEditorListener);
-        super.dispose();
-
-        // TODO: Dispose used light colors here
-    }
 }

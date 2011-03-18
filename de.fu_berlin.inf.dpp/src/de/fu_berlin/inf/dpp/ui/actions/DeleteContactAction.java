@@ -19,33 +19,34 @@
  */
 package de.fu_berlin.inf.dpp.ui.actions;
 
+import java.util.List;
+
 import org.apache.log4j.Logger;
+import org.eclipse.jface.action.Action;
 import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.jface.viewers.ISelectionProvider;
-import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.swt.widgets.Shell;
+import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.IWorkbench;
+import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.actions.SelectionProviderAction;
 import org.jivesoftware.smack.RosterEntry;
 import org.jivesoftware.smack.XMPPException;
 
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.User;
-import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
+import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.util.RosterUtils;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.SarosSessionManager;
-import de.fu_berlin.inf.dpp.ui.RosterView.TreeItem;
+import de.fu_berlin.inf.dpp.ui.util.selection.SelectionUtils;
+import de.fu_berlin.inf.dpp.ui.util.selection.retriever.SelectionRetrieverFactory;
 import de.fu_berlin.inf.dpp.util.Utils;
 
-public class DeleteContactAction extends SelectionProviderAction {
+public class DeleteContactAction extends Action {
 
     private static final Logger log = Logger
         .getLogger(DeleteContactAction.class.getName());
-
-    protected RosterEntry rosterEntry;
 
     protected Saros saros;
 
@@ -54,11 +55,18 @@ public class DeleteContactAction extends SelectionProviderAction {
     protected final String DELETE_ERROR_IN_SESSION = "You cannot delete this buddy "
         + "because they are currently in your Saros session.";
 
-    public DeleteContactAction(SarosSessionManager sessionManager, Saros saros,
-        ISelectionProvider provider) {
-        super(provider, "Delete");
-        selectionChanged((IStructuredSelection) provider.getSelection());
+    public DeleteContactAction(SarosSessionManager sessionManager, Saros saros) {
+        super("Delete");
 
+        SelectionUtils.getSelectionService().addSelectionListener(
+            new ISelectionListener() {
+                public void selectionChanged(IWorkbenchPart part,
+                    ISelection selection) {
+                    List<JID> buddies = SelectionRetrieverFactory
+                        .getSelectionRetriever(JID.class).getSelection();
+                    setEnabled(buddies.size() == 1);
+                }
+            });
         setToolTipText("Delete this buddy.");
 
         IWorkbench workbench = PlatformUI.getWorkbench();
@@ -92,14 +100,19 @@ public class DeleteContactAction extends SelectionProviderAction {
     }
 
     public void runDeleteAction() {
-        RosterEntry entry = rosterEntry;
+        RosterEntry rosterEntry = null;
+        List<RosterEntry> selectedRosterEntries = SelectionRetrieverFactory
+            .getSelectionRetriever(RosterEntry.class).getSelection();
+        if (selectedRosterEntries.size() == 1) {
+            rosterEntry = selectedRosterEntries.get(0);
+        }
 
-        Shell shell = EditorAPI.getShell();
-        if (shell == null || entry == null) {
+        if (rosterEntry == null) {
+            log.error("RosterEntry should not be null at this point!");
             return;
         }
 
-        if (rosterEntry != null && sessionManager != null) {
+        if (sessionManager != null) {
             // Is the chosen user currently in the session?
             ISarosSession sarosSession = sessionManager.getSarosSession();
             String entryJid = rosterEntry.getUser();
@@ -110,7 +123,7 @@ public class DeleteContactAction extends SelectionProviderAction {
 
                     // If so, stop the deletion from completing
                     if (entryJid.equals(pJid)) {
-                        MessageDialog.openError(shell,
+                        MessageDialog.openError(null,
                             "Cannot delete a buddy in the session",
                             DELETE_ERROR_IN_SESSION);
                         return;
@@ -119,27 +132,18 @@ public class DeleteContactAction extends SelectionProviderAction {
             }
         }
 
-        if (MessageDialog.openQuestion(shell, "Confirm Delete",
-            "Are you sure you want to delete " + toString(entry)
+        if (MessageDialog.openQuestion(null, "Confirm Delete",
+            "Are you sure you want to delete " + toString(rosterEntry)
                 + " from your buddies?")) {
 
             try {
-                RosterUtils.removeFromRoster(saros.getConnection(), entry);
+                RosterUtils
+                    .removeFromRoster(saros.getConnection(), rosterEntry);
             } catch (XMPPException e) {
-                log.error("Could not delete buddy " + toString(entry) + ":", e);
+                log.error("Could not delete buddy " + toString(rosterEntry)
+                    + ":", e);
             }
         }
     }
 
-    @Override
-    public void selectionChanged(IStructuredSelection selection) {
-        rosterEntry = null;
-        if (selection.size() == 1) {
-            rosterEntry = ((TreeItem) selection.getFirstElement())
-                .getRosterEntry();
-        }
-        boolean enabled = rosterEntry != null;
-
-        setEnabled(enabled);
-    }
 }

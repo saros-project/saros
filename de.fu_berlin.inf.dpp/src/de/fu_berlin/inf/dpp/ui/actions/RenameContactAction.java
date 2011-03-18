@@ -19,20 +19,23 @@
  */
 package de.fu_berlin.inf.dpp.ui.actions;
 
+import java.util.List;
+
 import org.apache.log4j.Logger;
+import org.eclipse.jface.action.Action;
 import org.eclipse.jface.dialogs.InputDialog;
-import org.eclipse.jface.viewers.ISelectionProvider;
-import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.viewers.TreeViewer;
+import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.ui.actions.SelectionProviderAction;
+import org.eclipse.ui.ISelectionListener;
+import org.eclipse.ui.IWorkbenchPart;
 import org.jivesoftware.smack.RosterEntry;
 
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.ui.RosterView.TreeItem;
+import de.fu_berlin.inf.dpp.ui.util.selection.SelectionUtils;
+import de.fu_berlin.inf.dpp.ui.util.selection.retriever.SelectionRetrieverFactory;
 import de.fu_berlin.inf.dpp.util.Utils;
 
 /**
@@ -40,86 +43,73 @@ import de.fu_berlin.inf.dpp.util.Utils;
  * 
  * @author rdjemili
  */
-public class RenameContactAction extends SelectionProviderAction {
+public class RenameContactAction extends Action {
 
     private static final Logger log = Logger
         .getLogger(RenameContactAction.class.getName());
 
-    private RosterEntry rosterEntry;
-
     protected Saros saros;
 
-    public RenameContactAction(Saros saros, ISelectionProvider provider) {
-        super(provider, "Rename...");
-
+    public RenameContactAction(Saros saros) {
+        super("Rename...");
         this.saros = saros;
-        selectionChanged((IStructuredSelection) provider.getSelection());
 
+        SelectionUtils.getSelectionService().addSelectionListener(
+            new ISelectionListener() {
+                public void selectionChanged(IWorkbenchPart part,
+                    ISelection selection) {
+                    List<JID> buddies = SelectionRetrieverFactory
+                        .getSelectionRetriever(JID.class).getSelection();
+                    setEnabled(buddies.size() == 1);
+                }
+            });
         setToolTipText("Set the nickname of this buddy.");
     }
 
-    /**
-     * @review runSafe OK
-     */
     @Override
     public void run() {
         Utils.runSafeSync(log, new Runnable() {
             public void run() {
-                runRename();
+                RosterEntry rosterEntry = null;
+                List<RosterEntry> selectedRosterEntries = SelectionRetrieverFactory
+                    .getSelectionRetriever(RosterEntry.class).getSelection();
+                if (selectedRosterEntries.size() == 1) {
+                    /*
+                     * TODO Why forbid renaming self? Is the own entry displayed
+                     * at all?
+                     */
+                    // Compare the plain-JID portion of the XMPP address
+                    if (!new JID(selectedRosterEntries.get(0).getUser())
+                        .equals(saros.getMyJID())) {
+                        rosterEntry = selectedRosterEntries.get(0);
+                    }
+                }
+
+                if (rosterEntry == null) {
+                    log.error("RosterEntry should not be null at this point!");
+                    return;
+                }
+
+                Shell shell = EditorAPI.getShell();
+
+                assert shell != null : "Action should not be run if the display is disposed";
+
+                String message = "Enter the new nickname of this buddy '"
+                    + rosterEntry.getUser() + "'";
+                if (rosterEntry.getName() != null) {
+                    message += " with current nickname '"
+                        + rosterEntry.getName() + "'";
+                }
+                message += ":";
+
+                InputDialog dialog = new InputDialog(shell, "Set new nickname",
+                    message, rosterEntry.getName(), null);
+
+                if (dialog.open() == Window.OK) {
+                    String newName = dialog.getValue();
+                    rosterEntry.setName(newName.length() == 0 ? null : newName);
+                }
             }
         });
-    }
-
-    protected void runRename() {
-        RosterEntry entry = rosterEntry;
-
-        assert entry != null : "Action should only be run if a rosterEntry is selected";
-
-        Shell shell = EditorAPI.getShell();
-
-        assert shell != null : "Action should not be run if the display is disposed";
-
-        String message = "Enter the new nickname of this buddy '"
-            + entry.getUser() + "'";
-        if (entry.getName() != null) {
-            message += " with current nickname '" + entry.getName() + "'";
-        }
-        message += ":";
-
-        InputDialog dialog = new InputDialog(shell, "Set new nickname",
-            message, entry.getName(), null);
-
-        if (dialog.open() == Window.OK) {
-            String newName = dialog.getValue();
-            entry.setName(newName.length() == 0 ? null : newName);
-        }
-
-        TreeViewer parent = (TreeViewer) getSelectionProvider();
-        parent.refresh(true);
-    }
-
-    protected RosterEntry getSelectedForRename(IStructuredSelection selection) {
-
-        if (selection.size() != 1)
-            return null;
-
-        TreeItem selected = (TreeItem) selection.getFirstElement();
-        RosterEntry result = selected.getRosterEntry();
-        /*
-         * TODO Why forbid renaming self? Is the own entry displayed at all?
-         */
-        // Compare the plain-JID portion of the XMPP address
-        if (result != null
-            && !new JID(result.getUser()).equals(saros.getMyJID())) {
-
-            return result;
-        }
-        return null;
-    }
-
-    @Override
-    public void selectionChanged(IStructuredSelection selection) {
-        this.rosterEntry = getSelectedForRename(selection);
-        setEnabled(this.rosterEntry != null);
     }
 }

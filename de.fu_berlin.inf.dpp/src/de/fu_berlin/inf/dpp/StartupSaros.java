@@ -106,7 +106,10 @@ public class StartupSaros implements IStartup {
             currentVersion);
         saros.saveConfigPrefs();
 
-        showRoster();
+        /*
+         * TODO UI fallback showRoster();
+         */
+        showSarosView();
         WizardUtils.openSarosConfigurationWizard();
     }
 
@@ -114,7 +117,7 @@ public class StartupSaros implements IStartup {
         log.info("start RMI Bot");
         Utils.runSafeAsync("RmiSWTWorkbenchBot-", log, new Runnable() {
             public void run() {
-                log.debug("Util.isSWT(): " + Utils.isSWT()); 
+                log.debug("Util.isSWT(): " + Utils.isSWT());
                 STFController.sleepTime = time;
                 try {
                     STFController.exportedObjects(port, saros, sessionManager,
@@ -128,18 +131,35 @@ public class StartupSaros implements IStartup {
         });
     }
 
-    protected void showRoster() {
+    // TODO UI fallback
+    // protected void showRoster() {
+    // Utils.runSafeSWTSync(log, new Runnable() {
+    // public void run() {
+    // IIntroManager m = PlatformUI.getWorkbench().getIntroManager();
+    // IIntroPart i = m.getIntro();
+    // /*
+    // * if there is a welcome screen, don't activate the Roster
+    // * because it would be maximized and hiding the workbench window
+    // */
+    // if (i != null)
+    // return;
+    // sarosUI.activateRosterView();
+    // }
+    // });
+    // }
+
+    protected void showSarosView() {
         Utils.runSafeSWTSync(log, new Runnable() {
             public void run() {
                 IIntroManager m = PlatformUI.getWorkbench().getIntroManager();
                 IIntroPart i = m.getIntro();
                 /*
-                 * if there is a welcome screen, don't activate the Roster
+                 * if there is a welcome screen, don't activate the SarosView
                  * because it would be maximized and hiding the workbench window
                  */
                 if (i != null)
                     return;
-                sarosUI.activateRosterView();
+                sarosUI.openSarosView();
             }
         });
     }

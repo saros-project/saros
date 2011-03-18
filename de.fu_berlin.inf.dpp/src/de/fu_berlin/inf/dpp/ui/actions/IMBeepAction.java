@@ -9,8 +9,8 @@ import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
 import de.fu_berlin.inf.dpp.ui.ImageManager;
 
 public class IMBeepAction extends Action {
-    public IMBeepAction(String text) {
-        super(text);
+    public IMBeepAction() {
+        super("Toggle beep");
         this.updateIcon();
         this.updateTooltip();
     }

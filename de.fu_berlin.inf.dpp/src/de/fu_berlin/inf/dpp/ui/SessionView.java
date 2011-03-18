@@ -89,6 +89,7 @@ import de.fu_berlin.inf.dpp.ui.actions.SendFileAction;
 import de.fu_berlin.inf.dpp.ui.actions.StoppedAction;
 import de.fu_berlin.inf.dpp.ui.actions.VideoSharingAction;
 import de.fu_berlin.inf.dpp.ui.actions.VoIPAction;
+import de.fu_berlin.inf.dpp.ui.sarosView.SessionViewTableViewer;
 import de.fu_berlin.inf.dpp.ui.widgets.explanation.ListExplanationComposite.ListExplanation;
 import de.fu_berlin.inf.dpp.ui.widgets.explanation.explanatory.ListExplanatoryViewPart;
 import de.fu_berlin.inf.dpp.util.Utils;
@@ -209,12 +210,11 @@ public class SessionView extends ListExplanatoryViewPart {
         }
     }
 
-    @Component(module = "ui")
-    public static class SessionViewTableViewer extends TableViewer {
-        public SessionViewTableViewer(Composite parent, int style) {
-            super(parent, style);
-        }
-    }
+    /*
+     * @Component(module = "ui") public static class SessionViewTableViewer
+     * extends TableViewer { public SessionViewTableViewer(Composite parent, int
+     * style) { super(parent, style); } }
+     */
 
     protected TableViewer viewer;
 
@@ -465,8 +465,8 @@ public class SessionView extends ListExplanatoryViewPart {
         this.showExplanation(true);
 
         // TODO Add 5 pixels of padding
-        this.viewer = new SessionViewTableViewer(parent, SWT.MULTI
-            | SWT.H_SCROLL | SWT.V_SCROLL | SWT.FULL_SELECTION);
+        this.viewer = new SessionViewTableViewer(new Table(parent, SWT.BORDER
+            | SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL | SWT.FULL_SELECTION));
         this.viewer.setContentProvider(new SessionContentProvider());
 
         final SessionLabelProvider labelProvider = new SessionLabelProvider();

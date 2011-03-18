@@ -20,7 +20,6 @@
 package de.fu_berlin.inf.dpp.ui.actions;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -29,10 +28,11 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.jface.action.Action;
 import org.eclipse.jface.dialogs.ErrorDialog;
-import org.eclipse.jface.viewers.ISelectionProvider;
-import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.ui.actions.SelectionProviderAction;
+import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.ui.ISelectionListener;
+import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.dialogs.ContainerSelectionDialog;
 import org.jivesoftware.smack.XMPPException;
 
@@ -48,7 +48,8 @@ import de.fu_berlin.inf.dpp.project.ISarosSessionListener;
 import de.fu_berlin.inf.dpp.project.SarosSessionManager;
 import de.fu_berlin.inf.dpp.project.SharedProject;
 import de.fu_berlin.inf.dpp.ui.ImageManager;
-import de.fu_berlin.inf.dpp.ui.RosterView.TreeItem;
+import de.fu_berlin.inf.dpp.ui.util.selection.SelectionUtils;
+import de.fu_berlin.inf.dpp.ui.util.selection.retriever.SelectionRetrieverFactory;
 import de.fu_berlin.inf.dpp.util.Utils;
 
 /**
@@ -57,7 +58,7 @@ import de.fu_berlin.inf.dpp.util.Utils;
  * @author rdjemili
  * @author oezbek
  */
-public class InviteAction extends SelectionProviderAction {
+public class InviteAction extends Action {
 
     private static final Logger log = Logger.getLogger(InviteAction.class
         .getName());
@@ -81,9 +82,9 @@ public class InviteAction extends SelectionProviderAction {
     protected InvitationProcessObservable invitationProcesses;
 
     public InviteAction(SarosSessionManager sessionManager, Saros saros,
-        ISelectionProvider provider, DiscoveryManager discoManager,
+        DiscoveryManager discoManager,
         InvitationProcessObservable invitationProcesses) {
-        super(provider, "Invite buddy...");
+        super("Invite Buddy...");
         setToolTipText("Invites the selected buddies to a Saros session. A new session will be started if none exists.");
 
         setImageDescriptor(ImageManager
@@ -94,6 +95,14 @@ public class InviteAction extends SelectionProviderAction {
         this.discoveryManager = discoManager;
         this.invitationProcesses = invitationProcesses;
         sessionManager.addSarosSessionListener(sessionListener);
+
+        SelectionUtils.getSelectionService().addSelectionListener(
+            new ISelectionListener() {
+                public void selectionChanged(IWorkbenchPart part,
+                    ISelection selection) {
+                    updateEnablement();
+                }
+            });
 
         updateEnablement();
     }
@@ -125,7 +134,9 @@ public class InviteAction extends SelectionProviderAction {
             try {
 
                 sessionManager.startSession(chosenProjects, null);
-                sessionManager.invite(getSelected(), makeDescription());
+                sessionManager.invite(SelectionRetrieverFactory
+                    .getSelectionRetriever(JID.class).getSelection(),
+                    makeDescription());
             } catch (final XMPPException e) {
                 Utils.runSafeSWTSync(log, new Runnable() {
                     public void run() {
@@ -143,40 +154,20 @@ public class InviteAction extends SelectionProviderAction {
 
             Utils.runSafeSync(log, new Runnable() {
                 public void run() {
-                    sessionManager.invite(getSelected(), makeDescription());
+                    sessionManager.invite(SelectionRetrieverFactory
+                        .getSelectionRetriever(JID.class).getSelection(),
+                        makeDescription());
                 }
             });
         }
     }
 
-    @Override
-    public void selectionChanged(IStructuredSelection selection) {
-        updateEnablement();
-    }
-
     public void updateEnablement() {
-
         Utils.runSafeSWTAsync(log, new Runnable() {
             public void run() {
                 setEnabled(canInviteSelected());
             }
         });
-
-    }
-
-    public List<JID> getSelected() {
-        ArrayList<JID> selected = new ArrayList<JID>();
-
-        for (Object object : getStructuredSelection().toList()) {
-            JID jid = ((TreeItem) object).getJID();
-            if (jid == null) {
-                return Collections.emptyList();
-            } else {
-                selected.add(jid);
-            }
-        }
-
-        return selected;
     }
 
     /**
@@ -194,9 +185,10 @@ public class InviteAction extends SelectionProviderAction {
     public boolean canInviteSelected() {
 
         ISarosSession sarosSession = sessionManager.getSarosSession();
-        List<JID> usersSelected = getSelected();
+        List<JID> selectedBuddies = SelectionRetrieverFactory
+            .getSelectionRetriever(JID.class).getSelection();
 
-        if (usersSelected.isEmpty())
+        if (selectedBuddies.isEmpty())
             return false;
 
         if (!saros.isConnected())
@@ -204,7 +196,7 @@ public class InviteAction extends SelectionProviderAction {
 
         // Test if each user is reachable and available
         boolean sarosSupported = false;
-        for (final JID jid : usersSelected) {
+        for (final JID jid : selectedBuddies) {
             try {
                 sarosSupported = discoveryManager.isSupportedNonBlock(jid,
                     Saros.NAMESPACE);
@@ -224,7 +216,7 @@ public class InviteAction extends SelectionProviderAction {
                 return false;
 
             // Make sure none of them are already in the session
-            for (JID jid : usersSelected) {
+            for (JID jid : selectedBuddies) {
                 if (sarosSession.getResourceQualifiedJID(jid) != null)
                     return false;
             }

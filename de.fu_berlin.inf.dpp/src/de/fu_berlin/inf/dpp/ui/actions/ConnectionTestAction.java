@@ -20,19 +20,21 @@
 package de.fu_berlin.inf.dpp.ui.actions;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
+import org.eclipse.jface.action.Action;
 import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
-import org.eclipse.jface.viewers.ISelectionProvider;
-import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.ui.actions.SelectionProviderAction;
+import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.ui.ISelectionListener;
+import org.eclipse.ui.IWorkbenchPart;
 import org.jivesoftware.smack.RosterEntry;
 import org.jivesoftware.smack.XMPPException;
 
@@ -42,7 +44,8 @@ import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.internal.ConnectionTestManager;
 import de.fu_berlin.inf.dpp.net.internal.ConnectionTestManager.TestResult;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
-import de.fu_berlin.inf.dpp.ui.RosterView.TreeItem;
+import de.fu_berlin.inf.dpp.ui.util.selection.SelectionUtils;
+import de.fu_berlin.inf.dpp.ui.util.selection.retriever.SelectionRetrieverFactory;
 import de.fu_berlin.inf.dpp.util.Utils;
 
 /**
@@ -50,26 +53,31 @@ import de.fu_berlin.inf.dpp.util.Utils;
  * 
  * @author szuecs
  */
-public class ConnectionTestAction extends SelectionProviderAction {
+public class ConnectionTestAction extends Action {
 
     private static final Logger log = Logger
         .getLogger(ConnectionTestAction.class);
-
-    protected RosterEntry rosterEntry;
 
     protected Saros saros;
 
     protected ConnectionTestManager connectionTestManager;
 
     public ConnectionTestAction(Saros saros,
-        ConnectionTestManager connectionTestManager, ISelectionProvider provider) {
-        super(provider, "Test data transfer connection...");
+        ConnectionTestManager connectionTestManager) {
+        super("Test data transfer connection...");
 
         this.saros = saros;
         this.connectionTestManager = connectionTestManager;
 
-        selectionChanged((IStructuredSelection) provider.getSelection());
-
+        SelectionUtils.getSelectionService().addSelectionListener(
+            new ISelectionListener() {
+                public void selectionChanged(IWorkbenchPart part,
+                    ISelection selection) {
+                    List<JID> buddies = SelectionRetrieverFactory
+                        .getSelectionRetriever(JID.class).getSelection();
+                    setEnabled(buddies.size() == 1);
+                }
+            });
         setToolTipText("Test the data transfer connection to the selected buddy.");
     }
 
@@ -78,6 +86,13 @@ public class ConnectionTestAction extends SelectionProviderAction {
      */
     @Override
     public void run() {
+
+        RosterEntry rosterEntry = null;
+        List<RosterEntry> selectedRosterEntries = SelectionRetrieverFactory
+            .getSelectionRetriever(RosterEntry.class).getSelection();
+        if (selectedRosterEntries.size() == 1) {
+            rosterEntry = selectedRosterEntries.get(0);
+        }
 
         if (rosterEntry == null) {
             log.error("RosterEntry should not be null at this point!");
@@ -129,18 +144,4 @@ public class ConnectionTestAction extends SelectionProviderAction {
 
     }
 
-    protected RosterEntry getSelectedForTest(IStructuredSelection selection) {
-
-        if (selection.size() != 1)
-            return null;
-
-        TreeItem selected = (TreeItem) selection.getFirstElement();
-        return selected.getRosterEntry();
-    }
-
-    @Override
-    public void selectionChanged(IStructuredSelection selection) {
-        this.rosterEntry = getSelectedForTest(selection);
-        setEnabled(this.rosterEntry != null);
-    }
 }

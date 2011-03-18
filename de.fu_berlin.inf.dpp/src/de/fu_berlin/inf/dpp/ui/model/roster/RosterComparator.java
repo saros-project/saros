@@ -6,6 +6,7 @@ import org.jivesoftware.smack.Roster;
 
 import de.fu_berlin.inf.dpp.ui.model.ITreeElement;
 
+
 /**
  * Comparator for {@link ITreeElement} describing {@link Roster} entities.
  * <p>

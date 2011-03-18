@@ -21,48 +21,35 @@ package de.fu_berlin.inf.dpp.ui;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
 
-import de.fu_berlin.inf.dpp.SarosPluginContext;
 import org.apache.log4j.Logger;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
-import org.eclipse.jface.viewers.DelegatingStyledCellLabelProvider;
-import org.eclipse.jface.viewers.DelegatingStyledCellLabelProvider.IStyledLabelProvider;
-import org.eclipse.jface.viewers.IStructuredContentProvider;
-import org.eclipse.jface.viewers.ITreeContentProvider;
-import org.eclipse.jface.viewers.LabelProvider;
-import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.jface.viewers.TreeViewer;
-import org.eclipse.jface.viewers.Viewer;
-import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.Tree;
 import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.part.ViewPart;
 import org.jivesoftware.smack.Roster;
 import org.jivesoftware.smack.RosterEntry;
-import org.jivesoftware.smack.RosterGroup;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.packet.Presence;
-import org.jivesoftware.smack.packet.Presence.Type;
-import org.jivesoftware.smack.packet.RosterPacket;
 import org.picocontainer.Disposable;
 import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.Saros;
+import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.accountManagement.XMPPAccountStore;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.feedback.ErrorLogManager;
@@ -78,9 +65,7 @@ import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager.IBytestreamConnection;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager.NetTransferMode;
 import de.fu_berlin.inf.dpp.net.internal.discoveryManager.DiscoveryManager;
-import de.fu_berlin.inf.dpp.net.internal.discoveryManager.DiscoveryManager.CacheMissException;
 import de.fu_berlin.inf.dpp.net.internal.discoveryManager.events.DiscoveryManagerListener;
-import de.fu_berlin.inf.dpp.net.util.RosterUtils;
 import de.fu_berlin.inf.dpp.observables.InvitationProcessObservable;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
 import de.fu_berlin.inf.dpp.project.SarosSessionManager;
@@ -91,6 +76,9 @@ import de.fu_berlin.inf.dpp.ui.actions.InviteAction;
 import de.fu_berlin.inf.dpp.ui.actions.NewContactAction;
 import de.fu_berlin.inf.dpp.ui.actions.RenameContactAction;
 import de.fu_berlin.inf.dpp.ui.actions.SkypeAction;
+import de.fu_berlin.inf.dpp.ui.model.TreeLabelProvider;
+import de.fu_berlin.inf.dpp.ui.model.roster.RosterComparator;
+import de.fu_berlin.inf.dpp.ui.model.roster.RosterContentProvider;
 import de.fu_berlin.inf.dpp.util.Utils;
 
 /**
@@ -249,384 +237,387 @@ public class RosterView extends ViewPart {
         }
     }
 
-    /**
-     * An item of the roster tree. Can be either a group or a single contact.
-     * 
-     * @author rdjemili
-     */
-    public interface TreeItem {
+    // uncomment for ui-fallback
+    // /**
+    // * An item of the roster tree. Can be either a group or a single contact.
+    // *
+    // * @author rdjemili
+    // */
+    // public interface TreeItem {
+    //
+    // /**
+    // * @return {@link JID} for this {@link TreeItem} or <code>null</code> if
+    // * there is none associated with it.
+    // */
+    // JID getJID();
+    //
+    // /**
+    // * @return the {@link RosterEntry} for this {@link TreeItem} or
+    // * <code>null</code> if there is none associated with it.
+    // */
+    // RosterEntry getRosterEntry();
+    //
+    // /**
+    // * @return all child items of this tree item.
+    // */
+    // Collection<TreeItem> getChildren();
+    //
+    // /**
+    // * @return if this {@link TreeItem} has children.
+    // */
+    // boolean hasChildren();
+    //
+    // /**
+    // * @return image to display for this tree item.
+    // */
+    // Image getImage();
+    //
+    // /**
+    // * @return item rendered as {@link StyledString} for display.
+    // */
+    // StyledString getStyledText();
+    //
+    // /**
+    // * @return the number of the category this item belongs to. Used to sort
+    // * {@link TreeItem}s. Items are first sorted by category, then
+    // * by the "normal" comparison result.
+    // */
+    // int getCategory();
+    // }
+    //
+    // /**
+    // * A contact item for a single user.
+    // */
+    // protected class ContactItem implements TreeItem {
+    //
+    // protected final String jid;
+    //
+    // public ContactItem(String jid) {
+    // if (jid == null) {
+    // throw new IllegalArgumentException("jid must not be null");
+    // }
+    // this.jid = jid;
+    // }
+    //
+    // public JID getJID() {
+    // return new JID(jid);
+    // }
+    //
+    // public RosterEntry getRosterEntry() {
+    // return roster.getEntry(jid);
+    // }
+    //
+    // public Collection<TreeItem> getChildren() {
+    // return Collections.emptyList();
+    // }
+    //
+    // public boolean hasChildren() {
+    // return false;
+    // }
+    //
+    // public Image getImage() {
+    // final Presence presence = roster.getPresence(jid);
+    // boolean rqPeer = false;
+    //
+    // // Check cache for Saros-support.
+    // try {
+    // rqPeer = discoveryManager.isSupportedNonBlock(getJID(),
+    // Saros.NAMESPACE);
+    // } catch (CacheMissException e) {
+    // // Saros support wasn't in cache. Update the discovery manager.
+    // discoveryManager.cacheSarosSupport(getJID());
+    // }
+    //
+    // if (presence.isAvailable() && saros.isConnected()) {
+    // if (presence.isAway()) {
+    // return rqPeer == false ? ImageManager.ICON_BUDDY_AWAY
+    // : ImageManager.ICON_BUDDY_SAROS_AWAY;
+    // } else {
+    // return rqPeer == false ? ImageManager.ICON_BUDDY
+    // : ImageManager.ICON_BUDDY_SAROS;
+    // }
+    // } else {
+    // return ImageManager.ICON_BUDDY_OFFLINE;
+    // }
+    // }
+    //
+    // public StyledString getStyledText() {
+    // // TODO Add a description of the pattern of the result.
+    // final StyledString result = new StyledString();
+    //
+    // final String user = jid;
+    // final RosterEntry entry = RosterView.this.roster.getEntry(user);
+    // if (entry == null) {
+    // return result;
+    // }
+    // result.append(RosterUtils.getDisplayableName(entry));
+    //
+    // // Append presence information if available.
+    // final Presence presence = roster.getPresence(user);
+    // if (entry.getStatus() == RosterPacket.ItemStatus.SUBSCRIPTION_PENDING) {
+    // result.append(" (wait for permission)",
+    // StyledString.COUNTER_STYLER);
+    // } else if (presence != null && presence.getType() != Type.available
+    // && presence.getType() != Type.unavailable) {
+    // // Available and Unavailable are visible in the icon color
+    // result.append(" (" + presence.getType() + ")",
+    // StyledString.COUNTER_STYLER);
+    // }
+    //
+    // // Append DataTransfer state information.
+    // if (presence != null && presence.isAvailable()) {
+    //
+    // final JID jid = new JID(user);
+    //
+    // final NetTransferMode transferMode = dataTransferManager
+    // .getTransferMode(jid);
+    //
+    // if (transferMode != NetTransferMode.NONE) {
+    // result.append(" Connected using: " + transferMode,
+    // StyledString.QUALIFIER_STYLER);
+    // }
+    // }
+    // return result;
+    // }
+    //
+    // /**
+    // * @return 0 if the contact is online, otherwise 1. So online contacts
+    // * get sorted before offline ones.
+    // */
+    // public int getCategory() {
+    // return roster.getPresence(jid).isAvailable() ? 0 : 1;
+    // }
+    //
+    // @Override
+    // public int hashCode() {
+    // return jid.hashCode();
+    // }
+    //
+    // @Override
+    // public boolean equals(Object obj) {
+    // if (this == obj) {
+    // return true;
+    // }
+    // if (obj == null) {
+    // return false;
+    // }
+    // if (!(obj instanceof ContactItem)) {
+    // return false;
+    // }
+    // return jid.equals(((ContactItem) obj).jid);
+    // }
+    //
+    // @Override
+    // public String toString() {
+    // return RosterUtils.getDisplayableName(roster.getEntry(jid));
+    // }
+    // }
+    //
+    // /**
+    // * A group item which holds a number of users.
+    // *
+    // * There are to concrete subclasses because of the way Smack handles
+    // groups
+    // * and unfiled contacts.
+    // */
+    // protected abstract class AbstractGroupItem implements TreeItem {
+    //
+    // /**
+    // * @return <code>null</code> because groups do not have a {@link JID}.
+    // */
+    // public JID getJID() {
+    // return null;
+    // }
+    //
+    // /**
+    // * @return <code>null</code> because groups do not have a
+    // * {@link RosterEntry}.
+    // */
+    // public RosterEntry getRosterEntry() {
+    // return null;
+    // }
+    //
+    // public Image getImage() {
+    // return ImageManager.ICON_GROUP;
+    // }
+    //
+    // @Override
+    // public int hashCode() {
+    // return this.toString().hashCode();
+    // }
+    // }
+    //
+    // /**
+    // * A group item for users in groups.
+    // */
+    // protected class GroupItem extends AbstractGroupItem {
+    //
+    // private final RosterGroup group;
+    //
+    // public GroupItem(RosterGroup group) {
+    // super();
+    // this.group = group;
+    // }
+    //
+    // public Collection<TreeItem> getChildren() {
+    // final List<TreeItem> result = new ArrayList<TreeItem>(
+    // group.getEntryCount());
+    // for (RosterEntry rosterEntry : group.getEntries()) {
+    // result.add(new ContactItem(rosterEntry.getUser()));
+    // }
+    // return result;
+    // }
+    //
+    // public boolean hasChildren() {
+    // return group.getEntryCount() > 0;
+    // }
+    //
+    // public StyledString getStyledText() {
+    // return new StyledString(this.toString());
+    // }
+    //
+    // /**
+    // * @return 1 so that {@link UnfiledGroupItem} will be sorted before all
+    // * other groups.
+    // */
+    // public int getCategory() {
+    // return 1;
+    // }
+    //
+    // @Override
+    // public boolean equals(Object obj) {
+    // if (this == obj) {
+    // return true;
+    // }
+    // if (!(obj instanceof GroupItem)) {
+    // return false;
+    // }
+    // return this.toString().equals(obj.toString());
+    // }
+    //
+    // @Override
+    // public String toString() {
+    // return group.getName();
+    // }
+    // }
+    //
+    // /**
+    // * A group item that holds all users that don't belong to another group.
+    // */
+    // protected class UnfiledGroupItem extends AbstractGroupItem {
+    //
+    // public Collection<TreeItem> getChildren() {
+    // final List<TreeItem> result = new ArrayList<TreeItem>(
+    // roster.getUnfiledEntryCount());
+    // for (RosterEntry rosterEntry : roster.getUnfiledEntries()) {
+    // result.add(new ContactItem(rosterEntry.getUser()));
+    // }
+    // return result;
+    // }
+    //
+    // public boolean hasChildren() {
+    // return roster.getUnfiledEntryCount() > 0;
+    // }
+    //
+    // public StyledString getStyledText() {
+    // return new StyledString(this.toString(),
+    // StyledString.QUALIFIER_STYLER);
+    // }
+    //
+    // /**
+    // * @return 0 so the unfiled contacts are sorted before the groups.
+    // *
+    // * @see GroupItem#getCategory()
+    // */
+    // public int getCategory() {
+    // return 0;
+    // }
+    //
+    // @Override
+    // public boolean equals(Object obj) {
+    // if (this == obj) {
+    // return true;
+    // }
+    // if (!(obj instanceof UnfiledGroupItem)) {
+    // return false;
+    // }
+    // return this.toString().equals(obj.toString());
+    // }
+    //
+    // @Override
+    // public String toString() {
+    // return "Buddies";
+    // }
+    // }
+    //
+    // /**
+    // * Provide tree content. Elements are of type {@link TreeItem}.
+    // */
+    // public class TreeContentProvider implements IStructuredContentProvider,
+    // ITreeContentProvider {
+    //
+    // public void inputChanged(Viewer viewer, Object oldInput, Object newInput)
+    // {
+    // // do nothing
+    // }
+    //
+    // public void dispose() {
+    // // do nothing
+    // }
+    //
+    // public Object[] getElements(Object parent) {
+    // if (parent.equals(getViewSite()) && (roster != null)) {
+    // final List<TreeItem> groups = new LinkedList<TreeItem>();
+    // for (RosterGroup rosterGroup : roster.getGroups()) {
+    // groups.add(new GroupItem(rosterGroup));
+    // }
+    // groups.add(new UnfiledGroupItem());
+    //
+    // return groups.toArray();
+    // }
+    //
+    // return new Object[0];
+    // }
+    //
+    // public Object getParent(Object child) {
+    // return null;
+    // }
+    //
+    // public Object[] getChildren(Object parent) {
+    // return ((TreeItem) parent).getChildren().toArray();
+    // }
+    //
+    // public boolean hasChildren(Object parent) {
+    // return ((TreeItem) parent).hasChildren();
+    // }
+    // }
+    //
+    // public static class ViewLabelProvider extends LabelProvider implements
+    // IStyledLabelProvider {
+    //
+    // @Override
+    // public String getText(Object object) {
+    // log.warn("Unexpected call to getText(), getStyledText() should"
+    // + " be called instead.");
+    // return super.getText(object);
+    // }
+    //
+    // @Override
+    // public Image getImage(Object element) {
+    // return ((TreeItem) element).getImage();
+    // }
+    //
+    // public StyledString getStyledText(Object element) {
+    // return ((TreeItem) element).getStyledText();
+    // }
+    // }
 
-        /**
-         * @return {@link JID} for this {@link TreeItem} or <code>null</code> if
-         *         there is none associated with it.
-         */
-        JID getJID();
-
-        /**
-         * @return the {@link RosterEntry} for this {@link TreeItem} or
-         *         <code>null</code> if there is none associated with it.
-         */
-        RosterEntry getRosterEntry();
-
-        /**
-         * @return all child items of this tree item.
-         */
-        Collection<TreeItem> getChildren();
-
-        /**
-         * @return if this {@link TreeItem} has children.
-         */
-        boolean hasChildren();
-
-        /**
-         * @return image to display for this tree item.
-         */
-        Image getImage();
-
-        /**
-         * @return item rendered as {@link StyledString} for display.
-         */
-        StyledString getStyledText();
-
-        /**
-         * @return the number of the category this item belongs to. Used to sort
-         *         {@link TreeItem}s. Items are first sorted by category, then
-         *         by the "normal" comparison result.
-         */
-        int getCategory();
-    }
-
-    /**
-     * A contact item for a single user.
-     */
-    protected class ContactItem implements TreeItem {
-
-        protected final String jid;
-
-        public ContactItem(String jid) {
-            if (jid == null) {
-                throw new IllegalArgumentException("jid must not be null");
-            }
-            this.jid = jid;
-        }
-
-        public JID getJID() {
-            return new JID(jid);
-        }
-
-        public RosterEntry getRosterEntry() {
-            return roster.getEntry(jid);
-        }
-
-        public Collection<TreeItem> getChildren() {
-            return Collections.emptyList();
-        }
-
-        public boolean hasChildren() {
-            return false;
-        }
-
-        public Image getImage() {
-            final Presence presence = roster.getPresence(jid);
-            boolean rqPeer = false;
-
-            // Check cache for Saros-support.
-            try {
-                rqPeer = discoveryManager.isSupportedNonBlock(getJID(),
-                    Saros.NAMESPACE);
-            } catch (CacheMissException e) {
-                // Saros support wasn't in cache. Update the discovery manager.
-                discoveryManager.cacheSarosSupport(getJID());
-            }
-
-            if (presence.isAvailable() && saros.isConnected()) {
-                if (presence.isAway()) {
-                    return rqPeer == false ? ImageManager.ICON_BUDDY_AWAY
-                        : ImageManager.ICON_BUDDY_SAROS_AWAY;
-                } else {
-                    return rqPeer == false ? ImageManager.ICON_BUDDY
-                        : ImageManager.ICON_BUDDY_SAROS;
-                }
-            } else {
-                return ImageManager.ICON_BUDDY_OFFLINE;
-            }
-        }
-
-        public StyledString getStyledText() {
-            // TODO Add a description of the pattern of the result.
-            final StyledString result = new StyledString();
-
-            final String user = jid;
-            final RosterEntry entry = RosterView.this.roster.getEntry(user);
-            if (entry == null) {
-                return result;
-            }
-            result.append(RosterUtils.getDisplayableName(entry));
-
-            // Append presence information if available.
-            final Presence presence = roster.getPresence(user);
-            if (entry.getStatus() == RosterPacket.ItemStatus.SUBSCRIPTION_PENDING) {
-                result.append(" (wait for permission)",
-                    StyledString.COUNTER_STYLER);
-            } else if (presence != null && presence.getType() != Type.available
-                && presence.getType() != Type.unavailable) {
-                // Available and Unavailable are visible in the icon color
-                result.append(" (" + presence.getType() + ")",
-                    StyledString.COUNTER_STYLER);
-            }
-
-            // Append DataTransfer state information.
-            if (presence != null && presence.isAvailable()) {
-
-                final JID jid = new JID(user);
-
-                final NetTransferMode transferMode = dataTransferManager
-                    .getTransferMode(jid);
-
-                if (transferMode != NetTransferMode.NONE) {
-                    result.append(" Connected using: " + transferMode,
-                        StyledString.QUALIFIER_STYLER);
-                }
-            }
-            return result;
-        }
-
-        /**
-         * @return 0 if the contact is online, otherwise 1. So online contacts
-         *         get sorted before offline ones.
-         */
-        public int getCategory() {
-            return roster.getPresence(jid).isAvailable() ? 0 : 1;
-        }
-
-        @Override
-        public int hashCode() {
-            return jid.hashCode();
-        }
-
-        @Override
-        public boolean equals(Object obj) {
-            if (this == obj) {
-                return true;
-            }
-            if (obj == null) {
-                return false;
-            }
-            if (!(obj instanceof ContactItem)) {
-                return false;
-            }
-            return jid.equals(((ContactItem) obj).jid);
-        }
-
-        @Override
-        public String toString() {
-            return RosterUtils.getDisplayableName(roster.getEntry(jid));
-        }
-    }
-
-    /**
-     * A group item which holds a number of users.
-     * 
-     * There are to concrete subclasses because of the way Smack handles groups
-     * and unfiled contacts.
-     */
-    protected abstract class AbstractGroupItem implements TreeItem {
-
-        /**
-         * @return <code>null</code> because groups do not have a {@link JID}.
-         */
-        public JID getJID() {
-            return null;
-        }
-
-        /**
-         * @return <code>null</code> because groups do not have a
-         *         {@link RosterEntry}.
-         */
-        public RosterEntry getRosterEntry() {
-            return null;
-        }
-
-        public Image getImage() {
-            return ImageManager.ICON_GROUP;
-        }
-
-        @Override
-        public int hashCode() {
-            return this.toString().hashCode();
-        }
-    }
-
-    /**
-     * A group item for users in groups.
-     */
-    protected class GroupItem extends AbstractGroupItem {
-
-        private final RosterGroup group;
-
-        public GroupItem(RosterGroup group) {
-            super();
-            this.group = group;
-        }
-
-        public Collection<TreeItem> getChildren() {
-            final List<TreeItem> result = new ArrayList<TreeItem>(
-                group.getEntryCount());
-            for (RosterEntry rosterEntry : group.getEntries()) {
-                result.add(new ContactItem(rosterEntry.getUser()));
-            }
-            return result;
-        }
-
-        public boolean hasChildren() {
-            return group.getEntryCount() > 0;
-        }
-
-        public StyledString getStyledText() {
-            return new StyledString(this.toString());
-        }
-
-        /**
-         * @return 1 so that {@link UnfiledGroupItem} will be sorted before all
-         *         other groups.
-         */
-        public int getCategory() {
-            return 1;
-        }
-
-        @Override
-        public boolean equals(Object obj) {
-            if (this == obj) {
-                return true;
-            }
-            if (!(obj instanceof GroupItem)) {
-                return false;
-            }
-            return this.toString().equals(obj.toString());
-        }
-
-        @Override
-        public String toString() {
-            return group.getName();
-        }
-    }
-
-    /**
-     * A group item that holds all users that don't belong to another group.
-     */
-    protected class UnfiledGroupItem extends AbstractGroupItem {
-
-        public Collection<TreeItem> getChildren() {
-            final List<TreeItem> result = new ArrayList<TreeItem>(
-                roster.getUnfiledEntryCount());
-            for (RosterEntry rosterEntry : roster.getUnfiledEntries()) {
-                result.add(new ContactItem(rosterEntry.getUser()));
-            }
-            return result;
-        }
-
-        public boolean hasChildren() {
-            return roster.getUnfiledEntryCount() > 0;
-        }
-
-        public StyledString getStyledText() {
-            return new StyledString(this.toString(),
-                StyledString.QUALIFIER_STYLER);
-        }
-
-        /**
-         * @return 0 so the unfiled contacts are sorted before the groups.
-         * 
-         * @see GroupItem#getCategory()
-         */
-        public int getCategory() {
-            return 0;
-        }
-
-        @Override
-        public boolean equals(Object obj) {
-            if (this == obj) {
-                return true;
-            }
-            if (!(obj instanceof UnfiledGroupItem)) {
-                return false;
-            }
-            return this.toString().equals(obj.toString());
-        }
-
-        @Override
-        public String toString() {
-            return "Buddies";
-        }
-    }
-
-    /**
-     * Provide tree content. Elements are of type {@link TreeItem}.
-     */
-    public class TreeContentProvider implements IStructuredContentProvider,
-        ITreeContentProvider {
-
-        public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
-            // do nothing
-        }
-
-        public void dispose() {
-            // do nothing
-        }
-
-        public Object[] getElements(Object parent) {
-            if (parent.equals(getViewSite()) && (roster != null)) {
-                final List<TreeItem> groups = new LinkedList<TreeItem>();
-                for (RosterGroup rosterGroup : roster.getGroups()) {
-                    groups.add(new GroupItem(rosterGroup));
-                }
-                groups.add(new UnfiledGroupItem());
-
-                return groups.toArray();
-            }
-
-            return new Object[0];
-        }
-
-        public Object getParent(Object child) {
-            return null;
-        }
-
-        public Object[] getChildren(Object parent) {
-            return ((TreeItem) parent).getChildren().toArray();
-        }
-
-        public boolean hasChildren(Object parent) {
-            return ((TreeItem) parent).hasChildren();
-        }
-    }
-
-    public static class ViewLabelProvider extends LabelProvider implements
-        IStyledLabelProvider {
-
-        @Override
-        public String getText(Object object) {
-            log.warn("Unexpected call to getText(), getStyledText() should"
-                + " be called instead.");
-            return super.getText(object);
-        }
-
-        @Override
-        public Image getImage(Object element) {
-            return ((TreeItem) element).getImage();
-        }
-
-        public StyledString getStyledText(Object element) {
-            return ((TreeItem) element).getStyledText();
-        }
-    }
-
-    public static class RosterComparator extends ViewerComparator {
-        @Override
-        public int category(Object element) {
-            return ((TreeItem) element).getCategory();
-        }
-    }
+    // public static class RosterComparator extends ViewerComparator {
+    // @Override
+    // public int category(Object element) {
+    // return ((TreeItem) element).getCategory();
+    // }
+    // }
 
     public RosterView() {
         super();
@@ -664,14 +655,18 @@ public class RosterView extends ViewPart {
         this.label.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
 
         // TODO Should scroll
-        this.viewer = new TreeViewer(composite, SWT.MULTI);
+        this.viewer = new TreeViewer(new Tree(composite, SWT.MULTI));
         this.viewer.getControl().setLayoutData(
             new GridData(SWT.FILL, SWT.FILL, true, true));
-        this.viewer.setContentProvider(new TreeContentProvider());
-        this.viewer.setLabelProvider(new DelegatingStyledCellLabelProvider(
-            new ViewLabelProvider()));
+        // this.viewer.setContentProvider(new TreeContentProvider());
+        this.viewer.setContentProvider(new RosterContentProvider());
+        // this.viewer.setLabelProvider(new
+        // DelegatingStyledCellLabelProvider(new ViewLabelProvider()));
+        this.viewer.setLabelProvider(new TreeLabelProvider());
+
         this.viewer.setComparator(new RosterComparator());
-        this.viewer.setInput(getViewSite());
+        // this.viewer.setInput(getViewSite());
+        this.viewer.setInput(saros.getRoster());
         this.viewer.expandAll();
 
         makeActions();
@@ -749,8 +744,8 @@ public class RosterView extends ViewPart {
     protected void updateStatusInformation(final ConnectionState newState) {
         if (label.getShell().isDisposed())
             return;
-        final String description = sarosUI.getDescription(newState);
-        label.setText(description);
+
+        label.setText(getDescription(newState));
         composite.layout();
     }
 
@@ -771,7 +766,8 @@ public class RosterView extends ViewPart {
                     return;
                 }
 
-                viewer.update(new ContactItem(entry.getUser()), null);
+                // viewer.update(new ContactItem(entry.getUser()), null);
+                viewer.refresh();
             }
         });
     }
@@ -810,6 +806,7 @@ public class RosterView extends ViewPart {
 
         viewer.getControl().setMenu(menu);
         getSite().registerContextMenu(menuMgr, viewer);
+        getSite().setSelectionProvider(viewer);
     }
 
     // private void hookDoubleClickAction() {
@@ -850,13 +847,49 @@ public class RosterView extends ViewPart {
 
     private void makeActions() {
         // this.messagingAction = new MessagingAction(this.viewer);
-        this.skypeAction = new SkypeAction(this.viewer);
+        this.skypeAction = new SkypeAction();
         this.inviteAction = new InviteAction(sessionManager, saros,
-            this.viewer, discoveryManager, invitationProcesses);
-        this.renameContactAction = new RenameContactAction(saros, this.viewer);
+            discoveryManager, invitationProcesses);
+        this.renameContactAction = new RenameContactAction(saros);
         this.deleteContactAction = new DeleteContactAction(sessionManager,
-            saros, this.viewer);
-        this.testAction = new ConnectionTestAction(saros,
-            connectionTestManager, this.viewer);
+            saros);
+        this.testAction = new ConnectionTestAction(saros, connectionTestManager);
+    }
+
+    /**
+     * @param state
+     * @return a nice string description of the given state, which can be used
+     *         to be shown in labels (e.g. CONNECTING becomes "Connecting...").
+     */
+    public String getDescription(ConnectionState state) {
+        String activeAccount;
+
+        if (accountStore.hasActiveAccount()) {
+            JID jid = new JID(accountStore.getActiveAccount().toString());
+            activeAccount = jid.getBase();
+        } else {
+            activeAccount = "No active accounts detected!";
+        }
+
+        switch (state) {
+        case NOT_CONNECTED:
+            return "Not connected";
+        case CONNECTING:
+            return activeAccount + " connecting...";
+        case CONNECTED:
+            JID jid = new JID(saros.getConnection().getUser());
+            return "Connected as " + jid.getBase();
+        case DISCONNECTING:
+            return "Disconnecting...";
+        case ERROR:
+            Exception e = saros.getConnectionError();
+            if (e == null) {
+                return "Error";
+            } else {
+                return "Error (" + e.getMessage() + ")";
+            }
+        default:
+            return "UNKNOWN STATE";
+        }
     }
 }

@@ -51,16 +51,17 @@ import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.invitation.IncomingProjectNegotiation;
 import de.fu_berlin.inf.dpp.invitation.IncomingSessionNegotiation;
-import de.fu_berlin.inf.dpp.net.ConnectionState;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
 import de.fu_berlin.inf.dpp.project.SarosSessionManager;
+import de.fu_berlin.inf.dpp.ui.sarosView.SarosView;
 import de.fu_berlin.inf.dpp.ui.util.DialogUtils;
 import de.fu_berlin.inf.dpp.ui.wizards.AddProjectToSessionWizard;
 import de.fu_berlin.inf.dpp.ui.wizards.JoinSessionWizard;
 import de.fu_berlin.inf.dpp.ui.wizards.dialogs.WizardDialogAccessable;
 import de.fu_berlin.inf.dpp.util.Utils;
 import de.fu_berlin.inf.dpp.util.VersionManager;
+import de.fu_berlin.inf.dpp.videosharing.player.VideoPlayerView;
 
 /**
  * Some helper functionality to interface with Eclipse.
@@ -69,12 +70,6 @@ import de.fu_berlin.inf.dpp.util.VersionManager;
 public class SarosUI {
 
     private static final Logger log = Logger.getLogger(SarosUI.class.getName());
-
-    private static final String SESSION_VIEW = "de.fu_berlin.inf.dpp.ui.SessionView";
-
-    private static final String ROSTER_VIEW = "de.fu_berlin.inf.dpp.ui.RosterView";
-
-    private static final String VIDEO_PLAYER_VIEW = "de.fu_berlin.inf.dpp.videosharing.player.VideoPlayerView";
 
     @Inject
     protected DataTransferManager dataTransferManager;
@@ -151,40 +146,16 @@ public class SarosUI {
     /**
      * @swt
      */
-    public void openSarosViews() {
-        // Create Session View
-        createSessionView();
-        // Open Roster so that a participant can be invited
-        activateRosterView();
+    public void openSarosView() {
+        createView(SarosView.ID);
+        activateSarosView();
     }
 
     /**
      * @swt
      */
-    public void activateRosterView() {
-        activateView(SarosUI.ROSTER_VIEW);
-    }
-
-    /**
-     * @swt
-     */
-    public void createSessionView() {
-        if (Utils.findView(SarosUI.SESSION_VIEW) == null)
-            createView(SarosUI.SESSION_VIEW);
-    }
-
-    /**
-     * @swt
-     */
-    public void bringToFrontSessionView() {
-        bringToFrontView(SarosUI.SESSION_VIEW);
-    }
-
-    /**
-     * @swt
-     */
-    public void activateSessionView() {
-        activateView(SarosUI.SESSION_VIEW);
+    public void activateSarosView() {
+        activateView(SarosView.ID);
     }
 
     protected void bringToFrontView(String view) {
@@ -195,15 +166,15 @@ public class SarosUI {
      * @swt
      */
     public void createVideoPlayerView() {
-        if (Utils.findView(SarosUI.VIDEO_PLAYER_VIEW) == null)
-            createView(SarosUI.VIDEO_PLAYER_VIEW);
+        if (Utils.findView(VideoPlayerView.ID) == null)
+            createView(VideoPlayerView.ID);
     }
 
     /**
      * @swt
      */
     public void activateVideoPlayerView() {
-        activateView(SarosUI.VIDEO_PLAYER_VIEW);
+        activateView(VideoPlayerView.ID);
     }
 
     protected void activateView(String view) {
@@ -237,37 +208,6 @@ public class SarosUI {
         } catch (PartInitException e) {
             log.error("Could not create View " + view, e);
         }
-    }
-
-    /**
-     * @param state
-     * @return a nice string description of the given state, which can be used
-     *         to be shown in labels (e.g. CONNECTING becomes "Connecting...").
-     */
-    public String getDescription(ConnectionState state) {
-        String activeAccount = "No account detected.";
-        if (accountStore.hasActiveAccount()) {
-            activeAccount = accountStore.getActiveAccount().toString();
-        }
-        switch (state) {
-        case NOT_CONNECTED:
-            return activeAccount + " Not connected";
-        case CONNECTING:
-            return activeAccount + " Connecting...";
-        case CONNECTED:
-            return " Connected as " + saros.getConnection().getUser();
-        case DISCONNECTING:
-            return "Disconnecting...";
-        case ERROR:
-            Exception e = saros.getConnectionError();
-            if (e == null) {
-                return "Error";
-            } else {
-                return "Error (" + e.getMessage() + ")";
-            }
-        }
-
-        return "";
     }
 
     public static Composite createLabelComposite(Composite parent, String text) {

@@ -1,21 +1,25 @@
 package de.fu_berlin.inf.dpp.ui.actions;
 
+import java.util.List;
+
 import org.apache.log4j.Logger;
+import org.eclipse.jface.action.Action;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.text.Region;
 import org.eclipse.jface.text.hyperlink.URLHyperlink;
-import org.eclipse.jface.viewers.ISelectionProvider;
-import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.swt.graphics.ImageData;
-import org.eclipse.ui.actions.SelectionProviderAction;
-import org.jivesoftware.smack.RosterEntry;
+import org.eclipse.ui.ISelectionListener;
+import org.eclipse.ui.IWorkbenchPart;
 import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.SkypeManager;
 import de.fu_berlin.inf.dpp.annotations.Component;
+import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.ui.ImageManager;
-import de.fu_berlin.inf.dpp.ui.RosterView.TreeItem;
+import de.fu_berlin.inf.dpp.ui.util.selection.SelectionUtils;
+import de.fu_berlin.inf.dpp.ui.util.selection.retriever.SelectionRetrieverFactory;
 import de.fu_berlin.inf.dpp.util.Utils;
 
 /**
@@ -24,24 +28,30 @@ import de.fu_berlin.inf.dpp.util.Utils;
  * @author rdjemili
  */
 @Component(module = "net")
-public class SkypeAction extends SelectionProviderAction {
+public class SkypeAction extends Action {
 
     private static final Logger log = Logger.getLogger(SkypeAction.class
         .getName());
 
-    protected String skypeURL;
-
     @Inject
     protected SkypeManager skypeManager;
 
-    public SkypeAction(ISelectionProvider provider) {
-        super(provider, "Skype Buddy");
+    public SkypeAction() {
+        super("Skype this buddy");
 
         SarosPluginContext.initComponent(this);
 
-        setEnabled(false);
+        SelectionUtils.getSelectionService().addSelectionListener(
+            new ISelectionListener() {
+                public void selectionChanged(IWorkbenchPart part,
+                    ISelection selection) {
+                    List<JID> buddies = SelectionRetrieverFactory
+                        .getSelectionRetriever(JID.class).getSelection();
+                    setEnabled(buddies.size() == 1);
+                }
+            });
 
-        setToolTipText("Start a Skype VoIP Session With Buddy");
+        setToolTipText("Start a Skype-VoIP session with this buddy");
         setImageDescriptor(new ImageDescriptor() {
             @Override
             public ImageData getImageData() {
@@ -57,47 +67,33 @@ public class SkypeAction extends SelectionProviderAction {
     public void run() {
         Utils.runSafeSync(log, new Runnable() {
             public void run() {
-                runOpenSkype();
-            }
-        });
-    }
+                final List<JID> buddies = SelectionRetrieverFactory
+                    .getSelectionRetriever(JID.class).getSelection();
 
-    public void runOpenSkype() {
-        if (this.skypeURL == null) {
-            return;
-        }
+                if (buddies.size() == 1) {
+                    Utils.runSafeAsync("SkypeAction-", log, new Runnable() {
+                        public void run() {
+                            Utils.runSafeSWTSync(log, new Runnable() {
+                                public void run() {
+                                    setEnabled(false);
+                                }
+                            });
+                            final String skypeURL = skypeManager
+                                .getSkypeURL(buddies.get(0).getBareJID());
+                            if (skypeURL != null) {
+                                Utils.runSafeSWTSync(log, new Runnable() {
+                                    public void run() {
+                                        URLHyperlink link = new URLHyperlink(
+                                            new Region(0, 0), skypeURL);
+                                        link.open();
+                                    }
+                                });
+                            }
 
-        URLHyperlink link = new URLHyperlink(new Region(0, 0), this.skypeURL);
-        link.open();
-    }
+                        }
+                    });
+                }
 
-    @Override
-    public void selectionChanged(IStructuredSelection selection) {
-
-        if (selection.size() != 1) {
-            setEnabled(false);
-            return;
-        }
-
-        final RosterEntry rosterEntry = ((TreeItem) selection.getFirstElement())
-            .getRosterEntry();
-        if (rosterEntry == null) {
-            setEnabled(false);
-            return;
-        }
-        Utils.runSafeAsync("SkypeAction-", log, new Runnable() {
-            public void run() {
-                Utils.runSafeSWTSync(log, new Runnable() {
-                    public void run() {
-                        setEnabled(false);
-                    }
-                });
-                skypeURL = skypeManager.getSkypeURL(rosterEntry.getUser());
-                Utils.runSafeSWTSync(log, new Runnable() {
-                    public void run() {
-                        setEnabled(skypeURL != null);
-                    }
-                });
             }
         });
     }

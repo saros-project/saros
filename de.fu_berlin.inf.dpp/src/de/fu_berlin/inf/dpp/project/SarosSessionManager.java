@@ -79,7 +79,7 @@ import de.fu_berlin.inf.dpp.project.internal.SarosSession;
 import de.fu_berlin.inf.dpp.synchronize.StopManager;
 import de.fu_berlin.inf.dpp.ui.ImageManager;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
-import de.fu_berlin.inf.dpp.ui.SessionView;
+import de.fu_berlin.inf.dpp.ui.sarosView.SarosView;
 import de.fu_berlin.inf.dpp.ui.wizards.InvitationWizard;
 import de.fu_berlin.inf.dpp.util.StackTrace;
 import de.fu_berlin.inf.dpp.util.Utils;
@@ -283,7 +283,7 @@ public class SarosSessionManager implements IConnectionListener,
             public void run() {
                 process.acknowledgeInvitation();
                 sarosUI.showIncomingInvitationUI(process);
-                sarosUI.openSarosViews();
+                sarosUI.openSarosView();
             }
         });
     }
@@ -444,7 +444,7 @@ public class SarosSessionManager implements IConnectionListener,
 
                 if (e.getMessage() == null) { // buddy canceled purposely
 
-                    SessionView.showNotification("Canceled Invitation", peer
+                    SarosView.showNotification("Canceled Invitation", peer
                         + " has canceled your Invitation.");
 
                     return new Status(IStatus.ERROR, Saros.SAROS, peer
@@ -452,7 +452,7 @@ public class SarosSessionManager implements IConnectionListener,
 
                 } else {
 
-                    SessionView
+                    SarosView
                         .showNotification(
                             "Error during Invitation",
                             "Your invitation to "
@@ -596,7 +596,7 @@ public class SarosSessionManager implements IConnectionListener,
                     String message = peer
                         + " has canceled the project sharing.";
 
-                    SessionView.showNotification("Canceled project sharing",
+                    SarosView.showNotification("Canceled project sharing",
                         message);
 
                     return new Status(IStatus.ERROR, Saros.SAROS, message);
@@ -606,7 +606,7 @@ public class SarosSessionManager implements IConnectionListener,
                         + peer
                         + " has been canceled remotely because of an error:\n\n"
                         + e.getMessage();
-                    SessionView.showNotification(
+                    SarosView.showNotification(
                         "Error during project sharing", message);
 
                     return new Status(IStatus.ERROR, Saros.SAROS, message);

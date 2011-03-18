@@ -44,8 +44,8 @@ import de.fu_berlin.inf.dpp.project.ISarosSessionListener;
 import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
 import de.fu_berlin.inf.dpp.project.SarosSessionManager;
 import de.fu_berlin.inf.dpp.ui.RemoteProgressManager;
-import de.fu_berlin.inf.dpp.ui.SessionView;
 import de.fu_berlin.inf.dpp.ui.actions.ConsistencyAction;
+import de.fu_berlin.inf.dpp.ui.sarosView.SarosView;
 import de.fu_berlin.inf.dpp.util.StackTrace;
 
 /**
@@ -58,7 +58,7 @@ import de.fu_berlin.inf.dpp.util.StackTrace;
  * 
  * If an inconsistency is detected the inconsistency state is set via the
  * {@link IsInconsistentObservable}. This enables the {@link ConsistencyAction}
- * (a.k.a. the yellow triangle) in the {@link SessionView}.
+ * (a.k.a. the yellow triangle) in the {@link SarosView}.
  * 
  * 2.) Send a ChecksumError to the host, if the user wants to recover from an
  * inconsistency.

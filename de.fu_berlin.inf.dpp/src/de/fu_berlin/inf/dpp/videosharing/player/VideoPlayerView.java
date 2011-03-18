@@ -92,6 +92,8 @@ public class VideoPlayerView extends ListExplanatoryViewPart implements
     VideoDisplay {
     private static Logger log = Logger.getLogger(VideoPlayerView.class);
 
+    public static final String ID = "de.fu_berlin.inf.dpp.videosharing.player.VideoPlayerView";
+
     @Inject
     protected VideoSharing videoSharing;
     @Inject

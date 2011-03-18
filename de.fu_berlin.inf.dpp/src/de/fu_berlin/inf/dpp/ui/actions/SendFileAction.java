@@ -39,15 +39,16 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
-import org.eclipse.jface.action.Action;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
+import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.actions.SelectionProviderAction;
 import org.eclipse.ui.progress.IProgressConstants;
 import org.picocontainer.annotations.Inject;
 
@@ -63,7 +64,7 @@ import de.fu_berlin.inf.dpp.net.internal.StreamServiceManager;
 import de.fu_berlin.inf.dpp.net.internal.StreamSession;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.SarosSessionManager;
-import de.fu_berlin.inf.dpp.ui.SessionView.SessionViewTableViewer;
+import de.fu_berlin.inf.dpp.ui.sarosView.SessionViewTableViewer;
 import de.fu_berlin.inf.dpp.ui.util.DialogUtils;
 import de.fu_berlin.inf.dpp.util.StopWatch;
 import de.fu_berlin.inf.dpp.util.StreamJob;
@@ -74,7 +75,7 @@ import de.fu_berlin.inf.dpp.util.Utils;
  * 
  * @author s-lau
  */
-public class SendFileAction extends Action {
+public class SendFileAction extends SelectionProviderAction {
     private static final Logger log = Logger.getLogger(SendFileAction.class);
 
     public static final String ACTION_ID = SendFileAction.class.getName();
@@ -91,9 +92,9 @@ public class SendFileAction extends Action {
     protected User selectedUser = null;
 
     public SendFileAction(StreamServiceManager streamServiceManager,
-        SessionViewTableViewer viewer,
+        SessionViewTableViewer viewer, ISelectionProvider provider,
         SendFileStreamService sendFileStreamService) {
-        super();
+        super(provider, "Send File");
         sendFileService = sendFileStreamService;
         sendFileStreamService.hookAction(this);
         setImageDescriptor(PlatformUI.getWorkbench().getSharedImages()

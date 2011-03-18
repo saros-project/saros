@@ -5,11 +5,12 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.jface.action.Action;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
+import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
+import org.eclipse.ui.actions.SelectionProviderAction;
 import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.SarosPluginContext;
@@ -21,19 +22,19 @@ import de.fu_berlin.inf.dpp.observables.VoIPSessionObservable;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.SarosSessionManager;
 import de.fu_berlin.inf.dpp.ui.ImageManager;
-import de.fu_berlin.inf.dpp.ui.SessionViewToolBar;
-import de.fu_berlin.inf.dpp.ui.SessionView.SessionViewTableViewer;
 import de.fu_berlin.inf.dpp.ui.dialogs.ErrorMessageDialog;
 import de.fu_berlin.inf.dpp.ui.dialogs.WarningMessageDialog;
+import de.fu_berlin.inf.dpp.ui.sarosView.SarosViewToolbar;
+import de.fu_berlin.inf.dpp.ui.sarosView.SessionViewTableViewer;
 import de.fu_berlin.inf.dpp.util.ValueChangeListener;
 
 /**
  * The {@link VoIPAction} manages the user interface interaction in the
- * {@link SessionViewToolBar}
+ * {@link SarosViewToolbar}
  * 
  * @author ologa
  */
-public class VoIPAction extends Action {
+public class VoIPAction extends SelectionProviderAction {
 
     private static final Logger log = Logger.getLogger(VoIPAction.class);
 
@@ -62,8 +63,8 @@ public class VoIPAction extends Action {
 
     protected User selectedUser;
 
-    public VoIPAction(SessionViewTableViewer viewer) {
-        super();
+    public VoIPAction(SessionViewTableViewer viewer, ISelectionProvider provider) {
+        super(provider, "Start VoIP Session");
         SarosPluginContext.initComponent(this);
         changeButton();
         setId(ACTION_ID);
@@ -125,8 +126,8 @@ public class VoIPAction extends Action {
                 protected IStatus run(IProgressMonitor monitor) {
                     log.info("Trying to invite " + selectedUser
                         + " to a new VoIP Session");
-                    return audioServiceManager.invite(selectedUser, SubMonitor
-                        .convert(monitor));
+                    return audioServiceManager.invite(selectedUser,
+                        SubMonitor.convert(monitor));
                 }
             };
             voipCreate.schedule();

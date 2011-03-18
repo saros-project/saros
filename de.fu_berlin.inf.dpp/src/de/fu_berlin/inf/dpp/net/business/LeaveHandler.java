@@ -13,7 +13,7 @@ import de.fu_berlin.inf.dpp.net.internal.extensions.PacketExtensionUtils;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.SarosSessionManager;
-import de.fu_berlin.inf.dpp.ui.SessionView;
+import de.fu_berlin.inf.dpp.ui.sarosView.SarosView;
 import de.fu_berlin.inf.dpp.util.Utils;
 
 /**
@@ -74,7 +74,7 @@ public class LeaveHandler {
             if (user.isHost()) {
                 sessionManager.stopSarosSession();
 
-                SessionView.showNotification(
+                SarosView.showNotification(
                     "Closing the session",
                     "Session was closed by inviter "
                         + user.getHumanReadableName() + ".");

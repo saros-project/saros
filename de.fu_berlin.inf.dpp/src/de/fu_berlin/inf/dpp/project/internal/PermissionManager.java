@@ -19,7 +19,7 @@ import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ISarosSessionListener;
 import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
 import de.fu_berlin.inf.dpp.project.SarosSessionManager;
-import de.fu_berlin.inf.dpp.ui.SessionView;
+import de.fu_berlin.inf.dpp.ui.sarosView.SarosView;
 
 /**
  * This manager is responsible for handling {@link User.Permission} changes.
@@ -43,7 +43,7 @@ public class PermissionManager implements IActivityProvider {
              * SessionView because it is not guaranteed there actually is a
              * session view open.
              */
-            SessionView.showNotification("Permission changed", String.format(
+            SarosView.showNotification("Permission changed", String.format(
                 "%s %s now %s access for this session.",
                 user.getHumanReadableName(), user.isLocal() ? "have" : "has",
                 user.hasWriteAccess() ? "write" : "read-only"));
@@ -51,13 +51,13 @@ public class PermissionManager implements IActivityProvider {
 
         @Override
         public void userJoined(User user) {
-            SessionView.showNotification("Buddy joined the session",
+            SarosView.showNotification("Buddy joined the session",
                 user.getHumanReadableName() + " joined the session.");
         }
 
         @Override
         public void userLeft(User user) {
-            SessionView.showNotification("Buddy left the session",
+            SarosView.showNotification("Buddy left the session",
                 user.getHumanReadableName() + " left the session.");
         }
     };
