@@ -15,6 +15,7 @@ public class Messages extends NLS {
     public static String roster_alreadyadded_errorMessage;
     public static String wizard_finish_noeffect;
     public static String server_unresolvable_errorMessage;
+    public static String account_exists_errorMessage;
     static {
         // initialize resource bundle
         NLS.initializeMessages(BUNDLE_NAME, Messages.class);

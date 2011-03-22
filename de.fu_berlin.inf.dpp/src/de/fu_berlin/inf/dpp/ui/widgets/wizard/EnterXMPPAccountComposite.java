@@ -290,7 +290,7 @@ public class EnterXMPPAccountComposite extends Composite {
      * @return
      */
     public String getPassword() {
-        return this.passwordText.getText().trim();
+        return this.passwordText.getText();
     }
 
     /**

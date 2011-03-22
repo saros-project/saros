@@ -136,16 +136,6 @@ public class AddXMPPAccountWizard extends Wizard {
         return account;
     }
 
-    /**
-     * We override this method, because we only want to allow to finish when the
-     * last page is displayed (to make sure that the user saw/confirmed all
-     * pages)
-     */
-    @Override
-    public boolean canFinish() {
-        return getContainer().getCurrentPage().getNextPage() == null;
-    }
-
     /*
      * Wizard Results
      */

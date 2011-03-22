@@ -189,7 +189,7 @@ public class CreateXMPPAccountWizardPage extends WizardPage {
         this.serverText.select(selectIndex);
     }
 
-    private void hookListeners() {
+    protected void hookListeners() {
         ModifyListener listener = new ModifyListener() {
             public void modifyText(ModifyEvent e) {
                 updatePageCompletion();
@@ -210,13 +210,17 @@ public class CreateXMPPAccountWizardPage extends WizardPage {
         }
     }
 
-    private void updatePageCompletion() {
+    protected void updatePageCompletion() {
         boolean done = !this.getServer().isEmpty()
             && !this.getUsername().isEmpty() && !this.getPassword().isEmpty();
 
         boolean passwordsMatch = this.passwordText.getText().equals(
             this.repeatPasswordText.getText());
         done &= passwordsMatch;
+
+        boolean accountExists = accountStore.contains(getUsername(),
+            getServer());
+        done &= !accountExists;
 
         if (!this.getUsername().isEmpty()) {
             usernameWasValid = true;
@@ -242,9 +246,11 @@ public class CreateXMPPAccountWizardPage extends WizardPage {
         } else if (passwordWasValid) {
             if (this.getPassword().isEmpty()) {
                 setErrorMessage(Messages.password_empty_errorMessage);
-            } else if (!passwordsMatch) {
-                setErrorMessage("Both passwords must match.");
             }
+        } else if (!passwordsMatch) {
+            setErrorMessage("Both passwords must match.");
+        } else if (accountExists) {
+            setErrorMessage(Messages.account_exists_errorMessage);
         } else {
             setErrorMessage(null);
         }
@@ -274,7 +280,7 @@ public class CreateXMPPAccountWizardPage extends WizardPage {
     }
 
     public String getPassword() {
-        return this.passwordText.getText().trim();
+        return this.passwordText.getText();
     }
 
     public boolean useNow() {

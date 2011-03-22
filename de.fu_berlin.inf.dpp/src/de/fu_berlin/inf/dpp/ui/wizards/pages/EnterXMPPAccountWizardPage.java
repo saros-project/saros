@@ -17,6 +17,7 @@ import org.picocontainer.annotations.Inject;
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.accountManagement.XMPPAccount;
+import de.fu_berlin.inf.dpp.accountManagement.XMPPAccountStore;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.ui.util.WizardUtils;
 import de.fu_berlin.inf.dpp.ui.widgets.explanation.note.SimpleNoteComposite;
@@ -39,6 +40,9 @@ public class EnterXMPPAccountWizardPage extends WizardPage {
 
     @Inject
     protected Saros saros;
+
+    @Inject
+    protected XMPPAccountStore accountStore;
 
     protected Button createAccountButton;
     protected EnterXMPPAccountComposite enterXMPPAccountComposite;
@@ -66,7 +70,7 @@ public class EnterXMPPAccountWizardPage extends WizardPage {
     protected boolean isXMPPServerValid = false;
 
     /**
-     * This flag is ture if Saros's Jabber server restriction should be
+     * This flag is true if Saros's Jabber server restriction should be
      * displayed.
      */
     protected boolean showSarosXMPPRestriction = false;
@@ -234,6 +238,7 @@ public class EnterXMPPAccountWizardPage extends WizardPage {
     protected void updatePageCompletion() {
         boolean isJIDValid = this.getJID().isValid();
         boolean isPasswordNotEmpty = !this.getPassword().isEmpty();
+        boolean accountExists = accountStore.contains(getJID());
 
         if (isJIDValid)
             wasJIDValid = true;
@@ -252,7 +257,8 @@ public class EnterXMPPAccountWizardPage extends WizardPage {
             setMessage(null);
         }
 
-        if (isJIDValid && isPasswordNotEmpty && isXMPPServerValid) {
+        if (isJIDValid && isPasswordNotEmpty && isXMPPServerValid
+            && !accountExists) {
             /*
              * TODO Connect and login attempt to new server Not done because
              * Saros.connect holds the whole connection code. Few reusable code.
@@ -267,6 +273,8 @@ public class EnterXMPPAccountWizardPage extends WizardPage {
                 setErrorMessage(Messages.password_empty_errorMessage);
             } else if (!isXMPPServerValid && wasXMPPServerValid) {
                 setErrorMessage(Messages.server_unresolvable_errorMessage);
+            } else if (accountExists) {
+                setErrorMessage(Messages.account_exists_errorMessage);
             } else {
                 setErrorMessage(null);
             }

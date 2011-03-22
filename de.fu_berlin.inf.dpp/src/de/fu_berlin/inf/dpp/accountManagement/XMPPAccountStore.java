@@ -8,6 +8,7 @@ import org.eclipse.jface.preference.IPreferenceStore;
 
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.annotations.Component;
+import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
 
 /**
@@ -349,4 +350,19 @@ public class XMPPAccountStore {
     public boolean hasActiveAccount() {
         return activeAccount != null;
     }
+
+    public boolean contains(String username, String server) {
+        for (XMPPAccount a : getAllAccounts()) {
+            if (a.getServer().equals(server)
+                && a.getUsername().equals(username)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean contains(JID jid) {
+        return contains(jid.getName(), jid.getDomain());
+    }
+
 }
