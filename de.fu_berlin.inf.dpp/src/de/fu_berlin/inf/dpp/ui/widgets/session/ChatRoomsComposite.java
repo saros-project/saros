@@ -73,12 +73,8 @@ public class ChatRoomsComposite extends ListExplanatoryComposite {
         .getImage("icons/view16/cmpsg_misc.png");
 
     protected ListExplanation howTo = new ListExplanation(SWT.ICON_INFORMATION,
-        "How to begin a Saros session you can either:",
-        "Right-click on a project in the Package Explorer",
-        "then select \"Share project\" from Saros sub-menu or",
-        "Right-click on a user from the buddy-list",
-        "then select \"Invite user...\"",
-        "this tab will be replaced by the groupchat");
+        "To share projects you can either:", "Right-click on a project",
+        "Right-click on a buddy", "Use the Saros menu in the Eclipse menu bar");
 
     @Inject
     // TODO: see
