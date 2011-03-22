@@ -10,8 +10,10 @@ import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Display;
+import org.jivesoftware.smack.packet.Presence;
 import org.picocontainer.annotations.Inject;
 
+import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
@@ -25,6 +27,9 @@ public class SessionLabelProvider extends LabelProvider implements
 
     @Inject
     private EditorManager editorManager;
+
+    @Inject
+    protected Saros saros;
 
     public String getColumnText(Object obj, int index) {
 
@@ -45,13 +50,16 @@ public class SessionLabelProvider extends LabelProvider implements
             fontData.setStyle(SWT.BOLD);
         }
         this.boldFont = new Font(disp, data);
-
     }
 
     @Override
     public Image getImage(Object obj) {
         User user = (User) obj;
-        if (user.isAway()) {
+        Presence userPresence = saros.getRoster().getPresence(
+            user.getJID().toString());
+        boolean userAway = userPresence.isAway();
+
+        if (userAway) {
             if (user.hasWriteAccess())
                 return ImageManager.ICON_BUDDY_SAROS_AWAY;
             else
