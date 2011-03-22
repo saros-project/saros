@@ -55,6 +55,8 @@ public class JIDCombo {
             @Override
             public void keyReleased(KeyEvent e) {
                 switch (e.keyCode) {
+                case SWT.HOME:
+                case SWT.END:
                 case SWT.ARROW_UP:
                 case SWT.ARROW_RIGHT:
                 case SWT.ARROW_DOWN:
