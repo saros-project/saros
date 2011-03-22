@@ -88,7 +88,7 @@ public class JID implements Serializable {
      * @param rosterEntry
      */
     public JID(RosterEntry rosterEntry) {
-        this(rosterEntry.getUser());
+        this((rosterEntry != null) ? rosterEntry.getUser() : null);
     }
 
     /**
