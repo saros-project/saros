@@ -2,8 +2,8 @@ package de.fu_berlin.inf.dpp.ui.widgets;
 
 import org.apache.log4j.Logger;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Label;
 import org.jivesoftware.smack.XMPPConnection;
 import org.picocontainer.annotations.Inject;
 
@@ -44,7 +44,7 @@ public class ConnectionStateComposite extends Composite {
     @Inject
     protected XMPPAccountStore accountStore;
 
-    protected Label stateLabel;
+    protected CLabel stateLabel;
 
     public ConnectionStateComposite(Composite parent, int style) {
         super(parent, style);
@@ -52,7 +52,8 @@ public class ConnectionStateComposite extends Composite {
         SarosPluginContext.initComponent(this);
 
         this.setLayout(LayoutUtils.createGridLayout(1, false, 10, 3, 0, 0));
-        stateLabel = new Label(this, SWT.WRAP);
+        stateLabel = new CLabel(this, SWT.NONE);
+        stateLabel.setLayoutData(LayoutUtils.createFillHGrabGridData());
         FontUtils.makeBold(stateLabel);
 
         updateLabel(saros.getConnectionState());
@@ -92,23 +93,18 @@ public class ConnectionStateComposite extends Composite {
      *         to be shown in labels (e.g. CONNECTING becomes "Connecting...").
      */
     public String getDescription(ConnectionState state) {
-        String activeAccount;
-
-        if (accountStore.hasActiveAccount()) {
-            JID jid = new JID(accountStore.getActiveAccount().toString());
-            activeAccount = jid.getBase();
-        } else {
-            activeAccount = "No active accounts detected!";
+        if (!accountStore.hasActiveAccount()) {
+            return "Add XMPP/Jabber account first";
         }
 
         switch (state) {
         case NOT_CONNECTED:
             return "Not connected";
         case CONNECTING:
-            return activeAccount + " connecting...";
+            return "Connecting...";
         case CONNECTED:
             JID jid = new JID(saros.getConnection().getUser());
-            return "Connected as " + jid.getBase();
+            return jid.getBase();
         case DISCONNECTING:
             return "Disconnecting...";
         case ERROR:
