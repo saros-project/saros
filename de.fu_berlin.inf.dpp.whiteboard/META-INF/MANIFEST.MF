@@ -9,8 +9,6 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.gef,
  org.eclipse.ui.views,
  org.eclipse.ui.editors,
- org.eclipse.jdt,
- org.eclipse.jdt.ui,
  org.eclipse.jface.text,
  de.fu_berlin.inf.dpp
 Bundle-ActivationPolicy: lazy
