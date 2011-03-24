@@ -16,7 +16,6 @@ import de.fu_berlin.inf.dpp.ui.actions.FollowModeAction;
 import de.fu_berlin.inf.dpp.ui.actions.IMBeepAction;
 import de.fu_berlin.inf.dpp.ui.actions.LeaveSessionAction;
 import de.fu_berlin.inf.dpp.ui.actions.NewContactAction;
-import de.fu_berlin.inf.dpp.ui.actions.OpenInviteInterface;
 import de.fu_berlin.inf.dpp.ui.actions.RestrictInviteesToReadOnlyAccessAction;
 import de.fu_berlin.inf.dpp.ui.actions.RestrictToReadOnlyAccessAction;
 import de.fu_berlin.inf.dpp.ui.actions.StoppedAction;
@@ -43,7 +42,6 @@ public class SarosViewToolbar implements Disposable {
      */
     public SarosViewToolbar(Saros saros, ViewPart sarosView,
         StoppedAction stoppedAction, ConsistencyAction consistencyAction,
-        OpenInviteInterface openInvitationInterfaceAction,
         RestrictToReadOnlyAccessAction removeDriverRoleAction,
         RestrictInviteesToReadOnlyAccessAction removeAllDriverRoleAction,
         FollowModeAction followModeAction, VoIPAction voipAction,
@@ -66,7 +64,6 @@ public class SarosViewToolbar implements Disposable {
         toolBar.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
         toolBar.add(stoppedAction);
         toolBar.add(consistencyAction);
-        toolBar.add(openInvitationInterfaceAction);
         toolBar.add(followModeAction);
         toolBar.add(leaveSessionAction);
         toolBar.add(iMBeepAction);

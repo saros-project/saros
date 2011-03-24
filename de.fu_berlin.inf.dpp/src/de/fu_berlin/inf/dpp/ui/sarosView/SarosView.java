@@ -57,7 +57,6 @@ import de.fu_berlin.inf.dpp.net.RosterAdapter;
 import de.fu_berlin.inf.dpp.net.RosterTracker;
 import de.fu_berlin.inf.dpp.net.internal.ConnectionTestManager;
 import de.fu_berlin.inf.dpp.net.internal.discoveryManager.DiscoveryManager;
-import de.fu_berlin.inf.dpp.observables.InvitationProcessObservable;
 import de.fu_berlin.inf.dpp.project.SarosSessionManager;
 import de.fu_berlin.inf.dpp.ui.BalloonNotification;
 import de.fu_berlin.inf.dpp.ui.actions.ChangeColorAction;
@@ -69,11 +68,9 @@ import de.fu_berlin.inf.dpp.ui.actions.FollowModeAction;
 import de.fu_berlin.inf.dpp.ui.actions.FollowThisPersonAction;
 import de.fu_berlin.inf.dpp.ui.actions.GiveWriteAccessAction;
 import de.fu_berlin.inf.dpp.ui.actions.IMBeepAction;
-import de.fu_berlin.inf.dpp.ui.actions.InviteAction;
 import de.fu_berlin.inf.dpp.ui.actions.JumpToUserWithWriteAccessPositionAction;
 import de.fu_berlin.inf.dpp.ui.actions.LeaveSessionAction;
 import de.fu_berlin.inf.dpp.ui.actions.NewContactAction;
-import de.fu_berlin.inf.dpp.ui.actions.OpenInviteInterface;
 import de.fu_berlin.inf.dpp.ui.actions.RenameContactAction;
 import de.fu_berlin.inf.dpp.ui.actions.RestrictInviteesToReadOnlyAccessAction;
 import de.fu_berlin.inf.dpp.ui.actions.RestrictToReadOnlyAccessAction;
@@ -125,9 +122,6 @@ public class SarosView extends ViewPart {
 
     @Inject
     protected RosterTracker rosterTracker;
-
-    @Inject
-    protected InvitationProcessObservable invitationProcesses;
 
     @Inject
     protected DiscoveryManager discoveryManager;
@@ -253,7 +247,6 @@ public class SarosView extends ViewPart {
         container.addComponent(FollowThisPersonAction.class);
         container.addComponent(JumpToUserWithWriteAccessPositionAction.class);
         container.addComponent(LeaveSessionAction.class);
-        container.addComponent(OpenInviteInterface.class);
         container.addComponent(SessionViewTableViewer.class,
             rosterSessionComposite.getSessionViewer());
         container.addComponent(RestrictInviteesToReadOnlyAccessAction.class);
@@ -282,8 +275,6 @@ public class SarosView extends ViewPart {
             public void menuAboutToShow(final IMenuManager manager) {
 
                 manager.add(new SkypeAction());
-                manager.add(new InviteAction(sessionManager, saros,
-                    discoveryManager, invitationProcesses));
                 manager.add(new Separator());
                 manager.add(SarosView.this.renameContactAction);
                 manager.add(SarosView.this.deleteContactAction);

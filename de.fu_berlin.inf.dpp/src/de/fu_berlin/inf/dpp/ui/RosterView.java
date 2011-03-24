@@ -72,7 +72,6 @@ import de.fu_berlin.inf.dpp.project.SarosSessionManager;
 import de.fu_berlin.inf.dpp.ui.actions.ChangeXMPPAccountAction;
 import de.fu_berlin.inf.dpp.ui.actions.ConnectionTestAction;
 import de.fu_berlin.inf.dpp.ui.actions.DeleteContactAction;
-import de.fu_berlin.inf.dpp.ui.actions.InviteAction;
 import de.fu_berlin.inf.dpp.ui.actions.NewContactAction;
 import de.fu_berlin.inf.dpp.ui.actions.RenameContactAction;
 import de.fu_berlin.inf.dpp.ui.actions.SkypeAction;
@@ -104,7 +103,6 @@ public class RosterView extends ViewPart {
     /*
      * Actions
      */
-    protected InviteAction inviteAction;
 
     protected RenameContactAction renameContactAction;
 
@@ -822,11 +820,6 @@ public class RosterView extends ViewPart {
     private void contributeToActionBars() {
         final IActionBars bars = getViewSite().getActionBars();
 
-        final IMenuManager menuManager = bars.getMenuManager();
-        // menuManager.add(this.messagingAction);
-        menuManager.add(inviteAction);
-        menuManager.add(new Separator());
-
         final IToolBarManager toolBarManager = bars.getToolBarManager();
         toolBarManager.add(new ChangeXMPPAccountAction());
         toolBarManager.add(new NewContactAction(saros));
@@ -835,7 +828,6 @@ public class RosterView extends ViewPart {
     private void fillContextMenu(IMenuManager manager) {
         // manager.add(this.messagingAction);
         manager.add(this.skypeAction);
-        manager.add(this.inviteAction);
         manager.add(new Separator());
         manager.add(this.renameContactAction);
         manager.add(this.deleteContactAction);
@@ -848,8 +840,6 @@ public class RosterView extends ViewPart {
     private void makeActions() {
         // this.messagingAction = new MessagingAction(this.viewer);
         this.skypeAction = new SkypeAction();
-        this.inviteAction = new InviteAction(sessionManager, saros,
-            discoveryManager, invitationProcesses);
         this.renameContactAction = new RenameContactAction(saros);
         this.deleteContactAction = new DeleteContactAction(sessionManager,
             saros);

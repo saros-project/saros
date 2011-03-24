@@ -11,7 +11,6 @@ import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
 import de.fu_berlin.inf.dpp.ui.actions.ConsistencyAction;
 import de.fu_berlin.inf.dpp.ui.actions.FollowModeAction;
 import de.fu_berlin.inf.dpp.ui.actions.LeaveSessionAction;
-import de.fu_berlin.inf.dpp.ui.actions.OpenInviteInterface;
 import de.fu_berlin.inf.dpp.ui.actions.RestrictInviteesToReadOnlyAccessAction;
 import de.fu_berlin.inf.dpp.ui.actions.RestrictToReadOnlyAccessAction;
 import de.fu_berlin.inf.dpp.ui.actions.SendFileAction;
@@ -38,7 +37,6 @@ public class SessionViewToolBar implements Disposable {
         ViewPart sessionView,
         StoppedAction stoppedAction,
         ConsistencyAction consistencyAction,
-        OpenInviteInterface openInvitationInterfaceAction,
         RestrictToReadOnlyAccessAction restrictToReadOnlyAccess,
         RestrictInviteesToReadOnlyAccessAction restrictInviteesToReadOnlyAccessAction,
         FollowModeAction followModeAction, SendFileAction sendFileAction,
@@ -59,7 +57,6 @@ public class SessionViewToolBar implements Disposable {
         toolBar.add(voipAction);
         toolBar.add(stoppedAction);
         toolBar.add(consistencyAction);
-        toolBar.add(openInvitationInterfaceAction);
         toolBar.add(restrictInviteesToReadOnlyAccessAction);
         toolBar.add(followModeAction);
         toolBar.add(leaveSessionAction);

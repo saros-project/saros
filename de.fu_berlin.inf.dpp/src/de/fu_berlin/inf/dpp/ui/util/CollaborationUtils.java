@@ -182,11 +182,19 @@ public class CollaborationUtils {
                 if (sarosSession != null) {
                     Utils.runSafeSync(log, new Runnable() {
                         public void run() {
-                            Collection<User> addedBuddies = sarosSession
+                            Collection<User> addedUsers = sarosSession
                                 .getParticipants();
                             List<JID> buddiesToAdd = new LinkedList<JID>();
                             for (JID buddy : buddies) {
-                                if (!addedBuddies.contains(buddy)) {
+                                boolean addBuddyToSession = true;
+                                for (User addedUser : addedUsers) {
+                                    JID addedBuddy = addedUser.getJID();
+                                    if (buddy.equals(addedBuddy)) {
+                                        addBuddyToSession = false;
+                                        break;
+                                    }
+                                }
+                                if (addBuddyToSession) {
                                     buddiesToAdd.add(buddy);
                                 }
                             }

@@ -82,7 +82,6 @@ import de.fu_berlin.inf.dpp.ui.actions.FollowThisPersonAction;
 import de.fu_berlin.inf.dpp.ui.actions.GiveWriteAccessAction;
 import de.fu_berlin.inf.dpp.ui.actions.JumpToUserWithWriteAccessPositionAction;
 import de.fu_berlin.inf.dpp.ui.actions.LeaveSessionAction;
-import de.fu_berlin.inf.dpp.ui.actions.OpenInviteInterface;
 import de.fu_berlin.inf.dpp.ui.actions.RestrictInviteesToReadOnlyAccessAction;
 import de.fu_berlin.inf.dpp.ui.actions.RestrictToReadOnlyAccessAction;
 import de.fu_berlin.inf.dpp.ui.actions.SendFileAction;
@@ -513,7 +512,6 @@ public class SessionView extends ListExplanatoryViewPart {
         container.addComponent(FollowThisPersonAction.class);
         container.addComponent(JumpToUserWithWriteAccessPositionAction.class);
         container.addComponent(LeaveSessionAction.class);
-        container.addComponent(OpenInviteInterface.class);
         container.addComponent(SessionViewTableViewer.class, this.viewer);
         container.addComponent(RestrictInviteesToReadOnlyAccessAction.class);
         container.addComponent(RestrictToReadOnlyAccessAction.class);
