@@ -10,6 +10,7 @@ import de.fu_berlin.inf.dpp.stf.client.testProject.testsuits.STFTest.TypeOfCreat
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.IRemoteWorkbenchBot;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.RemoteWorkbenchBot;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.IRemoteBotShell;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.IRemoteBotTreeItem;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.menuBar.IMenuBar;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.menuBar.MenuBar;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.views.IViews;
@@ -248,17 +249,6 @@ public class SuperBot extends STF implements ISuperBot {
         shell.bot().button(FINISH).click();
     }
 
-    public void confirmShellAddBuddyToSession(String... baseJIDOfinvitees)
-        throws RemoteException {
-        bot().waitUntilShellIsOpen(SHELL_ADD_BUDDY_TO_SESSION);
-        IRemoteBotShell shell = bot().shell(SHELL_ADD_BUDDY_TO_SESSION);
-        shell.activate();
-        for (String baseJID : baseJIDOfinvitees) {
-            shell.bot().tree().selectTreeItem(baseJID).check();
-        }
-        shell.bot().button(FINISH).click();
-    }
-
     public void confirmShellClosingTheSession() throws RemoteException {
         bot().waitUntilShellIsOpen(SHELL_CLOSING_THE_SESSION);
         bot().shell(SHELL_CLOSING_THE_SESSION).activate();
@@ -270,6 +260,18 @@ public class SuperBot extends STF implements ISuperBot {
         bot().waitUntilShellIsOpen(SHELL_REMOVAL_OF_SUBSCRIPTION);
         bot().shell(SHELL_REMOVAL_OF_SUBSCRIPTION).activate();
         bot().shell(SHELL_REMOVAL_OF_SUBSCRIPTION).confirm(OK);
+    }
+
+    public void confirmShellAddBuddyToSession(String... baseJIDOfinvitees)
+        throws RemoteException {
+        bot().waitUntilShellIsOpen(SHELL_ADD_BUDDY_TO_SESSION);
+        IRemoteBotShell shell = bot().shell(SHELL_ADD_BUDDY_TO_SESSION);
+        shell.activate();
+        for (String baseJID : baseJIDOfinvitees) {
+            shell.bot().tree().selectTreeItemWithRegex(baseJID + ".*" + "")
+                .check();
+        }
+        shell.bot().button(FINISH).click();
     }
 
     public void confirmShellAddBuddy(JID jid) throws RemoteException {
@@ -294,10 +296,17 @@ public class SuperBot extends STF implements ISuperBot {
         IRemoteBotShell shell = bot().shell(SHELL_SHARE_PROJECT);
         shell.activate();
 
-        shell.bot().table().getTableItem(projectName).check();
+        shell.bot().table().getTableItemWithRegex(projectName + ".*").check();
         shell.bot().button(NEXT).click();
+
+        for (IRemoteBotTreeItem item : shell.bot().tree().getAllItems()) {
+            if (item.isChecked())
+                item.check();
+        }
+
         for (JID jid : jids) {
-            shell.bot().tree().selectTreeItem(jid.getBase()).check();
+            shell.bot().tree().selectTreeItemWithRegex(jid.getBase() + ".*")
+                .check();
         }
         shell.bot().button(FINISH).click();
     }

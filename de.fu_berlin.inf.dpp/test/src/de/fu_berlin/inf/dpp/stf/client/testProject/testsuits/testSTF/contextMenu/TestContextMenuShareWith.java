@@ -2,6 +2,7 @@ package de.fu_berlin.inf.dpp.stf.client.testProject.testsuits.testSTF.contextMen
 
 import java.rmi.RemoteException;
 
+import org.junit.After;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -16,13 +17,19 @@ public class TestContextMenuShareWith extends STFTest {
         setUpSaros();
     }
 
+    @After
+    public void runAfterEveryTest() throws RemoteException,
+        InterruptedException {
+        leaveSessionHostFirst(alice);
+    }
+
     @Test
     public void testShareWithMultipleBuddies() throws RemoteException {
         alice.superBot().views().packageExplorerView().tree().newC()
             .javaProject(PROJECT1);
         alice.superBot().views().packageExplorerView()
             .selectJavaProject(PROJECT1).shareWith().buddy(bob.getJID());
-        bob.superBot().confirmShellSessionInvitationAndShellAddProject(PROJECT1,
-            TypeOfCreateProject.NEW_PROJECT);
+        bob.superBot().confirmShellSessionInvitationAndShellAddProject(
+            PROJECT1, TypeOfCreateProject.NEW_PROJECT);
     }
 }

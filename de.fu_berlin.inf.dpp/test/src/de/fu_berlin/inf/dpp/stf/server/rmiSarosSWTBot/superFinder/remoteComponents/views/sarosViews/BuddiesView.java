@@ -67,27 +67,31 @@ public class BuddiesView extends Views implements IBuddiesView {
 
     public void connectWith(JID jid, String password) throws RemoteException {
         log.trace("connectedByXMPP");
-        if (!isConnected()) {
-            log.trace("click the toolbar button \"Connect\" in the buddies view");
-            if (!sarosBot().menuBar().saros().preferences().existsAccount(jid)) {
-                sarosBot().menuBar().saros().preferences()
-                    .addAccount(jid, password);
-            } else {
-                if (!sarosBot().menuBar().saros().preferences()
-                    .isAccountActive(jid)) {
-                    sarosBot().menuBar().saros().preferences()
-                        .activateAccount(jid);
-                }
-            }
-            if (!isConnected()) {
-                clickToolbarButtonWithTooltip(TB_CONNECT);
-                waitUntilIsConnected();
+
+        log.trace("click the toolbar button \"Connect\" in the buddies view");
+        if (!sarosBot().menuBar().saros().preferences().existsAccount(jid)) {
+            sarosBot().menuBar().saros().preferences()
+                .addAccount(jid, password);
+        } else {
+            if (!sarosBot().menuBar().saros().preferences()
+                .isAccountActive(jid)) {
+                sarosBot().menuBar().saros().preferences().activateAccount(jid);
             }
         }
+        if (!isConnected()) {
+            clickToolbarButtonWithTooltip(TB_CONNECT);
+            waitUntilIsConnected();
+        } else {
+            clickToolbarButtonWithTooltip(TB_DISCONNECT);
+            waitUntilDisConnected();
+
+            clickToolbarButtonWithTooltip(TB_CONNECT);
+        }
+
     }
 
     public void connectWithActiveAccount() throws RemoteException {
-        if (!isConnected()) {
+        if (isDisConnected()) {
             if (!sarosBot().menuBar().saros().preferences().existsAccount()) {
                 throw new RuntimeException(
                     "You need to at first add a account!");
@@ -103,8 +107,8 @@ public class BuddiesView extends Views implements IBuddiesView {
             throw new RuntimeException("No buddy with the ID "
                 + buddyJID.getBase() + " existed!");
         }
-        initSarosContextMenuWrapper(tree.selectTreeItemWithRegex(NODE_BUDDIES
-            + ".*", getNickName(buddyJID) + ".*"));
+        initSarosContextMenuWrapper(tree
+            .selectTreeItemWithRegex(getNickName(buddyJID) + ".*"));
         sarosContextMenu.setBuddiesView(this);
         return sarosContextMenu;
     }
@@ -113,8 +117,7 @@ public class BuddiesView extends Views implements IBuddiesView {
         String nickName = getNickName(buddyJID);
         if (nickName == null)
             return false;
-        return tree.selectTreeItemWithRegex(NODE_BUDDIES)
-            .existsSubItemWithRegex(nickName + ".*");
+        return tree.existsSubItemWithRegex(nickName + ".*");
     }
 
     public void addANewBuddy(JID jid) throws RemoteException {
@@ -136,7 +139,8 @@ public class BuddiesView extends Views implements IBuddiesView {
      */
     @SuppressWarnings("unused")
     private void selectConnectAccount(String baseJID) throws RemoteException {
-        IRemoteBotToolbarDropDownButton b = view.toolbarDropDownButton(TB_CONNECT);
+        IRemoteBotToolbarDropDownButton b = view
+            .toolbarDropDownButton(TB_CONNECT);
         @SuppressWarnings("static-access")
         Matcher<MenuItem> withRegex = WidgetMatcherFactory.withRegex(baseJID
             + ".*");
@@ -155,7 +159,8 @@ public class BuddiesView extends Views implements IBuddiesView {
     private boolean isConnectAccountExist(String baseJID)
         throws RemoteException {
         Matcher matcher = allOf(widgetOfType(MenuItem.class));
-        IRemoteBotToolbarDropDownButton b = view.toolbarDropDownButton(TB_CONNECT);
+        IRemoteBotToolbarDropDownButton b = view
+            .toolbarDropDownButton(TB_CONNECT);
         List<? extends IRemoteBotMenu> accounts = b.menuItems(matcher);
         b.pressShortcut(Keystrokes.ESC);
         for (IRemoteBotMenu account : accounts) {
@@ -200,8 +205,7 @@ public class BuddiesView extends Views implements IBuddiesView {
     }
 
     public List<String> getAllBuddies() throws RemoteException {
-        return tree.selectTreeItemWithRegex(NODE_BUDDIES + ".*")
-            .getTextOfItems();
+        return tree.getTextOfItems();
     }
 
     /**********************************************
@@ -225,7 +229,7 @@ public class BuddiesView extends Views implements IBuddiesView {
     public void waitUntilDisConnected() throws RemoteException {
         bot().waitUntil(new DefaultCondition() {
             public boolean test() throws Exception {
-                return !isConnected();
+                return isDisConnected();
             }
 
             public String getFailureMessage() {
@@ -243,7 +247,7 @@ public class BuddiesView extends Views implements IBuddiesView {
 
     private void setViewWithTree(IRemoteBotView view) throws RemoteException {
         this.view = view;
-        tree = view.bot().tree();
+        tree = view.bot().treeInGroup("Buddies");
         // treeItem = null;
     }
 

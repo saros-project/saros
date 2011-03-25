@@ -5,13 +5,13 @@ import java.rmi.RemoteException;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.Component;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.contextMenu.ContextMenuWrapper;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.contextMenu.SarosContextMenuWrapper;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.views.sarosViews.IBuddiesView;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.views.sarosViews.BuddiesView;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.views.sarosViews.IChatView;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.views.sarosViews.ChatView;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.views.sarosViews.IBuddiesView;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.views.sarosViews.IChatView;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.views.sarosViews.IRSView;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.views.sarosViews.RSView;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.views.sarosViews.ISessionView;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.views.sarosViews.RSView;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.views.sarosViews.SessionView;
 
 public class Views extends Component implements IViews {
@@ -49,15 +49,15 @@ public class Views extends Component implements IViews {
     }
 
     public IChatView chatView() throws RemoteException {
-        bot().openViewById(VIEW_SAROS_CHAT_ID);
-        bot().view(VIEW_SAROS_CHAT).show();
-        return chatV.setView(bot().view(VIEW_SAROS_CHAT));
+        bot().openViewById(VIEW_SAROS_ID);
+        bot().view(VIEW_SAROS).show();
+        return chatV.setView(bot().view(VIEW_SAROS));
     }
 
     public IBuddiesView buddiesView() throws RemoteException {
-        bot().openViewById(VIEW_SAROS_BUDDIES_ID);
-        bot().view(VIEW_SAROS_BUDDIES).show();
-        return rosterV.setView(bot().view(VIEW_SAROS_BUDDIES));
+        bot().openViewById(VIEW_SAROS_ID);
+        bot().view(VIEW_SAROS).show();
+        return rosterV.setView(bot().view(VIEW_SAROS));
     }
 
     public IRSView remoteScreenView() throws RemoteException {
@@ -67,9 +67,9 @@ public class Views extends Component implements IViews {
     }
 
     public ISessionView sessionView() throws RemoteException {
-        bot().openViewById(VIEW_SAROS_SESSION_ID);
-        bot().view(VIEW_SAROS_SESSION).show();
-        return sessionV.setView(bot().view(VIEW_SAROS_SESSION));
+        bot().openViewById(VIEW_SAROS_ID);
+        bot().view(VIEW_SAROS).show();
+        return sessionV.setView(bot().view(VIEW_SAROS));
     }
 
     public IConsoleView consoleView() throws RemoteException {

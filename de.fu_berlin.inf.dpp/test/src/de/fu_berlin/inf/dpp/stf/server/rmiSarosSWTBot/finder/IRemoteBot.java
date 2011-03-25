@@ -58,7 +58,8 @@ public interface IRemoteBot extends Remote {
      *            the key set on the widget.
      * @param value
      *            the value for the key.
-     * @return a {@link IRemoteBotTree} with the specified <code>key/value</code>.
+     * @return a {@link IRemoteBotTree} with the specified
+     *         <code>key/value</code>.
      */
     public IRemoteBotTree treeWithId(String key, String value)
         throws RemoteException;
@@ -70,7 +71,8 @@ public interface IRemoteBot extends Remote {
      *            the value for the key.
      * @param index
      *            the index of the widget.
-     * @return a {@link IRemoteBotTree} with the specified <code>key/value</code>.
+     * @return a {@link IRemoteBotTree} with the specified
+     *         <code>key/value</code>.
      */
 
     public IRemoteBotTree treeWithId(String key, String value, int index)
@@ -129,8 +131,8 @@ public interface IRemoteBot extends Remote {
      *            the label on the widget.
      * @param inGroup
      *            the inGroup on the widget.
-     * @return a {@link IRemoteBotTree} with the specified <code>label</code> with
-     *         the specified <code>inGroup</code>.
+     * @return a {@link IRemoteBotTree} with the specified <code>label</code>
+     *         with the specified <code>inGroup</code>.
      */
     public IRemoteBotTree treeWithLabelInGroup(String label, String inGroup)
         throws RemoteException;
@@ -142,8 +144,8 @@ public interface IRemoteBot extends Remote {
      *            the inGroup on the widget.
      * @param index
      *            the index of the widget.
-     * @return a {@link IRemoteBotTree} with the specified <code>label</code> with
-     *         the specified <code>inGroup</code>.
+     * @return a {@link IRemoteBotTree} with the specified <code>label</code>
+     *         with the specified <code>inGroup</code>.
      */
 
     public IRemoteBotTree treeWithLabelInGroup(String label, String inGroup,
@@ -210,7 +212,8 @@ public interface IRemoteBot extends Remote {
     /**
      * @see SWTBot#buttonWithLabel(String)
      */
-    public IRemoteBotButton buttonWithLabel(String label) throws RemoteException;
+    public IRemoteBotButton buttonWithLabel(String label)
+        throws RemoteException;
 
     /**
      * @see SWTBot#buttonWithLabelInGroup(String, String, int)
@@ -264,7 +267,8 @@ public interface IRemoteBot extends Remote {
     /**
      * @see SWTBot#buttonInGroup(String)
      */
-    public IRemoteBotButton buttonInGroup(String inGroup) throws RemoteException;
+    public IRemoteBotButton buttonInGroup(String inGroup)
+        throws RemoteException;
 
     /**
      * @see SWTBot#buttonInGroup(String,int)
@@ -291,8 +295,8 @@ public interface IRemoteBot extends Remote {
     /**
      * @see SWTBot#buttonWithLabelInGroup(String, String,int)
      */
-    public IRemoteBotButton buttonWithLabelInGroup(String label, String inGroup,
-        int index) throws RemoteException;
+    public IRemoteBotButton buttonWithLabelInGroup(String label,
+        String inGroup, int index) throws RemoteException;
 
     /**
      * @see SWTBot#buttonInGroup(String, String)
@@ -309,8 +313,8 @@ public interface IRemoteBot extends Remote {
     /**
      * @see SWTBot#buttonWithTooltipInGroup(String, String)
      */
-    public IRemoteBotButton buttonWithTooltipInGroup(String tooltip, String inGroup)
-        throws RemoteException;
+    public IRemoteBotButton buttonWithTooltipInGroup(String tooltip,
+        String inGroup) throws RemoteException;
 
     /**
      * @see SWTBot#buttonWithTooltipInGroup(String, String, int)
@@ -351,7 +355,8 @@ public interface IRemoteBot extends Remote {
      *            the key set on the widget.
      * @param value
      *            the value for the key.
-     * @return a {@link IRemoteBotLabel} with the specified <code>key/value</code>.
+     * @return a {@link IRemoteBotLabel} with the specified
+     *         <code>key/value</code>.
      */
     public IRemoteBotLabel labelWithId(String key, String value)
         throws RemoteException;
@@ -363,7 +368,8 @@ public interface IRemoteBot extends Remote {
      *            the value for the key.
      * @param index
      *            the index of the widget.
-     * @return a {@link IRemoteBotLabel} with the specified <code>key/value</code>.
+     * @return a {@link IRemoteBotLabel} with the specified
+     *         <code>key/value</code>.
      */
 
     public IRemoteBotLabel labelWithId(String key, String value, int index)
@@ -394,7 +400,8 @@ public interface IRemoteBot extends Remote {
     /**
      * @param inGroup
      *            the inGroup on the widget.
-     * @return a {@link IRemoteBotLabel} with the specified <code>inGroup</code>.
+     * @return a {@link IRemoteBotLabel} with the specified <code>inGroup</code>
+     *         .
      */
     public IRemoteBotLabel labelInGroup(String inGroup) throws RemoteException;
 
@@ -403,7 +410,8 @@ public interface IRemoteBot extends Remote {
      *            the inGroup on the widget.
      * @param index
      *            the index of the widget.
-     * @return a {@link IRemoteBotLabel} with the specified <code>inGroup</code>.
+     * @return a {@link IRemoteBotLabel} with the specified <code>inGroup</code>
+     *         .
      */
 
     public IRemoteBotLabel labelInGroup(String inGroup, int index)
@@ -448,6 +456,8 @@ public interface IRemoteBot extends Remote {
 
     public boolean existsLabel() throws RemoteException;
 
+    public boolean existsLabelInGroup(String groupName) throws RemoteException;
+
     public boolean existsLabel(String text) throws RemoteException;
 
     /**********************************************
@@ -487,8 +497,8 @@ public interface IRemoteBot extends Remote {
     /**
      * @see SWTBot#styledTextWithId(String, String, int)
      */
-    public IRemoteBotStyledText styledTextWithId(String key, String value, int index)
-        throws RemoteException;
+    public IRemoteBotStyledText styledTextWithId(String key, String value,
+        int index) throws RemoteException;
 
     /**
      * @see SWTBot#styledTextWithId(String)
@@ -558,7 +568,8 @@ public interface IRemoteBot extends Remote {
      *            the label on the widget.
      * @return a {@link IRemoteBotCombo} with the specified <code>label</code>.
      */
-    public IRemoteBotCombo comboBoxWithLabel(String label) throws RemoteException;
+    public IRemoteBotCombo comboBoxWithLabel(String label)
+        throws RemoteException;
 
     /**
      * @param label
@@ -586,14 +597,16 @@ public interface IRemoteBot extends Remote {
      * @return a {@link IRemoteBotCombo} with the specified <code>text</code>.
      */
 
-    public IRemoteBotCombo comboBox(String text, int index) throws RemoteException;
+    public IRemoteBotCombo comboBox(String text, int index)
+        throws RemoteException;
 
     /**
      * @param key
      *            the key set on the widget.
      * @param value
      *            the value for the key.
-     * @return a {@link IRemoteBotCombo} with the specified <code>key/value</code>.
+     * @return a {@link IRemoteBotCombo} with the specified
+     *         <code>key/value</code>.
      */
     public IRemoteBotCombo comboBoxWithId(String key, String value)
         throws RemoteException;
@@ -605,7 +618,8 @@ public interface IRemoteBot extends Remote {
      *            the value for the key.
      * @param index
      *            the index of the widget.
-     * @return a {@link IRemoteBotCombo} with the specified <code>key/value</code>.
+     * @return a {@link IRemoteBotCombo} with the specified
+     *         <code>key/value</code>.
      */
 
     public IRemoteBotCombo comboBoxWithId(String key, String value, int index)
@@ -636,16 +650,19 @@ public interface IRemoteBot extends Remote {
     /**
      * @param inGroup
      *            the inGroup on the widget.
-     * @return a {@link IRemoteBotCombo} with the specified <code>inGroup</code>.
+     * @return a {@link IRemoteBotCombo} with the specified <code>inGroup</code>
+     *         .
      */
-    public IRemoteBotCombo comboBoxInGroup(String inGroup) throws RemoteException;
+    public IRemoteBotCombo comboBoxInGroup(String inGroup)
+        throws RemoteException;
 
     /**
      * @param inGroup
      *            the inGroup on the widget.
      * @param index
      *            the index of the widget.
-     * @return a {@link IRemoteBotCombo} with the specified <code>inGroup</code>.
+     * @return a {@link IRemoteBotCombo} with the specified <code>inGroup</code>
+     *         .
      */
 
     public IRemoteBotCombo comboBoxInGroup(String inGroup, int index)
@@ -669,8 +686,8 @@ public interface IRemoteBot extends Remote {
      *            the label on the widget.
      * @param inGroup
      *            the inGroup on the widget.
-     * @return a {@link IRemoteBotCombo} with the specified <code>label</code> with
-     *         the specified <code>inGroup</code>.
+     * @return a {@link IRemoteBotCombo} with the specified <code>label</code>
+     *         with the specified <code>inGroup</code>.
      */
     public IRemoteBotCombo comboBoxWithLabelInGroup(String label, String inGroup)
         throws RemoteException;
@@ -682,20 +699,20 @@ public interface IRemoteBot extends Remote {
      *            the inGroup on the widget.
      * @param index
      *            the index of the widget.
-     * @return a {@link IRemoteBotCombo} with the specified <code>label</code> with
-     *         the specified <code>inGroup</code>.
+     * @return a {@link IRemoteBotCombo} with the specified <code>label</code>
+     *         with the specified <code>inGroup</code>.
      */
 
-    public IRemoteBotCombo comboBoxWithLabelInGroup(String label, String inGroup,
-        int index) throws RemoteException;
+    public IRemoteBotCombo comboBoxWithLabelInGroup(String label,
+        String inGroup, int index) throws RemoteException;
 
     /**
      * @param text
      *            the text on the widget.
      * @param inGroup
      *            the inGroup on the widget.
-     * @return a {@link IRemoteBotCombo} with the specified <code>text</code> with
-     *         the specified <code>inGroup</code>.
+     * @return a {@link IRemoteBotCombo} with the specified <code>text</code>
+     *         with the specified <code>inGroup</code>.
      */
     public IRemoteBotCombo comboBoxInGroup(String text, String inGroup)
         throws RemoteException;
@@ -707,12 +724,12 @@ public interface IRemoteBot extends Remote {
      *            the inGroup on the widget.
      * @param index
      *            the index of the widget.
-     * @return a {@link IRemoteBotCombo} with the specified <code>text</code> with
-     *         the specified <code>inGroup</code>.
+     * @return a {@link IRemoteBotCombo} with the specified <code>text</code>
+     *         with the specified <code>inGroup</code>.
      */
 
-    public IRemoteBotCombo comboBoxInGroup(String text, String inGroup, int index)
-        throws RemoteException;
+    public IRemoteBotCombo comboBoxInGroup(String text, String inGroup,
+        int index) throws RemoteException;
 
     /**
      * @param text
@@ -737,7 +754,8 @@ public interface IRemoteBot extends Remote {
      *            the label on the widget.
      * @return a {@link IRemoteBotCCombo} with the specified <code>label</code>.
      */
-    public IRemoteBotCCombo ccomboBoxWithLabel(String label) throws RemoteException;
+    public IRemoteBotCCombo ccomboBoxWithLabel(String label)
+        throws RemoteException;
 
     /**
      * @param label
@@ -754,7 +772,8 @@ public interface IRemoteBot extends Remote {
      *            the key set on the widget.
      * @param value
      *            the value for the key.
-     * @return a {@link IRemoteBotCCombo} with the specified <code>key/value</code>.
+     * @return a {@link IRemoteBotCCombo} with the specified
+     *         <code>key/value</code>.
      */
     public IRemoteBotCCombo ccomboBoxWithId(String key, String value)
         throws RemoteException;
@@ -766,7 +785,8 @@ public interface IRemoteBot extends Remote {
      *            the value for the key.
      * @param index
      *            the index of the widget.
-     * @return a {@link IRemoteBotCCombo} with the specified <code>key/value</code>.
+     * @return a {@link IRemoteBotCCombo} with the specified
+     *         <code>key/value</code>.
      */
     public IRemoteBotCCombo ccomboBoxWithId(String key, String value, int index)
         throws RemoteException;
@@ -778,7 +798,8 @@ public interface IRemoteBot extends Remote {
      *            .
      * @return a {@link IRemoteBotCCombo} with the specified <code>value</code>.
      */
-    public IRemoteBotCCombo ccomboBoxWithId(String value) throws RemoteException;
+    public IRemoteBotCCombo ccomboBoxWithId(String value)
+        throws RemoteException;
 
     /**
      * @param value
@@ -795,16 +816,19 @@ public interface IRemoteBot extends Remote {
     /**
      * @param inGroup
      *            the inGroup on the widget.
-     * @return a {@link IRemoteBotCCombo} with the specified <code>inGroup</code>.
+     * @return a {@link IRemoteBotCCombo} with the specified
+     *         <code>inGroup</code>.
      */
-    public IRemoteBotCCombo ccomboBoxInGroup(String inGroup) throws RemoteException;
+    public IRemoteBotCCombo ccomboBoxInGroup(String inGroup)
+        throws RemoteException;
 
     /**
      * @param inGroup
      *            the inGroup on the widget.
      * @param index
      *            the index of the widget.
-     * @return a {@link IRemoteBotCCombo} with the specified <code>inGroup</code>.
+     * @return a {@link IRemoteBotCCombo} with the specified
+     *         <code>inGroup</code>.
      */
     public IRemoteBotCCombo ccomboBoxInGroup(String inGroup, int index)
         throws RemoteException;
@@ -826,8 +850,8 @@ public interface IRemoteBot extends Remote {
      *            the text on the widget.
      * @param inGroup
      *            the inGroup on the widget.
-     * @return a {@link IRemoteBotCCombo} with the specified <code>text</code> with
-     *         the specified <code>inGroup</code>.
+     * @return a {@link IRemoteBotCCombo} with the specified <code>text</code>
+     *         with the specified <code>inGroup</code>.
      */
     public IRemoteBotCCombo ccomboBoxInGroup(String text, String inGroup)
         throws RemoteException;
@@ -839,22 +863,22 @@ public interface IRemoteBot extends Remote {
      *            the inGroup on the widget.
      * @param index
      *            the index of the widget.
-     * @return a {@link IRemoteBotCCombo} with the specified <code>text</code> with
-     *         the specified <code>inGroup</code>.
+     * @return a {@link IRemoteBotCCombo} with the specified <code>text</code>
+     *         with the specified <code>inGroup</code>.
      */
-    public IRemoteBotCCombo ccomboBoxInGroup(String text, String inGroup, int index)
-        throws RemoteException;
+    public IRemoteBotCCombo ccomboBoxInGroup(String text, String inGroup,
+        int index) throws RemoteException;
 
     /**
      * @param label
      *            the label on the widget.
      * @param inGroup
      *            the inGroup on the widget.
-     * @return a {@link IRemoteBotCCombo} with the specified <code>label</code> with
-     *         the specified <code>inGroup</code>.
+     * @return a {@link IRemoteBotCCombo} with the specified <code>label</code>
+     *         with the specified <code>inGroup</code>.
      */
-    public IRemoteBotCCombo ccomboBoxWithLabelInGroup(String label, String inGroup)
-        throws RemoteException;
+    public IRemoteBotCCombo ccomboBoxWithLabelInGroup(String label,
+        String inGroup) throws RemoteException;
 
     /**
      * @param label
@@ -863,16 +887,17 @@ public interface IRemoteBot extends Remote {
      *            the inGroup on the widget.
      * @param index
      *            the index of the widget.
-     * @return a {@link IRemoteBotCCombo} with the specified <code>label</code> with
-     *         the specified <code>inGroup</code>.
+     * @return a {@link IRemoteBotCCombo} with the specified <code>label</code>
+     *         with the specified <code>inGroup</code>.
      */
 
-    public IRemoteBotCCombo ccomboBoxWithLabelInGroup(String label, String inGroup,
-        int index) throws RemoteException;
+    public IRemoteBotCCombo ccomboBoxWithLabelInGroup(String label,
+        String inGroup, int index) throws RemoteException;
 
     public IRemoteBotToolbarButton toolbarButton() throws RemoteException;
 
-    public IRemoteBotToolbarButton toolbarButton(int index) throws RemoteException;
+    public IRemoteBotToolbarButton toolbarButton(int index)
+        throws RemoteException;
 
     public boolean existsToolbarButton() throws RemoteException;
 
@@ -940,8 +965,8 @@ public interface IRemoteBot extends Remote {
      *         <code>key/value</code>.
      */
 
-    public IRemoteBotToolbarButton toolbarButtonWithId(String key, String value,
-        int index) throws RemoteException;
+    public IRemoteBotToolbarButton toolbarButtonWithId(String key,
+        String value, int index) throws RemoteException;
 
     /**
      * @param value
@@ -986,8 +1011,8 @@ public interface IRemoteBot extends Remote {
      *         <code>inGroup</code>.
      */
 
-    public IRemoteBotToolbarButton toolbarButtonInGroup(String inGroup, int index)
-        throws RemoteException;
+    public IRemoteBotToolbarButton toolbarButtonInGroup(String inGroup,
+        int index) throws RemoteException;
 
     /**
      * @param mnemonicText
@@ -1024,8 +1049,8 @@ public interface IRemoteBot extends Remote {
      * @return a {@link IRemoteBotToolbarButton} with the specified
      *         <code>tooltip</code> with the specified <code>inGroup</code>.
      */
-    public IRemoteBotToolbarButton toolbarButtonWithTooltipInGroup(String tooltip,
-        String inGroup) throws RemoteException;
+    public IRemoteBotToolbarButton toolbarButtonWithTooltipInGroup(
+        String tooltip, String inGroup) throws RemoteException;
 
     /**
      * @param tooltip
@@ -1038,8 +1063,8 @@ public interface IRemoteBot extends Remote {
      *         <code>tooltip</code> with the specified <code>inGroup</code>.
      */
 
-    public IRemoteBotToolbarButton toolbarButtonWithTooltipInGroup(String tooltip,
-        String inGroup, int index) throws RemoteException;
+    public IRemoteBotToolbarButton toolbarButtonWithTooltipInGroup(
+        String tooltip, String inGroup, int index) throws RemoteException;
 
     /**********************************************
      * 
@@ -1087,7 +1112,8 @@ public interface IRemoteBot extends Remote {
      *            the tooltip on the widget.
      * @return a {@link IRemoteBotText} with the specified <code>tooltip</code>.
      */
-    public IRemoteBotText textWithTooltip(String tooltip) throws RemoteException;
+    public IRemoteBotText textWithTooltip(String tooltip)
+        throws RemoteException;
 
     /**
      * @param tooltip
@@ -1105,7 +1131,8 @@ public interface IRemoteBot extends Remote {
      *            the message on the widget.
      * @return a {@link IRemoteBotText} with the specified <code>message</code>.
      */
-    public IRemoteBotText textWithMessage(String message) throws RemoteException;
+    public IRemoteBotText textWithMessage(String message)
+        throws RemoteException;
 
     /**
      * @param message
@@ -1123,7 +1150,8 @@ public interface IRemoteBot extends Remote {
      *            the key set on the widget.
      * @param value
      *            the value for the key.
-     * @return a {@link IRemoteBotText} with the specified <code>key/value</code>.
+     * @return a {@link IRemoteBotText} with the specified
+     *         <code>key/value</code>.
      */
     public IRemoteBotText textWithId(String key, String value)
         throws RemoteException;
@@ -1135,7 +1163,8 @@ public interface IRemoteBot extends Remote {
      *            the value for the key.
      * @param index
      *            the index of the widget.
-     * @return a {@link IRemoteBotText} with the specified <code>key/value</code>.
+     * @return a {@link IRemoteBotText} with the specified
+     *         <code>key/value</code>.
      */
 
     public IRemoteBotText textWithId(String key, String value, int index)
@@ -1199,8 +1228,8 @@ public interface IRemoteBot extends Remote {
      *            the label on the widget.
      * @param inGroup
      *            the inGroup on the widget.
-     * @return a {@link IRemoteBotText} with the specified <code>label</code> with
-     *         the specified <code>inGroup</code>.
+     * @return a {@link IRemoteBotText} with the specified <code>label</code>
+     *         with the specified <code>inGroup</code>.
      */
     public IRemoteBotText textWithLabelInGroup(String label, String inGroup)
         throws RemoteException;
@@ -1212,8 +1241,8 @@ public interface IRemoteBot extends Remote {
      *            the inGroup on the widget.
      * @param index
      *            the index of the widget.
-     * @return a {@link IRemoteBotText} with the specified <code>label</code> with
-     *         the specified <code>inGroup</code>.
+     * @return a {@link IRemoteBotText} with the specified <code>label</code>
+     *         with the specified <code>inGroup</code>.
      */
 
     public IRemoteBotText textWithLabelInGroup(String label, String inGroup,
@@ -1224,8 +1253,8 @@ public interface IRemoteBot extends Remote {
      *            the text on the widget.
      * @param inGroup
      *            the inGroup on the widget.
-     * @return a {@link IRemoteBotText} with the specified <code>text</code> with
-     *         the specified <code>inGroup</code>.
+     * @return a {@link IRemoteBotText} with the specified <code>text</code>
+     *         with the specified <code>inGroup</code>.
      */
     public IRemoteBotText textInGroup(String text, String inGroup)
         throws RemoteException;
@@ -1237,8 +1266,8 @@ public interface IRemoteBot extends Remote {
      *            the inGroup on the widget.
      * @param index
      *            the index of the widget.
-     * @return a {@link IRemoteBotText} with the specified <code>text</code> with
-     *         the specified <code>inGroup</code>.
+     * @return a {@link IRemoteBotText} with the specified <code>text</code>
+     *         with the specified <code>inGroup</code>.
      */
 
     public IRemoteBotText textInGroup(String text, String inGroup, int index)
@@ -1249,8 +1278,8 @@ public interface IRemoteBot extends Remote {
      *            the tooltip on the widget.
      * @param inGroup
      *            the inGroup on the widget.
-     * @return a {@link IRemoteBotText} with the specified <code>tooltip</code> with
-     *         the specified <code>inGroup</code>.
+     * @return a {@link IRemoteBotText} with the specified <code>tooltip</code>
+     *         with the specified <code>inGroup</code>.
      */
     public IRemoteBotText textWithTooltipInGroup(String tooltip, String inGroup)
         throws RemoteException;
@@ -1262,11 +1291,11 @@ public interface IRemoteBot extends Remote {
      *            the inGroup on the widget.
      * @param index
      *            the index of the widget.
-     * @return a {@link IRemoteBotText} with the specified <code>tooltip</code> with
-     *         the specified <code>inGroup</code>.
+     * @return a {@link IRemoteBotText} with the specified <code>tooltip</code>
+     *         with the specified <code>inGroup</code>.
      */
-    public IRemoteBotText textWithTooltipInGroup(String tooltip, String inGroup,
-        int index) throws RemoteException;
+    public IRemoteBotText textWithTooltipInGroup(String tooltip,
+        String inGroup, int index) throws RemoteException;
 
     /**********************************************
      * 
@@ -1274,6 +1303,8 @@ public interface IRemoteBot extends Remote {
      * 
      **********************************************/
     public boolean existsTable() throws RemoteException;
+
+    public boolean existsTableInGroup(String groupName) throws RemoteException;
 
     /**
      * @param label
@@ -1298,7 +1329,8 @@ public interface IRemoteBot extends Remote {
      *            the key set on the widget.
      * @param value
      *            the value for the key.
-     * @return a {@link IRemoteBotTable} with the specified <code>key/value</code>.
+     * @return a {@link IRemoteBotTable} with the specified
+     *         <code>key/value</code>.
      */
     public IRemoteBotTable tableWithId(String key, String value)
         throws RemoteException;
@@ -1310,7 +1342,8 @@ public interface IRemoteBot extends Remote {
      *            the value for the key.
      * @param index
      *            the index of the widget.
-     * @return a {@link IRemoteBotTable} with the specified <code>key/value</code>.
+     * @return a {@link IRemoteBotTable} with the specified
+     *         <code>key/value</code>.
      */
 
     public IRemoteBotTable tableWithId(String key, String value, int index)
@@ -1341,7 +1374,8 @@ public interface IRemoteBot extends Remote {
     /**
      * @param inGroup
      *            the inGroup on the widget.
-     * @return a {@link IRemoteBotTable} with the specified <code>inGroup</code>.
+     * @return a {@link IRemoteBotTable} with the specified <code>inGroup</code>
+     *         .
      */
     public IRemoteBotTable tableInGroup(String inGroup) throws RemoteException;
 
@@ -1350,7 +1384,8 @@ public interface IRemoteBot extends Remote {
      *            the inGroup on the widget.
      * @param index
      *            the index of the widget.
-     * @return a {@link IRemoteBotTable} with the specified <code>inGroup</code>.
+     * @return a {@link IRemoteBotTable} with the specified <code>inGroup</code>
+     *         .
      */
 
     public IRemoteBotTable tableInGroup(String inGroup, int index)
@@ -1374,8 +1409,8 @@ public interface IRemoteBot extends Remote {
      *            the label on the widget.
      * @param inGroup
      *            the inGroup on the widget.
-     * @return a {@link IRemoteBotTable} with the specified <code>label</code> with
-     *         the specified <code>inGroup</code>.
+     * @return a {@link IRemoteBotTable} with the specified <code>label</code>
+     *         with the specified <code>inGroup</code>.
      */
     public IRemoteBotTable tableWithLabelInGroup(String label, String inGroup)
         throws RemoteException;
@@ -1476,7 +1511,8 @@ public interface IRemoteBot extends Remote {
      *            the key set on the widget.
      * @param value
      *            the value for the key.
-     * @return a {@link IRemoteBotList} with the specified <code>key/value</code>.
+     * @return a {@link IRemoteBotList} with the specified
+     *         <code>key/value</code>.
      */
     public IRemoteBotList listWithId(String key, String value)
         throws RemoteException;
@@ -1488,7 +1524,8 @@ public interface IRemoteBot extends Remote {
      *            the value for the key.
      * @param index
      *            the index of the widget.
-     * @return a {@link IRemoteBotList} with the specified <code>key/value</code>.
+     * @return a {@link IRemoteBotList} with the specified
+     *         <code>key/value</code>.
      */
 
     public IRemoteBotList listWithId(String key, String value, int index)
@@ -1552,8 +1589,8 @@ public interface IRemoteBot extends Remote {
      *            the label on the widget.
      * @param inGroup
      *            the inGroup on the widget.
-     * @return a {@link IRemoteBotList} with the specified <code>label</code> with
-     *         the specified <code>inGroup</code>.
+     * @return a {@link IRemoteBotList} with the specified <code>label</code>
+     *         with the specified <code>inGroup</code>.
      */
     public IRemoteBotList listWithLabelInGroup(String label, String inGroup)
         throws RemoteException;
@@ -1565,8 +1602,8 @@ public interface IRemoteBot extends Remote {
      *            the inGroup on the widget.
      * @param index
      *            the index of the widget.
-     * @return a {@link IRemoteBotList} with the specified <code>label</code> with
-     *         the specified <code>inGroup</code>.
+     * @return a {@link IRemoteBotList} with the specified <code>label</code>
+     *         with the specified <code>inGroup</code>.
      */
 
     public IRemoteBotList listWithLabelInGroup(String label, String inGroup,
@@ -1584,7 +1621,8 @@ public interface IRemoteBot extends Remote {
     /**
      * @param label
      *            the label on the widget.
-     * @return a {@link IRemoteBotCheckBox} with the specified <code>label</code>.
+     * @return a {@link IRemoteBotCheckBox} with the specified
+     *         <code>label</code>.
      */
     public IRemoteBotCheckBox checkBoxWithLabel(String label)
         throws RemoteException;
@@ -1594,7 +1632,8 @@ public interface IRemoteBot extends Remote {
      *            the label on the widget.
      * @param index
      *            the index of the widget.
-     * @return a {@link IRemoteBotCheckBox} with the specified <code>label</code>.
+     * @return a {@link IRemoteBotCheckBox} with the specified
+     *         <code>label</code>.
      */
 
     public IRemoteBotCheckBox checkBoxWithLabel(String label, int index)
@@ -1606,7 +1645,8 @@ public interface IRemoteBot extends Remote {
      * @return a {@link IRemoteBotCheckBox} with the specified
      *         <code>mnemonicText</code>.
      */
-    public IRemoteBotCheckBox checkBox(String mnemonicText) throws RemoteException;
+    public IRemoteBotCheckBox checkBox(String mnemonicText)
+        throws RemoteException;
 
     /**
      * @param mnemonicText
@@ -1623,7 +1663,8 @@ public interface IRemoteBot extends Remote {
     /**
      * @param tooltip
      *            the tooltip on the widget.
-     * @return a {@link IRemoteBotCheckBox} with the specified <code>tooltip</code>.
+     * @return a {@link IRemoteBotCheckBox} with the specified
+     *         <code>tooltip</code>.
      */
     public IRemoteBotCheckBox checkBoxWithTooltip(String tooltip)
         throws RemoteException;
@@ -1633,7 +1674,8 @@ public interface IRemoteBot extends Remote {
      *            the tooltip on the widget.
      * @param index
      *            the index of the widget.
-     * @return a {@link IRemoteBotCheckBox} with the specified <code>tooltip</code>.
+     * @return a {@link IRemoteBotCheckBox} with the specified
+     *         <code>tooltip</code>.
      */
 
     public IRemoteBotCheckBox checkBoxWithTooltip(String tooltip, int index)
@@ -1669,9 +1711,11 @@ public interface IRemoteBot extends Remote {
      *            the value for the key
      *            {@link org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences#DEFAULT_KEY}
      *            .
-     * @return a {@link IRemoteBotCheckBox} with the specified <code>value</code>.
+     * @return a {@link IRemoteBotCheckBox} with the specified
+     *         <code>value</code>.
      */
-    public IRemoteBotCheckBox checkBoxWithId(String value) throws RemoteException;
+    public IRemoteBotCheckBox checkBoxWithId(String value)
+        throws RemoteException;
 
     /**
      * @param value
@@ -1680,7 +1724,8 @@ public interface IRemoteBot extends Remote {
      *            .
      * @param index
      *            the index of the widget.
-     * @return a {@link IRemoteBotCheckBox} with the specified <code>value</code>.
+     * @return a {@link IRemoteBotCheckBox} with the specified
+     *         <code>value</code>.
      */
 
     public IRemoteBotCheckBox checkBoxWithId(String value, int index)
@@ -1689,7 +1734,8 @@ public interface IRemoteBot extends Remote {
     /**
      * @param inGroup
      *            the inGroup on the widget.
-     * @return a {@link IRemoteBotCheckBox} with the specified <code>inGroup</code>.
+     * @return a {@link IRemoteBotCheckBox} with the specified
+     *         <code>inGroup</code>.
      */
     public IRemoteBotCheckBox checkBoxInGroup(String inGroup)
         throws RemoteException;
@@ -1699,21 +1745,24 @@ public interface IRemoteBot extends Remote {
      *            the inGroup on the widget.
      * @param index
      *            the index of the widget.
-     * @return a {@link IRemoteBotCheckBox} with the specified <code>inGroup</code>.
+     * @return a {@link IRemoteBotCheckBox} with the specified
+     *         <code>inGroup</code>.
      */
 
     public IRemoteBotCheckBox checkBoxInGroup(String inGroup, int index)
         throws RemoteException;
 
     /**
-     * @return a {@link IRemoteBotCheckBox} with the specified <code>none</code>.
+     * @return a {@link IRemoteBotCheckBox} with the specified <code>none</code>
+     *         .
      */
     public IRemoteBotCheckBox checkBox() throws RemoteException;
 
     /**
      * @param index
      *            the index of the widget.
-     * @return a {@link IRemoteBotCheckBox} with the specified <code>none</code>.
+     * @return a {@link IRemoteBotCheckBox} with the specified <code>none</code>
+     *         .
      */
 
     public IRemoteBotCheckBox checkBox(int index) throws RemoteException;
@@ -1723,11 +1772,11 @@ public interface IRemoteBot extends Remote {
      *            the label on the widget.
      * @param inGroup
      *            the inGroup on the widget.
-     * @return a {@link IRemoteBotCheckBox} with the specified <code>label</code>
-     *         with the specified <code>inGroup</code>.
+     * @return a {@link IRemoteBotCheckBox} with the specified
+     *         <code>label</code> with the specified <code>inGroup</code>.
      */
-    public IRemoteBotCheckBox checkBoxWithLabelInGroup(String label, String inGroup)
-        throws RemoteException;
+    public IRemoteBotCheckBox checkBoxWithLabelInGroup(String label,
+        String inGroup) throws RemoteException;
 
     /**
      * @param label
@@ -1736,8 +1785,8 @@ public interface IRemoteBot extends Remote {
      *            the inGroup on the widget.
      * @param index
      *            the index of the widget.
-     * @return a {@link IRemoteBotCheckBox} with the specified <code>label</code>
-     *         with the specified <code>inGroup</code>.
+     * @return a {@link IRemoteBotCheckBox} with the specified
+     *         <code>label</code> with the specified <code>inGroup</code>.
      */
 
     public IRemoteBotCheckBox checkBoxWithLabelInGroup(String label,
@@ -1752,8 +1801,8 @@ public interface IRemoteBot extends Remote {
      *         <code>mnemonicText</code> with the specified <code>inGroup</code>
      *         .
      */
-    public IRemoteBotCheckBox checkBoxInGroup(String mnemonicText, String inGroup)
-        throws RemoteException;
+    public IRemoteBotCheckBox checkBoxInGroup(String mnemonicText,
+        String inGroup) throws RemoteException;
 
     /**
      * @param mnemonicText
@@ -1767,16 +1816,16 @@ public interface IRemoteBot extends Remote {
      *         .
      */
 
-    public IRemoteBotCheckBox checkBoxInGroup(String mnemonicText, String inGroup,
-        int index) throws RemoteException;
+    public IRemoteBotCheckBox checkBoxInGroup(String mnemonicText,
+        String inGroup, int index) throws RemoteException;
 
     /**
      * @param tooltip
      *            the tooltip on the widget.
      * @param inGroup
      *            the inGroup on the widget.
-     * @return a {@link IRemoteBotCheckBox} with the specified <code>tooltip</code>
-     *         with the specified <code>inGroup</code>.
+     * @return a {@link IRemoteBotCheckBox} with the specified
+     *         <code>tooltip</code> with the specified <code>inGroup</code>.
      */
     public IRemoteBotCheckBox checkBoxWithTooltipInGroup(String tooltip,
         String inGroup) throws RemoteException;
@@ -1788,8 +1837,8 @@ public interface IRemoteBot extends Remote {
      *            the inGroup on the widget.
      * @param index
      *            the index of the widget.
-     * @return a {@link IRemoteBotCheckBox} with the specified <code>tooltip</code>
-     *         with the specified <code>inGroup</code>.
+     * @return a {@link IRemoteBotCheckBox} with the specified
+     *         <code>tooltip</code> with the specified <code>inGroup</code>.
      */
 
     public IRemoteBotCheckBox checkBoxWithTooltipInGroup(String tooltip,
@@ -1836,16 +1885,19 @@ public interface IRemoteBot extends Remote {
     /**
      * @param tooltip
      *            the tooltip on the widget.
-     * @return a {@link IRemoteBotRadio} with the specified <code>tooltip</code>.
+     * @return a {@link IRemoteBotRadio} with the specified <code>tooltip</code>
+     *         .
      */
-    public IRemoteBotRadio radioWithTooltip(String tooltip) throws RemoteException;
+    public IRemoteBotRadio radioWithTooltip(String tooltip)
+        throws RemoteException;
 
     /**
      * @param tooltip
      *            the tooltip on the widget.
      * @param index
      *            the index of the widget.
-     * @return a {@link IRemoteBotRadio} with the specified <code>tooltip</code>.
+     * @return a {@link IRemoteBotRadio} with the specified <code>tooltip</code>
+     *         .
      */
 
     public IRemoteBotRadio radioWithTooltip(String tooltip, int index)
@@ -1856,7 +1908,8 @@ public interface IRemoteBot extends Remote {
      *            the key set on the widget.
      * @param value
      *            the value for the key.
-     * @return a {@link IRemoteBotRadio} with the specified <code>key/value</code>.
+     * @return a {@link IRemoteBotRadio} with the specified
+     *         <code>key/value</code>.
      */
     public IRemoteBotRadio radioWithId(String key, String value)
         throws RemoteException;
@@ -1868,7 +1921,8 @@ public interface IRemoteBot extends Remote {
      *            the value for the key.
      * @param index
      *            the index of the widget.
-     * @return a {@link IRemoteBotRadio} with the specified <code>key/value</code>.
+     * @return a {@link IRemoteBotRadio} with the specified
+     *         <code>key/value</code>.
      */
 
     public IRemoteBotRadio radioWithId(String key, String value, int index)
@@ -1899,7 +1953,8 @@ public interface IRemoteBot extends Remote {
     /**
      * @param inGroup
      *            the inGroup on the widget.
-     * @return a {@link IRemoteBotRadio} with the specified <code>inGroup</code>.
+     * @return a {@link IRemoteBotRadio} with the specified <code>inGroup</code>
+     *         .
      */
     public IRemoteBotRadio radioInGroup(String inGroup) throws RemoteException;
 
@@ -1908,7 +1963,8 @@ public interface IRemoteBot extends Remote {
      *            the inGroup on the widget.
      * @param index
      *            the index of the widget.
-     * @return a {@link IRemoteBotRadio} with the specified <code>inGroup</code>.
+     * @return a {@link IRemoteBotRadio} with the specified <code>inGroup</code>
+     *         .
      */
 
     public IRemoteBotRadio radioInGroup(String inGroup, int index)
@@ -1932,8 +1988,8 @@ public interface IRemoteBot extends Remote {
      *            the label on the widget.
      * @param inGroup
      *            the inGroup on the widget.
-     * @return a {@link IRemoteBotRadio} with the specified <code>label</code> with
-     *         the specified <code>inGroup</code>.
+     * @return a {@link IRemoteBotRadio} with the specified <code>label</code>
+     *         with the specified <code>inGroup</code>.
      */
     public IRemoteBotRadio radioWithLabelInGroup(String label, String inGroup)
         throws RemoteException;
@@ -1945,8 +2001,8 @@ public interface IRemoteBot extends Remote {
      *            the inGroup on the widget.
      * @param index
      *            the index of the widget.
-     * @return a {@link IRemoteBotRadio} with the specified <code>label</code> with
-     *         the specified <code>inGroup</code>.
+     * @return a {@link IRemoteBotRadio} with the specified <code>label</code>
+     *         with the specified <code>inGroup</code>.
      */
 
     public IRemoteBotRadio radioWithLabelInGroup(String label, String inGroup,
@@ -1987,8 +2043,8 @@ public interface IRemoteBot extends Remote {
      * @return a {@link IRemoteBotRadio} with the specified <code>tooltip</code>
      *         with the specified <code>inGroup</code>.
      */
-    public IRemoteBotRadio radioWithTooltipInGroup(String tooltip, String inGroup)
-        throws RemoteException;
+    public IRemoteBotRadio radioWithTooltipInGroup(String tooltip,
+        String inGroup) throws RemoteException;
 
     /**
      * @param tooltip
@@ -2001,8 +2057,8 @@ public interface IRemoteBot extends Remote {
      *         with the specified <code>inGroup</code>.
      */
 
-    public IRemoteBotRadio radioWithTooltipInGroup(String tooltip, String inGroup,
-        int index) throws RemoteException;
+    public IRemoteBotRadio radioWithTooltipInGroup(String tooltip,
+        String inGroup, int index) throws RemoteException;
 
     /**********************************************
      * 
@@ -2069,8 +2125,8 @@ public interface IRemoteBot extends Remote {
      *         <code>tooltip</code>.
      */
 
-    public IRemoteBotToggleButton toggleButtonWithTooltip(String tooltip, int index)
-        throws RemoteException;
+    public IRemoteBotToggleButton toggleButtonWithTooltip(String tooltip,
+        int index) throws RemoteException;
 
     /**
      * @param key
@@ -2144,19 +2200,20 @@ public interface IRemoteBot extends Remote {
         throws RemoteException;
 
     /**
-     * @return a {@link IRemoteBotToggleButton} with the specified <code>none</code>
-     *         .
+     * @return a {@link IRemoteBotToggleButton} with the specified
+     *         <code>none</code> .
      */
     public IRemoteBotToggleButton toggleButton() throws RemoteException;
 
     /**
      * @param index
      *            the index of the widget.
-     * @return a {@link IRemoteBotToggleButton} with the specified <code>none</code>
-     *         .
+     * @return a {@link IRemoteBotToggleButton} with the specified
+     *         <code>none</code> .
      */
 
-    public IRemoteBotToggleButton toggleButton(int index) throws RemoteException;
+    public IRemoteBotToggleButton toggleButton(int index)
+        throws RemoteException;
 
     /**
      * @param label
@@ -2218,8 +2275,8 @@ public interface IRemoteBot extends Remote {
      * @return a {@link IRemoteBotToggleButton} with the specified
      *         <code>tooltip</code> with the specified <code>inGroup</code>.
      */
-    public IRemoteBotToggleButton toggleButtonWithTooltipInGroup(String tooltip,
-        String inGroup) throws RemoteException;
+    public IRemoteBotToggleButton toggleButtonWithTooltipInGroup(
+        String tooltip, String inGroup) throws RemoteException;
 
     /**
      * @param tooltip
@@ -2232,8 +2289,8 @@ public interface IRemoteBot extends Remote {
      *         <code>tooltip</code> with the specified <code>inGroup</code>.
      */
 
-    public IRemoteBotToggleButton toggleButtonWithTooltipInGroup(String tooltip,
-        String inGroup, int index) throws RemoteException;
+    public IRemoteBotToggleButton toggleButtonWithTooltipInGroup(
+        String tooltip, String inGroup, int index) throws RemoteException;
 
     /**********************************************
      * 

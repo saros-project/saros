@@ -15,10 +15,10 @@ import de.fu_berlin.inf.dpp.stf.client.testProject.testsuits.invitation.TestShar
 import de.fu_berlin.inf.dpp.stf.client.testProject.testsuits.invitation.TestShareProjectUsingExistingProject;
 import de.fu_berlin.inf.dpp.stf.client.testProject.testsuits.permissionsAndFollowmode.TestWriteAccessChangeAndImmediateWrite;
 import de.fu_berlin.inf.dpp.stf.client.testProject.testsuits.saving.TestCreatingNewFile;
-import de.fu_berlin.inf.dpp.stf.client.testProject.testsuits.testSTF.TestBasicSarosElements;
+import de.fu_berlin.inf.dpp.stf.client.testProject.testsuits.testSTF.views.sarosViews.TestSarosView;
 
 @RunWith(Suite.class)
-@SuiteClasses({ TestBasicSarosElements.class,
+@SuiteClasses({ TestSarosView.class,
     TestChangingNameInRosterView.class, TestHandleContacts.class,
     TestShare2UsersSequentially.class, TestShare3UsersSequentially.class,
     TestShare3UsersConcurrently.class,

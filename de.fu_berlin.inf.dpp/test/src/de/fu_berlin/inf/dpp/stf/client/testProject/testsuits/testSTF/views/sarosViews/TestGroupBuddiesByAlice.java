@@ -9,11 +9,10 @@ import org.junit.Test;
 
 import de.fu_berlin.inf.dpp.stf.client.testProject.testsuits.STFTest;
 
-public class TestBuddiesViewByAlice extends STFTest {
+public class TestGroupBuddiesByAlice extends STFTest {
     @BeforeClass
     public static void runBeforeClass() throws RemoteException {
         initTesters(TypeOfTester.ALICE);
-
         setUpWorkbench();
         setUpSaros();
     }
@@ -22,7 +21,7 @@ public class TestBuddiesViewByAlice extends STFTest {
     public void testConnectWith() throws RemoteException {
         alice.superBot().views().buddiesView().connectWith(TEST_JID, PASSWORD);
         assertTrue(alice.superBot().menuBar().saros().preferences()
-            .isAccountActive(bob.getJID()));
+            .isAccountActive(TEST_JID));
     }
 
     @Test

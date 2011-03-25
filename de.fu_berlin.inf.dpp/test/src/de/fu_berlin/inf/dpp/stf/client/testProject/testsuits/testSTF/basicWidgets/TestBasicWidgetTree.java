@@ -86,7 +86,7 @@ public class TestBasicWidgetTree extends STFTest {
         view.show();
 
         assertTrue(view.bot().tree()
-            .existsSubItemWithRegexs(changeToRegex(PROJECT1)));
+            .existsSubItemWithRegex(changeToRegex(PROJECT1)));
         assertTrue(alice.superBot().views().packageExplorerView().tree()
             .existsWithRegex(PROJECT1));
         assertTrue(view.bot().tree().selectTreeItem(PROJECT1, SRC)
@@ -112,10 +112,8 @@ public class TestBasicWidgetTree extends STFTest {
     public void existsTreeItemWithRegexsInView2() throws RemoteException {
         alice.superBot().views().buddiesView()
             .connectWith(alice.getJID(), alice.getPassword());
-        assertTrue(alice.bot().view(VIEW_SAROS_BUDDIES).bot().tree()
-            .existsSubItemWithRegexs(changeToRegex(NODE_BUDDIES)));
-        assertTrue(alice.bot().view(VIEW_SAROS_BUDDIES).bot().tree()
-            .selectTreeItem(NODE_BUDDIES)
+        assertTrue(alice.bot().view(VIEW_SAROS).bot()
+            .treeInGroup(GROUP_BUDDIES)
             .existsSubItemWithRegex(changeToRegex("bob_stf")));
     }
 
@@ -205,8 +203,8 @@ public class TestBasicWidgetTree extends STFTest {
     public void existsContextOfTreeItemInView() throws RemoteException {
         alice.superBot().views().buddiesView()
             .connectWith(alice.getJID(), alice.getPassword());
-        assertTrue(alice.bot().view(VIEW_SAROS_BUDDIES).bot().tree()
-            .selectTreeItemWithRegex(NODE_BUDDIES, "bob_stf.*")
+        assertTrue(alice.bot().view(VIEW_SAROS).bot()
+            .treeInGroup(GROUP_BUDDIES).selectTreeItemWithRegex("bob_stf.*")
             .existsContextMenu(CM_RENAME));
     }
 
@@ -224,13 +222,15 @@ public class TestBasicWidgetTree extends STFTest {
     public void isContextOfTreeItemInViewEnabled() throws RemoteException {
         alice.superBot().views().buddiesView()
             .connectWith(alice.getJID(), alice.getPassword());
-        assertTrue(alice.bot().view(VIEW_SAROS_BUDDIES).bot().tree()
-            .selectTreeItemWithRegex(NODE_BUDDIES, "bob_stf.*")
+        alice.superBot().views().buddiesView().waitUntilIsConnected();
+        assertTrue(alice.bot().view(VIEW_SAROS).bot()
+            .treeInGroup(GROUP_BUDDIES).selectTreeItemWithRegex("bob_stf.*")
             .isContextMenuEnabled(CM_RENAME));
 
-        assertFalse(alice.bot().view(VIEW_SAROS_BUDDIES).bot().tree()
-            .selectTreeItemWithRegex(NODE_BUDDIES, "bob_stf.*")
-            .isContextMenuEnabled(CM_INVITE_BUDDY));
+        // assertFalse(alice.bot().view(VIEW_SAROS).bot()
+        // .treeInGroup(GROUP_BUDDIES).selectTreeItemWithRegex("carl1_stf.*")
+        // .isContextMenuEnabled(CM_INVITE_BUDDY));
+        // alice.bot().sleep(1000);
     }
 
     // @Test
@@ -251,9 +251,9 @@ public class TestBasicWidgetTree extends STFTest {
     public void clickContextsOfTreeItemInView() throws RemoteException {
         alice.superBot().views().buddiesView()
             .connectWith(alice.getJID(), alice.getPassword());
-        alice.bot().view(VIEW_SAROS_BUDDIES).bot().tree()
-            .selectTreeItemWithRegex(NODE_BUDDIES, "bob_stf.*")
-            .contextMenu(CM_RENAME).click();
+        alice.bot().view(VIEW_SAROS).bot().treeInGroup(GROUP_BUDDIES)
+            .selectTreeItemWithRegex("bob_stf.*").contextMenu(CM_RENAME)
+            .click();
         assertTrue(alice.bot().isShellOpen(SHELL_SET_NEW_NICKNAME));
     }
 

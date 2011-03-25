@@ -30,7 +30,7 @@ public class TestBasicWidgetsTable extends STFTest {
 
     @Test
     public void existsTableItemInView() throws RemoteException {
-        IRemoteBotView view = alice.bot().view(VIEW_SAROS_SESSION);
+        IRemoteBotView view = alice.bot().view(VIEW_SAROS);
         view.show();
 
         assertTrue(view.bot().table().containsItem(OWN_PARTICIPANT_NAME));
@@ -38,7 +38,7 @@ public class TestBasicWidgetsTable extends STFTest {
 
     @Test
     public void selectTableItemInView() throws RemoteException {
-        IRemoteBotView view = alice.bot().view(VIEW_SAROS_SESSION);
+        IRemoteBotView view = alice.bot().view(VIEW_SAROS);
         view.show();
         view.bot().table().getTableItem(bob.getBaseJid()).select();
 
@@ -51,7 +51,7 @@ public class TestBasicWidgetsTable extends STFTest {
 
     @Test
     public void clickContextMenuOfTableInView() throws RemoteException {
-        IRemoteBotView view = alice.bot().view(VIEW_SAROS_SESSION);
+        IRemoteBotView view = alice.bot().view(VIEW_SAROS);
         view.show();
         view.bot().table().getTableItem(bob.getBaseJid())
             .contextMenu(CM_RESTRICT_TO_READ_ONLY_ACCESS).click();
@@ -64,7 +64,7 @@ public class TestBasicWidgetsTable extends STFTest {
 
     @Test
     public void isContextMenuOfTableVisibleInView() throws RemoteException {
-        IRemoteBotView view = alice.bot().view(VIEW_SAROS_SESSION);
+        IRemoteBotView view = alice.bot().view(VIEW_SAROS);
         view.show();
 
         assertTrue(view.bot().table().getTableItem(bob.getBaseJid())
@@ -76,7 +76,7 @@ public class TestBasicWidgetsTable extends STFTest {
 
     @Test
     public void isContextMenuOfTableEnabledInView() throws RemoteException {
-        IRemoteBotView view = alice.bot().view(VIEW_SAROS_SESSION);
+        IRemoteBotView view = alice.bot().view(VIEW_SAROS);
         view.show();
 
         assertTrue(view.bot().table().getTableItem(bob.getBaseJid())

@@ -8,10 +8,12 @@ import java.util.List;
 import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
 import org.eclipse.swtbot.swt.finder.waits.Conditions;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTable;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotTableItem;
 
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.conditions.SarosConditions;
 
-public class RemoteBotTable extends AbstractRmoteWidget implements IRemoteBotTable {
+public class RemoteBotTable extends AbstractRmoteWidget implements
+    IRemoteBotTable {
 
     private static transient RemoteBotTable self;
 
@@ -49,8 +51,26 @@ public class RemoteBotTable extends AbstractRmoteWidget implements IRemoteBotTab
         return stfBotMenu;
     }
 
-    public IRemoteBotTableItem getTableItem(String itemText) throws RemoteException {
+    public IRemoteBotTableItem getTableItem(String itemText)
+        throws RemoteException {
         stfBotTableItem.setWidget(widget.getTableItem(itemText));
+        return stfBotTableItem;
+    }
+
+    public IRemoteBotTableItem getTableItemWithRegex(String regex)
+        throws RemoteException {
+        boolean hasItem = false;
+
+        for (int i = 0; i < widget.rowCount(); i++) {
+            SWTBotTableItem item = widget.getTableItem(i);
+            if (item.getText().matches(regex)) {
+                hasItem = true;
+                stfBotTableItem.setWidget(item);
+                break;
+            }
+        }
+        if (!hasItem)
+            throw new RuntimeException("Not found the tableItem!");
         return stfBotTableItem;
     }
 

@@ -117,12 +117,12 @@ public interface ISuperBot extends Remote {
         throws RemoteException;
 
     /**
-     * confirm the shell with title {@link STF#SHELL_ADD_BUDDY_TO_SESSION}
+     * confirm the shell with title {@link STF#SHELL_ADD_BUDDY}
      * 
-     * @param inviteesXMPPJabberID
+     * @param baseJIDOfinvitees
      * @throws RemoteException
      */
-    public void confirmShellAddBuddyToSession(String... inviteesXMPPJabberID)
+    public void confirmShellAddBuddyToSession(String... baseJIDOfinvitees)
         throws RemoteException;
 
     /**

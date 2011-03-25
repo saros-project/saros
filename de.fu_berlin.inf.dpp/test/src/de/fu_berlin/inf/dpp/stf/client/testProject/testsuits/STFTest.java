@@ -290,21 +290,21 @@ public class STFTest extends STF {
 
     public static void openSarosViews(AbstractTester tester)
         throws RemoteException {
-        if (!tester.bot().isViewOpen(VIEW_SAROS_BUDDIES)) {
+        if (!tester.bot().isViewOpen(VIEW_SAROS)) {
             tester.superBot().menuBar().window()
-                .showViewWithName(NODE_SAROS, VIEW_SAROS_BUDDIES);
+                .showViewWithName(NODE_SAROS, VIEW_SAROS);
         }
-        if (!tester.bot().isViewOpen(VIEW_SAROS_SESSION))
-            tester.superBot().menuBar().window()
-                .showViewWithName(NODE_SAROS, VIEW_SAROS_SESSION);
-
-        if (!tester.bot().isViewOpen(VIEW_REMOTE_SCREEN))
-            tester.superBot().menuBar().window()
-                .showViewWithName(NODE_SAROS, VIEW_REMOTE_SCREEN);
-
-        if (!tester.bot().isViewOpen(VIEW_SAROS_CHAT))
-            tester.superBot().menuBar().window()
-                .showViewWithName(NODE_SAROS, VIEW_SAROS_CHAT);
+        // if (!tester.bot().isViewOpen(VIEW_SAROS_SESSION))
+        // tester.superBot().menuBar().window()
+        // .showViewWithName(NODE_SAROS, VIEW_SAROS_SESSION);
+        //
+        // if (!tester.bot().isViewOpen(VIEW_REMOTE_SCREEN))
+        // tester.superBot().menuBar().window()
+        // .showViewWithName(NODE_SAROS, VIEW_REMOTE_SCREEN);
+        //
+        // if (!tester.bot().isViewOpen(VIEW_SAROS_CHAT))
+        // tester.superBot().menuBar().window()
+        // .showViewWithName(NODE_SAROS, VIEW_SAROS_CHAT);
     }
 
     /**
@@ -621,22 +621,17 @@ public class STFTest extends STF {
      */
     public static void leaveSessionHostFirst(AbstractTester host)
         throws RemoteException, InterruptedException {
-        List<Callable<Void>> closeSessionTasks = new ArrayList<Callable<Void>>();
+
+        host.superBot().views().sessionView().leaveSession();
         for (final AbstractTester tester : activeTesters) {
             if (tester != host) {
-                if (tester.superBot().views().sessionView().isInSession()) {
-                    closeSessionTasks.add(new Callable<Void>() {
-                        public Void call() throws Exception {
-                            // Need to check for isDriver before leaving.
-                            tester.superBot().confirmShellClosingTheSession();
-                            return null;
-                        }
-                    });
-                }
+                tester.superBot().views().sessionView()
+                    .waitUntilIsNotInSession();
+
             }
         }
-        host.superBot().views().sessionView().leaveSession();
-        MakeOperationConcurrently.workAll(closeSessionTasks);
+
+        // MakeOperationConcurrently.workAll(closeSessionTasks);
     }
 
     /**
@@ -676,8 +671,7 @@ public class STFTest extends STF {
         if (host != null) {
             host.superBot().views().sessionView()
                 .waitUntilAllPeersLeaveSession(peerJIDs);
-            host.bot().view(VIEW_SAROS_SESSION).toolbarButton(TB_STOP_SESSION)
-                .click();
+            host.bot().view(VIEW_SAROS).toolbarButton(TB_STOP_SESSION).click();
             host.superBot().views().sessionView().waitUntilIsNotInSession();
         }
 

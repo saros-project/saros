@@ -129,8 +129,8 @@ public interface ISessionView extends Remote {
     /**
      * performs the action "Open invitation interface" which should be activated
      * by clicking the tool bar button with the tooltip text
-     * {@link STF#TB_ADD_BUDDY_TO_SESSION} on the session view. The button is
-     * only enabled, if you are host.
+     * {@link STF#TB_ADD_A_NEW_BUDDY} on the session view. The button is only
+     * enabled, if you are host.
      * <p>
      * <b>Attention:</b>
      * <ol>
@@ -139,11 +139,11 @@ public interface ISessionView extends Remote {
      * method(exclude remote triggered events). E.g. a popup window.</li>
      * </ol>
      * 
-     * @param inviteesJIDs
-     *            the buddies whom you want to invite to your session.
+     * @param jidOfInvitees
+     *            the buddy whom you want to invite to your session.
      * @throws RemoteException
      */
-    public void addBuddyToSession(String... inviteesJIDs)
+    public void addBuddyToSession(String... jidOfInvitees)
         throws RemoteException;
 
     /**
@@ -302,8 +302,8 @@ public interface ISessionView extends Remote {
      * is true.
      * 
      * @param superBot
-     *            {@link ISuperBot} of the invitee, whose session status you want
-     *            to know.
+     *            {@link ISuperBot} of the invitee, whose session status you
+     *            want to know.
      * @throws RemoteException
      */
     public void waitUntilIsInviteeInSession(ISuperBot superBot)
@@ -317,9 +317,10 @@ public interface ISessionView extends Remote {
      * if you immediately assert the after-state caused by such actions. E.g.
      * you will get assertError with the assertion
      * assertTrue(alice.views().sessionviews().isInsession()) if alice leave the
-     * session without waitUntil the condition {@link ISessionView#isInSession()}
-     * So it is recommended that you wait until the session is completely closed
-     * before you run the assertion or perform a following action.
+     * session without waitUntil the condition
+     * {@link ISessionView#isInSession()} So it is recommended that you wait
+     * until the session is completely closed before you run the assertion or
+     * perform a following action.
      * 
      * @throws RemoteException
      */
@@ -332,8 +333,8 @@ public interface ISessionView extends Remote {
      * 
      * 
      * @param superBot
-     *            {@link ISuperBot} of the invitee, whose session status you want
-     *            to know.
+     *            {@link ISuperBot} of the invitee, whose session status you
+     *            want to know.
      * @throws RemoteException
      */
     public void waitUntilIsInviteeNotInSession(ISuperBot superBot)

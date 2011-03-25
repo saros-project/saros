@@ -23,7 +23,11 @@ public interface IRemoteBotTable extends Remote {
 
     public IRemoteBotMenu contextMenu(String text) throws RemoteException;
 
-    public IRemoteBotTableItem getTableItem(String itemText) throws RemoteException;
+    public IRemoteBotTableItem getTableItem(String itemText)
+        throws RemoteException;
+
+    public IRemoteBotTableItem getTableItemWithRegex(String regex)
+        throws RemoteException;
 
     public IRemoteBotTableItem getTableItem(int row) throws RemoteException;
 

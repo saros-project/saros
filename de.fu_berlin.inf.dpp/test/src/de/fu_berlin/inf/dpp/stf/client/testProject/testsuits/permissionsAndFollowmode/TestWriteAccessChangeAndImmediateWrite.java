@@ -49,7 +49,7 @@ public class TestWriteAccessChangeAndImmediateWrite extends STFTest {
         bob.bot().editor(CLS1_SUFFIX).setTextWithoutSave(CP1);
         bob.superBot().views().sessionView().waitUntilIsInconsistencyDetected();
 
-        assertTrue(bob.bot().view(VIEW_SAROS_SESSION)
+        assertTrue(bob.bot().view(VIEW_SAROS)
             .toolbarButtonWithRegex(TB_INCONSISTENCY_DETECTED + ".*")
             .isEnabled());
         bob.superBot().views().sessionView().inconsistencyDetected();
@@ -58,7 +58,7 @@ public class TestWriteAccessChangeAndImmediateWrite extends STFTest {
             .grantWriteAccess();
         bob.bot().editor(CLS1_SUFFIX).setTextWithoutSave(CP2);
         bob.bot().sleep(5000);
-        assertFalse(bob.bot().view(VIEW_SAROS_SESSION)
+        assertFalse(bob.bot().view(VIEW_SAROS)
             .toolbarButton(TB_NO_INCONSISTENCIES).isEnabled());
     }
 }

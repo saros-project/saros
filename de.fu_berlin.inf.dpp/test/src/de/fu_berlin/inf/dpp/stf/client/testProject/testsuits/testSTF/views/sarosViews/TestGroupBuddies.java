@@ -1,6 +1,5 @@
 package de.fu_berlin.inf.dpp.stf.client.testProject.testsuits.testSTF.views.sarosViews;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
@@ -11,9 +10,8 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import de.fu_berlin.inf.dpp.stf.client.testProject.testsuits.STFTest;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.IRemoteBotView;
 
-public class TestBuddiesView extends STFTest {
+public class TestGroupBuddies extends STFTest {
 
     /**
      * Preconditions:
@@ -41,24 +39,8 @@ public class TestBuddiesView extends STFTest {
     }
 
     @Test
-    public void openCloseRosterView() throws RemoteException {
-        alice.bot().view(VIEW_SAROS_BUDDIES).close();
-        assertEquals(false, alice.bot().isViewOpen(VIEW_SAROS_BUDDIES));
-        alice.bot().openViewById(VIEW_SAROS_BUDDIES_ID);
-        assertEquals(true, alice.bot().isViewOpen(VIEW_SAROS_BUDDIES));
-    }
-
-    @Test
-    public void setFocusOnRosterView() throws RemoteException {
-        IRemoteBotView view_buddies = alice.bot().view(VIEW_SAROS_BUDDIES);
-        view_buddies.show();
-        assertTrue(view_buddies.isActive());
-        view_buddies.close();
-        assertFalse(view_buddies.isActive());
-        alice.bot().openViewById(VIEW_SAROS_BUDDIES_ID);
-        assertTrue(alice.bot().isViewOpen(VIEW_SAROS_BUDDIES));
-        alice.bot().view(VIEW_SAROS_SESSION).show();
-        assertFalse(alice.bot().view(VIEW_SAROS_BUDDIES).isActive());
+    public void testPreCondition() {
+        //
     }
 
     /**
@@ -161,8 +143,10 @@ public class TestBuddiesView extends STFTest {
         alice.superBot().views().buddiesView().selectBuddy(carl.getJID())
             .inviteBuddy();
 
-        carl.bot().shell(SHELL_SESSION_INVITATION).confirm(FINISH);
-        carl.superBot().confirmShellAddProjectWithNewProject(PROJECT1);
+        carl.superBot().confirmShellSessionInvitationAndShellAddProject(
+            PROJECT1, TypeOfCreateProject.NEW_PROJECT);
+        // carl.bot().shell(SHELL_SESSION_INVITATION).confirm(FINISH);
+        // carl.superBot().confirmShellAddProjectWithNewProject(PROJECT1);
         carl.superBot().views().sessionView().waitUntilIsInSession();
         assertTrue(carl.superBot().views().sessionView().isInSession());
 

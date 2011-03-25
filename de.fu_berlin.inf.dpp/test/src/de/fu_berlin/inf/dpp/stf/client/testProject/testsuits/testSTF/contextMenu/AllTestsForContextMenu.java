@@ -10,6 +10,8 @@ import org.junit.runners.Suite.SuiteClasses;
 @RunWith(Suite.class)
 @SuiteClasses(//
 { TestContextMenuOpen.class,//
+    TestContextMenuDelete.class,//
+    TestContextMenuShareWith.class //
 })
 public class AllTestsForContextMenu {
     // empty

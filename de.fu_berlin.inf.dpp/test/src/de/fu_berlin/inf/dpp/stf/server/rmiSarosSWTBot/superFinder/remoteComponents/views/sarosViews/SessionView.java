@@ -41,8 +41,8 @@ public class SessionView extends Views implements ISessionView {
 
     public ISessionView setView(IRemoteBotView view) throws RemoteException {
         this.view = view;
-        if (this.view.bot().existsTable())
-            this.table = this.view.bot().table();
+        if (this.view.bot().existsTableInGroup("Session"))
+            this.table = this.view.bot().tableInGroup("Session");
         return this;
     }
 
@@ -130,19 +130,25 @@ public class SessionView extends Views implements ISessionView {
     }
 
     /**
-     * TODO: With {@link IRemoteBotView#toolbarButtonWithRegex(String)} to perform
-     * this action you will get WidgetNotFoundException.
+     * TODO: With {@link IRemoteBotView#toolbarButtonWithRegex(String)} to
+     * perform this action you will get WidgetNotFoundException.
      */
-    public void addBuddyToSession(String... jidOfInvitees)
+     
+         public void addBuddyToSession(String... jidOfInvitees)
         throws RemoteException {
         view.toolbarButton(TB_ADD_BUDDY_TO_SESSION).click();
         sarosBot().confirmShellAddBuddyToSession(jidOfInvitees);
     }
+     
+    public void addANewBuddy(JID jidOfInvitee) throws RemoteException {
+        view.toolbarButton(TB_ADD_A_NEW_BUDDY).click();
+        sarosBot().confirmShellAddBuddy(jidOfInvitee);
+    }
 
     /**
      * Note: {@link STF#TB_INCONSISTENCY_DETECTED} is not complete toolbarName,
-     * so we need to use {@link IRemoteBotView#toolbarButtonWithRegex(String)} to
-     * perform this action.
+     * so we need to use {@link IRemoteBotView#toolbarButtonWithRegex(String)}
+     * to perform this action.
      */
     public void inconsistencyDetected() throws RemoteException {
         view.toolbarButtonWithRegex(TB_INCONSISTENCY_DETECTED + ".*").click();
@@ -202,7 +208,7 @@ public class SessionView extends Views implements ISessionView {
     }
 
     public boolean existsLabelInSessionView() throws RemoteException {
-        return view.bot().existsLabel();
+        return view.bot().existsLabelInGroup("Session");
     }
 
     public boolean isHost() throws RemoteException {

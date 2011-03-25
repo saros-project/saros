@@ -205,7 +205,7 @@ public class RemoteBotTree extends AbstractRmoteWidget implements IRemoteBotTree
         return getTextOfItems().contains(treeItemText);
     }
 
-    public boolean existsSubItemWithRegexs(String regex) throws RemoteException {
+    public boolean existsSubItemWithRegex(String regex) throws RemoteException {
         for (String subItem : getTextOfItems()) {
             if (subItem.matches(regex))
                 return true;

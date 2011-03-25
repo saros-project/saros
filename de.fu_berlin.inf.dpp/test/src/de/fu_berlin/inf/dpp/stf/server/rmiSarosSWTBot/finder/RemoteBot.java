@@ -15,34 +15,34 @@ import org.osgi.framework.Bundle;
 import de.fu_berlin.inf.dpp.stf.STF;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.conditions.SarosSWTBotPreferences;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.IRemoteBotButton;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.RemoteBotButton;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.IRemoteBotCCombo;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.RemoteBotCCombo;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.IRemoteBotCheckBox;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.RemoteBotCheckBox;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.IRemoteBotCombo;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.RemoteBotCombo;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.IRemoteBotLabel;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.RemoteBotLabel;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.IRemoteBotList;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.RemoteBotList;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.IRemoteBotMenu;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.RemoteBotMenu;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.IRemoteBotRadio;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.RemoteBotRadio;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.IRemoteBotShell;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.RemoteBotShell;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.IRemoteBotStyledText;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.RemoteBotStyledText;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.IRemoteBotTable;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.RemoteBotTable;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.IRemoteBotText;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.RemoteBotText;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.IRemoteBotToggleButton;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.RemoteBotToggleButton;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.IRemoteBotToolbarButton;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.RemoteBotToolbarButton;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.IRemoteBotTree;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.RemoteBotButton;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.RemoteBotCCombo;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.RemoteBotCheckBox;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.RemoteBotCombo;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.RemoteBotLabel;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.RemoteBotList;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.RemoteBotMenu;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.RemoteBotRadio;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.RemoteBotShell;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.RemoteBotStyledText;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.RemoteBotTable;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.RemoteBotText;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.RemoteBotToggleButton;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.RemoteBotToolbarButton;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.RemoteBotTree;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.views.sarosViews.ChatView;
 import de.fu_berlin.inf.dpp.stf.server.sarosSWTBot.SarosSWTBot;
@@ -262,7 +262,8 @@ public class RemoteBot extends STF implements IRemoteBot {
      * 
      **********************************************/
 
-    public IRemoteBotButton buttonWithLabel(String label) throws RemoteException {
+    public IRemoteBotButton buttonWithLabel(String label)
+        throws RemoteException {
         button.setWidget(swtBot.buttonWithLabel(label, 0));
         return button;
     }
@@ -319,7 +320,8 @@ public class RemoteBot extends STF implements IRemoteBot {
         return button;
     }
 
-    public IRemoteBotButton buttonInGroup(String inGroup) throws RemoteException {
+    public IRemoteBotButton buttonInGroup(String inGroup)
+        throws RemoteException {
         button.setWidget(swtBot.buttonInGroup(inGroup));
         return button;
     }
@@ -346,8 +348,8 @@ public class RemoteBot extends STF implements IRemoteBot {
         return button;
     }
 
-    public IRemoteBotButton buttonWithLabelInGroup(String label, String inGroup,
-        int index) throws RemoteException {
+    public IRemoteBotButton buttonWithLabelInGroup(String label,
+        String inGroup, int index) throws RemoteException {
         button.setWidget(swtBot.buttonWithLabelInGroup(label, inGroup, index));
         return button;
     }
@@ -364,8 +366,8 @@ public class RemoteBot extends STF implements IRemoteBot {
         return button;
     }
 
-    public IRemoteBotButton buttonWithTooltipInGroup(String tooltip, String inGroup)
-        throws RemoteException {
+    public IRemoteBotButton buttonWithTooltipInGroup(String tooltip,
+        String inGroup) throws RemoteException {
         button.setWidget(swtBot.buttonWithTooltipInGroup(tooltip, inGroup));
         return button;
     }
@@ -490,6 +492,21 @@ public class RemoteBot extends STF implements IRemoteBot {
         }
     }
 
+    public boolean existsLabelInGroup(String groupName) throws RemoteException {
+        long oldTimeout = SWTBotPreferences.TIMEOUT;
+        // increase the timeout
+        SWTBotPreferences.TIMEOUT = 1000;
+
+        try {
+            swtBot.labelInGroup(groupName);
+            SWTBotPreferences.TIMEOUT = oldTimeout;
+            return true;
+        } catch (WidgetNotFoundException e) {
+            SWTBotPreferences.TIMEOUT = oldTimeout;
+            return false;
+        }
+    }
+
     public boolean existsLabel(String text) throws RemoteException {
         long oldTimeout = SWTBotPreferences.TIMEOUT;
         // increase the timeout
@@ -540,8 +557,8 @@ public class RemoteBot extends STF implements IRemoteBot {
         return styledText;
     }
 
-    public IRemoteBotStyledText styledTextWithId(String key, String value, int index)
-        throws RemoteException {
+    public IRemoteBotStyledText styledTextWithId(String key, String value,
+        int index) throws RemoteException {
         styledText.setWidget(swtBot.styledTextWithId(key, value, index));
         return styledText;
     }
@@ -607,7 +624,8 @@ public class RemoteBot extends STF implements IRemoteBot {
      * Widget comboBox
      * 
      **********************************************/
-    public IRemoteBotCombo comboBoxWithLabel(String label) throws RemoteException {
+    public IRemoteBotCombo comboBoxWithLabel(String label)
+        throws RemoteException {
         comboBox.setWidget(swtBot.comboBoxWithLabel(label));
         return comboBox;
     }
@@ -623,7 +641,8 @@ public class RemoteBot extends STF implements IRemoteBot {
         return comboBox;
     }
 
-    public IRemoteBotCombo comboBox(String text, int index) throws RemoteException {
+    public IRemoteBotCombo comboBox(String text, int index)
+        throws RemoteException {
         comboBox.setWidget(swtBot.comboBox(text, index));
         return comboBox;
     }
@@ -651,7 +670,8 @@ public class RemoteBot extends STF implements IRemoteBot {
         return comboBox;
     }
 
-    public IRemoteBotCombo comboBoxInGroup(String inGroup) throws RemoteException {
+    public IRemoteBotCombo comboBoxInGroup(String inGroup)
+        throws RemoteException {
         comboBox.setWidget(swtBot.comboBoxInGroup(inGroup));
         return comboBox;
     }
@@ -678,8 +698,8 @@ public class RemoteBot extends STF implements IRemoteBot {
         return comboBox;
     }
 
-    public IRemoteBotCombo comboBoxWithLabelInGroup(String label, String inGroup,
-        int index) throws RemoteException {
+    public IRemoteBotCombo comboBoxWithLabelInGroup(String label,
+        String inGroup, int index) throws RemoteException {
         comboBox.setWidget(swtBot.comboBoxWithLabelInGroup(label, inGroup,
             index));
         return comboBox;
@@ -691,8 +711,8 @@ public class RemoteBot extends STF implements IRemoteBot {
         return comboBox;
     }
 
-    public IRemoteBotCombo comboBoxInGroup(String text, String inGroup, int index)
-        throws RemoteException {
+    public IRemoteBotCombo comboBoxInGroup(String text, String inGroup,
+        int index) throws RemoteException {
         comboBox.setWidget(swtBot.comboBoxInGroup(text, inGroup, index));
         return comboBox;
     }
@@ -713,7 +733,8 @@ public class RemoteBot extends STF implements IRemoteBot {
         return ccomboBox;
     }
 
-    public IRemoteBotCCombo ccomboBoxWithLabel(String label) throws RemoteException {
+    public IRemoteBotCCombo ccomboBoxWithLabel(String label)
+        throws RemoteException {
         ccomboBox.setWidget(swtBot.ccomboBoxWithLabel(label));
         return ccomboBox;
     }
@@ -736,7 +757,8 @@ public class RemoteBot extends STF implements IRemoteBot {
         return ccomboBox;
     }
 
-    public IRemoteBotCCombo ccomboBoxWithId(String value) throws RemoteException {
+    public IRemoteBotCCombo ccomboBoxWithId(String value)
+        throws RemoteException {
         ccomboBox.setWidget(swtBot.ccomboBoxWithId(value));
         return ccomboBox;
     }
@@ -747,7 +769,8 @@ public class RemoteBot extends STF implements IRemoteBot {
         return ccomboBox;
     }
 
-    public IRemoteBotCCombo ccomboBoxInGroup(String inGroup) throws RemoteException {
+    public IRemoteBotCCombo ccomboBoxInGroup(String inGroup)
+        throws RemoteException {
         ccomboBox.setWidget(swtBot.ccomboBoxInGroup(inGroup));
         return ccomboBox;
     }
@@ -775,20 +798,20 @@ public class RemoteBot extends STF implements IRemoteBot {
         return ccomboBox;
     }
 
-    public IRemoteBotCCombo ccomboBoxInGroup(String text, String inGroup, int index)
-        throws RemoteException {
+    public IRemoteBotCCombo ccomboBoxInGroup(String text, String inGroup,
+        int index) throws RemoteException {
         ccomboBox.setWidget(swtBot.ccomboBoxInGroup(text, inGroup, index));
         return ccomboBox;
     }
 
-    public IRemoteBotCCombo ccomboBoxWithLabelInGroup(String label, String inGroup)
-        throws RemoteException {
+    public IRemoteBotCCombo ccomboBoxWithLabelInGroup(String label,
+        String inGroup) throws RemoteException {
         ccomboBox.setWidget(swtBot.ccomboBoxWithLabelInGroup(label, inGroup));
         return ccomboBox;
     }
 
-    public IRemoteBotCCombo ccomboBoxWithLabelInGroup(String label, String inGroup,
-        int index) throws RemoteException {
+    public IRemoteBotCCombo ccomboBoxWithLabelInGroup(String label,
+        String inGroup, int index) throws RemoteException {
         ccomboBox.setWidget(swtBot.ccomboBoxWithLabelInGroup(label, inGroup,
             index));
         return ccomboBox;
@@ -804,7 +827,8 @@ public class RemoteBot extends STF implements IRemoteBot {
 
     }
 
-    public IRemoteBotToolbarButton toolbarButton(int index) throws RemoteException {
+    public IRemoteBotToolbarButton toolbarButton(int index)
+        throws RemoteException {
         return toolbarButton.setWidget(swtBot.toolbarButton(index));
 
     }
@@ -859,8 +883,8 @@ public class RemoteBot extends STF implements IRemoteBot {
 
     }
 
-    public IRemoteBotToolbarButton toolbarButtonWithId(String key, String value,
-        int index) throws RemoteException {
+    public IRemoteBotToolbarButton toolbarButtonWithId(String key,
+        String value, int index) throws RemoteException {
         return toolbarButton.setWidget(swtBot.toolbarButtonWithId(key, value,
             index));
 
@@ -885,8 +909,8 @@ public class RemoteBot extends STF implements IRemoteBot {
 
     }
 
-    public IRemoteBotToolbarButton toolbarButtonInGroup(String inGroup, int index)
-        throws RemoteException {
+    public IRemoteBotToolbarButton toolbarButtonInGroup(String inGroup,
+        int index) throws RemoteException {
         return toolbarButton.setWidget(swtBot.toolbarButtonInGroup(inGroup,
             index));
 
@@ -906,15 +930,15 @@ public class RemoteBot extends STF implements IRemoteBot {
 
     }
 
-    public IRemoteBotToolbarButton toolbarButtonWithTooltipInGroup(String tooltip,
-        String inGroup) throws RemoteException {
+    public IRemoteBotToolbarButton toolbarButtonWithTooltipInGroup(
+        String tooltip, String inGroup) throws RemoteException {
         return toolbarButton.setWidget(swtBot.toolbarButtonWithTooltipInGroup(
             tooltip, inGroup));
 
     }
 
-    public IRemoteBotToolbarButton toolbarButtonWithTooltipInGroup(String tooltip,
-        String inGroup, int index) throws RemoteException {
+    public IRemoteBotToolbarButton toolbarButtonWithTooltipInGroup(
+        String tooltip, String inGroup, int index) throws RemoteException {
         return toolbarButton.setWidget(swtBot.toolbarButtonWithTooltipInGroup(
             tooltip, inGroup, index));
 
@@ -947,7 +971,8 @@ public class RemoteBot extends STF implements IRemoteBot {
 
     }
 
-    public IRemoteBotText textWithTooltip(String tooltip) throws RemoteException {
+    public IRemoteBotText textWithTooltip(String tooltip)
+        throws RemoteException {
         text.setWidget(swtBot.textWithTooltip(tooltip));
         return text;
 
@@ -960,7 +985,8 @@ public class RemoteBot extends STF implements IRemoteBot {
 
     }
 
-    public IRemoteBotText textWithMessage(String message) throws RemoteException {
+    public IRemoteBotText textWithMessage(String message)
+        throws RemoteException {
         text.setWidget(swtBot.textWithMessage(message));
         return text;
 
@@ -1060,8 +1086,8 @@ public class RemoteBot extends STF implements IRemoteBot {
 
     }
 
-    public IRemoteBotText textWithTooltipInGroup(String tooltip, String inGroup,
-        int index) throws RemoteException {
+    public IRemoteBotText textWithTooltipInGroup(String tooltip,
+        String inGroup, int index) throws RemoteException {
         text.setWidget(swtBot.textWithTooltipInGroup(tooltip, inGroup, index));
         return text;
     }
@@ -1078,6 +1104,20 @@ public class RemoteBot extends STF implements IRemoteBot {
         SWTBotPreferences.TIMEOUT = 1000;
         try {
             swtBot.table();
+            SWTBotPreferences.TIMEOUT = oldTimeout;
+            return true;
+        } catch (WidgetNotFoundException e) {
+            SWTBotPreferences.TIMEOUT = oldTimeout;
+            return false;
+        }
+    }
+
+    public boolean existsTableInGroup(String groupName) throws RemoteException {
+        long oldTimeout = SWTBotPreferences.TIMEOUT;
+        // increase the timeout
+        SWTBotPreferences.TIMEOUT = 1000;
+        try {
+            swtBot.tableInGroup(groupName);
             SWTBotPreferences.TIMEOUT = oldTimeout;
             return true;
         } catch (WidgetNotFoundException e) {
@@ -1265,7 +1305,8 @@ public class RemoteBot extends STF implements IRemoteBot {
         return checkbox;
     }
 
-    public IRemoteBotCheckBox checkBox(String mnemonicText) throws RemoteException {
+    public IRemoteBotCheckBox checkBox(String mnemonicText)
+        throws RemoteException {
         checkbox.setWidget(swtBot.checkBox(mnemonicText));
         return checkbox;
     }
@@ -1300,7 +1341,8 @@ public class RemoteBot extends STF implements IRemoteBot {
         return checkbox;
     }
 
-    public IRemoteBotCheckBox checkBoxWithId(String value) throws RemoteException {
+    public IRemoteBotCheckBox checkBoxWithId(String value)
+        throws RemoteException {
         checkbox.setWidget(swtBot.checkBoxWithId(value));
         return checkbox;
     }
@@ -1333,8 +1375,8 @@ public class RemoteBot extends STF implements IRemoteBot {
         return checkbox;
     }
 
-    public IRemoteBotCheckBox checkBoxWithLabelInGroup(String label, String inGroup)
-        throws RemoteException {
+    public IRemoteBotCheckBox checkBoxWithLabelInGroup(String label,
+        String inGroup) throws RemoteException {
         checkbox.setWidget(swtBot.checkBoxWithLabelInGroup(label, inGroup));
         return checkbox;
     }
@@ -1346,14 +1388,14 @@ public class RemoteBot extends STF implements IRemoteBot {
         return checkbox;
     }
 
-    public IRemoteBotCheckBox checkBoxInGroup(String mnemonicText, String inGroup)
-        throws RemoteException {
+    public IRemoteBotCheckBox checkBoxInGroup(String mnemonicText,
+        String inGroup) throws RemoteException {
         checkbox.setWidget(swtBot.checkBoxInGroup(mnemonicText, inGroup));
         return checkbox;
     }
 
-    public IRemoteBotCheckBox checkBoxInGroup(String mnemonicText, String inGroup,
-        int index) throws RemoteException {
+    public IRemoteBotCheckBox checkBoxInGroup(String mnemonicText,
+        String inGroup, int index) throws RemoteException {
         checkbox
             .setWidget(swtBot.checkBoxInGroup(mnemonicText, inGroup, index));
         return checkbox;
@@ -1399,7 +1441,8 @@ public class RemoteBot extends STF implements IRemoteBot {
         return radio;
     }
 
-    public IRemoteBotRadio radioWithTooltip(String tooltip) throws RemoteException {
+    public IRemoteBotRadio radioWithTooltip(String tooltip)
+        throws RemoteException {
         radio.setWidget(swtBot.radioWithTooltip(tooltip));
         return radio;
     }
@@ -1478,14 +1521,14 @@ public class RemoteBot extends STF implements IRemoteBot {
         return radio;
     }
 
-    public IRemoteBotRadio radioWithTooltipInGroup(String tooltip, String inGroup)
-        throws RemoteException {
+    public IRemoteBotRadio radioWithTooltipInGroup(String tooltip,
+        String inGroup) throws RemoteException {
         radio.setWidget(swtBot.radioWithTooltipInGroup(tooltip, inGroup));
         return radio;
     }
 
-    public IRemoteBotRadio radioWithTooltipInGroup(String tooltip, String inGroup,
-        int index) throws RemoteException {
+    public IRemoteBotRadio radioWithTooltipInGroup(String tooltip,
+        String inGroup, int index) throws RemoteException {
         radio
             .setWidget(swtBot.radioWithTooltipInGroup(tooltip, inGroup, index));
         return radio;
@@ -1526,8 +1569,8 @@ public class RemoteBot extends STF implements IRemoteBot {
         return toggleButton;
     }
 
-    public IRemoteBotToggleButton toggleButtonWithTooltip(String tooltip, int index)
-        throws RemoteException {
+    public IRemoteBotToggleButton toggleButtonWithTooltip(String tooltip,
+        int index) throws RemoteException {
         toggleButton.setWidget(swtBot.toggleButtonWithTooltip(tooltip, index));
         return toggleButton;
     }
@@ -1573,7 +1616,8 @@ public class RemoteBot extends STF implements IRemoteBot {
         return toggleButton;
     }
 
-    public IRemoteBotToggleButton toggleButton(int index) throws RemoteException {
+    public IRemoteBotToggleButton toggleButton(int index)
+        throws RemoteException {
         toggleButton.setWidget(swtBot.toggleButton(index));
         return toggleButton;
     }
@@ -1606,15 +1650,15 @@ public class RemoteBot extends STF implements IRemoteBot {
         return toggleButton;
     }
 
-    public IRemoteBotToggleButton toggleButtonWithTooltipInGroup(String tooltip,
-        String inGroup) throws RemoteException {
+    public IRemoteBotToggleButton toggleButtonWithTooltipInGroup(
+        String tooltip, String inGroup) throws RemoteException {
         toggleButton.setWidget(swtBot.toggleButtonWithTooltipInGroup(tooltip,
             inGroup));
         return toggleButton;
     }
 
-    public IRemoteBotToggleButton toggleButtonWithTooltipInGroup(String tooltip,
-        String inGroup, int index) throws RemoteException {
+    public IRemoteBotToggleButton toggleButtonWithTooltipInGroup(
+        String tooltip, String inGroup, int index) throws RemoteException {
         toggleButton.setWidget(swtBot.toggleButtonWithTooltipInGroup(tooltip,
             inGroup, index));
         return toggleButton;

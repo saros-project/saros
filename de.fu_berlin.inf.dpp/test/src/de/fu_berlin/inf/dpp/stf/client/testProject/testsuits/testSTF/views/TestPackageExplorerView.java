@@ -7,6 +7,7 @@ import java.rmi.RemoteException;
 
 import org.junit.After;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import de.fu_berlin.inf.dpp.stf.client.testProject.testsuits.STFTest;
@@ -58,6 +59,7 @@ public class TestPackageExplorerView extends STFTest {
     }
 
     @Test
+    @Ignore("can't click the menu 'multiple buddies'")
     public void testShareWith() throws RemoteException {
         alice.superBot().views().packageExplorerView().tree().newC()
             .javaProject(PROJECT1);

@@ -95,7 +95,7 @@ public interface IRemoteBotTree extends Remote {
      */
     public boolean existsSubItem(String itemText) throws RemoteException;
 
-    public boolean existsSubItemWithRegexs(String regex) throws RemoteException;
+    public boolean existsSubItemWithRegex(String regex) throws RemoteException;
 
     /**
      * This method is suitable for shell widget.

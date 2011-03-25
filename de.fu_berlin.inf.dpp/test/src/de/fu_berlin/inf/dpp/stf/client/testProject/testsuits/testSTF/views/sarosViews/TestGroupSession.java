@@ -13,7 +13,7 @@ import org.junit.Test;
 
 import de.fu_berlin.inf.dpp.stf.client.testProject.testsuits.STFTest;
 
-public class TestSessionView extends STFTest {
+public class TestGroupSession extends STFTest {
 
     @BeforeClass
     public static void runBeforeClass() throws RemoteException,
@@ -38,19 +38,16 @@ public class TestSessionView extends STFTest {
     @Test
     public void testSetFocusOnSessionView() throws RemoteException {
         log.trace("alice set focus on session view.");
-        alice.bot().view(VIEW_SAROS_SESSION).show();
-        assertTrue(alice.bot().view(VIEW_SAROS_SESSION).isActive());
+        alice.bot().view(VIEW_SAROS).show();
+        assertTrue(alice.bot().view(VIEW_SAROS).isActive());
         log.trace("alice close session view.");
 
-        alice.bot().view(VIEW_SAROS_SESSION).close();
-        assertFalse(alice.bot().isViewOpen(VIEW_SAROS_SESSION));
+        alice.bot().view(VIEW_SAROS).close();
+        assertFalse(alice.bot().isViewOpen(VIEW_SAROS));
         log.trace("alice open session view again");
-        alice.bot().openViewById(VIEW_SAROS_SESSION_ID);
-        assertTrue(alice.bot().isViewOpen(VIEW_SAROS_SESSION));
+        alice.bot().openViewById(VIEW_SAROS_ID);
+        assertTrue(alice.bot().isViewOpen(VIEW_SAROS));
         log.trace("alice focus on saros buddies view.");
-        alice.bot().view(VIEW_SAROS_BUDDIES).show();
-        assertFalse(alice.bot().view(VIEW_SAROS_SESSION).isActive());
-        log.trace("testSetFocusOnSessionView is done.");
     }
 
     @Test
@@ -224,13 +221,14 @@ public class TestSessionView extends STFTest {
     }
 
     @Test
+    @Ignore("there are not the toolbar button 'restrict invitees to ready only access many more'")
     public void testRestrictInviteesToReadOnlyAccessGUI()
         throws RemoteException {
         assertTrue(alice.superBot().views().sessionView().isHost());
-        assertTrue(alice.bot().view(VIEW_SAROS_SESSION)
+        assertTrue(alice.bot().view(VIEW_SAROS)
             .toolbarButton(TB_RESTRICT_INVITEES_TO_READ_ONLY_ACCESS)
             .isEnabled());
-        assertFalse(bob.bot().view(VIEW_SAROS_SESSION)
+        assertFalse(bob.bot().view(VIEW_SAROS)
             .toolbarButton(TB_RESTRICT_INVITEES_TO_READ_ONLY_ACCESS)
             .isEnabled());
 

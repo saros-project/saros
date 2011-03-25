@@ -286,8 +286,7 @@ public class STF {
         .getString("shell_request_of_subscription_received");
     public final static String SHELL_BUDDY_ALREADY_ADDED = SarosMessages
         .getString("shell_buddy_already_added");
-    public final static String SHELL_ADD_BUDDY = SarosMessages
-        .getString("shell_add_buddy");
+
     public final static String SHELL_BUDDY_LOOKUP_FAILED = SarosMessages
         .getString("shell_buddy_look_up_failed");
     public final static String SHELL_SERVER_NOT_FOUND = SarosMessages
@@ -331,10 +330,15 @@ public class STF {
     /*
      * View infos
      */
-    public final static String VIEW_SAROS_SESSION = SarosMessages
-        .getString("view_saros_session");
-    public final static String VIEW_SAROS_SESSION_ID = SarosMessages
-        .getString("view_saros_session_id");
+    public final static String VIEW_SAROS = SarosMessages
+        .getString("view_saros");
+    public final static String VIEW_SAROS_ID = SarosMessages
+        .getString("view_saros_id");
+
+    public final static String GROUP_BUDDIES = SarosMessages
+        .getString("group_buddies");
+    public final static String GROUP_SESSION = SarosMessages
+        .getString("group_session");
 
     // Permission: Write Access
     static public final String OWN_PARTICIPANT_NAME = SarosMessages
@@ -353,6 +357,8 @@ public class STF {
         .getString("shell_screensharing_an_error_occured");
     public final static String SHELL_INVITATION = SarosMessages
         .getString("shell_invitation");
+    public final static String SHELL_ADD_BUDDY = SarosMessages
+        .getString("shell_add_buddy");
     public final static String SHELL_ADD_BUDDY_TO_SESSION = SarosMessages
         .getString("shell_add_buddy_to_session");
 
@@ -587,7 +593,7 @@ public class STF {
         viewTitlesAndIDs.put(VIEW_REMOTE_SCREEN, VIEW_REMOTE_SCREEN_ID);
         viewTitlesAndIDs.put(VIEW_SAROS_BUDDIES, VIEW_SAROS_BUDDIES_ID);
         viewTitlesAndIDs.put(VIEW_SAROS_CHAT, VIEW_SAROS_CHAT_ID);
-        viewTitlesAndIDs.put(VIEW_SAROS_SESSION, VIEW_SAROS_SESSION_ID);
+        viewTitlesAndIDs.put(VIEW_SAROS, VIEW_SAROS_ID);
         viewTitlesAndIDs.put(VIEW_SVN_REPOSITORIES, VIEW_SVN_REPOSITORIES_ID);
         viewTitlesAndIDs.put(VIEW_PROGRESS, VIEW_PROGRESS_ID);
     }
