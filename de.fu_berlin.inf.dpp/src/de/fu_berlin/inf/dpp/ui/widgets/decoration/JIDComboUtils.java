@@ -93,5 +93,11 @@ public class JIDComboUtils {
             item = username + "@" + item.split("@")[1];
             jidCombo.setItem(i, item);
         }
+
+        /*
+         * The modification of the list items resets the text. We make sure the
+         * initially set value remains.
+         */
+        jidCombo.setText(jid);
     }
 }
