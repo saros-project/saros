@@ -9,6 +9,7 @@ import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.observables.SarosSessionObservable;
+import de.fu_berlin.inf.dpp.project.AbstractSarosSessionListener;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ISarosSessionListener;
 import de.fu_berlin.inf.dpp.project.SarosSessionManager;
@@ -40,26 +41,18 @@ public class SarosSourceProvider extends AbstractSourceProvider {
     @Inject
     protected SarosSessionObservable sarosSessionObservable;
 
-    protected ISarosSessionListener sarosSessionListener = new ISarosSessionListener() {
-        public void sessionStarting(ISarosSession newSarosSession) {
-            // do nothing
-        }
+    protected ISarosSessionListener sarosSessionListener = new AbstractSarosSessionListener() {
 
+        @Override
         public void sessionStarted(ISarosSession newSarosSession) {
             sessionChanged(newSarosSession);
         }
 
+        @Override
         public void sessionEnding(ISarosSession oldSarosSession) {
             sessionChanged(new NullSarosSession());
         }
 
-        public void sessionEnded(ISarosSession oldSarosSession) {
-            // do nothing
-        }
-
-        public void projectAdded(String projectID) {
-            // do nothing
-        }
     };
 
     public SarosSourceProvider() {

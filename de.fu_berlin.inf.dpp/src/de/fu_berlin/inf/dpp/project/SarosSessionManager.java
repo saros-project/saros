@@ -28,7 +28,6 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-import de.fu_berlin.inf.dpp.SarosContext;
 import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
@@ -49,6 +48,7 @@ import org.picocontainer.annotations.Nullable;
 
 import de.fu_berlin.inf.dpp.FileList;
 import de.fu_berlin.inf.dpp.Saros;
+import de.fu_berlin.inf.dpp.SarosContext;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.activities.ProjectExchangeInfo;
 import de.fu_berlin.inf.dpp.annotations.Component;
@@ -548,7 +548,8 @@ public class SarosSessionManager implements IConnectionListener,
         if (!projectsToShare.isEmpty()) {
             OutgoingProjectNegotiation out = new OutgoingProjectNegotiation(
                 transmitter, user, this.getSarosSession(), projectsToShare,
-                projectExchangeProcesses, stopManager, sessionID, doStream, sarosContext);
+                projectExchangeProcesses, stopManager, sessionID, doStream,
+                sarosContext);
             OutgoingProjectJob job = new OutgoingProjectJob(out);
             job.schedule();
         }
@@ -606,8 +607,8 @@ public class SarosSessionManager implements IConnectionListener,
                         + peer
                         + " has been canceled remotely because of an error:\n\n"
                         + e.getMessage();
-                    SarosView.showNotification(
-                        "Error during project sharing", message);
+                    SarosView.showNotification("Error during project sharing",
+                        message);
 
                     return new Status(IStatus.ERROR, Saros.SAROS, message);
                 }
@@ -672,6 +673,28 @@ public class SarosSessionManager implements IConnectionListener,
         this.sarosSessionListeners.remove(listener);
     }
 
+    public void notifyPreIncomingInvitationCompleted(SubMonitor subMonitor) {
+        try {
+            for (ISarosSessionListener sarosSessionListener : this.sarosSessionListeners) {
+                sarosSessionListener.preIncomingInvitationCompleted(subMonitor);
+            }
+        } catch (RuntimeException e) {
+            log.error("Internal error in notifying listener"
+                + " of an incoming invitation: ", e);
+        }
+    }
+
+    public void notifyPostOutgoingInvitationCompleted(SubMonitor subMonitor, User user) {
+        try {
+            for (ISarosSessionListener sarosSessionListener : this.sarosSessionListeners) {
+                sarosSessionListener.postOutgoingInvitationCompleted(subMonitor, user);
+            }
+        } catch (RuntimeException e) {
+            log.error("Internal error in notifying listener"
+                + " of an outgoing invitation: ", e);
+        }
+    }
+
     public void notifySarosSessionStarting(ISarosSession sarosSession) {
         try {
             for (ISarosSessionListener sarosSessionListener : this.sarosSessionListeners) {
@@ -722,7 +745,7 @@ public class SarosSessionManager implements IConnectionListener,
                 listener.projectAdded(getSarosSession().getProjectID(project));
             } catch (RuntimeException e) {
                 log.error("Internal error in notifying listener"
-                    + " of SarosSession end: ", e);
+                    + " of an added project: ", e);
             }
         }
     }
