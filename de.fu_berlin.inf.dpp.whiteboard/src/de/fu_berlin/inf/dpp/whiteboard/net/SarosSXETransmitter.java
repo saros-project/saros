@@ -7,7 +7,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import org.apache.log4j.Logger;
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
 import org.jivesoftware.smack.PacketListener;
 import org.jivesoftware.smack.filter.PacketFilter;
@@ -42,8 +41,13 @@ import de.fu_berlin.inf.dpp.whiteboard.sxe.records.serializable.RecordDataObject
  */
 public class SarosSXETransmitter implements ISXETransmitter {
 
-	public static final long SXE_TIMEOUT = 3000L;
-	public static final long SXE_START_SYNC_TIMEOUT = 30000L;
+	/**
+	 * Interval to poll receiving
+	 * 
+	 * @see XMPPTransmitter#receive(SubMonitor, SarosPacketCollector, long,
+	 *      boolean)
+	 */
+	private static final long SXE_TIMEOUT_INTERVAL = 500L;
 
 	public static final Logger log = Logger
 			.getLogger(SarosSXETransmitter.class);
@@ -65,7 +69,7 @@ public class SarosSXETransmitter implements ISXETransmitter {
 	private final ISarosSession sarosSession;
 
 	public SarosSXETransmitter(ISarosSession sarosSession) {
-		SarosPluginContext.reinject(this);
+		SarosPluginContext.initComponent(this);
 		this.sarosSession = sarosSession;
 	}
 
@@ -135,8 +139,8 @@ public class SarosSXETransmitter implements ISXETransmitter {
 	}
 
 	@Override
-	public SXEMessage sendAndAwait(SubMonitor monitor, SXEMessage msg,
-			SXEMessageType... awaitFor) throws IOException,
+	public synchronized SXEMessage sendAndAwait(SubMonitor monitor,
+			SXEMessage msg, SXEMessageType... awaitFor) throws IOException,
 			LocalCancellationException {
 
 		log.debug(prefix() + "send " + msg.getMessageType() + " to "
@@ -148,14 +152,9 @@ public class SarosSXETransmitter implements ISXETransmitter {
 
 		sendWithoutDispatch(msg);
 
-		// we have to use a longer timeout for start sync
-		long timeout = SXE_TIMEOUT;
-		if (Arrays.asList(awaitFor).contains(SXEMessageType.STATE)) {
-			timeout = SXE_START_SYNC_TIMEOUT;
-		}
-
 		// receiving automatically removes collector
-		Packet packet = transmitter.receive(monitor, collector, timeout, false);
+		Packet packet = transmitter.receive(monitor, collector,
+				SXE_TIMEOUT_INTERVAL, true);
 
 		SXEMessage response = ((SXEExtension) packet.getExtension(
 				SXEMessage.SXE_TAG, SXEMessage.SXE_XMLNS)).getMessage();
@@ -188,7 +187,8 @@ public class SarosSXETransmitter implements ISXETransmitter {
 	 * Registers the controller to receive state-offer messages and to start the
 	 * invitation process
 	 */
-	public void enableInvitation(final SXEController controller) {
+	public void enableInvitation(final SXEController controller,
+			final SubMonitor subMonitor) {
 
 		invitationListener = new PacketListener() {
 			@Override
@@ -197,16 +197,11 @@ public class SarosSXETransmitter implements ISXETransmitter {
 						SXEMessage.SXE_TAG, SXEMessage.SXE_XMLNS);
 				extension.getMessage().setFrom(packet.getFrom());
 
-				/*
-				 * TODO should be placed in context with the
-				 * IncomingInvitationProcess
-				 */
 				SXEIncomingSynchronizationProcess inv = new SXEIncomingSynchronizationProcess(
 						controller, SarosSXETransmitter.this,
 						extension.getMessage());
-				// TODO monitor from saros progress
-				inv.start(SubMonitor.convert(new NullProgressMonitor()));
 
+				inv.start(subMonitor);
 			}
 		};
 
