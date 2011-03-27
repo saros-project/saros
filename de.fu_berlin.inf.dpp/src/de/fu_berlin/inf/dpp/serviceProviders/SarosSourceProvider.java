@@ -12,6 +12,7 @@ import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.net.ConnectionState;
 import de.fu_berlin.inf.dpp.net.IConnectionListener;
+import de.fu_berlin.inf.dpp.project.AbstractSarosSessionListener;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ISarosSessionListener;
 import de.fu_berlin.inf.dpp.project.SarosSessionManager;
@@ -62,26 +63,18 @@ public class SarosSourceProvider extends AbstractSourceProvider {
         }
     };
 
-    protected ISarosSessionListener sarosSessionListener = new ISarosSessionListener() {
-        public void sessionStarting(ISarosSession newSarosSession) {
-            // do nothing
-        }
+    protected ISarosSessionListener sarosSessionListener = new AbstractSarosSessionListener() {
 
+        @Override
         public void sessionStarted(ISarosSession newSarosSession) {
             sessionChanged(newSarosSession);
         }
 
+        @Override
         public void sessionEnding(ISarosSession oldSarosSession) {
             sessionChanged(new NullSarosSession());
         }
 
-        public void sessionEnded(ISarosSession oldSarosSession) {
-            // do nothing
-        }
-
-        public void projectAdded(String projectID) {
-            // do nothing
-        }
     };
 
     public SarosSourceProvider() {

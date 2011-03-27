@@ -4,13 +4,13 @@ import java.io.IOException;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import de.fu_berlin.inf.dpp.SarosContext;
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.Saros;
+import de.fu_berlin.inf.dpp.SarosContext;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.communication.muc.MUCManager;
 import de.fu_berlin.inf.dpp.communication.muc.negotiation.MUCSessionPreferences;
@@ -24,9 +24,9 @@ import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.internal.DefaultInvitationInfo.UserListRequestExtensionProvider;
 import de.fu_berlin.inf.dpp.net.internal.InvitationInfo;
 import de.fu_berlin.inf.dpp.net.internal.InvitationInfo.InvitationExtensionProvider;
-import de.fu_berlin.inf.dpp.net.internal.discoveryManager.DiscoveryManager;
 import de.fu_berlin.inf.dpp.net.internal.SarosPacketCollector;
 import de.fu_berlin.inf.dpp.net.internal.XMPPTransmitter;
+import de.fu_berlin.inf.dpp.net.internal.discoveryManager.DiscoveryManager;
 import de.fu_berlin.inf.dpp.observables.InvitationProcessObservable;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
@@ -88,8 +88,10 @@ public class OutgoingSessionNegotiation extends InvitationProcess {
         int colorID, InvitationProcessObservable invitationProcesses,
         ISarosSession sarosSession, String description,
         VersionManager versionManager, DiscoveryManager discoveryManager,
-        MUCSessionPreferencesNegotiatingManager comNegotiatingManager, SarosContext sarosContext) {
-        super(transmitter, peer, description, colorID, invitationProcesses, sarosContext);
+        MUCSessionPreferencesNegotiatingManager comNegotiatingManager,
+        SarosContext sarosContext) {
+        super(transmitter, peer, description, colorID, invitationProcesses,
+            sarosContext);
 
         this.sarosSession = sarosSession;
         this.versionManager = versionManager;
@@ -115,9 +117,13 @@ public class OutgoingSessionNegotiation extends InvitationProcess {
 
             sendInvitation(monitor.newChild(1));
 
-            addUserToSession();
+            User newUser = addUserToSession();
 
             completeInvitation(monitor.newChild(3));
+
+            sarosSessionManager.notifyPostOutgoingInvitationCompleted(monitor.newChild(1),
+                newUser);
+
         } catch (LocalCancellationException e) {
             localCancel(e.getMessage(), e.getCancelOption());
             executeCancellation();

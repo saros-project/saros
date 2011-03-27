@@ -3,13 +3,13 @@ package de.fu_berlin.inf.dpp.invitation;
 import java.io.IOException;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import de.fu_berlin.inf.dpp.SarosContext;
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.SubMonitor;
 import org.joda.time.DateTime;
 import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.Saros;
+import de.fu_berlin.inf.dpp.SarosContext;
 import de.fu_berlin.inf.dpp.User.Permission;
 import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
 import de.fu_berlin.inf.dpp.exceptions.RemoteCancellationException;
@@ -59,7 +59,8 @@ public class IncomingSessionNegotiation extends InvitationProcess {
         VersionManager versionManager, VersionInfo remoteVersionInfo,
         DateTime sessionStart, SarosUI sarosUI, String invitationID,
         Saros saros, String description, SarosContext sarosContext) {
-        super(transmitter, from, description, colorID, invitationProcesses, sarosContext);
+        super(transmitter, from, description, colorID, invitationProcesses,
+            sarosContext);
 
         this.versionInfo = determineVersion(remoteVersionInfo);
         this.sessionStart = sessionStart;
@@ -240,6 +241,8 @@ public class IncomingSessionNegotiation extends InvitationProcess {
         sessionManager.notifySarosSessionStarting(sarosSession);
         sarosSession.start();
         sessionManager.notifySarosSessionStarted(sarosSession);
+
+        sessionManager.notifyPreIncomingInvitationCompleted(monitor);
 
         sarosSession.userInvitationCompleted(sarosSession.getLocalUser());
         log.debug("Inv" + Utils.prefix(peer)
