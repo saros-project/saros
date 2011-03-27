@@ -117,7 +117,7 @@ public class SXEController extends AbstractSXEMessageHandler {
 	public void startSession() {
 		session = new SXESession();
 
-		log.debug(prefix() + "initialize session");
+		log.debug(prefix() + "initialize session at inviter side");
 
 		transmitter.installRecordReceiver(this);
 
@@ -134,7 +134,7 @@ public class SXEController extends AbstractSXEMessageHandler {
 	 *            the state message
 	 */
 	public void startSession(SXEMessage message) {
-		log.debug(prefix() + "receive state");
+		log.debug(prefix() + "receive state and start session at invitee side");
 
 		if (!(connectionState == State.CONNECTING)) {
 			log.error("Received state while not in connecting state");

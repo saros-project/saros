@@ -1,17 +1,14 @@
 package de.fu_berlin.inf.dpp.whiteboard.net;
 
 import org.apache.log4j.Logger;
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
 import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.project.AbstractSarosSessionListener;
-import de.fu_berlin.inf.dpp.project.AbstractSharedProjectListener;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ISarosSessionListener;
-import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
 import de.fu_berlin.inf.dpp.project.SarosSessionManager;
 import de.fu_berlin.inf.dpp.whiteboard.gef.model.GEFRecordFactory;
 import de.fu_berlin.inf.dpp.whiteboard.sxe.ISXEMessageHandler;
@@ -45,30 +42,41 @@ public class WhiteboardManager {
 	}
 
 	/**
-	 * The session listener registers the ISharedProjectListener, let's the host
-	 * initialize a local session and enables for other peers to be invited.
+	 * The session listener let's the host initialize a local session, enables
+	 * for other peers to be invited and let the host start the synchronization
+	 * process.
 	 */
 	protected ISarosSessionListener sessionListener = new AbstractSarosSessionListener() {
-		@Override
-		public void sessionStarted(ISarosSession session) {
-			log.debug("Whiteboard sssion started");
-			sarosSession = session;
-			sarosSession.addListener(sharedProjectListener);
 
+		@Override
+		public void sessionStarting(ISarosSession session) {
+			sarosSession = session;
 			sxeTransmitter = new SarosSXETransmitter(sarosSession);
 			controller.initNetwork(sxeTransmitter);
+		}
 
+		@Override
+		public void preIncomingInvitationCompleted(SubMonitor subMonitor) {
+			sxeTransmitter.enableInvitation(controller, subMonitor);
+		}
+
+		@Override
+		public void sessionStarted(ISarosSession session) {
 			if (sarosSession.isHost()) {
 				controller.startSession();
-			} else {
-				sxeTransmitter.enableInvitation(controller);
 			}
+		}
 
+		@Override
+		public void postOutgoingInvitationCompleted(SubMonitor subMonitor,
+				User user) {
+			SXEOutgoingSynchronizationProcess inv = new SXEOutgoingSynchronizationProcess(
+					controller, sxeTransmitter, user.getJID().toString());
+			inv.start(subMonitor);
 		}
 
 		@Override
 		public void sessionEnded(ISarosSession project) {
-			sarosSession.removeListener(sharedProjectListener);
 			controller.setDisconnected();
 
 			/*
@@ -77,25 +85,6 @@ public class WhiteboardManager {
 			 */
 			sxeTransmitter.dispose();
 		}
-	};
-
-	protected ISharedProjectListener sharedProjectListener = new AbstractSharedProjectListener() {
-
-		/*
-		 * called after receiving user list (outgoing) or in UserListHandler
-		 * createArchive(), executed by the Job of the
-		 * OutgoingInvitationProcess, perfect moment to start synchronization
-		 */
-		@Override
-		public void userJoined(User user) {
-
-			if (sarosSession.isHost()) {
-				SXEOutgoingSynchronizationProcess inv = new SXEOutgoingSynchronizationProcess(
-						controller, sxeTransmitter, user.getJID().toString());
-				inv.start(SubMonitor.convert(new NullProgressMonitor()));
-			}
-		}
-
 	};
 
 	@Inject
