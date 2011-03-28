@@ -27,8 +27,8 @@ public class PrecedenceRosterListenerComparator implements
 
     public int precedenceIndex(IRosterListener listener) {
         int i = 0;
-        for (Class<? extends IRosterListener> clazz : precedence) {
-            if (clazz.isAssignableFrom(listener.getClass())) {
+        for (Class<? extends IRosterListener> c : precedence) {
+            if (c.isAssignableFrom(listener.getClass())) {
                 return i;
             }
             i++;
