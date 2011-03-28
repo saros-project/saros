@@ -19,7 +19,6 @@
  */
 package de.fu_berlin.inf.dpp.ui.preferencePages;
 
-import de.fu_berlin.inf.dpp.SarosPluginContext;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.preference.BooleanFieldEditor;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
@@ -43,6 +42,7 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
 import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.Saros;
+import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.accountManagement.XMPPAccount;
 import de.fu_berlin.inf.dpp.accountManagement.XMPPAccountStore;
 import de.fu_berlin.inf.dpp.annotations.Component;
@@ -73,7 +73,7 @@ public class GeneralPreferencePage extends FieldEditorPreferencePage implements
     public static final String STARTUP_CONNECT_TEXT = "Automatically connect on startup";
     public static final String FOLLOW_MODE_TEXT = "Start in Follow Mode.";
     public static final String CONCURRENT_UNDO_TEXT = "Enable concurrent undo (only local changes are undone, session restart necessary).";
-    public static final String DISABLE_VERSION_CONTROL_TEXT = "Disable Version Control support";
+    public static final String DISABLE_VERSION_CONTROL_TEXT = "Disable version control support";
     public static final String DISABLE_VERSION_CONTROL_TOOLTIP = "Saros tries to share VCS operations"
         + " like checkout during the invitation, or switch or update during a session. (Currently, only SVN "
         + "is supported.) You can disable VCS support in case you have problems with the repository.\n"
