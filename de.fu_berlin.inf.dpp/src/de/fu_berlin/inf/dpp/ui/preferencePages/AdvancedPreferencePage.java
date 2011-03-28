@@ -1,6 +1,5 @@
 package de.fu_berlin.inf.dpp.ui.preferencePages;
 
-import de.fu_berlin.inf.dpp.SarosPluginContext;
 import org.eclipse.jface.preference.BooleanFieldEditor;
 import org.eclipse.jface.preference.FieldEditor;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
@@ -17,6 +16,7 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
 import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.Saros;
+import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
 
@@ -73,7 +73,8 @@ public class AdvancedPreferencePage extends FieldEditorPreferencePage implements
     protected void createPortFields() {
 
         ftGroup = new Group(getFieldEditorParent(), SWT.NONE);
-        ftGroup.setText("File transfer (changes require reconnection)"); //$NON-NLS-1$
+        ftGroup
+            .setText("File transfer (changes require reconnection to the server)"); //$NON-NLS-1$
 
         inviteGroup = new Group(getFieldEditorParent(), SWT.NONE);
         inviteGroup.setText("Invitation");
