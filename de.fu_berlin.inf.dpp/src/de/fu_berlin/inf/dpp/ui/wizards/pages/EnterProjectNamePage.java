@@ -3,6 +3,8 @@ package de.fu_berlin.inf.dpp.ui.wizards.pages;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IProject;
@@ -94,6 +96,7 @@ public class EnterProjectNamePage extends WizardPage {
     protected PreferenceUtils preferenceUtils;
 
     private boolean disposed;
+    protected boolean flashState;
 
     /**
      * 
@@ -130,6 +133,7 @@ public class EnterProjectNamePage extends WizardPage {
 
         setPageComplete(false);
         setTitle("Select local project.");
+
     }
 
     protected void setUpdateProject(IProject project, String projectID) {
@@ -215,9 +219,34 @@ public class EnterProjectNamePage extends WizardPage {
                     + '\n'
                     + "Suggestions: Update an existing project or copy resources from another project.");
             }
-            setImageDescriptor(ImageManager
-                .getImageDescriptor("icons/wizban/ibb.png"));
+            startIBBLogoFlash();
         }
+    }
+
+    /**
+     * Starts and maintains a timer that will flash two IBB logos to make the
+     * user aware of the warning.
+     */
+    protected void startIBBLogoFlash() {
+
+        new Timer().schedule(new TimerTask() {
+
+            @Override
+            public void run() {
+                Utils.runSafeSWTSync(log, new Runnable() {
+
+                    public void run() {
+                        flashState = !flashState;
+                        if (flashState)
+                            setImageDescriptor(ImageManager
+                                .getImageDescriptor("icons/wizban/ibb.png"));
+                        else
+                            setImageDescriptor(ImageManager
+                                .getImageDescriptor("icons/wizban/ibbFaded.png"));
+                    }
+                });
+            }
+        }, 0, 1000);
     }
 
     /**
