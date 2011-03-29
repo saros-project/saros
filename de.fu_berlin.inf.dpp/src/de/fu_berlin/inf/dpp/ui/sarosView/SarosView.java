@@ -368,8 +368,8 @@ public class SarosView extends ViewPart {
                     control = Display.getDefault().getFocusControl();
 
                 }
-                BalloonNotification
-                    .showNotification(control, title, text, 5000);
+                BalloonNotification.showNotification(control, title, text,
+                    15000);
             }
         });
     }
