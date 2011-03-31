@@ -3,8 +3,10 @@ package de.fu_berlin.inf.dpp.ui.actions;
 import org.apache.log4j.Logger;
 import org.eclipse.jface.action.Action;
 import org.picocontainer.Disposable;
+import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.Saros;
+import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.editor.AbstractSharedEditorListener;
@@ -117,21 +119,22 @@ public class FollowModeAction extends Action implements Disposable {
         }
     };
 
+    @Inject
     protected SarosSessionManager sessionManager;
 
+    @Inject
     protected EditorManager editorManager;
 
+    @Inject
     protected Saros saros;
 
-    public FollowModeAction(Saros saros, SarosSessionManager sessionManager,
-        EditorManager editorManager) {
+    public FollowModeAction() {
         super(null, AS_CHECK_BOX);
 
-        this.saros = saros;
-        this.sessionManager = sessionManager;
-        this.editorManager = editorManager;
+        SarosPluginContext.initComponent(this);
 
-        setImageDescriptor(ImageManager.getImageDescriptor("/icons/monitor_add.png"));
+        setImageDescriptor(ImageManager
+            .getImageDescriptor("/icons/monitor_add.png"));
         setToolTipText("Enable/disable follow mode");
         setId(ACTION_ID);
 

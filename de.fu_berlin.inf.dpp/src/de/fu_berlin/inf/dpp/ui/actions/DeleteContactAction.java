@@ -31,10 +31,16 @@ import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.PlatformUI;
 import org.jivesoftware.smack.RosterEntry;
+import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
+import org.picocontainer.Disposable;
+import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.Saros;
+import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.User;
+import de.fu_berlin.inf.dpp.net.ConnectionState;
+import de.fu_berlin.inf.dpp.net.IConnectionListener;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.util.RosterUtils;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
@@ -43,38 +49,60 @@ import de.fu_berlin.inf.dpp.ui.util.selection.SelectionUtils;
 import de.fu_berlin.inf.dpp.ui.util.selection.retriever.SelectionRetrieverFactory;
 import de.fu_berlin.inf.dpp.util.Utils;
 
-public class DeleteContactAction extends Action {
+public class DeleteContactAction extends Action implements Disposable {
 
     private static final Logger log = Logger
         .getLogger(DeleteContactAction.class.getName());
 
+    protected IConnectionListener connectionListener = new IConnectionListener() {
+        public void connectionStateChanged(XMPPConnection connection,
+            final ConnectionState newState) {
+            updateEnablement();
+        }
+    };
+
+    protected ISelectionListener selectionListener = new ISelectionListener() {
+        public void selectionChanged(IWorkbenchPart part, ISelection selection) {
+            updateEnablement();
+        }
+    };
+
+    @Inject
     protected Saros saros;
 
+    @Inject
     protected SarosSessionManager sessionManager;
 
     protected final String DELETE_ERROR_IN_SESSION = "You cannot delete this buddy "
         + "because they are currently in your Saros session.";
 
-    public DeleteContactAction(SarosSessionManager sessionManager, Saros saros) {
+    public DeleteContactAction() {
         super("Delete");
-
-        SelectionUtils.getSelectionService().addSelectionListener(
-            new ISelectionListener() {
-                public void selectionChanged(IWorkbenchPart part,
-                    ISelection selection) {
-                    List<JID> buddies = SelectionRetrieverFactory
-                        .getSelectionRetriever(JID.class).getSelection();
-                    setEnabled(buddies.size() == 1);
-                }
-            });
         setToolTipText("Delete this buddy.");
 
         IWorkbench workbench = PlatformUI.getWorkbench();
         setImageDescriptor(workbench.getSharedImages().getImageDescriptor(
             ISharedImages.IMG_TOOL_DELETE));
 
-        this.sessionManager = sessionManager;
-        this.saros = saros;
+        SarosPluginContext.initComponent(this);
+
+        saros.addListener(connectionListener);
+        SelectionUtils.getSelectionService().addSelectionListener(
+            selectionListener);
+        updateEnablement();
+    }
+
+    protected void updateEnablement() {
+        try {
+            List<JID> buddies = SelectionRetrieverFactory
+                .getSelectionRetriever(JID.class).getSelection();
+            this.setEnabled(saros.isConnected() && buddies.size() == 1);
+        } catch (NullPointerException e) {
+            this.setEnabled(false);
+        } catch (Exception e) {
+            if (!PlatformUI.getWorkbench().isClosing())
+                log.error("Unexcepted error while updating enablement", e);
+        }
     }
 
     public static String toString(RosterEntry entry) {
@@ -146,4 +174,9 @@ public class DeleteContactAction extends Action {
         }
     }
 
+    public void dispose() {
+        SelectionUtils.getSelectionService().removeSelectionListener(
+            selectionListener);
+        saros.removeListener(connectionListener);
+    }
 }

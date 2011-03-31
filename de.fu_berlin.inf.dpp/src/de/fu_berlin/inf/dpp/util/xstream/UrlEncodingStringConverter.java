@@ -9,7 +9,7 @@ import de.fu_berlin.inf.dpp.util.Utils;
  */
 public class UrlEncodingStringConverter extends AbstractSingleValueConverter {
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({ "rawtypes" })
     @Override
     public boolean canConvert(Class clazz) {
         return clazz.equals(String.class);

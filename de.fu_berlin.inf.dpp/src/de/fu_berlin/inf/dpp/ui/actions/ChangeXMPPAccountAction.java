@@ -2,22 +2,27 @@ package de.fu_berlin.inf.dpp.ui.actions;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import de.fu_berlin.inf.dpp.SarosPluginContext;
 import org.apache.log4j.Logger;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ActionContributionItem;
 import org.eclipse.jface.action.IMenuCreator;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.MenuItem;
+import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.handlers.IHandlerService;
 import org.jivesoftware.smack.XMPPConnection;
 import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.Saros;
+import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.accountManagement.XMPPAccount;
 import de.fu_berlin.inf.dpp.accountManagement.XMPPAccountStore;
 import de.fu_berlin.inf.dpp.net.ConnectionState;
 import de.fu_berlin.inf.dpp.net.IConnectionListener;
 import de.fu_berlin.inf.dpp.ui.ImageManager;
+import de.fu_berlin.inf.dpp.ui.util.WizardUtils;
 import de.fu_berlin.inf.dpp.util.Utils;
 
 /**
@@ -96,6 +101,30 @@ public class ChangeXMPPAccountAction extends Action implements IMenuCreator {
             this.currentAccountId = account.getId();
             addMenuItem(account.toString());
         }
+        new MenuItem(accountMenu, SWT.SEPARATOR);
+        addActionToMenu(accountMenu, new Action("Add Account...") {
+            @Override
+            public void run() {
+                WizardUtils.openAddXMPPAccountWizard();
+            }
+        });
+        addActionToMenu(accountMenu, new Action("Configure Accounts...") {
+            @Override
+            public void run() {
+                IHandlerService service = (IHandlerService) PlatformUI
+                    .getWorkbench().getActiveWorkbenchWindow().getActivePage()
+                    .getActivePart().getSite()
+                    .getService(IHandlerService.class);
+                try {
+                    service
+                        .executeCommand(
+                            "de.fu_berlin.inf.dpp.ui.commands.OpenSarosPreferences",
+                            null);
+                } catch (Exception e) {
+                    log.debug("Could execute command", e);
+                }
+            }
+        });
         return accountMenu;
     }
 

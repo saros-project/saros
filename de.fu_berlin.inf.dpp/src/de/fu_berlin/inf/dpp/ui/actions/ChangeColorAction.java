@@ -1,20 +1,23 @@
 package de.fu_berlin.inf.dpp.ui.actions;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Vector;
 
-import de.fu_berlin.inf.dpp.SarosPluginContext;
 import org.apache.log4j.Logger;
+import org.eclipse.jface.action.Action;
 import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.jface.viewers.ISelectionProvider;
-import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.ColorDialog;
-import org.eclipse.ui.actions.SelectionProviderAction;
+import org.eclipse.ui.ISelectionListener;
+import org.eclipse.ui.IWorkbenchPart;
+import org.eclipse.ui.PlatformUI;
 import org.picocontainer.Disposable;
 import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.Saros;
+import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.activities.business.ChangeColorActivity;
 import de.fu_berlin.inf.dpp.annotations.Component;
@@ -25,6 +28,8 @@ import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.project.internal.ChangeColorManager;
 import de.fu_berlin.inf.dpp.ui.ImageManager;
+import de.fu_berlin.inf.dpp.ui.util.selection.SelectionUtils;
+import de.fu_berlin.inf.dpp.ui.util.selection.retriever.SelectionRetrieverFactory;
 import de.fu_berlin.inf.dpp.util.Utils;
 
 /**
@@ -35,10 +40,15 @@ import de.fu_berlin.inf.dpp.util.Utils;
  * @author cnk and tobi
  */
 @Component(module = "action")
-public class ChangeColorAction extends SelectionProviderAction implements
-    Disposable {
+public class ChangeColorAction extends Action implements Disposable {
 
     private static final Logger log = Logger.getLogger(ChangeColorAction.class);
+
+    protected ISelectionListener selectionListener = new ISelectionListener() {
+        public void selectionChanged(IWorkbenchPart part, ISelection selection) {
+            updateEnablement();
+        }
+    };
 
     @Inject
     protected ISarosSessionManager sessionManager;
@@ -49,21 +59,33 @@ public class ChangeColorAction extends SelectionProviderAction implements
     @Inject
     protected EditorManager editorManager;
 
-    public ChangeColorAction(ISelectionProvider provider) {
-        super(provider, "Change Color");
+    public ChangeColorAction() {
+        super("Change Color");
         SarosPluginContext.initComponent(this);
 
         setToolTipText("changes your session colour");
         setImageDescriptor(ImageManager
             .getImageDescriptor("icons/elcl16/changecolor.png"));
 
-        selectionChanged(getStructuredSelection());
+        SelectionUtils.getSelectionService().addSelectionListener(
+            selectionListener);
+        updateEnablement();
     }
 
-    @Override
-    public void selectionChanged(IStructuredSelection selection) {
-        setEnabled(sessionManager.getSarosSession() != null
-            && getSelectedUser() != null);
+    public void updateEnablement() {
+        try {
+            List<User> participants = SelectionRetrieverFactory
+                .getSelectionRetriever(User.class).getSelection();
+            setEnabled(sessionManager.getSarosSession() != null
+                && participants.size() == 1
+                && participants.get(0).equals(
+                    sessionManager.getSarosSession().getLocalUser()));
+        } catch (NullPointerException e) {
+            this.setEnabled(false);
+        } catch (Exception e) {
+            if (!PlatformUI.getWorkbench().isClosing())
+                log.error("Unexcepted error while updating enablement", e);
+        }
     }
 
     /**
@@ -110,17 +132,8 @@ public class ChangeColorAction extends SelectionProviderAction implements
         });
     }
 
-    public User getSelectedUser() {
-        Object selected = getStructuredSelection().getFirstElement();
-
-        if (!(selected instanceof User))
-            return null;
-
-        User selectedUser = (User) selected;
-
-        if (selectedUser.isLocal())
-            return selectedUser;
-        else
-            return null;
+    public void dispose() {
+        SelectionUtils.getSelectionService().removeSelectionListener(
+            selectionListener);
     }
 }

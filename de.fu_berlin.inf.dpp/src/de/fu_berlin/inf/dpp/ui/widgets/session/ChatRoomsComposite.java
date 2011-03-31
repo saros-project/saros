@@ -77,8 +77,11 @@ public class ChatRoomsComposite extends ListExplanatoryComposite {
         "Right-click on a buddy", "Use the Saros menu in the Eclipse menu bar");
 
     @Inject
-    // TODO: see
-    // https://sourceforge.net/tracker/?func=detail&aid=3102858&group_id=167540&atid=843362
+    /*
+     * TODO: see
+     * https://sourceforge.net/tracker/?func=detail&aid=3102858&group_id
+     * =167540&atid=843362
+     */
     protected EditorManager editorManager;
     protected AbstractSharedEditorListener sharedEditorListener = new AbstractSharedEditorListener() {
         @Override
@@ -134,9 +137,13 @@ public class ChatRoomsComposite extends ListExplanatoryComposite {
                 Utils.runSafeSWTAsync(log, new Runnable() {
                     public void run() {
                         showExplanation(howTo);
-                        chatRoom1.dispose();
+                        if (chatRoom1 != null && !chatRoom1.isDisposed()) {
+                            chatRoom1.dispose();
+                        }
 
-                        chatRooms.setSelection(0);
+                        if (chatRooms != null && !chatRooms.isDisposed()) {
+                            chatRooms.setSelection(0);
+                        }
                     }
                 });
             }
@@ -329,14 +336,15 @@ public class ChatRoomsComposite extends ListExplanatoryComposite {
          */
         if (user != null) {
             senderCache.put(jid, user.getHumanReadableName());
-            colorCache.put(jid, SarosAnnotation.getLightUserColor(user));
+            colorCache.put(jid, SarosAnnotation.getUserColor(user));
         }
         final String sender = senderCache.get(jid);
         final Color color = colorCache.get(jid);
 
         Utils.runSafeSWTAsync(log, new Runnable() {
             public void run() {
-                if (chatControl == null || chatControl.isDisposed())
+                if (chatControl == null || chatControl.isDisposed()
+                    || sender == null || color == null)
                     return;
                 log.debug("Sender: " + sender);
                 log.debug("Color: " + color);

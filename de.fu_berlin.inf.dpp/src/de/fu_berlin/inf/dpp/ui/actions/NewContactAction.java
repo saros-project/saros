@@ -23,8 +23,10 @@ import org.eclipse.jface.action.Action;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.graphics.ImageData;
 import org.jivesoftware.smack.XMPPConnection;
+import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.Saros;
+import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.net.ConnectionState;
 import de.fu_berlin.inf.dpp.net.IConnectionListener;
 import de.fu_berlin.inf.dpp.ui.ImageManager;
@@ -32,9 +34,10 @@ import de.fu_berlin.inf.dpp.ui.util.WizardUtils;
 
 public class NewContactAction extends Action {
 
+    @Inject
     protected Saros saros;
 
-    public NewContactAction(Saros saros) {
+    public NewContactAction() {
         setToolTipText("Add a New Buddy");
         setImageDescriptor(new ImageDescriptor() {
             @Override
@@ -43,7 +46,7 @@ public class NewContactAction extends Action {
             }
         });
 
-        this.saros = saros;
+        SarosPluginContext.initComponent(this);
 
         saros.addListener(new IConnectionListener() {
             public void connectionStateChanged(XMPPConnection connection,

@@ -13,7 +13,9 @@ import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PlatformUI;
+import org.picocontainer.annotations.Inject;
 
+import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.concurrent.watchdog.ConsistencyWatchdogClient;
@@ -22,7 +24,7 @@ import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.project.AbstractSarosSessionListener;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.SarosSessionManager;
-import de.fu_berlin.inf.dpp.ui.SessionView;
+import de.fu_berlin.inf.dpp.ui.sarosView.SarosView;
 import de.fu_berlin.inf.dpp.util.Utils;
 import de.fu_berlin.inf.dpp.util.ValueChangeListener;
 
@@ -31,22 +33,22 @@ public class ConsistencyAction extends Action {
 
     private static Logger log = Logger.getLogger(ConsistencyAction.class);
 
+    @Inject
     protected SarosSessionManager sessionManager;
 
+    @Inject
     protected ConsistencyWatchdogClient watchdogClient;
 
+    @Inject
     protected IsInconsistentObservable inconsistentObservable;
 
-    public ConsistencyAction(ConsistencyWatchdogClient watchdogClient,
-        SarosSessionManager sessionManager,
-        IsInconsistentObservable inconsistentObservable) {
+    public ConsistencyAction() {
 
         setImageDescriptor(PlatformUI.getWorkbench().getSharedImages()
             .getImageDescriptor(ISharedImages.IMG_OBJS_WARN_TSK));
         setToolTipText("No inconsistencies");
-        this.watchdogClient = watchdogClient;
-        this.sessionManager = sessionManager;
-        this.inconsistentObservable = inconsistentObservable;
+
+        SarosPluginContext.initComponent(this);
 
         sessionManager
             .addSarosSessionListener(new AbstractSarosSessionListener() {
@@ -114,7 +116,7 @@ public class ConsistencyAction extends Action {
                         // when refactoring)
 
                         // show balloon notification
-                        SessionView
+                        SarosView
                             .showNotification(
                                 "Inconsistencies detected",
                                 "These files have become unsynchronised with the host:\n"

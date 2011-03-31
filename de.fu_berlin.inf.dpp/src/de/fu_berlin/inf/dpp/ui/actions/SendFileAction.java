@@ -28,31 +28,31 @@ import java.io.InputStream;
 import java.io.InterruptedIOException;
 import java.io.OutputStream;
 import java.io.Serializable;
+import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
 
-import de.fu_berlin.inf.dpp.SarosPluginContext;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
+import org.eclipse.jface.action.Action;
 import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.jface.viewers.ISelectionChangedListener;
-import org.eclipse.jface.viewers.ISelectionProvider;
-import org.eclipse.jface.viewers.SelectionChangedEvent;
-import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.FileDialog;
+import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.ISharedImages;
+import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.actions.SelectionProviderAction;
 import org.eclipse.ui.progress.IProgressConstants;
+import org.picocontainer.Disposable;
 import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.Saros;
+import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.exceptions.ConnectionException;
@@ -62,10 +62,10 @@ import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
 import de.fu_berlin.inf.dpp.net.internal.StreamService;
 import de.fu_berlin.inf.dpp.net.internal.StreamServiceManager;
 import de.fu_berlin.inf.dpp.net.internal.StreamSession;
-import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.SarosSessionManager;
-import de.fu_berlin.inf.dpp.ui.sarosView.SessionViewTableViewer;
 import de.fu_berlin.inf.dpp.ui.util.DialogUtils;
+import de.fu_berlin.inf.dpp.ui.util.selection.SelectionUtils;
+import de.fu_berlin.inf.dpp.ui.util.selection.retriever.SelectionRetrieverFactory;
 import de.fu_berlin.inf.dpp.util.StopWatch;
 import de.fu_berlin.inf.dpp.util.StreamJob;
 import de.fu_berlin.inf.dpp.util.Utils;
@@ -75,65 +75,72 @@ import de.fu_berlin.inf.dpp.util.Utils;
  * 
  * @author s-lau
  */
-public class SendFileAction extends SelectionProviderAction {
+public class SendFileAction extends Action implements Disposable {
     private static final Logger log = Logger.getLogger(SendFileAction.class);
 
     public static final String ACTION_ID = SendFileAction.class.getName();
 
+    protected ISelectionListener selectionListener = new ISelectionListener() {
+        public void selectionChanged(IWorkbenchPart part, ISelection selection) {
+            updateEnablement();
+        }
+    };
+
     @Inject
     protected Saros saros;
+
     @Inject
     protected SarosSessionManager sessionManager;
-    protected StreamServiceManager streamServiceManager;
-    protected SessionViewTableViewer tableViewer;
 
+    @Inject
+    protected StreamServiceManager streamServiceManager;
+
+    @Inject
     protected SendFileStreamService sendFileService;
 
-    protected User selectedUser = null;
+    public SendFileAction() {
+        super("Send File");
+        SarosPluginContext.initComponent(this);
 
-    public SendFileAction(StreamServiceManager streamServiceManager,
-        SessionViewTableViewer viewer, ISelectionProvider provider,
-        SendFileStreamService sendFileStreamService) {
-        super(provider, "Send File");
-        sendFileService = sendFileStreamService;
-        sendFileStreamService.hookAction(this);
+        sendFileService.hookAction(this);
         setImageDescriptor(PlatformUI.getWorkbench().getSharedImages()
             .getImageDescriptor(ISharedImages.IMG_OBJ_FILE));
         setId(ACTION_ID);
         setToolTipText("Send a file to selected buddy");
         setEnabled(false);
-        this.streamServiceManager = streamServiceManager;
-        this.tableViewer = viewer;
-        viewer.addSelectionChangedListener(new ISelectionChangedListener() {
 
-            public void selectionChanged(SelectionChangedEvent event) {
-                ISelection selection = event.getSelection();
-
-                if (selection instanceof StructuredSelection) {
-                    StructuredSelection users = (StructuredSelection) selection;
-                    if (users.size() == 1)
-                        selectedUser = (User) users.getFirstElement();
-                    else
-                        selectedUser = null;
-
-                    updateEnablement();
-                }
-            }
-        });
         SarosPluginContext.initComponent(this);
+
+        SelectionUtils.getSelectionService().addSelectionListener(
+            selectionListener);
+        updateEnablement();
     }
 
     protected void updateEnablement() {
-        ISarosSession sarosSession = sessionManager.getSarosSession();
-        User local = sarosSession == null ? null : sarosSession.getLocalUser();
-        setEnabled(selectedUser != null && local != null
-            && !local.equals(selectedUser));
+        List<User> participants = SelectionRetrieverFactory
+            .getSelectionRetriever(User.class).getSelection();
+        setEnabled(sessionManager.getSarosSession() != null
+            && participants.size() == 1 && !participants.get(0).isLocal());
     }
 
     @Override
     public void run() {
-        final User user = selectedUser;
-        if (user == null)
+        List<User> participants = null;
+        try {
+            participants = SelectionRetrieverFactory.getSelectionRetriever(
+                User.class).getSelection();
+            if (participants.size() != 1) {
+                log.warn("More than one participant selected.");
+                return;
+            }
+        } catch (NullPointerException e) {
+            this.setEnabled(false);
+        } catch (Exception e) {
+            if (!PlatformUI.getWorkbench().isClosing())
+                log.error("Unexcepted error while updating enablement", e);
+        }
+
+        if (participants == null)
             return;
 
         // prompt to choose a file
@@ -153,7 +160,7 @@ public class SendFileAction extends SelectionProviderAction {
             return;
         }
 
-        new SendFileJob(user, file).schedule();
+        new SendFileJob(participants.get(0), file).schedule();
     }
 
     /**
@@ -173,8 +180,8 @@ public class SendFileAction extends SelectionProviderAction {
         Exception e, SubMonitor monitor) {
         Utils.runSafeSWTAsync(log, new Runnable() {
             public void run() {
-                DialogUtils.openErrorMessageDialog(EditorAPI.getShell(),
-                    title, message);
+                DialogUtils.openErrorMessageDialog(EditorAPI.getShell(), title,
+                    message);
             }
         });
         if (monitor != null) {
@@ -646,6 +653,11 @@ public class SendFileAction extends SelectionProviderAction {
             self.size = file.length();
             return self;
         }
+    }
+
+    public void dispose() {
+        SelectionUtils.getSelectionService().removeSelectionListener(
+            selectionListener);
     }
 
 }

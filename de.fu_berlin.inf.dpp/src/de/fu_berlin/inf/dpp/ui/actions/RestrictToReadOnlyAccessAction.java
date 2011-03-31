@@ -1,11 +1,17 @@
 package de.fu_berlin.inf.dpp.ui.actions;
 
+import java.util.List;
+
 import org.apache.log4j.Logger;
-import org.eclipse.jface.viewers.ISelectionProvider;
-import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.ui.actions.SelectionProviderAction;
+import org.eclipse.jface.action.Action;
+import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.ui.ISelectionListener;
+import org.eclipse.ui.IWorkbenchPart;
+import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.services.IDisposable;
 import org.picocontainer.annotations.Inject;
 
+import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.User.Permission;
 import de.fu_berlin.inf.dpp.annotations.Component;
@@ -17,15 +23,16 @@ import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
 import de.fu_berlin.inf.dpp.project.SarosSessionManager;
 import de.fu_berlin.inf.dpp.ui.ImageManager;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
+import de.fu_berlin.inf.dpp.ui.util.selection.SelectionUtils;
+import de.fu_berlin.inf.dpp.ui.util.selection.retriever.SelectionRetrieverFactory;
 import de.fu_berlin.inf.dpp.util.Utils;
 
 @Component(module = "action")
-public class RestrictToReadOnlyAccessAction extends SelectionProviderAction {
+public class RestrictToReadOnlyAccessAction extends Action implements
+    IDisposable {
 
     private static final Logger log = Logger
         .getLogger(RestrictToReadOnlyAccessAction.class.getName());
-
-    protected User selectedUser;
 
     @Inject
     protected SarosUI sarosUI;
@@ -51,12 +58,18 @@ public class RestrictToReadOnlyAccessAction extends SelectionProviderAction {
         }
     };
 
+    protected ISelectionListener selectionListener = new ISelectionListener() {
+        public void selectionChanged(IWorkbenchPart part, ISelection selection) {
+            updateEnablement();
+        }
+    };
+
+    @Inject
     protected SarosSessionManager sessionManager;
 
-    public RestrictToReadOnlyAccessAction(SarosSessionManager sessionManager,
-        ISelectionProvider provider) {
-        super(provider, "Restrict to read-only access");
-        this.sessionManager = sessionManager;
+    public RestrictToReadOnlyAccessAction() {
+        super("Restrict to read-only access");
+        SarosPluginContext.initComponent(this);
 
         setImageDescriptor(ImageManager
             .getImageDescriptor("icons/elcl16/restricttoreadonlyaccess.png"));
@@ -75,44 +88,51 @@ public class RestrictToReadOnlyAccessAction extends SelectionProviderAction {
         }
 
         sessionManager.addSarosSessionListener(sessionListener);
+        SelectionUtils.getSelectionService().addSelectionListener(
+            selectionListener);
         updateEnablement();
     }
 
-    /**
-     * @review runSafe OK
-     */
     @Override
     public void run() {
         Utils.runSafeSync(log, new Runnable() {
             public void run() {
-                runRestriction();
+                List<User> participants = SelectionRetrieverFactory
+                    .getSelectionRetriever(User.class).getSelection();
+                if (participants.size() == 1) {
+                    if (participants.get(0).hasWriteAccess()) {
+                        sarosUI.performPermissionChange(participants.get(0),
+                            Permission.READONLY_ACCESS);
+                        updateEnablement();
+                    } else {
+                        log.warn("Participant has does not have write access: "
+                            + participants.get(0));
+                    }
+                } else {
+                    log.warn("More than one participant selected.");
+                }
             }
         });
     }
 
-    public void runRestriction() {
-        if (selectedUser.hasWriteAccess()) {
-            sarosUI.performPermissionChange(selectedUser,
-                Permission.READONLY_ACCESS);
-        } else {
-            log.warn("Buddy is has no write access: " + selectedUser);
-        }
-        updateEnablement();
-    }
-
-    @Override
-    public void selectionChanged(IStructuredSelection selection) {
-        this.selectedUser = (selection.size() == 1) ? (User) selection
-            .getFirstElement() : null;
-        updateEnablement();
-    }
-
     protected void updateEnablement() {
-        ISarosSession sarosSession = sessionManager.getSarosSession();
+        try {
+            List<User> participants = SelectionRetrieverFactory
+                .getSelectionRetriever(User.class).getSelection();
+            setEnabled(sessionManager.getSarosSession() != null
+                && participants.size() == 1
+                && participants.get(0).hasWriteAccess());
+        } catch (NullPointerException e) {
+            this.setEnabled(false);
+        } catch (Exception e) {
+            if (!PlatformUI.getWorkbench().isClosing())
+                log.error("Unexcepted error while updating enablement", e);
+        }
+    }
 
-        boolean enabled = ((sarosSession != null)
-            && (this.selectedUser != null) && sarosSession.isHost() && this.selectedUser
-            .hasWriteAccess());
-        setEnabled(enabled);
+    public void dispose() {
+        SelectionUtils.getSelectionService().removeSelectionListener(
+            selectionListener);
+        sessionManager.removeSarosSessionListener(sessionListener);
     }
 }

@@ -19,7 +19,6 @@ import de.fu_berlin.inf.dpp.util.ArrayUtils;
  * @author bkahlert
  */
 public class SelectionUtils {
-
     private SelectionUtils() {
         // no instantiation allowed
     }

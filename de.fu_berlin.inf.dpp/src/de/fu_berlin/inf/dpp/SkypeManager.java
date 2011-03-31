@@ -3,6 +3,7 @@ package de.fu_berlin.inf.dpp;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
@@ -38,6 +39,7 @@ import de.fu_berlin.inf.dpp.util.Utils;
  */
 @Component(module = "net")
 public class SkypeManager implements IConnectionListener {
+    private final Logger log = Logger.getLogger(SkypeManager.class);
 
     protected XStreamExtensionProvider<String> skypeProvider = new XStreamExtensionProvider<String>(
         "skypeInfo");
@@ -45,6 +47,34 @@ public class SkypeManager implements IConnectionListener {
     protected final Map<JID, String> skypeNames = new HashMap<JID, String>();
 
     protected Saros saros;
+
+    private PacketListener packetListener = new PacketListener() {
+        public void processPacket(Packet packet) {
+
+            @SuppressWarnings("unchecked")
+            XStreamIQPacket<String> iq = (XStreamIQPacket<String>) packet;
+
+            if (iq.getType() == IQ.Type.GET) {
+                IQ reply = skypeProvider.createIQ(getLocalSkypeName());
+                reply.setType(IQ.Type.RESULT);
+                reply.setPacketID(iq.getPacketID());
+                reply.setTo(iq.getFrom());
+
+                saros.getConnection().sendPacket(reply);
+            }
+            if (iq.getType() == IQ.Type.SET) {
+                String skypeName = iq.getPayload();
+                if (skypeName != null && skypeName.length() > 0) {
+                    skypeNames.put(new JID(iq.getFrom()), skypeName);
+                    log.debug("Skype Username for " + iq.getFrom() + " added: "
+                        + skypeName);
+                } else {
+                    skypeNames.remove(new JID(iq.getFrom()));
+                    log.debug("Skype Username for " + iq.getFrom() + " removed");
+                }
+            }
+        }
+    };
 
     public SkypeManager(Saros saros) {
         this.saros = saros;
@@ -56,7 +86,6 @@ public class SkypeManager implements IConnectionListener {
          */
         IPreferenceStore prefs = saros.getPreferenceStore();
         prefs.addPropertyChangeListener(new IPropertyChangeListener() {
-
             public void propertyChange(PropertyChangeEvent event) {
                 if (event.getProperty().equals(
                     PreferenceConstants.SKYPE_USERNAME)) {
@@ -64,7 +93,59 @@ public class SkypeManager implements IConnectionListener {
                 }
             }
         });
+    }
 
+    /**
+     * Non-blocking variant of {@link #getSkypeURL(String)}.
+     * 
+     * @return the skype url for given roster entry or <code>null</code> if
+     *         roster entry has no skype name or the entry's skype name is not
+     *         cached
+     * 
+     *         This method will return previously cached results.
+     */
+    public String getSkypeURLNonBlock(String jid) {
+
+        XMPPConnection connection = saros.getConnection();
+        if (connection == null)
+            return null;
+
+        Roster roster = connection.getRoster();
+        if (roster == null)
+            return null;
+
+        for (Presence presence : Utils.asIterable(roster.getPresences(jid))) {
+            if (presence.isAvailable()) {
+                String result = getSkypeURLNonBlock(new JID(presence.getFrom()));
+                if (result != null)
+                    return result;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Non-blocking variant of {@link #getSkypeURL(JID)}.
+     * 
+     * @return the skype url for given {@link JID} or <code>null</code> if
+     *         roster entry has no skype name or the entry's skype name is not
+     *         cached
+     * 
+     *         This method will return previously cached results.
+     */
+    public String getSkypeURLNonBlock(final JID rqJID) {
+        if (this.skypeNames.containsKey(rqJID)) {
+            return this.skypeNames.get(rqJID);
+        }
+
+        Utils.runSafeAsync(log, new Runnable() {
+            public void run() {
+                getSkypeURL(rqJID);
+            }
+        });
+
+        return null;
     }
 
     /**
@@ -106,8 +187,8 @@ public class SkypeManager implements IConnectionListener {
     /**
      * Returns the Skype-URL for user identified by the given RQ-JID.
      * 
-     * @return the skype url for given JID or <code>null</code> if the user has
-     *         no skype name set for this client.
+     * @return the skype url for given {@link JID} or <code>null</code> if the
+     *         user has no skype name set for this client.
      * 
      *         This method will return previously cached results.
      * 
@@ -170,36 +251,33 @@ public class SkypeManager implements IConnectionListener {
      */
     public void connectionStateChanged(final XMPPConnection connection,
         ConnectionState newState) {
-
         if (newState == ConnectionState.CONNECTED) {
-            connection.addPacketListener(new PacketListener() {
+            connection.addPacketListener(packetListener,
+                skypeProvider.getIQFilter());
 
-                public void processPacket(Packet packet) {
+            String skypeUsername = saros.getPreferenceStore().getString(
+                PreferenceConstants.SKYPE_USERNAME);
+            if (skypeUsername != null && !skypeUsername.isEmpty())
+                publishSkypeIQ(skypeUsername);
+            refreshCache(connection);
+        }
 
-                    @SuppressWarnings("unchecked")
-                    XStreamIQPacket<String> iq = (XStreamIQPacket<String>) packet;
-
-                    if (iq.getType() == IQ.Type.GET) {
-                        IQ reply = skypeProvider.createIQ(getLocalSkypeName());
-                        reply.setType(IQ.Type.RESULT);
-                        reply.setPacketID(iq.getPacketID());
-                        reply.setTo(iq.getFrom());
-
-                        connection.sendPacket(reply);
-                    }
-                    if (iq.getType() == IQ.Type.SET) {
-                        String skypeName = iq.getPayload();
-                        if (skypeName != null && skypeName.length() > 0) {
-                            skypeNames.put(new JID(iq.getFrom()), skypeName);
-                        } else {
-                            skypeNames.remove(new JID(iq.getFrom()));
-                        }
-                    }
-                }
-            }, skypeProvider.getIQFilter());
-        } else {
-            // Otherwise clear our cache
+        if (newState == ConnectionState.DISCONNECTING) {
+            connection.removePacketListener(packetListener);
             skypeNames.clear();
+        }
+    }
+
+    /**
+     * Request the skype name of all known buddies and caches the results.
+     * 
+     * @param connection
+     */
+    protected void refreshCache(final XMPPConnection connection) {
+        log.debug("Refreshing Skype username cache...");
+        for (final RosterEntry rosterEntry : connection.getRoster()
+            .getEntries()) {
+            getSkypeURLNonBlock(rosterEntry.getUser());
         }
     }
 

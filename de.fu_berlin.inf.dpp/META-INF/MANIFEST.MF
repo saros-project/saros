@@ -179,6 +179,7 @@ Export-Package: de.fu_berlin.inf.dpp;
  de.fu_berlin.inf.dpp.ui.widgets.viewer,
  de.fu_berlin.inf.dpp.ui.widgets.viewer.project,
  de.fu_berlin.inf.dpp.ui.widgets.viewer.roster,
+ de.fu_berlin.inf.dpp.ui.widgets.viewer.rosterSession,
  de.fu_berlin.inf.dpp.ui.widgets.wizard,
  de.fu_berlin.inf.dpp.ui.widgets.wizard.events,
  de.fu_berlin.inf.dpp.ui.wizards;

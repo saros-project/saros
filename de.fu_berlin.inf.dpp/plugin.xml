@@ -10,24 +10,6 @@
             id="de.fu_berlin.inf.dpp.Developer"
             name="Saros Development">
       </category>
-      <view
-            category="de.fu_berlin.inf.dpp.Saros"
-            class="de.fu_berlin.inf.dpp.ui.RosterView"
-            icon="icons/view16/rostr_misc.png"
-            id="de.fu_berlin.inf.dpp.ui.RosterView"
-            name="Saros Buddies"/>
-      <view
-            category="de.fu_berlin.inf.dpp.Saros"
-            class="de.fu_berlin.inf.dpp.ui.SessionView"
-            icon="icons/transmit.png"
-            id="de.fu_berlin.inf.dpp.ui.SessionView"
-            name="Saros Session"/>
-      <view
-            category="de.fu_berlin.inf.dpp.Saros"
-            class="de.fu_berlin.inf.dpp.ui.chat.ChatView"
-            icon="icons/view16/chat_misc.png"
-            id="de.fu_berlin.inf.dpp.ui.chat.ChatView"
-            name="Saros Chat"/>
      <view
             category="de.fu_berlin.inf.dpp.Saros"
             class="de.fu_berlin.inf.dpp.videosharing.player.VideoPlayerView"
@@ -52,29 +34,6 @@
                relationship="right"
                relative="org.eclipse.ui.views.TaskList">
          </view>
-         <!-- TODO uncomment for GUI fallback
-         <view
-               id="de.fu_berlin.inf.dpp.ui.RosterView"
-               ratio="0.5"
-               relationship="right"
-               relative="org.eclipse.ui.views.TaskList">
-         </view>
-         <view
-               id="de.fu_berlin.inf.dpp.ui.RosterView"
-               relationship="stack"
-               relative="de.fu_berlin.inf.dpp.ui.sarosView.SarosView">
-         </view>
-         <view
-               id="de.fu_berlin.inf.dpp.ui.SessionView"
-               relationship="stack"
-               relative="de.fu_berlin.inf.dpp.ui.RosterView">
-         </view>
-         <view
-               id="de.fu_berlin.inf.dpp.ui.chat.ChatView"
-               relationship="stack"
-               relative="de.fu_berlin.inf.dpp.ui.RosterView">
-         </view> -->
-
       </perspectiveExtension>
    </extension>
    <extension
@@ -196,7 +155,7 @@
       <specification
             annotationType="de.fu_berlin.inf.dpp.annotations.viewport.1"
             colorPreferenceKey="de.fu_berlin.inf.dpp.annotations.viewport.color.1"
-            colorPreferenceValue="255,128,128"
+            colorPreferenceValue="141,206,231"
             contributesToHeader="true"
             highlightPreferenceKey="de.fu_berlin.inf.dpp.annotations.viewport.highlight.1"
             highlightPreferenceValue="false"
@@ -213,7 +172,7 @@
       <specification
             annotationType="de.fu_berlin.inf.dpp.annotations.viewport.2"
             colorPreferenceKey="de.fu_berlin.inf.dpp.annotations.viewport.color.2"
-            colorPreferenceValue="128,255,128"
+            colorPreferenceValue="191,187,130"
             contributesToHeader="true"
             highlightPreferenceKey="de.fu_berlin.inf.dpp.annotations.viewport.highlight.2"
             highlightPreferenceValue="false"
@@ -230,7 +189,7 @@
       <specification
             annotationType="de.fu_berlin.inf.dpp.annotations.viewport.3"
             colorPreferenceKey="de.fu_berlin.inf.dpp.annotations.viewport.color.3"
-            colorPreferenceValue="128,128,255"
+            colorPreferenceValue="186,220,81"
             contributesToHeader="true"
             highlightPreferenceKey="de.fu_berlin.inf.dpp.annotations.viewport.highlight.3"
             highlightPreferenceValue="false"
@@ -247,7 +206,7 @@
       <specification
             annotationType="de.fu_berlin.inf.dpp.annotations.viewport.4"
             colorPreferenceKey="de.fu_berlin.inf.dpp.annotations.viewport.color.4"
-            colorPreferenceValue="255,255,128"
+            colorPreferenceValue="237,237,169"
             contributesToHeader="true"
             highlightPreferenceKey="de.fu_berlin.inf.dpp.annotations.viewport.highlight.4"
             highlightPreferenceValue="false"
@@ -264,7 +223,7 @@
       <specification
             annotationType="de.fu_berlin.inf.dpp.annotations.viewport.5"
             colorPreferenceKey="de.fu_berlin.inf.dpp.annotations.viewport.color.5"
-            colorPreferenceValue="128,255,255"
+            colorPreferenceValue="137,180,178"
             contributesToHeader="true"
             highlightPreferenceKey="de.fu_berlin.inf.dpp.annotations.viewport.highlight.5"
             highlightPreferenceValue="false"
@@ -287,7 +246,7 @@
             textPreferenceKey="de.fu_berlin.inf.dpp.annotations.contribution.text"
             textStylePreferenceKey="de.fu_berlin.inf.dpp.annotations.contribution.textstyle"
             verticalRulerPreferenceKey="de.fu_berlin.inf.dpp.annotations.contribution.ruler"
-            colorPreferenceValue="211,224,234"
+            colorPreferenceValue="128,128,128"
             contributesToHeader="false"
             highlightPreferenceValue="true"
             includeOnPreferencePage="true"
@@ -306,7 +265,7 @@
             textPreferenceKey="de.fu_berlin.inf.dpp.annotations.contribution.text.1"
             textStylePreferenceKey="de.fu_berlin.inf.dpp.annotations.contribution.textstyle.1"
             verticalRulerPreferenceKey="de.fu_berlin.inf.dpp.annotations.contribution.ruler.1"
-            colorPreferenceValue="255,200,200"
+            colorPreferenceValue="141,206,231"
             contributesToHeader="false"
             highlightPreferenceValue="true"
             includeOnPreferencePage="true"
@@ -324,7 +283,7 @@
             textPreferenceKey="de.fu_berlin.inf.dpp.annotations.contribution.text.2"
             textStylePreferenceKey="de.fu_berlin.inf.dpp.annotations.contribution.textstyle.2"
             verticalRulerPreferenceKey="de.fu_berlin.inf.dpp.annotations.contribution.ruler.2"
-            colorPreferenceValue="200,255,200"
+            colorPreferenceValue="191,187,130"
             contributesToHeader="false"
             highlightPreferenceValue="true"
             includeOnPreferencePage="true"
@@ -342,7 +301,7 @@
             textPreferenceKey="de.fu_berlin.inf.dpp.annotations.contribution.text.3"
             textStylePreferenceKey="de.fu_berlin.inf.dpp.annotations.contribution.textstyle.3"
             verticalRulerPreferenceKey="de.fu_berlin.inf.dpp.annotations.contribution.ruler.3"
-            colorPreferenceValue="200,200,255"
+            colorPreferenceValue="186,220,81"
             contributesToHeader="false"
             highlightPreferenceValue="true"
             includeOnPreferencePage="true"
@@ -360,7 +319,7 @@
             textPreferenceKey="de.fu_berlin.inf.dpp.annotations.contribution.text.4"
             textStylePreferenceKey="de.fu_berlin.inf.dpp.annotations.contribution.textstyle.4"
             verticalRulerPreferenceKey="de.fu_berlin.inf.dpp.annotations.contribution.ruler.4"
-            colorPreferenceValue="255,255,200"
+            colorPreferenceValue="237,237,169"
             contributesToHeader="false"
             highlightPreferenceValue="true"
             includeOnPreferencePage="true"
@@ -378,7 +337,7 @@
             textPreferenceKey="de.fu_berlin.inf.dpp.annotations.contribution.text.5"
             textStylePreferenceKey="de.fu_berlin.inf.dpp.annotations.contribution.textstyle.5"
             verticalRulerPreferenceKey="de.fu_berlin.inf.dpp.annotations.contribution.ruler.5"
-            colorPreferenceValue="200,255,255"
+            colorPreferenceValue="137,180,178"
             contributesToHeader="false"
             highlightPreferenceValue="true"
             includeOnPreferencePage="true"
@@ -392,7 +351,7 @@
       <specification
             annotationType="de.fu_berlin.inf.dpp.annotations.selection.1"
             colorPreferenceKey="de.fu_berlin.inf.dpp.annotations.selection.color.1"
-            colorPreferenceValue="255,128,128"
+            colorPreferenceValue="141,206,231"
             contributesToHeader="false"
             highlightPreferenceKey="de.fu_berlin.inf.dpp.annotations.selection.highlight.1"
             highlightPreferenceValue="true"
@@ -410,7 +369,7 @@
       <specification
             annotationType="de.fu_berlin.inf.dpp.annotations.selection.2"
             colorPreferenceKey="de.fu_berlin.inf.dpp.annotations.selection.color.2"
-            colorPreferenceValue="128,255,128"
+            colorPreferenceValue="191,187,130"
             contributesToHeader="false"
             highlightPreferenceKey="de.fu_berlin.inf.dpp.annotations.selection.highlight.2"
             highlightPreferenceValue="true"
@@ -428,7 +387,7 @@
       <specification
             annotationType="de.fu_berlin.inf.dpp.annotations.selection.3"
             colorPreferenceKey="de.fu_berlin.inf.dpp.annotations.selection.color.3"
-            colorPreferenceValue="128,128,255"
+            colorPreferenceValue="186,220,81"
             contributesToHeader="false"
             highlightPreferenceKey="de.fu_berlin.inf.dpp.annotations.selection.highlight.3"
             highlightPreferenceValue="true"
@@ -446,7 +405,7 @@
       <specification
             annotationType="de.fu_berlin.inf.dpp.annotations.selection.4"
             colorPreferenceKey="de.fu_berlin.inf.dpp.annotations.selection.color.4"
-            colorPreferenceValue="255,255,128"
+            colorPreferenceValue="237,237,169"
             contributesToHeader="false"
             highlightPreferenceKey="de.fu_berlin.inf.dpp.annotations.selection.highlight.4"
             highlightPreferenceValue="true"
@@ -464,7 +423,7 @@
       <specification
             annotationType="de.fu_berlin.inf.dpp.annotations.selection.5"
             colorPreferenceKey="de.fu_berlin.inf.dpp.annotations.selection.color.5"
-            colorPreferenceValue="128,255,255"
+            colorPreferenceValue="137,180,178"
             contributesToHeader="false"
             highlightPreferenceKey="de.fu_berlin.inf.dpp.annotations.selection.highlight.5"
             highlightPreferenceValue="true"
@@ -906,6 +865,68 @@
             allPopups="false"
             locationURI="popup:de.fu_berlin.inf.dpp.ui.sarosView.SarosView?after=additions">
          <command
+               commandId="de.fu_berlin.inf.dpp.ui.commands.ShareProject"
+               disabledIcon="icons/dlcl16/spacer.png"
+               icon="icons/elcl16/project_share_tsk.png"
+               style="push">
+            <visibleWhen
+                  checkEnabled="false">
+               <and>
+                  <reference
+                        definitionId="de.fu_berlin.inf.dpp.ui.definitions.isConnected">
+                  </reference>
+                  <not>
+                     <reference
+                           definitionId="de.fu_berlin.inf.dpp.ui.definitions.isSarosSessionRunning">
+                     </reference>
+                  </not>
+                  <reference
+                        definitionId="de.fu_berlin.inf.dpp.ui.definitions.sessionHeadlineSelected">
+                  </reference>
+               </and>
+            </visibleWhen>
+         </command>
+         <command
+               commandId="de.fu_berlin.inf.dpp.ui.commands.Empty"
+               disabledIcon="icons/dlcl16/project_share_tsk.png"
+               icon="icons/elcl16/project_share_tsk.png"
+               label="Share Projects... (Not Connected)"
+               style="push">
+            <visibleWhen
+                  checkEnabled="false">
+               <and>
+                  <not>
+                     <reference
+                           definitionId="de.fu_berlin.inf.dpp.ui.definitions.isConnected">
+                     </reference>
+                  </not>
+                  <reference
+                        definitionId="de.fu_berlin.inf.dpp.ui.definitions.isSarosSessionRunning">
+                  </reference>
+               </and>
+            </visibleWhen>
+         </command>
+         <command
+               commandId="de.fu_berlin.inf.dpp.ui.commands.SharedProjectAddProjects"
+               disabledIcon="icons/dlcl16/project_share_add_projects_tsk.png"
+               icon="icons/elcl16/project_share_add_projects_tsk.png"
+               style="push">
+            <visibleWhen
+                  checkEnabled="false">
+               <and>
+                  <reference
+                        definitionId="de.fu_berlin.inf.dpp.ui.definitions.isConnected">
+                  </reference>
+                  <reference
+                        definitionId="de.fu_berlin.inf.dpp.ui.definitions.isSarosSessionRunning">
+                  </reference>
+                  <reference
+                        definitionId="de.fu_berlin.inf.dpp.ui.definitions.sessionHeadlineSelected">
+                  </reference>
+               </and>
+            </visibleWhen>
+         </command>
+         <command
                commandId="de.fu_berlin.inf.dpp.ui.commands.AddBuddy"
                disabledIcon="icons/dlcl16/buddy_add_tsk.png"
                icon="icons/elcl16/buddy_add_tsk.png"
@@ -913,11 +934,76 @@
             <visibleWhen
                   checkEnabled="false">
                <and>
+                  <reference
+                        definitionId="de.fu_berlin.inf.dpp.ui.definitions.isConnected">
+                  </reference>
                   <not>
                      <reference
                            definitionId="de.fu_berlin.inf.dpp.ui.definitions.buddiesSelected">
                      </reference>
                   </not>
+                  <not>
+                     <reference
+                           definitionId="de.fu_berlin.inf.dpp.ui.definitions.participantsSelected">
+                     </reference>
+                  </not>
+                  <not>
+                     <reference
+                           definitionId="de.fu_berlin.inf.dpp.ui.definitions.sessionHeadlineSelected">
+                     </reference>
+                  </not>
+               </and>
+            </visibleWhen>
+         </command>
+         <command
+               commandId="de.fu_berlin.inf.dpp.ui.commands.Empty"
+               disabledIcon="icons/dlcl16/buddy_add_tsk.png"
+               icon="icons/elcl16/buddy_add_tsk.png"
+               label="Add Buddy... (Not Connected)"
+               style="push">
+            <visibleWhen
+                  checkEnabled="false">
+               <and>
+                  <not>
+                     <reference
+                           definitionId="de.fu_berlin.inf.dpp.ui.definitions.isConnected">
+                     </reference>
+                  </not>
+                  <not>
+                     <reference
+                           definitionId="de.fu_berlin.inf.dpp.ui.definitions.buddiesSelected">
+                     </reference>
+                  </not>
+                  <not>
+                     <reference
+                           definitionId="de.fu_berlin.inf.dpp.ui.definitions.participantsSelected">
+                     </reference>
+                  </not>
+                  <not>
+                     <reference
+                           definitionId="de.fu_berlin.inf.dpp.ui.definitions.sessionHeadlineSelected">
+                     </reference>
+                  </not>
+               </and>
+            </visibleWhen>
+         </command>
+         <command
+               commandId="de.fu_berlin.inf.dpp.ui.commands.SharedProjectAddBuddies"
+               disabledIcon="icons/dlcl16/project_share_add_buddies_tsk.png"
+               icon="icons/elcl16/project_share_add_buddies_tsk.png"
+               style="push">
+            <visibleWhen
+                  checkEnabled="false">
+               <and>
+                  <reference
+                        definitionId="de.fu_berlin.inf.dpp.ui.definitions.isConnected">
+                  </reference>
+                  <reference
+                        definitionId="de.fu_berlin.inf.dpp.ui.definitions.isSarosSessionRunning">
+                  </reference>
+                  <reference
+                        definitionId="de.fu_berlin.inf.dpp.ui.definitions.sessionHeadlineSelected">
+                  </reference>
                </and>
             </visibleWhen>
          </command>
@@ -1322,6 +1408,99 @@
             </iterate>
          </with>
       </definition>
+      <definition
+            id="de.fu_berlin.inf.dpp.ui.definitions.isParticipant">
+         <adapt
+               type="de.fu_berlin.inf.dpp.User">
+         </adapt>
+      </definition>
+      <definition
+            id="de.fu_berlin.inf.dpp.ui.definitions.singleParticipantSelected">
+         <and>
+            <reference
+                  definitionId="de.fu_berlin.inf.dpp.ui.definitions.participantsSelected">
+            </reference>
+            <with
+                  variable="selection">
+               <count
+                     value="1">
+               </count>
+            </with>
+         </and>
+      </definition>
+      <definition
+            id="de.fu_berlin.inf.dpp.ui.definitions.participantsSelected">
+         <with
+               variable="selection">
+            <iterate
+                  ifEmpty="false"
+                  operator="and">
+               <reference
+                     definitionId="de.fu_berlin.inf.dpp.ui.definitions.isParticipant">
+               </reference>
+            </iterate>
+         </with>
+      </definition>
+      <definition
+            id="de.fu_berlin.inf.dpp.ui.definitions.participantIsRemote">
+         <adapt
+               type="de.fu_berlin.inf.dpp.User">
+            <test
+                  property="de.fu_berlin.inf.dpp.isRemote">
+            </test>
+         </adapt>
+      </definition>
+      <definition
+            id="de.fu_berlin.inf.dpp.ui.definitions.participantsHasWriteAccess">
+         <adapt
+               type="de.fu_berlin.inf.dpp.User">
+            <test
+                  property="de.fu_berlin.inf.dpp.hasWriteAccess">
+            </test>
+         </adapt>
+      </definition>
+      <definition
+            id="de.fu_berlin.inf.dpp.ui.definitions.containsParticipantsWithoutWriteAccess">
+         <with
+               variable="selection">
+            <iterate
+                  ifEmpty="false"
+                  operator="or">
+               <reference
+                     definitionId="de.fu_berlin.inf.dpp.ui.definitions.participantsHasWriteAccess">
+               </reference>
+            </iterate>
+         </with>
+      </definition>
+      <definition
+            id="de.fu_berlin.inf.dpp.ui.definitions.containsRemoteParticipants">
+         <with
+               variable="selection">
+            <iterate
+                  ifEmpty="false"
+                  operator="or">
+               <reference
+                     definitionId="de.fu_berlin.inf.dpp.ui.definitions.participantIsRemote">
+               </reference>
+            </iterate>
+         </with>
+      </definition>
+      <definition
+            id="de.fu_berlin.inf.dpp.ui.definitions.sessionHeadlineSelected">
+         <with
+               variable="selection">
+            <count
+                  value="1">
+            </count>
+            <iterate
+                  ifEmpty="false"
+                  operator="or">
+               <instanceof
+                     value="de.fu_berlin.inf.dpp.ui.model.rosterSession.SessionHeaderElement">
+               </instanceof>
+            </iterate>
+         </with>
+      </definition>
    </extension>
    <extension
          point="org.eclipse.ui.services">
@@ -1366,6 +1545,13 @@
             properties="isInSarosSession"
             type="de.fu_berlin.inf.dpp.net.JID">
       </propertyTester>
+      <propertyTester
+            class="de.fu_berlin.inf.dpp.propertyTesters.ParticipantPropertyTester"
+            id="de.fu_berlin.inf.dpp.propertyTesters.ParticipantPropertyTester"
+            namespace="de.fu_berlin.inf.dpp"
+            properties="hasWriteAccess,isRemote"
+            type="de.fu_berlin.inf.dpp.User">
+      </propertyTester>
    </extension>
    <extension
          point="org.eclipse.core.runtime.adapters">
@@ -1384,6 +1570,13 @@
          </adapter>
          <adapter
                type="de.fu_berlin.inf.dpp.net.JID">
+         </adapter>
+      </factory>
+      <factory
+            adaptableType="de.fu_berlin.inf.dpp.ui.model.rosterSession.UserElement"
+            class="de.fu_berlin.inf.dpp.ui.model.rosterSession.RosterSessionAdapterFactory">
+         <adapter
+               type="de.fu_berlin.inf.dpp.User">
          </adapter>
       </factory>
    </extension>

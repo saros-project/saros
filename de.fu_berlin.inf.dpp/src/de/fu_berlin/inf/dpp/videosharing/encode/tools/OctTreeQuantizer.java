@@ -75,10 +75,10 @@ public class OctTreeQuantizer implements Quantizer {
     private int reduceColors;
     private int maximumColors;
     private int colors = 0;
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings("rawtypes")
     private Vector[] colorList;
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings("rawtypes")
     public OctTreeQuantizer() {
         setup(256);
         colorList = new Vector[MAX_LEVEL + 1];
@@ -212,7 +212,7 @@ public class OctTreeQuantizer implements Quantizer {
         LOGGER.debug("insertColor failed");
     }
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings("rawtypes")
     private void reduceTree(int numColors) {
         for (int level = MAX_LEVEL - 1; level >= 0; level--) {
             Vector v = colorList[level];

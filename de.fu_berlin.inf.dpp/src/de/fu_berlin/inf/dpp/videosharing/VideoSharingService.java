@@ -19,8 +19,6 @@
  */
 package de.fu_berlin.inf.dpp.videosharing;
 
-import org.apache.log4j.Logger;
-
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.net.internal.StreamService;
@@ -32,8 +30,6 @@ import de.fu_berlin.inf.dpp.util.Utils;
  */
 @Component(module = "net")
 public class VideoSharingService extends StreamService {
-
-    private static Logger log = Logger.getLogger(VideoSharingService.class);
 
     protected VideoSharing videoSharing;
 

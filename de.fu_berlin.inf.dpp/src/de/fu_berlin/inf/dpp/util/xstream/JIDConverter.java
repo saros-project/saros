@@ -7,7 +7,7 @@ import de.fu_berlin.inf.dpp.util.Utils;
 
 public class JIDConverter extends AbstractSingleValueConverter {
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({ "rawtypes" })
     @Override
     public boolean canConvert(Class type) {
         return type.equals(JID.class);

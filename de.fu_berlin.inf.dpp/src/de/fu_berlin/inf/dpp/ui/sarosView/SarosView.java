@@ -21,42 +21,41 @@ package de.fu_berlin.inf.dpp.ui.sarosView;
  */
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
+import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
+import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
-import org.eclipse.swt.custom.ScrolledComposite;
-import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Event;
-import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
+import org.eclipse.ui.IActionBars;
+import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IWorkbenchActionConstants;
+import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.part.ViewPart;
-import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.packet.Presence;
 import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.SarosPluginContext;
+import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.annotations.Component;
-import de.fu_berlin.inf.dpp.net.ConnectionState;
-import de.fu_berlin.inf.dpp.net.IConnectionListener;
 import de.fu_berlin.inf.dpp.net.IRosterListener;
+import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.RosterAdapter;
 import de.fu_berlin.inf.dpp.net.RosterTracker;
-import de.fu_berlin.inf.dpp.net.internal.ConnectionTestManager;
-import de.fu_berlin.inf.dpp.net.internal.discoveryManager.DiscoveryManager;
 import de.fu_berlin.inf.dpp.project.SarosSessionManager;
 import de.fu_berlin.inf.dpp.ui.BalloonNotification;
 import de.fu_berlin.inf.dpp.ui.actions.ChangeColorAction;
@@ -72,7 +71,6 @@ import de.fu_berlin.inf.dpp.ui.actions.JumpToUserWithWriteAccessPositionAction;
 import de.fu_berlin.inf.dpp.ui.actions.LeaveSessionAction;
 import de.fu_berlin.inf.dpp.ui.actions.NewContactAction;
 import de.fu_berlin.inf.dpp.ui.actions.RenameContactAction;
-import de.fu_berlin.inf.dpp.ui.actions.RestrictInviteesToReadOnlyAccessAction;
 import de.fu_berlin.inf.dpp.ui.actions.RestrictToReadOnlyAccessAction;
 import de.fu_berlin.inf.dpp.ui.actions.SendFileAction;
 import de.fu_berlin.inf.dpp.ui.actions.SkypeAction;
@@ -82,9 +80,10 @@ import de.fu_berlin.inf.dpp.ui.actions.VoIPAction;
 import de.fu_berlin.inf.dpp.ui.sounds.SoundManager;
 import de.fu_berlin.inf.dpp.ui.sounds.SoundPlayer;
 import de.fu_berlin.inf.dpp.ui.util.LayoutUtils;
+import de.fu_berlin.inf.dpp.ui.util.selection.retriever.SelectionRetrieverFactory;
 import de.fu_berlin.inf.dpp.ui.widgets.ConnectionStateComposite;
 import de.fu_berlin.inf.dpp.ui.widgets.session.ChatRoomsComposite;
-import de.fu_berlin.inf.dpp.ui.widgets.session.RosterSessionComposite;
+import de.fu_berlin.inf.dpp.ui.widgets.viewer.rosterSession.BuddySessionDisplayComposite;
 import de.fu_berlin.inf.dpp.util.Utils;
 import de.fu_berlin.inf.dpp.util.pico.ChildContainer;
 
@@ -99,39 +98,6 @@ public class SarosView extends ViewPart {
     private static final Logger log = Logger.getLogger(SarosView.class);
 
     public static final String ID = "de.fu_berlin.inf.dpp.ui.sarosView.SarosView";
-
-    protected Composite leftComposite;
-    protected RosterSessionComposite rosterSessionComposite;
-
-    /*
-     * Actions
-     */
-
-    protected RenameContactAction renameContactAction;
-    protected DeleteContactAction deleteContactAction;
-    protected ConnectionTestAction connectionTestAction;
-
-    @Inject
-    protected Saros saros;
-
-    @Inject
-    protected SarosSessionManager sessionManager;
-
-    @Inject
-    protected ConnectionTestManager connectionTestManager;
-
-    @Inject
-    protected RosterTracker rosterTracker;
-
-    @Inject
-    protected DiscoveryManager discoveryManager;
-
-    @Inject
-    protected ChildContainer container;
-
-    /**
-     * Listeners
-     */
 
     protected IRosterListener rosterListenerBuddys = new RosterAdapter() {
         /**
@@ -158,26 +124,66 @@ public class SarosView extends ViewPart {
         }
     };
 
-    protected final IConnectionListener connectionListener = new IConnectionListener() {
-
-        public void connectionStateChanged(XMPPConnection connection,
-            final ConnectionState newState) {
-
-            Utils.runSafeSWTAsync(log, new Runnable() {
-                public void run() {
-                    updateRenameContactActionEnablement();
-                    updateDeleteContactActionEnablement();
-                    updateTestActionEnablement();
-                }
-            });
+    protected IPartListener2 partListener = new IPartListener2() {
+        public void partInputChanged(IWorkbenchPartReference partRef) {
+            // do nothing
         }
 
+        public void partVisible(IWorkbenchPartReference partRef) {
+            // do nothing
+        }
+
+        public void partHidden(IWorkbenchPartReference partRef) {
+            // do nothing
+        }
+
+        public void partOpened(IWorkbenchPartReference partRef) {
+            // do nothing
+        }
+
+        public void partDeactivated(IWorkbenchPartReference partRef) {
+            if (buddySessionDisplayComposite != null
+                && !buddySessionDisplayComposite.isDisposed()) {
+                buddySessionDisplayComposite.getViewer().setSelection(
+                    new ISelection() {
+                        public boolean isEmpty() {
+                            return true;
+                        }
+                    });
+            }
+        }
+
+        public void partClosed(IWorkbenchPartReference partRef) {
+            getViewSite().getPage().removePartListener(partListener);
+        }
+
+        public void partBroughtToTop(IWorkbenchPartReference partRef) {
+            // do nothing
+        }
+
+        public void partActivated(IWorkbenchPartReference partRef) {
+            // do nothing
+        }
     };
+
+    protected Composite leftComposite;
+    protected BuddySessionDisplayComposite buddySessionDisplayComposite;
+
+    @Inject
+    protected Saros saros;
+
+    @Inject
+    protected SarosSessionManager sarosSessionManager;
+
+    @Inject
+    protected RosterTracker rosterTracker;
+
+    @Inject
+    protected ChildContainer container;
 
     public SarosView() {
         super();
         SarosPluginContext.initComponent(this);
-
     }
 
     @Override
@@ -192,32 +198,18 @@ public class SarosView extends ViewPart {
          */
         leftComposite = new Composite(baseSashForm, SWT.BORDER);
         leftComposite.setLayout(LayoutUtils.createGridLayout());
+        leftComposite.setBackground(Display.getCurrent().getSystemColor(
+            SWT.COLOR_WHITE));
 
         ConnectionStateComposite connectionStateComposite = new ConnectionStateComposite(
             leftComposite, SWT.NONE);
         connectionStateComposite.setLayoutData(LayoutUtils
             .createFillHGrabGridData());
 
-        final ScrolledComposite scrolledComposite = new ScrolledComposite(
-            leftComposite, SWT.H_SCROLL | SWT.V_SCROLL);
-        scrolledComposite.setLayoutData(LayoutUtils.createFillGridData());
-
-        this.rosterSessionComposite = new RosterSessionComposite(
-            scrolledComposite, SWT.NONE);
-
-        scrolledComposite.setContent(rosterSessionComposite);
-        scrolledComposite.addListener(SWT.Resize, new Listener() {
-            public void handleEvent(Event event) {
-                Rectangle clientArea = scrolledComposite.getClientArea();
-                int availableWidth = clientArea.width;
-
-                scrolledComposite.setMinHeight(rosterSessionComposite
-                    .computeSize(availableWidth, SWT.DEFAULT).y);
-            }
-        });
-
-        scrolledComposite.setExpandHorizontal(true);
-        scrolledComposite.setExpandVertical(true);
+        buddySessionDisplayComposite = new BuddySessionDisplayComposite(
+            leftComposite, SWT.V_SCROLL);
+        buddySessionDisplayComposite.setLayoutData(LayoutUtils
+            .createFillGridData());
 
         /*
          * RIGHT COLUMN
@@ -233,77 +225,147 @@ public class SarosView extends ViewPart {
          * should be implemented with commands and command handlers.
          */
 
-        container.addComponent(NewContactAction.class);
-        container.addComponent(ChangeXMPPAccountAction.class);
-        container.addComponent(IMBeepAction.class);
-        container.addComponent(VideoSharingAction.class);
-        container.addComponent(SendFileAction.class);
-        container.addComponent(VoIPAction.class);
-        container.addComponent(StoppedAction.class);
-        container.addComponent(ChangeColorAction.class);
-        container.addComponent(ConsistencyAction.class);
-        container.addComponent(GiveWriteAccessAction.class);
-        container.addComponent(FollowModeAction.class);
-        container.addComponent(FollowThisPersonAction.class);
-        container.addComponent(JumpToUserWithWriteAccessPositionAction.class);
-        container.addComponent(LeaveSessionAction.class);
-        container.addComponent(SessionViewTableViewer.class,
-            rosterSessionComposite.getSessionViewer());
-        container.addComponent(RestrictInviteesToReadOnlyAccessAction.class);
-        container.addComponent(RestrictToReadOnlyAccessAction.class);
-        container.addComponent(SessionContextMenu.class);
-        container.addComponent(SarosViewToolbar.class);
         container.addComponent(SarosView.class, this);
 
         // Make sure all components are registered
         container.getComponents(Object.class);
 
-        scrolledComposite.setMinSize(rosterSessionComposite.computeSize(
-            SWT.DEFAULT, SWT.DEFAULT));
+        /*
+         * Toolbar
+         */
+        IActionBars bars = this.getViewSite().getActionBars();
+        IToolBarManager toolBar = bars.getToolBarManager();
+        addToolBarItems(toolBar);
 
         /*
-         * Create Roster Actions
+         * Context Menu
          */
-        MenuManager menuMgr = new MenuManager("#PopupMenu");
-        menuMgr.setRemoveAllWhenShown(true);
-        this.renameContactAction = new RenameContactAction(saros);
-        this.deleteContactAction = new DeleteContactAction(sessionManager,
-            saros);
-        this.connectionTestAction = new ConnectionTestAction(saros,
-            connectionTestManager);
-        menuMgr.addMenuListener(new IMenuListener() {
-            public void menuAboutToShow(final IMenuManager manager) {
+        MenuManager menuManager = new MenuManager();
+        menuManager.setRemoveAllWhenShown(true);
+        addRosterMenuItems(menuManager);
+        addSessionMenuItems(menuManager);
 
-                manager.add(new SkypeAction());
-                manager.add(new Separator());
-                manager.add(SarosView.this.renameContactAction);
-                manager.add(SarosView.this.deleteContactAction);
-                manager.add(SarosView.this.connectionTestAction);
-                manager.add(new Separator(
-                    IWorkbenchActionConstants.MB_ADDITIONS));
-
-                updateRenameContactActionEnablement();
-                updateDeleteContactActionEnablement();
-                updateTestActionEnablement();
-            }
-        });
-
-        Viewer buddyViewer = this.rosterSessionComposite.getBuddyViewer();
-        final Menu menu = menuMgr.createContextMenu(buddyViewer.getControl());
-
-        buddyViewer.getControl().setMenu(menu);
-        getSite().registerContextMenu(menuMgr, buddyViewer);
-        getSite().setSelectionProvider(buddyViewer);
-
-        saros.addListener(connectionListener);
+        Viewer buddySessionViewer = buddySessionDisplayComposite.getViewer();
+        Menu menu = menuManager.createContextMenu(buddySessionViewer
+            .getControl());
+        buddySessionViewer.getControl().setMenu(menu);
+        getSite().registerContextMenu(menuManager, buddySessionViewer);
+        getSite().setSelectionProvider(buddySessionViewer);
 
         rosterTracker.addRosterListener(rosterListenerBuddys);
-
-        connectionListener.connectionStateChanged(saros.getConnection(),
-            saros.getConnectionState());
-
         rosterListenerBuddys.rosterChanged(saros.getRoster());
 
+        getViewSite().getPage().addPartListener(partListener);
+    }
+
+    protected void addToolBarItems(IToolBarManager toolBar) {
+        toolBar.add(new ChangeXMPPAccountAction());
+        toolBar.add(new NewContactAction());
+        toolBar.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
+        toolBar.add(new StoppedAction());
+        toolBar.add(new ConsistencyAction());
+        toolBar.add(new FollowModeAction());
+        toolBar.add(new IMBeepAction());
+        toolBar.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
+        toolBar.add(new LeaveSessionAction());
+    }
+
+    /**
+     * @param menuManager
+     */
+    protected void addRosterMenuItems(MenuManager menuManager) {
+        final SkypeAction skypeAction = new SkypeAction();
+        final RenameContactAction renameContactAction = new RenameContactAction();
+        final DeleteContactAction deleteContactAction = new DeleteContactAction();
+        final ConnectionTestAction connectionTestAction = new ConnectionTestAction();
+        menuManager.addMenuListener(new IMenuListener() {
+            public void menuAboutToShow(final IMenuManager manager) {
+                /*
+                 * Do not display the following actions if participants are
+                 * selected.
+                 */
+                List<User> participants = SelectionRetrieverFactory
+                    .getSelectionRetriever(User.class).getSelection();
+                if (participants.size() > 0)
+                    return;
+
+                /*
+                 * Do not display the following actions if no buddies are
+                 * selected.
+                 */
+                List<JID> buddies = SelectionRetrieverFactory
+                    .getSelectionRetriever(JID.class).getSelection();
+                if (buddies.size() == 0)
+                    return;
+
+                manager.add(skypeAction);
+                manager.add(new Separator());
+                manager.add(renameContactAction);
+                manager.add(deleteContactAction);
+                manager.add(connectionTestAction);
+                manager.add(new Separator(
+                    IWorkbenchActionConstants.MB_ADDITIONS));
+            }
+        });
+    }
+
+    /**
+     * @param menuManager
+     */
+    protected void addSessionMenuItems(MenuManager menuManager) {
+        final GiveWriteAccessAction giveWriteAccessAction = new GiveWriteAccessAction();
+        final RestrictToReadOnlyAccessAction restrictToReadOnlyAccessAction = new RestrictToReadOnlyAccessAction();
+        final FollowThisPersonAction followModeAction = new FollowThisPersonAction();
+        final JumpToUserWithWriteAccessPositionAction jumpToUserWithWriteAccessPositionAction = new JumpToUserWithWriteAccessPositionAction();
+        final SendFileAction sendFileAction = new SendFileAction();
+        final VideoSharingAction videoSharingAction = new VideoSharingAction();
+        final VoIPAction voipAction = new VoIPAction();
+        final ChangeColorAction changedColourAction = new ChangeColorAction();
+        menuManager.addMenuListener(new IMenuListener() {
+            public void menuAboutToShow(IMenuManager manager) {
+                /*
+                 * Do not display the following actions if no participants are
+                 * selected.
+                 */
+                List<User> participants = SelectionRetrieverFactory
+                    .getSelectionRetriever(User.class).getSelection();
+                if (participants.size() == 0)
+                    return;
+
+                /*
+                 * Do not display the following actions if non-participants are
+                 * selected.
+                 */
+                List<JID> buddies = SelectionRetrieverFactory
+                    .getSelectionRetriever(JID.class).getSelection();
+                if (buddies.size() > 0)
+                    return;
+
+                if (participants.size() == 1) {
+                    if (participants.get(0).isLocal()) {
+                        manager.add(changedColourAction);
+                    } else {
+                        if (sarosSessionManager.getSarosSession() != null
+                            && sarosSessionManager.getSarosSession().isHost()) {
+                            manager.add(giveWriteAccessAction);
+                            manager.add(restrictToReadOnlyAccessAction);
+                            manager.add(new Separator());
+                        }
+                        manager.add(followModeAction);
+                        manager.add(jumpToUserWithWriteAccessPositionAction);
+                        manager.add(new Separator());
+                        manager.add(sendFileAction);
+                        manager.add(videoSharingAction);
+                        manager.add(voipAction);
+                        manager.add(new Separator());
+                    }
+                }
+
+                // Other plug-ins can contribute their actions here
+                manager.add(new Separator(
+                    IWorkbenchActionConstants.MB_ADDITIONS));
+            }
+        });
     }
 
     @Override
@@ -311,7 +373,6 @@ public class SarosView extends ViewPart {
         super.dispose();
 
         rosterTracker.removeRosterListener(rosterListenerBuddys);
-        saros.removeListener(connectionListener);
 
         /*
          * Stop container and remove it from its parent.
@@ -321,35 +382,6 @@ public class SarosView extends ViewPart {
          * Unfortunately, child.getParent is immutable, so we have to ask Saros.
          */
         saros.removeChildContainer(container.getDelegate());
-
-    }
-
-    /**
-     * @swt Needs to called from an UI thread.
-     */
-    protected void updateRenameContactActionEnablement() {
-        boolean connected = saros.isConnected();
-
-        this.renameContactAction.setEnabled(connected);
-    }
-
-    /**
-     * @swt Needs to called from an UI thread.
-     */
-    protected void updateDeleteContactActionEnablement() {
-        boolean connected = saros.isConnected();
-
-        this.deleteContactAction.setEnabled(connected);
-    }
-
-    /**
-     * @swt Needs to called from an UI thread.
-     */
-    protected void updateTestActionEnablement() {
-        boolean connected = saros.isConnected();
-
-        this.connectionTestAction.setEnabled(connected);
-
     }
 
     public static void showNotification(final String title, final String text) {
