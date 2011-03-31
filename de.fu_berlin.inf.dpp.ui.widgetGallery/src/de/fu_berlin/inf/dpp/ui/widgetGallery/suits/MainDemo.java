@@ -10,6 +10,7 @@ import de.fu_berlin.inf.dpp.ui.widgetGallery.suits.decoration.DecorationDemoCont
 import de.fu_berlin.inf.dpp.ui.widgetGallery.suits.instruction.InstructionDemoContainer;
 import de.fu_berlin.inf.dpp.ui.widgetGallery.suits.project.ProjectDemoContainer;
 import de.fu_berlin.inf.dpp.ui.widgetGallery.suits.roster.RosterDemoContainer;
+import de.fu_berlin.inf.dpp.ui.widgetGallery.suits.rosterSession.RosterSessionDemoContainer;
 import de.fu_berlin.inf.dpp.ui.widgetGallery.suits.wizard.WizardDemoContainer;
 
 public class MainDemo extends DemoContainer {
@@ -31,7 +32,8 @@ public class MainDemo extends DemoContainer {
 		new InstructionDemoContainer(this, "Explanation");
 		new ChatDemoContainer(this, "Chat");
 		new RosterDemoContainer(this, "Roster");
+		open(new RosterSessionDemoContainer(this, "RosterSession"));
 		new ProjectDemoContainer(this, "Project");
-		open(new WizardDemoContainer(this, "Wizard"));
+		new WizardDemoContainer(this, "Wizard");
 	}
 }

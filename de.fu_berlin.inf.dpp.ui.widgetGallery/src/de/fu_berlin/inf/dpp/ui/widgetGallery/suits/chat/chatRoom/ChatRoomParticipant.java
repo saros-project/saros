@@ -10,11 +10,9 @@ import org.jivesoftware.smack.MessageListener;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
 
-import de.fu_berlin.inf.dpp.editor.annotations.SarosAnnotation;
 import de.fu_berlin.inf.dpp.ui.widgets.chatControl.ChatControl;
 import de.fu_berlin.inf.dpp.ui.widgets.chatControl.events.ChatControlAdapter;
 import de.fu_berlin.inf.dpp.ui.widgets.chatControl.events.MessageEnteredEvent;
-import de.fu_berlin.inf.dpp.util.ColorUtils;
 
 public class ChatRoomParticipant {
 	protected static String server = "jabber.ccc.de";
@@ -24,8 +22,8 @@ public class ChatRoomParticipant {
 			"dddfffggg", "dddfffggg" };
 	protected static String[] nicknames = new String[] { "Bjšrn", "Maria",
 			"Lin" };
-	protected static RGB[] colors = new RGB[] { new RGB(255, 128, 128),
-			new RGB(128, 255, 128), new RGB(255, 255, 128) };
+	protected static RGB[] colors = new RGB[] { new RGB(141, 206, 231),
+			new RGB(191, 187, 130), new RGB(186, 220, 81) };
 
 	protected XMPPConnection connection;
 	protected Chat[] chats;
@@ -57,9 +55,7 @@ public class ChatRoomParticipant {
 
 			String nickname = nicknames[i];
 
-			Color color = new Color(parent.getDisplay(),
-					ColorUtils.scaleColorBy(colors[i],
-							SarosAnnotation.LIGHT_COLOR_SCALE));
+			Color color = new Color(parent.getDisplay(), colors[i]);
 
 			chatRoomParticipants[i] = new ChatRoomParticipant(connection,
 					username, password, chatControl, nickname, color);

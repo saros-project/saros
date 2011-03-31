@@ -12,7 +12,6 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 
-import de.fu_berlin.inf.dpp.editor.annotations.SarosAnnotation;
 import de.fu_berlin.inf.dpp.ui.util.LayoutUtils;
 import de.fu_berlin.inf.dpp.ui.widgetGallery.demos.Demo;
 import de.fu_berlin.inf.dpp.ui.widgetGallery.demos.DemoContainer;
@@ -23,7 +22,6 @@ import de.fu_berlin.inf.dpp.ui.widgets.chatControl.events.IChatControlListener;
 import de.fu_berlin.inf.dpp.ui.widgets.chatControl.events.MessageEnteredEvent;
 import de.fu_berlin.inf.dpp.ui.widgets.explanation.SimpleExplanationComposite.SimpleExplanation;
 import de.fu_berlin.inf.dpp.ui.widgets.explanation.explanatory.SimpleExplanatoryComposite;
-import de.fu_berlin.inf.dpp.util.ColorUtils;
 
 public class ChatControlDemo extends Demo {
 	public String user1;
@@ -44,19 +42,14 @@ public class ChatControlDemo extends Demo {
 	}
 
 	public void createPartControls(Composite parent) {
-		Color red = new Color(parent.getDisplay(), 255, 128, 128);
-		Color lightRed = ColorUtils.scaleColorBy(red,
-				SarosAnnotation.LIGHT_COLOR_SCALE);
-
-		Color green = new Color(Display.getDefault(), 128, 255, 128);
-		Color lightGreen = ColorUtils.scaleColorBy(green,
-				SarosAnnotation.LIGHT_COLOR_SCALE);
+		Color red = new Color(parent.getDisplay(), 141, 206, 231);
+		Color green = new Color(Display.getDefault(), 191, 187, 130);
 
 		user1 = "bkahlert@saros-con.imp.fu-berlin.de/Saros";
-		user1_color = lightRed;
+		user1_color = red;
 
 		user2 = "Maria Spiering";
-		user2_color = lightGreen;
+		user2_color = green;
 
 		Composite root = new Composite(parent, SWT.NONE);
 		root.setLayout(LayoutUtils.createGridLayout());
