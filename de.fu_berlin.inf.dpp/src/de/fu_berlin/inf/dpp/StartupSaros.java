@@ -32,135 +32,115 @@ import de.fu_berlin.inf.dpp.util.Utils;
  * <br>
  * Checks whether the release number changed.
  * 
- * @author Lisa Dohrmann, Sandor Sz√ºcs
+ * @author Lisa Dohrmann, Sandor Szücs
  */
 @Component(module = "integration")
 public class StartupSaros implements IStartup {
 
-    private static final Logger log = Logger.getLogger(StartupSaros.class);
+	private static final Logger log = Logger.getLogger(StartupSaros.class);
 
-    @Inject
-    protected Saros saros;
+	@Inject
+	protected Saros saros;
 
-    @Inject
-    protected SarosUI sarosUI;
+	@Inject
+	protected SarosUI sarosUI;
 
-    @Inject
-    protected StatisticManager statisticManager;
+	@Inject
+	protected StatisticManager statisticManager;
 
-    @Inject
-    protected ErrorLogManager errorLogManager;
+	@Inject
+	protected ErrorLogManager errorLogManager;
 
-    @Inject
-    protected SarosSessionManager sessionManager;
+	@Inject
+	protected SarosSessionManager sessionManager;
 
-    @Inject
-    protected DataTransferManager dataTransferManager;
+	@Inject
+	protected DataTransferManager dataTransferManager;
 
-    @Inject
-    protected PreferenceUtils preferenceUtils;
+	@Inject
+	protected PreferenceUtils preferenceUtils;
 
-    @Inject
-    protected EditorManager editorManager;
+	@Inject
+	protected EditorManager editorManager;
 
-    @Inject
-    protected XMPPAccountStore xmppAccountStore;
+	@Inject
+	protected XMPPAccountStore xmppAccountStore;
 
-    @Inject
-    protected FeedbackManager feedbackManager;
+	@Inject
+	protected FeedbackManager feedbackManager;
 
-    public StartupSaros() {
-        SarosPluginContext.reinject(this);
-    }
+	public StartupSaros() {
+		SarosPluginContext.reinject(this);
+	}
 
-    public void earlyStartup() {
-        String currentVersion = saros.getVersion();
-        String lastVersion = saros.getConfigPrefs().get(
-            PreferenceConstants.SAROS_VERSION, "unknown");
+	public void earlyStartup() {
+		String currentVersion = saros.getVersion();
+		String lastVersion = saros.getConfigPrefs().get(
+				PreferenceConstants.SAROS_VERSION, "unknown");
 
-        String portNumber = System.getProperty("de.fu_berlin.inf.dpp.testmode");
-        String sleepTime = System.getProperty("de.fu_berlin.inf.dpp.sleepTime");
-        log.debug("de.fu_berlin.inf.dpp.testmode=" + portNumber);
+		String portNumber = System.getProperty("de.fu_berlin.inf.dpp.testmode");
+		String sleepTime = System.getProperty("de.fu_berlin.inf.dpp.sleepTime");
+		log.debug("de.fu_berlin.inf.dpp.testmode=" + portNumber);
 
-        boolean testmode = portNumber != null;
+		boolean testmode = portNumber != null;
 
-        if (testmode) {
-            int port = Integer.parseInt(portNumber);
-            int time = Integer.parseInt(sleepTime);
-            log.info("entered testmode, start RMI bot listen on port " + port);
-            log.info("sleep time: " + sleepTime);
-            startRmiBot(port, time);
-        }
+		if (testmode) {
+			int port = Integer.parseInt(portNumber);
+			int time = Integer.parseInt(sleepTime);
+			log.info("entered testmode, start RMI bot listen on port " + port);
+			log.info("sleep time: " + sleepTime);
+			startRmiBot(port, time);
+		}
 
-        boolean assertEnabled = false;
+		boolean assertEnabled = false;
 
-        // Side-effect-full assert to set assertEnabled to true if -ea
-        assert true == (assertEnabled = true);
+		// Side-effect-full assert to set assertEnabled to true if -ea
+		assert true == (assertEnabled = true);
 
-        // only continue if version changed or if -ea (for testing)
-        if (currentVersion.equals(lastVersion) || assertEnabled) {
-            return;
-        }
+		// only continue if version changed or if -ea (for testing)
+		if (currentVersion.equals(lastVersion) || assertEnabled) {
+			return;
+		}
 
-        saros.getConfigPrefs().put(PreferenceConstants.SAROS_VERSION,
-            currentVersion);
-        saros.saveConfigPrefs();
+		saros.getConfigPrefs().put(PreferenceConstants.SAROS_VERSION,
+				currentVersion);
+		saros.saveConfigPrefs();
 
-        /*
-         * TODO UI fallback showRoster();
-         */
-        showSarosView();
-        WizardUtils.openSarosConfigurationWizard();
-    }
+		showSarosView();
+		WizardUtils.openSarosConfigurationWizard();
+	}
 
-    protected void startRmiBot(final int port, final int time) {
-        log.info("start RMI Bot");
-        Utils.runSafeAsync("RmiSWTWorkbenchBot-", log, new Runnable() {
-            public void run() {
-                log.debug("Util.isSWT(): " + Utils.isSWT());
-                STFController.sleepTime = time;
-                try {
-                    STFController.exportedObjects(port, saros, sessionManager,
-                        dataTransferManager, editorManager, xmppAccountStore,
-                        feedbackManager);
-                    STFController.listRmiObjects();
-                } catch (RemoteException e) {
-                    log.error("remote:", e);
-                }
-            }
-        });
-    }
+	protected void startRmiBot(final int port, final int time) {
+		log.info("start RMI Bot");
+		Utils.runSafeAsync("RmiSWTWorkbenchBot-", log, new Runnable() {
+			public void run() {
+				log.debug("Util.isSWT(): " + Utils.isSWT());
+				STFController.sleepTime = time;
+				try {
+					STFController.exportedObjects(port, saros, sessionManager,
+							dataTransferManager, editorManager,
+							xmppAccountStore, feedbackManager);
+					STFController.listRmiObjects();
+				} catch (RemoteException e) {
+					log.error("remote:", e);
+				}
+			}
+		});
+	}
 
-    // TODO UI fallback
-    // protected void showRoster() {
-    // Utils.runSafeSWTSync(log, new Runnable() {
-    // public void run() {
-    // IIntroManager m = PlatformUI.getWorkbench().getIntroManager();
-    // IIntroPart i = m.getIntro();
-    // /*
-    // * if there is a welcome screen, don't activate the Roster
-    // * because it would be maximized and hiding the workbench window
-    // */
-    // if (i != null)
-    // return;
-    // sarosUI.activateRosterView();
-    // }
-    // });
-    // }
-
-    protected void showSarosView() {
-        Utils.runSafeSWTSync(log, new Runnable() {
-            public void run() {
-                IIntroManager m = PlatformUI.getWorkbench().getIntroManager();
-                IIntroPart i = m.getIntro();
-                /*
-                 * if there is a welcome screen, don't activate the SarosView
-                 * because it would be maximized and hiding the workbench window
-                 */
-                if (i != null)
-                    return;
-                sarosUI.openSarosView();
-            }
-        });
-    }
+	protected void showSarosView() {
+		Utils.runSafeSWTSync(log, new Runnable() {
+			public void run() {
+				IIntroManager m = PlatformUI.getWorkbench().getIntroManager();
+				IIntroPart i = m.getIntro();
+				/*
+				 * if there is a welcome screen, don't activate the SarosView
+				 * because it would be maximized and hiding the workbench window
+				 */
+				if (i != null)
+					return;
+				sarosUI.openSarosView();
+			}
+		});
+	}
 }
