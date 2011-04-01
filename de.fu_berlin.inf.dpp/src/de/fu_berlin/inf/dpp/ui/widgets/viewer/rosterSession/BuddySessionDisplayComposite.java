@@ -144,6 +144,7 @@ public class BuddySessionDisplayComposite extends ViewerComposite {
         public void followModeChanged(User user) {
             ViewerUtils.update(viewer,
                 new UserElement(user, saros.getRoster()), null);
+            ViewerUtils.refresh(viewer, true);
         }
 
         @Override
