@@ -447,7 +447,7 @@ public class SarosSessionManager implements IConnectionListener,
                     SarosView.showNotification("Canceled Invitation", peer
                         + " has canceled your Invitation.");
 
-                    return new Status(IStatus.ERROR, Saros.SAROS, peer
+                    return new Status(IStatus.CANCEL, Saros.SAROS, peer
                         + " has canceled your Invitation.");
 
                 } else {
@@ -684,10 +684,12 @@ public class SarosSessionManager implements IConnectionListener,
         }
     }
 
-    public void notifyPostOutgoingInvitationCompleted(SubMonitor subMonitor, User user) {
+    public void notifyPostOutgoingInvitationCompleted(SubMonitor subMonitor,
+        User user) {
         try {
             for (ISarosSessionListener sarosSessionListener : this.sarosSessionListeners) {
-                sarosSessionListener.postOutgoingInvitationCompleted(subMonitor, user);
+                sarosSessionListener.postOutgoingInvitationCompleted(
+                    subMonitor, user);
             }
         } catch (RuntimeException e) {
             log.error("Internal error in notifying listener"
