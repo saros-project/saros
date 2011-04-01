@@ -58,7 +58,6 @@ public class JIDComboUtils {
                 selectIndex = i;
         }
         jidCombo.select(selectIndex);
-        jidCombo.setSelection(new Point(0, 0));
     }
 
     /**
@@ -98,6 +97,10 @@ public class JIDComboUtils {
          * The modification of the list items resets the text. We make sure the
          * initially set value remains.
          */
-        jidCombo.setText(jid);
+        Point selection = jidCombo.getSelection();
+        if (!jidCombo.getText().equals(jid)) {
+            jidCombo.setText(jid);
+            jidCombo.setSelection(selection);
+        }
     }
 }

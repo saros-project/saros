@@ -12,6 +12,7 @@ import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.accountManagement.XMPPAccountStore;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
+import de.fu_berlin.inf.dpp.util.Utils;
 
 /**
  * Extend's an {@link JID} displaying {@link Combo}.<br/>
@@ -39,6 +40,12 @@ public class JIDCombo {
         fill();
         update();
         registerListeners();
+
+        Utils.runSafeSWTAsync(null, new Runnable() {
+            public void run() {
+                JIDCombo.this.control.setSelection(new Point(0, 0));
+            }
+        });
     }
 
     protected void fill() {
@@ -106,7 +113,6 @@ public class JIDCombo {
      * @see Combo#setFocus()
      */
     public boolean setFocus() {
-        this.control.setSelection(new Point(0, 0));
         return this.control.setFocus();
     }
 }
