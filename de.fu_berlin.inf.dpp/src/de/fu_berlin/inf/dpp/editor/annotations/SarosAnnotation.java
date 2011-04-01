@@ -11,7 +11,6 @@ import org.eclipse.ui.texteditor.AnnotationPreference;
 import org.eclipse.ui.texteditor.AnnotationPreferenceLookup;
 
 import de.fu_berlin.inf.dpp.User;
-import de.fu_berlin.inf.dpp.util.ColorUtils;
 import de.fu_berlin.inf.dpp.util.Utils;
 
 /**
@@ -20,12 +19,6 @@ import de.fu_berlin.inf.dpp.util.Utils;
  * Configuration of the annotations is done in the plugin-xml.
  */
 public abstract class SarosAnnotation extends Annotation {
-    /**
-     * The ratio by which a light color is lighter than it's corresponding
-     * normal color.
-     */
-    public static final float LIGHT_COLOR_SCALE = 1.22f;
-
     private static Logger log = Logger.getLogger(SarosAnnotation.class);
 
     /**
@@ -153,25 +146,5 @@ public abstract class SarosAnnotation extends Annotation {
         } catch (RuntimeException e) {
             return;
         }
-    }
-
-    /**
-     * Returns the light version of the color that corresponds to a user.
-     * <p>
-     * <b>Important notice:</b> Every returned color instance allocates OS
-     * resources that need to be disposed with {@link Color#dispose()}!
-     * 
-     * @param user
-     * @return the corresponding color
-     */
-    public static Color getLightUserColor(User user) {
-        Color userColor = SarosAnnotation.getUserColor(user);
-        Color userLightColor = ColorUtils.scaleColorBy(userColor,
-            LIGHT_COLOR_SCALE);
-
-        // The temporarily created color needs to be disposed
-        userColor.dispose();
-
-        return userLightColor;
     }
 }

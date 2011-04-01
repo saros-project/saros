@@ -24,7 +24,7 @@ public class ChatLineSeparator extends SimpleRoundedComposite {
 
     public ChatLineSeparator(Composite parent, User user, Date date) {
         this(parent, user.getHumanReadableName(), SarosAnnotation
-            .getLightUserColor(user), date);
+            .getUserColor(user), date);
     }
 
     public ChatLineSeparator(Composite parent, String username, Color color,

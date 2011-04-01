@@ -1,9 +1,14 @@
 package de.fu_berlin.inf.dpp.ui.actions;
 
+import java.util.List;
+
 import org.apache.log4j.Logger;
-import org.eclipse.jface.viewers.ISelectionProvider;
-import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.ui.actions.SelectionProviderAction;
+import org.eclipse.jface.action.Action;
+import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.ui.ISelectionListener;
+import org.eclipse.ui.IWorkbenchPart;
+import org.eclipse.ui.PlatformUI;
+import org.picocontainer.Disposable;
 import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.SarosPluginContext;
@@ -18,15 +23,15 @@ import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
 import de.fu_berlin.inf.dpp.project.SarosSessionManager;
 import de.fu_berlin.inf.dpp.ui.ImageManager;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
+import de.fu_berlin.inf.dpp.ui.util.selection.SelectionUtils;
+import de.fu_berlin.inf.dpp.ui.util.selection.retriever.SelectionRetrieverFactory;
 import de.fu_berlin.inf.dpp.util.Utils;
 
 @Component(module = "action")
-public class GiveWriteAccessAction extends SelectionProviderAction {
+public class GiveWriteAccessAction extends Action implements Disposable {
 
     private static final Logger log = Logger
         .getLogger(GiveWriteAccessAction.class.getName());
-
-    protected User selectedUser;
 
     @Inject
     protected SarosUI sarosUI;
@@ -51,14 +56,19 @@ public class GiveWriteAccessAction extends SelectionProviderAction {
             oldSarosSession.removeListener(projectListener);
             updateEnablement();
         }
+    };
 
+    protected ISelectionListener selectionListener = new ISelectionListener() {
+        public void selectionChanged(IWorkbenchPart part, ISelection selection) {
+            updateEnablement();
+        }
     };
 
     @Inject
     protected SarosSessionManager sessionManager;
 
-    public GiveWriteAccessAction(ISelectionProvider provider) {
-        super(provider, "Grant write access");
+    public GiveWriteAccessAction() {
+        super("Grant write access");
         setImageDescriptor(ImageManager
             .getImageDescriptor("icons/elcl16/grantwriteaccess.png"));
         setToolTipText("Grant write access to this buddy");
@@ -75,35 +85,51 @@ public class GiveWriteAccessAction extends SelectionProviderAction {
             sessionListener.sessionStarted(sessionManager.getSarosSession());
         }
         sessionManager.addSarosSessionListener(sessionListener);
+        SelectionUtils.getSelectionService().addSelectionListener(
+            selectionListener);
         updateEnablement();
     }
 
-    /**
-     * @review runSafe OK
-     */
     @Override
     public void run() {
         Utils.runSafeSync(log, new Runnable() {
             public void run() {
-                sarosUI.performPermissionChange(
-                    GiveWriteAccessAction.this.selectedUser,
-                    Permission.WRITE_ACCESS);
+                List<User> participants = SelectionRetrieverFactory
+                    .getSelectionRetriever(User.class).getSelection();
+                if (participants.size() == 1) {
+                    if (!participants.get(0).hasWriteAccess()) {
+                        sarosUI.performPermissionChange(participants.get(0),
+                            Permission.WRITE_ACCESS);
+                        updateEnablement();
+                    } else {
+                        log.warn("Participant has already write access: "
+                            + participants.get(0));
+                    }
+                } else {
+                    log.warn("More than one participant selected.");
+                }
             }
         });
     }
 
-    @Override
-    public void selectionChanged(IStructuredSelection selection) {
-        this.selectedUser = (selection.size() == 1) ? (User) selection
-            .getFirstElement() : null;
-        updateEnablement();
+    protected void updateEnablement() {
+        try {
+            List<User> participants = SelectionRetrieverFactory
+                .getSelectionRetriever(User.class).getSelection();
+            setEnabled(sessionManager.getSarosSession() != null
+                && participants.size() == 1
+                && participants.get(0).hasReadOnlyAccess());
+        } catch (NullPointerException e) {
+            this.setEnabled(false);
+        } catch (Exception e) {
+            if (!PlatformUI.getWorkbench().isClosing())
+                log.error("Unexcepted error while updating enablement", e);
+        }
     }
 
-    protected void updateEnablement() {
-        ISarosSession project = sessionManager.getSarosSession();
-
-        boolean enabled = ((project != null) && (this.selectedUser != null)
-            && project.isHost() && this.selectedUser.hasReadOnlyAccess());
-        setEnabled(enabled);
+    public void dispose() {
+        SelectionUtils.getSelectionService().removeSelectionListener(
+            selectionListener);
+        sessionManager.removeSarosSessionListener(sessionListener);
     }
 }

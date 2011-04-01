@@ -11,7 +11,7 @@ import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.SarosSessionManager;
 
 /**
- * Adds test to the {@link IProject}. <br/>
+ * Adds tests to the {@link IProject}. <br/>
  * Currently only tests whether given {@link IProject} is part of the
  * {@link ISarosSession}.
  */

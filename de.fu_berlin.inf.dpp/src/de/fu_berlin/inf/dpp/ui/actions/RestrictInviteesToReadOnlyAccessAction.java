@@ -109,23 +109,19 @@ public class RestrictInviteesToReadOnlyAccessAction extends Action {
     public void run() {
         Utils.runSafeSync(log, new Runnable() {
             public void run() {
-                runRestriction();
+                ISarosSession sarosSession = sessionManager.getSarosSession();
+                for (User user : sarosSession.getParticipants()) {
+                    if (user.hasWriteAccess() && !user.isHost()) {
+                        sarosUI.performPermissionChange(user,
+                            Permission.READONLY_ACCESS);
+                    } else if (user.isHost() && !user.hasWriteAccess()) {
+                        sarosUI.performPermissionChange(user,
+                            Permission.WRITE_ACCESS);
+                    }
+                }
+                updateEnablement();
             }
         });
-    }
-
-    public void runRestriction() {
-
-        ISarosSession sarosSession = sessionManager.getSarosSession();
-        for (User user : sarosSession.getParticipants()) {
-            if (user.hasWriteAccess() && !user.isHost()) {
-                sarosUI.performPermissionChange(user,
-                    Permission.READONLY_ACCESS);
-            } else if (user.isHost() && !user.hasWriteAccess()) {
-                sarosUI.performPermissionChange(user, Permission.WRITE_ACCESS);
-            }
-        }
-        updateEnablement();
     }
 
     protected void updateEnablement() {

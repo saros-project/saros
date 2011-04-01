@@ -54,6 +54,9 @@ public class ProjectShareBuddies extends ContributionItem {
 
     @Override
     public void fill(Menu menu, int index) {
+        if (!this.saros.isConnected())
+            return;
+
         final List<IProject> selectedProjects = SelectionRetrieverFactory
             .getSelectionRetriever(IProject.class).getSelection();
 

@@ -1,3 +1,43 @@
+11.3.25
+=======
+[FEATURE, UI] Introducing the new Saros View.
+[FEATURE] Adds a balloon pop-up message when inconsistencies are detected.
+[FEATURE, UI] Increase the duration of a balloon notification from 5s to 15s.
+[FEATURE, UI] New AddBuddyWizard
+[FEATURE, UI] New wizards and context menu
+[FEATURE] New colors (suitable for color blind people)
+[FEATURE] Skype entry in context menu is only active if the corresponding 
+	buddy has entered a Skype username
+
+[FIX] #2958669, receiving a project archive by IBB when being invited to 
+	a project now gives actual progress feedback of the running transfer. 
+	Also the IBB warning in the add project wizards warns the user about 
+	slowness including a bandwidth info (for non tiny projects)
+[FIX] #3110220: New registration window gives info on timeout for Jabber 
+	account registration
+[FIX] #3187098: We now interpret XMPP code 409 correctly.
+[FIX] It is now impossible to add 0 projects or buddies to the session
+[FIX] The shared project decorator is no longer delayed 
+[FIX] #3212089 (In the Create-Account-Waizard you could modify the 
+	explaination text below the server entry field.)
+[FIX] #3192349 User away image in session window was contrary to reality.
+[FIX] Pressing HOME in the JID input field in the AddBuddyWizard makes 
+	the cursor jump to the beginning of the text and then immediately 
+	select all the text. The text selection was not intended and removed.
+[FIX] #3267066 Stop cursor from reverting to first position on XMPP account 
+	combobox (Add new account dialog)
+[FIX] #3267122 Return status for a canceled invitation changed from ERROR 
+	to CANCEL. 
+[FIX] #3267087 Explicitly refresh a StructuredViewer after it has been 
+	updated via the ViewerUtils.
+
+[UI] Removal of the old Saros context menu item
+[UI] Added flashing warn logo for IBB connections in the AddProjectWizard, 
+	to be more noticeable
+[UI] Added "Add Projects..." and "Add Buddies..." to context menu of the 
+	session node in the merged roster/session view
+
+
 11.2.25
 =======
 [FEATURE] Disable broken partial sharing temporarily until its issues can be resolved.

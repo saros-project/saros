@@ -24,7 +24,7 @@ import org.eclipse.core.runtime.SubMonitor;
 import de.fu_berlin.inf.dpp.User;
 
 /**
- * A listener for SarosSession life-cycle related events.
+ * A listener for {@link ISarosSession} life-cycle related events.
  * 
  * @author rdjemili
  * @author bkahlert

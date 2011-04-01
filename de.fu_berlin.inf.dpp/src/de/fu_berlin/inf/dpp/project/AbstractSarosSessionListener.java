@@ -56,6 +56,5 @@ public class AbstractSarosSessionListener implements ISarosSessionListener {
 
     public void projectAdded(String projectID) {
         // do nothing
-
     }
 }

@@ -12,7 +12,7 @@ import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.SarosSessionManager;
 
 /**
- * Adds test to the {@link JID}. <br/>
+ * Adds tests to the {@link JID}. <br/>
  * Currently only tests whether given {@link JID} is part of the
  * {@link ISarosSession}.
  */

@@ -1,17 +1,25 @@
 package de.fu_berlin.inf.dpp.ui.actions;
 
+import java.util.List;
+
 import org.apache.log4j.Logger;
-import org.eclipse.jface.viewers.ISelectionProvider;
-import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.ui.actions.SelectionProviderAction;
+import org.eclipse.jface.action.Action;
+import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.ui.ISelectionListener;
+import org.eclipse.ui.IWorkbenchPart;
+import org.eclipse.ui.PlatformUI;
 import org.picocontainer.Disposable;
+import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.Saros;
+import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.project.SarosSessionManager;
 import de.fu_berlin.inf.dpp.ui.ImageManager;
+import de.fu_berlin.inf.dpp.ui.util.selection.SelectionUtils;
+import de.fu_berlin.inf.dpp.ui.util.selection.retriever.SelectionRetrieverFactory;
 import de.fu_berlin.inf.dpp.util.Utils;
 
 /**
@@ -19,37 +27,55 @@ import de.fu_berlin.inf.dpp.util.Utils;
  * user's one.
  */
 @Component(module = "action")
-public class JumpToUserWithWriteAccessPositionAction extends SelectionProviderAction
-    implements Disposable {
+public class JumpToUserWithWriteAccessPositionAction extends Action implements
+    Disposable {
 
     private static final Logger log = Logger
         .getLogger(JumpToUserWithWriteAccessPositionAction.class.getName());
 
+    protected ISelectionListener selectionListener = new ISelectionListener() {
+        public void selectionChanged(IWorkbenchPart part, ISelection selection) {
+            updateEnablement();
+        }
+    };
+
+    @Inject
     protected SarosSessionManager sessionManager;
 
+    @Inject
     protected EditorManager editorManager;
 
+    @Inject
     protected Saros saros;
 
-    public JumpToUserWithWriteAccessPositionAction(Saros saros,
-        SarosSessionManager sessionManager, EditorManager editorManager,
-        ISelectionProvider provider) {
-        super(provider, "Jump to position of selected buddy");
+    public JumpToUserWithWriteAccessPositionAction() {
+        super("Jump to position of selected buddy");
 
         setToolTipText("Jump to position of selected buddy");
-        setImageDescriptor(ImageManager.getImageDescriptor("icons/elcl16/jump.png"));
+        setImageDescriptor(ImageManager
+            .getImageDescriptor("icons/elcl16/jump.png"));
 
-        this.saros = saros;
-        this.editorManager = editorManager;
-        this.sessionManager = sessionManager;
+        SarosPluginContext.initComponent(this);
 
-        selectionChanged(getStructuredSelection());
+        SelectionUtils.getSelectionService().addSelectionListener(
+            selectionListener);
+        updateEnablement();
     }
 
-    @Override
-    public void selectionChanged(IStructuredSelection selection) {
-        setEnabled(sessionManager.getSarosSession() != null
-            && getSelectedUser() != null);
+    public void updateEnablement() {
+        try {
+            List<User> participants = SelectionRetrieverFactory
+                .getSelectionRetriever(User.class).getSelection();
+            setEnabled(sessionManager.getSarosSession() != null
+                && participants.size() == 1
+                && !participants.get(0).equals(
+                    sessionManager.getSarosSession().getLocalUser()));
+        } catch (NullPointerException e) {
+            this.setEnabled(false);
+        } catch (Exception e) {
+            if (!PlatformUI.getWorkbench().isClosing())
+                log.error("Unexcepted error while updating enablement", e);
+        }
     }
 
     /**
@@ -59,24 +85,19 @@ public class JumpToUserWithWriteAccessPositionAction extends SelectionProviderAc
     public void run() {
         Utils.runSafeSync(log, new Runnable() {
             public void run() {
-                User jumpTo = getSelectedUser();
-                assert jumpTo != null;
-                editorManager.jumpToUser(jumpTo);
+                List<User> participants = SelectionRetrieverFactory
+                    .getSelectionRetriever(User.class).getSelection();
+                if (participants.size() == 1) {
+                    editorManager.jumpToUser(participants.get(0));
+                } else {
+                    log.warn("More than one participant selected.");
+                }
             }
         });
     }
 
-    public User getSelectedUser() {
-        Object selected = getStructuredSelection().getFirstElement();
-
-        if (!(selected instanceof User))
-            return null;
-
-        User selectedUser = (User) selected;
-
-        if (selectedUser.isLocal())
-            return null;
-        else
-            return selectedUser;
+    public void dispose() {
+        SelectionUtils.getSelectionService().removeSelectionListener(
+            selectionListener);
     }
 }

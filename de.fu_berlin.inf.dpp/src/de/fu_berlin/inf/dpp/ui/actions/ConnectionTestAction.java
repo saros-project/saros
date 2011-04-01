@@ -35,11 +35,17 @@ import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.IWorkbenchPart;
+import org.eclipse.ui.PlatformUI;
 import org.jivesoftware.smack.RosterEntry;
+import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
+import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.Saros;
+import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
+import de.fu_berlin.inf.dpp.net.ConnectionState;
+import de.fu_berlin.inf.dpp.net.IConnectionListener;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.internal.ConnectionTestManager;
 import de.fu_berlin.inf.dpp.net.internal.ConnectionTestManager.TestResult;
@@ -58,27 +64,48 @@ public class ConnectionTestAction extends Action {
     private static final Logger log = Logger
         .getLogger(ConnectionTestAction.class);
 
+    protected IConnectionListener connectionListener = new IConnectionListener() {
+        public void connectionStateChanged(XMPPConnection connection,
+            final ConnectionState newState) {
+            updateEnablement();
+        }
+    };
+
+    protected ISelectionListener selectionListener = new ISelectionListener() {
+        public void selectionChanged(IWorkbenchPart part, ISelection selection) {
+            updateEnablement();
+        }
+    };
+
+    @Inject
     protected Saros saros;
 
+    @Inject
     protected ConnectionTestManager connectionTestManager;
 
-    public ConnectionTestAction(Saros saros,
-        ConnectionTestManager connectionTestManager) {
+    public ConnectionTestAction() {
         super("Test data transfer connection...");
-
-        this.saros = saros;
-        this.connectionTestManager = connectionTestManager;
-
-        SelectionUtils.getSelectionService().addSelectionListener(
-            new ISelectionListener() {
-                public void selectionChanged(IWorkbenchPart part,
-                    ISelection selection) {
-                    List<JID> buddies = SelectionRetrieverFactory
-                        .getSelectionRetriever(JID.class).getSelection();
-                    setEnabled(buddies.size() == 1);
-                }
-            });
         setToolTipText("Test the data transfer connection to the selected buddy.");
+
+        SarosPluginContext.initComponent(this);
+
+        saros.addListener(connectionListener);
+        SelectionUtils.getSelectionService().addSelectionListener(
+            selectionListener);
+        updateEnablement();
+    }
+
+    protected void updateEnablement() {
+        try {
+            List<JID> buddies = SelectionRetrieverFactory
+                .getSelectionRetriever(JID.class).getSelection();
+            this.setEnabled(saros.isConnected() && buddies.size() == 1);
+        } catch (NullPointerException e) {
+            this.setEnabled(false);
+        } catch (Exception e) {
+            if (!PlatformUI.getWorkbench().isClosing())
+                log.error("Unexcepted error while updating enablement", e);
+        }
     }
 
     /**
@@ -144,4 +171,9 @@ public class ConnectionTestAction extends Action {
 
     }
 
+    public void dispose() {
+        SelectionUtils.getSelectionService().removeSelectionListener(
+            selectionListener);
+        saros.removeListener(connectionListener);
+    }
 }

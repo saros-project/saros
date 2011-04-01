@@ -134,6 +134,12 @@ public class VersionManager {
     static {
 
         /**
+         * Version 11.3.25.r3201
+         */
+        compatibilityChart.put(new Version("11.3.25.r3201"),
+            Arrays.asList(new Version("11.3.25.r3201")));
+
+        /**
          * Version 11.2.25.r3105
          */
         compatibilityChart.put(new Version("11.2.25.r3105"),
@@ -317,8 +323,8 @@ public class VersionManager {
     protected XStreamExtensionProvider<VersionInfo> versionProvider = new XStreamExtensionProvider<VersionInfo>(
         "sarosVersion", VersionInfo.class, Version.class, Compatibility.class);
 
-    public VersionManager(final Saros saros,
-        final XMPPReceiver receiver, XMPPTransmitter transmitter) {
+    public VersionManager(final Saros saros, final XMPPReceiver receiver,
+        XMPPTransmitter transmitter) {
 
         this.bundle = saros.getBundle();
         this.saros = saros;

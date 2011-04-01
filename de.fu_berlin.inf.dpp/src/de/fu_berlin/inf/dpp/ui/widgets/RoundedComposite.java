@@ -8,6 +8,7 @@ import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
 
+import de.fu_berlin.inf.dpp.ui.util.PaintUtils;
 import de.fu_berlin.inf.dpp.util.ColorUtils;
 
 /**
@@ -54,12 +55,6 @@ public class RoundedComposite extends Composite {
      */
     private static final float BORDER_LIGHTNESS_SCALE = 0.85f;
 
-    /**
-     * Scale by which the background color's lightness should be modified for
-     * use as the border color.
-     */
-    public static final int ARC = 15;
-    protected static final int LINE_WEIGHT = 1;
     protected Color backgroundColor;
     protected Color borderColor;
 
@@ -92,9 +87,8 @@ public class RoundedComposite extends Composite {
                  * Draws the rounded background
                  */
                 if ((style & SWT.NO_BACKGROUND) == 0) {
-                    e.gc.setBackground(RoundedComposite.this.backgroundColor);
-                    e.gc.fillRoundRectangle(clientArea.x, clientArea.y,
-                        clientArea.width, clientArea.height, ARC, ARC);
+                    PaintUtils.drawRoundedRectangle(e.gc, clientArea,
+                        RoundedComposite.this.backgroundColor);
                 }
 
                 /*
@@ -105,11 +99,7 @@ public class RoundedComposite extends Composite {
                         borderColor = getDisplay().getSystemColor(
                             SWT.COLOR_BLACK);
 
-                    e.gc.setLineWidth(LINE_WEIGHT);
-                    e.gc.setForeground(borderColor);
-                    e.gc.drawRoundRectangle(clientArea.x, clientArea.y,
-                        clientArea.width - LINE_WEIGHT, clientArea.height
-                            - LINE_WEIGHT, ARC, ARC);
+                    PaintUtils.drawRoundedBorder(e.gc, bounds, borderColor);
                 }
 
                 /*
@@ -117,10 +107,11 @@ public class RoundedComposite extends Composite {
                  * horizontal line
                  */
                 if ((style & SWT.SEPARATOR) != 0) {
-                    e.gc.setLineWidth(LINE_WEIGHT);
+                    e.gc.setLineWidth(PaintUtils.LINE_WEIGHT);
                     e.gc.setForeground(RoundedComposite.this.backgroundColor);
-                    int top = (bounds.height - LINE_WEIGHT) / 2;
-                    e.gc.drawLine(ARC / 2, top, bounds.width - ARC / 2, top);
+                    int top = (bounds.height - PaintUtils.LINE_WEIGHT) / 2;
+                    e.gc.drawLine(PaintUtils.ARC / 2, top, bounds.width
+                        - PaintUtils.ARC / 2, top);
                 }
             }
         });

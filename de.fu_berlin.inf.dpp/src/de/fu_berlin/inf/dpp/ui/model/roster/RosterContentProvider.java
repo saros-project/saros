@@ -68,7 +68,9 @@ public class RosterContentProvider extends TreeContentProvider {
             if (Saros.NAMESPACE.equals(feature)) {
                 Utils.runSafeSWTAsync(log, new Runnable() {
                     public void run() {
-                        ViewerUtils.refresh(viewer, true);
+                        // ViewerUtils.refresh(viewer, true);
+                        ViewerUtils.update(viewer, new RosterEntryElement(
+                            roster, jid), null);
                     }
                 });
             }
@@ -119,11 +121,11 @@ public class RosterContentProvider extends TreeContentProvider {
     public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
         this.viewer = viewer;
 
-        if (oldInput != null && oldInput instanceof Roster) {
+        if (oldInput instanceof Roster) {
             ((Roster) oldInput).removeRosterListener(this.rosterListener);
         }
 
-        if (newInput != null && newInput instanceof Roster) {
+        if (newInput instanceof Roster) {
             this.roster = (Roster) newInput;
             this.roster.addRosterListener(this.rosterListener);
         } else {

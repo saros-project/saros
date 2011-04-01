@@ -465,7 +465,13 @@ public class Utils {
      * @blocking
      */
     public static void runSafeSWTSync(final Logger log, final Runnable runnable) {
-        Display.getDefault().syncExec(wrapSafe(log, runnable));
+        try {
+            Display.getDefault().syncExec(wrapSafe(log, runnable));
+        } catch (SWTException e) {
+            if (!PlatformUI.getWorkbench().isClosing()) {
+                throw e;
+            }
+        }
     }
 
     /**
@@ -522,7 +528,13 @@ public class Utils {
      * @nonBlocking
      */
     public static void runSafeSWTAsync(final Logger log, final Runnable runnable) {
-        Display.getDefault().asyncExec(wrapSafe(log, runnable));
+        try {
+            Display.getDefault().asyncExec(wrapSafe(log, runnable));
+        } catch (SWTException e) {
+            if (!PlatformUI.getWorkbench().isClosing()) {
+                throw e;
+            }
+        }
     }
 
     /**

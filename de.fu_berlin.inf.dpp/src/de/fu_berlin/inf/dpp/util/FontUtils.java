@@ -30,12 +30,10 @@ public class FontUtils {
     }
 
     public static void makeBold(Control control) {
-        FontData[] fontData = control.getFont().getFontData();
-        for (FontData fontData_ : fontData) {
-            fontData_.setStyle(SWT.BOLD);
-        }
+        FontData[] boldFontData = modifyFontData(control.getFont()
+            .getFontData(), SWT.BOLD);
 
-        final Font newFont = new Font(control.getDisplay(), fontData);
+        final Font newFont = new Font(control.getDisplay(), boldFontData);
         control.setFont(newFont);
 
         // Since you created the font, you must dispose it
@@ -44,5 +42,14 @@ public class FontUtils {
                 newFont.dispose();
             }
         });
+    }
+
+    public static FontData[] modifyFontData(FontData[] fontData, int style) {
+        FontData[] styledData = new FontData[fontData.length];
+        for (int i = 0; i < fontData.length; i++) {
+            styledData[i] = new FontData(fontData[i].getName(),
+                fontData[i].getHeight(), fontData[i].getStyle() | style);
+        }
+        return styledData;
     }
 }

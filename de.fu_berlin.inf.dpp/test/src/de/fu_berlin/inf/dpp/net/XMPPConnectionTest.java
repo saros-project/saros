@@ -89,18 +89,19 @@ public class XMPPConnectionTest {
      */
     @Test(timeout = 3000)
     public void testXMPPConnectionStringServerName() {
-        XMPPConnection connection = new XMPPConnection(
-            Constants.INF_XMPP_SERVER_SHORTNAME);
+        XMPPConnection connection = new XMPPConnection("broken");
+        boolean isConnected = false;
         try {
             // At this point, connecting should not be possible due to unknown
             // host, and the connection state should be "not connected".
             connection.connect();
+            isConnected = connection.isConnected();
         } catch (XMPPException e) {
             if (e.getWrappedThrowable() == null
                 || !(e.getWrappedThrowable() instanceof UnknownHostException))
                 fail();
         }
-        assertFalse(connection.isConnected());
+        assertFalse(isConnected);
     }
 
     @Test(timeout = 3000)

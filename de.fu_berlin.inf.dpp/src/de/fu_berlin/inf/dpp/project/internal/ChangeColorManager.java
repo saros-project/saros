@@ -139,7 +139,9 @@ public class ChangeColorManager implements IActivityProvider {
                             changeColor
                                 .setText("Color Conflict! Please choose a new color for "
                                     + newUser.getHumanReadableName());
-                            rgbOfNewParticipant = changeColor.open();
+                            RGB newColor = changeColor.open();
+                            if (newColor != null)
+                                rgbOfNewParticipant = newColor;
                         }
                     });
                 } else {
@@ -184,7 +186,7 @@ public class ChangeColorManager implements IActivityProvider {
             x3 = rgb.blue - color.blue;
             i = x1 * x1 + x2 * x2 + x3 * x3;
             i = Math.sqrt(i);
-            if (i < 100)
+            if (i < 30)
                 return false;
         }
         return true;

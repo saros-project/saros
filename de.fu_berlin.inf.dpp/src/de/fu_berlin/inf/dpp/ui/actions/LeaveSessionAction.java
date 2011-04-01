@@ -22,7 +22,9 @@ package de.fu_berlin.inf.dpp.ui.actions;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.graphics.ImageData;
+import org.picocontainer.annotations.Inject;
 
+import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.project.AbstractSarosSessionListener;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
@@ -40,12 +42,10 @@ import de.fu_berlin.inf.dpp.ui.util.CollaborationUtils;
 @Component(module = "action")
 public class LeaveSessionAction extends Action {
 
+    @Inject
     protected SarosSessionManager sessionManager;
 
-    public LeaveSessionAction(SarosSessionManager sessionManager) {
-
-        this.sessionManager = sessionManager;
-
+    public LeaveSessionAction() {
         setToolTipText("Leave Session");
         setImageDescriptor(new ImageDescriptor() {
             @Override
@@ -53,6 +53,8 @@ public class LeaveSessionAction extends Action {
                 return ImageManager.ELCL_PROJECT_SHARE_LEAVE.getImageData();
             }
         });
+
+        SarosPluginContext.initComponent(this);
 
         sessionManager
             .addSarosSessionListener(new AbstractSarosSessionListener() {

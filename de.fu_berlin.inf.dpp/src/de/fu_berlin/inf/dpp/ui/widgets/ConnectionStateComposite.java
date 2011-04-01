@@ -82,7 +82,6 @@ public class ConnectionStateComposite extends Composite {
             } else {
                 stateLabel.setToolTipText(null);
             }
-
             layout();
         }
     }

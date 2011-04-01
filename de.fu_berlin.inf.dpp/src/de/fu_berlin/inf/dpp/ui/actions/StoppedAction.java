@@ -4,7 +4,9 @@ import org.apache.log4j.Logger;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.graphics.ImageData;
+import org.picocontainer.annotations.Inject;
 
+import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.synchronize.StopManager;
 import de.fu_berlin.inf.dpp.ui.ImageManager;
@@ -24,10 +26,11 @@ public class StoppedAction extends Action {
 
     private static final Logger log = Logger.getLogger(StoppedAction.class);
 
+    @Inject
     protected StopManager stopManager;
     protected ObservableValue<Boolean> isBlockedObservable;
 
-    public StoppedAction(StopManager stopManager) {
+    public StoppedAction() {
         setText("Stop Running Process");
         setImageDescriptor(new ImageDescriptor() {
             @Override
@@ -36,7 +39,8 @@ public class StoppedAction extends Action {
                     .getImageData();
             }
         });
-        this.stopManager = stopManager;
+
+        SarosPluginContext.initComponent(this);
         this.isBlockedObservable = stopManager.getBlockedObservable();
 
         isBlockedObservable.addAndNotify(new ValueChangeListener<Boolean>() {

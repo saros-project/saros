@@ -15,7 +15,7 @@ import de.fu_berlin.inf.dpp.util.Utils;
  */
 public class IPathConverter extends AbstractSingleValueConverter {
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({ "unchecked", "rawtypes" })
     @Override
     public boolean canConvert(Class c) {
         return c.isAssignableFrom(IPath.class);
