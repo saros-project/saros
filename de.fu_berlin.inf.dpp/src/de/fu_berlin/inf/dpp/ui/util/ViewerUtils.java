@@ -180,6 +180,7 @@ public class ViewerUtils {
                 if (viewer instanceof StructuredViewer) {
                     StructuredViewer structuredViewer = (StructuredViewer) viewer;
                     structuredViewer.update(element, properties);
+                    structuredViewer.refresh();
                 } else {
                     viewer.refresh();
                 }
@@ -260,5 +261,4 @@ public class ViewerUtils {
             }
         });
     }
-
 }

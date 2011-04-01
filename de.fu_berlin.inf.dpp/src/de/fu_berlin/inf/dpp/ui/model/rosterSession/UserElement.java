@@ -56,7 +56,7 @@ public class UserElement extends TreeElement {
          * Other
          */
         if (user.equals(editorManager.getFollowedUser())) {
-            styledString.append(" (followed)", StyledString.QUALIFIER_STYLER);
+            styledString.append(" (following)", StyledString.QUALIFIER_STYLER);
         }
 
         if (!user.isInvitationComplete()) {
