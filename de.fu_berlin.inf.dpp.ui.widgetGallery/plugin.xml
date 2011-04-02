@@ -39,7 +39,8 @@
          <view
                id="de.fu_berlin.inf.dpp.ui.widgetGallery.WidgetGalleryView"
                minimized="false"
-               relationship="left">
+               relationship="stack"
+               relative="de.fu_berlin.inf.dpp.ui.sarosView.SarosView">
          </view>
       </perspectiveExtension>
    </extension>
