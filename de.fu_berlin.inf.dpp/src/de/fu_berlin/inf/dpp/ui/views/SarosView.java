@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.ui.sarosView;
+package de.fu_berlin.inf.dpp.ui.views;
 
 /*
  * DPP - Serious Distributed Pair Programming
@@ -97,7 +97,7 @@ public class SarosView extends ViewPart {
 
     private static final Logger log = Logger.getLogger(SarosView.class);
 
-    public static final String ID = "de.fu_berlin.inf.dpp.ui.sarosView.SarosView";
+    public static final String ID = "de.fu_berlin.inf.dpp.ui.views.SarosView";
 
     protected IRosterListener rosterListenerBuddys = new RosterAdapter() {
         /**

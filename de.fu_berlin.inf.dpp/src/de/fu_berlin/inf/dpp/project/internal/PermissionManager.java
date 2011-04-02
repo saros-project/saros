@@ -19,7 +19,7 @@ import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ISarosSessionListener;
 import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
 import de.fu_berlin.inf.dpp.project.SarosSessionManager;
-import de.fu_berlin.inf.dpp.ui.sarosView.SarosView;
+import de.fu_berlin.inf.dpp.ui.views.SarosView;
 
 /**
  * This manager is responsible for handling {@link User.Permission} changes.

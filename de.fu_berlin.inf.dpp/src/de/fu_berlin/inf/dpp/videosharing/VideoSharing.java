@@ -48,6 +48,7 @@ import de.fu_berlin.inf.dpp.observables.VideoSessionObservable;
 import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
 import de.fu_berlin.inf.dpp.ui.util.DialogUtils;
+import de.fu_berlin.inf.dpp.ui.views.VideoPlayerView;
 import de.fu_berlin.inf.dpp.util.Utils;
 import de.fu_berlin.inf.dpp.videosharing.activities.ImageSourceSwitchModeVideoActivity;
 import de.fu_berlin.inf.dpp.videosharing.activities.SessionErrorVideoActivity;
@@ -60,7 +61,6 @@ import de.fu_berlin.inf.dpp.videosharing.manager.ActivityManager;
 import de.fu_berlin.inf.dpp.videosharing.manager.ConnectionManager;
 import de.fu_berlin.inf.dpp.videosharing.net.ConnectionFactory;
 import de.fu_berlin.inf.dpp.videosharing.player.VideoDisplay;
-import de.fu_berlin.inf.dpp.videosharing.player.VideoPlayerView;
 import de.fu_berlin.inf.dpp.videosharing.source.ImageSource;
 import de.fu_berlin.inf.dpp.videosharing.source.Screen;
 

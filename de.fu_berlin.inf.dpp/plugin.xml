@@ -12,16 +12,16 @@
       </category>
      <view
             category="de.fu_berlin.inf.dpp.Saros"
-            class="de.fu_berlin.inf.dpp.videosharing.player.VideoPlayerView"
+            class="de.fu_berlin.inf.dpp.ui.views.VideoPlayerView"
             icon="icons/view16/video_misc.png"
-            id="de.fu_berlin.inf.dpp.videosharing.player.VideoPlayerView"
+            id="de.fu_berlin.inf.dpp.ui.views.VideoPlayerView"
             name="Remote Screen"
             restorable="true"/>
      <view
            category="de.fu_berlin.inf.dpp.Saros"
-           class="de.fu_berlin.inf.dpp.ui.sarosView.SarosView"
+           class="de.fu_berlin.inf.dpp.ui.views.SarosView"
            icon="icons/view16/saros_misc.png"
-           id="de.fu_berlin.inf.dpp.ui.sarosView.SarosView"
+           id="de.fu_berlin.inf.dpp.ui.views.SarosView"
            name="Saros">
      </view>
    </extension>
@@ -29,7 +29,7 @@
          point="org.eclipse.ui.perspectiveExtensions">
       <perspectiveExtension targetID="*">
          <view
-               id="de.fu_berlin.inf.dpp.ui.sarosView.SarosView"
+               id="de.fu_berlin.inf.dpp.ui.views.SarosView"
                ratio="0.5"
                relationship="right"
                relative="org.eclipse.ui.views.TaskList">
@@ -863,7 +863,7 @@
       </menuContribution>
       <menuContribution
             allPopups="false"
-            locationURI="popup:de.fu_berlin.inf.dpp.ui.sarosView.SarosView?after=additions">
+            locationURI="popup:de.fu_berlin.inf.dpp.ui.views.SarosView?after=additions">
          <command
                commandId="de.fu_berlin.inf.dpp.ui.commands.ShareProject"
                disabledIcon="icons/dlcl16/spacer.png"

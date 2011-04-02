@@ -12,7 +12,7 @@ import de.fu_berlin.inf.dpp.project.AbstractSarosSessionListener;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ISarosSessionListener;
 import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
-import de.fu_berlin.inf.dpp.ui.sarosView.SarosView;
+import de.fu_berlin.inf.dpp.ui.views.SarosView;
 
 /**
  * This class handles the creation and destruction of the {@link MUCSession}

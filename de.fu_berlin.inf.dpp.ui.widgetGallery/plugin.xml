@@ -40,7 +40,7 @@
                id="de.fu_berlin.inf.dpp.ui.widgetGallery.WidgetGalleryView"
                minimized="false"
                relationship="stack"
-               relative="de.fu_berlin.inf.dpp.ui.sarosView.SarosView">
+               relative="de.fu_berlin.inf.dpp.ui.views.SarosView">
          </view>
       </perspectiveExtension>
    </extension>

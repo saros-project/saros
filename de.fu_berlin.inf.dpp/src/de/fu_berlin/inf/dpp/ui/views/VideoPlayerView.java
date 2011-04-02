@@ -17,7 +17,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
-package de.fu_berlin.inf.dpp.videosharing.player;
+package de.fu_berlin.inf.dpp.ui.views;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -82,6 +82,7 @@ import de.fu_berlin.inf.dpp.videosharing.activities.MouseWheeledVideoActivity;
 import de.fu_berlin.inf.dpp.videosharing.activities.VideoActivity;
 import de.fu_berlin.inf.dpp.videosharing.decode.Decoder;
 import de.fu_berlin.inf.dpp.videosharing.decode.DecodingStatisticPacket;
+import de.fu_berlin.inf.dpp.videosharing.player.VideoDisplay;
 
 /**
  * @author s-lau
@@ -92,7 +93,7 @@ public class VideoPlayerView extends ListExplanatoryViewPart implements
     VideoDisplay {
     private static Logger log = Logger.getLogger(VideoPlayerView.class);
 
-    public static final String ID = "de.fu_berlin.inf.dpp.videosharing.player.VideoPlayerView";
+    public static final String ID = "de.fu_berlin.inf.dpp.ui.views.VideoPlayerView";
 
     @Inject
     protected VideoSharing videoSharing;
