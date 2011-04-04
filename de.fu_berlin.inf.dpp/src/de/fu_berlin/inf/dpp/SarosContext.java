@@ -1,6 +1,7 @@
 package de.fu_berlin.inf.dpp;
 
 import de.fu_berlin.inf.dpp.accountManagement.XMPPAccountStore;
+import de.fu_berlin.inf.dpp.communication.SkypeManager;
 import de.fu_berlin.inf.dpp.communication.audio.AudioService;
 import de.fu_berlin.inf.dpp.communication.audio.AudioServiceManager;
 import de.fu_berlin.inf.dpp.communication.audio.MixerManager;
