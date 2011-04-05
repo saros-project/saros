@@ -108,14 +108,12 @@ public class FollowModeAction extends Action implements Disposable {
 
     protected ISharedEditorListener editorListener = new AbstractSharedEditorListener() {
         @Override
-        public void followModeChanged(User user) {
-
-            setChecked(user != null);
+        public void followModeChanged(User user, boolean isFollowed) {
+            setChecked(isFollowed);
             updateEnablement();
 
             // should not be disabled but checked
             assert (!isEnabled() && isChecked()) == false;
-
         }
     };
 
@@ -144,20 +142,11 @@ public class FollowModeAction extends Action implements Disposable {
         updateEnablement();
     }
 
-    /**
-     * @review runSafe OK
-     */
     @Override
     public void run() {
-        Utils.runSafeSync(log, new Runnable() {
-            public void run() {
-
-                User toFollow = getNewToFollow();
-
-                log.info("Following: " + toFollow);
-                editorManager.setFollowing(toFollow);
-            }
-        });
+        User toFollow = getNewToFollow();
+        log.info("Following: " + toFollow);
+        editorManager.setFollowing(toFollow);
     }
 
     /**

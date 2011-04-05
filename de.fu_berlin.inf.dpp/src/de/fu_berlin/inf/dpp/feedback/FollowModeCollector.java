@@ -92,23 +92,15 @@ public class FollowModeCollector extends AbstractStatisticCollector {
     protected ISharedEditorListener editorListener = new AbstractSharedEditorListener() {
 
         @Override
-        public void followModeChanged(User user) {
+        public void followModeChanged(User user, boolean isFollowed) {
             /*
-             * set the appropriate mode of follow mode if followModeChanged has
-             * parameter null, the follow mode was de-activated, else some
-             * distinct user is followed and therefore the mode was enabled
+             * set the appropriate mode of follow mode
              */
-            if (user == null) {
-                followModeEnabled = false;
-            }
-
-            else {
-                followModeEnabled = true;
-            }
+            followModeEnabled = isFollowed;
 
             // do some logging
             if (log.isTraceEnabled()) {
-                if (user == null) {
+                if (!followModeEnabled) {
                     log.trace(String.format("Follow Mode was deactivated"));
                 } else {
                     log.trace(String.format("Now following %s ", user.getJID()));

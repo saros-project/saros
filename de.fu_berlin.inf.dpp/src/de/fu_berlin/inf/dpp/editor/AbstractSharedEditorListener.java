@@ -26,7 +26,7 @@ public abstract class AbstractSharedEditorListener implements
         // does nothing
     }
 
-    public void followModeChanged(User user) {
+    public void followModeChanged(User user, boolean isFollowed) {
         // does nothing
     }
 

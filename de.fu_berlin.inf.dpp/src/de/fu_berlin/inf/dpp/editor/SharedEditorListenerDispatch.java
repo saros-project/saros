@@ -12,8 +12,8 @@ import de.fu_berlin.inf.dpp.activities.business.TextSelectionActivity;
 import de.fu_berlin.inf.dpp.activities.business.ViewportActivity;
 
 /**
- * ISharedEditorListener which can dispatch to a changing set of
- * ISharedEditorListeners.
+ * {@link ISharedEditorListener} which can dispatch to a changing set of
+ * {@link ISharedEditorListener}s.
  */
 public class SharedEditorListenerDispatch implements ISharedEditorListener {
 
@@ -47,9 +47,9 @@ public class SharedEditorListenerDispatch implements ISharedEditorListener {
         }
     }
 
-    public void followModeChanged(User user) {
+    public void followModeChanged(User user, boolean isFollowed) {
         for (ISharedEditorListener listener : editorListeners) {
-            listener.followModeChanged(user);
+            listener.followModeChanged(user, isFollowed);
         }
     }
 
@@ -85,7 +85,7 @@ public class SharedEditorListenerDispatch implements ISharedEditorListener {
             listener.viewportGenerated(part, viewport, path);
         }
     }
-    
+
     public void colorChanged() {
         for (ISharedEditorListener listener : editorListeners) {
             listener.colorChanged();

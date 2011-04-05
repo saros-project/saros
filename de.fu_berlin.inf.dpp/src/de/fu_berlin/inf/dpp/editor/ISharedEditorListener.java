@@ -2,7 +2,6 @@ package de.fu_berlin.inf.dpp.editor;
 
 import org.eclipse.jface.text.source.ILineRange;
 import org.eclipse.ui.IEditorPart;
-import org.picocontainer.annotations.Nullable;
 
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.activities.SPath;
@@ -57,10 +56,11 @@ public interface ISharedEditorListener {
      * Is fired when the follow mode is changed.
      * 
      * @param user
-     *            which is now being followed (may be null if no user is
-     *            followed)
+     *            which is/is not being followed
+     * @param isFollowed
+     *            true if the {@link User} is followed
      */
-    public void followModeChanged(@Nullable User user);
+    public void followModeChanged(User user, boolean isFollowed);
 
     /**
      * Is fired after a text edit has occurred locally and sent to remote peers

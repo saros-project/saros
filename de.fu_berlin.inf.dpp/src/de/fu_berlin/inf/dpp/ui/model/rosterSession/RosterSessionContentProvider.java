@@ -46,7 +46,7 @@ public class RosterSessionContentProvider extends TreeContentProvider {
     protected EditorManager editorManager;
     protected ISharedEditorListener sharedEditorListener = new AbstractSharedEditorListener() {
         @Override
-        public void followModeChanged(User user) {
+        public void followModeChanged(User user, boolean isFollowed) {
             UserElement userElement = getUserElement(rosterSessionInput, user);
             if (userElement != null)
                 ViewerUtils.update(viewer, userElement, null);

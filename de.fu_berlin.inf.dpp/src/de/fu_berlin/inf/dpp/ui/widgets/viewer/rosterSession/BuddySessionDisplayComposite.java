@@ -141,10 +141,9 @@ public class BuddySessionDisplayComposite extends ViewerComposite {
 
     protected ISharedEditorListener sharedEditorListener = new AbstractSharedEditorListener() {
         @Override
-        public void followModeChanged(User user) {
+        public void followModeChanged(User user, boolean isFollowed) {
             ViewerUtils.update(viewer,
                 new UserElement(user, saros.getRoster()), null);
-            ViewerUtils.refresh(viewer, true);
         }
 
         @Override

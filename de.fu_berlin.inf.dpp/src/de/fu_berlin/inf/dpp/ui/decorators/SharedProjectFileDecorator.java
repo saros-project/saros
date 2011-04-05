@@ -27,8 +27,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import de.fu_berlin.inf.dpp.SarosPluginContext;
-import org.apache.commons.lang.ObjectUtils;
 import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.IPath;
@@ -40,6 +38,7 @@ import org.eclipse.jface.viewers.LabelProviderChangedEvent;
 import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.Saros;
+import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.annotations.Component;
@@ -171,22 +170,9 @@ public class SharedProjectFileDecorator implements ILightweightLabelDecorator {
             }
         }
 
-        User oldUserFollowed = null;
-
         @Override
-        public void followModeChanged(User user) {
-
-            if (ObjectUtils.equals(user, oldUserFollowed))
-                return;
-
-            if (oldUserFollowed != null) {
-                updateDecorations(oldUserFollowed);
-            }
-            oldUserFollowed = user;
-            if (user != null) {
-                updateDecorations(user);
-            }
-
+        public void followModeChanged(User user, boolean isFollowed) {
+            updateDecorations(user);
         }
     };
 

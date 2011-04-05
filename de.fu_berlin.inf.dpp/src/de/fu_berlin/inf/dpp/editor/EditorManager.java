@@ -136,7 +136,7 @@ public class EditorManager implements IActivityProvider, Disposable {
     /**
      * The user that is followed or <code>null</code> if no user is followed.
      */
-    protected User userToFollow = null;
+    protected User followedUser = null;
 
     protected boolean hasWriteAccess;
 
@@ -260,7 +260,7 @@ public class EditorManager implements IActivityProvider, Disposable {
         public void userLeft(final User user) {
 
             // If the user left which I am following, then stop following...
-            if (user.equals(userToFollow))
+            if (user.equals(followedUser))
                 setFollowing(null);
 
             removeAllAnnotations(new Predicate<SarosAnnotation>() {
@@ -1543,24 +1543,28 @@ public class EditorManager implements IActivityProvider, Disposable {
      * user is followed.
      */
     public User getFollowedUser() {
-        return userToFollow;
+        return followedUser;
     }
 
     /**
      * Sets the {@link User} to follow or <code>null</code> if no user should be
      * followed.
      */
-    public void setFollowing(User userToFollow) {
+    public void setFollowing(User newFollowedUser) {
+        assert newFollowedUser == null
+            || !newFollowedUser.equals(sarosSession.getLocalUser()) : "Local buddy cannot follow himself!";
 
-        assert userToFollow == null
-            || !userToFollow.equals(sarosSession.getLocalUser()) : "Local buddy cannot follow himself!";
+        User oldFollowedUser = this.followedUser;
+        this.followedUser = newFollowedUser;
 
-        this.userToFollow = userToFollow;
+        if (oldFollowedUser != null && !oldFollowedUser.equals(newFollowedUser)) {
+            editorListenerDispatch.followModeChanged(oldFollowedUser, false);
+        }
 
-        editorListenerDispatch.followModeChanged(this.userToFollow);
-
-        if (this.userToFollow != null)
-            this.jumpToUser(this.userToFollow);
+        if (newFollowedUser != null) {
+            editorListenerDispatch.followModeChanged(newFollowedUser, true);
+            this.jumpToUser(newFollowedUser);
+        }
     }
 
     /**
@@ -1622,7 +1626,7 @@ public class EditorManager implements IActivityProvider, Disposable {
 
             RemoteEditor remoteEditor = remoteEditorState.getRemoteEditor(path);
 
-            if (user.hasWriteAccess() || user.equals(userToFollow)) {
+            if (user.hasWriteAccess() || user.equals(followedUser)) {
                 ILineRange viewport = remoteEditor.getViewport();
                 if (viewport != null) {
                     editorAPI.setViewportAnnotation(editorPart, viewport, user);
