@@ -517,13 +517,6 @@ public class DataTransferManager implements IConnectionListener,
         }
     }
 
-    public void awaitJingleManager(JID jid) {
-
-        // if (discoveryManager.isJingleSupported(jid)) {
-        // getJingleManager();
-        // }
-    }
-
     /*
      * On Henning's suggestion, Saros is not the place to implement free
      * transport negotiation because this is actually part of XMP-protocol: the

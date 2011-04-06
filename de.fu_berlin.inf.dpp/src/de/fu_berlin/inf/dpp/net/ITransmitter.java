@@ -180,7 +180,8 @@ public interface ITransmitter {
      * @param processID
      *            ID to separate the project exchanging processes from one
      *            another
-     * @param peer {@link JID} of the peer receiving from
+     * @param peer
+     *            {@link JID} of the peer receiving from
      * @param forceWait
      * @return The archive as an {@link InputStream}
      */
@@ -318,13 +319,6 @@ public interface ITransmitter {
      */
     public void sendTimedActivities(JID recipient,
         List<TimedActivityDataObject> timedActivities);
-
-    /**
-     * Make sure that Jingle has sufficiently initialized so that a remote
-     * client trying to connect to us, will not fail because we are not ready to
-     * handle his Jingle negotiation attempts.
-     */
-    public void awaitJingleManager(JID peer);
 
     /**
      * Sends a query, a {@link IQ.Type} GET, to the user with given {@link JID}.

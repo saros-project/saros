@@ -556,13 +556,6 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
             sessionID.getValue(), errorMsg));
     }
 
-    // TODO: Remove this method.
-    public void awaitJingleManager(JID peer) {
-        // If other user supports Jingle, make sure that we are done starting
-        // the JingleManager
-        dataManager.awaitJingleManager(peer);
-    }
-
     public void sendRequestForActivity(ISarosSession sarosSession,
         Map<JID, Integer> expectedSequenceNumbers, boolean andup) {
 
