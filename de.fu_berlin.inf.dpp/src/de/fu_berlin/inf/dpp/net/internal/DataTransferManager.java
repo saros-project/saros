@@ -586,28 +586,6 @@ public class DataTransferManager implements IConnectionListener,
         }
     }
 
-    public enum JingleConnectionState {
-        /**
-         * A jingle connection starts in this state. It is not ready for sending
-         * yet. Trying to send will block.
-         */
-        INIT,
-        /**
-         * The jingle connection is ready for sending.
-         */
-        ESTABLISHED,
-        /**
-         * The jingle connection has been closed correctly. Trying to send will
-         * reopen the connection.
-         */
-        CLOSED,
-        /**
-         * The jingle connection has been closed on error. Trying to send will
-         * always return immediately.
-         */
-        ERROR
-    }
-
     /**
      * Sets up the transports for the given XMPPConnection
      */
