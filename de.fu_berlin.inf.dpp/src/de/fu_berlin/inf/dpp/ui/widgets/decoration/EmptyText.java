@@ -123,12 +123,8 @@ public class EmptyText {
      * @see Text#setText(String)
      */
     public void setText(final String string) {
-        Utils.runSafeSWTAsync(null, new Runnable() {
-            public void run() {
-                control.setText(string);
-                update();
-            }
-        });
+        control.setText(string);
+        update();
     }
 
     /**
