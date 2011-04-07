@@ -27,7 +27,7 @@
             category="de.fu_berlin.inf.dpp.Developer"
             class="de.fu_berlin.inf.dpp.ui.widgetGallery.views.WidgetGalleryView"
             icon="icons/view16/widget_gallery_misc.png"
-            id="de.fu_berlin.inf.dpp.ui.widgetGallery.WidgetGalleryView"
+            id="de.fu_berlin.inf.dpp.ui.widgetGallery.views.WidgetGalleryView"
             name="Saros Widget Gallery"
             restorable="true">
       </view>
@@ -37,12 +37,39 @@
       <perspectiveExtension
             targetID="*">
          <view
-               id="de.fu_berlin.inf.dpp.ui.widgetGallery.WidgetGalleryView"
+               id="de.fu_berlin.inf.dpp.ui.widgetGallery.views.WidgetGalleryView"
                minimized="false"
                relationship="stack"
                relative="de.fu_berlin.inf.dpp.ui.views.SarosView">
          </view>
       </perspectiveExtension>
+   </extension>
+   <extension
+         point="org.eclipse.ui.commands">
+      <command
+            categoryId="org.eclipse.ui.category.project"
+            id="de.fu_berlin.inf.dpp.ui.widgetGallery.commands.ShowWidgetGalleryView"
+            name="Show Saros Widget Gallery">
+      </command>
+   </extension>
+   <extension
+         point="org.eclipse.ui.handlers">
+      <handler
+            class="de.fu_berlin.inf.dpp.ui.widgetGallery.commandHandlers.ShowWidgetGalleryView"
+            commandId="de.fu_berlin.inf.dpp.ui.widgetGallery.commands.ShowWidgetGalleryView">
+      </handler>
+   </extension>
+   <extension
+         point="org.eclipse.ui.menus">
+      <menuContribution
+            allPopups="false"
+            locationURI="toolbar:de.fu_berlin.inf.dpp.ui.views.SarosView?after=additions">
+         <command
+               commandId="de.fu_berlin.inf.dpp.ui.widgetGallery.commands.ShowWidgetGalleryView"
+               icon="icons/view16/widget_gallery_misc.png"
+               style="push">
+         </command>
+      </menuContribution>
    </extension>
 
 </plugin>
