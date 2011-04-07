@@ -261,7 +261,7 @@ public class SarosView extends ViewPart {
     protected void addToolBarItems(IToolBarManager toolBar) {
         toolBar.add(new ChangeXMPPAccountAction());
         toolBar.add(new NewContactAction());
-        toolBar.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
+        toolBar.add(new Separator());
         toolBar.add(new StoppedAction());
         toolBar.add(new ConsistencyAction());
         toolBar.add(new FollowModeAction());
