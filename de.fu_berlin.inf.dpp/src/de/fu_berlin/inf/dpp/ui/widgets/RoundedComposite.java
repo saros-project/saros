@@ -99,7 +99,7 @@ public class RoundedComposite extends Composite {
                         borderColor = getDisplay().getSystemColor(
                             SWT.COLOR_BLACK);
 
-                    PaintUtils.drawRoundedBorder(e.gc, bounds, borderColor);
+                    PaintUtils.drawRoundedBorder(e.gc, clientArea, borderColor);
                 }
 
                 /*
