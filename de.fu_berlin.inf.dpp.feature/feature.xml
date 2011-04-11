@@ -364,6 +364,7 @@ Public License instead of this License.
       <import plugin="org.eclipse.ui.editors"/>
       <import plugin="org.eclipse.core.resources"/>
       <import plugin="org.eclipse.ui.ide"/>
+      <import plugin="org.eclipse.gef"/>
    </requires>
 
    <plugin
