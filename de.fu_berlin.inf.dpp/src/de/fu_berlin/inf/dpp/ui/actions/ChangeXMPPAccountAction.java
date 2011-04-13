@@ -146,6 +146,7 @@ public class ChangeXMPPAccountAction extends Action implements IMenuCreator {
 
     protected void connectWithThisAccount(int accountID) {
         accountService.setAccountActive(accountService.getAccount(accountID));
+        accountService.saveAccounts();
         Utils.runSafeAsync("ChangeXMPPAccountAction-", log, new Runnable() {
             public void run() {
                 reconnect();
