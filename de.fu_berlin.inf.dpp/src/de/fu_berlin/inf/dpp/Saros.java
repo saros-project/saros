@@ -20,11 +20,16 @@
 package de.fu_berlin.inf.dpp;
 
 import java.io.File;
+import java.net.Inet6Address;
 import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.net.SocketException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.UnknownHostException;
 import java.util.Collections;
+import java.util.Enumeration;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -231,10 +236,19 @@ public class Saros extends AbstractUIPlugin {
          * smack configuration or never start it automatically. Currently it
          * only starts after initiation the singleton on first access.
          */
-        Socks5Proxy proxy = Socks5Proxy.getSocks5Proxy();
         if (proxyEnabled != SmackConfiguration.isLocalSocks5ProxyEnabled()) {
             settingsChanged = true;
             SmackConfiguration.setLocalSocks5ProxyEnabled(proxyEnabled);
+        }
+
+        // Get & set all IP addresses as potential connect addresses
+        Socks5Proxy proxy = Socks5Proxy.getSocks5Proxy();
+        try {
+            List<String> myAdresses = getAllNonLoopbackIPAdresses();
+            if (!myAdresses.isEmpty())
+                proxy.replaceLocalAddresses(myAdresses);
+        } catch (Exception e) {
+            log.debug("Error while retrieving local IP addresses", e);
         }
 
         if (settingsChanged || proxy.isRunning() != proxyEnabled) {
@@ -257,6 +271,50 @@ public class Saros extends AbstractUIPlugin {
         // file transfer exclusively
         JingleManager.setServiceEnabled(connection, !getPreferenceStore()
             .getBoolean(PreferenceConstants.FORCE_FILETRANSFER_BY_CHAT));
+    }
+
+    /**
+     * Retrieves all non loopback IP addresses from all network devices of the
+     * local host. <br>
+     * IPv4 addresses are sorted before IPv6 addresses (to let connecting to
+     * IPv4 IPs before attempting their IPv6 equivalents when iterating the
+     * List).
+     * 
+     * @return List<{@link String}> of all retrieved IP addresses
+     * @throws UnknownHostException
+     * @throws SocketException
+     */
+    private List<String> getAllNonLoopbackIPAdresses()
+        throws UnknownHostException, SocketException {
+
+        List<String> ips = new LinkedList<String>();
+
+        // Holds last ipv4 index in ips list (used to sort IPv4 before IPv6 IPs)
+        int ipv4Index = 0;
+
+        Enumeration<NetworkInterface> eInterfaces = NetworkInterface
+            .getNetworkInterfaces();
+
+        // Enumerate interfaces and enumerate all internet addresses of each
+        if (eInterfaces != null) {
+            while (eInterfaces.hasMoreElements()) {
+                NetworkInterface ni = eInterfaces.nextElement();
+
+                Enumeration<InetAddress> iaddrs = ni.getInetAddresses();
+                while (iaddrs.hasMoreElements()) {
+                    InetAddress iaddr = iaddrs.nextElement();
+                    if (!iaddr.isLoopbackAddress()) {
+
+                        if (iaddr instanceof Inet6Address)
+                            ips.add(iaddr.getHostAddress());
+                        else
+                            ips.add(ipv4Index++, iaddr.getHostAddress());
+                    }
+                }
+            }
+        }
+
+        return ips;
     }
 
     /**
