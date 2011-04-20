@@ -15,41 +15,41 @@ import de.fu_berlin.inf.dpp.ui.widgets.wizard.SummaryItemComposite;
 
 public class SummaryItemCompositeDemo extends DescriptiveDemo {
 
-	public SummaryItemCompositeDemo(DemoContainer parent, String title) {
-		super(parent, title);
+    public SummaryItemCompositeDemo(DemoContainer parent, String title) {
+	super(parent, title);
+    }
+
+    @Override
+    public String getDescription() {
+	return null;
+    }
+
+    @Override
+    public void createContent(Composite parent) {
+	parent.setLayout(LayoutUtils.createGridLayout());
+
+	Composite root = new Composite(parent, SWT.NONE);
+	root.setLayoutData(new GridData(SWT.CENTER, SWT.CENTER, true, true));
+	root.setLayout(LayoutUtils.createGridLayout(0, 10));
+	Image[] images = new Image[] { ImageManager.ICON_BUDDY,
+		ImageManager.ICON_BUDDY_SAROS,
+		ImageManager.ICON_BUDDY_SAROS_AWAY,
+		ImageManager.ICON_BUDDY_SAROS_FOLLOWMODE,
+		ImageManager.ICON_BUDDY_SAROS_FOLLOWMODE_AWAY,
+		ImageManager.ICON_BUDDY_SAROS_FOLLOWMODE_READONLY,
+		ImageManager.ICON_BUDDY_SAROS_FOLLOWMODE_READONLY_AWAY,
+		ImageManager.ICON_BUDDY_SAROS_READONLY,
+		ImageManager.ICON_BUDDY_SAROS_READONLY_AWAY,
+		ImageManager.ICON_GROUP };
+
+	for (Image image : images) {
+	    SummaryItemComposite summaryItemCompositeDemo = new SummaryItemComposite(
+		    root, SWT.NONE);
+	    summaryItemCompositeDemo.setLayoutData(new GridData(SWT.FILL,
+		    SWT.CENTER, true, false));
+	    summaryItemCompositeDemo.setContent(new IllustratedText(image,
+		    "Summary title\nSummary content: "
+			    + StringUtils.genRandom(32)));
 	}
-
-	@Override
-	public String getDescription() {
-		return null;
-	}
-
-	@Override
-	public void createContent(Composite parent) {
-		parent.setLayout(LayoutUtils.createGridLayout());
-
-		Composite root = new Composite(parent, SWT.NONE);
-		root.setLayoutData(new GridData(SWT.CENTER, SWT.CENTER, true, true));
-		root.setLayout(LayoutUtils.createGridLayout(0, 10));
-		Image[] images = new Image[] { ImageManager.ICON_BUDDY,
-				ImageManager.ICON_BUDDY_SAROS,
-				ImageManager.ICON_BUDDY_SAROS_AWAY,
-				ImageManager.ICON_BUDDY_SAROS_FOLLOWMODE,
-				ImageManager.ICON_BUDDY_SAROS_FOLLOWMODE_AWAY,
-				ImageManager.ICON_BUDDY_SAROS_FOLLOWMODE_READONLY,
-				ImageManager.ICON_BUDDY_SAROS_FOLLOWMODE_READONLY_AWAY,
-				ImageManager.ICON_BUDDY_SAROS_READONLY,
-				ImageManager.ICON_BUDDY_SAROS_READONLY_AWAY,
-				ImageManager.ICON_GROUP };
-
-		for (Image image : images) {
-			SummaryItemComposite summaryItemCompositeDemo = new SummaryItemComposite(
-					root, SWT.NONE);
-			summaryItemCompositeDemo.setLayoutData(new GridData(SWT.FILL,
-					SWT.CENTER, true, false));
-			summaryItemCompositeDemo.setContent(new IllustratedText(image,
-					"Summary title\nSummary content: "
-							+ StringUtils.genRandom(32)));
-		}
-	}
+    }
 }

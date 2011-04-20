@@ -7,17 +7,17 @@ import de.fu_berlin.inf.dpp.ui.widgetGallery.demos.WizardPageDemo;
 import de.fu_berlin.inf.dpp.ui.wizards.pages.ConfigurationSettingsWizardPage;
 
 public class GeneralSettingsDemo extends WizardPageDemo {
-	public GeneralSettingsDemo(DemoContainer demoContainer, String title) {
-		super(demoContainer, title);
-	}
+    public GeneralSettingsDemo(DemoContainer demoContainer, String title) {
+	super(demoContainer, title);
+    }
 
-	@Override
-	public String getDescription() {
-		return null;
-	}
+    @Override
+    public String getDescription() {
+	return null;
+    }
 
-	@Override
-	public IWizardPage getWizardPage() {
-		return new ConfigurationSettingsWizardPage();
-	}
+    @Override
+    public IWizardPage getWizardPage() {
+	return new ConfigurationSettingsWizardPage();
+    }
 }

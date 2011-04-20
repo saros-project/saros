@@ -9,17 +9,17 @@ import de.fu_berlin.inf.dpp.ui.widgetGallery.suits.wizard.wizards.AllWizardsDemo
 
 public class WizardDemoContainer extends DemoContainer {
 
-	public WizardDemoContainer(DemoContainer demoContainer, String title) {
-		super(demoContainer, title);
-	}
+    public WizardDemoContainer(DemoContainer demoContainer, String title) {
+	super(demoContainer, title);
+    }
 
-	@Override
-	public void createPartControls(Composite parent) {
-		super.createPartControls(parent);
+    @Override
+    public void createPartControls(Composite parent) {
+	super.createPartControls(parent);
 
-		new CompositeDemoContainer(this, "Composites");
-		new PagesDemoContainer(this, "Pages");
-		new AllWizardsDemo(this, "Wizards");
-	}
+	new CompositeDemoContainer(this, "Composites");
+	new PagesDemoContainer(this, "Pages");
+	new AllWizardsDemo(this, "Wizards");
+    }
 
 }

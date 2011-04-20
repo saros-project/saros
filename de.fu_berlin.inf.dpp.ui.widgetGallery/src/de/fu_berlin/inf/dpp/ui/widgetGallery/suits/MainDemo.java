@@ -15,25 +15,25 @@ import de.fu_berlin.inf.dpp.ui.widgetGallery.suits.wizard.WizardDemoContainer;
 
 public class MainDemo extends DemoContainer {
 
-	public MainDemo(Composite parent) {
-		super(parent);
-	}
+    public MainDemo(Composite parent) {
+	super(parent);
+    }
 
-	public Control getControl() {
-		return this.control;
-	}
+    public Control getControl() {
+	return this.control;
+    }
 
-	@Override
-	public void createPartControls(Composite parent) {
-		super.createPartControls(parent);
+    @Override
+    public void createPartControls(Composite parent) {
+	super.createPartControls(parent);
 
-		new DecorationDemoContainer(this, "Decoration");
-		new BasicDemoContainer(this, "Composite");
-		new InstructionDemoContainer(this, "Explanation");
-		new ChatDemoContainer(this, "Chat");
-		new RosterDemoContainer(this, "Roster");
-		open(new RosterSessionDemoContainer(this, "RosterSession"));
-		new ProjectDemoContainer(this, "Project");
-		new WizardDemoContainer(this, "Wizard");
-	}
+	new DecorationDemoContainer(this, "Decoration");
+	new BasicDemoContainer(this, "Composite");
+	new InstructionDemoContainer(this, "Explanation");
+	new ChatDemoContainer(this, "Chat");
+	new RosterDemoContainer(this, "Roster");
+	open(new RosterSessionDemoContainer(this, "RosterSession"));
+	new ProjectDemoContainer(this, "Project");
+	new WizardDemoContainer(this, "Wizard");
+    }
 }

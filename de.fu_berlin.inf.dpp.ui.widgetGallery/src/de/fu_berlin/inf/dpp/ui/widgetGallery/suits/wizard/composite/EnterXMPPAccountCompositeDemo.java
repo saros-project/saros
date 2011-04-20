@@ -14,41 +14,41 @@ import de.fu_berlin.inf.dpp.ui.widgets.wizard.events.XMPPServerChangedEvent;
 
 public class EnterXMPPAccountCompositeDemo extends DescriptiveDemo {
 
-	public EnterXMPPAccountCompositeDemo(DemoContainer parent, String title) {
-		super(parent, title);
-	}
+    public EnterXMPPAccountCompositeDemo(DemoContainer parent, String title) {
+	super(parent, title);
+    }
 
-	@Override
-	public String getDescription() {
-		return null;
-	}
+    @Override
+    public String getDescription() {
+	return null;
+    }
 
-	@Override
-	public void createContent(Composite parent) {
-		parent.setLayout(LayoutUtils.createGridLayout());
-		showConsole();
+    @Override
+    public void createContent(Composite parent) {
+	parent.setLayout(LayoutUtils.createGridLayout());
+	showConsole();
 
-		EnterXMPPAccountComposite enterXMPPAccountComposite = new EnterXMPPAccountComposite(
-				parent, SWT.NONE);
-		enterXMPPAccountComposite.setLayoutData(new GridData(SWT.FILL,
-				SWT.CENTER, true, true));
-		enterXMPPAccountComposite
-				.addEnterXMPPAccountCompositeListener(new EnterXMPPAccountCompositeListener() {
-					public void isSarosXMPPServerChanged(
-							IsSarosXMPPServerChangedEvent event) {
-						addConsoleMessage("isSarosXMPPServerChanged changed to "
-								+ ((event.isSarosXMPPServer()) ? "true"
-										: "false"));
-					}
+	EnterXMPPAccountComposite enterXMPPAccountComposite = new EnterXMPPAccountComposite(
+		parent, SWT.BORDER);
+	enterXMPPAccountComposite.setLayoutData(new GridData(SWT.FILL,
+		SWT.CENTER, true, true));
+	enterXMPPAccountComposite
+		.addEnterXMPPAccountCompositeListener(new EnterXMPPAccountCompositeListener() {
+		    public void isSarosXMPPServerChanged(
+			    IsSarosXMPPServerChangedEvent event) {
+			addConsoleMessage("isSarosXMPPServerChanged changed to "
+				+ ((event.isSarosXMPPServer()) ? "true"
+					: "false"));
+		    }
 
-					public void xmppServerValidityChanged(
-							XMPPServerChangedEvent event) {
-						addConsoleMessage("XMPP server "
-								+ event.getXMPPServer()
-								+ " is "
-								+ ((event.isXMPPServerValid()) ? "valid"
-										: "invalid"));
-					}
-				});
-	}
+		    public void xmppServerValidityChanged(
+			    XMPPServerChangedEvent event) {
+			addConsoleMessage("XMPP server "
+				+ event.getXMPPServer()
+				+ " is "
+				+ ((event.isXMPPServerValid()) ? "valid"
+					: "invalid"));
+		    }
+		});
+    }
 }
