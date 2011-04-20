@@ -219,6 +219,16 @@ public class Saros extends AbstractUIPlugin {
     }
 
     protected void setBytestreamConnectionProperties() {
+
+        /*
+         * Setting the Smack timeout for packet replies. The default of 5000 can
+         * be too low for IBB transfers when many other packets are send
+         * concurrently (invitation over IBB, concurrently producing many
+         * activities)
+         */
+        SmackConfiguration.setPacketReplyTimeout(30000);
+
+        // Socks5 Proxy Configuration
         boolean settingsChanged = false;
         int port = sarosContext.getComponent(PreferenceUtils.class)
             .getFileTransferPort();
@@ -274,7 +284,7 @@ public class Saros extends AbstractUIPlugin {
     }
 
     /**
-     * Retrieves all non loopback IP addresses from all network devices of the
+     * Retrieves all non-loopback IP addresses from all network devices of the
      * local host. <br>
      * IPv4 addresses are sorted before IPv6 addresses (to let connecting to
      * IPv4 IPs before attempting their IPv6 equivalents when iterating the
@@ -284,7 +294,7 @@ public class Saros extends AbstractUIPlugin {
      * @throws UnknownHostException
      * @throws SocketException
      */
-    private List<String> getAllNonLoopbackIPAdresses()
+    protected List<String> getAllNonLoopbackIPAdresses()
         throws UnknownHostException, SocketException {
 
         List<String> ips = new LinkedList<String>();

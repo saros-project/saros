@@ -36,7 +36,9 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
+import org.picocontainer.annotations.Inject;
 
+import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.activities.SPathDataObject;
 import de.fu_berlin.inf.dpp.activities.business.FolderActivity.Type;
@@ -45,11 +47,17 @@ import de.fu_berlin.inf.dpp.activities.serializable.IActivityDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.TextEditActivityDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.TextSelectionActivityDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.ViewportActivityDataObject;
+import de.fu_berlin.inf.dpp.invitation.OutgoingProjectNegotiation;
+import de.fu_berlin.inf.dpp.net.ITransferModeListener;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.TimedActivityDataObject;
 import de.fu_berlin.inf.dpp.net.business.DispatchThreadContext;
+import de.fu_berlin.inf.dpp.net.internal.DataTransferManager.IBytestreamConnection;
+import de.fu_berlin.inf.dpp.net.internal.DataTransferManager.NetTransferMode;
+import de.fu_berlin.inf.dpp.observables.ProjectNegotiationObservable;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
+import de.fu_berlin.inf.dpp.util.ActivityUtils;
 import de.fu_berlin.inf.dpp.util.AutoHashMap;
 import de.fu_berlin.inf.dpp.util.StackTrace;
 import de.fu_berlin.inf.dpp.util.Utils;
@@ -98,10 +106,12 @@ public class ActivitySequencer {
     /** Buffer for outgoing activityDataObjects. */
     protected final BlockingQueue<DataObjectQueueItem> outgoingQueue = new LinkedBlockingQueue<DataObjectQueueItem>();
 
+    /** Long time buffer for outgoing activityDataObjects. */
+    protected Map<User, List<IActivityDataObject>> queuedOutgoingActivitiesOfUsers;
+
     /**
-     * A priority queue for timed activityDataObjects. For each buddy
-     * there is one ActivityQueue, in which received events from those are
-     * stored.<br>
+     * A priority queue for timed activityDataObjects. For each buddy there is
+     * one ActivityQueue, in which received events from those are stored.<br>
      * TODO "Timestamps" are treated more like consecutive sequence numbers, so
      * maybe all names and documentation should be changed to reflect this.
      */
@@ -453,7 +463,10 @@ public class ActivitySequencer {
 
     protected final DispatchThreadContext dispatchThread;
 
-    public ActivitySequencer(ISarosSession sarosSession,
+    @Inject
+    protected ProjectNegotiationObservable projectExchangeProcesses;
+
+    public ActivitySequencer(final ISarosSession sarosSession,
         ITransmitter transmitter, DataTransferManager transferManager,
         DispatchThreadContext threadContext, int updateInterval) {
 
@@ -464,6 +477,33 @@ public class ActivitySequencer {
 
         this.localJID = sarosSession.getLocalUser().getJID();
         this.MILLIS_UPDATE = updateInterval;
+
+        this.queuedOutgoingActivitiesOfUsers = Collections
+            .synchronizedMap(new HashMap<User, List<IActivityDataObject>>());
+
+        this.transferManager.getTransferModeDispatch().add(
+            new ITransferModeListener() {
+
+                public void clear() {
+                    // do nothing
+                }
+
+                public void transferFinished(JID jid, NetTransferMode newMode,
+                    boolean incoming, long sizeTransferred,
+                    long sizeUncompressed, long transmissionMillisecs) {
+
+                    // trigger flushing with nulled DataObjectQueueItem
+                    outgoingQueue.add(new DataObjectQueueItem((User) null,
+                        (IActivityDataObject) null));
+                }
+
+                public void connectionChanged(JID jid,
+                    IBytestreamConnection connection) {
+                    // do nothing
+                }
+            });
+
+        SarosPluginContext.initComponent(this);
     }
 
     /**
@@ -535,16 +575,23 @@ public class ActivitySequencer {
                 Map<User, List<IActivityDataObject>> toSend = AutoHashMap
                     .getListHashMap();
 
+                boolean doFlushQueues = false;
                 for (DataObjectQueueItem item : activities) {
-                    for (User recipient : item.recipients) {
-                        toSend.get(recipient).add(item.activityDataObject);
-                    }
+                    if (item.activityDataObject == null) {
+                        doFlushQueues = true;
+                    } else
+                        for (User recipient : item.recipients) {
+                            toSend.get(recipient).add(item.activityDataObject);
+                        }
                 }
 
                 for (Entry<User, List<IActivityDataObject>> e : toSend
                     .entrySet()) {
-                    sendActivities(e.getKey(), optimize(e.getValue()));
+                    sendActivities(e.getKey(), optimize(e.getValue()), false);
                 }
+
+                if (doFlushQueues)
+                    flushQueues();
 
                 /*
                  * Periodically execQueues() because waiting activityDataObjects
@@ -568,7 +615,7 @@ public class ActivitySequencer {
              *             activityDataObjects contain <code>null</code>.
              */
             private void sendActivities(User recipient,
-                List<IActivityDataObject> activityDataObjects) {
+                List<IActivityDataObject> activityDataObjects, boolean dontQueue) {
 
                 if (recipient.isLocal()) {
                     throw new IllegalArgumentException(
@@ -580,14 +627,87 @@ public class ActivitySequencer {
                         "Cannot send a null activityDataObject");
                 }
 
+                // Handle long time queue
+                List<IActivityDataObject> userqueue = queuedOutgoingActivitiesOfUsers
+                    .get(recipient);
+
+                if (isActivityQueuingSuiteable(recipient, activityDataObjects)
+                    && dontQueue == false) {
+                    // if new activities can be queued, do so
+                    if (userqueue == null) {
+                        userqueue = Collections
+                            .synchronizedList(new LinkedList<IActivityDataObject>());
+                    }
+                    userqueue.addAll(activityDataObjects);
+                    queuedOutgoingActivitiesOfUsers.put(recipient, userqueue);
+
+                    log.debug("Adding " + activityDataObjects.size()
+                        + " activities to queue: "
+                        + activityDataObjects.toString());
+                    return;
+                } else if (userqueue != null) {
+                    // send queued activities and new activities, clearing the
+                    // queue
+                    log.debug("Flushing activity queue, sending "
+                        + userqueue.size() + " old and "
+                        + activityDataObjects.size() + " new activities");
+
+                    queuedOutgoingActivitiesOfUsers.remove(recipient);
+                    userqueue.addAll(activityDataObjects);
+                    activityDataObjects = userqueue;
+                }
+
                 JID recipientJID = recipient.getJID();
+
                 List<TimedActivityDataObject> timedActivities = createTimedActivities(
                     recipientJID, activityDataObjects);
 
-                log.trace("Sending Activities to " + recipientJID + ": "
-                    + timedActivities);
+                log.trace("Sending " + timedActivities.size()
+                    + " activities to " + recipientJID + ": " + timedActivities);
 
                 transmitter.sendTimedActivities(recipientJID, timedActivities);
+            }
+
+            /**
+             * During an project transmission over IBB to the same recipient as
+             * these timedActivities, activities that are not time-critical will
+             * be queued and send as bundles to reduce message traffic (which in
+             * extreme situation could crash IBB connection)
+             * 
+             * @param recipient
+             *            {@link JID} of the user to send activities to
+             * @return true if the queued activities can stay queued, false if
+             *         they need to be send
+             */
+            boolean isActivityQueuingSuiteable(User recipient,
+                List<IActivityDataObject> usersActivities) {
+
+                JID recipientJID = recipient.getJID();
+
+                if (projectExchangeProcesses
+                    .getProjectExchangeProcess(recipientJID) instanceof OutgoingProjectNegotiation
+                    && transferManager.getTransferMode(recipientJID) == NetTransferMode.IBB) {
+
+                    // if timedActivities have non-time-critical activities
+                    // only, lets queue them
+                    if (ActivityUtils
+                        .containsQueueableActivitiesOnly(usersActivities))
+                        return true;
+                }
+                return false;
+            }
+
+            /**
+             * Sends all queued activities
+             */
+            void flushQueues() {
+
+                for (User user : queuedOutgoingActivitiesOfUsers.keySet()) {
+                    List<IActivityDataObject> userQueue = queuedOutgoingActivitiesOfUsers
+                        .get(user);
+                    sendActivities(user, userQueue, true);
+                }
+                queuedOutgoingActivitiesOfUsers.clear();
             }
         }, 0, MILLIS_UPDATE);
     }

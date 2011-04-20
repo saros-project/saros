@@ -88,11 +88,11 @@ import de.fu_berlin.inf.dpp.net.internal.extensions.UserListExtension;
 import de.fu_berlin.inf.dpp.observables.SarosSessionObservable;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
+import de.fu_berlin.inf.dpp.util.ActivityUtils;
 import de.fu_berlin.inf.dpp.util.CausedIOException;
 import de.fu_berlin.inf.dpp.util.StackTrace;
 import de.fu_berlin.inf.dpp.util.Utils;
 import de.fu_berlin.inf.dpp.util.VersionManager.VersionInfo;
-import de.fu_berlin.inf.dpp.util.log.LoggingUtils;
 
 /**
  * The one ITransmitter implementation which uses Smack Chat objects.
@@ -623,7 +623,7 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
             + ") " + Utils.prefix(recipient) + timedActivities;
 
         // only log on debug level if there is more than a checksum
-        if (LoggingUtils.containsChecksumsOnly(timedActivities))
+        if (ActivityUtils.containsChecksumsOnly(timedActivities))
             log.trace(msg);
         else
             log.debug(msg);
@@ -727,7 +727,7 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
                     sendMessageToUser(recipient, extension, true);
                 else {
                     log.error("Failed to sent packet extension by bytestream ("
-                        + Utils.formatByte(data.length) + " bytes)");
+                        + Utils.formatByte(data.length) + ")");
                     throw e;
                 }
             }

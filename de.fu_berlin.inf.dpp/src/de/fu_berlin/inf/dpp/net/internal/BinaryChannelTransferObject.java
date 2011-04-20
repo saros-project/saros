@@ -6,6 +6,7 @@ package de.fu_berlin.inf.dpp.net.internal;
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.log4j.Logger;
@@ -14,6 +15,7 @@ import org.eclipse.core.runtime.SubMonitor;
 import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
 import de.fu_berlin.inf.dpp.exceptions.RemoteCancellationException;
 import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
+import de.fu_berlin.inf.dpp.invitation.ProcessTools.CancelOption;
 import de.fu_berlin.inf.dpp.net.IncomingTransferObject;
 import de.fu_berlin.inf.dpp.net.internal.BinaryPacketProto.BinaryPacket;
 import de.fu_berlin.inf.dpp.net.internal.BinaryPacketProto.BinaryPacket.PacketType;
@@ -67,14 +69,29 @@ public class BinaryChannelTransferObject implements IncomingTransferObject {
             LinkedList<BinaryPacket> resultList = new LinkedList<BinaryPacket>();
 
             while (true) {
+                if (!this.binaryChannel.isConnected())
+                    throw new LocalCancellationException(
+                        "Data connection lost.", CancelOption.NOTIFY_PEER);
                 if (progress.isCanceled()) {
-                    reject();
-                    throw new LocalCancellationException();
+                    // reject();
+                    /*
+                     * @TODO: For sending, the BinaryChannel actually also
+                     * expects a Reject packet to detect the cancel; see
+                     * BinaryChannel.sendDirect() and the confirmation packet
+                     * where else an IOException is thrown.
+                     */
+
+                    throw new LocalCancellationException(
+                        "Data reception was manually cancelled.",
+                        CancelOption.NOTIFY_PEER);
                 }
 
                 BinaryPacket packet;
                 try {
-                    packet = myPackets.take();
+                    packet = myPackets.poll(5, TimeUnit.SECONDS);
+                    if (packet == null)
+                        continue;
+
                 } catch (InterruptedException e) {
                     log.error("Code not designed to be interrupted");
                     Thread.currentThread().interrupt();

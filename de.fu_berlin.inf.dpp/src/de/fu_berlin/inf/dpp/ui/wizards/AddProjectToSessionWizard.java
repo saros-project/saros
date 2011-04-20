@@ -50,6 +50,7 @@ public class AddProjectToSessionWizard extends Wizard {
     protected IncomingProjectNegotiation process;
     protected JID peer;
     protected List<FileList> fileLists;
+    protected boolean isExceptionCancel;
     /**
      * projectID => projectName
      * 
@@ -69,6 +70,10 @@ public class AddProjectToSessionWizard extends Wizard {
         this.dataTransferManager = dataTransferManager;
         this.preferenceUtils = preferenceUtils;
         setWindowTitle("Add Projects");
+        
+        /** holds if the wizard close is because of an exception or not */
+        isExceptionCancel = false;      
+
         this.setNeedsProgressMonitor(true);
     }
 
@@ -191,33 +196,31 @@ public class AddProjectToSessionWizard extends Wizard {
                 Shell shell = wizardDialog.getShell();
                 if (shell == null || shell.isDisposed())
                     return;
+                isExceptionCancel = true;
+                showCancelMessage(jid, errorMsg, cancelLocation);
                 wizardDialog.close();
             }
         });
-
-        Utils.runSafeSWTAsync(log, new Runnable() {
-            public void run() {
-                showCancelMessage(jid, errorMsg, cancelLocation);
-            }
-        });
-
     }
 
     @Override
     public boolean performCancel() {
-        if (!Utils
-            .popUpYesNoQuestion(
-                "Leaving the Session",
-                "The session participants must remain synchronised at all times."
-                    + " Declining an invitation will therefore eject you from the session. "
-                    + " Are you sure you want to leave?", false)) {
-            return false;
-        }
-        Utils.runSafeAsync(log, new Runnable() {
-            public void run() {
-                process.localCancel(null, CancelOption.NOTIFY_PEER);
+        if (!isExceptionCancel) {
+            if (!Utils
+                .popUpYesNoQuestion(
+                    "Leaving the Session",
+                    "The session participants must remain synchronised at all times."
+                        + " Declining an invitation will therefore eject you from the session. "
+                        + " Are you sure you want to leave?", false)) {
+                return false;
             }
-        });
+            Utils.runSafeAsync(log, new Runnable() {
+                public void run() {
+                    process.localCancel(null, CancelOption.NOTIFY_PEER);
+                }
+            });
+        }
+        isExceptionCancel = false;
         return true;
     }
 

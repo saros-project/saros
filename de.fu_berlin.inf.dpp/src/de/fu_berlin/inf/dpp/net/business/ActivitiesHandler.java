@@ -19,8 +19,8 @@ import de.fu_berlin.inf.dpp.net.internal.XMPPReceiver;
 import de.fu_berlin.inf.dpp.observables.SarosSessionObservable;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
+import de.fu_berlin.inf.dpp.util.ActivityUtils;
 import de.fu_berlin.inf.dpp.util.Utils;
-import de.fu_berlin.inf.dpp.util.log.LoggingUtils;
 
 /**
  * Handler for all {@link TimedActivities}
@@ -107,7 +107,7 @@ public class ActivitiesHandler {
                 + Utils.prefix(fromJID) + ": " + timedActivities;
 
             // only log on debug level if there is more than a checksum
-            if (LoggingUtils.containsChecksumsOnly(timedActivities))
+            if (ActivityUtils.containsChecksumsOnly(timedActivities))
                 log.trace(msg);
             else
                 log.debug(msg);
