@@ -244,6 +244,7 @@ public class SarosView extends ViewPart {
         menuManager.setRemoveAllWhenShown(true);
         addRosterMenuItems(menuManager);
         addSessionMenuItems(menuManager);
+        addAdditionsSeparator(menuManager);
 
         Viewer buddySessionViewer = buddySessionDisplayComposite.getViewer();
         Menu menu = menuManager.createContextMenu(buddySessionViewer
@@ -303,8 +304,6 @@ public class SarosView extends ViewPart {
                 manager.add(renameContactAction);
                 manager.add(deleteContactAction);
                 manager.add(connectionTestAction);
-                manager.add(new Separator(
-                    IWorkbenchActionConstants.MB_ADDITIONS));
             }
         });
     }
@@ -357,11 +356,22 @@ public class SarosView extends ViewPart {
                         manager.add(sendFileAction);
                         manager.add(videoSharingAction);
                         manager.add(voipAction);
-                        manager.add(new Separator());
                     }
                 }
+            }
+        });
+    }
 
-                // Other plug-ins can contribute their actions here
+    /**
+     * Adds the {@link IWorkbenchActionConstants#MB_ADDITIONS additions}
+     * {@link Separator} to the {@link MenuManager} in order to let others
+     * extend the menu.
+     * 
+     * @param menuManager
+     */
+    protected void addAdditionsSeparator(MenuManager menuManager) {
+        menuManager.addMenuListener(new IMenuListener() {
+            public void menuAboutToShow(IMenuManager manager) {
                 manager.add(new Separator(
                     IWorkbenchActionConstants.MB_ADDITIONS));
             }
