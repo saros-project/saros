@@ -13,8 +13,7 @@ import de.fu_berlin.inf.dpp.ui.ImageManager;
 import de.fu_berlin.inf.dpp.ui.model.TreeElement;
 
 /**
- * Wrapper for {@link UserElement RosterEntryElements} in use with
- * {@link Viewer Viewers}
+ * Wrapper for {@link UserElement} in use with {@link Viewer Viewers}
  * 
  * @author bkahlert
  */

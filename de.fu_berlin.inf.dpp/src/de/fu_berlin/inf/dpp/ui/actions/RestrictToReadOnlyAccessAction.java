@@ -28,6 +28,9 @@ import de.fu_berlin.inf.dpp.ui.util.selection.retriever.SelectionRetrieverFactor
 import de.fu_berlin.inf.dpp.util.Utils;
 
 @Component(module = "action")
+/**
+ *  Merge with {@link GiveWriteAccess}
+ */
 public class RestrictToReadOnlyAccessAction extends Action implements
     IDisposable {
 
@@ -68,13 +71,13 @@ public class RestrictToReadOnlyAccessAction extends Action implements
     protected SarosSessionManager sessionManager;
 
     public RestrictToReadOnlyAccessAction() {
-        super("Restrict to read-only access");
+        super("Restrict to Read-Only Access");
         SarosPluginContext.initComponent(this);
 
         setImageDescriptor(ImageManager
             .getImageDescriptor("icons/elcl16/restricttoreadonlyaccess.png"));
 
-        setToolTipText("Restrict To Read-Only Access");
+        setToolTipText("Restrict to Read-Only Access");
 
         /*
          * if SessionView is not "visible" on session start up this constructor

@@ -56,8 +56,8 @@ public class VideoSharingAction extends Action implements Disposable {
 
     protected static final String ACTION_ID = VideoSharingAction.class
         .getName();
-    public static final String TOOLTIP_START_SESSION = "Share your screen with selected buddy";
-    public static final String TOOLTIP_STOP_SESSION = "Stop session with buddy";
+    public static final String TOOLTIP_START_SESSION = "Share Your Screen With Selected Buddy";
+    public static final String TOOLTIP_STOP_SESSION = "Stop Session With Buddy";
 
     protected ValueChangeListener<VideoSharingSession> changeListener = new ValueChangeListener<VideoSharingSession>() {
         public void setValue(VideoSharingSession newValue) {
@@ -77,7 +77,7 @@ public class VideoSharingAction extends Action implements Disposable {
     protected VideoSessionObservable sessionObservable;
 
     public VideoSharingAction() {
-        super("Share your screen");
+        super("Share Your Screen");
         SarosPluginContext.initComponent(this);
         setId(ACTION_ID);
 

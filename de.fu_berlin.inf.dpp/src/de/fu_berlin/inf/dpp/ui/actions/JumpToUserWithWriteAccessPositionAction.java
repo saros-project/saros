@@ -49,9 +49,9 @@ public class JumpToUserWithWriteAccessPositionAction extends Action implements
     protected Saros saros;
 
     public JumpToUserWithWriteAccessPositionAction() {
-        super("Jump to position of selected buddy");
+        super("Jump to Position of Selected Buddy");
 
-        setToolTipText("Jump to position of selected buddy");
+        setToolTipText("Jump to Position of Selected Buddy");
         setImageDescriptor(ImageManager
             .getImageDescriptor("icons/elcl16/jump.png"));
 

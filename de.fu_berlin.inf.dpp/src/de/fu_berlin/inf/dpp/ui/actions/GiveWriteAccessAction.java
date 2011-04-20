@@ -68,10 +68,10 @@ public class GiveWriteAccessAction extends Action implements Disposable {
     protected SarosSessionManager sessionManager;
 
     public GiveWriteAccessAction() {
-        super("Grant write access");
+        super("Grant Write Access");
         setImageDescriptor(ImageManager
             .getImageDescriptor("icons/elcl16/grantwriteaccess.png"));
-        setToolTipText("Grant write access to this buddy");
+        setToolTipText("Grant Write Access to This Buddy");
 
         SarosPluginContext.initComponent(this);
         /*
