@@ -4,7 +4,9 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.eclipse.jface.action.Action;
+import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.PlatformUI;
@@ -74,8 +76,12 @@ public class RestrictToReadOnlyAccessAction extends Action implements
         super("Restrict to Read-Only Access");
         SarosPluginContext.initComponent(this);
 
-        setImageDescriptor(ImageManager
-            .getImageDescriptor("icons/elcl16/restricttoreadonlyaccess.png"));
+        setImageDescriptor(new ImageDescriptor() {
+            @Override
+            public ImageData getImageData() {
+                return ImageManager.ICON_BUDDY_SAROS_READONLY.getImageData();
+            }
+        });
 
         setToolTipText("Restrict to Read-Only Access");
 
