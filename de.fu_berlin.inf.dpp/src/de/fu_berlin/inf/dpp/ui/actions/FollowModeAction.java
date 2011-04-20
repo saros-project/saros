@@ -133,7 +133,7 @@ public class FollowModeAction extends Action implements Disposable {
 
         setImageDescriptor(ImageManager
             .getImageDescriptor("/icons/monitor_add.png"));
-        setToolTipText("Enable/disable follow mode");
+        setToolTipText("Enable/Disable Follow Mode");
         setId(ACTION_ID);
 
         sessionManager.addSarosSessionListener(sessionListener);
