@@ -159,7 +159,7 @@ public class VoIPAction extends Action {
             break;
         case STOPPED:
             setImageDescriptor(ImageManager
-                .getImageDescriptor("icons/elcl16/stoppedvoip.png"));
+                .getImageDescriptor("icons/elcl16/startvoip.png"));
             setToolTipText("Start a VoIP Session...");
             break;
         case STOPPING:
