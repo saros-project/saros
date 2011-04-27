@@ -13,7 +13,9 @@ public interface IRemoteBotTreeItem extends Remote {
 
     // public STFBotMenu contextMenu(String text) throws RemoteException;
 
-    public IRemoteBotMenu contextMenu(String... texts) throws RemoteException;
+    public IRemoteBotMenu contextMenus(String... texts) throws RemoteException;
+
+    public IRemoteBotMenu contextMenu(String text) throws RemoteException;
 
     /**********************************************
      * 
@@ -33,13 +35,15 @@ public interface IRemoteBotTreeItem extends Remote {
 
     public IRemoteBotTreeItem expand() throws RemoteException;
 
-    public IRemoteBotTreeItem expandNode(String... nodes) throws RemoteException;
+    public IRemoteBotTreeItem expandNode(String... nodes)
+        throws RemoteException;
 
     public void check() throws RemoteException;
 
     public IRemoteBotTreeItem collapse() throws RemoteException;
 
-    public IRemoteBotTreeItem collapseNode(String nodeText) throws RemoteException;
+    public IRemoteBotTreeItem collapseNode(String nodeText)
+        throws RemoteException;
 
     public IRemoteBotTreeItem select(String item) throws RemoteException;
 
@@ -103,5 +107,8 @@ public interface IRemoteBotTreeItem extends Remote {
      **********************************************/
 
     public void waitUntilSubItemExists(final String subItemText)
+        throws RemoteException;
+
+    public void waitUntilContextMenuExists(final String... contextNames)
         throws RemoteException;
 }

@@ -83,11 +83,11 @@ public class ContextMenuWrapper extends Component implements
     }
 
     public void open() throws RemoteException {
-        treeItem.contextMenu(CM_OPEN).click();
+        treeItem.contextMenus(CM_OPEN).click();
     }
 
     public void copy() throws RemoteException {
-        treeItem.contextMenu(MENU_COPY).click();
+        treeItem.contextMenus(MENU_COPY).click();
     }
 
     public void paste(String target) throws RemoteException {
@@ -110,7 +110,7 @@ public class ContextMenuWrapper extends Component implements
     }
 
     public void openWith(String editorType) throws RemoteException {
-        treeItem.contextMenu(CM_OPEN_WITH, CM_OTHER).click();
+        treeItem.contextMenus(CM_OPEN_WITH, CM_OTHER).click();
         bot().waitUntilShellIsOpen(SHELL_EDITOR_SELECTION);
         IRemoteBotShell shell_bob = bot().shell(SHELL_EDITOR_SELECTION);
         shell_bob.activate();
@@ -120,7 +120,7 @@ public class ContextMenuWrapper extends Component implements
     }
 
     public void delete() throws RemoteException {
-        treeItem.contextMenu(CM_DELETE).click();
+        treeItem.contextMenus(CM_DELETE).click();
         switch (type) {
         case PROJECT:
             bot().shell(SHELL_DELETE_RESOURCE).confirmWithCheckBox(OK, true);

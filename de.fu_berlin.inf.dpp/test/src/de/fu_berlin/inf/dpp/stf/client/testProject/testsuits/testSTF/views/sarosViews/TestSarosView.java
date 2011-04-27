@@ -1,6 +1,7 @@
 package de.fu_berlin.inf.dpp.stf.client.testProject.testsuits.testSTF.views.sarosViews;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.rmi.RemoteException;
 
@@ -31,23 +32,41 @@ public class TestSarosView extends STFTest {
     @Test
     public void connect() throws RemoteException {
         log.trace("xmppConnect");
-        alice.superBot().views().buddiesView()
+        alice.superBot().views().sarosView()
             .connectWith(alice.getJID(), alice.getPassword());
         log.trace("captureScreenshot");
         alice.bot().captureScreenshot(
             (alice.bot().getPathToScreenShot() + "/xmpp_connected.png"));
-        assertEquals(true, alice.superBot().views().buddiesView().isConnected());
+        assertEquals(true, alice.superBot().views().sarosView().isConnected());
+    }
+
+    @Test
+    public void connectWith() throws RemoteException {
+        alice.superBot().views().sarosView().connectWith(TEST_JID, PASSWORD);
+        assertTrue(alice.superBot().menuBar().saros().preferences()
+            .isAccountActive(TEST_JID));
+    }
+
+    @Test
+    public void connectWithActiveAccount() throws RemoteException {
+        alice.superBot().views().sarosView().connectWithActiveAccount();
+        assertTrue(alice.superBot().views().sarosView().isConnected());
     }
 
     @Test
     public void disconnect() throws RemoteException {
-        alice.superBot().views().buddiesView()
+        alice.superBot().views().sarosView()
             .connectWith(alice.getJID(), alice.getPassword());
-        alice.superBot().views().buddiesView().disconnect();
+        alice.superBot().views().sarosView().disconnect();
         alice.bot().captureScreenshot(
             (alice.bot().getPathToScreenShot() + "/xmpp_disconnected.png"));
-        assertEquals(false, alice.superBot().views().buddiesView()
-            .isConnected());
+        assertEquals(false, alice.superBot().views().sarosView().isConnected());
     }
 
+    @Test
+    public void addExistedBuddy() throws RemoteException {
+        assertTrue(alice.superBot().views().sarosView().hasBuddy(TEST_JID));
+        alice.superBot().views().sarosView().addANewBuddy(TEST_JID);
+        assertTrue(alice.superBot().views().sarosView().hasBuddy(TEST_JID));
+    }
 }

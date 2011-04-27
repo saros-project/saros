@@ -308,13 +308,16 @@ public class STF {
     public final static String CM_RENAME = SarosMessages.getString("cm_rename");
     public final static String CM_SKYPE_THIS_BUDDY = SarosMessages
         .getString("cm_skype_this_buddy");
-    public final static String CM_INVITE_BUDDY = SarosMessages
-        .getString("cm_invite_buddy");
+    public final static String CM_ADD_TO_SAROS_SESSION = SarosMessages
+        .getString("cm_add_to_saros_session");
     public final static String CM_TEST_DATA_TRANSFER = SarosMessages
         .getString("cm_test_data_transfer_connection");
 
     public final static String NODE_BUDDIES = SarosMessages
         .getString("tree_item_label_buddies");
+
+    public final static String NODE_SESSION = SarosMessages
+        .getString("tree_item_label_session");
 
     public final static String LABEL_XMPP_JABBER_JID = SarosMessages
         .getString("text_label_xmpp_jabber_jid");
@@ -409,6 +412,9 @@ public class STF {
     public final static String CM_CHANGE_COLOR = SarosMessages
         .getString("cm_change_color");
 
+    public final static String CM_STOP_SAROS_SESSION = SarosMessages
+        .getString("cm_stop_saros_session");
+
     /**********************************************
      * 
      * View Saros Chat
@@ -470,8 +476,15 @@ public class STF {
     /* Context menu of a selected tree item on the package explorer view */
     public final static String CM_SHARE_WITH = SarosMessages
         .getString("cm_share_with");
+
+    public final static String CM_WORK_TOGETHER_ON = SarosMessages
+        .getString("cm_work_together_on");
     public final static String CM_MULTIPLE_BUDDIES = SarosMessages
         .getString("cm_multiple_buddies");
+
+    public final static String CM_MULTIPLE_PROJECTS = SarosMessages
+        .getString("cm_multiple_projects");
+
     // public final static String CM_SHARE_PROJECT = SarosMessages
     // .getString("cm_share_project");
     public final static String CM_ADD_TO_SESSION = SarosMessages

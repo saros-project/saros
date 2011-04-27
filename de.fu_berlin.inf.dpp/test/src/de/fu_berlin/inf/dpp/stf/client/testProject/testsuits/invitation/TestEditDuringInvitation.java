@@ -56,10 +56,10 @@ public class TestEditDuringInvitation extends STFTest {
         buildSessionSequentially(PROJECT1, TypeOfCreateProject.NEW_PROJECT,
             alice, bob);
 
-        assertTrue(bob.superBot().views().sessionView()
+        assertTrue(bob.superBot().views().sarosView()
             .selectParticipant(bob.getJID()).hasWriteAccess());
 
-        alice.superBot().views().sessionView()
+        alice.superBot().views().sarosView()
             .addBuddyToSession(carl.getBaseJid());
         carl.bot().shell(SHELL_SESSION_INVITATION).confirm(FINISH);
 

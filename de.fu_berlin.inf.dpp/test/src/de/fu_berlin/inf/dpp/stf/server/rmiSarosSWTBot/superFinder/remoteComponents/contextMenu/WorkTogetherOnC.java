@@ -6,19 +6,19 @@ import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.IRemoteBotTreeItem;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.Component;
 
-public class ShareWithC extends Component implements IShareWithC {
+public class WorkTogetherOnC extends Component implements IWorkTogetherOnC {
 
-    private static transient ShareWithC self;
+    private static transient WorkTogetherOnC self;
 
     private IRemoteBotTreeItem treeItem;
 
     /**
-     * {@link ShareWithC} is a singleton, but inheritance is possible.
+     * {@link NewC} is a singleton, but inheritance is possible.
      */
-    public static ShareWithC getInstance() {
+    public static WorkTogetherOnC getInstance() {
         if (self != null)
             return self;
-        self = new ShareWithC();
+        self = new WorkTogetherOnC();
         return self;
     }
 
@@ -38,28 +38,15 @@ public class ShareWithC extends Component implements IShareWithC {
      * 
      **********************************************/
 
-    /**
-     * FIXME can not click the context menu.
-     */
-    public void multipleBuddies(String projectName, JID... baseJIDOfInvitees)
+    public void multipleProjects(String projectName, JID... baseJIDOfInvitees)
         throws RemoteException {
-        treeItem.contextMenus(CM_SHARE_WITH, CM_MULTIPLE_BUDDIES).click();
+        treeItem.contextMenus(CM_WORK_TOGETHER_ON, CM_MULTIPLE_PROJECTS)
+            .click();
         sarosBot().confirmShellShareProject(projectName, baseJIDOfInvitees);
     }
 
-    public void buddy(JID jid) throws RemoteException {
-        treeItem.contextMenus(CM_SHARE_WITH, jid.getBase()).click();
-    }
-
-    public void addToSarosSession() {
-        /*
-         * The menu is only activated if there are project existed in the
-         * package explorer view, which is not in the session.
-         */
-    }
-
-    public void stopToSarosSession() {
-        //
+    public void project(String projectName) throws RemoteException {
+        treeItem.contextMenus(CM_WORK_TOGETHER_ON, projectName).click();
     }
 
 }

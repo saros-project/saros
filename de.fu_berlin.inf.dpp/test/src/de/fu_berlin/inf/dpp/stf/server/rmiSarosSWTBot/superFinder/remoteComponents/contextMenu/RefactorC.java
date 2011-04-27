@@ -72,7 +72,7 @@ public class RefactorC extends Component implements IRefactorC {
      **************************************************************/
     private void rename(String shellTitle, String buttonName, String newName)
         throws RemoteException {
-        treeItem.contextMenu(MENU_REFACTOR, MENU_RENAME).click();
+        treeItem.contextMenus(MENU_REFACTOR, MENU_RENAME).click();
         IRemoteBotShell shell = bot().shell(shellTitle);
         shell.activate();
         shell.bot().textWithLabel(LABEL_NEW_NAME).setText(newName);

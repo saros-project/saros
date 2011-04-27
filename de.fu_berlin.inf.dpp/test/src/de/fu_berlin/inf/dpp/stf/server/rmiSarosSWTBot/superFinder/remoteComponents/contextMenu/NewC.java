@@ -62,7 +62,7 @@ public class NewC extends Component implements INewC {
     public void folder(String folderName) throws RemoteException {
         if (!exists(folderName)) {
             try {
-                treeItem.contextMenu(MENU_NEW, MENU_FOLDER).click();
+                treeItem.contextMenus(MENU_NEW, MENU_FOLDER).click();
                 confirmShellNewFolder(folderName);
             } catch (WidgetNotFoundException e) {
                 final String cause = "Error creating new folder";
@@ -94,7 +94,7 @@ public class NewC extends Component implements INewC {
     public void file(String fileName) throws RemoteException {
         if (!exists(fileName))
             try {
-                treeItem.contextMenu(MENU_NEW, MENU_FILE).click();
+                treeItem.contextMenus(MENU_NEW, MENU_FILE).click();
                 confirmShellNewFile(fileName);
             } catch (WidgetNotFoundException e) {
                 final String cause = "error creating new file.";
@@ -106,7 +106,7 @@ public class NewC extends Component implements INewC {
     public void cls(String className) throws RemoteException {
         if (!exists(className)) {
             try {
-                treeItem.contextMenu(MENU_NEW, MENU_CLASS).click();
+                treeItem.contextMenus(MENU_NEW, MENU_CLASS).click();
                 confirmShellNewJavaClass(className);
             } catch (WidgetNotFoundException e) {
                 final String cause = "error creating new Java Class";

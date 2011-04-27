@@ -110,7 +110,7 @@ public class TestBasicWidgetTree extends STFTest {
 
     @Test
     public void existsTreeItemWithRegexsInView2() throws RemoteException {
-        alice.superBot().views().buddiesView()
+        alice.superBot().views().sarosView()
             .connectWith(alice.getJID(), alice.getPassword());
         assertTrue(alice.bot().view(VIEW_SAROS).bot()
             .treeInGroup(GROUP_BUDDIES)
@@ -201,7 +201,7 @@ public class TestBasicWidgetTree extends STFTest {
 
     @Test
     public void existsContextOfTreeItemInView() throws RemoteException {
-        alice.superBot().views().buddiesView()
+        alice.superBot().views().sarosView()
             .connectWith(alice.getJID(), alice.getPassword());
         assertTrue(alice.bot().view(VIEW_SAROS).bot()
             .treeInGroup(GROUP_BUDDIES).selectTreeItemWithRegex("bob_stf.*")
@@ -220,9 +220,9 @@ public class TestBasicWidgetTree extends STFTest {
 
     @Test
     public void isContextOfTreeItemInViewEnabled() throws RemoteException {
-        alice.superBot().views().buddiesView()
+        alice.superBot().views().sarosView()
             .connectWith(alice.getJID(), alice.getPassword());
-        alice.superBot().views().buddiesView().waitUntilIsConnected();
+        alice.superBot().views().sarosView().waitUntilIsConnected();
         assertTrue(alice.bot().view(VIEW_SAROS).bot()
             .treeInGroup(GROUP_BUDDIES).selectTreeItemWithRegex("bob_stf.*")
             .isContextMenuEnabled(CM_RENAME));
@@ -249,10 +249,10 @@ public class TestBasicWidgetTree extends STFTest {
 
     @Test
     public void clickContextsOfTreeItemInView() throws RemoteException {
-        alice.superBot().views().buddiesView()
+        alice.superBot().views().sarosView()
             .connectWith(alice.getJID(), alice.getPassword());
         alice.bot().view(VIEW_SAROS).bot().treeInGroup(GROUP_BUDDIES)
-            .selectTreeItemWithRegex("bob_stf.*").contextMenu(CM_RENAME)
+            .selectTreeItemWithRegex("bob_stf.*").contextMenus(CM_RENAME)
             .click();
         assertTrue(alice.bot().isShellOpen(SHELL_SET_NEW_NICKNAME));
     }
@@ -263,7 +263,7 @@ public class TestBasicWidgetTree extends STFTest {
             .javaProject(PROJECT1);
 
         alice.bot().view(VIEW_PACKAGE_EXPLORER).bot().tree()
-            .selectTreeItem(PROJECT1).contextMenu(MENU_NEW, MENU_PACKAGE)
+            .selectTreeItem(PROJECT1).contextMenus(MENU_NEW, MENU_PACKAGE)
             .click();
 
         alice.bot().waitUntilShellIsOpen(SHELL_NEW_JAVA_PACKAGE);

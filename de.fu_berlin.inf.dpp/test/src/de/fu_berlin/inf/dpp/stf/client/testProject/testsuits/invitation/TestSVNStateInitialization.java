@@ -151,16 +151,16 @@ public class TestSVNStateInitialization extends STFTest {
         bob.superBot().confirmShellSessionInvitationAndShellAddProject(
             SVN_PROJECT, TypeOfCreateProject.NEW_PROJECT);
 
-        alice.superBot().views().sessionView()
+        alice.superBot().views().sarosView()
             .waitUntilIsInviteeInSession(bob.superBot());
         assertTrue(bob.superBot().views().packageExplorerView()
             .isProjectManagedBySVN(SVN_PROJECT));
 
-        assertTrue(alice.superBot().views().sessionView()
+        assertTrue(alice.superBot().views().sarosView()
             .selectParticipant(alice.getJID()).hasWriteAccess());
-        assertTrue(alice.superBot().views().sessionView()
+        assertTrue(alice.superBot().views().sarosView()
             .existsParticipant(bob.getJID()));
-        assertTrue(bob.superBot().views().sessionView()
+        assertTrue(bob.superBot().views().sarosView()
             .selectParticipant(bob.getJID()).hasWriteAccess());
     }
 
@@ -197,7 +197,7 @@ public class TestSVNStateInitialization extends STFTest {
         bob.superBot().confirmShellSessionInvitationAndShellAddProject(
             SVN_PROJECT, TypeOfCreateProject.NEW_PROJECT);
 
-        alice.superBot().views().sessionView()
+        alice.superBot().views().sarosView()
             .waitUntilIsInviteeInSession(bob.superBot());
 
         assertTrue(bob.superBot().views().packageExplorerView()
@@ -238,9 +238,9 @@ public class TestSVNStateInitialization extends STFTest {
         bob.superBot().confirmShellSessionInvitationAndShellAddProject(
             SVN_PROJECT, TypeOfCreateProject.NEW_PROJECT);
 
-        alice.superBot().views().sessionView()
+        alice.superBot().views().sarosView()
             .waitUntilIsInviteeInSession(bob.superBot());
-        bob.superBot().views().sessionView().waitUntilIsInSession();
+        bob.superBot().views().sarosView().waitUntilIsInSession();
 
         assertTrue(bob.superBot().views().packageExplorerView()
             .isProjectManagedBySVN(SVN_PROJECT));
@@ -288,9 +288,9 @@ public class TestSVNStateInitialization extends STFTest {
         bob.superBot().confirmShellSessionInvitationAndShellAddProject(
             SVN_PROJECT, TypeOfCreateProject.NEW_PROJECT);
 
-        alice.superBot().views().sessionView()
+        alice.superBot().views().sarosView()
             .waitUntilIsInviteeInSession(bob.superBot());
-        bob.superBot().views().sessionView().waitUntilIsInSession();
+        bob.superBot().views().sarosView().waitUntilIsInSession();
 
         assertTrue(bob.superBot().views().packageExplorerView()
             .isProjectManagedBySVN(SVN_PROJECT));
@@ -340,9 +340,9 @@ public class TestSVNStateInitialization extends STFTest {
         bob.superBot().confirmShellSessionInvitationAndShellAddProject(
             SVN_PROJECT, TypeOfCreateProject.NEW_PROJECT);
 
-        alice.superBot().views().sessionView()
+        alice.superBot().views().sarosView()
             .waitUntilIsInviteeInSession(bob.superBot());
-        bob.superBot().views().sessionView().waitUntilIsInSession();
+        bob.superBot().views().sarosView().waitUntilIsInSession();
 
         assertTrue(bob.superBot().views().packageExplorerView()
             .isProjectManagedBySVN(SVN_PROJECT));

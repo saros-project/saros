@@ -46,12 +46,14 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.Remot
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.RemoteBotViewMenu;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.SuperBot;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.Component;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.contextMenu.BuddiesContextMenuWrapper;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.contextMenu.ContextMenuWrapper;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.contextMenu.NewC;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.contextMenu.RefactorC;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.contextMenu.SarosContextMenuWrapper;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.contextMenu.ShareWithC;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.contextMenu.TeamC;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.contextMenu.WorkTogetherOnC;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.menuBar.MenuBar;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.menuBar.SarosM;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.menuBar.SarosPreferences;
@@ -60,9 +62,9 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponen
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.views.PEView;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.views.ProgressView;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.views.Views;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.views.sarosViews.BuddiesView;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.views.sarosViews.ChatView;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.views.sarosViews.RSView;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.views.sarosViews.SarosView;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.views.sarosViews.SessionView;
 
 /**
@@ -150,7 +152,7 @@ public class STFController {
          */
         exportObject(PEView.getInstance(), "packageExplorerView");
         exportObject(ProgressView.getInstance(), "progressView");
-        exportObject(BuddiesView.getInstance(), "rosterView");
+        exportObject(SarosView.getInstance(), "rosterView");
         exportObject(SessionView.getInstance(), "sessionView");
         exportObject(RSView.getInstance(), "remoteScreenView");
         exportObject(ChatView.getInstance(), "chatView");
@@ -164,8 +166,10 @@ public class STFController {
         exportObject(TeamC.getInstance(), "teamC");
         exportObject(ShareWithC.getInstance(), "shareWithC");
         exportObject(ContextMenuWrapper.getInstance(), "contextMenu");
-        exportObject(SarosContextMenuWrapper.getInstance(),
-            "sarosContextMenu");
+        exportObject(SarosContextMenuWrapper.getInstance(), "sarosContextMenu");
+        exportObject(BuddiesContextMenuWrapper.getInstance(),
+            "buddiesContextMenu");
+        exportObject(WorkTogetherOnC.getInstance(), "workTogetherOnC");
 
         exportObject(SarosPreferences.getInstance(), "sarosPreferences");
 

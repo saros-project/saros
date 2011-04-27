@@ -50,9 +50,14 @@ public class RemoteBotTreeItem extends AbstractRmoteWidget implements
      * 
      **********************************************/
 
-    public IRemoteBotMenu contextMenu(String... texts) throws RemoteException {
+    public IRemoteBotMenu contextMenus(String... texts) throws RemoteException {
         stfBotMenu.setWidget(ContextMenuHelper
             .getContextMenu(swtBotTree, texts));
+        return stfBotMenu;
+    }
+
+    public IRemoteBotMenu contextMenu(String text) throws RemoteException {
+        stfBotMenu.setWidget(widget.contextMenu(text));
         return stfBotMenu;
     }
 
@@ -86,7 +91,8 @@ public class RemoteBotTreeItem extends AbstractRmoteWidget implements
         return setWidget(widget.expand());
     }
 
-    public IRemoteBotTreeItem expandNode(String... nodes) throws RemoteException {
+    public IRemoteBotTreeItem expandNode(String... nodes)
+        throws RemoteException {
         return setWidget(widget.expandNode(nodes));
     }
 
@@ -98,7 +104,8 @@ public class RemoteBotTreeItem extends AbstractRmoteWidget implements
         return setWidget(widget.collapse());
     }
 
-    public IRemoteBotTreeItem collapseNode(String nodeText) throws RemoteException {
+    public IRemoteBotTreeItem collapseNode(String nodeText)
+        throws RemoteException {
         return setWidget(widget.collapseNode(nodeText));
     }
 
@@ -238,6 +245,19 @@ public class RemoteBotTreeItem extends AbstractRmoteWidget implements
             public String getFailureMessage() {
                 return "The tree node" + "doesn't contain the treeItem"
                     + subItemText;
+            }
+        });
+    }
+
+    public void waitUntilContextMenuExists(final String... contextNames)
+        throws RemoteException {
+        stfBot.waitLongUntil(new DefaultCondition() {
+            public boolean test() throws Exception {
+                return existsContextMenu(contextNames);
+            }
+
+            public String getFailureMessage() {
+                return "The contextmenu doesn't exists";
             }
         });
     }

@@ -28,7 +28,7 @@ public class TestChangingNameInRosterView extends STFTest {
         initTesters(TypeOfTester.ALICE, TypeOfTester.BOB);
         setUpWorkbench();
         setUpSaros();
-        resetBuddiesName();
+        // resetBuddiesName();
         setUpSessionWithAJavaProjectAndAClass(alice, bob);
     }
 
@@ -40,7 +40,7 @@ public class TestChangingNameInRosterView extends STFTest {
         // .renameBuddy(bob.jid, bob.jid.getBase());
         // }
         resetBuddiesName();
-        if (!alice.superBot().views().buddiesView().hasBuddy(bob.getJID())) {
+        if (!alice.superBot().views().sarosView().hasBuddy(bob.getJID())) {
             addBuddies(alice, bob);
         }
     }
@@ -62,20 +62,17 @@ public class TestChangingNameInRosterView extends STFTest {
      */
     @Test
     public void renameBuddyInRosterView() throws RemoteException {
-        assertTrue(alice.superBot().views().buddiesView()
-            .hasBuddy(bob.getJID()));
-        alice.superBot().views().buddiesView().selectBuddy(bob.getJID())
+        assertTrue(alice.superBot().views().sarosView().hasBuddy(bob.getJID()));
+        alice.superBot().views().sarosView().selectBuddy(bob.getJID())
             .rename(bob.getName());
-        assertTrue(alice.superBot().views().buddiesView()
-            .hasBuddy(bob.getJID()));
-        assertTrue(alice.superBot().views().buddiesView()
+        assertTrue(alice.superBot().views().sarosView().hasBuddy(bob.getJID()));
+        assertTrue(alice.superBot().views().sarosView()
             .getNickName(bob.getJID()).equals(bob.getName()));
         // assertTrue(alice.sessionV.isContactInSessionView(bob.getJID()));
-        alice.superBot().views().buddiesView().selectBuddy(bob.getJID())
+        alice.superBot().views().sarosView().selectBuddy(bob.getJID())
             .rename("new bob");
-        assertTrue(alice.superBot().views().buddiesView()
-            .hasBuddy(bob.getJID()));
-        assertTrue(alice.superBot().views().buddiesView()
+        assertTrue(alice.superBot().views().sarosView().hasBuddy(bob.getJID()));
+        assertTrue(alice.superBot().views().sarosView()
             .getNickName(bob.getJID()).equals("new bob"));
         // assertTrue(alice.sessionV.isContactInSessionView(bob.getJID()));
     }

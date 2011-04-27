@@ -107,7 +107,7 @@ public class TestSVNStateUpdates extends STFTest {
 
         buildSessionSequentially(SVN_PROJECT,
             TypeOfCreateProject.EXIST_PROJECT, alice, bob);
-        alice.superBot().views().sessionView()
+        alice.superBot().views().sarosView()
             .waitUntilIsInviteeInSession(bob.superBot());
     }
 
@@ -129,8 +129,8 @@ public class TestSVNStateUpdates extends STFTest {
     public static void runAfterClass() throws RemoteException {
         if (TesterConfiguration.DEVELOPMODE) {
             // don't delete SVN_PROJECT_COPY
-            alice.superBot().views().buddiesView().disconnect();
-            bob.superBot().views().buddiesView().disconnect();
+            alice.superBot().views().sarosView().disconnect();
+            bob.superBot().views().sarosView().disconnect();
         } else {
             resetSaros();
         }
@@ -153,7 +153,7 @@ public class TestSVNStateUpdates extends STFTest {
     @Test
     public void testGrantWriteAccessAndRenameClass() throws Exception {
 
-        assertTrue(bob.superBot().views().sessionView()
+        assertTrue(bob.superBot().views().sarosView()
             .selectParticipant(bob.getJID()).hasWriteAccess());
         bob.superBot().views().packageExplorerView()
             .selectClass(SVN_PROJECT, SVN_PKG, SVN_CLS1).refactor()
@@ -185,7 +185,7 @@ public class TestSVNStateUpdates extends STFTest {
     @Test
     public void testGrantWriteAccessAndMoveClass() throws Exception {
 
-        assertTrue(bob.superBot().views().sessionView()
+        assertTrue(bob.superBot().views().sarosView()
             .selectParticipant(bob.getJID()).hasWriteAccess());
         bob.superBot().views().packageExplorerView().tree().newC()
             .pkg(SVN_PROJECT, "new_package");

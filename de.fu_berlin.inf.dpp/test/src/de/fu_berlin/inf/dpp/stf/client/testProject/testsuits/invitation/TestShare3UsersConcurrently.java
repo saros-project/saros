@@ -57,31 +57,31 @@ public class TestShare3UsersConcurrently extends STFTest {
     public void testShareProjectConcurrently() throws RemoteException,
         InterruptedException {
 
-        assertTrue(carl.superBot().views().sessionView().isInSession());
-        assertFalse(carl.superBot().views().sessionView()
+        assertTrue(carl.superBot().views().sarosView().isInSession());
+        assertFalse(carl.superBot().views().sarosView()
             .selectParticipant(carl.getJID()).hasReadOnlyAccess());
-        assertTrue(carl.superBot().views().sessionView()
+        assertTrue(carl.superBot().views().sarosView()
             .selectParticipant(carl.getJID()).hasWriteAccess());
 
-        assertTrue(bob.superBot().views().sessionView().isInSession());
-        assertFalse(bob.superBot().views().sessionView()
+        assertTrue(bob.superBot().views().sarosView().isInSession());
+        assertFalse(bob.superBot().views().sarosView()
             .selectParticipant(bob.getJID()).hasReadOnlyAccess());
-        assertTrue(bob.superBot().views().sessionView()
+        assertTrue(bob.superBot().views().sarosView()
             .selectParticipant(bob.getJID()).hasWriteAccess());
 
-        assertTrue(alice.superBot().views().sessionView().isInSession());
-        assertFalse(alice.superBot().views().sessionView()
+        assertTrue(alice.superBot().views().sarosView().isInSession());
+        assertFalse(alice.superBot().views().sarosView()
             .selectParticipant(alice.getJID()).hasReadOnlyAccess());
-        assertTrue(alice.superBot().views().sessionView()
+        assertTrue(alice.superBot().views().sarosView()
             .selectParticipant(alice.getJID()).hasWriteAccess());
 
         leaveSessionPeersFirst();
 
-        assertFalse(carl.superBot().views().sessionView().isInSession());
+        assertFalse(carl.superBot().views().sarosView().isInSession());
 
-        assertFalse(bob.superBot().views().sessionView().isInSession());
+        assertFalse(bob.superBot().views().sarosView().isInSession());
 
-        assertFalse(alice.superBot().views().sessionView().isInSession());
+        assertFalse(alice.superBot().views().sarosView().isInSession());
 
     }
 }

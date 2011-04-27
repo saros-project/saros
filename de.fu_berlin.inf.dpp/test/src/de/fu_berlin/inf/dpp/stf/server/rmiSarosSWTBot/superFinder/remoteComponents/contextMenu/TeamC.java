@@ -49,7 +49,7 @@ public class TeamC extends Component implements ITeamC {
      * 
      **********************************************/
     public void shareProject(String repositoryURL) throws RemoteException {
-        treeItem.contextMenu(CM_TEAM, CM_SHARE_PROJECT_OF_TEAM).click();
+        treeItem.contextMenus(CM_TEAM, CM_SHARE_PROJECT_OF_TEAM).click();
 
         IRemoteBotShell shell = bot().shell(SHELL_SHARE_PROJECT);
         shell.confirmWithTable(TABLE_ITEM_REPOSITORY_TYPE_SVN, NEXT);
@@ -71,7 +71,7 @@ public class TeamC extends Component implements ITeamC {
 
         String[] contexts = { CM_TEAM, CM_SHARE_PROJECT_OF_TEAM };
 
-        treeItem.contextMenu(contexts).click();
+        treeItem.contextMenus(contexts).click();
 
         IRemoteBotShell shell = bot().shell(SHELL_SHARE_PROJECT);
         shell.confirmWithTable(TABLE_ITEM_REPOSITORY_TYPE_SVN, NEXT);
@@ -85,7 +85,7 @@ public class TeamC extends Component implements ITeamC {
         String specifiedFolderName) throws RemoteException {
         String[] contexts = { CM_TEAM, CM_SHARE_PROJECT_OF_TEAM };
 
-        treeItem.contextMenu(contexts).click();
+        treeItem.contextMenus(contexts).click();
 
         bot().shell(SHELL_SHARE_PROJECT).confirmWithTable(
             TABLE_ITEM_REPOSITORY_TYPE_SVN, NEXT);
@@ -162,13 +162,13 @@ public class TeamC extends Component implements ITeamC {
 
     public void disConnect() throws RemoteException {
         String[] contexts = { CM_TEAM, CM_DISCONNECT };
-        treeItem.contextMenu(contexts).click();
+        treeItem.contextMenus(contexts).click();
         bot().shell(SHELL_CONFIRM_DISCONNECT_FROM_SVN).confirm(YES);
     }
 
     public void revert() throws RemoteException {
         String[] contexts = { CM_TEAM, CM_REVERT };
-        treeItem.contextMenu(contexts).click();
+        treeItem.contextMenus(contexts).click();
         bot().shell(SHELL_REVERT).confirm(OK);
         bot().waitUntilShellIsClosed(SHELL_REVERT);
     }
@@ -181,7 +181,7 @@ public class TeamC extends Component implements ITeamC {
         throws RemoteException {
         String[] contexts = { CM_TEAM, CM_SWITCH_TO_ANOTHER_BRANCH_TAG_REVISION };
 
-        treeItem.contextMenu(contexts).click();
+        treeItem.contextMenus(contexts).click();
 
         IRemoteBotShell shell = bot().shell(SHELL_SWITCH);
         shell.waitUntilActive();

@@ -3,15 +3,16 @@ package de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteCompone
 import java.rmi.RemoteException;
 
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.Component;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.contextMenu.BuddiesContextMenuWrapper;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.contextMenu.ContextMenuWrapper;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.contextMenu.SarosContextMenuWrapper;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.views.sarosViews.BuddiesView;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.views.sarosViews.ChatView;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.views.sarosViews.IBuddiesView;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.views.sarosViews.IChatView;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.views.sarosViews.IRSView;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.views.sarosViews.ISarosView;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.views.sarosViews.ISessionView;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.views.sarosViews.RSView;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.views.sarosViews.SarosView;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.views.sarosViews.SessionView;
 
 public class Views extends Component implements IViews {
@@ -21,9 +22,11 @@ public class Views extends Component implements IViews {
     protected static ContextMenuWrapper contextMenu;
     protected static SarosContextMenuWrapper sarosContextMenu = SarosContextMenuWrapper
         .getInstance();
+    protected static BuddiesContextMenuWrapper buddiesContextMenu = BuddiesContextMenuWrapper
+        .getInstance();
 
     private static ChatView chatV;
-    private static BuddiesView rosterV;
+    private static SarosView rosterV;
     private static RSView rsV;
     private static SessionView sessionV;
     private static ConsoleView consoleV;
@@ -38,7 +41,7 @@ public class Views extends Component implements IViews {
             return self;
         self = new Views();
         chatV = ChatView.getInstance();
-        rosterV = BuddiesView.getInstance();
+        rosterV = SarosView.getInstance();
         rsV = RSView.getInstance();
         sessionV = SessionView.getInstance();
         consoleV = ConsoleView.getInstance();
@@ -54,7 +57,7 @@ public class Views extends Component implements IViews {
         return chatV.setView(bot().view(VIEW_SAROS));
     }
 
-    public IBuddiesView buddiesView() throws RemoteException {
+    public ISarosView sarosView() throws RemoteException {
         bot().openViewById(VIEW_SAROS_ID);
         bot().view(VIEW_SAROS).show();
         return rosterV.setView(bot().view(VIEW_SAROS));

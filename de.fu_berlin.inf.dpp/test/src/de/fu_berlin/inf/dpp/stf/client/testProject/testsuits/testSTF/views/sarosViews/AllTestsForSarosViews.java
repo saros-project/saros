@@ -9,8 +9,8 @@ import org.junit.runners.Suite.SuiteClasses;
  */
 @RunWith(Suite.class)
 @SuiteClasses(//
-{ TestGroupBuddiesByAlice.class, //
-    TestGroupBuddies.class,//
+{ TestBuddiesByAlice.class, //
+    TestBuddiesByAliceBobCarl.class,//
     TestGroupSession.class, //
     TestSarosView.class //
 })

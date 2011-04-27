@@ -42,7 +42,7 @@ public class TestMenuSaros extends STFTest {
         shell2.bot().shell(SHELL_SESSION_INVITATION).confirm(FINISH);
         bob.superBot().confirmShellAddProjectUsingWhichProject(PROJECT1,
             TypeOfCreateProject.NEW_PROJECT);
-        bob.superBot().views().sessionView().waitUntilIsInSession();
+        bob.superBot().views().sarosView().waitUntilIsInSession();
     }
 
     @Test
@@ -51,8 +51,8 @@ public class TestMenuSaros extends STFTest {
             .javaProject(PROJECT1);
         alice.superBot().menuBar().saros()
             .shareProjects(PROJECT1, bob.getJID());
-        bob.superBot().confirmShellSessionInvitationAndShellAddProject(PROJECT1,
-            TypeOfCreateProject.NEW_PROJECT);
+        bob.superBot().confirmShellSessionInvitationAndShellAddProject(
+            PROJECT1, TypeOfCreateProject.NEW_PROJECT);
     }
 
     @Test

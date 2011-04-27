@@ -75,8 +75,9 @@ public interface ISarosContextMenuWrapper extends Remote {
     public boolean isFollowingThisBuddy() throws RemoteException;
 
     /**
-     * wait until the condition {@link ISarosContextMenuWrapper#hasWriteAccess()}
-     * is true . This method should be used after performing the action
+     * wait until the condition
+     * {@link ISarosContextMenuWrapper#hasWriteAccess()} is true . This method
+     * should be used after performing the action
      * {@link ISarosContextMenuWrapper#grantWriteAccess()} to guarantee the
      * invitee has really got {@link User.Permission#WRITE_ACCESS} .
      * 
@@ -112,41 +113,47 @@ public interface ISarosContextMenuWrapper extends Remote {
      */
     public void waitUntilIsNotFollowingThisBuddy() throws RemoteException;
 
-    /**********************************************
-     * 
-     * contextMenus showed in buddies View
-     * 
-     **********************************************/
-    /**
-     * Delete the selected buddy by clicking his contextMenu
-     * {@link STF#CM_DELETE}
-     * <p>
-     * <b>Attention:</b>
-     * <ol>
-     * <li>Make sure, the roster view is open and active.</li>
-     * <li>The function should treat all the recursive following actions, which
-     * are activated or indirectly activated by clicking the context menu..</li>
-     * </ol>
-     * 
-     * @throws RemoteException
-     */
-    public void delete() throws RemoteException;
+    // /**********************************************
+    // *
+    // * contextMenus showed in buddies View
+    // *
+    // **********************************************/
+    // /**
+    // * Delete the selected buddy by clicking his contextMenu
+    // * {@link STF#CM_DELETE}
+    // * <p>
+    // * <b>Attention:</b>
+    // * <ol>
+    // * <li>Make sure, the roster view is open and active.</li>
+    // * <li>The function should treat all the recursive following actions,
+    // which
+    // * are activated or indirectly activated by clicking the context
+    // menu..</li>
+    // * </ol>
+    // *
+    // * @throws RemoteException
+    // */
+    // public void delete() throws RemoteException;
+    //
+    // /**
+    // * Rename the selected buddy'name to the passed newName
+    // *
+    // * @param newBuddyName
+    // * the new nickName
+    // * @throws RemoteException
+    // */
+    // public void rename(String newBuddyName) throws RemoteException;
+    //
+    // /**
+    // * Invite the selected buddy by clicking his contextMenu
+    // * {@link STF#CM_ADD_TO_SAROS_SESSION}
+    // *
+    // * @throws RemoteException
+    // */
+    // public void addToSarosSession() throws RemoteException;
+    //
+    // public void addBuddy(JID jid) throws RemoteException;
 
-    /**
-     * Rename the selected buddy'name to the passed newName
-     * 
-     * @param newBuddyName
-     *            the new nickName
-     * @throws RemoteException
-     */
-    public void rename(String newBuddyName) throws RemoteException;
-
-    /**
-     * Invite the selected buddy by clicking his contextMenu
-     * {@link STF#CM_INVITE_BUDDY}
-     * 
-     * @throws RemoteException
-     */
-    public void inviteBuddy() throws RemoteException;
+    public void leaveSarosSession() throws RemoteException;
 
 }

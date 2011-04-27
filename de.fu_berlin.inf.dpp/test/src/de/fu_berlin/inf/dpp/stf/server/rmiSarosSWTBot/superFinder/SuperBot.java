@@ -283,8 +283,8 @@ public class SuperBot extends STF implements ISuperBot {
         bot().shell(SHELL_ADD_BUDDY).bot().button(FINISH).click();
 
         bot().sleep(500);
-        if (bot().isShellOpen("Unknown Buddy Status")) {
-            bot().shell("Unknown Buddy Status").confirm(YES);
+        if (bot().isShellOpen("Buddy Unknown")) {
+            bot().shell("Buddy Unknown").confirm(YES);
         }
     }
 
@@ -319,7 +319,7 @@ public class SuperBot extends STF implements ISuperBot {
         }
         bot().shell(SHELL_SESSION_INVITATION).confirm(FINISH);
         confirmShellAddProjectUsingWhichProject(projectName, usingWhichProject);
-        views().sessionView().waitUntilIsInSession();
+        views().sarosView().waitUntilIsInSession();
     }
 
     public void confirmShellRequestOfSubscriptionReceived()

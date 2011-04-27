@@ -118,9 +118,9 @@ public class TestParallelInvitationWithTerminationByInvitees extends STFTest {
         edna.bot().shell(SHELL_SESSION_INVITATION).activate();
         edna.bot().shell(SHELL_SESSION_INVITATION).confirm(FINISH);
         edna.superBot().confirmShellAddProjectWithNewProject(PROJECT1);
-        edna.superBot().views().sessionView().leaveSession();
-        assertFalse(edna.superBot().views().sessionView().isInSession());
-        assertFalse(alice.superBot().views().sessionView()
+        edna.superBot().views().sarosView().leaveSession();
+        assertFalse(edna.superBot().views().sarosView().isInSession());
+        assertFalse(alice.superBot().views().sarosView()
             .selectParticipant(edna.getJID()).hasReadOnlyAccess());
 
     }
