@@ -9,10 +9,7 @@ import org.junit.runners.Suite.SuiteClasses;
  */
 @RunWith(Suite.class)
 @SuiteClasses(//
-{ TestBasicWidgetTree.class,//
-    TestBasicWidgetsTable.class, //
-
-})
+{ TestBasicWidgetTree.class })
 public class AllTestsForBasicWidgets {
     // empty
 }

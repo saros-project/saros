@@ -136,7 +136,7 @@ public class STF {
     public final static String SHELL_RENAME_PACKAGE = "Rename Package";
     public final static String SHELL_RENAME_JAVA_PROJECT = "Rename Java Project";
     public final static String SHELL_RENAME_RESOURCE = "Rename Resource";
-    public final static String SHELL_RENAME_COMPiIATION_UNIT = "Rename Compilation Unit";
+    public final static String SHELL_RENAME_COMPIIATION_UNIT = "Rename Compilation Unit";
     public final static String LABEL_NEW_NAME = "New name:";
 
     /* menu names */
@@ -339,11 +339,6 @@ public class STF {
         .getString("view_saros");
     public final static String VIEW_SAROS_ID = SarosMessages
         .getString("view_saros_id");
-
-    public final static String GROUP_BUDDIES = SarosMessages
-        .getString("group_buddies");
-    public final static String GROUP_SESSION = SarosMessages
-        .getString("group_session");
 
     // Permission: Write Access
     static public final String OWN_PARTICIPANT_NAME = SarosMessages

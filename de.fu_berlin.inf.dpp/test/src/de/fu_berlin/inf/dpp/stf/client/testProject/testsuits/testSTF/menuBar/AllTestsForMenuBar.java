@@ -12,6 +12,8 @@ import org.junit.runners.Suite.SuiteClasses;
 { TestMenuEdit.class,//
     TestMenuFile.class, //
     TestMenuRefactor.class, //
+    TestMenuSarosByAliceBob.class,//
+    TestMenuSarosByAliceBobCarl.class,//
     TestSarosPreferences.class //
 })
 public class AllTestsForMenuBar {

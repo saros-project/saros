@@ -112,8 +112,8 @@ public class TestBasicWidgetTree extends STFTest {
     public void existsTreeItemWithRegexsInView2() throws RemoteException {
         alice.superBot().views().sarosView()
             .connectWith(alice.getJID(), alice.getPassword());
-        assertTrue(alice.bot().view(VIEW_SAROS).bot()
-            .treeInGroup(GROUP_BUDDIES)
+        assertTrue(alice.bot().view(VIEW_SAROS).bot().tree()
+            .selectTreeItem(NODE_BUDDIES)
             .existsSubItemWithRegex(changeToRegex("bob_stf")));
     }
 
@@ -203,8 +203,8 @@ public class TestBasicWidgetTree extends STFTest {
     public void existsContextOfTreeItemInView() throws RemoteException {
         alice.superBot().views().sarosView()
             .connectWith(alice.getJID(), alice.getPassword());
-        assertTrue(alice.bot().view(VIEW_SAROS).bot()
-            .treeInGroup(GROUP_BUDDIES).selectTreeItemWithRegex("bob_stf.*")
+        assertTrue(alice.bot().view(VIEW_SAROS).bot().tree()
+            .selectTreeItemWithRegex(NODE_BUDDIES, "bob_stf.*")
             .existsContextMenu(CM_RENAME));
     }
 
@@ -223,8 +223,8 @@ public class TestBasicWidgetTree extends STFTest {
         alice.superBot().views().sarosView()
             .connectWith(alice.getJID(), alice.getPassword());
         alice.superBot().views().sarosView().waitUntilIsConnected();
-        assertTrue(alice.bot().view(VIEW_SAROS).bot()
-            .treeInGroup(GROUP_BUDDIES).selectTreeItemWithRegex("bob_stf.*")
+        assertTrue(alice.bot().view(VIEW_SAROS).bot().tree()
+            .selectTreeItemWithRegex(NODE_BUDDIES, "bob_stf.*")
             .isContextMenuEnabled(CM_RENAME));
 
         // assertFalse(alice.bot().view(VIEW_SAROS).bot()
@@ -251,9 +251,9 @@ public class TestBasicWidgetTree extends STFTest {
     public void clickContextsOfTreeItemInView() throws RemoteException {
         alice.superBot().views().sarosView()
             .connectWith(alice.getJID(), alice.getPassword());
-        alice.bot().view(VIEW_SAROS).bot().treeInGroup(GROUP_BUDDIES)
-            .selectTreeItemWithRegex("bob_stf.*").contextMenus(CM_RENAME)
-            .click();
+        alice.bot().view(VIEW_SAROS).bot().tree()
+            .selectTreeItemWithRegex(NODE_BUDDIES, "bob_stf.*")
+            .contextMenus(CM_RENAME).click();
         assertTrue(alice.bot().isShellOpen(SHELL_SET_NEW_NICKNAME));
     }
 

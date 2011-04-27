@@ -464,8 +464,7 @@ public class STFTest extends STF {
                 JID followedBuddyJID = tester.superBot().views().sarosView()
                     .getFollowedBuddy();
                 tester.superBot().views().sarosView()
-                    .selectParticipant(followedBuddyJID)
-                    .stopFollowing();
+                    .selectParticipant(followedBuddyJID).stopFollowing();
             }
         }
     }
@@ -489,8 +488,7 @@ public class STFTest extends STF {
                     JID followedBuddyJID = tester.superBot().views()
                         .sarosView().getFollowedBuddy();
                     tester.superBot().views().sarosView()
-                        .selectParticipant(followedBuddyJID)
-                        .stopFollowing();
+                        .selectParticipant(followedBuddyJID).stopFollowing();
                     return null;
                 }
             });

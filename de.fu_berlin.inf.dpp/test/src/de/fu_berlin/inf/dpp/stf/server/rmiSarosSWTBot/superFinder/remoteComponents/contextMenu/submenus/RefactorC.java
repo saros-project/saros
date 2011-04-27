@@ -57,7 +57,7 @@ public class RefactorC extends Component implements IRefactorC {
             rename(SHELL_RENAME_PACKAGE, OK, newName);
             break;
         case CLASS:
-            rename(SHELL_RENAME_COMPiIATION_UNIT, FINISH, newName);
+            rename(SHELL_RENAME_COMPIIATION_UNIT, FINISH, newName);
             break;
         default:
             rename(SHELL_RENAME_RESOURCE, OK, newName);
@@ -78,12 +78,12 @@ public class RefactorC extends Component implements IRefactorC {
         shell.bot().textWithLabel(LABEL_NEW_NAME).setText(newName);
         bot().shell(shellTitle).bot().button(buttonName).waitUntilIsEnabled();
         shell.bot().button(buttonName).click();
-        if (bot().isShellOpen("Rename Compilation Unit")) {
-            bot().shell("Rename Compilation Unit").bot().button(buttonName)
-                .waitUntilIsEnabled();
-            bot().shell("Rename Compilation Unit").bot().button(buttonName)
-                .click();
-        }
+        // if (bot().isShellOpen("Rename Compilation Unit")) {
+        // bot().shell("Rename Compilation Unit").bot().button(buttonName)
+        // .waitUntilIsEnabled();
+        // bot().shell("Rename Compilation Unit").bot().button(buttonName)
+        // .click();
+        // }
         if (bot().isShellOpen(shellTitle))
             bot().waitUntilShellIsClosed(shellTitle);
     }

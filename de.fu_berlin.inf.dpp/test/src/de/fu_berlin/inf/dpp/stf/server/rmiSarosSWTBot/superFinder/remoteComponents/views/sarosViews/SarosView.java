@@ -174,18 +174,20 @@ public class SarosView extends Views implements ISarosView {
     }
 
     public void leaveSession() throws RemoteException {
-        if (!isHost()) {
-            clickToolbarButtonWithTooltip(TB_LEAVE_SESSION);
-            bot().waitUntilShellIsOpen(SHELL_CONFIRM_LEAVING_SESSION);
-            bot().shell(SHELL_CONFIRM_LEAVING_SESSION).activate();
-            bot().shell(SHELL_CONFIRM_LEAVING_SESSION).confirm(YES);
-        } else {
-            clickToolbarButtonWithTooltip(TB_STOP_SESSION);
-            bot().waitUntilShellIsOpen(SHELL_CONFIRM_CLOSING_SESSION);
-            bot().shell(SHELL_CONFIRM_CLOSING_SESSION).activate();
-            bot().shell(SHELL_CONFIRM_CLOSING_SESSION).confirm(YES);
+        if (isInSession()) {
+            if (!isHost()) {
+                clickToolbarButtonWithTooltip(TB_LEAVE_SESSION);
+                bot().waitUntilShellIsOpen(SHELL_CONFIRM_LEAVING_SESSION);
+                bot().shell(SHELL_CONFIRM_LEAVING_SESSION).activate();
+                bot().shell(SHELL_CONFIRM_LEAVING_SESSION).confirm(YES);
+            } else {
+                clickToolbarButtonWithTooltip(TB_STOP_SESSION);
+                bot().waitUntilShellIsOpen(SHELL_CONFIRM_CLOSING_SESSION);
+                bot().shell(SHELL_CONFIRM_CLOSING_SESSION).activate();
+                bot().shell(SHELL_CONFIRM_CLOSING_SESSION).confirm(YES);
+            }
+            waitUntilIsNotInSession();
         }
-        waitUntilIsNotInSession();
     }
 
     /**

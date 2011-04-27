@@ -55,15 +55,11 @@ public class TestHandleContacts extends STFTest {
      */
     @Test
     public void testBobRemoveBuddyAlice() throws RemoteException {
-        assertTrue(alice.superBot().views().sarosView()
-            .hasBuddy(bob.getJID()));
-        assertTrue(bob.superBot().views().sarosView()
-            .hasBuddy(alice.getJID()));
+        assertTrue(alice.superBot().views().sarosView().hasBuddy(bob.getJID()));
+        assertTrue(bob.superBot().views().sarosView().hasBuddy(alice.getJID()));
         deleteBuddies(bob, alice);
-        assertFalse(bob.superBot().views().sarosView()
-            .hasBuddy(alice.getJID()));
-        assertFalse(alice.superBot().views().sarosView()
-            .hasBuddy(bob.getJID()));
+        assertFalse(bob.superBot().views().sarosView().hasBuddy(alice.getJID()));
+        assertFalse(alice.superBot().views().sarosView().hasBuddy(bob.getJID()));
     }
 
     /**
@@ -81,15 +77,11 @@ public class TestHandleContacts extends STFTest {
      */
     @Test
     public void testAliceRemoveBuddyBob() throws RemoteException {
-        assertTrue(alice.superBot().views().sarosView()
-            .hasBuddy(bob.getJID()));
-        assertTrue(bob.superBot().views().sarosView()
-            .hasBuddy(alice.getJID()));
+        assertTrue(alice.superBot().views().sarosView().hasBuddy(bob.getJID()));
+        assertTrue(bob.superBot().views().sarosView().hasBuddy(alice.getJID()));
         deleteBuddies(alice, bob);
-        assertFalse(bob.superBot().views().sarosView()
-            .hasBuddy(alice.getJID()));
-        assertFalse(alice.superBot().views().sarosView()
-            .hasBuddy(bob.getJID()));
+        assertFalse(bob.superBot().views().sarosView().hasBuddy(alice.getJID()));
+        assertFalse(alice.superBot().views().sarosView().hasBuddy(bob.getJID()));
     }
 
     /**
@@ -109,10 +101,8 @@ public class TestHandleContacts extends STFTest {
     public void testAliceAddBuddyBob() throws RemoteException {
         deleteBuddies(alice, bob);
         addBuddies(alice, bob);
-        assertTrue(bob.superBot().views().sarosView()
-            .hasBuddy(alice.getJID()));
-        assertTrue(alice.superBot().views().sarosView()
-            .hasBuddy(bob.getJID()));
+        assertTrue(bob.superBot().views().sarosView().hasBuddy(alice.getJID()));
+        assertTrue(alice.superBot().views().sarosView().hasBuddy(bob.getJID()));
     }
 
     /**
@@ -132,10 +122,8 @@ public class TestHandleContacts extends STFTest {
     public void testBobAddBuddyAlice() throws RemoteException {
         deleteBuddies(bob, alice);
         addBuddies(bob, alice);
-        assertTrue(bob.superBot().views().sarosView()
-            .hasBuddy(alice.getJID()));
-        assertTrue(alice.superBot().views().sarosView()
-            .hasBuddy(bob.getJID()));
+        assertTrue(bob.superBot().views().sarosView().hasBuddy(alice.getJID()));
+        assertTrue(alice.superBot().views().sarosView().hasBuddy(bob.getJID()));
     }
 
     /**
@@ -154,8 +142,7 @@ public class TestHandleContacts extends STFTest {
      */
     @Test
     public void testAddNoValidContact() throws RemoteException {
-        alice.bot().view(VIEW_SAROS_BUDDIES).toolbarButton(TB_ADD_A_NEW_BUDDY)
-            .click();
+        alice.bot().view(VIEW_SAROS).toolbarButton(TB_ADD_A_NEW_BUDDY).click();
         Map<String, String> labelsAndTexts = new HashMap<String, String>();
         labelsAndTexts.put("XMPP/Jabber ID", "bob@bla");
 
