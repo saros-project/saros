@@ -48,7 +48,7 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.SuperBot;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.Component;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.contextMenu.BuddiesContextMenuWrapper;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.contextMenu.ContextMenuWrapper;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.contextMenu.SarosContextMenuWrapper;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.contextMenu.SessionContextMenuWrapper;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.contextMenu.submenus.NewC;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.contextMenu.submenus.RefactorC;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.contextMenu.submenus.ShareWithC;
@@ -164,9 +164,11 @@ public class STFController {
         exportObject(TeamC.getInstance(), "teamC");
         exportObject(ShareWithC.getInstance(), "shareWithC");
         exportObject(ContextMenuWrapper.getInstance(), "contextMenu");
-        exportObject(SarosContextMenuWrapper.getInstance(), "sarosContextMenu");
+
         exportObject(BuddiesContextMenuWrapper.getInstance(),
             "buddiesContextMenu");
+        exportObject(SessionContextMenuWrapper.getInstance(),
+            "sessionContextMenu");
         exportObject(WorkTogetherOnC.getInstance(), "workTogetherOnC");
 
         exportObject(SarosPreferences.getInstance(), "sarosPreferences");

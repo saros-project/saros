@@ -27,7 +27,7 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.IRemo
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.IRemoteBotView;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.ISuperBot;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.contextMenu.IBuddiesContextMenuWrapper;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.contextMenu.ISarosContextMenuWrapper;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.contextMenu.ISessionContextMenuWrapper;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.views.Views;
 
 /**
@@ -244,18 +244,15 @@ public class SarosView extends Views implements ISarosView {
         return buddiesContextMenu;
     }
 
-    public ISarosContextMenuWrapper selectParticipant(final JID participantJID)
+    public ISessionContextMenuWrapper selectParticipant(final JID participantJID)
         throws RemoteException {
         if (!isInSession())
             throw new RuntimeException("You are not in a session!");
         String participantLabel = getParticipantLabel(participantJID);
-
-        initSarosContextMenuWrapper(tree.selectTreeItemWithRegex(NODE_SESSION,
-            participantLabel));
-
-        sarosContextMenu.setParticipantJID(participantJID);
-        sarosContextMenu.setSarosView(this);
-        return sarosContextMenu;
+        initSessionContextMenuWrapper(tree.selectTreeItemWithRegex(
+            NODE_SESSION, participantLabel));
+        sessionContextMenu.setParticipantJID(participantJID);
+        return sessionContextMenu;
     }
 
     /**********************************************
@@ -570,10 +567,12 @@ public class SarosView extends Views implements ISarosView {
         // treeItem = null;
     }
 
-    private void initSarosContextMenuWrapper(IRemoteBotTreeItem treeItem) {
+    private void initSessionContextMenuWrapper(IRemoteBotTreeItem treeItem) {
         // this.treeItem = treeItem;
-        sarosContextMenu.setTree(tree);
-        sarosContextMenu.setTreeItem(treeItem);
+        sessionContextMenu.setTree(tree);
+        sessionContextMenu.setTreeItem(treeItem);
+        sessionContextMenu.setSarosView(this);
+
     }
 
     private void initBuddiesContextMenuWrapper(IRemoteBotTreeItem treeItem) {

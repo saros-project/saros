@@ -11,7 +11,7 @@ import de.fu_berlin.inf.dpp.stf.client.AbstractTester;
 import de.fu_berlin.inf.dpp.stf.client.testProject.helpers.TestPattern;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.ISuperBot;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.contextMenu.IBuddiesContextMenuWrapper;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.contextMenu.ISarosContextMenuWrapper;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.contextMenu.ISessionContextMenuWrapper;
 
 /**
  * This interface contains convenience API to perform a action using widgets in
@@ -96,7 +96,7 @@ public interface ISarosView extends Remote {
 
     public IBuddiesContextMenuWrapper selectBuddies() throws RemoteException;
 
-    public ISarosContextMenuWrapper selectParticipant(final JID participantJID)
+    public ISessionContextMenuWrapper selectParticipant(final JID participantJID)
         throws RemoteException;
 
     /**********************************************
