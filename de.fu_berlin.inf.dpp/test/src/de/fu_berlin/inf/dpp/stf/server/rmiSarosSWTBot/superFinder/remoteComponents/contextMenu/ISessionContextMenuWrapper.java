@@ -29,19 +29,19 @@ public interface ISessionContextMenuWrapper extends ISarosContextMenuWrapper {
 
     /**
      * Follow the selected buddy by clicking his contextMenu
-     * {@link STF#CM_FOLLOW_THIS_BUDDY}
+     * {@link STF#CM_FOLLOW_PARTICIPANT}
      * 
      * @throws RemoteException
      */
-    public void followThisBuddy() throws RemoteException;
+    public void followParticipant() throws RemoteException;
 
     /**
      * Stop following the selected buddy by clicking his contextMenu
-     * {@link STF#CM_STOP_FOLLOWING_THIS_BUDDY}
+     * {@link STF#CM_STOP_FOLLOWING}
      * 
      * @throws RemoteException
      */
-    public void stopFollowingThisBuddy() throws RemoteException;
+    public void stopFollowing() throws RemoteException;
 
     /**
      * Jump to the position of the selected buddy by clicking his contextMenu
@@ -50,6 +50,10 @@ public interface ISessionContextMenuWrapper extends ISarosContextMenuWrapper {
      * @throws RemoteException
      */
     public void jumpToPositionOfSelectedBuddy() throws RemoteException;
+
+    public void addProjects(String... projectNames) throws RemoteException;
+
+    public void addBuddies(String... jidOfInvitees) throws RemoteException;
 
     /**
      * 
@@ -70,7 +74,7 @@ public interface ISessionContextMenuWrapper extends ISarosContextMenuWrapper {
      * @return<tt>true</tt>, if the local user is following the selected buddy
      * @throws RemoteException
      */
-    public boolean isFollowingThisBuddy() throws RemoteException;
+    public boolean isFollowing() throws RemoteException;
 
     /**
      * wait until the condition
@@ -94,19 +98,19 @@ public interface ISessionContextMenuWrapper extends ISarosContextMenuWrapper {
     public void waitUntilHasReadOnlyAccess() throws RemoteException;
 
     /**
-     * Wait until the condition
-     * {@link ISessionContextMenuWrapper#isFollowingThisBuddy()} is true.
+     * Wait until the condition {@link ISessionContextMenuWrapper#isFollowing()}
+     * is true.
      * 
      * @throws RemoteException
      */
-    public void waitUntilIsFollowingThisBuddy() throws RemoteException;
+    public void waitUntilIsFollowing() throws RemoteException;
 
     /**
-     * Wait until the condition
-     * {@link ISessionContextMenuWrapper#isFollowingThisBuddy()} is false.
+     * Wait until the condition {@link ISessionContextMenuWrapper#isFollowing()}
+     * is false.
      * 
      * @throws RemoteException
      */
-    public void waitUntilIsNotFollowingThisBuddy() throws RemoteException;
+    public void waitUntilIsNotFollowing() throws RemoteException;
 
 }

@@ -290,7 +290,7 @@ public class SuperBot extends STF implements ISuperBot {
 
     public void confirmShellShareProject(String projectName, JID... jids)
         throws RemoteException {
-        if (!bot().isShellOpen(SHELL_SHARE_PROJECT)) {
+        if (!bot().isShellOpen(SHELL_ADD_PROJECT)) {
             bot().waitUntilShellIsOpen(SHELL_SHARE_PROJECT);
         }
         IRemoteBotShell shell = bot().shell(SHELL_SHARE_PROJECT);
@@ -311,6 +311,21 @@ public class SuperBot extends STF implements ISuperBot {
         shell.bot().button(FINISH).click();
     }
 
+    public void confirmShellAddProjectsToSession(String... projectNames)
+        throws RemoteException {
+        if (!bot().isShellOpen(SHELL_ADD_PROJECTS_TO_SESSION)) {
+            bot().waitUntilShellIsOpen(SHELL_ADD_PROJECTS_TO_SESSION);
+        }
+        IRemoteBotShell shell = bot().shell(SHELL_ADD_PROJECTS_TO_SESSION);
+        shell.activate();
+
+        for (String projectName : projectNames) {
+            shell.bot().table().getTableItemWithRegex(projectName + ".*")
+                .check();
+        }
+        shell.bot().button(FINISH).click();
+    }
+
     public void confirmShellSessionInvitationAndShellAddProject(
         String projectName, TypeOfCreateProject usingWhichProject)
         throws RemoteException {
@@ -322,6 +337,36 @@ public class SuperBot extends STF implements ISuperBot {
         views().sarosView().waitUntilIsInSession();
     }
 
+    public void confirmShellAddProjects(String projectName,
+        TypeOfCreateProject usingWhichProject) throws RemoteException {
+        if (!bot().isShellOpen(SHELL_ADD_PROJECTS)) {
+            bot().waitLongUntilShellIsOpen(SHELL_ADD_PROJECTS);
+        }
+        IRemoteBotShell shell = bot().shell(SHELL_ADD_PROJECTS);
+
+        switch (usingWhichProject) {
+        case NEW_PROJECT:
+            shell.bot().radio(RADIO_CREATE_NEW_PROJECT).click();
+            break;
+        case EXIST_PROJECT:
+            shell.bot().radio(RADIO_USING_EXISTING_PROJECT).click();
+            shell.bot().textWithLabel("Project name", 1).setText(projectName);
+            break;
+        case EXIST_PROJECT_WITH_COPY:
+            shell.bot().radio("Use existing project").click();
+            shell
+                .bot()
+                .checkBox(
+                    "Create copy for working distributed. New project name:")
+                .click();
+            break;
+        default:
+            break;
+        }
+        shell.bot().button(FINISH).click();
+        shell.waitLongUntilIsClosed();
+    }
+
     public void confirmShellRequestOfSubscriptionReceived()
         throws RemoteException {
         bot().waitUntilShellIsOpen(SHELL_REQUEST_OF_SUBSCRIPTION_RECEIVED);
@@ -329,6 +374,19 @@ public class SuperBot extends STF implements ISuperBot {
         bot().shell(SHELL_REQUEST_OF_SUBSCRIPTION_RECEIVED).bot().button(OK)
             .click();
         bot().sleep(500);
+    }
+
+    public void confirmShellLeavingClosingSession() throws RemoteException {
+        if (!views.sarosView().isHost()) {
+            bot().waitUntilShellIsOpen(SHELL_CONFIRM_LEAVING_SESSION);
+            bot().shell(SHELL_CONFIRM_LEAVING_SESSION).activate();
+            bot().shell(SHELL_CONFIRM_LEAVING_SESSION).confirm(YES);
+        } else {
+            bot().waitUntilShellIsOpen(SHELL_CONFIRM_CLOSING_SESSION);
+            bot().shell(SHELL_CONFIRM_CLOSING_SESSION).activate();
+            bot().shell(SHELL_CONFIRM_CLOSING_SESSION).confirm(YES);
+        }
+        views.sarosView().waitUntilIsNotInSession();
     }
 
 }

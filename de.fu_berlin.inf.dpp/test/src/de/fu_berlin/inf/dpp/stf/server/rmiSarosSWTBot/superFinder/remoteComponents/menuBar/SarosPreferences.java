@@ -43,7 +43,7 @@ public class SarosPreferences extends Component implements ISarosPreferences {
         bot().waitUntilShellIsOpen(SHELL_CREATE_XMPP_JABBER_ACCOUNT);
         IRemoteBotShell shell = bot().shell(SHELL_CREATE_XMPP_JABBER_ACCOUNT);
         shell.activate();
-        sarosBot().confirmShellCreateNewXMPPJabberAccount(jid, password);
+        superBot().confirmShellCreateNewXMPPJabberAccount(jid, password);
         shell.bot().button(NEXT).click();
         shell.bot().button(FINISH).click();
         shell.bot().button(APPLY).click();
@@ -57,7 +57,7 @@ public class SarosPreferences extends Component implements ISarosPreferences {
             .bot()
             .buttonInGroup(GeneralPreferencePage.ADD_BTN_TEXT,
                 GeneralPreferencePage.ACCOUNT_GROUP_TITLE).click();
-        sarosBot().confirmShellAddXMPPJabberAccount(jid, password);
+        superBot().confirmShellAddXMPPJabberAccount(jid, password);
         bot().shell(SHELL_PREFERNCES).bot().button(APPLY).click();
         bot().shell(SHELL_PREFERNCES).bot().button(OK).click();
         bot().waitUntilShellIsClosed(SHELL_PREFERNCES);
@@ -92,7 +92,7 @@ public class SarosPreferences extends Component implements ISarosPreferences {
             .bot()
             .buttonInGroup(GeneralPreferencePage.CHANGE_BTN_TEXT,
                 GeneralPreferencePage.ACCOUNT_GROUP_TITLE).click();
-        sarosBot().confirmShellEditXMPPJabberAccount(newXmppJabberID,
+        superBot().confirmShellEditXMPPJabberAccount(newXmppJabberID,
             newPassword);
         shell.bot().button(APPLY).click();
         shell.bot().button(OK).click();

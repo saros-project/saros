@@ -59,8 +59,8 @@ public class SessionContextMenuWrapper extends SarosContextMenuWrapper
         bot().sleep(300);
     }
 
-    public void followThisBuddy() throws RemoteException {
-        if (isFollowingThisBuddy()) {
+    public void followParticipant() throws RemoteException {
+        if (isFollowing()) {
             log.debug(participantJID.getBase() + " is already followed by you.");
             return;
         }
@@ -68,14 +68,14 @@ public class SessionContextMenuWrapper extends SarosContextMenuWrapper
             throw new RuntimeException(
                 "Hi guy, you can't follow youself, it makes no sense! Please pass a correct parameter to the method.");
         }
-        treeItem.contextMenus(CM_FOLLOW_THIS_BUDDY).click();
+        treeItem.contextMenus(CM_FOLLOW_PARTICIPANT).click();
         // waitUntilIsFollowingThisBuddy();
     }
 
-    public void stopFollowingThisBuddy() throws RemoteException {
+    public void stopFollowing() throws RemoteException {
         log.debug(" JID of the followed user: " + participantJID.getBase());
-        treeItem.contextMenus(CM_STOP_FOLLOWING_THIS_BUDDY).click();
-        waitUntilIsNotFollowingThisBuddy();
+        treeItem.contextMenus(CM_STOP_FOLLOWING).click();
+        waitUntilIsNotFollowing();
     }
 
     public void jumpToPositionOfSelectedBuddy() throws RemoteException {
@@ -85,6 +85,22 @@ public class SessionContextMenuWrapper extends SarosContextMenuWrapper
         }
         treeItem.contextMenus(CM_JUMP_TO_POSITION_SELECTED_BUDDY).click();
     }
+
+    public void addProjects(String... projectNames) throws RemoteException {
+        treeItem.contextMenus(ADD_PROJECTS).click();
+        superBot().confirmShellAddProjectsToSession(projectNames);
+    }
+
+    public void addBuddies(String... jidOfInvitees) throws RemoteException {
+        treeItem.contextMenus(ADD_BUDDIES).click();
+        superBot().confirmShellAddBuddyToSession(jidOfInvitees);
+    }
+
+    /**********************************************
+     * 
+     * States
+     * 
+     **********************************************/
 
     public boolean hasWriteAccess() throws RemoteException {
         return !treeItem.contextMenus(CM_GRANT_WRITE_ACCESS).isEnabled()
@@ -96,9 +112,15 @@ public class SessionContextMenuWrapper extends SarosContextMenuWrapper
             .isEnabled() && treeItem.getText().contains(PERMISSION_NAME);
     }
 
-    public boolean isFollowingThisBuddy() throws RemoteException {
-        return treeItem.existsContextMenu(CM_STOP_FOLLOWING_THIS_BUDDY);
+    public boolean isFollowing() throws RemoteException {
+        return treeItem.existsContextMenu(CM_STOP_FOLLOWING);
     }
+
+    /**********************************************
+     * 
+     * Wait untils
+     * 
+     **********************************************/
 
     public void waitUntilHasWriteAccess() throws RemoteException {
         bot().waitUntil(new DefaultCondition() {
@@ -126,10 +148,10 @@ public class SessionContextMenuWrapper extends SarosContextMenuWrapper
         });
     }
 
-    public void waitUntilIsFollowingThisBuddy() throws RemoteException {
+    public void waitUntilIsFollowing() throws RemoteException {
         bot().waitUntil(new DefaultCondition() {
             public boolean test() throws Exception {
-                return isFollowingThisBuddy();
+                return isFollowing();
             }
 
             public String getFailureMessage() {
@@ -138,10 +160,10 @@ public class SessionContextMenuWrapper extends SarosContextMenuWrapper
         });
     }
 
-    public void waitUntilIsNotFollowingThisBuddy() throws RemoteException {
+    public void waitUntilIsNotFollowing() throws RemoteException {
         bot().waitUntil(new DefaultCondition() {
             public boolean test() throws Exception {
-                return !isFollowingThisBuddy();
+                return !isFollowing();
             }
 
             public String getFailureMessage() {

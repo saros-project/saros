@@ -35,14 +35,17 @@ public class TestSessionAliceBobCarl extends STFTest {
     }
 
     @Test
-    public void inviteUsersInSession() throws RemoteException,
-        InterruptedException {
+    public void inviteUsersInSession() throws RemoteException {
         bob.superBot().views().sarosView().leaveSession();
         bob.superBot().views().packageExplorerView().selectProject(PROJECT1)
             .delete();
         assertFalse(bob.superBot().views().sarosView().isInSession());
-        inviteBuddies(PROJECT1, TypeOfCreateProject.NEW_PROJECT, alice, bob,
-            carl);
+        alice.superBot().views().sarosView().selectSession()
+            .addBuddies(bob.getBaseJid(), carl.getBaseJid());
+        bob.superBot().confirmShellSessionInvitationAndShellAddProject(
+            PROJECT1, TypeOfCreateProject.NEW_PROJECT);
+        carl.superBot().confirmShellSessionInvitationAndShellAddProject(
+            PROJECT1, TypeOfCreateProject.NEW_PROJECT);
         assertTrue(carl.superBot().views().sarosView().isInSession());
         assertTrue(bob.superBot().views().sarosView().isInSession());
     }

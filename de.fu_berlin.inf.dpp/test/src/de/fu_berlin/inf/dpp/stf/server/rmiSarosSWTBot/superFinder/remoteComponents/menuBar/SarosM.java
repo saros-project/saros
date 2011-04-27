@@ -45,23 +45,33 @@ public class SarosM extends Component implements ISarosM {
     public void creatAccount(JID jid, String password) throws RemoteException {
         precondition();
         menu.menu(MENU_CREATE_ACCOUNT).click();
-        sarosBot().confirmShellCreateNewXMPPJabberAccount(jid, password);
+        superBot().confirmShellCreateNewXMPPJabberAccount(jid, password);
     }
 
     public void addBuddy(JID jid) throws RemoteException {
         menu.menu(MENU_ADD_BUDDY).click();
-        sarosBot().confirmShellAddBuddy(jid);
+        superBot().confirmShellAddBuddy(jid);
     }
 
     public void addBuddies(String... jidOfInvitees) throws RemoteException {
-        menu.menu(MENU_ADD_BUDDIES).click();
-        sarosBot().confirmShellAddBuddyToSession(jidOfInvitees);
+        menu.menu(ADD_BUDDIES).click();
+        superBot().confirmShellAddBuddyToSession(jidOfInvitees);
     }
 
     public void shareProjects(String projectName, JID... jids)
         throws RemoteException {
         menu.menu(MENU_SHARE_PROJECTS).click();
-        sarosBot().confirmShellShareProject(projectName, jids);
+        superBot().confirmShellShareProject(projectName, jids);
+    }
+
+    public void addProjects(String... projectNames) throws RemoteException {
+        menu.menu(ADD_PROJECTS).click();
+        superBot().confirmShellAddProjectsToSession(projectNames);
+    }
+
+    public void stopSession() throws RemoteException {
+        menu.menu(CM_STOP_SAROS_SESSION).click();
+        superBot().confirmShellLeavingClosingSession();
     }
 
     public ISarosPreferences preferences() throws RemoteException {

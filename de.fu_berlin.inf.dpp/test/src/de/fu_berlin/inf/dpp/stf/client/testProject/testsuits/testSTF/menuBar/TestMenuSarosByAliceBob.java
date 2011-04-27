@@ -1,5 +1,8 @@
 package de.fu_berlin.inf.dpp.stf.client.testProject.testsuits.testSTF.menuBar;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 import java.rmi.RemoteException;
 
 import org.junit.BeforeClass;
@@ -8,7 +11,7 @@ import org.junit.Test;
 import de.fu_berlin.inf.dpp.stf.client.testProject.testsuits.STFTest;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.IRemoteBotShell;
 
-public class TestMenuSaros extends STFTest {
+public class TestMenuSarosByAliceBob extends STFTest {
 
     @BeforeClass
     public static void runBeforeClass() throws RemoteException {
@@ -59,5 +62,31 @@ public class TestMenuSaros extends STFTest {
     public void testAddBuddy() throws RemoteException {
         alice.bot().menu(MENU_SAROS).menu(MENU_ADD_BUDDY).click();
         alice.superBot().confirmShellAddBuddy(bob.getJID());
+    }
+
+    @Test
+    public void addProjects() throws RemoteException, InterruptedException {
+        setUpSessionWithAJavaProjectAndAClass(alice, bob);
+        alice.superBot().views().packageExplorerView().tree().newC()
+            .javaProject(PROJECT2);
+        alice.superBot().menuBar().saros().addProjects(PROJECT2);
+        bob.superBot().confirmShellAddProjects(PROJECT2,
+            TypeOfCreateProject.NEW_PROJECT);
+    }
+
+    @Test
+    public void inviteUsersInSession() throws RemoteException,
+        InterruptedException {
+        setUpSessionWithAJavaProjectAndAClass(alice, bob);
+        assertFalse(carl.superBot().views().sarosView().isInSession());
+        inviteBuddies(PROJECT1, TypeOfCreateProject.NEW_PROJECT, alice, carl);
+        assertTrue(carl.superBot().views().sarosView().isInSession());
+    }
+
+    @Test
+    public void stopSession() throws RemoteException, InterruptedException {
+        setUpSessionWithAJavaProjectAndAClass(alice, bob);
+        alice.superBot().views().sarosView().selectBuddies().stopSarosSession();
+        assertFalse(alice.superBot().views().sarosView().isInSession());
     }
 }

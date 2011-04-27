@@ -36,4 +36,8 @@ public interface ISarosM extends Remote {
     public void shareProjects(String projectName, JID... jids)
         throws RemoteException;
 
+    public void addProjects(String... projectNames) throws RemoteException;
+
+    public void stopSession() throws RemoteException;
+
 }

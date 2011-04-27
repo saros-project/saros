@@ -182,8 +182,8 @@ public class STF {
         .getString("menu_create_account");
     public final static String MENU_ADD_BUDDY = SarosMessages
         .getString("menu_add_buddy");
-    public final static String MENU_ADD_BUDDIES = SarosMessages
-        .getString("menu_add_buddies");
+    public final static String ADD_BUDDIES = SarosMessages
+        .getString("add_buddies");
     public final static String MENU_SHARE_PROJECTS = SarosMessages
         .getString("menu_share_projects");
     public final static String MENU_PREFERENCES = SarosMessages
@@ -405,17 +405,23 @@ public class STF {
         .getString("cm_grant_write_access");
     public final static String CM_RESTRICT_TO_READ_ONLY_ACCESS = SarosMessages
         .getString("cm_restrict_to_read_only_access");
-    public final static String CM_FOLLOW_THIS_BUDDY = SarosMessages
+    public final static String CM_FOLLOW_PARTICIPANT = SarosMessages
         .getString("cm_follow_this_buddy");
-    public final static String CM_STOP_FOLLOWING_THIS_BUDDY = SarosMessages
+    public final static String CM_STOP_FOLLOWING = SarosMessages
         .getString("cm_stop_following_this_buddy");
     public final static String CM_JUMP_TO_POSITION_SELECTED_BUDDY = SarosMessages
         .getString("cm_jump_to_position_of_selected_buddy");
     public final static String CM_CHANGE_COLOR = SarosMessages
         .getString("cm_change_color");
 
+    public final static String ADD_PROJECTS = SarosMessages
+        .getString("add_projects");
+
     public final static String CM_STOP_SAROS_SESSION = SarosMessages
         .getString("cm_stop_saros_session");
+
+    public final static String MENU_STOP_SESSION = SarosMessages
+        .getString("menu_stop_session");
 
     /**********************************************
      * 
@@ -464,8 +470,12 @@ public class STF {
         .getString("shell_invitation_cancelled");
     public final static String SHELL_SESSION_INVITATION = SarosMessages
         .getString("shell_session_invitation");
+    public final static String SHELL_ADD_PROJECTS = SarosMessages
+        .getString("shell_add_projects");
     public final static String SHELL_ADD_PROJECT = SarosMessages
         .getString("shell_add_project");
+    public final static String SHELL_ADD_PROJECTS_TO_SESSION = SarosMessages
+        .getString("shell_add_projects_to_session");
     public final static String SHELL_PROBLEM_OCCURRED = SarosMessages
         .getString("shell_problem_occurred");
     public final static String SHELL_WARNING_LOCAL_CHANGES_DELETED = SarosMessages

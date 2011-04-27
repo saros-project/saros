@@ -465,7 +465,7 @@ public class STFTest extends STF {
                     .getFollowedBuddy();
                 tester.superBot().views().sarosView()
                     .selectParticipant(followedBuddyJID)
-                    .stopFollowingThisBuddy();
+                    .stopFollowing();
             }
         }
     }
@@ -490,7 +490,7 @@ public class STFTest extends STF {
                         .sarosView().getFollowedBuddy();
                     tester.superBot().views().sarosView()
                         .selectParticipant(followedBuddyJID)
-                        .stopFollowingThisBuddy();
+                        .stopFollowing();
                     return null;
                 }
             });
@@ -694,7 +694,7 @@ public class STFTest extends STF {
                 public Void call() throws Exception {
                     tester.superBot().views().sarosView()
                         .selectParticipant(followedBuddy.getJID())
-                        .isFollowingThisBuddy();
+                        .isFollowing();
                     return null;
                 }
             });

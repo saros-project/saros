@@ -33,7 +33,7 @@ public class BuddiesContextMenuWrapper extends SarosContextMenuWrapper
 
     /**********************************************
      * 
-     * contextMenus showed in buddies View
+     * contextMenus showed in buddies-area
      * 
      **********************************************/
 
@@ -68,7 +68,7 @@ public class BuddiesContextMenuWrapper extends SarosContextMenuWrapper
     public void addBuddy(JID jid) throws RemoteException {
         if (!sarosView.hasBuddy(jid)) {
             treeItem.contextMenus("Add Buddy...").click();
-            sarosBot().confirmShellAddBuddy(jid);
+            superBot().confirmShellAddBuddy(jid);
         }
     }
 

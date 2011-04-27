@@ -33,19 +33,8 @@ public class SarosContextMenuWrapper extends Component implements
      * 
      **************************************************************/
 
-    public void leaveSarosSession() throws RemoteException {
-        if (!sarosView.isHost()) {
-            treeItem.contextMenus(CM_STOP_SAROS_SESSION).click();
-            bot().waitUntilShellIsOpen(SHELL_CONFIRM_LEAVING_SESSION);
-            bot().shell(SHELL_CONFIRM_LEAVING_SESSION).activate();
-            bot().shell(SHELL_CONFIRM_LEAVING_SESSION).confirm(YES);
-        } else {
-            treeItem.contextMenus(CM_STOP_SAROS_SESSION).click();
-            bot().waitUntilShellIsOpen(SHELL_CONFIRM_CLOSING_SESSION);
-            bot().shell(SHELL_CONFIRM_CLOSING_SESSION).activate();
-            bot().shell(SHELL_CONFIRM_CLOSING_SESSION).confirm(YES);
-        }
-        sarosView.waitUntilIsNotInSession();
-
+    public void stopSarosSession() throws RemoteException {
+        treeItem.contextMenus(CM_STOP_SAROS_SESSION).click();
+        superBot().confirmShellLeavingClosingSession();
     }
 }

@@ -4,7 +4,6 @@ import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.util.List;
 
-import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.stf.STF;
 import de.fu_berlin.inf.dpp.stf.client.AbstractTester;
@@ -95,6 +94,8 @@ public interface ISarosView extends Remote {
         throws RemoteException;
 
     public IBuddiesContextMenuWrapper selectBuddies() throws RemoteException;
+
+    public ISessionContextMenuWrapper selectSession() throws RemoteException;
 
     public ISessionContextMenuWrapper selectParticipant(final JID participantJID)
         throws RemoteException;
@@ -296,24 +297,6 @@ public interface ISarosView extends Remote {
      */
     public void inconsistencyDetected() throws RemoteException;
 
-    /**
-     * performs the {@link RestrictInviteesToReadOnlyAccessAction} which should
-     * be activated by clicking the toolBar button with the toolTip text
-     * {@link STF#TB_RESTRICT_INVITEES_TO_READ_ONLY_ACCESS} on the session view.
-     * The button is only enabled, if there users with
-     * {@link User.Permission#WRITE_ACCESS} existed in the session.
-     * <p>
-     * <b>Attention:</b>
-     * <ol>
-     * <li>Makes sure, the session view is open and active.</li>
-     * <li>All iterative triggered events by the action should be handled in the
-     * method(exclude remote triggered events). E.g. a popup window.</li>
-     * </ol>
-     * 
-     * @throws RemoteException
-     */
-    public void restrictInviteesToReadOnlyAccess() throws RemoteException;
-
     /**********************************************
      * 
      * States
@@ -363,8 +346,7 @@ public interface ISarosView extends Remote {
      * 
      * @return<tt>true</tt>, if there are participant in the session list
      *                       existed and his contextMenu
-     *                       {@link STF#CM_STOP_FOLLOWING_THIS_BUDDY} is
-     *                       enabled.
+     *                       {@link STF#CM_STOP_FOLLOWING} is enabled.
      * @throws RemoteException
      */
     public boolean isFollowing() throws RemoteException;

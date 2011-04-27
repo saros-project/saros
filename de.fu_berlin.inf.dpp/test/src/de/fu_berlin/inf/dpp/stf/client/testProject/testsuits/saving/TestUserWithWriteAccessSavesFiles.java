@@ -51,9 +51,9 @@ public class TestUserWithWriteAccessSavesFiles extends STFTest {
         // alice.bot.waitUntilNoInvitationProgress();
         setFollowMode(alice, dave, edna);
         dave.superBot().views().sarosView().selectParticipant(alice.getJID())
-            .waitUntilIsFollowingThisBuddy();
+            .waitUntilIsFollowing();
         edna.superBot().views().sarosView().selectParticipant(alice.getJID())
-            .waitUntilIsFollowingThisBuddy();
+            .waitUntilIsFollowing();
 
     }
 

@@ -59,9 +59,9 @@ public class TestEditorByAliceAndBob extends STFTest {
     public void waitUntilBobJavaEditorOpen() throws RemoteException {
 
         bob.superBot().views().sarosView().selectParticipant(alice.getJID())
-            .followThisBuddy();
+            .followParticipant();
         assertTrue(bob.superBot().views().sarosView()
-            .selectParticipant(alice.getJID()).isFollowingThisBuddy());
+            .selectParticipant(alice.getJID()).isFollowing());
         alice.superBot().views().packageExplorerView()
             .selectClass(PROJECT1, PKG1, CLS1).open();
         bob.bot().waitUntilEditorOpen(CLS1_SUFFIX);
@@ -75,7 +75,7 @@ public class TestEditorByAliceAndBob extends STFTest {
             .selectClass(PROJECT1, PKG1, CLS1).open();
         setFollowMode(alice, bob);
         assertTrue(bob.superBot().views().sarosView()
-            .selectParticipant(alice.getJID()).isFollowingThisBuddy());
+            .selectParticipant(alice.getJID()).isFollowing());
         assertTrue(bob.bot().editor(CLS1_SUFFIX).isActive());
 
         alice.superBot().views().packageExplorerView().tree().newC()

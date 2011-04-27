@@ -87,14 +87,14 @@ public class TestSessionAliceBob extends STFTest {
     @Test
     public void testFollowMode() throws RemoteException {
         assertFalse(alice.superBot().views().sarosView()
-            .selectParticipant(bob.getJID()).isFollowingThisBuddy());
+            .selectParticipant(bob.getJID()).isFollowing());
         assertFalse(bob.superBot().views().sarosView()
-            .selectParticipant(alice.getJID()).isFollowingThisBuddy());
+            .selectParticipant(alice.getJID()).isFollowing());
 
         bob.superBot().views().sarosView().selectParticipant(alice.getJID())
-            .followThisBuddy();
+            .followParticipant();
         assertTrue(bob.superBot().views().sarosView()
-            .selectParticipant(alice.getJID()).isFollowingThisBuddy());
+            .selectParticipant(alice.getJID()).isFollowing());
 
         alice.superBot().views().packageExplorerView()
             .selectClass(PROJECT1, PKG1, CLS1).open();
@@ -103,9 +103,9 @@ public class TestSessionAliceBob extends STFTest {
         assertTrue(bob.bot().isEditorOpen(CLS1_SUFFIX));
 
         alice.superBot().views().sarosView().selectParticipant(bob.getJID())
-            .followThisBuddy();
+            .followParticipant();
         assertTrue(alice.superBot().views().sarosView()
-            .selectParticipant(bob.getJID()).isFollowingThisBuddy());
+            .selectParticipant(bob.getJID()).isFollowing());
 
         bob.bot().editor(CLS1 + SUFFIX_JAVA).closeWithSave();
         alice.bot().waitUntilEditorClosed(CLS1_SUFFIX);
@@ -115,19 +115,19 @@ public class TestSessionAliceBob extends STFTest {
     @Test
     public void testStopFollowing() throws RemoteException {
         assertFalse(alice.superBot().views().sarosView()
-            .selectParticipant(bob.getJID()).isFollowingThisBuddy());
+            .selectParticipant(bob.getJID()).isFollowing());
         assertFalse(bob.superBot().views().sarosView()
-            .selectParticipant(alice.getJID()).isFollowingThisBuddy());
+            .selectParticipant(alice.getJID()).isFollowing());
 
         bob.superBot().views().sarosView().selectParticipant(alice.getJID())
-            .followThisBuddy();
+            .followParticipant();
         assertTrue(bob.superBot().views().sarosView()
-            .selectParticipant(alice.getJID()).isFollowingThisBuddy());
+            .selectParticipant(alice.getJID()).isFollowing());
 
         bob.superBot().views().sarosView().selectParticipant(alice.getJID())
-            .stopFollowingThisBuddy();
+            .stopFollowing();
         assertFalse(bob.superBot().views().sarosView()
-            .selectParticipant(alice.getJID()).isFollowingThisBuddy());
+            .selectParticipant(alice.getJID()).isFollowing());
 
     }
 
@@ -196,31 +196,6 @@ public class TestSessionAliceBob extends STFTest {
         assertTrue(editorTextOfAlice.equals(editorTextOfBob));
     }
 
-    @Test
-    @Ignore("there are not the toolbar button 'restrict invitees to ready only access many more'")
-    public void testRestrictInviteesToReadOnlyAccessGUI()
-        throws RemoteException {
-        assertTrue(alice.superBot().views().sarosView().isHost());
-        assertTrue(alice.bot().view(VIEW_SAROS)
-            .toolbarButton(TB_RESTRICT_INVITEES_TO_READ_ONLY_ACCESS)
-            .isEnabled());
-        assertFalse(bob.bot().view(VIEW_SAROS)
-            .toolbarButton(TB_RESTRICT_INVITEES_TO_READ_ONLY_ACCESS)
-            .isEnabled());
-
-        assertTrue(alice.superBot().views().sarosView()
-            .selectParticipant(alice.getJID()).hasWriteAccess());
-        assertTrue(bob.superBot().views().sarosView()
-            .selectParticipant(bob.getJID()).hasWriteAccess());
-
-        alice.superBot().views().sarosView().restrictInviteesToReadOnlyAccess();
-        assertFalse(bob.superBot().views().sarosView()
-            .selectParticipant(bob.getJID()).hasWriteAccess());
-        assertTrue(alice.superBot().views().sarosView()
-            .selectParticipant(alice.getJID()).hasWriteAccess());
-
-    }
-
     /**
      * alice(host) first leave the session then bob confirm the windonws
      * "Closing the Session".
@@ -264,4 +239,14 @@ public class TestSessionAliceBob extends STFTest {
         assertFalse(bob.superBot().views().sarosView().isInSession());
     }
 
+    @Test
+    public void addProjects() throws RemoteException, InterruptedException {
+        alice.superBot().views().packageExplorerView().tree().newC()
+            .javaProject(PROJECT2);
+        alice.superBot().views().sarosView().selectSession()
+            .addProjects(PROJECT2);
+        bob.superBot().confirmShellAddProjects(PROJECT2,
+            TypeOfCreateProject.NEW_PROJECT);
+
+    }
 }

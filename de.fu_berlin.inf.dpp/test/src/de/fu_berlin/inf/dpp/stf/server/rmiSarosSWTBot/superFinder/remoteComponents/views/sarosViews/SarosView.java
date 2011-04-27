@@ -75,13 +75,13 @@ public class SarosView extends Views implements ISarosView {
         log.trace("connectedByXMPP");
 
         log.trace("click the toolbar button \"Connect\" in the buddies view");
-        if (!sarosBot().menuBar().saros().preferences().existsAccount(jid)) {
-            sarosBot().menuBar().saros().preferences()
+        if (!superBot().menuBar().saros().preferences().existsAccount(jid)) {
+            superBot().menuBar().saros().preferences()
                 .addAccount(jid, password);
         } else {
-            if (!sarosBot().menuBar().saros().preferences()
+            if (!superBot().menuBar().saros().preferences()
                 .isAccountActive(jid)) {
-                sarosBot().menuBar().saros().preferences().activateAccount(jid);
+                superBot().menuBar().saros().preferences().activateAccount(jid);
             }
         }
         if (!isConnected()) {
@@ -99,7 +99,7 @@ public class SarosView extends Views implements ISarosView {
 
     public void connectWithActiveAccount() throws RemoteException {
         if (isDisConnected()) {
-            if (!sarosBot().menuBar().saros().preferences().existsAccount()) {
+            if (!superBot().menuBar().saros().preferences().existsAccount()) {
                 throw new RuntimeException(
                     "You need to at first add a account!");
             }
@@ -136,7 +136,7 @@ public class SarosView extends Views implements ISarosView {
     public void addANewBuddy(JID jid) throws RemoteException {
         if (!hasBuddy(jid)) {
             clickToolbarButtonWithTooltip(TB_ADD_A_NEW_BUDDY);
-            sarosBot().confirmShellAddBuddy(jid);
+            superBot().confirmShellAddBuddy(jid);
         }
     }
 
@@ -173,18 +173,6 @@ public class SarosView extends Views implements ISarosView {
         }
     }
 
-    public void restrictInviteesToReadOnlyAccess() throws RemoteException {
-        if (!isHost()) {
-            throw new RuntimeException("Only host can perform this action.");
-        }
-
-        clickToolbarButtonWithTooltip(TB_RESTRICT_INVITEES_TO_READ_ONLY_ACCESS);
-        for (JID invitee : getInvitees())
-            selectParticipant(invitee).waitUntilHasReadOnlyAccess();
-        bot().sleep(300);
-
-    }
-
     public void leaveSession() throws RemoteException {
         if (!isHost()) {
             clickToolbarButtonWithTooltip(TB_LEAVE_SESSION);
@@ -208,7 +196,7 @@ public class SarosView extends Views implements ISarosView {
     public void addBuddyToSession(String... jidOfInvitees)
         throws RemoteException {
         view.toolbarButton(TB_ADD_BUDDY_TO_SESSION).click();
-        sarosBot().confirmShellAddBuddyToSession(jidOfInvitees);
+        superBot().confirmShellAddBuddyToSession(jidOfInvitees);
     }
 
     /**
@@ -242,6 +230,14 @@ public class SarosView extends Views implements ISarosView {
         initBuddiesContextMenuWrapper(tree.selectTreeItemWithRegex(
             NODE_BUDDIES, getNickName(buddyJID) + ".*"));
         return buddiesContextMenu;
+    }
+
+    public ISessionContextMenuWrapper selectSession() throws RemoteException {
+        if (!isInSession())
+            throw new RuntimeException("You are not in a session!");
+        initSessionContextMenuWrapper(tree
+            .selectTreeItemWithRegex(NODE_SESSION));
+        return sessionContextMenu;
     }
 
     public ISessionContextMenuWrapper selectParticipant(final JID participantJID)
@@ -338,9 +334,9 @@ public class SarosView extends Views implements ISarosView {
             contactLabel = OWN_PARTICIPANT_NAME;
             // else
             // contactLabel = OWN_PARTICIPANT_NAME + " " + PERMISSION_NAME;
-        } else if (sarosBot().views().sarosView().hasNickName(participantJID)) {
+        } else if (superBot().views().sarosView().hasNickName(participantJID)) {
             // if (hasWriteAccessByNoGUI(participantJID))
-            contactLabel = sarosBot().views().sarosView()
+            contactLabel = superBot().views().sarosView()
                 .getNickName(participantJID)
                 + " \\(" + participantJID.getBase() + "\\)";
             // else
@@ -383,7 +379,7 @@ public class SarosView extends Views implements ISarosView {
         JID followedBuddy = getFollowedBuddy();
         if (followedBuddy == null)
             return false;
-        return selectParticipant(followedBuddy).isFollowingThisBuddy();
+        return selectParticipant(followedBuddy).isFollowing();
     }
 
     public List<String> getAllParticipants() throws RemoteException {

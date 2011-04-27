@@ -11,6 +11,6 @@ public interface ISarosContextMenuWrapper extends Remote {
      * 
      **********************************************/
 
-    public void leaveSarosSession() throws RemoteException;
+    public void stopSarosSession() throws RemoteException;
 
 }

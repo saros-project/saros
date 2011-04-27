@@ -30,7 +30,7 @@ public class Component extends STF {
         return stfBot;
     }
 
-    protected ISuperBot sarosBot() {
+    protected ISuperBot superBot() {
         return SuperBot.getInstance();
     }
 

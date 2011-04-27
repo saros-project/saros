@@ -121,7 +121,7 @@ public class TestBuddiesByAliceBob extends STFTest {
             PROJECT1, TypeOfCreateProject.NEW_PROJECT);
 
         alice.superBot().views().sarosView().selectBuddies()
-            .leaveSarosSession();
+            .stopSarosSession();
 
     }
 

@@ -44,7 +44,7 @@ public class ShareWithC extends Component implements IShareWithC {
     public void multipleBuddies(String projectName, JID... baseJIDOfInvitees)
         throws RemoteException {
         treeItem.contextMenus(CM_SHARE_WITH, CM_MULTIPLE_BUDDIES).click();
-        sarosBot().confirmShellShareProject(projectName, baseJIDOfInvitees);
+        superBot().confirmShellShareProject(projectName, baseJIDOfInvitees);
     }
 
     public void buddy(JID jid) throws RemoteException {

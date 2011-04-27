@@ -162,6 +162,9 @@ public interface ISuperBot extends Remote {
     public void confirmShellShareProject(String projectName, JID... jids)
         throws RemoteException;
 
+    public void confirmShellAddProjectsToSession(String... projectNames)
+        throws RemoteException;
+
     /**
      * confirm the shell with title {@link STF#SHELL_SESSION_INVITATION} and
      * also the following shell with title {@link STF#SHELL_ADD_PROJECT}
@@ -177,7 +180,12 @@ public interface ISuperBot extends Remote {
         String projectName, TypeOfCreateProject usingWhichProject)
         throws RemoteException;
 
+    public void confirmShellAddProjects(String projectName,
+        TypeOfCreateProject usingWhichProject) throws RemoteException;
+
     public void confirmShellRequestOfSubscriptionReceived()
         throws RemoteException;
+
+    public void confirmShellLeavingClosingSession() throws RemoteException;
 
 }
