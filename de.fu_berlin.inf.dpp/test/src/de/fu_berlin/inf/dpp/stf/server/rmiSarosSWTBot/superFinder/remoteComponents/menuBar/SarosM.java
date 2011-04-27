@@ -53,6 +53,11 @@ public class SarosM extends Component implements ISarosM {
         sarosBot().confirmShellAddBuddy(jid);
     }
 
+    public void addBuddies(String... jidOfInvitees) throws RemoteException {
+        menu.menu(MENU_ADD_BUDDIES).click();
+        sarosBot().confirmShellAddBuddyToSession(jidOfInvitees);
+    }
+
     public void shareProjects(String projectName, JID... jids)
         throws RemoteException {
         menu.menu(MENU_SHARE_PROJECTS).click();

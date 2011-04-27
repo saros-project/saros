@@ -38,10 +38,6 @@ public class SarosContextMenuWrapper extends Component implements
         this.treeItem = treeItem;
     }
 
-    // public void setTableItem(IRemoteBotTableItem tableItem) {
-    // this.tableItem = tableItem;
-    // }
-
     public void setTree(IRemoteBotTree tree) {
         this.tree = tree;
     }
@@ -74,7 +70,7 @@ public class SarosContextMenuWrapper extends Component implements
             throw new RuntimeException("User \"" + treeItem.getText()
                 + "\" already has write access!.");
         }
-        treeItem.contextMenu(CM_GRANT_WRITE_ACCESS).click();
+        treeItem.contextMenus(CM_GRANT_WRITE_ACCESS).click();
         waitUntilHasWriteAccess();
         bot().sleep(300);
     }
@@ -84,7 +80,7 @@ public class SarosContextMenuWrapper extends Component implements
             throw new RuntimeException("User \"" + treeItem.getText()
                 + "\" already has read-only access!");
         }
-        treeItem.contextMenu(CM_RESTRICT_TO_READ_ONLY_ACCESS).click();
+        treeItem.contextMenus(CM_RESTRICT_TO_READ_ONLY_ACCESS).click();
         waitUntilHasReadOnlyAccess();
         bot().sleep(300);
     }
@@ -98,13 +94,13 @@ public class SarosContextMenuWrapper extends Component implements
             throw new RuntimeException(
                 "Hi guy, you can't follow youself, it makes no sense! Please pass a correct parameter to the method.");
         }
-        treeItem.contextMenu(CM_FOLLOW_THIS_BUDDY).click();
+        treeItem.contextMenus(CM_FOLLOW_THIS_BUDDY).click();
         // waitUntilIsFollowingThisBuddy();
     }
 
     public void stopFollowingThisBuddy() throws RemoteException {
         log.debug(" JID of the followed user: " + participantJID.getBase());
-        treeItem.contextMenu(CM_STOP_FOLLOWING_THIS_BUDDY).click();
+        treeItem.contextMenus(CM_STOP_FOLLOWING_THIS_BUDDY).click();
         waitUntilIsNotFollowingThisBuddy();
     }
 
@@ -113,16 +109,16 @@ public class SarosContextMenuWrapper extends Component implements
             throw new RuntimeException(
                 "Hi guy, you can't jump to the position of youself, it makes no sense! Please pass a correct parameter to the method.");
         }
-        treeItem.contextMenu(CM_JUMP_TO_POSITION_SELECTED_BUDDY).click();
+        treeItem.contextMenus(CM_JUMP_TO_POSITION_SELECTED_BUDDY).click();
     }
 
     public boolean hasWriteAccess() throws RemoteException {
-        return !treeItem.contextMenu(CM_GRANT_WRITE_ACCESS).isEnabled()
+        return !treeItem.contextMenus(CM_GRANT_WRITE_ACCESS).isEnabled()
             && !treeItem.getText().contains(PERMISSION_NAME);
     }
 
     public boolean hasReadOnlyAccess() throws RemoteException {
-        return !treeItem.contextMenu(CM_RESTRICT_TO_READ_ONLY_ACCESS)
+        return !treeItem.contextMenus(CM_RESTRICT_TO_READ_ONLY_ACCESS)
             .isEnabled() && treeItem.getText().contains(PERMISSION_NAME);
     }
 
@@ -182,13 +178,12 @@ public class SarosContextMenuWrapper extends Component implements
 
     public void leaveSarosSession() throws RemoteException {
         if (!sarosView.isHost()) {
-            treeItem.contextMenu(CM_STOP_SAROS_SESSION).click();
-
+            treeItem.contextMenus(CM_STOP_SAROS_SESSION).click();
             bot().waitUntilShellIsOpen(SHELL_CONFIRM_LEAVING_SESSION);
             bot().shell(SHELL_CONFIRM_LEAVING_SESSION).activate();
             bot().shell(SHELL_CONFIRM_LEAVING_SESSION).confirm(YES);
         } else {
-            treeItem.contextMenu(CM_STOP_SAROS_SESSION).click();
+            treeItem.contextMenus(CM_STOP_SAROS_SESSION).click();
             bot().waitUntilShellIsOpen(SHELL_CONFIRM_CLOSING_SESSION);
             bot().shell(SHELL_CONFIRM_CLOSING_SESSION).activate();
             bot().shell(SHELL_CONFIRM_CLOSING_SESSION).confirm(YES);

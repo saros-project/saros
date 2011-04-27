@@ -15,8 +15,6 @@ public interface IRemoteBotTreeItem extends Remote {
 
     public IRemoteBotMenu contextMenus(String... texts) throws RemoteException;
 
-    public IRemoteBotMenu contextMenu(String text) throws RemoteException;
-
     /**********************************************
      * 
      * actions

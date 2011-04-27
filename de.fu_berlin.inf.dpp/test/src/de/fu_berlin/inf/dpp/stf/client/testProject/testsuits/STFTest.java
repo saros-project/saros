@@ -360,7 +360,7 @@ public class STFTest extends STF {
             if (tester != null) {
                 // tester.sarosBot().views().buddiesView().resetAllBuddyNameNoGUI();
                 tester.superBot().views().sarosView().disconnect();
-                // deleteAllProjects(tester);
+                deleteAllProjects(tester);
             }
         }
         resetAllBots();
@@ -784,8 +784,8 @@ public class STFTest extends STF {
         final TypeOfCreateProject usingWhichProject, AbstractTester inviter,
         AbstractTester... invitees) throws RemoteException,
         InterruptedException {
-        inviter.superBot().views().sarosView()
-            .addBuddyToSession(getPeersBaseJID(invitees));
+        inviter.superBot().menuBar().saros()
+            .addBuddies(getPeersBaseJID(invitees));
         List<Callable<Void>> joinSessionTasks = new ArrayList<Callable<Void>>();
         for (final AbstractTester tester : invitees) {
             joinSessionTasks.add(new Callable<Void>() {

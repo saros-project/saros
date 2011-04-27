@@ -211,11 +211,6 @@ public class SarosView extends Views implements ISarosView {
         sarosBot().confirmShellAddBuddyToSession(jidOfInvitees);
     }
 
-    // public void addANewBuddy(JID jidOfInvitee) throws RemoteException {
-    // view.toolbarButton(TB_ADD_A_NEW_BUDDY).click();
-    // sarosBot().confirmShellAddBuddy(jidOfInvitee);
-    // }
-
     /**
      * Note: {@link STF#TB_INCONSISTENCY_DETECTED} is not complete toolbarName,
      * so we need to use {@link IRemoteBotView#toolbarButtonWithRegex(String)}
@@ -233,8 +228,8 @@ public class SarosView extends Views implements ISarosView {
      **********************************************/
 
     public IBuddiesContextMenuWrapper selectBuddies() throws RemoteException {
-        initSarosContextMenuWrapper(tree.selectTreeItemWithRegex(NODE_BUDDIES));
-        buddiesContextMenu.setSarosView(this);
+        initBuddiesContextMenuWrapper(tree
+            .selectTreeItemWithRegex(NODE_BUDDIES));
         return buddiesContextMenu;
     }
 
@@ -244,9 +239,8 @@ public class SarosView extends Views implements ISarosView {
             throw new RuntimeException("No buddy with the ID "
                 + buddyJID.getBase() + " existed!");
         }
-        initSarosContextMenuWrapper(tree.selectTreeItemWithRegex(NODE_BUDDIES,
-            getNickName(buddyJID) + ".*"));
-        buddiesContextMenu.setSarosView(this);
+        initBuddiesContextMenuWrapper(tree.selectTreeItemWithRegex(
+            NODE_BUDDIES, getNickName(buddyJID) + ".*"));
         return buddiesContextMenu;
     }
 
@@ -255,12 +249,8 @@ public class SarosView extends Views implements ISarosView {
         if (!isInSession())
             throw new RuntimeException("You are not in a session!");
         String participantLabel = getParticipantLabel(participantJID);
-        for (int i = 0; i < tree.selectTreeItem(NODE_SESSION).getTextOfItems()
-            .size(); i++) {
-            System.out.println("bla: "
-                + tree.selectTreeItem(NODE_SESSION).getTextOfItems().get(i));
-        }
-        initSarosContextMenuWrapper(tree.selectTreeItem(NODE_SESSION,
+
+        initSarosContextMenuWrapper(tree.selectTreeItemWithRegex(NODE_SESSION,
             participantLabel));
 
         sarosContextMenu.setParticipantJID(participantJID);
@@ -347,33 +337,30 @@ public class SarosView extends Views implements ISarosView {
         throws RemoteException {
         String contactLabel;
         if (localJID.equals(participantJID)) {
-            if (hasWriteAccessNoGUI())
-                contactLabel = OWN_PARTICIPANT_NAME;
-            else
-                contactLabel = OWN_PARTICIPANT_NAME + " " + PERMISSION_NAME;
+            // if (hasWriteAccessNoGUI())
+            contactLabel = OWN_PARTICIPANT_NAME;
+            // else
+            // contactLabel = OWN_PARTICIPANT_NAME + " " + PERMISSION_NAME;
         } else if (sarosBot().views().sarosView().hasNickName(participantJID)) {
-            if (hasWriteAccessByNoGUI(participantJID))
-                contactLabel = sarosBot().views().sarosView()
-                    .getNickName(participantJID)
-                    + " (" + participantJID.getBase() + ")";
-            else
-                contactLabel = sarosBot().views().sarosView()
-                    .getNickName(participantJID)
-                    + " ("
-                    + participantJID.getBase()
-                    + ")"
-                    + " "
-                    + PERMISSION_NAME;
+            // if (hasWriteAccessByNoGUI(participantJID))
+            contactLabel = sarosBot().views().sarosView()
+                .getNickName(participantJID)
+                + " \\(" + participantJID.getBase() + "\\)";
+            // else
+            // contactLabel = sarosBot().views().sarosView()
+            // .getNickName(participantJID)
+            // + " ("
+            // + participantJID.getBase()
+            // + ")"
+            // + " "
+            // + PERMISSION_NAME;
         } else {
-            if (hasWriteAccessByNoGUI(participantJID))
-                contactLabel = participantJID.getBase();
-            else
-                contactLabel = participantJID.getBase() + " " + PERMISSION_NAME;
+            // if (hasWriteAccessByNoGUI(participantJID))
+            contactLabel = participantJID.getBase();
+            // else
+            // contactLabel = participantJID.getBase() + " " + PERMISSION_NAME;
         }
-        if (isFollowing()) {
-            contactLabel += " (following)";
-        }
-        return contactLabel;
+        return contactLabel + ".*";
     }
 
     public boolean isInSession() throws RemoteException {
@@ -384,17 +371,13 @@ public class SarosView extends Views implements ISarosView {
         return false;
     }
 
-    public boolean existsLabelInSessionView() throws RemoteException {
-        return view.bot().existsLabelInGroup("Session");
-    }
-
     public boolean isHost() throws RemoteException {
         if (!isInSession())
             return false;
         String ownLabelsInSessionView = getParticipantLabel(localJID);
         String talbeItem = tree.selectTreeItem(NODE_SESSION).getNode(0)
             .getText();
-        if (ownLabelsInSessionView.equals(talbeItem))
+        if (talbeItem.matches(ownLabelsInSessionView))
             return true;
         return false;
     }
@@ -404,12 +387,6 @@ public class SarosView extends Views implements ISarosView {
         if (followedBuddy == null)
             return false;
         return selectParticipant(followedBuddy).isFollowingThisBuddy();
-    }
-
-    public String getFirstLabelTextInSessionview() throws RemoteException {
-        if (existsLabelInSessionView())
-            return view.bot().label().getText();
-        throw new RuntimeException("There are no label in the session view.");
     }
 
     public List<String> getAllParticipants() throws RemoteException {
@@ -599,4 +576,10 @@ public class SarosView extends Views implements ISarosView {
         sarosContextMenu.setTreeItem(treeItem);
     }
 
+    private void initBuddiesContextMenuWrapper(IRemoteBotTreeItem treeItem) {
+        // this.treeItem = treeItem;
+        buddiesContextMenu.setTree(tree);
+        buddiesContextMenu.setTreeItem(treeItem);
+        buddiesContextMenu.setSarosView(this);
+    }
 }

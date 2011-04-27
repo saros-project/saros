@@ -182,6 +182,8 @@ public class STF {
         .getString("menu_create_account");
     public final static String MENU_ADD_BUDDY = SarosMessages
         .getString("menu_add_buddy");
+    public final static String MENU_ADD_BUDDIES = SarosMessages
+        .getString("menu_add_buddies");
     public final static String MENU_SHARE_PROJECTS = SarosMessages
         .getString("menu_share_projects");
     public final static String MENU_PREFERENCES = SarosMessages

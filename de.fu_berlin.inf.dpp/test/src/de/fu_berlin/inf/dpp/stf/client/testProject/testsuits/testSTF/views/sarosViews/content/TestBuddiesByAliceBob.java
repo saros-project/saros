@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.stf.client.testProject.testsuits.testSTF.views.sarosViews;
+package de.fu_berlin.inf.dpp.stf.client.testProject.testsuits.testSTF.views.sarosViews.content;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -119,8 +119,10 @@ public class TestBuddiesByAliceBob extends STFTest {
             .workTogetherOn().project(PROJECT1);
         bob.superBot().confirmShellSessionInvitationAndShellAddProject(
             PROJECT1, TypeOfCreateProject.NEW_PROJECT);
+
         alice.superBot().views().sarosView().selectBuddies()
             .leaveSarosSession();
+
     }
 
     @Test

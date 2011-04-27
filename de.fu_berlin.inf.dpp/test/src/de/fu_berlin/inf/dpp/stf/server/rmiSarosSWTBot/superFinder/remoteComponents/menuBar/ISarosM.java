@@ -31,6 +31,8 @@ public interface ISarosM extends Remote {
 
     public void addBuddy(JID jid) throws RemoteException;
 
+    public void addBuddies(String... jidOfInvitees) throws RemoteException;
+
     public void shareProjects(String projectName, JID... jids)
         throws RemoteException;
 

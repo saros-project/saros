@@ -23,31 +23,6 @@ public class BuddiesContextMenuWrapper extends SarosContextMenuWrapper
         return self;
     }
 
-    // protected JID participantJID;
-    // protected IRemoteBotTreeItem treeItem;
-    // protected IRemoteBotTree tree;
-
-    // protected ISarosView sarosView;
-
-    // @Override
-    // public void setTreeItem(IRemoteBotTreeItem treeItem) {
-    // this.treeItem = treeItem;
-    // }
-    //
-    // @Override
-    // public void setTree(IRemoteBotTree tree) {
-    // this.tree = tree;
-    // }
-    //
-    // @Override
-    // public void setParticipantJID(JID jid) {
-    // this.participantJID = jid;
-    // }
-
-    // public void setSarosView(ISarosView sarosView) {
-    // this.sarosView = sarosView;
-    // }
-
     /**************************************************************
      * 
      * exported functions
@@ -84,7 +59,7 @@ public class BuddiesContextMenuWrapper extends SarosContextMenuWrapper
                 "You can't invite this user, he isn't conntected yet");
         }
         treeItem.waitUntilContextMenuExists(CM_ADD_TO_SAROS_SESSION);
-        treeItem.contextMenu(CM_ADD_TO_SAROS_SESSION).click();
+        treeItem.contextMenus(CM_ADD_TO_SAROS_SESSION).click();
 
     }
 

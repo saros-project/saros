@@ -56,11 +56,6 @@ public class RemoteBotTreeItem extends AbstractRmoteWidget implements
         return stfBotMenu;
     }
 
-    public IRemoteBotMenu contextMenu(String text) throws RemoteException {
-        stfBotMenu.setWidget(widget.contextMenu(text));
-        return stfBotMenu;
-    }
-
     /**********************************************
      * 
      * actions

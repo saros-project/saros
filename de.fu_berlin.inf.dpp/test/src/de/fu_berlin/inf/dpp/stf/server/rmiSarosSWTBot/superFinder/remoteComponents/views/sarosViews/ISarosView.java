@@ -380,22 +380,6 @@ public interface ISarosView extends Remote {
 
     /**
      * 
-     * @return<tt>true</tt>, if there are some label texts existed in the
-     *                       session view. You can only see the label texts when
-     *                       you are not in a session.
-     * @throws RemoteException
-     */
-    public boolean existsLabelInSessionView() throws RemoteException;
-
-    /**
-     * @return the first label text on the session view, which should be showed
-     *         if there are no session.
-     * @throws RemoteException
-     */
-    public String getFirstLabelTextInSessionview() throws RemoteException;
-
-    /**
-     * 
      * @return the JID of the local user
      * @throws RemoteException
      */
