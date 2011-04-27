@@ -3,6 +3,7 @@ package de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteCompone
 import java.rmi.RemoteException;
 
 import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.contextMenu.submenus.IWorkTogetherOnC;
 
 public interface IBuddiesContextMenuWrapper extends ISarosContextMenuWrapper {
 

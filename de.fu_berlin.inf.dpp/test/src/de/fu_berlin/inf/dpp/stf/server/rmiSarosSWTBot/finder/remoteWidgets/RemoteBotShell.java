@@ -12,10 +12,10 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.conditions.SarosConditions;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.IRemoteBot;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.RemoteBot;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.views.sarosViews.SessionView;
 import de.fu_berlin.inf.dpp.stf.server.sarosSWTBot.SarosSWTBot;
 
-public class RemoteBotShell extends AbstractRmoteWidget implements IRemoteBotShell {
+public class RemoteBotShell extends AbstractRmoteWidget implements
+    IRemoteBotShell {
     private static transient RemoteBotShell self;
 
     public final static String TEXT_FIELD_TYPE_FILTER_TEXT = "type filter text";

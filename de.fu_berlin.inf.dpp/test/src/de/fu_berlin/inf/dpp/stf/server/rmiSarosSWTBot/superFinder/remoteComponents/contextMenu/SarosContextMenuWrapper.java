@@ -9,7 +9,6 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.IRemo
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.IRemoteBotTreeItem;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.Component;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.views.sarosViews.ISarosView;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.views.sarosViews.ISessionView;
 
 public class SarosContextMenuWrapper extends Component implements
     ISarosContextMenuWrapper {
@@ -30,8 +29,7 @@ public class SarosContextMenuWrapper extends Component implements
     protected JID participantJID;
     protected IRemoteBotTreeItem treeItem;
     protected IRemoteBotTree tree;
-    // protected IRemoteBotTableItem tableItem;
-    protected ISessionView sessionView;
+
     protected ISarosView sarosView;
 
     public void setTreeItem(IRemoteBotTreeItem treeItem) {
@@ -44,10 +42,6 @@ public class SarosContextMenuWrapper extends Component implements
 
     public void setParticipantJID(JID jid) {
         this.participantJID = jid;
-    }
-
-    public void setSessionView(ISessionView sessionView) {
-        this.sessionView = sessionView;
     }
 
     public void setSarosView(ISarosView sarosView) {

@@ -10,10 +10,8 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponen
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.views.sarosViews.IChatView;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.views.sarosViews.IRSView;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.views.sarosViews.ISarosView;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.views.sarosViews.ISessionView;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.views.sarosViews.RSView;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.views.sarosViews.SarosView;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.views.sarosViews.SessionView;
 
 public class Views extends Component implements IViews {
 
@@ -28,7 +26,6 @@ public class Views extends Component implements IViews {
     private static ChatView chatV;
     private static SarosView rosterV;
     private static RSView rsV;
-    private static SessionView sessionV;
     private static ConsoleView consoleV;
     private static PEView pEV;
     private static ProgressView progressvV;
@@ -43,7 +40,6 @@ public class Views extends Component implements IViews {
         chatV = ChatView.getInstance();
         rosterV = SarosView.getInstance();
         rsV = RSView.getInstance();
-        sessionV = SessionView.getInstance();
         consoleV = ConsoleView.getInstance();
         pEV = PEView.getInstance();
         progressvV = ProgressView.getInstance();
@@ -67,12 +63,6 @@ public class Views extends Component implements IViews {
         bot().openViewById(VIEW_REMOTE_SCREEN_ID);
         bot().view(VIEW_REMOTE_SCREEN).show();
         return rsV.setView(bot().view(VIEW_REMOTE_SCREEN));
-    }
-
-    public ISessionView sessionView() throws RemoteException {
-        bot().openViewById(VIEW_SAROS_ID);
-        bot().view(VIEW_SAROS).show();
-        return sessionV.setView(bot().view(VIEW_SAROS));
     }
 
     public IConsoleView consoleView() throws RemoteException {

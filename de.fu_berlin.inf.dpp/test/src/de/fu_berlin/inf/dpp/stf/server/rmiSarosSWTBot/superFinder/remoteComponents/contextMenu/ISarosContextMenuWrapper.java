@@ -5,7 +5,6 @@ import java.rmi.RemoteException;
 
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.stf.STF;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.views.sarosViews.ISessionView;
 
 public interface ISarosContextMenuWrapper extends Remote {
 
