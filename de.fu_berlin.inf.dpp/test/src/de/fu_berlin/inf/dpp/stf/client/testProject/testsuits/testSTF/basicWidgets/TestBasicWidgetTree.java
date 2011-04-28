@@ -226,26 +226,7 @@ public class TestBasicWidgetTree extends STFTest {
         assertTrue(alice.bot().view(VIEW_SAROS).bot().tree()
             .selectTreeItemWithRegex(NODE_BUDDIES, "bob_stf.*")
             .isContextMenuEnabled(CM_RENAME));
-
-        // assertFalse(alice.bot().view(VIEW_SAROS).bot()
-        // .treeInGroup(GROUP_BUDDIES).selectTreeItemWithRegex("carl1_stf.*")
-        // .isContextMenuEnabled(CM_INVITE_BUDDY));
-        // alice.bot().sleep(1000);
     }
-
-    // @Test
-    // public void isSubmenuOfContextOfTreeItemInViewEnabled()
-    // throws RemoteException {
-    // alice.sarosBot().views().packageExplorerView().tree().newC()
-    // .javaProject(PROJECT1);
-    // String[] contextNames1 = { CM_SHARE_WITH, CM_SHARE_PROJECT };
-    // String[] contextNames2 = { CM_SHARE_WITH, CM_ADD_TO_SESSION };
-    // assertTrue(alice.bot().view(VIEW_PACKAGE_EXPLORER).bot().tree()
-    // .selectTreeItem(PROJECT1).isContextMenuEnabled(contextNames1));
-    //
-    // assertFalse(alice.bot().view(VIEW_PACKAGE_EXPLORER).bot().tree()
-    // .selectTreeItem(PROJECT1).isContextMenuEnabled(contextNames2));
-    // }
 
     @Test
     public void clickContextsOfTreeItemInView() throws RemoteException {

@@ -20,6 +20,6 @@ import de.fu_berlin.inf.dpp.stf.client.testProject.testsuits.testSTF.views.saros
     AllTestsForMenuBar.class, //
     AllTestsForSarosViews.class //
 })
-public class AllSTFTests_BasicElements {
+public class AllTestsForSTF {
     // empty
 }

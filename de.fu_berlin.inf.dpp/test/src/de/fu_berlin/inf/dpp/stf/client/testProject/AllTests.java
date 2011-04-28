@@ -25,7 +25,7 @@ import de.fu_berlin.inf.dpp.stf.client.testProject.testsuits.testSTF.views.saros
     TestShareProjectUsingExistingProject.class, TestEditDuringInvitation.class,
     TestFileOperations.class, TestFolderOperations.class,
     TestWriteAccessChangeAndImmediateWrite.class, TestCreatingNewFile.class })
-public class AllSTFTests {
+public class AllTests {
     /**
      * Run AllTests in the list of SuiteClasses annotation
      */

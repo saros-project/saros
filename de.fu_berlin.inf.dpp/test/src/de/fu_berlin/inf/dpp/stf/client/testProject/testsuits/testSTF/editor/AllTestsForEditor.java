@@ -11,7 +11,7 @@ import org.junit.runners.Suite.SuiteClasses;
 @SuiteClasses(//
 { TestEditor2.class,//
     TestEditorByAlice.class, //
-    TestEditorByAliceAndBob.class, //
+    TestEditorByAliceBob.class, //
 
 })
 public class AllTestsForEditor {

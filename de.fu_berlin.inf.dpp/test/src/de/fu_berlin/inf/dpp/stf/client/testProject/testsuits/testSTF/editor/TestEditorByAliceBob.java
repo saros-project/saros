@@ -11,7 +11,7 @@ import org.junit.Test;
 
 import de.fu_berlin.inf.dpp.stf.client.testProject.testsuits.STFTest;
 
-public class TestEditorByAliceAndBob extends STFTest {
+public class TestEditorByAliceBob extends STFTest {
 
     @BeforeClass
     public static void runBeforeClass() throws RemoteException,

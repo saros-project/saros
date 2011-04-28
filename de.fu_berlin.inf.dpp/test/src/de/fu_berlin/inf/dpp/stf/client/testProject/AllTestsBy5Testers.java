@@ -10,7 +10,7 @@ import de.fu_berlin.inf.dpp.stf.client.testProject.testsuits.saving.TestUserWith
 @RunWith(Suite.class)
 @SuiteClasses({ TestUserWithWriteAccessResetsFiles.class,
     TestUserWithWriteAccessSavesFiles.class })
-public class AllSTFTestsWith5Testers {
+public class AllTestsBy5Testers {
     /**
      * Run AllTests in the list of SuiteClasses annotation
      */
