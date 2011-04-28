@@ -85,6 +85,6 @@ public class SarosM extends Component implements ISarosM {
      **********************************************/
 
     protected void precondition() throws RemoteException {
-        bot().activateWorkbench();
+        remoteBot().activateWorkbench();
     }
 }

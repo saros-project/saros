@@ -21,13 +21,16 @@ public class Component extends STF {
     public static XMPPAccountStore xmppAccountStore;
     public static FeedbackManager feedbackManager;
 
-    // // SWTBot framework
-    public static SarosSWTBot bot = SarosSWTBot.getInstance();
+    // SWTBot framework
+
     public static int sleepTime = STFController.sleepTime;
 
-    protected IRemoteWorkbenchBot bot() {
-        RemoteWorkbenchBot stfBot = RemoteWorkbenchBot.getInstance();
-        return stfBot;
+    protected SarosSWTBot bot() {
+        return SarosSWTBot.getInstance();
+    }
+
+    protected IRemoteWorkbenchBot remoteBot() {
+        return RemoteWorkbenchBot.getInstance();
     }
 
     protected ISuperBot superBot() {

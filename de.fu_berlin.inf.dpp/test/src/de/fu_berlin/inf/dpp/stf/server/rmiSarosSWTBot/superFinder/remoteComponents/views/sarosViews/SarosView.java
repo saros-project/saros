@@ -17,7 +17,6 @@ import org.jivesoftware.smack.Roster;
 
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.stf.STF;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.conditions.SarosConditions;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.remoteFinder.remoteWidgets.IRemoteBotMenu;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.remoteFinder.remoteWidgets.IRemoteBotToolbarDropDownButton;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.remoteFinder.remoteWidgets.IRemoteBotTree;
@@ -27,7 +26,6 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.ISuperBot;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.contextMenu.IBuddiesContextMenuWrapper;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.contextMenu.ISessionContextMenuWrapper;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.views.Views;
-import de.fu_berlin.inf.dpp.stf.server.sarosSWTBot.widgets.SarosSWTBotChatInput;
 
 /**
  * This implementation of {@link ISarosView}
@@ -40,6 +38,8 @@ public class SarosView extends Views implements ISarosView {
 
     private IRemoteBotView view;
     private IRemoteBotTree tree;
+
+    protected static Chatroom chatroom = Chatroom.getInstance();
 
     // private STFBotTreeItem treeItem;
 
@@ -167,8 +167,8 @@ public class SarosView extends Views implements ISarosView {
             jidOfPeer,
             "Hi guy, you can't start a VoIP session with youself, it makes no sense! Please pass a correct parameter to the method.");
         clickToolbarButtonWithTooltip(TB_START_VOIP_SESSION);
-        if (bot().shell(SHELL_ERROR_IN_SAROS_PLUGIN).isActive()) {
-            bot().shell(SHELL_ERROR_IN_SAROS_PLUGIN).confirm(OK);
+        if (remoteBot().shell(SHELL_ERROR_IN_SAROS_PLUGIN).isActive()) {
+            remoteBot().shell(SHELL_ERROR_IN_SAROS_PLUGIN).confirm(OK);
         }
     }
 
@@ -176,14 +176,14 @@ public class SarosView extends Views implements ISarosView {
         if (isInSession()) {
             if (!isHost()) {
                 clickToolbarButtonWithTooltip(TB_LEAVE_SESSION);
-                bot().waitUntilShellIsOpen(SHELL_CONFIRM_LEAVING_SESSION);
-                bot().shell(SHELL_CONFIRM_LEAVING_SESSION).activate();
-                bot().shell(SHELL_CONFIRM_LEAVING_SESSION).confirm(YES);
+                remoteBot().waitUntilShellIsOpen(SHELL_CONFIRM_LEAVING_SESSION);
+                remoteBot().shell(SHELL_CONFIRM_LEAVING_SESSION).activate();
+                remoteBot().shell(SHELL_CONFIRM_LEAVING_SESSION).confirm(YES);
             } else {
                 clickToolbarButtonWithTooltip(TB_STOP_SESSION);
-                bot().waitUntilShellIsOpen(SHELL_CONFIRM_CLOSING_SESSION);
-                bot().shell(SHELL_CONFIRM_CLOSING_SESSION).activate();
-                bot().shell(SHELL_CONFIRM_CLOSING_SESSION).confirm(YES);
+                remoteBot().waitUntilShellIsOpen(SHELL_CONFIRM_CLOSING_SESSION);
+                remoteBot().shell(SHELL_CONFIRM_CLOSING_SESSION).activate();
+                remoteBot().shell(SHELL_CONFIRM_CLOSING_SESSION).confirm(YES);
             }
             waitUntilIsNotInSession();
         }
@@ -207,7 +207,7 @@ public class SarosView extends Views implements ISarosView {
      */
     public void inconsistencyDetected() throws RemoteException {
         view.toolbarButtonWithRegex(TB_INCONSISTENCY_DETECTED + ".*").click();
-        bot().waitUntilShellIsClosed(SHELL_PROGRESS_INFORMATION);
+        remoteBot().waitUntilShellIsClosed(SHELL_PROGRESS_INFORMATION);
     }
 
     /**********************************************
@@ -261,22 +261,9 @@ public class SarosView extends Views implements ISarosView {
         return sessionContextMenu;
     }
 
-    public void sendChatMessage(String message) throws RemoteException {
-        bot().activateWorkbench();
-        SarosSWTBotChatInput chatInput = bot.chatInput();
-        chatInput.setText(message);
-        bot.text();
-        log.debug("inerted message in chat view: " + chatInput.getText());
-        // chatInput.pressShortcut(Keystrokes.LF);
-        chatInput.pressEnterKey();
-    }
-
-    public boolean compareChatMessage(String jid, String message)
-        throws RemoteException {
-        log.debug("chatLine: " + bot().lastChatLine());
-        log.debug("text of the lastChatLine: " + bot.lastChatLine().getText());
-        String text = bot.lastChatLine().getText();
-        return text.equals(message);
+    public IChatroom selectChatroom() throws RemoteException {
+        view.bot().cTabItem();
+        return chatroom;
     }
 
     /**********************************************
@@ -426,53 +413,6 @@ public class SarosView extends Views implements ISarosView {
             return null;
     }
 
-    public String getUserNameOnChatLinePartnerChangeSeparator()
-        throws RemoteException {
-        log.debug("user name of the first chat line partner change separator: "
-            + bot.chatLinePartnerChangeSeparator().getPlainID());
-        return bot.chatLinePartnerChangeSeparator().getPlainID();
-    }
-
-    public String getUserNameOnChatLinePartnerChangeSeparator(int index)
-        throws RemoteException {
-        log.debug("user name of the chat line partner change separator with the index"
-            + index
-            + ": "
-            + bot.chatLinePartnerChangeSeparator(index).getPlainID());
-        return bot.chatLinePartnerChangeSeparator(index).getPlainID();
-    }
-
-    public String getUserNameOnChatLinePartnerChangeSeparator(String plainID)
-        throws RemoteException {
-        log.debug("user name of the chat line partner change separator with the plainID "
-            + plainID
-            + ": "
-            + bot.chatLinePartnerChangeSeparator(plainID).getPlainID());
-        return bot.chatLinePartnerChangeSeparator(plainID).getPlainID();
-    }
-
-    public String getTextOfChatLine() throws RemoteException {
-        log.debug("text of the first chat line: " + bot.chatLine().getText());
-        return bot.chatLine().getText();
-    }
-
-    public String getTextOfChatLine(int index) throws RemoteException {
-        log.debug("text of the chat line with the index " + index + ": "
-            + bot.chatLine(index).getText());
-        return bot.chatLine(index).getText();
-    }
-
-    public String getTextOfLastChatLine() throws RemoteException {
-        log.debug("text of the last chat line: " + bot.lastChatLine().getText());
-        return bot.lastChatLine().getText();
-    }
-
-    public String getTextOfChatLine(String regex) throws RemoteException {
-        log.debug("text of the chat line with the specifed regex: "
-            + bot.chatLine(regex).getText());
-        return bot.chatLine(regex).getText();
-    }
-
     /**********************************************
      * 
      * waits until
@@ -480,7 +420,7 @@ public class SarosView extends Views implements ISarosView {
      **********************************************/
 
     public void waitUntilIsConnected() throws RemoteException {
-        bot().waitUntil(new DefaultCondition() {
+        remoteBot().waitUntil(new DefaultCondition() {
             public boolean test() throws Exception {
                 return isConnected();
             }
@@ -492,7 +432,7 @@ public class SarosView extends Views implements ISarosView {
     }
 
     public void waitUntilDisConnected() throws RemoteException {
-        bot().waitUntil(new DefaultCondition() {
+        remoteBot().waitUntil(new DefaultCondition() {
             public boolean test() throws Exception {
                 return isDisConnected();
             }
@@ -504,7 +444,7 @@ public class SarosView extends Views implements ISarosView {
     }
 
     public void waitUntilIsInSession() throws RemoteException {
-        bot().waitUntil(new DefaultCondition() {
+        remoteBot().waitUntil(new DefaultCondition() {
             public boolean test() throws Exception {
                 return isInSession();
             }
@@ -521,7 +461,7 @@ public class SarosView extends Views implements ISarosView {
     }
 
     public void waitUntilIsNotInSession() throws RemoteException {
-        bot().waitUntil(new DefaultCondition() {
+        remoteBot().waitUntil(new DefaultCondition() {
             public boolean test() throws Exception {
                 return !isInSession();
             }
@@ -539,7 +479,7 @@ public class SarosView extends Views implements ISarosView {
 
     public void waitUntilAllPeersLeaveSession(
         final List<JID> jidsOfAllParticipants) throws RemoteException {
-        bot().waitUntil(new DefaultCondition() {
+        remoteBot().waitUntil(new DefaultCondition() {
             public boolean test() throws Exception {
                 for (JID jid : jidsOfAllParticipants) {
                     if (existsParticipant(jid))
@@ -555,8 +495,7 @@ public class SarosView extends Views implements ISarosView {
     }
 
     public void waitUntilIsInconsistencyDetected() throws RemoteException {
-
-        bot().waitUntil(new DefaultCondition() {
+        remoteBot().waitUntil(new DefaultCondition() {
             public boolean test() throws Exception {
                 return view.toolbarButtonWithRegex(
                     TB_INCONSISTENCY_DETECTED + ".*").isEnabled();
@@ -567,11 +506,6 @@ public class SarosView extends Views implements ISarosView {
                     + " isn't enabled.";
             }
         });
-    }
-
-    public void waitUntilGetChatMessage(String jid, String message)
-        throws RemoteException {
-        bot().waitUntil(SarosConditions.isChatMessageExist(this, jid, message));
     }
 
     /**************************************************************
@@ -586,14 +520,6 @@ public class SarosView extends Views implements ISarosView {
             return false;
         return view.toolbarButton(tooltip).isEnabled();
     }
-
-    // private void clickToolbarButtonWithTooltip(String tooltipText)
-    // throws RemoteException {
-    // if (!view.existsToolbarButton(tooltipText))
-    // throw new RuntimeException("The toolbarbutton " + tooltipText
-    // + " doesn't exist!");
-    // view.toolbarButton(tooltipText).click();
-    // }
 
     private void clickToolbarButtonWithTooltip(String tooltipText)
         throws RemoteException {

@@ -73,10 +73,10 @@ public class RefactorC extends Component implements IRefactorC {
     private void rename(String shellTitle, String buttonName, String newName)
         throws RemoteException {
         treeItem.contextMenus(MENU_REFACTOR, MENU_RENAME).click();
-        IRemoteBotShell shell = bot().shell(shellTitle);
+        IRemoteBotShell shell = remoteBot().shell(shellTitle);
         shell.activate();
         shell.bot().textWithLabel(LABEL_NEW_NAME).setText(newName);
-        bot().shell(shellTitle).bot().button(buttonName).waitUntilIsEnabled();
+        remoteBot().shell(shellTitle).bot().button(buttonName).waitUntilIsEnabled();
         shell.bot().button(buttonName).click();
         // if (bot().isShellOpen("Rename Compilation Unit")) {
         // bot().shell("Rename Compilation Unit").bot().button(buttonName)
@@ -84,15 +84,15 @@ public class RefactorC extends Component implements IRefactorC {
         // bot().shell("Rename Compilation Unit").bot().button(buttonName)
         // .click();
         // }
-        if (bot().isShellOpen(shellTitle))
-            bot().waitUntilShellIsClosed(shellTitle);
+        if (remoteBot().isShellOpen(shellTitle))
+            remoteBot().waitUntilShellIsClosed(shellTitle);
     }
 
     private void moveTo(String shellTitle, String buttonName, String... nodes)
         throws RemoteException {
-        bot().menu(MENU_REFACTOR).menu(MENU_MOVE).click();
-        bot().shell(shellTitle).confirmWithTree(buttonName, nodes);
-        bot().waitUntilShellIsClosed(shellTitle);
+        remoteBot().menu(MENU_REFACTOR).menu(MENU_MOVE).click();
+        remoteBot().shell(shellTitle).confirmWithTree(buttonName, nodes);
+        remoteBot().waitUntilShellIsClosed(shellTitle);
     }
 
 }

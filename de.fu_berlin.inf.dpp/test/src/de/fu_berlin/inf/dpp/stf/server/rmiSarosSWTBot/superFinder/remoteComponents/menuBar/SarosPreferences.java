@@ -35,20 +35,20 @@ public class SarosPreferences extends Component implements ISarosPreferences {
             .bot()
             .buttonInGroup(BUTTON_ADD_ACCOUNT, GROUP_TITLE_XMPP_JABBER_ACCOUNTS)
             .click();
-        bot().waitUntilShellIsOpen(SHELL_SAROS_CONFIGURATION);
-        bot().shell(SHELL_SAROS_CONFIGURATION).activate();
+        remoteBot().waitUntilShellIsOpen(SHELL_SAROS_CONFIGURATION);
+        remoteBot().shell(SHELL_SAROS_CONFIGURATION).activate();
         shell_preferences.bot()
             .buttonInGroup(GROUP_TITLE_CREATE_NEW_XMPP_JABBER_ACCOUNT).click();
 
-        bot().waitUntilShellIsOpen(SHELL_CREATE_XMPP_JABBER_ACCOUNT);
-        IRemoteBotShell shell = bot().shell(SHELL_CREATE_XMPP_JABBER_ACCOUNT);
+        remoteBot().waitUntilShellIsOpen(SHELL_CREATE_XMPP_JABBER_ACCOUNT);
+        IRemoteBotShell shell = remoteBot().shell(SHELL_CREATE_XMPP_JABBER_ACCOUNT);
         shell.activate();
         superBot().confirmShellCreateNewXMPPJabberAccount(jid, password);
         shell.bot().button(NEXT).click();
         shell.bot().button(FINISH).click();
         shell.bot().button(APPLY).click();
         shell.bot().button(OK).click();
-        bot().waitUntilShellIsClosed(SHELL_PREFERNCES);
+        remoteBot().waitUntilShellIsClosed(SHELL_PREFERNCES);
     }
 
     public void addAccount(JID jid, String password) throws RemoteException {
@@ -58,9 +58,9 @@ public class SarosPreferences extends Component implements ISarosPreferences {
             .buttonInGroup(GeneralPreferencePage.ADD_BTN_TEXT,
                 GeneralPreferencePage.ACCOUNT_GROUP_TITLE).click();
         superBot().confirmShellAddXMPPJabberAccount(jid, password);
-        bot().shell(SHELL_PREFERNCES).bot().button(APPLY).click();
-        bot().shell(SHELL_PREFERNCES).bot().button(OK).click();
-        bot().waitUntilShellIsClosed(SHELL_PREFERNCES);
+        remoteBot().shell(SHELL_PREFERNCES).bot().button(APPLY).click();
+        remoteBot().shell(SHELL_PREFERNCES).bot().button(OK).click();
+        remoteBot().waitUntilShellIsClosed(SHELL_PREFERNCES);
     }
 
     public void activateAccount(JID jid) throws RemoteException {
@@ -79,7 +79,7 @@ public class SarosPreferences extends Component implements ISarosPreferences {
         assert shell.bot().existsLabel("Active: " + jid.getBase());
         shell.bot().button(APPLY).click();
         shell.bot().button(OK).click();
-        bot().waitUntilShellIsClosed(SHELL_PREFERNCES);
+        remoteBot().waitUntilShellIsClosed(SHELL_PREFERNCES);
     }
 
     public void changeAccount(JID jid, String newXmppJabberID,
@@ -96,7 +96,7 @@ public class SarosPreferences extends Component implements ISarosPreferences {
             newPassword);
         shell.bot().button(APPLY).click();
         shell.bot().button(OK).click();
-        bot().waitUntilShellIsClosed(SHELL_PREFERNCES);
+        remoteBot().waitUntilShellIsClosed(SHELL_PREFERNCES);
     }
 
     public void deleteAccount(JID jid, String password) throws RemoteException {
@@ -111,15 +111,15 @@ public class SarosPreferences extends Component implements ISarosPreferences {
             .buttonInGroup(GeneralPreferencePage.DELETE_BTN_TEXT,
                 GeneralPreferencePage.ACCOUNT_GROUP_TITLE).click();
         if (isAccountActiveNoGUI(jid)) {
-            bot().waitUntilShellIsOpen(SHELL_DELETING_ACTIVE_ACCOUNT);
-            bot().shell(SHELL_DELETING_ACTIVE_ACCOUNT).activate();
-            assert bot().shell(SHELL_DELETING_ACTIVE_ACCOUNT).isActive();
+            remoteBot().waitUntilShellIsOpen(SHELL_DELETING_ACTIVE_ACCOUNT);
+            remoteBot().shell(SHELL_DELETING_ACTIVE_ACCOUNT).activate();
+            assert remoteBot().shell(SHELL_DELETING_ACTIVE_ACCOUNT).isActive();
             throw new RuntimeException(
                 "It's not allowd to delete a active account");
         }
         shell.bot().button(APPLY).click();
         shell.bot().button(OK).click();
-        bot().waitUntilShellIsClosed(SHELL_PREFERNCES);
+        remoteBot().waitUntilShellIsClosed(SHELL_PREFERNCES);
     }
 
     public void deleteAllNoActiveAccounts() throws RemoteException {
@@ -133,26 +133,26 @@ public class SarosPreferences extends Component implements ISarosPreferences {
                 .bot()
                 .buttonInGroup(GeneralPreferencePage.DELETE_BTN_TEXT,
                     GeneralPreferencePage.ACCOUNT_GROUP_TITLE).click();
-            if (bot().isShellOpen(SHELL_DELETING_ACTIVE_ACCOUNT)
-                && bot().shell(SHELL_DELETING_ACTIVE_ACCOUNT).isActive()) {
-                bot().shell(SHELL_DELETING_ACTIVE_ACCOUNT).bot().button(OK)
+            if (remoteBot().isShellOpen(SHELL_DELETING_ACTIVE_ACCOUNT)
+                && remoteBot().shell(SHELL_DELETING_ACTIVE_ACCOUNT).isActive()) {
+                remoteBot().shell(SHELL_DELETING_ACTIVE_ACCOUNT).bot().button(OK)
                     .click();
                 continue;
             }
         }
         assert shell.bot().listInGroup(GROUP_TITLE_XMPP_JABBER_ACCOUNTS)
             .itemCount() == 1;
-        bot().shell(SHELL_PREFERNCES).bot().button(APPLY).click();
-        bot().shell(SHELL_PREFERNCES).bot().button(OK).click();
-        bot().waitUntilShellIsClosed(SHELL_PREFERNCES);
-        bot().sleep(300);
+        remoteBot().shell(SHELL_PREFERNCES).bot().button(APPLY).click();
+        remoteBot().shell(SHELL_PREFERNCES).bot().button(OK).click();
+        remoteBot().waitUntilShellIsClosed(SHELL_PREFERNCES);
+        remoteBot().sleep(300);
     }
 
     public void setupSettingForScreensharing(int encoder, int videoResolution,
         int bandWidth, int capturedArea) throws RemoteException {
         clickMenuSarosPreferences();
-        bot().waitUntilShellIsOpen(SHELL_PREFERNCES);
-        IRemoteBotShell shell = bot().shell(SHELL_PREFERNCES);
+        remoteBot().waitUntilShellIsOpen(SHELL_PREFERNCES);
+        IRemoteBotShell shell = remoteBot().shell(SHELL_PREFERNCES);
         shell.activate();
 
         shell.bot().tree().selectTreeItem(NODE_SAROS, NODE_SAROS_SCREENSHARING);
@@ -161,14 +161,14 @@ public class SarosPreferences extends Component implements ISarosPreferences {
 
         shell.bot().button(APPLY).click();
         shell.bot().button(OK).click();
-        bot().waitUntilShellIsClosed(SHELL_PREFERNCES);
+        remoteBot().waitUntilShellIsClosed(SHELL_PREFERNCES);
     }
 
     public void disableAutomaticReminder() throws RemoteException {
         if (feedbackManager.isFeedbackDisabled()) {
             clickMenuSarosPreferences();
-            bot().waitUntilShellIsOpen(SHELL_PREFERNCES);
-            IRemoteBotShell shell = bot().shell(SHELL_PREFERNCES);
+            remoteBot().waitUntilShellIsOpen(SHELL_PREFERNCES);
+            IRemoteBotShell shell = remoteBot().shell(SHELL_PREFERNCES);
             shell.activate();
             shell.bot().tree().selectTreeItem(NODE_SAROS, NODE_SAROS_FEEDBACK);
             shell
@@ -178,7 +178,7 @@ public class SarosPreferences extends Component implements ISarosPreferences {
                     Messages.getString("feedback.page.group.interval")).click();
             shell.bot().button(APPLY).click();
             shell.bot().button(OK).click();
-            bot().waitUntilShellIsClosed(SHELL_PREFERNCES);
+            remoteBot().waitUntilShellIsClosed(SHELL_PREFERNCES);
         }
     }
 
@@ -210,7 +210,7 @@ public class SarosPreferences extends Component implements ISarosPreferences {
             }
         }
         shell.bot().button(CANCEL).click();
-        bot().waitUntilShellIsClosed(SHELL_PREFERNCES);
+        remoteBot().waitUntilShellIsClosed(SHELL_PREFERNCES);
         return false;
     }
 
@@ -223,7 +223,7 @@ public class SarosPreferences extends Component implements ISarosPreferences {
         if (activeAccount.equals("Active: " + jid.getBase()))
             isActive = true;
         shell.bot().button(CANCEL).click();
-        bot().waitUntilShellIsClosed(SHELL_PREFERNCES);
+        remoteBot().waitUntilShellIsClosed(SHELL_PREFERNCES);
         return isActive;
     }
 
@@ -238,8 +238,8 @@ public class SarosPreferences extends Component implements ISarosPreferences {
      */
     private IRemoteBotShell preCondition() throws RemoteException {
         clickMenuSarosPreferences();
-        bot().waitUntilShellIsOpen(SHELL_PREFERNCES);
-        IRemoteBotShell shell = bot().shell(SHELL_PREFERNCES);
+        remoteBot().waitUntilShellIsOpen(SHELL_PREFERNCES);
+        IRemoteBotShell shell = remoteBot().shell(SHELL_PREFERNCES);
         shell.activate();
         shell.bot().tree().selectTreeItem(NODE_SAROS);
         return shell;
@@ -251,8 +251,8 @@ public class SarosPreferences extends Component implements ISarosPreferences {
      * @throws RemoteException
      */
     private void clickMenuSarosPreferences() throws RemoteException {
-        bot().activateWorkbench();
-        bot().menu(MENU_SAROS).menu(MENU_PREFERENCES).click();
+        remoteBot().activateWorkbench();
+        remoteBot().menu(MENU_SAROS).menu(MENU_PREFERENCES).click();
     }
 
     private boolean isAccountActiveNoGUI(JID jid) {

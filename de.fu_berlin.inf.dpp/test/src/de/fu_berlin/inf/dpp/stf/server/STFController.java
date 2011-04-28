@@ -22,6 +22,7 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.remoteFinder.RemoteBot;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.remoteFinder.RemoteWorkbenchBot;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.remoteFinder.remoteWidgets.RemoteBotButton;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.remoteFinder.remoteWidgets.RemoteBotCCombo;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.remoteFinder.remoteWidgets.RemoteBotCTabItem;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.remoteFinder.remoteWidgets.RemoteBotChatLine;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.remoteFinder.remoteWidgets.RemoteBotCheckBox;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.remoteFinder.remoteWidgets.RemoteBotCombo;
@@ -63,6 +64,7 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponen
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.views.PEView;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.views.ProgressView;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.views.Views;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.views.sarosViews.Chatroom;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.views.sarosViews.RSView;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.views.sarosViews.SarosView;
 
@@ -146,6 +148,7 @@ public class STFController {
         exportObject(RemoteBotView.getInstance(), "view");
         exportObject(RemoteBotViewMenu.getInstance(), "viewMenu");
         exportObject(RemoteBotChatLine.getInstance(), "chatLine");
+        exportObject(RemoteBotCTabItem.getInstance(), "cTabItem");
 
         /*
          * remote eclipse components
@@ -170,6 +173,7 @@ public class STFController {
         exportObject(SessionContextMenuWrapper.getInstance(),
             "sessionContextMenu");
         exportObject(WorkTogetherOnC.getInstance(), "workTogetherOnC");
+        exportObject(Chatroom.getInstance(), "chatroom");
 
         exportObject(SarosPreferences.getInstance(), "sarosPreferences");
 

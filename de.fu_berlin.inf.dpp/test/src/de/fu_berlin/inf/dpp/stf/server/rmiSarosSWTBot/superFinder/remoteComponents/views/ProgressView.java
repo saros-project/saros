@@ -62,7 +62,7 @@ public class ProgressView extends Component implements IProgressView {
      * 
      **********************************************/
     public void waitUntilNotExistsProgress() throws RemoteException {
-        bot().waitUntil(new DefaultCondition() {
+        remoteBot().waitUntil(new DefaultCondition() {
             public boolean test() throws Exception {
                 return !existsPorgress();
             }

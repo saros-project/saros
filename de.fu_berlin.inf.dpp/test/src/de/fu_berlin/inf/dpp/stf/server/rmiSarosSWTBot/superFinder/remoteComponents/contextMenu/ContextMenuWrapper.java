@@ -94,12 +94,12 @@ public class ContextMenuWrapper extends Component implements
     public void paste(String target) throws RemoteException {
         if (treeItem == null) {
             tree.contextMenu(MENU_PASTE).click();
-            IRemoteBotShell shell = bot().shell(SHELL_COPY_PROJECT);
+            IRemoteBotShell shell = remoteBot().shell(SHELL_COPY_PROJECT);
             shell.activate();
             shell.bot().textWithLabel("Project name:").setText(target);
             shell.bot().button(OK).click();
-            bot().waitUntilShellIsClosed(SHELL_COPY_PROJECT);
-            bot().sleep(1000);
+            remoteBot().waitUntilShellIsClosed(SHELL_COPY_PROJECT);
+            remoteBot().sleep(1000);
         }
         // switch (type) {
         // case PROJECT:
@@ -112,8 +112,8 @@ public class ContextMenuWrapper extends Component implements
 
     public void openWith(String editorType) throws RemoteException {
         treeItem.contextMenus(CM_OPEN_WITH, CM_OTHER).click();
-        bot().waitUntilShellIsOpen(SHELL_EDITOR_SELECTION);
-        IRemoteBotShell shell_bob = bot().shell(SHELL_EDITOR_SELECTION);
+        remoteBot().waitUntilShellIsOpen(SHELL_EDITOR_SELECTION);
+        IRemoteBotShell shell_bob = remoteBot().shell(SHELL_EDITOR_SELECTION);
         shell_bob.activate();
         shell_bob.bot().table().getTableItem(editorType).select();
         shell_bob.bot().button(OK).waitUntilIsEnabled();
@@ -124,18 +124,18 @@ public class ContextMenuWrapper extends Component implements
         treeItem.contextMenus(CM_DELETE).click();
         switch (type) {
         case PROJECT:
-            bot().shell(SHELL_DELETE_RESOURCE).confirmWithCheckBox(OK, true);
-            bot().waitUntilShellIsClosed(SHELL_DELETE_RESOURCE);
+            remoteBot().shell(SHELL_DELETE_RESOURCE).confirmWithCheckBox(OK, true);
+            remoteBot().waitUntilShellIsClosed(SHELL_DELETE_RESOURCE);
             break;
         case JAVA_PROJECT:
-            bot().shell(SHELL_DELETE_RESOURCE).confirmWithCheckBox(OK, true);
-            bot().waitUntilShellIsClosed(SHELL_DELETE_RESOURCE);
+            remoteBot().shell(SHELL_DELETE_RESOURCE).confirmWithCheckBox(OK, true);
+            remoteBot().waitUntilShellIsClosed(SHELL_DELETE_RESOURCE);
             break;
         default:
-            bot().waitUntilShellIsOpen(CONFIRM_DELETE);
-            bot().shell(CONFIRM_DELETE).activate();
-            bot().shell(CONFIRM_DELETE).bot().button(OK).click();
-            bot().sleep(300);
+            remoteBot().waitUntilShellIsOpen(CONFIRM_DELETE);
+            remoteBot().shell(CONFIRM_DELETE).activate();
+            remoteBot().shell(CONFIRM_DELETE).bot().button(OK).click();
+            remoteBot().sleep(300);
             break;
         }
         tree.waitUntilItemNotExists(treeItem.getText());

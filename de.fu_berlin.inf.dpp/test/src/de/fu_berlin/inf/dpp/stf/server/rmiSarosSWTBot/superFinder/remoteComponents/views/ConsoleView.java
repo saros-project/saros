@@ -56,7 +56,7 @@ public class ConsoleView extends Component implements IConsoleView {
      * 
      **********************************************/
     public void waitUntilExistsTextInConsole() throws RemoteException {
-        bot().waitUntil(new DefaultCondition() {
+        remoteBot().waitUntil(new DefaultCondition() {
             public boolean test() throws Exception {
                 return existTextInConsole();
             }

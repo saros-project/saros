@@ -33,7 +33,7 @@ public class WindowM extends SarosPreferences implements IWindowM {
      **********************************************/
     public void setNewTextFileLineDelimiter(String OS) throws RemoteException {
         clickMenuPreferences();
-        IRemoteBotShell shell = bot().shell(SHELL_PREFERNCES);
+        IRemoteBotShell shell = remoteBot().shell(SHELL_PREFERNCES);
         IRemoteBotTree tree = shell.bot().tree();
         tree.expandNode(TREE_ITEM_GENERAL_IN_PRFERENCES).select(
             TREE_ITEM_WORKSPACE_IN_PREFERENCES);
@@ -49,14 +49,14 @@ public class WindowM extends SarosPreferences implements IWindowM {
         }
         shell.bot().button(APPLY).click();
         shell.bot().button(OK).click();
-        bot().waitUntilShellIsClosed(SHELL_PREFERNCES);
+        remoteBot().waitUntilShellIsClosed(SHELL_PREFERNCES);
     }
 
     public void clickMenuPreferences() throws RemoteException {
         if (getOS() == TypeOfOS.MAC)
-            bot().menu("Eclipse").menu(MENU_PREFERENCES).click();
+            remoteBot().menu("Eclipse").menu(MENU_PREFERENCES).click();
         else
-            bot().menu(MENU_WINDOW).menu(MENU_PREFERENCES).click();
+            remoteBot().menu(MENU_WINDOW).menu(MENU_PREFERENCES).click();
     }
 
     public void showViewProblems() throws RemoteException {
@@ -71,9 +71,9 @@ public class WindowM extends SarosPreferences implements IWindowM {
 
     public void showViewWithName(String parentNode, String node)
         throws RemoteException {
-        bot().activateWorkbench();
-        bot().menu(MENU_WINDOW).menu(MENU_SHOW_VIEW).menu(MENU_OTHER).click();
-        bot().shell(SHELL_SHOW_VIEW).confirmWithTreeWithFilterText(parentNode,
+        remoteBot().activateWorkbench();
+        remoteBot().menu(MENU_WINDOW).menu(MENU_SHOW_VIEW).menu(MENU_OTHER).click();
+        remoteBot().shell(SHELL_SHOW_VIEW).confirmWithTreeWithFilterText(parentNode,
             node, OK);
     }
 
@@ -95,15 +95,15 @@ public class WindowM extends SarosPreferences implements IWindowM {
     }
 
     public void openPerspectiveResource() throws RemoteException {
-        bot().openPerspectiveWithId(ID_RESOURCE_PERSPECTIVE);
+        remoteBot().openPerspectiveWithId(ID_RESOURCE_PERSPECTIVE);
     }
 
     public void openPerspectiveJava() throws RemoteException {
-        bot().openPerspectiveWithId(ID_JAVA_PERSPECTIVE);
+        remoteBot().openPerspectiveWithId(ID_JAVA_PERSPECTIVE);
     }
 
     public void openPerspectiveDebug() throws RemoteException {
-        bot().openPerspectiveWithId(ID_DEBUG_PERSPECTIVE);
+        remoteBot().openPerspectiveWithId(ID_DEBUG_PERSPECTIVE);
     }
 
     /**********************************************
@@ -113,7 +113,7 @@ public class WindowM extends SarosPreferences implements IWindowM {
      **********************************************/
     public String getTextFileLineDelimiter() throws RemoteException {
         clickMenuPreferences();
-        IRemoteBotShell shell = bot().shell(SHELL_PREFERNCES);
+        IRemoteBotShell shell = remoteBot().shell(SHELL_PREFERNCES);
         IRemoteBotTree tree = shell.bot().tree();
         tree.expandNode(TREE_ITEM_GENERAL_IN_PRFERENCES).select(
             TREE_ITEM_WORKSPACE_IN_PREFERENCES);
@@ -127,7 +127,7 @@ public class WindowM extends SarosPreferences implements IWindowM {
             IRemoteBotCombo combo = shell.bot().comboBoxInGroup(
                 "New text file line delimiter");
             String itemName = combo.items()[combo.selectionIndex()];
-            bot().shell(SHELL_PREFERNCES).close();
+            remoteBot().shell(SHELL_PREFERNCES).close();
             return itemName;
         }
         shell.close();
@@ -135,11 +135,11 @@ public class WindowM extends SarosPreferences implements IWindowM {
     }
 
     public boolean isJavaPerspectiveActive() throws RemoteException {
-        return bot().isPerspectiveActive(ID_JAVA_PERSPECTIVE);
+        return remoteBot().isPerspectiveActive(ID_JAVA_PERSPECTIVE);
     }
 
     public boolean isDebugPerspectiveActive() throws RemoteException {
-        return bot().isPerspectiveActive(ID_DEBUG_PERSPECTIVE);
+        return remoteBot().isPerspectiveActive(ID_DEBUG_PERSPECTIVE);
     }
 
 }

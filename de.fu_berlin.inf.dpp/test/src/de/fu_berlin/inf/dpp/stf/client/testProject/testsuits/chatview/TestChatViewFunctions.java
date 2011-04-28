@@ -74,33 +74,40 @@ public class TestChatViewFunctions extends STFTest {
 
     @Test
     public void testChat() throws RemoteException {
-        // String text = alice.bot().chatLine(0).getText();
-        // System.out.println(text);
 
-        alice.superBot().views().sarosView().sendChatMessage(message);
+        assertEquals("Chatroom 1", alice.bot().view(VIEW_SAROS).bot()
+            .cTabItem().getText());
 
-        System.out.println(alice.superBot().views().sarosView()
-            .getUserNameOnChatLinePartnerChangeSeparator());
-        // System.out.println(alice.bot.getTextOfChatLine());
-        //
-        // System.out.println(alice.superBot().views().sarosView()
-        // .getTextOfChatLine(".*joined the chat.*"));
+        alice.superBot().views().sarosView().selectChatroom()
+            .sendChatMessage(message);
+        System.out.println(alice.bot().view(VIEW_SAROS).bot().label(1)
+            .getText());
         alice.bot().sleep(1000);
-        String messageByAlice = alice.superBot().views().sarosView()
-            .getTextOfLastChatLine();
-        System.out.println(messageByAlice);
-        // bob.bot().sleep(1000);
-        String messageByBob = bob.superBot().views().sarosView()
-            .getUserNameOnChatLinePartnerChangeSeparator();
+        System.out.println(alice.superBot().views().sarosView()
+            .selectChatroom().getTextOfLastChatLine());
+        System.out.println(bob.bot().view(VIEW_SAROS).bot().label(1).getText());
 
-        System.out.println("bob: " + messageByBob);
-        assertEquals(messageByAlice, messageByBob);
-        System.out.println(bob.superBot().views().sarosView()
-            .getUserNameOnChatLinePartnerChangeSeparator(alice.getBaseJid()));
-
-        // bob.bot.waitUntilGetChatMessage(alice.getName(), message);
-        // assertTrue(bob.bot.compareChatMessage(alice.getName(),
-        // message));
+        //
+        // // System.out.println(alice.bot.getTextOfChatLine());
+        // //
+        // // System.out.println(alice.superBot().views().sarosView()
+        // // .getTextOfChatLine(".*joined the chat.*"));
+        // alice.bot().sleep(1000);
+        // String messageByAlice = alice.superBot().views().sarosView()
+        // .selectChatroom().getTextOfLastChatLine();
+        // System.out.println(messageByAlice);
+        // // bob.bot().sleep(1000);
+        // String messageByBob = bob.superBot().views().sarosView()
+        // .selectChatroom().getUserNameOnChatLinePartnerChangeSeparator();
+        //
+        // System.out.println("bob: " + messageByBob);
+        // assertEquals(messageByAlice, messageByBob);
+        // System.out.println(bob.superBot().views().sarosView().selectChatroom()
+        // .getUserNameOnChatLinePartnerChangeSeparator(alice.getBaseJid()));
+        //
+        // // bob.bot.waitUntilGetChatMessage(alice.getName(), message);
+        // // assertTrue(bob.bot.compareChatMessage(alice.getName(),
+        // // message));
 
     }
 }

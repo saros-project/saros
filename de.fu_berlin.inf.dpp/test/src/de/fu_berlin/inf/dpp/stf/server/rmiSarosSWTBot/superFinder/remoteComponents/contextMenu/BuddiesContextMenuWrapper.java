@@ -39,20 +39,20 @@ public class BuddiesContextMenuWrapper extends SarosContextMenuWrapper
 
     public void delete() throws RemoteException {
         treeItem.contextMenus(CM_DELETE).click();
-        bot().waitUntilShellIsOpen(CONFIRM_DELETE);
-        bot().shell(CONFIRM_DELETE).activate();
-        bot().shell(CONFIRM_DELETE).bot().button(YES).click();
+        remoteBot().waitUntilShellIsOpen(CONFIRM_DELETE);
+        remoteBot().shell(CONFIRM_DELETE).activate();
+        remoteBot().shell(CONFIRM_DELETE).bot().button(YES).click();
     }
 
     public void rename(String newBuddyName) throws RemoteException {
         treeItem.contextMenus(CM_RENAME).click();
-        IRemoteBotShell shell = bot().shell(SHELL_SET_NEW_NICKNAME);
+        IRemoteBotShell shell = remoteBot().shell(SHELL_SET_NEW_NICKNAME);
         if (!shell.activate()) {
             shell.waitUntilActive();
         }
         shell.bot().text().setText(newBuddyName);
         shell.bot().button(OK).click();
-        bot().sleep(500);
+        remoteBot().sleep(500);
     }
 
     public void addToSarosSession() throws RemoteException {

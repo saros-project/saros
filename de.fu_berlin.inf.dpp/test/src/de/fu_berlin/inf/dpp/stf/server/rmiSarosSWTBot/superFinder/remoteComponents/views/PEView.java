@@ -196,13 +196,13 @@ public class PEView extends Views implements IPEView {
     public void waitUntilFolderExists(String... folderNodes)
         throws RemoteException {
         String fullPath = getPath(folderNodes);
-        bot().waitUntil(SarosConditions.isResourceExist(fullPath));
+        remoteBot().waitUntil(SarosConditions.isResourceExist(fullPath));
     }
 
     public void waitUntilPkgExists(String projectName, String pkg)
         throws RemoteException {
         if (pkg.matches(PKG_REGEX)) {
-            bot().waitUntil(
+            remoteBot().waitUntil(
                 SarosConditions.isResourceExist(getPkgPath(projectName, pkg)));
         } else {
             throw new RuntimeException(
@@ -213,7 +213,7 @@ public class PEView extends Views implements IPEView {
     public void waitUntilPkgNotExists(String projectName, String pkg)
         throws RemoteException {
         if (pkg.matches(PKG_REGEX)) {
-            bot().waitUntil(
+            remoteBot().waitUntil(
                 SarosConditions
                     .isResourceNotExist(getPkgPath(projectName, pkg)));
         } else {
@@ -224,50 +224,50 @@ public class PEView extends Views implements IPEView {
 
     public void waitUntilFileExists(String... fileNodes) throws RemoteException {
         String fullPath = getPath(fileNodes);
-        bot().waitUntil(SarosConditions.isResourceExist(fullPath));
+        remoteBot().waitUntil(SarosConditions.isResourceExist(fullPath));
     }
 
     public void waitUntilClassExists(String projectName, String pkg,
         String className) throws RemoteException {
         String path = getClassPath(projectName, pkg, className);
-        bot().waitUntil(SarosConditions.isResourceExist(path));
+        remoteBot().waitUntil(SarosConditions.isResourceExist(path));
     }
 
     public void waitUntilClassNotExists(String projectName, String pkg,
         String className) throws RemoteException {
         String path = getClassPath(projectName, pkg, className);
-        bot().waitUntil(SarosConditions.isResourceNotExist(path));
+        remoteBot().waitUntil(SarosConditions.isResourceNotExist(path));
     }
 
     public void waitUntilWindowSarosRunningVCSOperationClosed()
         throws RemoteException {
-        bot().waitUntilShellIsClosed(SHELL_SAROS_RUNNING_VCS_OPERATION);
+        remoteBot().waitUntilShellIsClosed(SHELL_SAROS_RUNNING_VCS_OPERATION);
     }
 
     public void waitUntilProjectInSVN(String projectName)
         throws RemoteException {
-        bot().waitUntil(SarosConditions.isInSVN(projectName));
+        remoteBot().waitUntil(SarosConditions.isInSVN(projectName));
     }
 
     public void waitUntilProjectNotInSVN(String projectName)
         throws RemoteException {
-        bot().waitUntil(SarosConditions.isNotInSVN(projectName));
+        remoteBot().waitUntil(SarosConditions.isNotInSVN(projectName));
     }
 
     public void waitUntilRevisionIsSame(String fullPath, String revision)
         throws RemoteException {
-        bot().waitUntil(SarosConditions.isRevisionSame(fullPath, revision));
+        remoteBot().waitUntil(SarosConditions.isRevisionSame(fullPath, revision));
     }
 
     public void waitUntilUrlIsSame(String fullPath, String url)
         throws RemoteException {
-        bot().waitUntil(SarosConditions.isUrlSame(fullPath, url));
+        remoteBot().waitUntil(SarosConditions.isUrlSame(fullPath, url));
     }
 
     public void waitUntilFileContentSame(final String otherClassContent,
         final String... fileNodes) throws RemoteException {
 
-        bot().waitUntil(new DefaultCondition() {
+        remoteBot().waitUntil(new DefaultCondition() {
             public boolean test() throws Exception {
                 return getFileContent(fileNodes).equals(otherClassContent);
             }

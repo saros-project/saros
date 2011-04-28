@@ -103,6 +103,8 @@ public interface ISarosView extends Remote {
     public ISessionContextMenuWrapper selectParticipant(final JID participantJID)
         throws RemoteException;
 
+    public IChatroom selectChatroom() throws RemoteException;
+
     /**********************************************
      * 
      * States
@@ -451,28 +453,4 @@ public interface ISarosView extends Remote {
     public void waitUntilAllPeersLeaveSession(
         final List<JID> jidsOfAllParticipants) throws RemoteException;
 
-    public void waitUntilGetChatMessage(String jid, String message)
-        throws RemoteException;
-
-    public void sendChatMessage(String message) throws RemoteException;
-
-    public String getUserNameOnChatLinePartnerChangeSeparator()
-        throws RemoteException;
-
-    public String getUserNameOnChatLinePartnerChangeSeparator(int index)
-        throws RemoteException;
-
-    public String getUserNameOnChatLinePartnerChangeSeparator(String plainID)
-        throws RemoteException;
-
-    public String getTextOfChatLine() throws RemoteException;
-
-    public String getTextOfChatLine(int index) throws RemoteException;
-
-    public String getTextOfLastChatLine() throws RemoteException;
-
-    public String getTextOfChatLine(String regex) throws RemoteException;
-
-    public boolean compareChatMessage(String jid, String message)
-        throws RemoteException;
 }

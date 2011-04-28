@@ -9,6 +9,7 @@ import org.eclipse.swtbot.swt.finder.waits.ICondition;
 
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.remoteFinder.remoteWidgets.IRemoteBotButton;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.remoteFinder.remoteWidgets.IRemoteBotCCombo;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.remoteFinder.remoteWidgets.IRemoteBotCTabItem;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.remoteFinder.remoteWidgets.IRemoteBotCheckBox;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.remoteFinder.remoteWidgets.IRemoteBotCombo;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.remoteFinder.remoteWidgets.IRemoteBotLabel;
@@ -2291,6 +2292,8 @@ public interface IRemoteBot extends Remote {
 
     public IRemoteBotToggleButton toggleButtonWithTooltipInGroup(
         String tooltip, String inGroup, int index) throws RemoteException;
+
+    public IRemoteBotCTabItem cTabItem() throws RemoteException;
 
     /**********************************************
      * 

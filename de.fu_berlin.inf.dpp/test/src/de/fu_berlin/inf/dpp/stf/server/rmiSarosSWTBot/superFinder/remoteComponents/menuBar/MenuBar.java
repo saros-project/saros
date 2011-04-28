@@ -24,7 +24,7 @@ public class MenuBar extends Component implements IMenuBar {
     }
 
     public ISarosM saros() throws RemoteException {
-        return sarosM.setMenu(bot().menu(MENU_SAROS));
+        return sarosM.setMenu(remoteBot().menu(MENU_SAROS));
     }
 
     public IWindowM window() throws RemoteException {

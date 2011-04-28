@@ -4,7 +4,6 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
-import de.fu_berlin.inf.dpp.stf.client.testProject.testsuitToReproduceBugs.TestEditDuringInvitation;
 import de.fu_berlin.inf.dpp.stf.client.testProject.testsuits.RosterViewBehaviour.TestChangingNameInRosterView;
 import de.fu_berlin.inf.dpp.stf.client.testProject.testsuits.fileFolderOperations.TestFileOperations;
 import de.fu_berlin.inf.dpp.stf.client.testProject.testsuits.fileFolderOperations.TestFolderOperations;
@@ -18,13 +17,12 @@ import de.fu_berlin.inf.dpp.stf.client.testProject.testsuits.saving.TestCreating
 import de.fu_berlin.inf.dpp.stf.client.testProject.testsuits.testSTF.views.sarosViews.TestSarosView;
 
 @RunWith(Suite.class)
-@SuiteClasses({ TestSarosView.class,
-    TestChangingNameInRosterView.class, TestHandleContacts.class,
-    TestShare2UsersSequentially.class, TestShare3UsersSequentially.class,
-    TestShare3UsersConcurrently.class,
-    TestShareProjectUsingExistingProject.class, TestEditDuringInvitation.class,
-    TestFileOperations.class, TestFolderOperations.class,
-    TestWriteAccessChangeAndImmediateWrite.class, TestCreatingNewFile.class })
+@SuiteClasses({ TestSarosView.class, TestChangingNameInRosterView.class,
+    TestHandleContacts.class, TestShare2UsersSequentially.class,
+    TestShare3UsersSequentially.class, TestShare3UsersConcurrently.class,
+    TestShareProjectUsingExistingProject.class, TestFileOperations.class,
+    TestFolderOperations.class, TestWriteAccessChangeAndImmediateWrite.class,
+    TestCreatingNewFile.class })
 public class AllTests {
     /**
      * Run AllTests in the list of SuiteClasses annotation

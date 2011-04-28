@@ -16,7 +16,8 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotToolbarToggleButton;
 
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.remoteFinder.IRemoteBot;
 
-public class RemoteBotView extends AbstractRmoteWidget implements IRemoteBotView {
+public class RemoteBotView extends AbstractRmoteWidget implements
+    IRemoteBotView {
 
     private static transient RemoteBotView self;
 
@@ -59,7 +60,8 @@ public class RemoteBotView extends AbstractRmoteWidget implements IRemoteBotView
         return stfViewMenu;
     }
 
-    public IRemoteBotViewMenu menu(String label, int index) throws RemoteException {
+    public IRemoteBotViewMenu menu(String label, int index)
+        throws RemoteException {
         stfViewMenu.setWidget(widget.menu(label, index));
         return stfViewMenu;
     }
@@ -95,7 +97,8 @@ public class RemoteBotView extends AbstractRmoteWidget implements IRemoteBotView
         throw new WidgetNotFoundException("The toolBarButton doesn't exist!");
     }
 
-    public List<IRemoteBotToolbarButton> getToolbarButtons() throws RemoteException {
+    public List<IRemoteBotToolbarButton> getToolbarButtons()
+        throws RemoteException {
         List<IRemoteBotToolbarButton> toolbarButtons = new ArrayList<IRemoteBotToolbarButton>();
         for (SWTBotToolbarButton button : widget.getToolbarButtons()) {
             toolbarButtons.add(stfToolbarButton.setWidget(button));

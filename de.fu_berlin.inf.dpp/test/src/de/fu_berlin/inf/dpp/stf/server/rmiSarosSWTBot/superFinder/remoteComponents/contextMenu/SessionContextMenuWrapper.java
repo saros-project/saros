@@ -46,7 +46,7 @@ public class SessionContextMenuWrapper extends SarosContextMenuWrapper
         }
         treeItem.contextMenus(CM_GRANT_WRITE_ACCESS).click();
         waitUntilHasWriteAccess();
-        bot().sleep(300);
+        remoteBot().sleep(300);
     }
 
     public void restrictToReadOnlyAccess() throws RemoteException {
@@ -56,7 +56,7 @@ public class SessionContextMenuWrapper extends SarosContextMenuWrapper
         }
         treeItem.contextMenus(CM_RESTRICT_TO_READ_ONLY_ACCESS).click();
         waitUntilHasReadOnlyAccess();
-        bot().sleep(300);
+        remoteBot().sleep(300);
     }
 
     public void followParticipant() throws RemoteException {
@@ -129,7 +129,7 @@ public class SessionContextMenuWrapper extends SarosContextMenuWrapper
      **********************************************/
 
     public void waitUntilHasWriteAccess() throws RemoteException {
-        bot().waitUntil(new DefaultCondition() {
+        remoteBot().waitUntil(new DefaultCondition() {
             public boolean test() throws Exception {
                 return hasWriteAccess();
             }
@@ -142,7 +142,7 @@ public class SessionContextMenuWrapper extends SarosContextMenuWrapper
     }
 
     public void waitUntilHasReadOnlyAccess() throws RemoteException {
-        bot().waitUntil(new DefaultCondition() {
+        remoteBot().waitUntil(new DefaultCondition() {
             public boolean test() throws Exception {
                 return !hasWriteAccess();
             }
@@ -155,7 +155,7 @@ public class SessionContextMenuWrapper extends SarosContextMenuWrapper
     }
 
     public void waitUntilIsFollowing() throws RemoteException {
-        bot().waitUntil(new DefaultCondition() {
+        remoteBot().waitUntil(new DefaultCondition() {
             public boolean test() throws Exception {
                 return isFollowing();
             }
@@ -167,7 +167,7 @@ public class SessionContextMenuWrapper extends SarosContextMenuWrapper
     }
 
     public void waitUntilIsNotFollowing() throws RemoteException {
-        bot().waitUntil(new DefaultCondition() {
+        remoteBot().waitUntil(new DefaultCondition() {
             public boolean test() throws Exception {
                 return !isFollowing();
             }

@@ -16,6 +16,7 @@ import de.fu_berlin.inf.dpp.stf.STF;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.conditions.SarosSWTBotPreferences;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.remoteFinder.remoteWidgets.IRemoteBotButton;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.remoteFinder.remoteWidgets.IRemoteBotCCombo;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.remoteFinder.remoteWidgets.IRemoteBotCTabItem;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.remoteFinder.remoteWidgets.IRemoteBotCheckBox;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.remoteFinder.remoteWidgets.IRemoteBotCombo;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.remoteFinder.remoteWidgets.IRemoteBotLabel;
@@ -31,6 +32,7 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.remoteFinder.remoteWidgets
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.remoteFinder.remoteWidgets.IRemoteBotTree;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.remoteFinder.remoteWidgets.RemoteBotButton;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.remoteFinder.remoteWidgets.RemoteBotCCombo;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.remoteFinder.remoteWidgets.RemoteBotCTabItem;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.remoteFinder.remoteWidgets.RemoteBotCheckBox;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.remoteFinder.remoteWidgets.RemoteBotCombo;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.remoteFinder.remoteWidgets.RemoteBotLabel;
@@ -67,6 +69,7 @@ public class RemoteBot extends STF implements IRemoteBot {
     private static RemoteBotCheckBox checkbox;
     private static RemoteBotRadio radio;
     private static RemoteBotToggleButton toggleButton;
+    private static RemoteBotCTabItem cTabItem;
 
     /**
      * {@link RemoteBot} is a singleton, but inheritance is possible.
@@ -91,6 +94,7 @@ public class RemoteBot extends STF implements IRemoteBot {
         list = RemoteBotList.getInstance();
         checkbox = RemoteBotCheckBox.getInstance();
         radio = RemoteBotRadio.getInstance();
+        cTabItem = RemoteBotCTabItem.getInstance();
 
         return self;
     }
@@ -461,21 +465,6 @@ public class RemoteBot extends STF implements IRemoteBot {
 
     }
 
-    public boolean existsStyledText() throws RemoteException {
-        long oldTimeout = SWTBotPreferences.TIMEOUT;
-        // increase the timeout
-        SWTBotPreferences.TIMEOUT = 1000;
-
-        try {
-            swtBot.styledText();
-            SWTBotPreferences.TIMEOUT = oldTimeout;
-            return true;
-        } catch (WidgetNotFoundException e) {
-            SWTBotPreferences.TIMEOUT = oldTimeout;
-            return false;
-        }
-    }
-
     public boolean existsLabel() throws RemoteException {
         long oldTimeout = SWTBotPreferences.TIMEOUT;
         // increase the timeout
@@ -526,6 +515,20 @@ public class RemoteBot extends STF implements IRemoteBot {
      * Widget styledText
      * 
      **********************************************/
+    public boolean existsStyledText() throws RemoteException {
+        long oldTimeout = SWTBotPreferences.TIMEOUT;
+        // increase the timeout
+        SWTBotPreferences.TIMEOUT = 1000;
+
+        try {
+            swtBot.styledText();
+            SWTBotPreferences.TIMEOUT = oldTimeout;
+            return true;
+        } catch (WidgetNotFoundException e) {
+            SWTBotPreferences.TIMEOUT = oldTimeout;
+            return false;
+        }
+    }
 
     public IRemoteBotStyledText styledTextWithLabel(String label)
         throws RemoteException {
@@ -1185,6 +1188,12 @@ public class RemoteBot extends STF implements IRemoteBot {
 
     }
 
+    /**********************************************
+     * 
+     * Widget menu
+     * 
+     **********************************************/
+
     public IRemoteBotMenu menu(String text) throws RemoteException {
         return menu.setWidget(swtBot.menu(text));
 
@@ -1216,7 +1225,7 @@ public class RemoteBot extends STF implements IRemoteBot {
 
     /**********************************************
      * 
-     * Widget table
+     * Widget List
      * 
      **********************************************/
 
@@ -1289,7 +1298,7 @@ public class RemoteBot extends STF implements IRemoteBot {
 
     /**********************************************
      * 
-     * Widget table
+     * Widget CheckBox
      * 
      **********************************************/
     public IRemoteBotCheckBox checkBoxWithLabel(String label)
@@ -1661,6 +1670,12 @@ public class RemoteBot extends STF implements IRemoteBot {
         toggleButton.setWidget(swtBot.toggleButtonWithTooltipInGroup(tooltip,
             inGroup, index));
         return toggleButton;
+    }
+
+    public IRemoteBotCTabItem cTabItem() throws RemoteException {
+        cTabItem.setWidget(swtBot.cTabItem());
+        return cTabItem;
+
     }
 
     /**********************************************

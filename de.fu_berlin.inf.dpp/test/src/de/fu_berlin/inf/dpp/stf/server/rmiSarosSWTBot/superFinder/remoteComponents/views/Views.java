@@ -45,15 +45,15 @@ public class Views extends Component implements IViews {
     }
 
     public ISarosView sarosView() throws RemoteException {
-        bot().openViewById(VIEW_SAROS_ID);
-        bot().view(VIEW_SAROS).show();
-        return rosterV.setView(bot().view(VIEW_SAROS));
+        remoteBot().openViewById(VIEW_SAROS_ID);
+        remoteBot().view(VIEW_SAROS).show();
+        return rosterV.setView(remoteBot().view(VIEW_SAROS));
     }
 
     public IRSView remoteScreenView() throws RemoteException {
-        bot().openViewById(VIEW_REMOTE_SCREEN_ID);
-        bot().view(VIEW_REMOTE_SCREEN).show();
-        return rsV.setView(bot().view(VIEW_REMOTE_SCREEN));
+        remoteBot().openViewById(VIEW_REMOTE_SCREEN_ID);
+        remoteBot().view(VIEW_REMOTE_SCREEN).show();
+        return rsV.setView(remoteBot().view(VIEW_REMOTE_SCREEN));
     }
 
     public IConsoleView consoleView() throws RemoteException {
@@ -61,15 +61,15 @@ public class Views extends Component implements IViews {
     }
 
     public IPEView packageExplorerView() throws RemoteException {
-        bot().openViewById(VIEW_PACKAGE_EXPLORER_ID);
-        bot().view(VIEW_PACKAGE_EXPLORER).show();
-        return pEV.setView(bot().view(VIEW_PACKAGE_EXPLORER));
+        remoteBot().openViewById(VIEW_PACKAGE_EXPLORER_ID);
+        remoteBot().view(VIEW_PACKAGE_EXPLORER).show();
+        return pEV.setView(remoteBot().view(VIEW_PACKAGE_EXPLORER));
     }
 
     public IProgressView progressView() throws RemoteException {
-        bot().openViewById(VIEW_PROGRESS_ID);
-        bot().view(VIEW_PROGRESS).show();
-        return progressvV.setView(bot().view(VIEW_PROGRESS));
+        remoteBot().openViewById(VIEW_PROGRESS_ID);
+        remoteBot().view(VIEW_PROGRESS).show();
+        return progressvV.setView(remoteBot().view(VIEW_PROGRESS));
     }
 
 }
