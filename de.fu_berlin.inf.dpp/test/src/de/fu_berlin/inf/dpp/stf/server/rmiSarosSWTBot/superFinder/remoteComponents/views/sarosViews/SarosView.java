@@ -22,8 +22,8 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.remoteFinder.remoteWidgets
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.remoteFinder.remoteWidgets.IRemoteBotTreeItem;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.remoteFinder.remoteWidgets.IRemoteBotView;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.ISuperBot;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.contextMenu.IBuddiesContextMenuWrapper;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.contextMenu.ISessionContextMenuWrapper;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.contextMenu.sarosView.IContextMenusInBuddiesArea;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.contextMenu.sarosView.IContextMenusInSessionArea;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.views.Views;
 import de.fu_berlin.inf.dpp.stf.stfMessages.STFMessages;
 
@@ -216,13 +216,13 @@ public class SarosView extends Views implements ISarosView {
      * 
      **********************************************/
 
-    public IBuddiesContextMenuWrapper selectBuddies() throws RemoteException {
+    public IContextMenusInBuddiesArea selectBuddies() throws RemoteException {
         initBuddiesContextMenuWrapper(tree
             .selectTreeItemWithRegex(NODE_BUDDIES));
         return buddiesContextMenu;
     }
 
-    public IBuddiesContextMenuWrapper selectBuddy(JID buddyJID)
+    public IContextMenusInBuddiesArea selectBuddy(JID buddyJID)
         throws RemoteException {
         if (getNickName(buddyJID) == null) {
             throw new RuntimeException("No buddy with the ID "
@@ -233,7 +233,7 @@ public class SarosView extends Views implements ISarosView {
         return buddiesContextMenu;
     }
 
-    public ISessionContextMenuWrapper selectSession() throws RemoteException {
+    public IContextMenusInSessionArea selectSession() throws RemoteException {
         if (!isInSession())
             throw new RuntimeException("You are not in a session!");
         initSessionContextMenuWrapper(tree
@@ -241,7 +241,7 @@ public class SarosView extends Views implements ISarosView {
         return sessionContextMenu;
     }
 
-    public ISessionContextMenuWrapper selectNoSessionRunning()
+    public IContextMenusInSessionArea selectNoSessionRunning()
         throws RemoteException {
         if (isInSession())
             throw new RuntimeException("You are in a session!");
@@ -250,7 +250,7 @@ public class SarosView extends Views implements ISarosView {
         return sessionContextMenu;
     }
 
-    public ISessionContextMenuWrapper selectParticipant(final JID participantJID)
+    public IContextMenusInSessionArea selectParticipant(final JID participantJID)
         throws RemoteException {
         if (!isInSession())
             throw new RuntimeException("You are not in a session!");

@@ -3,6 +3,9 @@ package de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteCompone
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.views.eclipseViews.IConsoleView;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.views.eclipseViews.IPEView;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.views.eclipseViews.IProgressView;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.views.sarosViews.IRSView;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.views.sarosViews.ISarosView;
 

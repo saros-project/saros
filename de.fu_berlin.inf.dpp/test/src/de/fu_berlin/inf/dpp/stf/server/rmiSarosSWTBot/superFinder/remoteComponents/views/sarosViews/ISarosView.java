@@ -8,8 +8,8 @@ import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.stf.client.testProject.helpers.TestPattern;
 import de.fu_berlin.inf.dpp.stf.client.tester.AbstractTester;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.ISuperBot;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.contextMenu.IBuddiesContextMenuWrapper;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.contextMenu.ISessionContextMenuWrapper;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.contextMenu.sarosView.IContextMenusInBuddiesArea;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.contextMenu.sarosView.IContextMenusInSessionArea;
 import de.fu_berlin.inf.dpp.stf.stfMessages.STFMessages;
 
 /**
@@ -90,17 +90,17 @@ public interface ISarosView extends Remote {
      *            see {@link JID}
      * @throws RemoteException
      */
-    public IBuddiesContextMenuWrapper selectBuddy(JID buddyJID)
+    public IContextMenusInBuddiesArea selectBuddy(JID buddyJID)
         throws RemoteException;
 
-    public IBuddiesContextMenuWrapper selectBuddies() throws RemoteException;
+    public IContextMenusInBuddiesArea selectBuddies() throws RemoteException;
 
-    public ISessionContextMenuWrapper selectSession() throws RemoteException;
+    public IContextMenusInSessionArea selectSession() throws RemoteException;
 
-    public ISessionContextMenuWrapper selectNoSessionRunning()
+    public IContextMenusInSessionArea selectNoSessionRunning()
         throws RemoteException;
 
-    public ISessionContextMenuWrapper selectParticipant(final JID participantJID)
+    public IContextMenusInSessionArea selectParticipant(final JID participantJID)
         throws RemoteException;
 
     public IChatroom selectChatroom() throws RemoteException;

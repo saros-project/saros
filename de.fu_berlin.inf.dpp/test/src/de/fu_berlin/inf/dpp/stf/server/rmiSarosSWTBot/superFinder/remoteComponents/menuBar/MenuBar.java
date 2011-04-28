@@ -3,6 +3,10 @@ package de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteCompone
 import java.rmi.RemoteException;
 
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.Component;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.menuBar.menus.ISarosM;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.menuBar.menus.IWindowM;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.menuBar.menus.SarosM;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.menuBar.menus.WindowM;
 
 public class MenuBar extends Component implements IMenuBar {
 

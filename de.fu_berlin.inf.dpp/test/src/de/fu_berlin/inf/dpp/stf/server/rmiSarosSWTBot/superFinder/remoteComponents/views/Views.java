@@ -3,9 +3,15 @@ package de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteCompone
 import java.rmi.RemoteException;
 
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.Component;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.contextMenu.BuddiesContextMenuWrapper;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.contextMenu.ContextMenuWrapper;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.contextMenu.SessionContextMenuWrapper;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.contextMenu.pEView.ContextMenusInPEView;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.contextMenu.sarosView.ContextMenusInBuddiesArea;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.contextMenu.sarosView.ContextMenusInSessionArea;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.views.eclipseViews.ConsoleView;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.views.eclipseViews.IConsoleView;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.views.eclipseViews.IPEView;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.views.eclipseViews.IProgressView;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.views.eclipseViews.PEView;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.views.eclipseViews.ProgressView;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.views.sarosViews.IRSView;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.views.sarosViews.ISarosView;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.views.sarosViews.RSView;
@@ -15,11 +21,11 @@ public class Views extends Component implements IViews {
 
     private static transient Views self;
 
-    protected static ContextMenuWrapper contextMenu;
+    protected static ContextMenusInPEView contextMenu;
 
-    protected static BuddiesContextMenuWrapper buddiesContextMenu = BuddiesContextMenuWrapper
+    protected static ContextMenusInBuddiesArea buddiesContextMenu = ContextMenusInBuddiesArea
         .getInstance();
-    protected static SessionContextMenuWrapper sessionContextMenu = SessionContextMenuWrapper
+    protected static ContextMenusInSessionArea sessionContextMenu = ContextMenusInSessionArea
         .getInstance();
 
     private static SarosView rosterV;
@@ -40,7 +46,7 @@ public class Views extends Component implements IViews {
         consoleV = ConsoleView.getInstance();
         pEV = PEView.getInstance();
         progressvV = ProgressView.getInstance();
-        contextMenu = ContextMenuWrapper.getInstance();
+        contextMenu = ContextMenusInPEView.getInstance();
         return self;
     }
 
