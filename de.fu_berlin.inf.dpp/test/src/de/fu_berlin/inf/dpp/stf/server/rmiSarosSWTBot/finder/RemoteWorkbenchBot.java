@@ -20,15 +20,16 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.WorkbenchException;
 
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.IRemoteBotEditor;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.RemoteBotEditor;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.IRemoteBotPerspective;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.RemoteBotPerspective;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.IRemoteBotView;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.RemoteBotChatLine;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.RemoteBotEditor;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.RemoteBotPerspective;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.RemoteBotView;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.views.sarosViews.ChatView;
 import de.fu_berlin.inf.dpp.stf.server.sarosSWTBot.SarosSWTBot;
 
-public class RemoteWorkbenchBot extends RemoteBot implements IRemoteWorkbenchBot {
+public class RemoteWorkbenchBot extends RemoteBot implements
+    IRemoteWorkbenchBot {
 
     private static transient RemoteWorkbenchBot self;
 
@@ -37,6 +38,7 @@ public class RemoteWorkbenchBot extends RemoteBot implements IRemoteWorkbenchBot
     private static RemoteBotEditor stfBotEditor;
 
     private static SarosSWTBot sarosSwtBot;
+    private static RemoteBotChatLine chatLine;
 
     /**
      * {@link ChatView} is a singleton, but inheritance is possible.
@@ -49,6 +51,7 @@ public class RemoteWorkbenchBot extends RemoteBot implements IRemoteWorkbenchBot
         stfBotPers = RemoteBotPerspective.getInstance();
         stfBotEditor = RemoteBotEditor.getInstance();
         sarosSwtBot = SarosSWTBot.getInstance();
+        chatLine = RemoteBotChatLine.getInstance();
         return self;
     }
 
@@ -165,7 +168,8 @@ public class RemoteWorkbenchBot extends RemoteBot implements IRemoteWorkbenchBot
         return stfBotPers;
     }
 
-    public IRemoteBotPerspective perspectiveById(String id) throws RemoteException {
+    public IRemoteBotPerspective perspectiveById(String id)
+        throws RemoteException {
         stfBotPers.setWidget(sarosSwtBot.perspectiveById(id));
         return stfBotPers;
     }
@@ -287,4 +291,28 @@ public class RemoteWorkbenchBot extends RemoteBot implements IRemoteWorkbenchBot
         sarosSwtBot.closeAllShells();
     }
 
+    /**********************************************
+     * 
+     * Chat
+     * 
+     **********************************************/
+    public RemoteBotChatLine chatLine() throws RemoteException {
+        return chatLine(0);
+    }
+
+    public RemoteBotChatLine chatLine(int index) throws RemoteException {
+        chatLine.setWidget(sarosSwtBot.chatLine(index));
+        return chatLine;
+    }
+
+    public RemoteBotChatLine lastChatLine() throws RemoteException {
+        chatLine.setWidget(sarosSwtBot.lastChatLine());
+        return chatLine;
+    }
+
+    public RemoteBotChatLine chatLine(final String regex)
+        throws RemoteException {
+        chatLine.setWidget(sarosSwtBot.chatLine(regex));
+        return chatLine;
+    }
 }

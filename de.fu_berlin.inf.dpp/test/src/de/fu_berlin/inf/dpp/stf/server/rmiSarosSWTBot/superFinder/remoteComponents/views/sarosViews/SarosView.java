@@ -20,6 +20,7 @@ import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.stf.STF;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.conditions.SarosConditions;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.IRemoteBotMenu;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.IRemoteBotToolbarDropDownButton;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.IRemoteBotTree;
@@ -29,6 +30,7 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.ISuperBot;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.contextMenu.IBuddiesContextMenuWrapper;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.contextMenu.ISessionContextMenuWrapper;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.views.Views;
+import de.fu_berlin.inf.dpp.stf.server.sarosSWTBot.widgets.SarosSWTBotChatInput;
 
 /**
  * This implementation of {@link ISarosView}
@@ -190,16 +192,16 @@ public class SarosView extends Views implements ISarosView {
         }
     }
 
-    /**
-     * TODO: With {@link IRemoteBotView#toolbarButtonWithRegex(String)} to
-     * perform this action you will get WidgetNotFoundException.
-     */
-
-    public void addBuddyToSession(String... jidOfInvitees)
-        throws RemoteException {
-        view.toolbarButton(TB_ADD_BUDDY_TO_SESSION).click();
-        superBot().confirmShellAddBuddyToSession(jidOfInvitees);
-    }
+    // /**
+    // * TODO: With {@link IRemoteBotView#toolbarButtonWithRegex(String)} to
+    // * perform this action you will get WidgetNotFoundException.
+    // */
+    //
+    // public void addBuddyToSession(String... jidOfInvitees)
+    // throws RemoteException {
+    // view.toolbarButton(TB_ADD_BUDDY_TO_SESSION).click();
+    // superBot().confirmShellAddBuddyToSession(jidOfInvitees);
+    // }
 
     /**
      * Note: {@link STF#TB_INCONSISTENCY_DETECTED} is not complete toolbarName,
@@ -242,6 +244,15 @@ public class SarosView extends Views implements ISarosView {
         return sessionContextMenu;
     }
 
+    public ISessionContextMenuWrapper selectNoSessionRunning()
+        throws RemoteException {
+        if (isInSession())
+            throw new RuntimeException("You are in a session!");
+        initSessionContextMenuWrapper(tree
+            .selectTreeItemWithRegex(NODE_NO_SESSION_RUNNING));
+        return sessionContextMenu;
+    }
+
     public ISessionContextMenuWrapper selectParticipant(final JID participantJID)
         throws RemoteException {
         if (!isInSession())
@@ -251,6 +262,24 @@ public class SarosView extends Views implements ISarosView {
             NODE_SESSION, participantLabel));
         sessionContextMenu.setParticipantJID(participantJID);
         return sessionContextMenu;
+    }
+
+    public void sendChatMessage(String message) throws RemoteException {
+        bot().activateWorkbench();
+        SarosSWTBotChatInput chatInput = bot.chatInput();
+        chatInput.setText(message);
+        bot.text();
+        log.debug("inerted message in chat view: " + chatInput.getText());
+        // chatInput.pressShortcut(Keystrokes.LF);
+        chatInput.pressEnterKey();
+    }
+
+    public boolean compareChatMessage(String jid, String message)
+        throws RemoteException {
+        log.debug("chatLine: " + bot().lastChatLine());
+        log.debug("text of the lastChatLine: " + bot.lastChatLine().getText());
+        String text = bot.lastChatLine().getText();
+        return text.equals(message);
     }
 
     /**********************************************
@@ -400,6 +429,53 @@ public class SarosView extends Views implements ISarosView {
             return null;
     }
 
+    public String getUserNameOnChatLinePartnerChangeSeparator()
+        throws RemoteException {
+        log.debug("user name of the first chat line partner change separator: "
+            + bot.chatLinePartnerChangeSeparator().getPlainID());
+        return bot.chatLinePartnerChangeSeparator().getPlainID();
+    }
+
+    public String getUserNameOnChatLinePartnerChangeSeparator(int index)
+        throws RemoteException {
+        log.debug("user name of the chat line partner change separator with the index"
+            + index
+            + ": "
+            + bot.chatLinePartnerChangeSeparator(index).getPlainID());
+        return bot.chatLinePartnerChangeSeparator(index).getPlainID();
+    }
+
+    public String getUserNameOnChatLinePartnerChangeSeparator(String plainID)
+        throws RemoteException {
+        log.debug("user name of the chat line partner change separator with the plainID "
+            + plainID
+            + ": "
+            + bot.chatLinePartnerChangeSeparator(plainID).getPlainID());
+        return bot.chatLinePartnerChangeSeparator(plainID).getPlainID();
+    }
+
+    public String getTextOfChatLine() throws RemoteException {
+        log.debug("text of the first chat line: " + bot.chatLine().getText());
+        return bot.chatLine().getText();
+    }
+
+    public String getTextOfChatLine(int index) throws RemoteException {
+        log.debug("text of the chat line with the index " + index + ": "
+            + bot.chatLine(index).getText());
+        return bot.chatLine(index).getText();
+    }
+
+    public String getTextOfLastChatLine() throws RemoteException {
+        log.debug("text of the last chat line: " + bot.lastChatLine().getText());
+        return bot.lastChatLine().getText();
+    }
+
+    public String getTextOfChatLine(String regex) throws RemoteException {
+        log.debug("text of the chat line with the specifed regex: "
+            + bot.chatLine(regex).getText());
+        return bot.chatLine(regex).getText();
+    }
+
     /**********************************************
      * 
      * waits until
@@ -496,6 +572,11 @@ public class SarosView extends Views implements ISarosView {
         });
     }
 
+    public void waitUntilGetChatMessage(String jid, String message)
+        throws RemoteException {
+        bot().waitUntil(SarosConditions.isChatMessageExist(this, jid, message));
+    }
+
     /**************************************************************
      * 
      * inner functions
@@ -579,4 +660,5 @@ public class SarosView extends Views implements ISarosView {
         buddiesContextMenu.setTreeItem(treeItem);
         buddiesContextMenu.setSarosView(this);
     }
+
 }

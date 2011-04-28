@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.stf.client.testProject.testsuits.invitation.permutations;
+package de.fu_berlin.inf.dpp.stf.client.testProject.testsuitToReproduceBugs;
 
 import static org.junit.Assert.assertTrue;
 
@@ -74,25 +74,21 @@ public class TestParallelInvitationWithTerminationByHost extends STFTest {
         alice
             .superBot()
             .views()
-            .packageExplorerView()
-            .selectProject(PROJECT1)
-            .shareWith()
-            .multipleBuddies(PROJECT1, bob.getJID(), dave.getJID(),
-                carl.getJID());
-
+            .sarosView()
+            .selectNoSessionRunning()
+            .shareProjects(PROJECT1, bob.getJID(), dave.getJID(), carl.getJID());
         bob.bot().waitUntilShellIsOpen(SHELL_SESSION_INVITATION);
         bob.bot().shell(SHELL_SESSION_INVITATION).activate();
         alice.superBot().views().progressView().removeProcess(0);
-        bob.bot().waitUntilShellIsOpen(SHELL_INVITATION_CANCELLED);
+        bob.bot().waitLongUntilShellIsOpen(SHELL_INVITATION_CANCELLED);
         bob.bot().shell(SHELL_INVITATION_CANCELLED).activate();
-
         bob.bot().shell(SHELL_INVITATION_CANCELLED).close();
 
         carl.bot().waitUntilShellIsOpen(SHELL_SESSION_INVITATION);
         carl.bot().shell(SHELL_SESSION_INVITATION).activate();
         carl.bot().shell(SHELL_SESSION_INVITATION).confirm(FINISH);
-        alice.superBot().views().progressView().removeProcess(0);
-        carl.bot().shell(SHELL_INVITATION_CANCELLED).waitUntilActive();
+        alice.superBot().views().progressView().removeProcess(1);
+        carl.bot().waitLongUntilShellIsOpen(SHELL_INVITATION_CANCELLED);
         assertTrue(carl.bot().shell(SHELL_INVITATION_CANCELLED).isActive());
 
         carl.bot().shell(SHELL_INVITATION_CANCELLED).close();
@@ -102,14 +98,14 @@ public class TestParallelInvitationWithTerminationByHost extends STFTest {
         dave.bot().shell(SHELL_SESSION_INVITATION).confirm(FINISH);
 
         // dave.button.clickButton(FINISH);
-        alice.superBot().views().progressView().removeProcess(0);
+        alice.superBot().views().progressView().removeProcess(3);
         // FIXME Timeout exception by MAC OS X, the building session under
         // MAS
         // is so fast that the session process is already done after
         // canceling
         // this process, so dave should never get the window
         // "Invitation canceled".
-        dave.bot().shell(SHELL_INVITATION_CANCELLED).waitUntilActive();
+        dave.bot().waitLongUntilShellIsOpen(SHELL_INVITATION_CANCELLED);
         assertTrue(dave.bot().shell(SHELL_INVITATION_CANCELLED).isActive());
 
         dave.bot().shell(SHELL_INVITATION_CANCELLED).close();

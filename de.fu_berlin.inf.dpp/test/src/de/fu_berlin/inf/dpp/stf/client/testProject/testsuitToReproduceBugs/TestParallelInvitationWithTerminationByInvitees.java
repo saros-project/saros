@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.stf.client.testProject.testsuits.invitation.permutations;
+package de.fu_berlin.inf.dpp.stf.client.testProject.testsuitToReproduceBugs;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -75,10 +75,9 @@ public class TestParallelInvitationWithTerminationByInvitees extends STFTest {
         alice
             .superBot()
             .views()
-            .packageExplorerView()
-            .selectProject(PROJECT1)
-            .shareWith()
-            .multipleBuddies(PROJECT1, bob.getJID(), dave.getJID(),
+            .sarosView()
+            .selectNoSessionRunning()
+            .shareProjects(PROJECT1, bob.getJID(), dave.getJID(),
                 carl.getJID(), edna.getJID());
 
         bob.bot().waitUntilShellIsOpen(SHELL_SESSION_INVITATION);

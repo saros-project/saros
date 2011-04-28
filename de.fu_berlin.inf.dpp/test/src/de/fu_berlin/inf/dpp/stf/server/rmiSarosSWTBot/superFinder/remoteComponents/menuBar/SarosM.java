@@ -60,7 +60,7 @@ public class SarosM extends Component implements ISarosM {
 
     public void shareProjects(String projectName, JID... jids)
         throws RemoteException {
-        menu.menu(MENU_SHARE_PROJECTS).click();
+        menu.menu(SHARE_PROJECTS).click();
         superBot().confirmShellShareProject(projectName, jids);
     }
 

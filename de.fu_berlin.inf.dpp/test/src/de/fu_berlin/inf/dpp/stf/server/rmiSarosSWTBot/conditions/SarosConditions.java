@@ -9,7 +9,7 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotToolbarButton;
 
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.IRemoteBotTable;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.views.sarosViews.ChatView;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.views.sarosViews.SarosView;
 
 /**
  * This is a factory class to create some conditions provided with STF.
@@ -59,9 +59,9 @@ public class SarosConditions extends Conditions {
         return new ExistsNoResource(resourcePath);
     }
 
-    public static ICondition isChatMessageExist(ChatView chatV, String jid,
+    public static ICondition isChatMessageExist(SarosView sarosV, String jid,
         String message) {
-        return new ExistsChatMessage(chatV, jid, message);
+        return new ExistsChatMessage(sarosV, jid, message);
     }
 
     public static ICondition isRevisionSame(String fullPath, String revisionID) {

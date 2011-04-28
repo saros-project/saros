@@ -6,8 +6,6 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponen
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.contextMenu.BuddiesContextMenuWrapper;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.contextMenu.ContextMenuWrapper;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.contextMenu.SessionContextMenuWrapper;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.views.sarosViews.ChatView;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.views.sarosViews.IChatView;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.views.sarosViews.IRSView;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.views.sarosViews.ISarosView;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.views.sarosViews.RSView;
@@ -24,7 +22,6 @@ public class Views extends Component implements IViews {
     protected static SessionContextMenuWrapper sessionContextMenu = SessionContextMenuWrapper
         .getInstance();
 
-    private static ChatView chatV;
     private static SarosView rosterV;
     private static RSView rsV;
     private static ConsoleView consoleV;
@@ -38,7 +35,6 @@ public class Views extends Component implements IViews {
         if (self != null)
             return self;
         self = new Views();
-        chatV = ChatView.getInstance();
         rosterV = SarosView.getInstance();
         rsV = RSView.getInstance();
         consoleV = ConsoleView.getInstance();
@@ -46,12 +42,6 @@ public class Views extends Component implements IViews {
         progressvV = ProgressView.getInstance();
         contextMenu = ContextMenuWrapper.getInstance();
         return self;
-    }
-
-    public IChatView chatView() throws RemoteException {
-        bot().openViewById(VIEW_SAROS_ID);
-        bot().view(VIEW_SAROS).show();
-        return chatV.setView(bot().view(VIEW_SAROS));
     }
 
     public ISarosView sarosView() throws RemoteException {

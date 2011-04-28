@@ -156,11 +156,9 @@ public class TestSVNStateInitialization extends STFTest {
         assertTrue(bob.superBot().views().packageExplorerView()
             .isProjectManagedBySVN(SVN_PROJECT));
 
+        // assertTrue(alice.superBot().views().sarosView()
+        // .existsParticipant(bob.getJID()));
         assertTrue(alice.superBot().views().sarosView()
-            .selectParticipant(alice.getJID()).hasWriteAccess());
-        assertTrue(alice.superBot().views().sarosView()
-            .existsParticipant(bob.getJID()));
-        assertTrue(bob.superBot().views().sarosView()
             .selectParticipant(bob.getJID()).hasWriteAccess());
     }
 
@@ -192,8 +190,9 @@ public class TestSVNStateInitialization extends STFTest {
         // buildSessionSequentially(SVN_PROJECT,
         // TypeOfCreateProject.NEW_PROJECT,
         // alice, bob);
-        alice.superBot().views().packageExplorerView()
-            .selectJavaProject(SVN_PROJECT).shareWith().buddy(bob.getJID());
+        alice.superBot().views().sarosView().selectBuddy(bob.getJID())
+            .workTogetherOn().project(SVN_PROJECT);
+
         bob.superBot().confirmShellSessionInvitationAndShellAddProject(
             SVN_PROJECT, TypeOfCreateProject.NEW_PROJECT);
 
@@ -233,8 +232,8 @@ public class TestSVNStateInitialization extends STFTest {
         // buildSessionSequentially(SVN_PROJECT,
         // TypeOfCreateProject.NEW_PROJECT,
         // alice, bob);
-        alice.superBot().views().packageExplorerView()
-            .selectJavaProject(SVN_PROJECT).shareWith().buddy(bob.getJID());
+        alice.superBot().views().sarosView().selectBuddy(bob.getJID())
+            .workTogetherOn().project(SVN_PROJECT);
         bob.superBot().confirmShellSessionInvitationAndShellAddProject(
             SVN_PROJECT, TypeOfCreateProject.NEW_PROJECT);
 
@@ -283,8 +282,8 @@ public class TestSVNStateInitialization extends STFTest {
         // buildSessionSequentially(SVN_PROJECT,
         // TypeOfCreateProject.NEW_PROJECT,
         // alice, bob);
-        alice.superBot().views().packageExplorerView()
-            .selectJavaProject(SVN_PROJECT).shareWith().buddy(bob.getJID());
+        alice.superBot().views().sarosView().selectBuddy(bob.getJID())
+            .workTogetherOn().project(SVN_PROJECT);
         bob.superBot().confirmShellSessionInvitationAndShellAddProject(
             SVN_PROJECT, TypeOfCreateProject.NEW_PROJECT);
 
@@ -335,8 +334,8 @@ public class TestSVNStateInitialization extends STFTest {
         // buildSessionSequentially(SVN_PROJECT,
         // TypeOfCreateProject.NEW_PROJECT,
         // alice, bob);
-        alice.superBot().views().packageExplorerView()
-            .selectJavaProject(SVN_PROJECT).shareWith().buddy(bob.getJID());
+        alice.superBot().views().sarosView().selectBuddy(bob.getJID())
+            .workTogetherOn().project(SVN_PROJECT);
         bob.superBot().confirmShellSessionInvitationAndShellAddProject(
             SVN_PROJECT, TypeOfCreateProject.NEW_PROJECT);
 

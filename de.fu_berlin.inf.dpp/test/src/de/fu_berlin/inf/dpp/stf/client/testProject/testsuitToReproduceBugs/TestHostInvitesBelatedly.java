@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.stf.client.testProject.testsuits.enteringAndExitingSession;
+package de.fu_berlin.inf.dpp.stf.client.testProject.testsuitToReproduceBugs;
 
 import static org.junit.Assert.assertEquals;
 

@@ -2,16 +2,16 @@ package de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.conditions;
 
 import org.eclipse.swtbot.swt.finder.waits.DefaultCondition;
 
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.views.sarosViews.ChatView;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.views.sarosViews.SarosView;
 
 public class ExistsChatMessage extends DefaultCondition {
 
     private String jid;
     private String message;
-    private ChatView chatV;
+    private SarosView sarosView;
 
-    ExistsChatMessage(ChatView chatV, String jid, String message) {
-        this.chatV = chatV;
+    ExistsChatMessage(SarosView sarosView, String jid, String message) {
+        this.sarosView = sarosView;
         this.jid = jid;
         this.message = message;
     }
@@ -21,6 +21,6 @@ public class ExistsChatMessage extends DefaultCondition {
     }
 
     public boolean test() throws Exception {
-        return chatV.compareChatMessage(jid, message);
+        return sarosView.compareChatMessage(jid, message);
     }
 }

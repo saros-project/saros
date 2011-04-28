@@ -96,6 +96,12 @@ public class SessionContextMenuWrapper extends SarosContextMenuWrapper
         superBot().confirmShellAddBuddyToSession(jidOfInvitees);
     }
 
+    public void shareProjects(String projectName, JID... jids)
+        throws RemoteException {
+        treeItem.contextMenus(SHARE_PROJECTS).click();
+        superBot().confirmShellShareProject(projectName, jids);
+    }
+
     /**********************************************
      * 
      * States

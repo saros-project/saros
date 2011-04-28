@@ -31,7 +31,7 @@ public class TestMenuSarosByAliceBob extends STFTest {
     public void testShareProjectsWithBot() throws RemoteException {
         alice.superBot().views().packageExplorerView().tree().newC()
             .javaProject(PROJECT1);
-        alice.bot().menu(MENU_SAROS).menu(MENU_SHARE_PROJECTS).click();
+        alice.bot().menu(MENU_SAROS).menu(SHARE_PROJECTS).click();
         if (!alice.bot().isShellOpen(SHELL_SHARE_PROJECT)) {
             alice.bot().waitUntilShellIsOpen(SHELL_SHARE_PROJECT);
         }

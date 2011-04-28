@@ -97,6 +97,9 @@ public interface ISarosView extends Remote {
 
     public ISessionContextMenuWrapper selectSession() throws RemoteException;
 
+    public ISessionContextMenuWrapper selectNoSessionRunning()
+        throws RemoteException;
+
     public ISessionContextMenuWrapper selectParticipant(final JID participantJID)
         throws RemoteException;
 
@@ -258,25 +261,27 @@ public interface ISarosView extends Remote {
      */
     public void leaveSession() throws RemoteException;
 
-    /**
-     * performs the action "Open invitation interface" which should be activated
-     * by clicking the tool bar button with the tooltip text
-     * {@link STF#TB_ADD_A_NEW_BUDDY} on the session view. The button is only
-     * enabled, if you are host.
-     * <p>
-     * <b>Attention:</b>
-     * <ol>
-     * <li>Makes sure, the session view is open and active.</li>
-     * <li>All iterative triggered events by the action should be handled in the
-     * method(exclude remote triggered events). E.g. a popup window.</li>
-     * </ol>
-     * 
-     * @param jidOfInvitees
-     *            the buddy whom you want to invite to your session.
-     * @throws RemoteException
-     */
-    public void addBuddyToSession(String... jidOfInvitees)
-        throws RemoteException;
+    // /**
+    // * performs the action "Open invitation interface" which should be
+    // activated
+    // * by clicking the tool bar button with the tooltip text
+    // * {@link STF#TB_ADD_A_NEW_BUDDY} on the session view. The button is only
+    // * enabled, if you are host.
+    // * <p>
+    // * <b>Attention:</b>
+    // * <ol>
+    // * <li>Makes sure, the session view is open and active.</li>
+    // * <li>All iterative triggered events by the action should be handled in
+    // the
+    // * method(exclude remote triggered events). E.g. a popup window.</li>
+    // * </ol>
+    // *
+    // * @param jidOfInvitees
+    // * the buddy whom you want to invite to your session.
+    // * @throws RemoteException
+    // */
+    // public void addBuddyToSession(String... jidOfInvitees)
+    // throws RemoteException;
 
     /**
      * performs the action "inconsistency detected in ..." which should be
@@ -447,4 +452,28 @@ public interface ISarosView extends Remote {
     public void waitUntilAllPeersLeaveSession(
         final List<JID> jidsOfAllParticipants) throws RemoteException;
 
+    public void waitUntilGetChatMessage(String jid, String message)
+        throws RemoteException;
+
+    public void sendChatMessage(String message) throws RemoteException;
+
+    public String getUserNameOnChatLinePartnerChangeSeparator()
+        throws RemoteException;
+
+    public String getUserNameOnChatLinePartnerChangeSeparator(int index)
+        throws RemoteException;
+
+    public String getUserNameOnChatLinePartnerChangeSeparator(String plainID)
+        throws RemoteException;
+
+    public String getTextOfChatLine() throws RemoteException;
+
+    public String getTextOfChatLine(int index) throws RemoteException;
+
+    public String getTextOfLastChatLine() throws RemoteException;
+
+    public String getTextOfChatLine(String regex) throws RemoteException;
+
+    public boolean compareChatMessage(String jid, String message)
+        throws RemoteException;
 }

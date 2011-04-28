@@ -72,7 +72,6 @@ public class TestShareProjectUsingExistingProject extends STFTest {
             .selectPkg(PROJECT1, PKG1).existsWithRegex(CLS2));
 
         buildSessionSequentially(
-
             PROJECT1,
             TypeOfCreateProject.EXIST_PROJECT_WITH_COPY_AFTER_CANCEL_LOCAL_CHANGE,
             alice, bob);

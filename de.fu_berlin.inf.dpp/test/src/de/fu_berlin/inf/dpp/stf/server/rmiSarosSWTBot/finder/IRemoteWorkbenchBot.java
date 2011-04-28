@@ -11,6 +11,7 @@ import org.hamcrest.Matcher;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.IRemoteBotEditor;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.IRemoteBotPerspective;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.IRemoteBotView;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.RemoteBotChatLine;
 
 public interface IRemoteWorkbenchBot extends IRemoteBot {
     public IRemoteBotView view(String viewTitle) throws RemoteException;
@@ -43,7 +44,8 @@ public interface IRemoteWorkbenchBot extends IRemoteBot {
     public IRemoteBotPerspective perspectiveByLabel(String label)
         throws RemoteException;
 
-    public IRemoteBotPerspective perspectiveById(String id) throws RemoteException;
+    public IRemoteBotPerspective perspectiveById(String id)
+        throws RemoteException;
 
     /**
      * Shortcut for view(withPartId(id))
@@ -182,4 +184,12 @@ public interface IRemoteWorkbenchBot extends IRemoteBot {
 
     public void closeAllShells() throws RemoteException;
 
+    public RemoteBotChatLine chatLine() throws RemoteException;
+
+    public RemoteBotChatLine chatLine(int index) throws RemoteException;
+
+    public RemoteBotChatLine lastChatLine() throws RemoteException;
+
+    public RemoteBotChatLine chatLine(final String regex)
+        throws RemoteException;
 }

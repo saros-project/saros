@@ -170,6 +170,15 @@ public class STF {
 
     /**********************************************
      * 
+     * Multiused label name.
+     * 
+     **********************************************/
+
+    public final static String ADD_PROJECTS = SarosMessages
+        .getString("add_projects");
+
+    /**********************************************
+     * 
      * Main Menu Saros
      * 
      **********************************************/
@@ -184,10 +193,12 @@ public class STF {
         .getString("menu_add_buddy");
     public final static String ADD_BUDDIES = SarosMessages
         .getString("add_buddies");
-    public final static String MENU_SHARE_PROJECTS = SarosMessages
-        .getString("menu_share_projects");
+    public final static String SHARE_PROJECTS = SarosMessages
+        .getString("share_projects");
     public final static String MENU_PREFERENCES = SarosMessages
         .getString("menu_preferences");
+    public final static String MENU_STOP_SESSION = SarosMessages
+        .getString("menu_stop_session");
 
     public final static String SHELL_PREFERNCES = SarosMessages
         .getString("shell_preferences");
@@ -275,63 +286,10 @@ public class STF {
 
     /**********************************************
      * 
-     * View Saros Buddies
+     * Saros View
      * 
      **********************************************/
-    /* View infos */
-    public final static String VIEW_SAROS_BUDDIES = SarosMessages
-        .getString("view_saros_buddies");
-    public final static String VIEW_SAROS_BUDDIES_ID = SarosMessages
-        .getString("view_saros_buddies_id");
 
-    public final static String SHELL_REQUEST_OF_SUBSCRIPTION_RECEIVED = SarosMessages
-        .getString("shell_request_of_subscription_received");
-    public final static String SHELL_BUDDY_ALREADY_ADDED = SarosMessages
-        .getString("shell_buddy_already_added");
-
-    public final static String SHELL_BUDDY_LOOKUP_FAILED = SarosMessages
-        .getString("shell_buddy_look_up_failed");
-    public final static String SHELL_SERVER_NOT_FOUND = SarosMessages
-        .getString("shell_server_not_found");
-    public final static String SHELL_REMOVAL_OF_SUBSCRIPTION = SarosMessages
-        .getString("shell_removal_of_subscription");
-
-    public final static String SHELL_SET_NEW_NICKNAME = SarosMessages
-        .getString("shell_set_new_nickname");
-
-    public final static String TB_DISCONNECT = SarosMessages
-        .getString("tb_disconnect");
-    public final static String TB_ADD_A_NEW_BUDDY = SarosMessages
-        .getString("tb_add_a_new_buddy");
-    public final static String TB_CONNECT = SarosMessages
-        .getString("tb_connect");
-
-    public final static String CM_DELETE = SarosMessages.getString("cm_delete");
-    public final static String CM_RENAME = SarosMessages.getString("cm_rename");
-    public final static String CM_SKYPE_THIS_BUDDY = SarosMessages
-        .getString("cm_skype_this_buddy");
-    public final static String CM_ADD_TO_SAROS_SESSION = SarosMessages
-        .getString("cm_add_to_saros_session");
-    public final static String CM_TEST_DATA_TRANSFER = SarosMessages
-        .getString("cm_test_data_transfer_connection");
-
-    public final static String NODE_BUDDIES = SarosMessages
-        .getString("tree_item_label_buddies");
-
-    public final static String NODE_SESSION = SarosMessages
-        .getString("tree_item_label_session");
-
-    public final static String LABEL_XMPP_JABBER_JID = SarosMessages
-        .getString("text_label_xmpp_jabber_jid");
-
-    public final static String GROUP_TITLE_CREATE_NEW_XMPP_JABBER_ACCOUNT = SarosMessages
-        .getString("group_title_create_new_xmpp_jabber_account");
-
-    /**********************************************
-     * 
-     * View Saros Session
-     * 
-     **********************************************/
     /*
      * View infos
      */
@@ -340,15 +298,18 @@ public class STF {
     public final static String VIEW_SAROS_ID = SarosMessages
         .getString("view_saros_id");
 
-    // Permission: Write Access
-    static public final String OWN_PARTICIPANT_NAME = SarosMessages
-        .getString("own_participant_name");
-    public final static String PERMISSION_NAME = SarosMessages
-        .getString("permission_name");
-
-    /*
-     * title of shells which are pop up by performing the actions on the view.
-     */
+    public final static String SHELL_REQUEST_OF_SUBSCRIPTION_RECEIVED = SarosMessages
+        .getString("shell_request_of_subscription_received");
+    public final static String SHELL_BUDDY_ALREADY_ADDED = SarosMessages
+        .getString("shell_buddy_already_added");
+    public final static String SHELL_BUDDY_LOOKUP_FAILED = SarosMessages
+        .getString("shell_buddy_look_up_failed");
+    public final static String SHELL_SERVER_NOT_FOUND = SarosMessages
+        .getString("shell_server_not_found");
+    public final static String SHELL_REMOVAL_OF_SUBSCRIPTION = SarosMessages
+        .getString("shell_removal_of_subscription");
+    public final static String SHELL_SET_NEW_NICKNAME = SarosMessages
+        .getString("shell_set_new_nickname");
     public final static String SHELL_CONFIRM_CLOSING_SESSION = SarosMessages
         .getString("shell_confirm_closing_session");
     public final static String SHELL_INCOMING_SCREENSHARING_SESSION = SarosMessages
@@ -361,7 +322,6 @@ public class STF {
         .getString("shell_add_buddy");
     public final static String SHELL_ADD_BUDDY_TO_SESSION = SarosMessages
         .getString("shell_add_buddy_to_session");
-
     public final static String SHELL_ERROR_IN_SAROS_PLUGIN = SarosMessages
         .getString("shell_error_in_saros_plugin");
     public final static String SHELL_CLOSING_THE_SESSION = SarosMessages
@@ -369,9 +329,12 @@ public class STF {
     public final static String SHELL_CONFIRM_LEAVING_SESSION = SarosMessages
         .getString("comfirm_leaving_session");
 
-    /*
-     * Tool tip text of all the toolbar buttons on the view
-     */
+    public final static String TB_DISCONNECT = SarosMessages
+        .getString("tb_disconnect");
+    public final static String TB_ADD_A_NEW_BUDDY = SarosMessages
+        .getString("tb_add_a_new_buddy");
+    public final static String TB_CONNECT = SarosMessages
+        .getString("tb_connect");
     public final static String TB_SHARE_SCREEN_WITH_BUDDY = SarosMessages
         .getString("tb_share_screen_with_buddy");
     public final static String TB_STOP_SESSION_WITH_BUDDY = SarosMessages
@@ -395,7 +358,14 @@ public class STF {
     public final static String TB_STOP_SESSION = SarosMessages
         .getString("tb_stop_session");
 
-    // Context menu's name of the table on the view
+    public final static String CM_DELETE = SarosMessages.getString("cm_delete");
+    public final static String CM_RENAME = SarosMessages.getString("cm_rename");
+    public final static String CM_SKYPE_THIS_BUDDY = SarosMessages
+        .getString("cm_skype_this_buddy");
+    public final static String CM_ADD_TO_SAROS_SESSION = SarosMessages
+        .getString("cm_add_to_saros_session");
+    public final static String CM_TEST_DATA_TRANSFER = SarosMessages
+        .getString("cm_test_data_transfer_connection");
     public final static String CM_GRANT_WRITE_ACCESS = SarosMessages
         .getString("cm_grant_write_access");
     public final static String CM_RESTRICT_TO_READ_ONLY_ACCESS = SarosMessages
@@ -408,25 +378,27 @@ public class STF {
         .getString("cm_jump_to_position_of_selected_buddy");
     public final static String CM_CHANGE_COLOR = SarosMessages
         .getString("cm_change_color");
-
-    public final static String ADD_PROJECTS = SarosMessages
-        .getString("add_projects");
-
     public final static String CM_STOP_SAROS_SESSION = SarosMessages
         .getString("cm_stop_saros_session");
 
-    public final static String MENU_STOP_SESSION = SarosMessages
-        .getString("menu_stop_session");
+    public final static String NODE_BUDDIES = SarosMessages
+        .getString("tree_item_label_buddies");
+    public final static String NODE_SESSION = SarosMessages
+        .getString("tree_item_label_session");
+    public final static String NODE_NO_SESSION_RUNNING = SarosMessages
+        .getString("tree_item_label_no_session_running");
 
-    /**********************************************
-     * 
-     * View Saros Chat
-     * 
-     **********************************************/
-    public final static String VIEW_SAROS_CHAT = SarosMessages
-        .getString("view_saros_chat");
-    public final static String VIEW_SAROS_CHAT_ID = SarosMessages
-        .getString("view_saros_chat_id");
+    public final static String LABEL_XMPP_JABBER_JID = SarosMessages
+        .getString("text_label_xmpp_jabber_jid");
+
+    public final static String GROUP_TITLE_CREATE_NEW_XMPP_JABBER_ACCOUNT = SarosMessages
+        .getString("group_title_create_new_xmpp_jabber_account");
+
+    // Permission: Write Access
+    static public final String OWN_PARTICIPANT_NAME = SarosMessages
+        .getString("own_participant_name");
+    public final static String PERMISSION_NAME = SarosMessages
+        .getString("permission_name");
 
     /**********************************************
      * 
@@ -611,8 +583,6 @@ public class STF {
     static {
         viewTitlesAndIDs.put(VIEW_PACKAGE_EXPLORER, VIEW_PACKAGE_EXPLORER_ID);
         viewTitlesAndIDs.put(VIEW_REMOTE_SCREEN, VIEW_REMOTE_SCREEN_ID);
-        viewTitlesAndIDs.put(VIEW_SAROS_BUDDIES, VIEW_SAROS_BUDDIES_ID);
-        viewTitlesAndIDs.put(VIEW_SAROS_CHAT, VIEW_SAROS_CHAT_ID);
         viewTitlesAndIDs.put(VIEW_SAROS, VIEW_SAROS_ID);
         viewTitlesAndIDs.put(VIEW_SVN_REPOSITORIES, VIEW_SVN_REPOSITORIES_ID);
         viewTitlesAndIDs.put(VIEW_PROGRESS, VIEW_PROGRESS_ID);

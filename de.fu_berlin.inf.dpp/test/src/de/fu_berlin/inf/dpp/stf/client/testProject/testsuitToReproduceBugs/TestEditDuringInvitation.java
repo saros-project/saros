@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.stf.client.testProject.testsuits.invitation;
+package de.fu_berlin.inf.dpp.stf.client.testProject.testsuitToReproduceBugs;
 
 import static org.junit.Assert.assertTrue;
 
@@ -56,11 +56,11 @@ public class TestEditDuringInvitation extends STFTest {
         buildSessionSequentially(PROJECT1, TypeOfCreateProject.NEW_PROJECT,
             alice, bob);
 
-        assertTrue(bob.superBot().views().sarosView()
+        assertTrue(alice.superBot().views().sarosView()
             .selectParticipant(bob.getJID()).hasWriteAccess());
 
-        alice.superBot().views().sarosView()
-            .addBuddyToSession(carl.getBaseJid());
+        alice.superBot().views().sarosView().selectBuddy(carl.getJID())
+            .addToSarosSession();
         carl.bot().shell(SHELL_SESSION_INVITATION).confirm(FINISH);
 
         bob.superBot().views().packageExplorerView()

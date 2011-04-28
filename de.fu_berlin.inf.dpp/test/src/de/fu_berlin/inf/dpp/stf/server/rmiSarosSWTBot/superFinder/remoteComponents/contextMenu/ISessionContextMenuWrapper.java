@@ -3,6 +3,7 @@ package de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteCompone
 import java.rmi.RemoteException;
 
 import de.fu_berlin.inf.dpp.User;
+import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.stf.STF;
 
 public interface ISessionContextMenuWrapper extends ISarosContextMenuWrapper {
@@ -54,6 +55,9 @@ public interface ISessionContextMenuWrapper extends ISarosContextMenuWrapper {
     public void addProjects(String... projectNames) throws RemoteException;
 
     public void addBuddies(String... jidOfInvitees) throws RemoteException;
+
+    public void shareProjects(String projectName, JID... jids)
+        throws RemoteException;
 
     /**
      * 

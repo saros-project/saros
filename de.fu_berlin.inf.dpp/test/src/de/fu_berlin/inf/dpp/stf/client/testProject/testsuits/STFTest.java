@@ -692,7 +692,7 @@ public class STFTest extends STF {
                 public Void call() throws Exception {
                     tester.superBot().views().sarosView()
                         .selectParticipant(followedBuddy.getJID())
-                        .isFollowing();
+                        .followParticipant();
                     return null;
                 }
             });

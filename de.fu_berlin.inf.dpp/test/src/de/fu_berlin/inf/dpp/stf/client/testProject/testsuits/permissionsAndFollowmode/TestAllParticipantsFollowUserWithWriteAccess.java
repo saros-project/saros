@@ -58,11 +58,12 @@ public class TestAllParticipantsFollowUserWithWriteAccess extends STFTest {
      * </ol>
      * 
      * @throws RemoteException
+     * @throws InterruptedException
      */
     @Test
     public void followingUserOpenClassWhenFollowedUserOpenClass()
-        throws RemoteException {
-        alice.bot().editor(CLS1 + SUFFIX_JAVA).closeWithSave();
+        throws RemoteException, InterruptedException {
+        alice.bot().editor(CLS1_SUFFIX).closeWithSave();
         bob.bot().waitUntilEditorClosed(CLS1_SUFFIX);
         carl.bot().waitUntilEditorClosed(CLS1_SUFFIX);
         dave.bot().waitUntilEditorClosed(CLS1_SUFFIX);
@@ -72,6 +73,7 @@ public class TestAllParticipantsFollowUserWithWriteAccess extends STFTest {
 
         alice.superBot().views().packageExplorerView()
             .selectClass(PROJECT1, PKG1, CLS1).open();
+        // setFollowMode(alice, bob, carl, dave);
 
         bob.bot().waitUntilEditorOpen(CLS1_SUFFIX);
         carl.bot().waitUntilEditorOpen(CLS1_SUFFIX);

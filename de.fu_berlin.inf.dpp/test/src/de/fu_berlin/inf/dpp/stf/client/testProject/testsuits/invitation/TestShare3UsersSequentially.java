@@ -55,22 +55,18 @@ public class TestShare3UsersSequentially extends STFTest {
         InterruptedException {
 
         assertTrue(carl.superBot().views().sarosView().isInSession());
-        assertFalse(carl.superBot().views().sarosView()
+        assertFalse(alice.superBot().views().sarosView()
             .selectParticipant(carl.getJID()).hasReadOnlyAccess());
-        assertTrue(carl.superBot().views().sarosView()
+        assertTrue(alice.superBot().views().sarosView()
             .selectParticipant(carl.getJID()).hasWriteAccess());
 
         assertTrue(bob.superBot().views().sarosView().isInSession());
-        assertFalse(bob.superBot().views().sarosView()
+        assertFalse(alice.superBot().views().sarosView()
             .selectParticipant(bob.getJID()).hasReadOnlyAccess());
-        assertTrue(bob.superBot().views().sarosView()
+        assertTrue(alice.superBot().views().sarosView()
             .selectParticipant(bob.getJID()).hasWriteAccess());
 
         assertTrue(alice.superBot().views().sarosView().isInSession());
-        assertFalse(alice.superBot().views().sarosView()
-            .selectParticipant(alice.getJID()).hasReadOnlyAccess());
-        assertTrue(alice.superBot().views().sarosView()
-            .selectParticipant(alice.getJID()).hasWriteAccess());
 
         leaveSessionPeersFirst();
 
