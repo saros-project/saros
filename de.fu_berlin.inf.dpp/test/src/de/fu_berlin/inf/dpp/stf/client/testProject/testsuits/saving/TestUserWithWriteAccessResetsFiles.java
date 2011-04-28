@@ -76,9 +76,9 @@ public class TestUserWithWriteAccessResetsFiles extends STFTest {
         dave.bot().shell(SHELL_SAVE_RESOURCE).confirm(NO);
         edna.bot().shell(SHELL_SAVE_RESOURCE).confirm(NO);
 
+        // String contentOfDave = dave.superBot().views().packageExplorerView()
+        // .getFileContent(getClassPath(PROJECT1, PKG1, CLS1));
         String contentOfAlice = alice.superBot().views().packageExplorerView()
-            .getFileContent(getClassPath(PROJECT1, PKG1, CLS1));
-        String contentOfDave = dave.superBot().views().packageExplorerView()
             .getFileContent(getClassPath(PROJECT1, PKG1, CLS1));
 
         String contentOfEdna = edna.superBot().views().packageExplorerView()
@@ -87,7 +87,7 @@ public class TestUserWithWriteAccessResetsFiles extends STFTest {
         String contentOfBob = bob.superBot().views().packageExplorerView()
             .getFileContent(getClassPath(PROJECT1, PKG1, CLS1));
 
-        assertTrue(contentOfAlice.equals(contentOfDave));
+        // assertTrue(contentOfAlice.equals(contentOfDave));
         assertTrue(contentOfAlice.equals(contentOfEdna));
         assertTrue(contentOfAlice.equals(contentOfBob));
     }

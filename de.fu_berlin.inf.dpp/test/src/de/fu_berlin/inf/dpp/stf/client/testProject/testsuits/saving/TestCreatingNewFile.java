@@ -63,7 +63,7 @@ public class TestCreatingNewFile extends STFTest {
     /**
      * Steps:
      * <ol>
-     * <li>carl grants write access to alice.</li>
+     * <li>carl restrict to read-only access to alice.</li>
      * <li>carl creates a new file named "myFile.xml"</li>
      * <li>bob and carl activate "Follow-Mode"</li>
      * <li>alice creates new XML file myFile2.xml and edits it with the Eclipse
@@ -98,12 +98,15 @@ public class TestCreatingNewFile extends STFTest {
         carl.superBot().views().packageExplorerView()
             .selectFolder(PROJECT1, FOLDER1).newC().file(FILE1);
         waitsUntilTransferedDataIsArrived(alice);
-        assertFalse(alice.superBot().views().packageExplorerView()
+
+        assertTrue(alice.superBot().views().packageExplorerView()
             .selectProject(PROJECT1).existsWithRegex(FOLDER1));
         waitsUntilTransferedDataIsArrived(bob);
-        assertFalse(bob.superBot().views().packageExplorerView()
+        assertTrue(bob.superBot().views().packageExplorerView()
             .selectProject(PROJECT1).existsWithRegex(FOLDER1));
 
+        carl.superBot().views().sarosView().selectParticipant(alice.getJID())
+            .grantWriteAccess();
         setFollowMode(alice, carl, bob);
 
         alice.superBot().views().packageExplorerView().selectProject(PROJECT1)
