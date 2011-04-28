@@ -2,8 +2,8 @@ package de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteCompone
 
 import java.rmi.RemoteException;
 
-import de.fu_berlin.inf.dpp.stf.client.AbstractTester;
 import de.fu_berlin.inf.dpp.stf.client.testProject.helpers.TestPattern;
+import de.fu_berlin.inf.dpp.stf.client.tester.AbstractTester;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.Perspective;
 
 /**
@@ -11,12 +11,13 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponen
  * widgets. You can start off as follows:
  * <ol>
  * <li>
- * At first you need to create a {@link AbstractTester} object in your junit-test. (How
- * to do it please look at the javadoc in class {@link TestPattern} or read the
- * user guide in TWiki https://www.inf.fu-berlin.de/w/SE/SarosSTFTests).</li>
+ * At first you need to create a {@link AbstractTester} object in your
+ * junit-test. (How to do it please look at the javadoc in class
+ * {@link TestPattern} or read the user guide in TWiki
+ * https://www.inf.fu-berlin.de/w/SE/SarosSTFTests).</li>
  * <li>
- * then you can use the object mainMenu initialized in {@link AbstractTester} to access
- * the APIs :), e.g.
+ * then you can use the object mainMenu initialized in {@link AbstractTester} to
+ * access the APIs :), e.g.
  * 
  * <pre>
  * alice.mainMenu.clickMenuPreferences();
@@ -126,8 +127,6 @@ public interface IWindowM extends ISarosPreferences {
      *            example: "General"
      * @param nodeName
      *            example: "Console"
-     * @see WorkbenchImp#activateWorkbench()
-     * @see MainMenuComponent#clickMenuWithTexts(String...)
      * 
      */
     public void showViewWithName(String category, String nodeName)

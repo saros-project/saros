@@ -3,7 +3,7 @@ package de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteCompone
 import java.rmi.RemoteException;
 
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.IRemoteBotShell;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.remoteFinder.remoteWidgets.IRemoteBotShell;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.contextMenu.submenus.IWorkTogetherOnC;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.contextMenu.submenus.WorkTogetherOnC;
 

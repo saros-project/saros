@@ -3,8 +3,8 @@ package de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteCompone
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 
-import de.fu_berlin.inf.dpp.stf.client.AbstractTester;
 import de.fu_berlin.inf.dpp.stf.client.testProject.helpers.TestPattern;
+import de.fu_berlin.inf.dpp.stf.client.tester.AbstractTester;
 
 /**
  * This interface contains convenience API to perform a action using console

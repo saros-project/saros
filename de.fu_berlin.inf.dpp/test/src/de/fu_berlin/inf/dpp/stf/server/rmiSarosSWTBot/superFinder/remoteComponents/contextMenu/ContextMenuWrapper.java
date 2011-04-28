@@ -3,10 +3,9 @@ package de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteCompone
 import java.rmi.RemoteException;
 import java.util.List;
 
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.IRemoteBotShell;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.IRemoteBotTableItem;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.IRemoteBotTree;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.IRemoteBotTreeItem;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.remoteFinder.remoteWidgets.IRemoteBotShell;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.remoteFinder.remoteWidgets.IRemoteBotTree;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.remoteFinder.remoteWidgets.IRemoteBotTreeItem;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.Component;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.contextMenu.submenus.INewC;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.contextMenu.submenus.IRefactorC;
@@ -29,11 +28,9 @@ public class ContextMenuWrapper extends Component implements
     private IRemoteBotTreeItem treeItem;
     private IRemoteBotTree tree;
     private TreeItemType type;
-    private IRemoteBotTableItem tableItem;
 
     /**
-     * {@link ContextMenuWrapper} is a singleton, but inheritance is
-     * possible.
+     * {@link ContextMenuWrapper} is a singleton, but inheritance is possible.
      */
     public static ContextMenuWrapper getInstance() {
         if (self != null)
@@ -48,10 +45,6 @@ public class ContextMenuWrapper extends Component implements
 
     public void setTreeItem(IRemoteBotTreeItem treeItem) {
         this.treeItem = treeItem;
-    }
-
-    public void setTableItem(IRemoteBotTableItem tableItem) {
-        this.tableItem = tableItem;
     }
 
     public void setTreeItemType(TreeItemType type) {

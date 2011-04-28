@@ -6,7 +6,7 @@ import java.rmi.RemoteException;
 
 import org.eclipse.core.runtime.CoreException;
 
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.IRemoteBotEditor;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.remoteFinder.remoteWidgets.IRemoteBotEditor;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.contextMenu.IContextMenuWrapper;
 
 /**

@@ -25,8 +25,6 @@ public class ContextMenuHelper {
     /**
      * Clicks the context menu matching the text.
      * 
-     * @param text
-     *            the text on the context menu.
      * @throws WidgetNotFoundException
      *             if the widget is not found.
      */

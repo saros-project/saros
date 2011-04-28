@@ -6,8 +6,8 @@ import java.util.List;
 
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.stf.STF;
-import de.fu_berlin.inf.dpp.stf.client.AbstractTester;
 import de.fu_berlin.inf.dpp.stf.client.testProject.helpers.TestPattern;
+import de.fu_berlin.inf.dpp.stf.client.tester.AbstractTester;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.ISuperBot;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.contextMenu.IBuddiesContextMenuWrapper;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.contextMenu.ISessionContextMenuWrapper;
@@ -393,14 +393,14 @@ public interface ISarosView extends Remote {
     public void waitUntilIsInconsistencyDetected() throws RemoteException;
 
     /**
-     * Wait until the condition {@link ISessionView#isInSession()} is true.
+     * Wait until the condition {@link ISarosView#isInSession()} is true.
      * 
      * @throws RemoteException
      */
     public void waitUntilIsInSession() throws RemoteException;
 
     /**
-     * wait until the condition {@link ISessionView#isInSession()} by given user
+     * wait until the condition {@link ISarosView#isInSession()} by given user
      * is true.
      * 
      * @param superBot
@@ -412,24 +412,23 @@ public interface ISarosView extends Remote {
         throws RemoteException;
 
     /**
-     * Wait until the condition {@link ISessionView#isInSession()} is false.
+     * Wait until the condition {@link ISarosView#isInSession()} is false.
      * <p>
      * <b>Attention</b>:<br/>
      * Some actions need to long time to complete, so you will get assertError
      * if you immediately assert the after-state caused by such actions. E.g.
      * you will get assertError with the assertion
      * assertTrue(alice.views().sessionviews().isInsession()) if alice leave the
-     * session without waitUntil the condition
-     * {@link ISessionView#isInSession()} So it is recommended that you wait
-     * until the session is completely closed before you run the assertion or
-     * perform a following action.
+     * session without waitUntil the condition {@link ISarosView#isInSession()}
+     * So it is recommended that you wait until the session is completely closed
+     * before you run the assertion or perform a following action.
      * 
      * @throws RemoteException
      */
     public void waitUntilIsNotInSession() throws RemoteException;
 
     /**
-     * Wait until the condition {@link ISessionView#isInSession()} by the given
+     * Wait until the condition {@link ISarosView#isInSession()} by the given
      * user is false.
      * 
      * 
@@ -443,7 +442,7 @@ public interface ISarosView extends Remote {
         throws RemoteException;
 
     /**
-     * Wait until the condition {@link ISessionView#existsParticipant(JID)} for
+     * Wait until the condition {@link ISarosView#existsParticipant(JID)} for
      * all participants is false.
      * 
      * @param jidsOfAllParticipants

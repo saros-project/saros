@@ -240,7 +240,7 @@ public class TestSessionAliceBob extends STFTest {
     }
 
     @Test
-    public void addProjects() throws RemoteException, InterruptedException {
+    public void addProjects() throws RemoteException {
         alice.superBot().views().packageExplorerView().tree().newC()
             .javaProject(PROJECT2);
         alice.superBot().views().sarosView().selectSession()

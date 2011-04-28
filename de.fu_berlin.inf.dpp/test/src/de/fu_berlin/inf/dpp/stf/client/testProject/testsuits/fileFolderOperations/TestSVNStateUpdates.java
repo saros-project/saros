@@ -16,10 +16,10 @@ import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import de.fu_berlin.inf.dpp.stf.client.AbstractTester;
-import de.fu_berlin.inf.dpp.stf.client.TesterConfiguration;
 import de.fu_berlin.inf.dpp.stf.client.testProject.helpers.MakeOperationConcurrently;
 import de.fu_berlin.inf.dpp.stf.client.testProject.testsuits.STFTest;
+import de.fu_berlin.inf.dpp.stf.client.tester.AbstractTester;
+import de.fu_berlin.inf.dpp.stf.client.tester.TesterConfiguration;
 
 public class TestSVNStateUpdates extends STFTest {
     /**

@@ -2,7 +2,7 @@ package de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.conditions;
 
 import org.eclipse.swtbot.swt.finder.waits.DefaultCondition;
 
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.IRemoteBotTable;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.remoteFinder.remoteWidgets.IRemoteBotTable;
 
 public class ExistsTableItem extends DefaultCondition {
 

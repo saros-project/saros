@@ -2,7 +2,7 @@ package de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteCompone
 
 import java.rmi.RemoteException;
 
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.IRemoteBotView;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.remoteFinder.remoteWidgets.IRemoteBotView;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.Component;
 
 public class RSView extends Component implements IRSView {
@@ -11,7 +11,7 @@ public class RSView extends Component implements IRSView {
     private IRemoteBotView view;
 
     /**
-     * {@link ChatView} is a singleton, but inheritance is possible.
+     * {@link RSView} is a singleton, but inheritance is possible.
      */
     public static RSView getInstance() {
         if (self != null)

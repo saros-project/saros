@@ -18,10 +18,10 @@ import org.junit.rules.TestName;
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.stf.STF;
-import de.fu_berlin.inf.dpp.stf.client.AbstractTester;
-import de.fu_berlin.inf.dpp.stf.client.DummyTester;
-import de.fu_berlin.inf.dpp.stf.client.TesterConfiguration;
 import de.fu_berlin.inf.dpp.stf.client.testProject.helpers.MakeOperationConcurrently;
+import de.fu_berlin.inf.dpp.stf.client.tester.AbstractTester;
+import de.fu_berlin.inf.dpp.stf.client.tester.DummyTester;
+import de.fu_berlin.inf.dpp.stf.client.tester.TesterConfiguration;
 
 public class STFTest extends STF {
 

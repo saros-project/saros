@@ -4,7 +4,6 @@ import static org.eclipse.swtbot.swt.finder.matchers.WidgetMatcherFactory.allOf;
 import static org.eclipse.swtbot.swt.finder.matchers.WidgetMatcherFactory.widgetOfType;
 
 import java.rmi.RemoteException;
-import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.jface.bindings.keys.KeyStroke;
@@ -16,16 +15,14 @@ import org.eclipse.swtbot.swt.finder.waits.DefaultCondition;
 import org.hamcrest.Matcher;
 import org.jivesoftware.smack.Roster;
 
-import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.stf.STF;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.conditions.SarosConditions;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.IRemoteBotMenu;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.IRemoteBotToolbarDropDownButton;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.IRemoteBotTree;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.IRemoteBotTreeItem;
-import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.finder.remoteWidgets.IRemoteBotView;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.remoteFinder.remoteWidgets.IRemoteBotMenu;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.remoteFinder.remoteWidgets.IRemoteBotToolbarDropDownButton;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.remoteFinder.remoteWidgets.IRemoteBotTree;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.remoteFinder.remoteWidgets.IRemoteBotTreeItem;
+import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.remoteFinder.remoteWidgets.IRemoteBotView;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.ISuperBot;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.contextMenu.IBuddiesContextMenuWrapper;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.contextMenu.ISessionContextMenuWrapper;
@@ -611,34 +608,34 @@ public class SarosView extends Views implements ISarosView {
         selectParticipant(jidOfSelectedUser);
     }
 
-    private List<JID> getInvitees() {
-        List<JID> invitees = new ArrayList<JID>();
-        ISarosSession sarosSession = sessionManager.getSarosSession();
-        for (User user : sarosSession.getParticipants()) {
-            if (!user.isHost())
-                invitees.add(user.getJID());
-        }
-        return invitees;
-    }
-
-    private boolean hasWriteAccessNoGUI() {
-        ISarosSession sarosSession = sessionManager.getSarosSession();
-        if (sarosSession == null)
-            return false;
-        return sarosSession.hasWriteAccess();
-    }
-
-    private boolean hasWriteAccessByNoGUI(JID jid) {
-        ISarosSession sarosSession = sessionManager.getSarosSession();
-        if (sarosSession == null)
-            return false;
-        User user = sarosSession.getUser(jid);
-        if (user == null)
-            return false;
-        log.debug("isDriver(" + jid.toString() + ") == "
-            + sarosSession.getUsersWithWriteAccess().contains(user));
-        return sarosSession.getUsersWithWriteAccess().contains(user);
-    }
+    // private List<JID> getInvitees() {
+    // List<JID> invitees = new ArrayList<JID>();
+    // ISarosSession sarosSession = sessionManager.getSarosSession();
+    // for (User user : sarosSession.getParticipants()) {
+    // if (!user.isHost())
+    // invitees.add(user.getJID());
+    // }
+    // return invitees;
+    // }
+    //
+    // private boolean hasWriteAccessNoGUI() {
+    // ISarosSession sarosSession = sessionManager.getSarosSession();
+    // if (sarosSession == null)
+    // return false;
+    // return sarosSession.hasWriteAccess();
+    // }
+    //
+    // private boolean hasWriteAccessByNoGUI(JID jid) {
+    // ISarosSession sarosSession = sessionManager.getSarosSession();
+    // if (sarosSession == null)
+    // return false;
+    // User user = sarosSession.getUser(jid);
+    // if (user == null)
+    // return false;
+    // log.debug("isDriver(" + jid.toString() + ") == "
+    // + sarosSession.getUsersWithWriteAccess().contains(user));
+    // return sarosSession.getUsersWithWriteAccess().contains(user);
+    // }
 
     private void setViewWithTree(IRemoteBotView view) throws RemoteException {
         this.view = view;

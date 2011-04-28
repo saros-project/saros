@@ -103,7 +103,7 @@ public class TestPattern extends STFTest {
 
     @Test
     public void test1() throws RemoteException {
-
+        //
     }
 
     /**
@@ -126,6 +126,6 @@ public class TestPattern extends STFTest {
      */
     @Test
     public void test2() throws RemoteException {
-
+        //
     }
 }
