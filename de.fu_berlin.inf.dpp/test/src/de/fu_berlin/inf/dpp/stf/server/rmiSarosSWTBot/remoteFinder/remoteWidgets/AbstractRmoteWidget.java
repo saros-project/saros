@@ -1,9 +1,9 @@
 package de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.remoteFinder.remoteWidgets;
 
-import de.fu_berlin.inf.dpp.stf.STF;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.remoteFinder.RemoteWorkbenchBot;
+import de.fu_berlin.inf.dpp.stf.stfMessages.STFMessages;
 
-public class AbstractRmoteWidget extends STF {
+public class AbstractRmoteWidget extends STFMessages {
 
     protected static RemoteBotMenu stfBotMenu = RemoteBotMenu.getInstance();
 

@@ -12,9 +12,9 @@ import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import de.fu_berlin.inf.dpp.stf.STF;
 import de.fu_berlin.inf.dpp.stf.client.testProject.testsuits.STFTest;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.remoteFinder.remoteWidgets.IRemoteBotShell;
+import de.fu_berlin.inf.dpp.stf.stfMessages.STFMessages;
 
 public class TestSarosPreferences extends STFTest {
 
@@ -107,8 +107,8 @@ public class TestSarosPreferences extends STFTest {
 
     /**
      * FIXME: by fist run you will get the error message
-     * {@link STF#ERROR_MESSAGE_NOT_CONNECTED_TO_SERVER}, but by second run you
-     * will get anther error message {@link STF#ERROR_MESSAGE_COULD_NOT_CONNECT}
+     * {@link STFMessages#ERROR_MESSAGE_NOT_CONNECTED_TO_SERVER}, but by second run you
+     * will get anther error message {@link STFMessages#ERROR_MESSAGE_COULD_NOT_CONNECT}
      * 
      * 
      * @throws RemoteException

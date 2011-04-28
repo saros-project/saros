@@ -16,7 +16,6 @@ import org.hamcrest.Matcher;
 import org.jivesoftware.smack.Roster;
 
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.stf.STF;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.remoteFinder.remoteWidgets.IRemoteBotMenu;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.remoteFinder.remoteWidgets.IRemoteBotToolbarDropDownButton;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.remoteFinder.remoteWidgets.IRemoteBotTree;
@@ -26,6 +25,7 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.ISuperBot;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.contextMenu.IBuddiesContextMenuWrapper;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.contextMenu.ISessionContextMenuWrapper;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.views.Views;
+import de.fu_berlin.inf.dpp.stf.stfMessages.STFMessages;
 
 /**
  * This implementation of {@link ISarosView}
@@ -201,7 +201,7 @@ public class SarosView extends Views implements ISarosView {
     // }
 
     /**
-     * Note: {@link STF#TB_INCONSISTENCY_DETECTED} is not complete toolbarName,
+     * Note: {@link STFMessages#TB_INCONSISTENCY_DETECTED} is not complete toolbarName,
      * so we need to use {@link IRemoteBotView#toolbarButtonWithRegex(String)}
      * to perform this action.
      */

@@ -4,11 +4,11 @@ import java.rmi.Remote;
 import java.rmi.RemoteException;
 
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.stf.STF;
+import de.fu_berlin.inf.dpp.stf.stfMessages.STFMessages;
 
 /**
  * This interface contains convenience API to perform actions activated by
- * clicking subMenus of contextMenu {@link STF#CM_SHARE_WITH} in the package
+ * clicking subMenus of contextMenu {@link STFMessages#CM_SHARE_WITH} in the package
  * explorer view. STF users would start off as follows:
  * 
  * <pre>

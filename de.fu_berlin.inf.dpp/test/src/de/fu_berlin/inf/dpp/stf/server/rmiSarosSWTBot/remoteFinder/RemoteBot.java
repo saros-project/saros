@@ -12,7 +12,6 @@ import org.eclipse.swtbot.swt.finder.waits.ICondition;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 import org.osgi.framework.Bundle;
 
-import de.fu_berlin.inf.dpp.stf.STF;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.conditions.SarosSWTBotPreferences;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.remoteFinder.remoteWidgets.IRemoteBotButton;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.remoteFinder.remoteWidgets.IRemoteBotCCombo;
@@ -47,8 +46,9 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.remoteFinder.remoteWidgets
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.remoteFinder.remoteWidgets.RemoteBotToolbarButton;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.remoteFinder.remoteWidgets.RemoteBotTree;
 import de.fu_berlin.inf.dpp.stf.server.sarosSWTBot.SarosSWTBot;
+import de.fu_berlin.inf.dpp.stf.stfMessages.STFMessages;
 
-public class RemoteBot extends STF implements IRemoteBot {
+public class RemoteBot extends STFMessages implements IRemoteBot {
 
     private static transient RemoteBot self;
 

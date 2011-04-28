@@ -17,7 +17,6 @@ import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.feedback.FeedbackManager;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
 import de.fu_berlin.inf.dpp.project.SarosSessionManager;
-import de.fu_berlin.inf.dpp.stf.STF;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.remoteFinder.RemoteBot;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.remoteFinder.RemoteWorkbenchBot;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.remoteFinder.remoteWidgets.RemoteBotButton;
@@ -67,6 +66,7 @@ import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponen
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.views.sarosViews.Chatroom;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.views.sarosViews.RSView;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.views.sarosViews.SarosView;
+import de.fu_berlin.inf.dpp.stf.stfMessages.STFMessages;
 
 /**
  * STFController is responsible to register all exported objects.
@@ -95,7 +95,7 @@ public class STFController {
         XMPPAccountStore xmppAccountStore, FeedbackManager feedbackManager)
         throws RemoteException {
 
-        STF.saros = saros;
+        STFMessages.saros = saros;
         Component.sessionManager = sessionManager;
         Component.dataTransferManager = dataTransferManager;
         Component.editorManager = editorManager;

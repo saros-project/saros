@@ -5,12 +5,12 @@ import java.rmi.RemoteException;
 import java.util.List;
 
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.stf.STF;
 import de.fu_berlin.inf.dpp.stf.client.testProject.helpers.TestPattern;
 import de.fu_berlin.inf.dpp.stf.client.tester.AbstractTester;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.ISuperBot;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.contextMenu.IBuddiesContextMenuWrapper;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.contextMenu.ISessionContextMenuWrapper;
+import de.fu_berlin.inf.dpp.stf.stfMessages.STFMessages;
 
 /**
  * This interface contains convenience API to perform a action using widgets in
@@ -182,7 +182,7 @@ public interface ISarosView extends Remote {
     /**
      * performs the action "Share your screen with selected buddy" which should
      * be activated by clicking the tool bar button with the tooltip text
-     * {@link STF#TB_SHARE_SCREEN_WITH_BUDDY} on the session view.
+     * {@link STFMessages#TB_SHARE_SCREEN_WITH_BUDDY} on the session view.
      * <p>
      * <b>Attention:</b>
      * <ol>
@@ -203,7 +203,7 @@ public interface ISarosView extends Remote {
     /**
      * performs the action "Send a file to selected buddy" which should be
      * activated by clicking the tool bar button with the tooltip text
-     * {@link STF#TB_SEND_A_FILE_TO_SELECTED_BUDDY} on the session view.
+     * {@link STFMessages#TB_SEND_A_FILE_TO_SELECTED_BUDDY} on the session view.
      * <p>
      * <b>Attention:</b>
      * <ol>
@@ -227,7 +227,7 @@ public interface ISarosView extends Remote {
     /**
      * performs the action "Start a VoIP session" which should be activated by
      * clicking the tool bar button with the tooltip text
-     * {@link STF#TB_SEND_A_FILE_TO_SELECTED_BUDDY} on the session view.
+     * {@link STFMessages#TB_SEND_A_FILE_TO_SELECTED_BUDDY} on the session view.
      * <p>
      * <b>Attention:</b>
      * <ol>
@@ -250,7 +250,7 @@ public interface ISarosView extends Remote {
     /**
      * performs the action "Leave the session" which should be activated by
      * clicking the tool bar button with the toolTip text
-     * {@link STF#TB_LEAVE_SESSION} on the session view.
+     * {@link STFMessages#TB_LEAVE_SESSION} on the session view.
      * <p>
      * <b>Attention:</b>
      * <ol>
@@ -288,7 +288,7 @@ public interface ISarosView extends Remote {
     /**
      * performs the action "inconsistency detected in ..." which should be
      * activated by clicking the tool bar button with the toolTip text
-     * {@link STF#TB_INCONSISTENCY_DETECTED} on the session view. The button is
+     * {@link STFMessages#TB_INCONSISTENCY_DETECTED} on the session view. The button is
      * only enabled, if there are inconsistency detected in a file.
      * <p>
      * <b>Attention:</b>
@@ -353,7 +353,7 @@ public interface ISarosView extends Remote {
      * 
      * @return<tt>true</tt>, if there are participant in the session list
      *                       existed and his contextMenu
-     *                       {@link STF#CM_STOP_FOLLOWING} is enabled.
+     *                       {@link STFMessages#CM_STOP_FOLLOWING} is enabled.
      * @throws RemoteException
      */
     public boolean isFollowing() throws RemoteException;
@@ -387,7 +387,7 @@ public interface ISarosView extends Remote {
      **********************************************/
 
     /**
-     * Wait until the toolbarButton {@link STF#TB_INCONSISTENCY_DETECTED} is
+     * Wait until the toolbarButton {@link STFMessages#TB_INCONSISTENCY_DETECTED} is
      * enabled.
      * 
      * @throws RemoteException

@@ -4,10 +4,10 @@ import java.rmi.Remote;
 import java.rmi.RemoteException;
 
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.stf.STF;
 import de.fu_berlin.inf.dpp.stf.client.testProject.testsuits.STFTest.TypeOfCreateProject;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.menuBar.IMenuBar;
 import de.fu_berlin.inf.dpp.stf.server.rmiSarosSWTBot.superFinder.remoteComponents.views.IViews;
+import de.fu_berlin.inf.dpp.stf.stfMessages.STFMessages;
 
 public interface ISuperBot extends Remote {
 
@@ -30,7 +30,7 @@ public interface ISuperBot extends Remote {
      **********************************************/
 
     /**
-     * The shell with the title {@link STF#SHELL_ADD_PROJECT} should be appeared
+     * The shell with the title {@link STFMessages#SHELL_ADD_PROJECT} should be appeared
      * by the invitees' side during sharing session. This method confirm the
      * shell using a new project.
      * 
@@ -40,7 +40,7 @@ public interface ISuperBot extends Remote {
         throws RemoteException;
 
     /**
-     * The shell with the title {@link STF#SHELL_ADD_PROJECT} should be appeared
+     * The shell with the title {@link STFMessages#SHELL_ADD_PROJECT} should be appeared
      * by the invitees' side during sharing session. This method confirm the
      * shell using an existed project.
      * 
@@ -50,7 +50,7 @@ public interface ISuperBot extends Remote {
         throws RemoteException;
 
     /**
-     * The shell with the title {@link STF#SHELL_ADD_PROJECT} should be appeared
+     * The shell with the title {@link STFMessages#SHELL_ADD_PROJECT} should be appeared
      * by the invitees' side during sharing session. This method confirm the
      * shell using an existed project.
      * 
@@ -60,7 +60,7 @@ public interface ISuperBot extends Remote {
         String projectName) throws RemoteException;
 
     /**
-     * The shell with the title {@link STF#SHELL_ADD_PROJECT} should be appeared
+     * The shell with the title {@link STFMessages#SHELL_ADD_PROJECT} should be appeared
      * by the invitees' side during sharing session. This method confirm the
      * shell using an existed project with copy.
      * 
@@ -70,7 +70,7 @@ public interface ISuperBot extends Remote {
         String projectName) throws RemoteException;
 
     /**
-     * The shell with the title {@link STF#SHELL_ADD_PROJECT} should be appeared
+     * The shell with the title {@link STFMessages#SHELL_ADD_PROJECT} should be appeared
      * by the invitees' side during sharing session. This method confirm the
      * shell. with the passed parameter "usingWhichProject" to decide using
      * which project.
@@ -81,8 +81,8 @@ public interface ISuperBot extends Remote {
         TypeOfCreateProject usingWhichProject) throws RemoteException;
 
     /**
-     * Confirm the shell with title {@link STF#SHELL_EDIT_XMPP_JABBER_ACCOUNT}
-     * activated by clicking button {@link STF#BUTTON_EDIT_ACCOUNT} in saros
+     * Confirm the shell with title {@link STFMessages#SHELL_EDIT_XMPP_JABBER_ACCOUNT}
+     * activated by clicking button {@link STFMessages#BUTTON_EDIT_ACCOUNT} in saros
      * preference.
      * 
      * @param newXmppJabberID
@@ -93,7 +93,7 @@ public interface ISuperBot extends Remote {
         String newPassword) throws RemoteException;
 
     /**
-     * Confirm the shell with title {@link STF#SHELL_CREATE_XMPP_JABBER_ACCOUNT}
+     * Confirm the shell with title {@link STFMessages#SHELL_CREATE_XMPP_JABBER_ACCOUNT}
      * 
      * @param jid
      *            {@link JID}
@@ -105,7 +105,7 @@ public interface ISuperBot extends Remote {
         throws RemoteException;
 
     /**
-     * confirm the shell with title {@link STF#SHELL_ADD_XMPP_JABBER_ACCOUNT}
+     * confirm the shell with title {@link STFMessages#SHELL_ADD_XMPP_JABBER_ACCOUNT}
      * 
      * @param jid
      *            {@link JID}
@@ -117,7 +117,7 @@ public interface ISuperBot extends Remote {
         throws RemoteException;
 
     /**
-     * confirm the shell with title {@link STF#SHELL_ADD_BUDDY}
+     * confirm the shell with title {@link STFMessages#SHELL_ADD_BUDDY}
      * 
      * @param baseJIDOfinvitees
      * @throws RemoteException
@@ -126,14 +126,14 @@ public interface ISuperBot extends Remote {
         throws RemoteException;
 
     /**
-     * Confirm the shell with title {@link STF#SHELL_CLOSING_THE_SESSION}
+     * Confirm the shell with title {@link STFMessages#SHELL_CLOSING_THE_SESSION}
      * 
      * @throws RemoteException
      */
     public void confirmShellClosingTheSession() throws RemoteException;
 
     /**
-     * Confirm the shell with title {@link STF#SHELL_REMOVAL_OF_SUBSCRIPTION}
+     * Confirm the shell with title {@link STFMessages#SHELL_REMOVAL_OF_SUBSCRIPTION}
      * which would be appeared if someone delete your contact from his buddies
      * list.
      * 
@@ -142,7 +142,7 @@ public interface ISuperBot extends Remote {
     public void confirmShellRemovelOfSubscription() throws RemoteException;
 
     /**
-     * Confirm the shell with title {@link STF#SHELL_ADD_BUDDY}
+     * Confirm the shell with title {@link STFMessages#SHELL_ADD_BUDDY}
      * 
      * @param jid
      *            {@link JID}
@@ -151,7 +151,7 @@ public interface ISuperBot extends Remote {
     public void confirmShellAddBuddy(JID jid) throws RemoteException;
 
     /**
-     * confirm the shell with title {@link STF#SHELL_SHARE_PROJECT}
+     * confirm the shell with title {@link STFMessages#SHELL_SHARE_PROJECT}
      * 
      * @param projectName
      *            the name of shared project
@@ -166,8 +166,8 @@ public interface ISuperBot extends Remote {
         throws RemoteException;
 
     /**
-     * confirm the shell with title {@link STF#SHELL_SESSION_INVITATION} and
-     * also the following shell with title {@link STF#SHELL_ADD_PROJECT}
+     * confirm the shell with title {@link STFMessages#SHELL_SESSION_INVITATION} and
+     * also the following shell with title {@link STFMessages#SHELL_ADD_PROJECT}
      * 
      * @param projectName
      *            the name of shared project
