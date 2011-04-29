@@ -4,6 +4,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.apache.log4j.Logger;
+import org.eclipse.equinox.security.storage.ISecurePreferences;
+import org.eclipse.equinox.security.storage.StorageException;
 import org.eclipse.jface.preference.IPreferenceStore;
 
 import de.fu_berlin.inf.dpp.Saros;
@@ -17,13 +20,19 @@ import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
 @Component(module = "accountManagement")
 public class XMPPAccountStore {
 
+    protected static Logger log = Logger.getLogger(XMPPAccountStore.class
+        .getName());
+
     private List<XMPPAccount> accounts;
     private XMPPAccount activeAccount;
     private IPreferenceStore preferenceStore;
+    private ISecurePreferences securePreferenceStore;
     private Integer maxId;
 
     public XMPPAccountStore(Saros saros) {
         this.preferenceStore = saros.getPreferenceStore();
+        this.securePreferenceStore = saros.getSecurePrefs();
+
         accounts = new ArrayList<XMPPAccount>();
         loadAccounts();
     }
@@ -35,23 +44,42 @@ public class XMPPAccountStore {
      * The active account is saved as username, password, server.
      */
     public void saveAccounts() {
+        boolean encryptAccount = this.preferenceStore
+            .getBoolean(PreferenceConstants.ENCRYPT_ACCOUNT);
+
         // save the inactive accounts (active account is already saved)
         int i = 1;
         for (XMPPAccount account : accounts) {
             if (!account.isActive) {
-                this.preferenceStore.setValue(PreferenceConstants.USERNAME + i,
-                    account.getUsername());
-                this.preferenceStore.setValue(PreferenceConstants.PASSWORD + i,
-                    account.getPassword());
-                this.preferenceStore.setValue(PreferenceConstants.SERVER + i,
-                    account.getServer());
+
+                try {
+                    this.securePreferenceStore.put(PreferenceConstants.USERNAME
+                        + i, account.getUsername(), encryptAccount);
+
+                    this.securePreferenceStore.put(PreferenceConstants.SERVER
+                        + i, account.getServer(), encryptAccount);
+
+                    this.securePreferenceStore.put(PreferenceConstants.PASSWORD
+                        + i, account.getPassword(), encryptAccount);
+
+                } catch (StorageException e) {
+                    log.error("Error while storing account: " + e.getMessage());
+                }
+
                 i++;
             }
         }
         // set end-entry (empty string)
-        this.preferenceStore.setValue(PreferenceConstants.USERNAME + i, "");
-        this.preferenceStore.setValue(PreferenceConstants.PASSWORD + i, "");
-        this.preferenceStore.setValue(PreferenceConstants.SERVER + i, "");
+        try {
+            this.securePreferenceStore.put(PreferenceConstants.USERNAME + i,
+                "", encryptAccount);
+            this.securePreferenceStore.put(PreferenceConstants.SERVER + i, "",
+                encryptAccount);
+            this.securePreferenceStore.put(PreferenceConstants.PASSWORD + i,
+                "", encryptAccount);
+        } catch (StorageException e) {
+            log.error("Error while storing account: " + e.getMessage());
+        }
     }
 
     /**
@@ -62,12 +90,20 @@ public class XMPPAccountStore {
         maxId = 0;
 
         // load default account (keys: username, password, server)
-        String defaultUsername = preferenceStore
-            .getString(PreferenceConstants.USERNAME);
-        String defaultPassword = preferenceStore
-            .getString(PreferenceConstants.PASSWORD);
-        String defaultServer = preferenceStore
-            .getString(PreferenceConstants.SERVER);
+        String defaultUsername = "";
+        String defaultServer = "";
+        String defaultPassword = "";
+
+        try {
+            defaultUsername = this.securePreferenceStore.get(
+                PreferenceConstants.USERNAME, "");
+            defaultServer = this.securePreferenceStore.get(
+                PreferenceConstants.SERVER, "");
+            defaultPassword = this.securePreferenceStore.get(
+                PreferenceConstants.PASSWORD, "");
+        } catch (StorageException e) {
+            log.error("Exception while getting account: " + e.getMessage());
+        }
 
         // no default account exist
         if (defaultUsername.length() < 1) {
@@ -82,12 +118,21 @@ public class XMPPAccountStore {
         int i = 1;
         boolean noMoreUserFound = false;
         do {
-            String username = preferenceStore
-                .getString(PreferenceConstants.USERNAME + i);
-            String password = preferenceStore
-                .getString(PreferenceConstants.PASSWORD + i);
-            String server = preferenceStore
-                .getString(PreferenceConstants.SERVER + i);
+            String username = "";
+            String server = "";
+            String password = "";
+
+            try {
+                username = this.securePreferenceStore.get(
+                    PreferenceConstants.USERNAME + i, "");
+                server = this.securePreferenceStore.get(
+                    PreferenceConstants.SERVER + i, "");
+                password = this.securePreferenceStore.get(
+                    PreferenceConstants.PASSWORD + i, "");
+            } catch (StorageException e) {
+                log.error("Exception while getting account: " + e.getMessage());
+            }
+
             i++;
             if (username.length() < 1) {
                 noMoreUserFound = true;
@@ -103,8 +148,14 @@ public class XMPPAccountStore {
      * @return true if an account exist.
      */
     public boolean accountsInPreferenceExist() {
-        String username = preferenceStore
-            .getString(PreferenceConstants.USERNAME);
+        String username = "";
+        try {
+            username = this.securePreferenceStore.get(
+                PreferenceConstants.USERNAME, "");
+        } catch (StorageException e) {
+            log.error("Exception while getting account: " + e.getMessage());
+        }
+
         if (username.length() > 2) {
             return true;
         }
@@ -232,9 +283,19 @@ public class XMPPAccountStore {
             }
         }
 
-        preferenceStore.setValue(PreferenceConstants.USERNAME, username);
-        preferenceStore.setValue(PreferenceConstants.SERVER, server);
-        preferenceStore.setValue(PreferenceConstants.PASSWORD, password);
+        boolean encryptAccount = this.preferenceStore
+            .getBoolean(PreferenceConstants.ENCRYPT_ACCOUNT);
+
+        try {
+            this.securePreferenceStore.put(PreferenceConstants.USERNAME,
+                username, encryptAccount);
+            this.securePreferenceStore.put(PreferenceConstants.SERVER, server,
+                encryptAccount);
+            this.securePreferenceStore.put(PreferenceConstants.PASSWORD,
+                password, encryptAccount);
+        } catch (StorageException e) {
+            log.error("Error while storing account: " + e.getMessage());
+        }
     }
 
     /**
@@ -365,4 +426,12 @@ public class XMPPAccountStore {
         return contains(jid.getName(), jid.getDomain());
     }
 
+    /**
+     * Forces the current account data to be written to the permanent preference
+     * store.
+     */
+    public void flush() {
+        updateAccountDataToPreferenceStore();
+        saveAccounts();
+    }
 }

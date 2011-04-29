@@ -19,6 +19,7 @@
  */
 package de.fu_berlin.inf.dpp.preferences;
 
+import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
 import org.eclipse.core.runtime.preferences.DefaultScope;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
@@ -40,13 +41,14 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
     /*
      * @see org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer
      */
+    protected static Logger log = Logger.getLogger(PreferenceInitializer.class
+        .getName());
+
     @Override
     public void initializeDefaultPreferences() {
         IEclipsePreferences prefs = new DefaultScope().getNode(Saros.SAROS);
 
-        prefs.put(PreferenceConstants.SERVER, "");
-        prefs.put(PreferenceConstants.USERNAME, "");
-        prefs.put(PreferenceConstants.PASSWORD, "");
+        prefs.putBoolean(PreferenceConstants.ENCRYPT_ACCOUNT, false);
         prefs.putBoolean(PreferenceConstants.AUTO_CONNECT, false);
         prefs.putBoolean(PreferenceConstants.AUTO_FOLLOW_MODE, false);
         prefs.put(PreferenceConstants.SKYPE_USERNAME, "");

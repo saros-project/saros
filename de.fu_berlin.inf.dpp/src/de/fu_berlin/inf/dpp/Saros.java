@@ -43,8 +43,9 @@ import org.apache.log4j.helpers.LogLog;
 import org.eclipse.core.net.proxy.IProxyData;
 import org.eclipse.core.net.proxy.IProxyService;
 import org.eclipse.core.runtime.preferences.ConfigurationScope;
+import org.eclipse.equinox.security.storage.ISecurePreferences;
+import org.eclipse.equinox.security.storage.SecurePreferencesFactory;
 import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.wizard.IWizard;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.jivesoftware.smack.Connection;
@@ -519,6 +520,17 @@ public class Saros extends AbstractUIPlugin {
     }
 
     /**
+     * Retrieves the secure preferences store provided by
+     * org.eclipse.equinox.security. Preferences entered here are encrypted for
+     * storage.
+     * 
+     * @return The local secure preferences store.
+     */
+    public ISecurePreferences getSecurePrefs() {
+        return SecurePreferencesFactory.getDefault();
+    }
+
+    /**
      * @nonBlocking
      */
     public void asyncConnect() {
@@ -668,10 +680,7 @@ public class Saros extends AbstractUIPlugin {
      */
     protected ConnectionConfiguration getConnectionConfiguration()
         throws URISyntaxException {
-
-        IPreferenceStore prefStore = getPreferenceStore();
-
-        String serverString = prefStore.getString(PreferenceConstants.SERVER);
+        String serverString = preferenceUtils.getServer();
 
         URI uri;
         uri = (serverString.matches("://")) ? new URI(serverString) : new URI(
@@ -679,8 +688,7 @@ public class Saros extends AbstractUIPlugin {
 
         String server = uri.getHost();
         if (server == null) {
-            throw new URISyntaxException(
-                prefStore.getString(PreferenceConstants.SERVER),
+            throw new URISyntaxException(preferenceUtils.getServer(),
                 "The XMPP/Jabber server address is invalid: " + serverString);
         }
 

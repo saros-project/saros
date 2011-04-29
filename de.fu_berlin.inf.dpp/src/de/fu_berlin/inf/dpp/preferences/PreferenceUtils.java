@@ -8,6 +8,9 @@ import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioFormat.Encoding;
 import javax.sound.sampled.Mixer;
 
+import org.apache.log4j.Logger;
+import org.eclipse.equinox.security.storage.ISecurePreferences;
+import org.eclipse.equinox.security.storage.StorageException;
 import org.eclipse.jface.preference.PreferenceStore;
 import org.xiph.speex.spi.SpeexEncoding;
 
@@ -19,12 +22,17 @@ import de.fu_berlin.inf.dpp.net.JID;
 @Component(module = "prefs")
 public class PreferenceUtils {
 
+    protected static Logger log = Logger.getLogger(PreferenceUtils.class
+        .getName());
+
     protected Saros saros;
     protected MixerManager mixerManager;
+    protected ISecurePreferences securePreferenceStore;
 
     public PreferenceUtils(Saros saros, MixerManager mixerManager) {
         this.saros = saros;
         this.mixerManager = mixerManager;
+        this.securePreferenceStore = saros.getSecurePrefs();
     }
 
     public boolean isDebugEnabled() {
@@ -64,7 +72,15 @@ public class PreferenceUtils {
      * @return
      */
     public String getServer() {
-        return saros.getPreferenceStore().getString(PreferenceConstants.SERVER);
+        ISecurePreferences prefs = saros.getSecurePrefs();
+        String server = "";
+
+        try {
+            server = prefs.get(PreferenceConstants.SERVER, "");
+        } catch (StorageException e) {
+            log.error("Exception while retrieving account: " + e.getMessage());
+        }
+        return server;
     }
 
     /**
@@ -97,14 +113,21 @@ public class PreferenceUtils {
     }
 
     /**
-     * Returns the user name from the {@link PreferenceStore}.<br/>
+     * Returns the user name from the {@link ISecurePreferences}.<br/>
      * Might be an empty string but never null.
      * 
-     * @return
+     * @return User name
      */
     public String getUserName() {
-        return saros.getPreferenceStore().getString(
-            PreferenceConstants.USERNAME);
+        ISecurePreferences prefs = saros.getSecurePrefs();
+        String username = "";
+
+        try {
+            username = prefs.get(PreferenceConstants.USERNAME, "");
+        } catch (StorageException e) {
+            log.error("Exception while retrieving account: " + e.getMessage());
+        }
+        return username;
     }
 
     /**
@@ -124,8 +147,15 @@ public class PreferenceUtils {
      * @return
      */
     public String getPassword() {
-        return saros.getPreferenceStore().getString(
-            PreferenceConstants.PASSWORD);
+        String password = "";
+        try {
+            password = this.securePreferenceStore.get(
+                PreferenceConstants.PASSWORD, "");
+        } catch (StorageException e) {
+            log.error("Exception while getting password: " + e.getMessage());
+        }
+
+        return password;
     }
 
     /**

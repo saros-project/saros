@@ -70,6 +70,7 @@ public class GeneralPreferencePage extends FieldEditorPreferencePage implements
     public static final String DELETE_BTN_TEXT = "Delete Account";
     public static final String DELETE_ACTIVE_TEXT = "You cannot delete the active account.";
     public static final String NO_ENTRY_SELECTED_TEXT = "Please select account in list.";
+    public static final String ENCRYPT_PASSWORD_TEXT = "Encrypt password (this will request a separate secure storage password).";
     public static final String STARTUP_CONNECT_TEXT = "Automatically connect on startup";
     public static final String FOLLOW_MODE_TEXT = "Start in Follow Mode.";
     public static final String CONCURRENT_UNDO_TEXT = "Enable concurrent undo (only local changes are undone, session restart necessary).";
@@ -113,6 +114,7 @@ public class GeneralPreferencePage extends FieldEditorPreferencePage implements
         this.parent = new Composite(getFieldEditorParent(), SWT.NONE);
         layoutParent();
         createAccountsGroup();
+        createEncryptPasswordField(this.parent);
         createAutomaticConnectField(this.parent);
         createVersionControlPreferences(this.parent);
         createConcurrentUndoField(this.parent);
@@ -349,6 +351,11 @@ public class GeneralPreferencePage extends FieldEditorPreferencePage implements
         }
     }
 
+    protected void createEncryptPasswordField(Composite group) {
+        addField(new BooleanFieldEditor(PreferenceConstants.ENCRYPT_ACCOUNT,
+            ENCRYPT_PASSWORD_TEXT, group));
+    }
+
     protected void createAutomaticConnectField(Composite group) {
         addField(new BooleanFieldEditor(PreferenceConstants.AUTO_CONNECT,
             STARTUP_CONNECT_TEXT, group));
@@ -383,14 +390,15 @@ public class GeneralPreferencePage extends FieldEditorPreferencePage implements
 
     @Override
     public boolean performOk() {
-        this.accountStore.saveAccounts();
-        return super.performOk();
+        boolean done = super.performOk();
+        this.accountStore.flush();
+
+        return done;
     }
 
     @Override
     protected void performApply() {
-        this.accountStore.saveAccounts();
         super.performApply();
+        this.accountStore.flush();
     }
-
 }
