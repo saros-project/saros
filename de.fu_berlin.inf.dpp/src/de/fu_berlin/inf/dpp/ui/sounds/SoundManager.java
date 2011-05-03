@@ -16,7 +16,7 @@ public class SoundManager {
 
     private static final Logger log = Logger.getLogger(SoundManager.class);
 
-    private static final String SOUND_DIR = "/sounds/";
+    private static final String SOUND_DIR = "/assets/sounds/";
 
     public static final String USER_ONLINE = "UserComesOnline.wav";
     public static final String USER_OFFLINE = "UserGoesOffline.wav";
