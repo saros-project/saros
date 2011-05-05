@@ -257,8 +257,8 @@ public class EnterXMPPAccountWizardPage extends WizardPage {
             setMessage(null);
         }
 
-        if (isJIDValid && isPasswordNotEmpty && isXMPPServerValid
-            && !accountExists) {
+        if ((isJIDValid && isPasswordNotEmpty && isXMPPServerValid && !accountExists)
+            || isXMPPAccountCreated) {
             /*
              * TODO Connect and login attempt to new server Not done because
              * Saros.connect holds the whole connection code. Few reusable code.
