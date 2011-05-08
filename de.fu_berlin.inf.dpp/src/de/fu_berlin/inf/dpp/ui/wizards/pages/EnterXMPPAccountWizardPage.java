@@ -269,14 +269,12 @@ public class EnterXMPPAccountWizardPage extends WizardPage {
         } else {
             if (!isJIDValid && wasJIDValid) {
                 setErrorMessage(Messages.jid_format_errorMessage);
+            } else if (accountExists) {
+                setErrorMessage(Messages.account_exists_errorMessage);
             } else if (!isPasswordNotEmpty && wasPasswordValid) {
                 setErrorMessage(Messages.password_empty_errorMessage);
             } else if (!isXMPPServerValid && wasXMPPServerValid) {
                 setErrorMessage(Messages.server_unresolvable_errorMessage);
-            } else if (accountExists) {
-                setErrorMessage(Messages.account_exists_errorMessage);
-            } else {
-                setErrorMessage(null);
             }
             setPageComplete(false);
         }

@@ -231,7 +231,7 @@ public class CreateXMPPAccountWizardPage extends WizardPage {
         }
 
         if (!this.getUsername().isEmpty() && !accountExists
-            && this.getPassword().length() > 0 && passwordsMatch) {
+            && !this.getPassword().isEmpty() && passwordsMatch) {
             setErrorMessage(null);
 
             if (this.useNowButton != null && this.useNowButton.getSelection()) {
@@ -245,16 +245,11 @@ public class CreateXMPPAccountWizardPage extends WizardPage {
             setErrorMessage(Messages.account_exists_errorMessage);
         } else if (this.getUsername().isEmpty() && usernameWasValid) {
             setErrorMessage("Username must not be empty.");
-        } else if (passwordWasValid) {
-            if (this.getPassword().isEmpty()) {
-                setErrorMessage(Messages.password_empty_errorMessage);
-            }
+        } else if (this.getPassword().isEmpty() && passwordWasValid) {
+            setErrorMessage(Messages.password_empty_errorMessage);
         } else if (!passwordsMatch) {
             setErrorMessage("Both passwords must match.");
-        } else {
-            setErrorMessage(null);
         }
-
         setPageComplete(done);
     }
 
