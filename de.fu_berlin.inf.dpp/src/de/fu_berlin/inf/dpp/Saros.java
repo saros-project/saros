@@ -20,12 +20,15 @@
 package de.fu_berlin.inf.dpp;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.Inet6Address;
 import java.net.InetAddress;
+import java.net.MalformedURLException;
 import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URL;
 import java.net.UnknownHostException;
 import java.util.Collections;
 import java.util.Enumeration;
@@ -172,6 +175,12 @@ public class Saros extends AbstractUIPlugin {
      * be accessed over {@link #getConfigPrefs()} from outside this class.
      */
     protected Preferences configPrefs;
+
+    /**
+     * The secure preferences store, used to store sensitive data that may (at
+     * the user's option) be stored encrypted.
+     */
+    protected ISecurePreferences securePrefs;
 
     public static final Random RANDOM = new Random();
 
@@ -415,6 +424,7 @@ public class Saros extends AbstractUIPlugin {
 
         // TODO Devise a general way to stop and dispose our components
         saveConfigPrefs();
+        saveSecurePrefs();
 
         if (dotMonitor != null) {
             File f = new File("Saros-" + sarosFeatureID + ".dot");
@@ -526,8 +536,38 @@ public class Saros extends AbstractUIPlugin {
      * 
      * @return The local secure preferences store.
      */
-    public ISecurePreferences getSecurePrefs() {
-        return SecurePreferencesFactory.getDefault();
+    public synchronized ISecurePreferences getSecurePrefs() {
+
+        if (securePrefs == null) {
+            try {
+                File storeFile = new File(getStateLocation().toFile(), "/.pref");
+                URL workspaceLocation = storeFile.toURI().toURL();
+
+                securePrefs = SecurePreferencesFactory.open(workspaceLocation,
+                    null);
+            } catch (MalformedURLException e) {
+                log.error("Problem with URL when attempting to access secure preferences: "
+                    + e);
+            } catch (IOException e) {
+                log.error("I/O problem when attempting to access secure preferences: "
+                    + e);
+            }
+        }
+
+        return securePrefs;
+    }
+
+    public synchronized void saveSecurePrefs() {
+        if (xmppAccountStore != null) {
+            xmppAccountStore.flush();
+        }
+        try {
+            if (securePrefs != null) {
+                securePrefs.flush();
+            }
+        } catch (IOException e) {
+            log.error("Exception when trying to store secure preferences: " + e);
+        }
     }
 
     /**
