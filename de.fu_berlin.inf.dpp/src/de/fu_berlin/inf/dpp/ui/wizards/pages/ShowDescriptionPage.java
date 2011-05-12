@@ -29,7 +29,7 @@ public class ShowDescriptionPage extends WizardPage {
 
         setTitle("Session Invitation");
         setDescription("You have been invited to join a Saros session."
-            + " Click next if you want to accept the invitation.");
+            + " Click Finish if you want to accept the invitation.");
         setImageDescriptor(ImageManager
             .getImageDescriptor("icons/wizban/invitation.png"));
 
