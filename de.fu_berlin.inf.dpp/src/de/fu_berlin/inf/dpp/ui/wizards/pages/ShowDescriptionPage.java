@@ -28,8 +28,8 @@ public class ShowDescriptionPage extends WizardPage {
         this.description = joinSessionWizard.process.getDescription();
 
         setTitle("Session Invitation");
-        setDescription("You have been invited to join a Saros session."
-            + " Click Finish if you want to accept the invitation.");
+        setDescription("You have been invited to join a Saros session. When accepting the invitation by pressing Accept,\n"
+            + "this dialog will close, the project invitation negotiated in the background and a new wizard will open.");
         setImageDescriptor(ImageManager
             .getImageDescriptor("icons/wizban/invitation.png"));
 
