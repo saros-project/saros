@@ -29,6 +29,7 @@ import java.net.SocketException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.net.URLDecoder;
 import java.net.UnknownHostException;
 import java.util.Collections;
 import java.util.Enumeration;
@@ -543,14 +544,33 @@ public class Saros extends AbstractUIPlugin {
                 File storeFile = new File(getStateLocation().toFile(), "/.pref");
                 URL workspaceLocation = storeFile.toURI().toURL();
 
-                securePrefs = SecurePreferencesFactory.open(workspaceLocation,
-                    null);
+                /*
+                 * The SecurePreferencesFactory does not accept percent-encoded
+                 * URLs, so we must decode the URL before passing it.
+                 */
+                String prefLocation = URLDecoder.decode(
+                    workspaceLocation.toString(), "UTF-8");
+
+                /*
+                 * If the URL has changed after decoding, a reserved character
+                 * is used in the workspace location. Fallback to default
+                 * location.
+                 */
+                if (!workspaceLocation.toString().equals(prefLocation))
+                    throw new MalformedURLException(
+                        "A URL reserved character has been used in the workspace location");
+
+                securePrefs = SecurePreferencesFactory.open(new URL(
+                    prefLocation), null);
             } catch (MalformedURLException e) {
                 log.error("Problem with URL when attempting to access secure preferences: "
                     + e);
             } catch (IOException e) {
                 log.error("I/O problem when attempting to access secure preferences: "
                     + e);
+            } finally {
+                if (securePrefs == null)
+                    securePrefs = SecurePreferencesFactory.getDefault();
             }
         }
 
