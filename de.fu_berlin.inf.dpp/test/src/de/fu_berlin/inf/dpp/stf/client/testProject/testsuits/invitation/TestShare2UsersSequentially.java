@@ -53,13 +53,13 @@ public class TestShare2UsersSequentially extends STFTest {
             .javaProjectWithClasses(PROJECT1, PKG1, CLS1);
         buildSessionSequentially(PROJECT1, TypeOfCreateProject.NEW_PROJECT,
             alice, bob);
-        bob.bot()
+        bob.remoteBot()
             .captureScreenshot(
-                (bob.bot().getPathToScreenShot() + "/invitee_in_sharedproject.png"));
+                (bob.remoteBot().getPathToScreenShot() + "/invitee_in_sharedproject.png"));
         alice
-            .bot()
+            .remoteBot()
             .captureScreenshot(
-                (alice.bot().getPathToScreenShot() + "/inviter_in_sharedproject.png"));
+                (alice.remoteBot().getPathToScreenShot() + "/inviter_in_sharedproject.png"));
 
         assertTrue(bob.superBot().views().sarosView().isInSession());
         assertTrue(alice.superBot().views().sarosView().isInSession());

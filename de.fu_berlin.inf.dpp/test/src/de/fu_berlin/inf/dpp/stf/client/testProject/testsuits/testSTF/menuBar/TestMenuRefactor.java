@@ -106,7 +106,7 @@ public class TestMenuRefactor extends STFTest {
         alice.superBot().views().packageExplorerView()
             .selectPkg(PROJECT1, PKG1).refactor().rename(PKG2);
 
-        alice.bot().sleep(500);
+        alice.remoteBot().sleep(500);
         assertFalse(alice.superBot().views().packageExplorerView()
             .selectProject(PROJECT1).exists(PKG1));
         assertTrue(alice.superBot().views().packageExplorerView()

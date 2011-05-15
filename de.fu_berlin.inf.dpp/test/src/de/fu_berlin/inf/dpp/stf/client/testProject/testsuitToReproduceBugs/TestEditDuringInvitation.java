@@ -61,24 +61,24 @@ public class TestEditDuringInvitation extends STFTest {
 
         alice.superBot().views().sarosView().selectBuddy(carl.getJID())
             .addToSarosSession();
-        carl.bot().shell(SHELL_SESSION_INVITATION).confirm(FINISH);
+        carl.remoteBot().shell(SHELL_SESSION_INVITATION).confirm(FINISH);
 
         bob.superBot().views().packageExplorerView()
             .selectClass(PROJECT1, PKG1, CLS1).open();
-        bob.bot().editor(CLS1_SUFFIX).setTexWithSave(CP1);
-        String texByBob = bob.bot().editor(CLS1_SUFFIX).getText();
+        bob.remoteBot().editor(CLS1_SUFFIX).setTexWithSave(CP1);
+        String texByBob = bob.remoteBot().editor(CLS1_SUFFIX).getText();
         // System.out.println(texByBob);
 
         carl.superBot().confirmShellAddProjectWithNewProject(PROJECT1);
         carl.superBot().views().packageExplorerView()
             .selectClass(PROJECT1, PKG1, CLS1).open();
 
-        alice.bot().editor(CLS1_SUFFIX).waitUntilIsTextSame(texByBob);
-        String textByAlice = alice.bot().editor(CLS1_SUFFIX).getText();
+        alice.remoteBot().editor(CLS1_SUFFIX).waitUntilIsTextSame(texByBob);
+        String textByAlice = alice.remoteBot().editor(CLS1_SUFFIX).getText();
 
         // There are bugs here, carl get completely different content as bob.
-        carl.bot().editor(CLS1_SUFFIX).waitUntilIsTextSame(texByBob);
-        String textByCarl = carl.bot().editor(CLS1_SUFFIX).getText();
+        carl.remoteBot().editor(CLS1_SUFFIX).waitUntilIsTextSame(texByBob);
+        String textByCarl = carl.remoteBot().editor(CLS1_SUFFIX).getText();
         System.out.println(textByCarl);
 
         assertTrue(textByCarl.equals(texByBob));

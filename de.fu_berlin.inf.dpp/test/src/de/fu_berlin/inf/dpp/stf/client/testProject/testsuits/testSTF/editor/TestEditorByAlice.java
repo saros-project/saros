@@ -38,11 +38,11 @@ public class TestEditorByAlice extends STFTest {
 
         alice.superBot().views().packageExplorerView().selectProject(PROJECT1)
             .newC().file(fileName);
-        alice.bot().editor(fileName).waitUntilIsActive();
+        alice.remoteBot().editor(fileName).waitUntilIsActive();
 
         String expected = "Hello World";
-        alice.bot().editor(fileName).typeText(expected);
-        assertEquals(expected, alice.bot().editor(fileName).getText());
+        alice.remoteBot().editor(fileName).typeText(expected);
+        assertEquals(expected, alice.remoteBot().editor(fileName).getText());
     }
 
     @Test
@@ -51,14 +51,14 @@ public class TestEditorByAlice extends STFTest {
             .javaProjectWithClasses(PROJECT1, PKG1, CLS1);
         alice.superBot().views().packageExplorerView()
             .selectClass(PROJECT1, PKG1, CLS1).open();
-        alice.bot().editor(CLS1_SUFFIX).waitUntilIsActive();
+        alice.remoteBot().editor(CLS1_SUFFIX).waitUntilIsActive();
         String fileName = CLS1 + ".java";
-        alice.bot().editor(fileName).navigateTo(3, 0);
-        alice.bot().editor(CLS1_SUFFIX).typeText("testtext");
-        alice.bot().editor(fileName).navigateTo(3, 3);
-        alice.bot().editor(fileName)
+        alice.remoteBot().editor(fileName).navigateTo(3, 0);
+        alice.remoteBot().editor(CLS1_SUFFIX).typeText("testtext");
+        alice.remoteBot().editor(fileName).navigateTo(3, 3);
+        alice.remoteBot().editor(fileName)
             .pressShortcut(IKeyLookup.DELETE_NAME, IKeyLookup.DELETE_NAME);
-        assertEquals("tesext", alice.bot().editor(CLS1_SUFFIX).getTextOnLine(3));
+        assertEquals("tesext", alice.remoteBot().editor(CLS1_SUFFIX).getTextOnLine(3));
     }
 
     @Test
@@ -67,13 +67,13 @@ public class TestEditorByAlice extends STFTest {
             .javaProjectWithClasses(PROJECT1, PKG1, CLS1);
         alice.superBot().views().packageExplorerView()
             .selectClass(PROJECT1, PKG1, CLS1).open();
-        alice.bot().editor(CLS1_SUFFIX).waitUntilIsActive();
+        alice.remoteBot().editor(CLS1_SUFFIX).waitUntilIsActive();
         String fileName = CLS1 + ".java";
-        alice.bot().editor(fileName).navigateTo(3, 0);
-        alice.bot().editor(CLS1_SUFFIX).typeText("testtext");
+        alice.remoteBot().editor(fileName).navigateTo(3, 0);
+        alice.remoteBot().editor(CLS1_SUFFIX).typeText("testtext");
 
-        alice.bot().editor(fileName).pressShortCutEnter();
-        assertEquals(4, alice.bot().editor(CLS1_SUFFIX).getCursorLine());
+        alice.remoteBot().editor(fileName).pressShortCutEnter();
+        assertEquals(4, alice.remoteBot().editor(CLS1_SUFFIX).getCursorLine());
     }
 
     @Test
@@ -82,14 +82,14 @@ public class TestEditorByAlice extends STFTest {
             .javaProjectWithClasses(PROJECT1, PKG1, CLS1);
         alice.superBot().views().packageExplorerView()
             .selectClass(PROJECT1, PKG1, CLS1).open();
-        alice.bot().editor(CLS1_SUFFIX).waitUntilIsActive();
-        alice.bot().editor(CLS1_SUFFIX).navigateTo(3, 0);
+        alice.remoteBot().editor(CLS1_SUFFIX).waitUntilIsActive();
+        alice.remoteBot().editor(CLS1_SUFFIX).navigateTo(3, 0);
         assertDoesNotContain("public static void main",
-            alice.bot().editor(CLS1_SUFFIX).getTextOnLine(3));
-        alice.bot().editor(CLS1_SUFFIX)
+            alice.remoteBot().editor(CLS1_SUFFIX).getTextOnLine(3));
+        alice.remoteBot().editor(CLS1_SUFFIX)
             .autoCompleteProposal("main", "main - main method");
         assertContains("public static void main",
-            alice.bot().editor(CLS1_SUFFIX).getTextOnLine(3));
+            alice.remoteBot().editor(CLS1_SUFFIX).getTextOnLine(3));
     }
 
     @Test
@@ -98,9 +98,9 @@ public class TestEditorByAlice extends STFTest {
             .javaProjectWithClasses(PROJECT1, PKG1, CLS1);
         alice.superBot().views().packageExplorerView()
             .selectClass(PROJECT1, PKG1, CLS1).open();
-        alice.bot().editor(CLS1_SUFFIX).waitUntilIsActive();
-        alice.bot().editor(CLS1_SUFFIX).navigateTo(3, 0);
-        List<String> autoCompleteProposals = alice.bot().editor(CLS1_SUFFIX)
+        alice.remoteBot().editor(CLS1_SUFFIX).waitUntilIsActive();
+        alice.remoteBot().editor(CLS1_SUFFIX).navigateTo(3, 0);
+        List<String> autoCompleteProposals = alice.remoteBot().editor(CLS1_SUFFIX)
             .getAutoCompleteProposals("JFr");
         assertEquals(autoCompleteProposals.toString(), 2,
             autoCompleteProposals.size());
@@ -116,13 +116,13 @@ public class TestEditorByAlice extends STFTest {
             .javaProjectWithClasses(PROJECT1, PKG1, CLS1);
         alice.superBot().views().packageExplorerView()
             .selectClass(PROJECT1, PKG1, CLS1).open();
-        alice.bot().editor(CLS1_SUFFIX).waitUntilIsActive();
-        alice.bot().editor(CLS1_SUFFIX).navigateTo(3, 0);
-        alice.bot().editor(CLS1_SUFFIX)
+        alice.remoteBot().editor(CLS1_SUFFIX).waitUntilIsActive();
+        alice.remoteBot().editor(CLS1_SUFFIX).navigateTo(3, 0);
+        alice.remoteBot().editor(CLS1_SUFFIX)
             .autoCompleteProposal("main", "main - main method");
-        assertTrue(alice.bot().editor(CLS1_SUFFIX).isDirty());
-        alice.bot().editor(CLS1_SUFFIX).pressShortCutSave();
-        assertFalse(alice.bot().editor(CLS1_SUFFIX).isDirty());
+        assertTrue(alice.remoteBot().editor(CLS1_SUFFIX).isDirty());
+        alice.remoteBot().editor(CLS1_SUFFIX).pressShortCutSave();
+        assertFalse(alice.remoteBot().editor(CLS1_SUFFIX).isDirty());
     }
 
     @Test
@@ -133,13 +133,13 @@ public class TestEditorByAlice extends STFTest {
             .pkg(PROJECT1, PKG1);
         alice.superBot().views().packageExplorerView()
             .selectPkg(PROJECT1, PKG1).newC().clsImplementsRunnable(CLS1);
-        alice.bot().editor(CLS1_SUFFIX).pressShortCutNextAnnotation();
-        alice.bot().editor(CLS1_SUFFIX).quickfix("Add unimplemented methods");
-        assertContains("public void run()", alice.bot().editor(CLS1_SUFFIX)
+        alice.remoteBot().editor(CLS1_SUFFIX).pressShortCutNextAnnotation();
+        alice.remoteBot().editor(CLS1_SUFFIX).quickfix("Add unimplemented methods");
+        assertContains("public void run()", alice.remoteBot().editor(CLS1_SUFFIX)
             .getTextOnLine(5));
 
-        alice.bot().editor(CLS1_SUFFIX).navigateTo(7, 0);
-        alice.bot().editor(CLS1_SUFFIX)
+        alice.remoteBot().editor(CLS1_SUFFIX).navigateTo(7, 0);
+        alice.remoteBot().editor(CLS1_SUFFIX)
             .autoCompleteProposal("sys", "sysout - print to standard out");
     }
 
@@ -149,10 +149,10 @@ public class TestEditorByAlice extends STFTest {
             .project(PROJECT1);
         alice.superBot().views().packageExplorerView().selectProject(PROJECT1)
             .newC().file(FILE1);
-        alice.bot().editor(FILE1).navigateTo(0, 0);
-        alice.bot().editor(FILE1).typeText("pleese");
-        alice.bot().editor(FILE1).selectRange(0, 0, 6);
-        System.out.println(alice.bot().editor(FILE1).getSelection());
+        alice.remoteBot().editor(FILE1).navigateTo(0, 0);
+        alice.remoteBot().editor(FILE1).typeText("pleese");
+        alice.remoteBot().editor(FILE1).selectRange(0, 0, 6);
+        System.out.println(alice.remoteBot().editor(FILE1).getSelection());
 
     }
 
@@ -162,11 +162,11 @@ public class TestEditorByAlice extends STFTest {
             .project(PROJECT1);
         alice.superBot().views().packageExplorerView().selectProject(PROJECT1)
             .newC().file(FILE1);
-        alice.bot().editor(FILE1).typeText("pleese open the window");
-        alice.bot().editor(FILE1).selectLine(0);
-        alice.bot().editor(FILE1).quickfix(0);
-        System.out.println(alice.bot().editor(FILE1).getTextOnLine(0));
-        assertContains("please", alice.bot().editor(FILE1).getTextOnLine(0));
+        alice.remoteBot().editor(FILE1).typeText("pleese open the window");
+        alice.remoteBot().editor(FILE1).selectLine(0);
+        alice.remoteBot().editor(FILE1).quickfix(0);
+        System.out.println(alice.remoteBot().editor(FILE1).getTextOnLine(0));
+        assertContains("please", alice.remoteBot().editor(FILE1).getTextOnLine(0));
     }
 
     @Test
@@ -177,45 +177,45 @@ public class TestEditorByAlice extends STFTest {
             .pkg(PROJECT1, PKG1);
         alice.superBot().views().packageExplorerView()
             .selectPkg(PROJECT1, PKG1).newC().clsImplementsRunnable(CLS1);
-        alice.bot().editor(CLS1_SUFFIX).pressShortCutNextAnnotation();
-        alice.bot().editor(CLS1_SUFFIX).quickfix("Add unimplemented methods");
-        assertContains("public void run()", alice.bot().editor(CLS1_SUFFIX)
+        alice.remoteBot().editor(CLS1_SUFFIX).pressShortCutNextAnnotation();
+        alice.remoteBot().editor(CLS1_SUFFIX).quickfix("Add unimplemented methods");
+        assertContains("public void run()", alice.remoteBot().editor(CLS1_SUFFIX)
             .getTextOnLine(5));
-        alice.bot().editor(CLS1_SUFFIX).navigateTo(7, 0);
-        alice.bot().editor(CLS1_SUFFIX)
+        alice.remoteBot().editor(CLS1_SUFFIX).navigateTo(7, 0);
+        alice.remoteBot().editor(CLS1_SUFFIX)
             .autoCompleteProposal("sys", "sysout - print to standard out");
-        assertContains("System.out.println()", alice.bot().editor(CLS1_SUFFIX)
+        assertContains("System.out.println()", alice.remoteBot().editor(CLS1_SUFFIX)
             .getTextOnLine(7));
-        alice.bot().editor(CLS1_SUFFIX).typeText("\"Hello World\"");
-        assertContains("System.out.println(\"Hello World\")", alice.bot()
+        alice.remoteBot().editor(CLS1_SUFFIX).typeText("\"Hello World\"");
+        assertContains("System.out.println(\"Hello World\")", alice.remoteBot()
             .editor(CLS1_SUFFIX).getTextOnLine(7));
 
-        alice.bot().editor(CLS1_SUFFIX).navigateTo(3, 0);
-        alice.bot().editor(CLS1_SUFFIX)
+        alice.remoteBot().editor(CLS1_SUFFIX).navigateTo(3, 0);
+        alice.remoteBot().editor(CLS1_SUFFIX)
             .autoCompleteProposal("main", "main - main method");
-        alice.bot().editor(CLS1_SUFFIX)
+        alice.remoteBot().editor(CLS1_SUFFIX)
             .typeText("new Thread (new " + CLS1 + " ()");
-        alice.bot().editor(CLS1_SUFFIX)
+        alice.remoteBot().editor(CLS1_SUFFIX)
             .pressShortCutQuickAssignToLocalVariable();
         assertContains("Thread thread = new Thread (new " + CLS1 + " ());",
-            alice.bot().editor(CLS1_SUFFIX).getTextOnCurrentLine());
-        alice.bot().editor(CLS1_SUFFIX).pressShortCut(SWT.NONE, '\n');
-        alice.bot().editor(CLS1_SUFFIX).typeText("\n");
-        assertEquals(5, alice.bot().editor(CLS1_SUFFIX).getCursorLine());
-        alice.bot().editor(CLS1_SUFFIX).typeText("thread.start(");
-        alice.bot().editor(CLS1_SUFFIX).typeText("\n");
-        alice.bot().editor(CLS1_SUFFIX).typeText(";\n");
-        alice.bot().editor(CLS1_SUFFIX).typeText("thread.join(");
-        alice.bot().editor(CLS1_SUFFIX).typeText("\n");
-        alice.bot().editor(CLS1_SUFFIX).typeText(";");
-        alice.bot().editor(CLS1_SUFFIX).quickfix("Add throws declaration");
-        assertContains("InterruptedException", alice.bot().editor(CLS1_SUFFIX)
+            alice.remoteBot().editor(CLS1_SUFFIX).getTextOnCurrentLine());
+        alice.remoteBot().editor(CLS1_SUFFIX).pressShortCut(SWT.NONE, '\n');
+        alice.remoteBot().editor(CLS1_SUFFIX).typeText("\n");
+        assertEquals(5, alice.remoteBot().editor(CLS1_SUFFIX).getCursorLine());
+        alice.remoteBot().editor(CLS1_SUFFIX).typeText("thread.start(");
+        alice.remoteBot().editor(CLS1_SUFFIX).typeText("\n");
+        alice.remoteBot().editor(CLS1_SUFFIX).typeText(";\n");
+        alice.remoteBot().editor(CLS1_SUFFIX).typeText("thread.join(");
+        alice.remoteBot().editor(CLS1_SUFFIX).typeText("\n");
+        alice.remoteBot().editor(CLS1_SUFFIX).typeText(";");
+        alice.remoteBot().editor(CLS1_SUFFIX).quickfix("Add throws declaration");
+        assertContains("InterruptedException", alice.remoteBot().editor(CLS1_SUFFIX)
             .getTextOnLine(3));
-        alice.bot().editor(CLS1_SUFFIX).pressShortCut(SWT.NONE, '\n');
-        alice.bot().editor(CLS1_SUFFIX).pressShortCutSave();
-        assertFalse(alice.bot().editor(CLS1_SUFFIX).isDirty());
-        alice.bot().sleep(100);
-        alice.bot().editor(CLS1_SUFFIX).pressShortRunAsJavaApplication();
+        alice.remoteBot().editor(CLS1_SUFFIX).pressShortCut(SWT.NONE, '\n');
+        alice.remoteBot().editor(CLS1_SUFFIX).pressShortCutSave();
+        assertFalse(alice.remoteBot().editor(CLS1_SUFFIX).isDirty());
+        alice.remoteBot().sleep(100);
+        alice.remoteBot().editor(CLS1_SUFFIX).pressShortRunAsJavaApplication();
         alice.superBot().views().consoleView()
             .waitUntilExistsTextInConsole();
         assertContains("Hello World", alice.superBot().views().consoleView()

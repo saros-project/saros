@@ -38,51 +38,51 @@ public class TestContextMenuOpen extends STFTest {
             .newC().folder(FOLDER1);
         alice.superBot().views().packageExplorerView()
             .selectFolder(PROJECT1, FOLDER1).newC().file(FILE1);
-        assertTrue(alice.bot().isEditorOpen(FILE1));
-        alice.bot().editor(FILE1).closeWithSave();
-        assertFalse(alice.bot().isEditorOpen(FILE1));
+        assertTrue(alice.remoteBot().isEditorOpen(FILE1));
+        alice.remoteBot().editor(FILE1).closeWithSave();
+        assertFalse(alice.remoteBot().isEditorOpen(FILE1));
         alice.superBot().views().packageExplorerView()
             .selectFile(PROJECT1, FOLDER1, FILE1).open();
 
-        assertTrue(alice.bot().isEditorOpen(FILE1));
+        assertTrue(alice.remoteBot().isEditorOpen(FILE1));
 
         alice.superBot().views().packageExplorerView()
             .selectFile(PROJECT1, FOLDER1, FILE1).delete();
-        assertFalse(alice.bot().isEditorOpen(FILE1));
+        assertFalse(alice.remoteBot().isEditorOpen(FILE1));
     }
 
     @Test
     public void testOpenClass() throws RemoteException {
         alice.superBot().views().packageExplorerView().tree().newC()
             .javaProjectWithClasses(PROJECT1, PKG1, CLS1);
-        assertTrue(alice.bot().isEditorOpen(CLS1_SUFFIX));
-        alice.bot().editor(CLS1 + SUFFIX_JAVA).closeWithSave();
-        assertFalse(alice.bot().isEditorOpen(CLS1_SUFFIX));
+        assertTrue(alice.remoteBot().isEditorOpen(CLS1_SUFFIX));
+        alice.remoteBot().editor(CLS1 + SUFFIX_JAVA).closeWithSave();
+        assertFalse(alice.remoteBot().isEditorOpen(CLS1_SUFFIX));
         alice.superBot().views().packageExplorerView()
             .selectClass(PROJECT1, PKG1, CLS1).open();
-        assertTrue(alice.bot().isEditorOpen(CLS1_SUFFIX));
+        assertTrue(alice.remoteBot().isEditorOpen(CLS1_SUFFIX));
 
         alice.superBot().views().packageExplorerView()
             .selectClass(PROJECT1, PKG1, CLS1).delete();
-        assertFalse(alice.bot().isEditorOpen(CLS1_SUFFIX));
+        assertFalse(alice.remoteBot().isEditorOpen(CLS1_SUFFIX));
     }
 
     @Test
     public void testOpenClassWith() throws RemoteException {
         alice.superBot().views().packageExplorerView().tree().newC()
             .javaProjectWithClasses(PROJECT1, PKG1, CLS1);
-        assertTrue(alice.bot().isEditorOpen(CLS1_SUFFIX));
-        alice.bot().editor(CLS1 + SUFFIX_JAVA).closeWithSave();
-        assertFalse(alice.bot().isEditorOpen(CLS1_SUFFIX));
+        assertTrue(alice.remoteBot().isEditorOpen(CLS1_SUFFIX));
+        alice.remoteBot().editor(CLS1 + SUFFIX_JAVA).closeWithSave();
+        assertFalse(alice.remoteBot().isEditorOpen(CLS1_SUFFIX));
         alice.superBot().views().packageExplorerView()
             .selectClass(PROJECT1, PKG1, CLS1)
             .openWith(CM_OPEN_WITH_TEXT_EDITOR);
 
-        assertTrue(alice.bot().isEditorOpen(CLS1_SUFFIX));
+        assertTrue(alice.remoteBot().isEditorOpen(CLS1_SUFFIX));
 
         alice.superBot().views().packageExplorerView()
             .selectClass(PROJECT1, PKG1, CLS1).delete();
-        assertFalse(alice.bot().isEditorOpen(CLS1_SUFFIX));
+        assertFalse(alice.remoteBot().isEditorOpen(CLS1_SUFFIX));
     }
 
     @Test
@@ -93,16 +93,16 @@ public class TestContextMenuOpen extends STFTest {
             .newC().folder(FOLDER1);
         alice.superBot().views().packageExplorerView()
             .selectFolder(PROJECT1, FOLDER1).newC().file(FILE1);
-        alice.bot().editor(FILE1).closeWithSave();
+        alice.remoteBot().editor(FILE1).closeWithSave();
         alice.superBot().views().packageExplorerView()
             .selectFile(PROJECT1, FOLDER1, FILE1)
             .openWith(CM_OPEN_WITH_TEXT_EDITOR);
 
-        assertTrue(alice.bot().isEditorOpen(FILE1));
+        assertTrue(alice.remoteBot().isEditorOpen(FILE1));
 
         alice.superBot().views().packageExplorerView()
             .selectFile(PROJECT1, FOLDER1, FILE1).delete();
-        assertFalse(alice.bot().isEditorOpen(FILE1));
+        assertFalse(alice.remoteBot().isEditorOpen(FILE1));
     }
 
     @Test

@@ -68,7 +68,7 @@ public abstract class AbstractTester {
      * @return the simple {@link IRemoteBot}, with which tester can remotely access
      *         widgets of saros-instance
      */
-    public abstract IRemoteWorkbenchBot bot();
+    public abstract IRemoteWorkbenchBot remoteBot();
 
     /**
      * 

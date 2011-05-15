@@ -324,10 +324,10 @@ public class TestSVNStateInitialization extends STFTest {
             .existsWithRegex(SVN_CLS1 + SUFFIX_JAVA));
         alice.superBot().views().packageExplorerView()
             .selectClass(SVN_PROJECT, SVN_PKG, SVN_CLS1).open();
-        String cls1_content_before = alice.bot().editor(SVN_CLS1_SUFFIX)
+        String cls1_content_before = alice.remoteBot().editor(SVN_CLS1_SUFFIX)
             .getText();
-        alice.bot().editor(SVN_CLS1 + SUFFIX_JAVA).setTexWithSave(CP1);
-        String cls1_content_after = alice.bot().editor(SVN_CLS1_SUFFIX)
+        alice.remoteBot().editor(SVN_CLS1 + SUFFIX_JAVA).setTexWithSave(CP1);
+        String cls1_content_after = alice.remoteBot().editor(SVN_CLS1_SUFFIX)
             .getText();
         assertFalse(cls1_content_after.equals(cls1_content_before));
 
@@ -347,7 +347,7 @@ public class TestSVNStateInitialization extends STFTest {
             .isProjectManagedBySVN(SVN_PROJECT));
         bob.superBot().views().packageExplorerView()
             .selectClass(SVN_PROJECT, SVN_PKG, SVN_CLS1).open();
-        assertEquals(cls1_content_after, bob.bot().editor(SVN_CLS1_SUFFIX)
+        assertEquals(cls1_content_after, bob.remoteBot().editor(SVN_CLS1_SUFFIX)
             .getText());
     }
 }

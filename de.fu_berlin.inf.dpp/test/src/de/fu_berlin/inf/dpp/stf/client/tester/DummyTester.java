@@ -58,7 +58,7 @@ public class DummyTester extends AbstractTester {
     }
 
     @Override
-    public IRemoteWorkbenchBot bot() {
+    public IRemoteWorkbenchBot remoteBot() {
         throwException();
         return null;
     }

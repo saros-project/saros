@@ -21,12 +21,12 @@ public class TestSarosView extends STFTest {
 
     @Test
     public void testSarosView() throws RemoteException {
-        alice.bot().view(VIEW_SAROS).close();
-        assertEquals(false, alice.bot().isViewOpen(VIEW_SAROS));
-        alice.bot().openViewById(VIEW_SAROS_ID);
-        alice.bot().captureScreenshot(
-            (alice.bot().getPathToScreenShot() + "/session_view.png"));
-        assertEquals(true, alice.bot().isViewOpen(VIEW_SAROS));
+        alice.remoteBot().view(VIEW_SAROS).close();
+        assertEquals(false, alice.remoteBot().isViewOpen(VIEW_SAROS));
+        alice.remoteBot().openViewById(VIEW_SAROS_ID);
+        alice.remoteBot().captureScreenshot(
+            (alice.remoteBot().getPathToScreenShot() + "/session_view.png"));
+        assertEquals(true, alice.remoteBot().isViewOpen(VIEW_SAROS));
     }
 
     @Test
@@ -35,8 +35,8 @@ public class TestSarosView extends STFTest {
         alice.superBot().views().sarosView()
             .connectWith(alice.getJID(), alice.getPassword());
         log.trace("captureScreenshot");
-        alice.bot().captureScreenshot(
-            (alice.bot().getPathToScreenShot() + "/xmpp_connected.png"));
+        alice.remoteBot().captureScreenshot(
+            (alice.remoteBot().getPathToScreenShot() + "/xmpp_connected.png"));
         assertEquals(true, alice.superBot().views().sarosView().isConnected());
     }
 
@@ -58,8 +58,8 @@ public class TestSarosView extends STFTest {
         alice.superBot().views().sarosView()
             .connectWith(alice.getJID(), alice.getPassword());
         alice.superBot().views().sarosView().disconnect();
-        alice.bot().captureScreenshot(
-            (alice.bot().getPathToScreenShot() + "/xmpp_disconnected.png"));
+        alice.remoteBot().captureScreenshot(
+            (alice.remoteBot().getPathToScreenShot() + "/xmpp_disconnected.png"));
         assertEquals(false, alice.superBot().views().sarosView().isConnected());
     }
 

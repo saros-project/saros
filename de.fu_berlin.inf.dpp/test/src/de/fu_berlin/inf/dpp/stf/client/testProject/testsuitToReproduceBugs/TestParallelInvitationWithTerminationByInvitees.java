@@ -80,42 +80,42 @@ public class TestParallelInvitationWithTerminationByInvitees extends STFTest {
             .shareProjects(PROJECT1, bob.getJID(), dave.getJID(),
                 carl.getJID(), edna.getJID());
 
-        bob.bot().waitUntilShellIsOpen(SHELL_SESSION_INVITATION);
-        IRemoteBotShell shell_bob = bob.bot().shell(SHELL_SESSION_INVITATION);
+        bob.remoteBot().waitUntilShellIsOpen(SHELL_SESSION_INVITATION);
+        IRemoteBotShell shell_bob = bob.remoteBot().shell(SHELL_SESSION_INVITATION);
         shell_bob.activate();
         shell_bob.bot().button(CANCEL).click();
 
-        IRemoteBotShell shell_alice = alice.bot().shell(SHELL_PROBLEM_OCCURRED);
+        IRemoteBotShell shell_alice = alice.remoteBot().shell(SHELL_PROBLEM_OCCURRED);
         shell_alice.waitUntilActive();
-        assertTrue(alice.bot().shell(SHELL_PROBLEM_OCCURRED).bot().label(2)
+        assertTrue(alice.remoteBot().shell(SHELL_PROBLEM_OCCURRED).bot().label(2)
             .getText().matches(bob.getName() + ".*"));
         shell_alice.bot().button(OK).click();
 
-        IRemoteBotShell shell_carl = carl.bot().shell(SHELL_SESSION_INVITATION);
-        carl.bot().waitUntilShellIsOpen(SHELL_SESSION_INVITATION);
+        IRemoteBotShell shell_carl = carl.remoteBot().shell(SHELL_SESSION_INVITATION);
+        carl.remoteBot().waitUntilShellIsOpen(SHELL_SESSION_INVITATION);
         shell_carl.activate();
-        carl.bot().shell(SHELL_SESSION_INVITATION).confirm(FINISH);
+        carl.remoteBot().shell(SHELL_SESSION_INVITATION).confirm(FINISH);
         shell_carl.bot().button(CANCEL).click();
 
         shell_alice.waitUntilActive();
-        assertTrue(alice.bot().shell(SHELL_PROBLEM_OCCURRED).bot().label(2)
+        assertTrue(alice.remoteBot().shell(SHELL_PROBLEM_OCCURRED).bot().label(2)
             .getText().matches(carl.getName() + ".*"));
         shell_alice.bot().button(OK).click();
 
-        dave.bot().waitUntilShellIsClosed(SHELL_SESSION_INVITATION);
-        IRemoteBotShell shell_dave = dave.bot().shell(SHELL_SESSION_INVITATION);
+        dave.remoteBot().waitUntilShellIsClosed(SHELL_SESSION_INVITATION);
+        IRemoteBotShell shell_dave = dave.remoteBot().shell(SHELL_SESSION_INVITATION);
         shell_dave.activate();
-        dave.bot().shell(SHELL_SESSION_INVITATION).confirm(FINISH);
+        dave.remoteBot().shell(SHELL_SESSION_INVITATION).confirm(FINISH);
         shell_dave.bot().button(CANCEL).click();
 
         shell_alice.waitUntilActive();
-        assertTrue(alice.bot().shell(SHELL_PROBLEM_OCCURRED).bot().label(2)
+        assertTrue(alice.remoteBot().shell(SHELL_PROBLEM_OCCURRED).bot().label(2)
             .getText().matches(dave.getName() + ".*"));
         shell_alice.bot().button(OK).click();
 
-        edna.bot().waitUntilShellIsOpen(SHELL_SESSION_INVITATION);
-        edna.bot().shell(SHELL_SESSION_INVITATION).activate();
-        edna.bot().shell(SHELL_SESSION_INVITATION).confirm(FINISH);
+        edna.remoteBot().waitUntilShellIsOpen(SHELL_SESSION_INVITATION);
+        edna.remoteBot().shell(SHELL_SESSION_INVITATION).activate();
+        edna.remoteBot().shell(SHELL_SESSION_INVITATION).confirm(FINISH);
         edna.superBot().confirmShellAddProjectWithNewProject(PROJECT1);
         edna.superBot().views().sarosView().leaveSession();
         assertFalse(edna.superBot().views().sarosView().isInSession());

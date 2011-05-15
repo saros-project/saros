@@ -168,7 +168,7 @@ public class TestFileOperations extends STFTest {
         assertTrue(carl.superBot().views().packageExplorerView()
             .selectPkg(PROJECT1, PKG2).exists(CLS1_SUFFIX));
 
-        alice.bot().editor(CLS1_SUFFIX).setTexWithSave(CP1);
+        alice.remoteBot().editor(CLS1_SUFFIX).setTexWithSave(CP1);
         String clsContentOfAlice = alice.superBot().views()
             .packageExplorerView()
             .getFileContent(getClassPath(PROJECT1, PKG2, CLS1));

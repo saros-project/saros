@@ -84,7 +84,7 @@ public class TestSVNStateUpdates extends STFTest {
         for (final AbstractTester tester : activeTesters) {
             initTasks.add(new Callable<Void>() {
                 public Void call() throws Exception {
-                    tester.bot().resetWorkbench();
+                    tester.remoteBot().resetWorkbench();
                     tester.superBot().views().packageExplorerView()
                         .selectProject(SVN_PROJECT_COPY).copy();
                     tester.superBot().views().packageExplorerView().tree()
@@ -191,7 +191,7 @@ public class TestSVNStateUpdates extends STFTest {
             .pkg(SVN_PROJECT, "new_package");
         alice.superBot().views().packageExplorerView()
             .waitUntilPkgExists(SVN_PROJECT, "new_package");
-        bob.bot().sleep(1000);
+        bob.remoteBot().sleep(1000);
         bob.superBot().views().packageExplorerView()
             .selectClass(SVN_PROJECT, SVN_PKG, SVN_CLS1).refactor()
             .moveClassTo(SVN_PROJECT, "new_package");

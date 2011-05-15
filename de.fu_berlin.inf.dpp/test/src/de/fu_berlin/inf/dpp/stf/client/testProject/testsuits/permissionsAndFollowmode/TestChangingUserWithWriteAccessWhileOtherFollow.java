@@ -77,31 +77,31 @@ public class TestChangingUserWithWriteAccessWhileOtherFollow extends STFTest {
 
         alice.superBot().views().packageExplorerView()
             .selectClass(PROJECT1, PKG1, CLS1).open();
-        alice.bot().editor(CLS1_SUFFIX).setTextWithoutSave(CP1);
-        String dirtyClsContentOfAlice = alice.bot().editor(CLS1_SUFFIX)
+        alice.remoteBot().editor(CLS1_SUFFIX).setTextWithoutSave(CP1);
+        String dirtyClsContentOfAlice = alice.remoteBot().editor(CLS1_SUFFIX)
             .getText();
 
-        carl.bot().editor(CLS1_SUFFIX)
+        carl.remoteBot().editor(CLS1_SUFFIX)
             .waitUntilIsTextSame(dirtyClsContentOfAlice);
-        assertTrue(carl.bot().editor(CLS1_SUFFIX).isActive());
-        assertTrue(carl.bot().editor(CLS1_SUFFIX).isDirty());
+        assertTrue(carl.remoteBot().editor(CLS1_SUFFIX).isActive());
+        assertTrue(carl.remoteBot().editor(CLS1_SUFFIX).isDirty());
 
-        bob.bot().editor(CLS1_SUFFIX)
+        bob.remoteBot().editor(CLS1_SUFFIX)
             .waitUntilIsTextSame(dirtyClsContentOfAlice);
-        assertTrue(bob.bot().editor(CLS1_SUFFIX).isActive());
-        assertTrue(bob.bot().editor(CLS1_SUFFIX).isDirty());
+        assertTrue(bob.remoteBot().editor(CLS1_SUFFIX).isActive());
+        assertTrue(bob.remoteBot().editor(CLS1_SUFFIX).isDirty());
 
-        dave.bot().editor(CLS1_SUFFIX)
+        dave.remoteBot().editor(CLS1_SUFFIX)
             .waitUntilIsTextSame(dirtyClsContentOfAlice);
-        assertTrue(dave.bot().editor(CLS1_SUFFIX).isActive());
-        assertTrue(dave.bot().editor(CLS1_SUFFIX).isDirty());
+        assertTrue(dave.remoteBot().editor(CLS1_SUFFIX).isActive());
+        assertTrue(dave.remoteBot().editor(CLS1_SUFFIX).isDirty());
 
         resetFollowModeSequentially(carl, bob, dave);
-        alice.bot().editor(CLS1_SUFFIX).setTextWithoutSave(CP1_CHANGE);
+        alice.remoteBot().editor(CLS1_SUFFIX).setTextWithoutSave(CP1_CHANGE);
         // alice.bot().editor(CLS1_SUFFIX).closeAndSave();
 
-        assertTrue(carl.bot().editor(CLS1_SUFFIX).isActive());
-        assertTrue(carl.bot().editor(CLS1_SUFFIX).isDirty());
+        assertTrue(carl.remoteBot().editor(CLS1_SUFFIX).isActive());
+        assertTrue(carl.remoteBot().editor(CLS1_SUFFIX).isDirty());
         /*
          * TODO alice can still see the changes maded by carl, although she
          * already leave follow mode. There is a bug here (see Bug 3094186)and
@@ -114,8 +114,8 @@ public class TestChangingUserWithWriteAccessWhileOtherFollow extends STFTest {
         // assertFalse(alice.bot.getTextOfJavaEditor(PROJECT, PKG, CLS).equals(
         // dirtyClsChangeContentOfCarl));
 
-        assertTrue(bob.bot().editor(CLS1_SUFFIX).isActive());
-        assertTrue(bob.bot().editor(CLS1_SUFFIX).isDirty());
+        assertTrue(bob.remoteBot().editor(CLS1_SUFFIX).isActive());
+        assertTrue(bob.remoteBot().editor(CLS1_SUFFIX).isDirty());
 
         /*
          * TODO bob can still see the changes maded by carl, although he already
@@ -128,8 +128,8 @@ public class TestChangingUserWithWriteAccessWhileOtherFollow extends STFTest {
         // assertFalse(bob.bot.getTextOfJavaEditor(PROJECT, PKG, CLS).equals(
         // dirtyClsChangeContentOfCarl));
 
-        assertTrue(dave.bot().editor(CLS1_SUFFIX).isActive());
-        assertTrue(dave.bot().editor(CLS1_SUFFIX).isDirty());
+        assertTrue(dave.remoteBot().editor(CLS1_SUFFIX).isActive());
+        assertTrue(dave.remoteBot().editor(CLS1_SUFFIX).isDirty());
         /*
          * TODO dave can still see the changes , although he already leave
          * follow mode. There is a bug here (see Bug 3094186) and it should be

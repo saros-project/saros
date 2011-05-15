@@ -75,17 +75,17 @@ public class TestChatViewFunctions extends STFTest {
     @Test
     public void testChat() throws RemoteException {
 
-        assertEquals("Chatroom 1", alice.bot().view(VIEW_SAROS).bot()
+        assertEquals("Chatroom 1", alice.remoteBot().view(VIEW_SAROS).bot()
             .cTabItem().getText());
 
         alice.superBot().views().sarosView().selectChatroom()
             .sendChatMessage(message);
-        System.out.println(alice.bot().view(VIEW_SAROS).bot().label(1)
+        System.out.println(alice.remoteBot().view(VIEW_SAROS).bot().label(1)
             .getText());
-        alice.bot().sleep(1000);
+        alice.remoteBot().sleep(1000);
         System.out.println(alice.superBot().views().sarosView()
             .selectChatroom().getTextOfLastChatLine());
-        System.out.println(bob.bot().view(VIEW_SAROS).bot().label(1).getText());
+        System.out.println(bob.remoteBot().view(VIEW_SAROS).bot().label(1).getText());
 
         //
         // // System.out.println(alice.bot.getTextOfChatLine());

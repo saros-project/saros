@@ -80,37 +80,37 @@ public class TestHostInvitesBelatedly extends STFTest {
         CoreException, InterruptedException {
         alice.superBot().views().packageExplorerView()
             .selectClass(PROJECT1, PKG1, CLS1).open();
-        alice.bot().editor(CLS1_SUFFIX).setTextWithoutSave(CP1);
-        String dirtyContent1ByAlice = alice.bot().editor(CLS1_SUFFIX).getText();
+        alice.remoteBot().editor(CLS1_SUFFIX).setTextWithoutSave(CP1);
+        String dirtyContent1ByAlice = alice.remoteBot().editor(CLS1_SUFFIX).getText();
 
         bob.superBot().views().packageExplorerView()
             .selectClass(PROJECT1, PKG1, CLS1).open();
 
-        bob.bot().editor(CLS1_SUFFIX).setTexWithSave(CP1_CHANGE);
+        bob.remoteBot().editor(CLS1_SUFFIX).setTexWithSave(CP1_CHANGE);
 
         alice.superBot().views().packageExplorerView()
             .selectClass(PROJECT1, PKG1, CLS2).open();
 
-        alice.bot().editor(CLS2_SUFFIX).setTextWithoutSave(CP2);
-        String dirtyContent2ByAlice = alice.bot().editor(CLS2_SUFFIX).getText();
+        alice.remoteBot().editor(CLS2_SUFFIX).setTextWithoutSave(CP2);
+        String dirtyContent2ByAlice = alice.remoteBot().editor(CLS2_SUFFIX).getText();
 
         bob.superBot().views().packageExplorerView()
             .selectClass(PROJECT1, PKG1, CLS2).open();
 
-        bob.bot().editor(CLS2_SUFFIX).setTextWithoutSave(CP2_CHANGE);
+        bob.remoteBot().editor(CLS2_SUFFIX).setTextWithoutSave(CP2_CHANGE);
         // bob.editor.closeJavaEditorWithSave(CLS1);
         // bob.editor.closeJavaEditorWithSave(CLS2);
 
         inviteBuddies(PROJECT1, TypeOfCreateProject.EXIST_PROJECT, alice, bob);
 
-        bob.bot().editor(CLS1_SUFFIX).waitUntilIsTextSame(dirtyContent1ByAlice);
-        bob.bot().editor(CLS2_SUFFIX).waitUntilIsTextSame(dirtyContent2ByAlice);
+        bob.remoteBot().editor(CLS1_SUFFIX).waitUntilIsTextSame(dirtyContent1ByAlice);
+        bob.remoteBot().editor(CLS2_SUFFIX).waitUntilIsTextSame(dirtyContent2ByAlice);
 
-        String CLSContentOfAlice = alice.bot().editor(CLS1_SUFFIX).getText();
-        String CLS2ContentOfAlice = alice.bot().editor(CLS2_SUFFIX).getText();
+        String CLSContentOfAlice = alice.remoteBot().editor(CLS1_SUFFIX).getText();
+        String CLS2ContentOfAlice = alice.remoteBot().editor(CLS2_SUFFIX).getText();
 
-        String CLSContentOfBob = bob.bot().editor(CLS1_SUFFIX).getText();
-        String CLS2ContentOfBob = bob.bot().editor(CLS2_SUFFIX).getText();
+        String CLSContentOfBob = bob.remoteBot().editor(CLS1_SUFFIX).getText();
+        String CLS2ContentOfBob = bob.remoteBot().editor(CLS2_SUFFIX).getText();
 
         assertEquals(CLSContentOfAlice, CLSContentOfBob);
         assertEquals(CLS2ContentOfAlice, CLS2ContentOfBob);

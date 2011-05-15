@@ -63,25 +63,25 @@ public class TestAllParticipantsFollowUserWithWriteAccess extends STFTest {
     @Test
     public void followingUserOpenClassWhenFollowedUserOpenClass()
         throws RemoteException, InterruptedException {
-        alice.bot().editor(CLS1_SUFFIX).closeWithSave();
-        bob.bot().waitUntilEditorClosed(CLS1_SUFFIX);
-        carl.bot().waitUntilEditorClosed(CLS1_SUFFIX);
-        dave.bot().waitUntilEditorClosed(CLS1_SUFFIX);
-        assertFalse(bob.bot().isEditorOpen(CLS1_SUFFIX));
-        assertFalse(carl.bot().isEditorOpen(CLS1_SUFFIX));
-        assertFalse(dave.bot().isEditorOpen(CLS1_SUFFIX));
+        alice.remoteBot().editor(CLS1_SUFFIX).closeWithSave();
+        bob.remoteBot().waitUntilEditorClosed(CLS1_SUFFIX);
+        carl.remoteBot().waitUntilEditorClosed(CLS1_SUFFIX);
+        dave.remoteBot().waitUntilEditorClosed(CLS1_SUFFIX);
+        assertFalse(bob.remoteBot().isEditorOpen(CLS1_SUFFIX));
+        assertFalse(carl.remoteBot().isEditorOpen(CLS1_SUFFIX));
+        assertFalse(dave.remoteBot().isEditorOpen(CLS1_SUFFIX));
 
         alice.superBot().views().packageExplorerView()
             .selectClass(PROJECT1, PKG1, CLS1).open();
         // setFollowMode(alice, bob, carl, dave);
 
-        bob.bot().waitUntilEditorOpen(CLS1_SUFFIX);
-        carl.bot().waitUntilEditorOpen(CLS1_SUFFIX);
-        dave.bot().waitUntilEditorOpen(CLS1_SUFFIX);
+        bob.remoteBot().waitUntilEditorOpen(CLS1_SUFFIX);
+        carl.remoteBot().waitUntilEditorOpen(CLS1_SUFFIX);
+        dave.remoteBot().waitUntilEditorOpen(CLS1_SUFFIX);
 
-        assertTrue(bob.bot().isEditorOpen(CLS1_SUFFIX));
-        assertTrue(carl.bot().isEditorOpen(CLS1_SUFFIX));
-        assertTrue(dave.bot().isEditorOpen(CLS1_SUFFIX));
+        assertTrue(bob.remoteBot().isEditorOpen(CLS1_SUFFIX));
+        assertTrue(carl.remoteBot().isEditorOpen(CLS1_SUFFIX));
+        assertTrue(dave.remoteBot().isEditorOpen(CLS1_SUFFIX));
 
     }
 
@@ -102,34 +102,34 @@ public class TestAllParticipantsFollowUserWithWriteAccess extends STFTest {
      */
     @Test
     public void testFollowModeByEditingClassByAlice() throws RemoteException {
-        alice.bot().editor(CLS1_SUFFIX).setTextWithoutSave(CP1);
-        String dirtyClsContentOfAlice = alice.bot().editor(CLS1_SUFFIX)
+        alice.remoteBot().editor(CLS1_SUFFIX).setTextWithoutSave(CP1);
+        String dirtyClsContentOfAlice = alice.remoteBot().editor(CLS1_SUFFIX)
             .getText();
 
-        bob.bot().editor(CLS1_SUFFIX)
+        bob.remoteBot().editor(CLS1_SUFFIX)
             .waitUntilIsTextSame(dirtyClsContentOfAlice);
-        assertTrue(bob.bot().editor(CLS1_SUFFIX).isActive());
-        assertTrue(bob.bot().editor(CLS1_SUFFIX).isDirty());
-        assertTrue(bob.bot().editor(CLS1_SUFFIX).getText()
+        assertTrue(bob.remoteBot().editor(CLS1_SUFFIX).isActive());
+        assertTrue(bob.remoteBot().editor(CLS1_SUFFIX).isDirty());
+        assertTrue(bob.remoteBot().editor(CLS1_SUFFIX).getText()
             .equals(dirtyClsContentOfAlice));
 
-        carl.bot().editor(CLS1_SUFFIX)
+        carl.remoteBot().editor(CLS1_SUFFIX)
             .waitUntilIsTextSame(dirtyClsContentOfAlice);
-        assertTrue(carl.bot().editor(CLS1_SUFFIX).isActive());
-        assertTrue(carl.bot().editor(CLS1_SUFFIX).isDirty());
-        assertTrue(carl.bot().editor(CLS1_SUFFIX).getText()
+        assertTrue(carl.remoteBot().editor(CLS1_SUFFIX).isActive());
+        assertTrue(carl.remoteBot().editor(CLS1_SUFFIX).isDirty());
+        assertTrue(carl.remoteBot().editor(CLS1_SUFFIX).getText()
             .equals(dirtyClsContentOfAlice));
 
-        dave.bot().editor(CLS1_SUFFIX)
+        dave.remoteBot().editor(CLS1_SUFFIX)
             .waitUntilIsTextSame(dirtyClsContentOfAlice);
-        assertTrue(dave.bot().editor(CLS1_SUFFIX).isActive());
-        assertTrue(dave.bot().editor(CLS1_SUFFIX).isDirty());
-        assertTrue(dave.bot().editor(CLS1_SUFFIX).getText()
+        assertTrue(dave.remoteBot().editor(CLS1_SUFFIX).isActive());
+        assertTrue(dave.remoteBot().editor(CLS1_SUFFIX).isDirty());
+        assertTrue(dave.remoteBot().editor(CLS1_SUFFIX).getText()
             .equals(dirtyClsContentOfAlice));
-        bob.bot().editor(CLS1 + SUFFIX_JAVA).closeWithSave();
-        carl.bot().editor(CLS1 + SUFFIX_JAVA).closeWithSave();
-        dave.bot().editor(CLS1 + SUFFIX_JAVA).closeWithSave();
-        alice.bot().editor(CLS1 + SUFFIX_JAVA).closeWithSave();
+        bob.remoteBot().editor(CLS1 + SUFFIX_JAVA).closeWithSave();
+        carl.remoteBot().editor(CLS1 + SUFFIX_JAVA).closeWithSave();
+        dave.remoteBot().editor(CLS1 + SUFFIX_JAVA).closeWithSave();
+        alice.remoteBot().editor(CLS1 + SUFFIX_JAVA).closeWithSave();
     }
 
     /**
@@ -155,25 +155,25 @@ public class TestAllParticipantsFollowUserWithWriteAccess extends STFTest {
         CoreException {
         alice.superBot().views().packageExplorerView()
             .selectClass(PROJECT1, PKG1, CLS1).open();
-        bob.bot().waitUntilEditorOpen(CLS1_SUFFIX);
-        carl.bot().waitUntilEditorOpen(CLS1_SUFFIX);
-        dave.bot().waitUntilEditorOpen(CLS1_SUFFIX);
-        assertTrue(bob.bot().isEditorOpen(CLS1_SUFFIX));
-        assertTrue(carl.bot().isEditorOpen(CLS1_SUFFIX));
-        assertTrue(dave.bot().isEditorOpen(CLS1_SUFFIX));
+        bob.remoteBot().waitUntilEditorOpen(CLS1_SUFFIX);
+        carl.remoteBot().waitUntilEditorOpen(CLS1_SUFFIX);
+        dave.remoteBot().waitUntilEditorOpen(CLS1_SUFFIX);
+        assertTrue(bob.remoteBot().isEditorOpen(CLS1_SUFFIX));
+        assertTrue(carl.remoteBot().isEditorOpen(CLS1_SUFFIX));
+        assertTrue(dave.remoteBot().isEditorOpen(CLS1_SUFFIX));
 
-        alice.bot().editor(CLS1_SUFFIX).setTextWithoutSave(CP1_CHANGE);
-        alice.bot().editor(CLS1 + SUFFIX_JAVA).closeWithSave();
+        alice.remoteBot().editor(CLS1_SUFFIX).setTextWithoutSave(CP1_CHANGE);
+        alice.remoteBot().editor(CLS1 + SUFFIX_JAVA).closeWithSave();
         String clsContentOfAlice = alice.superBot().views()
             .packageExplorerView()
             .getFileContent(getClassPath(PROJECT1, PKG1, CLS1));
 
-        bob.bot().waitUntilEditorClosed(CLS1_SUFFIX);
-        carl.bot().waitUntilEditorClosed(CLS1_SUFFIX);
-        dave.bot().waitUntilEditorClosed(CLS1_SUFFIX);
-        assertFalse(bob.bot().isEditorOpen(CLS1_SUFFIX));
-        assertFalse(carl.bot().isEditorOpen(CLS1_SUFFIX));
-        assertFalse(dave.bot().isEditorOpen(CLS1_SUFFIX));
+        bob.remoteBot().waitUntilEditorClosed(CLS1_SUFFIX);
+        carl.remoteBot().waitUntilEditorClosed(CLS1_SUFFIX);
+        dave.remoteBot().waitUntilEditorClosed(CLS1_SUFFIX);
+        assertFalse(bob.remoteBot().isEditorOpen(CLS1_SUFFIX));
+        assertFalse(carl.remoteBot().isEditorOpen(CLS1_SUFFIX));
+        assertFalse(dave.remoteBot().isEditorOpen(CLS1_SUFFIX));
 
         assertTrue(bob.superBot().views().packageExplorerView()
             .getFileContent(getClassPath(PROJECT1, PKG1, CLS1))

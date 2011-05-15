@@ -226,12 +226,12 @@ public class STFTest extends STFMessages {
      */
     public static void setUpWorkbench() throws RemoteException {
         for (AbstractTester tester : activeTesters) {
-            tester.bot().activateWorkbench();
-            if (tester.bot().isViewOpen("Welcome"))
-                tester.bot().view("Welcome").close();
+            tester.remoteBot().activateWorkbench();
+            if (tester.remoteBot().isViewOpen("Welcome"))
+                tester.remoteBot().view("Welcome").close();
             tester.superBot().menuBar().window().openPerspective();
             closeUnnecessaryViews(tester);
-            tester.bot().resetWorkbench();
+            tester.remoteBot().resetWorkbench();
             deleteAllProjects(tester);
 
         }
@@ -250,20 +250,20 @@ public class STFTest extends STFMessages {
 
     public static void closeUnnecessaryViews(AbstractTester tester)
         throws RemoteException {
-        if (tester.bot().isViewOpen("Problems"))
-            tester.bot().view("Problems").close();
+        if (tester.remoteBot().isViewOpen("Problems"))
+            tester.remoteBot().view("Problems").close();
 
-        if (tester.bot().isViewOpen("Javadoc"))
-            tester.bot().view("Javadoc").close();
+        if (tester.remoteBot().isViewOpen("Javadoc"))
+            tester.remoteBot().view("Javadoc").close();
 
-        if (tester.bot().isViewOpen("Declaration"))
-            tester.bot().view("Declaration").close();
+        if (tester.remoteBot().isViewOpen("Declaration"))
+            tester.remoteBot().view("Declaration").close();
 
-        if (tester.bot().isViewOpen("Task List"))
-            tester.bot().view("Task List").close();
+        if (tester.remoteBot().isViewOpen("Task List"))
+            tester.remoteBot().view("Task List").close();
 
-        if (tester.bot().isViewOpen("Outline"))
-            tester.bot().view("Outline").close();
+        if (tester.remoteBot().isViewOpen("Outline"))
+            tester.remoteBot().view("Outline").close();
     }
 
     /**
@@ -290,7 +290,7 @@ public class STFTest extends STFMessages {
 
     public static void openSarosViews(AbstractTester tester)
         throws RemoteException {
-        if (!tester.bot().isViewOpen(VIEW_SAROS)) {
+        if (!tester.remoteBot().isViewOpen(VIEW_SAROS)) {
             tester.superBot().menuBar().window()
                 .showViewWithName(NODE_SAROS, VIEW_SAROS);
         }
@@ -380,13 +380,13 @@ public class STFTest extends STFMessages {
 
     public static void resetWorkbenches() throws RemoteException {
         for (AbstractTester tester : activeTesters) {
-            tester.bot().resetWorkbench();
+            tester.remoteBot().resetWorkbench();
         }
     }
 
     public static void closeAllShells() throws RemoteException {
         for (AbstractTester tester : activeTesters) {
-            tester.bot().closeAllShells();
+            tester.remoteBot().closeAllShells();
         }
     }
 
@@ -536,7 +536,7 @@ public class STFTest extends STFMessages {
                 .project(PROJECT1);
             tester.superBot().views().packageExplorerView()
                 .selectFolder(PROJECT1).newC().file(FILE3);
-            tester.bot().waitUntilEditorOpen(FILE3);
+            tester.remoteBot().waitUntilEditorOpen(FILE3);
         }
     }
 
@@ -574,7 +574,7 @@ public class STFTest extends STFMessages {
         inviter.superBot().menuBar().saros()
             .shareProjects(projectName, inviteesJID);
         for (AbstractTester invitee : invitees) {
-            invitee.bot().shell(SHELL_SESSION_INVITATION).confirm(FINISH);
+            invitee.remoteBot().shell(SHELL_SESSION_INVITATION).confirm(FINISH);
             invitee.superBot().confirmShellAddProjectUsingWhichProject(
                 projectName, usingWhichProject);
         }
@@ -668,7 +668,7 @@ public class STFTest extends STFMessages {
         if (host != null) {
             host.superBot().views().sarosView()
                 .waitUntilAllPeersLeaveSession(peerJIDs);
-            host.bot().view(VIEW_SAROS).toolbarButton(TB_STOP_SESSION).click();
+            host.remoteBot().view(VIEW_SAROS).toolbarButton(TB_STOP_SESSION).click();
             host.superBot().views().sarosView().waitUntilIsNotInSession();
         }
 
@@ -758,9 +758,9 @@ public class STFTest extends STFMessages {
         AbstractTester selectedBuddy) throws RemoteException {
         buddy.superBot().views().sarosView()
             .shareYourScreenWithSelectedBuddy(selectedBuddy.getJID());
-        selectedBuddy.bot().waitUntilShellIsOpen(
+        selectedBuddy.remoteBot().waitUntilShellIsOpen(
             SHELL_INCOMING_SCREENSHARING_SESSION);
-        selectedBuddy.bot().shell(SHELL_INCOMING_SCREENSHARING_SESSION).bot()
+        selectedBuddy.remoteBot().shell(SHELL_INCOMING_SCREENSHARING_SESSION).bot()
             .button(YES).click();
     }
 
@@ -788,7 +788,7 @@ public class STFTest extends STFMessages {
         for (final AbstractTester tester : invitees) {
             joinSessionTasks.add(new Callable<Void>() {
                 public Void call() throws Exception {
-                    tester.bot().shell(SHELL_SESSION_INVITATION)
+                    tester.remoteBot().shell(SHELL_SESSION_INVITATION)
                         .confirm(FINISH);
                     tester.superBot().confirmShellAddProjectUsingWhichProject(
                         projectName, usingWhichProject);
@@ -802,7 +802,7 @@ public class STFTest extends STFMessages {
 
     public void waitsUntilTransferedDataIsArrived(AbstractTester buddy)
         throws RemoteException {
-        buddy.bot().sleep(500);
+        buddy.remoteBot().sleep(500);
     }
 
     /**********************************************

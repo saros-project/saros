@@ -47,52 +47,52 @@ public class TestConcurrentEditing extends STFTest {
 
         alice.superBot().views().packageExplorerView().selectProject(PROJECT1)
             .newC().file(FILE);
-        alice.bot().waitUntilEditorOpen(FILE);
-        alice.bot().editor(FILE).setTexWithSave("test/STF/lorem.txt");
-        alice.bot().editor(FILE).navigateTo(0, 6);
+        alice.remoteBot().waitUntilEditorOpen(FILE);
+        alice.remoteBot().editor(FILE).setTexWithSave("test/STF/lorem.txt");
+        alice.remoteBot().editor(FILE).navigateTo(0, 6);
 
         buildSessionSequentially(PROJECT1, TypeOfCreateProject.NEW_PROJECT,
             alice, bob);
         bob.superBot().views().packageExplorerView().selectFile(path).open();
 
-        bob.bot().waitUntilEditorOpen(FILE);
-        bob.bot().editor(FILE).navigateTo(0, 30);
+        bob.remoteBot().waitUntilEditorOpen(FILE);
+        bob.remoteBot().editor(FILE).navigateTo(0, 30);
 
-        bob.bot().sleep(1000);
+        bob.remoteBot().sleep(1000);
 
         // Alice goes to 0,6 and hits Delete
-        alice.bot().activateWorkbench();
+        alice.remoteBot().activateWorkbench();
         int waitActivate = 100;
-        alice.bot().sleep(waitActivate);
-        alice.bot().editor(FILE).show();
+        alice.remoteBot().sleep(waitActivate);
+        alice.remoteBot().editor(FILE).show();
 
-        alice.bot().editor(FILE).waitUntilIsActive();
-        alice.bot().editor(FILE).pressShortcut("DELETE");
+        alice.remoteBot().editor(FILE).waitUntilIsActive();
+        alice.remoteBot().editor(FILE).pressShortcut("DELETE");
         // at the same time, Bob enters L at 0,30
-        bob.bot().activateWorkbench();
-        bob.bot().sleep(waitActivate);
-        bob.bot().editor(FILE).show();
-        bob.bot().editor(FILE).waitUntilIsActive();
-        bob.bot().editor(FILE).typeText("L");
+        bob.remoteBot().activateWorkbench();
+        bob.remoteBot().sleep(waitActivate);
+        bob.remoteBot().editor(FILE).show();
+        bob.remoteBot().editor(FILE).waitUntilIsActive();
+        bob.remoteBot().editor(FILE).typeText("L");
         // both sleep for less than 1000ms
-        alice.bot().sleep(300);
+        alice.remoteBot().sleep(300);
 
         // Alice hits Delete again
-        alice.bot().activateWorkbench();
-        alice.bot().sleep(waitActivate);
-        alice.bot().editor(FILE).show();
-        alice.bot().editor(FILE).waitUntilIsActive();
-        alice.bot().editor(FILE).pressShortcut("DELETE");
+        alice.remoteBot().activateWorkbench();
+        alice.remoteBot().sleep(waitActivate);
+        alice.remoteBot().editor(FILE).show();
+        alice.remoteBot().editor(FILE).waitUntilIsActive();
+        alice.remoteBot().editor(FILE).pressShortcut("DELETE");
         // Bob enters o
-        bob.bot().activateWorkbench();
-        bob.bot().sleep(waitActivate);
-        bob.bot().editor(FILE).show();
-        bob.bot().editor(FILE).waitUntilIsActive();
-        bob.bot().editor(FILE).typeText("o");
+        bob.remoteBot().activateWorkbench();
+        bob.remoteBot().sleep(waitActivate);
+        bob.remoteBot().editor(FILE).show();
+        bob.remoteBot().editor(FILE).waitUntilIsActive();
+        bob.remoteBot().editor(FILE).typeText("o");
 
-        alice.bot().sleep(5000);
-        String aliceText = alice.bot().editor(FILE).getText();
-        String bobText = bob.bot().editor(FILE).getText();
+        alice.remoteBot().sleep(5000);
+        String aliceText = alice.remoteBot().editor(FILE).getText();
+        String bobText = bob.remoteBot().editor(FILE).getText();
         assertEquals(aliceText, bobText);
     }
 
@@ -106,30 +106,30 @@ public class TestConcurrentEditing extends STFTest {
             alice, bob);
         bob.superBot().views().packageExplorerView()
             .selectClass(PROJECT1, PKG1, CLS1).open();
-        bob.bot().editor(CLS1_SUFFIX).waitUntilIsActive();
+        bob.remoteBot().editor(CLS1_SUFFIX).waitUntilIsActive();
 
-        alice.bot().editor(CLS1_SUFFIX).navigateTo(3, 0);
-        bob.bot().editor(CLS1_SUFFIX).navigateTo(3, 0);
+        alice.remoteBot().editor(CLS1_SUFFIX).navigateTo(3, 0);
+        bob.remoteBot().editor(CLS1_SUFFIX).navigateTo(3, 0);
         char[] content = "Merry Christmas and Happy New Year!".toCharArray();
         for (int i = 0; i < content.length; i++) {
-            alice.bot().editor(CLS1_SUFFIX).typeText(content[i] + "");
+            alice.remoteBot().editor(CLS1_SUFFIX).typeText(content[i] + "");
             Thread.sleep(100);
             if (i != 0 && i % 2 == 0) {
-                bob.bot().editor(CLS1_SUFFIX).navigateTo(3, i);
-                bob.bot()
+                bob.remoteBot().editor(CLS1_SUFFIX).navigateTo(3, i);
+                bob.remoteBot()
                     .editor(CLS1_SUFFIX)
                     .pressShortcut(IKeyLookup.DELETE_NAME,
                         IKeyLookup.DELETE_NAME);
             }
         }
 
-        String aliceText = alice.bot().editor(CLS1_SUFFIX).getText();
-        String bobText = bob.bot().editor(CLS1_SUFFIX).getText();
+        String aliceText = alice.remoteBot().editor(CLS1_SUFFIX).getText();
+        String bobText = bob.remoteBot().editor(CLS1_SUFFIX).getText();
         System.out.println(aliceText);
         System.out.println(bobText);
         assertEquals(aliceText, bobText);
-        bob.bot().sleep(5000);
-        assertTrue(bob.bot().view(VIEW_SAROS)
+        bob.remoteBot().sleep(5000);
+        assertTrue(bob.remoteBot().view(VIEW_SAROS)
             .existsToolbarButton(TB_INCONSISTENCY_DETECTED));
 
     }

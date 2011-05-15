@@ -25,14 +25,14 @@ public class TestEditor2 extends STFTest {
         String aliceText = "a";
         alice.superBot().views().packageExplorerView().selectFile(path).open();
 
-        alice.bot().editor(FILE3).typeText(aliceText);
+        alice.remoteBot().editor(FILE3).typeText(aliceText);
 
         String bobText = "b";
         bob.superBot().views().packageExplorerView().selectFile(path).open();
 
-        bob.bot().editor(FILE3).typeText(bobText);
+        bob.remoteBot().editor(FILE3).typeText(bobText);
 
-        assertEquals(aliceText, alice.bot().editor(FILE3).getText());
-        assertEquals(bobText, bob.bot().editor(FILE3).getText());
+        assertEquals(aliceText, alice.remoteBot().editor(FILE3).getText());
+        assertEquals(bobText, bob.remoteBot().editor(FILE3).getText());
     }
 }

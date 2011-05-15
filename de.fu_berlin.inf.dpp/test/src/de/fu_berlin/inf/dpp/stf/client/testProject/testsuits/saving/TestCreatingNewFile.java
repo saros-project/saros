@@ -123,16 +123,16 @@ public class TestCreatingNewFile extends STFTest {
         assertTrue(bob.superBot().views().packageExplorerView()
             .selectFolder(PROJECT1, FOLDER2).existsWithRegex(FILE2));
 
-        alice.bot().editor(FILE2).setTexWithSave(CP1);
+        alice.remoteBot().editor(FILE2).setTexWithSave(CP1);
 
-        String file2ContentOfAlice = alice.bot().editor(FILE2).getText();
+        String file2ContentOfAlice = alice.remoteBot().editor(FILE2).getText();
 
-        carl.bot().editor(FILE2).waitUntilIsTextSame(file2ContentOfAlice);
-        String file2ContentOfCarl = carl.bot().editor(FILE2).getText();
+        carl.remoteBot().editor(FILE2).waitUntilIsTextSame(file2ContentOfAlice);
+        String file2ContentOfCarl = carl.remoteBot().editor(FILE2).getText();
         assertTrue(file2ContentOfAlice.equals(file2ContentOfCarl));
 
-        bob.bot().editor(FILE2).waitUntilIsTextSame(file2ContentOfAlice);
-        String file2ContentOfBob = bob.bot().editor(FILE2).getText();
+        bob.remoteBot().editor(FILE2).waitUntilIsTextSame(file2ContentOfAlice);
+        String file2ContentOfBob = bob.remoteBot().editor(FILE2).getText();
         assertTrue(file2ContentOfAlice.equals(file2ContentOfBob));
 
     }

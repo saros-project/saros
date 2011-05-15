@@ -142,18 +142,18 @@ public class TestHandleContacts extends STFTest {
      */
     @Test
     public void testAddNoValidContact() throws RemoteException {
-        alice.bot().view(VIEW_SAROS).toolbarButton(TB_ADD_A_NEW_BUDDY).click();
+        alice.remoteBot().view(VIEW_SAROS).toolbarButton(TB_ADD_A_NEW_BUDDY).click();
         Map<String, String> labelsAndTexts = new HashMap<String, String>();
         labelsAndTexts.put("XMPP/Jabber ID", "bob@bla");
 
-        alice.bot().waitUntilShellIsOpen(SHELL_ADD_BUDDY);
-        IRemoteBotShell shell = alice.bot().shell(SHELL_ADD_BUDDY);
+        alice.remoteBot().waitUntilShellIsOpen(SHELL_ADD_BUDDY);
+        IRemoteBotShell shell = alice.remoteBot().shell(SHELL_ADD_BUDDY);
         shell.activate();
         shell.bot().comboBoxWithLabel(LABEL_XMPP_JABBER_ID).setText("bob@bla");
         shell.bot().button(FINISH).click();
-        alice.bot().waitUntilShellIsOpen(SHELL_SERVER_NOT_FOUND);
-        assertTrue(alice.bot().shell(SHELL_SERVER_NOT_FOUND).isActive());
-        alice.bot().shell(SHELL_SERVER_NOT_FOUND).confirm(NO);
+        alice.remoteBot().waitUntilShellIsOpen(SHELL_SERVER_NOT_FOUND);
+        assertTrue(alice.remoteBot().shell(SHELL_SERVER_NOT_FOUND).isActive());
+        alice.remoteBot().shell(SHELL_SERVER_NOT_FOUND).confirm(NO);
 
     }
 

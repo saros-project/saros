@@ -74,7 +74,7 @@ public class RealTester extends AbstractTester {
     }
 
     @Override
-    public IRemoteWorkbenchBot bot() {
+    public IRemoteWorkbenchBot remoteBot() {
         return bot;
     }
 

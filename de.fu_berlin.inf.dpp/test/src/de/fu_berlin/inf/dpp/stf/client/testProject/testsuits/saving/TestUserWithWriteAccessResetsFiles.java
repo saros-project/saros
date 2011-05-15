@@ -70,11 +70,11 @@ public class TestUserWithWriteAccessResetsFiles extends STFTest {
             .followParticipant();
         alice.superBot().views().packageExplorerView()
             .selectClass(PROJECT1, PKG1, CLS1).open();
-        alice.bot().editor(CLS1_SUFFIX).setTextWithoutSave(CP1);
-        alice.bot().editor(CLS1 + SUFFIX_JAVA).closeWithoutSave();
+        alice.remoteBot().editor(CLS1_SUFFIX).setTextWithoutSave(CP1);
+        alice.remoteBot().editor(CLS1 + SUFFIX_JAVA).closeWithoutSave();
 
-        dave.bot().shell(SHELL_SAVE_RESOURCE).confirm(NO);
-        edna.bot().shell(SHELL_SAVE_RESOURCE).confirm(NO);
+        dave.remoteBot().shell(SHELL_SAVE_RESOURCE).confirm(NO);
+        edna.remoteBot().shell(SHELL_SAVE_RESOURCE).confirm(NO);
 
         // String contentOfDave = dave.superBot().views().packageExplorerView()
         // .getFileContent(getClassPath(PROJECT1, PKG1, CLS1));

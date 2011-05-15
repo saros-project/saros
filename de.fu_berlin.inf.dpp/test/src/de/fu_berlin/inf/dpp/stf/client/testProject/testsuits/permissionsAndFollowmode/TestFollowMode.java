@@ -37,13 +37,13 @@ public class TestFollowMode extends STFTest {
     public void testBobFollowAlice() throws IOException, CoreException {
         alice.superBot().views().packageExplorerView()
             .selectClass(PROJECT1, PKG1, CLS1).open();
-        alice.bot().editor(CLS1_SUFFIX).setTexWithSave(CP1);
+        alice.remoteBot().editor(CLS1_SUFFIX).setTexWithSave(CP1);
         bob.superBot().views().sarosView().selectParticipant(alice.getJID())
             .followParticipant();
-        bob.bot().editor(CLS1_SUFFIX).waitUntilIsActive();
+        bob.remoteBot().editor(CLS1_SUFFIX).waitUntilIsActive();
         assertTrue(bob.superBot().views().sarosView()
             .selectParticipant(alice.getJID()).isFollowing());
-        assertTrue(bob.bot().editor(CLS1_SUFFIX).isActive());
+        assertTrue(bob.remoteBot().editor(CLS1_SUFFIX).isActive());
 
         String clsContentOfAlice = alice.superBot().views()
             .packageExplorerView()
@@ -60,16 +60,16 @@ public class TestFollowMode extends STFTest {
 
         alice.superBot().views().packageExplorerView().tree().newC()
             .cls(PROJECT1, PKG1, CLS2);
-        bob.bot().editor(CLS2_SUFFIX).waitUntilIsActive();
-        assertTrue(bob.bot().editor(CLS2_SUFFIX).isActive());
+        bob.remoteBot().editor(CLS2_SUFFIX).waitUntilIsActive();
+        assertTrue(bob.remoteBot().editor(CLS2_SUFFIX).isActive());
 
         alice.superBot().views().sarosView().selectParticipant(bob.getJID())
             .followParticipant();
-        bob.bot().editor(CLS1_SUFFIX).show();
-        alice.bot().editor(CLS1_SUFFIX).waitUntilIsActive();
+        bob.remoteBot().editor(CLS1_SUFFIX).show();
+        alice.remoteBot().editor(CLS1_SUFFIX).waitUntilIsActive();
         assertTrue(alice.superBot().views().sarosView()
             .selectParticipant(bob.getJID()).isFollowing());
-        assertTrue(alice.bot().editor(CLS1_SUFFIX).isActive());
+        assertTrue(alice.remoteBot().editor(CLS1_SUFFIX).isActive());
 
         // bob.sarosBot().sessionView().followThisBuddy(alice.jid);
         // alice.fileM.newClass(PROJECT1, PKG1, CLS3);

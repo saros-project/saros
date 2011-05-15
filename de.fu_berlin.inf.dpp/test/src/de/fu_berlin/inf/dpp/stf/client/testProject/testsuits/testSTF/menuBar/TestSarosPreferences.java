@@ -54,10 +54,10 @@ public class TestSarosPreferences extends STFTest {
 
     @Test
     public void createAccountWhichAlreadyExisted() throws RemoteException {
-        alice.bot().menu(MENU_SAROS).menu(MENU_CREATE_ACCOUNT).click();
+        alice.remoteBot().menu(MENU_SAROS).menu(MENU_CREATE_ACCOUNT).click();
 
-        alice.bot().waitUntilShellIsOpen(SHELL_CREATE_XMPP_JABBER_ACCOUNT);
-        IRemoteBotShell shell = alice.bot().shell(
+        alice.remoteBot().waitUntilShellIsOpen(SHELL_CREATE_XMPP_JABBER_ACCOUNT);
+        IRemoteBotShell shell = alice.remoteBot().shell(
             SHELL_CREATE_XMPP_JABBER_ACCOUNT);
         shell.activate();
         shell.bot().comboBoxWithLabel(LABEL_XMPP_JABBER_SERVER).setText(SERVER);
@@ -73,7 +73,7 @@ public class TestSarosPreferences extends STFTest {
         String errorMessage = shell.getErrorMessage();
         assertTrue(errorMessage.matches(ERROR_MESSAGE_ACCOUNT_ALREADY_EXISTS));
         shell.confirm(CANCEL);
-        assertFalse(alice.bot().isShellOpen(SHELL_CREATE_XMPP_JABBER_ACCOUNT));
+        assertFalse(alice.remoteBot().isShellOpen(SHELL_CREATE_XMPP_JABBER_ACCOUNT));
 
     }
 
@@ -84,10 +84,10 @@ public class TestSarosPreferences extends STFTest {
     @Test
     @Ignore("there are bugs: can't correctly check if the given passwords are same or not")
     public void createAccountWithDismatchedPassword() throws RemoteException {
-        alice.bot().menu(MENU_SAROS).menu(MENU_CREATE_ACCOUNT).click();
+        alice.remoteBot().menu(MENU_SAROS).menu(MENU_CREATE_ACCOUNT).click();
 
-        alice.bot().waitUntilShellIsOpen(SHELL_CREATE_XMPP_JABBER_ACCOUNT);
-        IRemoteBotShell shell_alice = alice.bot().shell(
+        alice.remoteBot().waitUntilShellIsOpen(SHELL_CREATE_XMPP_JABBER_ACCOUNT);
+        IRemoteBotShell shell_alice = alice.remoteBot().shell(
             SHELL_CREATE_XMPP_JABBER_ACCOUNT);
         shell_alice.activate();
         shell_alice.bot().comboBoxWithLabel(LABEL_XMPP_JABBER_SERVER)
@@ -102,7 +102,7 @@ public class TestSarosPreferences extends STFTest {
         String errorMessage = shell_alice.getErrorMessage();
         assertTrue(errorMessage.equals(ERROR_MESSAGE_PASSWORDS_NOT_MATCH));
         shell_alice.confirm(CANCEL);
-        assertFalse(alice.bot().isShellOpen(SHELL_CREATE_XMPP_JABBER_ACCOUNT));
+        assertFalse(alice.remoteBot().isShellOpen(SHELL_CREATE_XMPP_JABBER_ACCOUNT));
     }
 
     /**
@@ -116,9 +116,9 @@ public class TestSarosPreferences extends STFTest {
     @Test
     @Ignore
     public void createAccountWithInvalidServer() throws RemoteException {
-        alice.bot().menu(MENU_SAROS).menu(MENU_CREATE_ACCOUNT).click();
-        alice.bot().waitUntilShellIsOpen(SHELL_CREATE_XMPP_JABBER_ACCOUNT);
-        IRemoteBotShell shell_alice = alice.bot().shell(
+        alice.remoteBot().menu(MENU_SAROS).menu(MENU_CREATE_ACCOUNT).click();
+        alice.remoteBot().waitUntilShellIsOpen(SHELL_CREATE_XMPP_JABBER_ACCOUNT);
+        IRemoteBotShell shell_alice = alice.remoteBot().shell(
             SHELL_CREATE_XMPP_JABBER_ACCOUNT);
         shell_alice.activate();
 
@@ -135,7 +135,7 @@ public class TestSarosPreferences extends STFTest {
         String errorMessage = shell_alice.getErrorMessage();
         assertTrue(errorMessage.matches(ERROR_MESSAGE_COULD_NOT_CONNECT));
         shell_alice.confirm(CANCEL);
-        assertFalse(alice.bot().isShellOpen(SHELL_CREATE_XMPP_JABBER_ACCOUNT));
+        assertFalse(alice.remoteBot().isShellOpen(SHELL_CREATE_XMPP_JABBER_ACCOUNT));
     }
 
     @Test

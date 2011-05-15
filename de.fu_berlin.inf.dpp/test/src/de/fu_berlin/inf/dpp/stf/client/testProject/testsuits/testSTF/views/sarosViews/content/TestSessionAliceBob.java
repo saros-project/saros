@@ -38,15 +38,15 @@ public class TestSessionAliceBob extends STFTest {
     @Test
     public void testSetFocusOnsarosView() throws RemoteException {
         log.trace("alice set focus on session view.");
-        alice.bot().view(VIEW_SAROS).show();
-        assertTrue(alice.bot().view(VIEW_SAROS).isActive());
+        alice.remoteBot().view(VIEW_SAROS).show();
+        assertTrue(alice.remoteBot().view(VIEW_SAROS).isActive());
         log.trace("alice close session view.");
 
-        alice.bot().view(VIEW_SAROS).close();
-        assertFalse(alice.bot().isViewOpen(VIEW_SAROS));
+        alice.remoteBot().view(VIEW_SAROS).close();
+        assertFalse(alice.remoteBot().isViewOpen(VIEW_SAROS));
         log.trace("alice open session view again");
-        alice.bot().openViewById(VIEW_SAROS_ID);
-        assertTrue(alice.bot().isViewOpen(VIEW_SAROS));
+        alice.remoteBot().openViewById(VIEW_SAROS_ID);
+        assertTrue(alice.remoteBot().isViewOpen(VIEW_SAROS));
         log.trace("alice focus on saros buddies view.");
     }
 
@@ -99,17 +99,17 @@ public class TestSessionAliceBob extends STFTest {
         alice.superBot().views().packageExplorerView()
             .selectClass(PROJECT1, PKG1, CLS1).open();
 
-        bob.bot().waitUntilEditorOpen(CLS1_SUFFIX);
-        assertTrue(bob.bot().isEditorOpen(CLS1_SUFFIX));
+        bob.remoteBot().waitUntilEditorOpen(CLS1_SUFFIX);
+        assertTrue(bob.remoteBot().isEditorOpen(CLS1_SUFFIX));
 
         alice.superBot().views().sarosView().selectParticipant(bob.getJID())
             .followParticipant();
         assertTrue(alice.superBot().views().sarosView()
             .selectParticipant(bob.getJID()).isFollowing());
 
-        bob.bot().editor(CLS1 + SUFFIX_JAVA).closeWithSave();
-        alice.bot().waitUntilEditorClosed(CLS1_SUFFIX);
-        assertFalse(alice.bot().isEditorOpen(CLS1_SUFFIX));
+        bob.remoteBot().editor(CLS1 + SUFFIX_JAVA).closeWithSave();
+        alice.remoteBot().waitUntilEditorClosed(CLS1_SUFFIX);
+        assertFalse(alice.remoteBot().isEditorOpen(CLS1_SUFFIX));
     }
 
     @Test
@@ -144,26 +144,26 @@ public class TestSessionAliceBob extends STFTest {
     public void jumpToSelectedBuddy() throws RemoteException {
         alice.superBot().views().packageExplorerView().tree().newC()
             .cls(PROJECT1, PKG1, CLS2);
-        alice.bot().waitUntilEditorOpen(CLS2_SUFFIX);
-        assertTrue(alice.bot().isEditorOpen(CLS2_SUFFIX));
-        assertFalse(bob.bot().isEditorOpen(CLS2_SUFFIX));
-        bob.bot().captureScreenshot(
-            bob.bot().getPathToScreenShot() + "/vor_jump_to_position.png");
+        alice.remoteBot().waitUntilEditorOpen(CLS2_SUFFIX);
+        assertTrue(alice.remoteBot().isEditorOpen(CLS2_SUFFIX));
+        assertFalse(bob.remoteBot().isEditorOpen(CLS2_SUFFIX));
+        bob.remoteBot().captureScreenshot(
+            bob.remoteBot().getPathToScreenShot() + "/vor_jump_to_position.png");
         bob.superBot().views().sarosView().selectParticipant(alice.getJID())
             .jumpToPositionOfSelectedBuddy();
-        bob.bot().captureScreenshot(
-            bob.bot().getPathToScreenShot() + "/after_jump_to_position.png");
-        assertTrue(bob.bot().editor(CLS2_SUFFIX).isActive());
+        bob.remoteBot().captureScreenshot(
+            bob.remoteBot().getPathToScreenShot() + "/after_jump_to_position.png");
+        assertTrue(bob.remoteBot().editor(CLS2_SUFFIX).isActive());
 
         alice.superBot().views().packageExplorerView()
             .selectClass(PROJECT1, PKG1, CLS1).open();
-        alice.bot().editor(CLS1_SUFFIX).show();
-        assertTrue(alice.bot().editor(CLS1_SUFFIX).isActive());
-        assertFalse(bob.bot().isEditorOpen(CLS1_SUFFIX));
-        bob.bot().sleep(500);
+        alice.remoteBot().editor(CLS1_SUFFIX).show();
+        assertTrue(alice.remoteBot().editor(CLS1_SUFFIX).isActive());
+        assertFalse(bob.remoteBot().isEditorOpen(CLS1_SUFFIX));
+        bob.remoteBot().sleep(500);
         bob.superBot().views().sarosView().selectParticipant(alice.getJID())
             .jumpToPositionOfSelectedBuddy();
-        assertTrue(bob.bot().editor(CLS1_SUFFIX).isActive());
+        assertTrue(bob.remoteBot().editor(CLS1_SUFFIX).isActive());
     }
 
     @Test
@@ -172,8 +172,8 @@ public class TestSessionAliceBob extends STFTest {
     public void sharedYourScreenWithSelectedUserGUI() throws RemoteException {
         // alice.mainMenu.setupSettingForScreensharing(1, 0, -1, -1);
         shareYourScreen(alice, bob);
-        bob.bot().view(VIEW_REMOTE_SCREEN).waitUntilIsActive();
-        assertTrue(bob.bot().view(VIEW_REMOTE_SCREEN).isActive());
+        bob.remoteBot().view(VIEW_REMOTE_SCREEN).waitUntilIsActive();
+        assertTrue(bob.remoteBot().view(VIEW_REMOTE_SCREEN).isActive());
 
     }
 
@@ -181,18 +181,18 @@ public class TestSessionAliceBob extends STFTest {
     public void inconsistencyDetected() throws RemoteException {
         alice.superBot().views().packageExplorerView()
             .selectClass(PROJECT1, PKG1, CLS1).open();
-        String editorTextOfAlice = alice.bot().editor(CLS1_SUFFIX).getText();
+        String editorTextOfAlice = alice.remoteBot().editor(CLS1_SUFFIX).getText();
         alice.superBot().views().sarosView().selectParticipant(bob.getJID())
             .restrictToReadOnlyAccess();
         bob.superBot().views().packageExplorerView()
             .selectClass(PROJECT1, PKG1, CLS1).open();
-        bob.bot().editor(CLS1_SUFFIX).setTextWithoutSave(CP1);
-        String editorTextOfBob = bob.bot().editor(CLS1_SUFFIX).getText();
+        bob.remoteBot().editor(CLS1_SUFFIX).setTextWithoutSave(CP1);
+        String editorTextOfBob = bob.remoteBot().editor(CLS1_SUFFIX).getText();
         assertFalse(editorTextOfAlice.equals(editorTextOfBob));
         bob.superBot().views().sarosView().waitUntilIsInconsistencyDetected();
         bob.superBot().views().sarosView().inconsistencyDetected();
-        editorTextOfAlice = alice.bot().editor(CLS1_SUFFIX).getText();
-        editorTextOfBob = bob.bot().editor(CLS1_SUFFIX).getText();
+        editorTextOfAlice = alice.remoteBot().editor(CLS1_SUFFIX).getText();
+        editorTextOfBob = bob.remoteBot().editor(CLS1_SUFFIX).getText();
         assertTrue(editorTextOfAlice.equals(editorTextOfBob));
     }
 
