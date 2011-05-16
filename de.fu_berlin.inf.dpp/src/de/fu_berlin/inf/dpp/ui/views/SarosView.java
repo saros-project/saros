@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
@@ -34,11 +35,16 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
+import org.eclipse.swt.events.MouseAdapter;
+import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.Tree;
+import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.IViewPart;
@@ -52,6 +58,7 @@ import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.annotations.Component;
+import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.net.IRosterListener;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.RosterAdapter;
@@ -176,6 +183,9 @@ public class SarosView extends ViewPart {
     protected SarosSessionManager sarosSessionManager;
 
     @Inject
+    protected EditorManager editorManager;
+
+    @Inject
     protected RosterTracker rosterTracker;
 
     @Inject
@@ -210,6 +220,30 @@ public class SarosView extends ViewPart {
             leftComposite, SWT.V_SCROLL);
         buddySessionDisplayComposite.setLayoutData(LayoutUtils
             .createFillGridData());
+
+        /*
+         * Double click on buddy in Saros view jumps to position of clicked
+         * user.
+         */
+        final Control control = buddySessionDisplayComposite.getViewer()
+            .getControl();
+        control.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseDoubleClick(MouseEvent event) {
+                if (control instanceof Tree) {
+                    TreeItem treeItem = ((Tree) control).getItem(new Point(
+                        event.x, event.y));
+                    if (treeItem != null) {
+                        User user = (User) Platform.getAdapterManager()
+                            .getAdapter(treeItem.getData(), User.class);
+                        if (user != null)
+                            editorManager.jumpToUser(user);
+                    }
+                } else {
+                    log.warn("Control is not instance of Tree.");
+                }
+            }
+        });
 
         /*
          * RIGHT COLUMN
