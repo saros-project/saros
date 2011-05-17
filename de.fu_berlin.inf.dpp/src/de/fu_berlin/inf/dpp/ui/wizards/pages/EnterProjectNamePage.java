@@ -352,7 +352,8 @@ public class EnterProjectNamePage extends WizardPage {
             GridData.FILL_HORIZONTAL | GridData.GRAB_HORIZONTAL));
         copyToBeforeUpdateText.setFocus();
         copyToBeforeUpdateText.setText(EnterProjectNamePageUtils
-            .findProjectNameProposal(this.remoteProjectNames.get(projectID)));
+            .findProjectNameProposal(this.remoteProjectNames.get(projectID)
+                + "-copy"));
         this.copyToBeforeUpdateTexts.put(projectID, copyToBeforeUpdateText);
 
         Composite scanGroup = new Composite(workArea, SWT.NONE);
