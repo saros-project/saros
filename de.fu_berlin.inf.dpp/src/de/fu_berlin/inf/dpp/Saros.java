@@ -542,26 +542,17 @@ public class Saros extends AbstractUIPlugin {
         if (securePrefs == null) {
             try {
                 File storeFile = new File(getStateLocation().toFile(), "/.pref");
-                URL workspaceLocation = storeFile.toURI().toURL();
+                URI workspaceURI = storeFile.toURI();
 
                 /*
                  * The SecurePreferencesFactory does not accept percent-encoded
                  * URLs, so we must decode the URL before passing it.
                  */
                 String prefLocation = URLDecoder.decode(
-                    workspaceLocation.toString(), "UTF-8");
+                    workspaceURI.toString(), "UTF-8");
+                URL prefURL = new URL(prefLocation);
 
-                /*
-                 * If the URL has changed after decoding, a reserved character
-                 * is used in the workspace location. Fallback to default
-                 * location.
-                 */
-                if (!workspaceLocation.toString().equals(prefLocation))
-                    throw new MalformedURLException(
-                        "A URL reserved character has been used in the workspace location");
-
-                securePrefs = SecurePreferencesFactory.open(new URL(
-                    prefLocation), null);
+                securePrefs = SecurePreferencesFactory.open(prefURL, null);
             } catch (MalformedURLException e) {
                 log.error("Problem with URL when attempting to access secure preferences: "
                     + e);
