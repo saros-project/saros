@@ -3,6 +3,9 @@
    <description url="http://dpp.sf.net/update">
       Site to install the Saros Feature for Distributed Party Programming
    </description>
+   <feature url="http://downloads.sourceforge.net/dpp/de.fu_berlin.inf.dpp.feature_11.5.6.r3294.jar?use_mirror=dfn" id="de.fu_berlin.inf.dpp.feature" version="11.5.6.r3294">
+      <category name="DPP"/>
+   </feature>
    <feature url="http://downloads.sourceforge.net/dpp/de.fu_berlin.inf.dpp.feature_11.3.25.r3201.jar?use_mirror=dfn" id="de.fu_berlin.inf.dpp.feature" version="11.3.25.r3201">
       <category name="DPP"/>
    </feature>
@@ -51,6 +54,8 @@
    <feature url="http://downloads.sourceforge.net/dpp/de.fu_berlin.inf.dpp.feature_10.1.29.r1970.jar?use_mirror=dfn" id="de.fu_berlin.inf.dpp.feature" version="10.1.29.r1970">
       <category name="DPP"/>
    </feature>
+   <archive path="plugins/de.fu_berlin.inf.dpp_11.5.6.r3294.jar" url="http://downloads.sourceforge.net/dpp/de.fu_berlin.inf.dpp_11.5.6.r3294.jar?use_mirror=dfn"/>
+   <archive path="plugins/de.fu_berlin.inf.dpp.whiteboard_11.5.6.r3294.jar" url="http://downloads.sourceforge.net/dpp/de.fu_berlin.inf.dpp.whiteboard_11.5.6.r3294.jar?use_mirror=dfn"/>
    <archive path="plugins/de.fu_berlin.inf.dpp_11.3.25.r3201.jar" url="http://downloads.sourceforge.net/dpp/de.fu_berlin.inf.dpp_11.3.25.r3201.jar?use_mirror=dfn"/>
    <archive path="plugins/de.fu_berlin.inf.dpp.whiteboard_11.3.25.r3201.jar" url="http://downloads.sourceforge.net/dpp/de.fu_berlin.inf.dpp.whiteboard_11.3.25.r3201.jar?use_mirror=dfn"/>
    <archive path="plugins/de.fu_berlin.inf.dpp_11.2.25.r3105.jar" url="http://downloads.sourceforge.net/dpp/de.fu_berlin.inf.dpp_11.2.25.r3105.jar?use_mirror=dfn"/>

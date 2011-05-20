@@ -2,7 +2,7 @@
 <feature
       id="de.fu_berlin.inf.dpp.feature"
       label="Saros Feature"
-      version="11.3.25.r3201">
+      version="11.5.6.r3294">
 
    <description>
       Distributed Party Programming for Eclipse.
@@ -371,14 +371,14 @@ Public License instead of this License.
          id="de.fu_berlin.inf.dpp"
          download-size="0"
          install-size="0"
-         version="11.3.25.r3201"
+         version="11.5.6.r3294"
          unpack="false"/>
 
    <plugin
          id="de.fu_berlin.inf.dpp.whiteboard"
          download-size="0"
          install-size="0"
-         version="11.3.25.r3201"
+         version="11.5.6.r3294"
          unpack="false"/>
 
 </feature>
