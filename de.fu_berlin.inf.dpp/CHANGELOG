@@ -1,3 +1,41 @@
+11.5.20
+=======
+[FEATURE] IBB Warning logo animation
+[FEATURE] Secure storage for account data, with optional encryption.
+[FIX / FEATURE] #3300595 Double-click on Buddy causes „Jump to position"
+
+[FIX] #3300578 Fix slightly incorrect URL decoding, so that each workspace (regardless of having URL reserved characters) can have its own secure storage location.
+[FIX] #3267113 Conversion to sound file no longer done using URI conversion (certain URI-reserved characters meant that the path was distorted).
+[FIX] #3300592 Append "copy" when accepting a project and creating a new copy for an existing project. 
+[FIX] #3300587: Session invite wizard, title now referencing a button "Accept". Finish-button-label set to "Accept"
+[FIX] #3300590: Session invite wizard now gives a short information about the next events.
+[FIX] Error messages in "Create/Enter/Edit XMPP/Jabber Account" wizards shown correctly at all times.
+[FIX] #3293652 - "Add XMPP/Jabber Account"	Wizard defect (by Björn K.)
+[FIX] Socks5Proxy initialisation improved for multiple IP addresses
+[FIX] #3276197 Wrong VoIP Icon on Buddy Context menu
+[FIX] #3182202 doubled XMPP accounts
+	[FIX] #3182202 It is not possible to add a second account with same
+JID as an existing one
+		  - existence check in Create, Enter and Edit XMPP account
+wizard pages
+	[FIX] Cannot finish "Add XMPP/Jabber Account"-wizard anymore when it
+is invalid
+		  - AddXMPPAccountWizard was not checking for page complete
+	[FIX] Passwords are not trimmed anymore
+[FIX] Part 2 whiteboard timeout fix
+[FIX] URGENT Part 1 of whiteboard timeout/sync fix
+[FIX] #3284469 Disappearing accounts with multiple accounts
+[FIX] Anti IBB transfer crash
+[FIX] JDT dependency and whiteboard view appears at start up
+[FEATURE]/[UI] Connection state aware GUI
+[FIX] #3267743 Follow button and buddy marked as followed are not in sync
+[FIX] Leave/Stop Session does not show up in the context menu of the
+SarosView
+	
+[UI] Updated icons for give/remove write access
+
+
+
 11.3.25
 =======
 [FEATURE, UI] Introducing the new Saros View.
