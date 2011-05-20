@@ -257,8 +257,8 @@ public class EnterXMPPAccountWizardPage extends WizardPage {
             setMessage(null);
         }
 
-        if (isJIDValid && isPasswordNotEmpty && isXMPPServerValid
-            && !accountExists) {
+        if ((isJIDValid && isPasswordNotEmpty && isXMPPServerValid && !accountExists)
+            || isXMPPAccountCreated) {
             /*
              * TODO Connect and login attempt to new server Not done because
              * Saros.connect holds the whole connection code. Few reusable code.
@@ -269,14 +269,12 @@ public class EnterXMPPAccountWizardPage extends WizardPage {
         } else {
             if (!isJIDValid && wasJIDValid) {
                 setErrorMessage(Messages.jid_format_errorMessage);
+            } else if (accountExists) {
+                setErrorMessage(Messages.account_exists_errorMessage);
             } else if (!isPasswordNotEmpty && wasPasswordValid) {
                 setErrorMessage(Messages.password_empty_errorMessage);
             } else if (!isXMPPServerValid && wasXMPPServerValid) {
                 setErrorMessage(Messages.server_unresolvable_errorMessage);
-            } else if (accountExists) {
-                setErrorMessage(Messages.account_exists_errorMessage);
-            } else {
-                setErrorMessage(null);
             }
             setPageComplete(false);
         }

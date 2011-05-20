@@ -101,6 +101,8 @@ public class JoinSessionWizard extends Wizard {
     @Override
     public void createPageControls(Composite pageContainer) {
         this.descriptionPage.createControl(pageContainer);
+        this.wizardDialog.setWizardButtonLabel(IDialogConstants.FINISH_ID,
+            "Accept");
     }
 
     @Override

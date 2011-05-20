@@ -2,8 +2,6 @@ package de.fu_berlin.inf.dpp.ui.sounds;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.URL;
 
 import org.apache.log4j.Logger;
@@ -32,18 +30,11 @@ public class SoundManager {
         try {
             url = FileLocator.toFileURL(url);
         } catch (IOException e1) {
-            log.debug("could not convert to file-url", e1);
+            log.debug("Could not convert to file URL:", e1);
             return null;
         }
-        URI uri = null;
-        try {
-            uri = url.toURI();
-        } catch (URISyntaxException e) {
-            log.debug("could not cast url to uri", e);
-            return null;
-        }
-        File file = new File(uri);
+
+        File file = new File(url.getFile());
         return file;
     }
-
 }
