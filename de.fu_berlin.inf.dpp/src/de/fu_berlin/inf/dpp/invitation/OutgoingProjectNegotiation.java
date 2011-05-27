@@ -56,7 +56,7 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
      * this maps the currently exchanging projects. projectID => project in
      * workspace
      */
-    protected Map<String, IProject> projects;
+    protected List<IProject> projects;
     protected boolean doStream;
 
     protected ISarosSession sarosSession;
@@ -74,10 +74,14 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
 
     protected boolean useVersionControl;
 
+    protected List<ProjectExchangeInfo> pInfos;
+
     public OutgoingProjectNegotiation(ITransmitter transmitter, JID to,
         ISarosSession sarosSession, List<IProject> projects,
         ProjectNegotiationObservable projectExchangeProcesses,
-        StopManager stopManager, SessionIDObservable sessionID, boolean doStream, SarosContext sarosContext) {
+        StopManager stopManager, SessionIDObservable sessionID,
+        boolean doStream, SarosContext sarosContext,
+        List<ProjectExchangeInfo> projectExchangeInfos) {
         super(transmitter, to, projectExchangeProcesses, sarosContext);
 
         this.processID = String.valueOf(INVITATION_RAND.nextLong());
@@ -86,10 +90,8 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
         this.sarosSession = sarosSession;
         this.sessionID = sessionID;
         this.stopManager = stopManager;
-        this.projects = new HashMap<String, IProject>();
-        for (IProject project : projects) {
-            this.projects.put(sarosSession.getProjectID(project), project);
-        }
+        this.projects = projects;
+        this.pInfos = projectExchangeInfos;
 
     }
 
@@ -131,25 +133,34 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
 
     private void sendFileList(SubMonitor subMonitor)
         throws LocalCancellationException {
+        if (this.pInfos == null) {
+            subMonitor.setTaskName("Creating file list...");
+            subMonitor.setWorkRemaining(100);
+            useVersionControl = sarosSession.useVersionControl();
+            pInfos = new ArrayList<ProjectExchangeInfo>(this.projects.size());
+            for (IProject project : projects) {
+                if (subMonitor.isCanceled())
+                    throw new LocalCancellationException(null,
+                        CancelOption.NOTIFY_PEER);
+                try {
+                    FileList fileList = new FileList(project,
+                        useVersionControl, subMonitor.newChild(0));
+                    fileList.setProjectID(sarosSession.getProjectID(project));
+                    ProjectExchangeInfo pInfo = new ProjectExchangeInfo(
+                        sarosSession.getProjectID(project), "",
+                        project.getName(), fileList);
+                    pInfos.add(pInfo);
 
-        subMonitor.setTaskName("Creating file list...");
-        subMonitor.worked(50);
-        useVersionControl = sarosSession.useVersionControl();
-        List<ProjectExchangeInfo> pInfos = new ArrayList<ProjectExchangeInfo>(
-            this.projects.size());
-        try {
-            for (IProject project : projects.values()) {
-                FileList fileList = new FileList(project, useVersionControl);
-                fileList.setProjectID(sarosSession.getProjectID(project));
-                ProjectExchangeInfo pInfo = new ProjectExchangeInfo(
-                    sarosSession.getProjectID(project), "", project.getName(),
-                    fileList);
-                pInfos.add(pInfo);
+                } catch (CoreException e) {
+                    throw new LocalCancellationException(e.getMessage(),
+                        CancelOption.NOTIFY_PEER);
+                }
+                subMonitor.worked(100 / projects.size());
             }
-        } catch (CoreException e) {
-            throw new LocalCancellationException(e.getMessage(),
-                CancelOption.NOTIFY_PEER);
         }
+        if (subMonitor.isCanceled())
+            throw new LocalCancellationException(null, CancelOption.NOTIFY_PEER);
+        subMonitor.subTask("");
         log.debug("Inv" + Utils.prefix(peer) + ": Sending file list...");
         subMonitor.setTaskName("Sending file list...");
         this.sarosSession.sendActivity(sarosSession.getUser(peer),
@@ -201,7 +212,7 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
     @Override
     public Map<String, String> getProjectNames() {
         Map<String, String> result = new HashMap<String, String>();
-        for (IProject project : this.projects.values()) {
+        for (IProject project : this.projects) {
             result.put(sarosSession.getProjectID(project), project.getName());
         }
         return result;
@@ -378,7 +389,7 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
             // they have changed. How to ask Eclipse whether there are resource
             // changes?
             // if (outInvitationUI.confirmProjectSave(peer))
-            for (IProject project : projects.values()) {
+            for (IProject project : projects) {
                 EditorAPI.saveProject(project, false);
             }
             // else
@@ -466,7 +477,8 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
                 List<IPath> toSend = this.projectFilesToSend.get(projectID);
                 zout = new ZipOutputStream(output);
                 for (IPath path : toSend) {
-                    IFile file = this.projects.get(projectID).getFile(path);
+                    IFile file = sarosSession.getProject(projectID).getFile(
+                        path);
                     String absPath = file.getLocation().toPortableString();
 
                     byte[] buffer = new byte[streamService.getChunkSize()[0]];

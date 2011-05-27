@@ -1,10 +1,13 @@
 package de.fu_berlin.inf.dpp.invitation;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.log4j.Logger;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.picocontainer.annotations.Inject;
@@ -12,6 +15,7 @@ import org.picocontainer.annotations.Inject;
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.SarosContext;
 import de.fu_berlin.inf.dpp.User;
+import de.fu_berlin.inf.dpp.activities.ProjectExchangeInfo;
 import de.fu_berlin.inf.dpp.communication.muc.MUCManager;
 import de.fu_berlin.inf.dpp.communication.muc.negotiation.MUCSessionPreferences;
 import de.fu_berlin.inf.dpp.communication.muc.negotiation.MUCSessionPreferencesNegotiatingManager;
@@ -102,6 +106,15 @@ public class OutgoingSessionNegotiation extends InvitationProcess {
 
     public void start(SubMonitor monitor) throws SarosCancellationException {
 
+        /*
+         * Before the session or even project invitation can begin, we have to
+         * create the list of ProjectExchangeInfo containing the project
+         * dependent FileList.
+         */
+        List<ProjectExchangeInfo> projectExchangeInfos = sarosSessionManager
+            .createProjectExchangeInfoList(
+                new ArrayList<IProject>(sarosSession.getProjects()), monitor);
+
         log.debug("Inv" + Utils.prefix(peer) + ": Invitation has started.");
 
         monitor.beginTask("Invitation has started.", 101);
@@ -119,10 +132,10 @@ public class OutgoingSessionNegotiation extends InvitationProcess {
 
             User newUser = addUserToSession();
 
-            completeInvitation(monitor.newChild(3));
+            completeInvitation(monitor.newChild(3), projectExchangeInfos);
 
-            sarosSessionManager.notifyPostOutgoingInvitationCompleted(monitor.newChild(1),
-                newUser);
+            sarosSessionManager.notifyPostOutgoingInvitationCompleted(
+                monitor.newChild(1), newUser);
 
         } catch (LocalCancellationException e) {
             localCancel(e.getMessage(), e.getCancelOption());
@@ -338,7 +351,8 @@ public class OutgoingSessionNegotiation extends InvitationProcess {
         cancellationCause = new RemoteCancellationException(errorMsg);
     }
 
-    protected void completeInvitation(SubMonitor subMonitor)
+    protected void completeInvitation(SubMonitor subMonitor,
+        List<ProjectExchangeInfo> projectExchangeInfos)
         throws SarosCancellationException {
 
         log.debug("Inv" + Utils.prefix(peer)
@@ -367,7 +381,7 @@ public class OutgoingSessionNegotiation extends InvitationProcess {
         log.debug("Inv" + Utils.prefix(peer)
             + ": Invitation has completed successfully.");
 
-        sarosSessionManager.startSharingProjects(peer);
+        sarosSessionManager.startSharingProjects(peer, projectExchangeInfos);
 
     }
 

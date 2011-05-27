@@ -9,6 +9,7 @@ import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
 import org.joda.time.DateTime;
 
+import de.fu_berlin.inf.dpp.activities.ProjectExchangeInfo;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.communication.muc.negotiation.MUCSessionPreferences;
 import de.fu_berlin.inf.dpp.invitation.OutgoingProjectNegotiation;
@@ -116,6 +117,6 @@ public interface ISarosSessionManager {
      * initiate the ({@link OutgoingProjectNegotiation project exchanging}) with
      * user
      */
-    public void startSharingProjects(JID user);
+    public void startSharingProjects(JID user, List<ProjectExchangeInfo> projectExchangeInfos);
 
 }

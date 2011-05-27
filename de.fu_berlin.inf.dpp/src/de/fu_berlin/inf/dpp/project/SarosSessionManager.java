@@ -31,6 +31,7 @@ import java.util.concurrent.locks.ReentrantLock;
 import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -423,6 +424,7 @@ public class SarosSessionManager implements IConnectionListener,
             super("Inviting " + process.getPeer().getBase() + "...");
             this.process = process;
             this.peer = process.getPeer().getBase();
+            this.setUser(true);
             setProperty(IProgressConstants.KEEP_PROPERTY, Boolean.TRUE);
             setProperty(IProgressConstants.ICON_PROPERTY,
                 ImageManager
@@ -525,7 +527,7 @@ public class SarosSessionManager implements IConnectionListener,
             OutgoingProjectNegotiation out = new OutgoingProjectNegotiation(
                 transmitter, user.getJID(), this.getSarosSession(),
                 projectsToAdd, projectExchangeProcesses, stopManager,
-                sessionID, doStream, sarosContext);
+                sessionID, doStream, sarosContext, null);
             OutgoingProjectJob job = new OutgoingProjectJob(out);
             job.schedule();
         }
@@ -538,22 +540,67 @@ public class SarosSessionManager implements IConnectionListener,
      * 
      * @param user
      *            JID of session participant to share projects with
+     * @param projectExchangeInfos
+     *            List of ProjectExchangeInfo containing the project dependent
+     *            FileList
      */
-    public void startSharingProjects(JID user) {
+    public void startSharingProjects(JID user,
+        List<ProjectExchangeInfo> projectExchangeInfos) {
         boolean doStream = prefStore
             .getBoolean(PreferenceConstants.STREAM_PROJECT);
         List<IProject> projectsToShare = new ArrayList<IProject>(this
             .getSarosSession().getProjects());
 
-        if (!projectsToShare.isEmpty()) {
+        if (!projectsToShare.isEmpty() && !projectExchangeInfos.isEmpty()) {
             OutgoingProjectNegotiation out = new OutgoingProjectNegotiation(
                 transmitter, user, this.getSarosSession(), projectsToShare,
                 projectExchangeProcesses, stopManager, sessionID, doStream,
-                sarosContext);
+                sarosContext, projectExchangeInfos);
             OutgoingProjectJob job = new OutgoingProjectJob(out);
             job.schedule();
         }
 
+    }
+
+    /**
+     * Method to create list of ProjectExchangeInfo.
+     * 
+     * @param projectsToShare
+     *            List of projects initially to share
+     * @param subMonitor
+     * @return
+     * @throws LocalCancellationException
+     */
+    public List<ProjectExchangeInfo> createProjectExchangeInfoList(
+        List<IProject> projectsToShare, SubMonitor subMonitor)
+        throws LocalCancellationException {
+        subMonitor.setTaskName("Creating file list...");
+        subMonitor.setWorkRemaining(100);
+        List<ProjectExchangeInfo> pInfos = new ArrayList<ProjectExchangeInfo>(
+            projectsToShare.size());
+        for (IProject project : projectsToShare) {
+            if (subMonitor.isCanceled())
+                throw new LocalCancellationException(null,
+                    CancelOption.DO_NOT_NOTIFY_PEER);
+            try {
+                FileList fileList = new FileList(project, this
+                    .getSarosSession().useVersionControl(),
+                    subMonitor.newChild(0));
+                fileList.setProjectID(this.getSarosSession().getProjectID(
+                    project));
+                ProjectExchangeInfo pInfo = new ProjectExchangeInfo(this
+                    .getSarosSession().getProjectID(project), "",
+                    project.getName(), fileList);
+                pInfos.add(pInfo);
+            } catch (CoreException e) {
+                throw new LocalCancellationException(e.getMessage(),
+                    CancelOption.DO_NOT_NOTIFY_PEER);
+            }
+            subMonitor.worked(100 / projectsToShare.size());
+        }
+        subMonitor.subTask("");
+        subMonitor.done();
+        return pInfos;
     }
 
     protected class OutgoingProjectJob extends Job {
@@ -575,6 +622,7 @@ public class SarosSessionManager implements IConnectionListener,
                 + outgoingProjectNegotiation.getProjectNames() + ".");
             this.process = outgoingProjectNegotiation;
             this.peer = process.getPeer().getBase();
+            this.setUser(true);
             setProperty(IProgressConstants.KEEP_PROPERTY, Boolean.TRUE);
             setProperty(IProgressConstants.ICON_PROPERTY,
                 ImageManager.getImageDescriptor("/icons/invites.png"));

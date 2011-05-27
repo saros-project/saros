@@ -1,6 +1,5 @@
 package de.fu_berlin.inf.dpp.ui.wizards;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -15,11 +14,11 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IPageChangingListener;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.dialogs.PageChangingEvent;
-import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.swt.widgets.Shell;
 
@@ -28,6 +27,7 @@ import de.fu_berlin.inf.dpp.FileListDiff;
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
 import de.fu_berlin.inf.dpp.exceptions.RemoteCancellationException;
+import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
 import de.fu_berlin.inf.dpp.invitation.IncomingProjectNegotiation;
 import de.fu_berlin.inf.dpp.invitation.ProcessTools.CancelLocation;
 import de.fu_berlin.inf.dpp.invitation.ProcessTools.CancelOption;
@@ -70,11 +70,10 @@ public class AddProjectToSessionWizard extends Wizard {
         this.dataTransferManager = dataTransferManager;
         this.preferenceUtils = preferenceUtils;
         setWindowTitle("Add Projects");
-        
-        /** holds if the wizard close is because of an exception or not */
-        isExceptionCancel = false;      
 
-        this.setNeedsProgressMonitor(true);
+        /** holds if the wizard close is because of an exception or not */
+        isExceptionCancel = false;
+
     }
 
     @Override
@@ -145,32 +144,24 @@ public class AddProjectToSessionWizard extends Wizard {
         }
         if (!confirmOverwritingProjectResources(projectsToOverrideWithDiff))
             return false;
-        try {
-            getContainer().run(true, true, new IRunnableWithProgress() {
-                public void run(IProgressMonitor monitor)
-                    throws InvocationTargetException, InterruptedException {
-                    try {
 
-                        // AddProjectToSessionWizard.this.process.accept(source,
-                        // SubMonitor.convert(monitor), target, skip);
-                        AddProjectToSessionWizard.this.process.accept(
-                            projectNames, SubMonitor.convert(monitor),
-                            skipProjectSyncing, useVersionControl);
-                    } catch (Exception e) {
-                        throw new InvocationTargetException(e);
-                    }
+        Job job = new Job("Synchronizing") {
+            @Override
+            protected IStatus run(IProgressMonitor monitor) {
+                try {
+                    AddProjectToSessionWizard.this.process.accept(projectNames,
+                        SubMonitor.convert(monitor), skipProjectSyncing,
+                        useVersionControl);
+                } catch (SarosCancellationException e) {
+                    processException(e.getCause());
+                    return Status.CANCEL_STATUS;
                 }
-            });
-        } catch (InvocationTargetException e) {
-            processException(e.getCause());
-            return false;
-        } catch (InterruptedException e) {
-            log.error("Code not designed to be interrupted.", e);
-            processException(e);
-            return false;
-        }
+                return Status.OK_STATUS;
+            }
+        };
+        job.setUser(true);
+        job.schedule();
 
-        getShell().forceActive();
         return true;
     }
 

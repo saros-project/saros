@@ -38,6 +38,7 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.SubMonitor;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
@@ -186,18 +187,17 @@ public class FileList {
      * @param useVersionControl
      *            If false, the FileList won't include version control
      *            information.
+     * @param subMonitor
      * @throws CoreException
      *             Exception that might happen while fetching the files from the
      *             given container.
      * 
-     *             TODO 4 - Use ProgressMonitors to keep track of the creation
-     *             of a FileList
      */
-    public FileList(IContainer container, boolean useVersionControl)
-        throws CoreException {
+    public FileList(IContainer container, boolean useVersionControl,
+        SubMonitor subMonitor) throws CoreException {
         this(useVersionControl);
         container.refreshLocal(IResource.DEPTH_INFINITE, null);
-        addMembers(container.members());
+        addMembers(container.members(), subMonitor);
     }
 
     /**
@@ -214,7 +214,7 @@ public class FileList {
     public FileList(IResource[] resources, boolean useVersionControl)
         throws CoreException {
         this(useVersionControl);
-        addMembers(resources);
+        addMembers(resources, null);
     }
 
     /**
@@ -234,7 +234,7 @@ public class FileList {
     }
 
     public FileList(IProject source) throws CoreException {
-        this(source, true);
+        this(source, true, null);
     }
 
     /**
@@ -282,7 +282,8 @@ public class FileList {
      */
     public int computeMatch(IProject project) {
         try {
-            return this.computeMatch(new FileList(project, useVersionControl));
+            return this.computeMatch(new FileList(project, useVersionControl,
+                null));
         } catch (CoreException e) {
             log.error("Failed to generate FileList for match computation", e);
         }
@@ -358,7 +359,8 @@ public class FileList {
         return paths;
     }
 
-    private void addMembers(IResource[] resources) throws CoreException {
+    private void addMembers(IResource[] resources, SubMonitor subMonitor)
+        throws CoreException {
         if (resources.length == 0)
             return;
         IProject project = null;
@@ -396,7 +398,9 @@ public class FileList {
 
                     if (isManagedProject)
                         addVCSInfo(resource, data, vcs);
-
+                    if (subMonitor != null)
+                        subMonitor.subTask(file.getProject().getName() + ": "
+                            + file.getName());
                     this.entries.put(file.getProjectRelativePath(), data);
                 } catch (IOException e) {
                     log.error(e);
@@ -416,8 +420,12 @@ public class FileList {
                     if (!addVCSInfo(resource, data, vcs))
                         data = null;
                 }
+                if (subMonitor != null)
+                    subMonitor.subTask(folder.getProject().getName() + ": "
+                        + folder.getName());
                 this.entries.put(path, data);
-                addMembers(folder.members());
+
+                addMembers(folder.members(), subMonitor);
             }
         }
     }

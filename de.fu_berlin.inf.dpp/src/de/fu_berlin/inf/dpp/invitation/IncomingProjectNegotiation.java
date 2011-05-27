@@ -686,7 +686,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
     private FileList computeRequiredFiles(IProject currentLocalProject,
         FileList remoteFileList, boolean skipSync, VCSAdapter vcs,
         SubMonitor monitor) throws LocalCancellationException, IOException {
-        monitor.beginTask(null, 100);
+        monitor.beginTask("Compute required Files...", 100);
 
         if (skipSync) {
             return new FileList();
@@ -695,7 +695,8 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
         FileListDiff filesToSynchronize = null;
         FileList localFileList = null;
         try {
-            localFileList = new FileList(currentLocalProject, vcs != null);
+            localFileList = new FileList(currentLocalProject, vcs != null,
+                monitor.newChild(1));
         } catch (CoreException e) {
             e.printStackTrace();
             return new FileList();
