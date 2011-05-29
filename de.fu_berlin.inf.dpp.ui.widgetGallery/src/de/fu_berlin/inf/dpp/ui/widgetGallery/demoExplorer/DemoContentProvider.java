@@ -7,6 +7,7 @@ import org.eclipse.jface.viewers.IContentProvider;
 import org.eclipse.jface.viewers.Viewer;
 
 import de.fu_berlin.inf.dpp.ui.model.TreeContentProvider;
+import de.fu_berlin.inf.dpp.ui.widgetGallery.demoSuits.AbstractDemo;
 
 /**
  * {@link IContentProvider} for use in conjunction with a {@link AbstractDemo} input.

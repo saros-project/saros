@@ -6,7 +6,7 @@ import org.eclipse.swt.widgets.Label;
 
 import de.fu_berlin.inf.dpp.ui.util.LayoutUtils;
 import de.fu_berlin.inf.dpp.ui.widgetGallery.annotations.Demo;
-import de.fu_berlin.inf.dpp.ui.widgetGallery.demoExplorer.AbstractDemo;
+import de.fu_berlin.inf.dpp.ui.widgetGallery.demoSuits.AbstractDemo;
 import de.fu_berlin.inf.dpp.ui.widgets.viewer.rosterSession.BuddySessionDisplayComposite;
 
 @Demo("This BuddyDisplayComposite IPostSelectionProvider.\nIf you selected buddies and switch to another buddy demo you\n"

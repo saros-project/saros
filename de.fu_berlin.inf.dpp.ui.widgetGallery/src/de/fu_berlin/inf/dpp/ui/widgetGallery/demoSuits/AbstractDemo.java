@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.ui.widgetGallery.demoExplorer;
+package de.fu_berlin.inf.dpp.ui.widgetGallery.demoSuits;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;

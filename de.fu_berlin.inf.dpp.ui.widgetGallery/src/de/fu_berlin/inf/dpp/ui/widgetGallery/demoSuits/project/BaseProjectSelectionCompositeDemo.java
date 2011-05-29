@@ -12,7 +12,7 @@ import org.eclipse.ui.IWorkbenchPart;
 import de.fu_berlin.inf.dpp.ui.util.selection.SelectionUtils;
 import de.fu_berlin.inf.dpp.ui.util.selection.retriever.SelectionRetrieverFactory;
 import de.fu_berlin.inf.dpp.ui.widgetGallery.annotations.Demo;
-import de.fu_berlin.inf.dpp.ui.widgetGallery.demoExplorer.AbstractDemo;
+import de.fu_berlin.inf.dpp.ui.widgetGallery.demoSuits.AbstractDemo;
 import de.fu_berlin.inf.dpp.ui.widgets.viewer.project.BaseProjectSelectionComposite;
 
 @Demo("This demo show a BaseProjectSelectionComposite that reflects the currently selected projects in the workbench.")

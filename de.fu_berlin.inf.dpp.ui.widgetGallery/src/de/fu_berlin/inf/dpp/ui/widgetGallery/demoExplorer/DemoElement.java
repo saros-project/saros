@@ -7,6 +7,7 @@ import org.eclipse.swt.graphics.Image;
 import de.fu_berlin.inf.dpp.ui.model.TreeElement;
 import de.fu_berlin.inf.dpp.ui.widgetGallery.ImageManager;
 import de.fu_berlin.inf.dpp.ui.widgetGallery.annotations.Demo;
+import de.fu_berlin.inf.dpp.ui.widgetGallery.demoSuits.AbstractDemo;
 
 /**
  * Wrapper for {@link AbstractDemo}s for use with {@link Viewer Viewers}

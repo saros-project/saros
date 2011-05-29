@@ -14,7 +14,7 @@ import org.eclipse.swt.widgets.MessageBox;
 
 import de.fu_berlin.inf.dpp.ui.util.LayoutUtils;
 import de.fu_berlin.inf.dpp.ui.widgetGallery.annotations.Demo;
-import de.fu_berlin.inf.dpp.ui.widgetGallery.demoExplorer.AbstractDemo;
+import de.fu_berlin.inf.dpp.ui.widgetGallery.demoSuits.AbstractDemo;
 import de.fu_berlin.inf.dpp.ui.widgets.explanation.note.NoteComposite;
 
 @Demo("Different NoteComposites with various system icons and colors")

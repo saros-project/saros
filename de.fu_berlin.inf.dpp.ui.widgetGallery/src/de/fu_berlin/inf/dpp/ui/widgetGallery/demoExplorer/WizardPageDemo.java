@@ -7,6 +7,8 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 
+import de.fu_berlin.inf.dpp.ui.widgetGallery.demoSuits.AbstractDemo;
+
 public abstract class WizardPageDemo extends AbstractDemo {
 
     protected IWizardPage wizardPage;
