@@ -12,8 +12,10 @@ import de.fu_berlin.inf.dpp.ui.widgetGallery.application.Activator;
  */
 public class ImageManager {
 
-    public static Image RELOAD = getImage("icons/reload.png");
+    public static Image RELOAD = getImage("icons/elcl16/reload.png");
     public static Image WIDGET_GALLERY_32 = getImage("icons/widget_gallery_misc32.png");
+    public static Image DEMO_SUITE = getImage("icons/obj16/demo_suite.png");
+    public static Image DEMO = getImage("icons/obj16/demo.png");
 
     /**
      * Returns an image from the file at the given plug-in relative path.

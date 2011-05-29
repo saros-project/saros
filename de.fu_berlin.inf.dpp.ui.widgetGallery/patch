@@ -1,0 +1,16 @@
+Index: src/de/fu_berlin/inf/dpp/ui/widgetGallery/suits/wizard/wizards/AllWizardsDemo.java
+===================================================================
+--- src/de/fu_berlin/inf/dpp/ui/widgetGallery/suits/wizard/wizards/AllWizardsDemo.java	(revision 3288)
++++ src/de/fu_berlin/inf/dpp/ui/widgetGallery/suits/wizard/wizards/AllWizardsDemo.java	(working copy)
+@@ -28,6 +28,11 @@
+ 	parent.setLayout(new GridLayout(1, false));
+ 
+ 	final Map<String, Runnable> wizards = new LinkedHashMap<String, Runnable>();
++	wizards.put("GettingStartedWizard", new Runnable() {
++	    public void run() {
++		WizardUtils.openSarosGettingStartedWizard();
++	    }
++	});
+ 	wizards.put("NewWizard (internal)", new Runnable() {
+ 	    public void run() {
+ 		WizardUtils.openNewProjectWizard();

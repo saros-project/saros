@@ -1,0 +1,21 @@
+package de.fu_berlin.inf.dpp.ui.widgetGallery.demoSuits.instruction.explanation.list;
+
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.widgets.Composite;
+
+import de.fu_berlin.inf.dpp.ui.widgetGallery.annotations.Demo;
+import de.fu_berlin.inf.dpp.ui.widgetGallery.demoExplorer.AbstractDemo;
+import de.fu_berlin.inf.dpp.ui.widgets.explanation.ListExplanationComposite;
+import de.fu_berlin.inf.dpp.ui.widgets.explanation.ListExplanationComposite.ListExplanation;
+
+@Demo
+public class IntroductoryTextOnlyListExplanationCompositeDemo extends AbstractDemo {
+    @Override
+    public void createDemo(Composite parent) {
+	ListExplanationComposite listExplanationComposite = new ListExplanationComposite(
+		parent, SWT.NONE);
+	ListExplanation listItemExplanation = new ListExplanation(
+		SWT.ICON_INFORMATION, "I'm the introductory text...");
+	listExplanationComposite.setExplanation(listItemExplanation);
+    }
+}
