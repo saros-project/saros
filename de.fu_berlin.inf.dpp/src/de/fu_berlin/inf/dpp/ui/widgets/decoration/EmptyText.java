@@ -90,7 +90,7 @@ public class EmptyText {
                  * Modifying the control's test while the focus out occurs does
                  * not seem to work. We therefore defer the text change.
                  */
-                Utils.runSafeSWTAsync(null, new Runnable() {
+                Utils.runSafeSWTSync(null, new Runnable() {
                     public void run() {
                         control.setText(emptyText);
                         control.setForeground(emptyTextForegroundColor);
