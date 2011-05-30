@@ -1,28 +1,48 @@
 package de.fu_berlin.inf.dpp.test.util;
 
-import java.util.concurrent.BlockingQueue;
-
-import junit.framework.AssertionFailedError;
-
-// FIXME: Is this run by TestRunners?
 /**
- * A Thread which puts all Exceptions and AssertionFailedErrors caught into the
- * given BlockingQueue
+ * A Thread which runs the give Runnable. After the thread finished, you might
+ * call verify to ensure that no exceptions where thrown during execution of the
+ * given Runnable
  */
+
 public class TestThread extends Thread {
 
-    public TestThread(final BlockingQueue<Throwable> failures,
-        final Runnable runnable) {
-        super(new Runnable() {
-            public void run() {
-                try {
-                    runnable.run();
-                } catch (Exception e) {
-                    failures.add(e);
-                } catch (AssertionFailedError e) {
-                    failures.add(e);
-                }
-            }
-        });
+    volatile Error error;
+    volatile Exception exception;
+    volatile boolean finished;
+
+    private Runnable runnableToRun;
+
+    public TestThread(Runnable runnable) {
+        this.runnableToRun = runnable;
+        this.setName("Test-Thread:" + runnable.toString());
+    }
+
+    @Override
+    public void run() {
+        try {
+            if (runnableToRun != null)
+                runnableToRun.run();
+        } catch (Exception e) {
+            exception = e;
+        } catch (Error e) {
+            error = e;
+        } finally {
+            finished = true;
+        }
+    }
+
+    public void verify() throws Exception {
+
+        if (!finished)
+            throw new IllegalStateException(this.getName()
+                + " is still running or has not been started at all");
+
+        if (error != null)
+            throw error;
+
+        if (exception != null)
+            throw exception;
     }
 }
