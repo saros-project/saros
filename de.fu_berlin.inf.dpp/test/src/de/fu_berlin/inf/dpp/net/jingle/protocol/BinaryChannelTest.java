@@ -18,6 +18,8 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
+import junit.framework.AssertionFailedError;
+
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
@@ -30,7 +32,6 @@ import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.internal.BinaryChannel;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager.NetTransferMode;
 import de.fu_berlin.inf.dpp.net.internal.TransferDescription;
-import de.fu_berlin.inf.dpp.test.util.TestThread;
 
 /**
  * TODO This class currently references an unused, depreciated BinaryChannel
@@ -713,4 +714,21 @@ public class BinaryChannelTest {
         return clientSender;
     }
 
+    private static class TestThread extends Thread {
+
+        public TestThread(final BlockingQueue<Throwable> failures,
+            final Runnable runnable) {
+            super(new Runnable() {
+                public void run() {
+                    try {
+                        runnable.run();
+                    } catch (Exception e) {
+                        failures.add(e);
+                    } catch (AssertionFailedError e) {
+                        failures.add(e);
+                    }
+                }
+            });
+        }
+    }
 }
