@@ -61,7 +61,7 @@ public class TestEditDuringInvitation extends STFTest {
 
         alice.superBot().views().sarosView().selectBuddy(carl.getJID())
             .addToSarosSession();
-        carl.remoteBot().shell(SHELL_SESSION_INVITATION).confirm(FINISH);
+        carl.remoteBot().shell(SHELL_SESSION_INVITATION).confirm(ACCEPT);
 
         bob.superBot().views().packageExplorerView()
             .selectClass(PROJECT1, PKG1, CLS1).open();

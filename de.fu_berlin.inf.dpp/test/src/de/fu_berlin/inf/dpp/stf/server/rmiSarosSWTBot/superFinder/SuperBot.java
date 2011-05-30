@@ -84,25 +84,28 @@ public class SuperBot extends STFMessages implements ISuperBot {
         shell.bot().radio(RADIO_CREATE_NEW_PROJECT).click();
         shell.bot().button(FINISH).click();
 
-        try {
-            bot().shell(SHELL_ADD_PROJECT).waitLongUntilIsClosed();
-        } catch (Exception e) {
-            /*
-             * sometimes session can not be completely builded because of
-             * unclear reason, so after timeout STF try to close
-             * "the sesion invitation" window, but it can't close the window
-             * before stopping the invitation process. In this case a Special
-             * treatment should be done, so that the following tests still will
-             * be run.
-             */
-            bot().captureScreenshot(
-                bot().getPathToScreenShot()
-                    + "/sessionInvitationFailedUsingNewProject.png");
-            if (bot().activeShell().getText().equals(SHELL_ADD_PROJECT)) {
-                bot().activeShell().bot().toggleButton().click();
+        if (bot().isShellOpen(SHELL_ADD_PROJECT))
+            try {
+                bot().shell(SHELL_ADD_PROJECT).waitLongUntilIsClosed();
+            } catch (Exception e) {
+                e.printStackTrace();
+                /*
+                 * sometimes session can not be completely builded because of
+                 * unclear reason, so after timeout STF try to close
+                 * "the sesion invitation" window, but it can't close the window
+                 * before stopping the invitation process. In this case a
+                 * Special treatment should be done, so that the following tests
+                 * still will be run.
+                 */
+                bot().captureScreenshot(
+                    bot().getPathToScreenShot()
+                        + "/sessionInvitationFailedUsingNewProject.png");
+                if (bot().activeShell().getText().equals(SHELL_ADD_PROJECT)) {
+                    bot().activeShell().bot().toggleButton().click();
+                }
+                throw new RuntimeException("session invitation is failed!"
+                    + e.getMessage());
             }
-            throw new RuntimeException("session invitation is failed!");
-        }
 
     }
 
@@ -332,7 +335,7 @@ public class SuperBot extends STFMessages implements ISuperBot {
         if (!bot().isShellOpen(SHELL_SESSION_INVITATION)) {
             bot().waitLongUntilShellIsOpen(SHELL_SESSION_INVITATION);
         }
-        bot().shell(SHELL_SESSION_INVITATION).confirm(FINISH);
+        bot().shell(SHELL_SESSION_INVITATION).confirm(ACCEPT);
         confirmShellAddProjectUsingWhichProject(projectName, usingWhichProject);
         views().sarosView().waitUntilIsInSession();
     }

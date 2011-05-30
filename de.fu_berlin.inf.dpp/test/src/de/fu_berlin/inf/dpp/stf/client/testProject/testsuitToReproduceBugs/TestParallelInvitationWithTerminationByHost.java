@@ -86,16 +86,17 @@ public class TestParallelInvitationWithTerminationByHost extends STFTest {
 
         carl.remoteBot().waitUntilShellIsOpen(SHELL_SESSION_INVITATION);
         carl.remoteBot().shell(SHELL_SESSION_INVITATION).activate();
-        carl.remoteBot().shell(SHELL_SESSION_INVITATION).confirm(FINISH);
+        carl.remoteBot().shell(SHELL_SESSION_INVITATION).confirm(ACCEPT);
         alice.superBot().views().progressView().removeProcess(1);
         carl.remoteBot().waitLongUntilShellIsOpen(SHELL_INVITATION_CANCELLED);
-        assertTrue(carl.remoteBot().shell(SHELL_INVITATION_CANCELLED).isActive());
+        assertTrue(carl.remoteBot().shell(SHELL_INVITATION_CANCELLED)
+            .isActive());
 
         carl.remoteBot().shell(SHELL_INVITATION_CANCELLED).close();
 
         dave.remoteBot().waitUntilShellIsOpen(SHELL_SESSION_INVITATION);
         dave.remoteBot().shell(SHELL_SESSION_INVITATION).activate();
-        dave.remoteBot().shell(SHELL_SESSION_INVITATION).confirm(FINISH);
+        dave.remoteBot().shell(SHELL_SESSION_INVITATION).confirm(ACCEPT);
 
         // dave.button.clickButton(FINISH);
         alice.superBot().views().progressView().removeProcess(3);
@@ -106,7 +107,8 @@ public class TestParallelInvitationWithTerminationByHost extends STFTest {
         // this process, so dave should never get the window
         // "Invitation canceled".
         dave.remoteBot().waitLongUntilShellIsOpen(SHELL_INVITATION_CANCELLED);
-        assertTrue(dave.remoteBot().shell(SHELL_INVITATION_CANCELLED).isActive());
+        assertTrue(dave.remoteBot().shell(SHELL_INVITATION_CANCELLED)
+            .isActive());
 
         dave.remoteBot().shell(SHELL_INVITATION_CANCELLED).close();
     }

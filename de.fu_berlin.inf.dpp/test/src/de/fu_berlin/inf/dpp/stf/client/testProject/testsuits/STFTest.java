@@ -574,7 +574,7 @@ public class STFTest extends STFMessages {
         inviter.superBot().menuBar().saros()
             .shareProjects(projectName, inviteesJID);
         for (AbstractTester invitee : invitees) {
-            invitee.remoteBot().shell(SHELL_SESSION_INVITATION).confirm(FINISH);
+            invitee.remoteBot().shell(SHELL_SESSION_INVITATION).confirm(ACCEPT);
             invitee.superBot().confirmShellAddProjectUsingWhichProject(
                 projectName, usingWhichProject);
         }
@@ -668,7 +668,8 @@ public class STFTest extends STFMessages {
         if (host != null) {
             host.superBot().views().sarosView()
                 .waitUntilAllPeersLeaveSession(peerJIDs);
-            host.remoteBot().view(VIEW_SAROS).toolbarButton(TB_STOP_SESSION).click();
+            host.remoteBot().view(VIEW_SAROS).toolbarButton(TB_STOP_SESSION)
+                .click();
             host.superBot().views().sarosView().waitUntilIsNotInSession();
         }
 
@@ -760,8 +761,8 @@ public class STFTest extends STFMessages {
             .shareYourScreenWithSelectedBuddy(selectedBuddy.getJID());
         selectedBuddy.remoteBot().waitUntilShellIsOpen(
             SHELL_INCOMING_SCREENSHARING_SESSION);
-        selectedBuddy.remoteBot().shell(SHELL_INCOMING_SCREENSHARING_SESSION).bot()
-            .button(YES).click();
+        selectedBuddy.remoteBot().shell(SHELL_INCOMING_SCREENSHARING_SESSION)
+            .bot().button(YES).click();
     }
 
     /**
@@ -789,7 +790,7 @@ public class STFTest extends STFMessages {
             joinSessionTasks.add(new Callable<Void>() {
                 public Void call() throws Exception {
                     tester.remoteBot().shell(SHELL_SESSION_INVITATION)
-                        .confirm(FINISH);
+                        .confirm(ACCEPT);
                     tester.superBot().confirmShellAddProjectUsingWhichProject(
                         projectName, usingWhichProject);
                     return null;

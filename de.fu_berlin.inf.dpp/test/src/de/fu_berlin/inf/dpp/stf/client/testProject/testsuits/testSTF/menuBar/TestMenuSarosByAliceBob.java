@@ -42,9 +42,10 @@ public class TestMenuSarosByAliceBob extends STFTest {
         shell.bot().tree().selectTreeItem(bob.getBaseJid()).check();
         shell.bot().button(FINISH).click();
         bob.remoteBot().waitUntilShellIsOpen(SHELL_SESSION_INVITATION);
-        IRemoteBotShell shell2 = bob.remoteBot().shell(SHELL_SESSION_INVITATION);
+        IRemoteBotShell shell2 = bob.remoteBot()
+            .shell(SHELL_SESSION_INVITATION);
         shell2.activate();
-        shell2.bot().shell(SHELL_SESSION_INVITATION).confirm(FINISH);
+        shell2.bot().shell(SHELL_SESSION_INVITATION).confirm(ACCEPT);
         bob.superBot().confirmShellAddProjectUsingWhichProject(PROJECT1,
             TypeOfCreateProject.NEW_PROJECT);
         bob.superBot().views().sarosView().waitUntilIsInSession();

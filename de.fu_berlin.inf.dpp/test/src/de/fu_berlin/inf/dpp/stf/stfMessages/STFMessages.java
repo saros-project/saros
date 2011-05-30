@@ -21,7 +21,8 @@ import de.fu_berlin.inf.dpp.net.JID;
 
 public class STFMessages {
 
-    public static final transient Logger log = Logger.getLogger(STFMessages.class);
+    public static final transient Logger log = Logger
+        .getLogger(STFMessages.class);
 
     public enum TreeItemType {
         JAVA_PROJECT, PROJECT, FILE, CLASS, PKG, FOLDER, NULL
@@ -51,6 +52,7 @@ public class STFMessages {
     public final static String NO = "No";
     public final static String CANCEL = "Cancel";
     public final static String FINISH = "Finish";
+    public final static String ACCEPT = "Accept";
     public final static String APPLY = "Apply";
     public final static String NEXT = "Next >";
     public final static String BROWSE = "Browse";
@@ -183,16 +185,14 @@ public class STFMessages {
      * 
      **********************************************/
 
-    public final static String MENU_SAROS = Messages
-        .getString("menu_saros");
+    public final static String MENU_SAROS = Messages.getString("menu_saros");
     public final static String MENU_START_SAROS_CONFIGURATION = Messages
         .getString("menu_start_saros_configuration");
     public final static String MENU_CREATE_ACCOUNT = Messages
         .getString("menu_create_account");
     public final static String MENU_ADD_BUDDY = Messages
         .getString("menu_add_buddy");
-    public final static String ADD_BUDDIES = Messages
-        .getString("add_buddies");
+    public final static String ADD_BUDDIES = Messages.getString("add_buddies");
     public final static String SHARE_PROJECTS = Messages
         .getString("share_projects");
     public final static String MENU_PREFERENCES = Messages
@@ -263,8 +263,7 @@ public class STFMessages {
     static public final String CHECKBOX_START_FOLLOW_MODE = Messages
         .getString("checkbox_label_start_in_follow_mode_in_shell-saros-preferences");
 
-    static public final String NODE_SAROS = Messages
-        .getString("node_saros");
+    static public final String NODE_SAROS = Messages.getString("node_saros");
     static public final String NODE_SAROS_FEEDBACK = Messages
         .getString("node_Saros_feedback");
     static public final String NODE_SAROS_ADVANCED = Messages
@@ -293,8 +292,7 @@ public class STFMessages {
     /*
      * View infos
      */
-    public final static String VIEW_SAROS = Messages
-        .getString("view_saros");
+    public final static String VIEW_SAROS = Messages.getString("view_saros");
     public final static String VIEW_SAROS_ID = Messages
         .getString("view_saros_id");
 
@@ -333,8 +331,7 @@ public class STFMessages {
         .getString("tb_disconnect");
     public final static String TB_ADD_A_NEW_BUDDY = Messages
         .getString("tb_add_a_new_buddy");
-    public final static String TB_CONNECT = Messages
-        .getString("tb_connect");
+    public final static String TB_CONNECT = Messages.getString("tb_connect");
     public final static String TB_SHARE_SCREEN_WITH_BUDDY = Messages
         .getString("tb_share_screen_with_buddy");
     public final static String TB_STOP_SESSION_WITH_BUDDY = Messages
