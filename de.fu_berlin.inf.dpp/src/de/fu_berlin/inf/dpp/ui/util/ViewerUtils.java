@@ -240,6 +240,23 @@ public class ViewerUtils {
     }
 
     /**
+     * @see AbstractTreeViewer#expandToLevel(int)
+     */
+    public static void expandToLevel(final Viewer viewer, final int level) {
+        Utils.runSafeSWTSync(log, new Runnable() {
+            public void run() {
+                if (viewer == null || viewer.getControl().isDisposed())
+                    return;
+
+                if (viewer instanceof AbstractTreeViewer) {
+                    AbstractTreeViewer treeViewer = (AbstractTreeViewer) viewer;
+                    treeViewer.expandToLevel(level);
+                }
+            }
+        });
+    }
+
+    /**
      * If supported by the viewer expands all elements and makes sure it runs in
      * the SWT thread.
      * 
