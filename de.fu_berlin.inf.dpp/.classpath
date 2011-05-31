@@ -16,6 +16,7 @@
 	<classpathentry kind="src" path="test/junit"/>
 	<classpathentry kind="src" path="ext-src"/>
 	<classpathentry kind="src" path="test/src"/>
+	<classpathentry kind="src" path="test/framework/stf/src"/>
 	<classpathentry exported="true" kind="lib" path="lib/smack.jar" sourcepath="lib/smack_src_3_1_0_saros.zip"/>
 	<classpathentry exported="true" kind="lib" path="lib/smackx.jar" sourcepath="lib/smack_src_3_1_0_saros.zip"/>
 	<classpathentry exported="true" kind="lib" path="lib/smackx-debug.jar"/>
