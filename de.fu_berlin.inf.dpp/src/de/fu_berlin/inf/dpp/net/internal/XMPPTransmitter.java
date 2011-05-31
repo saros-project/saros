@@ -344,6 +344,19 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
                 monitor);
         }
 
+        monitor.subTask("Waiting for archive...");
+        while (!collector.hasReceived()) {
+            if (monitor.isCanceled()) {
+                throw new LocalCancellationException();
+            }
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException e) {
+                throw new LocalCancellationException();
+            }
+        }
+
+        monitor.subTask("Receiving archive...");
         try {
             IncomingTransferObject result = incomingExtProv.getPayload(receive(
                 monitor.newChild(packetListenerIBB == null ? 10 : 1),

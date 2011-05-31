@@ -24,6 +24,7 @@ public class SarosPacketCollector implements PacketListener {
     }
 
     private static Logger log = Logger.getLogger(SarosPacketCollector.class);
+    private boolean hasReveived = false;
 
     /**
      * Max number of packets that any one collector can hold. After the max is
@@ -99,6 +100,13 @@ public class SarosPacketCollector implements PacketListener {
     }
 
     /**
+     * Returns whether this collector has already received a packet.
+     */
+    public boolean hasReceived() {
+        return hasReveived;
+    }
+
+    /**
      * Processes a packet to see if it meets the criteria for this packet
      * collector. If so, the packet is added to the result queue.
      * 
@@ -117,6 +125,7 @@ public class SarosPacketCollector implements PacketListener {
             return;
 
         if (packetFilter == null || packetFilter.accept(packet)) {
+            hasReveived = true;
             try {
                 resultQueue.add(packet);
             } catch (IllegalStateException e) {
