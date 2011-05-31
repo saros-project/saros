@@ -151,13 +151,13 @@ public class STFTest extends STFMessages {
     public static final String CLS3_SUFFIX = "MyClass3" + SUFFIX_JAVA;
 
     /* content path */
-    public static final String CP1 = "test/STF/" + CLS1 + SUFFIX_JAVA;
-    public static final String CP2 = "test/STF/" + CLS2 + SUFFIX_JAVA;
-    public static final String CP3 = "test/STF/" + CLS3 + SUFFIX_JAVA;
-    public static final String CP1_CHANGE = "test/STF/" + CLS1 + "Change"
-        + SUFFIX_JAVA;
-    public static final String CP2_CHANGE = "test/STF/" + CLS2 + "Change"
-        + SUFFIX_JAVA;
+    public static final String CP1 = "resources/test/stf/" + CLS1 + SUFFIX_JAVA;
+    public static final String CP2 = "resources/test/stf/" + CLS2 + SUFFIX_JAVA;
+    public static final String CP3 = "resources/test/stf/" + CLS3 + SUFFIX_JAVA;
+    public static final String CP1_CHANGE = "resources/test/stf/" + CLS1
+        + "Change" + SUFFIX_JAVA;
+    public static final String CP2_CHANGE = "resources/test/stf/" + CLS2
+        + "Change" + SUFFIX_JAVA;
 
     /* SVN infos */
     protected static final String SVN_REPOSITORY_URL = "http://saros-build.imp.fu-berlin.de/svn/saros";
