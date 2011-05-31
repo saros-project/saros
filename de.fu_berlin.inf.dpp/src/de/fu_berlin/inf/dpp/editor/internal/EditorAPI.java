@@ -726,6 +726,7 @@ public class EditorAPI implements IEditorAPI {
         return getViewport(textViewer);
     }
 
+    @SuppressWarnings("unchecked")
     protected void updateViewportAnnotation(ITextViewer viewer, int top,
         int bottom, User source) {
 
@@ -735,8 +736,8 @@ public class EditorAPI implements IEditorAPI {
 
         IAnnotationModel model = ((ISourceViewer) viewer).getAnnotationModel();
 
-        for (@SuppressWarnings("unchecked")
-        Iterator<Annotation> it = model.getAnnotationIterator(); it.hasNext();) {
+        for (Iterator<Annotation> it = model.getAnnotationIterator(); it
+            .hasNext();) {
             Annotation annotation = it.next();
             if (annotation instanceof ViewportAnnotation) {
                 if (((ViewportAnnotation) annotation).getSource()

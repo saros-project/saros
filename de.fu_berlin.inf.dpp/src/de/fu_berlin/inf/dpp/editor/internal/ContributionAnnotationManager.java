@@ -64,13 +64,13 @@ public class ContributionAnnotationManager {
      * @param source
      *            of the annotation.
      */
+    @SuppressWarnings("unchecked")
     public void insertAnnotation(IAnnotationModel model, int offset,
         int length, User source) {
 
         if (length > 0) {
             /* Return early if there already is an annotation at that offset */
-            for (@SuppressWarnings("unchecked")
-            Iterator<Annotation> it = model.getAnnotationIterator(); it
+            for (Iterator<Annotation> it = model.getAnnotationIterator(); it
                 .hasNext();) {
                 Annotation annotation = it.next();
 
