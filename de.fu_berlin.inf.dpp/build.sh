@@ -14,18 +14,8 @@ then
 	exit 1
 fi
 
-# defaults for external libraries, can be overriden by environment
-# variables with the _DEFAULT
-COBERTURA_ROOT_DEFAULT="lib/cobertura-1.9.3"
-ANT4ECLIPSE_ROOT_DEFAULT="lib/org.ant4eclipse_1.0.0.M4"
-ECLIPSE_DIR_DEFAULT="../../eclipse"
-
 VM_ARGS_DEFAULT="-Xms512m -Xmx1024m -XX:MaxPermSize=256m"
 
-# set defaults if not set through environment
-: ${COBERTURA_ROOT:="$COBERTURA_ROOT_DEFAULT"}
-: ${ANT4ECLIPSE_ROOT:="$ANT4ECLIPSE_ROOT_DEFAULT"}
-: ${ECLIPSE_DIR:="$ECLIPSE_DIR_DEFAULT"}
 : ${ANT_OPTS:="$VM_ARGS_DEFAULT"}
 
 export ANT_OPTS

@@ -23,9 +23,8 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.core.expressions,
  org.eclipse.equinox.security
 Bundle-ActivationPolicy: lazy
-Bundle-ClassPath: bin/,
+Bundle-ClassPath: .,
  lib/log4j-1.2.15.jar,
- .,
  lib/smack.jar,
  lib/smackx.jar,
  lib/smackx-debug.jar,
@@ -72,7 +71,6 @@ Bundle-ClassPath: bin/,
  lib/org.eclipse.swtbot.swt.finder_2.0.0.595-dev-e36.jar,
  lib/org.eclipse.swtbot.eclipse.ui_2.0.0.595-dev-e36.jar,
  lib/org.eclipse.swtbot.ant.optional.junit4_2.0.0.595-dev-e36.jar
- 
 Export-Package: de.fu_berlin.inf.dpp;
   uses:="org.eclipse.core.runtime,
    org.jivesoftware.smack.packet,
