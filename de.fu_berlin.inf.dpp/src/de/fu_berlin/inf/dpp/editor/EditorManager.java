@@ -1457,6 +1457,7 @@ public class EditorManager implements IActivityProvider, Disposable {
         }
     }
 
+    @SuppressWarnings("unchecked")
     protected void removeAllAnnotations(IEditorPart editor,
         Predicate<SarosAnnotation> predicate) {
         IEditorInput input = editor.getEditorInput();
@@ -1469,8 +1470,8 @@ public class EditorManager implements IActivityProvider, Disposable {
 
         // Collect annotations.
         ArrayList<Annotation> annotations = new ArrayList<Annotation>(128);
-        for (@SuppressWarnings("unchecked")
-        Iterator<Annotation> it = model.getAnnotationIterator(); it.hasNext();) {
+        for (Iterator<Annotation> it = model.getAnnotationIterator(); it
+            .hasNext();) {
             Annotation annotation = it.next();
 
             if (annotation instanceof SarosAnnotation) {
