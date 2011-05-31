@@ -116,6 +116,7 @@ public class BinaryChannelTest {
      * 
      * @throws Throwable
      */
+    @SuppressWarnings("deprecation")
     @Test
     public void testBinaryChannelClientToServer() throws Throwable {
 
@@ -226,6 +227,7 @@ public class BinaryChannelTest {
     /**
      * Test bidirectional sending at the same time
      */
+    @SuppressWarnings("deprecation")
     @Test
     public void testBinaryChannelBiDi() throws Throwable {
 
@@ -378,6 +380,7 @@ public class BinaryChannelTest {
     /**
      * Test two people sending at the same time.
      */
+    @SuppressWarnings("deprecation")
     @Test(timeout = 90000)
     public void testBinaryChannelMultiSend() throws Throwable {
 
@@ -548,6 +551,7 @@ public class BinaryChannelTest {
      * currently expected to fail because of the todo in
      * {@link BinaryChannel#receiveIncomingTransferObject(SubMonitor)}.
      */
+    @SuppressWarnings("deprecation")
     @Test
     public void testShutdown() throws Throwable {
 
@@ -629,6 +633,7 @@ public class BinaryChannelTest {
 
         TestThread serverMainLoop = new TestThread(failureQueue,
             new Runnable() {
+                @SuppressWarnings("deprecation")
                 public void run() {
                     try {
                         serverSocket.set(server.accept());
@@ -657,6 +662,7 @@ public class BinaryChannelTest {
                     try {
                         runBinaryChannelLoop(clientQueue, clientChannel);
                     } catch (SocketException e) {
+                        // WHY ?!!!!
                     } catch (Exception e) {
                         throw new RuntimeException(e);
                     }
