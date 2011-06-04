@@ -71,7 +71,7 @@ public interface Constants {
     static public final String MENU_JAVA_PROJECT = "Java Project";
     static public final String MENU_CLOSE = "Close";
     static public final String MENU_CLOSE_ALL = "Close All";
-
+    static public final String MENU_REFRESH = "Refresh";
     static public final String MENU_SAVE = "Save";
     static public final String MENU_SAVE_AS = "Save As...";
     static public final String MENU_SAVE_All = "Save All";

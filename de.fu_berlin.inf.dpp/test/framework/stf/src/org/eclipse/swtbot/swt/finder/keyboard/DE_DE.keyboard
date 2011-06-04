@@ -1,28 +1,29 @@
-~ shift + `
-! shift + 1
-# #
-$ shift + 4
-% shift + 5
-& shift + 6
-* shift + 8
-( shift + 8
-) shift + 9
-_ shift + -
-+ +
-{ ALT + CTRL + 7
-} ALT + CTRL + 0
-| ALT + CTRL + <
-: shift + .
-" shift + 2
 < <
-> shift + <
+# #
++ +
 - -
-= shift + 0
-[ ALT + CTRL + 8
-] ALT + CTRL + 9
-\ \
-; shift + ,
-' shift + #
-, ,
 . .
-/ shift + 7
+, ,
+= SHIFT+0
+! SHIFT+1
+" SHIFT+2
+* SHIFT++
+§ SHIFT+3
+$ SHIFT+4
+% SHIFT+5
+& SHIFT+6
+/ SHIFT+7
+( SHIFT+8
+) SHIFT+9
+} ALT+CTRL+0
+@ ALT+CTRL+q
+{ ALT+CTRL+7
+[ ALT+CTRL+8
+] ALT+CTRL+9
+~ ALT+CTRL++
+| ALT+CTRL+<
+> SHIFT+<
+' SHIFT+#
+: SHIFT+.
+; SHIFT+,
+_ SHIFT+-

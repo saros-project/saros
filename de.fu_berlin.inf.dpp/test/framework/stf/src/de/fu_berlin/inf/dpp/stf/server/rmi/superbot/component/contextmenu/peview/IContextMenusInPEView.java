@@ -24,6 +24,8 @@ public interface IContextMenusInPEView extends Remote {
 
     public IRefactorC refactor() throws RemoteException;
 
+    public void refresh() throws RemoteException;
+
     public void copy() throws RemoteException;
 
     public void paste(String target) throws RemoteException;

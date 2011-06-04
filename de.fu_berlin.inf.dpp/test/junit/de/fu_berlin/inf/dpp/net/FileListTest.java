@@ -23,6 +23,9 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -218,4 +221,30 @@ public class FileListTest {
             + actual + "'", expected.length, actual.size());
     }
 
+    @Test
+    public void testToXmlAndBack() {
+        List<IPath> files = new ArrayList<IPath>();
+        for (int i = 0; i < 100; i++)
+            files.add(new Path("xml_me_" + i + "/<![CDATA["));
+
+        FileList list = new FileList(files);
+
+        String xml = list.toXML();
+        FileList listFromXml = FileList.fromXML(xml);
+
+        assertEquals(list, listFromXml);
+    }
+
+    @Test
+    public void testEmptyTempFiles() throws IOException {
+        List<IPath> files = new ArrayList<IPath>();
+        for (int i = 0; i < 100; i++)
+            files.add(new Path(File.createTempFile("saros_flt_junit", null)
+                .getPath()));
+
+        FileList list1 = new FileList(files);
+        FileList list2 = new FileList(files);
+
+        assertEquals(list1.computeMatch(list2), 100);
+    }
 }

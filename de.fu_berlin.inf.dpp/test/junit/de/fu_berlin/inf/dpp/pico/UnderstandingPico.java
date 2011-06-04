@@ -12,6 +12,8 @@ import org.picocontainer.PicoBuilder;
 import org.picocontainer.annotations.Inject;
 import org.picocontainer.injectors.AdaptingInjection;
 import org.picocontainer.injectors.AnnotatedFieldInjection;
+import org.picocontainer.injectors.CompositeInjection;
+import org.picocontainer.injectors.ConstructorInjection;
 import org.picocontainer.injectors.ProviderAdapter;
 import org.picocontainer.injectors.Reinjector;
 
@@ -229,4 +231,96 @@ public class UnderstandingPico {
         assertNotNull(session.b);
         assertTrue(session.b == applicationContainer.getComponent(B.class));
     }
+
+    public interface MyInterface {
+        public void print();
+    }
+
+    public static class MyInterfaceImpl implements MyInterface {
+
+        public MyInterfaceImpl() {
+
+        }
+
+        public void print() {
+            System.out.println("Hello World");
+        }
+    }
+
+    public static class MyInterfaceImpl2 implements MyInterface {
+
+        public MyInterfaceImpl2() {
+
+        }
+
+        public void print() {
+            System.out.println("Hello World 2");
+        }
+    }
+
+    public static class MySession {
+        @Inject
+        public MyInterface i;
+
+    }
+
+    @Test
+    public void testInterface() {
+        MutablePicoContainer container = new PicoBuilder(
+            new CompositeInjection(new ConstructorInjection(),
+                new AnnotatedFieldInjection())).withCaching().build();
+
+        container.addComponent(MyInterface.class, MyInterfaceImpl2.class);
+        container.addComponent(MySession.class);
+
+        MySession session = container.getComponent(MySession.class);
+        session.i.print();
+    }
+
+    public static class AA {
+        @Inject
+        BB b;
+
+        public void AA() {
+
+        }
+
+        public void print() {
+            b.print();
+        }
+    }
+
+    public static class BB {
+        public BB() {
+
+        }
+
+        public void print() {
+            System.out.println("Hello World");
+        }
+    }
+
+    public static class CC {
+        public CC() {
+
+        }
+
+        public void print() {
+            System.out.println("Hello World 2");
+        }
+    }
+
+    @Test
+    public void testInterface1() {
+        MutablePicoContainer container = new PicoBuilder(
+            new CompositeInjection(new ConstructorInjection(),
+                new AnnotatedFieldInjection())).withCaching().build();
+
+        container.addComponent(BB.class, BB.class);
+        container.addComponent(AA.class);
+
+        AA session = container.getComponent(AA.class);
+        session.print();
+    }
+
 }

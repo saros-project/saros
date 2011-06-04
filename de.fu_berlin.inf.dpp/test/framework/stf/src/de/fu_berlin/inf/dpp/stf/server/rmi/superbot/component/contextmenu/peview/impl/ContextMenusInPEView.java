@@ -92,6 +92,10 @@ public class ContextMenusInPEView extends Component implements
         treeItem.contextMenus(MENU_COPY).click();
     }
 
+    public void refresh() throws RemoteException {
+        treeItem.contextMenus(MENU_REFRESH).click();
+    }
+
     public void paste(String target) throws RemoteException {
         if (treeItem == null) {
             tree.contextMenu(MENU_PASTE).click();
@@ -125,11 +129,13 @@ public class ContextMenusInPEView extends Component implements
         treeItem.contextMenus(CM_DELETE).click();
         switch (type) {
         case PROJECT:
-            remoteBot().shell(SHELL_DELETE_RESOURCE).confirmWithCheckBox(OK, true);
+            remoteBot().shell(SHELL_DELETE_RESOURCE).confirmWithCheckBox(OK,
+                true);
             remoteBot().waitUntilShellIsClosed(SHELL_DELETE_RESOURCE);
             break;
         case JAVA_PROJECT:
-            remoteBot().shell(SHELL_DELETE_RESOURCE).confirmWithCheckBox(OK, true);
+            remoteBot().shell(SHELL_DELETE_RESOURCE).confirmWithCheckBox(OK,
+                true);
             remoteBot().waitUntilShellIsClosed(SHELL_DELETE_RESOURCE);
             break;
         default:

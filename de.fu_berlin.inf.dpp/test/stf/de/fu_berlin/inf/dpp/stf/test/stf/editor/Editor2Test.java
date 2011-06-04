@@ -25,21 +25,20 @@ public class Editor2Test extends StfTestCase {
 
     @Test
     public void testConcurrentEditing() throws RemoteException {
-        // no session!
-        String ALICEText = "a";
+
         ALICE.superBot().views().packageExplorerView()
             .selectFile(Constants.PATH).open();
 
-        ALICE.remoteBot().editor(Constants.FILE3).typeText(ALICEText);
+        ALICE.remoteBot().editor(Constants.FILE3).typeText(ALICE.toString());
 
-        String BOBText = "b";
         BOB.superBot().views().packageExplorerView().selectFile(Constants.PATH)
             .open();
 
-        BOB.remoteBot().editor(Constants.FILE3).typeText(BOBText);
+        BOB.remoteBot().editor(Constants.FILE3).typeText(BOB.toString());
 
-        assertEquals(ALICEText, ALICE.remoteBot().editor(Constants.FILE3)
+        assertEquals(ALICE.toString(), ALICE.remoteBot()
+            .editor(Constants.FILE3).getText());
+        assertEquals(BOB.toString(), BOB.remoteBot().editor(Constants.FILE3)
             .getText());
-        assertEquals(BOBText, BOB.remoteBot().editor(Constants.FILE3).getText());
     }
 }

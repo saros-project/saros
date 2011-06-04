@@ -3,8 +3,6 @@ package de.fu_berlin.inf.dpp.util;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
-import org.limewire.collection.Function;
-
 /**
  * An Iterator which is backed by another iterator but which transforms the
  * result using a given function.

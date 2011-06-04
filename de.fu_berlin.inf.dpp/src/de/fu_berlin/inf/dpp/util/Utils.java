@@ -176,26 +176,16 @@ public class Utils {
      */
     public static int getFreePort() {
         ServerSocket ss;
-        int freePort = 0;
+        int freePort = -1;
 
         for (int i = 0; i < 10; i++) {
-            freePort = (int) (10000 + Math.round(Math.random() * 10000));
-            freePort = freePort % 2 == 0 ? freePort : freePort + 1;
             try {
-                ss = new ServerSocket(freePort);
+                ss = new ServerSocket(0);
                 freePort = ss.getLocalPort();
                 ss.close();
-                return freePort;
             } catch (IOException e) {
                 log.error("Error while trying to find a free port:", e);
             }
-        }
-        try {
-            ss = new ServerSocket(0);
-            freePort = ss.getLocalPort();
-            ss.close();
-        } catch (IOException e) {
-            log.error("Error while trying to find a free port:", e);
         }
         return freePort;
     }
