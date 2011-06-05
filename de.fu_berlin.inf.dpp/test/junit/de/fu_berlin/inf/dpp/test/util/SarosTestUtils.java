@@ -3,6 +3,8 @@ package de.fu_berlin.inf.dpp.test.util;
 import static org.easymock.classextension.EasyMock.createMock;
 
 import org.easymock.EasyMock;
+import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.SubMonitor;
 
 public class SarosTestUtils {
 
@@ -16,6 +18,11 @@ public class SarosTestUtils {
     public static <T> T replay(T t) {
         EasyMock.replay(t);
         return t;
+    }
+
+    public static SubMonitor submonitor() {
+        NullProgressMonitor monitor = new NullProgressMonitor();
+        return SubMonitor.convert(monitor);
     }
 
 }
