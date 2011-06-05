@@ -1,33 +1,39 @@
 package de.fu_berlin.inf.dpp.test.fakes;
 
+import java.io.File;
+import java.io.IOException;
+import java.net.URI;
+import java.util.Map;
+
 import org.apache.commons.io.FileUtils;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.IProjectNature;
-import org.eclipse.core.runtime.*;
+import org.eclipse.core.runtime.Assert;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.IPluginDescriptor;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.content.IContentTypeMatcher;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.Map;
-
 
 /**
  * Fake-Implementation of {@link org.eclipse.core.resources.IProject}.
  * 
  * Wrappes a {@link java.io.File} to delegate the the most functionality.
  * 
- * If you call a functionallity which is not implemented you will get a
+ * If you call a functionality which is not implemented you will get a
  * {@link UnsupportedOperationException}.
  * 
  * For getting an instance of that implementation you need to call
- * {@link EclipseWorkspaceRootFake#getProject(String)}
- * on an appropriate instance of an EclipseWorkspaceRootFake.
+ * {@link EclipseWorkspaceRootFake#getProject(String)} on an appropriate
+ * instance of an EclipseWorkspaceRootFake.
  * 
  * @see de.fu_berlin.inf.dpp.test.util.EclipseWorkspaceFakeFacadeTest
  * @author cordes
  */
-public class EclipseProjectFake extends EclipseContainerFake implements IProject {
+public class EclipseProjectFake extends EclipseContainerFake implements
+    IProject {
 
     private EclipseProjectFake(File wrappedFile) {
         super(wrappedFile);
@@ -46,6 +52,7 @@ public class EclipseProjectFake extends EclipseContainerFake implements IProject
         return new EclipseProjectFake(file);
     }
 
+    @SuppressWarnings("rawtypes")
     public void build(int i, String s, Map map,
         IProgressMonitor iProgressMonitor) throws CoreException {
         throw new UnsupportedOperationException("not yet implemented");
@@ -150,5 +157,15 @@ public class EclipseProjectFake extends EclipseContainerFake implements IProject
 
     protected File getWrappedFile() {
         return wrappedFile;
+    }
+
+    public void loadSnapshot(int options, URI snapshotLocation,
+        IProgressMonitor monitor) throws CoreException {
+        throw new UnsupportedOperationException("not yet implemented");
+    }
+
+    public void saveSnapshot(int options, URI snapshotLocation,
+        IProgressMonitor monitor) throws CoreException {
+        throw new UnsupportedOperationException("not yet implemented");
     }
 }

@@ -1,15 +1,29 @@
 package de.fu_berlin.inf.dpp.test.fakes;
 
-import org.apache.commons.io.FileUtils;
-import org.eclipse.core.resources.*;
-import org.eclipse.core.runtime.*;
-import org.eclipse.core.runtime.jobs.ISchedulingRule;
-
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.util.Map;
 
+import org.apache.commons.io.FileUtils;
+import org.eclipse.core.resources.IContainer;
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IMarker;
+import org.eclipse.core.resources.IPathVariableManager;
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IProjectDescription;
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IResourceProxy;
+import org.eclipse.core.resources.IResourceProxyVisitor;
+import org.eclipse.core.resources.IResourceVisitor;
+import org.eclipse.core.resources.IWorkspace;
+import org.eclipse.core.resources.ResourceAttributes;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.QualifiedName;
+import org.eclipse.core.runtime.jobs.ISchedulingRule;
 
 /**
  * Fake-Implementation of {@link org.eclipse.core.resources.IResource}.
@@ -22,7 +36,7 @@ import java.util.Map;
  * @see de.fu_berlin.inf.dpp.test.util.EclipseWorkspaceFakeFacadeTest
  * @author cordes
  */
-abstract public class EclipseResourceFake implements IResource {
+public abstract class EclipseResourceFake implements IResource {
 
     protected File wrappedFile;
     protected EclipseProjectFake project;
@@ -147,6 +161,7 @@ abstract public class EclipseResourceFake implements IResource {
         return new EclipseContainerFake(wrappedFile.getParentFile());
     }
 
+    @SuppressWarnings("rawtypes")
     public Map getPersistentProperties() throws CoreException {
         throw new UnsupportedOperationException("not yet implemented");
     }
@@ -179,6 +194,7 @@ abstract public class EclipseResourceFake implements IResource {
         return new ResourceAttributes();
     }
 
+    @SuppressWarnings("rawtypes")
     public Map getSessionProperties() throws CoreException {
         throw new UnsupportedOperationException("not yet implemented");
     }
@@ -342,6 +358,7 @@ abstract public class EclipseResourceFake implements IResource {
         throw new UnsupportedOperationException("not yet implemented");
     }
 
+    @SuppressWarnings("rawtypes")
     public Object getAdapter(Class aClass) {
         throw new UnsupportedOperationException("not yet implemented");
     }
@@ -351,6 +368,23 @@ abstract public class EclipseResourceFake implements IResource {
     }
 
     public boolean isConflicting(ISchedulingRule iSchedulingRule) {
+        throw new UnsupportedOperationException("not yet implemented");
+    }
+
+    public URI getLocationURI() {
+        throw new UnsupportedOperationException("not yet implemented");
+    }
+
+    public IPathVariableManager getPathVariableManager() {
+        throw new UnsupportedOperationException("not yet implemented");
+    }
+
+    public boolean isVirtual() {
+        throw new UnsupportedOperationException("not yet implemented");
+    }
+
+    public void setDerived(boolean isDerived, IProgressMonitor monitor)
+        throws CoreException {
         throw new UnsupportedOperationException("not yet implemented");
     }
 }

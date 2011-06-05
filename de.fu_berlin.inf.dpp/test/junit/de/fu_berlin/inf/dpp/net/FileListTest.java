@@ -245,6 +245,6 @@ public class FileListTest {
         FileList list1 = new FileList(files);
         FileList list2 = new FileList(files);
 
-        assertEquals(list1.computeMatch(list2), 100);
+        assertEquals(100, list1.computeMatch(list2));
     }
 }

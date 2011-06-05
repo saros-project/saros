@@ -1,22 +1,23 @@
 package de.fu_berlin.inf.dpp.test.fakes;
 
-import org.apache.commons.io.FileUtils;
-import org.eclipse.core.resources.IContainer;
-import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IFolder;
-import org.eclipse.core.resources.IResource;
-import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.Path;
+import static de.fu_berlin.inf.dpp.test.util.SarosTestUtils.submonitor;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.util.Collection;
 
-import static de.fu_berlin.inf.dpp.test.util.SarosTestUtils.submonitor;
-
+import org.apache.commons.io.FileUtils;
+import org.eclipse.core.resources.FileInfoMatcherDescription;
+import org.eclipse.core.resources.IContainer;
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IFolder;
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IResourceFilterDescription;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.Path;
 
 /**
  * Fake-Implementation of {@link org.eclipse.core.resources.IContainer}.
@@ -29,8 +30,8 @@ import static de.fu_berlin.inf.dpp.test.util.SarosTestUtils.submonitor;
  * @see de.fu_berlin.inf.dpp.test.util.EclipseWorkspaceFakeFacadeTest
  * @author cordes
  */
-public class EclipseContainerFake extends EclipseResourceFake implements IContainer,
-    IFolder {
+public class EclipseContainerFake extends EclipseResourceFake implements
+    IContainer, IFolder {
 
     protected EclipseContainerFake(File wrappedFile) {
         super(wrappedFile);
@@ -76,6 +77,7 @@ public class EclipseContainerFake extends EclipseResourceFake implements IContai
     }
 
     public IResource[] members() throws CoreException {
+
         Collection<File> files = FileUtils.listFiles(project.wrappedFile,
             new String[] { "java" }, true);
         IResource[] result = new IResource[files.size()];
@@ -151,7 +153,18 @@ public class EclipseContainerFake extends EclipseResourceFake implements IContai
         throw new UnsupportedOperationException("not yet implemented");
     }
 
+    @Override
     public URI getLocationURI() {
+        throw new UnsupportedOperationException("not yet implemented");
+    }
+
+    public IResourceFilterDescription createFilter(int type,
+        FileInfoMatcherDescription matcherDescription, int updateFlags,
+        IProgressMonitor monitor) throws CoreException {
+        throw new UnsupportedOperationException("not yet implemented");
+    }
+
+    public IResourceFilterDescription[] getFilters() throws CoreException {
         throw new UnsupportedOperationException("not yet implemented");
     }
 }

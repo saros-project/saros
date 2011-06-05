@@ -1,5 +1,13 @@
 package de.fu_berlin.inf.dpp.test.fakes;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.Reader;
+import java.net.URI;
+
 import org.apache.commons.io.FileUtils;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFileState;
@@ -8,16 +16,12 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.content.IContentDescription;
 
-import java.io.*;
-import java.net.URI;
-
-
 /**
  * Fake-Implementation of {@link org.eclipse.core.resources.IFile}.
  * 
  * Wrappes a {@link java.io.File} to delegate the the most functionality.
  * 
- * If you call a functionallity which is not implemented you will get a
+ * If you call a functionality which is not implemented you will get a
  * {@link UnsupportedOperationException}.
  * 
  * @see de.fu_berlin.inf.dpp.test.util.EclipseWorkspaceFakeFacadeTest
@@ -29,7 +33,8 @@ public class EclipseFileFake extends EclipseResourceFake implements IFile {
         super(wrappedFile);
     }
 
-    public static EclipseFileFake getMockFile(IPath path, EclipseProjectFake project) {
+    public static EclipseFileFake getMockFile(IPath path,
+        EclipseProjectFake project) {
         String systemPath = project.getWrappedFile().getPath() + "/"
             + path.toPortableString();
         File file = new File(systemPath);
@@ -38,7 +43,8 @@ public class EclipseFileFake extends EclipseResourceFake implements IFile {
         return result;
     }
 
-    public static EclipseFileFake getMockFile(File file, EclipseProjectFake project) {
+    public static EclipseFileFake getMockFile(File file,
+        EclipseProjectFake project) {
         EclipseFileFake result = new EclipseFileFake(file);
         result.project = project;
         return result;

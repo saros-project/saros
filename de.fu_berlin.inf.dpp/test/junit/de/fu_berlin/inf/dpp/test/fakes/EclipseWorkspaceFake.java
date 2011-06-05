@@ -1,10 +1,6 @@
 package de.fu_berlin.inf.dpp.test.fakes;
 
-import org.apache.commons.io.FileUtils;
-import org.eclipse.core.internal.resources.WorkspaceDescription;
-import org.eclipse.core.resources.*;
-import org.eclipse.core.runtime.*;
-import org.eclipse.core.runtime.jobs.ISchedulingRule;
+import static de.fu_berlin.inf.dpp.test.util.SarosTestUtils.submonitor;
 
 import java.io.File;
 import java.io.IOException;
@@ -12,15 +8,39 @@ import java.io.InputStream;
 import java.net.URI;
 import java.util.Map;
 
-import static de.fu_berlin.inf.dpp.test.util.SarosTestUtils.submonitor;
-
+import org.apache.commons.io.FileUtils;
+import org.eclipse.core.internal.resources.WorkspaceDescription;
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IFilterMatcherDescriptor;
+import org.eclipse.core.resources.IMarker;
+import org.eclipse.core.resources.IPathVariableManager;
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IProjectDescription;
+import org.eclipse.core.resources.IProjectNatureDescriptor;
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IResourceChangeListener;
+import org.eclipse.core.resources.IResourceRuleFactory;
+import org.eclipse.core.resources.ISaveParticipant;
+import org.eclipse.core.resources.ISavedState;
+import org.eclipse.core.resources.ISynchronizer;
+import org.eclipse.core.resources.IWorkspace;
+import org.eclipse.core.resources.IWorkspaceDescription;
+import org.eclipse.core.resources.IWorkspaceRoot;
+import org.eclipse.core.resources.IWorkspaceRunnable;
+import org.eclipse.core.resources.WorkspaceLock;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Plugin;
+import org.eclipse.core.runtime.jobs.ISchedulingRule;
 
 /**
  * Fake-Implementation of {@link org.eclipse.core.resources.IWorkspace}.
  * 
  * Wrappes a {@link java.io.File} to delegate the the most functionality.
  * 
- * If you call a functionallity which is not implemented you will get a
+ * If you call a functionality which is not implemented you will get a
  * {@link UnsupportedOperationException}.
  * 
  * To get an initialized workspace you should use
@@ -114,6 +134,7 @@ public class EclipseWorkspaceFake implements IWorkspace {
         throw new UnsupportedOperationException("not yet implemented");
     }
 
+    @SuppressWarnings("rawtypes")
     public Map getDanglingReferences() {
         throw new UnsupportedOperationException("not yet implemented");
     }
@@ -240,7 +261,30 @@ public class EclipseWorkspaceFake implements IWorkspace {
         throw new UnsupportedOperationException("not yet implemented");
     }
 
+    @SuppressWarnings("rawtypes")
     public Object getAdapter(Class aClass) {
+        throw new UnsupportedOperationException("not yet implemented");
+    }
+
+    public ISavedState addSaveParticipant(String pluginId,
+        ISaveParticipant participant) throws CoreException {
+        throw new UnsupportedOperationException("not yet implemented");
+    }
+
+    public IFilterMatcherDescriptor getFilterMatcherDescriptor(
+        String filterMatcherId) {
+        throw new UnsupportedOperationException("not yet implemented");
+    }
+
+    public IFilterMatcherDescriptor[] getFilterMatcherDescriptors() {
+        throw new UnsupportedOperationException("not yet implemented");
+    }
+
+    public void removeSaveParticipant(String pluginId) {
+        throw new UnsupportedOperationException("not yet implemented");
+    }
+
+    public IStatus validateFiltered(IResource resource) {
         throw new UnsupportedOperationException("not yet implemented");
     }
 }
