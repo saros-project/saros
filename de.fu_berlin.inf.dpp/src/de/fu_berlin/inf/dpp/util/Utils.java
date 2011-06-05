@@ -187,6 +187,7 @@ public class Utils {
                 ss = new ServerSocket(0);
                 freePort = ss.getLocalPort();
                 ss.close();
+                break;
             } catch (IOException e) {
                 log.error("Error while trying to find a free port:", e);
             }
@@ -471,6 +472,7 @@ public class Utils {
             }
         } else {
             SyncedThread thread = null;
+            boolean wasInterrupted = false;
             try {
                 SYNC_LOCK.lockInterruptibly();
                 thread = new SyncedThread(wrapSafe(log, runnable));
@@ -478,8 +480,14 @@ public class Utils {
                 thread.join();
 
             } catch (InterruptedException e) {
+                wasInterrupted = true;
                 if (thread != null) {
                     thread.interrupt();
+                    try {
+                        thread.join(1000);
+                    } catch (InterruptedException irgnore) {
+                        // give up
+                    }
                 }
             } finally {
                 SYNC_LOCK.unlock();
@@ -487,10 +495,11 @@ public class Utils {
 
             Throwable throwable = null;
 
-            // FIXME: wait until the thread has finished
-
             if (thread != null)
                 throwable = thread.getRunningError();
+
+            if (wasInterrupted)
+                Thread.currentThread().interrupt();
 
             if (throwable != null)
                 SWT.error(SWT.ERROR_FAILED_EXEC, throwable);
