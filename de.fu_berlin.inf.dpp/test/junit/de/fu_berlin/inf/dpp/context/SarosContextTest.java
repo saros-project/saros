@@ -7,15 +7,16 @@ import static junit.framework.Assert.assertTrue;
 import static junit.framework.Assert.fail;
 import static org.junit.Assert.assertEquals;
 
-import de.fu_berlin.inf.dpp.util.EclipseHelperTestSaros;
 import org.junit.Test;
 import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.SarosContext;
 import de.fu_berlin.inf.dpp.SarosPluginContext;
-import de.fu_berlin.inf.dpp.util.EclipseHelper;
+import de.fu_berlin.inf.dpp.net.internal.IBBTransport;
 import de.fu_berlin.inf.dpp.project.SarosSessionManager;
+import de.fu_berlin.inf.dpp.util.EclipseHelper;
+import de.fu_berlin.inf.dpp.util.EclipseHelperTestSaros;
 
 /**
  * @author cordes
@@ -116,7 +117,25 @@ public class SarosContextTest {
             assertEquals("Workspace is closed.", exception.getMessage());
         }
     }
-        
+
+    @Test
+    public void ensureIBBTransportInContext() {
+        SarosContext context1 = SarosContext
+            .getContextForSaros(new TestSaros()).isTestContext().build();
+        assertNotNull(context1.getComponent(IBBTransport.class));
+        SarosContext context2 = SarosContext
+            .getContextForSaros(new TestSaros()).isTestContext().build();
+        assertNotNull(context2.getComponent(IBBTransport.class));
+
+        // it's a singleton ...
+        assertTrue(context1.getComponent(IBBTransport.class) == context1
+            .getComponent(IBBTransport.class));
+
+        // different contexts different instances ...
+        assertTrue(context1.getComponent(IBBTransport.class) != context2
+            .getComponent(IBBTransport.class));
+    }
+
     private class TestEntity {
         @Inject
         protected SarosSessionManager sarosSessionManager;

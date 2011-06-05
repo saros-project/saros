@@ -36,6 +36,7 @@ import de.fu_berlin.inf.dpp.project.internal.ChangeColorManager;
 import de.fu_berlin.inf.dpp.project.internal.PermissionManager;
 import de.fu_berlin.inf.dpp.project.internal.ProjectsAddedManager;
 import de.fu_berlin.inf.dpp.synchronize.StopManager;
+import de.fu_berlin.inf.dpp.util.EclipseHelper;
 import de.fu_berlin.inf.dpp.util.EclipseHelperTestSaros;
 import de.fu_berlin.inf.dpp.ui.LocalPresenceTracker;
 import de.fu_berlin.inf.dpp.ui.RemoteProgressManager;
@@ -142,7 +143,8 @@ public class SarosContext {
         RemoteProgressManager.class,
         XMPPAccountStore.class,
         ProjectsAddedManager.class,
-        de.fu_berlin.inf.dpp.util.EclipseHelper.class,
+        EclipseHelper.class,
+        IBBTransport.class,
 
         // Observables
         FileReplacementInProgressObservable.class,
@@ -199,7 +201,7 @@ public class SarosContext {
         AudioService.class,
         VideoSharingService.class,
         ArchiveStreamService.class
-
+    
     };
 
     private static final List<Class<?>> excludedComponentsForTestContext = new ArrayList<Class<?>>(
@@ -214,7 +216,7 @@ public class SarosContext {
     private SarosContext() {
         /*
          * Use the SarosContextBuilder to build a SarosContext. {@link SarosContextBuilder}
-         */
+         */         
     }
 
     private void init(List<Class<?>> excludedComponentsForTestContext) {
@@ -268,7 +270,7 @@ public class SarosContext {
          * 
          * CAUTION: Classes from which duplicates can exists, should not be
          * managed by PicoContainer.
-         */
+         */        
         reinjector = new Reinjector(this.container);
     }
 

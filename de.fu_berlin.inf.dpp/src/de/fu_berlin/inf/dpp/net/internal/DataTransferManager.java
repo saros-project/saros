@@ -77,9 +77,12 @@ public class DataTransferManager implements IConnectionListener,
     protected Map<NetTransferMode, Throwable> errors = new LinkedHashMap<NetTransferMode, Throwable>();
 
     protected SessionIDObservable sessionID = null;
+        
+    @Inject
+    private IBBTransport ibbTransport;
 
     public DataTransferManager(Saros saros, SessionIDObservable sessionID,
-        PreferenceUtils preferenceUtils, RosterTracker rosterTracker) {
+        PreferenceUtils preferenceUtils, RosterTracker rosterTracker, IBBTransport ibbTransport) {
         this.sessionID = sessionID;
         this.saros = saros;
         this.preferenceUtils = preferenceUtils;
@@ -87,6 +90,7 @@ public class DataTransferManager implements IConnectionListener,
         addRosterListener(rosterTracker);
         saros.addListener(this);
         transferModeDispatch.add(new TransferCompleteListener());
+        this.ibbTransport = ibbTransport;
     }
 
     /**
@@ -537,7 +541,7 @@ public class DataTransferManager implements IConnectionListener,
         if (!chatOnly) {
             addPrimaryTransports();
         }
-        transports.add(IBBTransport.getTransport());
+        transports.add(ibbTransport);
     }
 
     /**
