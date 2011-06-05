@@ -15,7 +15,7 @@
 <stringAttribute key="location" value="${workspace_loc}/../workspace-alice-stf"/>
 <stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="-os ${target.os} -ws ${target.ws} -arch ${target.arch} -nl ${target.nl}"/>
 <stringAttribute key="org.eclipse.jdt.launching.SOURCE_PATH_PROVIDER" value="org.eclipse.pde.ui.workbenchClasspathProvider"/>
-<stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-Xmx512m &#13;&#10;-ea&#13;&#10;-XX:MaxPermSize=128m &#13;&#10;-Djava.rmi.server.codebase=file:${workspace_loc}/Saros/bin&#13;&#10;-Djava.security.manager &#13;&#10;-Djava.security.policy=file:${workspace_loc}/Saros/test/resources/stf/all.policy &#13;&#10;-Dde.fu_berlin.inf.dpp.testmode=12345&#13;&#10;-Dde.fu_berlin.inf.dpp.sleepTime=200&#13;&#10;-Djava.rmi.server.hostname=localhost -Dorg.eclipse.swtbot.keyboard.strategy=org.eclipse.swtbot.swt.finder.keyboard.SWTKeyboardStrategy" />
+<stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-Xmx512m &#13;&#10;-ea&#13;&#10;-XX:MaxPermSize=256m &#13;&#10;-Djava.rmi.server.codebase=file:${workspace_loc}/Saros/bin&#13;&#10;-Djava.security.manager &#13;&#10;-Djava.security.policy=file:${workspace_loc}/Saros/test/resources/stf/all.policy &#13;&#10;-Dde.fu_berlin.inf.dpp.testmode=12345&#13;&#10;-Dde.fu_berlin.inf.dpp.sleepTime=200&#13;&#10;-Djava.rmi.server.hostname=localhost -Dorg.eclipse.swtbot.keyboard.strategy=org.eclipse.swtbot.swt.finder.keyboard.SWTKeyboardStrategy" />
 <stringAttribute key="org.eclipse.jdt.launching.WORKING_DIRECTORY" value="${workspace_loc}/../working-dir-alice-stf"/>
 <stringAttribute key="pde.version" value="3.3"/>
 <stringAttribute key="product" value="org.eclipse.platform.ide"/>
