@@ -37,7 +37,6 @@ import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.jface.text.source.LineRange;
 import org.eclipse.jface.text.source.SourceViewer;
 import org.eclipse.jface.viewers.ISelectionProvider;
-import org.eclipse.swt.SWTException;
 import org.eclipse.swt.custom.VerifyKeyListener;
 import org.eclipse.swt.events.VerifyEvent;
 import org.eclipse.swt.widgets.Display;
@@ -74,6 +73,8 @@ import de.fu_berlin.inf.dpp.util.BlockingProgressMonitor;
 import de.fu_berlin.inf.dpp.util.Pair;
 import de.fu_berlin.inf.dpp.util.StackTrace;
 import de.fu_berlin.inf.dpp.util.Utils;
+
+import static com.google.common.collect.Sets.newHashSet;
 
 /**
  * The central implementation of the IEditorAPI which basically encapsulates the
@@ -127,7 +128,8 @@ public class EditorAPI implements IEditorAPI {
      * {@inheritDoc}
      */
     public void addEditorPartListener(EditorManager editorManager) {
-
+        if (!Saros.isWorkbenchAvailable())
+            return;
         assert Utils.isSWT();
 
         if (editorManager == null)
@@ -153,6 +155,8 @@ public class EditorAPI implements IEditorAPI {
      * {@inheritDoc}
      */
     public void removeEditorPartListener(EditorManager editorManager) {
+        if (!Saros.isWorkbenchAvailable())
+            return;
 
         if (editorManager == null)
             throw new IllegalArgumentException();
@@ -177,7 +181,9 @@ public class EditorAPI implements IEditorAPI {
      * {@inheritDoc}
      */
     public IEditorPart openEditor(SPath path) {
-
+        if (!Saros.isWorkbenchAvailable()) {
+            return null;
+        }
         IFile file = path.getFile();
 
         if (!file.exists()) {
@@ -245,6 +251,8 @@ public class EditorAPI implements IEditorAPI {
      * {@inheritDoc}
      */
     public void closeEditor(IEditorPart part) {
+        if (!Saros.isWorkbenchAvailable())
+            return;
         IWorkbenchWindow window = EditorAPI.getActiveWindow();
         if (window != null) {
             IWorkbenchPage page = window.getActivePage();
@@ -279,7 +287,9 @@ public class EditorAPI implements IEditorAPI {
      * @see EditorAPI#getOpenEditors()
      */
     private static Set<IEditorPart> getOpenEditors(boolean restore) {
-
+        if (!Saros.isWorkbenchAvailable()) {
+            return newHashSet();
+        }
         Set<IEditorPart> editorParts = new HashSet<IEditorPart>();
 
         IWorkbenchWindow[] windows = EditorAPI.getWindows();
@@ -320,6 +330,9 @@ public class EditorAPI implements IEditorAPI {
      * {@inheritDoc}
      */
     public IEditorPart getActiveEditor() {
+        if (!Saros.isWorkbenchAvailable()) {
+            return null;
+        }
         IWorkbenchWindow window = EditorAPI.getActiveWindow();
         if (window != null) {
             IWorkbenchPage page = window.getActivePage();
@@ -335,6 +348,9 @@ public class EditorAPI implements IEditorAPI {
      * {@inheritDoc}
      */
     public IResource getEditorResource(IEditorPart editorPart) {
+        if (!Saros.isWorkbenchAvailable()) {
+            return null;
+        }
 
         IEditorInput input = editorPart.getEditorInput();
 
@@ -354,6 +370,9 @@ public class EditorAPI implements IEditorAPI {
      */
     public void setSelection(IEditorPart editorPart, ITextSelection selection,
         User source, boolean following) {
+        if (!Saros.isWorkbenchAvailable()) {
+            return;
+        }
 
         if (!(editorPart instanceof ITextEditor)) {
             return;
@@ -426,6 +445,10 @@ public class EditorAPI implements IEditorAPI {
     protected void setSelectionAnnotation(User source, IAnnotationModel model,
         @Nullable SarosAnnotation newAnnotation, @Nullable Position position) {
 
+        if (!Saros.isWorkbenchAvailable()) {
+            return;
+        }
+
         if ((newAnnotation == null) != (position == null)) {
             throw new IllegalArgumentException(
                 "Either both Annotation and Position must be null or non-null");
@@ -468,6 +491,10 @@ public class EditorAPI implements IEditorAPI {
      * 
      */
     public static void reveal(IEditorPart editorPart, ITextSelection selection) {
+        if (!Saros.isWorkbenchAvailable()) {
+            return;
+        }
+
         ITextViewer viewer = EditorAPI.getViewer(editorPart);
 
         IRegion visible = new Region(viewer.getTopIndexStartOffset(),
@@ -554,6 +581,10 @@ public class EditorAPI implements IEditorAPI {
      * {@inheritDoc}
      */
     public ITextSelection getSelection(IEditorPart editorPart) {
+        if (!Saros.isWorkbenchAvailable()) {
+            return null;
+        }
+
         if (!(editorPart instanceof ITextEditor)) {
             return TextSelection.emptySelection();
         }
@@ -573,6 +604,9 @@ public class EditorAPI implements IEditorAPI {
      */
     public void setEditable(final IEditorPart editorPart,
         final boolean newIsEditable) {
+        if (!Saros.isWorkbenchAvailable()) {
+            return;
+        }
 
         Utils.runSafeSWTSync(log, new Runnable() {
             public void run() {
@@ -626,6 +660,9 @@ public class EditorAPI implements IEditorAPI {
 
     public void addSharedEditorListener(EditorManager editorManager,
         IEditorPart editorPart) {
+        if (!Saros.isWorkbenchAvailable()) {
+            return;
+        }
 
         assert Utils.isSWT();
 
@@ -648,6 +685,9 @@ public class EditorAPI implements IEditorAPI {
 
     public void removeSharedEditorListener(EditorManager editorManager,
         IEditorPart editorPart) {
+        if (!Saros.isWorkbenchAvailable()) {
+            return;
+        }
 
         assert Utils.isSWT();
 
@@ -666,6 +706,9 @@ public class EditorAPI implements IEditorAPI {
     }
 
     public void reveal(IEditorPart editorPart, ILineRange viewport) {
+        if (!Saros.isWorkbenchAvailable()) {
+            return;
+        }
 
         int top = viewport.getStartLine();
         int bottom = top + viewport.getNumberOfLines();
@@ -693,6 +736,9 @@ public class EditorAPI implements IEditorAPI {
 
     public void setViewportAnnotation(IEditorPart editorPart,
         ILineRange viewport, User user) {
+        if (!Saros.isWorkbenchAvailable()) {
+            return;
+        }
 
         int top = viewport.getStartLine();
         int bottom = top + viewport.getNumberOfLines();
@@ -703,6 +749,10 @@ public class EditorAPI implements IEditorAPI {
     }
 
     public static ILineRange getViewport(ITextViewer viewer) {
+        if (!Saros.isWorkbenchAvailable()) {
+            return null;
+        }
+
         int top = viewer.getTopIndex();
         // Have to add +1 because a LineRange should excludes the bottom line
         int bottom = viewer.getBottomIndex() + 1;
@@ -719,6 +769,10 @@ public class EditorAPI implements IEditorAPI {
     }
 
     public ILineRange getViewport(IEditorPart editorPart) {
+        if (!Saros.isWorkbenchAvailable()) {
+            return null;
+        }
+
         ITextViewer textViewer = EditorAPI.getViewer(editorPart);
         if (textViewer == null)
             return null;
@@ -729,6 +783,9 @@ public class EditorAPI implements IEditorAPI {
     @SuppressWarnings("unchecked")
     protected void updateViewportAnnotation(ITextViewer viewer, int top,
         int bottom, User source) {
+        if (!Saros.isWorkbenchAvailable()) {
+            return;
+        }
 
         if (!(viewer instanceof ISourceViewer)) {
             return;
@@ -783,6 +840,9 @@ public class EditorAPI implements IEditorAPI {
      * @nonSWT This method may not be called from the SWT UI Thread!
      */
     public static boolean saveEditor(final IEditorPart editor) {
+        if (!Saros.isWorkbenchAvailable()) {
+            return true;
+        }
 
         if (editor == null)
             return true;
@@ -816,6 +876,10 @@ public class EditorAPI implements IEditorAPI {
      *         {@link TextViewer} for the editorPart.
      */
     public static ITextViewer getViewer(IEditorPart editorPart) {
+        if (!Saros.isWorkbenchAvailable()) {
+            return null;
+        }
+
         Object viewer = editorPart.getAdapter(ITextOperationTarget.class);
         if (viewer instanceof ITextViewer) {
             return (ITextViewer) viewer;
@@ -835,12 +899,15 @@ public class EditorAPI implements IEditorAPI {
     protected static IWorkbenchWindow getActiveWindow() {
         try {
             return PlatformUI.getWorkbench().getActiveWorkbenchWindow();
-        } catch (SWTException e) {
+        } catch (Exception e) {
             return null;
         }
     }
 
     protected static IWorkbenchWindow[] getWindows() {
+        if (!Saros.isWorkbenchAvailable())
+            return null;
+
         return PlatformUI.getWorkbench().getWorkbenchWindows();
     }
 
@@ -856,17 +923,22 @@ public class EditorAPI implements IEditorAPI {
      */
     public static boolean saveProject(final IProject projectToSave,
         final boolean confirm) {
+        if (!Saros.isWorkbenchAvailable()) {
+            return true;
+        }
         try {
-            return Utils.runSWTSync(new Callable<Boolean>() {
+            Boolean result = true;
+            result = Utils.runSWTSync(new Callable<Boolean>() {
                 public Boolean call() throws Exception {
                     /**
                      * TODO saveAllEditors does not save the Documents that we
                      * are modifying in the background
                      */
                     return IDE.saveAllEditors(
-                        new IResource[] { projectToSave }, confirm);
+                            new IResource[]{projectToSave}, confirm);
                 }
             });
+            return result;
         } catch (Exception e) {
             // The operation does not throw an exception, thus this is an error.
             throw new RuntimeException(e);
@@ -875,6 +947,9 @@ public class EditorAPI implements IEditorAPI {
 
     public static boolean existUnsavedFiles(IProject proj) {
         // Note: We don't need to check editors that aren't loaded.
+        if (!Saros.isWorkbenchAvailable()) {
+            return false;
+        }
         for (IEditorPart editorPart : getOpenEditors(false)) {
             final IEditorInput editorInput = editorPart.getEditorInput();
             if (!(editorInput instanceof IFileEditorInput)) {
@@ -890,24 +965,28 @@ public class EditorAPI implements IEditorAPI {
     }
 
     public static IWorkbenchWindow getAWorkbenchWindow() {
+        try {
+            if (PlatformUI.getWorkbench().getDisplay().isDisposed()) {
+                return null;
+            }
 
-        if (PlatformUI.getWorkbench().getDisplay().isDisposed()) {
-            return null;
-        }
+            IWorkbenchWindow w = PlatformUI.getWorkbench()
+                    .getActiveWorkbenchWindow();
+            if (w != null) {
+                return w;
+            }
 
-        IWorkbenchWindow w = PlatformUI.getWorkbench()
-            .getActiveWorkbenchWindow();
-        if (w != null) {
-            return w;
+            IWorkbenchWindow[] windows = PlatformUI.getWorkbench()
+                    .getWorkbenchWindows();
+            if (windows.length > 0) {
+                return windows[0];
+            } else {
+                return null;
+            }
+        } catch (Exception e) {
+            // do nothing
         }
-
-        IWorkbenchWindow[] windows = PlatformUI.getWorkbench()
-            .getWorkbenchWindows();
-        if (windows.length > 0) {
-            return windows[0];
-        } else {
-            return null;
-        }
+        return null;
     }
 
     /**
@@ -915,21 +994,23 @@ public class EditorAPI implements IEditorAPI {
      * Use instead of Display.getDefault().getActiveShell()!
      */
     public static Shell getShell() {
+        try {
+            IWorkbenchWindow window = getAWorkbenchWindow();
 
-        IWorkbenchWindow window = getAWorkbenchWindow();
-
-        if (window != null) {
-            Shell shell = window.getShell();
-            if (!shell.isDisposed()) {
-                return shell;
+            if (window != null) {
+                Shell shell = window.getShell();
+                if (!shell.isDisposed()) {
+                    return shell;
+                }
             }
+
+            // Window was null or shell disposed
+            Display display = PlatformUI.getWorkbench().getDisplay();
+            if (!display.isDisposed())
+                return display.getActiveShell();
+        } catch (Exception e) {
+            // do nothing
         }
-
-        // Window was null or shell disposed
-        Display display = PlatformUI.getWorkbench().getDisplay();
-        if (!display.isDisposed())
-            return display.getActiveShell();
-
         // Give up:
         return null;
     }
@@ -939,6 +1020,9 @@ public class EditorAPI implements IEditorAPI {
      * getActiveEditor()
      */
     public SPath getActiveEditorPath() {
+        if (!Saros.isWorkbenchAvailable()) {
+            return null;
+        }
         IEditorPart newActiveEditor = getActiveEditor();
         if (newActiveEditor == null)
             return null;
@@ -950,7 +1034,9 @@ public class EditorAPI implements IEditorAPI {
      * Syntactic sugar for getting the path of the given editor part.
      */
     public SPath getEditorPath(IEditorPart editorPart) {
-
+        if (!Saros.isWorkbenchAvailable()) {
+            return null;
+        }
         IResource resource = getEditorResource(editorPart);
         if (resource == null) {
             return null;

@@ -99,28 +99,28 @@ public class ImageManager {
     public static Image ICON_BUDDY_SAROS_AWAY = new DecorationOverlayIcon(
         ICON_BUDDY_SAROS, OVERLAY_AWAY, IDecoration.TOP_RIGHT).createImage();
 
-    /**
+   /**
      * Returns an image from the file at the given plug-in relative path.
-     * 
+     *
      * @param path
      * @return image; the returned image <b>MUST be disposed after usage</b> to
      *         free up memory
      */
     public static Image getImage(String path) {
-        return new Image(Display.getDefault(), getImageDescriptor(path)
-            .getImageData());
+        return Saros.isWorkbenchAvailable() ? new Image(Display.getDefault(), getImageDescriptor(path)
+            .getImageData()) : null;
     }
 
     /**
      * Returns an image descriptor for the image file at the given plug-in
      * relative path.
-     * 
+     *
      * @param path
      *            the path
      * @return the image descriptor
      */
     public static ImageDescriptor getImageDescriptor(String path) {
-        return AbstractUIPlugin.imageDescriptorFromPlugin(Saros.SAROS, path);
+        return Saros.isWorkbenchAvailable() ? AbstractUIPlugin.imageDescriptorFromPlugin(Saros.SAROS, path) : null;
     }
 
 }

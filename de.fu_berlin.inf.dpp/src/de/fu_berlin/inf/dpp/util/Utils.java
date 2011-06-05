@@ -31,6 +31,7 @@ import java.util.regex.Pattern;
 import java.util.zip.Deflater;
 import java.util.zip.Inflater;
 
+import de.fu_berlin.inf.dpp.Saros;
 import org.apache.commons.codec.BinaryDecoder;
 import org.apache.commons.codec.BinaryEncoder;
 import org.apache.commons.codec.DecoderException;
@@ -455,11 +456,19 @@ public class Utils {
      * @blocking
      */
     public static void runSafeSWTSync(final Logger log, final Runnable runnable) {
-        try {
-            Display.getDefault().syncExec(wrapSafe(log, runnable));
-        } catch (SWTException e) {
-            if (!PlatformUI.getWorkbench().isClosing()) {
-                throw e;
+        if (Saros.isWorkbenchAvailable()) {
+            try {
+                Display.getDefault().syncExec(wrapSafe(log, runnable));
+            } catch (SWTException e) {
+                if (!PlatformUI.getWorkbench().isClosing()) {
+                    throw e;
+                }
+            }
+        } else {
+            try {
+                runSafeAsync(log, runnable);
+            } catch (Exception e) {
+                //e.printStackTrace();
             }
         }
     }
@@ -518,11 +527,19 @@ public class Utils {
      * @nonBlocking
      */
     public static void runSafeSWTAsync(final Logger log, final Runnable runnable) {
-        try {
-            Display.getDefault().asyncExec(wrapSafe(log, runnable));
-        } catch (SWTException e) {
-            if (!PlatformUI.getWorkbench().isClosing()) {
-                throw e;
+        if (Saros.isWorkbenchAvailable()) {
+            try {
+                Display.getDefault().asyncExec(wrapSafe(log, runnable));
+            } catch (SWTException e) {
+                if (!PlatformUI.getWorkbench().isClosing()) {
+                    throw e;
+                }
+            }
+        } else {
+            try {
+                new Thread(runnable).start();
+            } catch (Exception e) {
+                // do nothing ...
             }
         }
     }
@@ -558,6 +575,10 @@ public class Utils {
      *      <code>null</code> is returned.
      */
     public static IViewPart findView(String id) {
+        if (!Saros.isWorkbenchAvailable()) {
+            return null;
+        }
+        
         IWorkbench workbench = PlatformUI.getWorkbench();
         if (workbench == null)
             return null;
@@ -592,7 +613,9 @@ public class Utils {
      * Crude check whether we are on the SWT thread
      */
     public static boolean isSWT() {
-
+        if (!Saros.isWorkbenchAvailable()) {
+            return false;
+        }
         if (Display.getCurrent() != null) {
             return true;
         }

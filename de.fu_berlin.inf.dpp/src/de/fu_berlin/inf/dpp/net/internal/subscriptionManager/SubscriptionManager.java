@@ -199,6 +199,8 @@ public class SubscriptionManager {
 
     protected static boolean askUserForSubscriptionConfirmation(
         final String from) {
+        if (!Saros.isWorkbenchAvailable())
+            return true;
         final AtomicReference<Boolean> result = new AtomicReference<Boolean>();
         Utils.runSafeSWTSync(log, new Runnable() {
             public void run() {

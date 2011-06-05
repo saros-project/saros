@@ -1,5 +1,6 @@
 package de.fu_berlin.inf.dpp.ui;
 
+import de.fu_berlin.inf.dpp.Saros;
 import org.apache.log4j.Logger;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Point;
@@ -38,6 +39,8 @@ public class BalloonNotification {
      */
     public static void showNotification(Control control, String title,
         String text, int timeout) {
+        if (!Saros.isWorkbenchAvailable())
+            return;
 
         if (control != null && control.isDisposed()) {
             control = null;

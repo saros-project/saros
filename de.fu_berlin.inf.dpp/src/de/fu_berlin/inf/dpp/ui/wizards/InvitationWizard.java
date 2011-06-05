@@ -132,6 +132,10 @@ public class InvitationWizard extends Wizard {
      *               TODO: is this the right way?
      */
     public static synchronized boolean confirmUnsupportedSaros(final JID peer) {
+        if (!Saros.isWorkbenchAvailable()) {
+            return true;
+        }
+        
         try {
             return Utils.runSWTSync(new Callable<Boolean>() {
                 public Boolean call() {
@@ -169,6 +173,9 @@ public class InvitationWizard extends Wizard {
      */
     public static synchronized boolean confirmVersionConflict(
         VersionInfo remoteVersionInfo, JID peer, Version localVersion) {
+        if (!Saros.isWorkbenchAvailable()) {
+            return true;
+        }
         final String title = "Saros Version Conflict with " + peer.getBase();
         final String message;
         if (remoteVersionInfo == null) {
@@ -225,6 +232,10 @@ public class InvitationWizard extends Wizard {
     }
 
     public static boolean confirmUnknownVersion(JID peer, Version localVersion) {
+        if (!Saros.isWorkbenchAvailable()) {
+            return true;
+        }
+        
         final String title = "Unable to determine Saros compatibility with "
             + peer.getBase();
         final String message = "Saros was unable to check the version number of your peer "

@@ -51,6 +51,7 @@ import org.eclipse.equinox.security.storage.ISecurePreferences;
 import org.eclipse.equinox.security.storage.SecurePreferencesFactory;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.wizard.IWizard;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.jivesoftware.smack.Connection;
 import org.jivesoftware.smack.ConnectionConfiguration;
@@ -1088,6 +1089,16 @@ public class Saros extends AbstractUIPlugin {
     public boolean getAutoFollowEnabled() {
         return getPreferenceStore().getBoolean(
             PreferenceConstants.AUTO_FOLLOW_MODE);
+    }
+
+    public static boolean isWorkbenchAvailable() {
+        boolean result = false;
+        try {
+            result = PlatformUI.getWorkbench() != null;
+        } catch (Exception e) {
+            // do nothing ...
+        }
+        return result;
     }
 
 }
