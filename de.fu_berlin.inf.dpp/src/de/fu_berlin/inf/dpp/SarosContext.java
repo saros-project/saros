@@ -36,6 +36,7 @@ import de.fu_berlin.inf.dpp.project.internal.ChangeColorManager;
 import de.fu_berlin.inf.dpp.project.internal.PermissionManager;
 import de.fu_berlin.inf.dpp.project.internal.ProjectsAddedManager;
 import de.fu_berlin.inf.dpp.synchronize.StopManager;
+import de.fu_berlin.inf.dpp.util.EclipseHelperTestSaros;
 import de.fu_berlin.inf.dpp.ui.LocalPresenceTracker;
 import de.fu_berlin.inf.dpp.ui.RemoteProgressManager;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
@@ -51,7 +52,12 @@ import org.apache.log4j.helpers.LogLog;
 import org.picocontainer.*;
 import org.picocontainer.injectors.*;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
+import static java.util.Arrays.asList;
 
 /**
  * Encapsulates a {@link org.picocontainer.PicoContainer} and its
@@ -136,6 +142,7 @@ public class SarosContext {
         RemoteProgressManager.class,
         XMPPAccountStore.class,
         ProjectsAddedManager.class,
+        de.fu_berlin.inf.dpp.util.EclipseHelper.class,
 
         // Observables
         FileReplacementInProgressObservable.class,
@@ -192,16 +199,25 @@ public class SarosContext {
         AudioService.class,
         VideoSharingService.class,
         ArchiveStreamService.class
-    
+
+    };
+
+    private static final List<Class<?>> excludedComponentsForTestContext = new ArrayList<Class<?>>(
+        asList(de.fu_berlin.inf.dpp.util.EclipseHelper.class));
+
+    private static final Map<Class<?>, Class<?>> testImplementations = new HashMap<Class<?>, Class<?>>() {
+        {
+            put(de.fu_berlin.inf.dpp.util.EclipseHelper.class, EclipseHelperTestSaros.class);
+        }
     };
 
     private SarosContext() {
         /*
          * Use the SarosContextBuilder to build a SarosContext. {@link SarosContextBuilder}
-         */         
+         */
     }
 
-    private void init() {
+    private void init(List<Class<?>> excludedComponentsForTestContext) {
         PicoBuilder picoBuilder = new PicoBuilder(new CompositeInjection(
             new ConstructorInjection(), new AnnotatedFieldInjection()))
             .withCaching().withLifecycle();
@@ -234,7 +250,9 @@ public class SarosContext {
          * Add components.
          */
         for (Class<?> component : picoContainerComponents) {
-            this.container.addComponent(component);
+            if (!excludedComponentsForTestContext.contains(component)) {
+                this.container.addComponent(component);
+            }
         }
 
         // add this context itself because some components need it ...
@@ -250,7 +268,7 @@ public class SarosContext {
          * 
          * CAUTION: Classes from which duplicates can exists, should not be
          * managed by PicoContainer.
-         */        
+         */
         reinjector = new Reinjector(this.container);
     }
 
@@ -358,8 +376,22 @@ public class SarosContext {
             result.saros = this.saros;
             result.dotMonitor = this.dotMonitor;
             result.isTestContext = this.isTestContext;
-            result.init();
+
+            if (result.isTestContext()) {
+                result.init(excludedComponentsForTestContext);
+                addTestImplemantations(result);
+            } else {
+                result.init(new ArrayList<Class<?>>());
+            }
+
             return result;
+        }
+
+        private void addTestImplemantations(SarosContext result) {
+            for (Map.Entry<Class<?>, Class<?>> entry : testImplementations
+                .entrySet()) {
+                result.container.addComponent(entry.getKey(), entry.getValue());
+            }
         }
     }
 

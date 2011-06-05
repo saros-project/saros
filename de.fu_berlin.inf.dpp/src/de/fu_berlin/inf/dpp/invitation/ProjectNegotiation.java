@@ -2,6 +2,7 @@ package de.fu_berlin.inf.dpp.invitation;
 
 import java.util.Map;
 
+import de.fu_berlin.inf.dpp.util.EclipseHelper;
 import org.apache.log4j.Logger;
 import org.picocontainer.annotations.Inject;
 
@@ -49,6 +50,8 @@ public abstract class ProjectNegotiation {
     protected ArchiveStreamService archiveStreamService;
     @Inject
     protected SarosSessionManager sessionManager;
+    @Inject
+    protected de.fu_berlin.inf.dpp.util.EclipseHelper eclipseHelper;
 
     protected StreamSessionListener sessionListener = new StreamSessionListener() {
 
@@ -87,6 +90,10 @@ public abstract class ProjectNegotiation {
 
     public JID getPeer() {
         return this.peer;
+    }
+
+    public EclipseHelper getEclipseHelper() {
+        return eclipseHelper;
     }
 
     /**

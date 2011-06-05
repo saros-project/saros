@@ -25,6 +25,7 @@ import java.io.ByteArrayInputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
+import de.fu_berlin.inf.dpp.util.EclipseHelper;
 import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
@@ -35,7 +36,6 @@ import org.eclipse.core.resources.IResourceChangeEvent;
 import org.eclipse.core.resources.IResourceChangeListener;
 import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.resources.IWorkspaceRoot;
-import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -128,6 +128,9 @@ public class SharedResourcesManager extends AbstractActivityProvider implements
     protected Saros saros;
 
     @Inject
+    protected EclipseHelper eclipseHelper;
+
+    @Inject
     protected EditorManager editorManager;
 
     @Inject
@@ -151,13 +154,13 @@ public class SharedResourcesManager extends AbstractActivityProvider implements
         public void sessionStarted(ISarosSession newSarosSession) {
             sarosSession = newSarosSession;
             sarosSession.addActivityProvider(SharedResourcesManager.this);
-            ResourcesPlugin.getWorkspace().addResourceChangeListener(
+            eclipseHelper.getWorkspace().addResourceChangeListener(
                 SharedResourcesManager.this, INTERESTING_EVENTS);
         }
 
         @Override
         public void sessionEnded(ISarosSession oldSarosSession) {
-            ResourcesPlugin.getWorkspace().removeResourceChangeListener(
+            eclipseHelper.getWorkspace().removeResourceChangeListener(
                 SharedResourcesManager.this);
 
             assert sarosSession == oldSarosSession;

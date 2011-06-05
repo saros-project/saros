@@ -1,5 +1,7 @@
 package de.fu_berlin.inf.dpp.context;
 
+import org.eclipse.core.resources.IWorkspace;
+import org.eclipse.equinox.security.storage.ISecurePreferences;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferenceStore;
 
@@ -32,5 +34,15 @@ public class TestSaros extends Saros {
     @Override
     public String toString() {
         return "testsaros";
+    }
+
+    // will be extended
+    public IWorkspace getWorspace() {
+        return null;
+    }
+
+    @Override
+    public ISecurePreferences getSecurePrefs() {
+        return null;
     }
 }

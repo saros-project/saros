@@ -27,7 +27,6 @@ import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.IWorkspaceDescription;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.IWorkspaceRunnable;
-import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -137,7 +136,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
         throws SarosCancellationException {
 
         this.monitor = subMonitor;
-        IWorkspace ws = ResourcesPlugin.getWorkspace();
+        IWorkspace ws = eclipseHelper.getWorkspace();
         IWorkspaceDescription desc = ws.getDescription();
         boolean wasAutobuilding = desc.isAutoBuilding();
 
@@ -291,7 +290,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
                     .getVcsProviderID());
             }
 
-            IProject p = ResourcesPlugin.getWorkspace().getRoot()
+            IProject p = eclipseHelper.getWorkspace().getRoot()
                 .getProject(projectName);
             if (p.exists()) {
                 /*
@@ -617,7 +616,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
         final IProject baseProject) throws Exception {
 
         log.debug("Inv" + Utils.prefix(peer) + ": Creating new project...");
-        IWorkspaceRoot workspaceRoot = ResourcesPlugin.getWorkspace().getRoot();
+        IWorkspaceRoot workspaceRoot = eclipseHelper.getWorkspace().getRoot();
         final IProject project = workspaceRoot.getProject(newProjectName);
 
         final File projectDir = new File(
@@ -887,7 +886,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
 
         log.debug("Inv" + Utils.prefix(peer) + ": Writing archive to disk...");
         try {
-            ResourcesPlugin.getWorkspace().run(new IWorkspaceRunnable() {
+            eclipseHelper.getWorkspace().run(new IWorkspaceRunnable() {
                 public void run(IProgressMonitor monitor) throws CoreException {
                     try {
                         FileUtils.writeArchive(archiveStream, project,

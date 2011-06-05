@@ -1,14 +1,21 @@
 package de.fu_berlin.inf.dpp.context;
 
-import de.fu_berlin.inf.dpp.Saros;
-import de.fu_berlin.inf.dpp.SarosContext;
-import de.fu_berlin.inf.dpp.SarosPluginContext;
-import de.fu_berlin.inf.dpp.project.SarosSessionManager;
+import static junit.framework.Assert.assertNotNull;
+import static junit.framework.Assert.assertNotSame;
+import static junit.framework.Assert.assertNull;
+import static junit.framework.Assert.assertTrue;
+import static junit.framework.Assert.fail;
+import static org.junit.Assert.assertEquals;
+
+import de.fu_berlin.inf.dpp.util.EclipseHelperTestSaros;
 import org.junit.Test;
 import org.picocontainer.annotations.Inject;
 
-import static junit.framework.Assert.*;
-import static org.junit.Assert.assertEquals;
+import de.fu_berlin.inf.dpp.Saros;
+import de.fu_berlin.inf.dpp.SarosContext;
+import de.fu_berlin.inf.dpp.SarosPluginContext;
+import de.fu_berlin.inf.dpp.util.EclipseHelper;
+import de.fu_berlin.inf.dpp.project.SarosSessionManager;
 
 /**
  * @author cordes
@@ -94,6 +101,22 @@ public class SarosContextTest {
         }
     }
 
+    @Test
+    public void testEclipseHelper() {
+        SarosContext testContext = SarosContext.getContextForSaros(
+            new TestSaros()).isTestContext().build();
+        assertTrue(testContext.getComponent(EclipseHelper.class) instanceof EclipseHelperTestSaros);
+
+        try {
+            SarosContext liveContext = SarosContext.getContextForSaros(
+                new TestSaros()).build();
+            liveContext.getComponent(EclipseHelper.class).getWorkspace();
+            fail("assert IllegalStateException: Workspace is closed.");
+        } catch (IllegalStateException exception) {
+            assertEquals("Workspace is closed.", exception.getMessage());
+        }
+    }
+        
     private class TestEntity {
         @Inject
         protected SarosSessionManager sarosSessionManager;
