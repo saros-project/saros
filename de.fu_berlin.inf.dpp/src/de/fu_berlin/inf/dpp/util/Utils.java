@@ -26,12 +26,13 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.Deflater;
 import java.util.zip.Inflater;
 
-import de.fu_berlin.inf.dpp.Saros;
 import org.apache.commons.codec.BinaryDecoder;
 import org.apache.commons.codec.BinaryEncoder;
 import org.apache.commons.codec.DecoderException;
@@ -47,6 +48,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.SWTException;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IViewPart;
@@ -67,6 +69,7 @@ import org.picocontainer.annotations.Nullable;
 
 import bmsi.util.Diff;
 import bmsi.util.DiffPrint;
+import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
@@ -455,6 +458,8 @@ public class Utils {
      * 
      * @blocking
      */
+    private static final Lock SYNC_LOCK = new ReentrantLock();
+
     public static void runSafeSWTSync(final Logger log, final Runnable runnable) {
         if (Saros.isWorkbenchAvailable()) {
             try {
@@ -465,11 +470,30 @@ public class Utils {
                 }
             }
         } else {
+            SyncedThread thread = null;
             try {
-                runSafeAsync(log, runnable);
-            } catch (Exception e) {
-                //e.printStackTrace();
+                SYNC_LOCK.lockInterruptibly();
+                thread = new SyncedThread(wrapSafe(log, runnable));
+                thread.start();
+                thread.join();
+
+            } catch (InterruptedException e) {
+                if (thread != null) {
+                    thread.interrupt();
+                }
+            } finally {
+                SYNC_LOCK.unlock();
             }
+
+            Throwable throwable = null;
+
+            // FIXME: wait until the thread has finished
+
+            if (thread != null)
+                throwable = thread.getRunningError();
+
+            if (throwable != null)
+                SWT.error(SWT.ERROR_FAILED_EXEC, throwable);
         }
     }
 
@@ -536,11 +560,7 @@ public class Utils {
                 }
             }
         } else {
-            try {
-                new Thread(runnable).start();
-            } catch (Exception e) {
-                // do nothing ...
-            }
+            runSafeAsync(log, runnable);
         }
     }
 
@@ -578,7 +598,7 @@ public class Utils {
         if (!Saros.isWorkbenchAvailable()) {
             return null;
         }
-        
+
         IWorkbench workbench = PlatformUI.getWorkbench();
         if (workbench == null)
             return null;
@@ -1199,5 +1219,31 @@ public class Utils {
             i++;
         }
         return join(seperator, strArray);
+    }
+
+    private static class SyncedThread extends Thread {
+
+        volatile Throwable throwable;
+
+        private Runnable runnableToRun;
+
+        public SyncedThread(Runnable runnable) {
+            this.runnableToRun = runnable;
+            this.setName("Synced-Thread:" + runnable.toString());
+        }
+
+        @Override
+        public void run() {
+            try {
+                if (runnableToRun != null)
+                    runnableToRun.run();
+            } catch (Throwable t) {
+                throwable = t;
+            }
+        }
+
+        public Throwable getRunningError() {
+            return throwable;
+        }
     }
 }
