@@ -2,12 +2,10 @@ package de.fu_berlin.inf.dpp.stf.client.util;
 
 import static de.fu_berlin.inf.dpp.stf.shared.Constants.ACCEPT;
 import static de.fu_berlin.inf.dpp.stf.shared.Constants.NODE_SAROS;
-import static de.fu_berlin.inf.dpp.stf.shared.Constants.SHELL_INCOMING_SCREENSHARING_SESSION;
 import static de.fu_berlin.inf.dpp.stf.shared.Constants.SHELL_SESSION_INVITATION;
 import static de.fu_berlin.inf.dpp.stf.shared.Constants.SRC;
 import static de.fu_berlin.inf.dpp.stf.shared.Constants.SUFFIX_JAVA;
 import static de.fu_berlin.inf.dpp.stf.shared.Constants.VIEW_SAROS;
-import static de.fu_berlin.inf.dpp.stf.shared.Constants.YES;
 
 import java.rmi.RemoteException;
 import java.util.ArrayList;
@@ -25,7 +23,19 @@ import de.fu_berlin.inf.dpp.stf.client.tester.AbstractTester;
 import de.fu_berlin.inf.dpp.stf.shared.Constants.TypeOfCreateProject;
 
 public class Util {
-
+    /**
+     * Closes the following views:
+     * <ol>
+     * <li>Problems</li>
+     * <li>Javadoc</li>
+     * <li>Declaration</li>
+     * <li>Task List</li>
+     * <li>Outline</li>
+     * </ol>
+     * 
+     * @param tester
+     *            the remote tester e.g: Alice
+     **/
     public static void closeUnnecessaryViews(AbstractTester tester)
         throws RemoteException {
         if (tester.remoteBot().isViewOpen("Problems"))
@@ -44,6 +54,12 @@ public class Util {
             tester.remoteBot().view("Outline").close();
     }
 
+    /**
+     * Deletes all projects from the current active workspace
+     * 
+     * @param tester
+     *            the remote tester e.g: Alice
+     **/
     public static void deleteAllProjects(AbstractTester tester)
         throws RemoteException {
         List<String> treeItems = tester.superBot().views()
@@ -54,6 +70,13 @@ public class Util {
         }
 
     }
+
+    /**
+     * Opens the view <b>Saros</b>
+     * 
+     * @param tester
+     *            the remote tester e.g: Alice
+     **/
 
     public static void openSarosViews(AbstractTester tester)
         throws RemoteException {
@@ -67,30 +90,34 @@ public class Util {
      * A convenient function to quickly build a session which share a java
      * project with a class.
      * 
+     * @param projectName
+     *            the name of the project
+     * @param packageName
+     *            the name of the package
+     * @param className
+     *            the name of the class without .java suffix
      * @param inviter
      * @param invitees
      * @throws RemoteException
-     * @throws InterruptedException
      */
     public static void setUpSessionWithAJavaProjectAndAClass(
+        String projectName, String packageName, String className,
         AbstractTester inviter, AbstractTester... invitees)
-        throws RemoteException, InterruptedException {
-        inviter
-            .superBot()
-            .views()
-            .packageExplorerView()
-            .tree()
-            .newC()
-            .javaProjectWithClasses(Constants.PROJECT1, Constants.PKG1,
-                Constants.CLS1);
-        Util.buildSessionConcurrently(Constants.PROJECT1,
-            TypeOfCreateProject.NEW_PROJECT, inviter, invitees);
+        throws RemoteException {
+
+        inviter.superBot().views().packageExplorerView().tree().newC()
+            .javaProjectWithClasses(projectName, packageName, className);
+
+        buildSessionConcurrently(projectName, TypeOfCreateProject.NEW_PROJECT,
+            inviter, invitees);
     }
 
     public static void setUpSessionWithJavaProjects(
         Map<String, List<String>> projectsPkgsClasses, AbstractTester inviter,
         AbstractTester... invitees) throws RemoteException {
+
         List<String> createdProjects = new ArrayList<String>();
+
         for (Iterator<String> i = projectsPkgsClasses.keySet().iterator(); i
             .hasNext();) {
             String key = i.next();
@@ -106,21 +133,21 @@ public class Util {
         }
     }
 
-    public static void createProjectWithFileBy(AbstractTester... testers)
-        throws RemoteException {
+    public static void createProjectWithFileBy(String projectName,
+        String fileName, AbstractTester... testers) throws RemoteException {
         for (AbstractTester tester : testers) {
             tester.superBot().views().packageExplorerView().tree().newC()
-                .project(Constants.PROJECT1);
+                .project(projectName);
             tester.superBot().views().packageExplorerView()
-                .selectFolder(Constants.PROJECT1).newC().file(Constants.FILE3);
-            tester.remoteBot().waitUntilEditorOpen(Constants.FILE3);
+                .selectFolder(fileName).newC().file(fileName);
+            tester.remoteBot().waitUntilEditorOpen(fileName);
         }
     }
 
     public static void buildSessionSequentially(String projectName,
         TypeOfCreateProject usingWhichProject, AbstractTester inviter,
         AbstractTester... invitees) throws RemoteException {
-        JID[] inviteesJID = Util.getPeerJID(invitees);
+        JID[] inviteesJID = getPeerJID(invitees);
         inviter.superBot().menuBar().saros()
             .shareProjects(projectName, inviteesJID);
         for (AbstractTester invitee : invitees) {
@@ -149,7 +176,7 @@ public class Util {
             });
         }
 
-        Util.workAll(joinSessionTasks);
+        workAll(joinSessionTasks);
     }
 
     /**
@@ -175,7 +202,7 @@ public class Util {
                 }
             });
         }
-        Util.workAll(followTasks);
+        workAll(followTasks);
     }
 
     /**
@@ -213,15 +240,16 @@ public class Util {
 
     }
 
-    public static void shareYourScreen(AbstractTester buddy,
-        AbstractTester selectedBuddy) throws RemoteException {
-        buddy.superBot().views().sarosView()
-            .shareYourScreenWithSelectedBuddy(selectedBuddy.getJID());
-        selectedBuddy.remoteBot().waitUntilShellIsOpen(
-            SHELL_INCOMING_SCREENSHARING_SESSION);
-        selectedBuddy.remoteBot().shell(SHELL_INCOMING_SCREENSHARING_SESSION)
-            .bot().button(YES).click();
-    }
+    /*
+     * public static void shareYourScreen(AbstractTester buddy, AbstractTester
+     * selectedBuddy) throws RemoteException {
+     * buddy.superBot().views().sarosView()
+     * .shareYourScreenWithSelectedBuddy(selectedBuddy.getJID());
+     * selectedBuddy.remoteBot().waitUntilShellIsOpen(
+     * SHELL_INCOMING_SCREENSHARING_SESSION);
+     * selectedBuddy.remoteBot().shell(SHELL_INCOMING_SCREENSHARING_SESSION)
+     * .bot().button(YES).click(); }
+     */
 
     /**
      * This method is same as
@@ -286,39 +314,6 @@ public class Util {
         buddy.remoteBot().sleep(500);
     }
 
-    public static <T> List<T> workAll(List<Callable<T>> tasks) {
-        if (System.getProperty("os.name").matches("Mac OS X.*"))
-            // the menubar is only active on Mac OS on the Window that has the
-            // current focus
-            return workAll(tasks, 1);
-        else
-            return workAll(tasks, tasks.size());
-    }
-
-    public static <T> List<T> workAll(List<Callable<T>> tasks,
-        int numberOfThreads) {
-
-        ExecutorService pool = Executors.newFixedThreadPool(numberOfThreads);
-
-        try {
-
-            List<T> result = new ArrayList<T>();
-
-            for (Future<T> future : pool.invokeAll(tasks))
-                result.add(future.get());
-
-            return result;
-
-        } catch (ExecutionException e) {
-            throw new RuntimeException(e);
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            throw new RuntimeException(e);
-        } finally {
-            pool.shutdown();
-        }
-    }
-
     public static void resetWriteAccess(AbstractTester host,
         AbstractTester... invitees) throws RemoteException {
         for (AbstractTester tester : invitees) {
@@ -377,11 +372,11 @@ public class Util {
      * 
      **********************************************/
 
-    public static void reBuildSession(AbstractTester host,
+    public static void reBuildSession(String projectName, AbstractTester host,
         AbstractTester... invitees) throws RemoteException {
         if (!host.superBot().views().sarosView().isInSession()) {
             for (AbstractTester tester : invitees) {
-                buildSessionSequentially(Constants.PROJECT1,
+                buildSessionSequentially(projectName,
                     TypeOfCreateProject.EXIST_PROJECT, host, tester);
             }
         }
@@ -415,6 +410,39 @@ public class Util {
         String className) {
         String[] nodes = { projectName, SRC, pkg, className + SUFFIX_JAVA };
         return nodes;
+    }
+
+    public static <T> List<T> workAll(List<Callable<T>> tasks) {
+        if (System.getProperty("os.name").matches("Mac OS X.*"))
+            // the menubar is only active on Mac OS on the Window that has the
+            // current focus
+            return workAll(tasks, 1);
+        else
+            return workAll(tasks, tasks.size());
+    }
+
+    public static <T> List<T> workAll(List<Callable<T>> tasks,
+        int numberOfThreads) {
+
+        ExecutorService pool = Executors.newFixedThreadPool(numberOfThreads);
+
+        try {
+
+            List<T> result = new ArrayList<T>();
+
+            for (Future<T> future : pool.invokeAll(tasks))
+                result.add(future.get());
+
+            return result;
+
+        } catch (ExecutionException e) {
+            throw new RuntimeException(e);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new RuntimeException(e);
+        } finally {
+            pool.shutdown();
+        }
     }
 
 }

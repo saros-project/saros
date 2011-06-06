@@ -18,8 +18,8 @@ import org.junit.rules.TestName;
 
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.stf.client.tester.AbstractTester;
-import de.fu_berlin.inf.dpp.stf.client.util.Constants;
 import de.fu_berlin.inf.dpp.stf.client.util.Util;
+import de.fu_berlin.inf.dpp.stf.test.Constants;
 
 public abstract class StfTestCase {
 
