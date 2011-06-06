@@ -18,8 +18,8 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import de.fu_berlin.inf.dpp.stf.client.StfTestCase;
-import de.fu_berlin.inf.dpp.stf.client.util.Constants;
 import de.fu_berlin.inf.dpp.stf.client.util.Util;
+import de.fu_berlin.inf.dpp.stf.test.Constants;
 
 public class AllParticipantsFollowUserWithWriteAccessTest extends StfTestCase {
 
@@ -43,7 +43,8 @@ public class AllParticipantsFollowUserWithWriteAccessTest extends StfTestCase {
         initTesters(ALICE, BOB, CARL, DAVE);
         setUpWorkbench();
         setUpSaros();
-        Util.setUpSessionWithAJavaProjectAndAClass(ALICE, BOB, CARL, DAVE);
+        Util.setUpSessionWithAJavaProjectAndAClass(Constants.PROJECT1,
+            Constants.PKG1, Constants.CLS1, ALICE, BOB, CARL, DAVE);
     }
 
     @Before

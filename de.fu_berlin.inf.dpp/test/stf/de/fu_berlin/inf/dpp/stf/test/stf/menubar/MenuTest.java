@@ -13,7 +13,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 import de.fu_berlin.inf.dpp.stf.client.StfTestCase;
-import de.fu_berlin.inf.dpp.stf.client.util.Constants;
+import de.fu_berlin.inf.dpp.stf.test.Constants;
 
 public class MenuTest extends StfTestCase {
 

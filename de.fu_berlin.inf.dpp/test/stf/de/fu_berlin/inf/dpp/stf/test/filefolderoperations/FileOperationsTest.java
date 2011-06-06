@@ -16,8 +16,8 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import de.fu_berlin.inf.dpp.stf.client.StfTestCase;
-import de.fu_berlin.inf.dpp.stf.client.util.Constants;
 import de.fu_berlin.inf.dpp.stf.client.util.Util;
+import de.fu_berlin.inf.dpp.stf.test.Constants;
 
 public class FileOperationsTest extends StfTestCase {
 
@@ -50,7 +50,8 @@ public class FileOperationsTest extends StfTestCase {
          * sometime the invitation process can not be completed, so it's
          * possible that all tests are failed.
          */
-        Util.setUpSessionWithAJavaProjectAndAClass(ALICE, BOB, CARL);
+        Util.setUpSessionWithAJavaProjectAndAClass(Constants.PROJECT1,
+            Constants.PKG1, Constants.CLS1, ALICE, BOB, CARL);
         Util.setFollowMode(ALICE, CARL);
     }
 

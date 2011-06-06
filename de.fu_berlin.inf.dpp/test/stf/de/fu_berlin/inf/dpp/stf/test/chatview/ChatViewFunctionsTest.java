@@ -2,7 +2,7 @@ package de.fu_berlin.inf.dpp.stf.test.chatview;
 
 import static de.fu_berlin.inf.dpp.stf.client.tester.SarosTester.ALICE;
 import static de.fu_berlin.inf.dpp.stf.client.tester.SarosTester.BOB;
-import static de.fu_berlin.inf.dpp.stf.server.STFMessage.VIEW_SAROS;
+import static de.fu_berlin.inf.dpp.stf.shared.Constants.VIEW_SAROS;
 import static org.junit.Assert.assertEquals;
 
 import java.rmi.AccessException;
@@ -36,7 +36,8 @@ public class ChatViewFunctionsTest extends StfTestCase {
         initTesters(ALICE, BOB);
         setUpWorkbench();
         setUpSaros();
-        Util.setUpSessionWithAJavaProjectAndAClass(ALICE, BOB);
+        Util.setUpSessionWithAJavaProjectAndAClass("foo", "bar", "test", ALICE,
+            BOB);
     }
 
     /**

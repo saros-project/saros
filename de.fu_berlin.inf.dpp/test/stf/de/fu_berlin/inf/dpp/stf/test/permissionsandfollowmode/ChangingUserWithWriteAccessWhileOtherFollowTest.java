@@ -15,8 +15,8 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import de.fu_berlin.inf.dpp.stf.client.StfTestCase;
-import de.fu_berlin.inf.dpp.stf.client.util.Constants;
 import de.fu_berlin.inf.dpp.stf.client.util.Util;
+import de.fu_berlin.inf.dpp.stf.test.Constants;
 
 public class ChangingUserWithWriteAccessWhileOtherFollowTest extends
     StfTestCase {
@@ -41,7 +41,8 @@ public class ChangingUserWithWriteAccessWhileOtherFollowTest extends
         initTesters(ALICE, BOB, CARL, DAVE);
         setUpWorkbench();
         setUpSaros();
-        Util.setUpSessionWithAJavaProjectAndAClass(ALICE, BOB, CARL, DAVE);
+        Util.setUpSessionWithAJavaProjectAndAClass(Constants.PROJECT1,
+            Constants.PKG1, Constants.CLS1, ALICE, BOB, CARL, DAVE);
         Util.setFollowMode(ALICE, BOB, CARL, DAVE);
     }
 
@@ -82,10 +83,12 @@ public class ChangingUserWithWriteAccessWhileOtherFollowTest extends
         // DAVE.bot.waitUntilFollowed(CARL.getBaseJid());
 
         ALICE.superBot().views().packageExplorerView()
-            .selectClass(Constants.PROJECT1, Constants.PKG1, Constants.CLS1).open();
-        ALICE.remoteBot().editor(Constants.CLS1_SUFFIX).setTextWithoutSave(Constants.CP1);
-        String dirtyClsContentOfAlice = ALICE.remoteBot().editor(Constants.CLS1_SUFFIX)
-            .getText();
+            .selectClass(Constants.PROJECT1, Constants.PKG1, Constants.CLS1)
+            .open();
+        ALICE.remoteBot().editor(Constants.CLS1_SUFFIX)
+            .setTextWithoutSave(Constants.CP1);
+        String dirtyClsContentOfAlice = ALICE.remoteBot()
+            .editor(Constants.CLS1_SUFFIX).getText();
 
         CARL.remoteBot().editor(Constants.CLS1_SUFFIX)
             .waitUntilIsTextSame(dirtyClsContentOfAlice);
@@ -103,7 +106,8 @@ public class ChangingUserWithWriteAccessWhileOtherFollowTest extends
         assertTrue(DAVE.remoteBot().editor(Constants.CLS1_SUFFIX).isDirty());
 
         Util.resetFollowModeSequentially(CARL, BOB, DAVE);
-        ALICE.remoteBot().editor(Constants.CLS1_SUFFIX).setTextWithoutSave(Constants.CP1_CHANGE);
+        ALICE.remoteBot().editor(Constants.CLS1_SUFFIX)
+            .setTextWithoutSave(Constants.CP1_CHANGE);
         // ALICE.bot().editor(CLS1_SUFFIX).closeAndSave();
 
         assertTrue(CARL.remoteBot().editor(Constants.CLS1_SUFFIX).isActive());

@@ -19,10 +19,10 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import de.fu_berlin.inf.dpp.stf.client.StfTestCase;
-import de.fu_berlin.inf.dpp.stf.client.util.Constants;
 import de.fu_berlin.inf.dpp.stf.client.util.Util;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotShell;
 import de.fu_berlin.inf.dpp.stf.shared.Constants.TypeOfCreateProject;
+import de.fu_berlin.inf.dpp.stf.test.Constants;
 
 public class MenuSarosByAliceBobTest extends StfTestCase {
 
@@ -80,8 +80,9 @@ public class MenuSarosByAliceBobTest extends StfTestCase {
     }
 
     @Test
-    public void addProjects() throws RemoteException, InterruptedException {
-        Util.setUpSessionWithAJavaProjectAndAClass(ALICE, BOB);
+    public void addProjects() throws RemoteException {
+        Util.setUpSessionWithAJavaProjectAndAClass(Constants.PROJECT1,
+            Constants.PKG1, Constants.CLS1, ALICE, BOB);
         ALICE.superBot().views().packageExplorerView().tree().newC()
             .javaProject(Constants.PROJECT2);
         ALICE.superBot().menuBar().saros().addProjects(Constants.PROJECT2);
@@ -90,8 +91,9 @@ public class MenuSarosByAliceBobTest extends StfTestCase {
     }
 
     @Test
-    public void stopSession() throws RemoteException, InterruptedException {
-        Util.setUpSessionWithAJavaProjectAndAClass(ALICE, BOB);
+    public void stopSession() throws RemoteException {
+        Util.setUpSessionWithAJavaProjectAndAClass(Constants.PROJECT1,
+            Constants.PKG1, Constants.CLS1, ALICE, BOB);
         ALICE.superBot().views().sarosView().selectBuddies().stopSarosSession();
         assertFalse(ALICE.superBot().views().sarosView().isInSession());
     }

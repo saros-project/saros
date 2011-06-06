@@ -9,7 +9,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import de.fu_berlin.inf.dpp.stf.client.StfTestCase;
-import de.fu_berlin.inf.dpp.stf.client.util.Constants;
+import de.fu_berlin.inf.dpp.stf.test.Constants;
 
 public class ContextMenuDeleteTest extends StfTestCase {
 
@@ -34,10 +34,17 @@ public class ContextMenuDeleteTest extends StfTestCase {
 
     @Test
     public void testDeleteAllItems() throws RemoteException {
-        ALICE.superBot().views().packageExplorerView().tree().newC()
-            .javaProjectWithClasses(Constants.PROJECT1, Constants.PKG1, Constants.CLS1);
+        ALICE
+            .superBot()
+            .views()
+            .packageExplorerView()
+            .tree()
+            .newC()
+            .javaProjectWithClasses(Constants.PROJECT1, Constants.PKG1,
+                Constants.CLS1);
         ALICE.superBot().views().packageExplorerView()
-            .selectPkg(Constants.PROJECT1, Constants.PKG1).newC().cls(Constants.CLS2);
+            .selectPkg(Constants.PROJECT1, Constants.PKG1).newC()
+            .cls(Constants.CLS2);
         ALICE.superBot().views().packageExplorerView().tree().newC()
             .pkg(Constants.PROJECT1, Constants.PKG2);
         ALICE.superBot().views().packageExplorerView()

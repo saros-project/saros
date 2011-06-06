@@ -10,8 +10,8 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import de.fu_berlin.inf.dpp.stf.client.StfTestCase;
-import de.fu_berlin.inf.dpp.stf.client.util.Constants;
 import de.fu_berlin.inf.dpp.stf.client.util.Util;
+import de.fu_berlin.inf.dpp.stf.test.Constants;
 
 public class Editor2Test extends StfTestCase {
 
@@ -20,7 +20,8 @@ public class Editor2Test extends StfTestCase {
         initTesters(ALICE, BOB);
         setUpWorkbench();
         setUpSaros();
-        Util.createProjectWithFileBy(ALICE, BOB);
+        Util.createProjectWithFileBy(Constants.PROJECT1, Constants.FILE3,
+            ALICE, BOB);
     }
 
     @Test

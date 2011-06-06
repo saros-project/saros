@@ -19,8 +19,8 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import de.fu_berlin.inf.dpp.stf.client.StfTestCase;
-import de.fu_berlin.inf.dpp.stf.client.util.Constants;
 import de.fu_berlin.inf.dpp.stf.client.util.Util;
+import de.fu_berlin.inf.dpp.stf.test.Constants;
 
 public class UserWithWriteAccessResetsFilesTest extends StfTestCase {
 
@@ -37,15 +37,14 @@ public class UserWithWriteAccessResetsFilesTest extends StfTestCase {
      * 
      * @throws AccessException
      * @throws RemoteException
-     * @throws InterruptedException
      */
     @BeforeClass
-    public static void runBeforeClass() throws RemoteException,
-        InterruptedException {
+    public static void runBeforeClass() throws RemoteException {
         initTesters(ALICE, BOB, CARL, DAVE, EDNA);
         setUpWorkbench();
         setUpSaros();
-        Util.setUpSessionWithAJavaProjectAndAClass(ALICE, BOB, CARL, DAVE, EDNA);
+        Util.setUpSessionWithAJavaProjectAndAClass(Constants.PROJECT1,
+            Constants.PKG1, Constants.CLS1, ALICE, BOB, CARL, DAVE, EDNA);
     }
 
     /**

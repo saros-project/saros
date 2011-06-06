@@ -2,9 +2,9 @@ package de.fu_berlin.inf.dpp.stf.test.permissionsandfollowmode;
 
 import static de.fu_berlin.inf.dpp.stf.client.tester.SarosTester.ALICE;
 import static de.fu_berlin.inf.dpp.stf.client.tester.SarosTester.BOB;
-import static de.fu_berlin.inf.dpp.stf.server.STFMessage.TB_INCONSISTENCY_DETECTED;
-import static de.fu_berlin.inf.dpp.stf.server.STFMessage.TB_NO_INCONSISTENCIES;
-import static de.fu_berlin.inf.dpp.stf.server.STFMessage.VIEW_SAROS;
+import static de.fu_berlin.inf.dpp.stf.shared.Constants.TB_INCONSISTENCY_DETECTED;
+import static de.fu_berlin.inf.dpp.stf.shared.Constants.TB_NO_INCONSISTENCIES;
+import static de.fu_berlin.inf.dpp.stf.shared.Constants.VIEW_SAROS;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
@@ -14,18 +14,18 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import de.fu_berlin.inf.dpp.stf.client.StfTestCase;
-import de.fu_berlin.inf.dpp.stf.client.util.Constants;
 import de.fu_berlin.inf.dpp.stf.client.util.Util;
+import de.fu_berlin.inf.dpp.stf.test.Constants;
 
 public class WriteAccessChangeAndImmediateWriteTest extends StfTestCase {
 
     @BeforeClass
-    public static void runBeforeClass() throws RemoteException,
-        InterruptedException {
+    public static void runBeforeClass() throws RemoteException {
         initTesters(ALICE, BOB);
         setUpWorkbench();
         setUpSaros();
-        Util.setUpSessionWithAJavaProjectAndAClass(ALICE, BOB);
+        Util.setUpSessionWithAJavaProjectAndAClass(Constants.PROJECT1,
+            Constants.PKG1, Constants.CLS1, ALICE, BOB);
     }
 
     /**

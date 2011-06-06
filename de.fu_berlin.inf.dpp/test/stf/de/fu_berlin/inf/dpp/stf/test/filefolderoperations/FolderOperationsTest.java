@@ -13,8 +13,8 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import de.fu_berlin.inf.dpp.stf.client.StfTestCase;
-import de.fu_berlin.inf.dpp.stf.client.util.Constants;
 import de.fu_berlin.inf.dpp.stf.client.util.Util;
+import de.fu_berlin.inf.dpp.stf.test.Constants;
 
 public class FolderOperationsTest extends StfTestCase {
 
@@ -36,19 +36,23 @@ public class FolderOperationsTest extends StfTestCase {
         initTesters(ALICE, BOB, CARL);
         setUpWorkbench();
         setUpSaros();
-        Util.setUpSessionWithAJavaProjectAndAClass(ALICE, BOB, CARL);
+        Util.setUpSessionWithAJavaProjectAndAClass(Constants.PROJECT1,
+            Constants.PKG1, Constants.CLS1, ALICE, BOB, CARL);
     }
 
     @Before
     public void runBeforeEveryTest() throws RemoteException {
         if (!ALICE.superBot().views().packageExplorerView()
-            .selectPkg(Constants.PROJECT1, Constants.PKG1).existsWithRegex(Constants.CLS1))
+            .selectPkg(Constants.PROJECT1, Constants.PKG1)
+            .existsWithRegex(Constants.CLS1))
             ALICE.superBot().views().packageExplorerView().tree().newC()
                 .cls(Constants.PROJECT1, Constants.PKG1, Constants.CLS1);
         if (!ALICE.superBot().views().packageExplorerView()
-            .selectProject(Constants.PROJECT1).existsWithRegex(Constants.FOLDER1))
+            .selectProject(Constants.PROJECT1)
+            .existsWithRegex(Constants.FOLDER1))
             ALICE.superBot().views().packageExplorerView()
-                .selectProject(Constants.PROJECT1).newC().folder(Constants.FOLDER1);
+                .selectProject(Constants.PROJECT1).newC()
+                .folder(Constants.FOLDER1);
     }
 
     /**
@@ -68,7 +72,8 @@ public class FolderOperationsTest extends StfTestCase {
     public void testRenameFolder() throws RemoteException {
         final String newFolderName = Constants.FOLDER1 + "New";
         ALICE.superBot().views().packageExplorerView()
-            .selectFolder(Constants.PROJECT1, Constants.FOLDER1).refactor().rename(newFolderName);
+            .selectFolder(Constants.PROJECT1, Constants.FOLDER1).refactor()
+            .rename(newFolderName);
 
         BOB.superBot().views().packageExplorerView()
             .waitUntilFolderExists(Constants.PROJECT1, newFolderName);

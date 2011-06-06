@@ -4,7 +4,6 @@ import static de.fu_berlin.inf.dpp.stf.client.tester.SarosTester.ALICE;
 import static de.fu_berlin.inf.dpp.stf.client.tester.SarosTester.BOB;
 import static de.fu_berlin.inf.dpp.stf.server.STFMessage.log;
 import static de.fu_berlin.inf.dpp.stf.shared.Constants.SUFFIX_JAVA;
-import static de.fu_berlin.inf.dpp.stf.shared.Constants.VIEW_REMOTE_SCREEN;
 import static de.fu_berlin.inf.dpp.stf.shared.Constants.VIEW_SAROS;
 import static de.fu_berlin.inf.dpp.stf.shared.Constants.VIEW_SAROS_ID;
 import static org.junit.Assert.assertFalse;
@@ -15,28 +14,27 @@ import java.rmi.RemoteException;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import de.fu_berlin.inf.dpp.stf.client.StfTestCase;
-import de.fu_berlin.inf.dpp.stf.client.util.Constants;
 import de.fu_berlin.inf.dpp.stf.client.util.Util;
 import de.fu_berlin.inf.dpp.stf.shared.Constants.TypeOfCreateProject;
+import de.fu_berlin.inf.dpp.stf.test.Constants;
 
 public class SessionAliceBobTest extends StfTestCase {
 
     @BeforeClass
-    public static void runBeforeClass() throws RemoteException,
-        InterruptedException {
+    public static void runBeforeClass() throws RemoteException {
         initTesters(ALICE, BOB);
         setUpWorkbench();
         setUpSaros();
-        Util.setUpSessionWithAJavaProjectAndAClass(ALICE, BOB);
+        Util.setUpSessionWithAJavaProjectAndAClass(Constants.PROJECT1,
+            Constants.PKG1, Constants.CLS1, ALICE, BOB);
     }
 
     @Before
     public void runBeforeEveryTest() throws RemoteException {
-        Util.reBuildSession(ALICE, BOB);
+        Util.reBuildSession(Constants.PROJECT1, ALICE, BOB);
     }
 
     @After
@@ -181,17 +179,18 @@ public class SessionAliceBobTest extends StfTestCase {
         assertTrue(BOB.remoteBot().editor(Constants.CLS1_SUFFIX).isActive());
     }
 
-    @Test
-    @Ignore
-    // FIXME dialog with error message "Xuggler not installed"
-    public void sharedYourScreenWithSelectedUserGUI() throws RemoteException {
-        // ALICE.mainMenu.setupSettingForScreensharing(1, 0, -1, -1);
-        Util.shareYourScreen(ALICE, BOB);
-        BOB.remoteBot().view(VIEW_REMOTE_SCREEN).waitUntilIsActive();
-        assertTrue(BOB.remoteBot().view(VIEW_REMOTE_SCREEN).isActive());
-
-    }
-
+    /*
+     * @Test
+     * 
+     * @Ignore // FIXME dialog with error message "Xuggler not installed" public
+     * void sharedYourScreenWithSelectedUserGUI() throws RemoteException { //
+     * ALICE.mainMenu.setupSettingForScreensharing(1, 0, -1, -1);
+     * Util.shareYourScreen(ALICE, BOB);
+     * BOB.remoteBot().view(VIEW_REMOTE_SCREEN).waitUntilIsActive();
+     * assertTrue(BOB.remoteBot().view(VIEW_REMOTE_SCREEN).isActive());
+     * 
+     * }
+     */
     @Test
     public void inconsistencyDetected() throws RemoteException {
         ALICE.superBot().views().packageExplorerView()

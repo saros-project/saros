@@ -9,8 +9,8 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import de.fu_berlin.inf.dpp.stf.client.StfTestCase;
-import de.fu_berlin.inf.dpp.stf.client.util.Constants;
 import de.fu_berlin.inf.dpp.stf.client.util.Util;
+import de.fu_berlin.inf.dpp.stf.test.Constants;
 
 public class KeyboardLayoutTest extends StfTestCase {
     @BeforeClass
@@ -23,7 +23,7 @@ public class KeyboardLayoutTest extends StfTestCase {
     @Test
     public void testKeyboardLayout() throws RemoteException {
 
-        Util.createProjectWithFileBy(ALICE);
+        Util.createProjectWithFileBy("keyboard", "layout_test.txt", ALICE);
         //
         final String textToTest = "!\"§$%&/()={[]}\\+*~#'-_.:,;|<>^?";
 

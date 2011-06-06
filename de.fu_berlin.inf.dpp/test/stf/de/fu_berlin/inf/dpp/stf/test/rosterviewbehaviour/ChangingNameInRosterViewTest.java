@@ -12,6 +12,7 @@ import org.junit.Test;
 
 import de.fu_berlin.inf.dpp.stf.client.StfTestCase;
 import de.fu_berlin.inf.dpp.stf.client.util.Util;
+import de.fu_berlin.inf.dpp.stf.test.Constants;
 
 public class ChangingNameInRosterViewTest extends StfTestCase {
 
@@ -26,13 +27,13 @@ public class ChangingNameInRosterViewTest extends StfTestCase {
      * @throws RemoteException
      */
     @BeforeClass
-    public static void runBeforeClass() throws RemoteException,
-        InterruptedException {
+    public static void runBeforeClass() throws RemoteException {
         initTesters(ALICE, BOB);
         setUpWorkbench();
         setUpSaros();
         // resetBuddiesName();
-        Util.setUpSessionWithAJavaProjectAndAClass(ALICE, BOB);
+        Util.setUpSessionWithAJavaProjectAndAClass(Constants.PROJECT1,
+            Constants.PKG1, Constants.CLS1, ALICE, BOB);
     }
 
     @After

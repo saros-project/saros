@@ -13,9 +13,9 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import de.fu_berlin.inf.dpp.stf.client.StfTestCase;
-import de.fu_berlin.inf.dpp.stf.client.util.Constants;
 import de.fu_berlin.inf.dpp.stf.client.util.Util;
 import de.fu_berlin.inf.dpp.stf.shared.Constants.TypeOfCreateProject;
+import de.fu_berlin.inf.dpp.stf.test.Constants;
 
 public class BuddiesByAliceBobCarlTest extends StfTestCase {
 
@@ -54,7 +54,8 @@ public class BuddiesByAliceBobCarlTest extends StfTestCase {
      */
     @Test
     public void inviteBuddy() throws RemoteException, InterruptedException {
-        Util.setUpSessionWithAJavaProjectAndAClass(ALICE, BOB);
+        Util.setUpSessionWithAJavaProjectAndAClass(Constants.PROJECT1,
+            Constants.PKG1, Constants.CLS1, ALICE, BOB);
         assertFalse(CARL.superBot().views().sarosView().isInSession());
         ALICE.superBot().views().sarosView().selectBuddy(CARL.getJID())
             .addToSarosSession();
