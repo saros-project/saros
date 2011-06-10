@@ -139,7 +139,7 @@ public class Util {
             tester.superBot().views().packageExplorerView().tree().newC()
                 .project(projectName);
             tester.superBot().views().packageExplorerView()
-                .selectFolder(fileName).newC().file(fileName);
+                .selectFolder(projectName).newC().file(fileName);
             tester.remoteBot().waitUntilEditorOpen(fileName);
         }
     }

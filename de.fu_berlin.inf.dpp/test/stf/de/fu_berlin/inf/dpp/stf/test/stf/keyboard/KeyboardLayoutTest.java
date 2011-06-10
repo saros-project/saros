@@ -23,15 +23,14 @@ public class KeyboardLayoutTest extends StfTestCase {
     @Test
     public void testKeyboardLayout() throws RemoteException {
 
-        Util.createProjectWithFileBy("keyboard", "layout_test.txt", ALICE);
+        Util.createProjectWithFileBy(Constants.PROJECT1, Constants.FILE3, ALICE);
         //
-        final String textToTest = "!\"§$%&/()={[]}\\+*~#'-_.:,;|<>^?";
+        final String textToTest = "!\"§$%&/()={[]}\\+*~#'-_.:,;|<>^? abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
         ALICE.superBot().views().packageExplorerView()
             .selectFile(Constants.PATH).open();
 
-        ALICE.remoteBot().editor(Constants.FILE3)
-            .typeText(String.valueOf((textToTest)));
+        ALICE.remoteBot().editor(Constants.FILE3).typeText(textToTest);
 
         ALICE.remoteBot().sleep(500);
         assertEquals("keyboard layout is misconfigured", textToTest, ALICE
