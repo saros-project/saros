@@ -8,13 +8,17 @@ package de.fu_berlin.inf.dpp.test.util;
 
 public class TestThread extends Thread {
 
+    public interface Runnable extends java.lang.Runnable {
+        public void runUnsafe() throws Exception;
+    }
+
     volatile Error error;
     volatile Exception exception;
     volatile boolean finished;
 
-    private Runnable runnableToRun;
+    private java.lang.Runnable runnableToRun;
 
-    public TestThread(Runnable runnable) {
+    public TestThread(java.lang.Runnable runnable) {
         this.runnableToRun = runnable;
         this.setName("Test-Thread:" + runnable.toString());
     }
@@ -22,8 +26,12 @@ public class TestThread extends Thread {
     @Override
     public void run() {
         try {
-            if (runnableToRun != null)
-                runnableToRun.run();
+            if (runnableToRun != null) {
+                if (runnableToRun instanceof Runnable)
+                    ((Runnable) runnableToRun).runUnsafe();
+                else
+                    runnableToRun.run();
+            }
         } catch (Exception e) {
             exception = e;
         } catch (Error e) {
