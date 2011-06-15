@@ -9,7 +9,6 @@ import java.rmi.RemoteException;
 
 import org.junit.After;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import de.fu_berlin.inf.dpp.stf.client.StfTestCase;
@@ -23,13 +22,14 @@ public class MenuTest extends StfTestCase {
         setUpWorkbench();
     }
 
+    @Override
     @After
-    public void runAfterEveryTest() throws RemoteException {
+    public void tearDown() throws RemoteException {
+        announceTestCaseEnd();
         deleteAllProjectsByActiveTesters();
     }
 
     @Test
-    @Ignore
     public void testDeleteProject() throws RemoteException {
         ALICE.superBot().views().packageExplorerView().tree().newC()
             .javaProject(Constants.PROJECT1);
@@ -46,15 +46,16 @@ public class MenuTest extends StfTestCase {
         ALICE.superBot().views().packageExplorerView().tree().newC()
             .javaProject(Constants.PROJECT1);
         ALICE.superBot().views().packageExplorerView().tree().newC()
-            .cls(Constants.PROJECT1, "pkg", "Cls");
+            .cls(Constants.PROJECT1, Constants.PKG1, Constants.CLS1);
         assertTrue(ALICE.superBot().views().packageExplorerView()
-            .selectPkg(Constants.PROJECT1, "pkg")
-            .existsWithRegex("Cls" + SUFFIX_JAVA));
+            .selectPkg(Constants.PROJECT1, Constants.PKG1)
+            .existsWithRegex(Constants.CLS1 + SUFFIX_JAVA));
         ALICE.superBot().views().packageExplorerView()
-            .selectClass(Constants.PROJECT1, "pkg", "Cls").delete();
+            .selectClass(Constants.PROJECT1, Constants.PKG1, Constants.CLS1)
+            .delete();
         assertFalse(ALICE.superBot().views().packageExplorerView()
-            .selectPkg(Constants.PROJECT1, "pkg")
-            .existsWithRegex("Cls" + SUFFIX_JAVA));
+            .selectPkg(Constants.PROJECT1, Constants.PKG1)
+            .existsWithRegex(Constants.CLS1 + SUFFIX_JAVA));
     }
 
     @Test

@@ -82,9 +82,8 @@ public class EditDuringInvitationTest extends StfTestCase {
             .open();
         BOB.remoteBot().editor(Constants.CLS1_SUFFIX)
             .setTexWithSave(Constants.CP1);
-        String texByBob = BOB.remoteBot().editor(Constants.CLS1_SUFFIX)
+        String textByBob = BOB.remoteBot().editor(Constants.CLS1_SUFFIX)
             .getText();
-        // System.out.println(texByBob);
 
         CARL.superBot()
             .confirmShellAddProjectWithNewProject(Constants.PROJECT1);
@@ -93,17 +92,17 @@ public class EditDuringInvitationTest extends StfTestCase {
             .open();
 
         ALICE.remoteBot().editor(Constants.CLS1_SUFFIX)
-            .waitUntilIsTextSame(texByBob);
+            .waitUntilIsTextSame(textByBob);
         String textByAlice = ALICE.remoteBot().editor(Constants.CLS1_SUFFIX)
             .getText();
 
         // There are bugs here, CARL get completely different content as BOB.
         CARL.remoteBot().editor(Constants.CLS1_SUFFIX)
-            .waitUntilIsTextSame(texByBob);
+            .waitUntilIsTextSame(textByBob);
         String textByCarl = CARL.remoteBot().editor(Constants.CLS1_SUFFIX)
             .getText();
 
-        assertTrue(textByCarl.equals(texByBob));
-        assertTrue(textByAlice.equals(texByBob));
+        assertTrue(textByCarl.equals(textByBob));
+        assertTrue(textByAlice.equals(textByBob));
     }
 }

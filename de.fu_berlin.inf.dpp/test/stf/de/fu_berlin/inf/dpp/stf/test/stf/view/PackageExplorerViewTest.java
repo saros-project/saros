@@ -24,8 +24,10 @@ public class PackageExplorerViewTest extends StfTestCase {
         setUpSaros();
     }
 
+    @Override
     @After
-    public void runAfterEveryTest() throws RemoteException {
+    public void tearDown() throws RemoteException {
+        announceTestCaseEnd();
         deleteAllProjectsByActiveTesters();
     }
 
@@ -36,28 +38,32 @@ public class PackageExplorerViewTest extends StfTestCase {
         ALICE.superBot().views().packageExplorerView().tree().newC()
             .cls(Constants.PROJECT1, Constants.PKG1, Constants.CLS1);
         assertTrue(ALICE.superBot().views().packageExplorerView()
-            .selectPkg(Constants.PROJECT1, Constants.PKG1).existsWithRegex(Constants.CLS1_SUFFIX));
+            .selectPkg(Constants.PROJECT1, Constants.PKG1)
+            .existsWithRegex(Constants.CLS1_SUFFIX));
         ALICE.superBot().views().packageExplorerView()
-            .selectClass(Constants.PROJECT1, Constants.PKG1, Constants.CLS1).delete();
+            .selectClass(Constants.PROJECT1, Constants.PKG1, Constants.CLS1)
+            .delete();
         assertFalse(ALICE.superBot().views().packageExplorerView()
-            .selectPkg(Constants.PROJECT1, Constants.PKG1).existsWithRegex(Constants.CLS1_SUFFIX));
+            .selectPkg(Constants.PROJECT1, Constants.PKG1)
+            .existsWithRegex(Constants.CLS1_SUFFIX));
     }
 
     @Test
-    // @Ignore
-    // this test fails, but it doesn't really matter...
     public void testIsFileExistWithGUI() throws RemoteException {
         ALICE.superBot().views().packageExplorerView().tree().newC()
             .javaProject(Constants.PROJECT1);
         ALICE.superBot().views().packageExplorerView().tree().newC()
             .cls(Constants.PROJECT1, Constants.PKG1, Constants.CLS1);
         assertTrue(ALICE.superBot().views().packageExplorerView()
-            .selectPkg(Constants.PROJECT1, Constants.PKG1).existsWithRegex(Constants.CLS1_SUFFIX));
+            .selectPkg(Constants.PROJECT1, Constants.PKG1)
+            .existsWithRegex(Constants.CLS1_SUFFIX));
 
         ALICE.superBot().views().packageExplorerView()
-            .selectClass(Constants.PROJECT1, Constants.PKG1, Constants.CLS1).delete();
+            .selectClass(Constants.PROJECT1, Constants.PKG1, Constants.CLS1)
+            .delete();
         assertFalse(ALICE.superBot().views().packageExplorerView()
-            .selectPkg(Constants.PROJECT1, Constants.PKG1).existsWithRegex(Constants.CLS1_SUFFIX));
+            .selectPkg(Constants.PROJECT1, Constants.PKG1)
+            .existsWithRegex(Constants.CLS1_SUFFIX));
 
     }
 
@@ -66,7 +72,8 @@ public class PackageExplorerViewTest extends StfTestCase {
     public void testShareWith() throws RemoteException {
         ALICE.superBot().views().packageExplorerView().tree().newC()
             .javaProject(Constants.PROJECT1);
-        ALICE.superBot().views().packageExplorerView().selectProject(Constants.PROJECT1)
-            .shareWith().multipleBuddies(Constants.PROJECT1, BOB.getJID());
+        ALICE.superBot().views().packageExplorerView()
+            .selectProject(Constants.PROJECT1).shareWith()
+            .multipleBuddies(Constants.PROJECT1, BOB.getJID());
     }
 }

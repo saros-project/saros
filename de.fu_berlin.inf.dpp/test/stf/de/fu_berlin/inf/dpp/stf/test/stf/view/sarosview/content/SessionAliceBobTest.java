@@ -2,7 +2,6 @@ package de.fu_berlin.inf.dpp.stf.test.stf.view.sarosview.content;
 
 import static de.fu_berlin.inf.dpp.stf.client.tester.SarosTester.ALICE;
 import static de.fu_berlin.inf.dpp.stf.client.tester.SarosTester.BOB;
-import static de.fu_berlin.inf.dpp.stf.server.STFMessage.log;
 import static de.fu_berlin.inf.dpp.stf.shared.Constants.SUFFIX_JAVA;
 import static de.fu_berlin.inf.dpp.stf.shared.Constants.VIEW_SAROS;
 import static de.fu_berlin.inf.dpp.stf.shared.Constants.VIEW_SAROS_ID;
@@ -32,30 +31,31 @@ public class SessionAliceBobTest extends StfTestCase {
             Constants.PKG1, Constants.CLS1, ALICE, BOB);
     }
 
+    @Override
     @Before
-    public void runBeforeEveryTest() throws RemoteException {
+    public void setUp() throws RemoteException {
         Util.reBuildSession(Constants.PROJECT1, ALICE, BOB);
+        announceTestCaseStart();
     }
 
+    @Override
     @After
-    public void runAfterEveryTest() throws RemoteException {
+    public void tearDown() throws RemoteException {
+        announceTestCaseEnd();
         Util.resetWriteAccess(ALICE, BOB);
         Util.resetFollowModeSequentially(ALICE, BOB);
     }
 
     @Test
-    public void testSetFocusOnsarosView() throws RemoteException {
-        log.trace("ALICE set focus on session view.");
+    public void testSetFocusOnSarosView() throws RemoteException {
         ALICE.remoteBot().view(VIEW_SAROS).show();
         assertTrue(ALICE.remoteBot().view(VIEW_SAROS).isActive());
-        log.trace("ALICE close session view.");
 
         ALICE.remoteBot().view(VIEW_SAROS).close();
         assertFalse(ALICE.remoteBot().isViewOpen(VIEW_SAROS));
-        log.trace("ALICE open session view again");
+
         ALICE.remoteBot().openViewById(VIEW_SAROS_ID);
         assertTrue(ALICE.remoteBot().isViewOpen(VIEW_SAROS));
-        log.trace("ALICE focus on saros buddies view.");
     }
 
     @Test
@@ -208,6 +208,7 @@ public class SessionAliceBobTest extends StfTestCase {
         String editorTextOfBob = BOB.remoteBot().editor(Constants.CLS1_SUFFIX)
             .getText();
         assertFalse(editorTextOfAlice.equals(editorTextOfBob));
+        BOB.remoteBot().sleep(10000);
         BOB.superBot().views().sarosView().waitUntilIsInconsistencyDetected();
         BOB.superBot().views().sarosView().inconsistencyDetected();
         editorTextOfAlice = ALICE.remoteBot().editor(Constants.CLS1_SUFFIX)
@@ -268,6 +269,10 @@ public class SessionAliceBobTest extends StfTestCase {
             .addProjects(Constants.PROJECT2);
         BOB.superBot().confirmShellAddProjects(Constants.PROJECT2,
             TypeOfCreateProject.NEW_PROJECT);
+
+        // TODO remove this, we have to wait for project arrival
+        // or next test cases will fail because of an uncloseable window
+        BOB.remoteBot().sleep(10000);
 
     }
 }

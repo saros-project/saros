@@ -19,8 +19,10 @@ public class ContextMenuDeleteTest extends StfTestCase {
         setUpWorkbench();
     }
 
+    @Override
     @After
-    public void runAfterEveryTest() throws RemoteException {
+    public void tearDown() throws RemoteException {
+        announceTestCaseStart();
         deleteAllProjectsByActiveTesters();
     }
 

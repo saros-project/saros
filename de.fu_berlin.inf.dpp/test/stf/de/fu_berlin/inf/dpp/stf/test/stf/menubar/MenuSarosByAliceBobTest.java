@@ -10,7 +10,6 @@ import static de.fu_berlin.inf.dpp.stf.shared.Constants.NEXT;
 import static de.fu_berlin.inf.dpp.stf.shared.Constants.SHARE_PROJECTS;
 import static de.fu_berlin.inf.dpp.stf.shared.Constants.SHELL_SESSION_INVITATION;
 import static de.fu_berlin.inf.dpp.stf.shared.Constants.SHELL_SHARE_PROJECT;
-import static org.junit.Assert.assertFalse;
 
 import java.rmi.RemoteException;
 
@@ -19,6 +18,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import de.fu_berlin.inf.dpp.stf.client.StfTestCase;
+import de.fu_berlin.inf.dpp.stf.client.tester.AbstractTester;
 import de.fu_berlin.inf.dpp.stf.client.util.Util;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotShell;
 import de.fu_berlin.inf.dpp.stf.shared.Constants.TypeOfCreateProject;
@@ -33,16 +33,44 @@ public class MenuSarosByAliceBobTest extends StfTestCase {
         setUpSaros();
     }
 
+    @Override
     @After
-    public void runAfterEveryTest() throws RemoteException {
+    public void tearDown() throws RemoteException {
+        announceTestCaseEnd();
         leaveSessionHostFirst(ALICE);
         deleteAllProjectsByActiveTesters();
+
+        // TODO remove this code, because it is a workaround
+        // against a bug in Saros Session Management
+        for (AbstractTester tester : getCurrentTesters()) {
+            tester.remoteBot().sleep(1000);
+            if (tester.remoteBot().isShellOpen("Synchronizing")) {
+                IRemoteBotShell sync = tester.remoteBot()
+                    .shell("Synchronizing");
+
+                sync.confirm("Cancel");
+                tester.remoteBot().sleep(1000);
+                if (tester.remoteBot().isShellOpen("Problem Occurred")) {
+                    IRemoteBotShell problem = tester.remoteBot().shell(
+                        "Problem Occurred");
+                    problem.confirm("OK");
+                }
+            }
+
+        }
     }
 
     @Test
-    public void testShareProjectsWithBot() throws RemoteException {
-        ALICE.superBot().views().packageExplorerView().tree().newC()
-            .javaProject(Constants.PROJECT1);
+    public void testShareProjectsWithRemoteBot() throws RemoteException {
+        ALICE
+            .superBot()
+            .views()
+            .packageExplorerView()
+            .tree()
+            .newC()
+            .javaProjectWithClasses(Constants.PROJECT1, Constants.PKG1,
+                Constants.CLS1);
+
         ALICE.remoteBot().menu(MENU_SAROS).menu(SHARE_PROJECTS).click();
         if (!ALICE.remoteBot().isShellOpen(SHELL_SHARE_PROJECT)) {
             ALICE.remoteBot().waitUntilShellIsOpen(SHELL_SHARE_PROJECT);
@@ -65,16 +93,27 @@ public class MenuSarosByAliceBobTest extends StfTestCase {
 
     @Test
     public void testShareProjectsWithSuperBot() throws RemoteException {
-        ALICE.superBot().views().packageExplorerView().tree().newC()
-            .javaProject(Constants.PROJECT1);
+        ALICE
+            .superBot()
+            .views()
+            .packageExplorerView()
+            .tree()
+            .newC()
+            .javaProjectWithClasses(Constants.PROJECT1, Constants.PKG1,
+                Constants.CLS1);
+
         ALICE.superBot().menuBar().saros()
             .shareProjects(Constants.PROJECT1, BOB.getJID());
         BOB.superBot().confirmShellSessionInvitationAndShellAddProject(
             Constants.PROJECT1, TypeOfCreateProject.NEW_PROJECT);
+        BOB.superBot().views().sarosView().waitUntilIsInSession();
+
     }
 
     @Test
     public void testAddBuddy() throws RemoteException {
+        ALICE.superBot().views().sarosView()
+            .connectWith(ALICE.getJID(), ALICE.getPassword());
         ALICE.remoteBot().menu(MENU_SAROS).menu(MENU_ADD_BUDDY).click();
         ALICE.superBot().confirmShellAddBuddy(BOB.getJID());
     }
@@ -83,18 +122,44 @@ public class MenuSarosByAliceBobTest extends StfTestCase {
     public void addProjects() throws RemoteException {
         Util.setUpSessionWithAJavaProjectAndAClass(Constants.PROJECT1,
             Constants.PKG1, Constants.CLS1, ALICE, BOB);
-        ALICE.superBot().views().packageExplorerView().tree().newC()
-            .javaProject(Constants.PROJECT2);
+
+        BOB.superBot()
+            .views()
+            .packageExplorerView()
+            .waitUntilClassExists(Constants.PROJECT1, Constants.PKG1,
+                Constants.CLS1);
+
+        ALICE
+            .superBot()
+            .views()
+            .packageExplorerView()
+            .tree()
+            .newC()
+            .javaProjectWithClasses(Constants.PROJECT2, Constants.PKG1,
+                Constants.CLS1);
+
         ALICE.superBot().menuBar().saros().addProjects(Constants.PROJECT2);
         BOB.superBot().confirmShellAddProjects(Constants.PROJECT2,
             TypeOfCreateProject.NEW_PROJECT);
+
+        BOB.superBot()
+            .views()
+            .packageExplorerView()
+            .waitUntilClassExists(Constants.PROJECT2, Constants.PKG1,
+                Constants.CLS1);
     }
 
     @Test
     public void stopSession() throws RemoteException {
         Util.setUpSessionWithAJavaProjectAndAClass(Constants.PROJECT1,
             Constants.PKG1, Constants.CLS1, ALICE, BOB);
+
+        ALICE.superBot().views().sarosView().waitUntilIsInSession();
+        BOB.superBot().views().sarosView().waitUntilIsInSession();
+
         ALICE.superBot().views().sarosView().selectBuddies().stopSarosSession();
-        assertFalse(ALICE.superBot().views().sarosView().isInSession());
+
+        ALICE.superBot().views().sarosView().waitUntilIsNotInSession();
+        BOB.superBot().views().sarosView().waitUntilIsNotInSession();
     }
 }

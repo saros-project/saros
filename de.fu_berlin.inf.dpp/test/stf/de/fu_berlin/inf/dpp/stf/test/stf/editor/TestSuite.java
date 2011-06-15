@@ -4,7 +4,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
 @RunWith(Suite.class)
-@Suite.SuiteClasses({ Editor2Test.class, EditorByAliceBobTest.class,
+@Suite.SuiteClasses({ EditorWithoutSessionTest.class, EditorByAliceBobTest.class,
     EditorByAliceTest.class })
 public class TestSuite {
     // the class remains completely empty,

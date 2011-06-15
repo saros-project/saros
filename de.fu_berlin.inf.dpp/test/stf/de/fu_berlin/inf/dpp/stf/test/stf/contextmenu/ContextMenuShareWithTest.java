@@ -22,19 +22,32 @@ public class ContextMenuShareWithTest extends StfTestCase {
         setUpSaros();
     }
 
+    @Override
     @After
-    public void runAfterEveryTest() throws RemoteException {
-        leaveSessionHostFirst(ALICE);
+    public void tearDown() throws RemoteException {
+        announceTestCaseEnd();
+        leaveSessionPeersFirst();
     }
 
     @Test
     public void testShareWithMultipleBuddies() throws RemoteException {
-        ALICE.superBot().views().packageExplorerView().tree().newC()
-            .javaProject(Constants.PROJECT1);
+        ALICE
+            .superBot()
+            .views()
+            .packageExplorerView()
+            .tree()
+            .newC()
+            .javaProjectWithClasses(Constants.PROJECT1, Constants.PKG1,
+                Constants.CLS1);
         ALICE.superBot().views().packageExplorerView()
             .selectJavaProject(Constants.PROJECT1).shareWith()
             .buddy(BOB.getJID());
         BOB.superBot().confirmShellSessionInvitationAndShellAddProject(
             Constants.PROJECT1, TypeOfCreateProject.NEW_PROJECT);
+
+        BOB.superBot().views().sarosView().waitUntilIsInSession();
+
+        // TODO remove this line
+        BOB.remoteBot().sleep(5000);
     }
 }

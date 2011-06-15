@@ -21,7 +21,7 @@ public class FolderOperationsTest extends StfTestCase {
     /**
      * Preconditions:
      * <ol>
-     * <li>ALICE (Host, Write Access), aclice share a java project with BOB and
+     * <li>ALICE (Host, Write Access), Alice share a java project with BOB and
      * CARL.</li>
      * <li>BOB (Read-Only Access)</li>
      * <li>CARL (Read-Only Access)</li>
@@ -38,10 +38,25 @@ public class FolderOperationsTest extends StfTestCase {
         setUpSaros();
         Util.setUpSessionWithAJavaProjectAndAClass(Constants.PROJECT1,
             Constants.PKG1, Constants.CLS1, ALICE, BOB, CARL);
+
+        BOB.superBot()
+            .views()
+            .packageExplorerView()
+            .waitUntilClassExists(Constants.PROJECT1, Constants.PKG1,
+                Constants.CLS1);
+
+        CARL.superBot()
+            .views()
+            .packageExplorerView()
+            .waitUntilClassExists(Constants.PROJECT1, Constants.PKG1,
+                Constants.CLS1);
+
     }
 
+    @Override
     @Before
-    public void runBeforeEveryTest() throws RemoteException {
+    public void setUp() throws RemoteException {
+        super.setUp();
         if (!ALICE.superBot().views().packageExplorerView()
             .selectPkg(Constants.PROJECT1, Constants.PKG1)
             .existsWithRegex(Constants.CLS1))

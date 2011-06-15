@@ -58,11 +58,9 @@ public class Share3UsersLeavingSessionTest extends StfTestCase {
             .newC()
             .javaProjectWithClasses(Constants.PROJECT1, Constants.PKG1,
                 Constants.CLS1);
+
         Util.buildSessionSequentially(Constants.PROJECT1,
             TypeOfCreateProject.NEW_PROJECT, ALICE, BOB);
-
-        ALICE.superBot().views().packageExplorerView()
-            .selectJavaProject("MyProject").copy();
 
         assertTrue(BOB.superBot().views().sarosView().isInSession());
         assertTrue(ALICE.superBot().views().sarosView().isInSession());
@@ -74,9 +72,8 @@ public class Share3UsersLeavingSessionTest extends StfTestCase {
 
         ALICE.superBot().views().sarosView().selectSession().stopSarosSession();
 
-        ALICE.remoteBot().sleep(1000);
-        ALICE.superBot().views().sarosView().disconnect();
-        BOB.superBot().views().sarosView().disconnect();
+        ALICE.superBot().views().sarosView().waitUntilIsNotInSession();
+        BOB.superBot().views().sarosView().waitUntilIsNotInSession();
 
         CARL.remoteBot().shell(SHELL_SESSION_INVITATION).confirm(ACCEPT);
 

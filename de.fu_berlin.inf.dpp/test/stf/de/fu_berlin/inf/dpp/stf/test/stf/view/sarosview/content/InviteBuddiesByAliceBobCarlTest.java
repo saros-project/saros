@@ -13,11 +13,13 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import de.fu_berlin.inf.dpp.stf.client.StfTestCase;
+import de.fu_berlin.inf.dpp.stf.client.tester.AbstractTester;
 import de.fu_berlin.inf.dpp.stf.client.util.Util;
+import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotShell;
 import de.fu_berlin.inf.dpp.stf.shared.Constants.TypeOfCreateProject;
 import de.fu_berlin.inf.dpp.stf.test.Constants;
 
-public class BuddiesByAliceBobCarlTest extends StfTestCase {
+public class InviteBuddiesByAliceBobCarlTest extends StfTestCase {
 
     @BeforeClass
     public static void runBeforeClass() throws RemoteException {
@@ -26,15 +28,30 @@ public class BuddiesByAliceBobCarlTest extends StfTestCase {
         setUpSaros();
     }
 
+    @Override
     @After
-    public void runAfterEveryTest() throws RemoteException {
-        resetBuddies();
-        resetBuddiesName();
-    }
+    public void tearDown() throws RemoteException {
+        announceTestCaseEnd();
+        leaveSessionHostFirst(ALICE);
+        // TODO remove this code, because it is a workaround
+        // against a bug in Saros Session Management
 
-    @Test
-    public void testPreCondition() {
-        //
+        for (AbstractTester tester : getCurrentTesters()) {
+            tester.remoteBot().sleep(1000);
+            if (tester.remoteBot().isShellOpen("Synchronizing")) {
+                IRemoteBotShell sync = tester.remoteBot()
+                    .shell("Synchronizing");
+
+                sync.confirm("Cancel");
+                tester.remoteBot().sleep(1000);
+                if (tester.remoteBot().isShellOpen("Problem Occurred")) {
+                    IRemoteBotShell problem = tester.remoteBot().shell(
+                        "Problem Occurred");
+                    problem.confirm("OK");
+                }
+            }
+
+        }
     }
 
     /**
@@ -62,6 +79,8 @@ public class BuddiesByAliceBobCarlTest extends StfTestCase {
         CARL.superBot().confirmShellSessionInvitationAndShellAddProject(
             Constants.PROJECT1, TypeOfCreateProject.NEW_PROJECT);
         CARL.superBot().views().sarosView().waitUntilIsInSession();
+        assertTrue(ALICE.superBot().views().sarosView().isInSession());
+        assertTrue(BOB.superBot().views().sarosView().isInSession());
         assertTrue(CARL.superBot().views().sarosView().isInSession());
 
     }

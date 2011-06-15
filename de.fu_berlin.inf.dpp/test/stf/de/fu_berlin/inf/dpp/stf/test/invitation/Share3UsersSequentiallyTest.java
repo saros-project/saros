@@ -33,16 +33,6 @@ public class Share3UsersSequentiallyTest extends StfTestCase {
         initTesters(ALICE, BOB, CARL);
         setUpWorkbench();
         setUpSaros();
-        ALICE
-            .superBot()
-            .views()
-            .packageExplorerView()
-            .tree()
-            .newC()
-            .javaProjectWithClasses(Constants.PROJECT1, Constants.PKG1,
-                Constants.CLS1);
-        Util.buildSessionSequentially(Constants.PROJECT1,
-            TypeOfCreateProject.NEW_PROJECT, ALICE, CARL, BOB);
     }
 
     /**
@@ -65,6 +55,30 @@ public class Share3UsersSequentiallyTest extends StfTestCase {
     @Test
     public void testShareProject3UsersSequentially() throws RemoteException,
         InterruptedException {
+
+        ALICE
+            .superBot()
+            .views()
+            .packageExplorerView()
+            .tree()
+            .newC()
+            .javaProjectWithClasses(Constants.PROJECT1, Constants.PKG1,
+                Constants.CLS1);
+
+        Util.buildSessionSequentially(Constants.PROJECT1,
+            TypeOfCreateProject.NEW_PROJECT, ALICE, CARL, BOB);
+
+        BOB.superBot()
+            .views()
+            .packageExplorerView()
+            .waitUntilClassExists(Constants.PROJECT1, Constants.PKG1,
+                Constants.CLS1);
+
+        CARL.superBot()
+            .views()
+            .packageExplorerView()
+            .waitUntilClassExists(Constants.PROJECT1, Constants.PKG1,
+                Constants.CLS1);
 
         assertTrue(CARL.superBot().views().sarosView().isInSession());
         assertFalse(ALICE.superBot().views().sarosView()

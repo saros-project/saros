@@ -62,18 +62,18 @@ public class Share2UsersSequentiallyTest extends StfTestCase {
             .newC()
             .javaProjectWithClasses(Constants.PROJECT1, Constants.PKG1,
                 Constants.CLS1);
+
         Util.buildSessionSequentially(Constants.PROJECT1,
             TypeOfCreateProject.NEW_PROJECT, ALICE, BOB);
-        BOB.remoteBot()
-            .captureScreenshot(
-                (BOB.remoteBot().getPathToScreenShot() + "/invitee_in_sharedproject.png"));
-        ALICE
-            .remoteBot()
-            .captureScreenshot(
-                (ALICE.remoteBot().getPathToScreenShot() + "/inviter_in_sharedproject.png"));
 
         assertTrue(BOB.superBot().views().sarosView().isInSession());
         assertTrue(ALICE.superBot().views().sarosView().isInSession());
+
+        BOB.superBot()
+            .views()
+            .packageExplorerView()
+            .waitUntilClassExists(Constants.PROJECT1, Constants.PKG1,
+                Constants.CLS1);
 
         assertFalse(ALICE.superBot().views().sarosView()
             .selectParticipant(BOB.getJID()).hasReadOnlyAccess());

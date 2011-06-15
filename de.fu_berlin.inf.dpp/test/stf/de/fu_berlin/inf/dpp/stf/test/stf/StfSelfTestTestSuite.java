@@ -9,6 +9,7 @@ import org.junit.runners.Suite;
     de.fu_berlin.inf.dpp.stf.test.stf.contextmenu.TestSuite.class,
     de.fu_berlin.inf.dpp.stf.test.stf.editor.TestSuite.class,
     de.fu_berlin.inf.dpp.stf.test.stf.menubar.TestSuite.class,
+    de.fu_berlin.inf.dpp.stf.test.stf.keyboard.KeyboardLayoutTest.class,
     de.fu_berlin.inf.dpp.stf.test.stf.view.TestSuite.class,
     de.fu_berlin.inf.dpp.stf.test.stf.view.sarosview.TestSuite.class,
     de.fu_berlin.inf.dpp.stf.test.stf.view.sarosview.content.TestSuite.class })

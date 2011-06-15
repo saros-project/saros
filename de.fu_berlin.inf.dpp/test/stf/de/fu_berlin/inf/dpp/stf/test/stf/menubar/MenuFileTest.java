@@ -23,8 +23,10 @@ public class MenuFileTest extends StfTestCase {
         setUpWorkbench();
     }
 
+    @Override
     @After
-    public void runAfterEveryTest() throws RemoteException {
+    public void tearDown() throws RemoteException {
+        announceTestCaseEnd();
         deleteAllProjectsByActiveTesters();
     }
 
@@ -83,7 +85,7 @@ public class MenuFileTest extends StfTestCase {
     }
 
     @Test
-    public void testNewPackage() throws RemoteException {
+    public void testNewPackage1() throws RemoteException {
         ALICE.superBot().views().packageExplorerView().tree().newC()
             .javaProject(Constants.PROJECT1);
         ALICE.superBot().views().packageExplorerView().tree().newC()
@@ -103,7 +105,7 @@ public class MenuFileTest extends StfTestCase {
     }
 
     @Test
-    public void testNewpackage() throws RemoteException {
+    public void testNewPackage2() throws RemoteException {
         ALICE.superBot().views().packageExplorerView().tree().newC()
             .project(Constants.PROJECT1);
         ALICE.superBot().views().packageExplorerView()
@@ -129,7 +131,7 @@ public class MenuFileTest extends StfTestCase {
 
     @Test
     @Ignore
-    public void test_newProjectWithClass() throws RemoteException {
+    public void testNewProjectWithClass() throws RemoteException {
         assertFalse(ALICE.superBot().views().packageExplorerView().tree()
             .existsWithRegex(Constants.PROJECT1));
         ALICE.superBot().views().packageExplorerView().tree().newC()

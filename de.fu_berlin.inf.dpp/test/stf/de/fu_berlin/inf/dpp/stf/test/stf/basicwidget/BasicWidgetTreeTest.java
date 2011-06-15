@@ -1,6 +1,7 @@
 package de.fu_berlin.inf.dpp.stf.test.stf.basicwidget;
 
 import static de.fu_berlin.inf.dpp.stf.client.tester.SarosTester.ALICE;
+import static de.fu_berlin.inf.dpp.stf.client.tester.SarosTester.BOB;
 import static de.fu_berlin.inf.dpp.stf.shared.Constants.CM_RENAME;
 import static de.fu_berlin.inf.dpp.stf.shared.Constants.MENU_CLOSE;
 import static de.fu_berlin.inf.dpp.stf.shared.Constants.MENU_FILE;
@@ -35,6 +36,7 @@ import java.rmi.RemoteException;
 
 import org.junit.After;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import de.fu_berlin.inf.dpp.stf.client.StfTestCase;
@@ -52,8 +54,10 @@ public class BasicWidgetTreeTest extends StfTestCase {
         setUpWorkbench();
     }
 
+    @Override
     @After
-    public void runAfterEveryTest() throws RemoteException {
+    public void tearDown() throws RemoteException {
+        announceTestCaseEnd();
         deleteAllProjectsByActiveTesters();
     }
 
@@ -162,7 +166,7 @@ public class BasicWidgetTreeTest extends StfTestCase {
             .connectWith(ALICE.getJID(), ALICE.getPassword());
         assertTrue(ALICE.remoteBot().view(VIEW_SAROS).bot().tree()
             .selectTreeItem(NODE_BUDDIES)
-            .existsSubItemWithRegex(Util.changeToRegex("bob_stf")));
+            .existsSubItemWithRegex(Util.changeToRegex(BOB.getName())));
     }
 
     @Test
@@ -206,6 +210,7 @@ public class BasicWidgetTreeTest extends StfTestCase {
     }
 
     @Test
+    @Ignore("SVN does not work at the moment")
     public void selectTreeItemWithRegexs() throws RemoteException {
         ALICE.superBot().views().packageExplorerView().tree().newC()
             .javaProject(Constants.SVN_PROJECT_COPY);
@@ -229,6 +234,7 @@ public class BasicWidgetTreeTest extends StfTestCase {
     }
 
     @Test
+    @Ignore("SVN does not work at the moment")
     public void selectTreeItemWithRegexsInView() throws RemoteException {
         ALICE.superBot().views().packageExplorerView().tree().newC()
             .javaProject(Constants.SVN_PROJECT_COPY);
@@ -274,7 +280,7 @@ public class BasicWidgetTreeTest extends StfTestCase {
         ALICE.superBot().views().sarosView()
             .connectWith(ALICE.getJID(), ALICE.getPassword());
         assertTrue(ALICE.remoteBot().view(VIEW_SAROS).bot().tree()
-            .selectTreeItemWithRegex(NODE_BUDDIES, "bob_stf.*")
+            .selectTreeItemWithRegex(NODE_BUDDIES, BOB.getName() + ".*")
             .existsContextMenu(CM_RENAME));
     }
 
@@ -294,7 +300,7 @@ public class BasicWidgetTreeTest extends StfTestCase {
             .connectWith(ALICE.getJID(), ALICE.getPassword());
         ALICE.superBot().views().sarosView().waitUntilIsConnected();
         assertTrue(ALICE.remoteBot().view(VIEW_SAROS).bot().tree()
-            .selectTreeItemWithRegex(NODE_BUDDIES, "bob_stf.*")
+            .selectTreeItemWithRegex(NODE_BUDDIES, BOB.getName() + ".*")
             .isContextMenuEnabled(CM_RENAME));
     }
 
@@ -303,7 +309,7 @@ public class BasicWidgetTreeTest extends StfTestCase {
         ALICE.superBot().views().sarosView()
             .connectWith(ALICE.getJID(), ALICE.getPassword());
         ALICE.remoteBot().view(VIEW_SAROS).bot().tree()
-            .selectTreeItemWithRegex(NODE_BUDDIES, "bob_stf.*")
+            .selectTreeItemWithRegex(NODE_BUDDIES, BOB.getName() + ".*")
             .contextMenus(CM_RENAME).click();
         assertTrue(ALICE.remoteBot().isShellOpen(SHELL_SET_NEW_NICKNAME));
     }

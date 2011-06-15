@@ -42,9 +42,10 @@ public class FileOperationsTest extends StfTestCase {
 
     }
 
+    @Override
     @Before
-    public void runBeforeEveryMethod() throws RemoteException,
-        InterruptedException {
+    public void setUp() throws RemoteException {
+        super.setUp();
         /*
          * NOTE: The session sharing by Version 11.3.25.DEVEL is not stable,
          * sometime the invitation process can not be completed, so it's
@@ -52,11 +53,26 @@ public class FileOperationsTest extends StfTestCase {
          */
         Util.setUpSessionWithAJavaProjectAndAClass(Constants.PROJECT1,
             Constants.PKG1, Constants.CLS1, ALICE, BOB, CARL);
+
+        BOB.superBot()
+            .views()
+            .packageExplorerView()
+            .waitUntilClassExists(Constants.PROJECT1, Constants.PKG1,
+                Constants.CLS1);
+
+        CARL.superBot()
+            .views()
+            .packageExplorerView()
+            .waitUntilClassExists(Constants.PROJECT1, Constants.PKG1,
+                Constants.CLS1);
+
         Util.setFollowMode(ALICE, CARL);
     }
 
+    @Override
     @After
-    public void runAfterEveryMethod() throws RemoteException {
+    public void tearDown() throws RemoteException {
+        announceTestCaseEnd();
         leaveSessionHostFirst(ALICE);
         deleteAllProjectsByActiveTesters();
     }

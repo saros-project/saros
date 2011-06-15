@@ -2,13 +2,13 @@ package de.fu_berlin.inf.dpp.stf.test.initialising;
 
 import static de.fu_berlin.inf.dpp.stf.client.tester.SarosTester.ALICE;
 import static de.fu_berlin.inf.dpp.stf.client.tester.SarosTester.BOB;
-import static de.fu_berlin.inf.dpp.stf.server.STFMessage.FINISH;
-import static de.fu_berlin.inf.dpp.stf.server.STFMessage.LABEL_XMPP_JABBER_ID;
-import static de.fu_berlin.inf.dpp.stf.server.STFMessage.NO;
-import static de.fu_berlin.inf.dpp.stf.server.STFMessage.SHELL_ADD_BUDDY;
-import static de.fu_berlin.inf.dpp.stf.server.STFMessage.SHELL_SERVER_NOT_FOUND;
-import static de.fu_berlin.inf.dpp.stf.server.STFMessage.TB_ADD_A_NEW_BUDDY;
-import static de.fu_berlin.inf.dpp.stf.server.STFMessage.VIEW_SAROS;
+import static de.fu_berlin.inf.dpp.stf.shared.Constants.FINISH;
+import static de.fu_berlin.inf.dpp.stf.shared.Constants.LABEL_XMPP_JABBER_ID;
+import static de.fu_berlin.inf.dpp.stf.shared.Constants.NO;
+import static de.fu_berlin.inf.dpp.stf.shared.Constants.SHELL_ADD_BUDDY;
+import static de.fu_berlin.inf.dpp.stf.shared.Constants.SHELL_SERVER_NOT_FOUND;
+import static de.fu_berlin.inf.dpp.stf.shared.Constants.TB_ADD_A_NEW_BUDDY;
+import static de.fu_berlin.inf.dpp.stf.shared.Constants.VIEW_SAROS;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
@@ -42,8 +42,10 @@ public class HandleContactsTest extends StfTestCase {
         setUpSaros();
     }
 
+    @Override
     @After
-    public void runAfterEveryTest() throws RemoteException {
+    public void tearDown() throws RemoteException {
+        announceTestCaseEnd();
         resetBuddies();
     }
 

@@ -13,7 +13,7 @@ import de.fu_berlin.inf.dpp.stf.client.StfTestCase;
 import de.fu_berlin.inf.dpp.stf.client.util.Util;
 import de.fu_berlin.inf.dpp.stf.test.Constants;
 
-public class Editor2Test extends StfTestCase {
+public class EditorWithoutSessionTest extends StfTestCase {
 
     @BeforeClass
     public static void runBeforeClass() throws RemoteException {

@@ -48,8 +48,7 @@ public class AllParticipantsFollowUserWithWriteAccessTest extends StfTestCase {
     }
 
     @Before
-    public void runBeforeEveryTest() throws RemoteException,
-        InterruptedException {
+    public void runBeforeEveryTest() throws RemoteException {
         Util.setFollowMode(ALICE, BOB, CARL, DAVE);
     }
 

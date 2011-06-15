@@ -38,15 +38,22 @@ public class BuddiesByAliceBobTest extends StfTestCase {
         setUpSaros();
     }
 
+    @Override
     @After
-    public void runAfterEveryTest() throws RemoteException {
+    public void tearDown() throws RemoteException {
+        announceTestCaseEnd();
         resetBuddies();
         resetBuddiesName();
     }
 
     @Test
-    public void testPreCondition() {
-        //
+    public void testAddExistingBuddy() throws RemoteException {
+        assertTrue(ALICE.superBot().views().sarosView()
+            .hasBuddy(Constants.TEST_JID));
+        ALICE.superBot().views().sarosView().selectBuddies()
+            .addBuddy(Constants.TEST_JID);
+        assertTrue(ALICE.superBot().views().sarosView()
+            .hasBuddy(Constants.TEST_JID));
     }
 
     /**
@@ -117,13 +124,25 @@ public class BuddiesByAliceBobTest extends StfTestCase {
     }
 
     @Test
-    public void workTogetherOnPorject() throws RemoteException {
-        ALICE.superBot().views().packageExplorerView().tree().newC()
-            .javaProject(Constants.PROJECT1);
+    public void workTogetherOnProject() throws RemoteException {
+        ALICE
+            .superBot()
+            .views()
+            .packageExplorerView()
+            .tree()
+            .newC()
+            .javaProjectWithClasses(Constants.PROJECT1, Constants.PKG1,
+                Constants.CLS1);
         ALICE.superBot().views().sarosView().selectBuddy(BOB.getJID())
             .workTogetherOn().project(Constants.PROJECT1);
         BOB.superBot().confirmShellSessionInvitationAndShellAddProject(
             Constants.PROJECT1, TypeOfCreateProject.NEW_PROJECT);
+
+        BOB.superBot()
+            .views()
+            .packageExplorerView()
+            .waitUntilClassExists(Constants.PROJECT1, Constants.PKG1,
+                Constants.CLS1);
 
         ALICE.superBot().views().sarosView().selectBuddies().stopSarosSession();
 
@@ -131,7 +150,7 @@ public class BuddiesByAliceBobTest extends StfTestCase {
 
     @Test
     @Ignore("contextMenu multipleProjects doesn't work")
-    public void workTogetherOnMultiPorject() throws RemoteException {
+    public void workTogetherOnMultiProject() throws RemoteException {
         ALICE.superBot().views().packageExplorerView().tree().newC()
             .javaProject(Constants.PROJECT1);
         ALICE.superBot().views().sarosView().selectBuddy(BOB.getJID())

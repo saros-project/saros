@@ -33,6 +33,11 @@ public class MenuSarosByAliceBobCarlTest extends StfTestCase {
         assertFalse(CARL.superBot().views().sarosView().isInSession());
         Util.inviteBuddies(Constants.PROJECT1, TypeOfCreateProject.NEW_PROJECT,
             ALICE, CARL);
+
+        // TODO remove this line
+        CARL.remoteBot().sleep(15000);
+
         assertTrue(CARL.superBot().views().sarosView().isInSession());
+
     }
 }
