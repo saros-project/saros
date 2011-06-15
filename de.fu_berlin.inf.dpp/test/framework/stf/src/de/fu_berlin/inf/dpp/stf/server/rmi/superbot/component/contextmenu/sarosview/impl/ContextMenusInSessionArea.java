@@ -100,7 +100,7 @@ public class ContextMenusInSessionArea extends ContextMenusInSarosView
     public void shareProjects(String projectName, JID... jids)
         throws RemoteException {
         treeItem.contextMenus(SHARE_PROJECTS).click();
-        superBot().confirmShellShareProject(projectName, jids);
+        superBot().confirmShellShareProjects(projectName, jids);
     }
 
     /**********************************************

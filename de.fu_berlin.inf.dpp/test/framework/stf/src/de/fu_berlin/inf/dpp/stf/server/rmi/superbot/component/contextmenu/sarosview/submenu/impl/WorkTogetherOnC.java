@@ -44,7 +44,7 @@ public class WorkTogetherOnC extends Component implements IWorkTogetherOnC {
         throws RemoteException {
         treeItem.contextMenus(CM_WORK_TOGETHER_ON, CM_MULTIPLE_PROJECTS)
             .click();
-        superBot().confirmShellShareProject(projectName, baseJIDOfInvitees);
+        superBot().confirmShellShareProjects(projectName, baseJIDOfInvitees);
     }
 
     public void project(String projectName) throws RemoteException {

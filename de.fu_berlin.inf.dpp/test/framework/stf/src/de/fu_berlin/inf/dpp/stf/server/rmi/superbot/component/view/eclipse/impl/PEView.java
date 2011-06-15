@@ -258,7 +258,8 @@ public class PEView extends Views implements IPEView {
 
     public void waitUntilRevisionIsSame(String fullPath, String revision)
         throws RemoteException {
-        remoteBot().waitUntil(SarosConditions.isRevisionSame(fullPath, revision));
+        remoteBot().waitUntil(
+            SarosConditions.isRevisionSame(fullPath, revision));
     }
 
     public void waitUntilUrlIsSame(String fullPath, String url)

@@ -288,15 +288,27 @@ public class SuperBot extends STFMessage implements ISuperBot {
         }
     }
 
-    public void confirmShellShareProject(String projectName, JID... jids)
+    public void confirmShellShareProjects(String projectName, JID... jids)
         throws RemoteException {
-        if (!bot().isShellOpen(SHELL_ADD_PROJECT)) {
+        confirmShellShareProjects(new String[] { projectName }, jids);
+    }
+
+    public void confirmShellShareProjects(String[] projectNames, JID... jids)
+        throws RemoteException {
+        if (!bot().isShellOpen(SHELL_SHARE_PROJECT)) {
             bot().waitUntilShellIsOpen(SHELL_SHARE_PROJECT);
         }
+
         IRemoteBotShell shell = bot().shell(SHELL_SHARE_PROJECT);
         shell.activate();
 
-        shell.bot().table().getTableItemWithRegex(projectName + ".*").check();
+        for (int i = 0; i < shell.bot().table().rowCount(); i++)
+            shell.bot().table().getTableItem(i).uncheck();
+
+        for (String projectName : projectNames)
+            shell.bot().table().getTableItemWithRegex(projectName + ".*")
+                .check();
+
         shell.bot().button(NEXT).click();
 
         for (IRemoteBotTreeItem item : shell.bot().tree().getAllItems()) {
@@ -318,6 +330,9 @@ public class SuperBot extends STFMessage implements ISuperBot {
         }
         IRemoteBotShell shell = bot().shell(SHELL_ADD_PROJECTS_TO_SESSION);
         shell.activate();
+
+        for (int i = 0; i < shell.bot().table().rowCount(); i++)
+            shell.bot().table().getTableItem(i).uncheck();
 
         for (String projectName : projectNames) {
             shell.bot().table().getTableItemWithRegex(projectName + ".*")

@@ -42,7 +42,8 @@ public class SarosPreferences extends Component implements ISarosPreferences {
             .buttonInGroup(GROUP_TITLE_CREATE_NEW_XMPP_JABBER_ACCOUNT).click();
 
         remoteBot().waitUntilShellIsOpen(SHELL_CREATE_XMPP_JABBER_ACCOUNT);
-        IRemoteBotShell shell = remoteBot().shell(SHELL_CREATE_XMPP_JABBER_ACCOUNT);
+        IRemoteBotShell shell = remoteBot().shell(
+            SHELL_CREATE_XMPP_JABBER_ACCOUNT);
         shell.activate();
         superBot().confirmShellCreateNewXMPPJabberAccount(jid, password);
         shell.bot().button(NEXT).click();
@@ -136,8 +137,8 @@ public class SarosPreferences extends Component implements ISarosPreferences {
                     GeneralPreferencePage.ACCOUNT_GROUP_TITLE).click();
             if (remoteBot().isShellOpen(SHELL_DELETING_ACTIVE_ACCOUNT)
                 && remoteBot().shell(SHELL_DELETING_ACTIVE_ACCOUNT).isActive()) {
-                remoteBot().shell(SHELL_DELETING_ACTIVE_ACCOUNT).bot().button(OK)
-                    .click();
+                remoteBot().shell(SHELL_DELETING_ACTIVE_ACCOUNT).bot()
+                    .button(OK).click();
                 continue;
             }
         }
@@ -166,7 +167,7 @@ public class SarosPreferences extends Component implements ISarosPreferences {
     }
 
     public void disableAutomaticReminder() throws RemoteException {
-        if (feedbackManager.isFeedbackDisabled()) {
+        if (!feedbackManager.isFeedbackDisabled()) {
             clickMenuSarosPreferences();
             remoteBot().waitUntilShellIsOpen(SHELL_PREFERNCES);
             IRemoteBotShell shell = remoteBot().shell(SHELL_PREFERNCES);

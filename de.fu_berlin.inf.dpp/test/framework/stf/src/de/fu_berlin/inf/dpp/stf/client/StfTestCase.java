@@ -48,20 +48,19 @@ public abstract class StfTestCase {
      * 
      * Before/After conditions
      * 
+     * @throws RemoteException
+     * 
      **********************************************/
 
     @Before
-    public void setUp() throws Exception {
-        for (AbstractTester tester : currentTesters) {
-            tester.remoteBot().logMessage(
-                "******* " + "STARTING TESTCASE " + this.getClass().getName()
-                    + ":" + currentTestName.getMethodName() + " *******");
-        }
+    public void setUp() throws RemoteException {
         closeAllShells();
+        announceTestCaseStart();
     }
 
     @After
     public void tearDown() throws RemoteException {
+        announceTestCaseEnd();
         resetWorkbenches();
     }
 
@@ -74,7 +73,25 @@ public abstract class StfTestCase {
      * 
      * often used to define preconditions
      * 
+     * @throws RemoteException
+     * 
      **********************************************/
+
+    public void announceTestCaseStart() throws RemoteException {
+        for (AbstractTester tester : currentTesters) {
+            tester.remoteBot().logMessage(
+                "******* " + "STARTING TESTCASE " + this.getClass().getName()
+                    + ":" + currentTestName.getMethodName() + " *******");
+        }
+    }
+
+    public void announceTestCaseEnd() throws RemoteException {
+        for (AbstractTester tester : currentTesters) {
+            tester.remoteBot().logMessage(
+                "******* " + "ENDING TESTCASE " + this.getClass().getName()
+                    + ":" + currentTestName.getMethodName() + " *******");
+        }
+    }
 
     /**
      * bring workbench to a original state before beginning your tests
@@ -285,10 +302,8 @@ public abstract class StfTestCase {
      * 
      * 
      * @throws RemoteException
-     * @throws InterruptedException
      */
-    public static void leaveSessionPeersFirst() throws RemoteException,
-        InterruptedException {
+    public static void leaveSessionPeersFirst() throws RemoteException {
         AbstractTester host = null;
         List<JID> peerJIDs = new ArrayList<JID>();
         List<Callable<Void>> leaveTasks = new ArrayList<Callable<Void>>();

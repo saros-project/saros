@@ -9,7 +9,6 @@ import static de.fu_berlin.inf.dpp.stf.shared.Constants.VIEW_SAROS;
 
 import java.rmi.RemoteException;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
@@ -116,21 +115,27 @@ public class Util {
         Map<String, List<String>> projectsPkgsClasses, AbstractTester inviter,
         AbstractTester... invitees) throws RemoteException {
 
-        List<String> createdProjects = new ArrayList<String>();
+        throw new UnsupportedOperationException("not yet implemented");
+        // List<String> createdProjects = new ArrayList<String>();
+        //
+        // for (Iterator<String> i = projectsPkgsClasses.keySet().iterator(); i
+        // .hasNext();) {
+        // String key = i.next();
+        // if (!createdProjects.contains(key)) {
+        // createdProjects.add(key);
+        // inviter.superBot().views().packageExplorerView().tree().newC()
+        // .javaProject(key);
+        // List<String> pkgAndclass = projectsPkgsClasses.get(key);
+        // inviter.superBot().views().packageExplorerView()
+        // .selectPkg(key, pkgAndclass.get(0)).newC()
+        // .cls(key, pkgAndclass.get(0), pkgAndclass.get(1));
+        // }
+        // }
 
-        for (Iterator<String> i = projectsPkgsClasses.keySet().iterator(); i
-            .hasNext();) {
-            String key = i.next();
-            if (!createdProjects.contains(key)) {
-                createdProjects.add(key);
-                inviter.superBot().views().packageExplorerView().tree().newC()
-                    .javaProject(key);
-                List<String> pkgAndclass = projectsPkgsClasses.get(key);
-                inviter.superBot().views().packageExplorerView()
-                    .selectPkg(key, pkgAndclass.get(0)).newC()
-                    .cls(key, pkgAndclass.get(0), pkgAndclass.get(1));
-            }
-        }
+        // buildSessionConcurrently(projectName,
+        // TypeOfCreateProject.NEW_PROJECT,
+        // inviter, invitees);
+
     }
 
     public static void createProjectWithFileBy(String projectName,
@@ -141,6 +146,19 @@ public class Util {
             tester.superBot().views().packageExplorerView()
                 .selectFolder(projectName).newC().file(fileName);
             tester.remoteBot().waitUntilEditorOpen(fileName);
+        }
+    }
+
+    public static void addProjectToSessionSequentially(String projectName,
+        TypeOfCreateProject usingWhichProject, AbstractTester inviter,
+        AbstractTester... invitees) throws RemoteException {
+
+        inviter.superBot().menuBar().saros().addProjects(projectName);
+
+        for (AbstractTester invitee : invitees) {
+            invitee.remoteBot().shell(SHELL_SESSION_INVITATION).confirm(ACCEPT);
+            invitee.superBot().confirmShellAddProjectUsingWhichProject(
+                projectName, usingWhichProject);
         }
     }
 
@@ -185,11 +203,9 @@ public class Util {
      * @param buddiesTofollow
      *            the list of the buddies who want to follow the local user.
      * @throws RemoteException
-     * @throws InterruptedException
      */
     public static void setFollowMode(final AbstractTester followedBuddy,
-        AbstractTester... buddiesTofollow) throws RemoteException,
-        InterruptedException {
+        AbstractTester... buddiesTofollow) throws RemoteException {
         List<Callable<Void>> followTasks = new ArrayList<Callable<Void>>();
         for (int i = 0; i < buddiesTofollow.length; i++) {
             final AbstractTester tester = buddiesTofollow[i];

@@ -2,6 +2,7 @@ package de.fu_berlin.inf.dpp.stf.server.rmi.superbot;
 
 import java.rmi.Remote;
 import java.rmi.RemoteException;
+import java.util.List;
 
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.stf.server.STFMessage;
@@ -161,7 +162,19 @@ public interface ISuperBot extends Remote {
      *            {@link JID}s of all invitees
      * @throws RemoteException
      */
-    public void confirmShellShareProject(String projectName, JID... jids)
+    public void confirmShellShareProjects(String projectName, JID... jids)
+        throws RemoteException;
+
+    /**
+     * confirm the shell with title {@link STFMessage#SHELL_SHARE_PROJECT}
+     * 
+     * @param projectNames
+     *            a {@link List} containing the names of shared projects
+     * @param jids
+     *            the {@link JID}s of all invitees
+     * @throws RemoteException
+     */
+    public void confirmShellShareProjects(String[] projectNames, JID... jids)
         throws RemoteException;
 
     public void confirmShellAddProjectsToSession(String... projectNames)
