@@ -166,6 +166,7 @@ Export-Package: de.fu_berlin.inf.dpp;
    org.eclipse.jface.viewers,
    de.fu_berlin.inf.dpp.editor,
    de.fu_berlin.inf.dpp.invitation",
+ de.fu_berlin.inf.dpp.ui.model,
  de.fu_berlin.inf.dpp.ui.util,
  de.fu_berlin.inf.dpp.ui.util.selection,
  de.fu_berlin.inf.dpp.ui.util.selection.retriever,
