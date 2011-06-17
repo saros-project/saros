@@ -302,18 +302,20 @@ public class SuperBot extends STFMessage implements ISuperBot {
         IRemoteBotShell shell = bot().shell(SHELL_SHARE_PROJECT);
         shell.activate();
 
-        for (int i = 0; i < shell.bot().table().rowCount(); i++)
-            shell.bot().table().getTableItem(i).uncheck();
+        for (IRemoteBotTreeItem item : shell.bot().tree().getAllItems()) {
+            if (item.isChecked())
+                item.uncheck();
+        }
 
         for (String projectName : projectNames)
-            shell.bot().table().getTableItemWithRegex(projectName + ".*")
+            shell.bot().tree().selectTreeItemWithRegex(projectName + ".*")
                 .check();
 
         shell.bot().button(NEXT).click();
 
         for (IRemoteBotTreeItem item : shell.bot().tree().getAllItems()) {
             if (item.isChecked())
-                item.check();
+                item.uncheck();
         }
 
         for (JID jid : jids) {
@@ -331,13 +333,15 @@ public class SuperBot extends STFMessage implements ISuperBot {
         IRemoteBotShell shell = bot().shell(SHELL_ADD_PROJECTS_TO_SESSION);
         shell.activate();
 
-        for (int i = 0; i < shell.bot().table().rowCount(); i++)
-            shell.bot().table().getTableItem(i).uncheck();
-
-        for (String projectName : projectNames) {
-            shell.bot().table().getTableItemWithRegex(projectName + ".*")
-                .check();
+        for (IRemoteBotTreeItem item : shell.bot().tree().getAllItems()) {
+            while (item.isChecked())
+                item.uncheck();
         }
+
+        for (String projectName : projectNames)
+            shell.bot().tree().selectTreeItemWithRegex(projectName + ".*")
+                .check();
+
         shell.bot().button(FINISH).click();
     }
 
