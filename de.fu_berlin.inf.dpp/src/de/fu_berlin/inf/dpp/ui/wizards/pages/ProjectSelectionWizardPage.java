@@ -3,6 +3,7 @@ package de.fu_berlin.inf.dpp.ui.wizards.pages;
 import java.util.List;
 
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
@@ -15,29 +16,30 @@ import org.picocontainer.annotations.Inject;
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
 import de.fu_berlin.inf.dpp.ui.util.selection.retriever.SelectionRetrieverFactory;
-import de.fu_berlin.inf.dpp.ui.widgets.viewer.project.ProjectSelectionComposite;
-import de.fu_berlin.inf.dpp.ui.widgets.viewer.project.events.BaseProjectSelectionListener;
+import de.fu_berlin.inf.dpp.ui.widgets.viewer.project.ProjectResourceSelectionComposite;
 import de.fu_berlin.inf.dpp.ui.widgets.viewer.project.events.FilterClosedProjectsChangedEvent;
-import de.fu_berlin.inf.dpp.ui.widgets.viewer.project.events.ProjectSelectionChangedEvent;
-import de.fu_berlin.inf.dpp.ui.widgets.viewer.project.events.ProjectSelectionListener;
+import de.fu_berlin.inf.dpp.ui.widgets.viewer.project.events.ProjectResourceSelectionChangedEvent;
+import de.fu_berlin.inf.dpp.ui.widgets.viewer.project.events.ProjectResourceSelectionListener;
 
 public class ProjectSelectionWizardPage extends WizardPage {
     public static final String TITLE = "Select Project";
-    public static final String DESCRIPTION = "Select the project(s) to work on.";
+    public static final String DESCRIPTION = "Select the file(s) to work on.";
 
-    public static final String NO_PROJECT_SELECTED_ERROR_MESSAGE = "Select at least one project to work on.";
+    public static final String NO_PROJECT_SELECTED_ERROR_MESSAGE = "Select at least one file to work on.";
 
-    protected ProjectSelectionComposite projectSelectionComposite;
+    protected ProjectResourceSelectionComposite projectResourceSelectionComposite;
 
     /**
-     * This {@link BaseProjectSelectionListener} changes the {@link WizardPage}
-     * 's state according to the selected {@link IProject}.
+     * This {@link ProjectResourceSelectionListener} changes the
+     * {@link WizardPage} 's state according to the selected {@link IProject}.
      */
-    protected ProjectSelectionListener projectSelectionListener = new ProjectSelectionListener() {
-        public void projectSelectionChanged(ProjectSelectionChangedEvent event) {
-            if (projectSelectionComposite != null
-                && !projectSelectionComposite.isDisposed()) {
-                if (projectSelectionComposite.getSelectedProjects().size() == 0) {
+    protected ProjectResourceSelectionListener projectResourceSelectionListener = new ProjectResourceSelectionListener() {
+        public void projectResourceSelectionChanged(
+            ProjectResourceSelectionChangedEvent event) {
+            if (projectResourceSelectionComposite != null
+                && !projectResourceSelectionComposite.isDisposed()) {
+                if (projectResourceSelectionComposite
+                    .getSelectedProjectResources().size() == 0) {
                     setErrorMessage(NO_PROJECT_SELECTED_ERROR_MESSAGE);
                 } else {
                     setErrorMessage(null);
@@ -78,8 +80,8 @@ public class ProjectSelectionWizardPage extends WizardPage {
         projectSelectionLabel.setText("Projects:");
 
         createProjectSelectionComposite(composite);
-        this.projectSelectionComposite.setLayoutData(new GridData(SWT.FILL,
-            SWT.FILL, true, true));
+        this.projectResourceSelectionComposite.setLayoutData(new GridData(
+            SWT.FILL, SWT.FILL, true, true));
 
         /*
          * Page completion
@@ -88,36 +90,39 @@ public class ProjectSelectionWizardPage extends WizardPage {
     }
 
     protected void createProjectSelectionComposite(Composite parent) {
-        if (this.projectSelectionComposite != null
-            && !this.projectSelectionComposite.isDisposed())
-            this.projectSelectionComposite.dispose();
+        if (this.projectResourceSelectionComposite != null
+            && !this.projectResourceSelectionComposite.isDisposed())
+            this.projectResourceSelectionComposite.dispose();
 
-        this.projectSelectionComposite = new ProjectSelectionComposite(parent,
-            SWT.BORDER | SWT.V_SCROLL, PlatformUI.getPreferenceStore()
+        this.projectResourceSelectionComposite = new ProjectResourceSelectionComposite(
+            parent, SWT.BORDER | SWT.V_SCROLL, PlatformUI.getPreferenceStore()
                 .getBoolean(
                     PreferenceConstants.PROJECTSELECTION_FILTERCLOSEDPROJECTS));
-        this.projectSelectionComposite
-            .setSelectedProjects(SelectionRetrieverFactory
-                .getSelectionRetriever(IProject.class).getOverallSelection());
-        this.projectSelectionComposite
-            .addProjectSelectionListener(projectSelectionListener);
+        this.projectResourceSelectionComposite
+            .setSelectedProjectResources(SelectionRetrieverFactory
+                .getSelectionRetriever(IResource.class).getOverallSelection());
+        this.projectResourceSelectionComposite
+            .addProjectResourceSelectionListener(projectResourceSelectionListener);
 
         /*
-         * If no project is selected and one project exists in the workspace,
-         * use it.
+         * If no project is selected and only one project exists in the
+         * workspace, select it in Wizard.
          */
-        if (this.projectSelectionComposite.getSelectedProjects().size() == 0) {
-            List<IProject> projects = this.projectSelectionComposite
-                .getProjects();
-            if (projects.size() == 1) {
-                this.projectSelectionComposite.setSelectedProjects(projects);
+        if (this.projectResourceSelectionComposite
+            .getSelectedProjectResources().size() == 0) {
+            List<IResource> resources = this.projectResourceSelectionComposite
+                .getProjectResources();
+
+            if (this.projectResourceSelectionComposite.getProjectsCount() == 1) {
+                this.projectResourceSelectionComposite
+                    .setSelectedProjectResources(resources);
             }
         }
     }
 
     protected void updatePageCompletion() {
-        int selectedProjectsCount = this.projectSelectionComposite
-            .getSelectedProjects().size();
+        int selectedProjectsCount = this.projectResourceSelectionComposite
+            .getSelectedProjectResources().size();
         setPageComplete(selectedProjectsCount > 0);
     }
 
@@ -127,18 +132,18 @@ public class ProjectSelectionWizardPage extends WizardPage {
         if (!visible)
             return;
 
-        this.projectSelectionComposite.setFocus();
+        this.projectResourceSelectionComposite.setFocus();
     }
 
     /*
      * WizardPage Results
      */
 
-    public List<IProject> getSelectedProjects() {
-        if (this.projectSelectionComposite == null
-            || this.projectSelectionComposite.isDisposed())
+    public List<IResource> getSelectedProjectResources() {
+        if (this.projectResourceSelectionComposite == null
+            || this.projectResourceSelectionComposite.isDisposed())
             return null;
-
-        return this.projectSelectionComposite.getSelectedProjects();
+        return this.projectResourceSelectionComposite
+            .getSelectedProjectResources();
     }
 }

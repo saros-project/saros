@@ -1,12 +1,15 @@
 package de.fu_berlin.inf.dpp.ui.util;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.PlatformUI;
@@ -20,38 +23,47 @@ import de.fu_berlin.inf.dpp.project.internal.SarosSession;
 import de.fu_berlin.inf.dpp.util.Utils;
 
 /**
- * Offers convenient methods for collaboration actions like sharing a project.
+ * Offers convenient methods for collaboration actions like sharing a project
+ * resources.
  * 
  * @author bkahlert
+ * @author kheld
  */
 public class CollaborationUtils {
     private static final Logger log = Logger
         .getLogger(CollaborationUtils.class);
 
     /**
-     * Shares given projects with given buddies.<br/>
+     * Shares given project resources with given buddies.<br/>
      * Does nothing if a {@link SarosSession} is already running.
      * 
      * @param sarosSessionManager
-     * @param projects
+     * @param selectedResources
      * @param buddies
      * 
      * @nonBlocking
      */
-    public static void shareProjectWith(
+    public static void shareProjectResourcesWith(
         final SarosSessionManager sarosSessionManager,
-        final List<IProject> projects, final List<JID> buddies) {
+        List<IResource> selectedResources, final List<JID> buddies) {
+
+        final HashMap<IProject, List<IResource>> newResources = acquireResources(
+            selectedResources, null);
 
         Utils.runSafeAsync(log, new Runnable() {
             public void run() {
                 if (sarosSessionManager.getSarosSession() == null) {
                     try {
-                        sarosSessionManager.startSession(projects, null);
+                        sarosSessionManager.startSession(newResources);
                     } catch (final XMPPException e) {
                         Utils.runSafeSWTSync(log, new Runnable() {
                             public void run() {
-                                MessageDialog.openError(null, "Offline",
-                                    getShareProjectFailureMessage(projects));
+                                MessageDialog
+                                    .openError(
+                                        null,
+                                        "Offline",
+                                        getShareProjectResourcesFailureMessage(newResources
+                                            .keySet()));
                                 log.warn("Start share project failed", e);
                             }
                         });
@@ -119,18 +131,21 @@ public class CollaborationUtils {
     }
 
     /**
-     * Adds the given projects to the session.<br/>
+     * Adds the given project resources to the session.<br/>
      * Does nothing if no {@link SarosSession} is running.
      * 
      * @param sarosSessionManager
-     * @param projects
+     * @param resourcesToAdd
      * 
      * @nonBlocking
      */
-    public static void addProjectsToSarosSession(
+    public static void addProjectResourcesToSarosSession(
         final SarosSessionManager sarosSessionManager,
-        final List<IProject> projects) {
-
+        List<IResource> resourcesToAdd) {
+        final HashMap<IProject, List<IResource>> newResources = acquireResources(
+            resourcesToAdd, sarosSessionManager.getSarosSession());
+        if (newResources.isEmpty())
+            return;
         Utils.runSafeAsync(log, new Runnable() {
             public void run() {
                 final ISarosSession sarosSession = sarosSessionManager
@@ -138,24 +153,12 @@ public class CollaborationUtils {
                 if (sarosSession != null) {
                     Utils.runSafeSync(log, new Runnable() {
                         public void run() {
-                            Set<IProject> addedProjects = sarosSession
-                                .getProjects();
-
-                            List<IProject> projectsToAdd = new LinkedList<IProject>();
-                            for (IProject project : projects) {
-                                if (!addedProjects.contains(project)) {
-                                    projectsToAdd.add(project);
-                                }
-                            }
-
-                            if (projectsToAdd.size() > 0) {
-                                sarosSessionManager
-                                    .addProjectsToSession(projectsToAdd);
-                            }
+                            sarosSessionManager
+                                .addProjectResourcesToSession(newResources);
                         }
                     });
                 } else {
-                    log.warn("Tried to add projects to "
+                    log.warn("Tried to add project resources to "
                         + SarosSession.class.getSimpleName()
                         + " although there is no one running");
                 }
@@ -199,9 +202,7 @@ public class CollaborationUtils {
                                 }
                             }
 
-                            String description = getShareProjectDescription(
-                                sarosSession.getHost().getJID(), sarosSession
-                                    .getProjects().toArray(new IProject[0]));
+                            String description = getShareProjectDescription(sarosSession);
 
                             if (buddiesToAdd.size() > 0) {
                                 sarosSessionManager.invite(buddiesToAdd,
@@ -224,14 +225,16 @@ public class CollaborationUtils {
      * @param projects
      * @return
      */
-    private static String getShareProjectFailureMessage(List<IProject> projects) {
+    private static String getShareProjectResourcesFailureMessage(
+        Set<IProject> projects) {
+
         StringBuilder message = new StringBuilder();
         message.append("You are not connected to an XMPP/Jabber server.\n");
         message.append("\n");
         message.append("The following project"
             + ((projects.size() == 1) ? "" : "s") + " could not be shared:\n");
-        for (int i = 0; i < projects.size(); i++) {
-            IProject project = projects.get(i);
+        while (projects.iterator().hasNext()) {
+            IProject project = projects.iterator().next();
             message.append("\t" + project.getName() + "\n");
         }
         message.append("\n");
@@ -244,24 +247,77 @@ public class CollaborationUtils {
      * Creates the message that invitees see on an incoming project share
      * request.
      * 
-     * @param inviter
-     * @param projects
+     * @param sarosSession
      * @return
      */
-    protected static String getShareProjectDescription(JID inviter,
-        IProject[] projects) {
+    protected static String getShareProjectDescription(
+        ISarosSession sarosSession) {
+        JID inviter = sarosSession.getHost().getJID();
+        Set<IProject> projects = sarosSession.getProjects();
         String result = inviter.getBase()
             + " has invited you to a Saros session";
 
-        if (projects.length == 1) {
+        if (projects.size() == 1) {
             result += " with the shared project\n";
-        } else if (projects.length > 1) {
+        } else if (projects.size() > 1) {
             result += " with the shared projects\n";
         }
         for (IProject project : projects) {
             result += "\n - " + project.getName();
+            if (!sarosSession.isCompletelyShared(project))
+                result += " (partial)";
         }
 
         return result;
+    }
+
+    /**
+     * Decides if selected resource is a complete shared project in contrast to
+     * partial shared ones. The result is stored in {@link HashMap}:
+     * <ul>
+     * <li>complete shared project: {@link IProject} --> null
+     * <li>partial shared project: {@link IProject} --> List<IResource>
+     * </ul>
+     * Adds to partial shared projects ".project" and ".classpath" files for
+     * project recognition.
+     * 
+     * @param selectedResources
+     * @param iSarosSession
+     * @return
+     * 
+     */
+    protected static HashMap<IProject, List<IResource>> acquireResources(
+        List<IResource> selectedResources, ISarosSession iSarosSession) {
+
+        HashMap<IProject, List<IResource>> allResources = new HashMap<IProject, List<IResource>>();
+
+        if (iSarosSession != null) {
+            List<IResource> alreadySharedResources = iSarosSession
+                .getAllSharedProjectResources();
+            selectedResources.removeAll(alreadySharedResources);
+        }
+        for (int i = 0; i < selectedResources.size(); i++) {
+            IResource iResource = selectedResources.get(i);
+            if (iResource instanceof IProject) {
+                allResources.put((IProject) iResource, null);
+            } else if (!allResources.containsKey(iResource.getProject())) {
+                IProject project = iResource.getProject();
+                List<IResource> tempResources = new ArrayList<IResource>();
+
+                for (int j = i; j < selectedResources.size(); j++) {
+                    if (!project.equals(selectedResources.get(j).getProject())) {
+                        i = j - 1;
+                        break;
+                    }
+                    tempResources.add(selectedResources.get(j));
+                }
+                if (!tempResources.contains(project.getFile(".project")))
+                    tempResources.add(project.getFile(".project"));
+                if (!tempResources.contains(project.getFile(".classpath")))
+                    tempResources.add(project.getFile(".classpath"));
+                allResources.put(project, tempResources);
+            }
+        }
+        return allResources;
     }
 }

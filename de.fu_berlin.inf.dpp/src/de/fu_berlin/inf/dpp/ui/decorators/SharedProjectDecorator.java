@@ -23,7 +23,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.IDecoration;
 import org.eclipse.jface.viewers.ILabelProviderListener;
@@ -65,20 +66,21 @@ public class SharedProjectDecorator implements ILightweightLabelDecorator {
         @Override
         public void sessionStarted(ISarosSession newSarosSession) {
             sarosSession = newSarosSession;
-            updateDecoratorsAsync(newSarosSession.getProjects().toArray());
         }
 
         @Override
         public void sessionEnded(ISarosSession oldSarosSession) {
             assert sarosSession == oldSarosSession;
             sarosSession = null;
-            updateDecoratorsAsync(oldSarosSession.getProjects().toArray());
+            updateDecoratorsAsync(resources.toArray());
         }
 
         @Override
         public void projectAdded(String projectID) {
             log.debug("PROJECT ADDED: " + projectID);
             updateDecoratorsAsync(sarosSession.getProjects().toArray());
+            updateDecoratorsAsync(sarosSession.getAllSharedProjectResources()
+                .toArray());
         }
     };
 
@@ -98,15 +100,21 @@ public class SharedProjectDecorator implements ILightweightLabelDecorator {
         sessionManager.removeSarosSessionListener(sessionListener);
     }
 
+    List<IResource> resources = new ArrayList<IResource>();
+
     public void decorate(Object element, IDecoration decoration) {
         if (this.sarosSession == null) {
             return;
         }
+        IResource iResource = (IResource) element;
 
-        if (element instanceof IProject) {
-            IProject project = (IProject) element;
-
-            if (this.sarosSession.isShared(project)) {
+        if ((sarosSession.isCompletelyShared(iResource.getProject()))
+            || (sarosSession.isShared(iResource))) {
+            resources.add(iResource);
+            if ((iResource instanceof IFile)) {
+                decoration.addOverlay(SharedProjectDecorator.projectDescriptor,
+                    IDecoration.TOP_RIGHT);
+            } else {
                 decoration.addOverlay(SharedProjectDecorator.projectDescriptor,
                     IDecoration.TOP_LEFT);
             }

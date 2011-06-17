@@ -6,6 +6,7 @@ import java.util.Comparator;
 import java.util.List;
 
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.jface.action.ContributionItem;
@@ -103,10 +104,10 @@ public class ProjectShareProjects extends ContributionItem {
         menuItem.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
-                List<IProject> projects = new ArrayList<IProject>();
-                projects.add(project);
-                CollaborationUtils.shareProjectWith(sarosSessionManager,
-                    projects, selectedBuddies);
+                List<IResource> projectResources = new ArrayList<IResource>();
+                projectResources.add(project);
+                CollaborationUtils.shareProjectResourcesWith(sarosSessionManager,
+                    projectResources, selectedBuddies);
             }
         });
 

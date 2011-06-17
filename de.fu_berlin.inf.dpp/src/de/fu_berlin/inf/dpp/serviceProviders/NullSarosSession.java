@@ -1,12 +1,14 @@
 package de.fu_berlin.inf.dpp.serviceProviders;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CancellationException;
 
 import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.SubMonitor;
 import org.joda.time.DateTime;
 
@@ -205,7 +207,7 @@ public class NullSarosSession implements ISarosSession {
         return null;
     }
 
-    public boolean isShared(IProject project) {
+    public boolean isShared(IResource resource) {
         log.warn("unexpected method call");
         return false;
     }
@@ -230,7 +232,8 @@ public class NullSarosSession implements ISarosSession {
         return null;
     }
 
-    public void addSharedProject(IProject project, String projectID) {
+    public void addSharedProjectResources(IProject project, String projectID,
+        List<IResource> dependentResources) {
         log.warn("unexpected method call");
 
     }
@@ -247,4 +250,31 @@ public class NullSarosSession implements ISarosSession {
 
     }
 
+    public List<IResource> getAllSharedProjectResources() {
+        log.warn("unexpected method call");
+        return null;
+    }
+
+    public HashMap<IProject, List<IResource>> getProjectResourcesMapping() {
+        log.warn("unexpected method call");
+        return null;
+    }
+
+    public boolean isCompletelyShared(IProject project) {
+        log.warn("unexpected method call");
+        return false;
+    }
+
+    public void stopQueue() {
+        log.warn("unexpected method call");
+    }
+
+    public void startQueue() {
+        log.warn("unexpected method call");
+    }
+
+    public List<IResource> getSharedProjectResources(IProject project) {
+        log.warn("unexpected method call");
+        return null;
+    }
 }

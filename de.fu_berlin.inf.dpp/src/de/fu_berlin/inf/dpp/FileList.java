@@ -43,6 +43,7 @@ import org.eclipse.core.runtime.SubMonitor;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 
+import de.fu_berlin.inf.dpp.util.ArrayUtils;
 import de.fu_berlin.inf.dpp.util.FileUtils;
 import de.fu_berlin.inf.dpp.util.xstream.IPathConverter;
 import de.fu_berlin.inf.dpp.vcs.VCSAdapter;
@@ -72,7 +73,7 @@ public class FileList {
     protected final boolean useVersionControl;
 
     /** The actual file list data. Keys are project relative paths. */
-    protected Map<IPath, FileListData> entries = new HashMap<IPath, FileListData>();
+    public Map<IPath, FileListData> entries = new HashMap<IPath, FileListData>();
     /** Identifies the VCS used. */
     protected String vcsProviderID;
 
@@ -81,7 +82,7 @@ public class FileList {
     /** VCS internal information. */
     protected VCSResourceInfo vcsProjectInfo;
 
-    /** ID of Project this list of files belog to */
+    /** ID of Project this list of files belong to */
     protected String projectID;
 
     static class FileListData {
@@ -197,7 +198,9 @@ public class FileList {
         SubMonitor subMonitor) throws CoreException {
         this(useVersionControl);
         container.refreshLocal(IResource.DEPTH_INFINITE, null);
-        addMembers(container.members(), subMonitor);
+        List<IResource> resources = ArrayUtils.getAdaptableObjects(
+            container.members(), IResource.class);
+        addMembers(resources, subMonitor);
     }
 
     /**
@@ -211,10 +214,10 @@ public class FileList {
      * 
      * @throws CoreException
      */
-    public FileList(IResource[] resources, boolean useVersionControl)
-        throws CoreException {
+    public FileList(List<IResource> resources, boolean useVersionControl,
+        SubMonitor subMonitor) throws CoreException {
         this(useVersionControl);
-        addMembers(resources, null);
+        addMembers(resources, subMonitor);
     }
 
     /**
@@ -233,8 +236,9 @@ public class FileList {
         }
     }
 
-    public FileList(IProject source) throws CoreException {
-        this(source, true, null);
+    public FileList(IProject source, SubMonitor subMonitor)
+        throws CoreException {
+        this(source, true, subMonitor);
     }
 
     /**
@@ -359,14 +363,14 @@ public class FileList {
         return paths;
     }
 
-    private void addMembers(IResource[] resources, SubMonitor subMonitor)
+    private void addMembers(List<IResource> resources, SubMonitor subMonitor)
         throws CoreException {
-        if (resources.length == 0)
+        if (resources.size() == 0)
             return;
         IProject project = null;
         VCSAdapter vcs = null;
         if (useVersionControl) {
-            project = resources[0].getProject();
+            project = resources.get(0).getProject();
             vcs = VCSAdapter.getAdapter(project);
             if (vcs != null) {
                 String providerID = vcs.getProviderID(project);
@@ -386,7 +390,8 @@ public class FileList {
             assert !useVersionControl
                 || (project != null && project.equals(resource.getProject()));
 
-            if (resource instanceof IFile) {
+            if (resource instanceof IFile
+                && !this.entries.containsKey(resource.getProjectRelativePath())) {
                 IFile file = (IFile) resource;
                 if (!file.exists()) {
                     continue;
@@ -406,7 +411,8 @@ public class FileList {
                     log.error(e);
                 }
 
-            } else if (resource instanceof IFolder) {
+            } else if (resource instanceof IFolder
+                && !this.entries.containsKey(resource.getProjectRelativePath())) {
                 IFolder folder = (IFolder) resource;
 
                 IPath path = folder.getProjectRelativePath();
@@ -425,7 +431,8 @@ public class FileList {
                         + folder.getName());
                 this.entries.put(path, data);
 
-                addMembers(folder.members(), subMonitor);
+                addMembers(ArrayUtils.getAdaptableObjects(folder.members(),
+                    IResource.class), subMonitor);
             }
         }
     }

@@ -16,16 +16,17 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
-import de.fu_berlin.inf.dpp.SarosContext;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.SubMonitor;
 
 import de.fu_berlin.inf.dpp.FileList;
+import de.fu_berlin.inf.dpp.SarosContext;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.activities.ProjectExchangeInfo;
 import de.fu_berlin.inf.dpp.activities.business.ProjectsAddedActivity;
@@ -74,10 +75,12 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
 
     protected boolean useVersionControl;
 
+    protected HashMap<IProject, List<IResource>> selectedProjectResources;
     protected List<ProjectExchangeInfo> pInfos;
 
     public OutgoingProjectNegotiation(ITransmitter transmitter, JID to,
-        ISarosSession sarosSession, List<IProject> projects,
+        ISarosSession sarosSession,
+        HashMap<IProject, List<IResource>> partialProjectResources,
         ProjectNegotiationObservable projectExchangeProcesses,
         StopManager stopManager, SessionIDObservable sessionID,
         boolean doStream, SarosContext sarosContext,
@@ -86,11 +89,14 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
 
         this.processID = String.valueOf(INVITATION_RAND.nextLong());
         this.projectExchangeProcesses = projectExchangeProcesses;
-        this.doStream = doStream;
+        // set to false because streaming is not well supported yet
+        this.doStream = false;
         this.sarosSession = sarosSession;
         this.sessionID = sessionID;
         this.stopManager = stopManager;
-        this.projects = projects;
+        this.selectedProjectResources = partialProjectResources;
+        this.projects = new ArrayList<IProject>(
+            selectedProjectResources.keySet());
         this.pInfos = projectExchangeInfos;
 
     }
@@ -138,19 +144,24 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
             subMonitor.setWorkRemaining(100);
             useVersionControl = sarosSession.useVersionControl();
             pInfos = new ArrayList<ProjectExchangeInfo>(this.projects.size());
-            for (IProject project : projects) {
+            for (IProject iProject : this.projects) {
                 if (subMonitor.isCanceled())
                     throw new LocalCancellationException(null,
                         CancelOption.NOTIFY_PEER);
                 try {
-                    FileList fileList = new FileList(project,
+                    String projectID = sarosSession.getProjectID(iProject);
+                    String projectName = iProject.getName();
+                    FileList projectFileList = generateFileList(iProject,
+                        this.selectedProjectResources.get(iProject),
                         useVersionControl, subMonitor.newChild(0));
-                    fileList.setProjectID(sarosSession.getProjectID(project));
-                    ProjectExchangeInfo pInfo = new ProjectExchangeInfo(
-                        sarosSession.getProjectID(project), "",
-                        project.getName(), fileList);
-                    pInfos.add(pInfo);
+                    projectFileList.setProjectID(projectID);
+                    String description = "";
+                    if (!sarosSession.isCompletelyShared(iProject))
+                        description = "partial";
 
+                    ProjectExchangeInfo pInfo = new ProjectExchangeInfo(
+                        projectID, description, projectName, projectFileList);
+                    pInfos.add(pInfo);
                 } catch (CoreException e) {
                     throw new LocalCancellationException(e.getMessage(),
                         CancelOption.NOTIFY_PEER);
@@ -168,6 +179,26 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
                 processID, this.doStream));
         subMonitor.done();
 
+    }
+
+    /**
+     * Put the resources to {@link FileList} that are part of the selection.
+     * 
+     * @param project
+     *            The project that should be added to this file list.
+     * @param resources
+     *            The resources that should be added to this file list.
+     * @param useVersionControl
+     * @return
+     * @throws CoreException
+     */
+    private FileList generateFileList(IProject project,
+        List<IResource> resources, boolean useVersionControl,
+        SubMonitor subMonitor) throws CoreException {
+        if (resources == null)
+            return new FileList(project, subMonitor);
+
+        return new FileList(resources, useVersionControl, subMonitor);
     }
 
     /**
@@ -205,8 +236,6 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
                 fileList.getPaths());
             log.debug(fileList.toString());
         }
-
-        // toSend.addAll(remoteFileLists.getPaths());
     }
 
     @Override

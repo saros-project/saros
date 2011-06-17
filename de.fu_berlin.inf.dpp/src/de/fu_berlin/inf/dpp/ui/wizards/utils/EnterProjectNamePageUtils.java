@@ -2,6 +2,8 @@ package de.fu_berlin.inf.dpp.ui.wizards.utils;
 
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -25,6 +27,12 @@ public class EnterProjectNamePageUtils {
         .getLogger(EnterProjectNamePageUtils.class);
 
     public static PreferenceUtils preferenceUtils;
+
+    /**
+     * Stores the unique project ID if a project is once shared in session. This
+     * is done to propose the same project directly for partial sharing.
+     */
+    static List<String> alreadySharedProjectsIDs = new ArrayList<String>();
 
     public static class ScanRunner implements Runnable {
 
@@ -130,43 +138,29 @@ public class EnterProjectNamePageUtils {
 
     /**
      * 
-     * @param name
+     * @param projectName
      * @return
      */
-    public static boolean projectIsUnique(String name) {
-
-        // Then check with all the projects
-        IWorkspace workspace = ResourcesPlugin.getWorkspace();
-        IProject[] projects = workspace.getRoot().getProjects();
-
-        return EnterProjectNamePageUtils.projectIsUnique(name, projects);
+    public static IProject getProjectForName(String projectName) {
+        return ResourcesPlugin.getWorkspace().getRoot().getProject(projectName);
     }
 
     /**
      * 
-     * @param name
-     * @return
-     */
-    public static IProject getProjectForName(String name) {
-        return ResourcesPlugin.getWorkspace().getRoot().getProject(name);
-    }
-
-    /**
-     * 
-     * @param name
+     * @param projectName
      * @param projects
      * @return
      */
-    public static boolean projectIsUnique(String name, IProject... projects) {
+    public static boolean projectIsUnique(String projectName, IProject... projects) {
 
-        if (name == null)
+        if (projectName == null)
             throw new IllegalArgumentException("Illegal project name given");
 
         if (new File(ResourcesPlugin.getWorkspace().getRoot().getLocation()
-            .toFile(), name).exists()) {
-            if (!getProjectForName(name).exists()) {
+            .toFile(), projectName).exists()) {
+            if (!getProjectForName(projectName).exists()) {
                 log.warn("Eclipse does not think there is a project "
-                    + "already for the given name " + name
+                    + "already for the given name " + projectName
                     + " but on the file system there is");
             }
             return false;
@@ -174,12 +168,7 @@ public class EnterProjectNamePageUtils {
 
         // Use File to compare so the comparison is case-sensitive depending on
         // the underlying platform
-        File newProjectName = new File(name);
-        //
-        // if (ResourcesPlugin.getWorkspace().getRoot().getFolder(new
-        // Path(name))
-        // .exists())
-        // return false;
+        File newProjectName = new File(projectName);
 
         for (IProject project : projects) {
             if (new File(project.getName()).equals(newProjectName)) {
@@ -235,20 +224,24 @@ public class EnterProjectNamePageUtils {
      * This method decides whether the given Project should be automatically
      * updated
      * 
-     * @param projectName
+     * @param remoteProjectNames
+     * 
      * @return <code>true</code> if automatically reuse of existing project is
      *         selected in preferences and the a project with the given name
      *         exists
      */
-    public static boolean autoUpdateProject(String projectName) {
+    public static boolean autoUpdateProject(String id, String remoteProjectNames) {
         if (preferenceUtils == null) {
             log.warn("preferenceUtils is null");
             return false;
         }
         if (preferenceUtils.isAutoReuseExisting()
-            && JoinSessionWizardUtils.existsProjects(projectName)) {
+            && JoinSessionWizardUtils.existsProjects(remoteProjectNames)) {
+            return true;
+        } else if (alreadySharedProjectsIDs.contains(id)) {
             return true;
         } else {
+            alreadySharedProjectsIDs.add(id);
             return false;
         }
     }

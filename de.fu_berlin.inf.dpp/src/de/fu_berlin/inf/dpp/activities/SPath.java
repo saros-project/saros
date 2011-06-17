@@ -1,6 +1,7 @@
 package de.fu_berlin.inf.dpp.activities;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IPath;
@@ -168,6 +169,13 @@ public class SPath {
      */
     public IResource getResource() {
         return project.findMember(projectRelativePath);
+    }
+
+    /**
+     * Returns the IFolder represented by this SPath.
+     */
+    public IFolder getFolder() {
+        return project.getFolder(projectRelativePath);
     }
 
     /**

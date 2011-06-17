@@ -1151,7 +1151,7 @@ public class EditorManager implements IActivityProvider, Disposable {
         if (resource == null)
             return false;
 
-        return this.sarosSession.isShared(resource.getProject());
+        return this.sarosSession.isShared(resource);
     }
 
     /**

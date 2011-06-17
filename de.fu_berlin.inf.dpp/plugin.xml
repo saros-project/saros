@@ -46,7 +46,7 @@
             lightweight="true"
             state="true">
          <enablement>
-            <objectClass name="org.eclipse.core.resources.IProject"/>
+            <objectClass name="org.eclipse.core.resources.IResource"/>
          </enablement>
       </decorator>
       <decorator
@@ -523,7 +523,7 @@
          point="org.eclipse.ui.commands">      
       <command
             categoryId="org.eclipse.ui.category.project"
-            id="de.fu_berlin.inf.dpp.ui.commands.ShareProject"
+            id="de.fu_berlin.inf.dpp.ui.commands.ShareProjectResource"
             name="Share Project(s)...">
       </command>
       <command
@@ -533,7 +533,7 @@
       </command>
       <command
             categoryId="org.eclipse.ui.category.project"
-            id="de.fu_berlin.inf.dpp.ui.commands.SharedProjectAddProjects"
+            id="de.fu_berlin.inf.dpp.ui.commands.SharedProjectAddProjectResources"
             name="Add Projects...">
       </command>
       <command
@@ -543,7 +543,7 @@
       </command>
       <command
             categoryId="org.eclipse.ui.category.project"
-            id="de.fu_berlin.inf.dpp.ui.commands.SharedProjectAddSelectedProjects"
+            id="de.fu_berlin.inf.dpp.ui.commands.SharedProjectAddSelectedProjectResources"
             name="Add to Saros Session">
       </command>
       <command
@@ -556,7 +556,7 @@
          point="org.eclipse.ui.handlers">
       <handler
       class="de.fu_berlin.inf.dpp.ui.commandHandlers.ShareProjectHandler"
-            commandId="de.fu_berlin.inf.dpp.ui.commands.ShareProject">
+            commandId="de.fu_berlin.inf.dpp.ui.commands.ShareProjectResource">
          <activeWhen>
             <and>
                <reference
@@ -586,7 +586,7 @@
       </handler>
       <handler
             class="de.fu_berlin.inf.dpp.ui.commandHandlers.SharedProjectAddProjectsHandler"
-            commandId="de.fu_berlin.inf.dpp.ui.commands.SharedProjectAddProjects">
+            commandId="de.fu_berlin.inf.dpp.ui.commands.SharedProjectAddProjectResources">
          <activeWhen>
             <and>
                <reference
@@ -614,7 +614,7 @@
       </handler>
       <handler
             class="de.fu_berlin.inf.dpp.ui.commandHandlers.SharedProjectAddSelectedProjectsHandler"
-            commandId="de.fu_berlin.inf.dpp.ui.commands.SharedProjectAddSelectedProjects">
+            commandId="de.fu_berlin.inf.dpp.ui.commands.SharedProjectAddSelectedProjectResources">
          <activeWhen>
             <and>
                <reference
@@ -624,7 +624,7 @@
                      definitionId="de.fu_berlin.inf.dpp.ui.definitions.isSarosSessionRunning">
                </reference>
                <reference
-                     definitionId="de.fu_berlin.inf.dpp.ui.definitions.projectsSelected">
+                     definitionId="de.fu_berlin.inf.dpp.ui.definitions.projectResourcesSelected">
                </reference>
                <not>
                   <reference
@@ -732,7 +732,7 @@
                </visibleWhen>
             </command>
             <command
-                  commandId="de.fu_berlin.inf.dpp.ui.commands.ShareProject"
+                  commandId="de.fu_berlin.inf.dpp.ui.commands.ShareProjectResource"
                   disabledIcon="icons/dlcl16/spacer.png"
                   icon="icons/elcl16/project_share_tsk.png"
                   style="push">
@@ -762,7 +762,7 @@
                </visibleWhen>
             </command>
             <command
-                  commandId="de.fu_berlin.inf.dpp.ui.commands.SharedProjectAddProjects"
+                  commandId="de.fu_berlin.inf.dpp.ui.commands.SharedProjectAddProjectResources"
                   disabledIcon="icons/dlcl16/project_share_add_projects_tsk.png"
                   icon="icons/elcl16/project_share_add_projects_tsk.png"
                   style="push">
@@ -865,7 +865,7 @@
             allPopups="false"
             locationURI="popup:de.fu_berlin.inf.dpp.ui.views.SarosView?after=additions">
          <command
-               commandId="de.fu_berlin.inf.dpp.ui.commands.ShareProject"
+               commandId="de.fu_berlin.inf.dpp.ui.commands.ShareProjectResource"
                disabledIcon="icons/dlcl16/spacer.png"
                icon="icons/elcl16/project_share_tsk.png"
                style="push">
@@ -907,7 +907,7 @@
             </visibleWhen>
          </command>
          <command
-               commandId="de.fu_berlin.inf.dpp.ui.commands.SharedProjectAddProjects"
+               commandId="de.fu_berlin.inf.dpp.ui.commands.SharedProjectAddProjectResources"
                disabledIcon="icons/dlcl16/project_share_add_projects_tsk.png"
                icon="icons/elcl16/project_share_add_projects_tsk.png"
                style="push">
@@ -1036,7 +1036,7 @@
                            </reference>
                         </not>
                         <reference
-                              definitionId="de.fu_berlin.inf.dpp.ui.definitions.projectsSelected">
+                              definitionId="de.fu_berlin.inf.dpp.ui.definitions.projectResourcesSelected">
                         </reference>
                      </and>
             </visibleWhen>
@@ -1072,7 +1072,7 @@
                      visible="true">
                </separator>
                <command
-                     commandId="de.fu_berlin.inf.dpp.ui.commands.ShareProject"
+                     commandId="de.fu_berlin.inf.dpp.ui.commands.ShareProjectResource"
                      label="Multiple Buddies..."
                      style="push">
                </command>
@@ -1089,7 +1089,7 @@
                </separator>
             </menu>
             <command
-                  commandId="de.fu_berlin.inf.dpp.ui.commands.SharedProjectAddSelectedProjects"
+                  commandId="de.fu_berlin.inf.dpp.ui.commands.SharedProjectAddSelectedProjectResources"
                   disabledIcon="icons/dlcl16/project_share_add_projects_tsk.png"
                   icon="icons/elcl16/project_share_add_projects_tsk.png"
                   style="push">
@@ -1103,7 +1103,7 @@
                            definitionId="de.fu_berlin.inf.dpp.ui.definitions.isSarosSessionRunning">
                      </reference>
                      <reference
-                           definitionId="de.fu_berlin.inf.dpp.ui.definitions.projectsSelected">
+                           definitionId="de.fu_berlin.inf.dpp.ui.definitions.projectResourcesSelected">
                      </reference>
                   </and>
                </visibleWhen>
@@ -1149,7 +1149,7 @@
             </command>
             <dynamic
                   class="de.fu_berlin.inf.dpp.ui.menuContributions.ProjectShareProjects"
-                  id="de.fu_berlin.inf.dpp.ui.menus.ProjectShareProjects">
+                  id="de.fu_berlin.inf.dpp.ui.menus.ProjectShareProjectResources">
                <visibleWhen
                      checkEnabled="false">
                   <reference
@@ -1162,7 +1162,7 @@
                   visible="true">
             </separator>
             <command
-                  commandId="de.fu_berlin.inf.dpp.ui.commands.ShareProject"
+                  commandId="de.fu_berlin.inf.dpp.ui.commands.ShareProjectResource"
                   label="Multiple Projects..."
                   style="push">
             </command>
@@ -1243,6 +1243,7 @@
       </menuContribution>
    </extension>
    <extension
+         id="de.fu_berlin.inf.dpp.ui.definitions.isResource"
          point="org.eclipse.core.expressions.definitions">
       <definition
             id="de.fu_berlin.inf.dpp.ui.definitions.isConnected">
@@ -1275,7 +1276,7 @@
             id="de.fu_berlin.inf.dpp.ui.definitions.isInSarosSession">
          <or>
             <adapt
-                  type="org.eclipse.core.resources.IProject">
+                  type="org.eclipse.core.resources.IResource">
                <test
                      property="de.fu_berlin.inf.dpp.isInSarosSession">
                </test>
@@ -1352,7 +1353,7 @@
                   ifEmpty="true"
                   operator="and">
                <reference
-                     definitionId="de.fu_berlin.inf.dpp.ui.definitions.isProject">
+                     definitionId="de.fu_berlin.inf.dpp.ui.definitions.isResource">
                </reference>
                <reference
                      definitionId="de.fu_berlin.inf.dpp.ui.definitions.isInSarosSession">
@@ -1486,6 +1487,25 @@
          </with>
       </definition>
       <definition
+            id="de.fu_berlin.inf.dpp.ui.definitions.isResource">
+         <adapt
+               type="org.eclipse.core.resources.IResource">
+         </adapt>
+      </definition>
+      <definition
+            id="de.fu_berlin.inf.dpp.ui.definitions.projectResourcesSelected">
+         <with
+               variable="selection">
+            <iterate
+                  ifEmpty="false"
+                  operator="and">
+               <reference
+                     definitionId="de.fu_berlin.inf.dpp.ui.definitions.isResource">
+               </reference>
+            </iterate>
+         </with>
+      </definition>
+      <definition
             id="de.fu_berlin.inf.dpp.ui.definitions.sessionHeadlineSelected">
          <with
                variable="selection">
@@ -1536,7 +1556,7 @@
             id="de.fu_berlin.inf.dpp.propertyTesters.ProjectPropertyTester"
             namespace="de.fu_berlin.inf.dpp"
             properties="isInSarosSession"
-            type="org.eclipse.core.resources.IProject">
+            type="org.eclipse.core.resources.IResource">
       </propertyTester>
       <propertyTester
             class="de.fu_berlin.inf.dpp.propertyTesters.BuddyPropertyTester"

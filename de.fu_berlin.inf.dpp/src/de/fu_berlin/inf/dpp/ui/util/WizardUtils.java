@@ -154,8 +154,8 @@ public class WizardUtils {
     }
 
     /**
-     * Opens a {@link ShareProjectWizard} in the SWT thread and returns the
-     * displayed instance in case of success.
+     * Opens a {@link ShareProjectAddProjectsWizard} in the SWT thread and
+     * returns the displayed instance in case of success.
      */
     public static ShareProjectAddProjectsWizard openShareProjectAddProjectsWizard() {
         return openWizardSuccessfully(new ShareProjectAddProjectsWizard(),
@@ -163,8 +163,8 @@ public class WizardUtils {
     }
 
     /**
-     * Opens a {@link ShareProjectWizard} in the SWT thread and returns the
-     * displayed instance in case of success.
+     * Opens a {@link ShareProjectAddBuddiesWizard} in the SWT thread and
+     * returns the displayed instance in case of success.
      */
     public static ShareProjectAddBuddiesWizard openShareProjectAddBuddiesWizard() {
         return openWizardSuccessfully(new ShareProjectAddBuddiesWizard(),

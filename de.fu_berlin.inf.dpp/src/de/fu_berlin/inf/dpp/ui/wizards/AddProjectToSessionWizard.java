@@ -34,6 +34,7 @@ import de.fu_berlin.inf.dpp.invitation.ProcessTools.CancelOption;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
+import de.fu_berlin.inf.dpp.project.SarosSessionManager;
 import de.fu_berlin.inf.dpp.ui.util.DialogUtils;
 import de.fu_berlin.inf.dpp.ui.wizards.JoinSessionWizard.OverwriteErrorDialog;
 import de.fu_berlin.inf.dpp.ui.wizards.dialogs.WizardDialogAccessable;
@@ -59,10 +60,13 @@ public class AddProjectToSessionWizard extends Wizard {
     protected DataTransferManager dataTransferManager;
     protected PreferenceUtils preferenceUtils;
 
+    private SarosSessionManager sessionManager;
+
     public AddProjectToSessionWizard(IncomingProjectNegotiation process,
         DataTransferManager dataTransferManager,
         PreferenceUtils preferenceUtils, JID peer, List<FileList> fileLists,
-        Map<String, String> projectNames) {
+        Map<String, String> projectNames, SarosSessionManager sessionManager) {
+        this.sessionManager = sessionManager;
         this.process = process;
         this.peer = peer;
         this.fileLists = fileLists;
@@ -78,8 +82,6 @@ public class AddProjectToSessionWizard extends Wizard {
 
     @Override
     public void addPages() {
-        // this.namePage = new EnterProjectNamePage(dataTransferManager,
-        // preferenceUtils, fileLists, peer, remoteProjectName, wizardDialog);
         this.namePage = new EnterProjectNamePage(dataTransferManager,
             preferenceUtils, fileLists, peer, this.remoteProjectNames,
             wizardDialog);
@@ -126,9 +128,16 @@ public class AddProjectToSessionWizard extends Wizard {
                 }
 
                 try {
+                    FileList remoteFileList = this.process
+                        .getRemoteFileList(projectID);
+                    if (sessionManager.getSarosSession().getProject(projectID) != null) {
+                        FileList sharedFileList = new FileList(
+                            sources.get(projectID), null);
+                        remoteFileList.entries.putAll(sharedFileList.entries);
+                    }
                     diff = FileListDiff.diff(
-                        new FileList(sources.get(projectID)),
-                        process.getRemoteFileList(projectID));
+                        new FileList(sources.get(projectID), null),
+                        remoteFileList);
                 } catch (CoreException e) {
                     MessageDialog.openError(getShell(),
                         "Error computing FileList",
@@ -149,9 +158,9 @@ public class AddProjectToSessionWizard extends Wizard {
             @Override
             protected IStatus run(IProgressMonitor monitor) {
                 try {
-                    AddProjectToSessionWizard.this.process.accept(projectNames,
-                        SubMonitor.convert(monitor), skipProjectSyncing,
-                        useVersionControl);
+                    AddProjectToSessionWizard.this.process
+                        .accept(projectNames, SubMonitor.convert(monitor),
+                            skipProjectSyncing, useVersionControl);
                 } catch (SarosCancellationException e) {
                     processException(e.getCause());
                     return Status.CANCEL_STATUS;
@@ -174,8 +183,8 @@ public class AddProjectToSessionWizard extends Wizard {
                 CancelLocation.REMOTE);
         } else {
             log.error("This type of exception is not expected here: ", t);
-            cancelWizard(process.getPeer(), "Unkown error: " + t.getMessage(),
-                CancelLocation.REMOTE);
+            cancelWizard(process.getPeer(), "Unkown error: "
+                + t.getMessage(), CancelLocation.REMOTE);
         }
     }
 
@@ -207,7 +216,8 @@ public class AddProjectToSessionWizard extends Wizard {
             }
             Utils.runSafeAsync(log, new Runnable() {
                 public void run() {
-                    process.localCancel(null, CancelOption.NOTIFY_PEER);
+                    process.localCancel(null,
+                        CancelOption.NOTIFY_PEER);
                 }
             });
         }

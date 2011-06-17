@@ -1,5 +1,6 @@
 package de.fu_berlin.inf.dpp.project;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -39,12 +40,14 @@ public interface ISarosSessionManager {
     /**
      * Starts a new Saros session with the local user as only participant.
      * 
-     * @param projects
-     *            the local Eclipse projects which should become shared.
+     * @param partialProjectResources
+     *            the local Eclipse project resources which should become
+     *            shared.
      * @throws XMPPException
      *             if this method is called with no established XMPP-connection.
      */
-    public void startSession(List<IProject> projects, List<IResource> resources)
+    public void startSession(
+        HashMap<IProject, List<IResource>> partialProjectResources)
         throws XMPPException;
 
     /**

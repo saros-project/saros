@@ -5,7 +5,8 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 
-import org.eclipse.core.resources.IProject;
+import org.apache.log4j.Logger;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.jface.action.ContributionItem;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -43,6 +44,8 @@ public class ProjectShareBuddies extends ContributionItem {
     @Inject
     protected DiscoveryManager discoveryManager;
 
+    Logger log = Logger.getLogger(this.getClass());
+
     public ProjectShareBuddies() {
         this(null);
     }
@@ -57,8 +60,8 @@ public class ProjectShareBuddies extends ContributionItem {
         if (!this.saros.isConnected())
             return;
 
-        final List<IProject> selectedProjects = SelectionRetrieverFactory
-            .getSelectionRetriever(IProject.class).getSelection();
+        final List<IResource> selectedProjectResources = SelectionRetrieverFactory
+            .getSelectionRetriever(IResource.class).getSelection();
 
         int numSarosSupportedBuddies = 0;
 
@@ -73,7 +76,7 @@ public class ProjectShareBuddies extends ContributionItem {
 
             if (sarosSupport) {
                 createBuddyMenuItem(menu, numSarosSupportedBuddies++,
-                    rosterEntry, selectedProjects);
+                    rosterEntry, selectedProjectResources);
             }
         }
 
@@ -107,11 +110,11 @@ public class ProjectShareBuddies extends ContributionItem {
      * @param parentMenu
      * @param index
      * @param rosterEntry
-     * @param projects
+     * @param resources
      * @return
      */
     protected MenuItem createBuddyMenuItem(Menu parentMenu, int index,
-        final RosterEntry rosterEntry, final List<IProject> projects) {
+        final RosterEntry rosterEntry, final List<IResource> resources) {
 
         /*
          * The model knows how to display roster entries best.
@@ -128,8 +131,8 @@ public class ProjectShareBuddies extends ContributionItem {
             public void widgetSelected(SelectionEvent e) {
                 List<JID> buddies = new ArrayList<JID>();
                 buddies.add(new JID(rosterEntry));
-                CollaborationUtils.shareProjectWith(sarosSessionManager,
-                    projects, buddies);
+                CollaborationUtils.shareProjectResourcesWith(
+                    sarosSessionManager, resources, buddies);
             }
         });
 

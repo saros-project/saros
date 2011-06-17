@@ -5,7 +5,7 @@ import java.util.List;
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
 import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.SarosPluginContext;
@@ -15,7 +15,7 @@ import de.fu_berlin.inf.dpp.ui.util.CollaborationUtils;
 import de.fu_berlin.inf.dpp.ui.util.selection.retriever.SelectionRetrieverFactory;
 
 /**
- * Handles the addition of selected {@link IProject}s to the running
+ * Handles the addition of selected {@link IResource}s to the running
  * {@link ISarosSession}.
  */
 public class SharedProjectAddSelectedProjectsHandler extends AbstractHandler {
@@ -27,10 +27,10 @@ public class SharedProjectAddSelectedProjectsHandler extends AbstractHandler {
         if (sarosSessionManager == null)
             SarosPluginContext.initComponent(this);
 
-        List<IProject> projects = SelectionRetrieverFactory
-            .getSelectionRetriever(IProject.class).getSelection();
-        CollaborationUtils.addProjectsToSarosSession(sarosSessionManager,
-            projects);
+        List<IResource> resources = SelectionRetrieverFactory
+            .getSelectionRetriever(IResource.class).getSelection();
+        CollaborationUtils.addProjectResourcesToSarosSession(
+            sarosSessionManager, resources);
         return null;
     }
 

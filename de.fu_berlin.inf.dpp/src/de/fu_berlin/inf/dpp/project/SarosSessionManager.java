@@ -21,6 +21,7 @@ package de.fu_berlin.inf.dpp.project;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -145,8 +146,6 @@ public class SarosSessionManager implements IConnectionListener,
 
     protected Saros saros;
 
-    protected List<IResource> partialProjectResources;
-
     /**
      * Should invitations send the project archive via StreamSession?
      */
@@ -162,15 +161,15 @@ public class SarosSessionManager implements IConnectionListener,
 
     protected static final Random sessionRandom = new Random();
 
-    public void startSession(List<IProject> projects,
-        List<IResource> partialProjectResources) throws XMPPException {
+    public void startSession(
+        HashMap<IProject, List<IResource>> projectResourcesMapping)
+        throws XMPPException {
         if (!saros.isConnected()) {
             throw new XMPPException("No connection");
         }
 
         this.sessionID.setValue(String.valueOf(sessionRandom
             .nextInt(Integer.MAX_VALUE)));
-        this.partialProjectResources = partialProjectResources;
 
         SarosSession sarosSession = new SarosSession(this.transmitter,
             dispatchThreadContext, new DateTime(), sarosContext);
@@ -181,11 +180,20 @@ public class SarosSessionManager implements IConnectionListener,
         sarosSession.start();
         notifySarosSessionStarted(sarosSession);
 
-        for (IProject project : projects) {
+        for (IProject iProject : projectResourcesMapping.keySet()) {
+            if (!iProject.isOpen()) {
+                try {
+                    iProject.open(null);
+                } catch (CoreException e1) {
+                    log.debug("An error occur while opening project", e1);
+                    continue;
+                }
+            }
             String projectID = String.valueOf(sessionRandom
                 .nextInt(Integer.MAX_VALUE));
-            sarosSession.addSharedProject(project, projectID);
-            notifyProjectAdded(project);
+            sarosSession.addSharedProjectResources(iProject, projectID,
+                projectResourcesMapping.get(iProject));
+            notifyProjectAdded(iProject);
         }
 
         SarosSessionManager.log.info("Session started");
@@ -306,6 +314,7 @@ public class SarosSessionManager implements IConnectionListener,
     public void incomingProjectReceived(JID from, final SarosUI sarosUI,
         List<ProjectExchangeInfo> projectInfos, String processID,
         boolean doStream) {
+        this.getSarosSession().startQueue();
         final IncomingProjectNegotiation process = new IncomingProjectNegotiation(
             transmitter, from, projectExchangeProcesses, processID,
             projectInfos, doStream, sarosContext);
@@ -509,24 +518,37 @@ public class SarosSessionManager implements IConnectionListener,
     }
 
     /**
-     * Adds projects to an existing session and starts to share the
-     * {@code projectsToAdd}
+     * Adds project resources to an existing session.
      * 
-     * @param projectsToAdd
-     *            List of projects that will be added to the session
+     * @param projectResourcesMapping
      * 
      */
-    public void addProjectsToSession(List<IProject> projectsToAdd) {
-        for (IProject project : projectsToAdd) {
-            this.getSarosSession().addSharedProject(project, project.getName());
-            notifyProjectAdded(project);
+    public void addProjectResourcesToSession(
+        HashMap<IProject, List<IResource>> projectResourcesMapping) {
+        for (IProject iProject : projectResourcesMapping.keySet()) {
+            if (!iProject.isOpen()) {
+                try {
+                    iProject.open(null);
+                } catch (CoreException e1) {
+                    log.debug("An error occur while opening project", e1);
+                    continue;
+                }
+            }
+
+            if (!this.getSarosSession().isCompletelyShared(iProject)) {
+                String projectID = String.valueOf(sessionRandom
+                    .nextInt(Integer.MAX_VALUE));
+                this.getSarosSession().addSharedProjectResources(iProject,
+                    projectID, projectResourcesMapping.get(iProject));
+                notifyProjectAdded(iProject);
+            }
         }
         boolean doStream = prefStore
             .getBoolean(PreferenceConstants.STREAM_PROJECT);
         for (User user : this.getSarosSession().getRemoteUsers()) {
             OutgoingProjectNegotiation out = new OutgoingProjectNegotiation(
                 transmitter, user.getJID(), this.getSarosSession(),
-                projectsToAdd, projectExchangeProcesses, stopManager,
+                projectResourcesMapping, projectExchangeProcesses, stopManager,
                 sessionID, doStream, sarosContext, null);
             OutgoingProjectJob job = new OutgoingProjectJob(out);
             job.schedule();
@@ -548,14 +570,15 @@ public class SarosSessionManager implements IConnectionListener,
         List<ProjectExchangeInfo> projectExchangeInfos) {
         boolean doStream = prefStore
             .getBoolean(PreferenceConstants.STREAM_PROJECT);
-        List<IProject> projectsToShare = new ArrayList<IProject>(this
-            .getSarosSession().getProjects());
+        HashMap<IProject, List<IResource>> projectResourcesMapping = this
+            .getSarosSession().getProjectResourcesMapping();
 
-        if (!projectsToShare.isEmpty() && !projectExchangeInfos.isEmpty()) {
+        if (!projectResourcesMapping.isEmpty()
+            && !projectExchangeInfos.isEmpty()) {
             OutgoingProjectNegotiation out = new OutgoingProjectNegotiation(
-                transmitter, user, this.getSarosSession(), projectsToShare,
-                projectExchangeProcesses, stopManager, sessionID, doStream,
-                sarosContext, projectExchangeInfos);
+                transmitter, user, this.getSarosSession(),
+                projectResourcesMapping, projectExchangeProcesses, stopManager,
+                sessionID, doStream, sarosContext, projectExchangeInfos);
             OutgoingProjectJob job = new OutgoingProjectJob(out);
             job.schedule();
         }
@@ -568,6 +591,7 @@ public class SarosSessionManager implements IConnectionListener,
      * @param projectsToShare
      *            List of projects initially to share
      * @param subMonitor
+     *            Show progress
      * @return
      * @throws LocalCancellationException
      */
@@ -578,19 +602,25 @@ public class SarosSessionManager implements IConnectionListener,
         subMonitor.setWorkRemaining(100);
         List<ProjectExchangeInfo> pInfos = new ArrayList<ProjectExchangeInfo>(
             projectsToShare.size());
-        for (IProject project : projectsToShare) {
+        for (IProject iProject : projectsToShare) {
             if (subMonitor.isCanceled())
                 throw new LocalCancellationException(null,
                     CancelOption.DO_NOT_NOTIFY_PEER);
             try {
-                FileList fileList = new FileList(project, this
-                    .getSarosSession().useVersionControl(),
+                String projectID = this.getSarosSession()
+                    .getProjectID(iProject);
+                String projectName = iProject.getName();
+                FileList projectFileList = generateFileList(iProject, this
+                    .getSarosSession().getSharedProjectResources(iProject),
+                    this.getSarosSession().useVersionControl(),
                     subMonitor.newChild(0));
-                fileList.setProjectID(this.getSarosSession().getProjectID(
-                    project));
-                ProjectExchangeInfo pInfo = new ProjectExchangeInfo(this
-                    .getSarosSession().getProjectID(project), "",
-                    project.getName(), fileList);
+                projectFileList.setProjectID(projectID);
+                String description = "";
+                if (!this.getSarosSession().isCompletelyShared(iProject))
+                    description = "partial";
+
+                ProjectExchangeInfo pInfo = new ProjectExchangeInfo(projectID,
+                    description, projectName, projectFileList);
                 pInfos.add(pInfo);
             } catch (CoreException e) {
                 throw new LocalCancellationException(e.getMessage(),
@@ -601,6 +631,29 @@ public class SarosSessionManager implements IConnectionListener,
         subMonitor.subTask("");
         subMonitor.done();
         return pInfos;
+    }
+
+    /**
+     * Put the resources to {@link FileList} that are part of the selection.
+     * 
+     * @param project
+     *            The project that should be added to this file list.
+     * @param resources
+     *            The resources that should be added to this file list.
+     * @param useVersionControl
+     * 
+     * @param subMonitor
+     *            Show progress
+     * @return
+     * @throws CoreException
+     */
+    public FileList generateFileList(IProject project,
+        List<IResource> resources, boolean useVersionControl,
+        SubMonitor subMonitor) throws CoreException {
+        if (resources == null)
+            return new FileList(project, subMonitor);
+
+        return new FileList(resources, useVersionControl, subMonitor);
     }
 
     protected class OutgoingProjectJob extends Job {

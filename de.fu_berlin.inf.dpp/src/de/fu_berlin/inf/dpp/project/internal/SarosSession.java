@@ -25,16 +25,19 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.LinkedBlockingQueue;
 
-import de.fu_berlin.inf.dpp.SarosContext;
 import org.apache.log4j.Logger;
+import org.eclipse.core.resources.IContainer;
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.widgets.Display;
@@ -43,6 +46,7 @@ import org.picocontainer.Disposable;
 import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.Saros;
+import de.fu_berlin.inf.dpp.SarosContext;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.User.Permission;
 import de.fu_berlin.inf.dpp.activities.business.EditorActivity;
@@ -71,6 +75,7 @@ import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
 import de.fu_berlin.inf.dpp.project.SharedProject;
 import de.fu_berlin.inf.dpp.synchronize.StartHandle;
 import de.fu_berlin.inf.dpp.synchronize.StopManager;
+import de.fu_berlin.inf.dpp.util.ArrayUtils;
 import de.fu_berlin.inf.dpp.util.MappedList;
 import de.fu_berlin.inf.dpp.util.StackTrace;
 import de.fu_berlin.inf.dpp.util.Utils;
@@ -130,14 +135,7 @@ public class SarosSession implements ISarosSession, Disposable {
 
     protected BlockingQueue<List<IActivity>> pendingActivityLists = new LinkedBlockingQueue<List<IActivity>>();
 
-    protected SharedProject sharedProject;
-
-    /**
-     * projectID => SharedProject
-     * 
-     * TODO: Think of joining this with the projectMapper
-     */
-    protected Map<String, SharedProject> sharedProjects = new HashMap<String, SharedProject>();
+    protected List<IResource> selectedProjectResources = new ArrayList<IResource>();
 
     public boolean cancelActivityDispatcher = false;
 
@@ -184,6 +182,7 @@ public class SarosSession implements ISarosSession, Disposable {
                             for (IActivity activity : transformed.executeLocally) {
                                 for (IActivityProvider executor : activityProviders) {
                                     executor.exec(activity);
+                                    handleResourcesActivity(activity);
                                 }
                             }
                         }
@@ -249,7 +248,8 @@ public class SarosSession implements ISarosSession, Disposable {
      * Constructor called for SarosSession of the host
      */
     public SarosSession(ITransmitter transmitter,
-        DispatchThreadContext threadContext, DateTime sessionStart, SarosContext sarosContext) {
+        DispatchThreadContext threadContext, DateTime sessionStart,
+        SarosContext sarosContext) {
 
         this(transmitter, threadContext, 0, sessionStart, sarosContext);
 
@@ -282,9 +282,31 @@ public class SarosSession implements ISarosSession, Disposable {
         concurrentDocumentClient = new ConcurrentDocumentClient(this);
     }
 
-    public void addSharedProject(IProject project, String projectID) {
-        projectMapper.addMapping(projectID, project);
-        sharedProjects.put(projectID, new SharedProject(project, this));
+    public void addSharedProjectResources(IProject project, String projectID,
+        List<IResource> dependentResources) {
+        if (!isCompletelyShared(project) && dependentResources != null) {
+            for (IResource iResource : dependentResources) {
+                if (iResource instanceof IFolder) {
+                    addMembers(iResource, dependentResources);
+                }
+            }
+            if (selectedProjectResources != null) {
+                selectedProjectResources.removeAll(dependentResources);
+                dependentResources.addAll(selectedProjectResources);
+                selectedProjectResources.clear();
+            }
+        }
+        if (!projectMapper.isShared(project)) {
+            projectMapper.addMapping(projectID, project, new SharedProject(
+                project, this));
+            projectMapper.addResourceMapping(project, dependentResources);
+        } else {
+            List<IResource> resources = getSharedProjectResources(project);
+            if (resources != null) {
+                resources.addAll(dependentResources);
+                projectMapper.addResourceMapping(project, resources);
+            }
+        }
         execQueuedActivities(projectID);
     }
 
@@ -547,6 +569,8 @@ public class SarosSession implements ISarosSession, Disposable {
     // TODO Review sendRequest for InterruptedException and remove this flag.
     boolean stopped = true;
 
+    private boolean queueing = false;
+
     public boolean isStopped() {
         return stopped;
     }
@@ -701,7 +725,7 @@ public class SarosSession implements ISarosSession, Disposable {
                  * When the project negotiation is done the method
                  * execQueuedActivities() will be executed
                  */
-                if (project == null) {
+                if (project == null || queueing) {
                     log.info("Activity " + dataObject.toString()
                         + " for Project " + projectID + " was queued.");
                     if (!queuedActivities.containsValue(dataObject)) {
@@ -772,12 +796,103 @@ public class SarosSession implements ISarosSession, Disposable {
                 || activity instanceof FolderActivity || activity instanceof FileActivity)) {
             return;
         }
-        try {
-            activitySequencer.sendActivity(toWhom,
-                activity.getActivityDataObject(this));
-        } catch (IllegalArgumentException e) {
-            log.warn("Could not convert Activity to DataObject: ", e);
+
+        boolean toSend = true;
+        if (activity instanceof FolderActivity
+            || activity instanceof FileActivity)
+            toSend = handleResourcesActivity(activity);
+
+        if (toSend) {
+            try {
+                activitySequencer.sendActivity(toWhom,
+                    activity.getActivityDataObject(this));
+            } catch (IllegalArgumentException e) {
+                log.warn("Could not convert Activity to DataObject: ", e);
+            }
         }
+    }
+
+    protected boolean handleResourcesActivity(IActivity activity) {
+        if (activity instanceof FileActivity) {
+            FileActivity fileActivity = ((FileActivity) activity);
+            IFile file = fileActivity.getPath().getFile();
+            if (file == null)
+                return false;
+            IProject project = file.getProject();
+            if (isCompletelyShared(project))
+                return true;
+
+            List<IResource> resources = getSharedProjectResources(project);
+            switch (fileActivity.getType()) {
+            case Created:
+                if (!isShared(file))
+                    return false;
+                if (file.exists()) {
+                    if (resources != null && !resources.contains(file)) {
+                        resources.add(file);
+                        projectMapper.addResourceMapping(project, resources);
+                        return true;
+                    }
+                } else {
+                    return false;
+                }
+                break;
+            case Removed:
+                if (!isShared(file))
+                    return false;
+                if (resources != null && resources.contains(file)) {
+                    resources.remove(file);
+                    projectMapper.addResourceMapping(project, resources);
+                    return true;
+                }
+                break;
+            case Moved:
+                IFile oldFile = fileActivity.getOldPath().getFile();
+                if (oldFile == null || !isShared(oldFile))
+                    return false;
+                List<IResource> res = getSharedProjectResources(oldFile
+                    .getProject());
+                if (res != null) {
+                    if (res.contains(oldFile))
+                        res.remove(oldFile);
+                    if (!res.contains(file))
+                        res.add(file);
+                    projectMapper.addResourceMapping(project, res);
+                    return true;
+                }
+                break;
+            }
+        }
+
+        if (activity instanceof FolderActivity) {
+            FolderActivity folderActivity = ((FolderActivity) activity);
+            IFolder folder = folderActivity.getPath().getFolder();
+            IProject iProject = folder.getProject();
+            if (isCompletelyShared(iProject))
+                return true;
+            List<IResource> resources = getSharedProjectResources(iProject);
+            if (resources != null) {
+                switch (folderActivity.getType()) {
+                case Created:
+                    if (!resources.contains(folder)
+                        && isShared(folder.getParent())) {
+                        resources.add(folder);
+                        projectMapper.addResourceMapping(iProject, resources);
+                        return true;
+                    }
+                    return false;
+                case Removed:
+                    if (!isShared(folder))
+                        return false;
+                    if (resources.contains(folder)) {
+                        resources.remove(folder);
+                        projectMapper.addResourceMapping(iProject, resources);
+                    }
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     public void addActivityProvider(IActivityProvider provider) {
@@ -796,8 +911,46 @@ public class SarosSession implements ISarosSession, Disposable {
         return sessionStart;
     }
 
-    public boolean isShared(IProject project) {
-        return projectMapper.isShared(project);
+    public boolean isShared(IResource resource) {
+        return projectMapper.isShared(resource);
+    }
+
+    public List<IResource> getAllSharedProjectResources() {
+        List<IResource> allSharedProjectResources = new ArrayList<IResource>();
+        Collection<List<IResource>> resources = projectMapper.getResources();
+        for (List<IResource> list : resources) {
+            if (list != null)
+                allSharedProjectResources.addAll(list);
+        }
+        return allSharedProjectResources;
+    }
+
+    protected void addMembers(IResource iResource,
+        List<IResource> dependentResources) {
+        if (iResource instanceof IFolder || iResource instanceof IProject) {
+
+            if (!isShared(iResource)) {
+                selectedProjectResources.add(iResource);
+            } else {
+                return;
+            }
+            List<IResource> childResources = null;
+            try {
+                childResources = ArrayUtils.getAdaptableObjects(
+                    ((IContainer) iResource).members(), IResource.class);
+            } catch (CoreException e) {
+                log.debug("Can't get children of Project/Folder. ", e);
+            }
+            if (childResources != null && (childResources.size() > 0)) {
+                for (IResource childResource : childResources) {
+                    addMembers(childResource, dependentResources);
+                }
+            }
+        } else if (iResource instanceof IFile) {
+            if (!isShared(iResource)) {
+                selectedProjectResources.add(iResource);
+            }
+        }
     }
 
     public boolean useVersionControl() {
@@ -813,12 +966,11 @@ public class SarosSession implements ISarosSession, Disposable {
     public SharedProject getSharedProject(IProject project) {
         if (!isShared(project))
             return null;
-        return sharedProjects.get(projectMapper.getID(project));
+        return projectMapper.getSharedProject(projectMapper.getID(project));
     }
 
     public List<SharedProject> getSharedProjects() {
-        return new ArrayList<SharedProject>(sharedProjects.values());
-
+        return projectMapper.getSharedProjects();
     }
 
     public String getProjectID(IProject project) {
@@ -851,5 +1003,25 @@ public class SarosSession implements ISarosSession, Disposable {
         log.debug("Inv" + Utils.prefix(peer)
             + ": All user list confirmations have arrived.");
 
+    }
+
+    public HashMap<IProject, List<IResource>> getProjectResourcesMapping() {
+        return projectMapper.getProjectResourceMapping();
+    }
+
+    public List<IResource> getSharedProjectResources(IProject project) {
+        return projectMapper.getProjectResourceMapping().get(project);
+    }
+
+    public boolean isCompletelyShared(IProject project) {
+        return projectMapper.isCompletelyShared(project);
+    }
+
+    public void stopQueue() {
+        queueing = false;
+    }
+
+    public void startQueue() {
+        queueing = true;
     }
 }

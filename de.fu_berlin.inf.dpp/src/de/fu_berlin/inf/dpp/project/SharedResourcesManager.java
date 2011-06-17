@@ -25,7 +25,6 @@ import java.io.ByteArrayInputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
-import de.fu_berlin.inf.dpp.util.EclipseHelper;
 import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
@@ -66,6 +65,7 @@ import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.observables.FileReplacementInProgressObservable;
 import de.fu_berlin.inf.dpp.synchronize.Blockable;
 import de.fu_berlin.inf.dpp.synchronize.StopManager;
+import de.fu_berlin.inf.dpp.util.EclipseHelper;
 import de.fu_berlin.inf.dpp.util.FileUtils;
 import de.fu_berlin.inf.dpp.util.Utils;
 import de.fu_berlin.inf.dpp.vcs.VCSAdapter;
@@ -285,8 +285,8 @@ public class SharedResourcesManager extends AbstractActivityProvider implements
             log.trace("Adding new activities " + visitor.pendingActivities);
             pendingActivities.enterAll(visitor.pendingActivities);
 
-            if (!postpone)
-                assert sharedProject.checkIntegrity();
+            // if (!postpone)
+            // assert sharedProject.checkIntegrity();
 
             log.trace("sharedProject.resourceMap: \n"
                 + sharedProject.resourceMap);
@@ -500,7 +500,8 @@ public class SharedResourcesManager extends AbstractActivityProvider implements
                 log.error("Could not write file: " + file);
             }
         } else if (type == FileActivity.Type.Removed) {
-            FileUtils.delete(file);
+            if (file.exists())
+                FileUtils.delete(file);
         } else if (type == FileActivity.Type.Moved) {
 
             IPath newFilePath = activity.getPath().getFile().getFullPath();
@@ -510,8 +511,10 @@ public class SharedResourcesManager extends AbstractActivityProvider implements
             if (oldResource == null) {
                 log.error(".exec Old File is not availible while moving "
                     + activity.getOldPath());
-            } else
+            } else {
+                FileUtils.mkdirs(activity.getPath().getFile());
                 FileUtils.move(newFilePath, oldResource);
+            }
 
             // while moving content of the file changed
             if (activity.getContents() != null) {
@@ -548,7 +551,8 @@ public class SharedResourcesManager extends AbstractActivityProvider implements
             FileUtils.create(folder);
         } else if (activity.getType() == FolderActivity.Type.Removed) {
             try {
-                FileUtils.delete(folder);
+                if (folder.exists())
+                    FileUtils.delete(folder);
             } catch (CoreException e) {
                 log.warn("Removing folder failed: " + folder);
             }

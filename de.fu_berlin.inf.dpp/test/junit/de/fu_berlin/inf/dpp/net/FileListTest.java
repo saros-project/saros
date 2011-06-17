@@ -30,6 +30,7 @@ import java.util.Collection;
 import java.util.List;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
@@ -61,8 +62,7 @@ public class FileListTest {
     protected IFile fileInSubDir1changed = new FileStub("subdir/file1",
         "changed fileInSubDir1");
 
-    protected IFile[] threeFileArray = new IFile[] { fileInRoot1, fileInRoot2,
-        fileInSubDir1 };
+    protected List<IResource> threeFileList = new ArrayList<IResource>();
 
     protected FileList threeEntryList;
     protected FileList fourEntryList; // contains one additional entry
@@ -73,12 +73,17 @@ public class FileListTest {
 
     @Before
     public void setUp() throws Exception {
-        threeEntryList = new FileList(new IFile[] { fileInRoot1, fileInRoot2,
-            fileInSubDir1 }, false);
-        fourEntryList = new FileList(new IFile[] { fileInRoot1, fileInRoot2,
-            fileInSubDir1, fileInSubDir2 }, false);
-        modifiedFourEntryList = new FileList(new IFile[] { fileInRoot1,
-            fileInRoot2, fileInSubDir1changed, fileInSubDir2 }, false);
+        List<IResource> resources = new ArrayList<IResource>();
+        resources.add(fileInRoot1);
+        resources.add(fileInRoot2);
+        resources.add(fileInSubDir1);
+        threeFileList.addAll(resources);
+        threeEntryList = new FileList(resources, false, null);
+        resources.add(fileInSubDir2);
+        fourEntryList = new FileList(resources, false, null);
+        resources.remove(fileInSubDir1);
+        resources.add(fileInSubDir1changed);
+        modifiedFourEntryList = new FileList(resources, false, null);
 
         emptyFileList = new FileList();
     }
@@ -196,7 +201,7 @@ public class FileListTest {
 
     @Test
     public void testEquals() throws CoreException {
-        FileList sameFileList = new FileList(threeFileArray, false);
+        FileList sameFileList = new FileList(threeFileList, false, null);
         assertEquals(threeEntryList, sameFileList);
         assertEquals(emptyFileList, emptyFileList);
 

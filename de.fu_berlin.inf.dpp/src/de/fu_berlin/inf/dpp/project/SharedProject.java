@@ -308,9 +308,11 @@ public class SharedProject {
 
     /** Removes the resource from the SharedProject. */
     public void remove(IResource resource) {
-        checkResource(resource);
-        IPath path = resource.getProjectRelativePath();
-        resourceMap.remove(path);
+        // checkResource(resource);
+        if (contains(resource)) {
+            IPath path = resource.getProjectRelativePath();
+            resourceMap.remove(path);
+        }
     }
 
     /** Adds the resource to the SharedProject. */
@@ -320,9 +322,11 @@ public class SharedProject {
         if (resource.getProject() != project)
             throw new IllegalArgumentException(format(
                 "resource {0} is not in project {1}", resource, project));
-        ResourceInfo resourceInfo = new ResourceInfo(null, null);
-        final IPath path = resource.getProjectRelativePath();
-        resourceMap.put(path, resourceInfo);
+        if (!contains(resource)) {
+            ResourceInfo resourceInfo = new ResourceInfo(null, null);
+            final IPath path = resource.getProjectRelativePath();
+            resourceMap.put(path, resourceInfo);
+        }
     }
 
     /**
@@ -346,8 +350,9 @@ public class SharedProject {
      */
     public void move(IResource resource, IPath oldFullPath) {
         IPath oldPath = oldFullPath.removeFirstSegments(1);
-        assert containsKey(oldPath);
-        resourceMap.remove(oldPath);
+        // assert containsKey(oldPath);
+        if (resourceMap.containsKey(oldPath))
+            resourceMap.remove(oldPath);
         add(resource);
     }
 

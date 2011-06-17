@@ -16,7 +16,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
-import de.fu_berlin.inf.dpp.SarosContext;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IContainer;
@@ -42,6 +41,7 @@ import org.picocontainer.annotations.Inject;
 import de.fu_berlin.inf.dpp.FileList;
 import de.fu_berlin.inf.dpp.FileListDiff;
 import de.fu_berlin.inf.dpp.Saros;
+import de.fu_berlin.inf.dpp.SarosContext;
 import de.fu_berlin.inf.dpp.activities.ProjectExchangeInfo;
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
@@ -161,13 +161,27 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
                 // Host/Inviter decided to transmit files with one big archive
                 acceptArchive(localProjects.size(), subMonitor.newChild(80));
             }
-            // We are finished with the exchanging process. Add all projects to
-            // the session.
+            // We are finished with the exchanging process. Add all projects
+            // resources to the session.
             for (String projectID : localProjects.keySet()) {
-                sessionManager.getSarosSession().addSharedProject(
-                    localProjects.get(projectID), projectID);
-                sessionManager.notifyProjectAdded(localProjects.get(projectID));
+                IProject iProject = localProjects.get(projectID);
+                if (isPartialRemoteProject(projectID)) {
+                    Set<IPath> paths = getRemoteFileList(projectID).entries
+                        .keySet();
+                    List<IResource> dependentResources = new ArrayList<IResource>();
+                    for (IPath iPath : paths) {
+                        dependentResources.add(iProject.findMember(iPath));
+                    }
+                    sessionManager.getSarosSession().addSharedProjectResources(
+                        iProject, projectID, dependentResources);
+                } else {
+                    sessionManager.getSarosSession().addSharedProjectResources(
+                        iProject, projectID, null);
+                }
+
+                sessionManager.notifyProjectAdded(iProject);
             }
+            sessionManager.getSarosSession().stopQueue();
         } catch (Exception e) {
             processException(e);
         } finally {
@@ -185,6 +199,14 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
             this.projectExchangeProcesses.removeProjectExchangeProcess(this);
             subMonitor.done();
         }
+    }
+
+    protected boolean isPartialRemoteProject(String projectID) {
+        for (ProjectExchangeInfo info : this.projectInfos) {
+            if (info.getProjectID().equals(projectID))
+                return info.getDescription().equals("partial");
+        }
+        return false;
     }
 
     /**

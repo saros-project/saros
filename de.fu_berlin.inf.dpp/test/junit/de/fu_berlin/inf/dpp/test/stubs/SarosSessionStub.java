@@ -1,11 +1,13 @@
 package de.fu_berlin.inf.dpp.test.stubs;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CancellationException;
 
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.SubMonitor;
 import org.joda.time.DateTime;
 
@@ -91,7 +93,7 @@ public class SarosSessionStub implements ISarosSession {
 
     }
 
-    public boolean isShared(IProject project) {
+    public boolean isShared(IResource resource) {
         throw new RuntimeException("Unexpected call to Stub");
     }
 
@@ -234,6 +236,36 @@ public class SarosSessionStub implements ISarosSession {
     }
 
     public void execQueuedActivities() {
+        throw new RuntimeException("Unexpected call to Stub");
+    }
+
+    public void addSharedProjectResources(IProject project, String projectID,
+        List<IResource> dependentResources) {
+        throw new RuntimeException("Unexpected call to Stub");
+
+    }
+
+    public List<IResource> getAllSharedProjectResources() {
+        throw new RuntimeException("Unexpected call to Stub");
+    }
+
+    public HashMap<IProject, List<IResource>> getProjectResourcesMapping() {
+        throw new RuntimeException("Unexpected call to Stub");
+    }
+
+    public boolean isCompletelyShared(IProject project) {
+        throw new RuntimeException("Unexpected call to Stub");
+    }
+
+    public void stopQueue() {
+        throw new RuntimeException("Unexpected call to Stub");
+    }
+
+    public void startQueue() {
+        throw new RuntimeException("Unexpected call to Stub");
+    }
+
+    public List<IResource> getSharedProjectResources(IProject project) {
         throw new RuntimeException("Unexpected call to Stub");
     }
 }

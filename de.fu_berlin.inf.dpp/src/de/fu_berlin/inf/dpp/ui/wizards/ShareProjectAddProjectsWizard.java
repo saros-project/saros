@@ -2,7 +2,7 @@ package de.fu_berlin.inf.dpp.ui.wizards;
 
 import java.util.List;
 
-import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.wizard.Wizard;
 import org.picocontainer.annotations.Inject;
@@ -42,13 +42,14 @@ public class ShareProjectAddProjectsWizard extends Wizard {
 
     @Override
     public boolean performFinish() {
-        List<IProject> selectedProjects = projectSelectionWizardPage
-            .getSelectedProjects();
-        if (selectedProjects == null)
+        List<IResource> selectedProjectResources = projectSelectionWizardPage
+            .getSelectedProjectResources();
+        if (selectedProjectResources == null
+            || selectedProjectResources.isEmpty())
             return false;
 
-        CollaborationUtils.addProjectsToSarosSession(sarosSessionManager,
-            selectedProjects);
+        CollaborationUtils.addProjectResourcesToSarosSession(
+            sarosSessionManager, selectedProjectResources);
 
         return true;
     }

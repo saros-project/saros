@@ -20,11 +20,13 @@
 package de.fu_berlin.inf.dpp.project;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CancellationException;
 
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.SubMonitor;
 import org.joda.time.DateTime;
 
@@ -251,7 +253,7 @@ public interface ISarosSession extends IActivityListener {
     public void returnColor(int colorID);
 
     /**
-     * Excutes the given activityDataObjects locally.
+     * Executes the given activityDataObjects locally.
      */
     public void exec(List<IActivityDataObject> activityDataObjects);
 
@@ -339,10 +341,10 @@ public interface ISarosSession extends IActivityListener {
     public DateTime getSessionStart();
 
     /**
-     * Returns true if the given IProject is currently shared using this Saros
-     * session.
+     * Returns true if the given {@link IResource} is currently shared using
+     * this Saros session.
      */
-    public boolean isShared(IProject project);
+    public boolean isShared(IResource resource);
 
     /**
      * Returns true if VCS support is enabled for this session.<br>
@@ -372,14 +374,17 @@ public interface ISarosSession extends IActivityListener {
     public IProject getProject(String projectID);
 
     /**
-     * Adds the specified project as a shared project to this session.
+     * Adds the specified project and/or resources to this session.
      * 
      * @param project
      *            The project to share.
      * @param projectID
      *            The global project ID.
+     * @param dependentResources
+     *            The project dependent resources.
      */
-    public void addSharedProject(IProject project, String projectID);
+    public void addSharedProjectResources(IProject project, String projectID,
+        List<IResource> dependentResources);
 
     /**
      * Returns all shared Projects in their current state
@@ -400,4 +405,47 @@ public interface ISarosSession extends IActivityListener {
     public void synchronizeUserList(ITransmitter transmitter, JID peer,
         String invitationID, SubMonitor monitor)
         throws SarosCancellationException;
+
+    /**
+     * Returns all resources of session.
+     * 
+     * @return Returns a list of all resources (excluding projects) from current
+     *         session.
+     */
+    public List<IResource> getAllSharedProjectResources();
+
+    /**
+     * Returns HashMap with the mapping of shared resources to their project.
+     * 
+     * @return project-->resource mapping
+     */
+    public HashMap<IProject, List<IResource>> getProjectResourcesMapping();
+
+    /**
+     * Returns project dependent resources, when shared.
+     * 
+     * @param project
+     * @return
+     */
+    public List<IResource> getSharedProjectResources(IProject project);
+
+    /**
+     * Checks if selected project is a complete shared one or partial shared.
+     * 
+     * @param project
+     * @return true if complete false if partial
+     */
+    public boolean isCompletelyShared(IProject project);
+
+    /**
+     * Stops queuing on receiver side to process queued
+     * {@link IActivityDataObject}s.
+     */
+    public void stopQueue();
+
+    /**
+     * Starts queuing on receiver side to process queued
+     * {@link IActivityDataObject}s after file transmission.
+     */
+    public void startQueue();
 }

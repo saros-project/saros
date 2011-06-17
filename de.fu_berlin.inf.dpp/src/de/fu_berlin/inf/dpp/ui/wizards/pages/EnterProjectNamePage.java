@@ -111,7 +111,6 @@ public class EnterProjectNamePage extends WizardPage {
         Map<String, String> remoteProjectNames,
         WizardDialogAccessable wizardDialog) {
         super("namePage");
-        // this.joinSessionWizard = joinSessionWizard;
         this.dataTransferManager = dataTransferManager;
         this.preferenceUtils = preferenceUtils;
         this.peer = peer;
@@ -149,10 +148,7 @@ public class EnterProjectNamePage extends WizardPage {
         } else {
 
             this.updateProjectStatusResults.get(projectID).setText(
-                "Your project "
-                    + project.getName()
-                    + " matches with "
-                    // + this.joinSessionWizard.process.getRemoteFileList()
+                "Your project " + project.getName() + " matches with "
                     + this.fileLists.get(0).computeMatch(project)
                     + "% accuracy.\n"
                     + "This fact will be used to shorten the process of "
@@ -273,10 +269,19 @@ public class EnterProjectNamePage extends WizardPage {
         newProjectNameText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL
             | GridData.GRAB_HORIZONTAL));
         newProjectNameText.setFocus();
-        newProjectNameText.setText(EnterProjectNamePageUtils
-            .findProjectNameProposal(this.remoteProjectNames.get(projectID)));
+        if (!this.newProjectNameTexts.keySet().contains(projectID)) {
+            newProjectNameText
+                .setText(EnterProjectNamePageUtils
+                    .findProjectNameProposal(this.remoteProjectNames
+                        .get(projectID)));
 
-        this.newProjectNameTexts.put(projectID, newProjectNameText);
+            this.newProjectNameTexts.put(projectID, newProjectNameText);
+        } else {
+            newProjectNameText.setText(this.newProjectNameTexts.get(projectID)
+                .toString());
+
+            this.newProjectNameTexts.put(projectID, newProjectNameText);
+        }
     }
 
     /**
@@ -450,27 +455,24 @@ public class EnterProjectNamePage extends WizardPage {
             tabComposite.setLayoutData(gridData);
 
             tabItem.setControl(tabComposite);
+            boolean selection = EnterProjectNamePageUtils.autoUpdateProject(
+                fileList.getProjectID(),
+                this.remoteProjectNames.get(fileList.getProjectID()));
 
             Button projCopy = new Button(tabComposite, SWT.RADIO);
             projCopy.setText("Create new project");
-            projCopy.setSelection(!EnterProjectNamePageUtils
-                .autoUpdateProject(this.remoteProjectNames.get(fileList
-                    .getProjectID())));
+            projCopy.setSelection(!selection);
             this.projCopies.put(fileList.getProjectID(), projCopy);
 
             createNewProjectGroup(tabComposite, fileList.getProjectID());
 
             Button projUpd = new Button(tabComposite, SWT.RADIO);
             projUpd.setText("Use existing project");
-            projUpd.setSelection(EnterProjectNamePageUtils
-                .autoUpdateProject(this.remoteProjectNames.get(fileList
-                    .getProjectID())));
+            projUpd.setSelection(selection);
             this.projUpdates.put(fileList.getProjectID(), projUpd);
 
             String newProjectName = "";
-            if (EnterProjectNamePageUtils
-                .autoUpdateProject(this.remoteProjectNames.get(fileList
-                    .getProjectID()))) {
+            if (selection) {
                 newProjectName = this.remoteProjectNames.get(fileList
                     .getProjectID());
             }

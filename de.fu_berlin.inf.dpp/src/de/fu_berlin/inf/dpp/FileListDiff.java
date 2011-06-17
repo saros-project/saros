@@ -2,10 +2,12 @@ package de.fu_berlin.inf.dpp;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
+import java.util.Set;
 
+import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
@@ -66,34 +68,37 @@ public class FileListDiff {
         FileListDiff result = new FileListDiff();
         if (base == null || target == null)
             return result;
+        // we have to copy the set because we should not work on references when
+        // deleting
+        Set<IPath> baseEntries = new HashSet<IPath>(base.entries.keySet());
+        Set<IPath> targetEntries = new HashSet<IPath>(target.entries.keySet());
 
-        for (Map.Entry<IPath, FileListData> entry : base.entries.entrySet()) {
-            if (!target.entries.containsKey(entry.getKey())) {
-                result.removed.add(entry.getKey());
-            }
-        }
+        // determine the paths that don't match the target to delete them
+        baseEntries.removeAll(targetEntries);
+        result.removed.addAll(baseEntries);
 
-        for (Map.Entry<IPath, FileListData> entry : target.entries.entrySet()) {
-            if (!base.entries.containsKey(entry.getKey())) {
-                result.added.add(entry.getKey());
-            }
-        }
+        // determine the paths that are not already present in local workspace
+        baseEntries = new HashSet<IPath>(base.entries.keySet());
+        targetEntries.removeAll(baseEntries);
+        result.added.addAll(targetEntries);
 
-        for (Map.Entry<IPath, FileListData> entry : base.entries.entrySet()) {
-            IPath path = entry.getKey();
-            if (target.entries.containsKey(path)) {
-
-                if (path.hasTrailingSeparator()) {
-                    result.unaltered.add(path);
-                } else {
-                    FileListData fileData = entry.getValue();
-                    FileListData otherFileData = target.entries.get(path);
-
+        // determine for all matching paths if files are altered
+        targetEntries = new HashSet<IPath>(target.entries.keySet());
+        baseEntries.retainAll(targetEntries);
+        for (IPath path : baseEntries) {
+            if (path.hasTrailingSeparator()) {
+                result.unaltered.add(path);
+            } else {
+                FileListData fileData = base.entries.get(path);
+                FileListData otherFileData = target.entries.get(path);
+                if (fileData != null && otherFileData != null) {
                     if (fileData.checksum == otherFileData.checksum) {
                         result.unaltered.add(path);
                     } else {
                         result.altered.add(path);
                     }
+                } else {
+                    result.unaltered.add(path);
                 }
             }
         }
@@ -151,9 +156,6 @@ public class FileListDiff {
      * Will create all folders contained in this FileList for the given project
      * and return a FileList which does not contain these folders.
      * 
-     * Note: All parent folders of any folder contained in the FileList must be
-     * contained as well.
-     * 
      * @throws CoreException
      */
     public FileListDiff addAllFolders(IProject localProject, SubMonitor monitor)
@@ -173,7 +175,7 @@ public class FileListDiff {
                 IFolder folder = localProject.getFolder(path);
                 if (!folder.exists()) {
                     monitor.subTask("Creating folder " + path.lastSegment());
-                    folder.create(true, true, monitor.newChild(1));
+                    prepareFolder(folder, monitor);
                     continue;
                 }
             } else {
@@ -181,10 +183,24 @@ public class FileListDiff {
             }
             monitor.worked(1);
         }
-        // result.readResolve();
-
         monitor.done();
         return result;
+    }
+
+    /**
+     * Recursively creates non existing parent folders of folders in FileList.
+     * 
+     * @param folder
+     * @param monitor
+     * @throws CoreException
+     */
+    protected void prepareFolder(IFolder folder, SubMonitor monitor)
+        throws CoreException {
+        IContainer parent = folder.getParent();
+        if (parent instanceof IFolder && !parent.exists())
+            prepareFolder((IFolder) parent, monitor);
+        if (!folder.exists())
+            folder.create(true, true, monitor.newChild(1));
     }
 
     /**
@@ -201,6 +217,14 @@ public class FileListDiff {
 
         // TODO Move to FileUtil, refactor FileUtil#delete(IResource).
         final List<IPath> toDelete = this.getRemovedPaths();
+
+        // don't delete the path of unaltered files
+        List<IPath> toKeep = this.getUnalteredPaths();
+        for (IPath iPath : toKeep) {
+            for (int i = 0; i < iPath.segmentCount(); i++) {
+                toDelete.remove(iPath.removeLastSegments(i));
+            }
+        }
         IWorkspaceRunnable deleteProcedure = new IWorkspaceRunnable() {
             public void run(IProgressMonitor progress) throws CoreException {
                 // SubMonitor monitor = (SubMonitor) progress;// doesn't work?

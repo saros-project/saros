@@ -32,6 +32,7 @@ import de.fu_berlin.inf.dpp.editor.annotations.SarosAnnotation;
 import de.fu_berlin.inf.dpp.net.ConnectionState;
 import de.fu_berlin.inf.dpp.net.IConnectionListener;
 import de.fu_berlin.inf.dpp.net.RosterTracker;
+import de.fu_berlin.inf.dpp.project.AbstractSarosSessionListener;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ISarosSessionListener;
 import de.fu_berlin.inf.dpp.project.SarosSessionManager;
@@ -94,37 +95,44 @@ public class BuddySessionDisplayComposite extends ViewerComposite {
         }
     };
 
-    protected ISarosSessionListener sarosSessionListener = new ISarosSessionListener() {
+    protected ISarosSessionListener sarosSessionListener = new AbstractSarosSessionListener() {
+        @Override
         public void sessionStarting(ISarosSession newSarosSession) {
             updateViewer();
             ViewerUtils.expandAll(viewer);
         }
 
+        @Override
         public void sessionStarted(ISarosSession newSarosSession) {
             updateViewer();
             ViewerUtils.expandAll(viewer);
         }
 
+        @Override
         public void sessionEnding(ISarosSession oldSarosSession) {
             updateViewer();
             ViewerUtils.expandAll(viewer);
         }
 
+        @Override
         public void sessionEnded(ISarosSession oldSarosSession) {
             updateViewer();
             ViewerUtils.expandAll(viewer);
         }
 
+        @Override
         public void projectAdded(String projectID) {
             updateViewer();
             ViewerUtils.expandAll(viewer);
         }
 
+        @Override
         public void preIncomingInvitationCompleted(SubMonitor subMonitor) {
             updateViewer();
             ViewerUtils.expandAll(viewer);
         }
 
+        @Override
         public void postOutgoingInvitationCompleted(SubMonitor subMonitor,
             User user) {
             updateViewer();

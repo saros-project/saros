@@ -128,7 +128,7 @@ public class SarosUI {
 
         AddProjectToSessionWizard projectWizard = new AddProjectToSessionWizard(
             process, dataTransferManager, preferenceUtils, process.getPeer(),
-            fileLists, process.getProjectNames());
+            fileLists, process.getProjectNames(), sessionManager);
         final WizardDialogAccessable wizardDialog = new WizardDialogAccessable(
             EditorAPI.getShell(), projectWizard);
 
