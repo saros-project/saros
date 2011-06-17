@@ -156,7 +156,6 @@ public class Util {
         inviter.superBot().menuBar().saros().addProjects(projectName);
 
         for (AbstractTester invitee : invitees) {
-            invitee.remoteBot().shell(SHELL_SESSION_INVITATION).confirm(ACCEPT);
             invitee.superBot().confirmShellAddProjectUsingWhichProject(
                 projectName, usingWhichProject);
         }
