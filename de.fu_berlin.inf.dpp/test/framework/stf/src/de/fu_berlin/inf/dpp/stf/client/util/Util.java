@@ -58,9 +58,13 @@ public class Util {
      * 
      * @param tester
      *            the remote tester e.g: Alice
+     * 
+     * @WARNING calling this method while still <b>in a session</b> can result
+     *          in <b>unexpected</b> behavior
      **/
     public static void deleteAllProjects(AbstractTester tester)
         throws RemoteException {
+        tester.remoteBot().closeAllEditors();
         List<String> treeItems = tester.superBot().views()
             .packageExplorerView().tree().getTextOfTreeItems();
         for (String treeItem : treeItems) {
@@ -322,11 +326,6 @@ public class Util {
             peerBaseJIDs[i] = peers[i].getJID();
         }
         return peerBaseJIDs;
-    }
-
-    public static void waitsUntilTransferedDataIsArrived(AbstractTester buddy)
-        throws RemoteException {
-        buddy.remoteBot().sleep(500);
     }
 
     public static void resetWriteAccess(AbstractTester host,

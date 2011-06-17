@@ -246,10 +246,9 @@ public class SessionAliceBobTest extends StfTestCase {
         throws RemoteException, InterruptedException {
         assertTrue(ALICE.superBot().views().sarosView().isInSession());
         assertTrue(BOB.superBot().views().sarosView().isInSession());
-        leaveSessionPeersFirst();
+        leaveSessionPeersFirst(ALICE);
         assertFalse(ALICE.superBot().views().sarosView().isInSession());
         assertFalse(BOB.superBot().views().sarosView().isInSession());
-
     }
 
     @Test

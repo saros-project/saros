@@ -19,7 +19,7 @@ import org.junit.rules.TestName;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.stf.client.tester.AbstractTester;
 import de.fu_berlin.inf.dpp.stf.client.util.Util;
-import de.fu_berlin.inf.dpp.stf.test.Constants;
+import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.IRemoteWorkbenchBot;
 
 public abstract class StfTestCase {
 
@@ -68,14 +68,6 @@ public abstract class StfTestCase {
     public static void tearDownAfterClass() throws RemoteException {
         resetSaros();
     }
-
-    /**********************************************
-     * 
-     * often used to define preconditions
-     * 
-     * @throws RemoteException
-     * 
-     **********************************************/
 
     public void announceTestCaseStart() throws RemoteException {
         for (AbstractTester tester : currentTesters) {
@@ -138,46 +130,58 @@ public abstract class StfTestCase {
             Util.openSarosViews(tester);
             tester.superBot().views().sarosView()
                 .connectWith(tester.getJID(), tester.getPassword());
+            resetBuddies(tester);
         }
-        resetBuddies();
     }
 
-    /**********************************************
-     * 
-     * often used to define afterConditions
-     * 
-     **********************************************/
     /**
-     * For all active testers, reset buddy names, disconnect, delete all
-     * projects.
+     * Tries to reset Saros to a stable state for the given tester(s). It does
+     * that be performing the following actions
+     * <ol>
+     * <li>reset all buddy names by calling
+     * {@linkplain #resetBuddyNames(AbstractTester)}</li>
+     * <li>disconnect from the current session</li>
+     * <li>delete all projects by calling
+     * {@linkplain Util#deleteAllProjects(AbstractTester)}</li>
+     * </ol>
+     * 
      * 
      * @throws RemoteException
      */
     public static void resetSaros() throws RemoteException {
-        for (AbstractTester tester : currentTesters) {
-            tester.superBot().views().sarosView().disconnect();
-            Util.deleteAllProjects(tester);
+        try {
+            for (AbstractTester tester : currentTesters) {
+                resetBuddyNames(tester);
+                tester.superBot().views().sarosView().disconnect();
+                Util.deleteAllProjects(tester);
+            }
+        } finally {
+            currentTesters.clear();
         }
 
-        currentTesters.clear();
     }
 
-    public static void resetSaros(AbstractTester... tester)
-        throws RemoteException {
-        resetBuddiesName();
-
-        for (AbstractTester t : tester) {
-            t.superBot().views().sarosView().disconnect();
-            Util.deleteAllProjects(t);
-            currentTesters.remove(t);
-        }
-    }
+    /**
+     * Resets the workbench for every active tester to their original state
+     * 
+     * @see IRemoteWorkbenchBot#resetWorkbench()
+     * 
+     * @throws RemoteException
+     */
 
     public static void resetWorkbenches() throws RemoteException {
         for (AbstractTester tester : currentTesters) {
             tester.remoteBot().resetWorkbench();
         }
     }
+
+    /**
+     * Closes all shells for all active testers
+     * 
+     * @see IRemoteWorkbenchBot#closeAllShells()
+     * 
+     * @throws RemoteException
+     */
 
     public static void closeAllShells() throws RemoteException {
         for (AbstractTester tester : currentTesters) {
@@ -203,45 +207,59 @@ public abstract class StfTestCase {
         }
     }
 
-    public static void resetBuddiesName() throws RemoteException {
-        for (int i = 0; i < currentTesters.size(); i++) {
-            for (int j = 0; j < currentTesters.size(); j++) {
-                if (i == j)
-                    continue;
+    /**
+     * Resets the buddy names for all active testers to their original by
+     * sequentially calling {@link #resetBuddyNames(AbstractTester)}
+     * 
+     * @throws RemoteException
+     */
 
-                currentTesters.get(i).superBot().views().sarosView()
-                    .selectBuddy(currentTesters.get(j).getJID())
-                    .rename(currentTesters.get(j).getBaseJid());
-            }
+    public static void resetBuddyNames() throws RemoteException {
+        for (AbstractTester tester : currentTesters)
+            resetBuddyNames(tester);
+    }
+
+    /**
+     * Resets the names of all buddies for the tester to their original states
+     * as defined in the configuration file
+     * 
+     * @param tester
+     *            the tester
+     * @throws RemoteException
+     */
+
+    public static void resetBuddyNames(AbstractTester tester)
+        throws RemoteException {
+        for (int i = 0; i < currentTesters.size(); i++) {
+            if (tester == currentTesters.get(i))
+                continue;
+
+            tester.superBot().views().sarosView()
+                .selectBuddy(currentTesters.get(i).getJID())
+                .rename(currentTesters.get(i).getBaseJid());
         }
     }
 
     public static void resetBuddies() throws RemoteException {
-        // check buddy lists.
-        for (int i = 0; i < currentTesters.size(); i++) {
-            for (int j = 0; j < currentTesters.size(); j++) {
-                if (i == j)
-                    continue;
-
-                Util.addBuddies(currentTesters.get(i), currentTesters.get(j));
-            }
-        }
+        for (AbstractTester tester : currentTesters)
+            resetBuddies(tester);
     }
 
-    public static void createSameJavaProjectByActiveTesters()
+    private static void resetBuddies(AbstractTester tester)
         throws RemoteException {
-        for (AbstractTester tester : currentTesters) {
-            tester
-                .superBot()
-                .views()
-                .packageExplorerView()
-                .tree()
-                .newC()
-                .javaProjectWithClasses(Constants.PROJECT1, Constants.PKG1,
-                    Constants.CLS1);
+        for (int i = 0; i < currentTesters.size(); i++) {
+            if (tester == currentTesters.get(i))
+                continue;
+            Util.addBuddies(tester, currentTesters.get(i));
         }
     }
 
+    /**
+     * Deletes all projects from all active testers by sequentially calling
+     * {@link Util#deleteAllProjects(AbstractTester tester)}
+     * 
+     * @throws RemoteException
+     */
     public static void deleteAllProjectsByActiveTesters()
         throws RemoteException {
         for (AbstractTester tester : currentTesters) {
@@ -249,7 +267,13 @@ public abstract class StfTestCase {
         }
     }
 
-    public static void disconnectByActiveTesters() throws RemoteException {
+    /**
+     * Disconnects all active testers in the order the were initialized by
+     * {@link #initTesters(AbstractTester tester, AbstractTester... testers)}
+     * 
+     * @throws RemoteException
+     */
+    public static void disconnectAllActiveTesters() throws RemoteException {
         for (AbstractTester tester : currentTesters) {
             if (tester != null) {
                 tester.superBot().views().sarosView().disconnect();
@@ -257,14 +281,14 @@ public abstract class StfTestCase {
         }
     }
 
-    public static void deleteFoldersByActiveTesters(String... folders)
-        throws RemoteException {
+    public static void deleteFoldersByActiveTesters(String project,
+        String... folders) throws RemoteException {
         for (AbstractTester tester : currentTesters) {
             for (String folder : folders) {
                 if (tester.superBot().views().packageExplorerView()
-                    .selectProject(Constants.PROJECT1).existsWithRegex(folder))
+                    .selectProject(project).existsWithRegex(folder))
                     tester.superBot().views().packageExplorerView()
-                        .selectFolder(Constants.PROJECT1, folder).delete();
+                        .selectFolder(project, folder).delete();
             }
         }
     }
@@ -272,11 +296,13 @@ public abstract class StfTestCase {
     /**
      * Define the leave session with the following steps.
      * <ol>
-     * <li>The host(alice) leave session first.</li>
-     * <li>Then other invitees confirm the windonws "Closing the Session"
+     * <li>The host leave session first.</li>
+     * <li>Then other invitees confirm the window "Closing the Session"
      * concurrently</li>
      * </ol>
      * 
+     * @param host
+     *            the host of the current session
      * @throws RemoteException
      */
     public static void leaveSessionHostFirst(AbstractTester host)
@@ -294,24 +320,24 @@ public abstract class StfTestCase {
     /**
      * Define the leave session with the following steps.
      * <ol>
-     * <li>The musicians bob and carl leave the session first.(concurrently)</li>
-     * <li>wait until bob and carl are really not in the session using
-     * "waitUntilAllPeersLeaveSession", then leave the host alice.</li>
+     * <li>All invitees leave the session first.(concurrently)</li>
+     * <li>Host waits until all invitees are no longer in the session using
+     * "waitUntilAllPeersLeaveSession"</li>
+     * <li>Host leaves the session</li>
      * </ol>
-     * make sure,
      * 
-     * 
+     * @param host
+     *            the host of the current session
      * @throws RemoteException
      */
-    public static void leaveSessionPeersFirst() throws RemoteException {
-        AbstractTester host = null;
+
+    public static void leaveSessionPeersFirst(AbstractTester host)
+        throws RemoteException {
         List<JID> peerJIDs = new ArrayList<JID>();
         List<Callable<Void>> leaveTasks = new ArrayList<Callable<Void>>();
         for (final AbstractTester tester : currentTesters) {
 
-            if (tester.superBot().views().sarosView().isHost()) {
-                host = tester;
-            } else {
+            if (tester != host) {
                 peerJIDs.add(tester.getJID());
                 leaveTasks.add(new Callable<Void>() {
                     public Void call() throws Exception {
@@ -323,13 +349,13 @@ public abstract class StfTestCase {
         }
 
         Util.workAll(leaveTasks);
-        if (host != null) {
-            host.superBot().views().sarosView()
-                .waitUntilAllPeersLeaveSession(peerJIDs);
-            host.remoteBot().view(VIEW_SAROS).toolbarButton(TB_STOP_SESSION)
-                .click();
-            host.superBot().views().sarosView().waitUntilIsNotInSession();
-        }
 
+        host.superBot().views().sarosView()
+            .waitUntilAllPeersLeaveSession(peerJIDs);
+
+        host.remoteBot().view(VIEW_SAROS).toolbarButton(TB_STOP_SESSION)
+            .click();
+        host.superBot().views().sarosView().waitUntilIsNotInSession();
     }
+
 }

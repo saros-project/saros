@@ -15,8 +15,6 @@ public final class Configuration {
     private final static String DEFAULT_CONFIGURATION_FILE = "de/fu_berlin/inf/dpp/stf/client/configuration.properties";
     private final static String OPTIONAL_CONFIGURATION_FILES_PROPERTY = "de.fu_berlin.inf.dpp.stf.client.configuration.files";
 
-    public final static boolean DEVELOPMODE = true;
-
     private final static Configuration INSTANCE = new Configuration();
 
     private Logger log = Logger.getLogger(Configuration.class);

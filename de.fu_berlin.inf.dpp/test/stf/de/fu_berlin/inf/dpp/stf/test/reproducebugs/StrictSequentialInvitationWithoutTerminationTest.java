@@ -108,7 +108,7 @@ public class StrictSequentialInvitationWithoutTerminationTest extends
         assertTrue(delimiterByAlice.equals(delimiterByCarl));
         assertTrue(delimiterByAlice.equals(delimiterByBob));
 
-        leaveSessionPeersFirst();
+        leaveSessionPeersFirst(ALICE);
 
     }
 }

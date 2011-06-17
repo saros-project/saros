@@ -10,7 +10,6 @@ import static org.junit.Assert.assertTrue;
 import java.rmi.RemoteException;
 
 import org.junit.After;
-import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -76,18 +75,6 @@ public class SVNStateInitializationTest extends StfTestCase {
                 .shareProjectUsingSpecifiedFolderName(
                     Constants.SVN_REPOSITORY_URL, Constants.SVN_PROJECT_PATH);
         }
-    }
-
-    @AfterClass
-    public static void resetSaros() throws RemoteException {
-        resetSaros(BOB);
-        // if (ConfigTester.DEVELOPMODE) {
-        // if (ALICE.sarosBot().sessionView().isInSession())
-        // ALICE.sarosBot().sessionView().leaveTheSessionByHost();
-        // // don't delete SVN_PROJECT_COPY
-        // } else {
-        resetSaros(ALICE);
-        // }
     }
 
     /**

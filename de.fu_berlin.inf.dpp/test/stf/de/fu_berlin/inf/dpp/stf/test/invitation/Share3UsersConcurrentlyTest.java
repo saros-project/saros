@@ -96,7 +96,7 @@ public class Share3UsersConcurrentlyTest extends StfTestCase {
 
         assertTrue(ALICE.superBot().views().sarosView().isInSession());
 
-        leaveSessionPeersFirst();
+        leaveSessionPeersFirst(ALICE);
 
         assertFalse(CARL.superBot().views().sarosView().isInSession());
 

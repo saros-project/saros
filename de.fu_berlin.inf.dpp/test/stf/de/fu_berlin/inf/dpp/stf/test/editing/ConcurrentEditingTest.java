@@ -27,9 +27,11 @@ public class ConcurrentEditingTest extends StfTestCase {
         setUpSaros();
     }
 
+    @Override
     @Before
-    public void beforeEachMethod() throws RemoteException {
-        leaveSessionPeersFirst();
+    public void setUp() throws RemoteException {
+        super.setUp();
+        leaveSessionPeersFirst(ALICE);
         deleteAllProjectsByActiveTesters();
     }
 

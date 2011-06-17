@@ -26,7 +26,7 @@ public class ContextMenuShareWithTest extends StfTestCase {
     @After
     public void tearDown() throws RemoteException {
         announceTestCaseEnd();
-        leaveSessionPeersFirst();
+        leaveSessionPeersFirst(ALICE);
     }
 
     @Test

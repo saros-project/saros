@@ -1,14 +1,15 @@
 package de.fu_berlin.inf.dpp.stf.client;
 
+import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Logger;
 
 import de.fu_berlin.inf.dpp.stf.client.tester.AbstractTester;
 import de.fu_berlin.inf.dpp.stf.client.tester.SarosTester;
-import de.fu_berlin.inf.dpp.stf.client.util.Util;
 
 public class ShutdownRemoteEclipse {
 
@@ -16,6 +17,7 @@ public class ShutdownRemoteEclipse {
 
     public static void main(String... args) {
 
+        BasicConfigurator.configure();
         List<AbstractTester> clients = new ArrayList<AbstractTester>();
 
         if (args.length == 0) {
@@ -31,14 +33,20 @@ public class ShutdownRemoteEclipse {
         }
 
         for (AbstractTester tester : clients) {
+            log.info("closing Eclipse instance of " + tester);
             try {
                 tester.superBot().views().sarosView().disconnect();
-                Util.deleteAllProjects(tester);
+                tester.remoteBot().closeAllEditors();
+                tester.remoteBot().closeAllShells();
+                tester.remoteBot().activateWorkbench();
+
                 tester.remoteBot().menu("File").menu("Exit").click();
             } catch (Exception e) {
-                log.error("unable to shut down eclipse instance of " + tester,
-                    e);
+                if (!(e.getCause() instanceof SocketException))
+                    log.error("unable to shutdown eclipse instance of "
+                        + tester, e);
             }
         }
+        log.info("DONE");
     }
 }

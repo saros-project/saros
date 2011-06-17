@@ -43,7 +43,7 @@ public class BuddiesByAliceBobTest extends StfTestCase {
     public void tearDown() throws RemoteException {
         announceTestCaseEnd();
         resetBuddies();
-        resetBuddiesName();
+        resetBuddyNames();
     }
 
     @Test

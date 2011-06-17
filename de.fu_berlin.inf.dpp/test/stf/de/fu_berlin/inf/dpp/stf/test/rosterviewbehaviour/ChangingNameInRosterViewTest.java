@@ -43,7 +43,7 @@ public class ChangingNameInRosterViewTest extends StfTestCase {
         // ALICE.sarosBot().views().buddiesView()
         // .renameBuddy(BOB.jid, BOB.jid.getBase());
         // }
-        resetBuddiesName();
+        resetBuddyNames();
         if (!ALICE.superBot().views().sarosView().hasBuddy(BOB.getJID())) {
             Util.addBuddies(ALICE, BOB);
         }

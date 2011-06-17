@@ -113,12 +113,15 @@ public class CreatingNewFileTest extends StfTestCase {
         CARL.superBot().views().packageExplorerView()
             .selectFolder(Constants.PROJECT1, Constants.FOLDER1).newC()
             .file(Constants.FILE1);
-        Util.waitsUntilTransferedDataIsArrived(ALICE);
+
+        // Util.waitsUntilTransferedDataIsArrived(ALICE);
 
         assertTrue(ALICE.superBot().views().packageExplorerView()
             .selectProject(Constants.PROJECT1)
             .existsWithRegex(Constants.FOLDER1));
-        Util.waitsUntilTransferedDataIsArrived(BOB);
+
+        // Util.waitsUntilTransferedDataIsArrived(BOB);
+
         assertTrue(BOB.superBot().views().packageExplorerView()
             .selectProject(Constants.PROJECT1)
             .existsWithRegex(Constants.FOLDER1));
