@@ -48,6 +48,6 @@ public class ContextMenuShareWithTest extends StfTestCase {
         BOB.superBot().views().sarosView().waitUntilIsInSession();
 
         // TODO remove this line
-        BOB.remoteBot().sleep(5000);
+        BOB.remoteBot().sleep(10000);
     }
 }

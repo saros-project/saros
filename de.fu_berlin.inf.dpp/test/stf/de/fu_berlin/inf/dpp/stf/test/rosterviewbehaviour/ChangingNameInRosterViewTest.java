@@ -71,13 +71,13 @@ public class ChangingNameInRosterViewTest extends StfTestCase {
             .rename(BOB.getName());
         assertTrue(ALICE.superBot().views().sarosView().hasBuddy(BOB.getJID()));
         assertTrue(ALICE.superBot().views().sarosView()
-            .getNickName(BOB.getJID()).equals(BOB.getName()));
+            .getNickname(BOB.getJID()).equals(BOB.getName()));
         // assertTrue(ALICE.sessionV.isContactInSessionView(BOB.getJID()));
         ALICE.superBot().views().sarosView().selectBuddy(BOB.getJID())
             .rename("new BOB");
         assertTrue(ALICE.superBot().views().sarosView().hasBuddy(BOB.getJID()));
         assertTrue(ALICE.superBot().views().sarosView()
-            .getNickName(BOB.getJID()).equals("new BOB"));
+            .getNickname(BOB.getJID()).equals("new BOB"));
         // assertTrue(ALICE.sessionV.isContactInSessionView(BOB.getJID()));
     }
 

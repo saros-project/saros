@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.stf.test.invitation;
+package de.fu_berlin.inf.dpp.stf.test.editing;
 
 import static de.fu_berlin.inf.dpp.stf.client.tester.SarosTester.ALICE;
 import static de.fu_berlin.inf.dpp.stf.client.tester.SarosTester.BOB;
@@ -11,11 +11,13 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import de.fu_berlin.inf.dpp.stf.annotation.TestLink;
 import de.fu_berlin.inf.dpp.stf.client.StfTestCase;
 import de.fu_berlin.inf.dpp.stf.client.util.Util;
 import de.fu_berlin.inf.dpp.stf.shared.Constants.TypeOfCreateProject;
 
-public class TestInvitation extends StfTestCase {
+@TestLink(id = "")
+public class Editing3ProjectsTest extends StfTestCase {
     @BeforeClass
     public static void beforeClass() throws Exception {
         initTesters(ALICE, BOB);

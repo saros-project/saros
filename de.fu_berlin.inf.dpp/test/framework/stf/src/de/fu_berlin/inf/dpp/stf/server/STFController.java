@@ -58,10 +58,10 @@ import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.menubar.impl.MenuB
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.menubar.menu.impl.SarosM;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.menubar.menu.impl.WindowM;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.menubar.menu.submenu.impl.SarosPreferences;
-import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.Views;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.eclipse.impl.ConsoleView;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.eclipse.impl.PEView;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.eclipse.impl.ProgressView;
+import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.impl.Views;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.saros.impl.Chatroom;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.saros.impl.RSView;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.saros.impl.SarosView;

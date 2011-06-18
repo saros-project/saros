@@ -43,6 +43,7 @@ public class SarosViewTest extends StfTestCase {
     public void connectWith() throws RemoteException {
         ALICE.superBot().views().sarosView()
             .connectWith(Constants.TEST_JID, Constants.PASSWORD);
+        assertEquals(true, ALICE.superBot().views().sarosView().isConnected());
         assertTrue(ALICE.superBot().menuBar().saros().preferences()
             .isAccountActive(Constants.TEST_JID));
     }
@@ -68,7 +69,7 @@ public class SarosViewTest extends StfTestCase {
             .connectWith(Constants.TEST_JID, Constants.PASSWORD);
         assertTrue(ALICE.superBot().views().sarosView()
             .hasBuddy(Constants.TEST_JID));
-        ALICE.superBot().views().sarosView().addANewBuddy(Constants.TEST_JID);
+        ALICE.superBot().views().sarosView().addNewBuddy(Constants.TEST_JID);
         assertTrue(ALICE.superBot().views().sarosView()
             .hasBuddy(Constants.TEST_JID));
     }

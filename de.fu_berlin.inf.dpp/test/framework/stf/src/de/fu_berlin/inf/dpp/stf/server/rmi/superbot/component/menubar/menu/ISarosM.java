@@ -28,7 +28,7 @@ public interface ISarosM extends Remote {
      *            TODO not implement yet.
      * @throws RemoteException
      */
-    public void creatAccount(JID jid, String password) throws RemoteException;
+    public void createAccount(JID jid, String password) throws RemoteException;
 
     public void addBuddy(JID jid) throws RemoteException;
 

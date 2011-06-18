@@ -237,7 +237,7 @@ public class Util {
         throws RemoteException {
         for (AbstractTester peer : peers) {
             if (!host.superBot().views().sarosView().hasBuddy(peer.getJID())) {
-                host.superBot().views().sarosView().addANewBuddy(peer.getJID());
+                host.superBot().views().sarosView().addNewBuddy(peer.getJID());
                 peer.superBot().confirmShellRequestOfSubscriptionReceived();
             }
         }

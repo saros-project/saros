@@ -83,13 +83,13 @@ public class BuddiesByAliceBobTest extends StfTestCase {
 
         assertTrue(ALICE.superBot().views().sarosView().hasBuddy(BOB.getJID()));
         assertTrue(ALICE.superBot().views().sarosView()
-            .getNickName(BOB.getJID()).equals(BOB.getName()));
+            .getNickname(BOB.getJID()).equals(BOB.getName()));
 
         ALICE.superBot().views().sarosView().selectBuddy(BOB.getJID())
             .rename("new name");
         assertTrue(ALICE.superBot().views().sarosView().hasBuddy(BOB.getJID()));
         assertTrue(ALICE.superBot().views().sarosView()
-            .getNickName(BOB.getJID()).equals("new name"));
+            .getNickname(BOB.getJID()).equals("new name"));
     }
 
     @Test

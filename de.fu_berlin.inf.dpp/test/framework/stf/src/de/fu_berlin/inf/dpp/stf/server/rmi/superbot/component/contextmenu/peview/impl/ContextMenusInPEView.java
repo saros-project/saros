@@ -106,13 +106,6 @@ public class ContextMenusInPEView extends Component implements
             remoteBot().waitUntilShellIsClosed(SHELL_COPY_PROJECT);
             remoteBot().sleep(1000);
         }
-        // switch (type) {
-        // case PROJECT:
-
-        // break;
-        // default:
-        // break;
-        // }
     }
 
     public void openWith(String editorType) throws RemoteException {

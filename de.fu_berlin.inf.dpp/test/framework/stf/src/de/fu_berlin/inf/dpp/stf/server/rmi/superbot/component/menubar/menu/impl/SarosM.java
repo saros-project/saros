@@ -45,7 +45,7 @@ public class SarosM extends Component implements ISarosM {
      * 
      **********************************************/
 
-    public void creatAccount(JID jid, String password) throws RemoteException {
+    public void createAccount(JID jid, String password) throws RemoteException {
         precondition();
         menu.menu(MENU_CREATE_ACCOUNT).click();
         superBot().confirmShellCreateNewXMPPJabberAccount(jid, password);

@@ -2,6 +2,7 @@ package de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.eclipse.impl
 
 import java.io.IOException;
 import java.rmi.RemoteException;
+import java.util.Arrays;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
@@ -17,8 +18,8 @@ import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotTree;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotTreeItem;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotView;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.contextmenu.peview.IContextMenusInPEView;
-import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.Views;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.eclipse.IPEView;
+import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.impl.Views;
 import de.fu_berlin.inf.dpp.vcs.VCSAdapter;
 import de.fu_berlin.inf.dpp.vcs.VCSResourceInfo;
 
@@ -276,7 +277,8 @@ public class PEView extends Views implements IPEView {
             }
 
             public String getFailureMessage() {
-                return "The both contents are not" + " same.";
+                return "the content of the file " + Arrays.toString(fileNodes)
+                    + " does not match: " + otherClassContent;
             }
         });
     }

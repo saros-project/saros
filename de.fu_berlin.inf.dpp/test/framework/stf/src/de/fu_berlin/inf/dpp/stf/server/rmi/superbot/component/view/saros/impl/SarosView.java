@@ -25,7 +25,7 @@ import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotView;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.ISuperBot;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.contextmenu.sarosview.IContextMenusInBuddiesArea;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.contextmenu.sarosview.IContextMenusInSessionArea;
-import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.Views;
+import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.impl.Views;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.saros.IChatroom;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.saros.ISarosView;
 
@@ -90,7 +90,7 @@ public class SarosView extends Views implements ISarosView {
             waitUntilIsConnected();
         } else {
             clickToolbarButtonWithTooltip(TB_DISCONNECT);
-            waitUntilDisConnected();
+            waitUntilIsDisconnected();
 
             clickToolbarButtonWithTooltip(TB_CONNECT);
             waitUntilIsConnected();
@@ -99,7 +99,7 @@ public class SarosView extends Views implements ISarosView {
     }
 
     public void connectWithActiveAccount() throws RemoteException {
-        if (isDisConnected()) {
+        if (isDisconnected()) {
             if (!superBot().menuBar().saros().preferences().existsAccount()) {
                 throw new RuntimeException(
                     "You need to at first add a account!");
@@ -112,7 +112,7 @@ public class SarosView extends Views implements ISarosView {
     public void disconnect() throws RemoteException {
         if (isConnected()) {
             clickToolbarButtonWithTooltip(TB_DISCONNECT);
-            waitUntilDisConnected();
+            waitUntilIsDisconnected();
         }
     }
 
@@ -134,7 +134,7 @@ public class SarosView extends Views implements ISarosView {
         }
     }
 
-    public void addANewBuddy(JID jid) throws RemoteException {
+    public void addNewBuddy(JID jid) throws RemoteException {
         if (!hasBuddy(jid)) {
             clickToolbarButtonWithTooltip(TB_ADD_A_NEW_BUDDY);
             superBot().confirmShellAddBuddy(jid);
@@ -156,7 +156,7 @@ public class SarosView extends Views implements ISarosView {
         clickToolbarButtonWithTooltip(TB_STOP_SESSION_WITH_BUDDY);
     }
 
-    public void sendAFileToSelectedBuddy(JID jidOfPeer) throws RemoteException {
+    public void sendFileToSelectedBuddy(JID jidOfPeer) throws RemoteException {
         selectParticipant(
             jidOfPeer,
             "Hi guy, you can't send a file to youself, it makes no sense! Please pass a correct parameter to the method.");
@@ -203,9 +203,10 @@ public class SarosView extends Views implements ISarosView {
     // }
 
     /**
-     * Note: {@link STFMessage#TB_INCONSISTENCY_DETECTED} is not complete toolbarName,
-     * so we need to use {@link IRemoteBotView#toolbarButtonWithRegex(String)}
-     * to perform this action.
+     * Note: {@link STFMessage#TB_INCONSISTENCY_DETECTED} is not complete
+     * toolbarName, so we need to use
+     * {@link IRemoteBotView#toolbarButtonWithRegex(String)} to perform this
+     * action.
      */
     public void inconsistencyDetected() throws RemoteException {
         view.toolbarButtonWithRegex(TB_INCONSISTENCY_DETECTED + ".*").click();
@@ -226,12 +227,12 @@ public class SarosView extends Views implements ISarosView {
 
     public IContextMenusInBuddiesArea selectBuddy(JID buddyJID)
         throws RemoteException {
-        if (getNickName(buddyJID) == null) {
+        if (getNickname(buddyJID) == null) {
             throw new RuntimeException("No buddy with the ID "
                 + buddyJID.getBase() + " existed!");
         }
         initBuddiesContextMenuWrapper(tree.selectTreeItemWithRegex(
-            NODE_BUDDIES, getNickName(buddyJID) + ".*"));
+            NODE_BUDDIES, getNickname(buddyJID) + ".*"));
         return buddiesContextMenu;
     }
 
@@ -278,11 +279,11 @@ public class SarosView extends Views implements ISarosView {
         return isToolbarButtonEnabled(TB_DISCONNECT);
     }
 
-    public boolean isDisConnected() throws RemoteException {
+    public boolean isDisconnected() throws RemoteException {
         return isToolbarButtonEnabled(TB_CONNECT);
     }
 
-    public String getNickName(JID buddyJID) throws RemoteException {
+    public String getNickname(JID buddyJID) throws RemoteException {
         Roster roster = saros.getRoster();
         if (roster.getEntry(buddyJID.getBase()) == null)
             return null;
@@ -293,9 +294,9 @@ public class SarosView extends Views implements ISarosView {
     }
 
     public boolean hasNickName(JID buddyJID) throws RemoteException {
-        if (getNickName(buddyJID) == null)
+        if (getNickname(buddyJID) == null)
             return false;
-        if (!getNickName(buddyJID).equals(buddyJID.getBase()))
+        if (!getNickname(buddyJID).equals(buddyJID.getBase()))
             return true;
         return false;
     }
@@ -325,7 +326,7 @@ public class SarosView extends Views implements ISarosView {
     }
 
     public boolean hasBuddy(JID buddyJID) throws RemoteException {
-        String nickName = getNickName(buddyJID);
+        String nickName = getNickname(buddyJID);
         if (nickName == null)
             return false;
         return tree.selectTreeItemWithRegex(NODE_BUDDIES)
@@ -354,7 +355,7 @@ public class SarosView extends Views implements ISarosView {
         } else if (superBot().views().sarosView().hasNickName(participantJID)) {
             // if (hasWriteAccessByNoGUI(participantJID))
             contactLabel = superBot().views().sarosView()
-                .getNickName(participantJID)
+                .getNickname(participantJID)
                 + " \\(" + participantJID.getBase() + "\\)";
             // else
             // contactLabel = sarosBot().views().sarosView()
@@ -428,19 +429,19 @@ public class SarosView extends Views implements ISarosView {
             }
 
             public String getFailureMessage() {
-                return "Can't connect.";
+                return "unable to connect";
             }
         });
     }
 
-    public void waitUntilDisConnected() throws RemoteException {
+    public void waitUntilIsDisconnected() throws RemoteException {
         remoteBot().waitUntil(new DefaultCondition() {
             public boolean test() throws Exception {
-                return isDisConnected();
+                return isDisconnected();
             }
 
             public String getFailureMessage() {
-                return "Can't disconnect.";
+                return "unable to disconnect";
             }
         });
     }
@@ -452,7 +453,7 @@ public class SarosView extends Views implements ISarosView {
             }
 
             public String getFailureMessage() {
-                return "can't open the session.";
+                return "joining the session failed";
             }
         });
     }
@@ -469,7 +470,7 @@ public class SarosView extends Views implements ISarosView {
             }
 
             public String getFailureMessage() {
-                return "can't close the session.";
+                return "leaving the session failed";
             }
         });
     }
@@ -491,7 +492,7 @@ public class SarosView extends Views implements ISarosView {
             }
 
             public String getFailureMessage() {
-                return "There are someone, who still not leave the session.";
+                return "there are still users in the session";
             }
         });
     }
@@ -504,7 +505,7 @@ public class SarosView extends Views implements ISarosView {
             }
 
             public String getFailureMessage() {
-                return "The toolbar button " + TB_INCONSISTENCY_DETECTED
+                return "the toolbar button " + TB_INCONSISTENCY_DETECTED
                     + " isn't enabled.";
             }
         });

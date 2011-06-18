@@ -4,20 +4,24 @@ import org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences;
 
 public class SarosSWTBotPreferences extends SWTBotPreferences {
 
-    public static long SAROS_TIMEOUT = toLong(
-        System.getProperty(KEY_TIMEOUT, "10000"), 10000);
+    public static long SAROS_TIMEOUT;
 
-    public static long SAROS_LONG_TIMEOUT = 20000;
+    public static long SAROS_LONG_TIMEOUT;
 
-    public static long SAROS_SHORT_TIMEOUT = 3000;
+    public static long SAROS_SHORT_TIMEOUT;
 
-    private static long toLong(String timeoutValue, long defaultValue) {
+    public static long SAROS_WIDGET_TIMEOUT;
+
+    static {
+        SAROS_WIDGET_TIMEOUT = 10 * 1000;
+        SAROS_SHORT_TIMEOUT = 10 * 1000;
+        SAROS_TIMEOUT = 20 * 1000;
+        SAROS_LONG_TIMEOUT = 60 * 1000;
+
         try {
-            Long timeout = Long.valueOf(timeoutValue);
-            return timeout.longValue();
-        } catch (Exception e) {
-            return defaultValue;
+            SAROS_TIMEOUT = Long.valueOf(System.getProperty(KEY_TIMEOUT));
+        } catch (Exception ignore) {
+            // ignore
         }
     }
-
 }

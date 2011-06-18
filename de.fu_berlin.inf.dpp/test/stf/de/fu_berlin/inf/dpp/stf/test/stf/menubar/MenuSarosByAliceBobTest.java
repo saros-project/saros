@@ -44,19 +44,22 @@ public class MenuSarosByAliceBobTest extends StfTestCase {
         // against a bug in Saros Session Management
         for (AbstractTester tester : getCurrentTesters()) {
             tester.remoteBot().sleep(1000);
-            if (tester.remoteBot().isShellOpen("Synchronizing")) {
-                IRemoteBotShell sync = tester.remoteBot()
-                    .shell("Synchronizing");
+            try {
+                if (tester.remoteBot().isShellOpen("Synchronizing")) {
+                    IRemoteBotShell sync = tester.remoteBot().shell(
+                        "Synchronizing");
 
-                sync.confirm("Cancel");
-                tester.remoteBot().sleep(1000);
-                if (tester.remoteBot().isShellOpen("Problem Occurred")) {
-                    IRemoteBotShell problem = tester.remoteBot().shell(
-                        "Problem Occurred");
-                    problem.confirm("OK");
+                    sync.confirm("Cancel");
+                    tester.remoteBot().sleep(1000);
+                    if (tester.remoteBot().isShellOpen("Problem Occurred")) {
+                        IRemoteBotShell problem = tester.remoteBot().shell(
+                            "Problem Occurred");
+                        problem.confirm("OK");
+                    }
                 }
+            } catch (Exception e) {
+                // ignore
             }
-
         }
     }
 

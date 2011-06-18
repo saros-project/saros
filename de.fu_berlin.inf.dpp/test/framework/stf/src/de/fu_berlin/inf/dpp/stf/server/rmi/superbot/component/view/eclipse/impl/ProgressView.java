@@ -69,7 +69,7 @@ public class ProgressView extends Component implements IProgressView {
             }
 
             public String getFailureMessage() {
-                return "There are still some progresses existed";
+                return "there still exist some progresses";
             }
         });
 

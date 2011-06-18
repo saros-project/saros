@@ -50,7 +50,7 @@ public class SarosPreferencesTest extends StfTestCase {
     public void createExistedAccountWithMenuSarosCreateAccount()
         throws RemoteException {
         ALICE.superBot().menuBar().saros()
-            .creatAccount(ALICE.getJID(), Constants.PASSWORD);
+            .createAccount(ALICE.getJID(), Constants.PASSWORD);
     }
 
     /*

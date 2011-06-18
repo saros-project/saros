@@ -66,7 +66,7 @@ public class NewC extends Component implements INewC {
                 treeItem.contextMenus(MENU_NEW, MENU_FOLDER).click();
                 confirmShellNewFolder(folderName);
             } catch (WidgetNotFoundException e) {
-                final String cause = "Error creating new folder";
+                final String cause = "error creating new folder";
                 log.error(cause, e);
                 throw new RemoteException(cause, e);
             }
@@ -78,7 +78,8 @@ public class NewC extends Component implements INewC {
             // if (!sarosBot().state().existsPkgNoGUI(projectName, pkg))
             try {
                 precondition();
-                remoteBot().menu(MENU_FILE).menu(MENU_NEW).menu(MENU_PACKAGE).click();
+                remoteBot().menu(MENU_FILE).menu(MENU_NEW).menu(MENU_PACKAGE)
+                    .click();
                 confirmShellNewJavaPackage(projectName, pkg);
             } catch (WidgetNotFoundException e) {
                 final String cause = "error creating new package";
@@ -98,7 +99,7 @@ public class NewC extends Component implements INewC {
                 treeItem.contextMenus(MENU_NEW, MENU_FILE).click();
                 confirmShellNewFile(fileName);
             } catch (WidgetNotFoundException e) {
-                final String cause = "error creating new file.";
+                final String cause = "error creating new file";
                 log.error(cause, e);
                 throw new RemoteException(cause, e);
             }
@@ -110,7 +111,7 @@ public class NewC extends Component implements INewC {
                 treeItem.contextMenus(MENU_NEW, MENU_CLASS).click();
                 confirmShellNewJavaClass(className);
             } catch (WidgetNotFoundException e) {
-                final String cause = "error creating new Java Class";
+                final String cause = "error creating new Java class";
                 log.error(cause, e);
                 throw new RemoteException(cause, e);
             }
@@ -126,7 +127,7 @@ public class NewC extends Component implements INewC {
             remoteBot().menu(MENU_FILE).menu(MENU_NEW).menu(MENU_CLASS).click();
             confirmShellNewJavaClass(projectName, pkg, className);
         } catch (WidgetNotFoundException e) {
-            final String cause = "error creating new Java Class";
+            final String cause = "error creating new Java class";
             log.error(cause, e);
             throw new RemoteException(cause, e);
         }
@@ -141,8 +142,10 @@ public class NewC extends Component implements INewC {
 
             shell_new.bot().textWithLabel(LABEL_NAME).setText(className);
             shell_new.bot().button("Add...").click();
-            remoteBot().waitUntilShellIsOpen("Implemented Interfaces Selection");
-            IRemoteBotShell shell = remoteBot().shell("Implemented Interfaces Selection");
+            remoteBot()
+                .waitUntilShellIsOpen("Implemented Interfaces Selection");
+            IRemoteBotShell shell = remoteBot().shell(
+                "Implemented Interfaces Selection");
             shell.activate();
             shell.bot().textWithLabel("Choose interfaces:")
                 .setText("java.lang.Runnable");
@@ -201,7 +204,6 @@ public class NewC extends Component implements INewC {
         shell.bot().textWithLabel(LABEL_PROJECT_NAME).setText(projectName);
         shell.bot().button(FINISH).click();
         remoteBot().waitUntilShellIsClosed(SHELL_NEW_PROJECT);
-        // bot.sleep(50);
     }
 
     private void confirmShellNewFile(String fileName) throws RemoteException {
@@ -222,7 +224,8 @@ public class NewC extends Component implements INewC {
         shell.bot().textWithLabel(LABEL_NAME).setText(pkg);
         shell.bot().button(FINISH).click();
         if (remoteBot().isShellOpen(SHELL_CREATE_XMPP_JABBER_ACCOUNT))
-            remoteBot().waitUntilShellIsClosed(SHELL_CREATE_XMPP_JABBER_ACCOUNT);
+            remoteBot()
+                .waitUntilShellIsClosed(SHELL_CREATE_XMPP_JABBER_ACCOUNT);
     }
 
     private void confirmShellNewFolder(String folderName)

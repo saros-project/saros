@@ -78,7 +78,7 @@ public interface ISarosView extends Remote {
      *            see {@link JID}.
      * @throws RemoteException
      */
-    public void addANewBuddy(JID jid) throws RemoteException;
+    public void addNewBuddy(JID jid) throws RemoteException;
 
     /**
      * Select the buddy specified with the given baseJID which is located under
@@ -134,7 +134,7 @@ public interface ISarosView extends Remote {
      * @return the nickname of the given user, if he has one.
      * @throws RemoteException
      */
-    public String getNickName(JID buddyJID) throws RemoteException;
+    public String getNickname(JID buddyJID) throws RemoteException;
 
     /**
      * 
@@ -170,7 +170,7 @@ public interface ISarosView extends Remote {
      * 
      * @throws RemoteException
      */
-    public void waitUntilDisConnected() throws RemoteException;
+    public void waitUntilIsDisconnected() throws RemoteException;
 
     /**********************************************
      * 
@@ -219,7 +219,7 @@ public interface ISarosView extends Remote {
      *            screen.
      * @throws RemoteException
      */
-    public void sendAFileToSelectedBuddy(JID selectedBuddyJID)
+    public void sendFileToSelectedBuddy(JID selectedBuddyJID)
         throws RemoteException;
 
     /**

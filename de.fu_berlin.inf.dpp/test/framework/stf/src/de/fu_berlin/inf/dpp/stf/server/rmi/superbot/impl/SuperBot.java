@@ -14,7 +14,7 @@ import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.ISuperBot;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.menubar.IMenuBar;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.menubar.impl.MenuBar;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.IViews;
-import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.Views;
+import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.impl.Views;
 
 public class SuperBot extends STFMessage implements ISuperBot {
 
@@ -102,7 +102,7 @@ public class SuperBot extends STFMessage implements ISuperBot {
                 if (bot().activeShell().getText().equals(SHELL_ADD_PROJECT)) {
                     bot().activeShell().bot().toggleButton().click();
                 }
-                throw new RuntimeException("session invitation is failed!", e);
+                throw new RuntimeException("session invitation failed", e);
             }
     }
 

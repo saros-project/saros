@@ -7,6 +7,7 @@ import org.eclipse.swtbot.swt.finder.waits.Conditions;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTableItem;
 import org.eclipse.swtbot.swt.finder.widgets.TimeoutException;
 
+import de.fu_berlin.inf.dpp.stf.server.bot.SarosSWTBotPreferences;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotMenu;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotTableItem;
 
@@ -91,17 +92,16 @@ public class RemoteBotTableItem extends AbstractRemoteWidget implements
      **********************************************/
     public boolean existsContextMenu(String contextName) throws RemoteException {
         long oldTimeout = SWTBotPreferences.TIMEOUT;
-        // increase the timeout
-        SWTBotPreferences.TIMEOUT = 1000;
+
+        SWTBotPreferences.TIMEOUT = SarosSWTBotPreferences.SAROS_WIDGET_TIMEOUT;
 
         try {
             widget.contextMenu(contextName);
-            SWTBotPreferences.TIMEOUT = oldTimeout;
             return true;
-
         } catch (TimeoutException e) {
-            SWTBotPreferences.TIMEOUT = oldTimeout;
             return false;
+        } finally {
+            SWTBotPreferences.TIMEOUT = oldTimeout;
         }
     }
 

@@ -42,7 +42,7 @@ public class ContextMenusInSessionArea extends ContextMenusInSarosView
      **********************************************/
     public void grantWriteAccess() throws RemoteException {
         if (hasWriteAccess()) {
-            throw new RuntimeException("User \"" + treeItem.getText()
+            throw new RuntimeException("user \"" + treeItem.getText()
                 + "\" already has write access!.");
         }
         treeItem.contextMenus(CM_GRANT_WRITE_ACCESS).click();
@@ -52,7 +52,7 @@ public class ContextMenusInSessionArea extends ContextMenusInSarosView
 
     public void restrictToReadOnlyAccess() throws RemoteException {
         if (!hasWriteAccess()) {
-            throw new RuntimeException("User \"" + treeItem.getText()
+            throw new RuntimeException("user \"" + treeItem.getText()
                 + "\" already has read-only access!");
         }
         treeItem.contextMenus(CM_RESTRICT_TO_READ_ONLY_ACCESS).click();
@@ -66,8 +66,7 @@ public class ContextMenusInSessionArea extends ContextMenusInSarosView
             return;
         }
         if (localJID.equals(participantJID)) {
-            throw new RuntimeException(
-                "Hi guy, you can't follow youself, it makes no sense! Please pass a correct parameter to the method.");
+            throw new RuntimeException("you can't follow yourself");
         }
         treeItem.contextMenus(CM_FOLLOW_PARTICIPANT).click();
         // waitUntilIsFollowingThisBuddy();
@@ -82,7 +81,7 @@ public class ContextMenusInSessionArea extends ContextMenusInSarosView
     public void jumpToPositionOfSelectedBuddy() throws RemoteException {
         if (localJID.equals(participantJID)) {
             throw new RuntimeException(
-                "Hi guy, you can't jump to the position of youself, it makes no sense! Please pass a correct parameter to the method.");
+                "you can't jump to the position of yourself");
         }
         treeItem.contextMenus(CM_JUMP_TO_POSITION_SELECTED_BUDDY).click();
     }
@@ -136,8 +135,8 @@ public class ContextMenusInSessionArea extends ContextMenusInSarosView
             }
 
             public String getFailureMessage() {
-                return "can't grant " + localJID.getBase()
-                    + " the write access.";
+                return "unable to grant write access to "
+                    + participantJID.getBase();
             }
         });
     }
@@ -149,7 +148,7 @@ public class ContextMenusInSessionArea extends ContextMenusInSarosView
             }
 
             public String getFailureMessage() {
-                return "can't restrict " + localJID.getBase()
+                return "unable to restrict " + participantJID.getBase()
                     + " to read-only access";
             }
         });
@@ -162,7 +161,7 @@ public class ContextMenusInSessionArea extends ContextMenusInSarosView
             }
 
             public String getFailureMessage() {
-                return localJID.getBase() + " is not following the user ";
+                return "unable to follow " + participantJID.getBase();
             }
         });
     }
@@ -174,7 +173,8 @@ public class ContextMenusInSessionArea extends ContextMenusInSarosView
             }
 
             public String getFailureMessage() {
-                return "Can't not stop following this user.";
+                return "unable to stop following mode on user"
+                    + participantJID.getBase();
             }
         });
     }
