@@ -233,7 +233,6 @@ Export-Package: de.fu_berlin.inf.dpp;
  org.jivesoftware.smackx.workgroup.settings,
  org.jivesoftware.smackx.workgroup.user,
  org.jivesoftware.smackx.workgroup.util,
- org.junit,
  org.limewire.collection,
  org.limewire.common,
  org.limewire.concurrent,
