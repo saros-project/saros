@@ -80,7 +80,7 @@ public class MenuSarosByAliceBobTest extends StfTestCase {
         }
         IRemoteBotShell shell = ALICE.remoteBot().shell(SHELL_SHARE_PROJECT);
         shell.activate();
-        shell.bot().table().getTableItem(Constants.PROJECT1).check();
+        shell.bot().tree().selectTreeItem(Constants.PROJECT1).check();
         shell.bot().button(NEXT).click();
         shell.bot().tree().selectTreeItem(BOB.getBaseJid()).check();
         shell.bot().button(FINISH).click();
