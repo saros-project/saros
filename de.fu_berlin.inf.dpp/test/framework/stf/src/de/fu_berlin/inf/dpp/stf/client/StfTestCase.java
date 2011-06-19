@@ -53,19 +53,18 @@ public abstract class StfTestCase {
      **********************************************/
 
     @Before
-    public void setUp() throws RemoteException {
-        closeAllShells();
+    public void before() throws RemoteException {
         announceTestCaseStart();
     }
 
     @After
-    public void tearDown() throws RemoteException {
+    public void after() throws RemoteException {
         announceTestCaseEnd();
         resetWorkbenches();
     }
 
     @AfterClass
-    public static void tearDownAfterClass() throws RemoteException {
+    public static void afterClass() throws RemoteException {
         resetSaros();
     }
 
@@ -245,7 +244,7 @@ public abstract class StfTestCase {
             resetBuddies(tester);
     }
 
-    private static void resetBuddies(AbstractTester tester)
+    public static void resetBuddies(AbstractTester tester)
         throws RemoteException {
         for (int i = 0; i < currentTesters.size(); i++) {
             if (tester == currentTesters.get(i))

@@ -30,7 +30,7 @@ public class InviteBuddiesByAliceBobCarlTest extends StfTestCase {
 
     @Override
     @After
-    public void tearDown() throws RemoteException {
+    public void after() throws RemoteException {
         announceTestCaseEnd();
         leaveSessionHostFirst(ALICE);
         // TODO remove this code, because it is a workaround

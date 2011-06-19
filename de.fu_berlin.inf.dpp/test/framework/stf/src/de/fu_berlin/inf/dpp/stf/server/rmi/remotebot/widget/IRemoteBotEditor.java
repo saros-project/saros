@@ -74,28 +74,27 @@ public interface IRemoteBotEditor extends Remote {
     public void closeWithoutSave() throws RemoteException;
 
     /**
-     * sets text in the editor without save
+     * sets the editor content to the content of string
      * 
-     * @param contentPath
+     * @param text
+     *            the text to set
+     * 
+     * @throws RemoteException
+     */
+
+    public void setText(String text) throws RemoteException;
+
+    /**
+     * sets the editor content to the content of the file
+     * 
+     * @param path
      *            the path to the test file whose content should be inserted in
      *            the text editor. All such test files are located in the
      *            directory [Saros]/test/STF.
      * 
      * @throws RemoteException
      */
-    public void setTexWithSave(String contentPath) throws RemoteException;
-
-    /**
-     * sets the given contents to the editor without saving.
-     * 
-     * @param contentPath
-     *            the path to the test file whose content should be set in the
-     *            text editor. All such test files are located in the directory
-     *            [Saros]/test/STF.
-     * 
-     * @throws RemoteException
-     */
-    public void setTextWithoutSave(String contentPath) throws RemoteException;
+    public void setTextFromFile(String path) throws RemoteException;
 
     /**
      * 

@@ -86,7 +86,7 @@ public class ChangingUserWithWriteAccessWhileOtherFollowTest extends
             .selectClass(Constants.PROJECT1, Constants.PKG1, Constants.CLS1)
             .open();
         ALICE.remoteBot().editor(Constants.CLS1_SUFFIX)
-            .setTextWithoutSave(Constants.CP1);
+            .setTextFromFile(Constants.CP1);
         String dirtyClsContentOfAlice = ALICE.remoteBot()
             .editor(Constants.CLS1_SUFFIX).getText();
 
@@ -107,7 +107,7 @@ public class ChangingUserWithWriteAccessWhileOtherFollowTest extends
 
         Util.resetFollowModeSequentially(CARL, BOB, DAVE);
         ALICE.remoteBot().editor(Constants.CLS1_SUFFIX)
-            .setTextWithoutSave(Constants.CP1_CHANGE);
+            .setTextFromFile(Constants.CP1_CHANGE);
         // ALICE.bot().editor(CLS1_SUFFIX).closeAndSave();
 
         assertTrue(CARL.remoteBot().editor(Constants.CLS1_SUFFIX).isActive());

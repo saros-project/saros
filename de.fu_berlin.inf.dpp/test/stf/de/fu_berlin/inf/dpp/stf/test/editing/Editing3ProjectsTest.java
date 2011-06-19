@@ -6,8 +6,6 @@ import static org.junit.Assert.assertEquals;
 
 import java.rmi.RemoteException;
 
-import org.junit.After;
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -25,10 +23,9 @@ public class Editing3ProjectsTest extends StfTestCase {
         setUpSaros();
     }
 
-    @Override
-    @Before
-    public void setUp() throws RemoteException {
-        super.setUp();
+    @Test
+    public void testShareMultipleWithBobAndCarlSequencetially()
+        throws RemoteException {
         ALICE.superBot().views().packageExplorerView().tree().newC()
             .javaProjectWithClasses("foo", "bar", "HelloAlice");
 
@@ -37,21 +34,6 @@ public class Editing3ProjectsTest extends StfTestCase {
 
         ALICE.superBot().views().packageExplorerView().tree().newC()
             .javaProjectWithClasses("foo2", "bar", "HelloCarl");
-    }
-
-    @Override
-    @After
-    public void tearDown() throws RemoteException {
-        announceTestCaseEnd();
-        leaveSessionHostFirst(ALICE);
-        ALICE.remoteBot().closeAllEditors();
-        BOB.remoteBot().closeAllEditors();
-        deleteAllProjectsByActiveTesters();
-    }
-
-    @Test
-    public void testShareMultipleWithBobAndCarlSequencetially()
-        throws RemoteException {
 
         Util.buildSessionSequentially("foo", TypeOfCreateProject.NEW_PROJECT,
             ALICE, BOB);

@@ -30,8 +30,8 @@ public class EditorByAliceTest extends StfTestCase {
 
     @Override
     @After
-    public void tearDown() throws RemoteException {
-        super.tearDown();
+    public void after() throws RemoteException {
+        super.after();
         deleteAllProjectsByActiveTesters();
     }
 

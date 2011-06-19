@@ -21,12 +21,12 @@ public class SarosConditions extends Conditions {
     // return new IsConnect(buttons, tooltipText);
     // }
 
-    public static ICondition isDisConnected(List<SWTBotToolbarButton> buttons,
+    public static ICondition isDisconnected(List<SWTBotToolbarButton> buttons,
         String tooltipText) {
         return new IsDisConnected(buttons, tooltipText);
     }
 
-    public static ICondition ShellActive(SWTBotShell shell) {
+    public static ICondition isShellActive(SWTBotShell shell) {
         return new IsShellActive(shell);
     }
 

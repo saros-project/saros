@@ -77,7 +77,8 @@ public class RefactorC extends Component implements IRefactorC {
         IRemoteBotShell shell = remoteBot().shell(shellTitle);
         shell.activate();
         shell.bot().textWithLabel(LABEL_NEW_NAME).setText(newName);
-        remoteBot().shell(shellTitle).bot().button(buttonName).waitUntilIsEnabled();
+        remoteBot().shell(shellTitle).bot().button(buttonName)
+            .waitUntilIsEnabled();
         shell.bot().button(buttonName).click();
         // if (bot().isShellOpen("Rename Compilation Unit")) {
         // bot().shell("Rename Compilation Unit").bot().button(buttonName)
@@ -91,7 +92,7 @@ public class RefactorC extends Component implements IRefactorC {
 
     private void moveTo(String shellTitle, String buttonName, String... nodes)
         throws RemoteException {
-        remoteBot().menu(MENU_REFACTOR).menu(MENU_MOVE).click();
+        treeItem.contextMenus(MENU_REFACTOR, MENU_MOVE).click();
         remoteBot().shell(shellTitle).confirmWithTree(buttonName, nodes);
         remoteBot().waitUntilShellIsClosed(shellTitle);
     }

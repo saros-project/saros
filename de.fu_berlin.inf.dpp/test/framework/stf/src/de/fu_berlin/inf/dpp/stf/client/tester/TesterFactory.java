@@ -57,12 +57,15 @@ final class TesterFactory {
 
         } catch (Exception e) {
             log.debug("error while initializing bot", e);
-            tester = new InvalidTester(new RuntimeException(
-                "could not connect to RMI of bot '" + name + "' with JID: "
-                    + jid + ", password: " + password + ", host: " + host
-                    + ", port: " + port + ", " + e.getMessage(), e.getCause()
+            tester = new InvalidTester(new JID(
+                jid == null ? "not@set.in/config" : jid.toString()),
+                password == null ? "" : password.toString(),
+                new RuntimeException("could not connect to RMI of bot '" + name
+                    + "' with JID: " + jid + ", password: " + password
+                    + ", host: " + host + ", port: " + port + ", "
+                    + e.getMessage(), e.getCause()
 
-            ));
+                ));
         }
 
         return tester;

@@ -33,14 +33,14 @@ public class SessionAliceBobTest extends StfTestCase {
 
     @Override
     @Before
-    public void setUp() throws RemoteException {
+    public void before() throws RemoteException {
         Util.reBuildSession(Constants.PROJECT1, ALICE, BOB);
         announceTestCaseStart();
     }
 
     @Override
     @After
-    public void tearDown() throws RemoteException {
+    public void after() throws RemoteException {
         announceTestCaseEnd();
         Util.resetWriteAccess(ALICE, BOB);
         Util.resetFollowModeSequentially(ALICE, BOB);
@@ -204,7 +204,7 @@ public class SessionAliceBobTest extends StfTestCase {
             .selectClass(Constants.PROJECT1, Constants.PKG1, Constants.CLS1)
             .open();
         BOB.remoteBot().editor(Constants.CLS1_SUFFIX)
-            .setTextWithoutSave(Constants.CP1);
+            .setTextFromFile(Constants.CP1);
         String editorTextOfBob = BOB.remoteBot().editor(Constants.CLS1_SUFFIX)
             .getText();
         assertFalse(editorTextOfAlice.equals(editorTextOfBob));

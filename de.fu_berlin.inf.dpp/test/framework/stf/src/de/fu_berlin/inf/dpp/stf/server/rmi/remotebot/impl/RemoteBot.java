@@ -96,6 +96,7 @@ public class RemoteBot extends STFMessage implements IRemoteBot {
         checkbox = RemoteBotCheckBox.getInstance();
         radio = RemoteBotRadio.getInstance();
         cTabItem = RemoteBotCTabItem.getInstance();
+        toggleButton = RemoteBotToggleButton.getInstance();
 
         return self;
     }
@@ -194,7 +195,7 @@ public class RemoteBot extends STFMessage implements IRemoteBot {
 
     }
 
-    public List<String> getTitlesOfOpenedShells() throws RemoteException {
+    public List<String> getOpenShellNames() throws RemoteException {
         ArrayList<String> list = new ArrayList<String>();
         for (SWTBotShell shell : swtBot.shells())
             list.add(shell.getText());
@@ -202,13 +203,7 @@ public class RemoteBot extends STFMessage implements IRemoteBot {
     }
 
     public boolean isShellOpen(String title) throws RemoteException {
-        // try {
-        // swtBot.shell(title);
-        // return true;
-        // } catch (WidgetNotFoundException e) {
-        // return false;
-        // }
-        return getTitlesOfOpenedShells().contains(title);
+        return getOpenShellNames().contains(title);
     }
 
     public void waitUntilShellIsClosed(final String title)
@@ -222,7 +217,6 @@ public class RemoteBot extends STFMessage implements IRemoteBot {
                 return "waiting for shell '" + title + "' to close";
             }
         });
-        swtBot.sleep(10);
     }
 
     public void waitUntilShellIsOpen(final String title) throws RemoteException {
@@ -1554,7 +1548,7 @@ public class RemoteBot extends STFMessage implements IRemoteBot {
 
     public IRemoteBotToggleButton toggleButtonWithLabel(String label, int index)
         throws RemoteException {
-        toggleButton.setWidget(swtBot.toggleButtonWithLabel(label));
+        toggleButton.setWidget(swtBot.toggleButtonWithLabel(label, index));
         return toggleButton;
     }
 

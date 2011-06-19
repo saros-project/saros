@@ -98,7 +98,7 @@ public class UserWithWriteAccessSavesFilesTest extends StfTestCase {
         assertFalse(EDNA.remoteBot().editor(Constants.CLS3_SUFFIX).isDirty());
 
         ALICE.remoteBot().editor(Constants.CLS1_SUFFIX)
-            .setTextWithoutSave(Constants.CP1);
+            .setTextFromFile(Constants.CP1);
         String dirtyClsContentOfAlice = ALICE.remoteBot()
             .editor(Constants.CLS1_SUFFIX).getText();
 
@@ -138,7 +138,7 @@ public class UserWithWriteAccessSavesFilesTest extends StfTestCase {
             .selectClass(Constants.PROJECT1, Constants.PKG1, Constants.CLS2)
             .open();
         ALICE.remoteBot().editor(Constants.CLS2_SUFFIX)
-            .setTextWithoutSave(Constants.CP1);
+            .setTextFromFile(Constants.CP1);
         String dirtyCls2ContentOfAlice = ALICE.remoteBot()
             .editor(Constants.CLS2_SUFFIX).getText();
         String cls2ContentOfAlice = ALICE
@@ -179,7 +179,7 @@ public class UserWithWriteAccessSavesFilesTest extends StfTestCase {
             .selectClass(Constants.PROJECT1, Constants.PKG1, Constants.CLS2)
             .open();
         ALICE.remoteBot().editor(Constants.CLS2_SUFFIX)
-            .setTextWithoutSave(Constants.CP1);
+            .setTextFromFile(Constants.CP1);
         String dirtyCls2ContentOfAlice = ALICE.remoteBot()
             .editor(Constants.CLS2_SUFFIX).getText();
         CARL.superBot().views().packageExplorerView()
@@ -218,14 +218,14 @@ public class UserWithWriteAccessSavesFilesTest extends StfTestCase {
     @Test
     public void testChangingInClosedFile() throws IOException, CoreException {
         ALICE.remoteBot().editor(Constants.CLS2_SUFFIX)
-            .setTextWithoutSave(Constants.CP1);
+            .setTextFromFile(Constants.CP1);
         CARL.superBot().views().packageExplorerView()
             .selectClass(Constants.PROJECT1, Constants.PKG1, Constants.CLS2)
             .openWith(CM_OPEN_WITH_TEXT_EDITOR);
         CARL.remoteBot().editor(Constants.CLS2 + SUFFIX_JAVA).closeWithSave();
 
         ALICE.remoteBot().editor(Constants.CLS2_SUFFIX)
-            .setTexWithSave(Constants.CP2_CHANGE);
+            .setTextFromFile(Constants.CP2_CHANGE);
         String dirtyCls2ChangeContentOfAlice = ALICE.remoteBot()
             .editor(Constants.CLS2_SUFFIX).getText();
         DAVE.superBot().views().packageExplorerView()
@@ -296,7 +296,7 @@ public class UserWithWriteAccessSavesFilesTest extends StfTestCase {
             .selectClass(Constants.PROJECT1, Constants.PKG1, Constants.CLS1)
             .open();
         ALICE.remoteBot().editor(Constants.CLS1_SUFFIX)
-            .setTextWithoutSave(Constants.CP1);
+            .setTextFromFile(Constants.CP1);
         ALICE.remoteBot().editor(Constants.CLS1_SUFFIX).closeWithSave();
         String clsConentOfAlice = ALICE
             .superBot()

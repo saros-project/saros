@@ -25,7 +25,7 @@ public class MenuFileTest extends StfTestCase {
 
     @Override
     @After
-    public void tearDown() throws RemoteException {
+    public void after() throws RemoteException {
         announceTestCaseEnd();
         deleteAllProjectsByActiveTesters();
     }

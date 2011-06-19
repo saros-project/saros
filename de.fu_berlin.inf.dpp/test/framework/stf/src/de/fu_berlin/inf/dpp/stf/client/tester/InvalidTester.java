@@ -12,8 +12,12 @@ import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.ISuperBot;
 class InvalidTester implements AbstractTester {
 
     RuntimeException exception;
+    String password;
+    JID jid;
 
-    public InvalidTester(RuntimeException exception) {
+    public InvalidTester(JID jid, String password, RuntimeException exception) {
+        this.jid = jid;
+        this.password = password;
         this.exception = exception;
     }
 
@@ -22,7 +26,7 @@ class InvalidTester implements AbstractTester {
      */
 
     public String getName() {
-        throw exception;
+        return jid.getName();
     }
 
     /**
@@ -30,7 +34,7 @@ class InvalidTester implements AbstractTester {
      */
 
     public String getBaseJid() {
-        throw exception;
+        return jid.getBase();
     }
 
     /**
@@ -38,11 +42,11 @@ class InvalidTester implements AbstractTester {
      */
 
     public String getRqJid() {
-        throw exception;
+        return jid.toString();
     }
 
     public String getDomain() {
-        throw exception;
+        return jid.getDomain();
     }
 
     public IRemoteWorkbenchBot remoteBot() {
@@ -54,10 +58,10 @@ class InvalidTester implements AbstractTester {
     }
 
     public JID getJID() {
-        throw exception;
+        return jid;
     }
 
     public String getPassword() {
-        throw exception;
+        return password;
     }
 }

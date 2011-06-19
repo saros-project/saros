@@ -43,7 +43,7 @@ public class FollowModeTest extends StfTestCase {
             .selectClass(Constants.PROJECT1, Constants.PKG1, Constants.CLS1)
             .open();
         ALICE.remoteBot().editor(Constants.CLS1_SUFFIX)
-            .setTexWithSave(Constants.CP1);
+            .setTextFromFile(Constants.CP1);
         BOB.superBot().views().sarosView().selectParticipant(ALICE.getJID())
             .followParticipant();
         BOB.remoteBot().editor(Constants.CLS1_SUFFIX).waitUntilIsActive();

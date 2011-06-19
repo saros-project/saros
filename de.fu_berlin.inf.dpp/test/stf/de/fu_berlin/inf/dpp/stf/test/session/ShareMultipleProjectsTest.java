@@ -25,8 +25,8 @@ public class ShareMultipleProjectsTest extends StfTestCase {
 
     @Override
     @Before
-    public void setUp() throws RemoteException {
-        super.setUp();
+    public void before() throws RemoteException {
+        super.before();
         ALICE.superBot().views().packageExplorerView().tree().newC()
             .javaProjectWithClasses("foo", "bar", "HelloAlice");
 
@@ -39,7 +39,7 @@ public class ShareMultipleProjectsTest extends StfTestCase {
 
     @Override
     @After
-    public void tearDown() throws RemoteException {
+    public void after() throws RemoteException {
         announceTestCaseEnd();
         leaveSessionHostFirst(ALICE);
         deleteAllProjectsByActiveTesters();

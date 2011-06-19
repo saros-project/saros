@@ -5,10 +5,12 @@ import static de.fu_berlin.inf.dpp.stf.client.tester.SarosTester.BOB;
 import static de.fu_berlin.inf.dpp.stf.client.tester.SarosTester.CARL;
 import static de.fu_berlin.inf.dpp.stf.shared.Constants.ACCEPT;
 import static de.fu_berlin.inf.dpp.stf.shared.Constants.SHELL_SESSION_INVITATION;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.rmi.RemoteException;
 
+import org.eclipse.swtbot.swt.finder.widgets.TimeoutException;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -77,16 +79,28 @@ public class EditDuringInvitationTest extends StfTestCase {
             .addToSarosSession();
         CARL.remoteBot().shell(SHELL_SESSION_INVITATION).confirm(ACCEPT);
 
+        CARL.superBot()
+            .confirmShellAddProjectWithNewProject(Constants.PROJECT1);
+
         BOB.superBot().views().packageExplorerView()
             .selectClass(Constants.PROJECT1, Constants.PKG1, Constants.CLS1)
             .open();
+
         BOB.remoteBot().editor(Constants.CLS1_SUFFIX)
-            .setTexWithSave(Constants.CP1);
+            .setTextFromFile(Constants.CP1);
+
+        for (int i = 0; i < 20; i++)
+            BOB.remoteBot().editor(Constants.CLS1_SUFFIX).typeText("FooBar");
+
         String textByBob = BOB.remoteBot().editor(Constants.CLS1_SUFFIX)
             .getText();
 
         CARL.superBot()
-            .confirmShellAddProjectWithNewProject(Constants.PROJECT1);
+            .views()
+            .packageExplorerView()
+            .waitUntilClassExists(Constants.PROJECT1, Constants.PKG1,
+                Constants.CLS1);
+
         CARL.superBot().views().packageExplorerView()
             .selectClass(Constants.PROJECT1, Constants.PKG1, Constants.CLS1)
             .open();
@@ -97,12 +111,16 @@ public class EditDuringInvitationTest extends StfTestCase {
             .getText();
 
         // There are bugs here, CARL get completely different content as BOB.
-        CARL.remoteBot().editor(Constants.CLS1_SUFFIX)
-            .waitUntilIsTextSame(textByBob);
+        try {
+            CARL.remoteBot().editor(Constants.CLS1_SUFFIX)
+                .waitUntilIsTextSame(textByBob);
+        } catch (TimeoutException e) {
+            //
+        }
         String textByCarl = CARL.remoteBot().editor(Constants.CLS1_SUFFIX)
             .getText();
 
-        assertTrue(textByCarl.equals(textByBob));
-        assertTrue(textByAlice.equals(textByBob));
+        assertEquals(textByBob, textByAlice);
+        assertEquals(textByBob, textByCarl);
     }
 }

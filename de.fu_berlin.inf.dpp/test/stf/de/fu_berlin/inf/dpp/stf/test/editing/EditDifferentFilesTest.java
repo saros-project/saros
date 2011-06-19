@@ -24,8 +24,7 @@ public class EditDifferentFilesTest extends StfTestCase {
     }
 
     @Before
-    public void setup() throws RemoteException {
-        super.setUp();
+    public void beforeEveryTest() throws RemoteException {
         deleteAllProjectsByActiveTesters();
         ALICE.superBot().views().packageExplorerView().tree().newC()
             .javaProjectWithClasses("foo", "bar", "HelloWorld");

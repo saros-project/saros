@@ -56,8 +56,8 @@ public class BasicWidgetTreeTest extends StfTestCase {
 
     @Override
     @After
-    public void tearDown() throws RemoteException {
-        announceTestCaseEnd();
+    public void after() throws RemoteException {
+        super.after();
         deleteAllProjectsByActiveTesters();
     }
 
@@ -255,7 +255,7 @@ public class BasicWidgetTreeTest extends StfTestCase {
                 Constants.SVN_CLS1).open();
 
         ALICE.remoteBot().editor(Constants.SVN_CLS1_SUFFIX)
-            .setTextWithoutSave(Constants.CP1);
+            .setTextFromFile(Constants.CP1);
         assertTrue(ALICE.remoteBot().editor(Constants.SVN_CLS1_SUFFIX)
             .isDirty());
         ALICE.remoteBot().view(VIEW_PACKAGE_EXPLORER)

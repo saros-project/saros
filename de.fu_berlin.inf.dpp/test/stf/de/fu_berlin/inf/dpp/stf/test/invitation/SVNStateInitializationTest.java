@@ -90,7 +90,7 @@ public class SVNStateInitializationTest extends StfTestCase {
      */
     @Override
     @Before
-    public void setUp() throws RemoteException {
+    public void before() throws RemoteException {
         ALICE.superBot().views().packageExplorerView()
             .selectProject(Constants.SVN_PROJECT_COPY).copy();
         ALICE.superBot().views().packageExplorerView().tree()
@@ -106,7 +106,7 @@ public class SVNStateInitializationTest extends StfTestCase {
 
     @Override
     @After
-    public void tearDown() throws RemoteException {
+    public void after() throws RemoteException {
         leaveSessionHostFirst(ALICE);
 
         if (ALICE.superBot().views().packageExplorerView().tree()
@@ -340,7 +340,7 @@ public class SVNStateInitializationTest extends StfTestCase {
         String cls1_content_before = ALICE.remoteBot()
             .editor(Constants.SVN_CLS1_SUFFIX).getText();
         ALICE.remoteBot().editor(Constants.SVN_CLS1 + SUFFIX_JAVA)
-            .setTexWithSave(Constants.CP1);
+            .setTextFromFile(Constants.CP1);
         String cls1_content_after = ALICE.remoteBot()
             .editor(Constants.SVN_CLS1_SUFFIX).getText();
         assertFalse(cls1_content_after.equals(cls1_content_before));

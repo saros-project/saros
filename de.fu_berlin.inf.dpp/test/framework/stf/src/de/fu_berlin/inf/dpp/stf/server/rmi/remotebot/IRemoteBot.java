@@ -170,7 +170,7 @@ public interface IRemoteBot extends Remote {
      * @return list of titles of all opened shells
      * @throws RemoteException
      */
-    public List<String> getTitlesOfOpenedShells() throws RemoteException;
+    public List<String> getOpenShellNames() throws RemoteException;
 
     /**
      * 

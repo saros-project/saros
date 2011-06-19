@@ -44,8 +44,8 @@ public class FileOperationsTest extends StfTestCase {
 
     @Override
     @Before
-    public void setUp() throws RemoteException {
-        super.setUp();
+    public void before() throws RemoteException {
+        super.before();
         /*
          * NOTE: The session sharing by Version 11.3.25.DEVEL is not stable,
          * sometime the invitation process can not be completed, so it's
@@ -71,7 +71,7 @@ public class FileOperationsTest extends StfTestCase {
 
     @Override
     @After
-    public void tearDown() throws RemoteException {
+    public void after() throws RemoteException {
         announceTestCaseEnd();
         leaveSessionHostFirst(ALICE);
         deleteAllProjectsByActiveTesters();
@@ -219,7 +219,7 @@ public class FileOperationsTest extends StfTestCase {
             .exists(Constants.CLS1_SUFFIX));
 
         ALICE.remoteBot().editor(Constants.CLS1_SUFFIX)
-            .setTexWithSave(Constants.CP1);
+            .setTextFromFile(Constants.CP1);
 
         String clsContentOfAlice = ALICE
             .superBot()

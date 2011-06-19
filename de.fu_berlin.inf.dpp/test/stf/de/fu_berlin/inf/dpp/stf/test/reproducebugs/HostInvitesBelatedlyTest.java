@@ -98,8 +98,7 @@ public class HostInvitesBelatedlyTest extends StfTestCase {
         ALICE.superBot().views().packageExplorerView()
             .selectClass(Constants.PROJECT1, Constants.PKG1, Constants.CLS1)
             .open();
-        ALICE.remoteBot().editor(Constants.CLS1_SUFFIX)
-            .setTextWithoutSave(Constants.CP1);
+        ALICE.remoteBot().editor(Constants.CLS1_SUFFIX).setText(Constants.CP1);
         String dirtyContent1ByAlice = ALICE.remoteBot()
             .editor(Constants.CLS1_SUFFIX).getText();
 
@@ -108,14 +107,13 @@ public class HostInvitesBelatedlyTest extends StfTestCase {
             .open();
 
         BOB.remoteBot().editor(Constants.CLS1_SUFFIX)
-            .setTexWithSave(Constants.CP1_CHANGE);
+            .setTextFromFile(Constants.CP1_CHANGE);
 
         ALICE.superBot().views().packageExplorerView()
             .selectClass(Constants.PROJECT1, Constants.PKG1, Constants.CLS2)
             .open();
 
-        ALICE.remoteBot().editor(Constants.CLS2_SUFFIX)
-            .setTextWithoutSave(Constants.CP2);
+        ALICE.remoteBot().editor(Constants.CLS2_SUFFIX).setText(Constants.CP2);
         String dirtyContent2ByAlice = ALICE.remoteBot()
             .editor(Constants.CLS2_SUFFIX).getText();
 
@@ -124,7 +122,7 @@ public class HostInvitesBelatedlyTest extends StfTestCase {
             .open();
 
         BOB.remoteBot().editor(Constants.CLS2_SUFFIX)
-            .setTextWithoutSave(Constants.CP2_CHANGE);
+            .setText(Constants.CP2_CHANGE);
         // BOB.editor.closeJavaEditorWithSave(CLS1);
         // BOB.editor.closeJavaEditorWithSave(CLS2);
 

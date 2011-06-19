@@ -110,7 +110,7 @@ public class AllParticipantsFollowUserWithWriteAccessTest extends StfTestCase {
     @Test
     public void testFollowModeByEditingClassByAlice() throws RemoteException {
         ALICE.remoteBot().editor(Constants.CLS1_SUFFIX)
-            .setTextWithoutSave(Constants.CP1);
+            .setTextFromFile(Constants.CP1);
         String dirtyClsContentOfAlice = ALICE.remoteBot()
             .editor(Constants.CLS1_SUFFIX).getText();
 
@@ -172,7 +172,7 @@ public class AllParticipantsFollowUserWithWriteAccessTest extends StfTestCase {
         assertTrue(DAVE.remoteBot().isEditorOpen(Constants.CLS1_SUFFIX));
 
         ALICE.remoteBot().editor(Constants.CLS1_SUFFIX)
-            .setTextWithoutSave(Constants.CP1_CHANGE);
+            .setTextFromFile(Constants.CP1_CHANGE);
         ALICE.remoteBot().editor(Constants.CLS1 + SUFFIX_JAVA).closeWithSave();
 
         String clsContentOfAlice = ALICE

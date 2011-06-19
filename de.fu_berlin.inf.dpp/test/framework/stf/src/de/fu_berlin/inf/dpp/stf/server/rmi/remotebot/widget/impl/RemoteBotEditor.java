@@ -70,15 +70,14 @@ public class RemoteBotEditor extends AbstractRemoteWidget implements
             stfBot.shell(SHELL_SAVE_RESOURCE).confirm(NO);
     }
 
-    public void setTexWithSave(String contentPath) throws RemoteException {
+    public void setTextFromFile(String contentPath) throws RemoteException {
         String contents = getFileContentNoGUI(contentPath);
         widget.setText(contents);
         widget.save();
     }
 
-    public void setTextWithoutSave(String contentPath) throws RemoteException {
-        String contents = getFileContentNoGUI(contentPath);
-        widget.setText(contents);
+    public void setText(String text) throws RemoteException {
+        widget.setText(text);
     }
 
     public void typeText(String text) throws RemoteException {

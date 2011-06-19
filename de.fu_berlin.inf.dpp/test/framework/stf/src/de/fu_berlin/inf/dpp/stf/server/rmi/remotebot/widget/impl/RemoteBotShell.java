@@ -109,10 +109,11 @@ public class RemoteBotShell extends AbstractRemoteWidget implements
     public void confirmWithTextFieldAndWait(Map<String, String> labelsAndTexts,
         String buttonText) throws RemoteException {
         activate();
-        for (String label : labelsAndTexts.keySet()) {
-            String text = labelsAndTexts.get(label);
-            bot().textWithLabel(label).setText(text);
-        }
+
+        for (Map.Entry<String, String> entry : labelsAndTexts.entrySet())
+            bot().textWithLabel(/* label */entry.getKey()).setText(
+                /* text */entry.getValue());
+
         bot().button(buttonText).waitUntilIsEnabled();
         bot().button(buttonText).click();
 
@@ -235,7 +236,7 @@ public class RemoteBotShell extends AbstractRemoteWidget implements
      **********************************************/
 
     public void waitUntilActive() throws RemoteException {
-        stfBot.waitUntil(SarosConditions.ShellActive(widget));
+        stfBot.waitUntil(SarosConditions.isShellActive(widget));
     }
 
     public void waitShortUntilIsClosed() throws RemoteException {

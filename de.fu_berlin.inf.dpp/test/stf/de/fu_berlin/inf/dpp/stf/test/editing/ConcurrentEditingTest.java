@@ -29,8 +29,8 @@ public class ConcurrentEditingTest extends StfTestCase {
 
     @Override
     @Before
-    public void setUp() throws RemoteException {
-        super.setUp();
+    public void before() throws RemoteException {
+        super.before();
         leaveSessionPeersFirst(ALICE);
         deleteAllProjectsByActiveTesters();
     }
@@ -58,7 +58,7 @@ public class ConcurrentEditingTest extends StfTestCase {
             .selectProject(Constants.PROJECT1).newC().file(FILE);
         ALICE.remoteBot().waitUntilEditorOpen(FILE);
         ALICE.remoteBot().editor(FILE)
-            .setTexWithSave("test/resources/stf/lorem.txt");
+            .setTextFromFile("test/resources/stf/lorem.txt");
         ALICE.remoteBot().editor(FILE).navigateTo(0, 6);
 
         Util.buildSessionSequentially(Constants.PROJECT1,
