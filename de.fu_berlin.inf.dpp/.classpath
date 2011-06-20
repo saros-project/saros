@@ -11,8 +11,14 @@
 	<classpathentry kind="lib" path="lib/org.eclipse.swtbot.junit4_x_2.0.4.20110304_0338-e5aff47-dev-e36.jar"/>
 	<classpathentry kind="lib" path="lib/org.eclipse.swtbot.swt.finder_2.0.4.20110304_0338-e5aff47-dev-e36.jar"/>
 	<classpathentry kind="lib" path="lib/commons-io-2.0.1.jar"/>
+	<classpathentry kind="lib" path="lib/cglib-nodep-2.2.jar"/>
+	<classpathentry kind="lib" path="lib/easymock-3.0.jar"/>
+	<classpathentry kind="lib" path="lib/javassist-3.14.0-GA.jar"/>
+	<classpathentry kind="lib" path="lib/objenesis-1.2.jar"/>
+	<classpathentry kind="lib" path="lib/powermock-easymock-1.4.9-full.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/J2SE-1.5"/>
 	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="src" path="test/stf"/>
 	<classpathentry kind="src" path="test/junit"/>
@@ -34,9 +40,6 @@
 	<classpathentry exported="true" kind="lib" path="lib/lw-nio-4.18.8-Java1.5.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/lw-rudp-4.18.8-Java1.5.jar"/>
 	<classpathentry kind="lib" path="lib/picocontainer-gems-2.7.jar" sourcepath="lib/picocontainer-gems-2.7-sources.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/cglib-nodep-2.1_3.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/easymock-2.0.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/easymockclassextension-2.0-pre-release.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/commons-httpclient-3.1.jar"/>
 	<classpathentry kind="lib" path="lib/joda-time-1.6.jar" sourcepath="lib/joda-time-1.6-sources.jar"/>
 	<classpathentry kind="lib" path="lib/protobuf-2.3.0.jar" sourcepath="lib/protobuf-2.3.0-src.jar"/>
