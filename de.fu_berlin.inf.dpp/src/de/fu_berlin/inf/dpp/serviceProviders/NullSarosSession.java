@@ -232,7 +232,7 @@ public class NullSarosSession implements ISarosSession {
         return null;
     }
 
-    public void addSharedProjectResources(IProject project, String projectID,
+    public void addSharedResources(IProject project, String projectID,
         List<IResource> dependentResources) {
         log.warn("unexpected method call");
 
@@ -250,7 +250,7 @@ public class NullSarosSession implements ISarosSession {
 
     }
 
-    public List<IResource> getAllSharedProjectResources() {
+    public List<IResource> getAllSharedResources() {
         log.warn("unexpected method call");
         return null;
     }
@@ -273,7 +273,7 @@ public class NullSarosSession implements ISarosSession {
         log.warn("unexpected method call");
     }
 
-    public List<IResource> getSharedProjectResources(IProject project) {
+    public List<IResource> getSharedResources(IProject project) {
         log.warn("unexpected method call");
         return null;
     }

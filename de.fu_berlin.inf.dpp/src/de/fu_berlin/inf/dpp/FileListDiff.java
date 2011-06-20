@@ -7,7 +7,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
@@ -20,6 +19,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
 
 import de.fu_berlin.inf.dpp.FileList.FileListData;
+import de.fu_berlin.inf.dpp.util.FileUtils;
 
 /**
  * A diff between two {@link FileList}s.
@@ -175,7 +175,7 @@ public class FileListDiff {
                 IFolder folder = localProject.getFolder(path);
                 if (!folder.exists()) {
                     monitor.subTask("Creating folder " + path.lastSegment());
-                    prepareFolder(folder, monitor);
+                    FileUtils.create(folder);
                     continue;
                 }
             } else {
@@ -185,22 +185,6 @@ public class FileListDiff {
         }
         monitor.done();
         return result;
-    }
-
-    /**
-     * Recursively creates non existing parent folders of folders in FileList.
-     * 
-     * @param folder
-     * @param monitor
-     * @throws CoreException
-     */
-    protected void prepareFolder(IFolder folder, SubMonitor monitor)
-        throws CoreException {
-        IContainer parent = folder.getParent();
-        if (parent instanceof IFolder && !parent.exists())
-            prepareFolder((IFolder) parent, monitor);
-        if (!folder.exists())
-            folder.create(true, true, monitor.newChild(1));
     }
 
     /**

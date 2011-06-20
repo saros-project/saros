@@ -42,14 +42,14 @@ public class ShareProjectAddProjectsWizard extends Wizard {
 
     @Override
     public boolean performFinish() {
-        List<IResource> selectedProjectResources = projectSelectionWizardPage
-            .getSelectedProjectResources();
-        if (selectedProjectResources == null
-            || selectedProjectResources.isEmpty())
+        List<IResource> selectedResources = projectSelectionWizardPage
+            .getSelectedResources();
+        if (selectedResources == null
+            || selectedResources.isEmpty())
             return false;
 
-        CollaborationUtils.addProjectResourcesToSarosSession(
-            sarosSessionManager, selectedProjectResources);
+        CollaborationUtils.addResourcesToSarosSession(
+            sarosSessionManager, selectedResources);
 
         return true;
     }

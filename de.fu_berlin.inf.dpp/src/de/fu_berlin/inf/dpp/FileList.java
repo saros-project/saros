@@ -286,8 +286,8 @@ public class FileList {
      */
     public int computeMatch(IProject project) {
         try {
-            return this.computeMatch(new FileList(project, useVersionControl,
-                null));
+            return this.computeMatch(FileListFactory.createFileList(project,
+                null, useVersionControl, null));
         } catch (CoreException e) {
             log.error("Failed to generate FileList for match computation", e);
         }

@@ -523,7 +523,7 @@
          point="org.eclipse.ui.commands">      
       <command
             categoryId="org.eclipse.ui.category.project"
-            id="de.fu_berlin.inf.dpp.ui.commands.ShareProjectResource"
+            id="de.fu_berlin.inf.dpp.ui.commands.ShareResource"
             name="Share Project(s)...">
       </command>
       <command
@@ -533,7 +533,7 @@
       </command>
       <command
             categoryId="org.eclipse.ui.category.project"
-            id="de.fu_berlin.inf.dpp.ui.commands.SharedProjectAddProjectResources"
+            id="de.fu_berlin.inf.dpp.ui.commands.SharedProjectAddResources"
             name="Add Projects...">
       </command>
       <command
@@ -543,7 +543,7 @@
       </command>
       <command
             categoryId="org.eclipse.ui.category.project"
-            id="de.fu_berlin.inf.dpp.ui.commands.SharedProjectAddSelectedProjectResources"
+            id="de.fu_berlin.inf.dpp.ui.commands.SharedProjectAddSelectedResources"
             name="Add to Saros Session">
       </command>
       <command
@@ -556,7 +556,7 @@
          point="org.eclipse.ui.handlers">
       <handler
       class="de.fu_berlin.inf.dpp.ui.commandHandlers.ShareProjectHandler"
-            commandId="de.fu_berlin.inf.dpp.ui.commands.ShareProjectResource">
+            commandId="de.fu_berlin.inf.dpp.ui.commands.ShareResource">
          <activeWhen>
             <and>
                <reference
@@ -586,7 +586,7 @@
       </handler>
       <handler
             class="de.fu_berlin.inf.dpp.ui.commandHandlers.SharedProjectAddProjectsHandler"
-            commandId="de.fu_berlin.inf.dpp.ui.commands.SharedProjectAddProjectResources">
+            commandId="de.fu_berlin.inf.dpp.ui.commands.SharedProjectAddResources">
          <activeWhen>
             <and>
                <reference
@@ -614,7 +614,7 @@
       </handler>
       <handler
             class="de.fu_berlin.inf.dpp.ui.commandHandlers.SharedProjectAddSelectedProjectsHandler"
-            commandId="de.fu_berlin.inf.dpp.ui.commands.SharedProjectAddSelectedProjectResources">
+            commandId="de.fu_berlin.inf.dpp.ui.commands.SharedProjectAddSelectedResources">
          <activeWhen>
             <and>
                <reference
@@ -624,7 +624,7 @@
                      definitionId="de.fu_berlin.inf.dpp.ui.definitions.isSarosSessionRunning">
                </reference>
                <reference
-                     definitionId="de.fu_berlin.inf.dpp.ui.definitions.projectResourcesSelected">
+                     definitionId="de.fu_berlin.inf.dpp.ui.definitions.resourcesSelected">
                </reference>
                <not>
                   <reference
@@ -732,7 +732,7 @@
                </visibleWhen>
             </command>
             <command
-                  commandId="de.fu_berlin.inf.dpp.ui.commands.ShareProjectResource"
+                  commandId="de.fu_berlin.inf.dpp.ui.commands.ShareResource"
                   disabledIcon="icons/dlcl16/spacer.png"
                   icon="icons/elcl16/project_share_tsk.png"
                   style="push">
@@ -762,7 +762,7 @@
                </visibleWhen>
             </command>
             <command
-                  commandId="de.fu_berlin.inf.dpp.ui.commands.SharedProjectAddProjectResources"
+                  commandId="de.fu_berlin.inf.dpp.ui.commands.SharedProjectAddResources"
                   disabledIcon="icons/dlcl16/project_share_add_projects_tsk.png"
                   icon="icons/elcl16/project_share_add_projects_tsk.png"
                   style="push">
@@ -865,7 +865,7 @@
             allPopups="false"
             locationURI="popup:de.fu_berlin.inf.dpp.ui.views.SarosView?after=additions">
          <command
-               commandId="de.fu_berlin.inf.dpp.ui.commands.ShareProjectResource"
+               commandId="de.fu_berlin.inf.dpp.ui.commands.ShareResource"
                disabledIcon="icons/dlcl16/spacer.png"
                icon="icons/elcl16/project_share_tsk.png"
                style="push">
@@ -907,7 +907,7 @@
             </visibleWhen>
          </command>
          <command
-               commandId="de.fu_berlin.inf.dpp.ui.commands.SharedProjectAddProjectResources"
+               commandId="de.fu_berlin.inf.dpp.ui.commands.SharedProjectAddResources"
                disabledIcon="icons/dlcl16/project_share_add_projects_tsk.png"
                icon="icons/elcl16/project_share_add_projects_tsk.png"
                style="push">
@@ -1036,7 +1036,7 @@
                            </reference>
                         </not>
                         <reference
-                              definitionId="de.fu_berlin.inf.dpp.ui.definitions.projectResourcesSelected">
+                              definitionId="de.fu_berlin.inf.dpp.ui.definitions.resourcesSelected">
                         </reference>
                      </and>
             </visibleWhen>
@@ -1072,7 +1072,7 @@
                      visible="true">
                </separator>
                <command
-                     commandId="de.fu_berlin.inf.dpp.ui.commands.ShareProjectResource"
+                     commandId="de.fu_berlin.inf.dpp.ui.commands.ShareResource"
                      label="Multiple Buddies..."
                      style="push">
                </command>
@@ -1089,7 +1089,7 @@
                </separator>
             </menu>
             <command
-                  commandId="de.fu_berlin.inf.dpp.ui.commands.SharedProjectAddSelectedProjectResources"
+                  commandId="de.fu_berlin.inf.dpp.ui.commands.SharedProjectAddSelectedResources"
                   disabledIcon="icons/dlcl16/project_share_add_projects_tsk.png"
                   icon="icons/elcl16/project_share_add_projects_tsk.png"
                   style="push">
@@ -1103,7 +1103,7 @@
                            definitionId="de.fu_berlin.inf.dpp.ui.definitions.isSarosSessionRunning">
                      </reference>
                      <reference
-                           definitionId="de.fu_berlin.inf.dpp.ui.definitions.projectResourcesSelected">
+                           definitionId="de.fu_berlin.inf.dpp.ui.definitions.resourcesSelected">
                      </reference>
                   </and>
                </visibleWhen>
@@ -1149,7 +1149,7 @@
             </command>
             <dynamic
                   class="de.fu_berlin.inf.dpp.ui.menuContributions.ProjectShareProjects"
-                  id="de.fu_berlin.inf.dpp.ui.menus.ProjectShareProjectResources">
+                  id="de.fu_berlin.inf.dpp.ui.menus.ProjectShareResources">
                <visibleWhen
                      checkEnabled="false">
                   <reference
@@ -1162,7 +1162,7 @@
                   visible="true">
             </separator>
             <command
-                  commandId="de.fu_berlin.inf.dpp.ui.commands.ShareProjectResource"
+                  commandId="de.fu_berlin.inf.dpp.ui.commands.ShareResource"
                   label="Multiple Projects..."
                   style="push">
             </command>
@@ -1493,7 +1493,7 @@
          </adapt>
       </definition>
       <definition
-            id="de.fu_berlin.inf.dpp.ui.definitions.projectResourcesSelected">
+            id="de.fu_berlin.inf.dpp.ui.definitions.resourcesSelected">
          <with
                variable="selection">
             <iterate

@@ -347,6 +347,14 @@ public interface ISarosSession extends IActivityListener {
     public boolean isShared(IResource resource);
 
     /**
+     * Checks if selected project is a complete shared one or partial shared.
+     * 
+     * @param project
+     * @return true if complete false if partial
+     */
+    public boolean isCompletelyShared(IProject project);
+
+    /**
      * Returns true if VCS support is enabled for this session.<br>
      * <br>
      * This setting can be changed in the Preferences. VCS support can be
@@ -383,7 +391,7 @@ public interface ISarosSession extends IActivityListener {
      * @param dependentResources
      *            The project dependent resources.
      */
-    public void addSharedProjectResources(IProject project, String projectID,
+    public void addSharedResources(IProject project, String projectID,
         List<IResource> dependentResources);
 
     /**
@@ -412,7 +420,7 @@ public interface ISarosSession extends IActivityListener {
      * @return Returns a list of all resources (excluding projects) from current
      *         session.
      */
-    public List<IResource> getAllSharedProjectResources();
+    public List<IResource> getAllSharedResources();
 
     /**
      * Returns HashMap with the mapping of shared resources to their project.
@@ -427,25 +435,17 @@ public interface ISarosSession extends IActivityListener {
      * @param project
      * @return
      */
-    public List<IResource> getSharedProjectResources(IProject project);
+    public List<IResource> getSharedResources(IProject project);
 
     /**
-     * Checks if selected project is a complete shared one or partial shared.
-     * 
-     * @param project
-     * @return true if complete false if partial
+     * Triggers queuing of incoming ActivityDataObjects on receiver side to
+     * process queued {@link IActivityDataObject}s after file transmission.
      */
-    public boolean isCompletelyShared(IProject project);
+    public void startQueue();
 
     /**
      * Stops queuing on receiver side to process queued
      * {@link IActivityDataObject}s.
      */
     public void stopQueue();
-
-    /**
-     * Starts queuing on receiver side to process queued
-     * {@link IActivityDataObject}s after file transmission.
-     */
-    public void startQueue();
 }

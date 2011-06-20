@@ -27,10 +27,10 @@ public class SharedProjectAddSelectedProjectsHandler extends AbstractHandler {
         if (sarosSessionManager == null)
             SarosPluginContext.initComponent(this);
 
-        List<IResource> resources = SelectionRetrieverFactory
+        List<IResource> selectedResources = SelectionRetrieverFactory
             .getSelectionRetriever(IResource.class).getSelection();
-        CollaborationUtils.addProjectResourcesToSarosSession(
-            sarosSessionManager, resources);
+        CollaborationUtils.addResourcesToSarosSession(
+            sarosSessionManager, selectedResources);
         return null;
     }
 

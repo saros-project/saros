@@ -40,14 +40,13 @@ public interface ISarosSessionManager {
     /**
      * Starts a new Saros session with the local user as only participant.
      * 
-     * @param partialProjectResources
+     * @param projectResources
      *            the local Eclipse project resources which should become
      *            shared.
      * @throws XMPPException
      *             if this method is called with no established XMPP-connection.
      */
-    public void startSession(
-        HashMap<IProject, List<IResource>> partialProjectResources)
+    public void startSession(HashMap<IProject, List<IResource>> projectResources)
         throws XMPPException;
 
     /**
@@ -120,6 +119,7 @@ public interface ISarosSessionManager {
      * initiate the ({@link OutgoingProjectNegotiation project exchanging}) with
      * user
      */
-    public void startSharingProjects(JID user, List<ProjectExchangeInfo> projectExchangeInfos);
+    public void startSharingProjects(JID user,
+        List<ProjectExchangeInfo> projectExchangeInfos);
 
 }

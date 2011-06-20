@@ -39,6 +39,7 @@ import org.junit.Test;
 
 import de.fu_berlin.inf.dpp.FileList;
 import de.fu_berlin.inf.dpp.FileListDiff;
+import de.fu_berlin.inf.dpp.FileListFactory;
 import de.fu_berlin.inf.dpp.test.stubs.FileStub;
 
 /**
@@ -78,14 +79,17 @@ public class FileListTest {
         resources.add(fileInRoot2);
         resources.add(fileInSubDir1);
         threeFileList.addAll(resources);
-        threeEntryList = new FileList(resources, false, null);
+        threeEntryList = FileListFactory.createFileList(null, resources, false,
+            null);
         resources.add(fileInSubDir2);
-        fourEntryList = new FileList(resources, false, null);
+        fourEntryList = FileListFactory.createFileList(null, resources, false,
+            null);
         resources.remove(fileInSubDir1);
         resources.add(fileInSubDir1changed);
-        modifiedFourEntryList = new FileList(resources, false, null);
+        modifiedFourEntryList = FileListFactory.createFileList(null, resources,
+            false, null);
 
-        emptyFileList = new FileList();
+        emptyFileList = FileListFactory.createEmptyFileList();
     }
 
     @Test
@@ -201,7 +205,8 @@ public class FileListTest {
 
     @Test
     public void testEquals() throws CoreException {
-        FileList sameFileList = new FileList(threeFileList, false, null);
+        FileList sameFileList = FileListFactory.createFileList(null,
+            threeFileList, false, null);
         assertEquals(threeEntryList, sameFileList);
         assertEquals(emptyFileList, emptyFileList);
 
@@ -232,7 +237,7 @@ public class FileListTest {
         for (int i = 0; i < 100; i++)
             files.add(new Path("xml_me_" + i + "/<![CDATA["));
 
-        FileList list = new FileList(files);
+        FileList list = FileListFactory.createPathFileList(files);
 
         String xml = list.toXML();
         FileList listFromXml = FileList.fromXML(xml);
@@ -247,8 +252,8 @@ public class FileListTest {
             files.add(new Path(File.createTempFile("saros_flt_junit", null)
                 .getPath()));
 
-        FileList list1 = new FileList(files);
-        FileList list2 = new FileList(files);
+        FileList list1 = FileListFactory.createPathFileList(files);
+        FileList list2 = FileListFactory.createPathFileList(files);
 
         assertEquals(100, list1.computeMatch(list2));
     }

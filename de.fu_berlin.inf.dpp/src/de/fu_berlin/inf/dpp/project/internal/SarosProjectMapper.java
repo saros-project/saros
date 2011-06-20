@@ -109,7 +109,7 @@ class SarosProjectMapper {
         return Collections.unmodifiableSet(idMapping.values());
     }
 
-    public synchronized List<IResource> getProjectResources(
+    public synchronized List<IResource> getResources(
         IProject localProject) {
         return resourceMapping.get(localProject);
     }

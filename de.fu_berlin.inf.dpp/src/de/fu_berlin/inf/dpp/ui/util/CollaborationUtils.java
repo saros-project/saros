@@ -43,7 +43,7 @@ public class CollaborationUtils {
      * 
      * @nonBlocking
      */
-    public static void shareProjectResourcesWith(
+    public static void shareResourcesWith(
         final SarosSessionManager sarosSessionManager,
         List<IResource> selectedResources, final List<JID> buddies) {
 
@@ -62,7 +62,7 @@ public class CollaborationUtils {
                                     .openError(
                                         null,
                                         "Offline",
-                                        getShareProjectResourcesFailureMessage(newResources
+                                        getShareResourcesFailureMessage(newResources
                                             .keySet()));
                                 log.warn("Start share project failed", e);
                             }
@@ -139,12 +139,12 @@ public class CollaborationUtils {
      * 
      * @nonBlocking
      */
-    public static void addProjectResourcesToSarosSession(
+    public static void addResourcesToSarosSession(
         final SarosSessionManager sarosSessionManager,
         List<IResource> resourcesToAdd) {
-        final HashMap<IProject, List<IResource>> newResources = acquireResources(
+        final HashMap<IProject, List<IResource>> projectResources = acquireResources(
             resourcesToAdd, sarosSessionManager.getSarosSession());
-        if (newResources.isEmpty())
+        if (projectResources.isEmpty())
             return;
         Utils.runSafeAsync(log, new Runnable() {
             public void run() {
@@ -154,7 +154,7 @@ public class CollaborationUtils {
                     Utils.runSafeSync(log, new Runnable() {
                         public void run() {
                             sarosSessionManager
-                                .addProjectResourcesToSession(newResources);
+                                .addResourcesToSession(projectResources);
                         }
                     });
                 } else {
@@ -225,7 +225,7 @@ public class CollaborationUtils {
      * @param projects
      * @return
      */
-    private static String getShareProjectResourcesFailureMessage(
+    private static String getShareResourcesFailureMessage(
         Set<IProject> projects) {
 
         StringBuilder message = new StringBuilder();
@@ -293,7 +293,7 @@ public class CollaborationUtils {
 
         if (iSarosSession != null) {
             List<IResource> alreadySharedResources = iSarosSession
-                .getAllSharedProjectResources();
+                .getAllSharedResources();
             selectedResources.removeAll(alreadySharedResources);
         }
         for (int i = 0; i < selectedResources.size(); i++) {

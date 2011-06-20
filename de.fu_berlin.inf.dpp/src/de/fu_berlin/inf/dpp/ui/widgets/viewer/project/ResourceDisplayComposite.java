@@ -38,11 +38,11 @@ import de.fu_berlin.inf.dpp.util.ArrayUtils;
  * @author kheld
  * 
  */
-public class ProjectResourceDisplayComposite extends ViewerComposite {
+public class ResourceDisplayComposite extends ViewerComposite {
     @Inject
     protected Saros saros;
 
-    public ProjectResourceDisplayComposite(Composite parent, int style) {
+    public ResourceDisplayComposite(Composite parent, int style) {
         super(parent, style);
 
         SarosPluginContext.initComponent(this);
@@ -79,7 +79,7 @@ public class ProjectResourceDisplayComposite extends ViewerComposite {
      * 
      * @return
      */
-    public List<IResource> getProjectResources() {
+    public List<IResource> getResources() {
         WorkbenchContentProvider contentProvider = (WorkbenchContentProvider) this.viewer
             .getContentProvider();
 

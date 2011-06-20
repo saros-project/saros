@@ -11,6 +11,7 @@ public class ProjectExchangeInfo {
     protected FileList fileList;
     protected String projectName;
     protected String projectID;
+    protected boolean partial;
 
     // The description is not used yet, but there was a description field all
     // the time and I didn't want to delete it. This field could be useful
@@ -28,11 +29,12 @@ public class ProjectExchangeInfo {
      *            Complete List of all Files in the project.
      */
     public ProjectExchangeInfo(String projectID, String description,
-        String projectName, FileList fileList) {
+        String projectName, boolean partial, FileList fileList) {
         this.fileList = fileList;
         this.projectName = projectName;
         this.description = description;
         this.projectID = projectID;
+        this.partial = partial;
     }
 
     public FileList getFileList() {
@@ -51,8 +53,13 @@ public class ProjectExchangeInfo {
         return projectID;
     }
 
+    public boolean isPartial() {
+        return partial;
+    }
+
     public ProjectExchangeInfoDataObject toProjectInfoDataObject() {
         return new ProjectExchangeInfoDataObject(projectID, description,
-            projectName, fileList.toXML());
+            projectName, partial, fileList.toXML());
     }
+
 }

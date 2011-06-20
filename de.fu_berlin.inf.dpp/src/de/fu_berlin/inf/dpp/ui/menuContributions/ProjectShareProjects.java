@@ -104,10 +104,10 @@ public class ProjectShareProjects extends ContributionItem {
         menuItem.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
-                List<IResource> projectResources = new ArrayList<IResource>();
-                projectResources.add(project);
-                CollaborationUtils.shareProjectResourcesWith(sarosSessionManager,
-                    projectResources, selectedBuddies);
+                List<IResource> resources = new ArrayList<IResource>();
+                resources.add(project);
+                CollaborationUtils.shareResourcesWith(sarosSessionManager,
+                    resources, selectedBuddies);
             }
         });
 

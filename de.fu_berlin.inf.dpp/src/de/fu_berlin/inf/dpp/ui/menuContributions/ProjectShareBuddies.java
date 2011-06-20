@@ -60,7 +60,7 @@ public class ProjectShareBuddies extends ContributionItem {
         if (!this.saros.isConnected())
             return;
 
-        final List<IResource> selectedProjectResources = SelectionRetrieverFactory
+        final List<IResource> selectedResources = SelectionRetrieverFactory
             .getSelectionRetriever(IResource.class).getSelection();
 
         int numSarosSupportedBuddies = 0;
@@ -76,7 +76,7 @@ public class ProjectShareBuddies extends ContributionItem {
 
             if (sarosSupport) {
                 createBuddyMenuItem(menu, numSarosSupportedBuddies++,
-                    rosterEntry, selectedProjectResources);
+                    rosterEntry, selectedResources);
             }
         }
 
@@ -131,7 +131,7 @@ public class ProjectShareBuddies extends ContributionItem {
             public void widgetSelected(SelectionEvent e) {
                 List<JID> buddies = new ArrayList<JID>();
                 buddies.add(new JID(rosterEntry));
-                CollaborationUtils.shareProjectResourcesWith(
+                CollaborationUtils.shareResourcesWith(
                     sarosSessionManager, resources, buddies);
             }
         });

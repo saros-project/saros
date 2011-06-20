@@ -135,7 +135,7 @@ public class SarosSession implements ISarosSession, Disposable {
 
     protected BlockingQueue<List<IActivity>> pendingActivityLists = new LinkedBlockingQueue<List<IActivity>>();
 
-    protected List<IResource> selectedProjectResources = new ArrayList<IResource>();
+    protected List<IResource> selectedResources = new ArrayList<IResource>();
 
     public boolean cancelActivityDispatcher = false;
 
@@ -282,7 +282,7 @@ public class SarosSession implements ISarosSession, Disposable {
         concurrentDocumentClient = new ConcurrentDocumentClient(this);
     }
 
-    public void addSharedProjectResources(IProject project, String projectID,
+    public void addSharedResources(IProject project, String projectID,
         List<IResource> dependentResources) {
         if (!isCompletelyShared(project) && dependentResources != null) {
             for (IResource iResource : dependentResources) {
@@ -290,10 +290,10 @@ public class SarosSession implements ISarosSession, Disposable {
                     addMembers(iResource, dependentResources);
                 }
             }
-            if (selectedProjectResources != null) {
-                selectedProjectResources.removeAll(dependentResources);
-                dependentResources.addAll(selectedProjectResources);
-                selectedProjectResources.clear();
+            if (selectedResources != null) {
+                selectedResources.removeAll(dependentResources);
+                dependentResources.addAll(selectedResources);
+                selectedResources.clear();
             }
         }
         if (!projectMapper.isShared(project)) {
@@ -301,8 +301,8 @@ public class SarosSession implements ISarosSession, Disposable {
                 project, this));
             projectMapper.addResourceMapping(project, dependentResources);
         } else {
-            List<IResource> resources = getSharedProjectResources(project);
-            if (resources != null) {
+            List<IResource> resources = getSharedResources(project);
+            if (resources != null && dependentResources != null) {
                 resources.addAll(dependentResources);
                 projectMapper.addResourceMapping(project, resources);
             }
@@ -822,7 +822,7 @@ public class SarosSession implements ISarosSession, Disposable {
             if (isCompletelyShared(project))
                 return true;
 
-            List<IResource> resources = getSharedProjectResources(project);
+            List<IResource> resources = getSharedResources(project);
             switch (fileActivity.getType()) {
             case Created:
                 if (!isShared(file))
@@ -850,8 +850,7 @@ public class SarosSession implements ISarosSession, Disposable {
                 IFile oldFile = fileActivity.getOldPath().getFile();
                 if (oldFile == null || !isShared(oldFile))
                     return false;
-                List<IResource> res = getSharedProjectResources(oldFile
-                    .getProject());
+                List<IResource> res = getSharedResources(oldFile.getProject());
                 if (res != null) {
                     if (res.contains(oldFile))
                         res.remove(oldFile);
@@ -870,7 +869,7 @@ public class SarosSession implements ISarosSession, Disposable {
             IProject iProject = folder.getProject();
             if (isCompletelyShared(iProject))
                 return true;
-            List<IResource> resources = getSharedProjectResources(iProject);
+            List<IResource> resources = getSharedResources(iProject);
             if (resources != null) {
                 switch (folderActivity.getType()) {
                 case Created:
@@ -915,14 +914,14 @@ public class SarosSession implements ISarosSession, Disposable {
         return projectMapper.isShared(resource);
     }
 
-    public List<IResource> getAllSharedProjectResources() {
-        List<IResource> allSharedProjectResources = new ArrayList<IResource>();
+    public List<IResource> getAllSharedResources() {
+        List<IResource> allSharedResources = new ArrayList<IResource>();
         Collection<List<IResource>> resources = projectMapper.getResources();
         for (List<IResource> list : resources) {
             if (list != null)
-                allSharedProjectResources.addAll(list);
+                allSharedResources.addAll(list);
         }
-        return allSharedProjectResources;
+        return allSharedResources;
     }
 
     protected void addMembers(IResource iResource,
@@ -930,7 +929,7 @@ public class SarosSession implements ISarosSession, Disposable {
         if (iResource instanceof IFolder || iResource instanceof IProject) {
 
             if (!isShared(iResource)) {
-                selectedProjectResources.add(iResource);
+                selectedResources.add(iResource);
             } else {
                 return;
             }
@@ -948,7 +947,7 @@ public class SarosSession implements ISarosSession, Disposable {
             }
         } else if (iResource instanceof IFile) {
             if (!isShared(iResource)) {
-                selectedProjectResources.add(iResource);
+                selectedResources.add(iResource);
             }
         }
     }
@@ -1009,7 +1008,7 @@ public class SarosSession implements ISarosSession, Disposable {
         return projectMapper.getProjectResourceMapping();
     }
 
-    public List<IResource> getSharedProjectResources(IProject project) {
+    public List<IResource> getSharedResources(IProject project) {
         return projectMapper.getProjectResourceMapping().get(project);
     }
 

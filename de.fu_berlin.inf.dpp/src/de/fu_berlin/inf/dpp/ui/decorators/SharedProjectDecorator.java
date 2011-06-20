@@ -79,7 +79,7 @@ public class SharedProjectDecorator implements ILightweightLabelDecorator {
         public void projectAdded(String projectID) {
             log.debug("PROJECT ADDED: " + projectID);
             updateDecoratorsAsync(sarosSession.getProjects().toArray());
-            updateDecoratorsAsync(sarosSession.getAllSharedProjectResources()
+            updateDecoratorsAsync(sarosSession.getAllSharedResources()
                 .toArray());
         }
     };

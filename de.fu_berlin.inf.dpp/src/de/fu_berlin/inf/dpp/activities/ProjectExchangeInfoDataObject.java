@@ -8,6 +8,7 @@ public class ProjectExchangeInfoDataObject {
     protected String projectName;
     protected String description;
     protected String projectID;
+    protected boolean partial;
 
     /**
      * 
@@ -20,11 +21,12 @@ public class ProjectExchangeInfoDataObject {
      *            Complete List of all Files in the project.
      */
     public ProjectExchangeInfoDataObject(String projectID, String description,
-        String projectName, String fileList) {
+        String projectName, boolean partial, String fileList) {
         this.xmlFileList = fileList;
         this.projectName = projectName;
         this.description = description;
         this.projectID = projectID;
+        this.partial = partial;
     }
 
     public String getFileList() {
@@ -43,9 +45,12 @@ public class ProjectExchangeInfoDataObject {
         return projectID;
     }
 
-    public ProjectExchangeInfo toProjectInfo() {
-        return new ProjectExchangeInfo(projectID, description, projectName,
-            FileList.fromXML(xmlFileList));
+    public boolean isPartial() {
+        return partial;
     }
 
+    public ProjectExchangeInfo toProjectInfo() {
+        return new ProjectExchangeInfo(projectID, description, projectName,
+            partial, FileList.fromXML(xmlFileList));
+    }
 }

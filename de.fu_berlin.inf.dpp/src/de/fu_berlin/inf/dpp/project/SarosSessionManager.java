@@ -49,6 +49,7 @@ import org.picocontainer.annotations.Inject;
 import org.picocontainer.annotations.Nullable;
 
 import de.fu_berlin.inf.dpp.FileList;
+import de.fu_berlin.inf.dpp.FileListFactory;
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.SarosContext;
 import de.fu_berlin.inf.dpp.User;
@@ -191,7 +192,7 @@ public class SarosSessionManager implements IConnectionListener,
             }
             String projectID = String.valueOf(sessionRandom
                 .nextInt(Integer.MAX_VALUE));
-            sarosSession.addSharedProjectResources(iProject, projectID,
+            sarosSession.addSharedResources(iProject, projectID,
                 projectResourcesMapping.get(iProject));
             notifyProjectAdded(iProject);
         }
@@ -523,7 +524,7 @@ public class SarosSessionManager implements IConnectionListener,
      * @param projectResourcesMapping
      * 
      */
-    public void addProjectResourcesToSession(
+    public void addResourcesToSession(
         HashMap<IProject, List<IResource>> projectResourcesMapping) {
         for (IProject iProject : projectResourcesMapping.keySet()) {
             if (!iProject.isOpen()) {
@@ -538,8 +539,8 @@ public class SarosSessionManager implements IConnectionListener,
             if (!this.getSarosSession().isCompletelyShared(iProject)) {
                 String projectID = String.valueOf(sessionRandom
                     .nextInt(Integer.MAX_VALUE));
-                this.getSarosSession().addSharedProjectResources(iProject,
-                    projectID, projectResourcesMapping.get(iProject));
+                this.getSarosSession().addSharedResources(iProject, projectID,
+                    projectResourcesMapping.get(iProject));
                 notifyProjectAdded(iProject);
             }
         }
@@ -610,17 +611,17 @@ public class SarosSessionManager implements IConnectionListener,
                 String projectID = this.getSarosSession()
                     .getProjectID(iProject);
                 String projectName = iProject.getName();
-                FileList projectFileList = generateFileList(iProject, this
-                    .getSarosSession().getSharedProjectResources(iProject),
+                FileList projectFileList = FileListFactory.createFileList(
+                    iProject,
+                    this.getSarosSession().getSharedResources(iProject),
                     this.getSarosSession().useVersionControl(),
                     subMonitor.newChild(0));
                 projectFileList.setProjectID(projectID);
-                String description = "";
-                if (!this.getSarosSession().isCompletelyShared(iProject))
-                    description = "partial";
+                boolean partial = !this.getSarosSession().isCompletelyShared(
+                    iProject);
 
                 ProjectExchangeInfo pInfo = new ProjectExchangeInfo(projectID,
-                    description, projectName, projectFileList);
+                    "", projectName, partial, projectFileList);
                 pInfos.add(pInfo);
             } catch (CoreException e) {
                 throw new LocalCancellationException(e.getMessage(),
@@ -631,29 +632,6 @@ public class SarosSessionManager implements IConnectionListener,
         subMonitor.subTask("");
         subMonitor.done();
         return pInfos;
-    }
-
-    /**
-     * Put the resources to {@link FileList} that are part of the selection.
-     * 
-     * @param project
-     *            The project that should be added to this file list.
-     * @param resources
-     *            The resources that should be added to this file list.
-     * @param useVersionControl
-     * 
-     * @param subMonitor
-     *            Show progress
-     * @return
-     * @throws CoreException
-     */
-    public FileList generateFileList(IProject project,
-        List<IResource> resources, boolean useVersionControl,
-        SubMonitor subMonitor) throws CoreException {
-        if (resources == null)
-            return new FileList(project, subMonitor);
-
-        return new FileList(resources, useVersionControl, subMonitor);
     }
 
     protected class OutgoingProjectJob extends Job {

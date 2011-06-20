@@ -49,19 +49,19 @@ public class ShareProjectWizard extends Wizard {
 
     @Override
     public boolean performFinish() {
-        List<IResource> selectedProjectResources = projectSelectionWizardPage
-            .getSelectedProjectResources();
+        List<IResource> selectedResources = projectSelectionWizardPage
+            .getSelectedResources();
         List<JID> selectedBuddies = buddySelectionWizardPage
             .getSelectedBuddies();
 
-        if (selectedProjectResources == null || selectedBuddies == null)
+        if (selectedResources == null || selectedBuddies == null)
             return false;
 
-        if (selectedProjectResources.isEmpty() || selectedBuddies.isEmpty())
+        if (selectedResources.isEmpty() || selectedBuddies.isEmpty())
             return false;
 
-        CollaborationUtils.shareProjectResourcesWith(sarosSessionManager,
-            selectedProjectResources, selectedBuddies);
+        CollaborationUtils.shareResourcesWith(sarosSessionManager,
+            selectedResources, selectedBuddies);
 
         return true;
     }

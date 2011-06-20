@@ -26,6 +26,7 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.SubMonitor;
 
 import de.fu_berlin.inf.dpp.FileList;
+import de.fu_berlin.inf.dpp.FileListFactory;
 import de.fu_berlin.inf.dpp.SarosContext;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.activities.ProjectExchangeInfo;
@@ -80,7 +81,7 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
 
     public OutgoingProjectNegotiation(ITransmitter transmitter, JID to,
         ISarosSession sarosSession,
-        HashMap<IProject, List<IResource>> partialProjectResources,
+        HashMap<IProject, List<IResource>> partialResources,
         ProjectNegotiationObservable projectExchangeProcesses,
         StopManager stopManager, SessionIDObservable sessionID,
         boolean doStream, SarosContext sarosContext,
@@ -94,9 +95,8 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
         this.sarosSession = sarosSession;
         this.sessionID = sessionID;
         this.stopManager = stopManager;
-        this.selectedProjectResources = partialProjectResources;
-        this.projects = new ArrayList<IProject>(
-            selectedProjectResources.keySet());
+        this.selectedProjectResources = partialResources;
+        this.projects = new ArrayList<IProject>(selectedProjectResources.keySet());
         this.pInfos = projectExchangeInfos;
 
     }
@@ -151,16 +151,15 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
                 try {
                     String projectID = sarosSession.getProjectID(iProject);
                     String projectName = iProject.getName();
-                    FileList projectFileList = generateFileList(iProject,
-                        this.selectedProjectResources.get(iProject),
+                    FileList projectFileList = FileListFactory.createFileList(
+                        iProject, this.selectedProjectResources.get(iProject),
                         useVersionControl, subMonitor.newChild(0));
                     projectFileList.setProjectID(projectID);
-                    String description = "";
-                    if (!sarosSession.isCompletelyShared(iProject))
-                        description = "partial";
+                    boolean partial = !sarosSession
+                        .isCompletelyShared(iProject);
 
                     ProjectExchangeInfo pInfo = new ProjectExchangeInfo(
-                        projectID, description, projectName, projectFileList);
+                        projectID, "", projectName, partial, projectFileList);
                     pInfos.add(pInfo);
                 } catch (CoreException e) {
                     throw new LocalCancellationException(e.getMessage(),
@@ -179,26 +178,6 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
                 processID, this.doStream));
         subMonitor.done();
 
-    }
-
-    /**
-     * Put the resources to {@link FileList} that are part of the selection.
-     * 
-     * @param project
-     *            The project that should be added to this file list.
-     * @param resources
-     *            The resources that should be added to this file list.
-     * @param useVersionControl
-     * @return
-     * @throws CoreException
-     */
-    private FileList generateFileList(IProject project,
-        List<IResource> resources, boolean useVersionControl,
-        SubMonitor subMonitor) throws CoreException {
-        if (resources == null)
-            return new FileList(project, subMonitor);
-
-        return new FileList(resources, useVersionControl, subMonitor);
     }
 
     /**

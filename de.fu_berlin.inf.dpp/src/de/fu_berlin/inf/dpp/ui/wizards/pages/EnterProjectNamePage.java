@@ -32,6 +32,7 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.dialogs.ContainerSelectionDialog;
 
 import de.fu_berlin.inf.dpp.FileList;
+import de.fu_berlin.inf.dpp.FileListFactory;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
@@ -382,7 +383,7 @@ public class EnterProjectNamePage extends WizardPage {
             .addSelectionListener(new SelectionAdapter() {
                 @Override
                 public void widgetSelected(SelectionEvent e) {
-                    FileList fileList = new FileList();
+                    FileList fileList = FileListFactory.createEmptyFileList();
                     for (FileList fList : EnterProjectNamePage.this.fileLists) {
                         if (fList.getProjectID().equals(projectID)) {
                             fileList = fList;
@@ -741,7 +742,7 @@ public class EnterProjectNamePage extends WizardPage {
      *         user could lead to overwriting project resources,
      *         <code>false</code> otherwise.
      */
-    public boolean overwriteProjectResources(String projectID) {
+    public boolean overwriteResources(String projectID) {
         if (isUpdateSelected(projectID)
             && !copyCheckboxes.get(projectID).getSelection()
             && !isSyncSkippingSelected(projectID)) {

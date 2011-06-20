@@ -22,14 +22,14 @@ import org.eclipse.swt.widgets.Control;
 
 import de.fu_berlin.inf.dpp.ui.util.LayoutUtils;
 import de.fu_berlin.inf.dpp.ui.util.WizardUtils;
-import de.fu_berlin.inf.dpp.ui.widgets.viewer.project.events.BaseProjectResourceSelectionListener;
+import de.fu_berlin.inf.dpp.ui.widgets.viewer.project.events.BaseResourceSelectionListener;
 import de.fu_berlin.inf.dpp.ui.widgets.viewer.project.events.FilterClosedProjectsChangedEvent;
 import de.fu_berlin.inf.dpp.ui.widgets.viewer.project.events.NewProjectListener;
-import de.fu_berlin.inf.dpp.ui.widgets.viewer.project.events.ProjectResourceSelectionListener;
+import de.fu_berlin.inf.dpp.ui.widgets.viewer.project.events.ResourceSelectionListener;
 
 /**
- * This {@link Composite} extends {@link BaseProjectResourceSelectionComposite}
- * and displays additional controls.
+ * This {@link Composite} extends {@link BaseResourceSelectionComposite} and
+ * displays additional controls.
  * <p>
  * This composite does <strong>NOT</strong> handle setting the layout and adding
  * sub {@link Control}s correctly.
@@ -46,8 +46,7 @@ import de.fu_berlin.inf.dpp.ui.widgets.viewer.project.events.ProjectResourceSele
  * @author kheld
  * 
  */
-public class ProjectResourceSelectionComposite extends
-    BaseProjectResourceSelectionComposite {
+public class ResourceSelectionComposite extends BaseResourceSelectionComposite {
     protected boolean filterClosedProjects;
     protected Button filterClosedProjectsButton;
 
@@ -66,14 +65,14 @@ public class ProjectResourceSelectionComposite extends
     };
 
     /**
-     * Constructs a new {@link ProjectResourceSelectionComposite}
+     * Constructs a new {@link ResourceSelectionComposite}
      * 
      * @param parent
      * @param style
      * @param filterClosedProjects
      *            true if initially closed projects should not be displayed
      */
-    public ProjectResourceSelectionComposite(Composite parent, int style,
+    public ResourceSelectionComposite(Composite parent, int style,
         boolean filterClosedProjects) {
         super(parent, style);
 
@@ -155,27 +154,25 @@ public class ProjectResourceSelectionComposite extends
         IProject newProject = listener.getNewProject();
         if (newProject != null) {
             viewer.refresh();
-            List<IResource> selectedProjectResources = this
-                .getSelectedProjectResources();
-            selectedProjectResources.add(newProject);
-            checkboxTreeViewer.setCheckedElements(selectedProjectResources
-                .toArray());
+            List<IResource> selectedResources = this.getSelectedResources();
+            selectedResources.add(newProject);
+            checkboxTreeViewer.setCheckedElements(selectedResources.toArray());
             checkboxTreeViewer.setSubtreeChecked(newProject, true);
         }
     }
 
     /**
-     * Notify all {@link ProjectResourceSelectionListener}s about a changed
-     * {@link ProjectResourceSelectionComposite#filterClosedProjects} option.
+     * Notify all {@link ResourceSelectionListener}s about a changed
+     * {@link ResourceSelectionComposite#filterClosedProjects} option.
      * 
      * @param filterClosedProjects
      */
     public void notifyProjectSelectionListener(boolean filterClosedProjects) {
         FilterClosedProjectsChangedEvent event = new FilterClosedProjectsChangedEvent(
             filterClosedProjects);
-        for (BaseProjectResourceSelectionListener projectResourceSelectionListener : this.projectResourceSelectionListeners) {
-            if (projectResourceSelectionListener instanceof ProjectResourceSelectionListener)
-                ((ProjectResourceSelectionListener) projectResourceSelectionListener)
+        for (BaseResourceSelectionListener resourceSelectionListener : this.resourceSelectionListeners) {
+            if (resourceSelectionListener instanceof ResourceSelectionListener)
+                ((ResourceSelectionListener) resourceSelectionListener)
                     .filterClosedProjectsChanged(event);
         }
     }

@@ -24,6 +24,7 @@ import org.eclipse.swt.widgets.Shell;
 
 import de.fu_berlin.inf.dpp.FileList;
 import de.fu_berlin.inf.dpp.FileListDiff;
+import de.fu_berlin.inf.dpp.FileListFactory;
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
 import de.fu_berlin.inf.dpp.exceptions.RemoteCancellationException;
@@ -114,7 +115,7 @@ public class AddProjectToSessionWizard extends Wizard {
          */
         Map<String, FileListDiff> projectsToOverrideWithDiff = new HashMap<String, FileListDiff>();
         for (String projectID : sources.keySet()) {
-            if (namePage.overwriteProjectResources(projectID)
+            if (namePage.overwriteResources(projectID)
                 && !preferenceUtils.isAutoReuseExisting()) {
                 FileListDiff diff;
 
@@ -131,12 +132,13 @@ public class AddProjectToSessionWizard extends Wizard {
                     FileList remoteFileList = this.process
                         .getRemoteFileList(projectID);
                     if (sessionManager.getSarosSession().getProject(projectID) != null) {
-                        FileList sharedFileList = new FileList(
-                            sources.get(projectID), null);
+                        FileList sharedFileList = FileListFactory
+                            .createFileList(sources.get(projectID), null, true,
+                                null);
                         remoteFileList.entries.putAll(sharedFileList.entries);
                     }
-                    diff = FileListDiff.diff(
-                        new FileList(sources.get(projectID), null),
+                    diff = FileListDiff.diff(FileListFactory.createFileList(
+                        sources.get(projectID), null, true, null),
                         remoteFileList);
                 } catch (CoreException e) {
                     MessageDialog.openError(getShell(),
@@ -151,16 +153,16 @@ public class AddProjectToSessionWizard extends Wizard {
                 }
             }
         }
-        if (!confirmOverwritingProjectResources(projectsToOverrideWithDiff))
+        if (!confirmOverwritingResources(projectsToOverrideWithDiff))
             return false;
 
         Job job = new Job("Synchronizing") {
             @Override
             protected IStatus run(IProgressMonitor monitor) {
                 try {
-                    AddProjectToSessionWizard.this.process
-                        .accept(projectNames, SubMonitor.convert(monitor),
-                            skipProjectSyncing, useVersionControl);
+                    AddProjectToSessionWizard.this.process.accept(projectNames,
+                        SubMonitor.convert(monitor), skipProjectSyncing,
+                        useVersionControl);
                 } catch (SarosCancellationException e) {
                     processException(e.getCause());
                     return Status.CANCEL_STATUS;
@@ -183,8 +185,8 @@ public class AddProjectToSessionWizard extends Wizard {
                 CancelLocation.REMOTE);
         } else {
             log.error("This type of exception is not expected here: ", t);
-            cancelWizard(process.getPeer(), "Unkown error: "
-                + t.getMessage(), CancelLocation.REMOTE);
+            cancelWizard(process.getPeer(), "Unkown error: " + t.getMessage(),
+                CancelLocation.REMOTE);
         }
     }
 
@@ -216,8 +218,7 @@ public class AddProjectToSessionWizard extends Wizard {
             }
             Utils.runSafeAsync(log, new Runnable() {
                 public void run() {
-                    process.localCancel(null,
-                        CancelOption.NOTIFY_PEER);
+                    process.localCancel(null, CancelOption.NOTIFY_PEER);
                 }
             });
         }
@@ -225,7 +226,7 @@ public class AddProjectToSessionWizard extends Wizard {
         return true;
     }
 
-    public boolean confirmOverwritingProjectResources(
+    public boolean confirmOverwritingResources(
         final Map<String, FileListDiff> everyThing) {
         try {
             return Utils.runSWTSync(new Callable<Boolean>() {

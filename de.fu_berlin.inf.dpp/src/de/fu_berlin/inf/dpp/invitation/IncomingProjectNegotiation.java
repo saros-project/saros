@@ -40,6 +40,7 @@ import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.FileList;
 import de.fu_berlin.inf.dpp.FileListDiff;
+import de.fu_berlin.inf.dpp.FileListFactory;
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.SarosContext;
 import de.fu_berlin.inf.dpp.activities.ProjectExchangeInfo;
@@ -172,10 +173,10 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
                     for (IPath iPath : paths) {
                         dependentResources.add(iProject.findMember(iPath));
                     }
-                    sessionManager.getSarosSession().addSharedProjectResources(
+                    sessionManager.getSarosSession().addSharedResources(
                         iProject, projectID, dependentResources);
                 } else {
-                    sessionManager.getSarosSession().addSharedProjectResources(
+                    sessionManager.getSarosSession().addSharedResources(
                         iProject, projectID, null);
                 }
 
@@ -204,7 +205,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
     protected boolean isPartialRemoteProject(String projectID) {
         for (ProjectExchangeInfo info : this.projectInfos) {
             if (info.getProjectID().equals(projectID))
-                return info.getDescription().equals("partial");
+                return info.isPartial();
         }
         return false;
     }
@@ -710,17 +711,17 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
         monitor.beginTask("Compute required Files...", 100);
 
         if (skipSync) {
-            return new FileList();
+            return FileListFactory.createEmptyFileList();
         }
 
         FileListDiff filesToSynchronize = null;
         FileList localFileList = null;
         try {
-            localFileList = new FileList(currentLocalProject, vcs != null,
-                monitor.newChild(1));
+            localFileList = FileListFactory.createFileList(currentLocalProject,
+                null, vcs != null, monitor.newChild(1));
         } catch (CoreException e) {
             e.printStackTrace();
-            return new FileList();
+            return FileListFactory.createEmptyFileList();
         }
         SubMonitor childMonitor = monitor.newChild(5,
             SubMonitor.SUPPRESS_ALL_LABELS);
@@ -736,10 +737,10 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
              * We send an empty file list to the host as a notification that we
              * do not need any files.
              */
-            return new FileList();
+            return FileListFactory.createEmptyFileList();
         }
 
-        return new FileList(missingFiles);
+        return FileListFactory.createPathFileList(missingFiles);
     }
 
     /**

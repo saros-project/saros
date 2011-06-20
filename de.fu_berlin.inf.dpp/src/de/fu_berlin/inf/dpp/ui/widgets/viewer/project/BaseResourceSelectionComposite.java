@@ -33,8 +33,8 @@ import de.fu_berlin.inf.dpp.project.AbstractSarosSessionListener;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ISarosSessionListener;
 import de.fu_berlin.inf.dpp.project.SarosSessionManager;
-import de.fu_berlin.inf.dpp.ui.widgets.viewer.project.events.BaseProjectResourceSelectionListener;
-import de.fu_berlin.inf.dpp.ui.widgets.viewer.project.events.ProjectResourceSelectionChangedEvent;
+import de.fu_berlin.inf.dpp.ui.widgets.viewer.project.events.BaseResourceSelectionListener;
+import de.fu_berlin.inf.dpp.ui.widgets.viewer.project.events.ResourceSelectionChangedEvent;
 import de.fu_berlin.inf.dpp.util.ArrayUtils;
 
 /**
@@ -56,10 +56,9 @@ import de.fu_berlin.inf.dpp.util.ArrayUtils;
  * @author kheld
  * 
  */
-public class BaseProjectResourceSelectionComposite extends
-    ProjectResourceDisplayComposite {
+public class BaseResourceSelectionComposite extends ResourceDisplayComposite {
 
-    protected List<BaseProjectResourceSelectionListener> projectResourceSelectionListeners = new ArrayList<BaseProjectResourceSelectionListener>();
+    protected List<BaseResourceSelectionListener> resourceSelectionListeners = new ArrayList<BaseResourceSelectionListener>();
     protected CheckboxTreeViewer checkboxTreeViewer = (CheckboxTreeViewer) this.viewer;
     Logger log = Logger.getLogger(this.getClass());
 
@@ -70,7 +69,7 @@ public class BaseProjectResourceSelectionComposite extends
             boolean isChecked = event.getChecked();
             IResource resource = (IResource) element;
             handleCheckStateChanged(resource, isChecked);
-            notifyProjectResourceSelectionChanged(resource, isChecked);
+            notifyResourceSelectionChanged(resource, isChecked);
         }
     };
 
@@ -179,7 +178,7 @@ public class BaseProjectResourceSelectionComposite extends
     @Inject
     protected SarosSessionManager sessionManager;
 
-    public BaseProjectResourceSelectionComposite(Composite parent, int style) {
+    public BaseResourceSelectionComposite(Composite parent, int style) {
         super(parent, style | SWT.CHECK);
 
         ((CheckboxTreeViewer) this.viewer)
@@ -251,7 +250,7 @@ public class BaseProjectResourceSelectionComposite extends
      * 
      * @param resources
      */
-    public void setSelectedProjectResources(List<IResource> resources) {
+    public void setSelectedResources(List<IResource> resources) {
         CheckboxTreeViewer checkboxTreeViewer = (CheckboxTreeViewer) this.viewer;
         IStructuredContentProvider structuredContentProvider = (IStructuredContentProvider) checkboxTreeViewer
             .getContentProvider();
@@ -281,7 +280,7 @@ public class BaseProjectResourceSelectionComposite extends
          * ... therefore we have to fire them.
          */
         for (IResource resource : checkStatesChanges.keySet()) {
-            notifyProjectResourceSelectionChanged(resource,
+            notifyResourceSelectionChanged(resource,
                 checkStatesChanges.get(resource));
         }
     }
@@ -321,7 +320,7 @@ public class BaseProjectResourceSelectionComposite extends
      * 
      * @return
      */
-    public List<IResource> getSelectedProjectResources() {
+    public List<IResource> getSelectedResources() {
         CheckboxTreeViewer checkboxTreeViewer = ((CheckboxTreeViewer) this.viewer);
 
         List<IResource> resources = ArrayUtils.getAdaptableObjects(
@@ -332,29 +331,27 @@ public class BaseProjectResourceSelectionComposite extends
     }
 
     /**
-     * Adds a {@link BaseProjectResourceSelectionListener}
+     * Adds a {@link BaseResourceSelectionListener}
      * 
-     * @param projectResourceSelectionListener
+     * @param resourceSelectionListener
      */
-    public void addProjectResourceSelectionListener(
-        BaseProjectResourceSelectionListener projectResourceSelectionListener) {
-        this.projectResourceSelectionListeners
-            .add(projectResourceSelectionListener);
+    public void addResourceSelectionListener(
+        BaseResourceSelectionListener resourceSelectionListener) {
+        this.resourceSelectionListeners.add(resourceSelectionListener);
     }
 
     /**
-     * Removes a {@link BaseProjectResourceSelectionListener}
+     * Removes a {@link BaseResourceSelectionListener}
      * 
-     * @param projectResourceSelectionListener
+     * @param resourceSelectionListener
      */
-    public void removeProjectResourceSelectionListener(
-        BaseProjectResourceSelectionListener projectResourceSelectionListener) {
-        this.projectResourceSelectionListeners
-            .remove(projectResourceSelectionListener);
+    public void removeResourceSelectionListener(
+        BaseResourceSelectionListener resourceSelectionListener) {
+        this.resourceSelectionListeners.remove(resourceSelectionListener);
     }
 
     /**
-     * Notify all {@link BaseProjectResourceSelectionListener}s about a changed
+     * Notify all {@link BaseResourceSelectionListener}s about a changed
      * selection.
      * 
      * @param resource
@@ -363,13 +360,12 @@ public class BaseProjectResourceSelectionComposite extends
      * @param isSelected
      *            new selection state
      */
-    public void notifyProjectResourceSelectionChanged(IResource resource,
+    public void notifyResourceSelectionChanged(IResource resource,
         boolean isSelected) {
-        ProjectResourceSelectionChangedEvent event = new ProjectResourceSelectionChangedEvent(
+        ResourceSelectionChangedEvent event = new ResourceSelectionChangedEvent(
             resource, isSelected);
-        for (BaseProjectResourceSelectionListener projectResourceSelectionListener : this.projectResourceSelectionListeners) {
-            projectResourceSelectionListener
-                .projectResourceSelectionChanged(event);
+        for (BaseResourceSelectionListener resourceSelectionListener : this.resourceSelectionListeners) {
+            resourceSelectionListener.resourceSelectionChanged(event);
         }
     }
 
