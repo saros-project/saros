@@ -65,8 +65,7 @@ public class EditorByAliceBobTest extends StfTestCase {
     }
 
     @Test
-    public void waitUntilBobsJavaEditorIsActive() throws RemoteException,
-        InterruptedException {
+    public void waitUntilBobsJavaEditorIsActive() throws RemoteException {
         ALICE.superBot().views().packageExplorerView()
             .selectClass(Constants.PROJECT1, Constants.PKG1, Constants.CLS1)
             .open();
@@ -90,8 +89,7 @@ public class EditorByAliceBobTest extends StfTestCase {
     }
 
     @Test
-    public void waitUntilBobsJavaEditorIsClosed() throws RemoteException,
-        InterruptedException {
+    public void waitUntilBobsJavaEditorIsClosed() throws RemoteException {
         Util.setFollowMode(ALICE, BOB);
         ALICE.superBot().views().packageExplorerView()
             .selectClass(Constants.PROJECT1, Constants.PKG1, Constants.CLS1)

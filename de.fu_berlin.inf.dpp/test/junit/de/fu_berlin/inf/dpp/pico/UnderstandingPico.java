@@ -232,6 +232,28 @@ public class UnderstandingPico {
         assertTrue(session.b == applicationContainer.getComponent(B.class));
     }
 
+    public interface IA {
+        public void printA();
+    }
+
+    public interface IB {
+        public void printB();
+    }
+
+    public static class AB implements IA, IB {
+
+        int x = 0;
+
+        public void printB() {
+            System.out.println((x++));
+        }
+
+        public void printA() {
+            System.out.println((x++));
+        }
+
+    }
+
     public interface MyInterface {
         public void print();
     }
@@ -258,7 +280,7 @@ public class UnderstandingPico {
         }
     }
 
-    public static class MySession {
+    public final static class MySession {
         @Inject
         public MyInterface i;
 
@@ -273,8 +295,16 @@ public class UnderstandingPico {
         container.addComponent(MyInterface.class, MyInterfaceImpl2.class);
         container.addComponent(MySession.class);
 
+        container.addComponent(IA.class, AB.class);
+        container.addComponent(IB.class, AB.class);
         MySession session = container.getComponent(MySession.class);
         session.i.print();
+
+        IA a = container.getComponent(IA.class);
+        IB b = container.getComponent(IB.class);
+
+        a.printA();
+        b.printB();
     }
 
     public static class AA {

@@ -39,19 +39,19 @@ public class Editing3ProjectsTest extends StfTestCase {
             ALICE, BOB);
 
         BOB.superBot().views().packageExplorerView()
-            .waitUntilClassExists("foo", "bar", "HelloAlice");
+            .waitUntilResourceIsShared("foo");
 
         Util.addProjectToSessionSequentially("foo1",
             TypeOfCreateProject.NEW_PROJECT, ALICE, BOB);
 
         BOB.superBot().views().packageExplorerView()
-            .waitUntilClassExists("foo1", "bar", "HelloBob");
+            .waitUntilResourceIsShared("foo1");
 
         Util.addProjectToSessionSequentially("foo2",
             TypeOfCreateProject.NEW_PROJECT, ALICE, BOB);
 
         BOB.superBot().views().packageExplorerView()
-            .waitUntilClassExists("foo2", "bar", "HelloCarl");
+            .waitUntilResourceIsShared("foo2");
 
         BOB.superBot().views().packageExplorerView()
             .selectClass("foo", "bar", "HelloAlice").open();

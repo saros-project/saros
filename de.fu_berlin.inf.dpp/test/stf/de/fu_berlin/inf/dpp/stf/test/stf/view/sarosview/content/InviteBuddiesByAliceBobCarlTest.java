@@ -8,14 +8,11 @@ import static org.junit.Assert.assertTrue;
 
 import java.rmi.RemoteException;
 
-import org.junit.After;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 import de.fu_berlin.inf.dpp.stf.client.StfTestCase;
-import de.fu_berlin.inf.dpp.stf.client.tester.AbstractTester;
 import de.fu_berlin.inf.dpp.stf.client.util.Util;
-import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotShell;
 import de.fu_berlin.inf.dpp.stf.shared.Constants.TypeOfCreateProject;
 import de.fu_berlin.inf.dpp.stf.test.Constants;
 
@@ -26,32 +23,6 @@ public class InviteBuddiesByAliceBobCarlTest extends StfTestCase {
         initTesters(ALICE, BOB, CARL);
         setUpWorkbench();
         setUpSaros();
-    }
-
-    @Override
-    @After
-    public void after() throws RemoteException {
-        announceTestCaseEnd();
-        leaveSessionHostFirst(ALICE);
-        // TODO remove this code, because it is a workaround
-        // against a bug in Saros Session Management
-
-        for (AbstractTester tester : getCurrentTesters()) {
-            tester.remoteBot().sleep(1000);
-            if (tester.remoteBot().isShellOpen("Synchronizing")) {
-                IRemoteBotShell sync = tester.remoteBot()
-                    .shell("Synchronizing");
-
-                sync.confirm("Cancel");
-                tester.remoteBot().sleep(1000);
-                if (tester.remoteBot().isShellOpen("Problem Occurred")) {
-                    IRemoteBotShell problem = tester.remoteBot().shell(
-                        "Problem Occurred");
-                    problem.confirm("OK");
-                }
-            }
-
-        }
     }
 
     /**
@@ -73,12 +44,24 @@ public class InviteBuddiesByAliceBobCarlTest extends StfTestCase {
     public void inviteBuddy() throws RemoteException, InterruptedException {
         Util.setUpSessionWithAJavaProjectAndAClass(Constants.PROJECT1,
             Constants.PKG1, Constants.CLS1, ALICE, BOB);
+
         assertFalse(CARL.superBot().views().sarosView().isInSession());
+
         ALICE.superBot().views().sarosView().selectBuddy(CARL.getJID())
             .addToSarosSession();
+
         CARL.superBot().confirmShellSessionInvitationAndShellAddProject(
             Constants.PROJECT1, TypeOfCreateProject.NEW_PROJECT);
+
         CARL.superBot().views().sarosView().waitUntilIsInSession();
+
+        ALICE.superBot().views().packageExplorerView()
+            .waitUntilResourceIsShared(Constants.PROJECT1);
+        BOB.superBot().views().packageExplorerView()
+            .waitUntilResourceIsShared(Constants.PROJECT1);
+        CARL.superBot().views().packageExplorerView()
+            .waitUntilResourceIsShared(Constants.PROJECT1);
+
         assertTrue(ALICE.superBot().views().sarosView().isInSession());
         assertTrue(BOB.superBot().views().sarosView().isInSession());
         assertTrue(CARL.superBot().views().sarosView().isInSession());

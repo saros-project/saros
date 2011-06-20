@@ -144,7 +144,7 @@ public class ContextMenusInSessionArea extends ContextMenusInSarosView
     public void waitUntilHasReadOnlyAccess() throws RemoteException {
         remoteBot().waitUntil(new DefaultCondition() {
             public boolean test() throws Exception {
-                return !hasWriteAccess();
+                return hasReadOnlyAccess();
             }
 
             public String getFailureMessage() {

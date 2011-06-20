@@ -1,7 +1,7 @@
 package de.fu_berlin.inf.dpp.concurrent.undo;
 
 import static de.fu_berlin.inf.dpp.test.util.SarosTestUtils.replay;
-import static org.easymock.classextension.EasyMock.createMock;
+import static org.easymock.EasyMock.createMock;
 import static org.junit.Assert.assertEquals;
 
 import org.eclipse.core.resources.IProject;

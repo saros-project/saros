@@ -17,6 +17,7 @@ import de.fu_berlin.inf.dpp.stf.server.bot.condition.SarosConditions;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotTree;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotTreeItem;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotView;
+import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.Component;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.contextmenu.peview.IContextMenusInPEView;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.eclipse.IPEView;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.impl.Views;
@@ -296,4 +297,23 @@ public class PEView extends Views implements IPEView {
         contextMenu.setTreeItemType(type);
     }
 
+    public boolean isResourceShared(String path) throws RemoteException {
+        IResource resource = ResourcesPlugin.getWorkspace().getRoot()
+            .findMember(new Path(path));
+        return Component.sessionManager.getSarosSession().isShared(resource);
+    }
+
+    public void waitUntilResourceIsShared(final String path)
+        throws RemoteException {
+        remoteBot().waitLongUntil(new DefaultCondition() {
+            public boolean test() throws Exception {
+                return isResourceShared(path);
+            }
+
+            public String getFailureMessage() {
+                return "the resource " + path
+                    + " is not shared in the current session";
+            }
+        });
+    }
 }

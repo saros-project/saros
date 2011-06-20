@@ -54,10 +54,8 @@ public class BasicWidgetTreeTest extends StfTestCase {
         setUpWorkbench();
     }
 
-    @Override
     @After
-    public void after() throws RemoteException {
-        super.after();
+    public void afterEveryTest() throws RemoteException {
         deleteAllProjectsByActiveTesters();
     }
 

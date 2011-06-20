@@ -105,6 +105,18 @@ public interface IPEView extends Remote {
         throws RemoteException;
 
     /**
+     * Tests if the given resource is shared in the current session
+     * 
+     * @param path
+     *            the full path of the local resource, e.g.
+     *            "example_project/src/org/eclipsecon/swtbot/example/MyFirstTest01.java"
+     * @return <code>true</code> if the resource is currently shared,
+     *         <code>false</code> otherwise
+     * @throws RemoteException
+     */
+    public boolean isResourceShared(String path) throws RemoteException;
+
+    /**
      * 
      * @param fullPath
      *            the full path of the local resource, e.g.
@@ -267,8 +279,8 @@ public interface IPEView extends Remote {
      *            path specified by the node array parameter.e.g.
      *            {"Foo-saros","parentFolder" ,"myFolder"}.
      * @return the saved content of the given file. This method is different
-     *         from {@link IRemoteBotEditor#getText()} , which return the text of
-     *         editor, which may be not saved.
+     *         from {@link IRemoteBotEditor#getText()} , which return the text
+     *         of editor, which may be not saved.
      * @throws RemoteException
      * @throws IOException
      * @throws CoreException
@@ -285,8 +297,8 @@ public interface IPEView extends Remote {
      * 
      * <p>
      * <b>Note:</b> the mothod is different from
-     * {@link IRemoteBotEditor#waitUntilIsTextSame(String)}, which compare only the
-     * text of editor which may be dirty.
+     * {@link IRemoteBotEditor#waitUntilIsTextSame(String)}, which compare only
+     * the text of editor which may be dirty.
      * </p>
      * 
      * @param otherFileContent
@@ -299,4 +311,17 @@ public interface IPEView extends Remote {
      */
     public void waitUntilFileContentSame(String otherFileContent,
         String... fileNodes) throws RemoteException;
+
+    /**
+     * Waits until the given resource is shared in the current session
+     * 
+     * @param path
+     *            the full path of the local resource, e.g.
+     *            "example_project/src/org/eclipsecon/swtbot/example/MyFirstTest01.java"
+     * 
+     * @throws RemoteException
+     */
+
+    public void waitUntilResourceIsShared(String path) throws RemoteException;
+
 }

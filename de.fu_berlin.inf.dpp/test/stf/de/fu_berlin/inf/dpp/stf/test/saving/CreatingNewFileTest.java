@@ -31,7 +31,8 @@ public class CreatingNewFileTest extends StfTestCase {
 
     @After
     public void runAfterEveryTest() throws RemoteException {
-        deleteFoldersByActiveTesters(Constants.FOLDER1, Constants.FOLDER2);
+        deleteFoldersByActiveTesters(Constants.PROJECT1, Constants.FOLDER1,
+            Constants.FOLDER2);
     }
 
     /**
@@ -51,6 +52,7 @@ public class CreatingNewFileTest extends StfTestCase {
 
     @Test
     public void testCarlCreateANewFile() throws IOException, CoreException {
+        CARL.remoteBot().sleep(10000);
         CARL.superBot().views().packageExplorerView()
             .selectProject(Constants.PROJECT1).newC().folder(Constants.FOLDER1);
         CARL.superBot().views().packageExplorerView()
@@ -153,7 +155,8 @@ public class CreatingNewFileTest extends StfTestCase {
             .selectFolder(Constants.PROJECT1, Constants.FOLDER2)
             .existsWithRegex(Constants.FILE2));
 
-        ALICE.remoteBot().editor(Constants.FILE2).setTextFromFile(Constants.CP1);
+        ALICE.remoteBot().editor(Constants.FILE2)
+            .setTextFromFile(Constants.CP1);
 
         String file2ContentOfAlice = ALICE.remoteBot().editor(Constants.FILE2)
             .getText();

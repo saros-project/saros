@@ -34,10 +34,8 @@ public class MenuSarosByAliceBobCarlTest extends StfTestCase {
         Util.inviteBuddies(Constants.PROJECT1, TypeOfCreateProject.NEW_PROJECT,
             ALICE, CARL);
 
-        // TODO remove this line
-        CARL.remoteBot().sleep(15000);
-
+        CARL.superBot().views().packageExplorerView()
+            .waitUntilResourceIsShared(Constants.PROJECT1);
         assertTrue(CARL.superBot().views().sarosView().isInSession());
-
     }
 }

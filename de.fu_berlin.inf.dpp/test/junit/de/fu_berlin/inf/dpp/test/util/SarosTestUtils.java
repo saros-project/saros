@@ -1,6 +1,6 @@
 package de.fu_berlin.inf.dpp.test.util;
 
-import static org.easymock.classextension.EasyMock.createMock;
+import static org.easymock.EasyMock.createMock;
 
 import org.easymock.EasyMock;
 import org.eclipse.core.runtime.NullProgressMonitor;
