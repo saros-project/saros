@@ -48,7 +48,7 @@ public class ProjectNegotiationObservable {
     public synchronized ProjectNegotiation getProjectExchangeProcess(
         String processID) {
         for (ProjectNegotiation projectNegotiation : this.processes.values()) {
-            if (projectNegotiation.getProcessID() == processID) {
+            if (projectNegotiation.getProcessID().equals(processID)) {
                 return projectNegotiation;
             }
         }

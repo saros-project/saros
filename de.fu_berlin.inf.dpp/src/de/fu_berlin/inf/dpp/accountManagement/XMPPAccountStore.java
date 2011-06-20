@@ -18,9 +18,9 @@ import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
  * Class for the management of multiple XMPP accounts in Saros.
  */
 @Component(module = "accountManagement")
-public class XMPPAccountStore {
+public final class XMPPAccountStore {
 
-    protected static Logger log = Logger.getLogger(XMPPAccountStore.class
+    private static Logger log = Logger.getLogger(XMPPAccountStore.class
         .getName());
 
     private List<XMPPAccount> accounts;
