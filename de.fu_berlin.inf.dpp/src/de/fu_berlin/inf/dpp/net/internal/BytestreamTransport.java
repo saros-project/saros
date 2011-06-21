@@ -4,7 +4,7 @@ import java.io.IOException;
 
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.SubMonitor;
-import org.jivesoftware.smack.XMPPConnection;
+import org.jivesoftware.smack.Connection;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smackx.bytestreams.BytestreamListener;
 import org.jivesoftware.smackx.bytestreams.BytestreamManager;
@@ -135,7 +135,7 @@ public abstract class BytestreamTransport implements ITransport {
         return channel;
     }
 
-    public void prepareXMPPConnection(XMPPConnection connection,
+    public void prepareXMPPConnection(Connection connection,
         IBytestreamConnectionListener listener) {
         this.connectionListener = listener;
         manager = getManager(connection);
@@ -154,6 +154,6 @@ public abstract class BytestreamTransport implements ITransport {
      * @return The configured BytestreamManager for the specialized transport
      *         method
      */
-    abstract protected BytestreamManager getManager(XMPPConnection connection);
+    abstract protected BytestreamManager getManager(Connection connection);
 
 }

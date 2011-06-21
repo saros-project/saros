@@ -18,8 +18,8 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.ui.editors.text.EditorsUI;
+import org.jivesoftware.smack.Connection;
 import org.jivesoftware.smack.Roster;
-import org.jivesoftware.smack.XMPPConnection;
 import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.Saros;
@@ -77,8 +77,36 @@ public class BuddySessionDisplayComposite extends ViewerComposite {
     @Inject
     protected RosterTracker rosterTracker;
 
+    // protected IRosterListener rosterListener = new IRosterListener() {
+    //
+    // public void entriesAdded(Collection<String> addresses) {
+    // updateViewer();
+    // ViewerUtils.expandAll(viewer);
+    // }
+    //
+    // public void entriesUpdated(Collection<String> addresses) {
+    // updateViewer();
+    // ViewerUtils.expandAll(viewer);
+    // }
+    //
+    // public void entriesDeleted(Collection<String> addresses) {
+    // updateViewer();
+    // ViewerUtils.expandAll(viewer);
+    // }
+    //
+    // public void presenceChanged(Presence presence) {
+    // ViewerUtils.refresh(viewer, true);
+    // }
+    //
+    // public void rosterChanged(Roster roster) {
+    // updateViewer();
+    // ViewerUtils.expandAll(viewer);
+    // }
+    //
+    // };
+
     protected IConnectionListener connectionListener = new IConnectionListener() {
-        public void connectionStateChanged(XMPPConnection connection,
+        public void connectionStateChanged(Connection connection,
             ConnectionState newState) {
             switch (newState) {
             case CONNECTED:
@@ -185,6 +213,8 @@ public class BuddySessionDisplayComposite extends ViewerComposite {
             editorPrefsListener);
         editorManager.addSharedEditorListener(sharedEditorListener);
 
+        // this.rosterTracker.addRosterListener(rosterListener);
+
         this.addDisposeListener(new DisposeListener() {
             public void widgetDisposed(DisposeEvent e) {
                 if (editorManager != null) {
@@ -201,6 +231,9 @@ public class BuddySessionDisplayComposite extends ViewerComposite {
                 }
                 if (saros != null) {
                     saros.removeListener(connectionListener);
+                }
+                if (rosterTracker != null) {
+                    // rosterTracker.removeRosterListener(rosterListener);
                 }
             }
         });

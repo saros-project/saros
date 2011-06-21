@@ -42,7 +42,7 @@ import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.progress.IProgressConstants;
-import org.jivesoftware.smack.XMPPConnection;
+import org.jivesoftware.smack.Connection;
 import org.jivesoftware.smack.XMPPException;
 import org.joda.time.DateTime;
 import org.picocontainer.annotations.Inject;
@@ -330,7 +330,7 @@ public class SarosSessionManager implements IConnectionListener,
         });
     }
 
-    public void connectionStateChanged(XMPPConnection connection,
+    public void connectionStateChanged(Connection connection,
         ConnectionState newState) {
 
         if (newState == ConnectionState.DISCONNECTING) {

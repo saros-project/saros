@@ -30,8 +30,8 @@ import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.PlatformUI;
+import org.jivesoftware.smack.Connection;
 import org.jivesoftware.smack.RosterEntry;
-import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
 import org.picocontainer.Disposable;
 import org.picocontainer.annotations.Inject;
@@ -55,7 +55,7 @@ public class DeleteContactAction extends Action implements Disposable {
         .getLogger(DeleteContactAction.class.getName());
 
     protected IConnectionListener connectionListener = new IConnectionListener() {
-        public void connectionStateChanged(XMPPConnection connection,
+        public void connectionStateChanged(Connection connection,
             final ConnectionState newState) {
             updateEnablement();
         }

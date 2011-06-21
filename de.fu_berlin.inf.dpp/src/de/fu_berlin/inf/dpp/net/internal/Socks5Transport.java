@@ -18,8 +18,8 @@ import java.util.concurrent.TimeoutException;
 
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.SubMonitor;
+import org.jivesoftware.smack.Connection;
 import org.jivesoftware.smack.SmackConfiguration;
-import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smackx.bytestreams.BytestreamManager;
 import org.jivesoftware.smackx.bytestreams.BytestreamRequest;
@@ -177,7 +177,8 @@ public class Socks5Transport extends BytestreamTransport {
     /**
      * Tests one of the bytestreams != null in the opposite direction. It
      * returns it if bidirectional or tries to wrap two unidirectional streams
-     * if possible. Else an exception is thrown. The testing order is defined by the boolean preferInSession.
+     * if possible. Else an exception is thrown. The testing order is defined by
+     * the boolean preferInSession.
      * 
      * @pre inSession!=null || outSession!=null
      * 
@@ -565,7 +566,7 @@ public class Socks5Transport extends BytestreamTransport {
     }
 
     @Override
-    protected BytestreamManager getManager(XMPPConnection connection) {
+    protected BytestreamManager getManager(Connection connection) {
         Socks5BytestreamManager socks5ByteStreamManager = Socks5BytestreamManager
             .getBytestreamManager(connection);
         socks5ByteStreamManager
@@ -579,7 +580,7 @@ public class Socks5Transport extends BytestreamTransport {
     }
 
     @Override
-    public void prepareXMPPConnection(XMPPConnection connection,
+    public void prepareXMPPConnection(Connection connection,
         IBytestreamConnectionListener listener) {
         super.prepareXMPPConnection(connection, listener);
         executorService = Executors.newFixedThreadPool(

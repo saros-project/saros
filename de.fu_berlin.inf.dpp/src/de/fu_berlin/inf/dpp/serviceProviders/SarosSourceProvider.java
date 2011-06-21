@@ -6,7 +6,7 @@ import java.util.Map;
 import org.eclipse.core.expressions.Expression;
 import org.eclipse.ui.AbstractSourceProvider;
 import org.eclipse.ui.ISources;
-import org.jivesoftware.smack.XMPPConnection;
+import org.jivesoftware.smack.Connection;
 import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.Saros;
@@ -59,7 +59,7 @@ public class SarosSourceProvider extends AbstractSourceProvider {
     protected SarosSessionManager sarosSessionManager;
 
     protected IConnectionListener connectionListener = new IConnectionListener() {
-        public void connectionStateChanged(XMPPConnection connection,
+        public void connectionStateChanged(Connection connection,
             ConnectionState newState) {
             connectionChanged();
         }

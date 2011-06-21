@@ -6,16 +6,16 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
-import de.fu_berlin.inf.dpp.SarosPluginContext;
 import org.apache.log4j.FileAppender;
 import org.apache.log4j.helpers.LogLog;
 import org.apache.log4j.spi.LoggingEvent;
 import org.eclipse.core.runtime.Platform;
-import org.jivesoftware.smack.XMPPConnection;
+import org.jivesoftware.smack.Connection;
 import org.picocontainer.annotations.Inject;
 import org.picocontainer.annotations.Nullable;
 
 import de.fu_berlin.inf.dpp.Saros;
+import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.net.ConnectionState;
 import de.fu_berlin.inf.dpp.net.IConnectionListener;
@@ -87,7 +87,7 @@ public class JIDFileAppender extends FileAppender {
 
         saros.addListener(new IConnectionListener() {
 
-            public void connectionStateChanged(XMPPConnection connection,
+            public void connectionStateChanged(Connection connection,
                 ConnectionState newState) {
 
                 if (newState == ConnectionState.CONNECTED) {

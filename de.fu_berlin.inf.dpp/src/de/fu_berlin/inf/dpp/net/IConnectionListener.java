@@ -19,7 +19,7 @@
  */
 package de.fu_berlin.inf.dpp.net;
 
-import org.jivesoftware.smack.XMPPConnection;
+import org.jivesoftware.smack.Connection;
 
 import de.fu_berlin.inf.dpp.Saros;
 
@@ -41,6 +41,6 @@ public interface IConnectionListener {
      *            <code>ERROR</code>, you can use
      *            {@link Saros#getConnectionError()} to get the error message.
      */
-    public void connectionStateChanged(XMPPConnection connection,
+    public void connectionStateChanged(Connection connection,
         ConnectionState newState);
 }

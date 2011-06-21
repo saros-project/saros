@@ -7,10 +7,10 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import org.apache.log4j.Logger;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.jivesoftware.smack.Connection;
 import org.jivesoftware.smack.PacketListener;
 import org.jivesoftware.smack.Roster;
 import org.jivesoftware.smack.RosterEntry;
-import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.filter.PacketTypeFilter;
 import org.jivesoftware.smack.packet.Packet;
@@ -49,7 +49,7 @@ import de.fu_berlin.inf.dpp.util.Utils;
 public class SubscriptionManager {
     private static Logger log = Logger.getLogger(SubscriptionManager.class);
 
-    protected XMPPConnection connection = null;
+    protected Connection connection = null;
     /**
      * It is generally possible that a smack thread iterates over this list
      * whereas the GUI thread removes its listeners when its job is done
@@ -58,7 +58,7 @@ public class SubscriptionManager {
     protected List<SubscriptionManagerListener> subscriptionManagerListeners = new CopyOnWriteArrayList<SubscriptionManagerListener>();
 
     protected IConnectionListener connectionListener = new IConnectionListener() {
-        public void connectionStateChanged(XMPPConnection connection,
+        public void connectionStateChanged(Connection connection,
             ConnectionState newState) {
             if (newState == ConnectionState.CONNECTED)
                 prepareConnection(connection);
@@ -84,7 +84,8 @@ public class SubscriptionManager {
 
                 final Presence presence = (Presence) packet;
                 log.debug("Received presence packet from: "
-                    + Utils.prefix(new JID(presence.getFrom())) + " " + presence);
+                    + Utils.prefix(new JID(presence.getFrom())) + " "
+                    + presence);
 
                 switch (presence.getType()) {
                 case available:
@@ -101,7 +102,7 @@ public class SubscriptionManager {
         saros.addListener(connectionListener);
     }
 
-    public void prepareConnection(XMPPConnection connection) {
+    public void prepareConnection(Connection connection) {
         this.connection = connection;
         connection.addPacketListener(packetListener, new PacketTypeFilter(
             Presence.class));

@@ -15,8 +15,8 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.swt.dnd.TransferData;
+import org.jivesoftware.smack.Connection;
 import org.jivesoftware.smack.Roster;
-import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.packet.Presence;
 import org.picocontainer.annotations.Inject;
 
@@ -58,7 +58,7 @@ public class DataTransferManager implements IConnectionListener,
 
     protected ConcurrentLinkedQueue<TransferData> fileTransferQueue;
 
-    protected XMPPConnection connection;
+    protected Connection connection;
 
     @Inject
     protected XMPPReceiver receiver;
@@ -238,7 +238,7 @@ public class DataTransferManager implements IConnectionListener,
         public IBytestreamConnection connect(JID peer, SubMonitor progress)
             throws IOException, InterruptedException;
 
-        public void prepareXMPPConnection(XMPPConnection connection,
+        public void prepareXMPPConnection(Connection connection,
             IBytestreamConnectionListener listener);
 
         public void disposeXMPPConnection();
@@ -629,7 +629,7 @@ public class DataTransferManager implements IConnectionListener,
     /**
      * Sets up the transports for the given XMPPConnection
      */
-    protected void prepareConnection(final XMPPConnection connection) {
+    protected void prepareConnection(final Connection connection) {
         assert (this.connectionIsDisposed());
 
         this.initTransports();
@@ -681,7 +681,7 @@ public class DataTransferManager implements IConnectionListener,
         connection = null;
     }
 
-    public void connectionStateChanged(XMPPConnection connection,
+    public void connectionStateChanged(Connection connection,
         ConnectionState newState) {
         if (newState == ConnectionState.CONNECTED)
             prepareConnection(connection);

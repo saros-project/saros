@@ -36,8 +36,8 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.PlatformUI;
+import org.jivesoftware.smack.Connection;
 import org.jivesoftware.smack.RosterEntry;
-import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
 import org.picocontainer.annotations.Inject;
 
@@ -65,7 +65,7 @@ public class ConnectionTestAction extends Action {
         .getLogger(ConnectionTestAction.class);
 
     protected IConnectionListener connectionListener = new IConnectionListener() {
-        public void connectionStateChanged(XMPPConnection connection,
+        public void connectionStateChanged(Connection connection,
             final ConnectionState newState) {
             updateEnablement();
         }

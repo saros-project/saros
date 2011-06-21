@@ -7,7 +7,7 @@ import org.eclipse.ui.IWindowListener;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
-import org.jivesoftware.smack.XMPPConnection;
+import org.jivesoftware.smack.Connection;
 import org.jivesoftware.smack.packet.Presence;
 
 import de.fu_berlin.inf.dpp.Saros;
@@ -30,7 +30,7 @@ public class LocalPresenceTracker {
 
     protected Saros saros;
 
-    protected XMPPConnection connection = null;
+    protected Connection connection = null;
 
     boolean active = true;
 
@@ -38,7 +38,7 @@ public class LocalPresenceTracker {
 
         saros.addListener(new IConnectionListener() {
 
-            public void connectionStateChanged(XMPPConnection connection,
+            public void connectionStateChanged(Connection connection,
                 ConnectionState newState) {
 
                 if (newState == ConnectionState.CONNECTED)
@@ -111,7 +111,7 @@ public class LocalPresenceTracker {
 
     }
 
-    protected synchronized void setConnection(XMPPConnection connection) {
+    protected synchronized void setConnection(Connection connection) {
         this.connection = connection;
     }
 

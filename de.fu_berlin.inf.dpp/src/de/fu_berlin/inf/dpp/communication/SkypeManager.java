@@ -7,11 +7,11 @@ import org.apache.log4j.Logger;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
+import org.jivesoftware.smack.Connection;
 import org.jivesoftware.smack.PacketCollector;
 import org.jivesoftware.smack.PacketListener;
 import org.jivesoftware.smack.Roster;
 import org.jivesoftware.smack.RosterEntry;
-import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.filter.PacketIDFilter;
 import org.jivesoftware.smack.packet.IQ;
 import org.jivesoftware.smack.packet.Packet;
@@ -107,7 +107,7 @@ public class SkypeManager implements IConnectionListener {
      */
     public String getSkypeURLNonBlock(String jid) {
 
-        XMPPConnection connection = saros.getConnection();
+        Connection connection = saros.getConnection();
         if (connection == null)
             return null;
 
@@ -166,7 +166,7 @@ public class SkypeManager implements IConnectionListener {
      */
     public String getSkypeURL(String jid) {
 
-        XMPPConnection connection = saros.getConnection();
+        Connection connection = saros.getConnection();
         if (connection == null)
             return null;
 
@@ -197,7 +197,7 @@ public class SkypeManager implements IConnectionListener {
      */
     public String getSkypeURL(JID rqJID) {
 
-        XMPPConnection connection = saros.getConnection();
+        Connection connection = saros.getConnection();
         if (connection == null)
             return null;
 
@@ -226,7 +226,7 @@ public class SkypeManager implements IConnectionListener {
      * TODO SS only send to those, that we know use Saros.
      */
     public void publishSkypeIQ(String newSkypeName) {
-        XMPPConnection connection = saros.getConnection();
+        Connection connection = saros.getConnection();
         if (connection == null)
             return;
 
@@ -250,7 +250,7 @@ public class SkypeManager implements IConnectionListener {
     /**
      * Register a new PacketListener for intercepting SkypeIQ packets.
      */
-    public void connectionStateChanged(final XMPPConnection connection,
+    public void connectionStateChanged(final Connection connection,
         ConnectionState newState) {
         if (newState == ConnectionState.CONNECTED) {
             connection.addPacketListener(packetListener,
@@ -274,7 +274,7 @@ public class SkypeManager implements IConnectionListener {
      * 
      * @param connection
      */
-    protected void refreshCache(final XMPPConnection connection) {
+    protected void refreshCache(final Connection connection) {
         log.debug("Refreshing Skype username cache...");
         for (final RosterEntry rosterEntry : connection.getRoster()
             .getEntries()) {
@@ -299,7 +299,7 @@ public class SkypeManager implements IConnectionListener {
      * @return the Skype user name of given user or <code>null</code> if the
      *         user doesn't respond in time (5s) or has no Skype name.
      */
-    protected String requestSkypeName(XMPPConnection connection, JID rqJID) {
+    protected String requestSkypeName(Connection connection, JID rqJID) {
 
         if ((connection == null) || !connection.isConnected()) {
             return null;

@@ -4,7 +4,7 @@ import org.apache.log4j.Logger;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.widgets.Composite;
-import org.jivesoftware.smack.XMPPConnection;
+import org.jivesoftware.smack.Connection;
 import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.Saros;
@@ -25,7 +25,7 @@ public class ConnectionStateComposite extends Composite {
         .getLogger(ConnectionStateComposite.class);
 
     protected final IConnectionListener connectionListener = new IConnectionListener() {
-        public void connectionStateChanged(XMPPConnection connection,
+        public void connectionStateChanged(Connection connection,
             final ConnectionState newState) {
             Utils.runSafeSWTAsync(log, new Runnable() {
                 public void run() {

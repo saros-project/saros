@@ -322,7 +322,7 @@ public class EnterXMPPAccountComposite extends Composite {
         /*
          * If server is not empty, open the server options
          */
-        if (!server.isEmpty() && serverOptionsExpandableComposite != null
+        if (!(server.length() == 0) && serverOptionsExpandableComposite != null
             && !serverOptionsExpandableComposite.isDisposed()) {
             serverOptionsExpandableComposite.setExpanded(true);
         }
@@ -333,7 +333,7 @@ public class EnterXMPPAccountComposite extends Composite {
      */
     public boolean isSarosXMPPServer() {
         String server = this.getServer();
-        if (server.isEmpty())
+        if (server.length() == 0)
             server = this.getJID().getDomain();
         return server.equalsIgnoreCase(preferenceUtils.getSarosXMPPServer());
     }
@@ -345,21 +345,52 @@ public class EnterXMPPAccountComposite extends Composite {
      * @return
      */
     public boolean isXMPPServerValid() {
-        boolean isXMPPServerValid;
+
         String server = getServer();
-        if (server.isEmpty()) {
-            isXMPPServerValid = true;
-        } else {
+
+        if (server.length() == 0)
+            return true;
+
+        String serverName = server;
+
+        // be aware of ip6: [2001:0db8:85a3:08d3:1319:8a2e:0370:7344]:8080
+        int idx = serverName.lastIndexOf(':');
+
+        if (idx != -1) {
+
+            if (idx == serverName.length() - 1) {
+                log.debug("empty port: " + server);
+                return false;
+            }
+
+            serverName = serverName.substring(0, idx);
+
+            if (serverName.length() == 0) {
+                log.debug("unknown host: " + server);
+                return false;
+            }
+
             try {
-                InetAddress address = InetAddress.getByName(getServer());
-                isXMPPServerValid = true;
-                log.debug("nslookup succeeded: " + getServer() + " = "
-                    + address);
-            } catch (UnknownHostException e) {
-                isXMPPServerValid = false;
-                log.debug("nslookup failed: " + getServer());
+                int port = Integer.parseInt(serverName.substring(idx + 1));
+
+                if (port <= 0 || port >= 65536) {
+                    log.debug("port range exceeded: " + server);
+                    return false;
+                }
+            } catch (NumberFormatException e) {
+                log.debug("port is not a number: " + server);
+                return false;
             }
         }
-        return isXMPPServerValid;
+
+        try {
+            InetAddress address = InetAddress.getByName(serverName);
+            log.debug("nslookup succeeded: " + serverName + " = " + address);
+            return true;
+        } catch (UnknownHostException e) {
+            log.debug("nslookup failed: " + serverName);
+            return false;
+        }
+
     }
 }

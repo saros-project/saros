@@ -6,9 +6,9 @@ import java.util.Arrays;
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
+import org.jivesoftware.smack.Connection;
 import org.jivesoftware.smack.PacketCollector;
 import org.jivesoftware.smack.PacketListener;
-import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.filter.PacketFilter;
 import org.jivesoftware.smack.filter.PacketIDFilter;
@@ -169,7 +169,7 @@ public class ConnectionTestManager {
 
         progress.beginTask("Connection Test with buddy " + plainJID, 68);
         try {
-            XMPPConnection connection = saros.getConnection();
+            Connection connection = saros.getConnection();
             if (connection == null || !connection.isConnected())
                 throw new XMPPException("Connection is not established!");
             progress.worked(1);

@@ -1,6 +1,6 @@
 package de.fu_berlin.inf.dpp.net.internal;
 
-import org.jivesoftware.smack.XMPPConnection;
+import org.jivesoftware.smack.Connection;
 import org.jivesoftware.smackx.bytestreams.BytestreamManager;
 import org.jivesoftware.smackx.ibb.InBandBytestreamManager;
 
@@ -18,7 +18,7 @@ public class IBBTransport extends BytestreamTransport {
     }
 
     @Override
-    protected BytestreamManager getManager(XMPPConnection connection) {
+    protected BytestreamManager getManager(Connection connection) {
         return InBandBytestreamManager.getByteStreamManager(connection);
     }
 

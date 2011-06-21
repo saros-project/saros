@@ -22,7 +22,7 @@ package de.fu_berlin.inf.dpp.ui.actions;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.graphics.ImageData;
-import org.jivesoftware.smack.XMPPConnection;
+import org.jivesoftware.smack.Connection;
 import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.Saros;
@@ -49,7 +49,7 @@ public class NewContactAction extends Action {
         SarosPluginContext.initComponent(this);
 
         saros.addListener(new IConnectionListener() {
-            public void connectionStateChanged(XMPPConnection connection,
+            public void connectionStateChanged(Connection connection,
                 ConnectionState newState) {
                 updateEnablement();
             }

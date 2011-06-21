@@ -6,7 +6,7 @@ import java.util.Map;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
-import org.jivesoftware.smack.XMPPConnection;
+import org.jivesoftware.smack.Connection;
 import org.jivesoftware.smack.XMPPException;
 import org.joda.time.DateTime;
 
@@ -110,7 +110,7 @@ public interface ISarosSessionManager {
     /*
      * @see IConnectionListener
      */
-    public void connectionStateChanged(XMPPConnection connection,
+    public void connectionStateChanged(Connection connection,
         ConnectionState newState);
 
     public void onReconnect(Map<JID, Integer> expectedSequenceNumbers);

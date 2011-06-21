@@ -39,10 +39,10 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
 import org.jivesoftware.smack.Chat;
 import org.jivesoftware.smack.ChatManager;
+import org.jivesoftware.smack.Connection;
 import org.jivesoftware.smack.MessageListener;
 import org.jivesoftware.smack.PacketCollector;
 import org.jivesoftware.smack.PacketListener;
-import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.filter.PacketFilter;
 import org.jivesoftware.smack.filter.PacketIDFilter;
@@ -115,7 +115,7 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
     public static final int FORCEDPART_OFFLINEUSER_AFTERSECS = 60;
     public static final int MAX_XMPP_MESSAGE_SIZE = 16378;
 
-    protected XMPPConnection connection;
+    protected Connection connection;
 
     protected ChatManager chatmanager;
 
@@ -1085,7 +1085,7 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
         }
     }
 
-    protected void prepareConnection(final XMPPConnection connection) {
+    protected void prepareConnection(final Connection connection) {
 
         // Create Containers
         this.chats = new HashMap<JID, Chat>();
@@ -1141,7 +1141,7 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
         connection = null;
     }
 
-    public void connectionStateChanged(XMPPConnection connection,
+    public void connectionStateChanged(Connection connection,
         ConnectionState newState) {
         if (newState == ConnectionState.CONNECTED)
             prepareConnection(connection);

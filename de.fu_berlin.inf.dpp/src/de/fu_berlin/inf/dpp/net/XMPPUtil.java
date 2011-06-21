@@ -1,8 +1,8 @@
 package de.fu_berlin.inf.dpp.net;
 
+import org.jivesoftware.smack.Connection;
 import org.jivesoftware.smack.PacketCollector;
 import org.jivesoftware.smack.SmackConfiguration;
-import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.filter.AndFilter;
 import org.jivesoftware.smack.filter.PacketFilter;
@@ -26,12 +26,12 @@ public class XMPPUtil {
      * http://xmpp.org/extensions/xep-0077.html
      */
     public static synchronized Registration getRegistrationInfo(
-        String toRegister, XMPPConnection connection) throws XMPPException {
+        String toRegister, Connection connection) throws XMPPException {
         Registration reg = new Registration();
         reg.setTo(connection.getServiceName());
         reg.setFrom(toRegister);
-        PacketFilter filter = new AndFilter(new PacketIDFilter(reg
-            .getPacketID()), new PacketTypeFilter(IQ.class));
+        PacketFilter filter = new AndFilter(new PacketIDFilter(
+            reg.getPacketID()), new PacketTypeFilter(IQ.class));
         PacketCollector collector = connection.createPacketCollector(filter);
         connection.sendPacket(reg);
         IQ result = (IQ) collector.nextResult(SmackConfiguration

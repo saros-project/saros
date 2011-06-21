@@ -155,7 +155,7 @@ public class Saros extends AbstractUIPlugin {
      */
     protected DotGraphMonitor dotMonitor;
 
-    protected XMPPConnection connection;
+    protected Connection connection;
 
     /**
      * The RQ-JID of the local user or null if the user is
@@ -901,7 +901,7 @@ public class Saros extends AbstractUIPlugin {
      * @return the currently established connection or <code>null</code> if
      *         there is none.
      */
-    public XMPPConnection getConnection() {
+    public Connection getConnection() {
         return this.connection;
     }
 

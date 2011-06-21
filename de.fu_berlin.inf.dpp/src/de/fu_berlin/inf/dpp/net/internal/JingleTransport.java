@@ -9,7 +9,7 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.jface.preference.IPreferenceStore;
-import org.jivesoftware.smack.XMPPConnection;
+import org.jivesoftware.smack.Connection;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smackx.jingle.JingleManager;
 import org.jivesoftware.smackx.jingle.JingleSession;
@@ -96,7 +96,7 @@ public class JingleTransport implements ITransport {
     private Logger log = Logger.getLogger(JingleTransport.class);
 
     protected IBytestreamConnectionListener listener;
-    protected XMPPConnection connection;
+    protected Connection connection;
     protected Saros saros;
     protected JingleManager manager;
     protected static JingleTransport instance;
@@ -184,7 +184,7 @@ public class JingleTransport implements ITransport {
         manager = null;
     }
 
-    public void prepareXMPPConnection(XMPPConnection connection,
+    public void prepareXMPPConnection(Connection connection,
         IBytestreamConnectionListener listener) {
 
         this.listener = listener;

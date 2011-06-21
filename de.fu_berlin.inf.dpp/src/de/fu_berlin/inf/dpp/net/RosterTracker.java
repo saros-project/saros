@@ -5,8 +5,8 @@ import java.util.Collections;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.jivesoftware.smack.Connection;
 import org.jivesoftware.smack.Roster;
-import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.packet.Presence;
 
 import de.fu_berlin.inf.dpp.Saros;
@@ -23,7 +23,7 @@ public class RosterTracker implements IConnectionListener {
 
     static final Logger log = Logger.getLogger(RosterTracker.class.getName());
 
-    protected XMPPConnection connection;
+    protected Connection connection;
 
     protected Roster roster;
 
@@ -55,7 +55,7 @@ public class RosterTracker implements IConnectionListener {
         listener.remove(rosterListener);
     }
 
-    protected void prepareConnection(XMPPConnection connection) {
+    protected void prepareConnection(Connection connection) {
         this.connection = connection;
         setRoster(this.connection.getRoster());
     }
@@ -65,7 +65,7 @@ public class RosterTracker implements IConnectionListener {
         this.connection = null;
     }
 
-    public void connectionStateChanged(XMPPConnection connection,
+    public void connectionStateChanged(Connection connection,
         ConnectionState newState) {
         if (newState == ConnectionState.CONNECTED) {
             prepareConnection(connection);
