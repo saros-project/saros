@@ -20,7 +20,8 @@ Require-Bundle: org.eclipse.ui,
  org.tigris.subversion.subclipse.ui;resolution:=optional,
  org.eclipse.ui.console,
  org.eclipse.core.expressions,
- org.eclipse.equinox.security
+ org.eclipse.equinox.security,
+ org.junit4;resolution:=optional
 Bundle-ActivationPolicy: lazy
 Bundle-ClassPath: .,
  lib/log4j-1.2.15.jar,
@@ -67,7 +68,12 @@ Bundle-ClassPath: .,
  lib/org.eclipse.swtbot.forms.finder_2.0.4.20110304_0338-e5aff47-dev-e36.jar,
  lib/org.eclipse.swtbot.go_2.0.4.20110304_0338-e5aff47-dev-e36.jar,
  lib/org.eclipse.swtbot.junit4_x_2.0.4.20110304_0338-e5aff47-dev-e36.jar,
- lib/org.eclipse.swtbot.swt.finder_2.0.4.20110304_0338-e5aff47-dev-e36.jar
+ lib/org.eclipse.swtbot.swt.finder_2.0.4.20110304_0338-e5aff47-dev-e36.jar,
+ lib/cglib-nodep-2.2.jar,
+ lib/easymock-3.0.jar,
+ lib/javassist-3.14.0-GA.jar,
+ lib/objenesis-1.2.jar,
+ lib/powermock-easymock-1.4.9-full.jar
 Export-Package: de.fu_berlin.inf.dpp;
   uses:="org.eclipse.core.runtime,
    org.jivesoftware.smack.packet,
