@@ -238,6 +238,11 @@ public class XMPPReceiver {
                 + "transfer object or a connection error occurred", e);
             return;
         }
+        if (data == null) {
+            log.debug("Received empty transferobject. Discarding transferObject:"
+                + transferObject.toString() + ")");
+            return;
+        }
 
         MXParser parser = new MXParser();
         PacketExtension extension = null;

@@ -524,6 +524,10 @@ public class SarosSession implements ISarosSession, Disposable {
         // TODO what is to do here if no user with write access exists anymore?
         listenerDispatch.userLeft(user);
 
+        // Disconnect bytestream connection when user leaves session to 
+        // prevent idling connection when not needed anymore.
+        transferManager.closeConnection(jid);
+
         log.info("Buddy " + Utils.prefix(jid) + " left session");
     }
 

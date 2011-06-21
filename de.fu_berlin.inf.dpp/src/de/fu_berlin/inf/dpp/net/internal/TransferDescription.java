@@ -304,7 +304,8 @@ public class TransferDescription implements Serializable {
         } catch (IOException e) {
             // should not happen
             throw new RuntimeException(
-                "Could not serialize: ObjectOutputStream failed");
+                "Could not deserialize the transfer description object: "
+                    + e.getMessage());
         }
     }
 

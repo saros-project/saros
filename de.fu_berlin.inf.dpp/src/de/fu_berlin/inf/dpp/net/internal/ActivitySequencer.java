@@ -657,6 +657,12 @@ public class ActivitySequencer {
                     activityDataObjects = userqueue;
                 }
 
+                // Dont send activities to peers that are not in the session (anymore)
+                if (!recipient.isInSarosSession()) {
+                    log.warn("Activities for peer not in session are dropped.");
+                    return;
+                }
+                
                 JID recipientJID = recipient.getJID();
 
                 List<TimedActivityDataObject> timedActivities = createTimedActivities(
@@ -958,5 +964,8 @@ public class ActivitySequencer {
      */
     public void userLeft(JID jid) {
         incomingQueues.removeQueue(jid);
+
+        queuedOutgoingActivitiesOfUsers.remove(jid);
+
     }
 }

@@ -105,8 +105,13 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
 
     private static Logger log = Logger.getLogger(XMPPTransmitter.class);
 
+    /**
+     * Maximum retry attempts to send an activity. Retry attempts will switch to
+     * prefer IBB on MAX_TRANSFER_RETRIES/2.
+     */
+    public static final int MAX_TRANSFER_RETRIES = 4;
+
     public static final int MAX_PARALLEL_SENDS = 10;
-    public static final int MAX_TRANSFER_RETRIES = 5;
     public static final int FORCEDPART_OFFLINEUSER_AFTERSECS = 60;
     public static final int MAX_XMPP_MESSAGE_SIZE = 16378;
 
@@ -722,29 +727,51 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
             log.error("UTF-8 is unsupported", e);
         }
 
-        if (data == null
-            || transferDescription == null
-            || (!dataManager.getTransferMode(recipient).isP2P() && data.length < MAX_XMPP_MESSAGE_SIZE)) {
+        int retry = 0;
+        do {
 
-            sendMessageToUser(recipient, extension, true);
+            if (data == null
+                || transferDescription == null
+                || (!dataManager.getTransferMode(recipient).isP2P() && data.length < MAX_XMPP_MESSAGE_SIZE)) {
 
-        } else {
-            try {
+                sendMessageToUser(recipient, extension, true);
+                break;
 
-                sendByBytestreamToProjectUser(recipient, data,
-                    transferDescription);
+            } else {
+                try {
 
-            } catch (IOException e) {
-                // else send by chat if applicable
-                if (data.length < MAX_XMPP_MESSAGE_SIZE)
-                    sendMessageToUser(recipient, extension, true);
-                else {
-                    log.error("Failed to sent packet extension by bytestream ("
-                        + Utils.formatByte(data.length) + ")");
-                    throw e;
+                    sendByBytestreamToProjectUser(recipient, data,
+                        transferDescription);
+                    break;
+
+                } catch (IOException e) {
+                    // else send by chat if applicable
+                    if (data.length < MAX_XMPP_MESSAGE_SIZE) {
+                        log.info("Retry failed bytestream transfer by chat.");
+                        sendMessageToUser(recipient, extension, true);
+                        break;
+                    } else {
+
+                        log.error("Failed to sent packet extension by bytestream ("
+                            + Utils.formatByte(data.length)
+                            + "): "
+                            + e.getMessage());
+
+                        if (retry == MAX_TRANSFER_RETRIES / 2) {
+                            // set bytestream connections prefer IBB
+                            dataManager.setFallbackConnectionMode(recipient);
+                        }
+
+                        if (retry < MAX_TRANSFER_RETRIES) {
+                            log.info("Transfer retry #" + retry + "...");
+                            continue;
+                        }
+                        throw e;
+
+                    }
                 }
             }
-        }
+        } while (++retry <= MAX_TRANSFER_RETRIES);
     }
 
     /**

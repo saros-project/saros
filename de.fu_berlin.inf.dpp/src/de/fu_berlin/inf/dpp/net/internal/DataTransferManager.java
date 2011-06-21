@@ -29,9 +29,9 @@ import de.fu_berlin.inf.dpp.net.IRosterListener;
 import de.fu_berlin.inf.dpp.net.ITransferModeListener;
 import de.fu_berlin.inf.dpp.net.IncomingTransferObject;
 import de.fu_berlin.inf.dpp.net.IncomingTransferObject.IncomingTransferObjectExtensionProvider;
-import de.fu_berlin.inf.dpp.net.UPnP.UPnPManager;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.RosterTracker;
+import de.fu_berlin.inf.dpp.net.UPnP.UPnPManager;
 import de.fu_berlin.inf.dpp.net.business.DispatchThreadContext;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
@@ -81,12 +81,18 @@ public class DataTransferManager implements IConnectionListener,
     protected Map<NetTransferMode, Throwable> errors = new LinkedHashMap<NetTransferMode, Throwable>();
 
     protected SessionIDObservable sessionID = null;
-        
+
+    /**
+     * Collection of {@link JID}s, flagged to prefer IBB transfer mode
+     */
+    protected Collection<JID> peersForIBB = new ArrayList<JID>();
+
     @Inject
     private IBBTransport ibbTransport;
 
     public DataTransferManager(Saros saros, SessionIDObservable sessionID,
-        PreferenceUtils preferenceUtils, RosterTracker rosterTracker, IBBTransport ibbTransport) {
+        PreferenceUtils preferenceUtils, RosterTracker rosterTracker,
+        IBBTransport ibbTransport) {
         this.sessionID = sessionID;
         this.saros = saros;
         this.preferenceUtils = preferenceUtils;
@@ -123,14 +129,9 @@ public class DataTransferManager implements IConnectionListener,
             public void presenceChanged(Presence presence) {
 
                 if (!presence.isAvailable())
-                    for (JID jid : connections.keySet()) {
-                        if (jid.toString().equals(presence.getFrom())) {
-                            IBytestreamConnection c = connections.remove(jid);
-                            log.debug(jid.getBase()
-                                + " is not available anymore. Bytestream connection closed.");
-                            c.close();
-                        }
-                    }
+                    if (closeConnection(new JID(presence.getFrom())))
+                        log.debug(presence.getFrom()
+                            + " is not available anymore. Bytestream connection closed.");
             }
 
             public void rosterChanged(Roster roster) {
@@ -383,7 +384,18 @@ public class DataTransferManager implements IConnectionListener,
         throws IOException, InterruptedException {
 
         IBytestreamConnection connection = null;
-        for (ITransport transport : transports) {
+
+        ArrayList<ITransport> transportModesToUse = transports;
+
+        // Move IBB to front for peers preferring IBB
+        if (peersForIBB.contains(recipient)) {
+            int ibbIndex = transports.indexOf(ibbTransport);
+            if (ibbIndex != -1)
+                transports.remove(ibbIndex);
+            transports.add(0, ibbTransport);
+        }
+
+        for (ITransport transport : transportModesToUse) {
             log.info("Try to establish a bytestream connection to "
                 + recipient.getBase() + " using "
                 + transport.getDefaultNetTransferMode());
@@ -425,6 +437,22 @@ public class DataTransferManager implements IConnectionListener,
 
     public TransferModeDispatch getTransferModeDispatch() {
         return transferModeDispatch;
+    }
+
+    /**
+     * Disconnects {@link IBytestreamConnection} with the specified peer
+     * 
+     * @param peer
+     *            {@link JID} of the peer to disconnect the
+     *            {@link IBytestreamConnection}
+     */
+    public boolean closeConnection(JID peer) {
+        IBytestreamConnection c = connections.remove(peer);
+        if (c == null)
+            return false;
+
+        c.close();
+        return true;
     }
 
     public synchronized void connectionChanged(JID peer,
@@ -744,6 +772,18 @@ public class DataTransferManager implements IConnectionListener,
      */
     protected void setIncomingIBBTransferSpeed(JID jid, double value) {
         incomingIBBTransferSpeeds.put(jid, value);
+    }
+
+    /**
+     * Flag the specified peer to prefer IBB during a connect during this Saros
+     * session.
+     * 
+     * @param peer
+     *            {@link JID} of the peer to set IBB as preferred transfer mode
+     */
+    public void setFallbackConnectionMode(JID peer) {
+        if (!peersForIBB.contains(peer))
+            peersForIBB.add(peer);
     }
 
 }
