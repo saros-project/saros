@@ -17,6 +17,7 @@ public interface IBytestreamConnectionListener {
 
     public void connectionClosed(JID peer, IBytestreamConnection connection);
 
-    public void connectionChanged(JID peer, IBytestreamConnection connection);
+    public void connectionChanged(JID peer, IBytestreamConnection connection,
+        boolean incomingRequest);
 
 }

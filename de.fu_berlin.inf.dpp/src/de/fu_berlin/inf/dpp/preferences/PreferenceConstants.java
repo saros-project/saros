@@ -39,6 +39,9 @@ public class PreferenceConstants {
 
     public static final String AUTO_CONNECT = "autoconnect";
 
+    public static final String AUTO_PORTMAPPING_DEVICEID = "autoportmappingdeviceid";
+    public static final String AUTO_PORTMAPPING_LASTMAPPEDPORT = "autoportmappinglastmappedport";
+
     public static final String AUTO_FOLLOW_MODE = "autofollowmode";
 
     public static final String SKYPE_USERNAME = "skypename";
@@ -52,6 +55,8 @@ public class PreferenceConstants {
     public static final String USE_NEXT_PORTS_FOR_FILE_TRANSFER = "use_next_ports_for_file_transfer";
 
     public static final String FORCE_FILETRANSFER_BY_CHAT = "chatfiletransfer";
+
+    public static final String GATEWAYCHECKPERFORMED = "gatewaycheckperformed";
 
     public static final String LOCAL_SOCKS5_PROXY_DISABLED = " local_socks5_proxy_disabled";
 

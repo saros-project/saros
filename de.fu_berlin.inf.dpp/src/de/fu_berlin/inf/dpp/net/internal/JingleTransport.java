@@ -46,8 +46,8 @@ public class JingleTransport implements ITransport {
             TransportCandidate localCandidate, JingleSession jingleSession) {
 
             final JID remoteJID = isInitiator(jingleSession) ? new JID(
-                jingleSession.getResponder()) : new JID(jingleSession
-                .getInitiator());
+                jingleSession.getResponder()) : new JID(
+                jingleSession.getInitiator());
 
             final JingleFileTransferSession newSession = new JingleFileTransferSession(
                 payload, remoteCandidate, localCandidate, null, jingleSession);
@@ -63,7 +63,7 @@ public class JingleTransport implements ITransport {
                             newSession, getDefaultNetTransferMode());
                         listener.connectionChanged(remoteJID,
                             new BinaryChannelConnection(remoteJID, channel,
-                                listener));
+                                listener), true);
                     } catch (IOException e) {
                         new CausedIOException("Could not connect to "
                             + remoteJID.getName(), e);
@@ -137,8 +137,7 @@ public class JingleTransport implements ITransport {
             i++;
         }
 
-        final JingleFileTransferSession session = sessions
-            .get(peer.toString());
+        final JingleFileTransferSession session = sessions.get(peer.toString());
 
         if (session == null)
             throw new IOException("Could not connect to " + peer.toString());
@@ -156,8 +155,7 @@ public class JingleTransport implements ITransport {
         int i = 0;
 
         while ((session.getSessionState() == JingleSessionStatePending
-            .getInstance())
-            && i < timeout) {
+            .getInstance()) && i < timeout) {
 
             if (i % 2 == 0)
                 log.debug("Waiting for connection since " + (i * 500) / 1000
@@ -240,8 +238,8 @@ public class JingleTransport implements ITransport {
                 "Jingle Manager could not be started because connection was closed in the meantime");
         }
 
-        manager = new JingleManager(connection, Collections
-            .singletonList((JingleMediaManager) mediaManager));
+        manager = new JingleManager(connection,
+            Collections.singletonList((JingleMediaManager) mediaManager));
 
         log.debug("Initialized jingle.");
     }

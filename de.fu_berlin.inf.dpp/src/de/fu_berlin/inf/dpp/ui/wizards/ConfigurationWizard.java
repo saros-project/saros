@@ -19,12 +19,14 @@
  */
 package de.fu_berlin.inf.dpp.ui.wizards;
 
+import org.bitlet.weupnp.GatewayDevice;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.feedback.ErrorLogManager;
 import de.fu_berlin.inf.dpp.feedback.StatisticManager;
+import de.fu_berlin.inf.dpp.net.UPnP.UPnPManager;
 import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
 import de.fu_berlin.inf.dpp.ui.ImageManager;
@@ -47,6 +49,9 @@ public class ConfigurationWizard extends AddXMPPAccountWizard {
 
     @Inject
     protected ErrorLogManager errorLogManager;
+
+    @Inject
+    protected UPnPManager upnpManager;
 
     ConfigurationSettingsWizardPage configurationSettingsWizardPage = new ConfigurationSettingsWizardPage();
 
@@ -73,8 +78,8 @@ public class ConfigurationWizard extends AddXMPPAccountWizard {
     }
 
     /**
-     * Sets the Saros configuration on the base of the
-     * {@link ConfigurationSettingsWizardPage}.
+     * Stores the Saros configuration on the base of the
+     * {@link ConfigurationSettingsWizardPage} into the PreferenceStore.
      */
     protected void setConfiguration() {
         IPreferenceStore preferences = saros.getPreferenceStore();
@@ -82,12 +87,12 @@ public class ConfigurationWizard extends AddXMPPAccountWizard {
         /*
          * network
          */
-        boolean autoConnect = this.configurationSettingsWizardPage
-            .isAutoConnect();
         String skypeUsername = (this.configurationSettingsWizardPage
             .isSkypeUsage()) ? this.configurationSettingsWizardPage
             .getSkypeUsername() : "";
-        preferences.setValue(PreferenceConstants.AUTO_CONNECT, autoConnect);
+        preferences.setValue(PreferenceConstants.AUTO_CONNECT,
+            this.configurationSettingsWizardPage.isAutoConnect());
+
         preferences.setValue(PreferenceConstants.SKYPE_USERNAME, skypeUsername);
 
         /*
@@ -100,6 +105,11 @@ public class ConfigurationWizard extends AddXMPPAccountWizard {
         statisticManager
             .setStatisticSubmissionAllowed(statisticSubmissionAllowed);
         errorLogManager.setErrorLogSubmissionAllowed(errorLogSubmissionAllowed);
-    }
 
+        // Gateway setting
+        GatewayDevice selGwDevice = this.configurationSettingsWizardPage
+            .getPortmappingDevice();
+        upnpManager.setSelectedGateway(selGwDevice);
+
+    }
 }

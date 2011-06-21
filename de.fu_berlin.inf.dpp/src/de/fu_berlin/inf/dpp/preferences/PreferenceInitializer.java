@@ -50,6 +50,8 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 
         prefs.putBoolean(PreferenceConstants.ENCRYPT_ACCOUNT, false);
         prefs.putBoolean(PreferenceConstants.AUTO_CONNECT, false);
+        prefs.put(PreferenceConstants.AUTO_PORTMAPPING_DEVICEID, "");
+        prefs.putBoolean(PreferenceConstants.GATEWAYCHECKPERFORMED, false);
         prefs.putBoolean(PreferenceConstants.AUTO_FOLLOW_MODE, false);
         prefs.put(PreferenceConstants.SKYPE_USERNAME, "");
         prefs.putBoolean(PreferenceConstants.DEBUG, false);

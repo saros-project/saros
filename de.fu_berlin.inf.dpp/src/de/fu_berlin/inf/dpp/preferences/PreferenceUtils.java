@@ -137,7 +137,7 @@ public class PreferenceUtils {
      *         string
      */
     public boolean hasUserName() {
-        return getUserName().length() > 0;
+        return getUserName().isEmpty() == false;
     }
 
     /**
@@ -166,6 +166,32 @@ public class PreferenceUtils {
     public boolean isAutoConnecting() {
         return saros.getPreferenceStore().getBoolean(
             PreferenceConstants.AUTO_CONNECT);
+    }
+
+    /**
+     * Returns whether port mapping is enabled or not by evaluating the stored
+     * deviceID to be empty or not.
+     * 
+     * @return true of port mapping is enabled, false otherwise
+     */
+    public boolean isAutoPortmappingEnabled() {
+        return saros.getPreferenceStore()
+            .getString(PreferenceConstants.AUTO_PORTMAPPING_DEVICEID).isEmpty() == false;
+    }
+
+    /**
+     * Returns the device ID of the gateway to perform port mapping on.
+     * 
+     * @return Device ID of the gateway or empty String if disabled.
+     */
+    public String getAutoPortmappingGatewayID() {
+        return saros.getPreferenceStore().getString(
+            PreferenceConstants.AUTO_PORTMAPPING_DEVICEID);
+    }
+
+    public int getAutoPortmappingLastPort() {
+        return saros.getPreferenceStore().getInt(
+            PreferenceConstants.AUTO_PORTMAPPING_LASTMAPPEDPORT);
     }
 
     /**

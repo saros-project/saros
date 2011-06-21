@@ -21,18 +21,14 @@ package de.fu_berlin.inf.dpp;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.Inet6Address;
 import java.net.InetAddress;
 import java.net.MalformedURLException;
-import java.net.NetworkInterface;
-import java.net.SocketException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.net.UnknownHostException;
 import java.util.Collections;
-import java.util.Enumeration;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -84,6 +80,10 @@ import de.fu_berlin.inf.dpp.feedback.StatisticManager;
 import de.fu_berlin.inf.dpp.net.ConnectionState;
 import de.fu_berlin.inf.dpp.net.IConnectionListener;
 import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.net.StunHelper;
+import de.fu_berlin.inf.dpp.net.UPnP.UPnPAccessWeupnp;
+import de.fu_berlin.inf.dpp.net.UPnP.UPnPManager;
+import de.fu_berlin.inf.dpp.net.util.NetworkingUtils;
 import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
 import de.fu_berlin.inf.dpp.project.SarosSessionManager;
@@ -230,6 +230,12 @@ public class Saros extends AbstractUIPlugin {
         return isInitialized;
     }
 
+    @Inject
+    UPnPManager upnpManager;
+
+    @Inject
+    StunHelper stunHelper;
+
     protected void setBytestreamConnectionProperties() {
 
         /*
@@ -242,50 +248,95 @@ public class Saros extends AbstractUIPlugin {
 
         // Socks5 Proxy Configuration
         boolean settingsChanged = false;
+        boolean portChanged = false;
         int port = sarosContext.getComponent(PreferenceUtils.class)
             .getFileTransferPort();
         boolean proxyEnabled = !getPreferenceStore().getBoolean(
             PreferenceConstants.LOCAL_SOCKS5_PROXY_DISABLED);
-
-        // Note: The proxy gets restarted on port change, too.
-        if (port != SmackConfiguration.getLocalSocks5ProxyPort()) {
-            settingsChanged = true;
-            SmackConfiguration.setLocalSocks5ProxyPort(port);
-        }
 
         /*
          * TODO Fix in Smack: Either always start proxy when enabled in the
          * smack configuration or never start it automatically. Currently it
          * only starts after initiation the singleton on first access.
          */
-        if (proxyEnabled != SmackConfiguration.isLocalSocks5ProxyEnabled()) {
+
+        // Thats why prevent auto start
+        boolean isLocalS5Penabled = SmackConfiguration
+            .isLocalSocks5ProxyEnabled();
+        SmackConfiguration.setLocalSocks5ProxyEnabled(false);
+        Socks5Proxy proxy = Socks5Proxy.getSocks5Proxy();
+        if (proxyEnabled != isLocalS5Penabled) {
             settingsChanged = true;
-            SmackConfiguration.setLocalSocks5ProxyEnabled(proxyEnabled);
         }
 
-        // Get & set all IP addresses as potential connect addresses
-        Socks5Proxy proxy = Socks5Proxy.getSocks5Proxy();
-        try {
-            List<String> myAdresses = getAllNonLoopbackIPAdresses();
-            if (!myAdresses.isEmpty())
-                proxy.replaceLocalAddresses(myAdresses);
-        } catch (Exception e) {
-            log.debug("Error while retrieving local IP addresses", e);
+        if (proxyEnabled == true)
+            SmackConfiguration.setLocalSocks5ProxyEnabled(true);
+
+        // Note: The proxy gets restarted on port change, too.
+        if (port != SmackConfiguration.getLocalSocks5ProxyPort()) {
+            settingsChanged = true;
+            portChanged = true;
+            SmackConfiguration.setLocalSocks5ProxyPort(port);
+        }
+
+        // Get & set all (useful) internal and external IP addresses as
+        // potential connect addresses
+        if (proxyEnabled) {
+
+            try {
+                List<InetAddress> myAdresses = NetworkingUtils
+                    .getAllNonLoopbackLocalIPAdresses(true);
+
+                if (!myAdresses.isEmpty()) {
+                    // convert to List of Strings
+                    List<String> myAdressesStr = new LinkedList<String>();
+                    for (InetAddress ip : myAdresses)
+                        myAdressesStr.add(ip.getHostName());
+                    proxy.replaceLocalAddresses(myAdressesStr);
+                }
+
+                // Perform public IP detection concurrently
+                // Dont perform if we know a local IP is the WAN IP
+                if (!stunHelper.isLocalIPthePublicIP())
+                    stunHelper.startWANIPDetection(
+                        getPreferenceStore()
+                            .getString(PreferenceConstants.STUN),
+                        getPreferenceStore().getInt(
+                            PreferenceConstants.STUN_PORT), false);
+
+            } catch (Exception e) {
+                log.debug("Error while retrieving IP addresses", e);
+            }
         }
 
         if (settingsChanged || proxy.isRunning() != proxyEnabled) {
-            StringBuilder sb = new StringBuilder(
-                "Socks5Proxy properties changed.");
+            StringBuilder sb = new StringBuilder();
+            if (settingsChanged)
+                sb.append("Socks5Proxy properties changed. ");
+
             if (proxy.isRunning()) {
                 proxy.stop();
-                sb.append(" Stopping...");
+                sb.append("Socks5Proxy stopped. ");
             }
             if (proxyEnabled) {
-                sb.append(" Starting.");
                 proxy.start();
+                sb.append("Socks5Proxy started on port " + proxy.getPort()
+                    + "...");
             }
-            if (settingsChanged)
-                log.debug(sb);
+            log.debug(sb);
+
+            // Update the mapped port on Socks5Proy port change
+            if (proxyEnabled && portChanged && upnpManager.isMapped())
+                upnpManager.createSarosPortMapping();
+
+            // create UPnP port mapping if not existing
+            if (proxyEnabled && preferenceUtils.isAutoPortmappingEnabled()
+                && !upnpManager.isMapped())
+                upnpManager.createSarosPortMapping();
+
+            // remove UPnP port mapping if not required
+            if (!proxyEnabled && upnpManager.isMapped())
+                upnpManager.removeSarosPortMapping();
         }
 
         // TODO: just pasted from before
@@ -293,50 +344,6 @@ public class Saros extends AbstractUIPlugin {
         // file transfer exclusively
         JingleManager.setServiceEnabled(connection, !getPreferenceStore()
             .getBoolean(PreferenceConstants.FORCE_FILETRANSFER_BY_CHAT));
-    }
-
-    /**
-     * Retrieves all non-loopback IP addresses from all network devices of the
-     * local host. <br>
-     * IPv4 addresses are sorted before IPv6 addresses (to let connecting to
-     * IPv4 IPs before attempting their IPv6 equivalents when iterating the
-     * List).
-     * 
-     * @return List<{@link String}> of all retrieved IP addresses
-     * @throws UnknownHostException
-     * @throws SocketException
-     */
-    protected List<String> getAllNonLoopbackIPAdresses()
-        throws UnknownHostException, SocketException {
-
-        List<String> ips = new LinkedList<String>();
-
-        // Holds last ipv4 index in ips list (used to sort IPv4 before IPv6 IPs)
-        int ipv4Index = 0;
-
-        Enumeration<NetworkInterface> eInterfaces = NetworkInterface
-            .getNetworkInterfaces();
-
-        // Enumerate interfaces and enumerate all internet addresses of each
-        if (eInterfaces != null) {
-            while (eInterfaces.hasMoreElements()) {
-                NetworkInterface ni = eInterfaces.nextElement();
-
-                Enumeration<InetAddress> iaddrs = ni.getInetAddresses();
-                while (iaddrs.hasMoreElements()) {
-                    InetAddress iaddr = iaddrs.nextElement();
-                    if (!iaddr.isLoopbackAddress()) {
-
-                        if (iaddr instanceof Inet6Address)
-                            ips.add(iaddr.getHostAddress());
-                        else
-                            ips.add(ipv4Index++, iaddr.getHostAddress());
-                    }
-                }
-            }
-        }
-
-        return ips;
     }
 
     /**
@@ -394,6 +401,9 @@ public class Saros extends AbstractUIPlugin {
 
         isInitialized = true;
 
+        sarosContext.getComponent(UPnPManager.class).init(
+            new UPnPAccessWeupnp(), getPreferenceStore());
+
         // determine if auto-connect can and should be performed
         boolean autoConnect = getPreferenceStore().getBoolean(
             PreferenceConstants.AUTO_CONNECT);
@@ -436,6 +446,11 @@ public class Saros extends AbstractUIPlugin {
         }
 
         try {
+            // Remove UPnP port mapping for Saros
+            upnpManager = sarosContext.getComponent(UPnPManager.class);
+            if (upnpManager.isMapped())
+                upnpManager.removeSarosPortMapping();
+
             if (isConnected()) {
                 /*
                  * Need to fork because disconnect should not be run in the SWT

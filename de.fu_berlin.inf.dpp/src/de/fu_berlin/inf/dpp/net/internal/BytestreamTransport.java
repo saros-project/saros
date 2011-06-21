@@ -82,10 +82,9 @@ public abstract class BytestreamTransport implements ITransport {
                     return;
 
                 JID peer = new JID(request.getFrom());
-
                 connectionListener.connectionChanged(peer,
                     new BinaryChannelConnection(peer, channel,
-                        connectionListener));
+                        connectionListener), true);
 
             } catch (InterruptedException e) {
                 log.debug("Interrupted while initiating new session.");

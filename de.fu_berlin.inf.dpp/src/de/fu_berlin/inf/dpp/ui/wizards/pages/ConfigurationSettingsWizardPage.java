@@ -1,5 +1,6 @@
 package de.fu_berlin.inf.dpp.ui.wizards.pages;
 
+import org.bitlet.weupnp.GatewayDevice;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.FocusAdapter;
@@ -7,7 +8,9 @@ import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Group;
@@ -22,12 +25,15 @@ import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.feedback.ErrorLogManager;
 import de.fu_berlin.inf.dpp.feedback.Messages;
 import de.fu_berlin.inf.dpp.feedback.StatisticManager;
+import de.fu_berlin.inf.dpp.net.UPnP.UPnPManager;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
 import de.fu_berlin.inf.dpp.ui.ImageManager;
 import de.fu_berlin.inf.dpp.ui.util.LayoutUtils;
+import de.fu_berlin.inf.dpp.ui.util.UPnPUIUtils;
 import de.fu_berlin.inf.dpp.ui.widgets.IllustratedComposite;
 import de.fu_berlin.inf.dpp.ui.widgets.decoration.EmptyText;
 import de.fu_berlin.inf.dpp.util.LinkListener;
+import de.fu_berlin.inf.dpp.util.Utils;
 
 /**
  * Allows the user to enter general configuration parameters for use with Saros.
@@ -50,12 +56,20 @@ public class ConfigurationSettingsWizardPage extends WizardPage {
     @Inject
     protected ErrorLogManager errorLogManager;
 
+    @Inject
+    protected UPnPManager upnpManager;
+
     public ConfigurationSettingsWizardPage() {
         super(ConfigurationSettingsWizardPage.class.getName());
         SarosPluginContext.initComponent(this);
         setTitle(TITLE);
         setDescription(DESCRIPTION);
     }
+
+    protected Button setupPortmappingButton;
+    protected Label portmappingLabel;
+    protected Combo gatewaysCombo;
+    protected Label gatewayInfo;
 
     protected Button autoConnectButton;
     protected Button skypeUsageButton;
@@ -75,8 +89,10 @@ public class ConfigurationSettingsWizardPage extends WizardPage {
         rightColumn.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
         setInitialValues();
+        populateGatewayCombo();
         hookListeners();
         updateSkypeUsernameEnablement();
+        updateGatewaysComboEnablement();
         updatePageCompletion();
     }
 
@@ -86,30 +102,71 @@ public class ConfigurationSettingsWizardPage extends WizardPage {
         leftColumn.setText("Connection");
 
         /*
+         * prepare network setting composite
+         */
+        Composite autoconnectComposite = new IllustratedComposite(leftColumn,
+            SWT.TOP, ImageManager.ELCL_XMPP_CONNECTED);
+        autoconnectComposite.setLayoutData(new GridData(SWT.FILL, SWT.CENTER,
+            true, true));
+        autoconnectComposite.setLayout(LayoutUtils.createGridLayout(0, 5));
+        autoconnectComposite.setBackgroundMode(SWT.INHERIT_NONE);
+
+        /*
          * auto connect
          */
-        Composite autoConnectComposite = new IllustratedComposite(leftColumn,
-            SWT.TOP, ImageManager.ELCL_XMPP_CONNECTED);
-        autoConnectComposite.setLayoutData(new GridData(SWT.FILL, SWT.CENTER,
-            true, true));
-        autoConnectComposite.setLayout(LayoutUtils.createGridLayout(0, 5));
-        autoConnectComposite.setBackgroundMode(SWT.INHERIT_NONE);
-
-        Label autoConnectLabel = new Label(autoConnectComposite, SWT.WRAP);
+        Label autoConnectLabel = new Label(autoconnectComposite, SWT.WRAP);
         autoConnectLabel.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true,
             false));
         autoConnectLabel
             .setText("Automatically connect to XMPP/Jabber server on Eclipse startup?");
 
-        this.autoConnectButton = new Button(autoConnectComposite, SWT.CHECK
+        this.autoConnectButton = new Button(autoconnectComposite, SWT.CHECK
             | SWT.LEFT);
         this.autoConnectButton.setText("Connect automatically");
 
         /*
          * separator
          */
-        Label separator = new Label(leftColumn, SWT.SEPARATOR | SWT.HORIZONTAL);
-        separator
+        new Label(leftColumn, SWT.SEPARATOR | SWT.HORIZONTAL)
+            .setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
+
+        // Gateway port mapping setting
+        Composite gatewayComposite = new IllustratedComposite(leftColumn,
+            SWT.TOP, ImageManager.ICON_UPNP);
+        gatewayComposite.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true,
+            true));
+        gatewayComposite.setLayout(LayoutUtils.createGridLayout(0, 5));
+        gatewayComposite.setBackgroundMode(SWT.INHERIT_NONE);
+
+        portmappingLabel = new Label(gatewayComposite, SWT.WRAP);
+        portmappingLabel.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true,
+            false));
+        portmappingLabel
+            .setText("Automatically configure your gateway to temporary open a port for Saros?");
+
+        this.setupPortmappingButton = new Button(gatewayComposite, SWT.CHECK
+            | SWT.LEFT | SWT.WRAP);
+        this.setupPortmappingButton
+            .setText("Allow Saros to configure the following gateway:");
+        this.setupPortmappingButton
+            .setToolTipText("When using a router for connecting to the internet, it may block incoming connections resulting in slow data transfers in a Saros session.\n"
+                + "Saros can open a port on that gateway for other peer to connect to you.\n"
+                + "This port mapping is removed when exiting Saros.");
+        setupPortmappingButton.setEnabled(false);
+
+        Composite comboCompo = new Composite(gatewayComposite, SWT.TOP
+            | SWT.LEFT);
+        RowLayout rowLayout = new RowLayout();
+        rowLayout.marginLeft = 16;
+        comboCompo.setLayout(rowLayout);
+        gatewaysCombo = new Combo(comboCompo, SWT.DROP_DOWN | SWT.READ_ONLY);
+        gatewayInfo = new Label(comboCompo, SWT.NONE);
+        gatewayInfo.setEnabled(false);
+
+        /*
+         * separator
+         */
+        new Label(leftColumn, SWT.SEPARATOR | SWT.HORIZONTAL)
             .setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
 
         /*
@@ -204,6 +261,8 @@ public class ConfigurationSettingsWizardPage extends WizardPage {
 
     protected void setInitialValues() {
         this.autoConnectButton.setSelection(preferenceUtils.isAutoConnecting());
+        this.setupPortmappingButton.setSelection(preferenceUtils
+            .isAutoPortmappingEnabled());
 
         String skypeUsername = preferenceUtils.getSkypeUserName();
         this.skypeUsageButton.setSelection(!skypeUsername.isEmpty());
@@ -217,6 +276,14 @@ public class ConfigurationSettingsWizardPage extends WizardPage {
     }
 
     protected void hookListeners() {
+        this.setupPortmappingButton
+            .addSelectionListener(new SelectionAdapter() {
+                @Override
+                public void widgetSelected(SelectionEvent e) {
+                    updateGatewaysComboEnablement();
+                }
+            });
+
         this.skypeUsageButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -241,10 +308,15 @@ public class ConfigurationSettingsWizardPage extends WizardPage {
             }
         };
         this.autoConnectButton.addListener(SWT.Selection, listener);
+        this.setupPortmappingButton.addListener(SWT.Selection, listener);
         this.skypeUsageButton.addListener(SWT.Selection, listener);
         this.skypeUsernameText.getControl().addListener(SWT.Modify, listener);
         this.statisticSubmissionButton.addListener(SWT.Selection, listener);
         this.errorLogSubmissionButton.addListener(SWT.Selection, listener);
+    }
+
+    protected void updateGatewaysComboEnablement() {
+        gatewaysCombo.setEnabled(setupPortmappingButton.getSelection());
     }
 
     protected void updateSkypeUsernameEnablement() {
@@ -254,6 +326,38 @@ public class ConfigurationSettingsWizardPage extends WizardPage {
             skypeUsernameText.setFocus();
         else
             skypeUsageButton.setFocus();
+    }
+
+    /**
+     * Populates the gateway combobox with discovered gateways.
+     */
+    protected void populateGatewayCombo() {
+        if (upnpManager.getGateways() == null) {
+            gatewaysCombo.setEnabled(false);
+            gatewayInfo.setText("Searching for gateways...");
+            gatewayInfo.pack();
+
+            // dont block during discovery
+            Utils.runSafeAsync(null, new Runnable() {
+
+                public void run() {
+                    upnpManager.discoverGateways();
+
+                    // GUI work from SWT thread
+                    Utils.runSafeSWTAsync(null, new Runnable() {
+                        public void run() {
+                            UPnPUIUtils.populateGaywaySelectionControls(
+                                upnpManager, gatewaysCombo, gatewayInfo,
+                                setupPortmappingButton);
+                        }
+                    });
+                }
+            });
+
+        } else {
+            UPnPUIUtils.populateGaywaySelectionControls(upnpManager, gatewaysCombo,
+                gatewayInfo, setupPortmappingButton);
+        }
     }
 
     protected void updatePageCompletion() {
@@ -275,6 +379,16 @@ public class ConfigurationSettingsWizardPage extends WizardPage {
 
     public boolean isAutoConnect() {
         return this.autoConnectButton.getSelection();
+    }
+
+    public GatewayDevice getPortmappingDevice() {
+        if (setupPortmappingButton.getSelection()) {
+            int sel = gatewaysCombo.getSelectionIndex();
+            if (sel != -1) {
+                return upnpManager.getGateways().get(sel);
+            }
+        }
+        return null;
     }
 
     public boolean isSkypeUsage() {

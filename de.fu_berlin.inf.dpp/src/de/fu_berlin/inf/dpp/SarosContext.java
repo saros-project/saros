@@ -1,5 +1,26 @@
 package de.fu_berlin.inf.dpp;
 
+import static java.util.Arrays.asList;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.apache.log4j.helpers.LogLog;
+import org.picocontainer.Characteristics;
+import org.picocontainer.ComponentAdapter;
+import org.picocontainer.MutablePicoContainer;
+import org.picocontainer.Parameter;
+import org.picocontainer.PicoBuilder;
+import org.picocontainer.PicoCompositionException;
+import org.picocontainer.PicoContainer;
+import org.picocontainer.injectors.AnnotatedFieldInjection;
+import org.picocontainer.injectors.CompositeInjection;
+import org.picocontainer.injectors.ConstructorInjection;
+import org.picocontainer.injectors.ProviderAdapter;
+import org.picocontainer.injectors.Reinjector;
+
 import de.fu_berlin.inf.dpp.accountManagement.XMPPAccountStore;
 import de.fu_berlin.inf.dpp.communication.SkypeManager;
 import de.fu_berlin.inf.dpp.communication.audio.AudioService;
@@ -15,16 +36,57 @@ import de.fu_berlin.inf.dpp.concurrent.watchdog.IsInconsistentObservable;
 import de.fu_berlin.inf.dpp.concurrent.watchdog.SessionViewOpener;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
-import de.fu_berlin.inf.dpp.feedback.*;
+import de.fu_berlin.inf.dpp.feedback.DataTransferCollector;
+import de.fu_berlin.inf.dpp.feedback.ErrorLogManager;
+import de.fu_berlin.inf.dpp.feedback.FeedbackManager;
+import de.fu_berlin.inf.dpp.feedback.FollowModeCollector;
+import de.fu_berlin.inf.dpp.feedback.JumpFeatureUsageCollector;
+import de.fu_berlin.inf.dpp.feedback.ParticipantCollector;
+import de.fu_berlin.inf.dpp.feedback.PermissionChangeCollector;
+import de.fu_berlin.inf.dpp.feedback.SelectionCollector;
+import de.fu_berlin.inf.dpp.feedback.SessionDataCollector;
+import de.fu_berlin.inf.dpp.feedback.StatisticManager;
+import de.fu_berlin.inf.dpp.feedback.TextEditCollector;
+import de.fu_berlin.inf.dpp.feedback.VoIPCollector;
 import de.fu_berlin.inf.dpp.invitation.ArchiveStreamService;
 import de.fu_berlin.inf.dpp.net.IncomingTransferObject;
 import de.fu_berlin.inf.dpp.net.RosterTracker;
-import de.fu_berlin.inf.dpp.net.business.*;
-import de.fu_berlin.inf.dpp.net.internal.*;
+import de.fu_berlin.inf.dpp.net.StunHelper;
+import de.fu_berlin.inf.dpp.net.UPnP.UPnPManager;
+import de.fu_berlin.inf.dpp.net.business.ActivitiesHandler;
+import de.fu_berlin.inf.dpp.net.business.CancelInviteHandler;
+import de.fu_berlin.inf.dpp.net.business.CancelProjectSharingHandler;
+import de.fu_berlin.inf.dpp.net.business.ConsistencyWatchdogHandler;
+import de.fu_berlin.inf.dpp.net.business.DispatchThreadContext;
+import de.fu_berlin.inf.dpp.net.business.InvitationHandler;
+import de.fu_berlin.inf.dpp.net.business.LeaveHandler;
+import de.fu_berlin.inf.dpp.net.business.RequestForActivityHandler;
+import de.fu_berlin.inf.dpp.net.business.UserListHandler;
+import de.fu_berlin.inf.dpp.net.internal.ActivitiesExtensionProvider;
+import de.fu_berlin.inf.dpp.net.internal.ConnectionTestManager;
+import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
+import de.fu_berlin.inf.dpp.net.internal.DefaultInvitationInfo;
+import de.fu_berlin.inf.dpp.net.internal.IBBTransport;
+import de.fu_berlin.inf.dpp.net.internal.InvitationInfo;
+import de.fu_berlin.inf.dpp.net.internal.StreamServiceManager;
+import de.fu_berlin.inf.dpp.net.internal.UserListInfo;
+import de.fu_berlin.inf.dpp.net.internal.XMPPReceiver;
+import de.fu_berlin.inf.dpp.net.internal.XMPPTransmitter;
 import de.fu_berlin.inf.dpp.net.internal.discoveryManager.DiscoveryManager;
-import de.fu_berlin.inf.dpp.net.internal.extensions.*;
+import de.fu_berlin.inf.dpp.net.internal.extensions.CancelInviteExtension;
+import de.fu_berlin.inf.dpp.net.internal.extensions.CancelProjectSharingExtension;
+import de.fu_berlin.inf.dpp.net.internal.extensions.LeaveExtension;
+import de.fu_berlin.inf.dpp.net.internal.extensions.RequestActivityExtension;
+import de.fu_berlin.inf.dpp.net.internal.extensions.UserListExtension;
 import de.fu_berlin.inf.dpp.net.internal.subscriptionManager.SubscriptionManager;
-import de.fu_berlin.inf.dpp.observables.*;
+import de.fu_berlin.inf.dpp.observables.FileReplacementInProgressObservable;
+import de.fu_berlin.inf.dpp.observables.InvitationProcessObservable;
+import de.fu_berlin.inf.dpp.observables.JingleFileTransferManagerObservable;
+import de.fu_berlin.inf.dpp.observables.ProjectNegotiationObservable;
+import de.fu_berlin.inf.dpp.observables.SarosSessionObservable;
+import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
+import de.fu_berlin.inf.dpp.observables.VideoSessionObservable;
+import de.fu_berlin.inf.dpp.observables.VoIPSessionObservable;
 import de.fu_berlin.inf.dpp.optional.jdt.JDTFacade;
 import de.fu_berlin.inf.dpp.preferences.PreferenceManager;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
@@ -36,12 +98,12 @@ import de.fu_berlin.inf.dpp.project.internal.ChangeColorManager;
 import de.fu_berlin.inf.dpp.project.internal.PermissionManager;
 import de.fu_berlin.inf.dpp.project.internal.ProjectsAddedManager;
 import de.fu_berlin.inf.dpp.synchronize.StopManager;
-import de.fu_berlin.inf.dpp.util.EclipseHelper;
-import de.fu_berlin.inf.dpp.util.EclipseHelperTestSaros;
 import de.fu_berlin.inf.dpp.ui.LocalPresenceTracker;
 import de.fu_berlin.inf.dpp.ui.RemoteProgressManager;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
 import de.fu_berlin.inf.dpp.ui.actions.SendFileAction;
+import de.fu_berlin.inf.dpp.util.EclipseHelper;
+import de.fu_berlin.inf.dpp.util.EclipseHelperTestSaros;
 import de.fu_berlin.inf.dpp.util.StackTrace;
 import de.fu_berlin.inf.dpp.util.VersionManager;
 import de.fu_berlin.inf.dpp.util.pico.ChildContainer;
@@ -49,21 +111,11 @@ import de.fu_berlin.inf.dpp.util.pico.ChildContainerProvider;
 import de.fu_berlin.inf.dpp.util.pico.DotGraphMonitor;
 import de.fu_berlin.inf.dpp.videosharing.VideoSharing;
 import de.fu_berlin.inf.dpp.videosharing.VideoSharingService;
-import org.apache.log4j.helpers.LogLog;
-import org.picocontainer.*;
-import org.picocontainer.injectors.*;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import static java.util.Arrays.asList;
 
 /**
- * Encapsulates a {@link org.picocontainer.PicoContainer} and its
- * saros-specific initializiation. Basicly it's used to get or reinject
- * components in the context:
+ * Encapsulates a {@link org.picocontainer.PicoContainer} and its saros-specific
+ * initializiation. Basicly it's used to get or reinject components in the
+ * context:
  * 
  * {@link de.fu_berlin.inf.dpp.SarosContext#getComponent(Class)},
  * {@link de.fu_berlin.inf.dpp.SarosContext#reinject(Object)}
@@ -145,6 +197,8 @@ public class SarosContext {
         ProjectsAddedManager.class,
         EclipseHelper.class,
         IBBTransport.class,
+        UPnPManager.class,
+        StunHelper.class,
 
         // Observables
         FileReplacementInProgressObservable.class,
@@ -186,22 +240,16 @@ public class SarosContext {
         DefaultInvitationInfo.InvitationCompleteExtensionProvider.class,
 
         // Statistic collectors
-        DataTransferCollector.class,
-        PermissionChangeCollector.class,
-        ParticipantCollector.class,
-        SessionDataCollector.class,
-        TextEditCollector.class,
-        JumpFeatureUsageCollector.class,
-        FollowModeCollector.class,
-        SelectionCollector.class,
+        DataTransferCollector.class, PermissionChangeCollector.class,
+        ParticipantCollector.class, SessionDataCollector.class,
+        TextEditCollector.class, JumpFeatureUsageCollector.class,
+        FollowModeCollector.class, SelectionCollector.class,
         VoIPCollector.class,
 
         // streaming services
-        SendFileAction.SendFileStreamService.class,
-        AudioService.class,
-        VideoSharingService.class,
-        ArchiveStreamService.class
-    
+        SendFileAction.SendFileStreamService.class, AudioService.class,
+        VideoSharingService.class, ArchiveStreamService.class
+
     };
 
     private static final List<Class<?>> excludedComponentsForTestContext = new ArrayList<Class<?>>(
@@ -209,14 +257,16 @@ public class SarosContext {
 
     private static final Map<Class<?>, Class<?>> testImplementations = new HashMap<Class<?>, Class<?>>() {
         {
-            put(de.fu_berlin.inf.dpp.util.EclipseHelper.class, EclipseHelperTestSaros.class);
+            put(de.fu_berlin.inf.dpp.util.EclipseHelper.class,
+                EclipseHelperTestSaros.class);
         }
     };
 
     private SarosContext() {
         /*
-         * Use the SarosContextBuilder to build a SarosContext. {@link SarosContextBuilder}
-         */         
+         * Use the SarosContextBuilder to build a SarosContext. {@link
+         * SarosContextBuilder}
+         */
     }
 
     private void init(List<Class<?>> excludedComponentsForTestContext) {
@@ -260,7 +310,6 @@ public class SarosContext {
         // add this context itself because some components need it ...
         this.container.addComponent(SarosContext.class, this);
 
-
         /*
          * The following classes are initialized by the re-injector because they
          * are created by Eclipse:
@@ -270,7 +319,7 @@ public class SarosContext {
          * 
          * CAUTION: Classes from which duplicates can exists, should not be
          * managed by PicoContainer.
-         */        
+         */
         reinjector = new Reinjector(this.container);
     }
 

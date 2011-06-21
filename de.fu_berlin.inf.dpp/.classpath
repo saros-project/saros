@@ -54,5 +54,6 @@
 	<classpathentry exported="true" kind="lib" path="lib/org.hamcrest.integration_1.1.0.v20090501071000.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/org.hamcrest.library_1.1.0.v20090501071000.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/org.hamcrest.text_1.1.0.v20090501071000.jar"/>
+	<classpathentry kind="lib" path="lib/weupnp.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

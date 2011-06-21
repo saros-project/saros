@@ -29,6 +29,7 @@ import de.fu_berlin.inf.dpp.net.IRosterListener;
 import de.fu_berlin.inf.dpp.net.ITransferModeListener;
 import de.fu_berlin.inf.dpp.net.IncomingTransferObject;
 import de.fu_berlin.inf.dpp.net.IncomingTransferObject.IncomingTransferObjectExtensionProvider;
+import de.fu_berlin.inf.dpp.net.UPnP.UPnPManager;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.RosterTracker;
 import de.fu_berlin.inf.dpp.net.business.DispatchThreadContext;
@@ -67,6 +68,9 @@ public class DataTransferManager implements IConnectionListener,
 
     @Inject
     protected IncomingTransferObjectExtensionProvider incomingExtProv;
+
+    @Inject
+    protected UPnPManager upnpManager;
 
     protected Saros saros;
 
@@ -415,7 +419,7 @@ public class DataTransferManager implements IConnectionListener,
 
             throw new IOException(Utils.prefix(recipient) + errorMsg.toString());
         } else
-            connectionChanged(recipient, connection);
+            connectionChanged(recipient, connection, false);
         return connection;
     }
 
@@ -424,7 +428,7 @@ public class DataTransferManager implements IConnectionListener,
     }
 
     public synchronized void connectionChanged(JID peer,
-        IBytestreamConnection connection2) {
+        IBytestreamConnection connection2, boolean incomingRequest) {
         // TODO: remove these lines
         IBytestreamConnection old = connections.get(peer);
         assert (old == null || !old.isConnected());
@@ -432,6 +436,10 @@ public class DataTransferManager implements IConnectionListener,
         log.debug("Bytestream connection changed " + connection2.getMode());
         connections.put(peer, connection2);
         transferModeDispatch.connectionChanged(peer, connection2);
+
+        if (connection2.getMode() == NetTransferMode.IBB && incomingRequest)
+            upnpManager.checkAndInformAboutUPnP();
+
     }
 
     public void connectionClosed(JID peer, IBytestreamConnection connection2) {

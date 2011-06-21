@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
@@ -44,6 +45,7 @@ public class ConfigurationSummaryWizardPage extends WizardPage {
     Composite composite;
     SimpleIllustratedComposite jid;
     SimpleIllustratedComposite autoConnection;
+    SimpleIllustratedComposite uPnPOption;
     SimpleIllustratedComposite skypeUsername;
     SimpleIllustratedComposite statisticSubmission;
     SimpleIllustratedComposite errorLogSubmission;
@@ -149,6 +151,12 @@ public class ConfigurationSummaryWizardPage extends WizardPage {
             networkSettingsComposite, SWT.NONE);
         this.autoConnection.setLayoutData(new GridData(SWT.FILL, SWT.CENTER,
             true, false));
+
+        this.uPnPOption = new SummaryItemComposite(networkSettingsComposite,
+            SWT.NONE);
+        this.uPnPOption.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true,
+            false));
+
         this.skypeUsername = new SummaryItemComposite(networkSettingsComposite,
             SWT.NONE);
         this.skypeUsername.setLayoutData(new GridData(SWT.FILL, SWT.CENTER,
@@ -207,6 +215,8 @@ public class ConfigurationSummaryWizardPage extends WizardPage {
 
         JID jid = enterXMPPAccountWizardPage.getJID();
         boolean autoConnect = configurationSettingsWizardPage.isAutoConnect();
+        boolean uPnPEnabled = configurationSettingsWizardPage
+            .getPortmappingDevice() != null;
         String skypeUsername = configurationSettingsWizardPage.isSkypeUsage() ? configurationSettingsWizardPage
             .getSkypeUsername() : "";
         boolean statisticSubmissionAllowed = configurationSettingsWizardPage
@@ -227,6 +237,26 @@ public class ConfigurationSummaryWizardPage extends WizardPage {
                 this.autoConnection.setContent(new IllustratedText(
                     ImageManager.DLCL_XMPP_CONNECTED,
                     "Do not connect automatically"));
+            }
+        }
+
+        if (this.uPnPOption != null) {
+            if (uPnPEnabled) {
+                this.uPnPOption.setContent(new IllustratedText(
+                    ImageManager.ICON_UPNP, "Use UPnP port mapping"));
+            } else {
+
+                Image disabledUPnP = null;
+                try {
+                    disabledUPnP = new Image(null, ImageManager.ICON_UPNP,
+                        SWT.IMAGE_DISABLE);
+                } catch (Exception e) {
+                    System.out.println("Unable to convert image:"
+                        + e.getMessage());
+                }
+                if (disabledUPnP != null)
+                    this.uPnPOption.setContent(new IllustratedText(
+                        disabledUPnP, "Don't use UPnP port mapping"));
             }
         }
 
