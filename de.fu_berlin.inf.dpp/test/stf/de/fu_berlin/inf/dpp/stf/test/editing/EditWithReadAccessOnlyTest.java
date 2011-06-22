@@ -12,9 +12,8 @@ import org.junit.Test;
 import de.fu_berlin.inf.dpp.stf.annotation.TestLink;
 import de.fu_berlin.inf.dpp.stf.client.StfTestCase;
 import de.fu_berlin.inf.dpp.stf.client.util.Util;
-import de.fu_berlin.inf.dpp.stf.test.Constants;
 
-@TestLink(id = "Saros-87:Observer trying to type")
+@TestLink(id = "Saros-87_Observer_trying_to_type")
 public class EditWithReadAccessOnlyTest extends StfTestCase {
 
     @BeforeClass
@@ -30,7 +29,7 @@ public class EditWithReadAccessOnlyTest extends StfTestCase {
             ALICE, BOB);
 
         BOB.superBot().views().packageExplorerView()
-            .waitUntilResourceIsShared(Constants.PROJECT1);
+            .waitUntilResourceIsShared("foo");
 
         ALICE.superBot().views().packageExplorerView()
             .selectClass("foo", "bar", "HelloWorld").open();
