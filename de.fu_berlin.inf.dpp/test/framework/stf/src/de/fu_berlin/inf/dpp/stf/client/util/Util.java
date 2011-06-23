@@ -117,7 +117,7 @@ public class Util {
 
     public static void setUpSessionWithJavaProjects(
         Map<String, List<String>> projectsPkgsClasses, AbstractTester inviter,
-        AbstractTester... invitees) throws RemoteException {
+        AbstractTester... invitees) {
 
         throw new UnsupportedOperationException("not yet implemented");
         // List<String> createdProjects = new ArrayList<String>();
