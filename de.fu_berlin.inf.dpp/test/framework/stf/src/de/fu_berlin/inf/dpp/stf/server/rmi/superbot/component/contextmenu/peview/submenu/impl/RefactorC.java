@@ -6,6 +6,7 @@ import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotShell;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotTreeItem;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.Component;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.contextmenu.peview.submenu.IRefactorC;
+import de.fu_berlin.inf.dpp.stf.server.util.Util;
 
 public class RefactorC extends Component implements IRefactorC {
 
@@ -46,7 +47,7 @@ public class RefactorC extends Component implements IRefactorC {
 
     public void moveClassTo(String targetProject, String targetPkg)
         throws RemoteException {
-        moveTo(SHELL_MOVE, OK, getPkgNodes(targetProject, targetPkg));
+        moveTo(SHELL_MOVE, OK, Util.getPkgNodes(targetProject, targetPkg));
     }
 
     public void rename(String newName) throws RemoteException {

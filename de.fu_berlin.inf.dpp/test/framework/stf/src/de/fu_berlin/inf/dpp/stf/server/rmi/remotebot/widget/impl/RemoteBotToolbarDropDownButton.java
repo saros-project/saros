@@ -14,7 +14,7 @@ import org.hamcrest.Matcher;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotMenu;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotToolbarDropDownButton;
 
-public class RemoteBotToolbarDropDownButton extends AbstractRemoteWidget
+public final class RemoteBotToolbarDropDownButton extends AbstractRemoteWidget
     implements IRemoteBotToolbarDropDownButton {
     private static transient RemoteBotToolbarDropDownButton self;
 

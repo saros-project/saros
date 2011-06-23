@@ -1,8 +1,9 @@
 package de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget;
 
+import java.rmi.Remote;
 import java.rmi.RemoteException;
 
-public interface IRemoteBotToggleButton {
+public interface IRemoteBotToggleButton extends Remote {
 
     /**********************************************
      * 

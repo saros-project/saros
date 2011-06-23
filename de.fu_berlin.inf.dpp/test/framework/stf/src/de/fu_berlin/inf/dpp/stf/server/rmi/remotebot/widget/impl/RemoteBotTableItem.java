@@ -11,7 +11,7 @@ import de.fu_berlin.inf.dpp.stf.server.bot.SarosSWTBotPreferences;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotMenu;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotTableItem;
 
-public class RemoteBotTableItem extends AbstractRemoteWidget implements
+public final class RemoteBotTableItem extends AbstractRemoteWidget implements
     IRemoteBotTableItem {
 
     private static transient RemoteBotTableItem self;

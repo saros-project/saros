@@ -4,6 +4,7 @@ import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotEditor;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotPerspective;
@@ -31,6 +32,9 @@ import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.impl.RemoteBotView;
 
 public class RemoteWorkbenchBot extends RemoteBot implements
     IRemoteWorkbenchBot {
+
+    private static final Logger log = Logger
+        .getLogger(RemoteWorkbenchBot.class);
 
     private static transient RemoteWorkbenchBot self;
 
@@ -271,7 +275,7 @@ public class RemoteWorkbenchBot extends RemoteBot implements
         SWTBotShell[] shells = sarosSwtBot.shells();
         for (SWTBotShell shell : shells) {
             if (shell.getText().matches(".+? - .+")) {
-                log.debug("shell found matching \"" + ".+? - .+" + "\"");
+                log.debug("found workbench " + shell.getText());
                 return shell;
             }
         }

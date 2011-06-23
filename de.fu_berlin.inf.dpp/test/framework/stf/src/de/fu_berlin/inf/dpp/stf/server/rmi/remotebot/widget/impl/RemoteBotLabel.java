@@ -7,7 +7,8 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotLabel;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotLabel;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotMenu;
 
-public class RemoteBotLabel extends AbstractRemoteWidget implements IRemoteBotLabel {
+public final class RemoteBotLabel extends AbstractRemoteWidget implements
+    IRemoteBotLabel {
 
     private static transient RemoteBotLabel self;
 

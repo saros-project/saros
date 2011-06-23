@@ -2,6 +2,7 @@ package de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.contextmenu.pevie
 
 import java.rmi.RemoteException;
 
+import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -19,6 +20,8 @@ import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.contextmenu.peview
 import de.fu_berlin.inf.dpp.vcs.VCSAdapter;
 
 public class TeamC extends Component implements ITeamC {
+
+    private static final Logger log = Logger.getLogger(TeamC.class);
 
     private static transient TeamC self;
 
@@ -103,7 +106,8 @@ public class TeamC extends Component implements ITeamC {
             IRemoteBotView view = remoteBot().view(VIEW_SVN_REPOSITORIES);
 
             view.show();
-            final boolean viewWasOpen = remoteBot().isViewOpen(VIEW_SVN_REPOSITORIES);
+            final boolean viewWasOpen = remoteBot().isViewOpen(
+                VIEW_SVN_REPOSITORIES);
             remoteBot().view(VIEW_SVN_REPOSITORIES)
                 .toolbarButton("Add SVN Repository").click();
 
@@ -121,7 +125,8 @@ public class TeamC extends Component implements ITeamC {
             return;
         }
 
-        remoteBot().shell(SHELL_SHARE_PROJECT).confirmWithTable(repositoryURL, NEXT);
+        remoteBot().shell(SHELL_SHARE_PROJECT).confirmWithTable(repositoryURL,
+            NEXT);
         IRemoteBotShell shell3 = remoteBot().shell(SHELL_SHARE_PROJECT);
         shell3.bot().radio("Use specified folder name:").click();
         shell3.bot().text().setText(specifiedFolderName);
@@ -146,8 +151,8 @@ public class TeamC extends Component implements ITeamC {
         shell.confirmWithTreeWithFilterText(TABLE_ITEM_REPOSITORY_TYPE_SVN,
             "Checkout Projects from SVN", NEXT);
         if (shell.bot().table().containsItem(repositoryURL)) {
-            remoteBot().shell("Checkout from SVN").confirmWithTable(repositoryURL,
-                NEXT);
+            remoteBot().shell("Checkout from SVN").confirmWithTable(
+                repositoryURL, NEXT);
         } else {
             shell.bot().radio("Create a new repository location").click();
             shell.bot().button(NEXT).click();
@@ -155,8 +160,9 @@ public class TeamC extends Component implements ITeamC {
             shell.bot().button(NEXT).click();
             remoteBot().shell("Checkout from SVN").waitUntilActive();
         }
-        remoteBot().shell("Checkout from SVN").confirmWithTreeWithWaitingExpand(
-            "Checkout from SVN", FINISH, repositoryURL, "trunk", "examples");
+        remoteBot().shell("Checkout from SVN")
+            .confirmWithTreeWithWaitingExpand("Checkout from SVN", FINISH,
+                repositoryURL, "trunk", "examples");
         remoteBot().shell("SVN Checkout").waitUntilActive();
         remoteBot().waitUntilShellIsClosed("SVN Checkout");
     }

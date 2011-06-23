@@ -6,6 +6,7 @@ import static org.eclipse.swtbot.swt.finder.matchers.WidgetMatcherFactory.widget
 import java.rmi.RemoteException;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.eclipse.jface.bindings.keys.KeyStroke;
 import org.eclipse.jface.bindings.keys.ParseException;
 import org.eclipse.swt.widgets.MenuItem;
@@ -16,7 +17,7 @@ import org.hamcrest.Matcher;
 import org.jivesoftware.smack.Roster;
 
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.stf.server.STFMessage;
+import de.fu_berlin.inf.dpp.stf.server.StfRemoteObject;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotMenu;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotToolbarDropDownButton;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotTree;
@@ -35,6 +36,8 @@ import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.saros.ISarosV
  * @author lchen
  */
 public class SarosView extends Views implements ISarosView {
+
+    private static final Logger log = Logger.getLogger(SarosView.class);
 
     private static transient SarosView self;
 
@@ -203,7 +206,7 @@ public class SarosView extends Views implements ISarosView {
     // }
 
     /**
-     * Note: {@link STFMessage#TB_INCONSISTENCY_DETECTED} is not complete
+     * Note: {@link StfRemoteObject#TB_INCONSISTENCY_DETECTED} is not complete
      * toolbarName, so we need to use
      * {@link IRemoteBotView#toolbarButtonWithRegex(String)} to perform this
      * action.

@@ -7,7 +7,8 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotCombo;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotCombo;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotMenu;
 
-public class RemoteBotCombo extends AbstractRemoteWidget implements IRemoteBotCombo {
+public final class RemoteBotCombo extends AbstractRemoteWidget implements
+    IRemoteBotCombo {
 
     private static transient RemoteBotCombo self;
 

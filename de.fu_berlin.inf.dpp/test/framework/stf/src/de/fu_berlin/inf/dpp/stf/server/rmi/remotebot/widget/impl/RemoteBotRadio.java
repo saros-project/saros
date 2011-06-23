@@ -8,7 +8,8 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotRadio;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotMenu;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotRadio;
 
-public class RemoteBotRadio extends AbstractRemoteWidget implements IRemoteBotRadio {
+public final class RemoteBotRadio extends AbstractRemoteWidget implements
+    IRemoteBotRadio {
     private static transient RemoteBotRadio self;
 
     private SWTBotRadio swtBotRadio;

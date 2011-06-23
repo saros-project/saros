@@ -1,9 +1,9 @@
 package de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.impl;
 
-import de.fu_berlin.inf.dpp.stf.server.STFMessage;
+import de.fu_berlin.inf.dpp.stf.server.StfRemoteObject;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.impl.RemoteWorkbenchBot;
 
-public class AbstractRemoteWidget extends STFMessage {
+public class AbstractRemoteWidget extends StfRemoteObject {
 
     protected static RemoteBotMenu stfBotMenu = RemoteBotMenu.getInstance();
 

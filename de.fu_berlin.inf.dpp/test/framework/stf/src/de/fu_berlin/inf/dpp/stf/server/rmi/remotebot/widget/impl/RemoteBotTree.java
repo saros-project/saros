@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
 import org.eclipse.swtbot.swt.finder.waits.DefaultCondition;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
@@ -15,7 +16,10 @@ import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotMenu;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotTree;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotTreeItem;
 
-public class RemoteBotTree extends AbstractRemoteWidget implements IRemoteBotTree {
+public final class RemoteBotTree extends AbstractRemoteWidget implements
+    IRemoteBotTree {
+
+    private static final Logger log = Logger.getLogger(RemoteBotTree.class);
 
     private static transient RemoteBotTree self;
 
@@ -49,7 +53,8 @@ public class RemoteBotTree extends AbstractRemoteWidget implements IRemoteBotTre
      **********************************************/
 
     public IRemoteBotTreeItem[] getAllItems() throws RemoteException {
-        IRemoteBotTreeItem[] items = new IRemoteBotTreeItem[widget.getAllItems().length];
+        IRemoteBotTreeItem[] items = new IRemoteBotTreeItem[widget
+            .getAllItems().length];
         for (int i = 0; i < widget.getAllItems().length; i++) {
             items[i] = stfBotTreeItem.setWidget(widget.getAllItems()[i]);
         }
@@ -67,7 +72,8 @@ public class RemoteBotTree extends AbstractRemoteWidget implements IRemoteBotTre
      * 
      **********************************************/
 
-    public IRemoteBotTreeItem collapseNode(String nodeText) throws RemoteException {
+    public IRemoteBotTreeItem collapseNode(String nodeText)
+        throws RemoteException {
         return stfBotTreeItem.setWidget(widget.collapseNode(nodeText));
     }
 
@@ -76,7 +82,8 @@ public class RemoteBotTree extends AbstractRemoteWidget implements IRemoteBotTre
         return stfBotTreeItem.setWidget(widget.expandNode(nodeText, recursive));
     }
 
-    public IRemoteBotTreeItem expandNode(String... nodes) throws RemoteException {
+    public IRemoteBotTreeItem expandNode(String... nodes)
+        throws RemoteException {
         return stfBotTreeItem.setWidget(widget.expandNode(nodes));
     }
 

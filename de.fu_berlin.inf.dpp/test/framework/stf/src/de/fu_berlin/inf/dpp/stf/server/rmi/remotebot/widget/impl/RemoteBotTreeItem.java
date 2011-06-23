@@ -4,6 +4,7 @@ import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.eclipse.swtbot.swt.finder.waits.DefaultCondition;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
@@ -12,9 +13,11 @@ import de.fu_berlin.inf.dpp.stf.server.bot.widget.ContextMenuHelper;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotMenu;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotTreeItem;
 
-public class RemoteBotTreeItem extends AbstractRemoteWidget implements
+public final class RemoteBotTreeItem extends AbstractRemoteWidget implements
     IRemoteBotTreeItem {
     private static transient RemoteBotTreeItem self;
+
+    private static final Logger log = Logger.getLogger(RemoteBotTreeItem.class);
 
     private SWTBotTreeItem widget;
 

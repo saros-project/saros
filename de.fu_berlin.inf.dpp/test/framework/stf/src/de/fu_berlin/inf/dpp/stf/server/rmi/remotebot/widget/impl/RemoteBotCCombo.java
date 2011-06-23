@@ -7,7 +7,7 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotCCombo;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotCCombo;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotMenu;
 
-public class RemoteBotCCombo extends AbstractRemoteWidget implements
+public final class RemoteBotCCombo extends AbstractRemoteWidget implements
     IRemoteBotCCombo {
 
     private static transient RemoteBotCCombo self;

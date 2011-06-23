@@ -15,7 +15,7 @@ import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotMenu;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotTable;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotTableItem;
 
-public class RemoteBotTable extends AbstractRemoteWidget implements
+public final class RemoteBotTable extends AbstractRemoteWidget implements
     IRemoteBotTable {
 
     private static transient RemoteBotTable self;

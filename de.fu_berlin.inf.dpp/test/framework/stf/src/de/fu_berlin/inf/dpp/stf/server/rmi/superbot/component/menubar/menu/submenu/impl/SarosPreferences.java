@@ -2,6 +2,8 @@ package de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.menubar.menu.subm
 
 import java.rmi.RemoteException;
 
+import org.apache.log4j.Logger;
+
 import de.fu_berlin.inf.dpp.accountManagement.XMPPAccount;
 import de.fu_berlin.inf.dpp.feedback.Messages;
 import de.fu_berlin.inf.dpp.net.JID;
@@ -11,6 +13,8 @@ import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.menubar.menu.subme
 import de.fu_berlin.inf.dpp.ui.preferencePages.GeneralPreferencePage;
 
 public class SarosPreferences extends Component implements ISarosPreferences {
+
+    private static final Logger log = Logger.getLogger(SarosPreferences.class);
 
     private static transient SarosPreferences self;
 

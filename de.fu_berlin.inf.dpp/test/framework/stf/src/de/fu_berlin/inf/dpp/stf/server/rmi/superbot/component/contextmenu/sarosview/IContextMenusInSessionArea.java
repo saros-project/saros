@@ -4,7 +4,7 @@ import java.rmi.RemoteException;
 
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.stf.server.STFMessage;
+import de.fu_berlin.inf.dpp.stf.server.StfRemoteObject;
 
 public interface IContextMenusInSessionArea extends IContextMenusInSarosView {
 
@@ -16,13 +16,13 @@ public interface IContextMenusInSessionArea extends IContextMenusInSarosView {
 
     /**
      * Grant the selected buddy a write access by clicking his contextMenu
-     * {@link STFMessage#CM_GRANT_WRITE_ACCESS}.
+     * {@link StfRemoteObject#CM_GRANT_WRITE_ACCESS}.
      */
     public void grantWriteAccess() throws RemoteException;
 
     /**
      * Restrict the selected buddy to read only access by clicking his
-     * contextMenu {@link STFMessage#CM_RESTRICT_TO_READ_ONLY_ACCESS}
+     * contextMenu {@link StfRemoteObject#CM_RESTRICT_TO_READ_ONLY_ACCESS}
      * 
      * @throws RemoteException
      */
@@ -30,7 +30,7 @@ public interface IContextMenusInSessionArea extends IContextMenusInSarosView {
 
     /**
      * Follow the selected buddy by clicking his contextMenu
-     * {@link STFMessage#CM_FOLLOW_PARTICIPANT}
+     * {@link StfRemoteObject#CM_FOLLOW_PARTICIPANT}
      * 
      * @throws RemoteException
      */
@@ -38,7 +38,7 @@ public interface IContextMenusInSessionArea extends IContextMenusInSarosView {
 
     /**
      * Stop following the selected buddy by clicking his contextMenu
-     * {@link STFMessage#CM_STOP_FOLLOWING}
+     * {@link StfRemoteObject#CM_STOP_FOLLOWING}
      * 
      * @throws RemoteException
      */
@@ -46,7 +46,7 @@ public interface IContextMenusInSessionArea extends IContextMenusInSarosView {
 
     /**
      * Jump to the position of the selected buddy by clicking his contextMenu
-     * {@link STFMessage#CM_JUMP_TO_POSITION_SELECTED_BUDDY}
+     * {@link StfRemoteObject#CM_JUMP_TO_POSITION_SELECTED_BUDDY}
      * 
      * @throws RemoteException
      */

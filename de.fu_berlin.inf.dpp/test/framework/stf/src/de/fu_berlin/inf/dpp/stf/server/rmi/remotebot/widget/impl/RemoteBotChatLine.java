@@ -5,7 +5,7 @@ import java.rmi.RemoteException;
 import de.fu_berlin.inf.dpp.stf.server.bot.widget.SarosSWTBotChatLine;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotChatLine;
 
-public class RemoteBotChatLine extends AbstractRemoteWidget implements
+public final class RemoteBotChatLine extends AbstractRemoteWidget implements
     IRemoteBotChatLine {
 
     private static transient RemoteBotChatLine self;

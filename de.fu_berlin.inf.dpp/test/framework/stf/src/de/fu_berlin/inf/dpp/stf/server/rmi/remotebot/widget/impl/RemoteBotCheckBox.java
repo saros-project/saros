@@ -7,7 +7,7 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotCheckBox;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotCheckBox;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotMenu;
 
-public class RemoteBotCheckBox extends AbstractRemoteWidget implements
+public final class RemoteBotCheckBox extends AbstractRemoteWidget implements
     IRemoteBotCheckBox {
 
     private static transient RemoteBotCheckBox self;

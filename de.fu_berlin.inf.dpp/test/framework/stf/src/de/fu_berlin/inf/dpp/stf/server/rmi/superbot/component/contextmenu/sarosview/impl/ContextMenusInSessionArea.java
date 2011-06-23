@@ -2,6 +2,7 @@ package de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.contextmenu.saros
 
 import java.rmi.RemoteException;
 
+import org.apache.log4j.Logger;
 import org.eclipse.swtbot.swt.finder.waits.DefaultCondition;
 
 import de.fu_berlin.inf.dpp.net.JID;
@@ -10,6 +11,9 @@ import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.contextmenu.sarosv
 public class ContextMenusInSessionArea extends ContextMenusInSarosView
     implements IContextMenusInSessionArea {
     private static transient ContextMenusInSessionArea self;
+
+    private static final Logger log = Logger
+        .getLogger(ContextMenusInSessionArea.class);
 
     /**
      * {@link ContextMenusInSessionArea} is a singleton, but inheritance is

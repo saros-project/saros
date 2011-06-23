@@ -36,6 +36,7 @@ import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.impl.RemoteBotStyled
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.impl.RemoteBotTable;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.impl.RemoteBotTableItem;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.impl.RemoteBotText;
+import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.impl.RemoteBotToggleButton;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.impl.RemoteBotToolbarButton;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.impl.RemoteBotToolbarDropDownButton;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.impl.RemoteBotToolbarPushButton;
@@ -45,7 +46,6 @@ import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.impl.RemoteBotTree;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.impl.RemoteBotTreeItem;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.impl.RemoteBotView;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.impl.RemoteBotViewMenu;
-import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.Component;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.contextmenu.peview.impl.ContextMenusInPEView;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.contextmenu.peview.submenu.impl.NewC;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.contextmenu.peview.submenu.impl.RefactorC;
@@ -94,12 +94,12 @@ public class STFController {
         XMPPAccountStore xmppAccountStore, FeedbackManager feedbackManager)
         throws RemoteException {
 
-        STFMessage.saros = saros;
-        Component.sessionManager = sessionManager;
-        Component.dataTransferManager = dataTransferManager;
-        Component.editorManager = editorManager;
-        Component.xmppAccountStore = xmppAccountStore;
-        Component.feedbackManager = feedbackManager;
+        StfRemoteObject.saros = saros;
+        StfRemoteObject.sessionManager = sessionManager;
+        StfRemoteObject.dataTransferManager = dataTransferManager;
+        StfRemoteObject.editorManager = editorManager;
+        StfRemoteObject.xmppAccountStore = xmppAccountStore;
+        StfRemoteObject.feedbackManager = feedbackManager;
 
         try {
             registry = LocateRegistry.createRegistry(port);
@@ -119,9 +119,11 @@ public class STFController {
          */
         exportObject(RemoteBotButton.getInstance(), "button");
         exportObject(RemoteBotCCombo.getInstance(), "ccombo");
+        exportObject(RemoteBotChatLine.getInstance(), "chatLine");
         exportObject(RemoteBotCheckBox.getInstance(), "checkBox");
         exportObject(RemoteBotCombo.getInstance(), "combo");
-        exportObject(RemoteBotEditor.getInstance(), "eclipseEditor");
+        exportObject(RemoteBotCTabItem.getInstance(), "cTabItem");
+        exportObject(RemoteBotEditor.getInstance(), "editor");
         exportObject(RemoteBotLabel.getInstance(), "label");
         exportObject(RemoteBotList.getInstance(), "list");
         exportObject(RemoteBotMenu.getInstance(), "menu");
@@ -132,7 +134,7 @@ public class STFController {
         exportObject(RemoteBotTable.getInstance(), "table");
         exportObject(RemoteBotTableItem.getInstance(), "tableItem");
         exportObject(RemoteBotText.getInstance(), "text");
-        exportObject(RemoteBotToolbarButton.getInstance(), "toggleButton");
+        exportObject(RemoteBotToggleButton.getInstance(), "toggleButton");
         exportObject(RemoteBotToolbarButton.getInstance(), "toolbarButton");
         exportObject(RemoteBotToolbarDropDownButton.getInstance(),
             "toolbarDropDownButton");
@@ -146,8 +148,6 @@ public class STFController {
         exportObject(RemoteBotTreeItem.getInstance(), "treeItem");
         exportObject(RemoteBotView.getInstance(), "view");
         exportObject(RemoteBotViewMenu.getInstance(), "viewMenu");
-        exportObject(RemoteBotChatLine.getInstance(), "chatLine");
-        exportObject(RemoteBotCTabItem.getInstance(), "cTabItem");
 
         /*
          * remote eclipse components

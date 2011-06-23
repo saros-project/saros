@@ -8,8 +8,8 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotToolbarPushButton;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotMenu;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotToolbarPushButton;
 
-public class RemoteBotToolbarPushButton extends AbstractRemoteWidget implements
-    IRemoteBotToolbarPushButton {
+public final class RemoteBotToolbarPushButton extends AbstractRemoteWidget
+    implements IRemoteBotToolbarPushButton {
 
     private static transient RemoteBotToolbarPushButton self;
 

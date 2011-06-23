@@ -7,7 +7,7 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotToggleButton;
 
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotToggleButton;
 
-public class RemoteBotToggleButton extends AbstractRemoteWidget implements
+public final class RemoteBotToggleButton extends AbstractRemoteWidget implements
     IRemoteBotToggleButton {
     private static transient RemoteBotToggleButton self;
 

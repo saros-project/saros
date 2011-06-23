@@ -6,7 +6,7 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotCTabItem;
 
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotCTabItem;
 
-public class RemoteBotCTabItem extends AbstractRemoteWidget implements
+public final class RemoteBotCTabItem extends AbstractRemoteWidget implements
     IRemoteBotCTabItem {
 
     private static transient RemoteBotCTabItem self;

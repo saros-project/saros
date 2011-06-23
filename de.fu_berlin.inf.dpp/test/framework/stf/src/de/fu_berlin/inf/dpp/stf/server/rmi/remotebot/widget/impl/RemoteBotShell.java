@@ -3,6 +3,7 @@ package de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.impl;
 import java.rmi.RemoteException;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
 import org.eclipse.swtbot.swt.finder.finders.UIThreadRunnable;
@@ -16,8 +17,11 @@ import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.impl.RemoteBot;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotMenu;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotShell;
 
-public class RemoteBotShell extends AbstractRemoteWidget implements
+public final class RemoteBotShell extends AbstractRemoteWidget implements
     IRemoteBotShell {
+
+    private static final Logger log = Logger.getLogger(RemoteBotShell.class);
+
     private static transient RemoteBotShell self;
 
     public final static String TEXT_FIELD_TYPE_FILTER_TEXT = "type filter text";
@@ -112,7 +116,7 @@ public class RemoteBotShell extends AbstractRemoteWidget implements
 
         for (Map.Entry<String, String> entry : labelsAndTexts.entrySet())
             bot().textWithLabel(/* label */entry.getKey()).setText(
-                /* text */entry.getValue());
+            /* text */entry.getValue());
 
         bot().button(buttonText).waitUntilIsEnabled();
         bot().button(buttonText).click();

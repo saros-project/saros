@@ -3,11 +3,11 @@ package de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.contextmenu.pevie
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 
-import de.fu_berlin.inf.dpp.stf.server.STFMessage;
+import de.fu_berlin.inf.dpp.stf.server.StfRemoteObject;
 
 /**
  * This interface contains convenience API to perform actions activated by
- * clicking subMenus of contextMenu {@link STFMessage#CM_TEAM} in the package explorer
+ * clicking subMenus of contextMenu {@link StfRemoteObject#CM_TEAM} in the package explorer
  * view. STF users would start off as follows:
  * 
  * <pre>

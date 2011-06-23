@@ -23,12 +23,12 @@ import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotToolbarTog
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotView;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotViewMenu;
 
-public class RemoteBotView extends AbstractRemoteWidget implements
+public final class RemoteBotView extends AbstractRemoteWidget implements
     IRemoteBotView {
 
     private static transient RemoteBotView self;
 
-    private SWTBotView widget;
+    private transient SWTBotView widget;
 
     /**
      * {@link RemoteBotView} is a singleton, but inheritance is possible.

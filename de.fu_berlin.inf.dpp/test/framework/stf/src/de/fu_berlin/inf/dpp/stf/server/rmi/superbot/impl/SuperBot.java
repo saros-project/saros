@@ -5,7 +5,7 @@ import java.rmi.RemoteException;
 import org.eclipse.swtbot.swt.finder.widgets.TimeoutException;
 
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.stf.server.STFMessage;
+import de.fu_berlin.inf.dpp.stf.server.StfRemoteObject;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.IRemoteWorkbenchBot;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.impl.RemoteWorkbenchBot;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotShell;
@@ -16,7 +16,7 @@ import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.menubar.impl.MenuB
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.IViews;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.impl.Views;
 
-public class SuperBot extends STFMessage implements ISuperBot {
+public class SuperBot extends StfRemoteObject implements ISuperBot {
 
     private static transient SuperBot self;
 

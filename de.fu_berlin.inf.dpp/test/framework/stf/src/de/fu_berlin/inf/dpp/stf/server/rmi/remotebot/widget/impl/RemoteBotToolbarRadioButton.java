@@ -8,8 +8,8 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotToolbarRadioButton;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotMenu;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotToolbarRadioButton;
 
-public class RemoteBotToolbarRadioButton extends AbstractRemoteWidget implements
-    IRemoteBotToolbarRadioButton {
+public final class RemoteBotToolbarRadioButton extends AbstractRemoteWidget
+    implements IRemoteBotToolbarRadioButton {
 
     private static transient RemoteBotToolbarRadioButton self;
 

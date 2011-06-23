@@ -9,9 +9,11 @@ import org.eclipse.jface.bindings.keys.ParseException;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotEclipseEditor;
+import org.eclipse.swtbot.swt.finder.utils.FileUtils;
 import org.eclipse.swtbot.swt.finder.waits.DefaultCondition;
 
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotEditor;
+import de.fu_berlin.inf.dpp.stf.server.util.Util;
 
 public class RemoteBotEditor extends AbstractRemoteWidget implements
     IRemoteBotEditor {
@@ -71,7 +73,8 @@ public class RemoteBotEditor extends AbstractRemoteWidget implements
     }
 
     public void setTextFromFile(String contentPath) throws RemoteException {
-        String contents = getFileContentNoGUI(contentPath);
+        String contents = FileUtils.read(saros.getBundle()
+            .getEntry(contentPath));
         widget.setText(contents);
         widget.save();
     }
@@ -138,14 +141,14 @@ public class RemoteBotEditor extends AbstractRemoteWidget implements
     }
 
     public void pressShortCutSave() throws RemoteException {
-        if (getOS() == TypeOfOS.MAC)
+        if (Util.getOS() == Util.TypeOfOS.MAC)
             widget.pressShortcut(SWT.COMMAND, 's');
         else
             widget.pressShortcut(SWT.CTRL, 's');
     }
 
     public void pressShortRunAsJavaApplication() throws RemoteException {
-        if (getOS() == TypeOfOS.MAC)
+        if (Util.getOS() == Util.TypeOfOS.MAC)
             widget.pressShortcut(SWT.ALT | SWT.COMMAND, 'x');
         else
             widget.pressShortcut(SWT.ALT | SWT.SHIFT, 'x');
@@ -154,7 +157,7 @@ public class RemoteBotEditor extends AbstractRemoteWidget implements
     }
 
     public void pressShortCutNextAnnotation() throws RemoteException {
-        if (getOS() == TypeOfOS.MAC)
+        if (Util.getOS() == Util.TypeOfOS.MAC)
             widget.pressShortcut(SWT.COMMAND, '.');
         else
             widget.pressShortcut(SWT.CTRL, '.');
@@ -164,7 +167,7 @@ public class RemoteBotEditor extends AbstractRemoteWidget implements
 
     public void pressShortCutQuickAssignToLocalVariable()
         throws RemoteException {
-        if (getOS() == TypeOfOS.MAC)
+        if (Util.getOS() == Util.TypeOfOS.MAC)
             widget.pressShortcut(SWT.COMMAND, '2');
         else
             widget.pressShortcut(SWT.CTRL, '2');
@@ -175,7 +178,8 @@ public class RemoteBotEditor extends AbstractRemoteWidget implements
 
     public void autoCompleteProposal(String insertText, String proposalText)
         throws RemoteException {
-        widget.autoCompleteProposal(checkInputText(insertText), proposalText);
+        widget.autoCompleteProposal(Util.checkInputText(insertText),
+            proposalText);
     }
 
     public void quickfix(String quickFixName) throws RemoteException {

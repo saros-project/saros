@@ -6,7 +6,7 @@ import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotViewMenu;
 
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotViewMenu;
 
-public class RemoteBotViewMenu extends AbstractRemoteWidget implements
+public final class RemoteBotViewMenu extends AbstractRemoteWidget implements
     IRemoteBotViewMenu {
 
     private static transient RemoteBotViewMenu self;

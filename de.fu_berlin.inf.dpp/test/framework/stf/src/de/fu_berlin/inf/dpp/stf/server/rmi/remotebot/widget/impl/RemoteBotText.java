@@ -7,7 +7,8 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotText;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotMenu;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotText;
 
-public class RemoteBotText extends AbstractRemoteWidget implements IRemoteBotText {
+public final class RemoteBotText extends AbstractRemoteWidget implements
+    IRemoteBotText {
 
     private static transient RemoteBotText self;
 

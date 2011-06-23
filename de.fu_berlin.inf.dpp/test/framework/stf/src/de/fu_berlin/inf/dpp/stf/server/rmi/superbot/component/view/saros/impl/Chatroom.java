@@ -2,6 +2,8 @@ package de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.saros.impl;
 
 import java.rmi.RemoteException;
 
+import org.apache.log4j.Logger;
+
 import de.fu_berlin.inf.dpp.stf.server.bot.condition.SarosConditions;
 import de.fu_berlin.inf.dpp.stf.server.bot.widget.SarosSWTBotChatInput;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotCTabItem;
@@ -9,6 +11,8 @@ import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.Component;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.saros.IChatroom;
 
 public class Chatroom extends Component implements IChatroom {
+
+    private static final Logger log = Logger.getLogger(Chatroom.class);
 
     private static transient Chatroom self;
 

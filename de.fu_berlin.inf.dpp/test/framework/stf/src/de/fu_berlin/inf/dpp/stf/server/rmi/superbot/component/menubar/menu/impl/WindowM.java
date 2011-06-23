@@ -8,6 +8,7 @@ import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotTree;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.Perspective;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.menubar.menu.IWindowM;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.menubar.menu.submenu.impl.SarosPreferences;
+import de.fu_berlin.inf.dpp.stf.server.util.Util;
 
 public class WindowM extends SarosPreferences implements IWindowM {
 
@@ -55,7 +56,7 @@ public class WindowM extends SarosPreferences implements IWindowM {
     }
 
     public void clickMenuPreferences() throws RemoteException {
-        if (getOS() == TypeOfOS.MAC)
+        if (Util.getOS() == Util.TypeOfOS.MAC)
             remoteBot().menu("Eclipse").menu(MENU_PREFERENCES).click();
         else
             remoteBot().menu(MENU_WINDOW).menu(MENU_PREFERENCES).click();
@@ -74,9 +75,10 @@ public class WindowM extends SarosPreferences implements IWindowM {
     public void showViewWithName(String parentNode, String node)
         throws RemoteException {
         remoteBot().activateWorkbench();
-        remoteBot().menu(MENU_WINDOW).menu(MENU_SHOW_VIEW).menu(MENU_OTHER).click();
-        remoteBot().shell(SHELL_SHOW_VIEW).confirmWithTreeWithFilterText(parentNode,
-            node, OK);
+        remoteBot().menu(MENU_WINDOW).menu(MENU_SHOW_VIEW).menu(MENU_OTHER)
+            .click();
+        remoteBot().shell(SHELL_SHOW_VIEW).confirmWithTreeWithFilterText(
+            parentNode, node, OK);
     }
 
     public void openPerspective() throws RemoteException {
