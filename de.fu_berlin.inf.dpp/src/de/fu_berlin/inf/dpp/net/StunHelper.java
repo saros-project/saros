@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.jivesoftware.smackx.socks5bytestream.Socks5Proxy;
+import org.jivesoftware.smackx.bytestreams.socks5.Socks5Proxy;
 
 import de.fu_berlin.inf.dpp.net.util.NetworkingUtils;
 import de.javawi.jstun.test.DiscoveryInfo;

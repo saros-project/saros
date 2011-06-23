@@ -24,9 +24,9 @@ import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smackx.bytestreams.BytestreamManager;
 import org.jivesoftware.smackx.bytestreams.BytestreamRequest;
 import org.jivesoftware.smackx.bytestreams.BytestreamSession;
-import org.jivesoftware.smackx.socks5bytestream.Socks5BytestreamManager;
-import org.jivesoftware.smackx.socks5bytestream.Socks5BytestreamSession;
-import org.jivesoftware.smackx.socks5bytestream.Socks5Proxy;
+import org.jivesoftware.smackx.bytestreams.socks5.Socks5BytestreamManager;
+import org.jivesoftware.smackx.bytestreams.socks5.Socks5BytestreamSession;
+import org.jivesoftware.smackx.bytestreams.socks5.Socks5Proxy;
 
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager.NetTransferMode;
 import de.fu_berlin.inf.dpp.util.CausedIOException;

@@ -12,7 +12,7 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.jivesoftware.smack.SmackConfiguration;
-import org.jivesoftware.smackx.socks5bytestream.Socks5Proxy;
+import org.jivesoftware.smackx.bytestreams.socks5.Socks5Proxy;
 
 /**
  * Static networking class, dealing with local IP retrieval

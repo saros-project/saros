@@ -18,7 +18,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.bitlet.weupnp.GatewayDevice;
 import org.bitlet.weupnp.PortMappingEntry;
 import org.jivesoftware.smack.SmackConfiguration;
-import org.jivesoftware.smackx.socks5bytestream.Socks5Proxy;
+import org.jivesoftware.smackx.bytestreams.socks5.Socks5Proxy;
 import org.junit.Before;
 import org.junit.Test;
 import org.xml.sax.SAXException;

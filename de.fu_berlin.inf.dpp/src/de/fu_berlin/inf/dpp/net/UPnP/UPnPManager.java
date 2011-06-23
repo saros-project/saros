@@ -11,7 +11,7 @@ import org.apache.log4j.Logger;
 import org.bitlet.weupnp.GatewayDevice;
 import org.bitlet.weupnp.PortMappingEntry;
 import org.eclipse.jface.preference.IPreferenceStore;
-import org.jivesoftware.smackx.socks5bytestream.Socks5Proxy;
+import org.jivesoftware.smackx.bytestreams.socks5.Socks5Proxy;
 import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.annotations.Component;
