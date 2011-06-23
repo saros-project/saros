@@ -9,36 +9,25 @@ import de.fu_berlin.inf.dpp.stf.server.StfRemoteObject;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.IRemoteWorkbenchBot;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.impl.RemoteWorkbenchBot;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotShell;
-import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotTreeItem;
+import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.impl.RemoteBotTree;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.ISuperBot;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.menubar.IMenuBar;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.menubar.impl.MenuBar;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.IViews;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.impl.Views;
 
-public class SuperBot extends StfRemoteObject implements ISuperBot {
+public final class SuperBot extends StfRemoteObject implements ISuperBot {
 
-    private static transient SuperBot self;
+    private static final SuperBot INSTANCE = new SuperBot();
 
-    private static IRemoteWorkbenchBot bot;
+    private JID localJID;
 
-    private static Views views;
-
-    private static MenuBar menuBar;
-
-    /**
-     * {@link SuperBot} is a singleton, but inheritance is possible.
-     */
     public static SuperBot getInstance() {
-        if (self != null)
-            return self;
-        self = new SuperBot();
-        bot = RemoteWorkbenchBot.getInstance();
+        return INSTANCE;
+    }
 
-        views = Views.getInstance();
-        menuBar = MenuBar.getInstance();
-
-        return self;
+    private IRemoteWorkbenchBot bot() {
+        return RemoteWorkbenchBot.getInstance();
     }
 
     /**************************************************************
@@ -53,21 +42,21 @@ public class SuperBot extends StfRemoteObject implements ISuperBot {
      * 
      **********************************************/
 
-    private IRemoteWorkbenchBot bot() {
-        return bot;
-    }
-
     public IViews views() throws RemoteException {
-        return views;
+        return Views.getInstance();
     }
 
     public IMenuBar menuBar() throws RemoteException {
         bot().activateWorkbench();
-        return menuBar;
+        return MenuBar.getInstance();
     }
 
     public void setJID(JID jid) throws RemoteException {
         localJID = jid;
+    }
+
+    public JID getJID() {
+        return localJID;
     }
 
     /**********************************************
@@ -224,11 +213,11 @@ public class SuperBot extends StfRemoteObject implements ISuperBot {
             if (errorMessage.matches(ERROR_MESSAGE_TOO_FAST_REGISTER_ACCOUNTS
                 + ".*"))
                 throw new RuntimeException(
-                    "You are not allowed to register accounts so fast!");
+                    "you are not allowed to register accounts so fast");
             else if (errorMessage.matches(ERROR_MESSAGE_ACCOUNT_ALREADY_EXISTS
                 + ".*\n*.*"))
-                throw new RuntimeException("The Account " + jid.getBase()
-                    + " is already existed!");
+                throw new RuntimeException("the Account " + jid.getBase()
+                    + " already exists");
         }
     }
 
@@ -302,10 +291,7 @@ public class SuperBot extends StfRemoteObject implements ISuperBot {
         IRemoteBotShell shell = bot().shell(SHELL_SHARE_PROJECT);
         shell.activate();
 
-        for (IRemoteBotTreeItem item : shell.bot().tree().getAllItems()) {
-            if (item.isChecked())
-                item.uncheck();
-        }
+        ((RemoteBotTree) shell.bot().tree()).uncheckAllItems();
 
         for (String projectName : projectNames)
             shell.bot().tree().selectTreeItemWithRegex(projectName + ".*")
@@ -313,10 +299,7 @@ public class SuperBot extends StfRemoteObject implements ISuperBot {
 
         shell.bot().button(NEXT).click();
 
-        for (IRemoteBotTreeItem item : shell.bot().tree().getAllItems()) {
-            if (item.isChecked())
-                item.uncheck();
-        }
+        ((RemoteBotTree) shell.bot().tree()).uncheckAllItems();
 
         for (JID jid : jids) {
             shell.bot().tree().selectTreeItemWithRegex(jid.getBase() + ".*")
@@ -333,10 +316,7 @@ public class SuperBot extends StfRemoteObject implements ISuperBot {
         IRemoteBotShell shell = bot().shell(SHELL_ADD_PROJECTS_TO_SESSION);
         shell.activate();
 
-        for (IRemoteBotTreeItem item : shell.bot().tree().getAllItems()) {
-            while (item.isChecked())
-                item.uncheck();
-        }
+        ((RemoteBotTree) shell.bot().tree()).uncheckAllItems();
 
         for (String projectName : projectNames)
             shell.bot().tree().selectTreeItemWithRegex(projectName + ".*")
@@ -396,7 +376,7 @@ public class SuperBot extends StfRemoteObject implements ISuperBot {
     }
 
     public void confirmShellLeavingClosingSession() throws RemoteException {
-        if (!views.sarosView().isHost()) {
+        if (!Views.getInstance().sarosView().isHost()) {
             bot().waitUntilShellIsOpen(SHELL_CONFIRM_LEAVING_SESSION);
             bot().shell(SHELL_CONFIRM_LEAVING_SESSION).activate();
             bot().shell(SHELL_CONFIRM_LEAVING_SESSION).confirm(YES);
@@ -405,7 +385,7 @@ public class SuperBot extends StfRemoteObject implements ISuperBot {
             bot().shell(SHELL_CONFIRM_CLOSING_SESSION).activate();
             bot().shell(SHELL_CONFIRM_CLOSING_SESSION).confirm(YES);
         }
-        views.sarosView().waitUntilIsNotInSession();
+        Views.getInstance().sarosView().waitUntilIsNotInSession();
     }
 
 }

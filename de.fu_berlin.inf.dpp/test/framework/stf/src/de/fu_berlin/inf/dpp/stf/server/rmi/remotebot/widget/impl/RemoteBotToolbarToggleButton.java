@@ -5,25 +5,20 @@ import java.rmi.RemoteException;
 import org.eclipse.swtbot.swt.finder.waits.Conditions;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotToolbarToggleButton;
 
+import de.fu_berlin.inf.dpp.stf.server.StfRemoteObject;
+import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.impl.RemoteWorkbenchBot;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotMenu;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotToolbarToggleButton;
 
-public final class RemoteBotToolbarToggleButton extends AbstractRemoteWidget
+public final class RemoteBotToolbarToggleButton extends StfRemoteObject
     implements IRemoteBotToolbarToggleButton {
 
-    private static transient RemoteBotToolbarToggleButton self;
+    private static final RemoteBotToolbarToggleButton INSTANCE = new RemoteBotToolbarToggleButton();
 
     private SWTBotToolbarToggleButton widget;
 
-    /**
-     * {@link RemoteBotToolbarToggleButton} is a singleton, but inheritance is
-     * possible.
-     */
     public static RemoteBotToolbarToggleButton getInstance() {
-        if (self != null)
-            return self;
-        self = new RemoteBotToolbarToggleButton();
-        return self;
+        return INSTANCE;
     }
 
     public IRemoteBotToolbarToggleButton setWidget(
@@ -44,7 +39,7 @@ public final class RemoteBotToolbarToggleButton extends AbstractRemoteWidget
      * 
      **********************************************/
     public IRemoteBotMenu contextMenu(String text) throws RemoteException {
-        return stfBotMenu.setWidget(widget.contextMenu(text));
+        return RemoteBotMenu.getInstance().setWidget(widget.contextMenu(text));
     }
 
     /**********************************************
@@ -112,7 +107,8 @@ public final class RemoteBotToolbarToggleButton extends AbstractRemoteWidget
      * 
      **********************************************/
     public void waitUntilIsEnabled() throws RemoteException {
-        stfBot.waitUntil(Conditions.widgetIsEnabled(widget));
+        RemoteWorkbenchBot.getInstance().waitUntil(
+            Conditions.widgetIsEnabled(widget));
     }
 
 }

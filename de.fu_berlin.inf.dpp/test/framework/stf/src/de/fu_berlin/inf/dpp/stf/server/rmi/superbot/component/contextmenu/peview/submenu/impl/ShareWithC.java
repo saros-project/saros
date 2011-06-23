@@ -3,24 +3,19 @@ package de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.contextmenu.pevie
 import java.rmi.RemoteException;
 
 import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.stf.server.StfRemoteObject;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotTreeItem;
-import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.Component;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.contextmenu.peview.submenu.IShareWithC;
+import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.impl.SuperBot;
 
-public class ShareWithC extends Component implements IShareWithC {
+public final class ShareWithC extends StfRemoteObject implements IShareWithC {
 
-    private static transient ShareWithC self;
+    private static final ShareWithC INSTANCE = new ShareWithC();
 
     private IRemoteBotTreeItem treeItem;
 
-    /**
-     * {@link ShareWithC} is a singleton, but inheritance is possible.
-     */
     public static ShareWithC getInstance() {
-        if (self != null)
-            return self;
-        self = new ShareWithC();
-        return self;
+        return INSTANCE;
     }
 
     public void setTreeItem(IRemoteBotTreeItem treeItem) {
@@ -45,7 +40,8 @@ public class ShareWithC extends Component implements IShareWithC {
     public void multipleBuddies(String projectName, JID... baseJIDOfInvitees)
         throws RemoteException {
         treeItem.contextMenus(CM_SHARE_WITH, CM_MULTIPLE_BUDDIES).click();
-        superBot().confirmShellShareProjects(projectName, baseJIDOfInvitees);
+        SuperBot.getInstance().confirmShellShareProjects(projectName,
+            baseJIDOfInvitees);
     }
 
     public void buddy(JID jid) throws RemoteException {

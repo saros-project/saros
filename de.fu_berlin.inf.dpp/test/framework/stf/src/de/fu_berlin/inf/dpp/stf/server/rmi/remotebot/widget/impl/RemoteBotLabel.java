@@ -4,24 +4,19 @@ import java.rmi.RemoteException;
 
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotLabel;
 
+import de.fu_berlin.inf.dpp.stf.server.StfRemoteObject;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotLabel;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotMenu;
 
-public final class RemoteBotLabel extends AbstractRemoteWidget implements
+public final class RemoteBotLabel extends StfRemoteObject implements
     IRemoteBotLabel {
 
-    private static transient RemoteBotLabel self;
+    private static final RemoteBotLabel INSTANCE = new RemoteBotLabel();
 
     private SWTBotLabel widget;
 
-    /**
-     * {@link RemoteBotTable} is a singleton, but inheritance is possible.
-     */
     public static RemoteBotLabel getInstance() {
-        if (self != null)
-            return self;
-        self = new RemoteBotLabel();
-        return self;
+        return INSTANCE;
     }
 
     public IRemoteBotLabel setWidget(SWTBotLabel label) {
@@ -41,7 +36,7 @@ public final class RemoteBotLabel extends AbstractRemoteWidget implements
      * 
      **********************************************/
     public IRemoteBotMenu contextMenu(String text) throws RemoteException {
-        return stfBotMenu.setWidget(widget.contextMenu(text));
+        return RemoteBotMenu.getInstance().setWidget(widget.contextMenu(text));
     }
 
     /**********************************************

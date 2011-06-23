@@ -4,23 +4,18 @@ import java.rmi.RemoteException;
 
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotViewMenu;
 
+import de.fu_berlin.inf.dpp.stf.server.StfRemoteObject;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotViewMenu;
 
-public final class RemoteBotViewMenu extends AbstractRemoteWidget implements
+public final class RemoteBotViewMenu extends StfRemoteObject implements
     IRemoteBotViewMenu {
 
-    private static transient RemoteBotViewMenu self;
+    private static final RemoteBotViewMenu INSTANCE = new RemoteBotViewMenu();
 
     private SWTBotViewMenu widget;
 
-    /**
-     * {@link RemoteBotViewMenu} is a singleton, but inheritance is possible.
-     */
     public static RemoteBotViewMenu getInstance() {
-        if (self != null)
-            return self;
-        self = new RemoteBotViewMenu();
-        return self;
+        return INSTANCE;
     }
 
     public IRemoteBotViewMenu setWidget(SWTBotViewMenu viewMenu) {

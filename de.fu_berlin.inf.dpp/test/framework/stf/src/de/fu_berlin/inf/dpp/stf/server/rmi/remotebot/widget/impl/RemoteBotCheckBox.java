@@ -4,24 +4,19 @@ import java.rmi.RemoteException;
 
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotCheckBox;
 
+import de.fu_berlin.inf.dpp.stf.server.StfRemoteObject;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotCheckBox;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotMenu;
 
-public final class RemoteBotCheckBox extends AbstractRemoteWidget implements
+public final class RemoteBotCheckBox extends StfRemoteObject implements
     IRemoteBotCheckBox {
 
-    private static transient RemoteBotCheckBox self;
+    private static final RemoteBotCheckBox INSTANCE = new RemoteBotCheckBox();
 
     private SWTBotCheckBox widget;
 
-    /**
-     * {@link RemoteBotCheckBox} is a singleton, but inheritance is possible.
-     */
     public static RemoteBotCheckBox getInstance() {
-        if (self != null)
-            return self;
-        self = new RemoteBotCheckBox();
-        return self;
+        return INSTANCE;
     }
 
     public IRemoteBotCheckBox setWidget(SWTBotCheckBox checkBox) {
@@ -46,7 +41,7 @@ public final class RemoteBotCheckBox extends AbstractRemoteWidget implements
      * @see SWTBotCheckBox#contextMenu(String)
      */
     public IRemoteBotMenu contextMenu(String text) throws RemoteException {
-        return stfBotMenu.setWidget(widget.contextMenu(text));
+        return RemoteBotMenu.getInstance().setWidget(widget.contextMenu(text));
     }
 
     /**********************************************

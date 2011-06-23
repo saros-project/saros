@@ -4,23 +4,19 @@ import java.rmi.RemoteException;
 
 import org.eclipse.swtbot.swt.finder.waits.DefaultCondition;
 
+import de.fu_berlin.inf.dpp.stf.server.StfRemoteObject;
+import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.impl.RemoteWorkbenchBot;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotView;
-import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.Component;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.eclipse.IProgressView;
 
-public class ProgressView extends Component implements IProgressView {
-    private static transient ProgressView self;
+public class ProgressView extends StfRemoteObject implements IProgressView {
+
+    private static final ProgressView INSTANCE = new ProgressView();
 
     private IRemoteBotView view;
 
-    /**
-     * {@link ProgressView} is a singleton, but inheritance is possible.
-     */
     public static ProgressView getInstance() {
-        if (self != null)
-            return self;
-        self = new ProgressView();
-        return self;
+        return INSTANCE;
     }
 
     public IProgressView setView(IRemoteBotView view) {
@@ -63,7 +59,7 @@ public class ProgressView extends Component implements IProgressView {
      * 
      **********************************************/
     public void waitUntilNotExistsProgress() throws RemoteException {
-        remoteBot().waitUntil(new DefaultCondition() {
+        RemoteWorkbenchBot.getInstance().waitUntil(new DefaultCondition() {
             public boolean test() throws Exception {
                 return !existsPorgress();
             }

@@ -36,20 +36,14 @@ import de.fu_berlin.inf.dpp.ui.widgets.chatControl.parts.ChatInput;
  * 
  * @author lchen
  */
-public class SarosSWTBot extends SWTWorkbenchBot {
-    private static final transient Logger log = Logger
-        .getLogger(SarosSWTBot.class);
+public final class SarosSWTBot extends SWTWorkbenchBot {
 
-    private static transient SarosSWTBot self;
+    private static final Logger log = Logger.getLogger(SarosSWTBot.class);
 
-    /**
-     * {@link SarosSWTBot} is a singleton
-     */
+    private static final SarosSWTBot INSTANCE = new SarosSWTBot();
+
     public static SarosSWTBot getInstance() {
-        if (self != null)
-            return self;
-        self = new SarosSWTBot();
-        return self;
+        return INSTANCE;
     }
 
     /**

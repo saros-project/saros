@@ -14,8 +14,6 @@ public interface IRemoteBotTree extends Remote {
      * 
      **********************************************/
 
-    public IRemoteBotTreeItem[] getAllItems() throws RemoteException;
-
     // public STFBotMenu contextMenu(String text) throws RemoteException;
 
     public IRemoteBotMenu contextMenu(String... texts) throws RemoteException;
@@ -26,12 +24,14 @@ public interface IRemoteBotTree extends Remote {
      * 
      **********************************************/
 
-    public IRemoteBotTreeItem collapseNode(String nodeText) throws RemoteException;
+    public IRemoteBotTreeItem collapseNode(String nodeText)
+        throws RemoteException;
 
     public IRemoteBotTreeItem expandNode(String nodeText, boolean recursive)
         throws RemoteException;
 
-    public IRemoteBotTreeItem expandNode(String... nodes) throws RemoteException;
+    public IRemoteBotTreeItem expandNode(String... nodes)
+        throws RemoteException;
 
     public IRemoteBotTree select(int... indices) throws RemoteException;
 

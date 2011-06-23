@@ -44,6 +44,7 @@ public class SarosViewTest extends StfTestCase {
         ALICE.superBot().views().sarosView()
             .connectWith(Constants.TEST_JID, Constants.PASSWORD);
         assertEquals(true, ALICE.superBot().views().sarosView().isConnected());
+        ALICE.remoteBot().sleep(1000);
         assertTrue(ALICE.superBot().menuBar().saros().preferences()
             .isAccountActive(Constants.TEST_JID));
     }

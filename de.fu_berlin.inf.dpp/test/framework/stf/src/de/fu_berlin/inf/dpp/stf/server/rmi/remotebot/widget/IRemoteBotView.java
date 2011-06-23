@@ -22,7 +22,8 @@ public interface IRemoteBotView extends Remote {
 
     public IRemoteBotViewMenu menu(String label) throws RemoteException;
 
-    public IRemoteBotViewMenu menu(String label, int index) throws RemoteException;
+    public IRemoteBotViewMenu menu(String label, int index)
+        throws RemoteException;
 
     public IRemoteBotToolbarButton toolbarButton(String tooltip)
         throws RemoteException;
@@ -45,10 +46,6 @@ public interface IRemoteBotView extends Remote {
 
     public IRemoteBotToolbarToggleButton toolbarToggleButton(String tooltip)
         throws RemoteException;
-
-    public List<IRemoteBotViewMenu> menus() throws RemoteException;
-
-    public List<IRemoteBotToolbarButton> getToolbarButtons() throws RemoteException;
 
     public String getTitle() throws RemoteException;
 

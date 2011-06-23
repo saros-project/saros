@@ -5,23 +5,20 @@ import java.rmi.RemoteException;
 import org.eclipse.swtbot.swt.finder.waits.Conditions;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotRadio;
 
+import de.fu_berlin.inf.dpp.stf.server.StfRemoteObject;
+import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.impl.RemoteWorkbenchBot;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotMenu;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotRadio;
 
-public final class RemoteBotRadio extends AbstractRemoteWidget implements
+public final class RemoteBotRadio extends StfRemoteObject implements
     IRemoteBotRadio {
-    private static transient RemoteBotRadio self;
+
+    private static final RemoteBotRadio INSTANCE = new RemoteBotRadio();
 
     private SWTBotRadio swtBotRadio;
 
-    /**
-     * {@link RemoteBotButton} is a singleton, but inheritance is possible.
-     */
     public static RemoteBotRadio getInstance() {
-        if (self != null)
-            return self;
-        self = new RemoteBotRadio();
-        return self;
+        return INSTANCE;
     }
 
     public IRemoteBotRadio setWidget(SWTBotRadio radio) {
@@ -37,7 +34,8 @@ public final class RemoteBotRadio extends AbstractRemoteWidget implements
      **************************************************************/
 
     public IRemoteBotMenu contextMenu(String text) throws RemoteException {
-        return stfBotMenu.setWidget(swtBotRadio.contextMenu(text));
+        return RemoteBotMenu.getInstance().setWidget(
+            swtBotRadio.contextMenu(text));
 
     }
 
@@ -94,6 +92,7 @@ public final class RemoteBotRadio extends AbstractRemoteWidget implements
      * 
      **********************************************/
     public void waitUntilIsEnabled() throws RemoteException {
-        stfBot.waitUntil(Conditions.widgetIsEnabled(swtBotRadio));
+        RemoteWorkbenchBot.getInstance().waitUntil(
+            Conditions.widgetIsEnabled(swtBotRadio));
     }
 }

@@ -4,23 +4,19 @@ import java.rmi.RemoteException;
 
 import org.eclipse.swtbot.swt.finder.waits.DefaultCondition;
 
+import de.fu_berlin.inf.dpp.stf.server.StfRemoteObject;
+import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.impl.RemoteWorkbenchBot;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotView;
-import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.Component;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.eclipse.IConsoleView;
 
-public class ConsoleView extends Component implements IConsoleView {
+public final class ConsoleView extends StfRemoteObject implements IConsoleView {
 
-    private static transient ConsoleView consoleViewObject;
+    private static final ConsoleView INSTANCE = new ConsoleView();
+
     private IRemoteBotView view;
 
-    /**
-     * {@link ConsoleView} is a singleton, but inheritance is possible.
-     */
     public static ConsoleView getInstance() {
-        if (consoleViewObject != null)
-            return consoleViewObject;
-        consoleViewObject = new ConsoleView();
-        return consoleViewObject;
+        return INSTANCE;
     }
 
     public IConsoleView setView(IRemoteBotView view) {
@@ -57,13 +53,13 @@ public class ConsoleView extends Component implements IConsoleView {
      * 
      **********************************************/
     public void waitUntilExistsTextInConsole() throws RemoteException {
-        remoteBot().waitUntil(new DefaultCondition() {
+        RemoteWorkbenchBot.getInstance().waitUntil(new DefaultCondition() {
             public boolean test() throws Exception {
                 return existTextInConsole();
             }
 
             public String getFailureMessage() {
-                return "in the console view contains no text.";
+                return "the console view contains no text";
             }
         });
     }

@@ -3,10 +3,11 @@ package de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.contextmenu.pevie
 import java.rmi.RemoteException;
 import java.util.List;
 
+import de.fu_berlin.inf.dpp.stf.server.StfRemoteObject;
+import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.impl.RemoteWorkbenchBot;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotShell;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotTree;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotTreeItem;
-import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.Component;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.contextmenu.peview.IContextMenusInPEView;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.contextmenu.peview.submenu.INewC;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.contextmenu.peview.submenu.IRefactorC;
@@ -17,31 +18,17 @@ import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.contextmenu.peview
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.contextmenu.peview.submenu.impl.ShareWithC;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.contextmenu.peview.submenu.impl.TeamC;
 
-public class ContextMenusInPEView extends Component implements
+public final class ContextMenusInPEView extends StfRemoteObject implements
     IContextMenusInPEView {
-    private static transient ContextMenusInPEView self;
 
-    protected static TeamC teamC;
-    protected static NewC newC;
-    protected static RefactorC reafactorC;
-    private static ShareWithC shareWithC;
+    private static final ContextMenusInPEView INSTANCE = new ContextMenusInPEView();
 
     private IRemoteBotTreeItem treeItem;
     private IRemoteBotTree tree;
     private TreeItemType type;
 
-    /**
-     * {@link ContextMenusInPEView} is a singleton, but inheritance is possible.
-     */
     public static ContextMenusInPEView getInstance() {
-        if (self != null)
-            return self;
-        self = new ContextMenusInPEView();
-        teamC = TeamC.getInstance();
-        reafactorC = RefactorC.getInstance();
-        newC = NewC.getInstance();
-        shareWithC = ShareWithC.getInstance();
-        return self;
+        return INSTANCE;
     }
 
     public void setTreeItem(IRemoteBotTreeItem treeItem) {
@@ -63,25 +50,25 @@ public class ContextMenusInPEView extends Component implements
      **************************************************************/
 
     public IShareWithC shareWith() throws RemoteException {
-        shareWithC.setTreeItem(treeItem);
-        return shareWithC;
+        ShareWithC.getInstance().setTreeItem(treeItem);
+        return ShareWithC.getInstance();
     }
 
     public INewC newC() throws RemoteException {
-        newC.setTree(tree);
-        newC.setTreeItem(treeItem);
-        return newC;
+        NewC.getInstance().setTree(tree);
+        NewC.getInstance().setTreeItem(treeItem);
+        return NewC.getInstance();
     }
 
     public ITeamC team() throws RemoteException {
-        teamC.setTreeItem(treeItem);
-        return teamC;
+        TeamC.getInstance().setTreeItem(treeItem);
+        return TeamC.getInstance();
     }
 
     public IRefactorC refactor() throws RemoteException {
-        reafactorC.setTreeItem(treeItem);
-        reafactorC.setTreeItemType(type);
-        return reafactorC;
+        RefactorC.getInstance().setTreeItem(treeItem);
+        RefactorC.getInstance().setTreeItemType(type);
+        return RefactorC.getInstance();
     }
 
     public void open() throws RemoteException {
@@ -99,19 +86,23 @@ public class ContextMenusInPEView extends Component implements
     public void paste(String target) throws RemoteException {
         if (treeItem == null) {
             tree.contextMenu(MENU_PASTE).click();
-            IRemoteBotShell shell = remoteBot().shell(SHELL_COPY_PROJECT);
+            IRemoteBotShell shell = RemoteWorkbenchBot.getInstance().shell(
+                SHELL_COPY_PROJECT);
             shell.activate();
             shell.bot().textWithLabel("Project name:").setText(target);
             shell.bot().button(OK).click();
-            remoteBot().waitUntilShellIsClosed(SHELL_COPY_PROJECT);
-            remoteBot().sleep(1000);
+            RemoteWorkbenchBot.getInstance().waitUntilShellIsClosed(
+                SHELL_COPY_PROJECT);
+            RemoteWorkbenchBot.getInstance().sleep(1000);
         }
     }
 
     public void openWith(String editorType) throws RemoteException {
         treeItem.contextMenus(CM_OPEN_WITH, CM_OTHER).click();
-        remoteBot().waitUntilShellIsOpen(SHELL_EDITOR_SELECTION);
-        IRemoteBotShell shell_bob = remoteBot().shell(SHELL_EDITOR_SELECTION);
+        RemoteWorkbenchBot.getInstance().waitUntilShellIsOpen(
+            SHELL_EDITOR_SELECTION);
+        IRemoteBotShell shell_bob = RemoteWorkbenchBot.getInstance().shell(
+            SHELL_EDITOR_SELECTION);
         shell_bob.activate();
         shell_bob.bot().table().getTableItem(editorType).select();
         shell_bob.bot().button(OK).waitUntilIsEnabled();
@@ -122,20 +113,24 @@ public class ContextMenusInPEView extends Component implements
         treeItem.contextMenus(CM_DELETE).click();
         switch (type) {
         case PROJECT:
-            remoteBot().shell(SHELL_DELETE_RESOURCE).confirmWithCheckBox(OK,
-                true);
-            remoteBot().waitUntilShellIsClosed(SHELL_DELETE_RESOURCE);
+            RemoteWorkbenchBot.getInstance().shell(SHELL_DELETE_RESOURCE)
+                .confirmWithCheckBox(OK, true);
+            RemoteWorkbenchBot.getInstance().waitUntilShellIsClosed(
+                SHELL_DELETE_RESOURCE);
             break;
         case JAVA_PROJECT:
-            remoteBot().shell(SHELL_DELETE_RESOURCE).confirmWithCheckBox(OK,
-                true);
-            remoteBot().waitUntilShellIsClosed(SHELL_DELETE_RESOURCE);
+            RemoteWorkbenchBot.getInstance().shell(SHELL_DELETE_RESOURCE)
+                .confirmWithCheckBox(OK, true);
+            RemoteWorkbenchBot.getInstance().waitUntilShellIsClosed(
+                SHELL_DELETE_RESOURCE);
             break;
         default:
-            remoteBot().waitUntilShellIsOpen(CONFIRM_DELETE);
-            remoteBot().shell(CONFIRM_DELETE).activate();
-            remoteBot().shell(CONFIRM_DELETE).bot().button(OK).click();
-            remoteBot().sleep(300);
+            RemoteWorkbenchBot.getInstance().waitUntilShellIsOpen(
+                CONFIRM_DELETE);
+            RemoteWorkbenchBot.getInstance().shell(CONFIRM_DELETE).activate();
+            RemoteWorkbenchBot.getInstance().shell(CONFIRM_DELETE).bot()
+                .button(OK).click();
+            RemoteWorkbenchBot.getInstance().sleep(300);
             break;
         }
         tree.waitUntilItemNotExists(treeItem.getText());

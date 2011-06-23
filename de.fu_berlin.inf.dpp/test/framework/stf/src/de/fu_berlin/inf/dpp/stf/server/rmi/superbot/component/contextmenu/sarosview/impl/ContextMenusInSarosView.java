@@ -2,13 +2,14 @@ package de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.contextmenu.saros
 
 import java.rmi.RemoteException;
 
+import de.fu_berlin.inf.dpp.stf.server.StfRemoteObject;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotTree;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotTreeItem;
-import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.Component;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.contextmenu.sarosview.IContextMenusInSarosView;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.saros.ISarosView;
+import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.impl.SuperBot;
 
-public class ContextMenusInSarosView extends Component implements
+public abstract class ContextMenusInSarosView extends StfRemoteObject implements
     IContextMenusInSarosView {
 
     protected IRemoteBotTreeItem treeItem;
@@ -36,6 +37,6 @@ public class ContextMenusInSarosView extends Component implements
 
     public void stopSarosSession() throws RemoteException {
         treeItem.contextMenus(CM_STOP_SAROS_SESSION).click();
-        superBot().confirmShellLeavingClosingSession();
+        SuperBot.getInstance().confirmShellLeavingClosingSession();
     }
 }

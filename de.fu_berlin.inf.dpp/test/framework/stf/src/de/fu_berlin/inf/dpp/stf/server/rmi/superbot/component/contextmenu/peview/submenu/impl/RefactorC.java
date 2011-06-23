@@ -2,27 +2,22 @@ package de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.contextmenu.pevie
 
 import java.rmi.RemoteException;
 
+import de.fu_berlin.inf.dpp.stf.server.StfRemoteObject;
+import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.impl.RemoteWorkbenchBot;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotShell;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotTreeItem;
-import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.Component;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.contextmenu.peview.submenu.IRefactorC;
 import de.fu_berlin.inf.dpp.stf.server.util.Util;
 
-public class RefactorC extends Component implements IRefactorC {
+public final class RefactorC extends StfRemoteObject implements IRefactorC {
 
-    private static transient RefactorC refactorImp;
+    private static final RefactorC INSTANCE = new RefactorC();
 
     private IRemoteBotTreeItem treeItem;
     private TreeItemType type;
 
-    /**
-     * {@link NewC} is a singleton, but inheritance is possible.
-     */
     public static RefactorC getInstance() {
-        if (refactorImp != null)
-            return refactorImp;
-        refactorImp = new RefactorC();
-        return refactorImp;
+        return INSTANCE;
     }
 
     public void setTreeItem(IRemoteBotTreeItem treeItem) {
@@ -75,11 +70,12 @@ public class RefactorC extends Component implements IRefactorC {
     private void rename(String shellTitle, String buttonName, String newName)
         throws RemoteException {
         treeItem.contextMenus(MENU_REFACTOR, MENU_RENAME).click();
-        IRemoteBotShell shell = remoteBot().shell(shellTitle);
+        IRemoteBotShell shell = RemoteWorkbenchBot.getInstance().shell(
+            shellTitle);
         shell.activate();
         shell.bot().textWithLabel(LABEL_NEW_NAME).setText(newName);
-        remoteBot().shell(shellTitle).bot().button(buttonName)
-            .waitUntilIsEnabled();
+        RemoteWorkbenchBot.getInstance().shell(shellTitle).bot()
+            .button(buttonName).waitUntilIsEnabled();
         shell.bot().button(buttonName).click();
         // if (bot().isShellOpen("Rename Compilation Unit")) {
         // bot().shell("Rename Compilation Unit").bot().button(buttonName)
@@ -87,15 +83,16 @@ public class RefactorC extends Component implements IRefactorC {
         // bot().shell("Rename Compilation Unit").bot().button(buttonName)
         // .click();
         // }
-        if (remoteBot().isShellOpen(shellTitle))
-            remoteBot().waitUntilShellIsClosed(shellTitle);
+        if (RemoteWorkbenchBot.getInstance().isShellOpen(shellTitle))
+            RemoteWorkbenchBot.getInstance().waitUntilShellIsClosed(shellTitle);
     }
 
     private void moveTo(String shellTitle, String buttonName, String... nodes)
         throws RemoteException {
         treeItem.contextMenus(MENU_REFACTOR, MENU_MOVE).click();
-        remoteBot().shell(shellTitle).confirmWithTree(buttonName, nodes);
-        remoteBot().waitUntilShellIsClosed(shellTitle);
+        RemoteWorkbenchBot.getInstance().shell(shellTitle)
+            .confirmWithTree(buttonName, nodes);
+        RemoteWorkbenchBot.getInstance().waitUntilShellIsClosed(shellTitle);
     }
 
 }

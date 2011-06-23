@@ -17,7 +17,6 @@ import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.feedback.FeedbackManager;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
 import de.fu_berlin.inf.dpp.project.SarosSessionManager;
-import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.impl.RemoteBot;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.impl.RemoteWorkbenchBot;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.impl.RemoteBotButton;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.impl.RemoteBotCCombo;
@@ -110,7 +109,7 @@ public class STFController {
         /*
          * bots' family
          */
-        exportObject(RemoteBot.getInstance(), "bot");
+        // exportObject(RemoteBot.getInstance(), "bot");
         exportObject(RemoteWorkbenchBot.getInstance(), "workbenchBot");
         exportObject(SuperBot.getInstance(), "superBot");
 

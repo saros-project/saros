@@ -5,23 +5,19 @@ import java.rmi.RemoteException;
 import org.eclipse.swtbot.swt.finder.waits.Conditions;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotMenu;
 
+import de.fu_berlin.inf.dpp.stf.server.StfRemoteObject;
+import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.impl.RemoteWorkbenchBot;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotMenu;
 
-public final class RemoteBotMenu extends AbstractRemoteWidget implements
+public final class RemoteBotMenu extends StfRemoteObject implements
     IRemoteBotMenu {
 
-    private static transient RemoteBotMenu menuImp;
+    private static final RemoteBotMenu INSTANCE = new RemoteBotMenu();
 
     private SWTBotMenu widget;
 
-    /**
-     * {@link RemoteBotMenu} is a singleton, but inheritance is possible.
-     */
     public static RemoteBotMenu getInstance() {
-        if (menuImp != null)
-            return menuImp;
-        menuImp = new RemoteBotMenu();
-        return menuImp;
+        return INSTANCE;
     }
 
     public IRemoteBotMenu setWidget(SWTBotMenu widget) {
@@ -106,6 +102,7 @@ public final class RemoteBotMenu extends AbstractRemoteWidget implements
      * 
      **********************************************/
     public void waitUntilIsEnabled() throws RemoteException {
-        stfBot.waitUntil(Conditions.widgetIsEnabled(widget));
+        RemoteWorkbenchBot.getInstance().waitUntil(
+            Conditions.widgetIsEnabled(widget));
     }
 }

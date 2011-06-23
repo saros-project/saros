@@ -2,7 +2,6 @@ package de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget;
 
 import java.rmi.Remote;
 import java.rmi.RemoteException;
-import java.util.List;
 
 import org.eclipse.jface.bindings.keys.KeyStroke;
 import org.eclipse.swt.widgets.MenuItem;
@@ -15,8 +14,6 @@ public interface IRemoteBotToolbarDropDownButton extends Remote {
      * finders
      * 
      **********************************************/
-    public List<IRemoteBotMenu> menuItems(Matcher<MenuItem> matcher)
-        throws RemoteException;
 
     public IRemoteBotMenu menuItem(String menuItem) throws RemoteException;
 

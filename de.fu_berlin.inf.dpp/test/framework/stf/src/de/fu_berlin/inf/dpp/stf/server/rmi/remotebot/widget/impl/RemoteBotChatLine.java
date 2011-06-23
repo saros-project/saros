@@ -2,24 +2,19 @@ package de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.impl;
 
 import java.rmi.RemoteException;
 
+import de.fu_berlin.inf.dpp.stf.server.StfRemoteObject;
 import de.fu_berlin.inf.dpp.stf.server.bot.widget.SarosSWTBotChatLine;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotChatLine;
 
-public final class RemoteBotChatLine extends AbstractRemoteWidget implements
+public final class RemoteBotChatLine extends StfRemoteObject implements
     IRemoteBotChatLine {
 
-    private static transient RemoteBotChatLine self;
+    private static final RemoteBotChatLine INSTANCE = new RemoteBotChatLine();
 
     private SarosSWTBotChatLine widget;
 
-    /**
-     * {@link RemoteBotChatLine} is a singleton, but inheritance is possible.
-     */
     public static RemoteBotChatLine getInstance() {
-        if (self != null)
-            return self;
-        self = new RemoteBotChatLine();
-        return self;
+        return INSTANCE;
     }
 
     public IRemoteBotChatLine setWidget(SarosSWTBotChatLine ccomb) {

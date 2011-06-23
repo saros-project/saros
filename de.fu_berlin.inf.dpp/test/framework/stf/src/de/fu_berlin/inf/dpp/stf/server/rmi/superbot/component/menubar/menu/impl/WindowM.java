@@ -2,26 +2,21 @@ package de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.menubar.menu.impl
 
 import java.rmi.RemoteException;
 
+import de.fu_berlin.inf.dpp.stf.server.StfRemoteObject;
+import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.impl.RemoteWorkbenchBot;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotCombo;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotShell;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotTree;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.Perspective;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.menubar.menu.IWindowM;
-import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.menubar.menu.submenu.impl.SarosPreferences;
 import de.fu_berlin.inf.dpp.stf.server.util.Util;
 
-public class WindowM extends SarosPreferences implements IWindowM {
+public final class WindowM extends StfRemoteObject implements IWindowM {
 
-    private static transient WindowM self;
+    private static final WindowM INSTANCE = new WindowM();
 
-    /**
-     * {@link WindowM} is a singleton, but inheritance is possible.
-     */
     public static WindowM getInstance() {
-        if (self != null)
-            return self;
-        self = new WindowM();
-        return self;
+        return INSTANCE;
     }
 
     /**************************************************************
@@ -36,7 +31,8 @@ public class WindowM extends SarosPreferences implements IWindowM {
      **********************************************/
     public void setNewTextFileLineDelimiter(String OS) throws RemoteException {
         clickMenuPreferences();
-        IRemoteBotShell shell = remoteBot().shell(SHELL_PREFERNCES);
+        IRemoteBotShell shell = RemoteWorkbenchBot.getInstance().shell(
+            SHELL_PREFERNCES);
         IRemoteBotTree tree = shell.bot().tree();
         tree.expandNode(TREE_ITEM_GENERAL_IN_PRFERENCES).select(
             TREE_ITEM_WORKSPACE_IN_PREFERENCES);
@@ -52,14 +48,17 @@ public class WindowM extends SarosPreferences implements IWindowM {
         }
         shell.bot().button(APPLY).click();
         shell.bot().button(OK).click();
-        remoteBot().waitUntilShellIsClosed(SHELL_PREFERNCES);
+        RemoteWorkbenchBot.getInstance().waitUntilShellIsClosed(
+            SHELL_PREFERNCES);
     }
 
     public void clickMenuPreferences() throws RemoteException {
-        if (Util.getOS() == Util.TypeOfOS.MAC)
-            remoteBot().menu("Eclipse").menu(MENU_PREFERENCES).click();
+        if (Util.getOperatingSystem() == Util.OperatingSystem.MAC)
+            RemoteWorkbenchBot.getInstance().menu("Eclipse")
+                .menu(MENU_PREFERENCES).click();
         else
-            remoteBot().menu(MENU_WINDOW).menu(MENU_PREFERENCES).click();
+            RemoteWorkbenchBot.getInstance().menu(MENU_WINDOW)
+                .menu(MENU_PREFERENCES).click();
     }
 
     public void showViewProblems() throws RemoteException {
@@ -74,11 +73,11 @@ public class WindowM extends SarosPreferences implements IWindowM {
 
     public void showViewWithName(String parentNode, String node)
         throws RemoteException {
-        remoteBot().activateWorkbench();
-        remoteBot().menu(MENU_WINDOW).menu(MENU_SHOW_VIEW).menu(MENU_OTHER)
-            .click();
-        remoteBot().shell(SHELL_SHOW_VIEW).confirmWithTreeWithFilterText(
-            parentNode, node, OK);
+        RemoteWorkbenchBot.getInstance().activateWorkbench();
+        RemoteWorkbenchBot.getInstance().menu(MENU_WINDOW).menu(MENU_SHOW_VIEW)
+            .menu(MENU_OTHER).click();
+        RemoteWorkbenchBot.getInstance().shell(SHELL_SHOW_VIEW)
+            .confirmWithTreeWithFilterText(parentNode, node, OK);
     }
 
     public void openPerspective() throws RemoteException {
@@ -99,15 +98,18 @@ public class WindowM extends SarosPreferences implements IWindowM {
     }
 
     public void openPerspectiveResource() throws RemoteException {
-        remoteBot().openPerspectiveWithId(ID_RESOURCE_PERSPECTIVE);
+        RemoteWorkbenchBot.getInstance().openPerspectiveWithId(
+            ID_RESOURCE_PERSPECTIVE);
     }
 
     public void openPerspectiveJava() throws RemoteException {
-        remoteBot().openPerspectiveWithId(ID_JAVA_PERSPECTIVE);
+        RemoteWorkbenchBot.getInstance().openPerspectiveWithId(
+            ID_JAVA_PERSPECTIVE);
     }
 
     public void openPerspectiveDebug() throws RemoteException {
-        remoteBot().openPerspectiveWithId(ID_DEBUG_PERSPECTIVE);
+        RemoteWorkbenchBot.getInstance().openPerspectiveWithId(
+            ID_DEBUG_PERSPECTIVE);
     }
 
     /**********************************************
@@ -117,7 +119,8 @@ public class WindowM extends SarosPreferences implements IWindowM {
      **********************************************/
     public String getTextFileLineDelimiter() throws RemoteException {
         clickMenuPreferences();
-        IRemoteBotShell shell = remoteBot().shell(SHELL_PREFERNCES);
+        IRemoteBotShell shell = RemoteWorkbenchBot.getInstance().shell(
+            SHELL_PREFERNCES);
         IRemoteBotTree tree = shell.bot().tree();
         tree.expandNode(TREE_ITEM_GENERAL_IN_PRFERENCES).select(
             TREE_ITEM_WORKSPACE_IN_PREFERENCES);
@@ -131,7 +134,7 @@ public class WindowM extends SarosPreferences implements IWindowM {
             IRemoteBotCombo combo = shell.bot().comboBoxInGroup(
                 "New text file line delimiter");
             String itemName = combo.items()[combo.selectionIndex()];
-            remoteBot().shell(SHELL_PREFERNCES).close();
+            RemoteWorkbenchBot.getInstance().shell(SHELL_PREFERNCES).close();
             return itemName;
         }
         shell.close();
@@ -139,11 +142,13 @@ public class WindowM extends SarosPreferences implements IWindowM {
     }
 
     public boolean isJavaPerspectiveActive() throws RemoteException {
-        return remoteBot().isPerspectiveActive(ID_JAVA_PERSPECTIVE);
+        return RemoteWorkbenchBot.getInstance().isPerspectiveActive(
+            ID_JAVA_PERSPECTIVE);
     }
 
     public boolean isDebugPerspectiveActive() throws RemoteException {
-        return remoteBot().isPerspectiveActive(ID_DEBUG_PERSPECTIVE);
+        return RemoteWorkbenchBot.getInstance().isPerspectiveActive(
+            ID_DEBUG_PERSPECTIVE);
     }
 
 }

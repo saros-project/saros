@@ -5,24 +5,20 @@ import java.rmi.RemoteException;
 import org.eclipse.swtbot.swt.finder.waits.Conditions;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotToolbarRadioButton;
 
+import de.fu_berlin.inf.dpp.stf.server.StfRemoteObject;
+import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.impl.RemoteWorkbenchBot;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotMenu;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotToolbarRadioButton;
 
-public final class RemoteBotToolbarRadioButton extends AbstractRemoteWidget
+public final class RemoteBotToolbarRadioButton extends StfRemoteObject
     implements IRemoteBotToolbarRadioButton {
 
-    private static transient RemoteBotToolbarRadioButton self;
+    private static final RemoteBotToolbarRadioButton INSTANCE = new RemoteBotToolbarRadioButton();
 
     private SWTBotToolbarRadioButton widget;
 
-    /**
-     * {@link RemoteBotButton} is a singleton, but inheritance is possible.
-     */
     public static RemoteBotToolbarRadioButton getInstance() {
-        if (self != null)
-            return self;
-        self = new RemoteBotToolbarRadioButton();
-        return self;
+        return INSTANCE;
     }
 
     public IRemoteBotToolbarRadioButton setWidget(
@@ -43,7 +39,7 @@ public final class RemoteBotToolbarRadioButton extends AbstractRemoteWidget
      * 
      **********************************************/
     public IRemoteBotMenu contextMenu(String text) throws RemoteException {
-        return stfBotMenu.setWidget(widget.contextMenu(text));
+        return RemoteBotMenu.getInstance().setWidget(widget.contextMenu(text));
     }
 
     /**********************************************
@@ -107,7 +103,8 @@ public final class RemoteBotToolbarRadioButton extends AbstractRemoteWidget
      * 
      **********************************************/
     public void waitUntilIsEnabled() throws RemoteException {
-        stfBot.waitUntil(Conditions.widgetIsEnabled(widget));
+        RemoteWorkbenchBot.getInstance().waitUntil(
+            Conditions.widgetIsEnabled(widget));
     }
 
 }

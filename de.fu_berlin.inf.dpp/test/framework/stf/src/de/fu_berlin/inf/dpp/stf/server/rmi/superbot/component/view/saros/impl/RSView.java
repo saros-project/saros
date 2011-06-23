@@ -2,23 +2,18 @@ package de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.saros.impl;
 
 import java.rmi.RemoteException;
 
+import de.fu_berlin.inf.dpp.stf.server.StfRemoteObject;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotView;
-import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.Component;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.saros.IRSView;
 
-public class RSView extends Component implements IRSView {
+public final class RSView extends StfRemoteObject implements IRSView {
 
-    private static transient RSView self;
+    private static final RSView INSTANCE = new RSView();
+
     private IRemoteBotView view;
 
-    /**
-     * {@link RSView} is a singleton, but inheritance is possible.
-     */
     public static RSView getInstance() {
-        if (self != null)
-            return self;
-        self = new RSView();
-        return self;
+        return INSTANCE;
     }
 
     public IRSView setView(IRemoteBotView view) {

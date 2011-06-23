@@ -2,35 +2,30 @@ package de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.impl;
 
 import java.rmi.RemoteException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
-import org.apache.log4j.Logger;
 import org.eclipse.swtbot.swt.finder.waits.DefaultCondition;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 
+import de.fu_berlin.inf.dpp.stf.server.StfRemoteObject;
 import de.fu_berlin.inf.dpp.stf.server.bot.widget.ContextMenuHelper;
+import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.impl.RemoteWorkbenchBot;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotMenu;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotTreeItem;
 
-public final class RemoteBotTreeItem extends AbstractRemoteWidget implements
+public final class RemoteBotTreeItem extends StfRemoteObject implements
     IRemoteBotTreeItem {
-    private static transient RemoteBotTreeItem self;
 
-    private static final Logger log = Logger.getLogger(RemoteBotTreeItem.class);
+    private static final RemoteBotTreeItem INSTANCE = new RemoteBotTreeItem();
 
-    private SWTBotTreeItem widget;
+    private transient SWTBotTreeItem widget;
 
-    private SWTBotTree swtBotTree;
+    private transient SWTBotTree swtBotTree;
 
-    /**
-     * {@link RemoteBotTreeItem} is a singleton, but inheritance is possible.
-     */
     public static RemoteBotTreeItem getInstance() {
-        if (self != null)
-            return self;
-        self = new RemoteBotTreeItem();
-        return self;
+        return INSTANCE;
     }
 
     public IRemoteBotTreeItem setWidget(SWTBotTreeItem item) {
@@ -56,9 +51,8 @@ public final class RemoteBotTreeItem extends AbstractRemoteWidget implements
      **********************************************/
 
     public IRemoteBotMenu contextMenus(String... texts) throws RemoteException {
-        stfBotMenu.setWidget(ContextMenuHelper
-            .getContextMenu(swtBotTree, texts));
-        return stfBotMenu;
+        return RemoteBotMenu.getInstance().setWidget(
+            ContextMenuHelper.getContextMenu(swtBotTree, texts));
     }
 
     /**********************************************
@@ -172,20 +166,9 @@ public final class RemoteBotTreeItem extends AbstractRemoteWidget implements
         List<String> allItemTexts = new ArrayList<String>();
         for (SWTBotTreeItem item : widget.getItems()) {
             allItemTexts.add(item.getText());
-            log.info("existed subTreeItem of the TreeItem " + widget.getText()
-                + ": " + item.getText());
         }
         return allItemTexts;
     }
-
-    // public STFBotTreeItem[] getItems() throws RemoteException {
-    // subItems = widget.getItems();
-    // STFBotTreeItem[] items = new STFBotTreeItem[widget.getItems().length];
-    // for (int i = 0; i < widget.getItems().length; i++) {
-    // items[i] = setWidget(widget.getItems()[i]);
-    // }
-    // return items;
-    // }
 
     public boolean existsSubItem(String text) throws RemoteException {
         return getTextOfItems().contains(text);
@@ -237,27 +220,28 @@ public final class RemoteBotTreeItem extends AbstractRemoteWidget implements
 
     public void waitUntilSubItemExists(final String subItemText)
         throws RemoteException {
-        stfBot.waitUntil(new DefaultCondition() {
+        RemoteWorkbenchBot.getInstance().waitUntil(new DefaultCondition() {
             public boolean test() throws Exception {
                 return existsSubItem(subItemText);
             }
 
             public String getFailureMessage() {
-                return "The tree node" + "doesn't contain the treeItem"
-                    + subItemText;
+                return "the tree node '" + widget.getText()
+                    + "'does not contain the tree item: " + subItemText;
             }
         });
     }
 
     public void waitUntilContextMenuExists(final String... contextNames)
         throws RemoteException {
-        stfBot.waitLongUntil(new DefaultCondition() {
+        RemoteWorkbenchBot.getInstance().waitLongUntil(new DefaultCondition() {
             public boolean test() throws Exception {
                 return existsContextMenu(contextNames);
             }
 
             public String getFailureMessage() {
-                return "The contextmenu doesn't exists";
+                return "the context menu for context names + "
+                    + Arrays.toString(contextNames) + " does not exists";
             }
         });
     }

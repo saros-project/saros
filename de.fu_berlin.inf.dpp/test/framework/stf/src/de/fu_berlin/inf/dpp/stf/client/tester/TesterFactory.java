@@ -9,6 +9,19 @@ final class TesterFactory {
 
     private final static Logger log = Logger.getLogger(TesterFactory.class);
 
+    private static AbstractTester createInvalidTester(Exception exception,
+        String name, Object jid, Object password, Object host, Object port) {
+
+        return new InvalidTester(new JID(jid == null ? "not@set.in/config"
+            : jid.toString()), password == null ? "" : password.toString(),
+            new RuntimeException("could not connect to RMI of bot '" + name
+                + "' with JID: " + jid + ", password: " + password + ", host: "
+                + host + ", port: " + port + ", " + exception.getMessage(),
+                exception.getCause()
+
+            ));
+    }
+
     public synchronized static AbstractTester createTester(String name) {
 
         Configuration configuration = Configuration.getInstance();
@@ -24,49 +37,41 @@ final class TesterFactory {
         Object host = null;
         Object port = null;
 
+        jid = configuration.get(name + "_JID");
+        password = configuration.get(name + "_PASSWORD");
+        host = configuration.get(name + "_HOST");
+        port = configuration.get(name + "_PORT");
+
         try {
-
-            jid = configuration.get(name + "_JID");
-            password = configuration.get(name + "_PASSWORD");
-            host = configuration.get(name + "_HOST");
-            port = configuration.get(name + "_PORT");
-
             if (jid == null)
-                throw new NullPointerException("JID for bot '" + name
+                throw new IllegalArgumentException("JID for bot '" + name
                     + "' is not set in the property file(s)");
 
             if (password == null)
-                throw new NullPointerException("password for bot '" + name
+                throw new IllegalArgumentException("password for bot '" + name
                     + "' is not set in the property file(s)");
 
             if (host == null)
-                throw new NullPointerException("host for bot '" + name
+                throw new IllegalArgumentException("host for bot '" + name
                     + "' is not set in the property file(s)");
 
             if (port == null)
-                throw new NullPointerException("port for bot '" + name
+                throw new IllegalArgumentException("port for bot '" + name
                     + "' is not set in the property file(s)");
+        } catch (IllegalArgumentException e) {
+            return createInvalidTester(e, name, jid, password, host, port);
+        }
 
+        try {
             tester = new RealTester(new JID(jid.toString()),
                 password.toString(), host.toString(), Integer.parseInt(port
                     .toString()));
-
-            log.info("created bot '" + name + "' with JID: " + jid
-                + ", password: " + password + ", host: " + host + ", port: "
-                + port);
-
         } catch (Exception e) {
-            log.debug("error while initializing bot", e);
-            tester = new InvalidTester(new JID(
-                jid == null ? "not@set.in/config" : jid.toString()),
-                password == null ? "" : password.toString(),
-                new RuntimeException("could not connect to RMI of bot '" + name
-                    + "' with JID: " + jid + ", password: " + password
-                    + ", host: " + host + ", port: " + port + ", "
-                    + e.getMessage(), e.getCause()
-
-                ));
+            return createInvalidTester(e, name, jid, password, host, port);
         }
+
+        log.info("created bot '" + name + "' with JID: " + jid + ", password: "
+            + password + ", host: " + host + ", port: " + port);
 
         return tester;
 

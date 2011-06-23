@@ -1,7 +1,6 @@
 package de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.impl;
 
 import java.rmi.RemoteException;
-import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.jface.bindings.keys.KeyStroke;
@@ -11,30 +10,30 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotMenu;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotToolbarDropDownButton;
 import org.hamcrest.Matcher;
 
+import de.fu_berlin.inf.dpp.stf.server.StfRemoteObject;
+import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.impl.RemoteWorkbenchBot;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotMenu;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotToolbarDropDownButton;
 
-public final class RemoteBotToolbarDropDownButton extends AbstractRemoteWidget
+public final class RemoteBotToolbarDropDownButton extends StfRemoteObject
     implements IRemoteBotToolbarDropDownButton {
-    private static transient RemoteBotToolbarDropDownButton self;
+
+    private static final RemoteBotToolbarDropDownButton INSTANCE = new RemoteBotToolbarDropDownButton();
 
     private SWTBotToolbarDropDownButton widget;
 
-    /**
-     * {@link RemoteBotToolbarDropDownButton} is a singleton, but inheritance is
-     * possible.
-     */
     public static RemoteBotToolbarDropDownButton getInstance() {
-        if (self != null)
-            return self;
-        self = new RemoteBotToolbarDropDownButton();
-        return self;
+        return INSTANCE;
     }
 
     public IRemoteBotToolbarDropDownButton setWidget(
         SWTBotToolbarDropDownButton toolbarDropDownButton) {
         this.widget = toolbarDropDownButton;
         return this;
+    }
+
+    public List<? extends SWTBotMenu> menuItems(Matcher<MenuItem> matcher) {
+        return widget.menuItems(matcher);
     }
 
     /**************************************************************
@@ -49,30 +48,18 @@ public final class RemoteBotToolbarDropDownButton extends AbstractRemoteWidget
      * 
      **********************************************/
 
-    public List<IRemoteBotMenu> menuItems(Matcher<MenuItem> matcher)
-        throws RemoteException {
-        List<IRemoteBotMenu> menus = new ArrayList<IRemoteBotMenu>();
-        for (SWTBotMenu m : widget.menuItems(matcher)) {
-            stfBotMenu.setWidget(m);
-            menus.add(stfBotMenu);
-        }
-        return menus;
-    }
-
     public IRemoteBotMenu menuItem(String menuItem) throws RemoteException {
-        stfBotMenu.setWidget(widget.menuItem(menuItem));
-        return stfBotMenu;
+        return RemoteBotMenu.getInstance().setWidget(widget.menuItem(menuItem));
     }
 
     public IRemoteBotMenu menuItem(Matcher<MenuItem> matcher)
         throws RemoteException {
 
-        stfBotMenu.setWidget(widget.menuItem(matcher));
-        return stfBotMenu;
+        return RemoteBotMenu.getInstance().setWidget(widget.menuItem(matcher));
     }
 
     public IRemoteBotMenu contextMenu(String text) throws RemoteException {
-        return stfBotMenu.setWidget(widget.contextMenu(text));
+        return RemoteBotMenu.getInstance().setWidget(widget.contextMenu(text));
     }
 
     /**********************************************
@@ -128,7 +115,8 @@ public final class RemoteBotToolbarDropDownButton extends AbstractRemoteWidget
      * 
      **********************************************/
     public void waitUntilIsEnabled() throws RemoteException {
-        stfBot.waitUntil(Conditions.widgetIsEnabled(widget));
+        RemoteWorkbenchBot.getInstance().waitUntil(
+            Conditions.widgetIsEnabled(widget));
     }
 
 }

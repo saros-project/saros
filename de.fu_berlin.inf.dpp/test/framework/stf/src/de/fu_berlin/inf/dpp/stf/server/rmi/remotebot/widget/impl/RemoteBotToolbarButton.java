@@ -5,24 +5,20 @@ import java.rmi.RemoteException;
 import org.eclipse.swtbot.swt.finder.waits.Conditions;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotToolbarButton;
 
+import de.fu_berlin.inf.dpp.stf.server.StfRemoteObject;
+import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.impl.RemoteWorkbenchBot;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotMenu;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotToolbarButton;
 
-public final class RemoteBotToolbarButton extends AbstractRemoteWidget
-    implements IRemoteBotToolbarButton {
+public final class RemoteBotToolbarButton extends StfRemoteObject implements
+    IRemoteBotToolbarButton {
 
-    private static transient RemoteBotToolbarButton ToolbarButtonImp;
+    private static final RemoteBotToolbarButton INSTANCE = new RemoteBotToolbarButton();
+
     private SWTBotToolbarButton toolbarButton;
 
-    /**
-     * {@link RemoteBotToolbarButton} is a singleton, but inheritance is
-     * possible.
-     */
     public static RemoteBotToolbarButton getInstance() {
-        if (ToolbarButtonImp != null)
-            return ToolbarButtonImp;
-        ToolbarButtonImp = new RemoteBotToolbarButton();
-        return ToolbarButtonImp;
+        return INSTANCE;
     }
 
     public IRemoteBotToolbarButton setWidget(SWTBotToolbarButton toolbarButton) {
@@ -37,7 +33,8 @@ public final class RemoteBotToolbarButton extends AbstractRemoteWidget
      **************************************************************/
 
     public IRemoteBotMenu contextMenu(String text) throws RemoteException {
-        return stfBotMenu.setWidget(toolbarButton.contextMenu(text));
+        return RemoteBotMenu.getInstance().setWidget(
+            toolbarButton.contextMenu(text));
 
     }
 
@@ -92,7 +89,8 @@ public final class RemoteBotToolbarButton extends AbstractRemoteWidget
      * 
      **********************************************/
     public void waitUntilIsEnabled() throws RemoteException {
-        stfBot.waitUntil(Conditions.widgetIsEnabled(toolbarButton));
+        RemoteWorkbenchBot.getInstance().waitUntil(
+            Conditions.widgetIsEnabled(toolbarButton));
     }
 
 }

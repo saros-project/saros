@@ -10,26 +10,22 @@ import org.eclipse.swtbot.swt.finder.waits.Conditions;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTable;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTableItem;
 
+import de.fu_berlin.inf.dpp.stf.server.StfRemoteObject;
 import de.fu_berlin.inf.dpp.stf.server.bot.condition.SarosConditions;
+import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.impl.RemoteWorkbenchBot;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotMenu;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotTable;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotTableItem;
 
-public final class RemoteBotTable extends AbstractRemoteWidget implements
+public final class RemoteBotTable extends StfRemoteObject implements
     IRemoteBotTable {
 
-    private static transient RemoteBotTable self;
+    private static final RemoteBotTable INSTANCE = new RemoteBotTable();
 
     private SWTBotTable widget;
 
-    /**
-     * {@link RemoteBotTable} is a singleton, but inheritance is possible.
-     */
     public static RemoteBotTable getInstance() {
-        if (self != null)
-            return self;
-        self = new RemoteBotTable();
-        return self;
+        return INSTANCE;
     }
 
     public IRemoteBotTable setWidget(SWTBotTable table) {
@@ -50,36 +46,32 @@ public final class RemoteBotTable extends AbstractRemoteWidget implements
      **********************************************/
 
     public IRemoteBotMenu contextMenu(String text) throws RemoteException {
-        stfBotMenu.setWidget(widget.contextMenu(text));
-        return stfBotMenu;
+        return RemoteBotMenu.getInstance().setWidget(widget.contextMenu(text));
     }
 
     public IRemoteBotTableItem getTableItem(String itemText)
         throws RemoteException {
-        stfBotTableItem.setWidget(widget.getTableItem(itemText));
-        return stfBotTableItem;
+        return RemoteBotTableItem.getInstance().setWidget(
+            widget.getTableItem(itemText));
     }
 
     public IRemoteBotTableItem getTableItemWithRegex(String regex)
         throws RemoteException {
-        boolean hasItem = false;
 
         for (int i = 0; i < widget.rowCount(); i++) {
             SWTBotTableItem item = widget.getTableItem(i);
             if (item.getText().matches(regex)) {
-                hasItem = true;
-                stfBotTableItem.setWidget(item);
-                break;
+                return RemoteBotTableItem.getInstance().setWidget(item);
             }
         }
-        if (!hasItem)
-            throw new RuntimeException("Not found the tableItem!");
-        return stfBotTableItem;
+        throw new WidgetNotFoundException(
+            "unable to find table item with regex: " + regex + " on table "
+                + widget.getText());
     }
 
     public IRemoteBotTableItem getTableItem(int row) throws RemoteException {
-        stfBotTableItem.setWidget(widget.getTableItem(row));
-        return stfBotTableItem;
+        return RemoteBotTableItem.getInstance().setWidget(
+            widget.getTableItem(row));
     }
 
     /**********************************************
@@ -199,16 +191,18 @@ public final class RemoteBotTable extends AbstractRemoteWidget implements
      * 
      **********************************************/
     public void waitUntilIsEnabled() throws RemoteException {
-        stfBot.waitUntil(Conditions.widgetIsEnabled(widget));
+        RemoteWorkbenchBot.getInstance().waitUntil(
+            Conditions.widgetIsEnabled(widget));
     }
 
     public void waitUntilTableHasRows(int row) throws RemoteException {
-        stfBot.waitUntil(tableHasRows(widget, row));
+        RemoteWorkbenchBot.getInstance().waitUntil(tableHasRows(widget, row));
     }
 
     public void waitUntilTableItemExists(String itemText)
         throws RemoteException {
-        stfBot.waitUntil(SarosConditions.existTableItem(this, itemText));
+        RemoteWorkbenchBot.getInstance().waitUntil(
+            SarosConditions.existTableItem(this, itemText));
     }
 
 }

@@ -3,39 +3,31 @@ package de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.impl;
 import java.rmi.RemoteException;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
 import org.eclipse.swtbot.swt.finder.finders.UIThreadRunnable;
 import org.eclipse.swtbot.swt.finder.results.StringResult;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 
+import de.fu_berlin.inf.dpp.stf.server.StfRemoteObject;
 import de.fu_berlin.inf.dpp.stf.server.bot.SarosSWTBot;
 import de.fu_berlin.inf.dpp.stf.server.bot.condition.SarosConditions;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.IRemoteBot;
-import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.impl.RemoteBot;
+import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.impl.RemoteWorkbenchBot;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotMenu;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotShell;
 
-public final class RemoteBotShell extends AbstractRemoteWidget implements
+public final class RemoteBotShell extends StfRemoteObject implements
     IRemoteBotShell {
 
-    private static final Logger log = Logger.getLogger(RemoteBotShell.class);
+    private static final RemoteBotShell INSTANCE = new RemoteBotShell();
 
-    private static transient RemoteBotShell self;
-
-    public final static String TEXT_FIELD_TYPE_FILTER_TEXT = "type filter text";
+    private static final String TEXT_FIELD_TYPE_FILTER_TEXT = "type filter text";
 
     private SWTBotShell widget;
 
-    /**
-     * {@link RemoteBotShell} is a singleton, but inheritance is possible.
-     */
     public static RemoteBotShell getInstance() {
-        if (self != null)
-            return self;
-        self = new RemoteBotShell();
-        return self;
+        return INSTANCE;
     }
 
     public IRemoteBotShell setWidget(SWTBotShell shell) {
@@ -55,14 +47,12 @@ public final class RemoteBotShell extends AbstractRemoteWidget implements
      * 
      **********************************************/
     public IRemoteBot bot() {
-        RemoteBot botImp = RemoteBot.getInstance();
-        // botImp.setBot(swtBotShell.bot());
-        botImp.setBot(SarosSWTBot.getInstance());
-        return botImp;
+        RemoteWorkbenchBot.getInstance().setBot(SarosSWTBot.getInstance());
+        return RemoteWorkbenchBot.getInstance();
     }
 
     public IRemoteBotMenu contextMenu(String text) throws RemoteException {
-        return stfBotMenu.setWidget(widget.contextMenu(text));
+        return RemoteBotMenu.getInstance().setWidget(widget.contextMenu(text));
     }
 
     /**********************************************
@@ -152,14 +142,10 @@ public final class RemoteBotShell extends AbstractRemoteWidget implements
     public void confirmWithTable(String itemName, String buttonText)
         throws RemoteException {
         waitUntilActive();
-        try {
-            bot().table().select(itemName);
-            bot().button(buttonText).waitUntilIsEnabled();
-            bot().button(buttonText).click();
-            // waitUntilShellCloses(shellName);
-        } catch (WidgetNotFoundException e) {
-            log.error("tableItem" + itemName + "can not be fund!");
-        }
+
+        bot().table().select(itemName);
+        bot().button(buttonText).waitUntilIsEnabled();
+        bot().button(buttonText).click();
     }
 
     public void confirmWithTreeWithFilterText(String rootOfTreeNode,
@@ -170,7 +156,6 @@ public final class RemoteBotShell extends AbstractRemoteWidget implements
         bot().tree().selectTreeItem(rootOfTreeNode, teeNode);
         bot().button(buttonText).waitUntilIsEnabled();
         bot().button(buttonText).click();
-        // waitUntilShellCloses(shellName);
     }
 
     /**********************************************
@@ -209,7 +194,7 @@ public final class RemoteBotShell extends AbstractRemoteWidget implements
                 }
             });
         if (errorMessage == null) {
-            throw new WidgetNotFoundException("Could not find errorMessage!");
+            throw new WidgetNotFoundException("could not find errorMessage!");
         }
         return errorMessage;
     }
@@ -223,7 +208,7 @@ public final class RemoteBotShell extends AbstractRemoteWidget implements
             }
         });
         if (message == null) {
-            throw new WidgetNotFoundException("Could not find message!");
+            throw new WidgetNotFoundException("could not find message!");
         }
         return message;
     }
@@ -240,15 +225,18 @@ public final class RemoteBotShell extends AbstractRemoteWidget implements
      **********************************************/
 
     public void waitUntilActive() throws RemoteException {
-        stfBot.waitUntil(SarosConditions.isShellActive(widget));
+        RemoteWorkbenchBot.getInstance().waitUntil(
+            SarosConditions.isShellActive(widget));
     }
 
     public void waitShortUntilIsClosed() throws RemoteException {
-        stfBot.waitShortUntil(SarosConditions.isShellClosed(widget));
+        RemoteWorkbenchBot.getInstance().waitShortUntil(
+            SarosConditions.isShellClosed(widget));
     }
 
     public void waitLongUntilIsClosed() throws RemoteException {
-        stfBot.waitLongUntil(SarosConditions.isShellClosed(widget));
+        RemoteWorkbenchBot.getInstance().waitLongUntil(
+            SarosConditions.isShellClosed(widget));
     }
 
 }

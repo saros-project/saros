@@ -30,34 +30,37 @@ import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.impl.RemoteBotEditor
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.impl.RemoteBotPerspective;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.impl.RemoteBotView;
 
-public class RemoteWorkbenchBot extends RemoteBot implements
+public final class RemoteWorkbenchBot extends RemoteBot implements
     IRemoteWorkbenchBot {
 
     private static final Logger log = Logger
         .getLogger(RemoteWorkbenchBot.class);
+    private static final RemoteWorkbenchBot INSTANCE = new RemoteWorkbenchBot();
 
-    private static transient RemoteWorkbenchBot self;
+    private RemoteBotView view;
+    private RemoteBotPerspective perspective;
+    private RemoteBotEditor editor;
 
-    private static RemoteBotView view;
-    private static RemoteBotPerspective stfBotPers;
-    private static RemoteBotEditor stfBotEditor;
+    private SarosSWTBot swtWorkBenchBot;
 
-    private static SarosSWTBot sarosSwtBot;
-    private static RemoteBotChatLine chatLine;
+    private RemoteBotChatLine chatLine;
 
-    /**
-     * {@link RemoteWorkbenchBot} is a singleton, but inheritance is possible.
-     */
-    public static RemoteWorkbenchBot getInstance() {
-        if (self != null)
-            return self;
-        self = new RemoteWorkbenchBot();
+    public RemoteWorkbenchBot() {
+        super();
         view = RemoteBotView.getInstance();
-        stfBotPers = RemoteBotPerspective.getInstance();
-        stfBotEditor = RemoteBotEditor.getInstance();
-        sarosSwtBot = SarosSWTBot.getInstance();
+        perspective = RemoteBotPerspective.getInstance();
+        editor = RemoteBotEditor.getInstance();
         chatLine = RemoteBotChatLine.getInstance();
-        return self;
+        swtWorkBenchBot = SarosSWTBot.getInstance();
+
+    }
+
+    public static RemoteWorkbenchBot getInstance() {
+        return INSTANCE;
+    }
+
+    public void setWorkbenchBot(SarosSWTBot bot) {
+        swtWorkBenchBot = bot;
     }
 
     /**********************************************
@@ -66,7 +69,7 @@ public class RemoteWorkbenchBot extends RemoteBot implements
      * 
      **********************************************/
     public IRemoteBotView view(String viewTitle) throws RemoteException {
-        view.setWidget(sarosSwtBot.viewByTitle(viewTitle));
+        view.setWidget(swtWorkBenchBot.viewByTitle(viewTitle));
         return view;
     }
 
@@ -99,7 +102,7 @@ public class RemoteWorkbenchBot extends RemoteBot implements
 
     public List<String> getTitlesOfOpenedViews() throws RemoteException {
         ArrayList<String> list = new ArrayList<String>();
-        for (SWTBotView view : sarosSwtBot.views())
+        for (SWTBotView view : swtWorkBenchBot.views())
             list.add(view.getTitle());
         return list;
     }
@@ -109,12 +112,12 @@ public class RemoteWorkbenchBot extends RemoteBot implements
     }
 
     public IRemoteBotView viewById(String id) throws RemoteException {
-        view.setWidget(sarosSwtBot.viewById(id));
+        view.setWidget(swtWorkBenchBot.viewById(id));
         return view;
     }
 
     public IRemoteBotView activeView() throws RemoteException {
-        return view(sarosSwtBot.activeView().getTitle());
+        return view(swtWorkBenchBot.activeView().getTitle());
     }
 
     /**********************************************
@@ -128,12 +131,12 @@ public class RemoteWorkbenchBot extends RemoteBot implements
     }
 
     public boolean isPerspectiveActive(String id) throws RemoteException {
-        return sarosSwtBot.perspectiveById(id).isActive();
+        return swtWorkBenchBot.perspectiveById(id).isActive();
     }
 
     public List<String> getPerspectiveTitles() throws RemoteException {
         ArrayList<String> list = new ArrayList<String>();
-        for (SWTBotPerspective perspective : sarosSwtBot.perspectives())
+        for (SWTBotPerspective perspective : swtWorkBenchBot.perspectives())
             list.add(perspective.getLabel());
         return list;
     }
@@ -169,26 +172,28 @@ public class RemoteWorkbenchBot extends RemoteBot implements
 
     public IRemoteBotPerspective perspectiveByLabel(String label)
         throws RemoteException {
-        stfBotPers.setWidget(sarosSwtBot.perspectiveByLabel(label));
-        return stfBotPers;
+        perspective.setWidget(swtWorkBenchBot.perspectiveByLabel(label));
+        return perspective;
     }
 
     public IRemoteBotPerspective perspectiveById(String id)
         throws RemoteException {
-        stfBotPers.setWidget(sarosSwtBot.perspectiveById(id));
-        return stfBotPers;
+        perspective.setWidget(swtWorkBenchBot.perspectiveById(id));
+        return perspective;
     }
 
     public IRemoteBotPerspective activePerspective() throws RemoteException {
-        return perspectiveByLabel(sarosSwtBot.activePerspective().getLabel());
+        return perspectiveByLabel(swtWorkBenchBot.activePerspective()
+            .getLabel());
     }
 
     public IRemoteBotPerspective defaultPerspective() throws RemoteException {
-        return perspectiveByLabel(sarosSwtBot.defaultPerspective().getLabel());
+        return perspectiveByLabel(swtWorkBenchBot.defaultPerspective()
+            .getLabel());
     }
 
     public void resetActivePerspective() throws RemoteException {
-        sarosSwtBot.resetActivePerspective();
+        swtWorkBenchBot.resetActivePerspective();
     }
 
     /**********************************************
@@ -198,18 +203,18 @@ public class RemoteWorkbenchBot extends RemoteBot implements
      **********************************************/
 
     public IRemoteBotEditor editor(String fileName) throws RemoteException {
-        stfBotEditor.setWidget(sarosSwtBot.editorByTitle(fileName)
-            .toTextEditor());
-        return stfBotEditor;
+        editor
+            .setWidget(swtWorkBenchBot.editorByTitle(fileName).toTextEditor());
+        return editor;
     }
 
     public IRemoteBotEditor editorById(String id) throws RemoteException {
-        stfBotEditor.setWidget(sarosSwtBot.editorById(id).toTextEditor());
-        return stfBotEditor;
+        editor.setWidget(swtWorkBenchBot.editorById(id).toTextEditor());
+        return editor;
     }
 
     public boolean isEditorOpen(String fileName) throws RemoteException {
-        for (SWTBotEditor editor : sarosSwtBot.editors()) {
+        for (SWTBotEditor editor : swtWorkBenchBot.editors()) {
             if (editor.getTitle().equals(fileName))
                 return true;
         }
@@ -217,21 +222,21 @@ public class RemoteWorkbenchBot extends RemoteBot implements
     }
 
     public IRemoteBotEditor activeEditor() throws RemoteException {
-        return editor(sarosSwtBot.activeEditor().getTitle());
+        return editor(swtWorkBenchBot.activeEditor().getTitle());
 
     }
 
     public void closeAllEditors() throws RemoteException {
-        sarosSwtBot.closeAllEditors();
+        swtWorkBenchBot.closeAllEditors();
     }
 
     public void saveAllEditors() throws RemoteException {
-        sarosSwtBot.saveAllEditors();
+        swtWorkBenchBot.saveAllEditors();
     }
 
     public void waitUntilEditorOpen(final String title) throws RemoteException {
 
-        sarosSwtBot.waitUntil(new DefaultCondition() {
+        swtWorkBenchBot.waitUntil(new DefaultCondition() {
             public boolean test() throws Exception {
                 return isEditorOpen(title);
             }
@@ -244,7 +249,7 @@ public class RemoteWorkbenchBot extends RemoteBot implements
 
     public void waitUntilEditorClosed(final String title)
         throws RemoteException {
-        sarosSwtBot.waitUntil(new DefaultCondition() {
+        swtWorkBenchBot.waitUntil(new DefaultCondition() {
             public boolean test() throws Exception {
                 return !isEditorOpen(title);
             }
@@ -272,7 +277,7 @@ public class RemoteWorkbenchBot extends RemoteBot implements
     }
 
     public SWTBotShell getWorkbench() throws RemoteException {
-        SWTBotShell[] shells = sarosSwtBot.shells();
+        SWTBotShell[] shells = swtWorkBenchBot.shells();
         for (SWTBotShell shell : shells) {
             if (shell.getText().matches(".+? - .+")) {
                 log.debug("found workbench " + shell.getText());
@@ -292,7 +297,7 @@ public class RemoteWorkbenchBot extends RemoteBot implements
      **********************************************/
 
     public void closeAllShells() throws RemoteException {
-        sarosSwtBot.closeAllShells();
+        swtWorkBenchBot.closeAllShells();
     }
 
     /**********************************************
@@ -305,18 +310,18 @@ public class RemoteWorkbenchBot extends RemoteBot implements
     }
 
     public RemoteBotChatLine chatLine(int index) throws RemoteException {
-        chatLine.setWidget(sarosSwtBot.chatLine(index));
+        chatLine.setWidget(swtWorkBenchBot.chatLine(index));
         return chatLine;
     }
 
     public RemoteBotChatLine lastChatLine() throws RemoteException {
-        chatLine.setWidget(sarosSwtBot.lastChatLine());
+        chatLine.setWidget(swtWorkBenchBot.lastChatLine());
         return chatLine;
     }
 
     public RemoteBotChatLine chatLine(final String regex)
         throws RemoteException {
-        chatLine.setWidget(sarosSwtBot.chatLine(regex));
+        chatLine.setWidget(swtWorkBenchBot.chatLine(regex));
         return chatLine;
     }
 }

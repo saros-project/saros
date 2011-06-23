@@ -4,27 +4,22 @@ import java.rmi.RemoteException;
 
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotPerspective;
 
+import de.fu_berlin.inf.dpp.stf.server.StfRemoteObject;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotPerspective;
 
-public final class RemoteBotPerspective extends AbstractRemoteWidget implements
+public final class RemoteBotPerspective extends StfRemoteObject implements
     IRemoteBotPerspective {
 
-    private static transient RemoteBotPerspective self;
+    private static final RemoteBotPerspective INSTANCE = new RemoteBotPerspective();
 
     private SWTBotPerspective widget;
 
-    /**
-     * {@link RemoteBotPerspective} is a singleton, but inheritance is possible.
-     */
     public static RemoteBotPerspective getInstance() {
-        if (self != null)
-            return self;
-        self = new RemoteBotPerspective();
-        return self;
+        return INSTANCE;
     }
 
-    public IRemoteBotPerspective setWidget(SWTBotPerspective pers) {
-        this.widget = pers;
+    public IRemoteBotPerspective setWidget(SWTBotPerspective perspective) {
+        this.widget = perspective;
         return this;
     }
 

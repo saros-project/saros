@@ -1,10 +1,10 @@
 package de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.menubar.menu;
 
+import java.rmi.Remote;
 import java.rmi.RemoteException;
 
 import de.fu_berlin.inf.dpp.stf.client.tester.AbstractTester;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.Perspective;
-import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.menubar.menu.submenu.ISarosPreferences;
 
 /**
  * This interface contains convenience API to perform a action using main menu
@@ -26,7 +26,7 @@ import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.menubar.menu.subme
  * 
  * @author Lin
  */
-public interface IWindowM extends ISarosPreferences {
+public interface IWindowM extends Remote {
 
     /**********************************************
      * 

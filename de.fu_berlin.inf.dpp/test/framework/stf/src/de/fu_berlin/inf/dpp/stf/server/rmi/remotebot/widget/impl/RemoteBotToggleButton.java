@@ -5,23 +5,19 @@ import java.rmi.RemoteException;
 import org.eclipse.swtbot.swt.finder.waits.Conditions;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotToggleButton;
 
+import de.fu_berlin.inf.dpp.stf.server.StfRemoteObject;
+import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.impl.RemoteWorkbenchBot;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotToggleButton;
 
-public final class RemoteBotToggleButton extends AbstractRemoteWidget implements
+public final class RemoteBotToggleButton extends StfRemoteObject implements
     IRemoteBotToggleButton {
-    private static transient RemoteBotToggleButton self;
+
+    private static final RemoteBotToggleButton INSTANCE = new RemoteBotToggleButton();
 
     private SWTBotToggleButton widget;
 
-    /**
-     * {@link RemoteBotToggleButton} is a singleton, but inheritance is
-     * possible.
-     */
     public static RemoteBotToggleButton getInstance() {
-        if (self != null)
-            return self;
-        self = new RemoteBotToggleButton();
-        return self;
+        return INSTANCE;
     }
 
     public IRemoteBotToggleButton setWidget(SWTBotToggleButton toggleButton) {
@@ -93,7 +89,8 @@ public final class RemoteBotToggleButton extends AbstractRemoteWidget implements
      * 
      **********************************************/
     public void waitUntilIsEnabled() throws RemoteException {
-        stfBot.waitUntil(Conditions.widgetIsEnabled(widget));
+        RemoteWorkbenchBot.getInstance().waitUntil(
+            Conditions.widgetIsEnabled(widget));
     }
 
 }

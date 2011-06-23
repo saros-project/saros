@@ -4,24 +4,19 @@ import java.rmi.RemoteException;
 
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotCCombo;
 
+import de.fu_berlin.inf.dpp.stf.server.StfRemoteObject;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotCCombo;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotMenu;
 
-public final class RemoteBotCCombo extends AbstractRemoteWidget implements
+public final class RemoteBotCCombo extends StfRemoteObject implements
     IRemoteBotCCombo {
 
-    private static transient RemoteBotCCombo self;
+    private static final RemoteBotCCombo INSTANCE = new RemoteBotCCombo();
 
     private SWTBotCCombo widget;
 
-    /**
-     * {@link RemoteBotCCombo} is a singleton, but inheritance is possible.
-     */
     public static RemoteBotCCombo getInstance() {
-        if (self != null)
-            return self;
-        self = new RemoteBotCCombo();
-        return self;
+        return INSTANCE;
     }
 
     public IRemoteBotCCombo setWidget(SWTBotCCombo ccomb) {
@@ -41,7 +36,7 @@ public final class RemoteBotCCombo extends AbstractRemoteWidget implements
      * 
      **********************************************/
     public IRemoteBotMenu contextMenu(String text) throws RemoteException {
-        return stfBotMenu.setWidget(widget.contextMenu(text));
+        return RemoteBotMenu.getInstance().setWidget(widget.contextMenu(text));
     }
 
     /**********************************************

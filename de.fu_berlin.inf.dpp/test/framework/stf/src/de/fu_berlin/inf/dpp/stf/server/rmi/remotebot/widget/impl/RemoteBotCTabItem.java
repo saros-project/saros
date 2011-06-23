@@ -4,23 +4,18 @@ import java.rmi.RemoteException;
 
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotCTabItem;
 
+import de.fu_berlin.inf.dpp.stf.server.StfRemoteObject;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotCTabItem;
 
-public final class RemoteBotCTabItem extends AbstractRemoteWidget implements
+public final class RemoteBotCTabItem extends StfRemoteObject implements
     IRemoteBotCTabItem {
 
-    private static transient RemoteBotCTabItem self;
+    private static final RemoteBotCTabItem INSTANCE = new RemoteBotCTabItem();
 
     private SWTBotCTabItem widget;
 
-    /**
-     * {@link RemoteBotCTabItem} is a singleton, but inheritance is possible.
-     */
     public static RemoteBotCTabItem getInstance() {
-        if (self != null)
-            return self;
-        self = new RemoteBotCTabItem();
-        return self;
+        return INSTANCE;
     }
 
     public IRemoteBotCTabItem setWidget(SWTBotCTabItem widget) {

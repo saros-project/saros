@@ -5,24 +5,19 @@ import java.util.List;
 
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotStyledText;
 
+import de.fu_berlin.inf.dpp.stf.server.StfRemoteObject;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotMenu;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotStyledText;
 
-public final class RemoteBotStyledText extends AbstractRemoteWidget implements
+public final class RemoteBotStyledText extends StfRemoteObject implements
     IRemoteBotStyledText {
 
-    private static transient RemoteBotStyledText self;
+    private static final RemoteBotStyledText INSTANCE = new RemoteBotStyledText();
 
     private SWTBotStyledText widget;
 
-    /**
-     * {@link RemoteBotStyledText} is a singleton, but inheritance is possible.
-     */
     public static RemoteBotStyledText getInstance() {
-        if (self != null)
-            return self;
-        self = new RemoteBotStyledText();
-        return self;
+        return INSTANCE;
     }
 
     public IRemoteBotStyledText setWidget(SWTBotStyledText styledText) {
@@ -43,7 +38,7 @@ public final class RemoteBotStyledText extends AbstractRemoteWidget implements
      **********************************************/
 
     public IRemoteBotMenu contextMenu(String text) throws RemoteException {
-        return stfBotMenu.setWidget(widget.contextMenu(text));
+        return RemoteBotMenu.getInstance().setWidget(widget.contextMenu(text));
     }
 
     /**********************************************

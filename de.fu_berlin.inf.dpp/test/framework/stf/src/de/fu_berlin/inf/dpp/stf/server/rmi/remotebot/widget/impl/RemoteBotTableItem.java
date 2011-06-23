@@ -7,25 +7,21 @@ import org.eclipse.swtbot.swt.finder.waits.Conditions;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTableItem;
 import org.eclipse.swtbot.swt.finder.widgets.TimeoutException;
 
+import de.fu_berlin.inf.dpp.stf.server.StfRemoteObject;
 import de.fu_berlin.inf.dpp.stf.server.bot.SarosSWTBotPreferences;
+import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.impl.RemoteWorkbenchBot;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotMenu;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotTableItem;
 
-public final class RemoteBotTableItem extends AbstractRemoteWidget implements
+public final class RemoteBotTableItem extends StfRemoteObject implements
     IRemoteBotTableItem {
 
-    private static transient RemoteBotTableItem self;
+    private static final RemoteBotTableItem INSTANCE = new RemoteBotTableItem();
 
     private SWTBotTableItem widget;
 
-    /**
-     * {@link RemoteBotTableItem} is a singleton, but inheritance is possible.
-     */
     public static RemoteBotTableItem getInstance() {
-        if (self != null)
-            return self;
-        self = new RemoteBotTableItem();
-        return self;
+        return INSTANCE;
     }
 
     public IRemoteBotTableItem setWidget(SWTBotTableItem tableItem) {
@@ -46,8 +42,7 @@ public final class RemoteBotTableItem extends AbstractRemoteWidget implements
      **********************************************/
 
     public IRemoteBotMenu contextMenu(String text) throws RemoteException {
-        stfBotMenu.setWidget(widget.contextMenu(text));
-        return stfBotMenu;
+        return RemoteBotMenu.getInstance().setWidget(widget.contextMenu(text));
     }
 
     /**********************************************
@@ -143,6 +138,7 @@ public final class RemoteBotTableItem extends AbstractRemoteWidget implements
      * 
      **********************************************/
     public void waitUntilIsEnabled() throws RemoteException {
-        stfBot.waitUntil(Conditions.widgetIsEnabled(widget));
+        RemoteWorkbenchBot.getInstance().waitUntil(
+            Conditions.widgetIsEnabled(widget));
     }
 }

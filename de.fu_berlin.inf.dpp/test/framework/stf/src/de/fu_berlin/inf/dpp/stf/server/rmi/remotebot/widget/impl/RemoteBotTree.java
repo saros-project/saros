@@ -11,32 +11,36 @@ import org.eclipse.swtbot.swt.finder.waits.DefaultCondition;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 
+import de.fu_berlin.inf.dpp.stf.server.StfRemoteObject;
 import de.fu_berlin.inf.dpp.stf.server.bot.widget.ContextMenuHelper;
+import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.impl.RemoteWorkbenchBot;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotMenu;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotTree;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotTreeItem;
 
-public final class RemoteBotTree extends AbstractRemoteWidget implements
+public final class RemoteBotTree extends StfRemoteObject implements
     IRemoteBotTree {
 
     private static final Logger log = Logger.getLogger(RemoteBotTree.class);
 
-    private static transient RemoteBotTree self;
+    private static final RemoteBotTree INSTANCE = new RemoteBotTree();
 
     private SWTBotTree widget;
 
-    /**
-     * {@link RemoteBotTable} is a singleton, but inheritance is possible.
-     */
     public static RemoteBotTree getInstance() {
-        if (self != null)
-            return self;
-        self = new RemoteBotTree();
-        return self;
+        return INSTANCE;
     }
 
     public IRemoteBotTree setWidget(SWTBotTree tree) {
         widget = tree;
+        return this;
+    }
+
+    public IRemoteBotTree uncheckAllItems() {
+        for (SWTBotTreeItem item : widget.getAllItems()) {
+            while (item.isChecked())
+                item.uncheck();
+        }
         return this;
     }
 
@@ -52,18 +56,9 @@ public final class RemoteBotTree extends AbstractRemoteWidget implements
      * 
      **********************************************/
 
-    public IRemoteBotTreeItem[] getAllItems() throws RemoteException {
-        IRemoteBotTreeItem[] items = new IRemoteBotTreeItem[widget
-            .getAllItems().length];
-        for (int i = 0; i < widget.getAllItems().length; i++) {
-            items[i] = stfBotTreeItem.setWidget(widget.getAllItems()[i]);
-        }
-        return items;
-    }
-
     public IRemoteBotMenu contextMenu(String... texts) throws RemoteException {
-        stfBotMenu.setWidget(ContextMenuHelper.getContextMenu(widget, texts));
-        return stfBotMenu;
+        return RemoteBotMenu.getInstance().setWidget(
+            ContextMenuHelper.getContextMenu(widget, texts));
     }
 
     /**********************************************
@@ -74,17 +69,20 @@ public final class RemoteBotTree extends AbstractRemoteWidget implements
 
     public IRemoteBotTreeItem collapseNode(String nodeText)
         throws RemoteException {
-        return stfBotTreeItem.setWidget(widget.collapseNode(nodeText));
+        return RemoteBotTreeItem.getInstance().setWidget(
+            widget.collapseNode(nodeText));
     }
 
     public IRemoteBotTreeItem expandNode(String nodeText, boolean recursive)
         throws RemoteException {
-        return stfBotTreeItem.setWidget(widget.expandNode(nodeText, recursive));
+        return RemoteBotTreeItem.getInstance().setWidget(
+            widget.expandNode(nodeText, recursive));
     }
 
     public IRemoteBotTreeItem expandNode(String... nodes)
         throws RemoteException {
-        return stfBotTreeItem.setWidget(widget.expandNode(nodes));
+        return RemoteBotTreeItem.getInstance().setWidget(
+            widget.expandNode(nodes));
     }
 
     public IRemoteBotTree select(int... indices) throws RemoteException {
@@ -101,25 +99,29 @@ public final class RemoteBotTree extends AbstractRemoteWidget implements
 
     public IRemoteBotTreeItem selectTreeItem(String... pathToTreeItem)
         throws RemoteException {
-        stfBotTreeItem.setWidget(widget.expandNode(pathToTreeItem).select());
-        stfBotTreeItem.setSWTBotTree(widget);
-        return stfBotTreeItem;
+        RemoteBotTreeItem.getInstance().setWidget(
+            widget.expandNode(pathToTreeItem).select());
+        RemoteBotTreeItem.getInstance().setSWTBotTree(widget);
+        return RemoteBotTreeItem.getInstance();
     }
 
     public IRemoteBotTreeItem selectTreeItemWithRegex(String... regexNodes)
         throws RemoteException {
         assert widget != null : "the passed tree is null.";
+
         SWTBotTreeItem currentItem = null;
         SWTBotTreeItem[] allChildrenOfCurrentItem;
+
         for (String regex : regexNodes) {
-            if (currentItem == null) {
+
+            if (currentItem == null)
                 allChildrenOfCurrentItem = widget.getAllItems();
-            } else {
+            else
                 allChildrenOfCurrentItem = currentItem.getItems();
-            }
+
             boolean itemWithRegexFound = false;
+
             for (SWTBotTreeItem child : allChildrenOfCurrentItem) {
-                log.info("treeItem name: " + child.getText());
                 if (child.getText().matches(regex)) {
                     currentItem = child;
                     if (!child.isExpanded())
@@ -128,19 +130,25 @@ public final class RemoteBotTree extends AbstractRemoteWidget implements
                     break;
                 }
             }
+
             if (!itemWithRegexFound) {
-                throw new WidgetNotFoundException("Tree item matching the \""
-                    + regex + "\" can't be found. Nodes: "
-                    + Arrays.asList(regexNodes));
+                throw new WidgetNotFoundException(
+                    "tree item matching the regex '" + regex
+                        + "' cannot be found. Nodes: "
+                        + Arrays.asList(regexNodes));
             }
         }
+
         if (currentItem != null) {
             SWTBotTreeItem item = currentItem.select();
-            stfBotTreeItem.setWidget(item);
-            stfBotTreeItem.setSWTBotTree(widget);
-            return stfBotTreeItem;
+            RemoteBotTreeItem.getInstance().setWidget(item);
+            RemoteBotTreeItem.getInstance().setSWTBotTree(widget);
+            return RemoteBotTreeItem.getInstance();
         }
-        return null;
+
+        throw new WidgetNotFoundException("unknown error: " + widget.getText()
+            + ", " + Arrays.asList(regexNodes));
+
     }
 
     public IRemoteBotTreeItem selectTreeItemAndWait(String... pathToTreeItem)
@@ -151,7 +159,6 @@ public final class RemoteBotTree extends AbstractRemoteWidget implements
                 if (selectedTreeItem == null) {
                     waitUntilItemExists(node);
                     selectedTreeItem = widget.expandNode(node);
-                    log.info("treeItem name: " + selectedTreeItem.getText());
                 } else {
 
                     RemoteBotTreeItem treeItem = RemoteBotTreeItem
@@ -160,21 +167,20 @@ public final class RemoteBotTree extends AbstractRemoteWidget implements
                     treeItem.setSWTBotTree(widget);
                     treeItem.waitUntilSubItemExists(node);
                     selectedTreeItem = selectedTreeItem.expandNode(node);
-                    log.info("treeItem name: " + selectedTreeItem.getText());
                 }
             } catch (WidgetNotFoundException e) {
-                log.error("treeitem \"" + node + "\" not found");
+                log.error("tree item \"" + node + "\" not found", e);
             }
         }
         if (selectedTreeItem != null) {
-            log.info("treeItem name: " + selectedTreeItem.getText());
-
             SWTBotTreeItem item = selectedTreeItem.select();
-            stfBotTreeItem.setWidget(item);
-            stfBotTreeItem.setSWTBotTree(widget);
-            return stfBotTreeItem;
+            RemoteBotTreeItem.getInstance().setWidget(item);
+            RemoteBotTreeItem.getInstance().setSWTBotTree(widget);
+            return RemoteBotTreeItem.getInstance();
         }
-        return null;
+
+        throw new WidgetNotFoundException("unknown error: " + widget.getText()
+            + ", " + Arrays.asList(pathToTreeItem));
     }
 
     /**********************************************
@@ -206,7 +212,6 @@ public final class RemoteBotTree extends AbstractRemoteWidget implements
         List<String> allItemTexts = new ArrayList<String>();
         for (SWTBotTreeItem item : widget.getAllItems()) {
             allItemTexts.add(item.getText());
-            log.info("existed treeItem of the tree: " + item.getText());
         }
         return allItemTexts;
     }
@@ -231,26 +236,28 @@ public final class RemoteBotTree extends AbstractRemoteWidget implements
     public void waitUntilItemExists(final String itemText)
         throws RemoteException {
 
-        stfBot.waitUntil(new DefaultCondition() {
+        RemoteWorkbenchBot.getInstance().waitUntil(new DefaultCondition() {
             public boolean test() throws Exception {
                 return existsSubItem(itemText);
             }
 
             public String getFailureMessage() {
-                return "Tree " + "doesn't contain the treeItem" + itemText;
+                return "tree '" + widget.getText()
+                    + "' does not contain the treeItem: " + itemText;
             }
         });
     }
 
     public void waitUntilItemNotExists(final String itemText)
         throws RemoteException {
-        stfBot.waitUntil(new DefaultCondition() {
+        RemoteWorkbenchBot.getInstance().waitUntil(new DefaultCondition() {
             public boolean test() throws Exception {
                 return !existsSubItem(itemText);
             }
 
             public String getFailureMessage() {
-                return "Tree " + "doesn't contain the treeItem" + itemText;
+                return "tree '" + widget.getText()
+                    + "' still contains the treeItem: " + itemText;
             }
         });
     }
@@ -273,7 +280,6 @@ public final class RemoteBotTree extends AbstractRemoteWidget implements
             }
             boolean itemFound = false;
             for (SWTBotTreeItem child : allChildrenOfCurrentItem) {
-                log.info("treeItem name: " + child.getText());
                 if (child.getText().matches(regex)) {
                     currentItem = child;
                     if (!child.isExpanded())
@@ -283,8 +289,8 @@ public final class RemoteBotTree extends AbstractRemoteWidget implements
                 }
             }
             if (!itemFound) {
-                throw new WidgetNotFoundException("Tree item \"" + regex
-                    + "\" not found. Nodes: "
+                throw new WidgetNotFoundException("tree item '" + regex
+                    + "' not found. Nodes: "
                     + Arrays.asList(regexPathToTreeItem));
             }
         }

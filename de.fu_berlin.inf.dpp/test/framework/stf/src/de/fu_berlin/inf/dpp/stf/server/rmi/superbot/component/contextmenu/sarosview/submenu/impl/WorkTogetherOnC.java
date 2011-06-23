@@ -3,25 +3,20 @@ package de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.contextmenu.saros
 import java.rmi.RemoteException;
 
 import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.stf.server.StfRemoteObject;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotTreeItem;
-import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.Component;
-import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.contextmenu.peview.submenu.impl.NewC;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.contextmenu.sarosview.submenu.IWorkTogetherOnC;
+import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.impl.SuperBot;
 
-public class WorkTogetherOnC extends Component implements IWorkTogetherOnC {
+public final class WorkTogetherOnC extends StfRemoteObject implements
+    IWorkTogetherOnC {
 
-    private static transient WorkTogetherOnC self;
+    private static final WorkTogetherOnC INSTANCE = new WorkTogetherOnC();
 
     private IRemoteBotTreeItem treeItem;
 
-    /**
-     * {@link NewC} is a singleton, but inheritance is possible.
-     */
     public static WorkTogetherOnC getInstance() {
-        if (self != null)
-            return self;
-        self = new WorkTogetherOnC();
-        return self;
+        return INSTANCE;
     }
 
     public void setTreeItem(IRemoteBotTreeItem treeItem) {
@@ -44,7 +39,8 @@ public class WorkTogetherOnC extends Component implements IWorkTogetherOnC {
         throws RemoteException {
         treeItem.contextMenus(CM_WORK_TOGETHER_ON, CM_MULTIPLE_PROJECTS)
             .click();
-        superBot().confirmShellShareProjects(projectName, baseJIDOfInvitees);
+        SuperBot.getInstance().confirmShellShareProjects(projectName,
+            baseJIDOfInvitees);
     }
 
     public void project(String projectName) throws RemoteException {

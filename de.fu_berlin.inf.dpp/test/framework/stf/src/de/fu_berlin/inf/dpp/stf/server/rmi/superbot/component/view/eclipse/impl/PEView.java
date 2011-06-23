@@ -14,33 +14,30 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.swtbot.swt.finder.waits.DefaultCondition;
 
+import de.fu_berlin.inf.dpp.stf.server.StfRemoteObject;
 import de.fu_berlin.inf.dpp.stf.server.bot.condition.SarosConditions;
+import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.impl.RemoteWorkbenchBot;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotTree;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotTreeItem;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotView;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.contextmenu.peview.IContextMenusInPEView;
+import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.contextmenu.peview.impl.ContextMenusInPEView;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.eclipse.IPEView;
-import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.impl.Views;
 import de.fu_berlin.inf.dpp.stf.server.util.Util;
 import de.fu_berlin.inf.dpp.vcs.VCSAdapter;
 import de.fu_berlin.inf.dpp.vcs.VCSResourceInfo;
 
-public class PEView extends Views implements IPEView {
-    private static transient PEView pEViewImp;
+public final class PEView extends StfRemoteObject implements IPEView {
 
     private static final Logger log = Logger.getLogger(PEView.class);
+
+    private static final PEView INSTANCE = new PEView();
 
     private IRemoteBotView view;
     private IRemoteBotTree tree;
 
-    /**
-     * {@link PEView} is a singleton, but inheritance is possible.
-     */
     public static PEView getInstance() {
-        if (pEViewImp != null)
-            return pEViewImp;
-        pEViewImp = new PEView();
-        return pEViewImp;
+        return INSTANCE;
     }
 
     public IPEView setView(IRemoteBotView view) throws RemoteException {
@@ -62,10 +59,10 @@ public class PEView extends Views implements IPEView {
      **********************************************/
 
     public IContextMenusInPEView tree() throws RemoteException {
-        contextMenu.setTree(tree);
-        contextMenu.setTreeItem(null);
-        contextMenu.setTreeItemType(null);
-        return contextMenu;
+        ContextMenusInPEView.getInstance().setTree(tree);
+        ContextMenusInPEView.getInstance().setTreeItem(null);
+        ContextMenusInPEView.getInstance().setTreeItemType(null);
+        return ContextMenusInPEView.getInstance();
     }
 
     public IContextMenusInPEView selectSrc(String projectName)
@@ -74,7 +71,7 @@ public class PEView extends Views implements IPEView {
         initContextMenuWrapper(
             tree.selectTreeItemWithRegex(Util.changeToRegex(projectName), SRC),
             TreeItemType.JAVA_PROJECT);
-        return contextMenu;
+        return ContextMenusInPEView.getInstance();
     }
 
     public IContextMenusInPEView selectJavaProject(String projectName)
@@ -83,7 +80,7 @@ public class PEView extends Views implements IPEView {
         initContextMenuWrapper(
             tree.selectTreeItemWithRegex(Util.changeToRegex(projectName)),
             TreeItemType.JAVA_PROJECT);
-        return contextMenu;
+        return ContextMenusInPEView.getInstance();
     }
 
     public IContextMenusInPEView selectProject(String projectName)
@@ -91,7 +88,7 @@ public class PEView extends Views implements IPEView {
         initContextMenuWrapper(
             tree.selectTreeItemWithRegex(Util.changeToRegex(projectName)),
             TreeItemType.PROJECT);
-        return contextMenu;
+        return ContextMenusInPEView.getInstance();
     }
 
     public IContextMenusInPEView selectPkg(String projectName, String pkg)
@@ -101,7 +98,7 @@ public class PEView extends Views implements IPEView {
             tree.selectTreeItemWithRegex(Util.changeToRegex(nodes)),
             TreeItemType.PKG);
 
-        return contextMenu;
+        return ContextMenusInPEView.getInstance();
     }
 
     public IContextMenusInPEView selectClass(String projectName, String pkg,
@@ -112,7 +109,7 @@ public class PEView extends Views implements IPEView {
             tree.selectTreeItemWithRegex(Util.changeToRegex(nodes)),
             TreeItemType.CLASS);
 
-        return contextMenu;
+        return ContextMenusInPEView.getInstance();
     }
 
     public IContextMenusInPEView selectFolder(String... folderNodes)
@@ -121,7 +118,7 @@ public class PEView extends Views implements IPEView {
             tree.selectTreeItemWithRegex(Util.changeToRegex(folderNodes)),
             TreeItemType.FOLDER);
 
-        return contextMenu;
+        return ContextMenusInPEView.getInstance();
     }
 
     public IContextMenusInPEView selectFile(String... fileNodes)
@@ -130,7 +127,7 @@ public class PEView extends Views implements IPEView {
             tree.selectTreeItemWithRegex(Util.changeToRegex(fileNodes)),
             TreeItemType.FILE);
 
-        return contextMenu;
+        return ContextMenusInPEView.getInstance();
     }
 
     /**********************************************
@@ -158,8 +155,7 @@ public class PEView extends Views implements IPEView {
         IResource resource = ResourcesPlugin.getWorkspace().getRoot()
             .findMember(path);
         if (resource == null)
-            throw new RemoteException("Resource \"" + fullPath
-                + "\" not found.");
+            throw new RemoteException("resource '" + fullPath + "' not found.");
         final VCSAdapter vcs = VCSAdapter.getAdapter(resource.getProject());
         if (vcs == null)
             return null;
@@ -174,8 +170,8 @@ public class PEView extends Views implements IPEView {
         IResource resource = ResourcesPlugin.getWorkspace().getRoot()
             .findMember(path);
         if (resource == null)
-            throw new RemoteException("Resource not found at \"" + fullPath
-                + "\"");
+            throw new RemoteException("resource not found at '" + fullPath
+                + "'");
         final VCSAdapter vcs = VCSAdapter.getAdapter(resource.getProject());
         if (vcs == null)
             return null;
@@ -186,12 +182,12 @@ public class PEView extends Views implements IPEView {
     public String getFileContent(String... nodes) throws RemoteException,
         IOException, CoreException {
         IPath path = new Path(Util.getPath(nodes));
-        log.info("Checking existence of file \"" + path + "\"");
+        log.debug("checking existence of file '" + path + "'");
         final IFile file = ResourcesPlugin.getWorkspace().getRoot()
             .getFile(path);
 
-        log.info("Checking full path: \"" + file.getFullPath().toOSString()
-            + "\"");
+        log.debug("Checking full path: '" + file.getFullPath().toOSString()
+            + "'");
         return Util.convertStreamToString(file.getContents());
     }
 
@@ -203,80 +199,92 @@ public class PEView extends Views implements IPEView {
     public void waitUntilFolderExists(String... folderNodes)
         throws RemoteException {
         String fullPath = Util.getPath(folderNodes);
-        remoteBot().waitUntil(SarosConditions.isResourceExist(fullPath));
+        RemoteWorkbenchBot.getInstance().waitUntil(
+            SarosConditions.isResourceExist(fullPath));
     }
 
     public void waitUntilPkgExists(String projectName, String pkg)
         throws RemoteException {
         if (pkg.matches(PKG_REGEX)) {
-            remoteBot().waitUntil(
+            RemoteWorkbenchBot.getInstance().waitUntil(
                 SarosConditions.isResourceExist(Util.getPkgPath(projectName,
                     pkg)));
         } else {
             throw new RuntimeException(
-                "The passed parameter \"pkg\" isn't valid, the package name should corresponds to the pattern [\\w\\.]*\\w+ e.g. PKG1.PKG2.PKG3");
+                "the passed parameter '"
+                    + pkg
+                    + "' is not valid, the package name should corresponds to the pattern [\\w\\.]*\\w+ e.g. PKG1.PKG2.PKG3");
         }
     }
 
     public void waitUntilPkgNotExists(String projectName, String pkg)
         throws RemoteException {
         if (pkg.matches(PKG_REGEX)) {
-            remoteBot().waitUntil(
+            RemoteWorkbenchBot.getInstance().waitUntil(
                 SarosConditions.isResourceNotExist(Util.getPkgPath(projectName,
                     pkg)));
         } else {
             throw new RuntimeException(
-                "The passed parameter \"pkg\" isn't valid, the package name should corresponds to the pattern [\\w\\.]*\\w+ e.g. PKG1.PKG2.PKG3");
+                "the passed parameter '"
+                    + pkg
+                    + "' is not valid, the package name should corresponds to the pattern [\\w\\.]*\\w+ e.g. PKG1.PKG2.PKG3");
         }
     }
 
     public void waitUntilFileExists(String... fileNodes) throws RemoteException {
         String fullPath = Util.getPath(fileNodes);
-        remoteBot().waitUntil(SarosConditions.isResourceExist(fullPath));
+        RemoteWorkbenchBot.getInstance().waitUntil(
+            SarosConditions.isResourceExist(fullPath));
     }
 
     public void waitUntilClassExists(String projectName, String pkg,
         String className) throws RemoteException {
         String path = Util.getClassPath(projectName, pkg, className);
-        remoteBot().waitUntil(SarosConditions.isResourceExist(path));
+        RemoteWorkbenchBot.getInstance().waitUntil(
+            SarosConditions.isResourceExist(path));
     }
 
     public void waitUntilClassNotExists(String projectName, String pkg,
         String className) throws RemoteException {
         String path = Util.getClassPath(projectName, pkg, className);
-        remoteBot().waitUntil(SarosConditions.isResourceNotExist(path));
+        RemoteWorkbenchBot.getInstance().waitUntil(
+            SarosConditions.isResourceNotExist(path));
     }
 
     public void waitUntilWindowSarosRunningVCSOperationClosed()
         throws RemoteException {
-        remoteBot().waitUntilShellIsClosed(SHELL_SAROS_RUNNING_VCS_OPERATION);
+        RemoteWorkbenchBot.getInstance().waitUntilShellIsClosed(
+            SHELL_SAROS_RUNNING_VCS_OPERATION);
     }
 
     public void waitUntilProjectInSVN(String projectName)
         throws RemoteException {
-        remoteBot().waitUntil(SarosConditions.isInSVN(projectName));
+        RemoteWorkbenchBot.getInstance().waitUntil(
+            SarosConditions.isInSVN(projectName));
     }
 
     public void waitUntilProjectNotInSVN(String projectName)
         throws RemoteException {
-        remoteBot().waitUntil(SarosConditions.isNotInSVN(projectName));
+        RemoteWorkbenchBot.getInstance().waitUntil(
+            SarosConditions.isNotInSVN(projectName));
     }
 
     public void waitUntilRevisionIsSame(String fullPath, String revision)
         throws RemoteException {
-        remoteBot().waitUntil(
+        RemoteWorkbenchBot.getInstance().waitUntil(
             SarosConditions.isRevisionSame(fullPath, revision));
     }
 
     public void waitUntilUrlIsSame(String fullPath, String url)
         throws RemoteException {
-        remoteBot().waitUntil(SarosConditions.isUrlSame(fullPath, url));
+        RemoteWorkbenchBot.getInstance().waitUntil(
+            SarosConditions.isUrlSame(fullPath, url));
     }
 
     public void waitUntilFileContentSame(final String otherClassContent,
         final String... fileNodes) throws RemoteException {
 
-        remoteBot().waitUntil(new DefaultCondition() {
+        RemoteWorkbenchBot.getInstance().waitUntil(new DefaultCondition() {
             public boolean test() throws Exception {
                 return getFileContent(fileNodes).equals(otherClassContent);
             }
@@ -296,9 +304,9 @@ public class PEView extends Views implements IPEView {
 
     private void initContextMenuWrapper(IRemoteBotTreeItem treeItem,
         TreeItemType type) {
-        contextMenu.setTree(tree);
-        contextMenu.setTreeItem(treeItem);
-        contextMenu.setTreeItemType(type);
+        ContextMenusInPEView.getInstance().setTree(tree);
+        ContextMenusInPEView.getInstance().setTreeItem(treeItem);
+        ContextMenusInPEView.getInstance().setTreeItemType(type);
     }
 
     public boolean isResourceShared(String path) throws RemoteException {
@@ -309,7 +317,7 @@ public class PEView extends Views implements IPEView {
 
     public void waitUntilResourceIsShared(final String path)
         throws RemoteException {
-        remoteBot().waitLongUntil(new DefaultCondition() {
+        RemoteWorkbenchBot.getInstance().waitLongUntil(new DefaultCondition() {
             public boolean test() throws Exception {
                 return isResourceShared(path);
             }

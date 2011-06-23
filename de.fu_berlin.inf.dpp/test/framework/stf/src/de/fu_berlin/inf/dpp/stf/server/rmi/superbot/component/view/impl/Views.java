@@ -2,10 +2,8 @@ package de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.impl;
 
 import java.rmi.RemoteException;
 
-import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.Component;
-import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.contextmenu.peview.impl.ContextMenusInPEView;
-import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.contextmenu.sarosview.impl.ContextMenusInBuddiesArea;
-import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.contextmenu.sarosview.impl.ContextMenusInSessionArea;
+import de.fu_berlin.inf.dpp.stf.server.StfRemoteObject;
+import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.impl.RemoteWorkbenchBot;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.IViews;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.eclipse.IConsoleView;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.eclipse.IPEView;
@@ -18,65 +16,44 @@ import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.saros.ISarosV
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.saros.impl.RSView;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.saros.impl.SarosView;
 
-public class Views extends Component implements IViews {
+public final class Views extends StfRemoteObject implements IViews {
 
-    private static transient Views self;
+    private static final Views INSTANCE = new Views();
 
-    protected static ContextMenusInPEView contextMenu;
-
-    protected static ContextMenusInBuddiesArea buddiesContextMenu = ContextMenusInBuddiesArea
-        .getInstance();
-    protected static ContextMenusInSessionArea sessionContextMenu = ContextMenusInSessionArea
-        .getInstance();
-
-    private static SarosView rosterV;
-    private static RSView rsV;
-    private static ConsoleView consoleV;
-    private static PEView pEV;
-    private static ProgressView progressvV;
-
-    /**
-     * {@link Views} is a singleton, but inheritance is possible.
-     */
     public static Views getInstance() {
-        if (self != null)
-            return self;
-        self = new Views();
-        rosterV = SarosView.getInstance();
-        rsV = RSView.getInstance();
-        consoleV = ConsoleView.getInstance();
-        pEV = PEView.getInstance();
-        progressvV = ProgressView.getInstance();
-        contextMenu = ContextMenusInPEView.getInstance();
-        return self;
+        return INSTANCE;
     }
 
     public ISarosView sarosView() throws RemoteException {
-        remoteBot().openViewById(VIEW_SAROS_ID);
-        remoteBot().view(VIEW_SAROS).show();
-        return rosterV.setView(remoteBot().view(VIEW_SAROS));
+        RemoteWorkbenchBot.getInstance().openViewById(VIEW_SAROS_ID);
+        RemoteWorkbenchBot.getInstance().view(VIEW_SAROS).show();
+        return SarosView.getInstance().setView(
+            RemoteWorkbenchBot.getInstance().view(VIEW_SAROS));
     }
 
     public IRSView remoteScreenView() throws RemoteException {
-        remoteBot().openViewById(VIEW_REMOTE_SCREEN_ID);
-        remoteBot().view(VIEW_REMOTE_SCREEN).show();
-        return rsV.setView(remoteBot().view(VIEW_REMOTE_SCREEN));
+        RemoteWorkbenchBot.getInstance().openViewById(VIEW_REMOTE_SCREEN_ID);
+        RemoteWorkbenchBot.getInstance().view(VIEW_REMOTE_SCREEN).show();
+        return RSView.getInstance().setView(
+            RemoteWorkbenchBot.getInstance().view(VIEW_REMOTE_SCREEN));
     }
 
     public IConsoleView consoleView() throws RemoteException {
-        return consoleV;
+        return ConsoleView.getInstance();
     }
 
     public IPEView packageExplorerView() throws RemoteException {
-        remoteBot().openViewById(VIEW_PACKAGE_EXPLORER_ID);
-        remoteBot().view(VIEW_PACKAGE_EXPLORER).show();
-        return pEV.setView(remoteBot().view(VIEW_PACKAGE_EXPLORER));
+        RemoteWorkbenchBot.getInstance().openViewById(VIEW_PACKAGE_EXPLORER_ID);
+        RemoteWorkbenchBot.getInstance().view(VIEW_PACKAGE_EXPLORER).show();
+        return PEView.getInstance().setView(
+            RemoteWorkbenchBot.getInstance().view(VIEW_PACKAGE_EXPLORER));
     }
 
     public IProgressView progressView() throws RemoteException {
-        remoteBot().openViewById(VIEW_PROGRESS_ID);
-        remoteBot().view(VIEW_PROGRESS).show();
-        return progressvV.setView(remoteBot().view(VIEW_PROGRESS));
+        RemoteWorkbenchBot.getInstance().openViewById(VIEW_PROGRESS_ID);
+        RemoteWorkbenchBot.getInstance().view(VIEW_PROGRESS).show();
+        return ProgressView.getInstance().setView(
+            RemoteWorkbenchBot.getInstance().view(VIEW_PROGRESS));
     }
 
 }

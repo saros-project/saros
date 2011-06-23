@@ -50,40 +50,31 @@ import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.impl.RemoteBotToggle
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.impl.RemoteBotToolbarButton;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.impl.RemoteBotTree;
 
-public class RemoteBot extends StfRemoteObject implements IRemoteBot {
+public abstract class RemoteBot extends StfRemoteObject implements IRemoteBot {
 
     private static final Logger log = Logger.getLogger(RemoteBot.class);
 
-    private static transient RemoteBot self;
+    protected SWTBot swtBot;
 
-    private static SWTBot swtBot;
+    protected RemoteBotShell shell;
+    protected RemoteBotButton button;
+    protected RemoteBotTree tree;
+    protected RemoteBotLabel label;
+    protected RemoteBotStyledText styledText;
+    protected RemoteBotCombo comboBox;
+    protected RemoteBotCCombo ccomboBox;
+    protected RemoteBotToolbarButton toolbarButton;
+    protected RemoteBotText text;
+    protected RemoteBotTable table;
+    protected RemoteBotMenu menu;
+    protected RemoteBotList list;
+    protected RemoteBotCheckBox checkbox;
+    protected RemoteBotRadio radio;
+    protected RemoteBotToggleButton toggleButton;
+    protected RemoteBotCTabItem cTabItem;
 
-    private static RemoteBotShell shell;
-    private static RemoteBotButton button;
-    private static RemoteBotTree tree;
-    private static RemoteBotLabel label;
-    private static RemoteBotStyledText styledText;
-    private static RemoteBotCombo comboBox;
-    private static RemoteBotCCombo ccomboBox;
-    private static RemoteBotToolbarButton toolbarButton;
-    private static RemoteBotText text;
-    private static RemoteBotTable table;
-    private static RemoteBotMenu menu;
-    private static RemoteBotList list;
-    private static RemoteBotCheckBox checkbox;
-    private static RemoteBotRadio radio;
-    private static RemoteBotToggleButton toggleButton;
-    private static RemoteBotCTabItem cTabItem;
-
-    /**
-     * {@link RemoteBot} is a singleton, but inheritance is possible.
-     */
-    public static RemoteBot getInstance() {
-        if (self != null)
-            return self;
-        self = new RemoteBot();
+    protected RemoteBot() {
         swtBot = SarosSWTBot.getInstance();
-
         shell = RemoteBotShell.getInstance();
         button = RemoteBotButton.getInstance();
         tree = RemoteBotTree.getInstance();
@@ -101,7 +92,6 @@ public class RemoteBot extends StfRemoteObject implements IRemoteBot {
         cTabItem = RemoteBotCTabItem.getInstance();
         toggleButton = RemoteBotToggleButton.getInstance();
 
-        return self;
     }
 
     public void setBot(SWTBot bot) {

@@ -12,24 +12,20 @@ import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotEclipseEditor;
 import org.eclipse.swtbot.swt.finder.utils.FileUtils;
 import org.eclipse.swtbot.swt.finder.waits.DefaultCondition;
 
+import de.fu_berlin.inf.dpp.stf.server.StfRemoteObject;
+import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.impl.RemoteWorkbenchBot;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotEditor;
 import de.fu_berlin.inf.dpp.stf.server.util.Util;
 
-public class RemoteBotEditor extends AbstractRemoteWidget implements
+public class RemoteBotEditor extends StfRemoteObject implements
     IRemoteBotEditor {
 
-    private static transient RemoteBotEditor self;
+    private static final RemoteBotEditor INSTANCE = new RemoteBotEditor();
 
     private SWTBotEclipseEditor widget;
 
-    /**
-     * {@link RemoteBotEditor} is a singleton, but inheritance is possible.
-     */
     public static RemoteBotEditor getInstance() {
-        if (self != null)
-            return self;
-        self = new RemoteBotEditor();
-        return self;
+        return INSTANCE;
     }
 
     public void setWidget(SWTBotEclipseEditor editor) {
@@ -67,9 +63,11 @@ public class RemoteBotEditor extends AbstractRemoteWidget implements
 
     public void closeWithoutSave() throws RemoteException {
         widget.close();
-        if (stfBot.isShellOpen(SHELL_SAVE_RESOURCE)
-            && stfBot.shell(SHELL_SAVE_RESOURCE).isActive())
-            stfBot.shell(SHELL_SAVE_RESOURCE).confirm(NO);
+        if (RemoteWorkbenchBot.getInstance().isShellOpen(SHELL_SAVE_RESOURCE)
+            && RemoteWorkbenchBot.getInstance().shell(SHELL_SAVE_RESOURCE)
+                .isActive())
+            RemoteWorkbenchBot.getInstance().shell(SHELL_SAVE_RESOURCE)
+                .confirm(NO);
     }
 
     public void setTextFromFile(String contentPath) throws RemoteException {
@@ -97,14 +95,14 @@ public class RemoteBotEditor extends AbstractRemoteWidget implements
         widget.selectCurrentLine();
         // It's is necessary to sleep a litte time so that the following
         // operation like quickfix will be successfully performed.
-        stfBot.sleep(500);
+        RemoteWorkbenchBot.getInstance().sleep(500);
     }
 
     public void selectLine(int line) throws RemoteException {
         widget.selectLine(line);
         // It's is necessary to sleep a litte time so that the following
         // operation like quickfix will be successfully performed.
-        stfBot.sleep(1000);
+        RemoteWorkbenchBot.getInstance().sleep(1000);
 
     }
 
@@ -113,7 +111,7 @@ public class RemoteBotEditor extends AbstractRemoteWidget implements
         widget.selectRange(line, column, length);
         // It's is necessary to sleep a litte time so that the following
         // operation like quickfix will be successfully performed.
-        stfBot.sleep(800);
+        RemoteWorkbenchBot.getInstance().sleep(800);
     }
 
     public void pressShortcut(String... keys) throws RemoteException {
@@ -122,7 +120,7 @@ public class RemoteBotEditor extends AbstractRemoteWidget implements
             try {
                 widget.pressShortcut(KeyStroke.getInstance(key));
             } catch (ParseException e) {
-                throw new RemoteException("Could not parse \"" + key + "\"", e);
+                throw new RemoteException("could not parse \"" + key + "\"", e);
             }
         }
     }
@@ -141,45 +139,44 @@ public class RemoteBotEditor extends AbstractRemoteWidget implements
     }
 
     public void pressShortCutSave() throws RemoteException {
-        if (Util.getOS() == Util.TypeOfOS.MAC)
+        if (Util.getOperatingSystem() == Util.OperatingSystem.MAC)
             widget.pressShortcut(SWT.COMMAND, 's');
         else
             widget.pressShortcut(SWT.CTRL, 's');
     }
 
     public void pressShortRunAsJavaApplication() throws RemoteException {
-        if (Util.getOS() == Util.TypeOfOS.MAC)
+        if (Util.getOperatingSystem() == Util.OperatingSystem.MAC)
             widget.pressShortcut(SWT.ALT | SWT.COMMAND, 'x');
         else
             widget.pressShortcut(SWT.ALT | SWT.SHIFT, 'x');
-        stfBot.sleep(1000);
+        RemoteWorkbenchBot.getInstance().sleep(1000);
         widget.pressShortcut(SWT.NONE, 'j');
     }
 
     public void pressShortCutNextAnnotation() throws RemoteException {
-        if (Util.getOS() == Util.TypeOfOS.MAC)
+        if (Util.getOperatingSystem() == Util.OperatingSystem.MAC)
             widget.pressShortcut(SWT.COMMAND, '.');
         else
             widget.pressShortcut(SWT.CTRL, '.');
 
-        stfBot.sleep(20);
+        RemoteWorkbenchBot.getInstance().sleep(20);
     }
 
     public void pressShortCutQuickAssignToLocalVariable()
         throws RemoteException {
-        if (Util.getOS() == Util.TypeOfOS.MAC)
+        if (Util.getOperatingSystem() == Util.OperatingSystem.MAC)
             widget.pressShortcut(SWT.COMMAND, '2');
         else
             widget.pressShortcut(SWT.CTRL, '2');
-        stfBot.sleep(1000);
+        RemoteWorkbenchBot.getInstance().sleep(1000);
         widget.pressShortcut(SWT.NONE, 'l');
 
     }
 
     public void autoCompleteProposal(String insertText, String proposalText)
         throws RemoteException {
-        widget.autoCompleteProposal(Util.checkInputText(insertText),
-            proposalText);
+        widget.autoCompleteProposal(insertText, proposalText);
     }
 
     public void quickfix(String quickFixName) throws RemoteException {
@@ -245,26 +242,28 @@ public class RemoteBotEditor extends AbstractRemoteWidget implements
      **********************************************/
 
     public void waitUntilIsActive() throws RemoteException {
-        stfBot.waitUntil(new DefaultCondition() {
+        RemoteWorkbenchBot.getInstance().waitUntil(new DefaultCondition() {
             public boolean test() throws Exception {
                 return isActive();
             }
 
             public String getFailureMessage() {
-                return "The editor is not open.";
+                return "editor '" + widget.getTitle() + "' is not open";
             }
         });
     }
 
     public void waitUntilIsTextSame(final String otherText)
         throws RemoteException {
-        stfBot.waitUntil(new DefaultCondition() {
+        RemoteWorkbenchBot.getInstance().waitUntil(new DefaultCondition() {
             public boolean test() throws Exception {
                 return getText().equals(otherText);
             }
 
             public String getFailureMessage() {
-                return "The both contents are not" + " same.";
+                return "content of editor '" + widget.getTitle()
+                    + "' does not match: " + widget.getText() + " != "
+                    + otherText;
             }
         });
 

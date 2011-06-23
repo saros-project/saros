@@ -5,24 +5,20 @@ import java.rmi.RemoteException;
 import org.eclipse.swtbot.swt.finder.waits.Conditions;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotButton;
 
+import de.fu_berlin.inf.dpp.stf.server.StfRemoteObject;
+import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.impl.RemoteWorkbenchBot;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotButton;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotMenu;
 
-public final class RemoteBotButton extends AbstractRemoteWidget implements
+public final class RemoteBotButton extends StfRemoteObject implements
     IRemoteBotButton {
 
-    private static transient RemoteBotButton self;
+    private static final RemoteBotButton INSTANCE = new RemoteBotButton();
 
     private SWTBotButton widget;
 
-    /**
-     * {@link RemoteBotButton} is a singleton, but inheritance is possible.
-     */
     public static RemoteBotButton getInstance() {
-        if (self != null)
-            return self;
-        self = new RemoteBotButton();
-        return self;
+        return INSTANCE;
     }
 
     public IRemoteBotButton setWidget(SWTBotButton button) {
@@ -42,7 +38,7 @@ public final class RemoteBotButton extends AbstractRemoteWidget implements
      * 
      **********************************************/
     public IRemoteBotMenu contextMenu(String text) throws RemoteException {
-        return stfBotMenu.setWidget(widget.contextMenu(text));
+        return RemoteBotMenu.getInstance().setWidget(widget.contextMenu(text));
     }
 
     /**********************************************
@@ -94,11 +90,13 @@ public final class RemoteBotButton extends AbstractRemoteWidget implements
      * 
      **********************************************/
     public void waitUntilIsEnabled() throws RemoteException {
-        stfBot.waitUntil(Conditions.widgetIsEnabled(widget));
+        RemoteWorkbenchBot.getInstance().waitUntil(
+            Conditions.widgetIsEnabled(widget));
     }
 
     public void waitLongUntilIsEnabled() throws RemoteException {
-        stfBot.waitLongUntil(Conditions.widgetIsEnabled(widget));
+        RemoteWorkbenchBot.getInstance().waitLongUntil(
+            Conditions.widgetIsEnabled(widget));
     }
 
 }
