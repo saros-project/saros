@@ -26,7 +26,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 import de.fu_berlin.inf.dpp.stf.client.StfTestCase;
-import de.fu_berlin.inf.dpp.stf.server.STFMessage;
+import de.fu_berlin.inf.dpp.stf.server.StfRemoteObject;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotShell;
 import de.fu_berlin.inf.dpp.stf.test.Constants;
 
@@ -130,9 +130,9 @@ public class SarosPreferencesTest extends StfTestCase {
 
     /**
      * FIXME: by fist run you will get the error message
-     * {@link STFMessage#ERROR_MESSAGE_NOT_CONNECTED_TO_SERVER}, but by second
+     * {@link StfRemoteObject#ERROR_MESSAGE_NOT_CONNECTED_TO_SERVER}, but by second
      * run you will get anther error message
-     * {@link STFMessage#ERROR_MESSAGE_COULD_NOT_CONNECT}
+     * {@link StfRemoteObject#ERROR_MESSAGE_COULD_NOT_CONNECT}
      * 
      * 
      * @throws RemoteException

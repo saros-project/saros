@@ -1,16 +1,16 @@
 package de.fu_berlin.inf.dpp.stf.test.reproducebugs;
 
 import static de.fu_berlin.inf.dpp.stf.client.tester.SarosTester.ALICE;
-import static de.fu_berlin.inf.dpp.stf.server.STFMessage.CANCEL;
-import static de.fu_berlin.inf.dpp.stf.server.STFMessage.ERROR_MESSAGE_PASSWORDS_NOT_MATCH;
-import static de.fu_berlin.inf.dpp.stf.server.STFMessage.FINISH;
-import static de.fu_berlin.inf.dpp.stf.server.STFMessage.LABEL_PASSWORD;
-import static de.fu_berlin.inf.dpp.stf.server.STFMessage.LABEL_REPEAT_PASSWORD;
-import static de.fu_berlin.inf.dpp.stf.server.STFMessage.LABEL_USER_NAME;
-import static de.fu_berlin.inf.dpp.stf.server.STFMessage.LABEL_XMPP_JABBER_SERVER;
-import static de.fu_berlin.inf.dpp.stf.server.STFMessage.MENU_CREATE_ACCOUNT;
-import static de.fu_berlin.inf.dpp.stf.server.STFMessage.MENU_SAROS;
-import static de.fu_berlin.inf.dpp.stf.server.STFMessage.SHELL_CREATE_XMPP_JABBER_ACCOUNT;
+import static de.fu_berlin.inf.dpp.stf.shared.Constants.CANCEL;
+import static de.fu_berlin.inf.dpp.stf.shared.Constants.ERROR_MESSAGE_PASSWORDS_NOT_MATCH;
+import static de.fu_berlin.inf.dpp.stf.shared.Constants.FINISH;
+import static de.fu_berlin.inf.dpp.stf.shared.Constants.LABEL_PASSWORD;
+import static de.fu_berlin.inf.dpp.stf.shared.Constants.LABEL_REPEAT_PASSWORD;
+import static de.fu_berlin.inf.dpp.stf.shared.Constants.LABEL_USER_NAME;
+import static de.fu_berlin.inf.dpp.stf.shared.Constants.LABEL_XMPP_JABBER_SERVER;
+import static de.fu_berlin.inf.dpp.stf.shared.Constants.MENU_CREATE_ACCOUNT;
+import static de.fu_berlin.inf.dpp.stf.shared.Constants.MENU_SAROS;
+import static de.fu_berlin.inf.dpp.stf.shared.Constants.SHELL_CREATE_XMPP_JABBER_ACCOUNT;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
