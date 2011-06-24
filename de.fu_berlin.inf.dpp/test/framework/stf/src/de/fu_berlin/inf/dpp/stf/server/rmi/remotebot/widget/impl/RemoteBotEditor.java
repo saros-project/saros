@@ -71,8 +71,8 @@ public class RemoteBotEditor extends StfRemoteObject implements
     }
 
     public void setTextFromFile(String contentPath) throws RemoteException {
-        String contents = FileUtils.read(saros.getBundle()
-            .getEntry(contentPath));
+        String contents = FileUtils.read(getSaros().getBundle().getEntry(
+            contentPath));
         widget.setText(contents);
         widget.save();
     }

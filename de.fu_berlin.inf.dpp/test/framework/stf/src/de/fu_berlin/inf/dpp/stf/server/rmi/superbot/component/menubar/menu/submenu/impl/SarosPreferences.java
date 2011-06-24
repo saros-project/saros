@@ -189,7 +189,7 @@ public final class SarosPreferences extends StfRemoteObject implements
     }
 
     public void disableAutomaticReminder() throws RemoteException {
-        if (!feedbackManager.isFeedbackDisabled()) {
+        if (!getFeedbackManager().isFeedbackDisabled()) {
             clickMenuSarosPreferences();
             RemoteWorkbenchBot.getInstance().waitUntilShellIsOpen(
                 SHELL_PREFERNCES);
@@ -210,8 +210,8 @@ public final class SarosPreferences extends StfRemoteObject implements
     }
 
     public void disableAutomaticReminderNoGUI() throws RemoteException {
-        if (!feedbackManager.isFeedbackDisabled()) {
-            feedbackManager.setFeedbackDisabled(true);
+        if (!getFeedbackManager().isFeedbackDisabled()) {
+            getFeedbackManager().setFeedbackDisabled(true);
         }
     }
 
@@ -301,7 +301,7 @@ public final class SarosPreferences extends StfRemoteObject implements
      * @return {@link XMPPAccount} of the given jid.
      */
     private XMPPAccount getXMPPAccount(JID jid) {
-        for (XMPPAccount account : xmppAccountStore.getAllAccounts()) {
+        for (XMPPAccount account : getXmppAccountStore().getAllAccounts()) {
             if (jid.getName().equals(account.getUsername())
                 && jid.getDomain().equals(account.getServer())) {
                 return account;
@@ -311,7 +311,7 @@ public final class SarosPreferences extends StfRemoteObject implements
     }
 
     private boolean isAccountExistNoGUI(JID jid, String password) {
-        for (XMPPAccount account : xmppAccountStore.getAllAccounts()) {
+        for (XMPPAccount account : getXmppAccountStore().getAllAccounts()) {
             log.debug("account id: " + account.getId());
             log.debug("account username: " + account.getUsername());
             log.debug("account password: " + account.getPassword());

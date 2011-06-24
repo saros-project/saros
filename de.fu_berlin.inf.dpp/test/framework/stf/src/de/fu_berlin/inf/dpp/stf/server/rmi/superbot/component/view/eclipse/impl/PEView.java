@@ -312,7 +312,7 @@ public final class PEView extends StfRemoteObject implements IPEView {
     public boolean isResourceShared(String path) throws RemoteException {
         IResource resource = ResourcesPlugin.getWorkspace().getRoot()
             .findMember(new Path(path));
-        return sessionManager.getSarosSession().isShared(resource);
+        return getSessionManager().getSarosSession().isShared(resource);
     }
 
     public void waitUntilResourceIsShared(final String path)

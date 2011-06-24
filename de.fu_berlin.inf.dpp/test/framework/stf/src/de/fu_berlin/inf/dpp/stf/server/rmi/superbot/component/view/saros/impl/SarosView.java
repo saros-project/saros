@@ -282,7 +282,7 @@ public final class SarosView extends StfRemoteObject implements ISarosView {
     }
 
     public String getNickname(JID buddyJID) throws RemoteException {
-        Roster roster = saros.getRoster();
+        Roster roster = getSaros().getRoster();
         if (roster.getEntry(buddyJID.getBase()) == null)
             return null;
         if (roster.getEntry(buddyJID.getBase()).getName() == null)
@@ -390,8 +390,8 @@ public final class SarosView extends StfRemoteObject implements ISarosView {
     }
 
     public JID getFollowedBuddy() throws RemoteException {
-        if (editorManager.getFollowedUser() != null)
-            return editorManager.getFollowedUser().getJID();
+        if (getEditorManager().getFollowedUser() != null)
+            return getEditorManager().getFollowedUser().getJID();
         else
             return null;
     }

@@ -7,8 +7,12 @@ import java.lang.reflect.Method;
 import java.net.URI;
 import java.net.URLClassLoader;
 import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
+
+/** @author srossbach */
 
 public class TestLinkFinder {
 
@@ -16,6 +20,7 @@ public class TestLinkFinder {
     private static URLClassLoader loader;
     private static File baseDirectory;
     private static Class<?> testLinkAnnotation;
+    private static Map<String, String> testCasesToJavaClass;
 
     public static void main(String... strings) throws IOException,
         ClassNotFoundException {
@@ -54,10 +59,15 @@ public class TestLinkFinder {
             file = baseDirectory;
         }
 
+        testCasesToJavaClass = new HashMap<String, String>();
+
         if (isJarFile)
             readJarFile(file);
         else
             readDirectory(file);
+
+        for (Map.Entry<String, String> entry : testCasesToJavaClass.entrySet())
+            System.out.println(entry.getValue() + "|" + entry.getKey());
     }
 
     private static File makeRelative(File file) {
@@ -80,7 +90,7 @@ public class TestLinkFinder {
             if (filename.endsWith(".class")) {
                 filename = makeRelative(file).getPath();
                 String className = filename.replace("\\", "/")
-                    .replace("/", ".").replaceAll("\\.class", "");
+                    .replace("/", ".").replaceAll("\\.class$", "");
 
                 if (!className.contains(STF_TEST_CASE_PACKAGE))
                     continue;
@@ -90,8 +100,8 @@ public class TestLinkFinder {
                 try {
                     clazz = loader.loadClass(className);
                 } catch (Throwable t) {
-                    System.err.println("Error: " + className + " "
-                        + t.getMessage());
+                    System.err.println("ERROR while loading class '"
+                        + className + "', " + t.getMessage());
                     continue;
                 }
 
@@ -116,7 +126,7 @@ public class TestLinkFinder {
                 continue;
 
             String className = entryName.replace("\\", "/").replace("/", ".")
-                .replaceAll("\\.class", "");
+                .replaceAll("\\.class$", "");
 
             if (!className.contains(STF_TEST_CASE_PACKAGE))
                 continue;
@@ -126,8 +136,8 @@ public class TestLinkFinder {
             try {
                 clazz = loader.loadClass(className);
             } catch (Throwable t) {
-                System.err
-                    .println("Error: " + className + " " + t.getMessage());
+                System.err.println("ERROR while loading class '" + className
+                    + "', " + t.getMessage());
                 continue;
             }
 
@@ -141,15 +151,35 @@ public class TestLinkFinder {
 
         try {
             for (Annotation annotation : clazz.getAnnotations()) {
-                if (testLinkAnnotation.isAssignableFrom(annotation.getClass())) {
-                    Method id = annotation.getClass().getMethod("id");
-                    System.out.print(id.invoke(annotation) + " ");
-                    System.out.println(clazz.getName());
-                }
+
+                if (!testLinkAnnotation.isAssignableFrom(annotation.getClass()))
+                    continue;
+
+                Method id = annotation.getClass().getMethod("id");
+                String className = clazz.getName();
+                String testLinkId = id.invoke(annotation).toString();
+                testLinkId = testLinkId.trim();
+
+                if (testLinkId.trim().length() == 0) {
+                    System.err.println("ERROR class '" + className
+                        + "' contains an empty test link id");
+                } else if (!testLinkId.matches("[-\\w]++")) {
+                    System.err.println("ERROR test link id '" + testLinkId
+                        + "' of class '" + className
+                        + "' contains invalid character(s)");
+                } else if (testCasesToJavaClass.containsKey(testLinkId)) {
+                    System.err.print("ERROR found duplicate test link id + '"
+                        + testLinkId + "' on different classes: ");
+                    System.err.println(className + ", "
+                        + testCasesToJavaClass.get(testLinkId));
+                } else
+                    testCasesToJavaClass.put(testLinkId, className);
+
+                break;
             }
         } catch (Throwable t) {
-            System.err.println("Error while reading annotations: " + clazz
-                + " " + t.getMessage());
+            System.err.println("ERROR while reading annotations of class '"
+                + clazz + "', " + t.getMessage());
         }
     }
 }

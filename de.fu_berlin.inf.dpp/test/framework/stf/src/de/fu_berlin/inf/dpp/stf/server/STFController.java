@@ -93,12 +93,12 @@ public class STFController {
         XMPPAccountStore xmppAccountStore, FeedbackManager feedbackManager)
         throws RemoteException {
 
-        StfRemoteObject.saros = saros;
-        StfRemoteObject.sessionManager = sessionManager;
-        StfRemoteObject.dataTransferManager = dataTransferManager;
-        StfRemoteObject.editorManager = editorManager;
-        StfRemoteObject.xmppAccountStore = xmppAccountStore;
-        StfRemoteObject.feedbackManager = feedbackManager;
+        StfRemoteObject.setSaros(saros);
+        StfRemoteObject.setSessionManager(sessionManager);
+        StfRemoteObject.setDataTransferManager(dataTransferManager);
+        StfRemoteObject.setEditorManager(editorManager);
+        StfRemoteObject.setXmppAccountStore(xmppAccountStore);
+        StfRemoteObject.setFeedbackManager(feedbackManager);
 
         try {
             registry = LocateRegistry.createRegistry(port);
@@ -209,9 +209,9 @@ public class STFController {
             registry.bind(exportName, remoteObject);
             return remoteObject;
         } catch (RemoteException e) {
-            log.error("Could not export the object " + exportName, e);
+            log.error("could not export the object " + exportName, e);
         } catch (AlreadyBoundException e) {
-            log.error("Could not bind the object " + exportName
+            log.error("could not bind the object " + exportName
                 + ", because it is bound already.", e);
         }
         return null;
@@ -222,9 +222,9 @@ public class STFController {
             for (String s : registry.list())
                 log.debug("registered Object: " + s);
         } catch (AccessException e) {
-            log.error("Failed on access", e);
+            log.error("failed on access", e);
         } catch (RemoteException e) {
-            log.error("Failed", e);
+            log.error("failed", e);
         }
     }
 }

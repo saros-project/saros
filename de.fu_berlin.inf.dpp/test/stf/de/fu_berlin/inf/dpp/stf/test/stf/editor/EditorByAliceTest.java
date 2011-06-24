@@ -121,6 +121,7 @@ public class EditorByAliceTest extends StfTestCase {
         ALICE.remoteBot().editor(Constants.CLS1_SUFFIX).navigateTo(3, 0);
         assertDoesNotContain("public static void main", ALICE.remoteBot()
             .editor(Constants.CLS1_SUFFIX).getTextOnLine(3));
+
         ALICE.remoteBot().editor(Constants.CLS1_SUFFIX)
             .autoCompleteProposal("main", "main - main method");
         assertContains("public static void main",
