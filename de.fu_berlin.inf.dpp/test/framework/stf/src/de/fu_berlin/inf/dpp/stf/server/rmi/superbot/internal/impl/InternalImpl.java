@@ -19,7 +19,7 @@ public class InternalImpl extends StfRemoteObject implements IInternal {
 
     private Field versionManagerBundleField;
 
-    Bundle sarosBundle;
+    private Bundle sarosBundle;
 
     public static IInternal getInstance() {
         return INSTANCE;
@@ -32,19 +32,31 @@ public class InternalImpl extends StfRemoteObject implements IInternal {
             versionManagerBundleField.setAccessible(true);
         } catch (SecurityException e) {
             log.error("reflection failed", e);
+            versionManagerBundleField = null;
         } catch (NoSuchFieldException e) {
             log.error("reflection failed", e);
+            versionManagerBundleField = null;
         }
     }
 
     public void changeSarosVersion(String version) throws RemoteException {
 
-        log.trace("attempting to change saros version to: " + version);
-        Version v = Version.parseVersion(version);
+        Version v;
 
-        if (versionManagerBundleField == null)
+        log.trace("attempting to change saros version to: " + version);
+
+        if (versionManagerBundleField == null) {
+            log.error("unable to change version, reflection failed during initialization");
             throw new IllegalStateException(
-                "unable to change version, reflection failed");
+                "unable to change version, reflection failed during initialization");
+        }
+
+        try {
+            v = Version.parseVersion(version);
+        } catch (IllegalArgumentException e) {
+            log.error(e.getMessage(), e);
+            throw e;
+        }
 
         try {
 
@@ -56,9 +68,13 @@ public class InternalImpl extends StfRemoteObject implements IInternal {
                 new BundleFake(v));
 
         } catch (IllegalArgumentException e) {
-            log.debug("unable to change saros version, reflection failed ", e);
+            log.error("unable to change saros version, reflection failed", e);
+            throw new RemoteException(
+                "unable to change saros version, reflection failed", e);
         } catch (IllegalAccessException e) {
-            log.debug("unable to change saros version, reflection failed", e);
+            log.error("unable to change saros version, reflection failed", e);
+            throw new RemoteException(
+                "unable to change saros version, reflection failed", e);
         }
 
     }
@@ -67,18 +83,24 @@ public class InternalImpl extends StfRemoteObject implements IInternal {
 
         log.trace("attempting to reset saros version");
 
-        if (sarosBundle == null)
+        if (sarosBundle == null) {
+            log.trace("saros version was not changed");
             return;
+        }
 
         try {
             versionManagerBundleField.set(getVersionManager(), sarosBundle);
         } catch (IllegalArgumentException e) {
-            log.debug("unable to reset saros version, reflection failed", e);
+            log.error("unable to reset saros version, reflection failed", e);
+            throw new RemoteException(
+                "unable to reset saros version, reflection failed", e);
         } catch (IllegalAccessException e) {
-            log.debug("unable to reset saros version, reflection failed", e);
+            log.error("unable to reset saros version, reflection failed", e);
+            throw new RemoteException(
+                "unable to reset saros version, reflection failed", e);
         }
 
+        log.trace("changed saros version to its default state");
         sarosBundle = null;
-
     }
 }
