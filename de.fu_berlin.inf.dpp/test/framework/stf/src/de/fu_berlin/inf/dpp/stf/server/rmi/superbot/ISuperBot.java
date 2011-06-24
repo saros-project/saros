@@ -8,9 +8,12 @@ import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.stf.server.StfRemoteObject;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.menubar.IMenuBar;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.IViews;
+import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.internal.IInternal;
 import de.fu_berlin.inf.dpp.stf.shared.Constants.TypeOfCreateProject;
 
 public interface ISuperBot extends Remote {
+
+    public IInternal internal() throws RemoteException;
 
     /**********************************************
      * 
@@ -31,8 +34,8 @@ public interface ISuperBot extends Remote {
      **********************************************/
 
     /**
-     * The shell with the title {@link StfRemoteObject#SHELL_ADD_PROJECT} should be
-     * appeared by the invitees' side during sharing session. This method
+     * The shell with the title {@link StfRemoteObject#SHELL_ADD_PROJECT} should
+     * be appeared by the invitees' side during sharing session. This method
      * confirm the shell using a new project.
      * 
      * @throws RemoteException
@@ -41,8 +44,8 @@ public interface ISuperBot extends Remote {
         throws RemoteException;
 
     /**
-     * The shell with the title {@link StfRemoteObject#SHELL_ADD_PROJECT} should be
-     * appeared by the invitees' side during sharing session. This method
+     * The shell with the title {@link StfRemoteObject#SHELL_ADD_PROJECT} should
+     * be appeared by the invitees' side during sharing session. This method
      * confirm the shell using an existed project.
      * 
      * @throws RemoteException
@@ -51,8 +54,8 @@ public interface ISuperBot extends Remote {
         throws RemoteException;
 
     /**
-     * The shell with the title {@link StfRemoteObject#SHELL_ADD_PROJECT} should be
-     * appeared by the invitees' side during sharing session. This method
+     * The shell with the title {@link StfRemoteObject#SHELL_ADD_PROJECT} should
+     * be appeared by the invitees' side during sharing session. This method
      * confirm the shell using an existed project.
      * 
      * @throws RemoteException
@@ -61,8 +64,8 @@ public interface ISuperBot extends Remote {
         String projectName) throws RemoteException;
 
     /**
-     * The shell with the title {@link StfRemoteObject#SHELL_ADD_PROJECT} should be
-     * appeared by the invitees' side during sharing session. This method
+     * The shell with the title {@link StfRemoteObject#SHELL_ADD_PROJECT} should
+     * be appeared by the invitees' side during sharing session. This method
      * confirm the shell using an existed project with copy.
      * 
      * @throws RemoteException
@@ -71,8 +74,8 @@ public interface ISuperBot extends Remote {
         String projectName) throws RemoteException;
 
     /**
-     * The shell with the title {@link StfRemoteObject#SHELL_ADD_PROJECT} should be
-     * appeared by the invitees' side during sharing session. This method
+     * The shell with the title {@link StfRemoteObject#SHELL_ADD_PROJECT} should
+     * be appeared by the invitees' side during sharing session. This method
      * confirm the shell. with the passed parameter "usingWhichProject" to
      * decide using which project.
      * 
@@ -83,8 +86,9 @@ public interface ISuperBot extends Remote {
 
     /**
      * Confirm the shell with title
-     * {@link StfRemoteObject#SHELL_EDIT_XMPP_JABBER_ACCOUNT} activated by clicking
-     * button {@link StfRemoteObject#BUTTON_EDIT_ACCOUNT} in saros preference.
+     * {@link StfRemoteObject#SHELL_EDIT_XMPP_JABBER_ACCOUNT} activated by
+     * clicking button {@link StfRemoteObject#BUTTON_EDIT_ACCOUNT} in saros
+     * preference.
      * 
      * @param newXmppJabberID
      * @param newPassword
@@ -129,7 +133,8 @@ public interface ISuperBot extends Remote {
         throws RemoteException;
 
     /**
-     * Confirm the shell with title {@link StfRemoteObject#SHELL_CLOSING_THE_SESSION}
+     * Confirm the shell with title
+     * {@link StfRemoteObject#SHELL_CLOSING_THE_SESSION}
      * 
      * @throws RemoteException
      */
@@ -137,8 +142,8 @@ public interface ISuperBot extends Remote {
 
     /**
      * Confirm the shell with title
-     * {@link StfRemoteObject#SHELL_REMOVAL_OF_SUBSCRIPTION} which would be appeared
-     * if someone delete your contact from his buddies list.
+     * {@link StfRemoteObject#SHELL_REMOVAL_OF_SUBSCRIPTION} which would be
+     * appeared if someone delete your contact from his buddies list.
      * 
      * @throws RemoteException
      */
@@ -181,9 +186,9 @@ public interface ISuperBot extends Remote {
         throws RemoteException;
 
     /**
-     * confirm the shell with title {@link StfRemoteObject#SHELL_SESSION_INVITATION}
-     * and also the following shell with title
-     * {@link StfRemoteObject#SHELL_ADD_PROJECT}
+     * confirm the shell with title
+     * {@link StfRemoteObject#SHELL_SESSION_INVITATION} and also the following
+     * shell with title {@link StfRemoteObject#SHELL_ADD_PROJECT}
      * 
      * @param projectName
      *            the name of shared project

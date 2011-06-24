@@ -63,9 +63,6 @@ import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.filter.PacketFilter;
 import org.jivesoftware.smack.packet.Packet;
 import org.jivesoftware.smackx.bytestreams.BytestreamSession;
-import org.osgi.framework.Bundle;
-import org.osgi.framework.Constants;
-import org.osgi.framework.Version;
 import org.picocontainer.annotations.Nullable;
 
 import bmsi.util.Diff;
@@ -663,48 +660,8 @@ public class Utils {
     }
 
     public static String getEclipsePlatformInfo() {
-        return getBundleVersion(Platform.getBundle("org.eclipse.core.runtime"),
-            "Unknown Eclipse Version");
-    }
-
-    public static String getBundleVersion(Bundle bundle, String defaultValue) {
-        if (bundle == null)
-            return defaultValue;
-
-        Object version = bundle.getHeaders().get(Constants.BUNDLE_VERSION);
-        if (version != null) {
-            return version.toString();
-        } else {
-            return defaultValue;
-        }
-    }
-
-    /**
-     * From the given {@link Bundle} this method will extract the Bundle Version
-     * as a {@link Version} object.
-     * 
-     * This method will return {@link Version#emptyVersion} in case of any
-     * error.
-     */
-    public static Version getBundleVersion(Bundle bundle) {
-        return parseBundleVersion(getBundleVersion(bundle, null));
-    }
-
-    /**
-     * Will turn a given Version string (in the form "9.7.31.r1343") into a
-     * Version object.
-     * 
-     * This method will return {@link Version#emptyVersion} in case of any
-     * error.
-     */
-    public static Version parseBundleVersion(String bundleVersion) {
-        try {
-            return Version.parseVersion(bundleVersion);
-        } catch (IllegalArgumentException e) {
-            log.warn("Bundle Version string is illegally formatted: "
-                + bundleVersion);
-            return Version.emptyVersion;
-        }
+        return Platform.getBundle("org.eclipse.core.runtime").getVersion()
+            .toString();
     }
 
     public static String getPlatformInfo() {

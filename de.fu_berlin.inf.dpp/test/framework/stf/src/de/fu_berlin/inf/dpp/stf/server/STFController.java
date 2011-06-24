@@ -1,5 +1,6 @@
 package de.fu_berlin.inf.dpp.stf.server;
 
+import java.lang.reflect.Field;
 import java.rmi.AccessException;
 import java.rmi.AlreadyBoundException;
 import java.rmi.NotBoundException;
@@ -10,8 +11,10 @@ import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 
 import org.apache.log4j.Logger;
+import org.picocontainer.MutablePicoContainer;
 
 import de.fu_berlin.inf.dpp.Saros;
+import de.fu_berlin.inf.dpp.SarosContext;
 import de.fu_berlin.inf.dpp.accountManagement.XMPPAccountStore;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.feedback.FeedbackManager;
@@ -65,6 +68,7 @@ import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.saros.impl.Ch
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.saros.impl.RSView;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.saros.impl.SarosView;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.impl.SuperBot;
+import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.internal.impl.InternalImpl;
 
 /**
  * STFController is responsible to register all exported objects.
@@ -93,12 +97,32 @@ public class STFController {
         XMPPAccountStore xmppAccountStore, FeedbackManager feedbackManager)
         throws RemoteException {
 
-        StfRemoteObject.setSaros(saros);
-        StfRemoteObject.setSessionManager(sessionManager);
-        StfRemoteObject.setDataTransferManager(dataTransferManager);
-        StfRemoteObject.setEditorManager(editorManager);
-        StfRemoteObject.setXmppAccountStore(xmppAccountStore);
-        StfRemoteObject.setFeedbackManager(feedbackManager);
+        MutablePicoContainer container = null;
+        try {
+
+            Field sarosContextField = Saros.class
+                .getDeclaredField("sarosContext");
+            sarosContextField.setAccessible(true);
+
+            Field mutablePicoContainerField = SarosContext.class
+                .getDeclaredField("container");
+            mutablePicoContainerField.setAccessible(true);
+
+            SarosContext sarosContext = (SarosContext) sarosContextField
+                .get(saros);
+
+            container = (MutablePicoContainer) mutablePicoContainerField
+                .get(sarosContext);
+        } catch (Exception e) {
+            throw new RemoteException(e.getMessage(), e);
+        }
+
+        assert container != null;
+
+        for (Object object : container.getComponents())
+            log.debug("container component: " + object.getClass().getName());
+
+        StfRemoteObject.setPicoContainer(container);
 
         try {
             registry = LocateRegistry.createRegistry(port);
@@ -177,6 +201,8 @@ public class STFController {
 
         exportObject(Views.getInstance(), "views");
         exportObject(MenuBar.getInstance(), "menuBar");
+
+        exportObject(InternalImpl.getInstance(), "internal");
     }
 
     /**

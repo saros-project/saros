@@ -388,7 +388,7 @@ public class VersionManager {
      * Returns the Version of the locally running Saros plugin
      */
     public Version getVersion() {
-        return Utils.getBundleVersion(bundle);
+        return bundle.getVersion();
     }
 
     /**
@@ -493,9 +493,22 @@ public class VersionManager {
      */
     public Compatibility determineCompatibility(String remoteVersionString) {
 
-        Version remoteVersion = Utils.parseBundleVersion(remoteVersionString);
-        Version localVersion = Utils.getBundleVersion(bundle);
+        Version remoteVersion = parseBundleVersion(remoteVersionString);
+        Version localVersion = getVersion();
 
         return determineCompatibility(localVersion, remoteVersion);
     }
+
+    private Version parseBundleVersion(String bundleVersion) {
+        Version version = Version.emptyVersion;
+        try {
+            version = Version.parseVersion(bundleVersion);
+        } catch (IllegalArgumentException e) {
+            log.warn(
+                "bundle version string of remote peer is illegally formatted: "
+                    + bundleVersion, e);
+        }
+        return version;
+    }
+
 }

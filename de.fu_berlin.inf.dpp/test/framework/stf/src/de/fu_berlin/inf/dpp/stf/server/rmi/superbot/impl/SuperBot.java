@@ -15,6 +15,8 @@ import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.menubar.IMenuBar;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.menubar.impl.MenuBar;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.IViews;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.impl.Views;
+import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.internal.IInternal;
+import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.internal.impl.InternalImpl;
 
 public final class SuperBot extends StfRemoteObject implements ISuperBot {
 
@@ -386,6 +388,10 @@ public final class SuperBot extends StfRemoteObject implements ISuperBot {
             bot().shell(SHELL_CONFIRM_CLOSING_SESSION).confirm(YES);
         }
         Views.getInstance().sarosView().waitUntilIsNotInSession();
+    }
+
+    public IInternal internal() throws RemoteException {
+        return InternalImpl.getInstance();
     }
 
 }

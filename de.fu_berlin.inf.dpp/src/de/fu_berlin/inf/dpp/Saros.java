@@ -135,9 +135,9 @@ public class Saros extends AbstractUIPlugin {
      */
     public final static String RESOURCE = "Saros";
 
-    public String sarosVersion;
+    private String sarosVersion;
 
-    public String sarosFeatureID;
+    private String sarosFeatureID;
 
     protected SarosSessionManager sessionManager;
 
@@ -354,7 +354,7 @@ public class Saros extends AbstractUIPlugin {
 
         super.start(context);
 
-        sarosVersion = Utils.getBundleVersion(getBundle(), "Unknown Version");
+        sarosVersion = getBundle().getVersion().toString();
 
         sarosFeatureID = SAROS + "_" + sarosVersion;
 
