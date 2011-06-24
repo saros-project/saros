@@ -98,9 +98,11 @@ public class ContributionAnnotationManager {
      * @param offset
      *            at which annotations should be splitted.
      */
+
+    @SuppressWarnings("unchecked")
     public void splitAnnotation(IAnnotationModel model, int offset) {
-        for (@SuppressWarnings("unchecked")
-        Iterator<Annotation> it = model.getAnnotationIterator(); it.hasNext();) {
+        for (Iterator<Annotation> it = model.getAnnotationIterator(); it
+            .hasNext();) {
             Annotation annotation = it.next();
 
             if (annotation instanceof ContributionAnnotation) {

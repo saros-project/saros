@@ -20,6 +20,7 @@ import java.net.Socket;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -1184,8 +1185,8 @@ public class Utils {
     }
 
     /**
-     * Concat <code>strings</code>. If <code>seperator</code> is not
-     * <code><b>null</b></code> or empty the seperator will be put between the
+     * Concat <code>strings</code>. If <code>separator</code> is not
+     * <code><b>null</b></code> or empty the separator will be put between the
      * strings but not after the last one
      * 
      * Example: <br />
@@ -1195,39 +1196,43 @@ public class Utils {
      * join(separator, strings) => 'a-b-c'</code>
      * 
      * @param separator
-     * @param strings
+     * @param objects
      * @return
      */
-    public static String join(String separator, String... strings) {
-        String sep = separator;
-        if (strings.length < 1) {
-            return "";
-        }
-        if (sep == null) {
-            sep = "";
-        }
-        int length = strings.length;
-        String result = "";
-        for (int i = 0; i < length - 1; i++) {
-            result += strings[i];
-            result += separator;
-        }
-        result += strings[length - 1];
-        return result;
+    public static String join(String separator, Object... objects) {
+        return join(separator, Arrays.asList(objects));
     }
 
     /**
-     * @see #join(String, String...)
+     * Concatenates all elements of this collection. For each element the
+     * toString method will be invoked and the separator will be appended but
+     * not for the last element of the collection. The order of the output
+     * depends on the iterator that is returned by the collection.
      * 
+     * @param separator
+     * @param objects
+     * @return
      */
-    public static String join(String seperator, List<String> strings) {
-        String[] strArray = new String[strings.size()];
-        int i = 0;
-        for (String str : strings) {
-            strArray[i] = str;
-            i++;
-        }
-        return join(seperator, strArray);
+
+    public static String join(String separator, Collection<?> objects) {
+        int length = objects.size();
+
+        if (length == 0)
+            return "";
+
+        if (separator == null)
+            separator = "";
+
+        StringBuilder result = new StringBuilder(512);
+
+        Iterator<?> it = objects.iterator();
+
+        for (int i = 0; i < length - 1; i++)
+            result.append(it.next()).append(separator);
+
+        result.append(it.next());
+
+        return result.toString();
     }
 
     private static class SyncedThread extends Thread {

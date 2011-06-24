@@ -821,13 +821,15 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
                 sessionID.getValue(), processID);
 
         log.debug("fileLists.size(): " + fileLists.size());
-        String[] xmlArray = new String[fileLists.size()];
-        // Now we convert each FileList into an XML representation...
-        for (int i = 0; i < xmlArray.length; i++) {
-            xmlArray[i] = fileLists.get(i).toXML();
-        }
-        // ...and queue them.
-        String xml = Utils.join("---next---", xmlArray);
+
+        int length = fileLists.size();
+
+        List<String> xmlFileLists = new ArrayList<String>(length);
+
+        for (FileList fileList : fileLists)
+            xmlFileLists.add(fileList.toXML());
+
+        String xml = Utils.join("---next---", xmlFileLists);
 
         byte[] content = xml.getBytes("UTF-8");
 
