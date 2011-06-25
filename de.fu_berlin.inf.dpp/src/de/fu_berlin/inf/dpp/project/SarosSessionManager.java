@@ -24,6 +24,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Random;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.locks.Lock;
@@ -181,7 +182,10 @@ public class SarosSessionManager implements IConnectionListener,
         sarosSession.start();
         notifySarosSessionStarted(sarosSession);
 
-        for (IProject iProject : projectResourcesMapping.keySet()) {
+        for (Entry<IProject, List<IResource>> mapEntry : projectResourcesMapping
+            .entrySet()) {
+            IProject iProject = mapEntry.getKey();
+            List<IResource> resourcesList = mapEntry.getValue();
             if (!iProject.isOpen()) {
                 try {
                     iProject.open(null);
@@ -192,8 +196,7 @@ public class SarosSessionManager implements IConnectionListener,
             }
             String projectID = String.valueOf(sessionRandom
                 .nextInt(Integer.MAX_VALUE));
-            sarosSession.addSharedResources(iProject, projectID,
-                projectResourcesMapping.get(iProject));
+            sarosSession.addSharedResources(iProject, projectID, resourcesList);
             notifyProjectAdded(iProject);
         }
 
@@ -526,7 +529,10 @@ public class SarosSessionManager implements IConnectionListener,
      */
     public void addResourcesToSession(
         HashMap<IProject, List<IResource>> projectResourcesMapping) {
-        for (IProject iProject : projectResourcesMapping.keySet()) {
+        for (Entry<IProject, List<IResource>> mapEntry : projectResourcesMapping
+            .entrySet()) {
+            IProject iProject = mapEntry.getKey();
+            List<IResource> resourcesList = mapEntry.getValue();
             if (!iProject.isOpen()) {
                 try {
                     iProject.open(null);
@@ -540,7 +546,7 @@ public class SarosSessionManager implements IConnectionListener,
                 String projectID = String.valueOf(sessionRandom
                     .nextInt(Integer.MAX_VALUE));
                 this.getSarosSession().addSharedResources(iProject, projectID,
-                    projectResourcesMapping.get(iProject));
+                    resourcesList);
                 notifyProjectAdded(iProject);
             }
         }

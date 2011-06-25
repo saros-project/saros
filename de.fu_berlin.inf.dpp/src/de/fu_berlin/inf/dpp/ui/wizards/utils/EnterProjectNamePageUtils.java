@@ -151,7 +151,8 @@ public class EnterProjectNamePageUtils {
      * @param projects
      * @return
      */
-    public static boolean projectIsUnique(String projectName, IProject... projects) {
+    public static boolean projectIsUnique(String projectName,
+        IProject... projects) {
 
         if (projectName == null)
             throw new IllegalArgumentException("Illegal project name given");
@@ -244,5 +245,9 @@ public class EnterProjectNamePageUtils {
             alreadySharedProjectsIDs.add(id);
             return false;
         }
+    }
+
+    public static void setPreferenceUtils(PreferenceUtils preferenceUtils) {
+        EnterProjectNamePageUtils.preferenceUtils = preferenceUtils;
     }
 }

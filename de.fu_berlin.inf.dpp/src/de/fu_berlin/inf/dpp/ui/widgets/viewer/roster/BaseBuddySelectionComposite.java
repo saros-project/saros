@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.viewers.CheckStateChangedEvent;
@@ -122,8 +123,9 @@ public class BaseBuddySelectionComposite extends BuddyDisplayComposite {
         /*
          * Update the check state in the RosterCheckStateProvider
          */
-        for (RosterEntryElement rosterEntryElement : checkStatesChanges
-            .keySet()) {
+        for (Entry<RosterEntryElement, Boolean> entryElement : checkStatesChanges
+            .entrySet()) {
+            RosterEntryElement rosterEntryElement = entryElement.getKey();
             boolean checked = checkStatesChanges.get(rosterEntryElement);
             this.checkStateProvider.setChecked(rosterEntryElement, checked);
         }
@@ -136,8 +138,9 @@ public class BaseBuddySelectionComposite extends BuddyDisplayComposite {
         /*
          * Fire events
          */
-        for (RosterEntryElement rosterEntryElement : checkStatesChanges
-            .keySet()) {
+        for (Entry<RosterEntryElement, Boolean> entryElement : checkStatesChanges
+            .entrySet()) {
+            RosterEntryElement rosterEntryElement = entryElement.getKey();
             boolean checked = checkStatesChanges.get(rosterEntryElement);
             this.notifyBuddySelectionChanged(
                 (JID) rosterEntryElement.getAdapter(JID.class), checked);

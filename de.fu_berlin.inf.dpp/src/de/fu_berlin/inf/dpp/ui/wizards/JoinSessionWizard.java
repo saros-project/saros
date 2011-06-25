@@ -83,7 +83,7 @@ public class JoinSessionWizard extends Wizard {
         this.preferenceUtils = preferenceUtils;
         this.manager = manager;
 
-        EnterProjectNamePageUtils.preferenceUtils = preferenceUtils;
+        EnterProjectNamePageUtils.setPreferenceUtils(preferenceUtils);
 
         process.setInvitationUI(this);
         setWindowTitle("Session Invitation");

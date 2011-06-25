@@ -142,14 +142,14 @@ public class CollaborationUtils {
     public static void addResourcesToSarosSession(
         final SarosSessionManager sarosSessionManager,
         List<IResource> resourcesToAdd) {
+        final ISarosSession sarosSession = sarosSessionManager
+            .getSarosSession();
         final HashMap<IProject, List<IResource>> projectResources = acquireResources(
-            resourcesToAdd, sarosSessionManager.getSarosSession());
+            resourcesToAdd, sarosSession);
         if (projectResources.isEmpty())
             return;
         Utils.runSafeAsync(log, new Runnable() {
             public void run() {
-                final ISarosSession sarosSession = sarosSessionManager
-                    .getSarosSession();
                 if (sarosSession != null) {
                     Utils.runSafeSync(log, new Runnable() {
                         public void run() {
