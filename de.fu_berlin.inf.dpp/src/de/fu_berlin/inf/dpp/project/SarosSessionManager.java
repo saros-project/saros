@@ -546,11 +546,13 @@ public class SarosSessionManager implements IConnectionListener,
         }
         boolean doStream = prefStore
             .getBoolean(PreferenceConstants.STREAM_PROJECT);
+
         for (User user : this.getSarosSession().getRemoteUsers()) {
             OutgoingProjectNegotiation out = new OutgoingProjectNegotiation(
                 transmitter, user.getJID(), this.getSarosSession(),
                 projectResourcesMapping, projectExchangeProcesses, stopManager,
                 sessionID, doStream, sarosContext, null);
+
             OutgoingProjectJob job = new OutgoingProjectJob(out);
             job.schedule();
         }
@@ -613,9 +615,9 @@ public class SarosSessionManager implements IConnectionListener,
                 String projectName = iProject.getName();
                 FileList projectFileList = FileListFactory.createFileList(
                     iProject,
-                    this.getSarosSession().getSharedResources(iProject),
-                    this.getSarosSession().useVersionControl(),
-                    subMonitor.newChild(0));
+                    this.getSarosSession().getSharedResources(iProject), this
+                        .getSarosSession().useVersionControl(), subMonitor
+                        .newChild(0));
                 projectFileList.setProjectID(projectID);
                 boolean partial = !this.getSarosSession().isCompletelyShared(
                     iProject);

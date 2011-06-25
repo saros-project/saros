@@ -49,6 +49,7 @@ import org.eclipse.core.runtime.jobs.ISchedulingRule;
  * @see de.fu_berlin.inf.dpp.test.util.EclipseWorkspaceFakeFacadeTest
  * @author cordes
  */
+
 public class EclipseWorkspaceFake implements IWorkspace {
 
     private File wrappedFile;
@@ -217,6 +218,7 @@ public class EclipseWorkspaceFake implements IWorkspace {
         // do nothing
     }
 
+    @Deprecated
     public void setWorkspaceLock(WorkspaceLock workspaceLock) {
         throw new UnsupportedOperationException("not yet implemented");
     }

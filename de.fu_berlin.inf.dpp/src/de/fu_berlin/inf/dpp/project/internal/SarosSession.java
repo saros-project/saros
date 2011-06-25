@@ -519,12 +519,12 @@ public class SarosSession implements ISarosSession, Disposable {
             returnColor(user.getColorID());
         }
 
-        activitySequencer.userLeft(jid);
+        activitySequencer.userLeft(user);
 
         // TODO what is to do here if no user with write access exists anymore?
         listenerDispatch.userLeft(user);
 
-        // Disconnect bytestream connection when user leaves session to 
+        // Disconnect bytestream connection when user leaves session to
         // prevent idling connection when not needed anymore.
         transferManager.closeConnection(jid);
 

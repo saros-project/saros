@@ -22,9 +22,9 @@ public class NetworkRequest implements Comparable<NetworkRequest> {
 
         /* adaption to new JupiterActivity format. */
         if (jupiterActivity.getSource() == null) {
-            this.jupiterActivity = new JupiterActivity(jupiterActivity
-                .getTimestamp(), jupiterActivity.getOperation(), from,
-                jupiterActivity.getPath());
+            this.jupiterActivity = new JupiterActivity(
+                jupiterActivity.getTimestamp(), jupiterActivity.getOperation(),
+                from, jupiterActivity.getPath());
         } else {
             this.jupiterActivity = jupiterActivity;
         }
@@ -44,6 +44,26 @@ public class NetworkRequest implements Comparable<NetworkRequest> {
 
     public int compareTo(NetworkRequest o) {
         return Integer.valueOf(delay).compareTo(o.delay);
+    }
+
+    @Override
+    public boolean equals(Object another) {
+        if (this == another)
+            return true;
+
+        if (another == null)
+            return false;
+
+        if (another instanceof NetworkRequest)
+            return false;
+
+        return this.delay == ((NetworkRequest) another).delay;
+    }
+
+    @Override
+    // FIXME bad hash function
+    public int hashCode() {
+        return this.delay;
     }
 
     public int getDelay() {

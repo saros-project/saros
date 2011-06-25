@@ -106,7 +106,7 @@ public class ConcurrentEditingTest extends StfTestCase {
     }
 
     @Test(expected = AssertionError.class)
-    public void AliceAndBobeditInSameLine() throws RemoteException,
+    public void aliceAndBobEditInSameLine() throws RemoteException,
         InterruptedException {
 
         ALICE

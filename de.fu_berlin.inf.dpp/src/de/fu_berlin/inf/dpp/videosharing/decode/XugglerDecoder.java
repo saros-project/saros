@@ -1,6 +1,6 @@
 /*
  * DPP - Serious Distributed Pair Programming
- * (c) Freie Universität Berlin - Fachbereich Mathematik und Informatik - 2010
+ * (c) Freie Universitï¿½t Berlin - Fachbereich Mathematik und Informatik - 2010
  * (c) Stephan Lau - 2010
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -49,7 +49,7 @@ public class XugglerDecoder extends Decoder {
 
     /* settings */
     IContainerFormat containerFormat;
-    protected static IPixelFormat.Type pixelformat;
+    protected IPixelFormat.Type pixelformat;
 
     /* video */
     protected IContainer container;
@@ -191,15 +191,15 @@ public class XugglerDecoder extends Decoder {
     protected IVideoPicture resample(IVideoPicture picture) {
         if (resampler == null) {
             // create new resampler
-            resampler = IVideoResampler.make(coder.getWidth(), coder
-                .getHeight(), pixelformat, coder.getWidth(), coder.getHeight(),
-                coder.getPixelType());
+            resampler = IVideoResampler.make(coder.getWidth(),
+                coder.getHeight(), pixelformat, coder.getWidth(),
+                coder.getHeight(), coder.getPixelType());
             if (resampler == null)
                 throw new RuntimeException("resampler not available");
         }
 
-        IVideoPicture newPicture = IVideoPicture.make(pixelformat, coder
-            .getWidth(), coder.getHeight());
+        IVideoPicture newPicture = IVideoPicture.make(pixelformat,
+            coder.getWidth(), coder.getHeight());
 
         if (resampler.resample(newPicture, picture) < 0)
             throw new RuntimeException("could not resample the picture");

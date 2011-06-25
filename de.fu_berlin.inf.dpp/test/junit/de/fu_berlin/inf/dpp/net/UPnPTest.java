@@ -35,7 +35,7 @@ public class UPnPTest {
      * UPnP access stub for UPnPManager to work with to use local test data
      * instead of a real network and gateway.
      */
-    protected class UPnPAccessStub implements IUPnPAccess {
+    protected static class UPnPAccessStub implements IUPnPAccess {
         Collection<GatewayDevice> gatewaysToServe = new ArrayList<GatewayDevice>();
         Map<Integer, PortMappingEntry> portmappings = new HashMap<Integer, PortMappingEntry>();
 
@@ -56,8 +56,7 @@ public class UPnPTest {
         public int deletePortMapping(GatewayDevice gateway, int port,
             String protocol) throws IOException, SAXException {
 
-            Integer portToRemove = new Integer(port);
-            return portmappings.remove(portToRemove) != null ? 0 : 404;
+            return portmappings.remove(port) != null ? 0 : 404;
         }
 
         public PortMappingEntry getSpecificPortMappingEntry(

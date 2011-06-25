@@ -99,10 +99,8 @@ public class BaseProjectSelectionComposite extends ProjectDisplayComposite {
         /*
          * ... therefore we have to fire them.
          */
-        for (IProject project : checkStatesChanges.keySet()) {
-            notifyProjectSelectionChanged(project,
-                checkStatesChanges.get(project));
-        }
+        for (Map.Entry<IProject, Boolean> entry : checkStatesChanges.entrySet())
+            notifyProjectSelectionChanged(entry.getKey(), entry.getValue());
     }
 
     /**

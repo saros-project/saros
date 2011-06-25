@@ -152,12 +152,21 @@ public class SendFileAction extends Action implements Disposable {
 
         // try to access file
         File file = new File(filename);
+        InputStream in = null;
+
         try {
-            new FileInputStream(file);
+            in = new FileInputStream(file);
         } catch (FileNotFoundException e) {
             errorPopup("Cannot read file",
                 "'" + filename + "' cannot be read.", e, null);
             return;
+        } finally {
+            if (in != null)
+                try {
+                    in.close();
+                } catch (IOException e) {
+                    log.warn("unable to close file:" + filename, e);
+                }
         }
 
         new SendFileJob(participants.get(0), file).schedule();

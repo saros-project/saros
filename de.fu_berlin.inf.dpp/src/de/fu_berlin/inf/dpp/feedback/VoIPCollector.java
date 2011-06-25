@@ -81,7 +81,7 @@ public class VoIPCollector extends AbstractStatisticCollector {
     protected int numberVoIPSessions = 0;
 
     /** Structure to store local VoIP events */
-    protected List<VoIPEvent> VoIPEvents = Collections
+    protected List<VoIPEvent> voIPEvents = Collections
         .synchronizedList(new ArrayList<VoIPEvent>());
 
     protected IAudioServiceListener audioListener = new AbstractAudioServiceListener() {
@@ -91,7 +91,7 @@ public class VoIPCollector extends AbstractStatisticCollector {
             /*
              * store the event in an array list
              */
-            VoIPEvents.add(event);
+            voIPEvents.add(event);
             numberVoIPSessions++;
         }
 
@@ -101,7 +101,7 @@ public class VoIPCollector extends AbstractStatisticCollector {
             /*
              * store the event in an array list
              */
-            VoIPEvents.add(event);
+            voIPEvents.add(event);
         }
     };
 
@@ -127,7 +127,7 @@ public class VoIPCollector extends AbstractStatisticCollector {
         /*
          * iterate through the array list and calculate time spent in VoIP
          */
-        for (VoIPEvent iterator : VoIPEvents) {
+        for (VoIPEvent iterator : voIPEvents) {
             VoIPEvent currentEntry = iterator;
             // if VoIP session got started, set time stamp
             if (currentEntry.enabled == true) {
@@ -178,7 +178,7 @@ public class VoIPCollector extends AbstractStatisticCollector {
     @Override
     protected void clearPreviousData() {
         // reset previous data
-        VoIPEvents.clear();
+        voIPEvents.clear();
         timeInVoIPSession = 0;
         sessionStart = 0;
         sessionEnd = 0;

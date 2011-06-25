@@ -13,7 +13,7 @@ import org.eclipse.jface.text.IDocumentListener;
  */
 public class StoppableDocumentListener implements IDocumentListener {
 
-    protected static Logger log = Logger
+    private final static Logger log = Logger
         .getLogger(StoppableDocumentListener.class.getName());
 
     private final EditorManager editorManager;

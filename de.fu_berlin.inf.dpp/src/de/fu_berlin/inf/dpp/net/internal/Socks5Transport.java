@@ -602,8 +602,8 @@ public class Socks5Transport extends BytestreamTransport {
      * Wraps two Socks5BytestreamSessions in one, where for the first one, "in",
      * the InputStream has to work, for the second one, "out", the OutputStream.
      */
-    protected class WrappedBidirectionalSocks5BytestreamSession implements
-        BytestreamSession {
+    protected static class WrappedBidirectionalSocks5BytestreamSession
+        implements BytestreamSession {
 
         protected Socks5BytestreamSession in;
         protected Socks5BytestreamSession out;

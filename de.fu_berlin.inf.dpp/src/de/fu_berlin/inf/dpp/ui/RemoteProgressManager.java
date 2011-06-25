@@ -54,7 +54,7 @@ public class RemoteProgressManager {
      * A remote progress represents a progress dialog being shown LOCALLY due to
      * ProgressActivities sent to the local user by a remote peer.
      */
-    public class RemoteProgress {
+    public static class RemoteProgress {
 
         /**
          * The unique ID of this progress we are showing.

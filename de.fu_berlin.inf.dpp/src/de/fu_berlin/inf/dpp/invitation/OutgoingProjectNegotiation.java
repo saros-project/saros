@@ -96,7 +96,8 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
         this.sessionID = sessionID;
         this.stopManager = stopManager;
         this.selectedProjectResources = partialResources;
-        this.projects = new ArrayList<IProject>(selectedProjectResources.keySet());
+        this.projects = new ArrayList<IProject>(
+            selectedProjectResources.keySet());
         this.pInfos = projectExchangeInfos;
 
     }
@@ -411,7 +412,7 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
             }
             streamSession = streamServiceManager.createSession(
                 archiveStreamService, sarosSession.getUser(this.peer),
-                new Integer(numberOfFilesToSend), sessionListener);
+                numberOfFilesToSend, sessionListener);
 
             streamSession.setListener(sessionListener);
 
@@ -584,11 +585,18 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
         try {
             SubMonitor archiveMonitor = subMonitor.newChild(50,
                 SubMonitor.SUPPRESS_ALL_LABELS);
+
             List<File> archivesToSend = new LinkedList<File>();
-            for (String projectID : projectFilesToSend.keySet()) {
-                List<IPath> toSend = projectFilesToSend.get(projectID);
+
+            for (Map.Entry<String, List<IPath>> entry : projectFilesToSend
+                .entrySet()) {
+
+                String projectID = entry.getKey();
+                List<IPath> toSend = entry.getValue();
+
                 File projectArchive = createProjectArchive(archiveMonitor,
                     toSend, projectID);
+
                 if (projectArchive != null) {
                     archivesToSend.add(projectArchive);
                 }

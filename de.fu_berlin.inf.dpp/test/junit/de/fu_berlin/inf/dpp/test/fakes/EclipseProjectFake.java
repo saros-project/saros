@@ -93,6 +93,7 @@ public class EclipseProjectFake extends EclipseContainerFake implements
         throw new UnsupportedOperationException("not yet implemented");
     }
 
+    @Deprecated
     public IPath getPluginWorkingLocation(IPluginDescriptor iPluginDescriptor) {
         throw new UnsupportedOperationException("not yet implemented");
     }

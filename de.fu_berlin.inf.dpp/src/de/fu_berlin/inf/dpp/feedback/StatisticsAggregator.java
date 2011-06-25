@@ -162,7 +162,6 @@ public class StatisticsAggregator {
         log.info("Output written to " + output.getAbsolutePath());
     }
 
-    @SuppressWarnings("unchecked")
     public Collection<File> listFiles(File rootFolder, String... extensions) {
         return FileUtils.listFiles(rootFolder, extensions, true);
     }

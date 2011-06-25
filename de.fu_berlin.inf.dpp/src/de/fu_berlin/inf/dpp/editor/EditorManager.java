@@ -118,7 +118,7 @@ import de.fu_berlin.inf.dpp.util.Utils;
 @Component(module = "core")
 public class EditorManager implements IActivityProvider, Disposable {
 
-    protected static Logger log = Logger.getLogger(EditorManager.class
+    protected static final Logger log = Logger.getLogger(EditorManager.class
         .getName());
 
     protected SharedEditorListenerDispatch editorListenerDispatch = new SharedEditorListenerDispatch();
@@ -163,11 +163,11 @@ public class EditorManager implements IActivityProvider, Disposable {
 
     protected HashMap<SPath, Long> lastRemoteEditTimes = new HashMap<SPath, Long>();
 
-    protected ContributionAnnotationManager contributionAnnotationManager;
+    ContributionAnnotationManager contributionAnnotationManager;
 
-    protected Queue<IActivity> queuedActivities = new LinkedList<IActivity>();
+    Queue<IActivity> queuedActivities = new LinkedList<IActivity>();
 
-    protected IActivityReceiver activityReceiver = new AbstractActivityReceiver() {
+    private IActivityReceiver activityReceiver = new AbstractActivityReceiver() {
         @Override
         public void receive(EditorActivity editorActivity) {
             execEditorActivity(editorActivity);
@@ -189,7 +189,7 @@ public class EditorManager implements IActivityProvider, Disposable {
         }
     };
 
-    protected Blockable stopManagerListener = new Blockable() {
+    private Blockable stopManagerListener = new Blockable() {
         public void unblock() {
             lockAllEditors(false);
         }
@@ -199,7 +199,7 @@ public class EditorManager implements IActivityProvider, Disposable {
         }
     };
 
-    protected ISharedProjectListener sharedProjectListener = new AbstractSharedProjectListener() {
+    private ISharedProjectListener sharedProjectListener = new AbstractSharedProjectListener() {
 
         @Override
         public void permissionChanged(final User user) {
@@ -272,9 +272,9 @@ public class EditorManager implements IActivityProvider, Disposable {
         }
     };
 
-    protected ISarosSessionListener sessionListener = new AbstractSarosSessionListener() {
+    private ISarosSessionListener sessionListener = new AbstractSarosSessionListener() {
 
-        protected RevertBufferListener buffListener;
+        private RevertBufferListener buffListener;
 
         @Override
         public void sessionStarted(ISarosSession newSarosSession) {
@@ -384,7 +384,7 @@ public class EditorManager implements IActivityProvider, Disposable {
         }
     };
 
-    protected ISharedEditorListener sharedEditorListener = new AbstractSharedEditorListener() {
+    private ISharedEditorListener sharedEditorListener = new AbstractSharedEditorListener() {
 
         @Override
         public void activeEditorChanged(User user, SPath path) {
@@ -1508,6 +1508,10 @@ public class EditorManager implements IActivityProvider, Disposable {
      * @return System.currentTimeMillis() of last local edit or 0 if there was
      *         no edit.
      */
+
+    // FIXME Bug: org.eclipse.core.runtime.IPath is incompatible with expected
+    // argument type de.fu_berlin.inf.dpp.activities.SPath
+
     public long getLastEditTime(IPath path) {
         if (!this.lastEditTimes.containsKey(path)) {
             log.warn("File has never been edited: " + path);
@@ -1523,6 +1527,10 @@ public class EditorManager implements IActivityProvider, Disposable {
      *            the project relative path of the resource
      * @return java system time of last remote edit
      */
+
+    // FIXME Bug: org.eclipse.core.runtime.IPath is incompatible with expected
+    // argument type de.fu_berlin.inf.dpp.activities.SPath
+
     public long getLastRemoteEditTime(IPath path) {
         if (!this.lastRemoteEditTimes.containsKey(path)) {
             log.warn("File has never been edited: " + path);

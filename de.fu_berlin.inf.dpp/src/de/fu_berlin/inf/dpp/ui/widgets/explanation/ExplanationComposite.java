@@ -35,7 +35,7 @@ public class ExplanationComposite extends IllustratedComposite {
     /**
      * The space between illustrative image and content
      */
-    protected int spacing = 20;
+    private static final int EXPLANATION_COMPOSITE_SPACING = 20;
 
     /**
      * Constructs a new {@link ExplanationComposite}.
@@ -50,7 +50,7 @@ public class ExplanationComposite extends IllustratedComposite {
      */
     public ExplanationComposite(Composite parent, int style, int systemImage) {
         super(parent, style, parent.getDisplay().getSystemImage(systemImage));
-        setSpacing(spacing);
+        setSpacing(EXPLANATION_COMPOSITE_SPACING);
     }
 
     /**
@@ -66,7 +66,7 @@ public class ExplanationComposite extends IllustratedComposite {
     public ExplanationComposite(Composite parent, final int style,
         Image explanationImage) {
         super(parent, style, explanationImage);
-        setSpacing(spacing);
+        setSpacing(EXPLANATION_COMPOSITE_SPACING);
     }
 
     @Override

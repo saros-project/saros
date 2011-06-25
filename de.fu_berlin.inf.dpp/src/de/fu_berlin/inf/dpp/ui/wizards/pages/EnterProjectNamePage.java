@@ -117,6 +117,9 @@ public class EnterProjectNamePage extends WizardPage {
         this.peer = peer;
         this.remoteProjectNames = remoteProjectNames;
 
+        if (wizardDialog == null)
+            throw new NullPointerException("wizard dialog is null");
+
         this.wizardDialog = wizardDialog;
 
         this.wizardDialog.addPageChangingListener(new IPageChangingListener() {
@@ -124,10 +127,6 @@ public class EnterProjectNamePage extends WizardPage {
                 pageChanges++;
             }
         });
-
-        if (this.wizardDialog == null) {
-            log.warn("WizardDialog is null");
-        }
 
         this.fileLists = fileLists;
 

@@ -34,12 +34,14 @@ public class MUCSessionPreferencesNegotiatingManager {
 
     protected String password;
 
+    private Random random = new Random();
+
     XStreamExtensionProvider<MUCSessionPreferences> communicationProvider = new XStreamExtensionProvider<MUCSessionPreferences>(
         "sarosComPrefs", MUCSessionPreferences.class);
 
     public MUCSessionPreferencesNegotiatingManager(SessionIDObservable sessionID) {
         this.sessionID = sessionID;
-        this.password = Integer.toString(new Random().nextInt());
+        this.password = Integer.toString(random.nextInt());
     }
 
     /**

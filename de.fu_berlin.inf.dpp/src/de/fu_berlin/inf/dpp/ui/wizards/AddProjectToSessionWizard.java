@@ -102,10 +102,8 @@ public class AddProjectToSessionWizard extends Wizard {
                 namePage.getSourceProject(fList.getProjectID()));
             projectNames.put(fList.getProjectID(),
                 namePage.getTargetProjectName(fList.getProjectID()));
-            skipProjectSyncing.put(
-                fList.getProjectID(),
-                new Boolean(namePage.isSyncSkippingSelected(fList
-                    .getProjectID())));
+            skipProjectSyncing.put(fList.getProjectID(),
+                namePage.isSyncSkippingSelected(fList.getProjectID()));
         }
 
         /*
@@ -114,17 +112,21 @@ public class AddProjectToSessionWizard extends Wizard {
          * and if there are differences between the remote and local project.
          */
         Map<String, FileListDiff> projectsToOverrideWithDiff = new HashMap<String, FileListDiff>();
-        for (String projectID : sources.keySet()) {
+        for (Map.Entry<String, IProject> entry : sources.entrySet()) {
+
+            String projectID = entry.getKey();
+            IProject project = entry.getValue();
+
             if (namePage.overwriteResources(projectID)
                 && !preferenceUtils.isAutoReuseExisting()) {
                 FileListDiff diff;
 
-                if (!sources.get(projectID).isOpen()) {
+                if (!project.isOpen()) {
                     try {
-                        sources.get(projectID).open(null);
-                    } catch (CoreException e1) {
+                        project.open(null);
+                    } catch (CoreException e) {
                         log.debug(
-                            "An error occur while opening the source file", e1);
+                            "An error occur while opening the source file", e);
                     }
                 }
 
@@ -133,13 +135,11 @@ public class AddProjectToSessionWizard extends Wizard {
                         .getRemoteFileList(projectID);
                     if (sessionManager.getSarosSession().getProject(projectID) != null) {
                         FileList sharedFileList = FileListFactory
-                            .createFileList(sources.get(projectID), null, true,
-                                null);
+                            .createFileList(project, null, true, null);
                         remoteFileList.entries.putAll(sharedFileList.entries);
                     }
                     diff = FileListDiff.diff(FileListFactory.createFileList(
-                        sources.get(projectID), null, true, null),
-                        remoteFileList);
+                        project, null, true, null), remoteFileList);
                 } catch (CoreException e) {
                     MessageDialog.openError(getShell(),
                         "Error computing FileList",
@@ -148,8 +148,7 @@ public class AddProjectToSessionWizard extends Wizard {
                 }
                 if (diff.getRemovedPaths().size() > 0
                     || diff.getAlteredPaths().size() > 0) {
-                    projectsToOverrideWithDiff.put(sources.get(projectID)
-                        .getName(), diff);
+                    projectsToOverrideWithDiff.put(project.getName(), diff);
                 }
             }
         }

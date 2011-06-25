@@ -22,8 +22,7 @@ public class PairTest {
             return u.intValue() + 0.5;
         }
     };
-    
-    
+
     @Test
     public void testCross() {
         Object p = new Object();
@@ -52,7 +51,8 @@ public class PairTest {
         // in : {(1,6),(2,6),(1,7),(2,7),(1,8),(2,8)}
         // out: {(1,(6,7,8)), (2,(6,7,8))}
 
-        List<Pair<Integer, Integer>> inList = new ArrayList<Pair<Integer, Integer>>(6);
+        List<Pair<Integer, Integer>> inList = new ArrayList<Pair<Integer, Integer>>(
+            6);
         List<Pair<Integer, List<Integer>>> outList;
 
         Integer p1 = new Integer(1);
@@ -72,12 +72,12 @@ public class PairTest {
         vSet.add(v27);
         vSet.add(v28);
 
-        inList.add(new Pair<Integer, Integer>(p1, v16));
-        inList.add(new Pair<Integer, Integer>(p2, v26));
-        inList.add(new Pair<Integer, Integer>(p1, v17));
-        inList.add(new Pair<Integer, Integer>(p2, v27));
-        inList.add(new Pair<Integer, Integer>(p1, v18));
-        inList.add(new Pair<Integer, Integer>(p2, v28));
+        inList.add(new Pair<Integer, Integer>(1, v16));
+        inList.add(new Pair<Integer, Integer>(2, v26));
+        inList.add(new Pair<Integer, Integer>(1, v17));
+        inList.add(new Pair<Integer, Integer>(2, v27));
+        inList.add(new Pair<Integer, Integer>(1, v18));
+        inList.add(new Pair<Integer, Integer>(2, v28));
 
         outList = Pair.disjointPartition(inList);
 
@@ -108,8 +108,8 @@ public class PairTest {
 
     @Test
     public void equals() {
-        Integer p = new Integer(5);
-        Double v = new Double(5.3);
+        int p = 5;
+        double v = 5.3;
 
         Pair<Integer, Double> pv1 = new Pair<Integer, Double>(p, v);
         Pair<Integer, Double> pv2 = new Pair<Integer, Double>(p, v);
@@ -162,8 +162,9 @@ public class PairTest {
 
     @Test
     public void testFlip() {
-        Integer p = new Integer(5);
-        Double v = new Double(5.3);
+        int p = 5;
+        double v = 5.3;
+
         Pair<Integer, Double> pv = new Pair<Integer, Double>(p, v);
 
         Pair<Double, Integer> vp = pv.flip();
@@ -176,9 +177,9 @@ public class PairTest {
 
     @Test
     public void testHashcode() {
-        Integer p = new Integer(5);
-        Double v1 = new Double(5.3);
-        Double v2 = new Double(5.5);
+        int p = 5;
+        double v1 = 5.3;
+        double v2 = 5.5;
 
         Pair<Integer, Double> pv1 = new Pair<Integer, Double>(p, v1);
         Pair<Integer, Double> pv2 = new Pair<Integer, Double>(p, v1);
@@ -200,8 +201,8 @@ public class PairTest {
         // all maps
         assertTrue(mapping.size() == is.size());
         for (Integer i : is)
-            assertTrue(mapping
-                .contains(new Pair<Double, Integer>(functionMock.apply(i), i)));
+            assertTrue(mapping.contains(new Pair<Double, Integer>(functionMock
+                .apply(i), i)));
     }
 
     @Test
@@ -211,23 +212,19 @@ public class PairTest {
 
         Collection<Integer> vs = new ArrayList<Integer>(6);
 
-        Integer v6 = new Integer(6);
-        Integer v7 = new Integer(7);
-        Integer v8 = new Integer(8);
-        Integer v9 = new Integer(9);
+        vs.add(6);
+        vs.add(6);
+        vs.add(7);
+        vs.add(7);
+        vs.add(8);
+        vs.add(9);
 
-        vs.add(v6);
-        vs.add(v6);
-        vs.add(v7);
-        vs.add(v7);
-        vs.add(v8);
-        vs.add(v9);
-        
-        List<Pair<Double,List<Integer>>> partition = Pair.partition(vs, functionMock);
-        
+        List<Pair<Double, List<Integer>>> partition = Pair.partition(vs,
+            functionMock);
+
         assertTrue(partition.size() == 4);
-        
-        for(Pair<Double,List<Integer>> e : partition) {
+
+        for (Pair<Double, List<Integer>> e : partition) {
             assertTrue(e.p != 0);
         }
     }
@@ -248,11 +245,12 @@ public class PairTest {
         assertTrue(cv.compare(pv34, pv58) < 0);
         assertTrue(cv.compare(pv58, pv56) > 0);
         assertTrue(cv.compare(pv56, pv76) == 0);
-        
+
         cp = Pair.pCompare(new Comparator<Integer>() {
             public int compare(Integer o1, Integer o2) {
                 return o2.compareTo(o1);
-            }});
+            }
+        });
         assertTrue(cp.compare(pv34, pv58) > 0);
         assertTrue(cp.compare(pv58, pv56) == 0);
         assertTrue(cp.compare(pv76, pv56) < 0);
@@ -260,23 +258,18 @@ public class PairTest {
         cv = Pair.vCompare(new Comparator<Double>() {
             public int compare(Double o1, Double o2) {
                 return o2.compareTo(o1);
-            }});
+            }
+        });
         assertTrue(cv.compare(pv34, pv58) > 0);
         assertTrue(cv.compare(pv58, pv56) < 0);
         assertTrue(cv.compare(pv56, pv76) == 0);
     }
 
     /*
-    @Test
-    public void testPVList() {
-        // never used
-    }
-    */
+     * @Test public void testPVList() { // never used }
+     */
 
     /*
-    @Test
-    public void testZip() {
-        // never used
-    }
-    */
+     * @Test public void testZip() { // never used }
+     */
 }

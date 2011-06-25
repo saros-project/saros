@@ -261,7 +261,7 @@ public class UnderstandingPico {
     public static class MyInterfaceImpl implements MyInterface {
 
         public MyInterfaceImpl() {
-
+            //
         }
 
         public void print() {
@@ -272,7 +272,7 @@ public class UnderstandingPico {
     public static class MyInterfaceImpl2 implements MyInterface {
 
         public MyInterfaceImpl2() {
-
+            //
         }
 
         public void print() {
@@ -311,8 +311,8 @@ public class UnderstandingPico {
         @Inject
         BB b;
 
-        public void AA() {
-
+        public AA() {
+            //
         }
 
         public void print() {
@@ -322,7 +322,7 @@ public class UnderstandingPico {
 
     public static class BB {
         public BB() {
-
+            //
         }
 
         public void print() {
@@ -332,7 +332,7 @@ public class UnderstandingPico {
 
     public static class CC {
         public CC() {
-
+            //
         }
 
         public void print() {

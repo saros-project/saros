@@ -279,10 +279,9 @@ public class BaseResourceSelectionComposite extends ResourceDisplayComposite {
         /*
          * ... therefore we have to fire them.
          */
-        for (IResource resource : checkStatesChanges.keySet()) {
-            notifyResourceSelectionChanged(resource,
-                checkStatesChanges.get(resource));
-        }
+        for (Map.Entry<IResource, Boolean> entry : checkStatesChanges
+            .entrySet())
+            notifyResourceSelectionChanged(entry.getKey(), entry.getValue());
     }
 
     /**

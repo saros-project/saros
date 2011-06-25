@@ -21,7 +21,6 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -70,7 +69,6 @@ import bmsi.util.DiffPrint;
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
-import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
 import de.fu_berlin.inf.dpp.net.JID;
 
 /**
@@ -147,28 +145,6 @@ public class Utils {
 
     public static String urlUnescape(String toUnescape) {
         return unescape(toUnescape, urlCodec);
-    }
-
-    public static String escapeCDATA(String toEscape) {
-        if (toEscape == null || toEscape.length() == 0) {
-            return "";
-        } else {
-            /*
-             * HACK otherwise there are problems with XMLPullParser which I
-             * don't understand...
-             */
-            if (toEscape.endsWith("]")) {
-                return escapeCDATA(toEscape.substring(0, toEscape.length() - 1))
-                    + "]";
-            }
-            if (!toEscape.endsWith("]]>") && toEscape.endsWith("]>")) {
-                return escapeCDATA(toEscape.substring(0, toEscape.length() - 2))
-                    + "]&gt;";
-            }
-
-            return "<![CDATA[" + toEscape.replaceAll("]]>", "]]]><![CDATA[]>")
-                + "]]>";
-        }
     }
 
     /**
@@ -315,16 +291,6 @@ public class Utils {
                 return it;
             }
         };
-    }
-
-    public static <T> List<T> reverse(T[] original) {
-        return reverse(Arrays.asList(original));
-    }
-
-    public static <T> List<T> reverse(List<T> original) {
-        List<T> reversed = new ArrayList<T>(original);
-        Collections.reverse(reversed);
-        return reversed;
     }
 
     public static PacketFilter orFilter(final PacketFilter... filters) {
@@ -948,90 +914,17 @@ public class Utils {
     }
 
     /**
-     * Replaces all white-space by spaces and trims white-spaces from the
-     * borders of the string
-     * 
-     * Returns null if null is given as a string.
-     */
-    public static String singleLineString(@Nullable String string) {
-        if (string == null)
-            return null;
-
-        return string.trim().replaceAll("\\s+", " ");
-    }
-
-    /**
      * Turn an integer representing a file size into a human readable
-     * representation. For instance 573 becomes 573byte, 16787 becomes 16KiB.
+     * representation. For instance 573 becomes 573 byte, 16787 becomes 16 KiB.
      */
     public static String formatByte(long length) {
-        if (length < 1 << 13) {
-            return length + "byte";
+        if (length < 1024L) {
+            return length + " byte";
         }
-        if (length < 1 << 23) {
-            return (length / 1024) + "KiB";
+        if (length < 1024L * 1024L) {
+            return (length / 1024L) + " KiB";
         }
-        return length / 1024 / 1024 + "MiB";
-    }
-
-    /**
-     * This method can be used for reading an InputStream completely into a byte
-     * array. But unlike IOUtils this method reports progress and is cancelable
-     * via the given monitor.
-     * 
-     * @param estimatedSize
-     *            Estimated size of data in bytes to be read from the input
-     *            stream used for initializing the progress monitor. Note: The
-     *            whole stream is read and not only the given number of bytes.
-     *            The estimated size MUST be greater than 0.
-     * 
-     * @cancelable This long-running operation can be canceled via the given
-     *             progress monitor and will throw an UserCancellationException
-     *             in this case.
-     */
-    public static byte[] toByteArray(InputStream in, long estimatedSize,
-        SubMonitor subMonitor) throws IOException, LocalCancellationException {
-        if (estimatedSize <= 0)
-            throw new IllegalArgumentException("estimated size ("
-                + estimatedSize + ") must be greater than 0.");
-
-        byte[] buf = new byte[CHUNKSIZE];
-        int count;
-        final int totalProgess = 10000;
-        long totalBytesReceived = 0;
-        int lastWorked = 0;
-
-        ByteArrayOutputStream bos = new ByteArrayOutputStream((int) Math.min(
-            estimatedSize, Integer.MAX_VALUE));
-
-        subMonitor.beginTask("Reading from Inputstream", totalProgess);
-
-        try {
-            while ((count = in.read(buf, 0, CHUNKSIZE)) > 0) {
-
-                if (subMonitor.isCanceled())
-                    throw new LocalCancellationException();
-                bos.write(buf, 0, count);
-
-                totalBytesReceived += count;
-
-                // compute progress
-                int worked = (int) Math
-                    .round((totalBytesReceived / (double) estimatedSize)
-                        * totalProgess);
-                // set progress if any between the last loop and now
-                if (worked > lastWorked) {
-                    subMonitor.worked(worked - lastWorked);
-                }
-                // remember last progress for next loop
-                lastWorked = worked;
-
-            }
-            return bos.toByteArray();
-        } finally {
-            IOUtils.closeQuietly(bos);
-            subMonitor.done();
-        }
+        return length / 1024L / 1024L + " MiB";
     }
 
     /**

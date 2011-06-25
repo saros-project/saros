@@ -14,11 +14,11 @@ public class ArrayUtilsTest {
 
         List<Object> objects = new ArrayList<Object>();
 
-        objects.add(new Integer(1));
-        objects.add(new Integer(5));
-        objects.add(new Short((short) 1));
-        objects.add(new Float(1));
-        objects.add(new Double(1));
+        objects.add(1);
+        objects.add(5);
+        objects.add((short) 1);
+        objects.add(1.0f);
+        objects.add(1.0);
 
         List<Number> numbers = ArrayUtils.getInstances(objects.toArray(),
             Number.class);

@@ -590,7 +590,6 @@ public class DiffPrint {
     static String[] slurp(String file) throws IOException {
         InputStream in = new FileInputStream(file);
         try {
-            @SuppressWarnings("unchecked")
             List<String> lines = IOUtils.readLines(in);
             return lines.toArray(new String[lines.size()]);
         } finally {

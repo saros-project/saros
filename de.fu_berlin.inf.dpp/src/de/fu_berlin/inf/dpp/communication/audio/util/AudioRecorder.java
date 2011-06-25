@@ -67,7 +67,7 @@ public class AudioRecorder {
             audioInputStream = new AudioInputStream(line);
             audioInputStream = AudioSystem.getAudioInputStream(audioFormat,
                 audioInputStream);
-            audioFormat = audioInputStream.getFormat();
+
             line.start();
             started = true;
             return true;

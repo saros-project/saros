@@ -82,7 +82,7 @@ public class ResourceChangeValidator extends ModelProvider {
             }
 
             if (resource instanceof IProject) {
-                if (!sarosSession.isShared((IProject) resource))
+                if (!sarosSession.isShared(resource))
                     return false;
 
                 if (delta.getKind() == IResourceDelta.REMOVED) {

@@ -101,13 +101,13 @@ public class ListExplanationComposite extends ExplanationComposite {
         /**
          * Number of columns used for layout
          */
-        final int numCols = 2;
+        final static int NUM_COLS = 2;
 
         public ListExplanationContentComposite(Composite parent, int style,
             ListExplanation listExplanation) {
             super(parent, style);
 
-            GridLayout gridLayout = new GridLayout(numCols, false);
+            GridLayout gridLayout = new GridLayout(NUM_COLS, false);
             gridLayout.marginWidth = 0;
             gridLayout.marginHeight = 0;
             this.setLayout(gridLayout);
@@ -118,7 +118,7 @@ public class ListExplanationComposite extends ExplanationComposite {
             if (listExplanation.introductoryText != null) {
                 Label introductoryLabel = new Label(this, SWT.WRAP);
                 introductoryLabel.setLayoutData(new GridData(SWT.FILL,
-                    SWT.FILL, true, true, numCols, 1));
+                    SWT.FILL, true, true, NUM_COLS, 1));
                 introductoryLabel.setText(listExplanation.introductoryText);
             }
 

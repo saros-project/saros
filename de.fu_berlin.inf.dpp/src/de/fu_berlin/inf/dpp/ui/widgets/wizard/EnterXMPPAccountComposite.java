@@ -183,7 +183,7 @@ public class EnterXMPPAccountComposite extends Composite {
     protected void notifyXMPPServerValidityChanged() {
         String server = this.getServer();
 
-        if (lastXMPPServer != server) {
+        if (!lastXMPPServer.equals(server)) {
             lastXMPPServer = server;
             XMPPServerChangedEvent event = new XMPPServerChangedEvent(server,
                 isXMPPServerValid());

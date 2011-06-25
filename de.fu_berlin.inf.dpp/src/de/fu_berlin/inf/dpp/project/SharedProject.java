@@ -79,7 +79,7 @@ public class SharedProject {
 
         @Override
         public String toString() {
-            return value == null ? null : value.toString();
+            return value == null ? "null" : value.toString();
         }
     }
 
@@ -96,7 +96,7 @@ public class SharedProject {
     protected UpdatableValue<VCSAdapter> vcs = new UpdatableValue<VCSAdapter>(
         null);
 
-    class ResourceInfo {
+    static class ResourceInfo {
         public ResourceInfo(String vcsUrl, String vcsRevision) {
             this.vcsUrl.update(vcsUrl);
             this.vcsRevision.update(vcsRevision);
@@ -123,22 +123,18 @@ public class SharedProject {
          */
         @Override
         public String toString() {
-            Map<String, String> sorted = new TreeMap<String, String>();
-            Set<Map.Entry<IPath, ResourceInfo>> entrySet = this.entrySet();
-            for (Map.Entry<IPath, ResourceInfo> entry : entrySet) {
-                sorted.put(entry.getKey().toString(), entry.getValue()
-                    .toString());
-            }
-            String result = "";
-            boolean addNewLine = false;
+
+            Map<?, ?> sortedMap = new TreeMap<IPath, ResourceInfo>(this);
+            StringBuilder result = new StringBuilder(512);
+
             String fullPath = project.getFullPath().toString() + "/";
-            for (Map.Entry<String, String> entry : sorted.entrySet()) {
-                if (addNewLine)
-                    result += "\n";
-                result += fullPath + entry.getKey() + " -> " + entry.getValue();
-                addNewLine = true;
-            }
-            return result;
+
+            for (Map.Entry<?, ?> entry : sortedMap.entrySet())
+                result.append(fullPath).append(entry.getKey()).append(" -> ")
+                    .append(entry.getValue()).append('\n');
+
+            result.setLength(result.length() - 1);
+            return result.toString();
         }
     };
 
@@ -167,31 +163,40 @@ public class SharedProject {
         public void subscriberResourceChanged(ISubscriberChangeEvent[] deltas) {
             if (!log.isTraceEnabled())
                 return;
-            String result = "subscriberResourceChanged:\n";
+
+            StringBuilder result = new StringBuilder(512);
+            result.append("subscriberResourceChanged:\n");
+
             for (ISubscriberChangeEvent delta : deltas) {
                 int flags = delta.getFlags();
                 boolean syncChanged = (flags & ISubscriberChangeEvent.SYNC_CHANGED) != 0;
+
                 if (flags == ISubscriberChangeEvent.NO_CHANGE)
-                    result += "0";
+                    result.append('0');
                 if (syncChanged)
-                    result += "S";
+                    result.append('S');
                 if ((flags & ISubscriberChangeEvent.ROOT_ADDED) != 0)
-                    result += "+";
+                    result.append('+');
                 if ((flags & ISubscriberChangeEvent.ROOT_REMOVED) != 0)
-                    result += "-";
+                    result.append('-');
+
                 IResource resource = delta.getResource();
-                result += " " + resource.getFullPath().toPortableString();
+                result.append(' ').append(
+                    resource.getFullPath().toPortableString());
+
                 if (syncChanged) {
                     VCSAdapter vcs = VCSAdapter.getAdapter(resource
                         .getProject());
                     if (vcs.isManaged(resource)) {
                         VCSResourceInfo info = vcs.getResourceInfo(resource);
-                        result += format(" ({0}:{1})", info.url, info.revision);
+                        result.append(format(" ({0}:{1})", info.url,
+                            info.revision));
                     }
                 }
-                result += "\n";
+
+                result.append('\n');
             }
-            log.trace(result);
+            log.trace(result.toString());
         }
     };
 

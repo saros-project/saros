@@ -104,10 +104,7 @@ public class SelectionUtils {
             for (Object structuredSelectionItem : structuredSelection.toArray()) {
                 objectsToAdapt.add(structuredSelectionItem);
             }
-        } else {
-            objectsToAdapt.add(objectsToAdapt);
         }
-
         return ArrayUtils
             .getAdaptableObjects(objectsToAdapt.toArray(), adapter);
     }

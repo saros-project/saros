@@ -59,9 +59,12 @@ public class ArchiveStreamService extends StreamService {
     public void startSession(final StreamSession newSession) {
 
         this.startLock.lock();
-        this.streamSession = newSession;
-        this.sessionReceived.signal();
-        this.startLock.unlock();
+        try {
+            this.streamSession = newSession;
+            this.sessionReceived.signal();
+        } finally {
+            this.startLock.unlock();
+        }
 
     }
 

@@ -225,8 +225,7 @@ public class CollaborationUtils {
      * @param projects
      * @return
      */
-    private static String getShareResourcesFailureMessage(
-        Set<IProject> projects) {
+    private static String getShareResourcesFailureMessage(Set<IProject> projects) {
 
         StringBuilder message = new StringBuilder();
         message.append("You are not connected to an XMPP/Jabber server.\n");
@@ -252,23 +251,28 @@ public class CollaborationUtils {
      */
     protected static String getShareProjectDescription(
         ISarosSession sarosSession) {
+
         JID inviter = sarosSession.getHost().getJID();
         Set<IProject> projects = sarosSession.getProjects();
-        String result = inviter.getBase()
-            + " has invited you to a Saros session";
+
+        StringBuilder result = new StringBuilder();
+
+        result.append(inviter.getBase()).append(
+            " has invited you to a Saros session");
 
         if (projects.size() == 1) {
-            result += " with the shared project\n";
+            result.append(" with the shared project\n");
         } else if (projects.size() > 1) {
-            result += " with the shared projects\n";
-        }
-        for (IProject project : projects) {
-            result += "\n - " + project.getName();
-            if (!sarosSession.isCompletelyShared(project))
-                result += " (partial)";
+            result.append(" with the shared projects\n");
         }
 
-        return result;
+        for (IProject project : projects) {
+            result.append("\n - ").append(project.getName());
+            if (!sarosSession.isCompletelyShared(project))
+                result.append(" (partial)");
+        }
+
+        return result.toString();
     }
 
     /**

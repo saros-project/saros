@@ -76,7 +76,7 @@ import de.fu_berlin.inf.dpp.util.Utils;
  */
 public class ActivitySequencer {
 
-    private static Logger log = Logger.getLogger(ActivitySequencer.class
+    private static final Logger log = Logger.getLogger(ActivitySequencer.class
         .getName());
 
     /**
@@ -657,12 +657,13 @@ public class ActivitySequencer {
                     activityDataObjects = userqueue;
                 }
 
-                // Dont send activities to peers that are not in the session (anymore)
+                // Dont send activities to peers that are not in the session
+                // (anymore)
                 if (!recipient.isInSarosSession()) {
                     log.warn("Activities for peer not in session are dropped.");
                     return;
                 }
-                
+
                 JID recipientJID = recipient.getJID();
 
                 List<TimedActivityDataObject> timedActivities = createTimedActivities(
@@ -959,13 +960,13 @@ public class ActivitySequencer {
      * TODO Maybe remove outgoing activityDataObjects from
      * {@link #outgoingQueue} too!?
      * 
-     * @param jid
-     *            of the user that left.
+     * @param user
+     *            the user that left.
      */
-    public void userLeft(JID jid) {
-        incomingQueues.removeQueue(jid);
+    public void userLeft(User user) {
+        incomingQueues.removeQueue(user.getJID());
 
-        queuedOutgoingActivitiesOfUsers.remove(jid);
+        queuedOutgoingActivitiesOfUsers.remove(user);
 
     }
 }

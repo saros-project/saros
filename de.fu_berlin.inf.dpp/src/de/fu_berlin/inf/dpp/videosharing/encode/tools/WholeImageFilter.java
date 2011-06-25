@@ -19,7 +19,6 @@ package de.fu_berlin.inf.dpp.videosharing.encode.tools;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
-import java.awt.image.WritableRaster;
 
 /**
  * A filter which acts as a superclass for filters which need to have the whole
@@ -47,10 +46,6 @@ public abstract class WholeImageFilter extends AbstractBufferedImageOp {
     public BufferedImage filter(BufferedImage src, BufferedImage dst) {
         int width = src.getWidth();
         int height = src.getHeight();
-        @SuppressWarnings("unused")
-        int type = src.getType();
-        @SuppressWarnings("unused")
-        WritableRaster srcRaster = src.getRaster();
 
         originalSpace = new Rectangle(0, 0, width, height);
         transformedSpace = new Rectangle(0, 0, width, height);
@@ -58,13 +53,11 @@ public abstract class WholeImageFilter extends AbstractBufferedImageOp {
 
         if (dst == null) {
             ColorModel dstCM = src.getColorModel();
-            dst = new BufferedImage(dstCM, dstCM
-                .createCompatibleWritableRaster(transformedSpace.width,
+            dst = new BufferedImage(dstCM,
+                dstCM.createCompatibleWritableRaster(transformedSpace.width,
                     transformedSpace.height), dstCM.isAlphaPremultiplied(),
                 null);
         }
-        @SuppressWarnings("unused")
-        WritableRaster dstRaster = dst.getRaster();
 
         int[] inPixels = getRGB(src, 0, 0, width, height, null);
         inPixels = filterPixels(width, height, inPixels, transformedSpace);

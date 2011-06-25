@@ -253,14 +253,14 @@ public class SarosContext {
     };
 
     private static final List<Class<?>> excludedComponentsForTestContext = new ArrayList<Class<?>>(
-        asList(de.fu_berlin.inf.dpp.util.EclipseHelper.class));
+        asList(new Class<?>[] { de.fu_berlin.inf.dpp.util.EclipseHelper.class }));
 
-    private static final Map<Class<?>, Class<?>> testImplementations = new HashMap<Class<?>, Class<?>>() {
-        {
-            put(de.fu_berlin.inf.dpp.util.EclipseHelper.class,
-                EclipseHelperTestSaros.class);
-        }
-    };
+    private static final Map<Class<?>, Class<?>> testImplementations = new HashMap<Class<?>, Class<?>>();
+
+    static {
+        testImplementations.put(de.fu_berlin.inf.dpp.util.EclipseHelper.class,
+            EclipseHelperTestSaros.class);
+    }
 
     private SarosContext() {
         /*

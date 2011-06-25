@@ -22,7 +22,6 @@ package de.fu_berlin.inf.dpp.ui.preferencePages;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.preference.BooleanFieldEditor;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
-import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
@@ -93,11 +92,11 @@ public class GeneralPreferencePage extends FieldEditorPreferencePage implements
 
     @Inject
     Saros saros;
+
     @Inject
     XMPPAccountStore accountStore;
+
     Composite parent;
-    IPreferenceStore preferenceStore;
-    String selectedEntry;
     Label infoLabel;
     Group accountGroup;
     List accountList;

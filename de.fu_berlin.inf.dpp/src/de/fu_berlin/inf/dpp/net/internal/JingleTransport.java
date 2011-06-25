@@ -30,7 +30,6 @@ import de.fu_berlin.inf.dpp.net.internal.DataTransferManager.ITransport;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager.NetTransferMode;
 import de.fu_berlin.inf.dpp.net.jingle.JingleFileTransferSession;
 import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
-import de.fu_berlin.inf.dpp.util.CausedIOException;
 
 public class JingleTransport implements ITransport {
 
@@ -65,8 +64,10 @@ public class JingleTransport implements ITransport {
                             new BinaryChannelConnection(remoteJID, channel,
                                 listener), true);
                     } catch (IOException e) {
-                        new CausedIOException("Could not connect to "
-                            + remoteJID.getName(), e);
+                        log.error(
+                            "could not connect to " + remoteJID.getName(), e);
+                        // throw new CausedIOException("Could not connect to "
+                        // + remoteJID.getName(), e);
                     }
 
                 } else {
@@ -109,7 +110,7 @@ public class JingleTransport implements ITransport {
         this.saros = saros;
     }
 
-    public static JingleTransport getTransport(Saros saros) {
+    public static synchronized JingleTransport getTransport(Saros saros) {
         if (instance == null)
             instance = new JingleTransport(saros);
         return instance;

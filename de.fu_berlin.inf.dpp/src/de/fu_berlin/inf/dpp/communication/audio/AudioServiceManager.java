@@ -102,8 +102,8 @@ public class AudioServiceManager {
             Utils.runSafeSWTAsync(log, new Runnable() {
 
                 public void run() {
-                    DialogUtils.openInformationMessageDialog(EditorAPI
-                        .getShell(), "VoIP Session stopped",
+                    DialogUtils.openInformationMessageDialog(
+                        EditorAPI.getShell(), "VoIP Session stopped",
                         "The VoIP Session has been stopped!");
                 }
             });
@@ -165,8 +165,8 @@ public class AudioServiceManager {
                 Utils.runSafeSWTSync(log, new Runnable() {
 
                     public void run() {
-                        DialogUtils.openErrorMessageDialog(EditorAPI
-                            .getShell(), "VoIP Session Error",
+                        DialogUtils.openErrorMessageDialog(
+                            EditorAPI.getShell(), "VoIP Session Error",
                             "The Invitation was interrupted.");
                     }
                 });
@@ -176,10 +176,10 @@ public class AudioServiceManager {
                 Utils.runSafeSWTSync(log, new Runnable() {
 
                     public void run() {
-                        DialogUtils.openErrorMessageDialog(EditorAPI
-                            .getShell(), "VoIP Session was rejected", target
-                            .getJID()
-                            + " has not accepted your VoIP Invitation.");
+                        DialogUtils.openErrorMessageDialog(
+                            EditorAPI.getShell(), "VoIP Session was rejected",
+                            target.getJID()
+                                + " has not accepted your VoIP Invitation.");
 
                     }
                 });
@@ -190,8 +190,8 @@ public class AudioServiceManager {
                 Utils.runSafeSWTSync(log, new Runnable() {
 
                     public void run() {
-                        DialogUtils.openErrorMessageDialog(EditorAPI
-                            .getShell(), "VoIP Session Error",
+                        DialogUtils.openErrorMessageDialog(
+                            EditorAPI.getShell(), "VoIP Session Error",
                             "Connection Error. Can't send any data!");
                     }
                 });
@@ -201,8 +201,8 @@ public class AudioServiceManager {
                 Utils.runSafeSWTSync(log, new Runnable() {
 
                     public void run() {
-                        DialogUtils.openErrorMessageDialog(EditorAPI
-                            .getShell(), "VoIP Session Error",
+                        DialogUtils.openErrorMessageDialog(
+                            EditorAPI.getShell(), "VoIP Session Error",
                             "Timeout (1000ms) reached. Negotiation canceled");
                     }
                 });
@@ -212,8 +212,8 @@ public class AudioServiceManager {
                 Utils.runSafeSWTSync(log, new Runnable() {
 
                     public void run() {
-                        DialogUtils.openErrorMessageDialog(EditorAPI
-                            .getShell(), "VoIP Session Error",
+                        DialogUtils.openErrorMessageDialog(
+                            EditorAPI.getShell(), "VoIP Session Error",
                             "Unkown Connection Error");
                     }
                 });
@@ -232,8 +232,7 @@ public class AudioServiceManager {
             log.error("Cannot invite. Another VoIP Session is running!");
             return Status.CANCEL_STATUS;
         case STOPPING:
-            log
-                .error("Cannot invite. Another VoIP Session is stopping at the moment!");
+            log.error("Cannot invite. Another VoIP Session is stopping at the moment!");
             return Status.CANCEL_STATUS;
         }
 
@@ -264,14 +263,14 @@ public class AudioServiceManager {
             audioListener.startSession(newSession);
 
             if (recordDeviceOk) {
-                audioSenderRunnable = new AudioSenderRunnable(session
-                    .getOutputStream(0), this, preferenceUtils);
+                audioSenderRunnable = new AudioSenderRunnable(
+                    session.getOutputStream(0), this, preferenceUtils);
                 Utils.runSafeAsync("audioSenderRunnable", log,
                     audioSenderRunnable);
             }
             if (playbackDeviceOk) {
-                audioReceiverRunnable = new AudioReceiverRunnable(session
-                    .getInputStream(0), this, preferenceUtils);
+                audioReceiverRunnable = new AudioReceiverRunnable(
+                    session.getInputStream(0), this, preferenceUtils);
                 audioReceiverRunnable.start();
             }
 
@@ -285,7 +284,7 @@ public class AudioServiceManager {
     /**
      * End a VoIP Session
      */
-    public void stopSession() {
+    public synchronized void stopSession() {
         if (getStatus() != VoIPStatus.STOPPED) {
             log.debug("VoIP session will be stopped.");
             session.stopSession();
@@ -318,11 +317,11 @@ public class AudioServiceManager {
             return true;
     }
 
-    public void setPlaybackDeviceOk(boolean playbackDeviceOk) {
+    public synchronized void setPlaybackDeviceOk(boolean playbackDeviceOk) {
         this.playbackDeviceOk = playbackDeviceOk;
     }
 
-    public void setRecordDeviceOk(boolean recordDeviceOk) {
+    public synchronized void setRecordDeviceOk(boolean recordDeviceOk) {
         this.recordDeviceOk = recordDeviceOk;
     }
 

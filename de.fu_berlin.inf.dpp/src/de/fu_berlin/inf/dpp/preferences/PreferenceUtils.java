@@ -22,12 +22,12 @@ import de.fu_berlin.inf.dpp.net.JID;
 @Component(module = "prefs")
 public class PreferenceUtils {
 
-    protected static Logger log = Logger.getLogger(PreferenceUtils.class
+    private static final Logger log = Logger.getLogger(PreferenceUtils.class
         .getName());
 
-    protected Saros saros;
-    protected MixerManager mixerManager;
-    protected ISecurePreferences securePreferenceStore;
+    private Saros saros;
+    private MixerManager mixerManager;
+    private ISecurePreferences securePreferenceStore;
 
     public PreferenceUtils(Saros saros, MixerManager mixerManager) {
         this.saros = saros;
