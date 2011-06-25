@@ -124,7 +124,12 @@ public class SharedProject {
         @Override
         public String toString() {
 
-            Map<?, ?> sortedMap = new TreeMap<IPath, ResourceInfo>(this);
+            Map<String, String> sortedMap = new TreeMap<String, String>();
+
+            for (Map.Entry<IPath, ResourceInfo> entry : this.entrySet())
+                sortedMap.put(entry.getKey().toString(), entry.getValue()
+                    .toString());
+
             StringBuilder result = new StringBuilder(512);
 
             String fullPath = project.getFullPath().toString() + "/";
