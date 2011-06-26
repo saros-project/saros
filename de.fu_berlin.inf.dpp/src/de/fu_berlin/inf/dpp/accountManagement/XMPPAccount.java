@@ -6,32 +6,47 @@ import java.io.Serializable;
  * Representation of a XMPP-Account.
  * 
  * @author Sebastian Schlaak
+ * @author Stefan Rossbach
  */
-public class XMPPAccount implements Comparable<XMPPAccount>, Serializable {
+public final class XMPPAccount implements Serializable {
 
     private static final long serialVersionUID = 3710620029882513026L;
-    public static final int NOT_INITIALIZED = -1;
 
-    protected final int id;
-    protected String username;
-    protected String password;
-    protected String server;
-    boolean isActive;
+    private final int id;
 
-    public XMPPAccount(int id, String username, String password, String server) {
+    private String username;
+    private String password;
+    private String server;
+
+    private boolean isActive;
+
+    XMPPAccount(int id, String username, String password, String server) {
         this.id = id;
+
+        if (username == null)
+            throw new NullPointerException("user name is null");
+
+        if (password == null)
+            throw new NullPointerException("password is null");
+
+        if (server == null)
+            throw new NullPointerException("server is null");
+
+        if (!server.toLowerCase().equals(server))
+            throw new IllegalArgumentException("server '" + server
+                + "' contains upppercase characters");
+
         this.username = username;
         this.password = password;
         this.server = server;
         this.isActive = false;
-        id = NOT_INITIALIZED;
     }
 
     public String getUsername() {
         return username;
     }
 
-    public void setUsername(String username) {
+    void setUsername(String username) {
         this.username = username;
     }
 
@@ -39,7 +54,7 @@ public class XMPPAccount implements Comparable<XMPPAccount>, Serializable {
         return password;
     }
 
-    public void setPassword(String password) {
+    void setPassword(String password) {
         this.password = password;
     }
 
@@ -47,7 +62,7 @@ public class XMPPAccount implements Comparable<XMPPAccount>, Serializable {
         return server;
     }
 
-    public void setServer(String server) {
+    void setServer(String server) {
         this.server = server;
     }
 
@@ -55,7 +70,7 @@ public class XMPPAccount implements Comparable<XMPPAccount>, Serializable {
         return isActive;
     }
 
-    public void setActive(boolean isActive) {
+    void setActive(boolean isActive) {
         this.isActive = isActive;
     }
 
@@ -66,7 +81,7 @@ public class XMPPAccount implements Comparable<XMPPAccount>, Serializable {
     @Override
     public String toString() {
         if (username.contains("@")) {
-            return String.format("%s [%s]", username, server);
+            return String.format("%s[%s]", username, server);
         } else {
             return String.format("%s@%s", username, server);
         }
@@ -76,11 +91,8 @@ public class XMPPAccount implements Comparable<XMPPAccount>, Serializable {
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = prime * result
-            + ((password == null) ? 0 : password.hashCode());
-        result = prime * result + ((server == null) ? 0 : server.hashCode());
-        result = prime * result
-            + ((username == null) ? 0 : username.hashCode());
+        result = prime * result + server.hashCode();
+        result = prime * result + username.hashCode();
         return result;
     }
 
@@ -92,27 +104,10 @@ public class XMPPAccount implements Comparable<XMPPAccount>, Serializable {
             return false;
         if (getClass() != obj.getClass())
             return false;
-        XMPPAccount other = (XMPPAccount) obj;
-        if (password == null) {
-            if (other.password != null)
-                return false;
-        } else if (!password.equals(other.password))
-            return false;
-        if (server == null) {
-            if (other.server != null)
-                return false;
-        } else if (!server.equals(other.server))
-            return false;
-        if (username == null) {
-            if (other.username != null)
-                return false;
-        } else if (!username.equals(other.username))
-            return false;
-        return true;
-    }
 
-    public int compareTo(XMPPAccount xmppAccount) {
-        return this.getUsername()
-            .compareToIgnoreCase(xmppAccount.getUsername());
+        XMPPAccount other = (XMPPAccount) obj;
+
+        return this.username.equals(other.username)
+            && this.server.equals(other.server);
     }
 }

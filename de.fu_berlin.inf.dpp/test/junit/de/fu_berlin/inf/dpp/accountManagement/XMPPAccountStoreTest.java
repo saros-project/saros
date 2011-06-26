@@ -13,6 +13,7 @@ import org.eclipse.equinox.security.storage.StorageException;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferenceStore;
 import org.junit.AfterClass;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -71,9 +72,25 @@ public class XMPPAccountStoreTest {
         }
     }
 
+    private void addUser(ISecurePreferences pref, int i, String name,
+        String password, String server) {
+        try {
+            pref.put(PreferenceConstants.USERNAME + i, name, true);
+            pref.put(PreferenceConstants.PASSWORD + i, password, true);
+            pref.put(PreferenceConstants.SERVER + i, server, true);
+        } catch (StorageException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     @BeforeClass
     public static void createSaros() throws IOException {
         saros = new SarosStub();
+    }
+
+    @Before
+    public void setUp() {
+        saros.securePreferences = new MemorySecurePreferences();
     }
 
     @AfterClass
@@ -89,7 +106,6 @@ public class XMPPAccountStoreTest {
 
     @Test
     public void testWithDefaultUser() {
-        saros.securePreferences = new MemorySecurePreferences();
 
         createDefaultUser(saros.securePreferences, "alice", "alice",
             "localhost");
@@ -100,17 +116,15 @@ public class XMPPAccountStoreTest {
         XMPPAccount account = list.get(0);
         store.saveAccounts();
 
+        assertTrue(store.isAccountInStore(account));
+
         assertEquals("alice", account.getUsername());
         assertEquals("alice", account.getPassword());
         assertEquals("localhost", account.getServer());
-
-        assertTrue(store.accountsInPreferenceExist());
-
     }
 
     @Test
     public void testLoadAccountsWithError() {
-        saros.securePreferences = new MemorySecurePreferences();
 
         createDefaultUser(saros.securePreferences, "alice", "alice",
             "localhost");
@@ -121,8 +135,6 @@ public class XMPPAccountStoreTest {
         store.saveAccounts();
 
         assertEquals(store.getAllAccounts().size(), 0);
-
-        assertFalse(store.accountsInPreferenceExist());
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -141,8 +153,6 @@ public class XMPPAccountStoreTest {
     @Test
     public void testDeleteExistingAccount() {
 
-        saros.securePreferences = new MemorySecurePreferences();
-
         createDefaultUser(saros.securePreferences, "alice", "alice",
             "localhost");
 
@@ -157,8 +167,6 @@ public class XMPPAccountStoreTest {
     @Test
     public void testCreateDuplicateAccount() {
 
-        saros.securePreferences = new MemorySecurePreferences();
-
         createDefaultUser(saros.securePreferences, "alice", "alice",
             "localhost");
 
@@ -171,8 +179,6 @@ public class XMPPAccountStoreTest {
 
     @Test
     public void testJIDContains() {
-
-        saros.securePreferences = new MemorySecurePreferences();
 
         createDefaultUser(saros.securePreferences, "alice", "alice",
             "localhost");
@@ -190,8 +196,6 @@ public class XMPPAccountStoreTest {
     @Test(expected = IllegalArgumentException.class)
     public void testChangeAccountDataOnNonExistingAccount() {
 
-        saros.securePreferences = new MemorySecurePreferences();
-
         createDefaultUser(saros.securePreferences, "alice", "alice",
             "localhost");
 
@@ -200,14 +204,62 @@ public class XMPPAccountStoreTest {
         store.changeAccountData(Integer.MIN_VALUE, "non", "valid", "user");
     }
 
+    @Test(expected = IllegalStateException.class)
+    public void getActiveAccountOnEmptyStorage() {
+        XMPPAccountStore store = new XMPPAccountStore(saros);
+        if (!store.hasActiveAccount())
+            store.getActiveAccount();
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testCreateAccountWithEmptyName() {
+        XMPPAccountStore store = new XMPPAccountStore(saros);
+        store.createNewAccount("", "bob", "localhost");
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testCreateAccountWithEmptyServer() {
+        XMPPAccountStore store = new XMPPAccountStore(saros);
+        store.createNewAccount("bob", "bob", "");
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void testCreateAccountWithNullName() {
+        XMPPAccountStore store = new XMPPAccountStore(saros);
+        store.createNewAccount(null, "bob", "bob");
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void testCreateAccountWithNullPassword() {
+        XMPPAccountStore store = new XMPPAccountStore(saros);
+        store.createNewAccount("bob", null, "bob");
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void testCreateAccountWithNullServer() {
+        XMPPAccountStore store = new XMPPAccountStore(saros);
+        store.createNewAccount("bob", "bob", null);
+    }
+
+    @Test
+    public void testLoadAccounts() {
+        createDefaultUser(saros.securePreferences, "alice", "alice",
+            "localhost");
+        addUser(saros.securePreferences, 1, "dave", "dave", "localhost");
+        addUser(saros.securePreferences, 2, "edna", "edna", ""); // this account
+                                                                 // must be
+                                                                 // skipped
+        addUser(saros.securePreferences, 3, "", "", "");
+        XMPPAccountStore store = new XMPPAccountStore(saros);
+
+        assertEquals(2, store.getAllAccounts().size());
+    }
+
     @Test
     public void testChangeAccountData() {
 
-        saros.securePreferences = new MemorySecurePreferences();
-
         createDefaultUser(saros.securePreferences, "alice", "alice",
             "localhost");
-
         XMPPAccountStore store = new XMPPAccountStore(saros);
         XMPPAccount account = store.createNewAccount("bob", "bob", "localhost");
 
@@ -217,13 +269,10 @@ public class XMPPAccountStoreTest {
         assertEquals("carl", account.getUsername());
         assertEquals("carl", account.getPassword());
         assertEquals("local", account.getServer());
-
     }
 
-    @Test(expected = IllegalStateException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void testActivateNonExistingAccountOnEmptyStore() {
-
-        saros.securePreferences = new MemorySecurePreferences();
 
         XMPPAccountStore store = new XMPPAccountStore(saros);
         XMPPAccount account = new XMPPAccount(0, "bob", "bob", "localhost");
@@ -234,16 +283,13 @@ public class XMPPAccountStoreTest {
     @Test
     public void testActivateMultipleAccount() {
 
-        saros.securePreferences = new MemorySecurePreferences();
-
         XMPPAccountStore store = new XMPPAccountStore(saros);
         XMPPAccount a = store.createNewAccount("alice", "alice", "localhost");
         XMPPAccount b = store.createNewAccount("bob", "bob", "localhost");
         XMPPAccount c = store.createNewAccount("carl", "carl", "localhost");
 
         saros.securePreferences.allowPutOperation(false);
-        store.saveAccounts(); // for code coverage
-
+        store.flush(); // for code coverage
         store.setAccountActive(a);
         store.setAccountActive(b);
         store.setAccountActive(c);
@@ -253,7 +299,6 @@ public class XMPPAccountStoreTest {
 
     @Test
     public void testGoogleExtension() throws StorageException {
-        saros.securePreferences = new MemorySecurePreferences();
 
         XMPPAccountStore store = new XMPPAccountStore(saros);
         XMPPAccount a = store.createNewAccount("alice", "alice",
@@ -268,7 +313,6 @@ public class XMPPAccountStoreTest {
 
     @Test
     public void testGetServers() {
-        saros.securePreferences = new MemorySecurePreferences();
 
         XMPPAccountStore store = new XMPPAccountStore(saros);
         store.createNewAccount("alice", "alice", "googlemail.com");
@@ -285,7 +329,6 @@ public class XMPPAccountStoreTest {
 
     @Test
     public void testGetDomains() {
-        saros.securePreferences = new MemorySecurePreferences();
 
         XMPPAccountStore store = new XMPPAccountStore(saros);
         store.createNewAccount("alice", "alice", "googlemail.com");
@@ -301,6 +344,18 @@ public class XMPPAccountStoreTest {
         assertTrue("josh =  bloch.com", servers.contains("bloch.com"));
         assertTrue("papa = schlumpfhause.dorf",
             servers.contains("schlumpfhausen.dorf"));
+    }
+
+    @Test
+    public void testComparator() {
+        XMPPAccountStore store = new XMPPAccountStore(saros);
+        store.createNewAccount("alice", "alice", "b");
+        store.createNewAccount("bob", "bob", "b");
+        XMPPAccount account = store.createNewAccount("alice", "foo", "a");
+        XMPPAccount another = store.getAllAccounts().get(0);
+        assertEquals(account.getUsername(), another.getUsername());
+        assertEquals(account.getPassword(), another.getPassword());
+        assertEquals(account.getServer(), another.getServer());
     }
 
 }

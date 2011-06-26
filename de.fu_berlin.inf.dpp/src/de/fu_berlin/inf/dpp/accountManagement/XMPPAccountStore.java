@@ -2,7 +2,10 @@ package de.fu_berlin.inf.dpp.accountManagement;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.eclipse.equinox.security.storage.ISecurePreferences;
@@ -16,6 +19,8 @@ import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
 
 /**
  * Class for the management of multiple XMPP accounts in Saros.
+ * 
+ * @author Stefan Rossbach
  */
 @Component(module = "accountManagement")
 public final class XMPPAccountStore {
@@ -23,7 +28,7 @@ public final class XMPPAccountStore {
     private static Logger log = Logger.getLogger(XMPPAccountStore.class
         .getName());
 
-    private List<XMPPAccount> accounts;
+    private Set<XMPPAccount> accounts;
     private XMPPAccount activeAccount;
     private IPreferenceStore preferenceStore;
     private ISecurePreferences securePreferenceStore;
@@ -33,7 +38,7 @@ public final class XMPPAccountStore {
         this.preferenceStore = saros.getPreferenceStore();
         this.securePreferenceStore = saros.getSecurePrefs();
 
-        accounts = new ArrayList<XMPPAccount>();
+        accounts = new HashSet<XMPPAccount>();
         loadAccounts();
     }
 
@@ -50,7 +55,7 @@ public final class XMPPAccountStore {
         // save the inactive accounts (active account is already saved)
         int i = 1;
         for (XMPPAccount account : accounts) {
-            if (!account.isActive) {
+            if (!account.isActive()) {
 
                 try {
                     this.securePreferenceStore.put(PreferenceConstants.USERNAME
@@ -102,22 +107,22 @@ public final class XMPPAccountStore {
             defaultPassword = this.securePreferenceStore.get(
                 PreferenceConstants.PASSWORD, "");
         } catch (StorageException e) {
-            log.error("Exception while getting account: " + e.getMessage());
+            log.error("exception while getting default account: "
+                + e.getMessage());
         }
 
         // no default account exist
-        if (defaultUsername.length() < 1) {
-            return;
-        } else {
+        if (defaultUsername.length() != 0) {
             XMPPAccount defaultAccount = createNewAccount(defaultUsername,
                 defaultPassword, defaultServer);
             setAccountActive(defaultAccount);
         }
 
         // load the other accounts (keys: username1, password1, ...)
+
         int i = 1;
-        boolean noMoreUserFound = false;
-        do {
+
+        while (true) {
             String username = "";
             String server = "";
             String password = "";
@@ -130,36 +135,22 @@ public final class XMPPAccountStore {
                 password = this.securePreferenceStore.get(
                     PreferenceConstants.PASSWORD + i, "");
             } catch (StorageException e) {
-                log.error("Exception while getting account: " + e.getMessage());
+                log.error("exception while getting account: " + e.getMessage());
             }
 
             i++;
-            if (username.length() < 1) {
-                noMoreUserFound = true;
-            } else {
-                createNewAccount(username, password, server);
+
+            if (username.length() == 0)
+                break;
+
+            if (server.length() == 0) {
+                log.warn("skipping account '" + username
+                    + "', server field is empty");
+                continue;
             }
-        } while (!noMoreUserFound);
-    }
 
-    /**
-     * Return true if an account exists in {@link IPreferenceStore}.
-     * 
-     * @return true if an account exist.
-     */
-    public boolean accountsInPreferenceExist() {
-        String username = "";
-        try {
-            username = this.securePreferenceStore.get(
-                PreferenceConstants.USERNAME, "");
-        } catch (StorageException e) {
-            log.error("Exception while getting account: " + e.getMessage());
+            createNewAccount(username, password, server);
         }
-
-        if (username.length() > 2) {
-            return true;
-        }
-        return false;
     }
 
     /**
@@ -168,8 +159,22 @@ public final class XMPPAccountStore {
      * @return
      */
     public List<XMPPAccount> getAllAccounts() {
-        Collections.sort(this.accounts);
-        return Collections.unmodifiableList(this.accounts);
+        List<XMPPAccount> accounts = new ArrayList<XMPPAccount>(this.accounts);
+
+        Comparator<XMPPAccount> comparator = new Comparator<XMPPAccount>() {
+
+            public int compare(XMPPAccount a, XMPPAccount b) {
+                int c = a.getUsername().compareToIgnoreCase(b.getUsername());
+
+                if (c == 0)
+                    return a.getServer().compareTo(b.getServer());
+                else
+                    return c;
+            }
+        };
+
+        Collections.sort(accounts, comparator);
+        return accounts;
     }
 
     /**
@@ -243,31 +248,25 @@ public final class XMPPAccountStore {
      *            the account to activate.
      */
     public void setAccountActive(XMPPAccount account) {
-        int accountToActivateId = account.getId();
-        int cntActiveAccounts = 0;
-        for (XMPPAccount accountInList : accounts) {
-            int accountInListID = accountInList.getId();
-            if (accountInListID == accountToActivateId) {
-                accountInList.setActive(true);
-                activeAccount = accountInList;
-                cntActiveAccounts++;
-            } else {
-                accountInList.setActive(false);
-            }
-        }
-        checkActiveAccountCount(cntActiveAccounts);
+
+        if (!accounts.contains(account))
+            throw new IllegalArgumentException("account '" + account
+                + "' is not in the current account store");
+
+        if (activeAccount != null)
+            activeAccount.setActive(false);
+
+        account.setActive(true);
+        activeAccount = account;
+
         updateAccountDataToPreferenceStore();
     }
 
-    protected void checkActiveAccountCount(int cntActiveAccounts) {
-        if (cntActiveAccounts < 1) {
-            throw new IllegalStateException("Less then one active Account");
-        } else if (cntActiveAccounts > 1) {
-            throw new IllegalStateException("More the one active Account");
-        }
-    }
+    private void updateAccountDataToPreferenceStore() {
 
-    protected void updateAccountDataToPreferenceStore() {
+        if (activeAccount == null)
+            return;
+
         String username = activeAccount.getUsername();
         String server = activeAccount.getServer();
         String password = activeAccount.getPassword();
@@ -294,54 +293,73 @@ public final class XMPPAccountStore {
             this.securePreferenceStore.put(PreferenceConstants.PASSWORD,
                 password, encryptAccount);
         } catch (StorageException e) {
-            log.error("Error while storing account: " + e.getMessage());
+            log.error("unable to store account '" + activeAccount + "' : "
+                + e.getMessage());
         }
     }
 
     /**
-     * Deletes the account from list.
+     * Deletes the account from the store.
      * 
      * @param account
      *            the account to delete.
      */
     public void deleteAccount(XMPPAccount account) {
-        if (isAccountInList(account)) {
-            this.accounts.remove(account);
-            saveAccounts();
-        } else {
-            throw new IllegalArgumentException("Account is not in List");
-        }
+
+        if (!accounts.contains(account))
+            throw new IllegalArgumentException("account '" + account
+                + "' is not in the current account store");
+
+        this.accounts.remove(account);
+        saveAccounts();
     }
 
     /**
      * 
      * @param account
      *            the account to check.
-     * @return true if the account exists in list.
+     * @return true if the account exists in the current store
      */
-    public boolean isAccountInList(XMPPAccount account) {
+    public boolean isAccountInStore(XMPPAccount account) {
         return this.accounts.contains(account);
-    }
-
-    protected boolean isAccountInList(int accountId) {
-        XMPPAccount found = getAccount(accountId);
-        return isAccountInList(found);
     }
 
     /**
      * Creates an account with a new id.
      * 
      * @param username
-     *            the username of the new account.
+     *            the user name of the new account as lower case string
      * @param password
      *            the password of the new account.
+     * @param server
+     *            the server of the new account as lower case string
      */
+
     public XMPPAccount createNewAccount(String username, String password,
         String server) {
+
+        if (username == null)
+            throw new NullPointerException("username is null");
+
+        if (password == null)
+            throw new NullPointerException("password is null");
+
+        if (server == null)
+            throw new NullPointerException("server is null");
+
+        if (username.trim().length() == 0)
+            throw new IllegalArgumentException("user name is empty");
+
+        if (server.trim().length() == 0)
+            throw new IllegalArgumentException("server is empty");
+
         XMPPAccount newAccount = new XMPPAccount(createNewId(), username,
             password, server);
+
         newAccount.setActive(false);
+
         this.accounts.add(newAccount);
+
         return newAccount;
     }
 
@@ -350,7 +368,7 @@ public final class XMPPAccountStore {
      * 
      * @return a new id.
      */
-    protected int createNewId() {
+    private int createNewId() {
         return maxId++;
     }
 
@@ -362,15 +380,17 @@ public final class XMPPAccountStore {
      * @return the account with the given id.
      */
     public XMPPAccount getAccount(int id) {
+
         XMPPAccount found = null;
-        for (XMPPAccount account : accounts) {
-            if (account.getId() == id) {
+
+        for (XMPPAccount account : accounts)
+            if (account.getId() == id)
                 found = account;
-            }
-        }
-        if (found == null) {
-            handleAccountNotInList(id);
-        }
+
+        if (found == null)
+            throw new IllegalArgumentException("account with id '" + id
+                + "' does not exist");
+
         return found;
     }
 
@@ -378,7 +398,7 @@ public final class XMPPAccountStore {
      * Changes the properties of an account.
      * 
      * @param username
-     *            the new username.
+     *            the new user name.
      * @param password
      *            the new password.
      * @param server
@@ -386,25 +406,24 @@ public final class XMPPAccountStore {
      */
     public void changeAccountData(int id, String username, String password,
         String server) {
-        if (!isAccountInList(id)) {
-            handleAccountNotInList(id);
-        }
+
         XMPPAccount accountToChange = getAccount(id);
+
         accountToChange.setUsername(username);
         accountToChange.setPassword(password);
         accountToChange.setServer(server);
-        if (id == activeAccount.getId()) {
+
+        if (id == activeAccount.getId())
             updateAccountDataToPreferenceStore();
-        }
+
         saveAccounts();
     }
 
-    protected void handleAccountNotInList(int id) {
-        throw new IllegalArgumentException("Account with id " + id
-            + " does not exist.");
-    }
-
     public XMPPAccount getActiveAccount() {
+        if (this.activeAccount == null)
+            throw new IllegalStateException(
+                "there is currently no active account");
+
         return this.activeAccount;
     }
 

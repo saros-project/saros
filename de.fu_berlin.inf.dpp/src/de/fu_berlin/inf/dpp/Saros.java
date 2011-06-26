@@ -916,12 +916,12 @@ public class Saros extends AbstractUIPlugin {
     public boolean configureXMPPAccount() {
         if (xmppAccountStore == null)
             SarosPluginContext.initComponent(this);
-        XMPPAccount xmppAccount = xmppAccountStore.getActiveAccount();
-        if (xmppAccount == null) {
+
+        if (!xmppAccountStore.hasActiveAccount())
             return (WizardUtils.openSarosConfigurationWizard() != null);
-        } else {
-            return (WizardUtils.openEditXMPPAccountWizard(xmppAccount) != null);
-        }
+
+        return (WizardUtils.openEditXMPPAccountWizard(xmppAccountStore
+            .getActiveAccount()) != null);
     }
 
     public void addListener(IConnectionListener listener) {
