@@ -3,7 +3,6 @@
 	<name>de.fu_berlin.inf.dpp.whiteboard</name>
 	<comment></comment>
 	<projects>
-		<project>Saros</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>
