@@ -23,11 +23,10 @@
 	<classpathentry kind="src" path="test/stf"/>
 	<classpathentry kind="src" path="test/junit"/>
 	<classpathentry kind="src" path="ext-src"/>
-	<classpathentry kind="src" path="test/src"/>
 	<classpathentry kind="src" path="test/framework/stf/src"/>
 	<classpathentry exported="true" kind="lib" path="lib/smack.jar" sourcepath="lib/smack_src_saros.zip"/>
 	<classpathentry exported="true" kind="lib" path="lib/smackx.jar" sourcepath="lib/smack_src_saros.zip"/>
-	<classpathentry exported="true" kind="lib" path="lib/smackx-debug.jar" />
+	<classpathentry exported="true" kind="lib" path="lib/smackx-debug.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/smackx-jingle.jar" sourcepath="lib/smack_src_saros.zip"/>
 	<classpathentry exported="true" kind="lib" path="lib/commons-logging.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/picocontainer-2.7.jar" sourcepath="lib/picocontainer-2.7-sources.jar"/>
