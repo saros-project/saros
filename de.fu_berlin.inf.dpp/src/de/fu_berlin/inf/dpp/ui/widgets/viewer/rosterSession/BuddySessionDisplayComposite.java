@@ -1,5 +1,7 @@
 package de.fu_berlin.inf.dpp.ui.widgets.viewer.rosterSession;
 
+import java.util.Collection;
+
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.jface.util.IPropertyChangeListener;
@@ -20,6 +22,7 @@ import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.ui.editors.text.EditorsUI;
 import org.jivesoftware.smack.Connection;
 import org.jivesoftware.smack.Roster;
+import org.jivesoftware.smack.packet.Presence;
 import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.Saros;
@@ -31,6 +34,7 @@ import de.fu_berlin.inf.dpp.editor.ISharedEditorListener;
 import de.fu_berlin.inf.dpp.editor.annotations.SarosAnnotation;
 import de.fu_berlin.inf.dpp.net.ConnectionState;
 import de.fu_berlin.inf.dpp.net.IConnectionListener;
+import de.fu_berlin.inf.dpp.net.IRosterListener;
 import de.fu_berlin.inf.dpp.net.RosterTracker;
 import de.fu_berlin.inf.dpp.project.AbstractSarosSessionListener;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
@@ -77,33 +81,33 @@ public class BuddySessionDisplayComposite extends ViewerComposite {
     @Inject
     protected RosterTracker rosterTracker;
 
-    // protected IRosterListener rosterListener = new IRosterListener() {
-    //
-    // public void entriesAdded(Collection<String> addresses) {
-    // updateViewer();
-    // ViewerUtils.expandAll(viewer);
-    // }
-    //
-    // public void entriesUpdated(Collection<String> addresses) {
-    // updateViewer();
-    // ViewerUtils.expandAll(viewer);
-    // }
-    //
-    // public void entriesDeleted(Collection<String> addresses) {
-    // updateViewer();
-    // ViewerUtils.expandAll(viewer);
-    // }
-    //
-    // public void presenceChanged(Presence presence) {
-    // ViewerUtils.refresh(viewer, true);
-    // }
-    //
-    // public void rosterChanged(Roster roster) {
-    // updateViewer();
-    // ViewerUtils.expandAll(viewer);
-    // }
-    //
-    // };
+    protected IRosterListener rosterListener = new IRosterListener() {
+
+        public void entriesAdded(Collection<String> addresses) {
+            updateViewer();
+            ViewerUtils.expandAll(viewer);
+        }
+
+        public void entriesUpdated(Collection<String> addresses) {
+            updateViewer();
+            ViewerUtils.expandAll(viewer);
+        }
+
+        public void entriesDeleted(Collection<String> addresses) {
+            updateViewer();
+            ViewerUtils.expandAll(viewer);
+        }
+
+        public void presenceChanged(Presence presence) {
+            ViewerUtils.refresh(viewer, true);
+        }
+
+        public void rosterChanged(Roster roster) {
+            updateViewer();
+            ViewerUtils.expandAll(viewer);
+        }
+
+    };
 
     protected IConnectionListener connectionListener = new IConnectionListener() {
         public void connectionStateChanged(Connection connection,
@@ -213,7 +217,7 @@ public class BuddySessionDisplayComposite extends ViewerComposite {
             editorPrefsListener);
         editorManager.addSharedEditorListener(sharedEditorListener);
 
-        // this.rosterTracker.addRosterListener(rosterListener);
+        this.rosterTracker.addRosterListener(rosterListener);
 
         this.addDisposeListener(new DisposeListener() {
             public void widgetDisposed(DisposeEvent e) {
@@ -233,7 +237,7 @@ public class BuddySessionDisplayComposite extends ViewerComposite {
                     saros.removeListener(connectionListener);
                 }
                 if (rosterTracker != null) {
-                    // rosterTracker.removeRosterListener(rosterListener);
+                    rosterTracker.removeRosterListener(rosterListener);
                 }
             }
         });

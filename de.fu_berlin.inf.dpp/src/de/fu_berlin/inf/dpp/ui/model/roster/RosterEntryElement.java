@@ -136,6 +136,11 @@ public class RosterEntryElement extends TreeElement {
         }
     }
 
+    public boolean isOnline() {
+        Presence presence = this.roster.getPresence(this.jid.getBase());
+        return presence.isAvailable() || presence.isAway();
+    }
+
     public boolean isSarosSupported() {
         boolean sarosSupported = false;
 
