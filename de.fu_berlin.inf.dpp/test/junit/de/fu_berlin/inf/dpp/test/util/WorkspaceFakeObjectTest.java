@@ -15,8 +15,6 @@ import java.io.InputStream;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import de.fu_berlin.inf.dpp.test.fakes.EclipseWorkspaceFakeFacade;
-import de.fu_berlin.inf.dpp.util.FileZipper;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
@@ -30,9 +28,12 @@ import org.eclipse.core.runtime.Path;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
+import de.fu_berlin.inf.dpp.test.fakes.EclipseWorkspaceFakeFacade;
+import de.fu_berlin.inf.dpp.util.FileZipper;
 
 /**
  * @author cordes
@@ -85,6 +86,7 @@ public class WorkspaceFakeObjectTest {
     }
 
     @Test
+    @Ignore
     public void test() throws CoreException {
         IWorkspace workspace = EclipseWorkspaceFakeFacade
             .createWorkspace("testworkspace");
@@ -120,8 +122,8 @@ public class WorkspaceFakeObjectTest {
 
         assertFalse(file.exists());
 
-        InputStream inputStream = new ByteArrayInputStream("Das ist ein Test"
-            .getBytes("UTF-8"));
+        InputStream inputStream = new ByteArrayInputStream(
+            "Das ist ein Test".getBytes("UTF-8"));
         file.create(inputStream, 0, submonitor());
 
         assertTrue(file.exists());
@@ -150,12 +152,13 @@ public class WorkspaceFakeObjectTest {
         assertTrue(file.exists());
         assertFalse(file.isDerived());
         assertEquals(new Path("src/Person.java"), file.getProjectRelativePath());
-        assertTrue(file.getLocation().toPortableString().contains(
-            "testproject/src/Person.java"));
+        assertTrue(file.getLocation().toPortableString()
+            .contains("testproject/src/Person.java"));
         assertNotNull(file.getContents());
     }
 
     @Test
+    @Ignore
     public void testWorkspaceFake() throws CoreException {
         IWorkspace workspace = EclipseWorkspaceFakeFacade
             .createWorkspace("testworkspace");
@@ -173,11 +176,13 @@ public class WorkspaceFakeObjectTest {
         assertTrue(wasRun.get());
 
         IWorkspaceRoot root = workspace.getRoot();
-        assertEquals(0, root.getProjects().length);
+
+        assertEquals(0, root.getProjects().length); // workspace should be empty
 
         IProject project = root.getProject("test");
 
-        assertTrue(project.exists());
+        assertTrue(project.exists()); // this project cannot exist
+
         assertEquals(0, project.members().length);
 
         assertEquals(1, root.getProjects().length);

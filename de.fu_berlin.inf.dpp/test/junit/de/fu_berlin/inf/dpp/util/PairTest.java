@@ -55,29 +55,20 @@ public class PairTest {
             6);
         List<Pair<Integer, List<Integer>>> outList;
 
-        Integer p1 = new Integer(1);
-        Integer p2 = new Integer(2);
-        Integer v16 = new Integer(6);
-        Integer v17 = new Integer(7);
-        Integer v18 = new Integer(8);
-        Integer v26 = new Integer(6);
-        Integer v27 = new Integer(7);
-        Integer v28 = new Integer(8);
-
         HashSet<Integer> vSet = new HashSet<Integer>();
-        vSet.add(v16);
-        vSet.add(v17);
-        vSet.add(v18);
-        vSet.add(v26);
-        vSet.add(v27);
-        vSet.add(v28);
+        vSet.add(6);
+        vSet.add(7);
+        vSet.add(8);
+        vSet.add(Integer.MAX_VALUE);
 
-        inList.add(new Pair<Integer, Integer>(1, v16));
-        inList.add(new Pair<Integer, Integer>(2, v26));
-        inList.add(new Pair<Integer, Integer>(1, v17));
-        inList.add(new Pair<Integer, Integer>(2, v27));
-        inList.add(new Pair<Integer, Integer>(1, v18));
-        inList.add(new Pair<Integer, Integer>(2, v28));
+        inList.add(new Pair<Integer, Integer>(1, 6));
+        inList.add(new Pair<Integer, Integer>(2, 6));
+        inList.add(new Pair<Integer, Integer>(1, 7));
+        inList.add(new Pair<Integer, Integer>(2, 7));
+        inList.add(new Pair<Integer, Integer>(1, 8));
+        inList.add(new Pair<Integer, Integer>(2, 8));
+        inList.add(new Pair<Integer, Integer>(1, Integer.MAX_VALUE));
+        inList.add(new Pair<Integer, Integer>(2, Integer.MAX_VALUE));
 
         outList = Pair.disjointPartition(inList);
 
@@ -88,8 +79,8 @@ public class PairTest {
         while (iter.hasNext()) {
             Pair<Integer, List<Integer>> pair = iter.next();
 
-            assertTrue((pair.p == p1) || (pair.p == p2));
-            assertTrue(pair.v.size() == 3);
+            assertTrue((pair.p == 1) || (pair.p == 2));
+            assertTrue(pair.v.size() == 4);
 
             Iterator<Integer> intIter = pair.v.iterator();
             Integer vOld = 0;
