@@ -42,9 +42,6 @@ public class InviteAndLeaveStressTest extends StfTestCase {
 
             leaveSessionHostFirst(ALICE);
 
-            if (i < 10)
-                Util.deleteAllProjects(BOB);
-
         }
 
         BOB.superBot().views().packageExplorerView()

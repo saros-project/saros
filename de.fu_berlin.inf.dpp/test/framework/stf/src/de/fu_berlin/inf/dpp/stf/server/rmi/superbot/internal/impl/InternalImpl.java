@@ -1,9 +1,29 @@
 package de.fu_berlin.inf.dpp.stf.server.rmi.superbot.internal.impl;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.rmi.RemoteException;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Random;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IFolder;
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IProjectDescription;
+import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
+import org.eclipse.jdt.core.IClasspathEntry;
+import org.eclipse.jdt.core.IJavaProject;
+import org.eclipse.jdt.core.JavaCore;
+import org.eclipse.jdt.launching.IVMInstall;
+import org.eclipse.jdt.launching.JavaRuntime;
+import org.eclipse.jdt.launching.LibraryLocation;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.Version;
 
@@ -102,5 +122,174 @@ public class InternalImpl extends StfRemoteObject implements IInternal {
 
         log.trace("changed saros version to its default state");
         sarosBundle = null;
+    }
+
+    public void createFile(String project, String path, String content)
+        throws RemoteException {
+
+        path = path.replace('\\', '/');
+
+        int idx = path.lastIndexOf('/');
+
+        if (idx != -1)
+            createFolder(project, path.substring(0, idx));
+
+        IFile file = ResourcesPlugin.getWorkspace().getRoot()
+            .getProject(project).getFile(path);
+
+        try {
+            file.create(new ByteArrayInputStream(content.getBytes()), true,
+                null);
+        } catch (CoreException e) {
+            log.debug(e.getMessage(), e);
+            throw new RemoteException(e.getMessage(), e.getCause());
+        }
+    }
+
+    private static class GeneratingInputStream extends InputStream {
+
+        private Random random = null;
+        private int size;
+
+        public GeneratingInputStream(int size, boolean compressAble) {
+            this.size = size;
+            if (!compressAble)
+                this.random = new Random();
+        }
+
+        @Override
+        public int read() throws IOException {
+            if (size == 0)
+                return -1;
+
+            size--;
+
+            if (random != null)
+                return random.nextInt() & 0xFF;
+
+            return 'A';
+        }
+
+    }
+
+    public void createFile(String project, String path, int size,
+        boolean compressAble) throws RemoteException {
+
+        path = path.replace('\\', '/');
+
+        int idx = path.lastIndexOf('/');
+
+        if (idx != -1)
+            createFolder(project, path.substring(0, idx));
+
+        IFile file = ResourcesPlugin.getWorkspace().getRoot()
+            .getProject(project).getFile(path);
+
+        try {
+            file.create(new GeneratingInputStream(size, compressAble), true,
+                null);
+        } catch (CoreException e) {
+            log.error(e.getMessage(), e);
+            throw new RemoteException(e.getMessage(), e.getCause());
+        }
+    }
+
+    public boolean deleteWorkspace() throws RemoteException {
+        boolean error = false;
+        for (IProject project : ResourcesPlugin.getWorkspace().getRoot()
+            .getProjects()) {
+            try {
+                project.delete(true, true, null);
+            } catch (CoreException e) {
+                error = true;
+                log.debug("unable to delete project '" + project.getName()
+                    + "' :" + e.getMessage(), e);
+            }
+        }
+        return !error;
+    }
+
+    public void createProject(String projectName) throws RemoteException {
+        IProject project = ResourcesPlugin.getWorkspace().getRoot()
+            .getProject(projectName);
+        try {
+            project.create(null);
+            project.open(null);
+        } catch (CoreException e) {
+            log.debug(
+                "unable to create project '" + project + "' :" + e.getMessage(),
+                e);
+            throw new RemoteException(e.getMessage(), e);
+        }
+    }
+
+    public void createJavaProject(String projectName) throws RemoteException {
+        IProject project = ResourcesPlugin.getWorkspace().getRoot()
+            .getProject(projectName);
+        try {
+            project.create(null);
+            project.open(null);
+
+            IProjectDescription description = project.getDescription();
+            description.setNatureIds(new String[] { JavaCore.NATURE_ID });
+            project.setDescription(description, null);
+
+            IJavaProject javaProject = JavaCore.create(project);
+
+            Set<IClasspathEntry> entries = new HashSet<IClasspathEntry>();
+
+            entries.add(JavaCore.newSourceEntry(
+                javaProject.getPath().append("src"), new IPath[0]));
+
+            IVMInstall vmInstall = JavaRuntime.getDefaultVMInstall();
+
+            LibraryLocation[] locations = JavaRuntime
+                .getLibraryLocations(vmInstall);
+
+            for (LibraryLocation element : locations) {
+                entries.add(JavaCore.newLibraryEntry(
+                    element.getSystemLibraryPath(), null, null));
+            }
+
+            javaProject.setRawClasspath(
+                entries.toArray(new IClasspathEntry[entries.size()]), null);
+
+        } catch (CoreException e) {
+            log.debug(
+                "unable to create java project '" + project + "' :"
+                    + e.getMessage(), e);
+            throw new RemoteException(e.getMessage(), e);
+        }
+    }
+
+    private void createFolder(String projectName, String path)
+        throws RemoteException {
+
+        path = path.replace('\\', '/');
+
+        IProject project = ResourcesPlugin.getWorkspace().getRoot()
+            .getProject(projectName);
+
+        try {
+
+            String segments[] = path.split("/");
+            IFolder folder = project.getFolder(segments[0]);
+            log.trace(Arrays.asList(segments));
+            if (!folder.exists())
+                folder.create(true, true, null);
+
+            if (segments.length <= 1)
+                return;
+
+            for (int i = 1; i < segments.length; i++) {
+                folder = folder.getFolder(segments[i]);
+                if (!folder.exists())
+                    folder.create(true, true, null);
+            }
+
+        } catch (CoreException e) {
+            log.error(e.getMessage(), e);
+            throw new RemoteException(e.getMessage(), e.getCause());
+        }
     }
 }

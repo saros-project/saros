@@ -203,6 +203,13 @@ public final class PEView extends StfRemoteObject implements IPEView {
             SarosConditions.isResourceExist(fullPath));
     }
 
+    public void waitUntilFolderNotExists(String... folderNodes)
+        throws RemoteException {
+        String fullPath = Util.getPath(folderNodes);
+        RemoteWorkbenchBot.getInstance().waitUntil(
+            SarosConditions.isResourceNotExist(fullPath));
+    }
+
     public void waitUntilPkgExists(String projectName, String pkg)
         throws RemoteException {
         if (pkg.matches(PKG_REGEX)) {
@@ -235,6 +242,13 @@ public final class PEView extends StfRemoteObject implements IPEView {
         String fullPath = Util.getPath(fileNodes);
         RemoteWorkbenchBot.getInstance().waitUntil(
             SarosConditions.isResourceExist(fullPath));
+    }
+
+    public void waitUntilFileNotExists(String... fileNodes)
+        throws RemoteException {
+        String fullPath = Util.getPath(fileNodes);
+        RemoteWorkbenchBot.getInstance().waitUntil(
+            SarosConditions.isResourceNotExist(fullPath));
     }
 
     public void waitUntilClassExists(String projectName, String pkg,

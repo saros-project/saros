@@ -15,7 +15,6 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import de.fu_berlin.inf.dpp.stf.client.StfTestCase;
-import de.fu_berlin.inf.dpp.stf.client.util.Util;
 import de.fu_berlin.inf.dpp.stf.shared.Constants.TypeOfCreateProject;
 import de.fu_berlin.inf.dpp.stf.test.Constants;
 
@@ -113,7 +112,7 @@ public class SVNStateInitializationTest extends StfTestCase {
             .existsWithRegex(Constants.SVN_PROJECT))
             ALICE.superBot().views().packageExplorerView()
                 .selectJavaProject(Constants.SVN_PROJECT).delete();
-        Util.deleteAllProjects(BOB);
+        BOB.superBot().internal().deleteWorkspace();
     }
 
     /**

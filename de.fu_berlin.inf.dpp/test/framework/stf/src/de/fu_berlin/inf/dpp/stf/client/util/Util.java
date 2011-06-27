@@ -54,27 +54,6 @@ public class Util {
     }
 
     /**
-     * Deletes all projects from the current active workspace
-     * 
-     * @param tester
-     *            the remote tester e.g: Alice
-     * 
-     * @WARNING calling this method while still <b>in a session</b> can result
-     *          in <b>unexpected</b> behavior
-     **/
-    public static void deleteAllProjects(AbstractTester tester)
-        throws RemoteException {
-        tester.remoteBot().closeAllEditors();
-        List<String> treeItems = tester.superBot().views()
-            .packageExplorerView().tree().getTextOfTreeItems();
-        for (String treeItem : treeItems) {
-            tester.superBot().views().packageExplorerView()
-                .selectProject(treeItem).delete();
-        }
-
-    }
-
-    /**
      * Opens the view <b>Saros</b>
      * 
      * @param tester
@@ -108,8 +87,20 @@ public class Util {
         AbstractTester inviter, AbstractTester... invitees)
         throws RemoteException {
 
-        inviter.superBot().views().packageExplorerView().tree().newC()
-            .javaProjectWithClasses(projectName, packageName, className);
+        String path = "src/" + packageName.replace(".", "/") + "/" + className
+            + ".java";
+
+        StringBuilder content = new StringBuilder();
+
+        if (packageName.trim().length() > 0)
+            content.append("package ").append(packageName).append(';')
+                .append('\n').append('\n');
+
+        content.append("public class ").append(className).append(" {\n\n}");
+
+        inviter.superBot().internal().createJavaProject(projectName);
+        inviter.superBot().internal()
+            .createFile(projectName, path, content.toString());
 
         buildSessionConcurrently(projectName, TypeOfCreateProject.NEW_PROJECT,
             inviter, invitees);

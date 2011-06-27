@@ -2,8 +2,7 @@ package de.fu_berlin.inf.dpp.stf.test.filefolderoperations;
 
 import static de.fu_berlin.inf.dpp.stf.client.tester.SarosTester.ALICE;
 import static de.fu_berlin.inf.dpp.stf.client.tester.SarosTester.BOB;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.rmi.RemoteException;
 
@@ -13,9 +12,10 @@ import org.junit.Test;
 import de.fu_berlin.inf.dpp.stf.annotation.TestLink;
 import de.fu_berlin.inf.dpp.stf.client.StfTestCase;
 import de.fu_berlin.inf.dpp.stf.client.util.Util;
+import de.fu_berlin.inf.dpp.stf.shared.Constants.TypeOfCreateProject;
 import de.fu_berlin.inf.dpp.stf.test.Constants;
 
-@TestLink(id = "")
+@TestLink(id = "Saros-43_folder_operations")
 public class FolderOperationsTest extends StfTestCase {
 
     /**
@@ -37,53 +37,21 @@ public class FolderOperationsTest extends StfTestCase {
         setUpSaros();
     }
 
-    /**
-     * Steps:
-     * <ol>
-     * <li>ALICE rename the folder "FOLDER1" to "newFolderName"</li>
-     * </ol>
-     * 
-     * Result:
-     * <ol>
-     * <li>the folder'name are renamed by BOB too</li>
-     * </ol>
-     * 
-     * @throws RemoteException
-     */
     @Test
     public void testRenameFolder() throws RemoteException {
+
+        ALICE.superBot().views().packageExplorerView().tree().newC()
+            .project("foo");
+        ALICE.superBot().internal()
+            .createFile("foo", "test/foo.txt", 1024 * 1024 * 6, true);
+
+        Util.buildSessionSequentially("foo", TypeOfCreateProject.NEW_PROJECT,
+            ALICE, BOB);
+
+        ALICE.remoteBot().sleep(30000);
+        fail();
         Util.setUpSessionWithAJavaProjectAndAClass(Constants.PROJECT1,
             Constants.PKG1, Constants.CLS1, ALICE, BOB);
 
-        if (!ALICE.superBot().views().packageExplorerView()
-            .selectPkg(Constants.PROJECT1, Constants.PKG1)
-            .existsWithRegex(Constants.CLS1))
-            ALICE.superBot().views().packageExplorerView().tree().newC()
-                .cls(Constants.PROJECT1, Constants.PKG1, Constants.CLS1);
-
-        if (!ALICE.superBot().views().packageExplorerView()
-            .selectProject(Constants.PROJECT1)
-            .existsWithRegex(Constants.FOLDER1))
-            ALICE.superBot().views().packageExplorerView()
-                .selectProject(Constants.PROJECT1).newC()
-                .folder(Constants.FOLDER1);
-
-        BOB.superBot()
-            .views()
-            .packageExplorerView()
-            .waitUntilClassExists(Constants.PROJECT1, Constants.PKG1,
-                Constants.CLS1);
-
-        final String newFolderName = Constants.FOLDER1 + "New";
-        ALICE.superBot().views().packageExplorerView()
-            .selectFolder(Constants.PROJECT1, Constants.FOLDER1).refactor()
-            .rename(newFolderName);
-
-        BOB.superBot().views().packageExplorerView()
-            .waitUntilFolderExists(Constants.PROJECT1, newFolderName);
-        assertTrue(BOB.superBot().views().packageExplorerView()
-            .selectProject(Constants.PROJECT1).existsWithRegex(newFolderName));
-        assertFalse(BOB.superBot().views().packageExplorerView()
-            .selectProject(Constants.PROJECT1).exists(Constants.FOLDER1));
     }
 }

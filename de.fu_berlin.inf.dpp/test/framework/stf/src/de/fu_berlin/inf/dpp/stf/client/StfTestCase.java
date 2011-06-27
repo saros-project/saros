@@ -106,8 +106,7 @@ public abstract class StfTestCase {
             tester.superBot().menuBar().window().openPerspective();
             Util.closeUnnecessaryViews(tester);
             tester.remoteBot().resetWorkbench();
-            Util.deleteAllProjects(tester);
-
+            tester.superBot().internal().deleteWorkspace();
         }
     }
 
@@ -140,8 +139,7 @@ public abstract class StfTestCase {
      * <li>reset all buddy names by calling
      * {@linkplain #resetBuddyNames(AbstractTester)}</li>
      * <li>disconnect from the current session</li>
-     * <li>delete all projects by calling
-     * {@linkplain Util#deleteAllProjects(AbstractTester)}</li>
+     * <li>delete the contents of the workspace</li>
      * </ol>
      * 
      * 
@@ -152,7 +150,7 @@ public abstract class StfTestCase {
             for (AbstractTester tester : currentTesters) {
                 resetBuddyNames(tester);
                 tester.superBot().views().sarosView().disconnect();
-                Util.deleteAllProjects(tester);
+                tester.superBot().internal().deleteWorkspace();
             }
         } finally {
             currentTesters.clear();
@@ -254,15 +252,14 @@ public abstract class StfTestCase {
     }
 
     /**
-     * Deletes all projects from all active testers by sequentially calling
-     * {@link Util#deleteAllProjects(AbstractTester tester)}
+     * Deletes all projects from all active testers by sequentially
      * 
      * @throws RemoteException
      */
     public static void deleteAllProjectsByActiveTesters()
         throws RemoteException {
         for (AbstractTester tester : currentTesters) {
-            Util.deleteAllProjects(tester);
+            tester.superBot().internal().deleteWorkspace();
         }
     }
 

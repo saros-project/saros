@@ -10,16 +10,11 @@ import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotEditor;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.contextmenu.peview.IContextMenusInPEView;
 
 /**
- * This interface contains only APIs to select treeItems in the package explorer
- * view e.g.
- * 
- * <pre>
- * alice.pEV.selectProject(...)
- * </pre>
- * 
- * </li>
+ * This interface contains methods to select treeItems in the package explorer
+ * view
  * 
  * @author lchen
+ * @author Stefan Rossbach
  */
 public interface IPEView extends Remote {
 
@@ -150,6 +145,17 @@ public interface IPEView extends Remote {
         throws RemoteException;
 
     /**
+     * Wait until the specified folder does not exist
+     * 
+     * @param folderNodes
+     *            node path to expand. Attempts to expand all nodes along the
+     *            path specified by the node array parameter.e.g.
+     *            {"Foo-saros","parentFolder" ,"myFolder"}
+     */
+    public void waitUntilFolderNotExists(String... folderNodes)
+        throws RemoteException;
+
+    /**
      * wait until the given package exists
      * 
      * @param projectName
@@ -217,6 +223,17 @@ public interface IPEView extends Remote {
      *            "myFolder", "myFile.xml"}
      */
     public void waitUntilFileExists(String... fileNodes) throws RemoteException;
+
+    /**
+     * Wait until the file does not exist.
+     * 
+     * @param fileNodes
+     *            node path to expand. Attempts to expand all nodes along the
+     *            path specified by the node array parameter.e.g. {"Foo-saros",
+     *            "myFolder", "myFile.xml"}
+     */
+    public void waitUntilFileNotExists(String... fileNodes)
+        throws RemoteException;
 
     /**
      * waits until the window with the title "Saros running VCS operation" is
