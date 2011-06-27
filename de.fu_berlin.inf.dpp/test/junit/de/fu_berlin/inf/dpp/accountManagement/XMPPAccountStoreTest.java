@@ -358,4 +358,22 @@ public class XMPPAccountStoreTest {
         assertEquals(account.getServer(), another.getServer());
     }
 
+    @Test(expected = IllegalArgumentException.class)
+    public void testChangeAccountToAnAlreadyExisting() {
+        XMPPAccountStore store = new XMPPAccountStore(saros);
+        store.createNewAccount("alice", "alice", "b");
+        XMPPAccount account = store.createNewAccount("bob", "bob", "b");
+        store.changeAccountData(account.getId(), "alice", "bob", "b");
+    }
+
+    @Test
+    public void testChangeAccountDataAndThenDeleteAccount() {
+        XMPPAccountStore store = new XMPPAccountStore(saros);
+        store.createNewAccount("alice", "alice", "b");
+        XMPPAccount account = store.createNewAccount("bob", "bob", "b");
+        store.changeAccountData(account.getId(), "bob1", "bob", "b");
+        store.deleteAccount(account);
+        assertEquals(1, store.getAllAccounts().size());
+    }
+
 }

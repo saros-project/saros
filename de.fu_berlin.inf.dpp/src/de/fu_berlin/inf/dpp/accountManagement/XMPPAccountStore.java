@@ -408,12 +408,18 @@ public final class XMPPAccountStore {
         String server) {
 
         XMPPAccount accountToChange = getAccount(id);
-
+        accounts.remove(accountToChange);
         accountToChange.setUsername(username);
         accountToChange.setPassword(password);
         accountToChange.setServer(server);
 
-        if (id == activeAccount.getId())
+        if (accounts.contains(accountToChange))
+            throw new IllegalArgumentException("an account with user name '"
+                + username + " and server '" + server + "' already exists");
+
+        accounts.add(accountToChange);
+
+        if (activeAccount != null && id == activeAccount.getId())
             updateAccountDataToPreferenceStore();
 
         saveAccounts();
