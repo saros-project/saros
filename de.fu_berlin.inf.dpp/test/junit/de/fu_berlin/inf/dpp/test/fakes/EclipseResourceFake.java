@@ -176,10 +176,8 @@ public abstract class EclipseResourceFake implements IResource {
     }
 
     public IPath getProjectRelativePath() {
-        String path = wrappedFile.getPath();
-        path = path.replaceAll(project.getWrappedFile().getPath(), "");
-        path = path.replaceFirst("/", "");
-        return new Path(path);
+        return new Path(wrappedFile.getPath().substring(
+            project.getWrappedFile().getPath().length() + 1));
     }
 
     public IPath getRawLocation() {
