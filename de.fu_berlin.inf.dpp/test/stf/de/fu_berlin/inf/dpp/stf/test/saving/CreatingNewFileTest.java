@@ -3,21 +3,23 @@ package de.fu_berlin.inf.dpp.stf.test.saving;
 import static de.fu_berlin.inf.dpp.stf.client.tester.SarosTester.ALICE;
 import static de.fu_berlin.inf.dpp.stf.client.tester.SarosTester.BOB;
 import static de.fu_berlin.inf.dpp.stf.client.tester.SarosTester.CARL;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
-import java.io.IOException;
 import java.rmi.RemoteException;
 
-import org.eclipse.core.runtime.CoreException;
-import org.junit.After;
+import org.eclipse.swtbot.swt.finder.widgets.TimeoutException;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import de.fu_berlin.inf.dpp.stf.annotation.TestLink;
 import de.fu_berlin.inf.dpp.stf.client.StfTestCase;
 import de.fu_berlin.inf.dpp.stf.client.util.Util;
-import de.fu_berlin.inf.dpp.stf.test.Constants;
+import de.fu_berlin.inf.dpp.stf.shared.Constants.TypeOfCreateProject;
 
+@TestLink(id = "Saros-18_creating_new_files")
 public class CreatingNewFileTest extends StfTestCase {
 
     @BeforeClass
@@ -25,153 +27,87 @@ public class CreatingNewFileTest extends StfTestCase {
         initTesters(ALICE, BOB, CARL);
         setUpWorkbench();
         setUpSaros();
-        Util.setUpSessionWithAJavaProjectAndAClass(Constants.PROJECT1,
-            Constants.PKG1, Constants.CLS1, CARL, BOB, ALICE);
     }
-
-    @After
-    public void runAfterEveryTest() throws RemoteException {
-        deleteFoldersByActiveTesters(Constants.PROJECT1, Constants.FOLDER1,
-            Constants.FOLDER2);
-    }
-
-    /**
-     * Steps:
-     * <ol>
-     * <li>CARL creates a new file.</li>
-     * </ol>
-     * 
-     * Result:
-     * <ol>
-     * <li>ALICE and BOB should see the new file in the package explorer.</li>
-     * </ol>
-     * 
-     * @throws CoreException
-     * @throws IOException
-     */
 
     @Test
-    public void testCarlCreateANewFile() throws IOException, CoreException {
-        CARL.remoteBot().sleep(10000);
-        CARL.superBot().views().packageExplorerView()
-            .selectProject(Constants.PROJECT1).newC().folder(Constants.FOLDER1);
-        CARL.superBot().views().packageExplorerView()
-            .selectFolder(Constants.PROJECT1, Constants.FOLDER1).newC()
-            .file(Constants.FILE1);
-        ALICE
-            .superBot()
-            .views()
-            .packageExplorerView()
-            .waitUntilFileExists(Constants.PROJECT1, Constants.FOLDER1,
-                Constants.FILE1);
-        assertTrue(ALICE.superBot().views().packageExplorerView()
-            .selectFolder(Constants.PROJECT1, Constants.FOLDER1)
-            .existsWithRegex(Constants.FILE1));
-        BOB.superBot()
-            .views()
-            .packageExplorerView()
-            .waitUntilFileExists(Constants.PROJECT1, Constants.FOLDER1,
-                Constants.FILE1);
-        assertTrue(BOB.superBot().views().packageExplorerView()
-            .selectFolder(Constants.PROJECT1, Constants.FOLDER1)
-            .existsWithRegex(Constants.FILE1));
-    }
+    public void testCreatingNewFileTest() throws RemoteException {
 
-    /**
-     * Steps:
-     * <ol>
-     * <li>CARL restrict to read-only access to ALICE.</li>
-     * <li>CARL creates a new file named "myFile.xml"</li>
-     * <li>BOB and CARL activate "Follow-Mode"</li>
-     * <li>ALICE creates new XML file myFile2.xml and edits it with the Eclipse
-     * XML View</li>
-     * </ol>
-     * 
-     * Result:
-     * <ol>
-     * <li></li>
-     * <li>ALICE1_fu and BOB1_fu should not find the file "myFile.xml"</li>
-     * <li></li>
-     * <li>BOB and CARL should see the newly created XML file and the changes
-     * made by ALICE</li>
-     * </ol>
-     * 
-     * @throws CoreException
-     * @throws IOException
-     * @throws InterruptedException
-     */
+        CARL.superBot().internal().createProject("foo");
 
-    @Test
-    public void testCarlGrantWriteAccess() throws IOException, CoreException,
-        InterruptedException {
+        Util.buildSessionConcurrently("foo", TypeOfCreateProject.NEW_PROJECT,
+            CARL, ALICE, BOB);
+
+        ALICE.superBot().views().packageExplorerView()
+            .waitUntilResourceIsShared("foo");
+        BOB.superBot().views().packageExplorerView()
+            .waitUntilResourceIsShared("foo");
+
+        CARL.superBot().internal()
+            .createFile("foo", "readme.txt", "this is a test case");
+
+        ALICE.superBot().views().packageExplorerView()
+            .waitUntilResourceIsShared("foo/readme.txt");
+        BOB.superBot().views().packageExplorerView()
+            .waitUntilResourceIsShared("foo/readme.txt");
 
         CARL.superBot().views().sarosView().selectParticipant(ALICE.getJID())
             .restrictToReadOnlyAccess();
-        assertFalse(CARL.superBot().views().sarosView()
-            .selectParticipant(ALICE.getJID()).hasWriteAccess());
-
-        CARL.superBot().views().packageExplorerView()
-            .selectProject(Constants.PROJECT1).newC().folder(Constants.FOLDER1);
-        CARL.superBot().views().packageExplorerView()
-            .selectFolder(Constants.PROJECT1, Constants.FOLDER1).newC()
-            .file(Constants.FILE1);
-
-        // Util.waitsUntilTransferedDataIsArrived(ALICE);
-
-        assertTrue(ALICE.superBot().views().packageExplorerView()
-            .selectProject(Constants.PROJECT1)
-            .existsWithRegex(Constants.FOLDER1));
-
-        // Util.waitsUntilTransferedDataIsArrived(BOB);
-
-        assertTrue(BOB.superBot().views().packageExplorerView()
-            .selectProject(Constants.PROJECT1)
-            .existsWithRegex(Constants.FOLDER1));
 
         CARL.superBot().views().sarosView().selectParticipant(ALICE.getJID())
-            .grantWriteAccess();
-        Util.setFollowMode(ALICE, CARL, BOB);
+            .waitUntilHasReadOnlyAccess();
+
+        // Lin's fault not mine !
+
+        // BOB.superBot().views().sarosView().selectParticipant(ALICE.getJID()).waitUntilHasReadOnlyAccess();
+
+        // ALICE.superBot().views().sarosView().selectParticipant(ALICE.getJID()).waitUntilHasReadOnlyAccess();
+
+        CARL.superBot().views().sarosView().selectParticipant(ALICE.getJID())
+            .followParticipant();
+        BOB.superBot().views().sarosView().selectParticipant(ALICE.getJID())
+            .followParticipant();
+
+        assertTrue(CARL.superBot().views().sarosView().isFollowing());
+        assertTrue(BOB.superBot().views().sarosView().isFollowing());
+
+        ALICE.superBot().internal()
+            .createFile("foo", "bar/readme.txt", "not visible");
 
         ALICE.superBot().views().packageExplorerView()
-            .selectProject(Constants.PROJECT1).newC().folder(Constants.FOLDER2);
-        ALICE.superBot().views().packageExplorerView()
-            .selectFolder(Constants.PROJECT1, Constants.FOLDER2).newC()
-            .file(Constants.FILE2);
+            .selectFile("foo", "bar", "readme.txt").open();
 
-        CARL.superBot()
-            .views()
-            .packageExplorerView()
-            .waitUntilFileExists(Constants.PROJECT1, Constants.FOLDER2,
-                Constants.FILE2);
-        assertTrue(CARL.superBot().views().packageExplorerView()
-            .selectFolder(Constants.PROJECT1, Constants.FOLDER2)
-            .existsWithRegex(Constants.FILE2));
-        BOB.superBot()
-            .views()
-            .packageExplorerView()
-            .waitUntilFileExists(Constants.PROJECT1, Constants.FOLDER2,
-                Constants.FILE2);
-        assertTrue(BOB.superBot().views().packageExplorerView()
-            .selectFolder(Constants.PROJECT1, Constants.FOLDER2)
-            .existsWithRegex(Constants.FILE2));
+        ALICE.remoteBot().editor("readme.txt").waitUntilIsActive();
+        ALICE
+            .remoteBot()
+            .editor("readme.txt")
+            .typeText(
+                "eene meene miste es rappelt in der kiste, eene meene meck und du bist weck ! weck bist du noch lange nicht ...");
 
-        ALICE.remoteBot().editor(Constants.FILE2)
-            .setTextFromFile(Constants.CP1);
+        assertFalse("Carls editor must not be opened", CARL.remoteBot()
+            .isEditorOpen("readme.txt"));
+        assertFalse("Bobs editor must not be opened", BOB.remoteBot()
+            .isEditorOpen("readme.txt"));
 
-        String file2ContentOfAlice = ALICE.remoteBot().editor(Constants.FILE2)
-            .getText();
+        assertFalse(
+            "Alices created file must not be marked as shared (CARL)",
+            CARL.superBot().views().packageExplorerView()
+                .isResourceShared("foo/bar/readme.txt"));
 
-        CARL.remoteBot().editor(Constants.FILE2)
-            .waitUntilIsTextSame(file2ContentOfAlice);
-        String file2ContentOfCarl = CARL.remoteBot().editor(Constants.FILE2)
-            .getText();
-        assertTrue(file2ContentOfAlice.equals(file2ContentOfCarl));
+        assertFalse(
+            "Alices created file must not be marked as shared (BOB)",
+            BOB.superBot().views().packageExplorerView()
+                .isResourceShared("foo/bar/readme.txt"));
 
-        BOB.remoteBot().editor(Constants.FILE2)
-            .waitUntilIsTextSame(file2ContentOfAlice);
-        String file2ContentOfBob = BOB.remoteBot().editor(Constants.FILE2)
-            .getText();
-        assertTrue(file2ContentOfAlice.equals(file2ContentOfBob));
+        assertEquals(
+            "Alice had changed a file during read only access while typing",
+            ALICE.remoteBot().editor("readme.txt").getText(), "not visible");
 
+        try {
+            ALICE.superBot().views().sarosView()
+                .waitUntilIsInconsistencyDetected();
+        } catch (TimeoutException e) {
+            fail("ALICE should have recieved an inconsistency warning, "
+                + e.getMessage());
+        }
     }
 }

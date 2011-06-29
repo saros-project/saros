@@ -192,6 +192,9 @@ public interface IRemoteBot extends Remote {
     public void waitUntilShellIsClosed(final String title)
         throws RemoteException;
 
+    public void waitLongUntilShellIsClosed(final String title)
+        throws RemoteException;
+
     /**
      * waits until the given Shell is open.
      * 

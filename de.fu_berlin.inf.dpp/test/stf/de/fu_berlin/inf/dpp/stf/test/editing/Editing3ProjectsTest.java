@@ -24,16 +24,18 @@ public class Editing3ProjectsTest extends StfTestCase {
     }
 
     @Test
-    public void testShareMultipleWithBobAndCarlSequencetially()
-        throws RemoteException {
-        ALICE.superBot().views().packageExplorerView().tree().newC()
-            .javaProjectWithClasses("foo", "bar", "HelloAlice");
+    public void testShareMultipleWithBobSequencetially() throws RemoteException {
 
-        ALICE.superBot().views().packageExplorerView().tree().newC()
-            .javaProjectWithClasses("foo1", "bar", "HelloBob");
+        ALICE.superBot().internal().createJavaProject("foo");
+        ALICE.superBot().internal().createJavaProject("foo1");
+        ALICE.superBot().internal().createJavaProject("foo2");
 
-        ALICE.superBot().views().packageExplorerView().tree().newC()
-            .javaProjectWithClasses("foo2", "bar", "HelloCarl");
+        ALICE.superBot().internal()
+            .createFile("foo", "src/bar/HelloAlice.java", "HelloAlice");
+        ALICE.superBot().internal()
+            .createFile("foo1", "src/bar/HelloBob.java", "HelloBob");
+        ALICE.superBot().internal()
+            .createFile("foo2", "src/bar/HelloCarl.java", "HelloCarl");
 
         Util.buildSessionSequentially("foo", TypeOfCreateProject.NEW_PROJECT,
             ALICE, BOB);

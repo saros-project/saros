@@ -559,6 +559,12 @@ public interface Constants {
     public final static String PKG_REGEX = "[\\w*\\.]*\\w*";
     public final static String PROJECT_REGEX = "\\w*";
 
-    public final static String SCREENSHOTDIR = "test/STF/screenshot";
+    /* Saros Preferences -> Advanced */
+
+    public static final String SAROS_ADVANCED_GROUP_FILE_TRANSFER = Configuration
+        .getString("saros_advanced_group_file_transfer");
+
+    public static final String SAROS_ADVANCED_GROUP_FILE_TRANSFER_FORCE_IBB = Configuration
+        .getString("saros_advanced_group_file_transfer_force_ibb");
 
 }

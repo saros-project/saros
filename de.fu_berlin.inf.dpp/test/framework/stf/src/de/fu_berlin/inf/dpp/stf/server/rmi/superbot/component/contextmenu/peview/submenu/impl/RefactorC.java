@@ -40,6 +40,12 @@ public final class RefactorC extends StfRemoteObject implements IRefactorC {
      * 
      **********************************************/
 
+    public void moveTo(String targetProject, String folder)
+        throws RemoteException {
+        moveTo(SHELL_MOVE, OK, targetProject.concat("/").concat(folder)
+            .replace('\\', '/').split("/"));
+    }
+
     public void moveClassTo(String targetProject, String targetPkg)
         throws RemoteException {
         moveTo(SHELL_MOVE, OK, Util.getPkgNodes(targetProject, targetPkg));
@@ -77,14 +83,10 @@ public final class RefactorC extends StfRemoteObject implements IRefactorC {
         RemoteWorkbenchBot.getInstance().shell(shellTitle).bot()
             .button(buttonName).waitUntilIsEnabled();
         shell.bot().button(buttonName).click();
-        // if (bot().isShellOpen("Rename Compilation Unit")) {
-        // bot().shell("Rename Compilation Unit").bot().button(buttonName)
-        // .waitUntilIsEnabled();
-        // bot().shell("Rename Compilation Unit").bot().button(buttonName)
-        // .click();
-        // }
+
         if (RemoteWorkbenchBot.getInstance().isShellOpen(shellTitle))
-            RemoteWorkbenchBot.getInstance().waitUntilShellIsClosed(shellTitle);
+            RemoteWorkbenchBot.getInstance().waitLongUntilShellIsClosed(
+                shellTitle);
     }
 
     private void moveTo(String shellTitle, String buttonName, String... nodes)
@@ -92,7 +94,7 @@ public final class RefactorC extends StfRemoteObject implements IRefactorC {
         treeItem.contextMenus(MENU_REFACTOR, MENU_MOVE).click();
         RemoteWorkbenchBot.getInstance().shell(shellTitle)
             .confirmWithTree(buttonName, nodes);
-        RemoteWorkbenchBot.getInstance().waitUntilShellIsClosed(shellTitle);
+        RemoteWorkbenchBot.getInstance().waitLongUntilShellIsClosed(shellTitle);
     }
 
 }

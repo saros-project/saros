@@ -439,7 +439,7 @@ public class Utils {
             boolean wasInterrupted = false;
             try {
                 SYNC_LOCK.lockInterruptibly();
-                thread = new SyncedThread(wrapSafe(log, runnable));
+                thread = new SyncedThread(runnable);
                 thread.start();
                 thread.join();
 

@@ -160,7 +160,7 @@ public final class SuperBot extends StfRemoteObject implements ISuperBot {
             .checkBox("Create copy for working distributed. New project name:")
             .click();
         shell.bot().button(FINISH).click();
-        bot().shell(SHELL_ADD_PROJECT).waitLongUntilIsClosed();
+        shell.waitLongUntilIsClosed();
     }
 
     public void confirmShellAddProjectUsingWhichProject(String projectName,

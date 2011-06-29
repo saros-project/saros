@@ -181,4 +181,20 @@ public interface ISarosPreferences extends Remote {
      */
     public void disableAutomaticReminderNoGUI() throws RemoteException;
 
+    /**
+     * Checks the button Force XMPP transfer over IBB in the Saros advances
+     * preferences. You have to reconnect to the server to apply this change.
+     * 
+     * @throws RemoteException
+     */
+    public void enableIBBOnlyTransfer() throws RemoteException;
+
+    /**
+     * Unchecks the button Force XMPP transfer over IBB in the Saros advances
+     * preferences. You have to reconnect to the server to apply this change.
+     * 
+     * @throws RemoteException
+     */
+    public void disableIBBOnlyTransfer() throws RemoteException;
+
 }

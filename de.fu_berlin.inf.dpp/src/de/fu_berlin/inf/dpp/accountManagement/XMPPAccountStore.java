@@ -338,6 +338,20 @@ public final class XMPPAccountStore {
     public XMPPAccount createNewAccount(String username, String password,
         String server) {
 
+        checkCredentials(username, password, server);
+
+        XMPPAccount newAccount = new XMPPAccount(createNewId(), username,
+            password, server);
+
+        newAccount.setActive(false);
+
+        this.accounts.add(newAccount);
+
+        return newAccount;
+    }
+
+    private void checkCredentials(String username, String password,
+        String server) {
         if (username == null)
             throw new NullPointerException("username is null");
 
@@ -352,15 +366,6 @@ public final class XMPPAccountStore {
 
         if (server.trim().length() == 0)
             throw new IllegalArgumentException("server is empty");
-
-        XMPPAccount newAccount = new XMPPAccount(createNewId(), username,
-            password, server);
-
-        newAccount.setActive(false);
-
-        this.accounts.add(newAccount);
-
-        return newAccount;
     }
 
     /**
@@ -407,16 +412,23 @@ public final class XMPPAccountStore {
     public void changeAccountData(int id, String username, String password,
         String server) {
 
+        checkCredentials(username, password, server);
+
+        XMPPAccount duplitcate = new XMPPAccount(-1, username, password, server);
+
+        if (accounts.contains(duplitcate))
+            throw new IllegalArgumentException("an account with user name '"
+                + username + " and server '" + server + "' already exists");
+
+        // remove the account before change anything otherwise the set will
+        // get corrupt
+
         XMPPAccount accountToChange = getAccount(id);
+
         accounts.remove(accountToChange);
         accountToChange.setUsername(username);
         accountToChange.setPassword(password);
         accountToChange.setServer(server);
-
-        if (accounts.contains(accountToChange))
-            throw new IllegalArgumentException("an account with user name '"
-                + username + " and server '" + server + "' already exists");
-
         accounts.add(accountToChange);
 
         if (activeAccount != null && id == activeAccount.getId())

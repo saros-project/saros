@@ -6,6 +6,19 @@ import java.rmi.RemoteException;
 public interface IInternal extends Remote {
 
     /**
+     * Creates a folder in the project
+     * 
+     * @param project
+     *            the name of the project
+     * @param path
+     *            the path of the folder e.g my/foo/bar
+     * @throws RemoteException
+     */
+
+    public void createFolder(String project, String path)
+        throws RemoteException;
+
+    /**
      * Creates a project
      * 
      * @param project

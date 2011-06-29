@@ -31,7 +31,7 @@ import de.fu_berlin.inf.dpp.stf.server.StfRemoteObject;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.internal.IInternal;
 import de.fu_berlin.inf.dpp.util.VersionManager;
 
-public class InternalImpl extends StfRemoteObject implements IInternal {
+public final class InternalImpl extends StfRemoteObject implements IInternal {
 
     private static final Logger log = Logger.getLogger(InternalImpl.class);
 
@@ -124,18 +124,21 @@ public class InternalImpl extends StfRemoteObject implements IInternal {
         sarosBundle = null;
     }
 
-    public void createFile(String project, String path, String content)
+    public void createFile(String projectName, String path, String content)
         throws RemoteException {
+
+        log.trace("creating file in project '" + projectName + "', path '"
+            + path + "' content: " + content);
 
         path = path.replace('\\', '/');
 
         int idx = path.lastIndexOf('/');
 
         if (idx != -1)
-            createFolder(project, path.substring(0, idx));
+            createFolder(projectName, path.substring(0, idx));
 
         IFile file = ResourcesPlugin.getWorkspace().getRoot()
-            .getProject(project).getFile(path);
+            .getProject(projectName).getFile(path);
 
         try {
             file.create(new ByteArrayInputStream(content.getBytes()), true,
@@ -172,18 +175,21 @@ public class InternalImpl extends StfRemoteObject implements IInternal {
 
     }
 
-    public void createFile(String project, String path, int size,
+    public void createFile(String projectName, String path, int size,
         boolean compressAble) throws RemoteException {
+
+        log.trace("creating file in project '" + projectName + "', path '"
+            + path + "' size: " + size + ", compressAble=" + compressAble);
 
         path = path.replace('\\', '/');
 
         int idx = path.lastIndexOf('/');
 
         if (idx != -1)
-            createFolder(project, path.substring(0, idx));
+            createFolder(projectName, path.substring(0, idx));
 
         IFile file = ResourcesPlugin.getWorkspace().getRoot()
-            .getProject(project).getFile(path);
+            .getProject(projectName).getFile(path);
 
         try {
             file.create(new GeneratingInputStream(size, compressAble), true,
@@ -196,9 +202,11 @@ public class InternalImpl extends StfRemoteObject implements IInternal {
 
     public boolean deleteWorkspace() throws RemoteException {
         boolean error = false;
+
         for (IProject project : ResourcesPlugin.getWorkspace().getRoot()
             .getProjects()) {
             try {
+                log.trace("deleting project: " + project.getName());
                 project.delete(true, true, null);
             } catch (CoreException e) {
                 error = true;
@@ -210,6 +218,8 @@ public class InternalImpl extends StfRemoteObject implements IInternal {
     }
 
     public void createProject(String projectName) throws RemoteException {
+
+        log.trace("creating project: " + projectName);
         IProject project = ResourcesPlugin.getWorkspace().getRoot()
             .getProject(projectName);
         try {
@@ -217,16 +227,21 @@ public class InternalImpl extends StfRemoteObject implements IInternal {
             project.open(null);
         } catch (CoreException e) {
             log.debug(
-                "unable to create project '" + project + "' :" + e.getMessage(),
-                e);
+                "unable to create project '" + projectName + "' : "
+                    + e.getMessage(), e);
             throw new RemoteException(e.getMessage(), e);
         }
     }
 
     public void createJavaProject(String projectName) throws RemoteException {
+
+        log.trace("creating java project: " + projectName);
+
         IProject project = ResourcesPlugin.getWorkspace().getRoot()
             .getProject(projectName);
+
         try {
+
             project.create(null);
             project.open(null);
 
@@ -255,14 +270,13 @@ public class InternalImpl extends StfRemoteObject implements IInternal {
                 entries.toArray(new IClasspathEntry[entries.size()]), null);
 
         } catch (CoreException e) {
-            log.debug(
-                "unable to create java project '" + project + "' :"
-                    + e.getMessage(), e);
+            log.debug("unable to create java project '" + projectName + "' :"
+                + e.getMessage(), e);
             throw new RemoteException(e.getMessage(), e);
         }
     }
 
-    private void createFolder(String projectName, String path)
+    public void createFolder(String projectName, String path)
         throws RemoteException {
 
         path = path.replace('\\', '/');

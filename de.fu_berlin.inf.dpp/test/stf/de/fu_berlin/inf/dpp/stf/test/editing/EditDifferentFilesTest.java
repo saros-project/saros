@@ -41,7 +41,7 @@ public class EditDifferentFilesTest extends StfTestCase {
     @Test
     public void testEditingOnDifferentFiles() throws Exception {
         BOB.superBot().views().packageExplorerView()
-            .waitUntilClassExists("foo", "bar", "HelloWorld");
+            .waitUntilResourceIsShared("foo/src/bar/HelloWorld.java");
 
         TestThread.Runnable aliceEditTask = new TestThread.Runnable() {
             public void runUnsafe() throws Exception {

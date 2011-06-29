@@ -148,8 +148,15 @@ public abstract class StfTestCase {
     public static void resetSaros() throws RemoteException {
         try {
             for (AbstractTester tester : currentTesters) {
+                if (!tester.superBot().views().sarosView().isConnected()) {
+                    tester.superBot().views().sarosView()
+                        .connectWith(tester.getJID(), tester.getPassword());
+                    tester.superBot().views().sarosView()
+                        .waitUntilIsConnected();
+                }
                 resetBuddyNames(tester);
                 tester.superBot().views().sarosView().disconnect();
+                tester.superBot().views().sarosView().waitUntilIsDisconnected();
                 tester.superBot().internal().deleteWorkspace();
             }
         } finally {

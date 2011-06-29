@@ -42,8 +42,12 @@ public class FollowModeTest extends StfTestCase {
         ALICE.superBot().views().packageExplorerView()
             .selectClass(Constants.PROJECT1, Constants.PKG1, Constants.CLS1)
             .open();
+
         ALICE.remoteBot().editor(Constants.CLS1_SUFFIX)
             .setTextFromFile(Constants.CP1);
+
+        ALICE.remoteBot().editor(Constants.CLS1_SUFFIX).save();
+
         BOB.superBot().views().sarosView().selectParticipant(ALICE.getJID())
             .followParticipant();
         BOB.remoteBot().editor(Constants.CLS1_SUFFIX).waitUntilIsActive();
@@ -82,31 +86,15 @@ public class FollowModeTest extends StfTestCase {
 
         ALICE.superBot().views().sarosView().selectParticipant(BOB.getJID())
             .followParticipant();
+
         BOB.remoteBot().editor(Constants.CLS1_SUFFIX).show();
+
         ALICE.remoteBot().editor(Constants.CLS1_SUFFIX).waitUntilIsActive();
+
         assertTrue(ALICE.superBot().views().sarosView()
             .selectParticipant(BOB.getJID()).isFollowing());
+
         assertTrue(ALICE.remoteBot().editor(Constants.CLS1_SUFFIX).isActive());
 
-        // BOB.sarosBot().sessionView().followThisBuddy(ALICE.jid);
-        // ALICE.fileM.newClass(PROJECT1, PKG1, CLS3);
-        // ALICE.editor.waitUntilJavaEditorActive(CLS3);
-        // ALICE.bot().editor(CLS3_SUFFIX).setTextAndSave(CP3);
-        // ALICE.editor.setBreakPoint(13, PROJECT1, PKG1, CLS3);
-        // ALICE.debugJavaFile(BotConfiguration.PROJECTNAME,
-        // BotConfiguration.PACKAGENAME, BotConfiguration.CLASSNAME3);
-        // BOB.waitUntilJavaEditorActive(BotConfiguration.CLASSNAME3);
-        // assertFalse(BOB.isDebugPerspectiveActive());
-        // ALICE.openJavaPerspective();
-        // BOB.sleep(1000);
-        // int lineFromAlice = ALICE.getJavaCursorLinePosition(
-        // BotConfiguration.PROJECTNAME, BotConfiguration.PACKAGENAME,
-        // BotConfiguration.CLASSNAME3);
-        // int lineFromBob = BOB.getJavaCursorLinePosition(
-        // BotConfiguration.PROJECTNAME, BotConfiguration.PACKAGENAME,
-        // BotConfiguration.CLASSNAME3);
-        // assertEquals(lineFromAlice, lineFromBob);
-        // ALICE.waitUntilShellActive("Confirm Perspective Switch");
-        // assertTrue(ALICE.isShellActive("Confirm Perspective Switch"));
     }
 }

@@ -99,9 +99,6 @@ public class ShareProjectUsingExistingProjectTest extends StfTestCase {
             Constants.PROJECT1,
             TypeOfCreateProject.EXIST_PROJECT_WITH_COPY_AFTER_CANCEL_LOCAL_CHANGE,
             ALICE, BOB);
-        // assertTrue(BOB.sarosC.isWIndowSessionInvitationActive());
-        // BOB.sarosC
-        // .confirmProjectSharingWizardUsingExistProjectWithCopy(PROJECT1);
 
         assertTrue(BOB.superBot().views().packageExplorerView().tree()
             .existsWithRegex(Constants.PROJECT1));
@@ -113,8 +110,7 @@ public class ShareProjectUsingExistingProjectTest extends StfTestCase {
         assertTrue(BOB.superBot().views().packageExplorerView()
             .selectPkg(Constants.PROJECT1_NEXT, Constants.PKG1)
             .existsWithRegex(Constants.CLS1));
-        // BOB.superBot().views().packageExplorerView()
-        // .selectJavaProject(PROJECT1_NEXT).delete();
+
     }
 
     @Test
@@ -128,12 +124,10 @@ public class ShareProjectUsingExistingProjectTest extends StfTestCase {
             .selectPkg(Constants.PROJECT1, Constants.PKG1)
             .existsWithRegex(Constants.CLS2));
         assertTrue(BOB.superBot().views().packageExplorerView().tree()
-            .existsWithRegex(Constants.PROJECT1_NEXT));
+            .existsWithRegex(Constants.PROJECT1_COPY));
         assertTrue(BOB.superBot().views().packageExplorerView()
-            .selectPkg(Constants.PROJECT1_NEXT, Constants.PKG1)
+            .selectPkg(Constants.PROJECT1_COPY, Constants.PKG1)
             .existsWithRegex(Constants.CLS1));
-        // BOB.superBot().views().packageExplorerView()
-        // .selectJavaProject(PROJECT1_NEXT).delete();
 
     }
 }

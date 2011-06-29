@@ -4,6 +4,7 @@ import static de.fu_berlin.inf.dpp.stf.client.tester.SarosTester.ALICE;
 
 import java.rmi.RemoteException;
 
+import org.eclipse.swtbot.swt.finder.widgets.TimeoutException;
 import org.junit.After;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -25,7 +26,7 @@ public class AccountPreferenceTest extends StfTestCase {
         resetDefaultAccount();
     }
 
-    @Test(expected = org.eclipse.swtbot.swt.finder.widgets.TimeoutException.class)
+    @Test(expected = TimeoutException.class)
     public void testDuplicateAccount() throws RemoteException {
         ALICE.superBot().menuBar().saros().preferences()
             .addAccount(new JID("foo@bar.com"), "foobar");

@@ -10,7 +10,7 @@ import static org.junit.Assert.assertTrue;
 import java.rmi.RemoteException;
 
 import org.eclipse.jface.bindings.keys.IKeyLookup;
-import org.junit.Before;
+import org.junit.After;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -27,11 +27,8 @@ public class ConcurrentEditingTest extends StfTestCase {
         setUpSaros();
     }
 
-    @Override
-    @Before
-    public void before() throws RemoteException {
-        super.before();
-        leaveSessionPeersFirst(ALICE);
+    @After
+    public void afterEveryTest() throws RemoteException {
         deleteAllProjectsByActiveTesters();
     }
 

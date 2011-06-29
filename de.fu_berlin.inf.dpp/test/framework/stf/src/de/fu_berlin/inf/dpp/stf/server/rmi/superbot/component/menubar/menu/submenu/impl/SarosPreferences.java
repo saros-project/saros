@@ -9,6 +9,7 @@ import de.fu_berlin.inf.dpp.feedback.Messages;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.stf.server.StfRemoteObject;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.impl.RemoteWorkbenchBot;
+import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotCheckBox;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotShell;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.menubar.menu.submenu.ISarosPreferences;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.impl.SuperBot;
@@ -186,6 +187,42 @@ public final class SarosPreferences extends StfRemoteObject implements
         shell.bot().button(OK).click();
         RemoteWorkbenchBot.getInstance().waitUntilShellIsClosed(
             SHELL_PREFERNCES);
+    }
+
+    public void enableIBBOnlyTransfer() throws RemoteException {
+        setIBBOnlyTransfer(true);
+    }
+
+    public void disableIBBOnlyTransfer() throws RemoteException {
+        setIBBOnlyTransfer(false);
+    }
+
+    private void setIBBOnlyTransfer(boolean check) throws RemoteException {
+
+        clickMenuSarosPreferences();
+
+        RemoteWorkbenchBot.getInstance().waitUntilShellIsOpen(SHELL_PREFERNCES);
+
+        IRemoteBotShell shell = RemoteWorkbenchBot.getInstance().shell(
+            SHELL_PREFERNCES);
+
+        shell.activate();
+        shell.bot().tree().selectTreeItem(NODE_SAROS, NODE_SAROS_ADVANCED);
+
+        IRemoteBotCheckBox checkBox = shell.bot().checkBoxInGroup(
+            SAROS_ADVANCED_GROUP_FILE_TRANSFER_FORCE_IBB,
+            SAROS_ADVANCED_GROUP_FILE_TRANSFER);
+
+        if (check)
+            checkBox.select();
+        else
+            checkBox.deselect();
+
+        shell.bot().button(APPLY).click();
+        shell.bot().button(OK).click();
+        RemoteWorkbenchBot.getInstance().waitUntilShellIsClosed(
+            SHELL_PREFERNCES);
+
     }
 
     public void disableAutomaticReminder() throws RemoteException {

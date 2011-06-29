@@ -6,6 +6,19 @@ import java.rmi.RemoteException;
 public interface IRefactorC extends Remote {
 
     /**
+     * Performs the action <b>Refactor -&gt; move</b>
+     * 
+     * @param targetProject
+     *            then name of the target project
+     * @param targetFolder
+     *            the name of the target folder
+     */
+
+    public void moveTo(String targetProject, String targetFolder) throws
+
+    RemoteException;
+
+    /**
      * Performs the action "move class to another package" which should be done
      * with the following steps:
      * 

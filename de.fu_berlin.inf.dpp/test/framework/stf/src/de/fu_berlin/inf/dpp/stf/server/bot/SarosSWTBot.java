@@ -224,13 +224,19 @@ public final class SarosSWTBot extends SWTWorkbenchBot {
      */
     @Override
     public SWTBotShell[] shells() {
-        super.shells();
+
         Shell[] shells = finder.getShells();
         ArrayList<SWTBotShell> result = new ArrayList<SWTBotShell>();
         for (Shell shell : shells) {
+
             if (!shell.isDisposed())
                 result.add(new SWTBotShell(shell));
+            else
+                log.warn("found disposed widget while iterating over all shells");
+
         }
+
         return result.toArray(new SWTBotShell[] {});
+
     }
 }

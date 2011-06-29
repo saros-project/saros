@@ -199,9 +199,22 @@ public abstract class RemoteBot extends StfRemoteObject implements IRemoteBot {
         return getOpenShellNames().contains(title);
     }
 
+    public void waitLongUntilShellIsClosed(final String title)
+        throws RemoteException {
+        waitUntil(new DefaultCondition() {
+            public boolean test() throws Exception {
+                return !isShellOpen(title);
+            }
+
+            public String getFailureMessage() {
+                return "waiting for shell '" + title + "' to close";
+            }
+        });
+    }
+
     public void waitUntilShellIsClosed(final String title)
         throws RemoteException {
-        swtBot.waitUntil(new DefaultCondition() {
+        waitUntil(new DefaultCondition() {
             public boolean test() throws Exception {
                 return !isShellOpen(title);
             }
@@ -213,7 +226,7 @@ public abstract class RemoteBot extends StfRemoteObject implements IRemoteBot {
     }
 
     public void waitUntilShellIsOpen(final String title) throws RemoteException {
-        swtBot.waitUntil(new DefaultCondition() {
+        waitUntil(new DefaultCondition() {
             public boolean test() throws Exception {
                 return isShellOpen(title);
             }
