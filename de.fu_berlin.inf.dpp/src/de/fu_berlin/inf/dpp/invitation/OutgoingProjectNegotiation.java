@@ -158,7 +158,7 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
                     projectFileList.setProjectID(projectID);
                     boolean partial = !sarosSession
                         .isCompletelyShared(iProject);
-
+                    
                     ProjectExchangeInfo pInfo = new ProjectExchangeInfo(
                         projectID, "", projectName, partial, projectFileList);
                     pInfos.add(pInfo);

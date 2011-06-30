@@ -73,7 +73,7 @@ public class FileList {
     protected final boolean useVersionControl;
 
     /** The actual file list data. Keys are project relative paths. */
-    public Map<IPath, FileListData> entries = new HashMap<IPath, FileListData>();
+    protected Map<IPath, FileListData> entries = new HashMap<IPath, FileListData>();
     /** Identifies the VCS used. */
     protected String vcsProviderID;
 

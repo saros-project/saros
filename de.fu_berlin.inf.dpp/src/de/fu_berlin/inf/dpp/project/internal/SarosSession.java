@@ -305,6 +305,8 @@ public class SarosSession implements ISarosSession, Disposable {
             if (resources != null && dependentResources != null) {
                 resources.addAll(dependentResources);
                 projectMapper.addResourceMapping(project, resources);
+            } else if (resources != null && dependentResources == null) {
+                projectMapper.addResourceMapping(project, null);
             }
         }
         execQueuedActivities(projectID);
