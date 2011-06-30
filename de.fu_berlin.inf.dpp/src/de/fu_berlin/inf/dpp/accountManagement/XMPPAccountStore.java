@@ -310,7 +310,7 @@ public final class XMPPAccountStore {
             throw new IllegalArgumentException("account '" + account
                 + "' is not in the current account store");
 
-        this.accounts.remove(account);
+        accounts.remove(account);
         saveAccounts();
     }
 
@@ -338,6 +338,20 @@ public final class XMPPAccountStore {
     public XMPPAccount createNewAccount(String username, String password,
         String server) {
 
+        checkCredentials(username, password, server);
+
+        XMPPAccount newAccount = new XMPPAccount(createNewId(), username,
+            password, server);
+
+        newAccount.setActive(false);
+
+        this.accounts.add(newAccount);
+
+        return newAccount;
+    }
+
+    private void checkCredentials(String username, String password,
+        String server) {
         if (username == null)
             throw new NullPointerException("username is null");
 
@@ -352,15 +366,6 @@ public final class XMPPAccountStore {
 
         if (server.trim().length() == 0)
             throw new IllegalArgumentException("server is empty");
-
-        XMPPAccount newAccount = new XMPPAccount(createNewId(), username,
-            password, server);
-
-        newAccount.setActive(false);
-
-        this.accounts.add(newAccount);
-
-        return newAccount;
     }
 
     /**
@@ -407,17 +412,28 @@ public final class XMPPAccountStore {
     public void changeAccountData(int id, String username, String password,
         String server) {
 
-        XMPPAccount accountToChange = getAccount(id);
-        accounts.remove(accountToChange);
-        accountToChange.setUsername(username);
-        accountToChange.setPassword(password);
-        accountToChange.setServer(server);
+        checkCredentials(username, password, server);
 
-        if (accounts.contains(accountToChange))
+        XMPPAccount account = getAccount(id);
+
+        accounts.remove(account);
+
+        XMPPAccount changedAccount = new XMPPAccount(id, username, password,
+            server);
+
+        // user changed more than the password
+        if (!changedAccount.equals(account)
+            && accounts.contains(changedAccount)) {
+            accounts.add(account);
             throw new IllegalArgumentException("an account with user name '"
                 + username + " and server '" + server + "' already exists");
+        }
 
-        accounts.add(accountToChange);
+        account.setUsername(username);
+        account.setPassword(password);
+        account.setServer(server);
+
+        accounts.add(account);
 
         if (activeAccount != null && id == activeAccount.getId())
             updateAccountDataToPreferenceStore();
