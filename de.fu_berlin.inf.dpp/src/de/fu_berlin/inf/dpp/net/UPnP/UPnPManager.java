@@ -389,7 +389,7 @@ public class UPnPManager {
             String externalIP = selectedGateway.getExternalIPAddress();
             if (externalIP != null
                 && !externalIP.isEmpty()
-                && Socks5Proxy.getSocks5Proxy().getLocalAddresses()
+                && !Socks5Proxy.getSocks5Proxy().getLocalAddresses()
                     .contains(externalIP))
                 Socks5Proxy.getSocks5Proxy().addLocalAddress(externalIP);
         } catch (Exception e) {
