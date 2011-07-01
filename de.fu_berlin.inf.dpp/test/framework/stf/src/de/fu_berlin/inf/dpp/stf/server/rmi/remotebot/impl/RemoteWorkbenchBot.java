@@ -9,8 +9,11 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotEditor;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotPerspective;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
+import org.eclipse.swtbot.swt.finder.SWTBot;
+import org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences;
 import org.eclipse.swtbot.swt.finder.waits.DefaultCondition;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
+import org.eclipse.swtbot.swt.finder.widgets.TimeoutException;
 import org.eclipse.ui.IPerspectiveDescriptor;
 import org.eclipse.ui.IViewReference;
 import org.eclipse.ui.IWorkbench;
@@ -21,6 +24,7 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.WorkbenchException;
 
 import de.fu_berlin.inf.dpp.stf.server.bot.SarosSWTBot;
+import de.fu_berlin.inf.dpp.stf.server.bot.condition.SarosConditions;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.IRemoteWorkbenchBot;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotEditor;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotPerspective;
@@ -297,7 +301,39 @@ public final class RemoteWorkbenchBot extends RemoteBot implements
      **********************************************/
 
     public void closeAllShells() throws RemoteException {
-        swtWorkBenchBot.closeAllShells();
+        try {
+            swtWorkBenchBot.closeAllShells();
+        } catch (TimeoutException closeAllShellsTimeout) {
+            log.warn(
+                "default SWTWorkbenchBot could not close all shells, trying to resolve the problem",
+                closeAllShellsTimeout);
+
+            for (String shellName : this.getOpenShellNames()) {
+                try {
+                    SWTBotShell shell = swtWorkBenchBot.shell(shellName);
+
+                    SWTBot bot = shell.bot();
+
+                    // TODO shell names currently hard coded
+
+                    if (shellName.equals("Leaving the Session")) {
+                        bot.button(YES).click();
+                        bot.waitUntil(SarosConditions.isShellClosed(shell));
+                    }
+                    if (shellName.equals("Synchronizing")) {
+                        bot.button(CANCEL).click();
+                        continue;
+                    }
+
+                } catch (RuntimeException rte) {
+                    log.error(rte.getMessage(), rte);
+                }
+            }
+
+            // wait for shell(s) to update(s)
+            swtWorkBenchBot.sleep(SWTBotPreferences.TIMEOUT);
+            swtWorkBenchBot.closeAllShells();
+        }
     }
 
     /**********************************************

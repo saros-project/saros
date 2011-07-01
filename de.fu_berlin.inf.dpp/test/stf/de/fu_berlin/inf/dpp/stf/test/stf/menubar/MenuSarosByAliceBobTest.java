@@ -18,7 +18,6 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import de.fu_berlin.inf.dpp.stf.client.StfTestCase;
-import de.fu_berlin.inf.dpp.stf.client.tester.AbstractTester;
 import de.fu_berlin.inf.dpp.stf.client.util.Util;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotShell;
 import de.fu_berlin.inf.dpp.stf.shared.Constants.TypeOfCreateProject;
@@ -39,28 +38,7 @@ public class MenuSarosByAliceBobTest extends StfTestCase {
         announceTestCaseEnd();
         leaveSessionHostFirst(ALICE);
         deleteAllProjectsByActiveTesters();
-
-        // TODO remove this code, because it is a workaround
-        // against a bug in Saros Session Management
-        for (AbstractTester tester : getCurrentTesters()) {
-            tester.remoteBot().sleep(1000);
-            try {
-                if (tester.remoteBot().isShellOpen("Synchronizing")) {
-                    IRemoteBotShell sync = tester.remoteBot().shell(
-                        "Synchronizing");
-
-                    sync.confirm("Cancel");
-                    tester.remoteBot().sleep(1000);
-                    if (tester.remoteBot().isShellOpen("Problem Occurred")) {
-                        IRemoteBotShell problem = tester.remoteBot().shell(
-                            "Problem Occurred");
-                        problem.confirm("OK");
-                    }
-                }
-            } catch (Exception e) {
-                // ignore
-            }
-        }
+        resetWorkbenches();
     }
 
     @Test
@@ -84,11 +62,13 @@ public class MenuSarosByAliceBobTest extends StfTestCase {
         shell.bot().button(NEXT).click();
         shell.bot().tree().selectTreeItem(BOB.getBaseJid()).check();
         shell.bot().button(FINISH).click();
+
         BOB.remoteBot().waitUntilShellIsOpen(SHELL_SESSION_INVITATION);
         IRemoteBotShell shell2 = BOB.remoteBot()
             .shell(SHELL_SESSION_INVITATION);
         shell2.activate();
         shell2.bot().shell(SHELL_SESSION_INVITATION).confirm(ACCEPT);
+
         BOB.superBot().confirmShellAddProjectUsingWhichProject(
             Constants.PROJECT1, TypeOfCreateProject.NEW_PROJECT);
         BOB.superBot().views().sarosView().waitUntilIsInSession();

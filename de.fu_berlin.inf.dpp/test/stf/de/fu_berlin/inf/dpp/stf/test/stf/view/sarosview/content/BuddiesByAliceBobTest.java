@@ -48,12 +48,10 @@ public class BuddiesByAliceBobTest extends StfTestCase {
 
     @Test
     public void testAddExistingBuddy() throws RemoteException {
-        assertTrue(ALICE.superBot().views().sarosView()
-            .hasBuddy(Constants.TEST_JID));
+        assertTrue(ALICE.superBot().views().sarosView().hasBuddy(BOB.getJID()));
         ALICE.superBot().views().sarosView().selectBuddies()
-            .addBuddy(Constants.TEST_JID);
-        assertTrue(ALICE.superBot().views().sarosView()
-            .hasBuddy(Constants.TEST_JID));
+            .addBuddy(BOB.getJID());
+        assertTrue(ALICE.superBot().views().sarosView().hasBuddy(BOB.getJID()));
     }
 
     /**

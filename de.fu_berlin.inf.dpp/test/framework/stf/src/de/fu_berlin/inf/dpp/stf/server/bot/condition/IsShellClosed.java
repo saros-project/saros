@@ -14,7 +14,7 @@ public class IsShellClosed extends DefaultCondition {
 
     public String getFailureMessage() {
 
-        return "STFBotShell is still open.";
+        return "shell '" + shell.getText() + "' is still open";
     }
 
     public boolean test() throws Exception {
