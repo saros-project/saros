@@ -310,7 +310,7 @@ public final class XMPPAccountStore {
             throw new IllegalArgumentException("account '" + account
                 + "' is not in the current account store");
 
-        this.accounts.remove(account);
+        accounts.remove(account);
         saveAccounts();
     }
 
@@ -414,22 +414,26 @@ public final class XMPPAccountStore {
 
         checkCredentials(username, password, server);
 
-        XMPPAccount duplitcate = new XMPPAccount(-1, username, password, server);
+        XMPPAccount account = getAccount(id);
 
-        if (accounts.contains(duplitcate))
+        accounts.remove(account);
+
+        XMPPAccount changedAccount = new XMPPAccount(id, username, password,
+            server);
+
+        // user changed more than the password
+        if (!changedAccount.equals(account)
+            && accounts.contains(changedAccount)) {
+            accounts.add(account);
             throw new IllegalArgumentException("an account with user name '"
                 + username + " and server '" + server + "' already exists");
+        }
 
-        // remove the account before change anything otherwise the set will
-        // get corrupt
+        account.setUsername(username);
+        account.setPassword(password);
+        account.setServer(server);
 
-        XMPPAccount accountToChange = getAccount(id);
-
-        accounts.remove(accountToChange);
-        accountToChange.setUsername(username);
-        accountToChange.setPassword(password);
-        accountToChange.setServer(server);
-        accounts.add(accountToChange);
+        accounts.add(account);
 
         if (activeAccount != null && id == activeAccount.getId())
             updateAccountDataToPreferenceStore();

@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
+import java.util.Map.Entry;
 import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.zip.ZipEntry;
@@ -57,6 +57,7 @@ import de.fu_berlin.inf.dpp.observables.ProjectNegotiationObservable;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
 import de.fu_berlin.inf.dpp.ui.wizards.AddProjectToSessionWizard;
 import de.fu_berlin.inf.dpp.ui.wizards.pages.EnterProjectNamePage;
+import de.fu_berlin.inf.dpp.util.ArrayUtils;
 import de.fu_berlin.inf.dpp.util.FileUtils;
 import de.fu_berlin.inf.dpp.util.UncloseableInputStream;
 import de.fu_berlin.inf.dpp.util.Utils;
@@ -167,8 +168,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
             for (String projectID : localProjects.keySet()) {
                 IProject iProject = localProjects.get(projectID);
                 if (isPartialRemoteProject(projectID)) {
-                    Set<IPath> paths = getRemoteFileList(projectID).entries
-                        .keySet();
+                    List<IPath> paths = getRemoteFileList(projectID).getPaths();
                     List<IResource> dependentResources = new ArrayList<IResource>();
                     for (IPath iPath : paths) {
                         dependentResources.add(iProject.findMember(iPath));
@@ -202,7 +202,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
         }
     }
 
-    protected boolean isPartialRemoteProject(String projectID) {
+    public boolean isPartialRemoteProject(String projectID) {
         for (ProjectExchangeInfo info : this.projectInfos) {
             if (info.getProjectID().equals(projectID))
                 return info.isPartial();
@@ -284,17 +284,17 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
         throws SarosCancellationException, IOException {
 
         subMonitor.beginTask(null, 100);
-        Set<String> projectNamesKeySet = projectNames.keySet();
-        int numberOfLoops = projectNamesKeySet.size();
+        int numberOfLoops = projectNames.size();
         List<FileList> missingFiles = new ArrayList<FileList>();
 
         /*
          * this for loop sets up all the projects needed for the session and
          * computes the missing files.
          */
-        for (String projectID : projectNamesKeySet) {
+        for (Entry<String, String> entry : projectNames.entrySet()) {
             SubMonitor lMonitor = subMonitor.newChild(100 / numberOfLoops);
-            String projectName = projectNames.get(projectID);
+            String projectID = entry.getKey();
+            String projectName = entry.getValue();
             checkCancellation();
             ProjectExchangeInfo projectInfo = null;
             for (ProjectExchangeInfo pInfo : this.projectInfos) {
@@ -313,25 +313,25 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
                     .getVcsProviderID());
             }
 
-            IProject p = eclipseHelper.getWorkspace().getRoot()
+            IProject iProject = eclipseHelper.getWorkspace().getRoot()
                 .getProject(projectName);
-            if (p.exists()) {
+            if (iProject.exists()) {
                 /*
                  * Saving unsaved files is supposed to be done in
                  * JoinSessionWizard#performFinish().
                  */
-                if (EditorAPI.existUnsavedFiles(p)) {
+                if (EditorAPI.existUnsavedFiles(iProject)) {
                     log.error("Unsaved files detected.");
                 }
             } else {
-                p = null;
+                iProject = null;
             }
-            IProject localProject = assignLocalProject(p, projectName, vcs,
-                lMonitor.newChild(30), projectInfo.getFileList());
+            IProject localProject = assignLocalProject(iProject, projectName,
+                projectID, vcs, lMonitor.newChild(30), projectInfo);
             localProjects.put(projectID, localProject);
 
             checkCancellation();
-            if (vcs != null) {
+            if (vcs != null && !isPartialRemoteProject(projectID)) {
                 log.debug("initVcState");
                 initVcState(localProject, vcs, lMonitor.newChild(40),
                     projectInfo.getFileList());
@@ -341,7 +341,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
             log.debug("compute required Files for project " + projectName
                 + " with ID: " + projectID);
             FileList requiredFiles = computeRequiredFiles(localProject,
-                projectInfo.getFileList(), skipSyncs.get(projectID)
+                projectInfo.getFileList(), projectID, skipSyncs.get(projectID)
                     .booleanValue(), vcs, lMonitor.newChild(30));
             requiredFiles.setProjectID(projectID);
             checkCancellation();
@@ -355,20 +355,25 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
      * In this method the project we want to have in the session is initialized.
      * If the baseProject is not null we use it as the base to create the
      * 
-     * @param remoteFileList
+     * @param projectID
+     * 
+     * @param projectInfo
      * 
      * @throws LocalCancellationException
      */
     private IProject assignLocalProject(final IProject baseProject,
-        final String newProjectName, VCSAdapter vcs, SubMonitor monitor,
-        FileList remoteFileList) throws LocalCancellationException {
+        final String newProjectName, String projectID, final VCSAdapter vcs,
+        final SubMonitor monitor, ProjectExchangeInfo projectInfo)
+        throws LocalCancellationException {
         IProject newLocalProject = baseProject;
+        FileList remoteFileList = projectInfo.getFileList();
         // if the baseProject already exists
         if (newLocalProject != null) {
             if (newLocalProject.getName().equals(newProjectName)) {
                 // TODO the project could be managed by a different Team
                 // provider
-                if (vcs != null && !vcs.isManaged(newLocalProject)) {
+                if (vcs != null && !vcs.isManaged(newLocalProject)
+                    && !projectInfo.isPartial()) {
                     String repositoryRoot = remoteFileList.getRepositoryRoot();
                     final String url = remoteFileList.getProjectInfo().url;
                     String directory = url.substring(repositoryRoot.length());
@@ -380,8 +385,9 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
         }
 
         if (vcs != null) {
-            newLocalProject = vcs.checkoutProject(newProjectName,
-                remoteFileList, monitor);
+            if (!isPartialRemoteProject(projectID))
+                newLocalProject = vcs.checkoutProject(newProjectName,
+                    remoteFileList, monitor);
 
             /*
              * HACK: After checking out a project, give Eclipse/the Team
@@ -706,13 +712,13 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
      * @throws IOException
      */
     private FileList computeRequiredFiles(IProject currentLocalProject,
-        FileList remoteFileList, boolean skipSync, VCSAdapter vcs,
-        SubMonitor monitor) throws LocalCancellationException, IOException {
+        FileList remoteFileList, String projectID, boolean skipSync,
+        VCSAdapter vcs, SubMonitor monitor) throws LocalCancellationException,
+        IOException {
         monitor.beginTask("Compute required Files...", 100);
 
-        if (skipSync) {
+        if (skipSync)
             return FileListFactory.createEmptyFileList();
-        }
 
         FileListDiff filesToSynchronize = null;
         FileList localFileList = null;
@@ -726,7 +732,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
         SubMonitor childMonitor = monitor.newChild(5,
             SubMonitor.SUPPRESS_ALL_LABELS);
         filesToSynchronize = computeDiff(localFileList, remoteFileList,
-            currentLocalProject, childMonitor);
+            currentLocalProject, projectID, childMonitor);
 
         List<IPath> missingFiles = filesToSynchronize.getAddedPaths();
         missingFiles.addAll(filesToSynchronize.getAlteredPaths());
@@ -753,6 +759,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
      * @param currentLocalProject
      *            The project in workspace. Every file we need to add/replace is
      *            added to the {@link FileListDiff}
+     * @param projectID
      * @param monitor
      *            The progress monitor of the dialog.
      * @return A modified FileListDiff which doesn't contain any directories or
@@ -762,7 +769,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
      */
     protected FileListDiff computeDiff(FileList localFileList,
         FileList remoteFileList, IProject currentLocalProject,
-        SubMonitor monitor) throws LocalCancellationException {
+        String projectID, SubMonitor monitor) throws LocalCancellationException {
         log.debug("Inv" + Utils.prefix(peer) + ": Computing file list diff...");
 
         monitor.beginTask(null, 100);
@@ -774,8 +781,9 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
             monitor.worked(20);
 
             monitor.subTask("Removing unneeded resources");
-            diff = diff.removeUnneededResources(currentLocalProject,
-                monitor.newChild(40, SubMonitor.SUPPRESS_ALL_LABELS));
+            if (!isPartialRemoteProject(projectID))
+                diff = diff.removeUnneededResources(currentLocalProject,
+                    monitor.newChild(40, SubMonitor.SUPPRESS_ALL_LABELS));
 
             monitor.subTask("Adding Folders");
             diff = diff.addAllFolders(currentLocalProject,
@@ -976,6 +984,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
 
         String url = remoteFileList.getVCSUrl(path);
         String revision = remoteFileList.getVCSRevision(path);
+        List<IPath> paths = remoteFileList.getPaths();
         if (url == null || revision == null) {
             // The resource might have been deleted.
             return;
@@ -984,7 +993,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
             log.trace("Switching " + resource.getName() + " from " + info.url
                 + " to " + url);
             vcs.switch_(resource, url, revision, monitor);
-        } else if (!info.revision.equals(revision)) {
+        } else if (!info.revision.equals(revision) && paths.contains(path)) {
             log.trace("Updating " + resource.getName() + " from "
                 + info.revision + " to " + revision);
             vcs.update(resource, revision, monitor);
@@ -995,9 +1004,11 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
         if (resource instanceof IContainer) {
             // Recurse.
             try {
-                final IResource[] children = ((IContainer) resource).members();
+                List<IResource> children = ArrayUtils.getAdaptableObjects(
+                    ((IContainer) resource).members(), IResource.class);
                 for (IResource child : children) {
-                    initVcState(child, vcs, monitor, remoteFileList);
+                    if (remoteFileList.getPaths().contains(child.getFullPath()))
+                        initVcState(child, vcs, monitor, remoteFileList);
                     if (monitor.isCanceled())
                         break;
                 }

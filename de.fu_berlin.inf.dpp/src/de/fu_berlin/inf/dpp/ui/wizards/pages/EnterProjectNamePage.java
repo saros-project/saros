@@ -183,16 +183,22 @@ public class EnterProjectNamePage extends WizardPage {
             setImageDescriptor(ImageManager
                 .getImageDescriptor("icons/wizban/socks5m.png"));
             break;
+
         case SOCKS5:
         case SOCKS5_DIRECT:
             setDescription("Direct file transfer connection with SOCKS5 protocol available.\nThis means that sharing a project from scratch will be fast.");
             setImageDescriptor(ImageManager
                 .getImageDescriptor("icons/wizban/socks5.png"));
             break;
-        case UNKNOWN:
-        case HANDMADE:
+
+        case NONE:
+            // no bytestream connection established yet (small filelist transfer
+            // before was done by chat willingly), so we cant say something
+            // about the transfer type so we dont give a message to not
+            // worry/confuse the user
+            break;
+
         case IBB:
-        default:
             String speedInfo = "";
 
             if (dataTransferManager.getIncomingIBBTransferSpeed(this.peer) != 0) {
@@ -216,6 +222,14 @@ public class EnterProjectNamePage extends WizardPage {
                     + "Suggestions: Update an existing project or copy resources from another project.");
             }
             startIBBLogoFlash();
+            break;
+            
+        case UNKNOWN:
+        case HANDMADE:
+        default:
+            setDescription("Warning: Unknown transport method established.");
+            break;
+
         }
     }
 

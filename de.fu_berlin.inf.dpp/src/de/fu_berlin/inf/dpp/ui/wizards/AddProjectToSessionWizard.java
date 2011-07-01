@@ -133,10 +133,13 @@ public class AddProjectToSessionWizard extends Wizard {
                 try {
                     FileList remoteFileList = this.process
                         .getRemoteFileList(projectID);
-                    if (sessionManager.getSarosSession().getProject(projectID) != null) {
+                    if (sessionManager.getSarosSession().isShared(project)) {
                         FileList sharedFileList = FileListFactory
-                            .createFileList(project, null, true, null);
-                        remoteFileList.entries.putAll(sharedFileList.entries);
+                            .createFileList(project, sessionManager
+                                .getSarosSession().getSharedResources(project),
+                                true, null);
+                        remoteFileList.getPaths().addAll(
+                            sharedFileList.getPaths());
                     }
                     diff = FileListDiff.diff(FileListFactory.createFileList(
                         project, null, true, null), remoteFileList);
@@ -146,9 +149,11 @@ public class AddProjectToSessionWizard extends Wizard {
                         "Could not compute local FileList: " + e.getMessage());
                     return false;
                 }
-                if (diff.getRemovedPaths().size() > 0
-                    || diff.getAlteredPaths().size() > 0) {
-                    projectsToOverrideWithDiff.put(project.getName(), diff);
+                if (!this.process.isPartialRemoteProject(projectID)) {
+                    if (diff.getRemovedPaths().size() > 0
+                        || diff.getAlteredPaths().size() > 0) {
+                        projectsToOverrideWithDiff.put(project.getName(), diff);
+                    }
                 }
             }
         }

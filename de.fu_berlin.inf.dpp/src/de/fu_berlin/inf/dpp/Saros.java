@@ -28,6 +28,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.net.UnknownHostException;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -284,16 +285,13 @@ public class Saros extends AbstractUIPlugin {
         if (proxyEnabled) {
 
             try {
-                List<InetAddress> myAdresses = NetworkingUtils
-                    .getAllNonLoopbackLocalIPAdresses(true);
+                List<String> hostAddresses = new LinkedList<String>();
 
-                if (!myAdresses.isEmpty()) {
-                    // convert to List of Strings
-                    List<String> myAdressesStr = new LinkedList<String>();
-                    for (InetAddress ip : myAdresses)
-                        myAdressesStr.add(ip.getHostName());
-                    proxy.replaceLocalAddresses(myAdressesStr);
-                }
+                for (InetAddress inetAddress : NetworkingUtils
+                    .getAllNonLoopbackLocalIPAdresses(true))
+                    hostAddresses.add(inetAddress.getHostAddress());
+
+                proxy.replaceLocalAddresses(hostAddresses);
 
                 // Perform public IP detection concurrently
                 // Dont perform if we know a local IP is the WAN IP
@@ -307,6 +305,9 @@ public class Saros extends AbstractUIPlugin {
             } catch (Exception e) {
                 log.debug("Error while retrieving IP addresses", e);
             }
+
+            log.debug("current known IP addresses for Socks5Proxy: "
+                + Arrays.toString(proxy.getLocalAddresses().toArray()));
         }
 
         if (settingsChanged || proxy.isRunning() != proxyEnabled) {
