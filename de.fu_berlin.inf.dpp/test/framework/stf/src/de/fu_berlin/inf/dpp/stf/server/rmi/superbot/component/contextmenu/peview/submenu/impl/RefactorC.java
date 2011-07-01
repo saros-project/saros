@@ -80,21 +80,18 @@ public final class RefactorC extends StfRemoteObject implements IRefactorC {
             shellTitle);
         shell.activate();
         shell.bot().textWithLabel(LABEL_NEW_NAME).setText(newName);
-        RemoteWorkbenchBot.getInstance().shell(shellTitle).bot()
-            .button(buttonName).waitUntilIsEnabled();
+        shell.bot().button(buttonName).waitUntilIsEnabled();
         shell.bot().button(buttonName).click();
-
-        if (RemoteWorkbenchBot.getInstance().isShellOpen(shellTitle))
-            RemoteWorkbenchBot.getInstance().waitLongUntilShellIsClosed(
-                shellTitle);
+        shell.waitLongUntilIsClosed();
     }
 
     private void moveTo(String shellTitle, String buttonName, String... nodes)
         throws RemoteException {
         treeItem.contextMenus(MENU_REFACTOR, MENU_MOVE).click();
-        RemoteWorkbenchBot.getInstance().shell(shellTitle)
-            .confirmWithTree(buttonName, nodes);
-        RemoteWorkbenchBot.getInstance().waitLongUntilShellIsClosed(shellTitle);
+        IRemoteBotShell shell = RemoteWorkbenchBot.getInstance().shell(
+            shellTitle);
+        shell.confirmWithTree(buttonName, nodes);
+        shell.waitLongUntilIsClosed();
     }
 
 }

@@ -159,8 +159,7 @@ public final class NewC extends StfRemoteObject implements INewC {
                 .activate();
             shell.bot().checkBox("Inherited abstract methods").click();
             shell.bot().button(FINISH).click();
-            RemoteWorkbenchBot.getInstance().waitUntilShellIsClosed(
-                SHELL_NEW_JAVA_CLASS);
+            shell.waitLongUntilIsClosed();
         }
     }
 
@@ -189,8 +188,7 @@ public final class NewC extends StfRemoteObject implements INewC {
         shell.activate();
         shell.bot().textWithLabel(LABEL_NAME).setText(className);
         shell.bot().button(FINISH).click();
-        RemoteWorkbenchBot.getInstance().waitUntilShellIsClosed(
-            SHELL_NEW_JAVA_CLASS);
+        shell.waitLongUntilIsClosed();
     }
 
     private void confirmShellNewJavaClass(String projectName, String pkg,
@@ -203,8 +201,7 @@ public final class NewC extends StfRemoteObject implements INewC {
         shell.bot().textWithLabel(LABEL_PACKAGE).setText(pkg);
         shell.bot().textWithLabel(LABEL_NAME).setText(className);
         shell.bot().button(FINISH).click();
-        RemoteWorkbenchBot.getInstance().waitUntilShellIsClosed(
-            SHELL_NEW_JAVA_CLASS);
+        shell.waitLongUntilIsClosed();
     }
 
     private void confirmWizardNewProject(String projectName)
@@ -214,8 +211,7 @@ public final class NewC extends StfRemoteObject implements INewC {
         shell.confirmWithTree(NEXT, NODE_GENERAL, NODE_PROJECT);
         shell.bot().textWithLabel(LABEL_PROJECT_NAME).setText(projectName);
         shell.bot().button(FINISH).click();
-        RemoteWorkbenchBot.getInstance().waitUntilShellIsClosed(
-            SHELL_NEW_PROJECT);
+        shell.waitLongUntilIsClosed();
     }
 
     private void confirmShellNewFile(String fileName) throws RemoteException {
@@ -225,7 +221,7 @@ public final class NewC extends StfRemoteObject implements INewC {
         shell.bot().textWithLabel(LABEL_FILE_NAME).setText(fileName);
         shell.bot().button(FINISH).waitUntilIsEnabled();
         shell.bot().button(FINISH).click();
-        RemoteWorkbenchBot.getInstance().waitUntilShellIsClosed(SHELL_NEW_FILE);
+        shell.waitLongUntilIsClosed();
     }
 
     private void confirmShellNewJavaPackage(String projectName, String pkg)
@@ -237,10 +233,7 @@ public final class NewC extends StfRemoteObject implements INewC {
             .setText((projectName + "/" + SRC));
         shell.bot().textWithLabel(LABEL_NAME).setText(pkg);
         shell.bot().button(FINISH).click();
-        if (RemoteWorkbenchBot.getInstance().isShellOpen(
-            SHELL_CREATE_XMPP_JABBER_ACCOUNT))
-            RemoteWorkbenchBot.getInstance().waitUntilShellIsClosed(
-                SHELL_CREATE_XMPP_JABBER_ACCOUNT);
+        shell.waitLongUntilIsClosed();
     }
 
     private void confirmShellNewFolder(String folderName)
@@ -252,8 +245,7 @@ public final class NewC extends StfRemoteObject implements INewC {
         shell.bot().textWithLabel(LABEL_FOLDER_NAME).setText(folderName);
 
         shell.bot().button(FINISH).click();
-        RemoteWorkbenchBot.getInstance().waitUntilShellIsClosed(
-            SHELL_NEW_FOLDER);
+        shell.waitLongUntilIsClosed();
     }
 
     private void confirmShellNewJavaProject(String projectName)
@@ -263,10 +255,8 @@ public final class NewC extends StfRemoteObject implements INewC {
         shell.activate();
         shell.bot().textWithLabel(LABEL_PROJECT_NAME).setText(projectName);
 
-        // bot.button(FINISH).click();
         shell.bot().button(FINISH).click();
-        RemoteWorkbenchBot.getInstance().waitUntilShellIsClosed(
-            SHELL_NEW_JAVA_PROJECT);
+        shell.waitLongUntilIsClosed();
     }
 
     private boolean exists(String name) throws RemoteException {

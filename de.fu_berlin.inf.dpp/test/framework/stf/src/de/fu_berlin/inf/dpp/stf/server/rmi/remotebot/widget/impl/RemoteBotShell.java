@@ -47,7 +47,11 @@ public final class RemoteBotShell extends StfRemoteObject implements
      * 
      **********************************************/
     public IRemoteBot bot() {
-        RemoteWorkbenchBot.getInstance().setBot(SarosSWTBot.getInstance());
+        RemoteWorkbenchBot.getInstance().setBot(SarosSWTBot.getInstance()/*
+                                                                          * widget.
+                                                                          * bot
+                                                                          * ()
+                                                                          */);
         return RemoteWorkbenchBot.getInstance();
     }
 
@@ -133,7 +137,6 @@ public final class RemoteBotShell extends StfRemoteObject implements
         waitUntilActive();
         for (String itemName : itemNames) {
             bot().tree().selectTreeItem(itemName).check();
-            // bot().table().getTableItem(itemName).check();
         }
         bot().button(buttonText).waitUntilIsEnabled();
         bot().button(buttonText).click();
@@ -180,7 +183,7 @@ public final class RemoteBotShell extends StfRemoteObject implements
     }
 
     public String getToolTipText() throws RemoteException {
-        return widget.getText();
+        return widget.getToolTipText();
     }
 
     public String getErrorMessage() throws RemoteException {

@@ -7,6 +7,7 @@ import java.rmi.RemoteException;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import de.fu_berlin.inf.dpp.stf.client.StfTestCase;
@@ -21,6 +22,7 @@ public class InviteWithDifferentVersionsTest extends StfTestCase {
     }
 
     @Test
+    @Ignore("crashes the regression")
     public void testInvitationWithDifferentVersions() throws RemoteException {
         // BOB.superBot().views().sarosView().disconnect();
         // BOB.superBot().views().sarosView().waitUntilIsDisconnected();

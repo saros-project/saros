@@ -74,27 +74,7 @@ public final class SuperBot extends StfRemoteObject implements ISuperBot {
         shell.activate();
         shell.bot().radio(RADIO_CREATE_NEW_PROJECT).click();
         shell.bot().button(FINISH).click();
-
-        if (bot().isShellOpen(SHELL_ADD_PROJECT))
-            try {
-                bot().shell(SHELL_ADD_PROJECT).waitLongUntilIsClosed();
-            } catch (Exception e) {
-                /*
-                 * sometimes session can not be completely builded because of
-                 * unclear reason, so after timeout STF try to close
-                 * "the sesion invitation" window, but it can't close the window
-                 * before stopping the invitation process. In this case a
-                 * Special treatment should be done, so that the following tests
-                 * still will be run.
-                 */
-                bot().captureScreenshot(
-                    bot().getPathToScreenShot()
-                        + "/sessionInvitationFailedUsingNewProject.png");
-                if (bot().activeShell().getText().equals(SHELL_ADD_PROJECT)) {
-                    bot().activeShell().bot().toggleButton().click();
-                }
-                throw new RuntimeException("session invitation failed", e);
-            }
+        shell.waitLongUntilIsClosed();
     }
 
     public void confirmShellAddProjectUsingExistProject(String projectName)
@@ -114,27 +94,7 @@ public final class SuperBot extends StfRemoteObject implements ISuperBot {
             bot().shell(SHELL_SAVE_RESOURCE).confirm(YES);
         }
 
-        /*
-         * after the release 10.10.28 it take less time for the session
-         * invitation to complete, so the popup window "Session Invitation" is
-         * immediately disappeared after you confirm the window ""Warning: Local
-         * changes will be deleted".
-         * 
-         * Before waitUntil it would be better to first check, whether the
-         * window "Session Invitation" is still open at all.
-         */
-        if (bot().isShellOpen(SHELL_ADD_PROJECT)) {
-            try {
-                bot().shell(SHELL_ADD_PROJECT).waitLongUntilIsClosed();
-            } catch (Exception e) {
-                bot().captureScreenshot(
-                    bot().getPathToScreenShot()
-                        + "/sessionInvitationFailedUsingExistProject.png");
-                if (bot().activeShell().getText().equals(SHELL_ADD_PROJECT)) {
-                    bot().activeShell().bot().toggleButton().click();
-                }
-            }
-        }
+        shell.waitLongUntilIsClosed();
     }
 
     public void confirmShellAddProjectUsingExistProjectWithCopyAfterCancelLocalChange(
@@ -194,6 +154,7 @@ public final class SuperBot extends StfRemoteObject implements ISuperBot {
             .setText(xmppJabberID);
         shell.bot().textWithLabel(LABEL_PASSWORD).setText(newPassword);
         shell.bot().button(FINISH).click();
+        shell.waitShortUntilIsClosed();
     }
 
     public void confirmShellCreateNewXMPPJabberAccount(JID jid, String password)
@@ -238,6 +199,7 @@ public final class SuperBot extends StfRemoteObject implements ISuperBot {
 
         shell.bot().textWithLabel(LABEL_PASSWORD).setText(password);
         shell.bot().button(FINISH).click();
+        shell.waitShortUntilIsClosed();
     }
 
     public void confirmShellClosingTheSession() throws RemoteException {
@@ -263,6 +225,7 @@ public final class SuperBot extends StfRemoteObject implements ISuperBot {
                 .check();
         }
         shell.bot().button(FINISH).click();
+        shell.waitShortUntilIsClosed();
     }
 
     public void confirmShellAddBuddy(JID jid) throws RemoteException {
@@ -286,6 +249,7 @@ public final class SuperBot extends StfRemoteObject implements ISuperBot {
 
     public void confirmShellShareProjects(String[] projectNames, JID... jids)
         throws RemoteException {
+
         if (!bot().isShellOpen(SHELL_SHARE_PROJECT)) {
             bot().waitUntilShellIsOpen(SHELL_SHARE_PROJECT);
         }
@@ -293,21 +257,23 @@ public final class SuperBot extends StfRemoteObject implements ISuperBot {
         IRemoteBotShell shell = bot().shell(SHELL_SHARE_PROJECT);
         shell.activate();
 
-        ((RemoteBotTree) shell.bot().tree()).uncheckAllItems();
+        RemoteBotTree tree = waitUntilTreeHasItems(shell);
+
+        tree.uncheckAllItems();
 
         for (String projectName : projectNames)
-            shell.bot().tree().selectTreeItemWithRegex(projectName + ".*")
-                .check();
+            tree.selectTreeItemWithRegex(projectName + ".*").check();
 
         shell.bot().button(NEXT).click();
 
-        ((RemoteBotTree) shell.bot().tree()).uncheckAllItems();
+        tree = waitUntilTreeHasItems(shell);
 
         for (JID jid : jids) {
-            shell.bot().tree().selectTreeItemWithRegex(jid.getBase() + ".*")
-                .check();
+            tree.selectTreeItemWithRegex(jid.getBase() + ".*").check();
         }
         shell.bot().button(FINISH).click();
+
+        shell.waitShortUntilIsClosed();
     }
 
     public void confirmShellAddProjectsToSession(String... projectNames)
@@ -318,13 +284,28 @@ public final class SuperBot extends StfRemoteObject implements ISuperBot {
         IRemoteBotShell shell = bot().shell(SHELL_ADD_PROJECTS_TO_SESSION);
         shell.activate();
 
-        ((RemoteBotTree) shell.bot().tree()).uncheckAllItems();
+        RemoteBotTree tree = waitUntilTreeHasItems(shell);
 
         for (String projectName : projectNames)
-            shell.bot().tree().selectTreeItemWithRegex(projectName + ".*")
-                .check();
+            tree.selectTreeItemWithRegex(projectName + ".*").check();
 
         shell.bot().button(FINISH).click();
+        shell.waitShortUntilIsClosed();
+    }
+
+    private RemoteBotTree waitUntilTreeHasItems(IRemoteBotShell shell)
+        throws RemoteException {
+        RemoteBotTree tree = null;
+        for (int i = 0; i < 10; i++) {
+            tree = (RemoteBotTree) shell.bot().tree();
+            if (tree.rowCount() == 0) {
+                shell.bot().sleep(500);
+                continue;
+            }
+            return tree;
+        }
+
+        throw new TimeoutException("tree '" + tree + "' is empty");
     }
 
     public void confirmShellSessionInvitationAndShellAddProject(

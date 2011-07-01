@@ -220,6 +220,7 @@ public final class SarosPreferences extends StfRemoteObject implements
 
         shell.bot().button(APPLY).click();
         shell.bot().button(OK).click();
+
         RemoteWorkbenchBot.getInstance().waitUntilShellIsClosed(
             SHELL_PREFERNCES);
 
@@ -324,27 +325,14 @@ public final class SarosPreferences extends StfRemoteObject implements
     }
 
     private boolean isAccountActiveNoGUI(JID jid) {
-        XMPPAccount account = getXMPPAccount(jid);
-        if (account == null)
+        XMPPAccount account = null;
+        try {
+            account = getXmppAccountStore().getActiveAccount();
+            assert account.isActive();
+            return account.getUsername().equals(jid.getName());
+        } catch (IllegalStateException e) {
             return false;
-        return account.isActive();
-    }
-
-    /**
-     * 
-     * @param jid
-     *            a JID which is used to identify the users of the Jabber
-     *            network, more about it please see {@link JID}.
-     * @return {@link XMPPAccount} of the given jid.
-     */
-    private XMPPAccount getXMPPAccount(JID jid) {
-        for (XMPPAccount account : getXmppAccountStore().getAllAccounts()) {
-            if (jid.getName().equals(account.getUsername())
-                && jid.getDomain().equals(account.getServer())) {
-                return account;
-            }
         }
-        return null;
     }
 
     private boolean isAccountExistNoGUI(JID jid, String password) {

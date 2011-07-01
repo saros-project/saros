@@ -5,19 +5,18 @@ import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.net.URI;
-import java.net.URLClassLoader;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
-/** @author srossbach */
+/** @author Stefan Rossbach */
 
 public class TestLinkFinder {
 
     private static final String STF_TEST_CASE_PACKAGE = "de.fu_berlin.inf.dpp.stf.test";
-    private static URLClassLoader loader;
+    private static ClassLoader classLoader;
     private static File baseDirectory;
     private static Class<?> testLinkAnnotation;
     private static Map<String, String> testCasesToJavaClass;
@@ -25,29 +24,33 @@ public class TestLinkFinder {
     public static void main(String... strings) throws IOException,
         ClassNotFoundException {
 
-        loader = (URLClassLoader) ClassLoader.getSystemClassLoader();
+        classLoader = ClassLoader.getSystemClassLoader();
+
         testLinkAnnotation = Class
             .forName("de.fu_berlin.inf.dpp.stf.annotation.TestLink");
 
         String className = TestLinkFinder.class.getName().replace(".", "/")
             .concat(".class");
 
-        String location = loader.getResource(className).toString();
+        String classLocationInClassPath = classLoader.getResource(className)
+            .toString();
 
-        int idx = location.indexOf('!');
+        int idx = classLocationInClassPath.indexOf('!');
 
         boolean isJarFile = false;
 
         File file;
 
         if (idx != -1) {
-            // jar:file/ .... !
-            location = location.substring(4, idx);
+            // jar:file/...!de/fu_berlin/.../TestLinkFinder.class
+            classLocationInClassPath = classLocationInClassPath.substring(4,
+                idx);
             isJarFile = true;
-            URI fileLocation = URI.create(location);
+            URI fileLocation = URI.create(classLocationInClassPath);
             file = new File(fileLocation);
         } else {
-            baseDirectory = new File(URI.create(location));
+            // file:/.../de/fu_berlin/.../TestLinkFinder.class
+            baseDirectory = new File(URI.create(classLocationInClassPath));
             File classFile = new File(className);
 
             baseDirectory = new File(baseDirectory.getPath()
@@ -98,7 +101,7 @@ public class TestLinkFinder {
                 Class<?> clazz;
 
                 try {
-                    clazz = loader.loadClass(className);
+                    clazz = classLoader.loadClass(className);
                 } catch (Throwable t) {
                     System.err.println("ERROR while loading class '"
                         + className + "', " + t.getMessage());
@@ -134,7 +137,7 @@ public class TestLinkFinder {
             Class<?> clazz;
 
             try {
-                clazz = loader.loadClass(className);
+                clazz = classLoader.loadClass(className);
             } catch (Throwable t) {
                 System.err.println("ERROR while loading class '" + className
                     + "', " + t.getMessage());

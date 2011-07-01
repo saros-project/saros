@@ -122,6 +122,7 @@ public final class RemoteBotTree extends StfRemoteObject implements
             boolean itemWithRegexFound = false;
 
             for (SWTBotTreeItem child : allChildrenOfCurrentItem) {
+
                 if (child.getText().matches(regex)) {
                     currentItem = child;
                     if (!child.isExpanded())
@@ -260,41 +261,6 @@ public final class RemoteBotTree extends StfRemoteObject implements
                     + "' still contains the treeItem: " + itemText;
             }
         });
-    }
-
-    /**************************************************************
-     * 
-     * inner functions
-     * 
-     **************************************************************/
-
-    public SWTBotTreeItem getTreeItemWithRegexs(SWTBotTree tree,
-        String... regexPathToTreeItem) {
-        SWTBotTreeItem currentItem = null;
-        SWTBotTreeItem[] allChildrenOfCurrentItem;
-        for (String regex : regexPathToTreeItem) {
-            if (currentItem == null) {
-                allChildrenOfCurrentItem = tree.getAllItems();
-            } else {
-                allChildrenOfCurrentItem = currentItem.getItems();
-            }
-            boolean itemFound = false;
-            for (SWTBotTreeItem child : allChildrenOfCurrentItem) {
-                if (child.getText().matches(regex)) {
-                    currentItem = child;
-                    if (!child.isExpanded())
-                        child.expand();
-                    itemFound = true;
-                    continue;
-                }
-            }
-            if (!itemFound) {
-                throw new WidgetNotFoundException("tree item '" + regex
-                    + "' not found. Nodes: "
-                    + Arrays.asList(regexPathToTreeItem));
-            }
-        }
-        return currentItem;
     }
 
 }
