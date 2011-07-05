@@ -54,5 +54,19 @@
 	<classpathentry exported="true" kind="lib" path="lib/org.hamcrest.library_1.1.0.v20090501071000.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/org.hamcrest.text_1.1.0.v20090501071000.jar"/>
 	<classpathentry kind="lib" path="lib/weupnp.jar"/>
+	<classpathentry kind="lib" path="lib/openfire/activation.jar"/>
+	<classpathentry kind="lib" path="lib/openfire/bouncycastle.jar"/>
+	<classpathentry kind="lib" path="lib/openfire/commons-el.jar"/>
+	<classpathentry kind="lib" path="lib/openfire/hsqldb.jar"/>
+	<classpathentry kind="lib" path="lib/openfire/jasper-compiler.jar"/>
+	<classpathentry kind="lib" path="lib/openfire/jasper-runtime.jar"/>
+	<classpathentry kind="lib" path="lib/openfire/jdic.jar"/>
+	<classpathentry kind="lib" path="lib/openfire/jtds.jar"/>
+	<classpathentry kind="lib" path="lib/openfire/mail.jar"/>
+	<classpathentry kind="lib" path="lib/openfire/mysql.jar"/>
+	<classpathentry kind="lib" path="lib/openfire/openfire.jar"/>
+	<classpathentry kind="lib" path="lib/openfire/postgres.jar"/>
+	<classpathentry kind="lib" path="lib/openfire/servlet.jar"/>
+	<classpathentry kind="lib" path="lib/openfire/startup.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
