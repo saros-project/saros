@@ -1,6 +1,9 @@
 package de.fu_berlin.inf.dpp.context;
 
+import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
 import org.eclipse.core.resources.IWorkspace;
+import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.equinox.security.storage.ISecurePreferences;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferenceStore;
@@ -44,5 +47,9 @@ public class TestSaros extends Saros {
     @Override
     public ISecurePreferences getSecurePrefs() {
         return null;
+    }
+
+    public String getUserName() {
+        return getPreferenceStore().getString(PreferenceConstants.USERNAME);
     }
 }

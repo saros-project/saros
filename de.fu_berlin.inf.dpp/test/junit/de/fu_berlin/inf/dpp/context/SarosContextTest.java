@@ -7,6 +7,8 @@ import static junit.framework.Assert.assertTrue;
 import static junit.framework.Assert.fail;
 import static org.junit.Assert.assertEquals;
 
+import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
+import org.eclipse.core.runtime.AssertionFailedException;
 import org.junit.Test;
 import org.picocontainer.annotations.Inject;
 
@@ -104,17 +106,33 @@ public class SarosContextTest {
 
     @Test
     public void testEclipseHelper() {
-        SarosContext testContext = SarosContext.getContextForSaros(
-            new TestSaros()).isTestContext().build();
-        assertTrue(testContext.getComponent(EclipseHelper.class) instanceof EclipseHelperTestSaros);
+        // testcontext
+        {
+            TestSaros testSaros = new TestSaros();
+            testSaros.getPreferenceStore().setValue(PreferenceConstants.USERNAME, "Bob");
 
-        try {
-            SarosContext liveContext = SarosContext.getContextForSaros(
-                new TestSaros()).build();
-            liveContext.getComponent(EclipseHelper.class).getWorkspace();
-            fail("assert IllegalStateException: Workspace is closed.");
-        } catch (IllegalStateException exception) {
-            assertEquals("Workspace is closed.", exception.getMessage());
+            SarosContext testContext = SarosContext.getContextForSaros(testSaros).isTestContext().build();
+            assertTrue(testContext.getComponent(EclipseHelper.class) instanceof EclipseHelperTestSaros);
+            String stateLocationPath = testContext.getComponent(EclipseHelper.class).getStateLocation().toPortableString();
+            assertEquals(stateLocationPath, "test/resources/states/Bob");
+        }
+        // livecontext
+        {
+            SarosContext liveContext = SarosContext.getContextForSaros(new TestSaros()).build();
+            try {
+                String stateLocationPath = liveContext.getComponent(EclipseHelper.class).getStateLocation().toPortableString();
+                assertEquals(stateLocationPath, "test/resources/states/Bob");
+                fail("assert AssertionFailedException: application has not been initialized.");
+            } catch (AssertionFailedException exception) {
+                assertEquals("assertion failed: The application has not been initialized.", exception.getMessage());
+            }
+
+            try {
+                liveContext.getComponent(EclipseHelper.class).getWorkspace();
+                fail("assert IllegalStateException: Workspace is closed.");
+            } catch (IllegalStateException exception) {
+                assertEquals("Workspace is closed.", exception.getMessage());
+            }
         }
     }
 

@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Enumeration;
 
+import de.fu_berlin.inf.dpp.util.EclipseHelper;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.log4j.Appender;
 import org.apache.log4j.FileAppender;
@@ -24,6 +25,7 @@ import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ISarosSessionListener;
 import de.fu_berlin.inf.dpp.project.SarosSessionManager;
 import de.fu_berlin.inf.dpp.ui.preferencePages.FeedbackPreferencePage;
+import org.picocontainer.annotations.Inject;
 
 /**
  * The ErrorLogManager is supposed to upload an error log file to our server at
@@ -48,6 +50,8 @@ public class ErrorLogManager extends AbstractFeedbackManager {
     protected StatisticManager statisticManager;
     protected SessionIDObservable sessionID;
     protected String currentSessionID;
+    @Inject
+    protected EclipseHelper eclipseHelper;
 
     protected ISarosSessionListener sessionListener = new AbstractSarosSessionListener() {
 
@@ -266,7 +270,7 @@ public class ErrorLogManager extends AbstractFeedbackManager {
             @Override
             protected IStatus run(IProgressMonitor monitor) {
                 try {
-                    FileSubmitter.uploadErrorLog(saros.getStateLocation()
+                    FileSubmitter.uploadErrorLog(eclipseHelper.getStateLocation()
                         .toOSString(), logNameExtended, errorLog, SubMonitor
                         .convert(monitor));
                 } catch (IOException e) {
