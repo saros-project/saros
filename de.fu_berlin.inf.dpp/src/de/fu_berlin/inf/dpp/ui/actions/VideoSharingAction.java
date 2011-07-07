@@ -113,7 +113,7 @@ public class VideoSharingAction extends Action implements Disposable {
 
     @Override
     public void run() {
-        Utils.runSafeAsync(log, new Runnable() {
+        Utils.runSafeSWTAsync(log, new Runnable() {
             public void run() {
                 List<User> participants = SelectionRetrieverFactory
                     .getSelectionRetriever(User.class).getSelection();
