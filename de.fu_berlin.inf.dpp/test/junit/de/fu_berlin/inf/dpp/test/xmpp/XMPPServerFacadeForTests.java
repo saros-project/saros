@@ -16,8 +16,8 @@ import de.fu_berlin.inf.dpp.net.util.XMPPAccountUtils;
  * Facade for creating and deleting user-accounts on a XMPP-Server.
  * 
  * You only need to call
- * {@link de.fu_berlin.inf.dpp.pcordes.xmpp.XMPPServerFacadeForTests#getNextUser()}
- * to get a {@link de.fu_berlin.inf.dpp.pcordes.xmpp.XmppUser}.
+ * {@link de.fu_berlin.inf.dpp.xmpp.XMPPServerFacadeForTests#getNextUser()} to
+ * get a {@link de.fu_berlin.inf.dpp.pcordes.xmpp.XmppUser}.
  * 
  * @author cordes
  */
@@ -107,7 +107,7 @@ public class XMPPServerFacadeForTests {
         if (server != null)
             return;
 
-        File openfireLibs = new File("lib/openfire");
+        File openfireLibs = new File("test/lib/openfire");
         File openfireHome = new File("test/resources/openfirehome");
 
         System.setProperty("openfire.lib.dir", openfireLibs.getAbsolutePath());

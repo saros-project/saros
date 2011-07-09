@@ -16,6 +16,6 @@ import de.fu_berlin.inf.dpp.vcs.VCSActivityPluginTest;
 @Suite.SuiteClasses({ VCSActivityPluginTest.class,
     SharedProjectUpdatableValuePluginTest.class, SharedProjectPluginTest.class,
     ResourceActivityFilterPluginTest.class })
-public class HeadlessPluginTestsSuite {
+public class HeadlessPluginTestSuite {
     // empty class
 }

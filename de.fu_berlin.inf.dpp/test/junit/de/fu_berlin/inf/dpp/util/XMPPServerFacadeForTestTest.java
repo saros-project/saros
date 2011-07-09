@@ -17,7 +17,7 @@ import de.fu_berlin.inf.dpp.test.xmpp.XmppUser;
 public class XMPPServerFacadeForTestTest {
 
     @Test
-    public void test() throws XMPPException, InterruptedException {
+    public void test() throws XMPPException {
         XMPPServerFacadeForTests.startServer();
         XMPPServerFacadeForTests facade = new XMPPServerFacadeForTests();
         XmppUser user = facade.getNextUser();

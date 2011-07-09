@@ -21,7 +21,7 @@ import de.fu_berlin.inf.dpp.util.UtilTestSuite;
     InternalExtensionsTestSuite.class, JingleProtocolTestSuite.class,
     UtilTestSuite.class, AccountManagementTestSuite.class,
     MucSessionTestSuite.class })
-public class AllTestsSuite {
+public class AllTestSuite {
     // the class remains completely empty,
     // being used only as a holder for the above annotations
 }
