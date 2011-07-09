@@ -18,7 +18,6 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 import org.picocontainer.annotations.Inject;
 
-import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.accountManagement.XMPPAccountStore;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
@@ -30,42 +29,30 @@ import de.fu_berlin.inf.dpp.ui.widgets.wizard.PublicXMPPServerComposite;
  * Allows the user to create an XMPP account.
  * 
  * @author bkahlert
+ * @author Stefan Rossbach
  */
 public class CreateXMPPAccountWizardPage extends WizardPage {
+
     public static final String TITLE = "Create XMPP/Jabber Account";
     public static final String DESCRIPTION = "Create a new XMPP/Jabber account for use with Saros.";
 
-    public static final String RESULTING_JID_INITIAL_HINT = "Fill in the XMPP/Jabber server and username field\n"
-        + "to get a preview of your XMPP/Jabber ID.";
-    public static final String RESULTING_JID_HINT = "Your XMPP/Jabber ID will be:\n%s";
+    private Combo serverText;
+    private Text usernameText;
+    private Text passwordText;
+    private Text repeatPasswordText;
+    private Button useNowButton;
 
-    protected Combo serverText;
-    protected Text usernameText;
-    protected Text passwordText;
-    protected Text repeatPasswordText;
+    private String defaultServer;
+    private String defaultUsername;
+    private String defaultPassword;
 
-    protected Button useNowButton;
-
-    protected final boolean showUseNowButton;
-
-    @Inject
-    protected Saros saros;
+    private boolean showUseNowButton;
 
     @Inject
-    protected PreferenceUtils preferenceUtils;
+    private PreferenceUtils preferenceUtils;
 
     @Inject
-    protected XMPPAccountStore accountStore;
-
-    /**
-     * True if the username was already valid.
-     */
-    protected boolean usernameWasValid = false;
-
-    /**
-     * True if the password did match already.
-     */
-    protected boolean passwordWasValid = false;
+    private XMPPAccountStore accountStore;
 
     /**
      * @param showUseNowButton
@@ -95,7 +82,7 @@ public class CreateXMPPAccountWizardPage extends WizardPage {
         updatePageCompletion();
     }
 
-    protected Composite createLeftColumn(Composite composite) {
+    private Composite createLeftColumn(Composite composite) {
         Composite leftColumn = new Composite(composite, SWT.NONE);
         leftColumn.setLayout(new GridLayout(2, false));
 
@@ -158,38 +145,37 @@ public class CreateXMPPAccountWizardPage extends WizardPage {
         spacer.setLayoutData(new GridData(SWT.BEGINNING, SWT.TOP, false, false,
             1, 2));
 
-        if (this.showUseNowButton) {
-            this.useNowButton = new Button(leftColumn, SWT.CHECK
-                | SWT.SEPARATOR);
-            this.useNowButton.setSelection(false);
-            this.useNowButton.setText("Use new account immediately");
-            this.useNowButton.setLayoutData(new GridData(SWT.FILL, SWT.CENTER,
-                true, false));
-        }
+        this.useNowButton = new Button(leftColumn, SWT.CHECK | SWT.SEPARATOR);
+        this.useNowButton.setSelection(false);
+        this.useNowButton.setText("Use new account immediately");
+        this.useNowButton.setLayoutData(new GridData(SWT.FILL, SWT.CENTER,
+            true, false));
+
+        this.useNowButton.setVisible(this.showUseNowButton);
 
         return leftColumn;
     }
 
-    public void setInitialValues() {
-        String defaultServer = preferenceUtils.getServer();
-        if (defaultServer.isEmpty())
+    private void setInitialValues() {
+        defaultUsername = "";
+        defaultPassword = "";
+        defaultServer = preferenceUtils.getServer();
+
+        if (defaultServer.length() == 0)
             defaultServer = preferenceUtils.getDefaultServer();
 
         List<String> servers = accountStore.getDomains();
-        if (servers.size() == 0)
-            servers.add(defaultServer);
+        servers.add(defaultServer);
+
         this.serverText.removeAll();
-        int selectIndex = 0;
-        for (int i = 0, j = servers.size(); i < j; i++) {
-            String server = servers.get(i);
+
+        for (String server : servers)
             this.serverText.add(server);
-            if (defaultServer.equals(server))
-                selectIndex = i;
-        }
-        this.serverText.select(selectIndex);
+
+        this.serverText.select(servers.indexOf(defaultServer));
     }
 
-    protected void hookListeners() {
+    private void hookListeners() {
         ModifyListener listener = new ModifyListener() {
             public void modifyText(ModifyEvent e) {
                 updatePageCompletion();
@@ -200,57 +186,73 @@ public class CreateXMPPAccountWizardPage extends WizardPage {
         this.usernameText.addModifyListener(listener);
         this.passwordText.addModifyListener(listener);
         this.repeatPasswordText.addModifyListener(listener);
-        if (this.useNowButton != null) {
-            this.useNowButton.addSelectionListener(new SelectionAdapter() {
-                @Override
-                public void widgetSelected(SelectionEvent e) {
-                    updatePageCompletion();
-                }
-            });
-        }
+        this.useNowButton.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                updatePageCompletion();
+            }
+        });
+
     }
 
-    protected void updatePageCompletion() {
-        boolean done = !this.getServer().isEmpty()
-            && !this.getUsername().isEmpty() && !this.getPassword().isEmpty();
+    private void updatePageCompletion() {
 
         boolean passwordsMatch = this.passwordText.getText().equals(
             this.repeatPasswordText.getText());
-        done &= passwordsMatch;
 
         boolean accountExists = accountStore.contains(getUsername(),
             getServer());
-        done &= !accountExists;
 
-        if (!this.getUsername().isEmpty()) {
-            usernameWasValid = true;
-        }
+        boolean isUsernameEmpty = this.getUsername().length() == 0;
 
-        if (!this.getPassword().isEmpty() && passwordsMatch) {
-            passwordWasValid = true;
-        }
+        boolean isPasswordEmpty = this.getPassword().length() == 0;
 
-        if (!this.getUsername().isEmpty() && !accountExists
-            && !this.getPassword().isEmpty() && passwordsMatch) {
-            setErrorMessage(null);
+        boolean isServerEmpty = this.getServer().length() == 0;
 
-            if (this.useNowButton != null && this.useNowButton.getSelection()) {
-                setMessage(
-                    "You will automatically connect to your new account after completion.",
-                    IMessageProvider.INFORMATION);
-            } else {
-                setMessage(null);
-            }
-        } else if (accountExists) {
+        boolean complete = !isUsernameEmpty && !accountExists
+            && !isPasswordEmpty && !isServerEmpty && passwordsMatch;
+
+        setErrorMessage(null);
+        setMessage(DESCRIPTION);
+
+        // only display those messages after the user has at least typed in one
+        // character
+
+        if (accountExists && haveDefaultsChanged())
             setErrorMessage(Messages.account_exists_errorMessage);
-        } else if (this.getUsername().isEmpty() && usernameWasValid) {
-            setErrorMessage("Username must not be empty.");
-        } else if (this.getPassword().isEmpty() && passwordWasValid) {
+
+        else if (isUsernameEmpty && haveDefaultsChanged())
+            setErrorMessage("You must enter a username.");
+
+        else if (isPasswordEmpty && haveDefaultsChanged())
             setErrorMessage(Messages.password_empty_errorMessage);
-        } else if (!passwordsMatch) {
-            setErrorMessage("Both passwords must match.");
+
+        else if (!passwordsMatch && haveDefaultsChanged())
+            setErrorMessage("The repeated password does not match the password.");
+
+        else if (isServerEmpty && haveDefaultsChanged())
+            setErrorMessage("You must enter a server.");
+
+        if (complete && this.useNowButton.getSelection()) {
+            setMessage(
+                "You will automatically connect to your new account after completion.",
+                IMessageProvider.INFORMATION);
         }
-        setPageComplete(done);
+
+        setPageComplete(complete);
+    }
+
+    private boolean changed = false;
+
+    private boolean haveDefaultsChanged() {
+        if (changed)
+            return changed;
+
+        changed = !(getUsername().equals(defaultUsername)
+            && getPassword().equals(defaultPassword) && getServer().equals(
+            defaultServer));
+
+        return changed;
     }
 
     @Override
