@@ -133,6 +133,9 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
                 errorMsg = e.getMessage();
             localCancel(errorMsg, CancelOption.NOTIFY_PEER);
             executeCancellation();
+        } catch (SarosCancellationException cancel) {
+            localCancel("", CancelOption.NOTIFY_PEER);
+            executeCancellation();
         } finally {
             monitor.done();
         }
@@ -201,7 +204,7 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
         log.debug("Inv" + Utils.prefix(peer)
             + ": Waiting for remote file list...");
 
-        subMonitor.setTaskName("Waiting for the peer's file list...");
+        subMonitor.setTaskName("Waiting for the " + peer + " file list...");
 
         checkCancellation(CancelOption.NOTIFY_PEER);
 

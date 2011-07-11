@@ -26,8 +26,6 @@ import de.fu_berlin.inf.dpp.FileList;
 import de.fu_berlin.inf.dpp.FileListDiff;
 import de.fu_berlin.inf.dpp.FileListFactory;
 import de.fu_berlin.inf.dpp.Saros;
-import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
-import de.fu_berlin.inf.dpp.exceptions.RemoteCancellationException;
 import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
 import de.fu_berlin.inf.dpp.invitation.IncomingProjectNegotiation;
 import de.fu_berlin.inf.dpp.invitation.ProcessTools.CancelLocation;
@@ -75,6 +73,8 @@ public class AddProjectToSessionWizard extends Wizard {
         this.dataTransferManager = dataTransferManager;
         this.preferenceUtils = preferenceUtils;
         setWindowTitle("Add Projects");
+
+        process.setProjectInvitationUI(this);
 
         /** holds if the wizard close is because of an exception or not */
         isExceptionCancel = false;
@@ -168,7 +168,6 @@ public class AddProjectToSessionWizard extends Wizard {
                         SubMonitor.convert(monitor), skipProjectSyncing,
                         useVersionControl);
                 } catch (SarosCancellationException e) {
-                    processException(e.getCause());
                     return Status.CANCEL_STATUS;
                 }
                 return Status.OK_STATUS;
@@ -178,20 +177,6 @@ public class AddProjectToSessionWizard extends Wizard {
         job.schedule();
 
         return true;
-    }
-
-    protected void processException(Throwable t) {
-        if (t instanceof LocalCancellationException) {
-            cancelWizard(process.getPeer(), t.getMessage(),
-                CancelLocation.LOCAL);
-        } else if (t instanceof RemoteCancellationException) {
-            cancelWizard(process.getPeer(), t.getMessage(),
-                CancelLocation.REMOTE);
-        } else {
-            log.error("This type of exception is not expected here: ", t);
-            cancelWizard(process.getPeer(), "Unkown error: " + t.getMessage(),
-                CancelLocation.REMOTE);
-        }
     }
 
     public void cancelWizard(final JID jid, final String errorMsg,

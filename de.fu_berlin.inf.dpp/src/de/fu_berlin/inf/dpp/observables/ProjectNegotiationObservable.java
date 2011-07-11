@@ -82,4 +82,10 @@ public class ProjectNegotiationObservable {
                 new StackTrace());
         }
     }
+
+    public synchronized Map<JID, ProjectNegotiation> getProcesses() {
+        Map<JID, ProjectNegotiation> projectNegotiations = new HashMap<JID, ProjectNegotiation>(
+            processes);
+        return projectNegotiations;
+    }
 }

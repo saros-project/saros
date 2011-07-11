@@ -125,6 +125,11 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
         return null;
     }
 
+    public void setProjectInvitationUI(
+        AddProjectToSessionWizard addIncomingProjectUI) {
+        this.addIncomingProjectUI = addIncomingProjectUI;
+    }
+
     /**
      * 
      * @param projectNames
@@ -197,7 +202,10 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
                         CancelOption.NOTIFY_PEER);
                 }
             }
-            this.projectExchangeProcesses.removeProjectExchangeProcess(this);
+            if (this.projectExchangeProcesses.getProcesses()
+                .containsValue(this))
+                this.projectExchangeProcesses
+                    .removeProjectExchangeProcess(this);
             subMonitor.done();
         }
     }

@@ -402,6 +402,7 @@ public class SarosSessionManager implements IConnectionListener,
 
         OutgoingInvitationJob outgoingInvitationJob = new OutgoingInvitationJob(
             result);
+        outgoingInvitationJob.setPriority(Job.SHORT);
         outgoingInvitationJob.schedule();
     }
 
@@ -560,6 +561,7 @@ public class SarosSessionManager implements IConnectionListener,
                 sessionID, doStream, sarosContext, null);
 
             OutgoingProjectJob job = new OutgoingProjectJob(out);
+            job.setPriority(Job.SHORT);
             job.schedule();
         }
     }
@@ -589,6 +591,7 @@ public class SarosSessionManager implements IConnectionListener,
                 projectResourcesMapping, projectExchangeProcesses, stopManager,
                 sessionID, doStream, sarosContext, projectExchangeInfos);
             OutgoingProjectJob job = new OutgoingProjectJob(out);
+            job.setPriority(Job.SHORT);
             job.schedule();
         }
 

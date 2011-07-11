@@ -33,20 +33,27 @@ public class InvitationProcessObservable {
         InvitationProcess oldProcess = this.processes.put(process.getPeer(),
             process);
         if (oldProcess != null) {
-            log.error("An internal error occurred:"
-                + " An existing invititation process with "
-                + Utils.prefix(oldProcess.getPeer())
-                + " was replace by a new one", new StackTrace());
+            log.error(
+                "An internal error occurred:"
+                    + " An existing invititation process with "
+                    + Utils.prefix(oldProcess.getPeer())
+                    + " was replace by a new one", new StackTrace());
         }
     }
 
     public synchronized void removeInvitationProcess(InvitationProcess process) {
         if (this.processes.remove(process.getPeer()) == null) {
-            log.error("An internal error occurred:"
-                + " No invititation process with "
-                + Utils.prefix(process.getPeer()) + " could be found",
+            log.error(
+                "An internal error occurred:"
+                    + " No invititation process with "
+                    + Utils.prefix(process.getPeer()) + " could be found",
                 new StackTrace());
         }
     }
 
+    public synchronized Map<JID, InvitationProcess> getProcesses() {
+        Map<JID, InvitationProcess> invitationProcesses = new HashMap<JID, InvitationProcess>(
+            processes);
+        return invitationProcesses;
+    }
 }

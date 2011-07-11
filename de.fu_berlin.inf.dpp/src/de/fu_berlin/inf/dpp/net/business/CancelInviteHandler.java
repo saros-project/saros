@@ -8,10 +8,12 @@ import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.invitation.InvitationProcess;
+import de.fu_berlin.inf.dpp.invitation.ProjectNegotiation;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.internal.XMPPReceiver;
 import de.fu_berlin.inf.dpp.net.internal.extensions.CancelInviteExtension;
 import de.fu_berlin.inf.dpp.observables.InvitationProcessObservable;
+import de.fu_berlin.inf.dpp.observables.ProjectNegotiationObservable;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 import de.fu_berlin.inf.dpp.util.Utils;
 
@@ -24,6 +26,9 @@ public class CancelInviteHandler extends CancelInviteExtension {
     @Inject
     protected InvitationProcessObservable invitationProcesses;
 
+    @Inject
+    protected ProjectNegotiationObservable projectExchangeProcesses;
+
     public CancelInviteHandler(SessionIDObservable sessionID,
         XMPPReceiver receiver) {
         super(sessionID);
@@ -32,12 +37,16 @@ public class CancelInviteHandler extends CancelInviteExtension {
 
     @Override
     public void invitationCanceledReceived(JID sender, String errorMsg) {
-        InvitationProcess process = invitationProcesses
+        InvitationProcess invitationProcess = invitationProcesses
             .getInvitationProcess(sender);
-        if (process != null) {
+        ProjectNegotiation projectExchange = projectExchangeProcesses
+            .getProjectExchangeProcess(sender);
+        if (invitationProcess != null) {
             log.debug("Inv" + Utils.prefix(sender)
                 + ": Received invitation cancel message");
-            process.remoteCancel(errorMsg);
+            invitationProcess.remoteCancel(errorMsg);
+        } else if (projectExchange != null) {
+            projectExchange.remoteCancel(errorMsg);
         } else {
             log.warn("Inv[unkown buddy]: Received invitation cancel message for unknown invitation process. Ignoring...");
         }

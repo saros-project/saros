@@ -70,8 +70,12 @@ public class OutgoingSessionNegotiation extends InvitationProcess {
                 } catch (LocalCancellationException e) {
                     log.debug("", e);
                     localCancel(e.getMessage(), CancelOption.NOTIFY_PEER);
+                    try {
+                        executeCancellation();
+                    } catch (SarosCancellationException e1) {
+                        log.debug("", e1);
+                    }
                 } catch (IOException e) {
-                    // TODO Auto-generated catch block
                     log.debug("", e);
                 }
                 log.debug("Inv"
@@ -467,7 +471,9 @@ public class OutgoingSessionNegotiation extends InvitationProcess {
             monitor.setTaskName("Invitation failed.");
         }
         sarosSession.returnColor(this.colorID);
-        invitationProcesses.removeInvitationProcess(this);
+        sarosSessionManager.stopSarosSession();
+        if (invitationProcesses.getProcesses().containsValue(this))
+            invitationProcesses.removeInvitationProcess(this);
         throw cancellationCause;
     }
 
