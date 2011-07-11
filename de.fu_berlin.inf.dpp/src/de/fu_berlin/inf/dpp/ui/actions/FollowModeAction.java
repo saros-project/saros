@@ -43,7 +43,10 @@ public class FollowModeAction extends Action implements Disposable {
 
         @Override
         public void userLeft(User user) {
-            updateEnablement();
+            if (user.equals(editorManager.getFollowedUser())) {
+                toFollowUser = null;
+                setEnabled(false);
+            }
         }
 
         @Override
@@ -57,6 +60,7 @@ public class FollowModeAction extends Action implements Disposable {
         public void sessionStarted(ISarosSession newSarosSession) {
 
             newSarosSession.addListener(permissionChangeListener);
+            toFollowUser = null;
             updateEnablement();
 
             /*
@@ -102,6 +106,7 @@ public class FollowModeAction extends Action implements Disposable {
         @Override
         public void sessionEnded(ISarosSession oldSarosSession) {
             oldSarosSession.removeListener(permissionChangeListener);
+            toFollowUser = null;
             updateEnablement();
         }
     };
@@ -110,8 +115,6 @@ public class FollowModeAction extends Action implements Disposable {
         @Override
         public void followModeChanged(User user, boolean isFollowed) {
             setChecked(isFollowed);
-            updateEnablement();
-
             // should not be disabled but checked
             assert (!isEnabled() && isChecked()) == false;
         }
@@ -142,6 +145,8 @@ public class FollowModeAction extends Action implements Disposable {
         updateEnablement();
     }
 
+    User toFollowUser;
+
     @Override
     public void run() {
         User toFollow = getNewToFollow();
@@ -160,17 +165,26 @@ public class FollowModeAction extends Action implements Disposable {
         ISarosSession sarosSession = sessionManager.getSarosSession();
         assert sarosSession != null;
 
-        if (editorManager.isFollowing()) {
-            return null;
-        } else {
+        if (toFollowUser == null) {
             for (User user : sarosSession.getParticipants()) {
                 if (user.isRemote() && user.hasWriteAccess()) {
-                    return user;
+                    if (!user.equals(editorManager.getFollowedUser())) {
+                        return user;
+                    } else {
+                        return null;
+                    }
                 }
             }
-            log.error("No user with write access to follow but action was enabled");
-            return null;
         }
+
+        if (editorManager.isFollowing()) {
+            if (!editorManager.getFollowedUser().equals(toFollowUser)) {
+                return toFollowUser;
+            } else {
+                return null;
+            }
+        }
+        return toFollowUser;
     }
 
     /**
@@ -182,12 +196,6 @@ public class FollowModeAction extends Action implements Disposable {
 
         if (sarosSession == null)
             return false;
-
-        if (editorManager.isFollowing()) {
-            // While following the button must be enabled to allow deactivation
-            // of follow mode.
-            return true;
-        }
 
         int usersWithWriteAccessCount = 0;
         for (User user : sarosSession.getParticipants()) {
@@ -204,5 +212,28 @@ public class FollowModeAction extends Action implements Disposable {
     public void dispose() {
         sessionManager.removeSarosSessionListener(sessionListener);
         editorManager.removeSharedEditorListener(editorListener);
+    }
+
+    public void setFollowModeActionStatus(User user) {
+        if (user != null && user.isRemote() && user.hasWriteAccess()) {
+            setEnabled(true);
+            setToFollowUser(user);
+            if (!editorManager.getFollowedUser().equals(user)) {
+                setChecked(false);
+                setToolTipText("Enable Follow Mode to " + user.toString());
+            } else {
+                setChecked(true);
+                setToolTipText("Disable Follow Mode to " + user.toString());
+            }
+        } else {
+            setChecked(false);
+            setEnabled(false);
+            setToFollowUser(null);
+            setToolTipText("Enable/Disable Follow Mode");
+        }
+    }
+
+    public void setToFollowUser(User toFollowUser) {
+        this.toFollowUser = toFollowUser;
     }
 }

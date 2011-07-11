@@ -990,9 +990,6 @@ public class EditorManager implements IActivityProvider, Disposable {
         // and the Resource accessible (we don't want to report stale files)?
         if (!isSharedEditor(editorPart)
             || !editorAPI.getEditorResource(editorPart).isAccessible()) {
-            if (getFollowedUser() != null) {
-                setFollowing(null);
-            }
             generateEditorActivated(null);
             return;
         }

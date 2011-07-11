@@ -243,6 +243,21 @@ public class SarosView extends ViewPart {
                     log.warn("Control is not instance of Tree.");
                 }
             }
+
+            @Override
+            public void mouseDown(MouseEvent event) {
+                if (control instanceof Tree) {
+                    TreeItem treeItem = ((Tree) control).getItem(new Point(
+                        event.x, event.y));
+                    if (treeItem != null) {
+                        User user = (User) Platform.getAdapterManager()
+                            .getAdapter(treeItem.getData(), User.class);
+                        fmAction.setFollowModeActionStatus(user);
+                    }
+                } else {
+                    log.warn("Control is not instance of Tree.");
+                }
+            }
         });
 
         /*
@@ -293,13 +308,16 @@ public class SarosView extends ViewPart {
         getViewSite().getPage().addPartListener(partListener);
     }
 
+    FollowModeAction fmAction;
+
     protected void addToolBarItems(IToolBarManager toolBar) {
         toolBar.add(new ChangeXMPPAccountAction());
         toolBar.add(new NewContactAction());
         toolBar.add(new Separator());
         toolBar.add(new StoppedAction());
         toolBar.add(new ConsistencyAction());
-        toolBar.add(new FollowModeAction());
+        fmAction = new FollowModeAction();
+        toolBar.add(fmAction);
         toolBar.add(new IMBeepAction());
         toolBar.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
         toolBar.add(new LeaveSessionAction());
