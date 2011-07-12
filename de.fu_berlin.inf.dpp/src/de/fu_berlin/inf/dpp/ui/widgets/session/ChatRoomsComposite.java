@@ -37,9 +37,9 @@ import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.SarosSessionManager;
 import de.fu_berlin.inf.dpp.ui.ImageManager;
-import de.fu_berlin.inf.dpp.ui.views.SarosView;
 import de.fu_berlin.inf.dpp.ui.sounds.SoundManager;
 import de.fu_berlin.inf.dpp.ui.sounds.SoundPlayer;
+import de.fu_berlin.inf.dpp.ui.views.SarosView;
 import de.fu_berlin.inf.dpp.ui.widgets.chatControl.ChatControl;
 import de.fu_berlin.inf.dpp.ui.widgets.chatControl.events.CharacterEnteredEvent;
 import de.fu_berlin.inf.dpp.ui.widgets.chatControl.events.ChatClearedEvent;
@@ -121,7 +121,7 @@ public class ChatRoomsComposite extends ListExplanatoryComposite {
 
                         hideExplanation();
                         chatRoom1 = new CTabItem(chatRooms, SWT.NONE);
-                        chatRoom1.setText("Chatroom 1");
+                        chatRoom1.setText("Roundtable");
                         chatRoom1.setImage(chatViewImage);
                         chatRoom1.setControl(chatControl);
                         chatRooms.setSelection(0);
@@ -279,7 +279,7 @@ public class ChatRoomsComposite extends ListExplanatoryComposite {
         if (this.joinedSession()) {
             this.attachToMUCSession(mucManager.getMUCSession());
             chatRoom1 = new CTabItem(chatRooms, SWT.NONE);
-            chatRoom1.setText("Chatroom 1");
+            chatRoom1.setText("Roundtable");
             chatRoom1.setImage(chatViewImage);
             chatRoom1.setControl(chatControl);
             chatRooms.setSelection(0);

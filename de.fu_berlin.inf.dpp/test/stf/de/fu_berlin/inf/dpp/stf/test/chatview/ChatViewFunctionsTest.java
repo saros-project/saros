@@ -80,7 +80,7 @@ public class ChatViewFunctionsTest extends StfTestCase {
     @Test
     public void testChat() throws RemoteException {
 
-        assertEquals("Chatroom 1", ALICE.remoteBot().view(VIEW_SAROS).bot()
+        assertEquals("Roundtable", ALICE.remoteBot().view(VIEW_SAROS).bot()
             .cTabItem().getText());
 
         ALICE.superBot().views().sarosView().selectChatroom()
