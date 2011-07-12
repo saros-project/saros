@@ -32,16 +32,12 @@ public class BuddiesByAliceBobTest extends StfTestCase {
      */
 
     @BeforeClass
-    public static void runBeforeClass() throws RemoteException {
-        initTesters(ALICE, BOB);
-        setUpWorkbench();
-        setUpSaros();
+    public static void selectTesters() throws Exception {
+        select(ALICE, BOB);
     }
 
-    @Override
     @After
-    public void after() throws RemoteException {
-        announceTestCaseEnd();
+    public void afterEveryTest() throws RemoteException {
         resetBuddies();
         resetBuddyNames();
     }
@@ -92,10 +88,10 @@ public class BuddiesByAliceBobTest extends StfTestCase {
 
     @Test
     public void addBuddy() throws RemoteException {
-        Util.deleteBuddies(ALICE, BOB);
+        Util.removeBuddiesFromContactList(ALICE, BOB);
         assertFalse(ALICE.superBot().views().sarosView().hasBuddy(BOB.getJID()));
         assertFalse(BOB.superBot().views().sarosView().hasBuddy(ALICE.getJID()));
-        Util.addBuddies(ALICE, BOB);
+        Util.addBuddiesToContactList(ALICE, BOB);
         assertTrue(ALICE.superBot().views().sarosView().hasBuddy(BOB.getJID()));
         assertTrue(BOB.superBot().views().sarosView().hasBuddy(ALICE.getJID()));
     }
@@ -116,9 +112,10 @@ public class BuddiesByAliceBobTest extends StfTestCase {
     @Test
     public void deleteBuddy() throws RemoteException {
         assertTrue(ALICE.superBot().views().sarosView().hasBuddy(BOB.getJID()));
-        Util.deleteBuddies(ALICE, BOB);
+        Util.removeBuddiesFromContactList(ALICE, BOB);
         assertFalse(ALICE.superBot().views().sarosView().hasBuddy(BOB.getJID()));
         assertFalse(BOB.superBot().views().sarosView().hasBuddy(ALICE.getJID()));
+        ALICE.remoteBot().sleep(5000);
     }
 
     @Test

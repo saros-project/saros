@@ -16,34 +16,20 @@ import de.fu_berlin.inf.dpp.stf.shared.Constants.TypeOfCreateProject;
 @TestLink(id = "Saros-43_folder_operations")
 public class FolderOperationsTest extends StfTestCase {
 
-    /**
-     * Preconditions:
-     * <ol>
-     * <li>ALICE (Host, Write Access), Alice share a java project with BOB and
-     * CARL.</li>
-     * <li>BOB (Read-Only Access)</li>
-     * </ol>
-     * 
-     * @throws RemoteException
-     * @throws InterruptedException
-     */
     @BeforeClass
-    public static void runBeforeClass() throws RemoteException,
-        InterruptedException {
-        initTesters(ALICE, BOB);
-        setUpWorkbench();
-        setUpSaros();
+    public static void selectTesters() throws Exception {
+        select(ALICE, BOB);
     }
 
     @Test
     public void testRenameFolder() throws RemoteException {
 
         ALICE.superBot().internal().createProject("foo");
-        ALICE
-            .superBot()
-            .internal()
-            .createFile("foo", "test/foo.txt", /* 100 MByte */
-                1024 * 1024 * 100, false);
+        ALICE.superBot().internal().createFile("foo", "test/foo.txt", /*
+                                                                       * 100
+                                                                       * MByte
+                                                                       */
+        1024 * 1024 * 100, false);
 
         Util.buildSessionSequentially("foo", TypeOfCreateProject.NEW_PROJECT,
             ALICE, BOB);

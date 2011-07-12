@@ -200,7 +200,7 @@ public final class InternalImpl extends StfRemoteObject implements IInternal {
         }
     }
 
-    public boolean deleteWorkspace() throws RemoteException {
+    public boolean clearWorkspace() throws RemoteException {
         boolean error = false;
 
         for (IProject project : ResourcesPlugin.getWorkspace().getRoot()
@@ -305,5 +305,22 @@ public final class InternalImpl extends StfRemoteObject implements IInternal {
             log.error(e.getMessage(), e);
             throw new RemoteException(e.getMessage(), e.getCause());
         }
+    }
+
+    public void createJavaClass(String projectName, String packageName,
+        String className) throws RemoteException {
+        String path = "src/" + packageName.replace(".", "/") + "/" + className
+            + ".java";
+
+        StringBuilder content = new StringBuilder();
+
+        if (packageName.trim().length() > 0)
+            content.append("package ").append(packageName).append(';')
+                .append('\n').append('\n');
+
+        content.append("public class ").append(className).append(" {\n\n}");
+
+        createFile(projectName, path, content.toString());
+
     }
 }

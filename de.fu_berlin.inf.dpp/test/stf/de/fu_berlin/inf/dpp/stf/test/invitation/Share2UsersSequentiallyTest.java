@@ -25,13 +25,10 @@ public class Share2UsersSequentiallyTest extends StfTestCase {
      * <li>Bob (Read-Only Access)</li>
      * </ol>
      * 
-     * @throws RemoteException
      */
     @BeforeClass
-    public static void runBeforeClass() throws RemoteException {
-        initTesters(ALICE, BOB);
-        setUpWorkbench();
-        setUpSaros();
+    public static void selectTesters() throws Exception {
+        select(ALICE, BOB);
     }
 
     /**
@@ -52,8 +49,8 @@ public class Share2UsersSequentiallyTest extends StfTestCase {
      * @throws InterruptedException
      */
     @Test
-    public void ALICEShareProjectWithBobSequentially() throws RemoteException,
-        InterruptedException {
+    public void testAliceShareProjectWithBobSequentially()
+        throws RemoteException, InterruptedException {
         ALICE
             .superBot()
             .views()

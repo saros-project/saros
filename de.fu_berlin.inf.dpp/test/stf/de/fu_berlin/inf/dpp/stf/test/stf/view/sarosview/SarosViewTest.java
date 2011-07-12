@@ -18,10 +18,8 @@ import de.fu_berlin.inf.dpp.stf.client.StfTestCase;
 public class SarosViewTest extends StfTestCase {
 
     @BeforeClass
-    public static void runBeforeClass() throws RemoteException {
-        initTesters(ALICE);
-        setUpWorkbench();
-        setUpSaros();
+    public static void selectTesters() throws Exception {
+        select(ALICE);
     }
 
     @Before

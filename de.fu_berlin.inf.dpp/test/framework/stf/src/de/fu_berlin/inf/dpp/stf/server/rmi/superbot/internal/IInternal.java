@@ -6,46 +6,48 @@ import java.rmi.RemoteException;
 public interface IInternal extends Remote {
 
     /**
-     * Creates a folder in the project
+     * Creates a folder in the project. All missing folders will be created
+     * automatically.
      * 
-     * @param project
+     * @Note the project must already exists
+     * @param projectName
      *            the name of the project
      * @param path
      *            the path of the folder e.g my/foo/bar
      * @throws RemoteException
      */
 
-    public void createFolder(String project, String path)
+    public void createFolder(String projectName, String path)
         throws RemoteException;
 
     /**
      * Creates a project
      * 
-     * @param project
+     * @param projectName
      *            the name of the project
      * @throws RemoteException
      */
 
-    public void createProject(String project) throws RemoteException;
+    public void createProject(String projectName) throws RemoteException;
 
     /**
      * Creates a Java project
      * 
-     * @param project
+     * @param projectName
      *            the name of the project
      * @throws RemoteException
      */
-    public void createJavaProject(String project) throws RemoteException;
+    public void createJavaProject(String projectName) throws RemoteException;
 
     /**
-     * Deletes the current workspace
+     * Clears the current workspace by deleting all projects
      * 
      * @return <code>true</code> if all projects were successfully deleted,
      *         <code>false</code> otherwise
      * @throws RemoteException
      */
 
-    public boolean deleteWorkspace() throws RemoteException;
+    public boolean clearWorkspace() throws RemoteException;
 
     /**
      * Changes the current Saros version to the given version
@@ -66,24 +68,30 @@ public interface IInternal extends Remote {
     public void resetSarosVersion() throws RemoteException;
 
     /**
-     * Creates a file in the given project
+     * Creates a file in the given project. All missing folders will be created
+     * automatically.
      * 
-     * @param project
+     * @Note the project must already exists
+     * @param projectName
      *            the project where the file should be created
      * 
      * @param path
      *            the relative path of the file e.g my/foo/bar/hello.java
      * @param content
      *            the content of the file
+     * @throws RemoteException
+     * 
      */
 
-    public void createFile(String project, String path, String content)
+    public void createFile(String projectName, String path, String content)
         throws RemoteException;
 
     /**
-     * Creates a file in the given project
+     * Creates a file in the given project. All missing folders will be created
+     * automatically.
      * 
-     * @param project
+     * @Note the project must already exists
+     * @param projectName
      *            the project where the file should be created
      * 
      * @param path
@@ -93,8 +101,25 @@ public interface IInternal extends Remote {
      * @param compressAble
      *            if <code>true</code> the content of the file will compress
      *            into not more than a several bytes
+     * @throws RemoteException
      */
-    public void createFile(String project, String path, int size,
+    public void createFile(String projectName, String path, int size,
         boolean compressAble) throws RemoteException;
 
+    /**
+     * Creates a java class in the given project
+     * 
+     * @Note the project must already exists
+     * @param projectName
+     *            the name project where the java class should be created
+     * 
+     * @param packageName
+     *            the name of the package e.g my.foo.bar
+     * @param className
+     *            the name of the class e.g HelloWorld
+     * @throws RemoteException
+     */
+
+    public void createJavaClass(String projectName, String packageName,
+        String className) throws RemoteException;
 }

@@ -11,8 +11,6 @@ import static de.fu_berlin.inf.dpp.stf.shared.Constants.SUFFIX_JAVA;
 import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
-import java.rmi.AccessException;
-import java.rmi.RemoteException;
 
 import org.eclipse.core.runtime.CoreException;
 import org.junit.BeforeClass;
@@ -35,16 +33,11 @@ public class UserWithWriteAccessResetsFilesTest extends StfTestCase {
      * <li>EDNA (Read-Only in Follow-Mode)</li>
      * </ol>
      * 
-     * @throws AccessException
-     * @throws RemoteException
      */
+
     @BeforeClass
-    public static void runBeforeClass() throws RemoteException {
-        initTesters(ALICE, BOB, CARL, DAVE, EDNA);
-        setUpWorkbench();
-        setUpSaros();
-        Util.setUpSessionWithAJavaProjectAndAClass(Constants.PROJECT1,
-            Constants.PKG1, Constants.CLS1, ALICE, BOB, CARL, DAVE, EDNA);
+    public static void selectTesters() throws Exception {
+        select(ALICE, BOB, CARL, DAVE, EDNA);
     }
 
     /**
@@ -72,6 +65,9 @@ public class UserWithWriteAccessResetsFilesTest extends StfTestCase {
      */
     @Test
     public void testAliceResetsFile() throws IOException, CoreException {
+        Util.setUpSessionWithJavaProjectAndClass(Constants.PROJECT1,
+            Constants.PKG1, Constants.CLS1, ALICE, BOB, CARL, DAVE, EDNA);
+
         DAVE.superBot().views().sarosView().selectParticipant(ALICE.getJID())
             .followParticipant();
         EDNA.superBot().views().sarosView().selectParticipant(ALICE.getJID())

@@ -23,25 +23,21 @@ import de.fu_berlin.inf.dpp.stf.test.Constants;
 public class SessionAliceBobTest extends StfTestCase {
 
     @BeforeClass
-    public static void runBeforeClass() throws RemoteException {
+    public static void runBeforeClass() throws Exception {
         initTesters(ALICE, BOB);
         setUpWorkbench();
         setUpSaros();
-        Util.setUpSessionWithAJavaProjectAndAClass(Constants.PROJECT1,
+        Util.setUpSessionWithJavaProjectAndClass(Constants.PROJECT1,
             Constants.PKG1, Constants.CLS1, ALICE, BOB);
     }
 
-    @Override
     @Before
-    public void before() throws RemoteException {
+    public void beforeEveryTest() throws RemoteException {
         Util.reBuildSession(Constants.PROJECT1, ALICE, BOB);
-        announceTestCaseStart();
     }
 
-    @Override
     @After
-    public void after() throws RemoteException {
-        announceTestCaseEnd();
+    public void afterEveryTest() throws RemoteException {
         Util.resetWriteAccess(ALICE, BOB);
         Util.resetFollowModeSequentially(ALICE, BOB);
     }
@@ -156,15 +152,10 @@ public class SessionAliceBobTest extends StfTestCase {
         ALICE.remoteBot().waitUntilEditorOpen(Constants.CLS2_SUFFIX);
         assertTrue(ALICE.remoteBot().isEditorOpen(Constants.CLS2_SUFFIX));
         assertFalse(BOB.remoteBot().isEditorOpen(Constants.CLS2_SUFFIX));
-        BOB.remoteBot()
-            .captureScreenshot(
-                BOB.remoteBot().getPathToScreenShot()
-                    + "/vor_jump_to_position.png");
+        BOB.remoteBot().captureScreenshot("/vor_jump_to_position.png");
         BOB.superBot().views().sarosView().selectParticipant(ALICE.getJID())
             .jumpToPositionOfSelectedBuddy();
-        BOB.remoteBot().captureScreenshot(
-            BOB.remoteBot().getPathToScreenShot()
-                + "/after_jump_to_position.png");
+        BOB.remoteBot().captureScreenshot("/after_jump_to_position.png");
         assertTrue(BOB.remoteBot().editor(Constants.CLS2_SUFFIX).isActive());
 
         ALICE.superBot().views().packageExplorerView()
@@ -210,7 +201,7 @@ public class SessionAliceBobTest extends StfTestCase {
         assertFalse(editorTextOfAlice.equals(editorTextOfBob));
         BOB.remoteBot().sleep(10000);
         BOB.superBot().views().sarosView().waitUntilIsInconsistencyDetected();
-        BOB.superBot().views().sarosView().inconsistencyDetected();
+        BOB.superBot().views().sarosView().resolveInconsistency();
         editorTextOfAlice = ALICE.remoteBot().editor(Constants.CLS1_SUFFIX)
             .getText();
         editorTextOfBob = BOB.remoteBot().editor(Constants.CLS1_SUFFIX)

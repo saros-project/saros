@@ -3,10 +3,12 @@ package de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.contextmenu.saros
 import java.rmi.RemoteException;
 
 import org.apache.log4j.Logger;
+import org.eclipse.swtbot.swt.finder.SWTBot;
+import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
 import org.eclipse.swtbot.swt.finder.waits.DefaultCondition;
 
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.impl.RemoteWorkbenchBot;
+import de.fu_berlin.inf.dpp.stf.server.bot.widget.ContextMenuHelper;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.contextmenu.sarosview.IContextMenusInSessionArea;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.impl.SuperBot;
 
@@ -40,23 +42,27 @@ public final class ContextMenusInSessionArea extends ContextMenusInSarosView
      * 
      **********************************************/
     public void grantWriteAccess() throws RemoteException {
+        log.trace("granting write access to: " + participantJID.getBase());
         if (hasWriteAccess()) {
             throw new RuntimeException("user \"" + treeItem.getText()
                 + "\" already has write access!.");
         }
-        treeItem.contextMenus(CM_GRANT_WRITE_ACCESS).click();
+        treeItem.select();
+        ContextMenuHelper.clickContextMenu(tree, CM_GRANT_WRITE_ACCESS);
         waitUntilHasWriteAccess();
-        RemoteWorkbenchBot.getInstance().sleep(300);
     }
 
     public void restrictToReadOnlyAccess() throws RemoteException {
+        log.trace("revoking write access from: " + participantJID.getBase());
+
         if (!hasWriteAccess()) {
             throw new RuntimeException("user \"" + treeItem.getText()
                 + "\" already has read-only access!");
         }
-        treeItem.contextMenus(CM_RESTRICT_TO_READ_ONLY_ACCESS).click();
+        treeItem.select();
+        ContextMenuHelper.clickContextMenu(tree,
+            CM_RESTRICT_TO_READ_ONLY_ACCESS);
         waitUntilHasReadOnlyAccess();
-        RemoteWorkbenchBot.getInstance().sleep(300);
     }
 
     public void followParticipant() throws RemoteException {
@@ -67,13 +73,18 @@ public final class ContextMenusInSessionArea extends ContextMenusInSarosView
         if (SuperBot.getInstance().getJID().equals(participantJID)) {
             throw new RuntimeException("you can't follow yourself");
         }
-        treeItem.contextMenus(CM_FOLLOW_PARTICIPANT).click();
+        log.trace("tree: " + tree.getText());
+        log.trace("treeItem: " + treeItem.getText());
+        treeItem.select();
+        ContextMenuHelper.clickContextMenu(tree, CM_FOLLOW_PARTICIPANT);
+
         // waitUntilIsFollowingThisBuddy();
     }
 
     public void stopFollowing() throws RemoteException {
         log.debug(" JID of the followed user: " + participantJID.getBase());
-        treeItem.contextMenus(CM_STOP_FOLLOWING).click();
+        treeItem.select();
+        ContextMenuHelper.clickContextMenu(tree, CM_STOP_FOLLOWING);
         waitUntilIsNotFollowing();
     }
 
@@ -82,22 +93,27 @@ public final class ContextMenusInSessionArea extends ContextMenusInSarosView
             throw new RuntimeException(
                 "you can't jump to the position of yourself");
         }
-        treeItem.contextMenus(CM_JUMP_TO_POSITION_SELECTED_BUDDY).click();
+        treeItem.select();
+        ContextMenuHelper.clickContextMenu(tree,
+            CM_JUMP_TO_POSITION_SELECTED_BUDDY);
     }
 
     public void addProjects(String... projectNames) throws RemoteException {
-        treeItem.contextMenus(ADD_PROJECTS).click();
+        treeItem.select();
+        ContextMenuHelper.clickContextMenu(tree, ADD_PROJECTS);
         SuperBot.getInstance().confirmShellAddProjectsToSession(projectNames);
     }
 
     public void addBuddies(String... jidOfInvitees) throws RemoteException {
-        treeItem.contextMenus(ADD_BUDDIES).click();
+        treeItem.select();
+        ContextMenuHelper.clickContextMenu(tree, ADD_BUDDIES);
         SuperBot.getInstance().confirmShellAddBuddyToSession(jidOfInvitees);
     }
 
     public void shareProjects(String projectName, JID... jids)
         throws RemoteException {
-        treeItem.contextMenus(SHARE_PROJECTS).click();
+        treeItem.select();
+        ContextMenuHelper.clickContextMenu(tree, SHARE_PROJECTS);
         SuperBot.getInstance().confirmShellShareProjects(projectName, jids);
     }
 
@@ -108,17 +124,33 @@ public final class ContextMenusInSessionArea extends ContextMenusInSarosView
      **********************************************/
 
     public boolean hasWriteAccess() throws RemoteException {
-        return !treeItem.contextMenus(CM_GRANT_WRITE_ACCESS).isEnabled()
-            && !treeItem.getText().contains(PERMISSION_NAME);
+        log.trace("checking if participant '" + participantJID.getBase()
+            + "' has write access");
+        treeItem.select();
+        return !ContextMenuHelper.getContextMenu(tree, CM_GRANT_WRITE_ACCESS)
+            .isEnabled() && !treeItem.getText().contains(PERMISSION_NAME);
     }
 
     public boolean hasReadOnlyAccess() throws RemoteException {
-        return !treeItem.contextMenus(CM_RESTRICT_TO_READ_ONLY_ACCESS)
-            .isEnabled() && treeItem.getText().contains(PERMISSION_NAME);
+        log.trace("checking if participant '" + participantJID.getBase()
+            + "' has read only access");
+        treeItem.select();
+        return !ContextMenuHelper.getContextMenu(tree,
+            CM_RESTRICT_TO_READ_ONLY_ACCESS).isEnabled()
+            && treeItem.getText().contains(PERMISSION_NAME);
     }
 
     public boolean isFollowing() throws RemoteException {
-        return treeItem.existsContextMenu(CM_STOP_FOLLOWING);
+        log.trace("checking if local user is following participant: "
+            + participantJID.getBase());
+        treeItem.select();
+        try {
+            return ContextMenuHelper.getContextMenu(tree, CM_STOP_FOLLOWING)
+                .isEnabled();
+
+        } catch (WidgetNotFoundException e) {
+            return false;
+        }
     }
 
     /**********************************************
@@ -128,7 +160,9 @@ public final class ContextMenusInSessionArea extends ContextMenusInSarosView
      **********************************************/
 
     public void waitUntilHasWriteAccess() throws RemoteException {
-        RemoteWorkbenchBot.getInstance().waitUntil(new DefaultCondition() {
+        log.trace("waiting for participant '" + participantJID.getBase()
+            + "' to gain write access");
+        new SWTBot().waitUntil(new DefaultCondition() {
             public boolean test() throws Exception {
                 return hasWriteAccess();
             }
@@ -141,7 +175,9 @@ public final class ContextMenusInSessionArea extends ContextMenusInSarosView
     }
 
     public void waitUntilHasReadOnlyAccess() throws RemoteException {
-        RemoteWorkbenchBot.getInstance().waitUntil(new DefaultCondition() {
+        log.trace("waiting for participant '" + participantJID.getBase()
+            + "' to gain read only access");
+        new SWTBot().waitUntil(new DefaultCondition() {
             public boolean test() throws Exception {
                 return hasReadOnlyAccess();
             }
@@ -154,7 +190,8 @@ public final class ContextMenusInSessionArea extends ContextMenusInSarosView
     }
 
     public void waitUntilIsFollowing() throws RemoteException {
-        RemoteWorkbenchBot.getInstance().waitUntil(new DefaultCondition() {
+        log.trace("waiting to follow participant: " + participantJID.getBase());
+        new SWTBot().waitUntil(new DefaultCondition() {
             public boolean test() throws Exception {
                 return isFollowing();
             }
@@ -166,7 +203,9 @@ public final class ContextMenusInSessionArea extends ContextMenusInSarosView
     }
 
     public void waitUntilIsNotFollowing() throws RemoteException {
-        RemoteWorkbenchBot.getInstance().waitUntil(new DefaultCondition() {
+        log.trace("waiting to stop following participant: "
+            + participantJID.getBase());
+        new SWTBot().waitUntil(new DefaultCondition() {
             public boolean test() throws Exception {
                 return !isFollowing();
             }
@@ -177,5 +216,4 @@ public final class ContextMenusInSessionArea extends ContextMenusInSarosView
             }
         });
     }
-
 }

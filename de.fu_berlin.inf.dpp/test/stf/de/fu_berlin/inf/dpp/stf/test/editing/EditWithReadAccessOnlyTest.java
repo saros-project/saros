@@ -17,15 +17,13 @@ import de.fu_berlin.inf.dpp.stf.client.util.Util;
 public class EditWithReadAccessOnlyTest extends StfTestCase {
 
     @BeforeClass
-    public static void beforeClass() throws Exception {
-        initTesters(ALICE, BOB);
-        setUpWorkbench();
-        setUpSaros();
+    public static void selectTesters() throws Exception {
+        select(ALICE, BOB);
     }
 
     @Test
     public void testEditingWithReadOnlyAccess() throws RemoteException {
-        Util.setUpSessionWithAJavaProjectAndAClass("foo", "bar", "HelloWorld",
+        Util.setUpSessionWithJavaProjectAndClass("foo", "bar", "HelloWorld",
             ALICE, BOB);
 
         BOB.superBot().views().packageExplorerView()

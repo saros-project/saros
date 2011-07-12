@@ -16,16 +16,15 @@ import de.fu_berlin.inf.dpp.stf.shared.Constants.TypeOfCreateProject;
 import de.fu_berlin.inf.dpp.test.util.TestThread;
 
 public class EditDifferentFilesTest extends StfTestCase {
+
     @BeforeClass
-    public static void beforeClass() throws Exception {
-        initTesters(ALICE, BOB);
-        setUpWorkbench();
-        setUpSaros();
+    public static void selectTesters() throws Exception {
+        select(ALICE, BOB);
     }
 
     @Before
     public void beforeEveryTest() throws RemoteException {
-        deleteAllProjectsByActiveTesters();
+        clearWorkspaces();
         ALICE.superBot().views().packageExplorerView().tree().newC()
             .javaProjectWithClasses("foo", "bar", "HelloWorld");
 
@@ -44,7 +43,7 @@ public class EditDifferentFilesTest extends StfTestCase {
             .waitUntilResourceIsShared("foo/src/bar/HelloWorld.java");
 
         TestThread.Runnable aliceEditTask = new TestThread.Runnable() {
-            public void runUnsafe() throws Exception {
+            public void run() throws Exception {
                 String textToType = "This is a long, long, long and\n long working test that bla bla bla";
 
                 for (char c : textToType.toCharArray()) {
@@ -53,14 +52,10 @@ public class EditDifferentFilesTest extends StfTestCase {
                     ALICE.remoteBot().sleep(100);
                 }
             }
-
-            public void run() {
-                // not called
-            }
         };
 
         TestThread.Runnable bobEditTask = new TestThread.Runnable() {
-            public void runUnsafe() throws Exception {
+            public void run() throws Exception {
                 String textToType = "Dieses ist ein sehr, sehr, sehr,\n langer bla bla bla";
 
                 BOB.superBot().views().packageExplorerView()
@@ -71,11 +66,6 @@ public class EditDifferentFilesTest extends StfTestCase {
                         .typeText(String.valueOf(c));
                     BOB.remoteBot().sleep(100);
                 }
-            }
-
-            public void run() {
-                // not called
-
             }
         };
 

@@ -12,7 +12,6 @@ import java.util.List;
 import java.util.concurrent.Callable;
 
 import org.junit.After;
-import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
@@ -126,17 +125,6 @@ public class SVNStateUpdatesTest extends StfTestCase {
             .existsWithRegex(Constants.SVN_PROJECT))
             ALICE.superBot().views().packageExplorerView()
                 .selectJavaProject(Constants.SVN_PROJECT).delete();
-    }
-
-    @AfterClass
-    public static void runAfterClass() throws RemoteException {
-        // if (TesterConfiguration.DEVELOPMODE) {
-        // // don't delete SVN_PROJECT_COPY
-        // ALICE.superBot().views().sarosView().disconnect();
-        // BOB.superBot().views().sarosView().disconnect();
-        // } else {
-        resetSaros();
-        // }
     }
 
     /**

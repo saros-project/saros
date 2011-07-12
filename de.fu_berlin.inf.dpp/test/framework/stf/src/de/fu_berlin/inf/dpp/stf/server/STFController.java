@@ -55,13 +55,13 @@ import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.contextmenu.peview
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.contextmenu.peview.submenu.impl.TeamC;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.contextmenu.sarosview.impl.ContextMenusInBuddiesArea;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.contextmenu.sarosview.impl.ContextMenusInSessionArea;
-import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.contextmenu.sarosview.submenu.impl.WorkTogetherOnC;
+import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.contextmenu.sarosview.submenu.impl.WorkTogetherOnContextMenu;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.menubar.impl.MenuBar;
-import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.menubar.menu.impl.SarosM;
-import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.menubar.menu.impl.WindowM;
+import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.menubar.menu.impl.SarosMenu;
+import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.menubar.menu.impl.WindowMenu;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.menubar.menu.submenu.impl.SarosPreferences;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.eclipse.impl.ConsoleView;
-import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.eclipse.impl.PEView;
+import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.eclipse.impl.PackageExplorerView;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.eclipse.impl.ProgressView;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.impl.Views;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.saros.impl.Chatroom;
@@ -175,7 +175,7 @@ public class STFController {
         /*
          * remote eclipse components
          */
-        exportObject(PEView.getInstance(), "packageExplorerView");
+        exportObject(PackageExplorerView.getInstance(), "packageExplorerView");
         exportObject(ProgressView.getInstance(), "progressView");
         exportObject(SarosView.getInstance(), "rosterView");
         exportObject(RSView.getInstance(), "remoteScreenView");
@@ -183,8 +183,8 @@ public class STFController {
 
         exportObject(NewC.getInstance(), "fileM");
         exportObject(RefactorC.getInstance(), "refactorM");
-        exportObject(WindowM.getInstance(), "windowM");
-        exportObject(SarosM.getInstance(), "sarosM");
+        exportObject(WindowMenu.getInstance(), "windowM");
+        exportObject(SarosMenu.getInstance(), "sarosM");
 
         exportObject(TeamC.getInstance(), "teamC");
         exportObject(ShareWithC.getInstance(), "shareWithC");
@@ -194,7 +194,7 @@ public class STFController {
             "buddiesContextMenu");
         exportObject(ContextMenusInSessionArea.getInstance(),
             "sessionContextMenu");
-        exportObject(WorkTogetherOnC.getInstance(), "workTogetherOnC");
+        exportObject(WorkTogetherOnContextMenu.getInstance(), "workTogetherOnC");
         exportObject(Chatroom.getInstance(), "chatroom");
 
         exportObject(SarosPreferences.getInstance(), "sarosPreferences");

@@ -52,7 +52,8 @@ class RealTester implements AbstractTester {
         return jid.getDomain();
     }
 
-    public IRemoteWorkbenchBot remoteBot() {
+    public IRemoteWorkbenchBot remoteBot() throws RemoteException {
+        bot.createBots();
         return bot;
     }
 

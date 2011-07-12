@@ -300,7 +300,7 @@ public interface ISarosView extends Remote {
      * 
      * @throws RemoteException
      */
-    public void inconsistencyDetected() throws RemoteException;
+    public void resolveInconsistency() throws RemoteException;
 
     /**********************************************
      * 

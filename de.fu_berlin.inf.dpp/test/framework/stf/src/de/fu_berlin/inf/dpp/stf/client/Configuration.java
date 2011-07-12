@@ -7,17 +7,18 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Map.Entry;
 import java.util.Properties;
-
-import org.apache.log4j.Logger;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public final class Configuration {
+
+    private static final Logger LOGGER = Logger.getLogger(Configuration.class
+        .getName());
 
     private final static String DEFAULT_CONFIGURATION_FILE = "de/fu_berlin/inf/dpp/stf/client/configuration.properties";
     private final static String OPTIONAL_CONFIGURATION_FILES_PROPERTY = "de.fu_berlin.inf.dpp.stf.client.configuration.files";
 
     private final static Configuration INSTANCE = new Configuration();
-
-    private Logger log = Logger.getLogger(Configuration.class);
 
     private Properties properties;
 
@@ -38,21 +39,22 @@ public final class Configuration {
         InputStream in = Thread.currentThread().getContextClassLoader()
             .getResourceAsStream(DEFAULT_CONFIGURATION_FILE);
 
-        log.debug("loading internal property file");
+        LOGGER.info("loading internal property file");
         if (in != null) {
             try {
                 loadProperties(in);
             } catch (IOException e) {
-                log.debug("error while reading internal property file", e);
+                LOGGER.log(Level.SEVERE,
+                    "error while reading internal property file", e);
             } finally {
                 try {
                     in.close();
                 } catch (IOException ignore) {
-                    //
+                    LOGGER.log(Level.WARNING, ignore.getMessage(), ignore);
                 }
             }
         } else
-            log.debug("could not find internal property file "
+            LOGGER.log(Level.WARNING, "could not find internal property file: "
                 + DEFAULT_CONFIGURATION_FILE);
 
         String configurationFiles = System.getProperty(
@@ -67,15 +69,17 @@ public final class Configuration {
                 continue;
 
             in = null;
-            log.debug("loading external property file " + configurationFile);
+            LOGGER.info("loading external property file: " + configurationFile);
             try {
                 in = new FileInputStream(new File(configurationFile));
                 loadProperties(in);
             } catch (FileNotFoundException e) {
-                log.debug("could not find external property file "
-                    + configurationFile, e);
+                LOGGER.log(Level.WARNING,
+                    "could not find external property file "
+                        + configurationFile, e);
             } catch (IOException e) {
-                log.debug("error while reading property file", e);
+                LOGGER
+                    .log(Level.SEVERE, "error while reading property file", e);
             } finally {
                 try {
                     if (in != null)

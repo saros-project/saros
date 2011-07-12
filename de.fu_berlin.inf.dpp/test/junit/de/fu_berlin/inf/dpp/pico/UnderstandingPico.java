@@ -305,6 +305,12 @@ public class UnderstandingPico {
 
         a.printA();
         b.printB();
+
+        a = container.getComponent(IA.class);
+        b = container.getComponent(IB.class);
+
+        a.printA();
+        b.printB();
     }
 
     public static class AA {

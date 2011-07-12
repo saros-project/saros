@@ -168,7 +168,7 @@ public class XMPPServer {
     /**
      * All modules loaded by this server
      */
-    private Map<Class, Module> modules = new LinkedHashMap<Class, Module>();
+    private Map<Class<?>, Module> modules = new LinkedHashMap<Class<?>, Module>();
 
     /**
      * Listeners that will be notified when the server has started or is about
@@ -629,7 +629,7 @@ public class XMPPServer {
      */
     private void loadModule(String module) {
         try {
-            Class modClass = loader.loadClass(module);
+            Class<?> modClass = loader.loadClass(module);
             Module mod = (Module) modClass.newInstance();
             this.modules.put(modClass, mod);
         } catch (Exception e) {
@@ -685,7 +685,7 @@ public class XMPPServer {
     public void restart() {
         if (isStandAlone() && isRestartable()) {
             try {
-                Class wrapperClass = Class.forName(WRAPPER_CLASSNAME);
+                Class<?> wrapperClass = Class.forName(WRAPPER_CLASSNAME);
                 Method restartMethod = wrapperClass.getMethod("restart",
                     (Class[]) null);
                 restartMethod.invoke(null, (Object[]) null);
@@ -865,18 +865,18 @@ public class XMPPServer {
             InputStream in = null;
             try {
                 in = new FileInputStream(new File("openfire_init.xml"));
-                if (in != null) {
-                    SAXReader reader = new SAXReader();
-                    Document doc = reader.read(in);
-                    String path = doc.getRootElement().getText();
-                    try {
-                        if (path != null) {
-                            openfireHome = verifyHome("conf", "openfire.xml");
-                        }
-                    } catch (FileNotFoundException fe) {
-                        fe.printStackTrace();
+
+                SAXReader reader = new SAXReader();
+                Document doc = reader.read(in);
+                String path = doc.getRootElement().getText();
+                try {
+                    if (path != null) {
+                        openfireHome = verifyHome("conf", "openfire.xml");
                     }
+                } catch (FileNotFoundException fe) {
+                    fe.printStackTrace();
                 }
+
             } catch (Exception e) {
                 System.err
                     .println("Error loading openfire_init.xml to find home.");
@@ -941,6 +941,7 @@ public class XMPPServer {
      * 
      * @author Iain Shigeoka
      */
+    @SuppressWarnings("unused")
     private class ShutdownThread extends Thread {
 
         /**

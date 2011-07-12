@@ -10,8 +10,6 @@ import static de.fu_berlin.inf.dpp.stf.shared.Constants.SHELL_SESSION_INVITATION
 import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
-import java.rmi.AccessException;
-import java.rmi.RemoteException;
 
 import org.eclipse.core.runtime.CoreException;
 import org.junit.BeforeClass;
@@ -31,14 +29,10 @@ public class ParallelInvitationWithTerminationByHostTest extends StfTestCase {
      * <li>Dave (Read-Only Access)</li>
      * </ol>
      * 
-     * @throws AccessException
-     * @throws RemoteException
      */
     @BeforeClass
-    public static void runBeforeClass() throws RemoteException {
-        initTesters(ALICE, BOB, CARL, DAVE);
-        setUpWorkbench();
-        setUpSaros();
+    public static void selectTesters() throws Exception {
+        select(ALICE, BOB, CARL, DAVE);
     }
 
     /**

@@ -57,7 +57,7 @@ public class SVNStateInitializationTest extends StfTestCase {
      * @throws RemoteException
      */
     @BeforeClass
-    public static void initMusicians() throws RemoteException {
+    public static void initMusicians() throws Exception {
         initTesters(ALICE, BOB);
         setUpWorkbench();
         setUpSaros();
@@ -87,9 +87,9 @@ public class SVNStateInitializationTest extends StfTestCase {
      * 
      * @throws RemoteException
      */
-    @Override
+
     @Before
-    public void before() throws RemoteException {
+    public void beforeEveryTest() throws RemoteException {
         ALICE.superBot().views().packageExplorerView()
             .selectProject(Constants.SVN_PROJECT_COPY).copy();
         ALICE.superBot().views().packageExplorerView().tree()
@@ -103,16 +103,15 @@ public class SVNStateInitializationTest extends StfTestCase {
             .selectPkg("stf_test_project", "pkg").existsWithRegex("Test.java"));
     }
 
-    @Override
     @After
-    public void after() throws RemoteException {
+    public void afterEveryTest() throws RemoteException {
         leaveSessionHostFirst(ALICE);
 
         if (ALICE.superBot().views().packageExplorerView().tree()
             .existsWithRegex(Constants.SVN_PROJECT))
             ALICE.superBot().views().packageExplorerView()
                 .selectJavaProject(Constants.SVN_PROJECT).delete();
-        BOB.superBot().internal().deleteWorkspace();
+        BOB.superBot().internal().clearWorkspace();
     }
 
     /**

@@ -32,19 +32,8 @@ public class StrictSequentialInvitationWithoutTerminationTest extends
      */
 
     @BeforeClass
-    public static void runBeforeClass() throws RemoteException,
-        InterruptedException {
-        initTesters(ALICE, BOB, CARL);
-        setUpWorkbench();
-        setUpSaros();
-        ALICE
-            .superBot()
-            .views()
-            .packageExplorerView()
-            .tree()
-            .newC()
-            .javaProjectWithClasses(Constants.PROJECT1, Constants.PKG1,
-                Constants.CLS1);
+    public static void selectTesters() throws Exception {
+        select(ALICE, BOB, CARL);
     }
 
     @After
@@ -85,6 +74,16 @@ public class StrictSequentialInvitationWithoutTerminationTest extends
     @Test
     public void testSetLineDelimiter() throws RemoteException,
         InterruptedException {
+
+        ALICE
+            .superBot()
+            .views()
+            .packageExplorerView()
+            .tree()
+            .newC()
+            .javaProjectWithClasses(Constants.PROJECT1, Constants.PKG1,
+                Constants.CLS1);
+
         ALICE.superBot().menuBar().window().setNewTextFileLineDelimiter("Unix");
 
         Util.buildSessionSequentially(Constants.PROJECT1,

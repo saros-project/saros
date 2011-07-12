@@ -8,14 +8,14 @@ import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotCombo;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotShell;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotTree;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.Perspective;
-import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.menubar.menu.IWindowM;
+import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.menubar.menu.IWindowMenu;
 import de.fu_berlin.inf.dpp.stf.server.util.Util;
 
-public final class WindowM extends StfRemoteObject implements IWindowM {
+public final class WindowMenu extends StfRemoteObject implements IWindowMenu {
 
-    private static final WindowM INSTANCE = new WindowM();
+    private static final WindowMenu INSTANCE = new WindowMenu();
 
-    public static WindowM getInstance() {
+    public static WindowMenu getInstance() {
         return INSTANCE;
     }
 

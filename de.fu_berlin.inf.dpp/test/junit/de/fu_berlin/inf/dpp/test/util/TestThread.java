@@ -8,30 +8,36 @@ package de.fu_berlin.inf.dpp.test.util;
 
 public class TestThread extends Thread {
 
-    public interface Runnable extends java.lang.Runnable {
-        public void runUnsafe() throws Exception;
+    public interface Runnable {
+        public void run() throws Exception;
     }
 
     volatile Error error;
     volatile Exception exception;
-    volatile boolean finished;
+    volatile boolean finished = false;
 
     private java.lang.Runnable runnableToRun;
+    private Runnable testThreadRunnable;
 
     public TestThread(java.lang.Runnable runnable) {
         this.runnableToRun = runnable;
         this.setName("Test-Thread:" + runnable.toString());
     }
 
+    public TestThread(Runnable runnable) {
+        this.testThreadRunnable = runnable;
+        this.setName("Test-Thread:" + runnable.toString());
+    }
+
     @Override
     public void run() {
         try {
-            if (runnableToRun != null) {
-                if (runnableToRun instanceof Runnable)
-                    ((Runnable) runnableToRun).runUnsafe();
-                else
-                    runnableToRun.run();
-            }
+            if (runnableToRun != null)
+                runnableToRun.run();
+
+            if (testThreadRunnable != null)
+                testThreadRunnable.run();
+
         } catch (Exception e) {
             exception = e;
         } catch (Error e) {

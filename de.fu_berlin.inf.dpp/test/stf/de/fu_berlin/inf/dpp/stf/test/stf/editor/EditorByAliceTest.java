@@ -12,7 +12,7 @@ import java.util.List;
 
 import org.eclipse.jface.bindings.keys.IKeyLookup;
 import org.eclipse.swt.SWT;
-import org.junit.After;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -23,16 +23,14 @@ import de.fu_berlin.inf.dpp.stf.test.Constants;
 public class EditorByAliceTest extends StfTestCase {
 
     @BeforeClass
-    public static void runBeforeClass() throws RemoteException {
-        initTesters(ALICE);
-        setUpWorkbench();
+    public static void selectTesters() throws Exception {
+        select(ALICE);
     }
 
-    @Override
-    @After
-    public void after() throws RemoteException {
-        super.after();
-        deleteAllProjectsByActiveTesters();
+    @Before
+    public void beforeEveryTest() throws RemoteException {
+        closeAllEditors();
+        clearWorkspaces();
     }
 
     @Test

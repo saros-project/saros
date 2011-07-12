@@ -18,12 +18,17 @@ import de.fu_berlin.inf.dpp.stf.test.Constants;
 public class EditorByAliceBobTest extends StfTestCase {
 
     @BeforeClass
-    public static void runBeforeClass() throws RemoteException {
+    public static void initializeSaros() throws Exception {
         initTesters(ALICE, BOB);
         setUpWorkbench();
         setUpSaros();
-        Util.setUpSessionWithAJavaProjectAndAClass(Constants.PROJECT1,
+        Util.setUpSessionWithJavaProjectAndClass(Constants.PROJECT1,
             Constants.PKG1, Constants.CLS1, ALICE, BOB);
+        BOB.superBot()
+            .views()
+            .packageExplorerView()
+            .waitUntilClassExists(Constants.PROJECT1, Constants.PKG1,
+                Constants.CLS1);
         if (ALICE.remoteBot().isEditorOpen(Constants.CLS1 + SUFFIX_JAVA))
             ALICE.remoteBot().editor(Constants.CLS1 + SUFFIX_JAVA)
                 .closeWithSave();

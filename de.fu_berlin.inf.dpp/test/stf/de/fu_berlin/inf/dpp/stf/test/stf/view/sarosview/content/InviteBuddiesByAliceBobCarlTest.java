@@ -19,10 +19,8 @@ import de.fu_berlin.inf.dpp.stf.test.Constants;
 public class InviteBuddiesByAliceBobCarlTest extends StfTestCase {
 
     @BeforeClass
-    public static void runBeforeClass() throws RemoteException {
-        initTesters(ALICE, BOB, CARL);
-        setUpWorkbench();
-        setUpSaros();
+    public static void selectTesters() throws Exception {
+        select(ALICE, BOB, CARL);
     }
 
     /**
@@ -42,7 +40,7 @@ public class InviteBuddiesByAliceBobCarlTest extends StfTestCase {
      */
     @Test
     public void inviteBuddy() throws RemoteException, InterruptedException {
-        Util.setUpSessionWithAJavaProjectAndAClass(Constants.PROJECT1,
+        Util.setUpSessionWithJavaProjectAndClass(Constants.PROJECT1,
             Constants.PKG1, Constants.CLS1, ALICE, BOB);
 
         assertFalse(CARL.superBot().views().sarosView().isInSession());

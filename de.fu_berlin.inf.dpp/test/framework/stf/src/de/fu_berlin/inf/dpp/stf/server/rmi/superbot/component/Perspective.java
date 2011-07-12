@@ -20,7 +20,6 @@ public class Perspective {
             break;
         case RESOURCE:
             WHICH_EXPLORER = ExplorerType.RESOURCE;
-
             break;
         default:
             WHICH_EXPLORER = ExplorerType.PACKAGE;

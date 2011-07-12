@@ -28,10 +28,8 @@ import de.fu_berlin.inf.dpp.stf.test.Constants;
 public class AccountWithDismatchedPasswordTest extends StfTestCase {
 
     @BeforeClass
-    public static void runBeforeClass() throws RemoteException {
-        initTesters(ALICE);
-        setUpWorkbench();
-        setUpSaros();
+    public static void selectTesters() throws Exception {
+        select(ALICE);
     }
 
     @After

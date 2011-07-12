@@ -16,16 +16,14 @@ import de.fu_berlin.inf.dpp.stf.test.Constants;
 public class EditorWithoutSessionTest extends StfTestCase {
 
     @BeforeClass
-    public static void runBeforeClass() throws RemoteException {
-        initTesters(ALICE, BOB);
-        setUpWorkbench();
-        setUpSaros();
-        Util.createProjectWithFileBy(Constants.PROJECT1, Constants.FILE3,
-            ALICE, BOB);
+    public static void selectTesters() throws Exception {
+        select(ALICE, BOB);
     }
 
     @Test
     public void testConcurrentEditing() throws RemoteException {
+        Util.createProjectWithFile(Constants.PROJECT1, Constants.FILE3, ALICE,
+            BOB);
 
         ALICE.superBot().views().packageExplorerView()
             .selectFile(Constants.PATH).open();

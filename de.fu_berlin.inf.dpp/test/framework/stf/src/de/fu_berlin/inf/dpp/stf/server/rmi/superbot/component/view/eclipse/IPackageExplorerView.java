@@ -16,7 +16,7 @@ import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.contextmenu.peview
  * @author lchen
  * @author Stefan Rossbach
  */
-public interface IPEView extends Remote {
+public interface IPackageExplorerView extends Remote {
 
     public IContextMenusInPEView tree() throws RemoteException;
 

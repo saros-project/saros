@@ -2,25 +2,35 @@ package de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.contextmenu.pevie
 
 import java.rmi.RemoteException;
 
+import org.eclipse.swtbot.swt.finder.SWTBot;
+import org.eclipse.swtbot.swt.finder.waits.Conditions;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
+
 import de.fu_berlin.inf.dpp.stf.server.StfRemoteObject;
-import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.impl.RemoteWorkbenchBot;
-import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotShell;
-import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotTreeItem;
+import de.fu_berlin.inf.dpp.stf.server.bot.SarosSWTBotPreferences;
+import de.fu_berlin.inf.dpp.stf.server.bot.widget.ContextMenuHelper;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.contextmenu.peview.submenu.IRefactorC;
-import de.fu_berlin.inf.dpp.stf.server.util.Util;
 
 public final class RefactorC extends StfRemoteObject implements IRefactorC {
 
     private static final RefactorC INSTANCE = new RefactorC();
 
-    private IRemoteBotTreeItem treeItem;
+    private SWTBotTree tree;
+    private SWTBotTreeItem treeItem;
+
     private TreeItemType type;
 
     public static RefactorC getInstance() {
         return INSTANCE;
     }
 
-    public void setTreeItem(IRemoteBotTreeItem treeItem) {
+    public void setTree(SWTBotTree tree) {
+        this.tree = tree;
+    }
+
+    public void setTreeItem(SWTBotTreeItem treeItem) {
         this.treeItem = treeItem;
     }
 
@@ -48,7 +58,7 @@ public final class RefactorC extends StfRemoteObject implements IRefactorC {
 
     public void moveClassTo(String targetProject, String targetPkg)
         throws RemoteException {
-        moveTo(SHELL_MOVE, OK, Util.getPkgNodes(targetProject, targetPkg));
+        moveTo(SHELL_MOVE, OK, targetProject, SRC, targetPkg);
     }
 
     public void rename(String newName) throws RemoteException {
@@ -73,25 +83,25 @@ public final class RefactorC extends StfRemoteObject implements IRefactorC {
      * inner functions
      * 
      **************************************************************/
-    private void rename(String shellTitle, String buttonName, String newName)
-        throws RemoteException {
-        treeItem.contextMenus(MENU_REFACTOR, MENU_RENAME).click();
-        IRemoteBotShell shell = RemoteWorkbenchBot.getInstance().shell(
-            shellTitle);
+    private void rename(String shellTitle, String buttonName, String newName) {
+        treeItem.select();
+        ContextMenuHelper.clickContextMenu(tree, MENU_REFACTOR, MENU_RENAME);
+        SWTBotShell shell = new SWTBot().shell(shellTitle);
         shell.activate();
         shell.bot().textWithLabel(LABEL_NEW_NAME).setText(newName);
-        shell.bot().button(buttonName).waitUntilIsEnabled();
         shell.bot().button(buttonName).click();
-        shell.waitLongUntilIsClosed();
+        shell.bot().waitUntil(Conditions.shellCloses(shell),
+            SarosSWTBotPreferences.SAROS_LONG_TIMEOUT);
     }
 
-    private void moveTo(String shellTitle, String buttonName, String... nodes)
-        throws RemoteException {
-        treeItem.contextMenus(MENU_REFACTOR, MENU_MOVE).click();
-        IRemoteBotShell shell = RemoteWorkbenchBot.getInstance().shell(
-            shellTitle);
-        shell.confirmWithTree(buttonName, nodes);
-        shell.waitLongUntilIsClosed();
+    private void moveTo(String shellTitle, String buttonName, String... nodes) {
+        treeItem.select();
+        ContextMenuHelper.clickContextMenu(tree, MENU_REFACTOR, MENU_MOVE);
+        SWTBotShell shell = new SWTBot().shell(shellTitle);
+        shell.activate();
+        shell.bot().tree().expandNode(nodes).select();
+        shell.bot().button(buttonName).click();
+        shell.bot().waitUntil(Conditions.shellCloses(shell),
+            SarosSWTBotPreferences.SAROS_LONG_TIMEOUT);
     }
-
 }

@@ -5,10 +5,8 @@ import static de.fu_berlin.inf.dpp.stf.client.tester.SarosTester.BOB;
 import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
-import java.rmi.RemoteException;
 
 import org.eclipse.core.runtime.CoreException;
-import org.junit.After;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -19,26 +17,15 @@ import de.fu_berlin.inf.dpp.stf.test.Constants;
 public class FollowModeTest extends StfTestCase {
 
     @BeforeClass
-    public static void runBeforeClass() throws RemoteException {
-        initTesters(ALICE, BOB);
-        setUpWorkbench();
-        setUpSaros();
-        Util.setUpSessionWithAJavaProjectAndAClass(Constants.PROJECT1,
-            Constants.PKG1, Constants.CLS1, ALICE, BOB);
+    public static void selectTesters() throws Exception {
+        select(ALICE, BOB);
     }
 
-    @After
-    public void runAfterEveryTest() throws RemoteException {
-        Util.resetFollowModeSequentially(BOB, ALICE);
-    }
-
-    /**
-     * 
-     * @throws IOException
-     * @throws CoreException
-     */
     @Test
     public void testBobFollowAlice() throws IOException, CoreException {
+        Util.setUpSessionWithJavaProjectAndClass(Constants.PROJECT1,
+            Constants.PKG1, Constants.CLS1, ALICE, BOB);
+
         ALICE.superBot().views().packageExplorerView()
             .selectClass(Constants.PROJECT1, Constants.PKG1, Constants.CLS1)
             .open();

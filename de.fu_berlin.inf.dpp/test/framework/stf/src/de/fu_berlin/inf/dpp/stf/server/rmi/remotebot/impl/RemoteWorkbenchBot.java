@@ -11,6 +11,7 @@ import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotPerspective;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.SWTBot;
 import org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences;
+import org.eclipse.swtbot.swt.finder.waits.Conditions;
 import org.eclipse.swtbot.swt.finder.waits.DefaultCondition;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 import org.eclipse.swtbot.swt.finder.widgets.TimeoutException;
@@ -24,7 +25,6 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.WorkbenchException;
 
 import de.fu_berlin.inf.dpp.stf.server.bot.SarosSWTBot;
-import de.fu_berlin.inf.dpp.stf.server.bot.condition.SarosConditions;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.IRemoteWorkbenchBot;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotEditor;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotPerspective;
@@ -55,16 +55,12 @@ public final class RemoteWorkbenchBot extends RemoteBot implements
         perspective = RemoteBotPerspective.getInstance();
         editor = RemoteBotEditor.getInstance();
         chatLine = RemoteBotChatLine.getInstance();
-        swtWorkBenchBot = SarosSWTBot.getInstance();
+        swtWorkBenchBot = new SarosSWTBot();
 
     }
 
     public static RemoteWorkbenchBot getInstance() {
         return INSTANCE;
-    }
-
-    public void setWorkbenchBot(SarosSWTBot bot) {
-        swtWorkBenchBot = bot;
     }
 
     /**********************************************
@@ -311,14 +307,15 @@ public final class RemoteWorkbenchBot extends RemoteBot implements
             for (String shellName : this.getOpenShellNames()) {
                 try {
                     SWTBotShell shell = swtWorkBenchBot.shell(shellName);
-
+                    shell.activate();
                     SWTBot bot = shell.bot();
 
                     // TODO shell names currently hard coded
 
                     if (shellName.equals("Leaving the Session")) {
                         bot.button(YES).click();
-                        bot.waitUntil(SarosConditions.isShellClosed(shell));
+                        bot.waitUntil(Conditions.shellCloses(shell));
+                        continue;
                     }
                     if (shellName.equals("Synchronizing")) {
                         bot.button(CANCEL).click();
@@ -359,5 +356,9 @@ public final class RemoteWorkbenchBot extends RemoteBot implements
         throws RemoteException {
         chatLine.setWidget(swtWorkBenchBot.chatLine(regex));
         return chatLine;
+    }
+
+    public void createBots() throws RemoteException {
+        this.setBot(new SWTBot());
     }
 }

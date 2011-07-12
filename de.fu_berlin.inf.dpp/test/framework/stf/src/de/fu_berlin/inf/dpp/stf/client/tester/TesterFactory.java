@@ -1,13 +1,15 @@
 package de.fu_berlin.inf.dpp.stf.client.tester;
 
-import org.apache.log4j.Logger;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.stf.client.Configuration;
 
 final class TesterFactory {
 
-    private final static Logger log = Logger.getLogger(TesterFactory.class);
+    private final static Logger LOGGER = Logger.getLogger(TesterFactory.class
+        .getName());
 
     private static AbstractTester createInvalidTester(Exception exception,
         String name, Object jid, Object password, Object host, Object port) {
@@ -30,7 +32,7 @@ final class TesterFactory {
 
         name = name.toUpperCase();
 
-        log.debug("initializing bot for name '" + name + "'");
+        LOGGER.info("initializing bot for name '" + name + "'");
 
         Object jid = null;
         Object password = null;
@@ -67,11 +69,14 @@ final class TesterFactory {
                 password.toString(), host.toString(), Integer.parseInt(port
                     .toString()));
         } catch (Exception e) {
+            LOGGER.log(Level.WARNING, "could not create tester: " + name, e);
             return createInvalidTester(e, name, jid, password, host, port);
         }
 
-        log.info("created bot '" + name + "' with JID: " + jid + ", password: "
-            + password + ", host: " + host + ", port: " + port);
+        LOGGER
+            .info("created bot '" + name + "' with JID: " + jid
+                + ", password: " + password + ", host: " + host + ", port: "
+                + port);
 
         return tester;
 

@@ -26,14 +26,11 @@ public class ShareProjectUsingExistingProjectTest extends StfTestCase {
      * <li>Bob (Read-Only Access)</li>
      * </ol>
      * 
-     * @throws RemoteException
      */
 
     @BeforeClass
-    public static void runBeforeClass() throws RemoteException {
-        initTesters(ALICE, BOB);
-        setUpWorkbench();
-        setUpSaros();
+    public static void selectTesters() throws Exception {
+        select(ALICE, BOB);
     }
 
     @Before
@@ -58,7 +55,7 @@ public class ShareProjectUsingExistingProjectTest extends StfTestCase {
     @After
     public void runAfterEveryTest() throws RemoteException {
         leaveSessionHostFirst(ALICE);
-        deleteAllProjectsByActiveTesters();
+        clearWorkspaces();
 
     }
 

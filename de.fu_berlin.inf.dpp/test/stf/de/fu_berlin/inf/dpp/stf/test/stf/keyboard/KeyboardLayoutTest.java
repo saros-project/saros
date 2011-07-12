@@ -13,17 +13,16 @@ import de.fu_berlin.inf.dpp.stf.client.util.Util;
 import de.fu_berlin.inf.dpp.stf.test.Constants;
 
 public class KeyboardLayoutTest extends StfTestCase {
+
     @BeforeClass
-    public static void runBeforeClass() throws RemoteException {
-        initTesters(ALICE);
-        setUpWorkbench();
-        setUpSaros();
+    public static void selectTesters() throws Exception {
+        select(ALICE);
     }
 
     @Test
     public void testKeyboardLayout() throws RemoteException {
 
-        Util.createProjectWithFileBy(Constants.PROJECT1, Constants.FILE3, ALICE);
+        Util.createProjectWithFile(Constants.PROJECT1, Constants.FILE3, ALICE);
         //
         final String textToTest = "!\"§$%&/()={[]}\\+*~#'-_.:,;|<>^? abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
 

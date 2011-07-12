@@ -16,11 +16,10 @@ import de.fu_berlin.inf.dpp.stf.shared.Constants.TypeOfCreateProject;
 
 @TestLink(id = "")
 public class Editing3ProjectsTest extends StfTestCase {
+
     @BeforeClass
-    public static void beforeClass() throws Exception {
-        initTesters(ALICE, BOB);
-        setUpWorkbench();
-        setUpSaros();
+    public static void selectTesters() throws Exception {
+        select(ALICE, BOB);
     }
 
     @Test

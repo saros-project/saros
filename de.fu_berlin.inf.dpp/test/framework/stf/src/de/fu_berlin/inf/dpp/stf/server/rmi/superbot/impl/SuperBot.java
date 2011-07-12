@@ -1,15 +1,20 @@
 package de.fu_berlin.inf.dpp.stf.server.rmi.superbot.impl;
 
 import java.rmi.RemoteException;
+import java.util.regex.Pattern;
 
+import org.eclipse.jface.wizard.WizardDialog;
+import org.eclipse.swtbot.swt.finder.SWTBot;
+import org.eclipse.swtbot.swt.finder.waits.Conditions;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.eclipse.swtbot.swt.finder.widgets.TimeoutException;
 
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.stf.server.StfRemoteObject;
-import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.IRemoteWorkbenchBot;
+import de.fu_berlin.inf.dpp.stf.server.bot.SarosSWTBotPreferences;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.impl.RemoteWorkbenchBot;
-import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotShell;
-import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.impl.RemoteBotTree;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.ISuperBot;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.menubar.IMenuBar;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.menubar.impl.MenuBar;
@@ -17,6 +22,7 @@ import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.IViews;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.impl.Views;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.internal.IInternal;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.internal.impl.InternalImpl;
+import de.fu_berlin.inf.dpp.stf.server.util.Util;
 
 public final class SuperBot extends StfRemoteObject implements ISuperBot {
 
@@ -26,10 +32,6 @@ public final class SuperBot extends StfRemoteObject implements ISuperBot {
 
     public static SuperBot getInstance() {
         return INSTANCE;
-    }
-
-    private IRemoteWorkbenchBot bot() {
-        return RemoteWorkbenchBot.getInstance();
     }
 
     /**************************************************************
@@ -49,7 +51,7 @@ public final class SuperBot extends StfRemoteObject implements ISuperBot {
     }
 
     public IMenuBar menuBar() throws RemoteException {
-        bot().activateWorkbench();
+        RemoteWorkbenchBot.getInstance().activateWorkbench();
         return MenuBar.getInstance();
     }
 
@@ -69,64 +71,91 @@ public final class SuperBot extends StfRemoteObject implements ISuperBot {
     public void confirmShellAddProjectWithNewProject(String projectname)
         throws RemoteException {
 
-        bot().waitLongUntilShellIsOpen(SHELL_ADD_PROJECT);
-        IRemoteBotShell shell = bot().shell(SHELL_ADD_PROJECT);
+        SWTBot bot = new SWTBot();
+        bot.waitUntil(Conditions.shellIsActive(SHELL_ADD_PROJECT),
+            SarosSWTBotPreferences.SAROS_LONG_TIMEOUT);
+
+        SWTBotShell shell = bot.shell(SHELL_ADD_PROJECT);
         shell.activate();
+
         shell.bot().radio(RADIO_CREATE_NEW_PROJECT).click();
         shell.bot().button(FINISH).click();
-        shell.waitLongUntilIsClosed();
+        shell.bot().waitUntil(Conditions.shellCloses(shell));
     }
 
     public void confirmShellAddProjectUsingExistProject(String projectName)
         throws RemoteException {
-        bot().waitLongUntilShellIsOpen(SHELL_ADD_PROJECT);
-        IRemoteBotShell shell = bot().shell(SHELL_ADD_PROJECT);
+        SWTBot bot = new SWTBot();
+        bot.waitUntil(Conditions.shellIsActive(SHELL_ADD_PROJECT),
+            SarosSWTBotPreferences.SAROS_LONG_TIMEOUT);
+
+        SWTBotShell shell = bot.shell(SHELL_ADD_PROJECT);
         shell.activate();
+
         shell.bot().radio(RADIO_USING_EXISTING_PROJECT).click();
         shell.bot().textWithLabel("Project name", 1).setText(projectName);
         shell.bot().button(FINISH).click();
 
-        if (bot().isShellOpen(SHELL_WARNING_LOCAL_CHANGES_DELETED))
-            bot().shell(SHELL_WARNING_LOCAL_CHANGES_DELETED).confirm(YES);
+        bot.sleep(500);
 
-        if (bot().isShellOpen(SHELL_SAVE_RESOURCE)
-            && bot().shell(SHELL_SAVE_RESOURCE).isActive()) {
-            bot().shell(SHELL_SAVE_RESOURCE).confirm(YES);
+        for (SWTBotShell currentShell : bot.shells()) {
+            if (currentShell.getText().equals(
+                SHELL_WARNING_LOCAL_CHANGES_DELETED)
+                || currentShell.getText().equals(SHELL_SAVE_RESOURCE)) {
+                currentShell.activate();
+                currentShell.bot().button(YES).click();
+            }
         }
 
-        shell.waitLongUntilIsClosed();
+        shell.bot().waitUntil(Conditions.shellCloses(shell));
     }
 
     public void confirmShellAddProjectUsingExistProjectWithCopyAfterCancelLocalChange(
         String projectName) throws RemoteException {
-        bot().waitLongUntilShellIsOpen(SHELL_ADD_PROJECT);
-        IRemoteBotShell shell = bot().shell(SHELL_ADD_PROJECT);
+
+        SWTBot bot = new SWTBot();
+        bot.waitUntil(Conditions.shellIsActive(SHELL_ADD_PROJECT),
+            SarosSWTBotPreferences.SAROS_LONG_TIMEOUT);
+
+        SWTBotShell shell = bot.shell(SHELL_ADD_PROJECT);
         shell.activate();
+
         shell.bot().radio("Use existing project").click();
         shell.bot().textWithLabel("Project name", 1).setText(projectName);
         shell.bot().button(FINISH).click();
-        bot().shell(SHELL_WARNING_LOCAL_CHANGES_DELETED).confirm(NO);
+        shell.activate();
+        shell.bot().button(NO).click();
 
         confirmShellAddProjectUsingExistProjectWithCopy(projectName);
     }
 
     public void confirmShellAddProjectUsingExistProjectWithCopy(
         String projectName) throws RemoteException {
-        bot().waitLongUntilShellIsOpen(SHELL_ADD_PROJECT);
-        IRemoteBotShell shell = bot().shell(SHELL_ADD_PROJECT);
+
+        SWTBot bot = new SWTBot();
+        bot.waitUntil(Conditions.shellIsActive(SHELL_ADD_PROJECT),
+            SarosSWTBotPreferences.SAROS_LONG_TIMEOUT);
+
+        SWTBotShell shell = bot.shell(SHELL_ADD_PROJECT);
         shell.activate();
+
         shell.bot().radio("Use existing project").click();
         shell.bot()
             .checkBox("Create copy for working distributed. New project name:")
             .click();
         shell.bot().button(FINISH).click();
-        shell.waitLongUntilIsClosed();
+        shell.bot().waitUntil(Conditions.shellCloses(shell));
     }
 
     public void confirmShellAddProjectUsingWhichProject(String projectName,
         TypeOfCreateProject usingWhichProject) throws RemoteException {
-        bot().waitLongUntilShellIsOpen(SHELL_ADD_PROJECT);
-        bot().shell(SHELL_ADD_PROJECT).activate();
+        SWTBot bot = new SWTBot();
+        bot.waitUntil(Conditions.shellIsActive(SHELL_ADD_PROJECT),
+            SarosSWTBotPreferences.SAROS_LONG_TIMEOUT);
+
+        SWTBotShell shell = bot.shell(SHELL_ADD_PROJECT);
+        shell.activate();
+
         switch (usingWhichProject) {
         case NEW_PROJECT:
             confirmShellAddProjectWithNewProject(projectName);
@@ -147,21 +176,22 @@ public final class SuperBot extends StfRemoteObject implements ISuperBot {
 
     public void confirmShellEditXMPPJabberAccount(String xmppJabberID,
         String newPassword) throws RemoteException {
-        bot().waitUntilShellIsOpen(SHELL_EDIT_XMPP_JABBER_ACCOUNT);
-        IRemoteBotShell shell = bot().shell(SHELL_EDIT_XMPP_JABBER_ACCOUNT);
+        SWTBotShell shell = new SWTBot().shell(SHELL_EDIT_XMPP_JABBER_ACCOUNT);
         shell.activate();
+
         shell.bot().comboBoxWithLabel(LABEL_XMPP_JABBER_ID)
             .setText(xmppJabberID);
         shell.bot().textWithLabel(LABEL_PASSWORD).setText(newPassword);
         shell.bot().button(FINISH).click();
-        shell.waitShortUntilIsClosed();
+        shell.bot().waitUntil(Conditions.shellCloses(shell));
     }
 
     public void confirmShellCreateNewXMPPJabberAccount(JID jid, String password)
         throws RemoteException {
-        bot().waitUntilShellIsOpen(SHELL_CREATE_XMPP_JABBER_ACCOUNT);
-        IRemoteBotShell shell = bot().shell(SHELL_CREATE_XMPP_JABBER_ACCOUNT);
+        SWTBotShell shell = new SWTBot()
+            .shell(SHELL_CREATE_XMPP_JABBER_ACCOUNT);
         shell.activate();
+
         shell.bot().textWithLabel(LABEL_XMPP_JABBER_SERVER)
             .setText(jid.getDomain());
         shell.bot().textWithLabel(LABEL_USER_NAME).setText(jid.getName());
@@ -170,9 +200,10 @@ public final class SuperBot extends StfRemoteObject implements ISuperBot {
 
         shell.bot().button(FINISH).click();
         try {
-            shell.waitShortUntilIsClosed();
+            shell.bot().waitUntil(Conditions.shellCloses(shell));
         } catch (TimeoutException e) {
-            String errorMessage = shell.getErrorMessage();
+            String errorMessage = ((WizardDialog) shell.widget.getData())
+                .getMessage();
             if (errorMessage.matches(ERROR_MESSAGE_TOO_FAST_REGISTER_ACCOUNTS
                 + ".*"))
                 throw new RuntimeException(
@@ -186,10 +217,10 @@ public final class SuperBot extends StfRemoteObject implements ISuperBot {
 
     public void confirmShellAddXMPPJabberAccount(JID jid, String password)
         throws RemoteException {
-        if (bot().isShellOpen(SHELL_ADD_XMPP_JABBER_ACCOUNT))
-            bot().waitUntilShellIsOpen(SHELL_ADD_XMPP_JABBER_ACCOUNT);
-        IRemoteBotShell shell = bot().shell(SHELL_ADD_XMPP_JABBER_ACCOUNT);
+
+        SWTBotShell shell = new SWTBot().shell(SHELL_ADD_XMPP_JABBER_ACCOUNT);
         shell.activate();
+
         /*
          * FIXME with comboBoxInGroup(GROUP_EXISTING_ACCOUNT) you wil get
          * WidgetNoFoundException.
@@ -199,47 +230,75 @@ public final class SuperBot extends StfRemoteObject implements ISuperBot {
 
         shell.bot().textWithLabel(LABEL_PASSWORD).setText(password);
         shell.bot().button(FINISH).click();
-        shell.waitShortUntilIsClosed();
+        shell.bot().waitUntil(Conditions.shellCloses(shell));
     }
 
     public void confirmShellClosingTheSession() throws RemoteException {
-        bot().waitUntilShellIsOpen(SHELL_CLOSING_THE_SESSION);
-        bot().shell(SHELL_CLOSING_THE_SESSION).activate();
-        bot().shell(SHELL_CLOSING_THE_SESSION).confirm(OK);
-        bot().waitUntilShellIsClosed(SHELL_CLOSING_THE_SESSION);
+        SWTBotShell shell = new SWTBot().shell(SHELL_CLOSING_THE_SESSION);
+        shell.activate();
+        shell.bot().button(OK).click();
+        shell.bot().waitUntil(Conditions.shellCloses(shell));
+        // wait for tree update in the saros session view
+        new SWTBot().sleep(500);
+
     }
 
     public void confirmShellRemovelOfSubscription() throws RemoteException {
-        bot().waitUntilShellIsOpen(SHELL_REMOVAL_OF_SUBSCRIPTION);
-        bot().shell(SHELL_REMOVAL_OF_SUBSCRIPTION).activate();
-        bot().shell(SHELL_REMOVAL_OF_SUBSCRIPTION).confirm(OK);
+        SWTBotShell shell = new SWTBot().shell(SHELL_REMOVAL_OF_SUBSCRIPTION);
+        shell.activate();
+        shell.bot().button(OK).click();
+        // wait for tree update in the saros session view
+        new SWTBot().sleep(500);
     }
 
     public void confirmShellAddBuddyToSession(String... baseJIDOfinvitees)
         throws RemoteException {
-        bot().waitUntilShellIsOpen(SHELL_ADD_BUDDY_TO_SESSION);
-        IRemoteBotShell shell = bot().shell(SHELL_ADD_BUDDY_TO_SESSION);
+
+        SWTBot bot = new SWTBot();
+        SWTBotShell shell = bot.shell(SHELL_ADD_BUDDY_TO_SESSION);
+
         shell.activate();
-        for (String baseJID : baseJIDOfinvitees) {
-            shell.bot().tree().selectTreeItemWithRegex(baseJID + ".*" + "")
-                .check();
-        }
+
+        // wait for tree update
+        bot.sleep(500);
+
+        SWTBotTree tree = shell.bot().tree();
+
+        for (String baseJID : baseJIDOfinvitees)
+            tree.getTreeItem(baseJID).check();
+
         shell.bot().button(FINISH).click();
-        shell.waitShortUntilIsClosed();
+        bot.waitUntil(Conditions.shellCloses(shell));
+
+        // wait for tree update in the saros session view
+        bot.sleep(500);
+
     }
 
     public void confirmShellAddBuddy(JID jid) throws RemoteException {
-        bot().waitUntilShellIsOpen(SHELL_ADD_BUDDY);
-        bot().shell(SHELL_ADD_BUDDY).activate();
-        bot().shell(SHELL_ADD_BUDDY).bot()
-            .comboBoxWithLabel(LABEL_XMPP_JABBER_ID).setText(jid.getBase());
-        bot().shell(SHELL_ADD_BUDDY).bot().button(FINISH).waitUntilIsEnabled();
-        bot().shell(SHELL_ADD_BUDDY).bot().button(FINISH).click();
+        SWTBot bot = new SWTBot();
+        SWTBotShell shell = bot.shell(SHELL_ADD_BUDDY);
+        shell.activate();
 
-        bot().sleep(500);
-        if (bot().isShellOpen("Buddy Unknown")) {
-            bot().shell("Buddy Unknown").confirm(YES);
+        shell.bot().comboBoxWithLabel(LABEL_XMPP_JABBER_ID)
+            .setText(jid.getBase());
+
+        shell.bot().button(FINISH).click();
+
+        bot.sleep(500);
+
+        for (SWTBotShell currentShell : bot.shells()) {
+            if (currentShell.getText().equals("Buddy Unknown")) {
+                currentShell.bot().button(YES).click();
+                break;
+            }
+
         }
+        bot.waitUntil(Conditions.shellCloses(shell));
+
+        // wait for tree update in the saros session view
+        bot.sleep(500);
+
     }
 
     public void confirmShellShareProjects(String projectName, JID... jids)
@@ -250,81 +309,79 @@ public final class SuperBot extends StfRemoteObject implements ISuperBot {
     public void confirmShellShareProjects(String[] projectNames, JID... jids)
         throws RemoteException {
 
-        if (!bot().isShellOpen(SHELL_SHARE_PROJECT)) {
-            bot().waitUntilShellIsOpen(SHELL_SHARE_PROJECT);
-        }
-
-        IRemoteBotShell shell = bot().shell(SHELL_SHARE_PROJECT);
+        SWTBot bot = new SWTBot();
+        SWTBotShell shell = bot.shell(SHELL_SHARE_PROJECT);
         shell.activate();
 
-        RemoteBotTree tree = waitUntilTreeHasItems(shell);
+        // wait for tree update
+        bot.sleep(500);
 
-        tree.uncheckAllItems();
+        SWTBotTree tree = shell.bot().tree();
+
+        for (SWTBotTreeItem item : tree.getAllItems())
+            while (item.isChecked())
+                item.uncheck();
 
         for (String projectName : projectNames)
-            tree.selectTreeItemWithRegex(projectName + ".*").check();
+            tree.getTreeItem(projectName).check();
 
         shell.bot().button(NEXT).click();
 
-        tree = waitUntilTreeHasItems(shell);
+        // wait for tree update
+        bot.sleep(500);
 
-        for (JID jid : jids) {
-            tree.selectTreeItemWithRegex(jid.getBase() + ".*").check();
-        }
+        tree = shell.bot().tree();
+
+        for (JID jid : jids)
+            Util.getTreeItemWithRegex(tree, Pattern.quote(jid.getBase()) + ".*")
+                .check();
+
         shell.bot().button(FINISH).click();
+        bot.waitUntil(Conditions.shellCloses(shell));
 
-        shell.waitShortUntilIsClosed();
     }
 
     public void confirmShellAddProjectsToSession(String... projectNames)
         throws RemoteException {
-        if (!bot().isShellOpen(SHELL_ADD_PROJECTS_TO_SESSION)) {
-            bot().waitUntilShellIsOpen(SHELL_ADD_PROJECTS_TO_SESSION);
-        }
-        IRemoteBotShell shell = bot().shell(SHELL_ADD_PROJECTS_TO_SESSION);
+
+        SWTBot bot = new SWTBot();
+        SWTBotShell shell = bot.shell(SHELL_ADD_PROJECTS_TO_SESSION);
         shell.activate();
 
-        RemoteBotTree tree = waitUntilTreeHasItems(shell);
+        // wait for tree update
+        bot.sleep(500);
+
+        SWTBotTree tree = shell.bot().tree();
 
         for (String projectName : projectNames)
-            tree.selectTreeItemWithRegex(projectName + ".*").check();
+            tree.getTreeItem(projectName).check();
 
         shell.bot().button(FINISH).click();
-        shell.waitShortUntilIsClosed();
-    }
-
-    private RemoteBotTree waitUntilTreeHasItems(IRemoteBotShell shell)
-        throws RemoteException {
-        RemoteBotTree tree = null;
-        for (int i = 0; i < 10; i++) {
-            tree = (RemoteBotTree) shell.bot().tree();
-            if (tree.rowCount() == 0) {
-                shell.bot().sleep(500);
-                continue;
-            }
-            return tree;
-        }
-
-        throw new TimeoutException("tree '" + tree + "' is empty");
+        bot.waitUntil(Conditions.shellCloses(shell));
     }
 
     public void confirmShellSessionInvitationAndShellAddProject(
         String projectName, TypeOfCreateProject usingWhichProject)
         throws RemoteException {
-        if (!bot().isShellOpen(SHELL_SESSION_INVITATION)) {
-            bot().waitLongUntilShellIsOpen(SHELL_SESSION_INVITATION);
-        }
-        bot().shell(SHELL_SESSION_INVITATION).confirm(ACCEPT);
+
+        SWTBot bot = new SWTBot();
+        bot.waitUntil(Conditions.shellIsActive(SHELL_SESSION_INVITATION),
+            SarosSWTBotPreferences.SAROS_LONG_TIMEOUT);
+
+        bot.shell(SHELL_SESSION_INVITATION).bot().button(ACCEPT).click();
+
         confirmShellAddProjectUsingWhichProject(projectName, usingWhichProject);
         views().sarosView().waitUntilIsInSession();
     }
 
     public void confirmShellAddProjects(String projectName,
         TypeOfCreateProject usingWhichProject) throws RemoteException {
-        if (!bot().isShellOpen(SHELL_ADD_PROJECTS)) {
-            bot().waitLongUntilShellIsOpen(SHELL_ADD_PROJECTS);
-        }
-        IRemoteBotShell shell = bot().shell(SHELL_ADD_PROJECTS);
+
+        SWTBot bot = new SWTBot();
+        bot.waitUntil(Conditions.shellIsActive(SHELL_ADD_PROJECTS),
+            SarosSWTBotPreferences.SAROS_LONG_TIMEOUT);
+
+        SWTBotShell shell = bot.shell(SHELL_ADD_PROJECTS);
 
         switch (usingWhichProject) {
         case NEW_PROJECT:
@@ -342,37 +399,42 @@ public final class SuperBot extends StfRemoteObject implements ISuperBot {
                     "Create copy for working distributed. New project name:")
                 .click();
             break;
-        default:
-            break;
+        case EXIST_PROJECT_WITH_COPY_AFTER_CANCEL_LOCAL_CHANGE:
+            throw new UnsupportedOperationException("not yet implemented");
         }
+
         shell.bot().button(FINISH).click();
-        shell.waitLongUntilIsClosed();
+        bot.waitUntil(Conditions.shellCloses(shell));
     }
 
     public void confirmShellRequestOfSubscriptionReceived()
         throws RemoteException {
-        bot().waitUntilShellIsOpen(SHELL_REQUEST_OF_SUBSCRIPTION_RECEIVED);
-        bot().shell(SHELL_REQUEST_OF_SUBSCRIPTION_RECEIVED).activate();
-        bot().shell(SHELL_REQUEST_OF_SUBSCRIPTION_RECEIVED).bot().button(OK)
-            .click();
-        bot().sleep(500);
+
+        SWTBot bot = new SWTBot();
+        SWTBotShell shell = bot.shell(SHELL_REQUEST_OF_SUBSCRIPTION_RECEIVED);
+
+        shell.activate();
+        shell.bot().button(OK).click();
+        bot.waitUntil(Conditions.shellCloses(shell));
+        // wait for tree update in the saros session view
+        bot.sleep(500);
     }
 
     public void confirmShellLeavingClosingSession() throws RemoteException {
+        SWTBot bot = new SWTBot();
+        SWTBotShell shell;
+
         if (!Views.getInstance().sarosView().isHost()) {
-            bot().waitUntilShellIsOpen(SHELL_CONFIRM_LEAVING_SESSION);
-            bot().shell(SHELL_CONFIRM_LEAVING_SESSION).activate();
-            bot().shell(SHELL_CONFIRM_LEAVING_SESSION).confirm(YES);
+            shell = bot.shell(SHELL_CONFIRM_LEAVING_SESSION);
         } else {
-            bot().waitUntilShellIsOpen(SHELL_CONFIRM_CLOSING_SESSION);
-            bot().shell(SHELL_CONFIRM_CLOSING_SESSION).activate();
-            bot().shell(SHELL_CONFIRM_CLOSING_SESSION).confirm(YES);
+            shell = bot.shell(SHELL_CONFIRM_CLOSING_SESSION);
         }
+        shell.activate();
+        shell.bot().button(YES).click();
         Views.getInstance().sarosView().waitUntilIsNotInSession();
     }
 
     public IInternal internal() throws RemoteException {
         return InternalImpl.getInstance();
     }
-
 }

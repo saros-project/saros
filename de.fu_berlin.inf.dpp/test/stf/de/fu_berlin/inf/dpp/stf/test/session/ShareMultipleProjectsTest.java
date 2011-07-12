@@ -16,17 +16,15 @@ import de.fu_berlin.inf.dpp.stf.client.util.Util;
 import de.fu_berlin.inf.dpp.stf.shared.Constants.TypeOfCreateProject;
 
 public class ShareMultipleProjectsTest extends StfTestCase {
+
     @BeforeClass
-    public static void beforeClass() throws Exception {
-        initTesters(ALICE, BOB, CARL);
-        setUpWorkbench();
-        setUpSaros();
+    public static void selectTesters() throws Exception {
+        select(ALICE, BOB, CARL);
     }
 
-    @Override
     @Before
-    public void before() throws RemoteException {
-        super.before();
+    public void beforeEveryTest() throws RemoteException {
+
         ALICE.superBot().views().packageExplorerView().tree().newC()
             .javaProjectWithClasses("foo", "bar", "HelloAlice");
 
@@ -37,12 +35,11 @@ public class ShareMultipleProjectsTest extends StfTestCase {
             .javaProjectWithClasses("foo2", "bar", "HelloCarl");
     }
 
-    @Override
     @After
-    public void after() throws RemoteException {
-        announceTestCaseEnd();
+    public void afterEveryTest() throws RemoteException {
+
         leaveSessionHostFirst(ALICE);
-        deleteAllProjectsByActiveTesters();
+        clearWorkspaces();
     }
 
     @Test

@@ -1,13 +1,19 @@
 package de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.contextmenu.peview.impl;
 
 import java.rmi.RemoteException;
+import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.swtbot.swt.finder.SWTBot;
+import org.eclipse.swtbot.swt.finder.waits.Conditions;
+import org.eclipse.swtbot.swt.finder.waits.DefaultCondition;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
+
 import de.fu_berlin.inf.dpp.stf.server.StfRemoteObject;
-import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.impl.RemoteWorkbenchBot;
-import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotShell;
-import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotTree;
-import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotTreeItem;
+import de.fu_berlin.inf.dpp.stf.server.bot.SarosSWTBotPreferences;
+import de.fu_berlin.inf.dpp.stf.server.bot.widget.ContextMenuHelper;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.contextmenu.peview.IContextMenusInPEView;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.contextmenu.peview.submenu.INewC;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.contextmenu.peview.submenu.IRefactorC;
@@ -23,15 +29,15 @@ public final class ContextMenusInPEView extends StfRemoteObject implements
 
     private static final ContextMenusInPEView INSTANCE = new ContextMenusInPEView();
 
-    private IRemoteBotTreeItem treeItem;
-    private IRemoteBotTree tree;
+    private SWTBotTreeItem treeItem;
+    private SWTBotTree tree;
     private TreeItemType type;
 
     public static ContextMenusInPEView getInstance() {
         return INSTANCE;
     }
 
-    public void setTreeItem(IRemoteBotTreeItem treeItem) {
+    public void setTreeItem(SWTBotTreeItem treeItem) {
         this.treeItem = treeItem;
     }
 
@@ -39,7 +45,7 @@ public final class ContextMenusInPEView extends StfRemoteObject implements
         this.type = type;
     }
 
-    public void setTree(IRemoteBotTree tree) {
+    public void setTree(SWTBotTree tree) {
         this.tree = tree;
     }
 
@@ -50,101 +56,122 @@ public final class ContextMenusInPEView extends StfRemoteObject implements
      **************************************************************/
 
     public IShareWithC shareWith() throws RemoteException {
+        ShareWithC.getInstance().setTree(tree);
         ShareWithC.getInstance().setTreeItem(treeItem);
         return ShareWithC.getInstance();
     }
 
     public INewC newC() throws RemoteException {
         NewC.getInstance().setTree(tree);
-        NewC.getInstance().setTreeItem(treeItem);
         return NewC.getInstance();
     }
 
     public ITeamC team() throws RemoteException {
+        TeamC.getInstance().setTree(tree);
         TeamC.getInstance().setTreeItem(treeItem);
         return TeamC.getInstance();
     }
 
     public IRefactorC refactor() throws RemoteException {
+        RefactorC.getInstance().setTree(tree);
         RefactorC.getInstance().setTreeItem(treeItem);
         RefactorC.getInstance().setTreeItemType(type);
         return RefactorC.getInstance();
     }
 
     public void open() throws RemoteException {
-        treeItem.contextMenus(CM_OPEN).click();
+        treeItem.select();
+        ContextMenuHelper.clickContextMenu(tree, CM_OPEN);
     }
 
     public void copy() throws RemoteException {
-        treeItem.contextMenus(MENU_COPY).click();
+        treeItem.select();
+        ContextMenuHelper.clickContextMenu(tree, MENU_COPY);
     }
 
     public void refresh() throws RemoteException {
-        treeItem.contextMenus(MENU_REFRESH).click();
+        treeItem.select();
+        ContextMenuHelper.clickContextMenu(tree, MENU_REFRESH);
     }
 
     public void paste(String target) throws RemoteException {
-        if (treeItem == null) {
-            tree.contextMenu(MENU_PASTE).click();
-            IRemoteBotShell shell = RemoteWorkbenchBot.getInstance().shell(
-                SHELL_COPY_PROJECT);
-            shell.activate();
-            shell.bot().textWithLabel("Project name:").setText(target);
-            shell.bot().button(OK).click();
-            RemoteWorkbenchBot.getInstance().waitUntilShellIsClosed(
-                SHELL_COPY_PROJECT);
-            RemoteWorkbenchBot.getInstance().sleep(1000);
-        }
+        ContextMenuHelper.clickContextMenu(tree, MENU_PASTE);
+        SWTBotShell shell = new SWTBot().shell(SHELL_COPY_PROJECT);
+
+        shell.activate();
+        shell.bot().textWithLabel("Project name:").setText(target);
+        shell.bot().button(OK).click();
+        shell.bot().waitUntil(Conditions.shellCloses(shell),
+            SarosSWTBotPreferences.SAROS_LONG_TIMEOUT);
+
     }
 
     public void openWith(String editorType) throws RemoteException {
-        treeItem.contextMenus(CM_OPEN_WITH, CM_OTHER).click();
-        RemoteWorkbenchBot.getInstance().waitUntilShellIsOpen(
-            SHELL_EDITOR_SELECTION);
-        IRemoteBotShell shell_bob = RemoteWorkbenchBot.getInstance().shell(
-            SHELL_EDITOR_SELECTION);
-        shell_bob.activate();
-        shell_bob.bot().table().getTableItem(editorType).select();
-        shell_bob.bot().button(OK).waitUntilIsEnabled();
-        shell_bob.confirm(OK);
+        treeItem.select();
+        ContextMenuHelper.clickContextMenu(tree, CM_OPEN_WITH, CM_OTHER);
+
+        SWTBotShell shell = new SWTBot().shell(SHELL_EDITOR_SELECTION);
+
+        shell.activate();
+        shell.bot().table().getTableItem(editorType).select();
+        shell.bot().button(OK).click();
+        shell.bot().waitUntil(Conditions.shellCloses(shell));
     }
 
     public void delete() throws RemoteException {
-        treeItem.contextMenus(CM_DELETE).click();
+        treeItem.select();
+        ContextMenuHelper.clickContextMenu(tree, CM_DELETE);
+
+        SWTBotShell shell;
+
         switch (type) {
         case PROJECT:
-            RemoteWorkbenchBot.getInstance().shell(SHELL_DELETE_RESOURCE)
-                .confirmWithCheckBox(OK, true);
-            RemoteWorkbenchBot.getInstance().waitUntilShellIsClosed(
-                SHELL_DELETE_RESOURCE);
-            break;
         case JAVA_PROJECT:
-            RemoteWorkbenchBot.getInstance().shell(SHELL_DELETE_RESOURCE)
-                .confirmWithCheckBox(OK, true);
-            RemoteWorkbenchBot.getInstance().waitUntilShellIsClosed(
-                SHELL_DELETE_RESOURCE);
+            shell = new SWTBot().shell(SHELL_DELETE_RESOURCE);
+            shell.activate();
+            if (!shell.bot().checkBox().isChecked())
+                shell.bot().checkBox().click();
+
+            shell.bot().button(OK).click();
+
             break;
         default:
-            RemoteWorkbenchBot.getInstance().waitUntilShellIsOpen(
-                CONFIRM_DELETE);
-            RemoteWorkbenchBot.getInstance().shell(CONFIRM_DELETE).activate();
-            RemoteWorkbenchBot.getInstance().shell(CONFIRM_DELETE).bot()
-                .button(OK).click();
-            RemoteWorkbenchBot.getInstance().sleep(300);
+            shell = new SWTBot().shell(CONFIRM_DELETE);
+            shell.activate();
+            shell.bot().button(OK).click();
             break;
         }
-        tree.waitUntilItemNotExists(treeItem.getText());
+
+        shell.bot().waitUntil(Conditions.shellCloses(shell));
+        shell.bot().waitWhile(new DefaultCondition() {
+
+            public boolean test() throws Exception {
+
+                for (SWTBotTreeItem item : tree.getAllItems())
+                    if (item.getText().equals(treeItem.getText()))
+                        return true;
+
+                return false;
+            }
+
+            public String getFailureMessage() {
+                // TODO Auto-generated method stub
+                return "tree item '" + treeItem.getText()
+                    + "' still exists in tree '" + tree.getText() + "'";
+            }
+
+        });
     }
 
     public boolean existsWithRegex(String name) throws RemoteException {
         if (treeItem == null) {
-            for (String item : tree.getTextOfItems()) {
+            for (String item : getTextOfItems(tree)) {
                 if (item.matches(name + ".*"))
                     return true;
             }
             return false;
         } else {
-            for (String item : treeItem.getTextOfItems()) {
+            for (String item : getTextOfItems(treeItem)) {
                 if (item.matches(name + ".*"))
                     return true;
             }
@@ -154,18 +181,26 @@ public final class ContextMenusInPEView extends StfRemoteObject implements
 
     public boolean exists(String name) throws RemoteException {
         if (treeItem == null) {
-            return tree.getTextOfItems().contains(name);
+            return getTextOfItems(tree).contains(name);
         } else {
-            return treeItem.getTextOfItems().contains(name);
+            return getTextOfItems(treeItem).contains(name);
         }
     }
 
-    public List<String> getTextOfTreeItems() throws RemoteException {
-        if (treeItem == null) {
-            return tree.getTextOfItems();
-        } else {
-            return treeItem.getTextOfItems();
+    private List<String> getTextOfItems(SWTBotTreeItem treeItem) {
+        List<String> allItemTexts = new ArrayList<String>();
+        for (SWTBotTreeItem item : treeItem.getItems()) {
+            allItemTexts.add(item.getText());
         }
+        return allItemTexts;
+    }
+
+    private List<String> getTextOfItems(SWTBotTree tree) {
+        List<String> allItemTexts = new ArrayList<String>();
+        for (SWTBotTreeItem item : tree.getAllItems()) {
+            allItemTexts.add(item.getText());
+        }
+        return allItemTexts;
     }
 
 }

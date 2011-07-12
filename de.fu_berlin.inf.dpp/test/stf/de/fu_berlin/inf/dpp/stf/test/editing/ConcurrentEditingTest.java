@@ -20,16 +20,15 @@ import de.fu_berlin.inf.dpp.stf.shared.Constants.TypeOfCreateProject;
 import de.fu_berlin.inf.dpp.stf.test.Constants;
 
 public class ConcurrentEditingTest extends StfTestCase {
+
     @BeforeClass
-    public static void beforeClass() throws Exception {
-        initTesters(ALICE, BOB);
-        setUpWorkbench();
-        setUpSaros();
+    public static void selectTesters() throws Exception {
+        select(ALICE, BOB);
     }
 
     @After
     public void afterEveryTest() throws RemoteException {
-        deleteAllProjectsByActiveTesters();
+        clearWorkspaces();
     }
 
     static final String FILE = "file.txt";

@@ -9,13 +9,15 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.eclipse.swtbot.swt.finder.widgets.TimeoutException;
 
 import de.fu_berlin.inf.dpp.stf.server.StfRemoteObject;
+import de.fu_berlin.inf.dpp.stf.server.bot.widget.ContextMenuHelper;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.impl.RemoteWorkbenchBot;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotShell;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotTable;
-import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotTreeItem;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotView;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.contextmenu.peview.submenu.ITeamC;
 import de.fu_berlin.inf.dpp.vcs.VCSAdapter;
@@ -26,13 +28,18 @@ public final class TeamC extends StfRemoteObject implements ITeamC {
 
     private static final TeamC INSTANCE = new TeamC();
 
-    private IRemoteBotTreeItem treeItem;
+    private SWTBotTree tree;
+    private SWTBotTreeItem treeItem;
 
     public static TeamC getInstance() {
         return INSTANCE;
     }
 
-    public void setTreeItem(IRemoteBotTreeItem view) {
+    public void setTree(SWTBotTree tree) {
+        this.tree = tree;
+    }
+
+    public void setTreeItem(SWTBotTreeItem view) {
         this.treeItem = view;
     }
 
@@ -48,7 +55,9 @@ public final class TeamC extends StfRemoteObject implements ITeamC {
      * 
      **********************************************/
     public void shareProject(String repositoryURL) throws RemoteException {
-        treeItem.contextMenus(CM_TEAM, CM_SHARE_PROJECT_OF_TEAM).click();
+        treeItem.select();
+        ContextMenuHelper.clickContextMenu(tree, CM_TEAM,
+            CM_SHARE_PROJECT_OF_TEAM);
 
         IRemoteBotShell shell = RemoteWorkbenchBot.getInstance().shell(
             SHELL_SHARE_PROJECT);
@@ -69,10 +78,9 @@ public final class TeamC extends StfRemoteObject implements ITeamC {
 
     public void shareProjectConfiguredWithSVNInfos(String repositoryURL)
         throws RemoteException {
-
-        String[] contexts = { CM_TEAM, CM_SHARE_PROJECT_OF_TEAM };
-
-        treeItem.contextMenus(contexts).click();
+        treeItem.select();
+        ContextMenuHelper.clickContextMenu(tree, CM_TEAM,
+            CM_SHARE_PROJECT_OF_TEAM);
 
         IRemoteBotShell shell = RemoteWorkbenchBot.getInstance().shell(
             SHELL_SHARE_PROJECT);
@@ -86,9 +94,9 @@ public final class TeamC extends StfRemoteObject implements ITeamC {
 
     public void shareProjectUsingSpecifiedFolderName(String repositoryURL,
         String specifiedFolderName) throws RemoteException {
-        String[] contexts = { CM_TEAM, CM_SHARE_PROJECT_OF_TEAM };
-
-        treeItem.contextMenus(contexts).click();
+        treeItem.select();
+        ContextMenuHelper.clickContextMenu(tree, CM_TEAM,
+            CM_SHARE_PROJECT_OF_TEAM);
 
         RemoteWorkbenchBot.getInstance().shell(SHELL_SHARE_PROJECT)
             .confirmWithTable(TABLE_ITEM_REPOSITORY_TYPE_SVN, NEXT);
@@ -186,15 +194,17 @@ public final class TeamC extends StfRemoteObject implements ITeamC {
     }
 
     public void disConnect() throws RemoteException {
-        String[] contexts = { CM_TEAM, CM_DISCONNECT };
-        treeItem.contextMenus(contexts).click();
+        treeItem.select();
+        ContextMenuHelper.clickContextMenu(tree, CM_TEAM, CM_DISCONNECT);
+
         RemoteWorkbenchBot.getInstance()
             .shell(SHELL_CONFIRM_DISCONNECT_FROM_SVN).confirm(YES);
     }
 
     public void revert() throws RemoteException {
-        String[] contexts = { CM_TEAM, CM_REVERT };
-        treeItem.contextMenus(contexts).click();
+        treeItem.select();
+        ContextMenuHelper.clickContextMenu(tree, CM_TEAM, CM_REVERT);
+
         RemoteWorkbenchBot.getInstance().shell(SHELL_REVERT).confirm(OK);
         RemoteWorkbenchBot.getInstance().waitUntilShellIsClosed(SHELL_REVERT);
     }
@@ -205,9 +215,10 @@ public final class TeamC extends StfRemoteObject implements ITeamC {
 
     private void switchToAnotherRevision(String versionID)
         throws RemoteException {
-        String[] contexts = { CM_TEAM, CM_SWITCH_TO_ANOTHER_BRANCH_TAG_REVISION };
 
-        treeItem.contextMenus(contexts).click();
+        treeItem.select();
+        ContextMenuHelper.clickContextMenu(tree, CM_TEAM,
+            CM_SWITCH_TO_ANOTHER_BRANCH_TAG_REVISION);
 
         IRemoteBotShell shell = RemoteWorkbenchBot.getInstance().shell(
             SHELL_SWITCH);

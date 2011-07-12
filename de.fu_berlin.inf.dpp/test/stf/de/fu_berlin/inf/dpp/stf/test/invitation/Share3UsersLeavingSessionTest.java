@@ -26,14 +26,11 @@ public class Share3UsersLeavingSessionTest extends StfTestCase {
      * <li>Alice (Host, Write Access)</li>
      * <li>Bob (Read-Only Access)</li>
      * </ol>
-     * 
-     * @throws RemoteException
      */
+
     @BeforeClass
-    public static void runBeforeClass() throws RemoteException {
-        initTesters(ALICE, BOB, CARL);
-        setUpWorkbench();
-        setUpSaros();
+    public static void selectTesters() throws Exception {
+        select(ALICE, BOB, CARL);
     }
 
     /**

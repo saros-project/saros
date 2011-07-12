@@ -33,16 +33,12 @@ import de.fu_berlin.inf.dpp.stf.test.Constants;
 public class SarosPreferencesTest extends StfTestCase {
 
     @BeforeClass
-    public static void runBeforeClass() throws RemoteException {
-        initTesters(ALICE);
-        setUpWorkbench();
-        setUpSaros();
+    public static void selectTesters() throws Exception {
+        select(ALICE);
     }
 
-    @Override
     @After
-    public void after() throws RemoteException {
-        announceTestCaseEnd();
+    public void afterEveryTest() throws RemoteException {
         resetDefaultAccount();
     }
 
@@ -94,7 +90,6 @@ public class SarosPreferencesTest extends StfTestCase {
         shell.confirm(CANCEL);
         assertFalse(ALICE.remoteBot().isShellOpen(
             SHELL_CREATE_XMPP_JABBER_ACCOUNT));
-
     }
 
     /**
@@ -130,8 +125,8 @@ public class SarosPreferencesTest extends StfTestCase {
 
     /**
      * FIXME: by fist run you will get the error message
-     * {@link StfRemoteObject#ERROR_MESSAGE_NOT_CONNECTED_TO_SERVER}, but by second
-     * run you will get anther error message
+     * {@link StfRemoteObject#ERROR_MESSAGE_NOT_CONNECTED_TO_SERVER}, but by
+     * second run you will get anther error message
      * {@link StfRemoteObject#ERROR_MESSAGE_COULD_NOT_CONNECT}
      * 
      * 

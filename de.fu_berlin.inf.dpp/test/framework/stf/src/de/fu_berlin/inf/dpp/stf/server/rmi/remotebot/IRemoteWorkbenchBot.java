@@ -192,4 +192,11 @@ public interface IRemoteWorkbenchBot extends IRemoteBot {
 
     public RemoteBotChatLine chatLine(final String regex)
         throws RemoteException;
+
+    /**
+     * For internal use, do not use this method
+     * 
+     * @throws RemoteException
+     */
+    public void createBots() throws RemoteException;
 }

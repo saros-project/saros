@@ -42,7 +42,7 @@ public enum SarosTester implements AbstractTester {
         return this.tester.getPassword();
     }
 
-    public IRemoteWorkbenchBot remoteBot() {
+    public IRemoteWorkbenchBot remoteBot() throws RemoteException {
         return this.tester.remoteBot();
     }
 

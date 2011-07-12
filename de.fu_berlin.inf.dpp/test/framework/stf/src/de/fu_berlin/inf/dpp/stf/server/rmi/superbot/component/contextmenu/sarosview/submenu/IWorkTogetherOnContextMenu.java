@@ -5,7 +5,7 @@ import java.rmi.RemoteException;
 
 import de.fu_berlin.inf.dpp.net.JID;
 
-public interface IWorkTogetherOnC extends Remote {
+public interface IWorkTogetherOnContextMenu extends Remote {
 
     /**********************************************
      * 

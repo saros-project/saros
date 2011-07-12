@@ -20,9 +20,9 @@ public final class RemoteBotTreeItem extends StfRemoteObject implements
 
     private static final RemoteBotTreeItem INSTANCE = new RemoteBotTreeItem();
 
-    private transient SWTBotTreeItem widget;
+    private SWTBotTreeItem widget;
 
-    private transient SWTBotTree swtBotTree;
+    private SWTBotTree swtBotTree;
 
     public static RemoteBotTreeItem getInstance() {
         return INSTANCE;

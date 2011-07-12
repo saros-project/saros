@@ -10,7 +10,6 @@ import org.eclipse.swtbot.swt.finder.results.StringResult;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 
 import de.fu_berlin.inf.dpp.stf.server.StfRemoteObject;
-import de.fu_berlin.inf.dpp.stf.server.bot.SarosSWTBot;
 import de.fu_berlin.inf.dpp.stf.server.bot.condition.SarosConditions;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.IRemoteBot;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.impl.RemoteWorkbenchBot;
@@ -47,11 +46,7 @@ public final class RemoteBotShell extends StfRemoteObject implements
      * 
      **********************************************/
     public IRemoteBot bot() {
-        RemoteWorkbenchBot.getInstance().setBot(SarosSWTBot.getInstance()/*
-                                                                          * widget.
-                                                                          * bot
-                                                                          * ()
-                                                                          */);
+        RemoteWorkbenchBot.getInstance().setBot(widget.bot());
         return RemoteWorkbenchBot.getInstance();
     }
 

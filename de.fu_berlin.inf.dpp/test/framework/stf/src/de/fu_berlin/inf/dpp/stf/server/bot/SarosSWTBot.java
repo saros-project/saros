@@ -40,12 +40,6 @@ public final class SarosSWTBot extends SWTWorkbenchBot {
 
     private static final Logger log = Logger.getLogger(SarosSWTBot.class);
 
-    private static final SarosSWTBot INSTANCE = new SarosSWTBot();
-
-    public static SarosSWTBot getInstance() {
-        return INSTANCE;
-    }
-
     /**
      * @param mnemonicText
      *            the mnemonicText on the widget.

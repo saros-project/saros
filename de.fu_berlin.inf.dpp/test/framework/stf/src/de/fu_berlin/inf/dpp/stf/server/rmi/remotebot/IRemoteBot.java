@@ -2325,6 +2325,4 @@ public interface IRemoteBot extends Remote {
      */
     public void captureScreenshot(String fileName) throws RemoteException;
 
-    public String getPathToScreenShot() throws RemoteException;
-
 }

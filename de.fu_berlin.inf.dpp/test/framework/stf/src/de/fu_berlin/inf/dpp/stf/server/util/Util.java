@@ -1,14 +1,15 @@
 package de.fu_berlin.inf.dpp.stf.server.util;
 
-import static de.fu_berlin.inf.dpp.stf.shared.Constants.SRC;
-import static de.fu_berlin.inf.dpp.stf.shared.Constants.SUFFIX_JAVA;
+import java.util.Arrays;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.io.StringWriter;
-import java.io.Writer;
+import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
+import org.eclipse.swtbot.swt.finder.SWTBot;
+import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
+import org.eclipse.swtbot.swt.finder.waits.DefaultCondition;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotToolbarButton;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
+import org.eclipse.swtbot.swt.finder.widgets.TimeoutException;
 
 public class Util {
 
@@ -32,75 +33,94 @@ public class Util {
         return OS_TYPE;
     }
 
-    public static String getClassPath(String projectName, String pkg,
-        String className) {
-        return projectName + "/src/" + pkg.replaceAll("\\.", "/") + "/"
-            + className + ".java";
+    public static SWTBotToolbarButton getToolbarButtonWithRegex(
+        final SWTBotView view, final String regex) {
+
+        try {
+            new SWTBot().waitUntil(new DefaultCondition() {
+                public String getFailureMessage() {
+                    return "Could not find toolbar button matching " + regex;
+                }
+
+                public boolean test() throws Exception {
+                    return getToolbarButton(view, regex) != null;
+                }
+            });
+            return getToolbarButton(view, regex);
+
+        } catch (TimeoutException e) {
+            throw new WidgetNotFoundException(
+                "Timed out waiting for toolbar button matching " + regex, e); //$NON-NLS-1$
+        }
     }
 
-    public static String getPkgPath(String projectName, String pkg) {
-        return projectName + "/src/" + pkg.replaceAll("\\.", "/");
+    private static SWTBotToolbarButton getToolbarButton(SWTBotView view,
+        String regex) {
+
+        for (SWTBotToolbarButton button : view.getToolbarButtons())
+            if (button.getToolTipText().matches(regex))
+                return button;
+
+        return null;
     }
 
-    public static String[] getClassNodes(String projectName, String pkg,
-        String className) {
-        String[] nodes = { projectName, SRC, pkg, className + SUFFIX_JAVA };
-        return nodes;
+    public static SWTBotTreeItem getTreeItemWithRegex(final SWTBotTree tree,
+        final String... regexNodes) {
+
+        try {
+            new SWTBot().waitUntil(new DefaultCondition() {
+                public String getFailureMessage() {
+                    return "Could not find node matching "
+                        + Arrays.asList(regexNodes);
+                }
+
+                public boolean test() throws Exception {
+                    return getTreeItem(tree.getAllItems(), regexNodes) != null;
+                }
+            });
+            return getTreeItem(tree.getAllItems(), regexNodes);
+
+        } catch (TimeoutException e) {
+            throw new WidgetNotFoundException(
+                "Timed out waiting for tree matching " + Arrays.asList(regexNodes), e); //$NON-NLS-1$
+        }
     }
 
-    public static String[] getPkgNodes(String projectName, String pkg) {
-        String[] nodes = { projectName, SRC, pkg };
-        return nodes;
-    }
+    private static SWTBotTreeItem getTreeItem(SWTBotTreeItem items[],
+        final String... regexNodes) {
 
-    public static String getPath(String... nodes) {
-        StringBuilder builder = new StringBuilder();
+        SWTBotTreeItem currentItem = null;
+
+        int l = regexNodes.length;
         int i = 0;
 
-        for (; i < nodes.length - 1; i++)
-            builder.append(nodes[i]).append('/');
+        regex: for (; i < l; i++) {
 
-        builder.append(nodes[i]);
+            if (items.length == 0)
+                break regex;
 
-        return builder.toString();
-    }
+            currentItem = null;
 
-    public static String changeToRegex(String text) {
-        // the name of project in SVN_control contains special characters, which
-        // should be filtered.
-        String[] names = text.split(" ");
-        if (names.length > 1) {
-            text = names[0];
-        }
-        return text + ".*";
-    }
+            String regex = regexNodes[i];
+            int il = items.length;
 
-    public static String[] changeToRegex(String... texts) {
-        String[] matchTexts = new String[texts.length];
-        for (int i = 0; i < texts.length; i++) {
-            matchTexts[i] = texts[i] + "( .*)?";
-        }
-        return matchTexts;
-    }
-
-    public static String convertStreamToString(InputStream is)
-        throws IOException {
-        if (is != null) {
-            Writer writer = new StringWriter();
-            char[] buffer = new char[8192];
-            try {
-                Reader reader = new InputStreamReader(is, "UTF-8");
-                int n;
-                while ((n = reader.read(buffer)) != -1) {
-                    writer.write(buffer, 0, n);
+            items: for (int j = 0; j < il; j++) {
+                SWTBotTreeItem item = items[j];
+                if (item.getText().matches(regex)) {
+                    currentItem = item;
+                    if (!currentItem.isExpanded())
+                        currentItem.expand();
+                    items = currentItem.getItems();
+                    break items;
                 }
-            } finally {
-                is.close();
-                writer.close();
             }
-            return writer.toString();
-        } else {
-            return "";
+
+            if (currentItem == null)
+                return null;
         }
+
+        return i == l ? currentItem : null;
+
     }
+
 }

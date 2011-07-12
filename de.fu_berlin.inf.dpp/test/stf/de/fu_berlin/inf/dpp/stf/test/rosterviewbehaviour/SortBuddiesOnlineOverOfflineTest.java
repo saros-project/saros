@@ -19,10 +19,8 @@ import de.fu_berlin.inf.dpp.stf.client.StfTestCase;
 public class SortBuddiesOnlineOverOfflineTest extends StfTestCase {
 
     @BeforeClass
-    public static void runBeforeClass() throws RemoteException {
-        initTesters(ALICE, CARL, BOB);
-        setUpWorkbench();
-        setUpSaros();
+    public static void selectTesters() throws Exception {
+        select(ALICE, CARL, BOB);
     }
 
     @Test

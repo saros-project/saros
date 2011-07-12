@@ -17,15 +17,13 @@ import de.fu_berlin.inf.dpp.stf.shared.Constants.TypeOfCreateProject;
 public class InviteAndLeaveStressTest extends StfTestCase {
 
     @BeforeClass
-    public static void beforeClass() throws Exception {
-        initTesters(ALICE, BOB);
-        setUpWorkbench();
-        setUpSaros();
+    public static void selectTesters() throws Exception {
+        select(ALICE, BOB);
     }
 
     @Before
     public void beforeEveryTest() throws RemoteException {
-        deleteAllProjectsByActiveTesters();
+        clearWorkspaces();
         ALICE.superBot().views().packageExplorerView().tree().newC()
             .javaProjectWithClasses("foo", "bar", "HelloWorld");
     }

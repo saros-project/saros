@@ -2,14 +2,16 @@ package de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.impl;
 
 import java.rmi.RemoteException;
 
+import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
+
 import de.fu_berlin.inf.dpp.stf.server.StfRemoteObject;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.impl.RemoteWorkbenchBot;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.IViews;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.eclipse.IConsoleView;
-import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.eclipse.IPEView;
+import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.eclipse.IPackageExplorerView;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.eclipse.IProgressView;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.eclipse.impl.ConsoleView;
-import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.eclipse.impl.PEView;
+import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.eclipse.impl.PackageExplorerView;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.eclipse.impl.ProgressView;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.saros.IRSView;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.saros.ISarosView;
@@ -25,10 +27,10 @@ public final class Views extends StfRemoteObject implements IViews {
     }
 
     public ISarosView sarosView() throws RemoteException {
+        SWTWorkbenchBot bot = new SWTWorkbenchBot();
         RemoteWorkbenchBot.getInstance().openViewById(VIEW_SAROS_ID);
-        RemoteWorkbenchBot.getInstance().view(VIEW_SAROS).show();
-        return SarosView.getInstance().setView(
-            RemoteWorkbenchBot.getInstance().view(VIEW_SAROS));
+        bot.viewByTitle(VIEW_SAROS).show();
+        return SarosView.getInstance().setView(bot.viewByTitle(VIEW_SAROS));
     }
 
     public IRSView remoteScreenView() throws RemoteException {
@@ -42,11 +44,13 @@ public final class Views extends StfRemoteObject implements IViews {
         return ConsoleView.getInstance();
     }
 
-    public IPEView packageExplorerView() throws RemoteException {
+    public IPackageExplorerView packageExplorerView() throws RemoteException {
+
+        SWTWorkbenchBot bot = new SWTWorkbenchBot();
         RemoteWorkbenchBot.getInstance().openViewById(VIEW_PACKAGE_EXPLORER_ID);
-        RemoteWorkbenchBot.getInstance().view(VIEW_PACKAGE_EXPLORER).show();
-        return PEView.getInstance().setView(
-            RemoteWorkbenchBot.getInstance().view(VIEW_PACKAGE_EXPLORER));
+        bot.viewByTitle(VIEW_PACKAGE_EXPLORER).show();
+        return PackageExplorerView.getInstance().setView(
+            bot.viewByTitle(VIEW_PACKAGE_EXPLORER));
     }
 
     public IProgressView progressView() throws RemoteException {

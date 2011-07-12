@@ -1,23 +1,32 @@
 package de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.saros.impl;
 
 import java.rmi.RemoteException;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
 import org.eclipse.jface.bindings.keys.KeyStroke;
 import org.eclipse.jface.bindings.keys.ParseException;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swtbot.eclipse.finder.matchers.WidgetMatcherFactory;
+import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
+import org.eclipse.swtbot.swt.finder.SWTBot;
+import org.eclipse.swtbot.swt.finder.waits.Conditions;
 import org.eclipse.swtbot.swt.finder.waits.DefaultCondition;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotToolbarButton;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotToolbarDropDownButton;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
+import org.eclipse.swtbot.swt.finder.widgets.TimeoutException;
 import org.hamcrest.Matcher;
 import org.jivesoftware.smack.Roster;
 
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.stf.server.StfRemoteObject;
+import de.fu_berlin.inf.dpp.stf.server.bot.SarosSWTBotPreferences;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.impl.RemoteWorkbenchBot;
-import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotToolbarDropDownButton;
-import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotTree;
-import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotTreeItem;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotView;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.ISuperBot;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.contextmenu.sarosview.IContextMenusInBuddiesArea;
@@ -27,6 +36,7 @@ import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.contextmenu.sarosv
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.saros.IChatroom;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.saros.ISarosView;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.impl.SuperBot;
+import de.fu_berlin.inf.dpp.stf.server.util.Util;
 
 /**
  * This implementation of {@link ISarosView}
@@ -39,14 +49,14 @@ public final class SarosView extends StfRemoteObject implements ISarosView {
 
     private static final SarosView INSTANCE = new SarosView();
 
-    private IRemoteBotView view;
-    private IRemoteBotTree tree;
+    private SWTBotView view;
+    private SWTBotTree tree;
 
     public static SarosView getInstance() {
         return INSTANCE;
     }
 
-    public ISarosView setView(IRemoteBotView view) throws RemoteException {
+    public ISarosView setView(SWTBotView view) {
         setViewWithTree(view);
         return this;
     }
@@ -115,8 +125,7 @@ public final class SarosView extends StfRemoteObject implements ISarosView {
      */
     @SuppressWarnings("unused")
     private void selectConnectAccount(String baseJID) throws RemoteException {
-        IRemoteBotToolbarDropDownButton b = view
-            .toolbarDropDownButton(TB_CONNECT);
+        SWTBotToolbarDropDownButton b = view.toolbarDropDownButton(TB_CONNECT);
         @SuppressWarnings("static-access")
         Matcher<MenuItem> withRegex = WidgetMatcherFactory.withRegex(baseJID
             + ".*");
@@ -133,6 +142,8 @@ public final class SarosView extends StfRemoteObject implements ISarosView {
             clickToolbarButtonWithTooltip(TB_ADD_A_NEW_BUDDY);
             SuperBot.getInstance().confirmShellAddBuddy(jid);
         }
+        // wait for update of the saros session tree
+        new SWTBot().sleep(500);
     }
 
     public void shareYourScreenWithSelectedBuddy(JID jidOfPeer)
@@ -168,20 +179,16 @@ public final class SarosView extends StfRemoteObject implements ISarosView {
         if (isInSession()) {
             if (!isHost()) {
                 clickToolbarButtonWithTooltip(TB_LEAVE_SESSION);
-                RemoteWorkbenchBot.getInstance().waitUntilShellIsOpen(
-                    SHELL_CONFIRM_LEAVING_SESSION);
-                RemoteWorkbenchBot.getInstance()
-                    .shell(SHELL_CONFIRM_LEAVING_SESSION).activate();
-                RemoteWorkbenchBot.getInstance()
-                    .shell(SHELL_CONFIRM_LEAVING_SESSION).confirm(YES);
+                SWTBotShell shell = new SWTBot()
+                    .shell(SHELL_CONFIRM_LEAVING_SESSION);
+                shell.activate();
+                shell.bot().button(YES).click();
             } else {
                 clickToolbarButtonWithTooltip(TB_STOP_SESSION);
-                RemoteWorkbenchBot.getInstance().waitUntilShellIsOpen(
-                    SHELL_CONFIRM_CLOSING_SESSION);
-                RemoteWorkbenchBot.getInstance()
-                    .shell(SHELL_CONFIRM_CLOSING_SESSION).activate();
-                RemoteWorkbenchBot.getInstance()
-                    .shell(SHELL_CONFIRM_CLOSING_SESSION).confirm(YES);
+                SWTBotShell shell = new SWTBot()
+                    .shell(SHELL_CONFIRM_CLOSING_SESSION);
+                shell.activate();
+                shell.bot().button(YES).click();
             }
             waitUntilIsNotInSession();
         }
@@ -204,10 +211,14 @@ public final class SarosView extends StfRemoteObject implements ISarosView {
      * {@link IRemoteBotView#toolbarButtonWithRegex(String)} to perform this
      * action.
      */
-    public void inconsistencyDetected() throws RemoteException {
-        view.toolbarButtonWithRegex(TB_INCONSISTENCY_DETECTED + ".*").click();
-        RemoteWorkbenchBot.getInstance().waitUntilShellIsClosed(
-            SHELL_PROGRESS_INFORMATION);
+    public void resolveInconsistency() throws RemoteException {
+        Util.getToolbarButtonWithRegex(view,
+            Pattern.quote(TB_INCONSISTENCY_DETECTED) + ".*").click();
+
+        SWTBot bot = new SWTBot();
+        bot.sleep(1000);
+        bot.waitWhile(Conditions.shellIsActive(SHELL_PROGRESS_INFORMATION),
+            SarosSWTBotPreferences.SAROS_LONG_TIMEOUT);
     }
 
     /**********************************************
@@ -217,8 +228,7 @@ public final class SarosView extends StfRemoteObject implements ISarosView {
      **********************************************/
 
     public IContextMenusInBuddiesArea selectBuddies() throws RemoteException {
-        initBuddiesContextMenuWrapper(tree
-            .selectTreeItemWithRegex(NODE_BUDDIES));
+        initBuddiesContextMenuWrapper(tree.getTreeItem(NODE_BUDDIES));
         return ContextMenusInBuddiesArea.getInstance();
     }
 
@@ -228,16 +238,16 @@ public final class SarosView extends StfRemoteObject implements ISarosView {
             throw new RuntimeException("no buddy exists with the JID: "
                 + buddyJID.getBase());
         }
-        initBuddiesContextMenuWrapper(tree.selectTreeItemWithRegex(
-            NODE_BUDDIES, getNickname(buddyJID) + ".*"));
+        initBuddiesContextMenuWrapper(Util.getTreeItemWithRegex(tree,
+            Pattern.quote(NODE_BUDDIES), Pattern.quote(getNickname(buddyJID))
+                + ".*"));
         return ContextMenusInBuddiesArea.getInstance();
     }
 
     public IContextMenusInSessionArea selectSession() throws RemoteException {
         if (!isInSession())
             throw new RuntimeException("you are not in a session");
-        initSessionContextMenuWrapper(tree
-            .selectTreeItemWithRegex(NODE_SESSION));
+        initSessionContextMenuWrapper(tree.getTreeItem(NODE_SESSION));
         return ContextMenusInSessionArea.getInstance();
     }
 
@@ -245,8 +255,7 @@ public final class SarosView extends StfRemoteObject implements ISarosView {
         throws RemoteException {
         if (isInSession())
             throw new RuntimeException("you are in a session");
-        initSessionContextMenuWrapper(tree
-            .selectTreeItemWithRegex(NODE_NO_SESSION_RUNNING));
+        initSessionContextMenuWrapper(tree.getTreeItem(NODE_NO_SESSION_RUNNING));
         return ContextMenusInSessionArea.getInstance();
     }
 
@@ -255,8 +264,9 @@ public final class SarosView extends StfRemoteObject implements ISarosView {
         if (!isInSession())
             throw new RuntimeException("you are not in a session");
         String participantLabel = getParticipantLabel(participantJID);
-        initSessionContextMenuWrapper(tree.selectTreeItemWithRegex(
-            NODE_SESSION, participantLabel));
+        initSessionContextMenuWrapper(Util
+            .getTreeItemWithRegex(tree, Pattern.quote(NODE_SESSION),
+                Pattern.quote(participantLabel) + ".*"));
         ContextMenusInSessionArea.getInstance().setParticipantJID(
             participantJID);
         return ContextMenusInSessionArea.getInstance();
@@ -273,11 +283,11 @@ public final class SarosView extends StfRemoteObject implements ISarosView {
      * 
      **********************************************/
 
-    public boolean isConnected() throws RemoteException {
+    public boolean isConnected() {
         return isToolbarButtonEnabled(TB_DISCONNECT);
     }
 
-    public boolean isDisconnected() throws RemoteException {
+    public boolean isDisconnected() {
         return isToolbarButtonEnabled(TB_CONNECT);
     }
 
@@ -300,25 +310,37 @@ public final class SarosView extends StfRemoteObject implements ISarosView {
     }
 
     public List<String> getAllBuddies() throws RemoteException {
-        return tree.selectTreeItem(NODE_BUDDIES).getTextOfItems();
+        SWTBotTreeItem items = tree.getTreeItem(NODE_BUDDIES);
+        List<String> buddies = new ArrayList<String>();
+
+        for (SWTBotTreeItem item : items.getItems())
+            buddies.add(item.getText());
+
+        return buddies;
     }
 
     public boolean hasBuddy(JID buddyJID) throws RemoteException {
         String nickName = getNickname(buddyJID);
         if (nickName == null)
             return false;
-        return tree.selectTreeItemWithRegex(NODE_BUDDIES)
-            .existsSubItemWithRegex(nickName + ".*");
+
+        try {
+            Util.getTreeItemWithRegex(tree, Pattern.quote(NODE_BUDDIES),
+                Pattern.quote(nickName) + ".*");
+            return true;
+        } catch (TimeoutException e) {
+            return false;
+        }
     }
 
     public boolean existsParticipant(JID participantJID) throws RemoteException {
         String participantLabel = getParticipantLabel(participantJID);
-        List<String> nodes = tree.selectTreeItem(NODE_SESSION).getNodes();
-        for (int i = 0; i < nodes.size(); i++) {
-            if (tree.selectTreeItem(NODE_SESSION).getNode(i).getText()
-                .equals(participantLabel))
+
+        participantLabel = Pattern.quote(participantLabel) + ".*";
+        for (String label : tree.getTreeItem(NODE_SESSION).getNodes())
+            if (label.matches(participantLabel))
                 return true;
-        }
+
         return false;
     }
 
@@ -326,51 +348,41 @@ public final class SarosView extends StfRemoteObject implements ISarosView {
         throws RemoteException {
         String contactLabel;
         if (SuperBot.getInstance().getJID().equals(participantJID)) {
-            // if (hasWriteAccessNoGUI())
             contactLabel = OWN_PARTICIPANT_NAME;
-            // else
-            // contactLabel = OWN_PARTICIPANT_NAME + " " + PERMISSION_NAME;
         } else if (SuperBot.getInstance().views().sarosView()
             .hasNickName(participantJID)) {
-            // if (hasWriteAccessByNoGUI(participantJID))
+
             contactLabel = SuperBot.getInstance().views().sarosView()
                 .getNickname(participantJID)
-                + " \\(" + participantJID.getBase() + "\\)";
-            // else
-            // contactLabel = sarosBot().views().sarosView()
-            // .getNickName(participantJID)
-            // + " ("
-            // + participantJID.getBase()
-            // + ")"
-            // + " "
-            // + PERMISSION_NAME;
+                + " (" + participantJID.getBase() + ")";
+
         } else {
-            // if (hasWriteAccessByNoGUI(participantJID))
+
             contactLabel = participantJID.getBase();
-            // else
-            // contactLabel = participantJID.getBase() + " " + PERMISSION_NAME;
+
         }
-        return contactLabel + ".*";
+        return contactLabel;
     }
 
-    public boolean isInSession() throws RemoteException {
-        if (view.existsToolbarButton(TB_STOP_SESSION))
-            return view.toolbarButton(TB_STOP_SESSION).isEnabled();
-        else if (view.existsToolbarButton(TB_LEAVE_SESSION))
-            return view.toolbarButton(TB_LEAVE_SESSION).isEnabled();
+    public boolean isInSession() {
+        for (SWTBotToolbarButton button : view.getToolbarButtons()) {
+            if ((button.getToolTipText().equals(TB_STOP_SESSION) || button
+                .getToolTipText().equals(TB_LEAVE_SESSION))
+                && button.isEnabled())
+                return true;
+        }
         return false;
     }
 
     public boolean isHost() throws RemoteException {
         if (!isInSession())
             return false;
-        String ownLabelsInSessionView = getParticipantLabel(SuperBot
-            .getInstance().getJID());
-        String talbeItem = tree.selectTreeItem(NODE_SESSION).getNode(0)
-            .getText();
-        if (talbeItem.matches(ownLabelsInSessionView))
-            return true;
-        return false;
+
+        List<String> participants = tree.getTreeItem(NODE_SESSION).getNodes();
+
+        return participants.size() > 0
+            && participants.get(0).equals(
+                getParticipantLabel(SuperBot.getInstance().getJID()));
     }
 
     public boolean isFollowing() throws RemoteException {
@@ -381,15 +393,15 @@ public final class SarosView extends StfRemoteObject implements ISarosView {
     }
 
     public List<String> getAllParticipants() throws RemoteException {
-        return tree.selectTreeItem(NODE_SESSION).getNodes();
+        return tree.getTreeItem(NODE_SESSION).getNodes();
 
     }
 
-    public JID getJID() throws RemoteException {
+    public JID getJID() {
         return SuperBot.getInstance().getJID();
     }
 
-    public JID getFollowedBuddy() throws RemoteException {
+    public JID getFollowedBuddy() {
         if (getEditorManager().getFollowedUser() != null)
             return getEditorManager().getFollowedUser().getJID();
         else
@@ -403,7 +415,7 @@ public final class SarosView extends StfRemoteObject implements ISarosView {
      **********************************************/
 
     public void waitUntilIsConnected() throws RemoteException {
-        RemoteWorkbenchBot.getInstance().waitUntil(new DefaultCondition() {
+        new SWTBot().waitUntil(new DefaultCondition() {
             public boolean test() throws Exception {
                 return isConnected();
             }
@@ -415,7 +427,7 @@ public final class SarosView extends StfRemoteObject implements ISarosView {
     }
 
     public void waitUntilIsDisconnected() throws RemoteException {
-        RemoteWorkbenchBot.getInstance().waitUntil(new DefaultCondition() {
+        new SWTBot().waitUntil(new DefaultCondition() {
             public boolean test() throws Exception {
                 return isDisconnected();
             }
@@ -427,7 +439,7 @@ public final class SarosView extends StfRemoteObject implements ISarosView {
     }
 
     public void waitUntilIsInSession() throws RemoteException {
-        RemoteWorkbenchBot.getInstance().waitUntil(new DefaultCondition() {
+        new SWTBot().waitUntil(new DefaultCondition() {
             public boolean test() throws Exception {
                 return isInSession();
             }
@@ -444,7 +456,7 @@ public final class SarosView extends StfRemoteObject implements ISarosView {
     }
 
     public void waitUntilIsNotInSession() throws RemoteException {
-        RemoteWorkbenchBot.getInstance().waitUntil(new DefaultCondition() {
+        new SWTBot().waitUntil(new DefaultCondition() {
             public boolean test() throws Exception {
                 return !isInSession();
             }
@@ -462,7 +474,7 @@ public final class SarosView extends StfRemoteObject implements ISarosView {
 
     public void waitUntilAllPeersLeaveSession(
         final List<JID> jidsOfAllParticipants) throws RemoteException {
-        RemoteWorkbenchBot.getInstance().waitUntil(new DefaultCondition() {
+        new SWTBot().waitUntil(new DefaultCondition() {
             public boolean test() throws Exception {
                 for (JID jid : jidsOfAllParticipants) {
                     if (existsParticipant(jid))
@@ -480,8 +492,9 @@ public final class SarosView extends StfRemoteObject implements ISarosView {
     public void waitUntilIsInconsistencyDetected() throws RemoteException {
         RemoteWorkbenchBot.getInstance().waitUntil(new DefaultCondition() {
             public boolean test() throws Exception {
-                return view.toolbarButtonWithRegex(
-                    TB_INCONSISTENCY_DETECTED + ".*").isEnabled();
+                return Util.getToolbarButtonWithRegex(view,
+                    Pattern.quote(TB_INCONSISTENCY_DETECTED) + ".*")
+                    .isEnabled();
             }
 
             public String getFailureMessage() {
@@ -497,16 +510,18 @@ public final class SarosView extends StfRemoteObject implements ISarosView {
      * 
      **************************************************************/
 
-    private boolean isToolbarButtonEnabled(String tooltip)
-        throws RemoteException {
-        if (!view.existsToolbarButton(tooltip))
-            return false;
-        return view.toolbarButton(tooltip).isEnabled();
+    private boolean isToolbarButtonEnabled(String tooltip) {
+
+        for (SWTBotToolbarButton button : view.getToolbarButtons())
+            if (button.getToolTipText().equals(tooltip) && button.isEnabled())
+                return true;
+
+        return false;
     }
 
-    private void clickToolbarButtonWithTooltip(String tooltipText)
-        throws RemoteException {
-        view.toolbarButtonWithRegex(tooltipText + ".*").click();
+    private void clickToolbarButtonWithTooltip(String tooltipText) {
+        Util.getToolbarButtonWithRegex(view, Pattern.quote(tooltipText) + ".*")
+            .click();
     }
 
     private void selectParticipant(JID jidOfSelectedUser, String message)
@@ -517,21 +532,18 @@ public final class SarosView extends StfRemoteObject implements ISarosView {
         selectParticipant(jidOfSelectedUser);
     }
 
-    private void setViewWithTree(IRemoteBotView view) throws RemoteException {
+    private void setViewWithTree(SWTBotView view) {
         this.view = view;
-        tree = view.bot().tree();
-        // treeItem = null;
+        this.tree = view.bot().tree();
     }
 
-    private void initSessionContextMenuWrapper(IRemoteBotTreeItem treeItem) {
-        // this.treeItem = treeItem;
+    private void initSessionContextMenuWrapper(SWTBotTreeItem treeItem) {
         ContextMenusInSessionArea.getInstance().setTree(tree);
         ContextMenusInSessionArea.getInstance().setTreeItem(treeItem);
         ContextMenusInSessionArea.getInstance().setSarosView(this);
     }
 
-    private void initBuddiesContextMenuWrapper(IRemoteBotTreeItem treeItem) {
-        // this.treeItem = treeItem;
+    private void initBuddiesContextMenuWrapper(SWTBotTreeItem treeItem) {
         ContextMenusInBuddiesArea.getInstance().setTree(tree);
         ContextMenusInBuddiesArea.getInstance().setTreeItem(treeItem);
         ContextMenusInBuddiesArea.getInstance().setSarosView(this);

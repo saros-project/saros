@@ -16,16 +16,12 @@ import de.fu_berlin.inf.dpp.stf.test.Constants;
 public class ContextMenuShareWithTest extends StfTestCase {
 
     @BeforeClass
-    public static void runBeforeClass() throws RemoteException {
-        initTesters(ALICE, BOB);
-        setUpWorkbench();
-        setUpSaros();
+    public static void selectTesters() throws Exception {
+        select(ALICE, BOB);
     }
 
-    @Override
     @After
-    public void after() throws RemoteException {
-        announceTestCaseEnd();
+    public void afterEveryTest() throws RemoteException {
         leaveSessionPeersFirst(ALICE);
     }
 

@@ -1,20 +1,18 @@
 package de.fu_berlin.inf.dpp.stf.client;
 
-import static de.fu_berlin.inf.dpp.stf.shared.Constants.TB_STOP_SESSION;
-import static de.fu_berlin.inf.dpp.stf.shared.Constants.VIEW_SAROS;
-
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.Callable;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
-import org.junit.After;
 import org.junit.AfterClass;
-import org.junit.Before;
 import org.junit.Rule;
-import org.junit.rules.TestName;
+import org.junit.rules.TestWatchman;
+import org.junit.runners.model.FrameworkMethod;
 
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.stf.client.tester.AbstractTester;
@@ -23,13 +21,81 @@ import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.IRemoteWorkbenchBot;
 
 public abstract class StfTestCase {
 
+    private static final Logger LOGGER = Logger.getLogger(StfTestCase.class
+        .getName());
+
     @Rule
-    public TestName currentTestName = new TestName();
+    public TestWatchman watchman = new TestWatchman() {
+        @Override
+        public void failed(Throwable e, FrameworkMethod method) {
+            logMessage("******* " + "TESTCASE "
+                + method.getMethod().getDeclaringClass().getName() + ":"
+                + method.getName() + " FAILED *******");
+            captureScreenshot((method.getMethod().getDeclaringClass().getName()
+                + "_" + method.getName()).replace('.', '_'));
+        }
+
+        @Override
+        public void succeeded(FrameworkMethod method) {
+            logMessage("******* " + "TESTCASE "
+                + method.getMethod().getDeclaringClass().getName() + ":"
+                + method.getName() + " SUCCEDED *******");
+        }
+
+        @Override
+        public void finished(FrameworkMethod method) {
+            logMessage("******* " + "TESTCASE "
+                + method.getMethod().getDeclaringClass().getName() + ":"
+                + method.getName() + " FINISHED *******");
+        }
+
+        @Override
+        public void starting(FrameworkMethod method) {
+            logMessage("******* " + "STARTING TESTCASE "
+                + method.getMethod().getDeclaringClass().getName() + ":"
+                + method.getName() + " *******");
+
+        }
+
+        private void logMessage(String message) {
+            for (AbstractTester tester : currentTesters) {
+                try {
+                    tester.remoteBot().logMessage(message);
+                } catch (Exception e) {
+                    LOGGER.log(Level.WARNING, "could not log message '"
+                        + message + "' at remote bot of tester " + tester, e);
+                }
+            }
+        }
+
+        private void captureScreenshot(String name) {
+
+            for (AbstractTester tester : currentTesters) {
+                try {
+                    tester.remoteBot().captureScreenshot(
+                        name + "_" + tester + "_" + System.currentTimeMillis()
+                            + ".jpg");
+                } catch (Exception e) {
+                    LOGGER.log(Level.WARNING,
+                        "could capture a screenshot at remote bot of tester "
+                            + tester, e);
+                }
+            }
+        }
+    };
 
     private static List<AbstractTester> currentTesters = new ArrayList<AbstractTester>();
 
+    public static void select(AbstractTester tester, AbstractTester... testers)
+        throws Exception {
+        initTesters(tester, testers);
+        setUpWorkbench();
+        setUpSaros();
+    }
+
     public static void initTesters(AbstractTester tester,
         AbstractTester... testers) {
+
         currentTesters.clear();
         currentTesters.add(tester);
         currentTesters.addAll(Arrays.asList(testers));
@@ -44,92 +110,9 @@ public abstract class StfTestCase {
         return Collections.unmodifiableList(currentTesters);
     }
 
-    /**********************************************
-     * 
-     * Before/After conditions
-     * 
-     * @throws RemoteException
-     * 
-     **********************************************/
-
-    @Before
-    public void before() throws RemoteException {
-        announceTestCaseStart();
-    }
-
-    @After
-    public void after() throws RemoteException {
-        announceTestCaseEnd();
-        resetWorkbenches();
-    }
-
     @AfterClass
-    public static void afterClass() throws RemoteException {
-        resetSaros();
-    }
-
-    public void announceTestCaseStart() throws RemoteException {
-        for (AbstractTester tester : currentTesters) {
-            tester.remoteBot().logMessage(
-                "******* " + "STARTING TESTCASE " + this.getClass().getName()
-                    + ":" + currentTestName.getMethodName() + " *******");
-        }
-    }
-
-    public void announceTestCaseEnd() throws RemoteException {
-        for (AbstractTester tester : currentTesters) {
-            tester.remoteBot().logMessage(
-                "******* " + "ENDING TESTCASE " + this.getClass().getName()
-                    + ":" + currentTestName.getMethodName() + " *******");
-        }
-    }
-
-    /**
-     * bring workbench to a original state before beginning your tests
-     * <ul>
-     * <li>activate saros-instance workbench</li>
-     * <li>close all opened popUp windows</li>
-     * <li>close all opened editors</li>
-     * <li>delete all existed projects</li>
-     * <li>close welcome view, if it is open</li>
-     * <li>open java perspective</li>
-     * <li>close all unnecessary views</li>
-     * </ul>
-     * 
-     * @throws RemoteException
-     */
-    public static void setUpWorkbench() throws RemoteException {
-        for (AbstractTester tester : currentTesters) {
-            tester.remoteBot().activateWorkbench();
-            if (tester.remoteBot().isViewOpen("Welcome"))
-                tester.remoteBot().view("Welcome").close();
-            tester.superBot().menuBar().window().openPerspective();
-            Util.closeUnnecessaryViews(tester);
-            tester.remoteBot().resetWorkbench();
-            tester.superBot().internal().deleteWorkspace();
-        }
-    }
-
-    /**
-     * bring Saros to a original state before beginning your tests
-     * <ul>
-     * <li>make automaticReminder disable</li>
-     * <li>open sarosViews</li>
-     * <li>connect</li>
-     * <li>check buddy lists, if all active testers are in contact</li>
-     * </ul>
-     * 
-     * @throws RemoteException
-     */
-    public static void setUpSaros() throws RemoteException {
-        for (AbstractTester tester : currentTesters) {
-            tester.superBot().menuBar().saros().preferences()
-                .disableAutomaticReminder();
-            Util.openSarosViews(tester);
-            tester.superBot().views().sarosView()
-                .connectWith(tester.getJID(), tester.getPassword());
-            resetBuddies(tester);
-        }
+    public static void cleanUpSaros() throws Exception {
+        tearDownSaros();
     }
 
     /**
@@ -143,26 +126,96 @@ public abstract class StfTestCase {
      * </ol>
      * 
      * 
-     * @throws RemoteException
+     * @throws Exception
      */
-    public static void resetSaros() throws RemoteException {
-        try {
-            for (AbstractTester tester : currentTesters) {
+    public static void tearDownSaros() throws Exception {
+
+        Exception exception = null;
+
+        for (AbstractTester tester : currentTesters) {
+            try {
                 if (!tester.superBot().views().sarosView().isConnected()) {
                     tester.superBot().views().sarosView()
                         .connectWith(tester.getJID(), tester.getPassword());
-                    tester.superBot().views().sarosView()
-                        .waitUntilIsConnected();
                 }
                 resetBuddyNames(tester);
                 tester.superBot().views().sarosView().disconnect();
-                tester.superBot().views().sarosView().waitUntilIsDisconnected();
-                tester.superBot().internal().deleteWorkspace();
+                tester.remoteBot().resetWorkbench();
+                tester.superBot().internal().clearWorkspace();
+            } catch (Exception e) {
+                exception = e;
             }
-        } finally {
-            currentTesters.clear();
+        }
+        currentTesters.clear();
+
+        if (exception != null)
+            throw exception;
+
+    }
+
+    /**
+     * bring workbench to a original state before beginning your tests
+     * <ul>
+     * <li>activate saros-instance workbench</li>
+     * <li>close all opened popUp windows</li>
+     * <li>close all opened editors</li>
+     * <li>deletes all projects</li>
+     * <li>close welcome view, if it is open</li>
+     * <li>opens the default perspective</li>
+     * <li>close all unnecessary views</li>
+     * </ul>
+     * 
+     * @throws Exception
+     */
+    public static void setUpWorkbench() throws Exception {
+
+        Exception exception = null;
+
+        for (AbstractTester tester : currentTesters) {
+            try {
+                tester.remoteBot().activateWorkbench();
+                if (tester.remoteBot().isViewOpen("Welcome"))
+                    tester.remoteBot().view("Welcome").close();
+                tester.superBot().menuBar().window().openPerspective();
+                Util.closeUnnecessaryViews(tester);
+                tester.superBot().internal().clearWorkspace();
+            } catch (Exception e) {
+                exception = e;
+            }
         }
 
+        if (exception != null)
+            throw exception;
+    }
+
+    /**
+     * bring Saros to a original state before beginning your tests
+     * <ul>
+     * <li>make automaticReminder disable</li>
+     * <li>open sarosViews</li>
+     * <li>connect</li>
+     * <li>check buddy lists, if all active testers are in contact</li>
+     * </ul>
+     * 
+     * @throws Exception
+     */
+    public static void setUpSaros() throws Exception {
+        Exception exception = null;
+
+        for (AbstractTester tester : currentTesters) {
+            try {
+                tester.superBot().menuBar().saros().preferences()
+                    .disableAutomaticReminder();
+                Util.openSarosView(tester);
+                tester.superBot().views().sarosView()
+                    .connectWith(tester.getJID(), tester.getPassword());
+                resetBuddies(tester);
+            } catch (Exception e) {
+                exception = e;
+            }
+        }
+        if (exception != null)
+            throw exception;
     }
 
     /**
@@ -176,6 +229,19 @@ public abstract class StfTestCase {
     public static void resetWorkbenches() throws RemoteException {
         for (AbstractTester tester : currentTesters) {
             tester.remoteBot().resetWorkbench();
+        }
+    }
+
+    /**
+     * Closes all editors for all active testers
+     * 
+     * @see IRemoteWorkbenchBot#closeAllShells()
+     * 
+     * @throws RemoteException
+     */
+    public static void closeAllEditors() throws RemoteException {
+        for (AbstractTester tester : currentTesters) {
+            tester.remoteBot().closeAllEditors();
         }
     }
 
@@ -195,19 +261,24 @@ public abstract class StfTestCase {
 
     public static void resetDefaultAccount() throws RemoteException {
         for (AbstractTester tester : currentTesters) {
-            if (tester != null) {
-                if (!tester.superBot().menuBar().saros().preferences()
-                    .existsAccount(tester.getJID()))
-                    tester.superBot().menuBar().saros().preferences()
-                        .addAccount(tester.getJID(), tester.getPassword());
-                if (!tester.superBot().menuBar().saros().preferences()
-                    .isAccountActive(tester.getJID()))
-                    tester.superBot().menuBar().saros().preferences()
-                        .activateAccount(tester.getJID());
-                tester.superBot().menuBar().saros().preferences()
-                    .deleteAllNoActiveAccounts();
 
+            if (!tester.superBot().menuBar().saros().preferences()
+                .existsAccount(tester.getJID())) {
+
+                tester.superBot().menuBar().saros().preferences()
+                    .addAccount(tester.getJID(), tester.getPassword());
             }
+
+            if (!tester.superBot().menuBar().saros().preferences()
+                .isAccountActive(tester.getJID())) {
+
+                tester.superBot().menuBar().saros().preferences()
+                    .activateAccount(tester.getJID());
+            }
+
+            tester.superBot().menuBar().saros().preferences()
+                .deleteAllNoActiveAccounts();
+
         }
     }
 
@@ -254,7 +325,7 @@ public abstract class StfTestCase {
         for (int i = 0; i < currentTesters.size(); i++) {
             if (tester == currentTesters.get(i))
                 continue;
-            Util.addBuddies(tester, currentTesters.get(i));
+            Util.addBuddiesToContactList(tester, currentTesters.get(i));
         }
     }
 
@@ -263,10 +334,9 @@ public abstract class StfTestCase {
      * 
      * @throws RemoteException
      */
-    public static void deleteAllProjectsByActiveTesters()
-        throws RemoteException {
+    public static void clearWorkspaces() throws RemoteException {
         for (AbstractTester tester : currentTesters) {
-            tester.superBot().internal().deleteWorkspace();
+            tester.superBot().internal().clearWorkspace();
         }
     }
 
@@ -280,18 +350,6 @@ public abstract class StfTestCase {
         for (AbstractTester tester : currentTesters) {
             if (tester != null) {
                 tester.superBot().views().sarosView().disconnect();
-            }
-        }
-    }
-
-    public static void deleteFoldersByActiveTesters(String project,
-        String... folders) throws RemoteException {
-        for (AbstractTester tester : currentTesters) {
-            for (String folder : folders) {
-                if (tester.superBot().views().packageExplorerView()
-                    .selectProject(project).existsWithRegex(folder))
-                    tester.superBot().views().packageExplorerView()
-                        .selectFolder(project, folder).delete();
             }
         }
     }
@@ -356,8 +414,8 @@ public abstract class StfTestCase {
         host.superBot().views().sarosView()
             .waitUntilAllPeersLeaveSession(peerJIDs);
 
-        host.remoteBot().view(VIEW_SAROS).toolbarButton(TB_STOP_SESSION)
-            .click();
+        host.superBot().views().sarosView().disconnect();
+
         host.superBot().views().sarosView().waitUntilIsNotInSession();
     }
 

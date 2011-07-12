@@ -14,15 +14,13 @@ import de.fu_berlin.inf.dpp.stf.client.StfTestCase;
 public class InternalTest extends StfTestCase {
 
     @BeforeClass
-    public static void runBeforeClass() throws RemoteException {
-        initTesters(ALICE);
-        setUpWorkbench();
-        setUpSaros();
+    public static void selectTesters() throws Exception {
+        select(ALICE);
     }
 
     @After
     public void deleteWorkspace() throws RemoteException {
-        ALICE.superBot().internal().deleteWorkspace();
+        ALICE.superBot().internal().clearWorkspace();
     }
 
     @Test

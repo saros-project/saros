@@ -23,10 +23,8 @@ import de.fu_berlin.inf.dpp.stf.shared.Constants.TypeOfCreateProject;
 public class CreatingNewFileTest extends StfTestCase {
 
     @BeforeClass
-    public static void runBeforeClass() throws RemoteException {
-        initTesters(ALICE, BOB, CARL);
-        setUpWorkbench();
-        setUpSaros();
+    public static void selectTesters() throws Exception {
+        select(ALICE, BOB, CARL);
     }
 
     @Test

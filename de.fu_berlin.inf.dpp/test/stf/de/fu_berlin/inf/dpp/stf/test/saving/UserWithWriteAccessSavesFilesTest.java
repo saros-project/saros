@@ -39,9 +39,9 @@ public class UserWithWriteAccessSavesFilesTest extends StfTestCase {
      * @throws RemoteException
      * @throws InterruptedException
      */
+
     @BeforeClass
-    public static void runBeforeClass() throws RemoteException,
-        InterruptedException {
+    public static void initializeSaros() throws Exception {
         initTesters(ALICE, BOB, CARL, DAVE, EDNA);
         setUpWorkbench();
         setUpSaros();

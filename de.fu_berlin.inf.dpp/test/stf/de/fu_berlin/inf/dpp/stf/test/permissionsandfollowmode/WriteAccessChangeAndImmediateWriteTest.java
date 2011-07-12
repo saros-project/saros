@@ -20,12 +20,8 @@ import de.fu_berlin.inf.dpp.stf.test.Constants;
 public class WriteAccessChangeAndImmediateWriteTest extends StfTestCase {
 
     @BeforeClass
-    public static void runBeforeClass() throws RemoteException {
-        initTesters(ALICE, BOB);
-        setUpWorkbench();
-        setUpSaros();
-        Util.setUpSessionWithAJavaProjectAndAClass(Constants.PROJECT1,
-            Constants.PKG1, Constants.CLS1, ALICE, BOB);
+    public static void selectTesters() throws Exception {
+        select(ALICE, BOB);
     }
 
     /**
@@ -48,6 +44,8 @@ public class WriteAccessChangeAndImmediateWriteTest extends StfTestCase {
      */
     @Test
     public void testFollowModeByOpenClassbyAlice() throws RemoteException {
+        Util.setUpSessionWithJavaProjectAndClass(Constants.PROJECT1,
+            Constants.PKG1, Constants.CLS1, ALICE, BOB);
 
         ALICE.superBot().views().sarosView().selectParticipant(BOB.getJID())
             .restrictToReadOnlyAccess();
@@ -61,7 +59,7 @@ public class WriteAccessChangeAndImmediateWriteTest extends StfTestCase {
         assertTrue(BOB.remoteBot().view(VIEW_SAROS)
             .toolbarButtonWithRegex(TB_INCONSISTENCY_DETECTED + ".*")
             .isEnabled());
-        BOB.superBot().views().sarosView().inconsistencyDetected();
+        BOB.superBot().views().sarosView().resolveInconsistency();
 
         ALICE.superBot().views().sarosView().selectParticipant(BOB.getJID())
             .grantWriteAccess();

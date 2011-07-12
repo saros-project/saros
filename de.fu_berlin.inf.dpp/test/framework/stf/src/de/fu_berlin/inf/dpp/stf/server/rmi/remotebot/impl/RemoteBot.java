@@ -1,11 +1,13 @@
 package de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.impl;
 
+import java.io.File;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.swtbot.swt.finder.SWTBot;
 import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
 import org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences;
@@ -14,7 +16,6 @@ import org.eclipse.swtbot.swt.finder.waits.ICondition;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 
 import de.fu_berlin.inf.dpp.stf.server.StfRemoteObject;
-import de.fu_berlin.inf.dpp.stf.server.bot.SarosSWTBot;
 import de.fu_berlin.inf.dpp.stf.server.bot.SarosSWTBotPreferences;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.IRemoteBot;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotButton;
@@ -53,6 +54,21 @@ import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.impl.RemoteBotTree;
 public abstract class RemoteBot extends StfRemoteObject implements IRemoteBot {
 
     private static final Logger log = Logger.getLogger(RemoteBot.class);
+    private static final File SCREENSHOT_DIRECTORY;
+
+    static {
+        Calendar calendar = Calendar.getInstance();
+
+        File file = ResourcesPlugin.getWorkspace().getRoot().getLocation()
+            .toFile();
+        file = new File(file, ".metadata");
+        file = new File(file, "saros_screenshots");
+        file = new File(file, calendar.get(Calendar.MONTH) + "_"
+            + calendar.get(Calendar.DAY_OF_MONTH) + "_"
+            + calendar.get(Calendar.YEAR));
+
+        SCREENSHOT_DIRECTORY = file;
+    }
 
     protected SWTBot swtBot;
 
@@ -74,7 +90,7 @@ public abstract class RemoteBot extends StfRemoteObject implements IRemoteBot {
     protected RemoteBotCTabItem cTabItem;
 
     protected RemoteBot() {
-        swtBot = SarosSWTBot.getInstance();
+        swtBot = new SWTBot();
         shell = RemoteBotShell.getInstance();
         button = RemoteBotButton.getInstance();
         tree = RemoteBotTree.getInstance();
@@ -1438,7 +1454,7 @@ public abstract class RemoteBot extends StfRemoteObject implements IRemoteBot {
     }
 
     public IRemoteBotRadio radio(String mnemonicText) throws RemoteException {
-        radio.setWidget(SarosSWTBot.getInstance().radio(mnemonicText));
+        radio.setWidget(swtBot.radio(mnemonicText));
         return radio;
     }
 
@@ -1709,14 +1725,9 @@ public abstract class RemoteBot extends StfRemoteObject implements IRemoteBot {
     }
 
     public void captureScreenshot(String fileName) throws RemoteException {
-        swtBot.captureScreenshot(fileName);
-    }
-
-    public String getPathToScreenShot() throws RemoteException {
-        Calendar calendar = Calendar.getInstance();
-        return System.getProperty("java.io.tmpdir") + "/saros_run_"
-            + calendar.get(Calendar.MONTH) + "_"
-            + calendar.get(Calendar.DAY_OF_MONTH) + "_"
-            + calendar.get(Calendar.YEAR);
+        log.trace("creating screenshot -> file: "
+            + new File(SCREENSHOT_DIRECTORY, fileName).getAbsolutePath());
+        swtBot.captureScreenshot(new File(SCREENSHOT_DIRECTORY, fileName)
+            .getAbsolutePath());
     }
 }

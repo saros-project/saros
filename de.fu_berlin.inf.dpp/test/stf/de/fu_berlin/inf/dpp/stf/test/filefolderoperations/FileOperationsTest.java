@@ -30,28 +30,20 @@ public class FileOperationsTest extends StfTestCase {
      * <li>CARL (Read-Only Access)</li>
      * </ol>
      * 
-     * @throws RemoteException
-     * @throws InterruptedException
      */
     @BeforeClass
-    public static void runBeforeClass() throws RemoteException,
-        InterruptedException {
-        initTesters(ALICE, BOB, CARL);
-        setUpWorkbench();
-        setUpSaros();
-
+    public static void selectTesters() throws Exception {
+        select(ALICE, BOB, CARL);
     }
 
-    @Override
     @Before
-    public void before() throws RemoteException {
-        super.before();
+    public void beforeEveryTest() throws RemoteException {
         /*
          * NOTE: The session sharing by Version 11.3.25.DEVEL is not stable,
          * sometime the invitation process can not be completed, so it's
          * possible that all tests are failed.
          */
-        Util.setUpSessionWithAJavaProjectAndAClass(Constants.PROJECT1,
+        Util.setUpSessionWithJavaProjectAndClass(Constants.PROJECT1,
             Constants.PKG1, Constants.CLS1, ALICE, BOB, CARL);
 
         BOB.superBot()
@@ -69,12 +61,10 @@ public class FileOperationsTest extends StfTestCase {
         Util.setFollowMode(ALICE, CARL);
     }
 
-    @Override
     @After
-    public void after() throws RemoteException {
-        announceTestCaseEnd();
+    public void afterEveryTest() throws RemoteException {
         leaveSessionHostFirst(ALICE);
-        deleteAllProjectsByActiveTesters();
+        clearWorkspaces();
     }
 
     // @After

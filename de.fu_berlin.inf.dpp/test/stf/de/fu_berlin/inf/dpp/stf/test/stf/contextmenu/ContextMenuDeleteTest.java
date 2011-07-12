@@ -14,16 +14,13 @@ import de.fu_berlin.inf.dpp.stf.test.Constants;
 public class ContextMenuDeleteTest extends StfTestCase {
 
     @BeforeClass
-    public static void runBeforeClass() throws RemoteException {
-        initTesters(ALICE);
-        setUpWorkbench();
+    public static void selectTesters() throws Exception {
+        select(ALICE);
     }
 
-    @Override
     @After
-    public void after() throws RemoteException {
-        announceTestCaseStart();
-        deleteAllProjectsByActiveTesters();
+    public void afterEveryTest() throws RemoteException {
+        clearWorkspaces();
     }
 
     @Test

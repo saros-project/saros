@@ -6,7 +6,6 @@ import static org.junit.Assert.assertTrue;
 
 import java.rmi.RemoteException;
 
-import org.junit.After;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -19,21 +18,14 @@ import de.fu_berlin.inf.dpp.stf.test.Constants;
 public class ChangingNameInRosterViewTest extends StfTestCase {
 
     @BeforeClass
-    public static void runBeforeClass() throws RemoteException {
-        initTesters(ALICE, BOB);
-        setUpWorkbench();
-        setUpSaros();
-    }
-
-    @After
-    public void runAfterEveryTest() throws RemoteException {
-        resetBuddyNames();
+    public static void selectTesters() throws Exception {
+        select(ALICE, BOB);
     }
 
     @Test
     public void renameBuddyInRosterView() throws RemoteException {
 
-        Util.setUpSessionWithAJavaProjectAndAClass(Constants.PROJECT1,
+        Util.setUpSessionWithJavaProjectAndClass(Constants.PROJECT1,
             Constants.PKG1, Constants.CLS1, ALICE, BOB);
 
         BOB.superBot().views().packageExplorerView()

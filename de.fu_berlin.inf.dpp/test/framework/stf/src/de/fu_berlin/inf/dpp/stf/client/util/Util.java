@@ -60,12 +60,36 @@ public class Util {
      *            the remote tester e.g: Alice
      **/
 
-    public static void openSarosViews(AbstractTester tester)
+    public static void openSarosView(AbstractTester tester)
         throws RemoteException {
         if (!tester.remoteBot().isViewOpen(VIEW_SAROS)) {
             tester.superBot().menuBar().window()
                 .showViewWithName(NODE_SAROS, VIEW_SAROS);
         }
+    }
+
+    /**
+     * A convenient function to quickly build a session which share a project
+     * and a file.
+     * 
+     * @param projectName
+     *            the name of the project
+     * @param path
+     *            the path of the file e.g: foo/bar/readme.txt
+     * @param content
+     *            the content of the file
+     * @param inviter
+     * @param invitees
+     * @throws RemoteException
+     */
+    public static void setUpSessionWithProjectAndFile(String projectName,
+        String path, String content, AbstractTester inviter,
+        AbstractTester... invitees) throws RemoteException {
+
+        inviter.superBot().internal().createProject(projectName);
+        inviter.superBot().internal().createFile(projectName, path, content);
+        buildSessionConcurrently(projectName, TypeOfCreateProject.NEW_PROJECT,
+            inviter, invitees);
     }
 
     /**
@@ -77,30 +101,18 @@ public class Util {
      * @param packageName
      *            the name of the package
      * @param className
-     *            the name of the class without .java suffix
+     *            the name of the class without .java or .class suffix
      * @param inviter
      * @param invitees
      * @throws RemoteException
      */
-    public static void setUpSessionWithAJavaProjectAndAClass(
-        String projectName, String packageName, String className,
-        AbstractTester inviter, AbstractTester... invitees)
-        throws RemoteException {
-
-        String path = "src/" + packageName.replace(".", "/") + "/" + className
-            + ".java";
-
-        StringBuilder content = new StringBuilder();
-
-        if (packageName.trim().length() > 0)
-            content.append("package ").append(packageName).append(';')
-                .append('\n').append('\n');
-
-        content.append("public class ").append(className).append(" {\n\n}");
+    public static void setUpSessionWithJavaProjectAndClass(String projectName,
+        String packageName, String className, AbstractTester inviter,
+        AbstractTester... invitees) throws RemoteException {
 
         inviter.superBot().internal().createJavaProject(projectName);
         inviter.superBot().internal()
-            .createFile(projectName, path, content.toString());
+            .createJavaClass(projectName, packageName, className);
 
         buildSessionConcurrently(projectName, TypeOfCreateProject.NEW_PROJECT,
             inviter, invitees);
@@ -133,14 +145,11 @@ public class Util {
 
     }
 
-    public static void createProjectWithFileBy(String projectName,
-        String fileName, AbstractTester... testers) throws RemoteException {
+    public static void createProjectWithFile(String projectName,
+        String filePath, AbstractTester... testers) throws RemoteException {
         for (AbstractTester tester : testers) {
-            tester.superBot().views().packageExplorerView().tree().newC()
-                .project(projectName);
-            tester.superBot().views().packageExplorerView()
-                .selectFolder(projectName).newC().file(fileName);
-            tester.remoteBot().waitUntilEditorOpen(fileName);
+            tester.superBot().internal().createProject(projectName);
+            tester.superBot().internal().createFile(projectName, filePath, "");
         }
     }
 
@@ -216,34 +225,51 @@ public class Util {
     }
 
     /**
-     * add buddy with GUI, which should be performed by both the users.
+     * Adds buddies to the contact list of the tester. All buddies will have the
+     * tester added to their contact list as well.
      * 
-     * @param peers
-     *            the user, which should be added in your contact list
+     * @param tester
+     *            the tester who wants to add buddies to his contact list eg.
+     *            ALICE
+     * 
+     * @param buddies
+     *            the buddies to add, eg. BOB, CARL
      * @throws RemoteException
      * 
      * 
      */
-    public static void addBuddies(AbstractTester host, AbstractTester... peers)
-        throws RemoteException {
-        for (AbstractTester peer : peers) {
-            if (!host.superBot().views().sarosView().hasBuddy(peer.getJID())) {
-                host.superBot().views().sarosView().addNewBuddy(peer.getJID());
+    public static void addBuddiesToContactList(AbstractTester tester,
+        AbstractTester... buddies) throws RemoteException {
+        for (AbstractTester peer : buddies) {
+            if (!tester.superBot().views().sarosView().hasBuddy(peer.getJID())) {
+                tester.superBot().views().sarosView()
+                    .addNewBuddy(peer.getJID());
                 peer.superBot().confirmShellRequestOfSubscriptionReceived();
             }
         }
     }
 
     /**
-     * Remove given contact from Roster with GUI, if contact was added before.
+     * Removes the given buddies from the contact list of the tester. All
+     * buddies will have the tester removed from their contact list as well.
+     * 
+     * @param tester
+     *            the tester who wants to add buddies to his contact list eg.
+     *            ALICE
+     * 
+     * @param buddies
+     *            the buddies to add, eg. BOB, CARL
+     * @throws RemoteException
+     * 
+     * 
      */
-    public static void deleteBuddies(AbstractTester buddy,
-        AbstractTester... deletedBuddies) throws RemoteException {
-        for (AbstractTester deletedBuddy : deletedBuddies) {
-            if (!buddy.superBot().views().sarosView()
+    public static void removeBuddiesFromContactList(AbstractTester tester,
+        AbstractTester... buddies) throws RemoteException {
+        for (AbstractTester deletedBuddy : buddies) {
+            if (!tester.superBot().views().sarosView()
                 .hasBuddy(deletedBuddy.getJID()))
-                return;
-            buddy.superBot().views().sarosView()
+                continue;
+            tester.superBot().views().sarosView()
                 .selectBuddy(deletedBuddy.getJID()).delete();
             deletedBuddy.superBot().confirmShellRemovelOfSubscription();
         }
@@ -273,12 +299,10 @@ public class Util {
      * @param invitees
      *            the user whom you want to invite to your session.
      * @throws RemoteException
-     * @throws InterruptedException
      */
     public static void inviteBuddies(final String projectName,
         final TypeOfCreateProject usingWhichProject, AbstractTester inviter,
-        AbstractTester... invitees) throws RemoteException,
-        InterruptedException {
+        AbstractTester... invitees) throws RemoteException {
         inviter.superBot().menuBar().saros()
             .addBuddies(Util.getPeersBaseJID(invitees));
         List<Callable<Void>> joinSessionTasks = new ArrayList<Callable<Void>>();
@@ -379,7 +403,14 @@ public class Util {
 
     public static void reBuildSession(String projectName, AbstractTester host,
         AbstractTester... invitees) throws RemoteException {
+        for (AbstractTester tester : invitees)
+            if (!tester.superBot().views().sarosView().isInSession())
+                tester.superBot().views().sarosView()
+                    .connectWith(tester.getJID(), tester.getPassword());
+
         if (!host.superBot().views().sarosView().isInSession()) {
+            host.superBot().views().sarosView()
+                .connectWith(host.getJID(), host.getPassword());
             for (AbstractTester tester : invitees) {
                 buildSessionSequentially(projectName,
                     TypeOfCreateProject.EXIST_PROJECT, host, tester);

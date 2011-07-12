@@ -26,18 +26,14 @@ import de.fu_berlin.inf.dpp.stf.test.Constants;
 public class MenuSarosByAliceBobTest extends StfTestCase {
 
     @BeforeClass
-    public static void runBeforeClass() throws RemoteException {
-        initTesters(ALICE, BOB);
-        setUpWorkbench();
-        setUpSaros();
+    public static void selectTesters() throws Exception {
+        select(ALICE, BOB);
     }
 
-    @Override
     @After
-    public void after() throws RemoteException {
-        announceTestCaseEnd();
+    public void afterEveryTest() throws RemoteException {
         leaveSessionHostFirst(ALICE);
-        deleteAllProjectsByActiveTesters();
+        clearWorkspaces();
         resetWorkbenches();
     }
 
@@ -103,7 +99,7 @@ public class MenuSarosByAliceBobTest extends StfTestCase {
 
     @Test
     public void addProjects() throws RemoteException {
-        Util.setUpSessionWithAJavaProjectAndAClass(Constants.PROJECT1,
+        Util.setUpSessionWithJavaProjectAndClass(Constants.PROJECT1,
             Constants.PKG1, Constants.CLS1, ALICE, BOB);
 
         BOB.superBot()
@@ -134,7 +130,7 @@ public class MenuSarosByAliceBobTest extends StfTestCase {
 
     @Test
     public void stopSession() throws RemoteException {
-        Util.setUpSessionWithAJavaProjectAndAClass(Constants.PROJECT1,
+        Util.setUpSessionWithJavaProjectAndClass(Constants.PROJECT1,
             Constants.PKG1, Constants.CLS1, ALICE, BOB);
 
         ALICE.superBot().views().sarosView().waitUntilIsInSession();

@@ -3,7 +3,7 @@ package de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.contextmenu.saros
 import java.rmi.RemoteException;
 
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.contextmenu.sarosview.submenu.IWorkTogetherOnC;
+import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.contextmenu.sarosview.submenu.IWorkTogetherOnContextMenu;
 
 public interface IContextMenusInBuddiesArea extends IContextMenusInSarosView {
 
@@ -21,6 +21,6 @@ public interface IContextMenusInBuddiesArea extends IContextMenusInSarosView {
 
     public void addBuddy(JID jid) throws RemoteException;
 
-    public IWorkTogetherOnC workTogetherOn() throws RemoteException;
+    public IWorkTogetherOnContextMenu workTogetherOn() throws RemoteException;
 
 }

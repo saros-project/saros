@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.contextmenu.peview.submenu.impl;
+package de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.contextmenu.sarosview.submenu.impl;
 
 import java.rmi.RemoteException;
 
@@ -8,17 +8,18 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.stf.server.StfRemoteObject;
 import de.fu_berlin.inf.dpp.stf.server.bot.widget.ContextMenuHelper;
-import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.contextmenu.peview.submenu.IShareWithC;
+import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.contextmenu.sarosview.submenu.IWorkTogetherOnContextMenu;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.impl.SuperBot;
 
-public final class ShareWithC extends StfRemoteObject implements IShareWithC {
+public final class WorkTogetherOnContextMenu extends StfRemoteObject implements
+    IWorkTogetherOnContextMenu {
 
-    private static final ShareWithC INSTANCE = new ShareWithC();
+    private static final WorkTogetherOnContextMenu INSTANCE = new WorkTogetherOnContextMenu();
 
-    private SWTBotTree tree;
     private SWTBotTreeItem treeItem;
+    private SWTBotTree tree;
 
-    public static ShareWithC getInstance() {
+    public static WorkTogetherOnContextMenu getInstance() {
         return INSTANCE;
     }
 
@@ -42,32 +43,18 @@ public final class ShareWithC extends StfRemoteObject implements IShareWithC {
      * 
      **********************************************/
 
-    /**
-     * FIXME can not click the context menu.
-     */
-    public void multipleBuddies(String projectName, JID... baseJIDOfInvitees)
+    public void multipleProjects(String projectName, JID... baseJIDOfInvitees)
         throws RemoteException {
         treeItem.select();
-        ContextMenuHelper.clickContextMenu(tree, CM_SHARE_WITH,
-            CM_MULTIPLE_BUDDIES);
+        ContextMenuHelper.clickContextMenu(tree, CM_WORK_TOGETHER_ON,
+            CM_MULTIPLE_PROJECTS);
         SuperBot.getInstance().confirmShellShareProjects(projectName,
             baseJIDOfInvitees);
     }
 
-    public void buddy(JID jid) throws RemoteException {
+    public void project(String projectName) throws RemoteException {
         treeItem.select();
-        ContextMenuHelper.clickContextMenu(tree, CM_SHARE_WITH, jid.getBase());
+        ContextMenuHelper.clickContextMenu(tree, CM_WORK_TOGETHER_ON,
+            projectName);
     }
-
-    public void addToSarosSession() {
-        /*
-         * The menu is only activated if there are project existed in the
-         * package explorer view, which is not in the session.
-         */
-    }
-
-    public void stopToSarosSession() {
-        //
-    }
-
 }

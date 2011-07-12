@@ -14,8 +14,6 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
-import java.rmi.AccessException;
-import java.rmi.RemoteException;
 
 import org.eclipse.core.runtime.CoreException;
 import org.junit.BeforeClass;
@@ -38,16 +36,12 @@ public class ParallelInvitationWithTerminationByInviteesTest extends
      * <li>Edna (Read-Only Access)</li>
      * </ol>
      * 
-     * @throws AccessException
-     * @throws RemoteException
      * 
      */
 
     @BeforeClass
-    public static void runBeforeClass() throws RemoteException {
-        initTesters(ALICE, BOB, CARL, DAVE, EDNA);
-        setUpWorkbench();
-        setUpSaros();
+    public static void selectTesters() throws Exception {
+        select(ALICE, BOB, CARL, DAVE, EDNA);
     }
 
     /**

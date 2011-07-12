@@ -26,13 +26,10 @@ public class Share3UsersSequentiallyTest extends StfTestCase {
      * <li>Carl (Read-Only Access)</li>
      * </ol>
      * 
-     * @throws RemoteException
      */
     @BeforeClass
-    public static void runBeforeClass() throws RemoteException {
-        initTesters(ALICE, BOB, CARL);
-        setUpWorkbench();
-        setUpSaros();
+    public static void selectTesters() throws Exception {
+        select(ALICE, BOB, CARL);
     }
 
     /**

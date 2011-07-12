@@ -35,6 +35,7 @@ import static org.junit.Assert.assertTrue;
 import java.rmi.RemoteException;
 
 import org.junit.After;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -49,14 +50,18 @@ import de.fu_berlin.inf.dpp.ui.preferencePages.GeneralPreferencePage;
 public class BasicWidgetTreeTest extends StfTestCase {
 
     @BeforeClass
-    public static void runBeforeClass() throws RemoteException {
-        initTesters(ALICE);
-        setUpWorkbench();
+    public static void selectTesters() throws Exception {
+        select(ALICE);
+    }
+
+    @Before
+    public void beforeEveryTest() throws RemoteException {
+        closeAllShells();
     }
 
     @After
     public void afterEveryTest() throws RemoteException {
-        deleteAllProjectsByActiveTesters();
+        clearWorkspaces();
     }
 
     @Test

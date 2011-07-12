@@ -26,7 +26,7 @@ import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.Perspective;
  * 
  * @author Lin
  */
-public interface IWindowM extends Remote {
+public interface IWindowMenu extends Remote {
 
     /**********************************************
      * 

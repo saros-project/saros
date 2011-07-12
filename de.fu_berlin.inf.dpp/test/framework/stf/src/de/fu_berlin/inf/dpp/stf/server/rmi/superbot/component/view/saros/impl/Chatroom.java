@@ -24,7 +24,7 @@ public final class Chatroom extends StfRemoteObject implements IChatroom {
     public void sendChatMessage(String message) throws RemoteException {
 
         RemoteWorkbenchBot.getInstance().activateWorkbench();
-        SarosSWTBotChatInput chatInput = SarosSWTBot.getInstance().chatInput();
+        SarosSWTBotChatInput chatInput = new SarosSWTBot().chatInput();
         chatInput.setText(message);
         log.debug("inserted message in chat view: " + chatInput.getText());
         // chatInput.pressShortcut(Keystrokes.LF);
@@ -33,72 +33,83 @@ public final class Chatroom extends StfRemoteObject implements IChatroom {
 
     public boolean compareChatMessage(String jid, String message)
         throws RemoteException {
+        SarosSWTBot bot = new SarosSWTBot();
         log.debug("chatLine: "
             + RemoteWorkbenchBot.getInstance().lastChatLine());
-        log.debug("text of the lastChatLine: "
-            + SarosSWTBot.getInstance().lastChatLine().getText());
-        String text = SarosSWTBot.getInstance().lastChatLine().getText();
+        log.debug("text of the lastChatLine: " + bot.lastChatLine().getText());
+        String text = bot.lastChatLine().getText();
         return text.equals(message);
     }
 
     public String getUserNameOnChatLinePartnerChangeSeparator()
         throws RemoteException {
+        SarosSWTBot bot = new SarosSWTBot();
         log.debug("user name of the first chat line partner change separator: "
-            + SarosSWTBot.getInstance().chatLinePartnerChangeSeparator()
-                .getPlainID());
-        return SarosSWTBot.getInstance().chatLinePartnerChangeSeparator()
-            .getPlainID();
+            + bot.chatLinePartnerChangeSeparator().getPlainID());
+        return bot.chatLinePartnerChangeSeparator().getPlainID();
     }
 
     public String getUserNameOnChatLinePartnerChangeSeparator(int index)
         throws RemoteException {
+
+        SarosSWTBot bot = new SarosSWTBot();
+
         log.debug("user name of the chat line partner change separator with the index"
             + index
             + ": "
-            + SarosSWTBot.getInstance().chatLinePartnerChangeSeparator(index)
-                .getPlainID());
-        return SarosSWTBot.getInstance().chatLinePartnerChangeSeparator(index)
-            .getPlainID();
+            + bot.chatLinePartnerChangeSeparator(index).getPlainID());
+        return bot.chatLinePartnerChangeSeparator(index).getPlainID();
     }
 
     public String getUserNameOnChatLinePartnerChangeSeparator(String plainID)
         throws RemoteException {
+
+        SarosSWTBot bot = new SarosSWTBot();
+
         log.debug("user name of the chat line partner change separator with the plainID "
             + plainID
             + ": "
-            + SarosSWTBot.getInstance().chatLinePartnerChangeSeparator(plainID)
-                .getPlainID());
-        return SarosSWTBot.getInstance()
-            .chatLinePartnerChangeSeparator(plainID).getPlainID();
+            + bot.chatLinePartnerChangeSeparator(plainID).getPlainID());
+        return bot.chatLinePartnerChangeSeparator(plainID).getPlainID();
     }
 
     public String getTextOfChatLine() throws RemoteException {
-        log.debug("text of the first chat line: "
-            + SarosSWTBot.getInstance().chatLine().getText());
-        return SarosSWTBot.getInstance().chatLine().getText();
+
+        SarosSWTBot bot = new SarosSWTBot();
+
+        log.debug("text of the first chat line: " + bot.chatLine().getText());
+        return bot.chatLine().getText();
     }
 
     public String getTextOfChatLine(int index) throws RemoteException {
+
+        SarosSWTBot bot = new SarosSWTBot();
+
         log.debug("text of the chat line with the index " + index + ": "
-            + SarosSWTBot.getInstance().chatLine(index).getText());
-        return SarosSWTBot.getInstance().chatLine(index).getText();
+            + bot.chatLine(index).getText());
+        return bot.chatLine(index).getText();
     }
 
     public String getTextOfLastChatLine() throws RemoteException {
-        log.debug("text of the last chat line: "
-            + SarosSWTBot.getInstance().lastChatLine().getText());
-        return SarosSWTBot.getInstance().lastChatLine().getText();
+
+        SarosSWTBot bot = new SarosSWTBot();
+
+        log.debug("text of the last chat line: " + bot.lastChatLine().getText());
+        return bot.lastChatLine().getText();
     }
 
     public String getTextOfChatLine(String regex) throws RemoteException {
+
+        SarosSWTBot bot = new SarosSWTBot();
+
         log.debug("text of the chat line with the specifed regex: "
-            + SarosSWTBot.getInstance().chatLine(regex).getText());
-        return SarosSWTBot.getInstance().chatLine(regex).getText();
+            + bot.chatLine(regex).getText());
+        return bot.chatLine(regex).getText();
     }
 
     public void waitUntilGetChatMessage(String jid, String message)
         throws RemoteException {
-        RemoteWorkbenchBot.getInstance().waitUntil(
-            SarosConditions.isChatMessageExist(this, jid, message));
+        new SarosSWTBot().waitUntil(SarosConditions.isChatMessageExist(this,
+            jid, message));
     }
 }

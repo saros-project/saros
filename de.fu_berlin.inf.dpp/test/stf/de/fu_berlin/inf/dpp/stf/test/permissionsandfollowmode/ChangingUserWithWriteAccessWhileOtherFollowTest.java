@@ -7,8 +7,6 @@ import static de.fu_berlin.inf.dpp.stf.client.tester.SarosTester.DAVE;
 import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
-import java.rmi.AccessException;
-import java.rmi.RemoteException;
 
 import org.eclipse.core.runtime.CoreException;
 import org.junit.BeforeClass;
@@ -31,17 +29,14 @@ public class ChangingUserWithWriteAccessWhileOtherFollowTest extends
      * <li>All read-only users enable followmode</li>
      * </ol>
      * 
-     * @throws AccessException
-     * @throws RemoteException
-     * @throws InterruptedException
      */
+
     @BeforeClass
-    public static void runBeforeClass() throws RemoteException,
-        InterruptedException {
+    public static void initializeSaros() throws Exception {
         initTesters(ALICE, BOB, CARL, DAVE);
         setUpWorkbench();
         setUpSaros();
-        Util.setUpSessionWithAJavaProjectAndAClass(Constants.PROJECT1,
+        Util.setUpSessionWithJavaProjectAndClass(Constants.PROJECT1,
             Constants.PKG1, Constants.CLS1, ALICE, BOB, CARL, DAVE);
         Util.setFollowMode(ALICE, BOB, CARL, DAVE);
     }

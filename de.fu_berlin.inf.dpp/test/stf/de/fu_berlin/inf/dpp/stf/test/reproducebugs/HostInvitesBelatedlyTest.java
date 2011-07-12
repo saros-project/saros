@@ -6,8 +6,6 @@ import static de.fu_berlin.inf.dpp.stf.client.tester.SarosTester.CARL;
 import static org.junit.Assert.assertEquals;
 
 import java.io.IOException;
-import java.rmi.AccessException;
-import java.rmi.RemoteException;
 
 import org.eclipse.core.runtime.CoreException;
 import org.junit.BeforeClass;
@@ -29,39 +27,11 @@ public class HostInvitesBelatedlyTest extends StfTestCase {
      * <li>All read-only users enable follow mode</li>
      * </ol>
      * 
-     * @throws AccessException
-     * @throws RemoteException
-     * @throws InterruptedException
      */
 
     @BeforeClass
-    public static void runBeforeClass() throws RemoteException,
-        InterruptedException {
-        initTesters(ALICE, BOB, CARL);
-        setUpWorkbench();
-        setUpSaros();
-        ALICE
-            .superBot()
-            .views()
-            .packageExplorerView()
-            .tree()
-            .newC()
-            .javaProjectWithClasses(Constants.PROJECT1, Constants.PKG1,
-                Constants.CLS1, Constants.CLS2);
-        BOB.superBot()
-            .views()
-            .packageExplorerView()
-            .tree()
-            .newC()
-            .javaProjectWithClasses(Constants.PROJECT1, Constants.PKG1,
-                Constants.CLS1, Constants.CLS2);
-
-        /*
-         * ALICE build session only with CARL and is followed by CARL.
-         */
-        Util.buildSessionConcurrently(Constants.PROJECT1,
-            TypeOfCreateProject.NEW_PROJECT, ALICE, CARL);
-        Util.setFollowMode(ALICE, CARL);
+    public static void selectTesters() throws Exception {
+        select(ALICE, BOB, CARL);
     }
 
     /**
@@ -95,6 +65,29 @@ public class HostInvitesBelatedlyTest extends StfTestCase {
     @Test
     public void testFollowModeByOpenClassbyAlice() throws IOException,
         CoreException, InterruptedException {
+        ALICE
+            .superBot()
+            .views()
+            .packageExplorerView()
+            .tree()
+            .newC()
+            .javaProjectWithClasses(Constants.PROJECT1, Constants.PKG1,
+                Constants.CLS1, Constants.CLS2);
+        BOB.superBot()
+            .views()
+            .packageExplorerView()
+            .tree()
+            .newC()
+            .javaProjectWithClasses(Constants.PROJECT1, Constants.PKG1,
+                Constants.CLS1, Constants.CLS2);
+
+        /*
+         * ALICE build session only with CARL and is followed by CARL.
+         */
+        Util.buildSessionConcurrently(Constants.PROJECT1,
+            TypeOfCreateProject.NEW_PROJECT, ALICE, CARL);
+        Util.setFollowMode(ALICE, CARL);
+
         ALICE.superBot().views().packageExplorerView()
             .selectClass(Constants.PROJECT1, Constants.PKG1, Constants.CLS1)
             .open();

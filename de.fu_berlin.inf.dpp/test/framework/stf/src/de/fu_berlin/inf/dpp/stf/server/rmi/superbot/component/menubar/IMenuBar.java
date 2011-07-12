@@ -3,13 +3,13 @@ package de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.menubar;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 
-import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.menubar.menu.ISarosM;
-import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.menubar.menu.IWindowM;
+import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.menubar.menu.ISarosMenu;
+import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.menubar.menu.IWindowMenu;
 
 public interface IMenuBar extends Remote {
 
-    public ISarosM saros() throws RemoteException;
+    public ISarosMenu saros() throws RemoteException;
 
-    public IWindowM window() throws RemoteException;
+    public IWindowMenu window() throws RemoteException;
 
 }

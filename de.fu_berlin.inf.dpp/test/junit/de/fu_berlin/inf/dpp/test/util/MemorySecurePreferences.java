@@ -6,6 +6,9 @@ import java.util.HashMap;
 import org.eclipse.equinox.security.storage.ISecurePreferences;
 import org.eclipse.equinox.security.storage.StorageException;
 
+/**
+ * @author Stefan Rossbach
+ */
 public class MemorySecurePreferences implements ISecurePreferences {
 
     private HashMap<String, Object> preferences = new HashMap<String, Object>();
@@ -22,14 +25,14 @@ public class MemorySecurePreferences implements ISecurePreferences {
 
     public void checkGetOperation() throws StorageException {
         if (!this.allowGet)
-            throw new StorageException(-1, new IllegalStateException(
-                "get disabled"));
+            throw new StorageException(StorageException.INTERNAL_ERROR,
+                new IllegalStateException("get disabled"));
     }
 
     public void checkPutOperation() throws StorageException {
         if (!this.allowPut)
-            throw new StorageException(-1, new IllegalStateException(
-                "put disabled"));
+            throw new StorageException(StorageException.INTERNAL_ERROR,
+                new IllegalStateException("put disabled"));
     }
 
     public String absolutePath() {
@@ -59,7 +62,7 @@ public class MemorySecurePreferences implements ISecurePreferences {
         try {
             return (String) object;
         } catch (Exception e) {
-            throw new StorageException(-1, e);
+            throw new StorageException(StorageException.INTERNAL_ERROR, e);
         }
     }
 
@@ -74,7 +77,7 @@ public class MemorySecurePreferences implements ISecurePreferences {
         try {
             return (Boolean) object;
         } catch (Exception e) {
-            throw new StorageException(-1, e);
+            throw new StorageException(StorageException.INTERNAL_ERROR, e);
         }
     }
 
@@ -89,7 +92,7 @@ public class MemorySecurePreferences implements ISecurePreferences {
         try {
             return (byte[]) object;
         } catch (Exception e) {
-            throw new StorageException(-1, e);
+            throw new StorageException(StorageException.INTERNAL_ERROR, e);
         }
     }
 
@@ -104,7 +107,7 @@ public class MemorySecurePreferences implements ISecurePreferences {
         try {
             return (Double) object;
         } catch (Exception e) {
-            throw new StorageException(-1, e);
+            throw new StorageException(StorageException.INTERNAL_ERROR, e);
         }
     }
 
@@ -119,7 +122,7 @@ public class MemorySecurePreferences implements ISecurePreferences {
         try {
             return (Float) object;
         } catch (Exception e) {
-            throw new StorageException(-1, e);
+            throw new StorageException(StorageException.INTERNAL_ERROR, e);
         }
     }
 
@@ -134,7 +137,7 @@ public class MemorySecurePreferences implements ISecurePreferences {
         try {
             return (Integer) object;
         } catch (Exception e) {
-            throw new StorageException(-1, e);
+            throw new StorageException(StorageException.INTERNAL_ERROR, e);
         }
     }
 
@@ -149,7 +152,7 @@ public class MemorySecurePreferences implements ISecurePreferences {
         try {
             return (Long) object;
         } catch (Exception e) {
-            throw new StorageException(-1, e);
+            throw new StorageException(StorageException.INTERNAL_ERROR, e);
         }
     }
 

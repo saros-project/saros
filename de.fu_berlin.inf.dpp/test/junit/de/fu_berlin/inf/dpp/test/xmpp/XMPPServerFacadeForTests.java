@@ -16,8 +16,8 @@ import de.fu_berlin.inf.dpp.net.util.XMPPAccountUtils;
  * Facade for creating and deleting user-accounts on a XMPP-Server.
  * 
  * You only need to call
- * {@link de.fu_berlin.inf.dpp.xmpp.XMPPServerFacadeForTests#getNextUser()} to
- * get a {@link de.fu_berlin.inf.dpp.pcordes.xmpp.XmppUser}.
+ * {@link de.fu_berlin.inf.dpp.test.xmpp.XMPPServerFacadeForTests#getNextUser()}
+ * to get a {@link de.fu_berlin.inf.dpp.test.xmpp.XmppUser}.
  * 
  * @author cordes
  */
@@ -120,7 +120,7 @@ public class XMPPServerFacadeForTests {
         try {
             server.stop();
         } catch (Exception e) {
-
+            e.printStackTrace();
         }
         server = null;
     }

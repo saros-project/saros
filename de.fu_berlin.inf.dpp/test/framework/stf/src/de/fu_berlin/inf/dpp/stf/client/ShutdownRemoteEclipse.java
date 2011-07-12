@@ -4,20 +4,19 @@ import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
-import org.apache.log4j.BasicConfigurator;
-import org.apache.log4j.Logger;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import de.fu_berlin.inf.dpp.stf.client.tester.AbstractTester;
 import de.fu_berlin.inf.dpp.stf.client.tester.SarosTester;
 
 public class ShutdownRemoteEclipse {
 
-    private static Logger log = Logger.getLogger(ShutdownRemoteEclipse.class);
+    private static Logger LOGGER = Logger.getLogger(ShutdownRemoteEclipse.class
+        .getName());
 
     public static void main(String... args) {
 
-        BasicConfigurator.configure();
         List<AbstractTester> clients = new ArrayList<AbstractTester>();
 
         if (args.length == 0) {
@@ -27,13 +26,13 @@ public class ShutdownRemoteEclipse {
                 try {
                     clients.add(SarosTester.valueOf(arg));
                 } catch (Exception e) {
-                    log.warn(arg + " is not a tester", e);
+                    LOGGER.log(Level.WARNING, arg + " is not a tester", e);
                 }
             }
         }
 
         for (AbstractTester tester : clients) {
-            log.info("closing Eclipse instance of " + tester);
+            LOGGER.info("closing Eclipse instance of " + tester);
             try {
                 tester.superBot().views().sarosView().disconnect();
                 tester.remoteBot().closeAllEditors();
@@ -43,10 +42,10 @@ public class ShutdownRemoteEclipse {
                 tester.remoteBot().menu("File").menu("Exit").click();
             } catch (Exception e) {
                 if (!(e.getCause() instanceof SocketException))
-                    log.error("unable to shutdown eclipse instance of "
-                        + tester, e);
+                    LOGGER.log(Level.SEVERE,
+                        "unable to shutdown eclipse instance of " + tester, e);
             }
         }
-        log.info("DONE");
+        LOGGER.info("DONE");
     }
 }

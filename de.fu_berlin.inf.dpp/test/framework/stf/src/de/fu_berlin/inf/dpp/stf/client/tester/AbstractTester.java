@@ -60,7 +60,7 @@ public interface AbstractTester {
      * @return the simple {@link IRemoteBot}, with which tester can remotely
      *         access widgets of saros-instance
      */
-    public IRemoteWorkbenchBot remoteBot();
+    public IRemoteWorkbenchBot remoteBot() throws RemoteException;
 
     /**
      * 
