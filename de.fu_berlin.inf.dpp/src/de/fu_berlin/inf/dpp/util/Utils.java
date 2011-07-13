@@ -18,6 +18,7 @@ import java.net.MalformedURLException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.URL;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -908,8 +909,14 @@ public class Utils {
         if (deltaMs == 0) {
             return " (" + formatByte(length) + " in < 1 ms)";
         } else {
-            return " (" + formatByte(length) + " in " + deltaMs + " ms at "
-                + (1000L * length / 1024L) / deltaMs + " KiB/s)";
+            return " ("
+                + formatByte(length)
+                + " in "
+                + deltaMs
+                + " ms at "
+                + new DecimalFormat("#0.00").format((1000d * length / 1024d)
+                    / deltaMs) + " KiB/s)";
+
         }
     }
 
