@@ -319,7 +319,7 @@ public class Socks5Transport extends BytestreamTransport {
         throws XMPPException, InterruptedException {
 
         String peer = request.getFrom();
-        log.debug(prefix() + "recieving response connection from " + peer
+        log.debug(prefix() + "receiving response connection from " + peer
             + verboseLocalProxyInfo());
 
         Socks5BytestreamSession inSession = (Socks5BytestreamSession) request
@@ -373,7 +373,7 @@ public class Socks5Transport extends BytestreamTransport {
     protected BinaryChannel acceptNewRequest(BytestreamRequest request)
         throws Exception, InterruptedException {
         String peer = request.getFrom();
-        log.debug(prefix() + "recieving request from " + peer
+        log.debug(prefix() + "receiving request from " + peer
             + verboseLocalProxyInfo());
 
         // start to establish response
