@@ -147,18 +147,26 @@ public class RosterSessionContentProvider extends TreeContentProvider {
                     sharedProjectListener);
             }
         } else {
+            disposeHeaderElements();
             this.rosterSessionInput = null;
+            return;
         }
 
         createHeaders();
     }
 
-    protected void createHeaders() {
+    private void disposeHeaderElements() {
         if (sessionHeaderElement != null)
             sessionHeaderElement.dispose();
         if (rosterHeaderElement != null)
             rosterHeaderElement.dispose();
 
+        sessionHeaderElement = null;
+        rosterHeaderElement = null;
+    }
+
+    protected void createHeaders() {
+        disposeHeaderElements();
         sessionHeaderElement = new SessionHeaderElement(viewer.getControl()
             .getFont(), rosterSessionInput);
 
