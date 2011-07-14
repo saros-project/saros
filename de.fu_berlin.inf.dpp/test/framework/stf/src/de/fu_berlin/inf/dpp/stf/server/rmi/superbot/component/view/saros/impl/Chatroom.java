@@ -31,16 +31,6 @@ public final class Chatroom extends StfRemoteObject implements IChatroom {
         chatInput.pressEnterKey();
     }
 
-    public boolean compareChatMessage(String jid, String message)
-        throws RemoteException {
-        SarosSWTBot bot = new SarosSWTBot();
-        log.debug("chatLine: "
-            + RemoteWorkbenchBot.getInstance().lastChatLine());
-        log.debug("text of the lastChatLine: " + bot.lastChatLine().getText());
-        String text = bot.lastChatLine().getText();
-        return text.equals(message);
-    }
-
     public String getUserNameOnChatLinePartnerChangeSeparator()
         throws RemoteException {
         SarosSWTBot bot = new SarosSWTBot();

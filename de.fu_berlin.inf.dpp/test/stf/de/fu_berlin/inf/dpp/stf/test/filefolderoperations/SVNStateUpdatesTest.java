@@ -265,7 +265,7 @@ public class SVNStateUpdatesTest extends StfTestCase {
     @Ignore
     public void testDisconnectAndConnect() throws RemoteException {
         ALICE.superBot().views().packageExplorerView()
-            .selectProject(Constants.SVN_PROJECT).team().disConnect();
+            .selectProject(Constants.SVN_PROJECT).team().disconnect();
         BOB.superBot().views().packageExplorerView()
             .waitUntilProjectNotInSVN(Constants.SVN_PROJECT);
         assertFalse(BOB.superBot().views().packageExplorerView()

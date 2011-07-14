@@ -2,6 +2,8 @@ package de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.menubar.menu.impl
 
 import java.rmi.RemoteException;
 
+import org.apache.log4j.Logger;
+
 import de.fu_berlin.inf.dpp.stf.server.StfRemoteObject;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.impl.RemoteWorkbenchBot;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotCombo;
@@ -13,6 +15,7 @@ import de.fu_berlin.inf.dpp.stf.server.util.Util;
 
 public final class WindowMenu extends StfRemoteObject implements IWindowMenu {
 
+    private static final Logger log = Logger.getLogger(WindowMenu.class);
     private static final WindowMenu INSTANCE = new WindowMenu();
 
     public static WindowMenu getInstance() {
@@ -142,13 +145,23 @@ public final class WindowMenu extends StfRemoteObject implements IWindowMenu {
     }
 
     public boolean isJavaPerspectiveActive() throws RemoteException {
-        return RemoteWorkbenchBot.getInstance().isPerspectiveActive(
-            ID_JAVA_PERSPECTIVE);
+        try {
+            return RemoteWorkbenchBot.getInstance().isPerspectiveActive(
+                ID_JAVA_PERSPECTIVE);
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            return false;
+        }
     }
 
     public boolean isDebugPerspectiveActive() throws RemoteException {
-        return RemoteWorkbenchBot.getInstance().isPerspectiveActive(
-            ID_DEBUG_PERSPECTIVE);
+        try {
+            return RemoteWorkbenchBot.getInstance().isPerspectiveActive(
+                ID_DEBUG_PERSPECTIVE);
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            return false;
+        }
     }
 
 }

@@ -209,11 +209,18 @@ public abstract class StfTestCase {
                 Util.openSarosView(tester);
                 tester.superBot().views().sarosView()
                     .connectWith(tester.getJID(), tester.getPassword());
+            } catch (Exception e) {
+                exception = e;
+            }
+        }
+        for (AbstractTester tester : currentTesters) {
+            try {
                 resetBuddies(tester);
             } catch (Exception e) {
                 exception = e;
             }
         }
+
         if (exception != null)
             throw exception;
     }
@@ -309,9 +316,12 @@ public abstract class StfTestCase {
             if (tester == currentTesters.get(i))
                 continue;
 
-            tester.superBot().views().sarosView()
-                .selectBuddy(currentTesters.get(i).getJID())
-                .rename(currentTesters.get(i).getBaseJid());
+            if (tester.superBot().views().sarosView()
+                .hasBuddy(currentTesters.get(i).getJID())) {
+                tester.superBot().views().sarosView()
+                    .selectBuddy(currentTesters.get(i).getJID())
+                    .rename(currentTesters.get(i).getBaseJid());
+            }
         }
     }
 

@@ -4,7 +4,6 @@ import java.rmi.RemoteException;
 
 import org.apache.log4j.Logger;
 import org.eclipse.swtbot.swt.finder.SWTBot;
-import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
 import org.eclipse.swtbot.swt.finder.waits.DefaultCondition;
 
 import de.fu_berlin.inf.dpp.net.JID;
@@ -126,31 +125,44 @@ public final class ContextMenusInSessionArea extends ContextMenusInSarosView
     public boolean hasWriteAccess() throws RemoteException {
         log.trace("checking if participant '" + participantJID.getBase()
             + "' has write access");
-        treeItem.select();
-        return !ContextMenuHelper.getContextMenu(tree, CM_GRANT_WRITE_ACCESS)
-            .isEnabled() && !treeItem.getText().contains(PERMISSION_NAME);
+        try {
+            treeItem.select();
+            return !ContextMenuHelper.getContextMenu(tree,
+                CM_GRANT_WRITE_ACCESS).isEnabled()
+                && !treeItem.getText().contains(PERMISSION_NAME);
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            return false;
+        }
     }
 
     public boolean hasReadOnlyAccess() throws RemoteException {
         log.trace("checking if participant '" + participantJID.getBase()
             + "' has read only access");
-        treeItem.select();
-        return !ContextMenuHelper.getContextMenu(tree,
-            CM_RESTRICT_TO_READ_ONLY_ACCESS).isEnabled()
-            && treeItem.getText().contains(PERMISSION_NAME);
+        try {
+            treeItem.select();
+            return !ContextMenuHelper.getContextMenu(tree,
+                CM_RESTRICT_TO_READ_ONLY_ACCESS).isEnabled()
+                && treeItem.getText().contains(PERMISSION_NAME);
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            return false;
+        }
+
     }
 
     public boolean isFollowing() throws RemoteException {
         log.trace("checking if local user is following participant: "
             + participantJID.getBase());
-        treeItem.select();
         try {
+            treeItem.select();
             return ContextMenuHelper.getContextMenu(tree, CM_STOP_FOLLOWING)
                 .isEnabled();
-
-        } catch (WidgetNotFoundException e) {
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
             return false;
         }
+
     }
 
     /**********************************************

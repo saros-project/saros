@@ -263,54 +263,70 @@ public final class SarosPreferences extends StfRemoteObject implements
     }
 
     public boolean existsAccount() throws RemoteException {
-        SWTBotShell shell = preCondition();
+        try {
+            SWTBotShell shell = preCondition();
 
-        shell.bot().sleep(REFRESH_TIME_FOR_ACCOUNT_LIST);
+            shell.bot().sleep(REFRESH_TIME_FOR_ACCOUNT_LIST);
 
-        String[] items = shell.bot()
-            .listInGroup(GROUP_TITLE_XMPP_JABBER_ACCOUNTS).getItems();
-        if (items == null || items.length == 0)
+            String[] items = shell.bot()
+                .listInGroup(GROUP_TITLE_XMPP_JABBER_ACCOUNTS).getItems();
+            if (items == null || items.length == 0)
+                return false;
+            else
+                return true;
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
             return false;
-        else
-            return true;
+        }
+
     }
 
     public boolean existsAccount(JID jid) throws RemoteException {
-        SWTBotShell shell = preCondition();
+        try {
+            SWTBotShell shell = preCondition();
 
-        shell.bot().sleep(500);
+            shell.bot().sleep(500);
 
-        String[] items = shell.bot()
-            .listInGroup(GROUP_TITLE_XMPP_JABBER_ACCOUNTS).getItems();
+            String[] items = shell.bot()
+                .listInGroup(GROUP_TITLE_XMPP_JABBER_ACCOUNTS).getItems();
 
-        for (String item : items) {
-            if ((jid.getBase()).equals(item)) {
-                shell.bot().button(CANCEL).click();
-                return true;
+            for (String item : items) {
+                if ((jid.getBase()).equals(item)) {
+                    shell.bot().button(CANCEL).click();
+                    return true;
+                }
             }
-        }
-        shell.bot().button(CANCEL).click();
-        shell.bot().waitUntil(SarosConditions.isShellClosed(shell));
+            shell.bot().button(CANCEL).click();
+            shell.bot().waitUntil(SarosConditions.isShellClosed(shell));
 
-        return false;
+            return false;
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            return false;
+        }
     }
 
     public boolean isAccountActive(JID jid) throws RemoteException {
+        try {
 
-        SWTBotShell shell = preCondition();
-        shell.bot().sleep(REFRESH_TIME_FOR_ACCOUNT_LIST);
+            SWTBotShell shell = preCondition();
+            shell.bot().sleep(REFRESH_TIME_FOR_ACCOUNT_LIST);
 
-        String activeAccount = shell.bot()
-            .labelInGroup(GROUP_TITLE_XMPP_JABBER_ACCOUNTS).getText();
+            String activeAccount = shell.bot()
+                .labelInGroup(GROUP_TITLE_XMPP_JABBER_ACCOUNTS).getText();
 
-        boolean isActive = false;
+            boolean isActive = false;
 
-        if (activeAccount.equals("Active: " + jid.getBase()))
-            isActive = true;
+            if (activeAccount.equals("Active: " + jid.getBase()))
+                isActive = true;
 
-        shell.bot().button(CANCEL).click();
-        shell.bot().waitUntil(SarosConditions.isShellClosed(shell));
-        return isActive;
+            shell.bot().button(CANCEL).click();
+            shell.bot().waitUntil(SarosConditions.isShellClosed(shell));
+            return isActive;
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            return false;
+        }
     }
 
     /**************************************************************

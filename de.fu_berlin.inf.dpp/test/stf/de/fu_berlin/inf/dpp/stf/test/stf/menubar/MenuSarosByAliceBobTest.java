@@ -49,13 +49,13 @@ public class MenuSarosByAliceBobTest extends StfTestCase {
                 Constants.CLS1);
 
         ALICE.remoteBot().menu(MENU_SAROS).menu(SHARE_PROJECTS).click();
-        if (!ALICE.remoteBot().isShellOpen(SHELL_SHARE_PROJECT)) {
-            ALICE.remoteBot().waitUntilShellIsOpen(SHELL_SHARE_PROJECT);
-        }
+
         IRemoteBotShell shell = ALICE.remoteBot().shell(SHELL_SHARE_PROJECT);
         shell.activate();
+        shell.bot().sleep(1000);
         shell.bot().tree().selectTreeItem(Constants.PROJECT1).check();
         shell.bot().button(NEXT).click();
+        shell.bot().sleep(1000);
         shell.bot().tree().selectTreeItem(BOB.getBaseJid()).check();
         shell.bot().button(FINISH).click();
 

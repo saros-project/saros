@@ -7,9 +7,6 @@ public interface IChatroom extends Remote {
 
     public void sendChatMessage(String message) throws RemoteException;
 
-    public boolean compareChatMessage(String jid, String message)
-        throws RemoteException;
-
     public String getUserNameOnChatLinePartnerChangeSeparator()
         throws RemoteException;
 

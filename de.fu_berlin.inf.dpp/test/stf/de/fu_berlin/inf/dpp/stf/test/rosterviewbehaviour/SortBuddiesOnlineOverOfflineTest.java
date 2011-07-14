@@ -84,7 +84,8 @@ public class SortBuddiesOnlineOverOfflineTest extends StfTestCase {
 
     private void checkBuddiesOrder(List<String> buddies, int s) {
         for (int i = s; i < buddies.size() - 1; i++)
-            assertTrue("roster is not sorted asc. ",
+            assertTrue("roster is not sorted asc. : " + buddies.get(i) + " > "
+                + buddies.get(i + 1),
                 buddies.get(i).compareTo(buddies.get(i + 1)) <= 0);
     }
 }

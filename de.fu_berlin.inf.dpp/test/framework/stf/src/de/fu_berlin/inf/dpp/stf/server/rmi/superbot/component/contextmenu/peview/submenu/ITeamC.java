@@ -198,7 +198,7 @@ public interface ITeamC extends Remote {
      * 
      * @throws RemoteException
      */
-    public void disConnect() throws RemoteException;
+    public void disconnect() throws RemoteException;
 
     /**
      * Perform the action "revert" which should be done with the following

@@ -2,6 +2,7 @@ package de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.eclipse.impl
 
 import java.rmi.RemoteException;
 
+import org.apache.log4j.Logger;
 import org.eclipse.swtbot.swt.finder.waits.DefaultCondition;
 
 import de.fu_berlin.inf.dpp.stf.server.StfRemoteObject;
@@ -11,6 +12,7 @@ import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.eclipse.ICons
 
 public final class ConsoleView extends StfRemoteObject implements IConsoleView {
 
+    private static final Logger log = Logger.getLogger(ConsoleView.class);
     private static final ConsoleView INSTANCE = new ConsoleView();
 
     private IRemoteBotView view;
@@ -40,11 +42,16 @@ public final class ConsoleView extends StfRemoteObject implements IConsoleView {
     }
 
     public boolean existTextInConsole() throws RemoteException {
-        if (!view.bot().existsStyledText())
+        try {
+            if (!view.bot().existsStyledText())
+                return false;
+            if (view.bot().styledText().getText().equals(""))
+                return false;
+            return true;
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
             return false;
-        if (view.bot().styledText().getText().equals(""))
-            return false;
-        return true;
+        }
     }
 
     /**********************************************

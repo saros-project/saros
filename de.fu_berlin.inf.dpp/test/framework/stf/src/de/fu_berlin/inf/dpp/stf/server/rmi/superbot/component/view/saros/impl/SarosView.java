@@ -19,7 +19,6 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotToolbarButton;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotToolbarDropDownButton;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
-import org.eclipse.swtbot.swt.finder.widgets.TimeoutException;
 import org.hamcrest.Matcher;
 import org.jivesoftware.smack.Roster;
 
@@ -194,17 +193,6 @@ public final class SarosView extends StfRemoteObject implements ISarosView {
         }
     }
 
-    // /**
-    // * TODO: With {@link IRemoteBotView#toolbarButtonWithRegex(String)} to
-    // * perform this action you will get WidgetNotFoundException.
-    // */
-    //
-    // public void addBuddyToSession(String... jidOfInvitees)
-    // throws RemoteException {
-    // view.toolbarButton(TB_ADD_BUDDY_TO_SESSION).click();
-    // superBot().confirmShellAddBuddyToSession(jidOfInvitees);
-    // }
-
     /**
      * Note: {@link StfRemoteObject#TB_INCONSISTENCY_DETECTED} is not complete
      * toolbarName, so we need to use
@@ -302,11 +290,16 @@ public final class SarosView extends StfRemoteObject implements ISarosView {
     }
 
     public boolean hasNickName(JID buddyJID) throws RemoteException {
-        if (getNickname(buddyJID) == null)
+        try {
+            if (getNickname(buddyJID) == null)
+                return false;
+            if (!getNickname(buddyJID).equals(buddyJID.getBase()))
+                return true;
             return false;
-        if (!getNickname(buddyJID).equals(buddyJID.getBase()))
-            return true;
-        return false;
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            return false;
+        }
     }
 
     public List<String> getAllBuddies() throws RemoteException {
@@ -320,28 +313,37 @@ public final class SarosView extends StfRemoteObject implements ISarosView {
     }
 
     public boolean hasBuddy(JID buddyJID) throws RemoteException {
-        String nickName = getNickname(buddyJID);
-        if (nickName == null)
-            return false;
-
         try {
-            Util.getTreeItemWithRegex(tree, Pattern.quote(NODE_BUDDIES),
-                Pattern.quote(nickName) + ".*");
-            return true;
-        } catch (TimeoutException e) {
+            String nickName = getNickname(buddyJID);
+            if (nickName == null)
+                return false;
+
+            nickName = Pattern.quote(nickName) + ".*";
+            for (String label : tree.getTreeItem(NODE_BUDDIES).getNodes())
+                if (label.matches(nickName))
+                    return true;
+
+            return false;
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
             return false;
         }
     }
 
     public boolean existsParticipant(JID participantJID) throws RemoteException {
-        String participantLabel = getParticipantLabel(participantJID);
+        try {
+            String participantLabel = getParticipantLabel(participantJID);
 
-        participantLabel = Pattern.quote(participantLabel) + ".*";
-        for (String label : tree.getTreeItem(NODE_SESSION).getNodes())
-            if (label.matches(participantLabel))
-                return true;
+            participantLabel = Pattern.quote(participantLabel) + ".*";
+            for (String label : tree.getTreeItem(NODE_SESSION).getNodes())
+                if (label.matches(participantLabel))
+                    return true;
 
-        return false;
+            return false;
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            return false;
+        }
     }
 
     public String getParticipantLabel(JID participantJID)
@@ -365,31 +367,48 @@ public final class SarosView extends StfRemoteObject implements ISarosView {
     }
 
     public boolean isInSession() {
-        for (SWTBotToolbarButton button : view.getToolbarButtons()) {
-            if ((button.getToolTipText().equals(TB_STOP_SESSION) || button
-                .getToolTipText().equals(TB_LEAVE_SESSION))
-                && button.isEnabled())
-                return true;
+        try {
+            for (SWTBotToolbarButton button : view.getToolbarButtons()) {
+                if ((button.getToolTipText().equals(TB_STOP_SESSION) || button
+                    .getToolTipText().equals(TB_LEAVE_SESSION))
+                    && button.isEnabled())
+                    return true;
+            }
+            return false;
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            return false;
         }
-        return false;
     }
 
     public boolean isHost() throws RemoteException {
-        if (!isInSession())
+        try {
+            if (!isInSession())
+                return false;
+
+            List<String> participants = tree.getTreeItem(NODE_SESSION)
+                .getNodes();
+
+            return participants.size() > 0
+                && participants.get(0).equals(
+                    getParticipantLabel(SuperBot.getInstance().getJID()));
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
             return false;
-
-        List<String> participants = tree.getTreeItem(NODE_SESSION).getNodes();
-
-        return participants.size() > 0
-            && participants.get(0).equals(
-                getParticipantLabel(SuperBot.getInstance().getJID()));
+        }
     }
 
     public boolean isFollowing() throws RemoteException {
-        JID followedBuddy = getFollowedBuddy();
-        if (followedBuddy == null)
+        try {
+            JID followedBuddy = getFollowedBuddy();
+            if (followedBuddy == null)
+                return false;
+
+            return selectParticipant(followedBuddy).isFollowing();
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
             return false;
-        return selectParticipant(followedBuddy).isFollowing();
+        }
     }
 
     public List<String> getAllParticipants() throws RemoteException {
@@ -512,11 +531,17 @@ public final class SarosView extends StfRemoteObject implements ISarosView {
 
     private boolean isToolbarButtonEnabled(String tooltip) {
 
-        for (SWTBotToolbarButton button : view.getToolbarButtons())
-            if (button.getToolTipText().equals(tooltip) && button.isEnabled())
-                return true;
+        try {
+            for (SWTBotToolbarButton button : view.getToolbarButtons())
+                if (button.getToolTipText().equals(tooltip)
+                    && button.isEnabled())
+                    return true;
 
-        return false;
+            return false;
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            return false;
+        }
     }
 
     private void clickToolbarButtonWithTooltip(String tooltipText) {

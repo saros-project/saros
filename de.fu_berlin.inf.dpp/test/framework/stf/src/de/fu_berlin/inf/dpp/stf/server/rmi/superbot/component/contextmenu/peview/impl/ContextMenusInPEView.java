@@ -3,7 +3,9 @@ package de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.contextmenu.pevie
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
 
+import org.apache.log4j.Logger;
 import org.eclipse.swtbot.swt.finder.SWTBot;
 import org.eclipse.swtbot.swt.finder.waits.Conditions;
 import org.eclipse.swtbot.swt.finder.waits.DefaultCondition;
@@ -27,6 +29,8 @@ import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.contextmenu.peview
 public final class ContextMenusInPEView extends StfRemoteObject implements
     IContextMenusInPEView {
 
+    private static final Logger log = Logger
+        .getLogger(ContextMenusInPEView.class);
     private static final ContextMenusInPEView INSTANCE = new ContextMenusInPEView();
 
     private SWTBotTreeItem treeItem;
@@ -164,26 +168,36 @@ public final class ContextMenusInPEView extends StfRemoteObject implements
     }
 
     public boolean existsWithRegex(String name) throws RemoteException {
-        if (treeItem == null) {
-            for (String item : getTextOfItems(tree)) {
-                if (item.matches(name + ".*"))
+        name = Pattern.quote(name) + ".*";
+        try {
+            List<String> items;
+
+            if (treeItem == null)
+                items = getTextOfItems(tree);
+            else
+                items = getTextOfItems(treeItem);
+
+            for (String item : items)
+                if (item.matches(name))
                     return true;
-            }
+
             return false;
-        } else {
-            for (String item : getTextOfItems(treeItem)) {
-                if (item.matches(name + ".*"))
-                    return true;
-            }
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
             return false;
         }
     }
 
     public boolean exists(String name) throws RemoteException {
-        if (treeItem == null) {
-            return getTextOfItems(tree).contains(name);
-        } else {
-            return getTextOfItems(treeItem).contains(name);
+        try {
+            if (treeItem == null)
+                return getTextOfItems(tree).contains(name);
+            else
+                return getTextOfItems(treeItem).contains(name);
+
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            return false;
         }
     }
 

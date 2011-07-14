@@ -193,7 +193,7 @@ public final class TeamC extends StfRemoteObject implements ITeamC {
         RemoteWorkbenchBot.getInstance().waitUntilShellIsClosed("SVN Checkout");
     }
 
-    public void disConnect() throws RemoteException {
+    public void disconnect() throws RemoteException {
         treeItem.select();
         ContextMenuHelper.clickContextMenu(tree, CM_TEAM, CM_DISCONNECT);
 

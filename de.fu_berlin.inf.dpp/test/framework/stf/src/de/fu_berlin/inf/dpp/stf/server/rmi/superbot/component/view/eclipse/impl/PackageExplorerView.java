@@ -33,9 +33,11 @@ import de.fu_berlin.inf.dpp.stf.server.util.Util;
 import de.fu_berlin.inf.dpp.vcs.VCSAdapter;
 import de.fu_berlin.inf.dpp.vcs.VCSResourceInfo;
 
-public final class PackageExplorerView extends StfRemoteObject implements IPackageExplorerView {
+public final class PackageExplorerView extends StfRemoteObject implements
+    IPackageExplorerView {
 
-    private static final Logger log = Logger.getLogger(PackageExplorerView.class);
+    private static final Logger log = Logger
+        .getLogger(PackageExplorerView.class);
 
     private static final PackageExplorerView INSTANCE = new PackageExplorerView();
 
@@ -153,12 +155,17 @@ public final class PackageExplorerView extends StfRemoteObject implements IPacka
 
     public boolean isProjectManagedBySVN(String projectName)
         throws RemoteException {
-        IProject project = ResourcesPlugin.getWorkspace().getRoot()
-            .getProject(projectName);
-        final VCSAdapter vcs = VCSAdapter.getAdapter(project);
-        if (vcs == null)
+        try {
+            IProject project = ResourcesPlugin.getWorkspace().getRoot()
+                .getProject(projectName);
+            final VCSAdapter vcs = VCSAdapter.getAdapter(project);
+            if (vcs == null)
+                return false;
+            return true;
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
             return false;
-        return true;
+        }
     }
 
     public String getRevision(String fullPath) throws RemoteException {

@@ -5,7 +5,7 @@ import java.rmi.RemoteException;
 
 public interface IProgressView extends Remote {
 
-    public boolean existsPorgress() throws RemoteException;
+    public boolean existsProgress() throws RemoteException;
 
     /**
      * remove the progress. ie. Click the gray clubs delete icon.
