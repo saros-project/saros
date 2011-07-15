@@ -48,6 +48,7 @@ public class MenuSarosByAliceBobTest extends StfTestCase {
             .javaProjectWithClasses(Constants.PROJECT1, Constants.PKG1,
                 Constants.CLS1);
 
+        ALICE.remoteBot().activateWorkbench();
         ALICE.remoteBot().menu(MENU_SAROS).menu(SHARE_PROJECTS).click();
 
         IRemoteBotShell shell = ALICE.remoteBot().shell(SHELL_SHARE_PROJECT);

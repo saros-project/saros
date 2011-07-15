@@ -2,21 +2,22 @@ package de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.saros.impl;
 
 import java.rmi.RemoteException;
 
+import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
+
 import de.fu_berlin.inf.dpp.stf.server.StfRemoteObject;
-import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotView;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.saros.IRSView;
 
 public final class RSView extends StfRemoteObject implements IRSView {
 
     private static final RSView INSTANCE = new RSView();
 
-    private IRemoteBotView view;
+    private SWTBotView view;
 
     public static RSView getInstance() {
         return INSTANCE;
     }
 
-    public IRSView setView(IRemoteBotView view) {
+    public IRSView setView(SWTBotView view) {
         this.view = view;
         return this;
     }

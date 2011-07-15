@@ -34,10 +34,13 @@ public final class Views extends StfRemoteObject implements IViews {
     }
 
     public IRSView remoteScreenView() throws RemoteException {
+
+        SWTWorkbenchBot bot = new SWTWorkbenchBot();
         RemoteWorkbenchBot.getInstance().openViewById(VIEW_REMOTE_SCREEN_ID);
         RemoteWorkbenchBot.getInstance().view(VIEW_REMOTE_SCREEN).show();
-        return RSView.getInstance().setView(
-            RemoteWorkbenchBot.getInstance().view(VIEW_REMOTE_SCREEN));
+        bot.viewByTitle(VIEW_REMOTE_SCREEN).show();
+        return RSView.getInstance()
+            .setView(bot.viewByTitle(VIEW_REMOTE_SCREEN));
     }
 
     public IConsoleView consoleView() throws RemoteException {

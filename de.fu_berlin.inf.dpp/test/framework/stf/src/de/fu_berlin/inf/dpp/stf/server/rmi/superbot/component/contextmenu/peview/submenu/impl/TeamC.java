@@ -9,16 +9,23 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
+import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
+import org.eclipse.swtbot.swt.finder.SWTBot;
+import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
+import org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences;
+import org.eclipse.swtbot.swt.finder.waits.Conditions;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotTable;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotTableItem;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
-import org.eclipse.swtbot.swt.finder.widgets.TimeoutException;
 
 import de.fu_berlin.inf.dpp.stf.server.StfRemoteObject;
+import de.fu_berlin.inf.dpp.stf.server.bot.SarosSWTBotPreferences;
+import de.fu_berlin.inf.dpp.stf.server.bot.condition.SarosConditions;
 import de.fu_berlin.inf.dpp.stf.server.bot.widget.ContextMenuHelper;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.impl.RemoteWorkbenchBot;
-import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotShell;
-import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotTable;
-import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotView;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.contextmenu.peview.submenu.ITeamC;
 import de.fu_berlin.inf.dpp.vcs.VCSAdapter;
 
@@ -59,21 +66,20 @@ public final class TeamC extends StfRemoteObject implements ITeamC {
         ContextMenuHelper.clickContextMenu(tree, CM_TEAM,
             CM_SHARE_PROJECT_OF_TEAM);
 
-        IRemoteBotShell shell = RemoteWorkbenchBot.getInstance().shell(
-            SHELL_SHARE_PROJECT);
-        shell.confirmWithTable(TABLE_ITEM_REPOSITORY_TYPE_SVN, NEXT);
+        SWTBotShell shell = getSvnShell();
+        shell.bot().sleep(500);
 
         if (shell.bot().table().containsItem(repositoryURL)) {
-            shell.confirmWithTable(repositoryURL, NEXT);
+            shell.bot().table().select(repositoryURL);
+            shell.bot().button(NEXT).click();
         } else {
             shell.bot().radio(LABEL_CREATE_A_NEW_REPOSITORY_LOCATION).click();
             shell.bot().button(NEXT).click();
             shell.bot().comboBoxWithLabel(LABEL_URL).setText(repositoryURL);
         }
-        shell.bot().button(FINISH).waitUntilIsEnabled();
+
         shell.bot().button(FINISH).click();
-        RemoteWorkbenchBot.getInstance().waitUntilShellIsClosed(
-            SHELL_SHARE_PROJECT);
+        shell.bot().waitUntil(Conditions.shellCloses(shell));
     }
 
     public void shareProjectConfiguredWithSVNInfos(String repositoryURL)
@@ -82,85 +88,133 @@ public final class TeamC extends StfRemoteObject implements ITeamC {
         ContextMenuHelper.clickContextMenu(tree, CM_TEAM,
             CM_SHARE_PROJECT_OF_TEAM);
 
-        IRemoteBotShell shell = RemoteWorkbenchBot.getInstance().shell(
-            SHELL_SHARE_PROJECT);
-        shell.confirmWithTable(TABLE_ITEM_REPOSITORY_TYPE_SVN, NEXT);
-        log.debug("SVN share project text: " + shell.bot().text());
-        shell.bot().button(FINISH).waitUntilIsEnabled();
+        SWTBotShell shell = getSvnShell();
         shell.bot().button(FINISH).click();
-        RemoteWorkbenchBot.getInstance().waitUntilShellIsClosed(
-            SHELL_SHARE_PROJECT);
+        shell.bot().waitUntil(Conditions.shellCloses(shell));
+    }
+
+    private SWTBotShell getSvnShell() {
+        long timeout = SWTBotPreferences.TIMEOUT;
+        try {
+            SWTBotShell shell = new SWTBot().shell(SHELL_SHARE_PROJECT);
+            shell.activate();
+            shell.bot().sleep(500);
+            SWTBotPreferences.TIMEOUT = 500;
+
+            int tableItemCount = shell.bot().table().rowCount();
+
+            SWTBotTable table = null;
+            for (int i = 0; i < tableItemCount; i++) {
+                shell.bot().sleep(500);
+                SWTBotTableItem item = shell.bot().table().getTableItem(i);
+                if (!item.getText().equals(TABLE_ITEM_REPOSITORY_TYPE_SVN))
+                    continue;
+
+                item.select();
+                shell.bot().button(NEXT).click();
+                try {
+                    table = shell.bot().table();
+                    break;
+                } catch (WidgetNotFoundException e) {
+                    log.warn("expected table in SVN shell, wrong SVN client ?",
+                        e);
+                    shell.bot().button(BACK).click();
+                }
+            }
+            if (table == null) {
+                shell.close();
+                throw new RuntimeException("no or wrong SVN client found");
+            }
+            return shell;
+        } finally {
+            SWTBotPreferences.TIMEOUT = timeout;
+        }
+
     }
 
     public void shareProjectUsingSpecifiedFolderName(String repositoryURL,
         String specifiedFolderName) throws RemoteException {
+
+        addRepositoryUrl(repositoryURL);
+
         treeItem.select();
         ContextMenuHelper.clickContextMenu(tree, CM_TEAM,
             CM_SHARE_PROJECT_OF_TEAM);
 
-        RemoteWorkbenchBot.getInstance().shell(SHELL_SHARE_PROJECT)
-            .confirmWithTable(TABLE_ITEM_REPOSITORY_TYPE_SVN, NEXT);
+        SWTBotShell shell = getSvnShell();
+        shell.bot().table().select(repositoryURL);
+        shell.bot().button(NEXT).click();
+        shell.bot().radio("Use specified folder name:").click();
+        shell.bot().text().setText(specifiedFolderName);
+        shell.bot().button(FINISH).click();
 
-        IRemoteBotShell shell = RemoteWorkbenchBot.getInstance().shell(
-            SHELL_SHARE_PROJECT);
-        IRemoteBotTable table = shell.bot().table();
+        shell = new SWTBot().shell("Remote Project Exists");
+        shell.activate();
+        shell.bot().button(YES).click();
+        shell.bot().waitUntil(Conditions.shellCloses(shell),
+            SarosSWTBotPreferences.SAROS_LONG_TIMEOUT);
 
-        if (table == null || !table.containsItem(repositoryURL)) {
-            // close window
-            shell.close();
-            // in svn repos view: enter url
+        new SWTBot().sleep(1000);
+        if (RemoteWorkbenchBot.getInstance().isShellOpen(
+            "Confirm Open Perspective")) {
+            shell = new SWTBot().shell("Confirm Open Perspective");
+            shell.activate();
+            shell.bot().button(NO).click();
+            shell.bot().waitUntil(Conditions.shellCloses(shell));
+        }
+    }
 
-            RemoteWorkbenchBot.getInstance().openViewById(
-                VIEW_SVN_REPOSITORIES_ID);
-            IRemoteBotView view = RemoteWorkbenchBot.getInstance().view(
-                VIEW_SVN_REPOSITORIES);
+    private void addRepositoryUrl(String repositoryURL) throws RemoteException {
+        RemoteWorkbenchBot.getInstance().activateWorkbench();
 
-            view.show();
-            final boolean viewWasOpen = RemoteWorkbenchBot.getInstance()
-                .isViewOpen(VIEW_SVN_REPOSITORIES);
-            RemoteWorkbenchBot.getInstance().view(VIEW_SVN_REPOSITORIES)
-                .toolbarButton("Add SVN Repository").click();
+        new SWTBot().menu(MENU_WINDOW).menu(MENU_SHOW_VIEW).menu(MENU_OTHER)
+            .click();
 
-            RemoteWorkbenchBot.getInstance().waitUntilShellIsOpen(
-                "Add SVN Repository");
-            IRemoteBotShell shell2 = RemoteWorkbenchBot.getInstance().shell(
-                "Add SVN Repository");
-            shell2.activate();
-            shell2.bot().comboBoxWithLabel(LABEL_URL).setText(repositoryURL);
-            shell2.bot().button(FINISH).click();
-            RemoteWorkbenchBot.getInstance().waitUntilShellIsClosed(
-                "Add SVN Repository");
-            if (!viewWasOpen)
-                RemoteWorkbenchBot.getInstance().view(VIEW_SVN_REPOSITORIES)
-                    .close();
-            // recur...
-            shareProjectUsingSpecifiedFolderName(repositoryURL,
-                specifiedFolderName);
-            return;
+        SWTBotShell viewShell = new SWTBot().shell(SHELL_SHOW_VIEW);
+        viewShell.activate();
+        new SWTBot().sleep(500);
+        SWTBotTreeItem[] items = viewShell.bot().tree().getAllItems();
+
+        boolean svnClientFound = false;
+        outer: for (SWTBotTreeItem item : items) {
+            if (item.getText().equals("SVN")) {
+                item.expand();
+                SWTBotTreeItem[] subItems = item.getItems();
+                for (SWTBotTreeItem subItem : subItems) {
+                    if (subItem.getText().equals("SVN Annotate")) {
+                        svnClientFound = true;
+                        item.select(VIEW_SVN_REPOSITORIES);
+                        break outer;
+                    }
+                }
+            }
         }
 
-        RemoteWorkbenchBot.getInstance().shell(SHELL_SHARE_PROJECT)
-            .confirmWithTable(repositoryURL, NEXT);
-        IRemoteBotShell shell3 = RemoteWorkbenchBot.getInstance().shell(
-            SHELL_SHARE_PROJECT);
-        shell3.bot().radio("Use specified folder name:").click();
-        shell3.bot().text().setText(specifiedFolderName);
-        shell3.bot().button(FINISH).click();
-        RemoteWorkbenchBot.getInstance().shell("Remote Project Exists")
-            .waitUntilActive();
-        RemoteWorkbenchBot.getInstance().shell("Remote Project Exists")
-            .confirm(YES);
-        RemoteWorkbenchBot.getInstance().waitUntilShellIsClosed(
-            SHELL_SHARE_PROJECT);
-        try {
-            RemoteWorkbenchBot.getInstance().sleep(1000);
-            if (RemoteWorkbenchBot.getInstance().isShellOpen(
-                "Confirm Open Perspective"))
-                RemoteWorkbenchBot.getInstance()
-                    .shell("Confirm Open Perspective").confirm(NO);
-        } catch (TimeoutException e) {
-            // ignore
-        }
+        if (!svnClientFound)
+            throw new RuntimeException("SVN Client is not installed");
+
+        viewShell.bot().button(OK).click();
+        viewShell.bot().waitUntil(Conditions.shellCloses(viewShell));
+
+        SWTBotView view = new SWTWorkbenchBot()
+            .viewByTitle(VIEW_SVN_REPOSITORIES);
+
+        view.show();
+        view.bot().sleep(500);
+
+        for (SWTBotTreeItem item : view.bot().tree().getAllItems())
+            if (item.getText().equals(repositoryURL)) {
+                view.close();
+                return;
+            }
+
+        view.toolbarButton("Add SVN Repository").click();
+        SWTBotShell shell = new SWTBot().shell("Add SVN Repository");
+        shell.bot().comboBoxWithLabel(LABEL_URL).setText(repositoryURL);
+        shell.bot().button(FINISH).click();
+        shell.bot().waitUntil(Conditions.shellCloses(shell),
+            SarosSWTBotPreferences.SAROS_LONG_TIMEOUT);
+        view.close();
 
     }
 
@@ -168,68 +222,80 @@ public final class TeamC extends StfRemoteObject implements ITeamC {
         throws RemoteException {
         RemoteWorkbenchBot.getInstance().menu(MENU_FILE).menu("Import...")
             .click();
-        IRemoteBotShell shell = RemoteWorkbenchBot.getInstance().shell(
-            SHELL_IMPORT);
-        shell.confirmWithTreeWithFilterText(TABLE_ITEM_REPOSITORY_TYPE_SVN,
-            "Checkout Projects from SVN", NEXT);
+
+        SWTBotShell shell = new SWTBot().shell(SHELL_IMPORT);
+        shell.activate();
+
+        shell.bot().text("type filter text")
+            .setText("Checkout Projects from SVN");
+        shell
+            .bot()
+            .tree()
+            .expandNode(TABLE_ITEM_REPOSITORY_TYPE_SVN,
+                "Checkout Projects from SVN").select();
+        shell.bot().button(NEXT).click();
+
         if (shell.bot().table().containsItem(repositoryURL)) {
-            RemoteWorkbenchBot.getInstance().shell("Checkout from SVN")
-                .confirmWithTable(repositoryURL, NEXT);
+            shell.bot().table().select(repositoryURL);
+            shell.bot().button(NEXT).click();
+
         } else {
             shell.bot().radio("Create a new repository location").click();
             shell.bot().button(NEXT).click();
             shell.bot().comboBoxWithLabel("Url:").setText(repositoryURL);
             shell.bot().button(NEXT).click();
-            RemoteWorkbenchBot.getInstance().shell("Checkout from SVN")
-                .waitUntilActive();
+            shell.bot()
+                .waitUntil(Conditions.shellIsActive("Checkout from SVN"));
         }
-        RemoteWorkbenchBot
-            .getInstance()
-            .shell("Checkout from SVN")
-            .confirmWithTreeWithWaitingExpand("Checkout from SVN", FINISH,
-                repositoryURL, "trunk", "examples");
-        RemoteWorkbenchBot.getInstance().shell("SVN Checkout")
-            .waitUntilActive();
-        RemoteWorkbenchBot.getInstance().waitUntilShellIsClosed("SVN Checkout");
+        shell.bot().tree()
+            .expandNode(repositoryURL, "stf_tests", "stf_test_project");
+
+        shell.bot().button(FINISH).click();
+        shell.bot().waitUntil(Conditions.shellCloses(shell),
+            SarosSWTBotPreferences.SAROS_LONG_TIMEOUT);
     }
 
     public void disconnect() throws RemoteException {
         treeItem.select();
         ContextMenuHelper.clickContextMenu(tree, CM_TEAM, CM_DISCONNECT);
-
-        RemoteWorkbenchBot.getInstance()
-            .shell(SHELL_CONFIRM_DISCONNECT_FROM_SVN).confirm(YES);
+        SWTBotShell shell = new SWTBot()
+            .shell(SHELL_CONFIRM_DISCONNECT_FROM_SVN);
+        shell.activate();
+        shell.bot().button(YES).click();
+        shell.bot().waitUntil(Conditions.shellCloses(shell));
     }
 
     public void revert() throws RemoteException {
         treeItem.select();
         ContextMenuHelper.clickContextMenu(tree, CM_TEAM, CM_REVERT);
-
-        RemoteWorkbenchBot.getInstance().shell(SHELL_REVERT).confirm(OK);
-        RemoteWorkbenchBot.getInstance().waitUntilShellIsClosed(SHELL_REVERT);
+        SWTBotShell shell = new SWTBot().shell(SHELL_REVERT);
+        shell.activate();
+        shell.bot().button(OK).click();
+        shell.bot().waitUntil(Conditions.shellCloses(shell));
     }
 
     public void update(String versionID) throws RemoteException {
         switchToAnotherRevision(versionID);
     }
 
-    private void switchToAnotherRevision(String versionID)
-        throws RemoteException {
+    private void switchToAnotherRevision(String versionID) {
 
         treeItem.select();
         ContextMenuHelper.clickContextMenu(tree, CM_TEAM,
             CM_SWITCH_TO_ANOTHER_BRANCH_TAG_REVISION);
 
-        IRemoteBotShell shell = RemoteWorkbenchBot.getInstance().shell(
-            SHELL_SWITCH);
-        shell.waitUntilActive();
+        SWTBotShell shell = new SWTBot().shell(SHELL_SWITCH);
+        shell.activate();
+
         if (shell.bot().checkBox(LABEL_SWITCH_TOHEAD_REVISION).isChecked())
             shell.bot().checkBox(LABEL_SWITCH_TOHEAD_REVISION).click();
         shell.bot().textWithLabel(LABEL_REVISION).setText(versionID);
         shell.bot().button(OK).click();
-        if (RemoteWorkbenchBot.getInstance().isShellOpen(SHELL_SVN_SWITCH))
-            RemoteWorkbenchBot.getInstance().waitUntilShellIsClosed(
-                SHELL_SVN_SWITCH);
+        shell.bot().sleep(1000);
+        shell.bot().waitWhile(
+            SarosConditions
+                .isShellOpen(new SWTWorkbenchBot(), SHELL_SVN_SWITCH));
+
     }
 
     public void switchProject(String projectName, String url)

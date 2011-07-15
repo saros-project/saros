@@ -147,11 +147,11 @@ public final class RemoteBotShell extends StfRemoteObject implements
     }
 
     public void confirmWithTreeWithFilterText(String rootOfTreeNode,
-        String teeNode, String buttonText) throws RemoteException {
+        String treeNode, String buttonText) throws RemoteException {
         waitUntilActive();
-        bot().text(TEXT_FIELD_TYPE_FILTER_TEXT).setText(teeNode);
+        bot().text(TEXT_FIELD_TYPE_FILTER_TEXT).setText(treeNode);
         bot().tree().waitUntilItemExists(rootOfTreeNode);
-        bot().tree().selectTreeItem(rootOfTreeNode, teeNode);
+        bot().tree().selectTreeItem(rootOfTreeNode, treeNode);
         bot().button(buttonText).waitUntilIsEnabled();
         bot().button(buttonText).click();
     }
@@ -192,7 +192,7 @@ public final class RemoteBotShell extends StfRemoteObject implements
                 }
             });
         if (errorMessage == null) {
-            throw new WidgetNotFoundException("could not find errorMessage!");
+            throw new WidgetNotFoundException("could not find error message");
         }
         return errorMessage;
     }

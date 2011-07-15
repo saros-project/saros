@@ -88,8 +88,7 @@ public class SarosPreferencesTest extends StfTestCase {
         String errorMessage = shell.getErrorMessage();
         assertTrue(errorMessage.matches(ERROR_MESSAGE_ACCOUNT_ALREADY_EXISTS));
         shell.confirm(CANCEL);
-        assertFalse(ALICE.remoteBot().isShellOpen(
-            SHELL_CREATE_XMPP_JABBER_ACCOUNT));
+        shell.waitShortUntilIsClosed();
     }
 
     /**
@@ -103,22 +102,22 @@ public class SarosPreferencesTest extends StfTestCase {
 
         ALICE.remoteBot()
             .waitUntilShellIsOpen(SHELL_CREATE_XMPP_JABBER_ACCOUNT);
-        IRemoteBotShell shell_ALICE = ALICE.remoteBot().shell(
+        IRemoteBotShell shell = ALICE.remoteBot().shell(
             SHELL_CREATE_XMPP_JABBER_ACCOUNT);
-        shell_ALICE.activate();
-        shell_ALICE.bot().comboBoxWithLabel(LABEL_XMPP_JABBER_SERVER)
+        shell.activate();
+        shell.bot().comboBoxWithLabel(LABEL_XMPP_JABBER_SERVER)
             .setText(Constants.SERVER);
-        shell_ALICE.bot().textWithLabel(LABEL_USER_NAME)
+        shell.bot().textWithLabel(LABEL_USER_NAME)
             .setText(Constants.NEW_XMPP_JABBER_ID);
-        shell_ALICE.bot().textWithLabel(LABEL_PASSWORD)
+        shell.bot().textWithLabel(LABEL_PASSWORD)
             .setText(Constants.PASSWORD);
-        shell_ALICE.bot().textWithLabel(LABEL_REPEAT_PASSWORD)
+        shell.bot().textWithLabel(LABEL_REPEAT_PASSWORD)
             .setText(Constants.NO_MATCHED_REPEAT_PASSWORD);
 
-        assertFalse(shell_ALICE.bot().button(FINISH).isEnabled());
-        String errorMessage = shell_ALICE.getErrorMessage();
+        assertFalse(shell.bot().button(FINISH).isEnabled());
+        String errorMessage = shell.getErrorMessage();
         assertTrue(errorMessage.equals(ERROR_MESSAGE_PASSWORDS_NOT_MATCH));
-        shell_ALICE.confirm(CANCEL);
+        shell.confirm(CANCEL);
         assertFalse(ALICE.remoteBot().isShellOpen(
             SHELL_CREATE_XMPP_JABBER_ACCOUNT));
     }

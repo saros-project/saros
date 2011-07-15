@@ -154,7 +154,7 @@ public class ContextMenuHelper {
     public static boolean isContextMenuEnabled(
         final AbstractSWTBot<? extends Control> bot, final String... texts) {
 
-        final boolean istContextEnabled = UIThreadRunnable
+        final boolean isContextEnabled = UIThreadRunnable
             .syncExec(new BoolResult() {
                 MenuItem menuItem = null;
 
@@ -182,7 +182,7 @@ public class ContextMenuHelper {
                 }
 
             });
-        return istContextEnabled;
+        return isContextEnabled;
 
     }
 

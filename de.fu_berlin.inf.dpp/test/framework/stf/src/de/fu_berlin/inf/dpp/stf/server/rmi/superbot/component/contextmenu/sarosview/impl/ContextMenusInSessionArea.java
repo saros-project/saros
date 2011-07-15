@@ -72,8 +72,7 @@ public final class ContextMenusInSessionArea extends ContextMenusInSarosView
         if (SuperBot.getInstance().getJID().equals(participantJID)) {
             throw new RuntimeException("you can't follow yourself");
         }
-        log.trace("tree: " + tree.getText());
-        log.trace("treeItem: " + treeItem.getText());
+
         treeItem.select();
         ContextMenuHelper.clickContextMenu(tree, CM_FOLLOW_PARTICIPANT);
 

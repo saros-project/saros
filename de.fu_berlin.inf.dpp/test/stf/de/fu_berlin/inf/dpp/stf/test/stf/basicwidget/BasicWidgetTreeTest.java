@@ -37,7 +37,6 @@ import java.rmi.RemoteException;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import de.fu_berlin.inf.dpp.stf.client.StfTestCase;
@@ -51,7 +50,7 @@ public class BasicWidgetTreeTest extends StfTestCase {
 
     @BeforeClass
     public static void selectTesters() throws Exception {
-        select(ALICE);
+        select(ALICE, BOB);
     }
 
     @Before
@@ -213,7 +212,6 @@ public class BasicWidgetTreeTest extends StfTestCase {
     }
 
     @Test
-    @Ignore("SVN does not work at the moment")
     public void selectTreeItemWithRegexs() throws RemoteException {
         ALICE.superBot().views().packageExplorerView().tree().newC()
             .javaProject(Constants.SVN_PROJECT_COPY);
@@ -230,14 +228,11 @@ public class BasicWidgetTreeTest extends StfTestCase {
         view.show();
         view.bot()
             .tree()
-            .selectTreeItemWithRegex(
-                Util.changeToRegex(Util.getClassNodes(
-                    Constants.SVN_PROJECT_COPY, Constants.SVN_PKG,
-                    Constants.SVN_CLS1)));
+            .select(Constants.SVN_PROJECT_COPY, Constants.SVN_PKG,
+                Constants.SVN_CLS1);
     }
 
     @Test
-    @Ignore("SVN does not work at the moment")
     public void selectTreeItemWithRegexsInView() throws RemoteException {
         ALICE.superBot().views().packageExplorerView().tree().newC()
             .javaProject(Constants.SVN_PROJECT_COPY);

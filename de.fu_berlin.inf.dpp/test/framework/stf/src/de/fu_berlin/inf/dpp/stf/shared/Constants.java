@@ -35,6 +35,7 @@ public interface Constants {
     public final static String ACCEPT = "Accept";
     public final static String APPLY = "Apply";
     public final static String NEXT = "Next >";
+    public final static String BACK = "< Back";
     public final static String BROWSE = "Browse";
 
     public final static String SRC = "src";
