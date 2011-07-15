@@ -29,9 +29,7 @@ import org.eclipse.ui.model.WorkbenchContentProvider;
 import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.SarosPluginContext;
-import de.fu_berlin.inf.dpp.project.AbstractSarosSessionListener;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
-import de.fu_berlin.inf.dpp.project.ISarosSessionListener;
 import de.fu_berlin.inf.dpp.project.SarosSessionManager;
 import de.fu_berlin.inf.dpp.ui.widgets.viewer.project.events.BaseResourceSelectionListener;
 import de.fu_berlin.inf.dpp.ui.widgets.viewer.project.events.ResourceSelectionChangedEvent;
@@ -96,19 +94,7 @@ public class BaseResourceSelectionComposite extends ResourceDisplayComposite {
             setChildrenUngrayed(resource);
             this.checkboxTreeViewer.setSubtreeChecked(resource, checked);
             setParentsCheckedORGrayed(resource);
-            // this.checkboxTreeViewer.setChecked(
-            // resource.getProject().getFile(".project"), checked);
-            // this.checkboxTreeViewer.setChecked(
-            // resource.getProject().getFile(".classpath"), checked);
-            // this.checkboxTreeViewer.setChecked(
-            // resource.getProject().getFile(".settings"), checked);
-
         }
-        // else if (resource instanceof IProject) {
-        // this.checkboxTreeViewer.setChecked(resource, checked);
-        // setChildrenUngrayed(resource);
-        // this.checkboxTreeViewer.setSubtreeChecked(resource, checked);
-        // }
     }
 
     /**
@@ -175,9 +161,6 @@ public class BaseResourceSelectionComposite extends ResourceDisplayComposite {
         return;
     }
 
-    @Inject
-    protected SarosSessionManager sessionManager;
-
     public BaseResourceSelectionComposite(Composite parent, int style) {
         super(parent, style | SWT.CHECK);
 
@@ -193,33 +176,11 @@ public class BaseResourceSelectionComposite extends ResourceDisplayComposite {
         });
 
         SarosPluginContext.initComponent(this);
-
-        sessionManager.addSarosSessionListener(sessionListener);
-        if (sessionManager.getSarosSession() != null) {
-            sessionListener.sessionStarted(sessionManager.getSarosSession());
-        }
         viewer.addFilter(sharedProjectsFilter);
     }
 
-    protected ISarosSession sarosSession;
-
-    protected ISarosSessionListener sessionListener = new AbstractSarosSessionListener() {
-
-        @Override
-        public void sessionStarted(ISarosSession newSarosSession) {
-            sarosSession = newSarosSession;
-        }
-
-        @Override
-        public void sessionEnded(ISarosSession sarosSession) {
-            viewer.removeFilter(sharedProjectsFilter);
-        }
-    };
-
-    @Override
-    public void dispose() {
-        sessionManager.removeSarosSessionListener(sessionListener);
-    }
+    @Inject
+    protected SarosSessionManager sessionManager;
 
     /**
      * Filter for already shared resources.
@@ -228,6 +189,7 @@ public class BaseResourceSelectionComposite extends ResourceDisplayComposite {
         @Override
         public boolean select(Viewer viewer, Object parentElement,
             Object element) {
+            ISarosSession sarosSession = sessionManager.getSarosSession();
             if (sarosSession != null) {
                 if (element instanceof IFile || element instanceof IFolder) {
                     return !sarosSession.isShared((IResource) element);
