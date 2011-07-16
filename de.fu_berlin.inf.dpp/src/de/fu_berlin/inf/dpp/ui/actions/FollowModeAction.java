@@ -218,7 +218,8 @@ public class FollowModeAction extends Action implements Disposable {
         if (user != null && user.isRemote() && user.hasWriteAccess()) {
             setEnabled(true);
             setToFollowUser(user);
-            if (!editorManager.getFollowedUser().equals(user)) {
+            if (editorManager.getFollowedUser() == null
+                || !editorManager.getFollowedUser().equals(user)) {
                 setChecked(false);
                 setToolTipText("Enable Follow Mode to " + user.toString());
             } else {
