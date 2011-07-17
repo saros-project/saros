@@ -148,9 +148,10 @@ public final class TeamC extends StfRemoteObject implements ITeamC {
         shell.bot().text().setText(specifiedFolderName);
         shell.bot().button(FINISH).click();
 
-        shell = new SWTBot().shell("Remote Project Exists");
-        shell.activate();
-        shell.bot().button(YES).click();
+        SWTBotShell shellPopup = new SWTBot().shell("Remote Project Exists");
+        shellPopup.activate();
+        shellPopup.bot().button(YES).click();
+
         shell.bot().waitUntil(Conditions.shellCloses(shell),
             SarosSWTBotPreferences.SAROS_LONG_TIMEOUT);
 

@@ -102,7 +102,7 @@ public interface ISarosPreferences extends Remote {
      */
     public void deleteAccount(JID jid, String password) throws RemoteException;
 
-    public void deleteAllNoActiveAccounts() throws RemoteException;
+    public void deleteAllNonActiveAccounts() throws RemoteException;
 
     /**********************************************
      * 
@@ -154,6 +154,14 @@ public interface ISarosPreferences extends Remote {
      * @throws RemoteException
      */
     public boolean isAccountActive(JID jid) throws RemoteException;
+
+    /**
+     * 
+     * @return the {@link JID} of the current active account or <tt>null</tt> if
+     *         there is not account activated
+     * @throws RemoteException
+     */
+    public JID getActiveAccount() throws RemoteException;
 
     public boolean existsAccount() throws RemoteException;
 

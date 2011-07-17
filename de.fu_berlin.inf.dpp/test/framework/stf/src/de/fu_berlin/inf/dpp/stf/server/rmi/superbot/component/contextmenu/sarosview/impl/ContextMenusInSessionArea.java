@@ -46,8 +46,13 @@ public final class ContextMenusInSessionArea extends ContextMenusInSarosView
             throw new RuntimeException("user \"" + treeItem.getText()
                 + "\" already has write access!.");
         }
-        treeItem.select();
-        ContextMenuHelper.clickContextMenu(tree, CM_GRANT_WRITE_ACCESS);
+        try {
+            treeItem.select();
+            ContextMenuHelper.clickContextMenu(tree, CM_GRANT_WRITE_ACCESS);
+        } catch (RuntimeException e) {
+            logError(log, e);
+            throw e;
+        }
         waitUntilHasWriteAccess();
     }
 
@@ -58,9 +63,16 @@ public final class ContextMenusInSessionArea extends ContextMenusInSarosView
             throw new RuntimeException("user \"" + treeItem.getText()
                 + "\" already has read-only access!");
         }
-        treeItem.select();
-        ContextMenuHelper.clickContextMenu(tree,
-            CM_RESTRICT_TO_READ_ONLY_ACCESS);
+
+        try {
+            treeItem.select();
+            ContextMenuHelper.clickContextMenu(tree,
+                CM_RESTRICT_TO_READ_ONLY_ACCESS);
+        } catch (RuntimeException e) {
+            logError(log, e);
+            throw e;
+        }
+
         waitUntilHasReadOnlyAccess();
     }
 
@@ -73,16 +85,25 @@ public final class ContextMenusInSessionArea extends ContextMenusInSarosView
             throw new RuntimeException("you can't follow yourself");
         }
 
-        treeItem.select();
-        ContextMenuHelper.clickContextMenu(tree, CM_FOLLOW_PARTICIPANT);
-
-        // waitUntilIsFollowingThisBuddy();
+        try {
+            treeItem.select();
+            ContextMenuHelper.clickContextMenu(tree, CM_FOLLOW_PARTICIPANT);
+        } catch (RuntimeException e) {
+            logError(log, e);
+            throw e;
+        }
     }
 
     public void stopFollowing() throws RemoteException {
         log.debug(" JID of the followed user: " + participantJID.getBase());
-        treeItem.select();
-        ContextMenuHelper.clickContextMenu(tree, CM_STOP_FOLLOWING);
+        try {
+            treeItem.select();
+            ContextMenuHelper.clickContextMenu(tree, CM_STOP_FOLLOWING);
+        } catch (RuntimeException e) {
+            logError(log, e);
+            throw e;
+        }
+
         waitUntilIsNotFollowing();
     }
 
@@ -91,27 +112,51 @@ public final class ContextMenusInSessionArea extends ContextMenusInSarosView
             throw new RuntimeException(
                 "you can't jump to the position of yourself");
         }
-        treeItem.select();
-        ContextMenuHelper.clickContextMenu(tree,
-            CM_JUMP_TO_POSITION_SELECTED_BUDDY);
+        try {
+            treeItem.select();
+            ContextMenuHelper.clickContextMenu(tree,
+                CM_JUMP_TO_POSITION_SELECTED_BUDDY);
+        } catch (RuntimeException e) {
+            logError(log, e);
+            throw e;
+        }
+
     }
 
     public void addProjects(String... projectNames) throws RemoteException {
-        treeItem.select();
-        ContextMenuHelper.clickContextMenu(tree, ADD_PROJECTS);
+        try {
+            treeItem.select();
+            ContextMenuHelper.clickContextMenu(tree, ADD_PROJECTS);
+        } catch (RuntimeException e) {
+            logError(log, e);
+            throw e;
+        }
+
         SuperBot.getInstance().confirmShellAddProjectsToSession(projectNames);
     }
 
     public void addBuddies(String... jidOfInvitees) throws RemoteException {
-        treeItem.select();
-        ContextMenuHelper.clickContextMenu(tree, ADD_BUDDIES);
+        try {
+            treeItem.select();
+            ContextMenuHelper.clickContextMenu(tree, ADD_BUDDIES);
+        } catch (RuntimeException e) {
+            logError(log, e);
+            throw e;
+        }
+
         SuperBot.getInstance().confirmShellAddBuddyToSession(jidOfInvitees);
     }
 
     public void shareProjects(String projectName, JID... jids)
         throws RemoteException {
-        treeItem.select();
-        ContextMenuHelper.clickContextMenu(tree, SHARE_PROJECTS);
+        try {
+            treeItem.select();
+            ContextMenuHelper.clickContextMenu(tree, SHARE_PROJECTS);
+        } catch (RuntimeException e) {
+            logError(log, e);
+            throw e;
+        }
+
         SuperBot.getInstance().confirmShellShareProjects(projectName, jids);
     }
 
@@ -129,8 +174,8 @@ public final class ContextMenusInSessionArea extends ContextMenusInSarosView
             return !ContextMenuHelper.getContextMenu(tree,
                 CM_GRANT_WRITE_ACCESS).isEnabled()
                 && !treeItem.getText().contains(PERMISSION_NAME);
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
+        } catch (RuntimeException e) {
+            logError(log, e);
             return false;
         }
     }
@@ -143,8 +188,8 @@ public final class ContextMenusInSessionArea extends ContextMenusInSarosView
             return !ContextMenuHelper.getContextMenu(tree,
                 CM_RESTRICT_TO_READ_ONLY_ACCESS).isEnabled()
                 && treeItem.getText().contains(PERMISSION_NAME);
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
+        } catch (RuntimeException e) {
+            logError(log, e);
             return false;
         }
 
@@ -153,15 +198,15 @@ public final class ContextMenusInSessionArea extends ContextMenusInSarosView
     public boolean isFollowing() throws RemoteException {
         log.trace("checking if local user is following participant: "
             + participantJID.getBase());
+
         try {
             treeItem.select();
             return ContextMenuHelper.getContextMenu(tree, CM_STOP_FOLLOWING)
                 .isEnabled();
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
+        } catch (RuntimeException e) {
+            logError(log, e);
             return false;
         }
-
     }
 
     /**********************************************

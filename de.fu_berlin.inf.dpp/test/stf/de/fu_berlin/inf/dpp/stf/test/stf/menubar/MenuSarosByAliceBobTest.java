@@ -12,8 +12,10 @@ import static de.fu_berlin.inf.dpp.stf.shared.Constants.SHELL_SESSION_INVITATION
 import static de.fu_berlin.inf.dpp.stf.shared.Constants.SHELL_SHARE_PROJECT;
 
 import java.rmi.RemoteException;
+import java.util.regex.Pattern;
 
 import org.junit.After;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -30,11 +32,15 @@ public class MenuSarosByAliceBobTest extends StfTestCase {
         select(ALICE, BOB);
     }
 
+    @Before
+    public void beforeEveryTest() throws RemoteException {
+        clearWorkspaces();
+        resetWorkbenches();
+    }
+
     @After
     public void afterEveryTest() throws RemoteException {
         leaveSessionHostFirst(ALICE);
-        clearWorkspaces();
-        resetWorkbenches();
     }
 
     @Test
@@ -57,7 +63,9 @@ public class MenuSarosByAliceBobTest extends StfTestCase {
         shell.bot().tree().selectTreeItem(Constants.PROJECT1).check();
         shell.bot().button(NEXT).click();
         shell.bot().sleep(1000);
-        shell.bot().tree().selectTreeItem(BOB.getBaseJid()).check();
+        shell.bot().tree()
+            .selectTreeItemWithRegex(Pattern.quote(BOB.getBaseJid()) + ".*")
+            .check();
         shell.bot().button(FINISH).click();
 
         BOB.remoteBot().waitUntilShellIsOpen(SHELL_SESSION_INVITATION);

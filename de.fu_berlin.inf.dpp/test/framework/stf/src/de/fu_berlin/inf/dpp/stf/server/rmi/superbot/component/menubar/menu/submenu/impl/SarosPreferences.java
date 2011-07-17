@@ -143,7 +143,7 @@ public final class SarosPreferences extends StfRemoteObject implements
         shell.bot().waitUntil(SarosConditions.isShellClosed(shell));
     }
 
-    public void deleteAllNoActiveAccounts() throws RemoteException {
+    public void deleteAllNonActiveAccounts() throws RemoteException {
 
         SWTBotShell shell = preCondition();
         shell.activate();
@@ -303,6 +303,23 @@ public final class SarosPreferences extends StfRemoteObject implements
         } catch (Exception e) {
             log.error(e.getMessage(), e);
             return false;
+        }
+    }
+
+    public JID getActiveAccount() throws RemoteException {
+
+        SWTBotShell shell = preCondition();
+        shell.bot().sleep(REFRESH_TIME_FOR_ACCOUNT_LIST);
+
+        try {
+            String activeAccount = shell.bot()
+                .labelInGroup(GROUP_TITLE_XMPP_JABBER_ACCOUNTS).getText();
+
+            return new JID(activeAccount.substring("Active:".length()).trim());
+
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            return null;
         }
     }
 

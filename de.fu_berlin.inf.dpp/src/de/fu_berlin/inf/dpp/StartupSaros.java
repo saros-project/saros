@@ -14,14 +14,7 @@ import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.accountManagement.XMPPAccountStore;
 import de.fu_berlin.inf.dpp.annotations.Component;
-import de.fu_berlin.inf.dpp.editor.EditorManager;
-import de.fu_berlin.inf.dpp.feedback.ErrorLogManager;
-import de.fu_berlin.inf.dpp.feedback.FeedbackManager;
-import de.fu_berlin.inf.dpp.feedback.StatisticManager;
-import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
 import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
-import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
-import de.fu_berlin.inf.dpp.project.SarosSessionManager;
 import de.fu_berlin.inf.dpp.stf.server.STFController;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
 import de.fu_berlin.inf.dpp.ui.util.WizardUtils;
@@ -49,28 +42,7 @@ public class StartupSaros implements IStartup {
     protected SarosUI sarosUI;
 
     @Inject
-    protected StatisticManager statisticManager;
-
-    @Inject
-    protected ErrorLogManager errorLogManager;
-
-    @Inject
-    protected SarosSessionManager sessionManager;
-
-    @Inject
-    protected DataTransferManager dataTransferManager;
-
-    @Inject
-    protected PreferenceUtils preferenceUtils;
-
-    @Inject
-    protected EditorManager editorManager;
-
-    @Inject
     protected XMPPAccountStore xmppAccountStore;
-
-    @Inject
-    protected FeedbackManager feedbackManager;
 
     public StartupSaros() {
         SarosPluginContext.reinject(this);
@@ -82,17 +54,15 @@ public class StartupSaros implements IStartup {
             PreferenceConstants.SAROS_VERSION, "unknown");
 
         String portNumber = System.getProperty("de.fu_berlin.inf.dpp.testmode");
-        String sleepTime = System.getProperty("de.fu_berlin.inf.dpp.sleepTime");
+
         log.debug("de.fu_berlin.inf.dpp.testmode=" + portNumber);
 
         boolean testmode = portNumber != null;
 
         if (testmode) {
             int port = Integer.parseInt(portNumber);
-            int time = Integer.parseInt(sleepTime);
             log.info("entered testmode, start RMI bot listen on port " + port);
-            log.info("sleep time: " + sleepTime);
-            startRmiBot(port, time);
+            startRmiBot(port);
         }
 
         boolean assertEnabled = false;
@@ -115,17 +85,13 @@ public class StartupSaros implements IStartup {
         WizardUtils.openSarosConfigurationWizard();
     }
 
-    protected void startRmiBot(final int port, final int time) {
+    protected void startRmiBot(final int port) {
         log.info("start RMI Bot");
         Utils.runSafeAsync("RmiSWTWorkbenchBot-", log, new Runnable() {
             public void run() {
                 log.debug("Util.isSWT(): " + Utils.isSWT());
-                STFController.sleepTime = time;
                 try {
-                    STFController.exportedObjects(port, saros, sessionManager,
-                        dataTransferManager, editorManager, xmppAccountStore,
-                        feedbackManager);
-                    STFController.listRmiObjects();
+                    STFController.start(port, saros);
                 } catch (RemoteException e) {
                     log.error("remote:", e);
                 }

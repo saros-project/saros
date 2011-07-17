@@ -14,29 +14,73 @@ public interface IRemoteBotTree extends Remote {
      * 
      **********************************************/
 
-    // public STFBotMenu contextMenu(String text) throws RemoteException;
-
     public IRemoteBotMenu contextMenu(String... texts) throws RemoteException;
 
-    /**********************************************
+    /**
+     * Collapses the node matching the node information.
      * 
-     * actions
-     * 
-     **********************************************/
+     * @param nodeText
+     *            the text on the node.
+     * @return the Tree item that was expanded.
+     * @throws WidgetNotFoundException
+     *             if the node is not found.
+     */
 
     public IRemoteBotTreeItem collapseNode(String nodeText)
         throws RemoteException;
 
+    /**
+     * Expands the nodes as if the plus sign was clicked.
+     * 
+     * @param nodeText
+     *            the node to be expanded.
+     * @param recursive
+     *            if the expansion should be recursive.
+     * @return the tree item that was expanded.
+     * @throws WidgetNotFoundException
+     *             if the node is not found.
+     */
+
     public IRemoteBotTreeItem expandNode(String nodeText, boolean recursive)
         throws RemoteException;
+
+    /**
+     * Attempts to expand all nodes along the path specified by the node array
+     * parameter.
+     * 
+     * @param nodes
+     *            node path to expand
+     * @return the last Tree item that was expanded.
+     * @throws WidgetNotFoundException
+     *             if any of the nodes on the path do not exist
+     */
 
     public IRemoteBotTreeItem expandNode(String... nodes)
         throws RemoteException;
 
+    /**
+     * Select the indexes provided.
+     * 
+     * @param indices
+     *            the indices to select.
+     * @return this same instance.
+     */
     public IRemoteBotTree select(int... indices) throws RemoteException;
 
+    /**
+     * Selects the items matching the array list.
+     * 
+     * @param items
+     *            the items to select.
+     * @return this same instance.
+     */
     public IRemoteBotTree select(String... items) throws RemoteException;
 
+    /**
+     * Unselects the selection in the tree.
+     * 
+     * @return this same instance.
+     */
     public IRemoteBotTree unselect() throws RemoteException;
 
     public IRemoteBotTreeItem selectTreeItem(String... nodes)
@@ -70,21 +114,47 @@ public interface IRemoteBotTree extends Remote {
     public IRemoteBotTreeItem selectTreeItemAndWait(String... nodes)
         throws RemoteException;
 
+    /**
+     * Gets if this tree has items within it.
+     * 
+     * @return <code>true</code> if the tree has any items, <code>false</code>
+     *         otherwise.
+     * @since 1.0
+     */
     public boolean hasItems() throws RemoteException;
+
+    /**
+     * Gets the number of rows in the tree.
+     * 
+     * @return the number of rows in the tree
+     */
 
     public int rowCount() throws RemoteException;
 
+    /**
+     * Gets the current selection count.
+     * 
+     * @return the number of selected items.
+     */
+
     public int selectionCount() throws RemoteException;
+
+    /**
+     * Gets the column count of this tree.
+     * 
+     * @return the number of columns in the tree
+     */
 
     public int columnCount() throws RemoteException;
 
+    /**
+     * Gets the columns of this tree.
+     * 
+     * @return the list of columns in the tree.
+     */
+
     public List<String> columns() throws RemoteException;
 
-    /**********************************************
-     * 
-     * states
-     * 
-     **********************************************/
     /**
      * This method is suitable for shell widget.
      * 

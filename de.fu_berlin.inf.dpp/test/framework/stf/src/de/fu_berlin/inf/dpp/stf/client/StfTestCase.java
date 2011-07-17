@@ -284,7 +284,7 @@ public abstract class StfTestCase {
             }
 
             tester.superBot().menuBar().saros().preferences()
-                .deleteAllNoActiveAccounts();
+                .deleteAllNonActiveAccounts();
 
         }
     }

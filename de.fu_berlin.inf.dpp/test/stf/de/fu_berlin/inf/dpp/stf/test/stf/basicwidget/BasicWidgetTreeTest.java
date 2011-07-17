@@ -10,7 +10,6 @@ import static de.fu_berlin.inf.dpp.stf.shared.Constants.MENU_OTHER;
 import static de.fu_berlin.inf.dpp.stf.shared.Constants.MENU_PACKAGE;
 import static de.fu_berlin.inf.dpp.stf.shared.Constants.MENU_PREFERENCES;
 import static de.fu_berlin.inf.dpp.stf.shared.Constants.MENU_SAROS;
-import static de.fu_berlin.inf.dpp.stf.shared.Constants.MENU_SAVE;
 import static de.fu_berlin.inf.dpp.stf.shared.Constants.MENU_SHOW_VIEW;
 import static de.fu_berlin.inf.dpp.stf.shared.Constants.MENU_WINDOW;
 import static de.fu_berlin.inf.dpp.stf.shared.Constants.NODE_ANNOTATIONS;
@@ -33,6 +32,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.rmi.RemoteException;
+import java.util.regex.Pattern;
 
 import org.junit.After;
 import org.junit.Before;
@@ -215,6 +215,7 @@ public class BasicWidgetTreeTest extends StfTestCase {
     public void selectTreeItemWithRegexs() throws RemoteException {
         ALICE.superBot().views().packageExplorerView().tree().newC()
             .javaProject(Constants.SVN_PROJECT_COPY);
+
         ALICE
             .superBot()
             .views()
@@ -225,52 +226,16 @@ public class BasicWidgetTreeTest extends StfTestCase {
                 Constants.SVN_PROJECT_PATH);
 
         IRemoteBotView view = ALICE.remoteBot().view(VIEW_PACKAGE_EXPLORER);
+        ALICE.remoteBot().sleep(1000);
+
         view.show();
         view.bot()
             .tree()
-            .select(Constants.SVN_PROJECT_COPY, Constants.SVN_PKG,
-                Constants.SVN_CLS1);
-    }
-
-    @Test
-    public void selectTreeItemWithRegexsInView() throws RemoteException {
-        ALICE.superBot().views().packageExplorerView().tree().newC()
-            .javaProject(Constants.SVN_PROJECT_COPY);
-        ALICE
-            .superBot()
-            .views()
-            .packageExplorerView()
-            .selectProject(Constants.SVN_PROJECT_COPY)
-            .team()
-            .shareProjectUsingSpecifiedFolderName(Constants.SVN_REPOSITORY_URL,
-                Constants.SVN_PROJECT_PATH);
-        ALICE.remoteBot().view(VIEW_PACKAGE_EXPLORER).show();
-        ALICE
-            .superBot()
-            .views()
-            .packageExplorerView()
-            .selectClass(Constants.SVN_PROJECT_COPY, Constants.SVN_PKG,
-                Constants.SVN_CLS1).open();
-
-        ALICE.remoteBot().editor(Constants.SVN_CLS1_SUFFIX)
-            .setTextFromFile(Constants.CP1);
-        assertTrue(ALICE.remoteBot().editor(Constants.SVN_CLS1_SUFFIX)
-            .isDirty());
-        ALICE.remoteBot().view(VIEW_PACKAGE_EXPLORER)
-            .toolbarButtonWithRegex(TB_COLLAPSE_ALL + ".*").click();
-
-        ALICE
-            .remoteBot()
-            .view(VIEW_PACKAGE_EXPLORER)
-            .bot()
-            .tree()
             .selectTreeItemWithRegex(
-                Util.changeToRegex(Util.getClassNodes(
-                    Constants.SVN_PROJECT_COPY, Constants.SVN_PKG,
-                    Constants.SVN_CLS1)));
-        ALICE.remoteBot().menu(MENU_FILE).menu(MENU_SAVE).click();
-        assertFalse(ALICE.remoteBot().editor(Constants.SVN_CLS1_SUFFIX)
-            .isDirty());
+                Pattern.quote(Constants.SVN_PROJECT_COPY) + ".*",
+                Pattern.quote(SRC) + ".*",
+                Pattern.quote(Constants.SVN_PKG) + ".*",
+                Pattern.quote(Constants.SVN_CLS1) + ".*");
     }
 
     @Test

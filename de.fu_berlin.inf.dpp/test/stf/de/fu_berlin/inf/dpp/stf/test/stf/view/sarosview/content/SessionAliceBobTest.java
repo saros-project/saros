@@ -196,6 +196,7 @@ public class SessionAliceBobTest extends StfTestCase {
             .open();
         BOB.remoteBot().editor(Constants.CLS1_SUFFIX)
             .setTextFromFile(Constants.CP1);
+        BOB.remoteBot().editor(Constants.CLS1_SUFFIX).save();
         String editorTextOfBob = BOB.remoteBot().editor(Constants.CLS1_SUFFIX)
             .getText();
         assertFalse(editorTextOfAlice.equals(editorTextOfBob));

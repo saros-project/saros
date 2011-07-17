@@ -2,6 +2,7 @@ package de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.contextmenu.saros
 
 import java.rmi.RemoteException;
 
+import org.apache.log4j.Logger;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 
@@ -42,4 +43,18 @@ public abstract class ContextMenusInSarosView extends StfRemoteObject implements
         ContextMenuHelper.clickContextMenu(tree, CM_STOP_SAROS_SESSION);
         SuperBot.getInstance().confirmShellLeavingClosingSession();
     }
+
+    protected final void logError(Logger log, Throwable t) {
+        String treeItemText = null;
+        String treeText = null;
+        try {
+            treeText = tree.getText();
+            treeItemText = treeItem.getText();
+        } catch (RuntimeException e) {
+            log.error(e.getMessage(), e);
+        }
+        log.error(t.getMessage() + "@ tree: " + treeText + ", tree item: "
+            + treeItemText, t);
+    }
+
 }

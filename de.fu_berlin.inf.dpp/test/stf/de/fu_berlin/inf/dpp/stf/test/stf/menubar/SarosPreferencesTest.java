@@ -13,6 +13,7 @@ import static de.fu_berlin.inf.dpp.stf.shared.Constants.LABEL_XMPP_JABBER_SERVER
 import static de.fu_berlin.inf.dpp.stf.shared.Constants.MENU_CREATE_ACCOUNT;
 import static de.fu_berlin.inf.dpp.stf.shared.Constants.MENU_SAROS;
 import static de.fu_berlin.inf.dpp.stf.shared.Constants.SHELL_CREATE_XMPP_JABBER_ACCOUNT;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
@@ -76,18 +77,16 @@ public class SarosPreferencesTest extends StfTestCase {
         shell.bot().comboBoxWithLabel(LABEL_XMPP_JABBER_SERVER)
             .setText(Constants.SERVER);
         shell.bot().textWithLabel(LABEL_USER_NAME)
-            .setText(Constants.REGISTERED_USER_NAME);
-        shell.bot().textWithLabel(LABEL_PASSWORD).setText(Constants.PASSWORD);
+            .setText(ALICE.getJID().getName());
+        shell.bot().textWithLabel(LABEL_PASSWORD).setText(ALICE.getPassword());
         shell.bot().textWithLabel(LABEL_REPEAT_PASSWORD)
-            .setText(Constants.PASSWORD);
-        shell.bot().button(FINISH).click();
-
-        // wait a minute,so that bot can get the error message.
-        shell.bot().button(FINISH).waitUntilIsEnabled();
-        assertTrue(shell.isActive());
-        String errorMessage = shell.getErrorMessage();
-        assertTrue(errorMessage.matches(ERROR_MESSAGE_ACCOUNT_ALREADY_EXISTS));
-        shell.confirm(CANCEL);
+            .setText(ALICE.getPassword());
+        shell.bot().sleep(1000);
+        assertFalse("could create a duplicated account",
+            shell.bot().button(FINISH).isEnabled());
+        assertEquals(ERROR_MESSAGE_ACCOUNT_ALREADY_EXISTS,
+            shell.getErrorMessage());
+        shell.bot().button(CANCEL).click();
         shell.waitShortUntilIsClosed();
     }
 
@@ -109,8 +108,7 @@ public class SarosPreferencesTest extends StfTestCase {
             .setText(Constants.SERVER);
         shell.bot().textWithLabel(LABEL_USER_NAME)
             .setText(Constants.NEW_XMPP_JABBER_ID);
-        shell.bot().textWithLabel(LABEL_PASSWORD)
-            .setText(Constants.PASSWORD);
+        shell.bot().textWithLabel(LABEL_PASSWORD).setText(Constants.PASSWORD);
         shell.bot().textWithLabel(LABEL_REPEAT_PASSWORD)
             .setText(Constants.NO_MATCHED_REPEAT_PASSWORD);
 

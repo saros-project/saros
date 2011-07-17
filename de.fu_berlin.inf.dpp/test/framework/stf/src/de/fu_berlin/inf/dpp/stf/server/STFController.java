@@ -15,11 +15,6 @@ import org.picocontainer.MutablePicoContainer;
 
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.SarosContext;
-import de.fu_berlin.inf.dpp.accountManagement.XMPPAccountStore;
-import de.fu_berlin.inf.dpp.editor.EditorManager;
-import de.fu_berlin.inf.dpp.feedback.FeedbackManager;
-import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
-import de.fu_berlin.inf.dpp.project.SarosSessionManager;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.impl.RemoteWorkbenchBot;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.impl.RemoteBotButton;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.impl.RemoteBotCCombo;
@@ -79,8 +74,6 @@ public class STFController {
     private static final transient Logger log = Logger
         .getLogger(STFController.class);
 
-    public static int sleepTime = 750;
-
     /** The RMI registry used, is not exported */
     private static transient Registry registry;
 
@@ -91,11 +84,7 @@ public class STFController {
      * solution is keeping a static references "classVariable" to the object in
      * the object in the server JVM.
      */
-    public static void exportedObjects(int port, Saros saros,
-        SarosSessionManager sessionManager,
-        DataTransferManager dataTransferManager, EditorManager editorManager,
-        XMPPAccountStore xmppAccountStore, FeedbackManager feedbackManager)
-        throws RemoteException {
+    public static void start(int port, Saros saros) throws RemoteException {
 
         MutablePicoContainer container = null;
         try {
@@ -203,6 +192,16 @@ public class STFController {
         exportObject(MenuBar.getInstance(), "menuBar");
 
         exportObject(InternalImpl.getInstance(), "internal");
+
+        try {
+            for (String s : registry.list())
+                log.debug("registered Object: " + s);
+        } catch (AccessException e) {
+            log.error("failed on access", e);
+        } catch (RemoteException e) {
+            log.error("failed", e);
+        }
+
     }
 
     /**
@@ -241,16 +240,5 @@ public class STFController {
                 + ", because it is bound already.", e);
         }
         return null;
-    }
-
-    public static void listRmiObjects() {
-        try {
-            for (String s : registry.list())
-                log.debug("registered Object: " + s);
-        } catch (AccessException e) {
-            log.error("failed on access", e);
-        } catch (RemoteException e) {
-            log.error("failed", e);
-        }
     }
 }
