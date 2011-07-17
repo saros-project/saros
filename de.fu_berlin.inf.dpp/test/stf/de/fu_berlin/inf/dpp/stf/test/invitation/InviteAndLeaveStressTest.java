@@ -31,12 +31,12 @@ public class InviteAndLeaveStressTest extends StfTestCase {
     @Test
     public void testAliceAlwaysLeavesSessionFirst() throws Exception {
 
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < 100; i++) {
             Util.buildSessionSequentially("foo",
                 TypeOfCreateProject.NEW_PROJECT, ALICE, BOB);
 
-            BOB.superBot().views().packageExplorerView()
-                .waitUntilClassExists("foo", "bar", "HelloWorld");
+            // BOB.superBot().views().packageExplorerView()
+            // .waitUntilClassExists("foo", "bar", "HelloWorld");
 
             leaveSessionHostFirst(ALICE);
 

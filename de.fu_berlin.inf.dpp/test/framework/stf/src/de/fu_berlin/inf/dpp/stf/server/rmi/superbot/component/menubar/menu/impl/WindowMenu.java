@@ -22,16 +22,6 @@ public final class WindowMenu extends StfRemoteObject implements IWindowMenu {
         return INSTANCE;
     }
 
-    /**************************************************************
-     * 
-     * exported functions
-     * 
-     **************************************************************/
-    /**********************************************
-     * 
-     * actions
-     * 
-     **********************************************/
     public void setNewTextFileLineDelimiter(String OS) throws RemoteException {
         clickMenuPreferences();
         IRemoteBotShell shell = RemoteWorkbenchBot.getInstance().shell(
@@ -115,11 +105,6 @@ public final class WindowMenu extends StfRemoteObject implements IWindowMenu {
             ID_DEBUG_PERSPECTIVE);
     }
 
-    /**********************************************
-     * 
-     * states
-     * 
-     **********************************************/
     public String getTextFileLineDelimiter() throws RemoteException {
         clickMenuPreferences();
         IRemoteBotShell shell = RemoteWorkbenchBot.getInstance().shell(

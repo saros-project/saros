@@ -28,18 +28,6 @@ public final class ProgressView extends StfRemoteObject implements
         return this;
     }
 
-    /**************************************************************
-     * 
-     * exported functions
-     * 
-     **************************************************************/
-
-    /**********************************************
-     * 
-     * actions
-     * 
-     **********************************************/
-
     public void removeProgress() throws RemoteException {
         view.bot().toolbarButton().click();
 
@@ -61,11 +49,6 @@ public final class ProgressView extends StfRemoteObject implements
         }
     }
 
-    /**********************************************
-     * 
-     * waits until
-     * 
-     **********************************************/
     public void waitUntilNotExistsProgress() throws RemoteException {
         RemoteWorkbenchBot.getInstance().waitUntil(new DefaultCondition() {
             public boolean test() throws Exception {

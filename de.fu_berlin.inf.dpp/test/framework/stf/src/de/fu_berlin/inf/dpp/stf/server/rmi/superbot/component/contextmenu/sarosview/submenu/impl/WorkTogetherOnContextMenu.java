@@ -31,18 +31,6 @@ public final class WorkTogetherOnContextMenu extends StfRemoteObject implements
         this.treeItem = treeItem;
     }
 
-    /**************************************************************
-     * 
-     * exported functions
-     * 
-     **************************************************************/
-
-    /**********************************************
-     * 
-     * actions
-     * 
-     **********************************************/
-
     public void multipleProjects(String projectName, JID... baseJIDOfInvitees)
         throws RemoteException {
         treeItem.select();

@@ -32,18 +32,6 @@ public class RemoteBotEditor extends StfRemoteObject implements
         this.widget = editor;
     }
 
-    /***********************************************************************
-     * 
-     * exported functions
-     * 
-     ***********************************************************************/
-
-    /**********************************************
-     * 
-     * actions
-     * 
-     **********************************************/
-
     public void show() throws RemoteException {
         widget.show();
     }
@@ -233,12 +221,6 @@ public class RemoteBotEditor extends StfRemoteObject implements
     public boolean isActive() throws RemoteException {
         return widget.isActive();
     }
-
-    /**********************************************
-     * 
-     * waits until
-     * 
-     **********************************************/
 
     public void waitUntilIsActive() throws RemoteException {
         RemoteWorkbenchBot.getInstance().waitUntil(new DefaultCondition() {

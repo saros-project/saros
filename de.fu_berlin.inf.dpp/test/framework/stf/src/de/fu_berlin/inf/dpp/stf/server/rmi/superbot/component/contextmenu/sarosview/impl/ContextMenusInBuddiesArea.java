@@ -22,18 +22,6 @@ public final class ContextMenusInBuddiesArea extends ContextMenusInSarosView
         return INSTANCE;
     }
 
-    /**************************************************************
-     * 
-     * exported functions
-     * 
-     **************************************************************/
-
-    /**********************************************
-     * 
-     * contextMenus showed in buddies-area
-     * 
-     **********************************************/
-
     public void delete() throws RemoteException {
         treeItem.select();
         ContextMenuHelper.clickContextMenu(tree, CM_DELETE);

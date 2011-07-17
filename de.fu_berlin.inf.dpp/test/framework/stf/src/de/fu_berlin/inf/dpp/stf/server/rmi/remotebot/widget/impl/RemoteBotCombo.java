@@ -24,18 +24,6 @@ public final class RemoteBotCombo extends StfRemoteObject implements
         return this;
     }
 
-    /**************************************************************
-     * 
-     * exported functions
-     * 
-     **************************************************************/
-
-    /**********************************************
-     * 
-     * finders
-     * 
-     **********************************************/
-
     /**
      * @see SWTBotCombo#contextMenu(String)
      */
@@ -90,12 +78,6 @@ public final class RemoteBotCombo extends StfRemoteObject implements
     public void setSelection(int index) throws RemoteException {
         widget.setSelection(index);
     }
-
-    /**********************************************
-     * 
-     * states
-     * 
-     **********************************************/
 
     /**
      * @see SWTBotCombo#itemCount()

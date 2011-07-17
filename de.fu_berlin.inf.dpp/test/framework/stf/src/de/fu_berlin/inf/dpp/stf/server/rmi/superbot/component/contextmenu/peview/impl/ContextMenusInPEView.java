@@ -53,12 +53,6 @@ public final class ContextMenusInPEView extends StfRemoteObject implements
         this.tree = tree;
     }
 
-    /**************************************************************
-     * 
-     * exported functions
-     * 
-     **************************************************************/
-
     public IShareWithC shareWith() throws RemoteException {
         ShareWithC.getInstance().setTree(tree);
         ShareWithC.getInstance().setTreeItem(treeItem);

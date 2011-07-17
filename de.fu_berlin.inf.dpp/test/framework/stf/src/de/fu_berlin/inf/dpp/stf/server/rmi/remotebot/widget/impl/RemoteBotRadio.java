@@ -27,23 +27,12 @@ public final class RemoteBotRadio extends StfRemoteObject implements
 
     }
 
-    /**************************************************************
-     * 
-     * exported functions
-     * 
-     **************************************************************/
-
     public IRemoteBotMenu contextMenu(String text) throws RemoteException {
         return RemoteBotMenu.getInstance().setWidget(
             swtBotRadio.contextMenu(text));
 
     }
 
-    /**********************************************
-     * 
-     * actions
-     * 
-     **********************************************/
     public void click() throws RemoteException {
         swtBotRadio.click();
     }
@@ -57,11 +46,6 @@ public final class RemoteBotRadio extends StfRemoteObject implements
         swtBotRadio.setFocus();
     }
 
-    /**********************************************
-     * 
-     * states
-     * 
-     **********************************************/
     public boolean isEnabled() throws RemoteException {
         return swtBotRadio.isEnabled();
     }
@@ -86,11 +70,6 @@ public final class RemoteBotRadio extends StfRemoteObject implements
         return swtBotRadio.isSelected();
     }
 
-    /**********************************************
-     * 
-     * waits until
-     * 
-     **********************************************/
     public void waitUntilIsEnabled() throws RemoteException {
         RemoteWorkbenchBot.getInstance().waitUntil(
             Conditions.widgetIsEnabled(swtBotRadio));

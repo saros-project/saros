@@ -25,17 +25,6 @@ public final class RemoteBotToggleButton extends StfRemoteObject implements
         return this;
     }
 
-    /**************************************************************
-     * 
-     * exported functions
-     * 
-     **************************************************************/
-
-    /**********************************************
-     * 
-     * actions
-     * 
-     **********************************************/
     public void click() throws RemoteException {
         widget.click();
     }
@@ -52,12 +41,6 @@ public final class RemoteBotToggleButton extends StfRemoteObject implements
     public void setFocus() throws RemoteException {
         widget.setFocus();
     }
-
-    /**********************************************
-     * 
-     * states
-     * 
-     **********************************************/
 
     public boolean isPressed() throws RemoteException {
         return widget.isPressed();
@@ -83,11 +66,6 @@ public final class RemoteBotToggleButton extends StfRemoteObject implements
         return widget.getText();
     }
 
-    /**********************************************
-     * 
-     * waits until
-     * 
-     **********************************************/
     public void waitUntilIsEnabled() throws RemoteException {
         RemoteWorkbenchBot.getInstance().waitUntil(
             Conditions.widgetIsEnabled(widget));

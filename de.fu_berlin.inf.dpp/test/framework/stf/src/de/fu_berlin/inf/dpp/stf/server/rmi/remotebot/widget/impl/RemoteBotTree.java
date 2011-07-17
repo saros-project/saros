@@ -44,28 +44,10 @@ public final class RemoteBotTree extends StfRemoteObject implements
         return this;
     }
 
-    /**************************************************************
-     * 
-     * exported functions
-     * 
-     **************************************************************/
-
-    /**********************************************
-     * 
-     * finders
-     * 
-     **********************************************/
-
     public IRemoteBotMenu contextMenu(String... texts) throws RemoteException {
         return RemoteBotMenu.getInstance().setWidget(
             ContextMenuHelper.getContextMenu(widget, texts));
     }
-
-    /**********************************************
-     * 
-     * actions
-     * 
-     **********************************************/
 
     public IRemoteBotTreeItem collapseNode(String nodeText)
         throws RemoteException {

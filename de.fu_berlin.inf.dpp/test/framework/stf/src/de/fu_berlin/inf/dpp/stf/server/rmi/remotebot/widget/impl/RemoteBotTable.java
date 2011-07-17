@@ -33,18 +33,6 @@ public final class RemoteBotTable extends StfRemoteObject implements
         return this;
     }
 
-    /**************************************************************
-     * 
-     * exported functions
-     * 
-     **************************************************************/
-
-    /**********************************************
-     * 
-     * finder
-     * 
-     **********************************************/
-
     public IRemoteBotMenu contextMenu(String text) throws RemoteException {
         return RemoteBotMenu.getInstance().setWidget(widget.contextMenu(text));
     }
@@ -74,12 +62,6 @@ public final class RemoteBotTable extends StfRemoteObject implements
             widget.getTableItem(row));
     }
 
-    /**********************************************
-     * 
-     * states
-     * 
-     **********************************************/
-
     public List<String> getTableColumns() throws RemoteException {
         return widget.columns();
     }
@@ -87,12 +69,6 @@ public final class RemoteBotTable extends StfRemoteObject implements
     public boolean containsItem(String item) throws RemoteException {
         return widget.containsItem(item);
     }
-
-    /**********************************************
-     * 
-     * actions
-     * 
-     **********************************************/
 
     public void select(String... items) throws RemoteException {
         widget.select(items);
@@ -122,11 +98,6 @@ public final class RemoteBotTable extends StfRemoteObject implements
         widget.setFocus();
     }
 
-    /**********************************************
-     * 
-     * states
-     * 
-     **********************************************/
     public int indexOfColumn(String column) throws RemoteException {
         return widget.indexOfColumn(column);
     }
@@ -185,11 +156,6 @@ public final class RemoteBotTable extends StfRemoteObject implements
         return widget.getText();
     }
 
-    /**********************************************
-     * 
-     * waits until
-     * 
-     **********************************************/
     public void waitUntilIsEnabled() throws RemoteException {
         RemoteWorkbenchBot.getInstance().waitUntil(
             Conditions.widgetIsEnabled(widget));

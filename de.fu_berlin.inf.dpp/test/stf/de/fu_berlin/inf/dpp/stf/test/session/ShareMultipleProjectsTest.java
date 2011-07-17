@@ -3,8 +3,14 @@ package de.fu_berlin.inf.dpp.stf.test.session;
 import static de.fu_berlin.inf.dpp.stf.client.tester.SarosTester.ALICE;
 import static de.fu_berlin.inf.dpp.stf.client.tester.SarosTester.BOB;
 import static de.fu_berlin.inf.dpp.stf.client.tester.SarosTester.CARL;
+import static de.fu_berlin.inf.dpp.stf.shared.Constants.ADD_PROJECTS;
+import static de.fu_berlin.inf.dpp.stf.shared.Constants.CANCEL;
+import static de.fu_berlin.inf.dpp.stf.shared.Constants.MENU_SAROS;
+import static de.fu_berlin.inf.dpp.stf.shared.Constants.SHELL_ADD_PROJECTS_TO_SESSION;
+import static org.junit.Assert.assertFalse;
 
 import java.rmi.RemoteException;
+import java.util.List;
 
 import org.junit.After;
 import org.junit.Before;
@@ -13,6 +19,7 @@ import org.junit.Test;
 
 import de.fu_berlin.inf.dpp.stf.client.StfTestCase;
 import de.fu_berlin.inf.dpp.stf.client.util.Util;
+import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotShell;
 import de.fu_berlin.inf.dpp.stf.shared.Constants.TypeOfCreateProject;
 
 public class ShareMultipleProjectsTest extends StfTestCase {
@@ -25,6 +32,7 @@ public class ShareMultipleProjectsTest extends StfTestCase {
     @Before
     public void beforeEveryTest() throws RemoteException {
 
+        clearWorkspaces();
         ALICE.superBot().views().packageExplorerView().tree().newC()
             .javaProjectWithClasses("foo", "bar", "HelloAlice");
 
@@ -37,9 +45,7 @@ public class ShareMultipleProjectsTest extends StfTestCase {
 
     @After
     public void afterEveryTest() throws RemoteException {
-
         leaveSessionHostFirst(ALICE);
-        clearWorkspaces();
     }
 
     @Test
@@ -76,19 +82,28 @@ public class ShareMultipleProjectsTest extends StfTestCase {
     }
 
     @Test
-    public void testShareSameDocumentManyTimesDuringSynchronizing()
-        throws RemoteException {
+    public void testShareSameProjectTwice() throws RemoteException {
 
         Util.buildSessionConcurrently("foo", TypeOfCreateProject.NEW_PROJECT,
             ALICE, BOB, CARL);
 
-        for (int i = 0; i < 10; i++)
-            Util.addProjectToSessionSequentially("foo2",
-                TypeOfCreateProject.NEW_PROJECT, ALICE, BOB, CARL);
+        ALICE.remoteBot().activateWorkbench();
+        ALICE.remoteBot().menu(MENU_SAROS).menu(ADD_PROJECTS).click();
 
-        Util.addProjectToSessionSequentially("foo1",
-            TypeOfCreateProject.NEW_PROJECT, ALICE, BOB, CARL);
+        IRemoteBotShell shell = ALICE.remoteBot().shell(
+            SHELL_ADD_PROJECTS_TO_SESSION);
+        shell.activate();
+        shell.bot().sleep(1000);
 
+        List<String> items = shell.bot().tree().getTextOfItems();
+
+        shell.bot().button(CANCEL).click();
+        shell.bot().sleep(1000);
+        shell.waitShortUntilIsClosed();
+
+        for (String item : items)
+            assertFalse("project foo is still marked as shareable",
+                item.equals("foo"));
     }
 
 }

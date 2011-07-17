@@ -24,21 +24,9 @@ public final class RemoteBotList extends StfRemoteObject implements
         return this;
     }
 
-    /**************************************************************
-     * 
-     * exported functions
-     * 
-     **************************************************************/
-
     public IRemoteBotMenu contextMenu(String text) throws RemoteException {
         return RemoteBotMenu.getInstance().setWidget(widget.contextMenu(text));
     }
-
-    /**********************************************
-     * 
-     * actions
-     * 
-     **********************************************/
 
     public void select(String item) throws RemoteException {
         widget.select(item);
@@ -68,11 +56,6 @@ public final class RemoteBotList extends StfRemoteObject implements
         widget.setFocus();
     }
 
-    /**********************************************
-     * 
-     * states
-     * 
-     **********************************************/
     public String itemAt(int index) throws RemoteException {
         return widget.itemAt(index);
     }

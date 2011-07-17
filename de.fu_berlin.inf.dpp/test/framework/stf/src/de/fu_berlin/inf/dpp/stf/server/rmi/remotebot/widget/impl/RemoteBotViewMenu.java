@@ -24,26 +24,9 @@ public final class RemoteBotViewMenu extends StfRemoteObject implements
 
     }
 
-    /**************************************************************
-     * 
-     * exported functions
-     * 
-     **************************************************************/
-
-    /**********************************************
-     * 
-     * actions
-     * 
-     **********************************************/
     public void click() throws RemoteException {
         widget.click();
     }
-
-    /**********************************************
-     * 
-     * states
-     * 
-     **********************************************/
 
     public String getToolTipText() throws RemoteException {
         return widget.getText();

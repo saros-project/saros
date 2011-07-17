@@ -29,17 +29,6 @@ public final class ContextMenusInSessionArea extends ContextMenusInSarosView
         this.participantJID = jid;
     }
 
-    /**************************************************************
-     * 
-     * exported functions
-     * 
-     **************************************************************/
-
-    /**********************************************
-     * 
-     * contextMenus showed in session-area
-     * 
-     **********************************************/
     public void grantWriteAccess() throws RemoteException {
         log.trace("granting write access to: " + participantJID.getBase());
         if (hasWriteAccess()) {
@@ -160,12 +149,6 @@ public final class ContextMenusInSessionArea extends ContextMenusInSarosView
         SuperBot.getInstance().confirmShellShareProjects(projectName, jids);
     }
 
-    /**********************************************
-     * 
-     * States
-     * 
-     **********************************************/
-
     public boolean hasWriteAccess() throws RemoteException {
         log.trace("checking if participant '" + participantJID.getBase()
             + "' has write access");
@@ -201,19 +184,14 @@ public final class ContextMenusInSessionArea extends ContextMenusInSarosView
 
         try {
             treeItem.select();
-            return ContextMenuHelper.getContextMenu(tree, CM_STOP_FOLLOWING)
-                .isEnabled();
+            return ContextMenuHelper.existsContextMenu(tree, CM_STOP_FOLLOWING)
+                && ContextMenuHelper.isContextMenuEnabled(tree,
+                    CM_STOP_FOLLOWING);
         } catch (RuntimeException e) {
             logError(log, e);
             return false;
         }
     }
-
-    /**********************************************
-     * 
-     * Wait untils
-     * 
-     **********************************************/
 
     public void waitUntilHasWriteAccess() throws RemoteException {
         log.trace("waiting for participant '" + participantJID.getBase()

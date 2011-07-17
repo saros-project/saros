@@ -3,8 +3,6 @@ package de.fu_berlin.inf.dpp.stf.client.util;
 import static de.fu_berlin.inf.dpp.stf.shared.Constants.ACCEPT;
 import static de.fu_berlin.inf.dpp.stf.shared.Constants.NODE_SAROS;
 import static de.fu_berlin.inf.dpp.stf.shared.Constants.SHELL_SESSION_INVITATION;
-import static de.fu_berlin.inf.dpp.stf.shared.Constants.SRC;
-import static de.fu_berlin.inf.dpp.stf.shared.Constants.SUFFIX_JAVA;
 import static de.fu_berlin.inf.dpp.stf.shared.Constants.VIEW_SAROS;
 
 import java.rmi.RemoteException;
@@ -33,7 +31,7 @@ public class Util {
      * </ol>
      * 
      * @param tester
-     *            the remote tester e.g: Alice
+     *            the remote tester e.g ALICE
      **/
     public static void closeUnnecessaryViews(AbstractTester tester)
         throws RemoteException {
@@ -57,7 +55,7 @@ public class Util {
      * Opens the view <b>Saros</b>
      * 
      * @param tester
-     *            the remote tester e.g: Alice
+     *            the remote tester e.g. ALICE
      **/
 
     public static void openSarosView(AbstractTester tester)
@@ -70,16 +68,20 @@ public class Util {
 
     /**
      * A convenient function to quickly build a session which share a project
-     * and a file.
+     * and a file. The invitiees are invited concurrently.
      * 
+     * @NOTE there is no guarantee the the project and the file are already
+     *       shared after this method returns
      * @param projectName
      *            the name of the project
      * @param path
-     *            the path of the file e.g: foo/bar/readme.txt
+     *            the path of the file e.g. foo/bar/readme.txt
      * @param content
      *            the content of the file
      * @param inviter
+     *            e.g. ALICE
      * @param invitees
+     *            e.g. BOB, CARL
      * @throws RemoteException
      */
     public static void setUpSessionWithProjectAndFile(String projectName,
@@ -94,8 +96,10 @@ public class Util {
 
     /**
      * A convenient function to quickly build a session which share a java
-     * project with a class.
+     * project with a class. The invitiees are invited concurrently.
      * 
+     * @NOTE there is no guarantee the the project and the class are already
+     *       shared after this method returns
      * @param projectName
      *            the name of the project
      * @param packageName
@@ -103,7 +107,9 @@ public class Util {
      * @param className
      *            the name of the class without .java or .class suffix
      * @param inviter
+     *            e.g. ALICE
      * @param invitees
+     *            e.g. BOB, CARL
      * @throws RemoteException
      */
     public static void setUpSessionWithJavaProjectAndClass(String projectName,
@@ -142,14 +148,25 @@ public class Util {
         // buildSessionConcurrently(projectName,
         // TypeOfCreateProject.NEW_PROJECT,
         // inviter, invitees);
-
     }
 
-    public static void createProjectWithFile(String projectName,
-        String filePath, AbstractTester... testers) throws RemoteException {
+    /**
+     * Creates a project with an empty file for every tester in his workspace.
+     * 
+     * @param projectName
+     *            the name of the project
+     * @param path
+     *            the path of the file e.g. foo/bar/readme.txt
+     * @param testers
+     *            e.g. ALICE, CARL
+     * @throws RemoteException
+     */
+
+    public static void createProjectWithFile(String projectName, String path,
+        AbstractTester... testers) throws RemoteException {
         for (AbstractTester tester : testers) {
             tester.superBot().internal().createProject(projectName);
-            tester.superBot().internal().createFile(projectName, filePath, "");
+            tester.superBot().internal().createFile(projectName, path, "");
         }
     }
 
@@ -321,12 +338,6 @@ public class Util {
         Util.workAll(joinSessionTasks);
     }
 
-    /**********************************************
-     * 
-     * inner functions
-     * 
-     **********************************************/
-
     public static String[] getPeersBaseJID(AbstractTester... peers) {
         String[] peerBaseJIDs = new String[peers.length];
         for (int i = 0; i < peers.length; i++) {
@@ -374,11 +385,9 @@ public class Util {
      * @param buddiesFollowing
      *            the list of the buddies who are following the local user.
      * @throws RemoteException
-     * @throws InterruptedException
      */
     public static void resetFollowModeConcurrently(
-        AbstractTester... buddiesFollowing) throws RemoteException,
-        InterruptedException {
+        AbstractTester... buddiesFollowing) throws RemoteException {
         List<Callable<Void>> stopFollowTasks = new ArrayList<Callable<Void>>();
         for (int i = 0; i < buddiesFollowing.length; i++) {
             final AbstractTester tester = buddiesFollowing[i];
@@ -420,32 +429,8 @@ public class Util {
 
     public static String getClassPath(String projectName, String pkg,
         String className) {
-        return projectName + "/src/" + pkg.replaceAll("\\.", "/") + "/"
-            + className + ".java";
-    }
-
-    public static String changeToRegex(String text) {
-        // the name of project in SVN_control contains special characters, which
-        // should be filtered.
-        String[] names = text.split(" ");
-        if (names.length > 1) {
-            text = names[0];
-        }
-        return text + ".*";
-    }
-
-    public static String[] changeToRegex(String... texts) {
-        String[] matchTexts = new String[texts.length];
-        for (int i = 0; i < texts.length; i++) {
-            matchTexts[i] = texts[i] + "( .*)?";
-        }
-        return matchTexts;
-    }
-
-    public static String[] getClassNodes(String projectName, String pkg,
-        String className) {
-        String[] nodes = { projectName, SRC, pkg, className + SUFFIX_JAVA };
-        return nodes;
+        return projectName + "/src/" + pkg.replace('.', '/') + "/" + className
+            + ".java";
     }
 
     public static <T> List<T> workAll(List<Callable<T>> tasks) {

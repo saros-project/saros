@@ -38,28 +38,10 @@ public final class RemoteBotTreeItem extends StfRemoteObject implements
         this.swtBotTree = tree;
     }
 
-    /**************************************************************
-     * 
-     * exported functions
-     * 
-     **************************************************************/
-
-    /**********************************************
-     * 
-     * finder
-     * 
-     **********************************************/
-
     public IRemoteBotMenu contextMenus(String... texts) throws RemoteException {
         return RemoteBotMenu.getInstance().setWidget(
             ContextMenuHelper.getContextMenu(swtBotTree, texts));
     }
-
-    /**********************************************
-     * 
-     * actions
-     * 
-     **********************************************/
 
     public void toggleCheck() throws RemoteException {
         widget.toggleCheck();
@@ -115,11 +97,6 @@ public final class RemoteBotTreeItem extends StfRemoteObject implements
         widget.setFocus();
     }
 
-    /**********************************************
-     * 
-     * states
-     * 
-     **********************************************/
     public boolean isSelected() throws RemoteException {
         return widget.isSelected();
     }
@@ -211,12 +188,6 @@ public final class RemoteBotTreeItem extends StfRemoteObject implements
     public String getToolTipText() throws RemoteException {
         return widget.getText();
     }
-
-    /**********************************************
-     * 
-     * wait until
-     * 
-     **********************************************/
 
     public void waitUntilSubItemExists(final String subItemText)
         throws RemoteException {

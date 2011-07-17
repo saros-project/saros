@@ -24,36 +24,13 @@ public final class RemoteBotLabel extends StfRemoteObject implements
         return this;
     }
 
-    /**************************************************************
-     * 
-     * exported functions
-     * 
-     **************************************************************/
-
-    /**********************************************
-     * 
-     * finders
-     * 
-     **********************************************/
     public IRemoteBotMenu contextMenu(String text) throws RemoteException {
         return RemoteBotMenu.getInstance().setWidget(widget.contextMenu(text));
     }
 
-    /**********************************************
-     * 
-     * actions
-     * 
-     **********************************************/
-
     public void setFocus() throws RemoteException {
         widget.setFocus();
     }
-
-    /**********************************************
-     * 
-     * states
-     * 
-     **********************************************/
 
     public int alignment() throws RemoteException {
         return widget.alignment();

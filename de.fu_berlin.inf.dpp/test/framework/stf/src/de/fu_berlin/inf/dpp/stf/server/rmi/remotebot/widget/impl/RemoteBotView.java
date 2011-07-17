@@ -40,17 +40,6 @@ public final class RemoteBotView extends StfRemoteObject implements
         return this;
     }
 
-    /**************************************************************
-     * 
-     * exported functions
-     * 
-     **************************************************************/
-
-    /**********************************************
-     * 
-     * Finders
-     * 
-     **********************************************/
     public IRemoteBot bot() {
         RemoteWorkbenchBot.getInstance().setBot(widget.bot());
         return RemoteWorkbenchBot.getInstance();
@@ -124,12 +113,6 @@ public final class RemoteBotView extends StfRemoteObject implements
             toolbarButton);
     }
 
-    /**********************************************
-     * 
-     * actions
-     * 
-     **********************************************/
-
     public void close() throws RemoteException {
         widget.close();
     }
@@ -141,12 +124,6 @@ public final class RemoteBotView extends StfRemoteObject implements
     public void setFocus() throws RemoteException {
         widget.setFocus();
     }
-
-    /**********************************************
-     * 
-     * states
-     * 
-     **********************************************/
 
     public List<String> getToolTipOfAllToolbarbuttons() throws RemoteException {
         List<String> tooltips = new ArrayList<String>();
@@ -176,11 +153,6 @@ public final class RemoteBotView extends StfRemoteObject implements
         return toolbarButtons;
     }
 
-    /**********************************************
-     * 
-     * waits until
-     * 
-     **********************************************/
     public void waitUntilIsActive() throws RemoteException {
 
         RemoteWorkbenchBot.getInstance().waitUntil(new DefaultCondition() {

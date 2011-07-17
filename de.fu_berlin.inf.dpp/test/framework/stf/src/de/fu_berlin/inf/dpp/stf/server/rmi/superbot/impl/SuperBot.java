@@ -34,18 +34,6 @@ public final class SuperBot extends StfRemoteObject implements ISuperBot {
         return INSTANCE;
     }
 
-    /**************************************************************
-     * 
-     * exported functions
-     * 
-     **************************************************************/
-
-    /**********************************************
-     * 
-     * finders
-     * 
-     **********************************************/
-
     public IViews views() throws RemoteException {
         return Views.getInstance();
     }
@@ -63,11 +51,6 @@ public final class SuperBot extends StfRemoteObject implements ISuperBot {
         return localJID;
     }
 
-    /**********************************************
-     * 
-     * shells
-     * 
-     **********************************************/
     public void confirmShellAddProjectWithNewProject(String projectname)
         throws RemoteException {
 

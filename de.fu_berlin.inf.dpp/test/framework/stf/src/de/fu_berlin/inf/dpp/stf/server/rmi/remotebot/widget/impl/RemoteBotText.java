@@ -24,28 +24,10 @@ public final class RemoteBotText extends StfRemoteObject implements
         return this;
     }
 
-    /**************************************************************
-     * 
-     * exported functions
-     * 
-     **************************************************************/
-
-    /**********************************************
-     * 
-     * finders
-     * 
-     **********************************************/
-
     public IRemoteBotMenu contextMenu(String text) throws RemoteException {
         return RemoteBotMenu.getInstance().setWidget(widget.contextMenu(text));
 
     }
-
-    /**********************************************
-     * 
-     * actions
-     * 
-     **********************************************/
 
     public IRemoteBotText selectAll() throws RemoteException {
         return setWidget(widget.selectAll());
@@ -62,12 +44,6 @@ public final class RemoteBotText extends StfRemoteObject implements
     public IRemoteBotText typeText(String text) throws RemoteException {
         return setWidget(widget.typeText(text));
     }
-
-    /**********************************************
-     * 
-     * states
-     * 
-     **********************************************/
 
     public String getText() throws RemoteException {
         return widget.getText();

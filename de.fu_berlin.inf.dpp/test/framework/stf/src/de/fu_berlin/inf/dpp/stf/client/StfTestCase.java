@@ -1,5 +1,8 @@
 package de.fu_berlin.inf.dpp.stf.client;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.PrintStream;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -33,6 +36,10 @@ public abstract class StfTestCase {
                 + method.getName() + " FAILED *******");
             captureScreenshot((method.getMethod().getDeclaringClass().getName()
                 + "_" + method.getName()).replace('.', '_'));
+
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            e.printStackTrace(new PrintStream(out));
+            logMessage(new String(out.toByteArray()));
         }
 
         @Override
@@ -86,6 +93,21 @@ public abstract class StfTestCase {
 
     private static List<AbstractTester> currentTesters = new ArrayList<AbstractTester>();
 
+    /**
+     * Calls
+     * <ol>
+     * <li>reset all buddy names by calling
+     * {@linkplain #initTesters(AbstractTester, AbstractTester...)}</li>
+     * <li>{@linkplain #setUpWorkbench()}</li>
+     * <li>{@linkplain #setUpSaros()}</li>
+     * </ol>
+     * 
+     * @param tester
+     *            a tester e.g ALICE
+     * @param testers
+     *            additional testers e.g BOB, CARL
+     * @throws Exception
+     */
     public static void select(AbstractTester tester, AbstractTester... testers)
         throws Exception {
         initTesters(tester, testers);
@@ -93,6 +115,16 @@ public abstract class StfTestCase {
         setUpSaros();
     }
 
+    /**
+     * Registers the given testers to be participants of the current test case.
+     * <b>THIS METHOD SHOULD ALWAYS BE THE FIRST METHOD CALLED IN THE
+     * <tt>BEFORECLASS</tt> METHOD.</b>
+     * 
+     * @param tester
+     *            a tester e.g ALICE
+     * @param testers
+     *            additional testers e.g BOB, CARL
+     */
     public static void initTesters(AbstractTester tester,
         AbstractTester... testers) {
 
@@ -141,7 +173,22 @@ public abstract class StfTestCase {
                 resetBuddyNames(tester);
                 tester.superBot().views().sarosView().disconnect();
                 tester.remoteBot().resetWorkbench();
-                tester.superBot().internal().clearWorkspace();
+
+                // Consistency watch dog seems to lock some files from time to
+                // time
+                int timeout = 0;
+                boolean cleared = false;
+                do {
+                    cleared = tester.superBot().internal().clearWorkspace();
+                    if (cleared)
+                        break;
+                    Thread.sleep(10000);
+                } while (++timeout < 6);
+
+                if (!cleared)
+                    throw new IOException(
+                        "could not clear the workspace of tester: "
+                            + tester.toString());
             } catch (Exception e) {
                 exception = e;
             }
@@ -154,9 +201,9 @@ public abstract class StfTestCase {
     }
 
     /**
-     * bring workbench to a original state before beginning your tests
+     * Brings workbench to a original state before beginning your tests
      * <ul>
-     * <li>activate saros-instance workbench</li>
+     * <li>activate Saros instance workbench</li>
      * <li>close all opened popUp windows</li>
      * <li>close all opened editors</li>
      * <li>deletes all projects</li>
@@ -189,7 +236,7 @@ public abstract class StfTestCase {
     }
 
     /**
-     * bring Saros to a original state before beginning your tests
+     * Brings Saros to a original state before beginning your tests
      * <ul>
      * <li>make automaticReminder disable</li>
      * <li>open sarosViews</li>
@@ -266,6 +313,16 @@ public abstract class StfTestCase {
         }
     }
 
+    /**
+     * Resets the account of all testers.
+     * <ul>
+     * <li>Add the account of the tester to the account store</li>
+     * <li>Activate the account of the tester</li>
+     * <li>Deletes all non active accounts</li>
+     * </ul>
+     * 
+     * @throws RemoteException
+     */
     public static void resetDefaultAccount() throws RemoteException {
         for (AbstractTester tester : currentTesters) {
 
@@ -325,10 +382,28 @@ public abstract class StfTestCase {
         }
     }
 
+    /**
+     * Resets the buddies for all active testers to their original by
+     * sequentially calling {@link #resetBuddies(AbstractTester)}
+     * 
+     * @throws RemoteException
+     */
     public static void resetBuddies() throws RemoteException {
         for (AbstractTester tester : currentTesters)
             resetBuddies(tester);
     }
+
+    /**
+     * Resets the buddies of the tester to their original states as defined in
+     * the configuration file. E.g if the test case included ALICE, BOB and
+     * CARL, and ALICE removed BOB from her roster then after the method returns
+     * ALICE will have BOB again in her roster and also BOB will have ALICE back
+     * in his roster.
+     * 
+     * @param tester
+     *            the tester
+     * @throws RemoteException
+     */
 
     public static void resetBuddies(AbstractTester tester)
         throws RemoteException {
@@ -340,14 +415,22 @@ public abstract class StfTestCase {
     }
 
     /**
-     * Deletes all projects from all active testers by sequentially
+     * Deletes all projects from all active testers by sequentially removing all
+     * projects from the workspace.
      * 
+     * @NOTE this method does not invoke any GUI action, instead it uses the
+     *       Eclipse API. Unexpected results can occur when there are still open
+     *       unsaved editor windows before this method is called.
+     * @return <code>true</code> if all workspaces could be cleared,
+     *         <code>false</code> otherwise
      * @throws RemoteException
      */
-    public static void clearWorkspaces() throws RemoteException {
+    public static boolean clearWorkspaces() throws RemoteException {
+        boolean cleared = true;
         for (AbstractTester tester : currentTesters) {
-            tester.superBot().internal().clearWorkspace();
+            cleared &= tester.superBot().internal().clearWorkspace();
         }
+        return cleared;
     }
 
     /**
@@ -383,7 +466,6 @@ public abstract class StfTestCase {
         for (final AbstractTester tester : currentTesters) {
             if (tester != host) {
                 tester.superBot().views().sarosView().waitUntilIsNotInSession();
-
             }
         }
     }
@@ -392,8 +474,7 @@ public abstract class StfTestCase {
      * Define the leave session with the following steps.
      * <ol>
      * <li>All invitees leave the session first.(concurrently)</li>
-     * <li>Host waits until all invitees are no longer in the session using
-     * "waitUntilAllPeersLeaveSession"</li>
+     * <li>Host waits until all invitees are no longer in the session.</li>
      * <li>Host leaves the session</li>
      * </ol>
      * 

@@ -63,11 +63,6 @@ public final class RemoteWorkbenchBot extends RemoteBot implements
         return INSTANCE;
     }
 
-    /**********************************************
-     * 
-     * view
-     * 
-     **********************************************/
     public IRemoteBotView view(String viewTitle) throws RemoteException {
         view.setWidget(swtWorkBenchBot.viewByTitle(viewTitle));
         return view;
@@ -119,12 +114,6 @@ public final class RemoteWorkbenchBot extends RemoteBot implements
     public IRemoteBotView activeView() throws RemoteException {
         return view(swtWorkBenchBot.activeView().getTitle());
     }
-
-    /**********************************************
-     * 
-     * perspective
-     * 
-     **********************************************/
 
     public boolean isPerspectiveOpen(String title) throws RemoteException {
         return getPerspectiveTitles().contains(title);
@@ -196,12 +185,6 @@ public final class RemoteWorkbenchBot extends RemoteBot implements
         swtWorkBenchBot.resetActivePerspective();
     }
 
-    /**********************************************
-     * 
-     * editor
-     * 
-     **********************************************/
-
     public IRemoteBotEditor editor(String fileName) throws RemoteException {
         editor
             .setWidget(swtWorkBenchBot.editorByTitle(fileName).toTextEditor());
@@ -260,12 +243,6 @@ public final class RemoteWorkbenchBot extends RemoteBot implements
         });
     }
 
-    /**********************************************
-     * 
-     * workbench
-     * 
-     **********************************************/
-
     public void resetWorkbench() throws RemoteException {
         closeAllShells();
         closeAllEditors();
@@ -289,12 +266,6 @@ public final class RemoteWorkbenchBot extends RemoteBot implements
         log.error(message);
         throw new RemoteException(message);
     }
-
-    /**********************************************
-     * 
-     * shell
-     * 
-     **********************************************/
 
     public void closeAllShells() throws RemoteException {
         try {
@@ -333,11 +304,6 @@ public final class RemoteWorkbenchBot extends RemoteBot implements
         }
     }
 
-    /**********************************************
-     * 
-     * Chat
-     * 
-     **********************************************/
     public RemoteBotChatLine chatLine() throws RemoteException {
         return chatLine(0);
     }

@@ -26,17 +26,6 @@ public final class ConsoleView extends StfRemoteObject implements IConsoleView {
         return this;
     }
 
-    /**************************************************************
-     * 
-     * exported functions
-     * 
-     **************************************************************/
-
-    /**********************************************
-     * 
-     * states
-     * 
-     **********************************************/
     public String getFirstTextInConsole() throws RemoteException {
         return view.bot().styledText().getText();
     }
@@ -54,11 +43,6 @@ public final class ConsoleView extends StfRemoteObject implements IConsoleView {
         }
     }
 
-    /**********************************************
-     * 
-     * waits until
-     * 
-     **********************************************/
     public void waitUntilExistsTextInConsole() throws RemoteException {
         RemoteWorkbenchBot.getInstance().waitUntil(new DefaultCondition() {
             public boolean test() throws Exception {

@@ -114,18 +114,6 @@ public abstract class RemoteBot extends StfRemoteObject implements IRemoteBot {
         swtBot = bot;
     }
 
-    /**************************************************************
-     * 
-     * exported functions
-     * 
-     **************************************************************/
-
-    /**********************************************
-     * 
-     * Widget tree
-     * 
-     **********************************************/
-
     public IRemoteBotTree tree() throws RemoteException {
         tree.setWidget(swtBot.tree());
         return tree;
@@ -192,12 +180,6 @@ public abstract class RemoteBot extends StfRemoteObject implements IRemoteBot {
         tree.setWidget(swtBot.treeWithLabelInGroup(label, inGroup, index));
         return tree;
     }
-
-    /**********************************************
-     * 
-     * Widget shell
-     * 
-     **********************************************/
 
     public IRemoteBotShell shell(String title) throws RemoteException {
         return shell.setWidget(swtBot.shell(title));
@@ -275,12 +257,6 @@ public abstract class RemoteBot extends StfRemoteObject implements IRemoteBot {
         final SWTBotShell activeShell = swtBot.activeShell();
         return activeShell == null ? null : activeShell.getText();
     }
-
-    /**********************************************
-     * 
-     * Widget button
-     * 
-     **********************************************/
 
     public IRemoteBotButton buttonWithLabel(String label)
         throws RemoteException {
@@ -399,11 +375,6 @@ public abstract class RemoteBot extends StfRemoteObject implements IRemoteBot {
         return button;
     }
 
-    /**********************************************
-     * 
-     * Widget label
-     * 
-     **********************************************/
     public IRemoteBotLabel label() throws RemoteException {
         label.setWidget(swtBot.label());
         return label;
@@ -527,11 +498,6 @@ public abstract class RemoteBot extends StfRemoteObject implements IRemoteBot {
         }
     }
 
-    /**********************************************
-     * 
-     * Widget styledText
-     * 
-     **********************************************/
     public boolean existsStyledText() throws RemoteException {
         long oldTimeout = SWTBotPreferences.TIMEOUT;
         // increase the timeout
@@ -638,11 +604,6 @@ public abstract class RemoteBot extends StfRemoteObject implements IRemoteBot {
         return styledText;
     }
 
-    /**********************************************
-     * 
-     * Widget comboBox
-     * 
-     **********************************************/
     public IRemoteBotCombo comboBoxWithLabel(String label)
         throws RemoteException {
         comboBox.setWidget(swtBot.comboBoxWithLabel(label));
@@ -836,11 +797,6 @@ public abstract class RemoteBot extends StfRemoteObject implements IRemoteBot {
         return ccomboBox;
     }
 
-    /**********************************************
-     * 
-     * Widget toolbarButton
-     * 
-     **********************************************/
     public IRemoteBotToolbarButton toolbarButton() throws RemoteException {
         return toolbarButton.setWidget(swtBot.toolbarButton());
 
@@ -961,11 +917,6 @@ public abstract class RemoteBot extends StfRemoteObject implements IRemoteBot {
 
     }
 
-    /**********************************************
-     * 
-     * Widget text
-     * 
-     **********************************************/
     public IRemoteBotText textWithLabel(String label) throws RemoteException {
         text.setWidget(swtBot.textWithLabel(label));
         return text;
@@ -1109,12 +1060,6 @@ public abstract class RemoteBot extends StfRemoteObject implements IRemoteBot {
         return text;
     }
 
-    /**********************************************
-     * 
-     * Widget table
-     * 
-     **********************************************/
-
     public boolean existsTable() throws RemoteException {
         long oldTimeout = SWTBotPreferences.TIMEOUT;
         // increase the timeout
@@ -1203,12 +1148,6 @@ public abstract class RemoteBot extends StfRemoteObject implements IRemoteBot {
 
     }
 
-    /**********************************************
-     * 
-     * Widget menu
-     * 
-     **********************************************/
-
     public IRemoteBotMenu menu(String text) throws RemoteException {
         return menu.setWidget(swtBot.menu(text));
 
@@ -1237,12 +1176,6 @@ public abstract class RemoteBot extends StfRemoteObject implements IRemoteBot {
         return menu.setWidget(swtBot.menuWithId(key, value, index));
 
     }
-
-    /**********************************************
-     * 
-     * Widget List
-     * 
-     **********************************************/
 
     public IRemoteBotList listWithLabel(String label) throws RemoteException {
         list.setWidget(swtBot.listWithLabel(label));
@@ -1311,11 +1244,6 @@ public abstract class RemoteBot extends StfRemoteObject implements IRemoteBot {
         return list;
     }
 
-    /**********************************************
-     * 
-     * Widget CheckBox
-     * 
-     **********************************************/
     public IRemoteBotCheckBox checkBoxWithLabel(String label)
         throws RemoteException {
         checkbox.setWidget(swtBot.checkBoxWithLabel(label));
@@ -1437,11 +1365,6 @@ public abstract class RemoteBot extends StfRemoteObject implements IRemoteBot {
         return checkbox;
     }
 
-    /**********************************************
-     * 
-     * Widget: Radio
-     * 
-     **********************************************/
     public IRemoteBotRadio radioWithLabel(String label) throws RemoteException {
         radio.setWidget(swtBot.radioWithLabel(label));
         return radio;
@@ -1557,11 +1480,6 @@ public abstract class RemoteBot extends StfRemoteObject implements IRemoteBot {
         return radio;
     }
 
-    /**********************************************
-     * 
-     * Widget toggleButton
-     * 
-     **********************************************/
     public IRemoteBotToggleButton toggleButtonWithLabel(String label)
         throws RemoteException {
         toggleButton.setWidget(swtBot.toggleButtonWithLabel(label));
@@ -1693,11 +1611,6 @@ public abstract class RemoteBot extends StfRemoteObject implements IRemoteBot {
 
     }
 
-    /**********************************************
-     * 
-     * Wait until
-     * 
-     **********************************************/
     public void waitUntil(ICondition condition) throws RemoteException {
         swtBot.waitUntil(condition, SarosSWTBotPreferences.SAROS_TIMEOUT);
     }
@@ -1709,12 +1622,6 @@ public abstract class RemoteBot extends StfRemoteObject implements IRemoteBot {
     public void waitShortUntil(ICondition condition) throws RemoteException {
         swtBot.waitUntil(condition, SarosSWTBotPreferences.SAROS_SHORT_TIMEOUT);
     }
-
-    /**********************************************
-     * 
-     * Others
-     * 
-     **********************************************/
 
     public void logMessage(String message) throws RemoteException {
         log.info(message);

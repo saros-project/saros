@@ -40,7 +40,6 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import de.fu_berlin.inf.dpp.stf.client.StfTestCase;
-import de.fu_berlin.inf.dpp.stf.client.util.Util;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotShell;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotView;
 import de.fu_berlin.inf.dpp.stf.test.Constants;
@@ -136,17 +135,17 @@ public class BasicWidgetTreeTest extends StfTestCase {
         view.show();
 
         assertTrue(view.bot().tree()
-            .existsSubItemWithRegex(Util.changeToRegex(Constants.PROJECT1)));
+            .existsSubItemWithRegex(Pattern.quote(Constants.PROJECT1) + ".*"));
         assertTrue(ALICE.superBot().views().packageExplorerView().tree()
             .existsWithRegex(Constants.PROJECT1));
         assertTrue(view.bot().tree().selectTreeItem(Constants.PROJECT1, SRC)
-            .existsSubItemWithRegex(Util.changeToRegex(Constants.PKG1)));
+            .existsSubItemWithRegex(Pattern.quote(Constants.PKG1) + ".*"));
 
         assertTrue(ALICE.superBot().views().packageExplorerView()
             .selectSrc(Constants.PROJECT1).existsWithRegex(Constants.PKG1));
         assertTrue(view.bot().tree()
             .selectTreeItem(Constants.PROJECT1, SRC, Constants.PKG1)
-            .existsSubItemWithRegex(Util.changeToRegex(Constants.CLS1)));
+            .existsSubItemWithRegex(Pattern.quote(Constants.CLS1) + ".*"));
 
         assertTrue(ALICE.superBot().views().packageExplorerView()
             .selectPkg(Constants.PROJECT1, Constants.PKG1)
@@ -156,7 +155,7 @@ public class BasicWidgetTreeTest extends StfTestCase {
 
         assertTrue(view.bot().tree()
             .selectTreeItem(Constants.PROJECT1, SRC, Constants.PKG1)
-            .existsSubItemWithRegex(Util.changeToRegex(Constants.CLS2)));
+            .existsSubItemWithRegex(Pattern.quote(Constants.CLS2) + ".*"));
         assertTrue(ALICE.superBot().views().packageExplorerView()
             .selectPkg(Constants.PROJECT1, Constants.PKG1)
             .existsWithRegex(Constants.CLS2_SUFFIX));
@@ -168,7 +167,7 @@ public class BasicWidgetTreeTest extends StfTestCase {
             .connectWith(ALICE.getJID(), ALICE.getPassword());
         assertTrue(ALICE.remoteBot().view(VIEW_SAROS).bot().tree()
             .selectTreeItem(NODE_BUDDIES)
-            .existsSubItemWithRegex(Util.changeToRegex(BOB.getName())));
+            .existsSubItemWithRegex(Pattern.quote(BOB.getName()) + ".*"));
     }
 
     @Test

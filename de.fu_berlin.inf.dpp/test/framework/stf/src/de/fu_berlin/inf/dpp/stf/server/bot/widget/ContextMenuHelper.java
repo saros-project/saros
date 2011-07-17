@@ -12,6 +12,7 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
+import org.eclipse.swt.widgets.Widget;
 import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
 import org.eclipse.swtbot.swt.finder.finders.UIThreadRunnable;
 import org.eclipse.swtbot.swt.finder.results.BoolResult;
@@ -19,6 +20,7 @@ import org.eclipse.swtbot.swt.finder.results.VoidResult;
 import org.eclipse.swtbot.swt.finder.results.WidgetResult;
 import org.eclipse.swtbot.swt.finder.widgets.AbstractSWTBot;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotMenu;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.hamcrest.Matcher;
 
 public class ContextMenuHelper {
@@ -26,19 +28,24 @@ public class ContextMenuHelper {
     private static final Logger log = Logger.getLogger(ContextMenuHelper.class);
 
     /**
-     * Clicks the context menu matching the text.
+     * Clicks the context menu item matching the text nodes.
      * 
+     * @param bot
+     *            a SWTBot class that wraps a {@link Widget} which extends
+     *            {@link Control}. E.g. {@link SWTBotTree}.
+     * @param nodes
+     *            the nodes of the context menu e.g New, Class
      * @throws WidgetNotFoundException
      *             if the widget is not found.
      */
     public static void clickContextMenu(
-        final AbstractSWTBot<? extends Control> bot, final String... texts) {
+        final AbstractSWTBot<? extends Control> bot, final String... nodes) {
 
-        final MenuItem menuItem = getMenuItem(bot, texts);
+        final MenuItem menuItem = getMenuItem(bot, nodes);
         // show
         if (menuItem == null) {
             throw new WidgetNotFoundException("Could not find menu: "
-                + Arrays.asList(texts));
+                + Arrays.asList(nodes));
         }
 
         // click
@@ -52,14 +59,27 @@ public class ContextMenuHelper {
         });
     }
 
-    public static SWTBotMenu getContextMenu(
-        final AbstractSWTBot<? extends Control> bot, final String... texts) {
+    /**
+     * Get the context menu item matching the text nodes.
+     * 
+     * @param bot
+     *            a SWTBot class that wraps a {@link Widget} which extends
+     *            {@link Control}. E.g. {@link SWTBotTree}.
+     * @param nodes
+     *            the nodes of the context menu e.g New, Class
+     * @return the context menu item matching the text nodes
+     * @throws WidgetNotFoundException
+     *             if the widget is not found.
+     */
 
-        final MenuItem menuItem = getMenuItem(bot, texts);
+    public static SWTBotMenu getContextMenu(
+        final AbstractSWTBot<? extends Control> bot, final String... nodes) {
+
+        final MenuItem menuItem = getMenuItem(bot, nodes);
 
         if (menuItem == null) {
             throw new WidgetNotFoundException("Could not find menu: "
-                + Arrays.asList(texts));
+                + Arrays.asList(nodes));
         }
 
         // hide
@@ -74,17 +94,20 @@ public class ContextMenuHelper {
     }
 
     /**
-     * Exists the context menu matching the texts.
+     * Checks if the context menu item matching the text nodes exists.
      * 
-     * @param texts
-     *            the text on the context menus.
-     * @throws WidgetNotFoundException
-     *             if the widget is not found.
+     * @param bot
+     *            a SWTBot class that wraps a {@link Widget} which extends
+     *            {@link Control}. E.g. {@link SWTBotTree}.
+     * @param nodes
+     *            the nodes of the context menu e.g New, Class
+     * @return <tt>true</tt> if the context menu item exists, <tt>false</tt>
+     *         otherwise
      */
     public static boolean existsContextMenu(
-        final AbstractSWTBot<? extends Control> bot, final String... texts) {
+        final AbstractSWTBot<? extends Control> bot, final String... nodes) {
 
-        final MenuItem menuItem = getMenuItem(bot, texts);
+        final MenuItem menuItem = getMenuItem(bot, nodes);
 
         // hide
         if (menuItem != null) {
@@ -98,14 +121,27 @@ public class ContextMenuHelper {
         return false;
     }
 
+    /**
+     * Checks if the context menu item matching the text nodes is enabled.
+     * 
+     * @param bot
+     *            a SWTBot class that wraps a {@link Widget} which extends
+     *            {@link Control}. E.g. {@link SWTBotTree}.
+     * @param nodes
+     *            the nodes of the context menu e.g New, Class
+     * @return <tt>true</tt> if the context menu item is enabled, <tt>false</tt>
+     *         otherwise
+     * @throws WidgetNotFoundException
+     *             if the widget is not found.
+     */
     public static boolean isContextMenuEnabled(
-        final AbstractSWTBot<? extends Control> bot, final String... texts) {
+        final AbstractSWTBot<? extends Control> bot, final String... nodes) {
 
-        final MenuItem menuItem = getMenuItem(bot, texts);
+        final MenuItem menuItem = getMenuItem(bot, nodes);
         // show
         if (menuItem == null) {
             throw new WidgetNotFoundException("Could not find menu: "
-                + Arrays.asList(texts));
+                + Arrays.asList(nodes));
         }
 
         return UIThreadRunnable.syncExec(new BoolResult() {
@@ -123,7 +159,8 @@ public class ContextMenuHelper {
             MenuItem[] items = menu.getItems();
             if (log.isTraceEnabled()) {
                 for (final MenuItem menuItem : items)
-                    log.trace("found context menu item: " + menuItem.getText());
+                    log.trace("found context menu item: " + menuItem.getText()
+                        + "[enabled=" + menuItem.isEnabled() + "]");
             }
 
             for (final MenuItem menuItem : items) {

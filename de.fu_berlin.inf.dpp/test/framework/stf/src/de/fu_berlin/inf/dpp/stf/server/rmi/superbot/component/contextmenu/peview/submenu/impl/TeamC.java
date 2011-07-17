@@ -50,17 +50,6 @@ public final class TeamC extends StfRemoteObject implements ITeamC {
         this.treeItem = view;
     }
 
-    /**************************************************************
-     * 
-     * exported functions
-     * 
-     **************************************************************/
-
-    /**********************************************
-     * 
-     * actions
-     * 
-     **********************************************/
     public void shareProject(String repositoryURL) throws RemoteException {
         treeItem.select();
         ContextMenuHelper.clickContextMenu(tree, CM_TEAM,
@@ -327,10 +316,4 @@ public final class TeamC extends StfRemoteObject implements ITeamC {
 
         vcs.switch_(resource, url, revision, new NullProgressMonitor());
     }
-    /**********************************************
-     * 
-     * States
-     * 
-     **********************************************/
-
 }

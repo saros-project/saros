@@ -24,18 +24,6 @@ public final class RemoteBotCTabItem extends StfRemoteObject implements
 
     }
 
-    /**************************************************************
-     * 
-     * exported functions
-     * 
-     **************************************************************/
-
-    /**********************************************
-     * 
-     * states
-     * 
-     **********************************************/
-
     public String getToolTipText() throws RemoteException {
         return widget.getText();
     }

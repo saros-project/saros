@@ -32,12 +32,6 @@ public abstract class ContextMenusInSarosView extends StfRemoteObject implements
         this.sarosView = sarosView;
     }
 
-    /**************************************************************
-     * 
-     * exported functions
-     * 
-     **************************************************************/
-
     public void stopSarosSession() throws RemoteException {
         treeItem.select();
         ContextMenuHelper.clickContextMenu(tree, CM_STOP_SAROS_SESSION);

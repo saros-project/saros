@@ -38,6 +38,9 @@ public class FileOperationsTest extends StfTestCase {
 
     @Before
     public void beforeEveryTest() throws RemoteException {
+        closeAllShells();
+        closeAllEditors();
+        clearWorkspaces();
         /*
          * NOTE: The session sharing by Version 11.3.25.DEVEL is not stable,
          * sometime the invitation process can not be completed, so it's
@@ -64,7 +67,6 @@ public class FileOperationsTest extends StfTestCase {
     @After
     public void afterEveryTest() throws RemoteException {
         leaveSessionHostFirst(ALICE);
-        clearWorkspaces();
     }
 
     // @After
@@ -276,8 +278,10 @@ public class FileOperationsTest extends StfTestCase {
     public void testMoveClass() throws RemoteException {
         ALICE.superBot().views().packageExplorerView().tree().newC()
             .pkg(Constants.PROJECT1, Constants.PKG2);
+
         ALICE.superBot().views().packageExplorerView().tree().newC()
             .cls(Constants.PROJECT1, Constants.PKG2, Constants.CLS2);
+
         ALICE.superBot().views().packageExplorerView()
             .selectClass(Constants.PROJECT1, Constants.PKG2, Constants.CLS2)
             .refactor().moveClassTo(Constants.PROJECT1, Constants.PKG1);
@@ -287,11 +291,13 @@ public class FileOperationsTest extends StfTestCase {
             .packageExplorerView()
             .waitUntilClassExists(Constants.PROJECT1, Constants.PKG1,
                 Constants.CLS2);
+
         CARL.superBot()
             .views()
             .packageExplorerView()
             .waitUntilClassExists(Constants.PROJECT1, Constants.PKG1,
                 Constants.CLS2);
+
         assertTrue(BOB.superBot().views().packageExplorerView()
             .selectPkg(Constants.PROJECT1, Constants.PKG1)
             .exists(Constants.CLS2_SUFFIX));

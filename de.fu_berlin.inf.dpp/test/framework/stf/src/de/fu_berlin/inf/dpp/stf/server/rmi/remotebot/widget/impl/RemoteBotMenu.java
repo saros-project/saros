@@ -25,18 +25,6 @@ public final class RemoteBotMenu extends StfRemoteObject implements
         return this;
     }
 
-    /**************************************************************
-     * 
-     * exported functions
-     * 
-     **************************************************************/
-
-    /**********************************************
-     * 
-     * finder
-     * 
-     **********************************************/
-
     public RemoteBotMenu contextMenu(String text) throws RemoteException {
         widget = widget.contextMenu(text);
         return this;
@@ -47,12 +35,6 @@ public final class RemoteBotMenu extends StfRemoteObject implements
         widget = widget.menu(menuName);
         return this;
     }
-
-    /**********************************************
-     * 
-     * actions
-     * 
-     **********************************************/
 
     public void click() throws RemoteException {
         widget.click();
@@ -67,11 +49,6 @@ public final class RemoteBotMenu extends StfRemoteObject implements
         widget.setFocus();
     }
 
-    /**********************************************
-     * 
-     * states
-     * 
-     **********************************************/
     public boolean isEnabled() throws RemoteException {
         return widget.isEnabled();
     }
@@ -96,11 +73,6 @@ public final class RemoteBotMenu extends StfRemoteObject implements
         return widget.getText();
     }
 
-    /**********************************************
-     * 
-     * waits until
-     * 
-     **********************************************/
     public void waitUntilIsEnabled() throws RemoteException {
         RemoteWorkbenchBot.getInstance().waitUntil(
             Conditions.widgetIsEnabled(widget));

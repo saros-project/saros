@@ -27,26 +27,10 @@ public final class RemoteBotToolbarRadioButton extends StfRemoteObject
         return this;
     }
 
-    /**************************************************************
-     * 
-     * exported functions
-     * 
-     **************************************************************/
-
-    /**********************************************
-     * 
-     * finders
-     * 
-     **********************************************/
     public IRemoteBotMenu contextMenu(String text) throws RemoteException {
         return RemoteBotMenu.getInstance().setWidget(widget.contextMenu(text));
     }
 
-    /**********************************************
-     * 
-     * actions
-     * 
-     **********************************************/
     public void click() throws RemoteException {
         widget.click();
     }
@@ -68,11 +52,6 @@ public final class RemoteBotToolbarRadioButton extends StfRemoteObject
         widget.setFocus();
     }
 
-    /**********************************************
-     * 
-     * states
-     * 
-     **********************************************/
     public boolean isEnabled() throws RemoteException {
         return widget.isEnabled();
     }
@@ -97,11 +76,6 @@ public final class RemoteBotToolbarRadioButton extends StfRemoteObject
         return widget.isChecked();
     }
 
-    /**********************************************
-     * 
-     * waits until
-     * 
-     **********************************************/
     public void waitUntilIsEnabled() throws RemoteException {
         RemoteWorkbenchBot.getInstance().waitUntil(
             Conditions.widgetIsEnabled(widget));

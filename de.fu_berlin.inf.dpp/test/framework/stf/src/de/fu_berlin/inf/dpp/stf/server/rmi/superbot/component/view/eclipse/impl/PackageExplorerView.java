@@ -54,18 +54,6 @@ public final class PackageExplorerView extends StfRemoteObject implements
         return this;
     }
 
-    /**************************************************************
-     * 
-     * exported functions
-     * 
-     **************************************************************/
-
-    /**********************************************
-     * 
-     * actions
-     * 
-     **********************************************/
-
     public IContextMenusInPEView tree() throws RemoteException {
         ContextMenusInPEView.getInstance().setTree(tree);
         ContextMenusInPEView.getInstance().setTreeItem(null);
@@ -143,12 +131,6 @@ public final class PackageExplorerView extends StfRemoteObject implements
         return ContextMenusInPEView.getInstance();
     }
 
-    /**********************************************
-     * 
-     * States
-     * 
-     **********************************************/
-
     public String getTitle() throws RemoteException {
         return VIEW_PACKAGE_EXPLORER;
     }
@@ -209,11 +191,6 @@ public final class PackageExplorerView extends StfRemoteObject implements
         return convertStreamToString(file.getContents());
     }
 
-    /**********************************************
-     * 
-     * wait until
-     * 
-     **********************************************/
     public void waitUntilFolderExists(String... folderNodes)
         throws RemoteException {
         String fullPath = getPath(folderNodes);
@@ -288,6 +265,12 @@ public final class PackageExplorerView extends StfRemoteObject implements
             SHELL_SAROS_RUNNING_VCS_OPERATION);
     }
 
+    public boolean isResourceShared(String path) throws RemoteException {
+        IResource resource = ResourcesPlugin.getWorkspace().getRoot()
+            .findMember(new Path(path));
+        return getSessionManager().getSarosSession().isShared(resource);
+    }
+
     public void waitUntilProjectInSVN(String projectName)
         throws RemoteException {
         RemoteWorkbenchBot.getInstance().waitUntil(
@@ -327,25 +310,6 @@ public final class PackageExplorerView extends StfRemoteObject implements
         });
     }
 
-    /**********************************************
-     * 
-     * innner function
-     * 
-     **********************************************/
-
-    private void initContextMenuWrapper(SWTBotTreeItem treeItem,
-        TreeItemType type) {
-        ContextMenusInPEView.getInstance().setTree(tree);
-        ContextMenusInPEView.getInstance().setTreeItem(treeItem);
-        ContextMenusInPEView.getInstance().setTreeItemType(type);
-    }
-
-    public boolean isResourceShared(String path) throws RemoteException {
-        IResource resource = ResourcesPlugin.getWorkspace().getRoot()
-            .findMember(new Path(path));
-        return getSessionManager().getSarosSession().isShared(resource);
-    }
-
     public void waitUntilResourceIsShared(final String path)
         throws RemoteException {
         RemoteWorkbenchBot.getInstance().waitLongUntil(new DefaultCondition() {
@@ -358,6 +322,13 @@ public final class PackageExplorerView extends StfRemoteObject implements
                     + " is not shared in the current session";
             }
         });
+    }
+
+    private void initContextMenuWrapper(SWTBotTreeItem treeItem,
+        TreeItemType type) {
+        ContextMenusInPEView.getInstance().setTree(tree);
+        ContextMenusInPEView.getInstance().setTreeItem(treeItem);
+        ContextMenusInPEView.getInstance().setTreeItemType(type);
     }
 
     private String getClassPath(String projectName, String pkg, String className) {

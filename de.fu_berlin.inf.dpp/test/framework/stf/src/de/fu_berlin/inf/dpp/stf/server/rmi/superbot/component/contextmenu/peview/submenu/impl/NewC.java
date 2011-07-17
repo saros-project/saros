@@ -32,17 +32,6 @@ public final class NewC extends StfRemoteObject implements INewC {
         this.tree = tree;
     }
 
-    /**************************************************************
-     * 
-     * exported functions
-     * 
-     **************************************************************/
-
-    /**********************************************
-     * 
-     * actions
-     * 
-     **********************************************/
     public void project(String projectName) throws RemoteException {
         ContextMenuHelper.getContextMenu(tree, MENU_NEW, MENU_PROJECT).click();
         confirmWizardNewProject(projectName);

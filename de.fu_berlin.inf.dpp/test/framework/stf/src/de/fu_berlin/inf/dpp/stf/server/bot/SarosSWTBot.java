@@ -226,7 +226,7 @@ public final class SarosSWTBot extends SWTWorkbenchBot {
             if (!shell.isDisposed())
                 result.add(new SWTBotShell(shell));
             else
-                log.warn("found disposed widget while iterating over all shells");
+                log.warn("found disposed shell while iterating over all shells");
 
         }
 

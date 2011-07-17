@@ -27,18 +27,6 @@ public final class SarosMenu extends StfRemoteObject implements ISarosMenu {
         return this;
     }
 
-    /**************************************************************
-     * 
-     * exported functions
-     * 
-     **************************************************************/
-
-    /**********************************************
-     * 
-     * actions
-     * 
-     **********************************************/
-
     public void createAccount(JID jid, String password) throws RemoteException {
         RemoteWorkbenchBot.getInstance().activateWorkbench();
         menu.menu(MENU_CREATE_ACCOUNT).click();

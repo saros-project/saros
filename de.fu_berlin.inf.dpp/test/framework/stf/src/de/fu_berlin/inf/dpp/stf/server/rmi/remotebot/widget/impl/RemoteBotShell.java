@@ -34,17 +34,6 @@ public final class RemoteBotShell extends StfRemoteObject implements
         return this;
     }
 
-    /**************************************************************
-     * 
-     * exported functions
-     * 
-     **************************************************************/
-
-    /**********************************************
-     * 
-     * finders
-     * 
-     **********************************************/
     public IRemoteBot bot() {
         RemoteWorkbenchBot.getInstance().setBot(widget.bot());
         return RemoteWorkbenchBot.getInstance();
@@ -54,11 +43,6 @@ public final class RemoteBotShell extends StfRemoteObject implements
         return RemoteBotMenu.getInstance().setWidget(widget.contextMenu(text));
     }
 
-    /**********************************************
-     * 
-     * actions
-     * 
-     **********************************************/
     public void setFocus() throws RemoteException {
         widget.setFocus();
     }
@@ -156,11 +140,6 @@ public final class RemoteBotShell extends StfRemoteObject implements
         bot().button(buttonText).click();
     }
 
-    /**********************************************
-     * 
-     * states
-     * 
-     **********************************************/
     public boolean isActive() throws RemoteException {
         return widget.isActive();
     }
@@ -216,12 +195,6 @@ public final class RemoteBotShell extends StfRemoteObject implements
         return bot().table().containsItem(label);
     }
 
-    /**********************************************
-     * 
-     * waits until
-     * 
-     **********************************************/
-
     public void waitUntilActive() throws RemoteException {
         RemoteWorkbenchBot.getInstance().waitUntil(
             SarosConditions.isShellActive(widget));
@@ -236,5 +209,4 @@ public final class RemoteBotShell extends StfRemoteObject implements
         RemoteWorkbenchBot.getInstance().waitLongUntil(
             SarosConditions.isShellClosed(widget));
     }
-
 }

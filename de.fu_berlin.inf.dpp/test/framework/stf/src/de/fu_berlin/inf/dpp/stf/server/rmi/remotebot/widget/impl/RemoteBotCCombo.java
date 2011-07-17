@@ -24,26 +24,9 @@ public final class RemoteBotCCombo extends StfRemoteObject implements
         return this;
     }
 
-    /**************************************************************
-     * 
-     * exported functions
-     * 
-     **************************************************************/
-
-    /**********************************************
-     * 
-     * finders
-     * 
-     **********************************************/
     public IRemoteBotMenu contextMenu(String text) throws RemoteException {
         return RemoteBotMenu.getInstance().setWidget(widget.contextMenu(text));
     }
-
-    /**********************************************
-     * 
-     * actions
-     * 
-     **********************************************/
 
     public void setSelection(int indexOfSelection) throws RemoteException {
         widget.setSelection(indexOfSelection);
@@ -69,11 +52,6 @@ public final class RemoteBotCCombo extends StfRemoteObject implements
         widget.setFocus();
     }
 
-    /**********************************************
-     * 
-     * states
-     * 
-     **********************************************/
     public boolean isEnabled() throws RemoteException {
         return widget.isEnabled();
     }

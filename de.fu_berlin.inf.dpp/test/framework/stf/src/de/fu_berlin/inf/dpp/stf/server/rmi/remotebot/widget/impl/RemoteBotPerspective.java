@@ -23,27 +23,9 @@ public final class RemoteBotPerspective extends StfRemoteObject implements
         return this;
     }
 
-    /**************************************************************
-     * 
-     * exported functions
-     * 
-     **************************************************************/
-
-    /**********************************************
-     * 
-     * actions
-     * 
-     **********************************************/
-
     public void activate() throws RemoteException {
         widget.activate();
     }
-
-    /**********************************************
-     * 
-     * states
-     * 
-     **********************************************/
 
     public String getLabel() throws RemoteException {
         return widget.getLabel();

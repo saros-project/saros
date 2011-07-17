@@ -60,18 +60,6 @@ public final class SarosView extends StfRemoteObject implements ISarosView {
         return this;
     }
 
-    /**************************************************************
-     * 
-     * exported functions
-     * 
-     **************************************************************/
-
-    /**********************************************
-     * 
-     * ToolbarButtons
-     * 
-     **********************************************/
-
     public void connectWith(JID jid, String password) throws RemoteException {
         if (!SuperBot.getInstance().menuBar().saros().preferences()
             .existsAccount(jid))

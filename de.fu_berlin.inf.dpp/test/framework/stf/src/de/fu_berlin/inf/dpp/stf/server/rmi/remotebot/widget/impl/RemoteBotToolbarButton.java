@@ -26,23 +26,11 @@ public final class RemoteBotToolbarButton extends StfRemoteObject implements
         return this;
     }
 
-    /**************************************************************
-     * 
-     * exported functions
-     * 
-     **************************************************************/
-
     public IRemoteBotMenu contextMenu(String text) throws RemoteException {
         return RemoteBotMenu.getInstance().setWidget(
             toolbarButton.contextMenu(text));
 
     }
-
-    /**********************************************
-     * 
-     * actions
-     * 
-     **********************************************/
 
     public void click() throws RemoteException {
         toolbarButton.click();
@@ -56,12 +44,6 @@ public final class RemoteBotToolbarButton extends StfRemoteObject implements
     public void setFocus() throws RemoteException {
         toolbarButton.setFocus();
     }
-
-    /**********************************************
-     * 
-     * states
-     * 
-     **********************************************/
 
     public boolean isEnabled() throws RemoteException {
         return toolbarButton.isEnabled();
@@ -83,11 +65,6 @@ public final class RemoteBotToolbarButton extends StfRemoteObject implements
         return toolbarButton.getToolTipText();
     }
 
-    /**********************************************
-     * 
-     * waits until
-     * 
-     **********************************************/
     public void waitUntilIsEnabled() throws RemoteException {
         RemoteWorkbenchBot.getInstance().waitUntil(
             Conditions.widgetIsEnabled(toolbarButton));

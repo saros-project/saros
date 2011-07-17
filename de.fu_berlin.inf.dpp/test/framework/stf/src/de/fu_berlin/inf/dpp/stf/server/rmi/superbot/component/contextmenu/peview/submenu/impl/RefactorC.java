@@ -38,18 +38,6 @@ public final class RefactorC extends StfRemoteObject implements IRefactorC {
         this.type = type;
     }
 
-    /**************************************************************
-     * 
-     * exported functions
-     * 
-     **************************************************************/
-
-    /**********************************************
-     * 
-     * actions
-     * 
-     **********************************************/
-
     public void moveTo(String targetProject, String folder)
         throws RemoteException {
         moveTo(SHELL_MOVE, OK, targetProject.concat("/").concat(folder)
@@ -78,11 +66,6 @@ public final class RefactorC extends StfRemoteObject implements IRefactorC {
         }
     }
 
-    /**************************************************************
-     * 
-     * inner functions
-     * 
-     **************************************************************/
     private void rename(String shellTitle, String buttonName, String newName) {
         treeItem.select();
         ContextMenuHelper.clickContextMenu(tree, MENU_REFACTOR, MENU_RENAME);

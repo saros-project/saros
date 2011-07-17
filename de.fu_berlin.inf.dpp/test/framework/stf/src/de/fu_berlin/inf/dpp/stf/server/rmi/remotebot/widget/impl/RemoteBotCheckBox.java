@@ -24,18 +24,6 @@ public final class RemoteBotCheckBox extends StfRemoteObject implements
         return this;
     }
 
-    /**************************************************************
-     * 
-     * exported functions
-     * 
-     **************************************************************/
-
-    /**********************************************
-     * 
-     * finders
-     * 
-     **********************************************/
-
     /**
      * 
      * @see SWTBotCheckBox#contextMenu(String)
@@ -44,11 +32,6 @@ public final class RemoteBotCheckBox extends StfRemoteObject implements
         return RemoteBotMenu.getInstance().setWidget(widget.contextMenu(text));
     }
 
-    /**********************************************
-     * 
-     * actions
-     * 
-     **********************************************/
     /**
      * 
      * @see SWTBotCheckBox#click()
@@ -81,12 +64,6 @@ public final class RemoteBotCheckBox extends StfRemoteObject implements
     public void setFocus() throws RemoteException {
         widget.setFocus();
     }
-
-    /**********************************************
-     * 
-     * states
-     * 
-     **********************************************/
 
     /**
      * 

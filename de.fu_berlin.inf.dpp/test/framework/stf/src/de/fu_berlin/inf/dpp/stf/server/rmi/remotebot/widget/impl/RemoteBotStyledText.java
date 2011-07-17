@@ -25,27 +25,9 @@ public final class RemoteBotStyledText extends StfRemoteObject implements
         return this;
     }
 
-    /**************************************************************
-     * 
-     * exported functions
-     * 
-     **************************************************************/
-
-    /**********************************************
-     * 
-     * finders
-     * 
-     **********************************************/
-
     public IRemoteBotMenu contextMenu(String text) throws RemoteException {
         return RemoteBotMenu.getInstance().setWidget(widget.contextMenu(text));
     }
-
-    /**********************************************
-     * 
-     * states
-     * 
-     **********************************************/
 
     public String getText() throws RemoteException {
 

@@ -29,27 +29,9 @@ public final class RemoteBotTableItem extends StfRemoteObject implements
         return this;
     }
 
-    /**************************************************************
-     * 
-     * exported functions
-     * 
-     **************************************************************/
-
-    /**********************************************
-     * 
-     * finders
-     * 
-     **********************************************/
-
     public IRemoteBotMenu contextMenu(String text) throws RemoteException {
         return RemoteBotMenu.getInstance().setWidget(widget.contextMenu(text));
     }
-
-    /**********************************************
-     * 
-     * actions
-     * 
-     **********************************************/
 
     public void select() throws RemoteException {
         widget.select();
@@ -80,11 +62,6 @@ public final class RemoteBotTableItem extends StfRemoteObject implements
         widget.setFocus();
     }
 
-    /**********************************************
-     * 
-     * states
-     * 
-     **********************************************/
     public boolean existsContextMenu(String contextName) throws RemoteException {
         long oldTimeout = SWTBotPreferences.TIMEOUT;
 
@@ -132,11 +109,6 @@ public final class RemoteBotTableItem extends StfRemoteObject implements
         return widget.getText();
     }
 
-    /**********************************************
-     * 
-     * waits until
-     * 
-     **********************************************/
     public void waitUntilIsEnabled() throws RemoteException {
         RemoteWorkbenchBot.getInstance().waitUntil(
             Conditions.widgetIsEnabled(widget));

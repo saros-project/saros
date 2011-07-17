@@ -30,21 +30,7 @@ public final class ShareWithC extends StfRemoteObject implements IShareWithC {
         this.treeItem = treeItem;
     }
 
-    /**************************************************************
-     * 
-     * exported functions
-     * 
-     **************************************************************/
-
-    /**********************************************
-     * 
-     * actions
-     * 
-     **********************************************/
-
-    /**
-     * FIXME can not click the context menu.
-     */
+    // FIXME can not click the context menu.
     public void multipleBuddies(String projectName, JID... baseJIDOfInvitees)
         throws RemoteException {
         treeItem.select();

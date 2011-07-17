@@ -32,11 +32,6 @@ public final class SarosPreferences extends StfRemoteObject implements
         return INSTANCE;
     }
 
-    /**********************************************
-     * 
-     * actions
-     * 
-     **********************************************/
     public void createAccount(JID jid, String password) throws RemoteException {
         SWTBotShell preferencesShell = preCondition();
 
@@ -346,13 +341,8 @@ public final class SarosPreferences extends StfRemoteObject implements
         }
     }
 
-    /**************************************************************
-     * 
-     * Inner functions
-     * 
-     *************************************************************/
     /**
-     * This is a convenient function to show the right setting-page of saros
+     * This is a convenient function to show the right setting-page of Saros
      * item in the preferences dialog.
      */
     private SWTBotShell preCondition() throws RemoteException {
