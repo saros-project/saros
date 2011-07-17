@@ -22,12 +22,9 @@ package de.fu_berlin.inf.dpp.net;
 import java.io.Serializable;
 import java.util.regex.Pattern;
 
-import org.apache.log4j.Logger;
 import org.jivesoftware.smack.RosterEntry;
 import org.jivesoftware.smack.util.StringUtils;
 import org.jivesoftware.smackx.muc.MultiUserChat;
-
-import de.fu_berlin.inf.dpp.util.StackTrace;
 
 /**
  * A JID which is used to identify the users of the XMPP network.
@@ -38,11 +35,9 @@ import de.fu_berlin.inf.dpp.util.StackTrace;
  */
 public class JID implements Serializable {
 
-    private static final Logger log = Logger.getLogger(JID.class.getName());
-
     private static final long serialVersionUID = 4830741516870940459L;
 
-    protected static final Pattern userAtHostPattern = Pattern.compile(
+    private static final Pattern userAtHostPattern = Pattern.compile(
         "^[A-Z0-9._%+-]+@[A-Z0-9.-]+$", Pattern.CASE_INSENSITIVE);
 
     private final String jid;
@@ -191,8 +186,6 @@ public class JID implements Serializable {
             JID other = (JID) obj;
             return getBase().equals(other.getBase());
         }
-        log.warn("Comparing a JID to something other a JID is not supported: "
-            + obj.getClass(), new StackTrace());
         return false;
     }
 
