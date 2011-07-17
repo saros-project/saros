@@ -1,6 +1,5 @@
 package de.fu_berlin.inf.dpp.net.util;
 
-import de.fu_berlin.inf.dpp.net.XMPPUtil;
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.jivesoftware.smack.AccountManager;
@@ -8,20 +7,23 @@ import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.packet.Registration;
 
+import de.fu_berlin.inf.dpp.net.XMPPUtil;
+
 /**
  * @author cordes
  */
 public final class XMPPAccountUtils {
     private static Logger LOG = Logger.getLogger(XMPPAccountUtils.class);
 
-    private XMPPAccountUtils() {}
-
+    private XMPPAccountUtils() {
+        //
+    }
 
     /**
      * Creates the given account on the given XMPP server.
-     *
+     * 
      * @blocking
-     *
+     * 
      * @param server
      *            the server on which to create the account.
      * @param username
@@ -33,8 +35,8 @@ public final class XMPPAccountUtils {
      * @throws org.jivesoftware.smack.XMPPException
      *             exception that occurs while registering.
      */
-    public static void createAccount(String server, String username, String password,
-        IProgressMonitor monitor) throws XMPPException {
+    public static void createAccount(String server, String username,
+        String password, IProgressMonitor monitor) throws XMPPException {
 
         monitor.beginTask("Registering account", 3);
 
@@ -82,8 +84,8 @@ public final class XMPPAccountUtils {
         }
     }
 
-
-    public static void deleteUserAccoountOnServer(String serverAddress, String username, String defaultPassword) throws XMPPException {
+    public static void deleteUserAccoountOnServer(String serverAddress,
+        String username, String defaultPassword) throws XMPPException {
         XMPPConnection connection = new XMPPConnection(serverAddress);
         connection.connect();
         connection.login(username, defaultPassword);

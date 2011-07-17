@@ -73,20 +73,16 @@ public final class SarosView extends StfRemoteObject implements ISarosView {
      **********************************************/
 
     public void connectWith(JID jid, String password) throws RemoteException {
-        log.trace("connectedByXMPP");
-
-        log.trace("click the toolbar button 'Connect' in the buddies view");
         if (!SuperBot.getInstance().menuBar().saros().preferences()
-            .existsAccount(jid)) {
+            .existsAccount(jid))
             SuperBot.getInstance().menuBar().saros().preferences()
                 .addAccount(jid, password);
-        } else {
-            if (!SuperBot.getInstance().menuBar().saros().preferences()
-                .isAccountActive(jid)) {
-                SuperBot.getInstance().menuBar().saros().preferences()
-                    .activateAccount(jid);
-            }
-        }
+
+        if (!SuperBot.getInstance().menuBar().saros().preferences()
+            .isAccountActive(jid))
+            SuperBot.getInstance().menuBar().saros().preferences()
+                .activateAccount(jid);
+
         if (!isConnected()) {
             clickToolbarButtonWithTooltip(TB_CONNECT);
             waitUntilIsConnected();
@@ -126,8 +122,8 @@ public final class SarosView extends StfRemoteObject implements ISarosView {
     private void selectConnectAccount(String baseJID) throws RemoteException {
         SWTBotToolbarDropDownButton b = view.toolbarDropDownButton(TB_CONNECT);
         @SuppressWarnings("static-access")
-        Matcher<MenuItem> withRegex = WidgetMatcherFactory.withRegex(baseJID
-            + ".*");
+        Matcher<MenuItem> withRegex = WidgetMatcherFactory.withRegex(Pattern
+            .quote(baseJID) + ".*");
         b.menuItem(withRegex).click();
         try {
             b.pressShortcut(KeyStroke.getInstance("ESC"));

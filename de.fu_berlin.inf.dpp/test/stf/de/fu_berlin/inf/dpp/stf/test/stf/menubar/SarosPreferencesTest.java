@@ -22,6 +22,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.junit.After;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -36,6 +37,11 @@ public class SarosPreferencesTest extends StfTestCase {
     @BeforeClass
     public static void selectTesters() throws Exception {
         select(ALICE);
+    }
+
+    @Before
+    public void beforeEveryTest() throws RemoteException {
+        closeAllShells();
     }
 
     @After
