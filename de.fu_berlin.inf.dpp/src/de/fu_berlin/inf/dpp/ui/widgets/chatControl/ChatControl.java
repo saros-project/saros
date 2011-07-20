@@ -68,7 +68,7 @@ public class ChatControl extends Composite {
                 if (e.stateMask == 0) {
                     String message = ChatControl.this.getInputText().trim();
                     ChatControl.this.setInputText("");
-                    if (!message.isEmpty())
+                    if (message.length() != 0)
                         ChatControl.this.notifyMessageEntered(message);
 
                     /*

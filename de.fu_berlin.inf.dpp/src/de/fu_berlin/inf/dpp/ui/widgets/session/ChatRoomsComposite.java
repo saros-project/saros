@@ -196,7 +196,7 @@ public class ChatRoomsComposite extends ListExplanatoryComposite {
          */
         public void characterEntered(CharacterEnteredEvent event) {
 
-            if (chatControl.getInputText().isEmpty()) {
+            if (chatControl.getInputText().length() == 0) {
                 mucManager.getMUCSession().setState(ChatState.inactive);
             } else {
                 mucManager.getMUCSession().setState(ChatState.composing);
