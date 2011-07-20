@@ -20,16 +20,7 @@ import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.packet.Presence;
 import org.junit.Test;
 
-import de.fu_berlin.inf.dpp.Saros;
-
 public class RosterTrackerTest {
-
-    private static class SarosStub extends Saros {
-        @Override
-        public void addListener(IConnectionListener listener) {
-            //
-        }
-    }
 
     private static Presence createPresence(String user, Presence.Type type) {
         Presence p = new Presence(type);
@@ -62,7 +53,7 @@ public class RosterTrackerTest {
         replay(mockConnection);
         replay(mockRoster);
 
-        RosterTracker tracker = new RosterTracker(new SarosStub());
+        RosterTracker tracker = new RosterTracker(createMock(SarosNet.class));
         tracker.connectionStateChanged(mockConnection,
             ConnectionState.CONNECTED);
 
@@ -72,7 +63,7 @@ public class RosterTrackerTest {
 
     @Test
     public void testEmptyRosterGetPresence() {
-        RosterTracker tracker = new RosterTracker(new SarosStub());
+        RosterTracker tracker = new RosterTracker(createMock(SarosNet.class));
 
         assertFalse("this iterator must not have any elements", tracker
             .getPresences(new JID("bla")).iterator().hasNext());
@@ -80,7 +71,7 @@ public class RosterTrackerTest {
 
     @Test
     public void testEmptyRosterGetAvailablePresences() {
-        RosterTracker tracker = new RosterTracker(new SarosStub());
+        RosterTracker tracker = new RosterTracker(createMock(SarosNet.class));
 
         assertFalse("this iterator must not have any elements", tracker
             .getAvailablePresences(new JID("bla")).iterator().hasNext());
@@ -88,13 +79,13 @@ public class RosterTrackerTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void testGetAvailablePresencesWithNullJid() {
-        RosterTracker tracker = new RosterTracker(new SarosStub());
+        RosterTracker tracker = new RosterTracker(createMock(SarosNet.class));
         tracker.getAvailablePresences(null);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testGetPresencesWithNullJid() {
-        RosterTracker tracker = new RosterTracker(new SarosStub());
+        RosterTracker tracker = new RosterTracker(createMock(SarosNet.class));
         tracker.getPresences(null);
     }
 
@@ -109,7 +100,7 @@ public class RosterTrackerTest {
         replay(mockConnection);
         replay(mockRoster);
 
-        RosterTracker tracker = new RosterTracker(new SarosStub());
+        RosterTracker tracker = new RosterTracker(createMock(SarosNet.class));
         tracker.connectionStateChanged(mockConnection,
             ConnectionState.CONNECTED);
 
@@ -131,7 +122,7 @@ public class RosterTrackerTest {
         replay(mockConnection);
         replay(mockRoster);
 
-        RosterTracker tracker = new RosterTracker(new SarosStub());
+        RosterTracker tracker = new RosterTracker(createMock(SarosNet.class));
         tracker.connectionStateChanged(mockConnection,
             ConnectionState.CONNECTED);
 
@@ -163,7 +154,7 @@ public class RosterTrackerTest {
         replay(mockConnection);
         replay(mockRoster);
 
-        RosterTracker tracker = new RosterTracker(new SarosStub());
+        RosterTracker tracker = new RosterTracker(createMock(SarosNet.class));
         tracker.connectionStateChanged(mockConnection,
             ConnectionState.CONNECTED);
 

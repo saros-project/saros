@@ -1,6 +1,5 @@
 package de.fu_berlin.inf.dpp.ui.wizards.pages;
 
-import de.fu_berlin.inf.dpp.SarosPluginContext;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
@@ -16,6 +15,7 @@ import org.jivesoftware.smack.Roster;
 import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.Saros;
+import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.ui.util.LayoutUtils;
 import de.fu_berlin.inf.dpp.ui.widgets.decoration.EmptyText;
@@ -129,7 +129,7 @@ public class AddBuddyWizardPage extends WizardPage {
     }
 
     protected void updatePageCompletion() {
-        JID ownJid = saros.getMyJID();
+        JID ownJid = saros.getSarosNet().getMyJID();
         JID foreignJid = this.getBuddy();
 
         if (foreignJid.isValid() && !foreignJid.equals(ownJid)) {
@@ -139,7 +139,7 @@ public class AddBuddyWizardPage extends WizardPage {
 
             wasJIDValid = true;
 
-            Roster roster = saros.getRoster();
+            Roster roster = saros.getSarosNet().getRoster();
             if (roster != null && roster.contains(foreignJid.getBase())) {
                 setMessage(Messages.roster_alreadyadded_errorMessage
                     + "\n" + Messages.wizard_finish_noeffect, //$NON-NLS-1$

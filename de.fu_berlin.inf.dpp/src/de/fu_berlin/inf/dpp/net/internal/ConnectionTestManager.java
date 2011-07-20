@@ -21,6 +21,7 @@ import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
 import de.fu_berlin.inf.dpp.net.IncomingTransferObject;
 import de.fu_berlin.inf.dpp.net.IncomingTransferObject.IncomingTransferObjectExtensionProvider;
 import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.net.SarosNet;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager.NetTransferMode;
 import de.fu_berlin.inf.dpp.net.internal.TransferDescription.FileTransferType;
 import de.fu_berlin.inf.dpp.net.internal.discoveryManager.DiscoveryManager;
@@ -56,7 +57,7 @@ public class ConnectionTestManager {
         "sarosConnectionTestResult", ConnectionTestResponse.class);
 
     @Inject
-    protected Saros saros;
+    protected SarosNet sarosNet;
 
     @Inject
     protected DataTransferManager dataTransferManager;
@@ -107,7 +108,7 @@ public class ConnectionTestManager {
                     iqResponse.setTo(packet.getFrom());
                     iqResponse.setPacketID(ito.getTransferDescription().testID);
 
-                    saros.getConnection().sendPacket(iqResponse);
+                    sarosNet.getConnection().sendPacket(iqResponse);
                 } catch (Exception e) {
                     log.error(
                         "Could not send test results to "
@@ -169,7 +170,7 @@ public class ConnectionTestManager {
 
         progress.beginTask("Connection Test with buddy " + plainJID, 68);
         try {
-            Connection connection = saros.getConnection();
+            Connection connection = sarosNet.getConnection();
             if (connection == null || !connection.isConnected())
                 throw new XMPPException("Connection is not established!");
             progress.worked(1);
@@ -185,7 +186,7 @@ public class ConnectionTestManager {
             progress.worked(1);
 
             TransferDescription transferData = TransferDescription
-                .createTestTransferDescription(user, id, saros.getMyJID());
+                .createTestTransferDescription(user, id, sarosNet.getMyJID());
 
             progress.subTask("Generating Test Data");
             byte[] testData = getTestArray(size);

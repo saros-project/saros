@@ -21,11 +21,9 @@ package de.fu_berlin.inf.dpp.net;
 
 import org.jivesoftware.smack.Connection;
 
-import de.fu_berlin.inf.dpp.Saros;
-
 /**
  * A listener for changes to the current connection state. Use
- * {@link Saros#addListener(IConnectionListener)} to attach it.
+ * {@link SarosNet#addListener(IConnectionListener)} to attach it.
  * 
  * @author rdjemili
  */
@@ -39,7 +37,8 @@ public interface IConnectionListener {
      * @param newState
      *            the new state of the connection. If the new state is
      *            <code>ERROR</code>, you can use
-     *            {@link Saros#getConnectionError()} to get the error message.
+     *            {@link SarosNet#getConnectionError()} to get the error
+     *            message.
      */
     public void connectionStateChanged(Connection connection,
         ConnectionState newState);

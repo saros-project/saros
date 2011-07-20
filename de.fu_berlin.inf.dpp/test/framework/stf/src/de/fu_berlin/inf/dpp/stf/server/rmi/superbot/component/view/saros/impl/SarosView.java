@@ -264,7 +264,7 @@ public final class SarosView extends StfRemoteObject implements ISarosView {
     }
 
     public String getNickname(JID buddyJID) throws RemoteException {
-        Roster roster = getSaros().getRoster();
+        Roster roster = getSaros().getSarosNet().getRoster();
         if (roster.getEntry(buddyJID.getBase()) == null)
             return null;
         if (roster.getEntry(buddyJID.getBase()).getName() == null)

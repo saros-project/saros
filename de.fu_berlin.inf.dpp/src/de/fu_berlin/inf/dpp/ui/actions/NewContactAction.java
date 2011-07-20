@@ -48,7 +48,7 @@ public class NewContactAction extends Action {
 
         SarosPluginContext.initComponent(this);
 
-        saros.addListener(new IConnectionListener() {
+        saros.getSarosNet().addListener(new IConnectionListener() {
             public void connectionStateChanged(Connection connection,
                 ConnectionState newState) {
                 updateEnablement();
@@ -63,6 +63,6 @@ public class NewContactAction extends Action {
     }
 
     protected void updateEnablement() {
-        setEnabled(saros.isConnected());
+        setEnabled(saros.getSarosNet().isConnected());
     }
 }

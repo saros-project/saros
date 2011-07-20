@@ -56,7 +56,6 @@ import org.picocontainer.annotations.Inject;
 
 import com.google.common.collect.ImmutableList;
 
-import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.exceptions.ConnectionException;
@@ -68,6 +67,7 @@ import de.fu_berlin.inf.dpp.exceptions.StreamServiceNotValidException;
 import de.fu_berlin.inf.dpp.net.IncomingTransferObject;
 import de.fu_berlin.inf.dpp.net.IncomingTransferObject.IncomingTransferObjectExtensionProvider;
 import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.net.SarosNet;
 import de.fu_berlin.inf.dpp.net.internal.StreamServiceManager.StreamMetaPacketData.StreamClose;
 import de.fu_berlin.inf.dpp.net.internal.StreamSession.Stream;
 import de.fu_berlin.inf.dpp.net.internal.StreamSession.StreamSessionListener;
@@ -120,7 +120,7 @@ public class StreamServiceManager implements Startable {
 
     protected DataTransferManager dataTransferManager;
 
-    protected Saros saros;
+    protected SarosNet sarosNet;
 
     protected SarosSessionManager sessionManager;
 
@@ -194,14 +194,14 @@ public class StreamServiceManager implements Startable {
         XMPPReceiver xmppReceiver,
         DataTransferManager dataTransferManager,
         SarosSessionObservable sarosSessionObservable,
-        Saros saros,
+        SarosNet sarosNet,
         SarosSessionManager sessionManager,
         List<StreamService> streamServices,
         IncomingTransferObjectExtensionProvider incomingTransferObjectExtensionProvider) {
 
         this.dataTransferManager = dataTransferManager;
         this.sarosSessionObservable = sarosSessionObservable;
-        this.saros = saros;
+        this.sarosNet = sarosNet;
         this.sessionManager = sessionManager;
         this.incomingTransferObjectExtensionProvider = incomingTransferObjectExtensionProvider;
 
@@ -236,7 +236,8 @@ public class StreamServiceManager implements Startable {
         sender = new PacketSender();
         Utils.runSafeAsync("StreamServiceManagers-senderThread", log, sender);
         receiver = new PacketReceiver();
-        Utils.runSafeAsync("StreamServiceManagers-receiverThread", log, receiver);
+        Utils.runSafeAsync("StreamServiceManagers-receiverThread", log,
+            receiver);
         stopSessionExecutor = Executors.newScheduledThreadPool(5,
             new NamedThreadFactory("StreamSessionStopper-"));
 
@@ -520,7 +521,7 @@ public class StreamServiceManager implements Startable {
                 "Tried to create a stream with unregistered service " + service);
         int initiationID = nextStreamSessionID.getAndIncrement();
 
-        StreamPath streamPath = new StreamPath(saros.getMyJID(), service,
+        StreamPath streamPath = new StreamPath(sarosNet.getMyJID(), service,
             initiationID);
 
         if (initiationDescription != null) {
@@ -539,7 +540,7 @@ public class StreamServiceManager implements Startable {
         // send negotiation
         TransferDescription transferDescription = TransferDescription
             .createStreamMetaTransferDescription(user.getJID(),
-                saros.getMyJID(), streamPath.toString(),
+                sarosNet.getMyJID(), streamPath.toString(),
                 sarosSessionID.getValue());
 
         if (sender != null)
@@ -1229,7 +1230,7 @@ public class StreamServiceManager implements Startable {
 
                     TransferDescription transferDescription = TransferDescription
                         .createStreamDataTransferDescription(
-                            stream.getSession().remoteJID, saros.getMyJID(),
+                            stream.getSession().remoteJID, sarosNet.getMyJID(),
                             sarosSessionID.getValue(),
                             stream.getStreamPath(data.length).toString());
 
@@ -1560,7 +1561,7 @@ public class StreamServiceManager implements Startable {
                 else {
                     final StreamSession newSession = new StreamSession(
                         StreamServiceManager.this, initiation.service,
-                        transferDescription.sender, saros.getMyJID(),
+                        transferDescription.sender, sarosNet.getMyJID(),
                         streamPath.sessionID, initiation.initial);
                     sessions.put(streamPath, newSession);
 

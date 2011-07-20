@@ -321,15 +321,7 @@ public class VersionManager {
     }
 
     protected Bundle bundle;
-
-    /**
-     * @Inject
-     */
     protected Saros saros;
-
-    /**
-     * @Inject
-     */
     protected XMPPTransmitter transmitter;
 
     protected XStreamExtensionProvider<VersionInfo> versionProvider = new XStreamExtensionProvider<VersionInfo>(
@@ -363,7 +355,7 @@ public class VersionManager {
                 reply.setType(IQ.Type.RESULT);
                 reply.setPacketID(iq.getPacketID());
                 reply.setTo(iq.getFrom());
-                saros.getConnection().sendPacket(reply);
+                saros.getSarosNet().getConnection().sendPacket(reply);
                 log.debug("Sending version info to " + iq.getFrom());
             }
         }, versionProvider.getIQFilter());

@@ -17,6 +17,7 @@ import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.RosterTracker;
+import de.fu_berlin.inf.dpp.net.SarosNet;
 import de.fu_berlin.inf.dpp.net.internal.discoveryManager.DiscoveryManager;
 import de.fu_berlin.inf.dpp.observables.InvitationProcessObservable;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
@@ -30,7 +31,7 @@ import de.fu_berlin.inf.dpp.util.VersionManager.VersionInfo;
 public class InvitationWizard extends Wizard {
 
     private static final Logger log = Logger.getLogger(InvitationWizard.class);
-    protected Saros saros;
+    protected SarosNet sarosNet;
     protected ISarosSession sarosSession;
     protected RosterTracker rosterTracker;
     protected DiscoveryManager discoveryManager;
@@ -39,11 +40,11 @@ public class InvitationWizard extends Wizard {
     protected VersionManager versionManager;
     protected InvitationProcessObservable invitationProcesses;
 
-    public InvitationWizard(Saros saros, ISarosSession sarosSession,
+    public InvitationWizard(SarosNet sarosNet, ISarosSession sarosSession,
         RosterTracker rosterTracker, DiscoveryManager discoveryManager,
         SarosSessionManager sessionManager, VersionManager versionManager,
         InvitationProcessObservable invitationProcesses) {
-        this.saros = saros;
+        this.sarosNet = sarosNet;
         this.sarosSession = sarosSession;
         this.rosterTracker = rosterTracker;
         this.discoveryManager = discoveryManager;
@@ -116,8 +117,8 @@ public class InvitationWizard extends Wizard {
 
     @Override
     public void addPages() {
-        userSelection = new InvitationWizardUserSelectionPage(saros, sarosSession,
-            rosterTracker, discoveryManager, invitationProcesses);
+        userSelection = new InvitationWizardUserSelectionPage(sarosNet,
+            sarosSession, rosterTracker, discoveryManager, invitationProcesses);
         addPage(userSelection);
     }
 
@@ -135,7 +136,7 @@ public class InvitationWizard extends Wizard {
         if (!Saros.isWorkbenchAvailable()) {
             return true;
         }
-        
+
         try {
             return Utils.runSWTSync(new Callable<Boolean>() {
                 public Boolean call() {
@@ -235,7 +236,7 @@ public class InvitationWizard extends Wizard {
         if (!Saros.isWorkbenchAvailable()) {
             return true;
         }
-        
+
         final String title = "Unable to determine Saros compatibility with "
             + peer.getBase();
         final String message = "Saros was unable to check the version number of your peer "

@@ -182,8 +182,8 @@ public class BuddySessionDisplayComposite extends ViewerComposite {
     protected ISharedEditorListener sharedEditorListener = new AbstractSharedEditorListener() {
         @Override
         public void followModeChanged(User user, boolean isFollowed) {
-            ViewerUtils.update(viewer,
-                new UserElement(user, saros.getRoster()), null);
+            ViewerUtils.update(viewer, new UserElement(user, saros
+                .getSarosNet().getRoster()), null);
         }
 
         @Override
@@ -211,7 +211,7 @@ public class BuddySessionDisplayComposite extends ViewerComposite {
         updateViewer();
         ViewerUtils.expandAll(this.viewer);
 
-        this.saros.addListener(connectionListener);
+        saros.getSarosNet().addListener(connectionListener);
         this.sarosSessionManager.addSarosSessionListener(sarosSessionListener);
         EditorsUI.getPreferenceStore().addPropertyChangeListener(
             editorPrefsListener);
@@ -233,8 +233,8 @@ public class BuddySessionDisplayComposite extends ViewerComposite {
                     sarosSessionManager
                         .removeSarosSessionListener(sarosSessionListener);
                 }
-                if (saros != null) {
-                    saros.removeListener(connectionListener);
+                if (saros.getSarosNet() != null) {
+                    saros.getSarosNet().removeListener(connectionListener);
                 }
                 if (rosterTracker != null) {
                     rosterTracker.removeRosterListener(rosterListener);
@@ -287,8 +287,8 @@ public class BuddySessionDisplayComposite extends ViewerComposite {
     }
 
     protected void updateViewer() {
-        if (saros.getRoster() != null)
-            cachedRoster = saros.getRoster();
+        if (saros.getSarosNet().getRoster() != null)
+            cachedRoster = saros.getSarosNet().getRoster();
         ViewerUtils.setInput(viewer, new RosterSessionInput(cachedRoster,
             sarosSessionManager.getSarosSession()));
     }

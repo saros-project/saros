@@ -38,7 +38,7 @@ import de.fu_berlin.inf.dpp.util.Utils;
  * is tried to establish a connection to the side peer, too. A special ID is
  * used to distinguish connect requests and response requests. If there is a
  * direct connection, we keep it, the other one discarded. If the is no one, a
- * SMACK will establish a mediated conneciton by the server.
+ * SMACK will establish a mediated connection by the server.
  * 
  * Are both connection direct, we use the one of the connect request (same for
  * mediated).
@@ -68,18 +68,6 @@ public class Socks5Transport extends BytestreamTransport {
     private static final String RESPONSE_SESSION_ID_PREFIX = "response_js5";
     private static final Random randomGenerator = new Random();
     private static final int NUMBER_OF_RESPONSE_THREADS = 10;
-
-    private static Socks5Transport instance = null;
-
-    private Socks5Transport() {
-        //
-    }
-
-    public synchronized static Socks5Transport getTransport() {
-        if (instance == null)
-            instance = new Socks5Transport();
-        return instance;
-    }
 
     protected HashMap<String, Exchanger<Socks5BytestreamSession>> runningConnects = new HashMap<String, Exchanger<Socks5BytestreamSession>>();
     protected ExecutorService executorService;
@@ -470,7 +458,7 @@ public class Socks5Transport extends BytestreamTransport {
 
             Exception exception = null;
             Socks5BytestreamSession outSession = null;
-            // Do we get a wroking connection?
+            // Do we get a working connection?
             try {
 
                 outSession = (Socks5BytestreamSession) manager
@@ -590,6 +578,8 @@ public class Socks5Transport extends BytestreamTransport {
 
     @Override
     public void disposeXMPPConnection() {
+        assert (executorService != null);
+
         List<Runnable> notCommenced = executorService.shutdownNow();
         if (notCommenced.size() > 0)
             log.warn(prefix()

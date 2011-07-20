@@ -85,7 +85,7 @@ public class JIDFileAppender extends FileAppender {
     protected void initialize() {
         SarosPluginContext.initComponent(this);
 
-        saros.addListener(new IConnectionListener() {
+        saros.getSarosNet().addListener(new IConnectionListener() {
 
             public void connectionStateChanged(Connection connection,
                 ConnectionState newState) {
@@ -97,7 +97,7 @@ public class JIDFileAppender extends FileAppender {
         });
 
         // If already connected use the current JID.
-        setJID(saros.getMyJID());
+        setJID(saros.getSarosNet().getMyJID());
     }
 
     protected synchronized void setJID(@Nullable JID newJID) {

@@ -129,7 +129,7 @@ public class CreateXMPPAccountWizard extends Wizard {
         // reconnect if user wishes
         if (createXMPPAccountPage.useNow()) {
             boolean reconnect = true;
-            if (saros.isConnected()) {
+            if (saros.getSarosNet().isConnected()) {
                 reconnect = DialogUtils.openQuestionMessageDialog(getShell(),
                     "Already Connected", "You are already connected.\n\n"
                         + "Do you want to disconnect and\n"

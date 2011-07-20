@@ -17,7 +17,7 @@ public class SarosPropertyTester extends PropertyTester {
         if (receiver instanceof Saros) {
             Saros saros = (Saros) receiver;
             if ("isConnected".equals(property)) {
-                return saros.isConnected();
+                return saros.getSarosNet().isConnected();
             }
         }
         return false;

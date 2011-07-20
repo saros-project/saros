@@ -192,11 +192,11 @@ public class TransferDescription implements Serializable {
     }
 
     public static TransferDescription createArchiveTransferDescription(
-        JID recipient2, JID jid, String sessionID, String invitationID) {
+        JID recipient, JID sender, String sessionID, String invitationID) {
 
         TransferDescription result = new TransferDescription();
-        result.recipient = recipient2;
-        result.sender = jid;
+        result.recipient = recipient;
+        result.sender = sender;
         result.type = FileTransferType.ARCHIVE_TRANSFER;
         result.sessionID = sessionID;
         result.invitationID = invitationID;

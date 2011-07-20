@@ -1,6 +1,6 @@
 /*
  * DPP - Serious Distributed Pair Programming
- * (c) Freie Universität Berlin - Fachbereich Mathematik und Informatik - 2010
+ * (c) Freie Universitï¿½t Berlin - Fachbereich Mathematik und Informatik - 2010
  * (c) Stephan Lau - 2010
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -174,8 +174,9 @@ public class StreamSession implements Disposable {
      */
     protected TransferDescription getTransferDescription() {
         return TransferDescription.createStreamMetaTransferDescription(
-            remoteJID, streamServiceManager.saros.getMyJID(), getStreamPath()
-                .toString(), streamServiceManager.sarosSessionID.getValue());
+            remoteJID, streamServiceManager.sarosNet.getMyJID(),
+            getStreamPath().toString(),
+            streamServiceManager.sarosSessionID.getValue());
     }
 
     public JID getRemoteJID() {
@@ -271,7 +272,7 @@ public class StreamSession implements Disposable {
      * @return <code>true</code> when we are initiator of this session
      */
     public boolean isInitiator() {
-        return this.initiator.equals(streamServiceManager.saros.getMyJID());
+        return this.initiator.equals(streamServiceManager.sarosNet.getMyJID());
     }
 
     /**

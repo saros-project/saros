@@ -20,7 +20,6 @@ import org.jivesoftware.smack.Roster;
 import org.jivesoftware.smack.packet.Presence;
 import org.picocontainer.annotations.Inject;
 
-import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
 import de.fu_berlin.inf.dpp.net.ConnectionState;
@@ -31,6 +30,7 @@ import de.fu_berlin.inf.dpp.net.IncomingTransferObject;
 import de.fu_berlin.inf.dpp.net.IncomingTransferObject.IncomingTransferObjectExtensionProvider;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.RosterTracker;
+import de.fu_berlin.inf.dpp.net.SarosNet;
 import de.fu_berlin.inf.dpp.net.UPnP.UPnPManager;
 import de.fu_berlin.inf.dpp.net.business.DispatchThreadContext;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
@@ -70,9 +70,13 @@ public class DataTransferManager implements IConnectionListener,
     protected IncomingTransferObjectExtensionProvider incomingExtProv;
 
     @Inject
+    private IBBTransport ibbTransport;
+
+    @Inject
     protected UPnPManager upnpManager;
 
-    protected Saros saros;
+    @Inject
+    private Socks5Transport socks5Transport;
 
     protected PreferenceUtils preferenceUtils;
 
@@ -82,25 +86,30 @@ public class DataTransferManager implements IConnectionListener,
 
     protected SessionIDObservable sessionID = null;
 
+    SarosNet sarosNet;
+
     /**
      * Collection of {@link JID}s, flagged to prefer IBB transfer mode
      */
     protected Collection<JID> peersForIBB = new ArrayList<JID>();
 
-    @Inject
-    private IBBTransport ibbTransport;
+    public DataTransferManager(SarosNet sarosNet,
+        SessionIDObservable sessionID, PreferenceUtils preferenceUtils,
+        RosterTracker rosterTracker, IBBTransport ibbTransport,
+        Socks5Transport socks5Transport) {
 
-    public DataTransferManager(Saros saros, SessionIDObservable sessionID,
-        PreferenceUtils preferenceUtils, RosterTracker rosterTracker,
-        IBBTransport ibbTransport) {
         this.sessionID = sessionID;
-        this.saros = saros;
         this.preferenceUtils = preferenceUtils;
-        this.initTransports();
-        addRosterListener(rosterTracker);
-        saros.addListener(this);
-        transferModeDispatch.add(new TransferCompleteListener());
         this.ibbTransport = ibbTransport;
+        this.socks5Transport = socks5Transport;
+        this.initTransports();
+
+        if (rosterTracker != null)
+            addRosterListener(rosterTracker);
+        sarosNet.addListener(this);
+        this.sarosNet = sarosNet;
+
+        transferModeDispatch.add(new TransferCompleteListener());
     }
 
     /**
@@ -318,7 +327,9 @@ public class DataTransferManager implements IConnectionListener,
 
         // Think about how to synchronize this, that multiple people can connect
         // at the same time.
-        LoggingUtils.log(log, "sending data ... ", transferData.logToDebug);
+        LoggingUtils.log(log, "sending data ... from " + sarosNet.getMyJID()
+            + " to " + transferData.getRecipient().toString(),
+            transferData.logToDebug);
 
         JID recipient = transferData.recipient;
 
@@ -337,7 +348,6 @@ public class DataTransferManager implements IConnectionListener,
             connection.send(transferData, input, progress);
 
             watch.stop();
-
             transferModeDispatch.transferFinished(recipient,
                 connection.getMode(), false, input.length, sizeUncompressed,
                 watch.getTime());
@@ -397,8 +407,8 @@ public class DataTransferManager implements IConnectionListener,
 
         for (ITransport transport : transportModesToUse) {
             log.info("Try to establish a bytestream connection to "
-                + recipient.getBase() + " using "
-                + transport.getDefaultNetTransferMode());
+                + recipient.getBase() + " from " + sarosNet.getMyJID()
+                + " using " + transport.getDefaultNetTransferMode());
             try {
                 connection = transport.connect(recipient, progress);
             } catch (IOException e) {
@@ -465,9 +475,9 @@ public class DataTransferManager implements IConnectionListener,
         connections.put(peer, connection2);
         transferModeDispatch.connectionChanged(peer, connection2);
 
-        if (connection2.getMode() == NetTransferMode.IBB && incomingRequest)
+        if (connection2.getMode() == NetTransferMode.IBB && incomingRequest
+            && upnpManager != null)
             upnpManager.checkAndInformAboutUPnP();
-
     }
 
     public void connectionClosed(JID peer, IBytestreamConnection connection2) {
@@ -564,7 +574,14 @@ public class DataTransferManager implements IConnectionListener,
      * effort.
      */
     protected void initTransports() {
-        initTransports(preferenceUtils.forceFileTranserByChat());
+        initTransports(isForceFileTransferByChatEnabled());
+    }
+
+    protected boolean isForceFileTransferByChatEnabled() {
+        if (preferenceUtils != null)
+            return preferenceUtils.forceFileTranserByChat();
+        else
+            return false;
     }
 
     /**
@@ -577,7 +594,8 @@ public class DataTransferManager implements IConnectionListener,
         if (!chatOnly) {
             addPrimaryTransports();
         }
-        transports.add(ibbTransport);
+        if (ibbTransport != null)
+            transports.add(ibbTransport);
     }
 
     /**
@@ -585,7 +603,8 @@ public class DataTransferManager implements IConnectionListener,
      * are tried in order they are inserted here.
      */
     protected void addPrimaryTransports() {
-        transports.add(0, Socks5Transport.getTransport());
+        if (socks5Transport != null)
+            transports.add(0, socks5Transport);
     }
 
     public boolean connectionIsDisposed() {
@@ -772,6 +791,13 @@ public class DataTransferManager implements IConnectionListener,
      */
     protected void setIncomingIBBTransferSpeed(JID jid, double value) {
         incomingIBBTransferSpeeds.put(jid, value);
+    }
+
+    protected void inject(XMPPReceiver xmppReceiver, DispatchThreadContext dtc,
+        IncomingTransferObjectExtensionProvider iep) {
+        this.receiver = xmppReceiver;
+        this.dispatchThreadContext = dtc;
+        this.incomingExtProv = iep;
     }
 
     /**

@@ -86,7 +86,7 @@ public class DeleteContactAction extends Action implements Disposable {
 
         SarosPluginContext.initComponent(this);
 
-        saros.addListener(connectionListener);
+        saros.getSarosNet().addListener(connectionListener);
         SelectionUtils.getSelectionService().addSelectionListener(
             selectionListener);
         updateEnablement();
@@ -96,7 +96,8 @@ public class DeleteContactAction extends Action implements Disposable {
         try {
             List<JID> buddies = SelectionRetrieverFactory
                 .getSelectionRetriever(JID.class).getSelection();
-            this.setEnabled(saros.isConnected() && buddies.size() == 1);
+            this.setEnabled(saros.getSarosNet().isConnected()
+                && buddies.size() == 1);
         } catch (NullPointerException e) {
             this.setEnabled(false);
         } catch (Exception e) {
@@ -165,8 +166,8 @@ public class DeleteContactAction extends Action implements Disposable {
                 + " from your buddies?")) {
 
             try {
-                RosterUtils
-                    .removeFromRoster(saros.getConnection(), rosterEntry);
+                RosterUtils.removeFromRoster(saros.getSarosNet()
+                    .getConnection(), rosterEntry);
             } catch (XMPPException e) {
                 log.error("Could not delete buddy " + toString(rosterEntry)
                     + ":", e);
@@ -177,6 +178,6 @@ public class DeleteContactAction extends Action implements Disposable {
     public void dispose() {
         SelectionUtils.getSelectionService().removeSelectionListener(
             selectionListener);
-        saros.removeListener(connectionListener);
+        saros.getSarosNet().removeListener(connectionListener);
     }
 }

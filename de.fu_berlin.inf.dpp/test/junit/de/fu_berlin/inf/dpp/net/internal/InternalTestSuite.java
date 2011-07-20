@@ -4,7 +4,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
 @RunWith(Suite.class)
-@Suite.SuiteClasses( { TransferDescriptionTest.class })
+@Suite.SuiteClasses({ TransferDescriptionTest.class, SarosNetConnectTest.class })
 public class InternalTestSuite {
     // the class remains completely empty,
     // being used only as a holder for the above annotations

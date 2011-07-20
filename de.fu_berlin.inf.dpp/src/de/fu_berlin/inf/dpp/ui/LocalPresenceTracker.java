@@ -10,10 +10,10 @@ import org.eclipse.ui.PlatformUI;
 import org.jivesoftware.smack.Connection;
 import org.jivesoftware.smack.packet.Presence;
 
-import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.net.ConnectionState;
 import de.fu_berlin.inf.dpp.net.IConnectionListener;
+import de.fu_berlin.inf.dpp.net.SarosNet;
 import de.fu_berlin.inf.dpp.util.DeferredValueChangeListener;
 import de.fu_berlin.inf.dpp.util.Utils;
 import de.fu_berlin.inf.dpp.util.ValueChangeListener;
@@ -28,15 +28,13 @@ public class LocalPresenceTracker {
     private static final Logger log = Logger
         .getLogger(LocalPresenceTracker.class);
 
-    protected Saros saros;
-
     protected Connection connection = null;
 
     boolean active = true;
 
-    public LocalPresenceTracker(Saros saros) {
+    public LocalPresenceTracker(SarosNet sarosNet) {
 
-        saros.addListener(new IConnectionListener() {
+        sarosNet.addListener(new IConnectionListener() {
 
             public void connectionStateChanged(Connection connection,
                 ConnectionState newState) {

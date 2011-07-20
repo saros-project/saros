@@ -158,7 +158,7 @@ public class SarosSessionManager implements IConnectionListener,
     public SarosSessionManager(Saros saros) {
         this.saros = saros;
         this.prefStore = saros.getPreferenceStore();
-        saros.addListener(this);
+        saros.getSarosNet().addListener(this);
     }
 
     protected static final Random sessionRandom = new Random();
@@ -166,7 +166,7 @@ public class SarosSessionManager implements IConnectionListener,
     public void startSession(
         HashMap<IProject, List<IResource>> projectResourcesMapping)
         throws XMPPException {
-        if (!saros.isConnected()) {
+        if (!saros.getSarosNet().isConnected()) {
             throw new XMPPException("No connection");
         }
 
@@ -368,9 +368,9 @@ public class SarosSessionManager implements IConnectionListener,
         Utils.runSafeSWTAsync(log, new Runnable() {
             public void run() {
                 // Instantiates and initializes the wizard
-                InvitationWizard wizard = new InvitationWizard(saros,
-                    sarosSession, rosterTracker, discoveryManager,
-                    SarosSessionManager.this, versionManager,
+                InvitationWizard wizard = new InvitationWizard(saros
+                    .getSarosNet(), sarosSession, rosterTracker,
+                    discoveryManager, SarosSessionManager.this, versionManager,
                     invitationProcesses);
 
                 // Instantiates the wizard container with the wizard and opens

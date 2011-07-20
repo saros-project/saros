@@ -61,7 +61,7 @@ public class SkypeManager implements IConnectionListener {
                 reply.setPacketID(iq.getPacketID());
                 reply.setTo(iq.getFrom());
 
-                saros.getConnection().sendPacket(reply);
+                saros.getSarosNet().getConnection().sendPacket(reply);
             }
             if (iq.getType() == IQ.Type.SET) {
                 String skypeName = iq.getPayload();
@@ -79,7 +79,7 @@ public class SkypeManager implements IConnectionListener {
 
     public SkypeManager(Saros saros) {
         this.saros = saros;
-        saros.addListener(this);
+        saros.getSarosNet().addListener(this);
 
         /**
          * Register for our preference store, so we can be notified if the Skype
@@ -107,7 +107,7 @@ public class SkypeManager implements IConnectionListener {
      */
     public String getSkypeURLNonBlock(String jid) {
 
-        Connection connection = saros.getConnection();
+        Connection connection = saros.getSarosNet().getConnection();
         if (connection == null)
             return null;
 
@@ -166,7 +166,7 @@ public class SkypeManager implements IConnectionListener {
      */
     public String getSkypeURL(String jid) {
 
-        Connection connection = saros.getConnection();
+        Connection connection = saros.getSarosNet().getConnection();
         if (connection == null)
             return null;
 
@@ -197,7 +197,8 @@ public class SkypeManager implements IConnectionListener {
      */
     public String getSkypeURL(JID rqJID) {
 
-        Connection connection = saros.getConnection();
+        Connection connection = saros.getSarosNet().getConnection();
+
         if (connection == null)
             return null;
 
@@ -226,7 +227,8 @@ public class SkypeManager implements IConnectionListener {
      * TODO SS only send to those, that we know use Saros.
      */
     public void publishSkypeIQ(String newSkypeName) {
-        Connection connection = saros.getConnection();
+        Connection connection = saros.getSarosNet().getConnection();
+
         if (connection == null)
             return;
 

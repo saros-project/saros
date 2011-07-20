@@ -51,10 +51,8 @@ public class SarosSourceProvider extends AbstractSourceProvider {
      * of the {@link #SAROS_SESSION} variable.
      */
     public static final String[] SAROS_SESSION_DEPENDENT_COMMANDS = {};
-
     @Inject
     protected Saros saros;
-
     @Inject
     protected SarosSessionManager sarosSessionManager;
 
@@ -81,7 +79,7 @@ public class SarosSourceProvider extends AbstractSourceProvider {
 
     public SarosSourceProvider() {
         SarosPluginContext.initComponent(this);
-        this.saros.addListener(this.connectionListener);
+        saros.getSarosNet().addListener(this.connectionListener);
         this.sarosSessionManager
             .addSarosSessionListener(this.sarosSessionListener);
 
@@ -93,7 +91,7 @@ public class SarosSourceProvider extends AbstractSourceProvider {
     public void dispose() {
         this.sarosSessionManager
             .removeSarosSessionListener(this.sarosSessionListener);
-        this.saros.removeListener(this.connectionListener);
+        saros.getSarosNet().removeListener(this.connectionListener);
     }
 
     public String[] getProvidedSourceNames() {

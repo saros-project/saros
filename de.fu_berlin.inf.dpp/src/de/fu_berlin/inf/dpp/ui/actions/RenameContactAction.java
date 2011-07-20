@@ -76,7 +76,7 @@ public class RenameContactAction extends Action {
 
         SarosPluginContext.initComponent(this);
 
-        saros.addListener(connectionListener);
+        saros.getSarosNet().addListener(connectionListener);
         SelectionUtils.getSelectionService().addSelectionListener(
             selectionListener);
         updateEnablement();
@@ -86,7 +86,8 @@ public class RenameContactAction extends Action {
         try {
             List<JID> buddies = SelectionRetrieverFactory
                 .getSelectionRetriever(JID.class).getSelection();
-            this.setEnabled(saros.isConnected() && buddies.size() == 1);
+            this.setEnabled(saros.getSarosNet().isConnected()
+                && buddies.size() == 1);
         } catch (NullPointerException e) {
             this.setEnabled(false);
         } catch (Exception e) {
@@ -109,7 +110,7 @@ public class RenameContactAction extends Action {
                      */
                     // Compare the plain-JID portion of the XMPP address
                     if (!new JID(selectedRosterEntries.get(0).getUser())
-                        .equals(saros.getMyJID())) {
+                        .equals(saros.getSarosNet().getMyJID())) {
                         rosterEntry = selectedRosterEntries.get(0);
                     }
                 }
@@ -145,6 +146,6 @@ public class RenameContactAction extends Action {
     public void dispose() {
         SelectionUtils.getSelectionService().removeSelectionListener(
             selectionListener);
-        saros.removeListener(connectionListener);
+        saros.getSarosNet().removeListener(connectionListener);
     }
 }

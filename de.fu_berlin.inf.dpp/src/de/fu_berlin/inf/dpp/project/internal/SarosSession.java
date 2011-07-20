@@ -62,6 +62,7 @@ import de.fu_berlin.inf.dpp.concurrent.management.TransformationResult;
 import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.net.SarosNet;
 import de.fu_berlin.inf.dpp.net.business.DispatchThreadContext;
 import de.fu_berlin.inf.dpp.net.internal.ActivitySequencer;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
@@ -93,6 +94,9 @@ public class SarosSession implements ISarosSession, Disposable {
     /* Dependencies */
     @Inject
     protected Saros saros;
+
+    @Inject
+    protected SarosNet sarosNet;
 
     @Inject
     protected PreferenceUtils preferenceUtils;
@@ -227,11 +231,11 @@ public class SarosSession implements ISarosSession, Disposable {
         sarosContext.initComponent(this);
 
         assert transmitter != null;
-        assert saros.getMyJID() != null;
+        assert sarosNet.getMyJID() != null;
 
         this.sessionStart = sessionStart;
 
-        this.localUser = new User(this, saros.getMyJID(), myColorID);
+        this.localUser = new User(this, sarosNet.getMyJID(), myColorID);
 
         this.prefStore = saros.getPreferenceStore();
         int updateInterval = prefStore
@@ -277,7 +281,7 @@ public class SarosSession implements ISarosSession, Disposable {
         host.invitationCompleted();
 
         participants.put(hostID, host);
-        participants.put(saros.getMyJID(), localUser);
+        participants.put(sarosNet.getMyJID(), localUser);
 
         concurrentDocumentClient = new ConcurrentDocumentClient(this);
     }

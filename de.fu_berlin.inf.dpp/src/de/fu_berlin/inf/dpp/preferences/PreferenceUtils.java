@@ -306,4 +306,12 @@ public class PreferenceUtils {
             PreferenceConstants.LOCAL_SOCKS5_PROXY_DISABLED);
     }
 
+    public String getStunIP() {
+        return saros.getPreferenceStore().getString(PreferenceConstants.STUN);
+    }
+
+    public int getStunPort() {
+        return saros.getPreferenceStore().getInt(PreferenceConstants.STUN_PORT);
+    }
+
 }

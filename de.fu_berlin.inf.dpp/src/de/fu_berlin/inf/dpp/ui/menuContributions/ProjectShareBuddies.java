@@ -54,7 +54,7 @@ public class ProjectShareBuddies extends ContributionItem {
 
     @Override
     public void fill(Menu menu, int index) {
-        if (!this.saros.isConnected())
+        if (!saros.getSarosNet().isConnected())
             return;
 
         final List<IResource> selectedResources = SelectionRetrieverFactory
@@ -88,8 +88,8 @@ public class ProjectShareBuddies extends ContributionItem {
      * @return
      */
     protected RosterEntry[] getSortedRosterEntries() {
-        RosterEntry[] rosterEntries = saros.getRoster().getEntries()
-            .toArray(new RosterEntry[0]);
+        RosterEntry[] rosterEntries = saros.getSarosNet().getRoster()
+            .getEntries().toArray(new RosterEntry[0]);
         Arrays.sort(rosterEntries, new Comparator<RosterEntry>() {
             public int compare(RosterEntry o1, RosterEntry o2) {
                 String name1 = RosterUtils.getDisplayableName(o1);
@@ -116,8 +116,8 @@ public class ProjectShareBuddies extends ContributionItem {
         /*
          * The model knows how to display roster entries best.
          */
-        RosterEntryElement rosterEntryElement = new RosterEntryElement(
-            saros.getRoster(), new JID(rosterEntry.getUser()));
+        RosterEntryElement rosterEntryElement = new RosterEntryElement(saros
+            .getSarosNet().getRoster(), new JID(rosterEntry.getUser()));
 
         MenuItem menuItem = new MenuItem(parentMenu, SWT.NONE, index);
         menuItem.setText(rosterEntryElement.getStyledText().toString());

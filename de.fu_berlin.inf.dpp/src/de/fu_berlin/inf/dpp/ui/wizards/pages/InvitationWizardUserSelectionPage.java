@@ -34,6 +34,7 @@ import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.net.IRosterListener;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.RosterTracker;
+import de.fu_berlin.inf.dpp.net.SarosNet;
 import de.fu_berlin.inf.dpp.net.internal.discoveryManager.DiscoveryManager;
 import de.fu_berlin.inf.dpp.net.internal.discoveryManager.DiscoveryManager.CacheMissException;
 import de.fu_berlin.inf.dpp.observables.InvitationProcessObservable;
@@ -45,7 +46,6 @@ public class InvitationWizardUserSelectionPage extends WizardPage {
     private static final Logger log = Logger
         .getLogger(InvitationWizardUserSelectionPage.class);
 
-    protected Saros saros;
     protected Roster roster;
     protected RosterTracker rosterTracker;
     protected ISarosSession sarosSession;
@@ -58,13 +58,12 @@ public class InvitationWizardUserSelectionPage extends WizardPage {
     protected SelectionListener onlySarosListener;
     protected ISelectionChangedListener userSelectionChangedListener;
 
-    public InvitationWizardUserSelectionPage(Saros saros,
+    public InvitationWizardUserSelectionPage(SarosNet sarosNet,
         ISarosSession sarosSession, RosterTracker rosterTracker,
         DiscoveryManager discoveryManager,
         InvitationProcessObservable invitationProcesses) {
         super("Select buddies to invite");
-        this.saros = saros;
-        this.roster = saros.getRoster();
+        this.roster = sarosNet.getRoster();
         this.sarosSession = sarosSession;
         this.rosterTracker = rosterTracker;
         this.discoveryManager = discoveryManager;

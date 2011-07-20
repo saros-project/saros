@@ -303,7 +303,7 @@ public class SarosView extends ViewPart {
         getSite().setSelectionProvider(buddySessionViewer);
 
         rosterTracker.addRosterListener(rosterListenerBuddys);
-        rosterListenerBuddys.rosterChanged(saros.getRoster());
+        rosterListenerBuddys.rosterChanged(saros.getSarosNet().getRoster());
 
         getViewSite().getPage().addPartListener(partListener);
     }

@@ -51,6 +51,7 @@ import de.fu_berlin.inf.dpp.feedback.VoIPCollector;
 import de.fu_berlin.inf.dpp.invitation.ArchiveStreamService;
 import de.fu_berlin.inf.dpp.net.IncomingTransferObject;
 import de.fu_berlin.inf.dpp.net.RosterTracker;
+import de.fu_berlin.inf.dpp.net.SarosNet;
 import de.fu_berlin.inf.dpp.net.StunHelper;
 import de.fu_berlin.inf.dpp.net.UPnP.UPnPManager;
 import de.fu_berlin.inf.dpp.net.business.ActivitiesHandler;
@@ -68,6 +69,7 @@ import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
 import de.fu_berlin.inf.dpp.net.internal.DefaultInvitationInfo;
 import de.fu_berlin.inf.dpp.net.internal.IBBTransport;
 import de.fu_berlin.inf.dpp.net.internal.InvitationInfo;
+import de.fu_berlin.inf.dpp.net.internal.Socks5Transport;
 import de.fu_berlin.inf.dpp.net.internal.StreamServiceManager;
 import de.fu_berlin.inf.dpp.net.internal.UserListInfo;
 import de.fu_berlin.inf.dpp.net.internal.XMPPReceiver;
@@ -159,8 +161,6 @@ public class SarosContext {
         ChangeColorManager.class,
         ConsistencyWatchdogClient.class,
         ConsistencyWatchdogServer.class,
-        DataTransferManager.class,
-        DiscoveryManager.class,
         EditorAPI.class,
         EditorManager.class,
         ErrorLogManager.class,
@@ -169,36 +169,43 @@ public class SarosContext {
         LocalPresenceTracker.class,
         MUCManager.class,
         MUCManagerSingletonWrapperChatView.class,
-        PingPongCentral.class,
         PreferenceManager.class,
         PreferenceUtils.class,
         PermissionManager.class,
-        RosterTracker.class,
-        SarosRosterListener.class,
         SarosUI.class,
         SarosSessionManager.class,
         SessionViewOpener.class,
         SharedResourcesManager.class,
-        SkypeManager.class,
         StatisticManager.class,
         StopManager.class,
-        StreamServiceManager.class,
         AudioServiceManager.class,
         MixerManager.class,
-        SubscriptionManager.class,
         UndoManager.class,
         VideoSharing.class,
         VersionManager.class,
         MUCSessionPreferencesNegotiatingManager.class,
-        XMPPReceiver.class,
-        XMPPTransmitter.class,
         RemoteProgressManager.class,
         XMPPAccountStore.class,
         ProjectsAddedManager.class,
         EclipseHelper.class,
+
+        // Network
+        ConnectionTestManager.class,
+        DataTransferManager.class,
+        DiscoveryManager.class,
         IBBTransport.class,
-        UPnPManager.class,
+        PingPongCentral.class,
+        RosterTracker.class,
+        SarosNet.class,
+        SarosRosterListener.class,
+        SkypeManager.class,
+        Socks5Transport.class,
+        StreamServiceManager.class,
         StunHelper.class,
+        SubscriptionManager.class,
+        UPnPManager.class,
+        XMPPReceiver.class,
+        XMPPTransmitter.class,
 
         // Observables
         FileReplacementInProgressObservable.class,
@@ -220,7 +227,6 @@ public class SarosContext {
         RequestForActivityHandler.class,
         ConsistencyWatchdogHandler.class,
         ActivitiesHandler.class,
-        ConnectionTestManager.class,
 
         // Extensions
         CancelInviteExtension.class,

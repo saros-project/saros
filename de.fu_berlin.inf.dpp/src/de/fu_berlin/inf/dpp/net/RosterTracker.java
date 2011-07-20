@@ -9,7 +9,6 @@ import org.jivesoftware.smack.Connection;
 import org.jivesoftware.smack.Roster;
 import org.jivesoftware.smack.packet.Presence;
 
-import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.util.Utils;
 
@@ -29,8 +28,12 @@ public class RosterTracker implements IConnectionListener {
 
     protected DispatchingRosterListener listener = new DispatchingRosterListener();
 
-    public RosterTracker(Saros saros) {
-        saros.addListener(this);
+    // public RosterTracker(Saros saros) {
+    // saros.getSarosNet().addListener(this);
+    // }
+
+    public RosterTracker(SarosNet sarosNet) {
+        sarosNet.addListener(this);
     }
 
     /**

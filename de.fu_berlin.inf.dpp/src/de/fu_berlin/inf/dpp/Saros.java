@@ -21,20 +21,13 @@ package de.fu_berlin.inf.dpp;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.InetAddress;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.net.UnknownHostException;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
 import java.util.Random;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 import javax.security.sasl.SaslException;
 
@@ -46,23 +39,14 @@ import org.eclipse.core.net.proxy.IProxyService;
 import org.eclipse.core.runtime.preferences.ConfigurationScope;
 import org.eclipse.equinox.security.storage.ISecurePreferences;
 import org.eclipse.equinox.security.storage.SecurePreferencesFactory;
-import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.wizard.IWizard;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
-import org.jivesoftware.smack.Connection;
 import org.jivesoftware.smack.ConnectionConfiguration;
-import org.jivesoftware.smack.ConnectionCreationListener;
-import org.jivesoftware.smack.ConnectionListener;
 import org.jivesoftware.smack.Roster;
 import org.jivesoftware.smack.Roster.SubscriptionMode;
-import org.jivesoftware.smack.SmackConfiguration;
-import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.proxy.ProxyInfo;
-import org.jivesoftware.smackx.ServiceDiscoveryManager;
-import org.jivesoftware.smackx.bytestreams.socks5.Socks5Proxy;
-import org.jivesoftware.smackx.jingle.JingleManager;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
@@ -75,16 +59,11 @@ import org.picocontainer.injectors.Reinjector;
 import de.fu_berlin.inf.dpp.accountManagement.XMPPAccount;
 import de.fu_berlin.inf.dpp.accountManagement.XMPPAccountStore;
 import de.fu_berlin.inf.dpp.annotations.Component;
-import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.feedback.ErrorLogManager;
 import de.fu_berlin.inf.dpp.feedback.StatisticManager;
-import de.fu_berlin.inf.dpp.net.ConnectionState;
-import de.fu_berlin.inf.dpp.net.IConnectionListener;
-import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.net.StunHelper;
+import de.fu_berlin.inf.dpp.net.SarosNet;
 import de.fu_berlin.inf.dpp.net.UPnP.UPnPAccessWeupnp;
 import de.fu_berlin.inf.dpp.net.UPnP.UPnPManager;
-import de.fu_berlin.inf.dpp.net.util.NetworkingUtils;
 import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
 import de.fu_berlin.inf.dpp.project.SarosSessionManager;
@@ -156,23 +135,6 @@ public class Saros extends AbstractUIPlugin {
      */
     protected DotGraphMonitor dotMonitor;
 
-    protected Connection connection;
-
-    /**
-     * The RQ-JID of the local user or null if the user is
-     * {@link ConnectionState#NOT_CONNECTED}.
-     */
-    protected JID myJID;
-
-    protected ConnectionState connectionState = ConnectionState.NOT_CONNECTED;
-
-    protected Exception connectionError;
-
-    protected final List<IConnectionListener> listeners = new CopyOnWriteArrayList<IConnectionListener>();
-
-    // Smack (XMPP) connection listener
-    protected ConnectionListener smackConnectionListener;
-
     /**
      * The global plug-in preferences, shared among all workspaces. Should only
      * be accessed over {@link #getConfigPrefs()} from outside this class.
@@ -231,122 +193,6 @@ public class Saros extends AbstractUIPlugin {
         return isInitialized;
     }
 
-    @Inject
-    UPnPManager upnpManager;
-
-    @Inject
-    StunHelper stunHelper;
-
-    protected void setBytestreamConnectionProperties() {
-
-        /*
-         * Setting the Smack timeout for packet replies. The default of 5000 can
-         * be too low for IBB transfers when many other packets are send
-         * concurrently (invitation over IBB, concurrently producing many
-         * activities)
-         */
-        SmackConfiguration.setPacketReplyTimeout(30000);
-
-        // Socks5 Proxy Configuration
-        boolean settingsChanged = false;
-        boolean portChanged = false;
-        int port = sarosContext.getComponent(PreferenceUtils.class)
-            .getFileTransferPort();
-        boolean proxyEnabled = !getPreferenceStore().getBoolean(
-            PreferenceConstants.LOCAL_SOCKS5_PROXY_DISABLED);
-
-        /*
-         * TODO Fix in Smack: Either always start proxy when enabled in the
-         * smack configuration or never start it automatically. Currently it
-         * only starts after initiation the singleton on first access.
-         */
-
-        // Thats why prevent auto start
-        boolean isLocalS5Penabled = SmackConfiguration
-            .isLocalSocks5ProxyEnabled();
-        SmackConfiguration.setLocalSocks5ProxyEnabled(false);
-        Socks5Proxy proxy = Socks5Proxy.getSocks5Proxy();
-        if (proxyEnabled != isLocalS5Penabled) {
-            settingsChanged = true;
-        }
-
-        if (proxyEnabled == true)
-            SmackConfiguration.setLocalSocks5ProxyEnabled(true);
-
-        // Note: The proxy gets restarted on port change, too.
-        if (port != SmackConfiguration.getLocalSocks5ProxyPort()) {
-            settingsChanged = true;
-            portChanged = true;
-            SmackConfiguration.setLocalSocks5ProxyPort(port);
-        }
-
-        // Get & set all (useful) internal and external IP addresses as
-        // potential connect addresses
-        if (proxyEnabled) {
-
-            try {
-                List<String> hostAddresses = new LinkedList<String>();
-
-                for (InetAddress inetAddress : NetworkingUtils
-                    .getAllNonLoopbackLocalIPAdresses(true))
-                    hostAddresses.add(inetAddress.getHostAddress());
-
-                proxy.replaceLocalAddresses(hostAddresses);
-
-                // Perform public IP detection concurrently
-                // Dont perform if we know a local IP is the WAN IP
-                if (!stunHelper.isLocalIPthePublicIP())
-                    stunHelper.startWANIPDetection(
-                        getPreferenceStore()
-                            .getString(PreferenceConstants.STUN),
-                        getPreferenceStore().getInt(
-                            PreferenceConstants.STUN_PORT), false);
-
-            } catch (Exception e) {
-                log.debug("Error while retrieving IP addresses", e);
-            }
-
-            log.debug("current known IP addresses for Socks5Proxy: "
-                + Arrays.toString(proxy.getLocalAddresses().toArray()));
-        }
-
-        if (settingsChanged || proxy.isRunning() != proxyEnabled) {
-            StringBuilder sb = new StringBuilder();
-            if (settingsChanged)
-                sb.append("Socks5Proxy properties changed. ");
-
-            if (proxy.isRunning()) {
-                proxy.stop();
-                sb.append("Socks5Proxy stopped. ");
-            }
-            if (proxyEnabled) {
-                proxy.start();
-                sb.append("Socks5Proxy started on port " + proxy.getPort()
-                    + "...");
-            }
-            log.debug(sb);
-
-            // Update the mapped port on Socks5Proy port change
-            if (proxyEnabled && portChanged && upnpManager.isMapped())
-                upnpManager.createSarosPortMapping();
-
-            // create UPnP port mapping if not existing
-            if (proxyEnabled && preferenceUtils.isAutoPortmappingEnabled()
-                && !upnpManager.isMapped())
-                upnpManager.createSarosPortMapping();
-
-            // remove UPnP port mapping if not required
-            if (!proxyEnabled && upnpManager.isMapped())
-                upnpManager.removeSarosPortMapping();
-        }
-
-        // TODO: just pasted from before
-        // This disables Jingle if the user has selected to use XMPP
-        // file transfer exclusively
-        JingleManager.setServiceEnabled(connection, !getPreferenceStore()
-            .getBoolean(PreferenceConstants.FORCE_FILETRANSFER_BY_CHAT));
-    }
-
     /**
      * This method is called upon plug-in activation
      */
@@ -358,32 +204,6 @@ public class Saros extends AbstractUIPlugin {
         sarosVersion = getBundle().getVersion().toString();
 
         sarosFeatureID = SAROS + "_" + sarosVersion;
-
-        Connection.DEBUG_ENABLED = getPreferenceStore().getBoolean(
-            PreferenceConstants.DEBUG);
-
-        // Jingle has to be started once!
-        JingleManager.setJingleServiceEnabled();
-
-        /*
-         * add Saros as XMPP feature once XMPPConnection is connected to the
-         * XMPP server
-         */
-        Connection
-            .addConnectionCreationListener(new ConnectionCreationListener() {
-                public void connectionCreated(Connection connection) {
-                    if (Saros.this.connection != connection) {
-                        // Ignore the connections created in createAccount.
-                        return;
-                    }
-
-                    ServiceDiscoveryManager sdm = ServiceDiscoveryManager
-                        .getInstanceFor(connection);
-                    sdm.addFeature(Saros.NAMESPACE);
-
-                    setBytestreamConnectionProperties();
-                }
-            });
 
         setupLoggers();
         log.info("Starting Saros " + sarosVersion + " running:\n"
@@ -401,6 +221,8 @@ public class Saros extends AbstractUIPlugin {
             .getComponent(SarosSessionManager.class);
 
         isInitialized = true;
+
+        getSarosNet().initialize();
 
         sarosContext.getComponent(UPnPManager.class).init(
             new UPnPAccessWeupnp(), getPreferenceStore());
@@ -447,27 +269,12 @@ public class Saros extends AbstractUIPlugin {
         }
 
         try {
+            getSarosNet().uninitialize();
             // Remove UPnP port mapping for Saros
-            upnpManager = sarosContext.getComponent(UPnPManager.class);
+            UPnPManager upnpManager = sarosContext
+                .getComponent(UPnPManager.class);
             if (upnpManager.isMapped())
                 upnpManager.removeSarosPortMapping();
-
-            if (isConnected()) {
-                /*
-                 * Need to fork because disconnect should not be run in the SWT
-                 * thread.
-                 */
-
-                /*
-                 * FIXME Provide a unique thread context in which all
-                 * connecting/disconnecting is done.
-                 */
-                Utils.runSafeAsync(log, new Runnable() {
-                    public void run() {
-                        disconnect();
-                    }
-                });
-            }
 
             /**
              * This will cause dispose() to be called on all components managed
@@ -489,21 +296,6 @@ public class Saros extends AbstractUIPlugin {
     public static void setDefault(Saros newPlugin) {
         Saros.plugin = newPlugin;
 
-    }
-
-    /**
-     * The RQ-JID of the local user
-     */
-    public JID getMyJID() {
-        return this.myJID;
-    }
-
-    public Roster getRoster() {
-        if (!isConnected()) {
-            return null;
-        }
-
-        return this.connection.getRoster();
     }
 
     /**
@@ -585,6 +377,9 @@ public class Saros extends AbstractUIPlugin {
         return securePrefs;
     }
 
+    @Inject
+    XMPPAccountStore xmppAccountStore;
+
     public synchronized void saveSecurePrefs() {
         if (xmppAccountStore != null) {
             xmppAccountStore.flush();
@@ -598,137 +393,102 @@ public class Saros extends AbstractUIPlugin {
         }
     }
 
-    /**
-     * @nonBlocking
-     */
-    public void asyncConnect() {
-        Utils.runSafeAsync("Saros-AsyncConnect-", log, new Runnable() {
-            public void run() {
-                connect(false);
-            }
-        });
+    protected void setupLoggers() {
+        try {
+            log = Logger.getLogger("de.fu_berlin.inf.dpp");
+
+            PropertyConfigurator.configureAndWatch("log4j.properties",
+                REFRESH_SECONDS * 1000);
+
+        } catch (SecurityException e) {
+            System.err.println("Could not start logging:");
+            e.printStackTrace();
+        }
     }
 
-    @Inject
-    PreferenceUtils preferenceUtils;
-    @Inject
-    StatisticManager statisticManager;
-    @Inject
-    ErrorLogManager errorLogManager;
-    @Inject
-    XMPPAccountStore xmppAccountStore;
+    /**
+     * Returns a string representing the Saros Version number for instance
+     * "9.5.7.r1266"
+     * 
+     * This method only returns a valid version string after the plugin has been
+     * started.
+     * 
+     * This is equivalent to the bundle version.
+     */
+    public String getVersion() {
+        return sarosVersion;
+    }
+
+    public SarosNet getSarosNet() {
+        return sarosContext.getComponent(SarosNet.class);
+    }
 
     /**
-     * Connects using the credentials from the preferences. If no credentials
-     * are present a wizard is opened before. It uses TLS if possible.
+     * Returns the configuration setting for enabled auto follow mode
      * 
-     * If there is already an established connection when calling this method,
-     * it disconnects before connecting (including state transitions!).
-     * 
-     * @blocking
+     * @return the state of the feature as <code> boolean</code>
      */
-    public void connect(boolean failSilently) {
-        // check if we need to do a re-inject
-        if (preferenceUtils == null || statisticManager == null
-            || errorLogManager == null)
-            sarosContext.reinject(this);
+    // TODO move to PreferenceUtils
+    public boolean getAutoFollowEnabled() {
+        return getPreferenceStore().getBoolean(
+            PreferenceConstants.AUTO_FOLLOW_MODE);
+    }
 
-        /*
-         * Check if we have a user name; if not show wizard before connecting
-         */
-        if (!preferenceUtils.hasUserName() || !preferenceUtils.hasServer()) {
-            if (!configureXMPPAccount())
-                return;
-        }
-
-        String username = preferenceUtils.getUserName();
-        String password = preferenceUtils.getPassword();
-
+    public static boolean isWorkbenchAvailable() {
+        boolean result = false;
         try {
-            ConnectionConfiguration connectionConfiguration = this
-                .getConnectionConfiguration();
-
-            if (isConnected()) {
-                disconnect();
-            }
-
-            this.setConnectionState(ConnectionState.CONNECTING, null);
-            this.connection = new XMPPConnection(connectionConfiguration);
-            this.connection.connect();
-
-            // add connection listener so we get notified if it will be closed
-            if (this.smackConnectionListener == null) {
-                this.smackConnectionListener = new SafeConnectionListener(log,
-                    new XMPPConnectionListener());
-            }
-            connection.addConnectionListener(this.smackConnectionListener);
-
-            Roster.setDefaultSubscriptionMode(Roster.SubscriptionMode.manual);
-
-            /*
-             * TODO SS Possible race condition, as our packet listeners are
-             * registered only after the login (in CONNECTED Connection State),
-             * so we might for instance receive subscription requests even
-             * though we do not have a packet listener running yet!
-             */
-            this.connection.login(username, password, Saros.RESOURCE);
-            /* other people can now send invitations */
-
-            this.myJID = new JID(this.connection.getUser());
-            setConnectionState(ConnectionState.CONNECTED, null);
-
-        } catch (URISyntaxException e) {
-            log.info("URI not parseable: " + e.getInput());
-            Utils.popUpFailureMessage("URI not parseable", e.getInput()
-                + " is not a valid URI.", failSilently);
-
-        } catch (IllegalArgumentException e) {
-            log.info("Illegal argument: " + e.getMessage());
-            setConnectionState(ConnectionState.ERROR, null);
-            Utils.popUpFailureMessage("Illegal argument", e.getMessage(),
-                failSilently);
-
-        } catch (XMPPException e) {
-            Throwable t = e.getWrappedThrowable();
-            Exception cause = (t != null) ? (Exception) t : e;
-
-            setConnectionState(ConnectionState.ERROR, cause);
-
-            if (cause instanceof SaslException) {
-                Utils.popUpFailureMessage("Error Connecting via SASL",
-                    cause.getMessage(), failSilently);
-            } else {
-                String question;
-                if (cause instanceof UnknownHostException) {
-                    log.info("Unknown host: " + cause);
-
-                    question = "The XMPP/Jabber server '"
-                        + this.connection.getHost()
-                        + "' could not be found.\n\n"
-                        + "Do you want edit your XMPP/Jabber account?";
-                } else {
-                    log.info("xmpp: " + cause.getMessage(), cause);
-
-                    question = "Could not connect to XMPP/Jabber server.\n"
-                        + "Server: " + this.connection.getHost() + "\n"
-                        + "User: " + username + "\n\n"
-                        + "Do you want edit your XMPP/Jabber account?";
-                }
-                if (Utils.popUpYesNoQuestion("Connecting Error", question,
-                    failSilently)) {
-                    if (configureXMPPAccount())
-                        connect(failSilently);
-                }
-            }
+            result = PlatformUI.getWorkbench() != null;
         } catch (Exception e) {
-            log.warn("Unhandled exception:", e);
-            setConnectionState(ConnectionState.ERROR, e);
-            Utils.popUpFailureMessage(
-                "Error Connecting",
-                "Could not connect to server '" + connection.getHost()
-                    + "' as user '" + username + "'.\nErrorMessage was:\n"
-                    + e.getMessage(), failSilently);
+            // do nothing ...
         }
+        return result;
+    }
+
+    /**
+     * Returns @link{IProxyService} if there is a registered service otherwise
+     * null.
+     */
+    protected IProxyService getProxyService() {
+        BundleContext bundleContext = getBundle().getBundleContext();
+        ServiceReference serviceReference = bundleContext
+            .getServiceReference(IProxyService.class.getName());
+        return (IProxyService) bundleContext.getService(serviceReference);
+    }
+
+    /**
+     * Returns a @link{ProxyInfo}, if a configuration of a proxy for the given
+     * host is available. If @link{IProxyData} is of type
+     * 
+     * @link{IProxyData.HTTP_PROXY_TYPE it tries to use Smacks
+     * @link{ProxyInfo.forHttpProxy and if it is of type
+     * @link{IProxyData.SOCKS_PROXY_TYPE then it tries to use Smacks
+     * @link{ProxyInfo.forSocks5Proxy otherwise it returns null.
+     * 
+     * @param host
+     *            The host to which you want to connect to.
+     * 
+     * @return Returns a @link{ProxyInfo} if available otherwise null.
+     * 
+     * @SuppressWarnings("deprecation") -> getProxyDataForHost replacement is
+     *                                  only available in Eclipse 3.5
+     */
+    @SuppressWarnings("deprecation")
+    public ProxyInfo getProxyInfo(String host) {
+        IProxyService ips = getProxyService();
+        if (ips == null || !ips.isProxiesEnabled())
+            return null;
+
+        for (IProxyData pd : ips.getProxyDataForHost(host)) {
+            if (IProxyData.HTTP_PROXY_TYPE.equals(pd.getType())) {
+                return ProxyInfo.forHttpProxy(pd.getHost(), pd.getPort(),
+                    pd.getUserId(), pd.getPassword());
+            } else if (IProxyData.SOCKS_PROXY_TYPE.equals(pd.getType())) {
+                return ProxyInfo.forSocks5Proxy(pd.getHost(), pd.getPort(),
+                    pd.getUserId(), pd.getPassword());
+            }
+        }
+
+        return null;
     }
 
     /**
@@ -748,6 +508,10 @@ public class Saros extends AbstractUIPlugin {
      */
     protected ConnectionConfiguration getConnectionConfiguration()
         throws URISyntaxException {
+
+        PreferenceUtils preferenceUtils = this.sarosContext
+            .getComponent(PreferenceUtils.class);
+
         String serverString = preferenceUtils.getServer();
 
         URI uri;
@@ -790,123 +554,6 @@ public class Saros extends AbstractUIPlugin {
     }
 
     /**
-     * Returns @link{IProxyService} if there is a registered service otherwise
-     * null.
-     */
-    protected IProxyService getProxyService() {
-        BundleContext bundleContext = getBundle().getBundleContext();
-        ServiceReference serviceReference = bundleContext
-            .getServiceReference(IProxyService.class.getName());
-        return (IProxyService) bundleContext.getService(serviceReference);
-    }
-
-    /**
-     * Returns a @link{ProxyInfo}, if a configuration of a proxy for the given
-     * host is available. If @link{IProxyData} is of type
-     * 
-     * @link{IProxyData.HTTP_PROXY_TYPE it tries to use Smacks
-     * @link{ProxyInfo.forHttpProxy and if it is of type
-     * @link{IProxyData.SOCKS_PROXY_TYPE then it tries to use Smacks
-     * @link{ProxyInfo.forSocks5Proxy otherwise it returns null.
-     * 
-     * @param host
-     *            The host to which you want to connect to.
-     * 
-     * @return Returns a @link{ProxyInfo} if available otherwise null.
-     * 
-     * @SuppressWarnings("deprecation") -> getProxyDataForHost replacement is
-     *                                  only available in Eclipse 3.5
-     */
-    @SuppressWarnings("deprecation")
-    protected ProxyInfo getProxyInfo(String host) {
-        IProxyService ips = getProxyService();
-        if (ips == null || !ips.isProxiesEnabled())
-            return null;
-
-        for (IProxyData pd : ips.getProxyDataForHost(host)) {
-            if (IProxyData.HTTP_PROXY_TYPE.equals(pd.getType())) {
-                return ProxyInfo.forHttpProxy(pd.getHost(), pd.getPort(),
-                    pd.getUserId(), pd.getPassword());
-            } else if (IProxyData.SOCKS_PROXY_TYPE.equals(pd.getType())) {
-                return ProxyInfo.forSocks5Proxy(pd.getHost(), pd.getPort(),
-                    pd.getUserId(), pd.getPassword());
-            }
-        }
-
-        return null;
-    }
-
-    /**
-     * Disconnects (if currently connected)
-     * 
-     * @blocking
-     * 
-     * @post this.myjid == null && this.connection == null &&
-     *       this.connectionState == ConnectionState.NOT_CONNECTED
-     */
-    public void disconnect() {
-        if (isConnected()) {
-            setConnectionState(ConnectionState.DISCONNECTING, null);
-
-            disconnectInternal();
-
-            setConnectionState(ConnectionState.NOT_CONNECTED, null);
-        }
-        this.myJID = null;
-
-        // Make a sanity check on the connection and connection state
-        if (this.connectionState != ConnectionState.NOT_CONNECTED) {
-            log.warn("Connection state is out of sync");
-            this.connectionState = ConnectionState.NOT_CONNECTED;
-        }
-        if (this.connection != null) {
-            log.warn("Connection has not been closed");
-            this.connection = null;
-        }
-    }
-
-    protected void disconnectInternal() {
-        if (connection != null) {
-            try {
-                connection.removeConnectionListener(smackConnectionListener);
-                connection.disconnect();
-            } catch (RuntimeException e) {
-                log.warn("Could not disconnect old XMPPConnection: ", e);
-            } finally {
-                connection = null;
-            }
-        }
-    }
-
-    public boolean isConnected() {
-        return this.connectionState == ConnectionState.CONNECTED;
-    }
-
-    /**
-     * @return the current state of the connection.
-     */
-    public ConnectionState getConnectionState() {
-        return this.connectionState;
-    }
-
-    /**
-     * @return an error string that contains the error message for the current
-     *         connection error if the state is {@link ConnectionState#ERROR} or
-     *         <code>null</code> if there is another state set.
-     */
-    public Exception getConnectionError() {
-        return this.connectionError;
-    }
-
-    /**
-     * @return the currently established connection or <code>null</code> if
-     *         there is none.
-     */
-    public Connection getConnection() {
-        return this.connection;
-    }
-
-    /**
      * Opens the appropriate {@link IWizard} to configure the active
      * {@link XMPPAccount}.<br/>
      * If no active {@link XMPPAccount} exists the {@link ConfigurationWizard}
@@ -925,196 +572,105 @@ public class Saros extends AbstractUIPlugin {
             .getActiveAccount()) != null);
     }
 
-    public void addListener(IConnectionListener listener) {
-        if (!this.listeners.contains(listener)) {
-            this.listeners.add(listener);
-        }
+    /**
+     * @nonBlocking
+     */
+    public void asyncConnect() {
+        Utils.runSafeAsync("Saros-AsyncConnect-", log, new Runnable() {
+            public void run() {
+                connect(false);
+            }
+        });
     }
 
-    public void removeListener(IConnectionListener listener) {
-        this.listeners.remove(listener);
-    }
-
-    protected void assertConnection() throws XMPPException {
-        if (!isConnected()) {
-            throw new XMPPException("No connection");
-        }
-    }
+    @Inject
+    PreferenceUtils preferenceUtils;
+    @Inject
+    UPnPManager upnpManager;
 
     /**
-     * Sets a new connection state and notifies all connection listeners.
+     * Connects using the credentials from the preferences. If no credentials
+     * are present a wizard is opened before. It uses TLS if possible.
+     * 
+     * If there is already an established connection when calling this method,
+     * it disconnects before connecting (including state transitions!).
+     * 
+     * @blocking
      */
-    protected void setConnectionState(ConnectionState state, Exception error) {
+    public void connect(boolean failSilently) {
 
-        this.connectionState = state;
-        this.connectionError = error;
+        // check if we need to do a re-inject
+        if (preferenceUtils == null)
+            sarosContext.reinject(this);
 
-        // Prefix the name of the user for which the state changed
-        String prefix = "";
-        if (connection != null) {
-            String user = connection.getUser();
-            if (user != null)
-                prefix = Utils.prefix(new JID(user));
+        getSarosNet().setSettings(preferenceUtils.isDebugEnabled(),
+            preferenceUtils.isLocalSOCKS5ProxyEnabled(),
+            preferenceUtils.getFileTransferPort(), preferenceUtils.getStunIP(),
+            preferenceUtils.getStunPort(),
+            preferenceUtils.isAutoPortmappingEnabled());
+
+        /*
+         * Check if we have a user name; if not show wizard before connecting
+         */
+        if (!preferenceUtils.hasUserName() || !preferenceUtils.hasServer()) {
+            if (!configureXMPPAccount())
+                return;
         }
 
-        if (error == null) {
-            log.debug(prefix + "New Connection State == " + state);
-        } else {
-            log.error(prefix + "New Connection State == " + state, error);
-        }
+        String username = preferenceUtils.getUserName();
+        String password = preferenceUtils.getPassword();
 
-        for (IConnectionListener listener : this.listeners) {
-            try {
-                listener.connectionStateChanged(this.connection, state);
-            } catch (RuntimeException e) {
-                log.error("Internal error in setConnectionState:", e);
-            }
-        }
-    }
-
-    protected void setupLoggers() {
         try {
-            log = Logger.getLogger("de.fu_berlin.inf.dpp");
+            ConnectionConfiguration connectionConfiguration = this
+                .getConnectionConfiguration();
+            getSarosNet().connect(connectionConfiguration, username, password,
+                failSilently);
 
-            PropertyConfigurator.configureAndWatch("log4j.properties",
-                REFRESH_SECONDS * 1000);
+        } catch (URISyntaxException e) {
+            log.info("URI not parseable: " + e.getInput());
+            Utils.popUpFailureMessage("URI not parseable", e.getInput()
+                + " is not a valid URI.", failSilently);
 
-        } catch (SecurityException e) {
-            System.err.println("Could not start logging:");
-            e.printStackTrace();
-        }
-    }
+        } catch (IllegalArgumentException e) {
+            log.info("Illegal argument: " + e.getMessage());
 
-    protected class XMPPConnectionListener implements ConnectionListener {
+            Utils.popUpFailureMessage("Illegal argument", e.getMessage(),
+                failSilently);
 
-        public void connectionClosed() {
-            // self inflicted, controlled disconnect
-            setConnectionState(ConnectionState.NOT_CONNECTED, null);
-        }
+        } catch (XMPPException e) {
+            Throwable t = e.getWrappedThrowable();
+            Exception cause = (t != null) ? (Exception) t : e;
 
-        public void connectionClosedOnError(Exception e) {
+            if (cause instanceof SaslException) {
+                Utils.popUpFailureMessage("Error Connecting via SASL",
+                    cause.getMessage(), failSilently);
+            } else {
+                String question;
+                if (cause instanceof UnknownHostException) {
+                    log.info("Unknown host: " + cause);
 
-            log.error("XMPP Connection Error: ", e);
+                    question = "The XMPP/Jabber server "
+                        + " could not be found.\n\n"
+                        + "Do you want edit your XMPP/Jabber account?";
+                } else {
+                    log.info("xmpp: " + cause.getMessage(), cause);
 
-            if (e.toString().equals("stream:error (conflict)")) {
-
-                disconnect();
-
-                Utils.runSafeSWTSync(log, new Runnable() {
-                    public void run() {
-                        MessageDialog.openError(
-                            EditorAPI.getShell(),
-                            "Connection error",
-                            "You have been disconnected from XMPP/Jabber, because of a resource conflict.\n"
-                                + "This indicates that you might have logged on again using the same XMPP/Jabber account"
-                                + " and XMPP resource, for instance using Saros or an other instant messaging client.");
-                    }
-                });
-                return;
-            }
-
-            // Only try to reconnect if we did achieve a connection...
-            if (getConnectionState() != ConnectionState.CONNECTED)
-                return;
-
-            setConnectionState(ConnectionState.ERROR, e);
-
-            disconnectInternal();
-
-            Utils.runSafeAsync(log, new Runnable() {
-                public void run() {
-
-                    Map<JID, Integer> expectedSequenceNumbers = Collections
-                        .emptyMap();
-                    if (sessionManager.getSarosSession() != null) {
-                        expectedSequenceNumbers = sessionManager
-                            .getSarosSession().getSequencer()
-                            .getExpectedSequenceNumbers();
-                    }
-
-                    // HACK Improve this hack to stop an infinite reconnect
-                    int i = 0;
-                    final int CONNECTION_RETRIES = 15;
-
-                    while (!isConnected() && i++ < CONNECTION_RETRIES) {
-
-                        try {
-                            log.info("Reconnecting...("
-                                + InetAddress.getLocalHost().toString() + ")");
-
-                            connect(true);
-                            if (!isConnected())
-                                Thread.sleep(5000);
-
-                        } catch (InterruptedException e) {
-                            log.error("Code not designed to be interruptable",
-                                e);
-                            Thread.currentThread().interrupt();
-                            return;
-                        } catch (UnknownHostException e) {
-                            log.info("Could not get localhost, maybe the network interface is down.");
-                        }
-                    }
-
-                    if (isConnected()) {
-                        sessionManager.onReconnect(expectedSequenceNumbers);
-                        log.debug("XMPP reconnected");
-                    }
+                    question = "Could not connect to XMPP/Jabber server.\n"
+                        // + "Server: " + this.connection.getHost() + "\n"
+                        + "User: " + username + "\n\n"
+                        + "Do you want edit your XMPP/Jabber account?";
                 }
-            });
-        }
-
-        public void reconnectingIn(int seconds) {
-            // TODO maybe using Smack reconnect is better
-            assert false : "Reconnecting is disabled";
-            // setConnectionState(ConnectionState.CONNECTING, null);
-        }
-
-        public void reconnectionFailed(Exception e) {
-            // TODO maybe using Smack reconnect is better
-            assert false : "Reconnecting is disabled";
-            // setConnectionState(ConnectionState.ERROR, e.getMessage());
-        }
-
-        public void reconnectionSuccessful() {
-            // TODO maybe using Smack reconnect is better
-            assert false : "Reconnecting is disabled";
-            // setConnectionState(ConnectionState.CONNECTED, null);
-        }
-    }
-
-    /**
-     * Returns a string representing the Saros Version number for instance
-     * "9.5.7.r1266"
-     * 
-     * This method only returns a valid version string after the plugin has been
-     * started.
-     * 
-     * This is equivalent to the bundle version.
-     */
-    public String getVersion() {
-        return sarosVersion;
-    }
-
-    /**
-     * Returns the configuration setting for enabled auto follow mode
-     * 
-     * @return the state of the feature as <code> boolean</code>
-     */
-    // TODO move to PreferenceUtils
-    public boolean getAutoFollowEnabled() {
-        return getPreferenceStore().getBoolean(
-            PreferenceConstants.AUTO_FOLLOW_MODE);
-    }
-
-    public static boolean isWorkbenchAvailable() {
-        boolean result = false;
-        try {
-            result = PlatformUI.getWorkbench() != null;
+                if (Utils.popUpYesNoQuestion("Connecting Error", question,
+                    failSilently)) {
+                    if (configureXMPPAccount())
+                        connect(failSilently);
+                }
+            }
         } catch (Exception e) {
-            // do nothing ...
+            log.warn("Unhandled exception:", e);
+            Utils.popUpFailureMessage("Error Connecting",
+                "Could not connect to server as user '" + username
+                    + "'.\nErrorMessage was:\n" + e.getMessage(), failSilently);
         }
-        return result;
     }
-
 }

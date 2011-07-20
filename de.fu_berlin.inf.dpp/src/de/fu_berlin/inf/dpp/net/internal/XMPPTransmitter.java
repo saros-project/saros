@@ -54,7 +54,6 @@ import org.joda.time.DateTime;
 import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.FileList;
-import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.User.UserConnectionState;
 import de.fu_berlin.inf.dpp.annotations.Component;
@@ -68,6 +67,7 @@ import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.IncomingTransferObject;
 import de.fu_berlin.inf.dpp.net.IncomingTransferObject.IncomingTransferObjectExtensionProvider;
 import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.net.SarosNet;
 import de.fu_berlin.inf.dpp.net.TimedActivityDataObject;
 import de.fu_berlin.inf.dpp.net.business.DispatchThreadContext;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager.NetTransferMode;
@@ -76,6 +76,7 @@ import de.fu_berlin.inf.dpp.net.internal.DefaultInvitationInfo.InvitationAcknowl
 import de.fu_berlin.inf.dpp.net.internal.DefaultInvitationInfo.InvitationCompleteExtensionProvider;
 import de.fu_berlin.inf.dpp.net.internal.DefaultInvitationInfo.UserListRequestExtensionProvider;
 import de.fu_berlin.inf.dpp.net.internal.DefaultSessionInfo.UserListConfirmationExtensionProvider;
+import de.fu_berlin.inf.dpp.net.internal.InvitationInfo.InvitationExtensionProvider;
 import de.fu_berlin.inf.dpp.net.internal.TransferDescription.FileTransferType;
 import de.fu_berlin.inf.dpp.net.internal.UserListInfo.JoinExtensionProvider;
 import de.fu_berlin.inf.dpp.net.internal.XStreamExtensionProvider.XStreamPacketExtension;
@@ -125,10 +126,9 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
 
     protected List<MessageTransfer> messageTransferQueue;
 
-    @Inject
     protected XMPPReceiver receiver;
 
-    protected Saros saros;
+    protected SarosNet sarosNet;
 
     @Inject
     protected SessionIDObservable sessionID;
@@ -181,11 +181,13 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
     protected DataTransferManager dataManager;
 
     public XMPPTransmitter(SessionIDObservable sessionID,
-        DataTransferManager dataManager, Saros saros) {
-        saros.addListener(this);
+        DataTransferManager dataManager, SarosNet sarosNet,
+        XMPPReceiver receiver) {
+        sarosNet.addListener(this);
         this.dataManager = dataManager;
         this.sessionID = sessionID;
-        this.saros = saros;
+        this.sarosNet = sarosNet;
+        this.receiver = receiver;
     }
 
     /********************************************************************************
@@ -616,7 +618,7 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
     public void sendTimedActivities(JID recipient,
         List<TimedActivityDataObject> timedActivities) {
 
-        if (recipient == null || recipient.equals(saros.getMyJID())) {
+        if (recipient == null || recipient.equals(sarosNet.getMyJID())) {
             throw new IllegalArgumentException(
                 "Recipient may not be null or equal to the local user");
         }
@@ -716,8 +718,15 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
      *             if sending by bytestreams fails and the extension raw data is
      *             longer than {@value #MAX_XMPP_MESSAGE_SIZE}
      */
+
     public void sendToProjectUser(JID recipient, PacketExtension extension,
         TransferDescription transferDescription) throws IOException {
+        sendToProjectUser(recipient, extension, transferDescription, true);
+    }
+
+    public void sendToProjectUser(JID recipient, PacketExtension extension,
+        TransferDescription transferDescription, boolean onlyInSession)
+        throws IOException {
 
         byte[] data = null;
 
@@ -734,7 +743,7 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
                 || transferDescription == null
                 || (!dataManager.getTransferMode(recipient).isP2P() && data.length < MAX_XMPP_MESSAGE_SIZE)) {
 
-                sendMessageToUser(recipient, extension, true);
+                sendMessageToUser(recipient, extension, onlyInSession);
                 break;
 
             } else {
@@ -895,7 +904,7 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
     public void sendMessageToAll(ISarosSession sarosSession,
         PacketExtension extension) {
 
-        JID myJID = saros.getMyJID();
+        JID myJID = sarosNet.getMyJID();
 
         for (User participant : sarosSession.getParticipants()) {
 
@@ -1005,7 +1014,6 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
         } finally {
             collector.cancel();
         }
-
     }
 
     /**
@@ -1162,6 +1170,39 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
     public void sendMessageToUser(JID peer,
         XStreamPacketExtension<DefaultInvitationInfo> create) {
         sendMessageToUser(peer, create, false);
+    }
+
+    void inject(SessionIDObservable sessionID,
+        SarosSessionObservable sarosSessionObservable,
+        LeaveExtension leaveExtension,
+        RequestActivityExtension requestActivityExtension,
+        UserListExtension userListExtension,
+        CancelInviteExtension cancelInviteExtension,
+        CancelProjectSharingExtension cancelProjectSharingExtension,
+        ActivitiesExtensionProvider activitiesProvider,
+        InvitationExtensionProvider invExtProv,
+        InvitationAcknowledgementExtensionProvider invAcknowledgementExtProv,
+        FileListRequestExtensionProvider fileListRequestExtProv,
+        JoinExtensionProvider userListExtProv,
+        UserListConfirmationExtensionProvider userListConfExtProv,
+        IncomingTransferObjectExtensionProvider incomingExtProv,
+        InvitationCompleteExtensionProvider invCompleteExtProv,
+        DispatchThreadContext dispatchThread) {
+        this.sarosSessionObservable = sarosSessionObservable;
+        this.leaveExtension = leaveExtension;
+        this.requestActivityExtension = requestActivityExtension;
+        this.userListExtension = userListExtension;
+        this.cancelInviteExtension = cancelInviteExtension;
+        this.cancelProjectSharingExtension = cancelProjectSharingExtension;
+        this.activitiesProvider = activitiesProvider;
+        this.invExtProv = invExtProv;
+        this.invAcknowledgementExtProv = invAcknowledgementExtProv;
+        this.fileListRequestExtProv = fileListRequestExtProv;
+        this.userListExtProv = userListExtProv;
+        this.userListConfExtProv = userListConfExtProv;
+        this.incomingExtProv = incomingExtProv;
+        this.invCompleteExtProv = invCompleteExtProv;
+        this.dispatchThread = dispatchThread;
 
     }
 }

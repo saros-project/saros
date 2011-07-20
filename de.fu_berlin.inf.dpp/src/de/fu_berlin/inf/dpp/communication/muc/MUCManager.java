@@ -65,7 +65,7 @@ public class MUCManager {
      *         2010/11/23
      */
     public MUCSession connectMUC(MUCSessionPreferences preferences) {
-        if (!saros.isConnected()) {
+        if (!saros.getSarosNet().isConnected()) {
             log.error("Can't join chat: Not connected.");
             return null;
         }
@@ -73,8 +73,8 @@ public class MUCManager {
         log.debug("Joining MUC...");
 
         boolean createdRoom = false;
-        MUCSession mucSession = new MUCSession(saros.getConnection(),
-            preferences);
+        MUCSession mucSession = new MUCSession(saros.getSarosNet()
+            .getConnection(), preferences);
         try {
             createdRoom = mucSession.connect();
         } catch (XMPPException e) {

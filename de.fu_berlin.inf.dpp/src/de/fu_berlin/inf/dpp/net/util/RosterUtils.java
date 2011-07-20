@@ -17,8 +17,8 @@ import org.jivesoftware.smack.packet.Registration;
 import org.jivesoftware.smack.packet.XMPPError;
 import org.jivesoftware.smackx.ServiceDiscoveryManager;
 
-import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.net.SarosNet;
 import de.fu_berlin.inf.dpp.net.XMPPUtil;
 import de.fu_berlin.inf.dpp.ui.util.DialogUtils;
 import de.fu_berlin.inf.dpp.util.Utils;
@@ -115,12 +115,12 @@ public class RosterUtils {
      *         or null if the current roster is not available or the nickname
      *         has not been set.
      */
-    public static String getNickname(Saros saros, JID jid) {
+    public static String getNickname(SarosNet sarosNet, JID jid) {
 
-        if (saros == null)
+        if (sarosNet == null)
             return null;
 
-        Connection connection = saros.getConnection();
+        Connection connection = sarosNet.getConnection();
         if (connection == null)
             return null;
 

@@ -516,4 +516,14 @@ public class UPnPManager {
     public String getPreSelectedDeviceID() {
         return preSelectedDeviceID;
     }
+
+    public String getExternalIP() {
+        if (getSelectedGateway() != null)
+            try {
+                return getSelectedGateway().getExternalIPAddress();
+            } catch (Exception e) {
+                return null;
+            }
+        return null;
+    }
 }

@@ -31,7 +31,6 @@ import org.jivesoftware.smack.packet.Packet;
 import org.joda.time.DateTime;
 
 import de.fu_berlin.inf.dpp.FileList;
-import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.activities.business.FileActivity;
 import de.fu_berlin.inf.dpp.activities.serializable.FileActivityDataObject;
@@ -309,8 +308,8 @@ public interface ITransmitter {
      * 
      * @throws IllegalArgumentException
      *             if the recipient is null, the recipient equals the local user
-     *             as returned by {@link Saros#getMyJID()} or the given list is
-     *             null or contains no activityDataObjects.
+     *             as returned by {@link SarosNet#getMyJID()} or the given list
+     *             is null or contains no activityDataObjects.
      * 
      * @throws AssertionError
      *             if the given list of timed activityDataObjects contains

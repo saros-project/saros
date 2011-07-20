@@ -291,8 +291,8 @@ public class User {
          * TODO This should use a subscription based mechanism or cache the
          * nick, to prevent this being called too many times
          */
-        String nickName = RosterUtils.getNickname(getSarosSession().getSaros(),
-            getJID());
+        String nickName = RosterUtils.getNickname(getSarosSession().getSaros()
+            .getSarosNet(), getJID());
         String jidBase = getJID().getBase();
 
         if (nickName != null && !nickName.equals(jidBase)) {

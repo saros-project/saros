@@ -22,6 +22,7 @@ import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.net.ConnectionState;
 import de.fu_berlin.inf.dpp.net.IConnectionListener;
 import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.net.SarosNet;
 import de.fu_berlin.inf.dpp.net.internal.SafePacketListener;
 import de.fu_berlin.inf.dpp.net.internal.subscriptionManager.events.IncomingSubscriptionEvent;
 import de.fu_berlin.inf.dpp.net.internal.subscriptionManager.events.SubscriptionManagerListener;
@@ -98,8 +99,8 @@ public class SubscriptionManager {
             }
         });
 
-    public SubscriptionManager(Saros saros) {
-        saros.addListener(connectionListener);
+    public SubscriptionManager(SarosNet sarosNet) {
+        sarosNet.addListener(connectionListener);
     }
 
     public void prepareConnection(Connection connection) {

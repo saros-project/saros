@@ -113,8 +113,8 @@ public class BaseBuddySelectionComposite extends BuddyDisplayComposite {
                 RosterEntryElement.class);
         List<RosterEntryElement> elementsToCheck = new ArrayList<RosterEntryElement>();
         for (JID buddy : buddies) {
-            elementsToCheck.add(new RosterEntryElement(this.saros.getRoster(),
-                buddy));
+            elementsToCheck.add(new RosterEntryElement(saros.getSarosNet()
+                .getRoster(), buddy));
         }
 
         Map<RosterEntryElement, Boolean> checkStatesChanges = calculateCheckStateDiff(

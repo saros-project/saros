@@ -37,6 +37,7 @@ public class ChangeXMPPAccountAction extends Action implements IMenuCreator {
     XMPPAccountStore accountService;
     @Inject
     Saros saros;
+
     protected int currentAccountId;
     private static final Logger log = Logger
         .getLogger(ChangeXMPPAccountAction.class);
@@ -51,7 +52,7 @@ public class ChangeXMPPAccountAction extends Action implements IMenuCreator {
     public ChangeXMPPAccountAction() {
         SarosPluginContext.initComponent(this);
         this.setText("Connect");
-        saros.addListener(connectionListener);
+        saros.getSarosNet().addListener(connectionListener);
         setMenuCreator(this);
         updateStatus();
     }
@@ -79,8 +80,8 @@ public class ChangeXMPPAccountAction extends Action implements IMenuCreator {
 
     protected void runConnectDisconnect() {
         try {
-            if (saros.isConnected()) {
-                saros.disconnect();
+            if (saros.getSarosNet().isConnected()) {
+                saros.getSarosNet().disconnect();
             } else {
                 log.debug("Connect!!!");
                 saros.connect(false);
@@ -92,7 +93,7 @@ public class ChangeXMPPAccountAction extends Action implements IMenuCreator {
     }
 
     protected void disconnect() {
-        saros.disconnect();
+        saros.getSarosNet().disconnect();
     }
 
     public Menu getMenu(Control parent) {
@@ -155,8 +156,8 @@ public class ChangeXMPPAccountAction extends Action implements IMenuCreator {
     }
 
     protected void reconnect() {
-        if (saros.isConnected()) {
-            saros.disconnect();
+        if (saros.getSarosNet().isConnected()) {
+            saros.getSarosNet().disconnect();
         }
         saros.connect(false);
     }
@@ -168,7 +169,7 @@ public class ChangeXMPPAccountAction extends Action implements IMenuCreator {
 
     protected void updateStatus() {
         try {
-            ConnectionState state = saros.getConnectionState();
+            ConnectionState state = saros.getSarosNet().getConnectionState();
             switch (state) {
             case CONNECTED:
                 setText("Disconnect");

@@ -21,7 +21,6 @@ package de.fu_berlin.inf.dpp.ui.wizards;
 import java.lang.reflect.InvocationTargetException;
 import java.util.concurrent.CancellationException;
 
-import de.fu_berlin.inf.dpp.SarosPluginContext;
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
@@ -33,6 +32,7 @@ import org.jivesoftware.smack.Roster;
 import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.Saros;
+import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.internal.subscriptionManager.SubscriptionManager;
 import de.fu_berlin.inf.dpp.net.internal.subscriptionManager.events.IncomingSubscriptionEvent;
@@ -113,8 +113,9 @@ public class AddBuddyWizard extends Wizard {
                         subscriptionManager
                             .addSubscriptionManagerListener(subscriptionManagerListener);
 
-                        RosterUtils.addToRoster(saros.getConnection(), jid,
-                            nickname, SubMonitor.convert(monitor));
+                        RosterUtils.addToRoster(saros.getSarosNet()
+                            .getConnection(), jid, nickname, SubMonitor
+                            .convert(monitor));
                         cachedBuddy = jid;
                     } catch (CancellationException e) {
                         throw new InterruptedException();

@@ -57,7 +57,7 @@ public class BuddyDisplayComposite extends ViewerComposite {
             ConnectionState newState) {
             switch (newState) {
             case CONNECTED:
-                ViewerUtils.setInput(viewer, saros.getRoster());
+                ViewerUtils.setInput(viewer, saros.getSarosNet().getRoster());
                 ViewerUtils.expandAll(viewer);
                 break;
             case NOT_CONNECTED:
@@ -81,15 +81,15 @@ public class BuddyDisplayComposite extends ViewerComposite {
         super.setLayout(LayoutUtils.createGridLayout());
         this.viewer.getControl()
             .setLayoutData(LayoutUtils.createFillGridData());
-        this.viewer.setInput(saros.getRoster());
+        this.viewer.setInput(saros.getSarosNet().getRoster());
         ViewerUtils.expandAll(this.viewer);
 
-        this.saros.addListener(connectionListener);
+        saros.getSarosNet().addListener(connectionListener);
 
         this.addDisposeListener(new DisposeListener() {
             public void widgetDisposed(DisposeEvent e) {
-                if (saros != null) {
-                    saros.removeListener(connectionListener);
+                if (saros.getSarosNet() != null) {
+                    saros.getSarosNet().removeListener(connectionListener);
                 }
             }
         });

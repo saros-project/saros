@@ -24,6 +24,7 @@ import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.net.IRosterListener;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.RosterTracker;
+import de.fu_berlin.inf.dpp.net.SarosNet;
 import de.fu_berlin.inf.dpp.net.internal.discoveryManager.events.DiscoveryManagerListener;
 import de.fu_berlin.inf.dpp.util.StackTrace;
 import de.fu_berlin.inf.dpp.util.Utils;
@@ -58,7 +59,7 @@ public class DiscoveryManager implements Disposable {
         .synchronizedMap(new HashMap<String, DiscoverInfoWrapper>());
 
     @Inject
-    protected Saros saros;
+    protected SarosNet sarosNet;
 
     @Inject
     protected RosterTracker rosterTracker;
@@ -408,11 +409,11 @@ public class DiscoveryManager implements Disposable {
                 + "fail because resource is missing: " + recipient.toString(),
                 new StackTrace());
 
-        if (!saros.isConnected())
+        if (!sarosNet.isConnected())
             throw new IllegalStateException("Not Connected");
 
         ServiceDiscoveryManager sdm = ServiceDiscoveryManager
-            .getInstanceFor(saros.getConnection());
+            .getInstanceFor(sarosNet.getConnection());
 
         try {
             return sdm.discoverInfo(recipient.toString());
@@ -420,7 +421,7 @@ public class DiscoveryManager implements Disposable {
 
             log.warn(
                 "Service Discovery failed on recipient " + recipient.toString()
-                    + " server:" + saros.getConnection().getHost() + ":", e);
+                    + " server:" + sarosNet.getConnection().getHost() + ":", e);
             return null;
         }
     }

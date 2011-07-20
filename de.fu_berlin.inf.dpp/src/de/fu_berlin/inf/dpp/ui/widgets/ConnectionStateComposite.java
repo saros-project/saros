@@ -56,20 +56,20 @@ public class ConnectionStateComposite extends Composite {
         stateLabel.setLayoutData(LayoutUtils.createFillHGrabGridData());
         FontUtils.makeBold(stateLabel);
 
-        updateLabel(saros.getConnectionState());
+        updateLabel(saros.getSarosNet().getConnectionState());
         this.stateLabel.setForeground(getDisplay().getSystemColor(
             SWT.COLOR_WHITE));
         this.stateLabel.setBackground(getDisplay().getSystemColor(
             SWT.COLOR_DARK_GRAY));
         this.setBackground(getDisplay().getSystemColor(SWT.COLOR_DARK_GRAY));
 
-        saros.addListener(connectionListener);
+        saros.getSarosNet().addListener(connectionListener);
     }
 
     @Override
     public void dispose() {
         super.dispose();
-        saros.removeListener(connectionListener);
+        saros.getSarosNet().removeListener(connectionListener);
     }
 
     protected void updateLabel(ConnectionState newState) {
@@ -102,14 +102,16 @@ public class ConnectionStateComposite extends Composite {
         case CONNECTING:
             return "Connecting...";
         case CONNECTED:
-            JID jid = new JID(saros.getConnection().getUser());
+            JID jid = new JID(saros.getSarosNet().getConnection().getUser());
             return jid.getBase();
         case DISCONNECTING:
             return "Disconnecting...";
         case ERROR:
-            Exception e = saros.getConnectionError();
+            Exception e = saros.getSarosNet().getConnectionError();
             if (e == null) {
                 return "Error";
+            } else if (e.toString().equalsIgnoreCase("stream:error (conflict)")) {
+                return "Error (Resource conflict. Other session running?)";
             } else {
                 return "Error (" + e.getMessage() + ")";
             }
