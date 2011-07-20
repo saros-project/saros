@@ -4,6 +4,8 @@ import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.util.List;
 
+import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
+
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.stf.client.tester.AbstractTester;
 import de.fu_berlin.inf.dpp.stf.server.StfRemoteObject;
@@ -39,7 +41,8 @@ public interface ISarosView extends Remote {
      * 
      **********************************************/
     /**
-     * Connect with the given ID.
+     * Connects with the given JID and waits until the tester is connected to
+     * the server.
      * 
      * @param jid
      *            see {@link JID}
@@ -49,14 +52,16 @@ public interface ISarosView extends Remote {
     public void connectWith(JID jid, String password) throws RemoteException;
 
     /**
-     * Connect with the current active ID.
+     * Connects with the current active account and waits until the tester is
+     * connected to the server.
      * 
      * @throws RemoteException
      */
     public void connectWithActiveAccount() throws RemoteException;
 
     /**
-     * Click the toolBarbotton "Disconnect".
+     * Clicks the tool bar button "Disconnect" and waits until the tester is
+     * disconnected from the server.
      * 
      * @throws RemoteException
      */
@@ -91,14 +96,35 @@ public interface ISarosView extends Remote {
     public IContextMenusInBuddiesArea selectBuddy(JID buddyJID)
         throws RemoteException;
 
+    /**
+     * Selects the tree node "Buddies"
+     */
     public IContextMenusInBuddiesArea selectBuddies() throws RemoteException;
 
+    /**
+     * Selects the tree node "Session"
+     */
     public IContextMenusInSessionArea selectSession() throws RemoteException;
 
+    /**
+     * Selects the tree node "No Session Running"
+     */
     public IContextMenusInSessionArea selectNoSessionRunning()
         throws RemoteException;
 
-    public IContextMenusInSessionArea selectParticipant(final JID participantJID)
+    /**
+     * Selects the participant with the given JID in the roster.
+     * 
+     * @param jid
+     *            the JID of the participant
+     * @throws IllegalStateException
+     *             if the tester is not in a session
+     * @throws WidgetNotFoundException
+     *             if the participant could not be found
+     * @throws RemoteException
+     * 
+     */
+    public IContextMenusInSessionArea selectParticipant(final JID jid)
         throws RemoteException;
 
     public IChatroom selectChatroom() throws RemoteException;
@@ -159,14 +185,14 @@ public interface ISarosView extends Remote {
      **********************************************/
 
     /**
-     * Wait until the XMPP connection is connected.
+     * Waits until the tester is connected to the XMPP server.
      * 
      * @throws RemoteException
      */
     public void waitUntilIsConnected() throws RemoteException;
 
     /**
-     * Wait until the connection is disconnected.
+     * Wait until the tester is disconnected from the XMPP server.
      * 
      * @throws RemoteException
      */
@@ -201,7 +227,8 @@ public interface ISarosView extends Remote {
     /**
      * performs the action "Send a file to selected buddy" which should be
      * activated by clicking the tool bar button with the tooltip text
-     * {@link StfRemoteObject#TB_SEND_A_FILE_TO_SELECTED_BUDDY} on the session view.
+     * {@link StfRemoteObject#TB_SEND_A_FILE_TO_SELECTED_BUDDY} on the session
+     * view.
      * <p>
      * <b>Attention:</b>
      * <ol>
@@ -225,7 +252,8 @@ public interface ISarosView extends Remote {
     /**
      * performs the action "Start a VoIP session" which should be activated by
      * clicking the tool bar button with the tooltip text
-     * {@link StfRemoteObject#TB_SEND_A_FILE_TO_SELECTED_BUDDY} on the session view.
+     * {@link StfRemoteObject#TB_SEND_A_FILE_TO_SELECTED_BUDDY} on the session
+     * view.
      * <p>
      * <b>Attention:</b>
      * <ol>
@@ -286,8 +314,9 @@ public interface ISarosView extends Remote {
     /**
      * performs the action "inconsistency detected in ..." which should be
      * activated by clicking the tool bar button with the toolTip text
-     * {@link StfRemoteObject#TB_INCONSISTENCY_DETECTED} on the session view. The
-     * button is only enabled, if there are inconsistency detected in a file.
+     * {@link StfRemoteObject#TB_INCONSISTENCY_DETECTED} on the session view.
+     * The button is only enabled, if there are inconsistency detected in a
+     * file.
      * <p>
      * <b>Attention:</b>
      * <ol>
@@ -318,7 +347,7 @@ public interface ISarosView extends Remote {
     public String getParticipantLabel(JID contactJID) throws RemoteException;
 
     /**
-     * Test if you are now in a session.
+     * Test if the tester is in a session.
      * 
      * @return <tt>true</tt> if the tool bar button "Leave the session" is
      *         enabled.
@@ -351,7 +380,8 @@ public interface ISarosView extends Remote {
      * 
      * @return<tt>true</tt>, if there are participant in the session list
      *                       existed and his contextMenu
-     *                       {@link StfRemoteObject#CM_STOP_FOLLOWING} is enabled.
+     *                       {@link StfRemoteObject#CM_STOP_FOLLOWING} is
+     *                       enabled.
      * @throws RemoteException
      */
     public boolean isFollowing() throws RemoteException;

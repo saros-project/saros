@@ -4,10 +4,9 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
 @RunWith(Suite.class)
-@Suite.SuiteClasses({ AccountWithDismatchedPasswordTest.class,
-    EditDuringInvitationTest.class, HostInvitesBelatedlyTest.class,
+@Suite.SuiteClasses({ EditDuringInvitationTest.class,
+    HostInvitesBelatedlyTest.class,
     ParallelInvitationWithTerminationByHostTest.class,
-    ParallelInvitationWithTerminationByInviteesTest.class,
     StrictSequentialInvitationWithoutTerminationTest.class })
 public class TestSuite {
     // the class remains completely empty,

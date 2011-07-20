@@ -112,13 +112,13 @@ public class BasicWidgetTreeTest extends StfTestCase {
         assertTrue(view.bot().tree().existsSubItem(Constants.PROJECT1));
 
         assertTrue(ALICE.superBot().views().packageExplorerView().tree()
-            .existsWithRegex(Constants.PROJECT1));
+            .existsWithRegex(Pattern.quote(Constants.PROJECT1) + ".*"));
         assertTrue(view.bot().tree()
             .selectTreeItem(Constants.PROJECT1, SRC, Constants.PKG1)
             .existsSubItem(Constants.CLS1 + SUFFIX_JAVA));
         ALICE.superBot().views().packageExplorerView()
             .selectPkg(Constants.PROJECT1, Constants.PKG1)
-            .existsWithRegex(Constants.CLS1_SUFFIX);
+            .existsWithRegex(Pattern.quote(Constants.CLS1_SUFFIX) + ".*");
     }
 
     @Test
@@ -137,19 +137,20 @@ public class BasicWidgetTreeTest extends StfTestCase {
         assertTrue(view.bot().tree()
             .existsSubItemWithRegex(Pattern.quote(Constants.PROJECT1) + ".*"));
         assertTrue(ALICE.superBot().views().packageExplorerView().tree()
-            .existsWithRegex(Constants.PROJECT1));
+            .existsWithRegex(Pattern.quote(Constants.PROJECT1) + ".*"));
         assertTrue(view.bot().tree().selectTreeItem(Constants.PROJECT1, SRC)
             .existsSubItemWithRegex(Pattern.quote(Constants.PKG1) + ".*"));
 
         assertTrue(ALICE.superBot().views().packageExplorerView()
-            .selectSrc(Constants.PROJECT1).existsWithRegex(Constants.PKG1));
+            .selectSrc(Constants.PROJECT1)
+            .existsWithRegex(Pattern.quote(Constants.PKG1) + ".*"));
         assertTrue(view.bot().tree()
             .selectTreeItem(Constants.PROJECT1, SRC, Constants.PKG1)
             .existsSubItemWithRegex(Pattern.quote(Constants.CLS1) + ".*"));
 
         assertTrue(ALICE.superBot().views().packageExplorerView()
             .selectPkg(Constants.PROJECT1, Constants.PKG1)
-            .existsWithRegex(Constants.CLS1_SUFFIX));
+            .existsWithRegex(Pattern.quote(Constants.CLS1_SUFFIX) + ".*"));
         ALICE.superBot().views().packageExplorerView().tree().newC()
             .cls(Constants.PROJECT1, Constants.PKG1, Constants.CLS2);
 
@@ -158,7 +159,7 @@ public class BasicWidgetTreeTest extends StfTestCase {
             .existsSubItemWithRegex(Pattern.quote(Constants.CLS2) + ".*"));
         assertTrue(ALICE.superBot().views().packageExplorerView()
             .selectPkg(Constants.PROJECT1, Constants.PKG1)
-            .existsWithRegex(Constants.CLS2_SUFFIX));
+            .existsWithRegex(Pattern.quote(Constants.CLS2_SUFFIX) + ".*"));
     }
 
     @Test

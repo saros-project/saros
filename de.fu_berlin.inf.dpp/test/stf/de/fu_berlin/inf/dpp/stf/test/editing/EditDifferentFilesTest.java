@@ -48,6 +48,8 @@ public class EditDifferentFilesTest extends StfTestCase {
 
                 for (char c : textToType.toCharArray()) {
                     ALICE.remoteBot().editor("HelloWorld.java")
+                        .waitUntilIsActive();
+                    ALICE.remoteBot().editor("HelloWorld.java")
                         .typeText(String.valueOf(c));
                     ALICE.remoteBot().sleep(100);
                 }
@@ -62,6 +64,8 @@ public class EditDifferentFilesTest extends StfTestCase {
                     .selectProject("foo").newC().cls("HelloGermany");
 
                 for (char c : textToType.toCharArray()) {
+                    BOB.remoteBot().editor("HelloGermany.java")
+                        .waitUntilIsActive();
                     BOB.remoteBot().editor("HelloGermany.java")
                         .typeText(String.valueOf(c));
                     BOB.remoteBot().sleep(100);

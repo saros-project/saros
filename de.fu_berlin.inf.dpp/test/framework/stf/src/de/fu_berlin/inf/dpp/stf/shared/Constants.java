@@ -513,6 +513,7 @@ public interface Constants {
      * 
      **********************************************/
     public final static String VIEW_CONSOLE = "Console";
+    public final static String VIEW_CONSOLE_ID = "org.eclipse.ui.console.ConsoleView";
 
     /**********************************************
      * 

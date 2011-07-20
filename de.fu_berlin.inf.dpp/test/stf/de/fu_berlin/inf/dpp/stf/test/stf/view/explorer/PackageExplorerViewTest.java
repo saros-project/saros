@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.stf.test.stf.view;
+package de.fu_berlin.inf.dpp.stf.test.stf.view.explorer;
 
 import static de.fu_berlin.inf.dpp.stf.client.tester.SarosTester.ALICE;
 import static de.fu_berlin.inf.dpp.stf.client.tester.SarosTester.BOB;
@@ -6,6 +6,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.rmi.RemoteException;
+import java.util.regex.Pattern;
 
 import org.junit.After;
 import org.junit.BeforeClass;
@@ -35,13 +36,13 @@ public class PackageExplorerViewTest extends StfTestCase {
             .cls(Constants.PROJECT1, Constants.PKG1, Constants.CLS1);
         assertTrue(ALICE.superBot().views().packageExplorerView()
             .selectPkg(Constants.PROJECT1, Constants.PKG1)
-            .existsWithRegex(Constants.CLS1_SUFFIX));
+            .existsWithRegex(Pattern.quote(Constants.CLS1_SUFFIX) + ".*"));
         ALICE.superBot().views().packageExplorerView()
             .selectClass(Constants.PROJECT1, Constants.PKG1, Constants.CLS1)
             .delete();
         assertFalse(ALICE.superBot().views().packageExplorerView()
             .selectPkg(Constants.PROJECT1, Constants.PKG1)
-            .existsWithRegex(Constants.CLS1_SUFFIX));
+            .existsWithRegex(Pattern.quote(Constants.CLS1_SUFFIX) + ".*"));
     }
 
     @Test
@@ -52,14 +53,14 @@ public class PackageExplorerViewTest extends StfTestCase {
             .cls(Constants.PROJECT1, Constants.PKG1, Constants.CLS1);
         assertTrue(ALICE.superBot().views().packageExplorerView()
             .selectPkg(Constants.PROJECT1, Constants.PKG1)
-            .existsWithRegex(Constants.CLS1_SUFFIX));
+            .existsWithRegex(Pattern.quote(Constants.CLS1_SUFFIX) + ".*"));
 
         ALICE.superBot().views().packageExplorerView()
             .selectClass(Constants.PROJECT1, Constants.PKG1, Constants.CLS1)
             .delete();
         assertFalse(ALICE.superBot().views().packageExplorerView()
             .selectPkg(Constants.PROJECT1, Constants.PKG1)
-            .existsWithRegex(Constants.CLS1_SUFFIX));
+            .existsWithRegex(Pattern.quote(Constants.CLS1_SUFFIX) + ".*"));
 
     }
 

@@ -1,6 +1,7 @@
 package de.fu_berlin.inf.dpp.ui.widgets.chatControl.parts;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.events.KeyListener;
@@ -8,7 +9,6 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Text;
 
 /**
  * This control displays an input field for text input
@@ -33,13 +33,13 @@ public class ChatInput extends Composite {
     public static final Color TEXT_COLOR = Display.getDefault().getSystemColor(
         SWT.COLOR_WIDGET_FOREGROUND);
 
-    protected Text text;
+    protected StyledText text;
 
     public ChatInput(Composite parent, int style) {
         super(parent, SWT.NONE);
         this.setLayout(new FillLayout());
 
-        this.text = new Text(this, style);
+        this.text = new StyledText(this, style);
 
         /*
          * Show/hide the hint appropriately

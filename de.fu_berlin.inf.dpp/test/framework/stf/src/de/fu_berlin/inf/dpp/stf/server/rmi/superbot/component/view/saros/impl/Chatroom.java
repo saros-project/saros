@@ -79,7 +79,7 @@ public final class Chatroom extends StfRemoteObject implements IChatroom {
         return bot.chatLinePartnerChangeSeparator(plainID).getPlainID();
     }
 
-    public String getTextOfChatLine() throws RemoteException {
+    public String getTextOfFirstChatLine() throws RemoteException {
 
         SarosSWTBot bot = new SarosSWTBot();
 

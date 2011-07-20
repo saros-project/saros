@@ -1,12 +1,9 @@
 package de.fu_berlin.inf.dpp.stf.server.bot.condition;
 
-import java.util.List;
-
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.swt.finder.waits.Conditions;
 import org.eclipse.swtbot.swt.finder.waits.ICondition;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
-import org.eclipse.swtbot.swt.finder.widgets.SWTBotToolbarButton;
 
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotTable;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.saros.impl.Chatroom;
@@ -15,16 +12,6 @@ import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.saros.impl.Ch
  * This is a factory class to create some conditions provided with STF.
  */
 public class SarosConditions extends Conditions {
-
-    // public static ICondition isConnect(List<SWTBotToolbarButton> buttons,
-    // String tooltipText) {
-    // return new IsConnect(buttons, tooltipText);
-    // }
-
-    public static ICondition isDisconnected(List<SWTBotToolbarButton> buttons,
-        String tooltipText) {
-        return new IsDisconnected(buttons, tooltipText);
-    }
 
     public static ICondition isShellActive(SWTBotShell shell) {
         return new IsShellActive(shell);

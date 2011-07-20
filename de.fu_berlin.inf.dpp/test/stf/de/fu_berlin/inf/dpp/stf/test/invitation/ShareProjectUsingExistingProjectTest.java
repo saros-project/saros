@@ -6,6 +6,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.rmi.RemoteException;
+import java.util.regex.Pattern;
 
 import org.junit.After;
 import org.junit.Before;
@@ -63,10 +64,10 @@ public class ShareProjectUsingExistingProjectTest extends StfTestCase {
     public void shareProjectUsingExistingProject() throws RemoteException {
         assertFalse(BOB.superBot().views().packageExplorerView()
             .selectPkg(Constants.PROJECT1, Constants.PKG1)
-            .existsWithRegex(Constants.CLS1_SUFFIX));
+            .existsWithRegex(Pattern.quote(Constants.CLS1_SUFFIX) + ".*"));
         assertTrue(BOB.superBot().views().packageExplorerView()
             .selectPkg(Constants.PROJECT1, Constants.PKG1)
-            .existsWithRegex(Constants.CLS2));
+            .existsWithRegex(Pattern.quote(Constants.CLS2) + ".*"));
         Util.buildSessionSequentially(Constants.PROJECT1,
             TypeOfCreateProject.EXIST_PROJECT, ALICE, BOB);
         BOB.superBot()
@@ -76,10 +77,10 @@ public class ShareProjectUsingExistingProjectTest extends StfTestCase {
                 Constants.CLS1);
         assertTrue(BOB.superBot().views().packageExplorerView()
             .selectPkg(Constants.PROJECT1, Constants.PKG1)
-            .existsWithRegex(Constants.CLS1));
+            .existsWithRegex(Pattern.quote(Constants.CLS1) + ".*"));
         assertFalse(BOB.superBot().views().packageExplorerView()
             .selectPkg(Constants.PROJECT1, Constants.PKG1)
-            .existsWithRegex(Constants.CLS2));
+            .existsWithRegex(Pattern.quote(Constants.CLS2) + ".*"));
     }
 
     @Test
@@ -87,10 +88,10 @@ public class ShareProjectUsingExistingProjectTest extends StfTestCase {
         throws RemoteException {
         assertFalse(BOB.superBot().views().packageExplorerView()
             .selectPkg(Constants.PROJECT1, Constants.PKG1)
-            .existsWithRegex(Constants.CLS1_SUFFIX));
+            .existsWithRegex(Pattern.quote(Constants.CLS1_SUFFIX) + ".*"));
         assertTrue(BOB.superBot().views().packageExplorerView()
             .selectPkg(Constants.PROJECT1, Constants.PKG1)
-            .existsWithRegex(Constants.CLS2));
+            .existsWithRegex(Pattern.quote(Constants.CLS2) + ".*"));
 
         Util.buildSessionSequentially(
             Constants.PROJECT1,
@@ -98,15 +99,15 @@ public class ShareProjectUsingExistingProjectTest extends StfTestCase {
             ALICE, BOB);
 
         assertTrue(BOB.superBot().views().packageExplorerView().tree()
-            .existsWithRegex(Constants.PROJECT1));
+            .existsWithRegex(Pattern.quote(Constants.PROJECT1) + ".*"));
         assertTrue(BOB.superBot().views().packageExplorerView()
             .selectPkg(Constants.PROJECT1, Constants.PKG1)
-            .existsWithRegex(Constants.CLS2));
+            .existsWithRegex(Pattern.quote(Constants.CLS2) + ".*"));
         assertTrue(BOB.superBot().views().packageExplorerView().tree()
-            .existsWithRegex(Constants.PROJECT1_NEXT));
+            .existsWithRegex(Pattern.quote(Constants.PROJECT1_NEXT) + ".*"));
         assertTrue(BOB.superBot().views().packageExplorerView()
             .selectPkg(Constants.PROJECT1_NEXT, Constants.PKG1)
-            .existsWithRegex(Constants.CLS1));
+            .existsWithRegex(Pattern.quote(Constants.CLS1) + ".*"));
 
     }
 
@@ -116,15 +117,15 @@ public class ShareProjectUsingExistingProjectTest extends StfTestCase {
         Util.buildSessionSequentially(Constants.PROJECT1,
             TypeOfCreateProject.EXIST_PROJECT_WITH_COPY, ALICE, BOB);
         assertTrue(BOB.superBot().views().packageExplorerView().tree()
-            .existsWithRegex(Constants.PROJECT1));
+            .existsWithRegex(Pattern.quote(Constants.PROJECT1) + ".*"));
         assertTrue(BOB.superBot().views().packageExplorerView()
             .selectPkg(Constants.PROJECT1, Constants.PKG1)
-            .existsWithRegex(Constants.CLS2));
+            .existsWithRegex(Pattern.quote(Constants.CLS2) + ".*"));
         assertTrue(BOB.superBot().views().packageExplorerView().tree()
-            .existsWithRegex(Constants.PROJECT1_COPY));
+            .existsWithRegex(Pattern.quote(Constants.PROJECT1_COPY) + ".*"));
         assertTrue(BOB.superBot().views().packageExplorerView()
             .selectPkg(Constants.PROJECT1_COPY, Constants.PKG1)
-            .existsWithRegex(Constants.CLS1));
+            .existsWithRegex(Pattern.quote(Constants.CLS1) + ".*"));
 
     }
 }

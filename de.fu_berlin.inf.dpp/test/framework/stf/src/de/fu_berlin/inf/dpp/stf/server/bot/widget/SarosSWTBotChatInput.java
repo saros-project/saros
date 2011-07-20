@@ -1,15 +1,18 @@
 package de.fu_berlin.inf.dpp.stf.server.bot.widget;
 
+import java.lang.reflect.Field;
+
+import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swtbot.swt.finder.ReferenceBy;
 import org.eclipse.swtbot.swt.finder.SWTBotWidget;
 import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
-import org.eclipse.swtbot.swt.finder.keyboard.Keystrokes;
 import org.eclipse.swtbot.swt.finder.results.VoidResult;
-import org.eclipse.swtbot.swt.finder.utils.MessageFormat;
 import org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences;
 import org.eclipse.swtbot.swt.finder.widgets.AbstractSWTBot;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotStyledText;
 import org.hamcrest.SelfDescribing;
 
+import de.fu_berlin.inf.dpp.ui.widgets.chatControl.ChatControl;
 import de.fu_berlin.inf.dpp.ui.widgets.chatControl.parts.ChatInput;
 
 /**
@@ -23,6 +26,8 @@ import de.fu_berlin.inf.dpp.ui.widgets.chatControl.parts.ChatInput;
  */
 @SWTBotWidget(clasz = ChatInput.class, preferredName = "chatInput", referenceBy = { ReferenceBy.TEXT })
 public class SarosSWTBotChatInput extends AbstractSWTBot<ChatInput> {
+
+    private SWTBotStyledText styledText;
 
     /**
      * Constructs a new instance of this object.
@@ -52,6 +57,7 @@ public class SarosSWTBotChatInput extends AbstractSWTBot<ChatInput> {
     public SarosSWTBotChatInput(ChatInput w, SelfDescribing description)
         throws WidgetNotFoundException {
         super(w, description);
+        this.styledText = new SWTBotStyledText(getStyledText(w));
     }
 
     /**
@@ -62,25 +68,28 @@ public class SarosSWTBotChatInput extends AbstractSWTBot<ChatInput> {
      * @return the same instance.
      */
     public SarosSWTBotChatInput setText(final String text) {
-        waitForEnabled();
-        asyncExec(new VoidResult() {
-            public void run() {
-                widget.setText(text);
-            }
-        });
+        styledText.setText(text);
         return this;
     }
 
     public SarosSWTBotChatInput pressEnterKey() {
-        waitForEnabled();
-        asyncExec(new VoidResult() {
+        // the ChatControl key listener ignores the mock keyboard event
+        // styledText.pressShortcut(Keystrokes.CR);
+        syncExec(new VoidResult() {
             public void run() {
-                widget.setFocus();
-                // keyboard().pressShortcut(SWT.CR, SWT.LF);
-                keyboard().pressShortcut(Keystrokes.LF);
+                try {
+                    String message = styledText.widget.getText().trim();
+                    if (message.length() == 0)
+                        return;
+                    styledText.widget.setText("");
+                    ChatControl control = (ChatControl) widget.getParent()
+                        .getParent();
+                    control.notifyMessageEntered(message);
+                } catch (Exception e) {
+                    log.error("sending chat message failed", e);
+                }
             }
         });
-        // pressShortcut(Keystrokes.LF);
         return this;
     }
 
@@ -107,11 +116,19 @@ public class SarosSWTBotChatInput extends AbstractSWTBot<ChatInput> {
      * @since 1.2
      */
     public SarosSWTBotChatInput typeText(final String text, int interval) {
-        log.debug(MessageFormat.format(
-            "Inserting text:{0} into text {1}", text, this)); //$NON-NLS-1$
-        setFocus();
-        keyboard().typeText(text, interval);
+        styledText.typeText(text, interval);
         return this;
     }
 
+    private StyledText getStyledText(ChatInput widget) {
+        try {
+            Field text = ChatInput.class.getDeclaredField("text");
+            text.setAccessible(true);
+            return (StyledText) text.get(widget);
+        } catch (Exception e) {
+            throw new WidgetNotFoundException(
+                "reflection failed, getting field 'text' on class "
+                    + ChatInput.class.getName(), e);
+        }
+    }
 }

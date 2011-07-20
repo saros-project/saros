@@ -13,7 +13,6 @@ import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.SWTBot;
 import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
-import org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences;
 import org.eclipse.swtbot.swt.finder.waits.Conditions;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTable;
@@ -83,41 +82,39 @@ public final class TeamC extends StfRemoteObject implements ITeamC {
     }
 
     private SWTBotShell getSvnShell() {
-        long timeout = SWTBotPreferences.TIMEOUT;
-        try {
-            SWTBotShell shell = new SWTBot().shell(SHELL_SHARE_PROJECT);
-            shell.activate();
+        SWTBotShell shell = new SWTBot().shell(SHELL_SHARE_PROJECT);
+        shell.activate();
+        shell.bot().sleep(500);
+
+        int tableItemCount = shell.bot().table().rowCount();
+        SWTBotTable table = null;
+        for (int i = 0; i < tableItemCount; i++) {
             shell.bot().sleep(500);
-            SWTBotPreferences.TIMEOUT = 500;
+            SWTBotTableItem item = shell.bot().table().getTableItem(i);
+            if (!item.getText().equals(TABLE_ITEM_REPOSITORY_TYPE_SVN))
+                continue;
 
-            int tableItemCount = shell.bot().table().rowCount();
-
-            SWTBotTable table = null;
-            for (int i = 0; i < tableItemCount; i++) {
+            item.select();
+            shell.bot().button(NEXT).click();
+            try {
                 shell.bot().sleep(500);
-                SWTBotTableItem item = shell.bot().table().getTableItem(i);
-                if (!item.getText().equals(TABLE_ITEM_REPOSITORY_TYPE_SVN))
-                    continue;
-
-                item.select();
-                shell.bot().button(NEXT).click();
-                try {
-                    table = shell.bot().table();
-                    break;
-                } catch (WidgetNotFoundException e) {
-                    log.warn("expected table in SVN shell, wrong SVN client ?",
-                        e);
+                table = shell.bot().table();
+                if (table.columnCount() != 1) {
+                    table = null;
                     shell.bot().button(BACK).click();
+                    continue;
                 }
+                break;
+            } catch (WidgetNotFoundException e) {
+                log.warn("expected table in SVN shell, wrong SVN client ?", e);
+                shell.bot().button(BACK).click();
             }
-            if (table == null) {
-                shell.close();
-                throw new RuntimeException("no or wrong SVN client found");
-            }
-            return shell;
-        } finally {
-            SWTBotPreferences.TIMEOUT = timeout;
         }
+        if (table == null) {
+            shell.close();
+            throw new RuntimeException("no or wrong SVN client found");
+        }
+        return shell;
 
     }
 

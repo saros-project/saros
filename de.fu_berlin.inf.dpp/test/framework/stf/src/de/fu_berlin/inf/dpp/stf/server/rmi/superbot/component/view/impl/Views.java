@@ -44,7 +44,11 @@ public final class Views extends StfRemoteObject implements IViews {
     }
 
     public IConsoleView consoleView() throws RemoteException {
-        return ConsoleView.getInstance();
+        SWTWorkbenchBot bot = new SWTWorkbenchBot();
+        RemoteWorkbenchBot.getInstance().openViewById(VIEW_CONSOLE_ID);
+        RemoteWorkbenchBot.getInstance().view(VIEW_CONSOLE).show();
+        bot.viewByTitle(VIEW_CONSOLE).show();
+        return ConsoleView.getInstance().setView(bot.viewByTitle(VIEW_CONSOLE));
     }
 
     public IPackageExplorerView packageExplorerView() throws RemoteException {

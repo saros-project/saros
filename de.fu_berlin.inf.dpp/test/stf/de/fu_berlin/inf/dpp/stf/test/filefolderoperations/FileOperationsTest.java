@@ -41,25 +41,15 @@ public class FileOperationsTest extends StfTestCase {
         closeAllShells();
         closeAllEditors();
         clearWorkspaces();
-        /*
-         * NOTE: The session sharing by Version 11.3.25.DEVEL is not stable,
-         * sometime the invitation process can not be completed, so it's
-         * possible that all tests are failed.
-         */
-        Util.setUpSessionWithJavaProjectAndClass(Constants.PROJECT1,
-            Constants.PKG1, Constants.CLS1, ALICE, BOB, CARL);
 
-        BOB.superBot()
-            .views()
-            .packageExplorerView()
-            .waitUntilClassExists(Constants.PROJECT1, Constants.PKG1,
-                Constants.CLS1);
+        Util.setUpSessionWithJavaProjectAndClass("Foo1_Saros", "my.pkg",
+            "MyClass", ALICE, BOB, CARL);
 
-        CARL.superBot()
-            .views()
-            .packageExplorerView()
-            .waitUntilClassExists(Constants.PROJECT1, Constants.PKG1,
-                Constants.CLS1);
+        BOB.superBot().views().packageExplorerView()
+            .waitUntilResourceIsShared("Foo1_Saros/src/my/pkg/MyClass.java");
+
+        CARL.superBot().views().packageExplorerView()
+            .waitUntilResourceIsShared("Foo1_Saros/src/my/pkg/MyClass.java");
 
         Util.setFollowMode(ALICE, CARL);
     }
@@ -68,14 +58,6 @@ public class FileOperationsTest extends StfTestCase {
     public void afterEveryTest() throws RemoteException {
         leaveSessionHostFirst(ALICE);
     }
-
-    // @After
-    // public void runBeforeEveryTest() throws RemoteException {
-    // ALICE.bot().saveAllEditors();
-    // BOB.bot().saveAllEditors();
-    // CARL.bot().saveAllEditors();
-    // resetSharedProject(ALICE);
-    // }
 
     /**
      * Steps:

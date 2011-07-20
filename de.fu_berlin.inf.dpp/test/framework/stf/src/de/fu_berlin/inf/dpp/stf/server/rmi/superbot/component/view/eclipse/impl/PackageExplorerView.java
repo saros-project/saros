@@ -79,10 +79,25 @@ public final class PackageExplorerView extends StfRemoteObject implements
         return ContextMenusInPEView.getInstance();
     }
 
+    public IContextMenusInPEView selectJavaProjectWithRegex(String projectName)
+        throws RemoteException {
+
+        initContextMenuWrapper(Util.getTreeItemWithRegex(tree, projectName),
+            TreeItemType.JAVA_PROJECT);
+        return ContextMenusInPEView.getInstance();
+    }
+
     public IContextMenusInPEView selectProject(String projectName)
         throws RemoteException {
         initContextMenuWrapper(
             Util.getTreeItemWithRegex(tree, Pattern.quote(projectName)),
+            TreeItemType.PROJECT);
+        return ContextMenusInPEView.getInstance();
+    }
+
+    public IContextMenusInPEView selectProjectWithRegex(String projectName)
+        throws RemoteException {
+        initContextMenuWrapper(Util.getTreeItemWithRegex(tree, projectName),
             TreeItemType.PROJECT);
         return ContextMenusInPEView.getInstance();
     }
@@ -96,6 +111,14 @@ public final class PackageExplorerView extends StfRemoteObject implements
         return ContextMenusInPEView.getInstance();
     }
 
+    public IContextMenusInPEView selectPkgWithRegex(String projectName,
+        String pkg) throws RemoteException {
+        initContextMenuWrapper(Util.getTreeItemWithRegex(tree, projectName,
+            Pattern.quote(SRC), pkg), TreeItemType.PKG);
+
+        return ContextMenusInPEView.getInstance();
+    }
+
     public IContextMenusInPEView selectClass(String projectName, String pkg,
         String className) throws RemoteException {
 
@@ -103,6 +126,16 @@ public final class PackageExplorerView extends StfRemoteObject implements
             Util.getTreeItemWithRegex(tree, Pattern.quote(projectName),
                 Pattern.quote(SRC), Pattern.quote(pkg),
                 Pattern.quote(className + SUFFIX_JAVA)), TreeItemType.CLASS);
+
+        return ContextMenusInPEView.getInstance();
+    }
+
+    public IContextMenusInPEView selectClassWithRegex(String projectName,
+        String pkg, String className) throws RemoteException {
+
+        initContextMenuWrapper(Util.getTreeItemWithRegex(tree, projectName,
+            Pattern.quote(SRC), pkg, className + Pattern.quote(SUFFIX_JAVA)),
+            TreeItemType.CLASS);
 
         return ContextMenusInPEView.getInstance();
     }

@@ -234,7 +234,7 @@ public final class SarosView extends StfRemoteObject implements ISarosView {
     public IContextMenusInSessionArea selectParticipant(final JID participantJID)
         throws RemoteException {
         if (!isInSession())
-            throw new RuntimeException("you are not in a session");
+            throw new IllegalStateException("you are not in a session");
         String participantLabel = getParticipantLabel(participantJID);
         initSessionContextMenuWrapper(Util
             .getTreeItemWithRegex(tree, Pattern.quote(NODE_SESSION),

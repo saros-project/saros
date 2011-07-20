@@ -5,6 +5,7 @@ import java.rmi.Remote;
 import java.rmi.RemoteException;
 
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
 
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotEditor;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.contextmenu.peview.IContextMenusInPEView;
@@ -23,33 +24,85 @@ public interface IPackageExplorerView extends Remote {
     public IContextMenusInPEView selectSrc(String projectName)
         throws RemoteException;
 
+    /**
+     * Selects the given Java project.
+     * 
+     * @param projectName
+     *            the name of the Java project
+     * @throws RemoteException
+     * @throws WidgetNotFoundException
+     *             if the Java project could not be found
+     */
     public IContextMenusInPEView selectJavaProject(String projectName)
         throws RemoteException;
 
     /**
-     * select the given project.
+     * Selects the given Java project matching the regular expression.
+     * 
+     * @param projectName
+     *            the name of the Java project as regular expression
+     * @throws RemoteException
+     * @throws WidgetNotFoundException
+     *             if the Java project could not be found
+     */
+
+    public IContextMenusInPEView selectJavaProjectWithRegex(String projectName)
+        throws RemoteException;
+
+    /**
+     * Select the given project.
      * 
      * @param projectName
      *            the name of the project
      * @throws RemoteException
+     * @throws WidgetNotFoundException
+     *             if the project could not be found
      */
     public IContextMenusInPEView selectProject(String projectName)
         throws RemoteException;
 
     /**
-     * select the given package
+     * Select the given project matching the regular expression.
+     * 
+     * @param projectName
+     *            the name of the project as regular expression
+     * @throws RemoteException
+     * @throws WidgetNotFoundException
+     *             if the project could not be found
+     */
+    public IContextMenusInPEView selectProjectWithRegex(String projectName)
+        throws RemoteException;
+
+    /**
+     * Select the given package.
      * 
      * @param projectName
      *            the name of the project, e.g.foo_bar
      * @param pkg
      *            the name of the package, e.g. my.pkg
      * @throws RemoteException
+     * @throws WidgetNotFoundException
+     *             if the project or package could not be found
      */
     public IContextMenusInPEView selectPkg(String projectName, String pkg)
         throws RemoteException;
 
     /**
-     * select the given class
+     * Select the given package matching the regular expression.
+     * 
+     * @param projectName
+     *            the name of the project as regular expression
+     * @param pkg
+     *            the name of the package as regular expression
+     * @throws RemoteException
+     * @throws WidgetNotFoundException
+     *             if the project or package could not be found
+     */
+    public IContextMenusInPEView selectPkgWithRegex(String projectName,
+        String pkg) throws RemoteException;
+
+    /**
+     * Select the given class
      * 
      * @param projectName
      *            the name of the project, e.g.foo_bar
@@ -58,25 +111,46 @@ public interface IPackageExplorerView extends Remote {
      * @param className
      *            the name of the class, e.g. myClass
      * @throws RemoteException
+     * @throws WidgetNotFoundException
+     *             if the project, package or class could not be found
      * 
      */
     public IContextMenusInPEView selectClass(String projectName, String pkg,
         String className) throws RemoteException;
 
     /**
-     * select the given folder
+     * Select the given class matching the regular expression.
+     * 
+     * @param projectName
+     *            the name of the project as regular expression
+     * @param pkg
+     *            the name of the package as regular expression
+     * @param className
+     *            the name of the class as regular expression
+     * @throws RemoteException
+     * @throws WidgetNotFoundException
+     *             if the project, package or class could not be found
+     * 
+     */
+    public IContextMenusInPEView selectClassWithRegex(String projectName,
+        String pkg, String className) throws RemoteException;
+
+    /**
+     * Selects the given folder.
      * 
      * @param folderNodes
      *            node path to expand. Attempts to expand all nodes along the
      *            path specified by the node array parameter.e.g.
      *            {"Foo-saros","myFolder"}
      * @throws RemoteException
+     * @throws WidgetNotFoundException
+     *             if the folder could not be found
      */
     public IContextMenusInPEView selectFolder(String... folderNodes)
         throws RemoteException;
 
     /**
-     * select the given file
+     * Select the given files
      * 
      * @param fileNodes
      *            node path to expand. Attempts to expand all nodes along the
@@ -91,12 +165,12 @@ public interface IPackageExplorerView extends Remote {
 
     /**
      * 
-     * @param prjectName
+     * @param projectName
      *            the name of the project
      * @return <tt>true</tt>, if the given project is under SVN control
      * @throws RemoteException
      */
-    public boolean isProjectManagedBySVN(String prjectName)
+    public boolean isProjectManagedBySVN(String projectName)
         throws RemoteException;
 
     /**

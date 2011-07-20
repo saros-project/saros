@@ -6,6 +6,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.rmi.RemoteException;
+import java.util.regex.Pattern;
 
 import org.junit.After;
 import org.junit.BeforeClass;
@@ -32,12 +33,12 @@ public class MenuTest extends StfTestCase {
             .javaProject(Constants.PROJECT1);
         ALICE.remoteBot().sleep(1000);
         assertTrue(ALICE.superBot().views().packageExplorerView().tree()
-            .existsWithRegex(Constants.PROJECT1));
+            .existsWithRegex(Pattern.quote(Constants.PROJECT1) + ".*"));
         ALICE.superBot().views().packageExplorerView()
             .selectJavaProject(Constants.PROJECT1).delete();
         ALICE.remoteBot().sleep(1000);
         assertFalse(ALICE.superBot().views().packageExplorerView().tree()
-            .existsWithRegex(Constants.PROJECT1));
+            .existsWithRegex(Pattern.quote(Constants.PROJECT1) + ".*"));
     }
 
     @Test
@@ -47,16 +48,22 @@ public class MenuTest extends StfTestCase {
         ALICE.superBot().views().packageExplorerView().tree().newC()
             .cls(Constants.PROJECT1, Constants.PKG1, Constants.CLS1);
         ALICE.remoteBot().sleep(1000);
-        assertTrue(ALICE.superBot().views().packageExplorerView()
+        assertTrue(ALICE
+            .superBot()
+            .views()
+            .packageExplorerView()
             .selectPkg(Constants.PROJECT1, Constants.PKG1)
-            .existsWithRegex(Constants.CLS1 + SUFFIX_JAVA));
+            .existsWithRegex(Pattern.quote(Constants.CLS1 + SUFFIX_JAVA) + ".*"));
         ALICE.superBot().views().packageExplorerView()
             .selectClass(Constants.PROJECT1, Constants.PKG1, Constants.CLS1)
             .delete();
         ALICE.remoteBot().sleep(1000);
-        assertFalse(ALICE.superBot().views().packageExplorerView()
+        assertFalse(ALICE
+            .superBot()
+            .views()
+            .packageExplorerView()
             .selectPkg(Constants.PROJECT1, Constants.PKG1)
-            .existsWithRegex(Constants.CLS1 + SUFFIX_JAVA));
+            .existsWithRegex(Pattern.quote(Constants.CLS1 + SUFFIX_JAVA) + ".*"));
     }
 
     @Test
@@ -65,14 +72,14 @@ public class MenuTest extends StfTestCase {
             .project(Constants.PROJECT1);
         ALICE.remoteBot().sleep(1000);
         assertFalse(ALICE.superBot().views().packageExplorerView().tree()
-            .existsWithRegex(Constants.PROJECT2));
+            .existsWithRegex(Pattern.quote(Constants.PROJECT2) + ".*"));
         ALICE.superBot().views().packageExplorerView()
             .selectProject(Constants.PROJECT1).copy();
         ALICE.superBot().views().packageExplorerView().tree()
             .paste(Constants.PROJECT2);
         ALICE.remoteBot().sleep(1000);
         assertTrue(ALICE.superBot().views().packageExplorerView().tree()
-            .existsWithRegex(Constants.PROJECT2));
+            .existsWithRegex(Pattern.quote(Constants.PROJECT2) + ".*"));
     }
 
     @Test
@@ -85,13 +92,13 @@ public class MenuTest extends StfTestCase {
         ALICE.remoteBot().sleep(1000);
         assertTrue(ALICE.superBot().views().packageExplorerView()
             .selectProject(Constants.PROJECT1)
-            .existsWithRegex(Constants.FOLDER1));
+            .existsWithRegex(Pattern.quote(Constants.FOLDER1) + ".*"));
         ALICE.superBot().views().packageExplorerView()
             .selectFolder(Constants.PROJECT1, Constants.FOLDER1).delete();
         ALICE.remoteBot().sleep(1000);
         assertFalse(ALICE.superBot().views().packageExplorerView()
             .selectProject(Constants.PROJECT1)
-            .existsWithRegex(Constants.FOLDER1));
+            .existsWithRegex(Pattern.quote(Constants.FOLDER1) + ".*"));
     }
 
 }

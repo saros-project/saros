@@ -509,5 +509,4 @@ public abstract class StfTestCase {
 
         host.superBot().views().sarosView().waitUntilIsNotInSession();
     }
-
 }

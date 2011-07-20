@@ -2,15 +2,11 @@ package de.fu_berlin.inf.dpp.stf.test.editing;
 
 import static de.fu_berlin.inf.dpp.stf.client.tester.SarosTester.ALICE;
 import static de.fu_berlin.inf.dpp.stf.client.tester.SarosTester.BOB;
-import static de.fu_berlin.inf.dpp.stf.shared.Constants.TB_INCONSISTENCY_DETECTED;
-import static de.fu_berlin.inf.dpp.stf.shared.Constants.VIEW_SAROS;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 import java.rmi.RemoteException;
 
 import org.eclipse.jface.bindings.keys.IKeyLookup;
-import org.junit.After;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -24,11 +20,6 @@ public class ConcurrentEditingTest extends StfTestCase {
     @BeforeClass
     public static void selectTesters() throws Exception {
         select(ALICE, BOB);
-    }
-
-    @After
-    public void afterEveryTest() throws RemoteException {
-        clearWorkspaces();
     }
 
     static final String FILE = "file.txt";
@@ -100,60 +91,5 @@ public class ConcurrentEditingTest extends StfTestCase {
         BOB.remoteBot().editor(FILE).closeWithoutSave();
 
         assertEquals(ALICEText, BOBText);
-    }
-
-    @Test(expected = AssertionError.class)
-    public void testAliceAndBobEditInSameLine() throws RemoteException {
-
-        ALICE
-            .superBot()
-            .views()
-            .packageExplorerView()
-            .tree()
-            .newC()
-            .javaProjectWithClasses(Constants.PROJECT1, Constants.PKG1,
-                Constants.CLS1);
-        Util.buildSessionConcurrently(Constants.PROJECT1,
-            TypeOfCreateProject.NEW_PROJECT, ALICE, BOB);
-        BOB.superBot()
-            .views()
-            .packageExplorerView()
-            .waitUntilClassExists(Constants.PROJECT1, Constants.PKG1,
-                Constants.CLS1);
-
-        BOB.superBot().views().packageExplorerView()
-            .selectClass(Constants.PROJECT1, Constants.PKG1, Constants.CLS1)
-            .open();
-        BOB.remoteBot().editor(Constants.CLS1_SUFFIX).waitUntilIsActive();
-
-        ALICE.remoteBot().editor(Constants.CLS1_SUFFIX).navigateTo(3, 0);
-        BOB.remoteBot().editor(Constants.CLS1_SUFFIX).navigateTo(3, 0);
-        char[] content = "Merry Christmas and Happy New Year!".toCharArray();
-        for (int i = 0; i < content.length; i++) {
-            ALICE.remoteBot().editor(Constants.CLS1_SUFFIX)
-                .typeText(content[i] + "");
-            ALICE.remoteBot().sleep(100);
-            if (i != 0 && i % 2 == 0) {
-                BOB.remoteBot().editor(Constants.CLS1_SUFFIX).navigateTo(3, i);
-                BOB.remoteBot()
-                    .editor(Constants.CLS1_SUFFIX)
-                    .pressShortcut(IKeyLookup.DELETE_NAME,
-                        IKeyLookup.DELETE_NAME);
-            }
-        }
-
-        String ALICEText = ALICE.remoteBot().editor(Constants.CLS1_SUFFIX)
-            .getText();
-        String BOBText = BOB.remoteBot().editor(Constants.CLS1_SUFFIX)
-            .getText();
-
-        // ????????????????????????????????????????????????
-        assertEquals(ALICEText, BOBText);
-
-        // ?????????????????????????????????????????????????
-        BOB.remoteBot().sleep(5000);
-        assertTrue(BOB.remoteBot().view(VIEW_SAROS)
-            .existsToolbarButton(TB_INCONSISTENCY_DETECTED));
-
     }
 }

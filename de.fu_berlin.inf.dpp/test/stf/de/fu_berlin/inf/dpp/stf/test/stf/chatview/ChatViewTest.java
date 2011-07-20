@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.stf.test.chatview;
+package de.fu_berlin.inf.dpp.stf.test.stf.chatview;
 
 import static de.fu_berlin.inf.dpp.stf.client.tester.SarosTester.ALICE;
 import static de.fu_berlin.inf.dpp.stf.client.tester.SarosTester.BOB;
@@ -13,8 +13,7 @@ import org.junit.Test;
 import de.fu_berlin.inf.dpp.stf.client.StfTestCase;
 import de.fu_berlin.inf.dpp.stf.client.util.Util;
 
-public class ChatViewFunctionsTest extends StfTestCase {
-
+public class ChatViewTest extends StfTestCase {
     String messageBob = "Hello Bob";
     String messageAlice = "Hello Alice";
 
@@ -24,7 +23,7 @@ public class ChatViewFunctionsTest extends StfTestCase {
     }
 
     @Test
-    public void testChat() throws RemoteException {
+    public void testChatSend() throws RemoteException {
         Util.setUpSessionWithJavaProjectAndClass("foo", "bar", "test", ALICE,
             BOB);
 
@@ -44,5 +43,32 @@ public class ChatViewFunctionsTest extends StfTestCase {
         ALICE.remoteBot().sleep(5000);
         assertEquals(messageAlice, ALICE.superBot().views().sarosView()
             .selectChatroom().getTextOfLastChatLine());
+    }
+
+    @Test
+    public void testChatRegex() throws RemoteException {
+
+        ALICE.superBot().views().sarosView().selectChatroom()
+            .sendChatMessage(messageBob);
+        ALICE.superBot().views().sarosView().selectChatroom()
+            .sendChatMessage(messageBob);
+        ALICE.superBot().views().sarosView().selectChatroom()
+            .sendChatMessage("ababababab");
+        ALICE.superBot().views().sarosView().selectChatroom()
+            .sendChatMessage(messageBob);
+        ALICE.superBot().views().sarosView().selectChatroom()
+            .sendChatMessage(messageBob);
+
+        ALICE.remoteBot().sleep(5000);
+
+        assertEquals("ababababab", ALICE.superBot().views().sarosView()
+            .selectChatroom().getTextOfChatLine("(ab)++"));
+
+        assertEquals("ababababab", BOB.superBot().views().sarosView()
+            .selectChatroom().getTextOfChatLine("(ab)++"));
+    }
+
+    public static void main(String... args) {
+        System.out.println("ababababab".matches("(ab)++"));
     }
 }

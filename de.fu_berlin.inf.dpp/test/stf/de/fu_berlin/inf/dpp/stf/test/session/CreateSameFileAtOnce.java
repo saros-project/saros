@@ -73,8 +73,8 @@ public class CreateSameFileAtOnce extends StfTestCase {
         else if (aliceText.equals(carlText))
             tester = BOB;
         else {
-            fail("the content of Alice editor: " + aliceText
-                + " is not expected, it must be '" + BOB.toString() + "' or '"
+            fail("the content of Alice editor: '" + aliceText
+                + "' is not expected, it must be '" + BOB.toString() + "' or '"
                 + CARL.toString() + "'");
             return; // just for get rid of the null pointer warning
         }

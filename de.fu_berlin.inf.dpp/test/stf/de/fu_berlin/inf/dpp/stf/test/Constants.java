@@ -82,8 +82,7 @@ public interface Constants {
     public static final String SVN_REPOSITORY_URL = "http://saros-build.imp.fu-berlin.de/svn/saros";
     public static final String SVN_PROJECT = "stf_test_project";
     public static final String SVN_PROJECT_COPY = "copy_of_stf_test_project";
-    public static final String SVN_SUFFIX = "[stf_test/stf_test_project]";
-    public static String SVN_PROJECT_PATH = System.getProperty("os.name")
-        .matches("Mac OS X.*") ? "stf_tests/stf_test_project"
-        : "/stf_tests/stf_test_project";
+    public static final String SVN_SUFFIX = "[stf_tests/stf_test_project]";
+    public static String SVN_PROJECT_PATH = "stf_tests/stf_test_project";
+    // : "/stf_tests/stf_test_project";
 }

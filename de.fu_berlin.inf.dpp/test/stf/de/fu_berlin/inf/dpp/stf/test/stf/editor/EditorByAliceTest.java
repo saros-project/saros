@@ -11,10 +11,8 @@ import java.rmi.RemoteException;
 import java.util.List;
 
 import org.eclipse.jface.bindings.keys.IKeyLookup;
-import org.eclipse.swt.SWT;
 import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import de.fu_berlin.inf.dpp.stf.client.StfTestCase;
@@ -213,90 +211,21 @@ public class EditorByAliceTest extends StfTestCase {
     }
 
     @Test
-    @Ignore("seems not to work, but isn't really neccessary")
     public void quickFixWithSpellChecker() throws RemoteException {
         ALICE.superBot().views().packageExplorerView().tree().newC()
             .project(Constants.PROJECT1);
         ALICE.superBot().views().packageExplorerView()
-            .selectProject(Constants.PROJECT1).newC().file(Constants.FILE1);
-        ALICE.remoteBot().editor(Constants.FILE1)
+            .selectProject(Constants.PROJECT1).newC().file("readme.txt");
+        ALICE.remoteBot().editor("readme.txt")
             .typeText("pleese open the window");
 
-        ALICE.remoteBot().editor(Constants.FILE1).navigateTo(0, 0);
+        ALICE.remoteBot().editor("readme.txt").navigateTo(0, 0);
 
-        ALICE.remoteBot().editor(Constants.FILE1).quickfix(0);
+        // just wait so that eclipse recognize the spelling error
+        ALICE.remoteBot().sleep(3000);
+        ALICE.remoteBot().editor("readme.txt").quickfix(0);
 
-        assertContains("please", ALICE.remoteBot().editor(Constants.FILE1)
+        assertContains("please", ALICE.remoteBot().editor("readme.txt")
             .getTextOnLine(0));
-    }
-
-    @Test
-    @Ignore("does not work and is not documented")
-    public void allTogether() throws RemoteException {
-        ALICE.superBot().views().packageExplorerView().tree().newC()
-            .javaProject(Constants.PROJECT1);
-        ALICE.superBot().views().packageExplorerView().tree().newC()
-            .pkg(Constants.PROJECT1, Constants.PKG1);
-        ALICE.superBot().views().packageExplorerView()
-            .selectPkg(Constants.PROJECT1, Constants.PKG1).newC()
-            .clsImplementsRunnable(Constants.CLS1);
-
-        ALICE.remoteBot().editor(Constants.CLS1_SUFFIX).selectLine(2);
-
-        ALICE.remoteBot().editor(Constants.CLS1_SUFFIX)
-            .pressShortCutNextAnnotation();
-        ALICE.remoteBot().editor(Constants.CLS1_SUFFIX)
-            .quickfix("Add unimplemented methods");
-        assertContains("public void run()",
-            ALICE.remoteBot().editor(Constants.CLS1_SUFFIX).getTextOnLine(5));
-        ALICE.remoteBot().editor(Constants.CLS1_SUFFIX).navigateTo(7, 0);
-        ALICE.remoteBot().editor(Constants.CLS1_SUFFIX)
-            .autoCompleteProposal("sys", "sysout - print to standard out");
-        assertContains("System.out.println()",
-            ALICE.remoteBot().editor(Constants.CLS1_SUFFIX).getTextOnLine(7));
-        ALICE.remoteBot().editor(Constants.CLS1_SUFFIX)
-            .typeText("\"Hello World\"");
-        assertContains("System.out.println(\"Hello World\")", ALICE.remoteBot()
-            .editor(Constants.CLS1_SUFFIX).getTextOnLine(7));
-
-        ALICE.remoteBot().editor(Constants.CLS1_SUFFIX).navigateTo(3, 0);
-        ALICE.remoteBot().editor(Constants.CLS1_SUFFIX)
-            .autoCompleteProposal("main", "main - main method");
-        ALICE.remoteBot().editor(Constants.CLS1_SUFFIX)
-            .typeText("new Thread (new " + Constants.CLS1 + " ()");
-        ALICE.remoteBot().editor(Constants.CLS1_SUFFIX)
-            .pressShortCutQuickAssignToLocalVariable();
-        ALICE.remoteBot().sleep(10000);
-        assertContains("Thread thread = new Thread (new " + Constants.CLS1
-            + " ());", ALICE.remoteBot().editor(Constants.CLS1_SUFFIX)
-            .getTextOnCurrentLine());
-        ALICE.remoteBot().editor(Constants.CLS1_SUFFIX)
-            .pressShortCut(SWT.NONE, '\n');
-        ALICE.remoteBot().editor(Constants.CLS1_SUFFIX).typeText("\n");
-        assertEquals(5, ALICE.remoteBot().editor(Constants.CLS1_SUFFIX)
-            .getCursorLine());
-        ALICE.remoteBot().editor(Constants.CLS1_SUFFIX)
-            .typeText("thread.start(");
-        ALICE.remoteBot().editor(Constants.CLS1_SUFFIX).typeText("\n");
-        ALICE.remoteBot().editor(Constants.CLS1_SUFFIX).typeText(";\n");
-        ALICE.remoteBot().editor(Constants.CLS1_SUFFIX)
-            .typeText("thread.join(");
-        ALICE.remoteBot().editor(Constants.CLS1_SUFFIX).typeText("\n");
-        ALICE.remoteBot().editor(Constants.CLS1_SUFFIX).typeText(";");
-        ALICE.remoteBot().editor(Constants.CLS1_SUFFIX)
-            .quickfix("Add throws declaration");
-        assertContains("InterruptedException",
-            ALICE.remoteBot().editor(Constants.CLS1_SUFFIX).getTextOnLine(3));
-        ALICE.remoteBot().editor(Constants.CLS1_SUFFIX)
-            .pressShortCut(SWT.NONE, '\n');
-        ALICE.remoteBot().editor(Constants.CLS1_SUFFIX).pressShortCutSave();
-        assertFalse(ALICE.remoteBot().editor(Constants.CLS1_SUFFIX).isDirty());
-        ALICE.remoteBot().sleep(100);
-        ALICE.remoteBot().editor(Constants.CLS1_SUFFIX)
-            .pressShortRunAsJavaApplication();
-        ALICE.superBot().views().consoleView().waitUntilExistsTextInConsole();
-        assertContains("Hello World", ALICE.superBot().views().consoleView()
-            .getFirstTextInConsole());
-
     }
 }

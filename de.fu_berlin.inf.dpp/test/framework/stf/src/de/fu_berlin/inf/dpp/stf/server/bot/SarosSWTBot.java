@@ -88,7 +88,8 @@ public final class SarosSWTBot extends SWTWorkbenchBot {
     @SuppressWarnings({ "unchecked", "rawtypes" })
     public SarosSWTBotChatInput chatInput(int index) {
         Matcher matcher = allOf(widgetOfType(ChatInput.class));
-        return new SarosSWTBotChatInput((ChatInput) widget(matcher, 0), matcher);
+        return new SarosSWTBotChatInput((ChatInput) widget(matcher, index),
+            matcher);
     }
 
     /**
@@ -110,7 +111,8 @@ public final class SarosSWTBot extends SWTWorkbenchBot {
     @SuppressWarnings({ "unchecked", "rawtypes" })
     public SarosSWTBotChatLine chatLine(int index) {
         Matcher matcher = allOf(widgetOfType(ChatLine.class));
-        return new SarosSWTBotChatLine((ChatLine) widget(matcher, 0), matcher);
+        return new SarosSWTBotChatLine((ChatLine) widget(matcher, index),
+            matcher);
     }
 
     /**
@@ -176,7 +178,7 @@ public final class SarosSWTBot extends SWTWorkbenchBot {
         int index) {
         Matcher matcher = allOf(widgetOfType(ChatLinePartnerChangeSeparator.class));
         return new SarosSWTBotChatLinePartnerChangeSeparator(
-            (ChatLinePartnerChangeSeparator) widget(matcher, 0), matcher);
+            (ChatLinePartnerChangeSeparator) widget(matcher, index), matcher);
     }
 
     /**

@@ -18,14 +18,6 @@ import de.fu_berlin.inf.dpp.stf.test.Constants;
 
 public class Share2UsersSequentiallyTest extends StfTestCase {
 
-    /**
-     * Preconditions:
-     * <ol>
-     * <li>Alice (Host, Write Access)</li>
-     * <li>Bob (Read-Only Access)</li>
-     * </ol>
-     * 
-     */
     @BeforeClass
     public static void selectTesters() throws Exception {
         select(ALICE, BOB);

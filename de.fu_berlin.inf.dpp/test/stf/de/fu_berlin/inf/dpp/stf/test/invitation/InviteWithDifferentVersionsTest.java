@@ -2,15 +2,20 @@ package de.fu_berlin.inf.dpp.stf.test.invitation;
 
 import static de.fu_berlin.inf.dpp.stf.client.tester.SarosTester.ALICE;
 import static de.fu_berlin.inf.dpp.stf.client.tester.SarosTester.BOB;
+import static de.fu_berlin.inf.dpp.stf.shared.Constants.NO;
+import static de.fu_berlin.inf.dpp.stf.shared.Constants.SHELL_SESSION_INVITATION;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import java.rmi.RemoteException;
+import java.util.List;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import de.fu_berlin.inf.dpp.stf.client.StfTestCase;
+import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotShell;
 
 public class InviteWithDifferentVersionsTest extends StfTestCase {
 
@@ -20,10 +25,9 @@ public class InviteWithDifferentVersionsTest extends StfTestCase {
     }
 
     @Test
-    @Ignore("crashes the regression")
     public void testInvitationWithDifferentVersions() throws RemoteException {
-        // BOB.superBot().views().sarosView().disconnect();
-        // BOB.superBot().views().sarosView().waitUntilIsDisconnected();
+        BOB.superBot().views().sarosView().disconnect();
+
         BOB.superBot().internal().changeSarosVersion("1.1.1");
 
         BOB.superBot().views().sarosView()
@@ -36,8 +40,37 @@ public class InviteWithDifferentVersionsTest extends StfTestCase {
 
         ALICE.superBot().menuBar().saros().shareProjects("foo", BOB.getJID());
 
-        ALICE.remoteBot().sleep(10000);
+        ALICE.remoteBot().sleep(5000);
+        List<String> shellNamesAlice = ALICE.remoteBot().getOpenShellNames();
+        List<String> shellNamesBob = BOB.remoteBot().getOpenShellNames();
 
+        boolean foundAlice = false;
+
+        for (String shellName : shellNamesAlice) {
+            if (shellName.matches(".*Saros Version.*")) {
+                foundAlice = true;
+                IRemoteBotShell shell = ALICE.remoteBot().shell(shellName);
+                shell.activate();
+                shell.bot().button(NO).click();
+                shell.waitShortUntilIsClosed();
+                break;
+            }
+        }
+
+        boolean foundBob = false;
+
+        for (String shellName : shellNamesBob) {
+            if (shellName.equals(SHELL_SESSION_INVITATION)) {
+                foundBob = true;
+                break;
+            }
+        }
+
+        assertTrue("Alice version mismatch warning shell was not open",
+            foundAlice);
+        assertFalse(
+            "Bobs invitation window is open although he has an invalid version",
+            foundBob);
     }
 
     @AfterClass

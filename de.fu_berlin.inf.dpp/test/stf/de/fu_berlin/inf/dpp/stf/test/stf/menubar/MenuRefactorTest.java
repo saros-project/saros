@@ -8,7 +8,6 @@ import java.rmi.RemoteException;
 
 import org.junit.After;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import de.fu_berlin.inf.dpp.stf.client.StfTestCase;
@@ -52,7 +51,6 @@ public class MenuRefactorTest extends StfTestCase {
     }
 
     @Test
-    // @Ignore("Need to fix: this method throws the WidgetNotFoundException by running all tests, but running this method alone, you will not get an exception.")
     public void testRenameClass() throws RemoteException {
 
         ALICE.superBot().views().packageExplorerView().tree().newC()
@@ -126,7 +124,6 @@ public class MenuRefactorTest extends StfTestCase {
     }
 
     @Test
-    @Ignore("need to fix")
     public void testShareProjectWithSVN() throws RemoteException {
         ALICE.superBot().views().packageExplorerView().tree().newC()
             .javaProject(Constants.PROJECT1);

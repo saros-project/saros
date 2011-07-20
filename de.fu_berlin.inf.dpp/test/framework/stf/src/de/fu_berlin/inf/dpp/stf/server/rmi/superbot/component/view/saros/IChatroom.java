@@ -19,7 +19,7 @@ public interface IChatroom extends Remote {
     public String getUserNameOnChatLinePartnerChangeSeparator(String plainID)
         throws RemoteException;
 
-    public String getTextOfChatLine() throws RemoteException;
+    public String getTextOfFirstChatLine() throws RemoteException;
 
     public String getTextOfChatLine(int index) throws RemoteException;
 

@@ -279,17 +279,16 @@ public final class RemoteWorkbenchBot extends RemoteBot implements
                 try {
                     SWTBotShell shell = swtWorkBenchBot.shell(shellName);
                     shell.activate();
-                    SWTBot bot = shell.bot();
 
                     // TODO shell names currently hard coded
 
                     if (shellName.equals("Leaving the Session")) {
-                        bot.button(YES).click();
-                        bot.waitUntil(Conditions.shellCloses(shell));
+                        shell.bot().button(YES).click();
+                        shell.bot().waitUntil(Conditions.shellCloses(shell));
                         continue;
                     }
                     if (shellName.equals("Synchronizing")) {
-                        bot.button(CANCEL).click();
+                        shell.bot().button(CANCEL).click();
                         continue;
                     }
 

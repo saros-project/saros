@@ -170,18 +170,6 @@ public class SessionAliceBobTest extends StfTestCase {
         assertTrue(BOB.remoteBot().editor(Constants.CLS1_SUFFIX).isActive());
     }
 
-    /*
-     * @Test
-     * 
-     * @Ignore // FIXME dialog with error message "Xuggler not installed" public
-     * void sharedYourScreenWithSelectedUserGUI() throws RemoteException { //
-     * ALICE.mainMenu.setupSettingForScreensharing(1, 0, -1, -1);
-     * Util.shareYourScreen(ALICE, BOB);
-     * BOB.remoteBot().view(VIEW_REMOTE_SCREEN).waitUntilIsActive();
-     * assertTrue(BOB.remoteBot().view(VIEW_REMOTE_SCREEN).isActive());
-     * 
-     * }
-     */
     @Test
     public void inconsistencyDetected() throws RemoteException {
         ALICE.superBot().views().packageExplorerView()

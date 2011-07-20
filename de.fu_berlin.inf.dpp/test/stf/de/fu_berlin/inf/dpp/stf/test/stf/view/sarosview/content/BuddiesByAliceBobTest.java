@@ -9,7 +9,6 @@ import java.rmi.RemoteException;
 
 import org.junit.After;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import de.fu_berlin.inf.dpp.stf.client.StfTestCase;
@@ -40,6 +39,7 @@ public class BuddiesByAliceBobTest extends StfTestCase {
     public void afterEveryTest() throws RemoteException {
         resetBuddies();
         resetBuddyNames();
+        clearWorkspaces();
     }
 
     @Test
@@ -144,7 +144,6 @@ public class BuddiesByAliceBobTest extends StfTestCase {
     }
 
     @Test
-    @Ignore("contextMenu multipleProjects doesn't work")
     public void workTogetherOnMultiProject() throws RemoteException {
         ALICE.superBot().views().packageExplorerView().tree().newC()
             .javaProject(Constants.PROJECT1);

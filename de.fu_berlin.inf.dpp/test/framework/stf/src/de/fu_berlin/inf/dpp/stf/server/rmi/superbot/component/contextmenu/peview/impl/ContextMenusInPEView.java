@@ -3,7 +3,6 @@ package de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.contextmenu.pevie
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
 import org.eclipse.swtbot.swt.finder.SWTBot;
@@ -102,6 +101,10 @@ public final class ContextMenusInPEView extends StfRemoteObject implements
         shell.bot().waitUntil(Conditions.shellCloses(shell),
             SarosSWTBotPreferences.SAROS_LONG_TIMEOUT);
 
+        new SWTBot().sleep(1000);
+        new SWTBot().waitWhile(Conditions.shellIsActive("Progess Information"),
+            SarosSWTBotPreferences.SAROS_LONG_TIMEOUT);
+
     }
 
     public void openWith(String editorType) throws RemoteException {
@@ -161,8 +164,7 @@ public final class ContextMenusInPEView extends StfRemoteObject implements
         });
     }
 
-    public boolean existsWithRegex(String name) throws RemoteException {
-        name = Pattern.quote(name) + ".*";
+    public boolean existsWithRegex(String regex) throws RemoteException {
         try {
             List<String> items;
 
@@ -172,7 +174,7 @@ public final class ContextMenusInPEView extends StfRemoteObject implements
                 items = getTextOfItems(treeItem);
 
             for (String item : items)
-                if (item.matches(name))
+                if (item.matches(regex))
                     return true;
 
             return false;
