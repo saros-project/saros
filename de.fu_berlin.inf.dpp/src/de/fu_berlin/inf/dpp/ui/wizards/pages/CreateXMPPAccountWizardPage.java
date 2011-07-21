@@ -103,7 +103,8 @@ public class CreateXMPPAccountWizardPage extends WizardPage {
 
         new Label(leftColumn, SWT.NONE);
         SimpleNoteComposite sarosRestriction = new SimpleNoteComposite(
-            leftColumn, SWT.BORDER, Messages.xmpp_saros_restriction);
+            leftColumn, SWT.BORDER, SWT.ICON_WARNING,
+            Messages.xmpp_saros_restriction);
         sarosRestriction.setLayoutData(LayoutUtils.createFillHGrabGridData());
 
         /*

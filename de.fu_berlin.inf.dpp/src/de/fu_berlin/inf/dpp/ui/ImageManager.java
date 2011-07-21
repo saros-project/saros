@@ -100,6 +100,22 @@ public class ImageManager {
     public static final Image ICON_BUDDY_SAROS_AWAY = new DecorationOverlayIcon(
         ICON_BUDDY_SAROS, OVERLAY_AWAY, IDecoration.TOP_RIGHT).createImage();
 
+    /*
+     * Getting Started
+     */
+    public static final ImageDescriptor WIZBAN_GETTING_STARTED_STEP0 = getImageDescriptor("icons/wizban/getting_started_step0_wiz.gif");
+    public static final ImageDescriptor WIZBAN_GETTING_STARTED_STEP1 = getImageDescriptor("icons/wizban/getting_started_step1_wiz.gif");
+    public static final ImageDescriptor WIZBAN_GETTING_STARTED_STEP2 = getImageDescriptor("icons/wizban/getting_started_step2_wiz.gif");
+    public static final ImageDescriptor WIZBAN_GETTING_STARTED_STEP3 = getImageDescriptor("icons/wizban/getting_started_step3_wiz.gif");
+    public static final ImageDescriptor WIZBAN_GETTING_STARTED_STEP4 = getImageDescriptor("icons/wizban/getting_started_step4_wiz.gif");
+
+    public static final ImageDescriptor IMAGE_GETTING_STARTED_STEP0 = getImageDescriptor("assets/images/getting_started/step0.png");
+    public static final ImageDescriptor IMAGE_GETTING_STARTED_STEP1 = getImageDescriptor("assets/images/getting_started/step1.png");
+    public static final ImageDescriptor IMAGE_GETTING_STARTED_STEP2 = getImageDescriptor("assets/images/getting_started/step2.png");
+    public static final ImageDescriptor IMAGE_GETTING_STARTED_STEP3 = getImageDescriptor("assets/images/getting_started/step3.png");
+    public static final ImageDescriptor IMAGE_GETTING_STARTED_STEP4_CONFIG = getImageDescriptor("assets/images/getting_started/step4_config.png");
+    public static final ImageDescriptor IMAGE_GETTING_STARTED_STEP4_NOCONFIG = getImageDescriptor("assets/images/getting_started/step4_noconfig.png");
+
     /**
      * Returns an image from the file at the given plug-in relative path.
      * 

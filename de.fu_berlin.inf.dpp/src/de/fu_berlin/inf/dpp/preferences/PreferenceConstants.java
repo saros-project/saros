@@ -107,6 +107,11 @@ public class PreferenceConstants {
     public static final String NEW_WORKSPACE = "eclipse.new.workspace";
 
     /*
+     * Getting Started Tutorial
+     */
+    public static final String GETTING_STARTED_FINISHED = "getting_started.finished";
+
+    /*
      * Global preferences, not initialized i.e. no default values
      */
 

@@ -21,11 +21,16 @@ public class AllWizardsDemo extends AbstractDemo {
 	parent.setLayout(new GridLayout(1, false));
 
 	final Map<String, Runnable> wizards = new LinkedHashMap<String, Runnable>();
-	// wizards.put("GettingStartedWizard", new Runnable() {
-	// public void run() {
-	// WizardUtils.openSarosGettingStartedWizard();
-	// }
-	// });
+	wizards.put("GettingStartedWizard (configuration)", new Runnable() {
+	    public void run() {
+		WizardUtils.openSarosGettingStartedWizard(true);
+	    }
+	});
+	wizards.put("GettingStartedWizard (no configuration)", new Runnable() {
+	    public void run() {
+		WizardUtils.openSarosGettingStartedWizard(false);
+	    }
+	});
 	wizards.put("NewWizard (internal)", new Runnable() {
 	    public void run() {
 		WizardUtils.openNewProjectWizard();

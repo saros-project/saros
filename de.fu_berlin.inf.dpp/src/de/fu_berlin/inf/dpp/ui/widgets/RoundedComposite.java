@@ -70,7 +70,7 @@ public class RoundedComposite extends Composite {
         /*
          * Make sure child widgets respect transparency
          */
-        this.setBackgroundMode(SWT.INHERIT_DEFAULT);
+        // this.setBackgroundMode(SWT.INHERIT_DEFAULT);
 
         /*
          * Updates the rounded rectangle background.

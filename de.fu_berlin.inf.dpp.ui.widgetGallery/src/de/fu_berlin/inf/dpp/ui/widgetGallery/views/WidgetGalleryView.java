@@ -15,6 +15,7 @@ import de.fu_berlin.inf.dpp.ui.widgetGallery.ImageManager;
 import de.fu_berlin.inf.dpp.ui.widgetGallery.annotations.Demo;
 import de.fu_berlin.inf.dpp.ui.widgetGallery.demoExplorer.DemoElement;
 import de.fu_berlin.inf.dpp.ui.widgetGallery.demoExplorer.DemoExplorer;
+import de.fu_berlin.inf.dpp.ui.widgetGallery.demoSuits.AbstractDemo;
 import de.fu_berlin.inf.dpp.ui.widgetGallery.util.CompositeUtils;
 import de.fu_berlin.inf.dpp.ui.widgetGallery.widgets.BannerComposite;
 import de.fu_berlin.inf.dpp.ui.widgetGallery.widgets.DemoBannerComposite;
@@ -28,6 +29,7 @@ public class WidgetGalleryView extends ViewPart {
     protected DemoBannerComposite demoBannerComposite;
     protected Composite demoComposite;
     protected Composite content;
+    protected AbstractDemo currentDemo;
 
     public void createPartControl(final Composite parent) {
 	parent.setLayout(GridLayoutFactory.fillDefaults().spacing(0, 0)
@@ -35,7 +37,7 @@ public class WidgetGalleryView extends ViewPart {
 
 	this.getSite().setSelectionProvider(selectionProviderIntermediate);
 
-	createBanner(parent);
+	// createBanner(parent);
 
 	SashForm sashForm = new SashForm(parent, SWT.HORIZONTAL | SWT.FLAT);
 	sashForm.setLayoutData(GridDataFactory.fillDefaults().grab(true, true)
@@ -117,10 +119,13 @@ public class WidgetGalleryView extends ViewPart {
 		title));
 	demoComposite.layout();
 
+	if (currentDemo != null)
+	    currentDemo.dispose();
 	CompositeUtils.emptyComposite(content);
 
 	try {
-	    demoElement.getDemo().newInstance().createPartControls(content);
+	    currentDemo = demoElement.getDemo().newInstance();
+	    currentDemo.createPartControls(content);
 	} catch (InstantiationException e) {
 	    e.printStackTrace();
 	} catch (IllegalAccessException e) {

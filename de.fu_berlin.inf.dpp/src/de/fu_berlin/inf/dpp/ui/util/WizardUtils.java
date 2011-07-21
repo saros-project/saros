@@ -8,6 +8,7 @@ import org.eclipse.jface.wizard.IWizard;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.actions.NewProjectAction;
@@ -18,6 +19,7 @@ import de.fu_berlin.inf.dpp.ui.wizards.AddXMPPAccountWizard;
 import de.fu_berlin.inf.dpp.ui.wizards.ConfigurationWizard;
 import de.fu_berlin.inf.dpp.ui.wizards.CreateXMPPAccountWizard;
 import de.fu_berlin.inf.dpp.ui.wizards.EditXMPPAccountWizard;
+import de.fu_berlin.inf.dpp.ui.wizards.GettingStartedWizard;
 import de.fu_berlin.inf.dpp.ui.wizards.ShareProjectAddBuddiesWizard;
 import de.fu_berlin.inf.dpp.ui.wizards.ShareProjectAddProjectsWizard;
 import de.fu_berlin.inf.dpp.ui.wizards.ShareProjectWizard;
@@ -35,17 +37,18 @@ public class WizardUtils {
      * Open a wizard in the SWT thread and returns the {@link WizardDialog}'s
      * return code.
      * 
+     * @param parentShell
      * @param wizard
      * @param initialSize
      * @return
      */
-    public static Integer openWizard(final Wizard wizard,
-        final Point initialSize) {
+    public static Integer openWizard(final Shell parentShell,
+        final Wizard wizard, final Point initialSize) {
         try {
             return Utils.runSWTSync(new Callable<Integer>() {
                 public Integer call() {
-                    WizardDialog wizardDialog = new CenteredWizardDialog(null,
-                        wizard, initialSize);
+                    WizardDialog wizardDialog = new CenteredWizardDialog(
+                        parentShell, wizard, initialSize);
                     wizardDialog.setHelpAvailable(false);
                     return wizardDialog.open();
                 }
@@ -65,10 +68,48 @@ public class WizardUtils {
      * 
      * @return the wizard if it was successfully finished; null otherwise
      */
+    public static <W extends Wizard> W openWizardSuccessfully(
+        final Shell parentShell, final W wizard, final Point initialSize) {
+        Integer returnCode = openWizard(parentShell, wizard, initialSize);
+        return (returnCode != null && returnCode == Window.OK) ? wizard : null;
+    }
+
+    /**
+     * Open a wizard in the SWT thread and returns the {@link WizardDialog}'s
+     * reference to the {@link Wizard} in case of success.
+     * 
+     * @param wizard
+     * @param initialSize
+     * 
+     * @return the wizard if it was successfully finished; null otherwise
+     */
     public static <W extends Wizard> W openWizardSuccessfully(final W wizard,
         final Point initialSize) {
-        Integer returnCode = openWizard(wizard, initialSize);
-        return (returnCode != null && returnCode == Window.OK) ? wizard : null;
+        return openWizardSuccessfully(null, wizard, initialSize);
+    }
+
+    /**
+     * Opens a {@link GettingStartedWizard} in the SWT thread and returns the
+     * displayed instance in case of success.
+     * 
+     * @param showConfigNote
+     *            true if the last page should indicate that the Saros
+     *            Configuration is going to open on finish
+     * 
+     * @return the wizard if it was successfully finished; null otherwise
+     */
+    public static GettingStartedWizard openSarosGettingStartedWizard(
+        boolean showConfigNote) {
+        Shell shell = null;
+        try {
+            shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow()
+                .getShell();
+        } catch (Exception e) {
+            log.warn("Error while determining the main shell for the tutorial",
+                e);
+        }
+        return openWizardSuccessfully(shell, new GettingStartedWizard(
+            showConfigNote), new Point(930, 720));
     }
 
     /**

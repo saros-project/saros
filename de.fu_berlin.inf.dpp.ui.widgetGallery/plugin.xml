@@ -68,6 +68,15 @@
          point="org.eclipse.ui.menus">
       <menuContribution
             allPopups="false"
+            locationURI="menu:de.fu_berlin.inf.dpp.ui.main.menu?after=DeveloperStart">
+         <command
+               commandId="de.fu_berlin.inf.dpp.ui.widgetGallery.commands.ShowWidgetGalleryView"
+               icon="icons/view16/widget_gallery_misc.png"
+               style="push">
+         </command>
+      </menuContribution>
+      <menuContribution
+            allPopups="false"
             locationURI="toolbar:de.fu_berlin.inf.dpp.ui.views.SarosView?after=additions">
          <command
                commandId="de.fu_berlin.inf.dpp.ui.widgetGallery.commands.ShowWidgetGalleryView"

@@ -146,13 +146,12 @@ public class RosterSessionContentProvider extends TreeContentProvider {
                 newRosterSessionInput.getSarosSession().addListener(
                     sharedProjectListener);
             }
+            createHeaders();
         } else {
             disposeHeaderElements();
             this.rosterSessionInput = null;
             return;
         }
-
-        createHeaders();
     }
 
     private void disposeHeaderElements() {

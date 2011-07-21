@@ -19,6 +19,15 @@ import de.fu_berlin.inf.dpp.ui.widgets.viewer.project.BaseProjectSelectionCompos
 public class BaseProjectSelectionCompositeDemo extends AbstractDemo {
     protected BaseProjectSelectionComposite baseProjectSelectionComposite;
 
+    protected ISelectionListener selectionListener = new ISelectionListener() {
+	public void selectionChanged(IWorkbenchPart part, ISelection selection) {
+	    baseProjectSelectionComposite
+		    .setSelectedProjects(SelectionRetrieverFactory
+			    .getSelectionRetriever(IProject.class)
+			    .getOverallSelection());
+	}
+    };
+
     @Override
     public void createDemo(Composite parent) {
 	parent.setLayout(new GridLayout(1, false));
@@ -28,18 +37,13 @@ public class BaseProjectSelectionCompositeDemo extends AbstractDemo {
 	baseProjectSelectionComposite.setLayoutData(new GridData(SWT.FILL,
 		SWT.FILL, true, true));
 	SelectionUtils.getSelectionService().addSelectionListener(
-		new ISelectionListener() {
-		    public void selectionChanged(IWorkbenchPart part,
-			    ISelection selection) {
-			updateSelection();
-		    }
-		});
+		selectionListener);
     }
 
-    protected void updateSelection() {
-	baseProjectSelectionComposite
-		.setSelectedProjects(SelectionRetrieverFactory
-			.getSelectionRetriever(IProject.class)
-			.getOverallSelection());
+    @Override
+    public void dispose() {
+	SelectionUtils.getSelectionService().removeSelectionListener(
+		selectionListener);
+	super.dispose();
     }
 }

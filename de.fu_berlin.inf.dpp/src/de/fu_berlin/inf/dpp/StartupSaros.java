@@ -12,9 +12,11 @@ import org.eclipse.ui.intro.IIntroManager;
 import org.eclipse.ui.intro.IIntroPart;
 import org.picocontainer.annotations.Inject;
 
+import de.fu_berlin.inf.dpp.accountManagement.XMPPAccount;
 import de.fu_berlin.inf.dpp.accountManagement.XMPPAccountStore;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
+import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
 import de.fu_berlin.inf.dpp.stf.server.STFController;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
 import de.fu_berlin.inf.dpp.ui.util.WizardUtils;
@@ -44,14 +46,15 @@ public class StartupSaros implements IStartup {
     @Inject
     protected XMPPAccountStore xmppAccountStore;
 
+    @Inject
+    protected PreferenceUtils preferenceUtils;
+
     public StartupSaros() {
         SarosPluginContext.reinject(this);
     }
 
     public void earlyStartup() {
         String currentVersion = saros.getVersion();
-        String lastVersion = saros.getConfigPrefs().get(
-            PreferenceConstants.SAROS_VERSION, "unknown");
 
         String portNumber = System.getProperty("de.fu_berlin.inf.dpp.testmode");
 
@@ -65,24 +68,25 @@ public class StartupSaros implements IStartup {
             startRmiBot(port);
         }
 
-        boolean assertEnabled = false;
-
-        // Side-effect-full assert to set assertEnabled to true if -ea
-        assert true == (assertEnabled = true);
-
-        // only continue if version changed or if -ea (for testing)
-        if (currentVersion.equals(lastVersion) || assertEnabled) {
-            return;
-        }
-
         saros.getConfigPrefs().put(PreferenceConstants.SAROS_VERSION,
             currentVersion);
         saros.saveConfigPrefs();
 
         updateAccounts();
-
         showSarosView();
-        WizardUtils.openSarosConfigurationWizard();
+
+        /*
+         * Only show configuration wizard if no accounts are configured. If
+         * Saros is already configured, do not show the tutorial because the
+         * user is probably already experienced.
+         */
+        XMPPAccount activeAccount = xmppAccountStore.getActiveAccount();
+        if (activeAccount == null) {
+            if (!preferenceUtils.isGettingStartedFinished()) {
+                WizardUtils.openSarosGettingStartedWizard(true);
+            }
+            WizardUtils.openSarosConfigurationWizard();
+        }
     }
 
     protected void startRmiBot(final int port) {

@@ -89,6 +89,10 @@ public abstract class AbstractDemo {
      */
     public abstract void createDemo(Composite composite);
 
+    public void dispose() {
+
+    }
+
     /**
      * Recreates the demo. Especially useful if debug mode is enabled.
      */

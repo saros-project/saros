@@ -19,6 +19,15 @@ import de.fu_berlin.inf.dpp.ui.widgets.viewer.roster.BaseBuddySelectionComposite
 public class BaseBuddySelectionCompositeDemo extends AbstractDemo {
     protected BaseBuddySelectionComposite baseBuddySelectionComposite;
 
+    protected ISelectionListener selectionListener = new ISelectionListener() {
+	public void selectionChanged(IWorkbenchPart part, ISelection selection) {
+	    baseBuddySelectionComposite
+		    .setSelectedBuddies(SelectionRetrieverFactory
+			    .getSelectionRetriever(JID.class)
+			    .getOverallSelection());
+	}
+    };
+
     @Override
     public void createDemo(Composite parent) {
 	parent.setLayout(new GridLayout(1, false));
@@ -28,17 +37,13 @@ public class BaseBuddySelectionCompositeDemo extends AbstractDemo {
 	baseBuddySelectionComposite.setLayoutData(new GridData(SWT.FILL,
 		SWT.FILL, true, true));
 	SelectionUtils.getSelectionService().addSelectionListener(
-		new ISelectionListener() {
-		    public void selectionChanged(IWorkbenchPart part,
-			    ISelection selection) {
-			updateSelection();
-		    }
-		});
+		selectionListener);
     }
 
-    protected void updateSelection() {
-	baseBuddySelectionComposite
-		.setSelectedBuddies(SelectionRetrieverFactory
-			.getSelectionRetriever(JID.class).getOverallSelection());
+    @Override
+    public void dispose() {
+	SelectionUtils.getSelectionService().removeSelectionListener(
+		selectionListener);
+	super.dispose();
     }
 }

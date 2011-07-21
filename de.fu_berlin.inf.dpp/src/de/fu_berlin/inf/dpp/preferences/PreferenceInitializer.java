@@ -48,8 +48,10 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
     public void initializeDefaultPreferences() {
         IEclipsePreferences prefs = new DefaultScope().getNode(Saros.SAROS);
 
+        prefs.putBoolean(PreferenceConstants.GETTING_STARTED_FINISHED, false);
+
         prefs.putBoolean(PreferenceConstants.ENCRYPT_ACCOUNT, false);
-        prefs.putBoolean(PreferenceConstants.AUTO_CONNECT, false);
+        prefs.putBoolean(PreferenceConstants.AUTO_CONNECT, true);
         prefs.put(PreferenceConstants.AUTO_PORTMAPPING_DEVICEID, "");
         prefs.putBoolean(PreferenceConstants.GATEWAYCHECKPERFORMED, false);
         prefs.putBoolean(PreferenceConstants.AUTO_FOLLOW_MODE, false);
