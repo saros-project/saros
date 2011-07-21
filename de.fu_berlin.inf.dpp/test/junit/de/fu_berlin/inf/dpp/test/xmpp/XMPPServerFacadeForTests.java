@@ -26,7 +26,12 @@ public class XMPPServerFacadeForTests {
     private static Logger LOG = Logger
         .getLogger(XMPPServerFacadeForTests.class);
 
-    public static final String SERVER_ADDRESS = "localhost";
+    private static final boolean USE_EXTERNAL_SERVER = Boolean
+        .getBoolean("de.fu_berlin.dpp.test.xmpp.useExternalServer");
+
+    public static final String SERVER_ADDRESS = System.getProperty(
+        "de.fu_berlin.dpp.test.xmpp.serverAddress", "localhost");
+
     public static final String DEFAULT_PASSWORD = "test1234";
 
     public static final String[] TEST_NAMES = { "alice", "bob", "carol",
@@ -104,6 +109,9 @@ public class XMPPServerFacadeForTests {
     }
 
     public static void startServer() {
+        if (USE_EXTERNAL_SERVER)
+            return;
+
         if (server != null)
             return;
 
@@ -117,6 +125,9 @@ public class XMPPServerFacadeForTests {
     }
 
     public static void stopServer() {
+        if (USE_EXTERNAL_SERVER)
+            return;
+
         try {
             server.stop();
         } catch (Exception e) {
