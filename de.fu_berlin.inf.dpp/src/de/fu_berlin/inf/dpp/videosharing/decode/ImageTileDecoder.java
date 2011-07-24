@@ -1,6 +1,6 @@
 /*
  * DPP - Serious Distributed Pair Programming
- * (c) Freie Universität Berlin - Fachbereich Mathematik und Informatik - 2010
+ * (c) Freie Universitï¿½t Berlin - Fachbereich Mathematik und Informatik - 2010
  * (c) Stephan Lau - 2010
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -19,7 +19,6 @@
  */
 package de.fu_berlin.inf.dpp.videosharing.decode;
 
-import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.EOFException;
@@ -28,34 +27,30 @@ import java.io.InputStream;
 import java.io.InterruptedIOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.util.NoSuchElementException;
 
 import javax.imageio.ImageIO;
-import javax.imageio.ImageReader;
-import javax.imageio.stream.ImageInputStream;
 
 import org.apache.log4j.Logger;
 
 import de.fu_berlin.inf.dpp.videosharing.VideoSharing.VideoSharingSession;
 import de.fu_berlin.inf.dpp.videosharing.encode.ImageTileEncoder;
-import de.fu_berlin.inf.dpp.videosharing.encode.ImageTileEncoder.ImageDone;
 import de.fu_berlin.inf.dpp.videosharing.encode.ImageTileEncoder.Tile;
 import de.fu_berlin.inf.dpp.videosharing.exceptions.DecoderInitializationException;
 import de.fu_berlin.inf.dpp.videosharing.exceptions.DecodingException;
 
 /**
+ * This class is responsible for decoding the received tiles from the
+ * {@link ImageTileEncoder}.
  * 
+ * @author Stefan Rossbach
  */
 public class ImageTileDecoder extends Decoder {
     private static Logger log = Logger.getLogger(ImageTileEncoder.class);
 
-    protected ObjectInputStream objectInput;
-    protected ImageDecoder imageDecoder;
-    protected String imageFormat;
-    /**
-     * Whole decoded image. Tiles are painted on it, until it is complete.
-     */
-    protected BufferedImage currentImage;
+    private ObjectInputStream objectInput;
+
+    /** the buffered image which is updated with tiles */
+    private BufferedImage image;
 
     public ImageTileDecoder(InputStream input, ObjectOutputStream statisticOut,
         int width, int height, String imageFormat,
@@ -68,86 +63,52 @@ public class ImageTileDecoder extends Decoder {
         } catch (IOException e) {
             throw new DecoderInitializationException(e);
         }
-        this.imageFormat = imageFormat;
-        imageDecoder = new ImageDecoder();
-        currentImage = new BufferedImage(width, height,
-            BufferedImage.TYPE_3BYTE_BGR);
+        // currently not used
+        // this.imageFormat = imageFormat;
+
     }
+
+    // Main encoder loop
 
     public void run() {
 
         while (!Thread.interrupted()) {
-            Object read;
             try {
-                read = objectInput.readObject();
+                Tile tile = (Tile) objectInput.readObject();
+
+                if (tile.imageData.length != 0) {
+                    BufferedImage subImage = ImageIO
+                        .read(new ByteArrayInputStream(tile.imageData));
+
+                    if (image == null || image.getWidth() != tile.iw
+                        || image.getHeight() != tile.ih)
+                        image = new BufferedImage(tile.iw, tile.ih,
+                            subImage.getType());
+
+                    image.getRaster().setRect(tile.x, tile.y,
+                        subImage.getRaster());
+
+                    statistic.dataRead(tile.imageData.length);
+                } else {
+                    statistic.renderedFrame();
+                    updatePlayer(image);
+                }
+
             } catch (IOException e) {
                 if (e instanceof EOFException)
                     // closed
                     break;
-                if (!(e instanceof InterruptedIOException))
+                if (!(e instanceof InterruptedIOException)) {
+                    log.error(e.getMessage(), e);
                     videoSharingSession.reportError(new DecodingException(e));
-                break;
-            } catch (ClassNotFoundException e) {
-                // should not happen
-                videoSharingSession.reportError(new DecodingException(e));
-                break;
-            }
-
-            Tile tile;
-            if (read instanceof Tile) {
-                tile = (Tile) read;
-
-            } else {
-                if (read instanceof ImageDone) {
-                    statistic.renderedFrame();
-                    updatePlayer(currentImage);
-                    currentImage.flush();
-                    continue;
-                } else {
-                    log.warn("Received unknown object " + read.toString());
-                    continue;
                 }
-            }
-            BufferedImage tileImage;
-            try {
-                statistic.dataRead(tile.getImageData().length);
-                tileImage = imageDecoder.decode(tile.getImageData());
-            } catch (IOException e) {
+                break;
+            } catch (Exception e) {
+                // should not happen
+                log.error(e.getMessage(), e);
                 videoSharingSession.reportError(new DecodingException(e));
                 break;
             }
-
-            if (tileImage != null) {
-                Graphics2D graphics2d = currentImage.createGraphics();
-                graphics2d.drawImage(tileImage, tile.getX(), tile.getY(), null);
-                tileImage.flush();
-                graphics2d.dispose();
-            }
         }
     }
-
-    protected class ImageDecoder {
-        protected ImageReader imageReader;
-        protected ImageInputStream imageInput;
-        protected int imageIndex = 0;
-
-        public ImageDecoder() throws DecoderInitializationException {
-
-            try {
-                imageReader = ImageIO.getImageReadersByFormatName(imageFormat)
-                    .next();
-            } catch (NoSuchElementException e) {
-                throw new DecoderInitializationException(
-                    "Imagedecoder not available for format " + imageFormat);
-            }
-        }
-
-        public BufferedImage decode(byte[] imageData) throws IOException {
-            ByteArrayInputStream input = new ByteArrayInputStream(imageData);
-            imageInput = ImageIO.createImageInputStream(input);
-            imageReader.setInput(imageInput, true, true);
-            return imageReader.read(imageReader.getMinIndex());
-        }
-    }
-
 }

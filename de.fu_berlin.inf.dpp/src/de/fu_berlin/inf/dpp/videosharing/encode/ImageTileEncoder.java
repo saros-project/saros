@@ -1,6 +1,6 @@
 /*
  * DPP - Serious Distributed Pair Programming
- * (c) Freie Universit‰t Berlin - Fachbereich Mathematik und Informatik - 2010
+ * (c) Freie Universit√§t Berlin - Fachbereich Mathematik und Informatik - 2010
  * (c) Stephan Lau - 2010
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -19,213 +19,226 @@
  */
 package de.fu_berlin.inf.dpp.videosharing.encode;
 
-import java.awt.Dimension;
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
-import java.awt.image.PixelGrabber;
+import java.awt.image.DataBuffer;
+import java.awt.image.DataBufferInt;
 import java.io.ByteArrayOutputStream;
+import java.io.EOFException;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.io.Serializable;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.NoSuchElementException;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
-import javax.imageio.IIOImage;
 import javax.imageio.ImageIO;
-import javax.imageio.ImageTypeSpecifier;
-import javax.imageio.ImageWriteParam;
-import javax.imageio.ImageWriter;
-import javax.imageio.stream.ImageOutputStream;
+import javax.imageio.stream.MemoryCacheImageOutputStream;
 
 import org.apache.log4j.Logger;
 
-import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
 import de.fu_berlin.inf.dpp.videosharing.VideoSharing.VideoSharingSession;
-import de.fu_berlin.inf.dpp.videosharing.decode.Decoder;
-import de.fu_berlin.inf.dpp.videosharing.encode.tools.QuantizeFilter;
 import de.fu_berlin.inf.dpp.videosharing.exceptions.EncoderInitializationException;
 import de.fu_berlin.inf.dpp.videosharing.exceptions.EncodingException;
 import de.fu_berlin.inf.dpp.videosharing.source.ImageSource;
 
 /**
  * @author s-lau
+ * @author Stefan Rossbach
  */
-public class ImageTileEncoder extends Encoder {
+public final class ImageTileEncoder extends Encoder {
+
+    public static class Tile implements Serializable {
+        private static final long serialVersionUID = 2961263497738302562L;
+
+        /** image date of the tile */
+        public byte[] imageData;
+
+        /** the x offset of the tile in the original image */
+        public int x;
+        /** the y offset of the tile in the original image */
+        public int y;
+
+        /** the width of the tile */
+        public int w;
+
+        /** the height of the tile */
+        public int h;
+
+        /** the width of the original image */
+        public int iw;
+
+        /** the height of the original image */
+        public int ih;
+
+        public Tile(byte[] imageData, int x, int y, int w, int h, int iw, int ih) {
+            super();
+            this.imageData = imageData;
+            this.x = x;
+            this.y = y;
+            this.w = w;
+            this.h = h;
+            this.iw = iw;
+            this.ih = ih;
+        }
+
+        @Override
+        public String toString() {
+            return "[" + imageData.length + ":" + x + ":" + y + ":" + w + ":"
+                + h + ":" + iw + ":" + ih + ":" + "]";
+        }
+    }
+
     private static Logger log = Logger.getLogger(ImageTileEncoder.class);
 
-    public final static int TILE_SIZE = 20;
-    public final static int KEYFRAME = 50;
-    /**
-     * Throw error when {@link #slowEncoding} bigger than this
-     */
-    public final static int SLOW_ENCODING_ERROR = 5;
+    private final static int MAX_ALLOWED_FRAMES_TO_DROP = 20;
 
-    /**
-     * All tiles from last input picture. Used to compute dirty tiles.
-     */
-    protected int tiles[][][];
+    /** Threshold in percent if an image should be completely encoded */
+    // currently set to 30% because our aggregation algorithm is bad
+    private static final int DIRTY_TILES_THRESHOLD = 30;
 
-    /**
-     * Number of tiles in x-direction.
-     */
-    protected int tilesX;
+    private int droppedFrames = 0;
 
-    /**
-     * Number of tiles in y-direction.
-     */
-    protected int tilesY;
+    private int maxBandwidthUsed = 0;
 
-    /**
-     * Frames since last key-frame.
-     */
-    protected int keyframe = 0;
+    private ObjectOutputStream objectOut;
 
-    /**
-     * Incremented when encoding is too slow (can't reach given FPS).
-     */
-    protected int slowEncoding = 0;
+    private ByteArrayOutputStream imageOutput = new ByteArrayOutputStream();
 
-    protected ObjectOutputStream objectOut;
-    protected QuantizeFilter filter;
-    protected ImageEncoder coder;
+    private BufferedImage lastImage = null;
 
     public ImageTileEncoder(OutputStream out, ImageSource source,
         VideoSharingSession videoSharingSession)
         throws EncoderInitializationException {
         super(out, source, videoSharingSession);
 
+        if ((width & 7) != 0 || (height & 7) != 0 || width <= 0 || height <= 0)
+            throw new EncoderInitializationException(
+                "The screen capture resolution must be a multiple of 8 for width and height. Current resolution is:"
+                    + width + "x" + height);
         try {
             objectOut = new ObjectOutputStream(out);
         } catch (IOException e) {
             throw new EncoderInitializationException(e);
         }
-
-        tilesX = (int) Math.ceil((double) width / TILE_SIZE);
-        tilesY = (int) Math.ceil((double) height / TILE_SIZE);
-
-        tiles = new int[tilesX][tilesY][TILE_SIZE * TILE_SIZE];
-
-        filter = new QuantizeFilter();
-        filter.setNumColors(preferences
-            .getInt(PreferenceConstants.IMAGE_TILE_COLORS));
-        filter.setDither(preferences
-            .getBoolean(PreferenceConstants.IMAGE_TILE_DITHER));
-        filter.setSerpentine(preferences
-            .getBoolean(PreferenceConstants.IMAGE_TILE_SERPENTINE));
-        coder = new ImageEncoder();
     }
 
+    /* main encoder loop */
+
     public void run() {
+
         while (isEncoding) {
             isPaused();
+
             if (Thread.interrupted()) {
                 stopEncodingInternal();
                 return;
             }
-            long trace = System.currentTimeMillis();
-            encodeImage(imageSource.toImage());
-            trace = System.currentTimeMillis() - trace;
-            long frameIntervall = (long) (1000 / (double) framerate);
 
-            if (trace < frameIntervall) {
-                try {
-                    Thread.sleep(frameIntervall - trace);
-                } catch (InterruptedException e) {
-                    stopEncodingInternal();
-                    return;
-                }
-                slowEncoding = 0;
-            } else {
-                if (++slowEncoding > SLOW_ENCODING_ERROR) {
-                    videoSharingSession
-                        .reportError(new EncodingException(
-                            "Can't encode that fast. Please choose lower frames per second."));
-                    return;
-                }
+            long startTime = System.currentTimeMillis();
+
+            imageOutput.reset();
+            BufferedImage image = imageSource.toImage();
+
+            if (image.getWidth() != width || image.getHeight() != height) {
+                BufferedImage scaledImage = new BufferedImage(width, height,
+                    image.getType());
+                Graphics2D g2 = scaledImage.createGraphics();
+                g2.setRenderingHint(RenderingHints.KEY_RENDERING,
+                    RenderingHints.VALUE_RENDER_SPEED);
+                g2.drawImage(image, 0, 0, width, height, null);
+                g2.dispose();
+                image = scaledImage;
             }
-        }
-    }
 
-    protected void encodeImage(BufferedImage capture) {
-        if (capture.getWidth() != width || capture.getHeight() != height)
-            capture = Decoder.resample(capture, new Dimension(width, height));
+            try {
 
-        capture = filter.filter(capture, null);
-        /*
-         * TODO reduce color in buffered for a real compression (use a smaller
-         * ColorModel)
-         */
-        // capture = new ColorConvertOp(
-        // ColorSpace.getInstance(ColorSpace.CS_GRAY), null).filter(
-        // convertToType(capture, BufferedImage.TYPE_BYTE_GRAY), null);
+                if (lastImage == null
+                    || image.getRaster().getDataBuffer().getDataType() != DataBuffer.TYPE_INT) {
+                    lastImage = image;
+                    imageOutput.reset();
+                    ImageIO.write(image, "jpeg",
+                        new MemoryCacheImageOutputStream(imageOutput));
+                    maxBandwidthUsed = Math.max(maxBandwidthUsed,
+                        imageOutput.size());
+                    objectOut.writeObject(new Tile(imageOutput.toByteArray(),
+                        0, 0, image.getWidth(), image.getHeight(), image
+                            .getWidth(), image.getHeight()));
+                    objectOut.flush();
 
-        if (++keyframe > KEYFRAME) {
-            keyframe = 0;
-        }
+                } else {
 
-        for (int i = 0; i < tilesX; i++) {
-            for (int j = 0; j < tilesY; j++) {
+                    int[] rasterOld = ((DataBufferInt) lastImage.getRaster()
+                        .getDataBuffer()).getData();
+                    int[] rasterNew = ((DataBufferInt) image.getRaster()
+                        .getDataBuffer()).getData();
 
-                if (Thread.interrupted()) {
-                    stopEncodingInternal();
-                    return;
-                }
+                    int bytesWritten = 0;
 
-                int offsetX = i * TILE_SIZE;
-                int offsetY = j * TILE_SIZE;
-                int lengthX = Math.min(TILE_SIZE, width - offsetX);
-                int lengthY = Math.min(TILE_SIZE, height - offsetY);
+                    for (DirtyTile dirtyTile : getDirtyTiles(rasterOld,
+                        rasterNew)) {
 
-                final BufferedImage currentTile = capture.getSubimage(offsetX,
-                    offsetY, lengthX, lengthY);
+                        BufferedImage dirtySubImage = image.getSubimage(
+                            dirtyTile.x, dirtyTile.y, dirtyTile.w, dirtyTile.h);
 
-                int pixels[] = new int[TILE_SIZE * TILE_SIZE];
-
-                PixelGrabber pg = new PixelGrabber(currentTile, 0, 0,
-                    TILE_SIZE, TILE_SIZE, pixels, 0, TILE_SIZE);
-
-                try {
-                    if (pg.grabPixels()) {
-
-                        if (keyframe == KEYFRAME
-                            || !Arrays.equals(tiles[i][j], pixels)) {
-
-                            byte[] imageData = coder.encode(currentTile);
-                            currentTile.flush();
-
-                            if (imageData != null && imageData.length > 0) {
-
-                                try {
-                                    objectOut.writeObject(new Tile(imageData, i
-                                        * TILE_SIZE, j * TILE_SIZE));
-                                } catch (IOException e) {
-                                    log.error("Sending tile: ", e);
-                                }
-
-                                tiles[i][j] = pixels;
-                            }
-                        }
+                        imageOutput.reset();
+                        ImageIO.write(dirtySubImage, "jpeg",
+                            new MemoryCacheImageOutputStream(imageOutput));
+                        bytesWritten += imageOutput.size();
+                        objectOut.writeObject(new Tile(imageOutput
+                            .toByteArray(), dirtyTile.x, dirtyTile.y,
+                            dirtyTile.w, dirtyTile.h, image.getWidth(), image
+                                .getHeight()));
+                        objectOut.flush();
                     }
-                } catch (InterruptedException e) {
-                    stopEncoding();
-                    return;
-                } catch (IOException e) {
+
+                    maxBandwidthUsed = Math.max(maxBandwidthUsed, bytesWritten);
+
+                    lastImage = image;
+
+                }
+
+                /*
+                 * send final tile as empty tile to update the picture and / or
+                 * the fps of the receiver (could be the case that no tile was
+                 * send at all
+                 */
+                objectOut.writeObject(new Tile(new byte[0], 0, 0, 0, 0, 0, 0));
+
+            } catch (IOException e) {
+                log.error(e.getMessage(), e);
+                stopEncodingInternal();
+                if (!(e instanceof EOFException))
                     videoSharingSession.reportError(new EncodingException(e));
+                return;
+            } catch (Exception e) {
+                log.error(e.getMessage(), e);
+                videoSharingSession.reportError(new EncodingException(e));
+                return;
+            }
+
+            long elapsedTime = System.currentTimeMillis() - startTime;
+            long frameIntervall = (1000L / framerate);
+
+            if (elapsedTime < frameIntervall) {
+                try {
+                    Thread.sleep(frameIntervall - elapsedTime);
+                } catch (InterruptedException e) {
+                    stopEncodingInternal();
+                    return;
+                }
+                droppedFrames = 0;
+            } else {
+                if (++droppedFrames > MAX_ALLOWED_FRAMES_TO_DROP) {
+                    reportMaxDroppedFramesReached();
                     return;
                 }
             }
         }
-
-        try {
-            objectOut.writeObject(ImageDone.INSTANCE);
-        } catch (IOException e) {
-            videoSharingSession.reportError(new EncodingException(e));
-            return;
-        }
-
     }
+
+    // WTF ?!!!!
 
     @Override
     public void stopEncodingInternal() {
@@ -266,115 +279,210 @@ public class ImageTileEncoder extends Encoder {
         return false;
     }
 
-    public static String[][] getSupportedImageFormats() {
-        String[] values = ImageIO.getWriterFormatNames();
-        Set<String> filteredValues = new HashSet<String>();
-        // remove doublettes
-        for (String val : values) {
-            if (filteredValues.contains(val.toLowerCase()))
-                continue;
-            filteredValues.add(val.toLowerCase());
+    /**
+     * Return a list of dirty 8x8 tiles from the difference of two images. The
+     * two arrays <b>must</b> have the same length.
+     * 
+     * @param bufferOld
+     *            image data from the old image
+     * @param bufferNew
+     *            image data from the old image
+     * @return a list of 8x8 tiles which differs from the old picture
+     */
+    private List<DirtyTile> getDirtyTiles(int[] bufferOld, int[] bufferNew) {
+
+        List<DirtyTile> dirtyTiles = new ArrayList<DirtyTile>();
+
+        int tilesX = width >>> 3;
+        int tilesY = height >>> 3;
+
+        int offset = 0;
+        int offsetY = 0;
+
+        int dirtyTilesFound = 0;
+        List<List<Integer>> dirtyXTilesPerRow = new ArrayList<List<Integer>>(
+            tilesY);
+
+        for (int y = 0, ty = 0; y < height; y += 8, ty++) {
+            offset = offsetY;
+
+            List<Integer> dirtyXTiles = new ArrayList<Integer>(tilesX);
+            for (int x = 0; x < width; x += 8) {
+                if (isTileDirty8x8(bufferOld, bufferNew, offset, width)) {
+                    dirtyXTiles.add(x);
+                    dirtyTilesFound++;
+                }
+                offset += 8;
+            }
+            dirtyXTilesPerRow.add(dirtyXTiles);
+            offsetY += (width << 3);
         }
-        values = filteredValues.toArray(new String[filteredValues.size()]);
-        String[][] namesAndValues = new String[values.length][];
-        int i = 0;
-        for (String val : values) {
-            namesAndValues[i] = new String[] { val, val };
-            ++i;
+
+        if ((dirtyTilesFound * 100) / (tilesX * tilesY) >= DIRTY_TILES_THRESHOLD) {
+            dirtyTiles.add(new DirtyTile(0, 0, width, height));
+            return dirtyTiles;
         }
-        return namesAndValues;
-    }
 
-    public static class Tile implements Serializable {
-        private static final long serialVersionUID = 2961263497738302562L;
-
-        protected byte[] imageData;
-        protected int x;
-        protected int y;
-
-        /**
-         * @param imageData
-         * @param x
-         * @param y
+        /*
+         * aggregate the dirty tiles to greater blocks if possible. currently it
+         * only aggregates the blocks per row use a better algorithm here eg. An
+         * Efficient Algorithm for Finding all Maximal Square Blocks in a Matrix
+         * from Heinz Breu
          */
-        public Tile(byte[] imageData, int x, int y) {
-            super();
-            this.imageData = imageData;
-            this.x = x;
-            this.y = y;
+        int y = 0;
+        for (List<Integer> dirtyXTiles : dirtyXTilesPerRow) {
+
+            int len = dirtyXTiles.size();
+            if (len == 0) {
+                y += 8;
+                continue;
+            }
+
+            int start;
+            int current;
+            start = current = dirtyXTiles.get(0);
+            for (int i = 1; i < len; i++) {
+                if (dirtyXTiles.get(i) - 8 == current) {
+                    current += 8;
+                } else {
+                    dirtyTiles.add(new DirtyTile(start, y, current - start + 8,
+                        8));
+                    start = current = dirtyXTiles.get(i);
+                }
+            }
+            dirtyTiles.add(new DirtyTile(start, y, current - start + 8, 8));
+
+            y += 8;
+
         }
 
-        public byte[] getImageData() {
-            return imageData;
-        }
-
-        public int getX() {
-            return x;
-        }
-
-        public int getY() {
-            return y;
-        }
-
+        return dirtyTiles;
     }
 
     /**
-     * Just a marker object signaling image is done.
+     * @param oldBuffer
+     *            image data from the old image
+     * @param newBuffer
+     *            image data from the new image
+     * @param offset
+     *            the offset to start comparison
+     * @param delta
+     *            the width of the image in pixels
+     * @return true if the 8x8 tile changed in the new image
      */
-    public static class ImageDone implements Serializable {
-        private static final long serialVersionUID = 6930705009545988323L;
+    private boolean isTileDirty8x8(int[] oldBuffer, int[] newBuffer,
+        int offset, int delta) {
+        /*
+         * DO NOT REFACTOR THIS CODE ! THIS IS AN UNROLLED LOOP THAT AVOIDS
+         * PIPELINE STALLS AND BRANCH PREDICTION
+         */
+        int y0 = (oldBuffer[offset + 0] ^ newBuffer[offset + 0])
+            | (oldBuffer[offset + 1] ^ newBuffer[offset + 1])
+            | (oldBuffer[offset + 2] ^ newBuffer[offset + 2])
+            | (oldBuffer[offset + 3] ^ newBuffer[offset + 3])
+            | (oldBuffer[offset + 4] ^ newBuffer[offset + 4])
+            | (oldBuffer[offset + 5] ^ newBuffer[offset + 5])
+            | (oldBuffer[offset + 6] ^ newBuffer[offset + 6])
+            | (oldBuffer[offset + 7] ^ newBuffer[offset + 7]);
+        offset += delta;
+        int y1 = (oldBuffer[offset + 0] ^ newBuffer[offset + 0])
+            | (oldBuffer[offset + 1] ^ newBuffer[offset + 1])
+            | (oldBuffer[offset + 2] ^ newBuffer[offset + 2])
+            | (oldBuffer[offset + 3] ^ newBuffer[offset + 3])
+            | (oldBuffer[offset + 4] ^ newBuffer[offset + 4])
+            | (oldBuffer[offset + 5] ^ newBuffer[offset + 5])
+            | (oldBuffer[offset + 6] ^ newBuffer[offset + 6])
+            | (oldBuffer[offset + 7] ^ newBuffer[offset + 7]);
+        offset += delta;
+        int y2 = (oldBuffer[offset + 0] ^ newBuffer[offset + 0])
+            | (oldBuffer[offset + 1] ^ newBuffer[offset + 1])
+            | (oldBuffer[offset + 2] ^ newBuffer[offset + 2])
+            | (oldBuffer[offset + 3] ^ newBuffer[offset + 3])
+            | (oldBuffer[offset + 4] ^ newBuffer[offset + 4])
+            | (oldBuffer[offset + 5] ^ newBuffer[offset + 5])
+            | (oldBuffer[offset + 6] ^ newBuffer[offset + 6])
+            | (oldBuffer[offset + 7] ^ newBuffer[offset + 7]);
+        offset += delta;
+        int y3 = (oldBuffer[offset + 0] ^ newBuffer[offset + 0])
+            | (oldBuffer[offset + 1] ^ newBuffer[offset + 1])
+            | (oldBuffer[offset + 2] ^ newBuffer[offset + 2])
+            | (oldBuffer[offset + 3] ^ newBuffer[offset + 3])
+            | (oldBuffer[offset + 4] ^ newBuffer[offset + 4])
+            | (oldBuffer[offset + 5] ^ newBuffer[offset + 5])
+            | (oldBuffer[offset + 6] ^ newBuffer[offset + 6])
+            | (oldBuffer[offset + 7] ^ newBuffer[offset + 7]);
+        offset += delta;
+        int y4 = (oldBuffer[offset + 0] ^ newBuffer[offset + 0])
+            | (oldBuffer[offset + 1] ^ newBuffer[offset + 1])
+            | (oldBuffer[offset + 2] ^ newBuffer[offset + 2])
+            | (oldBuffer[offset + 3] ^ newBuffer[offset + 3])
+            | (oldBuffer[offset + 4] ^ newBuffer[offset + 4])
+            | (oldBuffer[offset + 5] ^ newBuffer[offset + 5])
+            | (oldBuffer[offset + 6] ^ newBuffer[offset + 6])
+            | (oldBuffer[offset + 7] ^ newBuffer[offset + 7]);
+        offset += delta;
+        int y5 = (oldBuffer[offset + 0] ^ newBuffer[offset + 0])
+            | (oldBuffer[offset + 1] ^ newBuffer[offset + 1])
+            | (oldBuffer[offset + 2] ^ newBuffer[offset + 2])
+            | (oldBuffer[offset + 3] ^ newBuffer[offset + 3])
+            | (oldBuffer[offset + 4] ^ newBuffer[offset + 4])
+            | (oldBuffer[offset + 5] ^ newBuffer[offset + 5])
+            | (oldBuffer[offset + 6] ^ newBuffer[offset + 6])
+            | (oldBuffer[offset + 7] ^ newBuffer[offset + 7]);
+        offset += delta;
+        int y6 = (oldBuffer[offset + 0] ^ newBuffer[offset + 0])
+            | (oldBuffer[offset + 1] ^ newBuffer[offset + 1])
+            | (oldBuffer[offset + 2] ^ newBuffer[offset + 2])
+            | (oldBuffer[offset + 3] ^ newBuffer[offset + 3])
+            | (oldBuffer[offset + 4] ^ newBuffer[offset + 4])
+            | (oldBuffer[offset + 5] ^ newBuffer[offset + 5])
+            | (oldBuffer[offset + 6] ^ newBuffer[offset + 6])
+            | (oldBuffer[offset + 7] ^ newBuffer[offset + 7]);
+        offset += delta;
+        int y7 = (oldBuffer[offset + 0] ^ newBuffer[offset + 0])
+            | (oldBuffer[offset + 1] ^ newBuffer[offset + 1])
+            | (oldBuffer[offset + 2] ^ newBuffer[offset + 2])
+            | (oldBuffer[offset + 3] ^ newBuffer[offset + 3])
+            | (oldBuffer[offset + 4] ^ newBuffer[offset + 4])
+            | (oldBuffer[offset + 5] ^ newBuffer[offset + 5])
+            | (oldBuffer[offset + 6] ^ newBuffer[offset + 6])
+            | (oldBuffer[offset + 7] ^ newBuffer[offset + 7]);
 
-        public static final ImageDone INSTANCE = new ImageDone();
+        int s = y0 | y1 | y2 | y3 | y4 | y5 | y6 | y7;
+        return s != 0;
     }
 
-    protected class ImageEncoder {
-        protected ImageWriter imageWriter;
-        protected String imageFormat;
-        protected ImageOutputStream imageOut;
-        protected ByteArrayOutputStream byteOut;
-        protected ImageWriteParam imageWriteParam;
+    private static class DirtyTile {
+        int x;
+        int y;
+        int w;
+        int h;
 
-        public ImageEncoder() throws EncoderInitializationException {
-            byteOut = new ByteArrayOutputStream();
-            try {
-                imageOut = ImageIO.createImageOutputStream(byteOut);
-            } catch (IOException e) {
-                throw new EncoderInitializationException(e);
-            }
-            imageFormat = preferences
-                .getString(PreferenceConstants.IMAGE_TILE_CODEC);
-            try {
-                imageWriter = ImageIO.getImageWriters(
-                    new ImageTypeSpecifier(filter.filter(imageSource.toImage(),
-                        null)), imageFormat).next();
-            } catch (NoSuchElementException e) {
-                throw new EncoderInitializationException(
-                    "No writer for imageformat " + imageFormat + " available");
-            }
-            imageWriter.setOutput(imageOut);
-            imageWriteParam = imageWriter.getDefaultWriteParam();
-
-            try {
-                imageWriteParam
-                    .setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
-                imageWriteParam.setCompressionQuality((float) (preferences
-                    .getInt(PreferenceConstants.IMAGE_TILE_QUALITY) / 100.0));
-            } catch (UnsupportedOperationException e) {
-                imageWriteParam = null;
-            }
+        public DirtyTile(int x, int y, int w, int h) {
+            this.x = x;
+            this.y = y;
+            this.w = w;
+            this.h = h;
         }
 
-        public byte[] encode(BufferedImage bufferedImage) throws IOException {
-            if (imageWriteParam != null) {
-                imageWriter.write(null,
-                    new IIOImage(bufferedImage, null, null), imageWriteParam);
-            } else {
-                imageWriter.write(bufferedImage);
-            }
-            byte[] imageData = byteOut.toByteArray();
-            byteOut.reset();
-            return imageData;
+        @Override
+        public String toString() {
+            return "[" + x + ":" + y + ":" + w + ":" + h + "]";
         }
     }
 
+    private void reportMaxDroppedFramesReached() {
+        videoSharingSession
+            .reportError(new EncodingException(
+                "Your PC cannot handle the current frame rate. Maximum bandwidth used was "
+                    + (maxBandwidthUsed / 1024)
+                    + " KiB per frame and can result in "
+                    + ((maxBandwidthUsed / 1024) * framerate)
+                    + " KiB/s at the current frame rate("
+                    + framerate
+                    + " FPS)."
+                    + " Please choose a lower frames per second rate or switch to"
+                    + " a lower resolution. Make also sure that your network connection"
+                    + " supports the current used bandwidth."));
+    }
 }
