@@ -215,6 +215,22 @@ public class BaseBuddySelectionComposite extends BuddyDisplayComposite {
     }
 
     /**
+     * Returns the current online status of selected entries. If one of the
+     * selected RoserEntryElements is offline, the return value is false.
+     * 
+     * @return
+     */
+    public boolean areAllSelectedOnline() {
+        for (Object element : ((CheckboxTreeViewer) this.viewer)
+            .getCheckedElements()) {
+            if (element instanceof RosterEntryElement
+                && !((RosterEntryElement) element).isOnline())
+                return false;
+        }
+        return true;
+    }
+
+    /**
      * Adds a {@link BaseBuddySelectionListener}
      * 
      * @param buddySelectionListener
