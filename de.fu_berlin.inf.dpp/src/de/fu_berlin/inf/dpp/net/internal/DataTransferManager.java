@@ -18,6 +18,7 @@ import org.eclipse.swt.dnd.TransferData;
 import org.jivesoftware.smack.Connection;
 import org.jivesoftware.smack.Roster;
 import org.jivesoftware.smack.packet.Presence;
+import org.jivesoftware.smackx.bytestreams.socks5.Socks5Proxy;
 import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.annotations.Component;
@@ -50,8 +51,19 @@ import de.fu_berlin.inf.dpp.util.log.LoggingUtils;
 public class DataTransferManager implements IConnectionListener,
     IBytestreamConnectionListener {
 
+    /**
+     * Maps JIDs to a list of currently running incoming transfers - receptions
+     */
     protected Map<JID, List<TransferDescription>> incomingTransfers = new HashMap<JID, List<TransferDescription>>();
 
+    /**
+     * Maps JIDs to the number of currently running, ougoing transfers - send
+     */
+    protected Map<JID, Integer> outgoingTransfers = new HashMap<JID, Integer>();
+
+    /**
+     * Maps JIDs to the last known throughput of an incoming IBB reception
+     */
     protected Map<JID, Double> incomingIBBTransferSpeeds = new HashMap<JID, Double>();
 
     protected TransferModeDispatch transferModeDispatch = new TransferModeDispatch();
@@ -332,6 +344,12 @@ public class DataTransferManager implements IConnectionListener,
             transferData.logToDebug);
 
         JID recipient = transferData.recipient;
+        synchronized (outgoingTransfers) {
+            Integer count = outgoingTransfers.get(recipient);
+            if (count == null)
+                count = new Integer(0);
+            outgoingTransfers.put(recipient, ++count);
+        }
 
         IBytestreamConnection connection = getConnection(recipient,
             progress.newChild(1));
@@ -360,6 +378,12 @@ public class DataTransferManager implements IConnectionListener,
                 + transferData + " with " + connection.getMode().toString()
                 + ":" + e.getMessage() + ":", e.getCause());
             throw e;
+        } finally {
+            synchronized (outgoingTransfers) {
+                Integer count = outgoingTransfers.get(recipient);
+                if (count != null)
+                    outgoingTransfers.put(recipient, --count);
+            }
         }
     }
 
@@ -405,6 +429,9 @@ public class DataTransferManager implements IConnectionListener,
             transports.add(0, ibbTransport);
         }
 
+        log.debug("Currently used IP addresses for Socks5Proxy: "
+            + Arrays.toString(Socks5Proxy.getSocks5Proxy().getLocalAddresses()
+                .toArray()));
         for (ITransport transport : transportModesToUse) {
             log.info("Try to establish a bytestream connection to "
                 + recipient.getBase() + " from " + sarosNet.getMyJID()
@@ -764,6 +791,18 @@ public class DataTransferManager implements IConnectionListener,
     }
 
     /**
+     * Returns whether there is currently a file being send to the given
+     * recipient.
+     */
+    public boolean isSending(JID recipient) {
+        Integer transferCount;
+        synchronized (outgoingTransfers) {
+            transferCount = outgoingTransfers.get(recipient);
+        }
+        return (transferCount != null && transferCount > 0);
+    }
+
+    /**
      * Returns the last known speed of incoming IBB transfer for the given
      * {@link JID}.
      * 
@@ -810,6 +849,45 @@ public class DataTransferManager implements IConnectionListener,
     public void setFallbackConnectionMode(JID peer) {
         if (!peersForIBB.contains(peer))
             peersForIBB.add(peer);
+    }
+
+    /**
+     * Disconnects all idle IBB connections to peers. Use to enforce attempting
+     * a Socks5 connection on next data transfer.
+     * 
+     * @return false if not all IBBs could be closed because of ongoing
+     *         transfers
+     */
+    public synchronized boolean disconnectInBandBytestreams() {
+        log.info("Closing all IBBs on request");
+        List<IBytestreamConnection> openConnections;
+
+        openConnections = new ArrayList<IBytestreamConnection>(
+            connections.values());
+
+        boolean isTransfering = false;
+        for (IBytestreamConnection connection : openConnections) {
+            if (connection != null
+                && connection.getMode() == NetTransferMode.IBB) {
+
+                // If this connection is currently in use, dont disconnect
+                if (isReceiving(connection.getPeer())
+                    || isSending(connection.getPeer())) {
+                    isTransfering = true;
+                    continue;
+                }
+
+                try {
+                    connection.close();
+                    log.info("Closing IBB connection to "
+                        + connection.getPeer().getBareJID());
+                } catch (RuntimeException e) {
+                    log.error("Error while closing " + connection.getMode()
+                        + " connection ", e);
+                }
+            }
+        }
+        return isTransfering == false;
     }
 
 }

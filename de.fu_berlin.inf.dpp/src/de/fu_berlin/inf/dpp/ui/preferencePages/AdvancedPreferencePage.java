@@ -25,8 +25,10 @@ import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.net.UPnP.UPnPManager;
+import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
 import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
 import de.fu_berlin.inf.dpp.ui.util.UPnPUIUtils;
+import de.fu_berlin.inf.dpp.ui.views.SarosView;
 import de.fu_berlin.inf.dpp.util.Utils;
 
 /**
@@ -42,8 +44,12 @@ public class AdvancedPreferencePage extends FieldEditorPreferencePage implements
 
     @Inject
     protected Saros saros;
+    
     @Inject
     protected UPnPManager upnpManager;
+
+    @Inject
+    DataTransferManager dataTransferManager;
 
     public AdvancedPreferencePage() {
         super(FieldEditorPreferencePage.GRID);
@@ -71,7 +77,15 @@ public class AdvancedPreferencePage extends FieldEditorPreferencePage implements
             selGwDevice = upnpManager.getGateways().get(gwSel);
         }
 
-        upnpManager.setSelectedGateway(selGwDevice);
+        if (upnpManager.setSelectedGateway(selGwDevice)) {
+            
+            if (!dataTransferManager.disconnectInBandBytestreams())
+                SarosView
+                    .showNotification(
+                        "UPnP Activation",
+                    "For UPnP to take full effect, please reconnect with your XMPP account.");
+
+        }
 
         return super.performOk();
     }
@@ -292,19 +306,16 @@ public class AdvancedPreferencePage extends FieldEditorPreferencePage implements
                     // GUI work from SWT thread
                     Utils.runSafeSWTAsync(null, new Runnable() {
                         public void run() {
-                            if (gatewaySelector.isDisposed()
-                                || gatewayInfo.isDisposed()
-                                || allowUPnP.isDisposed())
-                                return;
 
-                            // in case controls are disposed in the meanwhile
-                            UPnPUIUtils.populateGaywaySelectionControls(
+                            UPnPUIUtils.populateGatewaySelectionControls(
                                 upnpManager, gatewaySelector, gatewayInfo,
                                 allowUPnP);
-                            gatewaySelector.setEnabled(!proxyDisabled
-                                .getBooleanValue());
-                            allowUPnP.setEnabled(!proxyDisabled
-                                .getBooleanValue());
+                            if (proxyDisabled.getBooleanValue()) {
+                                gatewaySelector.setEnabled(!proxyDisabled
+                                    .getBooleanValue());
+                                allowUPnP.setEnabled(!proxyDisabled
+                                    .getBooleanValue());
+                            }
                         }
                     });
                 }
@@ -312,11 +323,13 @@ public class AdvancedPreferencePage extends FieldEditorPreferencePage implements
 
         } else {
 
-            UPnPUIUtils.populateGaywaySelectionControls(upnpManager,
+            UPnPUIUtils.populateGatewaySelectionControls(upnpManager,
                 gatewaySelector, gatewayInfo, allowUPnP);
 
-            gatewaySelector.setEnabled(!proxyDisabled.getBooleanValue());
-            allowUPnP.setEnabled(!proxyDisabled.getBooleanValue());
+            if (proxyDisabled.getBooleanValue()) {
+                gatewaySelector.setEnabled(!proxyDisabled.getBooleanValue());
+                allowUPnP.setEnabled(!proxyDisabled.getBooleanValue());
+            }
         }
 
     }

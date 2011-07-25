@@ -279,7 +279,7 @@ public class XMPPReceiver {
         });
     }
 
-    void overideInjections(
+    void inject(
         IncomingTransferObjectExtensionProvider incomingExtProv,
         DispatchThreadContext dispatchThreadContext) {
         this.incomingExtProv = incomingExtProv;

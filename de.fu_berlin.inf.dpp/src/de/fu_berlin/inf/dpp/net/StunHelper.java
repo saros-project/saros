@@ -67,7 +67,7 @@ public class StunHelper {
         // log.info("STUN results:\n" + di.toString());
 
         // add WAN-IP to proxy addresses
-        proxy.addLocalAddress(publicIP.getHostAddress());
+        NetworkingUtils.addProxyAddress(publicIP.getHostAddress(), true);
         recentPublicIPs.put(privateIP, publicIP);
     }
 

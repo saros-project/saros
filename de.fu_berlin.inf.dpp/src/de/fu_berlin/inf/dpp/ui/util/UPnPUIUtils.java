@@ -23,16 +23,20 @@ public class UPnPUIUtils {
      * @param checkbox
      *            {@link Button} checkbox to enable/disable UPnP support
      */
-    public static void populateGaywaySelectionControls(
+    public static void populateGatewaySelectionControls(
         final UPnPManager upnpManager, final Combo combo, final Label info,
         final Button checkbox) {
 
-        // if the UPnPManager dont know about gateways, let him discover
-        if (upnpManager.getGateways() == null)
+        // Configuration controls closed in the meanwhile?
+        if (combo.isDisposed() || info.isDisposed() || checkbox.isDisposed())
             return;
 
+        combo.setEnabled(false);
+        checkbox.setEnabled(false);
+
         // if no devices are found, return now - nothing to populate
-        if (upnpManager.getGateways().isEmpty()) {
+        if (upnpManager.getGateways() == null
+            || upnpManager.getGateways().isEmpty()) {
             info.setText("No gateway found.");
             info.getParent().pack();
             return;
@@ -57,13 +61,9 @@ public class UPnPUIUtils {
             }
         }
 
-        // Configuration controls closed in the meanwhile?
-        if (combo.isDisposed() || info.isDisposed() || checkbox.isDisposed())
-            return;
-
         // if valid gateway found, show info and enable
         checkbox.setEnabled(true);
-        combo.setVisible(true);
+        combo.setEnabled(true);
         combo.select(indexToSelect);
         combo.pack();
         info.setVisible(false);

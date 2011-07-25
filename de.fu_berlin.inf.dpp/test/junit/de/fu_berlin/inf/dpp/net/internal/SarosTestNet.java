@@ -50,7 +50,7 @@ public class SarosTestNet {
         dtm.inject(xmppReceiver, dispatchThreadContext,
             incomingTransferObjectExtensionProvider);
 
-        xmppReceiver.overideInjections(incomingTransferObjectExtensionProvider,
+        xmppReceiver.inject(incomingTransferObjectExtensionProvider,
             dispatchThreadContext);
 
         xmppTransmitter = new XMPPTransmitter(sessionID, dtm, net, xmppReceiver);
