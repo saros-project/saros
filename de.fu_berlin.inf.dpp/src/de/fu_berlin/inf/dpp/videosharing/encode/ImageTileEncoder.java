@@ -44,6 +44,58 @@ import de.fu_berlin.inf.dpp.videosharing.exceptions.EncodingException;
 import de.fu_berlin.inf.dpp.videosharing.source.ImageSource;
 
 /**
+ * <p>
+ * This class handles image compression for video streaming be using only pure
+ * Java components
+ * </p>
+ * 
+ * <p>
+ * Algorithm:
+ * </p>
+ * <ol>
+ * <li>Capture an image and possible scale it down</li>
+ * <li>If this is the first captured image or the image that was captured is not
+ * a 24 or 32 bit RGB images then compress the whole image and send it to the
+ * receiver</li>
+ * <li>Otherwise the content of the images are subdivided into 8x8 tiles (pixel
+ * squares) and compared against each other
+ * <li>After comparison a matrix has been created which will look like this:
+ * 
+ * <pre>
+ * [x] [ ] [ ] [ ]
+ * [x] [x] [ ] [x]
+ * [x] [x] [ ] [x]
+ * [x] [x] [ ] [x]
+ * </pre>
+ * 
+ * <p>
+ * Where each X represents a dirty tile. Now all dirty tiles are aggregated to
+ * maximum square blocks (this is currently not implemented, only the tiles per
+ * row are aggregated)
+ * </p>
+ * 
+ * <p>
+ * Which should result in:
+ * </p>
+ * 
+ * <pre>
+ * |---|
+ * |[x]| [ ] [ ] [ ]
+ * |---|
+ * 
+ * |-------|     |---|
+ * |[x] [x]| [ ] |[x]|
+ * |[x] [x]| [ ] |[x]|
+ * |[x] [x]| [ ] |[x]|
+ * |-------|     |---|
+ * </pre>
+ * 
+ * </li>
+ * <li>Each of these maximum square block is now compressed and then send to the
+ * receiver</li>
+ * <li>Continue with step 1</li>
+ * </ol>
+ * 
  * @author s-lau
  * @author Stefan Rossbach
  */
