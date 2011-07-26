@@ -11,17 +11,18 @@ import de.fu_berlin.inf.dpp.stf.server.bot.widget.ContextMenuHelper;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.contextmenu.sarosview.IContextMenusInSarosView;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.saros.ISarosView;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.impl.SuperBot;
+import de.fu_berlin.inf.dpp.stf.server.util.Util;
 
 public abstract class ContextMenusInSarosView extends StfRemoteObject implements
     IContextMenusInSarosView {
 
-    protected SWTBotTreeItem treeItem;
+    protected String[] treeItemNodes;
     protected SWTBotTree tree;
 
     protected ISarosView sarosView;
 
-    public void setTreeItem(SWTBotTreeItem treeItem) {
-        this.treeItem = treeItem;
+    public void setTreeItemNodes(String... treeItemNodes) {
+        this.treeItemNodes = treeItemNodes;
     }
 
     public void setTree(SWTBotTree tree) {
@@ -33,22 +34,35 @@ public abstract class ContextMenusInSarosView extends StfRemoteObject implements
     }
 
     public void stopSarosSession() throws RemoteException {
-        treeItem.select();
+        getTreeItem().select();
         ContextMenuHelper.clickContextMenu(tree, CM_STOP_SAROS_SESSION);
         SuperBot.getInstance().confirmShellLeavingClosingSession();
     }
 
-    protected final void logError(Logger log, Throwable t) {
+    protected final void logError(Logger log, Throwable t, SWTBotTree tree,
+        SWTBotTreeItem treeItem) {
         String treeItemText = null;
         String treeText = null;
         try {
-            treeText = tree.getText();
-            treeItemText = treeItem.getText();
+            treeText = tree == null ? "not found" : tree.getText();
+            treeItemText = treeItem == null ? "not found" : treeItem.getText();
         } catch (RuntimeException e) {
             log.error(e.getMessage(), e);
         }
         log.error(t.getMessage() + "@ tree: " + treeText + ", tree item: "
             + treeItemText, t);
+    }
+
+    /**
+     * Gets the tree item that was passed as name by searching through the
+     * current tree. Because the Saros Session View tree can be refreshed any
+     * times it is necessary not to cache the tree item and always grab a fresh
+     * copy of the tree item
+     * 
+     * @return the current tree item
+     */
+    protected final SWTBotTreeItem getTreeItem() {
+        return Util.getTreeItemWithRegex(tree, treeItemNodes);
     }
 
 }

@@ -220,25 +220,15 @@ public class Util {
     /**
      * the local user can be concurrently followed by many other users.
      * 
-     * @param buddiesTofollow
+     * @param buddiesToFollow
      *            the list of the buddies who want to follow the local user.
      * @throws RemoteException
      */
     public static void setFollowMode(final AbstractTester followedBuddy,
-        AbstractTester... buddiesTofollow) throws RemoteException {
-        List<Callable<Void>> followTasks = new ArrayList<Callable<Void>>();
-        for (int i = 0; i < buddiesTofollow.length; i++) {
-            final AbstractTester tester = buddiesTofollow[i];
-            followTasks.add(new Callable<Void>() {
-                public Void call() throws Exception {
-                    tester.superBot().views().sarosView()
-                        .selectParticipant(followedBuddy.getJID())
-                        .followParticipant();
-                    return null;
-                }
-            });
-        }
-        workAll(followTasks);
+        AbstractTester... buddiesToFollow) throws RemoteException {
+        for (AbstractTester tester : buddiesToFollow)
+            tester.superBot().views().sarosView()
+                .selectParticipant(followedBuddy.getJID()).followParticipant();
     }
 
     /**

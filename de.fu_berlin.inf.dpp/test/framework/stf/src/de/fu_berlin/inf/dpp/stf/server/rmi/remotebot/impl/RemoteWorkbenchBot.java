@@ -16,7 +16,6 @@ import org.eclipse.swtbot.swt.finder.waits.DefaultCondition;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 import org.eclipse.swtbot.swt.finder.widgets.TimeoutException;
 import org.eclipse.ui.IPerspectiveDescriptor;
-import org.eclipse.ui.IViewReference;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
@@ -69,30 +68,28 @@ public final class RemoteWorkbenchBot extends RemoteBot implements
     }
 
     public void openViewById(final String viewId) throws RemoteException {
-        try {
-            Display.getDefault().syncExec(new Runnable() {
-                public void run() {
-                    final IWorkbench wb = PlatformUI.getWorkbench();
-                    final IWorkbenchWindow win = wb.getActiveWorkbenchWindow();
 
-                    IWorkbenchPage page = win.getActivePage();
-                    try {
-                        IViewReference[] registeredViews = page
-                            .getViewReferences();
-                        for (IViewReference registeredView : registeredViews) {
-                            log.debug("registered view ID: "
-                                + registeredView.getId());
-                        }
+        log.trace("opening view with id: " + viewId);
+        Display.getDefault().syncExec(new Runnable() {
+            public void run() {
 
-                        page.showView(viewId);
-                    } catch (PartInitException e) {
-                        throw new IllegalArgumentException(e);
-                    }
+                IWorkbenchWindow win = PlatformUI.getWorkbench()
+                    .getActiveWorkbenchWindow();
+
+                if (win == null) {
+                    log.warn("no active workbench window available, cannot open view with id: "
+                        + viewId);
+                    return;
                 }
-            });
-        } catch (IllegalArgumentException e) {
-            log.debug("Couldn't initialize " + viewId, e.getCause());
-        }
+
+                try {
+                    IWorkbenchPage page = win.getActivePage();
+                    page.showView(viewId);
+                } catch (PartInitException e) {
+                    log.error("failed to open view with id: " + viewId, e);
+                }
+            }
+        });
     }
 
     public List<String> getTitlesOfOpenedViews() throws RemoteException {

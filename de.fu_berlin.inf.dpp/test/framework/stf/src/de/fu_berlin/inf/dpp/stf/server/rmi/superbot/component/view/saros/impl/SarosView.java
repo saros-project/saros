@@ -200,7 +200,7 @@ public final class SarosView extends StfRemoteObject implements ISarosView {
      **********************************************/
 
     public IContextMenusInBuddiesArea selectBuddies() throws RemoteException {
-        initBuddiesContextMenuWrapper(tree.getTreeItem(NODE_BUDDIES));
+        initBuddiesContextMenuWrapper(Pattern.quote((NODE_BUDDIES)));
         return ContextMenusInBuddiesArea.getInstance();
     }
 
@@ -210,16 +210,15 @@ public final class SarosView extends StfRemoteObject implements ISarosView {
             throw new RuntimeException("no buddy exists with the JID: "
                 + buddyJID.getBase());
         }
-        initBuddiesContextMenuWrapper(Util.getTreeItemWithRegex(tree,
-            Pattern.quote(NODE_BUDDIES), Pattern.quote(getNickname(buddyJID))
-                + ".*"));
+        initBuddiesContextMenuWrapper(Pattern.quote(NODE_BUDDIES),
+            Pattern.quote(getNickname(buddyJID)) + ".*");
         return ContextMenusInBuddiesArea.getInstance();
     }
 
     public IContextMenusInSessionArea selectSession() throws RemoteException {
         if (!isInSession())
             throw new RuntimeException("you are not in a session");
-        initSessionContextMenuWrapper(tree.getTreeItem(NODE_SESSION));
+        initSessionContextMenuWrapper(Pattern.quote((NODE_SESSION)));
         return ContextMenusInSessionArea.getInstance();
     }
 
@@ -227,7 +226,7 @@ public final class SarosView extends StfRemoteObject implements ISarosView {
         throws RemoteException {
         if (isInSession())
             throw new RuntimeException("you are in a session");
-        initSessionContextMenuWrapper(tree.getTreeItem(NODE_NO_SESSION_RUNNING));
+        initSessionContextMenuWrapper(Pattern.quote((NODE_NO_SESSION_RUNNING)));
         return ContextMenusInSessionArea.getInstance();
     }
 
@@ -236,9 +235,8 @@ public final class SarosView extends StfRemoteObject implements ISarosView {
         if (!isInSession())
             throw new IllegalStateException("you are not in a session");
         String participantLabel = getParticipantLabel(participantJID);
-        initSessionContextMenuWrapper(Util
-            .getTreeItemWithRegex(tree, Pattern.quote(NODE_SESSION),
-                Pattern.quote(participantLabel) + ".*"));
+        initSessionContextMenuWrapper(Pattern.quote(NODE_SESSION),
+            Pattern.quote(participantLabel) + ".*");
         ContextMenusInSessionArea.getInstance().setParticipantJID(
             participantJID);
         return ContextMenusInSessionArea.getInstance();
@@ -546,15 +544,15 @@ public final class SarosView extends StfRemoteObject implements ISarosView {
         this.tree = view.bot().tree();
     }
 
-    private void initSessionContextMenuWrapper(SWTBotTreeItem treeItem) {
+    private void initSessionContextMenuWrapper(String... treeItemNodes) {
         ContextMenusInSessionArea.getInstance().setTree(tree);
-        ContextMenusInSessionArea.getInstance().setTreeItem(treeItem);
+        ContextMenusInSessionArea.getInstance().setTreeItemNodes(treeItemNodes);
         ContextMenusInSessionArea.getInstance().setSarosView(this);
     }
 
-    private void initBuddiesContextMenuWrapper(SWTBotTreeItem treeItem) {
+    private void initBuddiesContextMenuWrapper(String... treeItemNodes) {
         ContextMenusInBuddiesArea.getInstance().setTree(tree);
-        ContextMenusInBuddiesArea.getInstance().setTreeItem(treeItem);
+        ContextMenusInBuddiesArea.getInstance().setTreeItemNodes(treeItemNodes);
         ContextMenusInBuddiesArea.getInstance().setSarosView(this);
     }
 

@@ -6,7 +6,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.rmi.RemoteException;
 
-import org.junit.After;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -20,34 +20,38 @@ public class MenuRefactorTest extends StfTestCase {
         select(ALICE);
     }
 
-    @After
-    public void afterEveryTest() throws RemoteException {
+    @Before
+    public void beforeEveryTest() throws RemoteException {
         clearWorkspaces();
     }
 
-    /**********************************************
+    /* *********************************************
      * 
      * all related actions with the sub menus of the context menu "Refactor"
      * 
-     **********************************************/
+     * ********************************************
+     */
     @Test
     public void testMoveClassTo() throws RemoteException {
         ALICE.superBot().views().packageExplorerView().tree().newC()
             .javaProject(Constants.PROJECT1);
+
         ALICE.superBot().views().packageExplorerView().tree().newC()
             .cls(Constants.PROJECT1, Constants.PKG1, Constants.CLS1);
+
         ALICE.superBot().views().packageExplorerView().tree().newC()
             .pkg(Constants.PROJECT1, Constants.PKG2);
+
         ALICE.superBot().views().packageExplorerView()
             .selectClass(Constants.PROJECT1, Constants.PKG1, Constants.CLS1)
             .refactor().moveClassTo(Constants.PROJECT1, Constants.PKG2);
-        assertFalse(ALICE.superBot().views().packageExplorerView()
-            .selectPkg(Constants.PROJECT1, Constants.PKG1)
-            .exists(Constants.CLS1_SUFFIX));
 
-        assertTrue(ALICE.superBot().views().packageExplorerView()
-            .selectPkg(Constants.PROJECT1, Constants.PKG2)
-            .exists(Constants.CLS1_SUFFIX));
+        ALICE
+            .superBot()
+            .views()
+            .packageExplorerView()
+            .waitUntilClassExists(Constants.PROJECT1, Constants.PKG2,
+                Constants.CLS1);
     }
 
     @Test
@@ -55,72 +59,89 @@ public class MenuRefactorTest extends StfTestCase {
 
         ALICE.superBot().views().packageExplorerView().tree().newC()
             .javaProject(Constants.PROJECT1);
+
         ALICE.superBot().views().packageExplorerView().tree().newC()
             .cls(Constants.PROJECT1, Constants.PKG1, Constants.CLS1);
+
         ALICE.superBot().views().packageExplorerView()
             .selectClass(Constants.PROJECT1, Constants.PKG1, Constants.CLS1)
             .refactor().rename(Constants.CLS2);
 
-        assertFalse(ALICE.superBot().views().packageExplorerView()
-            .selectPkg(Constants.PROJECT1, Constants.PKG1)
-            .exists(Constants.CLS1_SUFFIX));
-        assertTrue(ALICE.superBot().views().packageExplorerView()
-            .selectPkg(Constants.PROJECT1, Constants.PKG1)
-            .exists(Constants.CLS2_SUFFIX));
+        ALICE
+            .superBot()
+            .views()
+            .packageExplorerView()
+            .waitUntilClassExists(Constants.PROJECT1, Constants.PKG1,
+                Constants.CLS2);
     }
 
     @Test
     public void testRenameFile() throws RemoteException {
         ALICE.superBot().views().packageExplorerView().tree().newC()
             .project(Constants.PROJECT1);
+
         ALICE.superBot().views().packageExplorerView()
             .selectProject(Constants.PROJECT1).newC().folder(Constants.FOLDER1);
+
         ALICE.superBot().views().packageExplorerView()
             .selectFolder(Constants.PROJECT1, Constants.FOLDER1).newC()
             .file(Constants.FILE1);
+
         ALICE.superBot().views().packageExplorerView()
             .selectFile(Constants.PROJECT1, Constants.FOLDER1, Constants.FILE1)
             .refactor().rename(Constants.FILE2);
 
-        assertFalse(ALICE.superBot().views().packageExplorerView()
-            .selectFolder(Constants.PROJECT1, Constants.FOLDER1)
-            .exists(Constants.FILE1));
-        assertTrue(ALICE.superBot().views().packageExplorerView()
-            .selectFolder(Constants.PROJECT1, Constants.FOLDER1)
-            .exists(Constants.FILE2));
+        ALICE
+            .superBot()
+            .views()
+            .packageExplorerView()
+            .waitUntilFileExists(Constants.PROJECT1, Constants.FOLDER1,
+                Constants.FILE2);
     }
 
     @Test
     public void testRenameFolder() throws RemoteException {
         ALICE.superBot().views().packageExplorerView().tree().newC()
             .project(Constants.PROJECT1);
+
         ALICE.superBot().views().packageExplorerView()
             .selectProject(Constants.PROJECT1).newC().folder(Constants.FOLDER1);
+
         ALICE.superBot().views().packageExplorerView()
             .selectFolder(Constants.PROJECT1, Constants.FOLDER1).refactor()
             .rename(Constants.FOLDER2);
 
-        assertFalse(ALICE.superBot().views().packageExplorerView()
-            .selectProject(Constants.PROJECT1).exists(Constants.FOLDER1));
-        assertTrue(ALICE.superBot().views().packageExplorerView()
-            .selectProject(Constants.PROJECT1).exists(Constants.FOLDER2));
+        ALICE.superBot().views().packageExplorerView()
+            .waitUntilFolderExists(Constants.PROJECT1, Constants.FOLDER2);
     }
 
     @Test
     public void testRenamePackage() throws RemoteException {
         ALICE.superBot().views().packageExplorerView().tree().newC()
             .javaProject(Constants.PROJECT1);
+
         ALICE.superBot().views().packageExplorerView().tree().newC()
             .pkg(Constants.PROJECT1, Constants.PKG1);
+
         ALICE.superBot().views().packageExplorerView()
             .selectPkg(Constants.PROJECT1, Constants.PKG1).refactor()
             .rename(Constants.PKG2);
 
-        ALICE.remoteBot().sleep(500);
-        assertFalse(ALICE.superBot().views().packageExplorerView()
-            .selectProject(Constants.PROJECT1).exists(Constants.PKG1));
-        assertTrue(ALICE.superBot().views().packageExplorerView()
-            .selectSrc(Constants.PROJECT1).exists(Constants.PKG2));
+        ALICE.superBot().views().packageExplorerView()
+            .waitUntilPkgExists(Constants.PROJECT1, Constants.PKG2);
+    }
+
+    @Test
+    public void testRenameProject() throws RemoteException {
+        ALICE.superBot().views().packageExplorerView().tree().newC()
+            .javaProject(Constants.PROJECT1);
+
+        ALICE.superBot().views().packageExplorerView()
+            .selectJavaProject(Constants.PROJECT1).refactor()
+            .rename(Constants.PROJECT2);
+
+        ALICE.superBot().views().packageExplorerView()
+            .waitUntilFolderExists(Constants.PROJECT2);
     }
 
     @Test
@@ -139,27 +160,5 @@ public class MenuRefactorTest extends StfTestCase {
                 Constants.SVN_PROJECT_PATH);
         assertTrue(ALICE.superBot().views().packageExplorerView()
             .isProjectManagedBySVN(Constants.PROJECT1));
-    }
-
-    /**
-     * Create a project, rename it, see if rename worked, delete all projects.
-     */
-    @Test
-    public void testRenameProject() throws RemoteException {
-        ALICE.superBot().views().packageExplorerView().tree().newC()
-            .javaProject(Constants.PROJECT1);
-
-        assertTrue(ALICE.superBot().views().packageExplorerView().tree()
-            .exists(Constants.PROJECT1));
-        assertFalse(ALICE.superBot().views().packageExplorerView().tree()
-            .exists(Constants.PROJECT2));
-        ALICE.superBot().views().packageExplorerView()
-            .selectJavaProject(Constants.PROJECT1).refactor()
-            .rename(Constants.PROJECT2);
-
-        assertFalse(ALICE.superBot().views().packageExplorerView().tree()
-            .exists(Constants.PROJECT1));
-        assertTrue(ALICE.superBot().views().packageExplorerView().tree()
-            .exists(Constants.PROJECT2));
     }
 }

@@ -24,6 +24,7 @@ import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
 import de.fu_berlin.inf.dpp.ui.model.TreeContentProvider;
 import de.fu_berlin.inf.dpp.ui.model.roster.RosterContentProvider;
 import de.fu_berlin.inf.dpp.ui.util.ViewerUtils;
+import de.fu_berlin.inf.dpp.util.Utils;
 
 /**
  * {@link IContentProvider} for use in conjunction with a {@link Roster} input.
@@ -33,6 +34,7 @@ import de.fu_berlin.inf.dpp.ui.util.ViewerUtils;
  * @author bkahlert
  */
 public class RosterSessionContentProvider extends TreeContentProvider {
+
     protected Viewer viewer;
     protected RosterContentProvider rosterContentProvider = new RosterContentProvider();
     protected RosterSessionInput rosterSessionInput;
@@ -54,29 +56,33 @@ public class RosterSessionContentProvider extends TreeContentProvider {
 
         @Override
         public void colorChanged() {
-            ViewerUtils.refresh(viewer, true);
-            ViewerUtils.expandAll(viewer);
+
+            // does not force a redraw
+            // ViewerUtils.refresh(viewer, true);
+
+            Utils.runSafeSWTSync(null, new Runnable() {
+                public void run() {
+                    viewer.getControl().redraw();
+                }
+            });
         }
     };
 
     protected RosterListener rosterListener = new RosterListener() {
         public void entriesAdded(Collection<String> addresses) {
-            // handled by RosterContentProvider
+            ViewerUtils.refresh(viewer, true);
         }
 
         public void entriesUpdated(Collection<String> addresses) {
-            // handled by RosterContentProvider
+            ViewerUtils.refresh(viewer, true);
         }
 
         public void entriesDeleted(Collection<String> addresses) {
-            // handled by RosterContentProvider
+            ViewerUtils.refresh(viewer, true);
         }
 
         public void presenceChanged(Presence presence) {
-            UserElement userElement = getUserElement(rosterSessionInput,
-                presence.getFrom());
-            if (userElement != null)
-                ViewerUtils.update(viewer, userElement, null);
+            ViewerUtils.refresh(viewer, true);
         }
     };
 

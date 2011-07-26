@@ -5,6 +5,7 @@ import java.rmi.RemoteException;
 import org.eclipse.swtbot.swt.finder.SWTBot;
 import org.eclipse.swtbot.swt.finder.waits.Conditions;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.stf.server.bot.widget.ContextMenuHelper;
@@ -23,7 +24,7 @@ public final class ContextMenusInBuddiesArea extends ContextMenusInSarosView
     }
 
     public void delete() throws RemoteException {
-        treeItem.select();
+        getTreeItem().select();
         ContextMenuHelper.clickContextMenu(tree, CM_DELETE);
         SWTBotShell shell = new SWTBot().shell(CONFIRM_DELETE);
         shell.activate();
@@ -34,7 +35,7 @@ public final class ContextMenusInBuddiesArea extends ContextMenusInSarosView
     }
 
     public void rename(String newBuddyName) throws RemoteException {
-        treeItem.select();
+        getTreeItem().select();
         ContextMenuHelper.clickContextMenu(tree, CM_RENAME);
 
         SWTBotShell shell = new SWTBot().shell(SHELL_SET_NEW_NICKNAME);
@@ -47,6 +48,8 @@ public final class ContextMenusInBuddiesArea extends ContextMenusInSarosView
     }
 
     public void addToSarosSession() throws RemoteException {
+        SWTBotTreeItem treeItem = getTreeItem();
+
         if (!treeItem.isEnabled()) {
             throw new RuntimeException(
                 "unable to invite this user, he is not conntected");
@@ -59,7 +62,7 @@ public final class ContextMenusInBuddiesArea extends ContextMenusInSarosView
 
     public void addBuddy(JID jid) throws RemoteException {
         if (!sarosView.hasBuddy(jid)) {
-            treeItem.select();
+            getTreeItem().select();
             ContextMenuHelper.clickContextMenu(tree, "Add Buddy...");
             SuperBot.getInstance().confirmShellAddBuddy(jid);
             // wait for tree update in saros session view
@@ -69,7 +72,7 @@ public final class ContextMenusInBuddiesArea extends ContextMenusInSarosView
 
     public IWorkTogetherOnContextMenu workTogetherOn() throws RemoteException {
         WorkTogetherOnContextMenu.getInstance().setTree(tree);
-        WorkTogetherOnContextMenu.getInstance().setTreeItem(treeItem);
+        WorkTogetherOnContextMenu.getInstance().setTreeItem(getTreeItem());
         return WorkTogetherOnContextMenu.getInstance();
     }
 }
