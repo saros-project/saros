@@ -8,6 +8,7 @@ import org.eclipse.jface.wizard.IWizard;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
@@ -88,6 +89,8 @@ public class WizardUtils {
         return openWizardSuccessfully(null, wizard, initialSize);
     }
 
+    public static final Point GettingStartedWizardSize = new Point(950, 740);
+
     /**
      * Opens a {@link GettingStartedWizard} in the SWT thread and returns the
      * displayed instance in case of success.
@@ -108,8 +111,17 @@ public class WizardUtils {
             log.warn("Error while determining the main shell for the tutorial",
                 e);
         }
+
+        int width = (int) (Display.getCurrent().getBounds().width / 0.66);
+        int height = (int) (Display.getCurrent().getBounds().height / 0.66);
+
+        if (width > GettingStartedWizardSize.x)
+            width = GettingStartedWizardSize.x;
+        if (height > GettingStartedWizardSize.y)
+            height = GettingStartedWizardSize.y;
+
         return openWizardSuccessfully(shell, new GettingStartedWizard(
-            showConfigNote), new Point(930, 720));
+            showConfigNote), new Point(width, height));
     }
 
     /**

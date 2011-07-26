@@ -18,14 +18,15 @@
  */
 package de.fu_berlin.inf.dpp.ui.wizards;
 
-import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.PaintEvent;
+import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Label;
 import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.SarosPluginContext;
@@ -33,7 +34,6 @@ import de.fu_berlin.inf.dpp.net.internal.subscriptionManager.SubscriptionManager
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
 import de.fu_berlin.inf.dpp.ui.ImageManager;
 import de.fu_berlin.inf.dpp.ui.util.DialogUtils;
-import de.fu_berlin.inf.dpp.ui.util.LayoutUtils;
 import de.fu_berlin.inf.dpp.ui.wizards.pages.AddBuddyWizardPage;
 
 /**
@@ -71,17 +71,55 @@ public class GettingStartedWizard extends Wizard {
                 : null;
         }
 
+        /**
+         * Paints the {@link #contentImage} so it appears centered and
+         * proportionally resized to it always uses the available space. The
+         * {@link #contentImage} is never rendered larger than its original
+         * size.
+         */
         public void createControl(Composite parent) {
-            Composite composite = new Composite(parent, SWT.NONE);
+            final Composite composite = new Composite(parent, SWT.NONE);
             setControl(composite);
 
-            composite.setLayout(LayoutUtils.createGridLayout());
-
             if (this.contentImage != null) {
-                Label label = new Label(composite, SWT.NONE);
-                label.setLayoutData(GridDataFactory.fillDefaults()
-                    .grab(true, true).create());
-                label.setImage(this.contentImage);
+                composite.addPaintListener(new PaintListener() {
+                    public void paintControl(PaintEvent e) {
+                        Rectangle clientArea = composite.getClientArea();
+
+                        int imgWidth = contentImage.getBounds().width;
+                        int imgHeight = contentImage.getBounds().height;
+
+                        int destWidth = imgWidth, destHeight = imgHeight;
+
+                        if (imgWidth > clientArea.width) {
+                            destWidth = clientArea.width;
+                            destHeight = (int) Math
+                                .round(((double) clientArea.width / (double) imgWidth)
+                                    * imgHeight);
+                            if (destHeight > clientArea.height) {
+                                destHeight = clientArea.height;
+                                destWidth = (int) Math
+                                    .round(((double) clientArea.height / (double) imgHeight)
+                                        * imgWidth);
+                            }
+                        } else if (imgHeight > clientArea.height) {
+                            destHeight = clientArea.height;
+                            destWidth = (int) Math
+                                .round(((double) clientArea.height / (double) imgHeight)
+                                    * imgWidth);
+                        }
+
+                        e.gc.drawImage(
+                            contentImage,
+                            0,
+                            0,
+                            imgWidth,
+                            imgHeight,
+                            clientArea.x + (clientArea.width - destWidth) / 2,
+                            clientArea.y + (clientArea.height - destHeight) / 2,
+                            destWidth, destHeight);
+                    }
+                });
             }
         }
 
