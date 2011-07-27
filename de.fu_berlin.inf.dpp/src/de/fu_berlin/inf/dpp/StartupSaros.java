@@ -12,7 +12,6 @@ import org.eclipse.ui.intro.IIntroManager;
 import org.eclipse.ui.intro.IIntroPart;
 import org.picocontainer.annotations.Inject;
 
-import de.fu_berlin.inf.dpp.accountManagement.XMPPAccount;
 import de.fu_berlin.inf.dpp.accountManagement.XMPPAccountStore;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
@@ -75,13 +74,15 @@ public class StartupSaros implements IStartup {
         updateAccounts();
         showSarosView();
 
+        if (testmode)
+            return;
+
         /*
          * Only show configuration wizard if no accounts are configured. If
          * Saros is already configured, do not show the tutorial because the
          * user is probably already experienced.
          */
-        XMPPAccount activeAccount = xmppAccountStore.getActiveAccount();
-        if (activeAccount == null) {
+        if (!xmppAccountStore.hasActiveAccount()) {
             if (!preferenceUtils.isGettingStartedFinished()) {
                 WizardUtils.openSarosGettingStartedWizard(true);
             }
