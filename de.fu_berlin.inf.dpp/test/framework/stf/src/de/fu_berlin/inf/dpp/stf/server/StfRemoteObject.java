@@ -5,6 +5,7 @@ import org.picocontainer.MutablePicoContainer;
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.accountManagement.XMPPAccountStore;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
+import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.feedback.FeedbackManager;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
 import de.fu_berlin.inf.dpp.project.SarosSessionManager;
@@ -45,5 +46,9 @@ public abstract class StfRemoteObject implements Constants {
 
     protected VersionManager getVersionManager() {
         return container.getComponent(VersionManager.class);
+    }
+
+    protected EditorAPI getEditorAPI() {
+        return container.getComponent(EditorAPI.class);
     }
 }

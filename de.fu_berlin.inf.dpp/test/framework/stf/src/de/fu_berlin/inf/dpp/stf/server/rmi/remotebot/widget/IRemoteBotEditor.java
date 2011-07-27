@@ -228,6 +228,16 @@ public interface IRemoteBotEditor extends Remote {
     public String getText() throws RemoteException;
 
     /**
+     * @see SWTBotEclipseEditor#getLineCount()
+     */
+    public int getLineCount() throws RemoteException;
+
+    /**
+     * @see SWTBotEclipseEditor#getLines()
+     */
+    public List<String> getLines() throws RemoteException;
+
+    /**
      * @see SWTBotEclipseEditor#getTextOnCurrentLine()
      */
     public String getTextOnCurrentLine() throws RemoteException;
@@ -269,7 +279,31 @@ public interface IRemoteBotEditor extends Remote {
     public List<String> getAutoCompleteProposals(String insertText)
         throws RemoteException;
 
+    /**
+     * Returns the current selected text
+     * 
+     * @return the current selected text
+     * @throws RemoteException
+     */
     public String getSelection() throws RemoteException;
+
+    /**
+     * Returns the current selected text which is marked by an annotation. Use
+     * this method to retrieve the selected text in follow mode.
+     * 
+     * @return the current selected text marked by an annotation
+     * @throws RemoteException
+     */
+    public String getSelectionByAnnotation() throws RemoteException;
+
+    /**
+     * Returns the current view port for the editor
+     * 
+     * @return the current view port where the first entry in the list is the
+     *         starting line and the second entry is the number of lines
+     * @throws RemoteException
+     */
+    public List<Integer> getViewport() throws RemoteException;
 
     /**********************************************
      * 

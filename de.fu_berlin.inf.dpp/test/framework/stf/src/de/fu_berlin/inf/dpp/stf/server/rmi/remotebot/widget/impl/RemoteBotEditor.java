@@ -1,17 +1,32 @@
 package de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.impl;
 
 import java.rmi.RemoteException;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.eclipse.jface.bindings.keys.IKeyLookup;
 import org.eclipse.jface.bindings.keys.KeyStroke;
 import org.eclipse.jface.bindings.keys.ParseException;
+import org.eclipse.jface.text.Position;
+import org.eclipse.jface.text.source.Annotation;
+import org.eclipse.jface.text.source.IAnnotationModel;
+import org.eclipse.jface.text.source.ILineRange;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotEclipseEditor;
+import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
+import org.eclipse.swtbot.swt.finder.finders.UIThreadRunnable;
+import org.eclipse.swtbot.swt.finder.results.ListResult;
 import org.eclipse.swtbot.swt.finder.utils.FileUtils;
 import org.eclipse.swtbot.swt.finder.waits.DefaultCondition;
+import org.eclipse.ui.IEditorInput;
+import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.texteditor.IDocumentProvider;
+import org.eclipse.ui.texteditor.ITextEditor;
 
+import de.fu_berlin.inf.dpp.editor.annotations.SelectionAnnotation;
 import de.fu_berlin.inf.dpp.stf.server.StfRemoteObject;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.impl.RemoteWorkbenchBot;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotEditor;
@@ -20,6 +35,7 @@ import de.fu_berlin.inf.dpp.stf.server.util.Util;
 public class RemoteBotEditor extends StfRemoteObject implements
     IRemoteBotEditor {
 
+    private static final Logger log = Logger.getLogger(RemoteBotEditor.class);
     private static final RemoteBotEditor INSTANCE = new RemoteBotEditor();
 
     private SWTBotEclipseEditor widget;
@@ -174,11 +190,18 @@ public class RemoteBotEditor extends StfRemoteObject implements
         widget.quickfix(index);
     }
 
-    /**********************************************
+    /*
      * 
      * states
-     * 
-     **********************************************/
+     */
+
+    public int getLineCount() throws RemoteException {
+        return widget.getLineCount();
+    }
+
+    public List<String> getLines() throws RemoteException {
+        return widget.getLines();
+    }
 
     public String getText() throws RemoteException {
         return widget.getText();
@@ -208,9 +231,97 @@ public class RemoteBotEditor extends StfRemoteObject implements
         return widget.isDirty();
     }
 
+    public List<Integer> getViewport() throws RemoteException {
+        @SuppressWarnings("deprecation")
+        final IEditorPart editorPart = widget.getEditorReference().getEditor(
+            false);
+
+        if (editorPart == null)
+            throw new WidgetNotFoundException(
+                "could not find editor part for editor " + widget.getTitle());
+
+        List<Integer> viewPort = UIThreadRunnable
+            .syncExec(new ListResult<Integer>() {
+                public List<Integer> run() {
+                    List<Integer> viewPort = new ArrayList<Integer>(2);
+                    ILineRange r = getEditorAPI().getViewport(editorPart);
+                    viewPort.add(r.getStartLine());
+                    viewPort.add(r.getNumberOfLines());
+                    return viewPort;
+                }
+            });
+
+        return viewPort;
+    }
+
     public String getSelection() throws RemoteException {
 
         return widget.getSelection();
+    }
+
+    public String getSelectionByAnnotation() throws RemoteException {
+
+        @SuppressWarnings("deprecation")
+        final IEditorPart editorPart = widget.getEditorReference().getEditor(
+            false);
+
+        if (editorPart == null)
+            throw new WidgetNotFoundException(
+                "could not find editor part for editor " + widget.getTitle());
+
+        if (!(editorPart instanceof ITextEditor))
+            throw new IllegalArgumentException(
+                "editor part is not an instance of ITextEditor");
+
+        List<Integer> selectionRange = UIThreadRunnable
+            .syncExec(new ListResult<Integer>() {
+                public List<Integer> run() {
+
+                    List<Integer> selectionRange = new ArrayList<Integer>();
+                    selectionRange.add(0);
+                    selectionRange.add(0);
+
+                    ITextEditor textEditor = (ITextEditor) editorPart;
+
+                    IDocumentProvider docProvider = textEditor
+                        .getDocumentProvider();
+
+                    if (docProvider == null)
+                        return selectionRange;
+
+                    IEditorInput input = textEditor.getEditorInput();
+                    IAnnotationModel model = docProvider
+                        .getAnnotationModel(input);
+
+                    if (model == null)
+                        return selectionRange;
+
+                    @SuppressWarnings("unchecked")
+                    Iterator<Annotation> annotationIterator = model
+                        .getAnnotationIterator();
+
+                    while (annotationIterator.hasNext()) {
+                        Annotation annotation = annotationIterator.next();
+
+                        if (!(annotation instanceof SelectionAnnotation))
+                            continue;
+
+                        Position p = model.getPosition(annotation);
+
+                        selectionRange.clear();
+                        selectionRange.add(p.getOffset());
+                        selectionRange.add(p.getLength());
+
+                        return selectionRange;
+                    }
+
+                    return selectionRange;
+                }
+            });
+
+        return widget.getText().substring(selectionRange.get(0),
+            selectionRange.get(1));
+
     }
 
     public List<String> getAutoCompleteProposals(String insertText)

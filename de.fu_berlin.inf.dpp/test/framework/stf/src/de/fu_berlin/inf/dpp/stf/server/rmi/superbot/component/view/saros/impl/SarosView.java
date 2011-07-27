@@ -167,11 +167,15 @@ public final class SarosView extends StfRemoteObject implements ISarosView {
                 shell.activate();
                 shell.bot().button(YES).click();
             } else {
+                boolean isLastInSession = tree.getTreeItem(NODE_SESSION)
+                    .getNodes().size() == 1;
                 clickToolbarButtonWithTooltip(TB_STOP_SESSION);
-                SWTBotShell shell = new SWTBot()
-                    .shell(SHELL_CONFIRM_CLOSING_SESSION);
-                shell.activate();
-                shell.bot().button(YES).click();
+                if (!isLastInSession) {
+                    SWTBotShell shell = new SWTBot()
+                        .shell(SHELL_CONFIRM_CLOSING_SESSION);
+                    shell.activate();
+                    shell.bot().button(YES).click();
+                }
             }
             waitUntilIsNotInSession();
         }

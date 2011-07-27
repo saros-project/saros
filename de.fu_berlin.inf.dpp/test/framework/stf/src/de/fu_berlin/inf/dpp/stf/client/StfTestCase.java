@@ -505,8 +505,7 @@ public abstract class StfTestCase {
         host.superBot().views().sarosView()
             .waitUntilAllPeersLeaveSession(peerJIDs);
 
-        host.superBot().views().sarosView().disconnect();
-
+        host.superBot().views().sarosView().leaveSession();
         host.superBot().views().sarosView().waitUntilIsNotInSession();
     }
 }
