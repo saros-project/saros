@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import org.apache.log4j.Logger;
 import org.eclipse.jface.bindings.keys.IKeyLookup;
 import org.eclipse.jface.bindings.keys.KeyStroke;
 import org.eclipse.jface.bindings.keys.ParseException;
@@ -35,7 +34,6 @@ import de.fu_berlin.inf.dpp.stf.server.util.Util;
 public class RemoteBotEditor extends StfRemoteObject implements
     IRemoteBotEditor {
 
-    private static final Logger log = Logger.getLogger(RemoteBotEditor.class);
     private static final RemoteBotEditor INSTANCE = new RemoteBotEditor();
 
     private SWTBotEclipseEditor widget;
@@ -311,7 +309,6 @@ public class RemoteBotEditor extends StfRemoteObject implements
                         selectionRange.clear();
                         selectionRange.add(p.getOffset());
                         selectionRange.add(p.getLength());
-
                         return selectionRange;
                     }
 
@@ -319,8 +316,9 @@ public class RemoteBotEditor extends StfRemoteObject implements
                 }
             });
 
-        return widget.getText().substring(selectionRange.get(0),
-            selectionRange.get(1));
+        String text = widget.getText();
+        return text.substring(selectionRange.get(0), selectionRange.get(0)
+            + selectionRange.get(1));
 
     }
 

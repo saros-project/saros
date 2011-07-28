@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.stf.test.invitation;
+package de.fu_berlin.inf.dpp.stf.test.invitation.version;
 
 import static de.fu_berlin.inf.dpp.stf.client.tester.SarosTester.ALICE;
 import static de.fu_berlin.inf.dpp.stf.client.tester.SarosTester.BOB;
@@ -14,9 +14,11 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import de.fu_berlin.inf.dpp.stf.annotation.TestLink;
 import de.fu_berlin.inf.dpp.stf.client.StfTestCase;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotShell;
 
+@TestLink(id = "Saros-132_version_mismatch")
 public class InviteWithDifferentVersionsTest extends StfTestCase {
 
     @BeforeClass

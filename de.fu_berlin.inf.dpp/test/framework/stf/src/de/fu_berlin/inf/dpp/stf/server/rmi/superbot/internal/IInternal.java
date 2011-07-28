@@ -122,4 +122,18 @@ public interface IInternal extends Remote {
 
     public void createJavaClass(String projectName, String packageName,
         String className) throws RemoteException;
+
+    /**
+     * Appends content to the give file
+     * 
+     * @param projectName
+     *            the name project where the java class should be created
+     * @param path
+     *            the relative path of the file e.g my/foo/bar/hello.java
+     * @param content
+     *            the content to append
+     * @throws RemoteException
+     */
+    public void append(String projectName, String path, String content)
+        throws RemoteException;
 }

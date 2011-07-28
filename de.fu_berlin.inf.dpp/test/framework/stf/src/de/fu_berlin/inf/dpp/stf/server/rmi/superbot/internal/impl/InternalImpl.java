@@ -175,6 +175,26 @@ public final class InternalImpl extends StfRemoteObject implements IInternal {
 
     }
 
+    public void append(String projectName, String path, String content)
+        throws RemoteException {
+        log.trace("appending content '" + content + "' to file '" + path
+            + "' in project '" + projectName + "'");
+        path = path.replace('\\', '/');
+
+        IFile file = ResourcesPlugin.getWorkspace().getRoot()
+            .getProject(projectName).getFile(path);
+
+        try {
+            file.appendContents(new ByteArrayInputStream(content.getBytes()),
+                true, false, null);
+
+        } catch (CoreException e) {
+            log.error(e.getMessage(), e);
+            throw new RemoteException(e.getMessage(), e.getCause());
+        }
+
+    }
+
     public void createFile(String projectName, String path, int size,
         boolean compressAble) throws RemoteException {
 

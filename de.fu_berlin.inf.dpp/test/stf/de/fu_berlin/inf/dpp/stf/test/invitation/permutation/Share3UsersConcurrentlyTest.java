@@ -1,7 +1,8 @@
-package de.fu_berlin.inf.dpp.stf.test.invitation;
+package de.fu_berlin.inf.dpp.stf.test.invitation.permutation;
 
 import static de.fu_berlin.inf.dpp.stf.client.tester.SarosTester.ALICE;
 import static de.fu_berlin.inf.dpp.stf.client.tester.SarosTester.BOB;
+import static de.fu_berlin.inf.dpp.stf.client.tester.SarosTester.CARL;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
@@ -16,33 +17,43 @@ import de.fu_berlin.inf.dpp.stf.client.util.Util;
 import de.fu_berlin.inf.dpp.stf.shared.Constants.TypeOfCreateProject;
 import de.fu_berlin.inf.dpp.stf.test.Constants;
 
-public class Share2UsersSequentiallyTest extends StfTestCase {
+public class Share3UsersConcurrentlyTest extends StfTestCase {
 
+    /**
+     * Preconditions:
+     * <ol>
+     * <li>Alice (Host, Write Access)</li>
+     * <li>Bob (Read-Only Access)</li>
+     * <li>Carl (Read-Only Access)</li>
+     * </ol>
+     * 
+     */
     @BeforeClass
     public static void selectTesters() throws Exception {
-        select(ALICE, BOB);
+        select(ALICE, BOB, CARL);
     }
 
     /**
      * Steps:
      * <ol>
-     * <li>Alice share project with BOB.</li>
+     * <li>Alice share project with BOB and CARL concurrently.</li>
      * <li>Alice and BOB leave the session.</li>
      * </ol>
      * 
      * Result:
      * <ol>
-     * <li>Alice and Bob are participants and have both
+     * <li>Alice, Bob and Carl are participants and have
      * {@link User.Permission#WRITE_ACCESS}.</li>
-     * <li>Alice and BOB have no {@link User.Permission}s after leaving the
-     * session.</li>
+     * <li>Alice, Bob and Carl have no {@link User.Permission}s after leaving
+     * the session.</li>
      * </ol>
      * 
      * @throws InterruptedException
      */
     @Test
-    public void testAliceShareProjectWithBobSequentially()
-        throws RemoteException, InterruptedException {
+    public void testShareProjectConcurrently() throws RemoteException,
+        InterruptedException {
+
         ALICE
             .superBot()
             .views()
@@ -51,12 +62,8 @@ public class Share2UsersSequentiallyTest extends StfTestCase {
             .newC()
             .javaProjectWithClasses(Constants.PROJECT1, Constants.PKG1,
                 Constants.CLS1);
-
-        Util.buildSessionSequentially(Constants.PROJECT1,
-            TypeOfCreateProject.NEW_PROJECT, ALICE, BOB);
-
-        assertTrue(BOB.superBot().views().sarosView().isInSession());
-        assertTrue(ALICE.superBot().views().sarosView().isInSession());
+        Util.buildSessionConcurrently(Constants.PROJECT1,
+            TypeOfCreateProject.NEW_PROJECT, ALICE, BOB, CARL);
 
         BOB.superBot()
             .views()
@@ -64,15 +71,32 @@ public class Share2UsersSequentiallyTest extends StfTestCase {
             .waitUntilClassExists(Constants.PROJECT1, Constants.PKG1,
                 Constants.CLS1);
 
+        CARL.superBot()
+            .views()
+            .packageExplorerView()
+            .waitUntilClassExists(Constants.PROJECT1, Constants.PKG1,
+                Constants.CLS1);
+
+        assertTrue(CARL.superBot().views().sarosView().isInSession());
+        assertFalse(ALICE.superBot().views().sarosView()
+            .selectParticipant(CARL.getJID()).hasReadOnlyAccess());
+        assertTrue(ALICE.superBot().views().sarosView()
+            .selectParticipant(CARL.getJID()).hasWriteAccess());
+
+        assertTrue(BOB.superBot().views().sarosView().isInSession());
         assertFalse(ALICE.superBot().views().sarosView()
             .selectParticipant(BOB.getJID()).hasReadOnlyAccess());
-
         assertTrue(ALICE.superBot().views().sarosView()
             .selectParticipant(BOB.getJID()).hasWriteAccess());
 
+        assertTrue(ALICE.superBot().views().sarosView().isInSession());
+
         leaveSessionPeersFirst(ALICE);
 
+        assertFalse(CARL.superBot().views().sarosView().isInSession());
+
         assertFalse(BOB.superBot().views().sarosView().isInSession());
+
         assertFalse(ALICE.superBot().views().sarosView().isInSession());
 
     }

@@ -9,7 +9,7 @@ import org.junit.runners.Suite;
     de.fu_berlin.inf.dpp.stf.test.editing.TestSuite.class,
     de.fu_berlin.inf.dpp.stf.test.filefolderoperations.TestSuite.class,
     de.fu_berlin.inf.dpp.stf.test.initialising.TestSuite.class,
-    de.fu_berlin.inf.dpp.stf.test.invitation.TestSuite.class,
+    de.fu_berlin.inf.dpp.stf.test.invitation.permutation.TestSuite.class,
     de.fu_berlin.inf.dpp.stf.test.permissionsandfollowmode.TestSuite.class,
     de.fu_berlin.inf.dpp.stf.test.reproducebugs.TestSuite.class,
     de.fu_berlin.inf.dpp.stf.test.rosterviewbehaviour.TestSuite.class,

@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.stf.test.invitation;
+package de.fu_berlin.inf.dpp.stf.test.invitation.permutation;
 
 import static de.fu_berlin.inf.dpp.stf.client.tester.SarosTester.ALICE;
 import static de.fu_berlin.inf.dpp.stf.client.tester.SarosTester.BOB;

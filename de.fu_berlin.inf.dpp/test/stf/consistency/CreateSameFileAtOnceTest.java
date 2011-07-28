@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.stf.test.session;
+package consistency;
 
 import static de.fu_berlin.inf.dpp.stf.client.tester.SarosTester.ALICE;
 import static de.fu_berlin.inf.dpp.stf.client.tester.SarosTester.BOB;
@@ -9,12 +9,14 @@ import static org.junit.Assert.fail;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import de.fu_berlin.inf.dpp.stf.annotation.TestLink;
 import de.fu_berlin.inf.dpp.stf.client.StfTestCase;
 import de.fu_berlin.inf.dpp.stf.client.tester.AbstractTester;
 import de.fu_berlin.inf.dpp.stf.client.util.Util;
 import de.fu_berlin.inf.dpp.stf.shared.Constants.TypeOfCreateProject;
 
-public class CreateSameFileAtOnce extends StfTestCase {
+@TestLink(id = "Saros-131_create_same_file_at_once")
+public class CreateSameFileAtOnceTest extends StfTestCase {
 
     @BeforeClass
     public static void selectTesters() throws Exception {
