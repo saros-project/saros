@@ -106,6 +106,7 @@ public class FollowModeAction extends Action implements Disposable {
         @Override
         public void sessionEnded(ISarosSession oldSarosSession) {
             oldSarosSession.removeListener(permissionChangeListener);
+            editorManager.setFollowing(null);
             toFollowUser = null;
             updateEnablement();
         }
