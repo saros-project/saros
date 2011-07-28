@@ -112,8 +112,8 @@ public class WizardUtils {
                 e);
         }
 
-        int width = (int) (Display.getCurrent().getBounds().width / 0.66);
-        int height = (int) (Display.getCurrent().getBounds().height / 0.66);
+        int width = (int) (Display.getCurrent().getBounds().width * 0.66);
+        int height = (int) (Display.getCurrent().getBounds().height * 0.66);
 
         if (width > GettingStartedWizardSize.x)
             width = GettingStartedWizardSize.x;
