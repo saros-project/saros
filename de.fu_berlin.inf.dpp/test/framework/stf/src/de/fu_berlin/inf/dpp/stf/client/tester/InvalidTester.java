@@ -7,7 +7,7 @@ import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.IRemoteWorkbenchBot;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.ISuperBot;
 
 /**
- * DummyTester is responsible to check if a tester is already initialized.
+ * Tester that could not be initialized.
  */
 class InvalidTester implements AbstractTester {
 

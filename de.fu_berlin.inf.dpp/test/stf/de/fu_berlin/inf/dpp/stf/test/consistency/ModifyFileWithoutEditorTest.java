@@ -1,4 +1,4 @@
-package consistency;
+package de.fu_berlin.inf.dpp.stf.test.consistency;
 
 import static de.fu_berlin.inf.dpp.stf.client.tester.SarosTester.ALICE;
 import static de.fu_berlin.inf.dpp.stf.client.tester.SarosTester.BOB;

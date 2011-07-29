@@ -85,7 +85,7 @@ public final class Configuration {
                     if (in != null)
                         in.close();
                 } catch (IOException ignore) {
-                    //
+                    LOGGER.log(Level.WARNING, ignore.getMessage(), ignore);
                 }
             }
         }
