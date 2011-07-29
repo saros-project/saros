@@ -191,25 +191,28 @@ public class UPnPManager {
             // perform discovery
             gateways = new ArrayList<GatewayDevice>(
                 upnpAccess.performDiscovery());
-        } catch (Exception e) {
-            log.debug("Error discovering a gateway:" + e.getMessage());
-        }
 
-        if (gateways == null || gateways.isEmpty()) {
-            log.debug("No gateway device found.");
-            setSelectedGateway(null); // disable UPnP feature
-        } else {
-            log.debug(gateways.size() + " gateway(s) discovered.");
-            for (GatewayDevice gw : gateways) {
-                if (gw.getUSN().equals(getPreSelectedDeviceID())) {
-                    selectedGateway = gw;
-                    log.debug("Using selected device: " + gw.getFriendlyName());
+            if (gateways == null || gateways.isEmpty()) {
+                log.debug("No gateway device found.");
+                setSelectedGateway(null); // disable UPnP feature
+            } else {
+                log.debug(gateways.size() + " gateway(s) discovered.");
+
+                for (GatewayDevice gw : gateways) {
+                    if (gw.getUSN().equals(getPreSelectedDeviceID())) {
+                        selectedGateway = gw;
+                        log.debug("Using selected device: "
+                            + gw.getFriendlyName());
+                    }
                 }
             }
-        }
 
-        if (selectedGateway != null) {
-            checkAndRemoveOldMapping();
+            if (selectedGateway != null) {
+                checkAndRemoveOldMapping();
+            }
+
+        } catch (Exception e) {
+            log.debug("Error discovering a gateway:" + e.getMessage());
         }
 
         discoveryRunningSemaphore.release();
