@@ -102,26 +102,40 @@ public class WizardUtils {
      * @return the wizard if it was successfully finished; null otherwise
      */
     public static GettingStartedWizard openSarosGettingStartedWizard(
-        boolean showConfigNote) {
-        Shell shell = null;
+        final boolean showConfigNote) {
+
         try {
-            shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow()
-                .getShell();
+            return Utils.runSWTSync(new Callable<GettingStartedWizard>() {
+                public GettingStartedWizard call() {
+
+                    Shell shell = null;
+
+                    try {
+                        shell = PlatformUI.getWorkbench()
+                            .getActiveWorkbenchWindow().getShell();
+                    } catch (Exception e) {
+                        log.warn(
+                            "Error while determining the main shell for the tutorial",
+                            e);
+                    }
+
+                    int width = (int) (Display.getCurrent().getBounds().width * 0.66);
+                    int height = (int) (Display.getCurrent().getBounds().height * 0.66);
+
+                    if (width > GettingStartedWizardSize.x)
+                        width = GettingStartedWizardSize.x;
+                    if (height > GettingStartedWizardSize.y)
+                        height = GettingStartedWizardSize.y;
+
+                    return openWizardSuccessfully(shell,
+                        new GettingStartedWizard(showConfigNote), new Point(
+                            width, height));
+                }
+            });
         } catch (Exception e) {
-            log.warn("Error while determining the main shell for the tutorial",
-                e);
+            log.error("could not create getting started wizard", e);
+            return null;
         }
-
-        int width = (int) (Display.getCurrent().getBounds().width * 0.66);
-        int height = (int) (Display.getCurrent().getBounds().height * 0.66);
-
-        if (width > GettingStartedWizardSize.x)
-            width = GettingStartedWizardSize.x;
-        if (height > GettingStartedWizardSize.y)
-            height = GettingStartedWizardSize.y;
-
-        return openWizardSuccessfully(shell, new GettingStartedWizard(
-            showConfigNote), new Point(width, height));
     }
 
     /**

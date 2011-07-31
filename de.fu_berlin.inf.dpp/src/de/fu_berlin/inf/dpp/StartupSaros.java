@@ -52,6 +52,11 @@ public class StartupSaros implements IStartup {
         SarosPluginContext.reinject(this);
     }
 
+    /*
+     * Once the workbench is started, the method earlyStartup() will be called
+     * from a separate thread
+     */
+
     public void earlyStartup() {
         String currentVersion = saros.getVersion();
 
@@ -82,12 +87,19 @@ public class StartupSaros implements IStartup {
          * Saros is already configured, do not show the tutorial because the
          * user is probably already experienced.
          */
-        if (!xmppAccountStore.hasActiveAccount()) {
-            if (!preferenceUtils.isGettingStartedFinished()) {
-                WizardUtils.openSarosGettingStartedWizard(true);
-            }
+
+        showWizards(!xmppAccountStore.hasActiveAccount(),
+            !preferenceUtils.isGettingStartedFinished());
+    }
+
+    protected void showWizards(boolean showConfigurationWizard,
+        boolean showGettingStartedWizard) {
+
+        if (showGettingStartedWizard)
+            WizardUtils.openSarosGettingStartedWizard(true);
+
+        if (showConfigurationWizard)
             WizardUtils.openSarosConfigurationWizard();
-        }
     }
 
     protected void startRmiBot(final int port) {
