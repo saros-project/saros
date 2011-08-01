@@ -478,7 +478,10 @@ public class OutgoingSessionNegotiation extends InvitationProcess {
             monitor.setTaskName("Invitation failed.");
         }
         sarosSession.returnColor(this.colorID);
-        sarosSessionManager.stopSarosSession();
+
+        if (sarosSession.getRemoteUsers().isEmpty())
+            sarosSessionManager.stopSarosSession();
+
         if (invitationProcesses.getProcesses().containsValue(this))
             invitationProcesses.removeInvitationProcess(this);
         throw cancellationCause;
