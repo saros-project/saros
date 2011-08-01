@@ -310,7 +310,10 @@ public interface Constants {
     public final static String SHELL_CLOSING_THE_SESSION = Configuration
         .getString("close_the_session");
     public final static String SHELL_CONFIRM_LEAVING_SESSION = Configuration
-        .getString("comfirm_leaving_session");
+        .getString("confirm_leaving_session");
+
+    public final static String SHELL_CONFIRM_DECLINE_INVITATION = Configuration
+        .getString("shell_confirm_decline_invitation");
 
     public final static String TB_DISCONNECT = Configuration
         .getString("tb_disconnect");
