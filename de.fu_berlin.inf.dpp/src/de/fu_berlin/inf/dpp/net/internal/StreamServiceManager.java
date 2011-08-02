@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -1838,16 +1839,15 @@ public class StreamServiceManager implements Startable {
     protected final class SharedProjectListener implements
         ISharedProjectListener {
         public void userLeft(User user) {
-            // remove his sessions
-            synchronized (sessions) {
-                // avoid ConcurrentModificationException when a sessions removes
-                // itself
-                for (StreamSession session : ImmutableList.copyOf(sessions
-                    .values())) {
-                    if (session.remoteJID.equals(user.getJID())) {
-                        session
-                            .reportErrorAndDispose(new ReceiverGoneException());
-                    }
+
+            // avoid ConcurrentModificationException when a sessions removes
+            // itself
+            List<StreamSession> currentSessions = new ArrayList<StreamSession>();
+            currentSessions.addAll(sessions.values());
+
+            for (StreamSession session : currentSessions) {
+                if (session.remoteJID.equals(user.getJID())) {
+                    session.reportErrorAndDispose(new ReceiverGoneException());
                 }
             }
         }
