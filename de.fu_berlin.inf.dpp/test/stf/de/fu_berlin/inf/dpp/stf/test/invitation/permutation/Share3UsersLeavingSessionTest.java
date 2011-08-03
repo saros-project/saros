@@ -4,12 +4,15 @@ import static de.fu_berlin.inf.dpp.stf.client.tester.SarosTester.ALICE;
 import static de.fu_berlin.inf.dpp.stf.client.tester.SarosTester.BOB;
 import static de.fu_berlin.inf.dpp.stf.client.tester.SarosTester.CARL;
 import static de.fu_berlin.inf.dpp.stf.shared.Constants.ACCEPT;
+import static de.fu_berlin.inf.dpp.stf.shared.Constants.OK;
 import static de.fu_berlin.inf.dpp.stf.shared.Constants.SHELL_SESSION_INVITATION;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.rmi.RemoteException;
 
+import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -76,6 +79,11 @@ public class Share3UsersLeavingSessionTest extends StfTestCase {
 
         CARL.remoteBot().sleep(2000);
 
+        try {
+            CARL.remoteBot().shell("Invitation Cancelled").confirm(OK);
+        } catch (WidgetNotFoundException e) {
+            fail("Invitation Cancelled is not open: " + e.getMessage());
+        }
         assertFalse(CARL + " is in a closed session", CARL.superBot().views()
             .sarosView().isInSession());
         assertFalse(ALICE + " is in a closed session", ALICE.superBot().views()

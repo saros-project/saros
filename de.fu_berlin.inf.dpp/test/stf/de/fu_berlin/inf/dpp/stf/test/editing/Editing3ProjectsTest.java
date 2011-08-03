@@ -14,7 +14,7 @@ import de.fu_berlin.inf.dpp.stf.client.StfTestCase;
 import de.fu_berlin.inf.dpp.stf.client.util.Util;
 import de.fu_berlin.inf.dpp.stf.shared.Constants.TypeOfCreateProject;
 
-@TestLink(id = "")
+@TestLink(id = "Saros-108_add_3_new_projects_to_a_existing_session")
 public class Editing3ProjectsTest extends StfTestCase {
 
     @BeforeClass
@@ -23,7 +23,7 @@ public class Editing3ProjectsTest extends StfTestCase {
     }
 
     @Test
-    public void testShareMultipleWithBobSequencetially() throws RemoteException {
+    public void testEditing3Projects() throws RemoteException {
 
         ALICE.superBot().internal().createJavaProject("foo");
         ALICE.superBot().internal().createJavaProject("foo1");

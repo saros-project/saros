@@ -3,6 +3,8 @@ package de.fu_berlin.inf.dpp.stf.test.reproducebugs;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
+import de.fu_berlin.inf.dpp.stf.test.invitation.permutation.EditDuringInvitationTest;
+
 @RunWith(Suite.class)
 @Suite.SuiteClasses({ EditDuringInvitationTest.class,
     HostInvitesBelatedlyTest.class,

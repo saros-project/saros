@@ -2,15 +2,11 @@ package de.fu_berlin.inf.dpp.stf.server.bot;
 
 import static org.eclipse.swtbot.swt.finder.matchers.WidgetMatcherFactory.allOf;
 import static org.eclipse.swtbot.swt.finder.matchers.WidgetMatcherFactory.widgetOfType;
-import static org.eclipse.swtbot.swt.finder.matchers.WidgetMatcherFactory.withMnemonic;
-import static org.eclipse.swtbot.swt.finder.matchers.WidgetMatcherFactory.withStyle;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Widget;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
@@ -23,7 +19,6 @@ import org.hamcrest.Matcher;
 import de.fu_berlin.inf.dpp.stf.server.bot.widget.SarosSWTBotChatInput;
 import de.fu_berlin.inf.dpp.stf.server.bot.widget.SarosSWTBotChatLine;
 import de.fu_berlin.inf.dpp.stf.server.bot.widget.SarosSWTBotChatLinePartnerChangeSeparator;
-import de.fu_berlin.inf.dpp.stf.server.bot.widget.SarosSWTBotRadio;
 import de.fu_berlin.inf.dpp.ui.widgets.chatControl.items.ChatLine;
 import de.fu_berlin.inf.dpp.ui.widgets.chatControl.items.ChatLinePartnerChangeSeparator;
 import de.fu_berlin.inf.dpp.ui.widgets.chatControl.parts.ChatDisplay;
@@ -39,35 +34,6 @@ import de.fu_berlin.inf.dpp.ui.widgets.chatControl.parts.ChatInput;
 public final class SarosSWTBot extends SWTWorkbenchBot {
 
     private static final Logger log = Logger.getLogger(SarosSWTBot.class);
-
-    /**
-     * @param mnemonicText
-     *            the mnemonicText on the widget.
-     * @return a {@link SarosSWTBotRadio} with the specified
-     *         <code>mnemonicText</code>.
-     * @throws WidgetNotFoundException
-     *             if the widget is not found or is disposed.
-     */
-    @Override
-    public SarosSWTBotRadio radio(String mnemonicText) {
-        return radio(mnemonicText, 0);
-    }
-
-    /**
-     * @param mnemonicText
-     *            the mnemonicText on the widget.
-     * @param index
-     *            the index of the widget.
-     * @return a {@link SarosSWTBotRadio} with the specified
-     *         <code>mnemonicText</code>.
-     */
-    @Override
-    @SuppressWarnings({ "unchecked", "rawtypes" })
-    public SarosSWTBotRadio radio(String mnemonicText, int index) {
-        Matcher matcher = allOf(widgetOfType(Button.class),
-            withMnemonic(mnemonicText), withStyle(SWT.RADIO, "SWT.RADIO"));
-        return new SarosSWTBotRadio((Button) widget(matcher, index), matcher);
-    }
 
     /**
      * @return a {@link SarosSWTBotChatInput} with the specified

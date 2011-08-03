@@ -38,6 +38,8 @@ public final class ContextMenusInSessionArea extends ContextMenusInSarosView
                 + "\" already has write access!.");
         }
 
+        log.trace("clicking on context menu item: " + CM_GRANT_WRITE_ACCESS);
+
         SWTBotTreeItem treeItem = getTreeItem();
 
         try {
@@ -58,6 +60,9 @@ public final class ContextMenusInSessionArea extends ContextMenusInSarosView
                 + "\" already has read-only access!");
         }
 
+        log.trace("clicking on context menu item: "
+            + CM_RESTRICT_TO_READ_ONLY_ACCESS);
+
         SWTBotTreeItem treeItem = getTreeItem();
 
         try {
@@ -73,14 +78,18 @@ public final class ContextMenusInSessionArea extends ContextMenusInSarosView
     }
 
     public void followParticipant() throws RemoteException {
+        log.trace("start following participant: " + participantJID.getBase());
 
         if (isFollowing()) {
-            log.debug(participantJID.getBase() + " is already followed by you.");
+            log.debug("you are already following participant: "
+                + participantJID.getBase());
             return;
         }
         if (SuperBot.getInstance().getJID().equals(participantJID)) {
             throw new RuntimeException("you can't follow yourself");
         }
+
+        log.trace("clicking on context menu item: " + CM_FOLLOW_PARTICIPANT);
 
         SWTBotTreeItem treeItem = getTreeItem();
 
@@ -91,12 +100,16 @@ public final class ContextMenusInSessionArea extends ContextMenusInSarosView
             logError(log, e, tree, treeItem);
             throw e;
         }
+
+        waitUntilIsFollowing();
     }
 
     public void stopFollowing() throws RemoteException {
-        log.debug(" JID of the followed user: " + participantJID.getBase());
+        log.trace("stop following user: " + participantJID.getBase());
 
         SWTBotTreeItem treeItem = getTreeItem();
+
+        log.trace("clicking on context menu item: " + CM_STOP_FOLLOWING);
 
         try {
             treeItem.select();
@@ -117,6 +130,9 @@ public final class ContextMenusInSessionArea extends ContextMenusInSarosView
 
         SWTBotTreeItem treeItem = getTreeItem();
 
+        log.trace("clicking on context menu item: "
+            + CM_JUMP_TO_POSITION_SELECTED_BUDDY);
+
         try {
             treeItem.select();
             ContextMenuHelper.clickContextMenu(tree,
@@ -132,6 +148,8 @@ public final class ContextMenusInSessionArea extends ContextMenusInSarosView
 
         SWTBotTreeItem treeItem = getTreeItem();
 
+        log.trace("clicking on context menu item: " + ADD_PROJECTS);
+
         try {
             treeItem.select();
             ContextMenuHelper.clickContextMenu(tree, ADD_PROJECTS);
@@ -145,6 +163,8 @@ public final class ContextMenusInSessionArea extends ContextMenusInSarosView
 
     public void addBuddies(String... jidOfInvitees) throws RemoteException {
         SWTBotTreeItem treeItem = getTreeItem();
+
+        log.trace("clicking on context menu item: " + ADD_BUDDIES);
 
         try {
             treeItem.select();
@@ -161,6 +181,8 @@ public final class ContextMenusInSessionArea extends ContextMenusInSarosView
         throws RemoteException {
 
         SWTBotTreeItem treeItem = getTreeItem();
+
+        log.trace("clicking on context menu item: " + SHARE_PROJECTS);
 
         try {
             treeItem.select();

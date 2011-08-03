@@ -214,12 +214,12 @@ public class ContextMenuHelper {
                         Matcher<?> matcher = allOf(instanceOf(MenuItem.class),
                             withMnemonic(text));
                         menuItem = show(menu, matcher);
-                        if (menuItem != null) {
+
+                        if (menuItem != null)
                             menu = menuItem.getMenu();
-                        } else {
-                            hide(menu);
+                        else
                             break;
-                        }
+
                     }
 
                     return menuItem;

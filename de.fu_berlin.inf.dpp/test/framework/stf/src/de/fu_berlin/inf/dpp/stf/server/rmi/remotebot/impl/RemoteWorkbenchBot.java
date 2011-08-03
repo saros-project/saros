@@ -284,6 +284,10 @@ public final class RemoteWorkbenchBot extends RemoteBot implements
                         shell.bot().waitUntil(Conditions.shellCloses(shell));
                         continue;
                     }
+                    if (shellName.equals("File Changed")) {
+                        shell.bot().button(NO).click();
+                        continue;
+                    }
                     if (shellName.equals("Synchronizing")) {
                         shell.bot().button(CANCEL).click();
                         continue;
