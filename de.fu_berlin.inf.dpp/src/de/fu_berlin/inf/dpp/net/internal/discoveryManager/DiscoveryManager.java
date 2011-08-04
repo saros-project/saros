@@ -449,7 +449,7 @@ public class DiscoveryManager implements Disposable {
      * 
      * @param discoveryManagerListener
      */
-    public void addDiscoveryManagerListener(
+    public synchronized void addDiscoveryManagerListener(
         DiscoveryManagerListener discoveryManagerListener) {
         this.discoveryManagerListeners.add(discoveryManagerListener);
     }
@@ -459,7 +459,7 @@ public class DiscoveryManager implements Disposable {
      * 
      * @param discoveryManagerListener
      */
-    public void removeDiscoveryManagerListener(
+    public synchronized void removeDiscoveryManagerListener(
         DiscoveryManagerListener discoveryManagerListener) {
         this.discoveryManagerListeners.remove(discoveryManagerListener);
     }
@@ -468,8 +468,8 @@ public class DiscoveryManager implements Disposable {
      * Notify all {@link DiscoveryManagerListener}s about an updated feature
      * support.
      */
-    public void notifyFeatureSupportUpdated(JID jid, String feature,
-        boolean isSupported) {
+    public synchronized void notifyFeatureSupportUpdated(JID jid,
+        String feature, boolean isSupported) {
         for (DiscoveryManagerListener discoveryManagerListener : this.discoveryManagerListeners) {
             discoveryManagerListener.featureSupportUpdated(jid, feature,
                 isSupported);
