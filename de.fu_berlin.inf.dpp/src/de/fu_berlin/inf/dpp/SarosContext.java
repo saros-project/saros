@@ -116,7 +116,7 @@ import de.fu_berlin.inf.dpp.videosharing.VideoSharingService;
 
 /**
  * Encapsulates a {@link org.picocontainer.PicoContainer} and its saros-specific
- * initializiation. Basicly it's used to get or reinject components in the
+ * initializiation. Basically it's used to get or reinject components in the
  * context:
  * 
  * {@link de.fu_berlin.inf.dpp.SarosContext#getComponent(Class)},
