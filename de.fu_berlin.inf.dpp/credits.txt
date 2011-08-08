@@ -1,17 +1,55 @@
+Icons: Eclipse Org. & Silk Icon set by http://www.famfamfam.com
 
- Author: Riad Djemili, Christopher Oezbek, Bj�rn Gustavs, Oliver Rieger
- 
- Icons: Eclipse Org. & Silk Icon set by http://www.famfamfam.com
- 
- Jupiter Algorithm Implementation taken from "ace - A Collaborative Editor"
- 
- This project uses the following libraries: 
- 
-   * Log4J - Apache ASL 2.0
-   * Smack - Apache ASL 2.0
-   * PicoContainer - Simplified BSD 
-   * Limewire - GPLv2.0 or later
-   * Easy Mock - MIT
-   * XStream - Simplified BSD
-   * Commons IO/Lang/Codec - Apache ASL 2.0
-   * JUnit - CPL
+Jupiter Algorithm Implementation taken from "ace - A Collaborative Editor"
+
+This project uses the following libraries: 
+
+	* Log4J - Apache ASL 2.0
+	* Smack - Apache ASL 2.0
+	* PicoContainer - Simplified BSD 
+	* Limewire - GPLv2.0 or later
+	* Easy Mock - MIT
+	* XStream - Simplified BSD
+	* Commons IO/Lang/Codec - Apache ASL 2.0
+	* JUnit - CPL
+	* SWTBot - EPL
+	* JSpeex - BSD
+	* Hamcrest - BSD
+	
+
+This is a list of people (in no particular order) who have been part of the 
+Saros team over the years and have contributed to the product: 
+	* Riad Djemili
+	* Christopher Oezbek
+	* Bjoern Gustavs
+	* Oliver Rieger
+	* Christoph Jacob
+	* Florian Thiel
+	* Marc Rintsch
+	* Lisa Dohrmann
+	* Sebastian Ziller
+	* Tas Sóti
+	* Edna Rosen
+	* Karl Beecher
+	* Alena Kiwitt
+	* Sandor Szücs
+	* Olaf Loga
+	* Stephan Lau
+	* Henning Staib
+	* Eike Starkmann
+	* Florian Pütz
+	* Andreas Haferburg
+	* Umut Erdogan
+	* Michael Jurke
+	* Sebastian Bauch
+	* Christian Dohnert
+	* Patrick Bitterling
+	* Lin Chen
+	* Björn Kahlert
+	* Philipp Cordes
+	* Wjatscheslaw Belousow
+	* Karl Held
+	* Meike Johannsen
+	* Stefan Rossbach
+	* Arsenij Solovjev
+	* Hendrik Degener
