@@ -1,18 +1,18 @@
 11.7.1
 ======
-[FEATURE] (karlheld) Partial Sharing feature
-[FEATURE] (ornis) Added UPnP support (Saros can add a port mapping for Saros on UPnP enabled routers). Added external IP detection for Socks5Proxy configuration
-[FEATURE] (ornis) Updated smack to v3.2.0
-[FEATURE] (kargor) #3307988 Sort online buddies over offline
+[FEATURE] Partial Sharing feature
+[FEATURE] Added UPnP support (Saros can add a port mapping for Saros on UPnP enabled routers). Added external IP detection for Socks5Proxy configuration
+[FEATURE] Updated smack to v3.2.0
+[FEATURE] #3307988 Sort online buddies over offline
 
-[FIX] (karlheld) #3300590 Poor Feedback During Invitation Process
-[FIX] (karlheld) #3294842 Invitation with a large project causes large gaps
-[FIX] (ornis) #3307407: project negotiation failed (timed out) for large large projects
-[FIX] (ornis) Retry failed activity transmissions
-[FIX] (ornis) #3338265: IBB Warning was displayed in AddProjectToSessionWizard although transport type was not known yet (Socks5 may be established later on)
-[FIX] (kargor) used wrong method on inet address resulting in useless socks5proxy support
-[FIX] (karlheld) SVN managed Projects better supported in partial Sharing
-[FIX] (k_beecher) #3309643 Survey URL updated
+[FIX] #3300590 Poor Feedback During Invitation Process
+[FIX] #3294842 Invitation with a large project causes large gaps
+[FIX] #3307407: project negotiation failed (timed out) for large large projects
+[FIX] Retry failed activity transmissions
+[FIX] #3338265: IBB Warning was displayed in AddProjectToSessionWizard although transport type was not known yet (Socks5 may be established later on)
+[FIX] used wrong method on inet address resulting in useless socks5proxy support
+[FIX] SVN managed Projects better supported in partial Sharing
+[FIX] #3309643 Survey URL updated
 
 
 11.5.6
