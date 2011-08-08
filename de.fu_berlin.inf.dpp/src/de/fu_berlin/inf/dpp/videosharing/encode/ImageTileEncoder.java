@@ -217,8 +217,6 @@ public final class ImageTileEncoder extends Encoder {
                     objectOut.writeObject(new Tile(imageOutput.toByteArray(),
                         0, 0, image.getWidth(), image.getHeight(), image
                             .getWidth(), image.getHeight()));
-                    objectOut.flush();
-
                 } else {
 
                     int[] rasterOld = ((DataBufferInt) lastImage.getRaster()
@@ -242,7 +240,6 @@ public final class ImageTileEncoder extends Encoder {
                             .toByteArray(), dirtyTile.x, dirtyTile.y,
                             dirtyTile.w, dirtyTile.h, image.getWidth(), image
                                 .getHeight()));
-                        objectOut.flush();
                     }
 
                     maxBandwidthUsed = Math.max(maxBandwidthUsed, bytesWritten);
@@ -257,6 +254,7 @@ public final class ImageTileEncoder extends Encoder {
                  * send at all
                  */
                 objectOut.writeObject(new Tile(new byte[0], 0, 0, 0, 0, 0, 0));
+                objectOut.flush();
 
             } catch (IOException e) {
                 log.error(e.getMessage(), e);
