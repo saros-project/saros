@@ -76,13 +76,6 @@ public class SubscriptionManager {
                 if (!(packet instanceof Presence))
                     return;
 
-                if (packet.getFrom().equals(connection.getUser())) {
-                    // If we receive a presence package from ourself, then we
-                    // are too lazy to manage subscription events by ourself.
-                    connection.getRoster().reload();
-                    return;
-                }
-
                 final Presence presence = (Presence) packet;
                 log.debug("Received presence packet from: "
                     + Utils.prefix(new JID(presence.getFrom())) + " "
@@ -188,8 +181,6 @@ public class SubscriptionManager {
         default:
             // do nothing
         }
-
-        connection.getRoster().reload();
     }
 
     protected void sendPresence(Presence.Type type, String to) {
