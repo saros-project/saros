@@ -109,6 +109,7 @@ public class GettingStartedWizard extends Wizard {
                                     * imgWidth);
                         }
 
+                        e.gc.setAntialias(SWT.ON);
                         e.gc.drawImage(
                             contentImage,
                             0,
