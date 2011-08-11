@@ -2,6 +2,8 @@ package de.fu_berlin.inf.dpp.ui.actions;
 
 import org.apache.log4j.Logger;
 import org.eclipse.jface.action.Action;
+import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.swt.graphics.ImageData;
 import org.picocontainer.Disposable;
 import org.picocontainer.annotations.Inject;
 
@@ -134,9 +136,13 @@ public class FollowModeAction extends Action implements Disposable {
         super(null, AS_CHECK_BOX);
 
         SarosPluginContext.initComponent(this);
+        setImageDescriptor(new ImageDescriptor() {
+            @Override
+            public ImageData getImageData() {
+                return ImageManager.ICON_BUDDY_SAROS_FOLLOWMODE.getImageData();
+            }
+        });
 
-        setImageDescriptor(ImageManager
-            .getImageDescriptor("/icons/monitor_add.png"));
         setToolTipText("Enable/Disable Follow Mode");
         setId(ACTION_ID);
 

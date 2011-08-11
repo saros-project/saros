@@ -4,7 +4,9 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.eclipse.jface.action.Action;
+import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.PlatformUI;
@@ -81,8 +83,13 @@ public class FollowThisPersonAction extends Action implements Disposable {
 
         SarosPluginContext.initComponent(this);
 
-        setImageDescriptor(ImageManager
-            .getImageDescriptor("/icons/monitor_add.png"));
+        setImageDescriptor(new ImageDescriptor() {
+            @Override
+            public ImageData getImageData() {
+                return ImageManager.ICON_BUDDY_SAROS_FOLLOWMODE.getImageData();
+            }
+        });
+
         setToolTipText("Follow Currently Selected Participant");
         setId(ACTION_ID);
 
