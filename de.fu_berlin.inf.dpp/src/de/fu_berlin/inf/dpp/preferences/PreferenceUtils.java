@@ -1,9 +1,5 @@
 package de.fu_berlin.inf.dpp.preferences;
 
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
-
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioFormat.Encoding;
 import javax.sound.sampled.Mixer;
@@ -17,7 +13,6 @@ import org.xiph.speex.spi.SpeexEncoding;
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.communication.audio.MixerManager;
-import de.fu_berlin.inf.dpp.net.JID;
 
 @Component(module = "prefs")
 public class PreferenceUtils {
@@ -37,22 +32,6 @@ public class PreferenceUtils {
 
     public boolean isDebugEnabled() {
         return saros.getPreferenceStore().getBoolean(PreferenceConstants.DEBUG);
-    }
-
-    public List<JID> getAutoInviteUsers() {
-
-        String autoInvite = saros.getPreferenceStore().getString(
-            PreferenceConstants.AUTO_INVITE);
-
-        if (autoInvite == null || autoInvite.trim().length() == 0)
-            return Collections.emptyList();
-
-        List<JID> result = new LinkedList<JID>();
-
-        for (String user : autoInvite.split(",")) {
-            result.add(new JID(user.trim()));
-        }
-        return result;
     }
 
     public boolean isAutoReuseExisting() {

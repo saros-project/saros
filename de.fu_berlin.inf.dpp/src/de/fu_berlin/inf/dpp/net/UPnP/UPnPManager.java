@@ -85,7 +85,7 @@ public class UPnPManager {
             setPreSelectedDeviceID(prefStore
                 .getString(PreferenceConstants.AUTO_PORTMAPPING_DEVICEID));
 
-            if (!getPreSelectedDeviceID().isEmpty()) {
+            if (getPreSelectedDeviceID().length() != 0) {
                 startGatewayDiscovery(false);
             }
         }
