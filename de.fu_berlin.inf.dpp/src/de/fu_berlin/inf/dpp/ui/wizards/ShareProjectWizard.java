@@ -47,6 +47,23 @@ public class ShareProjectWizard extends Wizard {
         this.addPage(this.buddySelectionWizardPage);
     }
 
+    /**
+     * @JTourBusStop 2, Invitation Process:
+     * 
+     *               The the chosen resources are put into collections to be
+     *               sent to the chosen buddies.
+     * 
+     *               As a slight detour, notice that the call to
+     *               CollaborationUtils.shareResourcesWith includes
+     *               sarosSessionManager as an argument. However, when you look
+     *               through this class you should find this variable is
+     *               declared but never initialised! It is not null however.
+     * 
+     *               Notice that "@Inject" annotation above the
+     *               sarosSessionManager declaration? That means that the our
+     *               PicoContainer has taken care of initialising the variable
+     *               for us. Look up PicoContainer to find out more about this.
+     */
     @Override
     public boolean performFinish() {
         List<IResource> selectedResources = projectSelectionWizardPage

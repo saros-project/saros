@@ -39,6 +39,18 @@ import de.fu_berlin.inf.dpp.project.ISarosSession;
 public interface IActivity {
 
     /**
+     * @JTourBusStop 4, Some Basics:
+     * 
+     *               When a session has begun, messages are passed between all
+     *               participants to keep the session synchronised. The messages
+     *               are known as Activities and come in different types. Each
+     *               type inherits from this interface and implements its
+     *               specific behaviour.
+     * 
+     *               Handling of Activities is done using the Inversion of
+     *               Control pattern.
+     */
+    /**
      * Returns the the user which has caused this activity.
      */
     public User getSource();

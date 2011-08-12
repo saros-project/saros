@@ -21,6 +21,16 @@ import de.fu_berlin.inf.dpp.project.ISarosSession;
 public class SPath {
 
     /**
+     * @JTourBusStop 5, Some Basics:
+     * 
+     *               Individual eclipse projects use IPaths to identify their
+     *               resources. However, because Saros needs to keep track of
+     *               resources across multiple projects, it encapsulates IPaths
+     *               in an SPath that includes additional identifying
+     *               information.
+     */
+
+    /**
      * The project relative path of the resource or editor this SPath
      * represents.
      */

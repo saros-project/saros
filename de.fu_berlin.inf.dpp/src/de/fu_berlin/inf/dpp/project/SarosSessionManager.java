@@ -163,6 +163,22 @@ public class SarosSessionManager implements IConnectionListener,
 
     protected static final Random sessionRandom = new Random();
 
+    /**
+     * @JTourBusStop 3, Invitation Process:
+     * 
+     *               This class manages the current Saros session.
+     * 
+     *               Saros makes a distinction between a session and a shared
+     *               project. A session is an on-line collaboration between
+     *               users which allows users to carry out activities. The main
+     *               activity is to share projects. Hence, before you share a
+     *               project, a session has to be started and all users added to
+     *               it.
+     * 
+     *               (At the moment, this separation is invisible to the user.
+     *               He/she must share a project in order to start a session.)
+     * 
+     */
     public void startSession(
         HashMap<IProject, List<IResource>> projectResourcesMapping)
         throws XMPPException {

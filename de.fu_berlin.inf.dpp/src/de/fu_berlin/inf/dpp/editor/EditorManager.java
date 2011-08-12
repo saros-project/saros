@@ -118,6 +118,21 @@ import de.fu_berlin.inf.dpp.util.Utils;
 @Component(module = "core")
 public class EditorManager implements IActivityProvider, Disposable {
 
+    /**
+     * @JTourBusStop 6, Some Basics:
+     * 
+     *               When you work on a project using Saros, you still use the
+     *               standard Eclipse Editor, however Saros adds a little extra
+     *               needed functionality to them.
+     * 
+     *               EditorManager is one of the most important classes in this
+     *               respect. Remember than every change done in an Editor needs
+     *               to be intercepted, translated into an Activity and sent to
+     *               all other participants. Furthermore every Activity from
+     *               other participants needs to be replayed in your local
+     *               editor when it received.
+     */
+
     protected static final Logger log = Logger.getLogger(EditorManager.class
         .getName());
 

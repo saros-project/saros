@@ -108,6 +108,30 @@ public class OutgoingSessionNegotiation extends InvitationProcess {
 
     }
 
+    /**
+     * @JTourBusStop 5, Invitation Process:
+     * 
+     *               The details of the invitation process are implemented in
+     *               the invitation package. OutgoingSessionNegotiation is an
+     *               example of a class that participates in this process.
+     * 
+     *               The host of a session needs negotiations for:
+     * 
+     *               - Sending invitation to a session
+     *               (OutgoingSessionNegotiation)
+     * 
+     *               - Sending project resources included in a session
+     *               (OutgoingProcjectNegotiation)
+     * 
+     *               All other participants need negotiations for:
+     * 
+     *               - Dealing with a received invitation to a session
+     *               (IncomingSessionNegotiation)
+     * 
+     *               - Handling incoming shared project resources
+     *               (IncomingProjectNegotiation)
+     */
+
     public void start(SubMonitor monitor) throws SarosCancellationException {
 
         /*

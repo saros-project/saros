@@ -95,6 +95,21 @@ import de.fu_berlin.inf.dpp.util.Utils;
 import de.fu_berlin.inf.dpp.util.pico.ChildContainer;
 
 /**
+ * @JTourBusStop 1, The Interface Tour:
+ * 
+ *               This tour shows you a few keys parts of the Saros interface and
+ *               how it functions. It will give you a glimpse of the main views
+ *               used by Saros, an idea about how to code the user interface and
+ *               how it communicates with the underlying business logic.
+ * 
+ *               We begin here at the SarosView, the central class that implements 
+ *               the Saros Eclipse view. Notice that each view inherits from the
+ *               Eclipse ViewPart, which manages most of the view's mechanics,
+ *               leaving us to fill in the missing parts specific to our view.
+ * 
+ */
+
+/**
  * This view displays the contact list, the Saros Session and Saros Chat.
  * 
  * @author patbit
@@ -196,6 +211,21 @@ public class SarosView extends ViewPart {
         SarosPluginContext.initComponent(this);
     }
 
+    /**
+     * @JTourBusStop 2, The Interface Tour:
+     * 
+     *               The createPartControl method constructs the view's
+     *               controls.
+     * 
+     *               Notice that the SarosView class doesn't contain everything.
+     *               Rather it arranges and manages other components which carry
+     *               out most of the functionality.
+     * 
+     *               You should have noticed that the Saros view is divided into
+     *               parts, left and right. The left side is a composite of the
+     *               session information and the roster. The right side
+     *               alternates between an info/chat window.
+     */
     @Override
     public void createPartControl(Composite parent) {
 
@@ -278,6 +308,19 @@ public class SarosView extends ViewPart {
 
         // Make sure all components are registered
         container.getComponents(Object.class);
+
+        /**
+         * @JTourBusStop 3, The Interface Tour:
+         * 
+         *               There are a few additional things in the Saros view.
+         * 
+         *               There is tool bar that holds the icons along the top
+         *               (also see addToolbarItems() below).
+         * 
+         *               Also, there are context menus which appear when you: -
+         *               right-click on a person in your current session -
+         *               right-click on a buddy in the buddy list.
+         */
 
         /*
          * Toolbar

@@ -39,6 +39,18 @@ import de.fu_berlin.inf.dpp.ui.util.DialogUtils;
 import de.fu_berlin.inf.dpp.ui.wizards.pages.CreateXMPPAccountWizardPage;
 
 /**
+ * @JTourBusStop 4, The Interface Tour:
+ * 
+ *               Another important element to the Saros interface is the
+ *               Wizard. Eclipse supplies an abstract Wizard class that can
+ *               be extended with your concrete functionality.
+ * 
+ *               In this example, the CreateXMPPAccountWizard allows the user
+ *               to enter the details of a new account, validate them and 
+ *               store them in our account store.
+ */
+
+/**
  * An wizard that is used to create XMPP accounts.
  * 
  * @author rdjemili
@@ -89,6 +101,12 @@ public class CreateXMPPAccountWizard extends Wizard {
         addPage(this.createXMPPAccountPage);
     }
 
+    /**
+     * @JTourBusStop 5, The Interface Tour:
+     * 
+     *               The performFinish() method is run when the user clicks the
+     *               finish button on the wizard.
+     */
     @Override
     public boolean performFinish() {
         this.cachedServer = this.getServer();

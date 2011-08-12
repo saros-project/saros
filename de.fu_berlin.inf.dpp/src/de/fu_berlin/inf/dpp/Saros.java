@@ -81,6 +81,19 @@ import de.fu_berlin.inf.dpp.util.pico.DotGraphMonitor;
  */
 @Component(module = "core")
 public class Saros extends AbstractUIPlugin {
+
+    /**
+     * @JTourBusStop 1, Some Basics:
+     * 
+     *               This class manages the lifecycle of the Saros plug-in,
+     *               contains some important supporting data members and
+     *               provides methods for the integration of Saros into Eclipse.
+     * 
+     *               Browse the data members. Some are quite obvious (version,
+     *               feature etc.) some need closer examination.
+     * 
+     */
+
     private static final int REFRESH_SECONDS = 3;
 
     /**
@@ -136,6 +149,20 @@ public class Saros extends AbstractUIPlugin {
     protected DotGraphMonitor dotMonitor;
 
     /**
+     * @JTourBusStop 2, Some Basics:
+     * 
+     *               Preferences are managed by Eclipse-provided classes. Most
+     *               are kept by Preferences, but some sensitive data (like user
+     *               account data) is kept in a SecurePreference.
+     * 
+     *               If you press Ctrl+Shift+R and type in "*preference*" you
+     *               will see every class in Saros that deals with preferences.
+     *               Classes named "*PreferencePage" implement individual pages
+     *               within the Eclipse preferences's Saros section. Preference
+     *               labels go in PreferenceConstants.java.
+     */
+
+    /**
      * The global plug-in preferences, shared among all workspaces. Should only
      * be accessed over {@link #getConfigPrefs()} from outside this class.
      */
@@ -150,6 +177,18 @@ public class Saros extends AbstractUIPlugin {
     public static final Random RANDOM = new Random();
 
     protected Logger log;
+
+    /**
+     * @JTourBusStop 4, Invitation Process:
+     * 
+     *               If you haven't already read about PicoContainer, stop and
+     *               do so now (www.picocontainer.org).
+     * 
+     *               Saros uses PicoContainer to manage dependencies on our
+     *               behalf. The SarosContext class encapsulates our usage of
+     *               PicoContainer. It's a well documented class, so take a look
+     *               at it.
+     */
 
     private SarosContext sarosContext;
 
