@@ -1,9 +1,9 @@
 /**
  * <h1>Jupiter Algorithm Overview</h1>
  * 
- * The Jupiter Architecture is the central concept for Distributed Pair 
+ * The Jupiter Architecture is the central concept for Distributed Party 
  * Programming in Saros. Each client administers its own copy of a shared 
- * artifact (project or file). Local {@link Operations} will be performed 
+ * artifact (resource). Local {@link Operations} will be performed 
  * immediately and communicated to a central server. From there all other 
  * clients get informed about the operation which they will transform in 
  * order to perform it on their own copies.

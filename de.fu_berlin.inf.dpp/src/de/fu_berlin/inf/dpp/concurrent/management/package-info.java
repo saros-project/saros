@@ -11,6 +11,6 @@
  * not be interrupted.
  * 
  * The {@link ConcurrentDocumentServer} exists only on the host site of a 
- * Saros session, even when a client adds projects or files to this session. 
+ * Saros session, even when a client adds resources to this session. 
  */
 package de.fu_berlin.inf.dpp.concurrent.management;

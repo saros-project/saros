@@ -3,7 +3,7 @@
  * 
  * The Concurrency Control supports writing collaborations of multiple 
  * users. All participants of a Saros session shall have a consistent 
- * copy of all shared files and folders.
+ * copy of all shared resources.
  * 
  * The Concurrency Control comprises of four subpackages:
  * 
