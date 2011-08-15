@@ -252,6 +252,8 @@ public interface Constants {
         .getString("node_Saros_feedback");
     static public final String NODE_SAROS_ADVANCED = Configuration
         .getString("node_Saros_Advanced");
+    static public final String NODE_SAROS_NETWORK = Configuration
+        .getString("node_saros_network");
     static public final String NODE_SAROS_COMMUNICATION = Configuration
         .getString("node_Saros_Communication");
     static public final String NODE_SAROS_SCREENSHARING = Configuration
@@ -383,8 +385,11 @@ public interface Constants {
     // Permission: Write Access
     static public final String OWN_PARTICIPANT_NAME = Configuration
         .getString("own_participant_name");
-    public final static String PERMISSION_NAME = Configuration
-        .getString("permission_name");
+    public final static String READ_ONLY_ACCESS = Configuration
+        .getString("read_only_access");
+
+    public static final String FOLLOW_MODE_ENABLED = Configuration
+        .getString("follow_mode_enabled");
 
     /**********************************************
      * 

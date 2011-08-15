@@ -11,7 +11,7 @@ import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotShell;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotTree;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.Perspective;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.menubar.menu.IWindowMenu;
-import de.fu_berlin.inf.dpp.stf.server.util.Util;
+import de.fu_berlin.inf.dpp.stf.server.util.WidgetUtil;
 
 public final class WindowMenu extends StfRemoteObject implements IWindowMenu {
 
@@ -46,7 +46,7 @@ public final class WindowMenu extends StfRemoteObject implements IWindowMenu {
     }
 
     public void clickMenuPreferences() throws RemoteException {
-        if (Util.getOperatingSystem() == Util.OperatingSystem.MAC)
+        if (WidgetUtil.getOperatingSystem() == WidgetUtil.OperatingSystem.MAC)
             RemoteWorkbenchBot.getInstance().menu("Eclipse")
                 .menu(MENU_PREFERENCES).click();
         else

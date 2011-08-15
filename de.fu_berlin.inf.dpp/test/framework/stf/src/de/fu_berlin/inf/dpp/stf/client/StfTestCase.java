@@ -14,6 +14,7 @@ import java.util.logging.Logger;
 
 import org.junit.AfterClass;
 import org.junit.Rule;
+import org.junit.rules.MethodRule;
 import org.junit.rules.TestWatchman;
 import org.junit.runners.model.FrameworkMethod;
 
@@ -28,7 +29,7 @@ public abstract class StfTestCase {
         .getName());
 
     @Rule
-    public TestWatchman watchman = new TestWatchman() {
+    public MethodRule watchman = new TestWatchman() {
         @Override
         public void failed(Throwable e, FrameworkMethod method) {
             logMessage("******* " + "TESTCASE "
@@ -166,12 +167,11 @@ public abstract class StfTestCase {
 
         for (AbstractTester tester : currentTesters) {
             try {
-                if (!tester.superBot().views().sarosView().isConnected()) {
-                    tester.superBot().views().sarosView()
-                        .connectWith(tester.getJID(), tester.getPassword());
-                }
-                resetBuddyNames(tester);
+                if (tester.superBot().views().sarosView().isConnected())
+                    tester.superBot().views().sarosView().disconnect();
+
                 tester.superBot().views().sarosView().disconnect();
+                tester.superBot().internal().resetSarosVersion();
                 tester.remoteBot().resetWorkbench();
 
                 // Consistency watch dog seems to lock some files from time to
@@ -262,6 +262,7 @@ public abstract class StfTestCase {
         }
         for (AbstractTester tester : currentTesters) {
             try {
+                resetBuddyNames(tester);
                 resetBuddies(tester);
             } catch (Exception e) {
                 exception = e;

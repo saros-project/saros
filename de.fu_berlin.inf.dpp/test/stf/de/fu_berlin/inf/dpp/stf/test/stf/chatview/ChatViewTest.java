@@ -67,8 +67,4 @@ public class ChatViewTest extends StfTestCase {
         assertEquals("ababababab", BOB.superBot().views().sarosView()
             .selectChatroom().getTextOfChatLine("(ab)++"));
     }
-
-    public static void main(String... args) {
-        System.out.println("ababababab".matches("(ab)++"));
-    }
 }

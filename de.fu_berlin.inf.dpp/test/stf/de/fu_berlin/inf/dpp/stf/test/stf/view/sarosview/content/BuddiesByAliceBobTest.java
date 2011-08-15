@@ -140,6 +140,7 @@ public class BuddiesByAliceBobTest extends StfTestCase {
                 Constants.CLS1);
 
         ALICE.superBot().views().sarosView().selectBuddies().stopSarosSession();
+        ALICE.superBot().views().sarosView().waitUntilIsNotInSession();
 
     }
 
@@ -152,6 +153,10 @@ public class BuddiesByAliceBobTest extends StfTestCase {
             .multipleProjects(Constants.PROJECT1, BOB.getJID());
         BOB.superBot().confirmShellSessionInvitationAndShellAddProject(
             Constants.PROJECT1, TypeOfCreateProject.NEW_PROJECT);
+
+        ALICE.superBot().views().sarosView().selectBuddies().stopSarosSession();
+        ALICE.superBot().views().sarosView().waitUntilIsNotInSession();
+
     }
 
 }

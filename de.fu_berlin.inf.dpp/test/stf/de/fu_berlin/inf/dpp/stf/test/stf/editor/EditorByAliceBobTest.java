@@ -79,6 +79,13 @@ public class EditorByAliceBobTest extends StfTestCase {
     @Test
     public void waitUntilBobsJavaEditorIsActive() throws RemoteException {
 
+        ALICE.superBot().views().packageExplorerView()
+            .selectClass(Constants.PROJECT1, Constants.PKG1, Constants.CLS1)
+            .open();
+
+        BOB.superBot().views().sarosView().selectParticipant(ALICE.getJID())
+            .followParticipant();
+
         BOB.remoteBot().editor(Constants.CLS1_SUFFIX).waitUntilIsActive();
 
         assertTrue(BOB.superBot().views().sarosView()

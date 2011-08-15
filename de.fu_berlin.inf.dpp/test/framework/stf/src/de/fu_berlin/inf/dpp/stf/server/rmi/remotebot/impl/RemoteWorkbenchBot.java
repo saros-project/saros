@@ -265,6 +265,7 @@ public final class RemoteWorkbenchBot extends RemoteBot implements
     }
 
     public void closeAllShells() throws RemoteException {
+        log.trace("try to close all shells with default SWTWorkbenchBot");
         try {
             swtWorkBenchBot.closeAllShells();
         } catch (TimeoutException closeAllShellsTimeout) {
@@ -298,7 +299,7 @@ public final class RemoteWorkbenchBot extends RemoteBot implements
                 }
             }
 
-            // wait for shell(s) to update(s)
+            // wait for shell(s) to update
             swtWorkBenchBot.sleep(SWTBotPreferences.TIMEOUT);
             swtWorkBenchBot.closeAllShells();
         }

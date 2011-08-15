@@ -29,7 +29,7 @@ import de.fu_berlin.inf.dpp.editor.annotations.SelectionAnnotation;
 import de.fu_berlin.inf.dpp.stf.server.StfRemoteObject;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.impl.RemoteWorkbenchBot;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotEditor;
-import de.fu_berlin.inf.dpp.stf.server.util.Util;
+import de.fu_berlin.inf.dpp.stf.server.util.WidgetUtil;
 
 public class RemoteBotEditor extends StfRemoteObject implements
     IRemoteBotEditor {
@@ -140,14 +140,14 @@ public class RemoteBotEditor extends StfRemoteObject implements
     }
 
     public void pressShortCutSave() throws RemoteException {
-        if (Util.getOperatingSystem() == Util.OperatingSystem.MAC)
+        if (WidgetUtil.getOperatingSystem() == WidgetUtil.OperatingSystem.MAC)
             widget.pressShortcut(SWT.COMMAND, 's');
         else
             widget.pressShortcut(SWT.CTRL, 's');
     }
 
     public void pressShortRunAsJavaApplication() throws RemoteException {
-        if (Util.getOperatingSystem() == Util.OperatingSystem.MAC)
+        if (WidgetUtil.getOperatingSystem() == WidgetUtil.OperatingSystem.MAC)
             widget.pressShortcut(SWT.ALT | SWT.COMMAND, 'x');
         else
             widget.pressShortcut(SWT.ALT | SWT.SHIFT, 'x');
@@ -156,7 +156,7 @@ public class RemoteBotEditor extends StfRemoteObject implements
     }
 
     public void pressShortCutNextAnnotation() throws RemoteException {
-        if (Util.getOperatingSystem() == Util.OperatingSystem.MAC)
+        if (WidgetUtil.getOperatingSystem() == WidgetUtil.OperatingSystem.MAC)
             widget.pressShortcut(SWT.COMMAND, '.');
         else
             widget.pressShortcut(SWT.CTRL, '.');
@@ -166,7 +166,7 @@ public class RemoteBotEditor extends StfRemoteObject implements
 
     public void pressShortCutQuickAssignToLocalVariable()
         throws RemoteException {
-        if (Util.getOperatingSystem() == Util.OperatingSystem.MAC)
+        if (WidgetUtil.getOperatingSystem() == WidgetUtil.OperatingSystem.MAC)
             widget.pressShortcut(SWT.COMMAND, '2');
         else
             widget.pressShortcut(SWT.CTRL, '2');

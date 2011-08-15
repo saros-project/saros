@@ -81,10 +81,11 @@ public final class ContextMenusInSessionArea extends ContextMenusInSarosView
         log.trace("start following participant: " + participantJID.getBase());
 
         if (isFollowing()) {
-            log.debug("you are already following participant: "
+            log.warn("you are already following participant: "
                 + participantJID.getBase());
             return;
         }
+
         if (SuperBot.getInstance().getJID().equals(participantJID)) {
             throw new RuntimeException("you can't follow yourself");
         }
@@ -106,6 +107,12 @@ public final class ContextMenusInSessionArea extends ContextMenusInSarosView
 
     public void stopFollowing() throws RemoteException {
         log.trace("stop following user: " + participantJID.getBase());
+
+        if (!isFollowing()) {
+            log.warn("you are not following participant: "
+                + participantJID.getBase());
+            return;
+        }
 
         SWTBotTreeItem treeItem = getTreeItem();
 
@@ -201,11 +208,7 @@ public final class ContextMenusInSessionArea extends ContextMenusInSarosView
 
         SWTBotTreeItem treeItem = null;
         try {
-            treeItem = getTreeItem();
-            treeItem.select();
-            return !ContextMenuHelper.getContextMenu(tree,
-                CM_GRANT_WRITE_ACCESS).isEnabled()
-                && !treeItem.getText().contains(PERMISSION_NAME);
+            return !getTreeItem().getText().contains(READ_ONLY_ACCESS);
         } catch (RuntimeException e) {
             logError(log, e, tree, treeItem);
             return false;
@@ -217,11 +220,7 @@ public final class ContextMenusInSessionArea extends ContextMenusInSarosView
             + "' has read only access");
         SWTBotTreeItem treeItem = null;
         try {
-            treeItem = getTreeItem();
-            treeItem.select();
-            return !ContextMenuHelper.getContextMenu(tree,
-                CM_RESTRICT_TO_READ_ONLY_ACCESS).isEnabled()
-                && treeItem.getText().contains(PERMISSION_NAME);
+            return getTreeItem().getText().contains(READ_ONLY_ACCESS);
         } catch (RuntimeException e) {
             logError(log, e, tree, treeItem);
             return false;
@@ -235,11 +234,7 @@ public final class ContextMenusInSessionArea extends ContextMenusInSarosView
 
         SWTBotTreeItem treeItem = null;
         try {
-            treeItem = getTreeItem();
-            treeItem.select();
-            return ContextMenuHelper.existsContextMenu(tree, CM_STOP_FOLLOWING)
-                && ContextMenuHelper.isContextMenuEnabled(tree,
-                    CM_STOP_FOLLOWING);
+            return getTreeItem().getText().contains(FOLLOW_MODE_ENABLED);
         } catch (RuntimeException e) {
             logError(log, e, tree, treeItem);
             return false;

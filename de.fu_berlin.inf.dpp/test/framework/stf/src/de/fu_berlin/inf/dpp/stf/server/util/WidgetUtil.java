@@ -11,7 +11,7 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.eclipse.swtbot.swt.finder.widgets.TimeoutException;
 
-public class Util {
+public class WidgetUtil {
 
     public enum OperatingSystem {
         MAC, WINDOW, UNIX

@@ -35,7 +35,7 @@ import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.contextmenu.sarosv
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.saros.IChatroom;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.saros.ISarosView;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.impl.SuperBot;
-import de.fu_berlin.inf.dpp.stf.server.util.Util;
+import de.fu_berlin.inf.dpp.stf.server.util.WidgetUtil;
 
 /**
  * This implementation of {@link ISarosView}
@@ -188,7 +188,7 @@ public final class SarosView extends StfRemoteObject implements ISarosView {
      * action.
      */
     public void resolveInconsistency() throws RemoteException {
-        Util.getToolbarButtonWithRegex(view,
+        WidgetUtil.getToolbarButtonWithRegex(view,
             Pattern.quote(TB_INCONSISTENCY_DETECTED) + ".*").click();
 
         SWTBot bot = new SWTBot();
@@ -497,7 +497,7 @@ public final class SarosView extends StfRemoteObject implements ISarosView {
     public void waitUntilIsInconsistencyDetected() throws RemoteException {
         RemoteWorkbenchBot.getInstance().waitUntil(new DefaultCondition() {
             public boolean test() throws Exception {
-                return Util.getToolbarButtonWithRegex(view,
+                return WidgetUtil.getToolbarButtonWithRegex(view,
                     Pattern.quote(TB_INCONSISTENCY_DETECTED) + ".*")
                     .isEnabled();
             }
@@ -531,7 +531,7 @@ public final class SarosView extends StfRemoteObject implements ISarosView {
     }
 
     private void clickToolbarButtonWithTooltip(String tooltipText) {
-        Util.getToolbarButtonWithRegex(view, Pattern.quote(tooltipText) + ".*")
+        WidgetUtil.getToolbarButtonWithRegex(view, Pattern.quote(tooltipText) + ".*")
             .click();
     }
 

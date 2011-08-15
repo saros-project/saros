@@ -423,6 +423,16 @@ public class Util {
             + ".java";
     }
 
+    /**
+     * Invokes all callable tasks in the list and returns when all tasks
+     * completed.
+     * 
+     * @param <T>
+     * @param tasks
+     *            a list containing callable tasks
+     * @return a list with the results of all tasks
+     */
+
     public static <T> List<T> workAll(List<Callable<T>> tasks) {
         if (System.getProperty("os.name").matches("Mac OS X.*"))
             // the menubar is only active on Mac OS on the Window that has the
@@ -432,6 +442,17 @@ public class Util {
             return workAll(tasks, tasks.size());
     }
 
+    /**
+     * Invokes all callable tasks in the list and returns when all tasks
+     * completed.
+     * 
+     * @param <T>
+     * @param tasks
+     *            a list containing callable tasks
+     * @param numberOfThreads
+     *            the number of threads to use to execute the tasks
+     * @return a list with the results of all tasks
+     */
     public static <T> List<T> workAll(List<Callable<T>> tasks,
         int numberOfThreads) {
 
@@ -455,5 +476,4 @@ public class Util {
             pool.shutdown();
         }
     }
-
 }

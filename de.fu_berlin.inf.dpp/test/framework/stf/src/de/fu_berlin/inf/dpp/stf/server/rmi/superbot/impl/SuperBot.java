@@ -22,7 +22,7 @@ import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.IViews;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.impl.Views;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.internal.IInternal;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.internal.impl.InternalImpl;
-import de.fu_berlin.inf.dpp.stf.server.util.Util;
+import de.fu_berlin.inf.dpp.stf.server.util.WidgetUtil;
 
 public final class SuperBot extends StfRemoteObject implements ISuperBot {
 
@@ -316,7 +316,7 @@ public final class SuperBot extends StfRemoteObject implements ISuperBot {
         tree = shell.bot().tree();
 
         for (JID jid : jids)
-            Util.getTreeItemWithRegex(tree, Pattern.quote(jid.getBase()) + ".*")
+            WidgetUtil.getTreeItemWithRegex(tree, Pattern.quote(jid.getBase()) + ".*")
                 .check();
 
         shell.bot().button(FINISH).click();

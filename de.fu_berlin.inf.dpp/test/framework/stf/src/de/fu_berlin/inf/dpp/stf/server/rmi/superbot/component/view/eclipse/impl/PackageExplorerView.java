@@ -29,7 +29,7 @@ import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.impl.RemoteWorkbenchBot;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.contextmenu.peview.IContextMenusInPEView;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.contextmenu.peview.impl.ContextMenusInPEView;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.eclipse.IPackageExplorerView;
-import de.fu_berlin.inf.dpp.stf.server.util.Util;
+import de.fu_berlin.inf.dpp.stf.server.util.WidgetUtil;
 import de.fu_berlin.inf.dpp.vcs.VCSAdapter;
 import de.fu_berlin.inf.dpp.vcs.VCSResourceInfo;
 
@@ -65,7 +65,7 @@ public final class PackageExplorerView extends StfRemoteObject implements
         throws RemoteException {
 
         initContextMenuWrapper(
-            Util.getTreeItemWithRegex(tree, Pattern.quote(projectName),
+            WidgetUtil.getTreeItemWithRegex(tree, Pattern.quote(projectName),
                 Pattern.quote(SRC)), TreeItemType.JAVA_PROJECT);
         return ContextMenusInPEView.getInstance();
     }
@@ -74,7 +74,7 @@ public final class PackageExplorerView extends StfRemoteObject implements
         throws RemoteException {
 
         initContextMenuWrapper(
-            Util.getTreeItemWithRegex(tree, Pattern.quote(projectName)),
+            WidgetUtil.getTreeItemWithRegex(tree, Pattern.quote(projectName)),
             TreeItemType.JAVA_PROJECT);
         return ContextMenusInPEView.getInstance();
     }
@@ -82,7 +82,7 @@ public final class PackageExplorerView extends StfRemoteObject implements
     public IContextMenusInPEView selectJavaProjectWithRegex(String projectName)
         throws RemoteException {
 
-        initContextMenuWrapper(Util.getTreeItemWithRegex(tree, projectName),
+        initContextMenuWrapper(WidgetUtil.getTreeItemWithRegex(tree, projectName),
             TreeItemType.JAVA_PROJECT);
         return ContextMenusInPEView.getInstance();
     }
@@ -90,14 +90,14 @@ public final class PackageExplorerView extends StfRemoteObject implements
     public IContextMenusInPEView selectProject(String projectName)
         throws RemoteException {
         initContextMenuWrapper(
-            Util.getTreeItemWithRegex(tree, Pattern.quote(projectName)),
+            WidgetUtil.getTreeItemWithRegex(tree, Pattern.quote(projectName)),
             TreeItemType.PROJECT);
         return ContextMenusInPEView.getInstance();
     }
 
     public IContextMenusInPEView selectProjectWithRegex(String projectName)
         throws RemoteException {
-        initContextMenuWrapper(Util.getTreeItemWithRegex(tree, projectName),
+        initContextMenuWrapper(WidgetUtil.getTreeItemWithRegex(tree, projectName),
             TreeItemType.PROJECT);
         return ContextMenusInPEView.getInstance();
     }
@@ -105,7 +105,7 @@ public final class PackageExplorerView extends StfRemoteObject implements
     public IContextMenusInPEView selectPkg(String projectName, String pkg)
         throws RemoteException {
         initContextMenuWrapper(
-            Util.getTreeItemWithRegex(tree, Pattern.quote(projectName),
+            WidgetUtil.getTreeItemWithRegex(tree, Pattern.quote(projectName),
                 Pattern.quote(SRC), Pattern.quote(pkg)), TreeItemType.PKG);
 
         return ContextMenusInPEView.getInstance();
@@ -113,7 +113,7 @@ public final class PackageExplorerView extends StfRemoteObject implements
 
     public IContextMenusInPEView selectPkgWithRegex(String projectName,
         String pkg) throws RemoteException {
-        initContextMenuWrapper(Util.getTreeItemWithRegex(tree, projectName,
+        initContextMenuWrapper(WidgetUtil.getTreeItemWithRegex(tree, projectName,
             Pattern.quote(SRC), pkg), TreeItemType.PKG);
 
         return ContextMenusInPEView.getInstance();
@@ -123,7 +123,7 @@ public final class PackageExplorerView extends StfRemoteObject implements
         String className) throws RemoteException {
 
         initContextMenuWrapper(
-            Util.getTreeItemWithRegex(tree, Pattern.quote(projectName),
+            WidgetUtil.getTreeItemWithRegex(tree, Pattern.quote(projectName),
                 Pattern.quote(SRC), Pattern.quote(pkg),
                 Pattern.quote(className + SUFFIX_JAVA)), TreeItemType.CLASS);
 
@@ -133,7 +133,7 @@ public final class PackageExplorerView extends StfRemoteObject implements
     public IContextMenusInPEView selectClassWithRegex(String projectName,
         String pkg, String className) throws RemoteException {
 
-        initContextMenuWrapper(Util.getTreeItemWithRegex(tree, projectName,
+        initContextMenuWrapper(WidgetUtil.getTreeItemWithRegex(tree, projectName,
             Pattern.quote(SRC), pkg, className + Pattern.quote(SUFFIX_JAVA)),
             TreeItemType.CLASS);
 
@@ -146,7 +146,7 @@ public final class PackageExplorerView extends StfRemoteObject implements
         for (int i = 0; i < folderNodes.length; i++)
             folderNodes[i] = Pattern.quote(folderNodes[i]);
 
-        initContextMenuWrapper(Util.getTreeItemWithRegex(tree, folderNodes),
+        initContextMenuWrapper(WidgetUtil.getTreeItemWithRegex(tree, folderNodes),
             TreeItemType.FOLDER);
 
         return ContextMenusInPEView.getInstance();
@@ -158,7 +158,7 @@ public final class PackageExplorerView extends StfRemoteObject implements
         for (int i = 0; i < fileNodes.length; i++)
             fileNodes[i] = Pattern.quote(fileNodes[i]);
 
-        initContextMenuWrapper(Util.getTreeItemWithRegex(tree, fileNodes),
+        initContextMenuWrapper(WidgetUtil.getTreeItemWithRegex(tree, fileNodes),
             TreeItemType.FILE);
 
         return ContextMenusInPEView.getInstance();

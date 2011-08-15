@@ -11,7 +11,7 @@ import de.fu_berlin.inf.dpp.stf.server.bot.widget.ContextMenuHelper;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.contextmenu.sarosview.IContextMenusInSarosView;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.saros.ISarosView;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.impl.SuperBot;
-import de.fu_berlin.inf.dpp.stf.server.util.Util;
+import de.fu_berlin.inf.dpp.stf.server.util.WidgetUtil;
 
 public abstract class ContextMenusInSarosView extends StfRemoteObject implements
     IContextMenusInSarosView {
@@ -62,7 +62,7 @@ public abstract class ContextMenusInSarosView extends StfRemoteObject implements
      * @return the current tree item
      */
     protected final SWTBotTreeItem getTreeItem() {
-        return Util.getTreeItemWithRegex(tree, treeItemNodes);
+        return WidgetUtil.getTreeItemWithRegex(tree, treeItemNodes);
     }
 
 }

@@ -3,7 +3,6 @@ package de.fu_berlin.inf.dpp.stf.test.invitation.permutation;
 import static de.fu_berlin.inf.dpp.stf.client.tester.SarosTester.ALICE;
 import static de.fu_berlin.inf.dpp.stf.client.tester.SarosTester.BOB;
 import static de.fu_berlin.inf.dpp.stf.client.tester.SarosTester.CARL;
-import static de.fu_berlin.inf.dpp.stf.shared.Constants.ACCEPT;
 import static de.fu_berlin.inf.dpp.stf.shared.Constants.OK;
 import static de.fu_berlin.inf.dpp.stf.shared.Constants.SHELL_SESSION_INVITATION;
 import static org.junit.Assert.assertFalse;
@@ -74,8 +73,6 @@ public class Share3UsersLeavingSessionTest extends StfTestCase {
 
         ALICE.superBot().views().sarosView().waitUntilIsNotInSession();
         BOB.superBot().views().sarosView().waitUntilIsNotInSession();
-
-        CARL.remoteBot().shell(SHELL_SESSION_INVITATION).confirm(ACCEPT);
 
         CARL.remoteBot().sleep(2000);
 
