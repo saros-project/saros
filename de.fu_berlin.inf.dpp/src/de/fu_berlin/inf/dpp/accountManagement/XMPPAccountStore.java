@@ -192,7 +192,7 @@ public final class XMPPAccountStore {
      * <li>jabber.org</li>
      * <li>xyz.com</li>
      * <li>saros-con.imp.fu-berlin.de</li>
-     * </ul>.
+     * </ul>
      * 
      * @return
      */
@@ -227,7 +227,7 @@ public final class XMPPAccountStore {
      * <li>jabber.org</li>
      * <li>googlemail.com</li>
      * <li>saros-con.imp.fu-berlin.de</li>
-     * </ul>.
+     * </ul>
      * 
      * @return
      */
@@ -245,7 +245,9 @@ public final class XMPPAccountStore {
      * Makes the given account active.
      * 
      * @param account
-     *            the account to activate.
+     *            the account to activate
+     * @throws IllegalArgumentException
+     *             if the account is not found
      */
     public void setAccountActive(XMPPAccount account) {
 
@@ -299,10 +301,10 @@ public final class XMPPAccountStore {
     }
 
     /**
-     * Deletes the account from the store.
+     * Deletes an account.
      * 
      * @param account
-     *            the account to delete.
+     *            the account to delete
      */
     public void deleteAccount(XMPPAccount account) {
 
@@ -318,7 +320,7 @@ public final class XMPPAccountStore {
      * 
      * @param account
      *            the account to check.
-     * @return true if the account exists in the current store
+     * @return true if the account exists
      */
     public boolean isAccountInStore(XMPPAccount account) {
         return this.accounts.contains(account);
@@ -333,6 +335,12 @@ public final class XMPPAccountStore {
      *            the password of the new account.
      * @param server
      *            the server of the new account as lower case string
+     * @throws NullPointerException
+     *             if username, password or server is null
+     * @throws IllegalArgumentException
+     *             if username or server string is empty or only contains
+     *             whitespace characters
+     * 
      */
 
     public XMPPAccount createNewAccount(String username, String password,
@@ -368,11 +376,6 @@ public final class XMPPAccountStore {
             throw new IllegalArgumentException("server is empty");
     }
 
-    /**
-     * Returns a new id.
-     * 
-     * @return a new id.
-     */
     private int createNewId() {
         return maxId++;
     }
@@ -381,8 +384,10 @@ public final class XMPPAccountStore {
      * Returns the account with the given id.
      * 
      * @param id
-     *            the id of the searched account.
-     * @return the account with the given id.
+     *            the id of the searched account
+     * @return the account with the given id
+     * @throws IllegalArgumentException
+     *             if the account does not exists
      */
     public XMPPAccount getAccount(int id) {
 
@@ -408,6 +413,9 @@ public final class XMPPAccountStore {
      *            the new password.
      * @param server
      *            the new server.
+     * 
+     * @throws IllegalArgumentException
+     *             if the new user name and server already exists
      */
     public void changeAccountData(int id, String username, String password,
         String server) {
@@ -441,6 +449,14 @@ public final class XMPPAccountStore {
         saveAccounts();
     }
 
+    /**
+     * Returns the current active account.
+     * 
+     * @return the active account
+     * @throws IllegalStateException
+     *             if no active account exists
+     * 
+     */
     public XMPPAccount getActiveAccount() {
         if (this.activeAccount == null)
             throw new IllegalStateException(
@@ -449,6 +465,11 @@ public final class XMPPAccountStore {
         return this.activeAccount;
     }
 
+    /**
+     * 
+     * @return <code>true</code> if an active account exists, <code>false</code>
+     *         otherwise
+     */
     public boolean hasActiveAccount() {
         return activeAccount != null;
     }

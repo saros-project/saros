@@ -23,12 +23,12 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import org.apache.log4j.Logger;
@@ -116,7 +116,7 @@ public class SarosSession implements ISarosSession, Disposable {
 
     protected ConcurrentDocumentServer concurrentDocumentServer;
 
-    protected final List<IActivityProvider> activityProviders = new LinkedList<IActivityProvider>();
+    protected final CopyOnWriteArrayList<IActivityProvider> activityProviders = new CopyOnWriteArrayList<IActivityProvider>();
 
     private MappedList<String, IActivityDataObject> queuedActivities = new MappedList<String, IActivityDataObject>();
 
@@ -905,10 +905,8 @@ public class SarosSession implements ISarosSession, Disposable {
     }
 
     public void addActivityProvider(IActivityProvider provider) {
-        if (!activityProviders.contains(provider)) {
-            activityProviders.add(provider);
+        if (activityProviders.addIfAbsent(provider))
             provider.addActivityListener(this);
-        }
     }
 
     public void removeActivityProvider(IActivityProvider provider) {

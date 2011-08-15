@@ -63,7 +63,7 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
         prefs
             .putBoolean(PreferenceConstants.LOCAL_SOCKS5_PROXY_DISABLED, false);
         prefs.putBoolean(PreferenceConstants.FORCE_FILETRANSFER_BY_CHAT, false);
-        prefs.putInt(PreferenceConstants.CHATFILETRANSFER_CHUNKSIZE, 50000);
+
         prefs.put(PreferenceConstants.STUN, "stunserver.org");
         prefs.putInt(PreferenceConstants.STUN_PORT, 3478);
         prefs.putInt(PreferenceConstants.MILLIS_UPDATE, 300);

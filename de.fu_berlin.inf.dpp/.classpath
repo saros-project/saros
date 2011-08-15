@@ -27,7 +27,6 @@
 	<classpathentry exported="true" kind="lib" path="lib/picocontainer-2.7.jar" sourcepath="lib/picocontainer-2.7-sources.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/commons-codec-1.3.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/commons-lang-2.4.jar" sourcepath="lib/commons-lang-2.4-sources.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/xstream-1.3.1.jar" sourcepath="lib/xstream-1.3.1_src.zip"/>
 	<classpathentry kind="lib" path="lib/picocontainer-gems-2.7.jar" sourcepath="lib/picocontainer-gems-2.7-sources.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/commons-httpclient-3.1.jar"/>
 	<classpathentry kind="lib" path="lib/joda-time-1.6.jar" sourcepath="lib/joda-time-1.6-sources.jar"/>
@@ -63,5 +62,7 @@
 	<classpathentry kind="lib" path="test/lib/openfire/postgres.jar"/>
 	<classpathentry kind="lib" path="test/lib/openfire/servlet.jar"/>
 	<classpathentry kind="lib" path="test/lib/openfire/startup.jar"/>
+	<classpathentry kind="lib" path="lib/xpp3-1.1.4c.jar"/>
+	<classpathentry kind="lib" path="lib/xstream-1.4-20101008.163445-1.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

@@ -2,7 +2,6 @@ package de.fu_berlin.inf.dpp.net;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -150,17 +149,12 @@ public class SarosNet {
          * only starts after initiation the singleton on first access.
          */
 
-        // Thats why prevent auto start
-        boolean isLocalS5Penabled = SmackConfiguration
-            .isLocalSocks5ProxyEnabled();
-        SmackConfiguration.setLocalSocks5ProxyEnabled(false);
-        Socks5Proxy proxy = Socks5Proxy.getSocks5Proxy();
-        if (proxyEnabled != isLocalS5Penabled) {
-            settingsChanged = true;
-        }
+        Socks5Proxy proxy = NetworkingUtils.getSocks5ProxySafe();
 
-        if (proxyEnabled == true)
-            SmackConfiguration.setLocalSocks5ProxyEnabled(true);
+        if (proxyEnabled != SmackConfiguration.isLocalSocks5ProxyEnabled()) {
+            settingsChanged = true;
+            SmackConfiguration.setLocalSocks5ProxyEnabled(proxyEnabled);
+        }
 
         // Note: The proxy gets restarted on port change, too.
         if (proxyPort != SmackConfiguration.getLocalSocks5ProxyPort()) {
@@ -193,9 +187,6 @@ public class SarosNet {
             } catch (Exception e) {
                 log.debug("Error while retrieving IP addresses", e);
             }
-
-            log.debug("Currently used IP addresses for Socks5Proxy: "
-                + Arrays.toString(proxy.getLocalAddresses().toArray()));
         }
 
         if (settingsChanged || proxy.isRunning() != proxyEnabled) {
@@ -228,9 +219,9 @@ public class SarosNet {
                     upnpManager.removeSarosPortMapping();
 
                 if (upnpManager.isMapped()) {
-                    String externalIP = upnpManager.getExternalIP();
-                    if (externalIP != null)
-                        proxy.addLocalAddress(externalIP);
+                    String gatewayPublicIP = upnpManager.getPublicGatewayIP();
+                    if (gatewayPublicIP != null)
+                        NetworkingUtils.addProxyAddress(gatewayPublicIP, true);
                 }
             }
         }

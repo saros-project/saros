@@ -1,6 +1,7 @@
 package de.fu_berlin.inf.dpp.net.UPnP;
 
 import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
@@ -84,7 +85,7 @@ public class UPnPManager {
             setPreSelectedDeviceID(prefStore
                 .getString(PreferenceConstants.AUTO_PORTMAPPING_DEVICEID));
 
-            if (!getPreSelectedDeviceID().isEmpty()) {
+            if (getPreSelectedDeviceID().length() != 0) {
                 startGatewayDiscovery(false);
             }
         }
@@ -107,14 +108,17 @@ public class UPnPManager {
      * @param gateway
      *            {@link GatewayDevice} selected for Saros to perform port
      *            mapping on.
+     * @return true if the gateway device changed, false if gateway did not
+     *         change or is null
+     * 
      * @throws IllegalArgumentException
      *             if the given gateway is not a discovered one
      */
-    public void setSelectedGateway(GatewayDevice gateway)
+    public boolean setSelectedGateway(GatewayDevice gateway)
         throws IllegalArgumentException {
 
         if (selectedGateway == gateway)
-            return;
+            return false;
 
         if (gateways == null)
             throw new IllegalArgumentException(
@@ -135,13 +139,16 @@ public class UPnPManager {
         if (prefStore != null)
             prefStore.setValue(PreferenceConstants.AUTO_PORTMAPPING_DEVICEID,
                 getPreSelectedDeviceID());
+
+        return selectedGateway != null;
     }
 
     /**
      * Returns all discovered gateways.
      * 
      * @return {@link List} of {@link GatewayDevice} found during UPnP
-     *         discovery.
+     *         discovery. Is <code>null</code> if discovery was not performed
+     *         yet.
      */
     public List<GatewayDevice> getGateways() {
         return gateways;
@@ -184,24 +191,28 @@ public class UPnPManager {
             // perform discovery
             gateways = new ArrayList<GatewayDevice>(
                 upnpAccess.performDiscovery());
-        } catch (Exception e) {
-            log.debug("Error discovering a gateway:" + e.getMessage());
-        }
 
-        if (gateways == null || gateways.isEmpty()) {
-            log.debug("No gateway device found.");
-        } else {
-            log.debug(gateways.size() + " gateway(s) discovered.");
-            for (GatewayDevice gw : gateways) {
-                if (gw.getUSN().equals(getPreSelectedDeviceID())) {
-                    selectedGateway = gw;
-                    log.debug("Using selected device: " + gw.getFriendlyName());
+            if (gateways == null || gateways.isEmpty()) {
+                log.debug("No gateway device found.");
+                setSelectedGateway(null); // disable UPnP feature
+            } else {
+                log.debug(gateways.size() + " gateway(s) discovered.");
+
+                for (GatewayDevice gw : gateways) {
+                    if (gw.getUSN().equals(getPreSelectedDeviceID())) {
+                        selectedGateway = gw;
+                        log.debug("Using selected device: "
+                            + gw.getFriendlyName());
+                    }
                 }
             }
-        }
 
-        if (selectedGateway != null) {
-            checkAndRemoveOldMapping();
+            if (selectedGateway != null) {
+                checkAndRemoveOldMapping();
+            }
+
+        } catch (Exception e) {
+            log.debug("Error discovering a gateway:" + e.getMessage());
         }
 
         discoveryRunningSemaphore.release();
@@ -262,7 +273,7 @@ public class UPnPManager {
      */
     public boolean createSarosPortMapping() {
 
-        if (!NetworkingUtils.isSocks5ProxyRunning())
+        if (!NetworkingUtils.getSocks5ProxySafe().isRunning())
             return false;
 
         int port = Socks5Proxy.getSocks5Proxy().getPort();
@@ -390,11 +401,14 @@ public class UPnPManager {
             if (externalIP != null
                 && !externalIP.isEmpty()
                 && !Socks5Proxy.getSocks5Proxy().getLocalAddresses()
-                    .contains(externalIP))
-                Socks5Proxy.getSocks5Proxy().addLocalAddress(externalIP);
+                    .contains(externalIP)) {
+                log.info("Adding gateway public IP:" + externalIP);
+                NetworkingUtils.addProxyAddress(externalIP, true);
+            }
         } catch (Exception e) {
             log.debug("Error retrieving external IP from selected gateway.", e);
         }
+
         discoveryRunningSemaphore.release();
 
         return true;
@@ -517,13 +531,33 @@ public class UPnPManager {
         return preSelectedDeviceID;
     }
 
-    public String getExternalIP() {
-        if (getSelectedGateway() != null)
+    /**
+     * Retrieves and returns the public IP of the selected gateway. Is
+     * <code>null</code> if no gateway is selected or IP retrieval failed.
+     */
+    public String getPublicGatewayIP() {
+        if (selectedGateway != null)
             try {
-                return getSelectedGateway().getExternalIPAddress();
+                String ip = selectedGateway.getExternalIPAddress();
+
+                // test IP to be a possible public IP
+                try {
+                    InetAddress address = InetAddress.getByName(ip);
+                    if (address.isAnyLocalAddress()
+                        || address.isLoopbackAddress()
+                        || address.isLinkLocalAddress())
+                        return null;
+
+                    return address.getHostAddress();
+                } catch (UnknownHostException e) {
+                    return null;
+                }
+
             } catch (Exception e) {
-                return null;
+                log.debug("Error requesting the public IP of active gateway "
+                    + selectedGateway.getFriendlyName(), e);
             }
         return null;
     }
+
 }

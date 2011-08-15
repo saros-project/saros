@@ -188,6 +188,7 @@ public class TransferDescription implements Serializable {
         result.sender = sender;
         result.testID = testID;
         result.type = FileTransferType.CONNECTION_TEST;
+        result.compressed = false;
         return result;
     }
 

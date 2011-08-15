@@ -1,5 +1,6 @@
 package de.fu_berlin.inf.dpp.ui.util;
 
+import org.apache.log4j.Logger;
 import org.bitlet.weupnp.GatewayDevice;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
@@ -11,6 +12,7 @@ import de.fu_berlin.inf.dpp.net.UPnP.UPnPManager;
  * Class for UPnP related UI methods
  */
 public class UPnPUIUtils {
+    protected static Logger log = Logger.getLogger(UPnPUIUtils.class);
 
     /**
      * Setups gateway SWT controls by populating a gateway combobox and
@@ -23,16 +25,21 @@ public class UPnPUIUtils {
      * @param checkbox
      *            {@link Button} checkbox to enable/disable UPnP support
      */
-    public static void populateGaywaySelectionControls(
+    public static void populateGatewaySelectionControls(
         final UPnPManager upnpManager, final Combo combo, final Label info,
         final Button checkbox) {
 
-        // if the UPnPManager dont know about gateways, let him discover
-        if (upnpManager.getGateways() == null)
+        // Configuration controls closed in the meanwhile?
+        if (combo.isDisposed() || info.isDisposed() || checkbox.isDisposed())
             return;
 
+        combo.setEnabled(false);
+        checkbox.setEnabled(false);
+        combo.removeAll();
+
         // if no devices are found, return now - nothing to populate
-        if (upnpManager.getGateways().isEmpty()) {
+        if (upnpManager.getGateways() == null
+            || upnpManager.getGateways().isEmpty()) {
             info.setText("No gateway found.");
             info.getParent().pack();
             return;
@@ -53,20 +60,21 @@ public class UPnPUIUtils {
                         upnpManager.getSelectedGateway().getUSN()))
                     indexToSelect = combo.getItemCount() - 1;
             } catch (Exception e) {
+                log.debug("Error updating UPnP selector:" + e.getMessage());
                 // ignore faulty gateway
             }
         }
 
-        // Configuration controls closed in the meanwhile?
-        if (combo.isDisposed() || info.isDisposed() || checkbox.isDisposed())
-            return;
-
         // if valid gateway found, show info and enable
-        checkbox.setEnabled(true);
-        combo.setVisible(true);
-        combo.select(indexToSelect);
-        combo.pack();
-        info.setVisible(false);
+        if (combo.getItemCount() > 0) {
+            checkbox.setEnabled(true);
+            combo.setEnabled(true);
+            combo.select(indexToSelect);
+            combo.pack();
+            info.setVisible(false);
+        } else {
+            info.setText("No valid gateway found.");
+        }
         info.getParent().pack();
     }
 }

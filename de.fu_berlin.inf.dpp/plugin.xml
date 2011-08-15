@@ -75,6 +75,11 @@
             name="Advanced"/>
       <page
             category="de.fu_berlin.inf.dpp.preferences"
+            class="de.fu_berlin.inf.dpp.ui.preferencePages.NetworkPreferencePage"
+            id="de.fu_berlin.inf.dpp.preferences.network"
+            name="Network"/>
+      <page
+            category="de.fu_berlin.inf.dpp.preferences"
             class="de.fu_berlin.inf.dpp.ui.preferencePages.FeedbackPreferencePage"
             id="de.fu_berlin.dpp.preferences.feedback"
             name="Feedback"/>

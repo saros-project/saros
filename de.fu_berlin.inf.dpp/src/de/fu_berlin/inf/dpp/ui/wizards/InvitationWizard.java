@@ -279,6 +279,12 @@ public class InvitationWizard extends Wizard {
         }
     }
 
+    public static void notifyUserOffline(JID peer) {
+        Utils.popUpFailureMessage("Invited buddy is offline!", "User " + peer
+            + " does not seem to be connected. "
+            + "You can't invite offline buddies!", false);
+    }
+
     public static Shell getAShell() {
         Shell shell = EditorAPI.getShell();
         if (shell == null)

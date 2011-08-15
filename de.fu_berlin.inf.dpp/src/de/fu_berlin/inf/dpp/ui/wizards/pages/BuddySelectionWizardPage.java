@@ -39,6 +39,7 @@ public class BuddySelectionWizardPage extends WizardPage {
     public static final String DESCRIPTION = "Select the buddy(s) to work with.";
 
     public static final String NO_BUDDY_SELECTED_ERROR_MESSAGE = "Select at least one buddy to work with.";
+    public static final String OFFLINE_BUDDY_SELECTED_ERROR_MESSAGE = "You selected at least one offline buddy.";
     public static final String BUDDIES_WITHOUT_SAROS_SUPPORT_WARNING_MESSAGE = "Please only invite buddies if you are sure they have Saros installed.";
 
     protected BuddySelectionComposite buddySelectionComposite;
@@ -171,6 +172,9 @@ public class BuddySelectionWizardPage extends WizardPage {
             if (selectedBuddies.size() == 0) {
                 if (selectionWasValid)
                     setErrorMessage(NO_BUDDY_SELECTED_ERROR_MESSAGE);
+                setPageComplete(false);
+            } else if (!this.buddySelectionComposite.areAllSelectedOnline()) {
+                setErrorMessage(OFFLINE_BUDDY_SELECTED_ERROR_MESSAGE);
                 setPageComplete(false);
             } else {
                 selectionWasValid = true;

@@ -208,9 +208,16 @@ public class OutgoingSessionNegotiation extends InvitationProcess {
 
         JID rqPeer = discoveryManager.getSupportingPresence(peer,
             Saros.NAMESPACE);
+
         if (rqPeer == null) {
-            log.debug("Inv" + Utils.prefix(peer) + ": Saros is not supported.");
-            if (!InvitationWizard.confirmUnsupportedSaros(peer)) {
+            log.debug("Inv" + Utils.prefix(peer)
+                + ": Saros is not supported or User is offline.");
+
+            if (!discoveryManager.isOnline(peer)) {
+                InvitationWizard.notifyUserOffline(peer);
+                localCancel(null, CancelOption.DO_NOT_NOTIFY_PEER);
+                throw new LocalCancellationException();
+            } else if (!InvitationWizard.confirmUnsupportedSaros(peer)) {
                 localCancel(null, CancelOption.DO_NOT_NOTIFY_PEER);
                 throw new LocalCancellationException();
             }
@@ -495,7 +502,10 @@ public class OutgoingSessionNegotiation extends InvitationProcess {
             monitor.setTaskName("Invitation failed.");
         }
         sarosSession.returnColor(this.colorID);
-        sarosSessionManager.stopSarosSession();
+
+        if (sarosSession.getRemoteUsers().isEmpty())
+            sarosSessionManager.stopSarosSession();
+
         if (invitationProcesses.getProcesses().containsValue(this))
             invitationProcesses.removeInvitationProcess(this);
         throw cancellationCause;

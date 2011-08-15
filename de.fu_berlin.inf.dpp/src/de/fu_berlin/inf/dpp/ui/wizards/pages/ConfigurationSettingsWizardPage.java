@@ -346,7 +346,7 @@ public class ConfigurationSettingsWizardPage extends WizardPage {
                     // GUI work from SWT thread
                     Utils.runSafeSWTAsync(null, new Runnable() {
                         public void run() {
-                            UPnPUIUtils.populateGaywaySelectionControls(
+                            UPnPUIUtils.populateGatewaySelectionControls(
                                 upnpManager, gatewaysCombo, gatewayInfo,
                                 setupPortmappingButton);
                         }
@@ -355,7 +355,7 @@ public class ConfigurationSettingsWizardPage extends WizardPage {
             });
 
         } else {
-            UPnPUIUtils.populateGaywaySelectionControls(upnpManager, gatewaysCombo,
+            UPnPUIUtils.populateGatewaySelectionControls(upnpManager, gatewaysCombo,
                 gatewayInfo, setupPortmappingButton);
         }
     }

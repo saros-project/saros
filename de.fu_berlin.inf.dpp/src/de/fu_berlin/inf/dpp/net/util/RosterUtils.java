@@ -62,6 +62,9 @@ public class RosterUtils {
     }
 
     protected static DialogContent getDialogContent(XMPPException e) {
+
+        // FIXME: use e.getXMPPError().getCode(); !
+
         if (e.getMessage().contains("item-not-found")) {
             return new DialogContent("Buddy Unknown",
                 "The buddy is unknown to the XMPP/Jabber server.\n\n"
@@ -398,8 +401,14 @@ public class RosterUtils {
         }
 
         try {
-            boolean discovered = sdm.discoverInfo(jid.toString())
-                .getIdentities().hasNext();
+            boolean discovered = sdm.discoverInfo(jid.getRAW()).getIdentities()
+                .hasNext();
+
+            if (!discovered && jid.isBareJID()) // FIXME: removed the hard coded
+                                                // suffix
+                discovered = sdm.discoverInfo(jid.getRAW() + "/Saros")
+                    .getIdentities().hasNext();
+
             /*
              * discovery does not change any state, if the user wanted to cancel
              * it, we can do that even after the execution finished

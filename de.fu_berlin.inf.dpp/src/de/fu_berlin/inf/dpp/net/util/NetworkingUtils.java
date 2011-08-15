@@ -6,6 +6,7 @@ import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.LinkedList;
 import java.util.List;
@@ -100,15 +101,46 @@ public class NetworkingUtils {
         return ips;
     }
 
-    public static boolean isSocks5ProxyRunning() {
-        boolean localSocks5ProxyEnabled = SmackConfiguration
+    /**
+     * Returns the Socks5Proxy object without changing its running state.
+     */
+    public static Socks5Proxy getSocks5ProxySafe() {
+        boolean isLocalS5Penabled = SmackConfiguration
             .isLocalSocks5ProxyEnabled();
 
         SmackConfiguration.setLocalSocks5ProxyEnabled(false);
-        boolean isRunning = Socks5Proxy.getSocks5Proxy().isRunning();
-        SmackConfiguration.setLocalSocks5ProxyEnabled(localSocks5ProxyEnabled);
 
-        return isRunning;
+        Socks5Proxy proxy = Socks5Proxy.getSocks5Proxy();
+
+        SmackConfiguration.setLocalSocks5ProxyEnabled(isLocalS5Penabled);
+
+        return proxy;
+    }
+
+    /**
+     * Adds a specified IP (String) to the list of addresses of the Socks5Proxy.
+     * (the target attempts the stream host addresses one by one in the order of
+     * the list)
+     * 
+     * @param ip
+     *            String of the address of the Socks5Proxy (stream host)
+     * @param inFront
+     *            boolean flag, if the address is to be inserted in front of the
+     *            list. If <code>false</code>, address is added at the end of
+     *            the list.
+     */
+    public static void addProxyAddress(String ip, boolean inFront) {
+        Socks5Proxy proxy = getSocks5ProxySafe();
+
+        if (!inFront) {
+            proxy.addLocalAddress(ip);
+            return;
+        }
+        ArrayList<String> list = new ArrayList<String>(
+            proxy.getLocalAddresses());
+        list.remove(ip);
+        list.add(0, ip);
+        proxy.replaceLocalAddresses(list);
     }
 
 }

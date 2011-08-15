@@ -12,7 +12,6 @@ import org.eclipse.ui.intro.IIntroManager;
 import org.eclipse.ui.intro.IIntroPart;
 import org.picocontainer.annotations.Inject;
 
-import de.fu_berlin.inf.dpp.accountManagement.XMPPAccount;
 import de.fu_berlin.inf.dpp.accountManagement.XMPPAccountStore;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
@@ -53,6 +52,11 @@ public class StartupSaros implements IStartup {
         SarosPluginContext.reinject(this);
     }
 
+    /*
+     * Once the workbench is started, the method earlyStartup() will be called
+     * from a separate thread
+     */
+
     public void earlyStartup() {
         String currentVersion = saros.getVersion();
 
@@ -75,18 +79,27 @@ public class StartupSaros implements IStartup {
         updateAccounts();
         showSarosView();
 
+        if (testmode)
+            return;
+
         /*
          * Only show configuration wizard if no accounts are configured. If
          * Saros is already configured, do not show the tutorial because the
          * user is probably already experienced.
          */
-        XMPPAccount activeAccount = xmppAccountStore.getActiveAccount();
-        if (activeAccount == null) {
-            if (!preferenceUtils.isGettingStartedFinished()) {
-                WizardUtils.openSarosGettingStartedWizard(true);
-            }
+
+        showWizards(!xmppAccountStore.hasActiveAccount(),
+            !preferenceUtils.isGettingStartedFinished());
+    }
+
+    protected void showWizards(boolean showConfigurationWizard,
+        boolean showGettingStartedWizard) {
+
+        if (showGettingStartedWizard)
+            WizardUtils.openSarosGettingStartedWizard(true);
+
+        if (showConfigurationWizard)
             WizardUtils.openSarosConfigurationWizard();
-        }
     }
 
     protected void startRmiBot(final int port) {
