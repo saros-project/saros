@@ -1,3 +1,20 @@
+11.7.29
+=========
+[FEATURE] [bkahlert] Saros Tutorial
+[FEATURE/Improved] [kargor] Screensharing with Java is now possible up to 10 FPS
+
+[FIX] [k_beecher] #3309643 Survey URL updated
+[FIX] [ornis] #3348956 fixed NPE when inviting to Screen Session blocking screen sharing functionality
+[FIX] [kargor] #3348924 Inappropriate "Username must not be emtpy" error 
+[FIX] [karlheld] #3348910 NullPointer Exception if Synchronisation is cancelled - ID: 3348910
+[FIX] [karlheld] 3348922 no follow mode available over saros view toolbar 
+[FIX] [kargor] NullPointerException when closing Eclipse - ID: 3324780
+[FIX] [karlheld] widgets are modified outside from the UI thread
+[FIX] [karlheld] UI Error caused by NullPointerException in FollowModeAction.java:221
+[FIX] [karlheld] #3362291 Invitation of offline Buddies to a session
+[FIX] [ornis] UPnP activation was not taking effect when enabled during session (refered to #3348912 Socks5 with NAT/UPnP only after remove/add buddy)
+
+
 11.7.1
 ======
 [FEATURE] (karlheld) Partial Sharing feature
