@@ -73,6 +73,7 @@ public class AddProjectToSessionWizard extends Wizard {
         this.dataTransferManager = dataTransferManager;
         this.preferenceUtils = preferenceUtils;
         setWindowTitle("Add Projects");
+        setHelpAvailable(true);
 
         process.setProjectInvitationUI(this);
 

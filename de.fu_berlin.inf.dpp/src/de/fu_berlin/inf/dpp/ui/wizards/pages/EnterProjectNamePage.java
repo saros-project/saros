@@ -1,5 +1,8 @@
 package de.fu_berlin.inf.dpp.ui.wizards.pages;
 
+import java.awt.Desktop;
+import java.io.IOException;
+import java.net.URI;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -38,6 +41,7 @@ import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
 import de.fu_berlin.inf.dpp.ui.ImageManager;
 import de.fu_berlin.inf.dpp.ui.preferencePages.GeneralPreferencePage;
+import de.fu_berlin.inf.dpp.ui.views.SarosView;
 import de.fu_berlin.inf.dpp.ui.wizards.dialogs.WizardDialogAccessable;
 import de.fu_berlin.inf.dpp.ui.wizards.utils.EnterProjectNamePageUtils;
 import de.fu_berlin.inf.dpp.util.Utils;
@@ -175,18 +179,18 @@ public class EnterProjectNamePage extends WizardPage {
             break;
         case SOCKS5_MEDIATED:
             if (preferenceUtils.isLocalSOCKS5ProxyEnabled())
-                setDescription("Attention: only a mediated file transfer connection with SOCKS5 protocol is available.\n"
-                    + "Suggestions: Update an existing project or copy resources from another project.");
+                setDescription("A mediated SOCKS5 data transfer connection is used.\n"
+                    + "Suggestions: Reuse existing project ressources and visit the FAQs using the Help button below.");
             else
                 setDescription("Attention: direct file transfer connections with SOCKS5 protocol are deactivated.\n"
-                    + "To activate uncheck 'Disable local file transfer proxy for direct connections'.");
+                    + "To activate, uncheck \"Only connect over external Socks5 Proxy\" in Saros preferences.");
             setImageDescriptor(ImageManager
                 .getImageDescriptor("icons/wizban/socks5m.png"));
             break;
 
         case SOCKS5:
         case SOCKS5_DIRECT:
-            setDescription("Direct file transfer connection with SOCKS5 protocol available.\nThis means that sharing a project from scratch will be fast.");
+            setDescription("Direct file transfer connection with SOCKS5 protocol is used.\nThis means that sharing a project from scratch will be fast.");
             setImageDescriptor(ImageManager
                 .getImageDescriptor("icons/wizban/socks5.png"));
             break;
@@ -214,16 +218,16 @@ public class EnterProjectNamePage extends WizardPage {
                 setDescription("Warning: Direct file transfer deactivated. Using slow IBB instead! "
                     + speedInfo
                     + '\n'
-                    + "To activate uncheck 'Force file transfer over XMPP network' in Saros preferences.");
+                    + "To activate, uncheck \"Only establish conenctions over IBB\" in Saros network preferences.");
             } else {
                 setDescription("Warning : Direct file transfer not available! Using slow IBB instead! "
                     + speedInfo
                     + '\n'
-                    + "Suggestions: Update an existing project or copy resources from another project.");
+                    + "Suggestions: Reuse existing project ressources and visit the FAQs using the Help button below.");
             }
             startIBBLogoFlash();
             break;
-            
+
         case UNKNOWN:
         case HANDMADE:
         default:
@@ -768,5 +772,18 @@ public class EnterProjectNamePage extends WizardPage {
     public void dispose() {
         this.disposed = true;
         super.dispose();
+    }
+
+    @Override
+    public void performHelp() {
+        try {
+            Desktop.getDesktop().browse(
+                URI.create("http://www.saros-project.org/faq#Network_issues"));
+        } catch (IOException e) {
+            SarosView
+                .showNotification(
+                    "FAQ",
+                    "Opening your browser failed.\nPlease visit the FAQ page on http://saros-project.org");
+        }
     }
 }

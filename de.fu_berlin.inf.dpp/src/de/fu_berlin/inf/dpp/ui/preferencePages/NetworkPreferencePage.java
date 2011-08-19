@@ -259,10 +259,10 @@ public final class NetworkPreferencePage extends PreferencePage implements
         gridLayout.numColumns = 1;
 
         group.setLayout(gridLayout);
-        group.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
+        group.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true));
 
         gatewayInfo = new Label(group, SWT.CENTER);
-        gatewayInfo.setLayoutData(new GridData(SWT.CENTER, SWT.CENTER, true,
+        gatewayInfo.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true,
             false));
 
         upnpDevicesTable = new Table(group, SWT.CHECK | SWT.BORDER
@@ -395,7 +395,7 @@ public final class NetworkPreferencePage extends PreferencePage implements
                             public void run() {
                                 if (!gatewayInfo.isDisposed()) {
                                     gatewayInfo
-                                        .setText("discovering UPnP gateway devices "
+                                        .setText("Discovering UPnP gateway devices... "
                                             + PROGRESS[progressIndex]);
                                     gatewayInfo.pack();
                                 }
@@ -425,7 +425,7 @@ public final class NetworkPreferencePage extends PreferencePage implements
 
                             if (gateways.isEmpty()) {
                                 gatewayInfo
-                                    .setText("could not find an UPnP device");
+                                    .setText("UPnP devices not found (a device might disallow discovery and require configuration).");
                                 gatewayInfo.pack();
                                 return;
                             }
@@ -443,9 +443,10 @@ public final class NetworkPreferencePage extends PreferencePage implements
             List<GatewayDevice> gateways = upnpManager.getGateways();
 
             if (gateways.isEmpty()) {
-                gatewayInfo.setText("could not find an UPnP device");
-                gatewayInfo.pack();
+                gatewayInfo
+                    .setText("UPnP devices not found (a device might disallow discovery and require configuration).");
                 gatewayInfo.setVisible(true);
+                gatewayInfo.pack();
                 return;
             }
 

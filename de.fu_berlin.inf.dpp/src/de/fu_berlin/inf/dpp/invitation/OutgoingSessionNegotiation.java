@@ -25,6 +25,7 @@ import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
 import de.fu_berlin.inf.dpp.invitation.ProcessTools.CancelOption;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
 import de.fu_berlin.inf.dpp.net.internal.DefaultInvitationInfo.UserListRequestExtensionProvider;
 import de.fu_berlin.inf.dpp.net.internal.InvitationInfo;
 import de.fu_berlin.inf.dpp.net.internal.InvitationInfo.InvitationExtensionProvider;
@@ -91,6 +92,9 @@ public class OutgoingSessionNegotiation extends InvitationProcess {
 
     @Inject
     protected XMPPTransmitter xmppTransmitter;
+
+    @Inject
+    protected DataTransferManager dataTransferManager;
 
     public OutgoingSessionNegotiation(ITransmitter transmitter, JID peer,
         int colorID, InvitationProcessObservable invitationProcesses,
@@ -287,10 +291,17 @@ public class OutgoingSessionNegotiation extends InvitationProcess {
     protected void sendInvitation(SubMonitor subMonitor)
         throws SarosCancellationException, IOException {
 
-        log.debug("Inv" + Utils.prefix(peer) + ": Sending invitation...");
-        checkCancellation(CancelOption.DO_NOT_NOTIFY_PEER);
         subMonitor.setWorkRemaining(100);
         subMonitor.setTaskName("Sending invitation...");
+
+        subMonitor.subTask("Prepare data connection...");
+
+        // Ensure bytestream connection to peer
+        dataTransferManager.getConnection(peer, subMonitor);
+        subMonitor.subTask("");
+
+        log.debug("Inv" + Utils.prefix(peer) + ": Sending invitation...");
+        checkCancellation(CancelOption.DO_NOT_NOTIFY_PEER);
 
         /*
          * TODO: this method should get a complete VersionInfo object from the
