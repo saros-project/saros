@@ -248,7 +248,8 @@ public final class SuperBot extends StfRemoteObject implements ISuperBot {
         SWTBotTree tree = shell.bot().tree();
 
         for (String baseJID : baseJIDOfinvitees)
-            tree.getTreeItem(baseJID).check();
+            WidgetUtil
+                .getTreeItemWithRegex(tree, Pattern.quote(baseJID) + ".*");
 
         shell.bot().button(FINISH).click();
         bot.waitUntil(Conditions.shellCloses(shell));
@@ -316,8 +317,8 @@ public final class SuperBot extends StfRemoteObject implements ISuperBot {
         tree = shell.bot().tree();
 
         for (JID jid : jids)
-            WidgetUtil.getTreeItemWithRegex(tree, Pattern.quote(jid.getBase()) + ".*")
-                .check();
+            WidgetUtil.getTreeItemWithRegex(tree,
+                Pattern.quote(jid.getBase()) + ".*").check();
 
         shell.bot().button(FINISH).click();
         bot.waitUntil(Conditions.shellCloses(shell));
