@@ -249,7 +249,8 @@ public final class SuperBot extends StfRemoteObject implements ISuperBot {
 
         for (String baseJID : baseJIDOfinvitees)
             WidgetUtil
-                .getTreeItemWithRegex(tree, Pattern.quote(baseJID) + ".*");
+                .getTreeItemWithRegex(tree, Pattern.quote(baseJID) + ".*")
+                .check();
 
         shell.bot().button(FINISH).click();
         bot.waitUntil(Conditions.shellCloses(shell));
@@ -315,6 +316,10 @@ public final class SuperBot extends StfRemoteObject implements ISuperBot {
         bot.sleep(500);
 
         tree = shell.bot().tree();
+
+        for (SWTBotTreeItem item : tree.getAllItems())
+            while (item.isChecked())
+                item.uncheck();
 
         for (JID jid : jids)
             WidgetUtil.getTreeItemWithRegex(tree,
