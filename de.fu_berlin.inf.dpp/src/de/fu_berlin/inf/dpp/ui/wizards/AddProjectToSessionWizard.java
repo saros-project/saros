@@ -150,12 +150,14 @@ public class AddProjectToSessionWizard extends Wizard {
                         "Could not compute local FileList: " + e.getMessage());
                     return false;
                 }
-                if (!this.process.isPartialRemoteProject(projectID)) {
-                    if (diff.getRemovedPaths().size() > 0
-                        || diff.getAlteredPaths().size() > 0) {
-                        projectsToOverrideWithDiff.put(project.getName(), diff);
-                    }
+                if (this.process.isPartialRemoteProject(projectID))
+                    diff.clearRemovedPaths();
+
+                if (!diff.getRemovedPaths().isEmpty()
+                    || !diff.getAlteredPaths().isEmpty()) {
+                    projectsToOverrideWithDiff.put(project.getName(), diff);
                 }
+
             }
         }
         if (!confirmOverwritingResources(projectsToOverrideWithDiff))

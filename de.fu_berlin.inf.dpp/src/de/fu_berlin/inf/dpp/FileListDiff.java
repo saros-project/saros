@@ -119,6 +119,10 @@ public class FileListDiff {
         return sorted(this.removed);
     }
 
+    public void clearRemovedPaths() {
+        this.removed.clear();
+    }
+
     public List<IPath> getUnalteredPaths() {
         return sorted(this.unaltered);
     }
