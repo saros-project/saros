@@ -54,6 +54,7 @@ import de.fu_berlin.inf.dpp.activities.business.FileActivity;
 import de.fu_berlin.inf.dpp.activities.business.FolderActivity;
 import de.fu_berlin.inf.dpp.activities.business.IActivity;
 import de.fu_berlin.inf.dpp.activities.business.PermissionActivity;
+import de.fu_berlin.inf.dpp.activities.serializable.EditorActivityDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.IActivityDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.IProjectActivityDataObject;
 import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentClient;
@@ -579,8 +580,6 @@ public class SarosSession implements ISarosSession, Disposable {
     // TODO Review sendRequest for InterruptedException and remove this flag.
     boolean stopped = true;
 
-    private boolean queueing = false;
-
     public boolean isStopped() {
         return stopped;
     }
@@ -713,6 +712,8 @@ public class SarosSession implements ISarosSession, Disposable {
         return result;
     }
 
+    String lastID;
+
     /**
      * 
      * @param dataObject
@@ -722,12 +723,20 @@ public class SarosSession implements ISarosSession, Disposable {
         if (dataObject instanceof IProjectActivityDataObject) {
             String projectID = ((IProjectActivityDataObject) dataObject)
                 .getProjectID();
+
             /*
              * some activities (e.g. EditorActivity) can return null for
              * projectID
              */
-            if (projectID != null) {
-                IProject project = getProject(projectID);
+            if (projectID != null
+                || dataObject instanceof EditorActivityDataObject) {
+                IProject project;
+                if (projectID != null) {
+                    lastID = projectID;
+                    project = getProject(projectID);
+                } else {
+                    project = getProject(lastID);
+                }
                 /*
                  * If we don't have that shared project, but will have it in
                  * future we will queue the activity.
@@ -735,11 +744,15 @@ public class SarosSession implements ISarosSession, Disposable {
                  * When the project negotiation is done the method
                  * execQueuedActivities() will be executed
                  */
-                if (project == null || queueing) {
+                if (project == null) {
                     log.info("Activity " + dataObject.toString()
                         + " for Project " + projectID + " was queued.");
                     if (!queuedActivities.containsValue(dataObject)) {
-                        queuedActivities.put(projectID, dataObject);
+                        if (projectID == null) {
+                            queuedActivities.put(lastID, dataObject);
+                        } else {
+                            queuedActivities.put(projectID, dataObject);
+                        }
                     }
                     return true;
                 }
@@ -1022,13 +1035,5 @@ public class SarosSession implements ISarosSession, Disposable {
 
     public boolean isCompletelyShared(IProject project) {
         return projectMapper.isCompletelyShared(project);
-    }
-
-    public void stopQueue() {
-        queueing = false;
-    }
-
-    public void startQueue() {
-        queueing = true;
     }
 }

@@ -334,7 +334,6 @@ public class SarosSessionManager implements IConnectionListener,
     public void incomingProjectReceived(JID from, final SarosUI sarosUI,
         List<ProjectExchangeInfo> projectInfos, String processID,
         boolean doStream) {
-        this.getSarosSession().startQueue();
         final IncomingProjectNegotiation process = new IncomingProjectNegotiation(
             transmitter, from, projectExchangeProcesses, processID,
             projectInfos, doStream, sarosContext);

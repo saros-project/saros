@@ -436,16 +436,4 @@ public interface ISarosSession extends IActivityListener {
      * @return
      */
     public List<IResource> getSharedResources(IProject project);
-
-    /**
-     * Triggers queuing of incoming ActivityDataObjects on receiver side to
-     * process queued {@link IActivityDataObject}s after file transmission.
-     */
-    public void startQueue();
-
-    /**
-     * Stops queuing on receiver side to process queued
-     * {@link IActivityDataObject}s.
-     */
-    public void stopQueue();
 }

@@ -187,7 +187,6 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
 
                 sessionManager.notifyProjectAdded(iProject);
             }
-            sessionManager.getSarosSession().stopQueue();
         } catch (Exception e) {
             processException(e);
         } finally {

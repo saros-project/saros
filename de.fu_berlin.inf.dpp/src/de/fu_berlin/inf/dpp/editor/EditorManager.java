@@ -89,6 +89,7 @@ import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
 import de.fu_berlin.inf.dpp.project.SarosSessionManager;
 import de.fu_berlin.inf.dpp.synchronize.Blockable;
 import de.fu_berlin.inf.dpp.synchronize.StopManager;
+import de.fu_berlin.inf.dpp.ui.views.SarosView;
 import de.fu_berlin.inf.dpp.util.BlockingProgressMonitor;
 import de.fu_berlin.inf.dpp.util.Predicate;
 import de.fu_berlin.inf.dpp.util.StackTrace;
@@ -245,12 +246,11 @@ public class EditorManager implements IActivityProvider, Disposable {
                     localUser, Type.Activated, path));
             }
 
-            if (locallyActiveEditor == null)
-                return;
-
             sarosSession.sendActivity(recipient, new EditorActivity(localUser,
                 Type.Activated, locallyActiveEditor));
 
+            if (locallyActiveEditor == null)
+                return;
             if (localViewport != null) {
                 sarosSession.sendActivity(recipient, new ViewportActivity(
                     localUser, localViewport, locallyActiveEditor));
@@ -391,6 +391,8 @@ public class EditorManager implements IActivityProvider, Disposable {
 
                     IEditorPart activeEditor = editorAPI.getActiveEditor();
                     if (activeEditor != null) {
+                        locallyActiveEditor = editorAPI
+                            .getEditorPath(activeEditor);
                         partActivated(activeEditor);
                     }
 
@@ -927,6 +929,14 @@ public class EditorManager implements IActivityProvider, Disposable {
          */
         if (user.equals(getFollowedUser()) && path != null) {
             editorAPI.openEditor(path);
+        } else if (user.equals(getFollowedUser()) && path == null) {
+            // Notify the follower that the followed selected a not shared file.
+            // Follow mode is "paused".
+            SarosView
+                .showNotification(
+                    "Follow mode paused!",
+                    user.getHumanReadableName()
+                        + " selected an editor that is not shared. \nFollow mode stays active and follows as soon as possible.");
         }
     }
 
@@ -1006,6 +1016,15 @@ public class EditorManager implements IActivityProvider, Disposable {
         if (!isSharedEditor(editorPart)
             || !editorAPI.getEditorResource(editorPart).isAccessible()) {
             generateEditorActivated(null);
+            // follower switched to another unshared editor or closed followed
+            // editor (not shared editor gets activated)
+            if (isFollowing()) {
+                setFollowing(null);
+                SarosView
+                    .showNotification(
+                        "Follow mode stopped!",
+                        "You switched to another editor that is not shared \nor closed the followed editor.");
+            }
             return;
         }
 
@@ -1013,7 +1032,7 @@ public class EditorManager implements IActivityProvider, Disposable {
          * If the opened editor is not the active editor of the user being
          * followed, then leave follow mode
          */
-        if (getFollowedUser() != null) {
+        if (isFollowing()) {
             RemoteEditor activeEditor = remoteEditorManager.getEditorState(
                 getFollowedUser()).getActiveEditor();
 
@@ -1021,6 +1040,11 @@ public class EditorManager implements IActivityProvider, Disposable {
                 && !activeEditor.getPath().equals(
                     editorAPI.getEditorPath(editorPart))) {
                 setFollowing(null);
+                // follower switched to another shared editor or closed followed
+                // editor (shared editor gets activated)
+                SarosView
+                    .showNotification("Follow mode stopped!",
+                        "You switched to another editor \nor closed the followed editor.");
             }
         }
 
@@ -1092,7 +1116,11 @@ public class EditorManager implements IActivityProvider, Disposable {
                 getFollowedUser()).getActiveEditor();
 
             if (activeEditor != null && activeEditor.getPath().equals(path)) {
+                // follower closed the followed editor (no other editor gets
+                // activated)
                 setFollowing(null);
+                SarosView.showNotification("Follow mode stopped!",
+                    "You closed the followed editor.");
             }
         }
 
@@ -1666,8 +1694,19 @@ public class EditorManager implements IActivityProvider, Disposable {
         RemoteEditor activeEditor = remoteEditorManager.getEditorState(jumpTo)
             .getActiveEditor();
 
+        // you can't follow yourself
+        if (sarosSession.getLocalUser().equals(jumpTo))
+            return;
+
         if (activeEditor == null) {
             log.info(Utils.prefix(jumpTo.getJID()) + "has no editor open");
+            // no active editor on target subject
+            SarosView.showNotification("Can't follow "
+                + jumpTo.getJID().getBase() + "!", jumpTo.getJID().getName()
+                + " has no shared file activated.");
+            // don't even activate the follow mode
+            if (jumpTo.equals(followedUser))
+                setFollowing(null);
             return;
         }
 
