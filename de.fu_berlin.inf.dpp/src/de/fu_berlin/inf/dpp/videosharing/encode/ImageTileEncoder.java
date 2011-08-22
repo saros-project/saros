@@ -45,7 +45,7 @@ import de.fu_berlin.inf.dpp.videosharing.source.ImageSource;
 
 /**
  * <p>
- * This class handles image compression for video streaming be using only pure
+ * This class handles image compression for video streaming by using only pure
  * Java components
  * </p>
  * 
