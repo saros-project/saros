@@ -6,6 +6,7 @@ import static org.junit.Assert.fail;
 
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import de.fu_berlin.inf.dpp.test.xmpp.XMPPServerFacadeForTests;
@@ -16,6 +17,7 @@ import de.fu_berlin.inf.dpp.test.xmpp.XmppUser;
  */
 public class XMPPServerFacadeForTestTest {
 
+    @Ignore
     @Test
     public void test() throws XMPPException {
         XMPPServerFacadeForTests.startServer();
