@@ -36,11 +36,11 @@ public class SimpleFollowModeIITest extends StfTestCase {
         ALICE.superBot().views().sarosView().selectParticipant(BOB.getJID())
             .restrictToReadOnlyAccess();
 
-        BOB.superBot().views().sarosView().selectParticipant(ALICE.getJID())
-            .followParticipant();
-
         ALICE.superBot().views().packageExplorerView()
             .selectFile("foo", "readme.txt").open();
+
+        BOB.superBot().views().sarosView().selectParticipant(ALICE.getJID())
+            .followParticipant();
 
         int lineCount = ALICE.remoteBot().editor("readme.txt").getLineCount();
         ALICE.remoteBot().editor("readme.txt").navigateTo(lineCount - 1, 0);

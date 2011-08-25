@@ -54,11 +54,11 @@ public class RefactorInFollowModeTest extends StfTestCase {
         BOB.superBot().views().packageExplorerView()
             .waitUntilResourceIsShared("foo/src/bar/HelloWorld.java");
 
-        BOB.superBot().views().sarosView().selectParticipant(ALICE.getJID())
-            .followParticipant();
-
         ALICE.superBot().views().packageExplorerView()
             .selectClass("foo", "bar", "HelloWorld").open();
+
+        BOB.superBot().views().sarosView().selectParticipant(ALICE.getJID())
+            .followParticipant();
 
         List<Integer> viewPortBeforeRefactor = BOB.remoteBot()
             .editor("HelloWorld.java").getViewport();
