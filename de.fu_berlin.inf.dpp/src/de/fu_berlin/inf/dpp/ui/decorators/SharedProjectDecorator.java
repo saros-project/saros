@@ -113,7 +113,7 @@ public class SharedProjectDecorator implements ILightweightLabelDecorator {
             resources.add(iResource);
             if ((iResource instanceof IFile)) {
                 decoration.addOverlay(SharedProjectDecorator.projectDescriptor,
-                    IDecoration.TOP_RIGHT);
+                    IDecoration.TOP_LEFT);
             } else {
                 decoration.addOverlay(SharedProjectDecorator.projectDescriptor,
                     IDecoration.TOP_LEFT);

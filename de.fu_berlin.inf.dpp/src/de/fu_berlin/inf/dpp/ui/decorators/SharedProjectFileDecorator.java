@@ -243,13 +243,13 @@ public class SharedProjectFileDecorator implements ILightweightLabelDecorator {
             if (containsUserToDisplay(editorManager
                 .getRemoteActiveEditorUsers(path))) {
                 log.trace("Active Deco: " + element);
-                decoration.addOverlay(activeDescriptor, IDecoration.TOP_LEFT);
+                decoration.addOverlay(activeDescriptor, IDecoration.TOP_RIGHT);
                 return true;
             }
             if (containsUserToDisplay(editorManager
                 .getRemoteOpenEditorUsers(path))) {
                 log.trace("Passive Deco: " + element);
-                decoration.addOverlay(passiveDescriptor, IDecoration.TOP_LEFT);
+                decoration.addOverlay(passiveDescriptor, IDecoration.TOP_RIGHT);
                 return true;
             }
 
