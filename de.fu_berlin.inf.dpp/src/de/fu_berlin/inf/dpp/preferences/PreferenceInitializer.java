@@ -93,6 +93,7 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 
         // Communication default settings
         prefs.put(PreferenceConstants.CHATSERVER, "conference.jabber.ccc.de");
+        prefs.putBoolean(PreferenceConstants.USE_DEFAULT_CHATSERVER, true);
         prefs.putBoolean(PreferenceConstants.BEEP_UPON_IM, true);
         prefs.putBoolean(PreferenceConstants.AUDIO_VBR, true);
         prefs.putBoolean(PreferenceConstants.AUDIO_ENABLE_DTX, true);

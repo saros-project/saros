@@ -37,6 +37,7 @@ public class CommunicationPreferencePage extends FieldEditorPreferencePage
 
     protected Composite parent;
     protected StringFieldEditor chatserver;
+    protected BooleanFieldEditor useDefaultChatServer;
     protected StringFieldEditor skypeName;
     protected BooleanFieldEditor beepUponIM;
     protected BooleanFieldEditor audio_vbr;
@@ -74,16 +75,20 @@ public class CommunicationPreferencePage extends FieldEditorPreferencePage
         voipGridData.horizontalSpan = 2;
 
         chatGroup.setText("Chat");
-        chatGroup.setLayout(new GridLayout(2, true));
+        chatGroup.setLayout(new GridLayout(2, false));
 
         voipGroup.setText("VoIP");
-        voipGroup.setLayout(new GridLayout(2, true));
+        voipGroup.setLayout(new GridLayout(2, false));
 
         chatGroup.setLayoutData(chatGridData);
         voipGroup.setLayoutData(voipGridData);
 
         chatserver = new StringFieldEditor(PreferenceConstants.CHATSERVER,
-            "Chatserver (Example: conference.jabber.org):", chatGroup);
+            "Chatserver:", chatGroup);
+
+        useDefaultChatServer = new BooleanFieldEditor(
+            PreferenceConstants.USE_DEFAULT_CHATSERVER,
+            "Use default chatserver", chatGroup);
 
         beepUponIM = new BooleanFieldEditor(PreferenceConstants.BEEP_UPON_IM,
             "Beep when receiving a chat message", chatGroup);
@@ -103,12 +108,12 @@ public class CommunicationPreferencePage extends FieldEditorPreferencePage
 
         audio_vbr = new BooleanFieldEditor(
             PreferenceConstants.AUDIO_VBR,
-            "Use Variable Bitrate (if activated gives a better quality-to-space ratio, but may introduce a delay)",
+            "Use Variable Bitrate (gives a better quality-to-space ratio, but may introduce a delay)",
             voipGroup);
 
         audio_dtx = new BooleanFieldEditor(
             PreferenceConstants.AUDIO_ENABLE_DTX,
-            "Use Discontinuous Transmission (if activated, silence is not transmitted - only works with variable bitrate)",
+            "Use Discontinuous Transmission (silence is not transmitted - only works with variable bitrate)",
             voipGroup);
 
         audio_dtx.setEnabled(prefs.getBoolean(PreferenceConstants.AUDIO_VBR),
@@ -123,6 +128,7 @@ public class CommunicationPreferencePage extends FieldEditorPreferencePage
             getRecordMixersString(), voipGroup);
 
         addField(chatserver);
+        addField(useDefaultChatServer);
         addField(beepUponIM);
         addField(skypeName);
         addField(audioQuality);
@@ -132,10 +138,6 @@ public class CommunicationPreferencePage extends FieldEditorPreferencePage
         addField(audioPlaybackDevs);
         addField(audioRecordDevs);
 
-    }
-
-    public void init(IWorkbench arg0) {
-        // NOP
     }
 
     @Override
@@ -151,6 +153,14 @@ public class CommunicationPreferencePage extends FieldEditorPreferencePage
         } else {
             setErrorMessage(null);
             setValid(true);
+        }
+    }
+
+    @Override
+    public void initialize() {
+        super.initialize();
+        if (prefs.getBoolean(PreferenceConstants.USE_DEFAULT_CHATSERVER)) {
+            chatserver.setEnabled(false, chatGroup);
         }
     }
 
@@ -172,8 +182,16 @@ public class CommunicationPreferencePage extends FieldEditorPreferencePage
                     audio_dtx.setEnabled(newValue, parent);
                 }
             }
-        }
 
+            if (field.getPreferenceName().equals(
+                PreferenceConstants.USE_DEFAULT_CHATSERVER)) {
+                if (event.getNewValue() instanceof Boolean) {
+                    boolean useDefault = ((Boolean) event.getNewValue())
+                        .booleanValue();
+                    chatserver.setEnabled(!useDefault, chatGroup);
+                }
+            }
+        }
     }
 
     protected String[][] getRecordMixersString() {
@@ -217,6 +235,10 @@ public class CommunicationPreferencePage extends FieldEditorPreferencePage
             outputArray[i][1] = inputArray[i];
         }
         return outputArray;
+    }
+
+    public void init(IWorkbench workbench) {
+        // TODO Auto-generated method stub
     }
 
 }

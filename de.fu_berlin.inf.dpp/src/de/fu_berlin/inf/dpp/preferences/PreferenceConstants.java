@@ -164,6 +164,8 @@ public class PreferenceConstants {
      **/
     public static final String CHATROOM = "chatroom";
 
+    public static final String USE_DEFAULT_CHATSERVER = "USE_DEFAULT_CHATSERVER";
+
     /** Beep when receiving an IM **/
     public static final String BEEP_UPON_IM = "BEEP_UPON_IM";
 
