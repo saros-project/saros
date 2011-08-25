@@ -98,7 +98,8 @@ public class ChatControl extends Composite {
         final int minVisibleInputLines) {
         super(parent, style & ~SWT.BORDER);
 
-        int chatDisplayStyle = (style & SWT.BORDER) | SWT.V_SCROLL;
+        int chatDisplayStyle = (style & SWT.BORDER) | SWT.V_SCROLL
+            | SWT.H_SCROLL;
         int chatInputStyle = (style & SWT.BORDER) | SWT.MULTI | SWT.V_SCROLL
             | SWT.WRAP;
 
