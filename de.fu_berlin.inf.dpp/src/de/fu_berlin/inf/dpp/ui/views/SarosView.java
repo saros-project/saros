@@ -508,8 +508,17 @@ public class SarosView extends ViewPart {
                     control = Display.getDefault().getFocusControl();
 
                 }
+                // show message at least 15 secs, but show it longer for longer
+                // messages
+                // Referenced by wikipedia, a user can read 2,5 words per second
+                // so we approximate 400ms per word
+                int showMessageTime = Math.max(15000,
+                    text.split("\\s").length * 400);
+                log.info("Show BalloonNotification title:\" " + title
+                    + "\" Message: \"" + text + "\"");
+
                 BalloonNotification.showNotification(control, title, text,
-                    15000);
+                    showMessageTime);
             }
         });
     }
