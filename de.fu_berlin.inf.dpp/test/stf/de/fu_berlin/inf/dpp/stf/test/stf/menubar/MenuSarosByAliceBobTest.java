@@ -14,7 +14,6 @@ import static de.fu_berlin.inf.dpp.stf.shared.Constants.SHELL_SHARE_PROJECT;
 import java.rmi.RemoteException;
 import java.util.regex.Pattern;
 
-import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -55,13 +54,8 @@ public class MenuSarosByAliceBobTest extends StfTestCase {
         resetWorkbenches();
     }
 
-    @After
-    public void afterEveryTest() throws Exception {
-        leaveSessionHostFirst(ALICE);
-    }
-
     @Test
-    public void testShareProjectsWithRemoteBot() throws RemoteException {
+    public void testShareProjectsWithRemoteBot() throws Exception {
 
         ALICE
             .superBot()
@@ -101,10 +95,13 @@ public class MenuSarosByAliceBobTest extends StfTestCase {
             .waitUntilResourceIsShared(
                 Util.classPathToFilePath(Constants.PROJECT1, Constants.PKG1,
                     Constants.CLS1));
+
+        leaveSessionHostFirst(ALICE);
+
     }
 
     @Test
-    public void testShareProjectsWithSuperBot() throws RemoteException {
+    public void testShareProjectsWithSuperBot() throws Exception {
         ALICE
             .superBot()
             .views()
@@ -128,6 +125,8 @@ public class MenuSarosByAliceBobTest extends StfTestCase {
             .waitUntilResourceIsShared(
                 Util.classPathToFilePath(Constants.PROJECT1, Constants.PKG1,
                     Constants.CLS1));
+
+        leaveSessionHostFirst(ALICE);
 
     }
 
@@ -168,6 +167,9 @@ public class MenuSarosByAliceBobTest extends StfTestCase {
             .packageExplorerView()
             .waitUntilClassExists(Constants.PROJECT2, Constants.PKG1,
                 Constants.CLS1);
+
+        leaveSessionHostFirst(ALICE);
+
     }
 
     @Test

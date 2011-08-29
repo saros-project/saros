@@ -486,12 +486,13 @@ public abstract class StfTestCase {
     public static void leaveSessionHostFirst(AbstractTester host)
         throws Exception {
 
+        if (!host.superBot().views().sarosView().isHost())
+            throw new IllegalStateException(host
+                + " is not host of the current session");
+
         host.superBot().views().sarosView().leaveSession();
         for (final AbstractTester tester : currentTesters) {
             if (tester != host) {
-                if (!tester.superBot().views().sarosView().isHost())
-                    throw new IllegalStateException(tester
-                        + " is not host of the current session");
                 tester.superBot().views().sarosView().waitUntilIsNotInSession();
             }
         }
@@ -507,12 +508,19 @@ public abstract class StfTestCase {
      * 
      * @param host
      *            the host of the current session
+     * @throws IllegalStateException
+     *             if the host is not host of the current session
      * @throws Exception
      *             if a (internal) failure occurs
      */
 
     public static void leaveSessionPeersFirst(AbstractTester host)
         throws Exception {
+
+        if (!host.superBot().views().sarosView().isHost())
+            throw new IllegalStateException(host
+                + " is not host of the current session");
+
         List<JID> peerJIDs = new ArrayList<JID>();
         List<Callable<Void>> leaveTasks = new ArrayList<Callable<Void>>();
         for (final AbstractTester tester : currentTesters) {
