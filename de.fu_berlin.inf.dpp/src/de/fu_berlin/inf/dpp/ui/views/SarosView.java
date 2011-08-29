@@ -296,7 +296,7 @@ public class SarosView extends ViewPart {
         Composite rightComposite = new Composite(baseSashForm, SWT.NONE);
         rightComposite.setLayout(new FillLayout());
 
-        new ChatRoomsComposite(rightComposite, SWT.NONE);
+        new ChatRoomsComposite(rightComposite, SWT.NONE, rosterTracker);
 
         /*
          * contributeToActionBars: TODO the creation of actions through the

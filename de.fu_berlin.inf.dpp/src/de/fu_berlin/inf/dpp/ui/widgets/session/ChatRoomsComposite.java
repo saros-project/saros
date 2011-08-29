@@ -1,5 +1,6 @@
 package de.fu_berlin.inf.dpp.ui.widgets.session;
 
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -15,6 +16,8 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
+import org.jivesoftware.smack.Roster;
+import org.jivesoftware.smack.packet.Presence;
 import org.jivesoftware.smackx.ChatState;
 import org.picocontainer.annotations.Inject;
 
@@ -33,7 +36,9 @@ import de.fu_berlin.inf.dpp.communication.muc.singleton.MUCManagerSingletonWrapp
 import de.fu_berlin.inf.dpp.editor.AbstractSharedEditorListener;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.editor.annotations.SarosAnnotation;
+import de.fu_berlin.inf.dpp.net.IRosterListener;
 import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.net.RosterTracker;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.SarosSessionManager;
 import de.fu_berlin.inf.dpp.ui.ImageManager;
@@ -75,6 +80,48 @@ public class ChatRoomsComposite extends ListExplanatoryComposite {
     protected ListExplanation howTo = new ListExplanation(SWT.ICON_INFORMATION,
         "To share projects you can either:", "Right-click on a project",
         "Right-click on a buddy", "Use the Saros menu in the Eclipse menu bar");
+
+    protected RosterTracker rosterTracker;
+
+    /**
+     * This RosterListener closure is added to the RosterTracker to get
+     * notifications when the roster changes.
+     */
+    protected IRosterListener rosterListener = new IRosterListener() {
+
+        /**
+         * This method is mainly called, if the user name is changed, rebuild
+         * Chat with uptodate nicknames from history
+         */
+        public void entriesUpdated(Collection<String> addresses) {
+
+            Utils.runSafeSWTAsync(log, new Runnable() {
+                public void run() {
+                    if (!isDisposed()) {
+                        log.info("roster entries changed, refreshing chat history");
+                        refreshFromHistory();
+                    }
+                }
+            });
+        }
+
+        public void entriesDeleted(Collection<String> addresses) {
+            // do nothing
+        }
+
+        public void presenceChanged(Presence presence) {
+            // do nothing
+        }
+
+        public void rosterChanged(Roster roster) {
+            // do nothing
+        }
+
+        public void entriesAdded(Collection<String> addresses) {
+            // do nothing
+        }
+
+    };
 
     @Inject
     /*
@@ -250,8 +297,12 @@ public class ChatRoomsComposite extends ListExplanatoryComposite {
      */
     protected Map<JID, Color> colorCache = new HashMap<JID, Color>();
 
-    public ChatRoomsComposite(Composite parent, int style) {
+    public ChatRoomsComposite(Composite parent, int style,
+        final RosterTracker rosterTracker) {
         super(parent, style);
+
+        this.rosterTracker = rosterTracker;
+        rosterTracker.addRosterListener(rosterListener);
 
         SarosPluginContext.initComponent(this);
 
@@ -302,6 +353,12 @@ public class ChatRoomsComposite extends ListExplanatoryComposite {
                 }
                 mucManager.removeMUCManagerListener(mucManagerListener);
                 editorManager.removeSharedEditorListener(sharedEditorListener);
+
+                /**
+                 * This must be called before finalization otherwise you will
+                 * get NPE on RosterTracker.
+                 */
+                rosterTracker.removeRosterListener(rosterListener);
             }
         });
 
