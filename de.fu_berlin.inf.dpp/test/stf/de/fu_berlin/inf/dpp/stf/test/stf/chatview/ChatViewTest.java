@@ -23,7 +23,7 @@ public class ChatViewTest extends StfTestCase {
     }
 
     @Test
-    public void testChatSend() throws RemoteException {
+    public void testChatSend() throws Exception {
         Util.setUpSessionWithJavaProjectAndClass("foo", "bar", "test", ALICE,
             BOB);
 

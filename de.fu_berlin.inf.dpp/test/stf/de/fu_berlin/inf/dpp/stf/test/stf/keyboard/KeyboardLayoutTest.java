@@ -3,8 +3,6 @@ package de.fu_berlin.inf.dpp.stf.test.stf.keyboard;
 import static de.fu_berlin.inf.dpp.stf.client.tester.SarosTester.ALICE;
 import static org.junit.Assert.assertEquals;
 
-import java.rmi.RemoteException;
-
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -20,9 +18,9 @@ public class KeyboardLayoutTest extends StfTestCase {
     }
 
     @Test
-    public void testKeyboardLayout() throws RemoteException {
+    public void testKeyboardLayout() throws Exception {
 
-        Util.createProjectWithFile(Constants.PROJECT1, Constants.FILE3, ALICE);
+        Util.createProjectWithEmptyFile(Constants.PROJECT1, Constants.FILE3, ALICE);
         //
         final String textToTest = "!\"§$%&/()={[]}\\+*~#'-_.:,;|<>^? abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
 

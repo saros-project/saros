@@ -9,7 +9,6 @@ import static de.fu_berlin.inf.dpp.stf.shared.Constants.MENU_SAROS;
 import static de.fu_berlin.inf.dpp.stf.shared.Constants.SHELL_ADD_PROJECTS_TO_SESSION;
 import static org.junit.Assert.assertFalse;
 
-import java.rmi.RemoteException;
 import java.util.List;
 
 import org.junit.After;
@@ -30,7 +29,7 @@ public class ShareMultipleProjectsTest extends StfTestCase {
     }
 
     @Before
-    public void beforeEveryTest() throws RemoteException {
+    public void beforeEveryTest() throws Exception {
 
         clearWorkspaces();
         ALICE.superBot().views().packageExplorerView().tree().newC()
@@ -44,13 +43,13 @@ public class ShareMultipleProjectsTest extends StfTestCase {
     }
 
     @After
-    public void afterEveryTest() throws RemoteException {
+    public void afterEveryTest() throws Exception {
         leaveSessionHostFirst(ALICE);
     }
 
     @Test
     public void testShareMultipleWithBobAndCarlSequencetially()
-        throws RemoteException {
+        throws Exception {
 
         Util.buildSessionConcurrently("foo", TypeOfCreateProject.NEW_PROJECT,
             ALICE, BOB, CARL);
@@ -82,7 +81,7 @@ public class ShareMultipleProjectsTest extends StfTestCase {
     }
 
     @Test
-    public void testShareSameProjectTwice() throws RemoteException {
+    public void testShareSameProjectTwice() throws Exception {
 
         Util.buildSessionConcurrently("foo", TypeOfCreateProject.NEW_PROJECT,
             ALICE, BOB, CARL);

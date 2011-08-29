@@ -21,7 +21,7 @@ public class MenuRefactorTest extends StfTestCase {
     }
 
     @Before
-    public void beforeEveryTest() throws RemoteException {
+    public void beforeEveryTest() throws Exception {
         clearWorkspaces();
     }
 

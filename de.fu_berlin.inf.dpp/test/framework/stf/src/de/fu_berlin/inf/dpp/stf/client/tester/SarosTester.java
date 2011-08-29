@@ -9,8 +9,10 @@ import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.ISuperBot;
 public enum SarosTester implements AbstractTester {
     ALICE(TesterFactory.createTester("ALICE")), BOB(TesterFactory
         .createTester("BOB")), CARL(TesterFactory.createTester("CARL")), DAVE(
-        TesterFactory.createTester("DAVE")), EDNA(TesterFactory
-        .createTester("EDNA"));
+        TesterFactory.createTester("DAVE"))/*
+                                            * EDNA(TesterFactory
+                                            * .createTester("EDNA"))
+                                            */;
 
     private AbstractTester tester;
 

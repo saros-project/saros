@@ -6,8 +6,6 @@ import static de.fu_berlin.inf.dpp.stf.client.tester.SarosTester.CARL;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import java.rmi.RemoteException;
-
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -50,7 +48,7 @@ public class Share3UsersSequentiallyTest extends StfTestCase {
      * @throws InterruptedException
      */
     @Test
-    public void testShareProject3UsersSequentially() throws RemoteException,
+    public void testShareProject3UsersSequentially() throws Exception,
         InterruptedException {
 
         ALICE

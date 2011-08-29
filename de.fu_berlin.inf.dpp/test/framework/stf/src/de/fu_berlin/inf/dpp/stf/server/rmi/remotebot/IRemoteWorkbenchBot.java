@@ -198,5 +198,5 @@ public interface IRemoteWorkbenchBot extends IRemoteBot {
      * 
      * @throws RemoteException
      */
-    public void createBots() throws RemoteException;
+    public void resetBot() throws RemoteException;
 }

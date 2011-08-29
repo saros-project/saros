@@ -54,14 +54,14 @@ public class ShareProjectUsingExistingProjectTest extends StfTestCase {
     }
 
     @After
-    public void runAfterEveryTest() throws RemoteException {
+    public void runAfterEveryTest() throws Exception {
         leaveSessionHostFirst(ALICE);
         clearWorkspaces();
 
     }
 
     @Test
-    public void shareProjectUsingExistingProject() throws RemoteException {
+    public void shareProjectUsingExistingProject() throws Exception {
         assertFalse(BOB.superBot().views().packageExplorerView()
             .selectPkg(Constants.PROJECT1, Constants.PKG1)
             .existsWithRegex(Pattern.quote(Constants.CLS1_SUFFIX) + ".*"));
@@ -85,7 +85,7 @@ public class ShareProjectUsingExistingProjectTest extends StfTestCase {
 
     @Test
     public void shareProjectUsingExistProjectWithCopyAfterCancelLocalChange()
-        throws RemoteException {
+        throws Exception {
         assertFalse(BOB.superBot().views().packageExplorerView()
             .selectPkg(Constants.PROJECT1, Constants.PKG1)
             .existsWithRegex(Pattern.quote(Constants.CLS1_SUFFIX) + ".*"));
@@ -112,8 +112,7 @@ public class ShareProjectUsingExistingProjectTest extends StfTestCase {
     }
 
     @Test
-    public void testShareProjectUsingExistingProjectWithCopy()
-        throws RemoteException {
+    public void testShareProjectUsingExistingProjectWithCopy() throws Exception {
         Util.buildSessionSequentially(Constants.PROJECT1,
             TypeOfCreateProject.EXIST_PROJECT_WITH_COPY, ALICE, BOB);
         assertTrue(BOB.superBot().views().packageExplorerView().tree()

@@ -14,7 +14,6 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import de.fu_berlin.inf.dpp.stf.server.StfRemoteObject;
 import de.fu_berlin.inf.dpp.stf.server.bot.widget.ContextMenuHelper;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.impl.RemoteWorkbenchBot;
-import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotMenu;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotTree;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotTreeItem;
 
@@ -44,9 +43,8 @@ public final class RemoteBotTree extends StfRemoteObject implements
         return this;
     }
 
-    public IRemoteBotMenu contextMenu(String... texts) throws RemoteException {
-        return RemoteBotMenu.getInstance().setWidget(
-            ContextMenuHelper.getContextMenu(widget, texts));
+    public void clickContextMenu(String... texts) throws RemoteException {
+        ContextMenuHelper.clickContextMenu(widget, texts);
     }
 
     public IRemoteBotTreeItem collapseNode(String nodeText)

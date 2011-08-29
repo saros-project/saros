@@ -23,7 +23,7 @@ public class MenuTest extends StfTestCase {
     }
 
     @After
-    public void afterEveryTest() throws RemoteException {
+    public void afterEveryTest() throws Exception {
         clearWorkspaces();
     }
 

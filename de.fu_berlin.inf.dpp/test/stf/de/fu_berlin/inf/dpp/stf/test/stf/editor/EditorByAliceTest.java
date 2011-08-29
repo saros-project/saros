@@ -26,7 +26,7 @@ public class EditorByAliceTest extends StfTestCase {
     }
 
     @Before
-    public void beforeEveryTest() throws RemoteException {
+    public void beforeEveryTest() throws Exception {
         closeAllEditors();
         clearWorkspaces();
     }

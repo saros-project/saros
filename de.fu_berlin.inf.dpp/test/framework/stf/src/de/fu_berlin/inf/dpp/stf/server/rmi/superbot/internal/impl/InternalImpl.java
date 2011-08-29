@@ -18,6 +18,7 @@ import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
@@ -342,5 +343,9 @@ public final class InternalImpl extends StfRemoteObject implements IInternal {
 
         createFile(projectName, path, content.toString());
 
+    }
+
+    public boolean existsResource(String path) throws RemoteException {
+        return ResourcesPlugin.getWorkspace().getRoot().exists(new Path(path));
     }
 }

@@ -36,7 +36,7 @@ public class ConcurrentEditingTest extends StfTestCase {
      *      tracker entry 3098992</a>
      */
     @Test
-    public void testBugInconsistencyConcurrentEditing() throws RemoteException,
+    public void testBugInconsistencyConcurrentEditing() throws Exception,
         InterruptedException {
         ALICE.superBot().views().packageExplorerView().tree().newC()
             .project(Constants.PROJECT1);

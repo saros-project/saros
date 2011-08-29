@@ -43,8 +43,8 @@ public class AllParticipantsFollowUserWithWriteAccessTest extends StfTestCase {
     }
 
     @Before
-    public void runBeforeEveryTest() throws RemoteException {
-        Util.setFollowMode(ALICE, BOB, CARL, DAVE);
+    public void runBeforeEveryTest() throws Exception {
+        Util.activateFollowMode(ALICE, BOB, CARL, DAVE);
     }
 
     /**
@@ -175,7 +175,7 @@ public class AllParticipantsFollowUserWithWriteAccessTest extends StfTestCase {
             .views()
             .packageExplorerView()
             .getFileContent(
-                Util.getClassPath(Constants.PROJECT1, Constants.PKG1,
+                Util.classPathToFilePath(Constants.PROJECT1, Constants.PKG1,
                     Constants.CLS1));
 
         BOB.remoteBot().waitUntilEditorClosed(Constants.CLS1_SUFFIX);
@@ -191,7 +191,7 @@ public class AllParticipantsFollowUserWithWriteAccessTest extends StfTestCase {
             .views()
             .packageExplorerView()
             .getFileContent(
-                Util.getClassPath(Constants.PROJECT1, Constants.PKG1,
+                Util.classPathToFilePath(Constants.PROJECT1, Constants.PKG1,
                     Constants.CLS1)).equals(clsContentOfAlice));
 
         assertTrue(CARL
@@ -199,7 +199,7 @@ public class AllParticipantsFollowUserWithWriteAccessTest extends StfTestCase {
             .views()
             .packageExplorerView()
             .getFileContent(
-                Util.getClassPath(Constants.PROJECT1, Constants.PKG1,
+                Util.classPathToFilePath(Constants.PROJECT1, Constants.PKG1,
                     Constants.CLS1)).equals(clsContentOfAlice));
 
         assertTrue(BOB
@@ -207,7 +207,7 @@ public class AllParticipantsFollowUserWithWriteAccessTest extends StfTestCase {
             .views()
             .packageExplorerView()
             .getFileContent(
-                Util.getClassPath(Constants.PROJECT1, Constants.PKG1,
+                Util.classPathToFilePath(Constants.PROJECT1, Constants.PKG1,
                     Constants.CLS1)).equals(clsContentOfAlice));
     }
 }

@@ -11,9 +11,7 @@ public interface IRemoteBotTreeItem extends Remote {
      * 
      **********************************************/
 
-    // public STFBotMenu contextMenu(String text) throws RemoteException;
-
-    public IRemoteBotMenu contextMenus(String... texts) throws RemoteException;
+    public void clickContextMenu(String... texts) throws RemoteException;
 
     /**********************************************
      * 

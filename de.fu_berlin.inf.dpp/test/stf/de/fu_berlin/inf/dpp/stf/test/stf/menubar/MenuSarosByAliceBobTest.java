@@ -33,18 +33,36 @@ public class MenuSarosByAliceBobTest extends StfTestCase {
     }
 
     @Before
-    public void beforeEveryTest() throws RemoteException {
-        clearWorkspaces();
+    public void beforeEveryTest() throws Exception {
+
+        int timeout = 10;
+
+        while (timeout > 0) {
+            if (clearWorkspaces())
+                break;
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                throw e;
+            }
+            timeout--;
+
+        }
+
+        if (timeout == 0)
+            throw new RuntimeException("unable to delete workspace");
+
         resetWorkbenches();
     }
 
     @After
-    public void afterEveryTest() throws RemoteException {
+    public void afterEveryTest() throws Exception {
         leaveSessionHostFirst(ALICE);
     }
 
     @Test
     public void testShareProjectsWithRemoteBot() throws RemoteException {
+
         ALICE
             .superBot()
             .views()
@@ -77,6 +95,12 @@ public class MenuSarosByAliceBobTest extends StfTestCase {
         BOB.superBot().confirmShellAddProjectUsingWhichProject(
             Constants.PROJECT1, TypeOfCreateProject.NEW_PROJECT);
         BOB.superBot().views().sarosView().waitUntilIsInSession();
+        BOB.superBot()
+            .views()
+            .packageExplorerView()
+            .waitUntilResourceIsShared(
+                Util.classPathToFilePath(Constants.PROJECT1, Constants.PKG1,
+                    Constants.CLS1));
     }
 
     @Test
@@ -92,9 +116,18 @@ public class MenuSarosByAliceBobTest extends StfTestCase {
 
         ALICE.superBot().menuBar().saros()
             .shareProjects(Constants.PROJECT1, BOB.getJID());
+
         BOB.superBot().confirmShellSessionInvitationAndShellAddProject(
             Constants.PROJECT1, TypeOfCreateProject.NEW_PROJECT);
+
         BOB.superBot().views().sarosView().waitUntilIsInSession();
+
+        BOB.superBot()
+            .views()
+            .packageExplorerView()
+            .waitUntilResourceIsShared(
+                Util.classPathToFilePath(Constants.PROJECT1, Constants.PKG1,
+                    Constants.CLS1));
 
     }
 
@@ -107,7 +140,7 @@ public class MenuSarosByAliceBobTest extends StfTestCase {
     }
 
     @Test
-    public void addProjects() throws RemoteException {
+    public void addProjects() throws Exception {
         Util.setUpSessionWithJavaProjectAndClass(Constants.PROJECT1,
             Constants.PKG1, Constants.CLS1, ALICE, BOB);
 
@@ -138,12 +171,18 @@ public class MenuSarosByAliceBobTest extends StfTestCase {
     }
 
     @Test
-    public void stopSession() throws RemoteException {
+    public void stopSession() throws Exception {
         Util.setUpSessionWithJavaProjectAndClass(Constants.PROJECT1,
             Constants.PKG1, Constants.CLS1, ALICE, BOB);
 
         ALICE.superBot().views().sarosView().waitUntilIsInSession();
         BOB.superBot().views().sarosView().waitUntilIsInSession();
+
+        BOB.superBot()
+            .views()
+            .packageExplorerView()
+            .waitUntilClassExists(Constants.PROJECT1, Constants.PKG1,
+                Constants.CLS1);
 
         ALICE.superBot().views().sarosView().selectBuddies().stopSarosSession();
 

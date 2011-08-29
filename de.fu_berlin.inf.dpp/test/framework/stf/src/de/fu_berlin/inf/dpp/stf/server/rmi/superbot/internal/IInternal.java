@@ -6,6 +6,17 @@ import java.rmi.RemoteException;
 public interface IInternal extends Remote {
 
     /**
+     * Checks if the given resource exists in the current workspace.
+     * 
+     * @param path
+     *            the path to the resource e.g my/foo/bar
+     * @return <code>true</code> if the resource exists, <code>false</code>
+     *         otherwise
+     * @throws RemoteException
+     */
+    public boolean existsResource(String path) throws RemoteException;
+
+    /**
      * Creates a folder in the project. All missing folders will be created
      * automatically.
      * 
@@ -15,6 +26,8 @@ public interface IInternal extends Remote {
      * @param path
      *            the path of the folder e.g my/foo/bar
      * @throws RemoteException
+     *             if the folder could not be created or the project do not
+     *             exists
      */
 
     public void createFolder(String projectName, String path)
@@ -26,6 +39,7 @@ public interface IInternal extends Remote {
      * @param projectName
      *            the name of the project
      * @throws RemoteException
+     *             if the project could not be created or already exists
      */
 
     public void createProject(String projectName) throws RemoteException;
@@ -36,6 +50,7 @@ public interface IInternal extends Remote {
      * @param projectName
      *            the name of the project
      * @throws RemoteException
+     *             if the project could not be created or already exists
      */
     public void createJavaProject(String projectName) throws RemoteException;
 
@@ -80,6 +95,7 @@ public interface IInternal extends Remote {
      * @param content
      *            the content of the file
      * @throws RemoteException
+     *             if the file could not be created or already exists
      * 
      */
 
@@ -102,12 +118,14 @@ public interface IInternal extends Remote {
      *            if <code>true</code> the content of the file will compress
      *            into not more than a several bytes
      * @throws RemoteException
+     *             if the file could not be created or already exists
      */
     public void createFile(String projectName, String path, int size,
         boolean compressAble) throws RemoteException;
 
     /**
-     * Creates a java class in the given project
+     * Creates a java class in the given project. All missing packages will be
+     * created automatically.
      * 
      * @Note the project must already exists
      * @param projectName
@@ -118,6 +136,7 @@ public interface IInternal extends Remote {
      * @param className
      *            the name of the class e.g HelloWorld
      * @throws RemoteException
+     *             if the class could not be created or already exists
      */
 
     public void createJavaClass(String projectName, String packageName,
@@ -133,6 +152,7 @@ public interface IInternal extends Remote {
      * @param content
      *            the content to append
      * @throws RemoteException
+     *             if the file does not exists
      */
     public void append(String projectName, String path, String content)
         throws RemoteException;

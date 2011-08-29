@@ -39,7 +39,7 @@ public class InviteBuddiesByAliceBobCarlTest extends StfTestCase {
      * @throws InterruptedException
      */
     @Test
-    public void inviteBuddy() throws RemoteException, InterruptedException {
+    public void inviteBuddy() throws Exception {
         Util.setUpSessionWithJavaProjectAndClass(Constants.PROJECT1,
             Constants.PKG1, Constants.CLS1, ALICE, BOB);
 

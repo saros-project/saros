@@ -36,7 +36,7 @@ public class BuddiesByAliceBobTest extends StfTestCase {
     }
 
     @After
-    public void afterEveryTest() throws RemoteException {
+    public void afterEveryTest() throws Exception {
         resetBuddies();
         resetBuddyNames();
         clearWorkspaces();
@@ -87,7 +87,7 @@ public class BuddiesByAliceBobTest extends StfTestCase {
     }
 
     @Test
-    public void addBuddy() throws RemoteException {
+    public void addBuddy() throws Exception {
         Util.removeBuddiesFromContactList(ALICE, BOB);
         assertFalse(ALICE.superBot().views().sarosView().hasBuddy(BOB.getJID()));
         assertFalse(BOB.superBot().views().sarosView().hasBuddy(ALICE.getJID()));
@@ -110,7 +110,7 @@ public class BuddiesByAliceBobTest extends StfTestCase {
      * @throws RemoteException
      */
     @Test
-    public void deleteBuddy() throws RemoteException {
+    public void deleteBuddy() throws Exception {
         assertTrue(ALICE.superBot().views().sarosView().hasBuddy(BOB.getJID()));
         Util.removeBuddiesFromContactList(ALICE, BOB);
         assertFalse(ALICE.superBot().views().sarosView().hasBuddy(BOB.getJID()));

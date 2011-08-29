@@ -63,7 +63,7 @@ public class HostInvitesBelatedlyTest extends StfTestCase {
      * @throws InterruptedException
      */
     @Test
-    public void testFollowModeByOpenClassbyAlice() throws IOException,
+    public void testFollowModeByOpenClassbyAlice() throws Exception,
         CoreException, InterruptedException {
         ALICE
             .superBot()
@@ -86,7 +86,7 @@ public class HostInvitesBelatedlyTest extends StfTestCase {
          */
         Util.buildSessionConcurrently(Constants.PROJECT1,
             TypeOfCreateProject.NEW_PROJECT, ALICE, CARL);
-        Util.setFollowMode(ALICE, CARL);
+        Util.activateFollowMode(ALICE, CARL);
 
         ALICE.superBot().views().packageExplorerView()
             .selectClass(Constants.PROJECT1, Constants.PKG1, Constants.CLS1)

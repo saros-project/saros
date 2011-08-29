@@ -3,8 +3,6 @@ package de.fu_berlin.inf.dpp.stf.test.filefolderoperations;
 import static de.fu_berlin.inf.dpp.stf.client.tester.SarosTester.ALICE;
 import static de.fu_berlin.inf.dpp.stf.client.tester.SarosTester.BOB;
 
-import java.rmi.RemoteException;
-
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -22,7 +20,7 @@ public class FolderOperationsTest extends StfTestCase {
     }
 
     @Test
-    public void testRenameFolder() throws RemoteException {
+    public void testRenameFolder() throws Exception {
 
         ALICE.superBot().internal().createProject("foo");
         ALICE.superBot().internal().createFile("foo", "test/foo.txt", /*

@@ -6,8 +6,6 @@ import static de.fu_berlin.inf.dpp.stf.client.tester.SarosTester.CARL;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.fail;
 
-import java.rmi.RemoteException;
-
 import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -25,7 +23,7 @@ public class RemoveUsersFromRosterView extends StfTestCase {
     }
 
     @Test
-    public void testRemoveUsersFromRosterView() throws RemoteException {
+    public void testRemoveUsersFromRosterView() throws Exception {
 
         Util.setUpSessionWithProjectAndFile("foo", "readme.txt", "Hello Bob",
             ALICE, BOB);

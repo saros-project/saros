@@ -8,8 +8,6 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-import java.rmi.RemoteException;
-
 import org.eclipse.swtbot.swt.finder.widgets.TimeoutException;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -28,7 +26,7 @@ public class CreatingNewFileTest extends StfTestCase {
     }
 
     @Test
-    public void testCreatingNewFileTest() throws RemoteException {
+    public void testCreatingNewFileTest() throws Exception {
 
         CARL.superBot().internal().createProject("foo");
 

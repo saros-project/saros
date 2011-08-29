@@ -20,7 +20,7 @@ public class AccountPreferenceTest extends StfTestCase {
     }
 
     @After
-    public void runAfterEveryTest() throws RemoteException {
+    public void runAfterEveryTest() throws Exception {
         resetDefaultAccount();
     }
 

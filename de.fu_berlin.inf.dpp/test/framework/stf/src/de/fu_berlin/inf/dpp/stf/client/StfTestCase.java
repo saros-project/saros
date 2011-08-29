@@ -3,7 +3,6 @@ package de.fu_berlin.inf.dpp.stf.client;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
-import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -143,6 +142,10 @@ public abstract class StfTestCase {
         return Collections.unmodifiableList(currentTesters);
     }
 
+    /**
+     * This method is called after every test case class. Override this method
+     * with care! Internal calls {@linkplain #tearDownSaros}
+     */
     @AfterClass
     public static void cleanUpSaros() throws Exception {
         tearDownSaros();
@@ -160,6 +163,7 @@ public abstract class StfTestCase {
      * 
      * 
      * @throws Exception
+     *             if a (internal) failure occur
      */
     public static void tearDownSaros() throws Exception {
 
@@ -213,6 +217,7 @@ public abstract class StfTestCase {
      * </ul>
      * 
      * @throws Exception
+     *             if a (internal) failure occur
      */
     public static void setUpWorkbench() throws Exception {
 
@@ -245,6 +250,7 @@ public abstract class StfTestCase {
      * </ul>
      * 
      * @throws Exception
+     *             if a (internal) failure occur
      */
     public static void setUpSaros() throws Exception {
         Exception exception = null;
@@ -277,11 +283,11 @@ public abstract class StfTestCase {
      * Resets the workbench for every active tester to their original state
      * 
      * @see IRemoteWorkbenchBot#resetWorkbench()
-     * 
-     * @throws RemoteException
+     * @throws Exception
+     *             if a (internal) failure occur
      */
 
-    public static void resetWorkbenches() throws RemoteException {
+    public static void resetWorkbenches() throws Exception {
         for (AbstractTester tester : currentTesters) {
             tester.remoteBot().resetWorkbench();
         }
@@ -291,10 +297,10 @@ public abstract class StfTestCase {
      * Closes all editors for all active testers
      * 
      * @see IRemoteWorkbenchBot#closeAllShells()
-     * 
-     * @throws RemoteException
+     * @throws Exception
+     *             if a (internal) failure occur
      */
-    public static void closeAllEditors() throws RemoteException {
+    public static void closeAllEditors() throws Exception {
         for (AbstractTester tester : currentTesters) {
             tester.remoteBot().closeAllEditors();
         }
@@ -304,11 +310,11 @@ public abstract class StfTestCase {
      * Closes all shells for all active testers
      * 
      * @see IRemoteWorkbenchBot#closeAllShells()
-     * 
-     * @throws RemoteException
+     * @throws Exception
+     *             if a (internal) failure occur
      */
 
-    public static void closeAllShells() throws RemoteException {
+    public static void closeAllShells() throws Exception {
         for (AbstractTester tester : currentTesters) {
             tester.remoteBot().closeAllShells();
         }
@@ -322,9 +328,10 @@ public abstract class StfTestCase {
      * <li>Deletes all non active accounts</li>
      * </ul>
      * 
-     * @throws RemoteException
+     * @throws Exception
+     *             if a (internal) failure occur
      */
-    public static void resetDefaultAccount() throws RemoteException {
+    public static void resetDefaultAccount() throws Exception {
         for (AbstractTester tester : currentTesters) {
 
             if (!tester.superBot().menuBar().saros().preferences()
@@ -351,10 +358,13 @@ public abstract class StfTestCase {
      * Resets the buddy names for all active testers to their original by
      * sequentially calling {@link #resetBuddyNames(AbstractTester)}
      * 
-     * @throws RemoteException
+     * @throws IllegalStateException
+     *             if one of the current testers is not connected
+     * @throws Exception
+     *             for any other (internal) failure
      */
 
-    public static void resetBuddyNames() throws RemoteException {
+    public static void resetBuddyNames() throws Exception {
         for (AbstractTester tester : currentTesters)
             resetBuddyNames(tester);
     }
@@ -365,11 +375,17 @@ public abstract class StfTestCase {
      * 
      * @param tester
      *            the tester
-     * @throws RemoteException
+     * @throws IllegalStateException
+     *             if the tester is not connected
+     * @throws Exception
+     *             for any other (internal) failure
      */
 
-    public static void resetBuddyNames(AbstractTester tester)
-        throws RemoteException {
+    public static void resetBuddyNames(AbstractTester tester) throws Exception {
+
+        if (!tester.superBot().views().sarosView().isConnected())
+            throw new IllegalStateException(tester + " is not connected");
+
         for (int i = 0; i < currentTesters.size(); i++) {
             if (tester == currentTesters.get(i))
                 continue;
@@ -387,9 +403,12 @@ public abstract class StfTestCase {
      * Resets the buddies for all active testers to their original by
      * sequentially calling {@link #resetBuddies(AbstractTester)}
      * 
-     * @throws RemoteException
-     */
-    public static void resetBuddies() throws RemoteException {
+     * @throws IllegalStateException
+     *             if one of the current testers is not connected
+     * @throws Exception
+     *             for any other (internal) failure
+     * */
+    public static void resetBuddies() throws Exception {
         for (AbstractTester tester : currentTesters)
             resetBuddies(tester);
     }
@@ -403,11 +422,13 @@ public abstract class StfTestCase {
      * 
      * @param tester
      *            the tester
-     * @throws RemoteException
+     * @throws IllegalStateException
+     *             if the tester or one of its buddies is not connected
+     * @throws Exception
+     *             for any other (internal) failure
      */
 
-    public static void resetBuddies(AbstractTester tester)
-        throws RemoteException {
+    public static void resetBuddies(AbstractTester tester) throws Exception {
         for (int i = 0; i < currentTesters.size(); i++) {
             if (tester == currentTesters.get(i))
                 continue;
@@ -424,9 +445,10 @@ public abstract class StfTestCase {
      *       unsaved editor windows before this method is called.
      * @return <code>true</code> if all workspaces could be cleared,
      *         <code>false</code> otherwise
-     * @throws RemoteException
+     * @throws Exception
+     *             if a (internal) failure occurs
      */
-    public static boolean clearWorkspaces() throws RemoteException {
+    public static boolean clearWorkspaces() throws Exception {
         boolean cleared = true;
         for (AbstractTester tester : currentTesters) {
             cleared &= tester.superBot().internal().clearWorkspace();
@@ -438,9 +460,10 @@ public abstract class StfTestCase {
      * Disconnects all active testers in the order the were initialized by
      * {@link #initTesters(AbstractTester tester, AbstractTester... testers)}
      * 
-     * @throws RemoteException
+     * @throws Exception
+     *             if a (internal) failure occurs
      */
-    public static void disconnectAllActiveTesters() throws RemoteException {
+    public static void disconnectAllActiveTesters() throws Exception {
         for (AbstractTester tester : currentTesters) {
             if (tester != null) {
                 tester.superBot().views().sarosView().disconnect();
@@ -449,23 +472,26 @@ public abstract class StfTestCase {
     }
 
     /**
-     * Define the leave session with the following steps.
-     * <ol>
-     * <li>The host leave session first.</li>
-     * <li>Then other invitees confirm the window "Closing the Session"
-     * concurrently</li>
-     * </ol>
+     * Stops the current session for all participants. The host is leaving the
+     * session first.
+     * 
      * 
      * @param host
      *            the host of the current session
-     * @throws RemoteException
+     * @throws IllegalStateException
+     *             if the host is not host of the current session
+     * @throws Exception
+     *             if a (internal) failure occurs
      */
     public static void leaveSessionHostFirst(AbstractTester host)
-        throws RemoteException {
+        throws Exception {
 
         host.superBot().views().sarosView().leaveSession();
         for (final AbstractTester tester : currentTesters) {
             if (tester != host) {
+                if (!tester.superBot().views().sarosView().isHost())
+                    throw new IllegalStateException(tester
+                        + " is not host of the current session");
                 tester.superBot().views().sarosView().waitUntilIsNotInSession();
             }
         }
@@ -481,11 +507,12 @@ public abstract class StfTestCase {
      * 
      * @param host
      *            the host of the current session
-     * @throws RemoteException
+     * @throws Exception
+     *             if a (internal) failure occurs
      */
 
     public static void leaveSessionPeersFirst(AbstractTester host)
-        throws RemoteException {
+        throws Exception {
         List<JID> peerJIDs = new ArrayList<JID>();
         List<Callable<Void>> leaveTasks = new ArrayList<Callable<Void>>();
         for (final AbstractTester tester : currentTesters) {

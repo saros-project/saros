@@ -15,6 +15,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
+import org.eclipse.swtbot.swt.finder.widgets.TimeoutException;
+
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.stf.client.tester.AbstractTester;
 import de.fu_berlin.inf.dpp.stf.shared.Constants.TypeOfCreateProject;
@@ -52,7 +54,7 @@ public class Util {
     }
 
     /**
-     * Opens the view <b>Saros</b>
+     * Opens the <b>Saros</b> view
      * 
      * @param tester
      *            the remote tester e.g. ALICE
@@ -67,10 +69,11 @@ public class Util {
     }
 
     /**
-     * A convenient function to quickly build a session which share a project
-     * and a file. The invitiees are invited concurrently.
+     * A convenient function to quickly build a session with a project and a
+     * file. The project is created by this method so it <b>must not</b> exist
+     * before. The invitiees are invited concurrently.
      * 
-     * @NOTE there is no guarantee the the project and the file are already
+     * @NOTE there is no guarantee that the project and its files are already
      *       shared after this method returns
      * @param projectName
      *            the name of the project
@@ -82,11 +85,17 @@ public class Util {
      *            e.g. ALICE
      * @param invitees
      *            e.g. BOB, CARL
-     * @throws RemoteException
+     * @throws IllegalStateException
+     *             if the inviter or one of the invitee is not connected or is
+     *             already in a session
+     * @throws Exception
+     *             for any other (internal) failure
      */
     public static void setUpSessionWithProjectAndFile(String projectName,
         String path, String content, AbstractTester inviter,
-        AbstractTester... invitees) throws RemoteException {
+        AbstractTester... invitees) throws Exception {
+
+        assertStates(true, false, inviter, invitees);
 
         inviter.superBot().internal().createProject(projectName);
         inviter.superBot().internal().createFile(projectName, path, content);
@@ -95,10 +104,11 @@ public class Util {
     }
 
     /**
-     * A convenient function to quickly build a session which share a java
-     * project with a class. The invitiees are invited concurrently.
+     * A convenient function to quickly build a session with a java project and
+     * a class. The project is created by this method so it <b>must not</b>
+     * exist before. The invitiees are invited concurrently.
      * 
-     * @NOTE there is no guarantee the the project and the class are already
+     * @NOTE there is no guarantee that the project and its files are already
      *       shared after this method returns
      * @param projectName
      *            the name of the project
@@ -110,11 +120,17 @@ public class Util {
      *            e.g. ALICE
      * @param invitees
      *            e.g. BOB, CARL
-     * @throws RemoteException
+     * @throws IllegalStateException
+     *             if the inviter or one of the invitee is not connected or is
+     *             already in a session
+     * @throws Exception
+     *             for any other (internal) failure
      */
     public static void setUpSessionWithJavaProjectAndClass(String projectName,
         String packageName, String className, AbstractTester inviter,
-        AbstractTester... invitees) throws RemoteException {
+        AbstractTester... invitees) throws Exception {
+
+        assertStates(true, false, inviter, invitees);
 
         inviter.superBot().internal().createJavaProject(projectName);
         inviter.superBot().internal()
@@ -152,6 +168,7 @@ public class Util {
 
     /**
      * Creates a project with an empty file for every tester in his workspace.
+     * The project and the file <b>must not</b> exist.
      * 
      * @param projectName
      *            the name of the project
@@ -159,48 +176,129 @@ public class Util {
      *            the path of the file e.g. foo/bar/readme.txt
      * @param testers
      *            e.g. ALICE, CARL
-     * @throws RemoteException
+     * @throws Exception
+     *             if a (internal) failure occurs
      */
 
-    public static void createProjectWithFile(String projectName, String path,
-        AbstractTester... testers) throws RemoteException {
+    public static void createProjectWithEmptyFile(String projectName,
+        String path, AbstractTester... testers) throws Exception {
+
         for (AbstractTester tester : testers) {
             tester.superBot().internal().createProject(projectName);
             tester.superBot().internal().createFile(projectName, path, "");
         }
     }
 
+    /**
+     * Adds a project to the current session. This is done sequentially, so the
+     * project is send to the invitees one after another.
+     * 
+     * @NOTE Adding a project that is already shared or does not exist results
+     *       in unexpected behavior.
+     * @NOTE there is no guarantee that the project and its files are already
+     *       shared after this method returns
+     * @param projectName
+     *            the name of the project
+     * @param projectType
+     *            the type of project that should be used on the invitee side
+     *            e.g new, use existing ...
+     * @param inviter
+     *            e.g. ALICE
+     * @param invitees
+     *            e.g. BOB, CARL
+     * @throws IllegalStateException
+     *             if the inviter or one of the invitee is not connected or is
+     *             not in a session
+     * @throws Exception
+     *             for any other (internal) failure
+     */
     public static void addProjectToSessionSequentially(String projectName,
-        TypeOfCreateProject usingWhichProject, AbstractTester inviter,
-        AbstractTester... invitees) throws RemoteException {
+        TypeOfCreateProject projectType, AbstractTester inviter,
+        AbstractTester... invitees) throws Exception {
+
+        assertStates(true, true, inviter, invitees);
 
         inviter.superBot().menuBar().saros().addProjects(projectName);
 
         for (AbstractTester invitee : invitees) {
             invitee.superBot().confirmShellAddProjectUsingWhichProject(
-                projectName, usingWhichProject);
+                projectName, projectType);
         }
     }
 
+    /**
+     * Establish a Saros session with the given invitees. Every invitee is
+     * invited one bye one.
+     * 
+     * @NOTE Establishing session with a project that is already shared or does
+     *       not exist results in unexpected behavior.
+     * @NOTE there is no guarantee that the project and its files are already
+     *       shared after this method returns
+     * @param projectName
+     *            the name of the project to share
+     * @param projectType
+     *            the type of project that should be used on the invitee side
+     *            e.g new, use existing ...
+     * @param inviter
+     *            e.g. ALICE
+     * @param invitees
+     *            e.g. BOB, CARL
+     * @throws IllegalStateException
+     *             if the inviter or one of the invitee is not connected or is
+     *             already in a session
+     * @throws Exception
+     *             for any other (internal) failure
+     */
     public static void buildSessionSequentially(String projectName,
-        TypeOfCreateProject usingWhichProject, AbstractTester inviter,
-        AbstractTester... invitees) throws RemoteException {
-        JID[] inviteesJID = getPeerJID(invitees);
+        TypeOfCreateProject projectType, AbstractTester inviter,
+        AbstractTester... invitees) throws Exception {
+
+        assertStates(true, false, inviter, invitees);
+
+        JID[] inviteesJID = getJID(invitees);
+
         inviter.superBot().menuBar().saros()
             .shareProjects(projectName, inviteesJID);
+
         for (AbstractTester invitee : invitees) {
             invitee.remoteBot().shell(SHELL_SESSION_INVITATION).confirm(ACCEPT);
             invitee.superBot().confirmShellAddProjectUsingWhichProject(
-                projectName, usingWhichProject);
+                projectName, projectType);
         }
     }
 
+    /**
+     * Establish a Saros session with the given invitees. All invitees are
+     * invited simultaneously.
+     * 
+     * @NOTE Establishing session with a project that is already shared or does
+     *       not exist results in unexpected behavior.
+     * @NOTE there is no guarantee that the project and its files are already
+     *       shared after this method returns
+     * @param projectName
+     *            the name of the project to share
+     * @param projectType
+     *            the type of project that should be used on the invitee side
+     *            e.g new, use existing ...
+     * @param inviter
+     *            e.g. ALICE
+     * @param invitees
+     *            e.g. BOB, CARL
+     * @throws IllegalStateException
+     *             if the inviter or one of the invitee is not connected or is
+     *             already in a session
+     * @throws Exception
+     *             for any other (internal) failure
+     */
+
     public static void buildSessionConcurrently(final String projectName,
-        final TypeOfCreateProject usingWhichProject, AbstractTester inviter,
-        AbstractTester... invitees) throws RemoteException {
+        final TypeOfCreateProject projectType, AbstractTester inviter,
+        AbstractTester... invitees) throws Exception {
+
+        assertStates(true, false, inviter, invitees);
 
         inviter.superBot().menuBar().saros()
-            .shareProjects(projectName, Util.getPeerJID(invitees));
+            .shareProjects(projectName, Util.getJID(invitees));
 
         List<Callable<Void>> joinSessionTasks = new ArrayList<Callable<Void>>();
         for (final AbstractTester invitee : invitees) {
@@ -208,7 +306,7 @@ public class Util {
                 public Void call() throws Exception {
                     invitee.superBot()
                         .confirmShellSessionInvitationAndShellAddProject(
-                            projectName, usingWhichProject);
+                            projectName, projectType);
                     return null;
                 }
             });
@@ -218,17 +316,34 @@ public class Util {
     }
 
     /**
-     * the local user can be concurrently followed by many other users.
+     * Activates the Follow mode feature. Activating Follow mode when the
+     * followed participant has no open editors results in failure of this
+     * method.
      * 
-     * @param buddiesToFollow
-     *            the list of the buddies who want to follow the local user.
-     * @throws RemoteException
+     * @param followedParticipant
+     *            the participant to follow e.g ALICE
+     * @param participants
+     *            the list of participants who want to activate Follow mode e.g
+     *            BOB, CARL
+     * @throws TimeoutException
+     *             if the follow participant has no editor open or the editor
+     *             activity was not received yet
+     * @throws IllegalStateException
+     *             if the followed participant or one of the participants is not
+     *             connected or not in a session
+     * @throws Exception
+     *             for any other (internal) failure
      */
-    public static void setFollowMode(final AbstractTester followedBuddy,
-        AbstractTester... buddiesToFollow) throws RemoteException {
-        for (AbstractTester tester : buddiesToFollow)
+    public static void activateFollowMode(
+        final AbstractTester followedParticipant,
+        AbstractTester... participants) throws Exception {
+
+        assertStates(true, true, followedParticipant, participants);
+
+        for (AbstractTester tester : participants)
             tester.superBot().views().sarosView()
-                .selectParticipant(followedBuddy.getJID()).followParticipant();
+                .selectParticipant(followedParticipant.getJID())
+                .followParticipant();
     }
 
     /**
@@ -236,17 +351,21 @@ public class Util {
      * tester added to their contact list as well.
      * 
      * @param tester
-     *            the tester who wants to add buddies to his contact list eg.
+     *            the tester who wants to add buddies to his contact list e.g
      *            ALICE
-     * 
      * @param buddies
-     *            the buddies to add, eg. BOB, CARL
-     * @throws RemoteException
-     * 
+     *            the buddies to add, e.g BOB, CARL
+     * @throws IllegalStateException
+     *             if the tester or one of the buddies is not connected
+     * @throws Exception
+     *             for any other (internal) failure
      * 
      */
     public static void addBuddiesToContactList(AbstractTester tester,
-        AbstractTester... buddies) throws RemoteException {
+        AbstractTester... buddies) throws Exception {
+
+        assertStates(true, null, tester, buddies);
+
         for (AbstractTester peer : buddies) {
             if (!tester.superBot().views().sarosView().hasBuddy(peer.getJID())) {
                 tester.superBot().views().sarosView()
@@ -261,17 +380,21 @@ public class Util {
      * buddies will have the tester removed from their contact list as well.
      * 
      * @param tester
-     *            the tester who wants to add buddies to his contact list eg.
+     *            the tester who wants to add buddies to his contact list e.g
      *            ALICE
-     * 
      * @param buddies
-     *            the buddies to add, eg. BOB, CARL
-     * @throws RemoteException
-     * 
+     *            the buddies to add, e.g BOB, CARL
+     * @throws IllegalStateException
+     *             if the tester or one of the buddies is not connected
+     * @throws Exception
+     *             for any other (internal) failure
      * 
      */
     public static void removeBuddiesFromContactList(AbstractTester tester,
-        AbstractTester... buddies) throws RemoteException {
+        AbstractTester... buddies) throws Exception {
+
+        assertStates(true, null, tester, buddies);
+
         for (AbstractTester deletedBuddy : buddies) {
             if (!tester.superBot().views().sarosView()
                 .hasBuddy(deletedBuddy.getJID()))
@@ -283,43 +406,59 @@ public class Util {
 
     }
 
-    /*
-     * public static void shareYourScreen(AbstractTester buddy, AbstractTester
-     * selectedBuddy) throws RemoteException {
-     * buddy.superBot().views().sarosView()
-     * .shareYourScreenWithSelectedBuddy(selectedBuddy.getJID());
-     * selectedBuddy.remoteBot().waitUntilShellIsOpen(
-     * SHELL_INCOMING_SCREENSHARING_SESSION);
-     * selectedBuddy.remoteBot().shell(SHELL_INCOMING_SCREENSHARING_SESSION)
-     * .bot().button(YES).click(); }
-     */
-
     /**
-     * This method is same as
+     * Adds buddies to the current session.
      * 
-     * . The difference to buildSessionConcurrently is that the invitation
-     * process is activated by clicking the toolbarbutton
-     * "open invitation interface" in the roster view.
-     * 
+     * @NOTE there is no guarantee that the project and its files are already
+     *       shared after this method returns
      * @param projectName
-     *            the name of the project which is in a session now.
+     *            the name of the project which <b>must</b> be shared in the
+     *            current session
+     * @param projectType
+     *            the type of project that should be used on the invitee side
+     *            e.g new, use existing ...
+     * @param inviter
+     *            the test who must be host of the current session
      * @param invitees
-     *            the user whom you want to invite to your session.
-     * @throws RemoteException
+     *            the buddies you want to invite to your session
+     * @throws IllegalStateException
+     *             if the inviter or one of the invitees is not connected, one
+     *             of the invitee is already in a session or the inviter is not
+     *             host
+     * @throws Exception
+     *             for any other (internal) failure
      */
     public static void inviteBuddies(final String projectName,
-        final TypeOfCreateProject usingWhichProject, AbstractTester inviter,
-        AbstractTester... invitees) throws RemoteException {
+        final TypeOfCreateProject projectType, AbstractTester inviter,
+        AbstractTester... invitees) throws Exception {
+
+        assertStates(true, null, inviter, invitees);
+
+        if (!inviter.superBot().views().sarosView().isInSession())
+            throw new IllegalStateException(inviter + " is not in a session");
+
+        if (!inviter.superBot().views().sarosView().isHost())
+            throw new IllegalStateException(inviter
+                + " is not host of the current session");
+
+        for (AbstractTester invitee : invitees) {
+            if (invitee.superBot().views().sarosView().isInSession())
+                throw new IllegalStateException(invitee
+                    + " is already in a session");
+        }
+
         inviter.superBot().menuBar().saros()
-            .addBuddies(Util.getPeersBaseJID(invitees));
+            .addBuddies(Util.getBaseJID(invitees));
+
         List<Callable<Void>> joinSessionTasks = new ArrayList<Callable<Void>>();
+
         for (final AbstractTester tester : invitees) {
             joinSessionTasks.add(new Callable<Void>() {
                 public Void call() throws Exception {
                     tester.remoteBot().shell(SHELL_SESSION_INVITATION)
                         .confirm(ACCEPT);
                     tester.superBot().confirmShellAddProjectUsingWhichProject(
-                        projectName, usingWhichProject);
+                        projectName, projectType);
                     return null;
                 }
             });
@@ -328,25 +467,62 @@ public class Util {
         Util.workAll(joinSessionTasks);
     }
 
-    public static String[] getPeersBaseJID(AbstractTester... peers) {
-        String[] peerBaseJIDs = new String[peers.length];
-        for (int i = 0; i < peers.length; i++) {
-            peerBaseJIDs[i] = peers[i].getBaseJid();
+    /**
+     * Returns the base part of the JID from the tester.
+     * 
+     * @param tester
+     *            a list of tester
+     * @return the base part JIDs of the tester in the same order as in the
+     *         tester list
+     */
+    public static String[] getBaseJID(AbstractTester... tester) {
+        String[] peerBaseJIDs = new String[tester.length];
+        for (int i = 0; i < tester.length; i++) {
+            peerBaseJIDs[i] = tester[i].getBaseJid();
         }
         return peerBaseJIDs;
     }
 
-    public static JID[] getPeerJID(AbstractTester... peers) {
-        JID[] peerBaseJIDs = new JID[peers.length];
-        for (int i = 0; i < peers.length; i++) {
-            peerBaseJIDs[i] = peers[i].getJID();
+    /**
+     * Returns the JID from the tester.
+     * 
+     * @param tester
+     *            a list of tester
+     * @return the JIDs of the tester in the same order as in the tester list
+     */
+
+    public static JID[] getJID(AbstractTester... tester) {
+        JID[] peerBaseJIDs = new JID[tester.length];
+        for (int i = 0; i < tester.length; i++) {
+            peerBaseJIDs[i] = tester[i].getJID();
         }
         return peerBaseJIDs;
     }
 
-    public static void resetWriteAccess(AbstractTester host,
-        AbstractTester... invitees) throws RemoteException {
-        for (AbstractTester tester : invitees) {
+    /**
+     * Grants write access to the given participants
+     * 
+     * @param host
+     *            the host of the current session, e.g ALICE
+     * @param participants
+     *            the participants to grant write access to, e.g BOB, CARL
+     * @throws IllegalStateException
+     *             if the host or one of the participants is not connected or is
+     *             not in a session or the host is not host of the current
+     *             session host
+     * @throws Exception
+     *             for any other (internal) failure
+     */
+    public static void grantWriteAccess(AbstractTester host,
+        AbstractTester... participants) throws Exception {
+
+        assertStates(true, true, host, participants);
+
+        if (!host.superBot().views().sarosView().isHost())
+            throw new IllegalStateException(host
+                + " is not host of the current session");
+
+        for (AbstractTester tester : participants) {
             if (tester.superBot().views().sarosView().isInSession()
                 && host.superBot().views().sarosView()
                     .selectParticipant(tester.getJID()).hasReadOnlyAccess()) {
@@ -356,9 +532,24 @@ public class Util {
         }
     }
 
-    public static void resetFollowModeSequentially(
-        AbstractTester... buddiesFollowing) throws RemoteException {
-        for (AbstractTester tester : buddiesFollowing) {
+    /**
+     * Stops the follow mode feature for all given participants.
+     * 
+     * @param participants
+     *            a list of participants where follow mode should been stopped
+     * @throws IllegalStateException
+     *             if tone of the participants is not connected or not in a
+     *             session
+     * @throws Exception
+     *             for any other (internal) failure
+     */
+
+    public static void stopFollowModeSequentially(
+        AbstractTester... participants) throws Exception {
+
+        assertStates(true, true, participants);
+
+        for (AbstractTester tester : participants) {
             if (tester.superBot().views().sarosView().isInSession()
                 && tester.superBot().views().sarosView().isFollowing()) {
                 JID followedBuddyJID = tester.superBot().views().sarosView()
@@ -370,17 +561,25 @@ public class Util {
     }
 
     /**
-     * stop the follow-mode of the buddies who are following the local user.
+     * Stops the follow mode feature. This is done concurrently for all given
+     * participants.
      * 
-     * @param buddiesFollowing
-     *            the list of the buddies who are following the local user.
-     * @throws RemoteException
+     * @param participants
+     *            a list of participants where follow mode should been stopped
+     * @throws IllegalStateException
+     *             if tone of the participants is not connected or not in a
+     *             session
+     * @throws Exception
+     *             for any other (internal) failure
      */
-    public static void resetFollowModeConcurrently(
-        AbstractTester... buddiesFollowing) throws RemoteException {
+    public static void stopFollowModeConcurrently(
+        AbstractTester... participants) throws Exception {
+
+        assertStates(true, true, participants);
+
         List<Callable<Void>> stopFollowTasks = new ArrayList<Callable<Void>>();
-        for (int i = 0; i < buddiesFollowing.length; i++) {
-            final AbstractTester tester = buddiesFollowing[i];
+        for (int i = 0; i < participants.length; i++) {
+            final AbstractTester tester = participants[i];
             stopFollowTasks.add(new Callable<Void>() {
                 public Void call() throws Exception {
                     JID followedBuddyJID = tester.superBot().views()
@@ -394,30 +593,65 @@ public class Util {
         workAll(stopFollowTasks);
     }
 
-    /**********************************************
+    /**
+     * Rebuilds a session if necessary with the given participants. If the
+     * project does not exists on the inviter side an empty non Java Project
+     * will be created. Participants that are already (in a different) session
+     * will not be invited.
      * 
-     * often used convenient functions
+     * @NOTE there is no guarantee that the project and its files are already
+     *       shared after this method returns
+     * @NOTE calling this method with always different project names during a
+     *       session will result in unexpected behavior
      * 
-     **********************************************/
+     * @param projectName
+     *            the name of the project
+     * @param inviter
+     *            e.g. ALICE
+     * @param invitees
+     *            e.g. BOB, CARL
+     * @throws IllegalStateException
+     *             if the host or one of the participants is not connected
+     * @throws Exception
+     *             for any other (internal) failure
+     */
 
-    public static void reBuildSession(String projectName, AbstractTester host,
-        AbstractTester... invitees) throws RemoteException {
+    public static void reBuildSession(String projectName,
+        AbstractTester inviter, AbstractTester... invitees) throws Exception {
+
+        assertStates(true, null, inviter, invitees);
+
+        if (!inviter.superBot().internal().existsResource(projectName))
+            inviter.superBot().internal().createProject(projectName);
+
         for (AbstractTester tester : invitees)
             if (!tester.superBot().views().sarosView().isInSession())
                 tester.superBot().views().sarosView()
                     .connectWith(tester.getJID(), tester.getPassword());
 
-        if (!host.superBot().views().sarosView().isInSession()) {
-            host.superBot().views().sarosView()
-                .connectWith(host.getJID(), host.getPassword());
+        if (!inviter.superBot().views().sarosView().isInSession()) {
+
             for (AbstractTester tester : invitees) {
                 buildSessionSequentially(projectName,
-                    TypeOfCreateProject.EXIST_PROJECT, host, tester);
+                    TypeOfCreateProject.EXIST_PROJECT, inviter, tester);
             }
         }
     }
 
-    public static String getClassPath(String projectName, String pkg,
+    /**
+     * Converts a class path of and Eclipse JDT project to its real path.<br/>
+     * E.g project name = foo, pkg = my.foo, className = HelloWorld will be
+     * converted to foo/src/my/foo/HelloWorld.java
+     * 
+     * @param projectName
+     *            the name of an Eclipse project
+     * @param pkg
+     *            an java package name
+     * @param className
+     *            a class name
+     * @return the path to that class
+     */
+    public static String classPathToFilePath(String projectName, String pkg,
         String className) {
         return projectName + "/src/" + pkg.replace('.', '/') + "/" + className
             + ".java";
@@ -476,4 +710,32 @@ public class Util {
             pool.shutdown();
         }
     }
+
+    private static void assertStates(Boolean isConnected, Boolean isInSession,
+        AbstractTester tester, AbstractTester... testers) throws Exception {
+        AbstractTester[] t = new AbstractTester[testers.length + 1];
+        System.arraycopy(testers, 0, t, 0, testers.length);
+        t[t.length - 1] = tester;
+
+        assertStates(isConnected, isInSession, t);
+    }
+
+    private static void assertStates(Boolean isConnected, Boolean isInSession,
+        AbstractTester... testers) throws Exception {
+        for (AbstractTester tester : testers) {
+            if (isConnected != null
+                && isConnected != tester.superBot().views().sarosView()
+                    .isConnected())
+                throw new IllegalStateException(tester + " is "
+                    + (isConnected ? "not connected" : "connected"));
+
+            if (isInSession != null
+                && isInSession != tester.superBot().views().sarosView()
+                    .isInSession())
+                throw new IllegalStateException(tester + " is "
+                    + (isInSession ? "not" : "already") + " in a session");
+
+        }
+    }
+
 }

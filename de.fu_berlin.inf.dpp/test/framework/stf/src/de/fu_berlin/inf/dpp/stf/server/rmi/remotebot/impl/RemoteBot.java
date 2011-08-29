@@ -10,7 +10,6 @@ import org.apache.log4j.Logger;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.swtbot.swt.finder.SWTBot;
 import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
-import org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences;
 import org.eclipse.swtbot.swt.finder.waits.DefaultCondition;
 import org.eclipse.swtbot.swt.finder.waits.ICondition;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
@@ -454,62 +453,40 @@ public abstract class RemoteBot extends StfRemoteObject implements IRemoteBot {
     }
 
     public boolean existsLabel() throws RemoteException {
-        long oldTimeout = SWTBotPreferences.TIMEOUT;
-        // increase the timeout
-        SWTBotPreferences.TIMEOUT = SarosSWTBotPreferences.SAROS_WIDGET_TIMEOUT;
-
         try {
             swtBot.label();
             return true;
         } catch (WidgetNotFoundException e) {
             return false;
-        } finally {
-            SWTBotPreferences.TIMEOUT = oldTimeout;
         }
     }
 
     public boolean existsLabelInGroup(String groupName) throws RemoteException {
-        long oldTimeout = SWTBotPreferences.TIMEOUT;
-        // increase the timeout
-        SWTBotPreferences.TIMEOUT = SarosSWTBotPreferences.SAROS_WIDGET_TIMEOUT;
 
         try {
             swtBot.labelInGroup(groupName);
             return true;
         } catch (WidgetNotFoundException e) {
             return false;
-        } finally {
-            SWTBotPreferences.TIMEOUT = oldTimeout;
         }
     }
 
     public boolean existsLabel(String text) throws RemoteException {
-        long oldTimeout = SWTBotPreferences.TIMEOUT;
-        // increase the timeout
-        SWTBotPreferences.TIMEOUT = SarosSWTBotPreferences.SAROS_WIDGET_TIMEOUT;
 
         try {
             swtBot.label(text);
             return true;
         } catch (WidgetNotFoundException e) {
             return false;
-        } finally {
-            SWTBotPreferences.TIMEOUT = oldTimeout;
         }
     }
 
     public boolean existsStyledText() throws RemoteException {
-        long oldTimeout = SWTBotPreferences.TIMEOUT;
-        // increase the timeout
-        SWTBotPreferences.TIMEOUT = SarosSWTBotPreferences.SAROS_WIDGET_TIMEOUT;
-
         try {
             swtBot.styledText();
             return true;
         } catch (WidgetNotFoundException e) {
             return false;
-        } finally {
-            SWTBotPreferences.TIMEOUT = oldTimeout;
         }
     }
 
@@ -809,17 +786,12 @@ public abstract class RemoteBot extends StfRemoteObject implements IRemoteBot {
     }
 
     public boolean existsToolbarButton() throws RemoteException {
-        long oldTimeout = SWTBotPreferences.TIMEOUT;
-        // increase the timeout
-        SWTBotPreferences.TIMEOUT = SarosSWTBotPreferences.SAROS_WIDGET_TIMEOUT;
 
         try {
             swtBot.toolbarButton();
             return true;
         } catch (WidgetNotFoundException e) {
             return false;
-        } finally {
-            SWTBotPreferences.TIMEOUT = oldTimeout;
         }
     }
 
@@ -1061,30 +1033,20 @@ public abstract class RemoteBot extends StfRemoteObject implements IRemoteBot {
     }
 
     public boolean existsTable() throws RemoteException {
-        long oldTimeout = SWTBotPreferences.TIMEOUT;
-        // increase the timeout
-        SWTBotPreferences.TIMEOUT = SarosSWTBotPreferences.SAROS_WIDGET_TIMEOUT;
         try {
             swtBot.table();
             return true;
         } catch (WidgetNotFoundException e) {
             return false;
-        } finally {
-            SWTBotPreferences.TIMEOUT = oldTimeout;
         }
     }
 
     public boolean existsTableInGroup(String groupName) throws RemoteException {
-        long oldTimeout = SWTBotPreferences.TIMEOUT;
-        // increase the timeout
-        SWTBotPreferences.TIMEOUT = SarosSWTBotPreferences.SAROS_WIDGET_TIMEOUT;
         try {
             swtBot.tableInGroup(groupName);
             return true;
         } catch (WidgetNotFoundException e) {
             return false;
-        } finally {
-            SWTBotPreferences.TIMEOUT = oldTimeout;
         }
     }
 
@@ -1612,7 +1574,8 @@ public abstract class RemoteBot extends StfRemoteObject implements IRemoteBot {
     }
 
     public void waitUntil(ICondition condition) throws RemoteException {
-        swtBot.waitUntil(condition, SarosSWTBotPreferences.SAROS_TIMEOUT);
+        swtBot
+            .waitUntil(condition, SarosSWTBotPreferences.SAROS_DEFAUL_TIMEOUT);
     }
 
     public void waitLongUntil(ICondition condition) throws RemoteException {

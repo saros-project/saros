@@ -19,7 +19,6 @@ import org.eclipse.swtbot.swt.finder.results.BoolResult;
 import org.eclipse.swtbot.swt.finder.results.VoidResult;
 import org.eclipse.swtbot.swt.finder.results.WidgetResult;
 import org.eclipse.swtbot.swt.finder.widgets.AbstractSWTBot;
-import org.eclipse.swtbot.swt.finder.widgets.SWTBotMenu;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.hamcrest.Matcher;
 
@@ -57,40 +56,6 @@ public class ContextMenuHelper {
                 hide(menuItem.getParent());
             }
         });
-    }
-
-    /**
-     * Get the context menu item matching the text nodes.
-     * 
-     * @param bot
-     *            a SWTBot class that wraps a {@link Widget} which extends
-     *            {@link Control}. E.g. {@link SWTBotTree}.
-     * @param nodes
-     *            the nodes of the context menu e.g New, Class
-     * @return the context menu item matching the text nodes
-     * @throws WidgetNotFoundException
-     *             if the widget is not found.
-     */
-
-    public static SWTBotMenu getContextMenu(
-        final AbstractSWTBot<? extends Control> bot, final String... nodes) {
-
-        final MenuItem menuItem = getMenuItem(bot, nodes);
-
-        if (menuItem == null) {
-            throw new WidgetNotFoundException("Could not find menu: "
-                + Arrays.asList(nodes));
-        }
-
-        // hide
-        UIThreadRunnable.syncExec(new VoidResult() {
-            public void run() {
-                hide(menuItem.getParent());
-            }
-        });
-
-        return new SWTBotMenu(menuItem);
-
     }
 
     /**

@@ -14,7 +14,7 @@ public interface IRemoteBotTree extends Remote {
      * 
      **********************************************/
 
-    public IRemoteBotMenu contextMenu(String... texts) throws RemoteException;
+    public void clickContextMenu(String... texts) throws RemoteException;
 
     /**
      * Collapses the node matching the node information.

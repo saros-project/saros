@@ -28,6 +28,7 @@ public class FollowModeDisabledInNewSessionTest extends StfTestCase {
 
         ALICE.superBot().views().packageExplorerView()
             .selectFile("foo", "readme.txt").open();
+
         BOB.superBot().views().sarosView().selectParticipant(ALICE.getJID())
             .followParticipant();
 

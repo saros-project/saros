@@ -1,6 +1,8 @@
 package de.fu_berlin.inf.dpp.stf.test.stf.internal;
 
 import static de.fu_berlin.inf.dpp.stf.client.tester.SarosTester.ALICE;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import java.rmi.RemoteException;
 
@@ -19,29 +21,39 @@ public class InternalTest extends StfTestCase {
     }
 
     @After
-    public void deleteWorkspace() throws RemoteException {
+    public void deleteWorkspace() throws Exception {
         ALICE.superBot().internal().clearWorkspace();
     }
 
     @Test
-    public void testCreateJavaProject() throws RemoteException {
+    public void testCreateJavaProject() throws Exception {
         ALICE.superBot().internal().createJavaProject("Hello");
     }
 
     @Test
-    public void testCreateProject() throws RemoteException {
+    public void testCreateProject() throws Exception {
         ALICE.superBot().internal().createJavaProject("Hello");
     }
 
     @Test
-    public void testCreateFolder() throws RemoteException {
+    public void testCreateFolder() throws Exception {
         ALICE.superBot().internal().createProject("foo");
         ALICE.superBot().internal().createFolder("foo", "bar");
     }
 
     @Test(expected = RemoteException.class)
-    public void testCreateFolderWithoutProject() throws RemoteException {
+    public void testCreateFolderWithoutProject() throws Exception {
         ALICE.superBot().internal().createFolder("foo", "bar");
+    }
+
+    @Test
+    public void testResourceExists() throws Exception {
+        ALICE.superBot().internal().createProject("foo");
+        ALICE.superBot().internal().createFolder("foo", "bar");
+
+        assertTrue(ALICE.superBot().internal().existsResource("foo"));
+        assertTrue(ALICE.superBot().internal().existsResource("foo/bar"));
+        assertFalse(ALICE.superBot().internal().existsResource("bar"));
     }
 
     @Test
@@ -50,7 +62,7 @@ public class InternalTest extends StfTestCase {
     }
 
     @Test
-    public void testcreateFile() throws RemoteException {
+    public void testcreateFile() throws Exception {
         ALICE.superBot().internal().createJavaProject("Hello");
         ALICE.superBot().internal().createFile("Hello", "test.bar", "bla");
         ALICE.superBot().internal()

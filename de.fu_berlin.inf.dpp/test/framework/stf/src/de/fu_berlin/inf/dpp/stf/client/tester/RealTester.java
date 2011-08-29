@@ -53,7 +53,7 @@ class RealTester implements AbstractTester {
     }
 
     public IRemoteWorkbenchBot remoteBot() throws RemoteException {
-        bot.createBots();
+        bot.resetBot();
         return bot;
     }
 

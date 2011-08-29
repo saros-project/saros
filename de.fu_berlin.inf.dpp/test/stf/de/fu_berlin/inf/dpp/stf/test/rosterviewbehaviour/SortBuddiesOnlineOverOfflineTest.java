@@ -69,9 +69,6 @@ public class SortBuddiesOnlineOverOfflineTest extends StfTestCase {
         BOB.superBot().views().sarosView().disconnect();
         CARL.superBot().views().sarosView().disconnect();
 
-        BOB.superBot().views().sarosView().waitUntilIsDisconnected();
-        CARL.superBot().views().sarosView().waitUntilIsDisconnected();
-
         // wait for roster update
         ALICE.remoteBot().sleep(1000);
 

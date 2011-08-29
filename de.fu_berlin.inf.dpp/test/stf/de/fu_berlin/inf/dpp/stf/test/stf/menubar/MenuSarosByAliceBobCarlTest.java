@@ -6,8 +6,6 @@ import static de.fu_berlin.inf.dpp.stf.client.tester.SarosTester.CARL;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import java.rmi.RemoteException;
-
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -24,7 +22,7 @@ public class MenuSarosByAliceBobCarlTest extends StfTestCase {
     }
 
     @Test
-    public void inviteUsersInSession() throws RemoteException {
+    public void inviteUsersInSession() throws Exception {
         Util.setUpSessionWithJavaProjectAndClass(Constants.PROJECT1,
             Constants.PKG1, Constants.CLS1, ALICE, BOB);
         assertFalse(CARL.superBot().views().sarosView().isInSession());

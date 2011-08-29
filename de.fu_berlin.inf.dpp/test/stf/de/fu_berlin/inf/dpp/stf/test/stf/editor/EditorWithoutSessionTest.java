@@ -4,8 +4,6 @@ import static de.fu_berlin.inf.dpp.stf.client.tester.SarosTester.ALICE;
 import static de.fu_berlin.inf.dpp.stf.client.tester.SarosTester.BOB;
 import static org.junit.Assert.assertEquals;
 
-import java.rmi.RemoteException;
-
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -21,8 +19,8 @@ public class EditorWithoutSessionTest extends StfTestCase {
     }
 
     @Test
-    public void testConcurrentEditing() throws RemoteException {
-        Util.createProjectWithFile(Constants.PROJECT1, Constants.FILE3, ALICE,
+    public void testConcurrentEditing() throws Exception {
+        Util.createProjectWithEmptyFile(Constants.PROJECT1, Constants.FILE3, ALICE,
             BOB);
 
         ALICE.superBot().views().packageExplorerView()

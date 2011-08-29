@@ -33,48 +33,45 @@ public final class NewC extends StfRemoteObject implements INewC {
     }
 
     public void project(String projectName) throws RemoteException {
-        ContextMenuHelper.getContextMenu(tree, MENU_NEW, MENU_PROJECT).click();
+        ContextMenuHelper.clickContextMenu(tree, MENU_NEW, MENU_PROJECT);
         confirmWizardNewProject(projectName);
     }
 
     public void javaProject(String projectName) throws RemoteException {
-        ContextMenuHelper.getContextMenu(tree, MENU_NEW, MENU_JAVA_PROJECT)
-            .click();
+        ContextMenuHelper.clickContextMenu(tree, MENU_NEW, MENU_JAVA_PROJECT);
         confirmShellNewJavaProject(projectName);
     }
 
     public void folder(String folderName) throws RemoteException {
 
-        ContextMenuHelper.getContextMenu(tree, MENU_NEW, MENU_FOLDER).click();
+        ContextMenuHelper.clickContextMenu(tree, MENU_NEW, MENU_FOLDER);
         confirmShellNewFolder(folderName);
 
     }
 
     public void pkg(String projectName, String pkg) throws RemoteException {
 
-        ContextMenuHelper.getContextMenu(tree, MENU_NEW, MENU_PACKAGE).click();
+        ContextMenuHelper.clickContextMenu(tree, MENU_NEW, MENU_PACKAGE);
         confirmShellNewJavaPackage(projectName, pkg);
     }
 
     public void file(String fileName) throws RemoteException {
 
-        ContextMenuHelper.getContextMenu(tree, MENU_NEW, MENU_FILE).click();
+        ContextMenuHelper.clickContextMenu(tree, MENU_NEW, MENU_FILE);
         confirmShellNewFile(fileName);
     }
 
     public void cls(String className) throws RemoteException {
 
-        ContextMenuHelper.getContextMenu(tree, MENU_NEW, MENU_CLASS).click();
+        ContextMenuHelper.clickContextMenu(tree, MENU_NEW, MENU_CLASS);
         confirmShellNewJavaClass(className);
     }
 
     public void cls(String projectName, String pkg, String className)
         throws RemoteException {
-        // if (!sarosBot().state().existsFileNoGUI(
-        // getClassPath(projectName, pkg, className))) {
+
         try {
-            ContextMenuHelper.getContextMenu(tree, MENU_NEW, MENU_CLASS)
-                .click();
+            ContextMenuHelper.clickContextMenu(tree, MENU_NEW, MENU_CLASS);
             confirmShellNewJavaClass(projectName, pkg, className);
         } catch (WidgetNotFoundException e) {
             final String cause = "error creating new Java class '" + className

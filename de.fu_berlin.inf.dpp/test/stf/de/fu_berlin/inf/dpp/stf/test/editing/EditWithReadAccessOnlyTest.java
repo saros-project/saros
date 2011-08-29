@@ -4,8 +4,6 @@ import static de.fu_berlin.inf.dpp.stf.client.tester.SarosTester.ALICE;
 import static de.fu_berlin.inf.dpp.stf.client.tester.SarosTester.BOB;
 import static org.junit.Assert.assertEquals;
 
-import java.rmi.RemoteException;
-
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -22,7 +20,7 @@ public class EditWithReadAccessOnlyTest extends StfTestCase {
     }
 
     @Test
-    public void testEditingWithReadOnlyAccess() throws RemoteException {
+    public void testEditingWithReadOnlyAccess() throws Exception {
         Util.setUpSessionWithJavaProjectAndClass("foo", "bar", "HelloWorld",
             ALICE, BOB);
 

@@ -8,8 +8,6 @@ import static de.fu_berlin.inf.dpp.stf.shared.Constants.VIEW_SAROS;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import java.rmi.RemoteException;
-
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -43,7 +41,7 @@ public class WriteAccessChangeAndImmediateWriteTest extends StfTestCase {
      * 
      */
     @Test
-    public void testFollowModeByOpenClassbyAlice() throws RemoteException {
+    public void testFollowModeByOpenClassbyAlice() throws Exception {
         Util.setUpSessionWithJavaProjectAndClass(Constants.PROJECT1,
             Constants.PKG1, Constants.CLS1, ALICE, BOB);
 

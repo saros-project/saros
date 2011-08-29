@@ -37,7 +37,7 @@ public class FileOperationsTest extends StfTestCase {
     }
 
     @Before
-    public void beforeEveryTest() throws RemoteException {
+    public void beforeEveryTest() throws Exception {
         closeAllShells();
         closeAllEditors();
         clearWorkspaces();
@@ -51,11 +51,11 @@ public class FileOperationsTest extends StfTestCase {
         CARL.superBot().views().packageExplorerView()
             .waitUntilResourceIsShared("Foo1_Saros/src/my/pkg/MyClass.java");
 
-        Util.setFollowMode(ALICE, CARL);
+        Util.activateFollowMode(ALICE, CARL);
     }
 
     @After
-    public void afterEveryTest() throws RemoteException {
+    public void afterEveryTest() throws Exception {
         leaveSessionHostFirst(ALICE);
     }
 
@@ -200,7 +200,7 @@ public class FileOperationsTest extends StfTestCase {
             .views()
             .packageExplorerView()
             .getFileContent(
-                Util.getClassPath(Constants.PROJECT1, Constants.PKG2,
+                Util.classPathToFilePath(Constants.PROJECT1, Constants.PKG2,
                     Constants.CLS1));
 
         CARL.superBot()
@@ -208,7 +208,7 @@ public class FileOperationsTest extends StfTestCase {
             .packageExplorerView()
             .waitUntilFileContentSame(
                 clsContentOfAlice,
-                Util.getClassPath(Constants.PROJECT1, Constants.PKG2,
+                Util.classPathToFilePath(Constants.PROJECT1, Constants.PKG2,
                     Constants.CLS1));
 
         BOB.superBot()
@@ -216,7 +216,7 @@ public class FileOperationsTest extends StfTestCase {
             .packageExplorerView()
             .waitUntilFileContentSame(
                 clsContentOfAlice,
-                Util.getClassPath(Constants.PROJECT1, Constants.PKG2,
+                Util.classPathToFilePath(Constants.PROJECT1, Constants.PKG2,
                     Constants.CLS1));
 
         String clsContentOfBob = BOB
@@ -224,7 +224,7 @@ public class FileOperationsTest extends StfTestCase {
             .views()
             .packageExplorerView()
             .getFileContent(
-                Util.getClassPath(Constants.PROJECT1, Constants.PKG2,
+                Util.classPathToFilePath(Constants.PROJECT1, Constants.PKG2,
                     Constants.CLS1));
 
         String clsContentOfCarl = CARL
@@ -232,7 +232,7 @@ public class FileOperationsTest extends StfTestCase {
             .views()
             .packageExplorerView()
             .getFileContent(
-                Util.getClassPath(Constants.PROJECT1, Constants.PKG2,
+                Util.classPathToFilePath(Constants.PROJECT1, Constants.PKG2,
                     Constants.CLS1));
 
         assertTrue(clsContentOfBob.equals(clsContentOfAlice));

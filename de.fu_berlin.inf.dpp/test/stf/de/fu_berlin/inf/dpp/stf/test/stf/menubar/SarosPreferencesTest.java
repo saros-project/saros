@@ -35,12 +35,12 @@ public class SarosPreferencesTest extends StfTestCase {
     }
 
     @Before
-    public void beforeEveryTest() throws RemoteException {
+    public void beforeEveryTest() throws Exception {
         closeAllShells();
     }
 
     @After
-    public void afterEveryTest() throws RemoteException {
+    public void afterEveryTest() throws Exception {
         resetDefaultAccount();
     }
 

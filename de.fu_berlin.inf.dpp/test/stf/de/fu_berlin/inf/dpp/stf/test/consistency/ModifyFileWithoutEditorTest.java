@@ -30,7 +30,7 @@ public class ModifyFileWithoutEditorTest extends StfTestCase {
         ALICE.superBot().internal().append("foo", "readme.txt", " finished");
 
         // do not make inconsistencies
-        ALICE.remoteBot().sleep(1000);
+        ALICE.remoteBot().sleep(2000);
 
         BOB.superBot().internal()
             .append("foo", "readme.txt", " World of Warcraft");
@@ -43,7 +43,7 @@ public class ModifyFileWithoutEditorTest extends StfTestCase {
         ALICE.remoteBot().editor("readme.txt").waitUntilIsActive();
         BOB.remoteBot().editor("readme.txt").waitUntilIsActive();
 
-        ALICE.remoteBot().sleep(1000);
+        ALICE.remoteBot().sleep(2000);
 
         String aliceText = ALICE.remoteBot().editor("readme.txt").getText();
         String bobText = BOB.remoteBot().editor("readme.txt").getText();

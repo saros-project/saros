@@ -21,7 +21,7 @@ public class ContextMenuShareWithTest extends StfTestCase {
     }
 
     @After
-    public void afterEveryTest() throws RemoteException {
+    public void afterEveryTest() throws Exception {
         leaveSessionPeersFirst(ALICE);
     }
 

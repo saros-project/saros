@@ -53,12 +53,12 @@ public class BasicWidgetTreeTest extends StfTestCase {
     }
 
     @Before
-    public void beforeEveryTest() throws RemoteException {
+    public void beforeEveryTest() throws Exception {
         closeAllShells();
     }
 
     @After
-    public void afterEveryTest() throws RemoteException {
+    public void afterEveryTest() throws Exception {
         clearWorkspaces();
     }
 
@@ -273,7 +273,7 @@ public class BasicWidgetTreeTest extends StfTestCase {
             .connectWith(ALICE.getJID(), ALICE.getPassword());
         ALICE.remoteBot().view(VIEW_SAROS).bot().tree()
             .selectTreeItemWithRegex(NODE_BUDDIES, BOB.getName() + ".*")
-            .contextMenus(CM_RENAME).click();
+            .clickContextMenu(CM_RENAME);
         assertTrue(ALICE.remoteBot().isShellOpen(SHELL_SET_NEW_NICKNAME));
     }
 
@@ -284,7 +284,7 @@ public class BasicWidgetTreeTest extends StfTestCase {
 
         ALICE.remoteBot().view(VIEW_PACKAGE_EXPLORER).bot().tree()
             .selectTreeItem(Constants.PROJECT1)
-            .contextMenus(MENU_NEW, MENU_PACKAGE).click();
+            .clickContextMenu(MENU_NEW, MENU_PACKAGE);
 
         ALICE.remoteBot().waitUntilShellIsOpen(SHELL_NEW_JAVA_PACKAGE);
         assertTrue(ALICE.remoteBot().shell(SHELL_NEW_JAVA_PACKAGE).activate());

@@ -38,7 +38,7 @@ public class ChangingUserWithWriteAccessWhileOtherFollowTest extends
         setUpSaros();
         Util.setUpSessionWithJavaProjectAndClass(Constants.PROJECT1,
             Constants.PKG1, Constants.CLS1, ALICE, BOB, CARL, DAVE);
-        Util.setFollowMode(ALICE, BOB, CARL, DAVE);
+        Util.activateFollowMode(ALICE, BOB, CARL, DAVE);
     }
 
     /**
@@ -64,8 +64,7 @@ public class ChangingUserWithWriteAccessWhileOtherFollowTest extends
      */
 
     @Test
-    public void testChangingWriteAccessWhileOtherFollow() throws IOException,
-        CoreException, InterruptedException {
+    public void testChangingWriteAccessWhileOtherFollow() throws Exception {
 
         /*
          * After new release 10.10.28 all read-only users is automatically in
@@ -100,7 +99,7 @@ public class ChangingUserWithWriteAccessWhileOtherFollowTest extends
         assertTrue(DAVE.remoteBot().editor(Constants.CLS1_SUFFIX).isActive());
         assertTrue(DAVE.remoteBot().editor(Constants.CLS1_SUFFIX).isDirty());
 
-        Util.resetFollowModeSequentially(CARL, BOB, DAVE);
+        Util.stopFollowModeSequentially(CARL, BOB, DAVE);
         ALICE.remoteBot().editor(Constants.CLS1_SUFFIX)
             .setTextFromFile(Constants.CP1_CHANGE);
         // ALICE.bot().editor(CLS1_SUFFIX).closeAndSave();

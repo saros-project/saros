@@ -32,7 +32,7 @@ public class HandleContactsTest extends StfTestCase {
     }
 
     @After
-    public void afterEveryTest() throws RemoteException {
+    public void afterEveryTest() throws Exception {
         resetBuddies();
     }
 
@@ -53,7 +53,7 @@ public class HandleContactsTest extends StfTestCase {
      * @throws RemoteException
      */
     @Test
-    public void testBobRemoveBuddyAlice() throws RemoteException {
+    public void testBobRemoveBuddyAlice() throws Exception {
         assertTrue(ALICE.superBot().views().sarosView().hasBuddy(BOB.getJID()));
         assertTrue(BOB.superBot().views().sarosView().hasBuddy(ALICE.getJID()));
         Util.removeBuddiesFromContactList(BOB, ALICE);
@@ -75,7 +75,7 @@ public class HandleContactsTest extends StfTestCase {
      * @throws RemoteException
      */
     @Test
-    public void testAliceRemoveBuddyBob() throws RemoteException {
+    public void testAliceRemoveBuddyBob() throws Exception {
         assertTrue(ALICE.superBot().views().sarosView().hasBuddy(BOB.getJID()));
         assertTrue(BOB.superBot().views().sarosView().hasBuddy(ALICE.getJID()));
         Util.removeBuddiesFromContactList(ALICE, BOB);
@@ -97,7 +97,7 @@ public class HandleContactsTest extends StfTestCase {
      * @throws RemoteException
      */
     @Test
-    public void testAliceAddBuddyBob() throws RemoteException {
+    public void testAliceAddBuddyBob() throws Exception {
         Util.removeBuddiesFromContactList(ALICE, BOB);
         Util.addBuddiesToContactList(ALICE, BOB);
         assertTrue(BOB.superBot().views().sarosView().hasBuddy(ALICE.getJID()));
@@ -118,7 +118,7 @@ public class HandleContactsTest extends StfTestCase {
      * @throws RemoteException
      */
     @Test
-    public void testBobAddBuddyAlice() throws RemoteException {
+    public void testBobAddBuddyAlice() throws Exception {
         Util.removeBuddiesFromContactList(BOB, ALICE);
         Util.addBuddiesToContactList(BOB, ALICE);
         assertTrue(BOB.superBot().views().sarosView().hasBuddy(ALICE.getJID()));

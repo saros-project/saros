@@ -4,8 +4,6 @@ import static de.fu_berlin.inf.dpp.stf.client.tester.SarosTester.ALICE;
 import static de.fu_berlin.inf.dpp.stf.client.tester.SarosTester.BOB;
 import static org.junit.Assert.assertTrue;
 
-import java.rmi.RemoteException;
-
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -23,7 +21,7 @@ public class ChangingNameInRosterViewTest extends StfTestCase {
     }
 
     @Test
-    public void renameBuddyInRosterView() throws RemoteException {
+    public void renameBuddyInRosterView() throws Exception {
 
         Util.setUpSessionWithJavaProjectAndClass(Constants.PROJECT1,
             Constants.PKG1, Constants.CLS1, ALICE, BOB);

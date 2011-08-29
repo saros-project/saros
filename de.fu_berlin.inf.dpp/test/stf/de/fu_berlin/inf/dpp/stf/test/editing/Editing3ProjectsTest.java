@@ -4,8 +4,6 @@ import static de.fu_berlin.inf.dpp.stf.client.tester.SarosTester.ALICE;
 import static de.fu_berlin.inf.dpp.stf.client.tester.SarosTester.BOB;
 import static org.junit.Assert.assertEquals;
 
-import java.rmi.RemoteException;
-
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -23,7 +21,7 @@ public class Editing3ProjectsTest extends StfTestCase {
     }
 
     @Test
-    public void testEditing3Projects() throws RemoteException {
+    public void testEditing3Projects() throws Exception {
 
         ALICE.superBot().internal().createJavaProject("foo");
         ALICE.superBot().internal().createJavaProject("foo1");

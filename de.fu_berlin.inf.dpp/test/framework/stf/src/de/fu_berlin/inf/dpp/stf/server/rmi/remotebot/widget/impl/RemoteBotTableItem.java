@@ -2,13 +2,11 @@ package de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.impl;
 
 import java.rmi.RemoteException;
 
-import org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences;
+import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
 import org.eclipse.swtbot.swt.finder.waits.Conditions;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTableItem;
-import org.eclipse.swtbot.swt.finder.widgets.TimeoutException;
 
 import de.fu_berlin.inf.dpp.stf.server.StfRemoteObject;
-import de.fu_berlin.inf.dpp.stf.server.bot.SarosSWTBotPreferences;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.impl.RemoteWorkbenchBot;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotMenu;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotTableItem;
@@ -63,17 +61,12 @@ public final class RemoteBotTableItem extends StfRemoteObject implements
     }
 
     public boolean existsContextMenu(String contextName) throws RemoteException {
-        long oldTimeout = SWTBotPreferences.TIMEOUT;
-
-        SWTBotPreferences.TIMEOUT = SarosSWTBotPreferences.SAROS_WIDGET_TIMEOUT;
 
         try {
             widget.contextMenu(contextName);
             return true;
-        } catch (TimeoutException e) {
+        } catch (WidgetNotFoundException e) {
             return false;
-        } finally {
-            SWTBotPreferences.TIMEOUT = oldTimeout;
         }
     }
 

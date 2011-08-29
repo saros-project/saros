@@ -72,8 +72,7 @@ public class StrictSequentialInvitationWithoutTerminationTest extends
      * @throws InterruptedException
      */
     @Test
-    public void testSetLineDelimiter() throws RemoteException,
-        InterruptedException {
+    public void testSetLineDelimiter() throws Exception {
 
         ALICE
             .superBot()

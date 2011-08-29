@@ -275,21 +275,26 @@ public final class RemoteWorkbenchBot extends RemoteBot implements
 
             for (String shellName : this.getOpenShellNames()) {
                 try {
-                    SWTBotShell shell = swtWorkBenchBot.shell(shellName);
-                    shell.activate();
+                    SWTBotShell shell;
 
                     // TODO shell names currently hard coded
 
                     if (shellName.equals("Leaving the Session")) {
+                        shell = swtWorkBenchBot.shell(shellName);
+                        shell.activate();
                         shell.bot().button(YES).click();
                         shell.bot().waitUntil(Conditions.shellCloses(shell));
                         continue;
                     }
                     if (shellName.equals("File Changed")) {
+                        shell = swtWorkBenchBot.shell(shellName);
+                        shell.activate();
                         shell.bot().button(NO).click();
                         continue;
                     }
                     if (shellName.equals("Synchronizing")) {
+                        shell = swtWorkBenchBot.shell(shellName);
+                        shell.activate();
                         shell.bot().button(CANCEL).click();
                         continue;
                     }
@@ -325,7 +330,7 @@ public final class RemoteWorkbenchBot extends RemoteBot implements
         return chatLine;
     }
 
-    public void createBots() throws RemoteException {
+    public void resetBot() throws RemoteException {
         this.setBot(new SWTBot());
     }
 }

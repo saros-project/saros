@@ -4,9 +4,6 @@ import static de.fu_berlin.inf.dpp.stf.client.tester.SarosTester.ALICE;
 import static de.fu_berlin.inf.dpp.stf.client.tester.SarosTester.BOB;
 import static org.junit.Assert.assertTrue;
 
-import java.io.IOException;
-
-import org.eclipse.core.runtime.CoreException;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -22,7 +19,7 @@ public class FollowModeTest extends StfTestCase {
     }
 
     @Test
-    public void testBobFollowAlice() throws IOException, CoreException {
+    public void testBobFollowAlice() throws Exception {
         Util.setUpSessionWithJavaProjectAndClass(Constants.PROJECT1,
             Constants.PKG1, Constants.CLS1, ALICE, BOB);
 
@@ -53,7 +50,7 @@ public class FollowModeTest extends StfTestCase {
             .views()
             .packageExplorerView()
             .getFileContent(
-                Util.getClassPath(Constants.PROJECT1, Constants.PKG1,
+                Util.classPathToFilePath(Constants.PROJECT1, Constants.PKG1,
                     Constants.CLS1));
 
         BOB.superBot()
@@ -61,14 +58,14 @@ public class FollowModeTest extends StfTestCase {
             .packageExplorerView()
             .waitUntilFileContentSame(
                 clsContentOfAlice,
-                Util.getClassPath(Constants.PROJECT1, Constants.PKG1,
+                Util.classPathToFilePath(Constants.PROJECT1, Constants.PKG1,
                     Constants.CLS1));
         String clsContentOfBob = BOB
             .superBot()
             .views()
             .packageExplorerView()
             .getFileContent(
-                Util.getClassPath(Constants.PROJECT1, Constants.PKG1,
+                Util.classPathToFilePath(Constants.PROJECT1, Constants.PKG1,
                     Constants.CLS1));
         assertTrue(clsContentOfBob.equals(clsContentOfAlice));
 
