@@ -112,6 +112,7 @@ public class ChangeColorManager implements IActivityProvider {
 
         @Override
         public void userJoined(User user) {
+            log.info("User Joined:" + user.toString());
             User localUser = sarosSession.getLocalUser();
             if (localUser.isHost()) {
                 rgbOfNewParticipant = SarosAnnotation.getUserColor(user)
@@ -154,6 +155,15 @@ public class ChangeColorManager implements IActivityProvider {
             for (User user : sarosSession.getParticipants()) {
                 RGB rgb = SarosAnnotation.getUserColor(user).getRGB();
                 sessionRGBS.put(user, rgb);
+
+                // Set color so that the different colors for selection and
+                // contribution are displayed
+
+                // FIXME if we do not update user colors HERE, different
+                // highlighting
+                // color will be only activated if user manually changes color
+                // again.
+                SarosAnnotation.setUserColor(user, rgb);
             }
 
             return sessionRGBS;
