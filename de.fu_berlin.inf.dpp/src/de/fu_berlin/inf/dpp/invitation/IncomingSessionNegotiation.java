@@ -59,8 +59,7 @@ public class IncomingSessionNegotiation extends InvitationProcess {
         VersionManager versionManager, VersionInfo remoteVersionInfo,
         DateTime sessionStart, SarosUI sarosUI, String invitationID,
         Saros saros, String description, SarosContext sarosContext) {
-        super(transmitter, from, description, colorID, invitationProcesses,
-            sarosContext);
+        super(from, description, colorID, sarosContext);
 
         this.versionInfo = determineVersion(remoteVersionInfo);
         this.sessionStart = sessionStart;

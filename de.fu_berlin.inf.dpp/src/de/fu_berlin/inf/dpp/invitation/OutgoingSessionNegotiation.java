@@ -23,7 +23,6 @@ import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
 import de.fu_berlin.inf.dpp.exceptions.RemoteCancellationException;
 import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
 import de.fu_berlin.inf.dpp.invitation.ProcessTools.CancelOption;
-import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
 import de.fu_berlin.inf.dpp.net.internal.DefaultInvitationInfo.UserListRequestExtensionProvider;
@@ -32,7 +31,6 @@ import de.fu_berlin.inf.dpp.net.internal.InvitationInfo.InvitationExtensionProvi
 import de.fu_berlin.inf.dpp.net.internal.SarosPacketCollector;
 import de.fu_berlin.inf.dpp.net.internal.XMPPTransmitter;
 import de.fu_berlin.inf.dpp.net.internal.discoveryManager.DiscoveryManager;
-import de.fu_berlin.inf.dpp.observables.InvitationProcessObservable;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.ui.wizards.InvitationWizard;
@@ -47,15 +45,19 @@ public class OutgoingSessionNegotiation extends InvitationProcess {
         .getLogger(OutgoingSessionNegotiation.class);
 
     protected ISarosSession sarosSession;
+    @Inject
     protected VersionManager versionManager;
     protected SubMonitor monitor;
     protected String invitationID;
     protected final static Random INVITATION_RAND = new Random();
+    @Inject
     protected DiscoveryManager discoveryManager;
     protected boolean peerAdvertisesSarosSupport = true;
     protected AtomicBoolean cancelled = new AtomicBoolean(false);
     protected SarosCancellationException cancellationCause;
+    @Inject
     protected MUCManager mucManager;
+    @Inject
     protected MUCSessionPreferencesNegotiatingManager comNegotiatingManager;
     protected VersionInfo versionInfo;
     protected SarosPacketCollector invitationCompleteCollector;
@@ -96,19 +98,12 @@ public class OutgoingSessionNegotiation extends InvitationProcess {
     @Inject
     protected DataTransferManager dataTransferManager;
 
-    public OutgoingSessionNegotiation(ITransmitter transmitter, JID peer,
-        int colorID, InvitationProcessObservable invitationProcesses,
+    public OutgoingSessionNegotiation(JID peer, int colorID,
         ISarosSession sarosSession, String description,
-        VersionManager versionManager, DiscoveryManager discoveryManager,
-        MUCSessionPreferencesNegotiatingManager comNegotiatingManager,
         SarosContext sarosContext) {
-        super(transmitter, peer, description, colorID, invitationProcesses,
-            sarosContext);
+        super(peer, description, colorID, sarosContext);
 
         this.sarosSession = sarosSession;
-        this.versionManager = versionManager;
-        this.comNegotiatingManager = comNegotiatingManager;
-        this.discoveryManager = discoveryManager;
 
     }
 

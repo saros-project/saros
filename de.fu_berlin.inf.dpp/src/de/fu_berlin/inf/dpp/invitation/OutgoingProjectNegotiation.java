@@ -24,6 +24,7 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.SubMonitor;
+import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.FileList;
 import de.fu_berlin.inf.dpp.FileListFactory;
@@ -36,11 +37,9 @@ import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
 import de.fu_berlin.inf.dpp.exceptions.RemoteCancellationException;
 import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
 import de.fu_berlin.inf.dpp.invitation.ProcessTools.CancelOption;
-import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.internal.StreamService;
 import de.fu_berlin.inf.dpp.net.internal.StreamSession;
-import de.fu_berlin.inf.dpp.observables.ProjectNegotiationObservable;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.synchronize.StartHandle;
@@ -70,7 +69,9 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
      * projectID => List of {@link IPath files} that will be send to peer
      */
     protected MappedList<String, IPath> projectFilesToSend = new MappedList<String, IPath>();
+    @Inject
     protected StopManager stopManager;
+    @Inject
     protected SessionIDObservable sessionID;
     protected final static Random INVITATION_RAND = new Random();
 
@@ -79,27 +80,21 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
     protected HashMap<IProject, List<IResource>> selectedProjectResources;
     protected List<ProjectExchangeInfo> pInfos;
 
-    public OutgoingProjectNegotiation(ITransmitter transmitter, JID to,
-        ISarosSession sarosSession,
-        HashMap<IProject, List<IResource>> partialResources,
-        ProjectNegotiationObservable projectExchangeProcesses,
-        StopManager stopManager, SessionIDObservable sessionID,
-        boolean doStream, SarosContext sarosContext,
+    public OutgoingProjectNegotiation(JID to, ISarosSession sarosSession,
+        HashMap<IProject, List<IResource>> partialResources, boolean doStream,
+        SarosContext sarosContext,
         List<ProjectExchangeInfo> projectExchangeInfos) {
-        super(transmitter, to, projectExchangeProcesses, sarosContext);
+        super(to, sarosContext);
 
         this.processID = String.valueOf(INVITATION_RAND.nextLong());
-        this.projectExchangeProcesses = projectExchangeProcesses;
         // set to false because streaming is not well supported yet
         this.doStream = false;
         this.sarosSession = sarosSession;
-        this.sessionID = sessionID;
-        this.stopManager = stopManager;
+
         this.selectedProjectResources = partialResources;
         this.projects = new ArrayList<IProject>(
             selectedProjectResources.keySet());
         this.pInfos = projectExchangeInfos;
-
     }
 
     public void start(SubMonitor monitor) throws SarosCancellationException {
@@ -161,7 +156,7 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
                     projectFileList.setProjectID(projectID);
                     boolean partial = !sarosSession
                         .isCompletelyShared(iProject);
-                    
+
                     ProjectExchangeInfo pInfo = new ProjectExchangeInfo(
                         projectID, "", projectName, partial, projectFileList);
                     pInfos.add(pInfo);

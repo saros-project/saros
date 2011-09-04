@@ -40,7 +40,8 @@ public abstract class InvitationProcess {
 
     private final static Logger log = Logger.getLogger(InvitationProcess.class);
 
-    protected final ITransmitter transmitter;
+    @Inject
+    protected ITransmitter transmitter;
     protected JID peer;
     protected String description;
     protected final int colorID;
@@ -53,6 +54,7 @@ public abstract class InvitationProcess {
     protected SarosSessionManager sarosSessionManager;
     protected StreamSession streamSession;
 
+    @Inject
     protected InvitationProcessObservable invitationProcesses;
     protected boolean error = false;
 
@@ -71,18 +73,13 @@ public abstract class InvitationProcess {
         }
     };
 
-    public InvitationProcess(ITransmitter transmitter, JID peer,
-        String description, int colorID,
-        InvitationProcessObservable invitationProcesses,
+    public InvitationProcess(JID peer, String description, int colorID,
         SarosContext sarosContext) {
-        this.transmitter = transmitter;
         this.peer = peer;
         this.description = description;
         this.colorID = colorID;
-        this.invitationProcesses = invitationProcesses;
-        this.invitationProcesses.addInvitationProcess(this);
-
         sarosContext.initComponent(this);
+        this.invitationProcesses.addInvitationProcess(this);
     }
 
     /**

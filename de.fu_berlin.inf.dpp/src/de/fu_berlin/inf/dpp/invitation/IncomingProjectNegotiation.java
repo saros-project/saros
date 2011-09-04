@@ -50,10 +50,8 @@ import de.fu_berlin.inf.dpp.exceptions.RemoteCancellationException;
 import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
 import de.fu_berlin.inf.dpp.invitation.ProcessTools.CancelLocation;
 import de.fu_berlin.inf.dpp.invitation.ProcessTools.CancelOption;
-import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.internal.StreamSession;
-import de.fu_berlin.inf.dpp.observables.ProjectNegotiationObservable;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
 import de.fu_berlin.inf.dpp.ui.wizards.AddProjectToSessionWizard;
 import de.fu_berlin.inf.dpp.ui.wizards.pages.EnterProjectNamePage;
@@ -86,11 +84,10 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
      */
     Map<String, IProject> localProjects;
 
-    public IncomingProjectNegotiation(ITransmitter transmitter, JID peer,
-        ProjectNegotiationObservable projectExchangeProcesses,
-        String processID, List<ProjectExchangeInfo> projectInfos,
-        boolean doStream, SarosContext sarosContext) {
-        super(transmitter, peer, projectExchangeProcesses, sarosContext);
+    public IncomingProjectNegotiation(JID peer, String processID,
+        List<ProjectExchangeInfo> projectInfos, boolean doStream,
+        SarosContext sarosContext) {
+        super(peer, sarosContext);
 
         this.processID = processID;
         this.projectInfos = projectInfos;

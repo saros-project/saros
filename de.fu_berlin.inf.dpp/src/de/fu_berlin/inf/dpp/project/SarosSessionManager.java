@@ -335,8 +335,7 @@ public class SarosSessionManager implements IConnectionListener,
         List<ProjectExchangeInfo> projectInfos, String processID,
         boolean doStream) {
         final IncomingProjectNegotiation process = new IncomingProjectNegotiation(
-            transmitter, from, projectExchangeProcesses, processID,
-            projectInfos, doStream, sarosContext);
+            from, processID, projectInfos, doStream, sarosContext);
 
         Utils.runSafeSWTAsync(log, new Runnable() {
 
@@ -411,9 +410,8 @@ public class SarosSessionManager implements IConnectionListener,
         ISarosSession sarosSession = sarosSessionObservable.getValue();
 
         OutgoingSessionNegotiation result = new OutgoingSessionNegotiation(
-            (transmitter), toInvite, sarosSession.getFreeColor(),
-            invitationProcesses, sarosSession, description, versionManager,
-            discoveryManager, comNegotiatingManager, sarosContext);
+            toInvite, sarosSession.getFreeColor(), sarosSession, description,
+            sarosContext);
 
         OutgoingInvitationJob outgoingInvitationJob = new OutgoingInvitationJob(
             result);
@@ -571,9 +569,8 @@ public class SarosSessionManager implements IConnectionListener,
 
         for (User user : this.getSarosSession().getRemoteUsers()) {
             OutgoingProjectNegotiation out = new OutgoingProjectNegotiation(
-                transmitter, user.getJID(), this.getSarosSession(),
-                projectResourcesMapping, projectExchangeProcesses, stopManager,
-                sessionID, doStream, sarosContext, null);
+                user.getJID(), this.getSarosSession(), projectResourcesMapping,
+                doStream, sarosContext, null);
 
             OutgoingProjectJob job = new OutgoingProjectJob(out);
             job.setPriority(Job.SHORT);
@@ -602,9 +599,8 @@ public class SarosSessionManager implements IConnectionListener,
         if (!projectResourcesMapping.isEmpty()
             && !projectExchangeInfos.isEmpty()) {
             OutgoingProjectNegotiation out = new OutgoingProjectNegotiation(
-                transmitter, user, this.getSarosSession(),
-                projectResourcesMapping, projectExchangeProcesses, stopManager,
-                sessionID, doStream, sarosContext, projectExchangeInfos);
+                user, this.getSarosSession(), projectResourcesMapping,
+                doStream, sarosContext, projectExchangeInfos);
             OutgoingProjectJob job = new OutgoingProjectJob(out);
             job.setPriority(Job.SHORT);
             job.schedule();

@@ -2,7 +2,6 @@ package de.fu_berlin.inf.dpp.invitation;
 
 import java.util.Map;
 
-import de.fu_berlin.inf.dpp.util.EclipseHelper;
 import org.apache.log4j.Logger;
 import org.picocontainer.annotations.Inject;
 
@@ -15,6 +14,7 @@ import de.fu_berlin.inf.dpp.net.internal.StreamSession;
 import de.fu_berlin.inf.dpp.net.internal.StreamSession.StreamSessionListener;
 import de.fu_berlin.inf.dpp.observables.ProjectNegotiationObservable;
 import de.fu_berlin.inf.dpp.project.SarosSessionManager;
+import de.fu_berlin.inf.dpp.util.EclipseHelper;
 
 /**
  * 
@@ -26,8 +26,10 @@ public abstract class ProjectNegotiation {
 
     private static Logger log = Logger.getLogger(ProjectNegotiation.class);
 
+    @Inject
     protected ProjectNegotiationObservable projectExchangeProcesses;
     protected JID peer;
+    @Inject
     protected ITransmitter transmitter;
     protected boolean error = false;
     protected StreamSession streamSession;
@@ -68,15 +70,11 @@ public abstract class ProjectNegotiation {
         }
     };
 
-    public ProjectNegotiation(ITransmitter transmitter, JID peer,
-        ProjectNegotiationObservable projectExchangeProcesses,
-        SarosContext sarosContext) {
-        this.transmitter = transmitter;
+    public ProjectNegotiation(JID peer, SarosContext sarosContext) {
         this.peer = peer;
-        this.projectExchangeProcesses = projectExchangeProcesses;
-        this.projectExchangeProcesses.addProjectExchangeProcess(this);
 
         sarosContext.initComponent(this);
+        this.projectExchangeProcesses.addProjectExchangeProcess(this);
     }
 
     /**
