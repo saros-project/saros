@@ -9,6 +9,9 @@ import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.picocontainer.MutablePicoContainer;
@@ -85,6 +88,14 @@ public class STFController {
      * the object in the server JVM.
      */
     public static void start(int port, Saros saros) throws RemoteException {
+
+        List<String> propertyKeys = Arrays.asList(System.getProperties()
+            .keySet().toArray(new String[0]));
+
+        Collections.sort(propertyKeys);
+
+        for (String key : propertyKeys)
+            log.info("Java property: " + key + " = " + System.getProperty(key));
 
         MutablePicoContainer container = null;
         try {

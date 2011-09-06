@@ -82,7 +82,7 @@ public class WidgetUtil {
 
         } catch (TimeoutException e) {
             throw new WidgetNotFoundException(
-                "Timed out waiting for tree matching " + Arrays.asList(regexNodes), e); //$NON-NLS-1$
+                "Timed out waiting for tree item matching " + Arrays.asList(regexNodes), e); //$NON-NLS-1$
         }
     }
 
