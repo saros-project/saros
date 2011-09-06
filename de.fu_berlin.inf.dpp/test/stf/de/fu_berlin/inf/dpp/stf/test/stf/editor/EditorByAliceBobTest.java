@@ -83,6 +83,8 @@ public class EditorByAliceBobTest extends StfTestCase {
             .selectClass(Constants.PROJECT1, Constants.PKG1, Constants.CLS1)
             .open();
 
+        ALICE.remoteBot().sleep(2000);
+
         BOB.superBot().views().sarosView().selectParticipant(ALICE.getJID())
             .followParticipant();
 
