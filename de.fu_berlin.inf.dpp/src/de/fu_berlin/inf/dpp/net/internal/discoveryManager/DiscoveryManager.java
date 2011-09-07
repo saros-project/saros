@@ -1,11 +1,10 @@
 package de.fu_berlin.inf.dpp.net.internal.discoveryManager;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -64,7 +63,7 @@ public class DiscoveryManager implements Disposable {
     @Inject
     protected RosterTracker rosterTracker;
 
-    protected List<DiscoveryManagerListener> discoveryManagerListeners = new ArrayList<DiscoveryManagerListener>();
+    protected CopyOnWriteArrayList<DiscoveryManagerListener> discoveryManagerListeners = new CopyOnWriteArrayList<DiscoveryManagerListener>();
 
     /*
      * Queues incoming calls that check Saros support by going to the discovery
@@ -449,9 +448,9 @@ public class DiscoveryManager implements Disposable {
      * 
      * @param discoveryManagerListener
      */
-    public synchronized void addDiscoveryManagerListener(
+    public void addDiscoveryManagerListener(
         DiscoveryManagerListener discoveryManagerListener) {
-        this.discoveryManagerListeners.add(discoveryManagerListener);
+        this.discoveryManagerListeners.addIfAbsent(discoveryManagerListener);
     }
 
     /**
@@ -459,7 +458,7 @@ public class DiscoveryManager implements Disposable {
      * 
      * @param discoveryManagerListener
      */
-    public synchronized void removeDiscoveryManagerListener(
+    public void removeDiscoveryManagerListener(
         DiscoveryManagerListener discoveryManagerListener) {
         this.discoveryManagerListeners.remove(discoveryManagerListener);
     }
@@ -468,8 +467,8 @@ public class DiscoveryManager implements Disposable {
      * Notify all {@link DiscoveryManagerListener}s about an updated feature
      * support.
      */
-    public synchronized void notifyFeatureSupportUpdated(JID jid,
-        String feature, boolean isSupported) {
+    private void notifyFeatureSupportUpdated(JID jid, String feature,
+        boolean isSupported) {
         for (DiscoveryManagerListener discoveryManagerListener : this.discoveryManagerListeners) {
             discoveryManagerListener.featureSupportUpdated(jid, feature,
                 isSupported);
