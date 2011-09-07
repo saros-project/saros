@@ -20,7 +20,7 @@ public class EclipseHelperTestSaros extends EclipseHelper {
     @Override
     public IWorkspace getWorkspace() {
         TestSaros testsaros = (TestSaros) saros;
-        return testsaros.getWorspace();
+        return testsaros.getWorkspace();
     }
 
     public IPath getStateLocation() {

@@ -30,6 +30,7 @@ import de.fu_berlin.inf.dpp.feedback.FeedbackManager;
 import de.fu_berlin.inf.dpp.videosharing.VideoSharing;
 import de.fu_berlin.inf.dpp.videosharing.preferences.VideoSharingPreferenceHelper;
 import de.fu_berlin.inf.dpp.videosharing.source.Screen;
+import org.eclipse.jface.preference.IPreferenceStore;
 
 /**
  * Class used to initialize default preference values.
@@ -46,90 +47,151 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 
     @Override
     public void initializeDefaultPreferences() {
-        IEclipsePreferences prefs = new DefaultScope().getNode(Saros.SAROS);
+        IEclipsePreferences prefs = new DefaultScope().getNode(Saros.SAROS);        
+        setPreferences(prefs);
+    }
 
-        prefs.putBoolean(PreferenceConstants.GETTING_STARTED_FINISHED, false);
+    public static void setPreferences(IEclipsePreferences prefs) {
+        setPreferences(new IEclipsePreferencesWrapper(prefs));
+    }
 
-        prefs.putBoolean(PreferenceConstants.ENCRYPT_ACCOUNT, false);
-        prefs.putBoolean(PreferenceConstants.AUTO_CONNECT, true);
-        prefs.put(PreferenceConstants.AUTO_PORTMAPPING_DEVICEID, "");
-        prefs.putBoolean(PreferenceConstants.GATEWAYCHECKPERFORMED, false);
-        prefs.putBoolean(PreferenceConstants.AUTO_FOLLOW_MODE, false);
-        prefs.put(PreferenceConstants.SKYPE_USERNAME, "");
-        prefs.putBoolean(PreferenceConstants.DEBUG, false);
-        prefs.putInt(PreferenceConstants.FILE_TRANSFER_PORT, 7777);
-        prefs.putBoolean(PreferenceConstants.USE_NEXT_PORTS_FOR_FILE_TRANSFER,
+    public static void setPreferences(IPreferenceStore preferenceStore) {
+        setPreferences(new IPreferenceStoreWrapper(preferenceStore));
+    }
+
+    private static void setPreferences(PreferenceHolderWrapper prefs) {
+        prefs.setValue(PreferenceConstants.GETTING_STARTED_FINISHED, false);
+
+        prefs.setValue(PreferenceConstants.ENCRYPT_ACCOUNT, false);
+        prefs.setValue(PreferenceConstants.AUTO_CONNECT, true);
+        prefs.setValue(PreferenceConstants.AUTO_PORTMAPPING_DEVICEID, "");
+        prefs.setValue(PreferenceConstants.GATEWAYCHECKPERFORMED, false);
+        prefs.setValue(PreferenceConstants.AUTO_FOLLOW_MODE, false);
+        prefs.setValue(PreferenceConstants.SKYPE_USERNAME, "");
+        prefs.setValue(PreferenceConstants.DEBUG, false);
+        prefs.setValue(PreferenceConstants.FILE_TRANSFER_PORT, 7777);
+        prefs.setValue(PreferenceConstants.USE_NEXT_PORTS_FOR_FILE_TRANSFER,
             true);
         prefs
-            .putBoolean(PreferenceConstants.LOCAL_SOCKS5_PROXY_DISABLED, false);
-        prefs.putBoolean(PreferenceConstants.FORCE_FILETRANSFER_BY_CHAT, false);
+            .setValue(PreferenceConstants.LOCAL_SOCKS5_PROXY_DISABLED, false);
+        prefs.setValue(PreferenceConstants.FORCE_FILETRANSFER_BY_CHAT, false);
 
-        prefs.put(PreferenceConstants.STUN, "stunserver.org");
-        prefs.putInt(PreferenceConstants.STUN_PORT, 3478);
-        prefs.putInt(PreferenceConstants.MILLIS_UPDATE, 300);
-        prefs.putBoolean(PreferenceConstants.AUTO_ACCEPT_INVITATION, false);
-        prefs.putBoolean(PreferenceConstants.CONCURRENT_UNDO, false);
-        prefs.putBoolean(PreferenceConstants.PING_PONG, false);
-        prefs.putBoolean(PreferenceConstants.DISABLE_VERSION_CONTROL, false);
+        prefs.setValue(PreferenceConstants.STUN, "stunserver.org");
+        prefs.setValue(PreferenceConstants.STUN_PORT, 3478);
+        prefs.setValue(PreferenceConstants.MILLIS_UPDATE, 300);
+        prefs.setValue(PreferenceConstants.AUTO_ACCEPT_INVITATION, false);
+        prefs.setValue(PreferenceConstants.CONCURRENT_UNDO, false);
+        prefs.setValue(PreferenceConstants.PING_PONG, false);
+        prefs.setValue(PreferenceConstants.DISABLE_VERSION_CONTROL, false);
 
         // InvitationDialog
-        prefs.putBoolean(PreferenceConstants.AUTO_CLOSE_DIALOG, true);
-        prefs.putBoolean(PreferenceConstants.SKIP_SYNC_SELECTABLE, false);
+        prefs.setValue(PreferenceConstants.AUTO_CLOSE_DIALOG, true);
+        prefs.setValue(PreferenceConstants.SKIP_SYNC_SELECTABLE, false);
 
         // its a new workspace per default, is set to false after first start in
         // earlyStartup()
-        prefs.putBoolean(PreferenceConstants.NEW_WORKSPACE, true);
+        prefs.setValue(PreferenceConstants.NEW_WORKSPACE, true);
 
         // Initialize Feedback Preferences
-        prefs.putInt(PreferenceConstants.FEEDBACK_SURVEY_DISABLED,
+        prefs.setValue(PreferenceConstants.FEEDBACK_SURVEY_DISABLED,
             FeedbackManager.FEEDBACK_ENABLED);
-        prefs.putInt(PreferenceConstants.FEEDBACK_SURVEY_INTERVAL, 5);
-        prefs.putInt(PreferenceConstants.STATISTIC_ALLOW_SUBMISSION,
+        prefs.setValue(PreferenceConstants.FEEDBACK_SURVEY_INTERVAL, 5);
+        prefs.setValue(PreferenceConstants.STATISTIC_ALLOW_SUBMISSION,
             AbstractFeedbackManager.UNKNOWN);
-        prefs.putInt(PreferenceConstants.ERROR_LOG_ALLOW_SUBMISSION,
+        prefs.setValue(PreferenceConstants.ERROR_LOG_ALLOW_SUBMISSION,
             AbstractFeedbackManager.UNKNOWN);
-        prefs.putInt(PreferenceConstants.ERROR_LOG_ALLOW_SUBMISSION_FULL,
+        prefs.setValue(PreferenceConstants.ERROR_LOG_ALLOW_SUBMISSION_FULL,
             AbstractFeedbackManager.FORBID);
 
         // Communication default settings
-        prefs.put(PreferenceConstants.CHATSERVER, "conference.jabber.ccc.de");
-        prefs.putBoolean(PreferenceConstants.USE_DEFAULT_CHATSERVER, true);
-        prefs.putBoolean(PreferenceConstants.BEEP_UPON_IM, true);
-        prefs.putBoolean(PreferenceConstants.AUDIO_VBR, true);
-        prefs.putBoolean(PreferenceConstants.AUDIO_ENABLE_DTX, true);
-        prefs.put(PreferenceConstants.AUDIO_SAMPLERATE, "44100");
-        prefs.put(PreferenceConstants.AUDIO_QUALITY_LEVEL, "8");
+        prefs.setValue(PreferenceConstants.CHATSERVER, "conference.jabber.ccc.de");
+        prefs.setValue(PreferenceConstants.USE_DEFAULT_CHATSERVER, true);
+        prefs.setValue(PreferenceConstants.BEEP_UPON_IM, true);
+        prefs.setValue(PreferenceConstants.AUDIO_VBR, true);
+        prefs.setValue(PreferenceConstants.AUDIO_ENABLE_DTX, true);
+        prefs.setValue(PreferenceConstants.AUDIO_SAMPLERATE, "44100");
+        prefs.setValue(PreferenceConstants.AUDIO_QUALITY_LEVEL, "8");
 
         // videosharing
 
-        prefs.putInt(PreferenceConstants.ENCODING_VIDEO_FRAMERATE, 10);
-        prefs.put(PreferenceConstants.ENCODING_VIDEO_RESOLUTION,
+        prefs.setValue(PreferenceConstants.ENCODING_VIDEO_FRAMERATE, 10);
+        prefs.setValue(PreferenceConstants.ENCODING_VIDEO_RESOLUTION,
             VideoSharingPreferenceHelper.RESOLUTIONS[2][1]);
-        prefs.putInt(PreferenceConstants.ENCODING_VIDEO_WIDTH, 320);
-        prefs.putInt(PreferenceConstants.ENCODING_VIDEO_HEIGHT, 240);
-        prefs.putInt(PreferenceConstants.ENCODING_MAX_BITRATE, 512000);
-        prefs.put(PreferenceConstants.ENCODING_CODEC,
+        prefs.setValue(PreferenceConstants.ENCODING_VIDEO_WIDTH, 320);
+        prefs.setValue(PreferenceConstants.ENCODING_VIDEO_HEIGHT, 240);
+        prefs.setValue(PreferenceConstants.ENCODING_MAX_BITRATE, 512000);
+        prefs.setValue(PreferenceConstants.ENCODING_CODEC,
             VideoSharing.Codec.XUGGLER.name());
 
-        prefs.put(PreferenceConstants.XUGGLER_CONTAINER_FORMAT, "flv");
-        prefs.put(PreferenceConstants.XUGGLER_CODEC, "libx264");
-        prefs.putBoolean(PreferenceConstants.XUGGLER_USE_VBV, false);
+        prefs.setValue(PreferenceConstants.XUGGLER_CONTAINER_FORMAT, "flv");
+        prefs.setValue(PreferenceConstants.XUGGLER_CODEC, "libx264");
+        prefs.setValue(PreferenceConstants.XUGGLER_USE_VBV, false);
 
-        prefs.put(PreferenceConstants.IMAGE_TILE_CODEC, "png");
-        prefs.putInt(PreferenceConstants.IMAGE_TILE_QUALITY, 60);
-        prefs.putInt(PreferenceConstants.IMAGE_TILE_COLORS, 256);
-        prefs.putBoolean(PreferenceConstants.IMAGE_TILE_DITHER, true);
-        prefs.putBoolean(PreferenceConstants.IMAGE_TILE_SERPENTINE, false);
+        prefs.setValue(PreferenceConstants.IMAGE_TILE_CODEC, "png");
+        prefs.setValue(PreferenceConstants.IMAGE_TILE_QUALITY, 60);
+        prefs.setValue(PreferenceConstants.IMAGE_TILE_COLORS, 256);
+        prefs.setValue(PreferenceConstants.IMAGE_TILE_DITHER, true);
+        prefs.setValue(PreferenceConstants.IMAGE_TILE_SERPENTINE, false);
 
-        prefs.putBoolean(PreferenceConstants.PLAYER_RESAMPLE, false);
-        prefs.putBoolean(PreferenceConstants.PLAYER_KEEP_ASPECT_RATIO, true);
+        prefs.setValue(PreferenceConstants.PLAYER_RESAMPLE, false);
+        prefs.setValue(PreferenceConstants.PLAYER_KEEP_ASPECT_RATIO, true);
 
-        prefs.put(PreferenceConstants.SCREEN_INITIAL_MODE,
+        prefs.setValue(PreferenceConstants.SCREEN_INITIAL_MODE,
             Screen.Mode.FOLLOW_MOUSE.name());
-        prefs.put(PreferenceConstants.SCREEN_MOUSE_AREA_QUALITY,
+        prefs.setValue(PreferenceConstants.SCREEN_MOUSE_AREA_QUALITY,
             VideoSharingPreferenceHelper.ZOOM_LEVELS[0][1]);
-        prefs.putInt(PreferenceConstants.SCREEN_MOUSE_AREA_WIDTH, 320);
-        prefs.putInt(PreferenceConstants.SCREEN_MOUSE_AREA_HEIGHT, 240);
-        prefs.putBoolean(PreferenceConstants.SCREEN_SHOW_MOUSEPOINTER, true);
+        prefs.setValue(PreferenceConstants.SCREEN_MOUSE_AREA_WIDTH, 320);
+        prefs.setValue(PreferenceConstants.SCREEN_MOUSE_AREA_HEIGHT, 240);
+        prefs.setValue(PreferenceConstants.SCREEN_SHOW_MOUSEPOINTER, true);
+    }
+
+
+    private static interface PreferenceHolderWrapper {
+        void setValue(String s, int i);
+
+        void setValue(String s, boolean b);
+
+        void setValue(String s, String s1);
+    }
+
+    private static class IEclipsePreferencesWrapper implements PreferenceHolderWrapper {
+        private IEclipsePreferences preferences;
+
+        private IEclipsePreferencesWrapper(IEclipsePreferences preferences) {
+            this.preferences = preferences;
+        }
+
+        public void setValue(String s, int i) {
+            preferences.putInt(s, i);
+        }
+
+        public void setValue(String s, boolean b) {
+            preferences.putBoolean(s, b);
+        }
+
+        public void setValue(String s, String s1) {
+            preferences.put(s, s1);
+        }
+    }
+
+
+    private static class IPreferenceStoreWrapper  implements PreferenceHolderWrapper {
+        private IPreferenceStore preferenceStore;
+
+        private IPreferenceStoreWrapper(IPreferenceStore preferenceStore) {
+            this.preferenceStore = preferenceStore;
+        }
+
+        public void setValue(String s, int i) {
+            preferenceStore.setValue(s, i);
+        }
+
+        public void setValue(String s, boolean b) {
+            preferenceStore.setValue(s, b);
+        }
+
+        public void setValue(String s, String s1) {
+            preferenceStore.setValue(s, s1);
+        }
     }
 }

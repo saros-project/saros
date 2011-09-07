@@ -190,7 +190,7 @@ public class Saros extends AbstractUIPlugin {
      *               at it.
      */
 
-    private SarosContext sarosContext;
+    protected SarosContext sarosContext;
 
     static {
         Roster.setDefaultSubscriptionMode(SubscriptionMode.accept_all);
@@ -488,10 +488,14 @@ public class Saros extends AbstractUIPlugin {
      * null.
      */
     protected IProxyService getProxyService() {
-        BundleContext bundleContext = getBundle().getBundleContext();
-        ServiceReference serviceReference = bundleContext
-            .getServiceReference(IProxyService.class.getName());
-        return (IProxyService) bundleContext.getService(serviceReference);
+        IProxyService result = null;
+        if (Saros.isWorkbenchAvailable()) {
+            BundleContext bundleContext = getBundle().getBundleContext();
+            ServiceReference serviceReference = bundleContext
+                    .getServiceReference(IProxyService.class.getName());
+            result = (IProxyService) bundleContext.getService(serviceReference);
+        }
+        return result;
     }
 
     /**

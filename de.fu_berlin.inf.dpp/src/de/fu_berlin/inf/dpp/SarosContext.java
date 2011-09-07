@@ -379,6 +379,10 @@ public class SarosContext {
         return container.getComponents(tClass);
     }
 
+    public List<Object> getComponents() {
+        return container.getComponents();
+    }
+
     public void addComponent(Object o, Object o1, Parameter... parameters) {
         container.addComponent(o, o1, parameters);
     }
