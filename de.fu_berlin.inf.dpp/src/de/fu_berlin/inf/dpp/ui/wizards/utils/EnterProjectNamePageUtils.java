@@ -145,14 +145,17 @@ public class EnterProjectNamePageUtils {
         return ResourcesPlugin.getWorkspace().getRoot().getProject(projectName);
     }
 
-    /**
+     /**
+     * Tests, if the given projectname does not already exist in the current workspace.
+     * In Addition the method also accepts an array of further reserved names.
      * 
-     * @param projectName
-     * @param projects
-     * @return
+     * @param projectName to test.
+     * @param reservedNames Array of reserved project names. May be empty but not null.
+     * @return true, if projectName does not exist in the current workspace and
+     *               does not exist in the reservedNames
      */
-    public static boolean projectIsUnique(String projectName,
-        IProject... projects) {
+    public static boolean projectNameIsUnique(String projectName,
+        String... reservedNames) {
 
         if (projectName == null)
             throw new IllegalArgumentException("Illegal project name given");
@@ -171,8 +174,8 @@ public class EnterProjectNamePageUtils {
         // the underlying platform
         File newProjectName = new File(projectName);
 
-        for (IProject project : projects) {
-            if (new File(project.getName()).equals(newProjectName)) {
+        for (String reserved : reservedNames) {
+            if (new File(reserved).equals(newProjectName)) {
                 return false;
             }
         }
@@ -180,11 +183,17 @@ public class EnterProjectNamePageUtils {
     }
 
     /**
+     * Proposes a projectname based on the existing projectnames in the current
+     * workspace and based on the array reservedNames.
+     * The proposed projectname is unique. 
+     * @see EnterProjectNamePageUtils#projectNameIsUnique
      * 
-     * @param projectName
-     * @return
+     * @param projectName Projectname which shall be checked.
+     * @return a unique projectname based on "projectName". If "projectName" is
+     * already unique, it will be returned without changes.
      */
-    public static String findProjectNameProposal(String projectName) {
+    public static String findProjectNameProposal(String projectName,
+        String... reservedNames) {
 
         // Start with the projects name
         String projectProposal = projectName;
@@ -193,8 +202,19 @@ public class EnterProjectNamePageUtils {
         IWorkspace workspace = ResourcesPlugin.getWorkspace();
         IProject[] projects = workspace.getRoot().getProjects();
 
-        if (EnterProjectNamePageUtils
-            .projectIsUnique(projectProposal, projects)) {
+        // Make String-Array from project names
+        String[] projectNames = new String[projects.length
+            + reservedNames.length];
+        for (int i = 0; i < projects.length; i++) {
+            projectNames[i] = projects[i].getName();
+        }
+        for (int i = projects.length; i < projects.length
+            + reservedNames.length; i++) {
+            projectNames[i] = reservedNames[i - projects.length];
+        }
+
+        if (EnterProjectNamePageUtils.projectNameIsUnique(projectProposal,
+            projectNames)) {
             return projectProposal;
 
         } else {
@@ -212,8 +232,8 @@ public class EnterProjectNamePageUtils {
             }
 
             // Then find the next available number
-            while (!EnterProjectNamePageUtils.projectIsUnique(projectProposal
-                + " " + i, projects)) {
+            while (!EnterProjectNamePageUtils.projectNameIsUnique(
+                projectProposal + " " + i, projectNames)) {
                 i++;
             }
 

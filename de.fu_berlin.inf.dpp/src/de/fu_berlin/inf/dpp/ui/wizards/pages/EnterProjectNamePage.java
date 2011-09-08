@@ -88,6 +88,8 @@ public class EnterProjectNamePage extends WizardPage {
     protected Map<String, Label> updateProjectNameLabels = new HashMap<String, Label>();
 
     protected Map<String, Button> scanWorkspaceProjectsButtons = new HashMap<String, Button>();
+    
+    protected Map<String, String> reservedProjectNames = new HashMap<String,String>();
 
     protected Button disableVCSCheckbox;
 
@@ -288,12 +290,13 @@ public class EnterProjectNamePage extends WizardPage {
             | GridData.GRAB_HORIZONTAL));
         newProjectNameText.setFocus();
         if (!this.newProjectNameTexts.keySet().contains(projectID)) {
-            newProjectNameText
-                .setText(EnterProjectNamePageUtils
-                    .findProjectNameProposal(this.remoteProjectNames
-                        .get(projectID)));
+            newProjectNameText.setText(EnterProjectNamePageUtils
+                .findProjectNameProposal(
+                    this.remoteProjectNames.get(projectID), 
+                    this.reservedProjectNames.values().toArray(new String[0]) ));
 
             this.newProjectNameTexts.put(projectID, newProjectNameText);
+            this.reservedProjectNames.put(projectID, newProjectNameText.getText());
         } else {
             newProjectNameText.setText(this.newProjectNameTexts.get(projectID)
                 .toString());
@@ -594,6 +597,10 @@ public class EnterProjectNamePage extends WizardPage {
 
                 public void widgetSelected(SelectionEvent e) {
 
+                    // remove the reserved name, because it's not used anymore and 
+                    // should not be included in tests anymore
+                    EnterProjectNamePage.this.reservedProjectNames.remove(projectID);
+                    
                     // quickly scan for existing project with the same name
                     Button projUpd = EnterProjectNamePage.this.projUpdates
                         .get(projectID);
@@ -601,7 +608,7 @@ public class EnterProjectNamePage extends WizardPage {
                         .get(projectID);
                     if (projUpd.getSelection()
                         && !EnterProjectNamePageUtils
-                            .projectIsUnique(EnterProjectNamePage.this.remoteProjectNames
+                            .projectNameIsUnique(EnterProjectNamePage.this.remoteProjectNames
                                 .get(projectID))) {
                         updateProjectText
                             .setText(EnterProjectNamePage.this.remoteProjectNames
@@ -618,18 +625,31 @@ public class EnterProjectNamePage extends WizardPage {
         s.widgetSelected(null);
     }
 
+    /**
+     * Sets page messages and disables finish button in case of
+     * the given projectname already exists.  
+     * If no errors occur the finish button will be enabled.
+     * @param newText Projectname for which to test. Must not be null.
+     */
     public void setPageCompleteTargetProject(String newText) {
 
         if (newText.length() == 0) {
             setErrorMessage("Please set a project name");
             setPageComplete(false);
         } else {
-            if (EnterProjectNamePageUtils.projectIsUnique(newText)) {
+            if (EnterProjectNamePageUtils.projectNameIsUnique(newText,
+                    this.reservedProjectNames.values().toArray(new String[0]))) {
                 setErrorMessage(null);
                 setPageComplete(true);
-            } else {
+            } else if(!EnterProjectNamePageUtils.projectNameIsUnique(newText)) {
+                //Project with name exists already in workspace
                 setErrorMessage("A project with the name " + newText
                     + " already exists");
+                setPageComplete(false);   
+            } else {
+                //Project with name has already been declared 
+                setErrorMessage("The name " + newText
+                    + " has already been used for another project.");
                 setPageComplete(false);
             }
         }
@@ -659,6 +679,10 @@ public class EnterProjectNamePage extends WizardPage {
         updatePageComplete(projectID);
     }
 
+    /**
+     * Updates the page for the given projectID
+     * @param projectID for which the page shall be updated. Must not be null.
+     */
     protected void updatePageComplete(String projectID) {
 
         if (isSyncSkippingSelected(projectID)) {
@@ -669,8 +693,14 @@ public class EnterProjectNamePage extends WizardPage {
         }
 
         if (!isUpdateSelected(projectID)) {
+            //Delete previous value first, to prevent the compare with it's own value 
+            this.reservedProjectNames.remove(projectID);
+            
             setPageCompleteTargetProject(this.newProjectNameTexts
                 .get(projectID).getText());
+            
+            this.reservedProjectNames.put(projectID, 
+                    this.newProjectNameTexts.get(projectID).getText());
         } else {
             String newText = this.updateProjectTexts.get(projectID).getText();
 
@@ -679,7 +709,7 @@ public class EnterProjectNamePage extends WizardPage {
                 setPageComplete(false);
 
             } else {
-                if (!EnterProjectNamePageUtils.projectIsUnique(newText)) {
+                if (!EnterProjectNamePageUtils.projectNameIsUnique(newText)) {
 
                     if (this.copyCheckboxes.get(projectID).getSelection()) {
                         setPageCompleteTargetProject(this.copyToBeforeUpdateTexts
@@ -693,6 +723,7 @@ public class EnterProjectNamePage extends WizardPage {
                     setErrorMessage("No project exists with this name to update from");
                     setPageComplete(false);
                 }
+                
             }
         }
     }
