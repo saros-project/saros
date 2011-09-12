@@ -8,6 +8,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.rmi.RemoteException;
 
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -18,38 +19,32 @@ import de.fu_berlin.inf.dpp.stf.test.Constants;
 public class EditorByAliceBobTest extends StfTestCase {
 
     @BeforeClass
-    public static void initializeSaros() throws Exception {
-        initTesters(ALICE, BOB);
-        setUpWorkbench();
-        setUpSaros();
+    public static void selectTester() throws Exception {
+        select(ALICE, BOB);
+
         Util.setUpSessionWithJavaProjectAndClass(Constants.PROJECT1,
             Constants.PKG1, Constants.CLS1, ALICE, BOB);
+
         BOB.superBot()
             .views()
             .packageExplorerView()
             .waitUntilClassExists(Constants.PROJECT1, Constants.PKG1,
                 Constants.CLS1);
-        if (ALICE.remoteBot().isEditorOpen(Constants.CLS1 + SUFFIX_JAVA))
-            ALICE.remoteBot().editor(Constants.CLS1 + SUFFIX_JAVA)
-                .closeWithSave();
     }
 
-    @Test
-    public void isJavaEditorOpen() throws RemoteException {
+    @Before
+    public void openAliceEditor() throws Exception {
         ALICE.superBot().views().packageExplorerView()
             .selectClass(Constants.PROJECT1, Constants.PKG1, Constants.CLS1)
             .open();
-        assertTrue(ALICE.remoteBot().isEditorOpen(Constants.CLS1_SUFFIX));
-        ALICE.remoteBot().editor(Constants.CLS1 + SUFFIX_JAVA).closeWithSave();
-        assertFalse(ALICE.remoteBot().isEditorOpen(Constants.CLS1_SUFFIX));
+
+        ALICE.remoteBot().editor(Constants.CLS1 + SUFFIX_JAVA)
+            .waitUntilIsActive();
+
     }
 
     @Test
     public void isEditorOpen() throws RemoteException {
-
-        ALICE.superBot().views().packageExplorerView()
-            .selectClass(Constants.PROJECT1, Constants.PKG1, Constants.CLS1)
-            .open();
 
         assertTrue(ALICE.remoteBot().isEditorOpen(Constants.CLS1 + SUFFIX_JAVA));
 
@@ -68,10 +63,6 @@ public class EditorByAliceBobTest extends StfTestCase {
         assertTrue(BOB.superBot().views().sarosView()
             .selectParticipant(ALICE.getJID()).isFollowing());
 
-        ALICE.superBot().views().packageExplorerView()
-            .selectClass(Constants.PROJECT1, Constants.PKG1, Constants.CLS1)
-            .open();
-
         BOB.remoteBot().waitUntilEditorOpen(Constants.CLS1_SUFFIX);
         assertTrue(BOB.remoteBot().editor(Constants.CLS1_SUFFIX).isActive());
     }
@@ -79,20 +70,15 @@ public class EditorByAliceBobTest extends StfTestCase {
     @Test
     public void waitUntilBobsJavaEditorIsActive() throws RemoteException {
 
-        ALICE.superBot().views().packageExplorerView()
-            .selectClass(Constants.PROJECT1, Constants.PKG1, Constants.CLS1)
-            .open();
-
-        ALICE.remoteBot().sleep(2000);
-
         BOB.superBot().views().sarosView().selectParticipant(ALICE.getJID())
             .followParticipant();
-
-        BOB.remoteBot().editor(Constants.CLS1_SUFFIX).waitUntilIsActive();
 
         assertTrue(BOB.superBot().views().sarosView()
             .selectParticipant(ALICE.getJID()).isFollowing());
 
+        BOB.remoteBot().editor(Constants.CLS1_SUFFIX).waitUntilIsActive();
+
+        // this also open the file in the editor right after creation
         ALICE.superBot().views().packageExplorerView().tree().newC()
             .cls(Constants.PROJECT1, Constants.PKG1, Constants.CLS2);
 
@@ -115,11 +101,14 @@ public class EditorByAliceBobTest extends StfTestCase {
     @Test
     public void waitUntilBobsJavaEditorIsClosed() throws RemoteException {
 
-        ALICE.superBot().views().packageExplorerView()
-            .selectClass(Constants.PROJECT1, Constants.PKG1, Constants.CLS1)
-            .open();
+        BOB.superBot().views().sarosView().selectParticipant(ALICE.getJID())
+            .followParticipant();
+
+        assertTrue(BOB.superBot().views().sarosView()
+            .selectParticipant(ALICE.getJID()).isFollowing());
 
         BOB.remoteBot().editor(Constants.CLS1_SUFFIX).waitUntilIsActive();
+
         assertTrue(BOB.remoteBot().editor(Constants.CLS1_SUFFIX).isActive());
 
         ALICE.remoteBot().editor(Constants.CLS1_SUFFIX).closeWithoutSave();
