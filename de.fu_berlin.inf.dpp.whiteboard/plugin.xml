@@ -54,7 +54,7 @@
             class="de.fu_berlin.inf.dpp.whiteboard.gef.editor.WhiteboardEditor"
             contributorClass="de.fu_berlin.inf.dpp.whiteboard.standalone.WhiteboardActionBarContributor"
             default="true"
-            icon=""
+            icon="icons/view16/whiteboard_misc.png"
             id="de.fu_berlin.inf.dpp.whiteboard.whiteboardeditor"
             name="Whiteboard">
       </editor>
