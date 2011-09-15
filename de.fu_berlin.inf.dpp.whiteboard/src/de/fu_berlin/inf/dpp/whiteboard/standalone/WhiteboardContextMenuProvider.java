@@ -39,7 +39,8 @@ public class WhiteboardContextMenuProvider extends ContextMenuProvider {
 		action = getActionRegistry().getAction(ActionFactory.DELETE.getId());
 		menu.appendToGroup(GEFActionConstants.GROUP_EDIT, action);
 
-		action = getActionRegistry().getAction(ActionFactory.RENAME.getId());
+		action = getActionRegistry()
+				.getAction(ActionFactory.SELECT_ALL.getId());
 		menu.appendToGroup(GEFActionConstants.GROUP_EDIT, action);
 	}
 
