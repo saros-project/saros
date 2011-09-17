@@ -38,7 +38,6 @@ import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
 import de.fu_berlin.inf.dpp.util.StopWatch;
 import de.fu_berlin.inf.dpp.util.Utils;
-import de.fu_berlin.inf.dpp.util.log.LoggingUtils;
 
 /**
  * This class is responsible for handling all transfers of binary data. It
@@ -51,6 +50,8 @@ import de.fu_berlin.inf.dpp.util.log.LoggingUtils;
 public class DataTransferManager implements IConnectionListener,
     IBytestreamConnectionListener {
 
+    private static final Logger log = Logger
+        .getLogger(DataTransferManager.class);
     /**
      * Maps JIDs to a list of currently running incoming transfers - receptions
      */
@@ -182,11 +183,8 @@ public class DataTransferManager implements IConnectionListener,
                 // TODO Put size in TransferDescription, so we can
                 // display it here
 
-                LoggingUtils.log(
-                    log,
-                    "[" + getTransferMode().toString()
-                        + "] Starting incoming data transfer: "
-                        + description.toString(), description.logToDebug);
+                log.trace("[" + getTransferMode()
+                    + "] Starting incoming data transfer: " + description);
 
                 long startTime = System.nanoTime();
 
@@ -194,13 +192,10 @@ public class DataTransferManager implements IConnectionListener,
 
                 long duration = Math.max(0, System.nanoTime() - startTime) / 1000000;
 
-                LoggingUtils.log(
-                    log,
-                    "[" + getTransferMode().toString()
-                        + "] Finished incoming data transfer: "
-                        + description.toString() + ", Throughput: "
-                        + Utils.throughput(getTransferredSize(), duration),
-                    description.logToDebug);
+                log.trace("[" + getTransferMode()
+                    + "] Finished incoming data transfer: " + description
+                    + ", Throughput: "
+                    + Utils.throughput(getTransferredSize(), duration));
 
                 transferModeDispatch.transferFinished(description.getSender(),
                     getTransferMode(), true,
@@ -238,9 +233,6 @@ public class DataTransferManager implements IConnectionListener,
         }
 
     }
-
-    private static final Logger log = Logger
-        .getLogger(DataTransferManager.class);
 
     protected Map<JID, IBytestreamConnection> connections = Collections
         .synchronizedMap(new HashMap<JID, IBytestreamConnection>());
@@ -339,16 +331,13 @@ public class DataTransferManager implements IConnectionListener,
 
         // Think about how to synchronize this, that multiple people can connect
         // at the same time.
-        LoggingUtils.log(log, "sending data ... from " + sarosNet.getMyJID()
-            + " to " + transferData.getRecipient().toString(),
-            transferData.logToDebug);
+        log.trace("sending data ... from " + sarosNet.getMyJID() + " to "
+            + transferData.getRecipient());
 
         JID recipient = transferData.recipient;
         synchronized (outgoingTransfers) {
-            Integer count = outgoingTransfers.get(recipient);
-            if (count == null)
-                count = new Integer(0);
-            outgoingTransfers.put(recipient, ++count);
+            if (outgoingTransfers.get(recipient) == null)
+                outgoingTransfers.put(recipient, 1);
         }
 
         IBytestreamConnection connection = getConnection(recipient,
