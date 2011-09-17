@@ -335,15 +335,21 @@ public class DataTransferManager implements IConnectionListener,
             + transferData.getRecipient());
 
         JID recipient = transferData.recipient;
-        synchronized (outgoingTransfers) {
-            if (outgoingTransfers.get(recipient) == null)
-                outgoingTransfers.put(recipient, 1);
-        }
 
         IBytestreamConnection connection = getConnection(recipient,
             progress.newChild(1));
 
+        synchronized (outgoingTransfers) {
+            Integer currentSendingOperations = outgoingTransfers.get(recipient);
+
+            currentSendingOperations = currentSendingOperations == null ? 0
+                : currentSendingOperations;
+
+            outgoingTransfers.put(recipient, currentSendingOperations + 1);
+        }
+
         try {
+
             StopWatch watch = new StopWatch().start();
 
             long sizeUncompressed = input.length;
@@ -358,11 +364,7 @@ public class DataTransferManager implements IConnectionListener,
             transferModeDispatch.transferFinished(recipient,
                 connection.getMode(), false, input.length, sizeUncompressed,
                 watch.getTime());
-
-        } catch (SarosCancellationException e) {
-            throw e; // Rethrow to circumvent the Exception catch below
         } catch (IOException e) {
-            e.printStackTrace();
             log.error(Utils.prefix(transferData.recipient) + "Failed to send "
                 + transferData + " with " + connection.getMode().toString()
                 + ":" + e.getMessage() + ":", e.getCause());
