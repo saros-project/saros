@@ -12,8 +12,7 @@
  * for collaborative text editing</li>
  * 
  * <li>management --- manages all JupiterActivities (operations 
- * processed by the users of a Saros session with 
- * {@link de.fu_berlin.inf.dpp.User.Permission#WRITE_ACCESS})</li>
+ * processed by the users of a Saros session with WRITE_ACCESS)</li>
  * 
  * <li>undo --- package for undo/redo operations within a Saros 
  * session</li>
@@ -23,3 +22,4 @@
  * </ul>
  */
 package de.fu_berlin.inf.dpp.concurrent;
+

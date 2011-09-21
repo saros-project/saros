@@ -6,7 +6,7 @@
  * Local Operations on each client site will be transformed into 
  * JupiterActivities (by {@link ConcurrentDocumentClient}) and sent to the 
  * host ({@link ConcurrentDocumentServer}). 
- * The {@link JupiterActivity} will be transformed into its corresponding 
+ * The JupiterActivity will be transformed into its corresponding 
  * operation and sent to all clients. This process has to be atomic and may 
  * not be interrupted.
  * 
@@ -14,3 +14,4 @@
  * Saros session, even when a client adds resources to this session. 
  */
 package de.fu_berlin.inf.dpp.concurrent.management;
+
