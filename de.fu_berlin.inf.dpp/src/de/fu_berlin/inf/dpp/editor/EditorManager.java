@@ -1701,12 +1701,9 @@ public class EditorManager implements IActivityProvider, Disposable {
         if (activeEditor == null) {
             log.info(Utils.prefix(jumpTo.getJID()) + "has no editor open");
             // no active editor on target subject
-            SarosView.showNotification("Can't follow "
-                + jumpTo.getJID().getBase() + "!", jumpTo.getJID().getName()
-                + " has no shared file activated.");
-            // don't even activate the follow mode
-            if (jumpTo.equals(followedUser))
-                setFollowing(null);
+            SarosView.showNotification("Following " + jumpTo.getJID().getBase()
+                + "!", jumpTo.getJID().getName()
+                + " has no shared file activated yet.");
             return;
         }
 
