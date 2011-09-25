@@ -57,7 +57,7 @@ public class RecoveryWhileTypingTest extends StfTestCase {
             }
         };
 
-        TestThread aliceEditTaskThread = new TestThread(aliceEditTask);
+        aliceEditTaskThread = new TestThread(aliceEditTask);
         aliceEditTaskThread.start();
 
         BOB.superBot().views().packageExplorerView()
