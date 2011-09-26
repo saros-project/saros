@@ -19,6 +19,7 @@ import de.fu_berlin.inf.dpp.stf.server.bot.SarosSWTBotPreferences;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.IRemoteBot;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotButton;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotCCombo;
+import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotCLabel;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotCTabItem;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotCheckBox;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotCombo;
@@ -35,6 +36,7 @@ import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotToolbarBut
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotTree;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.impl.RemoteBotButton;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.impl.RemoteBotCCombo;
+import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.impl.RemoteBotCLabel;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.impl.RemoteBotCTabItem;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.impl.RemoteBotCheckBox;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.impl.RemoteBotCombo;
@@ -88,6 +90,8 @@ public abstract class RemoteBot extends StfRemoteObject implements IRemoteBot {
     protected RemoteBotToggleButton toggleButton;
     protected RemoteBotCTabItem cTabItem;
 
+    protected RemoteBotCLabel clabel;
+
     protected RemoteBot() {
         swtBot = new SWTBot();
         shell = RemoteBotShell.getInstance();
@@ -106,6 +110,8 @@ public abstract class RemoteBot extends StfRemoteObject implements IRemoteBot {
         radio = RemoteBotRadio.getInstance();
         cTabItem = RemoteBotCTabItem.getInstance();
         toggleButton = RemoteBotToggleButton.getInstance();
+
+        clabel = RemoteBotCLabel.getInstance();
 
     }
 
@@ -382,7 +388,6 @@ public abstract class RemoteBot extends StfRemoteObject implements IRemoteBot {
     public IRemoteBotLabel label(String mnemonicText) throws RemoteException {
         label.setWidget(swtBot.label(mnemonicText));
         return label;
-
     }
 
     public IRemoteBotLabel label(String mnemonicText, int index)
@@ -1600,4 +1605,32 @@ public abstract class RemoteBot extends StfRemoteObject implements IRemoteBot {
         swtBot.captureScreenshot(new File(SCREENSHOT_DIRECTORY, fileName)
             .getAbsolutePath());
     }
+
+    /**********************************************
+     * 
+     * Widget cLabel
+     * 
+     **********************************************/
+
+    public boolean existsCLabel() throws RemoteException {
+        try {
+            swtBot.clabel();
+            return true;
+        } catch (WidgetNotFoundException e) {
+            return false;
+        }
+    }
+
+    public IRemoteBotCLabel clabel() throws RemoteException {
+        clabel.setWidget(swtBot.clabel());
+        return clabel;
+    }
+
+    public IRemoteBotCLabel clabel(String text) throws RemoteException {
+        clabel.setWidget(swtBot.clabel(text));
+        return clabel;
+    }
+
+    // -------------
+
 }

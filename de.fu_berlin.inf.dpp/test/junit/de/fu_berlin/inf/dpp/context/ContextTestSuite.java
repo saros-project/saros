@@ -1,11 +1,11 @@
-package de.fu_berlin.inf.dpp.net.jingle.protocol;
+package de.fu_berlin.inf.dpp.context;
 
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
 @RunWith(Suite.class)
-@Suite.SuiteClasses({ BinaryChannelTest.class, JingleSessionExceptionTest.class })
-public class JingleProtocolTestSuite {
+@Suite.SuiteClasses({ SarosContextTest.class })
+public class ContextTestSuite {
     // the class remains completely empty,
     // being used only as a holder for the above annotations
 }

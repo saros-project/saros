@@ -168,4 +168,28 @@ public class RosterTrackerTest {
 
     }
 
+    @Test
+    public void testRemoveRosterListener() {
+        XMPPConnection mockConnection = createMock(XMPPConnection.class);
+        Roster mockRoster = createMock(Roster.class);
+        expect(mockConnection.getRoster()).andReturn(mockRoster);
+        expect(mockRoster.getPresences("devil")).andReturn(roster1.iterator());
+        RosterListener mockListener = isA(RosterListener.class);
+        mockRoster.addRosterListener(mockListener);
+        expectLastCall();
+        replay(mockConnection);
+        replay(mockRoster);
+
+        RosterTracker tracker = new RosterTracker(createMock(SarosNet.class));
+        int size = tracker.listener.listeners.size();
+        tracker.addRosterListener((IRosterListener) mockListener);
+        assertEquals("The listener wasn't added to the list.", size + 1,
+            tracker.listener.listeners.size());
+
+        tracker.removeRosterListener((IRosterListener) mockListener);
+        assertEquals("The listener wasn't removed from the list.", size,
+            tracker.listener.listeners.size());
+
+    }
+
 }

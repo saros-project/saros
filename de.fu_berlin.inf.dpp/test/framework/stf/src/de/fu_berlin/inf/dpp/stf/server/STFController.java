@@ -21,6 +21,7 @@ import de.fu_berlin.inf.dpp.SarosContext;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.impl.RemoteWorkbenchBot;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.impl.RemoteBotButton;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.impl.RemoteBotCCombo;
+import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.impl.RemoteBotCLabel;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.impl.RemoteBotCTabItem;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.impl.RemoteBotChatLine;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.impl.RemoteBotCheckBox;
@@ -142,6 +143,7 @@ public class STFController {
          */
         exportObject(RemoteBotButton.getInstance(), "button");
         exportObject(RemoteBotCCombo.getInstance(), "ccombo");
+        exportObject(RemoteBotCLabel.getInstance(), "clabel");
         exportObject(RemoteBotChatLine.getInstance(), "chatLine");
         exportObject(RemoteBotCheckBox.getInstance(), "checkBox");
         exportObject(RemoteBotCombo.getInstance(), "combo");

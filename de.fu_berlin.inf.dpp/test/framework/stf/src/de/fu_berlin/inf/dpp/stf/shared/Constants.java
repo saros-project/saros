@@ -305,6 +305,10 @@ public interface Constants {
         .getString("shell_invitation");
     public final static String SHELL_ADD_BUDDY = Configuration
         .getString("shell_add_buddy");
+    public final static String CM_ADD_BUDDY_OFFLINE = Configuration
+        .getString("cm_add_buddy_offline");
+    public final static String CM_ADD_BUDDY = Configuration
+        .getString("cm_add_buddy");
     public final static String SHELL_ADD_BUDDY_TO_SESSION = Configuration
         .getString("shell_add_buddy_to_session");
     public final static String SHELL_ERROR_IN_SAROS_PLUGIN = Configuration

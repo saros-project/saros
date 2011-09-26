@@ -333,4 +333,5 @@ public final class RemoteWorkbenchBot extends RemoteBot implements
     public void resetBot() throws RemoteException {
         this.setBot(new SWTBot());
     }
+
 }

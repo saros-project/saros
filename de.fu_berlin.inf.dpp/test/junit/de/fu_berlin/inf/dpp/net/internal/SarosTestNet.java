@@ -15,17 +15,17 @@ import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 public class SarosTestNet {
 
     // the network
-    JID jid;
-    SarosNet net;
-    SessionIDObservable sessionID;
-    IBBTransport ibb;
-    Socks5Transport socks5Transport;
-    DataTransferManager dtm;
-    XMPPReceiver xmppReceiver;
-    XMPPTransmitter xmppTransmitter;
-    RosterTracker rosterTracker;
+    public JID jid;
+    public SarosNet net;
+    public SessionIDObservable sessionID;
+    public IBBTransport ibb;
+    public Socks5Transport socks5Transport;
+    public DataTransferManager dtm;
+    public XMPPReceiver xmppReceiver;
+    public XMPPTransmitter xmppTransmitter;
+    public RosterTracker rosterTracker;
 
-    SarosTestNet(String user, String server) {
+    public SarosTestNet(String user, String server) {
 
         jid = new JID(user + "@" + server);
 

@@ -9,6 +9,7 @@ import org.eclipse.swtbot.swt.finder.waits.ICondition;
 
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotButton;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotCCombo;
+import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotCLabel;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotCTabItem;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotCheckBox;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotCombo;
@@ -463,6 +464,18 @@ public interface IRemoteBot extends Remote {
     public boolean existsLabelInGroup(String groupName) throws RemoteException;
 
     public boolean existsLabel(String text) throws RemoteException;
+
+    /**********************************************
+     * 
+     * Widget CLabel
+     * 
+     **********************************************/
+
+    public boolean existsCLabel() throws RemoteException;
+
+    public IRemoteBotCLabel clabel() throws RemoteException;
+
+    public IRemoteBotCLabel clabel(String text) throws RemoteException;
 
     /**********************************************
      * 

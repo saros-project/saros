@@ -6,21 +6,15 @@ import org.junit.runners.Suite;
 import de.fu_berlin.inf.dpp.accountManagement.AccountManagementTestSuite;
 import de.fu_berlin.inf.dpp.communication.muc.session.MucSessionTestSuite;
 import de.fu_berlin.inf.dpp.concurrent.ConcurrencyTestSuite;
-import de.fu_berlin.inf.dpp.concurrent.jupiter.test.puzzles.JupiterPuzzlesTestSuite;
-import de.fu_berlin.inf.dpp.concurrent.undo.ConcurrentUndoTestSuite;
+import de.fu_berlin.inf.dpp.context.ContextTestSuite;
 import de.fu_berlin.inf.dpp.net.NetTestSuite;
-import de.fu_berlin.inf.dpp.net.internal.InternalTestSuite;
-import de.fu_berlin.inf.dpp.net.internal.extensions.InternalExtensionsTestSuite;
-import de.fu_berlin.inf.dpp.net.jingle.protocol.JingleProtocolTestSuite;
+import de.fu_berlin.inf.dpp.project.ProjectTestSuite;
 import de.fu_berlin.inf.dpp.util.UtilTestSuite;
 
 @RunWith(Suite.class)
-@Suite.SuiteClasses({ ConcurrencyTestSuite.class,
-    JupiterPuzzlesTestSuite.class, ConcurrentUndoTestSuite.class,
-    NetTestSuite.class, InternalTestSuite.class,
-    InternalExtensionsTestSuite.class, JingleProtocolTestSuite.class,
-    UtilTestSuite.class, AccountManagementTestSuite.class,
-    MucSessionTestSuite.class })
+@Suite.SuiteClasses({ AccountManagementTestSuite.class,
+    ConcurrencyTestSuite.class, ContextTestSuite.class, NetTestSuite.class,
+    UtilTestSuite.class, MucSessionTestSuite.class, ProjectTestSuite.class, })
 public class AllTestSuite {
     // the class remains completely empty,
     // being used only as a holder for the above annotations
