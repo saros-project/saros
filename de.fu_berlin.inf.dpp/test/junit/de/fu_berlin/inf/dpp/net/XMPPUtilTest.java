@@ -7,6 +7,7 @@ import org.jivesoftware.smack.Connection;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.packet.Registration;
+import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -24,6 +25,7 @@ public class XMPPUtilTest {
      * @throws XMPPException
      */
     @Test
+    @Ignore("not testing anything")
     public void testGetRegistrationInfo() throws XMPPException {
         Connection connectionAlice = new XMPPConnection(ALICE_JID.getDomain());
         connectionAlice.connect();
@@ -47,6 +49,7 @@ public class XMPPUtilTest {
      * @throws XMPPException
      */
     @Test
+    @Ignore("not testing anything")
     public void testGetRegistrationInfo2() throws XMPPException {
         Connection connectionAlice = new XMPPConnection(ALICE_JID.getDomain());
         connectionAlice.connect();

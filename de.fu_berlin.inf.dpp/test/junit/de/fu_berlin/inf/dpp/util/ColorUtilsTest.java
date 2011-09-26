@@ -4,7 +4,6 @@
 package de.fu_berlin.inf.dpp.util;
 
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 import org.eclipse.swt.graphics.RGB;
 import org.junit.After;
@@ -33,6 +32,7 @@ public class ColorUtilsTest {
      */
     @After
     public void tearDown() throws Exception {
+
     }
 
     /**
@@ -57,11 +57,9 @@ public class ColorUtilsTest {
      * {@link de.fu_berlin.inf.dpp.util.ColorUtils#addLightness(org.eclipse.swt.graphics.RGB, float)}
      * .
      */
-    @Test(expected = Exception.class)
+    @Test(expected = IndexOutOfBoundsException.class)
     public void testAddLightnessRGBFloat2() {
-        RGB colorTest = new RGB(128, 128, 128);
-        RGB shouldBeError = ColorUtils.addLightness(colorTest, -2);
-        fail("some exception should be thrown, because scale value less than 1 is not allowed");
+        ColorUtils.addLightness(new RGB(128, 128, 128), -2);
     }
 
     /**
@@ -74,6 +72,11 @@ public class ColorUtilsTest {
         // TODO
         // how to get device?
         // its the same like RGB testing
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testScaleColorWithInvalidRange() {
+        ColorUtils.scaleColorBy(new RGB(128, 128, 128), -1);
     }
 
     /**

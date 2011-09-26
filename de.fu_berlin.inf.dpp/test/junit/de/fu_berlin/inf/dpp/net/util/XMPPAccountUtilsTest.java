@@ -9,6 +9,7 @@ import java.util.Random;
 
 import org.eclipse.core.runtime.SubMonitor;
 import org.jivesoftware.smack.XMPPException;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import de.fu_berlin.inf.dpp.test.util.SarosTestUtils;
@@ -28,9 +29,10 @@ public class XMPPAccountUtilsTest {
      * 
      * @throws XMPPException
      * @throws InterruptedException
-     * @throws SpamException
      */
-    @Test()
+
+    @Test
+    @Ignore("this test can not be done that way with the current ejabberd server settings")
     public void testCreateAccount() throws XMPPException, InterruptedException {
         int rand = new Random().nextInt(20000);
         String userName = "testaccount" + rand;

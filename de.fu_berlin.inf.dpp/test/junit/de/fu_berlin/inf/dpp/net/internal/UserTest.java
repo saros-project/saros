@@ -11,6 +11,7 @@ import java.util.ArrayList;
 
 import org.easymock.EasyMock;
 import org.jivesoftware.smack.ConnectionConfiguration;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -38,27 +39,20 @@ public class UserTest {
     JID me;
 
     @Before
-    public void setUp() {
+    public void setUp() throws Exception {
 
         net = new SarosTestNet(Constants.INF_XMPP_TESTUSER_NAME,
             Constants.INF_XMPP_SERVICE_NAME);
 
-        try {
-            conConfig = new ConnectionConfiguration(
-                Constants.INF_XMPP_SERVICE_NAME);
-            conConfig
-                .setSecurityMode(ConnectionConfiguration.SecurityMode.enabled);
-            conConfig.setReconnectionAllowed(false);
+        conConfig = new ConnectionConfiguration(Constants.INF_XMPP_SERVICE_NAME);
+        conConfig.setSecurityMode(ConnectionConfiguration.SecurityMode.enabled);
+        conConfig.setReconnectionAllowed(false);
 
-            // Connect to Server
-            net.net.connect(conConfig, Constants.INF_XMPP_TESTUSER_NAME,
-                Constants.INF_XMPP_TESTUSER_PASSWORD, false);
+        // Connect to Server
+        net.net.connect(conConfig, Constants.INF_XMPP_TESTUSER_NAME,
+            Constants.INF_XMPP_TESTUSER_PASSWORD, false);
 
-            me = net.net.getMyJID();
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        me = net.net.getMyJID();
 
         sid = new SessionIDObservable();
 
@@ -84,6 +78,11 @@ public class UserTest {
         // net.xmppTransmitter.sendMessageToUser(me, m, false);
         //
         // Thread.sleep(1000);
+    }
+
+    @After
+    public void tearDown() {
+        net.net.disconnect();
     }
 
     @Test

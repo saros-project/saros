@@ -1,13 +1,13 @@
 package de.fu_berlin.inf.dpp.util;
 
-import org.apache.log4j.Logger;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.RGB;
 
 import com.imagingbook.color.ColorSpaceConversion;
 
 public class ColorUtils {
-    private static Logger log = Logger.getLogger(ColorUtils.class);
+
+    private static final int LIGTHNESS_INDEX = 1;
 
     private ColorUtils() {
         // no instantiation allowed
@@ -23,31 +23,32 @@ public class ColorUtils {
      *            range: -1 (results in black) to +1 (+1 results in white)
      * @return
      * 
+     * @throws IndexOutOfBoundsException
+     *             if lightness value is less than -1 or greater than 1
      * @see <a href="http://en.wikipedia.org/wiki/HSL_and_HSV">HSL and HSV</a>
      */
     public static RGB addLightness(RGB rgb, float lightness) {
-        /*
-         * Convert to HLS; HLS and HSL are synonym
-         */
-        float[] hls = ColorSpaceConversion.RGBtoHLS((float) rgb.red / 255,
-            (float) rgb.green / 255, (float) rgb.blue / 255);
 
-        /*
-         * Scale the lightness
-         */
-        hls[1] += lightness;
-        if (hls[1] < 0)
-            hls[1] = 0;
-        if (hls[1] > 1)
-            hls[1] = 1;
+        if (lightness < -1 || lightness > 1)
+            throw new IndexOutOfBoundsException(
+                "lightness factor must be in the interval [0, 1] but is: "
+                    + lightness);
 
-        /*
-         * Convert back from HLS to RGB
-         */
+        float[] hls = ColorSpaceConversion.RGBtoHLS(rgb.red / 255f,
+            rgb.green / 255f, rgb.blue / 255f);
+
+        hls[LIGTHNESS_INDEX] += lightness;
+        if (hls[LIGTHNESS_INDEX] < 0)
+            hls[LIGTHNESS_INDEX] = 0;
+
+        if (hls[LIGTHNESS_INDEX] > 1)
+            hls[LIGTHNESS_INDEX] = 1;
+
         float[] newRGB = ColorSpaceConversion.HLStoRGB(hls[0], hls[1], hls[2]);
 
         return new RGB(Math.round(newRGB[0] * 255),
             Math.round(newRGB[1] * 255), Math.round(newRGB[2] * 255));
+
     }
 
     /**
@@ -62,6 +63,8 @@ public class ColorUtils {
      *         Note: Please keep in mind that a <strong>new</strong> color is
      *         created. Both the already existing and the scaled need to be
      *         disposed after usage!
+     * @throws IndexOutOfBoundsException
+     *             if lightness value is less than -1 or greater than 1
      * 
      * @see <a href="http://en.wikipedia.org/wiki/HSL_and_HSV">HSL and HSV</a>
      */
@@ -80,26 +83,20 @@ public class ColorUtils {
      *            non-negative whereas 0 results in zero lightness = black color
      * @return the scaled RGB
      * 
+     * @throws IllegalArgumentException
+     *             if scale factor is negative
      * @see <a href="http://en.wikipedia.org/wiki/HSL_and_HSV">HSL and HSV</a>
      */
     public static RGB scaleColorBy(RGB rgb, float scale) {
         if (scale < 0)
-            log.error("Invalid range; scale must be non-negative");
+            throw new IllegalArgumentException("Invalid range " + scale
+                + "; scale must be non-negative");
 
-        /*
-         * Convert to HLS; HLS and HSL are synonym
-         */
-        float[] hls = ColorSpaceConversion.RGBtoHLS((float) rgb.red / 255,
-            (float) rgb.green / 255, (float) rgb.blue / 255);
+        float[] hls = ColorSpaceConversion.RGBtoHLS(rgb.red / 255f,
+            rgb.green / 255f, rgb.blue / 255f);
 
-        /*
-         * Scale the lightness
-         */
-        hls[1] *= scale;
+        hls[LIGTHNESS_INDEX] *= scale;
 
-        /*
-         * Convert back from HLS to RGB
-         */
         float[] scaledRGB = ColorSpaceConversion.HLStoRGB(hls[0], hls[1],
             hls[2]);
 
@@ -119,6 +116,8 @@ public class ColorUtils {
      *         Note: Please keep in mind that a <strong>new</strong> color is
      *         created. Both the already existing and the scaled need to be
      *         disposed after usage!
+     * @throws IllegalArgumentException
+     *             if scale factor is negative
      * 
      * @see <a href="http://en.wikipedia.org/wiki/HSL_and_HSV">HSL and HSV</a>
      */

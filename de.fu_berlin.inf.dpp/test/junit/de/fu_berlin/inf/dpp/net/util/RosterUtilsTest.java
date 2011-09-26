@@ -14,6 +14,7 @@ import org.jivesoftware.smack.Connection;
 import org.jivesoftware.smack.ConnectionConfiguration;
 import org.jivesoftware.smack.RosterEntry;
 import org.jivesoftware.smack.XMPPException;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -31,11 +32,34 @@ import de.fu_berlin.inf.dpp.net.util.RosterUtils.DialogContent;
  */
 public class RosterUtilsTest {
 
-    static DialogContent dialog1;
-    static DialogContent dialog2;
-    static DialogContent dialog3;
-    static DialogContent dialog4;
-    static DialogContent dialog5;
+    DialogContent dialog1 = new DialogContent("Buddy Unknown",
+        "The buddy is unknown to the XMPP/Jabber server.\n\n"
+            + "Do you want to add the buddy anyway?",
+        "Buddy unknown to XMPP/Jabber server.");
+
+    DialogContent dialog2 = new DialogContent("Server Not Found",
+        "The responsible XMPP/Jabber server could not be found.\n\n"
+            + "Do you want to add the buddy anyway?",
+        "Unable to find the responsible XMPP/Jabber server.");
+
+    DialogContent dialog3 = new DialogContent("Unsupported Buddy Status Check",
+        "The responsible XMPP/Jabber server does not support status requests.\n\n"
+            + "If the buddy exists you can still successfully add him.\n\n"
+            + "Do you want to try to add the buddy?",
+        "Buddy status check unsupported by XMPP/Jabber server.");
+
+    DialogContent dialog4 = new DialogContent(
+        "Unknown Buddy Status",
+        "For privacy reasons the XMPP/Jabber server does not reply to status requests.\n\n"
+            + "If the buddy exists you can still successfully add him.\n\n"
+            + "Do you want to try to add the buddy?",
+        "Unable to check the buddy status.");
+
+    DialogContent dialog5 = new DialogContent("Server Not Responding",
+        "The responsible XMPP/Jabber server is not connectable.\n"
+            + "The server is either inexistent or offline right now.\n\n"
+            + "Do you want to add the buddy anyway?",
+        "The XMPP/Jabber server did not respond.");
 
     SarosTestNet testNet;
     ConnectionConfiguration conConfig;
@@ -43,56 +67,26 @@ public class RosterUtilsTest {
     JID jid2 = new JID("christian_test@saros-con.imp.fu-berlin.de");
 
     @Before
-    public void setUp() {
-        dialog1 = new DialogContent("Buddy Unknown",
-            "The buddy is unknown to the XMPP/Jabber server.\n\n"
-                + "Do you want to add the buddy anyway?",
-            "Buddy unknown to XMPP/Jabber server.");
-
-        dialog2 = new DialogContent("Server Not Found",
-            "The responsible XMPP/Jabber server could not be found.\n\n"
-                + "Do you want to add the buddy anyway?",
-            "Unable to find the responsible XMPP/Jabber server.");
-
-        dialog3 = new DialogContent("Unsupported Buddy Status Check",
-            "The responsible XMPP/Jabber server does not support status requests.\n\n"
-                + "If the buddy exists you can still successfully add him.\n\n"
-                + "Do you want to try to add the buddy?",
-            "Buddy status check unsupported by XMPP/Jabber server.");
-
-        dialog4 = new DialogContent(
-            "Unknown Buddy Status",
-            "For privacy reasons the XMPP/Jabber server does not reply to status requests.\n\n"
-                + "If the buddy exists you can still successfully add him.\n\n"
-                + "Do you want to try to add the buddy?",
-            "Unable to check the buddy status.");
-
-        dialog5 = new DialogContent("Server Not Responding",
-            "The responsible XMPP/Jabber server is not connectable.\n"
-                + "The server is either inexistent or offline right now.\n\n"
-                + "Do you want to add the buddy anyway?",
-            "The XMPP/Jabber server did not respond.");
+    public void setUp() throws Exception {
 
         testNet = new SarosTestNet(Constants.INF_XMPP_TESTUSER_NAME,
             Constants.INF_XMPP_SERVICE_NAME);
 
-        try {
-            conConfig = new ConnectionConfiguration(
-                Constants.INF_XMPP_SERVICE_NAME);
-            conConfig
-                .setSecurityMode(ConnectionConfiguration.SecurityMode.enabled);
-            conConfig.setReconnectionAllowed(false);
+        conConfig = new ConnectionConfiguration(Constants.INF_XMPP_SERVICE_NAME);
+        conConfig.setSecurityMode(ConnectionConfiguration.SecurityMode.enabled);
+        conConfig.setReconnectionAllowed(false);
 
-            // Connect to Server
-            testNet.net.connect(conConfig, Constants.INF_XMPP_TESTUSER_NAME,
-                Constants.INF_XMPP_TESTUSER_PASSWORD, false);
+        // Connect to Server
+        testNet.net.connect(conConfig, Constants.INF_XMPP_TESTUSER_NAME,
+            Constants.INF_XMPP_TESTUSER_PASSWORD, false);
 
-            jid = testNet.net.getMyJID();
+        jid = testNet.net.getMyJID();
 
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+    }
 
+    @After
+    public void tearDown() {
+        testNet.net.disconnect();
     }
 
     /**
@@ -145,10 +139,8 @@ public class RosterUtilsTest {
         assertTrue("getNickname with null SarosNet should return null ",
             RosterUtils.getNickname(null, null) == null);
 
-        SarosNet sarosNet = testNet.net;
-
         assertTrue("getNickname with null SarosNet should return null ",
-            RosterUtils.getNickname(sarosNet, jid) == null);
+            RosterUtils.getNickname(testNet.net, jid) == null);
 
     }
 
@@ -162,38 +154,32 @@ public class RosterUtilsTest {
         RosterEntry entry = createMock(RosterEntry.class);
         EasyMock.expect(entry.getName()).andReturn("Alice").times(1);
         EasyMock.replay(entry);
+
         assertTrue("The returned nickname should be Alice", RosterUtils
             .getDisplayableName(entry).equals("Alice"));
+
+        EasyMock.verify(entry);
 
         RosterEntry entry2 = createMock(RosterEntry.class);
         EasyMock.expect(entry2.getName()).andReturn("").times(1);
         EasyMock.expect(entry2.getUser()).andReturn("Alice_User").times(1);
         EasyMock.replay(entry2);
+
         assertTrue("The returned nickname should be Alice", RosterUtils
             .getDisplayableName(entry2).equals("Alice_User"));
+
+        EasyMock.verify(entry2);
 
         RosterEntry entry3 = createMock(RosterEntry.class);
         EasyMock.expect(entry3.getName()).andReturn(null).times(1);
         EasyMock.expect(entry3.getUser()).andReturn("Alice_User").times(1);
         EasyMock.replay(entry3);
+
         assertTrue("The returned nickname should be Alice", RosterUtils
             .getDisplayableName(entry3).equals("Alice_User"));
-    }
 
-    /**
-     * Test method for
-     * {@link de.fu_berlin.inf.dpp.net.util.RosterUtils#createAccount(java.lang.String, java.lang.String, java.lang.String, org.eclipse.core.runtime.IProgressMonitor)}
-     * .
-     */
-    @Test
-    public void testCreateAccount() {
-        try {
-            RosterUtils.createAccount("saros-con.imp.fu-berlin.de",
-                "Christian_A", "1234", null);
-        } catch (InvocationTargetException e) {
-            // TODO Auto-generated catch block
-            // log.debug("", e);
-        }
+        EasyMock.verify(entry3);
+
     }
 
     /**
@@ -206,9 +192,9 @@ public class RosterUtilsTest {
         Connection con = testNet.net.getConnection();
         assertTrue("Account is unused, so it should be possible to create",
             RosterUtils.isAccountCreationPossible(con, "Christian_Z") == null);
-        Connection con2 = testNet.net.getConnection();
+
         assertTrue("Account is used, so it should return an error message",
-            RosterUtils.isAccountCreationPossible(con2, "christian_test")
+            RosterUtils.isAccountCreationPossible(con, "christian_test")
                 .contains("Account"));
 
     }
