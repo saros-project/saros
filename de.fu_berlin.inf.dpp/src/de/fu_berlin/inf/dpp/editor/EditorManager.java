@@ -1703,7 +1703,7 @@ public class EditorManager implements IActivityProvider, Disposable {
             // no active editor on target subject
             SarosView.showNotification("Following " + jumpTo.getJID().getBase()
                 + "!", jumpTo.getJID().getName()
-                + " has no shared file activated yet.");
+                + " has no shared file opened yet.");
             return;
         }
 
