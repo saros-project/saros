@@ -542,7 +542,9 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
          * 
          * TODO: make it possible to be in a session without a project
          */
-        sessionManager.stopSarosSession();
+        if (sessionManager.getSarosSession().getProjectResourcesMapping()
+            .keySet().isEmpty())
+            sessionManager.stopSarosSession();
         /*
          * If the sarosSession is null, stopSarosSession() does not clear the
          * sessionID, so we have to do this manually.
