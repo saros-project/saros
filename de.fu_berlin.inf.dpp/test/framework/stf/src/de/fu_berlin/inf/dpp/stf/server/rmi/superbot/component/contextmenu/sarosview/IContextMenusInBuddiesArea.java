@@ -7,11 +7,13 @@ import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.contextmenu.sarosv
 
 public interface IContextMenusInBuddiesArea extends IContextMenusInSarosView {
 
-    /**********************************************
+    /**
+     * Adds the buddies bar part of his JID to the chat by double clicking on
+     * the entry in the roster.
      * 
-     * contextMenus showed in buddies View
-     * 
-     **********************************************/
+     * @throws RemoteException
+     */
+    public void addJIDToChat() throws RemoteException;
 
     public void delete() throws RemoteException;
 

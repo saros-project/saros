@@ -46,7 +46,9 @@ public class CreateSameFileAtOnceTest extends StfTestCase {
                 .createFile("foo", "readme.txt", CARL.toString());
         }
 
-        ALICE.remoteBot().sleep(5000);
+        ALICE.superBot().views().packageExplorerView()
+            .waitUntilResourceIsShared("foo/readme.txt");
+
         ALICE.superBot().views().packageExplorerView()
             .selectFile("foo", "readme.txt").open();
         ALICE.remoteBot().editor("readme.txt").waitUntilIsActive();

@@ -17,7 +17,7 @@ import de.fu_berlin.inf.dpp.ui.widgets.chatControl.items.ChatLine;
  * 
  * @author lchen
  */
-@SWTBotWidget(clasz = ChatLine.class, preferredName = "chatLine", referenceBy = { ReferenceBy.LABEL })
+@SWTBotWidget(clasz = ChatLine.class, preferredName = "chatLine", referenceBy = { ReferenceBy.TEXT })
 public class SarosSWTBotChatLine extends AbstractSWTBot<ChatLine> {
 
     /**

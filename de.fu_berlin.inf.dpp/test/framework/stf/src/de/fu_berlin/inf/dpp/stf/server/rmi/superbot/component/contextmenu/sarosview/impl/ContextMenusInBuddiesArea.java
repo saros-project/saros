@@ -47,6 +47,14 @@ public final class ContextMenusInBuddiesArea extends ContextMenusInSarosView
         new SWTBot().sleep(500);
     }
 
+    // this method does not operate on the context menu
+    public void addJIDToChat() throws RemoteException {
+        SWTBotTreeItem treeItem = getTreeItem();
+
+        treeItem.select();
+        treeItem.doubleClick();
+    }
+
     public void addToSarosSession() throws RemoteException {
         SWTBotTreeItem treeItem = getTreeItem();
 

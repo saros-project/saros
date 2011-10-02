@@ -37,6 +37,12 @@ public final class Chatroom extends StfRemoteObject implements IChatroom {
         }
     }
 
+    public void sendChatMessage() throws RemoteException {
+        RemoteWorkbenchBot.getInstance().activateWorkbench();
+        SarosSWTBotChatInput chatInput = new SarosSWTBot().chatInput();
+        chatInput.pressEnterKey();
+    }
+
     public void sendChatMessage(String message) throws RemoteException {
 
         RemoteWorkbenchBot.getInstance().activateWorkbench();

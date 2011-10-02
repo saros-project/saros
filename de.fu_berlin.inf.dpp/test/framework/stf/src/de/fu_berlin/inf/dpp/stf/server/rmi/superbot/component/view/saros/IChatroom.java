@@ -8,6 +8,21 @@ public interface IChatroom extends Remote {
     public boolean compareChatMessage(String jid, String message)
         throws RemoteException;
 
+    /**
+     * Sends the current content of the chat input to the chat server by
+     * pressing the ENTER key.
+     * 
+     * @throws RemoteException
+     */
+    public void sendChatMessage() throws RemoteException;
+
+    /**
+     * Sends a message to the chat server.
+     * 
+     * @param message
+     *            the message to send
+     * @throws RemoteException
+     */
     public void sendChatMessage(String message) throws RemoteException;
 
     public String getUserNameOnChatLinePartnerChangeSeparator()
