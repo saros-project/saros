@@ -473,4 +473,13 @@ public class ChatRoomsComposite extends ListExplanatoryComposite {
             .getMUCSession().isJoined());
     }
 
+    /**
+     * Returns the current chat control for the active chat room
+     * 
+     * @return the current chat control for the active chat room or
+     *         <code>null</code> if there is no active chat room
+     */
+    public ChatControl getActiveChatControl() {
+        return chatControl;
+    }
 }

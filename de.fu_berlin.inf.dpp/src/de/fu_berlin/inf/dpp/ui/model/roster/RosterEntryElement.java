@@ -141,6 +141,10 @@ public class RosterEntryElement extends TreeElement {
         return presence.isAvailable() || presence.isAway();
     }
 
+    public JID getJID() {
+        return jid;
+    }
+
     public boolean isSarosSupported() {
         boolean sarosSupported = false;
 

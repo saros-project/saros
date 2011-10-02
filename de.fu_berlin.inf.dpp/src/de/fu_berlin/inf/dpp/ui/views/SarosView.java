@@ -84,11 +84,13 @@ import de.fu_berlin.inf.dpp.ui.actions.SkypeAction;
 import de.fu_berlin.inf.dpp.ui.actions.StoppedAction;
 import de.fu_berlin.inf.dpp.ui.actions.VideoSharingAction;
 import de.fu_berlin.inf.dpp.ui.actions.VoIPAction;
+import de.fu_berlin.inf.dpp.ui.model.roster.RosterEntryElement;
 import de.fu_berlin.inf.dpp.ui.sounds.SoundManager;
 import de.fu_berlin.inf.dpp.ui.sounds.SoundPlayer;
 import de.fu_berlin.inf.dpp.ui.util.LayoutUtils;
 import de.fu_berlin.inf.dpp.ui.util.selection.retriever.SelectionRetrieverFactory;
 import de.fu_berlin.inf.dpp.ui.widgets.ConnectionStateComposite;
+import de.fu_berlin.inf.dpp.ui.widgets.chatControl.ChatControl;
 import de.fu_berlin.inf.dpp.ui.widgets.session.ChatRoomsComposite;
 import de.fu_berlin.inf.dpp.ui.widgets.viewer.rosterSession.BuddySessionDisplayComposite;
 import de.fu_berlin.inf.dpp.util.Utils;
@@ -191,6 +193,8 @@ public class SarosView extends ViewPart {
     protected Composite leftComposite;
     protected BuddySessionDisplayComposite buddySessionDisplayComposite;
 
+    protected ChatRoomsComposite chatRooms;
+
     @Inject
     protected Saros saros;
 
@@ -252,8 +256,11 @@ public class SarosView extends ViewPart {
             .createFillGridData());
 
         /*
-         * Double click on buddy in Saros view jumps to position of clicked
-         * user.
+         * Double click on a session participant in Saros view jumps to position
+         * of clicked user.
+         * 
+         * Double click on a buddy in the roster adds its JID (bare component
+         * part) to the active chat tab input
          */
         final Control control = buddySessionDisplayComposite.getViewer()
             .getControl();
@@ -266,8 +273,32 @@ public class SarosView extends ViewPart {
                     if (treeItem != null) {
                         User user = (User) Platform.getAdapterManager()
                             .getAdapter(treeItem.getData(), User.class);
-                        if (user != null)
+
+                        if (user != null) {
                             editorManager.jumpToUser(user);
+                            return;
+                        }
+
+                        RosterEntryElement rosterEntryElement = (RosterEntryElement) Platform
+                            .getAdapterManager().getAdapter(treeItem.getData(),
+                                RosterEntryElement.class);
+
+                        ChatControl chatControl = chatRooms
+                            .getActiveChatControl();
+
+                        /*
+                         * TODO create links like those of the World of Warcraft
+                         * chat which then can be clicked to execute some action
+                         * e.g inviting user to a session are add them to the
+                         * roster (but should not be done here at all)
+                         */
+
+                        if (rosterEntryElement != null && chatControl != null) {
+                            String currentText = chatControl.getInputText();
+                            chatControl.setInputText(currentText + "["
+                                + rosterEntryElement.getJID().getBase() + "]");
+                        }
+
                     }
                 } else {
                     log.warn("Control is not instance of Tree.");
@@ -296,7 +327,8 @@ public class SarosView extends ViewPart {
         Composite rightComposite = new Composite(baseSashForm, SWT.NONE);
         rightComposite.setLayout(new FillLayout());
 
-        new ChatRoomsComposite(rightComposite, SWT.NONE, rosterTracker);
+        chatRooms = new ChatRoomsComposite(rightComposite, SWT.NONE,
+            rosterTracker);
 
         /*
          * contributeToActionBars: TODO the creation of actions through the
