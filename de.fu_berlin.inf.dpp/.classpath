@@ -1,15 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry exported="true" kind="lib" path="lib/log4j-1.2.15.jar" sourcepath="lib/log4j-1.2.15-sources.jar"/>
-	<classpathentry kind="lib" path="lib/org.eclipse.swtbot.ant.optional.junit4_2.0.4.20110304_0338-e5aff47-dev-e36.jar"/>
-	<classpathentry kind="lib" path="lib/org.eclipse.swtbot.eclipse.core_2.0.4.20110304_0338-e5aff47-dev-e36.jar"/>
-	<classpathentry kind="lib" path="lib/org.eclipse.swtbot.eclipse.finder_2.0.4.20110304_0338-e5aff47-dev-e36.jar"/>
-	<classpathentry kind="lib" path="lib/org.eclipse.swtbot.eclipse.gef.finder_2.0.4.20110304_0338-e5aff47-dev-e36.jar"/>
-	<classpathentry kind="lib" path="lib/org.eclipse.swtbot.eclipse.spy_2.0.4.20110304_0338-e5aff47-dev-e36.jar"/>
-	<classpathentry kind="lib" path="lib/org.eclipse.swtbot.forms.finder_2.0.4.20110304_0338-e5aff47-dev-e36.jar"/>
-	<classpathentry kind="lib" path="lib/org.eclipse.swtbot.go_2.0.4.20110304_0338-e5aff47-dev-e36.jar"/>
-	<classpathentry kind="lib" path="lib/org.eclipse.swtbot.junit4_x_2.0.4.20110304_0338-e5aff47-dev-e36.jar"/>
-	<classpathentry kind="lib" path="lib/org.eclipse.swtbot.swt.finder_2.0.4.20110304_0338-e5aff47-dev-e36.jar"/>
 	<classpathentry kind="lib" path="lib/commons-io-2.0.1.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/J2SE-1.5"/>
 	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
@@ -64,5 +55,13 @@
 	<classpathentry kind="lib" path="test/lib/openfire/startup.jar"/>
 	<classpathentry kind="lib" path="lib/xpp3-1.1.4c.jar"/>
 	<classpathentry kind="lib" path="lib/xstream-1.4-20101008.163445-1.jar"/>
+	<classpathentry kind="lib" path="lib/org.eclipse.swtbot.eclipse.core_2.0.5.20110922_1046-258a521-dev-e36.jar"/>
+	<classpathentry kind="lib" path="lib/org.eclipse.swtbot.eclipse.finder_2.0.5.20110922_1046-258a521-dev-e36.jar"/>
+	<classpathentry kind="lib" path="lib/org.eclipse.swtbot.eclipse.gef.finder_2.0.5.20110922_1046-258a521-dev-e36.jar"/>
+	<classpathentry kind="lib" path="lib/org.eclipse.swtbot.eclipse.spy_2.0.5.20110922_1046-258a521-dev-e36.jar"/>
+	<classpathentry kind="lib" path="lib/org.eclipse.swtbot.forms.finder_2.0.5.20110922_1046-258a521-dev-e36.jar"/>
+	<classpathentry kind="lib" path="lib/org.eclipse.swtbot.go_2.0.5.20110922_1046-258a521-dev-e36.jar"/>
+	<classpathentry kind="lib" path="lib/org.eclipse.swtbot.junit4_x_2.0.5.20110922_1046-258a521-dev-e36.jar"/>
+	<classpathentry kind="lib" path="lib/org.eclipse.swtbot.swt.finder_2.0.5.20110922_1046-258a521-dev-e36.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
