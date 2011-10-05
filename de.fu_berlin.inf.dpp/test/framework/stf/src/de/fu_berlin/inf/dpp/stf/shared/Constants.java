@@ -37,6 +37,7 @@ public interface Constants {
     public final static String NEXT = "Next >";
     public final static String BACK = "< Back";
     public final static String BROWSE = "Browse";
+    public final static String OVERWRITE = "Overwrite";
 
     public final static String SRC = "src";
     public final static String SUFFIX_JAVA = ".java";
@@ -246,6 +247,9 @@ public interface Constants {
     static public final String CHECKBOX_START_FOLLOW_MODE = Configuration
         .getString("checkbox_label_start_in_follow_mode_in_shell-saros-preferences");
 
+    static public final String CHECKBOX_NEEDS_BASED_SYNC = Configuration
+        .getString("checkbox_label_enable_needs_based_synchronisation_in_shell-saros-preferences");
+
     static public final String NODE_SAROS = Configuration
         .getString("node_saros");
     static public final String NODE_SAROS_FEEDBACK = Configuration
@@ -446,6 +450,8 @@ public interface Constants {
         .getString("shell_folder_selection");
     public final static String SHELL_SAVE_ALL_FILES_NOW = Configuration
         .getString("shell_save_all_files_now");
+    public final static String SHELL_NEW_FILE_SHARED = Configuration
+        .getString("shell_new_file_shared");
 
     /* Context menu of a selected tree item on the package explorer view */
     public final static String CM_SHARE_WITH = Configuration
@@ -564,6 +570,12 @@ public interface Constants {
     /* table iems of the shell "Share project" of the conext menu "Team" */
     public final static String TABLE_ITEM_REPOSITORY_TYPE_SVN = "SVN";
 
+    /*
+     * Invit. / Synch. Monitor Names
+     */
+
+    public static final String SHELL_MONITOR_PROJECT_SYNCHRONIZATION = Configuration
+        .getString("shell_monitor_project_synchronization");
     /**********************************************
      * 
      * Others

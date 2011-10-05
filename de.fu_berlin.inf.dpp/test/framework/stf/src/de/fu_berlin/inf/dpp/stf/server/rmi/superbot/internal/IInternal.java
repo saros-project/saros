@@ -6,6 +6,22 @@ import java.rmi.RemoteException;
 public interface IInternal extends Remote {
 
     /**
+     * Returns the file size in bytes
+     * 
+     * @param projectName
+     *            the name of the project
+     * @param path
+     *            the path of the folder e.g my/foo/bar
+     * @return The length, in bytes, or 0L if the file does not exist. Some
+     *         operating systems may return 0L for pathnames denoting
+     *         system-dependent entities such as devices or pipes.
+     * @throws RemoteException
+     */
+
+    public long getFileSize(String projectName, String path)
+        throws RemoteException;
+
+    /**
      * Checks if the given resource exists in the current workspace.
      * 
      * @param path

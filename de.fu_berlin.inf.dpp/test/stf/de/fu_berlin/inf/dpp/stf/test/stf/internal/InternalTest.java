@@ -1,6 +1,7 @@
 package de.fu_berlin.inf.dpp.stf.test.stf.internal;
 
 import static de.fu_berlin.inf.dpp.stf.client.tester.SarosTester.ALICE;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
@@ -71,6 +72,14 @@ public class InternalTest extends StfTestCase {
             .createFile("Hello", "x/y/z/foo.bar", 100, false);
         ALICE.superBot().internal()
             .createFile("Hello", "x/y/z/foo.bar.comp", 100, true);
+    }
+
+    @Test
+    public void testGetFileSize() throws Exception {
+        ALICE.superBot().internal().createJavaProject("Hello");
+        ALICE.superBot().internal().createFile("Hello", "test.bar", "bla");
+        assertEquals(3L,
+            ALICE.superBot().internal().getFileSize("Hello", "test.bar"));
     }
 
     @AfterClass

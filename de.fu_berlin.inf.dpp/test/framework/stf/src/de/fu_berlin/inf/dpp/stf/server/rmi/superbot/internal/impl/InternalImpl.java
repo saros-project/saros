@@ -1,6 +1,7 @@
 package de.fu_berlin.inf.dpp.stf.server.rmi.superbot.internal.impl;
 
 import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Field;
@@ -236,6 +237,14 @@ public final class InternalImpl extends StfRemoteObject implements IInternal {
             }
         }
         return !error;
+    }
+
+    public long getFileSize(String projectName, String path)
+        throws RemoteException {
+
+        return new File(ResourcesPlugin.getWorkspace().getRoot()
+            .getProject(projectName).getFile(path).getLocationURI()).length();
+
     }
 
     public void createProject(String projectName) throws RemoteException {

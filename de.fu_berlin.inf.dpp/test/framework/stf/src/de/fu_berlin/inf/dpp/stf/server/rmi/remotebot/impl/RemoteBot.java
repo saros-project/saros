@@ -195,6 +195,8 @@ public abstract class RemoteBot extends StfRemoteObject implements IRemoteBot {
         ArrayList<String> list = new ArrayList<String>();
         for (SWTBotShell shell : swtBot.shells())
             list.add(shell.getText());
+
+        log.trace("Currently opened shells: " + list.toString());
         return list;
     }
 
