@@ -24,9 +24,9 @@ import org.junit.BeforeClass;
  *
  * @author cordes
  */
-public abstract class AbstractSarosUnitTest {
+public abstract class AbstractSarosUnitTestCase {
 
-    private static Logger LOG = Logger.getLogger(AbstractSarosUnitTest.class);
+    private static Logger LOG = Logger.getLogger(AbstractSarosUnitTestCase.class);
 
     private XMPPServerFacadeForTests xmppFacade;
 

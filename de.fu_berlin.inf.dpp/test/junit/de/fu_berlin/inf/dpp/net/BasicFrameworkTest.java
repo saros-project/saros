@@ -2,7 +2,7 @@ package de.fu_berlin.inf.dpp.net;
 
 import de.fu_berlin.inf.dpp.context.TestSaros;
 import de.fu_berlin.inf.dpp.test.xmpp.XmppUser;
-import de.fu_berlin.inf.dpp.util.AbstractSarosUnitTest;
+import de.fu_berlin.inf.dpp.util.AbstractSarosUnitTestCase;
 import de.fu_berlin.inf.dpp.util.EclipseHelper;
 import org.junit.Test;
 
@@ -13,7 +13,7 @@ import static junit.framework.Assert.assertTrue;
 /**
  * @author cordes
  */
-public class BasicFrameworkTest extends AbstractSarosUnitTest {
+public class BasicFrameworkTest extends AbstractSarosUnitTestCase {
 
     @Test
     public void testXmppConnection() {
