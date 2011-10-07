@@ -63,7 +63,7 @@ public class SubscriptionManager {
             ConnectionState newState) {
             if (newState == ConnectionState.CONNECTED)
                 prepareConnection(connection);
-            else if (connection != null)
+            else
                 disposeConnection();
         }
     };
@@ -96,18 +96,29 @@ public class SubscriptionManager {
         sarosNet.addListener(connectionListener);
     }
 
-    public void prepareConnection(Connection connection) {
+    public synchronized void prepareConnection(Connection connection) {
+        if (this.connection != null)
+            disposeConnection();
+
         this.connection = connection;
         connection.addPacketListener(packetListener, new PacketTypeFilter(
             Presence.class));
     }
 
-    public void disposeConnection() {
-        connection.removePacketListener(packetListener);
-        connection = null;
+    public synchronized void disposeConnection() {
+        if (connection != null) {
+            connection.removePacketListener(packetListener);
+            connection = null;
+        }
     }
 
-    public void processPresence(Presence presence) {
+    public synchronized void processPresence(Presence presence) {
+
+        if (connection == null) {
+            log.warn("could not process presence, not connected to a server");
+            return;
+        }
+
         String userName = Utils.prefix(new JID(presence.getFrom()));
         switch (presence.getType()) {
         case error:
@@ -183,7 +194,7 @@ public class SubscriptionManager {
         }
     }
 
-    protected void sendPresence(Presence.Type type, String to) {
+    protected synchronized void sendPresence(Presence.Type type, String to) {
         Presence presence = new Presence(type);
         presence.setTo(to);
         presence.setFrom(connection.getUser());
