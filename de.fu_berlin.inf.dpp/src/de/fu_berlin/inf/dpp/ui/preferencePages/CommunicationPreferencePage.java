@@ -48,6 +48,8 @@ public class CommunicationPreferencePage extends FieldEditorPreferencePage
 
     private Group chatGroup;
     private Group voipGroup;
+    private Composite chatServerGroup;
+
     private String[][] audioQualityValues = { { "0", "0" }, { "1", "1" },
         { "2", "2" }, { "3", "3" }, { "4", "4" }, { "5", "5" }, { "6", "6" },
         { "7", "7" }, { "8", "8" }, { "9", "9" }, { "10", "10" } };
@@ -83,8 +85,13 @@ public class CommunicationPreferencePage extends FieldEditorPreferencePage
         chatGroup.setLayoutData(chatGridData);
         voipGroup.setLayoutData(voipGridData);
 
+        chatServerGroup = new Composite(chatGroup, SWT.NONE);
+        chatServerGroup.setLayout(new GridLayout(2, false));
+        chatServerGroup.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true,
+            false));
+
         chatserver = new StringFieldEditor(PreferenceConstants.CHATSERVER,
-            "Chatserver:", chatGroup);
+            "Chatserver:", chatServerGroup);
 
         useDefaultChatServer = new BooleanFieldEditor(
             PreferenceConstants.USE_DEFAULT_CHATSERVER,
@@ -160,7 +167,7 @@ public class CommunicationPreferencePage extends FieldEditorPreferencePage
     public void initialize() {
         super.initialize();
         if (prefs.getBoolean(PreferenceConstants.USE_DEFAULT_CHATSERVER)) {
-            chatserver.setEnabled(false, chatGroup);
+            chatserver.setEnabled(false, chatServerGroup);
         }
     }
 
@@ -188,7 +195,7 @@ public class CommunicationPreferencePage extends FieldEditorPreferencePage
                 if (event.getNewValue() instanceof Boolean) {
                     boolean useDefault = ((Boolean) event.getNewValue())
                         .booleanValue();
-                    chatserver.setEnabled(!useDefault, chatGroup);
+                    chatserver.setEnabled(!useDefault, chatServerGroup);
                 }
             }
         }
