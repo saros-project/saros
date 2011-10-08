@@ -15,7 +15,7 @@ import org.eclipse.draw2d.geometry.Translatable;
 import org.eclipse.gef.EditPart;
 import org.eclipse.gef.commands.Command;
 import org.eclipse.gef.editparts.AbstractGraphicalEditPart;
-import org.eclipse.gef.editparts.ScalableRootEditPart;
+import org.eclipse.gef.editparts.ScalableFreeformRootEditPart;
 import org.eclipse.gef.editparts.ZoomManager;
 import org.eclipse.gef.requests.CreateRequest;
 
@@ -42,11 +42,11 @@ public class ElementModelLayoutEditPolicy extends
 			.getLogger(ElementModelLayoutEditPolicy.class);
 
 	/* minimum values for resizing and drag creation */
-	public static final int MIN_WIDTH = 10;
-	public static final int MIN_HEIGHT = 10;
+	public static final int MIN_WIDTH = 1;
+	public static final int MIN_HEIGHT = 1;
 	/* default size for click and drag and drop creation */
-	public static final int DEFAULT_WIDTH = 400;
-	public static final int DEFAULT_HEIGHT = 400;
+	public static final int DEFAULT_WIDTH = 40;
+	public static final int DEFAULT_HEIGHT = 40;
 
 	/*
 	 * Paraphrase: change (or rather "add to another") parent command
@@ -133,7 +133,7 @@ public class ElementModelLayoutEditPolicy extends
 
 			/* adjust the default size to the zoom */
 			double zoom = 1d;
-			ZoomManager zoomManager = ((ScalableRootEditPart) getTargetEditPart(
+			ZoomManager zoomManager = ((ScalableFreeformRootEditPart) getTargetEditPart(
 					request).getViewer().getRootEditPart()).getZoomManager();
 			if (zoomManager != null)
 				zoom = zoomManager.getZoom() * zoomManager.getUIMultiplier();
