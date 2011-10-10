@@ -536,13 +536,9 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
                 cancellationCause);
         }
 
-        /*
-         * right now it doesn't make any sense to be in a session without a
-         * project
-         * 
-         * TODO: make it possible to be in a session without a project
-         */
-        sessionManager.stopSarosSession();
+        if (sessionManager.getSarosSession().getRemoteUsers().isEmpty())
+            sessionManager.stopSarosSession();
+
         /*
          * If the sarosSession is null, stopSarosSession() does not clear the
          * sessionID, so we have to do this manually.
