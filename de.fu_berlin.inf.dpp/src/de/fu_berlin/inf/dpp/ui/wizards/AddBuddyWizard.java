@@ -39,6 +39,7 @@ import de.fu_berlin.inf.dpp.net.internal.subscriptionManager.events.IncomingSubs
 import de.fu_berlin.inf.dpp.net.internal.subscriptionManager.events.SubscriptionManagerListener;
 import de.fu_berlin.inf.dpp.net.util.RosterUtils;
 import de.fu_berlin.inf.dpp.ui.ImageManager;
+import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.ui.wizards.pages.AddBuddyWizardPage;
 
 /**
@@ -50,7 +51,7 @@ import de.fu_berlin.inf.dpp.ui.wizards.pages.AddBuddyWizardPage;
 public class AddBuddyWizard extends Wizard {
     private static final Logger log = Logger.getLogger(AddBuddyWizard.class);
 
-    public static final String TITLE = "Add Buddy";
+    public static final String TITLE = Messages.AddBuddyWizard_title;
     public static final ImageDescriptor IMAGE = ImageManager.WIZBAN_ADD_BUDDY;
 
     @Inject
@@ -86,7 +87,7 @@ public class AddBuddyWizard extends Wizard {
         final String nickname = this.addBuddyWizardPage.getNickname();
 
         if (this.addBuddyWizardPage.isBuddyAlreadyAdded()) {
-            log.debug("Buddy " + jid.toString() + " already added.");
+            log.debug("Buddy " + jid.toString() + " already added."); //$NON-NLS-1$ //$NON-NLS-2$
             return true;
         }
 
@@ -133,8 +134,8 @@ public class AddBuddyWizard extends Wizard {
             // Leave the wizard open
             return false;
         } catch (InterruptedException e) {
-            log.debug("Adding buddy " + jid.toString()
-                + " was canceled by the user.");
+            log.debug("Adding buddy " + jid.toString() //$NON-NLS-1$
+                + " was canceled by the user."); //$NON-NLS-1$
 
             subscriptionManager
                 .removeSubscriptionManagerListener(subscriptionManagerListener);

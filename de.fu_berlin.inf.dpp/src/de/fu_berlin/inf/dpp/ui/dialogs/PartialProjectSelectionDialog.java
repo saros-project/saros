@@ -14,6 +14,7 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.dialogs.WizardExportResourcesPage;
 
+import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.util.Utils;
 
 /**
@@ -36,8 +37,9 @@ public class PartialProjectSelectionDialog {
         this.parentShell = parentShell;
 
         wizard = new PartialProjectWizard();
-        wizard.setWindowTitle("Saros - Configure project to share");
-        page = new SarosResourceSelectionPage("Select Resources to Share",
+        wizard.setWindowTitle(Messages.PartialProjectSelectionDialog_title);
+        page = new SarosResourceSelectionPage(
+            Messages.PartialProjectSelectionDialog_select_ressources_to_share,
             new StructuredSelection(project));
         wizard.addPage(page);
 
@@ -57,11 +59,8 @@ public class PartialProjectSelectionDialog {
         protected SarosResourceSelectionPage(String pageName,
             IStructuredSelection selection) {
             super(pageName, selection);
-            setTitle("Select Files to Share");
-            setDescription("Please select all files which should "
-                + "be shared using Saros initially.\n"
-                + "Removing big files will improve the"
-                + " speed of the initial synchronisation.");
+            setTitle(Messages.PartialProjectSelectionDialog_title2);
+            setDescription(Messages.PartialProjectSelectionDialog_description);
         }
 
         public void handleEvent(Event event) {
@@ -92,7 +91,7 @@ public class PartialProjectSelectionDialog {
             for (IResource resource : Utils
                 .asIterable((Iterator<IResource>) getSelectedResourcesIterator())) {
                 if (!project.equals(resource.getProject())) {
-                    setErrorMessage("Currently only files from the main project can be shared");
+                    setErrorMessage(Messages.PartialProjectSelectionDialog_error_only_files_from_main_project);
                     return false;
                 }
             }

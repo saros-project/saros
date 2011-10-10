@@ -36,6 +36,7 @@ import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
 import de.fu_berlin.inf.dpp.observables.VideoSessionObservable;
 import de.fu_berlin.inf.dpp.ui.ImageManager;
+import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.ui.util.selection.SelectionUtils;
 import de.fu_berlin.inf.dpp.ui.util.selection.retriever.SelectionRetrieverFactory;
 import de.fu_berlin.inf.dpp.util.Utils;
@@ -56,8 +57,8 @@ public class VideoSharingAction extends Action implements Disposable {
 
     protected static final String ACTION_ID = VideoSharingAction.class
         .getName();
-    public static final String TOOLTIP_START_SESSION = "Share Your Screen With Selected Buddy";
-    public static final String TOOLTIP_STOP_SESSION = "Stop Session With Buddy";
+    public static final String TOOLTIP_START_SESSION = Messages.VideoSharingAction_start_session_tooltip;
+    public static final String TOOLTIP_STOP_SESSION = Messages.VideoSharingAction_stop_session_tooltip;
 
     protected ValueChangeListener<VideoSharingSession> changeListener = new ValueChangeListener<VideoSharingSession>() {
         public void setValue(VideoSharingSession newValue) {
@@ -77,7 +78,7 @@ public class VideoSharingAction extends Action implements Disposable {
     protected VideoSessionObservable sessionObservable;
 
     public VideoSharingAction() {
-        super("Share Your Screen");
+        super(Messages.VideoSharingAction_title);
         SarosPluginContext.initComponent(this);
         setId(ACTION_ID);
 
@@ -97,17 +98,17 @@ public class VideoSharingAction extends Action implements Disposable {
             this.setEnabled(false);
         } catch (Exception e) {
             if (!PlatformUI.getWorkbench().isClosing())
-                log.error("Unexcepted error while updating enablement", e);
+                log.error("Unexcepted error while updating enablement", e); //$NON-NLS-1$
         }
 
         if (sessionObservable.getValue() != null) {
             setImageDescriptor(ImageManager
-                .getImageDescriptor("icons/elcl16/stopvideo.png"));
+                .getImageDescriptor("icons/elcl16/stopvideo.png")); //$NON-NLS-1$
             setToolTipText(TOOLTIP_STOP_SESSION);
             return;
         }
         setImageDescriptor(ImageManager
-            .getImageDescriptor("icons/elcl16/startvideo.png"));
+            .getImageDescriptor("icons/elcl16/startvideo.png")); //$NON-NLS-1$
         setToolTipText(TOOLTIP_START_SESSION);
     }
 
@@ -126,9 +127,9 @@ public class VideoSharingAction extends Action implements Disposable {
                             videoSharing.startSharing(participants.get(0));
                         } catch (final SarosCancellationException e) {
                             Utils.popUpFailureMessage(
-                                "Could not establish screensharing",
+                                Messages.VideoSharingAction_error_could_not_establish_screensharing_text,
                                 e.getMessage(), false);
-                            log.error("Could not establish screensharing: ", e);
+                            log.error("Could not establish screensharing: ", e); //$NON-NLS-1$
                         }
                     } else {
                         switch (videoSharingSession.getMode()) {
@@ -143,7 +144,7 @@ public class VideoSharingAction extends Action implements Disposable {
                     }
                     updateEnablement();
                 } else {
-                    log.warn("More than one participant selected.");
+                    log.warn("More than one participant selected."); //$NON-NLS-1$
                 }
             }
         });

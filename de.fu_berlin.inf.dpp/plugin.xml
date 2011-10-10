@@ -6,24 +6,24 @@
          point="org.eclipse.ui.views">
       <category
             id="de.fu_berlin.inf.dpp.Saros"
-            name="Saros"/>
+            name="%category.name"/>
       <category
             id="de.fu_berlin.inf.dpp.Developer"
-            name="Saros Development">
+            name="%category.name.0">
       </category>
      <view
             category="de.fu_berlin.inf.dpp.Saros"
             class="de.fu_berlin.inf.dpp.ui.views.VideoPlayerView"
             icon="icons/view16/video_misc.png"
             id="de.fu_berlin.inf.dpp.ui.views.VideoPlayerView"
-            name="Remote Screen"
+            name="%view.name"
             restorable="true"/>
      <view
            category="de.fu_berlin.inf.dpp.Saros"
            class="de.fu_berlin.inf.dpp.ui.views.SarosView"
            icon="icons/view16/saros_misc.png"
            id="de.fu_berlin.inf.dpp.ui.views.SarosView"
-           name="Saros">
+           name="%view.name.0">
      </view>
    </extension>
    <extension
@@ -43,7 +43,7 @@
             adaptable="true"
             class="de.fu_berlin.inf.dpp.ui.decorators.SharedProjectDecorator"
             id="de.fu_berlin.inf.dpp.ui.decorators.SharedProjectDecorator"
-            label="Shared Project Decorator"
+            label="%decorator.label"
             lightweight="true"
             state="true">
          <enablement>
@@ -54,7 +54,7 @@
             adaptable="true"
             class="de.fu_berlin.inf.dpp.ui.decorators.SharedProjectFileDecorator"
             id="de.fu_berlin.inf.dpp.ui.decorators.SharedProjectFileDecorator"
-            label="Shared Project File Decorator"
+            label="%decorator.label.0"
             lightweight="true"
             state="true">
          <enablement>
@@ -67,63 +67,63 @@
       <page
             class="de.fu_berlin.inf.dpp.ui.preferencePages.GeneralPreferencePage"
             id="de.fu_berlin.inf.dpp.preferences"
-            name="Saros"/>
+            name="%page.name"/>
       <page
             category="de.fu_berlin.inf.dpp.preferences"
             class="de.fu_berlin.inf.dpp.ui.preferencePages.AdvancedPreferencePage"
             id="de.fu_berlin.inf.dpp.preferences.advanced"
-            name="Advanced"/>
+            name="%page.name.0"/>
       <page
             category="de.fu_berlin.inf.dpp.preferences"
             class="de.fu_berlin.inf.dpp.ui.preferencePages.NetworkPreferencePage"
             id="de.fu_berlin.inf.dpp.preferences.network"
-            name="Network"/>
+            name="%page.name.1"/>
       <page
             category="de.fu_berlin.inf.dpp.preferences"
             class="de.fu_berlin.inf.dpp.ui.preferencePages.FeedbackPreferencePage"
             id="de.fu_berlin.dpp.preferences.feedback"
-            name="Feedback"/>
+            name="%page.name.2"/>
       <page
             category="de.fu_berlin.inf.dpp.preferences"
             class="de.fu_berlin.inf.dpp.ui.preferencePages.CommunicationPreferencePage"
             id="de.fu_berlin.dpp.preferences.communication"
-            name="Communication">
+            name="%page.name.3">
       </page>
       <page
             category="de.fu_berlin.inf.dpp.preferences"
             class="de.fu_berlin.inf.dpp.videosharing.preferences.VideoSharingPreferencePage"
             id="de.fu_berlin.inf.dpp.videosharing.preferences.VideoSharingPreferencePage"
-            name="Screensharing">
+            name="%page.name.4">
       </page>
       <page
             category="de.fu_berlin.inf.dpp.videosharing.preferences.VideoSharingPreferencePage"
             class="de.fu_berlin.inf.dpp.videosharing.preferences.EncoderPreferencePage"
             id="de.fu_berlin.inf.dpp.videosharing.preferences.EncoderPreferencePage"
-            name="Encoder">
+            name="%page.name.5">
       </page>
       <page
             category="de.fu_berlin.inf.dpp.videosharing.preferences.EncoderPreferencePage"
             class="de.fu_berlin.inf.dpp.videosharing.preferences.XugglerEncoderPreferencePage"
             id="de.fu_berlin.inf.dpp.videosharing.preferences.XugglerEncoderPreferencePage"
-            name="Xuggler">
+            name="%page.name.6">
       </page>
       <page
             category="de.fu_berlin.inf.dpp.videosharing.preferences.EncoderPreferencePage"
             class="de.fu_berlin.inf.dpp.videosharing.preferences.ImageTileEncoderPreferencePage"
             id="de.fu_berlin.inf.dpp.videosharing.preferences.ImageTileEncoderPreferencePage"
-            name="Image-Tile">
+            name="%page.name.7">
       </page>
       <page
             category="de.fu_berlin.inf.dpp.videosharing.preferences.VideoSharingPreferencePage"
             class="de.fu_berlin.inf.dpp.videosharing.preferences.VideoPlayerPreferencePage"
             id="de.fu_berlin.inf.dpp.videosharing.preferences.VideoPlayerPreferencePage"
-            name="Remote screen view">
+            name="%page.name.8">
       </page>
       <page
             category="de.fu_berlin.inf.dpp.videosharing.preferences.VideoSharingPreferencePage"
             class="de.fu_berlin.inf.dpp.videosharing.preferences.ScreenPreferencePage"
             id="de.fu_berlin.inf.dpp.videosharing.preferences.ScreenPreferencePage"
-            name="Desktop">
+            name="%page.name.9">
       </page>
    </extension>
    <extension
@@ -166,7 +166,7 @@
             highlightPreferenceKey="de.fu_berlin.inf.dpp.annotations.viewport.highlight.1"
             highlightPreferenceValue="false"
             includeOnPreferencePage="true"
-            label="DPP Viewport"
+            label="%specification.label.0"
             overviewRulerPreferenceKey="de.fu_berlin.inf.dpp.annotations.viewport.overview.1"
             overviewRulerPreferenceValue="true"
             presentationLayer="8"
@@ -183,7 +183,7 @@
             highlightPreferenceKey="de.fu_berlin.inf.dpp.annotations.viewport.highlight.2"
             highlightPreferenceValue="false"
             includeOnPreferencePage="true"
-            label="DPP Viewport"
+            label="%specification.label.0"
             overviewRulerPreferenceKey="de.fu_berlin.inf.dpp.annotations.viewport.overview.2"
             overviewRulerPreferenceValue="true"
             presentationLayer="8"
@@ -200,7 +200,7 @@
             highlightPreferenceKey="de.fu_berlin.inf.dpp.annotations.viewport.highlight.3"
             highlightPreferenceValue="false"
             includeOnPreferencePage="true"
-            label="DPP Viewport"
+            label="%specification.label.0"
             overviewRulerPreferenceKey="de.fu_berlin.inf.dpp.annotations.viewport.overview.3"
             overviewRulerPreferenceValue="true"
             presentationLayer="8"
@@ -217,7 +217,7 @@
             highlightPreferenceKey="de.fu_berlin.inf.dpp.annotations.viewport.highlight.4"
             highlightPreferenceValue="false"
             includeOnPreferencePage="true"
-            label="DPP Viewport"
+            label="%specification.label.0"
             overviewRulerPreferenceKey="de.fu_berlin.inf.dpp.annotations.viewport.overview.4"
             overviewRulerPreferenceValue="true"
             presentationLayer="8"
@@ -234,7 +234,7 @@
             highlightPreferenceKey="de.fu_berlin.inf.dpp.annotations.viewport.highlight.5"
             highlightPreferenceValue="false"
             includeOnPreferencePage="true"
-            label="DPP Viewport"
+            label="%specification.label.0"
             overviewRulerPreferenceKey="de.fu_berlin.inf.dpp.annotations.viewport.overview.5"
             overviewRulerPreferenceValue="true"
             presentationLayer="8"
@@ -256,7 +256,7 @@
             contributesToHeader="false"
             highlightPreferenceValue="true"
             includeOnPreferencePage="true"
-            label="DPP User"
+            label="%specification.label.4"
             overviewRulerPreferenceValue="false"
             presentationLayer="7"
             textPreferenceValue="true"
@@ -275,7 +275,7 @@
             contributesToHeader="false"
             highlightPreferenceValue="true"
             includeOnPreferencePage="true"
-            label="DPP User"
+            label="%specification.label.4"
             overviewRulerPreferenceValue="false"
             presentationLayer="7"
             textPreferenceValue="true"
@@ -293,7 +293,7 @@
             contributesToHeader="false"
             highlightPreferenceValue="true"
             includeOnPreferencePage="true"
-            label="DPP User"
+            label="%specification.label.4"
             overviewRulerPreferenceValue="false"
             presentationLayer="7"
             textPreferenceValue="true"
@@ -311,7 +311,7 @@
             contributesToHeader="false"
             highlightPreferenceValue="true"
             includeOnPreferencePage="true"
-            label="DPP User"
+            label="%specification.label.4"
             overviewRulerPreferenceValue="false"
             presentationLayer="7"
             textPreferenceValue="true"
@@ -329,7 +329,7 @@
             contributesToHeader="false"
             highlightPreferenceValue="true"
             includeOnPreferencePage="true"
-            label="DPP User"
+            label="%specification.label.4"
             overviewRulerPreferenceValue="false"
             presentationLayer="7"
             textPreferenceValue="true"
@@ -347,7 +347,7 @@
             contributesToHeader="false"
             highlightPreferenceValue="true"
             includeOnPreferencePage="true"
-            label="DPP User"
+            label="%specification.label.4"
             overviewRulerPreferenceValue="false"
             presentationLayer="7"
             textPreferenceValue="true"
@@ -362,7 +362,7 @@
             highlightPreferenceKey="de.fu_berlin.inf.dpp.annotations.selection.highlight.1"
             highlightPreferenceValue="true"
             includeOnPreferencePage="true"
-            label="DPP Selection of buddy 1"
+            label="%specification.label.10"
             overviewRulerPreferenceKey="de.fu_berlin.inf.dpp.annotations.selection.overview.1"
             overviewRulerPreferenceValue="true"
             presentationLayer="8"
@@ -380,7 +380,7 @@
             highlightPreferenceKey="de.fu_berlin.inf.dpp.annotations.selection.highlight.2"
             highlightPreferenceValue="true"
             includeOnPreferencePage="true"
-            label="DPP Selection of buddy 2"
+            label="%specification.label.11"
             overviewRulerPreferenceKey="de.fu_berlin.inf.dpp.annotations.selection.overview.2"
             overviewRulerPreferenceValue="true"
             presentationLayer="8"
@@ -398,7 +398,7 @@
             highlightPreferenceKey="de.fu_berlin.inf.dpp.annotations.selection.highlight.3"
             highlightPreferenceValue="true"
             includeOnPreferencePage="true"
-            label="DPP Selection of buddy 3"
+            label="%specification.label.12"
             overviewRulerPreferenceKey="de.fu_berlin.inf.dpp.annotations.selection.overview.3"
             overviewRulerPreferenceValue="true"
             presentationLayer="8"
@@ -416,7 +416,7 @@
             highlightPreferenceKey="de.fu_berlin.inf.dpp.annotations.selection.highlight.4"
             highlightPreferenceValue="true"
             includeOnPreferencePage="true"
-            label="DPP Selection of buddy 4"
+            label="%specification.label.13"
             overviewRulerPreferenceKey="de.fu_berlin.inf.dpp.annotations.selection.overview.4"
             overviewRulerPreferenceValue="true"
             presentationLayer="8"
@@ -434,7 +434,7 @@
             highlightPreferenceKey="de.fu_berlin.inf.dpp.annotations.selection.highlight.5"
             highlightPreferenceValue="true"
             includeOnPreferencePage="true"
-            label="DPP Selection of buddy 5"
+            label="%specification.label.14"
             overviewRulerPreferenceKey="de.fu_berlin.inf.dpp.annotations.selection.overview.5"
             overviewRulerPreferenceValue="true"
             presentationLayer="8"
@@ -478,32 +478,32 @@
          point="org.eclipse.ui.commands">
       <command
             id="de.fu_berlin.inf.dpp.ui.commands.Empty"
-            name="EMPTY COMMAND">
+            name="%command.name">
       </command>
       <command
             categoryId="org.eclipse.ui.category.project"
             id="de.fu_berlin.inf.dpp.ui.commands.GettingStarted"
-            name="Getting Started...">
+            name="%command.name.0">
       </command>
       <command
             categoryId="org.eclipse.ui.category.project"
             id="de.fu_berlin.inf.dpp.ui.commands.StartSarosConfiguration"
-            name="Start Saros Configuration...">
+            name="%command.name.1">
       </command>
       <command
             categoryId="org.eclipse.ui.category.project"
             id="de.fu_berlin.inf.dpp.ui.commands.CreateXMPPAccount"
-            name="Create XMPP/Jabber Account...">
+            name="%command.name.2">
       </command>
       <command
             categoryId="org.eclipse.ui.category.project"
             id="de.fu_berlin.inf.dpp.ui.commands.AddBuddy"
-            name="Add Buddy...">
+            name="%command.name.3">
       </command>
       <command
             categoryId="org.eclipse.ui.category.project"
             id="de.fu_berlin.inf.dpp.ui.commands.OpenSarosPreferences"
-            name="Preferences...">
+            name="%command.name.4">
       </command>
    </extension>
    <extension
@@ -539,32 +539,32 @@
       <command
             categoryId="org.eclipse.ui.category.project"
             id="de.fu_berlin.inf.dpp.ui.commands.ShareResource"
-            name="Share Project(s)...">
+            name="%command.name.5">
       </command>
       <command
             categoryId="org.eclipse.ui.category.project"
             id="de.fu_berlin.inf.dpp.ui.commands.SharedProjectLeave"
-            name="Leave Session...">
+            name="%command.name.6">
       </command>
       <command
             categoryId="org.eclipse.ui.category.project"
             id="de.fu_berlin.inf.dpp.ui.commands.SharedProjectAddResources"
-            name="Add Projects...">
+            name="%command.name.7">
       </command>
       <command
             categoryId="org.eclipse.ui.category.project"
             id="de.fu_berlin.inf.dpp.ui.commands.SharedProjectAddBuddies"
-            name="Add Buddies...">
+            name="%command.name.8">
       </command>
       <command
             categoryId="org.eclipse.ui.category.project"
             id="de.fu_berlin.inf.dpp.ui.commands.SharedProjectAddSelectedResources"
-            name="Add to Saros Session">
+            name="%command.name.9">
       </command>
       <command
             categoryId="org.eclipse.ui.category.project"
             id="de.fu_berlin.inf.dpp.ui.commands.SharedProjectAddSelectedBuddies"
-            name="Add to Saros Session">
+            name="%command.name.10">
       </command>
    </extension>
    <extension
@@ -679,7 +679,7 @@
             locationURI="menu:org.eclipse.ui.main.menu?after=additions">
          <menu
                id="de.fu_berlin.inf.dpp.ui.main.menu"
-               label="Saros">
+               label="%menu.label">
             <visibleWhen
                   checkEnabled="false">
             </visibleWhen>
@@ -714,7 +714,7 @@
                   commandId="de.fu_berlin.inf.dpp.ui.commands.Empty"
                   disabledIcon="icons/dlcl16/buddy_add_tsk.png"
                   icon="icons/elcl16/buddy_add_tsk.png"
-                  label="Add Buddy... (Not Connected)"
+                  label="%command.label"
                   style="push">
                <visibleWhen
                      checkEnabled="false">
@@ -749,7 +749,7 @@
                   commandId="de.fu_berlin.inf.dpp.ui.commands.Empty"
                   disabledIcon="icons/dlcl16/project_share_tsk.png"
                   icon="icons/elcl16/project_share_tsk.png"
-                  label="Share Projects... (Not Connected)"
+                  label="%command.label.0"
                   style="push">
                <visibleWhen
                      checkEnabled="false">
@@ -781,7 +781,7 @@
             </command>
             <command
                   commandId="de.fu_berlin.inf.dpp.ui.commands.Empty"
-                  label="Session Running"
+                  label="%command.label.1"
                   style="push">
                <visibleWhen
                      checkEnabled="false">
@@ -828,7 +828,7 @@
                   commandId="de.fu_berlin.inf.dpp.ui.commands.SharedProjectLeave"
                   disabledIcon="icons/dlcl16/project_share_leave_tsk.png"
                   icon="icons/elcl16/project_share_leave_tsk.png"
-                  label="Leave Session..."
+                  label="%command.label.2"
                   style="push">
                <visibleWhen
                      checkEnabled="false">
@@ -851,7 +851,7 @@
                   commandId="de.fu_berlin.inf.dpp.ui.commands.SharedProjectLeave"
                   disabledIcon="icons/dlcl16/project_share_terminate_tsk.png"
                   icon="icons/elcl16/project_share_terminate_tsk.png"
-                  label="Stop Session..."
+                  label="%command.label.3"
                   style="push">
                <visibleWhen
                      checkEnabled="false">
@@ -919,7 +919,7 @@
                commandId="de.fu_berlin.inf.dpp.ui.commands.Empty"
                disabledIcon="icons/dlcl16/project_share_tsk.png"
                icon="icons/elcl16/project_share_tsk.png"
-               label="Share Projects... (Not Connected)"
+               label="%command.label.4"
                style="push">
             <visibleWhen
                   checkEnabled="false">
@@ -988,7 +988,7 @@
                commandId="de.fu_berlin.inf.dpp.ui.commands.Empty"
                disabledIcon="icons/dlcl16/buddy_add_tsk.png"
                icon="icons/elcl16/buddy_add_tsk.png"
-               label="Add Buddy... (Not Connected)"
+               label="%command.label.5"
                style="push">
             <visibleWhen
                   checkEnabled="false">
@@ -1054,8 +1054,8 @@
             locationURI="popup:org.eclipse.ui.popup.any?after=CollaborationStart">
             <menu
                   icon="icons/elcl16/project_share_tsk.png"
-                  label="Share With"
-                  tooltip="Share the Selected Projects With Your Buddies">
+                  label="%menu.label.0"
+                  tooltip="%menu.tooltip">
                   <visibleWhen
                   checkEnabled="false">
                      <and>
@@ -1075,7 +1075,7 @@
                </separator>
                <command
                      commandId="de.fu_berlin.inf.dpp.ui.commands.Empty"
-                     label="Not Connected"
+                     label="%command.label.6"
                      style="push">
                   <visibleWhen
                         checkEnabled="false">
@@ -1102,7 +1102,7 @@
                </separator>
                <command
                      commandId="de.fu_berlin.inf.dpp.ui.commands.ShareResource"
-                     label="Multiple Buddies..."
+                     label="%command.label.7"
                      style="push">
                </command>
                <separator
@@ -1144,8 +1144,8 @@
             locationURI="popup:org.eclipse.ui.popup.any?after=CollaborationStart">
          <menu
                icon="icons/elcl16/project_share_tsk.png"
-               label="Work Together On"
-               tooltip="Share Projects With Selected Buddies">
+               label="%plugin.workTogetherOn"
+               tooltip="%menu.tooltip.0">
             <visibleWhen
                   checkEnabled="false">
                <and>
@@ -1165,7 +1165,7 @@
             </separator>
             <command
                   commandId="de.fu_berlin.inf.dpp.ui.commands.Empty"
-                  label="Not Connected"
+                  label="%command.label.8"
                   style="push">
                <visibleWhen
                      checkEnabled="false">
@@ -1192,7 +1192,7 @@
             </separator>
             <command
                   commandId="de.fu_berlin.inf.dpp.ui.commands.ShareResource"
-                  label="Multiple Projects..."
+                  label="%command.label.9"
                   style="push">
             </command>
             <separator
@@ -1235,7 +1235,7 @@
                commandId="de.fu_berlin.inf.dpp.ui.commands.SharedProjectLeave"
                disabledIcon="icons/dlcl16/project_share_leave_tsk.png"
                icon="icons/elcl16/project_share_leave_tsk.png"
-               label="Leave Saros Session..."
+               label="%command.label.10"
                style="push">
             <visibleWhen
                   checkEnabled="false">
@@ -1255,7 +1255,7 @@
                commandId="de.fu_berlin.inf.dpp.ui.commands.SharedProjectLeave"
                disabledIcon="icons/dlcl16/project_share_terminate_tsk.png"
                icon="icons/elcl16/project_share_terminate_tsk.png"
-               label="Stop Saros Session..."
+               label="%command.label.11"
                style="push">
             <visibleWhen
                   checkEnabled="false">

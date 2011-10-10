@@ -14,6 +14,7 @@ import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.accountManagement.XMPPAccount;
 import de.fu_berlin.inf.dpp.accountManagement.XMPPAccountStore;
 import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.ui.widgets.wizard.EnterXMPPAccountComposite;
 import de.fu_berlin.inf.dpp.ui.widgets.wizard.events.EnterXMPPAccountCompositeListener;
 import de.fu_berlin.inf.dpp.ui.widgets.wizard.events.IsSarosXMPPServerChangedEvent;
@@ -25,8 +26,8 @@ import de.fu_berlin.inf.dpp.ui.widgets.wizard.events.XMPPServerChangedEvent;
  * @author bkahlert
  */
 public class EditXMPPAccountWizardPage extends WizardPage {
-    public static final String TITLE = "Enter XMPP/Jabber ID";
-    public static final String DESCRIPTION = "Please enter you XMPP/Jabber ID and password.";
+    public static final String TITLE = Messages.EditXMPPAccountWizardPage_title;
+    public static final String DESCRIPTION = Messages.EditXMPPAccountWizardPage_description;
 
     @Inject
     protected Saros saros;

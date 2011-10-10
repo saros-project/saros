@@ -1,6 +1,7 @@
 package de.fu_berlin.inf.dpp.ui.actions;
 
 import java.lang.reflect.InvocationTargetException;
+import java.text.MessageFormat;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -24,6 +25,7 @@ import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.project.AbstractSarosSessionListener;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.SarosSessionManager;
+import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.ui.views.SarosView;
 import de.fu_berlin.inf.dpp.util.Utils;
 import de.fu_berlin.inf.dpp.util.ValueChangeListener;
@@ -46,7 +48,7 @@ public class ConsistencyAction extends Action {
 
         setImageDescriptor(PlatformUI.getWorkbench().getSharedImages()
             .getImageDescriptor(ISharedImages.IMG_OBJS_WARN_TSK));
-        setToolTipText("No inconsistencies");
+        setToolTipText(Messages.ConsistencyAction_tooltip_no_inconsistency);
 
         SarosPluginContext.initComponent(this);
 
@@ -90,12 +92,12 @@ public class ConsistencyAction extends Action {
         public void setValue(Boolean newValue) {
 
             if (sarosSession.isHost() && newValue == true) {
-                log.warn("No inconsistency should ever be reported"
-                    + " to the host");
+                log.warn("No inconsistency should ever be reported" //$NON-NLS-1$
+                    + " to the host"); //$NON-NLS-1$
                 return;
             }
-            log.debug("Inconsistency indicator goes: "
-                + (newValue ? "on" : "off"));
+            log.debug("Inconsistency indicator goes: " //$NON-NLS-1$
+                + (newValue ? "on" : "off")); //$NON-NLS-1$ //$NON-NLS-2$
             setEnabled(newValue);
 
             if (newValue) {
@@ -108,8 +110,10 @@ public class ConsistencyAction extends Action {
                         String files = Utils.toOSString(paths);
 
                         // set tooltip
-                        setToolTipText("Inconsistency Detected in file(s): "
-                            + files);
+                        setToolTipText(MessageFormat
+                            .format(
+                                Messages.ConsistencyAction_tooltip_inconsistency_detected,
+                                files));
 
                         // TODO Balloon is too aggressive at the moment, when
                         // the host is slow in sending changes (for instance
@@ -118,16 +122,15 @@ public class ConsistencyAction extends Action {
                         // show balloon notification
                         SarosView
                             .showNotification(
-                                "Inconsistencies detected",
-                                "These files have become unsynchronised with the host:\n"
-                                    + files
-                                    + "\n\nPress the inconsistency recovery button to synchronise your project."
-                                    + " \nYou may wish to backup those file(s) in case important changes are overwritten.");
+                                Messages.ConsistencyAction_title_inconsistency_deteced,
+                                MessageFormat
+                                    .format(
+                                        Messages.ConsistencyAction_message_inconsistency_detected,
+                                        files));
                     }
                 });
-
             } else {
-                setToolTipText("No inconsistencies");
+                setToolTipText(Messages.ConsistencyAction_tooltip_no_inconsistency);
             }
         }
 
@@ -138,7 +141,7 @@ public class ConsistencyAction extends Action {
         Utils.runSafeSWTAsync(log, new Runnable() {
 
             public void run() {
-                log.debug("Buddy activated CW recovery.");
+                log.debug("Buddy activated CW recovery."); //$NON-NLS-1$
 
                 Shell dialogShell = EditorAPI.getShell();
                 if (dialogShell == null)
@@ -152,15 +155,18 @@ public class ConsistencyAction extends Action {
                             throws InterruptedException {
 
                             SubMonitor progress = SubMonitor.convert(monitor);
-                            progress.beginTask("Performing recovery...", 100);
+                            progress
+                                .beginTask(
+                                    Messages.ConsistencyAction_progress_perform_recovery,
+                                    100);
                             watchdogClient.runRecovery(progress.newChild(100));
                             monitor.done();
                         }
                     });
                 } catch (InvocationTargetException e) {
-                    log.error("Exception not expected here.", e);
+                    log.error("Exception not expected here.", e); //$NON-NLS-1$
                 } catch (InterruptedException e) {
-                    log.error("Exception not expected here.", e);
+                    log.error("Exception not expected here.", e); //$NON-NLS-1$
                 }
             }
         });

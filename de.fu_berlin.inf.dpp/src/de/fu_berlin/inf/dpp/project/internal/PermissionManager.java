@@ -1,5 +1,6 @@
 package de.fu_berlin.inf.dpp.project.internal;
 
+import java.text.MessageFormat;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -18,6 +19,7 @@ import de.fu_berlin.inf.dpp.project.IActivityProvider;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ISarosSessionListener;
 import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
+import de.fu_berlin.inf.dpp.project.Messages;
 import de.fu_berlin.inf.dpp.project.SarosSessionManager;
 import de.fu_berlin.inf.dpp.ui.views.SarosView;
 
@@ -43,22 +45,34 @@ public class PermissionManager implements IActivityProvider {
              * SessionView because it is not guaranteed there actually is a
              * session view open.
              */
-            SarosView.showNotification("Permission changed", String.format(
-                "%s %s now %s access for this session.",
-                user.getHumanReadableName(), user.isLocal() ? "have" : "has",
-                user.hasWriteAccess() ? "write" : "read-only"));
+            if (user.isLocal()) {
+                SarosView.showNotification(Messages.PermissionManager_permission_changed, MessageFormat
+                    .format(Messages.PermissionManager_you_have_now_access, user
+                        .getHumanReadableName(),
+                        user.hasWriteAccess() ? Messages.PermissionManager_write : Messages.PermissionManager_read_only));
+            } else {
+                SarosView.showNotification(Messages.PermissionManager_permission_changed, MessageFormat
+                    .format(Messages.PermissionManager_he_has_now_access, user
+                        .getHumanReadableName(),
+                        user.hasWriteAccess() ? Messages.PermissionManager_write : Messages.PermissionManager_read_only));
+
+            }
         }
 
         @Override
         public void userJoined(User user) {
-            SarosView.showNotification("Buddy joined the session",
-                user.getHumanReadableName() + " joined the session.");
+            SarosView.showNotification(
+                Messages.PermissionManager_buddy_joined,
+                MessageFormat.format(Messages.PermissionManager_buddy_joined_text,
+                    user.getHumanReadableName()));
         }
 
         @Override
         public void userLeft(User user) {
-            SarosView.showNotification("Buddy left the session",
-                user.getHumanReadableName() + " left the session.");
+            SarosView.showNotification(
+                Messages.PermissionManager_buddy_left,
+                MessageFormat.format(Messages.PermissionManager_buddy_left_text,
+                    user.getHumanReadableName()));
         }
     };
 
@@ -115,8 +129,9 @@ public class PermissionManager implements IActivityProvider {
             PermissionActivity permissionActivity = (PermissionActivity) activity;
             User user = permissionActivity.getAffectedUser();
             if (!user.isInSarosSession()) {
-                throw new IllegalArgumentException("Buddy " + user
-                    + " is not a participant in this shared project");
+                throw new IllegalArgumentException(MessageFormat.format(
+                    Messages.PermissionManager_buddy_no_participant,
+                    user));
             }
             Permission permission = permissionActivity.getPermission();
             this.sarosSession.setPermission(user, permission);

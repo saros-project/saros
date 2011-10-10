@@ -51,5 +51,6 @@ public class FreeColors {
             && (!freeColors.contains(colorID))) {
             freeColors.add(colorID);
         }
+        // for better testing something should happen in the else case
     }
 }

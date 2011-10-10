@@ -28,6 +28,7 @@ import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.project.internal.ChangeColorManager;
 import de.fu_berlin.inf.dpp.ui.ImageManager;
+import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.ui.util.selection.SelectionUtils;
 import de.fu_berlin.inf.dpp.ui.util.selection.retriever.SelectionRetrieverFactory;
 import de.fu_berlin.inf.dpp.util.Utils;
@@ -60,12 +61,12 @@ public class ChangeColorAction extends Action implements Disposable {
     protected EditorManager editorManager;
 
     public ChangeColorAction() {
-        super("Change Color");
+        super(Messages.ChangeColorAction_title);
         SarosPluginContext.initComponent(this);
 
-        setToolTipText("changes your session colour");
+        setToolTipText(Messages.ChangeColorAction_tooltip);
         setImageDescriptor(ImageManager
-            .getImageDescriptor("icons/elcl16/changecolor.png"));
+            .getImageDescriptor("icons/elcl16/changecolor.png")); //$NON-NLS-1$
 
         SelectionUtils.getSelectionService().addSelectionListener(
             selectionListener);
@@ -84,7 +85,7 @@ public class ChangeColorAction extends Action implements Disposable {
             this.setEnabled(false);
         } catch (Exception e) {
             if (!PlatformUI.getWorkbench().isClosing())
-                log.error("Unexcepted error while updating enablement", e);
+                log.error("Unexcepted error while updating enablement", e); //$NON-NLS-1$
         }
     }
 
@@ -97,7 +98,7 @@ public class ChangeColorAction extends Action implements Disposable {
             public void run() {
                 boolean done = false;
                 ColorDialog changeColor = new ColorDialog(EditorAPI.getShell());
-                changeColor.setText("Please choose your color");
+                changeColor.setText(Messages.ChangeColorAction_dialog_text);
                 while (!done) {
                     RGB selectedColor = changeColor.open();
                     if (selectedColor == null) {
@@ -113,7 +114,7 @@ public class ChangeColorAction extends Action implements Disposable {
 
                     if (ChangeColorManager.checkColor(selectedColor,
                         listOfUsers)) {
-                        log.info(selectedColor + " was selected.");
+                        log.info(selectedColor + " was selected."); //$NON-NLS-1$
                         SarosAnnotation.setUserColor(localUser, selectedColor);
                         for (User user : listOfUsers) {
                             sarosSession.sendActivity(user,
@@ -125,7 +126,7 @@ public class ChangeColorAction extends Action implements Disposable {
                         done = true;
                     } else {
                         MessageDialog.openInformation(EditorAPI.getShell(),
-                            "Color Information", "Please choose another color");
+                            Messages.ChangeColorAction_message_title, Messages.ChangeColorAction_message_text);
                     }
                 }
             }
@@ -137,3 +138,4 @@ public class ChangeColorAction extends Action implements Disposable {
             selectionListener);
     }
 }
+

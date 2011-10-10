@@ -33,6 +33,7 @@ import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.net.internal.subscriptionManager.SubscriptionManager;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
 import de.fu_berlin.inf.dpp.ui.ImageManager;
+import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.ui.util.DialogUtils;
 import de.fu_berlin.inf.dpp.ui.wizards.pages.AddBuddyWizardPage;
 
@@ -42,7 +43,7 @@ import de.fu_berlin.inf.dpp.ui.wizards.pages.AddBuddyWizardPage;
  * @author bkahlert
  */
 public class GettingStartedWizard extends Wizard {
-    public static final String TITLE = "Getting Started";
+    public static final String TITLE = Messages.GettingStartedWizard_title;
     public static final ImageDescriptor IMAGE = ImageManager.WIZBAN_ADD_BUDDY;
 
     @Inject
@@ -150,24 +151,27 @@ public class GettingStartedWizard extends Wizard {
 
     @Override
     public void addPages() {
-        this.addPage(new GettingStartedPage("Getting Started", null,
+        this.addPage(new GettingStartedPage(
+            Messages.GettingStartedWizard_title, null,
             ImageManager.WIZBAN_GETTING_STARTED_STEP0,
             ImageManager.IMAGE_GETTING_STARTED_STEP0));
         this.addPage(new GettingStartedPage(
-            "Step 1: Configure Your Account",
-            "The Saros configuration wizard will help you set your Jabber/XMPP account.",
+            Messages.GettingStartedWizard_step1_account,
+            Messages.GettingStartedWizard_step1_account_text,
             ImageManager.WIZBAN_GETTING_STARTED_STEP1,
             ImageManager.IMAGE_GETTING_STARTED_STEP1));
         this.addPage(new GettingStartedPage(
-            "Step 2: Add Your Buddies",
-            "You will need to add buddies to your buddy list in order to work with them.",
+            Messages.GettingStartedWizard_step2_buddy,
+            Messages.GettingStartedWizard_step2_buddy_text,
             ImageManager.WIZBAN_GETTING_STARTED_STEP2,
             ImageManager.IMAGE_GETTING_STARTED_STEP2));
-        this.addPage(new GettingStartedPage("Step 3: Start Working Together",
-            "Saros offers you many ways to start a collaboration.",
+        this.addPage(new GettingStartedPage(
+            Messages.GettingStartedWizard_step3_workTogether,
+            Messages.GettingStartedWizard_step3_workTogether_text,
             ImageManager.WIZBAN_GETTING_STARTED_STEP3,
             ImageManager.IMAGE_GETTING_STARTED_STEP3));
-        this.addPage(new GettingStartedPage("Finish", null,
+        this.addPage(new GettingStartedPage(
+            Messages.GettingStartedWizard_finish, null,
             ImageManager.WIZBAN_GETTING_STARTED_STEP4,
             (showConfigNote) ? ImageManager.IMAGE_GETTING_STARTED_STEP4_CONFIG
                 : ImageManager.IMAGE_GETTING_STARTED_STEP4_NOCONFIG));
@@ -190,9 +194,8 @@ public class GettingStartedWizard extends Wizard {
             boolean finished = !DialogUtils
                 .openQuestionMessageDialog(
                     this.getShell(),
-                    "Show Again?",
-                    "Do you want this tutorial to show up again on your next start of Eclipse?\n\n"
-                        + "If not you have always the possiblity to start the tutorial via the Saros main menu.");
+                    Messages.GettingStartedWizard_show_again,
+                    Messages.GettingStartedWizard_show_again_text);
             preferenceUtils.setGettingStartedFinished(finished);
         }
         return true;

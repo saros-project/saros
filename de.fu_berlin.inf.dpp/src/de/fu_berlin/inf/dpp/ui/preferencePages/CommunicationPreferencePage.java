@@ -24,6 +24,7 @@ import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.communication.audio.MixerManager;
 import de.fu_berlin.inf.dpp.preferences.AudioSettings;
 import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
+import de.fu_berlin.inf.dpp.ui.Messages;
 
 @Component(module = "prefs")
 public class CommunicationPreferencePage extends FieldEditorPreferencePage
@@ -206,8 +207,8 @@ public class CommunicationPreferencePage extends FieldEditorPreferencePage
         String recordDevices[][];
         if (mixerInfo.length == 0) {
             recordDevices = new String[1][2];
-            recordDevices[0][0] = "";
-            recordDevices[0][1] = "UNKNOWN";
+            recordDevices[0][0] = ""; //$NON-NLS-1$
+            recordDevices[0][1] = Messages.CommunicationPreferencePage_unknown;
         } else {
             recordDevices = new String[mixerInfo.length][2];
             for (int i = 0; i < mixerInfo.length; i++) {
@@ -223,8 +224,8 @@ public class CommunicationPreferencePage extends FieldEditorPreferencePage
         String playbackDevices[][];
         if (mixerInfo.length == 0) {
             playbackDevices = new String[1][2];
-            playbackDevices[0][0] = "";
-            playbackDevices[0][1] = "UNKNOWN";
+            playbackDevices[0][0] = ""; //$NON-NLS-1$
+            playbackDevices[0][1] = Messages.CommunicationPreferencePage_unknown;
         } else {
             playbackDevices = new String[mixerInfo.length][2];
             for (int i = 0; i < mixerInfo.length; i++) {

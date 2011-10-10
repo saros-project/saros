@@ -24,6 +24,7 @@ import de.fu_berlin.inf.dpp.project.ISarosSessionListener;
 import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
 import de.fu_berlin.inf.dpp.project.SarosSessionManager;
 import de.fu_berlin.inf.dpp.ui.ImageManager;
+import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
 import de.fu_berlin.inf.dpp.ui.util.selection.SelectionUtils;
 import de.fu_berlin.inf.dpp.ui.util.selection.retriever.SelectionRetrieverFactory;
@@ -73,7 +74,7 @@ public class RestrictToReadOnlyAccessAction extends Action implements
     protected SarosSessionManager sessionManager;
 
     public RestrictToReadOnlyAccessAction() {
-        super("Restrict to Read-Only Access");
+        super(Messages.RestrictToReadOnlyAccessAction_title);
         SarosPluginContext.initComponent(this);
 
         setImageDescriptor(new ImageDescriptor() {
@@ -83,7 +84,7 @@ public class RestrictToReadOnlyAccessAction extends Action implements
             }
         });
 
-        setToolTipText("Restrict to Read-Only Access");
+        setToolTipText(Messages.RestrictToReadOnlyAccessAction_tooltip);
 
         /*
          * if SessionView is not "visible" on session start up this constructor
@@ -114,11 +115,11 @@ public class RestrictToReadOnlyAccessAction extends Action implements
                             Permission.READONLY_ACCESS);
                         updateEnablement();
                     } else {
-                        log.warn("Participant has does not have write access: "
+                        log.warn("Participant has does not have write access: " //$NON-NLS-1$
                             + participants.get(0));
                     }
                 } else {
-                    log.warn("More than one participant selected.");
+                    log.warn("More than one participant selected."); //$NON-NLS-1$
                 }
             }
         });
@@ -135,7 +136,7 @@ public class RestrictToReadOnlyAccessAction extends Action implements
             this.setEnabled(false);
         } catch (Exception e) {
             if (!PlatformUI.getWorkbench().isClosing())
-                log.error("Unexcepted error while updating enablement", e);
+                log.error("Unexcepted error while updating enablement", e); //$NON-NLS-1$
         }
     }
 

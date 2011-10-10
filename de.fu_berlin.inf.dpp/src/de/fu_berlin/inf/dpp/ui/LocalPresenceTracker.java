@@ -50,11 +50,11 @@ public class LocalPresenceTracker {
         try {
             bench = PlatformUI.getWorkbench();
         } catch (IllegalStateException e) {
-            log.warn("Workbench not found, assuming headless test");
+            log.warn("Workbench not found, assuming headless test"); //$NON-NLS-1$
             return;
         }
         if (bench == null) {
-            log.error("Could not get IWorkbench!");
+            log.error("Could not get IWorkbench!"); //$NON-NLS-1$
             return;
         }
 
@@ -92,8 +92,8 @@ public class LocalPresenceTracker {
             protected void setActiveDeferred(final boolean active) {
                 Utils.wrapSafe(log, new Runnable() {
                     public void run() {
-                        log.debug("Eclipse window now "
-                            + (active ? "  " : "in") + "active.");
+                        log.debug("Eclipse window now " //$NON-NLS-1$
+                            + (active ? "  " : "in") + "active."); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
                         /*
                          * Wait one second before sending an active presence
                          * update and 5 seconds for an away update.
@@ -122,10 +122,10 @@ public class LocalPresenceTracker {
         Presence presence = new Presence(Presence.Type.available);
         if (active) {
             presence.setMode(Presence.Mode.available);
-            presence.setStatus("Eclipse window is active");
+            presence.setStatus(Messages.LocalPresenceTracker_eclipse_active);
         } else {
             presence.setMode(Presence.Mode.away);
-            presence.setStatus("Eclipse window is in the background");
+            presence.setStatus(Messages.LocalPresenceTracker_eclipse_background);
         }
         connection.sendPacket(presence);
     }

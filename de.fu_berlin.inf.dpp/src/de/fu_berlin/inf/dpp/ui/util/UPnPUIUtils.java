@@ -7,6 +7,7 @@ import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Label;
 
 import de.fu_berlin.inf.dpp.net.UPnP.UPnPManager;
+import de.fu_berlin.inf.dpp.ui.Messages;
 
 /**
  * Class for UPnP related UI methods
@@ -40,7 +41,7 @@ public class UPnPUIUtils {
         // if no devices are found, return now - nothing to populate
         if (upnpManager.getGateways() == null
             || upnpManager.getGateways().isEmpty()) {
-            info.setText("No gateway found.");
+            info.setText(Messages.UPnPUIUtils_no_gateway);
             info.getParent().pack();
             return;
         }
@@ -51,7 +52,7 @@ public class UPnPUIUtils {
             try {
                 String name = gw.getFriendlyName();
                 if (!gw.isConnected())
-                    name += " (disconnected)";
+                    name += Messages.UPnPUIUtils_disconnected;
 
                 combo.add(name);
 
@@ -60,7 +61,7 @@ public class UPnPUIUtils {
                         upnpManager.getSelectedGateway().getUSN()))
                     indexToSelect = combo.getItemCount() - 1;
             } catch (Exception e) {
-                log.debug("Error updating UPnP selector:" + e.getMessage());
+                log.debug("Error updating UPnP selector:" + e.getMessage()); //$NON-NLS-1$
                 // ignore faulty gateway
             }
         }
@@ -73,7 +74,7 @@ public class UPnPUIUtils {
             combo.pack();
             info.setVisible(false);
         } else {
-            info.setText("No valid gateway found.");
+            info.setText(Messages.UPnPUIUtils_no_valid_gateway);
         }
         info.getParent().pack();
     }

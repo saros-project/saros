@@ -21,6 +21,7 @@ import org.picocontainer.annotations.Inject;
 import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.accountManagement.XMPPAccountStore;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
+import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.ui.util.LayoutUtils;
 import de.fu_berlin.inf.dpp.ui.widgets.explanation.note.SimpleNoteComposite;
 import de.fu_berlin.inf.dpp.ui.widgets.wizard.PublicXMPPServerComposite;
@@ -33,8 +34,8 @@ import de.fu_berlin.inf.dpp.ui.widgets.wizard.PublicXMPPServerComposite;
  */
 public class CreateXMPPAccountWizardPage extends WizardPage {
 
-    public static final String TITLE = "Create XMPP/Jabber Account";
-    public static final String DESCRIPTION = "Create a new XMPP/Jabber account for use with Saros.";
+    public static final String TITLE = Messages.CreateXMPPAccountWizardPage_title;
+    public static final String DESCRIPTION = Messages.CreateXMPPAccountWizardPage_description;
 
     private Combo serverText;
     private Text usernameText;
@@ -90,7 +91,7 @@ public class CreateXMPPAccountWizardPage extends WizardPage {
          * Row 1
          */
         Label serverLabel = new Label(leftColumn, SWT.NONE);
-        serverLabel.setText("XMPP/Jabber Server");
+        serverLabel.setText(Messages.CreateXMPPAccountWizardPage_label_server);
 
         this.serverText = new Combo(leftColumn, SWT.BORDER);
         this.serverText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true,
@@ -111,7 +112,7 @@ public class CreateXMPPAccountWizardPage extends WizardPage {
          * Row 2
          */
         Label usernameLabel = new Label(leftColumn, SWT.NONE);
-        usernameLabel.setText("Username");
+        usernameLabel.setText(Messages.CreateXMPPAccountWizardPage_label_username);
 
         this.usernameText = new Text(leftColumn, SWT.BORDER);
         this.usernameText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER,
@@ -121,7 +122,7 @@ public class CreateXMPPAccountWizardPage extends WizardPage {
          * Row 3
          */
         Label passwordLabel = new Label(leftColumn, SWT.NONE);
-        passwordLabel.setText("Password");
+        passwordLabel.setText(Messages.CreateXMPPAccountWizardPage_label_password);
 
         this.passwordText = new Text(leftColumn, SWT.BORDER);
         this.passwordText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER,
@@ -132,7 +133,7 @@ public class CreateXMPPAccountWizardPage extends WizardPage {
          * Row 4
          */
         Label repeatPasswordLabel = new Label(leftColumn, SWT.NONE);
-        repeatPasswordLabel.setText("Repeat Password");
+        repeatPasswordLabel.setText(Messages.CreateXMPPAccountWizardPage_label_repeat_password);
 
         this.repeatPasswordText = new Text(leftColumn, SWT.BORDER);
         this.repeatPasswordText.setLayoutData(new GridData(SWT.FILL,
@@ -148,7 +149,7 @@ public class CreateXMPPAccountWizardPage extends WizardPage {
 
         this.useNowButton = new Button(leftColumn, SWT.CHECK | SWT.SEPARATOR);
         this.useNowButton.setSelection(false);
-        this.useNowButton.setText("Use new account immediately");
+        this.useNowButton.setText(Messages.CreateXMPPAccountWizardPage_button_use_new_account);
         this.useNowButton.setLayoutData(new GridData(SWT.FILL, SWT.CENTER,
             true, false));
 
@@ -158,8 +159,8 @@ public class CreateXMPPAccountWizardPage extends WizardPage {
     }
 
     private void setInitialValues() {
-        defaultUsername = "";
-        defaultPassword = "";
+        defaultUsername = ""; //$NON-NLS-1$
+        defaultPassword = ""; //$NON-NLS-1$
         defaultServer = preferenceUtils.getServer();
 
         if (defaultServer.length() == 0)
@@ -223,20 +224,20 @@ public class CreateXMPPAccountWizardPage extends WizardPage {
             setErrorMessage(Messages.account_exists_errorMessage);
 
         else if (isUsernameEmpty && haveDefaultsChanged())
-            setErrorMessage("You must enter a username.");
+            setErrorMessage(Messages.CreateXMPPAccountWizardPage_error_enter_username);
 
         else if (isPasswordEmpty && haveDefaultsChanged())
             setErrorMessage(Messages.password_empty_errorMessage);
 
         else if (!passwordsMatch && haveDefaultsChanged())
-            setErrorMessage("The repeated password does not match the password.");
+            setErrorMessage(Messages.CreateXMPPAccountWizardPage_error_password_no_match);
 
         else if (isServerEmpty && haveDefaultsChanged())
-            setErrorMessage("You must enter a server.");
+            setErrorMessage(Messages.CreateXMPPAccountWizardPage_error_enter_server);
 
         if (complete && this.useNowButton.getSelection()) {
             setMessage(
-                "You will automatically connect to your new account after completion.",
+                Messages.CreateXMPPAccountWizardPage_message_you_will_connect,
                 IMessageProvider.INFORMATION);
         }
 

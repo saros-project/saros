@@ -19,6 +19,7 @@ import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.accountManagement.XMPPAccount;
 import de.fu_berlin.inf.dpp.accountManagement.XMPPAccountStore;
 import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.ui.util.WizardUtils;
 import de.fu_berlin.inf.dpp.ui.widgets.explanation.note.SimpleNoteComposite;
 import de.fu_berlin.inf.dpp.ui.widgets.wizard.EnterXMPPAccountComposite;
@@ -35,8 +36,8 @@ import de.fu_berlin.inf.dpp.util.FontUtils;
  * @author bkahlert
  */
 public class EnterXMPPAccountWizardPage extends WizardPage {
-    public static final String TITLE = "Enter XMPP/Jabber ID";
-    public static final String DESCRIPTION = "In order to use Saros you need to configure an XMPP/Jabber account.";
+    public static final String TITLE = Messages.EnterXMPPAccountWizardPage_title;
+    public static final String DESCRIPTION = Messages.EnterXMPPAccountWizardPage_description;
 
     @Inject
     protected Saros saros;
@@ -104,7 +105,7 @@ public class EnterXMPPAccountWizardPage extends WizardPage {
         Label separator = new Label(composite, SWT.NONE);
         separator.setLayoutData(new GridData(SWT.CENTER, SWT.CENTER, false,
             true));
-        separator.setText("OR");
+        separator.setText(Messages.EnterXMPPAccountWizardPage_or);
         FontUtils.changeFontSizeBy(separator, 10);
 
         /*
@@ -117,12 +118,9 @@ public class EnterXMPPAccountWizardPage extends WizardPage {
          * 2nd row
          */
 
-        SimpleNoteComposite x = new SimpleNoteComposite(
-            composite,
-            SWT.BORDER,
+        SimpleNoteComposite x = new SimpleNoteComposite(composite, SWT.BORDER,
             SWT.ICON_INFORMATION,
-            "If you already have some XMPP/Jabber account you can use it right away.\n"
-                + "For example users of Google, GMX, web.de or 1&&1 can directly use their mail address as their XMPP/Jabber ID with Saros.");
+            Messages.EnterXMPPAccountWizardPage_info_already_created_account);
         x.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false, 3, 1));
         x.setSpacing(8);
 
@@ -133,7 +131,8 @@ public class EnterXMPPAccountWizardPage extends WizardPage {
     protected Composite createLeftColumn(Composite composite) {
         Group newAccountColumnGroup = new Group(composite, SWT.NONE);
         newAccountColumnGroup.setLayout(new GridLayout(2, false));
-        newAccountColumnGroup.setText("New Account");
+        newAccountColumnGroup
+            .setText(Messages.EnterXMPPAccountWizardPage_new_account);
 
         Composite newAccountComposite = new Composite(newAccountColumnGroup,
             SWT.NONE);
@@ -142,7 +141,8 @@ public class EnterXMPPAccountWizardPage extends WizardPage {
         newAccountComposite.setLayout(new GridLayout(1, false));
 
         this.createAccountButton = new Button(newAccountComposite, SWT.PUSH);
-        this.createAccountButton.setText("Create New Account...");
+        this.createAccountButton
+            .setText(Messages.EnterXMPPAccountWizardPage_create_new_account);
         this.createAccountButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -157,7 +157,8 @@ public class EnterXMPPAccountWizardPage extends WizardPage {
     protected Composite createRightColumn(Composite composite) {
         Group existingAccountColumnGroup = new Group(composite, SWT.NONE);
         existingAccountColumnGroup.setLayout(new GridLayout(2, false));
-        existingAccountColumnGroup.setText("Existing Account");
+        existingAccountColumnGroup
+            .setText(Messages.EnterXMPPAccountWizardPage_existing_account);
 
         this.enterXMPPAccountComposite = new EnterXMPPAccountComposite(
             existingAccountColumnGroup, SWT.NONE);
@@ -217,11 +218,11 @@ public class EnterXMPPAccountWizardPage extends WizardPage {
             String password = account.getPassword();
 
             String jid;
-            if (username.contains("@")) {
+            if (username.contains("@")) { //$NON-NLS-1$
                 jid = username;
             } else {
-                jid = username + "@" + server;
-                server = "";
+                jid = username + "@" + server; //$NON-NLS-1$
+                server = ""; //$NON-NLS-1$
             }
 
             this.createAccountButton.setEnabled(false);

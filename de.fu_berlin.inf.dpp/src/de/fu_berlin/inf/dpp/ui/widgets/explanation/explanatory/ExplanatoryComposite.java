@@ -7,6 +7,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Layout;
 
+import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.ui.widgets.explanation.ExplanationComposite;
 import de.fu_berlin.inf.dpp.ui.widgets.explanation.exceptions.ContentControlInvalidException;
 
@@ -115,7 +116,7 @@ public class ExplanatoryComposite extends Composite {
             Control contentControl = this.getContentControl();
             if (contentControl == null)
                 throw new ContentControlInvalidException(
-                    "The content control was not set!", null);
+                    Messages.ExplanatoryComposite_content_control_not_set, null);
 
             this.stackLayout.topControl = contentControl;
             if (contentControl instanceof Composite) {

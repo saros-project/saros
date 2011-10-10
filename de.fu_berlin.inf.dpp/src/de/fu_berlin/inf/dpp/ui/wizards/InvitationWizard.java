@@ -1,5 +1,6 @@
 package de.fu_berlin.inf.dpp.ui.wizards;
 
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Set;
@@ -22,6 +23,7 @@ import de.fu_berlin.inf.dpp.net.internal.discoveryManager.DiscoveryManager;
 import de.fu_berlin.inf.dpp.observables.InvitationProcessObservable;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.SarosSessionManager;
+import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.ui.wizards.pages.InvitationWizardUserSelectionPage;
 import de.fu_berlin.inf.dpp.util.StackTrace;
 import de.fu_berlin.inf.dpp.util.Utils;
@@ -50,7 +52,7 @@ public class InvitationWizard extends Wizard {
         this.discoveryManager = discoveryManager;
         this.sessionManager = sessionManager;
         this.invitationProcesses = invitationProcesses;
-        setWindowTitle("Invitation");
+        setWindowTitle(Messages.InvitationWizard_title);
         setHelpAvailable(false);
         TrayDialog.setDialogHelpAvailable(false);
     }
@@ -75,20 +77,21 @@ public class InvitationWizard extends Wizard {
 
             while (projectSetIterator.hasNext()) {
                 IProject p = projectSetIterator.next();
-                projectString.append("- " + p.getName());
+                projectString.append("- " + p.getName()); //$NON-NLS-1$
                 if (projectSetIterator.hasNext())
-                    projectString.append("\n");
+                    projectString.append("\n"); //$NON-NLS-1$
             }
             log.debug(projectString);
         } else {
-            log.debug("There are no Projects to share");
+            log.debug(Messages.InvitationWizard_no_projects);
         }
 
         for (JID user : usersToInvite) {
             String hostName = sarosSession.getHost().getJID().getBase();
-            sessionManager.invite(user, hostName
-                + " has invited you to a Saros session"
-                + " on the following project(s): " + "\n\n" + projectString);
+            sessionManager
+                .invite(user, MessageFormat.format(
+                    Messages.InvitationWizard_invite_text, hostName,
+                    projectString));
 
         }
         return true;
@@ -141,15 +144,15 @@ public class InvitationWizard extends Wizard {
             return Utils.runSWTSync(new Callable<Boolean>() {
                 public Boolean call() {
                     return MessageDialog.openConfirm(getAShell(),
-                        "Invite buddy who does not support Saros?", "User "
-                            + peer + " does not seem to use Saros "
-                            + "(but rather a normal Instant Messaging client),"
-                            + " invite anyway?");
+                        Messages.InvitationWizard_invite_no_support,
+                        MessageFormat.format(
+                            Messages.InvitationWizard_invite_no_support_text,
+                            peer));
                 }
             });
         } catch (Exception e) {
             log.error(
-                "An error ocurred while trying to open the confirm dialog.", e);
+                "An error ocurred while trying to open the confirm dialog.", e); //$NON-NLS-1$
             return false;
         }
     }
@@ -177,43 +180,32 @@ public class InvitationWizard extends Wizard {
         if (!Saros.isWorkbenchAvailable()) {
             return true;
         }
-        final String title = "Saros Version Conflict with " + peer.getBase();
+        final String title = MessageFormat.format(
+            Messages.InvitationWizard_version_conflict, peer.getBase());
         final String message;
         if (remoteVersionInfo == null) {
-            message = "Asking "
-                + peer
-                + " for the Saros version in use failed.\n\n"
-                + "This probably means that the version used by your peer is\n"
-                + "older than version 9.8.21 and does not support version checking.\n"
-                + "It is best to ask your peer to update.\n\nDo you want to invite "
-                + peer.getBase() + " anyway?";
+            message = MessageFormat.format(
+                Messages.InvitationWizard_version_request_failed, peer,
+                peer.getBase());
         } else {
             switch (remoteVersionInfo.compatibility) {
             case TOO_OLD:
-                message = "Your Saros version is too old: " + localVersion
-                    + ".\nYour peer has a newer version: "
-                    + remoteVersionInfo.version
-                    + ".\nPlease check for updates!"
-                    + " Proceeding with incompatible versions"
-                    + " may cause malfunctions!\n\nDo you want to invite "
-                    + peer.getBase() + " anyway?";
+                message = MessageFormat.format(
+                    Messages.InvitationWizard_version_too_old, localVersion,
+                    remoteVersionInfo.version, peer.getBase());
                 break;
             case TOO_NEW:
-                message = "Your Saros version is: " + localVersion
-                    + ".\nYour peer has an older version: "
-                    + remoteVersionInfo.version
-                    + ".\nPlease tell your peer to check for updates!"
-                    + " Proceeding with incompatible versions"
-                    + " may cause malfunctions!\n\nDo you want to invite "
-                    + peer.getBase() + " anyway?";
+                message = MessageFormat.format(
+                    Messages.InvitationWizard_version_too_new, localVersion,
+                    remoteVersionInfo.version, peer.getBase());
                 break;
             default:
                 log.warn(
-                    "Warning message requested when no warning is in place!",
+                    "Warning message requested when no warning is in place!", //$NON-NLS-1$
                     new StackTrace());
                 // No warning to display
-                message = "An internal error occurred.\n\nDo you want to invite "
-                    + peer + " anyway?";
+                message = MessageFormat.format(
+                    Messages.InvitationWizard_invite_error, peer);
                 break;
             }
         }
@@ -227,7 +219,7 @@ public class InvitationWizard extends Wizard {
             });
         } catch (Exception e) {
             log.error(
-                "An error ocurred while trying to open the confirm dialog.", e);
+                "An error ocurred while trying to open the confirm dialog.", e); //$NON-NLS-1$
             return false;
         }
     }
@@ -237,13 +229,11 @@ public class InvitationWizard extends Wizard {
             return true;
         }
 
-        final String title = "Unable to determine Saros compatibility with "
-            + peer.getBase();
-        final String message = "Saros was unable to check the version number of your peer "
-            + peer.getBase()
-            + ", so it is possible that you are running incompatible versions of Saros. Please "
-            + "ensure that your peer is running the same version of Saros as you. (Your version is "
-            + localVersion.toString() + ".)\n\nDo you wish to proceed?";
+        final String title = MessageFormat.format(
+            Messages.InvitationWizard_is_compatible, peer.getBase());
+        final String message = MessageFormat.format(
+            Messages.InvitationWizard_version_check_failed_text,
+            peer.getBase(), localVersion.toString());
 
         try {
             return Utils.runSWTSync(new Callable<Boolean>() {
@@ -254,17 +244,17 @@ public class InvitationWizard extends Wizard {
             });
         } catch (Exception e) {
             log.error(
-                "An error ocurred while trying to open the confirm dialog.", e);
+                "An error ocurred while trying to open the confirm dialog.", e); //$NON-NLS-1$
             return false;
         }
     }
 
     public static boolean confirmProjectSave(JID peer) {
-        final String title = "Save All Resources";
-        final String message = "Some resources have been modified.\n"
-            + "If you want to proceed with the invitation of " + peer.getBase()
-            + ", the resources have to be saved. If you press 'No', "
-            + "the invitation will be cancelled.\n\nSave changes?";
+        final String title = Messages.InvitationWizard_save_ressources;
+        final String message = MessageFormat
+            .format(
+                Messages.InvitationWizard_save_ressources_text,
+                peer.getBase());
         try {
             return Utils.runSWTSync(new Callable<Boolean>() {
                 public Boolean call() {
@@ -274,15 +264,15 @@ public class InvitationWizard extends Wizard {
             });
         } catch (Exception e) {
             log.error(
-                "An error ocurred while trying to open the confirm dialog.", e);
+                "An error ocurred while trying to open the confirm dialog.", e); //$NON-NLS-1$
             return false;
         }
     }
 
     public static void notifyUserOffline(JID peer) {
-        Utils.popUpFailureMessage("Invited buddy is offline!", "User " + peer
-            + " does not seem to be connected. "
-            + "You can't invite offline buddies!", false);
+        Utils.popUpFailureMessage(Messages.InvitationWizard_buddy_offline,
+            MessageFormat.format(Messages.InvitationWizard_buddy_offline_text,
+                peer), false);
     }
 
     public static Shell getAShell() {

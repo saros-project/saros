@@ -10,6 +10,8 @@ import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 
+import de.fu_berlin.inf.dpp.ui.Messages;
+
 /**
  * This control displays an input field for text input
  * 
@@ -19,7 +21,7 @@ public class ChatInput extends Composite {
     /**
      * When no message is entered, display this hint
      */
-    public static final String HINT_TEXT = "Enter message here...";
+    public static final String HINT_TEXT = Messages.ChatInput_hint_text;
 
     /**
      * When no message is entered, use this color to display the hint
@@ -47,7 +49,7 @@ public class ChatInput extends Composite {
         this.text.addFocusListener(new FocusListener() {
             public void focusLost(FocusEvent e) {
                 String message = ChatInput.this.text.getText();
-                if (message.equals("")) {
+                if (message.equals("")) { //$NON-NLS-1$
                     ChatInput.this.showHint();
                 }
             }
@@ -85,7 +87,7 @@ public class ChatInput extends Composite {
 
     protected void hideHint() {
         this.text.setForeground(TEXT_COLOR);
-        this.text.setText("");
+        this.text.setText(""); //$NON-NLS-1$
     }
 
     /**

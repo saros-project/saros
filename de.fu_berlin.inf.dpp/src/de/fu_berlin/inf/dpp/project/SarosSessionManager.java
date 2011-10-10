@@ -19,6 +19,7 @@
  */
 package de.fu_berlin.inf.dpp.project;
 
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -183,7 +184,7 @@ public class SarosSessionManager implements IConnectionListener,
         HashMap<IProject, List<IResource>> projectResourcesMapping)
         throws XMPPException {
         if (!saros.getSarosNet().isConnected()) {
-            throw new XMPPException("No connection");
+            throw new XMPPException(Messages.SarosSessionManager_no_connection);
         }
 
         this.sessionID.setValue(String.valueOf(sessionRandom
@@ -206,7 +207,7 @@ public class SarosSessionManager implements IConnectionListener,
                 try {
                     iProject.open(null);
                 } catch (CoreException e1) {
-                    log.debug("An error occur while opening project", e1);
+                    log.debug("An error occur while opening project", e1); //$NON-NLS-1$
                     continue;
                 }
             }
@@ -216,7 +217,7 @@ public class SarosSessionManager implements IConnectionListener,
             notifyProjectAdded(iProject);
         }
 
-        SarosSessionManager.log.info("Session started");
+        SarosSessionManager.log.info("Session started"); //$NON-NLS-1$
     }
 
     /**
@@ -230,7 +231,7 @@ public class SarosSessionManager implements IConnectionListener,
 
         this.sarosSessionObservable.setValue(sarosSession);
 
-        log.info("Saros session joined");
+        log.info("Saros session joined"); //$NON-NLS-1$
 
         return sarosSession;
     }
@@ -246,13 +247,13 @@ public class SarosSessionManager implements IConnectionListener,
     public void stopSarosSession() {
 
         if (Utils.isSWT()) {
-            log.warn("StopSharedProject should not be called from SWT",
+            log.warn("StopSharedProject should not be called from SWT", //$NON-NLS-1$
                 new StackTrace());
         }
 
         if (!stopSharedProjectLock.tryLock()) {
-            log.debug("stopSharedProject() couldn't acquire "
-                + "stopSharedProjectLock.");
+            log.debug("stopSharedProject() couldn't acquire " //$NON-NLS-1$
+                + "stopSharedProjectLock."); //$NON-NLS-1$
             return;
         }
 
@@ -267,12 +268,12 @@ public class SarosSessionManager implements IConnectionListener,
             notifySessionEnding(sarosSession);
 
             this.transmitter.sendLeaveMessage(sarosSession);
-            log.debug("Leave message sent.");
+            log.debug("Leave message sent."); //$NON-NLS-1$
             if (!sarosSession.isStopped()) {
                 try {
                     sarosSession.stop();
                 } catch (RuntimeException e) {
-                    log.error("Error stopping project: ", e);
+                    log.error("Error stopping project: ", e); //$NON-NLS-1$
                 }
             }
             sarosSession.dispose();
@@ -282,7 +283,7 @@ public class SarosSessionManager implements IConnectionListener,
             notifySessionEnd(sarosSession);
 
             clearSessionID();
-            log.info("Session left");
+            log.info("Session left"); //$NON-NLS-1$
         } finally {
             stopSharedProjectLock.unlock();
         }
@@ -448,14 +449,16 @@ public class SarosSessionManager implements IConnectionListener,
         };
 
         public OutgoingInvitationJob(OutgoingSessionNegotiation process) {
-            super("Inviting " + process.getPeer().getBase() + "...");
+            super(MessageFormat.format(
+                Messages.SarosSessionManager_inviting_user, process.getPeer()
+                    .getBase()));
             this.process = process;
             this.peer = process.getPeer().getBase();
             this.setUser(true);
             setProperty(IProgressConstants.KEEP_PROPERTY, Boolean.TRUE);
             setProperty(IProgressConstants.ICON_PROPERTY,
                 ImageManager
-                    .getImageDescriptor("/icons/elcl16/project_share_tsk.png"));
+                    .getImageDescriptor("/icons/elcl16/project_share_tsk.png")); //$NON-NLS-1$
         }
 
         @Override
@@ -473,34 +476,44 @@ public class SarosSessionManager implements IConnectionListener,
 
                 if (e.getMessage() == null) { // buddy canceled purposely
 
-                    SarosView.showNotification("Canceled Invitation", peer
-                        + " has canceled your Invitation.");
+                    SarosView
+                        .showNotification(
+                            Messages.SarosSessionManager_canceled_invitation,
+                            MessageFormat
+                                .format(
+                                    Messages.SarosSessionManager_canceled_invitation_text,
+                                    peer));
 
-                    return new Status(IStatus.CANCEL, Saros.SAROS, peer
-                        + " has canceled your Invitation.");
+                    return new Status(
+                        IStatus.CANCEL,
+                        Saros.SAROS,
+                        MessageFormat
+                            .format(
+                                Messages.SarosSessionManager_canceled_invitation_text,
+                                peer));
 
                 } else {
 
                     SarosView
                         .showNotification(
-                            "Error during Invitation",
-                            "Your invitation to "
-                                + peer
-                                + " has been canceled remotely because of an error:\n\n"
-                                + e.getMessage());
+                            Messages.SarosSessionManager_error_during_invitation,
+                            MessageFormat
+                                .format(
+                                    Messages.SarosSessionManager_error_during_invitation_text,
+                                    peer, e.getMessage()));
 
                     return new Status(
                         IStatus.ERROR,
                         Saros.SAROS,
-                        "Your invitation to "
-                            + peer
-                            + " has been canceled remotely because of an error:\n\n"
-                            + e.getMessage());
+                        MessageFormat
+                            .format(
+                                Messages.SarosSessionManager_error_during_invitation_text2,
+                                peer, e.getMessage()));
                 }
 
             } catch (Exception e) {
 
-                log.error("This exception is not expected here: ", e);
+                log.error("This exception is not expected here: ", e); //$NON-NLS-1$
                 return new Status(IStatus.ERROR, Saros.SAROS, e.getMessage(), e);
 
             } finally {
@@ -551,7 +564,7 @@ public class SarosSessionManager implements IConnectionListener,
                 try {
                     iProject.open(null);
                 } catch (CoreException e1) {
-                    log.debug("An error occur while opening project", e1);
+                    log.debug("An error occur while opening project", e1); //$NON-NLS-1$
                     continue;
                 }
             }
@@ -621,7 +634,7 @@ public class SarosSessionManager implements IConnectionListener,
     public List<ProjectExchangeInfo> createProjectExchangeInfoList(
         List<IProject> projectsToShare, SubMonitor subMonitor)
         throws LocalCancellationException {
-        subMonitor.setTaskName("Creating file list...");
+        subMonitor.setTaskName(Messages.SarosSessionManager_creating_file_list);
         subMonitor.setWorkRemaining(100);
         List<ProjectExchangeInfo> pInfos = new ArrayList<ProjectExchangeInfo>(
             projectsToShare.size());
@@ -643,7 +656,7 @@ public class SarosSessionManager implements IConnectionListener,
                     iProject);
 
                 ProjectExchangeInfo pInfo = new ProjectExchangeInfo(projectID,
-                    "", projectName, partial, projectFileList);
+                    "", projectName, partial, projectFileList); //$NON-NLS-1$
                 pInfos.add(pInfo);
             } catch (CoreException e) {
                 throw new LocalCancellationException(e.getMessage(),
@@ -651,7 +664,7 @@ public class SarosSessionManager implements IConnectionListener,
             }
             subMonitor.worked(100 / projectsToShare.size());
         }
-        subMonitor.subTask("");
+        subMonitor.subTask(""); //$NON-NLS-1$
         subMonitor.done();
         return pInfos;
     }
@@ -671,14 +684,15 @@ public class SarosSessionManager implements IConnectionListener,
 
         public OutgoingProjectJob(
             OutgoingProjectNegotiation outgoingProjectNegotiation) {
-            super("Sharing project "
-                + outgoingProjectNegotiation.getProjectNames() + ".");
+            super(MessageFormat.format(
+                Messages.SarosSessionManager_sharing_project,
+                outgoingProjectNegotiation.getProjectNames()));
             this.process = outgoingProjectNegotiation;
             this.peer = process.getPeer().getBase();
             this.setUser(true);
             setProperty(IProgressConstants.KEEP_PROPERTY, Boolean.TRUE);
             setProperty(IProgressConstants.ICON_PROPERTY,
-                ImageManager.getImageDescriptor("/icons/invites.png"));
+                ImageManager.getImageDescriptor("/icons/invites.png")); //$NON-NLS-1$
         }
 
         @Override
@@ -695,28 +709,33 @@ public class SarosSessionManager implements IConnectionListener,
             } catch (RemoteCancellationException e) {
 
                 if (e.getMessage() == null) { // remote user canceled purposely
-                    String message = peer
-                        + " has canceled the project sharing.";
+                    String message = MessageFormat
+                        .format(
+                            Messages.SarosSessionManager_project_sharing_cancelled_text,
+                            peer);
 
-                    SarosView.showNotification("Canceled project sharing",
+                    SarosView.showNotification(
+                        Messages.SarosSessionManager_project_sharing_cancelled,
                         message);
 
                     return new Status(IStatus.ERROR, Saros.SAROS, message);
 
                 } else {
-                    String message = "The project sharing with "
-                        + peer
-                        + " has been canceled remotely because of an error:\n\n"
-                        + e.getMessage();
-                    SarosView.showNotification("Error during project sharing",
-                        message);
+                    String message = MessageFormat
+                        .format(
+                            Messages.SarosSessionManager_sharing_project_cancelled_remotely,
+                            peer, e.getMessage());
+                    SarosView
+                        .showNotification(
+                            Messages.SarosSessionManager_sharing_project_cancelled_remotely_text,
+                            message);
 
                     return new Status(IStatus.ERROR, Saros.SAROS, message);
                 }
 
             } catch (Exception e) {
 
-                log.error("This exception is not expected here: ", e);
+                log.error("This exception is not expected here: ", e); //$NON-NLS-1$
                 return new Status(IStatus.ERROR, Saros.SAROS, e.getMessage(), e);
 
             } finally {
@@ -780,8 +799,8 @@ public class SarosSessionManager implements IConnectionListener,
                 sarosSessionListener.preIncomingInvitationCompleted(subMonitor);
             }
         } catch (RuntimeException e) {
-            log.error("Internal error in notifying listener"
-                + " of an incoming invitation: ", e);
+            log.error("Internal error in notifying listener" //$NON-NLS-1$
+                + " of an incoming invitation: ", e); //$NON-NLS-1$
         }
     }
 
@@ -793,8 +812,8 @@ public class SarosSessionManager implements IConnectionListener,
                     subMonitor, user);
             }
         } catch (RuntimeException e) {
-            log.error("Internal error in notifying listener"
-                + " of an outgoing invitation: ", e);
+            log.error("Internal error in notifying listener" //$NON-NLS-1$
+                + " of an outgoing invitation: ", e); //$NON-NLS-1$
         }
     }
 
@@ -804,8 +823,8 @@ public class SarosSessionManager implements IConnectionListener,
                 sarosSessionListener.sessionStarting(sarosSession);
             }
         } catch (RuntimeException e) {
-            log.error("Internal error in notifying listener"
-                + " of SarosSession starting: ", e);
+            log.error("Internal error in notifying listener" //$NON-NLS-1$
+                + " of SarosSession starting: ", e); //$NON-NLS-1$
         }
     }
 
@@ -814,8 +833,8 @@ public class SarosSessionManager implements IConnectionListener,
             try {
                 sarosSessionListener.sessionStarted(sarosSession);
             } catch (RuntimeException e) {
-                log.error("Internal error in notifying listener"
-                    + " of SarosSession start: ", e);
+                log.error("Internal error in notifying listener" //$NON-NLS-1$
+                    + " of SarosSession start: ", e); //$NON-NLS-1$
             }
         }
     }
@@ -825,8 +844,8 @@ public class SarosSessionManager implements IConnectionListener,
             try {
                 saroSessionListener.sessionEnding(sarosSession);
             } catch (RuntimeException e) {
-                log.error("Internal error in notifying listener"
-                    + " of SarosSession ending: ", e);
+                log.error("Internal error in notifying listener" //$NON-NLS-1$
+                    + " of SarosSession ending: ", e); //$NON-NLS-1$
             }
         }
     }
@@ -836,8 +855,8 @@ public class SarosSessionManager implements IConnectionListener,
             try {
                 listener.sessionEnded(sarosSession);
             } catch (RuntimeException e) {
-                log.error("Internal error in notifying listener"
-                    + " of SarosSession end: ", e);
+                log.error("Internal error in notifying listener" //$NON-NLS-1$
+                    + " of SarosSession end: ", e); //$NON-NLS-1$
             }
         }
     }
@@ -847,8 +866,8 @@ public class SarosSessionManager implements IConnectionListener,
             try {
                 listener.projectAdded(getSarosSession().getProjectID(project));
             } catch (RuntimeException e) {
-                log.error("Internal error in notifying listener"
-                    + " of an added project: ", e);
+                log.error("Internal error in notifying listener" //$NON-NLS-1$
+                    + " of an added project: ", e); //$NON-NLS-1$
             }
         }
     }

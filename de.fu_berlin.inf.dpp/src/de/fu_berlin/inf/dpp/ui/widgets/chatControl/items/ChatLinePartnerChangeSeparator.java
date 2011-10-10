@@ -9,6 +9,7 @@ import org.eclipse.swt.widgets.Composite;
 
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.editor.annotations.SarosAnnotation;
+import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.ui.widgets.SimpleRoundedComposite;
 
 /**
@@ -20,7 +21,7 @@ import de.fu_berlin.inf.dpp.ui.widgets.SimpleRoundedComposite;
 public class ChatLinePartnerChangeSeparator extends SimpleRoundedComposite {
 
     protected final SimpleDateFormat dateFormatter = new SimpleDateFormat(
-        "dd/MM/yy HH:mm");
+        Messages.ChatLinePartnerChangeSeparator_date_formatter_pattern);
 
     public ChatLinePartnerChangeSeparator(Composite parent, User user, Date date) {
         this(parent, user.getHumanReadableName(), SarosAnnotation

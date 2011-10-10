@@ -34,10 +34,10 @@ import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
+import java.text.MessageFormat;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 
-import de.fu_berlin.inf.dpp.SarosPluginContext;
 import org.apache.log4j.Logger;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IToolBarManager;
@@ -63,10 +63,12 @@ import org.eclipse.ui.PlatformUI;
 import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.Saros;
+import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.observables.VideoSessionObservable;
 import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
 import de.fu_berlin.inf.dpp.ui.ImageManager;
+import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.ui.actions.VideoSharingAction;
 import de.fu_berlin.inf.dpp.ui.widgets.explanation.ListExplanationComposite.ListExplanation;
 import de.fu_berlin.inf.dpp.ui.widgets.explanation.explanatory.ListExplanatoryViewPart;
@@ -93,7 +95,7 @@ public class VideoPlayerView extends ListExplanatoryViewPart implements
     VideoDisplay {
     private static Logger log = Logger.getLogger(VideoPlayerView.class);
 
-    public static final String ID = "de.fu_berlin.inf.dpp.ui.views.VideoPlayerView";
+    public static final String ID = "de.fu_berlin.inf.dpp.ui.views.VideoPlayerView"; //$NON-NLS-1$
 
     @Inject
     protected VideoSharing videoSharing;
@@ -107,13 +109,12 @@ public class VideoPlayerView extends ListExplanatoryViewPart implements
     protected boolean keepAspectRatio = true;
 
     /* howto */
-    protected ListExplanation howTo = new ListExplanation(
-        SWT.ICON_INFORMATION,
-        "In order to share your screen with a session participant please do the following steps:",
-        "Open Saros session",
-        "Select a participant with whom you want to share your screen",
-        "Click on the \"" + VideoSharingAction.TOOLTIP_START_SESSION
-            + "\" button in the view's toolbar");
+    protected ListExplanation howTo = new ListExplanation(SWT.ICON_INFORMATION,
+        Messages.VideoPlayerView_howTo_intro,
+        Messages.VideoPlayerView_howTo_step_1,
+        Messages.VideoPlayerView_howTo_step_2, MessageFormat.format(
+            Messages.VideoPlayerView_howTo_step_3,
+            VideoSharingAction.TOOLTIP_START_SESSION));
 
     /* content */
     protected Composite parent;
@@ -218,11 +219,12 @@ public class VideoPlayerView extends ListExplanatoryViewPart implements
     }
 
     private void createStatisticBar(CoolBar coolBar) {
-        this.fps = createLabel(coolBar, "FPS  ", "rendered frames per second");
-        this.bitrate = createLabel(coolBar, "BITRATE  ",
-            "average video bitrate");
-        this.delay = createLabel(coolBar, "DLY",
-            "average delay of rendered frames to original video time");
+        this.fps = createLabel(coolBar, Messages.VideoPlayerView_fps,
+            Messages.VideoPlayerView_fps_text);
+        this.bitrate = createLabel(coolBar, Messages.VideoPlayerView_bitrate,
+            Messages.VideoPlayerView_bitrate_text);
+        this.delay = createLabel(coolBar, Messages.VideoPlayerView_dly,
+            Messages.VideoPlayerView_dly_text);
     }
 
     protected void createActionBar() {
@@ -310,9 +312,9 @@ public class VideoPlayerView extends ListExplanatoryViewPart implements
             videoCanvas.parentFrame.dispose();
         videoCanvas = null;
         canvas.update();
-        fps.setText("");
-        bitrate.setText("");
-        delay.setText("");
+        fps.setText(""); //$NON-NLS-1$
+        bitrate.setText(""); //$NON-NLS-1$
+        delay.setText(""); //$NON-NLS-1$
     }
 
     protected void updateStatusbar() {
@@ -345,9 +347,9 @@ public class VideoPlayerView extends ListExplanatoryViewPart implements
     class ChangeSourceModeAction extends Action {
 
         public ChangeSourceModeAction() {
-            setToolTipText("Change mode of image source");
+            setToolTipText(Messages.VideoPlayerView_change_image_source);
             setImageDescriptor(ImageManager
-                .getImageDescriptor("icons/elcl16/chvdsrc.png"));
+                .getImageDescriptor("icons/elcl16/chvdsrc.png")); //$NON-NLS-1$
 
             videoSharingSessionObservable
                 .addAndNotify(new ValueChangeListener<VideoSharingSession>() {
@@ -377,7 +379,7 @@ public class VideoPlayerView extends ListExplanatoryViewPart implements
     class StopVideoSessionAction extends Action {
 
         public StopVideoSessionAction() {
-            setToolTipText("Stop running session");
+            setToolTipText(Messages.VideoPlayerView_stop_session);
             setImageDescriptor(PlatformUI.getWorkbench().getSharedImages()
                 .getImageDescriptor(ISharedImages.IMG_ELCL_STOP));
 
@@ -412,8 +414,8 @@ public class VideoPlayerView extends ListExplanatoryViewPart implements
 
         public PauseVideoSessionAction() {
             setImageDescriptor(ImageManager
-                .getImageDescriptor("icons/elcl16/pausevideo.gif"));
-            setToolTipText("Pause");
+                .getImageDescriptor("icons/elcl16/pausevideo.gif")); //$NON-NLS-1$
+            setToolTipText(Messages.VideoPlayerView_pause);
             setEnabled(false);
             videoSharingSessionObservable
                 .add(new ValueChangeListener<VideoSharingSession>() {
@@ -448,16 +450,16 @@ public class VideoPlayerView extends ListExplanatoryViewPart implements
             if (enabled && session != null) {
                 if (session.isPaused()) {
                     setImageDescriptor(ImageManager
-                        .getImageDescriptor("icons/elcl16/resumevideo.gif"));
-                    setToolTipText("Resume");
+                        .getImageDescriptor("icons/elcl16/resumevideo.gif")); //$NON-NLS-1$
+                    setToolTipText(Messages.VideoPlayerView_resume);
                 } else {
                     setImageDescriptor(ImageManager
-                        .getImageDescriptor("icons/elcl16/pausevideo.gif"));
-                    setToolTipText("Pause");
+                        .getImageDescriptor("icons/elcl16/pausevideo.gif")); //$NON-NLS-1$
+                    setToolTipText(Messages.VideoPlayerView_pause);
                 }
             } else {
                 setImageDescriptor(ImageManager
-                    .getImageDescriptor("icons/elcl16/pausevideo.gif"));
+                    .getImageDescriptor("icons/elcl16/pausevideo.gif")); //$NON-NLS-1$
                 setToolTipText(null);
             }
         }
@@ -507,7 +509,7 @@ public class VideoPlayerView extends ListExplanatoryViewPart implements
 
         public void updateImage(BufferedImage tile, int x, int y) {
             if (paintInProgress) {
-                log.warn("Rendering seems too slow.");
+                log.warn(Messages.VideoPlayerView_rendering_too_slow);
                 return;
             }
             paintInProgress = true;
@@ -542,7 +544,7 @@ public class VideoPlayerView extends ListExplanatoryViewPart implements
             try {
                 activityOutput.writeObject(activity);
             } catch (IOException e) {
-                log.warn("Could not send activity: ", e);
+                log.warn("Could not send activity: ", e); //$NON-NLS-1$
             }
         }
 

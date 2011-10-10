@@ -17,6 +17,7 @@ import org.picocontainer.annotations.Inject;
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.ui.util.LayoutUtils;
 import de.fu_berlin.inf.dpp.ui.widgets.decoration.EmptyText;
 import de.fu_berlin.inf.dpp.ui.widgets.decoration.JIDCombo;
@@ -107,14 +108,14 @@ public class AddBuddyWizardPage extends WizardPage {
         gridData = new GridData(SWT.BEGINNING, SWT.CENTER, false, false);
         gridData.verticalIndent = space;
         nicknameLabel.setLayoutData(gridData);
-        nicknameLabel.setText("Nickname");
+        nicknameLabel.setText(Messages.AddBuddyWizardPage_nickname);
 
         Text nicknameText = new Text(composite, SWT.BORDER);
         gridData = new GridData(SWT.FILL, SWT.CENTER, true, false);
         gridData.horizontalIndent = space;
         gridData.verticalIndent = space;
         nicknameText.setLayoutData(gridData);
-        this.nicknameText = new EmptyText(nicknameText, "Optional");
+        this.nicknameText = new EmptyText(nicknameText, Messages.AddBuddyWizardPage_optional);
 
         hookListeners();
         updatePageCompletion();

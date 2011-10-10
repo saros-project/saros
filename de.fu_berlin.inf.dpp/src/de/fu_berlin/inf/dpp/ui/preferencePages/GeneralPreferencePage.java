@@ -47,6 +47,7 @@ import de.fu_berlin.inf.dpp.accountManagement.XMPPAccountStore;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
 import de.fu_berlin.inf.dpp.ui.ImageManager;
+import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.ui.util.WizardUtils;
 
 /**
@@ -59,36 +60,32 @@ public class GeneralPreferencePage extends FieldEditorPreferencePage implements
     IWorkbenchPreferencePage {
 
     // labels
-    public static final String GROUP_ACTIVE_LABEL = "activate";
-    public static final String GROUP_DEACTIVE_LABEL = "deactivate";
+    public static final String GROUP_ACTIVE_LABEL = Messages.GeneralPreferencePage_GROUP_ACTIVE_LABEL;
+    public static final String GROUP_DEACTIVE_LABEL = Messages.GeneralPreferencePage_GROUP_DEACTIVE_LABEL;
     public static final int COLUMNS_IN_ACCOUNTGROUP = 2;
-    public static final String ACCOUNT_GROUP_TITLE = "XMPP/Jabber Accounts";
-    public static final String ACTIVATE_BTN_TEXT = "Activate Account";
-    public static final String CHANGE_BTN_TEXT = "Edit Account";
-    public static final String ADD_BTN_TEXT = "Add Account";
-    public static final String DELETE_BTN_TEXT = "Delete Account";
-    public static final String DELETE_ACTIVE_TEXT = "You cannot delete the active account.";
-    public static final String NO_ENTRY_SELECTED_TEXT = "Please select account in list.";
-    public static final String ENCRYPT_PASSWORD_TEXT = "Encrypt password (this will request a separate secure storage password).";
-    public static final String STARTUP_CONNECT_TEXT = "Automatically connect on startup";
-    public static final String FOLLOW_MODE_TEXT = "Start in Follow Mode.";
-    public static final String CONCURRENT_UNDO_TEXT = "Enable concurrent undo (only local changes are undone, session restart necessary).";
-    public static final String DISABLE_VERSION_CONTROL_TEXT = "Disable version control support";
-    public static final String DISABLE_VERSION_CONTROL_TOOLTIP = "Saros tries to share VCS operations"
-        + " like checkout during the invitation, or switch or update during a session. (Currently, only SVN "
-        + "is supported.) You can disable VCS support in case you have problems with the repository.\n"
-        + "Disabling VCS support during a running session is possible, but enabling VCS support won't have"
-        + " any effect until you rejoin the session (restart if you're the creator).";
+    public static final String ACCOUNT_GROUP_TITLE = Messages.GeneralPreferencePage_ACCOUNT_GROUP_TITLE;
+    public static final String ACTIVATE_BTN_TEXT = Messages.GeneralPreferencePage_ACTIVATE_BTN_TEXT;
+    public static final String CHANGE_BTN_TEXT = Messages.GeneralPreferencePage_CHANGE_BTN_TEXT;
+    public static final String ADD_BTN_TEXT = Messages.GeneralPreferencePage_ADD_BTN_TEXT;
+    public static final String DELETE_BTN_TEXT = Messages.GeneralPreferencePage_DELETE_BTN_TEXT;
+    public static final String DELETE_ACTIVE_TEXT = Messages.GeneralPreferencePage_DELETE_ACTIVE_TEXT;
+    public static final String NO_ENTRY_SELECTED_TEXT = Messages.GeneralPreferencePage_NO_ENTRY_SELECTED_TEXT;
+    public static final String ENCRYPT_PASSWORD_TEXT = Messages.GeneralPreferencePage_ENCRYPT_PASSWORD_TEXT;
+    public static final String STARTUP_CONNECT_TEXT = Messages.GeneralPreferencePage_STARTUP_CONNECT_TEXT;
+    public static final String FOLLOW_MODE_TEXT = Messages.GeneralPreferencePage_FOLLOW_MODE_TEXT;
+    public static final String CONCURRENT_UNDO_TEXT = Messages.GeneralPreferencePage_CONCURRENT_UNDO_TEXT;
+    public static final String DISABLE_VERSION_CONTROL_TEXT = Messages.GeneralPreferencePage_DISABLE_VERSION_CONTROL_TEXT;
+    public static final String DISABLE_VERSION_CONTROL_TOOLTIP = Messages.GeneralPreferencePage_DISABLE_VERSION_CONTROL_TOOLTIP;
 
     // icons
     public static final Image ADD_IMAGE = ImageManager
-        .getImage("icons/btn/addaccount.png");
+        .getImage("icons/btn/addaccount.png"); //$NON-NLS-1$
     public static final Image ACTIVATE_IMAGE = ImageManager
-        .getImage("icons/btn/activateaccount.png");
+        .getImage("icons/btn/activateaccount.png"); //$NON-NLS-1$
     public static final Image DELETE_IMAGE = ImageManager
-        .getImage("icons/btn/deleteaccount.png");
+        .getImage("icons/btn/deleteaccount.png"); //$NON-NLS-1$
     public static final Image CHANGE_IMAGE = ImageManager
-        .getImage("icons/btn/changeaccount.png");
+        .getImage("icons/btn/changeaccount.png"); //$NON-NLS-1$
 
     @Inject
     Saros saros;
@@ -285,14 +282,15 @@ public class GeneralPreferencePage extends FieldEditorPreferencePage implements
     }
 
     protected void warnNothingSelected() {
-        MessageDialog.openError(getShell(), "No account selected",
+        MessageDialog.openError(getShell(),
+            Messages.GeneralPreferencePage_no_account_selected,
             NO_ENTRY_SELECTED_TEXT);
     }
 
     public void updateInfoLabel() {
         try {
             if (accountStore.hasActiveAccount()) {
-                infoLabel.setText("Active: "
+                infoLabel.setText(Messages.GeneralPreferencePage_active
                     + accountStore.getActiveAccount().toString());
             }
         } catch (NullPointerException e) {
@@ -339,7 +337,8 @@ public class GeneralPreferencePage extends FieldEditorPreferencePage implements
     }
 
     protected void handleActiveAccountDeleted() {
-        MessageDialog.openError(getShell(), "Deleting active account",
+        MessageDialog.openError(getShell(),
+            Messages.GeneralPreferencePage_delete_active_account,
             DELETE_ACTIVE_TEXT);
     }
 

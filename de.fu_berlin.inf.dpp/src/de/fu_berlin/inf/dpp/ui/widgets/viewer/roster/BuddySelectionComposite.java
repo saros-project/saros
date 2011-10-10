@@ -15,6 +15,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 
 import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.ui.model.roster.RosterEntryElement;
 import de.fu_berlin.inf.dpp.ui.model.roster.RosterGroupElement;
 import de.fu_berlin.inf.dpp.ui.util.LayoutUtils;
@@ -99,7 +100,7 @@ public class BuddySelectionComposite extends BaseBuddySelectionComposite {
         filterNonSarosBuddiesButton.setLayoutData(new GridData(SWT.BEGINNING,
             SWT.CENTER, false, false));
         filterNonSarosBuddiesButton
-            .setText("Hide buddies without Saros support");
+            .setText(Messages.BuddySelectionComposite_hide_buddies_no_saros);
         filterNonSarosBuddiesButton
             .addSelectionListener(new SelectionAdapter() {
                 @Override
@@ -112,7 +113,7 @@ public class BuddySelectionComposite extends BaseBuddySelectionComposite {
         Button addBuddyButton = new Button(controlComposite, SWT.PUSH);
         addBuddyButton.setLayoutData(new GridData(SWT.END, SWT.CENTER, true,
             false));
-        addBuddyButton.setText("Add Buddy...");
+        addBuddyButton.setText(Messages.BuddySelectionComposite_add_buddy);
         addBuddyButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {

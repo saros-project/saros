@@ -10,6 +10,7 @@ import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.ui.ImageManager;
+import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.ui.model.TreeElement;
 
 /**
@@ -38,6 +39,9 @@ public class UserElement extends TreeElement {
     @Override
     public StyledString getStyledText() {
         StyledString styledString = new StyledString();
+        final String read_only = Messages.UserElement_read_only;
+        final String following = Messages.UserElement_following;
+        final String joining = Messages.UserElement_joining;
 
         /*
          * Name
@@ -48,18 +52,21 @@ public class UserElement extends TreeElement {
          * Right level
          */
         if (user.hasReadOnlyAccess()) {
-            styledString.append(" (read-only)", StyledString.COUNTER_STYLER);
+            styledString.append(" (" + read_only + ")", //$NON-NLS-1$ //$NON-NLS-2$
+                StyledString.COUNTER_STYLER);
         }
 
         /*
          * Other
          */
         if (user.equals(editorManager.getFollowedUser())) {
-            styledString.append(" (following)", StyledString.QUALIFIER_STYLER);
+            styledString.append(" (" + following + ")", //$NON-NLS-1$ //$NON-NLS-2$
+                StyledString.QUALIFIER_STYLER);
         }
 
         if (!user.isInvitationComplete()) {
-            styledString.append(" (joining...)", StyledString.COUNTER_STYLER);
+            styledString.append(" (" + joining + ")", //$NON-NLS-1$ //$NON-NLS-2$
+                StyledString.COUNTER_STYLER);
         }
 
         return styledString;

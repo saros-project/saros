@@ -1,5 +1,6 @@
 package de.fu_berlin.inf.dpp.ui.util;
 
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -20,6 +21,7 @@ import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.SarosSessionManager;
 import de.fu_berlin.inf.dpp.project.internal.SarosSession;
+import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.util.Utils;
 
 /**
@@ -61,19 +63,19 @@ public class CollaborationUtils {
                                 MessageDialog
                                     .openError(
                                         null,
-                                        "Offline",
+                                        Messages.CollaborationUtils_offline,
                                         getShareResourcesFailureMessage(newResources
                                             .keySet()));
-                                log.warn("Start share project failed", e);
+                                log.warn("Start share project failed", e); //$NON-NLS-1$
                             }
                         });
                     }
 
                     addBuddiesToSarosSession(sarosSessionManager, buddies);
                 } else {
-                    log.warn("Tried to start "
+                    log.warn("Tried to start " //$NON-NLS-1$
                         + SarosSession.class.getSimpleName()
-                        + " although one is already running");
+                        + " although one is already running"); //$NON-NLS-1$
                 }
             }
         });
@@ -100,16 +102,14 @@ public class CollaborationUtils {
                     // Do not ask when host is alone...
                     reallyLeave = true;
                 } else {
-                    reallyLeave = MessageDialog
-                        .openQuestion(
-                            shell,
-                            "Confirm Closing Session",
-                            "Are you sure that you want to close this Saros session? Since you are the creator of this session, it will be closed for all participants.");
+                    reallyLeave = MessageDialog.openQuestion(shell,
+                        Messages.CollaborationUtils_confirm_closing,
+                        Messages.CollaborationUtils_confirm_closing_text);
                 }
             } else {
                 reallyLeave = MessageDialog.openQuestion(shell,
-                    "Confirm Leaving Session",
-                    "Are you sure that you want to leave this Saros session?");
+                    Messages.CollaborationUtils_confirm_leaving,
+                    Messages.CollaborationUtils_confirm_leaving_text);
             }
 
             if (!reallyLeave)
@@ -120,13 +120,13 @@ public class CollaborationUtils {
                     try {
                         sarosSessionManager.stopSarosSession();
                     } catch (Exception e) {
-                        log.error("Session could not be left: ", e);
+                        log.error("Session could not be left: ", e); //$NON-NLS-1$
                     }
                 }
             });
         } else {
-            log.warn("Tried to leave " + SarosSession.class.getSimpleName()
-                + " although there is no one running");
+            log.warn("Tried to leave " + SarosSession.class.getSimpleName() //$NON-NLS-1$
+                + " although there is no one running"); //$NON-NLS-1$
         }
     }
 
@@ -158,9 +158,9 @@ public class CollaborationUtils {
                         }
                     });
                 } else {
-                    log.warn("Tried to add project resources to "
+                    log.warn("Tried to add project resources to " //$NON-NLS-1$
                         + SarosSession.class.getSimpleName()
-                        + " although there is no one running");
+                        + " although there is no one running"); //$NON-NLS-1$
                 }
             }
         });
@@ -211,9 +211,9 @@ public class CollaborationUtils {
                         }
                     });
                 } else {
-                    log.warn("Tried to add buddies to "
+                    log.warn("Tried to add buddies to " //$NON-NLS-1$
                         + SarosSession.class.getSimpleName()
-                        + " although there is no one running");
+                        + " although there is no one running"); //$NON-NLS-1$
                 }
             }
         });
@@ -227,18 +227,19 @@ public class CollaborationUtils {
      */
     private static String getShareResourcesFailureMessage(Set<IProject> projects) {
 
+        String msg = MessageFormat
+            .format(
+                Messages.CollaborationUtils_error_not_connected,
+                ((projects.size() == 1) ? Messages.CollaborationUtils_project_singular_ending
+                    : Messages.CollaborationUtils_project_plural_ending));
         StringBuilder message = new StringBuilder();
-        message.append("You are not connected to an XMPP/Jabber server.\n");
-        message.append("\n");
-        message.append("The following project"
-            + ((projects.size() == 1) ? "" : "s") + " could not be shared:\n");
+        message.append(msg);
         while (projects.iterator().hasNext()) {
             IProject project = projects.iterator().next();
-            message.append("\t" + project.getName() + "\n");
+            message.append("\t" + project.getName() + "\n"); //$NON-NLS-1$ //$NON-NLS-2$
         }
-        message.append("\n");
-        message.append("Please make sure you are currently connected "
-            + "to a XMPP/Jabber server in order to share a project.");
+        message.append("\n"); //$NON-NLS-1$
+        message.append(Messages.CollaborationUtils_make_sure_connected_to);
         return message.toString();
     }
 
@@ -257,19 +258,17 @@ public class CollaborationUtils {
 
         StringBuilder result = new StringBuilder();
 
-        result.append(inviter.getBase()).append(
-            " has invited you to a Saros session");
-
-        if (projects.size() == 1) {
-            result.append(" with the shared project\n");
-        } else if (projects.size() > 1) {
-            result.append(" with the shared projects\n");
-        }
+        result
+            .append(MessageFormat.format(
+                Messages.CollaborationUtils_user_invited_to_saros_session,
+                inviter.getBase(),
+                ((projects.size() == 1) ? Messages.CollaborationUtils_project_singular_ending
+                    : Messages.CollaborationUtils_project_plural_ending)));
 
         for (IProject project : projects) {
-            result.append("\n - ").append(project.getName());
+            result.append("\n - ").append(project.getName()); //$NON-NLS-1$
             if (!sarosSession.isCompletelyShared(project))
-                result.append(" (partial)");
+                result.append(Messages.CollaborationUtils_partial);
         }
 
         return result.toString();
@@ -315,10 +314,10 @@ public class CollaborationUtils {
                     }
                     tempResources.add(selectedResources.get(j));
                 }
-                if (!tempResources.contains(project.getFile(".project")))
-                    tempResources.add(project.getFile(".project"));
-                if (!tempResources.contains(project.getFile(".classpath")))
-                    tempResources.add(project.getFile(".classpath"));
+                if (!tempResources.contains(project.getFile(".project"))) //$NON-NLS-1$
+                    tempResources.add(project.getFile(".project")); //$NON-NLS-1$
+                if (!tempResources.contains(project.getFile(".classpath"))) //$NON-NLS-1$
+                    tempResources.add(project.getFile(".classpath")); //$NON-NLS-1$
                 allResources.put(project, tempResources);
             }
         }

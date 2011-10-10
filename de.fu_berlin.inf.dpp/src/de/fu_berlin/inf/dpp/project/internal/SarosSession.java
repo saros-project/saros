@@ -19,6 +19,7 @@
  */
 package de.fu_berlin.inf.dpp.project.internal;
 
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -74,6 +75,7 @@ import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
 import de.fu_berlin.inf.dpp.project.IActivityProvider;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
+import de.fu_berlin.inf.dpp.project.Messages;
 import de.fu_berlin.inf.dpp.project.SharedProject;
 import de.fu_berlin.inf.dpp.synchronize.StartHandle;
 import de.fu_berlin.inf.dpp.synchronize.StopManager;
@@ -168,7 +170,7 @@ public class SarosSession implements ISarosSession, Disposable {
      * between transformation and application of remote operations. In other
      * words, the transformation would be applied to an out-dated state.
      */
-    private Thread activityDispatcher = new Thread("Saros Activity Dispatcher") {
+    private Thread activityDispatcher = new Thread("Saros Activity Dispatcher") { //$NON-NLS-1$
         @Override
         public void run() {
             try {
@@ -195,7 +197,7 @@ public class SarosSession implements ISarosSession, Disposable {
                 }
             } catch (InterruptedException e) {
                 if (!cancelActivityDispatcher)
-                    log.error("activityDispatcher interrupted prematurely!", e);
+                    log.error("activityDispatcher interrupted prematurely!", e); //$NON-NLS-1$
             }
         }
     };
@@ -207,7 +209,7 @@ public class SarosSession implements ISarosSession, Disposable {
 
         public QueueItem(List<User> recipients, IActivity activity) {
             if (recipients.size() == 0)
-                log.fatal("Empty list of recipients in constructor",
+                log.fatal("Empty list of recipients in constructor", //$NON-NLS-1$
                     new StackTrace());
             this.recipients = recipients;
             this.activity = activity;
@@ -383,7 +385,7 @@ public class SarosSession implements ISarosSession, Disposable {
 
         if (!localUser.isHost()) {
             throw new IllegalArgumentException(
-                "Only the inviter can initiate permission changes.");
+                Messages.SarosSession_only_inviter_can_initate_permission_changes);
         }
 
         if (user.isHost()) {
@@ -399,7 +401,7 @@ public class SarosSession implements ISarosSession, Disposable {
 
         } else {
             StartHandle startHandle = stopManager.stop(user,
-                "Performing permission change", progress);
+                Messages.SarosSession_performing_permission_change, progress);
 
             Utils.runSafeSWTSync(log, new Runnable() {
                 public void run() {
@@ -411,8 +413,8 @@ public class SarosSession implements ISarosSession, Disposable {
             });
 
             if (!startHandle.start())
-                log.error("Didn't unblock. "
-                    + "There still exist unstarted StartHandles.");
+                log.error("Didn't unblock. " //$NON-NLS-1$
+                    + "There still exist unstarted StartHandles."); //$NON-NLS-1$
         }
     }
 
@@ -421,14 +423,14 @@ public class SarosSession implements ISarosSession, Disposable {
      */
     public void setPermission(final User user, final Permission permission) {
 
-        assert Utils.isSWT() : "Must be called from SWT Thread";
+        assert Utils.isSWT() : "Must be called from SWT Thread"; //$NON-NLS-1$
 
         if (user == null || permission == null)
             throw new IllegalArgumentException();
 
         user.setPermission(permission);
 
-        log.info("Buddy " + user + " is now a " + permission);
+        log.info("Buddy " + user + " is now a " + permission); //$NON-NLS-1$ //$NON-NLS-2$
 
         listenerDispatch.permissionChanged(user);
     }
@@ -446,15 +448,15 @@ public class SarosSession implements ISarosSession, Disposable {
 
     public void userInvitationCompletedWrapped(final User user) {
 
-        assert Utils.isSWT() : "Must be called from SWT Thread";
+        assert Utils.isSWT() : "Must be called from SWT Thread"; //$NON-NLS-1$
 
         if (user == null)
             throw new IllegalArgumentException();
 
         user.invitationCompleted();
 
-        log.debug("The invitation of " + Utils.prefix(user.getJID())
-            + " is now complete");
+        log.debug("The invitation of " + Utils.prefix(user.getJID()) //$NON-NLS-1$
+            + " is now complete"); //$NON-NLS-1$
 
         listenerDispatch.invitationCompleted(user);
     }
@@ -505,20 +507,20 @@ public class SarosSession implements ISarosSession, Disposable {
         JID jid = user.getJID();
 
         if (participants.putIfAbsent(jid, user) != null) {
-            log.error("Buddy " + Utils.prefix(jid)
-                + " added twice to SarosSession", new StackTrace());
+            log.error("Buddy " + Utils.prefix(jid) //$NON-NLS-1$
+                + " added twice to SarosSession", new StackTrace()); //$NON-NLS-1$
             throw new IllegalArgumentException();
         }
 
         listenerDispatch.userJoined(user);
 
-        log.info("Buddy " + Utils.prefix(jid) + " joined session.");
+        log.info("Buddy " + Utils.prefix(jid) + " joined session."); //$NON-NLS-1$ //$NON-NLS-2$
     }
 
     public void removeUser(User user) {
         JID jid = user.getJID();
         if (participants.remove(jid) == null) {
-            log.warn("Tried to remove buddy who was not in participants: "
+            log.warn("Tried to remove buddy who was not in participants:"
                 + Utils.prefix(jid));
             return;
         }
@@ -535,7 +537,7 @@ public class SarosSession implements ISarosSession, Disposable {
         // prevent idling connection when not needed anymore.
         transferManager.closeConnection(jid);
 
-        log.info("Buddy " + Utils.prefix(jid) + " left session");
+        log.info("Buddy " + Utils.prefix(jid) + " left session"); //$NON-NLS-1$ //$NON-NLS-2$
     }
 
     /*
@@ -618,9 +620,9 @@ public class SarosSession implements ISarosSession, Disposable {
             throw new IllegalArgumentException();
 
         if (jid.isBareJID()) {
-            throw new IllegalArgumentException(
-                "JIDs used for the SarosSession should always be resource qualified: "
-                    + Utils.prefix(jid));
+            throw new IllegalArgumentException(MessageFormat.format(
+                Messages.SarosSession_jids_should_be_resource_qualified,
+                Utils.prefix(jid)));
         }
 
         User user = participants.get(jid);
@@ -704,7 +706,7 @@ public class SarosSession implements ISarosSession, Disposable {
                 }
 
             } catch (IllegalArgumentException e) {
-                log.warn("DataObject could not be attached to SarosSession: "
+                log.warn("DataObject could not be attached to SarosSession: " //$NON-NLS-1$
                     + dataObject, e);
             }
         }
@@ -772,17 +774,17 @@ public class SarosSession implements ISarosSession, Disposable {
         if (list == null) {
             return;
         }
-        log.info("All activities for project \"" + projectID
-            + "\" will be executed now");
+        log.info("All activities for project \"" + projectID //$NON-NLS-1$
+            + "\" will be executed now"); //$NON-NLS-1$
         exec(list);
     }
 
     public void activityCreated(IActivity activity) {
 
-        assert Utils.isSWT() : "Must be called from the SWT Thread";
+        assert Utils.isSWT() : "Must be called from the SWT Thread"; //$NON-NLS-1$
 
         if (activity == null)
-            throw new IllegalArgumentException("Activity cannot be null");
+            throw new IllegalArgumentException("Activity cannot be null"); //$NON-NLS-1$
 
         /*
          * Let ConcurrentDocumentManager have a look at the activities first
@@ -830,7 +832,7 @@ public class SarosSession implements ISarosSession, Disposable {
                 activitySequencer.sendActivity(toWhom,
                     activity.getActivityDataObject(this));
             } catch (IllegalArgumentException e) {
-                log.warn("Could not convert Activity to DataObject: ", e);
+                log.warn("Could not convert Activity to DataObject: ", e); //$NON-NLS-1$
             }
         }
     }
@@ -959,7 +961,7 @@ public class SarosSession implements ISarosSession, Disposable {
                 childResources = ArrayUtils.getAdaptableObjects(
                     ((IContainer) iResource).members(), IResource.class);
             } catch (CoreException e) {
-                log.debug("Can't get children of Project/Folder. ", e);
+                log.debug("Can't get children of Project/Folder. ", e); //$NON-NLS-1$
             }
             if (childResources != null && (childResources.size() > 0)) {
                 for (IResource childResource : childResources) {
@@ -1006,7 +1008,7 @@ public class SarosSession implements ISarosSession, Disposable {
         throws SarosCancellationException {
 
         Collection<User> participants = this.getParticipants();
-        log.debug("Inv" + Utils.prefix(peer) + ": Synchronizing userlist "
+        log.debug("Inv" + Utils.prefix(peer) + ": Synchronizing userlist " //$NON-NLS-1$ //$NON-NLS-2$
             + participants);
 
         SarosPacketCollector userListConfirmationCollector = transmitter
@@ -1016,12 +1018,12 @@ public class SarosSession implements ISarosSession, Disposable {
             transmitter.sendUserList(user.getJID(), invitationID, participants);
         }
 
-        log.debug("Inv" + Utils.prefix(peer)
-            + ": Waiting for user list confirmations...");
+        log.debug("Inv" + Utils.prefix(peer) //$NON-NLS-1$
+            + ": Waiting for user list confirmations..."); //$NON-NLS-1$
         transmitter.receiveUserListConfirmation(userListConfirmationCollector,
             this.getRemoteUsers(), monitor);
-        log.debug("Inv" + Utils.prefix(peer)
-            + ": All user list confirmations have arrived.");
+        log.debug("Inv" + Utils.prefix(peer) //$NON-NLS-1$
+            + ": All user list confirmations have arrived."); //$NON-NLS-1$
 
     }
 

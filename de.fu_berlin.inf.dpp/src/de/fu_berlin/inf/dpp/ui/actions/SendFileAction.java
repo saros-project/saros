@@ -28,6 +28,7 @@ import java.io.InputStream;
 import java.io.InterruptedIOException;
 import java.io.OutputStream;
 import java.io.Serializable;
+import java.text.MessageFormat;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
@@ -63,6 +64,7 @@ import de.fu_berlin.inf.dpp.net.internal.StreamService;
 import de.fu_berlin.inf.dpp.net.internal.StreamServiceManager;
 import de.fu_berlin.inf.dpp.net.internal.StreamSession;
 import de.fu_berlin.inf.dpp.project.SarosSessionManager;
+import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.ui.util.DialogUtils;
 import de.fu_berlin.inf.dpp.ui.util.selection.SelectionUtils;
 import de.fu_berlin.inf.dpp.ui.util.selection.retriever.SelectionRetrieverFactory;
@@ -99,14 +101,14 @@ public class SendFileAction extends Action implements Disposable {
     protected SendFileStreamService sendFileService;
 
     public SendFileAction() {
-        super("Send File");
+        super(Messages.SendFileAction_title);
         SarosPluginContext.initComponent(this);
 
         sendFileService.hookAction(this);
         setImageDescriptor(PlatformUI.getWorkbench().getSharedImages()
             .getImageDescriptor(ISharedImages.IMG_OBJ_FILE));
         setId(ACTION_ID);
-        setToolTipText("Send a file to selected buddy");
+        setToolTipText(Messages.SendFileAction_tooltip);
         setEnabled(false);
 
         SarosPluginContext.initComponent(this);
@@ -130,14 +132,14 @@ public class SendFileAction extends Action implements Disposable {
             participants = SelectionRetrieverFactory.getSelectionRetriever(
                 User.class).getSelection();
             if (participants.size() != 1) {
-                log.warn("More than one participant selected.");
+                log.warn("More than one participant selected."); //$NON-NLS-1$
                 return;
             }
         } catch (NullPointerException e) {
             this.setEnabled(false);
         } catch (Exception e) {
             if (!PlatformUI.getWorkbench().isClosing())
-                log.error("Unexcepted error while updating enablement", e);
+                log.error("Unexcepted error while updating enablement", e); //$NON-NLS-1$
         }
 
         if (participants == null)
@@ -145,7 +147,7 @@ public class SendFileAction extends Action implements Disposable {
 
         // prompt to choose a file
         FileDialog fd = new FileDialog(EditorAPI.getShell(), SWT.OPEN);
-        fd.setText("Select the file to send");
+        fd.setText(Messages.SendFileAction_filedialog_text);
         String filename = fd.open();
         if (filename == null)
             return;
@@ -157,15 +159,15 @@ public class SendFileAction extends Action implements Disposable {
         try {
             in = new FileInputStream(file);
         } catch (FileNotFoundException e) {
-            errorPopup("Cannot read file",
-                "'" + filename + "' cannot be read.", e, null);
+            errorPopup(Messages.SendFileAction_error_cannot_read_file_title,
+                MessageFormat.format(Messages.SendFileAction_error_cannot_read_file_message, filename), e, null);
             return;
         } finally {
             if (in != null)
                 try {
                     in.close();
                 } catch (IOException e) {
-                    log.warn("unable to close file:" + filename, e);
+                    log.warn("unable to close file:" + filename, e); //$NON-NLS-1$
                 }
         }
 
@@ -209,8 +211,8 @@ public class SendFileAction extends Action implements Disposable {
         protected File fileToSend;
 
         public SendFileJob(User user, File fileToSend) {
-            super("Sending '" + fileToSend.getName() + "' ("
-                + user.getHumanReadableName() + ")");
+            super(MessageFormat.format(Messages.SendFileAction_send_file_job_text,
+                fileToSend.getName(), user.getHumanReadableName()));
             this.user = user;
             this.fileToSend = fileToSend;
         }
@@ -218,80 +220,82 @@ public class SendFileAction extends Action implements Disposable {
         @Override
         protected IStatus run(IProgressMonitor ipmonitor) {
             SubMonitor monitor = SubMonitor.convert(ipmonitor);
-            monitor.beginTask("Set up session", 101);
+            monitor.beginTask(Messages.SendFileAction_monitor_set_up_session_text, 101);
 
             setProperty(IProgressConstants.KEEP_PROPERTY, Boolean.TRUE);
 
-            log.info("Asking " + user + " to accept our transfer.");
-            monitor.subTask("Notifying " + user.getHumanReadableName() + "...");
+            log.info("Asking " + user + " to accept our transfer."); //$NON-NLS-1$ //$NON-NLS-2$
+            monitor.subTask(MessageFormat.format(Messages.SendFileAction_monitor_notifying_text,
+                user.getHumanReadableName()));
             try {
                 setStreamSession(streamServiceManager.createSession(
                     sendFileService, user,
                     FileDescription.fromFile(fileToSend), null));
                 monitor.worked(1);
             } catch (RemoteCancellationException e) {
-                errorPopup(getName(), "Your file-transfer was rejected.", e,
+                errorPopup(getName(), Messages.SendFileAction_error_file_transfer_rejected_text, e,
                     monitor);
                 return Status.CANCEL_STATUS;
             } catch (ConnectionException e) {
-                errorPopup(getName(), "Could not establish connection.", e,
+                errorPopup(getName(), Messages.SendFileAction_error_no_connection_establish_text, e,
                     monitor);
                 return Status.CANCEL_STATUS;
             } catch (TimeoutException e) {
-                errorPopup(getName(), "Your file-transfer request timed out.",
+                errorPopup(getName(), Messages.SendFileAction_error_timed_out_text,
                     e, monitor);
                 return Status.CANCEL_STATUS;
             } catch (ExecutionException e) {
-                monitor.subTask("Unexpected error: " + e.getMessage());
-                log.error("Unexpected error: ", e);
+                monitor.subTask(MessageFormat.format(Messages.SendFileAction_unexpected_error,
+                    e.getMessage()));
+                log.error("Unexpected error: ", e); //$NON-NLS-1$
                 return new Status(IStatus.ERROR, Saros.SAROS,
-                    "Could not create session", e);
+                    Messages.SendFileAction_status_could_not_create_session_text, e);
             } catch (InterruptedException e) {
                 return Status.CANCEL_STATUS;
             }
 
-            monitor.setTaskName("Sending");
+            monitor.setTaskName(Messages.SendFileAction_monitor_sending_text);
 
             try {
                 send(getStreamSession(), fileToSend,
                     monitor.newChild(100, SubMonitor.SUPPRESS_SETTASKNAME));
 
             } catch (InterruptedIOException e) {
-                monitor.subTask("Canceled");
+                monitor.subTask(Messages.SendFileAction_monitor_canceled_text);
                 return Status.CANCEL_STATUS;
             } catch (IOException e) {
                 if (streamException == null) {
                     // plain IOE
-                    log.error("Error while sending file: ", e);
+                    log.error("Error while sending file: ", e); //$NON-NLS-1$
                     return new Status(IStatus.ERROR, Saros.SAROS,
-                        "Error while sending file", e);
+                        "Error while sending file", e); //$NON-NLS-1$
                 } else {
                     // IOE because stream is down
                     if (streamException instanceof ReceiverGoneException) {
-                        monitor.subTask("Receiver left during transfer.");
+                        monitor.subTask(Messages.SendFileAction_monitor_receiver_left_during_transfer_text);
                         return Status.CANCEL_STATUS;
                     }
                     if (streamException instanceof ConnectionException) {
-                        monitor.subTask("Lost connection.");
+                        monitor.subTask(Messages.SendFileAction_monitor_lost_connection_text);
                         return Status.CANCEL_STATUS;
                     }
-                    log.error("Unexpected error: ", streamException);
+                    log.error("Unexpected error: ", streamException); //$NON-NLS-1$
                     return new Status(IStatus.ERROR, Saros.SAROS,
-                        "Unexpected error", streamException);
+                        Messages.SendFileAction_status_unexpected_error, streamException);
                 }
             } catch (RemoteCancellationException e) {
-                monitor.subTask("Canceled");
+                monitor.subTask(Messages.SendFileAction_monitor_canceled_text);
                 return Status.CANCEL_STATUS;
             } catch (SarosCancellationException e) {
-                monitor.subTask("Canceled");
+                monitor.subTask(Messages.SendFileAction_monitor_canceled_text);
                 return Status.CANCEL_STATUS;
             } finally {
                 readyToStop.countDown();
                 monitor.done();
             }
 
-            monitor.setTaskName(sendSuccessfully ? "Successfully sent file"
-                : "Could not send whole file");
+            monitor.setTaskName(sendSuccessfully ? Messages.SendFileAction_monitor_successful_sent_text
+                : Messages.SendFileAction_monitor_not_sent_whole_file_text);
             return sendSuccessfully ? Status.OK_STATUS : Status.CANCEL_STATUS;
         }
 
@@ -314,7 +318,7 @@ public class SendFileAction extends Action implements Disposable {
         protected void send(StreamSession session, File file, SubMonitor monitor)
             throws RemoteCancellationException, IOException,
             SarosCancellationException {
-            monitor.subTask("Start sending file");
+            monitor.subTask(Messages.SendFileAction_monitor_start_sending_text);
             // TODO care for files bigger than 2GB
             monitor
                 .setWorkRemaining((file.length() + 1) > Integer.MAX_VALUE ? Integer.MAX_VALUE
@@ -359,7 +363,7 @@ public class SendFileAction extends Action implements Disposable {
         protected FileDescription fileDescription;
 
         public ReceiveFileJob(StreamSession session) {
-            super("Receiving file");
+            super(Messages.SendFileAction_receive_title);
             setStreamSession(session);
         }
 
@@ -373,72 +377,72 @@ public class SendFileAction extends Action implements Disposable {
                     fileDescription = (FileDescription) getStreamSession()
                         .getInitiationDescription();
                 } else {
-                    log.error("Got no filedescription!");
+                    log.error("Got no filedescription!"); //$NON-NLS-1$
                     return new Status(IStatus.ERROR, Saros.SAROS,
-                        "Cannot receive file, got no description.");
+                        Messages.SendFileAction_status_cannot_receive_file_text);
                 }
-                setName("Receiving '" + fileDescription.name + "' ("
-                    + getStreamSession().getRemoteJID() + ")");
+                setName(MessageFormat.format(Messages.SendFileAction_status_receiving_text,
+                    fileDescription.name, getStreamSession().getRemoteJID()));
                 monitor.beginTask(
-                    "Choose location where to save received file", 102);
+                    Messages.SendFileAction_monitor_choose_location_text, 102);
 
                 File file;
                 try {
                     file = saveFile(fileDescription.name,
                         monitor.newChild(1, SubMonitor.SUPPRESS_SETTASKNAME));
                 } catch (SarosCancellationException e) {
-                    monitor.subTask("Canceled");
+                    monitor.subTask(Messages.SendFileAction_monitor_canceled_text);
                     return Status.CANCEL_STATUS;
                 }
 
-                monitor.setTaskName("Receiving");
+                monitor.setTaskName(Messages.SendFileAction_monitor_receiving_text);
 
                 FileOutputStream fileOutputStream;
                 try {
-                    monitor.subTask("Opening file");
+                    monitor.subTask(Messages.SendFileAction_monitor_opening_text);
                     fileOutputStream = new FileOutputStream(file);
                     monitor.worked(1);
                 } catch (FileNotFoundException e) {
-                    errorPopup("Can not open file",
-                        "The file you specified can not be opened for writing",
+                    errorPopup(Messages.SendFileAction_error_cannot_open_file_title,
+                        Messages.SendFileAction_error_cannot_open_file_message,
                         e, monitor);
                     return new Status(IStatus.ERROR, Saros.SAROS,
-                        "Can not open file", e);
+                        Messages.SendFileAction_status_cannot_open_file, e);
                 }
 
                 try {
                     receive(getStreamSession(), fileOutputStream,
                         monitor.newChild(100, SubMonitor.SUPPRESS_SETTASKNAME));
                 } catch (RemoteCancellationException e) {
-                    monitor.subTask("Canceled");
+                    monitor.subTask(Messages.SendFileAction_monitor_canceled_text);
                     return Status.CANCEL_STATUS;
                 } catch (IOException e) {
                     if (stopped) {
                         // interrupted IO
-                        monitor.subTask("Canceled");
+                        monitor.subTask(Messages.SendFileAction_monitor_canceled_text);
                         return Status.CANCEL_STATUS;
                     }
                     if (streamException == null) {
                         // plain IOE
-                        log.error("Error while receiving file: ", e);
+                        log.error("Error while receiving file: ", e); //$NON-NLS-1$
                         return new Status(IStatus.ERROR, Saros.SAROS,
-                            "Error while receiving file", e);
+                            Messages.SendFileAction_error_receiving_file_text, e);
                     } else {
                         // IOE because stream is down
                         if (streamException instanceof ReceiverGoneException) {
-                            monitor.subTask("Receiver left during transfer.");
+                            monitor.subTask(Messages.SendFileAction_monitor_receiver_left_during_transfer_text);
                             return Status.CANCEL_STATUS;
                         }
                         if (streamException instanceof ConnectionException) {
-                            monitor.subTask("Lost connection.");
+                            monitor.subTask(Messages.SendFileAction_monitor_lost_connection_text);
                             return Status.CANCEL_STATUS;
                         }
-                        log.error("Unexpected error: ", streamException);
+                        log.error("Unexpected error: ", streamException); //$NON-NLS-1$
                         return new Status(IStatus.ERROR, Saros.SAROS,
-                            "Unexpected error", streamException);
+                            Messages.SendFileAction_status_unexpected_error_text, streamException);
                     }
                 } catch (SarosCancellationException e) {
-                    monitor.subTask("Canceled");
+                    monitor.subTask(Messages.SendFileAction_monitor_canceled_text);
                     return Status.CANCEL_STATUS;
                 }
 
@@ -450,8 +454,8 @@ public class SendFileAction extends Action implements Disposable {
             }
 
             monitor
-                .setTaskName(receivedSuccessfully ? "Successfully received file"
-                    : "Could not receive whole file");
+                .setTaskName(receivedSuccessfully ? Messages.SendFileAction_monitor_successful_received_file_text
+                    : Messages.SendFileAction_monitor_could_not_receive_whole_file_text);
             return receivedSuccessfully ? Status.OK_STATUS
                 : Status.CANCEL_STATUS;
         }
@@ -460,7 +464,7 @@ public class SendFileAction extends Action implements Disposable {
             FileOutputStream fileOutputStream, SubMonitor monitor)
             throws IOException, SarosCancellationException,
             RemoteCancellationException {
-            monitor.subTask("Start receiving file");
+            monitor.subTask(Messages.SendFileAction_monitor_start_receive_file);
 
             long fileSize = ((FileDescription) session
                 .getInitiationDescription()).size;
@@ -523,7 +527,7 @@ public class SendFileAction extends Action implements Disposable {
                 public String call() throws Exception {
                     FileDialog fd = new FileDialog(EditorAPI.getShell(),
                         SWT.SAVE);
-                    fd.setText("Choose location for saving received file");
+                    fd.setText(Messages.SendFileAction_dialog_choose_location_title);
                     fd.setFileName(targetFilename);
                     File file = null;
                     String destinationFilename;
@@ -539,8 +543,8 @@ public class SendFileAction extends Action implements Disposable {
 
                         if (file.exists()) {
                             again = !DialogUtils.openQuestionMessageDialog(
-                                EditorAPI.getShell(), "File exists",
-                                "Overwrite chosen file?");
+                                EditorAPI.getShell(), Messages.SendFileAction_dialog_file_exists_title,
+                                Messages.SendFileAction_dialog_file_exists_message);
 
                         }
                     } while (again);
@@ -555,7 +559,7 @@ public class SendFileAction extends Action implements Disposable {
                 filename = Utils.runSWTSync(getFile);
             } catch (Exception e) {
                 // should not happen
-                log.error("Unexpected error: ", e);
+                log.error("Unexpected error: ", e); //$NON-NLS-1$
             } finally {
                 monitor.worked(1);
                 monitor.done();
@@ -580,7 +584,7 @@ public class SendFileAction extends Action implements Disposable {
 
         @Override
         public String getServiceName() {
-            return "SendFile";
+            return "SendFile"; //$NON-NLS-1$
         }
 
         @Override
@@ -599,13 +603,13 @@ public class SendFileAction extends Action implements Disposable {
                 // no action hooked yet
                 return false;
 
-            log.info(from + " wants to send us a file.");
+            log.info(from + " wants to send us a file."); //$NON-NLS-1$
 
             final FileDescription description;
             if (file instanceof FileDescription) {
                 description = (FileDescription) file;
             } else {
-                log.error("Other party send no FileDescription!");
+                log.error("Other party send no FileDescription!"); //$NON-NLS-1$
                 return false;
             }
 
@@ -613,19 +617,18 @@ public class SendFileAction extends Action implements Disposable {
 
                 public Boolean call() throws Exception {
 
-                    return DialogUtils.openQuestionMessageDialog(
-                        EditorAPI.getShell(),
-                        "Incoming file transfer",
-                        "Accept '" + description.name + "' ("
-                            + Utils.formatByte(description.size) + ") from "
-                            + from + " ?");
+                    return DialogUtils.openQuestionMessageDialog(EditorAPI
+                        .getShell(), Messages.SendFileAction_dialog_incoming_file_transfer_title, MessageFormat
+                        .format(Messages.SendFileAction_dialog_incoming_file_transfer_message,
+                            description.name,
+                            Utils.formatByte(description.size), from));
                 }
             };
 
             try {
                 return Utils.runSWTSync(askUser);
             } catch (Exception e) {
-                log.error("Unexpected exception: ", e);
+                log.error("Unexpected exception: ", e); //$NON-NLS-1$
                 return false;
             }
         }
@@ -638,7 +641,7 @@ public class SendFileAction extends Action implements Disposable {
                 return;
             }
 
-            log.info("Starting FileTransferSession from "
+            log.info("Starting FileTransferSession from " //$NON-NLS-1$
                 + newSession.getRemoteJID());
 
             new ReceiveFileJob(newSession).schedule();

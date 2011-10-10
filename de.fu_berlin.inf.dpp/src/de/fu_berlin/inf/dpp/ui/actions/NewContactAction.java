@@ -30,6 +30,7 @@ import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.net.ConnectionState;
 import de.fu_berlin.inf.dpp.net.IConnectionListener;
 import de.fu_berlin.inf.dpp.ui.ImageManager;
+import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.ui.util.WizardUtils;
 
 public class NewContactAction extends Action {
@@ -38,7 +39,7 @@ public class NewContactAction extends Action {
     protected Saros saros;
 
     public NewContactAction() {
-        setToolTipText("Add a New Buddy");
+        setToolTipText(Messages.NewContactAction_tooltip);
         setImageDescriptor(new ImageDescriptor() {
             @Override
             public ImageData getImageData() {

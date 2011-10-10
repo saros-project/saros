@@ -10,6 +10,7 @@ import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.synchronize.StopManager;
 import de.fu_berlin.inf.dpp.ui.ImageManager;
+import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.util.ObservableValue;
 import de.fu_berlin.inf.dpp.util.ValueChangeListener;
 
@@ -31,7 +32,7 @@ public class StoppedAction extends Action {
     protected ObservableValue<Boolean> isBlockedObservable;
 
     public StoppedAction() {
-        setText("Stop Running Process");
+        setText(Messages.StoppedAction_title);
         setImageDescriptor(new ImageDescriptor() {
             @Override
             public ImageData getImageData() {
@@ -46,7 +47,7 @@ public class StoppedAction extends Action {
         isBlockedObservable.addAndNotify(new ValueChangeListener<Boolean>() {
             public void setValue(Boolean newValue) {
                 setEnabled(newValue);
-                setToolTipText(newValue ? "Project is stopped." : null);
+                setToolTipText(newValue ? Messages.StoppedAction_tooltip : null);
             }
         });
     }
@@ -57,7 +58,7 @@ public class StoppedAction extends Action {
         boolean isDebug = false;
         assert (isDebug = true) == true;
         if (isDebug) {
-            log.warn("Manually unblocking project.");
+            log.warn("Manually unblocking project."); //$NON-NLS-1$
             stopManager.lockProject(false);
         }
     }

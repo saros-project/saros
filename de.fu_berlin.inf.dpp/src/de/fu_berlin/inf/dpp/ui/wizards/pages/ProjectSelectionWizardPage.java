@@ -15,6 +15,7 @@ import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
+import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.ui.util.selection.retriever.SelectionRetrieverFactory;
 import de.fu_berlin.inf.dpp.ui.widgets.viewer.project.ResourceSelectionComposite;
 import de.fu_berlin.inf.dpp.ui.widgets.viewer.project.events.FilterClosedProjectsChangedEvent;
@@ -22,10 +23,10 @@ import de.fu_berlin.inf.dpp.ui.widgets.viewer.project.events.ResourceSelectionCh
 import de.fu_berlin.inf.dpp.ui.widgets.viewer.project.events.ResourceSelectionListener;
 
 public class ProjectSelectionWizardPage extends WizardPage {
-    public static final String TITLE = "Select Project";
-    public static final String DESCRIPTION = "Select the file(s) to work on.";
+    public static final String TITLE = Messages.ProjectSelectionWizardPage_title;
+    public static final String DESCRIPTION = Messages.ProjectSelectionWizardPage_description;
 
-    public static final String NO_PROJECT_SELECTED_ERROR_MESSAGE = "Select at least one file to work on.";
+    public static final String NO_PROJECT_SELECTED_ERROR_MESSAGE = Messages.ProjectSelectionWizardPage_selected_no_project;
 
     protected ResourceSelectionComposite resourceSelectionComposite;
 
@@ -75,7 +76,7 @@ public class ProjectSelectionWizardPage extends WizardPage {
         Label projectSelectionLabel = new Label(composite, SWT.NONE);
         projectSelectionLabel.setLayoutData(new GridData(SWT.BEGINNING,
             SWT.TOP, false, true));
-        projectSelectionLabel.setText("Projects:");
+        projectSelectionLabel.setText(Messages.ProjectSelectionWizardPage_projects);
 
         createProjectSelectionComposite(composite);
         this.resourceSelectionComposite.setLayoutData(new GridData(SWT.FILL,

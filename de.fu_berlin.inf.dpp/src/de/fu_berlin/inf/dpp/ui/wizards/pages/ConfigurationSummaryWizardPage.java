@@ -1,7 +1,9 @@
 package de.fu_berlin.inf.dpp.ui.wizards.pages;
 
+import java.text.MessageFormat;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
@@ -33,8 +35,8 @@ import de.fu_berlin.inf.dpp.util.FontUtils;
  * @author bkahlert
  */
 public class ConfigurationSummaryWizardPage extends WizardPage {
-    public static final String TITLE = "Configuration Complete";
-    public static final String DESCRIPTION = "Please click Finish to complete the Saros configuration.";
+    public static final String TITLE = de.fu_berlin.inf.dpp.ui.Messages.ConfigurationSummaryWizardPage_title;
+    public static final String DESCRIPTION = de.fu_berlin.inf.dpp.ui.Messages.ConfigurationSummaryWizardPage_description;
 
     @Inject
     protected Saros saros;
@@ -49,6 +51,9 @@ public class ConfigurationSummaryWizardPage extends WizardPage {
     SimpleIllustratedComposite skypeUsername;
     SimpleIllustratedComposite statisticSubmission;
     SimpleIllustratedComposite errorLogSubmission;
+
+    private static final Logger log = Logger
+        .getLogger(ConfigurationSummaryWizardPage.class);
 
     public ConfigurationSummaryWizardPage() {
         super(ConfigurationSummaryWizardPage.class.getName());
@@ -87,28 +92,28 @@ public class ConfigurationSummaryWizardPage extends WizardPage {
         successLabel.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true,
             false));
         successLabel
-            .setText("You are ready to finish your Saros configuration!");
+            .setText(de.fu_berlin.inf.dpp.ui.Messages.ConfigurationSummaryWizardPage_label_success);
         FontUtils.makeBold(successLabel);
 
         SimpleNoteComposite check = new SimpleNoteComposite(
             autoConnectComposite, SWT.BORDER,
             ImageManager.ELCL_PREFERENCES_OPEN,
-            "Please verify your settings on the right and click Finish.");
+            de.fu_berlin.inf.dpp.ui.Messages.ConfigurationSummaryWizardPage_check_settings);
         check.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
         check.setSpacing(5);
 
         SimpleNoteComposite addBuddies = new SimpleNoteComposite(
             autoConnectComposite, SWT.BORDER, ImageManager.ELCL_BUDDY_ADD,
-            "After completion you can add buddies to your buddy list.");
+            de.fu_berlin.inf.dpp.ui.Messages.ConfigurationSummaryWizardPage_addBuddies);
         addBuddies
             .setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
         addBuddies.setSpacing(5);
 
         SimpleNoteComposite shareProjects = new SimpleNoteComposite(
-            autoConnectComposite, SWT.BORDER, ImageManager.ELCL_PROJECT_SHARE,
-            "You can share projects via ...\n"
-                + "... a right-click on a project or a buddy.\n"
-                + "... the Saros menu in the Eclipse menu bar.");
+            autoConnectComposite,
+            SWT.BORDER,
+            ImageManager.ELCL_PROJECT_SHARE,
+            de.fu_berlin.inf.dpp.ui.Messages.ConfigurationSummaryWizardPage_share_project);
         shareProjects.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true,
             false));
         shareProjects.setSpacing(5);
@@ -119,7 +124,7 @@ public class ConfigurationSummaryWizardPage extends WizardPage {
     protected Composite createRightColumn(Composite composite) {
         Group rightColumn = new Group(composite, SWT.NONE);
         rightColumn.setLayout(LayoutUtils.createGridLayout(5, 0));
-        rightColumn.setText("Your Configuration");
+        rightColumn.setText(de.fu_berlin.inf.dpp.ui.Messages.ConfigurationSummaryWizardPage_right_column_your_configuration);
 
         /*
          * jid settings
@@ -218,7 +223,7 @@ public class ConfigurationSummaryWizardPage extends WizardPage {
         boolean uPnPEnabled = configurationSettingsWizardPage
             .getPortmappingDevice() != null;
         String skypeUsername = configurationSettingsWizardPage.isSkypeUsage() ? configurationSettingsWizardPage
-            .getSkypeUsername() : "";
+            .getSkypeUsername() : ""; //$NON-NLS-1$
         boolean statisticSubmissionAllowed = configurationSettingsWizardPage
             .isStatisticSubmissionAllowed();
         boolean errorLogSubmissionAllowed = configurationSettingsWizardPage
@@ -232,18 +237,18 @@ public class ConfigurationSummaryWizardPage extends WizardPage {
         if (this.autoConnection != null) {
             if (autoConnect) {
                 this.autoConnection.setContent(new IllustratedText(
-                    ImageManager.ELCL_XMPP_CONNECTED, "Connect automatically"));
+                    ImageManager.ELCL_XMPP_CONNECTED, de.fu_berlin.inf.dpp.ui.Messages.ConfigurationSummaryWizardPage_connect_auto));
             } else {
                 this.autoConnection.setContent(new IllustratedText(
                     ImageManager.DLCL_XMPP_CONNECTED,
-                    "Do not connect automatically"));
+                    de.fu_berlin.inf.dpp.ui.Messages.ConfigurationSummaryWizardPage_connect_auto_not));
             }
         }
 
         if (this.uPnPOption != null) {
             if (uPnPEnabled) {
                 this.uPnPOption.setContent(new IllustratedText(
-                    ImageManager.ICON_UPNP, "Use UPnP port mapping"));
+                    ImageManager.ICON_UPNP, de.fu_berlin.inf.dpp.ui.Messages.ConfigurationSummaryWizardPage_use_upnp));
             } else {
 
                 Image disabledUPnP = null;
@@ -251,24 +256,23 @@ public class ConfigurationSummaryWizardPage extends WizardPage {
                     disabledUPnP = new Image(null, ImageManager.ICON_UPNP,
                         SWT.IMAGE_DISABLE);
                 } catch (Exception e) {
-                    System.out.println("Unable to convert image:"
-                        + e.getMessage());
+                    log.debug("Unable to convert image:" + e.getMessage()); //$NON-NLS-1$
                 }
                 if (disabledUPnP != null)
                     this.uPnPOption.setContent(new IllustratedText(
-                        disabledUPnP, "Don't use UPnP port mapping"));
+                        disabledUPnP, de.fu_berlin.inf.dpp.ui.Messages.ConfigurationSummaryWizardPage_use_upnp_not));
             }
         }
 
         if (this.skypeUsername != null) {
             if (!skypeUsername.isEmpty()) {
                 this.skypeUsername.setContent(new IllustratedText(
-                    ImageManager.ELCL_BUDDY_SKYPE_CALL, "Show Skype username: "
-                        + skypeUsername));
+                    ImageManager.ELCL_BUDDY_SKYPE_CALL, MessageFormat.format(
+                        de.fu_berlin.inf.dpp.ui.Messages.ConfigurationSummaryWizardPage_skype_show_username, skypeUsername)));
             } else {
                 this.skypeUsername.setContent(new IllustratedText(
                     ImageManager.DLCL_BUDDY_SKYPE_CALL,
-                    "Do not show my Skype username"));
+                    de.fu_berlin.inf.dpp.ui.Messages.ConfigurationSummaryWizardPage_skype_show_username_not));
             }
         }
 
@@ -278,13 +282,13 @@ public class ConfigurationSummaryWizardPage extends WizardPage {
                     .setContent(new IllustratedText(
                         ImageManager.ETOOL_STATISTIC,
                         Messages
-                            .getString("feedback.statistic.page.statistic.submission")));
+                            .getString("feedback.statistic.page.statistic.submission"))); //$NON-NLS-1$
             } else {
                 this.statisticSubmission
                     .setContent(new IllustratedText(
                         ImageManager.DTOOL_STATISTIC,
                         Messages
-                            .getString("feedback.statistic.page.statistic.noSubmission")));
+                            .getString("feedback.statistic.page.statistic.noSubmission"))); //$NON-NLS-1$
             }
         }
 
@@ -292,11 +296,11 @@ public class ConfigurationSummaryWizardPage extends WizardPage {
             if (errorLogSubmissionAllowed) {
                 this.errorLogSubmission.setContent(new IllustratedText(
                     ImageManager.ETOOL_CRASH_REPORT, Messages
-                        .getString("feedback.statistic.page.error.log")));
+                        .getString("feedback.statistic.page.error.log"))); //$NON-NLS-1$
             } else {
                 this.errorLogSubmission.setContent(new IllustratedText(
                     ImageManager.DTOOL_CRASH_REPORT, Messages
-                        .getString("feedback.statistic.page.error.noLog")));
+                        .getString("feedback.statistic.page.error.noLog"))); //$NON-NLS-1$
             }
         }
 

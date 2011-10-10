@@ -1,5 +1,6 @@
 package de.fu_berlin.inf.dpp.ui.model.roster;
 
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
@@ -26,6 +27,7 @@ import de.fu_berlin.inf.dpp.net.internal.discoveryManager.DiscoveryManager.Cache
 import de.fu_berlin.inf.dpp.net.util.RosterUtils;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
 import de.fu_berlin.inf.dpp.ui.ImageManager;
+import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.ui.model.ITreeElement;
 import de.fu_berlin.inf.dpp.ui.model.TreeElement;
 
@@ -78,6 +80,8 @@ public class RosterEntryElement extends TreeElement {
     @Override
     public StyledString getStyledText() {
         StyledString styledString = new StyledString();
+        final String subscription_pending = Messages.RosterEntryElement_subscription_pending;
+        final String connected_using = Messages.RosterEntryElement_connected_using;
 
         /*
          * Name
@@ -92,11 +96,11 @@ public class RosterEntryElement extends TreeElement {
         final Presence presence = roster.getPresence(this.jid.getBase());
         if (rosterEntry != null
             && rosterEntry.getStatus() == RosterPacket.ItemStatus.SUBSCRIPTION_PENDING) {
-            styledString.append(" (subscription pending)",
+            styledString.append(" (" + subscription_pending + ")", //$NON-NLS-1$ //$NON-NLS-2$
                 StyledString.COUNTER_STYLER);
         } else if (presence != null && presence.getType() != Type.available
             && presence.getType() != Type.unavailable) {
-            styledString.append(" (" + presence.getType() + ")",
+            styledString.append(" (" + presence.getType() + ")", //$NON-NLS-1$ //$NON-NLS-2$
                 StyledString.COUNTER_STYLER);
         }
 
@@ -108,7 +112,8 @@ public class RosterEntryElement extends TreeElement {
                 .getTransferMode(jid);
 
             if (transferMode != NetTransferMode.NONE) {
-                styledString.append(" connected using: " + transferMode,
+                styledString.append(
+                    " " + MessageFormat.format(connected_using, transferMode), //$NON-NLS-1$
                     StyledString.QUALIFIER_STYLER);
             }
         }

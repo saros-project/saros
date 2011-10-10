@@ -9,6 +9,7 @@ import de.fu_berlin.inf.dpp.accountManagement.XMPPAccount;
 import de.fu_berlin.inf.dpp.accountManagement.XMPPAccountStore;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.ui.ImageManager;
+import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.ui.wizards.pages.EditXMPPAccountWizardPage;
 
 /**
@@ -17,7 +18,7 @@ import de.fu_berlin.inf.dpp.ui.wizards.pages.EditXMPPAccountWizardPage;
  * @author bkahlert
  */
 public class EditXMPPAccountWizard extends Wizard {
-    public static final String TITLE = "Edit XMPP/Jabber Account";
+    public static final String TITLE = Messages.EditXMPPAccountWizard_title;
     public static final ImageDescriptor IMAGE = ImageManager.WIZBAN_EDIT_XMPP_ACCOUNT;
 
     @Inject
@@ -39,11 +40,11 @@ public class EditXMPPAccountWizard extends Wizard {
         String username = account.getUsername();
         String password = account.getPassword();
         String server = account.getServer();
-        if (username.contains("@")) {
+        if (username.contains("@")) { //$NON-NLS-1$
             jid = new JID(username);
         } else {
-            jid = new JID(username + "@" + server);
-            server = "";
+            jid = new JID(username + "@" + server); //$NON-NLS-1$
+            server = ""; //$NON-NLS-1$
         }
 
         this.account = account;

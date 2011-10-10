@@ -22,6 +22,7 @@ import de.fu_berlin.inf.dpp.accountManagement.XMPPAccountStore;
 import de.fu_berlin.inf.dpp.net.ConnectionState;
 import de.fu_berlin.inf.dpp.net.IConnectionListener;
 import de.fu_berlin.inf.dpp.ui.ImageManager;
+import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.ui.util.WizardUtils;
 import de.fu_berlin.inf.dpp.util.Utils;
 
@@ -51,7 +52,7 @@ public class ChangeXMPPAccountAction extends Action implements IMenuCreator {
 
     public ChangeXMPPAccountAction() {
         SarosPluginContext.initComponent(this);
-        this.setText("Connect");
+        this.setText(Messages.ChangeXMPPAccountAction_connect);
         saros.getSarosNet().addListener(connectionListener);
         setMenuCreator(this);
         updateStatus();
@@ -63,11 +64,11 @@ public class ChangeXMPPAccountAction extends Action implements IMenuCreator {
     @Override
     public void run() {
 
-        Utils.runSafeAsync("ConnectDisconnectAction-", log, new Runnable() {
+        Utils.runSafeAsync("ConnectDisconnectAction-", log, new Runnable() { //$NON-NLS-1$
             public void run() {
                 try {
                     if (running.getAndSet(true)) {
-                        log.info("User clicked too fast, running already a connect or disconnect.");
+                        log.info("User clicked too fast, running already a connect or disconnect."); //$NON-NLS-1$
                         return;
                     }
                     runConnectDisconnect();
@@ -83,12 +84,12 @@ public class ChangeXMPPAccountAction extends Action implements IMenuCreator {
             if (saros.getSarosNet().isConnected()) {
                 saros.getSarosNet().disconnect();
             } else {
-                log.debug("Connect!!!");
+                log.debug("Connect!!!"); //$NON-NLS-1$
                 saros.connect(false);
             }
 
         } catch (RuntimeException e) {
-            log.error("Internal error in ConnectDisconnectAction:", e);
+            log.error("Internal error in ConnectDisconnectAction:", e); //$NON-NLS-1$
         }
     }
 
@@ -103,13 +104,13 @@ public class ChangeXMPPAccountAction extends Action implements IMenuCreator {
             addMenuItem(account.toString());
         }
         new MenuItem(accountMenu, SWT.SEPARATOR);
-        addActionToMenu(accountMenu, new Action("Add Account...") {
+        addActionToMenu(accountMenu, new Action(Messages.ChangeXMPPAccountAction_add_account) {
             @Override
             public void run() {
                 WizardUtils.openAddXMPPAccountWizard();
             }
         });
-        addActionToMenu(accountMenu, new Action("Configure Accounts...") {
+        addActionToMenu(accountMenu, new Action(Messages.ChangeXMPPAccountAction_configure_account) {
             @Override
             public void run() {
                 IHandlerService service = (IHandlerService) PlatformUI
@@ -119,10 +120,10 @@ public class ChangeXMPPAccountAction extends Action implements IMenuCreator {
                 try {
                     service
                         .executeCommand(
-                            "de.fu_berlin.inf.dpp.ui.commands.OpenSarosPreferences",
+                            "de.fu_berlin.inf.dpp.ui.commands.OpenSarosPreferences", //$NON-NLS-1$
                             null);
                 } catch (Exception e) {
-                    log.debug("Could execute command", e);
+                    log.debug("Could execute command", e); //$NON-NLS-1$
                 }
             }
         });
@@ -132,8 +133,8 @@ public class ChangeXMPPAccountAction extends Action implements IMenuCreator {
     private void addMenuItem(String account) {
         // The additional @ is needed because @ has special meaning in
         // Action#setText(), see JavaDoc of Action().
-        if (account.contains("@"))
-            account = account + "@";
+        if (account.contains("@")) //$NON-NLS-1$
+            account = account + "@"; //$NON-NLS-1$
         Action action = new Action(account) {
             int id = currentAccountId;
 
@@ -148,7 +149,7 @@ public class ChangeXMPPAccountAction extends Action implements IMenuCreator {
     protected void connectWithThisAccount(int accountID) {
         accountService.setAccountActive(accountService.getAccount(accountID));
         accountService.saveAccounts();
-        Utils.runSafeAsync("ChangeXMPPAccountAction-", log, new Runnable() {
+        Utils.runSafeAsync("ChangeXMPPAccountAction-", log, new Runnable() { //$NON-NLS-1$
             public void run() {
                 reconnect();
             }
@@ -172,29 +173,29 @@ public class ChangeXMPPAccountAction extends Action implements IMenuCreator {
             ConnectionState state = saros.getSarosNet().getConnectionState();
             switch (state) {
             case CONNECTED:
-                setText("Disconnect");
+                setText(Messages.ChangeXMPPAccountAction_disconnect);
                 setImageDescriptor(ImageManager
-                    .getImageDescriptor("/icons/elcl16/connect.png"));
+                    .getImageDescriptor("/icons/elcl16/connect.png")); //$NON-NLS-1$
                 break;
             case CONNECTING:
-                setText("Connecting");
+                setText(Messages.ChangeXMPPAccountAction_connecting);
                 setImageDescriptor(ImageManager
-                    .getImageDescriptor("/icons/elcl16/connecting.png"));
+                    .getImageDescriptor("/icons/elcl16/connecting.png")); //$NON-NLS-1$
                 break;
             case ERROR:
                 setImageDescriptor(ImageManager
-                    .getImageDescriptor("/icons/elcl16/conn_err.png"));
+                    .getImageDescriptor("/icons/elcl16/conn_err.png")); //$NON-NLS-1$
                 break;
             case NOT_CONNECTED:
-                setText("Connect");
+                setText(Messages.ChangeXMPPAccountAction_connect);
                 setImageDescriptor(ImageManager
-                    .getImageDescriptor("/icons/elcl16/disconnected.png"));
+                    .getImageDescriptor("/icons/elcl16/disconnected.png")); //$NON-NLS-1$
                 break;
             case DISCONNECTING:
             default:
-                setText("Disconnecting");
+                setText(Messages.ChangeXMPPAccountAction_disconnecting);
                 setImageDescriptor(ImageManager
-                    .getImageDescriptor("/icons/elcl16/disconnecting.png"));
+                    .getImageDescriptor("/icons/elcl16/disconnecting.png")); //$NON-NLS-1$
                 break;
             }
 
@@ -203,7 +204,7 @@ public class ChangeXMPPAccountAction extends Action implements IMenuCreator {
                 || state == ConnectionState.ERROR);
 
         } catch (RuntimeException e) {
-            log.error("Internal error in ChangeXMPPAccountAction:", e);
+            log.error("Internal error in ChangeXMPPAccountAction:", e); //$NON-NLS-1$
         }
     }
 

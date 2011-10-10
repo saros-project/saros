@@ -20,6 +20,7 @@
 package de.fu_berlin.inf.dpp.ui.actions;
 
 import java.lang.reflect.InvocationTargetException;
+import java.text.MessageFormat;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -50,6 +51,7 @@ import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.internal.ConnectionTestManager;
 import de.fu_berlin.inf.dpp.net.internal.ConnectionTestManager.TestResult;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
+import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.ui.util.selection.SelectionUtils;
 import de.fu_berlin.inf.dpp.ui.util.selection.retriever.SelectionRetrieverFactory;
 import de.fu_berlin.inf.dpp.util.Utils;
@@ -84,8 +86,8 @@ public class ConnectionTestAction extends Action {
     protected ConnectionTestManager connectionTestManager;
 
     public ConnectionTestAction() {
-        super("Test data transfer connection...");
-        setToolTipText("Test the data transfer connection to the selected buddy.");
+        super(Messages.ConnectionTestAction_title);
+        setToolTipText(Messages.ConnectionTestAction_tooltip);
 
         SarosPluginContext.initComponent(this);
 
@@ -105,7 +107,7 @@ public class ConnectionTestAction extends Action {
             this.setEnabled(false);
         } catch (Exception e) {
             if (!PlatformUI.getWorkbench().isClosing())
-                log.error("Unexcepted error while updating enablement", e);
+                log.error("Unexcepted error while updating enablement", e); //$NON-NLS-1$
         }
     }
 
@@ -123,7 +125,7 @@ public class ConnectionTestAction extends Action {
         }
 
         if (rosterEntry == null) {
-            log.error("RosterEntry should not be null at this point!");
+            log.error("RosterEntry should not be null at this point!"); //$NON-NLS-1$
             return;
         }
 
@@ -149,9 +151,10 @@ public class ConnectionTestAction extends Action {
             ErrorDialog
                 .openError(
                     EditorAPI.getShell(),
-                    "Connection Test failed",
-                    "Connection Test with buddy " + recipient + " failed",
-                    new Status(IStatus.ERROR, "de.fu_berlin.inf.dpp",
+                    Messages.ConnectionTestAction_error_title,
+                    MessageFormat.format(
+                        Messages.ConnectionTestAction_error_message, recipient),
+                    new Status(IStatus.ERROR, "de.fu_berlin.inf.dpp", //$NON-NLS-1$
                         IStatus.ERROR, Utils.getMessage(e.getCause()), e
                             .getCause()));
             return;
@@ -159,16 +162,11 @@ public class ConnectionTestAction extends Action {
             log.error(e);
             return;
         }
-        MessageDialog.openInformation(
-            EditorAPI.getShell(),
-            "Connection test successful",
-            "Connection Test with buddy "
-                + recipient
-                + " using "
-                + testResult[0].mode.toString()
-                + " "
-                + Utils.throughput(testResult[0].dataSize,
-                    testResult[0].transferTime));
+        MessageDialog.openInformation(EditorAPI.getShell(),
+            Messages.ConnectionTestAction_successful_title, MessageFormat.format(
+                Messages.ConnectionTestAction_successful_message, recipient,
+                testResult[0].mode.toString(), Utils.throughput(
+                    testResult[0].dataSize, testResult[0].transferTime)));
 
     }
 

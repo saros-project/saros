@@ -22,6 +22,7 @@ import de.fu_berlin.inf.dpp.net.internal.StreamSession;
 import de.fu_berlin.inf.dpp.observables.VoIPSessionObservable;
 import de.fu_berlin.inf.dpp.project.SarosSessionManager;
 import de.fu_berlin.inf.dpp.ui.ImageManager;
+import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.ui.dialogs.ErrorMessageDialog;
 import de.fu_berlin.inf.dpp.ui.dialogs.WarningMessageDialog;
 import de.fu_berlin.inf.dpp.ui.views.SarosView;
@@ -68,7 +69,7 @@ public class VoIPAction extends Action {
     protected AudioServiceManager audioServiceManager;
 
     public VoIPAction() {
-        super("Start VoIP Session");
+        super(Messages.VoIPAction_title);
         SarosPluginContext.initComponent(this);
         changeButton();
         setId(ACTION_ID);
@@ -89,7 +90,7 @@ public class VoIPAction extends Action {
             this.setEnabled(false);
         } catch (Exception e) {
             if (!PlatformUI.getWorkbench().isClosing())
-                log.error("Unexcepted error while updating enablement", e);
+                log.error("Unexcepted error while updating enablement", e); //$NON-NLS-1$
         }
     }
 
@@ -106,7 +107,7 @@ public class VoIPAction extends Action {
             case STOPPED:
                 if (!audioServiceManager.isPlaybackConfigured()) {
                     ErrorMessageDialog
-                        .showErrorMessage("Your playback device is not properly configured. Please check the VoIP Settings at Window > Preferences > Saros > Communication. The VoIP session will NOT be started!");
+                        .showErrorMessage(Messages.VoIPAction_error_playback_device_configured_wrong_text);
                     audioServiceManager.setPlaybackDeviceOk(false);
                     break;
                 }
@@ -114,16 +115,16 @@ public class VoIPAction extends Action {
                 if (!audioServiceManager.isRecordConfigured()) {
                     WarningMessageDialog
                         .showWarningMessage(
-                            "No Record device",
-                            "Your record device is not properly configured. Please check the VoIP Settings at Window > Preferences > Saros > Communication. The VoIP session will be started, but it could be pointless if the other buddy has also no record device.");
+                            Messages.VoIPAction_warning_no_record_device_title,
+                            Messages.VoIPAction_warning_no_record_device_text);
                     audioServiceManager.setRecordDeviceOk(false);
                 }
 
-                Job voipCreate = new Job("Creating VoIP Session") {
+                Job voipCreate = new Job(Messages.VoIPAction_job_title) {
                     @Override
                     protected IStatus run(IProgressMonitor monitor) {
-                        log.info("Trying to invite " + participants.get(0)
-                            + " to a new VoIP Session");
+                        log.info("Trying to invite " + participants.get(0) //$NON-NLS-1$
+                            + " to a new VoIP Session"); //$NON-NLS-1$
                         return audioServiceManager.invite(participants.get(0),
                             SubMonitor.convert(monitor));
                     }
@@ -136,12 +137,12 @@ public class VoIPAction extends Action {
             case STOPPING:
                 break;
             default:
-                log.error("unknown voip session status");
+                log.error("unknown voip session status"); //$NON-NLS-1$
                 break;
             }
             updateEnablement();
         } else {
-            log.warn("More than one participant selected.");
+            log.warn("More than one participant selected."); //$NON-NLS-1$
         }
     }
 
@@ -154,23 +155,23 @@ public class VoIPAction extends Action {
         switch (audioServiceManager.getStatus()) {
         case RUNNING:
             setImageDescriptor(ImageManager
-                .getImageDescriptor("icons/elcl16/stopvoip.png"));
-            setToolTipText("Stop VoIP Session...");
+                .getImageDescriptor("icons/elcl16/stopvoip.png")); //$NON-NLS-1$
+            setToolTipText(Messages.VoIPAction_stop_session_tooltip);
             break;
         case STOPPED:
             setImageDescriptor(ImageManager
-                .getImageDescriptor("icons/elcl16/startvoip.png"));
-            setToolTipText("Start a VoIP Session...");
+                .getImageDescriptor("icons/elcl16/startvoip.png")); //$NON-NLS-1$
+            setToolTipText(Messages.VoIPAction_start_session_tooltip);
             break;
         case STOPPING:
             setImageDescriptor(ImageManager
-                .getImageDescriptor("icons/elcl16/stoppingvoip.png"));
-            setToolTipText("Stop VoIP Session...");
+                .getImageDescriptor("icons/elcl16/stoppingvoip.png")); //$NON-NLS-1$
+            setToolTipText(Messages.VoIPAction_stop_session_tooltip);
             break;
         default:
             setImageDescriptor(ImageManager
-                .getImageDescriptor("icons/elcl16/startvoip.png"));
-            setToolTipText("Start a VoIP Session...");
+                .getImageDescriptor("icons/elcl16/startvoip.png")); //$NON-NLS-1$
+            setToolTipText(Messages.VoIPAction_start_session_tooltip);
             break;
         }
     }

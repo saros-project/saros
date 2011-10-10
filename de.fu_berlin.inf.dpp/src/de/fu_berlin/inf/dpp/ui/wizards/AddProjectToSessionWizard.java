@@ -1,5 +1,6 @@
 package de.fu_berlin.inf.dpp.ui.wizards;
 
+import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -34,6 +35,7 @@ import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
 import de.fu_berlin.inf.dpp.project.SarosSessionManager;
+import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.ui.util.DialogUtils;
 import de.fu_berlin.inf.dpp.ui.wizards.JoinSessionWizard.OverwriteErrorDialog;
 import de.fu_berlin.inf.dpp.ui.wizards.dialogs.WizardDialogAccessable;
@@ -72,7 +74,7 @@ public class AddProjectToSessionWizard extends Wizard {
         this.remoteProjectNames = projectNames;
         this.dataTransferManager = dataTransferManager;
         this.preferenceUtils = preferenceUtils;
-        setWindowTitle("Add Projects");
+        setWindowTitle(Messages.AddProjectToSessionWizard_title);
         setHelpAvailable(true);
 
         process.setProjectInvitationUI(this);
@@ -127,7 +129,7 @@ public class AddProjectToSessionWizard extends Wizard {
                         project.open(null);
                     } catch (CoreException e) {
                         log.debug(
-                            "An error occur while opening the source file", e);
+                            "An error occur while opening the source file", e); //$NON-NLS-1$
                     }
                 }
 
@@ -200,12 +202,9 @@ public class AddProjectToSessionWizard extends Wizard {
     @Override
     public boolean performCancel() {
         if (!isExceptionCancel) {
-            if (!Utils
-                .popUpYesNoQuestion(
-                    "Leaving the Session",
-                    "The session participants must remain synchronised at all times."
-                        + " Declining an invitation will therefore eject you from the session. "
-                        + " Are you sure you want to leave?", false)) {
+            if (!Utils.popUpYesNoQuestion(
+                Messages.AddProjectToSessionWizard_leave_session,
+                Messages.AddProjectToSessionWizard_leave_session_text, false)) {
                 return false;
             }
             Utils.runSafeAsync(log, new Runnable() {
@@ -224,44 +223,61 @@ public class AddProjectToSessionWizard extends Wizard {
             return Utils.runSWTSync(new Callable<Boolean>() {
                 public Boolean call() {
 
-                    String message = "Each project you are accepting will be synchronised with the inviter's copy. It has been found that some of your local files differ from those of the inviter.\n\n"
-                        + "All local differences will be overwritten!\n\n"
-                        + "Press \"No\" and then select \"Create copy...\" if you are unsure.\n"
-                        + "Press \"Details\" to find out what changes will occur if you proceed.\n\n"
-                        + "Do you want to proceed?";
+                    String message = Messages.AddProjectToSessionWizard_synchronize_projects;
 
                     String PID = Saros.SAROS;
                     MultiStatus info = new MultiStatus(PID, 1, message, null);
                     for (String projectName : everyThing.keySet()) {
                         FileListDiff diff = everyThing.get(projectName);
-                        info.add(new Status(IStatus.INFO, PID, 1,
-                            "Following files in project '" + projectName
-                                + "' are affected:", null));
+                        info.add(new Status(
+                            IStatus.INFO,
+                            PID,
+                            1,
+                            MessageFormat
+                                .format(
+                                    Messages.AddProjectToSessionWizard_files_affected,
+                                    projectName), null));
                         for (IPath path : diff.getRemovedPaths()) {
-                            info.add(new Status(IStatus.WARNING, PID, 1,
-                                "  File will be removed: " + path.toOSString(),
-                                null));
+                            info.add(new Status(
+                                IStatus.WARNING,
+                                PID,
+                                1,
+                                MessageFormat
+                                    .format(
+                                        Messages.AddProjectToSessionWizard_file_toRemove,
+                                        path.toOSString()), null));
                         }
                         for (IPath path : diff.getAlteredPaths()) {
-                            info.add(new Status(IStatus.WARNING, PID, 1,
-                                "  File will be overwritten: "
-                                    + path.toOSString(), null));
+                            info.add(new Status(
+                                IStatus.WARNING,
+                                PID,
+                                1,
+                                MessageFormat
+                                    .format(
+                                        Messages.AddProjectToSessionWizard_file_overwritten,
+                                        path.toOSString()), null));
                         }
                         for (IPath path : diff.getAddedPaths()) {
-                            info.add(new Status(IStatus.INFO, PID, 1,
-                                "  File will be added: " + path.toOSString(),
-                                null));
+                            info.add(new Status(
+                                IStatus.INFO,
+                                PID,
+                                1,
+                                MessageFormat
+                                    .format(
+                                        Messages.AddProjectToSessionWizard_file_added,
+                                        path.toOSString()), null));
                         }
-                        info.add(new Status(IStatus.INFO, PID, 1, "", null));
+                        info.add(new Status(IStatus.INFO, PID, 1, "", null)); //$NON-NLS-1$
                     }
-                    return new OverwriteErrorDialog(getShell(),
-                        "Warning: Local changes will be deleted", null, info)
-                        .open() == IDialogConstants.OK_ID;
+                    return new OverwriteErrorDialog(
+                        getShell(),
+                        Messages.AddProjectToSessionWizard_delete_local_changes,
+                        null, info).open() == IDialogConstants.OK_ID;
                 }
             });
         } catch (Exception e) {
             log.error(
-                "An error ocurred while trying to open the confirm dialog.", e);
+                "An error ocurred while trying to open the confirm dialog.", e); //$NON-NLS-1$
             return false;
         }
     }
@@ -274,26 +290,38 @@ public class AddProjectToSessionWizard extends Wizard {
         if (errorMsg != null) {
             switch (cancelLocation) {
             case LOCAL:
-                DialogUtils.openErrorMessageDialog(getShell(),
-                    "Invitation Cancelled",
-                    "Your invitation has been cancelled "
-                        + "locally because of an error:\n\n" + errorMsg);
+                DialogUtils
+                    .openErrorMessageDialog(
+                        getShell(),
+                        Messages.AddProjectToSessionWizard_invitation_cancelled,
+                        MessageFormat
+                            .format(
+                                Messages.AddProjectToSessionWizard_invitation_cancelled_text,
+                                errorMsg));
                 break;
             case REMOTE:
-                DialogUtils.openErrorMessageDialog(getShell(),
-                    "Invitation Cancelled",
-                    "Your invitation has been cancelled " + "remotely by "
-                        + peer + " because of an error:\n\n" + errorMsg);
+                DialogUtils
+                    .openErrorMessageDialog(
+                        getShell(),
+                        Messages.AddProjectToSessionWizard_invitation_cancelled,
+                        MessageFormat
+                            .format(
+                                Messages.AddProjectToSessionWizard_invitation_cancelled_text2,
+                                peer, errorMsg));
             }
         } else {
             switch (cancelLocation) {
             case LOCAL:
                 break;
             case REMOTE:
-                DialogUtils.openInformationMessageDialog(getShell(),
-                    "Invitation Cancelled",
-                    "Your invitation has been cancelled remotely by " + peer
-                        + "!");
+                DialogUtils
+                    .openInformationMessageDialog(
+                        getShell(),
+                        Messages.AddProjectToSessionWizard_invitation_cancelled,
+                        MessageFormat
+                            .format(
+                                Messages.AddProjectToSessionWizard_invitation_cancelled_text3,
+                                peer));
             }
         }
     }

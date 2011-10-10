@@ -23,7 +23,6 @@ import org.picocontainer.annotations.Inject;
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.feedback.ErrorLogManager;
-import de.fu_berlin.inf.dpp.feedback.Messages;
 import de.fu_berlin.inf.dpp.feedback.StatisticManager;
 import de.fu_berlin.inf.dpp.net.UPnP.UPnPManager;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
@@ -41,8 +40,8 @@ import de.fu_berlin.inf.dpp.util.Utils;
  * @author bkahlert
  */
 public class ConfigurationSettingsWizardPage extends WizardPage {
-    public static final String TITLE = "General Settings";
-    public static final String DESCRIPTION = "Configure your settings for use with Saros.";
+    public static final String TITLE = de.fu_berlin.inf.dpp.ui.Messages.ConfigurationSettingsWizardPage_title;
+    public static final String DESCRIPTION = de.fu_berlin.inf.dpp.ui.Messages.ConfigurationSettingsWizardPage_description;
 
     @Inject
     protected Saros saros;
@@ -99,7 +98,8 @@ public class ConfigurationSettingsWizardPage extends WizardPage {
     protected Composite createLeftColumn(Composite composite) {
         Group leftColumn = new Group(composite, SWT.NONE);
         leftColumn.setLayout(LayoutUtils.createGridLayout(5, 0));
-        leftColumn.setText("Connection");
+        leftColumn
+            .setText(de.fu_berlin.inf.dpp.ui.Messages.ConfigurationSettingsWizardPage_left_column_connection);
 
         /*
          * prepare network setting composite
@@ -118,11 +118,12 @@ public class ConfigurationSettingsWizardPage extends WizardPage {
         autoConnectLabel.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true,
             false));
         autoConnectLabel
-            .setText("Automatically connect to XMPP/Jabber server on Eclipse startup?");
+            .setText(de.fu_berlin.inf.dpp.ui.Messages.ConfigurationSettingsWizardPage_label_autoconnect);
 
         this.autoConnectButton = new Button(autoconnectComposite, SWT.CHECK
             | SWT.LEFT);
-        this.autoConnectButton.setText("Connect automatically");
+        this.autoConnectButton
+            .setText(de.fu_berlin.inf.dpp.ui.Messages.ConfigurationSettingsWizardPage_button_autoconnect);
 
         /*
          * separator
@@ -142,16 +143,14 @@ public class ConfigurationSettingsWizardPage extends WizardPage {
         portmappingLabel.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true,
             false));
         portmappingLabel
-            .setText("Automatically configure your gateway to temporary open a port for Saros?");
+            .setText(de.fu_berlin.inf.dpp.ui.Messages.ConfigurationSettingsWizardPage_label_portmapping);
 
         this.setupPortmappingButton = new Button(gatewayComposite, SWT.CHECK
             | SWT.LEFT | SWT.WRAP);
         this.setupPortmappingButton
-            .setText("Allow Saros to configure the following gateway:");
+            .setText(de.fu_berlin.inf.dpp.ui.Messages.ConfigurationSettingsWizardPage_button_portmapping);
         this.setupPortmappingButton
-            .setToolTipText("When using a router for connecting to the internet, it may block incoming connections resulting in slow data transfers in a Saros session.\n"
-                + "Saros can open a port on that gateway for other peer to connect to you.\n"
-                + "This port mapping is removed when exiting Saros.");
+            .setToolTipText(de.fu_berlin.inf.dpp.ui.Messages.ConfigurationSettingsWizardPage_button_portmapping_tooltip);
         setupPortmappingButton.setEnabled(false);
 
         Composite comboCompo = new Composite(gatewayComposite, SWT.TOP
@@ -182,7 +181,8 @@ public class ConfigurationSettingsWizardPage extends WizardPage {
         Label skypeLabel = new Label(skypeComposite, SWT.WRAP);
         skypeLabel.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true,
             false, 2, 1));
-        skypeLabel.setText("Shall your buddies see your Skype username?");
+        skypeLabel
+            .setText(de.fu_berlin.inf.dpp.ui.Messages.ConfigurationSettingsWizardPage_label_skype);
 
         Composite skypeUsageComposite = new Composite(skypeComposite, SWT.NONE);
         skypeUsageComposite.setLayoutData(new GridData(SWT.BEGINNING,
@@ -190,13 +190,15 @@ public class ConfigurationSettingsWizardPage extends WizardPage {
         skypeUsageComposite.setLayout(LayoutUtils.createGridLayout(2, false, 0,
             5));
         this.skypeUsageButton = new Button(skypeUsageComposite, SWT.CHECK);
-        this.skypeUsageButton.setText("Yes, use:");
+        this.skypeUsageButton
+            .setText(de.fu_berlin.inf.dpp.ui.Messages.ConfigurationSettingsWizardPage_yes_use);
 
         Text skypeUsernameText = new Text(skypeComposite, SWT.BORDER);
         skypeUsernameText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER,
             true, false));
-        this.skypeUsernameText = new EmptyText(skypeUsernameText,
-            "Skype username");
+        this.skypeUsernameText = new EmptyText(
+            skypeUsernameText,
+            de.fu_berlin.inf.dpp.ui.Messages.ConfigurationSettingsWizardPage_skype_username);
 
         return leftColumn;
     }
@@ -204,7 +206,8 @@ public class ConfigurationSettingsWizardPage extends WizardPage {
     protected Composite createRightColumn(Composite composite) {
         Group rightColumn = new Group(composite, SWT.NONE);
         rightColumn.setLayout(LayoutUtils.createGridLayout(5, 0));
-        rightColumn.setText("Statistic");
+        rightColumn
+            .setText(de.fu_berlin.inf.dpp.ui.Messages.ConfigurationSettingsWizardPage_statistic);
 
         /*
          * statistic submission
@@ -219,15 +222,16 @@ public class ConfigurationSettingsWizardPage extends WizardPage {
 
         Link message = new Link(statisticSubmissionComposite, SWT.WRAP);
         message.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
-        message.setText(Messages.getString("feedback.statistic.page.request")); //$NON-NLS-1$
+        message
+            .setText(de.fu_berlin.inf.dpp.ui.Messages.ConfigurationSettingsWizardPage_feedback_descr);
         message.addListener(SWT.Selection, new LinkListener());
 
         statisticSubmissionButton = new Button(statisticSubmissionComposite,
             SWT.CHECK | SWT.WRAP);
         statisticSubmissionButton.setLayoutData(new GridData(SWT.FILL,
             SWT.CENTER, true, false));
-        statisticSubmissionButton.setText(Messages
-            .getString("feedback.statistic.page.statistic.submission")); //$NON-NLS-1$
+        statisticSubmissionButton
+            .setText(de.fu_berlin.inf.dpp.ui.Messages.ConfigurationSettingsWizardPage_feedback_allow_data);
         statisticSubmissionButton.setSelection(true);
 
         /*
@@ -252,8 +256,8 @@ public class ConfigurationSettingsWizardPage extends WizardPage {
             SWT.CHECK | SWT.WRAP);
         errorLogSubmissionButton.setLayoutData(new GridData(SWT.FILL,
             SWT.BOTTOM, false, false));
-        errorLogSubmissionButton.setText(Messages
-            .getString("feedback.statistic.page.error.log")); //$NON-NLS-1$
+        errorLogSubmissionButton
+            .setText(de.fu_berlin.inf.dpp.ui.Messages.ConfigurationSettingsWizardPage_feedback_allow_crash);
         errorLogSubmissionButton.setSelection(true);
 
         return rightColumn;
@@ -334,7 +338,8 @@ public class ConfigurationSettingsWizardPage extends WizardPage {
     protected void populateGatewayCombo() {
         if (upnpManager.getGateways() == null) {
             gatewaysCombo.setEnabled(false);
-            gatewayInfo.setText("Searching for gateways...");
+            gatewayInfo
+                .setText(de.fu_berlin.inf.dpp.ui.Messages.ConfigurationSettingsWizardPage_0);
             gatewayInfo.pack();
 
             // dont block during discovery
@@ -355,8 +360,8 @@ public class ConfigurationSettingsWizardPage extends WizardPage {
             });
 
         } else {
-            UPnPUIUtils.populateGatewaySelectionControls(upnpManager, gatewaysCombo,
-                gatewayInfo, setupPortmappingButton);
+            UPnPUIUtils.populateGatewaySelectionControls(upnpManager,
+                gatewaysCombo, gatewayInfo, setupPortmappingButton);
         }
     }
 

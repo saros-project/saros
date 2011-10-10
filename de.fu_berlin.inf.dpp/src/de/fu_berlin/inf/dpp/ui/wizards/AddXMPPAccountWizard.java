@@ -30,6 +30,7 @@ import de.fu_berlin.inf.dpp.accountManagement.XMPPAccount;
 import de.fu_berlin.inf.dpp.accountManagement.XMPPAccountStore;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.ui.ImageManager;
+import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.ui.util.DialogUtils;
 import de.fu_berlin.inf.dpp.ui.wizards.pages.EnterXMPPAccountWizardPage;
 import de.fu_berlin.inf.dpp.util.Utils;
@@ -55,7 +56,7 @@ public class AddXMPPAccountWizard extends Wizard {
     public AddXMPPAccountWizard() {
         SarosPluginContext.initComponent(this);
 
-        setWindowTitle("Add XMPP/Jabber Account");
+        setWindowTitle(Messages.AddXMPPAccountWizard_title);
         setHelpAvailable(false);
         setNeedsProgressMonitor(false);
         setDefaultPageImageDescriptor(ImageManager.WIZBAN_CONFIGURATION);
@@ -80,10 +81,9 @@ public class AddXMPPAccountWizard extends Wizard {
                 doCancel = Utils.runSWTSync(new Callable<Boolean>() {
                     public Boolean call() throws Exception {
                         return DialogUtils.openQuestionMessageDialog(
-                            getShell(), "Account Created",
-                            "Your XMPP/Jabber Account has already been created\n"
-                                + "and added to your Saros configuration.\n\n"
-                                + "Do you really want to cancel?");
+                            getShell(),
+                            Messages.AddXMPPAccountWizard_account_created,
+                            Messages.AddXMPPAccountWizard_account_created_text);
                     }
                 });
             } catch (Exception e) {

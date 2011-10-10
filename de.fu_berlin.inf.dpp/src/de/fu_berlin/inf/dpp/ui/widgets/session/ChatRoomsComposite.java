@@ -42,6 +42,7 @@ import de.fu_berlin.inf.dpp.net.RosterTracker;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.SarosSessionManager;
 import de.fu_berlin.inf.dpp.ui.ImageManager;
+import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.ui.sounds.SoundManager;
 import de.fu_berlin.inf.dpp.ui.sounds.SoundPlayer;
 import de.fu_berlin.inf.dpp.ui.views.SarosView;
@@ -168,7 +169,8 @@ public class ChatRoomsComposite extends ListExplanatoryComposite {
 
                         hideExplanation();
                         chatRoom1 = new CTabItem(chatRooms, SWT.NONE);
-                        chatRoom1.setText("Roundtable");
+                        chatRoom1
+                            .setText(Messages.ChatRoomsComposite_roundtable);
                         chatRoom1.setImage(chatViewImage);
                         chatRoom1.setControl(chatControl);
                         chatRooms.setSelection(0);
@@ -216,7 +218,7 @@ public class ChatRoomsComposite extends ListExplanatoryComposite {
         }
 
         public void stateChanged(final JID sender, final ChatState state) {
-            log.debug("Received ChatState from " + sender + ": "
+            log.debug("Received ChatState from " + sender + ": " //$NON-NLS-1$ //$NON-NLS-2$
                 + state.toString());
 
             Utils.runSafeSWTAsync(log, new Runnable() {
@@ -330,7 +332,7 @@ public class ChatRoomsComposite extends ListExplanatoryComposite {
         if (this.joinedSession()) {
             this.attachToMUCSession(mucManager.getMUCSession());
             chatRoom1 = new CTabItem(chatRooms, SWT.NONE);
-            chatRoom1.setText("Roundtable");
+            chatRoom1.setText(Messages.ChatRoomsComposite_roundtable);
             chatRoom1.setImage(chatViewImage);
             chatRoom1.setControl(chatControl);
             chatRooms.setSelection(0);
@@ -403,19 +405,21 @@ public class ChatRoomsComposite extends ListExplanatoryComposite {
                 if (chatControl == null || chatControl.isDisposed()
                     || sender == null || color == null)
                     return;
-                log.debug("Sender: " + sender);
-                log.debug("Color: " + color);
+                log.debug("Sender: " + sender); //$NON-NLS-1$
+                log.debug("Color: " + color); //$NON-NLS-1$
                 chatControl.addChatLine(sender, color, message, receivedOn);
             }
         });
     }
 
     protected void addChatLine(MUCSessionHistoryJoinElement join) {
-        addChatLine(join.getSender(), "... joined the chat.", join.getDate());
+        addChatLine(join.getSender(),
+            Messages.ChatRoomsComposite_joint_the_chat, join.getDate());
     }
 
     protected void addChatLine(MUCSessionHistoryLeaveElement leave) {
-        addChatLine(leave.getSender(), "... left the chat.", leave.getDate());
+        addChatLine(leave.getSender(),
+            Messages.ChatRoomsComposite_left_the_chat, leave.getDate());
     }
 
     protected void addChatLine(

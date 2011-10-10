@@ -20,6 +20,7 @@
 package de.fu_berlin.inf.dpp.ui.wizards;
 
 import java.lang.reflect.InvocationTargetException;
+import java.text.MessageFormat;
 
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -43,6 +44,7 @@ import de.fu_berlin.inf.dpp.invitation.ProcessTools.CancelOption;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
+import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.ui.util.DialogUtils;
 import de.fu_berlin.inf.dpp.ui.wizards.dialogs.WizardDialogAccessable;
 import de.fu_berlin.inf.dpp.ui.wizards.pages.ShowDescriptionPage;
@@ -86,7 +88,7 @@ public class JoinSessionWizard extends Wizard {
         EnterProjectNamePageUtils.setPreferenceUtils(preferenceUtils);
 
         process.setInvitationUI(this);
-        setWindowTitle("Session Invitation");
+        setWindowTitle(Messages.JoinSessionWizard_title);
         setHelpAvailable(false);
         setNeedsProgressMonitor(true);
 
@@ -102,7 +104,7 @@ public class JoinSessionWizard extends Wizard {
     public void createPageControls(Composite pageContainer) {
         this.descriptionPage.createControl(pageContainer);
         this.wizardDialog.setWizardButtonLabel(IDialogConstants.FINISH_ID,
-            "Accept");
+            Messages.JoinSessionWizard_accept);
     }
 
     @Override
@@ -123,7 +125,7 @@ public class JoinSessionWizard extends Wizard {
             processException(e.getCause());
             return false;
         } catch (InterruptedException e) {
-            log.error("Code not designed to be interrupted.", e);
+            log.error("Code not designed to be interrupted.", e); //$NON-NLS-1$
             processException(e);
             return false;
         }
@@ -144,8 +146,8 @@ public class JoinSessionWizard extends Wizard {
         protected void createButtonsForButtonBar(Composite parent) {
             super.createButtonsForButtonBar(parent);
             Button ok = getButton(IDialogConstants.OK_ID);
-            ok.setText("Yes");
-            Button no = createButton(parent, IDialogConstants.CANCEL_ID, "No",
+            ok.setText(Messages.JoinSessionWizard_yes);
+            Button no = createButton(parent, IDialogConstants.CANCEL_ID, Messages.JoinSessionWizard_no,
                 true);
             no.moveBelow(ok);
             no.setFocus();
@@ -202,7 +204,7 @@ public class JoinSessionWizard extends Wizard {
                 try {
                     Thread.sleep(1000);
                 } catch (InterruptedException e) {
-                    log.error("Code not designed to be interruptable", e);
+                    log.error("Code not designed to be interruptable", e); //$NON-NLS-1$
                     Thread.currentThread().interrupt();
                     return;
                 }
@@ -271,25 +273,34 @@ public class JoinSessionWizard extends Wizard {
             switch (cancelLocation) {
             case LOCAL:
                 DialogUtils.openErrorMessageDialog(getShell(),
-                    "Invitation Cancelled",
-                    "Your invitation has been cancelled "
-                        + "locally because of an error:\n\n" + errorMsg);
+                    Messages.JoinSessionWizard_inv_cancelled,
+                    Messages.JoinSessionWizard_inv_cancelled_text
+                        + Messages.JoinSessionWizard_8 + errorMsg);
                 break;
             case REMOTE:
-                DialogUtils.openErrorMessageDialog(getShell(),
-                    "Invitation Cancelled",
-                    "Your invitation has been cancelled " + "remotely by "
-                        + peer + " because of an error:\n\n" + errorMsg);
+                DialogUtils
+                    .openErrorMessageDialog(
+                        getShell(),
+
+                        Messages.JoinSessionWizard_inv_cancelled,
+                        MessageFormat
+                            .format(
+                                Messages.JoinSessionWizard_inv_cancelled_text2,
+                                peer, errorMsg));
             }
         } else {
             switch (cancelLocation) {
             case LOCAL:
                 break;
             case REMOTE:
-                DialogUtils.openInformationMessageDialog(getShell(),
-                    "Invitation Cancelled",
-                    "Your invitation has been cancelled remotely by " + peer
-                        + "!");
+                DialogUtils
+                    .openInformationMessageDialog(
+                        getShell(),
+                        Messages.JoinSessionWizard_inv_cancelled,
+                        MessageFormat
+                            .format(
+                                Messages.JoinSessionWizard_inv_cancelled_text3,
+                                peer));
             }
         }
     }
@@ -302,8 +313,8 @@ public class JoinSessionWizard extends Wizard {
             cancelWizard(process.getPeer(), t.getMessage(),
                 CancelLocation.REMOTE);
         } else {
-            log.error("This type of exception is not expected here: ", t);
-            cancelWizard(process.getPeer(), "Unkown error: " + t.getMessage(),
+            log.error("This type of exception is not expected here: ", t); //$NON-NLS-1$
+            cancelWizard(process.getPeer(), "Unkown error: " + t.getMessage(), //$NON-NLS-1$
                 CancelLocation.REMOTE);
         }
     }

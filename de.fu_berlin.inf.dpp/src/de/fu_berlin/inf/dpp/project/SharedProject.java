@@ -2,6 +2,7 @@ package de.fu_berlin.inf.dpp.project;
 
 import static java.text.MessageFormat.format;
 
+import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -79,7 +80,7 @@ public class SharedProject {
 
         @Override
         public String toString() {
-            return value == null ? "null" : value.toString();
+            return value == null ? "null" : value.toString(); //$NON-NLS-1$
         }
     }
 
@@ -110,7 +111,7 @@ public class SharedProject {
 
         @Override
         public String toString() {
-            return format("R[{0}@{1}]", vcsUrl.toString(),
+            return format("R[{0}@{1}]", vcsUrl.toString(), //$NON-NLS-1$
                 vcsRevision.toString());
         }
     }
@@ -132,10 +133,10 @@ public class SharedProject {
 
             StringBuilder result = new StringBuilder(512);
 
-            String fullPath = project.getFullPath().toString() + "/";
+            String fullPath = project.getFullPath().toString() + "/"; //$NON-NLS-1$
 
             for (Map.Entry<?, ?> entry : sortedMap.entrySet())
-                result.append(fullPath).append(entry.getKey()).append(" -> ")
+                result.append(fullPath).append(entry.getKey()).append(" -> ") //$NON-NLS-1$
                     .append(entry.getValue()).append('\n');
 
             result.setLength(result.length() - 1);
@@ -170,7 +171,7 @@ public class SharedProject {
                 return;
 
             StringBuilder result = new StringBuilder(512);
-            result.append("subscriberResourceChanged:\n");
+            result.append("subscriberResourceChanged:\n"); //$NON-NLS-1$
 
             for (ISubscriberChangeEvent delta : deltas) {
                 int flags = delta.getFlags();
@@ -194,7 +195,7 @@ public class SharedProject {
                         .getProject());
                     if (vcs.isManaged(resource)) {
                         VCSResourceInfo info = vcs.getResourceInfo(resource);
-                        result.append(format(" ({0}:{1})", info.url,
+                        result.append(format(" ({0}:{1})", info.url, //$NON-NLS-1$
                             info.revision));
                     }
                 }
@@ -231,7 +232,7 @@ public class SharedProject {
         try {
             addAll(project);
         } catch (CoreException e) {
-            log.debug("Couldn't add all members of " + project.getName() + ".",
+            log.debug("Couldn't add all members of " + project.getName() + ".", //$NON-NLS-1$ //$NON-NLS-2$
                 e);
         }
 
@@ -249,12 +250,12 @@ public class SharedProject {
             if (subscriber != null)
                 subscriber.addListener(subscriberChangeListener);
             else
-                log.error("Could not add this SharedProject as an ISubscriberChangeListener.");
+                log.error("Could not add this SharedProject as an ISubscriberChangeListener."); //$NON-NLS-1$
         }
         Set<IPath> paths = resourceMap.keySet();
         for (IPath path : paths) {
             IResource resource = project.findMember(path);
-            assert resource != null : "Resource not found at " + path;
+            assert resource != null : "Resource not found at " + path; //$NON-NLS-1$
             VCSResourceInfo info = vcs.getResourceInfo(resource);
 
             updateVcsUrl(resource, info.url);
@@ -302,10 +303,12 @@ public class SharedProject {
      */
     protected void checkResource(IResource resource) {
         if (resource == null)
-            throw new IllegalArgumentException("Resource is null");
+            throw new IllegalArgumentException(
+                Messages.SharedProject_resource_is_null);
         else if (!contains(resource))
-            throw new IllegalArgumentException("Resource not in map "
-                + resource.toString());
+            throw new IllegalArgumentException(
+                Messages.SharedProject_resource_not_in_map
+                    + resource.toString());
     }
 
     /**
@@ -328,10 +331,12 @@ public class SharedProject {
     /** Adds the resource to the SharedProject. */
     public void add(IResource resource) {
         if (resource == null)
-            throw new IllegalArgumentException("Resource is null");
+            throw new IllegalArgumentException(
+                Messages.SharedProject_resource_is_null);
         if (resource.getProject() != project)
             throw new IllegalArgumentException(format(
-                "resource {0} is not in project {1}", resource, project));
+                Messages.SharedProject_resource_not_in_project, resource,
+                project));
         if (!contains(resource)) {
             ResourceInfo resourceInfo = new ResourceInfo(null, null);
             final IPath path = resource.getProjectRelativePath();
@@ -407,8 +412,9 @@ public class SharedProject {
             IPath path = entry.getKey();
             IResource resource = project.findMember(path);
             if (resource == null) {
-                String msg = format("Resource {0} in map doesn''t exist"
-                    + " in project {1}.", path, project.getName());
+                String msg = format(
+                    Messages.SharedProject_resource_in_map_not_exist, path,
+                    project.getName());
                 logIllegalStateException(msg);
                 illegalState = true;
                 resourceMap.remove(path);
@@ -424,16 +430,14 @@ public class SharedProject {
             String foundRevision = found.vcsRevision.getValue();
             if (found.vcsRevision.update(expected.revision)) {
                 String msg = format(
-                    "Revision out of sync on {0} in project {1} - found {2}, expected {3}.",
-                    path, projectName, foundRevision, expected.revision);
+                    Messages.SharedProject_revision_out_of_sync, path,
+                    projectName, foundRevision, expected.revision);
                 logIllegalStateException(msg);
                 illegalState = true;
             }
             if (found.vcsUrl.update(expected.url)) {
-                String msg = format(
-                    "VCS URL out of sync on {0} in project {1}\n"
-                        + "found \"{2}\"\nexpected \"{3}\".", path,
-                    projectName, foundUrl, expected.url);
+                String msg = format(Messages.SharedProject_vcs_url_out_of_sync,
+                    path, projectName, foundUrl, expected.url);
                 logIllegalStateException(msg);
                 illegalState = true;
             }
@@ -445,10 +449,12 @@ public class SharedProject {
                 if (resource == null)
                     return result;
                 IPath path = resource.getProjectRelativePath();
-                assert path != null : "Path of " + resource + " is null!";
+                String assMsg = MessageFormat.format(
+                    Messages.SharedProject_path_is_null, resource);
+                assert path != null : assMsg;
                 if (!contains(resource)) {
                     final String msg = format(
-                        "Resource map of {0} doesn''t contain {1}.",
+                        Messages.SharedProject_resource_map_does_not_contain,
                         projectName, path.toString());
                     logIllegalStateException(msg);
                     result = true;

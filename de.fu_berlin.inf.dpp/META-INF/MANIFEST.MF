@@ -1,9 +1,10 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: Saros Plug-in
+Bundle-Name: %Bundle-Name
 Bundle-SymbolicName: de.fu_berlin.inf.dpp;singleton:=true
 Bundle-Version: 11.10.28.DEVEL
 Bundle-Activator: de.fu_berlin.inf.dpp.Saros
+Bundle-Localization: plugin
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
  org.eclipse.ui.workbench.texteditor,
@@ -243,7 +244,7 @@ Export-Package: de.fu_berlin.inf.dpp;
  org.picocontainer.visitors,
  org.xmlpull.mxp1,
  org.xmlpull.v1
-Bundle-Vendor: FU-Berlin
+Bundle-Vendor: %Bundle-Vendor
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Import-Package: org.eclipse.core.filesystem,
  org.eclipse.core.net.proxy

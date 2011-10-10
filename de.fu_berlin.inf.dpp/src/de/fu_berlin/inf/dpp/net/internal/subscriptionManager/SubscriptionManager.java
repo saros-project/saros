@@ -207,6 +207,10 @@ public class SubscriptionManager {
     }
 
     protected static void informUserAboutUnsubscription(final String from) {
+        // if we are not in plugin_mode (no SWT is available), do nothing (like
+        // jUnitTest)
+        if (!Saros.isWorkbenchAvailable())
+            return;
         Utils.runSafeSWTSync(log, new Runnable() {
             public void run() {
                 MessageDialog.openInformation(EditorAPI.getShell(),

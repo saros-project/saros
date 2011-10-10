@@ -5,6 +5,7 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.picocontainer.annotations.Nullable;
 
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
+import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.util.Utils;
 
 /**
@@ -57,14 +58,14 @@ public class ErrorMessageDialog {
     public static void showErrorMessage(@Nullable String exceptionMessage) {
 
         if ((exceptionMessage == null) || exceptionMessage.trim().length() == 0) {
-            exceptionMessage = "An unspecified error occurred.";
+            exceptionMessage = Messages.ErrorMessageDialog_error_unspecified;
         }
         final String error = exceptionMessage;
 
         Utils.runSafeSWTSync(log, new Runnable() {
             public void run() {
                 MessageDialog.openError(EditorAPI.getShell(),
-                    "Error in Saros-Plugin", error);
+                    Messages.ErrorMessageDialog_error_plugin, error);
             }
         });
     }

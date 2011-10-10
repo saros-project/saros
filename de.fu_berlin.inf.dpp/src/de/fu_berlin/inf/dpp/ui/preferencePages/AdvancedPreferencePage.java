@@ -15,6 +15,7 @@ import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
+import de.fu_berlin.inf.dpp.ui.Messages;
 
 /**
  * Contains the advanced preferences - consisting of preferences that are geared
@@ -36,7 +37,7 @@ public class AdvancedPreferencePage extends FieldEditorPreferencePage implements
         SarosPluginContext.initComponent(this);
 
         setPreferenceStore(saros.getPreferenceStore());
-        setDescription("Advanced settings geared toward developers and power users.");
+        setDescription(Messages.AdvancedPreferencePage_description);
     }
 
     @Override
@@ -48,7 +49,7 @@ public class AdvancedPreferencePage extends FieldEditorPreferencePage implements
 
     private void createInviteFields() {
         inviteGroup = new Group(getFieldEditorParent(), SWT.NONE);
-        inviteGroup.setText("Invitation");
+        inviteGroup.setText(Messages.AdvancedPreferencePage_invitation);
         inviteGroup.setLayout(new GridLayout(2, false));
         GridData inviteGridData = new GridData(SWT.FILL, SWT.CENTER, true,
             false);
@@ -57,17 +58,14 @@ public class AdvancedPreferencePage extends FieldEditorPreferencePage implements
 
         addField(new BooleanFieldEditor(
             PreferenceConstants.SKIP_SYNC_SELECTABLE,
-            "Offer possibility to skip synchronisation in Session Invitation dialog",
-            inviteGroup));
+            Messages.AdvancedPreferencePage_skip_synchronization, inviteGroup));
 
         addField(new BooleanFieldEditor(
             PreferenceConstants.AUTO_ACCEPT_INVITATION,
-            "Automatically accept incoming invitation (for debugging)",
-            inviteGroup));
+            Messages.AdvancedPreferencePage_auto_accept_invite, inviteGroup));
 
-        addField(new BooleanFieldEditor(
-            PreferenceConstants.AUTO_REUSE_PROJECT,
-            "When automatically accepting invitation reuse existing project (for debugging)",
+        addField(new BooleanFieldEditor(PreferenceConstants.AUTO_REUSE_PROJECT,
+            Messages.AdvancedPreferencePage_auto_accept_invite_info,
             inviteGroup));
     }
 
@@ -78,25 +76,19 @@ public class AdvancedPreferencePage extends FieldEditorPreferencePage implements
 
         IntegerFieldEditor millisUpdateField = new IntegerFieldEditor(
             PreferenceConstants.MILLIS_UPDATE,
-            "Interval (in milliseconds) between outgoing updates to peers",
-            getFieldEditorParent());
+            Messages.AdvancedPreferencePage_peer_update, getFieldEditorParent());
         millisUpdateField.setValidRange(100, 1000);
-        millisUpdateField
-            .getLabelControl(getFieldEditorParent())
+        millisUpdateField.getLabelControl(getFieldEditorParent())
             .setToolTipText(
-                "The length of interval between your edits being sent to others in your session."
-                    + " If you find the rate of updates in the session is slow"
-                    + " you can reduce this number to increase the interval."
-                    + " (Requires session restart.)");
+                Messages.AdvancedPreferencePage_interval_between_editings);
 
         addField(millisUpdateField);
 
         addField(new BooleanFieldEditor(PreferenceConstants.PING_PONG,
-            "Perform Latency Measurement using Ping Pong Activities",
-            getFieldEditorParent()));
+            Messages.AdvancedPreferencePage_ping_pong, getFieldEditorParent()));
 
         addField(new BooleanFieldEditor(PreferenceConstants.DEBUG,
-            "Show XMPP/Jabber debug window (needs restart).",
+            Messages.AdvancedPreferencePage_show_xmpp_debug,
             getFieldEditorParent()));
     }
 

@@ -6,11 +6,12 @@ import org.eclipse.swt.graphics.Image;
 import org.jivesoftware.smack.Roster;
 
 import de.fu_berlin.inf.dpp.ui.ImageManager;
+import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.ui.model.TreeElement;
 import de.fu_berlin.inf.dpp.ui.model.roster.RosterContentProvider;
 
 /**
- * Container {@link TreeElement}Êfor a {@link Roster}
+ * Container {@link TreeElement}ï¿½for a {@link Roster}
  * 
  * @author bkahlert
  */
@@ -28,7 +29,7 @@ public class RosterHeaderElement extends HeaderElement {
     @Override
     public StyledString getStyledText() {
         StyledString styledString = new StyledString();
-        styledString.append("Buddies", boldStyler);
+        styledString.append(Messages.RosterHeaderElement_buddies, boldStyler);
         return styledString;
     }
 

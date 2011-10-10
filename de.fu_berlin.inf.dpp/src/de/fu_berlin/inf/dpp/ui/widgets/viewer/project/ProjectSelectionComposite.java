@@ -17,6 +17,7 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 
+import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.ui.util.LayoutUtils;
 import de.fu_berlin.inf.dpp.ui.util.WizardUtils;
 import de.fu_berlin.inf.dpp.ui.widgets.viewer.project.events.BaseProjectSelectionListener;
@@ -91,12 +92,12 @@ public class ProjectSelectionComposite extends BaseProjectSelectionComposite {
                     .getSelection());
             }
         });
-        filterClosedProjectsButton.setText("Hide closed projects");
+        filterClosedProjectsButton.setText(Messages.ProjectSelectionComposite_hide_closed_projects);
 
         Button newProjectButton = new Button(controlComposite, SWT.PUSH);
         newProjectButton.setLayoutData(new GridData(SWT.END, SWT.CENTER, true,
             false));
-        newProjectButton.setText("New Project...");
+        newProjectButton.setText(Messages.ProjectSelectionComposite_new_project);
         newProjectButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {

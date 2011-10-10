@@ -11,10 +11,11 @@ import org.eclipse.swt.graphics.Image;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.project.internal.SarosSession;
 import de.fu_berlin.inf.dpp.ui.ImageManager;
+import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.ui.model.TreeElement;
 
 /**
- * Container {@link TreeElement}Êfor a {@link SarosSession}
+ * Container {@link TreeElement}ï¿½for a {@link SarosSession}
  * 
  * @author bkahlert
  */
@@ -31,9 +32,11 @@ public class SessionHeaderElement extends HeaderElement {
         StyledString styledString = new StyledString();
         if (rosterSessionInput == null
             || rosterSessionInput.getSarosSession() == null) {
-            styledString.append("No Session Running", boldStyler);
+            styledString.append(
+                Messages.SessionHeaderElement_no_session_running, boldStyler);
         } else {
-            styledString.append("Session", boldStyler);
+            styledString.append(Messages.SessionHeaderElement_session,
+                boldStyler);
         }
         return styledString;
     }

@@ -2,6 +2,7 @@ package de.fu_berlin.inf.dpp.ui.wizards.utils;
 
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -19,6 +20,7 @@ import org.eclipse.jface.operation.IRunnableWithProgress;
 import de.fu_berlin.inf.dpp.FileList;
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
+import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.util.Utils;
 
 public class EnterProjectNamePageUtils {
@@ -53,8 +55,10 @@ public class EnterProjectNamePageUtils {
                     public void run(IProgressMonitor monitor)
                         throws InterruptedException {
 
-                        monitor.beginTask("Scanning workspace projects ... ",
-                            IProgressMonitor.UNKNOWN);
+                        monitor
+                            .beginTask(
+                                Messages.EnterProjectNamePageUtils_monitar_scanning,
+                                IProgressMonitor.UNKNOWN);
                         IProject project = EnterProjectNamePageUtils
                             .getLocalProject(ScanRunner.this.remoteFileList,
                                 monitor);
@@ -65,12 +69,13 @@ public class EnterProjectNamePageUtils {
 
                 });
             } catch (InvocationTargetException e) {
-                log.error("An error occurred while scanning "
-                    + "for best matching project: ", e);
+                log.error("An error occurred while scanning " //$NON-NLS-1$
+                    + "for best matching project: ", e); //$NON-NLS-1$
                 MessageDialog.openError(EditorAPI.getShell(),
-                    "An Error occurred in Saros",
-                    "An error occurred while scanning "
-                        + "for best matching project: " + e.getMessage());
+                    Messages.EnterProjectNamePageUtils_scan_error,
+                    MessageFormat.format(
+                        Messages.EnterProjectNamePageUtils_scan_error_text,
+                        e.getMessage()));
             } catch (InterruptedException e) {
                 this.project = null;
             }
@@ -253,7 +258,7 @@ public class EnterProjectNamePageUtils {
      */
     public static boolean autoUpdateProject(String id, String remoteProjectNames) {
         if (preferenceUtils == null) {
-            log.warn("preferenceUtils is null");
+            log.warn("preferenceUtils is null"); //$NON-NLS-1$
             return false;
         }
         if (preferenceUtils.isAutoReuseExisting()

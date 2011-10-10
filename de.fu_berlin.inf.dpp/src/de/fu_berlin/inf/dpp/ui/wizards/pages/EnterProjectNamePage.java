@@ -3,7 +3,9 @@ package de.fu_berlin.inf.dpp.ui.wizards.pages;
 import java.awt.Desktop;
 import java.io.IOException;
 import java.net.URI;
+import java.text.MessageFormat;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Timer;
@@ -40,6 +42,7 @@ import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
 import de.fu_berlin.inf.dpp.ui.ImageManager;
+import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.ui.preferencePages.GeneralPreferencePage;
 import de.fu_berlin.inf.dpp.ui.views.SarosView;
 import de.fu_berlin.inf.dpp.ui.wizards.dialogs.WizardDialogAccessable;
@@ -70,6 +73,8 @@ public class EnterProjectNamePage extends WizardPage {
     protected Map<String, Button> projCopies = new HashMap<String, Button>();
 
     protected Map<String, Text> newProjectNameTexts = new HashMap<String, Text>();
+
+    protected Map<String, String> errorProjectNames = new LinkedHashMap<String, String>();
 
     protected Map<String, Button> skipCheckBoxes = new HashMap<String, Button>();
 
@@ -117,14 +122,15 @@ public class EnterProjectNamePage extends WizardPage {
         PreferenceUtils preferenceUtils, List<FileList> fileLists, JID peer,
         Map<String, String> remoteProjectNames,
         WizardDialogAccessable wizardDialog) {
-        super("namePage");
+        super(Messages.EnterProjectNamePage_title);
         this.dataTransferManager = dataTransferManager;
         this.preferenceUtils = preferenceUtils;
         this.peer = peer;
         this.remoteProjectNames = remoteProjectNames;
 
         if (wizardDialog == null)
-            throw new NullPointerException("wizard dialog is null");
+            throw new NullPointerException(
+                Messages.EnterProjectNamePage_error_wizard_isNull);
 
         this.wizardDialog = wizardDialog;
 
@@ -137,7 +143,7 @@ public class EnterProjectNamePage extends WizardPage {
         this.fileLists = fileLists;
 
         setPageComplete(false);
-        setTitle("Select local project.");
+        setTitle(Messages.EnterProjectNamePage_title2);
 
     }
 
@@ -146,25 +152,23 @@ public class EnterProjectNamePage extends WizardPage {
 
         if (project == null) {
 
-            this.updateProjectStatusResults
-                .get(projectID)
-                .setText(
-                    "No matching project found. Project download will start from scratch.");
+            this.updateProjectStatusResults.get(projectID).setText(
+                Messages.EnterProjectNamePage_no_matching_project);
 
         } else {
-
+            this.errorProjectNames.remove(projectID);
             this.updateProjectStatusResults.get(projectID).setText(
-                "Your project " + project.getName() + " matches with "
-                    + this.fileLists.get(0).computeMatch(project)
-                    + "% accuracy.\n"
-                    + "This fact will be used to shorten the process of "
-                    + "downloading the remote project.");
+                MessageFormat.format(
+                    Messages.EnterProjectNamePage_projectA_matches_projectB,
+                    project.getName(),
+                    this.fileLists.get(0).computeMatch(project)));
 
             this.updateProjectTexts.get(projectID).setText(
                 this.similarProjects.get(projectID).getName());
-
+            this.updatePageComplete(null);
         }
         updatePageComplete(projectID);
+
     }
 
     /**
@@ -175,26 +179,24 @@ public class EnterProjectNamePage extends WizardPage {
         switch (dataTransferManager.getTransferMode(this.peer)) {
         case JINGLETCP:
         case JINGLEUDP:
-            setDescription("P2P Connection with Jingle available.\nThis means that sharing a project from scratch will be fast.");
+            setDescription(Messages.EnterProjectNamePage_p2p_jingle_connection);
             setImageDescriptor(ImageManager
-                .getImageDescriptor("icons/wizban/jingle.png"));
+                .getImageDescriptor("icons/wizban/jingle.png")); //$NON-NLS-1$
             break;
         case SOCKS5_MEDIATED:
             if (preferenceUtils.isLocalSOCKS5ProxyEnabled())
-                setDescription("A mediated SOCKS5 data transfer connection is used.\n"
-                    + "Suggestions: Reuse existing project ressources and visit the FAQs using the Help button below.");
+                setDescription(Messages.EnterProjectNamePage_description_socks5proxy);
             else
-                setDescription("Attention: direct file transfer connections with SOCKS5 protocol are deactivated.\n"
-                    + "To activate, uncheck \"Only connect over external Socks5 Proxy\" in Saros preferences.");
+                setDescription(Messages.EnterProjectNamePage_description_file_transfer);
             setImageDescriptor(ImageManager
-                .getImageDescriptor("icons/wizban/socks5m.png"));
+                .getImageDescriptor("icons/wizban/socks5m.png")); //$NON-NLS-1$
             break;
 
         case SOCKS5:
         case SOCKS5_DIRECT:
-            setDescription("Direct file transfer connection with SOCKS5 protocol is used.\nThis means that sharing a project from scratch will be fast.");
+            setDescription(Messages.EnterProjectNamePage_description_direct_filetranfser);
             setImageDescriptor(ImageManager
-                .getImageDescriptor("icons/wizban/socks5.png"));
+                .getImageDescriptor("icons/wizban/socks5.png")); //$NON-NLS-1$
             break;
 
         case NONE:
@@ -205,27 +207,26 @@ public class EnterProjectNamePage extends WizardPage {
             break;
 
         case IBB:
-            String speedInfo = "";
+            String speedInfo = ""; //$NON-NLS-1$
 
             if (dataTransferManager.getIncomingIBBTransferSpeed(this.peer) != 0) {
                 // Show throughput of recent IBB transfer in warning
-                speedInfo = "("
+                speedInfo = "(" //$NON-NLS-1$
                     + Math.round(dataTransferManager
                         .getIncomingIBBTransferSpeed(this.peer) / 1024 * 10.)
-                    / 10. + " KiB/s only!)";
+                    / 10. + " KiB/s only!)"; //$NON-NLS-1$
             }
 
             if (preferenceUtils.forceFileTranserByChat()) {
 
-                setDescription("Warning: Direct file transfer deactivated. Using slow IBB instead! "
-                    + speedInfo
-                    + '\n'
-                    + "To activate, uncheck \"Only establish conenctions over IBB\" in Saros network preferences.");
+                setDescription(MessageFormat
+                    .format(
+                        Messages.EnterProjectNamePage_direct_filetransfer_deactivated,
+                        speedInfo));
             } else {
-                setDescription("Warning : Direct file transfer not available! Using slow IBB instead! "
-                    + speedInfo
-                    + '\n'
-                    + "Suggestions: Reuse existing project ressources and visit the FAQs using the Help button below.");
+                setDescription(MessageFormat.format(
+                    Messages.EnterProjectNamePage_direct_filetransfer_nan,
+                    speedInfo));
             }
             startIBBLogoFlash();
             break;
@@ -233,7 +234,7 @@ public class EnterProjectNamePage extends WizardPage {
         case UNKNOWN:
         case HANDMADE:
         default:
-            setDescription("Warning: Unknown transport method established.");
+            setDescription(Messages.EnterProjectNamePage_unknown_transport_method);
             break;
 
         }
@@ -255,10 +256,10 @@ public class EnterProjectNamePage extends WizardPage {
                         flashState = !flashState;
                         if (flashState)
                             setImageDescriptor(ImageManager
-                                .getImageDescriptor("icons/wizban/ibb.png"));
+                                .getImageDescriptor("icons/wizban/ibb.png")); //$NON-NLS-1$
                         else
                             setImageDescriptor(ImageManager
-                                .getImageDescriptor("icons/wizban/ibbFaded.png"));
+                                .getImageDescriptor("icons/wizban/ibbFaded.png")); //$NON-NLS-1$
                     }
                 });
             }
@@ -282,7 +283,7 @@ public class EnterProjectNamePage extends WizardPage {
         projectGroup.setLayoutData(data);
 
         Label newProjectNameLabel = new Label(projectGroup, SWT.NONE);
-        newProjectNameLabel.setText("Project name");
+        newProjectNameLabel.setText(Messages.EnterProjectNamePage_project_name);
         this.newProjectNameLabels.put(projectID, newProjectNameLabel);
 
         Text newProjectNameText = new Text(projectGroup, SWT.BORDER);
@@ -324,7 +325,8 @@ public class EnterProjectNamePage extends WizardPage {
         projectGroup.setLayoutData(data);
 
         Label updateProjectNameLabel = new Label(projectGroup, SWT.NONE);
-        updateProjectNameLabel.setText("Project name");
+        updateProjectNameLabel
+            .setText(Messages.EnterProjectNamePage_project_name);
         updateProjectNameLabel.setEnabled(false);
         this.updateProjectNameLabels.put(projectID, updateProjectNameLabel);
 
@@ -337,12 +339,12 @@ public class EnterProjectNamePage extends WizardPage {
         this.updateProjectTexts.put(projectID, updateProjectText);
 
         Button browseUpdateProjectButton = new Button(projectGroup, SWT.PUSH);
-        browseUpdateProjectButton.setText("Browse");
+        browseUpdateProjectButton.setText(Messages.EnterProjectNamePage_browse);
         setButtonLayoutData(browseUpdateProjectButton);
         browseUpdateProjectButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
-                String projectName = getProjectDialog("Select project for update.");
+                String projectName = getProjectDialog(Messages.EnterProjectNamePage_select_project_for_update);
                 if (projectName != null)
                     EnterProjectNamePage.this.updateProjectTexts.get(projectID)
                         .setText(projectName);
@@ -362,8 +364,7 @@ public class EnterProjectNamePage extends WizardPage {
         optionsGroup.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
         Button copyCheckbox = new Button(optionsGroup, SWT.CHECK);
-        copyCheckbox
-            .setText("Create copy for working distributed. New project name:");
+        copyCheckbox.setText(Messages.EnterProjectNamePage_create_copy);
         copyCheckbox.setSelection(false);
         copyCheckbox.addSelectionListener(new SelectionAdapter() {
             @Override
@@ -379,7 +380,7 @@ public class EnterProjectNamePage extends WizardPage {
         copyToBeforeUpdateText.setFocus();
         copyToBeforeUpdateText.setText(EnterProjectNamePageUtils
             .findProjectNameProposal(this.remoteProjectNames.get(projectID)
-                + "-copy"));
+                + "-copy")); //$NON-NLS-1$
         this.copyToBeforeUpdateTexts.put(projectID, copyToBeforeUpdateText);
 
         Composite scanGroup = new Composite(workArea, SWT.NONE);
@@ -394,9 +395,10 @@ public class EnterProjectNamePage extends WizardPage {
         scanGroup.setLayoutData(data);
 
         Button scanWorkspaceProjectsButton = new Button(scanGroup, SWT.PUSH);
-        scanWorkspaceProjectsButton.setText("Scan workspace");
         scanWorkspaceProjectsButton
-            .setToolTipText("Scan workspace for similar projects.");
+            .setText(Messages.EnterProjectNamePage_scan_workspace);
+        scanWorkspaceProjectsButton
+            .setToolTipText(Messages.EnterProjectNamePage_scan_workspace2);
         setButtonLayoutData(scanWorkspaceProjectsButton);
 
         scanWorkspaceProjectsButton
@@ -418,7 +420,8 @@ public class EnterProjectNamePage extends WizardPage {
             scanWorkspaceProjectsButton);
 
         Label updateProjectStatusResult = new Label(scanGroup, SWT.NONE);
-        updateProjectStatusResult.setText("No scan results.");
+        updateProjectStatusResult
+            .setText(Messages.EnterProjectNamePage_scan_no_result);
         updateProjectStatusResult.setLayoutData(new GridData(
             GridData.FILL_HORIZONTAL | GridData.GRAB_VERTICAL));
         this.updateProjectStatusResults.put(projectID,
@@ -461,7 +464,7 @@ public class EnterProjectNamePage extends WizardPage {
         setControl(composite);
 
         for (String projectID : this.remoteProjectNames.keySet()) {
-            log.debug(projectID + ": " + this.remoteProjectNames.get(projectID));
+            log.debug(projectID + ": " + this.remoteProjectNames.get(projectID)); //$NON-NLS-1$
         }
 
         for (final FileList fileList : this.fileLists) {
@@ -481,18 +484,18 @@ public class EnterProjectNamePage extends WizardPage {
                 this.remoteProjectNames.get(fileList.getProjectID()));
 
             Button projCopy = new Button(tabComposite, SWT.RADIO);
-            projCopy.setText("Create new project");
+            projCopy.setText(Messages.EnterProjectNamePage_create_new_project);
             projCopy.setSelection(!selection);
             this.projCopies.put(fileList.getProjectID(), projCopy);
 
             createNewProjectGroup(tabComposite, fileList.getProjectID());
 
             Button projUpd = new Button(tabComposite, SWT.RADIO);
-            projUpd.setText("Use existing project");
+            projUpd.setText(Messages.EnterProjectNamePage_use_existing_project);
             projUpd.setSelection(selection);
             this.projUpdates.put(fileList.getProjectID(), projUpd);
 
-            String newProjectName = "";
+            String newProjectName = ""; //$NON-NLS-1$
             if (selection) {
                 newProjectName = this.remoteProjectNames.get(fileList
                     .getProjectID());
@@ -502,7 +505,8 @@ public class EnterProjectNamePage extends WizardPage {
 
             if (preferenceUtils.isSkipSyncSelectable()) {
                 Button skipCheckBox = new Button(tabComposite, SWT.CHECK);
-                skipCheckBox.setText("Skip synchronization");
+                skipCheckBox
+                    .setText(Messages.EnterProjectNamePage_skip_synchronizing);
                 skipCheckBox.setSelection(false);
                 skipCheckBox.addSelectionListener(new SelectionAdapter() {
                     @Override
@@ -541,7 +545,7 @@ public class EnterProjectNamePage extends WizardPage {
                 try {
                     Thread.sleep(1000);
                 } catch (InterruptedException e) {
-                    log.error("Code not designed to be interruptable", e);
+                    log.error("Code not designed to be interruptable", e); //$NON-NLS-1$
                     Thread.currentThread().interrupt();
                     return;
                 }
@@ -776,7 +780,7 @@ public class EnterProjectNamePage extends WizardPage {
     }
 
     /**
-     * Returns whether the user has selected to skip synchronisation
+     * Returns whether the user has selected to skip synchronization
      */
     public boolean isSyncSkippingSelected(String projectID) {
         if (preferenceUtils.isSkipSyncSelectable()) {
@@ -809,12 +813,10 @@ public class EnterProjectNamePage extends WizardPage {
     public void performHelp() {
         try {
             Desktop.getDesktop().browse(
-                URI.create("http://www.saros-project.org/faq#Network_issues"));
+                URI.create(Messages.EnterProjectNamePage_saros_url));
         } catch (IOException e) {
-            SarosView
-                .showNotification(
-                    "FAQ",
-                    "Opening your browser failed.\nPlease visit the FAQ page on http://saros-project.org");
+            SarosView.showNotification(Messages.EnterProjectNamePage_faq,
+                Messages.EnterProjectNamePage_error_browser_open);
         }
     }
 }

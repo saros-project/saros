@@ -17,6 +17,7 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 
+import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.ui.widgets.SimpleRoundedComposite;
 import de.fu_berlin.inf.dpp.ui.widgets.chatControl.events.ChatClearedEvent;
 import de.fu_berlin.inf.dpp.ui.widgets.chatControl.events.IChatDisplayListener;
@@ -83,7 +84,7 @@ public class ChatDisplay extends ScrolledComposite {
         this.optionsComposite.setLayout(gridLayout);
 
         final Button clearButton = new Button(optionsComposite, SWT.PUSH);
-        clearButton.setText("Clear");
+        clearButton.setText(Messages.ChatDisplay_clear);
         clearButton.addSelectionListener(new SelectionListener() {
 
             public void widgetSelected(SelectionEvent e) {

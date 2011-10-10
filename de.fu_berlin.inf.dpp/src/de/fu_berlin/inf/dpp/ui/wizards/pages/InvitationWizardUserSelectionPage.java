@@ -39,6 +39,7 @@ import de.fu_berlin.inf.dpp.net.internal.discoveryManager.DiscoveryManager;
 import de.fu_berlin.inf.dpp.net.internal.discoveryManager.DiscoveryManager.CacheMissException;
 import de.fu_berlin.inf.dpp.observables.InvitationProcessObservable;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
+import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.util.Utils;
 
 public class InvitationWizardUserSelectionPage extends WizardPage {
@@ -62,14 +63,14 @@ public class InvitationWizardUserSelectionPage extends WizardPage {
         ISarosSession sarosSession, RosterTracker rosterTracker,
         DiscoveryManager discoveryManager,
         InvitationProcessObservable invitationProcesses) {
-        super("Select buddies to invite");
+        super(Messages.InvitationWizardUserSelectionPage_title);
         this.roster = sarosNet.getRoster();
         this.sarosSession = sarosSession;
         this.rosterTracker = rosterTracker;
         this.discoveryManager = discoveryManager;
         this.invitationProcesses = invitationProcesses;
-        setTitle("Participant selection");
-        setDescription("Select the buddies you would like to invite");
+        setTitle(Messages.InvitationWizardUserSelectionPage_title2);
+        setDescription(Messages.InvitationWizardUserSelectionPage_description);
     }
 
     public void createControl(Composite parent) {
@@ -77,7 +78,7 @@ public class InvitationWizardUserSelectionPage extends WizardPage {
         composite.setLayout(new GridLayout(2, false));
 
         Label projectLabel = new Label(composite, SWT.NONE);
-        projectLabel.setText("Projects");
+        projectLabel.setText(Messages.InvitationWizardUserSelectionPage_label_projects);
 
         Text projectName = new Text(composite, SWT.READ_ONLY | SWT.SINGLE
             | SWT.BORDER);
@@ -86,7 +87,7 @@ public class InvitationWizardUserSelectionPage extends WizardPage {
         StringBuilder sb = new StringBuilder();
         for (IProject project : sarosSession.getProjects()) {
             if (sb.length() > 0)
-                sb.append(", ");
+                sb.append(", "); //$NON-NLS-1$
             sb.append(project.getName());
         }
         projectName.setText(sb.toString());
@@ -100,12 +101,12 @@ public class InvitationWizardUserSelectionPage extends WizardPage {
 
         TableColumn userColumn = new TableColumn(userListTable, SWT.NONE);
         userColumn.setWidth(250);
-        userColumn.setText("Buddy");
+        userColumn.setText(Messages.InvitationWizardUserSelectionPage_buddy);
 
         TableColumn sarosEnabledColumn = new TableColumn(userListTable,
             SWT.CENTER);
         sarosEnabledColumn.setWidth(100);
-        sarosEnabledColumn.setText("Saros support");
+        sarosEnabledColumn.setText(Messages.InvitationWizardUserSelectionPage_saros_support);
 
         GridData gd = new GridData(SWT.FILL, SWT.FILL, true, true);
         gd.minimumHeight = 150;
@@ -133,9 +134,9 @@ public class InvitationWizardUserSelectionPage extends WizardPage {
         // CheckBox to show only users with Saros support.
         onlySaros = new Button(composite, SWT.CHECK);
         onlySaros.setSelection(false);
-        onlySaros.setText("Hide buddies without Saros support");
+        onlySaros.setText(Messages.InvitationWizardUserSelectionPage_hide_saros_support);
         onlySaros
-            .setToolTipText("Hide buddies who are not logged in with Saros, but e.g. with a chat client.");
+            .setToolTipText(Messages.InvitationWizardUserSelectionPage_hide_buddies_offline);
         onlySarosListener = new SelectionListener() {
             public void widgetDefaultSelected(SelectionEvent e) {
                 // do nothing
@@ -183,11 +184,11 @@ public class InvitationWizardUserSelectionPage extends WizardPage {
                         Saros.NAMESPACE);
                 } catch (CacheMissException e) {
                     refreshSarosSupport(jid);
-                    return "?";
+                    return "?"; //$NON-NLS-1$
                 }
-                return supported ? "Yes" : "No";
+                return supported ? Messages.InvitationWizardUserSelectionPage_yes : Messages.InvitationWizardUserSelectionPage_no;
             default:
-                return "default value";
+                return Messages.InvitationWizardUserSelectionPage_default_value;
             }
         }
     }
@@ -298,7 +299,7 @@ public class InvitationWizardUserSelectionPage extends WizardPage {
         Utils.runSafeAsync(log, new Runnable() {
             public void run() {
                 boolean supported = discoveryManager.isSarosSupported(jid);
-                log.debug("discovered: " + supported);
+                log.debug("discovered: " + supported); //$NON-NLS-1$
                 refreshUserList();
             }
         });

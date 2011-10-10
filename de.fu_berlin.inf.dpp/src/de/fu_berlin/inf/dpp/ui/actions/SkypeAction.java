@@ -24,6 +24,7 @@ import de.fu_berlin.inf.dpp.communication.SkypeManager;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
 import de.fu_berlin.inf.dpp.ui.ImageManager;
+import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.ui.util.selection.SelectionUtils;
 import de.fu_berlin.inf.dpp.ui.util.selection.retriever.SelectionRetrieverFactory;
 import de.fu_berlin.inf.dpp.util.Utils;
@@ -60,11 +61,11 @@ public class SkypeAction extends Action implements Disposable {
     protected SkypeManager skypeManager;
 
     public SkypeAction() {
-        super("Skype this buddy");
+        super(Messages.SkypeAction_title);
 
         SarosPluginContext.initComponent(this);
 
-        setToolTipText("Start a Skype-VoIP session with this buddy");
+        setToolTipText(Messages.SkypeAction_tooltip);
         setImageDescriptor(new ImageDescriptor() {
             @Override
             public ImageData getImageData() {
@@ -88,7 +89,7 @@ public class SkypeAction extends Action implements Disposable {
             this.setEnabled(false);
         } catch (Exception e) {
             if (!PlatformUI.getWorkbench().isClosing())
-                log.error("Unexcepted error while updating enablement", e);
+                log.error("Unexcepted error while updating enablement", e); //$NON-NLS-1$
         }
     }
 
@@ -103,7 +104,7 @@ public class SkypeAction extends Action implements Disposable {
                     .getSelectionRetriever(JID.class).getSelection();
 
                 if (participants.size() == 1) {
-                    Utils.runSafeAsync("SkypeAction-", log, new Runnable() {
+                    Utils.runSafeAsync("SkypeAction-", log, new Runnable() { //$NON-NLS-1$
                         public void run() {
                             Utils.runSafeSWTSync(log, new Runnable() {
                                 public void run() {
@@ -125,7 +126,7 @@ public class SkypeAction extends Action implements Disposable {
                         }
                     });
                 } else {
-                    log.warn("More than one participant selected.");
+                    log.warn("More than one participant selected."); //$NON-NLS-1$
                 }
             }
         });

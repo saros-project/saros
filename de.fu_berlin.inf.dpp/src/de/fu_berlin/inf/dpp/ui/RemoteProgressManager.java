@@ -1,6 +1,7 @@
 package de.fu_berlin.inf.dpp.ui;
 
 import java.lang.reflect.InvocationTargetException;
+import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
@@ -307,9 +308,11 @@ public class RemoteProgressManager {
             public void worked(int work) {
                 worked += work;
                 if (worked > totalWorked)
-                    log.warn("Worked (" + worked
-                        + ")is greater than totalWork (" + totalWorked
-                        + "). Forgot to call beginTask?", new StackTrace());
+                    log.warn(
+                        MessageFormat
+                            .format(
+                                "Worked ({0})is greater than totalWork ({1}). Forgot to call beginTask?",
+                                worked, totalWorked), new StackTrace());
                 sarosSession.sendActivity(recipients, new ProgressActivity(
                     localUser, progressID, worked, totalWorked, null,
                     ProgressAction.UPDATE));

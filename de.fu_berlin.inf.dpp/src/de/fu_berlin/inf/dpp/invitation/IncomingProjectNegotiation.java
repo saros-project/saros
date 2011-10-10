@@ -6,6 +6,7 @@ import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -472,14 +473,14 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
              */
             localCancel(e.getMessage(), CancelOption.NOTIFY_PEER);
         } else if (e instanceof IOException) {
-            String errorMsg = "Unknown error: " + e;
+            String errorMsg = MessageFormat.format("Unknown error: {0}", e);
             if (e.getMessage() != null)
                 errorMsg = e.getMessage();
             localCancel(errorMsg, CancelOption.NOTIFY_PEER);
         } else {
             log.warn("Inv" + Utils.prefix(peer)
                 + ": This type of Exception is not expected: ", e);
-            String errorMsg = "Unknown error: " + e;
+            String errorMsg = MessageFormat.format("Unknown error: {0}", e);
             if (e.getMessage() != null)
                 errorMsg = e.getMessage();
             localCancel(errorMsg, CancelOption.NOTIFY_PEER);
@@ -524,8 +525,10 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
             RemoteCancellationException e = (RemoteCancellationException) cancellationCause;
             errorMsg = e.getMessage();
             if (errorMsg != null) {
-                cancelMessage = "Sharing project was cancelled by the remote user "
-                    + " because of an error on his/her side: " + errorMsg;
+                cancelMessage = MessageFormat
+                    .format(
+                        "Sharing project was cancelled by the remote user because of an error on his/her side: {0}",
+                        errorMsg);
                 log.error("Inv" + Utils.prefix(peer) + ": " + cancelMessage);
             } else {
                 cancelMessage = "Sharing project was cancelled by the remote user.";
@@ -653,7 +656,8 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
 
         if (projectDir.exists()) {
             throw new CoreException(new Status(IStatus.ERROR, Saros.SAROS,
-                "Project " + newProjectName + " already exists!"));
+                MessageFormat.format("Project {0} already exists!",
+                    newProjectName)));
         }
 
         ProgressMonitorDialog dialog = new ProgressMonitorDialog(EditorAPI
@@ -791,8 +795,8 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
 
             return diff;
         } catch (CoreException e) {
-            throw new LocalCancellationException(
-                "Could not create diff file list: " + e.getMessage(),
+            throw new LocalCancellationException(MessageFormat.format(
+                "Could not create diff file list: {0}", e.getMessage()),
                 CancelOption.NOTIFY_PEER);
         } finally {
             monitor.done();
@@ -853,7 +857,8 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
                     log.info("everything seems to be normal");
                 }
                 currentFile = currentProject.getFile(zipEntry.getName());
-                monitor.setTaskName("Receiving " + zipEntry.getName());
+                monitor.setTaskName(MessageFormat.format("Receiving {0}",
+                    zipEntry.getName()));
 
                 if (currentFile.exists()) {
                     log.debug(currentFile

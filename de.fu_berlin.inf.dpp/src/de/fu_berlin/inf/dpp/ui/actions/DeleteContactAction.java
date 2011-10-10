@@ -19,6 +19,7 @@
  */
 package de.fu_berlin.inf.dpp.ui.actions;
 
+import java.text.MessageFormat;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -45,6 +46,7 @@ import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.util.RosterUtils;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.SarosSessionManager;
+import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.ui.util.selection.SelectionUtils;
 import de.fu_berlin.inf.dpp.ui.util.selection.retriever.SelectionRetrieverFactory;
 import de.fu_berlin.inf.dpp.util.Utils;
@@ -73,12 +75,11 @@ public class DeleteContactAction extends Action implements Disposable {
     @Inject
     protected SarosSessionManager sessionManager;
 
-    protected final String DELETE_ERROR_IN_SESSION = "You cannot delete this buddy "
-        + "because they are currently in your Saros session.";
+    protected final String DELETE_ERROR_IN_SESSION = Messages.DeleteContactAction_delete_error_in_session;
 
     public DeleteContactAction() {
-        super("Delete");
-        setToolTipText("Delete this buddy.");
+        super(Messages.DeleteContactAction_title);
+        setToolTipText(Messages.DeleteContactAction_tooltip);
 
         IWorkbench workbench = PlatformUI.getWorkbench();
         setImageDescriptor(workbench.getSharedImages().getImageDescriptor(
@@ -102,7 +103,7 @@ public class DeleteContactAction extends Action implements Disposable {
             this.setEnabled(false);
         } catch (Exception e) {
             if (!PlatformUI.getWorkbench().isClosing())
-                log.error("Unexcepted error while updating enablement", e);
+                log.error("Unexcepted error while updating enablement", e); //$NON-NLS-1$
         }
     }
 
@@ -110,7 +111,7 @@ public class DeleteContactAction extends Action implements Disposable {
         StringBuilder sb = new StringBuilder();
         String name = entry.getName();
         if (name != null && name.trim().length() > 0) {
-            sb.append("'").append(name).append("' ");
+            sb.append(Messages.DeleteContactAction_name_begin_deco).append(name).append(Messages.DeleteContactAction_name_end_deco);
         }
         sb.append(entry.getUser());
         return sb.toString();
@@ -137,7 +138,7 @@ public class DeleteContactAction extends Action implements Disposable {
         }
 
         if (rosterEntry == null) {
-            log.error("RosterEntry should not be null at this point!");
+            log.error("RosterEntry should not be null at this point!"); //$NON-NLS-1$
             return;
         }
 
@@ -153,7 +154,7 @@ public class DeleteContactAction extends Action implements Disposable {
                     // If so, stop the deletion from completing
                     if (entryJid.equals(pJid)) {
                         MessageDialog.openError(null,
-                            "Cannot delete a buddy in the session",
+                            Messages.DeleteContactAction_error_title,
                             DELETE_ERROR_IN_SESSION);
                         return;
                     }
@@ -161,16 +162,16 @@ public class DeleteContactAction extends Action implements Disposable {
             }
         }
 
-        if (MessageDialog.openQuestion(null, "Confirm Delete",
-            "Are you sure you want to delete " + toString(rosterEntry)
-                + " from your buddies?")) {
+        if (MessageDialog.openQuestion(null, Messages.DeleteContactAction_confirm_title, MessageFormat
+            .format(Messages.DeleteContactAction_confirm_message,
+                toString(rosterEntry)))) {
 
             try {
                 RosterUtils.removeFromRoster(saros.getSarosNet()
                     .getConnection(), rosterEntry);
             } catch (XMPPException e) {
-                log.error("Could not delete buddy " + toString(rosterEntry)
-                    + ":", e);
+                log.error("Could not delete buddy " + toString(rosterEntry) //$NON-NLS-1$
+                    + ":", e); //$NON-NLS-1$
             }
         }
     }

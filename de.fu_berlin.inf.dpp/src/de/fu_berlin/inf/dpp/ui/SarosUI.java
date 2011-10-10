@@ -54,9 +54,9 @@ import de.fu_berlin.inf.dpp.invitation.IncomingSessionNegotiation;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
 import de.fu_berlin.inf.dpp.project.SarosSessionManager;
+import de.fu_berlin.inf.dpp.ui.util.DialogUtils;
 import de.fu_berlin.inf.dpp.ui.views.SarosView;
 import de.fu_berlin.inf.dpp.ui.views.VideoPlayerView;
-import de.fu_berlin.inf.dpp.ui.util.DialogUtils;
 import de.fu_berlin.inf.dpp.ui.wizards.AddProjectToSessionWizard;
 import de.fu_berlin.inf.dpp.ui.wizards.JoinSessionWizard;
 import de.fu_berlin.inf.dpp.ui.wizards.dialogs.WizardDialogAccessable;
@@ -192,21 +192,21 @@ public class SarosUI {
         try {
             IWorkbench workbench = PlatformUI.getWorkbench();
             if (workbench == null) {
-                log.error("Workbench not created when trying to show view!");
+                log.error("Workbench not created when trying to show view!"); //$NON-NLS-1$
                 return;
             }
 
             IWorkbenchWindow window = workbench.getActiveWorkbenchWindow();
             if (window == null) {
-                log.error("No Active WorkbenchWindow found "
-                    + "(the platform is shutting down)"
-                    + " when trying to show view!");
+                log.error("No Active WorkbenchWindow found " //$NON-NLS-1$
+                    + "(the platform is shutting down)" //$NON-NLS-1$
+                    + " when trying to show view!"); //$NON-NLS-1$
                 return;
             }
 
             window.getActivePage().showView(view, null, mode);
         } catch (PartInitException e) {
-            log.error("Could not create View " + view, e);
+            log.error("Could not create View " + view, e); //$NON-NLS-1$
         }
     }
 
@@ -240,7 +240,7 @@ public class SarosUI {
 
                     try {
 
-                        progress.beginTask("Performing permission change",
+                        progress.beginTask(Messages.SarosUI_permission_change,
                             IProgressMonitor.UNKNOWN);
 
                         sessionManager.getSarosSession()
@@ -248,31 +248,29 @@ public class SarosUI {
                                 progress);
 
                     } catch (CancellationException e) {
-                        log.warn("Permission change failed because buddy"
-                            + " canceled the permission change");
+                        log.warn("Permission change failed because buddy canceled the permission change"); //$NON-NLS-1$
                         Utils.runSafeSWTSync(log, new Runnable() {
                             public void run() {
                                 MessageDialog.openInformation(EditorAPI
                                     .getAWorkbenchWindow().getShell(),
-                                    "Permission Change Canceled",
-                                    "The permission change was canceled.");
+                                    Messages.SarosUI_permission_canceled,
+                                    Messages.SarosUI_permission_canceled_text);
                             }
                         });
                     } catch (InterruptedException e) {
-                        log.error("Code not designed to be interruptable", e);
+                        log.error("Code not designed to be interruptable", e); //$NON-NLS-1$
                     } finally {
                         progress.done();
                     }
                 }
             });
         } catch (InvocationTargetException e) {
-            log.error("Internal Error: ", e);
+            log.error("Internal Error: ", e); //$NON-NLS-1$
             MessageDialog.openError(EditorAPI.getAWorkbenchWindow().getShell(),
-                "Permission Change Failed",
-                "Permission change failed because of an internal error.\n\n"
-                    + " Please try again.");
+                Messages.SarosUI_permission_failed,
+                Messages.SarosUI_permission_failed_text);
         } catch (InterruptedException e) {
-            log.error("Code not designed to be interruptable", e);
+            log.error("Code not designed to be interruptable", e); //$NON-NLS-1$
         }
     }
 }

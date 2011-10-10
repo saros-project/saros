@@ -18,6 +18,7 @@ import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.project.AbstractSarosSessionListener;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
+import de.fu_berlin.inf.dpp.project.Messages;
 import de.fu_berlin.inf.dpp.project.SarosSessionManager;
 
 /**
@@ -34,21 +35,17 @@ public class ResourceChangeValidator extends ModelProvider {
     private static final Logger log = Logger
         .getLogger(ResourceChangeValidator.class.getName());
 
-    private static final String ERROR_TEXT = "Only participants with write access should edit"
-        + " the resources of this shared project.";
-    private static final String DELETE_PROJECT_ERROR_TEXT = "You should leave"
-        + " the Saros session before deleting a shared project. Deleting a"
-        + " project has no effect on the other session participants, so the"
-        + " session will become inconsistent.";
+    private static final String ERROR_TEXT = Messages.ResourceChangeValidator_error_no_write_access;
+    private static final String DELETE_PROJECT_ERROR_TEXT = Messages.ResourceChangeValidator_error_leave_session_before_delete_project;
 
     /** Error code for internal use, but we don't need it. */
     private static final int ERROR_CODE = 0;
 
     private static final IStatus ERROR_STATUS = new Status(IStatus.ERROR,
-        "de.fu_berlin.inf.dpp", ERROR_CODE, ERROR_TEXT, null);
+        "de.fu_berlin.inf.dpp", ERROR_CODE, ERROR_TEXT, null); //$NON-NLS-1$
 
     private static final IStatus DELETE_PROJECT_ERROR_STATUS = new Status(
-        IStatus.ERROR, "de.fu_berlin.inf.dpp", ERROR_CODE,
+        IStatus.ERROR, "de.fu_berlin.inf.dpp", ERROR_CODE, //$NON-NLS-1$
         DELETE_PROJECT_ERROR_TEXT, null);
 
     /** the currently running shared project */
@@ -138,7 +135,7 @@ public class ResourceChangeValidator extends ModelProvider {
         try {
             delta.accept(visitor);
         } catch (CoreException e) {
-            log.error("Could not run visitor: ", e);
+            log.error("Could not run visitor: ", e); //$NON-NLS-1$
         }
 
         if (!sarosSession.hasWriteAccess()

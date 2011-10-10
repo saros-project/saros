@@ -7,10 +7,11 @@ import org.eclipse.ui.PlatformUI;
 
 import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
 import de.fu_berlin.inf.dpp.ui.ImageManager;
+import de.fu_berlin.inf.dpp.ui.Messages;
 
 public class IMBeepAction extends Action {
     public IMBeepAction() {
-        super("Toggle beep");
+        super(Messages.IMBeepAction_title);
         this.updateIcon();
         this.updateTooltip();
         this.setEnabled(true);
@@ -44,17 +45,17 @@ public class IMBeepAction extends Action {
     public void updateIcon() {
         if (this.isOn()) {
             this.setImageDescriptor(ImageManager
-                .getImageDescriptor("/icons/elcl16/speakeron.png"));
+                .getImageDescriptor("/icons/elcl16/speakeron.png")); //$NON-NLS-1$
         } else {
             this.setImageDescriptor(ImageManager
-                .getImageDescriptor("/icons/elcl16/speakeroff.png"));
+                .getImageDescriptor("/icons/elcl16/speakeroff.png")); //$NON-NLS-1$
         }
     }
 
     protected void updateTooltip() {
         if (this.isOn())
-            setToolTipText("Turn beep notificaton off");
+            setToolTipText(Messages.IMBeepAction_off_tooltip);
         else
-            setToolTipText("Turn beep notification on");
+            setToolTipText(Messages.IMBeepAction_on_tooltip);
     }
 }

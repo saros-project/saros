@@ -182,7 +182,7 @@ public class User {
     public void invitationCompleted() {
         if (invitationComplete)
             throw new IllegalStateException(
-                "The invitation status of the buddy can be set only once!");
+                Messages.User_invitation);
         invitationComplete = true;
     }
 
@@ -222,7 +222,7 @@ public class User {
         if (getClass() != obj.getClass()) {
             if (obj.getClass() == String.class || obj.getClass() == JID.class)
                 log.warn(
-                    "Comparing a User to a String or JID is probably a programming mistake: "
+                    Messages.User_comparing
                         + obj.getClass(), new StackTrace());
             return false;
         }
@@ -284,7 +284,7 @@ public class User {
     public String getHumanReadableName() {
 
         if (isLocal()) {
-            return "You";
+            return Messages.User_you;
         }
 
         /*
@@ -296,7 +296,7 @@ public class User {
         String jidBase = getJID().getBase();
 
         if (nickName != null && !nickName.equals(jidBase)) {
-            return nickName + " (" + jidBase + ")";
+            return nickName + " (" + jidBase + ")"; //$NON-NLS-1$ //$NON-NLS-2$
         }
 
         return jidBase;

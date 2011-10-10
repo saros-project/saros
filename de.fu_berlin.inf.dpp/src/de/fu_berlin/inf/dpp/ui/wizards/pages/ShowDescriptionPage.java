@@ -1,5 +1,7 @@
 package de.fu_berlin.inf.dpp.ui.wizards.pages;
 
+import java.text.MessageFormat;
+
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
@@ -9,6 +11,7 @@ import org.eclipse.swt.widgets.Label;
 
 import de.fu_berlin.inf.dpp.invitation.IncomingSessionNegotiation;
 import de.fu_berlin.inf.dpp.ui.ImageManager;
+import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.ui.wizards.JoinSessionWizard;
 import de.fu_berlin.inf.dpp.util.VersionManager;
 
@@ -23,15 +26,14 @@ public class ShowDescriptionPage extends WizardPage {
 
     public ShowDescriptionPage(JoinSessionWizard joinSessionWizard,
         VersionManager manager, IncomingSessionNegotiation invProcess) {
-        super("firstPage");
+        super(Messages.ShowDescriptionPage_title);
         this.joinSessionWizard = joinSessionWizard;
         this.description = joinSessionWizard.process.getDescription();
 
-        setTitle("Session Invitation");
-        setDescription("You have been invited to join a Saros session. When accepting the invitation by pressing Accept,\n"
-            + "this dialog will close, the project invitation negotiated in the background and a new wizard will open.");
+        setTitle(Messages.ShowDescriptionPage_title2);
+        setDescription(Messages.ShowDescriptionPage_description);
         setImageDescriptor(ImageManager
-            .getImageDescriptor("icons/wizban/invitation.png"));
+            .getImageDescriptor("icons/wizban/invitation.png")); //$NON-NLS-1$
 
         /*
          * Show compatibility issues and inform the user what to do (but the
@@ -43,11 +45,10 @@ public class ShowDescriptionPage extends WizardPage {
         switch (vInfo.compatibility) {
 
         case TOO_NEW:
-            setMessage("Your Saros version is: " + manager.getVersion()
-                + ". Your peer has an older version: " + remoteSarosVersion
-                + ".\n Please tell your peer to check for updates!"
-                + " Proceeding with incompatible versions"
-                + " may cause malfunctions!", WARNING);
+            setMessage(
+                MessageFormat.format(
+                    Messages.ShowDescriptionPage_error_too_new,
+                    manager.getVersion(), remoteSarosVersion), WARNING);
             break;
 
         case OK:
@@ -55,12 +56,11 @@ public class ShowDescriptionPage extends WizardPage {
 
         case TOO_OLD:
         default:
-            setMessage("Your Saros version is too old: "
-                + manager.getVersion().toString()
-                + ". Your peer has a newer version: " + remoteSarosVersion
-                + ".\n Please check for updates!"
-                + " Proceeding with incompatible versions"
-                + " may cause malfunctions!", WARNING);
+            setMessage(
+                MessageFormat.format(
+                    Messages.ShowDescriptionPage_error_too_old,
+                    manager.getVersion().toString(), remoteSarosVersion),
+                WARNING);
         }
     }
 

@@ -18,6 +18,7 @@ import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.project.SarosSessionManager;
 import de.fu_berlin.inf.dpp.ui.ImageManager;
+import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.ui.util.selection.SelectionUtils;
 import de.fu_berlin.inf.dpp.ui.util.selection.retriever.SelectionRetrieverFactory;
 import de.fu_berlin.inf.dpp.util.Utils;
@@ -49,11 +50,11 @@ public class JumpToUserWithWriteAccessPositionAction extends Action implements
     protected Saros saros;
 
     public JumpToUserWithWriteAccessPositionAction() {
-        super("Jump to Position of Selected Buddy");
+        super(Messages.JumpToUserWithWriteAccessPositionAction_title);
 
-        setToolTipText("Jump to Position of Selected Buddy");
+        setToolTipText(Messages.JumpToUserWithWriteAccessPositionAction_tooltip);
         setImageDescriptor(ImageManager
-            .getImageDescriptor("icons/elcl16/jump.png"));
+            .getImageDescriptor("icons/elcl16/jump.png")); //$NON-NLS-1$
 
         SarosPluginContext.initComponent(this);
 
@@ -74,7 +75,7 @@ public class JumpToUserWithWriteAccessPositionAction extends Action implements
             this.setEnabled(false);
         } catch (Exception e) {
             if (!PlatformUI.getWorkbench().isClosing())
-                log.error("Unexcepted error while updating enablement", e);
+                log.error("Unexcepted error while updating enablement", e); //$NON-NLS-1$
         }
     }
 
@@ -90,7 +91,7 @@ public class JumpToUserWithWriteAccessPositionAction extends Action implements
                 if (participants.size() == 1) {
                     editorManager.jumpToUser(participants.get(0));
                 } else {
-                    log.warn("More than one participant selected.");
+                    log.warn("More than one participant selected."); //$NON-NLS-1$
                 }
             }
         });

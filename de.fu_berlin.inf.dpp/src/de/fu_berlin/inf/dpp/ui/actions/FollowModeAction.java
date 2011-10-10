@@ -1,5 +1,7 @@
 package de.fu_berlin.inf.dpp.ui.actions;
 
+import java.text.MessageFormat;
+
 import org.apache.log4j.Logger;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.resource.ImageDescriptor;
@@ -22,6 +24,7 @@ import de.fu_berlin.inf.dpp.project.ISarosSessionListener;
 import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
 import de.fu_berlin.inf.dpp.project.SarosSessionManager;
 import de.fu_berlin.inf.dpp.ui.ImageManager;
+import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.util.Utils;
 
 /**
@@ -143,7 +146,7 @@ public class FollowModeAction extends Action implements Disposable {
             }
         });
 
-        setToolTipText("Enable/Disable Follow Mode");
+        setToolTipText(Messages.FollowModeAction_enable_disable_tooltip);
         setId(ACTION_ID);
 
         sessionManager.addSarosSessionListener(sessionListener);
@@ -157,7 +160,7 @@ public class FollowModeAction extends Action implements Disposable {
     @Override
     public void run() {
         User toFollow = getNewToFollow();
-        log.info("Following: " + toFollow);
+        log.info("Following: " + toFollow); //$NON-NLS-1$
         editorManager.setFollowing(toFollow);
     }
 
@@ -228,16 +231,18 @@ public class FollowModeAction extends Action implements Disposable {
             if (editorManager.getFollowedUser() == null
                 || !editorManager.getFollowedUser().equals(user)) {
                 setChecked(false);
-                setToolTipText("Enable Follow Mode to " + user.toString());
+                setToolTipText(MessageFormat.format(
+                    Messages.FollowModeAction_enable_followmode_tooltip, user.toString()));
             } else {
                 setChecked(true);
-                setToolTipText("Disable Follow Mode to " + user.toString());
+                setToolTipText(MessageFormat.format(
+                    Messages.FollowModeAction_disable_followmode_tooltip, user.toString()));
             }
         } else {
             setChecked(false);
             setEnabled(false);
             setToFollowUser(null);
-            setToolTipText("Enable/Disable Follow Mode");
+            setToolTipText(Messages.FollowModeAction_enable_disable_tooltip);
         }
     }
 

@@ -1,5 +1,7 @@
 package de.fu_berlin.inf.dpp.ui.widgets;
 
+import java.text.MessageFormat;
+
 import org.apache.log4j.Logger;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
@@ -13,13 +15,14 @@ import de.fu_berlin.inf.dpp.accountManagement.XMPPAccountStore;
 import de.fu_berlin.inf.dpp.net.ConnectionState;
 import de.fu_berlin.inf.dpp.net.IConnectionListener;
 import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
 import de.fu_berlin.inf.dpp.ui.util.LayoutUtils;
 import de.fu_berlin.inf.dpp.util.FontUtils;
 import de.fu_berlin.inf.dpp.util.Utils;
 
 public class ConnectionStateComposite extends Composite {
-    private static final String CONNECTED_TOOLTIP = "Connected using Saros %s";
+    private static final String CONNECTED_TOOLTIP = Messages.ConnectionStateComposite_tooltip_connected;
 
     private static final Logger log = Logger
         .getLogger(ConnectionStateComposite.class);
@@ -93,30 +96,30 @@ public class ConnectionStateComposite extends Composite {
      */
     public String getDescription(ConnectionState state) {
         if (!accountStore.hasActiveAccount()) {
-            return "Add XMPP/Jabber account first";
+            return Messages.ConnectionStateComposite_info_add_jabber_account;
         }
 
         switch (state) {
         case NOT_CONNECTED:
-            return "Not connected";
+            return Messages.ConnectionStateComposite_not_connected;
         case CONNECTING:
-            return "Connecting...";
+            return Messages.ConnectionStateComposite_connecting;
         case CONNECTED:
             JID jid = new JID(saros.getSarosNet().getConnection().getUser());
             return jid.getBase();
         case DISCONNECTING:
-            return "Disconnecting...";
+            return Messages.ConnectionStateComposite_disconnecting;
         case ERROR:
             Exception e = saros.getSarosNet().getConnectionError();
             if (e == null) {
-                return "Error";
-            } else if (e.toString().equalsIgnoreCase("stream:error (conflict)")) {
-                return "Error (Resource conflict. Other session running?)";
+                return Messages.ConnectionStateComposite_error;
+            } else if (e.toString().equalsIgnoreCase("stream:error (conflict)")) { //$NON-NLS-1$
+                return Messages.ConnectionStateComposite_error_ressource_conflict;
             } else {
-                return "Error (" + e.getMessage() + ")";
+                return MessageFormat.format(Messages.ConnectionStateComposite_error_with_message, e.getMessage());
             }
         default:
-            return "UNKNOWN STATE";
+            return Messages.ConnectionStateComposite_error_unknown;
         }
     }
 }

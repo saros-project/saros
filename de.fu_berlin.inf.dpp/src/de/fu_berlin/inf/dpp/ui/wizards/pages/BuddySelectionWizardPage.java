@@ -20,6 +20,7 @@ import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.internal.discoveryManager.DiscoveryManager;
 import de.fu_berlin.inf.dpp.net.internal.discoveryManager.events.DiscoveryManagerListener;
 import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
+import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.ui.util.selection.retriever.SelectionRetrieverFactory;
 import de.fu_berlin.inf.dpp.ui.widgets.viewer.roster.BuddySelectionComposite;
 import de.fu_berlin.inf.dpp.ui.widgets.viewer.roster.events.BuddySelectionChangedEvent;
@@ -35,12 +36,12 @@ import de.fu_berlin.inf.dpp.util.Utils;
 public class BuddySelectionWizardPage extends WizardPage {
     private final Logger log = Logger.getLogger(BuddySelectionWizardPage.class);
 
-    public static final String TITLE = "Select Buddy";
-    public static final String DESCRIPTION = "Select the buddy(s) to work with.";
+    public static final String TITLE = Messages.BuddySelectionWizardPage_title;
+    public static final String DESCRIPTION = Messages.BuddySelectionWizardPage_description;
 
-    public static final String NO_BUDDY_SELECTED_ERROR_MESSAGE = "Select at least one buddy to work with.";
-    public static final String OFFLINE_BUDDY_SELECTED_ERROR_MESSAGE = "You selected at least one offline buddy.";
-    public static final String BUDDIES_WITHOUT_SAROS_SUPPORT_WARNING_MESSAGE = "Please only invite buddies if you are sure they have Saros installed.";
+    public static final String NO_BUDDY_SELECTED_ERROR_MESSAGE = Messages.BuddySelectionWizardPage_error_select_one_buddy;
+    public static final String OFFLINE_BUDDY_SELECTED_ERROR_MESSAGE = Messages.BuddySelectionWizardPage_error_selected_offline;
+    public static final String BUDDIES_WITHOUT_SAROS_SUPPORT_WARNING_MESSAGE = Messages.BuddySelectionWizardPage_warn_only_saros_buddies;
 
     protected BuddySelectionComposite buddySelectionComposite;
 
@@ -112,7 +113,7 @@ public class BuddySelectionWizardPage extends WizardPage {
         Label buddytSelectionLabel = new Label(composite, SWT.NONE);
         buddytSelectionLabel.setLayoutData(new GridData(SWT.BEGINNING, SWT.TOP,
             false, true));
-        buddytSelectionLabel.setText("Buddies:");
+        buddytSelectionLabel.setText(Messages.BuddySelectionWizardPage_label_buddies);
 
         createBuddySelectionComposite(composite);
         this.buddySelectionComposite.setLayoutData(new GridData(SWT.FILL,

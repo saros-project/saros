@@ -25,6 +25,7 @@ import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ISarosSessionListener;
 import de.fu_berlin.inf.dpp.project.SarosSessionManager;
 import de.fu_berlin.inf.dpp.ui.ImageManager;
+import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.ui.util.selection.SelectionUtils;
 import de.fu_berlin.inf.dpp.ui.util.selection.retriever.SelectionRetrieverFactory;
 import de.fu_berlin.inf.dpp.util.Utils;
@@ -79,7 +80,7 @@ public class FollowThisPersonAction extends Action implements Disposable {
     protected Saros saros;
 
     public FollowThisPersonAction() {
-        super("Follow Participant");
+        super(Messages.FollowThisPersonAction_follow_title);
 
         SarosPluginContext.initComponent(this);
 
@@ -90,7 +91,7 @@ public class FollowThisPersonAction extends Action implements Disposable {
             }
         });
 
-        setToolTipText("Follow Currently Selected Participant");
+        setToolTipText(Messages.FollowThisPersonAction_follow_tooltip);
         setId(ACTION_ID);
 
         sessionManager.addSarosSessionListener(sessionListener);
@@ -117,10 +118,10 @@ public class FollowThisPersonAction extends Action implements Disposable {
                     } else {
                         toFollow = participants.get(0);
                     }
-                    log.info("Following: " + toFollow);
+                    log.info("Following: " + toFollow); //$NON-NLS-1$
                     editorManager.setFollowing(toFollow);
                 } else {
-                    log.warn("More than one participant selected.");
+                    log.warn("More than one participant selected."); //$NON-NLS-1$
                 }
 
             }
@@ -136,23 +137,23 @@ public class FollowThisPersonAction extends Action implements Disposable {
             if (sarosSession != null && participants.size() == 1
                 && !participants.get(0).isLocal()) {
                 if (editorManager.getFollowedUser() == participants.get(0)) {
-                    setText("Stop Following");
-                    setToolTipText("Stop Following Currently Selected Participant");
+                    setText(Messages.FollowThisPersonAction_stop_follow_title);
+                    setToolTipText(Messages.FollowThisPersonAction_stop_follow_tooltip);
                 } else {
-                    setText("Follow Participant");
-                    setToolTipText("Follow Currently Selected Participant");
+                    setText(Messages.FollowThisPersonAction_follow_title);
+                    setToolTipText(Messages.FollowThisPersonAction_follow_tooltip);
                 }
                 setEnabled(true);
             } else {
-                setText("Follow Participant");
-                setToolTipText("Follow Currently Selected Participant");
+                setText(Messages.FollowThisPersonAction_follow_title);
+                setToolTipText(Messages.FollowThisPersonAction_follow_tooltip);
                 setEnabled(false);
             }
         } catch (NullPointerException e) {
             this.setEnabled(false);
         } catch (Exception e) {
             if (!PlatformUI.getWorkbench().isClosing())
-                log.error("Unexcepted error while updating enablement", e);
+                log.error("Unexcepted error while updating enablement", e); //$NON-NLS-1$
         }
     }
 

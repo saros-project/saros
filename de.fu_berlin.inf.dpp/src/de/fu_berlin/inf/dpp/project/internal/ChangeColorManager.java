@@ -1,5 +1,6 @@
 package de.fu_berlin.inf.dpp.project.internal;
 
+import java.text.MessageFormat;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -28,6 +29,7 @@ import de.fu_berlin.inf.dpp.project.IActivityProvider;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ISarosSessionListener;
 import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
+import de.fu_berlin.inf.dpp.project.Messages;
 import de.fu_berlin.inf.dpp.project.SarosSessionManager;
 import de.fu_berlin.inf.dpp.util.Utils;
 
@@ -76,11 +78,11 @@ public class ChangeColorManager implements IActivityProvider {
 
         User user = activity.getSource();
         if (!user.isInSarosSession()) {
-            throw new IllegalArgumentException("Buddy " + user
-                + " is not a participant in this shared project");
+            throw new IllegalArgumentException(MessageFormat.format(
+                Messages.ChangeColorManager_buddy_no_participant, user));
         }
 
-        log.info("received color: " + activity.getColor() + " from buddy: "
+        log.info("received color: " + activity.getColor() + " from buddy: " //$NON-NLS-1$ //$NON-NLS-2$
             + user);
         SarosAnnotation.setUserColor(user, activity.getColor());
 
@@ -137,9 +139,10 @@ public class ChangeColorManager implements IActivityProvider {
                         public void run() {
                             ColorDialog changeColor = new ColorDialog(EditorAPI
                                 .getShell());
-                            changeColor
-                                .setText("Color Conflict! Please choose a new color for "
-                                    + newUser.getHumanReadableName());
+                            changeColor.setText(MessageFormat
+                                .format(
+                                    Messages.ChangeColorManager_color_conflict,
+                                    newUser.getHumanReadableName()));
                             RGB newColor = changeColor.open();
                             if (newColor != null)
                                 rgbOfNewParticipant = newColor;

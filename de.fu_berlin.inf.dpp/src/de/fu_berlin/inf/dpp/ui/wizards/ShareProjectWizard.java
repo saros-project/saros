@@ -11,6 +11,7 @@ import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.project.SarosSessionManager;
 import de.fu_berlin.inf.dpp.ui.ImageManager;
+import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.ui.util.CollaborationUtils;
 import de.fu_berlin.inf.dpp.ui.wizards.pages.BuddySelectionWizardPage;
 import de.fu_berlin.inf.dpp.ui.wizards.pages.ProjectSelectionWizardPage;
@@ -24,7 +25,7 @@ import de.fu_berlin.inf.dpp.ui.wizards.pages.ProjectSelectionWizardPage;
  * @author kheld
  */
 public class ShareProjectWizard extends Wizard {
-    public static final String TITLE = "Share Project";
+    public static final String TITLE = Messages.ShareProjectWizard_title;
     public static final ImageDescriptor IMAGE = ImageManager.WIZBAN_SHARE_PROJECT_OUTGOING;
 
     @Inject

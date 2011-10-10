@@ -90,6 +90,7 @@ public class PingPongCentral extends AbstractActivityProvider {
         @Override
         public String toString() {
 
+            // TODO Internationalized ?
             String windowText = "";
             int n = slidingAverage.size();
             if (n > 0) {

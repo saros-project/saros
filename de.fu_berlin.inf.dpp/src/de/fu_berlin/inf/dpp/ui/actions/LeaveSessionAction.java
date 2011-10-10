@@ -30,6 +30,7 @@ import de.fu_berlin.inf.dpp.project.AbstractSarosSessionListener;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.SarosSessionManager;
 import de.fu_berlin.inf.dpp.ui.ImageManager;
+import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.ui.util.CollaborationUtils;
 
 /**
@@ -46,7 +47,7 @@ public class LeaveSessionAction extends Action {
     protected SarosSessionManager sessionManager;
 
     public LeaveSessionAction() {
-        setToolTipText("Leave Session");
+        setToolTipText(Messages.LeaveSessionAction_leave_session_tooltip);
         setImageDescriptor(new ImageDescriptor() {
             @Override
             public ImageData getImageData() {
@@ -83,7 +84,7 @@ public class LeaveSessionAction extends Action {
     protected void updateEnablement() {
         if (sessionManager.getSarosSession() != null) {
             if (sessionManager.getSarosSession().isHost()) {
-                setToolTipText("Stop Session...");
+                setToolTipText(Messages.LeaveSessionAction_stop_session_tooltip);
                 setImageDescriptor(new ImageDescriptor() {
                     @Override
                     public ImageData getImageData() {
@@ -92,7 +93,7 @@ public class LeaveSessionAction extends Action {
                     }
                 });
             } else {
-                setToolTipText("Leave Session...");
+                setToolTipText(Messages.LeaveSessionAction_leave_session_tooltip);
                 setImageDescriptor(new ImageDescriptor() {
                     @Override
                     public ImageData getImageData() {

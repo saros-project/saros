@@ -10,6 +10,7 @@ import org.picocontainer.annotations.Inject;
 import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.project.SarosSessionManager;
 import de.fu_berlin.inf.dpp.ui.ImageManager;
+import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.ui.util.CollaborationUtils;
 import de.fu_berlin.inf.dpp.ui.wizards.pages.ProjectSelectionWizardPage;
 
@@ -19,7 +20,7 @@ import de.fu_berlin.inf.dpp.ui.wizards.pages.ProjectSelectionWizardPage;
  * @author bkahlert
  */
 public class ShareProjectAddProjectsWizard extends Wizard {
-    public static final String TITLE = "Add Project(s) to Session";
+    public static final String TITLE = Messages.ShareProjectAddProjectsWizard_title;
     public static final ImageDescriptor IMAGE = ImageManager.WIZBAN_SHARE_PROJECT_ADD_PROJECTS;
 
     @Inject

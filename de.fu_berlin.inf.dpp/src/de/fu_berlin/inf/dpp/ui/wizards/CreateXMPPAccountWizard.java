@@ -35,6 +35,7 @@ import de.fu_berlin.inf.dpp.accountManagement.XMPPAccountStore;
 import de.fu_berlin.inf.dpp.net.util.RosterUtils;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
 import de.fu_berlin.inf.dpp.ui.ImageManager;
+import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.ui.util.DialogUtils;
 import de.fu_berlin.inf.dpp.ui.wizards.pages.CreateXMPPAccountWizardPage;
 
@@ -87,7 +88,7 @@ public class CreateXMPPAccountWizard extends Wizard {
 
         SarosPluginContext.initComponent(this);
 
-        setWindowTitle("Create XMPP/Jabber Account");
+        setWindowTitle(Messages.CreateXMPPAccountWizard_title);
         setDefaultPageImageDescriptor(ImageManager.WIZBAN_CREATE_XMPP_ACCOUNT);
 
         this.createXMPPAccountPage = new CreateXMPPAccountWizardPage(
@@ -120,8 +121,8 @@ public class CreateXMPPAccountWizard extends Wizard {
                     throws InvocationTargetException {
                     RosterUtils.createAccount(cachedServer, cachedUsername,
                         cachedPassword, monitor);
-                    log.debug("Account creation succeeded: username="
-                        + cachedUsername + ", server=" + cachedServer);
+                    log.debug("Account creation succeeded: username=" //$NON-NLS-1$
+                        + cachedUsername + ", server=" + cachedServer); //$NON-NLS-1$
                 }
             });
         } catch (InvocationTargetException e) {
@@ -132,8 +133,8 @@ public class CreateXMPPAccountWizard extends Wizard {
             // Leave the wizard open
             return false;
         } catch (InterruptedException e) {
-            log.error("An internal error occurred: InterruptedException"
-                + " thrown from uninterruptable method", e);
+            log.error("An internal error occurred: InterruptedException" //$NON-NLS-1$
+                + " thrown from uninterruptable method", e); //$NON-NLS-1$
             this.createXMPPAccountPage.setErrorMessage(e.getCause()
                 .getMessage());
             return false;
@@ -149,9 +150,8 @@ public class CreateXMPPAccountWizard extends Wizard {
             boolean reconnect = true;
             if (saros.getSarosNet().isConnected()) {
                 reconnect = DialogUtils.openQuestionMessageDialog(getShell(),
-                    "Already Connected", "You are already connected.\n\n"
-                        + "Do you want to disconnect and\n"
-                        + "reconnect with your new account?");
+                    Messages.CreateXMPPAccountWizard_already_connected,
+                    Messages.CreateXMPPAccountWizard_already_connected_text);
             }
 
             if (reconnect) {

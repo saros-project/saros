@@ -24,6 +24,7 @@ import de.fu_berlin.inf.dpp.project.ISarosSessionListener;
 import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
 import de.fu_berlin.inf.dpp.project.SarosSessionManager;
 import de.fu_berlin.inf.dpp.ui.ImageManager;
+import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
 import de.fu_berlin.inf.dpp.ui.util.selection.SelectionUtils;
 import de.fu_berlin.inf.dpp.ui.util.selection.retriever.SelectionRetrieverFactory;
@@ -70,14 +71,14 @@ public class GiveWriteAccessAction extends Action implements Disposable {
     protected SarosSessionManager sessionManager;
 
     public GiveWriteAccessAction() {
-        super("Grant Write Access");
+        super(Messages.GiveWriteAccessAction_title);
         setImageDescriptor(new ImageDescriptor() {
             @Override
             public ImageData getImageData() {
                 return ImageManager.ICON_BUDDY_SAROS.getImageData();
             }
         });
-        setToolTipText("Grant Write Access to This Buddy");
+        setToolTipText(Messages.GiveWriteAccessAction_tooltip);
 
         SarosPluginContext.initComponent(this);
         /*
@@ -108,11 +109,11 @@ public class GiveWriteAccessAction extends Action implements Disposable {
                             Permission.WRITE_ACCESS);
                         updateEnablement();
                     } else {
-                        log.warn("Participant has already write access: "
+                        log.warn("Participant has already write access: " //$NON-NLS-1$
                             + participants.get(0));
                     }
                 } else {
-                    log.warn("More than one participant selected.");
+                    log.warn("More than one participant selected."); //$NON-NLS-1$
                 }
             }
         });
@@ -129,7 +130,7 @@ public class GiveWriteAccessAction extends Action implements Disposable {
             this.setEnabled(false);
         } catch (Exception e) {
             if (!PlatformUI.getWorkbench().isClosing())
-                log.error("Unexcepted error while updating enablement", e);
+                log.error("Unexcepted error while updating enablement", e); //$NON-NLS-1$
         }
     }
 

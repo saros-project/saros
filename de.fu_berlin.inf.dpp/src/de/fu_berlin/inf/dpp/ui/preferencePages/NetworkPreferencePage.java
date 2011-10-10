@@ -1,6 +1,7 @@
 package de.fu_berlin.inf.dpp.ui.preferencePages;
 
 import java.net.InetAddress;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -32,6 +33,7 @@ import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.net.UPnP.UPnPManager;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
 import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
+import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.ui.views.SarosView;
 import de.fu_berlin.inf.dpp.util.Utils;
 
@@ -69,7 +71,7 @@ public final class NetworkPreferencePage extends PreferencePage implements
         SarosPluginContext.initComponent(this);
 
         setPreferenceStore(saros.getPreferenceStore());
-        setDescription("Saros networks settings:");
+        setDescription(Messages.NetworkPreferencePage_network_settings);
     }
 
     public void init(IWorkbench workbench) {
@@ -82,17 +84,17 @@ public final class NetworkPreferencePage extends PreferencePage implements
         setErrorMessage(null);
 
         if (!checkStunIpAddress(stunIpAddressText.getText())) {
-            setErrorMessage("The STUN Server address is either not valid or could not be resolved");
+            setErrorMessage(Messages.NetworkPreferencePage_text_stun_server_not_valid);
             return false;
         }
 
         if (!checkPort(stunPortAddressText.getText())) {
-            setErrorMessage("The STUN port is not valid. Must be in range of 1 - 65535");
+            setErrorMessage(Messages.NetworkPreferencePage_text_stun_server_not_valid2);
             return false;
         }
 
         if (!checkPort(localSocks5PortText.getText())) {
-            setErrorMessage("The direct connection port is not valid. Must be in range of 1 - 65535");
+            setErrorMessage(Messages.NetworkPreferencePage_text_direct_connection_not_valid);
             return false;
         }
 
@@ -127,8 +129,9 @@ public final class NetworkPreferencePage extends PreferencePage implements
 
                         if (!dataTransferManager.disconnectInBandBytestreams())
                             SarosView
-                                .showNotification("UPnP Activation",
-                                    "For UPnP to take full effect, please reconnect with your XMPP account.");
+                                .showNotification(
+                                    Messages.NetworkPreferencePage_upnp_activation,
+                                    Messages.NetworkPreferencePage_upnp_activation_text);
                     }
                 }
             }
@@ -146,22 +149,18 @@ public final class NetworkPreferencePage extends PreferencePage implements
 
         Label socks5GroupDescriptionLabel = new Label(composite, SWT.NONE);
         socks5GroupDescriptionLabel
-            .setText("These options configure the behaviour of how Saros tries to establish a session.\nChanges requires a reconnect to the XMPP Server.");
+            .setText(Messages.NetworkPreferencePage_sock5_label_text);
 
         createSocks5OptionsGroup(composite);
 
         Label stunGroupDescriptionLabel = new Label(composite, SWT.NONE);
         stunGroupDescriptionLabel
-            .setText("A STUN server is used to determine your public IP address if you are behind a NAT device\n"
-                + "which has no or deactivated UPnP support. Please make sure you are forwarding the direct\n"
-                + "connection port or no direct connection may be established.");
+            .setText(Messages.NetworkPreferencePage_stungroup_label_text);
         createStunServerGroup(composite);
 
         Label upnpGroupDescriptionLabel = new Label(composite, SWT.NONE);
         upnpGroupDescriptionLabel
-            .setText("For a fast file sharing Saros needs a direct TCP connection. Direct TCP connections normally are not possible\n"
-                + "if you are behind a Router due to the Network Address Translation (NAT) of the Router. Enabling UPnP port mapping\n"
-                + "on your Router allows Saros to communicate with the router to forward a port without your manual intervention.");
+            .setText(Messages.NetworkPreferencePage_upnp_label_Text);
 
         createUpnpGroup(composite);
 
@@ -253,7 +252,7 @@ public final class NetworkPreferencePage extends PreferencePage implements
     private Group createUpnpGroup(Composite parent) {
 
         Group group = new Group(parent, SWT.NONE);
-        group.setText("UPnP Devices");
+        group.setText(Messages.NetworkPreferencePage_upnp_devices);
 
         GridLayout gridLayout = new GridLayout();
         gridLayout.numColumns = 1;
@@ -287,7 +286,7 @@ public final class NetworkPreferencePage extends PreferencePage implements
     private Group createSocks5OptionsGroup(Composite parent) {
         Group group = new Group(parent, SWT.NONE);
 
-        group.setText("Connection establishment");
+        group.setText(Messages.NetworkPreferencePage_connection_established);
 
         GridLayout gridLayout = new GridLayout();
         gridLayout.numColumns = 1;
@@ -297,9 +296,9 @@ public final class NetworkPreferencePage extends PreferencePage implements
 
         buttonOnlyAllowIBB = new Button(group, SWT.CHECK);
         buttonOnlyAllowIBB
-            .setText("Only establish connections over IBB [only very small bandwidth is guaranteed]");
+            .setText(Messages.NetworkPreferencePage_button_establish_connection);
         buttonOnlyAllowIBB
-            .setToolTipText("If checked connections are established through XEP-0047: In-Band Bytestreams only");
+            .setToolTipText(Messages.NetworkPreferencePage_tooltip_establish_connection);
 
         buttonOnlyAllowIBB.addSelectionListener(new SelectionAdapter() {
             @Override
@@ -310,9 +309,9 @@ public final class NetworkPreferencePage extends PreferencePage implements
 
         buttonOnlyAllowMediatedSocks5 = new Button(group, SWT.CHECK);
         buttonOnlyAllowMediatedSocks5
-            .setText("Only establish connections over an external Socks5 Proxy Server [high bandwidth may be not guaranteed]");
+            .setText(Messages.NetworkPreferencePage_buttonOnlyAllowMediatedSocks5_text);
         buttonOnlyAllowMediatedSocks5
-            .setToolTipText("If checked connections are established through an external Socks5 Proxy server which is provided by your XMPP Server");
+            .setToolTipText(Messages.NetworkPreferencePage_buttonOnlyAllowMediatedSocks5_tooltip);
 
         buttonOnlyAllowMediatedSocks5
             .addSelectionListener(new SelectionAdapter() {
@@ -327,9 +326,10 @@ public final class NetworkPreferencePage extends PreferencePage implements
         row.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
 
         Label localSocks5PortLabel = new Label(row, SWT.CENTER);
-        localSocks5PortLabel.setText("Direct connection port: ");
         localSocks5PortLabel
-            .setToolTipText("The port used for outgoing invitations when a direct connection is possible");
+            .setText(Messages.NetworkPreferencePage_localSocks5PortLabel_text);
+        localSocks5PortLabel
+            .setToolTipText(Messages.NetworkPreferencePage_localSocks5PortLabel_tooltip);
 
         localSocks5PortText = new Text(row, SWT.SINGLE | SWT.BORDER);
         localSocks5PortText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER,
@@ -337,9 +337,9 @@ public final class NetworkPreferencePage extends PreferencePage implements
 
         buttonAllowAlternativeSocks5Port = new Button(group, SWT.CHECK);
         buttonAllowAlternativeSocks5Port
-            .setText("Allow binding to next available port");
+            .setText(Messages.NetworkPreferencePage_buttonAllowAlternativeSocks5Port_text);
         buttonAllowAlternativeSocks5Port
-            .setToolTipText("If checked the next available port is used\nif the given direct connection port is already bound\nby another application");
+            .setToolTipText(Messages.NetworkPreferencePage_buttonAllowAlternativeSocks5Port_tooltip);
 
         return group;
     }
@@ -347,7 +347,7 @@ public final class NetworkPreferencePage extends PreferencePage implements
     private Group createStunServerGroup(Composite parent) {
         Group group = new Group(parent, SWT.NONE);
 
-        group.setText("STUN Server");
+        group.setText(Messages.NetworkPreferencePage_stun_server);
 
         GridLayout gridLayout = new GridLayout();
         gridLayout.numColumns = 2;
@@ -356,17 +356,16 @@ public final class NetworkPreferencePage extends PreferencePage implements
         group.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
 
         Label ipAddressLabel = new Label(group, SWT.CENTER);
-        ipAddressLabel.setText("Address: ");
+        ipAddressLabel.setText(Messages.NetworkPreferencePage_adress);
         ipAddressLabel
-            .setToolTipText("The address of a server e.g stunserver.org or its literal representation e.g 132.177.123.13");
+            .setToolTipText(Messages.NetworkPreferencePage_adress_tooltip);
 
         stunIpAddressText = new Text(group, SWT.SINGLE | SWT.BORDER);
         stunIpAddressText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER,
             true, false));
         Label portLabel = new Label(group, SWT.CENTER);
-        portLabel.setText("Port: ");
-        portLabel
-            .setToolTipText("The port of the server (default STUN Port is 3478)");
+        portLabel.setText(Messages.NetworkPreferencePage_port);
+        portLabel.setToolTipText(Messages.NetworkPreferencePage_port_tooltip);
 
         stunPortAddressText = new Text(group, SWT.SINGLE | SWT.BORDER);
         stunPortAddressText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER,
@@ -380,7 +379,7 @@ public final class NetworkPreferencePage extends PreferencePage implements
 
     private void discoverUpnpGateways() {
         if (upnpManager.getGateways() == null) {
-            gatewayInfo.setText("discovering UPnP gateway devices");
+            gatewayInfo.setText(Messages.NetworkPreferencePage_discover_upnp);
             gatewayInfo.pack();
             gatewayInfo.setVisible(true);
 
@@ -394,9 +393,10 @@ public final class NetworkPreferencePage extends PreferencePage implements
                         Utils.runSafeSWTAsync(null, new Runnable() {
                             public void run() {
                                 if (!gatewayInfo.isDisposed()) {
-                                    gatewayInfo
-                                        .setText("Discovering UPnP gateway devices... "
-                                            + PROGRESS[progressIndex]);
+                                    gatewayInfo.setText(MessageFormat
+                                        .format(
+                                            Messages.NetworkPreferencePage_discover_upnp_gateway,
+                                            PROGRESS[progressIndex]));
                                     gatewayInfo.pack();
                                 }
                             }
@@ -425,7 +425,7 @@ public final class NetworkPreferencePage extends PreferencePage implements
 
                             if (gateways.isEmpty()) {
                                 gatewayInfo
-                                    .setText("UPnP devices not found (a device might disallow discovery and require configuration).");
+                                    .setText(Messages.NetworkPreferencePage_upnp_device_not_found);
                                 gatewayInfo.pack();
                                 return;
                             }
@@ -444,7 +444,7 @@ public final class NetworkPreferencePage extends PreferencePage implements
 
             if (gateways.isEmpty()) {
                 gatewayInfo
-                    .setText("UPnP devices not found (a device might disallow discovery and require configuration).");
+                    .setText(Messages.NetworkPreferencePage_upnp_device_not_found2);
                 gatewayInfo.setVisible(true);
                 gatewayInfo.pack();
                 return;
@@ -484,19 +484,19 @@ public final class NetworkPreferencePage extends PreferencePage implements
         TableItem item;
 
         column = new TableColumn(upnpDevicesTable, SWT.NONE);
-        column.setText("Allow Port Mapping");
+        column.setText(Messages.NetworkPreferencePage_allow_port_mapping);
 
         column = new TableColumn(upnpDevicesTable, SWT.NONE);
-        column.setText("Device");
+        column.setText(Messages.NetworkPreferencePage_device);
 
         column = new TableColumn(upnpDevicesTable, SWT.NONE);
-        column.setText("Local IP Address");
+        column.setText(Messages.NetworkPreferencePage_local_ip);
 
         column = new TableColumn(upnpDevicesTable, SWT.NONE);
-        column.setText("External IP Address");
+        column.setText(Messages.NetworkPreferencePage_external_ip);
 
         column = new TableColumn(upnpDevicesTable, SWT.NONE);
-        column.setText("Device IP Address");
+        column.setText(Messages.NetworkPreferencePage_device_ip);
 
         for (GatewayDevice device : gateways) {
             String name;
@@ -510,11 +510,11 @@ public final class NetworkPreferencePage extends PreferencePage implements
 
             try {
                 if (!device.isConnected())
-                    externalIpAddress = "not connected";
+                    externalIpAddress = Messages.NetworkPreferencePage_not_connected;
                 else
                     externalIpAddress = device.getExternalIPAddress();
             } catch (Exception e) {
-                externalIpAddress = "n/a";
+                externalIpAddress = Messages.NetworkPreferencePage_not_available;
             }
 
             item = new TableItem(upnpDevicesTable, SWT.NONE);

@@ -126,7 +126,7 @@ public class Saros extends AbstractUIPlugin {
      * XMPP server (for instance when logging in as john@doe.com, Saros will
      * connect using john@doe.com/Saros)
      */
-    public final static String RESOURCE = "Saros";
+    public final static String RESOURCE = "Saros"; //$NON-NLS-1$
 
     private String sarosVersion;
 
@@ -219,7 +219,7 @@ public class Saros extends AbstractUIPlugin {
 
     protected static void checkInitialized() {
         if (plugin == null || !isInitialized()) {
-            LogLog.error("Saros not initialized", new StackTrace());
+            LogLog.error("Saros not initialized", new StackTrace()); //$NON-NLS-1$
             throw new IllegalStateException();
         }
     }
@@ -242,10 +242,10 @@ public class Saros extends AbstractUIPlugin {
 
         sarosVersion = getBundle().getVersion().toString();
 
-        sarosFeatureID = SAROS + "_" + sarosVersion;
+        sarosFeatureID = SAROS + "_" + sarosVersion; //$NON-NLS-1$
 
         setupLoggers();
-        log.info("Starting Saros " + sarosVersion + " running:\n"
+        log.info("Starting Saros " + sarosVersion + " running:\n" //$NON-NLS-1$ //$NON-NLS-2$
             + Utils.getPlatformInfo());
 
         // Remove the Bundle if an instance of it was already registered
@@ -301,8 +301,8 @@ public class Saros extends AbstractUIPlugin {
         saveSecurePrefs();
 
         if (dotMonitor != null) {
-            File f = new File("Saros-" + sarosFeatureID + ".dot");
-            log.info("Saving Saros architecture diagram dot file: "
+            File f = new File("Saros-" + sarosFeatureID + ".dot"); //$NON-NLS-1$ //$NON-NLS-2$
+            log.info("Saving Saros architecture diagram dot file: " //$NON-NLS-1$
                 + f.getAbsolutePath());
             dotMonitor.save(f);
         }
@@ -373,7 +373,7 @@ public class Saros extends AbstractUIPlugin {
             try {
                 configPrefs.flush();
             } catch (BackingStoreException e) {
-                log.error("Couldn't store global plug-in preferences", e);
+                log.error("Couldn't store global plug-in preferences", e); //$NON-NLS-1$
             }
         }
     }
@@ -389,7 +389,7 @@ public class Saros extends AbstractUIPlugin {
 
         if (securePrefs == null) {
             try {
-                File storeFile = new File(getStateLocation().toFile(), "/.pref");
+                File storeFile = new File(getStateLocation().toFile(), "/.pref"); //$NON-NLS-1$
                 URI workspaceURI = storeFile.toURI();
 
                 /*
@@ -397,15 +397,15 @@ public class Saros extends AbstractUIPlugin {
                  * URLs, so we must decode the URL before passing it.
                  */
                 String prefLocation = URLDecoder.decode(
-                    workspaceURI.toString(), "UTF-8");
+                    workspaceURI.toString(), "UTF-8"); //$NON-NLS-1$
                 URL prefURL = new URL(prefLocation);
 
                 securePrefs = SecurePreferencesFactory.open(prefURL, null);
             } catch (MalformedURLException e) {
-                log.error("Problem with URL when attempting to access secure preferences: "
+                log.error("Problem with URL when attempting to access secure preferences: " //$NON-NLS-1$
                     + e);
             } catch (IOException e) {
-                log.error("I/O problem when attempting to access secure preferences: "
+                log.error("I/O problem when attempting to access secure preferences: " //$NON-NLS-1$
                     + e);
             } finally {
                 if (securePrefs == null)
@@ -428,19 +428,19 @@ public class Saros extends AbstractUIPlugin {
                 securePrefs.flush();
             }
         } catch (IOException e) {
-            log.error("Exception when trying to store secure preferences: " + e);
+            log.error("Exception when trying to store secure preferences: " + e); //$NON-NLS-1$
         }
     }
 
     protected void setupLoggers() {
         try {
-            log = Logger.getLogger("de.fu_berlin.inf.dpp");
+            log = Logger.getLogger("de.fu_berlin.inf.dpp"); //$NON-NLS-1$
 
-            PropertyConfigurator.configureAndWatch("log4j.properties",
+            PropertyConfigurator.configureAndWatch("log4j.properties", //$NON-NLS-1$
                 REFRESH_SECONDS * 1000);
 
         } catch (SecurityException e) {
-            System.err.println("Could not start logging:");
+            System.err.println("Could not start logging:"); //$NON-NLS-1$
             e.printStackTrace();
         }
     }
@@ -558,13 +558,13 @@ public class Saros extends AbstractUIPlugin {
         String serverString = preferenceUtils.getServer();
 
         URI uri;
-        uri = (serverString.matches("://")) ? new URI(serverString) : new URI(
-            "jabber://" + serverString);
+        uri = (serverString.matches("://")) ? new URI(serverString) : new URI( //$NON-NLS-1$
+            "jabber://" + serverString); //$NON-NLS-1$
 
         String server = uri.getHost();
         if (server == null) {
             throw new URISyntaxException(preferenceUtils.getServer(),
-                "The XMPP/Jabber server address is invalid: " + serverString);
+                "The XMPP/Jabber server address is invalid: " + serverString); //$NON-NLS-1$
         }
 
         ProxyInfo proxyInfo = getProxyInfo(uri.getHost());
@@ -619,11 +619,11 @@ public class Saros extends AbstractUIPlugin {
      * @nonBlocking
      */
     public void asyncConnect() {
-        Utils.runSafeAsync("Saros-AsyncConnect-", log, new Runnable() {
-            public void run() {
-                connect(false);
-            }
-        });
+        Utils.runSafeAsync("Saros-AsyncConnect-", log, new Runnable() { //$NON-NLS-1$
+                public void run() {
+                    connect(false);
+                }
+            });
     }
 
     @Inject
@@ -670,14 +670,14 @@ public class Saros extends AbstractUIPlugin {
                 failSilently);
 
         } catch (URISyntaxException e) {
-            log.info("URI not parseable: " + e.getInput());
-            Utils.popUpFailureMessage("URI not parseable", e.getInput()
-                + " is not a valid URI.", failSilently);
+            log.info("URI not parseable: " + e.getInput()); //$NON-NLS-1$
+            Utils.popUpFailureMessage(Messages.Saros_0, e.getInput()
+                + Messages.Saros_1, failSilently);
 
         } catch (IllegalArgumentException e) {
-            log.info("Illegal argument: " + e.getMessage());
+            log.info("Illegal argument: " + e.getMessage()); //$NON-NLS-1$
 
-            Utils.popUpFailureMessage("Illegal argument", e.getMessage(),
+            Utils.popUpFailureMessage(Messages.Saros_2, e.getMessage(),
                 failSilently);
 
         } catch (XMPPException e) {
@@ -685,35 +685,33 @@ public class Saros extends AbstractUIPlugin {
             Exception cause = (t != null) ? (Exception) t : e;
 
             if (cause instanceof SaslException) {
-                Utils.popUpFailureMessage("Error Connecting via SASL",
-                    cause.getMessage(), failSilently);
+                Utils.popUpFailureMessage(Messages.Saros_3, cause.getMessage(),
+                    failSilently);
             } else {
                 String question;
                 if (cause instanceof UnknownHostException) {
-                    log.info("Unknown host: " + cause);
+                    log.info("Unknown host: " + cause); //$NON-NLS-1$
 
-                    question = "The XMPP/Jabber server "
-                        + " could not be found.\n\n"
-                        + "Do you want edit your XMPP/Jabber account?";
+                    question = Messages.Saros_28 + Messages.Saros_29
+                        + Messages.Saros_30;
                 } else {
-                    log.info("xmpp: " + cause.getMessage(), cause);
+                    log.info("xmpp: " + cause.getMessage(), cause); //$NON-NLS-1$
 
-                    question = "Could not connect to XMPP/Jabber server.\n"
-                        // + "Server: " + this.connection.getHost() + "\n"
-                        + "User: " + username + "\n\n"
-                        + "Do you want edit your XMPP/Jabber account?";
+                    question = Messages.Saros_32
+                    // + "Server: " + this.connection.getHost() + "\n"
+                        + Messages.Saros_33 + username + "\n\n" //$NON-NLS-2$
+                        + Messages.Saros_30;
                 }
-                if (Utils.popUpYesNoQuestion("Connecting Error", question,
+                if (Utils.popUpYesNoQuestion(Messages.Saros_36, question,
                     failSilently)) {
                     if (configureXMPPAccount())
                         connect(failSilently);
                 }
             }
         } catch (Exception e) {
-            log.warn("Unhandled exception:", e);
-            Utils.popUpFailureMessage("Error Connecting",
-                "Could not connect to server as user '" + username
-                    + "'.\nErrorMessage was:\n" + e.getMessage(), failSilently);
+            log.warn("Unhandled exception:", e); //$NON-NLS-1$
+            Utils.popUpFailureMessage(Messages.Saros_36, Messages.Saros_39
+                + username + Messages.Saros_40 + e.getMessage(), failSilently);
         }
     }
 }

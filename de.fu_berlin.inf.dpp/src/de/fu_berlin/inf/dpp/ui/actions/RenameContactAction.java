@@ -19,6 +19,7 @@
  */
 package de.fu_berlin.inf.dpp.ui.actions;
 
+import java.text.MessageFormat;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -40,6 +41,7 @@ import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.net.ConnectionState;
 import de.fu_berlin.inf.dpp.net.IConnectionListener;
 import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.ui.util.selection.SelectionUtils;
 import de.fu_berlin.inf.dpp.ui.util.selection.retriever.SelectionRetrieverFactory;
 import de.fu_berlin.inf.dpp.util.Utils;
@@ -71,8 +73,8 @@ public class RenameContactAction extends Action {
     protected Saros saros;
 
     public RenameContactAction() {
-        super("Rename...");
-        setToolTipText("Set the nickname of this buddy.");
+        super(Messages.RenameContactAction_title);
+        setToolTipText(Messages.RenameContactAction_tooltip);
 
         SarosPluginContext.initComponent(this);
 
@@ -92,7 +94,7 @@ public class RenameContactAction extends Action {
             this.setEnabled(false);
         } catch (Exception e) {
             if (!PlatformUI.getWorkbench().isClosing())
-                log.error("Unexcepted error while updating enablement", e);
+                log.error("Unexcepted error while updating enablement", e); //$NON-NLS-1$
         }
     }
 
@@ -116,23 +118,25 @@ public class RenameContactAction extends Action {
                 }
 
                 if (rosterEntry == null) {
-                    log.error("RosterEntry should not be null at this point!");
+                    log.error("RosterEntry should not be null at this point!"); //$NON-NLS-1$
                     return;
                 }
 
                 Shell shell = EditorAPI.getShell();
 
-                assert shell != null : "Action should not be run if the display is disposed";
+                assert shell != null : "Action should not be run if the display is disposed"; //$NON-NLS-1$
 
-                String message = "Enter the new nickname of this buddy '"
-                    + rosterEntry.getUser() + "'";
+                String message = MessageFormat.format(
+                    Messages.RenameContactAction_rename_message,
+                    rosterEntry.getUser());
+
                 if (rosterEntry.getName() != null) {
-                    message += " with current nickname '"
-                        + rosterEntry.getName() + "'";
+                    message += MessageFormat.format(
+                        Messages.RenameContactAction_rename_current_nickname_message, rosterEntry.getName());
                 }
-                message += ":";
+                message += ":"; //$NON-NLS-1$
 
-                InputDialog dialog = new InputDialog(shell, "Set new nickname",
+                InputDialog dialog = new InputDialog(shell, Messages.RenameContactAction_new_nickname_dialog_title,
                     message, rosterEntry.getName(), null);
 
                 if (dialog.open() == Window.OK) {
