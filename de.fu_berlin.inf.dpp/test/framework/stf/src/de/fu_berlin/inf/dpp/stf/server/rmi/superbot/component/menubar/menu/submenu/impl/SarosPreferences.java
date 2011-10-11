@@ -310,7 +310,8 @@ public final class SarosPreferences extends StfRemoteObject implements
             String activeAccount = shell.bot()
                 .labelInGroup(GROUP_TITLE_XMPP_JABBER_ACCOUNTS).getText();
 
-            return new JID(activeAccount.substring("Active:".length()).trim());
+            return new JID(activeAccount.substring(
+                LABEL_ACTIVE_ACCOUNT_PREFIX.length()).trim());
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
@@ -327,10 +328,9 @@ public final class SarosPreferences extends StfRemoteObject implements
             String activeAccount = shell.bot()
                 .labelInGroup(GROUP_TITLE_XMPP_JABBER_ACCOUNTS).getText();
 
-            boolean isActive = false;
-
-            if (activeAccount.equals("Active: " + jid.getBase()))
-                isActive = true;
+            boolean isActive = activeAccount
+                .startsWith(LABEL_ACTIVE_ACCOUNT_PREFIX)
+                && activeAccount.contains(jid.getBase());
 
             shell.bot().button(CANCEL).click();
             shell.bot().waitUntil(SarosConditions.isShellClosed(shell));

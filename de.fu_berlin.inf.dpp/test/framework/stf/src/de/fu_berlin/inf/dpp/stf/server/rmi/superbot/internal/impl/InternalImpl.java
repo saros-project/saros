@@ -232,7 +232,7 @@ public final class InternalImpl extends StfRemoteObject implements IInternal {
                 project.delete(true, true, null);
             } catch (CoreException e) {
                 error = true;
-                log.debug("unable to delete project '" + project.getName()
+                log.error("unable to delete project '" + project.getName()
                     + "' :" + e.getMessage(), e);
             }
         }

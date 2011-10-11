@@ -1,5 +1,6 @@
 package de.fu_berlin.inf.dpp.stf.shared;
 
+import java.util.Locale;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
@@ -8,10 +9,22 @@ import java.util.ResourceBundle;
  * messages.properties.
  */
 class Configuration {
-    private static final String BUNDLE_NAME = "de.fu_berlin.inf.dpp.stf.shared.configuration"; //$NON-NLS-1$
 
-    private static final ResourceBundle RESOURCE_BUNDLE = ResourceBundle
-        .getBundle(BUNDLE_NAME);
+    private static final String[] BUNDLE_NAMES = {
+        "de.fu_berlin.inf.dpp.project.messages",
+        "de.fu_berlin.inf.dpp.feedback.messages",
+        "de.fu_berlin.inf.dpp.messages", "de.fu_berlin.inf.dpp.ui.messages",
+        "de.fu_berlin.inf.dpp.stf.shared.configuration" };
+
+    private static final ResourceBundle[] RESOURCE_BUNDLES;
+
+    static {
+        RESOURCE_BUNDLES = new ResourceBundle[BUNDLE_NAMES.length];
+
+        for (int i = 0; i < BUNDLE_NAMES.length; i++)
+            RESOURCE_BUNDLES[i] = ResourceBundle.getBundle(BUNDLE_NAMES[i],
+                Locale.ENGLISH);
+    }
 
     private Configuration() {
         // do nothing
@@ -24,10 +37,22 @@ class Configuration {
      * @return the value for the key as a String
      */
     public static String getString(String key) {
-        try {
-            return RESOURCE_BUNDLE.getString(key);
-        } catch (MissingResourceException e) {
-            return '!' + key + '!';
+
+        String value = null;
+
+        for (ResourceBundle bundle : RESOURCE_BUNDLES) {
+
+            try {
+                value = null;
+                value = bundle.getString(key);
+                if (value != null)
+                    return value;
+
+            } catch (MissingResourceException e) {
+                value = '!' + key + '!';
+            }
         }
+
+        return value;
     }
 }

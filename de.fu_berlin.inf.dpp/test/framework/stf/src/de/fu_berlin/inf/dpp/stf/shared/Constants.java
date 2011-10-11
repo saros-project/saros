@@ -209,7 +209,7 @@ public interface Constants {
         .getString("text_label_repeat_password");
 
     public final static String ERROR_MESSAGE_PASSWORDS_NOT_MATCH = Configuration
-        .getString("error_message_passwords_not_match");
+        .getString("CreateXMPPAccountWizardPage_error_password_no_match");
     public final static String ERROR_MESSAGE_COULD_NOT_CONNECT = Configuration
         .getString("error_message_could_not_connect");
     public final static String ERROR_MESSAGE_NOT_CONNECTED_TO_SERVER = Configuration
@@ -224,6 +224,9 @@ public interface Constants {
         .getString("group_existing_account");
     static public final String GROUP_TITLE_XMPP_JABBER_ACCOUNTS = Configuration
         .getString("group_title_xmpp_jabber_accounts_in_shell-saros-preferences");
+
+    static public final String LABEL_ACTIVE_ACCOUNT_PREFIX = Configuration
+        .getString("GeneralPreferencePage_active");
 
     static public final String BUTTON_ACTIVATE_ACCOUNT = Configuration
         .getString("button_text_activate_account_in_shell-saros-preferences");
@@ -350,9 +353,9 @@ public interface Constants {
     public final static String TB_ENABLE_DISABLE_FOLLOW_MODE = Configuration
         .getString("tb_enable_disable_follow_mode");
     public final static String TB_LEAVE_SESSION = Configuration
-        .getString("tb_leave_session");
+        .getString("LeaveSessionAction_leave_session_tooltip");
     public final static String TB_STOP_SESSION = Configuration
-        .getString("tb_stop_session");
+        .getString("LeaveSessionAction_stop_session_tooltip");
 
     public final static String CM_DELETE = Configuration.getString("cm_delete");
     public final static String CM_RENAME = Configuration.getString("cm_rename");

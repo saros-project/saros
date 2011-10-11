@@ -279,7 +279,7 @@ public final class RemoteWorkbenchBot extends RemoteBot implements
 
                     // TODO shell names currently hard coded
 
-                    if (shellName.equals("Leaving the Session")) {
+                    if (shellName.equals(SHELL_CONFIRM_DECLINE_INVITATION)) {
                         shell = swtWorkBenchBot.shell(shellName);
                         shell.activate();
                         shell.bot().button(YES).click();
@@ -292,7 +292,7 @@ public final class RemoteWorkbenchBot extends RemoteBot implements
                         shell.bot().button(NO).click();
                         continue;
                     }
-                    if (shellName.equals("Synchronizing")) {
+                    if (shellName.equals(SHELL_MONITOR_PROJECT_SYNCHRONIZATION)) {
                         shell = swtWorkBenchBot.shell(shellName);
                         shell.activate();
                         shell.bot().button(CANCEL).click();
