@@ -2,7 +2,9 @@ package de.fu_berlin.inf.dpp.stf.test.stf.basicwidget;
 
 import static de.fu_berlin.inf.dpp.stf.client.tester.SarosTester.ALICE;
 import static de.fu_berlin.inf.dpp.stf.client.tester.SarosTester.BOB;
+import static de.fu_berlin.inf.dpp.stf.shared.Constants.BUTTON_ADD_ACCOUNT;
 import static de.fu_berlin.inf.dpp.stf.shared.Constants.CM_RENAME;
+import static de.fu_berlin.inf.dpp.stf.shared.Constants.GROUP_TITLE_XMPP_JABBER_ACCOUNTS;
 import static de.fu_berlin.inf.dpp.stf.shared.Constants.MENU_CLOSE;
 import static de.fu_berlin.inf.dpp.stf.shared.Constants.MENU_FILE;
 import static de.fu_berlin.inf.dpp.stf.shared.Constants.MENU_NEW;
@@ -43,7 +45,6 @@ import de.fu_berlin.inf.dpp.stf.client.StfTestCase;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotShell;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotView;
 import de.fu_berlin.inf.dpp.stf.test.Constants;
-import de.fu_berlin.inf.dpp.ui.preferencePages.GeneralPreferencePage;
 
 public class BasicWidgetTreeTest extends StfTestCase {
 
@@ -207,8 +208,8 @@ public class BasicWidgetTreeTest extends StfTestCase {
         shell.bot().tree().selectTreeItem(NODE_SAROS);
         assertTrue(shell
             .bot()
-            .buttonInGroup(GeneralPreferencePage.CHANGE_BTN_TEXT,
-                GeneralPreferencePage.ACCOUNT_GROUP_TITLE).isVisible());
+            .buttonInGroup(BUTTON_ADD_ACCOUNT, GROUP_TITLE_XMPP_JABBER_ACCOUNTS)
+            .isVisible());
     }
 
     @Test
