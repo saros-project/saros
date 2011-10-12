@@ -96,7 +96,7 @@ public class StartupSaros implements IStartup {
         boolean showGettingStartedWizard) {
 
         if (showGettingStartedWizard)
-            WizardUtils.openSarosGettingStartedWizard(true);
+            WizardUtils.openSarosGettingStartedWizard(showConfigurationWizard);
 
         if (showConfigurationWizard)
             WizardUtils.openSarosConfigurationWizard();

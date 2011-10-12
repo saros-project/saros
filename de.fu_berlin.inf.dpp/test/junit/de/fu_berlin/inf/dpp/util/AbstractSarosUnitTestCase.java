@@ -1,10 +1,5 @@
 package de.fu_berlin.inf.dpp.util;
 
-import de.fu_berlin.inf.dpp.SarosContext;
-import de.fu_berlin.inf.dpp.context.TestSaros;
-import de.fu_berlin.inf.dpp.test.fakes.EclipseWorkspaceFakeFacade;
-import de.fu_berlin.inf.dpp.test.xmpp.XMPPServerFacadeForTests;
-import de.fu_berlin.inf.dpp.test.xmpp.XmppUser;
 import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IWorkspace;
@@ -13,20 +8,25 @@ import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 
+import de.fu_berlin.inf.dpp.context.TestSaros;
+import de.fu_berlin.inf.dpp.test.fakes.EclipseWorkspaceFakeFacade;
+import de.fu_berlin.inf.dpp.test.xmpp.XMPPServerFacadeForTests;
+import de.fu_berlin.inf.dpp.test.xmpp.XmppUser;
+
 /**
  * Extend a new unit-test from this class and you will get a needed
  * functionality to write tests which handles instances of
- * {@link de.fu_berlin.inf.dpp.context.TestSaros} to run
- * productive code.
+ * {@link de.fu_berlin.inf.dpp.context.TestSaros} to run productive code.
  * <p/>
- * When you run such a SarosUnitTest automatically a XMPP-Server will
- * be started which will be used by the test-instances.
- *
+ * When you run such a SarosUnitTest automatically a XMPP-Server will be started
+ * which will be used by the test-instances.
+ * 
  * @author cordes
  */
 public abstract class AbstractSarosUnitTestCase {
 
-    private static Logger LOG = Logger.getLogger(AbstractSarosUnitTestCase.class);
+    private static Logger LOG = Logger
+        .getLogger(AbstractSarosUnitTestCase.class);
 
     private XMPPServerFacadeForTests xmppFacade;
 
@@ -57,7 +57,8 @@ public abstract class AbstractSarosUnitTestCase {
     }
 
     /**
-     * will be later replaced by a separate class for generating different types of scenarios      
+     * will be later replaced by a separate class for generating different types
+     * of scenarios
      */
     protected TestSaros getTestSaros() {
         TestSaros result = new TestSaros();
@@ -65,7 +66,8 @@ public abstract class AbstractSarosUnitTestCase {
         XmppUser xmppUser = xmppFacade.getNextUser();
         result.setXMPPUser(xmppUser);
 
-        IWorkspace workspace = EclipseWorkspaceFakeFacade.createWorkspace(xmppUser.getUsername());
+        IWorkspace workspace = EclipseWorkspaceFakeFacade
+            .createWorkspace(xmppUser.getUsername());
         IProject project = workspace.getRoot().getProject("test");
         EclipseWorkspaceFakeFacade.addSomeProjectData(project);
         result.setWorkspace(workspace);
@@ -74,4 +76,3 @@ public abstract class AbstractSarosUnitTestCase {
     }
 
 }
-

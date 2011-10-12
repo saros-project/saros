@@ -9,10 +9,11 @@ import de.fu_berlin.inf.dpp.concurrent.ConcurrencyTestSuite;
 import de.fu_berlin.inf.dpp.context.ContextTestSuite;
 import de.fu_berlin.inf.dpp.net.NetTestSuite;
 import de.fu_berlin.inf.dpp.project.ProjectTestSuite;
+import de.fu_berlin.inf.dpp.startup.StartupTestSuite;
 import de.fu_berlin.inf.dpp.util.UtilTestSuite;
 
 @RunWith(Suite.class)
-@Suite.SuiteClasses({ AccountManagementTestSuite.class,
+@Suite.SuiteClasses({ StartupTestSuite.class, AccountManagementTestSuite.class,
     ConcurrencyTestSuite.class, ContextTestSuite.class, NetTestSuite.class,
     UtilTestSuite.class, MucSessionTestSuite.class, ProjectTestSuite.class, })
 public class AllTestSuite {

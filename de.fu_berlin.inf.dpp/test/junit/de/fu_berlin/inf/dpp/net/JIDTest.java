@@ -21,9 +21,12 @@
 package de.fu_berlin.inf.dpp.net;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import org.jivesoftware.smack.RosterEntry;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class JIDTest {
@@ -43,11 +46,41 @@ public class JIDTest {
             .createFromServicePerspective("saros128280129@conference.jabber.ccc.de/userXYZ@jabber.org/Saros");
     }
 
+    @Test
+    @Ignore
+    public void testWellformedJID() {
+        assertTrue("'foo.com' is a valid domain for a JID",
+            new JID("foo.com").isValid());
+        // new org.xmpp.packet.JID("foo.com"); OK
+
+        assertTrue("'foo' is a valid domain for a JID",
+            new JID("foo").isValid());
+        // new org.xmpp.packet.JID("foo"); OK
+
+        assertTrue("IP6 addr. is a valid domain for a JID", new JID(
+            "[2001:0:5ef5:79fd:2887:225e:a7b4]").isValid());
+
+        // new org.xmpp.packet.JID("[2001:0:5ef5:79fd:2887:225e:a7b4]"); NOK,
+        // old RFC
+
+        assertTrue("IP4 addr. is a valid domain for a JID",
+            new JID("127.0.0.1").isValid());
+
+        // new org.xmpp.packet.JID("[2001:0:5ef5:79fd:2887:225e:a7b4]"); OK
+
+    }
+
+    @Test
+    public void testMalformedJID() {
+        assertFalse("'foo@bar@foo.bar' is not a valid JID", new JID(
+            "foo@bar@foo.bar").isValid());
+    }
+
     /**
      * TODO Test also other malformatted JID formats.
      */
     @Test(expected = IllegalArgumentException.class)
-    public void testMalformatedJID() {
+    public void testJIDContructorWithNullString() {
         new JID((String) null);
     }
 
@@ -55,7 +88,7 @@ public class JIDTest {
      * TODO Test also other malformatted JID formats.
      */
     @Test(expected = IllegalArgumentException.class)
-    public void testMalformatedJID2() {
+    public void testJIDConstructorWithNullRosterEntry() {
         new JID((RosterEntry) null);
     }
 
