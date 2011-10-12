@@ -46,10 +46,11 @@ import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.SWTError;
 import org.eclipse.swt.SWTException;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IViewPart;
@@ -466,7 +467,8 @@ public class Utils {
             if (wasInterrupted)
                 Thread.currentThread().interrupt();
 
-            if (throwable != null)
+            if (!((throwable instanceof SWTError)
+                || (throwable instanceof SWTException) || (throwable instanceof IllegalStateException)))
                 SWT.error(SWT.ERROR_FAILED_EXEC, throwable);
         }
     }
@@ -766,7 +768,7 @@ public class Utils {
     /**
      * Compresses the given byte array using a Java Deflater.
      */
-    public static byte[] deflate(byte[] input, SubMonitor subMonitor) {
+    public static byte[] deflate(byte[] input, IProgressMonitor subMonitor) {
         subMonitor.beginTask("Deflate bytearray", input.length / CHUNKSIZE + 1);
 
         Deflater compressor = new Deflater(Deflater.DEFLATED);
@@ -794,7 +796,7 @@ public class Utils {
      *             If the operation fails (because the given byte array does not
      *             contain data accepted by the inflater)
      */
-    public static byte[] inflate(byte[] input, SubMonitor subMonitor)
+    public static byte[] inflate(byte[] input, IProgressMonitor subMonitor)
         throws IOException {
 
         subMonitor.beginTask("Inflate bytearray", input.length / CHUNKSIZE + 1);
