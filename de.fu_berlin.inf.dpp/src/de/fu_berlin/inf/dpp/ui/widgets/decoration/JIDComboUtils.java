@@ -83,6 +83,11 @@ public class JIDComboUtils {
      *            to update
      */
     public static void updateJIDCombo(Combo jidCombo) {
+        /*
+         * Save the current selection
+         */
+        Point selection = jidCombo.getSelection();
+
         String jid = jidCombo.getText();
         String username = (jid.contains("@")) ? jid.split("@")[0] : jid;
 
@@ -94,13 +99,9 @@ public class JIDComboUtils {
         }
 
         /*
-         * The modification of the list items resets the text. We make sure the
-         * initially set value remains.
+         * The modification of the list items changes the selection. Now, the
+         * saved selection have to be set again.
          */
-        Point selection = jidCombo.getSelection();
-        if (!jidCombo.getText().equals(jid)) {
-            jidCombo.setText(jid);
-            jidCombo.setSelection(selection);
-        }
+        jidCombo.setSelection(new Point(selection.x, selection.y));
     }
 }
