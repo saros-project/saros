@@ -24,6 +24,8 @@ public class ColorUtils {
 	 * @see <a href="http://en.wikipedia.org/wiki/HSL_and_HSV">HSL and HSV</a>
 	 */
 	public static RGB addLightness(RGB rgb, float lightness) {
+	    if(lightness < -1 || lightness > 1) throw new IndexOutOfBoundsException();
+	    
 		/*
 		 * Convert to HLS; HLS and HSL are synonym
 		 */
@@ -81,6 +83,7 @@ public class ColorUtils {
 	 * @see <a href="http://en.wikipedia.org/wiki/HSL_and_HSV">HSL and HSV</a>
 	 */
 	public static RGB scaleColorBy(RGB rgb, float scale) {
+	    if(scale < 0) throw new IllegalArgumentException();
 		
 		/*
 		 * Convert to HLS; HLS and HSL are synonym
