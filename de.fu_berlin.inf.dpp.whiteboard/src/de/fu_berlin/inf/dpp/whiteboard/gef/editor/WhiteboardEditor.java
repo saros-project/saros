@@ -15,7 +15,7 @@ import org.eclipse.gef.SharedImages;
 import org.eclipse.gef.commands.Command;
 import org.eclipse.gef.dnd.TemplateTransferDragSourceListener;
 import org.eclipse.gef.dnd.TemplateTransferDropTargetListener;
-import org.eclipse.gef.editparts.ScalableRootEditPart;
+import org.eclipse.gef.editparts.ScalableFreeformRootEditPart;
 import org.eclipse.gef.editparts.ZoomManager;
 import org.eclipse.gef.palette.CombinedTemplateCreationEntry;
 import org.eclipse.gef.palette.CreationToolEntry;
@@ -71,11 +71,6 @@ import de.fu_berlin.inf.dpp.whiteboard.sxe.records.ElementRecord;
 public class WhiteboardEditor extends SarosPermissionsGraphicalEditor {
 
 	public static final String ID = "de.fu_berlin.inf.dpp.whiteboard.whiteboardeditor";
-
-	/**
-	 * We use a zoom multiplier to avoid choppy curves on higher zoom levels
-	 */
-	public static final double ZOOM_UI_MULTIPLIER = 10d;
 
 	private KeyHandler keyHandler;
 
@@ -246,19 +241,17 @@ public class WhiteboardEditor extends SarosPermissionsGraphicalEditor {
 		GraphicalViewer viewer = getGraphicalViewer();
 		viewer.setEditPartFactory(new RecordPartFactory());
 
-		ScalableRootEditPart rootEditPart = new ScalableRootEditPart();
+		ScalableFreeformRootEditPart rootEditPart = new ScalableFreeformRootEditPart();
 		viewer.setRootEditPart(rootEditPart);
 
 		ZoomManager manager = rootEditPart.getZoomManager();
-		manager.setUIMultiplier(ZOOM_UI_MULTIPLIER);
 		getActionRegistry().registerAction(new ZoomInAction(manager));
 		getActionRegistry().registerAction(new ZoomOutAction(manager));
 
-		// Note, the zoomlevels have to by multiplied by the ZOOM_UI_MULTIPLIER
-		zoomLevels = new double[] { 0.01, 0.025, 0.05, 0.075, 0.1, 0.15, 0.20,
-				0.25, 0.30, 0.40, 0.50, 1.0 };
+		zoomLevels = new double[] { 0.1, 0.25, 0.5, 0.75, 1, 1.5, 2.0, 2.5, 3,
+				4, 5, 10 };
 		manager.setZoomLevels(zoomLevels);
-		manager.setZoom(0.1);
+		manager.setZoom(1);
 		ArrayList<String> zoomContributions = new ArrayList<String>();
 		zoomContributions.add(ZoomManager.FIT_ALL);
 		zoomContributions.add(ZoomManager.FIT_HEIGHT);
@@ -361,7 +354,7 @@ public class WhiteboardEditor extends SarosPermissionsGraphicalEditor {
 	@Override
 	public Object getAdapter(@SuppressWarnings("rawtypes") Class type) {
 		if (type == ZoomManager.class)
-			return ((ScalableRootEditPart) getGraphicalViewer()
+			return ((ScalableFreeformRootEditPart) getGraphicalViewer()
 					.getRootEditPart()).getZoomManager();
 		return super.getAdapter(type);
 	}

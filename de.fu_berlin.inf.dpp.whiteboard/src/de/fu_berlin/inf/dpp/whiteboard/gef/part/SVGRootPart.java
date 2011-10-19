@@ -1,9 +1,8 @@
 package de.fu_berlin.inf.dpp.whiteboard.gef.part;
 
-import org.eclipse.draw2d.ColorConstants;
+import org.eclipse.draw2d.FreeformLayer;
+import org.eclipse.draw2d.FreeformLayout;
 import org.eclipse.draw2d.IFigure;
-import org.eclipse.draw2d.RectangleFigure;
-import org.eclipse.draw2d.XYLayout;
 import org.eclipse.gef.DragTracker;
 import org.eclipse.gef.Request;
 import org.eclipse.gef.tools.MarqueeDragTracker;
@@ -21,11 +20,8 @@ public class SVGRootPart extends SVGRectPart {
 
 	@Override
 	protected IFigure createFigure() {
-		IFigure figure = new RectangleFigure();
-
-		XYLayout layout = new XYLayout();
-		figure.setLayoutManager(layout);
-		figure.setForegroundColor(ColorConstants.white);
+		IFigure figure = new FreeformLayer();
+		figure.setLayoutManager(new FreeformLayout());
 
 		return figure;
 	}
