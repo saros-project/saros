@@ -539,7 +539,10 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
                 cancellationCause);
         }
 
-        sessionManager.stopSarosSession();
+        if (sessionManager.getSarosSession().getProjectResourcesMapping()
+            .keySet().isEmpty()
+            || sessionManager.getSarosSession().getRemoteUsers().isEmpty())
+            sessionManager.stopSarosSession();
 
         /*
          * If the sarosSession is null, stopSarosSession() does not clear the

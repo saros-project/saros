@@ -1,3 +1,26 @@
+11.9.30
+=======
+[FIX] [karlheld] of follow mode that enables the possibility to start following, even if the followed person has no shared editor open
+[FIX] [kargor] map of outgoing sends was not updated properly if an I/O exception was thrown
+[FIX] [k_beecher] #3258875: Fixed a problem with suggested names for incoming projects being invalid. Submitted on behalf of SWTP Team 1.
+[FIX] [k_beecher] #3390589: The user's annotation colours are slightly manipulated so that highlighting is a slightly different shade to contribution. Committed on behalf of SWTP Team 2.
+[FIX] [k_beecher] #3103549: Username in the chat history are updated after it is updated on the roster. Submitted on behalf of SWTP Team 2.
+[FIX] [k_beecher] #3392263: The message balloon appears for a length of time proportional to the length of the message. Submitted on behalf of SWTP team 2.
+[FIX] [k_beecher] #3392912: Layout grouping and explanations for VoIP. 
+[FIX] [k_beecher] #3392910: Audio quality now a drop-down
+[FIX] [k_beecher] #3396880: Added a horizontal scroll bar to the chat window. Submitted on behalf of SWTP team 1.
+[FIX] [k_beecher] #3390616: Swapped the shared file/folder decorators so that they are consistent. Submitted on behalf of Softwaretechnik Projekt team 1.
+[FIX] [karlheld] #3391919: no follow mode from the beginning with before opened files
+[FIX] [karlheld] #3381262: Partial Sharing overwrites files without confirmation
+[FIX] [k_beecher] Added reference to whiteboard view window icon. Submitted on behalf of SWTP team 2.
+[FIX] [k_beecher] Fixed NPE with whiteboard context menu. Committed on behalf of SWTP team 2.
+[FIX] [ornis] #3390056: Missing transfer type description
+[FIX] [karlheld] #2830185: Invitation window is not informend when users leave 
+[FIX] [karlheld] #3414929 Bad wording in "has no shared file activated yet". Is now changed to "has no shared file opened yet".
+[FIX] [karlheld] #3414923: Cancel adding a new project creashes whole session
+[FIX] [kargor] fixed NPE when connecting to a XMPP server failed
+[FIX] [k_beecher] #3414959 When project invitation is cancelled, test for others in session before attempting close.
+
 11.7.29
 =========
 [FEATURE] [bkahlert] Saros Tutorial

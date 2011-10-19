@@ -358,6 +358,10 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
                 cancellationCause);
             monitor.setTaskName("Invitation failed.");
         }
+
+        if (sessionManager.getSarosSession().getRemoteUsers().isEmpty())
+            sessionManager.stopSarosSession();
+
         projectExchangeProcesses.removeProjectExchangeProcess(this);
         throw cancellationCause;
     }
