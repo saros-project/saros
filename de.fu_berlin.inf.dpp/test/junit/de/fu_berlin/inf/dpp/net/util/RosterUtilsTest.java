@@ -16,6 +16,7 @@ import org.jivesoftware.smack.RosterEntry;
 import org.jivesoftware.smack.XMPPException;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import de.fu_berlin.inf.dpp.Constants;
@@ -95,6 +96,7 @@ public class RosterUtilsTest {
      * .
      */
     @Test
+    @Ignore("senseless test")
     public void testGetDialogContent() {
         XMPPException e1 = new XMPPException("item-not-found");
         assertTrue("item-not-found is wrong implemented",
@@ -135,6 +137,7 @@ public class RosterUtilsTest {
      * Not completely finished
      */
     @Test
+    @Ignore("not finished yet")
     public void testGetNickname() {
         assertTrue("getNickname with null SarosNet should return null ",
             RosterUtils.getNickname(null, null) == null);
@@ -188,6 +191,7 @@ public class RosterUtilsTest {
      * .
      */
     @Test
+    @Ignore("will not work if the order of the test cases is permutated on every run")
     public void testIsAccountCreationPossible() {
         Connection con = testNet.net.getConnection();
         assertTrue("Account is unused, so it should be possible to create",
@@ -207,6 +211,7 @@ public class RosterUtilsTest {
      * @throws InvocationTargetException
      */
     @Test
+    @Ignore("will not work if the order of the test cases is permutated on every run")
     public void testAddToRoster() throws InvocationTargetException {
         Connection con = testNet.net.getConnection();
         RosterUtils.addToRoster(con, jid2, "Chris", null);
@@ -224,6 +229,7 @@ public class RosterUtilsTest {
      * @throws InvocationTargetException
      */
     @Test(expected = InvocationTargetException.class)
+    @Ignore("will not work if the order of the test cases is permutated on every run")
     public void testAddToRoster2() throws InvocationTargetException {
 
         RosterUtils.addToRoster(null, jid, "Alice", null);
@@ -239,6 +245,7 @@ public class RosterUtilsTest {
      *             To get to the catch clause of XMPPException
      */
     @Test
+    @Ignore("will not work if the order of the test cases is permutated on every run")
     public void testAddToRoster3() throws InvocationTargetException {
         Connection con = testNet.net.getConnection();
         con.disconnect();
@@ -253,6 +260,7 @@ public class RosterUtilsTest {
      * 
      */
     @Test
+    @Ignore("will not work if the order of the test cases is permutated on every run")
     public void testGetNickname2() {
         SarosNet sarosNet = testNet.net;
         assertTrue("getNickname should now return the nickname: Chris ",
@@ -269,6 +277,7 @@ public class RosterUtilsTest {
      * @throws InterruptedException
      */
     @Test
+    @Ignore("will not work if the order of the test cases is permutated on every run")
     public void testRemoveFromRoster() throws XMPPException,
         InterruptedException {
         Connection con = testNet.net.getConnection();
@@ -289,6 +298,7 @@ public class RosterUtilsTest {
      * @throws XMPPException
      */
     @Test(expected = XMPPException.class)
+    @Ignore("will not work if the order of the test cases is permutated on every run")
     public void testRemoveFromRoster2() throws XMPPException {
         Connection con = testNet.net.getConnection();
         con.disconnect();
