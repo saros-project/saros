@@ -1,5 +1,6 @@
 package de.fu_berlin.inf.dpp.stf.server.rmi.superbot.internal.impl;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -131,6 +132,18 @@ class BundleFake implements Bundle {
 
     public Version getVersion() {
         return version;
+    }
+
+    public int compareTo(Bundle bundle) {
+        return 0;
+    }
+
+    public <A> A adapt(Class<A> clazz) {
+        return null;
+    }
+
+    public File getDataFile(String path) {
+        return null;
     }
 
 }
