@@ -1,6 +1,5 @@
 package de.fu_berlin.inf.dpp.net.util;
 
-import java.lang.reflect.Method;
 import java.net.Inet6Address;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
@@ -39,62 +38,30 @@ public class NetworkingUtils {
         boolean includeIPv6Addresses) throws UnknownHostException,
         SocketException {
 
-        List<InetAddress> ips = new LinkedList<InetAddress>();
+        LinkedList<InetAddress> ips = new LinkedList<InetAddress>();
 
-        // Holds last ipv4 index in ips list (used to sort IPv4 before IPv6 IPs)
-        int ipv4Index = 0;
+        for (Enumeration<NetworkInterface> networkInterfaces = NetworkInterface
+            .getNetworkInterfaces(); networkInterfaces.hasMoreElements();) {
 
-        // Prepare method calls by reflection
-        Class<NetworkInterface> networkInterfaceClass = NetworkInterface.class;
-        Method mIsUp = null;
-        Method mIsLoopback = null;
-        try {
-            mIsUp = networkInterfaceClass.getMethod("isUp", (Class[]) null);
-        } catch (Exception e) {
-            // ignore Java 1.6 feature
-        }
-        try {
-            mIsLoopback = networkInterfaceClass.getMethod("isLoopback",
-                (Class[]) null);
-        } catch (Exception e) {
-            // ignore Java 1.6 feature
-        }
+            NetworkInterface networkInterface = networkInterfaces.nextElement();
 
-        // Get all network interfaces
-        Enumeration<NetworkInterface> eInterfaces = NetworkInterface
-            .getNetworkInterfaces();
+            if (networkInterface.isLoopback() || !networkInterface.isUp())
+                continue;
 
-        // Enumerate interfaces and enumerate all Internet addresses of each
-        if (eInterfaces != null) {
-            while (eInterfaces.hasMoreElements()) {
-                NetworkInterface ni = eInterfaces.nextElement();
+            Enumeration<InetAddress> inetAddresses = networkInterface
+                .getInetAddresses();
 
-                // skip loopback devices and not running interfaces
-                try {
-                    if (mIsLoopback != null)
-                        if ((Boolean) mIsLoopback.invoke(ni, (Object[]) null))
-                            continue;
-                    if (mIsUp != null)
-                        if ((Boolean) mIsUp.invoke(ni, (Object[]) null) == false)
-                            continue;
-                } catch (Exception e) {
-                    // ignore Java 1.6 feature
-                }
+            while (inetAddresses.hasMoreElements()) {
+                InetAddress inetAddress = inetAddresses.nextElement();
 
-                Enumeration<InetAddress> iaddrs = ni.getInetAddresses();
-                while (iaddrs.hasMoreElements()) {
-                    InetAddress iaddr = iaddrs.nextElement();
+                if (inetAddress.isLoopbackAddress())
+                    continue;
 
-                    // in case ni.isLoopback failed to invoke
-                    if (iaddr.isLoopbackAddress())
-                        continue;
-
-                    if (iaddr instanceof Inet6Address) {
-                        if (includeIPv6Addresses)
-                            ips.add(iaddr);
-                    } else
-                        ips.add(ipv4Index++, iaddr);
-                }
+                if (inetAddress instanceof Inet6Address) {
+                    if (includeIPv6Addresses)
+                        ips.addLast(inetAddress);
+                } else
+                    ips.addFirst(inetAddress);
             }
         }
 
