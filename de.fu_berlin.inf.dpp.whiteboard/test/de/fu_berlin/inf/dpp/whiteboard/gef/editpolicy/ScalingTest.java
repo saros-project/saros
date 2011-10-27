@@ -21,7 +21,7 @@ import org.eclipse.gef.requests.ChangeBoundsRequest;
 import org.junit.Before;
 import org.junit.Test;
 
-public class TestScaling {
+public class ScalingTest {
 
 	String resizeDataMethodName = "recalculateResizeData";
 	private static final String PERCENTAGE_HEIGHT = "percentageHeight";

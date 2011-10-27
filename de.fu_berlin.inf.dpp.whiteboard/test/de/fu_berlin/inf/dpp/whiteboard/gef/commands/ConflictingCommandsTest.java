@@ -14,7 +14,7 @@ import de.fu_berlin.inf.dpp.whiteboard.gef.model.LayoutElementRecord;
 import de.fu_berlin.inf.dpp.whiteboard.sxe.TestUtils;
 import de.fu_berlin.inf.dpp.whiteboard.sxe.records.DocumentRecord;
 
-public class TestConflictingCommands {
+public class ConflictingCommandsTest {
 
 	static final int[] points = { 0, 0, 100, 100 };
 	static final PointList pointList = new PointList(points);

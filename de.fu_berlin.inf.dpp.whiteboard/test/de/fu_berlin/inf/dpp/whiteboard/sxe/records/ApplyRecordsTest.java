@@ -7,7 +7,7 @@ import org.junit.Test;
 
 import de.fu_berlin.inf.dpp.whiteboard.sxe.SXEController;
 
-public class TestApplyRecords {
+public class ApplyRecordsTest {
 
 	private final SXEDefaultRecordFactory recordFactory = new SXEDefaultRecordFactory();
 	private final SXEController controller = new SXEController(recordFactory);
