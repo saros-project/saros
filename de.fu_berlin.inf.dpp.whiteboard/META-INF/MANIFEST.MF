@@ -12,5 +12,6 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.jface.text,
  de.fu_berlin.inf.dpp
 Bundle-ActivationPolicy: lazy
-Bundle-ClassPath: .
+Bundle-ClassPath: .,
+ lib/log4j-1.2.16.jar
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
