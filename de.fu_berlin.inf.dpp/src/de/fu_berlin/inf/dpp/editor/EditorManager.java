@@ -546,7 +546,7 @@ public class EditorManager implements IActivityProvider, Disposable {
 
         this.locallyActiveEditor = path;
 
-        if (path != null)
+        if (path != null && sarosSession.isShared(path.getResource()))
             this.locallyOpenEditors.add(path);
 
         editorListenerDispatch.activeEditorChanged(sarosSession.getLocalUser(),
@@ -991,6 +991,19 @@ public class EditorManager implements IActivityProvider, Disposable {
     }
 
     /**
+     * Convenient method to send an {@link EditorActivity} of type "Activated"
+     * of the currently opened {@link IEditorPart}.
+     */
+    public void sendPartActivated() {
+        Utils.runSafeSWTSync(log, new Runnable() {
+            public void run() {
+                partActivated(editorAPI.getActiveEditor());
+            }
+        });
+
+    }
+
+    /**
      * Called when the local user activated an shared editor.
      * 
      * This can be called twice for a single IEditorPart, because it is called
@@ -1014,6 +1027,8 @@ public class EditorManager implements IActivityProvider, Disposable {
         // Is the new editor part supported by Saros (and inside the project)
         // and the Resource accessible (we don't want to report stale files)?
         if (!isSharedEditor(editorPart)
+            || !sarosSession.isShared(this.editorAPI
+                .getEditorResource(editorPart))
             || !editorAPI.getEditorResource(editorPart).isAccessible()) {
             generateEditorActivated(null);
             // follower switched to another unshared editor or closed followed
@@ -1170,6 +1185,19 @@ public class EditorManager implements IActivityProvider, Disposable {
     }
 
     /**
+     * Convenient method to (un-)lock <b>all</b> opened editors of workbench.
+     * 
+     * @param locked
+     *            <ul>
+     *            <li><b>true</b> locks all opened editors of workbench
+     *            <li><b>false</b> unlocks all opened editors of workbench
+     *            </ul>
+     */
+    public void setAllLocalOpenedEditorsLocked(boolean locked) {
+        this.editorPool.setLocalEditorsEnabled(!locked);
+    }
+
+    /**
      * This method verifies if the given EditorPart is supported by Saros, which
      * is based basically on two facts:
      * 
@@ -1191,7 +1219,7 @@ public class EditorManager implements IActivityProvider, Disposable {
         if (resource == null)
             return false;
 
-        return this.sarosSession.isShared(resource);
+        return this.sarosSession.isShared(resource.getProject());
     }
 
     /**
@@ -1858,4 +1886,57 @@ public class EditorManager implements IActivityProvider, Disposable {
         this.execColorChanged();
     }
 
+    /**
+     * Convenient method to determine if an file is currently opened as editor.
+     * 
+     * @param path
+     *            Path of the file to check if it is opened.
+     * @return <ul>
+     *         <li><b>true</b> if the file is opened in workspace
+     *         <li><b>false</b> if there is no opened editor for that file
+     *         </ul>
+     */
+    public boolean isOpenEditor(SPath path) {
+        if (path == null)
+            throw new IllegalArgumentException();
+
+        for (IEditorPart iEditorPart : EditorAPI.getOpenEditors()) {
+            IResource resource = this.editorAPI.getEditorResource(iEditorPart);
+            if (resource.equals(path.getResource())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Open the editor window of given {@link SPath}.
+     * 
+     * @param path
+     *            Path of the Editor to open.
+     */
+    public void openEditor(SPath path) {
+        if (path == null)
+            throw new IllegalArgumentException();
+
+        editorAPI.openEditor(path);
+    }
+
+    /**
+     * Close the editor window of given {@link SPath}.
+     * 
+     * @param path
+     *            Path of the Editor to close.
+     */
+    public void closeEditor(SPath path) {
+        if (path == null)
+            throw new IllegalArgumentException();
+
+        for (IEditorPart iEditorPart : EditorAPI.getOpenEditors()) {
+            IResource resource = this.editorAPI.getEditorResource(iEditorPart);
+            if (resource.equals(path.getResource())) {
+                editorAPI.closeEditor(iEditorPart);
+            }
+        }
+    }
 }

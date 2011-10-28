@@ -302,4 +302,14 @@ public class PreferenceUtils {
     public int getStunPort() {
         return saros.getPreferenceStore().getInt(PreferenceConstants.STUN_PORT);
     }
+
+    public String isNeedsBasedSyncEnabled() {
+        return saros.getPreferenceStore().getString(
+            PreferenceConstants.NEEDS_BASED_SYNC);
+    }
+
+    public void setNeedsBasedSyncEnabled(boolean value) {
+        saros.getPreferenceStore().setValue(
+            PreferenceConstants.NEEDS_BASED_SYNC, value);
+    }
 }

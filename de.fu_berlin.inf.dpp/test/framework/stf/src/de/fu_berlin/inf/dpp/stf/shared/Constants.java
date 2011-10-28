@@ -38,6 +38,9 @@ public interface Constants {
     public final static String BACK = "< Back";
     public final static String BROWSE = "Browse";
     public final static String OVERWRITE = "Overwrite";
+    public final static String BACKUP = "Create Backup";
+    public final static String RUN_IN_BACKGROUND = "Run in Background";
+    public final static String RESTORE_DEFAULTS = "Restore Defaults";
 
     public final static String SRC = "src";
     public final static String SUFFIX_JAVA = ".java";
@@ -455,6 +458,8 @@ public interface Constants {
         .getString("shell_save_all_files_now");
     public final static String SHELL_NEW_FILE_SHARED = Configuration
         .getString("shell_new_file_shared");
+    public final static String SHELL_NEED_BASED_SYNC = Configuration
+        .getString("shell_need_based_sync");
 
     /* Context menu of a selected tree item on the package explorer view */
     public final static String CM_SHARE_WITH = Configuration

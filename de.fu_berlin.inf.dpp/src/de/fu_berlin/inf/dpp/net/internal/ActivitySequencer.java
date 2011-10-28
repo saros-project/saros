@@ -56,6 +56,7 @@ import de.fu_berlin.inf.dpp.net.business.DispatchThreadContext;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager.IBytestreamConnection;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager.NetTransferMode;
 import de.fu_berlin.inf.dpp.observables.ProjectNegotiationObservable;
+import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.util.ActivityUtils;
 import de.fu_berlin.inf.dpp.util.AutoHashMap;
@@ -466,6 +467,9 @@ public class ActivitySequencer {
     @Inject
     protected ProjectNegotiationObservable projectExchangeProcesses;
 
+    @Inject
+    protected PreferenceUtils preferenceUtils;
+
     public ActivitySequencer(final ISarosSession sarosSession,
         ITransmitter transmitter, DataTransferManager transferManager,
         DispatchThreadContext threadContext, int updateInterval) {
@@ -694,6 +698,10 @@ public class ActivitySequencer {
                 if (projectExchangeProcesses
                     .getProjectExchangeProcess(recipientJID) instanceof OutgoingProjectNegotiation
                     && transferManager.getTransferMode(recipientJID) == NetTransferMode.IBB) {
+
+                    if (!preferenceUtils.isNeedsBasedSyncEnabled().equals(
+                        "false"))
+                        return false;
 
                     // if timedActivities have non-time-critical activities
                     // only, lets queue them

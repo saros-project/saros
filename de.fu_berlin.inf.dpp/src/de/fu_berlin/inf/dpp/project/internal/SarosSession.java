@@ -19,6 +19,8 @@
  */
 package de.fu_berlin.inf.dpp.project.internal;
 
+import java.io.FileNotFoundException;
+import java.lang.reflect.InvocationTargetException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -39,7 +41,10 @@ import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
+import org.eclipse.jface.dialogs.ProgressMonitorDialog;
+import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.widgets.Display;
 import org.joda.time.DateTime;
@@ -50,18 +55,26 @@ import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.SarosContext;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.User.Permission;
+import de.fu_berlin.inf.dpp.activities.SPath;
+import de.fu_berlin.inf.dpp.activities.business.ChecksumActivity;
 import de.fu_berlin.inf.dpp.activities.business.EditorActivity;
 import de.fu_berlin.inf.dpp.activities.business.FileActivity;
 import de.fu_berlin.inf.dpp.activities.business.FolderActivity;
 import de.fu_berlin.inf.dpp.activities.business.IActivity;
+import de.fu_berlin.inf.dpp.activities.business.JupiterActivity;
 import de.fu_berlin.inf.dpp.activities.business.PermissionActivity;
+import de.fu_berlin.inf.dpp.activities.business.TextSelectionActivity;
+import de.fu_berlin.inf.dpp.activities.business.ViewportActivity;
 import de.fu_berlin.inf.dpp.activities.serializable.EditorActivityDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.IActivityDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.IProjectActivityDataObject;
 import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentClient;
 import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentServer;
 import de.fu_berlin.inf.dpp.concurrent.management.TransformationResult;
+import de.fu_berlin.inf.dpp.editor.EditorManager;
+import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
+import de.fu_berlin.inf.dpp.invitation.ProjectNegotiation;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.SarosNet;
@@ -79,7 +92,9 @@ import de.fu_berlin.inf.dpp.project.Messages;
 import de.fu_berlin.inf.dpp.project.SharedProject;
 import de.fu_berlin.inf.dpp.synchronize.StartHandle;
 import de.fu_berlin.inf.dpp.synchronize.StopManager;
+import de.fu_berlin.inf.dpp.ui.util.CollaborationUtils;
 import de.fu_berlin.inf.dpp.util.ArrayUtils;
+import de.fu_berlin.inf.dpp.util.FileUtils;
 import de.fu_berlin.inf.dpp.util.MappedList;
 import de.fu_berlin.inf.dpp.util.StackTrace;
 import de.fu_berlin.inf.dpp.util.Utils;
@@ -112,6 +127,9 @@ public class SarosSession implements ISarosSession, Disposable {
 
     @Inject
     protected ProjectNegotiationObservable projectNegotiationObservable;
+
+    @Inject
+    protected EditorManager editorManager;
 
     protected ActivitySequencer activitySequencer;
 
@@ -189,7 +207,7 @@ public class SarosSession implements ISarosSession, Disposable {
                             for (IActivity activity : transformed.executeLocally) {
                                 for (IActivityProvider executor : activityProviders) {
                                     executor.exec(activity);
-                                    handleResourcesActivity(activity);
+                                    handleFileAndFolderActivities(activity);
                                 }
                             }
                         }
@@ -307,6 +325,8 @@ public class SarosSession implements ISarosSession, Disposable {
             projectMapper.addMapping(projectID, project, new SharedProject(
                 project, this));
             projectMapper.addResourceMapping(project, dependentResources);
+            projectMapper.addUserToProjectMapping(getLocalUser().getJID(),
+                project, projectID);
         } else {
             List<IResource> resources = getSharedResources(project);
             if (resources != null && dependentResources != null) {
@@ -730,8 +750,7 @@ public class SarosSession implements ISarosSession, Disposable {
              * some activities (e.g. EditorActivity) can return null for
              * projectID
              */
-            if (projectID != null
-                || dataObject instanceof EditorActivityDataObject) {
+            if (dataObject instanceof EditorActivityDataObject) {
                 IProject project;
                 if (projectID != null) {
                     lastID = projectID;
@@ -822,59 +841,240 @@ public class SarosSession implements ISarosSession, Disposable {
             return;
         }
 
-        boolean toSend = true;
+        /*
+         * If the need based synchronization is not disabled, process this
+         * JupiterActivity.
+         */
+        if (activity instanceof JupiterActivity)
+            needBasedSynchronization(((JupiterActivity) activity), toWhom);
+
+        // avoid consistency control during project negotiation to relieve the
+        // general transmission process
+        if (isInProjectNegotiation(activity)
+            && activity instanceof ChecksumActivity)
+            return;
+
+        // avoid sending of unwanted editor related activities
+
+        if (activity instanceof TextSelectionActivity
+            || activity instanceof ViewportActivity
+            || activity instanceof JupiterActivity) {
+            if (!needBasedPathsList.contains(activity.getPath())
+                && !isShared(activity.getPath().getResource()))
+                return;
+        }
+
+        toSend = true;
+        // handle FileActivities and FolderActivities to update ProjectMapper
         if (activity instanceof FolderActivity
             || activity instanceof FileActivity)
-            toSend = handleResourcesActivity(activity);
+            handleFileAndFolderActivities(activity);
 
-        if (toSend) {
+        if (!toSend)
+            return;
+
+        try {
+            activitySequencer.sendActivity(toWhom,
+                activity.getActivityDataObject(this));
+        } catch (IllegalArgumentException e) {
+            log.warn("Could not convert Activity to DataObject: ", e);
+        }
+    }
+
+    /**
+     * Convenient method to determine if Project of given {@link IActivity} is
+     * currently transmitted.
+     * 
+     * @param activity
+     * @return <b>true</b> if the activity is send during a project transmission<br>
+     *         <b>false</b> if no transmission is running
+     */
+    private boolean isInProjectNegotiation(IActivity activity) {
+        if (activity == null)
+            throw new IllegalArgumentException();
+
+        SPath path = activity.getPath();
+        if (path == null)
+            return false;
+
+        // determine if we are in a transmission process with our project
+        Collection<ProjectNegotiation> projectNegotiations = projectNegotiationObservable
+            .getProcesses().values();
+        Set<String> projectIDs = null;
+        for (ProjectNegotiation projectNegotiation : projectNegotiations) {
+            projectIDs = projectNegotiation.getProjectNames().keySet();
+        }
+        if (projectIDs != null) {
+            return projectIDs.contains(getProjectID(path.getProject()));
+        }
+        return false;
+    }
+
+    List<SPath> needBasedPathsList = new ArrayList<SPath>();
+
+    /**
+     * Method to enable the need based sync.
+     * 
+     * @param jupiterActivity
+     *            {@link JupiterActivity} that triggers the need based
+     *            synchronization
+     * @param toWhom
+     */
+    private void needBasedSynchronization(JupiterActivity jupiterActivity,
+        List<User> toWhom) {
+        if (jupiterActivity == null)
+            throw new IllegalArgumentException();
+
+        if (preferenceUtils.isNeedsBasedSyncEnabled().equals("false"))
+            return;
+
+        final SPath path = jupiterActivity.getPath();
+        IProject iProject = path.getProject();
+
+        if (!isOwnedProject(iProject))
+            return;
+
+        if (needBasedPathsList.contains(path))
+            return;
+
+        boolean isProjectTransmitted = isInProjectNegotiation(jupiterActivity);
+
+        /*
+         * need-based transmission when file is not shared or file is in
+         * transmission process
+         */
+        if (isProjectTransmitted
+            || (!isShared(path.getFile()) && !isProjectTransmitted)) {
+            if (preferenceUtils.isNeedsBasedSyncEnabled().equals("undefined")) {
+                if (!CollaborationUtils.activateNeedBasedSynchronization(saros))
+                    return;
+            }
+
+            needBasedPathsList.add(path);
+
             try {
-                activitySequencer.sendActivity(toWhom,
-                    activity.getActivityDataObject(this));
-            } catch (IllegalArgumentException e) {
-                log.warn("Could not convert Activity to DataObject: ", e); //$NON-NLS-1$
+                sendSingleFile(path);
+                sendActivity(toWhom, jupiterActivity);
+            } catch (FileNotFoundException e) {
+                log.error("File could not be found, despite existing: " + path,
+                    e);
             }
         }
     }
 
-    protected boolean handleResourcesActivity(IActivity activity) {
+    /**
+     * 
+     * This Method enables a reliable way to automatically synchronize single
+     * Files to all other session participants.
+     * 
+     * @param path
+     *            identifies the file to synchronize to all session participants
+     * @throws FileNotFoundException
+     */
+    protected void sendSingleFile(final SPath path)
+        throws FileNotFoundException {
+        if (path == null)
+            throw new IllegalArgumentException();
+
+        for (final User recipient : getRemoteUsers()) {
+            final ProgressMonitorDialog dialog = new ProgressMonitorDialog(
+                EditorAPI.getAWorkbenchWindow().getShell());
+            final SarosSession session = this;
+            Utils.runSafeSWTSync(log, new Runnable() {
+                public void run() {
+                    try {
+                        dialog.run(true, true, new IRunnableWithProgress() {
+                            public void run(IProgressMonitor monitor) {
+                                // synchronize the file and check if it is
+                                // correctly transmitted
+                                FileUtils.syncSingleFile(recipient, session,
+                                    path, SubMonitor.convert(monitor));
+
+                                /*
+                                 * Notify the session participants of your
+                                 * activated editor. This is mandatory to avoid
+                                 * inconsistencies with the editor manager and
+                                 * by that with the follow mode.
+                                 */
+                                editorManager.sendPartActivated();
+                            }
+                        });
+                    } catch (InvocationTargetException e) {
+                        try {
+                            throw e.getCause();
+                        } catch (CancellationException c) {
+                            log.info("Need based sync was cancelled by local user");
+                        } catch (Throwable t) {
+                            log.error("Internal Error: ", t);
+                        }
+                    } catch (InterruptedException e) {
+                        log.debug(
+                            "Thread is interrupted, either before or during the need based synchronization of "
+                                + path, e);
+                    }
+                }
+            });
+
+        }
+    }
+
+    boolean toSend = true;
+
+    /**
+     * Method to update the ProjectMapper when changes on shared files oder
+     * folders happened.
+     * 
+     * @param activity
+     *            {@link FileActivity} or {@link FolderActivity} to handle
+     */
+    protected void handleFileAndFolderActivities(IActivity activity) {
+        if (!(activity instanceof FileActivity)
+            && !(activity instanceof FolderActivity))
+            return;
+
         if (activity instanceof FileActivity) {
             FileActivity fileActivity = ((FileActivity) activity);
-            IFile file = fileActivity.getPath().getFile();
-            if (file == null)
-                return false;
-            IProject project = file.getProject();
-            if (isCompletelyShared(project))
-                return true;
+            SPath path = fileActivity.getPath();
+            IFile file = path.getFile();
 
+            if (isInProjectNegotiation(fileActivity)
+                && !fileActivity.isNeedBased()) {
+                toSend = false;
+                return;
+            }
+
+            if (file == null)
+                return;
+
+            IProject project = file.getProject();
             List<IResource> resources = getSharedResources(project);
+
             switch (fileActivity.getType()) {
             case Created:
-                if (!isShared(file))
-                    return false;
-                if (file.exists()) {
-                    if (resources != null && !resources.contains(file)) {
-                        resources.add(file);
-                        projectMapper.addResourceMapping(project, resources);
-                        return true;
-                    }
-                } else {
-                    return false;
+                if (!file.exists())
+                    return;
+
+                if (resources != null && !resources.contains(file)) {
+                    resources.add(file);
+                    projectMapper.addResourceMapping(project, resources);
                 }
                 break;
             case Removed:
-                if (!isShared(file))
-                    return false;
+                if (!isShared(file)) {
+                    toSend = false;
+                    return;
+                }
                 if (resources != null && resources.contains(file)) {
                     resources.remove(file);
                     projectMapper.addResourceMapping(project, resources);
-                    return true;
                 }
                 break;
             case Moved:
                 IFile oldFile = fileActivity.getOldPath().getFile();
-                if (oldFile == null || !isShared(oldFile))
-                    return false;
+                if (oldFile == null || !isShared(oldFile)) {
+                    toSend = false;
+                    return;
+                }
                 List<IResource> res = getSharedResources(oldFile.getProject());
                 if (res != null) {
                     if (res.contains(oldFile))
@@ -882,19 +1082,19 @@ public class SarosSession implements ISarosSession, Disposable {
                     if (!res.contains(file))
                         res.add(file);
                     projectMapper.addResourceMapping(project, res);
-                    return true;
                 }
                 break;
             }
-        }
-
-        if (activity instanceof FolderActivity) {
+        } else if (activity instanceof FolderActivity) {
             FolderActivity folderActivity = ((FolderActivity) activity);
             IFolder folder = folderActivity.getPath().getFolder();
+
+            if (folder == null)
+                return;
+
             IProject iProject = folder.getProject();
-            if (isCompletelyShared(iProject))
-                return true;
             List<IResource> resources = getSharedResources(iProject);
+
             if (resources != null) {
                 switch (folderActivity.getType()) {
                 case Created:
@@ -902,21 +1102,21 @@ public class SarosSession implements ISarosSession, Disposable {
                         && isShared(folder.getParent())) {
                         resources.add(folder);
                         projectMapper.addResourceMapping(iProject, resources);
-                        return true;
                     }
-                    return false;
+                    break;
                 case Removed:
-                    if (!isShared(folder))
-                        return false;
+                    if (!isShared(folder)) {
+                        toSend = false;
+                        return;
+                    }
                     if (resources.contains(folder)) {
                         resources.remove(folder);
                         projectMapper.addResourceMapping(iProject, resources);
                     }
-                    return true;
                 }
             }
         }
-        return false;
+        return;
     }
 
     public void addActivityProvider(IActivityProvider provider) {
@@ -1037,5 +1237,23 @@ public class SarosSession implements ISarosSession, Disposable {
 
     public boolean isCompletelyShared(IProject project) {
         return projectMapper.isCompletelyShared(project);
+    }
+
+    private boolean isOwnedProject(IProject iProject) {
+        ArrayList<IProject> ownedProjects = projectMapper
+            .getOwnedProjectIDs(getLocalUser().getJID());
+
+        if (ownedProjects == null)
+            return false;
+
+        return ownedProjects.contains(iProject);
+    }
+
+    public void addProjectOwnership(String projectID, IProject project,
+        JID ownerJID) {
+        projectMapper.addMapping(projectID, project, new SharedProject(project,
+            this));
+        projectMapper.addResourceMapping(project, new ArrayList<IResource>());
+        projectMapper.addUserToProjectMapping(ownerJID, project, projectID);
     }
 }

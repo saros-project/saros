@@ -21,6 +21,7 @@ package de.fu_berlin.inf.dpp.activities.business;
 
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.User.Permission;
+import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.activities.serializable.IActivityDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.PermissionActivityDataObject;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
@@ -100,5 +101,9 @@ public class PermissionActivity extends AbstractActivity {
     public IActivityDataObject getActivityDataObject(ISarosSession sarosSession) {
         return new PermissionActivityDataObject(source.getJID(),
             affectedUser.getJID(), permission);
+    }
+
+    public SPath getPath() {
+        return null;
     }
 }

@@ -68,6 +68,11 @@ public class Messages extends NLS {
     public static String CollaborationUtils_project_plural_ending;
     public static String CollaborationUtils_project_singular_ending;
     public static String CollaborationUtils_user_invited_to_saros_session;
+    public static String CollaborationUtils_confirm_need_based;
+    public static String CollaborationUtils_confirm_need_based_text;
+    public static String CollaborationUtils_confirm_need_based_file;
+    public static String CollaborationUtils_confirm_need_based_file_text;
+    public static String CollaborationUtils_confirm_need_based_file_balloon_text;
 
     public static String ConfigurationSettingsWizardPage_0;
     public static String ConfigurationSettingsWizardPage_button_autoconnect;
@@ -194,6 +199,7 @@ public class Messages extends NLS {
     public static String GeneralPreferencePage_DISABLE_VERSION_CONTROL_TOOLTIP;
     public static String GeneralPreferencePage_ENCRYPT_PASSWORD_TEXT;
     public static String GeneralPreferencePage_FOLLOW_MODE_TEXT;
+    public static String GeneralPreferencePage_ENABLE_NEEDS_BASED_SYNC_TEXT;
     public static String GeneralPreferencePage_GROUP_ACTIVE_LABEL;
     public static String GeneralPreferencePage_GROUP_DEACTIVE_LABEL;
     public static String GeneralPreferencePage_no_account_selected;

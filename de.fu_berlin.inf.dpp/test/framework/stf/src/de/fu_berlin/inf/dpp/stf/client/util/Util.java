@@ -316,6 +316,56 @@ public class Util {
     }
 
     /**
+     * 
+     * Establish a Saros session with specific files of a project. All invitees
+     * are invited simultaneously.
+     * 
+     * @NOTE Establishing session with a project that is already shared or does
+     *       not exist results in unexpected behavior.
+     * @NOTE there is no guarantee that the project and its files are already
+     *       shared after this method returns
+     * @param projectName
+     *            the name of the project to share
+     * @param files
+     *            the files of the project to share
+     * @param projectType
+     *            the type of project that should be used on the invitee side
+     *            e.g new, use existing ...
+     * @param inviter
+     *            e.g. ALICE
+     * @param invitees
+     *            e.g. BOB, CARL
+     * @throws IllegalStateException
+     *             if the inviter or one of the invitee is not connected or is
+     *             already in a session
+     * @throws Exception
+     *             for any other (internal) failure
+     */
+    public static void buildFileSessionConcurrently(final String projectName,
+        String[] files, final TypeOfCreateProject projectType,
+        AbstractTester inviter, AbstractTester... invitees) throws Exception {
+
+        assertStates(true, false, inviter, invitees);
+
+        inviter.superBot().menuBar().saros()
+            .shareProjectFiles(projectName, files, Util.getJID(invitees));
+
+        List<Callable<Void>> joinSessionTasks = new ArrayList<Callable<Void>>();
+        for (final AbstractTester invitee : invitees) {
+            joinSessionTasks.add(new Callable<Void>() {
+                public Void call() throws Exception {
+                    invitee.superBot()
+                        .confirmShellSessionInvitationAndShellAddProject(
+                            projectName, projectType);
+                    return null;
+                }
+            });
+        }
+
+        workAll(joinSessionTasks);
+    }
+
+    /**
      * Activates the Follow mode feature. Activating Follow mode when the
      * followed participant has no open editors results in failure of this
      * method.

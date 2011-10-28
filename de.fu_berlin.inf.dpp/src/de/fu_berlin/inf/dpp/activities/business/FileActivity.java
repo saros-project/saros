@@ -19,7 +19,7 @@ public class FileActivity extends AbstractActivity implements IResourceActivity 
      * of a consistency recovery and those used as regular activities.
      */
     public static enum Purpose {
-        ACTIVITY, RECOVERY;
+        ACTIVITY, RECOVERY, NEEDS_BASED_SYNC;
     }
 
     public static enum Type {
@@ -36,6 +36,7 @@ public class FileActivity extends AbstractActivity implements IResourceActivity 
     protected final SPath oldPath;
     protected final Purpose purpose;
     protected final byte[] data;
+    protected final Long checksum;
 
     /**
      * Utility method for creating a file activity of type == Created for a
@@ -72,13 +73,15 @@ public class FileActivity extends AbstractActivity implements IResourceActivity 
         // return new FileActivity(source, Type.Created, npath, null,
         // content,
         // purpose);
+        Long checksum = de.fu_berlin.inf.dpp.util.FileUtils.checksum(path
+            .getFile());
 
         File f = new File(path.getFile().getLocation().toOSString());
 
         byte[] content = FileUtils.readFileToByteArray(f);
 
         return new FileActivity(source, Type.Created, path, null, content,
-            purpose);
+            purpose, checksum);
     }
 
     /**
@@ -108,7 +111,7 @@ public class FileActivity extends AbstractActivity implements IResourceActivity 
             content = FileUtils.readFileToByteArray(file);
         }
         return new FileActivity(source, Type.Moved, destPath, sourcePath,
-            content, Purpose.ACTIVITY);
+            content, Purpose.ACTIVITY, null);
     }
 
     /**
@@ -119,7 +122,8 @@ public class FileActivity extends AbstractActivity implements IResourceActivity 
      */
     public static FileActivity removed(User source, SPath path, Purpose purpose) {
 
-        return new FileActivity(source, Type.Removed, path, null, null, purpose);
+        return new FileActivity(source, Type.Removed, path, null, null,
+            purpose, null);
     }
 
     /**
@@ -139,7 +143,7 @@ public class FileActivity extends AbstractActivity implements IResourceActivity 
      *            moving)
      */
     public FileActivity(User source, Type type, SPath newPath, SPath oldPath,
-        byte[] data, Purpose purpose) {
+        byte[] data, Purpose purpose, Long checksum) {
 
         super(source);
 
@@ -166,6 +170,7 @@ public class FileActivity extends AbstractActivity implements IResourceActivity 
         this.oldPath = oldPath;
         this.data = data;
         this.purpose = purpose;
+        this.checksum = checksum;
     }
 
     public SPath getPath() {
@@ -250,10 +255,18 @@ public class FileActivity extends AbstractActivity implements IResourceActivity 
         return Purpose.RECOVERY.equals(purpose);
     }
 
+    public boolean isNeedBased() {
+        return Purpose.NEEDS_BASED_SYNC.equals(purpose);
+    }
+
+    public long getChecksum() {
+        return checksum;
+    }
+
     public IActivityDataObject getActivityDataObject(ISarosSession sarosSession) {
         return new FileActivityDataObject(source.getJID(), type,
             newPath.toSPathDataObject(sarosSession),
             (oldPath != null ? oldPath.toSPathDataObject(sarosSession) : null),
-            data, purpose);
+            data, purpose, checksum);
     }
 }

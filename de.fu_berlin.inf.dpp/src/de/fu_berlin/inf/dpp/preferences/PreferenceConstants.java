@@ -44,6 +44,8 @@ public class PreferenceConstants {
 
     public static final String AUTO_FOLLOW_MODE = "autofollowmode";
 
+    public static final String NEEDS_BASED_SYNC = "undefined";
+
     public static final String SKYPE_USERNAME = "skypename";
 
     public static final String CONCURRENT_UNDO = "concurrent_undo";

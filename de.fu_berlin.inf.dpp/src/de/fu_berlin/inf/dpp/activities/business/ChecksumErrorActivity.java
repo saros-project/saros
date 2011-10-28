@@ -113,4 +113,8 @@ public class ChecksumErrorActivity extends AbstractActivity {
         return "ChecksumError(src:" + this.getSource() + ", paths:"
             + this.paths + ", recoveryID:" + recoveryID + ")";
     }
+
+    public SPath getPath() {
+        return null;
+    }
 }

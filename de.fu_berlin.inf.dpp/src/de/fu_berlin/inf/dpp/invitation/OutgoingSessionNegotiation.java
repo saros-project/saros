@@ -19,6 +19,7 @@ import de.fu_berlin.inf.dpp.activities.ProjectExchangeInfo;
 import de.fu_berlin.inf.dpp.communication.muc.MUCManager;
 import de.fu_berlin.inf.dpp.communication.muc.negotiation.MUCSessionPreferences;
 import de.fu_berlin.inf.dpp.communication.muc.negotiation.MUCSessionPreferencesNegotiatingManager;
+import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
 import de.fu_berlin.inf.dpp.exceptions.RemoteCancellationException;
 import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
@@ -96,6 +97,9 @@ public class OutgoingSessionNegotiation extends InvitationProcess {
     protected XMPPTransmitter xmppTransmitter;
 
     @Inject
+    protected EditorManager editorManager;
+
+    @Inject
     protected DataTransferManager dataTransferManager;
 
     public OutgoingSessionNegotiation(JID peer, int colorID,
@@ -132,6 +136,8 @@ public class OutgoingSessionNegotiation extends InvitationProcess {
      */
 
     public void start(SubMonitor monitor) throws SarosCancellationException {
+
+        editorManager.setAllLocalOpenedEditorsLocked(true);
 
         /*
          * Before the session or even project invitation can begin, we have to

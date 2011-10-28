@@ -436,4 +436,19 @@ public interface ISarosSession extends IActivityListener {
      * @return
      */
     public List<IResource> getSharedResources(IProject project);
+
+    /**
+     * Adds to the SarosProjectMapper the mapping of JID to project. This is
+     * done to identify the resources host.
+     * 
+     * @param projectID
+     *            ID of the project
+     * @param project
+     *            the IProject itself
+     * @param ownerJID
+     *            the inviter to this project
+     */
+    public void addProjectOwnership(String projectID, IProject project,
+        JID ownerJID);
+
 }

@@ -32,6 +32,7 @@ import de.fu_berlin.inf.dpp.SarosContext;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.activities.ProjectExchangeInfo;
 import de.fu_berlin.inf.dpp.activities.business.ProjectsAddedActivity;
+import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
 import de.fu_berlin.inf.dpp.exceptions.RemoteCancellationException;
@@ -77,6 +78,9 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
 
     protected boolean useVersionControl;
 
+    @Inject
+    protected EditorManager editorManager;
+
     protected HashMap<IProject, List<IResource>> selectedProjectResources;
     protected List<ProjectExchangeInfo> pInfos;
 
@@ -102,6 +106,7 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
         sendFileList(monitor.newChild(1));
         try {
             getRemoteFileList(monitor.newChild(2));
+            editorManager.setAllLocalOpenedEditorsLocked(false);
             if (doStream) {
                 streamArchive(monitor.newChild(97));
             } else {

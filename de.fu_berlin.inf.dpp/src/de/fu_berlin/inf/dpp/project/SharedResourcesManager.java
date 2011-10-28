@@ -22,6 +22,8 @@ package de.fu_berlin.inf.dpp.project;
 import static java.text.MessageFormat.format;
 
 import java.io.ByteArrayInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
@@ -65,6 +67,7 @@ import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.observables.FileReplacementInProgressObservable;
 import de.fu_berlin.inf.dpp.synchronize.Blockable;
 import de.fu_berlin.inf.dpp.synchronize.StopManager;
+import de.fu_berlin.inf.dpp.ui.util.CollaborationUtils;
 import de.fu_berlin.inf.dpp.util.EclipseHelper;
 import de.fu_berlin.inf.dpp.util.FileUtils;
 import de.fu_berlin.inf.dpp.util.Utils;
@@ -492,10 +495,56 @@ public class SharedResourcesManager extends AbstractActivityProvider implements
         if (type == FileActivity.Type.Created) {
             // TODO The progress should be reported to the user.
             SubMonitor monitor = SubMonitor.convert(new NullProgressMonitor());
+            boolean wasOpenedEditor = editorManager.isOpenEditor(path);
+            boolean needBased = activity.isNeedBased();
+
+            if (needBased) {
+                Long remoteChecksum = activity.getChecksum();
+                Long localChecksum = null;
+                if (file.exists()) {
+                    try {
+                        localChecksum = FileUtils.checksum(file);
+                    } catch (IOException e1) {
+                        log.debug("Checksum could not be generated.", e1);
+                    }
+                }
+                // check if there is already that file in workspace or the files
+                // even completely match
+                if (file.exists() && !remoteChecksum.equals(localChecksum)) {
+                    editorManager.closeEditor(path);
+                    // ask the user what to do
+                    if (CollaborationUtils.needBasedFileHandlingDialog(activity
+                        .getSource().getHumanReadableName(), file.getName(),
+                        true)) {
+                        // TRUE: backup/rename and than overwrite
+                        try {
+                            editorManager.saveLazy(path);
+                            FileUtils.backupFile(file, monitor);
+                        } catch (FileNotFoundException e) {
+                            log.error(
+                                "File could not be found, despite existing: "
+                                    + path, e);
+                        }
+                    }
+                } else {
+                    editorManager.closeEditor(path);
+                    CollaborationUtils.needBasedFileHandlingDialog(activity
+                        .getSource().getHumanReadableName(), file.getName(),
+                        false);
+                }
+            }
+
             try {
                 FileUtils.writeFile(
                     new ByteArrayInputStream(activity.getContents()), file,
                     monitor);
+
+                if (needBased) {
+                    if (wasOpenedEditor)
+                        editorManager.openEditor(path);
+
+                    sarosSession.getConcurrentDocumentClient().reset(path);
+                }
             } catch (Exception e) {
                 log.error("Could not write file: " + file);
             }

@@ -1,5 +1,6 @@
 package de.fu_berlin.inf.dpp.util;
 
+import java.io.FileNotFoundException;
 import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -30,8 +31,13 @@ import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 
+import de.fu_berlin.inf.dpp.User;
+import de.fu_berlin.inf.dpp.activities.SPath;
+import de.fu_berlin.inf.dpp.activities.business.FileActivity;
+import de.fu_berlin.inf.dpp.activities.business.FileActivity.Purpose;
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
+import de.fu_berlin.inf.dpp.project.ISarosSession;
 
 /**
  * This class contains static utility methods for file handling.
@@ -140,15 +146,37 @@ public class FileUtils {
     }
 
     /**
+     * Move the file to the same location, with a trailed "_BACKUP" on file
+     * name.
+     * 
+     * @param file
+     *            the {@link IFile} to rename
+     * @param monitor
+     *            a progress monitor to show progress to user
+     * @throws CoreException
+     * @throws FileNotFoundException
+     */
+    public static void backupFile(IFile file, SubMonitor monitor)
+        throws CoreException, FileNotFoundException {
+        if (!file.exists())
+            throw new FileNotFoundException();
+        IPath newPath = new Path(file.getName().concat("_BACKUP"));
+        file.move(newPath, true, monitor);
+    }
+
+    /**
      * Unzip the data in the given InputStream as a Zip archive to the given
-     * IContainer
+     * IContainer. Already shared files will not be overwritten.
+     * 
+     * @param iSarosSession
      * 
      * @cancelable This long-running operation can be canceled via the given
      *             progress monitor and will throw an LocalCancellationException
      *             in this case.
      */
     public static boolean writeArchive(InputStream input, IContainer container,
-        SubMonitor monitor) throws CoreException, LocalCancellationException {
+        SubMonitor monitor, ISarosSession iSarosSession) throws CoreException,
+        LocalCancellationException {
 
         ZipInputStream zip = new ZipInputStream(input);
 
@@ -164,15 +192,16 @@ public class FileUtils {
                 IPath path = Path.fromPortableString(entry.getName());
                 IFile file = container.getFile(path);
 
-                writeFile(new FilterInputStream(zip) {
-                    @Override
-                    public void close() throws IOException {
-                        // prevent the ZipInputStream from being closed
-                    }
-                }, file, monitor.newChild(1));
+                if (!iSarosSession.isShared(file)) {
+                    writeFile(new FilterInputStream(zip) {
+                        @Override
+                        public void close() throws IOException {
+                            // prevent the ZipInputStream from being closed
+                        }
+                    }, file, monitor.newChild(1));
 
-                log.debug("File written to disk: " + path);
-
+                    log.debug("File written to disk: " + path);
+                }
                 zip.closeEntry();
             }
             log.debug(String.format("Unpacked archive in %d s",
@@ -467,5 +496,35 @@ public class FileUtils {
         workspace.run(moveProcedure, workspace.getRoot(),
             IWorkspace.AVOID_UPDATE, null);
 
+    }
+
+    /**
+     * Synchronizing a single file for the given user.
+     */
+    public static void syncSingleFile(User from,
+        final ISarosSession sarosSession, final SPath path, SubMonitor progress) {
+
+        progress.beginTask("Synchronizing file: " + path.toString(), 10);
+        progress.worked(1);
+
+        // Reset jupiter
+        if (sarosSession.isHost()) {
+            sarosSession.getConcurrentDocumentServer().reset(from.getJID(),
+                path);
+        } else {
+            sarosSession.getConcurrentDocumentClient().reset(path);
+        }
+
+        progress.worked(1);
+        final User user = sarosSession.getLocalUser();
+
+        try {
+            // Send the file to client
+            sarosSession.sendActivity(from,
+                FileActivity.created(user, path, Purpose.NEEDS_BASED_SYNC));
+        } catch (IOException e) {
+            log.error("File could not be read, despite existing: " + path, e);
+        }
+        progress.done();
     }
 }

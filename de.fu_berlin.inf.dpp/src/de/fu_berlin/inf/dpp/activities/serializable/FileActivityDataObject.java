@@ -29,6 +29,8 @@ public class FileActivityDataObject extends AbstractProjectActivityDataObject
 
     protected byte[] data;
 
+    protected Long checksum;
+
     /**
      * Generic constructor for {@link FileActivityDataObject}s
      * 
@@ -47,7 +49,7 @@ public class FileActivityDataObject extends AbstractProjectActivityDataObject
      */
     public FileActivityDataObject(JID source, Type type,
         SPathDataObject newPath, SPathDataObject oldPath, byte[] data,
-        Purpose purpose) {
+        Purpose purpose, Long checksum) {
         super(source);
 
         if (type == null || purpose == null)
@@ -73,6 +75,7 @@ public class FileActivityDataObject extends AbstractProjectActivityDataObject
         this.oldPath = oldPath;
         this.data = data;
         this.purpose = purpose;
+        this.checksum = checksum;
     }
 
     @Override
@@ -154,6 +157,6 @@ public class FileActivityDataObject extends AbstractProjectActivityDataObject
         return new FileActivity(sarosSession.getUser(source), type,
             newPath.toSPath(sarosSession),
             (oldPath != null ? oldPath.toSPath(sarosSession) : null), data,
-            purpose);
+            purpose, checksum);
     }
 }

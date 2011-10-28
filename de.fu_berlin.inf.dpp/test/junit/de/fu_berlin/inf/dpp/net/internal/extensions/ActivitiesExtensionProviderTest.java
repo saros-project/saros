@@ -51,11 +51,9 @@ public class ActivitiesExtensionProviderTest {
 
     protected static final Operation timestamp = new TimestampOperation();
     protected static final Operation noOp = new NoOperation();
-    protected static final Operation insert = new InsertOperation(
-        34,
+    protected static final Operation insert = new InsertOperation(34,
         "One Line Delimiters\r\nLinux\nSeveral\n\nTabs\t\t\tEncoding Test�������");
-    protected static final Operation delete = new DeleteOperation(
-        37,
+    protected static final Operation delete = new DeleteOperation(37,
         "One Line Delimiters\r\nLinux\nSeveral\n\nTabs\t\t\tEncoding Test�������");
     protected static final Operation easySplit = new SplitOperation(insert,
         delete);
@@ -66,7 +64,7 @@ public class ActivitiesExtensionProviderTest {
     protected static final IActivityDataObject[] activityDataObjects = new IActivityDataObject[] {
         new EditorActivityDataObject(jid, EditorActivity.Type.Activated, path),
         new FileActivityDataObject(jid, FileActivity.Type.Created, path, null,
-            new byte[] { 34, 72 }, Purpose.ACTIVITY),
+            new byte[] { 34, 72 }, Purpose.ACTIVITY, null),
         new FolderActivityDataObject(jid, FolderActivity.Type.Created, path),
         new PermissionActivityDataObject(jid, new JID("user@server"),
             Permission.WRITE_ACCESS),

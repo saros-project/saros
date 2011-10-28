@@ -85,6 +85,8 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
      */
     Map<String, IProject> localProjects;
 
+    protected JID jid;
+
     public IncomingProjectNegotiation(JID peer, String processID,
         List<ProjectExchangeInfo> projectInfos, boolean doStream,
         SarosContext sarosContext) {
@@ -94,6 +96,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
         this.projectInfos = projectInfos;
         this.doStream = doStream;
         this.localProjects = new HashMap<String, IProject>();
+        this.jid = peer;
 
     }
 
@@ -154,6 +157,13 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
 
             List<FileList> missingFiles = calculateMissingFiles(projectNames,
                 skipSyncs, useVersionControl, subMonitor.newChild(10));
+
+            // the user who sends this ProjectNegotiation is now responsible for
+            // all resources from that project
+            for (Entry<String, IProject> entry : localProjects.entrySet()) {
+                sessionManager.getSarosSession().addProjectOwnership(
+                    entry.getKey(), entry.getValue(), jid);
+            }
 
             transmitter.sendFileLists(peer, processID, missingFiles,
                 subMonitor.newChild(10));
@@ -928,7 +938,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
                 public void run(IProgressMonitor monitor) throws CoreException {
                     try {
                         FileUtils.writeArchive(archiveStream, project,
-                            subMonitor);
+                            subMonitor, sessionManager.getSarosSession());
                     } catch (LocalCancellationException e) {
                         throw new CoreException(new Status(IStatus.CANCEL,
                             Saros.SAROS, null, e));

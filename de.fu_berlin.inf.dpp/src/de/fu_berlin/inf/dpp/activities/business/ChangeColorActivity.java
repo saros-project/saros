@@ -3,6 +3,7 @@ package de.fu_berlin.inf.dpp.activities.business;
 import org.eclipse.swt.graphics.RGB;
 
 import de.fu_berlin.inf.dpp.User;
+import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.activities.serializable.ChangeColorActivityDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.IActivityDataObject;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
@@ -44,5 +45,9 @@ public class ChangeColorActivity extends AbstractActivity {
 
     public RGB getColor() {
         return this.color;
+    }
+
+    public SPath getPath() {
+        return null;
     }
 }

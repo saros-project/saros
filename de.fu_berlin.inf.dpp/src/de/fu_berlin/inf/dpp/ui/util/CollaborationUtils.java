@@ -12,16 +12,21 @@ import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.preference.PreferenceStore;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.PlatformUI;
 import org.jivesoftware.smack.XMPPException;
 
+import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.SarosSessionManager;
 import de.fu_berlin.inf.dpp.project.internal.SarosSession;
+import de.fu_berlin.inf.dpp.ui.BalloonNotification;
 import de.fu_berlin.inf.dpp.ui.Messages;
+import de.fu_berlin.inf.dpp.ui.views.SarosView;
 import de.fu_berlin.inf.dpp.util.Utils;
 
 /**
@@ -322,5 +327,57 @@ public class CollaborationUtils {
             }
         }
         return allResources;
+    }
+
+    /**
+     * Method to ask for the decision of a user, if he wanted to activate the
+     * need based synchronization.
+     * 
+     * @param saros
+     *            Saros instance is needed to store decision in
+     *            {@link PreferenceStore}.
+     * @return <b>true</b> if the user decides to activate the need based
+     *         synchronization<br>
+     *         <b>false</b> in the case the user decides not to use the need
+     *         based synchronization
+     */
+    public static boolean activateNeedBasedSynchronization(Saros saros) {
+        return (Utils.popUpRememberDecisionDialog(
+            Messages.CollaborationUtils_confirm_need_based,
+            Messages.CollaborationUtils_confirm_need_based_text, false, saros,
+            PreferenceConstants.NEEDS_BASED_SYNC));
+    }
+
+    /**
+     * Method to ask the participants who received a need based file whether to
+     * overwrite or backup the own file in workspace.
+     * 
+     * @param fileName
+     * @param userName
+     * @param showDialog
+     *            <b>true</b> opens a {@link MessageDialog}, <b>false</b> opens
+     *            a {@link BalloonNotification}
+     * 
+     * @return <b>true</b> The user wants to backup the file. (just in case
+     *         {@link MessageDialog} is used)<br>
+     *         <b>false</b> The user wants to overwrite the file. (just in case
+     *         {@link MessageDialog} is used)
+     */
+    public static boolean needBasedFileHandlingDialog(String userName,
+        String fileName, boolean showDialog) {
+        String message = MessageFormat.format(
+            Messages.CollaborationUtils_confirm_need_based_file_text, userName,
+            fileName);
+        String messageBalloon = MessageFormat.format(
+            Messages.CollaborationUtils_confirm_need_based_file_balloon_text,
+            userName, fileName);
+        if (showDialog) {
+            return Utils.popUpCustomQuestion(
+                Messages.CollaborationUtils_confirm_need_based_file, message,
+                new String[] { "Create Backup", "Overwrite" }, false);
+        } else {
+            SarosView.showNotification("New file shared!", messageBalloon);
+            return true;
+        }
     }
 }

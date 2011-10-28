@@ -67,13 +67,13 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
         prefs.setValue(PreferenceConstants.AUTO_PORTMAPPING_DEVICEID, "");
         prefs.setValue(PreferenceConstants.GATEWAYCHECKPERFORMED, false);
         prefs.setValue(PreferenceConstants.AUTO_FOLLOW_MODE, false);
+        prefs.setValue(PreferenceConstants.NEEDS_BASED_SYNC, "undefined");
         prefs.setValue(PreferenceConstants.SKYPE_USERNAME, "");
         prefs.setValue(PreferenceConstants.DEBUG, false);
         prefs.setValue(PreferenceConstants.FILE_TRANSFER_PORT, 7777);
         prefs.setValue(PreferenceConstants.USE_NEXT_PORTS_FOR_FILE_TRANSFER,
             true);
-        prefs
-            .setValue(PreferenceConstants.LOCAL_SOCKS5_PROXY_DISABLED, false);
+        prefs.setValue(PreferenceConstants.LOCAL_SOCKS5_PROXY_DISABLED, false);
         prefs.setValue(PreferenceConstants.FORCE_FILETRANSFER_BY_CHAT, false);
 
         prefs.setValue(PreferenceConstants.STUN, "stunserver.org");

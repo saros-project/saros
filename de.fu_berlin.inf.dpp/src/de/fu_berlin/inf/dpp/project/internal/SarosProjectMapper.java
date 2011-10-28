@@ -14,6 +14,8 @@ import org.eclipse.core.resources.IResource;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 
+import de.fu_berlin.inf.dpp.User;
+import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.project.SharedProject;
 
 /**
@@ -31,6 +33,13 @@ class SarosProjectMapper {
      * mapping of project IDs --> {@link IProject}s
      */
     BiMap<String, IProject> idMapping = HashBiMap.create();
+
+    /**
+     * mapping of {@link User}s --> Lists of {@link IProject}s to determine the
+     * one how shared a specific project. The User is needed to avoid mixtures
+     * of project files from different users in one project.
+     */
+    HashMap<JID, ArrayList<IProject>> userToProjectIDMapping = new HashMap<JID, ArrayList<IProject>>();
 
     /**
      * mapping of {@link IProject}s --> Lists of project dependent
@@ -55,6 +64,18 @@ class SarosProjectMapper {
 
         if (!sharedProjects.containsValue(sharedProject))
             sharedProjects.put(id, sharedProject);
+    }
+
+    public synchronized void addUserToProjectMapping(JID senderJID,
+        IProject project, String projectID) {
+        if (userToProjectIDMapping.containsValue(project))
+            return;
+        ArrayList<IProject> ownedProjects = userToProjectIDMapping
+            .get(senderJID);
+        if (ownedProjects == null)
+            ownedProjects = new ArrayList<IProject>();
+        ownedProjects.add(project);
+        userToProjectIDMapping.put(senderJID, ownedProjects);
     }
 
     public synchronized void addResourceMapping(IProject localProject,
@@ -109,8 +130,7 @@ class SarosProjectMapper {
         return Collections.unmodifiableSet(idMapping.values());
     }
 
-    public synchronized List<IResource> getResources(
-        IProject localProject) {
+    public synchronized List<IResource> getResources(IProject localProject) {
         return resourceMapping.get(localProject);
     }
 
@@ -136,5 +156,9 @@ class SarosProjectMapper {
 
     public synchronized boolean isCompletelyShared(IProject project) {
         return completeProjectsList.contains(project);
+    }
+
+    public synchronized ArrayList<IProject> getOwnedProjectIDs(JID id) {
+        return userToProjectIDMapping.get(id);
     }
 }

@@ -231,7 +231,7 @@ public class SharedProjectFileDecorator implements ILightweightLabelDecorator {
                 return false;
 
             IFile file = (IFile) element;
-            if (!this.sarosSession.isShared(file.getProject()))
+            if (!this.sarosSession.isShared(file))
                 return false;
 
             IPath iPath = file.getProjectRelativePath();

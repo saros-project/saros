@@ -37,6 +37,9 @@ public interface ISarosMenu extends Remote {
     public void shareProjects(String projectName, JID... jids)
         throws RemoteException;
 
+    public void shareProjectFiles(String projectName, String[] files,
+        JID... jids) throws RemoteException;
+
     public void shareProjects(String[] projectNames, JID... jids)
         throws RemoteException;
 

@@ -76,6 +76,7 @@ public class GeneralPreferencePage extends FieldEditorPreferencePage implements
     public static final String CONCURRENT_UNDO_TEXT = Messages.GeneralPreferencePage_CONCURRENT_UNDO_TEXT;
     public static final String DISABLE_VERSION_CONTROL_TEXT = Messages.GeneralPreferencePage_DISABLE_VERSION_CONTROL_TEXT;
     public static final String DISABLE_VERSION_CONTROL_TOOLTIP = Messages.GeneralPreferencePage_DISABLE_VERSION_CONTROL_TOOLTIP;
+    public static final String NEEDS_BASED_SYNC_TEXT = Messages.GeneralPreferencePage_ENABLE_NEEDS_BASED_SYNC_TEXT;
 
     // icons
     public static final Image ADD_IMAGE = ImageManager
@@ -115,6 +116,7 @@ public class GeneralPreferencePage extends FieldEditorPreferencePage implements
         createVersionControlPreferences(this.parent);
         createConcurrentUndoField(this.parent);
         createFollowModePreferences(this.parent);
+        createNeedsBasesSyncPreferences(this.parent);
     }
 
     /*
@@ -376,6 +378,11 @@ public class GeneralPreferencePage extends FieldEditorPreferencePage implements
     protected void createFollowModePreferences(Composite group) {
         addField(new BooleanFieldEditor(PreferenceConstants.AUTO_FOLLOW_MODE,
             FOLLOW_MODE_TEXT, group));
+    }
+
+    protected void createNeedsBasesSyncPreferences(Composite group) {
+        addField(new BooleanFieldEditor(PreferenceConstants.NEEDS_BASED_SYNC,
+            NEEDS_BASED_SYNC_TEXT, group));
     }
 
     protected Composite createGroup(String text, Composite parent) {

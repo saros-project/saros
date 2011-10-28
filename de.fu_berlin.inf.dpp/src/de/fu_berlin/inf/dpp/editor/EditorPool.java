@@ -314,6 +314,21 @@ class EditorPool {
     }
 
     /**
+     * Will set all IEditorParts that are opened editable or non-editable. This
+     * method is not limited to shared editors.
+     * 
+     * @param editable
+     */
+    public void setLocalEditorsEnabled(boolean editable) {
+
+        log.trace("EditorPool.setEditable");
+
+        for (IEditorPart editorPart : EditorAPI.getOpenEditors()) {
+            this.editorManager.editorAPI.setEditable(editorPart, editable);
+        }
+    }
+
+    /**
      * Returns true iff the given IEditorPart is managed by the
      * {@link EditorPool}. See EditorPool for a description of which
      * IEditorParts are managed.

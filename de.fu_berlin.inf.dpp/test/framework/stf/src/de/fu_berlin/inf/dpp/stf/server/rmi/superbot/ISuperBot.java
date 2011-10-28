@@ -209,4 +209,10 @@ public interface ISuperBot extends Remote {
 
     public void confirmShellLeavingClosingSession() throws RemoteException;
 
+    public void confirmShellNewSharedFile(String decision)
+        throws RemoteException;
+
+    public void confirmShellNeedBased(String decsision, boolean remember)
+        throws RemoteException;
+
 }

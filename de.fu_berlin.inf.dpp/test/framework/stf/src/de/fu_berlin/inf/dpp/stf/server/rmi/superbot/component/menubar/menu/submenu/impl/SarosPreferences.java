@@ -389,4 +389,27 @@ public final class SarosPreferences extends StfRemoteObject implements
         return false;
     }
 
+    public void setNeedBasedActivated(boolean activate) throws RemoteException {
+        SWTBotShell shell = preCondition();
+        shell.bot().sleep(500);
+        SWTBotCheckBox checkBox = shell.bot().checkBox(
+            CHECKBOX_NEEDS_BASED_SYNC);
+
+        if (activate)
+            checkBox.select();
+        else
+            checkBox.deselect();
+
+        shell.bot().button(APPLY).click();
+        shell.bot().button(OK).click();
+
+        shell.bot().waitUntil(SarosConditions.isShellClosed(shell));
+    }
+
+    public void restoreDefaults() throws RemoteException {
+        SWTBotShell shell = preCondition();
+        shell.bot().button(RESTORE_DEFAULTS).click();
+        shell.bot().button(APPLY).click();
+        shell.bot().button(OK).click();
+    }
 }

@@ -48,7 +48,9 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.preference.PreferenceStore;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.SWTError;
 import org.eclipse.swt.SWTException;
@@ -72,6 +74,7 @@ import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.ui.dialogs.RememberDecisionMessageDialog;
 
 /**
  * Static Utility functions
@@ -1019,6 +1022,86 @@ public class Utils {
                 public Boolean call() {
                     return MessageDialog.openQuestion(EditorAPI.getShell(),
                         title, message);
+                }
+            });
+        } catch (Exception e) {
+            log.error("An internal error ocurred while trying"
+                + " to open the question dialog.");
+            return false;
+        }
+    }
+
+    /**
+     * Ask the User a given question. It pops up an QuestionDialog with given
+     * title and message. Additionally custom button labels are applicable.
+     * 
+     * @param title
+     *            dialog title
+     * @param message
+     *            displayed message
+     * @param dialogButtonLabels
+     *            custom button labels
+     * @param failSilently
+     *            don`t open the dialog
+     * 
+     * @return boolean indicating whether the user said Yes or No
+     */
+    public static boolean popUpCustomQuestion(final String title,
+        final String message, final String[] dialogButtonLabels,
+        boolean failSilently) {
+        if (failSilently)
+            return false;
+
+        try {
+            return Utils.runSWTSync(new Callable<Boolean>() {
+                public Boolean call() {
+                    MessageDialog md = new MessageDialog(EditorAPI.getShell(),
+                        title, null, message, MessageDialog.QUESTION,
+                        dialogButtonLabels, 0);
+                    md.open();
+                    return md.getReturnCode() == 0;
+                }
+            });
+        } catch (Exception e) {
+            log.error("An internal error ocurred while trying"
+                + " to open the question dialog.");
+            return false;
+        }
+    }
+
+    /**
+     * Ask the User a given question. It pops up an {@link MessageDialog} with
+     * given title and message. It stores the decision in the
+     * {@link PreferenceStore} it the checkbox is selected.
+     * 
+     * @param saros
+     *            is needed to set the selection to preference store
+     * @param needsBasedSync
+     *            constant where to store in the preference store
+     * 
+     * @return boolean indicating whether the user said Yes or No
+     */
+    public static boolean popUpRememberDecisionDialog(final String title,
+        final String message, boolean failSilently, final Saros saros,
+        final String needsBasedSync) {
+        if (failSilently)
+            return false;
+
+        try {
+            return Utils.runSWTSync(new Callable<Boolean>() {
+                public Boolean call() {
+                    RememberDecisionMessageDialog dialog = new RememberDecisionMessageDialog(
+                        EditorAPI.getShell(), title, null, message,
+                        MessageDialog.QUESTION, new String[] {
+                            IDialogConstants.YES_LABEL,
+                            IDialogConstants.NO_LABEL }, 0);
+                    int result = dialog.open();
+                    if (dialog.isRememberDecision()) {
+                        saros.getPreferenceStore().setValue(needsBasedSync,
+                            Boolean.toString(result == 0));
+                    }
+
+                    return result == 0;
                 }
             });
         } catch (Exception e) {

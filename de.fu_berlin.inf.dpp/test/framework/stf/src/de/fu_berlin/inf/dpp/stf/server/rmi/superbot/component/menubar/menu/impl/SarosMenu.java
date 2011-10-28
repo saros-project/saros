@@ -53,6 +53,14 @@ public final class SarosMenu extends StfRemoteObject implements ISarosMenu {
         SuperBot.getInstance().confirmShellShareProjects(projectName, jids);
     }
 
+    public void shareProjectFiles(String project, String[] files, JID... jids)
+        throws RemoteException {
+        RemoteWorkbenchBot.getInstance().activateWorkbench();
+        menu.menu(SHARE_PROJECTS).click();
+        SuperBot.getInstance().confirmShellShareProjectFiles(project, files,
+            jids);
+    }
+
     public void shareProjects(String[] projectNames, JID... jids)
         throws RemoteException {
         RemoteWorkbenchBot.getInstance().activateWorkbench();

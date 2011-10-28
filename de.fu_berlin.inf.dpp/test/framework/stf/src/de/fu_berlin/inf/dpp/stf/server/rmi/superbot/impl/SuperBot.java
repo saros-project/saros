@@ -426,4 +426,61 @@ public final class SuperBot extends StfRemoteObject implements ISuperBot {
     public IInternal internal() throws RemoteException {
         return InternalImpl.getInstance();
     }
+
+    public void confirmShellShareProjectFiles(String project, String[] files,
+        JID[] jids) {
+        SWTBot bot = new SWTBot();
+        SWTBotShell shell = bot.shell(SHELL_SHARE_PROJECT);
+        shell.activate();
+
+        // wait for tree update
+        bot.sleep(500);
+
+        SWTBotTree tree = shell.bot().tree();
+
+        for (SWTBotTreeItem item : tree.getAllItems())
+            while (item.isChecked())
+                item.uncheck();
+        tree.getTreeItem(project).collapse();
+
+        for (String file : files)
+            tree.getTreeItem(project).getNode(file).check();
+
+        shell.bot().button(NEXT).click();
+
+        // wait for tree update
+        bot.sleep(500);
+
+        tree = shell.bot().tree();
+
+        for (SWTBotTreeItem item : tree.getAllItems())
+            while (item.isChecked())
+                item.uncheck();
+
+        for (JID jid : jids)
+            WidgetUtil.getTreeItemWithRegex(tree,
+                Pattern.quote(jid.getBase()) + ".*").check();
+
+        shell.bot().button(FINISH).click();
+        bot.waitUntil(Conditions.shellCloses(shell));
+    }
+
+    public void confirmShellNewSharedFile(String decision) {
+        SWTBot bot = new SWTBot();
+        SWTBotShell shell = bot.shell(SHELL_NEW_FILE_SHARED);
+        shell.activate();
+        shell.bot().button(decision).click();
+        bot.waitUntil(Conditions.shellCloses(shell));
+    }
+
+    public void confirmShellNeedBased(String decsision, boolean remember)
+        throws RemoteException {
+        SWTBot bot = new SWTBot();
+        SWTBotShell shell = bot.shell(SHELL_NEED_BASED_SYNC);
+        shell.activate();
+        if (remember)
+            shell.bot().checkBox("Remember my decision.").click();
+        shell.bot().button(decsision).click();
+        bot.waitUntil(Conditions.shellCloses(shell));
+    }
 }

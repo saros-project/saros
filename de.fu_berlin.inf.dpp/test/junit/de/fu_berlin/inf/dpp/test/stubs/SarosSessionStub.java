@@ -268,4 +268,14 @@ public class SarosSessionStub implements ISarosSession {
     public List<IResource> getSharedResources(IProject project) {
         throw new RuntimeException("Unexpected call to Stub");
     }
+
+    public void addSharedResources(IProject project, String projectID,
+        List<IResource> dependentResources, JID jid) {
+        throw new RuntimeException("Unexpected call to Stub");
+    }
+
+    public void addProjectOwnership(String projectID, IProject project,
+        JID ownerJID) {
+        throw new RuntimeException("Unexpected call to Stub");
+    }
 }
