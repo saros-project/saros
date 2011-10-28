@@ -156,8 +156,12 @@ public class ChildRecordChangeCache {
 			log.warn("Tried to notify listeners of uncommitted records!");
 			return;
 		}
-		for (ChildRecordChangeListener l : listeners)
+		log.trace("Notify Listener: " + record + " \nAttributes: " + attrs
+				+ " \nElements: " + elements);
+		for (ChildRecordChangeListener l : listeners) {
 			l.attributeRecordChanged(attrs);
+		}
+
 		for (ChildRecordChangeListener l : listeners)
 			l.childElementRecordChanged(elements);
 		for (ChildRecordChangeListener l : listeners)

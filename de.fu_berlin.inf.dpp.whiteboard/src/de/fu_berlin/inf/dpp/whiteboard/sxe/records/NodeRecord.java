@@ -91,12 +91,22 @@ public abstract class NodeRecord extends AbstractRecord implements
 	 */
 	protected NodeRecord(DocumentRecord documentRecord, NodeType nodeType,
 			int version) {
-		this.rid = String.valueOf(RANDOM.nextLong());
+		this.rid = getNextRandomUniqueID();
 		this.nodeType = nodeType;
 		this.documentRecord = documentRecord;
 		this.version = version;
 		initialSet = new SetRecord(this, version);
 		initialSet.setSetVisibilityTo(true);
+	}
+
+	/**
+	 * Generate a random Identifier that is most likely unique
+	 * 
+	 * @return a numerical String representing a random id
+	 */
+	public String getNextRandomUniqueID() {
+		// if needed, increase the random number.
+		return (System.currentTimeMillis()) + "" + RANDOM.nextInt(100 * 1000);
 	}
 
 	public DocumentRecord getDocumentRecord() {

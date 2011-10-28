@@ -77,4 +77,20 @@ public class SXEMessage {
 		this.records = records;
 	}
 
+	@Override
+	public String toString() {
+		String out = "";
+		out += "from: " + from;
+		out += ", to: " + to;
+		out += ", msgId: " + msgId;
+		out += "messageTyp: " + messageType;
+		out += "message: [";
+		for (RecordDataObject rec : records) {
+			out += rec + ", ";
+		}
+		out += "]";
+
+		return super.toString() + ": " + out;
+	}
+
 }

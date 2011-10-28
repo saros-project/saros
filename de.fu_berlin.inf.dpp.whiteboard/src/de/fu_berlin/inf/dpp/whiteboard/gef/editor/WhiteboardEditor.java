@@ -6,6 +6,7 @@ import org.apache.batik.util.SVGConstants;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.gef.ContextMenuProvider;
 import org.eclipse.gef.DefaultEditDomain;
+import org.eclipse.gef.EditPolicy;
 import org.eclipse.gef.GraphicalViewer;
 import org.eclipse.gef.KeyHandler;
 import org.eclipse.gef.KeyStroke;
@@ -25,6 +26,7 @@ import org.eclipse.gef.palette.PaletteRoot;
 import org.eclipse.gef.palette.PaletteSeparator;
 import org.eclipse.gef.palette.PanningSelectionToolEntry;
 import org.eclipse.gef.palette.ToolEntry;
+import org.eclipse.gef.requests.CreateRequest;
 import org.eclipse.gef.tools.AbstractTool;
 import org.eclipse.gef.ui.actions.ActionRegistry;
 import org.eclipse.gef.ui.actions.GEFActionConstants;
@@ -37,6 +39,7 @@ import org.eclipse.gef.ui.actions.ZoomInAction;
 import org.eclipse.gef.ui.actions.ZoomOutAction;
 import org.eclipse.gef.ui.parts.ScrollingGraphicalViewer;
 import org.eclipse.jface.action.IAction;
+import org.eclipse.jface.dialogs.InputDialog;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.dnd.DND;
@@ -44,13 +47,21 @@ import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.actions.ActionFactory;
 
+import de.fu_berlin.inf.dpp.whiteboard.gef.actions.ChangeBackgroundColorAction;
+import de.fu_berlin.inf.dpp.whiteboard.gef.actions.ChangeForegroundColorAction;
 import de.fu_berlin.inf.dpp.whiteboard.gef.actions.CopyRecordAction;
 import de.fu_berlin.inf.dpp.whiteboard.gef.actions.PasteRecordAction;
 import de.fu_berlin.inf.dpp.whiteboard.gef.actions.SXEDeleteAction;
+import de.fu_berlin.inf.dpp.whiteboard.gef.commands.ElementRecordCreateCommand;
+import de.fu_berlin.inf.dpp.whiteboard.gef.editpolicy.ElementModelLayoutEditPolicy;
 import de.fu_berlin.inf.dpp.whiteboard.gef.part.RecordPartFactory;
+import de.fu_berlin.inf.dpp.whiteboard.gef.request.CreateTextBoxRequest;
+import de.fu_berlin.inf.dpp.whiteboard.gef.tools.ArrowCreationTool;
 import de.fu_berlin.inf.dpp.whiteboard.gef.tools.CreationToolWithoutSelection;
+import de.fu_berlin.inf.dpp.whiteboard.gef.tools.LineCreationTool;
 import de.fu_berlin.inf.dpp.whiteboard.gef.tools.PanningTool.PanningToolEntry;
 import de.fu_berlin.inf.dpp.whiteboard.gef.tools.PointlistCreationTool;
+import de.fu_berlin.inf.dpp.whiteboard.gef.tools.TextboxCreationTool;
 import de.fu_berlin.inf.dpp.whiteboard.gef.util.IconUtils;
 import de.fu_berlin.inf.dpp.whiteboard.net.WhiteboardManager;
 import de.fu_berlin.inf.dpp.whiteboard.standalone.WhiteboardContextMenuProvider;
@@ -136,6 +147,42 @@ public class WhiteboardEditor extends SarosPermissionsGraphicalEditor {
 
 				if (getTargetEditPart() != null) {
 					Command command = getCommand();
+
+					// [FIXME] find a better solution to enable a proper
+					// creation of text-based elements via drag & drop
+					if (command instanceof ElementRecordCreateCommand) {
+						String cName = ((ElementRecordCreateCommand) command)
+								.getChildName();
+						if (cName.equals(SVGConstants.SVG_TEXT_VALUE)
+								|| cName.equals(SVGConstants.SVG_ANNOTATION_TAG)) {
+
+							// Open dialog to enter the text
+							InputDialog d = new InputDialog(null, "Enter Text",
+									"Enter the text", "text", null);
+							String val = "";
+							if (d != null) {
+								d.open();
+
+								val = d.getValue();
+								if (val == null || val.isEmpty())
+									val = "";
+							}
+
+							CreateRequest oldReq = ((CreateRequest) getTargetRequest());
+							CreateTextBoxRequest r = new CreateTextBoxRequest();
+							r.setSize(oldReq.getSize());
+							r.setLocation(oldReq.getLocation());
+							r.setFactory(new CombinedTargetRecordCreationFactory(
+									cName));
+							r.setText(val);
+
+							ElementModelLayoutEditPolicy p = ((ElementModelLayoutEditPolicy) (getTargetEditPart()
+									.getEditPolicy(EditPolicy.LAYOUT_ROLE)));
+							command = p.getCommand(r);
+
+						}
+					}
+
 					if (command != null && command.canExecute())
 						getViewer().getEditDomain().getCommandStack()
 								.execute(command);
@@ -320,6 +367,14 @@ public class WhiteboardEditor extends SarosPermissionsGraphicalEditor {
 		registry.registerAction(action);
 		getStackActions().add(action.getId());
 
+		action = new ChangeBackgroundColorAction();
+		registry.registerAction(action);
+		getSelectionActions().add(action.getId());
+
+		action = new ChangeForegroundColorAction();
+		registry.registerAction(action);
+		getSelectionActions().add(action.getId());
+
 		action = new SelectAllAction(this) {
 			{
 				/*
@@ -380,14 +435,56 @@ public class WhiteboardEditor extends SarosPermissionsGraphicalEditor {
 
 		PaletteGroup instGroup = new PaletteGroup("Create elements");
 		root.add(instGroup);
-
 		instGroup.add(createPolylineToolEntry());
 		instGroup.add(createRectangleToolEntry());
 		instGroup.add(createEllipseToolEntry());
+		instGroup.add(createTextToolEntry());
+		instGroup.add(createLineToolEntry());
+		instGroup.add(createArrowToolEntry());
+		instGroup.add(createAnnotationToolEntry());
+
+		PaletteSeparator sep3 = new PaletteSeparator();
+		root.add(sep3);
+
+		PaletteGroup colourGroup = new PaletteGroup("Choose colour");
+		root.add(colourGroup);
 
 		root.setDefaultEntry(selectionToolEntry);
 
 		return root;
+	}
+
+	protected static ToolEntry createTextToolEntry() {
+
+		// Note: same template for Drag and Drop as well as click and drag
+		CombinedTargetRecordCreationFactory template = new CombinedTargetRecordCreationFactory(
+				SVGConstants.SVG_TEXT_TAG);
+
+		CreationToolEntry entry = new CombinedTemplateCreationEntry("TextBox",
+				"Creation of a textbox", template, template,
+				ImageDescriptor.createFromImage(IconUtils.getTextBoxImage()),
+				ImageDescriptor.createFromImage(IconUtils.getTextBoxImage()));
+		entry.setToolProperty(AbstractTool.PROPERTY_UNLOAD_WHEN_FINISHED, false);
+		entry.setToolClass(TextboxCreationTool.class);
+		return entry;
+	}
+
+	protected static ToolEntry createAnnotationToolEntry() {
+
+		// Note: same template for Drag and Drop as well as click and drag
+		CombinedTargetRecordCreationFactory template = new CombinedTargetRecordCreationFactory(
+				SVGConstants.SVG_ANNOTATION_TAG);
+
+		CreationToolEntry entry = new CombinedTemplateCreationEntry(
+				"Annotation",
+				"Creation of an annotation",
+				template,
+				template,
+				ImageDescriptor.createFromImage(IconUtils.getAnnotationImage()),
+				ImageDescriptor.createFromImage(IconUtils.getAnnotationImage()));
+		entry.setToolProperty(AbstractTool.PROPERTY_UNLOAD_WHEN_FINISHED, false);
+		entry.setToolClass(TextboxCreationTool.class);
+		return entry;
 	}
 
 	protected static ToolEntry createEllipseToolEntry() {
@@ -408,7 +505,6 @@ public class WhiteboardEditor extends SarosPermissionsGraphicalEditor {
 		// Note: same template for Drag and Drop as well as click and drag
 		CombinedTargetRecordCreationFactory template = new CombinedTargetRecordCreationFactory(
 				SVGConstants.SVG_RECT_TAG);
-
 		CreationToolEntry entry = new CombinedTemplateCreationEntry(
 				"Rectangle", "Creation of a rectangle", template, template,
 				ImageDescriptor.createFromImage(IconUtils.getRectImage()),
@@ -429,6 +525,34 @@ public class WhiteboardEditor extends SarosPermissionsGraphicalEditor {
 				ImageDescriptor.createFromImage(IconUtils.getPencilImage()));
 		entry.setToolProperty(AbstractTool.PROPERTY_UNLOAD_WHEN_FINISHED, false);
 		entry.setToolClass(PointlistCreationTool.class);
+		return entry;
+	}
+
+	protected static ToolEntry createLineToolEntry() {
+		// Note: A normal Line is a Polyline with just 2 Points
+		CombinedTargetRecordCreationFactory template = new CombinedTargetRecordCreationFactory(
+				SVGConstants.SVG_POLYLINE_TAG);
+
+		CreationToolEntry entry = new CombinedTemplateCreationEntry("Line",
+				"Drawing a line", template, template,
+				ImageDescriptor.createFromImage(IconUtils.getLineImage()),
+				ImageDescriptor.createFromImage(IconUtils.getLineImage()));
+		entry.setToolProperty(AbstractTool.PROPERTY_UNLOAD_WHEN_FINISHED, false);
+		entry.setToolClass(LineCreationTool.class);
+		return entry;
+	}
+
+	protected static ToolEntry createArrowToolEntry() {
+		// Note: A normal Line is a Polyline with just 2 Points
+		CombinedTargetRecordCreationFactory template = new CombinedTargetRecordCreationFactory(
+				SVGConstants.SVG_POLYLINE_TAG);
+
+		CreationToolEntry entry = new CombinedTemplateCreationEntry(
+				"ArrowLine", "Drawing a line", template, template,
+				ImageDescriptor.createFromImage(IconUtils.getArrowImage()),
+				ImageDescriptor.createFromImage(IconUtils.getArrowImage()));
+		entry.setToolProperty(AbstractTool.PROPERTY_UNLOAD_WHEN_FINISHED, false);
+		entry.setToolClass(ArrowCreationTool.class);
 		return entry;
 	}
 

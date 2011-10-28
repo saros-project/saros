@@ -445,6 +445,7 @@ public class SXEController extends AbstractSXEMessageHandler {
 					 * 
 					 * Or if a record is trivial - does not change anything.
 					 */
+
 					if (!applied)
 						log.trace("Did not apply local record: " + current);
 				} catch (XMLNotWellFormedException e) {

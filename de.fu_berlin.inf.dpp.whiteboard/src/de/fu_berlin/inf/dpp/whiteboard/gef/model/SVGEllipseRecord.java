@@ -8,6 +8,7 @@ import org.eclipse.draw2d.geometry.Dimension;
 import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.draw2d.geometry.Rectangle;
 
+import de.fu_berlin.inf.dpp.whiteboard.gef.util.ColorUtils;
 import de.fu_berlin.inf.dpp.whiteboard.sxe.records.DocumentRecord;
 import de.fu_berlin.inf.dpp.whiteboard.sxe.records.IRecord;
 
@@ -38,6 +39,7 @@ public class SVGEllipseRecord extends LayoutElementRecord {
 	public List<IRecord> createLayoutRecords(Rectangle layout,
 			boolean withoutSetRecords) {
 		List<IRecord> records = new ArrayList<IRecord>(4);
+
 		records.add(createNewOrSetAttributeRecord(null,
 				SVGConstants.SVG_CX_ATTRIBUTE,
 				String.valueOf(layout.x + layout.width / 2), withoutSetRecords));
@@ -50,9 +52,18 @@ public class SVGEllipseRecord extends LayoutElementRecord {
 		records.add(createNewOrSetAttributeRecord(null,
 				SVGConstants.SVG_RY_ATTRIBUTE,
 				String.valueOf(layout.height / 2), withoutSetRecords));
+		records.add(createNewOrSetAttributeRecord(null,
+				SVGConstants.SVG_FILL_ATTRIBUTE,
+				String.valueOf(ColorUtils.getBackgroundColor()),
+				withoutSetRecords));
+		records.add(createNewOrSetAttributeRecord(null,
+				SVGConstants.SVG_COLOR_ATTRIBUTE,
+				String.valueOf(ColorUtils.getForegroundColor()),
+				withoutSetRecords));
 		return records;
 	}
 
+	@Override
 	public boolean isComposite() {
 		return true;
 	}

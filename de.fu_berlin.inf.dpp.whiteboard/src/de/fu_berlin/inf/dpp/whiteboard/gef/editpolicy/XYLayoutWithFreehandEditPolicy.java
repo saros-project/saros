@@ -1,17 +1,24 @@
 package de.fu_berlin.inf.dpp.whiteboard.gef.editpolicy;
 
+import org.apache.log4j.Logger;
 import org.eclipse.draw2d.AbstractPointListShape;
-import org.eclipse.draw2d.ColorConstants;
 import org.eclipse.draw2d.IFigure;
 import org.eclipse.draw2d.Polyline;
+import org.eclipse.draw2d.geometry.Dimension;
 import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.draw2d.geometry.PointList;
+import org.eclipse.draw2d.geometry.Rectangle;
 import org.eclipse.gef.EditPart;
 import org.eclipse.gef.Request;
 import org.eclipse.gef.commands.Command;
 import org.eclipse.gef.editpolicies.XYLayoutEditPolicy;
+import org.eclipse.gef.requests.CreateRequest;
+import org.eclipse.swt.graphics.Color;
 
+import de.fu_berlin.inf.dpp.whiteboard.gef.request.CreateLineRequest;
 import de.fu_berlin.inf.dpp.whiteboard.gef.request.CreatePointlistRequest;
+import de.fu_berlin.inf.dpp.whiteboard.gef.request.CreateTextBoxRequest;
+import de.fu_berlin.inf.dpp.whiteboard.gef.util.ColorUtils;
 
 /**
  * This edit policy extends the XYLayout by the freehand drawing feature
@@ -20,8 +27,13 @@ import de.fu_berlin.inf.dpp.whiteboard.gef.request.CreatePointlistRequest;
  * 
  */
 public abstract class XYLayoutWithFreehandEditPolicy extends XYLayoutEditPolicy {
+	private static final Logger log = Logger
+			.getLogger(XYLayoutWithFreehandEditPolicy.class);
 
 	public static final String REQ_CREATE_POINTLIST = "create pointlist";
+	public static final String REQ_CREATE_LINE = "create line";
+	public static final String REQ_CREATE_ARROW = "create arrow";
+	public static final String REQ_CREATE_TEXTBOX = "create textbox";
 	/**  */
 	private static final int PIXEL_TOLERANCE = 3;
 
@@ -34,11 +46,17 @@ public abstract class XYLayoutWithFreehandEditPolicy extends XYLayoutEditPolicy 
 	 */
 	@Override
 	public Command getCommand(Request request) {
-		if (REQ_CREATE_POINTLIST.equals(request.getType())) {
+		if (REQ_CREATE_POINTLIST.equals(request.getType())
+				|| REQ_CREATE_LINE.equals(request.getType())) {
 			return getCreatePointListCommand((CreatePointlistRequest) request);
 		}
+		if (REQ_CREATE_TEXTBOX.equals(request.getType()))
+			return getCreateTextboxCommand((CreateTextBoxRequest) request);
 		return super.getCommand(request);
 	}
+
+	protected abstract Command getCreateTextboxCommand(
+			CreateTextBoxRequest request);
 
 	/**
 	 * 
@@ -48,11 +66,35 @@ public abstract class XYLayoutWithFreehandEditPolicy extends XYLayoutEditPolicy 
 	protected abstract Command getCreatePointListCommand(
 			CreatePointlistRequest request);
 
+	/**
+	 * Shows the feedback while creating a figure
+	 */
 	@Override
 	public void showTargetFeedback(Request request) {
 		if (REQ_CREATE_POINTLIST.equals(request.getType()))
 			showPointlistCreationFeedback((CreatePointlistRequest) request);
+		else if (REQ_CREATE_LINE.equals(request.getType()))
+			showLineCreationFeedback((CreateLineRequest) request);
+		if (REQ_CREATE_TEXTBOX.equals(request.getType())) {
+			showLayoutTargetFeedback(request);
+			CreateRequest createReq = (CreateRequest) request;
+			if (createReq.getSize() != null) {
+				test(createReq);
+			}
+			// [FIXME] for annotation request implement a resize of the image
+			// that fits to the bounds of the feedback layout
+		}
 		super.showTargetFeedback(request);
+	}
+
+	void test(CreateRequest r) {
+		Point p = new Point(r.getLocation().getCopy());
+		Dimension size = r.getSize().getCopy();
+		Rectangle feedbackBounds = new Rectangle(p, size);
+		IFigure feedback = getSizeOnDropFeedback(r);
+		feedback.setSize(50, 50);
+		feedback.setLocation(p);
+		feedback.setBounds(feedbackBounds.expand(getCreationFeedbackOffset(r)));
 	}
 
 	/**
@@ -63,7 +105,10 @@ public abstract class XYLayoutWithFreehandEditPolicy extends XYLayoutEditPolicy 
 	protected AbstractPointListShape getPolylineFeedback() {
 		if (shape == null) {
 			shape = new Polyline();
-			shape.setForegroundColor(ColorConstants.black);
+			shape.setForegroundColor(new Color(null, ColorUtils
+					.getRGBForegroundColor()));
+			shape.setBackgroundColor(new Color(null, ColorUtils
+					.getRGBBackgroundColor()));
 			addFeedback(shape);
 		}
 		return shape;
@@ -98,6 +143,7 @@ public abstract class XYLayoutWithFreehandEditPolicy extends XYLayoutEditPolicy 
 	protected void showPointlistCreationFeedback(CreatePointlistRequest request) {
 		Point p = new Point(request.getPoints().getLastPoint().getCopy());
 		AbstractPointListShape feedback = getPolylineFeedback(request);
+
 		/*
 		 * For efficiency reasons we don't use getPointListFor() and don't
 		 * normalize the feedback
@@ -111,17 +157,34 @@ public abstract class XYLayoutWithFreehandEditPolicy extends XYLayoutEditPolicy 
 		feedback.addPoint(p);
 	}
 
+	/**
+	 * Extends (or creates if applicable) the feedback and adds the last point.
+	 * 
+	 * @param request
+	 */
+	protected void showLineCreationFeedback(CreatePointlistRequest request) {
+		getPolylineFeedback(request).setPoints(request.getPoints());
+	}
+
 	@Override
 	public EditPart getTargetEditPart(Request request) {
-		if (REQ_CREATE_POINTLIST.equals(request.getType()))
+		if (REQ_CREATE_POINTLIST.equals(request.getType())
+				|| REQ_CREATE_LINE.equals(request.getType()))
+			return getHost();
+		if (REQ_CREATE_TEXTBOX.equals(request.getType()))
 			return getHost();
 		return super.getTargetEditPart(request);
 	}
 
 	@Override
 	public void eraseTargetFeedback(Request request) {
-		if (REQ_CREATE_POINTLIST.equals(request.getType()))
+		if (REQ_CREATE_POINTLIST.equals(request.getType())
+				|| REQ_CREATE_LINE.equals(request.getType()))
 			erasePointlistCreationFeedback(request);
+		if (REQ_CREATE_TEXTBOX.equals(request.getType())) {
+			eraseLayoutTargetFeedback(request);
+			eraseSizeOnDropFeedback(request);
+		}
 		super.eraseTargetFeedback(request);
 	}
 
@@ -134,7 +197,7 @@ public abstract class XYLayoutWithFreehandEditPolicy extends XYLayoutEditPolicy 
 	 * A simple mechanism to reduce the amount of points at expense of
 	 * similarity between drawn and resulting point list
 	 */
-	protected int getPixelTolerance() {
+	protected static int getPixelTolerance() {
 		return PIXEL_TOLERANCE;
 	}
 
@@ -183,9 +246,15 @@ public abstract class XYLayoutWithFreehandEditPolicy extends XYLayoutEditPolicy 
 	 * @param points
 	 * @return normalized point list
 	 */
-	protected PointList getNormalizedPointList(PointList points) {
+	protected static PointList getNormalizedPointList(PointList points) {
 		PointList ps = new PointList(points.size());
 		int[] rawPoints = points.toIntArray();
+		// dont do overhead for a small list of points
+		if (points.size() < 20) {
+			for (int i = 0; i < rawPoints.length; i += 2)
+				ps.addPoint(rawPoints[i], rawPoints[i + 1]);
+			return ps;
+		}
 		if (rawPoints.length == 0)
 			return ps;
 		ps.addPoint(rawPoints[0], rawPoints[1]);
@@ -248,7 +317,7 @@ public abstract class XYLayoutWithFreehandEditPolicy extends XYLayoutEditPolicy 
 		IFigure figure = getLayoutContainer();
 
 		PointList points = getNormalizedPointList(request.getPoints());
-
+		// PointList points = request.getPoints();
 		figure.translateToRelative(points);
 		figure.translateFromParent(points);
 		points.translate(getLayoutOrigin().getNegated());

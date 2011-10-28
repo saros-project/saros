@@ -6,11 +6,13 @@ import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.User;
+import de.fu_berlin.inf.dpp.editor.annotations.SarosAnnotation;
 import de.fu_berlin.inf.dpp.project.AbstractSarosSessionListener;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ISarosSessionListener;
 import de.fu_berlin.inf.dpp.project.SarosSessionManager;
 import de.fu_berlin.inf.dpp.whiteboard.gef.model.GEFRecordFactory;
+import de.fu_berlin.inf.dpp.whiteboard.gef.util.ColorUtils;
 import de.fu_berlin.inf.dpp.whiteboard.sxe.ISXEMessageHandler;
 import de.fu_berlin.inf.dpp.whiteboard.sxe.SXEController;
 import de.fu_berlin.inf.dpp.whiteboard.sxe.net.SXEOutgoingSynchronizationProcess;
@@ -50,7 +52,12 @@ public class WhiteboardManager {
 
 		@Override
 		public void sessionStarting(ISarosSession session) {
+			log.debug("Session Started, set Color: "
+					+ SarosAnnotation.getUserColor(session.getLocalUser())
+							.getRGB());
 			sarosSession = session;
+			ColorUtils.setForegroundColor(SarosAnnotation.getUserColor(
+					session.getLocalUser()).getRGB());
 			sxeTransmitter = new SarosSXETransmitter(sarosSession);
 			controller.initNetwork(sxeTransmitter);
 		}
@@ -101,6 +108,10 @@ public class WhiteboardManager {
 		log.debug("WhiteboardManager instantiated");
 
 		controller = new SXEController(new GEFRecordFactory());
+	}
+
+	public ISarosSession getSarosSession() {
+		return sarosSession;
 	}
 
 	public ISXEMessageHandler getSXEMessageHandler() {

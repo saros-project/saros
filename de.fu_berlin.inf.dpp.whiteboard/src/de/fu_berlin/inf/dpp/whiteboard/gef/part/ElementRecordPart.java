@@ -8,6 +8,8 @@ import org.eclipse.draw2d.geometry.Rectangle;
 import org.eclipse.gef.EditPolicy;
 import org.eclipse.gef.GraphicalEditPart;
 import org.eclipse.gef.editparts.AbstractGraphicalEditPart;
+import org.eclipse.gef.editparts.ScalableFreeformRootEditPart;
+import org.eclipse.gef.editparts.ZoomManager;
 
 import de.fu_berlin.inf.dpp.whiteboard.gef.editpolicy.ElementModelDeletePolicy;
 import de.fu_berlin.inf.dpp.whiteboard.gef.editpolicy.ElementModelLayoutEditPolicy;
@@ -78,5 +80,16 @@ public abstract class ElementRecordPart extends AbstractGraphicalEditPart
 	@Override
 	public void childRecordConflict(Map<NodeRecord, Set<SetRecord>> conflicts) {
 		// TODO inform user
+	}
+
+	/**
+	 * Returns the current zoom Level. 1 for 100%
+	 * 
+	 * @return
+	 */
+	protected double getCurrentZoom() {
+		ZoomManager z = ((ScalableFreeformRootEditPart) getViewer()
+				.getRootEditPart()).getZoomManager();
+		return z.getZoom() * z.getUIMultiplier();
 	}
 }

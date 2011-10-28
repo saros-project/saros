@@ -90,6 +90,7 @@ public class DocumentRecord {
 		if (record.getDocumentRecord() != this) {
 			log.warn("Added record from other docuemnt");
 		}
+		log.debug("Added Node: " + record);
 		record.setDocumentRecord(this);
 		newRecords.put(record.getRid(), record);
 	}
@@ -172,6 +173,7 @@ public class DocumentRecord {
 	 * @return the document root ElementRecord
 	 */
 	public ElementRecord getRoot() {
+		// TODO loop with return?
 		for (NodeRecord r : newRecords.values())
 			return (ElementRecord) r;
 		return null;

@@ -1,5 +1,6 @@
 package de.fu_berlin.inf.dpp.whiteboard.standalone;
 
+import org.apache.log4j.Logger;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IPersistableElement;
@@ -13,6 +14,8 @@ import de.fu_berlin.inf.dpp.whiteboard.gef.editor.WhiteboardEditor;
 
 public class ApplicationWorkbenchAdvisor extends WorkbenchAdvisor {
 
+	protected static Logger log = Logger
+			.getLogger(ApplicationWorkbenchAdvisor.class);
 	private static final String PERSPECTIVE_ID = "de.fu_berlin.inf.dpp.whiteboard.standalone.perspective";
 
 	@Override
@@ -28,14 +31,13 @@ public class ApplicationWorkbenchAdvisor extends WorkbenchAdvisor {
 
 	@Override
 	public void postStartup() {
-
 		try {
 			IWorkbenchPage page = PlatformUI.getWorkbench()
 					.getActiveWorkbenchWindow().getActivePage();
 			page.openEditor(new DummyEditorInput("empty"), WhiteboardEditor.ID,
 					false);
 		} catch (Exception e) {
-			e.printStackTrace();
+			log.debug("tried to open DummyEditor", e);
 		}
 	}
 

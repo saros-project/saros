@@ -1,11 +1,13 @@
 package de.fu_berlin.inf.dpp.whiteboard.gef.part;
 
+import org.apache.batik.util.SVGConstants;
 import org.eclipse.draw2d.IFigure;
 import org.eclipse.draw2d.Polyline;
 import org.eclipse.draw2d.XYLayout;
 import org.eclipse.swt.graphics.Color;
 
 import de.fu_berlin.inf.dpp.whiteboard.gef.model.SVGPolylineRecord;
+import de.fu_berlin.inf.dpp.whiteboard.gef.util.ColorUtils;
 
 public class SVGPolylinePart extends ElementRecordPart {
 
@@ -18,7 +20,22 @@ public class SVGPolylinePart extends ElementRecordPart {
 
 		XYLayout layout = new XYLayout();
 		figure.setLayoutManager(layout);
-		figure.setForegroundColor(new Color(null, 0, 0, 0));
+		figure.setForegroundColor(new Color(null, ColorUtils
+				.getRGBForegroundColor()));
+		// figure.setForegroundColor(new Color(null, 0, 0, 0));
+
+		try {
+			SVGPolylineRecord r = (SVGPolylineRecord) getElementRecord();
+			String s = r.getAttributeValue(SVGConstants.SVG_COLOR_ATTRIBUTE);
+			if (s != null) {
+				String rbg[] = s.split(",");
+				figure.setForegroundColor(new Color(null, Integer
+						.parseInt(rbg[0]), Integer.parseInt(rbg[1]), Integer
+						.parseInt(rbg[2])));
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 
 		return figure;
 	}

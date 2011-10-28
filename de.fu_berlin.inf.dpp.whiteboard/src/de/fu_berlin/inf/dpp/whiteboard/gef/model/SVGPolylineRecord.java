@@ -10,6 +10,7 @@ import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.draw2d.geometry.PointList;
 import org.eclipse.draw2d.geometry.Rectangle;
 
+import de.fu_berlin.inf.dpp.whiteboard.gef.util.ColorUtils;
 import de.fu_berlin.inf.dpp.whiteboard.sxe.records.DocumentRecord;
 import de.fu_berlin.inf.dpp.whiteboard.sxe.records.IRecord;
 
@@ -49,6 +50,10 @@ public class SVGPolylineRecord extends LayoutElementRecord {
 		String newPoints = generatePointsAttribute(points);
 		l.add(createNewOrSetAttributeRecord(null,
 				SVGConstants.SVG_POINTS_ATTRIBUTE, newPoints, false));
+
+		l.add(createNewOrSetAttributeRecord(null,
+				SVGConstants.SVG_COLOR_ATTRIBUTE,
+				String.valueOf(ColorUtils.getForegroundColor()), false));
 		return l;
 	}
 
@@ -82,6 +87,7 @@ public class SVGPolylineRecord extends LayoutElementRecord {
 				points.addPoint(Integer.parseInt(tmpPoint[0]),
 						Integer.parseInt(tmpPoint[1]));
 		}
+
 	}
 
 	protected static int scaleMaintainPosition(int anchor, int x, double scale) {
@@ -172,6 +178,10 @@ public class SVGPolylineRecord extends LayoutElementRecord {
 		List<IRecord> records = new ArrayList<IRecord>(1);
 		records.add(createNewOrSetAttributeRecord(null,
 				SVGConstants.SVG_POINTS_ATTRIBUTE, newPoints,
+				onlyCreateNewRecords));
+		records.add(createNewOrSetAttributeRecord(null,
+				SVGConstants.SVG_COLOR_ATTRIBUTE,
+				String.valueOf(ColorUtils.getForegroundColor()),
 				onlyCreateNewRecords));
 		return records;
 	}

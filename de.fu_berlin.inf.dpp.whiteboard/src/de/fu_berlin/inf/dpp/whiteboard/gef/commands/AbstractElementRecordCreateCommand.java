@@ -25,7 +25,7 @@ import de.fu_berlin.inf.dpp.whiteboard.sxe.records.IRecord;
  */
 public abstract class AbstractElementRecordCreateCommand extends SXECommand {
 	private LayoutElementRecord parent;
-	private String newChildName;
+	protected String newChildName;
 	private LayoutElementRecord child;
 
 	/**

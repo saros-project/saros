@@ -4,9 +4,6 @@ import java.util.Arrays;
 
 import org.apache.batik.util.SVGConstants;
 import org.apache.log4j.Logger;
-import org.eclipse.draw2d.ColorConstants;
-import org.eclipse.draw2d.FigureUtilities;
-import org.eclipse.draw2d.Graphics;
 import org.eclipse.draw2d.IFigure;
 import org.eclipse.draw2d.PositionConstants;
 import org.eclipse.draw2d.Shape;
@@ -26,15 +23,20 @@ import org.eclipse.gef.editpolicies.ResizableEditPolicy;
 import org.eclipse.gef.requests.ChangeBoundsRequest;
 import org.eclipse.gef.requests.CreateRequest;
 import org.eclipse.gef.tools.ResizeTracker;
+import org.eclipse.swt.graphics.Color;
 
 import de.fu_berlin.inf.dpp.whiteboard.gef.commands.ElementRecordAddCommand;
 import de.fu_berlin.inf.dpp.whiteboard.gef.commands.ElementRecordChangeLayoutCommand;
 import de.fu_berlin.inf.dpp.whiteboard.gef.commands.ElementRecordCreateCommand;
 import de.fu_berlin.inf.dpp.whiteboard.gef.commands.PolylineRecordCreateCommand;
+import de.fu_berlin.inf.dpp.whiteboard.gef.commands.TextboxCreateCommand;
 import de.fu_berlin.inf.dpp.whiteboard.gef.model.LayoutElementRecord;
 import de.fu_berlin.inf.dpp.whiteboard.gef.model.SVGPolylineRecord;
 import de.fu_berlin.inf.dpp.whiteboard.gef.part.ElementRecordPart;
+import de.fu_berlin.inf.dpp.whiteboard.gef.part.SVGAnnotationPart;
 import de.fu_berlin.inf.dpp.whiteboard.gef.request.CreatePointlistRequest;
+import de.fu_berlin.inf.dpp.whiteboard.gef.request.CreateTextBoxRequest;
+import de.fu_berlin.inf.dpp.whiteboard.gef.util.ColorUtils;
 import de.fu_berlin.inf.dpp.whiteboard.gef.util.LayoutUtils;
 
 /**
@@ -62,7 +64,6 @@ public class ElementModelLayoutEditPolicy extends
 	@Override
 	protected Command createAddCommand(EditPart child, Object constraint) {
 		ElementRecordAddCommand command = null;
-
 		log.trace("Create Add Command " + child);
 
 		if (child instanceof ElementRecordPart) {
@@ -113,6 +114,9 @@ public class ElementModelLayoutEditPolicy extends
 		return command;
 	}
 
+	/**
+	 * is called every time the mouse moves in the editor
+	 */
 	@Override
 	protected Command getCreateCommand(CreateRequest request) {
 
@@ -167,16 +171,68 @@ public class ElementModelLayoutEditPolicy extends
 		return null;
 	}
 
+	@Override
+	protected Command getCreateTextboxCommand(CreateTextBoxRequest request) {
+		log.trace("Create Textbox Command " + request.getLocation() + " "
+				+ request.getSize());
+
+		if (request.getType() == REQ_CREATE_TEXTBOX
+				&& getHost() instanceof ElementRecordPart) {
+
+			LayoutElementRecord parent = (LayoutElementRecord) getHost()
+					.getModel();
+			Rectangle constraint = (Rectangle) getConstraintFor(request);
+
+			// Take the next parent that is a composite
+			parent = LayoutUtils.translateAndGetParent(constraint, parent);
+
+			/* adjust the default size to the zoom */
+			double zoom = 1d;
+			ZoomManager zoomManager = ((ScalableFreeformRootEditPart) getTargetEditPart(
+					request).getViewer().getRootEditPart()).getZoomManager();
+			if (zoomManager != null)
+				zoom = zoomManager.getZoom() * zoomManager.getUIMultiplier();
+
+			// created by Drag and Drop or click
+			if (request.getNewObjectType().equals(
+					SVGConstants.SVG_ANNOTATION_TAG)) {
+				constraint.width = (int) (SVGAnnotationPart.IMAGE_WIDTH / zoom);
+				constraint.height = (int) (SVGAnnotationPart.IMAGE_HEIGHT / zoom);
+
+			} else {
+				if (constraint.width == -1 && constraint.height == -1) {
+					normalizeConstraint(constraint,
+							(int) (DEFAULT_WIDTH / zoom),
+							(int) (DEFAULT_HEIGHT / zoom));
+				}
+				// else if(request.getNewObject() instanceof SVGAnnotationPart)
+				// created by selection rectangle
+				else {
+					normalizeConstraint(constraint, MIN_WIDTH, MIN_HEIGHT);
+				}
+			}
+			TextboxCreateCommand cmd = new TextboxCreateCommand();
+
+			cmd.setParent(parent);
+			cmd.setChildName((String) request.getNewObjectType());
+			cmd.setLayout(constraint);
+			cmd.setText(request.getText());
+
+			return cmd;
+		}
+		return null;
+	}
+
 	/**
 	 * Returns a polyline create command that appends a polyline to the root
 	 */
 	@Override
 	protected Command getCreatePointListCommand(CreatePointlistRequest request) {
 
-		log.trace("Create PointList Command "
+		log.trace(request.getType() + " Create PointList Command "
 				+ Arrays.toString(request.getPoints().toIntArray()));
 
-		if (request.getType() == REQ_CREATE_POINTLIST
+		if ((request.getType() == REQ_CREATE_POINTLIST || request.getType() == REQ_CREATE_LINE)
 				&& getHost() instanceof ElementRecordPart) {
 			try {
 
@@ -209,16 +265,26 @@ public class ElementModelLayoutEditPolicy extends
 	protected IFigure createSizeOnDropFeedback(CreateRequest createRequest) {
 		EditPart part = getHost().getViewer().getEditPartFactory()
 				.createEditPart(getHost(), createRequest.getNewObject());
+
+		log.trace("Create Size on drop feedback EditPart:" + part
+				+ " is AbstractGraphicalEditPart:"
+				+ (part instanceof AbstractGraphicalEditPart));
+
 		if (part instanceof AbstractGraphicalEditPart) {
 			IFigure figure = ((AbstractGraphicalEditPart) part).getFigure();
-			if (figure instanceof Shape) {
-				FigureUtilities.makeGhostShape((Shape) figure);
-				((Shape) figure).setLineStyle(Graphics.LINE_DASHDOT);
-				figure.setForegroundColor(ColorConstants.white);
-			}
+			figure.setForegroundColor(new Color(null, ColorUtils
+					.getRGBForegroundColor()));
+			figure.setBackgroundColor(new Color(null, ColorUtils
+					.getRGBBackgroundColor()));
+
+			log.trace("Figure is Shape: " + (figure instanceof Shape));
+			log.trace("Figure BG Color:" + figure.getBackgroundColor()
+					+ " Foreground Color:" + figure.getForegroundColor());
 			addFeedback(figure);
 			return figure;
-		}
+		} else
+			log.debug("Part is no instance of AbstractGraphicalEditPart: "
+					+ part.getClass().toString());
 
 		return null;
 	}

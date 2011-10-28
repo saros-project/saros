@@ -31,6 +31,10 @@ public class ElementRecordCreateCommand extends
 		super.setChildName(name);
 	}
 
+	public String getChildName() {
+		return this.newChildName;
+	}
+
 	@Override
 	protected List<IRecord> getAttributeRecords(LayoutElementRecord child) {
 		return child.getChangeLayoutRecords(layout);

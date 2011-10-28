@@ -8,7 +8,7 @@ import org.eclipse.gef.requests.CreateRequest;
 import de.fu_berlin.inf.dpp.whiteboard.gef.editpolicy.XYLayoutWithFreehandEditPolicy;
 
 /**
- * Simple request class to track points
+ * Simple request class to create a line
  * 
  * @author jurke
  * 
@@ -23,6 +23,66 @@ public class CreatePointlistRequest extends CreateRequest {
 
 	public PointList getPoints() {
 		return points;
+	}
+
+	/**
+	 * Updates the last point in the pointlist
+	 * 
+	 * @param p
+	 */
+	public void updateEndPoint(Point p) {
+		if (points == null)
+			points = new PointList();
+
+		if (points.size() > 1) {
+			points.setPoint(p, points.size() - 1);
+		} else
+			points.addPoint(p);
+
+	}
+
+	/**
+	 * Updates the last point in the pointlist
+	 * 
+	 * @param p
+	 */
+	public void updateArrowPoint(Point p) {
+		if (points == null) {
+			points = new PointList();
+			points.addPoint(p);
+			return;
+		}
+
+		Point p1 = points.getPoint(0);
+		Point p2 = p;
+		points.removeAllPoints();
+
+		double width = p2.x - p1.x;
+		double height = p2.y - p1.y;
+
+		double arrow_end_x = p2.x;
+		double arrow_end_y = p2.y;
+
+		double winkel = -Math.atan2(height, width) + Math.PI / 2.0;
+		double length = Math.sqrt(width * width + height * height);
+		double arrow_left_x = arrow_end_x - length / 8.0
+				* Math.sin(winkel - Math.PI / 4.0);
+		double arrow_left_y = arrow_end_y - length / 8.0
+				* Math.cos(winkel - Math.PI / 4.0);
+		double arrow_right_x = arrow_end_x - length / 8.0
+				* Math.sin(winkel + Math.PI / 4.0);
+		double arrow_right_y = arrow_end_y - length / 8.0
+				* Math.cos(winkel + Math.PI / 4.0);
+
+		Point a_left = new Point((int) arrow_left_x, (int) arrow_left_y);
+		Point a_right = new Point((int) arrow_right_x, (int) arrow_right_y);
+
+		points.addPoint(p1);
+		points.addPoint(p2);
+		points.addPoint(a_left);
+		points.addPoint(p2);
+		points.addPoint(a_right);
+
 	}
 
 	public void addPoint(Point p) {

@@ -79,6 +79,8 @@ public class SXEOutgoingSynchronizationProcess extends SXESynchronization {
 					msg.setRecords(SXEUtils.toDataObjects(state));
 
 					log.debug(prefix() + "Sending state to " + msg.getTo());
+
+					log.debug("Send message: " + msg);
 					controller.getTransmitter().sendAsync(msg);
 
 					/*

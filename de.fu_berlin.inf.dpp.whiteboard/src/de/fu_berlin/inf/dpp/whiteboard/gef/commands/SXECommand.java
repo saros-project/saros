@@ -35,7 +35,6 @@ public abstract class SXECommand extends Command {
 		try {
 
 			List<IRecord> records = getRecords();
-
 			getDocumentRecord().getController().executeAndCommit(records);
 
 		} catch (Exception e) {

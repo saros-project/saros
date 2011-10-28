@@ -20,6 +20,8 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.actions.ActionFactory;
 import org.eclipse.ui.part.ViewPart;
 
+import de.fu_berlin.inf.dpp.whiteboard.gef.actions.ChangeBackgroundColorAction;
+import de.fu_berlin.inf.dpp.whiteboard.gef.actions.ChangeForegroundColorAction;
 import de.fu_berlin.inf.dpp.whiteboard.gef.editor.WhiteboardEditor;
 
 public class SarosWhiteboardView extends ViewPart {
@@ -73,12 +75,21 @@ public class SarosWhiteboardView extends ViewPart {
 	public void contributeToToolBar(IToolBarManager toolBarManager) {
 		toolBarManager.add(getAction(ActionFactory.UNDO.getId()));
 		toolBarManager.add(getAction(ActionFactory.REDO.getId()));
+
 		toolBarManager.add(new Separator());
+
 		toolBarManager.add(getAction(ActionFactory.SELECT_ALL.getId()));
 		toolBarManager.add(getAction(ActionFactory.COPY.getId()));
 		toolBarManager.add(getAction(ActionFactory.PASTE.getId()));
 		toolBarManager.add(getAction(ActionFactory.DELETE.getId()));
+
 		toolBarManager.add(new Separator());
+
+		toolBarManager.add(getAction(ChangeForegroundColorAction.ACTION_ID));
+		toolBarManager.add(getAction(ChangeBackgroundColorAction.ACTION_ID));
+
+		toolBarManager.add(new Separator());
+
 		toolBarManager.add(getAction(GEFActionConstants.ZOOM_IN));
 		toolBarManager.add(getAction(GEFActionConstants.ZOOM_OUT));
 

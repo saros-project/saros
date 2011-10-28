@@ -356,6 +356,7 @@ public interface SVGConstants extends CSSConstants, XMLConstants {
 	String SVG_DEFS_TAG = "defs";
 	String SVG_DESC_TAG = "desc";
 	String SVG_ELLIPSE_TAG = "ellipse";
+	String SVG_TEXTBOX_TAG = "text";
 	String SVG_FE_BLEND_TAG = "feBlend";
 	String SVG_FE_COLOR_MATRIX_TAG = "feColorMatrix";
 	String SVG_FE_COMPONENT_TRANSFER_TAG = "feComponentTransfer";
@@ -394,6 +395,7 @@ public interface SVGConstants extends CSSConstants, XMLConstants {
 	String SVG_HKERN_TAG = "hkern";
 	String SVG_IMAGE_TAG = "image";
 	String SVG_LINE_TAG = "line";
+	String SVG_ARROW_TAG = "arrowline";
 	String SVG_LINEAR_GRADIENT_TAG = "linearGradient";
 	String SVG_MARKER_TAG = "marker";
 	String SVG_MASK_TAG = "mask";
@@ -430,6 +432,7 @@ public interface SVGConstants extends CSSConstants, XMLConstants {
 	String SVG_ACCUMULATE_ATTRIBUTE = "accumulate";
 	String SVG_ADDITIVE_ATTRIBUTE = "additive";
 	String SVG_AMPLITUDE_ATTRIBUTE = "amplitude";
+	String SVG_ANNOTATION_TAG = "annotation";
 	String SVG_ARABIC_FORM_ATTRIBUTE = "arabic-form";
 	String SVG_ASCENT_ATTRIBUTE = "ascent";
 	String SVG_AZIMUTH_ATTRIBUTE = "azimuth";
@@ -447,6 +450,7 @@ public interface SVGConstants extends CSSConstants, XMLConstants {
 	String SVG_CLASS_ATTRIBUTE = "class";
 	String SVG_CLIP_PATH_ATTRIBUTE = CSS_CLIP_PATH_PROPERTY;
 	String SVG_CLIP_PATH_UNITS_ATTRIBUTE = "clipPathUnits";
+	String SVG_COLOR_ATTRIBUTE = CSS_COLOR_PROPERTY;
 	String SVG_COLOR_INTERPOLATION_ATTRIBUTE = CSS_COLOR_INTERPOLATION_PROPERTY;
 	String SVG_COLOR_RENDERING_ATTRIBUTE = CSS_COLOR_RENDERING_PROPERTY;
 	String SVG_CONTENT_SCRIPT_TYPE_ATTRIBUTE = "contentScriptType";
@@ -920,6 +924,8 @@ public interface SVGConstants extends CSSConstants, XMLConstants {
 	String PATH_QUAD_TO = "Q";
 	String PATH_SMOOTH_QUAD_TO = "T";
 
+	String SVG_BACKGROUNDCOLOR_TAG = "backgroundColor";
+
 	// /////////////////////////////////////////////////////////////////
 	// event constants
 	// /////////////////////////////////////////////////////////////////
@@ -933,4 +939,5 @@ public interface SVGConstants extends CSSConstants, XMLConstants {
 	String SVG_EVENT_MOUSEOUT = "mouseout";
 	String SVG_EVENT_MOUSEOVER = "mouseover";
 	String SVG_EVENT_MOUSEUP = "mouseup";
+
 }

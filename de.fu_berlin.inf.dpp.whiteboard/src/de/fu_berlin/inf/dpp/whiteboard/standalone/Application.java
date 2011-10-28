@@ -12,15 +12,17 @@ import org.eclipse.ui.PlatformUI;
  */
 public class Application implements IApplication {
 
+	protected static Logger log = Logger.getLogger(Application.class);
+
 	/*
 	 * (non-Javadoc)
 	 * 
 	 * @see org.eclipse.equinox.app.IApplication#start(org.eclipse.equinox.app.
 	 * IApplicationContext)
 	 */
+	@Override
 	public Object start(IApplicationContext context) throws Exception {
 		Display display = PlatformUI.createDisplay();
-		setupLoggers();
 		try {
 			int returnCode = PlatformUI.createAndRunWorkbench(display,
 					new ApplicationWorkbenchAdvisor());
@@ -39,29 +41,18 @@ public class Application implements IApplication {
 	 * 
 	 * @see org.eclipse.equinox.app.IApplication#stop()
 	 */
+	@Override
 	public void stop() {
 		final IWorkbench workbench = PlatformUI.getWorkbench();
 		if (workbench == null)
 			return;
 		final Display display = workbench.getDisplay();
 		display.syncExec(new Runnable() {
+			@Override
 			public void run() {
 				if (!display.isDisposed())
 					workbench.close();
 			}
 		});
-	}
-
-	protected static Logger log = null;
-
-	protected void setupLoggers() {
-		if (log != null)
-			return;
-		try {
-			log = Logger.getLogger("de.fu_berlin.inf.dpp");
-		} catch (SecurityException e) {
-			System.err.println("Could not start logging:");
-			e.printStackTrace();
-		}
 	}
 }

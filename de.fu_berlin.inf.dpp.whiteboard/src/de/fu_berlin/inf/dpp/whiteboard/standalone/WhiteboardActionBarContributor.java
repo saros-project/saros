@@ -1,5 +1,6 @@
 package de.fu_berlin.inf.dpp.whiteboard.standalone;
 
+import org.apache.log4j.Logger;
 import org.eclipse.gef.ui.actions.ActionBarContributor;
 import org.eclipse.gef.ui.actions.DeleteRetargetAction;
 import org.eclipse.gef.ui.actions.GEFActionConstants;
@@ -15,7 +16,13 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.actions.ActionFactory;
 import org.eclipse.ui.actions.RetargetAction;
 
+import de.fu_berlin.inf.dpp.ui.actions.ChangeColorAction;
+import de.fu_berlin.inf.dpp.whiteboard.gef.actions.ChangeBackgroundColorAction;
+import de.fu_berlin.inf.dpp.whiteboard.gef.actions.ChangeForegroundColorAction;
+
 public class WhiteboardActionBarContributor extends ActionBarContributor {
+
+	private static final Logger log = Logger.getLogger(ChangeColorAction.class);
 
 	@Override
 	protected void buildActions() {
@@ -24,6 +31,10 @@ public class WhiteboardActionBarContributor extends ActionBarContributor {
 		addRetargetAction(new UndoRetargetAction());
 		addRetargetAction(new RedoRetargetAction());
 		addRetargetAction(new DeleteRetargetAction());
+
+		addAction(new ChangeBackgroundColorAction());
+		addAction(new ChangeForegroundColorAction());
+		addRetargetAction((RetargetAction) ActionFactory.SELECT_ALL.create(iww));
 
 		addRetargetAction((RetargetAction) ActionFactory.COPY.create(iww));
 		addRetargetAction((RetargetAction) ActionFactory.PASTE.create(iww));
@@ -37,20 +48,26 @@ public class WhiteboardActionBarContributor extends ActionBarContributor {
 	}
 
 	@Override
-	public void contributeToToolBar(IToolBarManager toolBarManager) {
+	public void contributeToToolBar(final IToolBarManager toolBarManager) {
 		toolBarManager.add(getAction(ActionFactory.UNDO.getId()));
 		toolBarManager.add(getAction(ActionFactory.REDO.getId()));
 		toolBarManager.add(new Separator());
 		toolBarManager.add(getAction(ActionFactory.COPY.getId()));
 		toolBarManager.add(getAction(ActionFactory.PASTE.getId()));
+		toolBarManager.add(getAction(ActionFactory.SELECT_ALL.getId()));
 		toolBarManager.add(getAction(ActionFactory.DELETE.getId()));
+		toolBarManager.add(new Separator());
+		toolBarManager.add(getAction(ChangeForegroundColorAction.ACTION_ID));
+		toolBarManager.add(getAction(ChangeBackgroundColorAction.ACTION_ID));
+
 		toolBarManager.add(new Separator());
 		toolBarManager.add(getAction(GEFActionConstants.ZOOM_IN));
 		toolBarManager.add(getAction(GEFActionConstants.ZOOM_OUT));
 		toolBarManager.add(new ZoomComboContributionItem(getPage()));
+
 	}
 
-	// @Override
+	@Override
 	public void contributeToMenu(IMenuManager menuManager) {
 	}
 }

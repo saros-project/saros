@@ -8,6 +8,7 @@ import org.eclipse.draw2d.geometry.Dimension;
 import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.draw2d.geometry.Rectangle;
 
+import de.fu_berlin.inf.dpp.whiteboard.gef.util.ColorUtils;
 import de.fu_berlin.inf.dpp.whiteboard.sxe.records.DocumentRecord;
 import de.fu_berlin.inf.dpp.whiteboard.sxe.records.IRecord;
 
@@ -22,7 +23,7 @@ public class SVGRectRecord extends LayoutElementRecord {
 	public List<IRecord> createLayoutRecords(Rectangle layout,
 			boolean onlyCreateNewRecords) {
 		List<IRecord> records = new ArrayList<IRecord>(4);
-		// log.debug("Rect: " + layout);
+
 		records.add(createNewOrSetAttributeRecord(null,
 				SVGConstants.SVG_X_ATTRIBUTE, String.valueOf(layout.x),
 				onlyCreateNewRecords));
@@ -35,6 +36,14 @@ public class SVGRectRecord extends LayoutElementRecord {
 		records.add(createNewOrSetAttributeRecord(null,
 				SVGConstants.SVG_HEIGHT_ATTRIBUTE,
 				String.valueOf(layout.height), onlyCreateNewRecords));
+		records.add(createNewOrSetAttributeRecord(null,
+				SVGConstants.SVG_FILL_ATTRIBUTE,
+				String.valueOf(ColorUtils.getBackgroundColor()),
+				onlyCreateNewRecords));
+		records.add(createNewOrSetAttributeRecord(null,
+				SVGConstants.SVG_COLOR_ATTRIBUTE,
+				String.valueOf(ColorUtils.getForegroundColor()),
+				onlyCreateNewRecords));
 		return records;
 	}
 

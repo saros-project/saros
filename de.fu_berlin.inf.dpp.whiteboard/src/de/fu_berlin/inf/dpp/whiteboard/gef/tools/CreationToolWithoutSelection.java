@@ -1,5 +1,8 @@
 package de.fu_berlin.inf.dpp.whiteboard.gef.tools;
 
+import org.apache.log4j.Logger;
+import org.eclipse.gef.EditPart;
+import org.eclipse.gef.Request;
 import org.eclipse.gef.tools.CreationTool;
 
 /**
@@ -13,11 +16,44 @@ import org.eclipse.gef.tools.CreationTool;
  */
 public class CreationToolWithoutSelection extends CreationTool {
 
+	Logger log = Logger.getLogger(CreationToolWithoutSelection.class);
+
+	@Override
+	protected Request createTargetRequest() {
+		return super.createTargetRequest();
+	}
+
 	@Override
 	protected void performCreation(int button) {
 		executeCurrentCommand();
 		if (getCurrentViewer() != null)
 			getCurrentViewer().deselectAll();
+	}
+
+	@Override
+	protected void showTargetFeedback() {
+		super.showTargetFeedback();
+
+	}
+
+	@Override
+	protected void setTargetEditPart(EditPart editpart) {
+		super.setTargetEditPart(editpart);
+	}
+
+	@Override
+	protected boolean updateTargetUnderMouse() {
+		if (!isTargetLocked()) {
+			EditPart editPart = getCurrentViewer()
+					.findObjectAtExcluding(getLocation(), getExclusionSet(),
+							getTargetingConditional());
+			if (editPart != null)
+				editPart = editPart.getTargetEditPart(getTargetRequest());
+			boolean changed = getTargetEditPart() != editPart;
+			setTargetEditPart(editPart);
+			return changed;
+		} else
+			return false;
 	}
 
 }
