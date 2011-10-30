@@ -1,13 +1,11 @@
 package de.fu_berlin.inf.dpp;
 
-import static java.util.Arrays.asList;
-
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
+import java.util.Set;
 
-import org.apache.log4j.helpers.LogLog;
+import org.apache.log4j.Logger;
 import org.picocontainer.Characteristics;
 import org.picocontainer.ComponentAdapter;
 import org.picocontainer.MutablePicoContainer;
@@ -129,10 +127,50 @@ import de.fu_berlin.inf.dpp.videosharing.VideoSharingService;
  * {@link de.fu_berlin.inf.dpp.SarosContext#initComponent(Object)}.
  * 
  * @author philipp.cordes
+ * @author Stefan Rossbach
  */
 public class SarosContext {
 
-    protected DotGraphMonitor dotMonitor;
+    private static class Component {
+        private Class<?> intf;
+        private Class<?> clazz;
+
+        private Component(Class<?> intf, Class<?> clazz) {
+            this.intf = intf;
+            this.clazz = clazz;
+        }
+
+        public static <T> Component create(Class<T> intf,
+            Class<? extends T> clazz) {
+            return new Component(intf, clazz);
+        }
+
+        public static Component create(Class<?> clazz) {
+            return new Component(clazz, clazz);
+        }
+
+        public Class<?> getInterface() {
+            return this.intf;
+        }
+
+        public Class<?> getImplementation() {
+            return this.clazz;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            return ((obj instanceof Component) && ((Component) obj).intf == this.intf);
+        }
+
+        @Override
+        public int hashCode() {
+            return this.intf.hashCode();
+        }
+    }
+
+    private static final Logger log = Logger.getLogger(SarosContext.class);
+
+    private DotGraphMonitor dotMonitor;
 
     /**
      * A caching container which holds all the singletons in Saros.
@@ -153,129 +191,140 @@ public class SarosContext {
 
     private boolean isTestContext = false;
 
-    private static final Class<?>[] picoContainerComponents = new Class<?>[] {
+    private static final Component[] COMPONENTS = new Component[] {
         // Thread Context
-        DispatchThreadContext.class,
+        Component.create(DispatchThreadContext.class),
 
         // Core Managers
-        ChangeColorManager.class,
-        ConsistencyWatchdogClient.class,
-        ConsistencyWatchdogServer.class,
-        EditorAPI.class,
-        EditorManager.class,
-        ErrorLogManager.class,
-        FeedbackManager.class,
-        JDTFacade.class,
-        LocalPresenceTracker.class,
-        MUCManager.class,
-        MUCManagerSingletonWrapperChatView.class,
-        PreferenceManager.class,
-        PreferenceUtils.class,
-        PermissionManager.class,
-        SarosUI.class,
-        SarosSessionManager.class,
-        SessionViewOpener.class,
-        SharedResourcesManager.class,
-        StatisticManager.class,
-        StopManager.class,
-        AudioServiceManager.class,
-        MixerManager.class,
-        UndoManager.class,
-        VideoSharing.class,
-        VersionManager.class,
-        MUCSessionPreferencesNegotiatingManager.class,
-        RemoteProgressManager.class,
-        XMPPAccountStore.class,
-        ProjectsAddedManager.class,
-        EclipseHelper.class,
+        Component.create(ChangeColorManager.class),
+        Component.create(ConsistencyWatchdogClient.class),
+        Component.create(ConsistencyWatchdogServer.class),
+        Component.create(EditorAPI.class),
+        Component.create(EditorManager.class),
+        Component.create(ErrorLogManager.class),
+        Component.create(FeedbackManager.class),
+        Component.create(JDTFacade.class),
+        Component.create(LocalPresenceTracker.class),
+        Component.create(MUCManager.class),
+        Component.create(MUCManagerSingletonWrapperChatView.class),
+        Component.create(PreferenceManager.class),
+        Component.create(PreferenceUtils.class),
+        Component.create(PermissionManager.class),
+        Component.create(SarosUI.class),
+        Component.create(SarosSessionManager.class),
+        Component.create(SessionViewOpener.class),
+        Component.create(SharedResourcesManager.class),
+        Component.create(StatisticManager.class),
+        Component.create(StopManager.class),
+        Component.create(AudioServiceManager.class),
+        Component.create(MixerManager.class),
+        Component.create(UndoManager.class),
+        Component.create(VideoSharing.class),
+        Component.create(VersionManager.class),
+        Component.create(MUCSessionPreferencesNegotiatingManager.class),
+        Component.create(RemoteProgressManager.class),
+        Component.create(XMPPAccountStore.class),
+        Component.create(ProjectsAddedManager.class),
+        Component.create(EclipseHelper.class),
 
         // Network
-        ConnectionTestManager.class,
-        DataTransferManager.class,
-        DiscoveryManager.class,
-        IBBTransport.class,
-        PingPongCentral.class,
-        RosterTracker.class,
-        SarosNet.class,
-        SarosRosterListener.class,
-        SkypeManager.class,
-        Socks5Transport.class,
-        StreamServiceManager.class,
-        StunHelper.class,
-        SubscriptionManager.class,
-        UPnPManager.class,
-        XMPPReceiver.class,
-        XMPPTransmitter.class,
+        Component.create(ConnectionTestManager.class),
+        Component.create(DataTransferManager.class),
+        Component.create(DiscoveryManager.class),
+        Component.create(IBBTransport.class),
+        Component.create(PingPongCentral.class),
+        Component.create(RosterTracker.class),
+        Component.create(SarosNet.class),
+        Component.create(SarosRosterListener.class),
+        Component.create(SkypeManager.class),
+        Component.create(Socks5Transport.class),
+        Component.create(StreamServiceManager.class),
+        Component.create(StunHelper.class),
+        Component.create(SubscriptionManager.class),
+        Component.create(UPnPManager.class),
+        Component.create(XMPPReceiver.class),
+        Component.create(XMPPTransmitter.class),
 
         // Observables
-        FileReplacementInProgressObservable.class,
-        InvitationProcessObservable.class,
-        ProjectNegotiationObservable.class,
-        IsInconsistentObservable.class,
-        JingleFileTransferManagerObservable.class,
-        SessionIDObservable.class,
-        SarosSessionObservable.class,
-        VoIPSessionObservable.class,
-        VideoSessionObservable.class,
+        Component.create(FileReplacementInProgressObservable.class),
+        Component.create(InvitationProcessObservable.class),
+        Component.create(ProjectNegotiationObservable.class),
+        Component.create(IsInconsistentObservable.class),
+        Component.create(JingleFileTransferManagerObservable.class),
+        Component.create(SessionIDObservable.class),
+        Component.create(SarosSessionObservable.class),
+        Component.create(VoIPSessionObservable.class),
+        Component.create(VideoSessionObservable.class),
 
         // Handlers
-        CancelInviteHandler.class,
-        CancelProjectSharingHandler.class,
-        UserListHandler.class,
-        InvitationHandler.class,
-        LeaveHandler.class,
-        RequestForActivityHandler.class,
-        ConsistencyWatchdogHandler.class,
-        ActivitiesHandler.class,
+        Component.create(CancelInviteHandler.class),
+        Component.create(CancelProjectSharingHandler.class),
+        Component.create(UserListHandler.class),
+        Component.create(InvitationHandler.class),
+        Component.create(LeaveHandler.class),
+        Component.create(RequestForActivityHandler.class),
+        Component.create(ConsistencyWatchdogHandler.class),
+        Component.create(ActivitiesHandler.class),
 
         // Extensions
-        CancelInviteExtension.class,
-        CancelProjectSharingExtension.class,
-        UserListExtension.class,
-        RequestActivityExtension.class,
-        LeaveExtension.class,
+        Component.create(CancelInviteExtension.class),
+        Component.create(CancelProjectSharingExtension.class),
+        Component.create(UserListExtension.class),
+        Component.create(RequestActivityExtension.class),
+        Component.create(LeaveExtension.class),
 
         // Extension Providers
-        ActivitiesExtensionProvider.class,
-        InvitationInfo.InvitationExtensionProvider.class,
-        IncomingTransferObject.IncomingTransferObjectExtensionProvider.class,
-        DefaultInvitationInfo.InvitationAcknowledgementExtensionProvider.class,
-        DefaultInvitationInfo.FileListRequestExtensionProvider.class,
-        UserListInfo.JoinExtensionProvider.class,
-        DefaultInvitationInfo.UserListConfirmationExtensionProvider.class,
-        DefaultInvitationInfo.InvitationCompleteExtensionProvider.class,
+        Component.create(ActivitiesExtensionProvider.class),
+        Component.create(InvitationInfo.InvitationExtensionProvider.class),
+        Component
+            .create(IncomingTransferObject.IncomingTransferObjectExtensionProvider.class),
+        Component
+            .create(DefaultInvitationInfo.InvitationAcknowledgementExtensionProvider.class),
+        Component
+            .create(DefaultInvitationInfo.FileListRequestExtensionProvider.class),
+        Component.create(UserListInfo.JoinExtensionProvider.class),
+        Component
+            .create(DefaultInvitationInfo.UserListConfirmationExtensionProvider.class),
+        Component
+            .create(DefaultInvitationInfo.InvitationCompleteExtensionProvider.class),
 
         // Statistic collectors
-        DataTransferCollector.class, PermissionChangeCollector.class,
-        ParticipantCollector.class, SessionDataCollector.class,
-        TextEditCollector.class, JumpFeatureUsageCollector.class,
-        FollowModeCollector.class, SelectionCollector.class,
-        VoIPCollector.class,
+        Component.create(DataTransferCollector.class),
+        Component.create(PermissionChangeCollector.class),
+        Component.create(ParticipantCollector.class),
+        Component.create(SessionDataCollector.class),
+        Component.create(TextEditCollector.class),
+        Component.create(JumpFeatureUsageCollector.class),
+        Component.create(FollowModeCollector.class),
+        Component.create(SelectionCollector.class),
+        Component.create(VoIPCollector.class),
 
         // streaming services
-        SendFileAction.SendFileStreamService.class, AudioService.class,
-        VideoSharingService.class, ArchiveStreamService.class
+        Component.create(SendFileAction.SendFileStreamService.class),
+        Component.create(AudioService.class),
+        Component.create(VideoSharingService.class),
+        Component.create(ArchiveStreamService.class)
 
     };
 
-    private static final List<Class<?>> excludedComponentsForTestContext = new ArrayList<Class<?>>(
-        asList(new Class<?>[] { de.fu_berlin.inf.dpp.util.EclipseHelper.class }));
+    private static final Component[] TEST_COMPONENTS = new Component[] { Component
+        .create(EclipseHelper.class, EclipseHelperTestSaros.class) };
 
-    private static final Map<Class<?>, Class<?>> testImplementations = new HashMap<Class<?>, Class<?>>();
+    /*
+     * Use the SarosContextBuilder to build a SarosContext. {@link
+     * SarosContextBuilder}
+     */
 
-    static {
-        testImplementations.put(de.fu_berlin.inf.dpp.util.EclipseHelper.class,
-            EclipseHelperTestSaros.class);
+    private SarosContext(Saros saros, DotGraphMonitor dotGraphMonitor,
+        boolean isTestContext) {
+
+        this.saros = saros;
+        this.dotMonitor = dotGraphMonitor;
+        this.isTestContext = isTestContext;
+        init();
     }
 
-    private SarosContext() {
-        /*
-         * Use the SarosContextBuilder to build a SarosContext. {@link
-         * SarosContextBuilder}
-         */
-    }
-
-    private void init(List<Class<?>> excludedComponentsForTestContext) {
+    private void init() {
         PicoBuilder picoBuilder = new PicoBuilder(new CompositeInjection(
             new ConstructorInjection(), new AnnotatedFieldInjection()))
             .withCaching().withLifecycle();
@@ -302,16 +351,30 @@ public class SarosContext {
          * first argument. This makes it easier to search for a class without
          * tool support.
          */
+
         this.container.addComponent(Saros.class, this.saros);
 
-        /*
-         * Add components.
-         */
-        for (Class<?> component : picoContainerComponents) {
-            if (!excludedComponentsForTestContext.contains(component)) {
-                this.container.addComponent(component);
+        Set<Component> contextComponents = new HashSet<Component>(
+            Arrays.asList(COMPONENTS));
+
+        if (this.isTestContext) {
+            for (Component component : TEST_COMPONENTS) {
+                boolean removed = contextComponents.remove(component);
+                if (!removed) {
+                    log.warn("could not replace impl. class for interface '"
+                        + component.getInterface().getName()
+                        + "' with the test impl. class '"
+                        + component.getImplementation().getName()
+                        + "', the interface does not exist in the context");
+                } else {
+                    contextComponents.add(component);
+                }
             }
         }
+
+        for (Component component : contextComponents)
+            this.container.addComponent(component.getInterface(),
+                component.getImplementation());
 
         // add this context itself because some components need it ...
         this.container.addComponent(SarosContext.class, this);
@@ -338,11 +401,10 @@ public class SarosContext {
     public synchronized void reinject(Object toInjectInto) {
         try {
             // Remove the component if an instance of it was already registered
-            Class<? extends Object> clazz = toInjectInto.getClass();
-            ComponentAdapter<Object> removed = this.container
-                .removeComponent(clazz);
+            Class<?> clazz = toInjectInto.getClass();
+            ComponentAdapter<?> removed = this.container.removeComponent(clazz);
             if (removed != null && clazz != Saros.class) {
-                LogLog.warn(clazz.toString() + " added more than once!",
+                log.warn(clazz.getName() + " added more than once!",
                     new StackTrace());
             }
 
@@ -355,7 +417,7 @@ public class SarosContext {
              */
             this.reinjector.reinject(clazz, new AnnotatedFieldInjection());
         } catch (PicoCompositionException e) {
-            LogLog.error("Internal error in reinjection:", e);
+            log.error("Internal error in reinjection:", e);
         }
     }
 
@@ -433,27 +495,8 @@ public class SarosContext {
         }
 
         public SarosContext build() {
-            SarosContext result = new SarosContext();
-            result.saros = this.saros;
-            result.dotMonitor = this.dotMonitor;
-            result.isTestContext = this.isTestContext;
-
-            if (result.isTestContext()) {
-                result.init(excludedComponentsForTestContext);
-                addTestImplemantations(result);
-            } else {
-                result.init(new ArrayList<Class<?>>());
-            }
-
-            return result;
-        }
-
-        private void addTestImplemantations(SarosContext result) {
-            for (Map.Entry<Class<?>, Class<?>> entry : testImplementations
-                .entrySet()) {
-                result.container.addComponent(entry.getKey(), entry.getValue());
-            }
+            return new SarosContext(this.saros, this.dotMonitor,
+                this.isTestContext);
         }
     }
-
 }
