@@ -1,6 +1,5 @@
 package de.fu_berlin.inf.dpp.ui;
 
-import de.fu_berlin.inf.dpp.Saros;
 import org.apache.log4j.Logger;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Point;
@@ -12,6 +11,7 @@ import org.eclipse.swt.widgets.Shell;
 
 import com.novocode.naf.swt.custom.BalloonWindow;
 
+import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.util.Utils;
 
 public class BalloonNotification {
@@ -46,14 +46,9 @@ public class BalloonNotification {
             control = null;
         }
 
-        Shell parentShell = null;
-        if (control != null) {
-            parentShell = control.getShell();
-            parentShell.forceActive();
-        }
-
-        final BalloonWindow window = new BalloonWindow(parentShell, SWT.ON_TOP
-            | SWT.TOOL | SWT.CLOSE | SWT.TITLE);
+        final BalloonWindow window = new BalloonWindow(
+            control != null ? control.getShell() : null, SWT.TOOL | SWT.CLOSE
+                | SWT.TITLE);
 
         window.setText(title);
 
@@ -79,7 +74,7 @@ public class BalloonNotification {
                 final Shell shell = window.getShell();
                 if (shell.isDisposed())
                     return;
-                shell.forceActive();
+
                 window.close();
             }
         });
