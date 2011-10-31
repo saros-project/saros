@@ -376,7 +376,7 @@ public class CollaborationUtils {
                 Messages.CollaborationUtils_confirm_need_based_file, message,
                 new String[] { "Create Backup", "Overwrite" }, false);
         } else {
-            SarosView.showNotification("New file shared!", messageBalloon);
+            SarosView.showNotification("New file in session!", messageBalloon);
             return true;
         }
     }

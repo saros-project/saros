@@ -110,7 +110,7 @@ public class NeedBasedSyncTest extends StfTestCase {
         ALICE.superBot().views().packageExplorerView()
             .selectFile("foo", "file1").open();
 
-        ALICE.remoteBot().editor("file1").typeText("123456789");
+        ALICE.remoteBot().editor("file1").setText("123456789");
 
         BOB.superBot().views().packageExplorerView()
             .waitUntilResourceIsShared("foo/file1");
@@ -445,17 +445,6 @@ public class NeedBasedSyncTest extends StfTestCase {
                 shellAlice.bot().button(Constants.RUN_IN_BACKGROUND).click();
             }
         }
-
-        IRemoteBotShell shellCarl = CARL.remoteBot().shell(
-            Constants.SHELL_MONITOR_PROJECT_SYNCHRONIZATION);
-        shellCarl.activate();
-        shellCarl.bot().button(Constants.RUN_IN_BACKGROUND).click();
-
-        BOB.remoteBot().activateWorkbench();
-        IRemoteBotShell shellBob = BOB.remoteBot().shell(
-            Constants.SHELL_MONITOR_PROJECT_SYNCHRONIZATION);
-        shellBob.activate();
-        shellBob.bot().button(Constants.RUN_IN_BACKGROUND).click();
 
         BOB.superBot().views().sarosView().selectParticipant(ALICE.getJID())
             .followParticipant();
