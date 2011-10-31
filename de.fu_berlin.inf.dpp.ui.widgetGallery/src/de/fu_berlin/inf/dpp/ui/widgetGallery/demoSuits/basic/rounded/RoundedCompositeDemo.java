@@ -15,7 +15,7 @@ import org.eclipse.swt.widgets.MessageBox;
 
 import de.fu_berlin.inf.dpp.ui.widgetGallery.annotations.Demo;
 import de.fu_berlin.inf.dpp.ui.widgetGallery.demoSuits.AbstractDemo;
-import de.fu_berlin.inf.dpp.ui.widgets.RoundedComposite;
+import de.fu_berlin.inf.nebula.widgets.RoundedComposite;
 
 @Demo
 public class RoundedCompositeDemo extends AbstractDemo {

@@ -24,8 +24,8 @@ import de.fu_berlin.inf.dpp.ui.wizards.GettingStartedWizard;
 import de.fu_berlin.inf.dpp.ui.wizards.ShareProjectAddBuddiesWizard;
 import de.fu_berlin.inf.dpp.ui.wizards.ShareProjectAddProjectsWizard;
 import de.fu_berlin.inf.dpp.ui.wizards.ShareProjectWizard;
-import de.fu_berlin.inf.dpp.ui.wizards.dialogs.CenteredWizardDialog;
 import de.fu_berlin.inf.dpp.util.Utils;
+import de.fu_berlin.inf.nebula.wizards.dialogs.CenteredWizardDialog;
 
 /**
  * Utility class for {@link IWizard}s

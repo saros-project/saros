@@ -18,10 +18,10 @@ import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.ui.Messages;
-import de.fu_berlin.inf.dpp.ui.util.LayoutUtils;
 import de.fu_berlin.inf.dpp.ui.widgets.decoration.EmptyText;
 import de.fu_berlin.inf.dpp.ui.widgets.decoration.JIDCombo;
-import de.fu_berlin.inf.dpp.util.FontUtils;
+import de.fu_berlin.inf.nebula.utils.FontUtils;
+import de.fu_berlin.inf.nebula.utils.LayoutUtils;
 
 /**
  * Allows the user to enter a {@link JID}.
@@ -115,7 +115,8 @@ public class AddBuddyWizardPage extends WizardPage {
         gridData.horizontalIndent = space;
         gridData.verticalIndent = space;
         nicknameText.setLayoutData(gridData);
-        this.nicknameText = new EmptyText(nicknameText, Messages.AddBuddyWizardPage_optional);
+        this.nicknameText = new EmptyText(nicknameText,
+            Messages.AddBuddyWizardPage_optional);
 
         hookListeners();
         updatePageCompletion();

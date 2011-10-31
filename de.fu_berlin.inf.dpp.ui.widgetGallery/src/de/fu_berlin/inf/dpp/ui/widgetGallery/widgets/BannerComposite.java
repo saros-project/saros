@@ -4,8 +4,8 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
 
-import de.fu_berlin.inf.dpp.ui.widgets.SimpleIllustratedComposite;
-import de.fu_berlin.inf.dpp.util.FontUtils;
+import de.fu_berlin.inf.nebula.utils.FontUtils;
+import de.fu_berlin.inf.nebula.widgets.SimpleIllustratedComposite;
 
 public class BannerComposite extends SimpleIllustratedComposite {
 

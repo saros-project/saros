@@ -19,7 +19,7 @@ import de.fu_berlin.inf.dpp.ui.widgetGallery.demoSuits.AbstractDemo;
 import de.fu_berlin.inf.dpp.ui.widgetGallery.util.CompositeUtils;
 import de.fu_berlin.inf.dpp.ui.widgetGallery.widgets.BannerComposite;
 import de.fu_berlin.inf.dpp.ui.widgetGallery.widgets.DemoBannerComposite;
-import de.fu_berlin.inf.dpp.ui.widgets.SimpleIllustratedComposite.IllustratedText;
+import de.fu_berlin.inf.nebula.widgets.SimpleIllustratedComposite.IllustratedText;
 
 public class WidgetGalleryView extends ViewPart {
     public static final String ID = "de.fu_berlin.inf.dpp.ui.widgetGallery.views.WidgetGalleryView";

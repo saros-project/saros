@@ -6,8 +6,8 @@ import org.eclipse.swt.widgets.Composite;
 
 import de.fu_berlin.inf.dpp.ui.widgetGallery.annotations.Demo;
 import de.fu_berlin.inf.dpp.ui.widgetGallery.demoSuits.AbstractDemo;
-import de.fu_berlin.inf.dpp.ui.widgets.explanation.SimpleExplanationComposite;
-import de.fu_berlin.inf.dpp.ui.widgets.explanation.SimpleExplanationComposite.SimpleExplanation;
+import de.fu_berlin.inf.nebula.explanation.SimpleExplanationComposite;
+import de.fu_berlin.inf.nebula.explanation.SimpleExplanationComposite.SimpleExplanation;
 
 @Demo("The following SimpleExplanationComposite has a minimal width/height of 300/300.")
 public class HugeSimpleExplanationCompositeDemo extends AbstractDemo {

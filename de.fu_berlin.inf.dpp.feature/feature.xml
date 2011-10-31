@@ -381,4 +381,11 @@ Public License instead of this License.
          version="11.9.30.r3567"
          unpack="false"/>
 
+   <plugin
+         id="de.fu_berlin.inf.dpp.nebula"
+         download-size="0"
+         install-size="0"
+         version="1.0.0.0"
+         unpack="false"/>
+
 </feature>

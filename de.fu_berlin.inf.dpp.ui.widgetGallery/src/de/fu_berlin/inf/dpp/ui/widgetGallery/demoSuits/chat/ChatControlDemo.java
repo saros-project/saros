@@ -12,7 +12,6 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 
-import de.fu_berlin.inf.dpp.ui.util.LayoutUtils;
 import de.fu_berlin.inf.dpp.ui.widgetGallery.annotations.Demo;
 import de.fu_berlin.inf.dpp.ui.widgetGallery.demoSuits.AbstractDemo;
 import de.fu_berlin.inf.dpp.ui.widgets.chatControl.ChatControl;
@@ -20,8 +19,9 @@ import de.fu_berlin.inf.dpp.ui.widgets.chatControl.events.CharacterEnteredEvent;
 import de.fu_berlin.inf.dpp.ui.widgets.chatControl.events.ChatClearedEvent;
 import de.fu_berlin.inf.dpp.ui.widgets.chatControl.events.IChatControlListener;
 import de.fu_berlin.inf.dpp.ui.widgets.chatControl.events.MessageEnteredEvent;
-import de.fu_berlin.inf.dpp.ui.widgets.explanation.SimpleExplanationComposite.SimpleExplanation;
-import de.fu_berlin.inf.dpp.ui.widgets.explanation.explanatory.SimpleExplanatoryComposite;
+import de.fu_berlin.inf.nebula.explanation.SimpleExplanationComposite.SimpleExplanation;
+import de.fu_berlin.inf.nebula.explanation.explanatory.SimpleExplanatoryComposite;
+import de.fu_berlin.inf.nebula.utils.LayoutUtils;
 
 @Demo
 public class ChatControlDemo extends AbstractDemo {

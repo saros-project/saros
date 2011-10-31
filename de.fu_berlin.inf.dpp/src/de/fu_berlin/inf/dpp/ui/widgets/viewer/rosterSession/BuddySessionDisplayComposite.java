@@ -38,10 +38,10 @@ import de.fu_berlin.inf.dpp.ui.model.TreeLabelProvider;
 import de.fu_berlin.inf.dpp.ui.model.rosterSession.RosterSessionComparator;
 import de.fu_berlin.inf.dpp.ui.model.rosterSession.RosterSessionContentProvider;
 import de.fu_berlin.inf.dpp.ui.model.rosterSession.RosterSessionInput;
-import de.fu_berlin.inf.dpp.ui.util.LayoutUtils;
-import de.fu_berlin.inf.dpp.ui.util.PaintUtils;
-import de.fu_berlin.inf.dpp.ui.util.ViewerUtils;
 import de.fu_berlin.inf.dpp.ui.widgets.viewer.ViewerComposite;
+import de.fu_berlin.inf.nebula.utils.LayoutUtils;
+import de.fu_berlin.inf.nebula.utils.PaintUtils;
+import de.fu_berlin.inf.nebula.utils.ViewerUtils;
 
 /**
  * This {@link Composite} displays the {@link SarosSession} and the

@@ -9,11 +9,12 @@ import org.eclipse.swt.widgets.Display;
 
 import de.fu_berlin.inf.dpp.ui.widgetGallery.annotations.Demo;
 import de.fu_berlin.inf.dpp.ui.widgetGallery.demoSuits.AbstractDemo;
-import de.fu_berlin.inf.dpp.ui.widgets.explanation.ListExplanationComposite.ListExplanation;
-import de.fu_berlin.inf.dpp.ui.widgets.explanation.explanatory.ListExplanatoryComposite;
+import de.fu_berlin.inf.nebula.explanation.ListExplanationComposite.ListExplanation;
+import de.fu_berlin.inf.nebula.explanation.explanatory.ListExplanatoryComposite;
 
 @Demo
-public class IntroductoryTextOnlyListExplanatoryCompositeDemo extends AbstractDemo {
+public class IntroductoryTextOnlyListExplanatoryCompositeDemo extends
+	AbstractDemo {
     @Override
     public void createDemo(Composite parent) {
 	final ListExplanatoryComposite explanatoryComposite = new ListExplanatoryComposite(

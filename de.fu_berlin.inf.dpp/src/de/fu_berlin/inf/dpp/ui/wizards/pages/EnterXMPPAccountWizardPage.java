@@ -21,13 +21,13 @@ import de.fu_berlin.inf.dpp.accountManagement.XMPPAccountStore;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.ui.util.WizardUtils;
-import de.fu_berlin.inf.dpp.ui.widgets.explanation.note.SimpleNoteComposite;
 import de.fu_berlin.inf.dpp.ui.widgets.wizard.EnterXMPPAccountComposite;
 import de.fu_berlin.inf.dpp.ui.widgets.wizard.events.EnterXMPPAccountCompositeListener;
 import de.fu_berlin.inf.dpp.ui.widgets.wizard.events.IsSarosXMPPServerChangedEvent;
 import de.fu_berlin.inf.dpp.ui.widgets.wizard.events.XMPPServerChangedEvent;
 import de.fu_berlin.inf.dpp.ui.wizards.CreateXMPPAccountWizard;
-import de.fu_berlin.inf.dpp.util.FontUtils;
+import de.fu_berlin.inf.nebula.explanation.note.SimpleNoteComposite;
+import de.fu_berlin.inf.nebula.utils.FontUtils;
 
 /**
  * Allows the user to enter an XMPP account defined by a {@link JID}, a password

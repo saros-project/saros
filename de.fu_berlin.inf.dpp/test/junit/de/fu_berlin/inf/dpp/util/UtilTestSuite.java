@@ -12,7 +12,7 @@ import de.fu_berlin.inf.dpp.test.util.WorkspaceFakeObjectTest;
     TotalOrderComparatorTest.class, ArrayUtilsTest.class,
     MappingIteratorTest.class, EclipseWorkspaceFakeFacadeTest.class,
     WorkspaceFakeObjectTest.class, ActivityUtilsTest.class,
-    ColorUtilsTest.class, ThreadAccessRecorderTest.class, })
+    ThreadAccessRecorderTest.class, })
 public class UtilTestSuite {
     // the class remains completely empty,
     // being used only as a holder for the above annotations

@@ -23,7 +23,8 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.core.expressions,
  org.eclipse.equinox.security,
  org.junit4;resolution:=optional,
- org.eclipse.jdt.launching;resolution:=optional
+ org.eclipse.jdt.launching;resolution:=optional,
+ de.fu_berlin.inf.dpp.nebula;bundle-version="1.0.0"
 Bundle-ActivationPolicy: lazy
 Bundle-ClassPath: .,
  lib/log4j-1.2.15.jar,
@@ -169,9 +170,6 @@ Export-Package: de.fu_berlin.inf.dpp;
  de.fu_berlin.inf.dpp.ui.widgets.chatControl,
  de.fu_berlin.inf.dpp.ui.widgets.chatControl.events,
  de.fu_berlin.inf.dpp.ui.widgets.decoration,
- de.fu_berlin.inf.dpp.ui.widgets.explanation,
- de.fu_berlin.inf.dpp.ui.widgets.explanation.explanatory,
- de.fu_berlin.inf.dpp.ui.widgets.explanation.note,
  de.fu_berlin.inf.dpp.ui.widgets.viewer,
  de.fu_berlin.inf.dpp.ui.widgets.viewer.project,
  de.fu_berlin.inf.dpp.ui.widgets.viewer.roster,

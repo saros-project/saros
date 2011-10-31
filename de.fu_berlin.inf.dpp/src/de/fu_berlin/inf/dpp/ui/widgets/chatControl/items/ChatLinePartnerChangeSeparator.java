@@ -10,7 +10,7 @@ import org.eclipse.swt.widgets.Composite;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.editor.annotations.SarosAnnotation;
 import de.fu_berlin.inf.dpp.ui.Messages;
-import de.fu_berlin.inf.dpp.ui.widgets.SimpleRoundedComposite;
+import de.fu_berlin.inf.nebula.widgets.SimpleRoundedComposite;
 
 /**
  * This composite is used to display a separator between messages of different

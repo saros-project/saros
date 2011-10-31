@@ -51,9 +51,9 @@ import de.fu_berlin.inf.dpp.ui.widgets.chatControl.events.CharacterEnteredEvent;
 import de.fu_berlin.inf.dpp.ui.widgets.chatControl.events.ChatClearedEvent;
 import de.fu_berlin.inf.dpp.ui.widgets.chatControl.events.IChatControlListener;
 import de.fu_berlin.inf.dpp.ui.widgets.chatControl.events.MessageEnteredEvent;
-import de.fu_berlin.inf.dpp.ui.widgets.explanation.ListExplanationComposite.ListExplanation;
-import de.fu_berlin.inf.dpp.ui.widgets.explanation.explanatory.ListExplanatoryComposite;
 import de.fu_berlin.inf.dpp.util.Utils;
+import de.fu_berlin.inf.nebula.explanation.ListExplanationComposite.ListExplanation;
+import de.fu_berlin.inf.nebula.explanation.explanatory.ListExplanatoryComposite;
 
 /**
  * This component shows chat he right side of the {@link SarosView}

@@ -26,10 +26,10 @@ import de.fu_berlin.inf.dpp.ui.model.TreeLabelProvider;
 import de.fu_berlin.inf.dpp.ui.model.roster.RosterComparator;
 import de.fu_berlin.inf.dpp.ui.model.roster.RosterContentProvider;
 import de.fu_berlin.inf.dpp.ui.model.roster.RosterEntryElement;
-import de.fu_berlin.inf.dpp.ui.util.LayoutUtils;
-import de.fu_berlin.inf.dpp.ui.util.ViewerUtils;
 import de.fu_berlin.inf.dpp.ui.widgets.viewer.ViewerComposite;
 import de.fu_berlin.inf.dpp.util.ArrayUtils;
+import de.fu_berlin.inf.nebula.utils.LayoutUtils;
+import de.fu_berlin.inf.nebula.utils.ViewerUtils;
 
 /**
  * This {@link Composite} displays the {@link Roster} with its

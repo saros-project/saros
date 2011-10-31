@@ -16,9 +16,9 @@ import org.picocontainer.annotations.Inject;
 import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
 import de.fu_berlin.inf.dpp.ui.util.DialogUtils;
-import de.fu_berlin.inf.dpp.ui.util.LayoutUtils;
-import de.fu_berlin.inf.dpp.ui.widgets.explanation.note.NoteComposite;
 import de.fu_berlin.inf.dpp.util.Utils;
+import de.fu_berlin.inf.nebula.explanation.note.NoteComposite;
+import de.fu_berlin.inf.nebula.utils.LayoutUtils;
 
 public class PublicXMPPServerComposite extends NoteComposite {
     private static final Logger log = Logger

@@ -7,10 +7,10 @@ import org.eclipse.swt.widgets.Layout;
 import org.eclipse.swt.widgets.Tree;
 
 import de.fu_berlin.inf.dpp.ui.model.TreeLabelProvider;
-import de.fu_berlin.inf.dpp.ui.util.LayoutUtils;
-import de.fu_berlin.inf.dpp.ui.util.ViewerUtils;
 import de.fu_berlin.inf.dpp.ui.widgetGallery.demoSuits.MainDemo;
 import de.fu_berlin.inf.dpp.ui.widgets.viewer.ViewerComposite;
+import de.fu_berlin.inf.nebula.utils.LayoutUtils;
+import de.fu_berlin.inf.nebula.utils.ViewerUtils;
 
 public class DemoExplorer extends ViewerComposite {
 

@@ -8,8 +8,8 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Text;
 
-import de.fu_berlin.inf.dpp.util.ColorUtils;
 import de.fu_berlin.inf.dpp.util.Utils;
+import de.fu_berlin.inf.nebula.utils.ColorUtils;
 
 /**
  * Class which displays a default text if the user has not entered own input.

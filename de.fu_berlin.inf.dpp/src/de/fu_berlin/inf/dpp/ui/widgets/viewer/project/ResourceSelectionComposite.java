@@ -21,12 +21,12 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 
 import de.fu_berlin.inf.dpp.ui.Messages;
-import de.fu_berlin.inf.dpp.ui.util.LayoutUtils;
 import de.fu_berlin.inf.dpp.ui.util.WizardUtils;
 import de.fu_berlin.inf.dpp.ui.widgets.viewer.project.events.BaseResourceSelectionListener;
 import de.fu_berlin.inf.dpp.ui.widgets.viewer.project.events.FilterClosedProjectsChangedEvent;
 import de.fu_berlin.inf.dpp.ui.widgets.viewer.project.events.NewProjectListener;
 import de.fu_berlin.inf.dpp.ui.widgets.viewer.project.events.ResourceSelectionListener;
+import de.fu_berlin.inf.nebula.utils.LayoutUtils;
 
 /**
  * This {@link Composite} extends {@link BaseResourceSelectionComposite} and
@@ -99,12 +99,14 @@ public class ResourceSelectionComposite extends BaseResourceSelectionComposite {
                     .getSelection());
             }
         });
-        filterClosedProjectsButton.setText(Messages.ResourceSelectionComposite_hide_closed_projects);
+        filterClosedProjectsButton
+            .setText(Messages.ResourceSelectionComposite_hide_closed_projects);
 
         Button newProjectButton = new Button(controlComposite, SWT.PUSH);
         newProjectButton.setLayoutData(new GridData(SWT.END, SWT.CENTER, true,
             false));
-        newProjectButton.setText(Messages.ResourceSelectionComposite_new_project);
+        newProjectButton
+            .setText(Messages.ResourceSelectionComposite_new_project);
         newProjectButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {

@@ -19,14 +19,14 @@ import de.fu_berlin.inf.dpp.feedback.Messages;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
 import de.fu_berlin.inf.dpp.ui.ImageManager;
-import de.fu_berlin.inf.dpp.ui.util.LayoutUtils;
-import de.fu_berlin.inf.dpp.ui.widgets.SimpleIllustratedComposite;
-import de.fu_berlin.inf.dpp.ui.widgets.SimpleIllustratedComposite.IllustratedText;
-import de.fu_berlin.inf.dpp.ui.widgets.explanation.note.SimpleNoteComposite;
 import de.fu_berlin.inf.dpp.ui.widgets.wizard.SummaryItemComposite;
 import de.fu_berlin.inf.dpp.ui.wizards.ConfigurationWizard;
 import de.fu_berlin.inf.dpp.ui.wizards.utils.WizardPageUtils;
-import de.fu_berlin.inf.dpp.util.FontUtils;
+import de.fu_berlin.inf.nebula.explanation.note.SimpleNoteComposite;
+import de.fu_berlin.inf.nebula.utils.FontUtils;
+import de.fu_berlin.inf.nebula.utils.LayoutUtils;
+import de.fu_berlin.inf.nebula.widgets.SimpleIllustratedComposite;
+import de.fu_berlin.inf.nebula.widgets.SimpleIllustratedComposite.IllustratedText;
 
 /**
  * Final {@link WizardPage} for the {@link ConfigurationWizard} that summarizes
@@ -96,14 +96,17 @@ public class ConfigurationSummaryWizardPage extends WizardPage {
         FontUtils.makeBold(successLabel);
 
         SimpleNoteComposite check = new SimpleNoteComposite(
-            autoConnectComposite, SWT.BORDER,
+            autoConnectComposite,
+            SWT.BORDER,
             ImageManager.ELCL_PREFERENCES_OPEN,
             de.fu_berlin.inf.dpp.ui.Messages.ConfigurationSummaryWizardPage_check_settings);
         check.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
         check.setSpacing(5);
 
         SimpleNoteComposite addBuddies = new SimpleNoteComposite(
-            autoConnectComposite, SWT.BORDER, ImageManager.ELCL_BUDDY_ADD,
+            autoConnectComposite,
+            SWT.BORDER,
+            ImageManager.ELCL_BUDDY_ADD,
             de.fu_berlin.inf.dpp.ui.Messages.ConfigurationSummaryWizardPage_addBuddies);
         addBuddies
             .setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
@@ -124,7 +127,8 @@ public class ConfigurationSummaryWizardPage extends WizardPage {
     protected Composite createRightColumn(Composite composite) {
         Group rightColumn = new Group(composite, SWT.NONE);
         rightColumn.setLayout(LayoutUtils.createGridLayout(5, 0));
-        rightColumn.setText(de.fu_berlin.inf.dpp.ui.Messages.ConfigurationSummaryWizardPage_right_column_your_configuration);
+        rightColumn
+            .setText(de.fu_berlin.inf.dpp.ui.Messages.ConfigurationSummaryWizardPage_right_column_your_configuration);
 
         /*
          * jid settings
@@ -236,19 +240,24 @@ public class ConfigurationSummaryWizardPage extends WizardPage {
 
         if (this.autoConnection != null) {
             if (autoConnect) {
-                this.autoConnection.setContent(new IllustratedText(
-                    ImageManager.ELCL_XMPP_CONNECTED, de.fu_berlin.inf.dpp.ui.Messages.ConfigurationSummaryWizardPage_connect_auto));
+                this.autoConnection
+                    .setContent(new IllustratedText(
+                        ImageManager.ELCL_XMPP_CONNECTED,
+                        de.fu_berlin.inf.dpp.ui.Messages.ConfigurationSummaryWizardPage_connect_auto));
             } else {
-                this.autoConnection.setContent(new IllustratedText(
-                    ImageManager.DLCL_XMPP_CONNECTED,
-                    de.fu_berlin.inf.dpp.ui.Messages.ConfigurationSummaryWizardPage_connect_auto_not));
+                this.autoConnection
+                    .setContent(new IllustratedText(
+                        ImageManager.DLCL_XMPP_CONNECTED,
+                        de.fu_berlin.inf.dpp.ui.Messages.ConfigurationSummaryWizardPage_connect_auto_not));
             }
         }
 
         if (this.uPnPOption != null) {
             if (uPnPEnabled) {
-                this.uPnPOption.setContent(new IllustratedText(
-                    ImageManager.ICON_UPNP, de.fu_berlin.inf.dpp.ui.Messages.ConfigurationSummaryWizardPage_use_upnp));
+                this.uPnPOption
+                    .setContent(new IllustratedText(
+                        ImageManager.ICON_UPNP,
+                        de.fu_berlin.inf.dpp.ui.Messages.ConfigurationSummaryWizardPage_use_upnp));
             } else {
 
                 Image disabledUPnP = null;
@@ -259,20 +268,27 @@ public class ConfigurationSummaryWizardPage extends WizardPage {
                     log.debug("Unable to convert image:" + e.getMessage()); //$NON-NLS-1$
                 }
                 if (disabledUPnP != null)
-                    this.uPnPOption.setContent(new IllustratedText(
-                        disabledUPnP, de.fu_berlin.inf.dpp.ui.Messages.ConfigurationSummaryWizardPage_use_upnp_not));
+                    this.uPnPOption
+                        .setContent(new IllustratedText(
+                            disabledUPnP,
+                            de.fu_berlin.inf.dpp.ui.Messages.ConfigurationSummaryWizardPage_use_upnp_not));
             }
         }
 
         if (this.skypeUsername != null) {
             if (!skypeUsername.isEmpty()) {
-                this.skypeUsername.setContent(new IllustratedText(
-                    ImageManager.ELCL_BUDDY_SKYPE_CALL, MessageFormat.format(
-                        de.fu_berlin.inf.dpp.ui.Messages.ConfigurationSummaryWizardPage_skype_show_username, skypeUsername)));
+                this.skypeUsername
+                    .setContent(new IllustratedText(
+                        ImageManager.ELCL_BUDDY_SKYPE_CALL,
+                        MessageFormat
+                            .format(
+                                de.fu_berlin.inf.dpp.ui.Messages.ConfigurationSummaryWizardPage_skype_show_username,
+                                skypeUsername)));
             } else {
-                this.skypeUsername.setContent(new IllustratedText(
-                    ImageManager.DLCL_BUDDY_SKYPE_CALL,
-                    de.fu_berlin.inf.dpp.ui.Messages.ConfigurationSummaryWizardPage_skype_show_username_not));
+                this.skypeUsername
+                    .setContent(new IllustratedText(
+                        ImageManager.DLCL_BUDDY_SKYPE_CALL,
+                        de.fu_berlin.inf.dpp.ui.Messages.ConfigurationSummaryWizardPage_skype_show_username_not));
             }
         }
 

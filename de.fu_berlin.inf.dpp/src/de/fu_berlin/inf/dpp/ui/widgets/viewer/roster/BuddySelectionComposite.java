@@ -18,13 +18,13 @@ import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.ui.model.roster.RosterEntryElement;
 import de.fu_berlin.inf.dpp.ui.model.roster.RosterGroupElement;
-import de.fu_berlin.inf.dpp.ui.util.LayoutUtils;
-import de.fu_berlin.inf.dpp.ui.util.ViewerUtils;
 import de.fu_berlin.inf.dpp.ui.util.WizardUtils;
 import de.fu_berlin.inf.dpp.ui.widgets.viewer.roster.events.BaseBuddySelectionListener;
 import de.fu_berlin.inf.dpp.ui.widgets.viewer.roster.events.BuddySelectionListener;
 import de.fu_berlin.inf.dpp.ui.widgets.viewer.roster.events.FilterNonSarosBuddiesChangedEvent;
 import de.fu_berlin.inf.dpp.ui.wizards.AddBuddyWizard;
+import de.fu_berlin.inf.nebula.utils.LayoutUtils;
+import de.fu_berlin.inf.nebula.utils.ViewerUtils;
 
 /**
  * This {@link Composite} extends {@link BaseBuddySelectionComposite} and

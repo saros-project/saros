@@ -18,12 +18,12 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 
 import de.fu_berlin.inf.dpp.ui.Messages;
-import de.fu_berlin.inf.dpp.ui.util.LayoutUtils;
 import de.fu_berlin.inf.dpp.ui.util.WizardUtils;
 import de.fu_berlin.inf.dpp.ui.widgets.viewer.project.events.BaseProjectSelectionListener;
 import de.fu_berlin.inf.dpp.ui.widgets.viewer.project.events.FilterClosedProjectsChangedEvent;
 import de.fu_berlin.inf.dpp.ui.widgets.viewer.project.events.NewProjectListener;
 import de.fu_berlin.inf.dpp.ui.widgets.viewer.project.events.ProjectSelectionListener;
+import de.fu_berlin.inf.nebula.utils.LayoutUtils;
 
 /**
  * This {@link Composite} extends {@link BaseProjectSelectionComposite} and
@@ -92,12 +92,14 @@ public class ProjectSelectionComposite extends BaseProjectSelectionComposite {
                     .getSelection());
             }
         });
-        filterClosedProjectsButton.setText(Messages.ProjectSelectionComposite_hide_closed_projects);
+        filterClosedProjectsButton
+            .setText(Messages.ProjectSelectionComposite_hide_closed_projects);
 
         Button newProjectButton = new Button(controlComposite, SWT.PUSH);
         newProjectButton.setLayoutData(new GridData(SWT.END, SWT.CENTER, true,
             false));
-        newProjectButton.setText(Messages.ProjectSelectionComposite_new_project);
+        newProjectButton
+            .setText(Messages.ProjectSelectionComposite_new_project);
         newProjectButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {

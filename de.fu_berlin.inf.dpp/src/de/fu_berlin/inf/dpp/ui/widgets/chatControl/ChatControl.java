@@ -21,7 +21,7 @@ import de.fu_berlin.inf.dpp.ui.widgets.chatControl.events.IChatDisplayListener;
 import de.fu_berlin.inf.dpp.ui.widgets.chatControl.events.MessageEnteredEvent;
 import de.fu_berlin.inf.dpp.ui.widgets.chatControl.parts.ChatDisplay;
 import de.fu_berlin.inf.dpp.ui.widgets.chatControl.parts.ChatInput;
-import de.fu_berlin.inf.dpp.ui.widgets.explanation.ExplanationComposite;
+import de.fu_berlin.inf.nebula.explanation.ExplanationComposite;
 
 /**
  * This composite displays a chat conversation and the possibility to enter

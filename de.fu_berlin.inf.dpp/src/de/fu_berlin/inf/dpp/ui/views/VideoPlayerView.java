@@ -70,8 +70,6 @@ import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
 import de.fu_berlin.inf.dpp.ui.ImageManager;
 import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.ui.actions.VideoSharingAction;
-import de.fu_berlin.inf.dpp.ui.widgets.explanation.ListExplanationComposite.ListExplanation;
-import de.fu_berlin.inf.dpp.ui.widgets.explanation.explanatory.ListExplanatoryViewPart;
 import de.fu_berlin.inf.dpp.util.Utils;
 import de.fu_berlin.inf.dpp.util.ValueChangeListener;
 import de.fu_berlin.inf.dpp.videosharing.VideoSharing;
@@ -85,6 +83,8 @@ import de.fu_berlin.inf.dpp.videosharing.activities.VideoActivity;
 import de.fu_berlin.inf.dpp.videosharing.decode.Decoder;
 import de.fu_berlin.inf.dpp.videosharing.decode.DecodingStatisticPacket;
 import de.fu_berlin.inf.dpp.videosharing.player.VideoDisplay;
+import de.fu_berlin.inf.nebula.explanation.ListExplanationComposite.ListExplanation;
+import de.fu_berlin.inf.nebula.explanation.explanatory.ListExplanatoryViewPart;
 
 /**
  * @author s-lau

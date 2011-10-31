@@ -22,9 +22,9 @@ import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.accountManagement.XMPPAccountStore;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
 import de.fu_berlin.inf.dpp.ui.Messages;
-import de.fu_berlin.inf.dpp.ui.util.LayoutUtils;
-import de.fu_berlin.inf.dpp.ui.widgets.explanation.note.SimpleNoteComposite;
 import de.fu_berlin.inf.dpp.ui.widgets.wizard.PublicXMPPServerComposite;
+import de.fu_berlin.inf.nebula.explanation.note.SimpleNoteComposite;
+import de.fu_berlin.inf.nebula.utils.LayoutUtils;
 
 /**
  * Allows the user to create an XMPP account.
@@ -112,7 +112,8 @@ public class CreateXMPPAccountWizardPage extends WizardPage {
          * Row 2
          */
         Label usernameLabel = new Label(leftColumn, SWT.NONE);
-        usernameLabel.setText(Messages.CreateXMPPAccountWizardPage_label_username);
+        usernameLabel
+            .setText(Messages.CreateXMPPAccountWizardPage_label_username);
 
         this.usernameText = new Text(leftColumn, SWT.BORDER);
         this.usernameText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER,
@@ -122,7 +123,8 @@ public class CreateXMPPAccountWizardPage extends WizardPage {
          * Row 3
          */
         Label passwordLabel = new Label(leftColumn, SWT.NONE);
-        passwordLabel.setText(Messages.CreateXMPPAccountWizardPage_label_password);
+        passwordLabel
+            .setText(Messages.CreateXMPPAccountWizardPage_label_password);
 
         this.passwordText = new Text(leftColumn, SWT.BORDER);
         this.passwordText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER,
@@ -133,7 +135,8 @@ public class CreateXMPPAccountWizardPage extends WizardPage {
          * Row 4
          */
         Label repeatPasswordLabel = new Label(leftColumn, SWT.NONE);
-        repeatPasswordLabel.setText(Messages.CreateXMPPAccountWizardPage_label_repeat_password);
+        repeatPasswordLabel
+            .setText(Messages.CreateXMPPAccountWizardPage_label_repeat_password);
 
         this.repeatPasswordText = new Text(leftColumn, SWT.BORDER);
         this.repeatPasswordText.setLayoutData(new GridData(SWT.FILL,
@@ -149,7 +152,8 @@ public class CreateXMPPAccountWizardPage extends WizardPage {
 
         this.useNowButton = new Button(leftColumn, SWT.CHECK | SWT.SEPARATOR);
         this.useNowButton.setSelection(false);
-        this.useNowButton.setText(Messages.CreateXMPPAccountWizardPage_button_use_new_account);
+        this.useNowButton
+            .setText(Messages.CreateXMPPAccountWizardPage_button_use_new_account);
         this.useNowButton.setLayoutData(new GridData(SWT.FILL, SWT.CENTER,
             true, false));
 

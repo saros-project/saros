@@ -25,8 +25,8 @@ import de.fu_berlin.inf.dpp.net.internal.DataTransferManager.NetTransferMode;
 import de.fu_berlin.inf.dpp.net.internal.discoveryManager.DiscoveryManager;
 import de.fu_berlin.inf.dpp.net.internal.discoveryManager.events.DiscoveryManagerListener;
 import de.fu_berlin.inf.dpp.ui.model.TreeContentProvider;
-import de.fu_berlin.inf.dpp.ui.util.ViewerUtils;
 import de.fu_berlin.inf.dpp.util.Utils;
+import de.fu_berlin.inf.nebula.utils.ViewerUtils;
 
 /**
  * {@link IContentProvider} for use in conjunction with a {@link Roster} input.

@@ -14,7 +14,7 @@ import org.eclipse.ui.texteditor.AnnotationPreference;
 import org.eclipse.ui.texteditor.AnnotationPreferenceLookup;
 
 import de.fu_berlin.inf.dpp.User;
-import de.fu_berlin.inf.dpp.util.ColorUtils;
+import de.fu_berlin.inf.nebula.utils.ColorUtils;
 
 /**
  * The annotation that shows the viewports of users with

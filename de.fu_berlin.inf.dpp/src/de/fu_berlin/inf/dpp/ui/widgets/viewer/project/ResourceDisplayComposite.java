@@ -17,9 +17,9 @@ import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.SarosPluginContext;
-import de.fu_berlin.inf.dpp.ui.util.LayoutUtils;
 import de.fu_berlin.inf.dpp.ui.widgets.viewer.ViewerComposite;
 import de.fu_berlin.inf.dpp.util.ArrayUtils;
+import de.fu_berlin.inf.nebula.utils.LayoutUtils;
 
 /**
  * This {@link Composite} displays all {@link IResource}s within the

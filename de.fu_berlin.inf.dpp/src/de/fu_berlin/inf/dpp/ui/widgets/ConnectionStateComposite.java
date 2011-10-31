@@ -17,9 +17,9 @@ import de.fu_berlin.inf.dpp.net.IConnectionListener;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
-import de.fu_berlin.inf.dpp.ui.util.LayoutUtils;
-import de.fu_berlin.inf.dpp.util.FontUtils;
 import de.fu_berlin.inf.dpp.util.Utils;
+import de.fu_berlin.inf.nebula.utils.FontUtils;
+import de.fu_berlin.inf.nebula.utils.LayoutUtils;
 
 public class ConnectionStateComposite extends Composite {
     private static final String CONNECTED_TOOLTIP = Messages.ConnectionStateComposite_tooltip_connected;
@@ -116,7 +116,9 @@ public class ConnectionStateComposite extends Composite {
             } else if (e.toString().equalsIgnoreCase("stream:error (conflict)")) { //$NON-NLS-1$
                 return Messages.ConnectionStateComposite_error_ressource_conflict;
             } else {
-                return MessageFormat.format(Messages.ConnectionStateComposite_error_with_message, e.getMessage());
+                return MessageFormat.format(
+                    Messages.ConnectionStateComposite_error_with_message,
+                    e.getMessage());
             }
         default:
             return Messages.ConnectionStateComposite_error_unknown;
