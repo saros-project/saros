@@ -10,6 +10,7 @@ import java.util.Map;
 
 import org.apache.commons.io.FileUtils;
 import org.eclipse.core.internal.resources.WorkspaceDescription;
+import org.eclipse.core.resources.IBuildConfiguration;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFilterMatcherDescriptor;
 import org.eclipse.core.resources.IMarker;
@@ -288,5 +289,19 @@ public class EclipseWorkspaceFake implements IWorkspace {
 
     public IStatus validateFiltered(IResource resource) {
         throw new UnsupportedOperationException("not yet implemented");
+    }
+
+    @Override
+    public void build(IBuildConfiguration[] buildConfigs, int kind,
+        boolean buildReferences, IProgressMonitor monitor) throws CoreException {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public IBuildConfiguration newBuildConfig(String projectName,
+        String configName) {
+        // TODO Auto-generated method stub
+        return null;
     }
 }

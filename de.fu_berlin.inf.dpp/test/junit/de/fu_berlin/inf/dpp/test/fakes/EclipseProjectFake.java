@@ -6,6 +6,7 @@ import java.net.URI;
 import java.util.Map;
 
 import org.apache.commons.io.FileUtils;
+import org.eclipse.core.resources.IBuildConfiguration;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.IProjectNature;
@@ -52,14 +53,13 @@ public class EclipseProjectFake extends EclipseContainerFake implements
         return new EclipseProjectFake(file);
     }
 
-    @SuppressWarnings("rawtypes")
-    public void build(int i, String s, Map map,
-        IProgressMonitor iProgressMonitor) throws CoreException {
+    public void build(int i, IProgressMonitor iProgressMonitor)
+        throws CoreException {
         throw new UnsupportedOperationException("not yet implemented");
     }
 
-    public void build(int i, IProgressMonitor iProgressMonitor)
-        throws CoreException {
+    public void build(IBuildConfiguration config, int kind,
+        IProgressMonitor monitor) throws CoreException {
         throw new UnsupportedOperationException("not yet implemented");
     }
 
@@ -168,5 +168,44 @@ public class EclipseProjectFake extends EclipseContainerFake implements
     public void saveSnapshot(int options, URI snapshotLocation,
         IProgressMonitor monitor) throws CoreException {
         throw new UnsupportedOperationException("not yet implemented");
+    }
+
+    @Override
+    public void build(int kind, String builderName, Map<String, String> args,
+        IProgressMonitor monitor) throws CoreException {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public IBuildConfiguration getActiveBuildConfig() throws CoreException {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public IBuildConfiguration getBuildConfig(String configName)
+        throws CoreException {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public IBuildConfiguration[] getBuildConfigs() throws CoreException {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public IBuildConfiguration[] getReferencedBuildConfigs(String configName,
+        boolean includeMissing) throws CoreException {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public boolean hasBuildConfig(String configName) throws CoreException {
+        // TODO Auto-generated method stub
+        return false;
     }
 }
