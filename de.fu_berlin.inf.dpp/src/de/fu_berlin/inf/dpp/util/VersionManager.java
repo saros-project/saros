@@ -1,5 +1,7 @@
 package de.fu_berlin.inf.dpp.util;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -410,13 +412,48 @@ public class VersionManager {
     public Compatibility determineCompatibility(Version localVersion,
         Version remoteVersion) {
 
+        Class<Version> versionClass = Version.class;
+        Method compareToMethod = null;
+
+        try {
+            // Works on Eclipse 3.7
+            compareToMethod = versionClass
+                .getMethod("compareTo", Version.class);
+        } catch (NoSuchMethodException e1) {
+            log.debug("We're on Eclipse 3.6 or earlier. Falling back to Version.compareTo().");
+            try {
+                // Works on Eclipse 3.6 and earlier
+                compareToMethod = versionClass.getMethod("compareTo",
+                    Object.class);
+            } catch (NoSuchMethodException e2) {
+                log.error("Unexpected error: cannot find a compareTo method in Version class."
+                    + e2);
+            }
+        }
+
+        // Comparison result. If defaults to 1, the compatibility chart will be
+        // consulted later.
+        int comparison = 1;
+        try {
+            comparison = (Integer) compareToMethod.invoke(localVersion,
+                remoteVersion);
+        } catch (InvocationTargetException e) {
+            log.error("Couldn't execute Version.compareTo(): " + e);
+        } catch (IllegalAccessException e) {
+            log.error("IllegalAccessException trying to invoke Version.compareTo(): "
+                + e);
+        } catch (NullPointerException e) {
+            log.error("Couldn't find Version.compareTo() using reflection: "
+                + e);
+        }
+
         // If localVersion is older than remote version, then we cannot know
         // whether we are compatible
-        if (localVersion.compareTo(remoteVersion) < 0)
+        if (comparison < 0)
             return Compatibility.TOO_OLD;
 
         // We are always compatible with ourselves
-        if (localVersion.compareTo(remoteVersion) == 0)
+        if (comparison == 0)
             return Compatibility.OK;
 
         List<Version> compatibleVersions = compatibilityChart.get(localVersion);
@@ -424,8 +461,8 @@ public class VersionManager {
             log.error("VersionManager does not know about current version."
                 + " The release manager must have slept: " + localVersion);
 
-            // Fallback to comparing versions directly
-            return Compatibility.valueOf(localVersion.compareTo(remoteVersion));
+            // Fall back to comparing versions directly
+            return Compatibility.valueOf(comparison);
         }
 
         if (compatibleVersions.contains(remoteVersion))
