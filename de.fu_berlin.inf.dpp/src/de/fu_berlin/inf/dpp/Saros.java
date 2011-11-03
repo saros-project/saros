@@ -36,6 +36,7 @@ import org.apache.log4j.PropertyConfigurator;
 import org.apache.log4j.helpers.LogLog;
 import org.eclipse.core.net.proxy.IProxyData;
 import org.eclipse.core.net.proxy.IProxyService;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.preferences.ConfigurationScope;
 import org.eclipse.equinox.security.storage.ISecurePreferences;
 import org.eclipse.equinox.security.storage.SecurePreferencesFactory;
@@ -301,10 +302,13 @@ public class Saros extends AbstractUIPlugin {
         saveSecurePrefs();
 
         if (dotMonitor != null) {
-            File f = new File("Saros-" + sarosFeatureID + ".dot"); //$NON-NLS-1$ //$NON-NLS-2$
+            File file = ResourcesPlugin.getWorkspace().getRoot().getLocation()
+                .toFile();
+            file = new File(file, ".metadata");
+            file = new File(file, "saros-" + sarosFeatureID + ".dot");
             log.info("Saving Saros architecture diagram dot file: " //$NON-NLS-1$
-                + f.getAbsolutePath());
-            dotMonitor.save(f);
+                + file.getAbsolutePath());
+            dotMonitor.save(file);
         }
 
         try {
