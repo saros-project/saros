@@ -430,5 +430,6 @@ public final class SarosPreferences extends StfRemoteObject implements
         shell.bot().button(RESTORE_DEFAULTS).click();
         shell.bot().button(APPLY).click();
         shell.bot().button(OK).click();
+        shell.bot().waitUntil(SarosConditions.isShellClosed(shell));
     }
 }
