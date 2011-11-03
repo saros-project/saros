@@ -1,14 +1,15 @@
 package de.fu_berlin.inf.dpp.net;
 
-import de.fu_berlin.inf.dpp.context.TestSaros;
-import de.fu_berlin.inf.dpp.test.xmpp.XmppUser;
-import de.fu_berlin.inf.dpp.util.AbstractSarosUnitTestCase;
-import de.fu_berlin.inf.dpp.util.EclipseHelper;
-import org.junit.Test;
-
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertNotNull;
 import static junit.framework.Assert.assertTrue;
+
+import org.junit.Ignore;
+import org.junit.Test;
+
+import de.fu_berlin.inf.dpp.context.TestSaros;
+import de.fu_berlin.inf.dpp.util.AbstractSarosUnitTestCase;
+import de.fu_berlin.inf.dpp.util.EclipseHelper;
 
 /**
  * @author cordes
@@ -16,6 +17,7 @@ import static junit.framework.Assert.assertTrue;
 public class BasicFrameworkTest extends AbstractSarosUnitTestCase {
 
     @Test
+    @Ignore("Nobody using the framework, so disabled for now")
     public void testXmppConnection() {
         TestSaros saros = getTestSaros();
         saros.connect(false);
@@ -23,10 +25,12 @@ public class BasicFrameworkTest extends AbstractSarosUnitTestCase {
     }
 
     @Test
+    @Ignore("Nobody using the framework, so disabled for now")
     public void testWorkspace() {
         TestSaros saros = getTestSaros();
         assertNotNull(saros.getWorkspace());
-        assertNotNull(saros.getContext().getComponent(EclipseHelper.class).getWorkspace());
+        assertNotNull(saros.getContext().getComponent(EclipseHelper.class)
+            .getWorkspace());
         assertEquals(1, saros.getWorkspace().getRoot().getProjects().length);
         assertEquals("alice", saros.getUserName());
     }
