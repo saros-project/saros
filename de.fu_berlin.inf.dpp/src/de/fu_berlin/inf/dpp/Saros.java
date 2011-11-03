@@ -434,10 +434,11 @@ public class Saros extends AbstractUIPlugin {
 
     protected void setupLoggers() {
         try {
-            log = Logger.getLogger("de.fu_berlin.inf.dpp"); //$NON-NLS-1$
 
-            PropertyConfigurator.configureAndWatch("log4j.properties", //$NON-NLS-1$
-                REFRESH_SECONDS * 1000);
+            PropertyConfigurator.configure(Saros.class.getClassLoader()
+                .getResource("saros.log4j.properties"));
+
+            log = Logger.getLogger("de.fu_berlin.inf.dpp"); //$NON-NLS-1$
 
         } catch (SecurityException e) {
             System.err.println("Could not start logging:"); //$NON-NLS-1$
@@ -492,7 +493,7 @@ public class Saros extends AbstractUIPlugin {
         if (Saros.isWorkbenchAvailable()) {
             BundleContext bundleContext = getBundle().getBundleContext();
             ServiceReference serviceReference = bundleContext
-                    .getServiceReference(IProxyService.class.getName());
+                .getServiceReference(IProxyService.class.getName());
             result = (IProxyService) bundleContext.getService(serviceReference);
         }
         return result;
