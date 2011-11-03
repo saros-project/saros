@@ -40,12 +40,16 @@ public final class RemoteBotList extends StfRemoteObject implements
         widget.select(index);
     }
 
+    public String[] selection() throws RemoteException {
+        return widget.selection();
+    }
+
     public void select(String... items) throws RemoteException {
         widget.select(items);
     }
 
-    public void selectionCount() throws RemoteException {
-        widget.selectionCount();
+    public int selectionCount() throws RemoteException {
+        return widget.selectionCount();
     }
 
     public void unselect() throws RemoteException {

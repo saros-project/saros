@@ -194,7 +194,7 @@ public class Messages extends NLS {
     public static String GeneralPreferencePage_CONCURRENT_UNDO_TEXT;
     public static String GeneralPreferencePage_delete_active_account;
     public static String GeneralPreferencePage_DELETE_ACTIVE_TEXT;
-    public static String GeneralPreferencePage_DELETE_BTN_TEXT;
+    public static String GeneralPreferencePage_REMOVE_BTN_TEXT;
     public static String GeneralPreferencePage_DISABLE_VERSION_CONTROL_TEXT;
     public static String GeneralPreferencePage_DISABLE_VERSION_CONTROL_TOOLTIP;
     public static String GeneralPreferencePage_ENCRYPT_PASSWORD_TEXT;
@@ -205,6 +205,11 @@ public class Messages extends NLS {
     public static String GeneralPreferencePage_no_account_selected;
     public static String GeneralPreferencePage_NO_ENTRY_SELECTED_TEXT;
     public static String GeneralPreferencePage_STARTUP_CONNECT_TEXT;
+    public static String GeneralPreferencePage_REMOVE_ACCOUNT_DIALOG_TITLE;
+    public static String GeneralPreferencePage_REMOVE_ACCOUNT_DIALOG_MESSAGE;
+    public static String GeneralPreferencePage_ACTIVATE_ACCOUNT_DIALOG_TITLE;
+    public static String GeneralPreferencePage_ACTIVATE_ACCOUNT_DIALOG_MESSAGE;
+
     public static String GettingStartedWizard_finish;
     public static String GettingStartedWizard_show_again;
     public static String GettingStartedWizard_show_again_text;

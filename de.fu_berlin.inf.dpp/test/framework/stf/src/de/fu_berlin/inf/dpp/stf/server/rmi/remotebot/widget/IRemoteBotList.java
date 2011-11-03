@@ -5,18 +5,7 @@ import java.rmi.RemoteException;
 
 public interface IRemoteBotList extends Remote {
 
-    /**********************************************
-     * 
-     * finders
-     * 
-     **********************************************/
     public IRemoteBotMenu contextMenu(String text) throws RemoteException;
-
-    /**********************************************
-     * 
-     * actions
-     * 
-     **********************************************/
 
     public String itemAt(int index) throws RemoteException;
 
@@ -32,17 +21,20 @@ public interface IRemoteBotList extends Remote {
 
     public void select(String... items) throws RemoteException;
 
-    public void selectionCount() throws RemoteException;
+    /**
+     * Gets the arrray of selected items.
+     * 
+     * @return the selected items in the list.
+     * @throws RemoteException
+     */
+
+    public String[] selection() throws RemoteException;
+
+    public int selectionCount() throws RemoteException;
 
     public void unselect() throws RemoteException;
 
     public void setFocus() throws RemoteException;
-
-    /**********************************************
-     * 
-     * states
-     * 
-     **********************************************/
 
     public String[] getItems() throws RemoteException;
 

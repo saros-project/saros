@@ -259,6 +259,8 @@ public abstract class StfTestCase {
             try {
                 tester.superBot().menuBar().saros().preferences()
                     .disableAutomaticReminder();
+                tester.superBot().menuBar().saros().preferences()
+                    .restoreDefaults();
                 Util.openSarosView(tester);
                 tester.superBot().views().sarosView()
                     .connectWith(tester.getJID(), tester.getPassword());
@@ -349,7 +351,7 @@ public abstract class StfTestCase {
             }
 
             tester.superBot().menuBar().saros().preferences()
-                .deleteAllNonActiveAccounts();
+                .removeAllNonActiveAccounts();
 
         }
     }

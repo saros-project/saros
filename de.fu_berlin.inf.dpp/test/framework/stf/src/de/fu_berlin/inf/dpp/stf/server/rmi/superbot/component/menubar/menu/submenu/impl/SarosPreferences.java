@@ -4,20 +4,19 @@ import java.rmi.RemoteException;
 
 import org.apache.log4j.Logger;
 import org.eclipse.swtbot.swt.finder.SWTBot;
+import org.eclipse.swtbot.swt.finder.waits.Conditions;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotButton;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotCheckBox;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
-import org.eclipse.swtbot.swt.finder.widgets.TimeoutException;
 
 import de.fu_berlin.inf.dpp.accountManagement.XMPPAccount;
 import de.fu_berlin.inf.dpp.feedback.Messages;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.stf.server.StfRemoteObject;
-import de.fu_berlin.inf.dpp.stf.server.bot.SarosSWTBot;
 import de.fu_berlin.inf.dpp.stf.server.bot.condition.SarosConditions;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.impl.RemoteWorkbenchBot;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.menubar.menu.submenu.ISarosPreferences;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.impl.SuperBot;
-import de.fu_berlin.inf.dpp.ui.preferencePages.GeneralPreferencePage;
 
 public final class SarosPreferences extends StfRemoteObject implements
     ISarosPreferences {
@@ -67,8 +66,8 @@ public final class SarosPreferences extends StfRemoteObject implements
         SWTBotShell shell = preCondition();
         shell
             .bot()
-            .buttonInGroup(GeneralPreferencePage.ADD_BTN_TEXT,
-                GeneralPreferencePage.ACCOUNT_GROUP_TITLE).click();
+            .buttonInGroup(BUTTON_ADD_ACCOUNT, GROUP_TITLE_XMPP_JABBER_ACCOUNTS)
+            .click();
 
         SuperBot.getInstance().confirmShellAddXMPPJabberAccount(jid, password);
 
@@ -80,17 +79,27 @@ public final class SarosPreferences extends StfRemoteObject implements
     public void activateAccount(JID jid) throws RemoteException {
         assert existsAccount(jid) : "the account (" + jid.getBase()
             + ") doesn't exist yet!";
+
         if (isAccountActiveNoGUI(jid))
             return;
 
         SWTBotShell shell = preCondition();
-        shell.bot().listInGroup(GeneralPreferencePage.ACCOUNT_GROUP_TITLE)
+
+        shell.bot().listInGroup(GROUP_TITLE_XMPP_JABBER_ACCOUNTS)
             .select(jid.getBase());
 
         shell
             .bot()
-            .buttonInGroup(GeneralPreferencePage.ACTIVATE_BTN_TEXT,
-                GeneralPreferencePage.ACCOUNT_GROUP_TITLE).click();
+            .buttonInGroup(BUTTON_ACTIVATE_ACCOUNT,
+                GROUP_TITLE_XMPP_JABBER_ACCOUNTS).click();
+
+        SWTBotShell activateAccountConfirmationShell = shell.bot().shell(
+            ACTIVATE_ACCOUNT_DIALOG_TITLE);
+
+        activateAccountConfirmationShell.activate();
+        activateAccountConfirmationShell.bot().button(OK).click();
+        activateAccountConfirmationShell.bot().waitUntil(
+            Conditions.shellCloses(activateAccountConfirmationShell));
 
         assert shell.bot().label("Active: " + jid.getBase()).isVisible();
 
@@ -99,16 +108,16 @@ public final class SarosPreferences extends StfRemoteObject implements
         shell.bot().waitUntil(SarosConditions.isShellClosed(shell));
     }
 
-    public void changeAccount(JID jid, String newXmppJabberID,
-        String newPassword) throws RemoteException {
+    public void editAccount(JID jid, String newXmppJabberID, String newPassword)
+        throws RemoteException {
         SWTBotShell shell = preCondition();
-        shell.bot().listInGroup(GeneralPreferencePage.ACCOUNT_GROUP_TITLE)
+        shell.bot().listInGroup(GROUP_TITLE_XMPP_JABBER_ACCOUNTS)
             .select(jid.getBase());
 
         shell
             .bot()
-            .buttonInGroup(GeneralPreferencePage.CHANGE_BTN_TEXT,
-                GeneralPreferencePage.ACCOUNT_GROUP_TITLE).click();
+            .buttonInGroup(BUTTON_EDIT_ACCOUNT,
+                GROUP_TITLE_XMPP_JABBER_ACCOUNTS).click();
         SuperBot.getInstance().confirmShellEditXMPPJabberAccount(
             newXmppJabberID, newPassword);
         shell.bot().button(APPLY).click();
@@ -116,29 +125,41 @@ public final class SarosPreferences extends StfRemoteObject implements
         shell.bot().waitUntil(SarosConditions.isShellClosed(shell));
     }
 
-    public void deleteAccount(JID jid, String password) throws RemoteException {
+    public void removeAccount(JID jid, String password) throws RemoteException {
 
         if (!isAccountExistNoGUI(jid, password))
             return;
 
         if (isAccountActiveNoGUI(jid))
             throw new RuntimeException(
-                "it is not allowed to delete a active account");
+                "it is not allowed to remove an active account");
 
         SWTBotShell shell = preCondition();
-        shell.bot().listInGroup(GeneralPreferencePage.ACCOUNT_GROUP_TITLE)
+        shell.bot().listInGroup(GROUP_TITLE_XMPP_JABBER_ACCOUNTS)
             .select(jid.getBase());
 
-        shell
-            .bot()
-            .buttonInGroup(GeneralPreferencePage.DELETE_BTN_TEXT,
-                GeneralPreferencePage.ACCOUNT_GROUP_TITLE).click();
-        shell.bot().button(APPLY).click();
-        shell.bot().button(OK).click();
-        shell.bot().waitUntil(SarosConditions.isShellClosed(shell));
+        SWTBotButton removeButton = shell.bot().buttonInGroup(
+            BUTTON_REMOVE_ACCOUNT, GROUP_TITLE_XMPP_JABBER_ACCOUNTS);
+
+        if (removeButton.isEnabled()) {
+            removeButton.click();
+            SWTBotShell removeAccountConfirmationShell = shell.bot().shell(
+                REMOVE_ACCOUNT_DIALOG_TITLE);
+
+            removeAccountConfirmationShell.activate();
+            removeAccountConfirmationShell.bot().button(YES).click();
+            removeAccountConfirmationShell.bot().waitUntil(
+                Conditions.shellCloses(removeAccountConfirmationShell));
+
+            shell.bot().button(APPLY).click();
+            shell.bot().button(OK).click();
+            shell.bot().waitUntil(Conditions.shellCloses(shell));
+        } else
+            throw new RuntimeException(
+                "it is not allowed to remove an active account");
     }
 
-    public void deleteAllNonActiveAccounts() throws RemoteException {
+    public void removeAllNonActiveAccounts() throws RemoteException {
 
         SWTBotShell shell = preCondition();
         shell.activate();
@@ -154,29 +175,27 @@ public final class SarosPreferences extends StfRemoteObject implements
             shell.bot().listInGroup(GROUP_TITLE_XMPP_JABBER_ACCOUNTS)
                 .select(item);
 
-            shell
-                .bot()
-                .buttonInGroup(GeneralPreferencePage.DELETE_BTN_TEXT,
-                    GeneralPreferencePage.ACCOUNT_GROUP_TITLE).click();
+            SWTBotButton removeButton = shell.bot().buttonInGroup(
+                BUTTON_REMOVE_ACCOUNT, GROUP_TITLE_XMPP_JABBER_ACCOUNTS);
 
-            SWTBot bot = new SWTBot();
-            try {
-                bot.waitUntil(SarosConditions.isShellOpen(new SarosSWTBot(),
-                    SHELL_DELETING_ACTIVE_ACCOUNT), 100);
-                SWTBotShell errorShell = bot
-                    .shell(SHELL_DELETING_ACTIVE_ACCOUNT);
-                errorShell.activate();
-                errorShell.bot().button(OK).click();
-            } catch (TimeoutException ignore) {
-                //
+            if (removeButton.isEnabled()) {
+                removeButton.click();
+                SWTBotShell removeAccountConfirmationShell = shell.bot().shell(
+                    REMOVE_ACCOUNT_DIALOG_TITLE);
+
+                removeAccountConfirmationShell.activate();
+                removeAccountConfirmationShell.bot().button(YES).click();
+                removeAccountConfirmationShell.bot().waitUntil(
+                    Conditions.shellCloses(removeAccountConfirmationShell));
             }
+
         }
         assert shell.bot().listInGroup(GROUP_TITLE_XMPP_JABBER_ACCOUNTS)
             .itemCount() == 1;
 
         shell.bot().button(APPLY).click();
         shell.bot().button(OK).click();
-        shell.bot().waitUntil(SarosConditions.isShellClosed(shell));
+        shell.bot().waitUntil(Conditions.shellCloses(shell));
     }
 
     public void setupSettingForScreensharing(int encoder, int videoResolution,
@@ -280,7 +299,7 @@ public final class SarosPreferences extends StfRemoteObject implements
         try {
             SWTBotShell shell = preCondition();
 
-            shell.bot().sleep(500);
+            shell.bot().sleep(REFRESH_TIME_FOR_ACCOUNT_LIST);
 
             String[] items = shell.bot()
                 .listInGroup(GROUP_TITLE_XMPP_JABBER_ACCOUNTS).getItems();

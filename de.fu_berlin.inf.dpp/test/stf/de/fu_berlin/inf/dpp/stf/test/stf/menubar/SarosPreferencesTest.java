@@ -135,7 +135,7 @@ public class SarosPreferencesTest extends StfTestCase {
             .menuBar()
             .saros()
             .preferences()
-            .changeAccount(ALICE.getJID(), Constants.NEW_XMPP_JABBER_ID,
+            .editAccount(ALICE.getJID(), Constants.NEW_XMPP_JABBER_ID,
                 Constants.PASSWORD);
         assertFalse(ALICE.superBot().menuBar().saros().preferences()
             .existsAccount(ALICE.getJID()));
@@ -152,7 +152,7 @@ public class SarosPreferencesTest extends StfTestCase {
         assertTrue(ALICE.superBot().menuBar().saros().preferences()
             .existsAccount(ALICE.getJID()));
         ALICE.superBot().menuBar().saros().preferences()
-            .deleteAccount(ALICE.getJID(), ALICE.getPassword());
+            .removeAccount(ALICE.getJID(), ALICE.getPassword());
     }
 
     @Test
@@ -164,7 +164,7 @@ public class SarosPreferencesTest extends StfTestCase {
         assertTrue(ALICE.superBot().menuBar().saros().preferences()
             .existsAccount(Constants.JID_TO_ADD));
         ALICE.superBot().menuBar().saros().preferences()
-            .deleteAccount(Constants.JID_TO_ADD, Constants.PASSWORD);
+            .removeAccount(Constants.JID_TO_ADD, Constants.PASSWORD);
         assertFalse(ALICE.superBot().menuBar().saros().preferences()
             .existsAccount(Constants.JID_TO_ADD));
     }

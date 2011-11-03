@@ -236,10 +236,12 @@ public interface Constants {
 
     static public final String BUTTON_EDIT_ACCOUNT = Configuration
         .getString("button_edit_account");
+
     static public final String BUTTON_ADD_ACCOUNT = Configuration
         .getString("button_text_add_account_in_shell-saros-preferences");
-    static public final String BUTTON_DELETE_ACCOUNT = Configuration
-        .getString("button_text_delete_account_in_shell-saros-preferences");
+
+    static public final String BUTTON_REMOVE_ACCOUNT = Configuration
+        .getString("GeneralPreferencePage_REMOVE_BTN_TEXT");
 
     static public final String CHECKBOX_AUTO_CONNECT_ON_STARTUP = Configuration
         .getString("checkbox_label_auto_connect_on_startup_in_shell-saros-preferences");
@@ -255,6 +257,12 @@ public interface Constants {
 
     static public final String CHECKBOX_NEEDS_BASED_SYNC = Configuration
         .getString("checkbox_label_enable_needs_based_synchronisation_in_shell-saros-preferences");
+
+    static public final String REMOVE_ACCOUNT_DIALOG_TITLE = Configuration
+        .getString("GeneralPreferencePage_REMOVE_ACCOUNT_DIALOG_TITLE");
+
+    static public final String ACTIVATE_ACCOUNT_DIALOG_TITLE = Configuration
+        .getString("GeneralPreferencePage_ACTIVATE_ACCOUNT_DIALOG_TITLE");
 
     static public final String NODE_SAROS = Configuration
         .getString("node_saros");

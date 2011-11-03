@@ -19,6 +19,8 @@
  */
 package de.fu_berlin.inf.dpp.ui.preferencePages;
 
+import java.text.MessageFormat;
+
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.preference.BooleanFieldEditor;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
@@ -56,18 +58,19 @@ import de.fu_berlin.inf.dpp.ui.util.WizardUtils;
  * @author Sebastian Schlaak
  */
 @Component(module = "prefs")
-public class GeneralPreferencePage extends FieldEditorPreferencePage implements
-    IWorkbenchPreferencePage {
+public final class GeneralPreferencePage extends FieldEditorPreferencePage
+    implements IWorkbenchPreferencePage {
+
+    public static final int COLUMNS_IN_ACCOUNTGROUP = 2;
 
     // labels
     public static final String GROUP_ACTIVE_LABEL = Messages.GeneralPreferencePage_GROUP_ACTIVE_LABEL;
     public static final String GROUP_DEACTIVE_LABEL = Messages.GeneralPreferencePage_GROUP_DEACTIVE_LABEL;
-    public static final int COLUMNS_IN_ACCOUNTGROUP = 2;
     public static final String ACCOUNT_GROUP_TITLE = Messages.GeneralPreferencePage_ACCOUNT_GROUP_TITLE;
     public static final String ACTIVATE_BTN_TEXT = Messages.GeneralPreferencePage_ACTIVATE_BTN_TEXT;
     public static final String CHANGE_BTN_TEXT = Messages.GeneralPreferencePage_CHANGE_BTN_TEXT;
     public static final String ADD_BTN_TEXT = Messages.GeneralPreferencePage_ADD_BTN_TEXT;
-    public static final String DELETE_BTN_TEXT = Messages.GeneralPreferencePage_DELETE_BTN_TEXT;
+    public static final String REMOVE_BTN_TEXT = Messages.GeneralPreferencePage_REMOVE_BTN_TEXT;
     public static final String DELETE_ACTIVE_TEXT = Messages.GeneralPreferencePage_DELETE_ACTIVE_TEXT;
     public static final String NO_ENTRY_SELECTED_TEXT = Messages.GeneralPreferencePage_NO_ENTRY_SELECTED_TEXT;
     public static final String ENCRYPT_PASSWORD_TEXT = Messages.GeneralPreferencePage_ENCRYPT_PASSWORD_TEXT;
@@ -89,16 +92,19 @@ public class GeneralPreferencePage extends FieldEditorPreferencePage implements
         .getImage("icons/btn/changeaccount.png"); //$NON-NLS-1$
 
     @Inject
-    Saros saros;
+    private Saros saros;
 
     @Inject
-    XMPPAccountStore accountStore;
+    private XMPPAccountStore accountStore;
 
-    Composite parent;
-    Label infoLabel;
-    Group accountGroup;
-    List accountList;
-    int selectedEntryId;
+    private Composite parent;
+    private Label infoLabel;
+    private Group accountGroup;
+    private List accountList;
+
+    private Button activateAccountButton;
+    private Button removeAccountButton;
+    private Button editAccountButton;
 
     public GeneralPreferencePage() {
         super(FieldEditorPreferencePage.GRID);
@@ -122,7 +128,7 @@ public class GeneralPreferencePage extends FieldEditorPreferencePage implements
     /*
      * Creates a grid-layout with one column.
      */
-    protected void layoutParent() {
+    private void layoutParent() {
         parent.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
         parent.setLayout(new GridLayout(1, false));
     }
@@ -130,7 +136,7 @@ public class GeneralPreferencePage extends FieldEditorPreferencePage implements
     /*
      * Creates the account-list, buttons and the 'activeUserLabel'.
      */
-    protected void createAccountsGroup() {
+    private void createAccountsGroup() {
         accountGroup = createGroupWithGridLayout(COLUMNS_IN_ACCOUNTGROUP,
             ACCOUNT_GROUP_TITLE);
         createAccountList(accountGroup);
@@ -138,7 +144,7 @@ public class GeneralPreferencePage extends FieldEditorPreferencePage implements
         createInfoLabel(accountGroup);
     }
 
-    protected Group createGroupWithGridLayout(int numColumns, String title) {
+    private Group createGroupWithGridLayout(int numColumns, String title) {
         Group accountGroup = new Group(parent, SWT.NONE);
         accountGroup.setLayout(new GridLayout(numColumns, false));
         accountGroup.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true,
@@ -150,15 +156,15 @@ public class GeneralPreferencePage extends FieldEditorPreferencePage implements
     /*
      * Creates a list-component filled with the accounts.
      */
-    protected void createAccountList(Composite composite) {
+    private void createAccountList(Composite composite) {
 
         accountList = new List(composite, SWT.BORDER | SWT.H_SCROLL
             | SWT.V_SCROLL);
         GridData data = new GridData(GridData.FILL_BOTH);
         accountList.setLayoutData(data);
-        for (XMPPAccount account : accountStore.getAllAccounts()) {
-            accountList.add(account.toString());
-        }
+
+        updateList();
+
         accountList.addSelectionListener(new SelectionListener() {
 
             public void widgetSelected(SelectionEvent e) {
@@ -170,13 +176,15 @@ public class GeneralPreferencePage extends FieldEditorPreferencePage implements
             }
 
             private void handleEvent() {
-                // String entry = "";
-                // String[] selection = accountList.getSelection();
-                selectedEntryId = accountList.getSelectionIndex();
-                /*
-                 * for (int i = 0; i < selection.length; i++) entry +=
-                 * selection[i]; selectedEntry = entry;
-                 */
+
+                activateAccountButton.setEnabled(true);
+                removeAccountButton.setEnabled(true);
+                editAccountButton.setEnabled(true);
+
+                if (getSelectedAccount().isActive()) {
+                    activateAccountButton.setEnabled(false);
+                    removeAccountButton.setEnabled(false);
+                }
             }
         });
     }
@@ -184,15 +192,15 @@ public class GeneralPreferencePage extends FieldEditorPreferencePage implements
     /*
      * Creates the buttons: activate, add, change and delete.
      */
-    protected void createAccountListControls(Composite parent) {
+    private void createAccountListControls(Composite parent) {
         Composite controlComposite = createAccountListComposite(parent);
-        createActivateBtn(controlComposite);
-        createAddAccountBtn(controlComposite);
-        createDeleteBtn(controlComposite);
-        createChangeBtn(controlComposite);
+        createActivateAccountButton(controlComposite);
+        createAddAccountButton(controlComposite);
+        createRemoveAccountButton(controlComposite);
+        createEditAccountButton(controlComposite);
     }
 
-    protected Composite createAccountListComposite(Composite parent) {
+    private Composite createAccountListComposite(Composite parent) {
         Composite buildControlComposite = new Composite(parent, SWT.NONE);
         GridLayout gridLayout = new GridLayout(1, true);
         buildControlComposite.setLayout(gridLayout);
@@ -201,167 +209,135 @@ public class GeneralPreferencePage extends FieldEditorPreferencePage implements
         return buildControlComposite;
     }
 
-    protected void createInfoLabel(Composite composite) {
+    private void createInfoLabel(Composite composite) {
         infoLabel = new Label(composite, SWT.SINGLE);
-        infoLabel.setForeground(infoLabel.getDisplay().getSystemColor(
-            SWT.COLOR_RED));
         GridData data = new GridData(GridData.FILL_HORIZONTAL);
         infoLabel.setLayoutData(data);
         updateInfoLabel();
     }
 
-    protected void createActivateBtn(Composite composite) {
-        createAccountGroupButton(composite, ACTIVATE_IMAGE, ACTIVATE_BTN_TEXT,
-            new ActiveAccountChangeListener());
-    }
-
-    protected void createAccountGroupButton(Composite composite, Image icon,
+    private Button createAccountGroupButton(Composite composite, Image icon,
         String text, Listener listener) {
-        Button activateAccountBtn = new Button(composite, SWT.PUSH);
-        activateAccountBtn.setImage(icon);
-        activateAccountBtn.setText(text);
-        activateAccountBtn.addListener(SWT.Selection, listener);
-        activateAccountBtn
-            .setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        Button button = new Button(composite, SWT.PUSH);
+        button.setImage(icon);
+        button.setText(text);
+        button.addListener(SWT.Selection, listener);
+        button.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        return button;
     }
 
-    class ActiveAccountChangeListener implements Listener {
-        public void handleEvent(Event event) {
-            if (isEntrySelected()) {
-                setAccountActive();
-            } else {
-                warnNothingSelected();
-            }
+    private XMPPAccount getSelectedAccount() {
+        return (XMPPAccount) accountList.getData(String.valueOf(accountList
+            .getSelectionIndex()));
+    }
+
+    private void updateList() {
+        accountList.removeAll();
+        int index = 0;
+        for (XMPPAccount account : accountStore.getAllAccounts()) {
+            accountList.add(createHumanDisplayAbleName(account));
+            accountList.setData(String.valueOf(index++), account);
         }
     }
 
-    protected void setAccountActive() {
-        int selectedEntryId = getSelectedEntryID();
-        accountStore.setAccountActive(accountStore.getAccount(selectedEntryId));
-        updateInfoLabel();
-        updateList();
+    private void updateInfoLabel() {
+        if (accountStore.hasActiveAccount())
+            infoLabel.setText(Messages.GeneralPreferencePage_active
+                + createHumanDisplayAbleName(accountStore.getActiveAccount()));
+        else
+            infoLabel.setText("");
     }
 
-    protected void createChangeBtn(Composite composite) {
-        createAccountGroupButton(composite, CHANGE_IMAGE, CHANGE_BTN_TEXT,
-            new AccountChangeListener());
+    private String createHumanDisplayAbleName(XMPPAccount account) {
+        return account.getUsername() + "@" + account.getServer();
     }
 
-    class AccountChangeListener implements Listener {
-        public void handleEvent(Event event) {
-            if (event.type == SWT.Selection) {
-                if (isEntrySelected()) {
-                    changeAccountData();
-                } else {
-                    warnNothingSelected();
-                }
-            }
-        }
-    }
-
-    protected boolean isEntrySelected() {
-        return accountList.getSelectionIndex() != -1;
-    }
-
-    protected void changeAccountData() {
-        if (WizardUtils.openEditXMPPAccountWizard(this.getSelectedAccount()) != null) {
-            updateInfoLabel();
-            updateList();
-        }
-    }
-
-    protected int getSelectedEntryID() {
-        XMPPAccount account = accountStore.getAllAccounts().get(
-            this.selectedEntryId);
-        return account.getId();
-    }
-
-    public XMPPAccount getSelectedAccount() {
-        int selectedEntryId = getSelectedEntryID();
-        XMPPAccount selectedAccount = this.accountStore
-            .getAccount(selectedEntryId);
-        return selectedAccount;
-    }
-
-    protected void warnNothingSelected() {
-        MessageDialog.openError(getShell(),
-            Messages.GeneralPreferencePage_no_account_selected,
-            NO_ENTRY_SELECTED_TEXT);
-    }
-
-    public void updateInfoLabel() {
-        try {
-            if (accountStore.hasActiveAccount()) {
-                infoLabel.setText(Messages.GeneralPreferencePage_active
-                    + accountStore.getActiveAccount().toString());
-            }
-        } catch (NullPointerException e) {
-            e.printStackTrace();
-        }
-    }
-
-    protected void createAddAccountBtn(Composite composite) {
+    private void createAddAccountButton(Composite composite) {
         createAccountGroupButton(composite, ADD_IMAGE, ADD_BTN_TEXT,
             new Listener() {
                 public void handleEvent(Event event) {
-                    if (event.type == SWT.Selection) {
-                        WizardUtils.openAddXMPPAccountWizard();
+                    WizardUtils.openAddXMPPAccountWizard();
+                    activateAccountButton.setEnabled(false);
+                    removeAccountButton.setEnabled(false);
+                    editAccountButton.setEnabled(false);
+                    updateInfoLabel();
+                    updateList();
+                }
+            });
+    }
+
+    private void createEditAccountButton(Composite composite) {
+        editAccountButton = createAccountGroupButton(composite, CHANGE_IMAGE,
+            CHANGE_BTN_TEXT, new Listener() {
+                public void handleEvent(Event event) {
+                    if (WizardUtils
+                        .openEditXMPPAccountWizard(getSelectedAccount()) != null) {
+                        activateAccountButton.setEnabled(false);
+                        removeAccountButton.setEnabled(false);
+                        editAccountButton.setEnabled(false);
                         updateInfoLabel();
                         updateList();
                     }
                 }
             });
+        editAccountButton.setEnabled(false);
     }
 
-    protected void createDeleteBtn(Composite composite) {
-        createAccountGroupButton(composite, DELETE_IMAGE, DELETE_BTN_TEXT,
-            new Listener() {
+    private void createRemoveAccountButton(Composite composite) {
+        removeAccountButton = createAccountGroupButton(composite, DELETE_IMAGE,
+            REMOVE_BTN_TEXT, new Listener() {
                 public void handleEvent(Event event) {
-                    if (isEntrySelected()) {
-                        int selectedEntryId = getSelectedEntryID();
-                        if (hasActiveAccountDeleted()) {
-                            handleActiveAccountDeleted();
-                        } else {
-                            accountStore.deleteAccount(accountStore
-                                .getAccount(selectedEntryId));
-                        }
+                    if (MessageDialog.openQuestion(
+                        GeneralPreferencePage.this.getShell(),
+                        Messages.GeneralPreferencePage_REMOVE_ACCOUNT_DIALOG_TITLE,
+                        MessageFormat
+                            .format(
+                                Messages.GeneralPreferencePage_REMOVE_ACCOUNT_DIALOG_MESSAGE,
+                                createHumanDisplayAbleName(getSelectedAccount())))
+
+                    ) {
+                        accountStore.deleteAccount(getSelectedAccount());
+                        activateAccountButton.setEnabled(false);
+                        removeAccountButton.setEnabled(false);
+                        editAccountButton.setEnabled(false);
                         updateList();
-                    } else {
-                        warnNothingSelected();
                     }
                 }
             });
+        removeAccountButton.setEnabled(false);
     }
 
-    protected boolean hasActiveAccountDeleted() {
-        int selectedEntryId = getSelectedEntryID();
-        return (selectedEntryId == accountStore.getActiveAccount().getId());
+    private void createActivateAccountButton(Composite composite) {
+        activateAccountButton = createAccountGroupButton(composite,
+            ACTIVATE_IMAGE, ACTIVATE_BTN_TEXT, new Listener() {
+                public void handleEvent(Event event) {
+                    accountStore.setAccountActive(getSelectedAccount());
+                    updateInfoLabel();
+                    activateAccountButton.setEnabled(false);
+                    removeAccountButton.setEnabled(false);
+                    MessageDialog.openInformation(
+                        GeneralPreferencePage.this.getShell(),
+                        Messages.GeneralPreferencePage_ACTIVATE_ACCOUNT_DIALOG_TITLE,
+                        MessageFormat
+                            .format(
+                                Messages.GeneralPreferencePage_ACTIVATE_ACCOUNT_DIALOG_MESSAGE,
+                                createHumanDisplayAbleName(getSelectedAccount())));
+                }
+            });
+        activateAccountButton.setEnabled(false);
     }
 
-    protected void handleActiveAccountDeleted() {
-        MessageDialog.openError(getShell(),
-            Messages.GeneralPreferencePage_delete_active_account,
-            DELETE_ACTIVE_TEXT);
-    }
-
-    public void updateList() {
-        accountList.removeAll();
-        for (XMPPAccount account : accountStore.getAllAccounts()) {
-            accountList.add(account.toString());
-        }
-    }
-
-    protected void createEncryptPasswordField(Composite group) {
+    private void createEncryptPasswordField(Composite group) {
         addField(new BooleanFieldEditor(PreferenceConstants.ENCRYPT_ACCOUNT,
             ENCRYPT_PASSWORD_TEXT, group));
     }
 
-    protected void createAutomaticConnectField(Composite group) {
+    private void createAutomaticConnectField(Composite group) {
         addField(new BooleanFieldEditor(PreferenceConstants.AUTO_CONNECT,
             STARTUP_CONNECT_TEXT, group));
     }
 
-    protected void createVersionControlPreferences(Composite group) {
+    private void createVersionControlPreferences(Composite group) {
         BooleanFieldEditor editor = new BooleanFieldEditor(
             PreferenceConstants.DISABLE_VERSION_CONTROL,
             DISABLE_VERSION_CONTROL_TEXT, group);
@@ -370,12 +346,12 @@ public class GeneralPreferencePage extends FieldEditorPreferencePage implements
         addField(editor);
     }
 
-    protected void createConcurrentUndoField(Composite group) {
+    private void createConcurrentUndoField(Composite group) {
         addField(new BooleanFieldEditor(PreferenceConstants.CONCURRENT_UNDO,
             CONCURRENT_UNDO_TEXT, group));
     }
 
-    protected void createFollowModePreferences(Composite group) {
+    private void createFollowModePreferences(Composite group) {
         addField(new BooleanFieldEditor(PreferenceConstants.AUTO_FOLLOW_MODE,
             FOLLOW_MODE_TEXT, group));
     }
@@ -383,10 +359,6 @@ public class GeneralPreferencePage extends FieldEditorPreferencePage implements
     protected void createNeedsBasesSyncPreferences(Composite group) {
         addField(new BooleanFieldEditor(PreferenceConstants.NEEDS_BASED_SYNC,
             NEEDS_BASED_SYNC_TEXT, group));
-    }
-
-    protected Composite createGroup(String text, Composite parent) {
-        return createGroupWithGridLayout(1, text);
     }
 
     public void init(IWorkbench workbench) {

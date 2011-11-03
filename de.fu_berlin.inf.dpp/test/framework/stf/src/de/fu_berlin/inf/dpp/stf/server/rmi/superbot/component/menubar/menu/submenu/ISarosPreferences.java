@@ -82,7 +82,7 @@ public interface ISarosPreferences extends Remote {
      * 
      * @throws RemoteException
      */
-    public void changeAccount(JID jid, String newXmppJabberID,
+    public void editAccount(JID jid, String newXmppJabberID,
         String newPassword) throws RemoteException;
 
     /**
@@ -100,9 +100,9 @@ public interface ISarosPreferences extends Remote {
      *            password of the given jid.
      * @throws RemoteException
      */
-    public void deleteAccount(JID jid, String password) throws RemoteException;
+    public void removeAccount(JID jid, String password) throws RemoteException;
 
-    public void deleteAllNonActiveAccounts() throws RemoteException;
+    public void removeAllNonActiveAccounts() throws RemoteException;
 
     /**********************************************
      * 
