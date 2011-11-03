@@ -8,8 +8,17 @@ import org.eclipse.jface.text.IDocumentListener;
  * A DocumentListener which informs the given EditorManager of changes before
  * they occur in a document (using documentAboutToBeChanged).
  * 
+ * The StoppableDocumentListener (actually TextChangeListener) notifies the
+ * EditorManager about local text changes in a shared document. The
+ * EditorManager then transmits the changes to all listening session
+ * participants. The EditorManager temporariliy disables this listener when it
+ * locally applies remote changes to a file to avoid an endless cycle of
+ * notification (because the change would also trigger a text change event).
+ * 
  * This implementation can be made to stop sending events using the enabled
  * field.
+ * 
+ * @author awaldmann, anarw and nwarnatsch
  */
 public class StoppableDocumentListener implements IDocumentListener {
 

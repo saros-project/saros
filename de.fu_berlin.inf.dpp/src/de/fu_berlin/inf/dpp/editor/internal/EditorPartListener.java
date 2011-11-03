@@ -1,5 +1,9 @@
 /**
+ * The EditorPartListener listens to changes to the editors view, e.g. if the view is opened, activated, 
+ * closed, brought to the top or the source has changed. The Listener notifies the EditorManager about 
+ * the state of the view, so the Manager can react on it, e.g. to update followers.
  * 
+ * @author awaldmann and nwarnatsch
  */
 package de.fu_berlin.inf.dpp.editor.internal;
 
