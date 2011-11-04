@@ -185,6 +185,7 @@ public class Messages extends NLS {
     public static String EnterXMPPAccountWizardPage_title;
     public static String ErrorMessageDialog_error_plugin;
     public static String ErrorMessageDialog_error_unspecified;
+    public static String Explain_version_control;
     public static String ExplanatoryComposite_content_control_not_set;
     public static String GeneralPreferencePage_ACCOUNT_GROUP_TITLE;
     public static String GeneralPreferencePage_ACTIVATE_BTN_TEXT;
