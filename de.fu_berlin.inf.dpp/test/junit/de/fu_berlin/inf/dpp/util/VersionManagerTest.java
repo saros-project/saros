@@ -21,64 +21,185 @@
 
 package de.fu_berlin.inf.dpp.util;
 
-import static org.easymock.EasyMock.createMock;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertEquals;
 
-import org.junit.Before;
+import java.lang.reflect.Field;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+
+import org.easymock.EasyMock;
+import org.jivesoftware.smack.PacketListener;
+import org.jivesoftware.smack.filter.PacketFilter;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.osgi.framework.Bundle;
 import org.osgi.framework.Version;
+import org.powermock.api.easymock.PowerMock;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
 
-import de.fu_berlin.inf.dpp.Constants;
 import de.fu_berlin.inf.dpp.Saros;
-import de.fu_berlin.inf.dpp.net.internal.SarosTestNet;
-import de.fu_berlin.inf.dpp.net.internal.XMPPTransmitter;
+import de.fu_berlin.inf.dpp.net.ITransmitter;
+import de.fu_berlin.inf.dpp.net.internal.XMPPReceiver;
 import de.fu_berlin.inf.dpp.util.VersionManager.Compatibility;
+import de.fu_berlin.inf.dpp.util.VersionManager.VersionInfo;
 
+@RunWith(PowerMockRunner.class)
+@PrepareForTest(Saros.class)
 public class VersionManagerTest {
 
-    Version older;
-    Version newer;
-    VersionManager versionManager;
+    Saros sarosLocal;
+    Saros sarosRemote;
 
-    Saros sarosObj;
-    SarosTestNet net;
-    XMPPTransmitter transmitter;
+    Bundle bundeLocal;
+    Bundle bundeRemote;
 
-    @Before
-    public void SetUp() {
-        older = new Version("11.5.6.r3294");
-        newer = new Version("11.7.1.r3426");
+    ITransmitter transmitter;
+    XMPPReceiver receiver;
 
-        // session = new SarosSessionStub().getSaros();
-        sarosObj = createMock(Saros.class);
-        net = new SarosTestNet(Constants.INF_XMPP_TESTUSER_NAME,
-            Constants.INF_XMPP_SERVICE_NAME);
+    VersionManager versionManagerRemote;
+    VersionManager versionManagerLocal;
 
-        versionManager = new VersionManager(sarosObj, net.xmppReceiver,
-            net.xmppTransmitter);
+    private void createMocks(Version local, Version remote) {
+        sarosLocal = PowerMock.createMock(Saros.class);
+        sarosRemote = PowerMock.createMock(Saros.class);
+
+        bundeLocal = PowerMock.createMock(Bundle.class);
+        bundeRemote = PowerMock.createMock(Bundle.class);
+
+        EasyMock.expect(sarosLocal.getBundle()).andReturn(bundeLocal);
+
+        EasyMock.expect(sarosRemote.getBundle()).andReturn(bundeRemote);
+
+        EasyMock.expect(bundeLocal.getVersion()).andReturn(local);
+
+        EasyMock.expect(bundeRemote.getVersion()).andReturn(remote);
+
+        transmitter = PowerMock.createMock(ITransmitter.class);
+
+        receiver = PowerMock.createMock(XMPPReceiver.class);
+
+        receiver.addPacketListener(EasyMock.isA(PacketListener.class),
+            EasyMock.isA(PacketFilter.class));
+
+        EasyMock.expectLastCall().asStub();
+
+        PowerMock.replayAll();
+
+        versionManagerLocal = new VersionManager(sarosLocal, receiver,
+            transmitter);
+        versionManagerRemote = new VersionManager(sarosRemote, receiver,
+            transmitter);
+
     }
 
     @Test
     public void testVersionsSame() {
-        Compatibility comp = versionManager
-            .determineCompatibility(newer, newer);
-        assertTrue(comp == Compatibility.OK);
+
+        Version local = new Version("1.1.1.r1");
+        Version remote = new Version("1.1.1.r1");
+
+        createMocks(local, remote);
+
+        VersionInfo info = new VersionInfo();
+        info.version = remote;
+        info.compatibility = versionManagerRemote.determineCompatibility(
+            remote, local);
+        assertEquals(Compatibility.OK,
+            versionManagerLocal.determineCompatibility(info).compatibility);
     }
 
     @Test
-    public void testLocalIsOlder() {
-        Compatibility comp = versionManager
-            .determineCompatibility(older, newer);
-        assertTrue(comp == Compatibility.TOO_OLD);
+    public void testlocalVersionsTooOld() {
+
+        Version local = new Version("1.1.1.r1");
+        Version remote = new Version("1.1.2.r1");
+
+        createMocks(local, remote);
+
+        VersionInfo info = new VersionInfo();
+        info.version = remote;
+        info.compatibility = versionManagerRemote.determineCompatibility(
+            remote, local);
+        assertEquals(Compatibility.TOO_OLD,
+            versionManagerLocal.determineCompatibility(info).compatibility);
+        // verifiyMocks();
     }
 
     @Test
-    public void testUsingChart() {
-        // By making the local version newer, we make the VersionManager consult
-        // the compatibility chart. The versions we've chosen are not
-        // compatible.
-        Compatibility comp = versionManager
-            .determineCompatibility(newer, older);
-        assertTrue(comp == Compatibility.TOO_NEW);
+    public void testlocalVersionsTooNew() {
+
+        Version local = new Version("1.1.2.r1");
+        Version remote = new Version("1.1.1.r1");
+
+        createMocks(local, remote);
+
+        VersionInfo info = new VersionInfo();
+        info.version = remote;
+        info.compatibility = versionManagerRemote.determineCompatibility(
+            remote, local);
+        assertEquals(Compatibility.TOO_NEW,
+            versionManagerLocal.determineCompatibility(info).compatibility);
+        // verifiyMocks();
     }
+
+    @SuppressWarnings("unchecked")
+    @Test
+    public void testLocalVersionTooNewButCompatible() throws Exception {
+        Version local = new Version("999999.1.2.r1");
+        Version remote = new Version("999999.1.1.r1");
+
+        createMocks(local, remote);
+
+        Field f = versionManagerLocal.getClass().getDeclaredField(
+            "COMPATIBILITY_CHART");
+
+        f.setAccessible(true);
+
+        Map<Version, List<Version>> chart = (Map<Version, List<Version>>) f
+            .get(versionManagerLocal);
+
+        chart.put(local, Arrays.asList(remote));
+
+        VersionInfo info = new VersionInfo();
+        info.version = remote;
+        info.compatibility = versionManagerRemote.determineCompatibility(
+            remote, local);
+        assertEquals(Compatibility.TOO_OLD,
+            versionManagerRemote.determineCompatibility(remote, local));
+        assertEquals(Compatibility.OK,
+            versionManagerLocal.determineCompatibility(info).compatibility);
+
+    }
+
+    @SuppressWarnings("unchecked")
+    @Test
+    public void testLocalVersionTooOldButCompatible() throws Exception {
+        Version local = new Version("999999.1.1.r1");
+        Version remote = new Version("999999.1.2.r1");
+
+        createMocks(local, remote);
+
+        Field f = versionManagerLocal.getClass().getDeclaredField(
+            "COMPATIBILITY_CHART");
+
+        f.setAccessible(true);
+
+        Map<Version, List<Version>> chart = (Map<Version, List<Version>>) f
+            .get(versionManagerRemote);
+
+        chart.put(remote, Arrays.asList(local));
+
+        VersionInfo info = new VersionInfo();
+        info.version = remote;
+        info.compatibility = versionManagerRemote.determineCompatibility(
+            remote, local);
+        assertEquals(Compatibility.TOO_OLD,
+            versionManagerLocal.determineCompatibility(local, remote));
+        assertEquals(Compatibility.OK,
+            versionManagerLocal.determineCompatibility(info).compatibility);
+
+    }
+
 }

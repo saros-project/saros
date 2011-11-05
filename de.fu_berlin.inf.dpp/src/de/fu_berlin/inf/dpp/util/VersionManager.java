@@ -1,7 +1,5 @@
 package de.fu_berlin.inf.dpp.util;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -17,9 +15,9 @@ import org.osgi.framework.Version;
 
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.annotations.Component;
+import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.internal.XMPPReceiver;
-import de.fu_berlin.inf.dpp.net.internal.XMPPTransmitter;
 import de.fu_berlin.inf.dpp.net.internal.XStreamExtensionProvider;
 import de.fu_berlin.inf.dpp.net.internal.XStreamExtensionProvider.XStreamIQPacket;
 
@@ -122,7 +120,7 @@ public class VersionManager {
      * {@link Compatibility#OK} if and only if the version information are
      * {@link Version#equals(Object)} to each other.
      */
-    public static Map<Version, List<Version>> compatibilityChart = new HashMap<Version, List<Version>>();
+    private static final Map<Version, List<Version>> COMPATIBILITY_CHART = new HashMap<Version, List<Version>>();
 
     /**
      * Initialize the compatibility map.
@@ -136,52 +134,52 @@ public class VersionManager {
     static {
 
         /**
-         * Version 11.7.29.3479
+         * Version 11.9.30.3567
          */
-        compatibilityChart.put(new Version("11.9.30.r3567"), Arrays.asList(
+        COMPATIBILITY_CHART.put(new Version("11.9.30.r3567"), Arrays.asList(
             new Version("11.9.30.r3567"), new Version("11.7.29.r3479"),
             new Version("11.7.1.r3426")));
 
         /**
          * Version 11.7.29.3479
          */
-        compatibilityChart.put(new Version("11.7.29.r3479"), Arrays.asList(
+        COMPATIBILITY_CHART.put(new Version("11.7.29.r3479"), Arrays.asList(
             new Version("11.7.29.r3479"), new Version("11.7.1.r3426")));
 
         /**
          * Version 11.7.1.3426
          */
-        compatibilityChart.put(new Version("11.7.1.r3426"),
+        COMPATIBILITY_CHART.put(new Version("11.7.1.r3426"),
             Arrays.asList(new Version("11.7.1.r3426")));
 
         /**
          * Version 11.5.6.r3294
          */
-        compatibilityChart.put(new Version("11.5.6.r3294"), Arrays.asList(
+        COMPATIBILITY_CHART.put(new Version("11.5.6.r3294"), Arrays.asList(
             new Version("11.5.6.r3294"), new Version("11.3.25.r3201")));
 
         /**
          * Version 11.3.25.r3201
          */
-        compatibilityChart.put(new Version("11.3.25.r3201"),
+        COMPATIBILITY_CHART.put(new Version("11.3.25.r3201"),
             Arrays.asList(new Version("11.3.25.r3201")));
 
         /**
          * Version 11.2.25.r3105
          */
-        compatibilityChart.put(new Version("11.2.25.r3105"),
+        COMPATIBILITY_CHART.put(new Version("11.2.25.r3105"),
             Arrays.asList(new Version("11.2.25.r3105")));
 
         /**
          * Version 11.1.28.r2959
          */
-        compatibilityChart.put(new Version("11.1.28.r2959"),
+        COMPATIBILITY_CHART.put(new Version("11.1.28.r2959"),
             Arrays.asList(new Version("11.1.28.r2959")));
 
         /**
          * Version 11.1.7.r2897
          */
-        compatibilityChart.put(new Version("11.1.7.r2897"), Arrays.asList(
+        COMPATIBILITY_CHART.put(new Version("11.1.7.r2897"), Arrays.asList(
             new Version("11.1.7.r2897"), new Version("10.11.26.r2744"),
             new Version("10.10.29.r2640"), new Version("10.10.01.r2552"),
             new Version("10.8.27.r2333"), new Version("10.7.30.r2310")));
@@ -189,7 +187,7 @@ public class VersionManager {
         /**
          * Version 10.11.26.r2744
          */
-        compatibilityChart.put(new Version("10.11.26.r2744"), Arrays.asList(
+        COMPATIBILITY_CHART.put(new Version("10.11.26.r2744"), Arrays.asList(
             new Version("10.11.26.r2744"), new Version("10.10.29.r2640"),
             new Version("10.10.01.r2552"), new Version("10.8.27.r2333"),
             new Version("10.7.30.r2310")));
@@ -197,21 +195,21 @@ public class VersionManager {
         /**
          * Version 10.10.29.r2640
          */
-        compatibilityChart.put(new Version("10.10.29.r2640"), Arrays.asList(
+        COMPATIBILITY_CHART.put(new Version("10.10.29.r2640"), Arrays.asList(
             new Version("10.10.29.r2640"), new Version("10.10.01.r2552"),
             new Version("10.8.27.r2333"), new Version("10.7.30.r2310")));
 
         /**
          * Version 10.10.01.r2552
          */
-        compatibilityChart.put(new Version("10.10.01.r2552"), Arrays.asList(
+        COMPATIBILITY_CHART.put(new Version("10.10.01.r2552"), Arrays.asList(
             new Version("10.10.01.r2552"), new Version("10.8.27.r2333"),
             new Version("10.7.30.r2310")));
 
         /**
          * Version 10.8.27.r2333
          */
-        compatibilityChart.put(new Version("10.8.27.r2333"), Arrays.asList(
+        COMPATIBILITY_CHART.put(new Version("10.8.27.r2333"), Arrays.asList(
             new Version("10.8.27.r2333"), new Version("10.7.30.r2310")));
 
         /**
@@ -220,7 +218,7 @@ public class VersionManager {
          * CommunicationPreferences are now sent and received as part of the
          * InvitationInfo.
          */
-        compatibilityChart.put(new Version("10.7.30.r2310"),
+        COMPATIBILITY_CHART.put(new Version("10.7.30.r2310"),
             Arrays.asList(new Version("10.7.30.r2310")));
 
         /**
@@ -229,7 +227,7 @@ public class VersionManager {
          * We are no longer backwards-compatible because of the changes in the
          * net refactoring. 10.6.25 isn't compatible to 10.6.11.r2223
          */
-        compatibilityChart.put(new Version("10.6.25.r2236"),
+        COMPATIBILITY_CHART.put(new Version("10.6.25.r2236"),
             Arrays.asList(new Version("10.6.25.r2236")));
 
         /**
@@ -238,54 +236,54 @@ public class VersionManager {
          * We are no longer backwards-compatible because of the changes in the
          * net refactoring.
          */
-        compatibilityChart.put(new Version("10.6.11.r2223"),
+        COMPATIBILITY_CHART.put(new Version("10.6.11.r2223"),
             Arrays.asList(new Version("10.6.11.r2223")));
 
         /**
          * Version 10.5.28.r2173
          */
-        compatibilityChart.put(new Version("10.5.28.r2173"), Arrays.asList(
+        COMPATIBILITY_CHART.put(new Version("10.5.28.r2173"), Arrays.asList(
             new Version("10.5.28.r2173"), new Version("10.4.14.r2128")));
 
         /**
          * Version 10.4.14.r2128
          */
-        compatibilityChart.put(new Version("10.4.14.r2128"),
+        COMPATIBILITY_CHART.put(new Version("10.4.14.r2128"),
             Arrays.asList(new Version("10.4.14.r2128")));
 
         /**
          * Version 10.3.26.r2105
          */
-        compatibilityChart.put(new Version("10.3.26.r2105"),
+        COMPATIBILITY_CHART.put(new Version("10.3.26.r2105"),
             Arrays.asList(new Version("10.3.26.r2105")));
         /**
          * Version 10.2.26.r2037
          */
-        compatibilityChart.put(new Version("10.2.26.r2037"),
+        COMPATIBILITY_CHART.put(new Version("10.2.26.r2037"),
             Arrays.asList(new Version("10.2.26.r2037")));
 
         /**
          * Version 10.1.29.r1970
          */
-        compatibilityChart.put(new Version("10.1.29.r1970"),
+        COMPATIBILITY_CHART.put(new Version("10.1.29.r1970"),
             Arrays.asList(new Version("10.1.29.r1970")));
 
         /**
          * Version 9.12.04.r1862
          */
-        compatibilityChart.put(new Version("9.12.4.r1878"),
+        COMPATIBILITY_CHART.put(new Version("9.12.4.r1878"),
             Arrays.asList(new Version("9.12.4.r1878")));
 
         /**
          * Version 9.10.30.r1833
          */
-        compatibilityChart.put(new Version("9.10.30.r1833"),
+        COMPATIBILITY_CHART.put(new Version("9.10.30.r1833"),
             Arrays.asList(new Version("9.10.30.r1833")));
 
         /**
          * Version 9.10.30.DEVEL
          */
-        compatibilityChart.put(new Version("9.10.30.DEVEL"),
+        COMPATIBILITY_CHART.put(new Version("9.10.30.DEVEL"),
             Arrays.asList(new Version("9.10.30.DEVEL")));
 
         /**
@@ -294,20 +292,20 @@ public class VersionManager {
          * We are not backward compatible because of changes in the invitation
          * process.
          */
-        compatibilityChart.put(new Version("9.10.2.r1803"),
+        COMPATIBILITY_CHART.put(new Version("9.10.2.r1803"),
             Arrays.asList(new Version("9.10.2.r1803")));
 
         /**
          * Version 9.10.2.DEVEL
          */
-        compatibilityChart.put(new Version("9.10.2.DEVEL"), Arrays.asList(
+        COMPATIBILITY_CHART.put(new Version("9.10.2.DEVEL"), Arrays.asList(
             new Version("9.10.2.DEVEL"), new Version("9.9.11.r1706"),
             new Version("9.9.11.DEVEL")));
 
         /**
          * Version 9.9.11.r1706
          */
-        compatibilityChart.put(new Version("9.9.11.r1706"), Arrays.asList(
+        COMPATIBILITY_CHART.put(new Version("9.9.11.r1706"), Arrays.asList(
             new Version("9.9.11.r1706"), new Version("9.9.11.DEVEL")));
 
         /**
@@ -316,13 +314,13 @@ public class VersionManager {
          * No longer compatible with 9.8.21 since r.1665 changed compression of
          * Activities
          */
-        compatibilityChart.put(new Version("9.9.11.DEVEL"),
+        COMPATIBILITY_CHART.put(new Version("9.9.11.DEVEL"),
             Arrays.asList(new Version("9.9.11.DEVEL")));
 
         /**
          * Version 9.8.21.r1660
          */
-        compatibilityChart.put(new Version("9.8.21.r1660"), Arrays.asList(
+        COMPATIBILITY_CHART.put(new Version("9.8.21.r1660"), Arrays.asList(
             new Version("9.8.21.r1660"), new Version("9.8.21.DEVEL")));
 
         /**
@@ -331,19 +329,19 @@ public class VersionManager {
          * No longer compatible with 9.7.31 since r.1576 changed serialization
          * of Activities
          */
-        compatibilityChart.put(new Version("9.8.21.DEVEL"),
+        COMPATIBILITY_CHART.put(new Version("9.8.21.DEVEL"),
             Arrays.asList(new Version("9.8.21.DEVEL")));
     }
 
     protected Bundle bundle;
     protected Saros saros;
-    protected XMPPTransmitter transmitter;
+    protected ITransmitter transmitter;
 
     protected XStreamExtensionProvider<VersionInfo> versionProvider = new XStreamExtensionProvider<VersionInfo>(
         "sarosVersion", VersionInfo.class, Version.class, Compatibility.class);
 
     public VersionManager(final Saros saros, final XMPPReceiver receiver,
-        XMPPTransmitter transmitter) {
+        ITransmitter transmitter) {
 
         this.bundle = saros.getBundle();
         this.saros = saros;
@@ -412,64 +410,23 @@ public class VersionManager {
     public Compatibility determineCompatibility(Version localVersion,
         Version remoteVersion) {
 
-        Class<Version> versionClass = Version.class;
-        Method compareToMethod = null;
+        Compatibility compatibility = Compatibility.valueOf(compare(
+            localVersion, remoteVersion));
 
-        try {
-            // Works on Eclipse 3.7
-            compareToMethod = versionClass
-                .getMethod("compareTo", Version.class);
-        } catch (NoSuchMethodException e1) {
-            log.debug("We're on Eclipse 3.6 or earlier. Falling back to Version.compareTo().");
-            try {
-                // Works on Eclipse 3.6 and earlier
-                compareToMethod = versionClass.getMethod("compareTo",
-                    Object.class);
-            } catch (NoSuchMethodException e2) {
-                log.error("Unexpected error: cannot find a compareTo method in Version class."
-                    + e2);
+        // remote version is lower than our version
+        if (compatibility == Compatibility.TOO_NEW) {
+            List<Version> compatibleVersions = COMPATIBILITY_CHART
+                .get(localVersion);
+            if (compatibleVersions != null
+                && compatibleVersions.contains(remoteVersion)) {
+                compatibility = Compatibility.OK;
+            } else {
+                log.error("VersionManager does not know about current version."
+                    + " The release manager must have slept: " + localVersion);
             }
         }
 
-        // Comparison result. If defaults to 1, the compatibility chart will be
-        // consulted later.
-        int comparison = 1;
-        try {
-            comparison = (Integer) compareToMethod.invoke(localVersion,
-                remoteVersion);
-        } catch (InvocationTargetException e) {
-            log.error("Couldn't execute Version.compareTo(): " + e);
-        } catch (IllegalAccessException e) {
-            log.error("IllegalAccessException trying to invoke Version.compareTo(): "
-                + e);
-        } catch (NullPointerException e) {
-            log.error("Couldn't find Version.compareTo() using reflection: "
-                + e);
-        }
-
-        // If localVersion is older than remote version, then we cannot know
-        // whether we are compatible
-        if (comparison < 0)
-            return Compatibility.TOO_OLD;
-
-        // We are always compatible with ourselves
-        if (comparison == 0)
-            return Compatibility.OK;
-
-        List<Version> compatibleVersions = compatibilityChart.get(localVersion);
-        if (compatibleVersions == null) {
-            log.error("VersionManager does not know about current version."
-                + " The release manager must have slept: " + localVersion);
-
-            // Fall back to comparing versions directly
-            return Compatibility.valueOf(comparison);
-        }
-
-        if (compatibleVersions.contains(remoteVersion))
-            // The compatibilityChart tells us that we are compatible
-            return Compatibility.OK;
-        else
-            return Compatibility.TOO_NEW;
+        return compatibility;
     }
 
     /**
@@ -537,7 +494,6 @@ public class VersionManager {
      * Given the bundle version string of a remote Saros instance, will return
      * whether the local version is compatible with the given instance.
      * 
-     * @blocking This is a long running operation
      */
     public Compatibility determineCompatibility(String remoteVersionString) {
 
@@ -559,4 +515,33 @@ public class VersionManager {
         return version;
     }
 
+    /*
+     * implements
+     * http://www.osgi.org/javadoc/r4v43/org/osgi/framework/Version.html
+     * #compareTo%28org.osgi.framework.Version%29 because interface signature
+     * changed between Eclipse 3.6 and 3.7
+     */
+    private int compare(Version a, Version b) {
+        int compareTo;
+
+        compareTo = Integer.valueOf(a.getMajor()).compareTo(
+            Integer.valueOf(b.getMajor()));
+
+        if (compareTo != 0)
+            return compareTo;
+
+        compareTo = Integer.valueOf(a.getMinor()).compareTo(
+            Integer.valueOf(b.getMinor()));
+
+        if (compareTo != 0)
+            return compareTo;
+
+        compareTo = Integer.valueOf(a.getMicro()).compareTo(
+            Integer.valueOf(b.getMicro()));
+
+        if (compareTo != 0)
+            return compareTo;
+
+        return a.getQualifier().compareTo(b.getQualifier());
+    }
 }
