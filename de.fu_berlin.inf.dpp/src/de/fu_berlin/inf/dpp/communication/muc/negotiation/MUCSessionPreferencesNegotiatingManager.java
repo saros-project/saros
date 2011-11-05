@@ -11,7 +11,7 @@ import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
 
 /**
- * The CommunicationNegotiatingManager is responsible to transmit the
+ * The CommunicationNegotiatingManager is responsible for transmitting the
  * Communication config of the host to all other participants of the shared
  * project during the Invitation process
  * 

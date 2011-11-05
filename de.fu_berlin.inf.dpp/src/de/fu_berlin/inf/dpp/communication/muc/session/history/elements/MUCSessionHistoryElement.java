@@ -6,7 +6,7 @@ import de.fu_berlin.inf.dpp.communication.muc.session.history.MUCSessionHistory;
 import de.fu_berlin.inf.dpp.net.JID;
 
 /**
- * This class describes an entry a {@link MUCSessionHistory}
+ * This class describes an entry in a {@link MUCSessionHistory}
  */
 public abstract class MUCSessionHistoryElement {
     protected JID jid;

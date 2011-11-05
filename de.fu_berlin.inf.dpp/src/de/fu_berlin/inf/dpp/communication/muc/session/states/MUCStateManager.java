@@ -21,10 +21,10 @@ import org.jivesoftware.smackx.packet.ChatStateExtension;
 import de.fu_berlin.inf.dpp.net.JID;
 
 /**
- * Handles the one's own {@link ChatState} of a particular {@link MultiUserChat}
- * and the propagation of incoming {@link ChatState} changes. . This class
- * manages both the packet extensions and the response necessary for compliance
- * with XEP-0085.
+ * Handles the {@link ChatState} of a particular {@link MultiUserChat} and the
+ * propagation of incoming {@link ChatState} changes. This class manages both
+ * the packet extensions and the response necessary for compliance with
+ * XEP-0085.
  * 
  * @author mariaspg
  * @author bkahlert

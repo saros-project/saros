@@ -28,7 +28,7 @@ import de.fu_berlin.inf.dpp.net.internal.StreamSession.StreamSessionOutputStream
 /**
  * Service defining stream-based sessions. Subclass it and add it to our
  * picoContainer (in {@link Saros#Saros()}) to work with it. A
- * {@link StreamService} is identified by it's name, which must be unique among
+ * {@link StreamService} is identified by its name, which must be unique among
  * other defined {@link StreamService}s.
  * 
  * <dl>

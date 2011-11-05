@@ -13,7 +13,7 @@ import de.fu_berlin.inf.dpp.ui.util.DialogUtils;
 import de.fu_berlin.inf.dpp.util.Utils;
 
 /**
- * Implemented {#link StreamService} for VoIP function
+ * Implemented {@link StreamService} for VoIP function
  * 
  * @author ologa
  */
