@@ -1,5 +1,6 @@
 package de.fu_berlin.inf.dpp.whiteboard.gef.commands;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
@@ -32,13 +33,20 @@ public class ConflictingCommandsTest {
 		cmd.setParent(document.getRoot());
 		cmd.setPointList(pointList);
 		cmd.execute();
-
-		assertTrue(document.getRoot().getVisibleChildElements().size() == 1);
+		int numberOfVisibleChildren = document.getRoot()
+				.getVisibleChildElements().size();
+		// There should be only one element, the Polyline
+		assertEquals(
+				"There should be only one element, the Polyline, but the document has "
+						+ numberOfVisibleChildren + " children.",
+				numberOfVisibleChildren, 1);
 
 		LayoutElementRecord polyLine = (LayoutElementRecord) document.getRoot()
 				.getVisibleChildElements().get(0);
 
-		assertTrue(polyLine.getVisibleAttributes().size() == 1);
+		assertEquals(
+				"The Polyline should have exactly 1 attribute for each color and points.",
+				2, polyLine.getVisibleAttributes().size());
 
 		origPointsAttribute = polyLine
 				.getAttributeValue(SVGConstants.SVG_POINTS_ATTRIBUTE);
