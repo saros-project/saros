@@ -14,6 +14,7 @@ import java.util.Collections;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.apache.log4j.PropertyConfigurator;
 import org.picocontainer.MutablePicoContainer;
 
 import de.fu_berlin.inf.dpp.Saros;
@@ -78,17 +79,12 @@ public class STFController {
     private static final transient Logger log = Logger
         .getLogger(STFController.class);
 
-    /** The RMI registry used, is not exported */
-    private static transient Registry registry;
+    private static Registry registry;
 
-    /*
-     * sometimes when connecting to a server i'm getting error:
-     * java.rmi.NoSuchObjectException:no Such object in table. This happens when
-     * the remote object the stub refers to has been DGC'd and GC's locally. My
-     * solution is keeping a static references "classVariable" to the object in
-     * the object in the server JVM.
-     */
     public static void start(int port, Saros saros) throws RemoteException {
+
+        PropertyConfigurator.configure(STFController.class.getClassLoader()
+            .getResource("saros_testmode.log4j.properties"));
 
         List<String> propertyKeys = Arrays.asList(System.getProperties()
             .keySet().toArray(new String[0]));

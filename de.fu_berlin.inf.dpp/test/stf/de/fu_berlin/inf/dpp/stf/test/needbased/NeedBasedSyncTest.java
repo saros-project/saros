@@ -415,7 +415,7 @@ public class NeedBasedSyncTest extends StfTestCase {
     @Test
     public void testNeedBasedSyncDuringSynchronization() throws Exception {
 
-        String[] filesToShare = new String[11];
+        String[] filesToShare = new String[101];
 
         filesToShare[0] = "file1";
 
@@ -423,9 +423,9 @@ public class NeedBasedSyncTest extends StfTestCase {
         ALICE.superBot().internal().createFile("foo", "file2", "bla123");
         ALICE.superBot().internal().createFile("foo", "file3", "bla345bla");
 
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < 100; i++) {
             ALICE.superBot().internal()
-                .createFile("foo", "fileX" + i, 512 * 512, false);
+                .createFile("foo", "fileX" + i, 1024 * 512, false);
             filesToShare[i + 1] = "fileX" + i;
         }
 
@@ -438,6 +438,10 @@ public class NeedBasedSyncTest extends StfTestCase {
             .waitUntilFolderExists("foo");
 
         List<String> shellNamesAlice = ALICE.remoteBot().getOpenShellNames();
+
+        // if the test fails here, either your PC is to fast
+        // or sometime a shell pops up for just a short period
+        // cannot find the source of this bug
         for (String string : shellNamesAlice) {
             if (string.startsWith("Sharing project")) {
                 IRemoteBotShell shellAlice = ALICE.remoteBot().shell(string);

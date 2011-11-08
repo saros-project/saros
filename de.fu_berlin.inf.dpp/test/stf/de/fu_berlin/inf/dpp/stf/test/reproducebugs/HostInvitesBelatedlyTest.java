@@ -2,7 +2,6 @@ package de.fu_berlin.inf.dpp.stf.test.reproducebugs;
 
 import static de.fu_berlin.inf.dpp.stf.client.tester.SarosTester.ALICE;
 import static de.fu_berlin.inf.dpp.stf.client.tester.SarosTester.BOB;
-import static de.fu_berlin.inf.dpp.stf.client.tester.SarosTester.CARL;
 import static org.junit.Assert.assertEquals;
 
 import java.io.IOException;
@@ -18,20 +17,9 @@ import de.fu_berlin.inf.dpp.stf.test.Constants;
 
 public class HostInvitesBelatedlyTest extends StfTestCase {
 
-    /**
-     * Preconditions:
-     * <ol>
-     * <li>Alice (Host, Write Access)</li>
-     * <li>Bob (Read-Only Access)</li>
-     * <li>Carl (Read-Only Access)</li>
-     * <li>All read-only users enable follow mode</li>
-     * </ol>
-     * 
-     */
-
     @BeforeClass
     public static void selectTesters() throws Exception {
-        select(ALICE, BOB, CARL);
+        select(ALICE, BOB);
     }
 
     /**
@@ -63,8 +51,8 @@ public class HostInvitesBelatedlyTest extends StfTestCase {
      * @throws InterruptedException
      */
     @Test
-    public void testFollowModeByOpenClassbyAlice() throws Exception,
-        CoreException, InterruptedException {
+    public void testSynchronizeWithOpenDirtyEditorsAtInviteesSide()
+        throws Exception {
         ALICE
             .superBot()
             .views()
@@ -73,6 +61,7 @@ public class HostInvitesBelatedlyTest extends StfTestCase {
             .newC()
             .javaProjectWithClasses(Constants.PROJECT1, Constants.PKG1,
                 Constants.CLS1, Constants.CLS2);
+
         BOB.superBot()
             .views()
             .packageExplorerView()
@@ -81,19 +70,12 @@ public class HostInvitesBelatedlyTest extends StfTestCase {
             .javaProjectWithClasses(Constants.PROJECT1, Constants.PKG1,
                 Constants.CLS1, Constants.CLS2);
 
-        /*
-         * ALICE build session only with CARL and is followed by CARL.
-         */
-        Util.buildSessionConcurrently(Constants.PROJECT1,
-            TypeOfCreateProject.NEW_PROJECT, ALICE, CARL);
-        Util.activateFollowMode(ALICE, CARL);
-
         ALICE.superBot().views().packageExplorerView()
             .selectClass(Constants.PROJECT1, Constants.PKG1, Constants.CLS1)
             .open();
-        ALICE.remoteBot().editor(Constants.CLS1_SUFFIX).setText(Constants.CP1);
-        String dirtyContent1ByAlice = ALICE.remoteBot()
-            .editor(Constants.CLS1_SUFFIX).getText();
+
+        ALICE.remoteBot().editor(Constants.CLS1_SUFFIX)
+            .setTextFromFile(Constants.CP1);
 
         BOB.superBot().views().packageExplorerView()
             .selectClass(Constants.PROJECT1, Constants.PKG1, Constants.CLS1)
@@ -106,34 +88,30 @@ public class HostInvitesBelatedlyTest extends StfTestCase {
             .selectClass(Constants.PROJECT1, Constants.PKG1, Constants.CLS2)
             .open();
 
-        ALICE.remoteBot().editor(Constants.CLS2_SUFFIX).setText(Constants.CP2);
-        String dirtyContent2ByAlice = ALICE.remoteBot()
-            .editor(Constants.CLS2_SUFFIX).getText();
+        ALICE.remoteBot().editor(Constants.CLS2_SUFFIX)
+            .setTextFromFile(Constants.CP2);
 
         BOB.superBot().views().packageExplorerView()
             .selectClass(Constants.PROJECT1, Constants.PKG1, Constants.CLS2)
             .open();
 
         BOB.remoteBot().editor(Constants.CLS2_SUFFIX)
-            .setText(Constants.CP2_CHANGE);
-        // BOB.editor.closeJavaEditorWithSave(CLS1);
-        // BOB.editor.closeJavaEditorWithSave(CLS2);
+            .setTextFromFile(Constants.CP2_CHANGE);
 
-        Util.inviteBuddies(Constants.PROJECT1,
-            TypeOfCreateProject.EXIST_PROJECT, ALICE, BOB);
+        Util.buildSessionConcurrently(Constants.PROJECT1,
+            TypeOfCreateProject.NEW_PROJECT, ALICE, BOB);
 
-        BOB.remoteBot().editor(Constants.CLS1_SUFFIX)
-            .waitUntilIsTextSame(dirtyContent1ByAlice);
-        BOB.remoteBot().editor(Constants.CLS2_SUFFIX)
-            .waitUntilIsTextSame(dirtyContent2ByAlice);
+        ALICE.remoteBot().sleep(5000);
 
         String CLSContentOfAlice = ALICE.remoteBot()
             .editor(Constants.CLS1_SUFFIX).getText();
+
         String CLS2ContentOfAlice = ALICE.remoteBot()
             .editor(Constants.CLS2_SUFFIX).getText();
 
         String CLSContentOfBob = BOB.remoteBot().editor(Constants.CLS1_SUFFIX)
             .getText();
+
         String CLS2ContentOfBob = BOB.remoteBot().editor(Constants.CLS2_SUFFIX)
             .getText();
 

@@ -102,6 +102,11 @@ public class AllParticipantsFollowUserWithWriteAccessTest extends StfTestCase {
      */
     @Test
     public void testFollowModeByEditingClassByAlice() throws Exception {
+
+        ALICE.superBot().views().packageExplorerView()
+            .selectClass(Constants.PROJECT1, Constants.PKG1, Constants.CLS1)
+            .open();
+
         ALICE.remoteBot().editor(Constants.CLS1_SUFFIX)
             .typeText("foo la la la");
 

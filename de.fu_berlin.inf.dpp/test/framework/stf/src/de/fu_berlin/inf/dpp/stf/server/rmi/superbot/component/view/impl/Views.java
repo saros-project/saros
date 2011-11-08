@@ -62,9 +62,11 @@ public final class Views extends StfRemoteObject implements IViews {
 
     public IProgressView progressView() throws RemoteException {
         RemoteWorkbenchBot.getInstance().openViewById(VIEW_PROGRESS_ID);
-        RemoteWorkbenchBot.getInstance().view(VIEW_PROGRESS).show();
+
+        SWTWorkbenchBot bot = new SWTWorkbenchBot();
+        bot.viewByTitle(VIEW_PROGRESS).show();
         return ProgressView.getInstance().setView(
-            RemoteWorkbenchBot.getInstance().view(VIEW_PROGRESS));
+            bot.viewByTitle(VIEW_PROGRESS));
     }
 
 }
