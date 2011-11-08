@@ -36,7 +36,6 @@ public class Share2UsersSequentiallyTest extends StfTestCase {
      * session.</li>
      * </ol>
      * 
-     * @throws InterruptedException
      */
     @Test
     public void testAliceShareProjectWithBobSequentially() throws Exception {

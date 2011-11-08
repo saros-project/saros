@@ -100,13 +100,16 @@ public class ShareProjectUsingExistingProjectTest extends StfTestCase {
 
         assertTrue(BOB.superBot().views().packageExplorerView().tree()
             .existsWithRegex(Pattern.quote(Constants.PROJECT1) + ".*"));
+
         assertTrue(BOB.superBot().views().packageExplorerView()
             .selectPkg(Constants.PROJECT1, Constants.PKG1)
             .existsWithRegex(Pattern.quote(Constants.CLS2) + ".*"));
+
         assertTrue(BOB.superBot().views().packageExplorerView().tree()
-            .existsWithRegex(Pattern.quote(Constants.PROJECT1_NEXT) + ".*"));
+            .existsWithRegex(Pattern.quote(Constants.PROJECT1_COPY) + ".*"));
+
         assertTrue(BOB.superBot().views().packageExplorerView()
-            .selectPkg(Constants.PROJECT1_NEXT, Constants.PKG1)
+            .selectPkg(Constants.PROJECT1_COPY, Constants.PKG1)
             .existsWithRegex(Pattern.quote(Constants.CLS1) + ".*"));
 
     }

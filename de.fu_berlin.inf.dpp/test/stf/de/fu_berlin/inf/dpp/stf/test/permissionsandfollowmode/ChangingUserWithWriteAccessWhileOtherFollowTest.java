@@ -79,8 +79,10 @@ public class ChangingUserWithWriteAccessWhileOtherFollowTest extends
         ALICE.superBot().views().packageExplorerView()
             .selectClass(Constants.PROJECT1, Constants.PKG1, Constants.CLS1)
             .open();
+
         ALICE.remoteBot().editor(Constants.CLS1_SUFFIX)
             .setTextFromFile(Constants.CP1);
+
         String dirtyClsContentOfAlice = ALICE.remoteBot()
             .editor(Constants.CLS1_SUFFIX).getText();
 

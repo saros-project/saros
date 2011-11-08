@@ -8,8 +8,7 @@ import de.fu_berlin.inf.dpp.stf.test.invitation.permutation.EditDuringInvitation
 @RunWith(Suite.class)
 @Suite.SuiteClasses({ EditDuringInvitationTest.class,
     HostInvitesBelatedlyTest.class,
-    ParallelInvitationWithTerminationByHostTest.class,
-    StrictSequentialInvitationWithoutTerminationTest.class })
+    ParallelInvitationWithTerminationByHostTest.class, })
 public class TestSuite {
     // the class remains completely empty,
     // being used only as a holder for the above annotations

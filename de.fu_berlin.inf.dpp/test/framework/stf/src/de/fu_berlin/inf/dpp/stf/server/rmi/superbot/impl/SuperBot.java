@@ -79,7 +79,7 @@ public final class SuperBot extends StfRemoteObject implements ISuperBot {
         shell.bot().textWithLabel("Project name", 1).setText(projectName);
         shell.bot().button(FINISH).click();
 
-        bot.sleep(500);
+        bot.sleep(2000);
 
         for (SWTBotShell currentShell : bot.shells()) {
             if (currentShell.getText().equals(
@@ -87,6 +87,8 @@ public final class SuperBot extends StfRemoteObject implements ISuperBot {
                 || currentShell.getText().equals(SHELL_SAVE_RESOURCE)) {
                 currentShell.activate();
                 currentShell.bot().button(YES).click();
+                currentShell.bot().waitUntil(
+                    Conditions.shellCloses(currentShell));
             }
         }
 
@@ -106,8 +108,19 @@ public final class SuperBot extends StfRemoteObject implements ISuperBot {
         shell.bot().radio("Use existing project").click();
         shell.bot().textWithLabel("Project name", 1).setText(projectName);
         shell.bot().button(FINISH).click();
-        shell.activate();
-        shell.bot().button(NO).click();
+
+        bot.sleep(2000);
+
+        for (SWTBotShell currentShell : bot.shells()) {
+            if (currentShell.getText().equals(
+                SHELL_WARNING_LOCAL_CHANGES_DELETED)
+                || currentShell.getText().equals(SHELL_SAVE_RESOURCE)) {
+                currentShell.activate();
+                currentShell.bot().button(NO).click();
+                currentShell.bot().waitUntil(
+                    Conditions.shellCloses(currentShell));
+            }
+        }
 
         confirmShellAddProjectUsingExistProjectWithCopy(projectName);
     }

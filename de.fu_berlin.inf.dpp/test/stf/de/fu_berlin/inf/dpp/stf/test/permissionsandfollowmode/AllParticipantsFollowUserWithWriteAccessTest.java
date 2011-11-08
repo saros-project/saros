@@ -34,16 +34,17 @@ public class AllParticipantsFollowUserWithWriteAccessTest extends StfTestCase {
      */
 
     @BeforeClass
-    public static void initializeSaros() throws Exception {
-        initTesters(ALICE, BOB, CARL, DAVE);
-        setUpWorkbench();
-        setUpSaros();
+    public static void selectTester() throws Exception {
+        select(ALICE, BOB, CARL, DAVE);
+
         Util.setUpSessionWithJavaProjectAndClass(Constants.PROJECT1,
             Constants.PKG1, Constants.CLS1, ALICE, BOB, CARL, DAVE);
     }
 
     @Before
     public void runBeforeEveryTest() throws Exception {
+        closeAllShells();
+        closeAllEditors();
         Util.activateFollowMode(ALICE, BOB, CARL, DAVE);
     }
 
@@ -63,11 +64,8 @@ public class AllParticipantsFollowUserWithWriteAccessTest extends StfTestCase {
      */
     @Test
     public void followingUserOpenClassWhenFollowedUserOpenClass()
-        throws RemoteException, InterruptedException {
-        ALICE.remoteBot().editor(Constants.CLS1_SUFFIX).closeWithSave();
-        BOB.remoteBot().waitUntilEditorClosed(Constants.CLS1_SUFFIX);
-        CARL.remoteBot().waitUntilEditorClosed(Constants.CLS1_SUFFIX);
-        DAVE.remoteBot().waitUntilEditorClosed(Constants.CLS1_SUFFIX);
+        throws Exception {
+        assertFalse(ALICE.remoteBot().isEditorOpen(Constants.CLS1_SUFFIX));
         assertFalse(BOB.remoteBot().isEditorOpen(Constants.CLS1_SUFFIX));
         assertFalse(CARL.remoteBot().isEditorOpen(Constants.CLS1_SUFFIX));
         assertFalse(DAVE.remoteBot().isEditorOpen(Constants.CLS1_SUFFIX));
@@ -75,15 +73,15 @@ public class AllParticipantsFollowUserWithWriteAccessTest extends StfTestCase {
         ALICE.superBot().views().packageExplorerView()
             .selectClass(Constants.PROJECT1, Constants.PKG1, Constants.CLS1)
             .open();
-        // setFollowMode(ALICE, BOB, CARL, DAVE);
 
         BOB.remoteBot().waitUntilEditorOpen(Constants.CLS1_SUFFIX);
         CARL.remoteBot().waitUntilEditorOpen(Constants.CLS1_SUFFIX);
         DAVE.remoteBot().waitUntilEditorOpen(Constants.CLS1_SUFFIX);
 
-        assertTrue(BOB.remoteBot().isEditorOpen(Constants.CLS1_SUFFIX));
-        assertTrue(CARL.remoteBot().isEditorOpen(Constants.CLS1_SUFFIX));
-        assertTrue(DAVE.remoteBot().isEditorOpen(Constants.CLS1_SUFFIX));
+        ALICE.remoteBot().editor(Constants.CLS1_SUFFIX).closeWithSave();
+        BOB.remoteBot().waitUntilEditorClosed(Constants.CLS1_SUFFIX);
+        CARL.remoteBot().waitUntilEditorClosed(Constants.CLS1_SUFFIX);
+        DAVE.remoteBot().waitUntilEditorClosed(Constants.CLS1_SUFFIX);
 
     }
 
@@ -103,9 +101,10 @@ public class AllParticipantsFollowUserWithWriteAccessTest extends StfTestCase {
      * @throws RemoteException
      */
     @Test
-    public void testFollowModeByEditingClassByAlice() throws RemoteException {
+    public void testFollowModeByEditingClassByAlice() throws Exception {
         ALICE.remoteBot().editor(Constants.CLS1_SUFFIX)
-            .setTextFromFile(Constants.CP1);
+            .typeText("foo la la la");
+
         String dirtyClsContentOfAlice = ALICE.remoteBot()
             .editor(Constants.CLS1_SUFFIX).getText();
 
@@ -154,20 +153,18 @@ public class AllParticipantsFollowUserWithWriteAccessTest extends StfTestCase {
      * @throws IOException
      */
     @Test
-    public void testFollowModeByClosingEditorByAlice() throws IOException,
-        CoreException {
+    public void testFollowModeByClosingEditorByAlice() throws Exception {
         ALICE.superBot().views().packageExplorerView()
             .selectClass(Constants.PROJECT1, Constants.PKG1, Constants.CLS1)
             .open();
+
         BOB.remoteBot().waitUntilEditorOpen(Constants.CLS1_SUFFIX);
         CARL.remoteBot().waitUntilEditorOpen(Constants.CLS1_SUFFIX);
         DAVE.remoteBot().waitUntilEditorOpen(Constants.CLS1_SUFFIX);
-        assertTrue(BOB.remoteBot().isEditorOpen(Constants.CLS1_SUFFIX));
-        assertTrue(CARL.remoteBot().isEditorOpen(Constants.CLS1_SUFFIX));
-        assertTrue(DAVE.remoteBot().isEditorOpen(Constants.CLS1_SUFFIX));
 
         ALICE.remoteBot().editor(Constants.CLS1_SUFFIX)
             .setTextFromFile(Constants.CP1_CHANGE);
+
         ALICE.remoteBot().editor(Constants.CLS1 + SUFFIX_JAVA).closeWithSave();
 
         String clsContentOfAlice = ALICE
@@ -181,10 +178,6 @@ public class AllParticipantsFollowUserWithWriteAccessTest extends StfTestCase {
         BOB.remoteBot().waitUntilEditorClosed(Constants.CLS1_SUFFIX);
         CARL.remoteBot().waitUntilEditorClosed(Constants.CLS1_SUFFIX);
         DAVE.remoteBot().waitUntilEditorClosed(Constants.CLS1_SUFFIX);
-
-        assertFalse(BOB.remoteBot().isEditorOpen(Constants.CLS1_SUFFIX));
-        assertFalse(CARL.remoteBot().isEditorOpen(Constants.CLS1_SUFFIX));
-        assertFalse(DAVE.remoteBot().isEditorOpen(Constants.CLS1_SUFFIX));
 
         assertTrue(BOB
             .superBot()
