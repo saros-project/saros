@@ -38,6 +38,8 @@ public class CreatingNewFileTest extends StfTestCase {
         BOB.superBot().views().packageExplorerView()
             .waitUntilResourceIsShared("foo");
 
+        CARL.remoteBot().sleep(2000);
+
         CARL.superBot().internal()
             .createFile("foo", "readme.txt", "this is a test case");
 

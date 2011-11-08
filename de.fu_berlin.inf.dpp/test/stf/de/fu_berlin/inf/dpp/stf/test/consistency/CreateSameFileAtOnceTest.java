@@ -34,6 +34,9 @@ public class CreateSameFileAtOnceTest extends StfTestCase {
         CARL.superBot().views().packageExplorerView()
             .waitUntilResourceIsShared("foo");
 
+        BOB.remoteBot().sleep(2000);
+        CARL.remoteBot().sleep(2000);
+
         if ((System.currentTimeMillis() & 1L) != 0L) {
             BOB.superBot().internal()
                 .createFile("foo", "readme.txt", BOB.toString());
