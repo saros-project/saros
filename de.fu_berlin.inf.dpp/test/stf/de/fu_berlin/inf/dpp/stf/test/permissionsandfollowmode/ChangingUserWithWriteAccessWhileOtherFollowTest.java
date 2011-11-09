@@ -86,15 +86,15 @@ public class ChangingUserWithWriteAccessWhileOtherFollowTest extends
         String dirtyClsContentOfAlice = ALICE.remoteBot()
             .editor(Constants.CLS1_SUFFIX).getText();
 
-        CARL.remoteBot().editor(Constants.CLS1_SUFFIX)
-            .waitUntilIsTextSame(dirtyClsContentOfAlice);
-        assertTrue(CARL.remoteBot().editor(Constants.CLS1_SUFFIX).isActive());
-        assertTrue(CARL.remoteBot().editor(Constants.CLS1_SUFFIX).isDirty());
-
         BOB.remoteBot().editor(Constants.CLS1_SUFFIX)
             .waitUntilIsTextSame(dirtyClsContentOfAlice);
         assertTrue(BOB.remoteBot().editor(Constants.CLS1_SUFFIX).isActive());
         assertTrue(BOB.remoteBot().editor(Constants.CLS1_SUFFIX).isDirty());
+
+        CARL.remoteBot().editor(Constants.CLS1_SUFFIX)
+            .waitUntilIsTextSame(dirtyClsContentOfAlice);
+        assertTrue(CARL.remoteBot().editor(Constants.CLS1_SUFFIX).isActive());
+        assertTrue(CARL.remoteBot().editor(Constants.CLS1_SUFFIX).isDirty());
 
         DAVE.remoteBot().editor(Constants.CLS1_SUFFIX)
             .waitUntilIsTextSame(dirtyClsContentOfAlice);
