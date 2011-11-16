@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.jivesoftware.smack.Chat;
@@ -225,6 +226,22 @@ public class MUCSession {
          * Connect to a room
          */
         MultiUserChat muc = new MultiUserChat(connection, preferences.getRoom());
+        boolean joined = false;
+        this.createdRoom = false;
+
+        /*
+         * Try to create and then join the room TODO: Check whether the case
+         * happens that the room was not joined, that is: No room creation is
+         * ever necessary.
+         */
+        try {
+            log.debug("Trying to create room.");
+            muc.create(connection.getUser());
+            this.createdRoom = true;
+            joined = true;
+        } catch (XMPPException e) {
+            log.debug(e);
+        }
 
         /*
          * Join the room
@@ -234,29 +251,16 @@ public class MUCSession {
          * room on the first join. Therefore it would be better to force the
          * user to explicitly call create
          */
-        boolean joined = false;
-        try {
-            muc.join(connection.getUser(), preferences.getPassword());
-            joined = true;
-        } catch (XMPPException e) {
-            log.debug(e);
-        }
-
-        /*
-         * If join was not possible, try to create and then join the room TODO:
-         * Check whether the case happens that the room was not joined, that is:
-         * No room creation is ever necessary.
-         */
-        this.createdRoom = false;
         if (!joined) {
             try {
-                muc.create(connection.getUser());
-                this.createdRoom = true;
                 muc.join(connection.getUser(), preferences.getPassword());
+                joined = true;
             } catch (XMPPException e) {
                 log.debug(e);
             }
         }
+
+        this.muc = muc;
 
         if (this.createdRoom) {
             configureRoom();
@@ -267,17 +271,34 @@ public class MUCSession {
             + preferences.getRoomName() + " Password "
             + preferences.getPassword());
 
-        this.muc = muc;
-
         return createdRoom;
     }
 
     protected void configureRoom() {
         try {
+            log.debug("Configuring room");
             // Get the the room's configuration form
             Form form = muc.getConfigurationForm();
 
-            // Create a new form to submit based on the original form
+            // Insert fields which are missing or have a required value
+            Map<String, Boolean> booleanConfigs = new HashMap<String, Boolean>();
+            booleanConfigs.put("muc#roomconfig_moderatedroom", false);
+            booleanConfigs.put("muc#roomconfig_publicroom", false);
+            booleanConfigs.put("muc#roomconfig_allowinvites", true);
+            booleanConfigs.put("muc#roomconfig_persistentroom", false);
+            booleanConfigs.put("muc#roomconfig_passwordprotectedroom", true);
+
+            FormField formOption;
+            for (String fieldName : booleanConfigs.keySet()) {
+                formOption = new FormField(fieldName);
+                formOption.setType(FormField.TYPE_BOOLEAN);
+                form.addField(formOption);
+            }
+            formOption = new FormField("muc#roomconfig_roomsecret");
+            formOption.setType(FormField.TYPE_TEXT_PRIVATE);
+            form.addField(formOption);
+
+            // Create an answer form
             Form submitForm = form.createAnswerForm();
 
             // Add default answers to the form to submit
@@ -291,17 +312,14 @@ public class MUCSession {
                 }
             }
 
-            // set configuration, see XMPP Specs
-            submitForm.setAnswer("muc#roomconfig_moderatedroom", false);
-            submitForm.setAnswer("muc#roomconfig_publicroom", false);
-            submitForm.setAnswer("muc#roomconfig_passwordprotectedroom", true);
+            // Add our custom fields to the form
+            for (Map.Entry<String, Boolean> field : booleanConfigs.entrySet()) {
+                submitForm.setAnswer(field.getKey(), field.getValue());
+            }
             submitForm.setAnswer("muc#roomconfig_roomsecret",
                 preferences.getPassword());
-            submitForm.setAnswer("muc#roomconfig_allowinvites", true);
-            submitForm.setAnswer("muc#roomconfig_persistentroom", false);
 
-            // Send the completed form (with default values) to the
-            // server to configure the room
+            // Send the completed form to the server to configure the room
             muc.sendConfigurationForm(submitForm);
         } catch (XMPPException e) {
             log.debug(e);
