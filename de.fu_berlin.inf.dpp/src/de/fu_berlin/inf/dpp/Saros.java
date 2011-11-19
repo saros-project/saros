@@ -95,8 +95,6 @@ public class Saros extends AbstractUIPlugin {
      * 
      */
 
-    private static final int REFRESH_SECONDS = 3;
-
     /**
      * The single instance of the Saros plugin.
      */
@@ -312,6 +310,10 @@ public class Saros extends AbstractUIPlugin {
         }
 
         try {
+
+            sarosContext.getComponent(SarosSessionManager.class)
+                .stopSarosSession();
+
             getSarosNet().uninitialize();
             // Remove UPnP port mapping for Saros
             UPnPManager upnpManager = sarosContext
