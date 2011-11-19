@@ -125,6 +125,7 @@ public class EditXMPPAccountWizardPage extends WizardPage {
     }
 
     protected void updatePageCompletion() {
+
         boolean isJIDValid = this.getJID().isValid();
         boolean isPasswordNotEmpty = !this.getPassword().isEmpty();
         boolean accountExists = !getJID().equals(initialJID)
@@ -132,18 +133,21 @@ public class EditXMPPAccountWizardPage extends WizardPage {
 
         if (isJIDValid)
             wasJIDValid = true;
+
         if (isPasswordNotEmpty)
             wasPasswordValid = true;
+
         if (getServer().isEmpty() || isXMPPServerValid) {
             wasXMPPServerValid = true;
         }
 
-        /*
-         * Saros XMPP restriction message
-         */
-        if (showSarosXMPPRestriction) {
+        if (showSarosXMPPRestriction)
             setMessage(Messages.xmpp_saros_restriction_short, WARNING);
-        }
+        else
+            setMessage(null);
+
+        setPageComplete(false);
+        String errorMessage = null;
 
         if (isJIDValid && isPasswordNotEmpty && isXMPPServerValid
             && !accountExists) {
@@ -152,20 +156,29 @@ public class EditXMPPAccountWizardPage extends WizardPage {
              * Saros.connect holds the whole connection code. Few reusable code.
              * 2011/02/19 bkahlert
              */
-            setErrorMessage(null);
             setPageComplete(true);
-        } else {
-            if (!isJIDValid && wasJIDValid) {
-                setErrorMessage(Messages.jid_format_errorMessage);
-            } else if (accountExists) {
-                setErrorMessage(Messages.account_exists_errorMessage);
-            } else if (!isPasswordNotEmpty && wasPasswordValid) {
-                setErrorMessage(Messages.password_empty_errorMessage);
-            } else if (!isXMPPServerValid && wasXMPPServerValid) {
-                setErrorMessage(Messages.server_unresolvable_errorMessage);
-            }
-            setPageComplete(false);
+        } else if (!isJIDValid && wasJIDValid) {
+            errorMessage = Messages.jid_format_errorMessage;
+        } else if (accountExists) {
+            errorMessage = Messages.account_exists_errorMessage;
+        } else if (!isPasswordNotEmpty && wasPasswordValid) {
+            errorMessage = Messages.password_empty_errorMessage;
+        } else if (!isXMPPServerValid && wasXMPPServerValid) {
+            errorMessage = Messages.server_unresolvable_errorMessage;
         }
+
+        updateErrorMessage(errorMessage);
+    }
+
+    private String lastErrorMessage = null;
+
+    private void updateErrorMessage(String message) {
+        if (lastErrorMessage != null && lastErrorMessage.equals(message))
+            return;
+
+        lastErrorMessage = message;
+
+        setErrorMessage(message);
     }
 
     @Override
