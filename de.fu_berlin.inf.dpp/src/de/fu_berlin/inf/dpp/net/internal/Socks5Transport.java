@@ -3,6 +3,8 @@ package de.fu_berlin.inf.dpp.net.internal;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.lang.reflect.Field;
+import java.net.Socket;
 import java.net.SocketTimeoutException;
 import java.util.HashMap;
 import java.util.List;
@@ -68,6 +70,9 @@ public class Socks5Transport extends BytestreamTransport {
     private static final String RESPONSE_SESSION_ID_PREFIX = "response_js5";
     private static final Random randomGenerator = new Random();
     private static final int NUMBER_OF_RESPONSE_THREADS = 10;
+
+    private boolean socketOptionNoDelay = Boolean.valueOf(System.getProperty(
+        "de.fu_berlin.inf.dpp.net.socks5.TCP_NODELAY", "true"));
 
     protected HashMap<String, Exchanger<Socks5BytestreamSession>> runningConnects = new HashMap<String, Exchanger<Socks5BytestreamSession>>();
     protected ExecutorService executorService;
@@ -374,6 +379,7 @@ public class Socks5Transport extends BytestreamTransport {
 
             if (inSession.isDirect()) {
                 waitToCloseResponse(responseFuture);
+                configureSocks5Socket(inSession);
                 return new BinaryChannel(inSession,
                     NetTransferMode.SOCKS5_DIRECT);
             } else {
@@ -396,6 +402,7 @@ public class Socks5Transport extends BytestreamTransport {
                 log.debug(prefix()
                     + "newly established session is direct! Discarding the other.");
                 Utils.closeQuietly(inSession);
+                configureSocks5Socket(outSession);
                 return new BinaryChannel(outSession,
                     NetTransferMode.SOCKS5_DIRECT);
             }
@@ -464,9 +471,11 @@ public class Socks5Transport extends BytestreamTransport {
                 outSession = (Socks5BytestreamSession) manager
                     .establishSession(peer);
 
-                if (outSession.isDirect())
+                if (outSession.isDirect()) {
+                    configureSocks5Socket(outSession);
                     return new BinaryChannel(outSession,
                         NetTransferMode.SOCKS5_DIRECT);
+                }
 
                 log.debug(prefix()
                     + "session is mediated. Waiting for peer to connect ...");
@@ -509,6 +518,7 @@ public class Socks5Transport extends BytestreamTransport {
                     log.debug(prefix()
                         + "response connection is direct! Discarding the other.");
                     Utils.closeQuietly(outSession);
+                    configureSocks5Socket(inSession);
                     return new BinaryChannel(inSession,
                         NetTransferMode.SOCKS5_DIRECT);
                 }
@@ -642,4 +652,24 @@ public class Socks5Transport extends BytestreamTransport {
 
     }
 
+    private void configureSocks5Socket(Socks5BytestreamSession session) {
+
+        Field socket = null;
+
+        try {
+            socket = Socks5BytestreamSession.class.getDeclaredField("socket");
+            socket.setAccessible(true);
+        } catch (Exception e) {
+            log.warn("Smack API has changed, cannot access socket options", e);
+            return;
+        }
+
+        try {
+            ((Socket) socket.get(session)).setTcpNoDelay(socketOptionNoDelay);
+            log.debug("nagle algorithm for socket disabled: "
+                + socketOptionNoDelay);
+        } catch (Exception e) {
+            log.warn("could not modifiy socket options", e);
+        }
+    }
 }
