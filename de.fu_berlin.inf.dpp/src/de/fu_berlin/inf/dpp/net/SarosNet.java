@@ -279,9 +279,10 @@ public class SarosNet {
         loginUsername = username;
         loginPassword = password;
 
+        this.connection = new XMPPConnection(connectionConfiguration);
+
         try {
             this.setConnectionState(ConnectionState.CONNECTING, null);
-            this.connection = new XMPPConnection(connectionConfiguration);
             this.connection.connect();
 
             // add connection listener so we get notified if it will be closed
