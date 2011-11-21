@@ -176,6 +176,7 @@ public class Messages extends NLS {
     public static String EnterProjectNamePage_title2;
     public static String EnterProjectNamePage_unknown_transport_method;
     public static String EnterProjectNamePage_use_existing_project;
+
     public static String EnterXMPPAccountWizardPage_create_new_account;
     public static String EnterXMPPAccountWizardPage_description;
     public static String EnterXMPPAccountWizardPage_existing_account;

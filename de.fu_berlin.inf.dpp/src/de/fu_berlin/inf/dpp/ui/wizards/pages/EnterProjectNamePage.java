@@ -449,6 +449,7 @@ public class EnterProjectNamePage extends WizardPage {
             .findMember((Path) result[0]).getProject().getName();
     }
 
+    @Override
     public void createControl(Composite parent) {
         // Create the root control
 
@@ -657,28 +658,59 @@ public class EnterProjectNamePage extends WizardPage {
      * @param newText
      *            Projectname for which to test. Must not be null.
      */
-    public void setPageCompleteTargetProject(String newText) {
+    protected String setPageCompleteTargetProject(String newText,
+        String projectID) {
+
+        String errorMessage = null;
 
         if (newText.length() == 0) {
-            setErrorMessage("Please set a project name");
-            setPageComplete(false);
+            errorMessage = Messages.EnterProjectNamePage_set_project_name;
+            this.errorProjectNames.put(projectID, errorMessage);
         } else {
             if (EnterProjectNamePageUtils.projectNameIsUnique(newText,
                 this.reservedProjectNames.values().toArray(new String[0]))) {
-                setErrorMessage(null);
-                setPageComplete(true);
+                this.errorProjectNames.remove(projectID);
             } else if (!EnterProjectNamePageUtils.projectNameIsUnique(newText)) {
                 // Project with name exists already in workspace
-                setErrorMessage("A project with the name " + newText
-                    + " already exists");
-                setPageComplete(false);
+                errorMessage = MessageFormat.format(
+                    Messages.EnterProjectNamePage_error_projectname_exists,
+                    newText);
+                this.errorProjectNames.put(projectID, errorMessage);
             } else {
                 // Project with name has already been declared
-                setErrorMessage("The name " + newText
-                    + " has already been used for another project.");
-                setPageComplete(false);
+                errorMessage = MessageFormat.format(
+                    Messages.EnterProjectNamePage_error_projectname_in_use,
+                    newText);
+                this.errorProjectNames.put(projectID, errorMessage);
             }
         }
+
+        this.updatePageState(errorMessage);
+        return errorMessage;
+    }
+
+    /**
+     * Updates the error message if any others still exist, otherwise activates
+     * the finish button.
+     * 
+     * If the project name is correct, no error message should exist and it is
+     * set to null. If null and there is a fault in any of the other tabs the
+     * errorMessage is replaced by one of the current errors.
+     * 
+     * @param errorMessage
+     *            Current error message. (the message can be null)
+     */
+    protected void updatePageState(String errorMessage) {
+        if (this.errorProjectNames.isEmpty()) {
+            setPageComplete(true);
+        } else {
+            if (errorMessage == null && !this.errorProjectNames.isEmpty()) {
+                errorMessage = this.errorProjectNames.entrySet().iterator()
+                    .next().getValue();
+            }
+            setPageComplete(false);
+        }
+        setErrorMessage(errorMessage);
     }
 
     protected void updateEnabled(String projectID) {
@@ -713,8 +745,10 @@ public class EnterProjectNamePage extends WizardPage {
      */
     protected void updatePageComplete(String projectID) {
 
+        String errorMessage = null;
+
         if (isSyncSkippingSelected(projectID)) {
-            setMessage("Skipping Synchronisation might cause inconsistencies!",
+            setMessage(Messages.EnterProjectNamePage_skip_synchronizing_warn,
                 IMessageProvider.WARNING);
         } else {
             setMessage(null);
@@ -726,7 +760,7 @@ public class EnterProjectNamePage extends WizardPage {
             this.reservedProjectNames.remove(projectID);
 
             setPageCompleteTargetProject(this.newProjectNameTexts
-                .get(projectID).getText());
+                .get(projectID).getText(), projectID);
 
             this.reservedProjectNames.put(projectID, this.newProjectNameTexts
                 .get(projectID).getText());
@@ -734,26 +768,31 @@ public class EnterProjectNamePage extends WizardPage {
             String newText = this.updateProjectTexts.get(projectID).getText();
 
             if (newText.length() == 0) {
-                setErrorMessage("Please set a project name to update from or press 'Scan Workspace' to find best matching existing project");
-                setPageComplete(false);
+                errorMessage = MessageFormat.format(
+                    Messages.EnterProjectNamePage_error_set_projectname2,
+                    this.remoteProjectNames.get(projectID));
+                this.errorProjectNames.put(projectID, errorMessage);
 
             } else {
                 if (!EnterProjectNamePageUtils.projectNameIsUnique(newText)) {
 
                     if (this.copyCheckboxes.get(projectID).getSelection()) {
-                        setPageCompleteTargetProject(this.copyToBeforeUpdateTexts
-                            .get(projectID).getText());
+                        errorMessage = setPageCompleteTargetProject(
+                            this.copyToBeforeUpdateTexts.get(projectID)
+                                .getText(), projectID);
                     } else {
-                        setErrorMessage(null);
-                        setPageComplete(true);
+                        this.errorProjectNames.remove(projectID);
                     }
 
                 } else {
-                    setErrorMessage("No project exists with this name to update from");
-                    setPageComplete(false);
+                    errorMessage = MessageFormat.format(
+                        Messages.EnterProjectNamePage_error_wrong_name,
+                        this.updateProjectTexts.get(projectID).getText());
+                    this.errorProjectNames.put(projectID, errorMessage);
                 }
-
             }
+
+            this.updatePageState(errorMessage);
         }
     }
 
@@ -777,10 +816,6 @@ public class EnterProjectNamePage extends WizardPage {
         } else {
             return this.newProjectNameTexts.get(projectID).getText();
         }
-    }
-
-    public String getTargetProjectNames() {
-        return null;
     }
 
     public boolean useVersionControl() {
