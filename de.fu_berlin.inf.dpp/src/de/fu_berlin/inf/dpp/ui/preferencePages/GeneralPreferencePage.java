@@ -32,7 +32,6 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
@@ -78,7 +77,6 @@ public final class GeneralPreferencePage extends FieldEditorPreferencePage
     public static final String FOLLOW_MODE_TEXT = Messages.GeneralPreferencePage_FOLLOW_MODE_TEXT;
     public static final String CONCURRENT_UNDO_TEXT = Messages.GeneralPreferencePage_CONCURRENT_UNDO_TEXT;
     public static final String DISABLE_VERSION_CONTROL_TEXT = Messages.GeneralPreferencePage_DISABLE_VERSION_CONTROL_TEXT;
-    public static final String DISABLE_VERSION_CONTROL_TOOLTIP = Messages.GeneralPreferencePage_DISABLE_VERSION_CONTROL_TOOLTIP;
     public static final String NEEDS_BASED_SYNC_TEXT = Messages.GeneralPreferencePage_ENABLE_NEEDS_BASED_SYNC_TEXT;
 
     // icons
@@ -341,8 +339,6 @@ public final class GeneralPreferencePage extends FieldEditorPreferencePage
         BooleanFieldEditor editor = new BooleanFieldEditor(
             PreferenceConstants.DISABLE_VERSION_CONTROL,
             DISABLE_VERSION_CONTROL_TEXT, group);
-        Control descriptionControl = editor.getDescriptionControl(group);
-        descriptionControl.setToolTipText(DISABLE_VERSION_CONTROL_TOOLTIP);
         addField(editor);
     }
 

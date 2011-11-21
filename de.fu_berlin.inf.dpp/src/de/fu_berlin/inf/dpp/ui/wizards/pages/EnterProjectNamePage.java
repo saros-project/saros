@@ -528,8 +528,6 @@ public class EnterProjectNamePage extends WizardPage {
         disableVCSCheckbox = new Button(vcsComposite, SWT.CHECK);
         disableVCSCheckbox
             .setText(GeneralPreferencePage.DISABLE_VERSION_CONTROL_TEXT);
-        disableVCSCheckbox
-            .setToolTipText(GeneralPreferencePage.DISABLE_VERSION_CONTROL_TOOLTIP);
         disableVCSCheckbox.setSelection(!preferenceUtils.useVersionControl());
 
         Button explainButton = new Button(vcsComposite, SWT.PUSH);

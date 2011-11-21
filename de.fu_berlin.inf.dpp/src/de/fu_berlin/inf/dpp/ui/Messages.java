@@ -188,6 +188,7 @@ public class Messages extends NLS {
     public static String ErrorMessageDialog_error_unspecified;
     public static String Explain_version_control;
     public static String ExplanatoryComposite_content_control_not_set;
+
     public static String GeneralPreferencePage_ACCOUNT_GROUP_TITLE;
     public static String GeneralPreferencePage_ACTIVATE_BTN_TEXT;
     public static String GeneralPreferencePage_active;
@@ -198,7 +199,6 @@ public class Messages extends NLS {
     public static String GeneralPreferencePage_DELETE_ACTIVE_TEXT;
     public static String GeneralPreferencePage_REMOVE_BTN_TEXT;
     public static String GeneralPreferencePage_DISABLE_VERSION_CONTROL_TEXT;
-    public static String GeneralPreferencePage_DISABLE_VERSION_CONTROL_TOOLTIP;
     public static String GeneralPreferencePage_ENCRYPT_PASSWORD_TEXT;
     public static String GeneralPreferencePage_FOLLOW_MODE_TEXT;
     public static String GeneralPreferencePage_ENABLE_NEEDS_BASED_SYNC_TEXT;
