@@ -82,19 +82,21 @@ public class JIDFileAppender extends FileAppender {
             super.activateOptions();
     }
 
+    private IConnectionListener listener = new IConnectionListener() {
+
+        public void connectionStateChanged(Connection connection,
+            ConnectionState newState) {
+
+            if (newState == ConnectionState.CONNECTED) {
+                setJID(new JID(connection.getUser()));
+            }
+        }
+    };
+
     protected void initialize() {
         SarosPluginContext.initComponent(this);
 
-        saros.getSarosNet().addListener(new IConnectionListener() {
-
-            public void connectionStateChanged(Connection connection,
-                ConnectionState newState) {
-
-                if (newState == ConnectionState.CONNECTED) {
-                    setJID(new JID(connection.getUser()));
-                }
-            }
-        });
+        saros.getSarosNet().addListener(listener);
 
         // If already connected use the current JID.
         setJID(saros.getSarosNet().getMyJID());
@@ -118,6 +120,13 @@ public class JIDFileAppender extends FileAppender {
              */
             this.fileNameBackup = getFile();
         }
+
+        // log4j config changed, we are out
+        if (fileNameBackup == null) {
+            saros.getSarosNet().removeListener(listener);
+            return;
+        }
+
         // directory of the Eclipse log
         String directory = Platform.getLogFileLocation().toFile().getParent();
 
