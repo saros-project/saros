@@ -58,6 +58,7 @@ public class StartupSaros implements IStartup {
      */
 
     public void earlyStartup() {
+
         String currentVersion = saros.getVersion();
 
         String portNumber = System.getProperty("de.fu_berlin.inf.dpp.testmode");
@@ -88,7 +89,7 @@ public class StartupSaros implements IStartup {
          * user is probably already experienced.
          */
 
-        showWizards(!xmppAccountStore.hasActiveAccount(),
+        showWizards(xmppAccountStore.isEmpty(),
             !preferenceUtils.isGettingStartedFinished());
     }
 
@@ -187,11 +188,49 @@ public class StartupSaros implements IStartup {
                 password = prefStore
                     .getString(PreferenceConstants.PASSWORD + i);
             }
+
+            // update 2
+
+            i = 0;
+
+            while (true) {
+                String suffix = (i == 0) ? "" : String.valueOf(i);
+
+                username = secureStore.get(PreferenceConstants.USERNAME
+                    + suffix, "");
+
+                server = secureStore.get(PreferenceConstants.SERVER + suffix,
+                    "");
+
+                password = secureStore.get(PreferenceConstants.PASSWORD
+                    + suffix, "");
+
+                if (username.isEmpty())
+                    break;
+
+                try {
+                    xmppAccountStore.createAccount(username, password,
+                        server.toLowerCase());
+                } catch (Exception e) {
+                    log.error("could not update account '" + username + "'", e);
+                }
+
+                secureStore.put(PreferenceConstants.USERNAME + suffix, "",
+                    false);
+
+                secureStore.put(PreferenceConstants.SERVER + suffix, "", false);
+
+                secureStore.put(PreferenceConstants.PASSWORD + suffix, "",
+                    false);
+
+                i++;
+
+            }
+
         } catch (StorageException e) {
             log.error("Exception with secure storage while upgrading: "
                 + e.getMessage());
         }
 
-        xmppAccountStore.loadAccounts();
     }
 }

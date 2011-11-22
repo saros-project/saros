@@ -48,7 +48,8 @@ public class MemorySecurePreferences implements ISecurePreferences {
     }
 
     public void flush() throws IOException {
-        //
+        if (!this.allowPut)
+            throw new IOException("put disabled");
     }
 
     public String get(String key, String def) throws StorageException {

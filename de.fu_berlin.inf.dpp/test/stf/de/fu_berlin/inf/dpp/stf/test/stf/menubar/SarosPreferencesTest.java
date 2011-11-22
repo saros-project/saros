@@ -152,7 +152,7 @@ public class SarosPreferencesTest extends StfTestCase {
         assertTrue(ALICE.superBot().menuBar().saros().preferences()
             .existsAccount(ALICE.getJID()));
         ALICE.superBot().menuBar().saros().preferences()
-            .removeAccount(ALICE.getJID(), ALICE.getPassword());
+            .removeAccount(ALICE.getJID());
     }
 
     @Test
@@ -164,7 +164,7 @@ public class SarosPreferencesTest extends StfTestCase {
         assertTrue(ALICE.superBot().menuBar().saros().preferences()
             .existsAccount(Constants.JID_TO_ADD));
         ALICE.superBot().menuBar().saros().preferences()
-            .removeAccount(Constants.JID_TO_ADD, Constants.PASSWORD);
+            .removeAccount(Constants.JID_TO_ADD);
         assertFalse(ALICE.superBot().menuBar().saros().preferences()
             .existsAccount(Constants.JID_TO_ADD));
     }

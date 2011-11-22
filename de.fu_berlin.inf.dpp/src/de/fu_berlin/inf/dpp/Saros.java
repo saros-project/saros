@@ -199,7 +199,10 @@ public class Saros extends AbstractUIPlugin {
      * Create the shared instance.
      */
     public Saros() {
+        createContext();
+    }
 
+    protected void createContext() {
         // Only start a DotGraphMonitor if asserts are enabled (aka debug mode)
         assert (dotMonitor = new DotGraphMonitor()) != null;
 
@@ -426,9 +429,6 @@ public class Saros extends AbstractUIPlugin {
     XMPPAccountStore xmppAccountStore;
 
     public synchronized void saveSecurePrefs() {
-        if (xmppAccountStore != null) {
-            xmppAccountStore.flush();
-        }
         try {
             if (securePrefs != null) {
                 securePrefs.flush();
@@ -443,9 +443,8 @@ public class Saros extends AbstractUIPlugin {
 
             PropertyConfigurator.configure(Saros.class.getClassLoader()
                 .getResource("saros.log4j.properties"));
-
+            
             log = Logger.getLogger("de.fu_berlin.inf.dpp"); //$NON-NLS-1$
-
         } catch (SecurityException e) {
             System.err.println("Could not start logging:"); //$NON-NLS-1$
             e.printStackTrace();
@@ -556,13 +555,11 @@ public class Saros extends AbstractUIPlugin {
      *             If the server string in the preferences cannot be transformed
      *             into an URI
      */
-    protected ConnectionConfiguration getConnectionConfiguration()
-        throws URISyntaxException {
+    protected ConnectionConfiguration getConnectionConfiguration(
+        String serverString) throws URISyntaxException {
 
         PreferenceUtils preferenceUtils = this.sarosContext
             .getComponent(PreferenceUtils.class);
-
-        String serverString = preferenceUtils.getServer();
 
         URI uri;
         uri = (serverString.matches("://")) ? new URI(serverString) : new URI( //$NON-NLS-1$
@@ -615,7 +612,7 @@ public class Saros extends AbstractUIPlugin {
         if (xmppAccountStore == null)
             SarosPluginContext.initComponent(this);
 
-        if (!xmppAccountStore.hasActiveAccount())
+        if (xmppAccountStore.isEmpty())
             return (WizardUtils.openSarosConfigurationWizard() != null);
 
         return (WizardUtils.openEditXMPPAccountWizard(xmppAccountStore
@@ -659,20 +656,40 @@ public class Saros extends AbstractUIPlugin {
             preferenceUtils.getStunPort(),
             preferenceUtils.isAutoPortmappingEnabled());
 
-        /*
-         * Check if we have a user name; if not show wizard before connecting
-         */
-        if (!preferenceUtils.hasUserName() || !preferenceUtils.hasServer()) {
-            if (!configureXMPPAccount())
-                return;
-        }
+        if (xmppAccountStore == null)
+            SarosPluginContext.initComponent(this);
 
-        String username = preferenceUtils.getUserName();
-        String password = preferenceUtils.getPassword();
+        if (xmppAccountStore.isEmpty() && !configureXMPPAccount())
+            return;
+
+        XMPPAccount account = xmppAccountStore.getActiveAccount();
+
+        String username = account.getUsername();
+        String password = account.getPassword();
+        String server = account.getServer();
+
+        // FIXME use domain and server values to connect
+
+        /*
+         * 
+         * Google Talk users have to keep their server portion in the username;
+         * see http://code.google.com/apis/talk/talk_developers_home.html
+         */
+
+        if (server.equalsIgnoreCase("gmail.com")
+
+        || server.equalsIgnoreCase("googlemail.com")) {
+
+            if (!username.contains("@")) {
+
+                username += "@" + server;
+
+            }
+        }
 
         try {
             ConnectionConfiguration connectionConfiguration = this
-                .getConnectionConfiguration();
+                .getConnectionConfiguration(server);
             getSarosNet().connect(connectionConfiguration, username, password,
                 failSilently);
 

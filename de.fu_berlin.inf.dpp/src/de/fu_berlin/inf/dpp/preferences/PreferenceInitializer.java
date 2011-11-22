@@ -23,6 +23,7 @@ import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
 import org.eclipse.core.runtime.preferences.DefaultScope;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.eclipse.jface.preference.IPreferenceStore;
 
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.feedback.AbstractFeedbackManager;
@@ -30,7 +31,6 @@ import de.fu_berlin.inf.dpp.feedback.FeedbackManager;
 import de.fu_berlin.inf.dpp.videosharing.VideoSharing;
 import de.fu_berlin.inf.dpp.videosharing.preferences.VideoSharingPreferenceHelper;
 import de.fu_berlin.inf.dpp.videosharing.source.Screen;
-import org.eclipse.jface.preference.IPreferenceStore;
 
 /**
  * Class used to initialize default preference values.
@@ -47,7 +47,7 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 
     @Override
     public void initializeDefaultPreferences() {
-        IEclipsePreferences prefs = new DefaultScope().getNode(Saros.SAROS);        
+        IEclipsePreferences prefs = new DefaultScope().getNode(Saros.SAROS);
         setPreferences(prefs);
     }
 
@@ -84,6 +84,10 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
         prefs.setValue(PreferenceConstants.PING_PONG, false);
         prefs.setValue(PreferenceConstants.DISABLE_VERSION_CONTROL, false);
 
+        // XMPP
+
+        prefs.setValue(PreferenceConstants.DEFAULT_XMPP_PORT, 5222);
+
         // InvitationDialog
         prefs.setValue(PreferenceConstants.AUTO_CLOSE_DIALOG, true);
         prefs.setValue(PreferenceConstants.SKIP_SYNC_SELECTABLE, false);
@@ -104,7 +108,8 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
             AbstractFeedbackManager.FORBID);
 
         // Communication default settings
-        prefs.setValue(PreferenceConstants.CHATSERVER, "conference.jabber.ccc.de");
+        prefs.setValue(PreferenceConstants.CHATSERVER,
+            "conference.jabber.ccc.de");
         prefs.setValue(PreferenceConstants.USE_DEFAULT_CHATSERVER, true);
         prefs.setValue(PreferenceConstants.BEEP_UPON_IM, true);
         prefs.setValue(PreferenceConstants.AUDIO_VBR, true);
@@ -145,7 +150,6 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
         prefs.setValue(PreferenceConstants.SCREEN_SHOW_MOUSEPOINTER, true);
     }
 
-
     private static interface PreferenceHolderWrapper {
         void setValue(String s, int i);
 
@@ -154,7 +158,8 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
         void setValue(String s, String s1);
     }
 
-    private static class IEclipsePreferencesWrapper implements PreferenceHolderWrapper {
+    private static class IEclipsePreferencesWrapper implements
+        PreferenceHolderWrapper {
         private IEclipsePreferences preferences;
 
         private IEclipsePreferencesWrapper(IEclipsePreferences preferences) {
@@ -174,8 +179,8 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
         }
     }
 
-
-    private static class IPreferenceStoreWrapper  implements PreferenceHolderWrapper {
+    private static class IPreferenceStoreWrapper implements
+        PreferenceHolderWrapper {
         private IPreferenceStore preferenceStore;
 
         private IPreferenceStoreWrapper(IPreferenceStore preferenceStore) {

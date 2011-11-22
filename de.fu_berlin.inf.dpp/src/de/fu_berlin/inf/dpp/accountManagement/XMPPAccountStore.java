@@ -1,5 +1,10 @@
 package de.fu_berlin.inf.dpp.accountManagement;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -25,132 +30,138 @@ import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
 @Component(module = "accountManagement")
 public final class XMPPAccountStore {
 
-    private static Logger log = Logger.getLogger(XMPPAccountStore.class
-        .getName());
+    private static final Logger log = Logger.getLogger(XMPPAccountStore.class);
+
+    private int defaultXmppPort;
 
     private Set<XMPPAccount> accounts;
     private XMPPAccount activeAccount;
     private IPreferenceStore preferenceStore;
     private ISecurePreferences securePreferenceStore;
-    private Integer maxId;
 
+    @Deprecated
     public XMPPAccountStore(Saros saros) {
-        this.preferenceStore = saros.getPreferenceStore();
-        this.securePreferenceStore = saros.getSecurePrefs();
+        this(saros.getPreferenceStore(), saros.getSecurePrefs());
+    }
 
+    public XMPPAccountStore(IPreferenceStore preferenceStore,
+        ISecurePreferences securePreferenceStore) {
+        this.preferenceStore = preferenceStore;
+        this.securePreferenceStore = securePreferenceStore;
+        defaultXmppPort = this.preferenceStore
+            .getInt(PreferenceConstants.DEFAULT_XMPP_PORT);
         accounts = new HashSet<XMPPAccount>();
         loadAccounts();
     }
 
-    /**
-     * Saves the inactive accounts to: username1, password1, server1, username2,
-     * password2, ....
-     * 
-     * The active account is saved as username, password, server.
-     */
-    public void saveAccounts() {
+    @SuppressWarnings("unchecked")
+    private void loadAccounts() {
+
+        byte[] accountData = null;
+        byte[] activeAccountData = null;
+
+        try {
+            activeAccountData = this.securePreferenceStore.getByteArray(
+                PreferenceConstants.ACTIVE_ACCOUNT, null);
+        } catch (StorageException e) {
+            log.error("error while loading active account", e);
+        }
+
+        try {
+            accountData = this.securePreferenceStore.getByteArray(
+                PreferenceConstants.ACCOUNT_DATA, null);
+        } catch (StorageException e) {
+            log.error("error while loading accounts", e);
+        }
+
+        if (activeAccountData != null) {
+            try {
+                activeAccount = (XMPPAccount) new ObjectInputStream(
+                    new ByteArrayInputStream(activeAccountData)).readObject();
+
+            } catch (Exception e) {
+                log.error("error while loading active account", e);
+            }
+        }
+
+        if (accountData != null) {
+            try {
+                accounts = (Set<XMPPAccount>) new ObjectInputStream(
+                    new ByteArrayInputStream(accountData)).readObject();
+
+            } catch (Exception e) {
+                log.error("error while loading accounts", e);
+            }
+        }
+
+        if (accountData == null)
+            accounts = new HashSet<XMPPAccount>();
+
+        if (accounts.isEmpty() && activeAccount != null)
+            accounts.add(activeAccount);
+
+        if (activeAccount == null && !accounts.isEmpty())
+            activeAccount = accounts.iterator().next();
+
+        log.info("loaded " + accounts.size() + " accounts");
+    }
+
+    private void saveAccounts() {
+
+        boolean error = false;
+
         boolean encryptAccount = this.preferenceStore
             .getBoolean(PreferenceConstants.ENCRYPT_ACCOUNT);
 
-        // save the inactive accounts (active account is already saved)
-        int i = 1;
-        for (XMPPAccount account : accounts) {
-            if (!account.isActive()) {
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
 
-                try {
-                    this.securePreferenceStore.put(PreferenceConstants.USERNAME
-                        + i, account.getUsername(), encryptAccount);
-
-                    this.securePreferenceStore.put(PreferenceConstants.SERVER
-                        + i, account.getServer(), encryptAccount);
-
-                    this.securePreferenceStore.put(PreferenceConstants.PASSWORD
-                        + i, account.getPassword(), encryptAccount);
-
-                } catch (StorageException e) {
-                    log.error("Error while storing account: " + e.getMessage());
-                }
-
-                i++;
-            }
-        }
-        // set end-entry (empty string)
         try {
-            this.securePreferenceStore.put(PreferenceConstants.USERNAME + i,
-                "", encryptAccount);
-            this.securePreferenceStore.put(PreferenceConstants.SERVER + i, "",
+            ObjectOutputStream oos = new ObjectOutputStream(out);
+            oos.writeObject(activeAccount);
+            oos.flush();
+        } catch (IOException e) {
+            log.error(e);
+            error = true;
+        }
+
+        try {
+            this.securePreferenceStore.putByteArray(
+                PreferenceConstants.ACTIVE_ACCOUNT, out.toByteArray(),
                 encryptAccount);
-            this.securePreferenceStore.put(PreferenceConstants.PASSWORD + i,
-                "", encryptAccount);
         } catch (StorageException e) {
-            log.error("Error while storing account: " + e.getMessage());
+            log.debug("error while saving active account", e);
+            error = true;
         }
-    }
 
-    /**
-     * Loads the accounts from {@link IPreferenceStore}.
-     */
-    public void loadAccounts() {
-        accounts.clear();
-        maxId = 0;
-
-        // load default account (keys: username, password, server)
-        String defaultUsername = "";
-        String defaultServer = "";
-        String defaultPassword = "";
+        out.reset();
 
         try {
-            defaultUsername = this.securePreferenceStore.get(
-                PreferenceConstants.USERNAME, "");
-            defaultServer = this.securePreferenceStore.get(
-                PreferenceConstants.SERVER, "");
-            defaultPassword = this.securePreferenceStore.get(
-                PreferenceConstants.PASSWORD, "");
+            ObjectOutputStream oos = new ObjectOutputStream(out);
+            oos.writeObject(accounts);
+            oos.flush();
+        } catch (IOException e) {
+            log.error(e);
+            error = true;
+        }
+
+        try {
+            this.securePreferenceStore.putByteArray(
+                PreferenceConstants.ACCOUNT_DATA, out.toByteArray(),
+                encryptAccount);
         } catch (StorageException e) {
-            log.error("exception while getting default account: "
-                + e.getMessage());
+            log.debug("error while saving accounts", e);
+            error = true;
         }
 
-        // no default account exist
-        if (defaultUsername.length() != 0) {
-            XMPPAccount defaultAccount = createNewAccount(defaultUsername,
-                defaultPassword, defaultServer);
-            setAccountActive(defaultAccount);
+        try {
+            securePreferenceStore.flush();
+        } catch (IOException e) {
+            log.debug("error writing data", e);
+            error = true;
         }
 
-        // load the other accounts (keys: username1, password1, ...)
-
-        int i = 1;
-
-        while (true) {
-            String username = "";
-            String server = "";
-            String password = "";
-
-            try {
-                username = this.securePreferenceStore.get(
-                    PreferenceConstants.USERNAME + i, "");
-                server = this.securePreferenceStore.get(
-                    PreferenceConstants.SERVER + i, "");
-                password = this.securePreferenceStore.get(
-                    PreferenceConstants.PASSWORD + i, "");
-            } catch (StorageException e) {
-                log.error("exception while getting account: " + e.getMessage());
-            }
-
-            i++;
-
-            if (username.length() == 0)
-                break;
-
-            if (server.length() == 0) {
-                log.warn("skipping account '" + username
-                    + "', server field is empty");
-                continue;
-            }
-
-            createNewAccount(username, password, server);
-        }
+        if (!error)
+            log.info("saved " + accounts.size() + " accounts");
     }
 
     /**
@@ -166,10 +177,21 @@ public final class XMPPAccountStore {
             public int compare(XMPPAccount a, XMPPAccount b) {
                 int c = a.getUsername().compareToIgnoreCase(b.getUsername());
 
-                if (c == 0)
-                    return a.getServer().compareTo(b.getServer());
-                else
+                if (c != 0)
                     return c;
+
+                c = a.getDomain().compareToIgnoreCase(b.getDomain());
+
+                if (c != 0)
+                    return c;
+
+                c = a.getServer().compareToIgnoreCase(b.getServer());
+
+                if (c != 0)
+                    return c;
+
+                return Integer.valueOf(a.getPort()).compareTo(
+                    Integer.valueOf(b.getPort()));
             }
         };
 
@@ -199,13 +221,7 @@ public final class XMPPAccountStore {
     public List<String> getDomains() {
         List<String> domains = new ArrayList<String>();
         for (XMPPAccount account : this.accounts) {
-            String username = account.getUsername();
-            String domain;
-            if (username.contains("@")) {
-                domain = username.split("@")[1];
-            } else {
-                domain = account.getServer();
-            }
+            String domain = account.getDomain();
             if (!domains.contains(domain))
                 domains.add(domain);
         }
@@ -247,7 +263,7 @@ public final class XMPPAccountStore {
      * @param account
      *            the account to activate
      * @throws IllegalArgumentException
-     *             if the account is not found
+     *             if the account is not found in the store
      */
     public void setAccountActive(XMPPAccount account) {
 
@@ -255,49 +271,9 @@ public final class XMPPAccountStore {
             throw new IllegalArgumentException("account '" + account
                 + "' is not in the current account store");
 
-        if (activeAccount != null)
-            activeAccount.setActive(false);
-
-        account.setActive(true);
         activeAccount = account;
 
-        updateAccountDataToPreferenceStore();
-    }
-
-    private void updateAccountDataToPreferenceStore() {
-
-        if (activeAccount == null)
-            return;
-
-        String username = activeAccount.getUsername();
-        String server = activeAccount.getServer();
-        String password = activeAccount.getPassword();
-
-        /*
-         * Google Talk users have to keep their server portion in the username;
-         * see http://code.google.com/apis/talk/talk_developers_home.html
-         */
-        if (server.equalsIgnoreCase("gmail.com")
-            || server.equalsIgnoreCase("googlemail.com")) {
-            if (!username.contains("@")) {
-                username += "@" + server;
-            }
-        }
-
-        boolean encryptAccount = this.preferenceStore
-            .getBoolean(PreferenceConstants.ENCRYPT_ACCOUNT);
-
-        try {
-            this.securePreferenceStore.put(PreferenceConstants.USERNAME,
-                username, encryptAccount);
-            this.securePreferenceStore.put(PreferenceConstants.SERVER, server,
-                encryptAccount);
-            this.securePreferenceStore.put(PreferenceConstants.PASSWORD,
-                password, encryptAccount);
-        } catch (StorageException e) {
-            log.error("unable to store account '" + activeAccount + "' : "
-                + e.getMessage());
-        }
+        saveAccounts();
     }
 
     /**
@@ -305,6 +281,10 @@ public final class XMPPAccountStore {
      * 
      * @param account
      *            the account to delete
+     * @throws IllegalArgumentException
+     *             if the account is not found in the store
+     * @throws IllegalStateException
+     *             if the account is active
      */
     public void deleteAccount(XMPPAccount account) {
 
@@ -312,139 +292,128 @@ public final class XMPPAccountStore {
             throw new IllegalArgumentException("account '" + account
                 + "' is not in the current account store");
 
+        if (this.activeAccount == account)
+            throw new IllegalStateException("account '" + account
+                + "' is active and cannot be deleted");
+
         accounts.remove(account);
+
         saveAccounts();
     }
 
-    /**
-     * 
-     * @param account
-     *            the account to check.
-     * @return true if the account exists
-     */
-    public boolean isAccountInStore(XMPPAccount account) {
-        return this.accounts.contains(account);
+    // TODO remove this method
+    @Deprecated
+    public XMPPAccount createAccount(String username, String password,
+        String server) {
+        return createAccount(username, password, server, server,
+            defaultXmppPort, true, true);
     }
 
     /**
-     * Creates an account with a new id.
+     * Creates an account. The account will automatically become active if the
+     * account store is empty.
      * 
      * @param username
      *            the user name of the new account as lower case string
      * @param password
      *            the password of the new account.
+     * @param domain
+     *            the domain name of the server
      * @param server
      *            the server of the new account as lower case string
+     * @param port
+     *            the port of the server
+     * @param useTSL
+     *            if the connection should be secured using TSL
+     * @param useSASL
+     *            if the authentication should be negotiated using SASL
      * @throws NullPointerException
-     *             if username, password or server is null
+     *             if username, password, domain or server is null
      * @throws IllegalArgumentException
-     *             if username or server string is empty or only contains
-     *             whitespace characters
-     * 
+     *             if username, domain or server string is empty or only
+     *             contains whitespace characters<br>
+     *             if the domain or server contains upper case characters<br>
+     *             if the port value is not in range of 1 <= x <= 65535<br>
+     *             if an account already exists with the given username,
+     *             password, domain, server and port
      */
 
-    public XMPPAccount createNewAccount(String username, String password,
-        String server) {
+    public XMPPAccount createAccount(String username, String password,
+        String domain, String server, int port, boolean useTSL, boolean useSASL) {
 
-        checkCredentials(username, password, server);
+        XMPPAccount newAccount = new XMPPAccount(username, password, domain,
+            server, port, useTSL, useSASL);
 
-        XMPPAccount newAccount = new XMPPAccount(createNewId(), username,
-            password, server);
+        if (this.accounts.contains(newAccount))
+            throw new IllegalArgumentException("account already exists");
 
-        newAccount.setActive(false);
+        if (this.accounts.isEmpty())
+            this.activeAccount = newAccount;
 
         this.accounts.add(newAccount);
+
+        saveAccounts();
 
         return newAccount;
     }
 
-    private void checkCredentials(String username, String password,
-        String server) {
-        if (username == null)
-            throw new NullPointerException("username is null");
-
-        if (password == null)
-            throw new NullPointerException("password is null");
-
-        if (server == null)
-            throw new NullPointerException("server is null");
-
-        if (username.trim().length() == 0)
-            throw new IllegalArgumentException("user name is empty");
-
-        if (server.trim().length() == 0)
-            throw new IllegalArgumentException("server is empty");
-    }
-
-    private int createNewId() {
-        return maxId++;
-    }
-
-    /**
-     * Returns the account with the given id.
-     * 
-     * @param id
-     *            the id of the searched account
-     * @return the account with the given id
-     * @throws IllegalArgumentException
-     *             if the account does not exists
-     */
-    public XMPPAccount getAccount(int id) {
-
-        XMPPAccount found = null;
-
-        for (XMPPAccount account : accounts)
-            if (account.getId() == id)
-                found = account;
-
-        if (found == null)
-            throw new IllegalArgumentException("account with id '" + id
-                + "' does not exist");
-
-        return found;
+    @Deprecated
+    public void changeAccountData(XMPPAccount account, String username,
+        String password, String server) {
+        changeAccountData(account, username, password, account.getDomain(),
+            server, account.getPort(), account.useTSL(), account.useSASL());
     }
 
     /**
      * Changes the properties of an account.
      * 
      * @param username
-     *            the new user name.
+     *            the new user name
      * @param password
-     *            the new password.
+     *            the new password
+     * @param domain
+     *            the domain name of the server
      * @param server
-     *            the new server.
-     * 
+     *            the server ip / name
+     * @param port
+     *            the port of the server
+     * @param useTSL
+     *            if the connection should be secured using TSL
+     * @param useSASL
+     *            if the authentication should be negotiated using SASL
      * @throws IllegalArgumentException
-     *             if the new user name and server already exists
+     *             if username, domain or server string is empty or only
+     *             contains whitespace characters<br>
+     *             if the domain or server contains upper case characters<br>
+     *             if the port value is not in range of 1 <= x <= 65535<br>
+     *             if an account already exists with the given username,
+     *             password, domain, server and port
      */
-    public void changeAccountData(int id, String username, String password,
-        String server) {
+    public void changeAccountData(XMPPAccount account, String username,
+        String password, String domain, String server, int port,
+        boolean useTSL, boolean useSASL) {
 
-        checkCredentials(username, password, server);
-
-        XMPPAccount account = getAccount(id);
+        XMPPAccount changedAccount = new XMPPAccount(username, password,
+            domain, server, port, useTSL, useSASL);
 
         accounts.remove(account);
 
-        XMPPAccount changedAccount = new XMPPAccount(id, username, password,
-            server);
-
-        // user changed more than the password
-        if (!changedAccount.equals(account)
-            && accounts.contains(changedAccount)) {
+        if (accounts.contains(changedAccount)) {
             accounts.add(account);
             throw new IllegalArgumentException("an account with user name '"
-                + username + " and server '" + server + "' already exists");
+                + username + "', domain '" + domain + "' and server '" + server
+                + "' with port '" + port + "' already exists");
         }
 
         account.setUsername(username);
         account.setPassword(password);
+        account.setDomain(domain);
         account.setServer(server);
+        account.setPort(port);
+        account.setUseSASL(useSASL);
+        account.setUseTSL(useTSL);
 
         accounts.add(account);
-
-        if (activeAccount != null && id == activeAccount.getId())
-            updateAccountDataToPreferenceStore();
 
         saveAccounts();
     }
@@ -454,29 +423,35 @@ public final class XMPPAccountStore {
      * 
      * @return the active account
      * @throws IllegalStateException
-     *             if no active account exists
+     *             if the account store is empty
      * 
      */
     public XMPPAccount getActiveAccount() {
         if (this.activeAccount == null)
-            throw new IllegalStateException(
-                "there is currently no active account");
+            throw new IllegalStateException("the account store is empty");
 
         return this.activeAccount;
     }
 
     /**
+     * Returns if the account store is currently empty
      * 
-     * @return <code>true</code> if an active account exists, <code>false</code>
-     *         otherwise
+     * @return <code>true</code> if the account store is empty,
+     *         <code>false</code> otherwise
      */
-    public boolean hasActiveAccount() {
-        return activeAccount != null;
+    public boolean isEmpty() {
+        return this.accounts.isEmpty();
     }
 
-    public boolean contains(String username, String server) {
+    @Deprecated
+    public boolean exists(JID jid) {
+        return exists(jid.getName(), jid.getDomain());
+    }
+
+    @Deprecated
+    public boolean exists(String username, String server) {
         for (XMPPAccount a : getAllAccounts()) {
-            if (a.getServer().equals(server)
+            if (a.getServer().equalsIgnoreCase(server)
                 && a.getUsername().equals(username)) {
                 return true;
             }
@@ -484,16 +459,33 @@ public final class XMPPAccountStore {
         return false;
     }
 
-    public boolean contains(JID jid) {
-        return contains(jid.getName(), jid.getDomain());
-    }
-
     /**
-     * Forces the current account data to be written to the permanent preference
-     * store.
+     * Checks if the an account with the given arguments exists in the account
+     * store
+     * 
+     * @param username
+     *            the username
+     * @param password
+     *            the password
+     * @param domain
+     *            the domain name of the server
+     * @param server
+     *            the server ip / name
+     * @param port
+     *            the port of the server
+     * @return <code>true if such an account exists, <code>false</code>
+     *         otherwise
      */
-    public void flush() {
-        updateAccountDataToPreferenceStore();
-        saveAccounts();
+    public boolean exists(String username, String password, String domain,
+        String server, int port) {
+        for (XMPPAccount a : getAllAccounts()) {
+            if (a.getServer().equalsIgnoreCase(server)
+                && a.getPassword().equals(password)
+                && a.getDomain().equalsIgnoreCase(domain)
+                && a.getUsername().equals(username) && a.getPort() == port) {
+                return true;
+            }
+        }
+        return false;
     }
 }

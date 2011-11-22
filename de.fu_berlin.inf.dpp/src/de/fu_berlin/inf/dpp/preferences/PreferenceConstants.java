@@ -35,11 +35,18 @@ public class PreferenceConstants {
 
     public static final String PASSWORD = "password";
 
+    public static final String ACTIVE_ACCOUNT = "active_account";
+
+    public static final String ACCOUNT_DATA = "account_data";
+
+    public static final String DEFAULT_XMPP_PORT = "default_xmpp_port";
+
     public static final String ENCRYPT_ACCOUNT = "encrypt_account";
 
     public static final String AUTO_CONNECT = "autoconnect";
 
     public static final String AUTO_PORTMAPPING_DEVICEID = "autoportmappingdeviceid";
+
     public static final String AUTO_PORTMAPPING_LASTMAPPEDPORT = "autoportmappinglastmappedport";
 
     public static final String AUTO_FOLLOW_MODE = "autofollowmode";

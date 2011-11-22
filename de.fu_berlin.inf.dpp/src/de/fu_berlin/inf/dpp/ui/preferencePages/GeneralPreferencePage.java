@@ -179,7 +179,8 @@ public final class GeneralPreferencePage extends FieldEditorPreferencePage
                 removeAccountButton.setEnabled(true);
                 editAccountButton.setEnabled(true);
 
-                if (getSelectedAccount().isActive()) {
+                if (getSelectedAccount()
+                    .equals(accountStore.getActiveAccount())) {
                     activateAccountButton.setEnabled(false);
                     removeAccountButton.setEnabled(false);
                 }
@@ -239,7 +240,7 @@ public final class GeneralPreferencePage extends FieldEditorPreferencePage
     }
 
     private void updateInfoLabel() {
-        if (accountStore.hasActiveAccount())
+        if (!accountStore.isEmpty())
             infoLabel.setText(Messages.GeneralPreferencePage_active
                 + createHumanDisplayAbleName(accountStore.getActiveAccount()));
         else
@@ -247,7 +248,7 @@ public final class GeneralPreferencePage extends FieldEditorPreferencePage
     }
 
     private String createHumanDisplayAbleName(XMPPAccount account) {
-        return account.getUsername() + "@" + account.getServer();
+        return account.getUsername() + "@" + account.getDomain();
     }
 
     private void createAddAccountButton(Composite composite) {
@@ -364,7 +365,6 @@ public final class GeneralPreferencePage extends FieldEditorPreferencePage
     @Override
     public boolean performOk() {
         boolean done = super.performOk();
-        this.accountStore.flush();
 
         return done;
     }
@@ -372,6 +372,5 @@ public final class GeneralPreferencePage extends FieldEditorPreferencePage
     @Override
     protected void performApply() {
         super.performApply();
-        this.accountStore.flush();
     }
 }

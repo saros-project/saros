@@ -95,7 +95,7 @@ public class ConnectionStateComposite extends Composite {
      *         to be shown in labels (e.g. CONNECTING becomes "Connecting...").
      */
     public String getDescription(ConnectionState state) {
-        if (!accountStore.hasActiveAccount()) {
+        if (accountStore.isEmpty()) {
             return Messages.ConnectionStateComposite_info_add_jabber_account;
         }
 

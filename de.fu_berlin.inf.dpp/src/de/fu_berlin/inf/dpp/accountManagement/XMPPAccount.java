@@ -10,18 +10,20 @@ import java.io.Serializable;
  */
 public final class XMPPAccount implements Serializable {
 
-    private static final long serialVersionUID = 3710620029882513026L;
-
-    private final int id;
+    private static final long serialVersionUID = 1L;
 
     private String username;
     private String password;
+    private String domain;
     private String server;
 
-    private boolean isActive;
+    private int port;
 
-    XMPPAccount(int id, String username, String password, String server) {
-        this.id = id;
+    private boolean useTSL;
+    private boolean useSASL;
+
+    XMPPAccount(String username, String password, String domain, String server,
+        int port, boolean useTSL, boolean useSASL) {
 
         if (username == null)
             throw new NullPointerException("user name is null");
@@ -32,14 +34,69 @@ public final class XMPPAccount implements Serializable {
         if (server == null)
             throw new NullPointerException("server is null");
 
+        if (domain == null)
+            throw new NullPointerException("domain is null");
+
+        if (username.trim().length() == 0)
+            throw new IllegalArgumentException("user name is empty");
+
+        if (server.trim().length() == 0)
+            throw new IllegalArgumentException("server is empty");
+
+        if (domain.trim().length() == 0)
+            throw new IllegalArgumentException("domain is empty");
+
         if (!server.toLowerCase().equals(server))
-            throw new IllegalArgumentException("server '" + server
-                + "' contains upppercase characters");
+            throw new IllegalArgumentException(
+                "server url must be in lower case letters");
+
+        if (!domain.toLowerCase().equals(domain))
+            throw new IllegalArgumentException(
+                "domain url must be in lower case letters");
+
+        if (port <= 0 || port >= 65536)
+            throw new IllegalArgumentException("port number is not valid");
 
         this.username = username;
         this.password = password;
         this.server = server;
-        this.isActive = false;
+        this.domain = domain;
+        this.port = port;
+
+        this.useSASL = useSASL;
+        this.useTSL = useTSL;
+    }
+
+    public boolean useSASL() {
+        return this.useSASL;
+    }
+
+    void setUseSASL(boolean useSASL) {
+        this.useSASL = useSASL;
+    }
+
+    public boolean useTSL() {
+        return this.useTSL;
+    }
+
+    void setUseTSL(boolean useTSL) {
+        this.useTSL = useTSL;
+    }
+
+    public int getPort() {
+        return port;
+    }
+
+    void setPort(int port) {
+        this.port = port;
+    }
+
+    public String getDomain() {
+        return this.domain;
+    }
+
+    void setDomain(String domain) {
+        this.domain = domain;
     }
 
     public String getUsername() {
@@ -66,25 +123,9 @@ public final class XMPPAccount implements Serializable {
         this.server = server;
     }
 
-    public boolean isActive() {
-        return isActive;
-    }
-
-    void setActive(boolean isActive) {
-        this.isActive = isActive;
-    }
-
-    public int getId() {
-        return id;
-    }
-
     @Override
     public String toString() {
-        if (username.contains("@")) {
-            return String.format("%s[%s]", username, server);
-        } else {
-            return String.format("%s@%s", username, server);
-        }
+        return String.format("%s@%s[%s:%d]", username, domain, server, port);
     }
 
     @Override
@@ -108,6 +149,8 @@ public final class XMPPAccount implements Serializable {
         XMPPAccount other = (XMPPAccount) obj;
 
         return this.username.equals(other.username)
-            && this.server.equals(other.server);
+            && this.password.equals(other.password)
+            && this.server.equals(other.server)
+            && this.domain.equals(other.domain) && this.port == other.port;
     }
 }

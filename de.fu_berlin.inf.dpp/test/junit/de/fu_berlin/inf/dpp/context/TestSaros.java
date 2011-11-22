@@ -10,6 +10,7 @@ import org.osgi.service.prefs.Preferences;
 
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.SarosContext;
+import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
 import de.fu_berlin.inf.dpp.preferences.PreferenceInitializer;
 import de.fu_berlin.inf.dpp.test.util.MemoryPreferences;
@@ -32,17 +33,21 @@ public class TestSaros extends Saros {
 
     public TestSaros() {
         // do not call super().
-        log = Logger.getLogger(TestSaros.class);
 
+        log = Logger.getLogger(TestSaros.class);
+    }
+
+    @Override
+    protected void createContext() {
         sarosContext = SarosContext.getContextForSaros(this).isTestContext()
             .build();
 
-        getContext().reinject(this);
+        // getContext().reinject(this);
         // initialize context !
-        getContext().getComponents().size();
-
+        getContext().getComponents();
         getSarosNet().initialize();
         Saros.setInitialized(true);
+        SarosPluginContext.setSarosContext(sarosContext);
     }
 
     @Override

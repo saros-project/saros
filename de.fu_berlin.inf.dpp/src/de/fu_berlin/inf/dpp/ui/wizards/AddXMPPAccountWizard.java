@@ -118,20 +118,13 @@ public class AddXMPPAccountWizard extends Wizard {
             username = jid.getBase();
         }
 
-        boolean hasActiveAccount = accountStore.hasActiveAccount();
+        boolean wasEmpty = accountStore.isEmpty();
 
-        XMPPAccount account = accountStore.createNewAccount(username, password,
-            server);
-        accountStore.saveAccounts();
+        XMPPAccount account = accountStore.createAccount(username, password,
+            server.toLowerCase());
 
-        /*
-         * If an active account has already been set, the user created already
-         * an account with the CreateXMPPAccountWizard
-         */
-        if (!hasActiveAccount) {
-            accountStore.setAccountActive(account);
+        if (wasEmpty)
             saros.connect(false);
-        }
 
         return account;
     }

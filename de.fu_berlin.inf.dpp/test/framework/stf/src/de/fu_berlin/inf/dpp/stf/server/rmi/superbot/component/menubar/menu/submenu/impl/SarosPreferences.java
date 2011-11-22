@@ -125,9 +125,9 @@ public final class SarosPreferences extends StfRemoteObject implements
         shell.bot().waitUntil(SarosConditions.isShellClosed(shell));
     }
 
-    public void removeAccount(JID jid, String password) throws RemoteException {
+    public void removeAccount(JID jid) throws RemoteException {
 
-        if (!isAccountExistNoGUI(jid, password))
+        if (!isAccountExistNoGUI(jid))
             return;
 
         if (isAccountActiveNoGUI(jid))
@@ -386,26 +386,15 @@ public final class SarosPreferences extends StfRemoteObject implements
         XMPPAccount account = null;
         try {
             account = getXmppAccountStore().getActiveAccount();
-            assert account.isActive();
-            return account.getUsername().equals(jid.getName());
+            return account.getUsername().equals(jid.getName())
+                && account.getDomain().equals(jid.getDomain());
         } catch (IllegalStateException e) {
             return false;
         }
     }
 
-    private boolean isAccountExistNoGUI(JID jid, String password) {
-        for (XMPPAccount account : getXmppAccountStore().getAllAccounts()) {
-            log.debug("account id: " + account.getId());
-            log.debug("account username: " + account.getUsername());
-            log.debug("account password: " + account.getPassword());
-            log.debug("account server: " + account.getServer());
-            if (jid.getName().equals(account.getUsername())
-                && jid.getDomain().equals(account.getServer())
-                && password.equals(account.getPassword())) {
-                return true;
-            }
-        }
-        return false;
+    private boolean isAccountExistNoGUI(JID jid) {
+        return getXmppAccountStore().exists(jid);
     }
 
     public void setNeedBasedActivated(boolean activate) throws RemoteException {

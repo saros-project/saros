@@ -141,9 +141,8 @@ public class CreateXMPPAccountWizard extends Wizard {
         }
 
         // add account to the accountStore
-        this.createdXMPPAccount = accountStore.createNewAccount(cachedUsername,
-            cachedPassword, cachedServer);
-        accountStore.saveAccounts();
+        this.createdXMPPAccount = accountStore.createAccount(cachedUsername,
+            cachedPassword, cachedServer.toLowerCase());
 
         // reconnect if user wishes
         if (createXMPPAccountPage.useNow()) {
@@ -157,10 +156,6 @@ public class CreateXMPPAccountWizard extends Wizard {
             if (reconnect) {
                 accountStore.setAccountActive(this.createdXMPPAccount);
                 saros.connect(false);
-            }
-        } else {
-            if (!accountStore.hasActiveAccount()) {
-                accountStore.setAccountActive(this.createdXMPPAccount);
             }
         }
 

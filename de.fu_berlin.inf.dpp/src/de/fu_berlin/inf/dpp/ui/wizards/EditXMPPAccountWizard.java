@@ -71,8 +71,8 @@ public class EditXMPPAccountWizard extends Wizard {
             username = jid.getBase();
         }
 
-        this.xmppAccountStore.changeAccountData(account.getId(), username,
-            password, server);
+        this.xmppAccountStore.changeAccountData(account, username, password,
+            server.toLowerCase());
         return true;
     }
 }

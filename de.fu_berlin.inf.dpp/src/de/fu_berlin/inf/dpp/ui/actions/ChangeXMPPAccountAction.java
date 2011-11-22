@@ -65,18 +65,18 @@ public class ChangeXMPPAccountAction extends Action implements IMenuCreator {
     public void run() {
 
         Utils.runSafeAsync("ConnectDisconnectAction-", log, new Runnable() { //$NON-NLS-1$
-            public void run() {
-                try {
-                    if (running.getAndSet(true)) {
-                        log.info("User clicked too fast, running already a connect or disconnect."); //$NON-NLS-1$
-                        return;
+                public void run() {
+                    try {
+                        if (running.getAndSet(true)) {
+                            log.info("User clicked too fast, running already a connect or disconnect."); //$NON-NLS-1$
+                            return;
+                        }
+                        runConnectDisconnect();
+                    } finally {
+                        running.set(false);
                     }
-                    runConnectDisconnect();
-                } finally {
-                    running.set(false);
                 }
-            }
-        });
+            });
     }
 
     protected void runConnectDisconnect() {
@@ -100,17 +100,18 @@ public class ChangeXMPPAccountAction extends Action implements IMenuCreator {
     public Menu getMenu(Control parent) {
         accountMenu = new Menu(parent);
         for (XMPPAccount account : accountService.getAllAccounts()) {
-            this.currentAccountId = account.getId();
-            addMenuItem(account.toString());
+            addMenuItem(account);
         }
         new MenuItem(accountMenu, SWT.SEPARATOR);
-        addActionToMenu(accountMenu, new Action(Messages.ChangeXMPPAccountAction_add_account) {
+        addActionToMenu(accountMenu, new Action(
+            Messages.ChangeXMPPAccountAction_add_account) {
             @Override
             public void run() {
                 WizardUtils.openAddXMPPAccountWizard();
             }
         });
-        addActionToMenu(accountMenu, new Action(Messages.ChangeXMPPAccountAction_configure_account) {
+        addActionToMenu(accountMenu, new Action(
+            Messages.ChangeXMPPAccountAction_configure_account) {
             @Override
             public void run() {
                 IHandlerService service = (IHandlerService) PlatformUI
@@ -130,30 +131,29 @@ public class ChangeXMPPAccountAction extends Action implements IMenuCreator {
         return accountMenu;
     }
 
-    private void addMenuItem(String account) {
+    private void addMenuItem(final XMPPAccount account) {
         // The additional @ is needed because @ has special meaning in
         // Action#setText(), see JavaDoc of Action().
-        if (account.contains("@")) //$NON-NLS-1$
-            account = account + "@"; //$NON-NLS-1$
-        Action action = new Action(account) {
-            int id = currentAccountId;
+
+        String accountText = account.getUsername() + "@" + account.getDomain()
+            + "@";
+        Action action = new Action(accountText) {
 
             @Override
             public void run() {
-                connectWithThisAccount(id);
+                connectWithThisAccount(account);
             }
         };
         addActionToMenu(accountMenu, action);
     }
 
-    protected void connectWithThisAccount(int accountID) {
-        accountService.setAccountActive(accountService.getAccount(accountID));
-        accountService.saveAccounts();
+    protected void connectWithThisAccount(XMPPAccount account) {
+        accountService.setAccountActive(account);
         Utils.runSafeAsync("ChangeXMPPAccountAction-", log, new Runnable() { //$NON-NLS-1$
-            public void run() {
-                reconnect();
-            }
-        });
+                public void run() {
+                    reconnect();
+                }
+            });
     }
 
     protected void reconnect() {

@@ -82,8 +82,8 @@ public interface ISarosPreferences extends Remote {
      * 
      * @throws RemoteException
      */
-    public void editAccount(JID jid, String newXmppJabberID,
-        String newPassword) throws RemoteException;
+    public void editAccount(JID jid, String newXmppJabberID, String newPassword)
+        throws RemoteException;
 
     /**
      * delete the account specified by the given jid with GUI, which should be
@@ -96,11 +96,9 @@ public interface ISarosPreferences extends Remote {
      * @param jid
      *            a JID which is used to identify the users of the Jabber
      *            network, more about it please see {@link JID}.
-     * @param password
-     *            password of the given jid.
      * @throws RemoteException
      */
-    public void removeAccount(JID jid, String password) throws RemoteException;
+    public void removeAccount(JID jid) throws RemoteException;
 
     public void removeAllNonActiveAccounts() throws RemoteException;
 
