@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.net.jingle.protocol;
+package de.fu_berlin.inf.dpp.net.internal;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;

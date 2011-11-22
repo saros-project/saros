@@ -6,8 +6,9 @@ import org.junit.runners.Suite;
 import de.fu_berlin.inf.dpp.net.internal.extensions.InternalExtensionsTestSuite;
 
 @RunWith(Suite.class)
-@Suite.SuiteClasses({ TransferDescriptionTest.class, SarosNetConnectTest.class,
-    SarosNetTest.class, UserTest.class, InternalExtensionsTestSuite.class })
+@Suite.SuiteClasses({ BinaryChannelTest.class, TransferDescriptionTest.class,
+    SarosNetConnectTest.class, SarosNetTest.class, UserTest.class,
+    InternalExtensionsTestSuite.class })
 public class InternalTestSuite {
     // the class remains completely empty,
     // being used only as a holder for the above annotations
