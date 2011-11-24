@@ -128,8 +128,12 @@ public class EditXMPPAccountWizardPage extends WizardPage {
 
         boolean isJIDValid = this.getJID().isValid();
         boolean isPasswordNotEmpty = !this.getPassword().isEmpty();
-        boolean accountExists = !getJID().equals(initialJID)
-            && accountStore.exists(getJID());
+        boolean accountExists = accountStore.exists(getJID());
+
+        // allow password modification
+        if (accountExists && initialJID.equals(getJID())
+            && initialServer.equals(getServer()))
+            accountExists = false;
 
         if (isJIDValid)
             wasJIDValid = true;

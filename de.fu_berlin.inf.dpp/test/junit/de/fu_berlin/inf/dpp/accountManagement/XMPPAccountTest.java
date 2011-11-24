@@ -109,7 +109,7 @@ public class XMPPAccountTest {
         accounts.add(alice2);
         accounts.add(bob);
 
-        assertEquals(4, accounts.size());
+        assertEquals(3, accounts.size());
 
         assertTrue(alice0.equals(alice0));
 
@@ -119,6 +119,6 @@ public class XMPPAccountTest {
 
         assertFalse(alice0.equals(null));
         assertFalse(alice0.equals(new StringBuilder()));
-        assertFalse(alice0.equals(alice1));
+        assertTrue(alice0.equals(alice1));
     }
 }

@@ -240,8 +240,7 @@ public class EnterXMPPAccountWizardPage extends WizardPage {
 
         boolean isJIDValid = this.getJID().isValid();
         boolean isPasswordNotEmpty = !this.getPassword().isEmpty();
-        boolean accountExists = !getJID().equals(getJID())
-            && accountStore.exists(getJID());
+        boolean accountExists = accountStore.exists(getJID());
 
         if (isJIDValid)
             wasJIDValid = true;

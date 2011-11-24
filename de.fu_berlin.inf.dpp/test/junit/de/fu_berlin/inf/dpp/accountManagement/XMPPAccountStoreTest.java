@@ -279,12 +279,11 @@ public class XMPPAccountStoreTest {
             securePreferences);
         store.createAccount("alice", "alice", "b", "b", 1, true, true);
 
-        assertTrue(store.exists("alice", "alice", "b", "b", 1));
-        assertFalse(store.exists("Alice", "alice", "b", "b", 1));
-        assertFalse(store.exists("alice", "Alice", "b", "b", 1));
-        assertFalse(store.exists("alice", "alice", "a", "b", 1));
-        assertFalse(store.exists("alice", "alice", "b", "a", 1));
-        assertFalse(store.exists("alice", "alice", "b", "b", 5));
+        assertTrue(store.exists("alice", "b", "b", 1));
+        assertFalse(store.exists("Alice", "b", "b", 1));
+        assertFalse(store.exists("alice", "a", "b", 1));
+        assertFalse(store.exists("alice", "b", "a", 1));
+        assertFalse(store.exists("alice", "b", "b", 5));
     }
 
 }

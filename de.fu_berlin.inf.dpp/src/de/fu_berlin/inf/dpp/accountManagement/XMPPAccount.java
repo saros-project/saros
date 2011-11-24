@@ -125,7 +125,9 @@ public final class XMPPAccount implements Serializable {
 
     @Override
     public String toString() {
-        return String.format("%s@%s[%s:%d]", username, domain, server, port);
+        return "username: '" + username + "', domain: '" + domain
+            + "', server: '" + server + "', port: " + port + ", TSL: " + useTSL
+            + ", SASL: " + useSASL;
     }
 
     @Override
@@ -149,7 +151,6 @@ public final class XMPPAccount implements Serializable {
         XMPPAccount other = (XMPPAccount) obj;
 
         return this.username.equals(other.username)
-            && this.password.equals(other.password)
             && this.server.equals(other.server)
             && this.domain.equals(other.domain) && this.port == other.port;
     }

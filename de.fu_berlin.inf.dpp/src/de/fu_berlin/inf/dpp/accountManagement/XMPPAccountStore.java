@@ -465,8 +465,6 @@ public final class XMPPAccountStore {
      * 
      * @param username
      *            the username
-     * @param password
-     *            the password
      * @param domain
      *            the domain name of the server
      * @param server
@@ -476,11 +474,10 @@ public final class XMPPAccountStore {
      * @return <code>true if such an account exists, <code>false</code>
      *         otherwise
      */
-    public boolean exists(String username, String password, String domain,
-        String server, int port) {
+    public boolean exists(String username, String domain, String server,
+        int port) {
         for (XMPPAccount a : getAllAccounts()) {
             if (a.getServer().equalsIgnoreCase(server)
-                && a.getPassword().equals(password)
                 && a.getDomain().equalsIgnoreCase(domain)
                 && a.getUsername().equals(username) && a.getPort() == port) {
                 return true;
