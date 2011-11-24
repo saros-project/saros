@@ -81,7 +81,6 @@ import de.fu_berlin.inf.dpp.net.internal.extensions.UserListExtension;
 import de.fu_berlin.inf.dpp.net.internal.subscriptionManager.SubscriptionManager;
 import de.fu_berlin.inf.dpp.observables.FileReplacementInProgressObservable;
 import de.fu_berlin.inf.dpp.observables.InvitationProcessObservable;
-import de.fu_berlin.inf.dpp.observables.JingleFileTransferManagerObservable;
 import de.fu_berlin.inf.dpp.observables.ProjectNegotiationObservable;
 import de.fu_berlin.inf.dpp.observables.SarosSessionObservable;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
@@ -250,7 +249,6 @@ public class SarosContext {
         Component.create(InvitationProcessObservable.class),
         Component.create(ProjectNegotiationObservable.class),
         Component.create(IsInconsistentObservable.class),
-        Component.create(JingleFileTransferManagerObservable.class),
         Component.create(SessionIDObservable.class),
         Component.create(SarosSessionObservable.class),
         Component.create(VoIPSessionObservable.class),
