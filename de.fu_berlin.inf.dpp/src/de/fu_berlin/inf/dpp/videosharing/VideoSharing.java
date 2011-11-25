@@ -1,6 +1,6 @@
 /*
  * DPP - Serious Distributed Pair Programming
- * (c) Freie Universit�t Berlin - Fachbereich Mathematik und Informatik - 2010
+ * (c) Freie Universität Berlin - Fachbereich Mathematik und Informatik - 2010
  * (c) Stephan Lau - 2010
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -210,7 +210,8 @@ public class VideoSharing {
 
             public VideoPlayerView call() throws Exception {
                 sarosUI.createVideoPlayerView();
-                IViewPart view = Utils.findView(VideoPlayerView.class.getName());
+                IViewPart view = Utils
+                    .findView(VideoPlayerView.class.getName());
                 if (view instanceof VideoPlayerView) {
                     VideoPlayerView playerView = (VideoPlayerView) view;
                     return playerView;
@@ -270,8 +271,8 @@ public class VideoSharing {
 
         Utils.runSafeSWTAsync(log, new Runnable() {
             public void run() {
-                DialogUtils.openErrorMessageDialog(EditorAPI.getShell(),
-                    title, message);
+                DialogUtils.openErrorMessageDialog(EditorAPI.getShell(), title,
+                    message);
             }
         });
 
@@ -299,8 +300,8 @@ public class VideoSharing {
      * Available codecs for transmission of images
      */
     public static enum Codec {
-        XUGGLER("Xuggler (pure video, needs Xuggler installed, recommended)"), IMAGE(
-            "Tile-Encoding (based on images, pure Java, extremely slow)");
+        IMAGE("Tile-Encoding (based on images, pure Java, extremely slow)"), XUGGLER(
+            "Xuggler (pure video, needs Xuggler installed, recommended)");
 
         String humanName;
 
@@ -694,9 +695,8 @@ public class VideoSharing {
 
         /**
          * Reports an error during the session, disposes it and reports to the
-         * local and buddy. Only the first one in this session will be
-         * reported, subsequent errors (which may occur while disposing) will be
-         * ignored.
+         * local and buddy. Only the first one in this session will be reported,
+         * subsequent errors (which may occur while disposing) will be ignored.
          * 
          * @param e
          */

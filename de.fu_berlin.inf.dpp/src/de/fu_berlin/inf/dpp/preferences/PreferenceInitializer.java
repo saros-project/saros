@@ -119,7 +119,7 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 
         // videosharing
 
-        prefs.setValue(PreferenceConstants.ENCODING_VIDEO_FRAMERATE, 10);
+        prefs.setValue(PreferenceConstants.ENCODING_VIDEO_FRAMERATE, 5);
         prefs.setValue(PreferenceConstants.ENCODING_VIDEO_RESOLUTION,
             VideoSharingPreferenceHelper.RESOLUTIONS[2][1]);
         prefs.setValue(PreferenceConstants.ENCODING_VIDEO_WIDTH, 320);

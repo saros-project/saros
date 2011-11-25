@@ -1,6 +1,6 @@
 /*
  * DPP - Serious Distributed Pair Programming
- * (c) Freie Universit‰t Berlin - Fachbereich Mathematik und Informatik - 2010
+ * (c) Freie Universit√§t Berlin - Fachbereich Mathematik und Informatik - 2010
  * (c) Stephan Lau - 2010
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -19,7 +19,6 @@
  */
 package de.fu_berlin.inf.dpp.videosharing.preferences;
 
-import de.fu_berlin.inf.dpp.SarosPluginContext;
 import org.eclipse.jface.preference.BooleanFieldEditor;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
 import org.eclipse.jface.preference.IntegerFieldEditor;
@@ -33,6 +32,7 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
 import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.Saros;
+import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
 import de.fu_berlin.inf.dpp.videosharing.source.Screen;
@@ -78,7 +78,7 @@ public class ScreenPreferencePage extends FieldEditorPreferencePage implements
             composite, 4));
 
         addField(new BooleanFieldEditor(
-            PreferenceConstants.SCREEN_SHOW_MOUSEPOINTER, "Show mousepointer",
+            PreferenceConstants.SCREEN_SHOW_MOUSEPOINTER, "Show mouse pointer",
             composite));
     }
 
