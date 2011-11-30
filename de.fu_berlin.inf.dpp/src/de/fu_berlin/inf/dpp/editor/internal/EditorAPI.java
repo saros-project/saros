@@ -1,5 +1,7 @@
 package de.fu_berlin.inf.dpp.editor.internal;
 
+import static com.google.common.collect.Sets.newHashSet;
+
 import java.awt.Toolkit;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -73,8 +75,6 @@ import de.fu_berlin.inf.dpp.util.BlockingProgressMonitor;
 import de.fu_berlin.inf.dpp.util.Pair;
 import de.fu_berlin.inf.dpp.util.StackTrace;
 import de.fu_berlin.inf.dpp.util.Utils;
-
-import static com.google.common.collect.Sets.newHashSet;
 
 /**
  * The central implementation of the IEditorAPI which basically encapsulates the
@@ -815,7 +815,10 @@ public class EditorAPI implements IEditorAPI {
             int end = document.getLineOffset(bottom);
             if (end == -1 || end < start)
                 throw new BadLocationException("End line -1 or less than start");
-            SarosAnnotation annotation = new ViewportAnnotation(source);
+            ViewportAnnotation va = new ViewportAnnotation(source);
+            if (lines > 1)
+                va.setMoreThanOneLine(true);
+            SarosAnnotation annotation = va;
             Position position = new Position(start, end - start);
             model.addAnnotation(annotation, position);
         } catch (BadLocationException e) {
@@ -935,7 +938,7 @@ public class EditorAPI implements IEditorAPI {
                      * are modifying in the background
                      */
                     return IDE.saveAllEditors(
-                            new IResource[]{projectToSave}, confirm);
+                        new IResource[] { projectToSave }, confirm);
                 }
             });
             return result;
@@ -971,13 +974,13 @@ public class EditorAPI implements IEditorAPI {
             }
 
             IWorkbenchWindow w = PlatformUI.getWorkbench()
-                    .getActiveWorkbenchWindow();
+                .getActiveWorkbenchWindow();
             if (w != null) {
                 return w;
             }
 
             IWorkbenchWindow[] windows = PlatformUI.getWorkbench()
-                    .getWorkbenchWindows();
+                .getWorkbenchWindows();
             if (windows.length > 0) {
                 return windows[0];
             } else {

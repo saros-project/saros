@@ -41,6 +41,8 @@ public class ViewportAnnotation extends SarosAnnotation implements
 
     private Color fillColor;
 
+    private boolean multipleLines = false;
+
     public ViewportAnnotation(User source) {
         super(ViewportAnnotation.TYPE, false, "Visible scope of "
             + source.getHumanReadableName(), source);
@@ -76,6 +78,10 @@ public class ViewportAnnotation extends SarosAnnotation implements
         int w = canvasSize.x - 2 * ViewportAnnotation.INSET;
         int h = bounds.height;
 
+        if (multipleLines) {
+            h += gc.getFontMetrics().getHeight();
+        }
+
         if (y < 0) {
             h = h + y;
             y = 0;
@@ -87,6 +93,18 @@ public class ViewportAnnotation extends SarosAnnotation implements
 
         gc.fillRectangle(x, y, w, h);
         gc.drawRectangle(x, y, w, h);
+    }
+
+    /**
+     * Enables the advanced computation of the Viewport, because the calculation
+     * of the viewport annotation differs between files with one line and files
+     * with more than one line.
+     * 
+     * @param multipleLines
+     *            boolean flag that signs, if the editor has more than one line
+     */
+    public void setMoreThanOneLine(boolean multipleLines) {
+        this.multipleLines = multipleLines;
     }
 
     public int getLayer() {
