@@ -6,7 +6,7 @@ Bundle-Version: 11.9.30.r3567
 Bundle-Activator: de.fu_berlin.inf.dpp.whiteboard.Activator
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
- org.eclipse.gef,
+ org.eclipse.gef;bundle-version="3.7.0",
  org.eclipse.ui.views,
  org.eclipse.ui.editors,
  org.eclipse.jface.text,
