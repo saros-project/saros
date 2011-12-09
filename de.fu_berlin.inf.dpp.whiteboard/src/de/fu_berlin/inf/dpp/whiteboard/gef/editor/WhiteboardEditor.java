@@ -531,7 +531,7 @@ public class WhiteboardEditor extends SarosPermissionsGraphicalEditor {
 	protected static ToolEntry createLineToolEntry() {
 		// Note: A normal Line is a Polyline with just 2 Points
 		CombinedTargetRecordCreationFactory template = new CombinedTargetRecordCreationFactory(
-				SVGConstants.SVG_POLYLINE_TAG);
+				SVGConstants.SVG_LINE_TAG);
 
 		CreationToolEntry entry = new CombinedTemplateCreationEntry("Line",
 				"Drawing a line", template, template,
@@ -545,10 +545,10 @@ public class WhiteboardEditor extends SarosPermissionsGraphicalEditor {
 	protected static ToolEntry createArrowToolEntry() {
 		// Note: A normal Line is a Polyline with just 2 Points
 		CombinedTargetRecordCreationFactory template = new CombinedTargetRecordCreationFactory(
-				SVGConstants.SVG_POLYLINE_TAG);
+				SVGConstants.SVG_ARROW_TAG);
 
 		CreationToolEntry entry = new CombinedTemplateCreationEntry(
-				"ArrowLine", "Drawing a line", template, template,
+				"ArrowLine", "Drawing an arrow", template, template,
 				ImageDescriptor.createFromImage(IconUtils.getArrowImage()),
 				ImageDescriptor.createFromImage(IconUtils.getArrowImage()));
 		entry.setToolProperty(AbstractTool.PROPERTY_UNLOAD_WHEN_FINISHED, false);
