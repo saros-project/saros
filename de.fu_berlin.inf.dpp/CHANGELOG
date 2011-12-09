@@ -1,3 +1,33 @@
+11.12.9
+=======
+[FEATURE] Cascading annotation on folders containing open files - ID:
+3439856
+[FEATURE] Need based file synchronization
+[FEATURE] New whiteboard drawing features: Straight line, Straight line with 
+arrow-head, Text, Annotation, Drawing done in your session colour
+
+[FIX] 2788256: Prevent viewport annotations appearing one line too short.
+[FIX] fixed bug allowing FINISH button to become active even the account
+already exists
+[FIX] #3428730: Tooltip for VCS disabling removed
+[FIX] 3392279: All errors from all tabs during project acceptance (when
+invitee chooses locations for incoming projects) are displayed. Based on a
+patch from SWTP Team 3.
+[FIX] 3422151: Wrong error text in Saros Configuration Wizard
+[FIX] Non-Hosts remain in dead session when host closes eclipse - ID:
+3439796
+[FIX] subscription requests when buddy is not connected - ID: 3428736
+[FIX] #3067071, #3060297: MUC now works with local Openfire servers.
+[UI] Added an explanation for VCS support. Based on a patch by SWTP team 3.
+[FIX] Useless activate account button for active xmpp/jabb account - ID:
+3428732
+[FIX] Highlighting of active xmpp/jabber server - ID: 3428727
+[FIX] XMPP/Jabber: "delete" account - ID: 3428726
+[FIX] whiteboard: capped arrow head size
+[FIX] whiteboard: fixed arrow description
+[FIX] whiteboard: minor internal correction of the model
+
+
 11.9.30
 =======
 [FIX] [karlheld] of follow mode that enables the possibility to start following, even if the followed person has no shared editor open
