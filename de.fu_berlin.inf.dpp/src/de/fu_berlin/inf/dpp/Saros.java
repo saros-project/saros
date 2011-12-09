@@ -269,25 +269,12 @@ public class Saros extends AbstractUIPlugin {
             new UPnPAccessWeupnp(), getPreferenceStore());
 
         // determine if auto-connect can and should be performed
-        boolean autoConnect = getPreferenceStore().getBoolean(
-            PreferenceConstants.AUTO_CONNECT);
-
-        if (!autoConnect)
-            return;
-
-        StatisticManager statisticManager = sarosContext
-            .getComponent(StatisticManager.class);
-        ErrorLogManager errorLogManager = sarosContext
-            .getComponent(ErrorLogManager.class);
-
-        // we need at least a user name, but also the agreement to the
-        // statistic and error log submission
-        boolean hasUserName = this.sarosContext.getComponent(
-            PreferenceUtils.class).hasUserName();
-        boolean hasAgreement = statisticManager.hasStatisticAgreement()
-            && errorLogManager.hasErrorLogAgreement();
-
-        if (hasUserName && hasAgreement) {
+        if (getPreferenceStore().getBoolean(PreferenceConstants.AUTO_CONNECT)
+            && !sarosContext.getComponent(XMPPAccountStore.class).isEmpty()
+            && sarosContext.getComponent(StatisticManager.class)
+                .hasStatisticAgreement()
+            && sarosContext.getComponent(ErrorLogManager.class)
+                .hasErrorLogAgreement()) {
             asyncConnect();
         }
     }
@@ -443,7 +430,7 @@ public class Saros extends AbstractUIPlugin {
 
             PropertyConfigurator.configure(Saros.class.getClassLoader()
                 .getResource("saros.log4j.properties"));
-            
+
             log = Logger.getLogger("de.fu_berlin.inf.dpp"); //$NON-NLS-1$
         } catch (SecurityException e) {
             System.err.println("Could not start logging:"); //$NON-NLS-1$
