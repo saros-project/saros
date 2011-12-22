@@ -39,20 +39,6 @@
 	<classpathentry kind="lib" path="test/lib/javassist-3.14.0-GA.jar"/>
 	<classpathentry kind="lib" path="test/lib/objenesis-1.2.jar"/>
 	<classpathentry kind="lib" path="test/lib/powermock-easymock-1.4.9-full.jar"/>
-	<classpathentry kind="lib" path="test/lib/openfire/activation.jar"/>
-	<classpathentry kind="lib" path="test/lib/openfire/bouncycastle.jar"/>
-	<classpathentry kind="lib" path="test/lib/openfire/commons-el.jar"/>
-	<classpathentry kind="lib" path="test/lib/openfire/hsqldb.jar"/>
-	<classpathentry kind="lib" path="test/lib/openfire/jasper-compiler.jar"/>
-	<classpathentry kind="lib" path="test/lib/openfire/jasper-runtime.jar"/>
-	<classpathentry kind="lib" path="test/lib/openfire/jdic.jar"/>
-	<classpathentry kind="lib" path="test/lib/openfire/jtds.jar"/>
-	<classpathentry kind="lib" path="test/lib/openfire/mail.jar"/>
-	<classpathentry kind="lib" path="test/lib/openfire/mysql.jar"/>
-	<classpathentry kind="lib" path="test/lib/openfire/openfire.jar"/>
-	<classpathentry kind="lib" path="test/lib/openfire/postgres.jar"/>
-	<classpathentry kind="lib" path="test/lib/openfire/servlet.jar"/>
-	<classpathentry kind="lib" path="test/lib/openfire/startup.jar"/>
 	<classpathentry kind="lib" path="lib/xpp3-1.1.4c.jar"/>
 	<classpathentry kind="lib" path="lib/xstream-1.4-20101008.163445-1.jar"/>
 	<classpathentry kind="lib" path="lib/org.eclipse.swtbot.eclipse.core_2.0.5.20110922_1046-258a521-dev-e36.jar"/>

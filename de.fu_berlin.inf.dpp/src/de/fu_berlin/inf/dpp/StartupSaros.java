@@ -1,7 +1,5 @@
 package de.fu_berlin.inf.dpp;
 
-import java.rmi.RemoteException;
-
 import org.apache.log4j.Logger;
 import org.eclipse.equinox.security.storage.ISecurePreferences;
 import org.eclipse.equinox.security.storage.StorageException;
@@ -37,16 +35,16 @@ public class StartupSaros implements IStartup {
     private static final Logger log = Logger.getLogger(StartupSaros.class);
 
     @Inject
-    protected Saros saros;
+    private Saros saros;
 
     @Inject
-    protected SarosUI sarosUI;
+    private SarosUI sarosUI;
 
     @Inject
-    protected XMPPAccountStore xmppAccountStore;
+    private XMPPAccountStore xmppAccountStore;
 
     @Inject
-    protected PreferenceUtils preferenceUtils;
+    private PreferenceUtils preferenceUtils;
 
     public StartupSaros() {
         SarosPluginContext.reinject(this);
@@ -59,41 +57,31 @@ public class StartupSaros implements IStartup {
 
     public void earlyStartup() {
 
-        String currentVersion = saros.getVersion();
-
-        String portNumber = System.getProperty("de.fu_berlin.inf.dpp.testmode");
-
-        log.debug("de.fu_berlin.inf.dpp.testmode=" + portNumber);
-
-        boolean testmode = portNumber != null;
-
-        if (testmode) {
-            int port = Integer.parseInt(portNumber);
-            log.info("entered testmode, start RMI bot listen on port " + port);
-            startRmiBot(port);
-        }
-
-        saros.getConfigPrefs().put(PreferenceConstants.SAROS_VERSION,
-            currentVersion);
-        saros.saveConfigPrefs();
-
         updateAccounts();
         showSarosView();
 
-        if (testmode)
-            return;
+        Integer port = Integer.getInteger("de.fu_berlin.inf.dpp.testmode");
 
-        /*
-         * Only show configuration wizard if no accounts are configured. If
-         * Saros is already configured, do not show the tutorial because the
-         * user is probably already experienced.
-         */
+        if (port != null && port > 0 && port <= 65535) {
+            log.info("starting  RMI bot listen on port " + port);
+            startRmiBot(port);
 
-        showWizards(xmppAccountStore.isEmpty(),
-            !preferenceUtils.isGettingStartedFinished());
+        } else if (port != null) {
+            log.error("could not start RMI bot, port " + port
+                + " is not a valid port number");
+        } else {
+            /*
+             * Only show configuration wizard if no accounts are configured. If
+             * Saros is already configured, do not show the tutorial because the
+             * user is probably already experienced.
+             */
+
+            showWizards(xmppAccountStore.isEmpty(),
+                !preferenceUtils.isGettingStartedFinished());
+        }
     }
 
-    protected void showWizards(boolean showConfigurationWizard,
+    private void showWizards(boolean showConfigurationWizard,
         boolean showGettingStartedWizard) {
 
         if (showGettingStartedWizard)
@@ -103,21 +91,20 @@ public class StartupSaros implements IStartup {
             WizardUtils.openSarosConfigurationWizard();
     }
 
-    protected void startRmiBot(final int port) {
-        log.info("start RMI Bot");
+    private void startRmiBot(final int port) {
+
         Utils.runSafeAsync("RmiSWTWorkbenchBot-", log, new Runnable() {
             public void run() {
-                log.debug("Util.isSWT(): " + Utils.isSWT());
                 try {
                     STFController.start(port, saros);
-                } catch (RemoteException e) {
-                    log.error("remote:", e);
+                } catch (Exception e) {
+                    log.error("starting RMI bot failed", e);
                 }
             }
         });
     }
 
-    protected void showSarosView() {
+    private void showSarosView() {
         Utils.runSafeSWTSync(log, new Runnable() {
             public void run() {
                 IIntroManager m = PlatformUI.getWorkbench().getIntroManager();
@@ -126,9 +113,8 @@ public class StartupSaros implements IStartup {
                  * if there is a welcome screen, don't activate the SarosView
                  * because it would be maximized and hiding the workbench window
                  */
-                if (i != null)
-                    return;
-                sarosUI.openSarosView();
+                if (i == null)
+                    sarosUI.openSarosView();
             }
         });
     }
@@ -141,7 +127,7 @@ public class StartupSaros implements IStartup {
      * <li>Resets the existing details in the IPreferenceStore to empty string
      * </ul>
      */
-    protected void updateAccounts() {
+    private void updateAccounts() {
         IPreferenceStore prefStore = saros.getPreferenceStore();
         ISecurePreferences secureStore = saros.getSecurePrefs();
 

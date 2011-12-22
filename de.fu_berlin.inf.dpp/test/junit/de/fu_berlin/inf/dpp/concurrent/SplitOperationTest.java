@@ -1,7 +1,7 @@
 package de.fu_berlin.inf.dpp.concurrent;
 
-import static de.fu_berlin.inf.dpp.test.util.SarosTestUtils.replay;
 import static org.easymock.EasyMock.createMock;
+import static org.easymock.EasyMock.replay;
 import static org.junit.Assert.assertEquals;
 
 import java.util.Collections;
@@ -10,6 +10,7 @@ import java.util.List;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.Path;
+import org.junit.Before;
 import org.junit.Test;
 
 import de.fu_berlin.inf.dpp.User;
@@ -27,9 +28,9 @@ import de.fu_berlin.inf.dpp.concurrent.jupiter.test.util.JupiterTestCase;
  */
 public class SplitOperationTest {
 
-    protected IProject project = replay(createMock(IProject.class));
+    protected IProject project;
 
-    protected SPath path = new SPath(project, new Path("path"));
+    protected SPath path;
     protected User source = JupiterTestCase.createUserMock("source");
 
     public static Operation S(Operation one, Operation two) {
@@ -46,6 +47,13 @@ public class SplitOperationTest {
 
     public static Operation nop() {
         return new NoOperation();
+    }
+
+    @Before
+    public void setUp() {
+        project = createMock(IProject.class);
+        replay(project);
+        path = new SPath(project, new Path("path"));
     }
 
     @Test

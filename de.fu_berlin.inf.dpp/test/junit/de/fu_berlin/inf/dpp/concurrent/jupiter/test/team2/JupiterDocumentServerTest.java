@@ -1,12 +1,13 @@
 package de.fu_berlin.inf.dpp.concurrent.jupiter.test.team2;
 
-import static de.fu_berlin.inf.dpp.test.util.SarosTestUtils.replay;
 import static org.easymock.EasyMock.createMock;
+import static org.easymock.EasyMock.replay;
 import junit.framework.TestCase;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
+import org.junit.Before;
 import org.junit.Test;
 
 import de.fu_berlin.inf.dpp.activities.SPath;
@@ -17,8 +18,15 @@ public class JupiterDocumentServerTest extends TestCase {
 
     private static final String PATH = "TestPath";
 
-    IProject project = replay(createMock(IProject.class));
+    IProject project;
     IPath path = new Path(PATH);
+
+    @Override
+    public @Before
+    void setUp() throws Exception {
+        project = createMock(IProject.class);
+        replay(project);
+    }
 
     /*
      * Info: there should be added a Spec. for JupiterDocumentServer

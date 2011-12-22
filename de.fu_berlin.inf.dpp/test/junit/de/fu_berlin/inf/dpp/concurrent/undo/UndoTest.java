@@ -1,7 +1,7 @@
 package de.fu_berlin.inf.dpp.concurrent.undo;
 
-import static de.fu_berlin.inf.dpp.test.util.SarosTestUtils.replay;
 import static org.easymock.EasyMock.createMock;
+import static org.easymock.EasyMock.replay;
 import static org.junit.Assert.assertEquals;
 
 import org.eclipse.core.resources.IProject;
@@ -24,18 +24,22 @@ public class UndoTest {
 
     // private static Logger log = Logger.getLogger(UndoTest.class.getName());
 
-    protected IProject project = replay(createMock(IProject.class));
+    protected IProject project;
 
-    protected SPath path1 = new SPath(project, new Path("path1"));
-    protected SPath path2 = new SPath(project, new Path("path2"));
+    protected SPath path1;
+    protected SPath path2;
 
     protected OperationHistory history;
     protected UndoManager undoManager;
 
     @Before
     public void setUp() {
+        project = createMock(IProject.class);
+        replay(project);
         undoManager = new UndoManager();
         history = undoManager.getHistory();
+        path1 = new SPath(project, new Path("path1"));
+        path2 = new SPath(project, new Path("path2"));
     }
 
     protected Operation nop() {

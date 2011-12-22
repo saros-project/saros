@@ -1,7 +1,7 @@
 package de.fu_berlin.inf.dpp.project;
 
-import static de.fu_berlin.inf.dpp.test.util.SarosTestUtils.replay;
 import static org.easymock.EasyMock.createMock;
+import static org.easymock.EasyMock.replay;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -49,7 +49,11 @@ public class ResourceActivityFilterPluginTest {
     public @Before
     void setUp() throws Exception {
         JID jid = new JID("kitty@hello.com");
-        User source = new User(replay(createMock(ISarosSession.class)), jid, 0);
+
+        ISarosSession session = createMock(ISarosSession.class);
+        replay(session);
+
+        User source = new User(session, jid, 0);
 
         add_p_a = new FolderActivity(source, FolderActivity.Type.Created,
             newSPath("/p/a"));

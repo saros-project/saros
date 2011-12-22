@@ -1,7 +1,7 @@
 package de.fu_berlin.inf.dpp.concurrent.jupiter.test.util;
 
-import static de.fu_berlin.inf.dpp.test.util.SarosTestUtils.replay;
 import static org.easymock.EasyMock.createMock;
+import static org.easymock.EasyMock.replay;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -32,7 +32,8 @@ public class JupiterSimulator {
 
     public JupiterSimulator(String document) {
 
-        IProject project = replay(createMock(IProject.class));
+        IProject project = createMock(IProject.class);
+        replay(project);
         IPath path = new Path("test");
 
         client = new Peer(new Jupiter(true), document, project, path);

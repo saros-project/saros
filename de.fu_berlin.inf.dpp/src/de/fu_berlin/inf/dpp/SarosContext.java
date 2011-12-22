@@ -102,7 +102,6 @@ import de.fu_berlin.inf.dpp.ui.RemoteProgressManager;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
 import de.fu_berlin.inf.dpp.ui.actions.SendFileAction;
 import de.fu_berlin.inf.dpp.util.EclipseHelper;
-import de.fu_berlin.inf.dpp.util.EclipseHelperTestSaros;
 import de.fu_berlin.inf.dpp.util.StackTrace;
 import de.fu_berlin.inf.dpp.util.VersionManager;
 import de.fu_berlin.inf.dpp.util.pico.ChildContainer;
@@ -305,9 +304,6 @@ public class SarosContext {
 
     };
 
-    private static final Component[] TEST_COMPONENTS = new Component[] { Component
-        .create(EclipseHelper.class, EclipseHelperTestSaros.class) };
-
     /*
      * Use the SarosContextBuilder to build a SarosContext. {@link
      * SarosContextBuilder}
@@ -354,21 +350,6 @@ public class SarosContext {
 
         Set<Component> contextComponents = new HashSet<Component>(
             Arrays.asList(COMPONENTS));
-
-        if (this.isTestContext) {
-            for (Component component : TEST_COMPONENTS) {
-                boolean removed = contextComponents.remove(component);
-                if (!removed) {
-                    log.warn("could not replace impl. class for interface '"
-                        + component.getInterface().getName()
-                        + "' with the test impl. class '"
-                        + component.getImplementation().getName()
-                        + "', the interface does not exist in the context");
-                } else {
-                    contextComponents.add(component);
-                }
-            }
-        }
 
         for (Component component : contextComponents)
             this.container.addComponent(component.getInterface(),
@@ -459,10 +440,6 @@ public class SarosContext {
         container.dispose();
     }
 
-    public boolean isTestContext() {
-        return isTestContext;
-    }
-
     /**
      * Starting point for getting a correct initialized SarosContext.
      */
@@ -484,11 +461,6 @@ public class SarosContext {
 
         public SarosContextBuilder withDotMonitor(DotGraphMonitor dotMonitor) {
             this.dotMonitor = dotMonitor;
-            return this;
-        }
-
-        public SarosContextBuilder isTestContext() {
-            this.isTestContext = true;
             return this;
         }
 

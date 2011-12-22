@@ -4,8 +4,8 @@ package de.fu_berlin.inf.dpp.concurrent.jupiter.test.puzzles;
  * This test class represent local execution of document changes and
  * appropriate jupiter operations.
  */
-import static de.fu_berlin.inf.dpp.test.util.SarosTestUtils.replay;
 import static org.easymock.EasyMock.createMock;
+import static org.easymock.EasyMock.replay;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -32,7 +32,9 @@ public class SimpleJupiterDocumentTest extends JupiterTestCase {
     @Test
     public void testExecuteLocalOperations() {
         Algorithm algo = new Jupiter(true);
-        IProject project = replay(createMock(IProject.class));
+        IProject project = createMock(IProject.class);
+        replay(project);
+
         IPath path = new Path("dummy");
 
         Document doc = new Document("abc", project, path);
@@ -58,5 +60,4 @@ public class SimpleJupiterDocumentTest extends JupiterTestCase {
         System.out.println(jupiterActivity.getOperation().toString());
 
     }
-
 }

@@ -1,7 +1,7 @@
 package de.fu_berlin.inf.dpp.concurrent.jupiter.test.util;
 
-import static de.fu_berlin.inf.dpp.test.util.SarosTestUtils.replay;
 import static org.easymock.EasyMock.createMock;
+import static org.easymock.EasyMock.replay;
 
 import java.util.HashMap;
 import java.util.PriorityQueue;
@@ -23,7 +23,7 @@ public class NetworkSimulator {
 
     private RuntimeException error;
 
-    public IProject project = replay(createMock(IProject.class));
+    public IProject project;
 
     public IPath path = new Path("dummy");
 
@@ -32,6 +32,8 @@ public class NetworkSimulator {
     protected int presentTime = -1;
 
     public NetworkSimulator() {
+        project = createMock(IProject.class);
+        replay(project);
         clients = new HashMap<JID, NetworkEventHandler>();
     }
 

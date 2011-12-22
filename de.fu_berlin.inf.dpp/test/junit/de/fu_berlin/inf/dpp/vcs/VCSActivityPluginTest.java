@@ -1,7 +1,7 @@
 package de.fu_berlin.inf.dpp.vcs;
 
-import static de.fu_berlin.inf.dpp.test.util.SarosTestUtils.replay;
 import static org.easymock.EasyMock.createMock;
+import static org.easymock.EasyMock.replay;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
@@ -23,7 +23,9 @@ public class VCSActivityPluginTest {
         IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
 
         JID jid = new JID("");
-        User source = new User(replay(createMock(ISarosSession.class)), jid, 0);
+        ISarosSession session = createMock(ISarosSession.class);
+        replay(session);
+        User source = new User(session, jid, 0);
         IProject p = root.getProject("p");
         SPath p_a = new SPath(p, new Path("a"));
         VCSActivity switch_p_a = new VCSActivity(VCSActivity.Type.Switch,
