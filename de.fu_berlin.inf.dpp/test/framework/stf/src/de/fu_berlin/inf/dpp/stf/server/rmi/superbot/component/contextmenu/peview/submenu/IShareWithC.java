@@ -8,8 +8,8 @@ import de.fu_berlin.inf.dpp.stf.server.StfRemoteObject;
 
 /**
  * This interface contains convenience API to perform actions activated by
- * clicking subMenus of contextMenu {@link StfRemoteObject#CM_SHARE_WITH} in the package
- * explorer view. STF users would start off as follows:
+ * clicking subMenus of contextMenu {@link StfRemoteObject#CM_SHARE_WITH} in the
+ * package explorer view. STF users would start off as follows:
  * 
  * <pre>
  * //
@@ -86,4 +86,6 @@ public interface IShareWithC extends Remote {
      * @throws RemoteException
      */
     public void buddy(JID jid) throws RemoteException;
+
+    public void addToSarosSession() throws RemoteException;
 }

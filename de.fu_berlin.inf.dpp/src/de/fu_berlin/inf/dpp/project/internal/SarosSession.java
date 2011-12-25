@@ -1251,9 +1251,12 @@ public class SarosSession implements ISarosSession, Disposable {
 
     public void addProjectOwnership(String projectID, IProject project,
         JID ownerJID) {
-        projectMapper.addMapping(projectID, project, new SharedProject(project,
-            this));
-        projectMapper.addResourceMapping(project, new ArrayList<IResource>());
-        projectMapper.addUserToProjectMapping(ownerJID, project, projectID);
+        if (projectMapper.getSharedProject(projectID) == null) {
+            projectMapper.addMapping(projectID, project, new SharedProject(
+                project, this));
+            projectMapper.addResourceMapping(project,
+                new ArrayList<IResource>());
+            projectMapper.addUserToProjectMapping(ownerJID, project, projectID);
+        }
     }
 }
