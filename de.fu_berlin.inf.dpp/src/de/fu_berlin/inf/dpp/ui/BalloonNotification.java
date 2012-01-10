@@ -2,6 +2,7 @@ package de.fu_berlin.inf.dpp.ui;
 
 import org.apache.log4j.Logger;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -47,8 +48,12 @@ public class BalloonNotification {
         }
 
         final BalloonWindow window = new BalloonWindow(
-            control != null ? control.getShell() : null, SWT.TOOL | SWT.CLOSE
-                | SWT.TITLE);
+            control != null ? control.getShell() : null, SWT.TOOL | SWT.TITLE);
+        // Note: if you add SWT.CLOSE to the style of the BalloonWindow, it will
+        // only be closed when directly clicking on the close icon (x) and
+        // therefore break user expectations.
+        // FIXME: find out a way to display the closing X AND make the bubble
+        // close on any click anywhere on it.
 
         window.setText(title);
 
@@ -57,9 +62,18 @@ public class BalloonNotification {
         // the contents won't show
         Composite c = window.getContents();
         c.setLayout(new FillLayout());
+
         Label l = new Label(c, SWT.NONE);
         l.setText(text);
         c.pack(true);
+
+        Shell shell = window.getShell();
+        final Color col = new Color(shell.getDisplay(), 255, 255, 225);
+        l.setBackground(col);
+        l.setForeground(shell.getDisplay().getSystemColor(SWT.COLOR_BLACK));
+
+        // make window close when clicking on balloon text, too
+        window.addSelectionControl(l);
 
         // Locate the balloon to the widget location
         if (control != null) {
