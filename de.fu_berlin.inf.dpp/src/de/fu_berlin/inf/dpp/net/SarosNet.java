@@ -23,6 +23,7 @@ import de.fu_berlin.inf.dpp.SafeConnectionListener;
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.net.UPnP.UPnPManager;
 import de.fu_berlin.inf.dpp.net.util.NetworkingUtils;
+import de.fu_berlin.inf.dpp.ui.views.SarosView;
 import de.fu_berlin.inf.dpp.util.Utils;
 
 /**
@@ -455,6 +456,16 @@ public class SarosNet {
                 disconnect();
                 setConnectionState(ConnectionState.NOT_CONNECTED, e);
 
+                return;
+            }
+
+            if (e.toString().equals("stream:error (text)")) {
+                // the same user logged in via xmpp on another server/host
+                SarosView
+                    .showNotification(
+                        "XMPP Connection lost",
+                        "Someone logged in with your current XMPP user data from another host, so you got disconncted. You can reconnect at any time.");
+                setConnectionState(ConnectionState.NOT_CONNECTED, e);
                 return;
             }
 
