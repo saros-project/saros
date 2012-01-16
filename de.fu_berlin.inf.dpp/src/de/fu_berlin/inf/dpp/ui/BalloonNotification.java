@@ -1,5 +1,8 @@
 package de.fu_berlin.inf.dpp.ui;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.log4j.Logger;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
@@ -19,6 +22,23 @@ public class BalloonNotification {
 
     private static final Logger log = Logger
         .getLogger(BalloonNotification.class.getName());
+
+    private static List<BalloonWindow> windows = new ArrayList<BalloonWindow>();
+
+    /**
+     * Close all currently active notification windows
+     * 
+     * It would probably suffice to only remember the last notification window,
+     * because currently all windows are displayed in the same position,
+     * overlapping each other. But if we ever manage to (FIXME) display balloon
+     * notifications in different spots, they might not overlap and
+     * should/remain.
+     */
+    public static void removeAllActiveNotifications() {
+        for (BalloonWindow window : windows) {
+            window.close();
+        }
+    }
 
     /**
      * Opens a notification window next to a control. The notification window
@@ -47,8 +67,13 @@ public class BalloonNotification {
             control = null;
         }
 
+        // close all previous balloon notifications like it is done in
+        // windows to prevent overlapping of multiple balloons...
+        BalloonNotification.removeAllActiveNotifications();
+
         final BalloonWindow window = new BalloonWindow(
             control != null ? control.getShell() : null, SWT.TOOL | SWT.TITLE);
+        windows.add(window);
         // Note: if you add SWT.CLOSE to the style of the BalloonWindow, it will
         // only be closed when directly clicking on the close icon (x) and
         // therefore break user expectations.
