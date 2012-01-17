@@ -72,6 +72,7 @@ public class ResourceDisplayComposite extends ViewerComposite {
         this.viewer.setContentProvider(new WorkbenchContentProvider());
         this.viewer.setLabelProvider(new WorkbenchLabelProvider());
         this.viewer.setUseHashlookup(true);
+        this.viewer.setSorter(new WorkbenchItemsSorter());
     }
 
     /**
