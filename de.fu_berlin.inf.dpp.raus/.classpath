@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.7"/>
+	<classpathentry kind="lib" path="/usr/share/eclipse/dropins/subclipse/eclipse/plugins/org.tigris.subversion.subclipse.ui_1.6.18.jar"/>
+	<classpathentry kind="lib" path="/usr/share/eclipse/dropins/subclipse/eclipse/plugins/org.tigris.subversion.subclipse.core_1.6.18.jar"/>
+	<classpathentry kind="lib" path="/usr/lib64/eclipse/plugins/org.eclipse.team.core_3.6.0.I20110525-0800.jar" sourcepath="/usr/lib64/eclipse/dropins/sdk/plugins/org.eclipse.team.core.source_3.6.0.I20110525-0800.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="jar:file:/usr/lib64/eclipse/dropins/sdk/plugins/org.eclipse.platform.doc.isv_3.7.1.r371_20110831.jar!/reference/api"/>
+		</attributes>
+		<accessrules>
+			<accessrule kind="accessible" pattern="org/eclipse/team/core/*"/>
+			<accessrule kind="accessible" pattern="org/eclipse/team/core/diff/*"/>
+			<accessrule kind="accessible" pattern="org/eclipse/team/core/diff/provider/*"/>
+			<accessrule kind="accessible" pattern="org/eclipse/team/core/history/*"/>
+			<accessrule kind="accessible" pattern="org/eclipse/team/core/history/provider/*"/>
+			<accessrule kind="discouraged" pattern="org/eclipse/team/core/importing/provisional/*"/>
+			<accessrule kind="accessible" pattern="org/eclipse/team/core/mapping/*"/>
+			<accessrule kind="accessible" pattern="org/eclipse/team/core/mapping/provider/*"/>
+			<accessrule kind="accessible" pattern="org/eclipse/team/core/subscribers/*"/>
+			<accessrule kind="accessible" pattern="org/eclipse/team/core/synchronize/*"/>
+			<accessrule kind="accessible" pattern="org/eclipse/team/core/variants/*"/>
+			<accessrule kind="discouraged" pattern="org/eclipse/team/internal/core/*"/>
+			<accessrule kind="discouraged" pattern="org/eclipse/team/internal/core/history/*"/>
+			<accessrule kind="discouraged" pattern="org/eclipse/team/internal/core/importing/*"/>
+			<accessrule kind="discouraged" pattern="org/eclipse/team/internal/core/mapping/*"/>
+			<accessrule kind="discouraged" pattern="org/eclipse/team/internal/core/streams/*"/>
+			<accessrule kind="discouraged" pattern="org/eclipse/team/internal/core/subscribers/*"/>
+			<accessrule ignoreifbetter="true" kind="nonaccessible" pattern="**/*"/>
+		</accessrules>
+	</classpathentry>
+	<classpathentry kind="lib" path="/usr/share/eclipse/dropins/svnkit/eclipse/plugins/org.tmatesoft.svnkit_1.3.4/svnkit.jar"/>
+	<classpathentry kind="lib" path="/usr/lib64/eclipse/plugins/org.eclipse.swt.gtk.linux.x86_64_3.7.1.v3738a.jar" sourcepath="/usr/lib64/eclipse/dropins/sdk/plugins/org.eclipse.swt.gtk.linux.x86_64.source_3.7.1.v3738a.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="jar:file:/usr/lib64/eclipse/dropins/sdk/plugins/org.eclipse.platform.doc.isv_3.7.1.r371_20110831.jar!/reference/api"/>
+		</attributes>
+		<accessrules>
+			<accessrule kind="accessible" pattern="org/eclipse/swt/*"/>
+			<accessrule kind="accessible" pattern="org/eclipse/swt/accessibility/*"/>
+			<accessrule kind="accessible" pattern="org/eclipse/swt/awt/*"/>
+			<accessrule kind="accessible" pattern="org/eclipse/swt/browser/*"/>
+			<accessrule kind="accessible" pattern="org/eclipse/swt/custom/*"/>
+			<accessrule kind="accessible" pattern="org/eclipse/swt/dnd/*"/>
+			<accessrule kind="accessible" pattern="org/eclipse/swt/events/*"/>
+			<accessrule kind="accessible" pattern="org/eclipse/swt/graphics/*"/>
+			<accessrule kind="accessible" pattern="org/eclipse/swt/layout/*"/>
+			<accessrule kind="accessible" pattern="org/eclipse/swt/opengl/*"/>
+			<accessrule kind="accessible" pattern="org/eclipse/swt/printing/*"/>
+			<accessrule kind="accessible" pattern="org/eclipse/swt/program/*"/>
+			<accessrule kind="accessible" pattern="org/eclipse/swt/widgets/*"/>
+			<accessrule kind="discouraged" pattern="org/eclipse/swt/internal/*"/>
+			<accessrule kind="discouraged" pattern="org/eclipse/swt/internal/image/*"/>
+			<accessrule kind="discouraged" pattern="org/eclipse/swt/internal/theme/*"/>
+			<accessrule kind="discouraged" pattern="org/eclipse/swt/internal/accessibility/gtk/*"/>
+			<accessrule kind="discouraged" pattern="org/eclipse/swt/internal/cairo/*"/>
+			<accessrule kind="discouraged" pattern="org/eclipse/swt/internal/cde/*"/>
+			<accessrule kind="discouraged" pattern="org/eclipse/swt/internal/gnome/*"/>
+			<accessrule kind="discouraged" pattern="org/eclipse/swt/internal/gtk/*"/>
+			<accessrule kind="discouraged" pattern="org/eclipse/swt/internal/mozilla/*"/>
+			<accessrule kind="discouraged" pattern="org/eclipse/swt/internal/opengl/glx/*"/>
+			<accessrule ignoreifbetter="true" kind="nonaccessible" pattern="**/*"/>
+		</accessrules>
+	</classpathentry>
+	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
+	<classpathentry kind="lib" path="/usr/lib64/eclipse/dropins/jdt/plugins/org.eclipse.jdt.junit_3.7.0.v20110505-0800.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/Saros"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>
