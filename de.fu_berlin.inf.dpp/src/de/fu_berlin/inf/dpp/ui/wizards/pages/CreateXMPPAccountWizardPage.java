@@ -1,6 +1,10 @@
 package de.fu_berlin.inf.dpp.ui.wizards.pages;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.wizard.WizardPage;
@@ -163,22 +167,20 @@ public class CreateXMPPAccountWizardPage extends WizardPage {
     }
 
     private void setInitialValues() {
-        defaultUsername = ""; //$NON-NLS-1$
-        defaultPassword = ""; //$NON-NLS-1$
-        defaultServer = preferenceUtils.getServer();
+        defaultUsername = "";
+        defaultPassword = "";
+        defaultServer = preferenceUtils.getDefaultServer();
 
-        if (defaultServer.length() == 0)
-            defaultServer = preferenceUtils.getDefaultServer();
-
-        List<String> servers = accountStore.getDomains();
+        Set<String> servers = new HashSet<String>(accountStore.getDomains());
         servers.add(defaultServer);
 
-        this.serverText.removeAll();
+        List<String> serverList = new ArrayList<String>(servers);
+        Collections.sort(serverList);
 
-        for (String server : servers)
+        for (String server : serverList)
             this.serverText.add(server);
 
-        this.serverText.select(servers.indexOf(defaultServer));
+        this.serverText.select(serverList.indexOf(defaultServer));
     }
 
     private void hookListeners() {
