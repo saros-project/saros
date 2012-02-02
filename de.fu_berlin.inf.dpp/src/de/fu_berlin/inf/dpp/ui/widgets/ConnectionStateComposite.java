@@ -17,6 +17,7 @@ import de.fu_berlin.inf.dpp.net.IConnectionListener;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
+import de.fu_berlin.inf.dpp.ui.views.SarosView;
 import de.fu_berlin.inf.dpp.util.Utils;
 import de.fu_berlin.inf.nebula.utils.FontUtils;
 import de.fu_berlin.inf.nebula.utils.LayoutUtils;
@@ -115,6 +116,13 @@ public class ConnectionStateComposite extends Composite {
                 return Messages.ConnectionStateComposite_error;
             } else if (e.toString().equalsIgnoreCase("stream:error (conflict)")) { //$NON-NLS-1$
                 return Messages.ConnectionStateComposite_error_ressource_conflict;
+            } else if (e.toString().equalsIgnoreCase("stream:error (text)")) {
+                // the same user logged in via xmpp on another server/host
+                SarosView
+                    .showNotification(
+                        "XMPP Connection lost",
+                        "Someone logged in with your current XMPP account from another host, so you got disconnected. Your account may had been compromised !");
+                return Messages.ConnectionStateComposite_not_connected;
             } else {
                 return MessageFormat.format(
                     Messages.ConnectionStateComposite_error_with_message,
