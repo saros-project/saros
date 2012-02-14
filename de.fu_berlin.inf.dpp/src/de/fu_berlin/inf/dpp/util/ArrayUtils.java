@@ -1,7 +1,10 @@
 package de.fu_berlin.inf.dpp.util;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.core.runtime.Platform;
 
@@ -43,13 +46,13 @@ public class ArrayUtils {
      * @return
      */
     @SuppressWarnings("unchecked")
-    public static <Adapter> List<Adapter> getAdaptableObjects(Object[] objects,
-        Class<? extends Adapter> adapter) {
-        List<Adapter> adaptableObjects = new ArrayList<Adapter>();
+    public static <T> List<T> getAdaptableObjects(Object[] objects,
+        Class<? extends T> adapter) {
+        Set<T> adaptableObjects = new HashSet<T>(objects.length);
 
         for (Object object : objects) {
-            Adapter adaptedObject = (Adapter) Platform.getAdapterManager()
-                .getAdapter(object, adapter);
+            T adaptedObject = (T) Platform.getAdapterManager().getAdapter(
+                object, adapter);
 
             if (adaptedObject != null
                 && !adaptableObjects.contains(adaptedObject)) {
@@ -57,7 +60,7 @@ public class ArrayUtils {
             }
         }
 
-        return adaptableObjects;
+        return (List<T>) Arrays.asList(adaptableObjects.toArray());
     }
 
 }
