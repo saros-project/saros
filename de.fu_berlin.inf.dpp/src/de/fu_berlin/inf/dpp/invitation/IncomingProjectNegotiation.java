@@ -31,6 +31,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
@@ -400,9 +401,22 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
         }
 
         if (vcs != null) {
-            if (!isPartialRemoteProject(projectID))
-                newLocalProject = vcs.checkoutProject(newProjectName,
-                    remoteFileList, monitor);
+            if (!isPartialRemoteProject(projectID)) {
+                try {
+
+                    newLocalProject = vcs.checkoutProject(newProjectName,
+                        remoteFileList, monitor);
+                } catch (OperationCanceledException e) {
+                    /*
+                     * The exception is thrown if the user canceled the svn
+                     * checkout process. We send the remote user a sophisticated
+                     * message here.
+                     */
+                    throw new LocalCancellationException(
+                        "The VCS checkout process was canceled",
+                        CancelOption.NOTIFY_PEER);
+                }
+            }
 
             /*
              * HACK: After checking out a project, give Eclipse/the Team
