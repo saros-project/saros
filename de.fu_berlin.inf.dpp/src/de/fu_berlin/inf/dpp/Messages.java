@@ -13,9 +13,7 @@ public class Messages extends NLS {
     public static String Saros_30;
     public static String Saros_32;
     public static String Saros_33;
-    public static String Saros_35;
     public static String Saros_36;
-    public static String Saros_38;
     public static String Saros_39;
     public static String Saros_40;
     public static String User_comparing;
