@@ -91,6 +91,8 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
         // InvitationDialog
         prefs.setValue(PreferenceConstants.AUTO_CLOSE_DIALOG, true);
         prefs.setValue(PreferenceConstants.SKIP_SYNC_SELECTABLE, false);
+        prefs.setValue(
+            PreferenceConstants.BUDDYSELECTION_FILTERNONSAROSBUDDIES, true);
 
         // its a new workspace per default, is set to false after first start in
         // earlyStartup()
@@ -126,7 +128,7 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
         prefs.setValue(PreferenceConstants.ENCODING_VIDEO_HEIGHT, 240);
         prefs.setValue(PreferenceConstants.ENCODING_MAX_BITRATE, 512000);
         prefs.setValue(PreferenceConstants.ENCODING_CODEC,
-            VideoSharing.Codec.XUGGLER.name());
+            VideoSharing.Codec.IMAGE.name());
 
         prefs.setValue(PreferenceConstants.XUGGLER_CONTAINER_FORMAT, "flv");
         prefs.setValue(PreferenceConstants.XUGGLER_CODEC, "libx264");
