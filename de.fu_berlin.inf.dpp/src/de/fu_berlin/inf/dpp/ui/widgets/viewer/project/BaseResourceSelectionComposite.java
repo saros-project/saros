@@ -11,7 +11,6 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.viewers.CheckStateChangedEvent;
 import org.eclipse.jface.viewers.CheckboxTreeViewer;
 import org.eclipse.jface.viewers.ICheckStateListener;
@@ -52,6 +51,7 @@ import de.fu_berlin.inf.dpp.util.ArrayUtils;
  * 
  * @author bkahlert
  * @author kheld
+ * @author waldmann
  * 
  */
 public class BaseResourceSelectionComposite extends ResourceDisplayComposite {
@@ -76,7 +76,7 @@ public class BaseResourceSelectionComposite extends ResourceDisplayComposite {
      * <ul>
      * <li>If folder or project root is selected, check subtree
      * <li>If one (or more) element(s) of project selected, select
-     * <b>.calsspath</b> and <b>.project</b> file aswell (if exists)
+     * <b>.classpath</b> and <b>.project</b> file as well (if exists)
      * <li>If selected resource is not project root, handle gray status of
      * checkboxes in the higher tree levels
      * </ul>
@@ -88,35 +88,13 @@ public class BaseResourceSelectionComposite extends ResourceDisplayComposite {
         if (resource instanceof IFile) {
             this.checkboxTreeViewer.setChecked(resource, checked);
             setParentsCheckedORGrayed(resource);
-        } else if (resource instanceof IFolder || resource instanceof IProject) {
-            this.checkboxTreeViewer.setGrayChecked(resource, false);
+        } else if (resource instanceof IFolder) {
             this.checkboxTreeViewer.setChecked(resource, checked);
-            setChildrenUngrayed(resource);
             this.checkboxTreeViewer.setSubtreeChecked(resource, checked);
             setParentsCheckedORGrayed(resource);
-        }
-    }
-
-    /**
-     * Traverses the whole subtree of selected resource to reset their gray
-     * status. This is necessary to do before elements can get checked.
-     * 
-     * @param resource
-     */
-    private void setChildrenUngrayed(IResource resource) {
-        if (resource instanceof IProject) {
-            if (!((IProject) resource).isOpen())
-                return;
-        }
-        if ((resource instanceof IProject) || (resource instanceof IFolder)) {
-            try {
-                for (Object elemt : ((IContainer) resource).members()) {
-                    this.checkboxTreeViewer.setGrayChecked(elemt, false);
-                    setChildrenUngrayed((IResource) elemt);
-                }
-            } catch (CoreException e) {
-                log.debug("Can't determine tree members.", e);
-            }
+        } else if (resource instanceof IProject) {
+            this.checkboxTreeViewer.setGrayChecked(resource, false);
+            this.checkboxTreeViewer.setSubtreeChecked(resource, checked);
         }
     }
 
@@ -139,24 +117,24 @@ public class BaseResourceSelectionComposite extends ResourceDisplayComposite {
             Object[] childs = ((WorkbenchContentProvider) checkboxTreeViewer
                 .getContentProvider()).getChildren(parentResource);
             for (int i = 0; i < childs.length; i++) {
-                if (this.checkboxTreeViewer.getChecked(childs[i]))
+                if (this.checkboxTreeViewer.getChecked(childs[i])) {
                     checkedChildren++;
-                if (this.checkboxTreeViewer.getGrayed(childs[i]))
+                }
+                if (this.checkboxTreeViewer.getGrayed(childs[i])) {
                     grayedChildren++;
+                }
             }
             checkedChildren = checkedChildren - grayedChildren;
             if (childs.length == checkedChildren) {
                 checkboxTreeViewer.setGrayed(parentResource, false);
                 checkboxTreeViewer.setChecked(parentResource, true);
-                setParentsCheckedORGrayed(parentResource);
             } else if ((grayedChildren > 0) || (checkedChildren > 0)) {
                 checkboxTreeViewer.setChecked(parentResource, true);
                 checkboxTreeViewer.setGrayed(parentResource, true);
-                setParentsCheckedORGrayed(parentResource);
             } else {
                 checkboxTreeViewer.setGrayChecked(parentResource, false);
-                setParentsCheckedORGrayed(parentResource);
             }
+            setParentsCheckedORGrayed(parentResource);
         }
         return;
     }
@@ -220,7 +198,7 @@ public class BaseResourceSelectionComposite extends ResourceDisplayComposite {
         Object[] allElements = structuredContentProvider
             .getElements(checkboxTreeViewer.getInput());
         Object[] checkedElements = checkboxTreeViewer.getCheckedElements();
-
+        
         List<IResource> allResources = ArrayUtils.getAdaptableObjects(
             allElements, IResource.class);
         List<IResource> checkedResources = ArrayUtils.getAdaptableObjects(
@@ -228,7 +206,7 @@ public class BaseResourceSelectionComposite extends ResourceDisplayComposite {
 
         Map<IResource, Boolean> checkStatesChanges = calculateCheckStateDiff(
             allResources, checkedResources, resources);
-
+            
         /*
          * Does not fire events...
          */
@@ -277,7 +255,8 @@ public class BaseResourceSelectionComposite extends ResourceDisplayComposite {
     }
 
     /**
-     * Returns the currently selected {@link IResource}s.
+     * Returns the currently selected {@link IResource}s. If you only want to
+     * know if at least one resource is selected, use hasSelectedResources()
      * 
      * @return
      */
@@ -292,6 +271,14 @@ public class BaseResourceSelectionComposite extends ResourceDisplayComposite {
     }
 
     /**
+     * Returns true if at least one resource is selected
+     */
+    public boolean hasSelectedResources() {
+        CheckboxTreeViewer checkboxTreeViewer = ((CheckboxTreeViewer) this.viewer);
+        return checkboxTreeViewer.getCheckedElements().length > 0;
+    }
+
+	/**
      * Adds a {@link BaseResourceSelectionListener}
      * 
      * @param resourceSelectionListener

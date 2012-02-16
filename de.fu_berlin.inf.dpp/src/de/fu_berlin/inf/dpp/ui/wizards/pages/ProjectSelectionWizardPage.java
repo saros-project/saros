@@ -2,6 +2,7 @@ package de.fu_berlin.inf.dpp.ui.wizards.pages;
 
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.jface.wizard.WizardPage;
@@ -21,11 +22,10 @@ import de.fu_berlin.inf.dpp.ui.widgets.viewer.project.ResourceSelectionComposite
 import de.fu_berlin.inf.dpp.ui.widgets.viewer.project.events.FilterClosedProjectsChangedEvent;
 import de.fu_berlin.inf.dpp.ui.widgets.viewer.project.events.ResourceSelectionChangedEvent;
 import de.fu_berlin.inf.dpp.ui.widgets.viewer.project.events.ResourceSelectionListener;
+import de.fu_berlin.inf.dpp.util.Utils;
 
 public class ProjectSelectionWizardPage extends WizardPage {
-    public static final String TITLE = Messages.ProjectSelectionWizardPage_title;
-    public static final String DESCRIPTION = Messages.ProjectSelectionWizardPage_description;
-
+    Logger log = Logger.getLogger(this.getClass());
     public static final String NO_PROJECT_SELECTED_ERROR_MESSAGE = Messages.ProjectSelectionWizardPage_selected_no_project;
 
     protected ResourceSelectionComposite resourceSelectionComposite;
@@ -38,12 +38,13 @@ public class ProjectSelectionWizardPage extends WizardPage {
         public void resourceSelectionChanged(ResourceSelectionChangedEvent event) {
             if (resourceSelectionComposite != null
                 && !resourceSelectionComposite.isDisposed()) {
-                if (resourceSelectionComposite.getSelectedResources().size() == 0) {
+                if (!resourceSelectionComposite.hasSelectedResources()) {
                     setErrorMessage(NO_PROJECT_SELECTED_ERROR_MESSAGE);
+                    setPageComplete(false);
                 } else {
                     setErrorMessage(null);
+                    setPageComplete(true);
                 }
-                updatePageCompletion();
             }
         }
 
@@ -60,8 +61,8 @@ public class ProjectSelectionWizardPage extends WizardPage {
 
     public ProjectSelectionWizardPage() {
         super(ProjectSelectionWizardPage.class.getName());
-        setTitle(TITLE);
-        setDescription(DESCRIPTION);
+        setTitle(Messages.ProjectSelectionWizardPage_title);
+        setDescription(Messages.ProjectSelectionWizardPage_description);
     }
 
     public void createControl(Composite parent) {
@@ -76,18 +77,21 @@ public class ProjectSelectionWizardPage extends WizardPage {
         Label projectSelectionLabel = new Label(composite, SWT.NONE);
         projectSelectionLabel.setLayoutData(new GridData(SWT.BEGINNING,
             SWT.TOP, false, true));
-        projectSelectionLabel.setText(Messages.ProjectSelectionWizardPage_projects);
+        projectSelectionLabel
+            .setText(Messages.ProjectSelectionWizardPage_projects);
 
         createProjectSelectionComposite(composite);
         this.resourceSelectionComposite.setLayoutData(new GridData(SWT.FILL,
             SWT.FILL, true, true));
-
-        /*
-         * Page completion
-         */
-        updatePageCompletion();
     }
 
+    /**
+     * Create the composite and initialize it's selection asynchronously with
+     * the current selection of the active "navigator"-type views in the current
+     * workspace perspective
+     * 
+     * @param parent
+     */
     protected void createProjectSelectionComposite(Composite parent) {
         if (this.resourceSelectionComposite != null
             && !this.resourceSelectionComposite.isDisposed())
@@ -97,30 +101,41 @@ public class ProjectSelectionWizardPage extends WizardPage {
             parent, SWT.BORDER | SWT.V_SCROLL, PlatformUI.getPreferenceStore()
                 .getBoolean(
                     PreferenceConstants.PROJECTSELECTION_FILTERCLOSEDPROJECTS));
-        this.resourceSelectionComposite
-            .setSelectedResources(SelectionRetrieverFactory
-                .getSelectionRetriever(IResource.class).getOverallSelection());
-        this.resourceSelectionComposite
-            .addResourceSelectionListener(resourceSelectionListener);
 
         /*
-         * If no project is selected and only one project exists in the
-         * workspace, select it in Wizard.
+         * Initialize the selection asynchronously, so the wizard opens
+         * INSTANTLY instead of waiting up to XX seconds with flickering cursor
+         * until the selection was applied.
+         * 
+         * FIXME: We still have a nasty flickering cursor, while the selection
+         * is applied and the user has to wait up to 5 seconds (when choosing
+         * many huge projects with many files are selected) but unless the
+         * checkboxTreeViewer itself is optimized, it's probably hard to further
+         * speed up this process(?)
          */
-        if (this.resourceSelectionComposite.getSelectedResources().size() == 0) {
-            List<IResource> resources = this.resourceSelectionComposite
-                .getResources();
-
-            if (this.resourceSelectionComposite.getProjectsCount() == 1) {
-                this.resourceSelectionComposite.setSelectedResources(resources);
+        Utils.runSafeSWTAsync(log, new Runnable() {
+            @Override
+            public void run() {
+                List<IResource> selection = SelectionRetrieverFactory
+                    .getSelectionRetriever(IResource.class).getSelection();
+                resourceSelectionComposite.setSelectedResources(selection);
+                resourceSelectionComposite
+                    .addResourceSelectionListener(resourceSelectionListener);
+                /*
+                 * If nothing is selected and only one project exists in the
+                 * workspace, select it in the Wizard.
+                 */
+                if (selection.size() == 0) {
+                    if (resourceSelectionComposite.getProjectsCount() == 1) {
+                        List<IResource> resources = resourceSelectionComposite
+                            .getResources();
+                        resourceSelectionComposite
+                            .setSelectedResources(resources);
+                    }
+                }
+                setPageComplete(selection.size() > 0);
             }
-        }
-    }
-
-    protected void updatePageCompletion() {
-        int selectedProjectsCount = this.resourceSelectionComposite
-            .getSelectedResources().size();
-        setPageComplete(selectedProjectsCount > 0);
+        });
     }
 
     @Override
