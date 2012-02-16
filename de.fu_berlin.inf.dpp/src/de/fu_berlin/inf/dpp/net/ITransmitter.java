@@ -57,7 +57,7 @@ import de.fu_berlin.inf.dpp.util.VersionManager.VersionInfo;
 @Component(module = "net")
 public interface ITransmitter {
 
-    public static final long INVITATION_ACKNOWLEDGEMENT_TIMEOUT = 3000;
+    public static final long INVITATION_ACKNOWLEDGEMENT_TIMEOUT = 30000;
 
     /* ---------- invitations --------- */
 
