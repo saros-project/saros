@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.net;
+package de.fu_berlin.inf.dpp.net.stun.internal;
 
 import java.net.InetAddress;
 import java.util.ArrayList;
@@ -11,13 +11,14 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.jivesoftware.smackx.bytestreams.socks5.Socks5Proxy;
 
+import de.fu_berlin.inf.dpp.net.stun.IStunService;
 import de.fu_berlin.inf.dpp.net.util.NetworkingUtils;
 import de.javawi.jstun.test.DiscoveryInfo;
 import de.javawi.jstun.test.DiscoveryTest;
 
-public class StunHelper {
+public class StunServiceImpl implements IStunService {
 
-    protected static Logger log = Logger.getLogger(StunHelper.class);
+    protected static Logger log = Logger.getLogger(StunServiceImpl.class);
 
     /**
      * Set, if a local IP IS a public IP. (e.g. direct connection)
@@ -34,7 +35,7 @@ public class StunHelper {
      */
     protected Collection<DiscoveryInfo> stunResults;
 
-    public StunHelper() {
+    public StunServiceImpl() {
         aLocalIPisPublicIP = false;
         recentPublicIPs = new HashMap<InetAddress, InetAddress>();
         stunResults = new ArrayList<DiscoveryInfo>();

@@ -17,11 +17,12 @@ import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smackx.ServiceDiscoveryManager;
 import org.jivesoftware.smackx.bytestreams.socks5.Socks5Proxy;
-import org.picocontainer.annotations.Inject;
+import org.picocontainer.annotations.Nullable;
 
 import de.fu_berlin.inf.dpp.SafeConnectionListener;
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.net.UPnP.UPnPManager;
+import de.fu_berlin.inf.dpp.net.stun.IStunService;
 import de.fu_berlin.inf.dpp.net.util.NetworkingUtils;
 import de.fu_berlin.inf.dpp.util.Utils;
 
@@ -59,6 +60,21 @@ public class SarosNet {
 
     // Smack (XMPP) connection listener
     protected ConnectionListener smackConnectionListener;
+
+    protected IStunService stunService;
+
+    protected UPnPManager upnpManager;
+
+    private int packetReplyTimeout;
+
+    public SarosNet(@Nullable UPnPManager upnpManager,
+        @Nullable IStunService stunHelper) {
+        this.upnpManager = upnpManager;
+        this.stunService = stunHelper;
+
+        packetReplyTimeout = Integer.getInteger(
+            "de.fu_berlin.inf.dpp.net.smack.PACKET_REPLAY_TIMEOUT", 30000);
+    }
 
     /**
      * Configures this instance with debug, proxy, stun and UPnP settings.
@@ -119,11 +135,6 @@ public class SarosNet {
             });
     }
 
-    @Inject
-    StunHelper stunHelper;
-    @Inject
-    UPnPManager upnpManager;
-
     /**
      * Configures Bytestream related settings, like PacketReplyTimeout,
      * Socks5Proxy configuration, look up streamhost address candiates for
@@ -137,7 +148,7 @@ public class SarosNet {
          * concurrently (invitation over IBB, concurrently producing many
          * activities)
          */
-        SmackConfiguration.setPacketReplyTimeout(30000);
+        SmackConfiguration.setPacketReplyTimeout(packetReplyTimeout);
 
         // Socks5 Proxy Configuration
         boolean settingsChanged = false;
@@ -181,8 +192,9 @@ public class SarosNet {
 
                 // Perform public IP detection concurrently
                 // Dont perform if we know a local IP is the WAN IP
-                if (stunHelper != null && !stunHelper.isLocalIPthePublicIP())
-                    stunHelper.startWANIPDetection(stunServer, stunPort, false);
+                if (stunService != null && !stunService.isLocalIPthePublicIP())
+                    stunService
+                        .startWANIPDetection(stunServer, stunPort, false);
 
             } catch (Exception e) {
                 log.debug("Error while retrieving IP addresses", e);
@@ -225,12 +237,6 @@ public class SarosNet {
                 }
             }
         }
-
-        // TODO: just pasted from before
-        // This disables Jingle if the user has selected to use XMPP
-        // file transfer exclusively
-        // JingleManager.setServiceEnabled(connection, !getPreferenceStore()
-        // .getBoolean(PreferenceConstants.FORCE_FILETRANSFER_BY_CHAT));
     }
 
     /**
@@ -262,8 +268,8 @@ public class SarosNet {
      *            XMPP account name to login
      * @param password
      *            password to login with
-     * @praram failSilently true, if upon connection failure no feedback message
-     *         is shown
+     * @param failSilently
+     *            true, if upon connection failure no feedback message is shown
      * 
      * @blocking
      */

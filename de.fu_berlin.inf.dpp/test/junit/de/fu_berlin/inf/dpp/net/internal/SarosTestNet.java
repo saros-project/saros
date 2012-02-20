@@ -29,7 +29,7 @@ public class SarosTestNet {
 
         jid = new JID(user + "@" + server);
 
-        net = new SarosNet();
+        net = new SarosNet(null, null);
         net.setSettings(false, true, 0, "", 0, false);
         net.initialize();
 

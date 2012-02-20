@@ -50,7 +50,6 @@ import de.fu_berlin.inf.dpp.invitation.ArchiveStreamService;
 import de.fu_berlin.inf.dpp.net.IncomingTransferObject;
 import de.fu_berlin.inf.dpp.net.RosterTracker;
 import de.fu_berlin.inf.dpp.net.SarosNet;
-import de.fu_berlin.inf.dpp.net.StunHelper;
 import de.fu_berlin.inf.dpp.net.UPnP.UPnPManager;
 import de.fu_berlin.inf.dpp.net.business.ActivitiesHandler;
 import de.fu_berlin.inf.dpp.net.business.CancelInviteHandler;
@@ -79,6 +78,8 @@ import de.fu_berlin.inf.dpp.net.internal.extensions.LeaveExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.RequestActivityExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.UserListExtension;
 import de.fu_berlin.inf.dpp.net.internal.subscriptionManager.SubscriptionManager;
+import de.fu_berlin.inf.dpp.net.stun.IStunService;
+import de.fu_berlin.inf.dpp.net.stun.internal.StunServiceImpl;
 import de.fu_berlin.inf.dpp.observables.FileReplacementInProgressObservable;
 import de.fu_berlin.inf.dpp.observables.InvitationProcessObservable;
 import de.fu_berlin.inf.dpp.observables.ProjectNegotiationObservable;
@@ -237,7 +238,7 @@ public class SarosContext {
         Component.create(SkypeManager.class),
         Component.create(Socks5Transport.class),
         Component.create(StreamServiceManager.class),
-        Component.create(StunHelper.class),
+        Component.create(IStunService.class, StunServiceImpl.class),
         Component.create(SubscriptionManager.class),
         Component.create(UPnPManager.class),
         Component.create(XMPPReceiver.class),

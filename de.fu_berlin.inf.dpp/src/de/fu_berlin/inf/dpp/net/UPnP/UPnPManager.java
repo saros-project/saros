@@ -16,7 +16,7 @@ import org.jivesoftware.smackx.bytestreams.socks5.Socks5Proxy;
 import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.annotations.Component;
-import de.fu_berlin.inf.dpp.net.StunHelper;
+import de.fu_berlin.inf.dpp.net.stun.IStunService;
 import de.fu_berlin.inf.dpp.net.util.NetworkingUtils;
 import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
 import de.fu_berlin.inf.dpp.ui.views.SarosView;
@@ -32,7 +32,7 @@ public class UPnPManager {
     protected Logger log = Logger.getLogger(UPnPManager.class);
 
     @Inject
-    StunHelper stunHelper;
+    protected IStunService stunService;
 
     protected IUPnPAccess upnpAccess = null;
 
@@ -482,13 +482,13 @@ public class UPnPManager {
                     return;
 
                 // perform Stun test to check for NATed environment
-                if (stunHelper.getStunResults().isEmpty())
-                    stunHelper.startWANIPDetection(
+                if (stunService.getStunResults().isEmpty())
+                    stunService.startWANIPDetection(
                         prefStore.getString(PreferenceConstants.STUN),
                         prefStore.getInt(PreferenceConstants.STUN_PORT), true);
 
                 boolean bOpenAccess = true;
-                for (DiscoveryInfo di : stunHelper.getStunResults()) {
+                for (DiscoveryInfo di : stunService.getStunResults()) {
                     if (!di.isOpenAccess())
                         bOpenAccess = false;
                 }
