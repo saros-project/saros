@@ -45,6 +45,9 @@ public class FreeColors {
      *            Color ID to return.
      */
     public synchronized void add(int colorID) {
+        if (colorID < 1 || colorID >= maxColorID)
+            return;
+
         if (!freeColors.contains(colorID))
             freeColors.addFirst(colorID);
     }
