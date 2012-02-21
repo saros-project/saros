@@ -136,18 +136,6 @@ public class OutgoingSessionNegotiation extends InvitationProcess {
      */
 
     public void start(SubMonitor monitor) throws SarosCancellationException {
-
-        editorManager.setAllLocalOpenedEditorsLocked(true);
-
-        /*
-         * Before the session or even project invitation can begin, we have to
-         * create the list of ProjectExchangeInfo containing the project
-         * dependent FileList.
-         */
-        List<ProjectExchangeInfo> projectExchangeInfos = sarosSessionManager
-            .createProjectExchangeInfoList(
-                new ArrayList<IProject>(sarosSession.getProjects()), monitor);
-
         log.debug("Inv" + Utils.prefix(peer) + ": Invitation has started.");
 
         monitor.beginTask("Invitation has started.", 101);
@@ -164,6 +152,12 @@ public class OutgoingSessionNegotiation extends InvitationProcess {
             sendInvitation(monitor.newChild(1));
 
             User newUser = addUserToSession();
+
+            editorManager.setAllLocalOpenedEditorsLocked(true);
+
+            List<ProjectExchangeInfo> projectExchangeInfos = sarosSessionManager
+                .createProjectExchangeInfoList(new ArrayList<IProject>(
+                    sarosSession.getProjects()), monitor);
 
             completeInvitation(monitor.newChild(3), projectExchangeInfos);
 
