@@ -76,7 +76,6 @@ import de.fu_berlin.inf.dpp.net.internal.DefaultInvitationInfo.InvitationAcknowl
 import de.fu_berlin.inf.dpp.net.internal.DefaultInvitationInfo.InvitationCompleteExtensionProvider;
 import de.fu_berlin.inf.dpp.net.internal.DefaultInvitationInfo.UserListRequestExtensionProvider;
 import de.fu_berlin.inf.dpp.net.internal.DefaultSessionInfo.UserListConfirmationExtensionProvider;
-import de.fu_berlin.inf.dpp.net.internal.InvitationInfo.InvitationExtensionProvider;
 import de.fu_berlin.inf.dpp.net.internal.TransferDescription.FileTransferType;
 import de.fu_berlin.inf.dpp.net.internal.UserListInfo.JoinExtensionProvider;
 import de.fu_berlin.inf.dpp.net.internal.XStreamExtensionProvider.XStreamPacketExtension;
@@ -1170,39 +1169,5 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
     public void sendMessageToUser(JID peer,
         XStreamPacketExtension<DefaultInvitationInfo> create) {
         sendMessageToUser(peer, create, false);
-    }
-
-    void inject(SessionIDObservable sessionID,
-        SarosSessionObservable sarosSessionObservable,
-        LeaveExtension leaveExtension,
-        RequestActivityExtension requestActivityExtension,
-        UserListExtension userListExtension,
-        CancelInviteExtension cancelInviteExtension,
-        CancelProjectSharingExtension cancelProjectSharingExtension,
-        ActivitiesExtensionProvider activitiesProvider,
-        InvitationExtensionProvider invExtProv,
-        InvitationAcknowledgementExtensionProvider invAcknowledgementExtProv,
-        FileListRequestExtensionProvider fileListRequestExtProv,
-        JoinExtensionProvider userListExtProv,
-        UserListConfirmationExtensionProvider userListConfExtProv,
-        IncomingTransferObjectExtensionProvider incomingExtProv,
-        InvitationCompleteExtensionProvider invCompleteExtProv,
-        DispatchThreadContext dispatchThread) {
-        this.sarosSessionObservable = sarosSessionObservable;
-        this.leaveExtension = leaveExtension;
-        this.requestActivityExtension = requestActivityExtension;
-        this.userListExtension = userListExtension;
-        this.cancelInviteExtension = cancelInviteExtension;
-        this.cancelProjectSharingExtension = cancelProjectSharingExtension;
-        this.activitiesProvider = activitiesProvider;
-        this.invExtProv = invExtProv;
-        this.invAcknowledgementExtProv = invAcknowledgementExtProv;
-        this.fileListRequestExtProv = fileListRequestExtProv;
-        this.userListExtProv = userListExtProv;
-        this.userListConfExtProv = userListConfExtProv;
-        this.incomingExtProv = incomingExtProv;
-        this.invCompleteExtProv = invCompleteExtProv;
-        this.dispatchThread = dispatchThread;
-
     }
 }
