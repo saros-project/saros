@@ -42,7 +42,6 @@ import org.eclipse.core.runtime.preferences.ConfigurationScope;
 import org.eclipse.equinox.security.storage.ISecurePreferences;
 import org.eclipse.equinox.security.storage.SecurePreferencesFactory;
 import org.eclipse.jface.wizard.IWizard;
-import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.jivesoftware.smack.ConnectionConfiguration;
 import org.jivesoftware.smack.Roster;
@@ -473,29 +472,15 @@ public class Saros extends AbstractUIPlugin {
             PreferenceConstants.AUTO_FOLLOW_MODE);
     }
 
-    public static boolean isWorkbenchAvailable() {
-        boolean result = false;
-        try {
-            result = PlatformUI.getWorkbench() != null;
-        } catch (Exception e) {
-            // do nothing ...
-        }
-        return result;
-    }
-
     /**
      * Returns @link{IProxyService} if there is a registered service otherwise
      * null.
      */
     protected IProxyService getProxyService() {
-        IProxyService result = null;
-        if (Saros.isWorkbenchAvailable()) {
-            BundleContext bundleContext = getBundle().getBundleContext();
-            ServiceReference serviceReference = bundleContext
-                .getServiceReference(IProxyService.class.getName());
-            result = (IProxyService) bundleContext.getService(serviceReference);
-        }
-        return result;
+        BundleContext bundleContext = getBundle().getBundleContext();
+        ServiceReference serviceReference = bundleContext
+            .getServiceReference(IProxyService.class.getName());
+        return (IProxyService) bundleContext.getService(serviceReference);
     }
 
     /**

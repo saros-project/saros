@@ -187,8 +187,6 @@ public class SarosContext {
      */
     private Saros saros;
 
-    private boolean isTestContext = false;
-
     private static final Component[] COMPONENTS = new Component[] {
         // Thread Context
         Component.create(DispatchThreadContext.class),
@@ -308,12 +306,10 @@ public class SarosContext {
      * SarosContextBuilder}
      */
 
-    private SarosContext(Saros saros, DotGraphMonitor dotGraphMonitor,
-        boolean isTestContext) {
+    private SarosContext(Saros saros, DotGraphMonitor dotGraphMonitor) {
 
         this.saros = saros;
         this.dotMonitor = dotGraphMonitor;
-        this.isTestContext = isTestContext;
         init();
     }
 
@@ -452,7 +448,6 @@ public class SarosContext {
     public static class SarosContextBuilder {
         private Saros saros;
         private DotGraphMonitor dotMonitor;
-        private boolean isTestContext = false;
 
         public SarosContextBuilder(Saros saros) {
             this.saros = saros;
@@ -464,8 +459,7 @@ public class SarosContext {
         }
 
         public SarosContext build() {
-            return new SarosContext(this.saros, this.dotMonitor,
-                this.isTestContext);
+            return new SarosContext(this.saros, this.dotMonitor);
         }
     }
 }

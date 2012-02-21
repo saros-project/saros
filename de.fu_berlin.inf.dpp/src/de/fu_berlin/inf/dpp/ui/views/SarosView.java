@@ -522,9 +522,6 @@ public class SarosView extends ViewPart {
     }
 
     public static void showNotification(final String title, final String text) {
-        if (!Saros.isWorkbenchAvailable()) {
-            return;
-        }
         Utils.runSafeSWTAsync(log, new Runnable() {
             public void run() {
                 IViewPart sarosView = Utils.findView(SarosView.ID);

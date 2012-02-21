@@ -15,7 +15,6 @@ import org.eclipse.swt.widgets.Shell;
 
 import com.novocode.naf.swt.custom.BalloonWindow;
 
-import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.util.Utils;
 
 public class BalloonNotification {
@@ -60,8 +59,6 @@ public class BalloonNotification {
      */
     public static void showNotification(Control control, String title,
         String text, int timeout) {
-        if (!Saros.isWorkbenchAvailable())
-            return;
 
         if (control != null && control.isDisposed()) {
             control = null;

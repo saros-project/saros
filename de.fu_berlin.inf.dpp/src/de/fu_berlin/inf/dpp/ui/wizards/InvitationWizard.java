@@ -14,7 +14,6 @@ import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.swt.widgets.Shell;
 import org.osgi.framework.Version;
 
-import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.RosterTracker;
@@ -136,9 +135,6 @@ public class InvitationWizard extends Wizard {
      *               TODO: is this the right way?
      */
     public static synchronized boolean confirmUnsupportedSaros(final JID peer) {
-        if (!Saros.isWorkbenchAvailable()) {
-            return true;
-        }
 
         try {
             return Utils.runSWTSync(new Callable<Boolean>() {
@@ -177,9 +173,7 @@ public class InvitationWizard extends Wizard {
      */
     public static synchronized boolean confirmVersionConflict(
         VersionInfo remoteVersionInfo, JID peer, Version localVersion) {
-        if (!Saros.isWorkbenchAvailable()) {
-            return true;
-        }
+
         final String title = MessageFormat.format(
             Messages.InvitationWizard_version_conflict, peer.getBase());
         final String message;
@@ -225,9 +219,6 @@ public class InvitationWizard extends Wizard {
     }
 
     public static boolean confirmUnknownVersion(JID peer, Version localVersion) {
-        if (!Saros.isWorkbenchAvailable()) {
-            return true;
-        }
 
         final String title = MessageFormat.format(
             Messages.InvitationWizard_is_compatible, peer.getBase());
@@ -251,10 +242,8 @@ public class InvitationWizard extends Wizard {
 
     public static boolean confirmProjectSave(JID peer) {
         final String title = Messages.InvitationWizard_save_ressources;
-        final String message = MessageFormat
-            .format(
-                Messages.InvitationWizard_save_ressources_text,
-                peer.getBase());
+        final String message = MessageFormat.format(
+            Messages.InvitationWizard_save_ressources_text, peer.getBase());
         try {
             return Utils.runSWTSync(new Callable<Boolean>() {
                 public Boolean call() {

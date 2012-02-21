@@ -14,7 +14,6 @@ import org.jivesoftware.smack.filter.PacketTypeFilter;
 import org.jivesoftware.smack.packet.Packet;
 import org.jivesoftware.smack.packet.Presence;
 
-import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.net.ConnectionState;
@@ -217,9 +216,6 @@ public class SubscriptionManager {
 
     private void askUserForSubscriptionConfirmation(final Presence presence) {
 
-        if (!Saros.isWorkbenchAvailable())
-            return;
-
         Utils.runSafeSWTAsync(log, new Runnable() {
             public void run() {
                 // TODO Should flash dialog
@@ -247,9 +243,6 @@ public class SubscriptionManager {
     // FIXME REMOVE THIS METHOD FROM THE CLASS !!! Belongs to the UI, not to the
     // logic
     private void informUserAboutUnsubscription(final String from) {
-
-        if (!Saros.isWorkbenchAvailable())
-            return;
 
         Utils.runSafeSWTAsync(log, new Runnable() {
             public void run() {

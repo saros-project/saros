@@ -124,8 +124,8 @@ public class ImageManager {
      *         free up memory
      */
     public static Image getImage(String path) {
-        return Saros.isWorkbenchAvailable() ? new Image(Display.getDefault(),
-            getImageDescriptor(path).getImageData()) : null;
+        return new Image(Display.getDefault(), getImageDescriptor(path)
+            .getImageData());
     }
 
     /**
@@ -137,8 +137,7 @@ public class ImageManager {
      * @return the image descriptor
      */
     public static ImageDescriptor getImageDescriptor(String path) {
-        return Saros.isWorkbenchAvailable() ? AbstractUIPlugin
-            .imageDescriptorFromPlugin(Saros.SAROS, path) : null;
+        return AbstractUIPlugin.imageDescriptorFromPlugin(Saros.SAROS, path);
     }
 
 }

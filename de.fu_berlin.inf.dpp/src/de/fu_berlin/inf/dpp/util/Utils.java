@@ -51,8 +51,6 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.preference.PreferenceStore;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.SWTError;
 import org.eclipse.swt.SWTException;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IViewPart;
@@ -431,48 +429,12 @@ public class Utils {
     private static final Lock SYNC_LOCK = new ReentrantLock();
 
     public static void runSafeSWTSync(final Logger log, final Runnable runnable) {
-        if (Saros.isWorkbenchAvailable()) {
-            try {
-                Display.getDefault().syncExec(wrapSafe(log, runnable));
-            } catch (SWTException e) {
-                if (!PlatformUI.getWorkbench().isClosing()) {
-                    throw e;
-                }
+        try {
+            Display.getDefault().syncExec(wrapSafe(log, runnable));
+        } catch (SWTException e) {
+            if (!PlatformUI.getWorkbench().isClosing()) {
+                throw e;
             }
-        } else {
-            SyncedThread thread = null;
-            boolean wasInterrupted = false;
-            try {
-                SYNC_LOCK.lockInterruptibly();
-                thread = new SyncedThread(runnable);
-                thread.start();
-                thread.join();
-
-            } catch (InterruptedException e) {
-                wasInterrupted = true;
-                if (thread != null) {
-                    thread.interrupt();
-                    try {
-                        thread.join(1000);
-                    } catch (InterruptedException irgnore) {
-                        // give up
-                    }
-                }
-            } finally {
-                SYNC_LOCK.unlock();
-            }
-
-            Throwable throwable = null;
-
-            if (thread != null)
-                throwable = thread.getRunningError();
-
-            if (wasInterrupted)
-                Thread.currentThread().interrupt();
-
-            if (!((throwable instanceof SWTError)
-                || (throwable instanceof SWTException) || (throwable instanceof IllegalStateException)))
-                SWT.error(SWT.ERROR_FAILED_EXEC, throwable);
         }
     }
 
@@ -530,16 +492,12 @@ public class Utils {
      * @nonBlocking
      */
     public static void runSafeSWTAsync(final Logger log, final Runnable runnable) {
-        if (Saros.isWorkbenchAvailable()) {
-            try {
-                Display.getDefault().asyncExec(wrapSafe(log, runnable));
-            } catch (SWTException e) {
-                if (!PlatformUI.getWorkbench().isClosing()) {
-                    throw e;
-                }
+        try {
+            Display.getDefault().asyncExec(wrapSafe(log, runnable));
+        } catch (SWTException e) {
+            if (!PlatformUI.getWorkbench().isClosing()) {
+                throw e;
             }
-        } else {
-            runSafeAsync(log, runnable);
         }
     }
 
@@ -574,10 +532,6 @@ public class Utils {
      *      <code>null</code> is returned.
      */
     public static IViewPart findView(String id) {
-        if (!Saros.isWorkbenchAvailable()) {
-            return null;
-        }
-
         IWorkbench workbench = PlatformUI.getWorkbench();
         if (workbench == null)
             return null;
@@ -612,9 +566,6 @@ public class Utils {
      * Crude check whether we are on the SWT thread
      */
     public static boolean isSWT() {
-        if (!Saros.isWorkbenchAvailable()) {
-            return false;
-        }
         if (Display.getCurrent() != null) {
             return true;
         }
