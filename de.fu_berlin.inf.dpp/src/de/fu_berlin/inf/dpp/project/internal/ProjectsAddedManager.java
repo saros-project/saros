@@ -5,14 +5,12 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.activities.business.AbstractActivityReceiver;
 import de.fu_berlin.inf.dpp.activities.business.IActivity;
 import de.fu_berlin.inf.dpp.activities.business.ProjectsAddedActivity;
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 import de.fu_berlin.inf.dpp.project.AbstractSarosSessionListener;
 import de.fu_berlin.inf.dpp.project.IActivityListener;
 import de.fu_berlin.inf.dpp.project.IActivityProvider;
@@ -31,16 +29,14 @@ public class ProjectsAddedManager implements IActivityProvider {
 
     private static Logger log = Logger.getLogger(ProjectsAddedManager.class);
 
-    protected ISarosSession sarosSession;
     protected SarosSessionManager sessionManager;
     protected final List<IActivityListener> activityListeners = new LinkedList<IActivityListener>();
-    @Inject
     protected SarosUI sarosUI;
-    @Inject
-    protected SessionIDObservable sessionIDObservable;
 
-    public ProjectsAddedManager(SarosSessionManager sessionManager) {
+    public ProjectsAddedManager(SarosSessionManager sessionManager,
+        SarosUI sarosUI) {
         this.sessionManager = sessionManager;
+        this.sarosUI = sarosUI;
         sessionManager.addSarosSessionListener(sessionListener);
     }
 
@@ -87,13 +83,11 @@ public class ProjectsAddedManager implements IActivityProvider {
         @Override
         public void sessionStarted(ISarosSession session) {
             session.addActivityProvider(ProjectsAddedManager.this);
-            sarosSession = session;
         }
 
         @Override
         public void sessionEnded(ISarosSession project) {
             project.removeActivityProvider(ProjectsAddedManager.this);
-            sarosSession = null;
         }
     };
 

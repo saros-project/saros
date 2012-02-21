@@ -4,9 +4,6 @@ import java.text.MessageFormat;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.picocontainer.annotations.Inject;
-
-import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.User.Permission;
 import de.fu_berlin.inf.dpp.activities.business.IActivity;
@@ -46,38 +43,43 @@ public class PermissionManager implements IActivityProvider {
              * session view open.
              */
             if (user.isLocal()) {
-                SarosView.showNotification(Messages.PermissionManager_permission_changed, MessageFormat
-                    .format(Messages.PermissionManager_you_have_now_access, user
-                        .getHumanReadableName(),
-                        user.hasWriteAccess() ? Messages.PermissionManager_write : Messages.PermissionManager_read_only));
+                SarosView
+                    .showNotification(
+                        Messages.PermissionManager_permission_changed,
+                        MessageFormat.format(
+                            Messages.PermissionManager_you_have_now_access,
+                            user.getHumanReadableName(),
+                            user.hasWriteAccess() ? Messages.PermissionManager_write
+                                : Messages.PermissionManager_read_only));
             } else {
-                SarosView.showNotification(Messages.PermissionManager_permission_changed, MessageFormat
-                    .format(Messages.PermissionManager_he_has_now_access, user
-                        .getHumanReadableName(),
-                        user.hasWriteAccess() ? Messages.PermissionManager_write : Messages.PermissionManager_read_only));
+                SarosView
+                    .showNotification(
+                        Messages.PermissionManager_permission_changed,
+                        MessageFormat.format(
+                            Messages.PermissionManager_he_has_now_access,
+                            user.getHumanReadableName(),
+                            user.hasWriteAccess() ? Messages.PermissionManager_write
+                                : Messages.PermissionManager_read_only));
 
             }
         }
 
         @Override
         public void userJoined(User user) {
-            SarosView.showNotification(
-                Messages.PermissionManager_buddy_joined,
-                MessageFormat.format(Messages.PermissionManager_buddy_joined_text,
+            SarosView.showNotification(Messages.PermissionManager_buddy_joined,
+                MessageFormat.format(
+                    Messages.PermissionManager_buddy_joined_text,
                     user.getHumanReadableName()));
         }
 
         @Override
         public void userLeft(User user) {
-            SarosView.showNotification(
-                Messages.PermissionManager_buddy_left,
-                MessageFormat.format(Messages.PermissionManager_buddy_left_text,
+            SarosView.showNotification(Messages.PermissionManager_buddy_left,
+                MessageFormat.format(
+                    Messages.PermissionManager_buddy_left_text,
                     user.getHumanReadableName()));
         }
     };
-
-    @Inject
-    protected Saros saros;
 
     public PermissionManager(SarosSessionManager sessionManager) {
         sessionManager.addSarosSessionListener(sessionListener);
@@ -130,8 +132,7 @@ public class PermissionManager implements IActivityProvider {
             User user = permissionActivity.getAffectedUser();
             if (!user.isInSarosSession()) {
                 throw new IllegalArgumentException(MessageFormat.format(
-                    Messages.PermissionManager_buddy_no_participant,
-                    user));
+                    Messages.PermissionManager_buddy_no_participant, user));
             }
             Permission permission = permissionActivity.getPermission();
             this.sarosSession.setPermission(user, permission);

@@ -1,15 +1,14 @@
 package de.fu_berlin.inf.dpp.project.internal;
 
-import java.util.NoSuchElementException;
-import java.util.Queue;
-import java.util.concurrent.LinkedBlockingQueue;
+import java.util.Deque;
+import java.util.LinkedList;
 
 /**
  * A pool of free colors.
  */
 public class FreeColors {
     protected final int maxColorID;
-    protected final Queue<Integer> freeColors;
+    protected final Deque<Integer> freeColors;
 
     /**
      * Creates the pool of free color IDs.
@@ -20,7 +19,7 @@ public class FreeColors {
     public FreeColors(int maxColorID) {
         assert maxColorID > 1;
         this.maxColorID = maxColorID;
-        freeColors = new LinkedBlockingQueue<Integer>();
+        freeColors = new LinkedList<Integer>();
         for (int i = 1; i < maxColorID; ++i) {
             freeColors.add(i);
         }
@@ -32,12 +31,11 @@ public class FreeColors {
      * 
      * @return color ID.
      */
-    public int get() {
-        try {
-            return freeColors.remove();
-        } catch (NoSuchElementException e) {
+    public synchronized int get() {
+        if (freeColors.isEmpty())
             return maxColorID;
-        }
+
+        return freeColors.removeFirst();
     }
 
     /**
@@ -46,11 +44,8 @@ public class FreeColors {
      * @param colorID
      *            Color ID to return.
      */
-    public void add(int colorID) {
-        if ((colorID > 0) && (colorID < maxColorID)
-            && (!freeColors.contains(colorID))) {
-            freeColors.add(colorID);
-        }
-        // for better testing something should happen in the else case
+    public synchronized void add(int colorID) {
+        if (!freeColors.contains(colorID))
+            freeColors.addFirst(colorID);
     }
 }

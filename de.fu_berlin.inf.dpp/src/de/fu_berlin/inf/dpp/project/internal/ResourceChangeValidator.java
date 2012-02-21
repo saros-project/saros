@@ -42,10 +42,10 @@ public class ResourceChangeValidator extends ModelProvider {
     private static final int ERROR_CODE = 0;
 
     private static final IStatus ERROR_STATUS = new Status(IStatus.ERROR,
-        "de.fu_berlin.inf.dpp", ERROR_CODE, ERROR_TEXT, null); //$NON-NLS-1$
+        "de.fu_berlin.inf.dpp", ERROR_CODE, ERROR_TEXT, null);
 
     private static final IStatus DELETE_PROJECT_ERROR_STATUS = new Status(
-        IStatus.ERROR, "de.fu_berlin.inf.dpp", ERROR_CODE, //$NON-NLS-1$
+        IStatus.ERROR, "de.fu_berlin.inf.dpp", ERROR_CODE,
         DELETE_PROJECT_ERROR_TEXT, null);
 
     /** the currently running shared project */

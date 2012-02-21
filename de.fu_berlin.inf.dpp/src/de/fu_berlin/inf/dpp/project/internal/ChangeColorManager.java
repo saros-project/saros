@@ -11,9 +11,7 @@ import java.util.Vector;
 import org.apache.log4j.Logger;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.ColorDialog;
-import org.picocontainer.annotations.Inject;
 
-import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.activities.business.AbstractActivityReceiver;
 import de.fu_berlin.inf.dpp.activities.business.ChangeColorActivity;
@@ -47,14 +45,14 @@ public class ChangeColorManager implements IActivityProvider {
     protected final List<IActivityListener> activityListeners = new LinkedList<IActivityListener>();
     protected SarosSessionManager sessionManager;
     protected ISarosSession sarosSession;
-    @Inject
     protected EditorManager editorManager;
-    @Inject
-    protected Saros saros;
+
     protected RGB rgbOfNewParticipant;
 
-    public ChangeColorManager(SarosSessionManager sessionManager) {
+    public ChangeColorManager(SarosSessionManager sessionManager,
+        EditorManager editorManager) {
         this.sessionManager = sessionManager;
+        this.editorManager = editorManager;
         sessionManager.addSarosSessionListener(sessionListener);
     }
 
@@ -139,10 +137,9 @@ public class ChangeColorManager implements IActivityProvider {
                         public void run() {
                             ColorDialog changeColor = new ColorDialog(EditorAPI
                                 .getShell());
-                            changeColor.setText(MessageFormat
-                                .format(
-                                    Messages.ChangeColorManager_color_conflict,
-                                    newUser.getHumanReadableName()));
+                            changeColor.setText(MessageFormat.format(
+                                Messages.ChangeColorManager_color_conflict,
+                                newUser.getHumanReadableName()));
                             RGB newColor = changeColor.open();
                             if (newColor != null)
                                 rgbOfNewParticipant = newColor;
