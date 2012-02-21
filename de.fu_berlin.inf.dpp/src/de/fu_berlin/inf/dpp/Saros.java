@@ -202,10 +202,10 @@ public class Saros extends AbstractUIPlugin {
     public Saros() {
 
         try {
-            InputStream sarosPropertiers = Saros.class.getClassLoader()
+            InputStream sarosProperties = Saros.class.getClassLoader()
                 .getResourceAsStream("de/fu_berlin/inf/dpp/saros.properties");
-            System.getProperties().load(sarosPropertiers);
-            sarosPropertiers.close();
+            System.getProperties().load(sarosProperties);
+            sarosProperties.close();
         } catch (Exception e) {
             LogLog.error("could not load saros property file", e);
         }
