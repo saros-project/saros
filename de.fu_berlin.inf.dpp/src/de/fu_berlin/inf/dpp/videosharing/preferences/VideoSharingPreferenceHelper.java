@@ -1,6 +1,6 @@
 /*
  * DPP - Serious Distributed Pair Programming
- * (c) Freie Universität Berlin - Fachbereich Mathematik und Informatik - 2010
+ * (c) Freie Universitï¿½t Berlin - Fachbereich Mathematik und Informatik - 2010
  * (c) Stephan Lau - 2010
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -19,6 +19,7 @@
  */
 package de.fu_berlin.inf.dpp.videosharing.preferences;
 
+import java.io.File;
 import java.util.Arrays;
 
 import org.eclipse.jface.preference.ComboFieldEditor;
@@ -115,11 +116,24 @@ public class VideoSharingPreferenceHelper {
     }
 
     public static void checkXugglerInstallation(FieldEditorPreferencePage page) {
-        if (!XugglerEncoder.isInstalled()) {
-            page.setErrorMessage(XUGGLER_NOT_INSTALLED_MESSAGE);
-        } else {
+        if (XugglerEncoder.isInstalled()) {
             page.setErrorMessage(null);
+            return;
         }
+        String libraryPath = System.getProperty("java.library.path");
+        String architecture = System.getProperty("osgi.arch");
+        String os = System.getProperty("osgi.os");
+
+        if (libraryPath != null && "x86_64".equalsIgnoreCase(architecture)
+            && "win32".equalsIgnoreCase(os)) {
+            for (String path : libraryPath.split(File.pathSeparator)) {
+                if (new File(path, "xuggle-xuggler-io.dll").exists()) {
+                    page.setErrorMessage("32-Bit Xuggler installation is not compatible with a 64-Bit JVM");
+
+                }
+            }
+        } else
+            page.setErrorMessage(XUGGLER_NOT_INSTALLED_MESSAGE);
     }
 
     private static final class EncoderComboFieldEditor extends ComboFieldEditor {
@@ -306,5 +320,4 @@ public class VideoSharingPreferenceHelper {
                 Integer.parseInt(res[1]) };
         }
     }
-
 }
