@@ -53,4 +53,11 @@ public abstract class AbstractFeedbackManager {
             saros.getPreferenceStore().setValue(preferenceKey, globalValue);
         }
     }
+
+    /**
+     * @return the Saros instance.
+     */
+    protected Saros getSaros() {
+        return saros;
+    }
 }

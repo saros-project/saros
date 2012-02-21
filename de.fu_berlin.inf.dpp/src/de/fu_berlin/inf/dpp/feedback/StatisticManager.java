@@ -10,7 +10,6 @@ import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.CancellationException;
 
-import de.fu_berlin.inf.dpp.util.EclipseHelper;
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -27,7 +26,6 @@ import de.fu_berlin.inf.dpp.project.ISarosSessionListener;
 import de.fu_berlin.inf.dpp.project.SarosSessionManager;
 import de.fu_berlin.inf.dpp.ui.preferencePages.FeedbackPreferencePage;
 import de.fu_berlin.inf.dpp.util.StackTrace;
-import org.picocontainer.annotations.Inject;
 
 /**
  * The StatisticManager is supposed to gather statistic data and submit it at
@@ -53,9 +51,6 @@ public class StatisticManager extends AbstractFeedbackManager {
 
     protected Set<AbstractStatisticCollector> allCollectors;
     protected Set<AbstractStatisticCollector> activeCollectors;
-
-    @Inject
-    protected EclipseHelper eclipseHelper;
 
     protected ISarosSessionListener sessionListener = new AbstractSarosSessionListener() {
 
@@ -373,8 +368,8 @@ public class StatisticManager extends AbstractFeedbackManager {
      */
     protected void saveAndSubmitStatistic() {
         // save to disk
-        File file = statistic
-            .toFile(eclipseHelper.getStateLocation(), createFileName());
+        File file = statistic.toFile(getSaros().getStateLocation(),
+            createFileName());
 
         // only submit, if user permitted submission
         if (isStatisticSubmissionAllowed()) {

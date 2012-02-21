@@ -102,7 +102,6 @@ import de.fu_berlin.inf.dpp.ui.LocalPresenceTracker;
 import de.fu_berlin.inf.dpp.ui.RemoteProgressManager;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
 import de.fu_berlin.inf.dpp.ui.actions.SendFileAction;
-import de.fu_berlin.inf.dpp.util.EclipseHelper;
 import de.fu_berlin.inf.dpp.util.StackTrace;
 import de.fu_berlin.inf.dpp.util.VersionManager;
 import de.fu_berlin.inf.dpp.util.pico.ChildContainer;
@@ -224,7 +223,6 @@ public class SarosContext {
         Component.create(RemoteProgressManager.class),
         Component.create(XMPPAccountStore.class),
         Component.create(ProjectsAddedManager.class),
-        Component.create(EclipseHelper.class),
 
         // Network
         Component.create(ConnectionTestManager.class),

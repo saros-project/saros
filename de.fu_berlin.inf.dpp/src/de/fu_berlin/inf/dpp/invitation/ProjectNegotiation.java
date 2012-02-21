@@ -14,7 +14,6 @@ import de.fu_berlin.inf.dpp.net.internal.StreamSession;
 import de.fu_berlin.inf.dpp.net.internal.StreamSession.StreamSessionListener;
 import de.fu_berlin.inf.dpp.observables.ProjectNegotiationObservable;
 import de.fu_berlin.inf.dpp.project.SarosSessionManager;
-import de.fu_berlin.inf.dpp.util.EclipseHelper;
 
 /**
  * 
@@ -52,8 +51,6 @@ public abstract class ProjectNegotiation {
     protected ArchiveStreamService archiveStreamService;
     @Inject
     protected SarosSessionManager sessionManager;
-    @Inject
-    protected de.fu_berlin.inf.dpp.util.EclipseHelper eclipseHelper;
 
     protected StreamSessionListener sessionListener = new StreamSessionListener() {
 
@@ -88,10 +85,6 @@ public abstract class ProjectNegotiation {
 
     public JID getPeer() {
         return this.peer;
-    }
-
-    public EclipseHelper getEclipseHelper() {
-        return eclipseHelper;
     }
 
     /**
