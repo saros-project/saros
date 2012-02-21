@@ -1,6 +1,7 @@
 package de.fu_berlin.inf.dpp.communication.audio;
 
-import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Mixer;
@@ -10,54 +11,59 @@ import javax.sound.sampled.Mixer;
  * PreferencePage
  * 
  * @author ologa
+ * @author Stefan Rossbach
  */
 public class MixerManager {
 
     // TODO Mixer.Info should be stored in preferences rather than just the
     // Strings
-    HashMap<String, Mixer.Info> recordDevices = new HashMap<String, Mixer.Info>();
-    HashMap<String, Mixer.Info> playbackDevices = new HashMap<String, Mixer.Info>();
+
+    private static final int INPUT_MIXER = 1;
+    private static final int OUTPUT_MIXER = 2;
 
     public MixerManager() {
-        initializeMixerInfo();
+        // nop
     }
 
-    public Mixer.Info[] getRecordingMixers() {
-        return recordDevices.values().toArray(new Mixer.Info[0]);
+    public List<Mixer.Info> getRecordingMixers() {
+        return getMixerInfos(INPUT_MIXER);
     }
 
-    public Mixer.Info[] getPlaybackMixers() {
-        return playbackDevices.values().toArray(new Mixer.Info[0]);
+    public List<Mixer.Info> getPlaybackMixers() {
+        return getMixerInfos(OUTPUT_MIXER);
     }
 
-    public Mixer getMixerByName(String mixerInfo) {
-        Mixer mixer = null;
-        if (recordDevices.containsKey(mixerInfo)) {
-            mixer = AudioSystem.getMixer(recordDevices.get(mixerInfo));
-        }
-        if (playbackDevices.containsKey(mixerInfo)) {
-            mixer = AudioSystem.getMixer(playbackDevices.get(mixerInfo));
-        }
-        if (mixer == null) {
-            return null;
-        } else {
-            return mixer;
-        }
+    public Mixer getMixerByName(String name) {
+        for (Mixer.Info mixerInfo : AudioSystem.getMixerInfo())
+            if (mixerInfo.getName().equals(name))
+                return AudioSystem.getMixer(mixerInfo);
+
+        return null;
     }
 
-    protected void initializeMixerInfo() {
-        Mixer.Info mixerInfo[] = AudioSystem.getMixerInfo();
-        for (int i = 0; i < mixerInfo.length; i++) {
-            Mixer tempmixer = AudioSystem.getMixer(mixerInfo[i]);
+    private List<Mixer.Info> getMixerInfos(int type) {
+        List<Mixer.Info> mixerInfos = new ArrayList<Mixer.Info>();
+
+        for (Mixer.Info mixerInfo : AudioSystem.getMixerInfo()) {
+
             // On some machines are Software Mixer whose names begin with "PORT"
-            // We dont want Software Mixer here
-            if (!mixerInfo[i].getName().contains("Port")) {
-                if (tempmixer.getSourceLineInfo().length > 0) {
-                    playbackDevices.put(mixerInfo[i].getName(), mixerInfo[i]);
-                } else if (tempmixer.getTargetLineInfo().length > 0) {
-                    recordDevices.put(mixerInfo[i].getName(), mixerInfo[i]);
-                }
+            // We do not want Software Mixer here
+            if (mixerInfo.getName().toUpperCase().contains("PORT"))
+                continue;
+
+            Mixer mixer = AudioSystem.getMixer(mixerInfo);
+
+            if (mixer.getSourceLineInfo().length > 0
+                && (type & OUTPUT_MIXER) == OUTPUT_MIXER) {
+                mixerInfos.add(mixerInfo);
+            }
+
+            if (mixer.getTargetLineInfo().length > 0
+                && (type & INPUT_MIXER) == INPUT_MIXER) {
+                mixerInfos.add(mixerInfo);
             }
         }
+
+        return mixerInfos;
     }
 }

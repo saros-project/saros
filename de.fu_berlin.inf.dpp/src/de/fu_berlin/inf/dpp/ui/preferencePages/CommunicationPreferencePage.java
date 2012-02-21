@@ -1,5 +1,8 @@
 package de.fu_berlin.inf.dpp.ui.preferencePages;
 
+import java.util.Collections;
+import java.util.List;
+
 import javax.sound.sampled.Mixer;
 
 import org.eclipse.jface.preference.BooleanFieldEditor;
@@ -127,13 +130,37 @@ public class CommunicationPreferencePage extends FieldEditorPreferencePage
         audio_dtx.setEnabled(prefs.getBoolean(PreferenceConstants.AUDIO_VBR),
             voipGroup);
 
-        ComboFieldEditor audioPlaybackDevs = new ComboFieldEditor(
-            PreferenceConstants.AUDIO_PLAYBACK_DEVICE, "Audio Playback Device",
-            getPlaybackMixersString(), voipGroup);
+        boolean enabled = true;
 
-        ComboFieldEditor audioRecordDevs = new ComboFieldEditor(
+        String[][] playbackMixers = getPlaybackMixerNames();
+
+        if (playbackMixers == null) {
+            playbackMixers = new String[][] { { "N/A",
+                Messages.CommunicationPreferencePage_unknown } };
+            enabled = false;
+        }
+
+        ComboFieldEditor audioPlaybackDevices = new ComboFieldEditor(
+            PreferenceConstants.AUDIO_PLAYBACK_DEVICE, "Audio Playback Device",
+            playbackMixers, voipGroup);
+
+        audioPlaybackDevices.setEnabled(enabled, voipGroup);
+
+        enabled = true;
+
+        String[][] recordMixers = getRecordMixerNames();
+
+        if (recordMixers == null) {
+            recordMixers = new String[][] { { "N/A",
+                Messages.CommunicationPreferencePage_unknown } };
+            enabled = false;
+        }
+
+        ComboFieldEditor audioRecordDevices = new ComboFieldEditor(
             PreferenceConstants.AUDIO_RECORD_DEVICE, "Audio Record Device",
-            getRecordMixersString(), voipGroup);
+            recordMixers, voipGroup);
+
+        audioRecordDevices.setEnabled(enabled, voipGroup);
 
         addField(chatserver);
         addField(useDefaultChatServer);
@@ -143,8 +170,8 @@ public class CommunicationPreferencePage extends FieldEditorPreferencePage
         addField(audioSamplerate);
         addField(audio_vbr);
         addField(audio_dtx);
-        addField(audioPlaybackDevs);
-        addField(audioRecordDevs);
+        addField(audioPlaybackDevices);
+        addField(audioRecordDevices);
 
     }
 
@@ -202,38 +229,35 @@ public class CommunicationPreferencePage extends FieldEditorPreferencePage
         }
     }
 
-    protected String[][] getRecordMixersString() {
-        Mixer.Info mixerInfo[] = mixerManager.getRecordingMixers();
-        String recordDevices[][];
-        if (mixerInfo.length == 0) {
-            recordDevices = new String[1][2];
-            recordDevices[0][0] = ""; //$NON-NLS-1$
-            recordDevices[0][1] = Messages.CommunicationPreferencePage_unknown;
-        } else {
-            recordDevices = new String[mixerInfo.length][2];
-            for (int i = 0; i < mixerInfo.length; i++) {
-                recordDevices[i][0] = mixerInfo[i].getName();
-                recordDevices[i][1] = mixerInfo[i].getName();
-            }
-        }
-        return recordDevices;
+    protected String[][] getRecordMixerNames() {
+        return getMixerNames(0);
     }
 
-    protected String[][] getPlaybackMixersString() {
-        Mixer.Info mixerInfo[] = mixerManager.getPlaybackMixers();
-        String playbackDevices[][];
-        if (mixerInfo.length == 0) {
-            playbackDevices = new String[1][2];
-            playbackDevices[0][0] = ""; //$NON-NLS-1$
-            playbackDevices[0][1] = Messages.CommunicationPreferencePage_unknown;
-        } else {
-            playbackDevices = new String[mixerInfo.length][2];
-            for (int i = 0; i < mixerInfo.length; i++) {
-                playbackDevices[i][0] = mixerInfo[i].getName();
-                playbackDevices[i][1] = mixerInfo[i].getName();
-            }
+    protected String[][] getPlaybackMixerNames() {
+        return getMixerNames(1);
+    }
+
+    @SuppressWarnings("unchecked")
+    protected String[][] getMixerNames(int type) {
+        List<Mixer.Info> mixerInfo;
+        if (type == 0)
+            mixerInfo = mixerManager.getRecordingMixers();
+        else if (type == 1)
+            mixerInfo = mixerManager.getPlaybackMixers();
+        else
+            mixerInfo = Collections.EMPTY_LIST;
+
+        if (mixerInfo.isEmpty())
+            return null;
+
+        String[][] devices = new String[mixerInfo.size()][2];
+        for (int i = 0; i < mixerInfo.size(); i++) {
+            devices[i][0] = mixerInfo.get(i).getName();
+            devices[i][1] = mixerInfo.get(i).getName();
         }
-        return playbackDevices;
+
+        return devices;
+
     }
 
     protected String[][] get2dArray(String[] inputArray) {
@@ -248,5 +272,4 @@ public class CommunicationPreferencePage extends FieldEditorPreferencePage
     public void init(IWorkbench workbench) {
         // TODO Auto-generated method stub
     }
-
 }
