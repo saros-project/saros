@@ -62,7 +62,7 @@ public abstract class SarosAnnotation extends Annotation {
      * resources that need to be disposed with {@link Color#dispose()}!
      * 
      * @param user
-     * @return the corresponding color, null if no color is stored
+     * @return the corresponding color, <code>null</code> if no color is stored
      */
     public static Color getUserColor(User user) {
 
@@ -128,37 +128,31 @@ public abstract class SarosAnnotation extends Annotation {
             return;
         }
 
-        try {
-            Utils.runSafeSWTSync(log, new Runnable() {
-                public void run() {
-                    int r = userRGB.red;
-                    int g = userRGB.green;
-                    int b = userRGB.blue;
+        Utils.runSafeSWTSync(log, new Runnable() {
+            public void run() {
+                int r = userRGB.red;
+                int g = userRGB.green;
+                int b = userRGB.blue;
 
-                    log.info("Set new User Color: " + userRGB);
-                    // Highlighting color of buddy
-                    EditorsUI.getPreferenceStore().setValue(
-                        ap.getColorPreferenceKey(), r + "," + g + "," + b);
+                log.info("Set new User Color: " + userRGB);
+                // Highlighting color of buddy
+                EditorsUI.getPreferenceStore().setValue(
+                    ap.getColorPreferenceKey(), r + "," + g + "," + b);
 
-                    // viewport color (side bar, displays what buddy is looking
-                    // at)
-                    EditorsUI.getPreferenceStore().setValue(
-                        apForViewPort.getColorPreferenceKey(),
-                        r + "," + g + "," + b);
+                // viewport color (side bar, displays what buddy is looking
+                // at)
+                EditorsUI.getPreferenceStore().setValue(
+                    apForViewPort.getColorPreferenceKey(),
+                    r + "," + g + "," + b);
 
-                    // color for things, that the buddy writes
-                    // make a small different color for selection and
-                    // contribution color
-                    EditorsUI.getPreferenceStore().setValue(
-                        apForContribution.getColorPreferenceKey(),
-                        (int) (r * 0.9) + "," + (int) (g * 0.9) + ","
-                            + (int) (b * 0.9));
-                }
-            });
-
-        } catch (RuntimeException e) {
-            log.debug(e);
-            return;
-        }
+                // color for things, that the buddy writes
+                // make a small different color for selection and
+                // contribution color
+                EditorsUI.getPreferenceStore().setValue(
+                    apForContribution.getColorPreferenceKey(),
+                    (int) (r * 0.9) + "," + (int) (g * 0.9) + ","
+                        + (int) (b * 0.9));
+            }
+        });
     }
 }
