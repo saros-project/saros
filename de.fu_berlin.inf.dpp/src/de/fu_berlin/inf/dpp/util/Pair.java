@@ -1,7 +1,7 @@
 /**
  * GASP-Reference Implementation for the Software Laboratory 2007.
  * 
- * http://projects.mi.fu-berlin.de/w/bin/view/SE/ProgrammierPraktikum2006
+ * http://www.inf.fu-berlin.de/w/SE/ProgrammierPraktikum2006
  * 
  * Copyright (C) 2007 Christopher Oezbek, Jan Sebastian Siwy, Olufemi
  * Rosanwo, Nicolai Kamenzky
