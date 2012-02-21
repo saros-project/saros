@@ -104,6 +104,7 @@ public class Messages extends NLS {
     public static String ConfigurationSummaryWizardPage_use_upnp;
     public static String ConfigurationSummaryWizardPage_use_upnp_not;
     public static String ConnectionStateComposite_connecting;
+    public static String ConnectionStateComposite_connected;
     public static String ConnectionStateComposite_disconnecting;
     public static String ConnectionStateComposite_error;
     public static String ConnectionStateComposite_error_ressource_conflict;
@@ -112,6 +113,7 @@ public class Messages extends NLS {
     public static String ConnectionStateComposite_info_add_jabber_account;
     public static String ConnectionStateComposite_not_connected;
     public static String ConnectionStateComposite_tooltip_connected;
+    public static String ConnectionStateComposite_remote_login_warning;
     public static String ConnectionTestAction_error_message;
     public static String ConnectionTestAction_error_title;
     public static String ConnectionTestAction_successful_message;
@@ -474,6 +476,7 @@ public class Messages extends NLS {
     public static String FollowThisPersonAction_stop_follow_title;
     public static String FollowThisPersonAction_stop_follow_tooltip;
     public static String EnterProjectNamePage_error_projectname_in_use;
+
     static {
         // initialize resource bundle
         NLS.initializeMessages(BUNDLE_NAME, Messages.class);

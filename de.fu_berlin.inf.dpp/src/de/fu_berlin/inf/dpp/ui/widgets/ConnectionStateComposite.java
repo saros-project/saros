@@ -100,8 +100,15 @@ public class ConnectionStateComposite extends Composite {
             return Messages.ConnectionStateComposite_info_add_jabber_account;
         }
 
+        Exception e = null;
         switch (state) {
         case NOT_CONNECTED:
+            e = saros.getSarosNet().getConnectionError();
+            if (e.toString().equalsIgnoreCase("stream:error (text)")) {
+                // the same user logged in via xmpp on another server/host
+                SarosView.showNotification("XMPP Connection lost",
+                    Messages.ConnectionStateComposite_remote_login_warning);
+            }
             return Messages.ConnectionStateComposite_not_connected;
         case CONNECTING:
             return Messages.ConnectionStateComposite_connecting;
@@ -111,18 +118,11 @@ public class ConnectionStateComposite extends Composite {
         case DISCONNECTING:
             return Messages.ConnectionStateComposite_disconnecting;
         case ERROR:
-            Exception e = saros.getSarosNet().getConnectionError();
+            e = saros.getSarosNet().getConnectionError();
             if (e == null) {
                 return Messages.ConnectionStateComposite_error;
             } else if (e.toString().equalsIgnoreCase("stream:error (conflict)")) { //$NON-NLS-1$
                 return Messages.ConnectionStateComposite_error_ressource_conflict;
-            } else if (e.toString().equalsIgnoreCase("stream:error (text)")) {
-                // the same user logged in via xmpp on another server/host
-                SarosView
-                    .showNotification(
-                        "XMPP Connection lost",
-                        "Someone logged in with your current XMPP account from another host, so you got disconnected. Your account may had been compromised !");
-                return Messages.ConnectionStateComposite_not_connected;
             } else {
                 return MessageFormat.format(
                     Messages.ConnectionStateComposite_error_with_message,
