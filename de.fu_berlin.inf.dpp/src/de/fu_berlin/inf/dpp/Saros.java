@@ -21,6 +21,7 @@ package de.fu_berlin.inf.dpp;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -199,10 +200,16 @@ public class Saros extends AbstractUIPlugin {
      * Create the shared instance.
      */
     public Saros() {
-        createContext();
-    }
 
-    protected void createContext() {
+        try {
+            InputStream sarosPropertiers = Saros.class.getClassLoader()
+                .getResourceAsStream("de/fu_berlin/inf/dpp/saros.properties");
+            System.getProperties().load(sarosPropertiers);
+            sarosPropertiers.close();
+        } catch (Exception e) {
+            LogLog.error("could not load saros property file", e);
+        }
+
         // Only start a DotGraphMonitor if asserts are enabled (aka debug mode)
         assert (dotMonitor = new DotGraphMonitor()) != null;
 
