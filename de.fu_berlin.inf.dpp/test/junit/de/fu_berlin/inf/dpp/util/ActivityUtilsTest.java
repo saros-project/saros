@@ -1,5 +1,6 @@
 package de.fu_berlin.inf.dpp.util;
 
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
@@ -76,7 +77,7 @@ public class ActivityUtilsTest {
         timedActivities.add(tmp1);
 
         // should be false, because there is another ActivityDataObject
-        assertTrue(ActivityUtils.containsChecksumsOnly(timedActivities) == false);
+        assertFalse(ActivityUtils.containsChecksumsOnly(timedActivities));
     }
 
     @Test
@@ -87,8 +88,7 @@ public class ActivityUtilsTest {
 
         activities.add(tmp);
 
-        assertTrue(false == ActivityUtils
-            .containsQueueableActivitiesOnly(activities));
+        assertFalse(ActivityUtils.containsQueueableActivitiesOnly(activities));
     }
 
     @Test
