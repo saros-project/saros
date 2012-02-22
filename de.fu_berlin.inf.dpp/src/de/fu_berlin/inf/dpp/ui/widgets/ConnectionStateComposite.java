@@ -103,8 +103,10 @@ public class ConnectionStateComposite extends Composite {
         Exception e = null;
         switch (state) {
         case NOT_CONNECTED:
+            // FIXME: fix SarosNet if no ERROR is reported !!!
             e = saros.getSarosNet().getConnectionError();
-            if (e.toString().equalsIgnoreCase("stream:error (text)")) {
+            if (e != null
+                && e.toString().equalsIgnoreCase("stream:error (text)")) {
                 // the same user logged in via xmpp on another server/host
                 SarosView.showNotification("XMPP Connection lost",
                     Messages.ConnectionStateComposite_remote_login_warning);
