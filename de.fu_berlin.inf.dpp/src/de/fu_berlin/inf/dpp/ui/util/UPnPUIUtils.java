@@ -6,7 +6,7 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Label;
 
-import de.fu_berlin.inf.dpp.net.UPnP.UPnPManager;
+import de.fu_berlin.inf.dpp.net.upnp.UPnPManager;
 import de.fu_berlin.inf.dpp.ui.Messages;
 
 /**

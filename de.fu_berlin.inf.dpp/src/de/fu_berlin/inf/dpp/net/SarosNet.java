@@ -21,8 +21,8 @@ import org.picocontainer.annotations.Nullable;
 
 import de.fu_berlin.inf.dpp.SafeConnectionListener;
 import de.fu_berlin.inf.dpp.Saros;
-import de.fu_berlin.inf.dpp.net.UPnP.UPnPManager;
 import de.fu_berlin.inf.dpp.net.stun.IStunService;
+import de.fu_berlin.inf.dpp.net.upnp.UPnPManager;
 import de.fu_berlin.inf.dpp.net.util.NetworkingUtils;
 import de.fu_berlin.inf.dpp.util.Utils;
 

@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.net.UPnP;
+package de.fu_berlin.inf.dpp.net.upnp;
 
 import java.io.IOException;
 import java.net.SocketException;

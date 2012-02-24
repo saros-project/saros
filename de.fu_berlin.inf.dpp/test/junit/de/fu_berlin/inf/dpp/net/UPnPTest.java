@@ -23,8 +23,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.xml.sax.SAXException;
 
-import de.fu_berlin.inf.dpp.net.UPnP.IUPnPAccess;
-import de.fu_berlin.inf.dpp.net.UPnP.UPnPManager;
+import de.fu_berlin.inf.dpp.net.upnp.IUPnPAccess;
+import de.fu_berlin.inf.dpp.net.upnp.UPnPManager;
 
 /**
  * Test class to perform tests on UPnP management functionality in Saros.
