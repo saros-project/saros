@@ -27,8 +27,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.Deflater;
@@ -426,7 +424,6 @@ public class Utils {
      * 
      * @blocking
      */
-    private static final Lock SYNC_LOCK = new ReentrantLock();
 
     public static void runSafeSWTSync(final Logger log, final Runnable runnable) {
         try {
@@ -1126,31 +1123,5 @@ public class Utils {
         result.append(it.next());
 
         return result.toString();
-    }
-
-    private static class SyncedThread extends Thread {
-
-        volatile Throwable throwable;
-
-        private Runnable runnableToRun;
-
-        public SyncedThread(Runnable runnable) {
-            this.runnableToRun = runnable;
-            this.setName("Synced-Thread:" + runnable.toString());
-        }
-
-        @Override
-        public void run() {
-            try {
-                if (runnableToRun != null)
-                    runnableToRun.run();
-            } catch (Throwable t) {
-                throwable = t;
-            }
-        }
-
-        public Throwable getRunningError() {
-            return throwable;
-        }
     }
 }
