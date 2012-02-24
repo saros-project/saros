@@ -6,7 +6,7 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Label;
 
-import de.fu_berlin.inf.dpp.net.upnp.UPnPManager;
+import de.fu_berlin.inf.dpp.net.upnp.IUPnPService;
 import de.fu_berlin.inf.dpp.ui.Messages;
 
 /**
@@ -27,7 +27,7 @@ public class UPnPUIUtils {
      *            {@link Button} checkbox to enable/disable UPnP support
      */
     public static void populateGatewaySelectionControls(
-        final UPnPManager upnpManager, final Combo combo, final Label info,
+        final IUPnPService upnpService, final Combo combo, final Label info,
         final Button checkbox) {
 
         // Configuration controls closed in the meanwhile?
@@ -39,8 +39,8 @@ public class UPnPUIUtils {
         combo.removeAll();
 
         // if no devices are found, return now - nothing to populate
-        if (upnpManager.getGateways() == null
-            || upnpManager.getGateways().isEmpty()) {
+        if (upnpService.getGateways() == null
+            || upnpService.getGateways().isEmpty()) {
             info.setText(Messages.UPnPUIUtils_no_gateway);
             info.getParent().pack();
             return;
@@ -48,7 +48,7 @@ public class UPnPUIUtils {
 
         // insert found gateways into combobox
         int indexToSelect = 0;
-        for (GatewayDevice gw : upnpManager.getGateways()) {
+        for (GatewayDevice gw : upnpService.getGateways()) {
             try {
                 String name = gw.getFriendlyName();
                 if (!gw.isConnected())
@@ -56,9 +56,9 @@ public class UPnPUIUtils {
 
                 combo.add(name);
 
-                if (upnpManager.getSelectedGateway() != null
+                if (upnpService.getSelectedGateway() != null
                     && gw.getUSN().equals(
-                        upnpManager.getSelectedGateway().getUSN()))
+                        upnpService.getSelectedGateway().getUSN()))
                     indexToSelect = combo.getItemCount() - 1;
             } catch (Exception e) {
                 log.debug("Error updating UPnP selector:" + e.getMessage()); //$NON-NLS-1$

@@ -33,7 +33,7 @@ import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.RosterTracker;
 import de.fu_berlin.inf.dpp.net.SarosNet;
 import de.fu_berlin.inf.dpp.net.business.DispatchThreadContext;
-import de.fu_berlin.inf.dpp.net.upnp.UPnPManager;
+import de.fu_berlin.inf.dpp.net.upnp.IUPnPService;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
 import de.fu_berlin.inf.dpp.util.StopWatch;
@@ -86,7 +86,7 @@ public class DataTransferManager implements IConnectionListener,
     private IBBTransport ibbTransport;
 
     @Inject
-    protected UPnPManager upnpManager;
+    protected IUPnPService upnpService;
 
     @Inject
     private Socks5Transport socks5Transport;
@@ -494,8 +494,8 @@ public class DataTransferManager implements IConnectionListener,
         transferModeDispatch.connectionChanged(peer, connection2);
 
         if (connection2.getMode() == NetTransferMode.IBB && incomingRequest
-            && upnpManager != null)
-            upnpManager.checkAndInformAboutUPnP();
+            && upnpService != null)
+            upnpService.checkAndInformAboutUPnP();
     }
 
     public void connectionClosed(JID peer, IBytestreamConnection connection2) {

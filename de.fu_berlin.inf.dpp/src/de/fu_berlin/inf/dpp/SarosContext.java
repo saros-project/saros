@@ -80,7 +80,8 @@ import de.fu_berlin.inf.dpp.net.internal.extensions.UserListExtension;
 import de.fu_berlin.inf.dpp.net.internal.subscriptionManager.SubscriptionManager;
 import de.fu_berlin.inf.dpp.net.stun.IStunService;
 import de.fu_berlin.inf.dpp.net.stun.internal.StunServiceImpl;
-import de.fu_berlin.inf.dpp.net.upnp.UPnPManager;
+import de.fu_berlin.inf.dpp.net.upnp.IUPnPService;
+import de.fu_berlin.inf.dpp.net.upnp.internal.UPnPServiceImpl;
 import de.fu_berlin.inf.dpp.observables.FileReplacementInProgressObservable;
 import de.fu_berlin.inf.dpp.observables.InvitationProcessObservable;
 import de.fu_berlin.inf.dpp.observables.ProjectNegotiationObservable;
@@ -236,7 +237,7 @@ public class SarosContext {
         Component.create(StreamServiceManager.class),
         Component.create(IStunService.class, StunServiceImpl.class),
         Component.create(SubscriptionManager.class),
-        Component.create(UPnPManager.class),
+        Component.create(IUPnPService.class, UPnPServiceImpl.class),
         Component.create(XMPPReceiver.class),
         Component.create(XMPPTransmitter.class),
 

@@ -24,7 +24,7 @@ import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.feedback.ErrorLogManager;
 import de.fu_berlin.inf.dpp.feedback.StatisticManager;
-import de.fu_berlin.inf.dpp.net.upnp.UPnPManager;
+import de.fu_berlin.inf.dpp.net.upnp.IUPnPService;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
 import de.fu_berlin.inf.dpp.ui.ImageManager;
 import de.fu_berlin.inf.dpp.ui.util.UPnPUIUtils;
@@ -56,7 +56,7 @@ public class ConfigurationSettingsWizardPage extends WizardPage {
     protected ErrorLogManager errorLogManager;
 
     @Inject
-    protected UPnPManager upnpManager;
+    protected IUPnPService upnpService;
 
     public ConfigurationSettingsWizardPage() {
         super(ConfigurationSettingsWizardPage.class.getName());
@@ -336,7 +336,7 @@ public class ConfigurationSettingsWizardPage extends WizardPage {
      * Populates the gateway combobox with discovered gateways.
      */
     protected void populateGatewayCombo() {
-        if (upnpManager.getGateways() == null) {
+        if (upnpService.getGateways() == null) {
             gatewaysCombo.setEnabled(false);
             gatewayInfo
                 .setText(de.fu_berlin.inf.dpp.ui.Messages.ConfigurationSettingsWizardPage_0);
@@ -346,13 +346,13 @@ public class ConfigurationSettingsWizardPage extends WizardPage {
             Utils.runSafeAsync(null, new Runnable() {
 
                 public void run() {
-                    upnpManager.discoverGateways();
+                    upnpService.discoverGateways();
 
                     // GUI work from SWT thread
                     Utils.runSafeSWTAsync(null, new Runnable() {
                         public void run() {
                             UPnPUIUtils.populateGatewaySelectionControls(
-                                upnpManager, gatewaysCombo, gatewayInfo,
+                                upnpService, gatewaysCombo, gatewayInfo,
                                 setupPortmappingButton);
                         }
                     });
@@ -360,7 +360,7 @@ public class ConfigurationSettingsWizardPage extends WizardPage {
             });
 
         } else {
-            UPnPUIUtils.populateGatewaySelectionControls(upnpManager,
+            UPnPUIUtils.populateGatewaySelectionControls(upnpService,
                 gatewaysCombo, gatewayInfo, setupPortmappingButton);
         }
     }
@@ -390,7 +390,7 @@ public class ConfigurationSettingsWizardPage extends WizardPage {
         if (setupPortmappingButton.getSelection()) {
             int sel = gatewaysCombo.getSelectionIndex();
             if (sel != -1) {
-                return upnpManager.getGateways().get(sel);
+                return upnpService.getGateways().get(sel);
             }
         }
         return null;

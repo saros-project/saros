@@ -22,7 +22,7 @@ import org.picocontainer.annotations.Nullable;
 import de.fu_berlin.inf.dpp.SafeConnectionListener;
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.net.stun.IStunService;
-import de.fu_berlin.inf.dpp.net.upnp.UPnPManager;
+import de.fu_berlin.inf.dpp.net.upnp.IUPnPService;
 import de.fu_berlin.inf.dpp.net.util.NetworkingUtils;
 import de.fu_berlin.inf.dpp.util.Utils;
 
@@ -63,13 +63,13 @@ public class SarosNet {
 
     protected IStunService stunService;
 
-    protected UPnPManager upnpManager;
+    protected IUPnPService upnpService;
 
     private int packetReplyTimeout;
 
-    public SarosNet(@Nullable UPnPManager upnpManager,
+    public SarosNet(@Nullable IUPnPService upnpService,
         @Nullable IStunService stunHelper) {
-        this.upnpManager = upnpManager;
+        this.upnpService = upnpService;
         this.stunService = stunHelper;
 
         packetReplyTimeout = Integer.getInteger(
@@ -217,21 +217,21 @@ public class SarosNet {
             }
             log.debug(sb);
 
-            if (upnpManager != null) {
+            if (upnpService != null) {
                 // Update the mapped port on Socks5Proy port change
-                if (proxyEnabled && portChanged && upnpManager.isMapped())
-                    upnpManager.createSarosPortMapping();
+                if (proxyEnabled && portChanged && upnpService.isMapped())
+                    upnpService.createSarosPortMapping();
 
                 // create UPnP port mapping if not existing
-                if (proxyEnabled && autoPortMapping && !upnpManager.isMapped())
-                    upnpManager.createSarosPortMapping();
+                if (proxyEnabled && autoPortMapping && !upnpService.isMapped())
+                    upnpService.createSarosPortMapping();
 
                 // remove UPnP port mapping if not required
-                if (!proxyEnabled && upnpManager.isMapped())
-                    upnpManager.removeSarosPortMapping();
+                if (!proxyEnabled && upnpService.isMapped())
+                    upnpService.removeSarosPortMapping();
 
-                if (upnpManager.isMapped()) {
-                    String gatewayPublicIP = upnpManager.getPublicGatewayIP();
+                if (upnpService.isMapped()) {
+                    String gatewayPublicIP = upnpService.getPublicGatewayIP();
                     if (gatewayPublicIP != null)
                         NetworkingUtils.addProxyAddress(gatewayPublicIP, true);
                 }

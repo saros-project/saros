@@ -26,7 +26,7 @@ import org.picocontainer.annotations.Inject;
 import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.feedback.ErrorLogManager;
 import de.fu_berlin.inf.dpp.feedback.StatisticManager;
-import de.fu_berlin.inf.dpp.net.upnp.UPnPManager;
+import de.fu_berlin.inf.dpp.net.upnp.IUPnPService;
 import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
 import de.fu_berlin.inf.dpp.ui.ImageManager;
@@ -51,7 +51,7 @@ public class ConfigurationWizard extends AddXMPPAccountWizard {
     protected ErrorLogManager errorLogManager;
 
     @Inject
-    protected UPnPManager upnpManager;
+    protected IUPnPService upnpService;
 
     ConfigurationSettingsWizardPage configurationSettingsWizardPage = new ConfigurationSettingsWizardPage();
 
@@ -109,7 +109,7 @@ public class ConfigurationWizard extends AddXMPPAccountWizard {
         // Gateway setting
         GatewayDevice selGwDevice = this.configurationSettingsWizardPage
             .getPortmappingDevice();
-        upnpManager.setSelectedGateway(selGwDevice);
+        upnpService.setSelectedGateway(selGwDevice);
 
     }
 }

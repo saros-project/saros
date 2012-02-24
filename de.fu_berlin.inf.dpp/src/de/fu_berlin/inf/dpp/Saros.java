@@ -63,8 +63,8 @@ import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.feedback.ErrorLogManager;
 import de.fu_berlin.inf.dpp.feedback.StatisticManager;
 import de.fu_berlin.inf.dpp.net.SarosNet;
-import de.fu_berlin.inf.dpp.net.upnp.UPnPAccessWeupnp;
-import de.fu_berlin.inf.dpp.net.upnp.UPnPManager;
+import de.fu_berlin.inf.dpp.net.upnp.IUPnPService;
+import de.fu_berlin.inf.dpp.net.upnp.internal.UPnPAccessImpl;
 import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
 import de.fu_berlin.inf.dpp.project.SarosSessionManager;
@@ -271,8 +271,8 @@ public class Saros extends AbstractUIPlugin {
 
         getSarosNet().initialize();
 
-        sarosContext.getComponent(UPnPManager.class).init(
-            new UPnPAccessWeupnp(), getPreferenceStore());
+        sarosContext.getComponent(IUPnPService.class).init(
+            new UPnPAccessImpl(), getPreferenceStore());
 
         // determine if auto-connect can and should be performed
         if (getPreferenceStore().getBoolean(PreferenceConstants.AUTO_CONNECT)
@@ -312,8 +312,8 @@ public class Saros extends AbstractUIPlugin {
 
             getSarosNet().uninitialize();
             // Remove UPnP port mapping for Saros
-            UPnPManager upnpManager = sarosContext
-                .getComponent(UPnPManager.class);
+            IUPnPService upnpManager = sarosContext
+                .getComponent(IUPnPService.class);
             if (upnpManager.isMapped())
                 upnpManager.removeSarosPortMapping();
 
@@ -612,7 +612,7 @@ public class Saros extends AbstractUIPlugin {
     @Inject
     PreferenceUtils preferenceUtils;
     @Inject
-    UPnPManager upnpManager;
+    IUPnPService upnpManager;
 
     /**
      * Connects using the credentials from the preferences. If no credentials

@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.net.upnp;
+package de.fu_berlin.inf.dpp.net.upnp.internal;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -17,6 +17,8 @@ import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.net.stun.IStunService;
+import de.fu_berlin.inf.dpp.net.upnp.IUPnPAccess;
+import de.fu_berlin.inf.dpp.net.upnp.IUPnPService;
 import de.fu_berlin.inf.dpp.net.util.NetworkingUtils;
 import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
 import de.fu_berlin.inf.dpp.ui.views.SarosView;
@@ -27,9 +29,9 @@ import de.javawi.jstun.test.DiscoveryInfo;
  *  Class for performing UPnP functions (using the weupnp library) and managing the mapping state.
  */
 @Component(module = "net")
-public class UPnPManager {
+public class UPnPServiceImpl implements IUPnPService {
 
-    protected Logger log = Logger.getLogger(UPnPManager.class);
+    protected Logger log = Logger.getLogger(UPnPServiceImpl.class);
 
     @Inject
     protected IStunService stunService;
@@ -52,6 +54,7 @@ public class UPnPManager {
 
     protected int currentlyMappedPort = 0;
 
+    @Override
     public int getCurrentlyMappedPort() {
         return currentlyMappedPort;
     }
@@ -75,6 +78,7 @@ public class UPnPManager {
      *            {@link IPreferenceStore} to store settings in, may be null to
      *            disable storage
      */
+    @Override
     public void init(IUPnPAccess upnpAccess, IPreferenceStore preferenceStore) {
         this.upnpAccess = upnpAccess;
 
@@ -96,6 +100,7 @@ public class UPnPManager {
      * 
      * @return currently selected {@link GatewayDevice}, or null if none.
      */
+    @Override
     public GatewayDevice getSelectedGateway() {
         return selectedGateway;
     }
@@ -114,6 +119,7 @@ public class UPnPManager {
      * @throws IllegalArgumentException
      *             if the given gateway is not a discovered one
      */
+    @Override
     public boolean setSelectedGateway(GatewayDevice gateway)
         throws IllegalArgumentException {
 
@@ -150,6 +156,7 @@ public class UPnPManager {
      *         discovery. Is <code>null</code> if discovery was not performed
      *         yet.
      */
+    @Override
     public List<GatewayDevice> getGateways() {
         return gateways;
     }
@@ -161,6 +168,7 @@ public class UPnPManager {
      *            Boolean flag whether the discovery should be performed
      *            blocking or concurrently
      */
+    @Override
     public void startGatewayDiscovery(boolean blocked) {
         if (blocked)
             discoverGateways();
@@ -175,6 +183,7 @@ public class UPnPManager {
     /**
      * Trigger the UPnP discovery.
      */
+    @Override
     public synchronized void discoverGateways() {
 
         try {
@@ -271,6 +280,7 @@ public class UPnPManager {
      * 
      * @return true if port mapping was created, false otherwise
      */
+    @Override
     public boolean createSarosPortMapping() {
 
         if (!NetworkingUtils.getSocks5ProxySafe().isRunning())
@@ -419,6 +429,7 @@ public class UPnPManager {
      * 
      * @return true if port mapping removal was successful, false otherwise
      */
+    @Override
     public boolean removeSarosPortMapping() {
         if (selectedGateway == null || currentlyMappedPort == 0)
             return false;
@@ -450,6 +461,7 @@ public class UPnPManager {
      * transport is not enforced in preferences</li><li>a gateway was discovered
      * by UPnP</li> <li>STUN discovery did not detected open access</li>
      */
+    @Override
     public void checkAndInformAboutUPnP() {
         if (prefStore == null)
             return;
@@ -519,14 +531,17 @@ public class UPnPManager {
      * 
      * @return true if a port is currently mapped for Saros, false otherwise.
      */
+    @Override
     public boolean isMapped() {
         return currentlyMappedPort != 0;
     }
 
+    @Override
     public void setPreSelectedDeviceID(String preSelectedDeviceID) {
         this.preSelectedDeviceID = preSelectedDeviceID;
     }
 
+    @Override
     public String getPreSelectedDeviceID() {
         return preSelectedDeviceID;
     }
@@ -535,6 +550,7 @@ public class UPnPManager {
      * Retrieves and returns the public IP of the selected gateway. Is
      * <code>null</code> if no gateway is selected or IP retrieval failed.
      */
+    @Override
     public String getPublicGatewayIP() {
         if (selectedGateway != null)
             try {

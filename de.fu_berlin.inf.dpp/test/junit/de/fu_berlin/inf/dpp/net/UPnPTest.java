@@ -24,7 +24,8 @@ import org.junit.Test;
 import org.xml.sax.SAXException;
 
 import de.fu_berlin.inf.dpp.net.upnp.IUPnPAccess;
-import de.fu_berlin.inf.dpp.net.upnp.UPnPManager;
+import de.fu_berlin.inf.dpp.net.upnp.IUPnPService;
+import de.fu_berlin.inf.dpp.net.upnp.internal.UPnPServiceImpl;
 
 /**
  * Test class to perform tests on UPnP management functionality in Saros.
@@ -83,7 +84,7 @@ public class UPnPTest {
     }
 
     protected UPnPAccessStub upnpAccess;
-    protected UPnPManager testUpnpManager;
+    protected IUPnPService testUpnpManager;
     protected GatewayDevice testGateway1;
     protected GatewayDevice testGateway2;
     protected GatewayDevice testGateway3;
@@ -91,7 +92,7 @@ public class UPnPTest {
     @Before
     public void setUp() throws Exception {
         upnpAccess = new UPnPAccessStub();
-        testUpnpManager = new UPnPManager();
+        testUpnpManager = new UPnPServiceImpl();
         testUpnpManager.init(upnpAccess, null);
 
         testGateway1 = new GatewayDevice();

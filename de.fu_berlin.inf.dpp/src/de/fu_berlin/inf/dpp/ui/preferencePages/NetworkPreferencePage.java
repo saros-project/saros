@@ -31,7 +31,7 @@ import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
-import de.fu_berlin.inf.dpp.net.upnp.UPnPManager;
+import de.fu_berlin.inf.dpp.net.upnp.IUPnPService;
 import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
 import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.ui.views.SarosView;
@@ -47,7 +47,7 @@ public final class NetworkPreferencePage extends PreferencePage implements
     private Saros saros;
 
     @Inject
-    private UPnPManager upnpManager;
+    private IUPnPService upnpService;
 
     @Inject
     private DataTransferManager dataTransferManager;
@@ -120,11 +120,11 @@ public final class NetworkPreferencePage extends PreferencePage implements
             Integer.valueOf(stunPortAddressText.getText()));
 
         // FIXME: you can only remove a gateway after the discovery is performed
-        if (upnpManager.getGateways() != null) {
-            upnpManager.setSelectedGateway(null);
+        if (upnpService.getGateways() != null) {
+            upnpService.setSelectedGateway(null);
             for (TableItem item : upnpDevicesTable.getItems()) {
                 if (item.getChecked()) {
-                    if (upnpManager.setSelectedGateway((GatewayDevice) item
+                    if (upnpService.setSelectedGateway((GatewayDevice) item
                         .getData())) {
 
                         if (!dataTransferManager.disconnectInBandBytestreams())
@@ -378,7 +378,7 @@ public final class NetworkPreferencePage extends PreferencePage implements
     private int progressIndex = 0;
 
     private void discoverUpnpGateways() {
-        if (upnpManager.getGateways() == null) {
+        if (upnpService.getGateways() == null) {
             gatewayInfo.setText(Messages.NetworkPreferencePage_discover_upnp);
             gatewayInfo.pack();
             gatewayInfo.setVisible(true);
@@ -387,9 +387,9 @@ public final class NetworkPreferencePage extends PreferencePage implements
 
                 public void run() {
 
-                    upnpManager.startGatewayDiscovery(false);
+                    upnpService.startGatewayDiscovery(false);
 
-                    while (upnpManager.getGateways() == null) {
+                    while (upnpService.getGateways() == null) {
                         Utils.runSafeSWTAsync(null, new Runnable() {
                             public void run() {
                                 if (!gatewayInfo.isDisposed()) {
@@ -416,7 +416,7 @@ public final class NetworkPreferencePage extends PreferencePage implements
 
                     Utils.runSafeSWTAsync(null, new Runnable() {
                         public void run() {
-                            List<GatewayDevice> gateways = upnpManager
+                            List<GatewayDevice> gateways = upnpService
                                 .getGateways();
 
                             if (gatewayInfo.isDisposed()
@@ -431,8 +431,8 @@ public final class NetworkPreferencePage extends PreferencePage implements
                             }
 
                             gatewayInfo.setVisible(false);
-                            updateUpnpDevicesTable(upnpManager.getGateways(),
-                                upnpManager.getSelectedGateway());
+                            updateUpnpDevicesTable(upnpService.getGateways(),
+                                upnpService.getSelectedGateway());
                             upnpDevicesTable.setVisible(true);
                         }
                     });
@@ -440,7 +440,7 @@ public final class NetworkPreferencePage extends PreferencePage implements
             });
 
         } else {
-            List<GatewayDevice> gateways = upnpManager.getGateways();
+            List<GatewayDevice> gateways = upnpService.getGateways();
 
             if (gateways.isEmpty()) {
                 gatewayInfo
@@ -450,8 +450,8 @@ public final class NetworkPreferencePage extends PreferencePage implements
                 return;
             }
 
-            updateUpnpDevicesTable(upnpManager.getGateways(),
-                upnpManager.getSelectedGateway());
+            updateUpnpDevicesTable(upnpService.getGateways(),
+                upnpService.getSelectedGateway());
             upnpDevicesTable.setVisible(true);
         }
 
@@ -478,6 +478,7 @@ public final class NetworkPreferencePage extends PreferencePage implements
 
         while (upnpDevicesTable.getColumnCount() > 0)
             upnpDevicesTable.getColumn(0).dispose();
+
         upnpDevicesTable.removeAll();
 
         TableColumn column;
@@ -517,7 +518,7 @@ public final class NetworkPreferencePage extends PreferencePage implements
                 externalIpAddress = Messages.NetworkPreferencePage_not_available;
             }
 
-            item = new TableItem(upnpDevicesTable, SWT.NONE);
+            item = new TableItem(upnpDevicesTable, SWT.NULL);
             item.setText(1, name);
             item.setText(2, internalIpAddress);
             item.setText(3, externalIpAddress);
@@ -530,9 +531,9 @@ public final class NetworkPreferencePage extends PreferencePage implements
             }
         }
 
-        for (int i = 0; i < upnpDevicesTable.getColumnCount(); i++) {
+        for (int i = 0; i < upnpDevicesTable.getColumnCount(); i++)
             upnpDevicesTable.getColumn(i).pack();
-        }
+
     }
 
     private boolean checkStunIpAddress(String address) {

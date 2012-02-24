@@ -11,9 +11,11 @@ import org.bitlet.weupnp.GatewayDevice;
 import org.bitlet.weupnp.PortMappingEntry;
 import org.xml.sax.SAXException;
 
+import de.fu_berlin.inf.dpp.net.upnp.internal.UPnPServiceImpl;
+
 /**
  * An interface responsible for UPnP accessing functionality. Implementing
- * classes can be used for the {@link UPnPManager} to perform UPnP actions with.
+ * classes can be used for the {@link UPnPServiceImpl} to perform UPnP actions with.
  */
 public interface IUPnPAccess {
     Collection<GatewayDevice> performDiscovery() throws SocketException,
