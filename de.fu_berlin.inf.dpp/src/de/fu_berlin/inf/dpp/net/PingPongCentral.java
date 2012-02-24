@@ -144,7 +144,8 @@ public class PingPongCentral extends AbstractActivityProvider {
     protected ScheduledExecutorService scheduler = Executors
         .newScheduledThreadPool(1, new NamedThreadFactory("PingPongScheduler"));
 
-    protected ScheduledFuture<?> pingPongHandle = null;
+    protected AtomicReference<ScheduledFuture<?>> pingPongHandle = new AtomicReference<ScheduledFuture<?>>(
+        null);
 
     protected ISarosSessionListener sessionListener = new AbstractSarosSessionListener() {
         @Override
@@ -152,7 +153,13 @@ public class PingPongCentral extends AbstractActivityProvider {
 
             oldSarosSession.removeActivityProvider(PingPongCentral.this);
 
-            pingPongHandle.cancel(true);
+            ScheduledFuture<?> pingPongFuture = pingPongHandle.getAndSet(null);
+
+            if (pingPongFuture != null)
+                pingPongFuture.cancel(true);
+            else
+                log.warn("saros session listener error, session ended but has not started at all");
+
             sarosSession.set(null);
 
             log.info(PingPongCentral.this.toString());
@@ -166,7 +173,7 @@ public class PingPongCentral extends AbstractActivityProvider {
 
             newSarosSession.addActivityProvider(PingPongCentral.this);
 
-            pingPongHandle = scheduler.scheduleAtFixedRate(new Runnable() {
+            pingPongHandle.set(scheduler.scheduleAtFixedRate(new Runnable() {
                 public void run() {
                     if (!sendPings)
                         return;
@@ -179,7 +186,7 @@ public class PingPongCentral extends AbstractActivityProvider {
                         }
                     });
                 }
-            }, 10, 10, TimeUnit.SECONDS);
+            }, 10, 10, TimeUnit.SECONDS));
         }
     };
 
