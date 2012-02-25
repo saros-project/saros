@@ -19,10 +19,13 @@ import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.accountManagement.XMPPAccount;
 import de.fu_berlin.inf.dpp.accountManagement.XMPPAccountStore;
+import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.net.ConnectionState;
 import de.fu_berlin.inf.dpp.net.IConnectionListener;
+import de.fu_berlin.inf.dpp.project.SarosSessionManager;
 import de.fu_berlin.inf.dpp.ui.ImageManager;
 import de.fu_berlin.inf.dpp.ui.Messages;
+import de.fu_berlin.inf.dpp.ui.util.DialogUtils;
 import de.fu_berlin.inf.dpp.ui.util.WizardUtils;
 import de.fu_berlin.inf.dpp.util.Utils;
 
@@ -36,8 +39,12 @@ public class ChangeXMPPAccountAction extends Action implements IMenuCreator {
     Menu accountMenu;
     @Inject
     XMPPAccountStore accountService;
+
     @Inject
     Saros saros;
+
+    @Inject
+    SarosSessionManager sarosSessionManager;
 
     protected int currentAccountId;
     private static final Logger log = Logger
@@ -63,46 +70,28 @@ public class ChangeXMPPAccountAction extends Action implements IMenuCreator {
     // user clicks on Button
     @Override
     public void run() {
-
-        Utils.runSafeAsync("ConnectDisconnectAction-", log, new Runnable() { //$NON-NLS-1$
-                public void run() {
-                    try {
-                        if (running.getAndSet(true)) {
-                            log.info("User clicked too fast, running already a connect or disconnect."); //$NON-NLS-1$
-                            return;
-                        }
-                        runConnectDisconnect();
-                    } finally {
-                        running.set(false);
-                    }
-                }
-            });
+        if (saros.getSarosNet().isConnected())
+            disconnect();
+        else if (!accountService.isEmpty())
+            connect(accountService.getActiveAccount());
     }
 
-    protected void runConnectDisconnect() {
-        try {
-            if (saros.getSarosNet().isConnected()) {
-                saros.getSarosNet().disconnect();
-            } else {
-                log.debug("Connect!!!"); //$NON-NLS-1$
-                saros.connect(false);
-            }
-
-        } catch (RuntimeException e) {
-            log.error("Internal error in ConnectDisconnectAction:", e); //$NON-NLS-1$
-        }
-    }
-
-    protected void disconnect() {
-        saros.getSarosNet().disconnect();
-    }
-
+    @Override
     public Menu getMenu(Control parent) {
         accountMenu = new Menu(parent);
+
+        XMPPAccount activeAccount = null;
+
+        if (saros.getSarosNet().isConnected())
+            activeAccount = accountService.getActiveAccount();
+
         for (XMPPAccount account : accountService.getAllAccounts()) {
-            addMenuItem(account);
+            if (!account.equals(activeAccount))
+                addMenuItem(account);
         }
+
         new MenuItem(accountMenu, SWT.SEPARATOR);
+
         addActionToMenu(accountMenu, new Action(
             Messages.ChangeXMPPAccountAction_add_account) {
             @Override
@@ -110,6 +99,7 @@ public class ChangeXMPPAccountAction extends Action implements IMenuCreator {
                 WizardUtils.openAddXMPPAccountWizard();
             }
         });
+
         addActionToMenu(accountMenu, new Action(
             Messages.ChangeXMPPAccountAction_configure_account) {
             @Override
@@ -147,20 +137,58 @@ public class ChangeXMPPAccountAction extends Action implements IMenuCreator {
         addActionToMenu(accountMenu, action);
     }
 
-    protected void connectWithThisAccount(XMPPAccount account) {
+    protected void connectWithThisAccount(final XMPPAccount account) {
+
+        if (sarosSessionManager.getSarosSession() == null) {
+            connect(account);
+            return;
+        }
+
+        Utils.runSafeSWTAsync(log, new Runnable() {
+            public void run() {
+                boolean proceed = DialogUtils.openQuestionMessageDialog(
+                    EditorAPI.getShell(),
+                    "Disconnecting from the current Saros Session",
+                    "Connecting with a different account will disconnect you from your current Saros session. Do you wish to continue ?");
+
+                if (proceed)
+                    connect(account);
+            }
+        });
+    }
+
+    protected void connect(XMPPAccount account) {
         accountService.setAccountActive(account);
-        Utils.runSafeAsync("ChangeXMPPAccountAction-", log, new Runnable() { //$NON-NLS-1$
+
+        Utils.runSafeAsync("ConnectAction-", log, new Runnable() { //$NON-NLS-1$
                 public void run() {
-                    reconnect();
+                    try {
+                        if (running.getAndSet(true)) {
+                            log.info("User clicked too fast, running already a connect or disconnect."); //$NON-NLS-1$
+                            return;
+                        }
+                        saros.connect(false);
+                    } finally {
+                        running.set(false);
+                    }
                 }
             });
     }
 
-    protected void reconnect() {
-        if (saros.getSarosNet().isConnected()) {
-            saros.getSarosNet().disconnect();
-        }
-        saros.connect(false);
+    protected void disconnect() {
+        Utils.runSafeAsync("DisconnectAction-", log, new Runnable() { //$NON-NLS-1$
+                public void run() {
+                    try {
+                        if (running.getAndSet(true)) {
+                            log.info("User clicked too fast, running already a connect or disconnect."); //$NON-NLS-1$
+                            return;
+                        }
+                        saros.getSarosNet().disconnect();
+                    } finally {
+                        running.set(false);
+                    }
+                }
+            });
     }
 
     protected void addActionToMenu(Menu parent, Action action) {
