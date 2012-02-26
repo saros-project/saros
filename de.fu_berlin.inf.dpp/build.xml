@@ -166,7 +166,7 @@
 
 	<target name="pmd">
 		<mkdir dir="${pmd.report.dir}" />
-		<pmd rulesetfiles="rulesets/basic.xml,rulesets/unusedcode.xml,rulesets/imports.xml">
+		<pmd rulesetfiles="rulesets/basic.xml,rulesets/unusedcode.xml,rulesets/imports.xml,rulesets/naming.xml">
 			<formatter type="xml" toFile="${pmd.reportfile}"/>
 			<fileset dir="${src.dir}">
 				<include name="**/*.java"/>
