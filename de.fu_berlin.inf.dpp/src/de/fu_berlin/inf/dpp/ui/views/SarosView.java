@@ -521,7 +521,28 @@ public class SarosView extends ViewPart {
         saros.removeChildContainer(container.getDelegate());
     }
 
+    /**
+     * Displays a notification next to the Saros View. If the view cannot be
+     * found the notification is displayed next to the element that has the
+     * current focus. The visibility time of the notification will vary,
+     * depending on how much words the text contains. This method <b>SHOULD
+     * NOT</b> be called directly from the business logic.
+     * 
+     * @param title
+     *            the title of the notification
+     * @param text
+     *            the text of the notification
+     * @throws NullPointerException
+     *             if title or text is <code>null</code>
+     */
     public static void showNotification(final String title, final String text) {
+
+        if (title == null)
+            throw new NullPointerException("title is null");
+
+        if (text == null)
+            throw new NullPointerException("text is null");
+
         Utils.runSafeSWTAsync(log, new Runnable() {
             public void run() {
                 IViewPart sarosView = Utils.findView(SarosView.ID);
