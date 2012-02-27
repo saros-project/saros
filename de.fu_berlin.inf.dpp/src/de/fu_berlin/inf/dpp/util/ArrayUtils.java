@@ -1,33 +1,35 @@
 package de.fu_berlin.inf.dpp.util;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.eclipse.core.runtime.IAdapterManager;
 import org.eclipse.core.runtime.Platform;
 
 /**
- * @author bkahlert
+ * @author Björn Kahlert
+ * @author Stefan Rossbach
+ * @author Maria Spiering
  */
 public class ArrayUtils {
 
     /**
-     * Returns a list of elements that are instances of class clazz.
+     * Returns a list of elements that are instances of this class.
      * 
-     * @param <T>
-     * @param array
+     * @param objects
      * @param clazz
-     * @return
+     * @return all objects that are instances of this class or <code>null</code>
+     *         if the object array is <code>null</code>
      */
     @SuppressWarnings("unchecked")
-    public static <T> List<T> getInstances(Object[] array, Class<T> clazz) {
-        if (array == null)
+    public static <T> List<T> getInstances(Object[] objects, Class<T> clazz) {
+        if (objects == null)
             return null;
 
         List<T> instanceObjects = new ArrayList<T>();
-        for (Object object : array) {
+        for (Object object : objects) {
             if (clazz.isInstance(object)) {
                 instanceObjects.add((T) object);
             }
@@ -37,22 +39,49 @@ public class ArrayUtils {
     }
 
     /**
-     * Tries to adapt each selection item to adapter and returns all adapted
-     * items.
+     * Tries to adapt each object to the given class.
      * 
      * @param objects
-     * @param adapter
-     *            to adapt each object to
-     * @return
+     *            objects that are tried to adapted
+     * @param clazz
+     *            class to adapt each object to
+     * @return all objects that were adapted or <code>null</code> if the object
+     *         array is <code>null</code>
+     * 
+     * @deprecated use
+     *             {@link #getAdaptableObjects(Object[] objects, Class clazz, IAdapterManager adapterManager)}
+     **/
+
+    @Deprecated
+    public static <T> List<T> getAdaptableObjects(Object[] objects,
+        Class<? extends T> clazz) {
+        return getAdaptableObjects(objects, clazz, Platform.getAdapterManager());
+    }
+
+    /**
+     * Tries to adapt each object to the given class.
+     * 
+     * @param objects
+     *            objects that are tried to adapted
+     * @param clazz
+     *            class to adapt each object to
+     * @param adapterManager
+     *            the adpaterManager that is used to adapt the objects
+     * 
+     * @return all objects that were adapted or <code>null</code> if the object
+     *         array is <code>null</code>
      */
     @SuppressWarnings("unchecked")
     public static <T> List<T> getAdaptableObjects(Object[] objects,
-        Class<? extends T> adapter) {
+        Class<? extends T> clazz, IAdapterManager adapterManager) {
+
+        if (objects == null)
+            return null;
+
         Set<T> adaptableObjects = new HashSet<T>(objects.length);
 
         for (Object object : objects) {
-            T adaptedObject = (T) Platform.getAdapterManager().getAdapter(
-                object, adapter);
+            T adaptedObject = (T) adapterManager.getAdapter(object, clazz);
 
             if (adaptedObject != null
                 && !adaptableObjects.contains(adaptedObject)) {
@@ -60,7 +89,7 @@ public class ArrayUtils {
             }
         }
 
-        return (List<T>) Arrays.asList(adaptableObjects.toArray());
+        return new ArrayList<T>(adaptableObjects);
     }
 
 }
