@@ -1,6 +1,7 @@
 package de.fu_berlin.inf.dpp.stf.server.rmi.superbot.internal.impl;
 
 import java.io.ByteArrayInputStream;
+import java.io.DataInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -356,5 +357,34 @@ public final class InternalImpl extends StfRemoteObject implements IInternal {
 
     public boolean existsResource(String path) throws RemoteException {
         return ResourcesPlugin.getWorkspace().getRoot().exists(new Path(path));
+    }
+
+    public byte[] getFileContent(String projectName, String path)
+        throws RemoteException {
+
+        int size = (int) getFileSize(projectName, path);
+
+        IFile file = ResourcesPlugin.getWorkspace().getRoot()
+            .getProject(projectName).getFile(path);
+
+        byte[] content = new byte[size];
+
+        DataInputStream in;
+
+        try {
+            in = new DataInputStream(file.getContents());
+        } catch (CoreException e) {
+            log.error(e.getMessage(), e);
+            throw new RemoteException(e.getMessage(), e.getCause());
+        }
+
+        try {
+            in.readFully(content);
+            in.close();
+        } catch (IOException e) {
+            throw new RemoteException("error while reading file:" + file, e);
+        }
+
+        return content;
     }
 }

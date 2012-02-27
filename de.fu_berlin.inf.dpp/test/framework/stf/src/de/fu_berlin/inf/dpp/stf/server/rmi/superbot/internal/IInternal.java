@@ -172,4 +172,21 @@ public interface IInternal extends Remote {
      */
     public void append(String projectName, String path, String content)
         throws RemoteException;
+
+    /**
+     * Gets the content from the given file
+     * 
+     * @param projectName
+     *            the name project where the java class should be created
+     * @param path
+     *            the relative path of the file e.g my/foo/bar/hello.java
+     * 
+     * @return the content of this file as byte array
+     * 
+     * @throws RemoteException
+     *             if the file does not exists
+     */
+    public byte[] getFileContent(String projectName, String path)
+        throws RemoteException;
+
 }
