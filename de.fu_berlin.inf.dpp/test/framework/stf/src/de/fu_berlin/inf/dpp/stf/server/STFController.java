@@ -19,6 +19,8 @@ import org.picocontainer.MutablePicoContainer;
 
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.SarosContext;
+import de.fu_berlin.inf.dpp.stf.server.rmi.controlbot.impl.ControlBotImpl;
+import de.fu_berlin.inf.dpp.stf.server.rmi.controlbot.manipulation.impl.NetworkManipulatorImpl;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.impl.RemoteWorkbenchBot;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.impl.RemoteBotButton;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.impl.RemoteBotCCombo;
@@ -130,9 +132,9 @@ public class STFController {
         /*
          * bots' family
          */
-        // exportObject(RemoteBot.getInstance(), "bot");
         exportObject(RemoteWorkbenchBot.getInstance(), "workbenchBot");
         exportObject(SuperBot.getInstance(), "superBot");
+        exportObject(ControlBotImpl.getInstance(), "controlBot");
 
         /*
          * export remoteWidgets
@@ -201,6 +203,10 @@ public class STFController {
         exportObject(MenuBar.getInstance(), "menuBar");
 
         exportObject(InternalImpl.getInstance(), "internal");
+
+        /* ultimate bot :P, only Chuck Norris can do it better ! */
+
+        exportObject(NetworkManipulatorImpl.getInstance(), "networkManipulator");
 
         try {
             for (String s : registry.list())

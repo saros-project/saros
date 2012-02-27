@@ -3,6 +3,7 @@ package de.fu_berlin.inf.dpp.stf.client.tester;
 import java.rmi.RemoteException;
 
 import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.stf.server.rmi.controlbot.IControlBot;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.IRemoteBot;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.IRemoteWorkbenchBot;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.ISuperBot;
@@ -70,5 +71,12 @@ public interface AbstractTester {
      * @throws RemoteException
      */
     public ISuperBot superBot() throws RemoteException;
+
+    /**
+     * @return the control {@link IControlBot}, which is changing the behavior
+     *         of how Saros operates.
+     * @throws RemoteException
+     */
+    public IControlBot controlBot() throws RemoteException;
 
 }
