@@ -267,6 +267,8 @@ public class SarosSession implements ISarosSession, Disposable {
 
         activityDispatcher.setDaemon(true);
         activityDispatcher.start();
+
+        freeColors = new FreeColors(MAX_USERCOLORS - 1);
     }
 
     /**
