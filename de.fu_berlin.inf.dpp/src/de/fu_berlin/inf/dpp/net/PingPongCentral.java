@@ -39,7 +39,8 @@ public class PingPongCentral extends AbstractActivityProvider {
 
     private static final Logger log = Logger.getLogger(PingPongCentral.class);
 
-    protected AtomicReference<ISarosSession> sarosSession;
+    protected AtomicReference<ISarosSession> sarosSession = new AtomicReference<ISarosSession>(
+        null);
 
     protected SarosSessionManager sessionManager;
 
