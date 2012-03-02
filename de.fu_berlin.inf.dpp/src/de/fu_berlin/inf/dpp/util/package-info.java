@@ -8,7 +8,6 @@
  * {@link UncloseableInputStream}, or {@link AutoHashMap}.
  * <li>Some classes which include more specific static utility functions, 
  * like {@link ActivityUtils}, {@link FileUtils}, {@ArrayUtils}.
- * <li>Iterator classes: {@link ArrayIterator}, {@link MappingIterator}.
  * <li>{@link Utils}, a class full of useful functions, including 
  * ones for thread-management.
  */
