@@ -129,11 +129,11 @@ public class VideoSharingPreferenceHelper {
             for (String path : libraryPath.split(File.pathSeparator)) {
                 if (new File(path, "xuggle-xuggler-io.dll").exists()) {
                     page.setErrorMessage("32-Bit Xuggler installation is not compatible with a 64-Bit JVM");
-
+                    return;
                 }
             }
-        } else
-            page.setErrorMessage(XUGGLER_NOT_INSTALLED_MESSAGE);
+        }
+        page.setErrorMessage(XUGGLER_NOT_INSTALLED_MESSAGE);
     }
 
     private static final class EncoderComboFieldEditor extends ComboFieldEditor {
