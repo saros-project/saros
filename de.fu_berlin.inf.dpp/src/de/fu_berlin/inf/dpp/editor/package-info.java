@@ -18,8 +18,6 @@
  * 
  * <li>the {@link EditorPool} manages EditorParts of the local users.</li>
  * 
- * <li>the {@link EditorUtils} provides static utility methods for working with Eclipse Editors</li>
- * 
  * <li>the {@link ISharedEditorListener} is an interface for synchronizing editor tabs</li>
  * 
  * <li>the {@link RemoteEditorManager} holds the state of the Editors of the other users in the session</li>
