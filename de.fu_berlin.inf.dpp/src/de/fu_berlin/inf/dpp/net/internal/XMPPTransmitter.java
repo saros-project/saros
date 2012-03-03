@@ -21,9 +21,12 @@ package de.fu_berlin.inf.dpp.net.internal;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.nio.ByteBuffer;
+import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -33,7 +36,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
@@ -863,8 +865,24 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
 
         progress.subTask("Reading archive");
 
-        byte[] content = archive == null ? new byte[0] : FileUtils
-            .readFileToByteArray(archive);
+        byte[] content;
+
+        if (archive == null) {
+            content = new byte[0];
+        } else {
+            int archiveSize = (int) archive.length();
+            content = new byte[archiveSize];
+            FileInputStream in = new FileInputStream(archive);
+            FileChannel channel = in.getChannel();
+            ByteBuffer buffer = ByteBuffer.wrap(content);
+
+            while (!progress.isCanceled() && archiveSize > 0)
+                archiveSize -= channel.read(buffer);
+
+            channel.close();
+            in.close();
+        }
+
         progress.worked(10);
 
         progress.subTask("Sending archive");
