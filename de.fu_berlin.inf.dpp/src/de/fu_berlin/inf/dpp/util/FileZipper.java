@@ -12,6 +12,7 @@ import java.io.OutputStream;
 import java.util.List;
 import java.util.zip.Adler32;
 import java.util.zip.CheckedOutputStream;
+import java.util.zip.Deflater;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipException;
 import java.util.zip.ZipOutputStream;
@@ -36,6 +37,12 @@ import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
 public class FileZipper {
 
     private static Logger log = Logger.getLogger(FileZipper.class);
+
+    /*
+     * Setting this value to high will result in cache misses either by the OS
+     * or HDD / SDD controller and slow down performance !
+     */
+    private static final int BUFFER_SIZE = 32 * 1024;
 
     /**
      * To create a checksum when unzipping one could use
@@ -74,8 +81,10 @@ public class FileZipper {
 
         progress.beginTask("Creating Archive", files.size());
 
+        byte[] buffer = new byte[BUFFER_SIZE];
+
         OutputStream outputStream = new BufferedOutputStream(
-            new FileOutputStream(archive));
+            new FileOutputStream(archive), BUFFER_SIZE);
 
         CheckedOutputStream cos = null;
 
@@ -91,7 +100,7 @@ public class FileZipper {
 
             try {
                 zipSingleFile(new WrappedIFile(file), path.toPortableString(),
-                    zipStream, progress.newChild(1));
+                    zipStream, buffer, progress.newChild(1));
             } catch (SarosCancellationException e) {
                 cleanup(archive);
                 throw e;
@@ -111,8 +120,8 @@ public class FileZipper {
         }
         stopWatch.stop();
 
-        log.debug(String.format("Created project archive %s at %s", stopWatch
-            .throughput(archive.length()), archive.getAbsolutePath()));
+        log.debug(String.format("Created project archive %s at %s",
+            stopWatch.throughput(archive.length()), archive.getAbsolutePath()));
 
         progress.done();
     }
@@ -121,6 +130,11 @@ public class FileZipper {
         if (archive != null && archive.exists() && !archive.delete()) {
             log.warn("Could not delete archive file: " + archive);
         }
+    }
+
+    public static void zipFiles(List<File> files, File archive,
+        SubMonitor progress) throws IOException, SarosCancellationException {
+        zipFiles(files, archive, true, progress);
     }
 
     /**
@@ -141,24 +155,32 @@ public class FileZipper {
      *             if the list of files is empty. The archive is then deleted.
      */
     public static void zipFiles(List<File> files, File archive,
-        SubMonitor progress) throws IOException, SarosCancellationException {
+        boolean compress, SubMonitor progress) throws IOException,
+        SarosCancellationException {
         try {
             if (files.isEmpty()) {
                 log.warn("The list with files to zip was empty.");
                 return;
             }
 
+            byte[] buffer = new byte[BUFFER_SIZE];
+
             progress.beginTask("Creating Archive", files.size());
 
             OutputStream outputStream = new BufferedOutputStream(
-                new FileOutputStream(archive));
+                new FileOutputStream(archive), BUFFER_SIZE);
+
             ZipOutputStream zipStream = new ZipOutputStream(outputStream);
+
+            zipStream.setLevel(compress ? Deflater.DEFAULT_COMPRESSION
+                : Deflater.NO_COMPRESSION);
+
             int filesZipped = 0;
 
             for (File file : files) {
                 try {
                     zipSingleFile(new WrappedFile(file), file.getName(),
-                        zipStream, progress.newChild(1));
+                        zipStream, buffer, progress.newChild(1));
                     ++filesZipped;
                 } catch (SarosCancellationException e) {
                     cleanup(archive);
@@ -196,8 +218,8 @@ public class FileZipper {
      *             if the file was null or a directory or didn't exist
      */
     protected static void zipSingleFile(FileWrapper file, String filename,
-        ZipOutputStream zipStream, SubMonitor progress) throws IOException,
-        SarosCancellationException {
+        ZipOutputStream zipStream, byte[] buffer, SubMonitor progress)
+        throws IOException, SarosCancellationException {
 
         try {
 
@@ -214,7 +236,7 @@ public class FileZipper {
             }
 
             zipStream.putNextEntry(new ZipEntry(filename));
-            writeFileToStream(file, filename, zipStream);
+            writeFileToStream(file, filename, zipStream, buffer);
             zipStream.closeEntry();
 
         } finally {
@@ -223,7 +245,8 @@ public class FileZipper {
     }
 
     protected static void writeFileToStream(FileWrapper file, String filename,
-        ZipOutputStream zipStream) throws CausedIOException, IOException {
+        ZipOutputStream out, byte[] buffer) throws CausedIOException,
+        IOException {
         InputStream in;
         try {
             in = file.getInputStream();
@@ -233,7 +256,10 @@ public class FileZipper {
         }
 
         try {
-            IOUtils.copy(in, zipStream);
+            int n = 0;
+            while (-1 != (n = in.read(buffer)))
+                out.write(buffer, 0, n);
+
         } finally {
             IOUtils.closeQuietly(in);
         }
@@ -299,5 +325,4 @@ public class FileZipper {
             return file.getName();
         }
     }
-
 }
