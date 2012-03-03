@@ -119,7 +119,7 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
                     // pack all archive files into one big archive
                     zipArchive = File
                         .createTempFile("SarosSyncArchive", ".zip");
-                    FileZipper.zipFiles(projectArchives, zipArchive,
+                    FileZipper.zipFiles(projectArchives, zipArchive, false,
                         monitor.newChild(2));
                 }
                 // send the big archive
