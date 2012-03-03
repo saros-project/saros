@@ -104,6 +104,8 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
     public void start(SubMonitor monitor) throws SarosCancellationException {
         this.monitor = monitor;
         sendFileList(monitor.newChild(1));
+        File zipArchive = null;
+
         try {
             getRemoteFileList(monitor.newChild(2));
             editorManager.setAllLocalOpenedEditorsLocked(false);
@@ -113,7 +115,6 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
                 // pack each project into one archive
                 List<File> projectArchives = createProjectArchives(
                     monitor.newChild(8), this.projectFilesToSend);
-                File zipArchive = null;
                 if (projectArchives.size() > 0) {
                     // pack all archive files into one big archive
                     zipArchive = File
@@ -137,6 +138,9 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
             localCancel("", CancelOption.NOTIFY_PEER);
             executeCancellation();
         } finally {
+            if (zipArchive != null)
+                zipArchive.delete();
+
             monitor.done();
         }
     }
