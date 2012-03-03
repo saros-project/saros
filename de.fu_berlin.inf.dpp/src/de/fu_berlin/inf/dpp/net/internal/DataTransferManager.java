@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.SubMonitor;
@@ -25,6 +26,7 @@ import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
 import de.fu_berlin.inf.dpp.net.ConnectionState;
 import de.fu_berlin.inf.dpp.net.IConnectionListener;
+import de.fu_berlin.inf.dpp.net.IPacketInterceptor;
 import de.fu_berlin.inf.dpp.net.IRosterListener;
 import de.fu_berlin.inf.dpp.net.ITransferModeListener;
 import de.fu_berlin.inf.dpp.net.IncomingTransferObject;
@@ -68,6 +70,10 @@ public class DataTransferManager implements IConnectionListener,
     protected Map<JID, Double> incomingIBBTransferSpeeds = new HashMap<JID, Double>();
 
     protected TransferModeDispatch transferModeDispatch = new TransferModeDispatch();
+
+    private CopyOnWriteArrayList<IPacketInterceptor> packetInterceptors = new CopyOnWriteArrayList<IPacketInterceptor>();
+
+    private JID currentLocalJID;
 
     protected ConcurrentLinkedQueue<TransferData> fileTransferQueue;
 
@@ -308,6 +314,15 @@ public class DataTransferManager implements IConnectionListener,
         final IncomingTransferObject transferObjectData = new LoggingTransferObject(
             transferObjectDescription);
 
+        boolean dispatchPacket = true;
+
+        for (IPacketInterceptor packetInterceptor : packetInterceptors)
+            dispatchPacket &= packetInterceptor
+                .receivedPacket(transferObjectDescription);
+
+        if (!dispatchPacket)
+            return;
+
         // ask upper layer to accept
         dispatchThreadContext.executeAsDispatch(new Runnable() {
             public void run() {
@@ -326,7 +341,7 @@ public class DataTransferManager implements IConnectionListener,
      * @throws IOException
      *             If a technical problem occurred.
      */
-    public void sendData(TransferDescription transferData, byte[] input,
+    public void sendData(TransferDescription transferData, byte[] payload,
         SubMonitor progress) throws IOException, SarosCancellationException {
 
         // Think about how to synchronize this, that multiple people can connect
@@ -335,6 +350,7 @@ public class DataTransferManager implements IConnectionListener,
             + transferData.getRecipient());
 
         JID recipient = transferData.recipient;
+        transferData.sender = currentLocalJID;
 
         IBytestreamConnection connection = getConnection(recipient,
             progress.newChild(1));
@@ -350,19 +366,28 @@ public class DataTransferManager implements IConnectionListener,
 
         try {
 
+            boolean sendPacket = true;
+
+            for (IPacketInterceptor packetInterceptor : packetInterceptors)
+                sendPacket &= packetInterceptor.sendPacket(transferData,
+                    payload);
+
+            if (!sendPacket)
+                return;
+
             StopWatch watch = new StopWatch().start();
 
-            long sizeUncompressed = input.length;
+            long sizeUncompressed = payload.length;
 
             if (transferData.compressInDataTransferManager()) {
-                input = Utils.deflate(input, progress.newChild(15));
+                payload = Utils.deflate(payload, progress.newChild(15));
             }
 
-            connection.send(transferData, input, progress);
+            connection.send(transferData, payload, progress);
 
             watch.stop();
             transferModeDispatch.transferFinished(recipient,
-                connection.getMode(), false, input.length, sizeUncompressed,
+                connection.getMode(), false, payload.length, sizeUncompressed,
                 watch.getTime());
         } catch (IOException e) {
             log.error(Utils.prefix(transferData.recipient) + "Failed to send "
@@ -676,6 +701,7 @@ public class DataTransferManager implements IConnectionListener,
 
         this.connection = connection;
         this.fileTransferQueue = new ConcurrentLinkedQueue<TransferData>();
+        this.currentLocalJID = new JID(connection.getUser());
 
         for (ITransport transport : transports) {
             transport.prepareXMPPConnection(connection, this);
@@ -879,6 +905,14 @@ public class DataTransferManager implements IConnectionListener,
             }
         }
         return isTransfering == false;
+    }
+
+    public void addPacketInterceptor(IPacketInterceptor interceptor) {
+        packetInterceptors.addIfAbsent(interceptor);
+    }
+
+    public void removePacketInterceptor(IPacketInterceptor interceptor) {
+        packetInterceptors.remove(interceptor);
     }
 
 }
