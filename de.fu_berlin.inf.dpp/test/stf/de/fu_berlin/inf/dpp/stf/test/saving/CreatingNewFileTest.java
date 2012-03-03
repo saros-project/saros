@@ -104,7 +104,7 @@ public class CreatingNewFileTest extends StfTestCase {
             ALICE.superBot().views().sarosView()
                 .waitUntilIsInconsistencyDetected();
         } catch (TimeoutException e) {
-            fail("ALICE should have recieved an inconsistency warning, "
+            fail("ALICE should have received an inconsistency warning, "
                 + e.getMessage());
         }
     }

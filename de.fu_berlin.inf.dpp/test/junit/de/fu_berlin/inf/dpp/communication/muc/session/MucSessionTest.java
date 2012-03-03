@@ -120,7 +120,7 @@ public class MucSessionTest {
                 }
             }
 
-            assertEquals("alice and or bob has not recieved all messages", 0,
+            assertEquals("alice and or bob has not received all messages", 0,
                 aliceRevMessageCount - bobRevMessageCount);
 
             alice.disconnect();

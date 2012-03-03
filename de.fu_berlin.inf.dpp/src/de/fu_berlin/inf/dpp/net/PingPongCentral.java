@@ -112,7 +112,7 @@ public class PingPongCentral extends AbstractActivityProvider {
                 + getAverageRoundTripTime()
                 + "ms - "
                 + windowText
-                + "Pings recieved/sent == "
+                + "Pings received/sent == "
                 + pingsReceived
                 + "/"
                 + pingsSent
