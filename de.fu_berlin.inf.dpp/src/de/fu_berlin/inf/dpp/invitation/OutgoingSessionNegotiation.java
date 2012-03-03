@@ -63,35 +63,10 @@ public class OutgoingSessionNegotiation extends InvitationProcess {
     protected VersionInfo versionInfo;
     protected SarosPacketCollector invitationCompleteCollector;
 
-    protected Thread receiveInvitationCompleteThread = new Thread(
-        new Runnable() {
-
-            public void run() {
-                try {
-                    transmitter.receiveInvitationCompleteConfirmation(
-                        monitor.newChild(50, SubMonitor.SUPPRESS_ALL_LABELS),
-                        invitationCompleteCollector);
-                } catch (LocalCancellationException e) {
-                    log.debug("", e);
-                    localCancel(e.getMessage(), CancelOption.NOTIFY_PEER);
-                    try {
-                        executeCancellation();
-                    } catch (SarosCancellationException e1) {
-                        log.debug("", e1);
-                    }
-                } catch (IOException e) {
-                    log.debug("", e);
-                }
-                log.debug("Inv"
-                    + Utils.prefix(peer)
-                    + ": Notifying participants that the invitation is complete.");
-            }
-        });
-
     @Inject
     protected SessionIDObservable sessionID;
 
-    protected static InvitationInfo.InvitationExtensionProvider invExtProv;
+    protected InvitationInfo.InvitationExtensionProvider invExtProv;
 
     @Inject
     protected XMPPTransmitter xmppTransmitter;
@@ -138,31 +113,55 @@ public class OutgoingSessionNegotiation extends InvitationProcess {
     public void start(SubMonitor monitor) throws SarosCancellationException {
         log.debug("Inv" + Utils.prefix(peer) + ": Invitation has started.");
 
-        monitor.beginTask("Invitation has started.", 101);
+        monitor.beginTask("Negotiating session...", 100);
         this.invitationID = String.valueOf(INVITATION_RAND.nextLong());
         this.monitor = monitor;
         invitationCompleteCollector = transmitter
             .getInvitationCompleteCollector(invitationID);
-        receiveInvitationCompleteThread.start();
+
         try {
-            checkAvailability(monitor.newChild(1));
+            checkAvailability(monitor.newChild(1, SubMonitor.SUPPRESS_NONE));
 
-            checkVersion(monitor.newChild(1));
+            checkVersion(monitor.newChild(1, SubMonitor.SUPPRESS_NONE));
 
-            sendInvitation(monitor.newChild(1));
+            sendInvitation(monitor.newChild(1, SubMonitor.SUPPRESS_NONE));
 
-            User newUser = addUserToSession();
+            User newUser = addUserToSession(monitor.newChild(0,
+                SubMonitor.SUPPRESS_ALL_LABELS));
+
+            monitor.setTaskName("Negotiating data connection...");
+
+            /*
+             * HACK Ensure byte stream connection to peer so the project wizard
+             * always show the currently used connection (IBB, Socks5(D/M)
+             */
+
+            dataTransferManager.getConnection(
+                peer,
+                monitor.newChild(0, SubMonitor.SUPPRESS_BEGINTASK
+                    | SubMonitor.SUPPRESS_SETTASKNAME));
+
+            monitor.subTask("");
+            monitor.worked(7);
 
             editorManager.setAllLocalOpenedEditorsLocked(true);
 
+            // FIXME lock the projects on the workspace !
+            monitor
+                .setTaskName("Calculating file list and file checksums. This may take a while...");
             List<ProjectExchangeInfo> projectExchangeInfos = sarosSessionManager
                 .createProjectExchangeInfoList(new ArrayList<IProject>(
-                    sarosSession.getProjects()), monitor);
+                    sarosSession.getProjects()), monitor.newChild(85,
+                    SubMonitor.SUPPRESS_BEGINTASK
+                        | SubMonitor.SUPPRESS_SETTASKNAME));
 
-            completeInvitation(monitor.newChild(3), projectExchangeInfos);
+            monitor.subTask("");
+
+            completeInvitation(monitor.newChild(5, SubMonitor.SUPPRESS_NONE),
+                projectExchangeInfos);
 
             sarosSessionManager.notifyPostOutgoingInvitationCompleted(
-                monitor.newChild(1), newUser);
+                monitor.newChild(0, SubMonitor.SUPPRESS_ALL_LABELS), newUser);
 
         } catch (LocalCancellationException e) {
             localCancel(e.getMessage(), e.getCancelOption());
@@ -203,7 +202,7 @@ public class OutgoingSessionNegotiation extends InvitationProcess {
         throws LocalCancellationException {
 
         log.debug("Inv" + Utils.prefix(peer) + ": Checking Saros support...");
-        subMonitor.setTaskName("Checking Saros support...");
+        subMonitor.beginTask("Checking Saros support...", 1);
 
         JID rqPeer = discoveryManager.getSupportingPresence(peer,
             Saros.NAMESPACE);
@@ -230,6 +229,8 @@ public class OutgoingSessionNegotiation extends InvitationProcess {
             log.debug("Inv" + Utils.prefix(peer) + ": Saros is supported.");
         }
         peer = rqPeer;
+        subMonitor.worked(1);
+        subMonitor.done();
     }
 
     /**
@@ -241,7 +242,8 @@ public class OutgoingSessionNegotiation extends InvitationProcess {
         throws SarosCancellationException {
 
         log.debug("Inv" + Utils.prefix(peer) + ": Checking peer's version...");
-        subMonitor.setTaskName("Checking version...");
+        subMonitor.beginTask("Checking version compatibility...", 1);
+
         VersionInfo versionInfo = versionManager.determineCompatibility(peer);
 
         checkCancellation(CancelOption.DO_NOT_NOTIFY_PEER);
@@ -273,6 +275,8 @@ public class OutgoingSessionNegotiation extends InvitationProcess {
                 versionManager.getVersion()))
                 localCancel(null, CancelOption.DO_NOT_NOTIFY_PEER);
         }
+        subMonitor.worked(1);
+        subMonitor.done();
     }
 
     /**
@@ -286,14 +290,7 @@ public class OutgoingSessionNegotiation extends InvitationProcess {
     protected void sendInvitation(SubMonitor subMonitor)
         throws SarosCancellationException, IOException {
 
-        subMonitor.setWorkRemaining(100);
-        subMonitor.setTaskName("Sending invitation...");
-
-        subMonitor.subTask("Prepare data connection...");
-
-        // Ensure bytestream connection to peer
-        dataTransferManager.getConnection(peer, subMonitor);
-        subMonitor.subTask("");
+        subMonitor.beginTask("Sending invitation...", 3);
 
         log.debug("Inv" + Utils.prefix(peer) + ": Sending invitation...");
         checkCancellation(CancelOption.DO_NOT_NOTIFY_PEER);
@@ -321,13 +318,24 @@ public class OutgoingSessionNegotiation extends InvitationProcess {
 
         xmppTransmitter.sendMessageToUser(peer, invExtProv.create(invInfo));
 
-        // transmitter.sendInvitation(sarosSession.getProjectID(this.project),
-        // peer, description, colorID, hostVersionInfo, invitationID,
-        // sarosSession.getSessionStart(), doStream, comPrefs);
+        subMonitor.worked(1);
 
-        subMonitor.worked(25);
+        /*
+         * FIXME RACE CONDITIONS IF THE REMOTE INVITEE RESPONDS TO FAST !!!
+         * INSTALL THE COLLECTORS HERE ! Thread may be suspended here for
+         * several seconds if the garbage collector kicks in and perform a full
+         * GC.
+         */
+
         subMonitor
             .setTaskName("Invitation sent. Waiting for acknowledgement...");
+
+        /*
+         * FIXME this packet should contain an OK or REJECT currently the reject
+         * response is processed by the SarosSessionManager which performs a
+         * cancel on the monitor ! So this blocks until the timeout passed.
+         * Currently 30 seconds !
+         */
 
         if (!transmitter.receivedInvitationAcknowledgment(invitationID,
             subMonitor.newChild(1, SubMonitor.SUPPRESS_ALL_LABELS))) {
@@ -336,24 +344,26 @@ public class OutgoingSessionNegotiation extends InvitationProcess {
                     : "Missing Saros support.", CancelOption.DO_NOT_NOTIFY_PEER);
         }
 
-        subMonitor.worked(2);
         subMonitor
             .setTaskName("Invitation acknowledged. Waiting for user list request...");
         UserListRequestExtensionProvider userListRequestExtProv = new UserListRequestExtensionProvider();
-        transmitter.receive(subMonitor.newChild(75,
+        transmitter.receive(subMonitor.newChild(1,
             SubMonitor.SUPPRESS_ALL_LABELS), transmitter
             .getUserListRequestCollector(invitationID, userListRequestExtProv),
             10000, true);
 
         log.debug("Inv" + Utils.prefix(peer)
             + ": User list request has received.");
+
+        subMonitor.done();
     }
 
     /**
      * Adds the invited user to the current SarosSession.<br>
      */
     // TODO move to SarosSession.
-    protected User addUserToSession() throws SarosCancellationException {
+    protected User addUserToSession(SubMonitor subMonitor)
+        throws SarosCancellationException {
         synchronized (sarosSession) {
             User newUser = new User(sarosSession, peer, colorID);
             this.sarosSession.addUser(newUser);
@@ -362,7 +372,7 @@ public class OutgoingSessionNegotiation extends InvitationProcess {
 
             checkCancellation(CancelOption.NOTIFY_PEER);
             sarosSession.synchronizeUserList(xmppTransmitter, peer,
-                invitationID, monitor);
+                invitationID, subMonitor);
             return newUser;
         }
     }
@@ -394,28 +404,28 @@ public class OutgoingSessionNegotiation extends InvitationProcess {
 
     protected void completeInvitation(SubMonitor subMonitor,
         List<ProjectExchangeInfo> projectExchangeInfos)
-        throws SarosCancellationException {
+        throws SarosCancellationException, IOException {
 
         log.debug("Inv" + Utils.prefix(peer)
             + ": Waiting for invitation complete confirmation...");
-        subMonitor.setWorkRemaining(100);
-        subMonitor.setTaskName("Waiting for peer to complete invitation...");
 
-        try {
-            receiveInvitationCompleteThread.join();
-        } catch (InterruptedException e) {
-            log.debug("Code not designed to be interrupted", e);
-            localCancel(e.getMessage(), CancelOption.NOTIFY_PEER);
-            executeCancellation();
-        }
+        subMonitor.beginTask("Waiting for peer to complete invitation...", 2);
+
+        transmitter.receiveInvitationCompleteConfirmation(
+            subMonitor.newChild(1, SubMonitor.SUPPRESS_ALL_LABELS),
+            invitationCompleteCollector);
+        log.debug("Inv" + Utils.prefix(peer)
+            + ": Notifying participants that the invitation is complete.");
 
         subMonitor.setTaskName("Completing invitation...");
         synchronized (sarosSession) {
             sarosSession.userInvitationCompleted(sarosSession.getUser(peer));
             checkCancellation(CancelOption.NOTIFY_PEER);
             sarosSession.synchronizeUserList(xmppTransmitter, peer,
-                invitationID, subMonitor);
+                invitationID,
+                subMonitor.newChild(1, SubMonitor.SUPPRESS_ALL_LABELS));
         }
+
         subMonitor.setTaskName("Invitation has completed successfully.");
 
         invitationProcesses.removeInvitationProcess(this);
@@ -423,6 +433,7 @@ public class OutgoingSessionNegotiation extends InvitationProcess {
             + ": Invitation has completed successfully.");
 
         sarosSessionManager.startSharingProjects(peer, projectExchangeInfos);
+        subMonitor.done();
 
     }
 
