@@ -43,10 +43,10 @@ public interface IActivity {
      * @JTourBusStop 4, Some Basics:
      * 
      *               When a session has begun, messages are passed between all
-     *               participants to keep the session synchronised. The messages
+     *               participants to keep the session synchronized. The messages
      *               are known as Activities and come in different types. Each
      *               type inherits from this interface and implements its
-     *               specific behaviour.
+     *               specific behavior.
      * 
      *               Handling of Activities is done using the Inversion of
      *               Control pattern.

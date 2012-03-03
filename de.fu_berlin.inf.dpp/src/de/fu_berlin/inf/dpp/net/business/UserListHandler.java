@@ -87,12 +87,12 @@ public class UserListHandler {
                             newUser.invitationCompleted();
 
                         // Add him and send him a message, and tell him our
-                        // colour
+                        // color
                         sarosSession.addUser(newUser);
                     } else {
                         // User already exists
 
-                        // Check if the existing user has the colour that we
+                        // Check if the existing user has the color that we
                         // expect
                         if (user.getColorID() != userEntry.colorID) {
                             log.warn("Received color id doesn't"

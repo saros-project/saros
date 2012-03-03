@@ -446,7 +446,7 @@ public class SarosView extends ViewPart {
         final SendFileAction sendFileAction = new SendFileAction();
         final VideoSharingAction videoSharingAction = new VideoSharingAction();
         final VoIPAction voipAction = new VoIPAction();
-        final ChangeColorAction changedColourAction = new ChangeColorAction();
+        final ChangeColorAction changedColorAction = new ChangeColorAction();
         menuManager.addMenuListener(new IMenuListener() {
             public void menuAboutToShow(IMenuManager manager) {
                 /*
@@ -469,7 +469,7 @@ public class SarosView extends ViewPart {
 
                 if (participants.size() == 1) {
                     if (participants.get(0).isLocal()) {
-                        manager.add(changedColourAction);
+                        manager.add(changedColorAction);
                     } else {
                         if (sarosSessionManager.getSarosSession() != null
                             && sarosSessionManager.getSarosSession().isHost()) {

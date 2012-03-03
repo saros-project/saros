@@ -25,7 +25,7 @@
  * 
  * <li>the {@link Messages} is used for access to messages.properties</li>
  * 
- * <li>the {@link ParticipantCollector} collects information about user behaviour of participants in a session.</li>
+ * <li>the {@link ParticipantCollector} collects information about user behavior of participants in a session.</li>
  * 
  * <li>the {@link PermissionChangeCollector} collects the permission changes and the time each user spends in each state.</li>
  * 
