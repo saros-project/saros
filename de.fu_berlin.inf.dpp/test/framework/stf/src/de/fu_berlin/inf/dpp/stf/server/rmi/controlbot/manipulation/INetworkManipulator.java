@@ -7,7 +7,9 @@ import de.fu_berlin.inf.dpp.net.JID;
 
 /**
  * This interface gives you control to manipulate the Saros and XMPP network
- * access
+ * access. All methods provided by the interface are <b>not</b> thread safe.
+ * 
+ * @author Stefan Rossbach
  */
 public interface INetworkManipulator extends Remote {
 
@@ -142,10 +144,24 @@ public interface INetworkManipulator extends Remote {
      * 
      * @throws RemoteException
      */
+    public void blockIncomingSessionPackets() throws RemoteException;
+
+    /**
+     * Blocks all outgoing packet transfer for the current Saros Session.
+     * 
+     * @throws RemoteException
+     */
+    public void blockOutgoingSessionPackets() throws RemoteException;
+
+    /**
+     * Unblocks all incoming packet transfer for the current Saros session.
+     * 
+     * @throws RemoteException
+     */
     public void unblockIncomingSessionPackets() throws RemoteException;
 
     /**
-     * Unblocks all incoming packet transfer for the current Saros Session.
+     * Unblocks all outgoing packet transfer for the current Saros Session.
      * 
      * @throws RemoteException
      */
