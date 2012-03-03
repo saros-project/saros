@@ -76,8 +76,8 @@ public class InvitationHandler {
                 } else {
                     transmitter.sendMessageToUser(new JID(packet.getFrom()),
                         cancelInviteExtension.create(sessionID,
-                            "I am already in a Saros session and so"
-                                + "cannot accept your invitation."));
+                            "I am already in a Saros session "
+                                + "and so cannot accept your invitation."));
                 }
             }
         }, invExtProv.getPacketFilter());
