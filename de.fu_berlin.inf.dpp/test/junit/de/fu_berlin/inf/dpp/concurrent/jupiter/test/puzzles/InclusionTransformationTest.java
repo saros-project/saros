@@ -1,7 +1,6 @@
 package de.fu_berlin.inf.dpp.concurrent.jupiter.test.puzzles;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -75,7 +74,6 @@ public class InclusionTransformationTest extends JupiterTestCase {
         network.execute(700);
 
         assertEqualDocs("xyyxabcdefg", client, server);
-        assertTrue("" + network.getLastError(), network.getLastError() == null);
     }
 
     /**
@@ -98,7 +96,6 @@ public class InclusionTransformationTest extends JupiterTestCase {
         network.execute(700);
 
         assertEqualDocs("xyxxdefg", client, server);
-        assertTrue("" + network.getLastError(), network.getLastError() == null);
     }
 
     /**
@@ -121,7 +118,6 @@ public class InclusionTransformationTest extends JupiterTestCase {
         network.execute();
 
         assertEqualDocs("yxbdefg", client, server);
-        assertTrue("" + network.getLastError(), network.getLastError() == null);
     }
 
     /**
@@ -137,7 +133,6 @@ public class InclusionTransformationTest extends JupiterTestCase {
         network.execute(200);
 
         assertEqualDocs("xbcdefg", client, server);
-        assertTrue("" + network.getLastError(), network.getLastError() == null);
     }
 
     /**
@@ -153,7 +148,6 @@ public class InclusionTransformationTest extends JupiterTestCase {
         network.execute(200);
 
         assertEqualDocs("xdefg", client, server);
-        assertTrue("" + network.getLastError(), network.getLastError() == null);
     }
 
     /**
@@ -169,7 +163,6 @@ public class InclusionTransformationTest extends JupiterTestCase {
         network.execute(200);
 
         assertEqualDocs("xbcdefg", client, server);
-        assertTrue("" + network.getLastError(), network.getLastError() == null);
     }
 
     /**
@@ -185,7 +178,6 @@ public class InclusionTransformationTest extends JupiterTestCase {
         network.execute(200);
 
         assertEqualDocs("xbcdefg", client, server);
-        assertTrue("" + network.getLastError(), network.getLastError() == null);
     }
 
     /**
@@ -201,7 +193,6 @@ public class InclusionTransformationTest extends JupiterTestCase {
         network.execute(200);
 
         assertEqualDocs("xdefg", client, server);
-        assertTrue("" + network.getLastError(), network.getLastError() == null);
     }
 
     /**
@@ -217,7 +208,6 @@ public class InclusionTransformationTest extends JupiterTestCase {
         network.execute(200);
 
         assertEqualDocs("defg", client, server);
-        assertTrue("" + network.getLastError(), network.getLastError() == null);
     }
 
     /**
@@ -233,7 +223,6 @@ public class InclusionTransformationTest extends JupiterTestCase {
         network.execute(200);
 
         assertEqualDocs("efg", client, server);
-        assertTrue("" + network.getLastError(), network.getLastError() == null);
     }
 
     /**
@@ -249,7 +238,6 @@ public class InclusionTransformationTest extends JupiterTestCase {
         network.execute(200);
 
         assertEqualDocs("efg", client, server);
-        assertTrue("" + network.getLastError(), network.getLastError() == null);
     }
 
     /**
@@ -266,7 +254,6 @@ public class InclusionTransformationTest extends JupiterTestCase {
         network.execute(200);
 
         assertEqualDocs("efg", client, server);
-        assertTrue("" + network.getLastError(), network.getLastError() == null);
     }
 
     /**
@@ -282,7 +269,6 @@ public class InclusionTransformationTest extends JupiterTestCase {
         network.execute(200);
 
         assertEqualDocs("defg", client, server);
-        assertTrue("" + network.getLastError(), network.getLastError() == null);
     }
 
     @Test
@@ -293,7 +279,6 @@ public class InclusionTransformationTest extends JupiterTestCase {
         network.execute(200);
 
         assertEqualDocs("uvwxyzefg", client, server);
-        assertTrue("" + network.getLastError(), network.getLastError() == null);
     }
 
     @Test
@@ -309,7 +294,6 @@ public class InclusionTransformationTest extends JupiterTestCase {
         network.execute(300);
 
         assertEqualDocs("abcd123456789lmnopqrstuvwxyz", client, server);
-        assertTrue("" + network.getLastError(), network.getLastError() == null);
     }
 
     @Test
@@ -325,7 +309,6 @@ public class InclusionTransformationTest extends JupiterTestCase {
         network.execute(300);
 
         assertEqualDocs("abcdlmnopqrstuvwxyz", client, server);
-        assertTrue("" + network.getLastError(), network.getLastError() == null);
     }
 
     @Test
@@ -352,7 +335,6 @@ public class InclusionTransformationTest extends JupiterTestCase {
         network.execute(300);
 
         assertEqualDocs("abcd123lmnopqrstuvwxyz", client, server);
-        assertTrue("" + network.getLastError(), network.getLastError() == null);
     }
 
     @Test
@@ -371,7 +353,6 @@ public class InclusionTransformationTest extends JupiterTestCase {
         network.execute(300);
 
         assertEqualDocs("abcd789lmnopqrstuvwxyz", client, server);
-        assertTrue("" + network.getLastError(), network.getLastError() == null);
     }
 
     @Test
@@ -388,7 +369,6 @@ public class InclusionTransformationTest extends JupiterTestCase {
         network.execute(400);
 
         assertEqualDocs("abcd123lmnopqrstuvwxyz", client, server);
-        assertTrue("" + network.getLastError(), network.getLastError() == null);
     }
 
     @Test
@@ -403,7 +383,6 @@ public class InclusionTransformationTest extends JupiterTestCase {
         network.execute();
 
         assertEqualDocs("abcd12ijklmnopqrstuvwxyz", client, server);
-        assertTrue("" + network.getLastError(), network.getLastError() == null);
     }
 
     @Test
@@ -418,7 +397,6 @@ public class InclusionTransformationTest extends JupiterTestCase {
         network.execute();
 
         assertEqualDocs("abcreplacedlmnopqrstuvwxyz", client, server);
-        assertTrue("" + network.getLastError(), network.getLastError() == null);
     }
 
     /**

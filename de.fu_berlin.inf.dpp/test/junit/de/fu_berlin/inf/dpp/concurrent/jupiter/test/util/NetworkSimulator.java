@@ -21,8 +21,6 @@ public class NetworkSimulator {
 
     private HashMap<JID, NetworkEventHandler> clients;
 
-    private RuntimeException error;
-
     public IProject project;
 
     public IPath path = new Path("dummy");
@@ -81,9 +79,4 @@ public class NetworkSimulator {
     public void removeClient(NetworkEventHandler remote) {
         clients.remove(remote.getUser().getJID());
     }
-
-    public RuntimeException getLastError() {
-        return error;
-    }
-
 }
