@@ -70,9 +70,10 @@ public class RosterTracker implements IConnectionListener {
 
     public void connectionStateChanged(Connection connection,
         ConnectionState newState) {
-        if (newState == ConnectionState.CONNECTED) {
+        if (newState == ConnectionState.CONNECTING) {
             prepareConnection(connection);
-        } else if (this.connection != null) {
+        } else if (this.connection != null
+            && newState != ConnectionState.CONNECTED) {
             disposeConnection();
         }
     }
