@@ -15,7 +15,6 @@ import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.io.Writer;
 import java.net.MalformedURLException;
-import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.URL;
 import java.text.DecimalFormat;
@@ -146,28 +145,6 @@ public class Utils {
 
     public static String urlUnescape(String toUnescape) {
         return unescape(toUnescape, urlCodec);
-    }
-
-    /**
-     * Obtain a free port we can use.
-     * 
-     * @return A free port number.
-     */
-    public static int getFreePort() {
-        ServerSocket ss;
-        int freePort = -1;
-
-        for (int i = 0; i < 10; i++) {
-            try {
-                ss = new ServerSocket(0);
-                freePort = ss.getLocalPort();
-                ss.close();
-                break;
-            } catch (IOException e) {
-                log.error("Error while trying to find a free port:", e);
-            }
-        }
-        return freePort;
     }
 
     public static void close(Socket socketToClose) {
