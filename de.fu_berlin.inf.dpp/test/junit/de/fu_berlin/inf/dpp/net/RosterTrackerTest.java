@@ -55,6 +55,9 @@ public class RosterTrackerTest {
 
         RosterTracker tracker = new RosterTracker(createMock(SarosNet.class));
         tracker.connectionStateChanged(mockConnection,
+            ConnectionState.CONNECTING);
+
+        tracker.connectionStateChanged(mockConnection,
             ConnectionState.CONNECTED);
 
         verify(mockConnection);
@@ -101,6 +104,10 @@ public class RosterTrackerTest {
         replay(mockRoster);
 
         RosterTracker tracker = new RosterTracker(createMock(SarosNet.class));
+
+        tracker.connectionStateChanged(mockConnection,
+            ConnectionState.CONNECTING);
+
         tracker.connectionStateChanged(mockConnection,
             ConnectionState.CONNECTED);
 
@@ -123,6 +130,10 @@ public class RosterTrackerTest {
         replay(mockRoster);
 
         RosterTracker tracker = new RosterTracker(createMock(SarosNet.class));
+
+        tracker.connectionStateChanged(mockConnection,
+            ConnectionState.CONNECTING);
+
         tracker.connectionStateChanged(mockConnection,
             ConnectionState.CONNECTED);
 
@@ -155,6 +166,10 @@ public class RosterTrackerTest {
         replay(mockRoster);
 
         RosterTracker tracker = new RosterTracker(createMock(SarosNet.class));
+
+        tracker.connectionStateChanged(mockConnection,
+            ConnectionState.CONNECTING);
+
         tracker.connectionStateChanged(mockConnection,
             ConnectionState.CONNECTED);
 
