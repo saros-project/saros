@@ -16,4 +16,4 @@
  *
  *
  */
-package de.fu_berlin.inf.dpp.communication.audio.muc;
+package de.fu_berlin.inf.dpp.communication.muc;
