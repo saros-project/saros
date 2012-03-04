@@ -13,6 +13,7 @@ import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ISarosSessionListener;
 import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.ui.views.SarosView;
+import de.fu_berlin.inf.dpp.util.Utils;
 
 /**
  * This class handles the creation and destruction of the {@link MUCSession}
@@ -40,10 +41,15 @@ public class MUCManagerSingletonWrapperChatView extends
                 .getOwnPreferences() : mucSessionPreferencesNegotiationManager
                 .getSessionPreferences();
 
-            MUCManagerSingletonWrapperChatView.this.mucSession = mucManager
-                .connectMUC(preferences);
-            log.debug(MUCManagerSingletonWrapperChatView.class.getSimpleName()
-                + " created / joined.");
+            Utils.runSafeAsync(log, new Runnable() {
+                @Override
+                public void run() {
+                    MUCManagerSingletonWrapperChatView.this.mucSession = mucManager
+                        .connectMUC(preferences);
+                    log.debug(MUCManagerSingletonWrapperChatView.class
+                        .getSimpleName() + " created / joined.");
+                }
+            });
         }
 
         @Override
