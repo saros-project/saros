@@ -477,6 +477,9 @@ public class Messages extends NLS {
     public static String FollowThisPersonAction_stop_follow_tooltip;
     public static String EnterProjectNamePage_error_projectname_in_use;
 
+    public static String SharedProjectDecorator_shared;
+    public static String SharedProjectDecorator_shared_partial;
+
     static {
         // initialize resource bundle
         NLS.initializeMessages(BUNDLE_NAME, Messages.class);
