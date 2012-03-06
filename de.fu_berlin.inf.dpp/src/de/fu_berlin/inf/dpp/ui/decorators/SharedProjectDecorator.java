@@ -24,6 +24,7 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.IDecoration;
@@ -39,6 +40,7 @@ import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ISarosSessionListener;
 import de.fu_berlin.inf.dpp.project.SarosSessionManager;
 import de.fu_berlin.inf.dpp.ui.ImageManager;
+import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.util.Utils;
 
 /**
@@ -117,6 +119,15 @@ public class SharedProjectDecorator implements ILightweightLabelDecorator {
             } else {
                 decoration.addOverlay(SharedProjectDecorator.projectDescriptor,
                     IDecoration.TOP_LEFT);
+            }
+            if ((iResource instanceof IProject)) {
+                if (sarosSession.isCompletelyShared(iResource.getProject())) {
+                    decoration
+                        .addSuffix(Messages.SharedProjectDecorator_shared);
+                } else {
+                    decoration
+                        .addSuffix(Messages.SharedProjectDecorator_shared_partial);
+                }
             }
         }
     }
