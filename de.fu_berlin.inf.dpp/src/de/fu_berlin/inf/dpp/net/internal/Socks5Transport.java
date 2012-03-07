@@ -167,6 +167,13 @@ public class Socks5Transport extends BytestreamTransport {
 
     }
 
+    /*
+     * the Smack API does not tell us, if a mediated Socks5 connection is
+     * unidirectional. But some server implementation (OpenFire) may return such
+     * a connection. In this case we have to wrap the unidirectional
+     * connections.
+     */
+
     /**
      * Tests one of the bytestreams != null in the opposite direction. It
      * returns it if bidirectional or tries to wrap two unidirectional streams
