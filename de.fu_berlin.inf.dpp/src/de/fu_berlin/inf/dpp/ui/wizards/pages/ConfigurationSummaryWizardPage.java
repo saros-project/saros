@@ -21,7 +21,7 @@ import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
 import de.fu_berlin.inf.dpp.ui.ImageManager;
 import de.fu_berlin.inf.dpp.ui.widgets.wizard.SummaryItemComposite;
 import de.fu_berlin.inf.dpp.ui.wizards.ConfigurationWizard;
-import de.fu_berlin.inf.dpp.ui.wizards.utils.WizardPageUtils;
+import de.fu_berlin.inf.dpp.util.ArrayUtils;
 import de.fu_berlin.inf.nebula.explanation.note.SimpleNoteComposite;
 import de.fu_berlin.inf.nebula.utils.FontUtils;
 import de.fu_berlin.inf.nebula.utils.LayoutUtils;
@@ -209,10 +209,14 @@ public class ConfigurationSummaryWizardPage extends WizardPage {
         if (!visible)
             return;
 
-        List<EnterXMPPAccountWizardPage> enterXMPPAccountWizardPages = WizardPageUtils
-            .getPage(this.getWizard(), EnterXMPPAccountWizardPage.class);
-        List<ConfigurationSettingsWizardPage> configurationSettingsWizardPages = WizardPageUtils
-            .getPage(this.getWizard(), ConfigurationSettingsWizardPage.class);
+        List<EnterXMPPAccountWizardPage> enterXMPPAccountWizardPages = ArrayUtils
+            .getInstances(getWizard().getPages(),
+                EnterXMPPAccountWizardPage.class);
+
+        List<ConfigurationSettingsWizardPage> configurationSettingsWizardPages = ArrayUtils
+            .getInstances(getWizard().getPages(),
+                ConfigurationSettingsWizardPage.class);
+
         if (enterXMPPAccountWizardPages.isEmpty()
             || configurationSettingsWizardPages.isEmpty())
             return;
