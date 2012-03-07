@@ -6,6 +6,7 @@ import static de.fu_berlin.inf.dpp.stf.client.tester.SarosTester.CARL;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
+import org.junit.After;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -23,6 +24,14 @@ public class CreateSameFileAtOnceTest extends StfTestCase {
         select(ALICE, BOB, CARL);
     }
 
+    @After
+    public void restoreNetwork() throws Exception {
+        BOB.controlBot().getNetworkManipulator()
+            .unblockOutgoingSessionPackets();
+        CARL.controlBot().getNetworkManipulator()
+            .unblockOutgoingSessionPackets();
+    }
+
     @Test
     public void testCreateSameFileAtOnce() throws Exception {
         ALICE.superBot().internal().createProject("foo");
@@ -34,20 +43,28 @@ public class CreateSameFileAtOnceTest extends StfTestCase {
         CARL.superBot().views().packageExplorerView()
             .waitUntilResourceIsShared("foo");
 
-        BOB.remoteBot().sleep(2000);
-        CARL.remoteBot().sleep(2000);
+        AbstractTester firstTester = BOB;
+        AbstractTester secondTester = CARL;
 
-        if ((System.currentTimeMillis() & 1L) != 0L) {
-            BOB.superBot().internal()
-                .createFile("foo", "readme.txt", BOB.toString());
-            CARL.superBot().internal()
-                .createFile("foo", "readme.txt", CARL.toString());
-        } else {
-            CARL.superBot().internal()
-                .createFile("foo", "readme.txt", BOB.toString());
-            BOB.superBot().internal()
-                .createFile("foo", "readme.txt", CARL.toString());
+        if ((System.currentTimeMillis() & 1L) == 0L) {
+            firstTester = CARL;
+            secondTester = BOB;
         }
+
+        BOB.controlBot().getNetworkManipulator().blockOutgoingSessionPackets();
+        CARL.controlBot().getNetworkManipulator().blockOutgoingSessionPackets();
+
+        firstTester.superBot().internal()
+            .createFile("foo", "readme.txt", firstTester.toString());
+
+        secondTester.superBot().internal()
+            .createFile("foo", "readme.txt", secondTester.toString());
+
+        BOB.controlBot().getNetworkManipulator()
+            .unblockOutgoingSessionPackets();
+
+        CARL.controlBot().getNetworkManipulator()
+            .unblockOutgoingSessionPackets();
 
         ALICE.superBot().views().packageExplorerView()
             .waitUntilResourceIsShared("foo/readme.txt");
