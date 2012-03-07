@@ -2,15 +2,21 @@ package de.fu_berlin.inf.dpp.ui.util;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.Deque;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
+import org.eclipse.core.resources.IContainer;
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.preference.PreferenceStore;
 import org.eclipse.swt.widgets.Shell;
@@ -271,9 +277,49 @@ public class CollaborationUtils {
                     : Messages.CollaborationUtils_project_plural_ending)));
 
         for (IProject project : projects) {
-            result.append("\n - ").append(project.getName()); //$NON-NLS-1$
             if (!sarosSession.isCompletelyShared(project))
                 result.append(Messages.CollaborationUtils_partial);
+
+            long projectSize = 0;
+            long files = 0;
+
+            Deque<IResource> stack = new LinkedList<IResource>();
+
+            if (sarosSession.isCompletelyShared(project))
+                stack.push(project);
+
+            while (!stack.isEmpty()) {
+                IResource resource = stack.pop();
+
+                IContainer container = (IContainer) resource
+                    .getAdapter(IContainer.class);
+
+                if (container != null) {
+                    try {
+                        stack.addAll(Arrays.asList(container.members()));
+                    } catch (CoreException e) {
+                        log.warn("cannot calculate the correct project size", e);
+                    }
+                    continue;
+                }
+
+                IFile file = (IFile) resource.getAdapter(IFile.class);
+                if (file != null) {
+                    projectSize += file.getLocation().toFile().length();
+                    files++;
+                }
+            }
+
+            if (sarosSession.isCompletelyShared(project)) {
+                result.append(String.format(
+                    "\nProject: %s, Files: %d, Size: %s", project.getName(),
+                    files, format(projectSize)));
+            } else {
+                result.append(String.format(
+                    "\nProject: %s, Files: %d, Size: %s", project.getName()
+                        + " " + Messages.CollaborationUtils_partial, "N/A",
+                    "N/A"));
+            }
         }
 
         return result.toString();
@@ -379,5 +425,20 @@ public class CollaborationUtils {
             SarosView.showNotification("New file in session!", messageBalloon);
             return true;
         }
+    }
+
+    private static String format(long size) {
+
+        if (size < 1024)
+            return "< 1 KiB";
+
+        if (size < 1024 * 1024)
+            return String.format(Locale.US, "%.2f KiB", size / (1024F));
+
+        if (size < 1024 * 1024 * 1024)
+            return String.format(Locale.US, "%.2f MiB", size / (1024F * 1024F));
+
+        return String.format(Locale.US, "%.2f GiB", size
+            / (1024F * 1024F * 1024F));
     }
 }
