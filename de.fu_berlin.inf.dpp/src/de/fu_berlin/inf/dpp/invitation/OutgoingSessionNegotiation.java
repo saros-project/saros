@@ -8,15 +8,16 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.jivesoftware.smack.packet.Packet;
 import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.SarosContext;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.activities.ProjectExchangeInfo;
-import de.fu_berlin.inf.dpp.communication.muc.MUCManager;
 import de.fu_berlin.inf.dpp.communication.muc.negotiation.MUCSessionPreferences;
 import de.fu_berlin.inf.dpp.communication.muc.negotiation.MUCSessionPreferencesNegotiatingManager;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
@@ -24,14 +25,19 @@ import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
 import de.fu_berlin.inf.dpp.exceptions.RemoteCancellationException;
 import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
 import de.fu_berlin.inf.dpp.invitation.ProcessTools.CancelOption;
+import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
+import de.fu_berlin.inf.dpp.net.internal.DefaultInvitationInfo.InvitationAcknowledgementExtensionProvider;
+import de.fu_berlin.inf.dpp.net.internal.DefaultInvitationInfo.InvitationCompleteExtensionProvider;
 import de.fu_berlin.inf.dpp.net.internal.DefaultInvitationInfo.UserListRequestExtensionProvider;
 import de.fu_berlin.inf.dpp.net.internal.InvitationInfo;
 import de.fu_berlin.inf.dpp.net.internal.InvitationInfo.InvitationExtensionProvider;
 import de.fu_berlin.inf.dpp.net.internal.SarosPacketCollector;
+import de.fu_berlin.inf.dpp.net.internal.XMPPReceiver;
 import de.fu_berlin.inf.dpp.net.internal.XMPPTransmitter;
 import de.fu_berlin.inf.dpp.net.internal.discoveryManager.DiscoveryManager;
+import de.fu_berlin.inf.dpp.net.internal.extensions.PacketExtensionUtils;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.ui.wizards.InvitationWizard;
@@ -42,34 +48,41 @@ import de.fu_berlin.inf.dpp.util.VersionManager.VersionInfo;
 
 public class OutgoingSessionNegotiation extends InvitationProcess {
 
-    private static Logger log = Logger
+    private final static Logger log = Logger
         .getLogger(OutgoingSessionNegotiation.class);
 
+    private final static Random INVITATION_RAND = new Random();
+
     protected ISarosSession sarosSession;
-    @Inject
-    protected VersionManager versionManager;
     protected SubMonitor monitor;
     protected String invitationID;
-    protected final static Random INVITATION_RAND = new Random();
-    @Inject
-    protected DiscoveryManager discoveryManager;
     protected boolean peerAdvertisesSarosSupport = true;
     protected AtomicBoolean cancelled = new AtomicBoolean(false);
     protected SarosCancellationException cancellationCause;
+
+    protected VersionInfo versionInfo;
+
+    protected SarosPacketCollector invitationCompleteCollector;
+    protected SarosPacketCollector invitationAcknowledgedCollector;
+    protected SarosPacketCollector userListRequestCollector;
+
     @Inject
-    protected MUCManager mucManager;
+    protected VersionManager versionManager;
+
+    @Inject
+    protected DiscoveryManager discoveryManager;
+
     @Inject
     protected MUCSessionPreferencesNegotiatingManager comNegotiatingManager;
-    protected VersionInfo versionInfo;
-    protected SarosPacketCollector invitationCompleteCollector;
 
     @Inject
     protected SessionIDObservable sessionID;
 
-    protected InvitationInfo.InvitationExtensionProvider invExtProv;
-
     @Inject
     protected XMPPTransmitter xmppTransmitter;
+
+    @Inject
+    protected XMPPReceiver xmppReceiver;
 
     @Inject
     protected EditorManager editorManager;
@@ -116,8 +129,8 @@ public class OutgoingSessionNegotiation extends InvitationProcess {
         monitor.beginTask("Negotiating session...", 100);
         this.invitationID = String.valueOf(INVITATION_RAND.nextLong());
         this.monitor = monitor;
-        invitationCompleteCollector = transmitter
-            .getInvitationCompleteCollector(invitationID);
+
+        createCollectors();
 
         try {
             checkAvailability(monitor.newChild(1, SubMonitor.SUPPRESS_NONE));
@@ -194,6 +207,7 @@ public class OutgoingSessionNegotiation extends InvitationProcess {
             localCancel(errorMsg, CancelOption.NOTIFY_PEER);
             executeCancellation();
         } finally {
+            deleteCollectors();
             monitor.done();
         }
     }
@@ -314,31 +328,16 @@ public class OutgoingSessionNegotiation extends InvitationProcess {
             colorID, description, versionInfo, sarosSession.getSessionStart(),
             comPrefs);
 
-        invExtProv = new InvitationExtensionProvider();
-
-        xmppTransmitter.sendMessageToUser(peer, invExtProv.create(invInfo));
+        xmppTransmitter.sendMessageToUser(peer,
+            new InvitationExtensionProvider().create(invInfo));
 
         subMonitor.worked(1);
-
-        /*
-         * FIXME RACE CONDITIONS IF THE REMOTE INVITEE RESPONDS TO FAST !!!
-         * INSTALL THE COLLECTORS HERE ! Thread may be suspended here for
-         * several seconds if the garbage collector kicks in and perform a full
-         * GC.
-         */
 
         subMonitor
             .setTaskName("Invitation sent. Waiting for acknowledgement...");
 
-        /*
-         * FIXME this packet should contain an OK or REJECT currently the reject
-         * response is processed by the SarosSessionManager which performs a
-         * cancel on the monitor ! So this blocks until the timeout passed.
-         * Currently 30 seconds !
-         */
-
-        if (!transmitter.receivedInvitationAcknowledgment(invitationID,
-            subMonitor.newChild(1, SubMonitor.SUPPRESS_ALL_LABELS))) {
+        if (collectPacket(invitationAcknowledgedCollector,
+            ITransmitter.INVITATION_ACKNOWLEDGEMENT_TIMEOUT, subMonitor) == null) {
             throw new LocalCancellationException(
                 peerAdvertisesSarosSupport ? "No invitation acknowledgement received."
                     : "Missing Saros support.", CancelOption.DO_NOT_NOTIFY_PEER);
@@ -346,11 +345,14 @@ public class OutgoingSessionNegotiation extends InvitationProcess {
 
         subMonitor
             .setTaskName("Invitation acknowledged. Waiting for user list request...");
-        UserListRequestExtensionProvider userListRequestExtProv = new UserListRequestExtensionProvider();
-        transmitter.receive(subMonitor.newChild(1,
-            SubMonitor.SUPPRESS_ALL_LABELS), transmitter
-            .getUserListRequestCollector(invitationID, userListRequestExtProv),
-            10000, true);
+
+        if (collectPacket(userListRequestCollector, 10000, subMonitor) == null) {
+            throw new LocalCancellationException(
+                peerAdvertisesSarosSupport ? "No user list request received."
+                    : "Missing Saros support.", CancelOption.DO_NOT_NOTIFY_PEER);
+        }
+
+        // Reply is send in addUserToSession !
 
         log.debug("Inv" + Utils.prefix(peer)
             + ": User list request has received.");
@@ -404,16 +406,19 @@ public class OutgoingSessionNegotiation extends InvitationProcess {
 
     protected void completeInvitation(SubMonitor subMonitor,
         List<ProjectExchangeInfo> projectExchangeInfos)
-        throws SarosCancellationException, IOException {
+        throws SarosCancellationException {
 
         log.debug("Inv" + Utils.prefix(peer)
             + ": Waiting for invitation complete confirmation...");
 
         subMonitor.beginTask("Waiting for peer to complete invitation...", 2);
 
-        transmitter.receiveInvitationCompleteConfirmation(
-            subMonitor.newChild(1, SubMonitor.SUPPRESS_ALL_LABELS),
-            invitationCompleteCollector);
+        if (collectPacket(invitationCompleteCollector, 10000, subMonitor) == null) {
+            throw new LocalCancellationException(
+                peerAdvertisesSarosSupport ? "no invitation complete response received"
+                    : "Missing Saros support.", CancelOption.DO_NOT_NOTIFY_PEER);
+        }
+
         log.debug("Inv" + Utils.prefix(peer)
             + ": Notifying participants that the invitation is complete.");
 
@@ -554,5 +559,49 @@ public class OutgoingSessionNegotiation extends InvitationProcess {
             localCancel(null, cancelOption);
             throw new SarosCancellationException();
         }
+    }
+
+    protected Packet collectPacket(SarosPacketCollector collector,
+        long timeout, IProgressMonitor monitor)
+        throws SarosCancellationException {
+
+        Packet packet = null;
+
+        while (timeout > 0) {
+            if (monitor != null && monitor.isCanceled())
+                checkCancellation(CancelOption.NOTIFY_PEER);
+
+            packet = collector.nextResult(1000);
+
+            if (packet != null)
+                break;
+
+            timeout -= 1000;
+        }
+
+        return packet;
+    }
+
+    protected void deleteCollectors() {
+        invitationCompleteCollector.cancel();
+        invitationAcknowledgedCollector.cancel();
+        userListRequestCollector.cancel();
+    }
+
+    protected void createCollectors() {
+        invitationCompleteCollector = xmppReceiver
+            .createCollector(PacketExtensionUtils.getInvitationFilter(
+                new InvitationCompleteExtensionProvider(), sessionID,
+                invitationID));
+
+        invitationAcknowledgedCollector = xmppReceiver
+            .createCollector(PacketExtensionUtils.getInvitationFilter(
+                new InvitationAcknowledgementExtensionProvider(), sessionID,
+                invitationID));
+
+        userListRequestCollector = xmppReceiver
+            .createCollector(PacketExtensionUtils
+                .getInvitationFilter(new UserListRequestExtensionProvider(),
+                    sessionID, invitationID));
     }
 }
