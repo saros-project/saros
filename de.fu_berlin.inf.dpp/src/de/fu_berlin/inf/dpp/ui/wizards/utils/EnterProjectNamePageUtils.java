@@ -150,14 +150,17 @@ public class EnterProjectNamePageUtils {
         return ResourcesPlugin.getWorkspace().getRoot().getProject(projectName);
     }
 
-     /**
-     * Tests, if the given projectname does not already exist in the current workspace.
-     * In Addition the method also accepts an array of further reserved names.
+    /**
+     * Tests, if the given projectname does not already exist in the current
+     * workspace. In Addition the method also accepts an array of further
+     * reserved names.
      * 
-     * @param projectName to test.
-     * @param reservedNames Array of reserved project names. May be empty but not null.
+     * @param projectName
+     *            to test.
+     * @param reservedNames
+     *            Array of reserved project names. May be empty but not null.
      * @return true, if projectName does not exist in the current workspace and
-     *               does not exist in the reservedNames
+     *         does not exist in the reservedNames
      */
     public static boolean projectNameIsUnique(String projectName,
         String... reservedNames) {
@@ -189,13 +192,15 @@ public class EnterProjectNamePageUtils {
 
     /**
      * Proposes a projectname based on the existing projectnames in the current
-     * workspace and based on the array reservedNames.
-     * The proposed projectname is unique. 
+     * workspace and based on the array reservedNames. The proposed projectname
+     * is unique.
+     * 
      * @see EnterProjectNamePageUtils#projectNameIsUnique
      * 
-     * @param projectName Projectname which shall be checked.
+     * @param projectName
+     *            Projectname which shall be checked.
      * @return a unique projectname based on "projectName". If "projectName" is
-     * already unique, it will be returned without changes.
+     *         already unique, it will be returned without changes.
      */
     public static String findProjectNameProposal(String projectName,
         String... reservedNames) {
@@ -262,7 +267,7 @@ public class EnterProjectNamePageUtils {
             return false;
         }
         if (preferenceUtils.isAutoReuseExisting()
-            && JoinSessionWizardUtils.existsProjects(remoteProjectNames)) {
+            && existsProjects(remoteProjectNames)) {
             return true;
         } else if (alreadySharedProjectsIDs.contains(id)) {
             return true;
@@ -274,5 +279,23 @@ public class EnterProjectNamePageUtils {
 
     public static void setPreferenceUtils(PreferenceUtils preferenceUtils) {
         EnterProjectNamePageUtils.preferenceUtils = preferenceUtils;
+    }
+
+    /**
+     * @param projectName
+     * @return <code><b>true</b></code> if a project with the given Name exists
+     *         in the workspace
+     */
+    public static boolean existsProjects(String projectName) {
+        // Start with the projects name
+        File proposedName = new File(projectName);
+
+        // Then check with all the projects
+        IWorkspace workspace = ResourcesPlugin.getWorkspace();
+        for (IProject project : workspace.getRoot().getProjects()) {
+            if (new File(project.getName()).equals(proposedName))
+                return true;
+        }
+        return false;
     }
 }
