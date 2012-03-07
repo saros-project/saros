@@ -59,14 +59,6 @@ public class AdvancedPreferencePage extends FieldEditorPreferencePage implements
         addField(new BooleanFieldEditor(
             PreferenceConstants.SKIP_SYNC_SELECTABLE,
             Messages.AdvancedPreferencePage_skip_synchronization, inviteGroup));
-
-        addField(new BooleanFieldEditor(
-            PreferenceConstants.AUTO_ACCEPT_INVITATION,
-            Messages.AdvancedPreferencePage_auto_accept_invite, inviteGroup));
-
-        addField(new BooleanFieldEditor(PreferenceConstants.AUTO_REUSE_PROJECT,
-            Messages.AdvancedPreferencePage_auto_accept_invite_info,
-            inviteGroup));
     }
 
     @Override
