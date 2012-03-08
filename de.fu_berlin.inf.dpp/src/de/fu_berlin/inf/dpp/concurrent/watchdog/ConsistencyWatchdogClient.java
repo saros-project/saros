@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.TimeUnit;
@@ -24,7 +25,6 @@ import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.texteditor.IDocumentProvider;
 import org.picocontainer.annotations.Inject;
 
-import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.activities.business.AbstractActivityReceiver;
@@ -49,27 +49,21 @@ import de.fu_berlin.inf.dpp.ui.views.SarosView;
 import de.fu_berlin.inf.dpp.util.StackTrace;
 
 /**
- * This class is responsible for two things:
- * 
- * 1.) Process checksums sent to us from the server by checking our locally
- * existing files against them.
- * 
- * See {@link #performCheck(ChecksumActivity)}
- * 
- * If an inconsistency is detected the inconsistency state is set via the
- * {@link IsInconsistentObservable}. This enables the {@link ConsistencyAction}
- * (a.k.a. the yellow triangle) in the {@link SarosView}.
- * 
- * 2.) Send a ChecksumError to the host, if the user wants to recover from an
- * inconsistency.
- * 
- * See {@link #runRecovery(SubMonitor)}
+ * This class is responsible for two things: 1.) Process checksums sent to us
+ * from the server by checking our locally existing files against them. See
+ * {@link #performCheck(ChecksumActivity)} If an inconsistency is detected the
+ * inconsistency state is set via the {@link IsInconsistentObservable}. This
+ * enables the {@link ConsistencyAction} (a.k.a. the yellow triangle) in the
+ * {@link SarosView}. 2.) Send a ChecksumError to the host, if the user wants to
+ * recover from an inconsistency. See {@link #runRecovery(SubMonitor)}
  */
 @Component(module = "consistency")
 public class ConsistencyWatchdogClient extends AbstractActivityProvider {
 
     private static Logger log = Logger
         .getLogger(ConsistencyWatchdogClient.class);
+
+    private static final Random RANDOM = new Random();
 
     @Inject
     protected IsInconsistentObservable inconsistencyToResolve;
@@ -144,6 +138,7 @@ public class ConsistencyWatchdogClient extends AbstractActivityProvider {
     }
 
     protected IActivityReceiver activityReceiver = new AbstractActivityReceiver() {
+
         @Override
         public void receive(ChecksumActivity checksumActivityDataObject) {
 
@@ -243,9 +238,7 @@ public class ConsistencyWatchdogClient extends AbstractActivityProvider {
      * effect.
      * 
      * @noSWT This method should not be called from SWT
-     * 
      * @blocking This method returns after the recovery has finished
-     * 
      * @client Can only be called on the client!
      */
     public void runRecovery(SubMonitor monitor) {
@@ -353,7 +346,7 @@ public class ConsistencyWatchdogClient extends AbstractActivityProvider {
     protected SimpleDateFormat format = new SimpleDateFormat("HHmmssSS");
 
     protected String getNextRecoveryID() {
-        return format.format(new Date()) + Saros.RANDOM.nextLong();
+        return format.format(new Date()) + RANDOM.nextLong();
     }
 
     @Override
@@ -426,9 +419,7 @@ public class ConsistencyWatchdogClient extends AbstractActivityProvider {
      * 
      * @return whether a consistency check could be performed or not (for
      *         instance because no current checksum is available)
-     * 
      * @swt This must be called from SWT
-     * 
      * @client This can only be called on the client
      */
     public boolean performCheck(SPath path) {
