@@ -59,7 +59,6 @@ import org.eclipse.ui.texteditor.IEditorStatusLine;
 import org.eclipse.ui.texteditor.ITextEditor;
 import org.picocontainer.annotations.Nullable;
 
-import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.annotations.Component;
@@ -86,10 +85,8 @@ import de.fu_berlin.inf.dpp.util.Utils;
 @Component(module = "core")
 public class EditorAPI implements IEditorAPI {
 
-    protected Saros saros;
+    public EditorAPI() {
 
-    public EditorAPI(Saros saros) {
-        this.saros = saros;
     }
 
     private static Logger log = Logger.getLogger(EditorAPI.class.getName());
