@@ -39,13 +39,10 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
-import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.FileList;
-import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.User.Permission;
-import de.fu_berlin.inf.dpp.accountManagement.XMPPAccountStore;
 import de.fu_berlin.inf.dpp.activities.ProjectExchangeInfo;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
@@ -71,26 +68,19 @@ public class SarosUI {
 
     private static final Logger log = Logger.getLogger(SarosUI.class.getName());
 
-    @Inject
-    protected DataTransferManager dataTransferManager;
+    final protected SarosSessionManager sessionManager;
+    final protected VersionManager versionManager;
+    final protected DataTransferManager dataTransferManager;
+    final protected PreferenceUtils preferenceUtils;
 
-    @Inject
-    protected PreferenceUtils preferenceUtils;
-
-    @Inject
-    protected Saros saros;
-
-    @Inject
-    VersionManager manager;
-
-    @Inject
-    XMPPAccountStore accountStore;
-
-    protected SarosSessionManager sessionManager;
-
-    public SarosUI(SarosSessionManager sessionManager) {
+    public SarosUI(SarosSessionManager sessionManager,
+        VersionManager versionManager, DataTransferManager dataTransferManager,
+        PreferenceUtils preferenceUtils) {
 
         this.sessionManager = sessionManager;
+        this.versionManager = versionManager;
+        this.dataTransferManager = dataTransferManager;
+        this.preferenceUtils = preferenceUtils;
 
     }
 
@@ -98,7 +88,7 @@ public class SarosUI {
         IncomingSessionNegotiation process) {
 
         JoinSessionWizard sessionWizard = new JoinSessionWizard(process,
-            dataTransferManager, preferenceUtils, manager);
+            dataTransferManager, preferenceUtils, versionManager);
         final WizardDialogAccessable wizardDialog = new WizardDialogAccessable(
             EditorAPI.getShell(), sessionWizard);
 
