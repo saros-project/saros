@@ -92,52 +92,6 @@ public class PreferenceUtils {
     }
 
     /**
-     * Returns the user name from the {@link ISecurePreferences}.<br/>
-     * Might be an empty string but never null.
-     * 
-     * @return User name
-     */
-    public String getUserName() {
-        ISecurePreferences prefs = saros.getSecurePrefs();
-        String username = "";
-
-        try {
-            username = prefs.get(PreferenceConstants.USERNAME, "");
-        } catch (StorageException e) {
-            log.error("Exception while retrieving account: " + e.getMessage());
-        }
-        return username;
-    }
-
-    /**
-     * Returns true if the user has specified a user name for a XMPP account.
-     * 
-     * @return true if there is a user name that is not equal to the empty
-     *         string
-     */
-    public boolean hasUserName() {
-        return getUserName().isEmpty() == false;
-    }
-
-    /**
-     * Returns the user's password from the {@link PreferenceStore}.<br/>
-     * Might be an empty string but never null.
-     * 
-     * @return
-     */
-    public String getPassword() {
-        String password = "";
-        try {
-            password = this.securePreferenceStore.get(
-                PreferenceConstants.PASSWORD, "");
-        } catch (StorageException e) {
-            log.error("Exception while getting password: " + e.getMessage());
-        }
-
-        return password;
-    }
-
-    /**
      * Returns whether auto-connect is enabled or not.
      * 
      * @return true if auto-connect is enabled.
