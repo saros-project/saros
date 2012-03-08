@@ -8,7 +8,6 @@ import org.junit.Test;
 
 import de.fu_berlin.inf.dpp.stf.client.StfTestCase;
 import de.fu_berlin.inf.dpp.stf.client.util.Util;
-import de.fu_berlin.inf.dpp.stf.test.Constants;
 
 public class KeyboardLayoutTest extends StfTestCase {
 
@@ -20,18 +19,18 @@ public class KeyboardLayoutTest extends StfTestCase {
     @Test
     public void testKeyboardLayout() throws Exception {
 
-        Util.createProjectWithEmptyFile(Constants.PROJECT1, Constants.FILE3, ALICE);
+        Util.createProjectWithEmptyFile("keyboard", "text.txt", ALICE);
         //
         final String textToTest = "!\"§$%&/()={[]}\\+*~#'-_.:,;|<>^? abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
         ALICE.superBot().views().packageExplorerView()
-            .selectFile(Constants.PATH).open();
+            .selectFile("keyboard", "text.txt").open();
 
-        ALICE.remoteBot().editor(Constants.FILE3).typeText(textToTest);
+        ALICE.remoteBot().editor("text.txt").typeText(textToTest);
 
         ALICE.remoteBot().sleep(500);
         assertEquals("keyboard layout is misconfigured", textToTest, ALICE
-            .remoteBot().editor(Constants.FILE3).getText());
+            .remoteBot().editor("text.txt").getText());
     }
 
 }

@@ -1,6 +1,8 @@
 package de.fu_berlin.inf.dpp.stf.server.rmi.superbot.impl;
 
 import java.rmi.RemoteException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.Pattern;
 
 import org.eclipse.jface.wizard.WizardDialog;
@@ -454,10 +456,18 @@ public final class SuperBot extends StfRemoteObject implements ISuperBot {
         for (SWTBotTreeItem item : tree.getAllItems())
             while (item.isChecked())
                 item.uncheck();
-        tree.getTreeItem(project).collapse();
 
-        for (String file : files)
-            tree.getTreeItem(project).getNode(file).check();
+        for (String file : files) {
+            String[] nodes = file.split("/|\\\\");
+            List<String> regex = new ArrayList<String>(nodes.length + 1);
+            regex.add(Pattern.quote(project));
+
+            for (String node : nodes)
+                regex.add(Pattern.quote(node));
+
+            WidgetUtil.getTreeItemWithRegex(tree, regex.toArray(new String[0]))
+                .check();
+        }
 
         shell.bot().button(NEXT).click();
 

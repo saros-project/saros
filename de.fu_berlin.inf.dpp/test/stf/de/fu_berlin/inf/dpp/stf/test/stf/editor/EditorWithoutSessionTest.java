@@ -20,16 +20,16 @@ public class EditorWithoutSessionTest extends StfTestCase {
 
     @Test
     public void testConcurrentEditing() throws Exception {
-        Util.createProjectWithEmptyFile(Constants.PROJECT1, Constants.FILE3, ALICE,
-            BOB);
+        Util.createProjectWithEmptyFile(Constants.PROJECT1, Constants.FILE3,
+            ALICE, BOB);
 
         ALICE.superBot().views().packageExplorerView()
-            .selectFile(Constants.PATH).open();
+            .selectFile(Constants.PROJECT1, Constants.FILE3).open();
 
         ALICE.remoteBot().editor(Constants.FILE3).typeText(ALICE.toString());
 
-        BOB.superBot().views().packageExplorerView().selectFile(Constants.PATH)
-            .open();
+        BOB.superBot().views().packageExplorerView()
+            .selectFile(Constants.PROJECT1, Constants.FILE3).open();
 
         BOB.remoteBot().editor(Constants.FILE3).typeText(BOB.toString());
 

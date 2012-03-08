@@ -138,28 +138,32 @@ public interface IPackageExplorerView extends Remote {
     /**
      * Selects the given folder.
      * 
+     * @param projectName
+     *            the name of the project
      * @param folderNodes
      *            node path to expand. Attempts to expand all nodes along the
-     *            path specified by the node array parameter.e.g.
-     *            {"Foo-saros","myFolder"}
+     *            path specified by the node array parameter.e.g. {"myFolder",
+     *            "foo", "bar"}
      * @throws RemoteException
      * @throws WidgetNotFoundException
      *             if the folder could not be found
      */
-    public IContextMenusInPEView selectFolder(String... folderNodes)
-        throws RemoteException;
+    public IContextMenusInPEView selectFolder(String projectName,
+        String... folderNodes) throws RemoteException;
 
     /**
      * Select the given files
      * 
+     * @param projectName
+     *            the name of the project
      * @param fileNodes
      *            node path to expand. Attempts to expand all nodes along the
-     *            path specified by the node array parameter.e.g.
-     *            {"Foo-saros","myFolder", "myFile.xml"}
+     *            path specified by the node array parameter.e.g. {"myFolder",
+     *            "myFile.xml"}
      * @throws RemoteException
      */
-    public IContextMenusInPEView selectFile(String... fileNodes)
-        throws RemoteException;
+    public IContextMenusInPEView selectFile(String projectName,
+        String... fileNodes) throws RemoteException;
 
     public String getTitle() throws RemoteException;
 

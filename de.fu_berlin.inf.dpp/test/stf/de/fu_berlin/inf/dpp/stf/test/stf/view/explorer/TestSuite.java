@@ -5,6 +5,7 @@ import org.junit.runners.Suite;
 
 @RunWith(Suite.class)
 @Suite.SuiteClasses({ PackageExplorerViewTest.class,
+    PackageExplorerViewDecoratorTest.class,
     PackageExplorerViewConditionTest.class })
 public class TestSuite {
     // the class remains completely empty,

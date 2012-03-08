@@ -7,7 +7,9 @@ import java.io.Reader;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.rmi.RemoteException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
@@ -23,6 +25,7 @@ import org.eclipse.swtbot.swt.finder.waits.DefaultCondition;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 
+import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.stf.server.StfRemoteObject;
 import de.fu_berlin.inf.dpp.stf.server.bot.condition.SarosConditions;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.impl.RemoteWorkbenchBot;
@@ -54,6 +57,11 @@ public final class PackageExplorerView extends StfRemoteObject implements
         return this;
     }
 
+    /*
+     * begin of interface IPackageExplorerView implementation
+     */
+
+    @Override
     public IContextMenusInPEView tree() throws RemoteException {
         ContextMenusInPEView.getInstance().setTree(tree);
         ContextMenusInPEView.getInstance().setTreeItem(null);
@@ -61,113 +69,123 @@ public final class PackageExplorerView extends StfRemoteObject implements
         return ContextMenusInPEView.getInstance();
     }
 
+    @Override
     public IContextMenusInPEView selectSrc(String projectName)
         throws RemoteException {
 
-        initContextMenuWrapper(
-            WidgetUtil.getTreeItemWithRegex(tree, Pattern.quote(projectName),
-                Pattern.quote(SRC)), TreeItemType.JAVA_PROJECT);
+        initContextMenuWrapper(WidgetUtil.getTreeItemWithRegex(tree,
+            createProjectRegex(projectName), Pattern.quote(SRC)),
+            TreeItemType.JAVA_PROJECT);
         return ContextMenusInPEView.getInstance();
     }
 
+    @Override
     public IContextMenusInPEView selectJavaProject(String projectName)
         throws RemoteException {
 
-        initContextMenuWrapper(
-            WidgetUtil.getTreeItemWithRegex(tree, Pattern.quote(projectName)),
-            TreeItemType.JAVA_PROJECT);
+        initContextMenuWrapper(WidgetUtil.getTreeItemWithRegex(tree,
+            createProjectRegex(projectName)), TreeItemType.JAVA_PROJECT);
         return ContextMenusInPEView.getInstance();
     }
 
+    @Override
     public IContextMenusInPEView selectJavaProjectWithRegex(String projectName)
         throws RemoteException {
 
-        initContextMenuWrapper(WidgetUtil.getTreeItemWithRegex(tree, projectName),
+        initContextMenuWrapper(
+            WidgetUtil.getTreeItemWithRegex(tree, projectName),
             TreeItemType.JAVA_PROJECT);
         return ContextMenusInPEView.getInstance();
     }
 
+    @Override
     public IContextMenusInPEView selectProject(String projectName)
         throws RemoteException {
-        initContextMenuWrapper(
-            WidgetUtil.getTreeItemWithRegex(tree, Pattern.quote(projectName)),
-            TreeItemType.PROJECT);
+        initContextMenuWrapper(WidgetUtil.getTreeItemWithRegex(tree,
+            createProjectRegex(projectName)), TreeItemType.PROJECT);
         return ContextMenusInPEView.getInstance();
     }
 
+    @Override
     public IContextMenusInPEView selectProjectWithRegex(String projectName)
         throws RemoteException {
-        initContextMenuWrapper(WidgetUtil.getTreeItemWithRegex(tree, projectName),
+        initContextMenuWrapper(
+            WidgetUtil.getTreeItemWithRegex(tree, projectName),
             TreeItemType.PROJECT);
         return ContextMenusInPEView.getInstance();
     }
 
+    @Override
     public IContextMenusInPEView selectPkg(String projectName, String pkg)
         throws RemoteException {
-        initContextMenuWrapper(
-            WidgetUtil.getTreeItemWithRegex(tree, Pattern.quote(projectName),
-                Pattern.quote(SRC), Pattern.quote(pkg)), TreeItemType.PKG);
+        initContextMenuWrapper(WidgetUtil.getTreeItemWithRegex(tree,
+            createProjectRegex(projectName), Pattern.quote(SRC),
+            Pattern.quote(pkg)), TreeItemType.PKG);
 
         return ContextMenusInPEView.getInstance();
     }
 
+    @Override
     public IContextMenusInPEView selectPkgWithRegex(String projectName,
         String pkg) throws RemoteException {
-        initContextMenuWrapper(WidgetUtil.getTreeItemWithRegex(tree, projectName,
-            Pattern.quote(SRC), pkg), TreeItemType.PKG);
+        initContextMenuWrapper(
+            WidgetUtil.getTreeItemWithRegex(tree, projectName,
+                Pattern.quote(SRC), pkg), TreeItemType.PKG);
 
         return ContextMenusInPEView.getInstance();
     }
 
+    @Override
     public IContextMenusInPEView selectClass(String projectName, String pkg,
         String className) throws RemoteException {
 
-        initContextMenuWrapper(
-            WidgetUtil.getTreeItemWithRegex(tree, Pattern.quote(projectName),
-                Pattern.quote(SRC), Pattern.quote(pkg),
-                Pattern.quote(className + SUFFIX_JAVA)), TreeItemType.CLASS);
-
-        return ContextMenusInPEView.getInstance();
-    }
-
-    public IContextMenusInPEView selectClassWithRegex(String projectName,
-        String pkg, String className) throws RemoteException {
-
-        initContextMenuWrapper(WidgetUtil.getTreeItemWithRegex(tree, projectName,
-            Pattern.quote(SRC), pkg, className + Pattern.quote(SUFFIX_JAVA)),
+        initContextMenuWrapper(WidgetUtil.getTreeItemWithRegex(tree,
+            createProjectRegex(projectName), Pattern.quote(SRC),
+            Pattern.quote(pkg), Pattern.quote(className + SUFFIX_JAVA)),
             TreeItemType.CLASS);
 
         return ContextMenusInPEView.getInstance();
     }
 
-    public IContextMenusInPEView selectFolder(String... folderNodes)
-        throws RemoteException {
+    @Override
+    public IContextMenusInPEView selectClassWithRegex(String projectName,
+        String pkg, String className) throws RemoteException {
 
-        for (int i = 0; i < folderNodes.length; i++)
-            folderNodes[i] = Pattern.quote(folderNodes[i]);
-
-        initContextMenuWrapper(WidgetUtil.getTreeItemWithRegex(tree, folderNodes),
-            TreeItemType.FOLDER);
-
-        return ContextMenusInPEView.getInstance();
-    }
-
-    public IContextMenusInPEView selectFile(String... fileNodes)
-        throws RemoteException {
-
-        for (int i = 0; i < fileNodes.length; i++)
-            fileNodes[i] = Pattern.quote(fileNodes[i]);
-
-        initContextMenuWrapper(WidgetUtil.getTreeItemWithRegex(tree, fileNodes),
-            TreeItemType.FILE);
+        initContextMenuWrapper(WidgetUtil.getTreeItemWithRegex(tree,
+            projectName, Pattern.quote(SRC), pkg,
+            className + Pattern.quote(SUFFIX_JAVA)), TreeItemType.CLASS);
 
         return ContextMenusInPEView.getInstance();
     }
 
+    @Override
+    public IContextMenusInPEView selectFolder(String projectName,
+        String... folderNodes) throws RemoteException {
+
+        initContextMenuWrapper(
+            WidgetUtil.getTreeItemWithRegex(tree,
+                createNodeRegex(projectName, folderNodes)), TreeItemType.FOLDER);
+
+        return ContextMenusInPEView.getInstance();
+    }
+
+    @Override
+    public IContextMenusInPEView selectFile(String projectName,
+        String... fileNodes) throws RemoteException {
+
+        initContextMenuWrapper(
+            WidgetUtil.getTreeItemWithRegex(tree,
+                createNodeRegex(projectName, fileNodes)), TreeItemType.FILE);
+
+        return ContextMenusInPEView.getInstance();
+    }
+
+    @Override
     public String getTitle() throws RemoteException {
         return VIEW_PACKAGE_EXPLORER;
     }
 
+    @Override
     public boolean isProjectManagedBySVN(String projectName)
         throws RemoteException {
         try {
@@ -183,6 +201,7 @@ public final class PackageExplorerView extends StfRemoteObject implements
         }
     }
 
+    @Override
     public String getRevision(String fullPath) throws RemoteException {
         IPath path = new Path(fullPath);
         IResource resource = ResourcesPlugin.getWorkspace().getRoot()
@@ -197,6 +216,7 @@ public final class PackageExplorerView extends StfRemoteObject implements
         return result;
     }
 
+    @Override
     public String getURLOfRemoteResource(String fullPath)
         throws RemoteException {
         IPath path = new Path(fullPath);
@@ -212,6 +232,7 @@ public final class PackageExplorerView extends StfRemoteObject implements
         return info.url;
     }
 
+    @Override
     public String getFileContent(String... nodes) throws RemoteException,
         IOException, CoreException {
         IPath path = new Path(getPath(nodes));
@@ -224,6 +245,7 @@ public final class PackageExplorerView extends StfRemoteObject implements
         return convertStreamToString(file.getContents());
     }
 
+    @Override
     public void waitUntilFolderExists(String... folderNodes)
         throws RemoteException {
         String fullPath = getPath(folderNodes);
@@ -231,6 +253,7 @@ public final class PackageExplorerView extends StfRemoteObject implements
             SarosConditions.isResourceExist(fullPath));
     }
 
+    @Override
     public void waitUntilFolderNotExists(String... folderNodes)
         throws RemoteException {
         String fullPath = getPath(folderNodes);
@@ -238,6 +261,7 @@ public final class PackageExplorerView extends StfRemoteObject implements
             SarosConditions.isResourceNotExist(fullPath));
     }
 
+    @Override
     public void waitUntilPkgExists(String projectName, String pkg)
         throws RemoteException {
         if (pkg.matches(PKG_REGEX)) {
@@ -251,6 +275,7 @@ public final class PackageExplorerView extends StfRemoteObject implements
         }
     }
 
+    @Override
     public void waitUntilPkgNotExists(String projectName, String pkg)
         throws RemoteException {
         if (pkg.matches(PKG_REGEX)) {
@@ -265,12 +290,14 @@ public final class PackageExplorerView extends StfRemoteObject implements
         }
     }
 
+    @Override
     public void waitUntilFileExists(String... fileNodes) throws RemoteException {
         String fullPath = getPath(fileNodes);
         RemoteWorkbenchBot.getInstance().waitUntil(
             SarosConditions.isResourceExist(fullPath));
     }
 
+    @Override
     public void waitUntilFileNotExists(String... fileNodes)
         throws RemoteException {
         String fullPath = getPath(fileNodes);
@@ -278,6 +305,7 @@ public final class PackageExplorerView extends StfRemoteObject implements
             SarosConditions.isResourceNotExist(fullPath));
     }
 
+    @Override
     public void waitUntilClassExists(String projectName, String pkg,
         String className) throws RemoteException {
         String path = getClassPath(projectName, pkg, className);
@@ -285,6 +313,7 @@ public final class PackageExplorerView extends StfRemoteObject implements
             SarosConditions.isResourceExist(path));
     }
 
+    @Override
     public void waitUntilClassNotExists(String projectName, String pkg,
         String className) throws RemoteException {
         String path = getClassPath(projectName, pkg, className);
@@ -292,42 +321,56 @@ public final class PackageExplorerView extends StfRemoteObject implements
             SarosConditions.isResourceNotExist(path));
     }
 
+    @Override
     public void waitUntilWindowSarosRunningVCSOperationClosed()
         throws RemoteException {
         RemoteWorkbenchBot.getInstance().waitUntilShellIsClosed(
             SHELL_SAROS_RUNNING_VCS_OPERATION);
     }
 
+    @Override
     public boolean isResourceShared(String path) throws RemoteException {
         IResource resource = ResourcesPlugin.getWorkspace().getRoot()
             .findMember(new Path(path));
-        return getSessionManager().getSarosSession().isShared(resource);
+
+        ISarosSession session = getSessionManager().getSarosSession();
+
+        if (session == null)
+            throw new IllegalStateException(
+                "cannot query shared resource status without a running session");
+
+        return session.isShared(resource);
     }
 
+    @Override
     public void waitUntilProjectInSVN(String projectName)
         throws RemoteException {
         RemoteWorkbenchBot.getInstance().waitUntil(
             SarosConditions.isInSVN(projectName));
     }
 
+    @Override
     public void waitUntilProjectNotInSVN(String projectName)
         throws RemoteException {
         RemoteWorkbenchBot.getInstance().waitUntil(
             SarosConditions.isNotInSVN(projectName));
     }
 
+    @Override
     public void waitUntilRevisionIsSame(String fullPath, String revision)
         throws RemoteException {
         RemoteWorkbenchBot.getInstance().waitUntil(
             SarosConditions.isRevisionSame(fullPath, revision));
     }
 
+    @Override
     public void waitUntilUrlIsSame(String fullPath, String url)
         throws RemoteException {
         RemoteWorkbenchBot.getInstance().waitUntil(
             SarosConditions.isUrlSame(fullPath, url));
     }
 
+    @Override
     public void waitUntilFileContentSame(final String otherClassContent,
         final String... fileNodes) throws RemoteException {
 
@@ -343,6 +386,7 @@ public final class PackageExplorerView extends StfRemoteObject implements
         });
     }
 
+    @Override
     public void waitUntilResourceIsShared(final String path)
         throws RemoteException {
         RemoteWorkbenchBot.getInstance().waitLongUntil(new DefaultCondition() {
@@ -356,6 +400,10 @@ public final class PackageExplorerView extends StfRemoteObject implements
             }
         });
     }
+
+    /*
+     * end of interface IPackageExplorerView implementation
+     */
 
     private void initContextMenuWrapper(SWTBotTreeItem treeItem,
         TreeItemType type) {
@@ -385,24 +433,39 @@ public final class PackageExplorerView extends StfRemoteObject implements
         return builder.toString();
     }
 
-    private String convertStreamToString(InputStream is) throws IOException {
-        if (is != null) {
-            Writer writer = new StringWriter();
-            char[] buffer = new char[8192];
-            try {
-                Reader reader = new InputStreamReader(is, "UTF-8");
-                int n;
-                while ((n = reader.read(buffer)) != -1) {
-                    writer.write(buffer, 0, n);
-                }
-            } finally {
-                is.close();
-                writer.close();
-            }
-            return writer.toString();
-        } else {
-            return "";
-        }
+    private String createProjectRegex(String projectName) {
+        return Pattern.quote(projectName) + "("
+            + Pattern.quote(PROJECT_SHARED_DECORATOR) + "|"
+            + Pattern.quote(PROJECT_PARTIAL_SHARED_DECORATOR) + ")?+";
     }
 
+    private String[] createNodeRegex(String projectName, String... nodes) {
+        List<String> regex = new ArrayList<String>(nodes.length + 1);
+
+        regex.add(createProjectRegex(projectName));
+
+        for (String node : nodes)
+            regex.add(Pattern.quote(node));
+
+        return regex.toArray(new String[0]);
+    }
+
+    private String convertStreamToString(InputStream is) throws IOException {
+        Writer writer = new StringWriter();
+        char[] buffer = new char[8192];
+
+        try {
+            Reader reader = new InputStreamReader(is, "UTF-8");
+            int n;
+
+            while ((n = reader.read(buffer)) != -1)
+                writer.write(buffer, 0, n);
+
+        } finally {
+            is.close();
+            writer.close();
+        }
+
+        return writer.toString();
+    }
 }

@@ -52,8 +52,8 @@ public class ConcurrentEditingTest extends StfTestCase {
             TypeOfCreateProject.NEW_PROJECT, ALICE, BOB);
         BOB.superBot().views().packageExplorerView()
             .waitUntilFileExists(Constants.PROJECT1 + "/" + FILE);
-        BOB.superBot().views().packageExplorerView().selectFile(Constants.PATH)
-            .open();
+        BOB.superBot().views().packageExplorerView()
+            .selectFile(Constants.PROJECT1, FILE).open();
 
         BOB.remoteBot().waitUntilEditorOpen(FILE);
         BOB.remoteBot().editor(FILE).navigateTo(0, 30);

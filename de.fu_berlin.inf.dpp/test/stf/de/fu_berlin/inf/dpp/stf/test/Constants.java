@@ -42,7 +42,7 @@ public interface Constants {
     public static final String FILE1 = "MyFile.xml";
     public static final String FILE2 = "MyFile2.xml";
     public static final String FILE3 = "file.txt";
-    public static final String[] PATH = { PROJECT1, FILE3 };
+
     /* Package name */
     public static final String PKG1 = "my.pkg";
     public static final String PKG2 = "my.pkg2";

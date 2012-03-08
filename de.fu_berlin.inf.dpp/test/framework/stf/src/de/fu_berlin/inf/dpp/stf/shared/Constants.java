@@ -21,6 +21,16 @@ public interface Constants {
     public final static String SHELL_COPY_PROJECT = "Copy Project";
     public final static String SHELL_DELETING_ACTIVE_ACCOUNT = "Deleting active account";
 
+    /*
+     * DECORATORS
+     */
+
+    public final static String PROJECT_SHARED_DECORATOR = Configuration
+        .getString("SharedProjectDecorator_shared");
+
+    public final static String PROJECT_PARTIAL_SHARED_DECORATOR = Configuration
+        .getString("SharedProjectDecorator_shared_partial");
+
     /**********************************************
      * 
      * Basic Widgets
