@@ -19,7 +19,6 @@ import org.jivesoftware.smackx.ServiceDiscoveryManager;
 import org.jivesoftware.smackx.bytestreams.socks5.Socks5Proxy;
 import org.picocontainer.annotations.Nullable;
 
-import de.fu_berlin.inf.dpp.SafeConnectionListener;
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.net.stun.IStunService;
 import de.fu_berlin.inf.dpp.net.upnp.IUPnPService;
