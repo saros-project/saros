@@ -214,11 +214,6 @@ public class Saros extends AbstractUIPlugin {
 
         setInitialized(false);
         setDefault(this);
-
-        sarosContext = SarosContext.getContextForSaros(this)
-            .withDotMonitor(dotMonitor).build();
-
-        SarosPluginContext.setSarosContext(sarosContext);
     }
 
     protected static void setInitialized(boolean initialized) {
@@ -247,6 +242,11 @@ public class Saros extends AbstractUIPlugin {
     public void start(BundleContext context) throws Exception {
 
         super.start(context);
+
+        sarosContext = SarosContext.getContextForSaros(this)
+            .withDotMonitor(dotMonitor).build();
+
+        SarosPluginContext.setSarosContext(sarosContext);
 
         sarosVersion = getBundle().getVersion().toString();
 

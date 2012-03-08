@@ -6,6 +6,9 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
+import org.eclipse.equinox.security.storage.ISecurePreferences;
+import org.eclipse.jface.preference.IPreferenceStore;
+import org.osgi.service.prefs.Preferences;
 import org.picocontainer.Characteristics;
 import org.picocontainer.ComponentAdapter;
 import org.picocontainer.MutablePicoContainer;
@@ -328,10 +331,10 @@ public class SarosContext {
         }
 
         // Initialize our dependency injection container
-        this.container = picoBuilder.build();
+        container = picoBuilder.build();
 
         // Add Adapter which creates ChildContainers
-        this.container.as(Characteristics.NO_CACHE).addAdapter(
+        container.as(Characteristics.NO_CACHE).addAdapter(
             new ProviderAdapter(new ChildContainerProvider(this.container)));
         /*
          * All singletons which exist for the whole plug-in life-cycle are
@@ -342,7 +345,15 @@ public class SarosContext {
          * tool support.
          */
 
-        this.container.addComponent(Saros.class, this.saros);
+        container.addComponent(Saros.class, saros);
+
+        container.addComponent(IPreferenceStore.class,
+            saros.getPreferenceStore());
+
+        container
+            .addComponent(ISecurePreferences.class, saros.getSecurePrefs());
+
+        container.addComponent(Preferences.class, saros.getConfigPrefs());
 
         Set<Component> contextComponents = new HashSet<Component>(
             Arrays.asList(COMPONENTS));
@@ -377,14 +388,14 @@ public class SarosContext {
         try {
             // Remove the component if an instance of it was already registered
             Class<?> clazz = toInjectInto.getClass();
-            ComponentAdapter<?> removed = this.container.removeComponent(clazz);
+            ComponentAdapter<?> removed = container.removeComponent(clazz);
             if (removed != null && clazz != Saros.class) {
                 log.warn(clazz.getName() + " added more than once!",
                     new StackTrace());
             }
 
             // Add the given instance to the container
-            this.container.addComponent(clazz, toInjectInto);
+            container.addComponent(clazz, toInjectInto);
 
             /*
              * Ask PicoContainer to inject into the component via fields
@@ -402,10 +413,10 @@ public class SarosContext {
      * have a different life cycle than the Saros plug-in.
      */
     public synchronized void initComponent(Object toInjectInto) {
-        ChildContainer dummyContainer = this.container
+        ChildContainer dummyContainer = container
             .getComponent(ChildContainer.class);
         dummyContainer.reinject(toInjectInto);
-        this.container.removeChildContainer(dummyContainer);
+        container.removeChildContainer(dummyContainer);
     }
 
     public <T> T getComponent(Class<T> tClass) {
@@ -460,7 +471,7 @@ public class SarosContext {
         }
 
         public SarosContext build() {
-            return new SarosContext(this.saros, this.dotMonitor);
+            return new SarosContext(saros, dotMonitor);
         }
     }
 }
