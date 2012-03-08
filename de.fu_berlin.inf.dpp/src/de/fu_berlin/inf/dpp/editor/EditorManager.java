@@ -77,7 +77,6 @@ import de.fu_berlin.inf.dpp.editor.annotations.ViewportAnnotation;
 import de.fu_berlin.inf.dpp.editor.internal.ContributionAnnotationManager;
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.editor.internal.IEditorAPI;
-import de.fu_berlin.inf.dpp.editor.internal.RevertBufferListener;
 import de.fu_berlin.inf.dpp.observables.FileReplacementInProgressObservable;
 import de.fu_berlin.inf.dpp.project.AbstractSarosSessionListener;
 import de.fu_berlin.inf.dpp.project.AbstractSharedProjectListener;
@@ -289,8 +288,6 @@ public class EditorManager implements IActivityProvider, Disposable {
 
     private ISarosSessionListener sessionListener = new AbstractSarosSessionListener() {
 
-        private RevertBufferListener buffListener;
-
         @Override
         public void sessionStarted(ISarosSession newSarosSession) {
             sarosSession = newSarosSession;
@@ -341,9 +338,6 @@ public class EditorManager implements IActivityProvider, Disposable {
 
                     sarosSession.removeListener(sharedProjectListener);
                     sarosSession.removeActivityProvider(EditorManager.this);
-
-                    if (buffListener != null)
-                        buffListener.dispose();
 
                     sarosSession = null;
                     lastEditTimes.clear();
@@ -1829,53 +1823,6 @@ public class EditorManager implements IActivityProvider, Disposable {
 
     public void dispose() {
         stopManager.removeBlockable(stopManagerListener);
-    }
-
-    /**
-     * Triggers a "Document Revert" by other session participants. This happens
-     * when a user with {@link User.Permission#WRITE_ACCESS} rejected changes in
-     * file buffer (e.g. "Close editor"+ "Do NOT save"). This method gets
-     * invoked, only when the user is a user with
-     * {@link User.Permission#WRITE_ACCESS}. It sends to other session
-     * participants two activityDataObjects which revert their documents:
-     * <ul>
-     * <li>TextEdit - replaces content of the document with new (reverted)
-     * content</li>
-     * <li>EditorAcitvity(Type.Saved) - saves the reverted document</li>
-     * </ul>
-     * 
-     * @param path
-     *            path of the document which was reverted
-     * @param newContent
-     *            new content of the document (after it was reverted)
-     * @param oldContent
-     *            old content of the document (before reverting)
-     */
-    public void triggerRevert(SPath path, String newContent, String oldContent) {
-
-        log.trace(".triggerRevert invoked");
-        log.trace(".triggerRevert File: " + path.toString());
-
-        // TODO Check if we are in the shared project!!
-
-        User localUser = sarosSession.getLocalUser();
-        int offset = 0;
-
-        /**
-         * TODO We should warn the user if he is reverting changes by other
-         * users with {@link User.Permission#WRITE_ACCESS}
-         * 
-         * TODO If the UndoManager knows which changes were ours, we could
-         * revert just those
-         */
-        IActivity textEditActivity = new TextEditActivity(localUser, offset,
-            newContent, oldContent, path);
-
-        IActivity saveActivity = new EditorActivity(localUser, Type.Saved, path);
-
-        fireActivity(textEditActivity);
-        fireActivity(saveActivity);
-
     }
 
     public Set<SPath> getRemoteOpenEditors() {
