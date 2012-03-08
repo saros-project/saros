@@ -277,8 +277,6 @@ public class CollaborationUtils {
                     : Messages.CollaborationUtils_project_plural_ending)));
 
         for (IProject project : projects) {
-            if (!sarosSession.isCompletelyShared(project))
-                result.append(Messages.CollaborationUtils_partial);
 
             long projectSize = 0;
             long files = 0;
@@ -316,7 +314,7 @@ public class CollaborationUtils {
                     files, format(projectSize)));
             } else {
                 result.append(String.format(
-                    "\nProject: %s, Files: %d, Size: %s", project.getName()
+                    "\nProject: %s, Files: %s, Size: %s", project.getName()
                         + " " + Messages.CollaborationUtils_partial, "N/A",
                     "N/A"));
             }
