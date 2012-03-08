@@ -1,11 +1,18 @@
 package de.fu_berlin.inf.dpp.whiteboard.gef.editpolicy;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.eclipse.draw2d.PositionConstants;
 import org.eclipse.draw2d.geometry.Dimension;
 import org.eclipse.draw2d.geometry.Point;
+import org.eclipse.gef.DragTracker;
 import org.eclipse.gef.GraphicalEditPart;
 import org.eclipse.gef.commands.Command;
 import org.eclipse.gef.editpolicies.ResizableEditPolicy;
+import org.eclipse.gef.handles.NonResizableHandleKit;
+import org.eclipse.gef.handles.ResizableHandleKit;
+import org.eclipse.gef.handles.ResizeHandle;
 import org.eclipse.gef.requests.ChangeBoundsRequest;
 import org.eclipse.gef.tools.ResizeTracker;
 
@@ -73,43 +80,7 @@ public class ResizableRatioScalingEditPolicy extends ResizableEditPolicy {
 		}
 	}
 
-	@Override
-	protected ResizeTracker getResizeTracker(int direction) {
-		return new ResizeTracker((GraphicalEditPart) getHost(), direction) {
-
-			/**
-			 * Overridden to generate and save additional resize percentage
-			 * information derived by the help from the ResizeTracker which are
-			 * then stored in the request
-			 */
-			@SuppressWarnings("unchecked")
-			@Override
-			protected void updateSourceRequest() {
-				super.updateSourceRequest();
-				ChangeBoundsRequest request = (ChangeBoundsRequest) getSourceRequest();
-				// note that the getOwner() method is the crucial
-				// method to determine the figure that is currently
-				// resized and that serves as basis for further
-				// percentage calculations
-				GraphicalEditPart dragSource = getOwner();
-				Dimension sizeDelta = request.getSizeDelta();
-				Dimension originalSize = dragSource.getFigure().getSize();
-				// calculating percentage resize values, for maximum
-				// precision we save the result as double value
-				double percentageHeight = 100d * sizeDelta.height
-						/ originalSize.height;
-				double percentageWidth = 100d * sizeDelta.width
-						/ originalSize.width;
-				// saving percentage information
-				request.getExtendedData().put(PERCENTAGE_HEIGHT,
-						percentageHeight);
-				request.getExtendedData()
-						.put(PERCENTAGE_WIDTH, percentageWidth);
-			}
-		};
-	}
-
-	/**
+	/*
 	 * Overridden to adapt the feedback to the new percentage oriented resizing
 	 * mechanism.
 	 */
@@ -130,4 +101,135 @@ public class ResizableRatioScalingEditPolicy extends ResizableEditPolicy {
 		recalculateResizeData(request, (GraphicalEditPart) getHost());
 		return super.getResizeCommand(request);
 	}
+
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	@Override
+	protected List createSelectionHandles() {
+		List list = new ArrayList();
+		int directions = getResizeDirections();
+		if (directions == 0)
+			NonResizableHandleKit.addHandles((GraphicalEditPart) getHost(),
+					list);
+		else if (directions != -1) {
+			ResizableHandleKit.addMoveHandle((GraphicalEditPart) getHost(),
+					list);
+			if ((directions & PositionConstants.EAST) != 0)
+				list.add(new CustomResizeHandle((GraphicalEditPart) getHost(),
+						PositionConstants.EAST));
+			else
+				NonResizableHandleKit.addHandle((GraphicalEditPart) getHost(),
+						list, PositionConstants.EAST);
+			if ((directions & PositionConstants.SOUTH_EAST) == PositionConstants.SOUTH_EAST)
+				list.add(new CustomResizeHandle((GraphicalEditPart) getHost(),
+						PositionConstants.SOUTH_EAST));
+			else
+				NonResizableHandleKit.addHandle((GraphicalEditPart) getHost(),
+						list, PositionConstants.SOUTH_EAST);
+			if ((directions & PositionConstants.SOUTH) != 0)
+				list.add(new CustomResizeHandle((GraphicalEditPart) getHost(),
+						PositionConstants.SOUTH));
+			else
+				NonResizableHandleKit.addHandle((GraphicalEditPart) getHost(),
+						list, PositionConstants.SOUTH);
+			if ((directions & PositionConstants.SOUTH_WEST) == PositionConstants.SOUTH_WEST)
+				list.add(new CustomResizeHandle((GraphicalEditPart) getHost(),
+						PositionConstants.SOUTH_WEST));
+			else
+				NonResizableHandleKit.addHandle((GraphicalEditPart) getHost(),
+						list, PositionConstants.SOUTH_WEST);
+			if ((directions & PositionConstants.WEST) != 0)
+				list.add(new CustomResizeHandle((GraphicalEditPart) getHost(),
+						PositionConstants.WEST));
+			else
+				NonResizableHandleKit.addHandle((GraphicalEditPart) getHost(),
+						list, PositionConstants.WEST);
+			if ((directions & PositionConstants.NORTH_WEST) == PositionConstants.NORTH_WEST)
+				list.add(new CustomResizeHandle((GraphicalEditPart) getHost(),
+						PositionConstants.NORTH_WEST));
+			else
+				NonResizableHandleKit.addHandle((GraphicalEditPart) getHost(),
+						list, PositionConstants.NORTH_WEST);
+			if ((directions & PositionConstants.NORTH) != 0)
+				list.add(new CustomResizeHandle((GraphicalEditPart) getHost(),
+						PositionConstants.NORTH));
+			else
+				NonResizableHandleKit.addHandle((GraphicalEditPart) getHost(),
+						list, PositionConstants.NORTH);
+			if ((directions & PositionConstants.NORTH_EAST) == PositionConstants.NORTH_EAST)
+				list.add(new CustomResizeHandle((GraphicalEditPart) getHost(),
+						PositionConstants.NORTH_EAST));
+			else
+				NonResizableHandleKit.addHandle((GraphicalEditPart) getHost(),
+						list, PositionConstants.NORTH_EAST);
+		} else {
+			ResizableHandleKit.addMoveHandle((GraphicalEditPart) getHost(),
+					list);
+			list.add(new CustomResizeHandle((GraphicalEditPart) getHost(),
+					PositionConstants.EAST));
+			list.add(new CustomResizeHandle((GraphicalEditPart) getHost(),
+					PositionConstants.SOUTH_EAST));
+			list.add(new CustomResizeHandle((GraphicalEditPart) getHost(),
+					PositionConstants.SOUTH));
+			list.add(new CustomResizeHandle((GraphicalEditPart) getHost(),
+					PositionConstants.SOUTH_WEST));
+			list.add(new CustomResizeHandle((GraphicalEditPart) getHost(),
+					PositionConstants.WEST));
+			list.add(new CustomResizeHandle((GraphicalEditPart) getHost(),
+					PositionConstants.NORTH_WEST));
+			list.add(new CustomResizeHandle((GraphicalEditPart) getHost(),
+					PositionConstants.NORTH));
+			list.add(new CustomResizeHandle((GraphicalEditPart) getHost(),
+					PositionConstants.NORTH_EAST));
+
+		}
+		return list;
+	}
+
+	// A {@link ResizeHandle} using a custom DragTracker for percentage based
+	// resizing
+	class CustomResizeHandle extends ResizeHandle {
+
+		int direction;
+
+		public CustomResizeHandle(GraphicalEditPart owner, int direction) {
+			super(owner, direction);
+			this.direction = direction;
+		}
+
+		/**
+		 * Provides a custom {@link ResizeTracker} saving additional resize
+		 * percentage information from the resize source in the source request
+		 * later dispatched to respective EditParts.
+		 */
+		@Override
+		protected DragTracker createDragTracker() {
+			return new ResizeTracker(getOwner(), direction) {
+				@SuppressWarnings("unchecked")
+				@Override
+				protected void updateSourceRequest() {
+					super.updateSourceRequest();
+					ChangeBoundsRequest request = (ChangeBoundsRequest) getSourceRequest();
+					// note that the getOwner() method is the crucial
+					// method to determine the figure that is currently
+					// resized and that serves as basis for further
+					// percentage calculations
+					GraphicalEditPart dragSource = getOwner();
+					Dimension sizeDelta = request.getSizeDelta();
+					Dimension originalSize = dragSource.getFigure().getSize();
+					// calculating percentage resize values, for maximum
+					// precision we save the result as double value
+					double percentageHeight = 100d * sizeDelta.height
+							/ originalSize.height;
+					double percentageWidth = 100d * sizeDelta.width
+							/ originalSize.width;
+					// saving percentage information
+					request.getExtendedData().put(PERCENTAGE_HEIGHT,
+							percentageHeight);
+					request.getExtendedData().put(PERCENTAGE_WIDTH,
+							percentageWidth);
+				}
+			};
+		}
+	}
+
 }
