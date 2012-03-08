@@ -57,7 +57,6 @@ import org.picocontainer.Disposable;
 import org.picocontainer.annotations.Inject;
 import org.picocontainer.annotations.Nullable;
 
-import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.activities.business.AbstractActivityReceiver;
@@ -429,19 +428,12 @@ public class EditorManager implements IActivityProvider, Disposable {
     /**
      * @Inject
      */
-    protected Saros saros;
-
-    /**
-     * @Inject
-     */
     protected StopManager stopManager;
 
-    public EditorManager(Saros saros, SarosSessionManager sessionManager,
+    public EditorManager(SarosSessionManager sessionManager,
         StopManager stopManager, EditorAPI editorApi) {
 
         log.trace("EditorManager initialized");
-
-        this.saros = saros;
 
         editorAPI = editorApi;
         sessionManager.addSarosSessionListener(this.sessionListener);
