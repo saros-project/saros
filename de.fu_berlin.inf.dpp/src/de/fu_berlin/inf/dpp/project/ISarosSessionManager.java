@@ -2,11 +2,9 @@ package de.fu_berlin.inf.dpp.project;
 
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
-import org.jivesoftware.smack.Connection;
 import org.jivesoftware.smack.XMPPException;
 import org.joda.time.DateTime;
 
@@ -14,7 +12,6 @@ import de.fu_berlin.inf.dpp.activities.ProjectExchangeInfo;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.communication.muc.negotiation.MUCSessionPreferences;
 import de.fu_berlin.inf.dpp.invitation.OutgoingProjectNegotiation;
-import de.fu_berlin.inf.dpp.net.ConnectionState;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
 import de.fu_berlin.inf.dpp.util.VersionManager.VersionInfo;
@@ -106,14 +103,6 @@ public interface ISarosSessionManager {
     public void invitationReceived(JID from, String sessionID, int colorID,
         VersionInfo versionInfo, DateTime sessionStart, SarosUI sarosUI,
         String invitationID, MUCSessionPreferences comPrefs, String description);
-
-    /*
-     * @see IConnectionListener
-     */
-    public void connectionStateChanged(Connection connection,
-        ConnectionState newState);
-
-    public void onReconnect(Map<JID, Integer> expectedSequenceNumbers);
 
     /**
      * initiate the ({@link OutgoingProjectNegotiation project exchanging}) with

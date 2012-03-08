@@ -69,16 +69,15 @@ public class SarosUI {
     private static final Logger log = Logger.getLogger(SarosUI.class.getName());
 
     final protected SarosSessionManager sessionManager;
-    final protected VersionManager versionManager;
+    final protected VersionManager manager;
     final protected DataTransferManager dataTransferManager;
     final protected PreferenceUtils preferenceUtils;
 
-    public SarosUI(SarosSessionManager sessionManager,
-        VersionManager versionManager, DataTransferManager dataTransferManager,
-        PreferenceUtils preferenceUtils) {
+    public SarosUI(SarosSessionManager sessionManager, VersionManager versionManager,
+        DataTransferManager dataTransferManager, PreferenceUtils preferenceUtils) {
 
         this.sessionManager = sessionManager;
-        this.versionManager = versionManager;
+        this.manager = versionManager;
         this.dataTransferManager = dataTransferManager;
         this.preferenceUtils = preferenceUtils;
 
@@ -88,7 +87,7 @@ public class SarosUI {
         IncomingSessionNegotiation process) {
 
         JoinSessionWizard sessionWizard = new JoinSessionWizard(process,
-            dataTransferManager, preferenceUtils, versionManager);
+            dataTransferManager, preferenceUtils, manager);
         final WizardDialogAccessable wizardDialog = new WizardDialogAccessable(
             EditorAPI.getShell(), sessionWizard);
 

@@ -8,7 +8,6 @@ import org.eclipse.core.runtime.SubMonitor;
 import org.joda.time.DateTime;
 import org.picocontainer.annotations.Inject;
 
-import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.SarosContext;
 import de.fu_berlin.inf.dpp.User.Permission;
 import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
@@ -41,7 +40,6 @@ public class IncomingSessionNegotiation extends InvitationProcess {
     protected DateTime sessionStart;
     protected ISarosSession sarosSession;
     protected String invitationID;
-    protected Saros saros;
 
     @Inject
     SessionIDObservable sessionID;
@@ -58,13 +56,13 @@ public class IncomingSessionNegotiation extends InvitationProcess {
         InvitationProcessObservable invitationProcesses,
         VersionManager versionManager, VersionInfo remoteVersionInfo,
         DateTime sessionStart, SarosUI sarosUI, String invitationID,
-        Saros saros, String description, SarosContext sarosContext) {
+        String description, SarosContext sarosContext) {
         super(from, description, colorID, sarosContext);
 
         this.versionInfo = determineVersion(remoteVersionInfo);
         this.sessionStart = sessionStart;
         this.invitationID = invitationID;
-        this.saros = saros;
+
         this.sessionManager = sessionManager;
         this.versionManager = versionManager;
 
