@@ -23,17 +23,20 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicReference;
 
-import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+import org.jivesoftware.smack.Connection;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smackx.ChatState;
 
-import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.communication.muc.events.IMUCManagerListener;
 import de.fu_berlin.inf.dpp.communication.muc.negotiation.MUCSessionPreferences;
 import de.fu_berlin.inf.dpp.communication.muc.session.MUCSession;
+import de.fu_berlin.inf.dpp.net.ConnectionState;
+import de.fu_berlin.inf.dpp.net.IConnectionListener;
+import de.fu_berlin.inf.dpp.net.SarosNet;
 
 /**
  * This class manages the creation and destruction of {@link MUCSession}s.
@@ -46,13 +49,28 @@ import de.fu_berlin.inf.dpp.communication.muc.session.MUCSession;
 public class MUCManager {
     private static final Logger log = Logger.getLogger(MUCManager.class);
 
-    protected Saros saros;
     protected Set<MUCSession> mucSessions = new HashSet<MUCSession>();
     protected List<IMUCManagerListener> mucManagerListeners = new ArrayList<IMUCManagerListener>();
 
-    public MUCManager(Saros saros) {
-        log.setLevel(Level.DEBUG);
-        this.saros = saros;
+    protected AtomicReference<Connection> connection = new AtomicReference<Connection>(
+        null);
+
+    protected final IConnectionListener listener = new IConnectionListener() {
+
+        @Override
+        public void connectionStateChanged(Connection connection,
+            ConnectionState state) {
+
+            if (state == ConnectionState.CONNECTED)
+                MUCManager.this.connection.set(connection);
+            else
+                MUCManager.this.connection.set(null);
+        }
+
+    };
+
+    public MUCManager(SarosNet sarosNet) {
+        sarosNet.addListener(listener);
     }
 
     /**
@@ -65,7 +83,10 @@ public class MUCManager {
      *         2010/11/23
      */
     public MUCSession connectMUC(MUCSessionPreferences preferences) {
-        if (!saros.getSarosNet().isConnected()) {
+
+        Connection connection = this.connection.get();
+
+        if (connection == null) {
             log.error("Can't join chat: Not connected.");
             return null;
         }
@@ -73,8 +94,7 @@ public class MUCManager {
         log.debug("Joining MUC...");
 
         boolean createdRoom = false;
-        MUCSession mucSession = new MUCSession(saros.getSarosNet()
-            .getConnection(), preferences);
+        MUCSession mucSession = new MUCSession(connection, preferences);
         try {
             createdRoom = mucSession.connect();
         } catch (XMPPException e) {
