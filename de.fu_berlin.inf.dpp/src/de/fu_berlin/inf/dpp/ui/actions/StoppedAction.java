@@ -18,7 +18,7 @@ import de.fu_berlin.inf.dpp.util.ValueChangeListener;
  * The icon of this action is used as visual indicator for the user if the
  * {@link StopManager} blocked the project.
  * 
- * Pressing the button has no effect for users, unless eclipse ist started with
+ * Pressing the button has no effect for users, unless eclipse is started with
  * assertions enabled. Then it is possible to manually unblock the project for
  * debugging purposes.
  */
