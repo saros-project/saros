@@ -26,7 +26,6 @@ import de.fu_berlin.inf.dpp.SarosContext;
 import de.fu_berlin.inf.dpp.exceptions.StreamException;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.net.internal.StreamServiceManager;
 import de.fu_berlin.inf.dpp.net.internal.StreamSession;
 import de.fu_berlin.inf.dpp.net.internal.StreamSession.StreamSessionListener;
 import de.fu_berlin.inf.dpp.observables.InvitationProcessObservable;
@@ -46,8 +45,6 @@ public abstract class InvitationProcess {
     protected String description;
     protected final int colorID;
 
-    @Inject
-    protected StreamServiceManager streamServiceManager;
     @Inject
     protected SarosSessionManager sarosSessionManager;
     protected StreamSession streamSession;
