@@ -20,7 +20,7 @@ import de.fu_berlin.inf.dpp.util.Utils;
 @Component(module = "net")
 public class RosterTracker implements IConnectionListener {
 
-    static final Logger log = Logger.getLogger(RosterTracker.class.getName());
+    static final Logger log = Logger.getLogger(RosterTracker.class);
 
     protected Connection connection;
 

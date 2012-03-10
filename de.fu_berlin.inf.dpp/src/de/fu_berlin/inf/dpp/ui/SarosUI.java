@@ -66,7 +66,7 @@ import de.fu_berlin.inf.dpp.util.VersionManager;
 @Component(module = "ui")
 public class SarosUI {
 
-    private static final Logger log = Logger.getLogger(SarosUI.class.getName());
+    private static final Logger log = Logger.getLogger(SarosUI.class);
 
     final protected SarosSessionManager sessionManager;
     final protected VersionManager manager;

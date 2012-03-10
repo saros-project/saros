@@ -20,7 +20,7 @@ import org.eclipse.swt.widgets.Listener;
  */
 public class LinkListener implements Listener {
 
-    private Logger log = Logger.getLogger(LinkListener.class.getName());
+    private Logger log = Logger.getLogger(LinkListener.class);
 
     public LinkListener() {
         // default constructor

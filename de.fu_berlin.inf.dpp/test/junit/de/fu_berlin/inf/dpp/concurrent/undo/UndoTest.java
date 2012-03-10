@@ -22,7 +22,7 @@ import de.fu_berlin.inf.dpp.concurrent.undo.OperationHistory.Type;
  */
 public class UndoTest {
 
-    // private static Logger log = Logger.getLogger(UndoTest.class.getName());
+    // private static Logger log = Logger.getLogger(UndoTest.class);
 
     protected IProject project;
 
