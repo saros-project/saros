@@ -4,8 +4,7 @@
  * 
  * Notable contents include:
  * <ol>
- * <li>Useful ADTs, like {@link MappedList}, {@link Pair},
- * {@link UncloseableInputStream}, or {@link AutoHashMap}.
+ * <li>Useful ADTs, like {@link MappedList}, {@link Pair} or {@link AutoHashMap}.
  * <li>Some classes which include more specific static utility functions, 
  * like {@link ActivityUtils}, {@link FileUtils}, {@ArrayUtils}.
  * <li>{@link Utils}, a class full of useful functions, including 
