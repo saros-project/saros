@@ -105,7 +105,7 @@ import de.fu_berlin.inf.dpp.util.VersionManager.VersionInfo;
 @Component(module = "net")
 public class XMPPTransmitter implements ITransmitter, IConnectionListener {
 
-    private static Logger log = Logger.getLogger(XMPPTransmitter.class);
+    private static final Logger log = Logger.getLogger(XMPPTransmitter.class);
 
     /**
      * Maximum retry attempts to send an activity. Retry attempts will switch to

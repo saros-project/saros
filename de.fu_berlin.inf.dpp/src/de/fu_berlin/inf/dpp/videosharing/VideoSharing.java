@@ -78,7 +78,7 @@ import de.fu_berlin.inf.dpp.videosharing.source.Screen;
 @Component(module = "net")
 public class VideoSharing {
 
-    private static Logger log = Logger.getLogger(VideoSharing.class);
+    private static final Logger log = Logger.getLogger(VideoSharing.class);
 
     public static final String VIDEO_SHARING = "de.fu_berlin.inf.dpp.videosharing";
 

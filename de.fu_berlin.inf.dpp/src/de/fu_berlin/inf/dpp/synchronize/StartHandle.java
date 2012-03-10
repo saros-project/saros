@@ -11,7 +11,7 @@ import de.fu_berlin.inf.dpp.util.StackTrace;
 
 public class StartHandle {
 
-    private static Logger log = Logger.getLogger(StartHandle.class);
+    private static final Logger log = Logger.getLogger(StartHandle.class);
 
     protected StopManager stopManager;
 

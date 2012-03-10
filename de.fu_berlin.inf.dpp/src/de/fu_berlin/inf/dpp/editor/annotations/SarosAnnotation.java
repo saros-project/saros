@@ -19,7 +19,7 @@ import de.fu_berlin.inf.dpp.util.Utils;
  * Configuration of the annotations is done in the plugin-xml.
  */
 public abstract class SarosAnnotation extends Annotation {
-    private static Logger log = Logger.getLogger(SarosAnnotation.class);
+    private static final Logger log = Logger.getLogger(SarosAnnotation.class);
 
     /**
      * Source of this annotation (JID).

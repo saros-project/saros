@@ -15,8 +15,8 @@ import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 @Component(module = "net")
 public class RequestActivityExtension extends SessionDefaultPacketExtension {
 
-    private static Logger log = Logger.getLogger(RequestActivityExtension.class
-        .getName());
+    private static final Logger log = Logger
+        .getLogger(RequestActivityExtension.class.getName());
 
     public RequestActivityExtension(SessionIDObservable sessionIDObservable) {
         super(sessionIDObservable, "requestActivity");

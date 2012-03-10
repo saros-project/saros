@@ -89,7 +89,7 @@ public class EditorAPI implements IEditorAPI {
 
     }
 
-    private static Logger log = Logger.getLogger(EditorAPI.class);
+    private static final Logger log = Logger.getLogger(EditorAPI.class);
 
     protected final VerifyKeyListener keyVerifier = new VerifyKeyListener() {
         public void verifyKey(VerifyEvent event) {

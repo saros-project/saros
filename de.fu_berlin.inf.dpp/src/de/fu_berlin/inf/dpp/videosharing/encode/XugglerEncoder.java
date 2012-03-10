@@ -51,7 +51,7 @@ import de.fu_berlin.inf.dpp.videosharing.source.ImageSource;
  */
 public class XugglerEncoder extends Encoder {
     @SuppressWarnings("unused")
-    private static Logger log = Logger.getLogger(XugglerEncoder.class);
+    private static final Logger log = Logger.getLogger(XugglerEncoder.class);
 
     /**
      * Throw error when {@link #slowEncoding} bigger than this

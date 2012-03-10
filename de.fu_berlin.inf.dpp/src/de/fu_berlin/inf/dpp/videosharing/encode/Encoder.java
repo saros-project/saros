@@ -46,7 +46,7 @@ import de.fu_berlin.inf.dpp.videosharing.source.ImageSource;
  */
 public abstract class Encoder implements Runnable {
 
-    private static Logger log = Logger.getLogger(Encoder.class);
+    private static final Logger log = Logger.getLogger(Encoder.class);
 
     @Inject
     protected Saros saros;

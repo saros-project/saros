@@ -33,7 +33,7 @@ import de.fu_berlin.inf.dpp.util.ValueChangeListener;
 @Component(module = "action")
 public class ConsistencyAction extends Action {
 
-    private static Logger log = Logger.getLogger(ConsistencyAction.class);
+    private static final Logger log = Logger.getLogger(ConsistencyAction.class);
 
     @Inject
     protected SarosSessionManager sessionManager;

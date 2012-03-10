@@ -12,8 +12,8 @@ import de.fu_berlin.inf.dpp.stf.client.tester.SarosTester;
 
 public class ShutdownRemoteEclipse {
 
-    private static Logger LOGGER = Logger.getLogger(ShutdownRemoteEclipse.class
-        .getName());
+    private static final Logger LOGGER = Logger
+        .getLogger(ShutdownRemoteEclipse.class.getName());
 
     public static void main(String... args) {
 

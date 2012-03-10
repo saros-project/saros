@@ -27,7 +27,8 @@ import de.fu_berlin.inf.dpp.util.Utils;
  */
 public class ProjectsAddedManager implements IActivityProvider {
 
-    private static Logger log = Logger.getLogger(ProjectsAddedManager.class);
+    private static final Logger log = Logger
+        .getLogger(ProjectsAddedManager.class);
 
     protected SarosSessionManager sessionManager;
     protected final List<IActivityListener> activityListeners = new LinkedList<IActivityListener>();

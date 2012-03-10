@@ -36,7 +36,7 @@ import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
  */
 public class FileZipper {
 
-    private static Logger log = Logger.getLogger(FileZipper.class);
+    private static final Logger log = Logger.getLogger(FileZipper.class);
 
     /*
      * Setting this value to high will result in cache misses either by the OS

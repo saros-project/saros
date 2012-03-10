@@ -19,7 +19,8 @@ import org.jivesoftware.smackx.bytestreams.socks5.Socks5Proxy;
  */
 public class NetworkingUtils {
 
-    protected static Logger log = Logger.getLogger("de.fu_berlin.inf.dpp.net");
+    protected static final Logger log = Logger
+        .getLogger("de.fu_berlin.inf.dpp.net");
 
     /**
      * Retrieves all IP addresses from all non-loopback-, running network

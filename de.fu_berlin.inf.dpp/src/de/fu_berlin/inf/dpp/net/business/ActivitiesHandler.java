@@ -28,7 +28,7 @@ import de.fu_berlin.inf.dpp.util.Utils;
 @Component(module = "net")
 public class ActivitiesHandler {
 
-    private static Logger log = Logger.getLogger(ActivitiesHandler.class
+    private static final Logger log = Logger.getLogger(ActivitiesHandler.class
         .getName());
 
     @Inject

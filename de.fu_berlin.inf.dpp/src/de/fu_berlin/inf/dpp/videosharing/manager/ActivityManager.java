@@ -42,7 +42,7 @@ import de.fu_berlin.inf.dpp.videosharing.source.ImageSource;
  */
 public class ActivityManager implements Disposable {
 
-    private static Logger log = Logger.getLogger(ActivityManager.class);
+    private static final Logger log = Logger.getLogger(ActivityManager.class);
 
     ImageSource imageSource;
     ObjectInputStream objectIn;

@@ -42,7 +42,7 @@ import de.fu_berlin.inf.dpp.videosharing.encode.Encoder;
  */
 public class ConnectionManager implements Disposable {
 
-    private static Logger log = Logger.getLogger(ConnectionManager.class);
+    private static final Logger log = Logger.getLogger(ConnectionManager.class);
 
     @Inject
     protected Saros saros;

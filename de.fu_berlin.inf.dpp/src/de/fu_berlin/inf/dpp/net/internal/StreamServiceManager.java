@@ -112,7 +112,8 @@ import de.fu_berlin.inf.dpp.util.ValueChangeListener;
 @Component(module = "net")
 public class StreamServiceManager implements Startable {
 
-    public static Logger log = Logger.getLogger(StreamServiceManager.class);
+    public static final Logger log = Logger
+        .getLogger(StreamServiceManager.class);
 
     /**
      * Timeout in seconds for canceling negotiations

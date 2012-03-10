@@ -18,7 +18,7 @@ import de.javawi.jstun.test.DiscoveryTest;
 
 public class StunServiceImpl implements IStunService {
 
-    protected static Logger log = Logger.getLogger(StunServiceImpl.class);
+    protected static final Logger log = Logger.getLogger(StunServiceImpl.class);
 
     /**
      * Set, if a local IP IS a public IP. (e.g. direct connection)

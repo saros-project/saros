@@ -45,7 +45,7 @@ import de.fu_berlin.inf.dpp.videosharing.exceptions.DecodingException;
  * @author Stefan Rossbach
  */
 public class ImageTileDecoder extends Decoder {
-    private static Logger log = Logger.getLogger(ImageTileEncoder.class);
+    private static final Logger log = Logger.getLogger(ImageTileEncoder.class);
 
     private ObjectInputStream objectInput;
 

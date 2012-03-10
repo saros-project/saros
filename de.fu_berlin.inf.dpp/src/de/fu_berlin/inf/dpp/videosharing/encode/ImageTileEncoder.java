@@ -142,7 +142,7 @@ public final class ImageTileEncoder extends Encoder {
         }
     }
 
-    private static Logger log = Logger.getLogger(ImageTileEncoder.class);
+    private static final Logger log = Logger.getLogger(ImageTileEncoder.class);
 
     private final static int MAX_ALLOWED_FRAMES_TO_DROP = 20;
 

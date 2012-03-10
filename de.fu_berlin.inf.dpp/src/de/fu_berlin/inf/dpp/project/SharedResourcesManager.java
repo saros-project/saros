@@ -106,7 +106,7 @@ public class SharedResourcesManager extends AbstractActivityProvider implements
      */
     static final int INTERESTING_EVENTS = IResourceChangeEvent.POST_CHANGE;
 
-    static Logger log = Logger.getLogger(SharedResourcesManager.class);
+    static final Logger log = Logger.getLogger(SharedResourcesManager.class);
 
     /**
      * If the StopManager has paused the project, the SharedResourcesManager

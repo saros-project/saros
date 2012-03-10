@@ -72,7 +72,7 @@ import de.fu_berlin.inf.dpp.util.Utils;
 @Component(module = "undo")
 public class UndoManager implements Disposable, IActivityProvider {
 
-	private static Logger log = Logger.getLogger(UndoManager.class);
+	private static final Logger log = Logger.getLogger(UndoManager.class);
 
 	protected List<TextEditActivity> expectedActivities =
 		new LinkedList<TextEditActivity>();

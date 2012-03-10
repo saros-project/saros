@@ -47,7 +47,7 @@ import de.fu_berlin.inf.dpp.project.ISarosSession;
  */
 public class FileUtils {
 
-    private static Logger log = Logger.getLogger(FileUtils.class);
+    private static final Logger log = Logger.getLogger(FileUtils.class);
 
     private FileUtils() {
         // no instantiation allowed

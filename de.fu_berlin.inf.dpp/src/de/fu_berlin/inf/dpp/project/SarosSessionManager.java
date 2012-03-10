@@ -96,8 +96,8 @@ import de.fu_berlin.inf.dpp.util.VersionManager.VersionInfo;
 @Component(module = "core")
 public class SarosSessionManager implements ISarosSessionManager {
 
-    private static Logger log = Logger.getLogger(SarosSessionManager.class
-        .getName());
+    private static final Logger log = Logger
+        .getLogger(SarosSessionManager.class.getName());
 
     @Inject
     protected SarosSessionObservable sarosSessionObservable;

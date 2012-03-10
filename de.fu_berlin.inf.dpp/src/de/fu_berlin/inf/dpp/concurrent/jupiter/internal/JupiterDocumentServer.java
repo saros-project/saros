@@ -22,7 +22,8 @@ import de.fu_berlin.inf.dpp.net.JID;
  */
 public class JupiterDocumentServer {
 
-    private static Logger log = Logger.getLogger(JupiterDocumentServer.class);
+    private static final Logger log = Logger
+        .getLogger(JupiterDocumentServer.class);
 
     /**
      * List of proxy clients.

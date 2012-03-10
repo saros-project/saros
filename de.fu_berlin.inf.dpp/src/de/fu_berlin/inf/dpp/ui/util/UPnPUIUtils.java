@@ -13,7 +13,7 @@ import de.fu_berlin.inf.dpp.ui.Messages;
  * Class for UPnP related UI methods
  */
 public class UPnPUIUtils {
-    protected static Logger log = Logger.getLogger(UPnPUIUtils.class);
+    protected static final Logger log = Logger.getLogger(UPnPUIUtils.class);
 
     /**
      * Setups gateway SWT controls by populating a gateway combobox and

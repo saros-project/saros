@@ -53,7 +53,7 @@ import de.fu_berlin.inf.dpp.videosharing.activities.VideoActivity;
  */
 public class Screen implements ImageSource {
     @SuppressWarnings("unused")
-    private static Logger log = Logger.getLogger(Screen.class);
+    private static final Logger log = Logger.getLogger(Screen.class);
 
     @Inject
     protected Saros saros;

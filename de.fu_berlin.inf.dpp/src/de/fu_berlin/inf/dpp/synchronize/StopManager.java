@@ -41,7 +41,7 @@ import de.fu_berlin.inf.dpp.util.Utils;
 @Component(module = "core")
 public class StopManager implements IActivityProvider {
 
-    private static Logger log = Logger.getLogger(StopManager.class);
+    private static final Logger log = Logger.getLogger(StopManager.class);
 
     protected static Random random = new Random();
 

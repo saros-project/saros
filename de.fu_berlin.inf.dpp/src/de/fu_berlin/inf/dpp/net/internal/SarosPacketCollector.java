@@ -23,7 +23,8 @@ public class SarosPacketCollector implements PacketListener {
         public void cancelPacketCollector(SarosPacketCollector collector);
     }
 
-    private static Logger log = Logger.getLogger(SarosPacketCollector.class);
+    private static final Logger log = Logger
+        .getLogger(SarosPacketCollector.class);
     private boolean hasReveived = false;
 
     /**

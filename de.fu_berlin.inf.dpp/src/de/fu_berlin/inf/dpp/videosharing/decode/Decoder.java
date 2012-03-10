@@ -48,7 +48,7 @@ import de.fu_berlin.inf.dpp.videosharing.player.VideoDisplay;
  */
 public abstract class Decoder implements Runnable, Disposable {
 
-    private static Logger log = Logger.getLogger(Decoder.class);
+    private static final Logger log = Logger.getLogger(Decoder.class);
 
     protected VideoSharingSession videoSharingSession;
 

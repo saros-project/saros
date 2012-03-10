@@ -38,7 +38,7 @@ import de.fu_berlin.inf.dpp.net.internal.StreamSession.StreamSessionListener;
  */
 public abstract class StreamJob extends Job {
 
-    private static Logger log = Logger.getLogger(StreamJob.class);
+    private static final Logger log = Logger.getLogger(StreamJob.class);
 
     /**
      * {@link #streamSession} had an exception

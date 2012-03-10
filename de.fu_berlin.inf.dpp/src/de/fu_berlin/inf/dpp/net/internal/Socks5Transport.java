@@ -54,7 +54,7 @@ import de.fu_berlin.inf.dpp.util.Utils;
  */
 public class Socks5Transport extends BytestreamTransport {
 
-    private static Logger log = Logger.getLogger(Socks5Transport.class);
+    private static final Logger log = Logger.getLogger(Socks5Transport.class);
     private static final byte BIDIRECTIONAL_TEST_BYTE = 0x1A;
     private static final int TEST_STREAM_TIMEOUT = 2000;
     /*

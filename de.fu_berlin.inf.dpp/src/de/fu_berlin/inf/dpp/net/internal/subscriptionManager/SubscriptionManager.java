@@ -45,7 +45,8 @@ import de.fu_berlin.inf.dpp.util.Utils;
  */
 @Component(module = "net")
 public class SubscriptionManager {
-    private static Logger log = Logger.getLogger(SubscriptionManager.class);
+    private static final Logger log = Logger
+        .getLogger(SubscriptionManager.class);
 
     private Connection connection = null;
     /**

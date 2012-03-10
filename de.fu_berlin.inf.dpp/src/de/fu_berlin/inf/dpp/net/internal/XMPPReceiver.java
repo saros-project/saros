@@ -44,7 +44,7 @@ import de.fu_berlin.inf.dpp.util.Utils;
 @Component(module = "net")
 public class XMPPReceiver {
 
-    private static Logger log = Logger.getLogger(XMPPReceiver.class);
+    private static final Logger log = Logger.getLogger(XMPPReceiver.class);
 
     @Inject
     protected IncomingTransferObjectExtensionProvider incomingExtProv;

@@ -31,7 +31,7 @@ import de.fu_berlin.inf.dpp.util.StackTrace;
  */
 class EditorPool {
 
-    private static Logger log = Logger.getLogger(EditorPool.class);
+    private static final Logger log = Logger.getLogger(EditorPool.class);
 
     protected EditorManager editorManager;
 

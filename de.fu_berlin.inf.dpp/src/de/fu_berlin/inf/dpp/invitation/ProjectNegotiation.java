@@ -23,7 +23,8 @@ import de.fu_berlin.inf.dpp.project.SarosSessionManager;
  */
 public abstract class ProjectNegotiation {
 
-    private static Logger log = Logger.getLogger(ProjectNegotiation.class);
+    private static final Logger log = Logger
+        .getLogger(ProjectNegotiation.class);
 
     @Inject
     protected ProjectNegotiationObservable projectExchangeProcesses;

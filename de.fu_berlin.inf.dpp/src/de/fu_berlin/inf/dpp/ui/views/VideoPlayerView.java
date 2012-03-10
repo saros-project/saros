@@ -93,7 +93,7 @@ import de.fu_berlin.inf.nebula.explanation.explanatory.ListExplanatoryViewPart;
 @Component(module = "ui")
 public class VideoPlayerView extends ListExplanatoryViewPart implements
     VideoDisplay {
-    private static Logger log = Logger.getLogger(VideoPlayerView.class);
+    private static final Logger log = Logger.getLogger(VideoPlayerView.class);
 
     public static final String ID = "de.fu_berlin.inf.dpp.ui.views.VideoPlayerView"; //$NON-NLS-1$
 

@@ -42,8 +42,8 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
     /*
      * @see org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer
      */
-    protected static Logger log = Logger.getLogger(PreferenceInitializer.class
-        .getName());
+    protected static final Logger log = Logger
+        .getLogger(PreferenceInitializer.class.getName());
 
     @Override
     public void initializeDefaultPreferences() {
