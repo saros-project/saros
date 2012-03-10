@@ -51,7 +51,6 @@ import org.eclipse.core.runtime.jobs.JobChangeAdapter;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.swt.widgets.Shell;
-import org.picocontainer.Disposable;
 import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.Saros;
@@ -67,7 +66,6 @@ import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.observables.FileReplacementInProgressObservable;
 import de.fu_berlin.inf.dpp.synchronize.Blockable;
-import de.fu_berlin.inf.dpp.synchronize.StopManager;
 import de.fu_berlin.inf.dpp.ui.util.CollaborationUtils;
 import de.fu_berlin.inf.dpp.util.FileUtils;
 import de.fu_berlin.inf.dpp.util.Utils;
@@ -89,7 +87,7 @@ import de.fu_berlin.inf.dpp.vcs.VCSResourceInfo;
  */
 @Component(module = "core")
 public class SharedResourcesManager extends AbstractActivityProvider implements
-    IResourceChangeListener, Disposable {
+    IResourceChangeListener {
     /** The {@link IResourceChangeEvent}s we're going to register for. */
     /*
      * haferburg: We're really only interested in
@@ -117,8 +115,6 @@ public class SharedResourcesManager extends AbstractActivityProvider implements
     protected boolean pause = false;
 
     protected ISarosSession sarosSession;
-
-    protected StopManager stopManager;
 
     /**
      * Should return <code>true</code> while executing resource changes to avoid
@@ -154,6 +150,7 @@ public class SharedResourcesManager extends AbstractActivityProvider implements
         public void sessionStarted(ISarosSession newSarosSession) {
             sarosSession = newSarosSession;
             sarosSession.addActivityProvider(SharedResourcesManager.this);
+            sarosSession.getStopManager().addBlockable(stopManagerListener);
             ResourcesPlugin.getWorkspace().addResourceChangeListener(
                 SharedResourcesManager.this, INTERESTING_EVENTS);
         }
@@ -165,6 +162,7 @@ public class SharedResourcesManager extends AbstractActivityProvider implements
 
             assert sarosSession == oldSarosSession;
             sarosSession.removeActivityProvider(SharedResourcesManager.this);
+            sarosSession.getStopManager().removeBlockable(stopManagerListener);
             sarosSession = null;
         }
     };
@@ -180,16 +178,9 @@ public class SharedResourcesManager extends AbstractActivityProvider implements
 
     private ResourceActivityFilter pendingActivities = new ResourceActivityFilter();
 
-    public SharedResourcesManager(ISarosSessionManager sessionManager,
-        StopManager stopManager) {
+    public SharedResourcesManager(ISarosSessionManager sessionManager) {
         this.sessionManager = sessionManager;
         this.sessionManager.addSarosSessionListener(sessionListener);
-        this.stopManager = stopManager;
-        this.stopManager.addBlockable(stopManagerListener);
-    }
-
-    public void dispose() {
-        stopManager.removeBlockable(stopManagerListener);
     }
 
     /**

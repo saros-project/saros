@@ -101,7 +101,6 @@ import de.fu_berlin.inf.dpp.project.SharedResourcesManager;
 import de.fu_berlin.inf.dpp.project.internal.ChangeColorManager;
 import de.fu_berlin.inf.dpp.project.internal.PermissionManager;
 import de.fu_berlin.inf.dpp.project.internal.ProjectsAddedManager;
-import de.fu_berlin.inf.dpp.synchronize.StopManager;
 import de.fu_berlin.inf.dpp.ui.LocalPresenceTracker;
 import de.fu_berlin.inf.dpp.ui.RemoteProgressManager;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
@@ -215,7 +214,6 @@ public class SarosContext {
         Component.create(SessionViewOpener.class),
         Component.create(SharedResourcesManager.class),
         Component.create(StatisticManager.class),
-        Component.create(StopManager.class),
         Component.create(AudioServiceManager.class),
         Component.create(MixerManager.class),
         Component.create(UndoManager.class),

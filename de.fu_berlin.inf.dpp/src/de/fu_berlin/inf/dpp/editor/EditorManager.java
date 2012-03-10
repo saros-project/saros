@@ -53,7 +53,6 @@ import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.texteditor.DocumentProviderRegistry;
 import org.eclipse.ui.texteditor.IDocumentProvider;
 import org.eclipse.ui.texteditor.ITextEditor;
-import org.picocontainer.Disposable;
 import org.picocontainer.annotations.Inject;
 import org.picocontainer.annotations.Nullable;
 
@@ -86,7 +85,6 @@ import de.fu_berlin.inf.dpp.project.ISarosSessionListener;
 import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
 import de.fu_berlin.inf.dpp.project.SarosSessionManager;
 import de.fu_berlin.inf.dpp.synchronize.Blockable;
-import de.fu_berlin.inf.dpp.synchronize.StopManager;
 import de.fu_berlin.inf.dpp.ui.views.SarosView;
 import de.fu_berlin.inf.dpp.util.BlockingProgressMonitor;
 import de.fu_berlin.inf.dpp.util.Predicate;
@@ -115,7 +113,7 @@ import de.fu_berlin.inf.dpp.util.Utils;
  *         of activityDataObjects, dirty state management,...
  */
 @Component(module = "core")
-public class EditorManager implements IActivityProvider, Disposable {
+public class EditorManager implements IActivityProvider {
 
     /**
      * @JTourBusStop 6, Some Basics:
@@ -290,6 +288,7 @@ public class EditorManager implements IActivityProvider, Disposable {
         @Override
         public void sessionStarted(ISarosSession newSarosSession) {
             sarosSession = newSarosSession;
+            sarosSession.getStopManager().addBlockable(stopManagerListener);
 
             assert editorPool.getAllEditors().size() == 0 : "EditorPool was not correctly reset!";
 
@@ -315,6 +314,7 @@ public class EditorManager implements IActivityProvider, Disposable {
         public void sessionEnded(ISarosSession oldSarosSession) {
 
             assert sarosSession == oldSarosSession;
+            sarosSession.getStopManager().removeBlockable(stopManagerListener);
 
             Utils.runSafeSWTSync(log, new Runnable() {
                 public void run() {
@@ -428,19 +428,13 @@ public class EditorManager implements IActivityProvider, Disposable {
     /**
      * @Inject
      */
-    protected StopManager stopManager;
-
-    public EditorManager(SarosSessionManager sessionManager,
-        StopManager stopManager, EditorAPI editorApi) {
+    public EditorManager(SarosSessionManager sessionManager, EditorAPI editorApi) {
 
         log.trace("EditorManager initialized");
 
         editorAPI = editorApi;
         sessionManager.addSarosSessionListener(this.sessionListener);
         addSharedEditorListener(sharedEditorListener);
-
-        stopManager.addBlockable(stopManagerListener);
-        this.stopManager = stopManager;
     }
 
     public boolean isConnected(IFile file) {
@@ -1811,10 +1805,6 @@ public class EditorManager implements IActivityProvider, Disposable {
             log.debug("Unlock all editors");
         editorPool
             .setWriteAccessEnabled(!lock && sarosSession.hasWriteAccess());
-    }
-
-    public void dispose() {
-        stopManager.removeBlockable(stopManagerListener);
     }
 
     public Set<SPath> getRemoteOpenEditors() {

@@ -41,6 +41,7 @@ import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.internal.ActivitySequencer;
+import de.fu_berlin.inf.dpp.synchronize.StopManager;
 
 /**
  * A SarosSession consists of one or more shared projects, which are the central
@@ -450,5 +451,12 @@ public interface ISarosSession extends IActivityListener {
      */
     public void addProjectOwnership(String projectID, IProject project,
         JID ownerJID);
+
+    /**
+     * Return the stop manager of this session.
+     *
+     * @return
+     */
+    public StopManager getStopManager();
 
 }

@@ -27,6 +27,7 @@ import de.fu_berlin.inf.dpp.project.IActivityProvider;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
 import de.fu_berlin.inf.dpp.project.SharedProject;
+import de.fu_berlin.inf.dpp.synchronize.StopManager;
 
 /**
  * Instances of this class signify a non existing {@link ISarosSession}.
@@ -283,4 +284,8 @@ public class NullSarosSession implements ISarosSession {
         log.warn("unexpected method call");
     }
 
+    public StopManager getStopManager() {
+        log.warn("unexpected method call");
+        return null;
+    }
 }

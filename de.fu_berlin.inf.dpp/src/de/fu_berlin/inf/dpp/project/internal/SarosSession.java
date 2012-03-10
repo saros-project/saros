@@ -123,9 +123,6 @@ public class SarosSession implements ISarosSession, Disposable {
     protected DataTransferManager transferManager;
 
     @Inject
-    protected StopManager stopManager;
-
-    @Inject
     protected ProjectNegotiationObservable projectNegotiationObservable;
 
     @Inject
@@ -138,6 +135,8 @@ public class SarosSession implements ISarosSession, Disposable {
     protected ConcurrentDocumentServer concurrentDocumentServer;
 
     protected final CopyOnWriteArrayList<IActivityProvider> activityProviders = new CopyOnWriteArrayList<IActivityProvider>();
+
+    protected StopManager stopManager = new StopManager(this);
 
     private MappedList<String, IActivityDataObject> queuedActivities = new MappedList<String, IActivityDataObject>();
 
@@ -618,6 +617,7 @@ public class SarosSession implements ISarosSession, Disposable {
         }
 
         activitySequencer.stop();
+        stopManager.sessionStopped();
 
         stopped = true;
     }
@@ -1258,5 +1258,9 @@ public class SarosSession implements ISarosSession, Disposable {
                 new ArrayList<IResource>());
             projectMapper.addUserToProjectMapping(ownerJID, project, projectID);
         }
+    }
+
+    public StopManager getStopManager() {
+        return stopManager;
     }
 }

@@ -23,7 +23,6 @@ import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
-import org.picocontainer.Disposable;
 
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.activities.business.AbstractActivityReceiver;
@@ -33,16 +32,14 @@ import de.fu_berlin.inf.dpp.activities.business.StopActivity;
 import de.fu_berlin.inf.dpp.activities.business.StopActivity.State;
 import de.fu_berlin.inf.dpp.activities.business.StopActivity.Type;
 import de.fu_berlin.inf.dpp.annotations.Component;
-import de.fu_berlin.inf.dpp.observables.SarosSessionObservable;
 import de.fu_berlin.inf.dpp.project.IActivityListener;
 import de.fu_berlin.inf.dpp.project.IActivityProvider;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.util.ObservableValue;
 import de.fu_berlin.inf.dpp.util.Utils;
-import de.fu_berlin.inf.dpp.util.ValueChangeListener;
 
 @Component(module = "core")
-public class StopManager implements IActivityProvider, Disposable {
+public class StopManager implements IActivityProvider {
 
     private static Logger log = Logger.getLogger(StopManager.class.getName());
 
@@ -58,9 +55,7 @@ public class StopManager implements IActivityProvider, Disposable {
     protected ObservableValue<Boolean> blocked = new ObservableValue<Boolean>(
         false);
 
-    protected ISarosSession sarosSession;
-
-    SarosSessionObservable sarosSessionObservable;
+    protected final ISarosSession sarosSession;
 
     /**
      * Maps a User to a List of his StartHandles. Never touch this directly, use
@@ -87,44 +82,14 @@ public class StopManager implements IActivityProvider, Disposable {
     protected Set<StopActivity> expectedAcknowledgments = Collections
         .synchronizedSet(new HashSet<StopActivity>());
 
-    protected ValueChangeListener<ISarosSession> sharedProjectObserver = new ValueChangeListener<ISarosSession>() {
-        public void setValue(ISarosSession newSharedProject) {
-
-            if (newSharedProject == sarosSession)
-                return;
-
-            // session ended, start all local start handles
-            if (newSharedProject == null && sarosSession != null) {
-                for (StartHandle startHandle : getStartHandles(sarosSession
-                    .getLocalUser())) {
-                    startHandle.start();
-                }
-                lockProject(false);
-            }
-
-            if (sarosSession != null) {
-                sarosSession.removeActivityProvider(StopManager.this);
-                reset();
-            }
-
-            sarosSession = newSharedProject;
-
-            if (newSharedProject != null) {
-                newSharedProject.addActivityProvider(StopManager.this);
-            }
-        }
-    };
-
-    public StopManager(SarosSessionObservable sarosSessionObservable) {
-
-        this.sarosSessionObservable = sarosSessionObservable;
-        sarosSessionObservable.add(sharedProjectObserver);
+    public StopManager(ISarosSession session) {
+        this.sarosSession = session;
+        session.addActivityProvider(this);
     }
 
     protected IActivityReceiver activityDataObjectReceiver = new AbstractActivityReceiver() {
         @Override
         public void receive(final StopActivity stopActivity) {
-
             if (sarosSession == null)
                 throw new IllegalStateException(
                     "Cannot receive StopActivities without a shared project");
@@ -521,17 +486,13 @@ public class StopManager implements IActivityProvider, Disposable {
         blockables.remove(stoppable);
     }
 
-    public void dispose() {
-        sarosSessionObservable.remove(sharedProjectObserver);
-    }
-
-    protected void reset() {
-        lockProject(false);
-        startHandles.clear();
-        expectedAcknowledgments.clear();
-    }
-
     public ObservableValue<Boolean> getBlockedObservable() {
         return blocked;
+    }
+
+    public void sessionStopped() {
+        lockProject(false);
+        // TODO Auto-generated method stub
+        /* add old cleanup here... */
     }
 }

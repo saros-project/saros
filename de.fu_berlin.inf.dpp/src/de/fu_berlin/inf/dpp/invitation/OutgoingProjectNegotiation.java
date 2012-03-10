@@ -44,7 +44,6 @@ import de.fu_berlin.inf.dpp.net.internal.StreamSession;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.synchronize.StartHandle;
-import de.fu_berlin.inf.dpp.synchronize.StopManager;
 import de.fu_berlin.inf.dpp.util.FileZipper;
 import de.fu_berlin.inf.dpp.util.MappedList;
 import de.fu_berlin.inf.dpp.util.Utils;
@@ -70,8 +69,6 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
      * projectID => List of {@link IPath files} that will be send to peer
      */
     protected MappedList<String, IPath> projectFilesToSend = new MappedList<String, IPath>();
-    @Inject
-    protected StopManager stopManager;
     @Inject
     protected SessionIDObservable sessionID;
     protected final static Random INVITATION_RAND = new Random();
@@ -399,7 +396,7 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
         // TODO: startHandles outside of sync block?
         List<StartHandle> startHandles;
         synchronized (sarosSession) {
-            startHandles = stopManager.stop(usersToStop,
+            startHandles = sarosSession.getStopManager().stop(usersToStop,
                 "Synchronizing invitation",
                 subMonitor.newChild(25, SubMonitor.SUPPRESS_ALL_LABELS));
         }
@@ -588,7 +585,7 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
         // TODO: startHandles outside of sync block?
         List<StartHandle> startHandles;
         synchronized (sarosSession) {
-            startHandles = stopManager.stop(usersToStop,
+            startHandles = sarosSession.getStopManager().stop(usersToStop,
                 "Synchronizing invitation",
                 subMonitor.newChild(25, SubMonitor.SUPPRESS_ALL_LABELS));
         }

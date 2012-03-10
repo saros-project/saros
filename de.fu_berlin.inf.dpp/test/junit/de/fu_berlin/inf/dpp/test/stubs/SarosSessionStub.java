@@ -26,6 +26,7 @@ import de.fu_berlin.inf.dpp.project.IActivityProvider;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
 import de.fu_berlin.inf.dpp.project.SharedProject;
+import de.fu_berlin.inf.dpp.synchronize.StopManager;
 
 public class SarosSessionStub implements ISarosSession {
 
@@ -276,6 +277,10 @@ public class SarosSessionStub implements ISarosSession {
 
     public void addProjectOwnership(String projectID, IProject project,
         JID ownerJID) {
+        throw new RuntimeException("Unexpected call to Stub");
+    }
+
+    public StopManager getStopManager() {
         throw new RuntimeException("Unexpected call to Stub");
     }
 }

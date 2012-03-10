@@ -40,7 +40,6 @@ import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ISarosSessionListener;
 import de.fu_berlin.inf.dpp.project.SarosSessionManager;
 import de.fu_berlin.inf.dpp.synchronize.StartHandle;
-import de.fu_berlin.inf.dpp.synchronize.StopManager;
 import de.fu_berlin.inf.dpp.util.Utils;
 
 /**
@@ -57,9 +56,6 @@ public class ConsistencyWatchdogHandler {
 
     @Inject
     protected ConsistencyWatchdogClient watchdogClient;
-
-    @Inject
-    protected StopManager stopManager;
 
     protected SarosSessionManager sessionManager;
 
@@ -169,8 +165,9 @@ public class ConsistencyWatchdogHandler {
         progress.beginTask("Performing recovery", 1200);
         try {
 
-            startHandles = stopManager.stop(sarosSession.getParticipants(),
-                "Consistency recovery", progress.newChild(200));
+            startHandles = sarosSession.getStopManager().stop(
+                sarosSession.getParticipants(), "Consistency recovery",
+                progress.newChild(200));
 
             progress.subTask("Sending files to client...");
             recoverFiles(checksumError, progress.newChild(700));
