@@ -23,8 +23,6 @@ import java.awt.Dimension;
 import java.awt.image.BufferedImage;
 import java.io.OutputStream;
 
-import org.apache.log4j.Logger;
-
 import com.xuggle.xuggler.ICodec;
 import com.xuggle.xuggler.IContainer;
 import com.xuggle.xuggler.IContainerFormat;
@@ -50,8 +48,6 @@ import de.fu_berlin.inf.dpp.videosharing.source.ImageSource;
  * 
  */
 public class XugglerEncoder extends Encoder {
-    @SuppressWarnings("unused")
-    private static final Logger log = Logger.getLogger(XugglerEncoder.class);
 
     /**
      * Throw error when {@link #slowEncoding} bigger than this

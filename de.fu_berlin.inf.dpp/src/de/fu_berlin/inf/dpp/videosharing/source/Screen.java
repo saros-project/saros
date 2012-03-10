@@ -33,7 +33,6 @@ import java.awt.Toolkit;
 import java.awt.image.BufferedImage;
 
 import de.fu_berlin.inf.dpp.SarosPluginContext;
-import org.apache.log4j.Logger;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.picocontainer.annotations.Inject;
 
@@ -52,9 +51,6 @@ import de.fu_berlin.inf.dpp.videosharing.activities.VideoActivity;
  * 
  */
 public class Screen implements ImageSource {
-    @SuppressWarnings("unused")
-    private static final Logger log = Logger.getLogger(Screen.class);
-
     @Inject
     protected Saros saros;
     protected IPreferenceStore preferences;
