@@ -1,6 +1,5 @@
 package de.fu_berlin.inf.dpp.invitation;
 
-import java.io.EOFException;
 import java.io.File;
 import java.io.FilterInputStream;
 import java.io.IOException;
@@ -17,7 +16,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
@@ -54,13 +52,11 @@ import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
 import de.fu_berlin.inf.dpp.invitation.ProcessTools.CancelLocation;
 import de.fu_berlin.inf.dpp.invitation.ProcessTools.CancelOption;
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.net.internal.StreamSession;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
 import de.fu_berlin.inf.dpp.ui.wizards.AddProjectToSessionWizard;
 import de.fu_berlin.inf.dpp.ui.wizards.pages.EnterProjectNamePage;
 import de.fu_berlin.inf.dpp.util.ArrayUtils;
 import de.fu_berlin.inf.dpp.util.FileUtils;
-import de.fu_berlin.inf.dpp.util.UncloseableInputStream;
 import de.fu_berlin.inf.dpp.util.Utils;
 import de.fu_berlin.inf.dpp.vcs.VCSAdapter;
 import de.fu_berlin.inf.dpp.vcs.VCSResourceInfo;
@@ -80,8 +76,6 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
     @Inject
     protected PreferenceUtils preferenceUtils;
 
-    protected boolean doStream;
-
     /**
      * maps the projectID to the project in workspace
      */
@@ -90,13 +84,11 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
     protected JID jid;
 
     public IncomingProjectNegotiation(JID peer, String processID,
-        List<ProjectExchangeInfo> projectInfos, boolean doStream,
-        SarosContext sarosContext) {
+        List<ProjectExchangeInfo> projectInfos, SarosContext sarosContext) {
         super(peer, sarosContext);
 
         this.processID = processID;
         this.projectInfos = projectInfos;
-        this.doStream = doStream;
         this.localProjects = new HashMap<String, IProject>();
         this.jid = peer;
 
@@ -171,13 +163,9 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
                 subMonitor.newChild(10));
             checkCancellation();
 
-            if (this.doStream) {
-                // Host/Inviter decided to transmit files via stream
-                acceptStream(subMonitor.newChild(80));
-            } else {
-                // Host/Inviter decided to transmit files with one big archive
-                acceptArchive(localProjects.size(), subMonitor.newChild(80));
-            }
+            // Host/Inviter decided to transmit files with one big archive
+            acceptArchive(localProjects.size(), subMonitor.newChild(80));
+
             // We are finished with the exchanging process. Add all projects
             // resources to the session.
             for (String projectID : localProjects.keySet()) {
@@ -827,112 +815,6 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
                 CancelOption.NOTIFY_PEER);
         } finally {
             monitor.done();
-        }
-    }
-
-    /**
-     * If the missing files are sent via stream this method is called. Every
-     * file will be written after receiving
-     */
-    private void acceptStream(SubMonitor monitor)
-        throws SarosCancellationException {
-        try {
-            archiveStreamService.startLock.lock();
-            log.debug("lock started");
-            log.debug("waiting for session");
-            archiveStreamService.sessionReceived.await();
-        } catch (InterruptedException e) {
-            log.debug("Method interrupted waiting for archive stream lock.");
-        } finally {
-            archiveStreamService.startLock.unlock();
-        }
-
-        StreamSession newSession = archiveStreamService.streamSession;
-        int numOfFiles = archiveStreamService.getFileNum();
-
-        IFile currentFile = null;
-
-        int worked = 0;
-        int lastWorked = 0;
-        int filesReceived = 0;
-        double increment = 0.0;
-
-        InputStream in = newSession.getInputStream(0);
-        ZipInputStream zin = new ZipInputStream(in);
-        try {
-
-            ZipEntry zipEntry = null;
-            monitor.beginTask(null, 100);
-            monitor.subTask("Receiving project files...");
-
-            if (numOfFiles >= 1) {
-                increment = (double) 100 / numOfFiles;
-            } else {
-                monitor.worked(100);
-            }
-
-            while ((zipEntry = zin.getNextEntry()) != null) {
-                // every zipEntry represents/contains exactly one file
-                String projectID = new String(zipEntry.getExtra());
-                IProject currentProject = localProjects.get(projectID);
-                if (currentProject == null) {
-                    // this is really unlikely
-                    log.error("currentProject is null");
-                    throw new SarosCancellationException(
-                        "File did not belong to a project that is supposed to be added");
-                } else {
-                    log.info("everything seems to be normal");
-                }
-                currentFile = currentProject.getFile(zipEntry.getName());
-                monitor.setTaskName(MessageFormat.format("Receiving {0}",
-                    zipEntry.getName()));
-
-                if (currentFile.exists()) {
-                    log.debug(currentFile
-                        + " already exists on invitee. Replacing this file.");
-                    currentFile.delete(true, null);
-                }
-
-                currentFile.create(new UncloseableInputStream(zin), true, null);
-
-                worked = (int) Math.round(increment * filesReceived);
-
-                if ((worked - lastWorked) > 0) {
-                    monitor.worked((worked - lastWorked));
-                    lastWorked = worked;
-                }
-
-                filesReceived++;
-
-                checkCancellation();
-            }
-            // Just to be sure we don't have any problems with rounding
-            monitor.worked(100);
-
-        } catch (SarosCancellationException e) {
-            log.debug("Invitation process was cancelled.");
-            localCancel("An invitee cancelled the invitation.",
-                CancelOption.NOTIFY_PEER);
-            executeCancellation();
-        } catch (CoreException e) {
-            log.error("Exception while creating file. Message: ", e);
-            localCancel(
-                "A problem occurred while the project's files were being received: \""
-                    + e.getMessage() + "\" The invitation was cancelled.",
-                CancelOption.NOTIFY_PEER);
-            executeCancellation();
-        } catch (EOFException e) {
-            log.error("Error while receiving files: " + e.getMessage());
-            localCancel(
-                "A problem occured when receiving the project files. It is possible that the files were corrupted in transit.\n\nPlease attempt invitation again.",
-                CancelOption.NOTIFY_PEER);
-            executeCancellation();
-        } catch (Exception e) {
-            log.error("Unknown exception: ", e);
-        } finally {
-            IOUtils.closeQuietly(in);
-            IOUtils.closeQuietly(zin);
-            newSession.stopSession();
         }
     }
 

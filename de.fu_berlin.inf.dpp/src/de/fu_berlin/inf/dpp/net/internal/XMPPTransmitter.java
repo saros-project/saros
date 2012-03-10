@@ -197,7 +197,7 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
 
     public void sendInvitation(String projectID, JID guest, String description,
         int colorID, VersionInfo versionInfo, String invitationID,
-        DateTime sessionStart, boolean doStream, MUCSessionPreferences comPrefs) {
+        DateTime sessionStart, MUCSessionPreferences comPrefs) {
 
         log.trace("Sending invitation to " + Utils.prefix(guest)
             + " with description " + description);

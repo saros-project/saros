@@ -322,15 +322,11 @@ public class SarosSessionManager implements ISarosSessionManager {
      *            see: {@link ProjectExchangeInfo}
      * @param processID
      *            ID of the exchanging process
-     * @param doStream
-     *            If <code>true</code>, the files of the projects will be
-     *            streamed.
      */
     public void incomingProjectReceived(JID from, final SarosUI sarosUI,
-        List<ProjectExchangeInfo> projectInfos, String processID,
-        boolean doStream) {
+        List<ProjectExchangeInfo> projectInfos, String processID) {
         final IncomingProjectNegotiation process = new IncomingProjectNegotiation(
-            from, processID, projectInfos, doStream, sarosContext);
+            from, processID, projectInfos, sarosContext);
 
         Utils.runSafeSWTAsync(log, new Runnable() {
 
@@ -546,7 +542,7 @@ public class SarosSessionManager implements ISarosSessionManager {
         for (User user : this.getSarosSession().getRemoteUsers()) {
             OutgoingProjectNegotiation out = new OutgoingProjectNegotiation(
                 user.getJID(), this.getSarosSession(), projectResourcesMapping,
-                false, sarosContext, null);
+                sarosContext, null);
 
             OutgoingProjectJob job = new OutgoingProjectJob(out);
             job.setPriority(Job.SHORT);
@@ -574,7 +570,7 @@ public class SarosSessionManager implements ISarosSessionManager {
         if (!projectResourcesMapping.isEmpty()
             && !projectExchangeInfos.isEmpty()) {
             OutgoingProjectNegotiation out = new OutgoingProjectNegotiation(
-                user, this.getSarosSession(), projectResourcesMapping, false,
+                user, this.getSarosSession(), projectResourcesMapping,
                 sarosContext, projectExchangeInfos);
             OutgoingProjectJob job = new OutgoingProjectJob(out);
             job.setPriority(Job.SHORT);

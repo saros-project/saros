@@ -49,8 +49,6 @@ public abstract class ProjectNegotiation {
     @Inject
     protected StreamServiceManager streamServiceManager;
     @Inject
-    protected ArchiveStreamService archiveStreamService;
-    @Inject
     protected SarosSessionManager sessionManager;
 
     protected StreamSessionListener sessionListener = new StreamSessionListener() {

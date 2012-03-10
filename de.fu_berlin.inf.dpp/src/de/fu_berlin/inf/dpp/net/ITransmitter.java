@@ -76,7 +76,7 @@ public interface ITransmitter {
      */
     public void sendInvitation(String projectID, JID jid, String description,
         int colorID, VersionInfo versionInfo, String invitationID,
-        DateTime sessionStart, boolean doStream, MUCSessionPreferences comPrefs);
+        DateTime sessionStart, MUCSessionPreferences comPrefs);
 
     /**
      * Sends an cancellation message that tells the receiver that the invitation

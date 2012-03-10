@@ -20,15 +20,12 @@ public class ProjectsAddedActivity extends AbstractActivity {
 
     protected List<ProjectExchangeInfo> projectInfos;
     protected String processID;
-    protected boolean doStream;
 
     public ProjectsAddedActivity(User source,
-        List<ProjectExchangeInfo> projectInfos, String processID,
-        boolean doStream) {
+        List<ProjectExchangeInfo> projectInfos, String processID) {
         super(source);
         this.projectInfos = projectInfos;
         this.processID = processID;
-        this.doStream = doStream;
     }
 
     public void dispatch(IActivityReceiver receiver) {
@@ -42,7 +39,7 @@ public class ProjectsAddedActivity extends AbstractActivity {
             pInfos.add(fileList.toProjectInfoDataObject());
         }
         return new ProjectsAddedActivityDataObject(this.source.getJID(),
-            pInfos, processID, doStream);
+            pInfos, processID);
     }
 
     public List<ProjectExchangeInfo> getProjectInfos() {
@@ -51,10 +48,6 @@ public class ProjectsAddedActivity extends AbstractActivity {
 
     public String getProcessID() {
         return processID;
-    }
-
-    public boolean doStream() {
-        return doStream;
     }
 
     public SPath getPath() {

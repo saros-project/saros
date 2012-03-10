@@ -62,9 +62,10 @@ public class ProjectsAddedManager implements IActivityProvider {
             return;
         }
         JID from = fileListActivity.getSource().getJID();
-        sessionManager.incomingProjectReceived(from, sarosUI,
-            fileListActivity.getProjectInfos(),
-            fileListActivity.getProcessID(), fileListActivity.doStream());
+        sessionManager
+            .incomingProjectReceived(from, sarosUI,
+                fileListActivity.getProjectInfos(),
+                fileListActivity.getProcessID());
     }
 
     public void exec(IActivity activity) {

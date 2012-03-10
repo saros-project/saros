@@ -49,7 +49,6 @@ import de.fu_berlin.inf.dpp.feedback.SessionDataCollector;
 import de.fu_berlin.inf.dpp.feedback.StatisticManager;
 import de.fu_berlin.inf.dpp.feedback.TextEditCollector;
 import de.fu_berlin.inf.dpp.feedback.VoIPCollector;
-import de.fu_berlin.inf.dpp.invitation.ArchiveStreamService;
 import de.fu_berlin.inf.dpp.net.IncomingTransferObject;
 import de.fu_berlin.inf.dpp.net.PingPongCentral;
 import de.fu_berlin.inf.dpp.net.RosterTracker;
@@ -299,7 +298,6 @@ public class SarosContext {
         Component.create(SendFileAction.SendFileStreamService.class),
         Component.create(AudioService.class),
         Component.create(VideoSharingService.class),
-        Component.create(ArchiveStreamService.class)
 
     };
 

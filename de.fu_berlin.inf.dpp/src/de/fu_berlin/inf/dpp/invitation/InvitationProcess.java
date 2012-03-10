@@ -49,8 +49,6 @@ public abstract class InvitationProcess {
     @Inject
     protected StreamServiceManager streamServiceManager;
     @Inject
-    protected ArchiveStreamService archiveStreamService;
-    @Inject
     protected SarosSessionManager sarosSessionManager;
     protected StreamSession streamSession;
 

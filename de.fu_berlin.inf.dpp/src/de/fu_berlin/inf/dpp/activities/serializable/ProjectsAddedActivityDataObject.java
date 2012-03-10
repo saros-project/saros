@@ -19,15 +19,12 @@ public class ProjectsAddedActivityDataObject extends AbstractActivityDataObject 
 
     protected List<ProjectExchangeInfoDataObject> projectInfos;
     protected String processID;
-    protected boolean doStream;
 
     public ProjectsAddedActivityDataObject(JID source,
-        List<ProjectExchangeInfoDataObject> projectInfos, String processID,
-        boolean doStream) {
+        List<ProjectExchangeInfoDataObject> projectInfos, String processID) {
         super(source);
         this.projectInfos = projectInfos;
         this.processID = processID;
-        this.doStream = doStream;
     }
 
     public IActivity getActivity(ISarosSession sarosSession) {
@@ -37,7 +34,7 @@ public class ProjectsAddedActivityDataObject extends AbstractActivityDataObject 
             pInfos.add(projectInfo.toProjectInfo());
         }
         return new ProjectsAddedActivity(sarosSession.getUser(source), pInfos,
-            processID, doStream);
+            processID);
     }
 
     public List<ProjectExchangeInfoDataObject> getProjectInfos() {
