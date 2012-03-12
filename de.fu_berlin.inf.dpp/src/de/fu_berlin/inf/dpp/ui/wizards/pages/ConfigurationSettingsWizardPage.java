@@ -1,5 +1,6 @@
 package de.fu_berlin.inf.dpp.ui.wizards.pages;
 
+import org.apache.log4j.Logger;
 import org.bitlet.weupnp.GatewayDevice;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
@@ -20,14 +21,13 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Text;
 import org.picocontainer.annotations.Inject;
 
-import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.feedback.ErrorLogManager;
 import de.fu_berlin.inf.dpp.feedback.StatisticManager;
 import de.fu_berlin.inf.dpp.net.upnp.IUPnPService;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
 import de.fu_berlin.inf.dpp.ui.ImageManager;
-import de.fu_berlin.inf.dpp.ui.util.UPnPUIUtils;
+import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.ui.widgets.decoration.EmptyText;
 import de.fu_berlin.inf.dpp.util.LinkListener;
 import de.fu_berlin.inf.dpp.util.Utils;
@@ -40,11 +40,12 @@ import de.fu_berlin.inf.nebula.widgets.IllustratedComposite;
  * @author bkahlert
  */
 public class ConfigurationSettingsWizardPage extends WizardPage {
+
+    private static final Logger LOG = Logger
+        .getLogger(ConfigurationSettingsWizardPage.class);
+
     public static final String TITLE = de.fu_berlin.inf.dpp.ui.Messages.ConfigurationSettingsWizardPage_title;
     public static final String DESCRIPTION = de.fu_berlin.inf.dpp.ui.Messages.ConfigurationSettingsWizardPage_description;
-
-    @Inject
-    protected Saros saros;
 
     @Inject
     protected PreferenceUtils preferenceUtils;
@@ -333,36 +334,40 @@ public class ConfigurationSettingsWizardPage extends WizardPage {
     }
 
     /**
-     * Populates the gateway combobox with discovered gateways.
+     * Populates the gateway combo box with discovered gateways.
      */
     protected void populateGatewayCombo() {
-        if (upnpService.getGateways() == null) {
-            gatewaysCombo.setEnabled(false);
-            gatewayInfo
-                .setText(de.fu_berlin.inf.dpp.ui.Messages.ConfigurationSettingsWizardPage_0);
-            gatewayInfo.pack();
 
-            // dont block during discovery
-            Utils.runSafeAsync(null, new Runnable() {
-
-                public void run() {
-                    upnpService.discoverGateways();
-
-                    // GUI work from SWT thread
-                    Utils.runSafeSWTAsync(null, new Runnable() {
-                        public void run() {
-                            UPnPUIUtils.populateGatewaySelectionControls(
-                                upnpService, gatewaysCombo, gatewayInfo,
-                                setupPortmappingButton);
-                        }
-                    });
-                }
-            });
-
-        } else {
-            UPnPUIUtils.populateGatewaySelectionControls(upnpService,
-                gatewaysCombo, gatewayInfo, setupPortmappingButton);
+        if (upnpService.getGateways() != null) {
+            populateGatewaySelectionControls(upnpService, gatewaysCombo,
+                gatewayInfo, setupPortmappingButton);
+            return;
         }
+
+        gatewaysCombo.setEnabled(false);
+        gatewayInfo.setText(Messages.ConfigurationSettingsWizardPage_0);
+        gatewayInfo.pack();
+
+        // do not block during discovery
+        Utils.runSafeAsync(null, new Runnable() {
+
+            public void run() {
+                upnpService.discoverGateways();
+
+                // GUI work from SWT thread
+                Utils.runSafeSWTAsync(null, new Runnable() {
+
+                    public void run() {
+                        if (ConfigurationSettingsWizardPage.this.getControl()
+                            .isDisposed())
+                            return;
+
+                        populateGatewaySelectionControls(upnpService,
+                            gatewaysCombo, gatewayInfo, setupPortmappingButton);
+                    }
+                });
+            }
+        });
     }
 
     protected void updatePageCompletion() {
@@ -410,5 +415,65 @@ public class ConfigurationSettingsWizardPage extends WizardPage {
 
     public boolean isErrorLogSubmissionAllowed() {
         return this.errorLogSubmissionButton.getSelection();
+    }
+
+    /**
+     * Setups gateway SWT controls by populating a gateway combobox and
+     * configuring an information Label and the enabling checkbox.
+     * 
+     * @param combo
+     *            {@link Combo} selector to populate with discovered gateways
+     * @param info
+     *            {@link Label} displaying status information of the discovery
+     * @param checkbox
+     *            {@link Button} checkbox to enable/disable UPnP support
+     */
+    private void populateGatewaySelectionControls(
+        final IUPnPService upnpService, final Combo combo, final Label info,
+        final Button checkbox) {
+
+        combo.setEnabled(false);
+        checkbox.setEnabled(false);
+        combo.removeAll();
+
+        // if no devices are found, return now - nothing to populate
+        if (upnpService.getGateways() == null
+            || upnpService.getGateways().isEmpty()) {
+            info.setText(Messages.UPnPUIUtils_no_gateway);
+            info.getParent().pack();
+            return;
+        }
+
+        // insert found gateways into combobox
+        int indexToSelect = 0;
+        for (GatewayDevice gw : upnpService.getGateways()) {
+            try {
+                String name = gw.getFriendlyName();
+                if (!gw.isConnected())
+                    name += Messages.UPnPUIUtils_disconnected;
+
+                combo.add(name);
+
+                if (upnpService.getSelectedGateway() != null
+                    && gw.getUSN().equals(
+                        upnpService.getSelectedGateway().getUSN()))
+                    indexToSelect = combo.getItemCount() - 1;
+            } catch (Exception e) {
+                LOG.debug("Error updating UPnP selector:" + e.getMessage()); //$NON-NLS-1$
+                // ignore faulty gateway
+            }
+        }
+
+        // if valid gateway found, show info and enable
+        if (combo.getItemCount() > 0) {
+            checkbox.setEnabled(true);
+            combo.setEnabled(true);
+            combo.select(indexToSelect);
+            combo.pack();
+            info.setVisible(false);
+        } else {
+            info.setText(Messages.UPnPUIUtils_no_valid_gateway);
+        }
+        info.getParent().pack();
     }
 }
