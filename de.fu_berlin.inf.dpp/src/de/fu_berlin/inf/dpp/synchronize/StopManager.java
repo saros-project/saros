@@ -50,7 +50,7 @@ import de.fu_berlin.inf.dpp.util.Utils;
  * remove the block of remote users.
  */
 @Component(module = "core")
-public class StopManager extends AbstractActivityProvider {
+public final class StopManager extends AbstractActivityProvider {
 
     private static final Logger log = Logger.getLogger(StopManager.class);
 
@@ -363,6 +363,7 @@ public class StopManager extends AbstractActivityProvider {
      * @param lock
      *            if true the project gets locked, else it gets unlocked
      */
+    // TODO: Make private when StoppedAction is removed.
     public void lockProject(boolean lock) {
         for (Blockable blockable : blockables) {
             if (lock)
@@ -379,7 +380,7 @@ public class StopManager extends AbstractActivityProvider {
      * 
      * @return true if the affected user is unlocked afterwards
      */
-    protected boolean executeUnlock(StartHandle startHandle) {
+    private boolean executeUnlock(StartHandle startHandle) {
 
         if (!startHandle.getUser().isLocal())
             throw new IllegalArgumentException(
@@ -414,7 +415,7 @@ public class StopManager extends AbstractActivityProvider {
      * @param handle
      *            the startHandle whose start() initiated the unlocking
      */
-    public void initiateUnlock(StartHandle handle) {
+    private void initiateUnlock(StartHandle handle) {
         if (sarosSession == null)
             throw new IllegalStateException(
                 "Cannot initiate unlock without a shared project");
@@ -487,7 +488,7 @@ public class StopManager extends AbstractActivityProvider {
         return result;
     }
 
-    public StartHandle generateStartHandle(StopActivity stopActivity) {
+    private StartHandle generateStartHandle(StopActivity stopActivity) {
         User user = stopActivity.getUser();
         return new StartHandle(user, this, stopActivity.getActivityID());
     }
