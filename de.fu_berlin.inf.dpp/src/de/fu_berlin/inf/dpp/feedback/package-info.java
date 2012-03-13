@@ -48,5 +48,5 @@
  * </ul>
  */
 
-package de.fu_berlin.inf.dpp.ui.feedback;
-import de.fu_berlin.inf.dpp.User;
+package de.fu_berlin.inf.dpp.feedback;
+
