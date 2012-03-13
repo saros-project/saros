@@ -30,8 +30,7 @@ import de.fu_berlin.inf.dpp.activities.business.StopActivity;
 import de.fu_berlin.inf.dpp.activities.business.StopActivity.State;
 import de.fu_berlin.inf.dpp.activities.business.StopActivity.Type;
 import de.fu_berlin.inf.dpp.annotations.Component;
-import de.fu_berlin.inf.dpp.project.IActivityListener;
-import de.fu_berlin.inf.dpp.project.IActivityProvider;
+import de.fu_berlin.inf.dpp.project.AbstractActivityProvider;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.util.ObservableValue;
 import de.fu_berlin.inf.dpp.util.Utils;
@@ -51,7 +50,7 @@ import de.fu_berlin.inf.dpp.util.Utils;
  * remove the block of remote users.
  */
 @Component(module = "core")
-public class StopManager implements IActivityProvider {
+public class StopManager extends AbstractActivityProvider {
 
     private static final Logger log = Logger.getLogger(StopManager.class);
 
@@ -59,8 +58,6 @@ public class StopManager implements IActivityProvider {
 
     // Waits MILLISTOWAIT ms until the next test for progress cancellation
     public final int MILLISTOWAIT = 100;
-
-    private final List<IActivityListener> activityListeners = new LinkedList<IActivityListener>();
 
     protected List<Blockable> blockables = new LinkedList<Blockable>();
 
@@ -445,22 +442,9 @@ public class StopManager implements IActivityProvider {
     /**
      * {@inheritDoc}
      */
-    public void addActivityListener(IActivityListener listener) {
-        activityListeners.add(listener);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void exec(IActivity activityDataObject) {
         activityDataObject.dispatch(activityDataObjectReceiver);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public void removeActivityListener(IActivityListener listener) {
-        activityListeners.remove(listener);
     }
 
     private void fireActivity(StopActivity stopActivity) {
@@ -471,6 +455,7 @@ public class StopManager implements IActivityProvider {
                 + " recipient which already left: " + stopActivity);
 
         sarosSession.sendActivity(recipient, stopActivity);
+        super.fireActivity(stopActivity);
     }
 
     /**
