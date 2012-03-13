@@ -4,7 +4,7 @@ import java.util.concurrent.CancellationException;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.log4j.Logger;
-import org.eclipse.core.runtime.SubMonitor;
+import org.eclipse.core.runtime.IProgressMonitor;
 
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.util.StackTrace;
@@ -83,7 +83,7 @@ public class StartHandle {
      *         handle.
      * @Throws CancellationException
      */
-    public boolean startAndAwait(final SubMonitor progress) {
+    public boolean startAndAwait(final IProgressMonitor progress) {
 
         log.debug("Called startAndAwait on " + user);
 
@@ -105,7 +105,7 @@ public class StartHandle {
      * 
      * @Throws CancellationException
      */
-    public boolean await(final SubMonitor progress) {
+    public boolean await(final IProgressMonitor progress) {
         try {
             while (!acknowledged.get() && !progress.isCanceled())
                 Thread.sleep(stopManager.MILLISTOWAIT);
