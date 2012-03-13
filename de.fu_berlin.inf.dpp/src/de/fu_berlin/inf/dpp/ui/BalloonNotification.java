@@ -37,6 +37,7 @@ public class BalloonNotification {
         for (BalloonWindow window : windows) {
             window.close();
         }
+        windows.clear();
     }
 
     /**
@@ -59,7 +60,7 @@ public class BalloonNotification {
      */
     public static void showNotification(Control control, String title,
         String text, int timeout) {
-
+        
         if (control != null && control.isDisposed()) {
             control = null;
         }
