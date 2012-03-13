@@ -463,7 +463,7 @@ public class StopManager implements IActivityProvider {
         activityListeners.remove(listener);
     }
 
-    public void fireActivity(StopActivity stopActivity) {
+    private void fireActivity(StopActivity stopActivity) {
 
         User recipient = stopActivity.getRecipient();
         if (!recipient.isInSarosSession())
@@ -477,7 +477,7 @@ public class StopManager implements IActivityProvider {
      * Adds a StartHandle to startHandles, which maps a user to a list of
      * StartHandles. These Lists are created lazily.
      */
-    public void addStartHandle(StartHandle startHandle) {
+    private void addStartHandle(StartHandle startHandle) {
         getStartHandles(startHandle.getUser()).add(startHandle);
     }
 
@@ -488,11 +488,11 @@ public class StopManager implements IActivityProvider {
      * @return false if the given startHandle didn't exist in Map, true
      *         otherwise
      */
-    public boolean removeStartHandle(StartHandle startHandle) {
+    private boolean removeStartHandle(StartHandle startHandle) {
         return getStartHandles(startHandle.getUser()).remove(startHandle);
     }
 
-    public synchronized List<StartHandle> getStartHandles(User user) {
+    private synchronized List<StartHandle> getStartHandles(User user) {
 
         List<StartHandle> result = startHandles.get(user);
         if (result == null) {
@@ -533,5 +533,17 @@ public class StopManager implements IActivityProvider {
         expectedAcknowledgments.clear();
         acknowledged.signalAll();
         reentrantLock.unlock();
+    }
+
+    /**
+     * Resume the StartHandle and remove it from internal lists.
+     * 
+     * @param startHandle
+     * @return Returns true if the last handle for the user has been removed.
+     */
+    synchronized boolean resumeStartHandle(StartHandle startHandle) {
+        removeStartHandle(startHandle);
+        initiateUnlock(startHandle);
+        return getStartHandles(startHandle.getUser()).isEmpty();
     }
 }

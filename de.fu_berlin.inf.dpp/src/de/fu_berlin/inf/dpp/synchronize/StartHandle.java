@@ -63,11 +63,7 @@ public class StartHandle {
             throw new IllegalStateException(
                 "start can only be called once per StartHandle");
 
-        stopManager.removeStartHandle(this);
-
-        stopManager.initiateUnlock(this);
-
-        return stopManager.getStartHandles(user).isEmpty();
+        return stopManager.resumeStartHandle(this);
     }
 
     /**
@@ -95,13 +91,8 @@ public class StartHandle {
             throw new IllegalStateException(
                 "start can only be called once per StartHandle");
 
-        stopManager.removeStartHandle(this);
-
-        stopManager.initiateUnlock(this);
-
-        if (stopManager.getStartHandles(user).isEmpty()) {
+        if (stopManager.resumeStartHandle(this))
             return await(progress);
-        }
 
         return false;
     }
