@@ -5,6 +5,8 @@ import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.zip.Adler32;
 import java.util.zip.CheckedInputStream;
 import java.util.zip.ZipEntry;
@@ -47,7 +49,7 @@ import de.fu_berlin.inf.dpp.project.ISarosSession;
  */
 public class FileUtils {
 
-    private static final Logger log = Logger.getLogger(FileUtils.class);
+    private static Logger log = Logger.getLogger(FileUtils.class);
 
     private FileUtils() {
         // no instantiation allowed
@@ -174,11 +176,14 @@ public class FileUtils {
      *             progress monitor and will throw an LocalCancellationException
      *             in this case.
      */
-    public static boolean writeArchive(InputStream input, IContainer container,
-        SubMonitor monitor, ISarosSession iSarosSession) throws CoreException,
-        LocalCancellationException {
+    public static boolean writeArchive(InputStream input,
+        IContainer container, SubMonitor monitor, ISarosSession iSarosSession)
+        throws CoreException, LocalCancellationException {
 
         ZipInputStream zip = new ZipInputStream(input);
+
+        monitor.beginTask("Unpacking archive file to workspace", 10);
+        monitor.subTask("Unpacking archive file to workspace");
 
         long startTime = System.currentTimeMillis();
 
@@ -200,6 +205,7 @@ public class FileUtils {
                         }
                     }, file, monitor.newChild(1));
 
+                    monitor.subTask("Unpacked " + path);
                     log.debug("File written to disk: " + path);
                 }
                 zip.closeEntry();
@@ -211,6 +217,7 @@ public class FileUtils {
             log.error("Failed to unpack archive", e);
             return false;
         } finally {
+            monitor.subTask("");
             IOUtils.closeQuietly(zip);
             monitor.done();
         }
@@ -526,5 +533,50 @@ public class FileUtils {
             log.error("File could not be read, despite existing: " + path, e);
         }
         progress.done();
+    }
+
+    /**
+     * Calculate the total filesize of all files contained in parameter
+     * resources (and all files in contained folders...)
+     * 
+     * @param resources
+     * @return
+     */
+    public static long getAllFilesSize(List<IResource> resources) {
+        long totalFileSizes = 0;
+        for (IResource res : resources) {
+            switch (res.getType()) {
+            case IResource.FILE:
+                IFile file = (IFile) res;
+                try {
+                    long filesize = org.eclipse.core.filesystem.EFS
+                        .getStore(file.getLocationURI()).fetchInfo()
+                        .getLength();
+                    totalFileSizes += filesize;
+                } catch (CoreException e) {
+                    log.warn(
+                        "Failed to retrieve file size of file "
+                            + file.getLocationURI(), e);
+                }
+                break;
+            case IResource.FOLDER:
+                List<IResource> childrenResources = new ArrayList<IResource>();
+                IResource[] members;
+                try {
+                    members = ((IFolder) res).members();
+                    for (IResource child : members) {
+                        childrenResources.add(child);
+                    }
+                } catch (CoreException e) {
+                    // TODO Auto-generated catch block
+                    log.warn("Failed to process folder", e);
+                }
+                totalFileSizes += FileUtils.getAllFilesSize(childrenResources);
+                break;
+            default:
+                break;
+            }
+        }
+        return totalFileSizes;
     }
 }
