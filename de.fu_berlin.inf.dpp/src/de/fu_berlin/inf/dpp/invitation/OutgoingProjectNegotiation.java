@@ -91,17 +91,20 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
         sendFileList(monitor.newChild(1));
         File zipArchive = null;
 
+        List<File> zipArchives = new ArrayList<File>();
         try {
             getRemoteFileList(monitor.newChild(2));
             editorManager.setAllLocalOpenedEditorsLocked(false);
             // pack each project into one archive
-            List<File> projectArchives = createProjectArchives(
-                monitor.newChild(8), this.projectFilesToSend);
-            if (projectArchives.size() > 0) {
+            zipArchives = createProjectArchives(monitor.newChild(8),
+                this.projectFilesToSend);
+            if (zipArchives.size() > 0) {
                 // pack all archive files into one big archive
                 zipArchive = File.createTempFile("SarosSyncArchive", ".zip");
-                FileZipper.zipFiles(projectArchives, zipArchive, false,
+                FileZipper.zipFiles(zipArchives, zipArchive, false,
                     monitor.newChild(2));
+
+                zipArchives.add(zipArchive);
             }
             // send the big archive
             sendArchive(monitor.newChild(87), zipArchive, processID);
@@ -117,8 +120,11 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
             localCancel("", CancelOption.NOTIFY_PEER);
             executeCancellation();
         } finally {
-            if (zipArchive != null)
-                zipArchive.delete();
+            for (File archive : zipArchives) {
+                if (!archive.delete())
+                    log.warn("could not archive file: "
+                        + archive.getAbsolutePath());
+            }
 
             monitor.done();
         }
