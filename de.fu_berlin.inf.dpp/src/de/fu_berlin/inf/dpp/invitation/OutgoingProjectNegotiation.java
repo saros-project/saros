@@ -68,8 +68,8 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
     @Inject
     protected EditorManager editorManager;
 
-    protected HashMap<IProject, List<IResource>> selectedProjectResources;
-    protected List<ProjectExchangeInfo> pInfos;
+    protected HashMap<IProject, List<IResource>> projectResources;
+    protected List<ProjectExchangeInfo> projectExchangeInfos;
 
     public OutgoingProjectNegotiation(JID to, ISarosSession sarosSession,
         HashMap<IProject, List<IResource>> partialResources,
@@ -80,36 +80,42 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
         this.processID = String.valueOf(INVITATION_RAND.nextLong());
         this.sarosSession = sarosSession;
 
-        this.selectedProjectResources = partialResources;
-        this.projects = new ArrayList<IProject>(
-            selectedProjectResources.keySet());
-        this.pInfos = projectExchangeInfos;
+        this.projectResources = partialResources;
+        this.projects = new ArrayList<IProject>(projectResources.keySet());
+        this.projectExchangeInfos = projectExchangeInfos;
     }
 
     public void start(SubMonitor monitor) throws SarosCancellationException {
         this.monitor = monitor;
-        sendFileList(monitor.newChild(1));
+
         File zipArchive = null;
 
         List<File> zipArchives = new ArrayList<File>();
+
+        monitor.beginTask("Negotiating project...", 100);
+
         try {
-            getRemoteFileList(monitor.newChild(2));
+            sendFileList(monitor.newChild(0));
+            monitor.subTask("");
+            getRemoteFileList(monitor.newChild(0));
+            monitor.subTask("");
             editorManager.setAllLocalOpenedEditorsLocked(false);
             // pack each project into one archive
-            zipArchives = createProjectArchives(monitor.newChild(8),
+            zipArchives = createProjectArchives(monitor.newChild(30),
                 this.projectFilesToSend);
             if (zipArchives.size() > 0) {
                 // pack all archive files into one big archive
                 zipArchive = File.createTempFile("SarosSyncArchive", ".zip");
                 FileZipper.zipFiles(zipArchives, zipArchive, false,
-                    monitor.newChild(2));
+                    monitor.newChild(20));
 
                 zipArchives.add(zipArchive);
             }
             // send the big archive
-            sendArchive(monitor.newChild(87), zipArchive, processID);
+            monitor.subTask("");
+            sendArchive(monitor.newChild(50), zipArchive, processID);
 
-            this.projectExchangeProcesses.removeProjectExchangeProcess(this);
+            projectExchangeProcesses.removeProjectExchangeProcess(this);
         } catch (IOException e) {
             String errorMsg = "Unknown error: " + e;
             if (e.getMessage() != null)
@@ -130,83 +136,96 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
         }
     }
 
-    private void sendFileList(SubMonitor subMonitor)
+    private void sendFileList(SubMonitor monitor)
         throws LocalCancellationException {
-        if (this.pInfos == null) {
-            subMonitor.setTaskName("Creating file list...");
-            subMonitor.setWorkRemaining(100);
-            useVersionControl = sarosSession.useVersionControl();
-            pInfos = new ArrayList<ProjectExchangeInfo>(this.projects.size());
-            for (IProject iProject : this.projects) {
-                if (subMonitor.isCanceled())
-                    throw new LocalCancellationException(null,
-                        CancelOption.NOTIFY_PEER);
-                try {
+
+        try {
+
+            if (this.projectExchangeInfos == null) {
+
+                monitor.beginTask("Creating file list...", projects.size());
+
+                useVersionControl = sarosSession.useVersionControl();
+                projectExchangeInfos = new ArrayList<ProjectExchangeInfo>(
+                    this.projects.size());
+
+                for (IProject iProject : this.projects) {
+                    if (monitor.isCanceled())
+                        break;
+
                     String projectID = sarosSession.getProjectID(iProject);
                     String projectName = iProject.getName();
+
                     FileList projectFileList = FileListFactory.createFileList(
-                        iProject, this.selectedProjectResources.get(iProject),
-                        useVersionControl, subMonitor.newChild(0));
+                        iProject, projectResources.get(iProject),
+                        useVersionControl, monitor.newChild(1));
+
+                    if (monitor.isCanceled())
+                        break;
+
                     projectFileList.setProjectID(projectID);
+
                     boolean partial = !sarosSession
                         .isCompletelyShared(iProject);
 
                     ProjectExchangeInfo pInfo = new ProjectExchangeInfo(
                         projectID, "", projectName, partial, projectFileList);
-                    pInfos.add(pInfo);
-                } catch (CoreException e) {
-                    throw new LocalCancellationException(e.getMessage(),
-                        CancelOption.NOTIFY_PEER);
+
+                    projectExchangeInfos.add(pInfo);
                 }
-                subMonitor.worked(100 / projects.size());
             }
+
+            if (monitor.isCanceled())
+                throw new LocalCancellationException(null,
+                    CancelOption.NOTIFY_PEER);
+
+            monitor.subTask("");
+            log.debug("Inv" + Utils.prefix(peer) + ": Sending file list...");
+            monitor.setTaskName("Sending file list...");
+
+            sarosSession.sendActivity(sarosSession.getUser(peer),
+                new ProjectsAddedActivity(sarosSession.getLocalUser(),
+                    projectExchangeInfos, processID));
+
+        } catch (CoreException e) {
+            throw new LocalCancellationException(e.getMessage(),
+                CancelOption.NOTIFY_PEER);
+        } finally {
+            monitor.done();
         }
-        if (subMonitor.isCanceled())
-            throw new LocalCancellationException(null, CancelOption.NOTIFY_PEER);
-        subMonitor.subTask("");
-        log.debug("Inv" + Utils.prefix(peer) + ": Sending file list...");
-        subMonitor.setTaskName("Sending file list...");
-        this.sarosSession.sendActivity(sarosSession.getUser(peer),
-            new ProjectsAddedActivity(sarosSession.getLocalUser(), pInfos,
-                processID));
-        subMonitor.done();
 
     }
 
     /**
-     * Create and send the complete file list, then wait for the peer's partial
-     * file list.
-     * 
-     * @param subMonitor
-     * @throws IOException
-     * @throws SarosCancellationException
+     * Wait for the peer's partial file list which contains the files that we
+     * must send.
      */
-    protected void getRemoteFileList(SubMonitor subMonitor) throws IOException,
+    protected void getRemoteFileList(SubMonitor monitor) throws IOException,
         SarosCancellationException {
-
-        checkCancellation(CancelOption.NOTIFY_PEER);
-
-        subMonitor.setWorkRemaining(100);
-
-        checkCancellation(CancelOption.NOTIFY_PEER);
 
         log.debug("Inv" + Utils.prefix(peer)
             + ": Waiting for remote file list...");
 
-        subMonitor.setTaskName("Waiting for the " + peer + " file list...");
+        try {
+            monitor.beginTask("Waiting for the " + peer + " file list...", 1);
 
-        checkCancellation(CancelOption.NOTIFY_PEER);
+            checkCancellation(CancelOption.NOTIFY_PEER);
 
-        List<FileList> remoteFileLists = transmitter.receiveFileLists(
-            processID, peer, subMonitor, true);
-        log.debug("Inv" + Utils.prefix(peer)
-            + ": Remote file list has been received.");
+            List<FileList> remoteFileLists = transmitter.receiveFileLists(
+                processID, peer, monitor.newChild(1), true);
 
-        checkCancellation(CancelOption.NOTIFY_PEER);
-        for (FileList fileList : remoteFileLists) {
-            this.projectFilesToSend.put(fileList.getProjectID(),
-                fileList.getPaths());
-            log.debug(fileList.toString());
+            log.debug("Inv" + Utils.prefix(peer)
+                + ": Remote file list has been received.");
+
+            checkCancellation(CancelOption.NOTIFY_PEER);
+
+            for (FileList fileList : remoteFileLists) {
+                this.projectFilesToSend.put(fileList.getProjectID(),
+                    fileList.getPaths());
+                log.debug(fileList.toString());
+            }
+        } finally {
+            monitor.done();
         }
     }
 
@@ -396,16 +415,14 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
      *            peer
      * @return List of project archives
      */
-    protected List<File> createProjectArchives(SubMonitor subMonitor,
+    protected List<File> createProjectArchives(SubMonitor monitor,
         MappedList<String, IPath> projectFilesToSend) throws IOException,
         SarosCancellationException {
 
         log.debug("Inv" + Utils.prefix(peer) + ": Creating archive...");
         checkCancellation(CancelOption.NOTIFY_PEER);
 
-        subMonitor.setWorkRemaining(100);
-        subMonitor.setTaskName("Creating archive...");
-
+        monitor.beginTask("Creating archives...", projectFilesToSend.size());
         /*
          * STOP users
          * 
@@ -422,15 +439,14 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
             + usersToStop);
         // TODO: startHandles outside of sync block?
         List<StartHandle> startHandles;
+
         synchronized (sarosSession) {
             startHandles = sarosSession.getStopManager().stop(usersToStop,
                 "Synchronizing invitation",
-                subMonitor.newChild(25, SubMonitor.SUPPRESS_ALL_LABELS));
+                monitor.newChild(0, SubMonitor.SUPPRESS_ALL_LABELS));
         }
 
         try {
-            SubMonitor archiveMonitor = subMonitor.newChild(50,
-                SubMonitor.SUPPRESS_ALL_LABELS);
 
             List<File> archivesToSend = new LinkedList<File>();
 
@@ -440,16 +456,21 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
                 String projectID = entry.getKey();
                 List<IPath> toSend = entry.getValue();
 
-                File projectArchive = createProjectArchive(archiveMonitor,
-                    toSend, projectID);
+                File projectArchive = createProjectArchive(
+                    monitor.newChild(1, SubMonitor.SUPPRESS_NONE), toSend,
+                    projectID);
 
                 if (projectArchive != null) {
                     archivesToSend.add(projectArchive);
                 }
             }
-            subMonitor.worked(25);
+
             return archivesToSend;
+
         } finally {
+
+            monitor.done();
+
             // START all users
             for (StartHandle startHandle : startHandles) {
                 log.debug("Inv" + Utils.prefix(peer) + ": Starting user "
@@ -459,22 +480,27 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
         }
     }
 
-    protected void sendArchive(SubMonitor subMonitor, File archive,
+    protected void sendArchive(SubMonitor monitor, File archive,
         String projectID) throws SarosCancellationException, IOException {
 
-        subMonitor.setWorkRemaining(100);
+        monitor.beginTask("Sending archive...", 1);
 
         log.debug("Inv" + Utils.prefix(peer) + ": Sending archive...");
-        subMonitor.setTaskName("Sending archive...");
+        monitor.setTaskName("Sending archive...");
+
         if (archive == null)
             log.debug("Inv" + Utils.prefix(peer) + ": The archive is empty.");
-        transmitter.sendProjectArchive(peer, projectID, archive,
-            subMonitor.newChild(100, SubMonitor.SUPPRESS_ALL_LABELS));
+
+        try {
+            transmitter.sendProjectArchive(peer, projectID, archive,
+                monitor.newChild(1, SubMonitor.SUPPRESS_ALL_LABELS));
+        } finally {
+            monitor.done();
+        }
     }
 
-    private File createProjectArchive(SubMonitor archiveMonitor,
-        List<IPath> toSend, String projectID) throws IOException,
-        SarosCancellationException {
+    private File createProjectArchive(SubMonitor monitor, List<IPath> toSend,
+        String projectID) throws IOException, SarosCancellationException {
         IProject project = sarosSession.getProject(projectID);
         log.debug("Got project from session");
         /*
@@ -491,14 +517,16 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
         }
 
         File tempArchive = null;
-        if (toSend.size() > 0) {
+        try {
+            if (toSend.size() > 0) {
 
-            tempArchive = File.createTempFile(prefix, ".zip");
-            FileZipper.createProjectZipArchive(toSend, tempArchive, project,
-                archiveMonitor);
+                tempArchive = File.createTempFile(prefix, ".zip");
+                FileZipper.createProjectZipArchive(toSend, tempArchive,
+                    project, monitor);
+            }
+        } finally {
+            monitor.done();
         }
-
-        archiveMonitor.done();
         return tempArchive;
     }
 }
