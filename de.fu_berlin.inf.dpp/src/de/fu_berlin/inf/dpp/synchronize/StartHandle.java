@@ -9,6 +9,11 @@ import org.eclipse.core.runtime.SubMonitor;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.util.StackTrace;
 
+/**
+ * The StartHandle will be created and returned by the StopManager. This handle
+ * can be used exactly once to signal the StopManager to un-stop (start) the
+ * remote user again.
+ */
 public class StartHandle {
 
     private static final Logger log = Logger.getLogger(StartHandle.class);
@@ -29,24 +34,26 @@ public class StartHandle {
      */
     protected AtomicBoolean acknowledged = new AtomicBoolean(false);
 
-    public StartHandle(User user, StopManager stopManager, String id) {
+    StartHandle(User user, StopManager stopManager, String id) {
         this.user = user;
         this.stopManager = stopManager;
         this.id = id;
     }
 
     /**
-     * Notifies the StopManager, that the operation for which this IStartHandle
+     * Notifies the StopManager, that the operation for which this StartHandle
      * was returned by a call to stop has finished.
      * 
      * This method will return immediately and return true, if the stopped user
-     * continued working or false if other IStartHandles exist for this user,
+     * continued working or false if other StartHandles exist for this user,
      * which have not been called.
      * 
      * @nonblocking
      * 
      * @Throws IllegalStateException if start() is called twice on the same
      *         handle.
+     * 
+     * @return <code>true</true> if this was the last StartHandle for the user.
      */
     public boolean start() {
 
@@ -64,11 +71,15 @@ public class StartHandle {
     }
 
     /**
-     * Notifies the StopManager, that the operation for which this IStartHandle
+     * Notifies the StopManager, that the operation for which this StartHandle
      * was returned by a call to stop has finished.
      * 
-     * This method returns true, if the stopped user continued working or false
-     * if other IStartHandles exist for this user, which have not been called.
+     * @param progress
+     *            A progress monitor used to cancel the operation.
+     * 
+     * @return <code>true</code>, if the stopped user continued working or false
+     *         if other StartHandles exist for this user, which have not been
+     *         called.
      * 
      * @blocking waits until the blocked user acknowledged the start
      * 
@@ -100,6 +111,8 @@ public class StartHandle {
      * using the given progress monitor.
      * 
      * Returns whether the handle was acknowledged or not
+     * 
+     * @Throws CancellationException
      */
     public boolean await(final SubMonitor progress) {
         try {
@@ -115,15 +128,26 @@ public class StartHandle {
         return acknowledged.get();
     }
 
+    /**
+     * Get the stopped User.
+     * 
+     * @return the stopped User
+     */
     public User getUser() {
         return user;
     }
 
-    public String getHandleID() {
+    /**
+     * @return the internal handle id
+     */
+    String getHandleID() {
         return id;
     }
 
-    public void acknowledge() {
+    /**
+     * Remember that the stopped user has acknowledged this handle.
+     */
+    void acknowledge() {
         if (!acknowledged.compareAndSet(false, true)) {
             log.warn("Acknowledge should only be called once per handle",
                 new StackTrace());

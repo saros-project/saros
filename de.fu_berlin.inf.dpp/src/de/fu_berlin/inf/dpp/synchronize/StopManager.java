@@ -38,6 +38,20 @@ import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.util.ObservableValue;
 import de.fu_berlin.inf.dpp.util.Utils;
 
+/**
+ * The @StopManager class is used to coordinate blocking of user input between
+ * different Saros Users. Blocking the user input is not implemented by this
+ * class but by classes that implement the @Blockable interface and have
+ * registered themselves with the StopManager by calling {@link #addBlockable}.
+ *
+ * There are two variants of the {@link #stop} method. One is working on a
+ * single Saros User and the other is working on a collection of them. The
+ * guarantee the StopManager makes is that at the end of the execution of the
+ * {@link #stop} method all Saros Users are stopped or all of them are started.
+ *
+ * A StartHandle will be returned for each stopped user, it can be used to
+ * remove the block of remote users.
+ */
 @Component(module = "core")
 public class StopManager implements IActivityProvider {
 
