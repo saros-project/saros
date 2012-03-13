@@ -62,6 +62,7 @@ public class StoppedAction extends Action implements Disposable {
     };
 
     public StoppedAction() {
+        setEnabled(false);
         setText(Messages.StoppedAction_title);
         setImageDescriptor(new ImageDescriptor() {
             @Override
