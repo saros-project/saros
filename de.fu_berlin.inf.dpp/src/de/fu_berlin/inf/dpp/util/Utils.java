@@ -389,10 +389,13 @@ public class Utils {
      * Run the given runnable in a new thread and log any RuntimeExceptions to
      * the given log.
      * 
+     * @return The Thread which has been created and started to run the given
+     *         runnable.
+     * 
      * @nonBlocking
      */
-    public static void runSafeAsync(final Logger log, final Runnable runnable) {
-        runSafeAsync(null, log, runnable);
+    public static Thread runSafeAsync(final Logger log, final Runnable runnable) {
+        return runSafeAsync(null, log, runnable);
     }
 
     /**

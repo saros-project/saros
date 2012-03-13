@@ -13,7 +13,6 @@ import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
@@ -21,7 +20,6 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
 
 import de.fu_berlin.inf.dpp.User;
@@ -43,12 +41,12 @@ import de.fu_berlin.inf.dpp.util.Utils;
  * different Saros Users. Blocking the user input is not implemented by this
  * class but by classes that implement the @Blockable interface and have
  * registered themselves with the StopManager by calling {@link #addBlockable}.
- *
+ * 
  * There are two variants of the {@link #stop} method. One is working on a
  * single Saros User and the other is working on a collection of them. The
  * guarantee the StopManager makes is that at the end of the execution of the
  * {@link #stop} method all Saros Users are stopped or all of them are started.
- *
+ * 
  * A StartHandle will be returned for each stopped user, it can be used to
  * remove the block of remote users.
  */
@@ -85,7 +83,13 @@ public class StopManager implements IActivityProvider {
     private Map<String, StartHandle> startsToBeAcknowledged = Collections
         .synchronizedMap(new HashMap<String, StartHandle>());
 
-    // blocking mechanism
+    /**
+     * Blocking mechanism. The call to stop wants to block until the
+     * acknowledgment for the StopActivity arrives at our anonymous
+     * {@link AbstractActivityReceiver} implementation. We use a wait condition
+     * for that. There might be multiple threads that wait for this event to
+     * happen. The lock is not used to protect any data structure.
+     */
     protected Lock reentrantLock = new ReentrantLock();
     protected final Condition acknowledged = reentrantLock.newCondition();
 
@@ -139,18 +143,21 @@ public class StopManager implements IActivityProvider {
                         return;
                     }
 
-                    // it has to be removed from the expected ack list
-                    // because it already arrived
-                    if (expectedAcknowledgments.remove(stopActivity)) {
-                        reentrantLock.lock();
-                        acknowledged.signalAll();
-                        reentrantLock.unlock();
-                        return;
-                    } else {
+                    /**
+                     * Remove from the expectedAcknowledgements set and inform
+                     * who ever has been waiting for that to happen. Warn if the
+                     * removal is failing besides the above check.
+                     */
+                    if (!expectedAcknowledgments.remove(stopActivity)) {
                         log.warn("Received unexpected "
                             + "StopActivity acknowledgement: " + stopActivity);
                         return;
                     }
+
+                    reentrantLock.lock();
+                    acknowledged.signalAll();
+                    reentrantLock.unlock();
+                    return;
                 }
             }
 
@@ -186,9 +193,6 @@ public class StopManager implements IActivityProvider {
      * Blocking method that asks the given users to halt all user-input and
      * returns a list of handles to be used when the users can start again.
      * 
-     * TODO This method is not tested for more than one user since it is not
-     * used yet.
-     * 
      * @param users
      *            the participants who has to stop
      * @param cause
@@ -213,20 +217,19 @@ public class StopManager implements IActivityProvider {
 
         final List<StartHandle> resultingHandles = Collections
             .synchronizedList(new LinkedList<StartHandle>());
-        final CountDownLatch doneSignal = new CountDownLatch(users.size());
+        final LinkedList<Thread> threads = new LinkedList<Thread>();
 
         for (final User user : users) {
-            Utils.runSafeAsync(log, new Runnable() {
+            threads.add(Utils.runSafeAsync(log, new Runnable() {
                 public void run() {
                     try {
-                        StartHandle startHandle = stop(user, cause,
-                            SubMonitor.convert(new NullProgressMonitor()));
-                        // FIXME Race Condition: startHandle was not added yet
-                        // in case of cancellation
+                        if (monitor.isCanceled())
+                            return;
+
+                        StartHandle startHandle = stop(user, cause, monitor);
                         resultingHandles.add(startHandle);
                         log.debug("Added " + startHandle
                             + " to resulting handles.");
-                        doneSignal.countDown();
                     } catch (CancellationException e) {
                         log.debug("Buddy canceled the Stopping");
                         monitor.setCanceled(true);
@@ -235,16 +238,28 @@ public class StopManager implements IActivityProvider {
                         monitor.setCanceled(true);
                     }
                 }
-            });
+            }));
         }
-        while (resultingHandles.size() != users.size() && !monitor.isCanceled()) {
+
+        /**
+         * We have started all threads and we will wait for all of them to
+         * finish now. This is the safest and most simple approach to avoid
+         * ending up with ConcurrentModificationExceptions that might happen
+         * when we resume the remote users while some threads still need to be
+         * executed.
+         */
+        while (!threads.isEmpty()) {
             try {
-                // waiting for all startHandles
-                doneSignal.await(MILLISTOWAIT, TimeUnit.MILLISECONDS);
+                threads.getFirst().join();
+                threads.removeFirst();
             } catch (InterruptedException e) {
-                log.error("Stopping was interrupted. Not all buddies could successfully be stopped.");
+                // We need to ignore this right now as we would end up with
+                // inconsistent state at the end of this method. Some remote
+                // Users might be blocked already and would remain blocked. We
+                // will just need to try again until all threads have terminated
             }
         }
+
         if (monitor.isCanceled()) {
             // Restart the already stopped users
             log.debug("Monitor was canceled. Restarting already stopped buddies.");
@@ -506,7 +521,17 @@ public class StopManager implements IActivityProvider {
 
     public void sessionStopped() {
         lockProject(false);
-        // TODO Auto-generated method stub
-        /* add old cleanup here... */
+        clearExpectedAcknowledgments();
+    }
+
+    private void clearExpectedAcknowledgments() {
+        /**
+         * Clear the expectedAcknowledgements and inform the threads that are
+         * blocked in the stop method that there will be no response.
+         */
+        reentrantLock.lock();
+        expectedAcknowledgments.clear();
+        acknowledged.signalAll();
+        reentrantLock.unlock();
     }
 }
