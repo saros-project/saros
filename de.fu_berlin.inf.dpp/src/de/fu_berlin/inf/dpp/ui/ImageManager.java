@@ -40,6 +40,7 @@ public class ImageManager {
     public static final Image DTOOL_STATISTIC = getImage("icons/dtool16/statistic_misc.png"); //$NON-NLS-1$
     public static final Image ETOOL_CRASH_REPORT = getImage("icons/etool16/crash_report_misc.png"); //$NON-NLS-1$
     public static final Image DTOOL_CRASH_REPORT = getImage("icons/dtool16/crash_report_misc.png"); //$NON-NLS-1$
+    public static final Image ETOOL_NEW_PROJECT = getImage("icons/etool16/new_project.gif"); //$NON-NLS-1$
 
     /*
      * local tool bar
@@ -65,6 +66,7 @@ public class ImageManager {
     public static final Image DLCL_PROJECT_SHARE_ADD_BUDDIES = getImage("icons/dlcl16/project_share_add_buddies_tsk.png"); //$NON-NLS-1$
     public static final Image ELCL_SAROS_SESSION_STOP_PROCESS = getImage("icons/elcl16/saros_session_stop_process_tsk.png"); //$NON-NLS-1$
     public static final Image DLCL_SAROS_SESSION_STOP_PROCESS = getImage("icons/dlcl16/saros_session_stop_process_tsk.png"); //$NON-NLS-1$
+    public static final Image ELCL_DELETE = getImage("icons/btn/deleteaccount.png"); //$NON-NLS-1$
 
     /*
      * objects
