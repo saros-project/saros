@@ -845,8 +845,8 @@ public class Utils {
             return " ("
                 + formatByte(length)
                 + " in "
-                + deltaMs
-                + " ms at "
+                + formatDuration(deltaMs / 1000)
+                + " at "
                 + new DecimalFormat("#0.00").format((1000d * length / 1024d)
                     / deltaMs) + " KiB/s)";
 
@@ -865,6 +865,31 @@ public class Utils {
             return (length / 1024L) + " KiB";
         }
         return length / 1024L / 1024L + " MiB";
+    }
+
+    /**
+     * Formats a given duration in seconds (e.g. achived by using a StopWatch)
+     * as HH:MM:SS
+     * 
+     * @param seconds
+     * @return
+     */
+    public static String formatDuration(long seconds) {
+        String format = "";
+
+        if (seconds <= 0L) {
+            return "";
+        }
+        long hours = seconds / 3600;
+        long minutes = (seconds % 3600) / 60;
+        long secs = (seconds % 60);
+
+        format += hours > 0 ? String.format("%02d", hours) + "h " : "";
+        format += minutes > 0 ? String.format(hours > 0 ? "%02d" : "%d",
+            minutes) + "m " : "";
+        format += seconds > 0 ? String
+            .format(minutes > 0 ? "%02d" : "%d", secs) + "s" : "";
+        return format;
     }
 
     /**
