@@ -592,10 +592,13 @@ public class SarosSessionManager implements ISarosSessionManager {
     public List<ProjectExchangeInfo> createProjectExchangeInfoList(
         List<IProject> projectsToShare, SubMonitor subMonitor)
         throws LocalCancellationException {
-        subMonitor.setTaskName(Messages.SarosSessionManager_creating_file_list);
-        subMonitor.setWorkRemaining(100);
+
+        subMonitor.beginTask(Messages.SarosSessionManager_creating_file_list,
+            projectsToShare.size());
+
         List<ProjectExchangeInfo> pInfos = new ArrayList<ProjectExchangeInfo>(
             projectsToShare.size());
+
         for (IProject iProject : projectsToShare) {
             if (subMonitor.isCanceled())
                 throw new LocalCancellationException(null,
@@ -604,11 +607,14 @@ public class SarosSessionManager implements ISarosSessionManager {
                 String projectID = this.getSarosSession()
                     .getProjectID(iProject);
                 String projectName = iProject.getName();
+
                 FileList projectFileList = FileListFactory.createFileList(
                     iProject,
                     this.getSarosSession().getSharedResources(iProject), this
                         .getSarosSession().useVersionControl(), subMonitor
-                        .newChild(0));
+                        .newChild(1, SubMonitor.SUPPRESS_BEGINTASK
+                            | SubMonitor.SUPPRESS_SETTASKNAME));
+
                 projectFileList.setProjectID(projectID);
                 boolean partial = !this.getSarosSession().isCompletelyShared(
                     iProject);
@@ -616,11 +622,11 @@ public class SarosSessionManager implements ISarosSessionManager {
                 ProjectExchangeInfo pInfo = new ProjectExchangeInfo(projectID,
                     "", projectName, partial, projectFileList); //$NON-NLS-1$
                 pInfos.add(pInfo);
+
             } catch (CoreException e) {
                 throw new LocalCancellationException(e.getMessage(),
                     CancelOption.DO_NOT_NOTIFY_PEER);
             }
-            subMonitor.worked(100 / projectsToShare.size());
         }
         subMonitor.subTask("");
         subMonitor.done();

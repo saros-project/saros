@@ -160,13 +160,10 @@ public class OutgoingSessionNegotiation extends InvitationProcess {
             editorManager.setAllLocalOpenedEditorsLocked(true);
 
             // FIXME lock the projects on the workspace !
-            monitor
-                .setTaskName("Calculating file list and file checksums. This may take a while...");
             List<ProjectExchangeInfo> projectExchangeInfos = sarosSessionManager
                 .createProjectExchangeInfoList(new ArrayList<IProject>(
                     sarosSession.getProjects()), monitor.newChild(85,
-                    SubMonitor.SUPPRESS_BEGINTASK
-                        | SubMonitor.SUPPRESS_SETTASKNAME));
+                    SubMonitor.SUPPRESS_NONE));
 
             monitor.subTask("");
 
