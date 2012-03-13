@@ -79,7 +79,25 @@ public class FileZipper {
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
 
-        progress.beginTask("Creating Archive", files.size());
+        long totalFileSizes = 0;
+
+        for (IPath path : files) {
+            IFile file = project.getFile(path);
+            try {
+                long filesize = org.eclipse.core.filesystem.EFS
+                    .getStore(file.getLocationURI()).fetchInfo().getLength();
+                totalFileSizes += filesize;
+            } catch (CoreException e) {
+                // TODO Auto-generated catch block
+                log.warn(
+                    "Failed to retrieve file size of file "
+                        + file.getLocationURI(), e);
+            }
+        }
+        progress.beginTask("Creating the archive", files.size());
+        progress.setTaskName("Creating archive for project \""
+            + project.getName() + "\" (" + files.size() + " files, "
+            + Utils.formatByte(totalFileSizes) + ")");
 
         byte[] buffer = new byte[BUFFER_SIZE];
 
@@ -95,12 +113,17 @@ public class FileZipper {
 
         ZipOutputStream zipStream = new ZipOutputStream(outputStream);
 
+        int i = 1;
         for (IPath path : files) {
             IFile file = project.getFile(path);
 
             try {
+                progress.subTask("Compressing file " + (i++) + "/"
+                    + files.size() + ": " + path.toPortableString());
                 zipSingleFile(new WrappedIFile(file), path.toPortableString(),
                     zipStream, buffer, progress.newChild(1));
+                totalFileSizes -= org.eclipse.core.filesystem.EFS
+                    .getStore(file.getLocationURI()).fetchInfo().getLength();
             } catch (SarosCancellationException e) {
                 cleanup(archive);
                 throw e;
@@ -110,6 +133,18 @@ public class FileZipper {
             } catch (IOException e) {
                 cleanup(archive);
                 throw e;
+            } catch (CoreException e) {
+                // TODO Auto-generated catch block
+                log.debug("", e);
+            }
+            if (totalFileSizes > 0) {
+                progress.setTaskName("Creating archive for project \""
+                    + project.getName() + "\": " + (files.size() - i + 1)
+                    + " files and " + Utils.formatByte(totalFileSizes)
+                    + " left");
+            } else {
+                progress.setTaskName("Creating archive for project \""
+                    + project.getName() + "\": done");
             }
         }
         zipStream.close();
@@ -123,7 +158,9 @@ public class FileZipper {
         log.debug(String.format("Created project archive %s at %s",
             stopWatch.throughput(archive.length()), archive.getAbsolutePath()));
 
-        progress.done();
+        // we should not call DONE on a subMonitor, since the progress is marked
+        // as finished anyway when the parent progress is touched again
+        progress.subTask(""); // ex: .done()
     }
 
     public static void cleanup(File archive) {
