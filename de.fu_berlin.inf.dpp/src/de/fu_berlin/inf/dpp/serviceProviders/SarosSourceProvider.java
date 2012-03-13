@@ -3,9 +3,12 @@ package de.fu_berlin.inf.dpp.serviceProviders;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.eclipse.core.commands.Command;
 import org.eclipse.core.expressions.Expression;
 import org.eclipse.ui.AbstractSourceProvider;
 import org.eclipse.ui.ISources;
+import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.commands.ICommandService;
 import org.jivesoftware.smack.Connection;
 import org.picocontainer.annotations.Inject;
 
@@ -17,7 +20,6 @@ import de.fu_berlin.inf.dpp.project.AbstractSarosSessionListener;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ISarosSessionListener;
 import de.fu_berlin.inf.dpp.project.SarosSessionManager;
-import de.fu_berlin.inf.dpp.ui.util.CommandUtils;
 import de.fu_berlin.inf.dpp.util.Utils;
 
 /**
@@ -113,7 +115,7 @@ public class SarosSourceProvider extends AbstractSourceProvider {
         Utils.runSafeSWTAsync(null, new Runnable() {
             public void run() {
                 fireSourceChanged(ISources.WORKBENCH, SAROS, saros);
-                CommandUtils.refreshUIElements(SAROS_DEPENDENT_COMMANDS);
+                refreshUIElements(SAROS_DEPENDENT_COMMANDS);
             }
         });
     }
@@ -123,10 +125,26 @@ public class SarosSourceProvider extends AbstractSourceProvider {
             public void run() {
                 fireSourceChanged(ISources.WORKBENCH, SAROS_SESSION,
                     sarosSession);
-                CommandUtils
-                    .refreshUIElements(SAROS_SESSION_DEPENDENT_COMMANDS);
+
+                refreshUIElements(SAROS_SESSION_DEPENDENT_COMMANDS);
             }
         });
     }
 
+    /**
+     * Refreshes all UI elements that display the given {@link Command}s.
+     * 
+     * @param commandIDs
+     */
+    private void refreshUIElements(final String[] commandIDs) {
+        ICommandService commandService = (ICommandService) PlatformUI
+            .getWorkbench().getActiveWorkbenchWindow()
+            .getService(ICommandService.class);
+
+        if (commandService == null)
+            return;
+
+        for (String commandID : commandIDs)
+            commandService.refreshElements(commandID, null);
+    }
 }
