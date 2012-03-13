@@ -1,7 +1,5 @@
 package de.fu_berlin.inf.dpp.ui;
 
-import java.util.concurrent.TimeUnit;
-
 import org.apache.log4j.Logger;
 import org.eclipse.ui.IWindowListener;
 import org.eclipse.ui.IWorkbench;
@@ -14,9 +12,6 @@ import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.net.ConnectionState;
 import de.fu_berlin.inf.dpp.net.IConnectionListener;
 import de.fu_berlin.inf.dpp.net.SarosNet;
-import de.fu_berlin.inf.dpp.util.DeferredValueChangeListener;
-import de.fu_berlin.inf.dpp.util.Utils;
-import de.fu_berlin.inf.dpp.util.ValueChangeListener;
 
 /**
  * This class is responsible of setting the presence of Saros to away if the
@@ -28,9 +23,13 @@ public class LocalPresenceTracker {
     private static final Logger log = Logger
         .getLogger(LocalPresenceTracker.class);
 
-    protected Connection connection = null;
+    private static final long DELAY_UNTIL_SET_AWAY = 5 * 60 * 1000; // 5 minutes
 
-    boolean active = true;
+    private Connection connection = null;
+
+    private boolean active = true;
+
+    private Thread awayAnnouncer = null;
 
     public LocalPresenceTracker(SarosNet sarosNet) {
 
@@ -61,73 +60,100 @@ public class LocalPresenceTracker {
         bench.addWindowListener(new IWindowListener() {
 
             public void windowOpened(IWorkbenchWindow window) {
-                setActiveDeferred(true);
+                announceAvailable();
             }
 
             public void windowDeactivated(IWorkbenchWindow window) {
-                setActiveDeferred(false);
+                setAway(DELAY_UNTIL_SET_AWAY);
             }
 
             public void windowClosed(IWorkbenchWindow window) {
-                setActiveDeferred(false);
+                setAway(DELAY_UNTIL_SET_AWAY);
             }
 
             public void windowActivated(IWorkbenchWindow window) {
-                setActiveDeferred(true);
+                announceAvailable();
             }
 
-            protected ValueChangeListener<Boolean> windowChanges = new ValueChangeListener<Boolean>() {
-                public void setValue(Boolean newValue) {
-                    setActive(newValue);
-                }
-            };
-
-            /**
-             * Defer sending of events for 5 seconds in case the user comes back
-             * quickly
-             */
-            protected DeferredValueChangeListener<Boolean> deferrer = new DeferredValueChangeListener<Boolean>(
-                windowChanges, 5, TimeUnit.SECONDS);
-
-            protected void setActiveDeferred(final boolean active) {
-                Utils.wrapSafe(log, new Runnable() {
-                    public void run() {
-                        log.debug("Eclipse window now " //$NON-NLS-1$
-                            + (active ? "  " : "in") + "active."); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-                        /*
-                         * Wait one second before sending an active presence
-                         * update and 5 seconds for an away update.
-                         */
-                        deferrer.setValue(active, active ? 1 : 5,
-                            TimeUnit.SECONDS);
-                    }
-                }).run();
-            }
         });
 
-        setActive(bench.getActiveWorkbenchWindow() != null);
+        if (bench.getActiveWorkbenchWindow() != null)
+            announceAvailable();
+        else
+            setAway(DELAY_UNTIL_SET_AWAY);
 
     }
 
-    protected synchronized void setConnection(Connection connection) {
+    private synchronized void setConnection(Connection connection) {
         this.connection = connection;
     }
 
-    protected synchronized void setActive(boolean newValue) {
-        if (active == newValue || connection == null) {
+    private synchronized void setAway(final long delay) {
+        if ((awayAnnouncer != null && awayAnnouncer.isAlive()))
             return;
-        }
-        active = newValue;
+
+        awayAnnouncer = new Thread(new Runnable() {
+
+            @Override
+            public void run() {
+                try {
+                    Thread.sleep(delay);
+                    announceAway();
+                } catch (InterruptedException e) {
+                    return;
+                } catch (Exception e) {
+                    log.error(e.getMessage(), e);
+                }
+            }
+        });
+
+        awayAnnouncer.start();
+    }
+
+    private synchronized void announceAway() {
+
+        if (!active)
+            return;
+
+        active = false;
+
+        if (connection == null)
+            return;
 
         Presence presence = new Presence(Presence.Type.available);
-        if (active) {
-            presence.setMode(Presence.Mode.available);
-            presence.setStatus(Messages.LocalPresenceTracker_eclipse_active);
-        } else {
-            presence.setMode(Presence.Mode.away);
-            presence.setStatus(Messages.LocalPresenceTracker_eclipse_background);
-        }
+        presence.setMode(Presence.Mode.away);
+        presence.setStatus(Messages.LocalPresenceTracker_eclipse_background);
+
         connection.sendPacket(presence);
     }
 
+    private synchronized void announceAvailable() {
+
+        if (awayAnnouncer != null) {
+            awayAnnouncer.interrupt();
+            try {
+                awayAnnouncer.join();
+            } catch (InterruptedException e) {
+                active = false;
+                Thread.currentThread().interrupt();
+                return;
+            }
+        }
+
+        awayAnnouncer = null;
+
+        if (active)
+            return;
+
+        active = true;
+
+        if (connection == null)
+            return;
+
+        Presence presence = new Presence(Presence.Type.available);
+
+        presence.setMode(Presence.Mode.available);
+        presence.setStatus(Messages.LocalPresenceTracker_eclipse_active);
+        connection.sendPacket(presence);
+    }
 }

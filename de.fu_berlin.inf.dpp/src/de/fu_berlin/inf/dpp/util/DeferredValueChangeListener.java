@@ -7,15 +7,15 @@ import java.util.concurrent.TimeUnit;
 
 public class DeferredValueChangeListener<T> implements ValueChangeListener<T> {
 
-    protected ValueChangeListener<T> wrapped;
+    private ValueChangeListener<T> wrapped;
 
-    protected ScheduledExecutorService executor;
+    private ScheduledExecutorService executor;
 
-    protected Future<?> setFilterFuture;
+    private Future<?> setFilterFuture;
 
-    protected long time;
+    private long time;
 
-    protected TimeUnit timeUnit;
+    private TimeUnit timeUnit;
 
     public static <S> ValueChangeListener<S> defer(ValueChangeListener<S> wrap,
         long time, TimeUnit timeUnit) {
