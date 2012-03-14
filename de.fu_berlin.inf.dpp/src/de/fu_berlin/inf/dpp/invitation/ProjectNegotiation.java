@@ -2,15 +2,11 @@ package de.fu_berlin.inf.dpp.invitation;
 
 import java.util.Map;
 
-import org.apache.log4j.Logger;
 import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.SarosContext;
-import de.fu_berlin.inf.dpp.exceptions.StreamException;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.net.internal.StreamSession;
-import de.fu_berlin.inf.dpp.net.internal.StreamSession.StreamSessionListener;
 import de.fu_berlin.inf.dpp.observables.ProjectNegotiationObservable;
 import de.fu_berlin.inf.dpp.project.SarosSessionManager;
 
@@ -22,16 +18,11 @@ import de.fu_berlin.inf.dpp.project.SarosSessionManager;
  */
 public abstract class ProjectNegotiation {
 
-    private static final Logger log = Logger
-        .getLogger(ProjectNegotiation.class);
-
     @Inject
     protected ProjectNegotiationObservable projectExchangeProcesses;
     protected JID peer;
     @Inject
     protected ITransmitter transmitter;
-    protected boolean error = false;
-    protected StreamSession streamSession;
     protected String processID;
 
     /**
@@ -47,21 +38,6 @@ public abstract class ProjectNegotiation {
 
     @Inject
     protected SarosSessionManager sessionManager;
-
-    protected StreamSessionListener sessionListener = new StreamSessionListener() {
-
-        public void sessionStopped() {
-            if (streamSession != null) {
-                streamSession.shutdownFinished();
-                streamSession = null;
-            }
-        }
-
-        public void errorOccured(StreamException e) {
-            log.error("Got error while streaming project archive: ", e);
-            error = true;
-        }
-    };
 
     public ProjectNegotiation(JID peer, SarosContext sarosContext) {
         this.peer = peer;

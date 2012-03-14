@@ -19,15 +19,11 @@
  */
 package de.fu_berlin.inf.dpp.invitation;
 
-import org.apache.log4j.Logger;
 import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.SarosContext;
-import de.fu_berlin.inf.dpp.exceptions.StreamException;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.net.internal.StreamSession;
-import de.fu_berlin.inf.dpp.net.internal.StreamSession.StreamSessionListener;
 import de.fu_berlin.inf.dpp.observables.InvitationProcessObservable;
 import de.fu_berlin.inf.dpp.project.SarosSessionManager;
 
@@ -37,8 +33,6 @@ import de.fu_berlin.inf.dpp.project.SarosSessionManager;
  */
 public abstract class InvitationProcess {
 
-    private final static Logger log = Logger.getLogger(InvitationProcess.class);
-
     @Inject
     protected ITransmitter transmitter;
     protected JID peer;
@@ -47,26 +41,9 @@ public abstract class InvitationProcess {
 
     @Inject
     protected SarosSessionManager sarosSessionManager;
-    protected StreamSession streamSession;
 
     @Inject
     protected InvitationProcessObservable invitationProcesses;
-    protected boolean error = false;
-
-    protected StreamSessionListener sessionListener = new StreamSessionListener() {
-
-        public void sessionStopped() {
-            if (streamSession != null) {
-                streamSession.shutdownFinished();
-                streamSession = null;
-            }
-        }
-
-        public void errorOccured(StreamException e) {
-            log.error("Got error while streaming project archive: ", e);
-            error = true;
-        }
-    };
 
     public InvitationProcess(JID peer, String description, int colorID,
         SarosContext sarosContext) {
