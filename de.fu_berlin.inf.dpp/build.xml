@@ -91,6 +91,9 @@
 			<!-- only instrument Saros and Plugins proper code -->
 			<includeClasses regex="de\.fu_berlin\.inf.*" />
 
+			<!-- exclude GUI classes  -->
+			<excludeClasses regex=".*\.ui\..*" />
+
 			<!-- exclude classes ending in Test -->
 			<excludeClasses regex=".*Test" />
 
