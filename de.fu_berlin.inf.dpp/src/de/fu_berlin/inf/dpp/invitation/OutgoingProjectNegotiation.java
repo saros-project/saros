@@ -40,6 +40,7 @@ import de.fu_berlin.inf.dpp.net.internal.SarosPacketCollector;
 import de.fu_berlin.inf.dpp.net.internal.XMPPReceiver;
 import de.fu_berlin.inf.dpp.net.internal.extensions.PacketExtensionUtils;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
+import de.fu_berlin.inf.dpp.project.IChecksumCache;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.synchronize.StartHandle;
 import de.fu_berlin.inf.dpp.util.FileZipper;
@@ -77,6 +78,9 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
 
     @Inject
     protected XMPPReceiver xmppReceiver;
+
+    @Inject
+    protected IChecksumCache checksumCache;
 
     protected HashMap<IProject, List<IResource>> projectResources;
     protected List<ProjectExchangeInfo> projectExchangeInfos;
@@ -171,7 +175,7 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
 
                     FileList projectFileList = FileListFactory.createFileList(
                         iProject, projectResources.get(iProject),
-                        useVersionControl, monitor.newChild(1));
+                        checksumCache, useVersionControl, monitor.newChild(1));
 
                     if (monitor.isCanceled())
                         break;

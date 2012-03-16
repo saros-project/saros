@@ -133,6 +133,9 @@ public class SarosSessionManager implements ISarosSessionManager {
     @Inject
     protected SarosContext sarosContext;
 
+    @Inject
+    protected IChecksumCache checksumCache;
+
     protected SarosNet sarosNet;
 
     private final List<ISarosSessionListener> sarosSessionListeners = new CopyOnWriteArrayList<ISarosSessionListener>();
@@ -610,10 +613,11 @@ public class SarosSessionManager implements ISarosSessionManager {
 
                 FileList projectFileList = FileListFactory.createFileList(
                     iProject,
-                    this.getSarosSession().getSharedResources(iProject), this
-                        .getSarosSession().useVersionControl(), subMonitor
-                        .newChild(1, SubMonitor.SUPPRESS_BEGINTASK
-                            | SubMonitor.SUPPRESS_SETTASKNAME));
+                    this.getSarosSession().getSharedResources(iProject),
+                    checksumCache,
+                    this.getSarosSession().useVersionControl(),
+                    subMonitor.newChild(1, SubMonitor.SUPPRESS_BEGINTASK
+                        | SubMonitor.SUPPRESS_SETTASKNAME));
 
                 projectFileList.setProjectID(projectID);
                 boolean partial = !this.getSarosSession().isCompletelyShared(

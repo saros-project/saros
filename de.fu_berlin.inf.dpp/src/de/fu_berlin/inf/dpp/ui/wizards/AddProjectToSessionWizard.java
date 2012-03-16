@@ -22,11 +22,13 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.dialogs.PageChangingEvent;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.swt.widgets.Shell;
+import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.FileList;
 import de.fu_berlin.inf.dpp.FileListDiff;
 import de.fu_berlin.inf.dpp.FileListFactory;
 import de.fu_berlin.inf.dpp.Saros;
+import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
 import de.fu_berlin.inf.dpp.invitation.IncomingProjectNegotiation;
 import de.fu_berlin.inf.dpp.invitation.ProcessTools.CancelLocation;
@@ -34,6 +36,7 @@ import de.fu_berlin.inf.dpp.invitation.ProcessTools.CancelOption;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
+import de.fu_berlin.inf.dpp.project.IChecksumCache;
 import de.fu_berlin.inf.dpp.project.SarosSessionManager;
 import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.ui.util.DialogUtils;
@@ -63,10 +66,17 @@ public class AddProjectToSessionWizard extends Wizard {
 
     private SarosSessionManager sessionManager;
 
+    // FIXME should not be injected
+    @Inject
+    private IChecksumCache checksumCache;
+
     public AddProjectToSessionWizard(IncomingProjectNegotiation process,
         DataTransferManager dataTransferManager,
         PreferenceUtils preferenceUtils, JID peer, List<FileList> fileLists,
         Map<String, String> projectNames, SarosSessionManager sessionManager) {
+
+        SarosPluginContext.initComponent(this);
+
         this.sessionManager = sessionManager;
         this.process = process;
         this.peer = peer;
@@ -140,12 +150,14 @@ public class AddProjectToSessionWizard extends Wizard {
                         FileList sharedFileList = FileListFactory
                             .createFileList(project, sessionManager
                                 .getSarosSession().getSharedResources(project),
-                                true, null);
+                                checksumCache, true, null);
                         remoteFileList.getPaths().addAll(
                             sharedFileList.getPaths());
                     }
+
                     diff = FileListDiff.diff(FileListFactory.createFileList(
-                        project, null, true, null), remoteFileList);
+                        project, null, checksumCache, true, null),
+                        remoteFileList);
                 } catch (CoreException e) {
                     MessageDialog.openError(getShell(),
                         "Error computing FileList",

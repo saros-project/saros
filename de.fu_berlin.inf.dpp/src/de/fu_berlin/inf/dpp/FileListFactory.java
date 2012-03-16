@@ -6,17 +6,23 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.SubMonitor;
+import org.eclipse.core.runtime.IProgressMonitor;
+
+import de.fu_berlin.inf.dpp.project.IChecksumCache;
 
 public class FileListFactory {
 
     public static FileList createFileList(IProject project,
-        List<IResource> resources, boolean useVersionControl,
-        SubMonitor subMonitor) throws CoreException {
-        if (resources == null)
-            return new FileList(project, useVersionControl, subMonitor);
+        List<IResource> resources, IChecksumCache checksumCache,
+        boolean useVersionControl, IProgressMonitor monitor)
+        throws CoreException {
 
-        return new FileList(resources, useVersionControl, subMonitor);
+        if (resources == null)
+            return new FileList(project, checksumCache, useVersionControl,
+                monitor);
+
+        return new FileList(resources, checksumCache, useVersionControl,
+            monitor);
     }
 
     public static FileList createPathFileList(List<IPath> paths) {

@@ -37,12 +37,13 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
-import org.eclipse.core.runtime.SubMonitor;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 
+import de.fu_berlin.inf.dpp.project.IChecksumCache;
 import de.fu_berlin.inf.dpp.util.ArrayUtils;
 import de.fu_berlin.inf.dpp.util.FileUtils;
 import de.fu_berlin.inf.dpp.util.xstream.IPathConverter;
@@ -194,13 +195,14 @@ public class FileList {
      *             given container.
      * 
      */
-    public FileList(IContainer container, boolean useVersionControl,
-        SubMonitor subMonitor) throws CoreException {
+    public FileList(IContainer container, IChecksumCache checksumCache,
+        boolean useVersionControl, IProgressMonitor monitor)
+        throws CoreException {
         this(useVersionControl);
         container.refreshLocal(IResource.DEPTH_INFINITE, null);
         List<IResource> resources = ArrayUtils.getAdaptableObjects(
             container.members(), IResource.class);
-        addMembers(resources, subMonitor);
+        addMembers(resources, checksumCache, monitor);
     }
 
     /**
@@ -214,10 +216,11 @@ public class FileList {
      * 
      * @throws CoreException
      */
-    public FileList(List<IResource> resources, boolean useVersionControl,
-        SubMonitor subMonitor) throws CoreException {
+    public FileList(List<IResource> resources, IChecksumCache checksumCache,
+        boolean useVersionControl, IProgressMonitor monitor)
+        throws CoreException {
         this(useVersionControl);
-        addMembers(resources, subMonitor);
+        addMembers(resources, checksumCache, monitor);
     }
 
     /**
@@ -234,11 +237,6 @@ public class FileList {
                 this.entries.put(path, null);
             }
         }
-    }
-
-    public FileList(IProject source, SubMonitor subMonitor)
-        throws CoreException {
-        this(source, true, subMonitor);
     }
 
     /**
@@ -287,7 +285,7 @@ public class FileList {
     public int computeMatch(IProject project) {
         try {
             return this.computeMatch(FileListFactory.createFileList(project,
-                null, useVersionControl, null));
+                null, null, useVersionControl, null));
         } catch (CoreException e) {
             log.error("Failed to generate FileList for match computation", e);
         }
@@ -363,18 +361,22 @@ public class FileList {
         return paths;
     }
 
-    private void addMembers(List<IResource> resources, SubMonitor subMonitor)
+    private void addMembers(List<IResource> resources,
+        IChecksumCache checksumCache, IProgressMonitor monitor)
         throws CoreException {
+
         if (resources.size() == 0)
             return;
+
         IProject project = null;
         VCSAdapter vcs = null;
+
         if (useVersionControl) {
             project = resources.get(0).getProject();
             vcs = VCSAdapter.getAdapter(project);
+
             if (vcs != null) {
                 String providerID = vcs.getProviderID(project);
-
                 this.vcsProviderID = providerID;
                 this.vcsRepositoryRoot = vcs.getRepositoryString(project);
                 this.vcsProjectInfo = vcs.getCurrentResourceInfo(project);
@@ -399,13 +401,26 @@ public class FileList {
 
                 try {
                     FileListData data = new FileListData();
-                    data.checksum = FileUtils.checksum(file);
+
+                    Long checksum = null;
+                    String path = file.getFullPath().toPortableString();
+
+                    if (checksumCache != null)
+                        checksum = checksumCache.getChecksum(path);
+
+                    data.checksum = checksum == null ? FileUtils.checksum(file)
+                        : checksum;
+
+                    if (checksumCache != null)
+                        checksumCache.addChecksum(path, data.checksum);
 
                     if (isManagedProject)
                         addVCSInfo(resource, data, vcs);
-                    if (subMonitor != null)
-                        subMonitor.subTask(file.getProject().getName() + ": "
+
+                    if (monitor != null)
+                        monitor.subTask(file.getProject().getName() + ": "
                             + file.getName());
+
                     this.entries.put(file.getProjectRelativePath(), data);
                 } catch (IOException e) {
                     log.error(e);
@@ -426,13 +441,14 @@ public class FileList {
                     if (!addVCSInfo(resource, data, vcs))
                         data = null;
                 }
-                if (subMonitor != null)
-                    subMonitor.subTask(folder.getProject().getName() + ": "
+                if (monitor != null)
+                    monitor.subTask(folder.getProject().getName() + ": "
                         + folder.getName());
+
                 this.entries.put(path, data);
 
                 addMembers(ArrayUtils.getAdaptableObjects(folder.members(),
-                    IResource.class), subMonitor);
+                    IResource.class), checksumCache, monitor);
             }
         }
     }

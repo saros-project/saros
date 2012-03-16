@@ -79,15 +79,15 @@ public class FileListTest {
         resources.add(fileInRoot2);
         resources.add(fileInSubDir1);
         threeFileList.addAll(resources);
-        threeEntryList = FileListFactory.createFileList(null, resources, false,
-            null);
+        threeEntryList = FileListFactory.createFileList(null, resources, null,
+            false, null);
         resources.add(fileInSubDir2);
-        fourEntryList = FileListFactory.createFileList(null, resources, false,
-            null);
+        fourEntryList = FileListFactory.createFileList(null, resources, null,
+            false, null);
         resources.remove(fileInSubDir1);
         resources.add(fileInSubDir1changed);
         modifiedFourEntryList = FileListFactory.createFileList(null, resources,
-            false, null);
+            null, false, null);
 
         emptyFileList = FileListFactory.createEmptyFileList();
     }
@@ -206,7 +206,7 @@ public class FileListTest {
     @Test
     public void testEquals() throws CoreException {
         FileList sameFileList = FileListFactory.createFileList(null,
-            threeFileList, false, null);
+            threeFileList, null, false, null);
         assertEquals(threeEntryList, sameFileList);
         assertEquals(emptyFileList, emptyFileList);
 

@@ -163,8 +163,7 @@ public class FileStub implements IFile {
     }
 
     public IPath getFullPath() {
-        throw new RuntimeException("Unexpected call to Stub");
-
+        return this.path;
     }
 
     public IFileState[] getHistory(IProgressMonitor monitor)

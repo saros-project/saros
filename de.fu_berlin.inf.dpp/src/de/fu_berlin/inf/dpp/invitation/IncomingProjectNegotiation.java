@@ -53,6 +53,7 @@ import de.fu_berlin.inf.dpp.invitation.ProcessTools.CancelLocation;
 import de.fu_berlin.inf.dpp.invitation.ProcessTools.CancelOption;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
+import de.fu_berlin.inf.dpp.project.IChecksumCache;
 import de.fu_berlin.inf.dpp.ui.wizards.AddProjectToSessionWizard;
 import de.fu_berlin.inf.dpp.ui.wizards.pages.EnterProjectNamePage;
 import de.fu_berlin.inf.dpp.util.ArrayUtils;
@@ -75,6 +76,9 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
 
     @Inject
     protected PreferenceUtils preferenceUtils;
+
+    @Inject
+    protected IChecksumCache checksumCache;
 
     /**
      * maps the projectID to the project in workspace
@@ -743,7 +747,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
         FileList localFileList = null;
         try {
             localFileList = FileListFactory.createFileList(currentLocalProject,
-                null, vcs != null, monitor.newChild(1));
+                null, checksumCache, vcs != null, monitor.newChild(1));
         } catch (CoreException e) {
             e.printStackTrace();
             return FileListFactory.createEmptyFileList();

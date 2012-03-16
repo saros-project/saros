@@ -94,10 +94,13 @@ import de.fu_berlin.inf.dpp.observables.VoIPSessionObservable;
 import de.fu_berlin.inf.dpp.optional.jdt.JDTFacade;
 import de.fu_berlin.inf.dpp.preferences.PreferenceManager;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
+import de.fu_berlin.inf.dpp.project.IChecksumCache;
 import de.fu_berlin.inf.dpp.project.SarosRosterListener;
 import de.fu_berlin.inf.dpp.project.SarosSessionManager;
 import de.fu_berlin.inf.dpp.project.SharedResourcesManager;
 import de.fu_berlin.inf.dpp.project.internal.ChangeColorManager;
+import de.fu_berlin.inf.dpp.project.internal.ChecksumCacheImpl;
+import de.fu_berlin.inf.dpp.project.internal.FileContentNotifierBridge;
 import de.fu_berlin.inf.dpp.project.internal.PermissionManager;
 import de.fu_berlin.inf.dpp.project.internal.ProjectsAddedManager;
 import de.fu_berlin.inf.dpp.ui.LocalPresenceTracker;
@@ -134,27 +137,34 @@ public class SarosContext {
     private static class Component {
         private Class<?> intf;
         private Class<?> clazz;
+        private Object instance;
 
-        private Component(Class<?> intf, Class<?> clazz) {
+        private Component(Class<?> intf, Class<?> clazz, Object instance) {
             this.intf = intf;
             this.clazz = clazz;
+            this.instance = instance;
         }
 
         public static <T> Component create(Class<T> intf,
             Class<? extends T> clazz) {
-            return new Component(intf, clazz);
+            return new Component(intf, clazz, null);
         }
 
         public static Component create(Class<?> clazz) {
-            return new Component(clazz, clazz);
+            return new Component(clazz, clazz, null);
+        }
+
+        public static <T> Component create(Class<T> intf,
+            Class<? extends T> clazz, Object instance) {
+            return new Component(intf, clazz, instance);
         }
 
         public Class<?> getInterface() {
-            return this.intf;
+            return intf;
         }
 
-        public Class<?> getImplementation() {
-            return this.clazz;
+        public Object getImplementation() {
+            return instance != null ? instance : clazz;
         }
 
         @Override
@@ -164,7 +174,7 @@ public class SarosContext {
 
         @Override
         public int hashCode() {
-            return this.intf.hashCode();
+            return intf.hashCode();
         }
     }
 
@@ -299,7 +309,10 @@ public class SarosContext {
         Component.create(AudioService.class),
         Component.create(VideoSharingService.class),
 
-    };
+        // cache support
+
+        Component.create(IChecksumCache.class, ChecksumCacheImpl.class,
+            new ChecksumCacheImpl(new FileContentNotifierBridge())), };
 
     /*
      * Use the SarosContextBuilder to build a SarosContext. {@link
@@ -355,11 +368,11 @@ public class SarosContext {
             Arrays.asList(COMPONENTS));
 
         for (Component component : contextComponents)
-            this.container.addComponent(component.getInterface(),
+            container.addComponent(component.getInterface(),
                 component.getImplementation());
 
         // add this context itself because some components need it ...
-        this.container.addComponent(SarosContext.class, this);
+        container.addComponent(SarosContext.class, this);
 
         /*
          * The following classes are initialized by the re-injector because they
@@ -397,7 +410,7 @@ public class SarosContext {
              * Ask PicoContainer to inject into the component via fields
              * annotated with @Inject
              */
-            this.reinjector.reinject(clazz, new AnnotatedFieldInjection());
+            reinjector.reinject(clazz, new AnnotatedFieldInjection());
         } catch (PicoCompositionException e) {
             log.error("Internal error in reinjection:", e);
         }
