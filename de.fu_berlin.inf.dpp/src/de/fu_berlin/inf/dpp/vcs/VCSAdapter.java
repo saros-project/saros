@@ -4,6 +4,7 @@ import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.team.core.RepositoryProvider;
 import org.eclipse.team.core.RepositoryProviderType;
@@ -98,7 +99,8 @@ public abstract class VCSAdapter {
      * @return The newly created project.
      */
     public abstract IProject checkoutProject(String newProjectName,
-        FileList fileList, SubMonitor monitor);
+        FileList fileList, IProgressMonitor monitor)
+        throws OperationCanceledException;
 
     /**
      * Updates the file to the specified revision.

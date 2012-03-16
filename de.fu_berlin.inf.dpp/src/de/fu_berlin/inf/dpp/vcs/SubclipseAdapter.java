@@ -136,7 +136,7 @@ class SubclipseAdapter extends VCSAdapter {
 
     @Override
     public IProject checkoutProject(String newProjectName, FileList fileList,
-        SubMonitor monitor) {
+        IProgressMonitor monitor) {
         ISVNRepositoryLocation loc;
         IProject result = null;
 
