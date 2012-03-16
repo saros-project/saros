@@ -1029,13 +1029,13 @@ public class Utils {
      * 
      * @param saros
      *            is needed to set the selection to preference store
-     * @param needsBasedSync
+     * @param preferenceName
      *            constant where to store in the preference store
      * 
      * @return boolean indicating whether the user said Yes or No
      */
     public static boolean popUpRememberDecisionDialog(final String title,
-        final String message, final Saros saros, final String needsBasedSync) {
+        final String message, final Saros saros, final String preferenceName) {
         try {
             return Utils.runSWTSync(new Callable<Boolean>() {
                 public Boolean call() {
@@ -1046,7 +1046,7 @@ public class Utils {
                             IDialogConstants.NO_LABEL }, 0);
                     int result = dialog.open();
                     if (dialog.isRememberDecision()) {
-                        saros.getPreferenceStore().setValue(needsBasedSync,
+                        saros.getPreferenceStore().setValue(preferenceName,
                             Boolean.toString(result == 0));
                     }
 
