@@ -4,10 +4,6 @@ import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioFormat.Encoding;
 import javax.sound.sampled.Mixer;
 
-import org.apache.log4j.Logger;
-import org.eclipse.equinox.security.storage.ISecurePreferences;
-import org.eclipse.equinox.security.storage.StorageException;
-import org.eclipse.jface.preference.PreferenceStore;
 import org.xiph.speex.spi.SpeexEncoding;
 
 import de.fu_berlin.inf.dpp.Saros;
@@ -17,17 +13,12 @@ import de.fu_berlin.inf.dpp.communication.audio.MixerManager;
 @Component(module = "prefs")
 public class PreferenceUtils {
 
-    private static final Logger log = Logger.getLogger(PreferenceUtils.class
-        .getName());
-
     private Saros saros;
     private MixerManager mixerManager;
-    private ISecurePreferences securePreferenceStore;
 
     public PreferenceUtils(Saros saros, MixerManager mixerManager) {
         this.saros = saros;
         this.mixerManager = mixerManager;
-        this.securePreferenceStore = saros.getSecurePrefs();
     }
 
     public boolean isDebugEnabled() {
@@ -42,34 +33,6 @@ public class PreferenceUtils {
     public boolean isAutoAcceptInvitation() {
         return saros.getPreferenceStore().getBoolean(
             PreferenceConstants.AUTO_ACCEPT_INVITATION);
-    }
-
-    /**
-     * Returns the server from the {@link PreferenceStore}.<br/>
-     * Might be an empty string but never null.
-     * 
-     * @return
-     */
-    public String getServer() {
-        ISecurePreferences prefs = saros.getSecurePrefs();
-        String server = "";
-
-        try {
-            server = prefs.get(PreferenceConstants.SERVER, "");
-        } catch (StorageException e) {
-            log.error("Exception while retrieving account: " + e.getMessage());
-        }
-        return server;
-    }
-
-    /**
-     * Returns true if the user has specified a server for a XMPP account.
-     * 
-     * @return true if there is a user name that is not equal to the empty
-     *         string
-     */
-    public boolean hasServer() {
-        return getServer().length() > 0;
     }
 
     /**

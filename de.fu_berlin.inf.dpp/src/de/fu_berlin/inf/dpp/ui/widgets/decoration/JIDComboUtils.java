@@ -42,9 +42,7 @@ public class JIDComboUtils {
      */
     public static void fillJIDCombo(Combo jidCombo,
         PreferenceUtils preferenceUtils, XMPPAccountStore xmppAccountStore) {
-        String defaultServer = preferenceUtils.getServer();
-        if (defaultServer.isEmpty())
-            defaultServer = preferenceUtils.getDefaultServer();
+        String defaultServer = preferenceUtils.getDefaultServer();
 
         List<String> servers = xmppAccountStore.getDomains();
         if (servers.size() == 0)

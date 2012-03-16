@@ -29,12 +29,6 @@ import de.fu_berlin.inf.dpp.StartupSaros;
  */
 public class PreferenceConstants {
 
-    public static final String SERVER = "server";
-
-    public static final String USERNAME = "username";
-
-    public static final String PASSWORD = "password";
-
     public static final String ACTIVE_ACCOUNT = "active_account";
 
     public static final String ACCOUNT_DATA = "account_data";
@@ -154,11 +148,6 @@ public class PreferenceConstants {
     public static final String STATISTIC_ALLOW_PSEUDONYM = "STATISTIC_ALLOW_PSEUDONYM";
 
     public static final String PING_PONG = "PINGPONG";
-
-    /**
-     * Send project via streaming.
-     */
-    public static final String STREAM_PROJECT = "STREAM_PROJECT";
 
     /**
      * Preferences for Communication
