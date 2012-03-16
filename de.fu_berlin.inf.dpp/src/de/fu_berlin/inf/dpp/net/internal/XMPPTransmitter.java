@@ -76,7 +76,6 @@ import de.fu_berlin.inf.dpp.net.business.DispatchThreadContext;
 import de.fu_berlin.inf.dpp.net.internal.DefaultInvitationInfo.FileListRequestExtensionProvider;
 import de.fu_berlin.inf.dpp.net.internal.DefaultInvitationInfo.InvitationAcknowledgementExtensionProvider;
 import de.fu_berlin.inf.dpp.net.internal.DefaultInvitationInfo.InvitationCompleteExtensionProvider;
-import de.fu_berlin.inf.dpp.net.internal.DefaultInvitationInfo.UserListRequestExtensionProvider;
 import de.fu_berlin.inf.dpp.net.internal.DefaultSessionInfo.UserListConfirmationExtensionProvider;
 import de.fu_berlin.inf.dpp.net.internal.UserListInfo.JoinExtensionProvider;
 import de.fu_berlin.inf.dpp.net.internal.XStreamExtensionProvider.XStreamPacketExtension;
@@ -207,38 +206,6 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
         sendMessageToUser(guest, invExtProv.create(invInfo));
     }
 
-    public SarosPacketCollector getFileListRequestCollector(String invitationID) {
-        PacketFilter filter = PacketExtensionUtils.getInvitationFilter(
-            fileListRequestExtProv, sessionID, invitationID);
-
-        return installReceiver(filter);
-    }
-
-    public boolean receivedInvitationAcknowledgment(String invitationID,
-        SubMonitor monitor) throws LocalCancellationException {
-
-        PacketFilter filter = PacketExtensionUtils.getInvitationFilter(
-            invAcknowledgementExtProv, sessionID, invitationID);
-        SarosPacketCollector collector = installReceiver(filter);
-
-        try {
-            receive(monitor, collector, INVITATION_ACKNOWLEDGEMENT_TIMEOUT,
-                false);
-        } catch (IOException e) {
-            return false;
-        }
-
-        return true;
-    }
-
-    public DefaultInvitationInfo receiveFileListRequest(
-        SarosPacketCollector collector, String invitationID, SubMonitor monitor)
-        throws LocalCancellationException, IOException {
-
-        Packet result = receive(monitor, collector, 500, true);
-        return fileListRequestExtProv.getPayload(result);
-    }
-
     public void sendInvitationAcknowledgement(JID to, String invitationID) {
         log.trace("Sending invitation acknowledgment to " + Utils.prefix(to));
         sendMessageToUser(to,
@@ -251,85 +218,6 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
         sendMessageToUser(to,
             fileListRequestExtProv.create(new DefaultInvitationInfo(sessionID,
                 invitationID)));
-    }
-
-    public FileList receiveFileList(SarosPacketCollector collector,
-        SubMonitor monitor, boolean forceWait)
-        throws SarosCancellationException, IOException {
-
-        log.trace("Waiting for FileList from ");
-
-        IncomingTransferObject result = incomingExtProv.getPayload(receive(
-            monitor, collector, 500, true));
-
-        if (monitor.isCanceled()) {
-            result.reject();
-            throw new LocalCancellationException();
-        }
-
-        byte[] data = result.accept(monitor);
-        String fileListAsString;
-        try {
-            fileListAsString = new String(data, "UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            fileListAsString = new String(data);
-        }
-
-        // should return null if it's not parseable.
-        return FileList.fromXML(fileListAsString);
-    }
-
-    public List<FileList> receiveFileLists(String processID, JID peer,
-        SubMonitor monitor, boolean forceWait)
-        throws SarosCancellationException, IOException {
-
-        log.trace("Waiting for FileList from " + peer.getBareJID());
-
-        PacketFilter filter = PacketExtensionUtils.getIncomingFileListFilter(
-            incomingExtProv, sessionID.getValue(), processID, peer);
-        SarosPacketCollector collector = installReceiver(filter);
-
-        IncomingTransferObject result = incomingExtProv.getPayload(receive(
-            monitor, collector, 500, true));
-
-        if (monitor.isCanceled()) {
-            result.reject();
-            throw new LocalCancellationException();
-        }
-
-        byte[] data = result.accept(monitor);
-        String fileListAsString;
-        try {
-            fileListAsString = new String(data, "UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            fileListAsString = new String(data);
-        }
-
-        // We disassemble the complete fileListString to an array of
-        // fileListStrings...
-        String[] fileListStrings = fileListAsString.split("---next---");
-
-        List<FileList> fileLists = new ArrayList<FileList>();
-
-        // and make a new FileList out of each XML-String
-        for (int i = 0; i < fileListStrings.length; i++) {
-            FileList fileList = FileList.fromXML(fileListStrings[i]);
-            if (fileList != null) {
-                fileLists.add(fileList);
-            }
-        }
-
-        return fileLists;
-    }
-
-    public SarosPacketCollector getInvitationCollector(String invitationID,
-        String type) {
-
-        PacketFilter filter = PacketExtensionUtils
-            .getIncomingTransferObjectFilter(incomingExtProv, sessionID,
-                invitationID, type);
-
-        return installReceiver(filter);
     }
 
     public InputStream receiveArchive(String processID, final JID peer,
@@ -475,6 +363,7 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
             userListConfExtProv.create(new DefaultSessionInfo(sessionID)), true);
     }
 
+    // FIXME move to XMPPReceiver
     public SarosPacketCollector getUserListConfirmationCollector() {
 
         PacketFilter filter = PacketExtensionUtils.getSessionIDFilter(
@@ -483,6 +372,7 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
         return installReceiver(filter);
     }
 
+    // FIXME move to XMPPReceiver
     public boolean receiveUserListConfirmation(SarosPacketCollector collector,
         List<User> fromUsers, SubMonitor monitor)
         throws LocalCancellationException {
@@ -523,21 +413,6 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
         } finally {
             collector.cancel();
         }
-    }
-
-    public SarosPacketCollector getInvitationCompleteCollector(
-        String invitationID) {
-
-        PacketFilter filter = PacketExtensionUtils.getInvitationFilter(
-            invCompleteExtProv, sessionID, invitationID);
-        return installReceiver(filter);
-    }
-
-    public void receiveInvitationCompleteConfirmation(SubMonitor monitor,
-        SarosPacketCollector collector) throws LocalCancellationException,
-        IOException {
-
-        receive(monitor, collector, 500, true);
     }
 
     public void sendInvitationCompleteConfirmation(JID to, String invitationID) {
@@ -1171,14 +1046,6 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
             prepareConnection(connection);
         else if (this.connection != null)
             disposeConnection();
-    }
-
-    public SarosPacketCollector getUserListRequestCollector(
-        String invitationID,
-        UserListRequestExtensionProvider userListRequestExtProv) {
-        PacketFilter filter = PacketExtensionUtils.getInvitationFilter(
-            userListRequestExtProv, sessionID, invitationID);
-        return installReceiver(filter);
     }
 
     public void sendMessageToUser(JID peer,

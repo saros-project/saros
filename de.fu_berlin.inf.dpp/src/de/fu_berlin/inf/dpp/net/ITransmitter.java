@@ -40,7 +40,6 @@ import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
 import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
 import de.fu_berlin.inf.dpp.invitation.InvitationProcess;
 import de.fu_berlin.inf.dpp.net.internal.DefaultInvitationInfo;
-import de.fu_berlin.inf.dpp.net.internal.DefaultInvitationInfo.UserListRequestExtensionProvider;
 import de.fu_berlin.inf.dpp.net.internal.SarosPacketCollector;
 import de.fu_berlin.inf.dpp.net.internal.XStreamExtensionProvider;
 import de.fu_berlin.inf.dpp.net.internal.XStreamExtensionProvider.XStreamPacketExtension;
@@ -56,8 +55,6 @@ import de.fu_berlin.inf.dpp.util.VersionManager.VersionInfo;
  */
 @Component(module = "net")
 public interface ITransmitter {
-
-    public static final long INVITATION_ACKNOWLEDGEMENT_TIMEOUT = 30000;
 
     /* ---------- invitations --------- */
 
@@ -123,56 +120,6 @@ public interface ITransmitter {
     public void sendFileLists(JID jid, String processID,
         List<FileList> fileLists, SubMonitor monitor) throws IOException,
         SarosCancellationException;
-
-    /**
-     * 
-     * @param invitationID
-     *            ID of the ivitation process
-     * @param monitor
-     *            a monitor to which progress will be reported and which is
-     *            queried for cancellation.
-     * @return whether a invitation acknowledgment got received in
-     *         {@link #INVITATION_ACKNOWLEDGEMENT_TIMEOUT} or not
-     * @throws LocalCancellationException
-     */
-    public boolean receivedInvitationAcknowledgment(String invitationID,
-        SubMonitor monitor) throws LocalCancellationException;
-
-    /**
-     * @throws IOException
-     *             If the operation fails because of a problem with the XMPP
-     *             Connection.
-     * @throws LocalCancellationException
-     */
-    public DefaultInvitationInfo receiveFileListRequest(
-        SarosPacketCollector collector, String invitationID, SubMonitor monitor)
-        throws IOException, LocalCancellationException;
-
-    /**
-     * @param archiveCollector
-     * @blocking If forceWait is true.
-     * 
-     * @throws IOException
-     *             If the operation fails because of a problem with the XMPP
-     *             Connection.
-     */
-    public FileList receiveFileList(SarosPacketCollector archiveCollector,
-        SubMonitor monitor, boolean forceWait)
-        throws SarosCancellationException, IOException;
-
-    /**
-     * 
-     * @param processID
-     * @param peer
-     *            TODO
-     * @blocking If forceWait is true.
-     * @throws IOException
-     *             If the operation fails because of a problem with the XMPP
-     *             Connection.
-     */
-    public List<FileList> receiveFileLists(String processID, JID peer,
-        SubMonitor monitor, boolean forceWait)
-        throws SarosCancellationException, IOException;
 
     /**
      * 
@@ -337,9 +284,6 @@ public interface ITransmitter {
     public <T> T sendQuery(JID jid, XStreamExtensionProvider<T> provider,
         T payload, long timeout);
 
-    public SarosPacketCollector getInvitationCollector(String invitationID,
-        String filelistTransfer);
-
     /**
      * @param to
      *            peer that invited this user and where to send the
@@ -348,19 +292,6 @@ public interface ITransmitter {
      *            the ID of the invitation
      */
     public void sendInvitationAcknowledgement(JID to, String invitationID);
-
-    public void receiveInvitationCompleteConfirmation(SubMonitor monitor,
-        SarosPacketCollector collector) throws LocalCancellationException,
-        IOException;
-
-    public SarosPacketCollector getFileListRequestCollector(String invitationID);
-
-    public SarosPacketCollector getUserListRequestCollector(
-        String invitationID,
-        UserListRequestExtensionProvider userListRequestExtProv);
-
-    public SarosPacketCollector getInvitationCompleteCollector(
-        String invitationID);
 
     public SarosPacketCollector getUserListConfirmationCollector();
 
