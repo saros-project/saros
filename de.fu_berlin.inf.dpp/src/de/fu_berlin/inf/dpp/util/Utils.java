@@ -1035,11 +1035,7 @@ public class Utils {
      * @return boolean indicating whether the user said Yes or No
      */
     public static boolean popUpRememberDecisionDialog(final String title,
-        final String message, boolean failSilently, final Saros saros,
-        final String needsBasedSync) {
-        if (failSilently)
-            return false;
-
+        final String message, final Saros saros, final String needsBasedSync) {
         try {
             return Utils.runSWTSync(new Callable<Boolean>() {
                 public Boolean call() {

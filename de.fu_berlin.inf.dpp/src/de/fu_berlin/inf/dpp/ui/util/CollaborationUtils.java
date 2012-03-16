@@ -388,7 +388,7 @@ public class CollaborationUtils {
     public static boolean activateNeedBasedSynchronization(Saros saros) {
         return (Utils.popUpRememberDecisionDialog(
             Messages.CollaborationUtils_confirm_need_based,
-            Messages.CollaborationUtils_confirm_need_based_text, false, saros,
+            Messages.CollaborationUtils_confirm_need_based_text, saros,
             PreferenceConstants.NEEDS_BASED_SYNC));
     }
 
