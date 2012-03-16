@@ -16,7 +16,9 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
+import org.jivesoftware.smack.packet.Packet;
 import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.FileList;
@@ -31,7 +33,12 @@ import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
 import de.fu_berlin.inf.dpp.exceptions.RemoteCancellationException;
 import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
 import de.fu_berlin.inf.dpp.invitation.ProcessTools.CancelOption;
+import de.fu_berlin.inf.dpp.net.IncomingTransferObject;
+import de.fu_berlin.inf.dpp.net.IncomingTransferObject.IncomingTransferObjectExtensionProvider;
 import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.net.internal.SarosPacketCollector;
+import de.fu_berlin.inf.dpp.net.internal.XMPPReceiver;
+import de.fu_berlin.inf.dpp.net.internal.extensions.PacketExtensionUtils;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.synchronize.StartHandle;
@@ -68,8 +75,13 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
     @Inject
     protected EditorManager editorManager;
 
+    @Inject
+    protected XMPPReceiver xmppReceiver;
+
     protected HashMap<IProject, List<IResource>> projectResources;
     protected List<ProjectExchangeInfo> projectExchangeInfos;
+
+    protected SarosPacketCollector remoteUserListResponseCollector;
 
     public OutgoingProjectNegotiation(JID to, ISarosSession sarosSession,
         HashMap<IProject, List<IResource>> partialResources,
@@ -88,6 +100,7 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
     public void start(SubMonitor monitor) throws SarosCancellationException {
         this.monitor = monitor;
 
+        createCollectors();
         File zipArchive = null;
 
         List<File> zipArchives = new ArrayList<File>();
@@ -131,7 +144,7 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
                     log.warn("could not archive file: "
                         + archive.getAbsolutePath());
             }
-
+            deleteCollectors();
             monitor.done();
         }
     }
@@ -211,8 +224,17 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
 
             checkCancellation(CancelOption.NOTIFY_PEER);
 
-            List<FileList> remoteFileLists = transmitter.receiveFileLists(
-                processID, peer, monitor.newChild(1), true);
+            Packet packet = collectPacket(remoteUserListResponseCollector,
+                60 * 60 * 1000, monitor);
+
+            if (packet == null)
+                throw new LocalCancellationException(
+                    "received no response from " + peer
+                        + " while waiting for the file list",
+                    CancelOption.DO_NOT_NOTIFY_PEER);
+
+            List<FileList> remoteFileLists = deserializeRemoteFileList(packet,
+                monitor);
 
             log.debug("Inv" + Utils.prefix(peer)
                 + ": Remote file list has been received.");
@@ -379,10 +401,6 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
         throw cancellationCause;
     }
 
-    public FileList getRemoteFileList() {
-        return null;
-    }
-
     /**
      * This method does <strong>not</strong> execute the cancellation but only
      * sets the {@link #cancellationCause}. It should be called if the
@@ -528,5 +546,65 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
             monitor.done();
         }
         return tempArchive;
+    }
+
+    private Packet collectPacket(SarosPacketCollector collector, long timeout,
+        IProgressMonitor monitor) throws SarosCancellationException {
+
+        Packet packet = null;
+
+        while (timeout > 0) {
+            if (monitor != null && monitor.isCanceled())
+                checkCancellation(CancelOption.NOTIFY_PEER);
+
+            packet = collector.nextResult(1000);
+
+            if (packet != null)
+                break;
+
+            timeout -= 1000;
+        }
+
+        return packet;
+    }
+
+    private void createCollectors() {
+        remoteUserListResponseCollector = xmppReceiver
+            .createCollector(PacketExtensionUtils.getIncomingFileListFilter(
+                new IncomingTransferObjectExtensionProvider(),
+                sessionID.getValue(), processID, peer));
+    }
+
+    private void deleteCollectors() {
+        remoteUserListResponseCollector.cancel();
+    }
+
+    private List<FileList> deserializeRemoteFileList(Packet packet,
+        SubMonitor monitor) throws SarosCancellationException, IOException {
+        IncomingTransferObject result = new IncomingTransferObjectExtensionProvider()
+            .getPayload(packet);
+
+        if (monitor.isCanceled()) {
+            result.reject();
+            throw new LocalCancellationException();
+        }
+
+        String fileListAsString = new String(result.accept(monitor), "UTF-8");
+
+        // We disassemble the complete fileListString to an array of
+        // fileListStrings...
+        String[] fileListStrings = fileListAsString.split("---next---");
+
+        List<FileList> fileLists = new ArrayList<FileList>();
+
+        // and make a new FileList out of each XML-String
+        for (int i = 0; i < fileListStrings.length; i++) {
+            FileList fileList = FileList.fromXML(fileListStrings[i]);
+            if (fileList != null) {
+                fileLists.add(fileList);
+            }
+        }
+
+        return fileLists;
     }
 }
