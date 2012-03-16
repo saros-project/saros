@@ -394,7 +394,8 @@ public final class SarosPreferences extends StfRemoteObject implements
     }
 
     private boolean isAccountExistNoGUI(JID jid) {
-        return getXmppAccountStore().exists(jid);
+        return getXmppAccountStore().exists(jid.getName(), jid.getDomain(), "",
+            0);
     }
 
     public void setNeedBasedActivated(boolean activate) throws RemoteException {

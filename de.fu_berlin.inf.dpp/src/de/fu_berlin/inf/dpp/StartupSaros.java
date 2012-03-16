@@ -1,9 +1,6 @@
 package de.fu_berlin.inf.dpp;
 
 import org.apache.log4j.Logger;
-import org.eclipse.equinox.security.storage.ISecurePreferences;
-import org.eclipse.equinox.security.storage.StorageException;
-import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.ui.IStartup;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.intro.IIntroManager;
@@ -12,7 +9,6 @@ import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.accountManagement.XMPPAccountStore;
 import de.fu_berlin.inf.dpp.annotations.Component;
-import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
 import de.fu_berlin.inf.dpp.stf.server.STFController;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
@@ -57,7 +53,6 @@ public class StartupSaros implements IStartup {
 
     public void earlyStartup() {
 
-        updateAccounts();
         showSarosView();
 
         Integer port = Integer.getInteger("de.fu_berlin.inf.dpp.testmode");
@@ -105,7 +100,7 @@ public class StartupSaros implements IStartup {
     }
 
     private void showSarosView() {
-        Utils.runSafeSWTSync(log, new Runnable() {
+        Utils.runSafeSWTAsync(log, new Runnable() {
             public void run() {
                 IIntroManager m = PlatformUI.getWorkbench().getIntroManager();
                 IIntroPart i = m.getIntro();
@@ -117,106 +112,5 @@ public class StartupSaros implements IStartup {
                     sarosUI.openSarosView();
             }
         });
-    }
-
-    /**
-     * This method searches for any XMPP accounts in the IPreferenceStore. For
-     * each one it:
-     * <ul>
-     * <li>Copies the details to the ISecureStorage
-     * <li>Resets the existing details in the IPreferenceStore to empty string
-     * </ul>
-     */
-    private void updateAccounts() {
-        IPreferenceStore prefStore = saros.getPreferenceStore();
-        ISecurePreferences secureStore = saros.getSecurePrefs();
-
-        // Get the active account
-        String username = prefStore.getString(PreferenceConstants.USERNAME);
-        String server = prefStore.getString(PreferenceConstants.SERVER);
-        String password = prefStore.getString(PreferenceConstants.PASSWORD);
-
-        try {
-            // If there is an active account...
-            if (!username.equals("")) {
-                // ... put it into secure storage
-                secureStore.put(PreferenceConstants.USERNAME, username, false);
-                secureStore.put(PreferenceConstants.SERVER, server, false);
-                secureStore.put(PreferenceConstants.PASSWORD, password, false);
-
-                // ... and clear the old preferences
-                prefStore.setValue(PreferenceConstants.USERNAME, "");
-                prefStore.setValue(PreferenceConstants.SERVER, "");
-                prefStore.setValue(PreferenceConstants.PASSWORD, "");
-            }
-
-            // Now do the same with any remaining accounts
-            int i = 1;
-            username = prefStore.getString(PreferenceConstants.USERNAME + i);
-            server = prefStore.getString(PreferenceConstants.SERVER + i);
-            password = prefStore.getString(PreferenceConstants.PASSWORD + i);
-
-            while (!username.equals("")) {
-                secureStore.put(PreferenceConstants.USERNAME + i, username,
-                    false);
-                secureStore.put(PreferenceConstants.SERVER + i, server, false);
-                secureStore.put(PreferenceConstants.PASSWORD + i, password,
-                    false);
-
-                prefStore.setValue(PreferenceConstants.USERNAME + i, "");
-                prefStore.setValue(PreferenceConstants.SERVER + i, "");
-                prefStore.setValue(PreferenceConstants.PASSWORD + i, "");
-
-                i++;
-                username = prefStore
-                    .getString(PreferenceConstants.USERNAME + i);
-                server = prefStore.getString(PreferenceConstants.SERVER + i);
-                password = prefStore
-                    .getString(PreferenceConstants.PASSWORD + i);
-            }
-
-            // update 2
-
-            i = 0;
-
-            while (true) {
-                String suffix = (i == 0) ? "" : String.valueOf(i);
-
-                username = secureStore.get(PreferenceConstants.USERNAME
-                    + suffix, "");
-
-                server = secureStore.get(PreferenceConstants.SERVER + suffix,
-                    "");
-
-                password = secureStore.get(PreferenceConstants.PASSWORD
-                    + suffix, "");
-
-                if (username.isEmpty())
-                    break;
-
-                try {
-                    xmppAccountStore.createAccount(username, password,
-                        server.toLowerCase());
-                } catch (Exception e) {
-                    log.error("could not update account '" + username + "'", e);
-                }
-
-                secureStore.put(PreferenceConstants.USERNAME + suffix, "",
-                    false);
-
-                secureStore.put(PreferenceConstants.SERVER + suffix, "", false);
-
-                secureStore.put(PreferenceConstants.PASSWORD + suffix, "",
-                    false);
-
-                i++;
-
-            }
-
-        } catch (StorageException e) {
-            log.error("Exception with secure storage while upgrading: "
-                + e.getMessage());
-        }
-
     }
 }

@@ -1,19 +1,15 @@
 package de.fu_berlin.inf.dpp.ui.widgets.wizard;
 
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.log4j.Logger;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.FocusAdapter;
-import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
@@ -25,40 +21,29 @@ import org.eclipse.ui.forms.widgets.ExpandableComposite;
 import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.SarosPluginContext;
-import de.fu_berlin.inf.dpp.accountManagement.XMPPAccountStore;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
-import de.fu_berlin.inf.dpp.ui.widgets.decoration.EmptyText;
 import de.fu_berlin.inf.dpp.ui.widgets.decoration.JIDCombo;
-import de.fu_berlin.inf.dpp.ui.widgets.wizard.events.EnterXMPPAccountCompositeListener;
-import de.fu_berlin.inf.dpp.ui.widgets.wizard.events.IsSarosXMPPServerChangedEvent;
-import de.fu_berlin.inf.dpp.ui.widgets.wizard.events.XMPPServerChangedEvent;
-import de.fu_berlin.inf.dpp.ui.wizards.pages.EnterXMPPAccountWizardPage;
 
 /**
  * Gives the user the possibility to enter a {@link JID}, the corresponding
- * password and optionally a server.
+ * password and optionally a server with port and security settings.
  */
 public class EnterXMPPAccountComposite extends Composite {
-    private static final Logger log = Logger
-        .getLogger(EnterXMPPAccountWizardPage.class);
 
-    protected List<EnterXMPPAccountCompositeListener> enterXMPPAccountCompositeListeners = new ArrayList<EnterXMPPAccountCompositeListener>();
-    protected List<ModifyListener> modifyListeners = new ArrayList<ModifyListener>();
+    private List<ModifyListener> modifyListeners = new ArrayList<ModifyListener>();
+
+    private JIDCombo jidCombo;
+    private Text passwordText;
+    private ExpandableComposite serverOptionsExpandableComposite;
+    private Text serverText;
+    private Text portText;
+
+    private Button useTSLButton;
+    private Button useSASLButton;
 
     @Inject
-    protected PreferenceUtils preferenceUtils;
-
-    @Inject
-    protected XMPPAccountStore xmppAccountStore;
-
-    protected JIDCombo jidCombo;
-    protected Text passwordText;
-    protected ExpandableComposite serverOptionsExpandableComposite;
-    protected EmptyText serverText;
-
-    protected boolean lastIsSarosXMPPServer = false;
-    protected String lastXMPPServer;
+    private PreferenceUtils preferenceUtils;
 
     public EnterXMPPAccountComposite(Composite composite, int style) {
         super(composite, style);
@@ -82,10 +67,10 @@ public class EnterXMPPAccountComposite extends Composite {
         Label passwordLabel = new Label(this, SWT.NONE);
         passwordLabel.setText("Password");
 
-        this.passwordText = new Text(this, SWT.BORDER);
-        this.passwordText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER,
-            true, false));
-        this.passwordText.setEchoChar('*');
+        passwordText = new Text(this, SWT.BORDER);
+        passwordText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true,
+            false));
+        passwordText.setEchoChar('*');
 
         /*
          * Row 3: Server Options
@@ -97,7 +82,7 @@ public class EnterXMPPAccountComposite extends Composite {
                 | ExpandableComposite.CLIENT_INDENT);
         serverOptionsExpandableComposite.setLayoutData(GridDataFactory
             .fillDefaults().grab(true, true).minSize(SWT.DEFAULT, 50).create());
-        serverOptionsExpandableComposite.setText("Server Options");
+        serverOptionsExpandableComposite.setText("Advanced Options");
         serverOptionsExpandableComposite
             .addExpansionListener(new ExpansionAdapter() {
                 @Override
@@ -111,26 +96,24 @@ public class EnterXMPPAccountComposite extends Composite {
         expandableCompositeContent.setLayout(new GridLayout(2, false));
         serverOptionsExpandableComposite.setClient(expandableCompositeContent);
 
-        Label serverLabel = new Label(expandableCompositeContent, SWT.NONE);
-        serverLabel.setText("Server");
+        new Label(expandableCompositeContent, SWT.NONE).setText("Server");
 
-        Text serverText = new Text(expandableCompositeContent, SWT.BORDER);
+        serverText = new Text(expandableCompositeContent, SWT.BORDER);
         serverText
             .setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
-        this.serverText = new EmptyText(serverText, "Optional");
 
-        this.hookListeners();
-    }
+        new Label(expandableCompositeContent, SWT.NONE).setText("Port");
 
-    /**
-     * Adds a {@link EnterXMPPAccountCompositeListener}
-     * 
-     * @param enterXMPPAccountCompositeListener
-     */
-    public void addEnterXMPPAccountCompositeListener(
-        EnterXMPPAccountCompositeListener enterXMPPAccountCompositeListener) {
-        this.enterXMPPAccountCompositeListeners
-            .add(enterXMPPAccountCompositeListener);
+        portText = new Text(expandableCompositeContent, SWT.BORDER);
+        portText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
+
+        useTSLButton = new Button(expandableCompositeContent, SWT.CHECK);
+        useTSLButton.setText("Use TSL");
+
+        useSASLButton = new Button(expandableCompositeContent, SWT.CHECK);
+        useSASLButton.setText("Use SASL");
+
+        hookListeners();
     }
 
     /**
@@ -141,64 +124,13 @@ public class EnterXMPPAccountComposite extends Composite {
     }
 
     /**
-     * Removes a {@link EnterXMPPAccountCompositeListener}
-     * 
-     * @param enterXMPPAccountCompositeListener
-     */
-    public void removeEnterXMPPAccountCompositeListener(
-        EnterXMPPAccountCompositeListener enterXMPPAccountCompositeListener) {
-        this.enterXMPPAccountCompositeListeners
-            .remove(enterXMPPAccountCompositeListener);
-    }
-
-    /**
      * @see Text#removeModifyListener(ModifyListener)
      */
     public void removeModifyListener(ModifyListener modifyListener) {
         this.modifyListeners.remove(modifyListener);
     }
 
-    /**
-     * Notify all {@link EnterXMPPAccountCompositeListener}s about a changed
-     * xmpp server.
-     */
-    public void notifyIsSarosXMPPServerChanged() {
-        boolean isSarosServer = this.isSarosXMPPServer();
-        if (lastIsSarosXMPPServer != isSarosServer) {
-            lastIsSarosXMPPServer = isSarosServer;
-
-            IsSarosXMPPServerChangedEvent event = new IsSarosXMPPServerChangedEvent(
-                isSarosServer);
-            for (EnterXMPPAccountCompositeListener enterXMPPAccountCompositeListener : this.enterXMPPAccountCompositeListeners) {
-                enterXMPPAccountCompositeListener
-                    .isSarosXMPPServerChanged(event);
-            }
-        }
-    }
-
-    /**
-     * Notify all {@ink EnterXMPPAccountCompositeListener}s if the validity of
-     * the given XMPP server has changed.
-     */
-    protected void notifyXMPPServerValidityChanged() {
-        String server = this.getServer();
-
-        if (!lastXMPPServer.equals(server)) {
-            lastXMPPServer = server;
-            XMPPServerChangedEvent event = new XMPPServerChangedEvent(server,
-                isXMPPServerValid());
-            for (EnterXMPPAccountCompositeListener enterXMPPAccountCompositeListener : this.enterXMPPAccountCompositeListeners) {
-                enterXMPPAccountCompositeListener
-                    .xmppServerValidityChanged(event);
-            }
-        }
-    }
-
-    /**
-     * Notify all {@link EnterXMPPAccountCompositeListener}s about a changed
-     * xmpp server.
-     */
-    public void notifyModifyText(ModifyEvent e) {
+    private void notifyModifyText(ModifyEvent e) {
         for (ModifyListener modifyListener : this.modifyListeners) {
             modifyListener.modifyText(e);
         }
@@ -221,49 +153,18 @@ public class EnterXMPPAccountComposite extends Composite {
         this.serverText.setEnabled(enabled);
     }
 
-    protected void hookListeners() {
-        /*
-         * If user changes to another server than Saros's server, notify.
-         */
-        this.jidCombo.getControl().addModifyListener(new ModifyListener() {
-            public void modifyText(ModifyEvent e) {
-                if (!isSarosXMPPServer())
-                    notifyIsSarosXMPPServerChanged();
-            }
-        });
+    private void hookListeners() {
 
-        /*
-         * We don't want trigger Saros server restriction warning until the user
-         * really chose to use it (by filling out another input control).
-         */
-        this.jidCombo.getControl().addFocusListener(new FocusAdapter() {
-            @Override
-            public void focusLost(FocusEvent e) {
-                notifyIsSarosXMPPServerChanged();
-            }
-        });
-
-        /*
-         * Check the server's validity on focus loss.
-         */
-        this.serverText.getControl().addFocusListener(new FocusAdapter() {
-            @Override
-            public void focusLost(FocusEvent e) {
-                notifyXMPPServerValidityChanged();
-            }
-        });
-
-        /*
-         * Notify about text changes
-         */
         ModifyListener modifyListener = new ModifyListener() {
             public void modifyText(ModifyEvent e) {
                 notifyModifyText(e);
             }
         };
-        this.jidCombo.getControl().addModifyListener(modifyListener);
-        this.passwordText.addModifyListener(modifyListener);
-        this.serverText.getControl().addModifyListener(modifyListener);
+
+        jidCombo.getControl().addModifyListener(modifyListener);
+        passwordText.addModifyListener(modifyListener);
+        serverText.addModifyListener(modifyListener);
+        portText.addModifyListener(modifyListener);
     }
 
     /**
@@ -272,16 +173,16 @@ public class EnterXMPPAccountComposite extends Composite {
      * @return
      */
     public JID getJID() {
-        return new JID(this.jidCombo.getText().trim());
+        return new JID(jidCombo.getText().trim());
     }
 
     /**
-     * Sets the given {@JID} to the jid field.
+     * Sets the given {@JID} to the JID field.
      * 
      * @param jid
      */
     public void setJID(JID jid) {
-        this.jidCombo.setText(jid.getBase());
+        jidCombo.setText(jid.getBase());
     }
 
     /**
@@ -290,7 +191,7 @@ public class EnterXMPPAccountComposite extends Composite {
      * @return
      */
     public String getPassword() {
-        return this.passwordText.getText();
+        return passwordText.getText();
     }
 
     /**
@@ -299,16 +200,16 @@ public class EnterXMPPAccountComposite extends Composite {
      * @param password
      */
     public void setPassword(String password) {
-        this.passwordText.setText(password);
+        passwordText.setText(password);
     }
 
     /**
-     * Returns the entered server.
+     * Returns the entered server in lower case letters.
      * 
      * @return empty string if no server has been provided
      */
     public String getServer() {
-        return this.serverText.getText().trim();
+        return serverText.getText().trim().toLowerCase();
     }
 
     /**
@@ -317,80 +218,54 @@ public class EnterXMPPAccountComposite extends Composite {
      * @param server
      */
     public void setServer(String server) {
-        this.serverText.setText(server);
+        serverText.setText(server);
 
-        /*
-         * If server is not empty, open the server options
-         */
-        if (!(server.length() == 0) && serverOptionsExpandableComposite != null
-            && !serverOptionsExpandableComposite.isDisposed()) {
+        if (!(server.length() == 0)) {
             serverOptionsExpandableComposite.setExpanded(true);
         }
+    }
+
+    public boolean isUsingTSL() {
+        return useTSLButton.getSelection();
+    }
+
+    public void setUsingTSL(boolean use) {
+        useTSLButton.setSelection(use);
+    }
+
+    public boolean isUsingSASL() {
+        return useSASLButton.getSelection();
+    }
+
+    public void setUsingSASL(boolean use) {
+        useSASLButton.setSelection(use);
+    }
+
+    /**
+     * Sets the given port to the port field.
+     * 
+     * @param port
+     */
+    public void setPort(String port) {
+        portText.setText(port);
+    }
+
+    /**
+     * Returns the entered port.
+     * 
+     * @return empty string if no port has been provided
+     */
+    public String getPort() {
+        return portText.getText().trim();
     }
 
     /**
      * Returns true if the effectively used server is Saros's XMPP/Jabber server
      */
     public boolean isSarosXMPPServer() {
-        String server = this.getServer();
-        if (server.length() == 0)
-            server = this.getJID().getDomain();
-        return server.equalsIgnoreCase(preferenceUtils.getSarosXMPPServer());
-    }
-
-    /**
-     * Return true if the entered server is valid.<br/>
-     * A server is valid if it is empty or the name can be resolved.
-     * 
-     * @return
-     */
-    public boolean isXMPPServerValid() {
-
         String server = getServer();
-
         if (server.length() == 0)
-            return true;
-
-        String serverName = server;
-
-        // be aware of ip6: [2001:0db8:85a3:08d3:1319:8a2e:0370:7344]:8080
-        int idx = serverName.lastIndexOf(':');
-
-        if (idx != -1) {
-
-            if (idx == serverName.length() - 1) {
-                log.debug("empty port: " + server);
-                return false;
-            }
-
-            serverName = serverName.substring(0, idx);
-
-            if (serverName.length() == 0) {
-                log.debug("unknown host: " + server);
-                return false;
-            }
-
-            try {
-                int port = Integer.parseInt(serverName.substring(idx + 1));
-
-                if (port <= 0 || port >= 65536) {
-                    log.debug("port range exceeded: " + server);
-                    return false;
-                }
-            } catch (NumberFormatException e) {
-                log.debug("port is not a number: " + server);
-                return false;
-            }
-        }
-
-        try {
-            InetAddress address = InetAddress.getByName(serverName);
-            log.debug("nslookup succeeded: " + serverName + " = " + address);
-            return true;
-        } catch (UnknownHostException e) {
-            log.debug("nslookup failed: " + serverName);
-            return false;
-        }
-
+            server = getJID().getDomain();
+        return server.equalsIgnoreCase(preferenceUtils.getSarosXMPPServer());
     }
 }

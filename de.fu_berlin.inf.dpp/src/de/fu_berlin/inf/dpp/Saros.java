@@ -24,7 +24,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.net.UnknownHostException;
@@ -274,6 +273,29 @@ public class Saros extends AbstractUIPlugin {
         sarosContext.getComponent(IUPnPService.class).init(
             new UPnPAccessImpl(), getPreferenceStore());
 
+        /*
+         * REMOVE ME this code must be removed after the MARCH 2012 release this
+         * is currently a hack to stop annoying the user because we had made
+         * some changes. Google users cannot connect until they blank the
+         * fields, so we do it for them now !
+         */
+
+        XMPPAccountStore store = sarosContext
+            .getComponent(XMPPAccountStore.class);
+
+        for (XMPPAccount account : store.getAllAccounts()) {
+            try {
+                if (account.getDomain().equalsIgnoreCase(account.getServer())
+                    && account.getPort() == 5222) {
+                    store.changeAccountData(account, account.getUsername(),
+                        account.getPassword(), account.getDomain(), "", 0,
+                        account.useTSL(), account.useSASL());
+                }
+            } catch (IllegalArgumentException e) {
+                // ignore
+            }
+        }
+
         // determine if auto-connect can and should be performed
         if (getPreferenceStore().getBoolean(PreferenceConstants.AUTO_CONNECT)
             && !sarosContext.getComponent(XMPPAccountStore.class).isEmpty()
@@ -519,64 +541,39 @@ public class Saros extends AbstractUIPlugin {
         return null;
     }
 
-    /**
-     * Returns a @link{ConnectionConfiguration} representing the settings stored
-     * in the Eclipse preferences.
-     * 
-     * This methods will fall back to use DNS SRV to get the XMPP port of the
-     * server if the SERVER configured in the preferences does not have an
-     * explicit port set.
-     * 
-     * Also this method configures the SecurityMode and the reconnection
-     * attribute.
-     * 
-     * @throws URISyntaxException
-     *             If the server string in the preferences cannot be transformed
-     *             into an URI
-     */
-    protected ConnectionConfiguration getConnectionConfiguration(
-        String serverString) throws URISyntaxException {
+    protected ConnectionConfiguration createConnectionConfiguration(
+        String domain, String server, int port, boolean useTSL, boolean useSASL) {
 
-        PreferenceUtils preferenceUtils = this.sarosContext
-            .getComponent(PreferenceUtils.class);
+        ProxyInfo proxyInfo;
 
-        URI uri;
-        uri = (serverString.matches("://")) ? new URI(serverString) : new URI( //$NON-NLS-1$
-            "jabber://" + serverString); //$NON-NLS-1$
+        if (server.length() != 0)
+            proxyInfo = getProxyInfo(server);
+        else
+            proxyInfo = getProxyInfo(domain);
 
-        String server = uri.getHost();
-        if (server == null) {
-            throw new URISyntaxException(preferenceUtils.getServer(),
-                "The XMPP/Jabber server address is invalid: " + serverString); //$NON-NLS-1$
-        }
+        ConnectionConfiguration connectionConfiguration = null;
 
-        ProxyInfo proxyInfo = getProxyInfo(uri.getHost());
-        ConnectionConfiguration conConfig = null;
-
-        if (uri.getPort() < 0) {
-            conConfig = proxyInfo == null ? new ConnectionConfiguration(
-                uri.getHost()) : new ConnectionConfiguration(uri.getHost(),
+        if (server.length() == 0 && proxyInfo == null)
+            connectionConfiguration = new ConnectionConfiguration(domain);
+        else if (server.length() == 0 && proxyInfo != null)
+            connectionConfiguration = new ConnectionConfiguration(domain,
                 proxyInfo);
-        } else {
-            conConfig = proxyInfo == null ? new ConnectionConfiguration(
-                uri.getHost(), uri.getPort()) : new ConnectionConfiguration(
-                uri.getHost(), uri.getPort(), proxyInfo);
-        }
+        else if (server.length() != 0 && proxyInfo == null)
+            connectionConfiguration = new ConnectionConfiguration(server, port,
+                domain);
+        else
+            connectionConfiguration = new ConnectionConfiguration(server, port,
+                domain, proxyInfo);
 
-        /*
-         * TODO It has to ask the user, if s/he wants to use non-TLS connections
-         * with PLAIN SASL if TLS is not supported by the server.
-         * 
-         * TODO use MessageDialog and Util.runSWTSync() to provide a password
-         * call-back if the user has no password set in the preferences.
-         */
-        conConfig.setSecurityMode(ConnectionConfiguration.SecurityMode.enabled);
-        /*
-         * We handle reconnecting ourselves
-         */
-        conConfig.setReconnectionAllowed(false);
+        connectionConfiguration.setSASLAuthenticationEnabled(useSASL);
 
-        return conConfig;
+        if (!useTSL)
+            connectionConfiguration
+                .setSecurityMode(ConnectionConfiguration.SecurityMode.disabled);
+
+        connectionConfiguration.setReconnectionAllowed(false);
+
+        return connectionConfiguration;
     }
 
     /**
@@ -645,38 +642,26 @@ public class Saros extends AbstractUIPlugin {
 
         String username = account.getUsername();
         String password = account.getPassword();
+        String domain = account.getDomain();
         String server = account.getServer();
-
-        // FIXME use domain and server values to connect
+        int port = account.getPort();
+        boolean useTSL = account.useTSL();
+        boolean useSASL = account.useSASL();
 
         /*
-         * 
          * Google Talk users have to keep their server portion in the username;
          * see http://code.google.com/apis/talk/talk_developers_home.html
          */
 
-        if (server.equalsIgnoreCase("gmail.com")
-
-        || server.equalsIgnoreCase("googlemail.com")) {
-
-            if (!username.contains("@")) {
-
-                username += "@" + server;
-
-            }
+        if (domain.equalsIgnoreCase("gmail.com")
+            || domain.equalsIgnoreCase("googlemail.com")) {
+            username += "@" + domain;
         }
 
         try {
-            ConnectionConfiguration connectionConfiguration = this
-                .getConnectionConfiguration(server);
-            getSarosNet().connect(connectionConfiguration, username, password,
-                failSilently);
-
-        } catch (URISyntaxException e) {
-            log.info("URI not parseable: " + e.getInput()); //$NON-NLS-1$
-            Utils.popUpFailureMessage(Messages.Saros_0, e.getInput()
-                + Messages.Saros_1, failSilently);
-
+            getSarosNet().connect(
+                createConnectionConfiguration(domain, server, port, useTSL,
+                    useSASL), username, password, failSilently);
         } catch (IllegalArgumentException e) {
             log.info("Illegal argument: " + e.getMessage()); //$NON-NLS-1$
 

@@ -9,71 +9,75 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.picocontainer.annotations.Inject;
 
-import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.accountManagement.XMPPAccount;
 import de.fu_berlin.inf.dpp.accountManagement.XMPPAccountStore;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.ui.widgets.wizard.EnterXMPPAccountComposite;
-import de.fu_berlin.inf.dpp.ui.widgets.wizard.events.EnterXMPPAccountCompositeListener;
-import de.fu_berlin.inf.dpp.ui.widgets.wizard.events.IsSarosXMPPServerChangedEvent;
-import de.fu_berlin.inf.dpp.ui.widgets.wizard.events.XMPPServerChangedEvent;
 
 /**
  * Allows the user to edit a given {@link XMPPAccount}.
  * 
- * @author bkahlert
+ * @author Björn Kahlert
+ * @author Stefan Rossbach
  */
 public class EditXMPPAccountWizardPage extends WizardPage {
     public static final String TITLE = Messages.EditXMPPAccountWizardPage_title;
     public static final String DESCRIPTION = Messages.EditXMPPAccountWizardPage_description;
 
     @Inject
-    protected Saros saros;
+    private XMPPAccountStore accountStore;
 
-    @Inject
-    protected XMPPAccountStore accountStore;
-
-    protected EnterXMPPAccountComposite enterXMPPAccountComposite;
+    private EnterXMPPAccountComposite enterXMPPAccountComposite;
 
     /**
      * This flag is true if {@link JID} was already valid.
      */
-    protected boolean wasJIDValid = false;
+    private boolean wasJIDValid = false;
 
     /**
      * This flag is true if the password was already valid.
      */
-    protected boolean wasPasswordValid = false;
+    private boolean wasPasswordValid = false;
 
     /**
      * This flag is true if the server was already valid.
      */
-    protected boolean wasXMPPServerValid = false;
-    protected boolean isXMPPServerValid = false;
-
-    protected final JID initialJID;
-    protected final String initialPassword;
-    protected final String initialServer;
+    private boolean wasServerValid = false;
 
     /**
-     * This flag is true if Saros's Jabber server restriction should be
-     * displayed.
+     * This flag is true if the port was already valid.
      */
-    protected boolean showSarosXMPPRestriction = false;
+    private boolean wasPortValid = false;
 
-    public EditXMPPAccountWizardPage(JID initialJID, String initialPassword,
-        String initialServer) {
+    private final JID initialJID;
+    private final String initialPassword;
+    private final String initialServer;
+    private final String initialPort;
+
+    private boolean useTSL;
+    private boolean useSASL;
+
+    public EditXMPPAccountWizardPage(XMPPAccount account) {
         super(EditXMPPAccountWizardPage.class.getName());
 
         SarosPluginContext.initComponent(this);
         setTitle(TITLE);
         setDescription(DESCRIPTION);
 
-        this.initialJID = initialJID;
-        this.initialPassword = initialPassword;
-        this.initialServer = initialServer;
+        initialJID = new JID(account.getUsername(), account.getDomain());
+
+        initialPassword = account.getPassword();
+        initialServer = account.getServer();
+
+        if (account.getPort() == 0)
+            initialPort = "";
+        else
+            initialPort = String.valueOf(account.getPort());
+
+        useTSL = account.useTSL();
+        useSASL = account.useSASL();
     }
 
     public void createControl(Composite parent) {
@@ -82,96 +86,112 @@ public class EditXMPPAccountWizardPage extends WizardPage {
 
         composite.setLayout(new GridLayout(1, false));
 
-        this.enterXMPPAccountComposite = new EnterXMPPAccountComposite(
-            composite, SWT.NONE);
-        this.enterXMPPAccountComposite.setLayoutData(new GridData(SWT.FILL,
+        enterXMPPAccountComposite = new EnterXMPPAccountComposite(composite,
+            SWT.NONE);
+        enterXMPPAccountComposite.setLayoutData(new GridData(SWT.FILL,
             SWT.FILL, true, true));
-
-        this.isXMPPServerValid = this.enterXMPPAccountComposite
-            .isXMPPServerValid();
 
         setInitialValues();
         hookListeners();
         updatePageCompletion();
     }
 
-    protected void setInitialValues() {
-        this.enterXMPPAccountComposite.setJID(this.initialJID);
-        this.enterXMPPAccountComposite.setPassword(this.initialPassword);
-        this.enterXMPPAccountComposite.setServer(this.initialServer);
+    private void setInitialValues() {
+        enterXMPPAccountComposite.setJID(initialJID);
+        enterXMPPAccountComposite.setPassword(initialPassword);
+        enterXMPPAccountComposite.setServer(initialServer);
+        enterXMPPAccountComposite.setPort(initialPort);
+        enterXMPPAccountComposite.setUsingTSL(useTSL);
+        enterXMPPAccountComposite.setUsingSASL(useSASL);
     }
 
-    protected void hookListeners() {
+    private void hookListeners() {
         this.enterXMPPAccountComposite.addModifyListener(new ModifyListener() {
             public void modifyText(ModifyEvent e) {
                 updatePageCompletion();
             }
         });
-
-        this.enterXMPPAccountComposite
-            .addEnterXMPPAccountCompositeListener(new EnterXMPPAccountCompositeListener() {
-                public void xmppServerValidityChanged(
-                    XMPPServerChangedEvent event) {
-                    isXMPPServerValid = event.isXMPPServerValid();
-                    updatePageCompletion();
-                }
-
-                public void isSarosXMPPServerChanged(
-                    IsSarosXMPPServerChangedEvent event) {
-                    showSarosXMPPRestriction = event.isSarosXMPPServer();
-                    updatePageCompletion();
-                }
-            });
     }
 
-    protected void updatePageCompletion() {
+    private void updatePageCompletion() {
 
-        boolean isJIDValid = this.getJID().isValid();
-        boolean isPasswordNotEmpty = !this.getPassword().isEmpty();
-        boolean accountExists = accountStore.exists(getJID());
+        boolean isJIDValid = getJID().isValid();
+        boolean isPasswordValid = !getPassword().isEmpty();
+        boolean isServerValid = (getServer().isEmpty() && getPort().isEmpty())
+            || !getServer().isEmpty();
 
-        // allow password modification
-        if (accountExists && initialJID.equals(getJID())
-            && initialServer.equals(getServer()))
-            accountExists = false;
+        Boolean accountExists = null;
+
+        int port;
+
+        try {
+            port = Integer.parseInt(enterXMPPAccountComposite.getPort());
+            if (port <= 0 || port > 65535)
+                port = -1;
+
+        } catch (NumberFormatException e) {
+            port = -1;
+        }
+
+        boolean isPortValid = port != -1;
+
+        if (enterXMPPAccountComposite.getPort().isEmpty()
+            && enterXMPPAccountComposite.getServer().isEmpty()) {
+            port = 0;
+            isPortValid = true;
+        }
+
+        if (!enterXMPPAccountComposite.getPort().isEmpty())
+            wasPortValid = true;
 
         if (isJIDValid)
             wasJIDValid = true;
 
-        if (isPasswordNotEmpty)
+        if (isPasswordValid)
             wasPasswordValid = true;
 
-        if (getServer().isEmpty() || isXMPPServerValid) {
-            wasXMPPServerValid = true;
-        }
-
-        if (showSarosXMPPRestriction)
-            setMessage(Messages.xmpp_saros_restriction_short, WARNING);
-        else
-            setMessage(null);
+        if (isServerValid)
+            wasServerValid = true;
 
         setPageComplete(false);
         String errorMessage = null;
 
-        if (isJIDValid && isPasswordNotEmpty && isXMPPServerValid
-            && !accountExists) {
-            /*
-             * TODO Connect and login attempt to new server Not done because
-             * Saros.connect holds the whole connection code. Few reusable code.
-             * 2011/02/19 bkahlert
-             */
-            setPageComplete(true);
-        } else if (!isJIDValid && wasJIDValid) {
+        /*
+         * only query if the account exists when all required fields are filled
+         * out properly otherwise "accountExists" is null -> state not known yet
+         */
+        if ((isJIDValid && isPasswordValid && isServerValid && isPortValid))
+            accountExists = accountStore.exists(getJID().getName(), getJID()
+                .getDomain(), getServer(), port);
+
+        // allow password modification
+        if (accountExists != null && accountExists.booleanValue()
+            && initialJID.equals(getJID()) && initialServer.equals(getServer())
+            && initialPort.equals(getPort()))
+            accountExists = false;
+
+        if (!isJIDValid && wasJIDValid) {
             errorMessage = Messages.jid_format_errorMessage;
-        } else if (accountExists) {
-            errorMessage = Messages.account_exists_errorMessage;
-        } else if (!isPasswordNotEmpty && wasPasswordValid) {
+        } else if (!isPasswordValid && wasPasswordValid) {
             errorMessage = Messages.password_empty_errorMessage;
-        } else if (!isXMPPServerValid && wasXMPPServerValid) {
-            errorMessage = Messages.server_unresolvable_errorMessage;
+        } else if (!isServerValid && wasServerValid) {
+            errorMessage = "The server field must not be empty";
+        } else if (!isPortValid && wasPortValid && getPort().isEmpty()) {
+            errorMessage = "Port field must not be empty";
+        } else if (!isPortValid && wasPortValid) {
+            errorMessage = "Invalid port number";
+        } else if (accountExists != null && accountExists.booleanValue()) {
+            errorMessage = Messages.account_exists_errorMessage;
         }
 
         updateErrorMessage(errorMessage);
+
+        boolean isAdvancedSectionValid = ((getServer().isEmpty() && getPort()
+            .isEmpty()) || (!getServer().isEmpty() && !getPort().isEmpty() && port != 0));
+
+        if (isAdvancedSectionValid && accountExists != null
+            && !accountExists.booleanValue())
+            setPageComplete(true);
     }
 
     private String lastErrorMessage = null;
@@ -224,4 +244,22 @@ public class EditXMPPAccountWizardPage extends WizardPage {
     public String getServer() {
         return this.enterXMPPAccountComposite.getServer();
     }
+
+    /**
+     * Returns the entered port
+     * 
+     * @return the entered port
+     */
+    public String getPort() {
+        return enterXMPPAccountComposite.getPort();
+    }
+
+    public boolean isUsingTSL() {
+        return enterXMPPAccountComposite.isUsingTSL();
+    }
+
+    public boolean isUsingSASL() {
+        return enterXMPPAccountComposite.isUsingSASL();
+    }
+
 }

@@ -77,6 +77,16 @@ public class JID implements Serializable {
         this.jid = jid;
     }
 
+    public JID(String name, String domain) {
+        if (name == null)
+            throw new IllegalArgumentException("name cannot be null");
+
+        if (domain == null)
+            throw new IllegalArgumentException("domain cannot be null");
+
+        this.jid = name + "@" + domain;
+    }
+
     /**
      * Construct a new JID
      * 

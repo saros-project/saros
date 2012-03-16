@@ -98,7 +98,6 @@ public class JIDCombo {
      */
     public void setText(String string) {
         this.control.setText(string);
-        update();
     }
 
     /**

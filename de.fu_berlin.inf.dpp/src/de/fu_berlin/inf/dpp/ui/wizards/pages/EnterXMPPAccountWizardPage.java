@@ -14,7 +14,6 @@ import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.picocontainer.annotations.Inject;
 
-import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.accountManagement.XMPPAccount;
 import de.fu_berlin.inf.dpp.accountManagement.XMPPAccountStore;
@@ -22,9 +21,6 @@ import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.ui.util.WizardUtils;
 import de.fu_berlin.inf.dpp.ui.widgets.wizard.EnterXMPPAccountComposite;
-import de.fu_berlin.inf.dpp.ui.widgets.wizard.events.EnterXMPPAccountCompositeListener;
-import de.fu_berlin.inf.dpp.ui.widgets.wizard.events.IsSarosXMPPServerChangedEvent;
-import de.fu_berlin.inf.dpp.ui.widgets.wizard.events.XMPPServerChangedEvent;
 import de.fu_berlin.inf.dpp.ui.wizards.CreateXMPPAccountWizard;
 import de.fu_berlin.inf.nebula.explanation.note.SimpleNoteComposite;
 import de.fu_berlin.inf.nebula.utils.FontUtils;
@@ -40,41 +36,42 @@ public class EnterXMPPAccountWizardPage extends WizardPage {
     public static final String DESCRIPTION = Messages.EnterXMPPAccountWizardPage_description;
 
     @Inject
-    protected Saros saros;
+    private XMPPAccountStore accountStore;
 
-    @Inject
-    protected XMPPAccountStore accountStore;
-
-    protected Button createAccountButton;
-    protected EnterXMPPAccountComposite enterXMPPAccountComposite;
+    private Button createAccountButton;
+    private EnterXMPPAccountComposite enterXMPPAccountComposite;
 
     /**
      * True if the entered account was freshly created by the
      * {@link CreateXMPPAccountWizard}.
      */
-    protected boolean isXMPPAccountCreated = false;
+    private boolean isXMPPAccountCreated = false;
 
     /**
      * This flag is true if {@link JID} was already valid.
      */
-    protected boolean wasJIDValid = false;
+    private boolean wasJIDValid = false;
 
     /**
      * This flag is true if the password was already valid.
      */
-    protected boolean wasPasswordValid = false;
+    private boolean wasPasswordValid = false;
 
     /**
      * This flag is true if the server was already valid.
      */
-    protected boolean wasXMPPServerValid = false;
-    protected boolean isXMPPServerValid = false;
+    private boolean wasServerValid = false;
+
+    /**
+     * This flag is true if the port was already valid.
+     */
+    private boolean wasPortValid = false;
 
     /**
      * This flag is true if Saros's Jabber server restriction should be
      * displayed.
      */
-    protected boolean showSarosXMPPRestriction = false;
+    private boolean showSarosXMPPRestriction = false;
 
     public EnterXMPPAccountWizardPage() {
         super(EnterXMPPAccountWizardPage.class.getName());
@@ -121,6 +118,7 @@ public class EnterXMPPAccountWizardPage extends WizardPage {
         SimpleNoteComposite x = new SimpleNoteComposite(composite, SWT.BORDER,
             SWT.ICON_INFORMATION,
             Messages.EnterXMPPAccountWizardPage_info_already_created_account);
+
         x.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false, 3, 1));
         x.setSpacing(8);
 
@@ -128,22 +126,26 @@ public class EnterXMPPAccountWizardPage extends WizardPage {
         updatePageCompletion();
     }
 
-    protected Composite createLeftColumn(Composite composite) {
+    private Composite createLeftColumn(Composite composite) {
         Group newAccountColumnGroup = new Group(composite, SWT.NONE);
         newAccountColumnGroup.setLayout(new GridLayout(2, false));
+
         newAccountColumnGroup
             .setText(Messages.EnterXMPPAccountWizardPage_new_account);
 
         Composite newAccountComposite = new Composite(newAccountColumnGroup,
             SWT.NONE);
+
         newAccountComposite.setLayoutData(new GridData(SWT.CENTER, SWT.CENTER,
             true, true));
+
         newAccountComposite.setLayout(new GridLayout(1, false));
 
-        this.createAccountButton = new Button(newAccountComposite, SWT.PUSH);
-        this.createAccountButton
+        createAccountButton = new Button(newAccountComposite, SWT.PUSH);
+        createAccountButton
             .setText(Messages.EnterXMPPAccountWizardPage_create_new_account);
-        this.createAccountButton.addSelectionListener(new SelectionAdapter() {
+
+        createAccountButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
                 openCreateXMPPAccountWizard();
@@ -154,103 +156,106 @@ public class EnterXMPPAccountWizardPage extends WizardPage {
         return newAccountColumnGroup;
     }
 
-    protected Composite createRightColumn(Composite composite) {
+    private Composite createRightColumn(Composite composite) {
         Group existingAccountColumnGroup = new Group(composite, SWT.NONE);
         existingAccountColumnGroup.setLayout(new GridLayout(2, false));
+
         existingAccountColumnGroup
             .setText(Messages.EnterXMPPAccountWizardPage_existing_account);
 
-        this.enterXMPPAccountComposite = new EnterXMPPAccountComposite(
+        enterXMPPAccountComposite = new EnterXMPPAccountComposite(
             existingAccountColumnGroup, SWT.NONE);
+
         GridData gridData2 = new GridData(SWT.CENTER, SWT.CENTER, true, true);
         gridData2.verticalIndent = 23;
         gridData2.minimumWidth = 350;
-        this.enterXMPPAccountComposite.setLayoutData(gridData2);
-
-        this.isXMPPServerValid = this.enterXMPPAccountComposite
-            .isXMPPServerValid();
+        enterXMPPAccountComposite.setLayoutData(gridData2);
+        enterXMPPAccountComposite.setUsingTSL(true);
+        enterXMPPAccountComposite.setUsingSASL(true);
 
         return existingAccountColumnGroup;
     }
 
-    protected void hookListeners() {
+    private void hookListeners() {
         this.enterXMPPAccountComposite.addModifyListener(new ModifyListener() {
             public void modifyText(ModifyEvent e) {
                 updatePageCompletion();
             }
         });
 
-        this.enterXMPPAccountComposite
-            .addEnterXMPPAccountCompositeListener(new EnterXMPPAccountCompositeListener() {
-
-                public void xmppServerValidityChanged(
-                    XMPPServerChangedEvent event) {
-                    isXMPPServerValid = event.isXMPPServerValid();
-                    updatePageCompletion();
-                }
-
-                public void isSarosXMPPServerChanged(
-                    IsSarosXMPPServerChangedEvent event) {
-                    showSarosXMPPRestriction = event.isSarosXMPPServer();
-                    updatePageCompletion();
-                }
-            });
     }
 
     /**
      * Opens a {@link CreateXMPPAccountWizard} and takes over the created
      * account.
      */
-    protected void openCreateXMPPAccountWizard() {
+    private void openCreateXMPPAccountWizard() {
         getContainer().getShell().setVisible(false);
 
         CreateXMPPAccountWizard createXMPPAccountWizard = WizardUtils
             .openCreateXMPPAccountWizard(false);
+
         if (createXMPPAccountWizard != null
             && createXMPPAccountWizard.getCreatedXMPPAccount() != null) {
-            this.isXMPPAccountCreated = true;
+            isXMPPAccountCreated = true;
 
             XMPPAccount account = createXMPPAccountWizard
                 .getCreatedXMPPAccount();
 
-            String server = account.getServer();
-            String username = account.getUsername();
-            String password = account.getPassword();
-
-            String jid;
-            if (username.contains("@")) { //$NON-NLS-1$
-                jid = username;
-            } else {
-                jid = username + "@" + server; //$NON-NLS-1$
-                server = ""; //$NON-NLS-1$
-            }
-
-            this.createAccountButton.setEnabled(false);
-            this.enterXMPPAccountComposite.setEnabled(false);
-            this.enterXMPPAccountComposite.setJID(new JID(jid));
-            this.enterXMPPAccountComposite.setPassword(password);
-            this.enterXMPPAccountComposite.setServer(server);
+            createAccountButton.setEnabled(false);
+            enterXMPPAccountComposite.setEnabled(false);
+            enterXMPPAccountComposite.setJID(new JID(account.getUsername(),
+                account.getDomain()));
+            enterXMPPAccountComposite.setPassword(account.getPassword());
+            enterXMPPAccountComposite.setServer("");
+            enterXMPPAccountComposite.setPort("");
+            enterXMPPAccountComposite.setUsingTSL(true);
+            enterXMPPAccountComposite.setUsingSASL(true);
         }
 
         getContainer().getShell().setVisible(true);
         getContainer().getShell().setFocus();
     }
 
-    protected void updatePageCompletion() {
+    private void updatePageCompletion() {
 
-        boolean isJIDValid = this.getJID().isValid();
-        boolean isPasswordNotEmpty = !this.getPassword().isEmpty();
-        boolean accountExists = accountStore.exists(getJID());
+        boolean isJIDValid = getJID().isValid();
+        boolean isPasswordValid = !getPassword().isEmpty();
+        boolean isServerValid = (getServer().isEmpty() && getPort().isEmpty())
+            || !getServer().isEmpty();
+
+        Boolean accountExists = null;
+
+        int port;
+
+        try {
+            port = Integer.parseInt(enterXMPPAccountComposite.getPort());
+            if (port <= 0 || port > 65535)
+                port = -1;
+
+        } catch (NumberFormatException e) {
+            port = -1;
+        }
+
+        boolean isPortValid = port != -1;
+
+        if (enterXMPPAccountComposite.getPort().isEmpty()
+            && enterXMPPAccountComposite.getServer().isEmpty()) {
+            port = 0;
+            isPortValid = true;
+        }
+
+        if (!enterXMPPAccountComposite.getPort().isEmpty())
+            wasPortValid = true;
 
         if (isJIDValid)
             wasJIDValid = true;
 
-        if (isPasswordNotEmpty)
+        if (isPasswordValid)
             wasPasswordValid = true;
 
-        if (getServer().isEmpty() || isXMPPServerValid) {
-            wasXMPPServerValid = true;
-        }
+        if (isServerValid)
+            wasServerValid = true;
 
         if (showSarosXMPPRestriction)
             setMessage(Messages.xmpp_saros_restriction_short, WARNING);
@@ -260,25 +265,37 @@ public class EnterXMPPAccountWizardPage extends WizardPage {
         setPageComplete(false);
         String errorMessage = null;
 
-        if ((isJIDValid && isPasswordNotEmpty && isXMPPServerValid && !accountExists)
-            || isXMPPAccountCreated) {
-            /*
-             * TODO Connect and login attempt to new server Not done because
-             * Saros.connect holds the whole connection code. Few reusable code.
-             * 2011/02/19 bkahlert
-             */
-            setPageComplete(true);
-        } else if (!isJIDValid && wasJIDValid) {
+        /*
+         * only query if the account exists when all required fields are filled
+         * out properly otherwise "accountExists" is null -> state not known yet
+         */
+        if ((isJIDValid && isPasswordValid && isServerValid && isPortValid))
+            accountExists = accountStore.exists(getJID().getName(), getJID()
+                .getDomain(), getServer(), port);
+
+        if (!isJIDValid && wasJIDValid) {
             errorMessage = Messages.jid_format_errorMessage;
-        } else if (accountExists) {
-            errorMessage = Messages.account_exists_errorMessage;
-        } else if (!isPasswordNotEmpty && wasPasswordValid) {
+        } else if (!isPasswordValid && wasPasswordValid) {
             errorMessage = Messages.password_empty_errorMessage;
-        } else if (!isXMPPServerValid && wasXMPPServerValid) {
-            errorMessage = Messages.server_unresolvable_errorMessage;
+        } else if (!isServerValid && wasServerValid) {
+            errorMessage = "The server field must not be empty";
+        } else if (!isPortValid && wasPortValid && getPort().isEmpty()) {
+            errorMessage = "Port field must not be empty";
+        } else if (!isPortValid && wasPortValid) {
+            errorMessage = "Invalid port number";
+        } else if (accountExists != null && accountExists.booleanValue()) {
+            errorMessage = Messages.account_exists_errorMessage;
         }
 
         updateErrorMessage(errorMessage);
+
+        boolean isAdvancedSectionValid = ((getServer().isEmpty() && getPort()
+            .isEmpty()) || (!getServer().isEmpty() && !getPort().isEmpty() && port != 0));
+
+        if (isAdvancedSectionValid && accountExists != null
+            && !accountExists.booleanValue())
+            setPageComplete(true);
+
     }
 
     private String lastErrorMessage = null;
@@ -298,7 +315,7 @@ public class EnterXMPPAccountWizardPage extends WizardPage {
         if (!visible)
             return;
 
-        this.enterXMPPAccountComposite.setFocus();
+        enterXMPPAccountComposite.setFocus();
     }
 
     /*
@@ -311,7 +328,7 @@ public class EnterXMPPAccountWizardPage extends WizardPage {
      * @return
      */
     public JID getJID() {
-        return this.enterXMPPAccountComposite.getJID();
+        return enterXMPPAccountComposite.getJID();
     }
 
     /**
@@ -320,7 +337,7 @@ public class EnterXMPPAccountWizardPage extends WizardPage {
      * @return
      */
     public String getPassword() {
-        return this.enterXMPPAccountComposite.getPassword();
+        return enterXMPPAccountComposite.getPassword();
     }
 
     /**
@@ -329,7 +346,7 @@ public class EnterXMPPAccountWizardPage extends WizardPage {
      * @return empty string if no server has been provided
      */
     public String getServer() {
-        return this.enterXMPPAccountComposite.getServer();
+        return enterXMPPAccountComposite.getServer();
     }
 
     /**
@@ -337,6 +354,23 @@ public class EnterXMPPAccountWizardPage extends WizardPage {
      * {@link CreateXMPPAccountWizard}.
      */
     public boolean isXMPPAccountCreated() {
-        return this.isXMPPAccountCreated;
+        return isXMPPAccountCreated;
+    }
+
+    /**
+     * Returns the entered port
+     * 
+     * @return the entered port
+     */
+    public String getPort() {
+        return enterXMPPAccountComposite.getPort();
+    }
+
+    public boolean isUsingTSL() {
+        return enterXMPPAccountComposite.isUsingTSL();
+    }
+
+    public boolean isUsingSASL() {
+        return enterXMPPAccountComposite.isUsingSASL();
     }
 }

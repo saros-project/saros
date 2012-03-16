@@ -208,7 +208,8 @@ public class CreateXMPPAccountWizardPage extends WizardPage {
         boolean passwordsMatch = this.passwordText.getText().equals(
             this.repeatPasswordText.getText());
 
-        boolean accountExists = accountStore.exists(getUsername(), getServer());
+        boolean accountExists = accountStore.exists(getUsername(), getServer(),
+            "", 0);
 
         boolean isUsernameEmpty = this.getUsername().length() == 0;
 

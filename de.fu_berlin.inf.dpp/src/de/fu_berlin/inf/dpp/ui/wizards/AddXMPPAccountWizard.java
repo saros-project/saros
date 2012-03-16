@@ -105,23 +105,26 @@ public class AddXMPPAccountWizard extends Wizard {
             return null;
 
         JID jid = enterXMPPAccountWizardPage.getJID();
-        String password = enterXMPPAccountWizardPage.getPassword();
 
+        String username = jid.getName();
+        String password = enterXMPPAccountWizardPage.getPassword();
+        String domain = jid.getDomain().toLowerCase();
         String server = enterXMPPAccountWizardPage.getServer();
-        String username;
-        if (server.isEmpty()) {
-            // If no optional server, use server portion of jid
-            server = jid.getDomain();
-            username = jid.getName();
-        } else {
-            // If optional server, use whole jid for username
-            username = jid.getBase();
-        }
+
+        int port;
+
+        if (enterXMPPAccountWizardPage.getPort().length() != 0)
+            port = Integer.valueOf(enterXMPPAccountWizardPage.getPort());
+        else
+            port = 0;
+
+        boolean useTSL = enterXMPPAccountWizardPage.isUsingTSL();
+        boolean useSASL = enterXMPPAccountWizardPage.isUsingSASL();
 
         boolean wasEmpty = accountStore.isEmpty();
 
         XMPPAccount account = accountStore.createAccount(username, password,
-            server.toLowerCase());
+            domain, server, port, useTSL, useSASL);
 
         if (wasEmpty)
             saros.connect(false);

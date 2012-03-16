@@ -172,7 +172,7 @@ public class WizardUtils {
      */
     public static AddXMPPAccountWizard openAddXMPPAccountWizard() {
         return openWizardSuccessfully(new AddXMPPAccountWizard(), new Point(
-            850, 440));
+            850, 500));
     }
 
     /**
@@ -200,7 +200,7 @@ public class WizardUtils {
     public static EditXMPPAccountWizard openEditXMPPAccountWizard(
         XMPPAccount account) {
         return openWizardSuccessfully(new EditXMPPAccountWizard(account),
-            new Point(500, 340));
+            new Point(500, 400));
     }
 
     /**

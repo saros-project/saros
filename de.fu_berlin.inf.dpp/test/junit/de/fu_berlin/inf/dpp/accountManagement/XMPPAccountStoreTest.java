@@ -11,7 +11,6 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 
-import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
 import de.fu_berlin.inf.dpp.test.util.MemoryPreferenceStore;
 import de.fu_berlin.inf.dpp.test.util.MemorySecurePreferences;
@@ -148,19 +147,6 @@ public class XMPPAccountStoreTest {
         store.setAccountActive(account);
     }
 
-    @Test
-    public void testJIDexists() {
-        XMPPAccountStore store = new XMPPAccountStore(preferenceStore,
-            securePreferences);
-        store.createAccount("a", "a", "a", "a", 1, true, true);
-        store.createAccount("b", "a", "a", "a", 1, true, true);
-
-        assertTrue(store.exists(new JID("a@a")));
-        assertTrue(store.exists(new JID("b@a")));
-        assertFalse(store.exists(new JID("nothing@all")));
-
-    }
-
     @Test(expected = IllegalArgumentException.class)
     public void testChangeAccountDataToAlreadyExistingAccount() {
 
@@ -274,7 +260,7 @@ public class XMPPAccountStoreTest {
     }
 
     @Test
-    public void testExists() {
+    public void testAccountexists() {
         XMPPAccountStore store = new XMPPAccountStore(preferenceStore,
             securePreferences);
         store.createAccount("alice", "alice", "b", "b", 1, true, true);
@@ -286,4 +272,23 @@ public class XMPPAccountStoreTest {
         assertFalse(store.exists("alice", "b", "b", 5));
     }
 
+    @Test
+    public void testChangeAccountDataAndActiveAccountAfterDeserialization() {
+        XMPPAccountStore store = new XMPPAccountStore(preferenceStore,
+            securePreferences);
+
+        XMPPAccount account = store.createAccount("alice", "alice", "b", "b",
+            1, true, true);
+
+        store = new XMPPAccountStore(preferenceStore, securePreferences);
+
+        account = store.getActiveAccount();
+
+        XMPPAccount another = store.getAllAccounts().get(0);
+
+        store.changeAccountData(another, another.getUsername(),
+            another.getPassword(), another.getDomain(), "", 0, true, true);
+
+        assertEquals(another, account);
+    }
 }

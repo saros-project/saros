@@ -36,20 +36,8 @@ public class EditXMPPAccountWizard extends Wizard {
 
         this.setNeedsProgressMonitor(false);
 
-        JID jid;
-        String username = account.getUsername();
-        String password = account.getPassword();
-        String server = account.getServer();
-        if (username.contains("@")) { //$NON-NLS-1$
-            jid = new JID(username);
-        } else {
-            jid = new JID(username + "@" + server); //$NON-NLS-1$
-            server = ""; //$NON-NLS-1$
-        }
-
         this.account = account;
-        this.editXMPPAccountWizardPage = new EditXMPPAccountWizardPage(jid,
-            password, server);
+        editXMPPAccountWizardPage = new EditXMPPAccountWizardPage(account);
     }
 
     @Override
@@ -59,20 +47,26 @@ public class EditXMPPAccountWizard extends Wizard {
 
     @Override
     public boolean performFinish() {
-        JID jid = this.editXMPPAccountWizardPage.getJID();
-        String password = this.editXMPPAccountWizardPage.getPassword();
-        String server = this.editXMPPAccountWizardPage.getServer();
+        JID jid = editXMPPAccountWizardPage.getJID();
 
-        String username;
-        if (server.isEmpty()) {
-            username = jid.getName();
-            server = jid.getDomain();
-        } else {
-            username = jid.getBase();
-        }
+        String username = jid.getName();
+        String password = editXMPPAccountWizardPage.getPassword();
+        String domain = jid.getDomain().toLowerCase();
+        String server = editXMPPAccountWizardPage.getServer();
 
-        this.xmppAccountStore.changeAccountData(account, username, password,
-            server.toLowerCase());
+        int port;
+
+        if (editXMPPAccountWizardPage.getPort().length() != 0)
+            port = Integer.valueOf(editXMPPAccountWizardPage.getPort());
+        else
+            port = 0;
+
+        boolean useTSL = editXMPPAccountWizardPage.isUsingTSL();
+        boolean useSASL = editXMPPAccountWizardPage.isUsingSASL();
+
+        xmppAccountStore.changeAccountData(account, username, password, domain,
+            server, port, useTSL, useSASL);
+
         return true;
     }
 }

@@ -40,9 +40,6 @@ public final class XMPPAccount implements Serializable {
         if (username.trim().length() == 0)
             throw new IllegalArgumentException("user name is empty");
 
-        if (server.trim().length() == 0)
-            throw new IllegalArgumentException("server is empty");
-
         if (domain.trim().length() == 0)
             throw new IllegalArgumentException("domain is empty");
 
@@ -54,8 +51,13 @@ public final class XMPPAccount implements Serializable {
             throw new IllegalArgumentException(
                 "domain url must be in lower case letters");
 
-        if (port <= 0 || port >= 65536)
+        if (port < 0 || port >= 65536)
             throw new IllegalArgumentException("port number is not valid");
+
+        if ((server.trim().length() != 0 && port == 0)
+            || (server.trim().length() == 0 && port != 0))
+            throw new IllegalArgumentException(
+                "server or port value must not be unused if at least one value is used");
 
         this.username = username;
         this.password = password;
@@ -127,7 +129,7 @@ public final class XMPPAccount implements Serializable {
     public String toString() {
         return "username: '" + username + "', domain: '" + domain
             + "', server: '" + server + "', port: " + port + ", TSL: " + useTSL
-            + ", SASL: " + useSASL;
+            + ", SASL: " + useSASL + " : ";
     }
 
     @Override

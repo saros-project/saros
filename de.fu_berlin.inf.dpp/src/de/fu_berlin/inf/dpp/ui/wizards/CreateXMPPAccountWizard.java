@@ -142,7 +142,7 @@ public class CreateXMPPAccountWizard extends Wizard {
 
         // add account to the accountStore
         this.createdXMPPAccount = accountStore.createAccount(cachedUsername,
-            cachedPassword, cachedServer.toLowerCase());
+            cachedPassword, cachedServer.toLowerCase(), "", 0, true, true);
 
         // reconnect if user wishes
         if (createXMPPAccountPage.useNow()) {

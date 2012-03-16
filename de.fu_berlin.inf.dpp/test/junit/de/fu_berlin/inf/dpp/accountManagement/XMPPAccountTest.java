@@ -48,8 +48,8 @@ public class XMPPAccountTest {
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void testEmptyServer() {
-        new XMPPAccount("alice", "alice", "", "", 1, true, true);
+    public void testUsingNoServerButPort() {
+        new XMPPAccount("alice", "alice", "localhost", "", 1, true, true);
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -66,6 +66,12 @@ public class XMPPAccountTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void testInvalidAccountDataPortUnderflow() {
+        new XMPPAccount("alice", "alice", "localhost", "localhost", -1, true,
+            true);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testUsingServerWithoutPort() {
         new XMPPAccount("alice", "alice", "localhost", "localhost", 0, true,
             true);
     }
