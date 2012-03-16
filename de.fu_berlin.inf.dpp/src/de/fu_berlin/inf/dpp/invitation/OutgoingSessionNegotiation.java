@@ -25,7 +25,6 @@ import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
 import de.fu_berlin.inf.dpp.exceptions.RemoteCancellationException;
 import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
 import de.fu_berlin.inf.dpp.invitation.ProcessTools.CancelOption;
-import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
 import de.fu_berlin.inf.dpp.net.internal.DefaultInvitationInfo.InvitationAcknowledgementExtensionProvider;
@@ -50,6 +49,10 @@ public class OutgoingSessionNegotiation extends InvitationProcess {
 
     private final static Logger log = Logger
         .getLogger(OutgoingSessionNegotiation.class);
+
+    private static final long INVITATION_ACKNOWLEDGEMENT_TIMEOUT = 30000;
+    private static final long USER_LIST_REQUEST_TIMEOUT = 30000;
+    private static final long INVITATION_COMPLETED_RESPONSE_TIMEOUT = 30000;
 
     private final static Random INVITATION_RAND = new Random();
 
@@ -334,7 +337,7 @@ public class OutgoingSessionNegotiation extends InvitationProcess {
             .setTaskName("Invitation sent. Waiting for acknowledgement...");
 
         if (collectPacket(invitationAcknowledgedCollector,
-            ITransmitter.INVITATION_ACKNOWLEDGEMENT_TIMEOUT, subMonitor) == null) {
+            INVITATION_ACKNOWLEDGEMENT_TIMEOUT, subMonitor) == null) {
             throw new LocalCancellationException(
                 peerAdvertisesSarosSupport ? "No invitation acknowledgement received."
                     : "Missing Saros support.", CancelOption.DO_NOT_NOTIFY_PEER);
@@ -343,7 +346,8 @@ public class OutgoingSessionNegotiation extends InvitationProcess {
         subMonitor
             .setTaskName("Invitation acknowledged. Waiting for user list request...");
 
-        if (collectPacket(userListRequestCollector, 10000, subMonitor) == null) {
+        if (collectPacket(userListRequestCollector, USER_LIST_REQUEST_TIMEOUT,
+            subMonitor) == null) {
             throw new LocalCancellationException(
                 peerAdvertisesSarosSupport ? "No user list request received."
                     : "Missing Saros support.", CancelOption.DO_NOT_NOTIFY_PEER);
@@ -410,7 +414,8 @@ public class OutgoingSessionNegotiation extends InvitationProcess {
 
         subMonitor.beginTask("Waiting for peer to complete invitation...", 2);
 
-        if (collectPacket(invitationCompleteCollector, 10000, subMonitor) == null) {
+        if (collectPacket(invitationCompleteCollector,
+            INVITATION_COMPLETED_RESPONSE_TIMEOUT, subMonitor) == null) {
             throw new LocalCancellationException(
                 peerAdvertisesSarosSupport ? "no invitation complete response received"
                     : "Missing Saros support.", CancelOption.DO_NOT_NOTIFY_PEER);
