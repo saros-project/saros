@@ -184,7 +184,7 @@ public class XMPPReceiver {
         final IncomingTransferObject incomingTransferObject) {
         final Packet packet = new Message();
         packet.setPacketID(Packet.ID_NOT_AVAILABLE);
-        packet.setFrom(description.sender.toString());
+        packet.setFrom(description.getSender().toString());
         packet.addExtension(incomingExtProv.create(incomingTransferObject));
         if (processIncomingTransferDescription(packet)) {
             return;
@@ -209,8 +209,8 @@ public class XMPPReceiver {
         TransferDescription description, IncomingTransferObject transferObject) {
         SubMonitor monitor = SubMonitor.convert(new NullProgressMonitor());
 
-        String name = description.type;
-        String namespace = description.namespace;
+        String name = description.getType();
+        String namespace = description.getNamespace();
         // IQ provider?
 
         PacketExtensionProvider provider = (PacketExtensionProvider) ProviderManager
@@ -268,8 +268,8 @@ public class XMPPReceiver {
 
         final Packet packet = new Message();
         packet.setPacketID(Packet.ID_NOT_AVAILABLE);
-        packet.setFrom(description.sender.toString());
-        packet.setTo(description.recipient.toString());
+        packet.setFrom(description.getSender().toString());
+        packet.setTo(description.getRecipient().toString());
         packet.addExtension(extension);
 
         dispatchThreadContext.executeAsDispatch(new Runnable() {
@@ -279,8 +279,7 @@ public class XMPPReceiver {
         });
     }
 
-    void inject(
-        IncomingTransferObjectExtensionProvider incomingExtProv,
+    void inject(IncomingTransferObjectExtensionProvider incomingExtProv,
         DispatchThreadContext dispatchThreadContext) {
         this.incomingExtProv = incomingExtProv;
         this.dispatchThreadContext = dispatchThreadContext;

@@ -21,9 +21,8 @@ import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
 import de.fu_berlin.inf.dpp.net.IncomingTransferObject;
 import de.fu_berlin.inf.dpp.net.IncomingTransferObject.IncomingTransferObjectExtensionProvider;
 import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.net.NetTransferMode;
 import de.fu_berlin.inf.dpp.net.SarosNet;
-import de.fu_berlin.inf.dpp.net.internal.DataTransferManager.NetTransferMode;
-import de.fu_berlin.inf.dpp.net.internal.TransferDescription.FileTransferType;
 import de.fu_berlin.inf.dpp.net.internal.discoveryManager.DiscoveryManager;
 import de.fu_berlin.inf.dpp.util.StopWatch;
 import de.fu_berlin.inf.dpp.util.Utils;
@@ -106,7 +105,8 @@ public class ConnectionTestManager {
                 try {
                     IQ iqResponse = responseProvider.createIQ(result);
                     iqResponse.setTo(packet.getFrom());
-                    iqResponse.setPacketID(ito.getTransferDescription().testID);
+                    iqResponse.setPacketID(ito.getTransferDescription()
+                        .getTestID());
 
                     sarosNet.getConnection().sendPacket(iqResponse);
                 } catch (Exception e) {
@@ -124,8 +124,8 @@ public class ConnectionTestManager {
                 if (payload == null)
                     return false;
 
-                return FileTransferType.CONNECTION_TEST.equals(payload
-                    .getTransferDescription().type);
+                return TransferDescription.CONNECTION_TEST.equals(payload
+                    .getTransferDescription().getType());
             }
         });
 

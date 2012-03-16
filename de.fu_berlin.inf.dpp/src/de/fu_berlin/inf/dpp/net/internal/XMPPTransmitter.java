@@ -69,16 +69,15 @@ import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.IncomingTransferObject;
 import de.fu_berlin.inf.dpp.net.IncomingTransferObject.IncomingTransferObjectExtensionProvider;
 import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.net.NetTransferMode;
 import de.fu_berlin.inf.dpp.net.SarosNet;
 import de.fu_berlin.inf.dpp.net.TimedActivityDataObject;
 import de.fu_berlin.inf.dpp.net.business.DispatchThreadContext;
-import de.fu_berlin.inf.dpp.net.internal.DataTransferManager.NetTransferMode;
 import de.fu_berlin.inf.dpp.net.internal.DefaultInvitationInfo.FileListRequestExtensionProvider;
 import de.fu_berlin.inf.dpp.net.internal.DefaultInvitationInfo.InvitationAcknowledgementExtensionProvider;
 import de.fu_berlin.inf.dpp.net.internal.DefaultInvitationInfo.InvitationCompleteExtensionProvider;
 import de.fu_berlin.inf.dpp.net.internal.DefaultInvitationInfo.UserListRequestExtensionProvider;
 import de.fu_berlin.inf.dpp.net.internal.DefaultSessionInfo.UserListConfirmationExtensionProvider;
-import de.fu_berlin.inf.dpp.net.internal.TransferDescription.FileTransferType;
 import de.fu_berlin.inf.dpp.net.internal.UserListInfo.JoinExtensionProvider;
 import de.fu_berlin.inf.dpp.net.internal.XStreamExtensionProvider.XStreamPacketExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.CancelInviteExtension;
@@ -341,7 +340,7 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
         log.debug("Receiving archive");
         final PacketFilter filter = PacketExtensionUtils
             .getIncomingTransferObjectFilter(incomingExtProv, sessionID,
-                processID, FileTransferType.ARCHIVE_TRANSFER);
+                processID, TransferDescription.ARCHIVE_TRANSFER);
 
         SarosPacketCollector collector = installReceiver(filter);
 
@@ -682,15 +681,13 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
          * and namespace of the packet extension and standard values and thus
          * transparent to users of this method.
          */
-        TransferDescription result = new TransferDescription();
-        result.recipient = recipient;
-        result.sender = sarosSessionObservable.getValue().getLocalUser()
-            .getJID();
-        result.type = extension.getElementName();
-        result.namespace = extension.getNamespace();
-        result.sessionID = this.sessionID.getValue();
-        result.compressed = false;
-        result.logToDebug = false;
+        TransferDescription result = new TransferDescription()
+            .setRecipient(recipient)
+            .setSender(
+                sarosSessionObservable.getValue().getLocalUser().getJID())
+            .setType(extension.getElementName())
+            .setNamespace(extension.getNamespace())
+            .setSessionID(this.sessionID.getValue()).setCompressContent(false);
 
         sendToProjectUser(recipient, extension, result);
     }

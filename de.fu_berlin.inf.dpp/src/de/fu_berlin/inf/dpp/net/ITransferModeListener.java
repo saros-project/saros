@@ -1,7 +1,6 @@
 package de.fu_berlin.inf.dpp.net;
 
-import de.fu_berlin.inf.dpp.net.internal.DataTransferManager.IBytestreamConnection;
-import de.fu_berlin.inf.dpp.net.internal.DataTransferManager.NetTransferMode;
+import de.fu_berlin.inf.dpp.net.internal.IByteStreamConnection;
 
 /**
  * This interface can be implemented to be informed about file transfers being
@@ -40,7 +39,7 @@ public interface ITransferModeListener {
      * @param connection
      *            maybenull if the connection was closed
      */
-    public void connectionChanged(JID jid, IBytestreamConnection connection);
+    public void connectionChanged(JID jid, IByteStreamConnection connection);
 
     /**
      * Is called when the transferMode information is reset (probably because

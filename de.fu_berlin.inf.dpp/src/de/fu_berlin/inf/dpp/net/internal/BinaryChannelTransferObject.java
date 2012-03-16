@@ -17,9 +17,9 @@ import de.fu_berlin.inf.dpp.exceptions.RemoteCancellationException;
 import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
 import de.fu_berlin.inf.dpp.invitation.ProcessTools.CancelOption;
 import de.fu_berlin.inf.dpp.net.IncomingTransferObject;
+import de.fu_berlin.inf.dpp.net.NetTransferMode;
 import de.fu_berlin.inf.dpp.net.internal.BinaryPacketProto.BinaryPacket;
 import de.fu_berlin.inf.dpp.net.internal.BinaryPacketProto.BinaryPacket.PacketType;
-import de.fu_berlin.inf.dpp.net.internal.DataTransferManager.NetTransferMode;
 import de.fu_berlin.inf.dpp.util.Utils;
 
 public class BinaryChannelTransferObject implements IncomingTransferObject {
@@ -105,11 +105,8 @@ public class BinaryChannelTransferObject implements IncomingTransferObject {
                 }
 
                 if (first) {
-                    progress.beginTask(
-                        "Receiving",
-                        packet.getRemaining()
-                            + (transferDescription
-                                .compressInDataTransferManager() ? 1 : 0));
+                    progress.beginTask("Receiving", packet.getRemaining()
+                        + (transferDescription.compressContent() ? 1 : 0));
                     first = false;
                 }
 
@@ -125,7 +122,7 @@ public class BinaryChannelTransferObject implements IncomingTransferObject {
 
             transferredSize = data.length;
 
-            if (transferDescription.compressInDataTransferManager())
+            if (transferDescription.compressContent())
                 data = Utils.inflate(data, progress.newChild(1));
 
             uncompressedSize = data.length;

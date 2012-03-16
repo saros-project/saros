@@ -73,7 +73,6 @@ import de.fu_berlin.inf.dpp.net.internal.StreamServiceManager.StreamMetaPacketDa
 import de.fu_berlin.inf.dpp.net.internal.StreamSession.Stream;
 import de.fu_berlin.inf.dpp.net.internal.StreamSession.StreamSessionListener;
 import de.fu_berlin.inf.dpp.net.internal.StreamSession.StreamSessionOutputStream;
-import de.fu_berlin.inf.dpp.net.internal.TransferDescription.FileTransferType;
 import de.fu_berlin.inf.dpp.observables.SarosSessionObservable;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 import de.fu_berlin.inf.dpp.project.AbstractSarosSessionListener;
@@ -580,15 +579,15 @@ public class StreamServiceManager implements Startable {
      * </p>
      * <p>
      * The common representation is a {@link String} (used in
-     * {@link TransferDescription#file_project_path}), which starts with the
-     * type of packet (specified in {@link TransferDescription#type}) followed
-     * by {@link #jid} (who initiated the session) and {@link #sessionID}.
+     * {@link TransferDescription#getArchivePath()}), which starts with the type
+     * of packet (specified in {@link TransferDescription#type}) followed by
+     * {@link #jid} (who initiated the session) and {@link #sessionID}.
      * </p>
      * <p>
      * Currently two types are used and implemented:
      * <ul>
-     * <li> {@link TransferDescription.FileTransferType#STREAM_DATA}: A data
-     * packet. Path additionally contains {@link #streamID} and {@link #size}.<br/>
+     * <li> {@link TransferDescription#STREAM_DATA}: A data packet. Path
+     * additionally contains {@link #streamID} and {@link #size}.<br/>
      * Example:
      * 
      * <pre>
@@ -596,9 +595,9 @@ public class StreamServiceManager implements Startable {
      * </pre>
      * 
      * </li>
-     * <li> {@link TransferDescription.FileTransferType#STREAM_META}: A meta
-     * packet. Path also stores the involved service name (to discover the
-     * appropriate {@link StreamService} for an incoming initiation).
+     * <li> {@link TransferDescription#STREAM_META}: A meta packet. Path also
+     * stores the involved service name (to discover the appropriate
+     * {@link StreamService} for an incoming initiation).
      * 
      * <pre>
      * STREAM_META/alice1_fu@jabber.ccc.de/1/SendFileSingle
@@ -637,14 +636,14 @@ public class StreamServiceManager implements Startable {
             this.type = tokens[0];
             if (this.type == null)
                 throw new IllegalArgumentException("Type not known!");
-            if (FileTransferType.STREAM_META.equals(this.type)) {
+            if (TransferDescription.STREAM_META.equals(this.type)) {
                 if (tokens.length != 4)
                     throw new IllegalArgumentException(
                         "Unexpected number of tokens for a meta-path.");
                 this.jid = tokens[1];
                 this.serviceName = tokens[3];
                 this.sessionID = Integer.valueOf(tokens[2]);
-            } else if (FileTransferType.STREAM_DATA.equals(this.type)) {
+            } else if (TransferDescription.STREAM_DATA.equals(this.type)) {
                 if (tokens.length != 5)
                     throw new IllegalArgumentException(
                         "Unexpected number of tokens for a data-path.");
@@ -672,7 +671,7 @@ public class StreamServiceManager implements Startable {
          *            of data in bytes
          */
         public StreamPath(JID jid, int sessionID, int streamID, int size) {
-            this.type = FileTransferType.STREAM_DATA;
+            this.type = TransferDescription.STREAM_DATA;
             this.jid = jid.getBase();
             this.size = size;
             this.sessionID = sessionID;
@@ -690,7 +689,7 @@ public class StreamServiceManager implements Startable {
          *            of {@link StreamSession} or it's initiation
          */
         public StreamPath(JID jid, StreamService service, int sessionID) {
-            this.type = FileTransferType.STREAM_META;
+            this.type = TransferDescription.STREAM_META;
             this.jid = jid.getBase();
             this.serviceName = service.getServiceName();
             this.sessionID = sessionID;
@@ -706,10 +705,10 @@ public class StreamServiceManager implements Startable {
          */
         @Override
         public String toString() {
-            if (FileTransferType.STREAM_DATA.equals(type)) {
+            if (TransferDescription.STREAM_DATA.equals(type)) {
                 return String.format("%6$s%5$c%1$s%5$c%2$d%5$c%3$d%5$c%4$d",
                     jid, sessionID, streamID, size, PATH_DELIMITER, type);
-            } else if (FileTransferType.STREAM_META.equals(type)) {
+            } else if (TransferDescription.STREAM_META.equals(type)) {
                 return String.format("%5$s%4$c%1$s%4$c%3$d%4$c%2$s", jid,
                     serviceName, sessionID, PATH_DELIMITER, type);
             } else {
@@ -767,7 +766,7 @@ public class StreamServiceManager implements Startable {
     /**
      * <p>
      * MetaPackets are session-life-cycle related packets of type
-     * {@link FileTransferType#STREAM_META}. These {@link Enum}s contain the
+     * {@link TransferDescription#STREAM_META}. These {@link Enum}s contain the
      * data to identify the type of {@link StreamMetaPacketData}. Additionally
      * {@link Serializable}'s can be merged into data.
      * </p>
@@ -1255,8 +1254,8 @@ public class StreamServiceManager implements Startable {
      * <p>
      * This class receives all {@link IncomingTransferObject}'s from
      * {@link DataTransferManager} and processes
-     * {@link FileTransferType#STREAM_META} and
-     * {@link FileTransferType#STREAM_DATA}.
+     * {@link TransferDescription#STREAM_META} and
+     * {@link TransferDescription#STREAM_DATA}.
      * </p>
      * <p>
      * Interrupting the Thread will cause a shutdown.
@@ -1324,9 +1323,9 @@ public class StreamServiceManager implements Startable {
 
         /**
          * Process an incoming {@link StreamPacket}.
-         * {@link FileTransferType#STREAM_DATA}-packets are passed to session,
-         * {@link FileTransferType#STREAM_META}-packets will be processed by
-         * {@link #processMeta(StreamPacket)}
+         * {@link TransferDescription#STREAM_DATA}-packets are passed to
+         * session, {@link TransferDescription#STREAM_META}-packets will be
+         * processed by {@link #processMeta(StreamPacket)}
          * 
          * @param packet
          */
@@ -1335,7 +1334,7 @@ public class StreamServiceManager implements Startable {
             TransferDescription description = packet.getTransferDescription();
 
             log.trace("Packet " + counter + " arrived");
-            if (FileTransferType.STREAM_DATA.equals(description.type)) {
+            if (TransferDescription.STREAM_DATA.equals(description.getType())) {
                 StreamSession session = sessions.get(packet.getStreamPath());
                 if (session == null) {
                     log.error("Received packet for an unknown session. Path is "
@@ -1348,10 +1347,12 @@ public class StreamServiceManager implements Startable {
                     return;
                 }
                 session.addPacket(packet);
-            } else if (FileTransferType.STREAM_META.equals(description.type)) {
+            } else if (TransferDescription.STREAM_META.equals(description
+                .getType())) {
                 processMeta(packet);
             } else {
-                log.error("Received unknown packet type: " + description.type);
+                log.error("Received unknown packet type: "
+                    + description.getType());
             }
 
         }
@@ -1384,11 +1385,11 @@ public class StreamServiceManager implements Startable {
             final StreamPath streamPath;
             try {
                 streamPath = new StreamPath(
-                    transferDescription.file_project_path);
+                    transferDescription.getArchivePath());
             } catch (IllegalArgumentException e) {
                 log.error("Packet had invalid stream-path: "
-                    + (transferDescription.file_project_path == null ? "none"
-                        : transferDescription.file_project_path));
+                    + (transferDescription.getArchivePath() == null ? "none"
+                        : transferDescription.getArchivePath()));
                 return;
             }
             final StreamSession session = sessions.get(streamPath);
@@ -1413,7 +1414,7 @@ public class StreamServiceManager implements Startable {
 
                 if (sessions.containsKey(streamPath)) {
                     log.error("Received initiation packet more than once from "
-                        + transferDescription.sender);
+                        + transferDescription.getSender());
                     return;
                 }
 
@@ -1423,8 +1424,8 @@ public class StreamServiceManager implements Startable {
                     return;
                 }
 
-                final User from = sarosSession
-                    .getUser(transferDescription.sender);
+                final User from = sarosSession.getUser(transferDescription
+                    .getSender());
                 if (from == null) {
                     log.warn("Buddy left, discarding packet!");
                     return;
@@ -1458,8 +1459,9 @@ public class StreamServiceManager implements Startable {
                                 }
                                 newSession = new StreamSession(
                                     StreamServiceManager.this, service,
-                                    transferDescription.sender,
-                                    transferDescription.sender,
+                                    transferDescription.getSender(),
+                                    // FIMXE IS THIS RIGHT ?!
+                                    transferDescription.getSender(),
                                     streamPath.sessionID, initiationDescription);
 
                             }
@@ -1489,8 +1491,8 @@ public class StreamServiceManager implements Startable {
                                 sender.sendPacket(
                                     TransferDescription
                                         .createStreamMetaTransferDescription(
-                                            transferDescription.sender,
-                                            transferDescription.recipient,
+                                            transferDescription.getSender(),
+                                            transferDescription.getRecipient(),
                                             streamPath.toString(),
                                             sarosSessionID.getValue()),
                                     StreamMetaPacketData.REJECT.getIdentifier(),
@@ -1563,7 +1565,7 @@ public class StreamServiceManager implements Startable {
                 else {
                     final StreamSession newSession = new StreamSession(
                         StreamServiceManager.this, initiation.service,
-                        transferDescription.sender, sarosNet.getMyJID(),
+                        transferDescription.getSender(), sarosNet.getMyJID(),
                         streamPath.sessionID, initiation.initial);
                     sessions.put(streamPath, newSession);
 
@@ -1664,8 +1666,8 @@ public class StreamServiceManager implements Startable {
             throws IllegalArgumentException {
             this.ito = ito;
             this.transferDescription = ito.getTransferDescription();
-            this.streamPath = new StreamPath(
-                ito.getTransferDescription().file_project_path);
+            this.streamPath = new StreamPath(ito.getTransferDescription()
+                .getArchivePath());
         }
 
         /**
@@ -1682,7 +1684,7 @@ public class StreamServiceManager implements Startable {
             this.data = data;
             this.progress = progress == null ? SubMonitor
                 .convert(new NullProgressMonitor()) : progress;
-            this.streamPath = new StreamPath(desc.file_project_path);
+            this.streamPath = new StreamPath(desc.getArchivePath());
         }
 
         /**
@@ -1733,7 +1735,8 @@ public class StreamServiceManager implements Startable {
                 throw new StreamException("Packet contained no data");
             }
 
-            if (transferDescription.type.equals(FileTransferType.STREAM_DATA)
+            if (transferDescription.getType().equals(
+                TransferDescription.STREAM_DATA)
                 && data.length != streamPath.size) {
                 if (streamPath.size > data.length) {
                     log.error("Lost bytes! Got " + data.length + ", expected "
@@ -1823,14 +1826,14 @@ public class StreamServiceManager implements Startable {
 
             TransferDescription transferDescription = payload
                 .getTransferDescription();
-            if (!Utils.equals(transferDescription.sessionID,
+            if (!Utils.equals(transferDescription.getSessionID(),
                 sarosSessionID.getValue()))
                 return false;
 
-            return ObjectUtils.equals(transferDescription.type,
-                FileTransferType.STREAM_DATA)
-                || ObjectUtils.equals(transferDescription.type,
-                    FileTransferType.STREAM_META);
+            return ObjectUtils.equals(transferDescription.getType(),
+                TransferDescription.STREAM_DATA)
+                || ObjectUtils.equals(transferDescription.getType(),
+                    TransferDescription.STREAM_META);
         }
     }
 

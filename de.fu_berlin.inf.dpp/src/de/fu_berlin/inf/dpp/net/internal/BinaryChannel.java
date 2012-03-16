@@ -24,9 +24,9 @@ import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
 import de.fu_berlin.inf.dpp.exceptions.RemoteCancellationException;
 import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
 import de.fu_berlin.inf.dpp.net.IncomingTransferObject;
+import de.fu_berlin.inf.dpp.net.NetTransferMode;
 import de.fu_berlin.inf.dpp.net.internal.BinaryPacketProto.BinaryPacket;
 import de.fu_berlin.inf.dpp.net.internal.BinaryPacketProto.BinaryPacket.PacketType;
-import de.fu_berlin.inf.dpp.net.internal.DataTransferManager.NetTransferMode;
 import de.fu_berlin.inf.dpp.util.AutoHashMap;
 import de.fu_berlin.inf.dpp.util.CausedIOException;
 import de.fu_berlin.inf.dpp.util.StackTrace;
@@ -35,22 +35,22 @@ import de.fu_berlin.inf.dpp.util.Utils;
 /**
  * BinaryChannel is a class that encapsulates a bidirectional communication
  * channel between two participants.
- * 
+ *
  * The threading requirements of this class are the following:
- * 
+ *
  * 1.) sendDirect() is a reentrant method for sending data. Any number of
  * threads can call it in parallel.
- * 
+ *
  * 2.) {@link #receiveIncomingTransferObject(SubMonitor)} is the mainloop of
  * this class. No sending/receiving will work if this method is not called
  * repeatedly. BUT it may only be called from a single thread at any point in
  * time!
- * 
+ *
  * 3.) Calling {@link BinaryChannelTransferObject#accept(SubMonitor)} must be
  * done from a thread different than
  * {@link #receiveIncomingTransferObject(SubMonitor)}. Otherwise the
  * BinaryChannel will be blocked.
- * 
+ *
  * @author sszuecs
  * @author coezbek
  */
@@ -135,7 +135,7 @@ public class BinaryChannel {
 
     /**
      * Creates an observer BinaryChannel.
-     * 
+     *
      * @throws IOException
      */
     // TODO: update TestCases, remove Socket variable and this constructor
@@ -166,12 +166,12 @@ public class BinaryChannel {
     /**
      * Run the BinaryChannels main loop until the next IncomingTransferObject is
      * received.
-     * 
+     *
      * Without calling this method, the BinaryChannel will not work.
-     * 
+     *
      * @nonreentrant This method is not reentrant! Use only with a single
      *               thread!
-     * 
+     *
      * @throws LocalCancellationException
      *             If waiting was canceled using the supplied progress.
      * @throws IOException
@@ -269,7 +269,7 @@ public class BinaryChannel {
 
     /**
      * It sends a given Packet through the ObjectOutputStream.
-     * 
+     *
      * @throws IOException
      */
     protected void send(BinaryPacket packet) throws IOException {
@@ -285,7 +285,7 @@ public class BinaryChannel {
 
         TransferDescription transferDescription = TransferDescription
             .fromByteArray(Utils.inflate(description, progress.newChild(1)));
-        transferDescription.objectid = objectid;
+        transferDescription.setID(objectid);
         return transferDescription;
     }
 
@@ -296,15 +296,15 @@ public class BinaryChannel {
     /**
      * It sends the given transferDescription and data direct. Supports
      * cancellation by given SubMonitor.
-     * 
+     *
      * @reentrant This method may be called from multiple threads at once
-     * 
+     *
      * @blocking
-     * 
+     *
      * @throws IOException
      *             If there was an error sending (for instance the socket is
      *             closed) or
-     * 
+     *
      * @throws LocalCancellationException
      *             If the local user canceled and this cancellation was
      *             performed by this method.
@@ -321,15 +321,14 @@ public class BinaryChannel {
         progress.beginTask("send direct", countData + 1);
 
         int objectid = nextObjectId();
-        transferDescription.objectid = objectid;
+        transferDescription.setID(objectid);
 
         byte[] descData = null;
         descData = Utils.deflate(transferDescription.toByteArray(),
             progress.newChild(1));
         if (descData == null) {
-            log.error(
-                "Failed to deflate bytes of a Base64 encoded TransferDescription String:"
-                    + transferDescription.toBase64(), new StackTrace());
+            log.error("Failed to deflate transfer description:"
+                + transferDescription, new StackTrace());
             throw new IOException();
         }
 
@@ -371,7 +370,7 @@ public class BinaryChannel {
 
         } catch (LocalCancellationException e) {
 
-            log.debug("send was canceled:" + transferDescription.objectid);
+            log.debug("send was canceled:" + transferDescription.getID());
 
             send(buildPacket(PacketType.CANCEL, objectid));
             throw e;
@@ -433,7 +432,7 @@ public class BinaryChannel {
 
     /**
      * The next ID to use when sending {@link BinaryPacket}s.
-     * 
+     *
      * This object should only be accessed from nextObjectId()
      */
     protected int currentObjectId = 0;
@@ -456,7 +455,7 @@ public class BinaryChannel {
 
     /**
      * See {{@link #ACCEPTED_ERROR_CODES_ON_CLOSURE}
-     * 
+     *
      * @param e
      * @return whether the error should be logged
      */
@@ -495,8 +494,8 @@ public class BinaryChannel {
      */
     public void sendReject(TransferDescription transferDescription)
         throws IOException {
-        log.debug("sendReject objectid:" + transferDescription.objectid);
-        send(buildPacket(PacketType.REJECT, transferDescription.objectid));
+        log.debug("sendReject objectid:" + transferDescription.getID());
+        send(buildPacket(PacketType.REJECT, transferDescription.getID()));
     }
 
     /**

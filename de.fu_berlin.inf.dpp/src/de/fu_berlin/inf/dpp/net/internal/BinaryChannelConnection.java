@@ -12,22 +12,21 @@ import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
 import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
 import de.fu_berlin.inf.dpp.net.IncomingTransferObject;
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.net.internal.DataTransferManager.IBytestreamConnection;
-import de.fu_berlin.inf.dpp.net.internal.DataTransferManager.NetTransferMode;
+import de.fu_berlin.inf.dpp.net.NetTransferMode;
 import de.fu_berlin.inf.dpp.util.Utils;
 
 /**
  * Encapsulates a BinaryChannel to a particular peer
- * 
+ *
  * see {#link
  * de.fu_berlin.inf.dpp.net.internal.DataTransferManager.IBytestreamConnection}
  */
-public class BinaryChannelConnection implements IBytestreamConnection {
+public class BinaryChannelConnection implements IByteStreamConnection {
 
     private static final Logger log = Logger
         .getLogger(BinaryChannelConnection.class);
 
-    private IBytestreamConnectionListener listener;
+    private IByteStreamConnectionListener listener;
     private BinaryChannel binaryChannel;
     private ReceiverThread receiveThread;
     private SubMonitor progress = null;
@@ -111,7 +110,7 @@ public class BinaryChannelConnection implements IBytestreamConnection {
     }
 
     public BinaryChannelConnection(JID peer, BinaryChannel channel,
-        IBytestreamConnectionListener listener) {
+        IByteStreamConnectionListener listener) {
         this.listener = listener;
         this.peer = peer;
         this.binaryChannel = channel;
@@ -135,7 +134,7 @@ public class BinaryChannelConnection implements IBytestreamConnection {
 
     public NetTransferMode getMode() {
         if (binaryChannel == null)
-            return NetTransferMode.UNKNOWN;
+            return NetTransferMode.NONE;
         return binaryChannel.transferMode;
     }
 

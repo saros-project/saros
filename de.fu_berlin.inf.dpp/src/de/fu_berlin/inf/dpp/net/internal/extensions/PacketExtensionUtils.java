@@ -158,15 +158,15 @@ public class PacketExtensionUtils {
 
                 TransferDescription transferDescription = payload
                     .getTransferDescription();
-                if (!Utils.equals(transferDescription.sessionID,
+                if (!Utils.equals(transferDescription.getSessionID(),
                     sessionID.getValue()))
                     return false;
 
-                if (!ObjectUtils.equals(transferDescription.invitationID,
+                if (!ObjectUtils.equals(transferDescription.getInvitationID(),
                     invitationID))
                     return false;
 
-                if (!ObjectUtils.equals(transferDescription.type, type))
+                if (!ObjectUtils.equals(transferDescription.getType(), type))
                     return false;
 
                 return true;
@@ -189,13 +189,13 @@ public class PacketExtensionUtils {
                 }
                 TransferDescription transferDescription = payload
                     .getTransferDescription();
-                if (!Utils.equals(transferDescription.sender, peer)) {
+                if (!Utils.equals(transferDescription.getSender(), peer)) {
                     return false;
                 }
-                if (!Utils.equals(transferDescription.sessionID, sessionID)) {
+                if (!Utils.equals(transferDescription.getSessionID(), sessionID)) {
                     return false;
                 }
-                if (!Utils.equals(transferDescription.processID, processID)) {
+                if (!Utils.equals(transferDescription.getProcessID(), processID)) {
                     return false;
                 }
 

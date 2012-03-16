@@ -12,20 +12,18 @@ import org.jivesoftware.smackx.bytestreams.BytestreamRequest;
 import org.jivesoftware.smackx.bytestreams.BytestreamSession;
 
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.net.internal.DataTransferManager.IBytestreamConnection;
-import de.fu_berlin.inf.dpp.net.internal.DataTransferManager.ITransport;
-import de.fu_berlin.inf.dpp.net.internal.DataTransferManager.NetTransferMode;
+import de.fu_berlin.inf.dpp.net.NetTransferMode;
 import de.fu_berlin.inf.dpp.util.CausedIOException;
 
 /**
  * Abstract skeleton for different transport methods
  */
-public abstract class BytestreamTransport implements ITransport {
+public abstract class ByteStreamTransport implements ITransport {
 
     private static final Logger log = Logger.getLogger(Socks5Transport.class);
 
     protected BytestreamManager manager;
-    protected IBytestreamConnectionListener connectionListener;
+    protected IByteStreamConnectionListener connectionListener;
 
     /**
      * @param peer
@@ -33,7 +31,7 @@ public abstract class BytestreamTransport implements ITransport {
      * 
      * @return a new connection to peer
      */
-    public IBytestreamConnection connect(final JID peer, SubMonitor progress)
+    public IByteStreamConnection connect(final JID peer, SubMonitor progress)
         throws IOException, InterruptedException {
 
         progress.subTask("Try to initiate bytestream with " + toString());
@@ -136,7 +134,7 @@ public abstract class BytestreamTransport implements ITransport {
     }
 
     public void prepareXMPPConnection(Connection connection,
-        IBytestreamConnectionListener listener) {
+        IByteStreamConnectionListener listener) {
         this.connectionListener = listener;
         manager = getManager(connection);
         manager.addIncomingBytestreamListener(streamListener);

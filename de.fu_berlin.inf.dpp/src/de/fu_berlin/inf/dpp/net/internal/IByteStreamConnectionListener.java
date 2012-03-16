@@ -2,7 +2,6 @@ package de.fu_berlin.inf.dpp.net.internal;
 
 import de.fu_berlin.inf.dpp.net.IncomingTransferObject;
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.net.internal.DataTransferManager.IBytestreamConnection;
 
 /**
  * Listener interface used by ITransport and IBytestreamConnection to notify
@@ -10,14 +9,14 @@ import de.fu_berlin.inf.dpp.net.internal.DataTransferManager.IBytestreamConnecti
  * 
  * @author jurke
  */
-public interface IBytestreamConnectionListener {
+public interface IByteStreamConnectionListener {
 
     public void addIncomingTransferObject(
         final IncomingTransferObject incomingTransferObject);
 
-    public void connectionClosed(JID peer, IBytestreamConnection connection);
+    public void connectionClosed(JID peer, IByteStreamConnection connection);
 
-    public void connectionChanged(JID peer, IBytestreamConnection connection,
+    public void connectionChanged(JID peer, IByteStreamConnection connection,
         boolean incomingRequest);
 
 }

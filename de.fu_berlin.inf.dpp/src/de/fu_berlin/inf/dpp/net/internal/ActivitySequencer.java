@@ -51,10 +51,9 @@ import de.fu_berlin.inf.dpp.invitation.OutgoingProjectNegotiation;
 import de.fu_berlin.inf.dpp.net.ITransferModeListener;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.net.NetTransferMode;
 import de.fu_berlin.inf.dpp.net.TimedActivityDataObject;
 import de.fu_berlin.inf.dpp.net.business.DispatchThreadContext;
-import de.fu_berlin.inf.dpp.net.internal.DataTransferManager.IBytestreamConnection;
-import de.fu_berlin.inf.dpp.net.internal.DataTransferManager.NetTransferMode;
 import de.fu_berlin.inf.dpp.observables.ProjectNegotiationObservable;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
@@ -502,7 +501,7 @@ public class ActivitySequencer {
                 }
 
                 public void connectionChanged(JID jid,
-                    IBytestreamConnection connection) {
+                    IByteStreamConnection connection) {
                     // do nothing
                 }
             });

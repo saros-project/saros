@@ -177,12 +177,6 @@ public class EnterProjectNamePage extends WizardPage {
     protected void updateConnectionStatus() {
 
         switch (dataTransferManager.getTransferMode(this.peer)) {
-        case JINGLETCP:
-        case JINGLEUDP:
-            setDescription(Messages.EnterProjectNamePage_p2p_jingle_connection);
-            setImageDescriptor(ImageManager
-                .getImageDescriptor("icons/wizban/jingle.png")); //$NON-NLS-1$
-            break;
         case SOCKS5_MEDIATED:
             if (preferenceUtils.isLocalSOCKS5ProxyEnabled())
                 setDescription(Messages.EnterProjectNamePage_description_socks5proxy);
@@ -230,9 +224,6 @@ public class EnterProjectNamePage extends WizardPage {
             }
             startIBBLogoFlash();
             break;
-
-        case UNKNOWN:
-        case HANDMADE:
         default:
             setDescription(Messages.EnterProjectNamePage_unknown_transport_method);
             break;

@@ -19,9 +19,9 @@ import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.net.ITransferModeListener;
 import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.net.NetTransferMode;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
-import de.fu_berlin.inf.dpp.net.internal.DataTransferManager.IBytestreamConnection;
-import de.fu_berlin.inf.dpp.net.internal.DataTransferManager.NetTransferMode;
+import de.fu_berlin.inf.dpp.net.internal.IByteStreamConnection;
 import de.fu_berlin.inf.dpp.net.internal.discoveryManager.DiscoveryManager;
 import de.fu_berlin.inf.dpp.net.internal.discoveryManager.events.DiscoveryManagerListener;
 import de.fu_berlin.inf.dpp.ui.model.TreeContentProvider;
@@ -50,7 +50,7 @@ public class RosterContentProvider extends TreeContentProvider {
             // do nothing
         }
 
-        public void connectionChanged(JID jid, IBytestreamConnection connection) {
+        public void connectionChanged(JID jid, IByteStreamConnection connection) {
             ViewerUtils.update(viewer, new RosterEntryElement(roster, jid),
                 null);
         }

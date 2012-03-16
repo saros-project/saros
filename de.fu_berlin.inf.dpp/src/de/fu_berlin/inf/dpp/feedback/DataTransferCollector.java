@@ -6,9 +6,9 @@ import java.util.List;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.net.ITransferModeListener;
 import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.net.NetTransferMode;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
-import de.fu_berlin.inf.dpp.net.internal.DataTransferManager.IBytestreamConnection;
-import de.fu_berlin.inf.dpp.net.internal.DataTransferManager.NetTransferMode;
+import de.fu_berlin.inf.dpp.net.internal.IByteStreamConnection;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.SarosSessionManager;
 import de.fu_berlin.inf.dpp.util.Function;
@@ -105,7 +105,7 @@ public class DataTransferCollector extends AbstractStatisticCollector {
                 }
 
                 public void connectionChanged(JID jid,
-                    IBytestreamConnection connection) {
+                    IByteStreamConnection connection) {
                     // do nothing
                 }
             });

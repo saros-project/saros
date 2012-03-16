@@ -17,8 +17,8 @@ import org.powermock.modules.junit4.PowerMockRunner;
 
 import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.net.NetTransferMode;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
-import de.fu_berlin.inf.dpp.net.internal.DataTransferManager.NetTransferMode;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest(SarosPluginContext.class)

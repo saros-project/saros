@@ -30,7 +30,7 @@ import org.jivesoftware.smackx.bytestreams.socks5.Socks5BytestreamManager;
 import org.jivesoftware.smackx.bytestreams.socks5.Socks5BytestreamSession;
 import org.jivesoftware.smackx.bytestreams.socks5.Socks5Proxy;
 
-import de.fu_berlin.inf.dpp.net.internal.DataTransferManager.NetTransferMode;
+import de.fu_berlin.inf.dpp.net.NetTransferMode;
 import de.fu_berlin.inf.dpp.util.CausedIOException;
 import de.fu_berlin.inf.dpp.util.NamedThreadFactory;
 import de.fu_berlin.inf.dpp.util.Utils;
@@ -41,18 +41,18 @@ import de.fu_berlin.inf.dpp.util.Utils;
  * used to distinguish connect requests and response requests. If there is a
  * direct connection, we keep it, the other one discarded. If the is no one, a
  * SMACK will establish a mediated connection by the server.
- * 
+ *
  * Are both connection direct, we use the one of the connect request (same for
  * mediated).
- * 
+ *
  * However, still there might be a server that only supports unidirectional
  * SOCKS5 bytestreams (i.e. OpenFire). In that case both mediated unidirectional
  * connections are wrapped into a bidirectional one. (see {#link
  * WrappedBidirectionalSocks5BytestreamSession})
- * 
+ *
  * @author jurke
  */
-public class Socks5Transport extends BytestreamTransport {
+public class Socks5Transport extends ByteStreamTransport {
 
     private static final Logger log = Logger.getLogger(Socks5Transport.class);
     private static final byte BIDIRECTIONAL_TEST_BYTE = 0x1A;
@@ -60,9 +60,9 @@ public class Socks5Transport extends BytestreamTransport {
     /*
      * 3s might not be enough always, especially when local SOCKS5 proxy port is
      * bound by another application or Ubuntu is used.
-     * 
+     *
      * With Ubuntu we experienced delays of about 7 to 10s.
-     * 
+     *
      * However, should be greater than TEST_STREAM_TIMEOUT always
      */
     private static final int WAIT_FOR_RESPONSE_CONNECTION = TEST_STREAM_TIMEOUT + 7000;
@@ -89,7 +89,7 @@ public class Socks5Transport extends BytestreamTransport {
     }
 
     /**
-     * 
+     *
      * @param peer
      * @return a Future that tries to establish a second connection to the
      *         peer's local SOCKS5 proxy
@@ -107,7 +107,7 @@ public class Socks5Transport extends BytestreamTransport {
     /**
      * Starts a new thread that waits until the connection is established to
      * close it correctly.
-     * 
+     *
      * @param future
      */
     protected void waitToCloseResponse(
@@ -179,9 +179,9 @@ public class Socks5Transport extends BytestreamTransport {
      * returns it if bidirectional or tries to wrap two unidirectional streams
      * if possible. Else an exception is thrown. The testing order is defined by
      * the boolean preferInSession.
-     * 
+     *
      * @pre inSession!=null || outSession!=null
-     * 
+     *
      * @param inSession
      * @param outSession
      * @param preferInSession
@@ -235,7 +235,7 @@ public class Socks5Transport extends BytestreamTransport {
     /**
      * Sends and receives an INT to distinguish between bidirectional and
      * unidirectional streams.
-     * 
+     *
      * @param session
      * @param sendFirst
      * @return whether a stream is bidirectional
@@ -280,7 +280,7 @@ public class Socks5Transport extends BytestreamTransport {
             /*
              * At least we have to wait TEST_STREAM_TIMEOUT to cause a timeout
              * on the peer side, too.
-             * 
+             *
              * Else the first package might be read and the above error occurs
              * (test != BIDIRECTIONAL_TEST_BYTE).
              */
@@ -308,9 +308,9 @@ public class Socks5Transport extends BytestreamTransport {
 
     /**
      * Handles a response request.
-     * 
+     *
      * The session is exchanged to the connecting thread.
-     * 
+     *
      * @param request
      * @throws XMPPException
      * @throws InterruptedException
@@ -353,17 +353,17 @@ public class Socks5Transport extends BytestreamTransport {
 
     /**
      * Accepts a Request and returns an established BinaryChannel.
-     * 
+     *
      * Immediately tries to establish a second session to the requesting peer
      * but also accepts this request to achieve a direct connection although one
      * peer might be behind a NAT.
-     * 
+     *
      * A direct connection is used, the other discarded where the requesting
      * session is preferred.
-     * 
+     *
      * In case of unidirectional connections both sessions a wrapped into a
      * bidirectional one.
-     * 
+     *
      * @param request
      * @return established BinaryChannel
      * @throws XMPPException
@@ -437,7 +437,7 @@ public class Socks5Transport extends BytestreamTransport {
     /**
      * Handles the SOCKS5Bytestream Request and distinguishes between connect
      * requests and response requests.
-     * 
+     *
      * see handleResponse() and acceptNewRequest()
      */
     @Override
@@ -554,7 +554,7 @@ public class Socks5Transport extends BytestreamTransport {
     }
 
     /**
-     * 
+     *
      * @param peer
      * @return a BytestreamSession with a response ID
      * @throws XMPPException
@@ -586,7 +586,7 @@ public class Socks5Transport extends BytestreamTransport {
 
     @Override
     public void prepareXMPPConnection(Connection connection,
-        IBytestreamConnectionListener listener) {
+        IByteStreamConnectionListener listener) {
         super.prepareXMPPConnection(connection, listener);
         executorService = Executors.newFixedThreadPool(
             NUMBER_OF_RESPONSE_THREADS, new NamedThreadFactory(
