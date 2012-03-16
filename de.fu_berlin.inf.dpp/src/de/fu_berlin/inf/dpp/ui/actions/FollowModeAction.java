@@ -162,6 +162,9 @@ public class FollowModeAction extends Action implements Disposable {
         User toFollow = getNewToFollow();
         log.info("Following: " + toFollow); //$NON-NLS-1$
         editorManager.setFollowing(toFollow);
+        if (toFollow != null) {
+            editorManager.jumpToUser(toFollow);
+        }
     }
 
     /**
@@ -207,12 +210,7 @@ public class FollowModeAction extends Action implements Disposable {
         if (sarosSession == null)
             return false;
 
-        int usersWithWriteAccessCount = 0;
-        for (User user : sarosSession.getParticipants()) {
-            if (user.isRemote() && user.hasWriteAccess())
-                usersWithWriteAccessCount++;
-        }
-        return usersWithWriteAccessCount == 1;
+        return true;
     }
 
     protected void updateEnablement() {
@@ -225,18 +223,20 @@ public class FollowModeAction extends Action implements Disposable {
     }
 
     public void setFollowModeActionStatus(User user) {
-        if (user != null && user.isRemote() && user.hasWriteAccess()) {
+        if (user != null && user.isRemote()) {
             setEnabled(true);
             setToFollowUser(user);
             if (editorManager.getFollowedUser() == null
                 || !editorManager.getFollowedUser().equals(user)) {
                 setChecked(false);
                 setToolTipText(MessageFormat.format(
-                    Messages.FollowModeAction_enable_followmode_tooltip, user.toString()));
+                    Messages.FollowModeAction_enable_followmode_tooltip,
+                    user.toString()));
             } else {
                 setChecked(true);
                 setToolTipText(MessageFormat.format(
-                    Messages.FollowModeAction_disable_followmode_tooltip, user.toString()));
+                    Messages.FollowModeAction_disable_followmode_tooltip,
+                    user.toString()));
             }
         } else {
             setChecked(false);
