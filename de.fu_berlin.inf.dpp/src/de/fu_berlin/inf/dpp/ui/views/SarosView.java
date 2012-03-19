@@ -386,10 +386,16 @@ public class SarosView extends ViewPart {
     FollowModeAction fmAction;
 
     protected void addToolBarItems(IToolBarManager toolBar) {
+        boolean isDebug = false;
+        assert (isDebug = true) == true;
+
         toolBar.add(new ChangeXMPPAccountAction());
         toolBar.add(new NewContactAction());
         toolBar.add(new Separator());
-        toolBar.add(new StoppedAction());
+
+        if (isDebug)
+            toolBar.add(new StoppedAction());
+
         toolBar.add(new ConsistencyAction());
         fmAction = new FollowModeAction();
         toolBar.add(fmAction);
