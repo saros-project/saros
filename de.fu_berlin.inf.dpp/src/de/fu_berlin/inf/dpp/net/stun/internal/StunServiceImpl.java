@@ -1,191 +1,483 @@
 package de.fu_berlin.inf.dpp.net.stun.internal;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.net.InetSocketAddress;
+import java.net.SocketAddress;
+import java.net.SocketTimeoutException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.LinkedList;
+import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
+import java.util.Random;
+import java.util.Set;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
-import org.jivesoftware.smackx.bytestreams.socks5.Socks5Proxy;
 
 import de.fu_berlin.inf.dpp.net.stun.IStunService;
 import de.fu_berlin.inf.dpp.net.util.NetworkingUtils;
-import de.javawi.jstun.test.DiscoveryInfo;
-import de.javawi.jstun.test.DiscoveryTest;
 
-public class StunServiceImpl implements IStunService {
+public final class StunServiceImpl implements IStunService {
 
-    protected static final Logger log = Logger.getLogger(StunServiceImpl.class);
+    private static final Logger log = Logger.getLogger(StunServiceImpl.class);
 
-    /**
-     * Set, if a local IP IS a public IP. (e.g. direct connection)
-     */
-    protected boolean aLocalIPisPublicIP;
+    private boolean isDirectConnection = false;
 
-    /**
-     * Last known public IP per local IP
-     */
-    protected Map<InetAddress, InetAddress> recentPublicIPs;
+    private Set<InetSocketAddress> discoveredPublicIpAddresses = new HashSet<InetSocketAddress>();
 
-    /**
-     * Cache of detected STUN results
-     */
-    protected Collection<DiscoveryInfo> stunResults;
-
-    public StunServiceImpl() {
-        aLocalIPisPublicIP = false;
-        recentPublicIPs = new HashMap<InetAddress, InetAddress>();
-        stunResults = new ArrayList<DiscoveryInfo>();
+    public synchronized boolean isDirectConnectionAvailable() {
+        return isDirectConnection;
     }
 
-    /**
-     * Returns whether a local retrieved IP is a public IP.
-     * 
-     * @return whether a local retrieved IP is a public IP.
-     */
-    public boolean isLocalIPthePublicIP() {
-        return aLocalIPisPublicIP;
+    public synchronized Collection<InetSocketAddress> getPublicIpAddresses() {
+        return new ArrayList<InetSocketAddress>(discoveredPublicIpAddresses);
     }
 
-    public Collection<DiscoveryInfo> getStunResults() {
-        return stunResults;
-    }
+    public Collection<InetSocketAddress> discover(String stunAddress,
+        int stunPort, int timeout) {
 
-    synchronized public void setPublicIP(InetAddress privateIP,
-        InetAddress publicIP) {
-        Socks5Proxy proxy = Socks5Proxy.getSocks5Proxy();
+        if (stunAddress == null)
+            throw new NullPointerException("stun address is null");
 
-        if (recentPublicIPs.containsKey(privateIP)) {
-            proxy.removeLocalAddress(recentPublicIPs.get(privateIP)
-                .getHostAddress());
+        if (stunPort <= 0 || stunPort >= 65536)
+            throw new IllegalArgumentException(
+                "stun port is not in range of 1 - 65535");
 
-            recentPublicIPs.remove(privateIP);
+        synchronized (this) {
+            discoveredPublicIpAddresses.clear();
+            isDirectConnection = false;
         }
 
-        // log.info("STUN results:\n" + di.toString());
+        List<InetAddress> localInetAddresses;
+        InetAddress stunInetAddress = null;
 
-        // add WAN-IP to proxy addresses
-        NetworkingUtils.addProxyAddress(publicIP.getHostAddress(), true);
-        recentPublicIPs.put(privateIP, publicIP);
+        try {
+            stunInetAddress = InetAddress.getByName(stunAddress);
+            localInetAddresses = NetworkingUtils
+                .getAllNonLoopbackLocalIPAdresses(false);
+
+        } catch (IOException e) {
+            log.error(
+                "error retrieving local IP addresses or Stun Server IP address: "
+                    + e.getMessage(), e);
+            return new ArrayList<InetSocketAddress>();
+        }
+
+        List<Thread> discoveryThreads = new ArrayList<Thread>();
+
+        for (InetAddress address : localInetAddresses) {
+            Thread discoveryThread = new Thread(new StunDiscovery(address,
+                stunInetAddress, stunPort, timeout));
+
+            discoveryThreads.add(discoveryThread);
+            discoveryThread.setName("STUN-Discovery-"
+                + address.getHostAddress());
+            discoveryThread.start();
+        }
+
+        while (discoveryThreads.isEmpty()) {
+            try {
+                discoveryThreads.get(0).wait();
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                break;
+            }
+        }
+
+        return getPublicIpAddresses();
+
     }
 
     /**
-     * Thread class for performing jSTUN discovery to retrieve network
-     * information.
+     * Thread class for performing STUN discovery to retrieve public IP
+     * addresses
      */
     private class StunDiscovery implements Runnable {
-        InetAddress localAddress;
-        String stunHost;
-        int stunPort;
 
-        public StunDiscovery(InetAddress localAddress, String stunHost,
-            int stunPort) {
+        private static final short BINDING_REQUEST = 0x0001;
+        private static final short BINDING_RESPONSE = 0x0101;
+
+        private static final short CHANGE_REQUEST = 0x0003;
+        private static final int MAGIC_COOKIE = 0x2112A442;
+
+        private static final short MAPPED_ADDRESS = 0x0001;
+        private static final short XOR_MAPPED_ADDRESS = 0x0020;
+        private static final short ERROR_CODE = 0x0009;
+
+        private static final short IP4_FAMILY = 0x0001;
+        private static final short IP6_FAMILY = 0x0002;
+
+        private static final int MINIMUM_IP6_MTU_SIZE = 1280;
+
+        private static final int STUN_HEADER_SIZE = 20;
+
+        private InetAddress localAddress;
+        private InetAddress stunAddress;
+        private int stunPort;
+        private int timeout;
+
+        private Random random = new Random();
+
+        public StunDiscovery(InetAddress localAddress, InetAddress stunAddress,
+            int stunPort, int timeout) {
             this.localAddress = localAddress;
-            this.stunHost = stunHost;
+            this.stunAddress = stunAddress;
             this.stunPort = stunPort;
+            this.timeout = timeout;
         }
 
         public void run() {
-            try {
-                // Perform the jSTUN discovery
-                DiscoveryTest disc = new DiscoveryTest(localAddress, stunHost,
-                    stunPort);
-                DiscoveryInfo di = disc.test();
 
-                InetAddress ip = di.getPublicIP();
+            InetSocketAddress publicInetAddress = null;
+
+            try {
+                publicInetAddress = performStunDiscovery(new InetSocketAddress(
+                    stunAddress, stunPort), new InetSocketAddress(localAddress,
+                    0), timeout);
+            } catch (IOException e) {
+                log.error("an error occured while performing a stun discovery",
+                    e);
+                return;
+
+            }
+            if (publicInetAddress != null
+                && !publicInetAddress.getAddress().isAnyLocalAddress()) {
+
+                synchronized (StunServiceImpl.this) {
+                    if (publicInetAddress.getAddress().equals(localAddress))
+                        isDirectConnection = true;
+
+                    log.info("added public WAN-IP: "
+                        + publicInetAddress.getAddress().getHostAddress()
+                        + " (through " + localAddress.getHostAddress() + ")");
+                    discoveredPublicIpAddresses.add(publicInetAddress);
+                }
+            }
+        }
+
+        /**
+         * Performs a stun discovery over UDP using RFC 5389. Should be
+         * compatible with RFC 3489 too.
+         * 
+         * @param stunServer
+         *            the address of the stun server
+         * @param localAddress
+         *            the local address that the UDP should bound to
+         * @param timeout
+         *            how long this method should wait for a response from the
+         *            stun server
+         * @return the public IP address and port or <code>null</code> if the
+         *         discovery failed
+         * @throws IOException
+         *             if an I/O error occurs
+         */
+        private InetSocketAddress performStunDiscovery(
+            SocketAddress stunServer, SocketAddress localAddress, int timeout)
+            throws IOException {
+
+            Thread senderThread = null;
+
+            InetAddress mappedInetAddress = null;
+            InetAddress xorMappedInetAddress = null;
+            int port = 0;
+
+            int transactionId0 = random.nextInt();
+            int transactionId1 = random.nextInt();
+            int transactionId2 = random.nextInt();
+
+            final DatagramSocket socket = new DatagramSocket(localAddress);
+
+            // see STUN HEADER: http://tools.ietf.org/html/rfc5389#page-10
+
+            try {
+                ByteArrayOutputStream out = new ByteArrayOutputStream();
+
+                DataOutputStream dout = new DataOutputStream(out);
+                dout.writeShort(BINDING_REQUEST);
+                dout.writeShort(8); // CHANGE_REQUEST SIZE
+                dout.writeInt(MAGIC_COOKIE);
+                dout.writeInt(transactionId0);
+                dout.writeInt(transactionId1);
+                dout.writeInt(transactionId2);
 
                 /*
-                 * If a public IP was retrieved, add it to the local addresses
-                 * of the Socks5 proxy for external clients to be able to
-                 * connect to me.
+                 * this should not be send using RFC 5389, because we will get
+                 * an response error. Normally a server should send the public
+                 * IP even if an error occurs, so it is fine for now
                  */
-                Socks5Proxy proxy = Socks5Proxy.getSocks5Proxy();
-                if (ip != null) {
-                    // the local IP matches the retrieved IP address, so it is
-                    // already the public IP. Store this fact for later.
-                    if (ip.equals(localAddress)) {
-                        aLocalIPisPublicIP = true;
-                        return;
+                dout.writeShort(CHANGE_REQUEST);
+                dout.writeShort(4);
+                dout.writeInt(0);
+                dout.close();
+
+                socket.connect(stunServer);
+                socket.setSoTimeout(timeout);
+
+                byte[] requestData = out.toByteArray();
+
+                final DatagramPacket packet = new DatagramPacket(requestData,
+                    requestData.length);
+
+                final CountDownLatch responeReceived = new CountDownLatch(1);
+
+                // we are using UDP, and since there is no guarantee that these
+                // packets ever reach the destination we have to resent them
+                senderThread = new Thread(new Runnable() {
+                    public void run() {
+                        long sendDelay = 500;
+                        while (!Thread.currentThread().isInterrupted()) {
+                            try {
+                                log.trace("sending stun request");
+                                socket.send(packet);
+                                if (responeReceived.await(sendDelay,
+                                    TimeUnit.MILLISECONDS))
+                                    break;
+
+                                sendDelay *= 2;
+                            } catch (IOException e) {
+                                if (!Thread.currentThread().isInterrupted())
+                                    log.error("error sending stun request", e);
+                                break;
+                            } catch (InterruptedException e) {
+                                break;
+                            }
+                        }
+                    }
+                });
+
+                senderThread.start();
+
+                DatagramPacket response = new DatagramPacket(
+                    new byte[MINIMUM_IP6_MTU_SIZE], MINIMUM_IP6_MTU_SIZE);
+
+                byte[] responseData = null;
+
+                int retries = 10;
+
+                while (retries-- > 0) {
+                    socket.receive(response);
+                    responseData = response.getData();
+
+                    if (responseData.length <= STUN_HEADER_SIZE) {
+                        log.warn("received stun response with invalid header");
+                        continue;
                     }
 
-                    synchronized (stunResults) {
-                        stunResults.add(di);
+                    // compare the transaction ID / Magic cookie
+                    for (int i = 4; i < STUN_HEADER_SIZE; i++) {
+                        if (requestData[i] != responseData[i]) {
+                            log.warn("received stun response with invalid transaction id");
+                            continue;
+                        }
                     }
 
-                    // Add public IP if its not already in the list
-                    if (!proxy.getLocalAddresses()
-                        .contains(ip.getHostAddress())) {
-                        setPublicIP(localAddress, ip);
-                        log.debug("Added WAN-IP: " + ip.getHostAddress()
-                            + " (through " + localAddress.getHostAddress()
-                            + ")");
-                    }
+                    break;
                 }
 
-            } catch (Exception e) {
-                log.debug("Error while performing STUN: " + e.getMessage());
-            }
-        }
-    }
+                responeReceived.countDown();
+                senderThread.interrupt();
+                socket.close();
 
-    /**
-     * Retrieves the WAN (external) IP of this system using a STUN server by
-     * calling jSTUN discovery concurrently.
-     * 
-     * @param stunAddress
-     *            Address of the STUN server
-     * @param stunPort
-     *            Port of the STUN server
-     */
-    public void startWANIPDetection(String stunAddress, int stunPort,
-        boolean blocking) {
+                if (retries == 0)
+                    return null;
 
-        // Check if the stun server settings are valid, abort otherwise
-        if (stunAddress.isEmpty() || stunPort == 0)
-            return;
+                DataInputStream in = new DataInputStream(
+                    new ByteArrayInputStream(responseData));
 
-        List<InetAddress> localIPs = null;
+                short responseCode = in.readShort();
 
-        // If we know local IPs to bind
-        if (!recentPublicIPs.isEmpty()) {
-            localIPs = new LinkedList<InetAddress>(recentPublicIPs.keySet());
-        } else {
-            try {
-                localIPs = NetworkingUtils
-                    .getAllNonLoopbackLocalIPAdresses(false);
+                int attributesLength = in.readUnsignedShort();
 
-            } catch (Exception e) {
-                log.debug("Error retrieving local IP addresses:"
-                    + e.getMessage());
-            }
-        }
+                log.trace("received stun response, payload length is: "
+                    + attributesLength + " bytes");
 
-        if (localIPs == null)
-            return;
+                byte[] transactionId = new byte[16];
+                in.read(transactionId);
 
-        stunResults.clear();
+                if (responseCode != BINDING_RESPONSE)
+                    log.warn("received bad stun response code from server: 0x"
+                        + Integer.toHexString(responseCode & 0xFFFF));
 
-        // try all retrieved local addresses to bind for STUN request
-        Collection<Thread> threads = new ArrayList<Thread>();
-        for (InetAddress ip : localIPs) {
-            // create and start new thread to perform the discovery
-            Thread thread = new Thread(new StunDiscovery(ip, stunAddress,
-                stunPort));
-            threads.add(thread);
-            thread.start();
-        }
+                while (attributesLength > 4) {
 
-        if (blocking) {
-            for (Thread thread : threads)
-                try {
-                    thread.join();
-                } catch (InterruptedException e) {
-                    // continue with next thread
+                    short code = in.readShort();
+                    int length = in.readUnsignedShort();
+
+                    attributesLength -= length + 4;
+
+                    log.trace("processing stun value code: 0x"
+                        + Integer.toHexString(code & 0xFFFF) + ", length: "
+                        + length);
+
+                    if (attributesLength < 0) {
+                        log.warn("stun response is corrupted: 0x"
+                            + Integer.toHexString(code & 0xFFFF));
+                        break;
+                    }
+
+                    boolean isXorMapped = false;
+                    switch (code) {
+
+                    case XOR_MAPPED_ADDRESS:
+                        isXorMapped = true;
+                        //$FALL-THROUGH$
+                    case MAPPED_ADDRESS:
+
+                        short ipFamily = in.readShort();
+
+                        port = in.readUnsignedShort();
+
+                        length -= 4;
+
+                        if (isXorMapped) {
+                            port ^= MAGIC_COOKIE >>> 16;
+                        }
+
+                        byte[] inetAddress;
+
+                        if (ipFamily == IP4_FAMILY)
+                            inetAddress = new byte[4];
+                        else if (ipFamily == IP6_FAMILY)
+                            inetAddress = new byte[16];
+                        else {
+                            log.warn("received unknown IP family value: 0x"
+                                + Integer.toHexString(ipFamily & 0xFFFF));
+                            skipFully(in, length);
+                            continue;
+                        }
+
+                        in.read(inetAddress);
+
+                        if (isXorMapped) {
+
+                            xorBytes(inetAddress, 0, MAGIC_COOKIE, false);
+
+                            if (ipFamily == IP6_FAMILY) {
+                                xorBytes(inetAddress, 4, transactionId0, false);
+                                xorBytes(inetAddress, 8, transactionId1, false);
+                                xorBytes(inetAddress, 12, transactionId2, false);
+                            }
+                        }
+
+                        if (isXorMapped)
+                            xorMappedInetAddress = InetAddress
+                                .getByAddress(inetAddress);
+                        else
+                            mappedInetAddress = InetAddress
+                                .getByAddress(inetAddress);
+
+                        break;
+
+                    case ERROR_CODE:
+
+                        int errorNumber = in.readInt();
+
+                        errorNumber = (((errorNumber >>> 8) & 0x7) * 100)
+                            + (errorNumber & 0xFF);
+
+                        length -= 4;
+
+                        byte[] errorMessageBytes = new byte[length];
+                        in.readFully(errorMessageBytes);
+                        processError(errorNumber, new String(errorMessageBytes,
+                            "UTF-8"));
+                        break;
+
+                    default:
+                        log.trace("skipping stun value with code: 0x"
+                            + Integer.toHexString(code & 0xFFFF));
+                        skipFully(in, length);
+                    }
                 }
-        }
-    }
+            } catch (SocketTimeoutException e) {
+                log.warn("received no response from stun server " + stunServer
+                    + " at local address " + localAddress);
+            } finally {
+                if (senderThread != null && senderThread.isAlive())
+                    senderThread.interrupt();
 
+                socket.close();
+
+            }
+
+            return xorMappedInetAddress == null ? new InetSocketAddress(
+                mappedInetAddress, port) : new InetSocketAddress(
+                xorMappedInetAddress, port);
+        }
+
+        private void skipFully(InputStream in, long length) throws IOException {
+            while (length > 0) {
+                length -= in.skip(length);
+            }
+        }
+
+        private void xorBytes(byte[] bytes, int offset, int value,
+            boolean isHostOrder) {
+            if (isHostOrder) {
+                bytes[offset + 0] ^= ((value & 0x000000FF) >>> 0);
+                bytes[offset + 1] ^= ((value & 0x0000FF00) >>> 8);
+                bytes[offset + 2] ^= ((value & 0x00FF0000) >>> 16);
+                bytes[offset + 3] ^= ((value & 0xFF000000) >>> 24);
+            } else {
+                bytes[offset + 3] ^= ((value & 0x000000FF) >>> 0);
+                bytes[offset + 2] ^= ((value & 0x0000FF00) >>> 8);
+                bytes[offset + 1] ^= ((value & 0x00FF0000) >>> 16);
+                bytes[offset + 0] ^= ((value & 0xFF000000) >>> 24);
+            }
+        }
+
+        private boolean processError(int code, String message) {
+            switch (code) {
+            case 400:
+                log.error("400 (Bad Request): The request was malformed."
+                    + " [" + message + "]");
+                return false;
+
+            case 401:
+                log.error("401 (Unauthorized): The Binding Request did not contain a MESSAGE-INTEGRITY attribute."
+                    + " [" + message + "]");
+                return false;
+            case 420:
+                log.error("420 (Unknown Attribute): The server did not understand a mandatory attribute in the request."
+                    + " [" + message + "]");
+                return false;
+            case 430:
+                log.error("430 (Stale Credentials): The Binding Request did contain a MESSAGE-INTEGRITY attribute, but it used a shared secret that has expired."
+                    + " [" + message + "]");
+                return false;
+            case 431:
+                log.error("431 (Integrity Check Failure): The Binding Request contained a MESSAGE-INTEGRITY attribute, but the HMAC failed verification."
+                    + " [" + message + "]");
+                return false;
+            case 432:
+                log.error("432 (Missing Username): The Binding Request contained a MESSAGE-INTEGRITY attribute, but not a USERNAME attribute."
+                    + " [" + message + "]");
+                return false;
+            case 433:
+                log.error("433 (Use TLS): The Shared Secret request has to be sent over TLS, but was not received over TLS."
+                    + " [" + message + "]");
+                return false;
+            case 500:
+                log.error("500 (Server Error): The server has suffered a temporary error."
+                    + " [" + message + "]");
+                return true;
+            case 600:
+                log.error("600 (Global Failure:) The server is refusing to fulfill the request."
+                    + " [" + message + "]");
+                return false;
+            }
+
+            return false;
+        }
+
+    }
 }

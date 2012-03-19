@@ -1,7 +1,9 @@
 package de.fu_berlin.inf.dpp.net;
 
 import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -189,12 +191,19 @@ public class SarosNet {
                     proxy.replaceLocalAddresses(myAdressesStr);
                 }
 
-                // Perform public IP detection concurrently
-                // Dont perform if we know a local IP is the WAN IP
-                if (stunService != null && !stunService.isLocalIPthePublicIP())
-                    stunService
-                        .startWANIPDetection(stunServer, stunPort, false);
+                if (stunService != null) {
+                    Utils.runSafeAsync(log, new Runnable() {
+                        @Override
+                        public void run() {
+                            Collection<InetSocketAddress> addresses = stunService
+                                .discover(stunServer, stunPort, 10000);
 
+                            for (InetSocketAddress address : addresses)
+                                NetworkingUtils.addProxyAddress(address
+                                    .getAddress().getHostAddress(), true);
+                        }
+                    });
+                }
             } catch (Exception e) {
                 log.debug("Error while retrieving IP addresses", e);
             }

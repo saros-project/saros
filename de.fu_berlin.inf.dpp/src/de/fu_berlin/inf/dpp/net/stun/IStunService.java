@@ -1,29 +1,49 @@
 package de.fu_berlin.inf.dpp.net.stun;
 
+import java.net.InetSocketAddress;
 import java.util.Collection;
-
-import de.javawi.jstun.test.DiscoveryInfo;
 
 public interface IStunService {
 
     /**
-     * Returns whether a local retrieved IP is a public IP.
+     * Returns whether one of the available network interfaces is connected
+     * directly to the Internet.
      * 
-     * @return whether a local retrieved IP is a public IP.
+     * @return <code>true</code> if a network interfaces is connected directly
+     *         to the Internet, <code>false</code> otherwise or if no discovery
+     *         was performed or is still running.
      */
-    public boolean isLocalIPthePublicIP();
-
-    public Collection<DiscoveryInfo> getStunResults();
+    public boolean isDirectConnectionAvailable();
 
     /**
-     * Retrieves the WAN (external) IP of this system using a STUN server by
-     * calling jSTUN discovery concurrently.
+     * Returns the currently discovered public IP addresses. The collection will
+     * be empty if no discovery has performed yet, is still running or failed.
+     * The collection may also be incomplete if the discovery process has not
+     * finished for all network interfaces at the time this method is called.
+     * 
+     * @return the currently discovered public IP addresses and the port
+     *         associated with this IP.
+     */
+    public Collection<InetSocketAddress> getPublicIpAddresses();
+
+    /**
+     * Starts a WAN (public / external) IP discovery of this system using STUN
+     * protocol RFC 5389 via UDP.
      * 
      * @param stunAddress
      *            Address of the STUN server
      * @param stunPort
      *            Port of the STUN server
+     * @param timeout
+     *            timeout in milliseconds before the discovery is aborted
+     * 
+     * @return the currently discovered public IP addresses and the port
+     *         associated with this IP.
+     * 
+     * @blocking this method blocks until the discovery has finished or the
+     *           timeout is exceeded
      */
-    public void startWANIPDetection(String stunAddress, int stunPort,
-        boolean blocking);
+    public Collection<InetSocketAddress> discover(String stunAddress,
+        int stunPort, int timeout);
+
 }

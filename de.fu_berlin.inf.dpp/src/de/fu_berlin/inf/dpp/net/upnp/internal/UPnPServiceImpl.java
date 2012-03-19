@@ -23,7 +23,6 @@ import de.fu_berlin.inf.dpp.net.util.NetworkingUtils;
 import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
 import de.fu_berlin.inf.dpp.ui.views.SarosView;
 import de.fu_berlin.inf.dpp.util.Utils;
-import de.javawi.jstun.test.DiscoveryInfo;
 
 /*
  *  Class for performing UPnP functions (using the weupnp library) and managing the mapping state.
@@ -493,18 +492,7 @@ public class UPnPServiceImpl implements IUPnPService {
                 if (gateways.isEmpty())
                     return;
 
-                // perform Stun test to check for NATed environment
-                if (stunService.getStunResults().isEmpty())
-                    stunService.startWANIPDetection(
-                        prefStore.getString(PreferenceConstants.STUN),
-                        prefStore.getInt(PreferenceConstants.STUN_PORT), true);
-
-                boolean bOpenAccess = true;
-                for (DiscoveryInfo di : stunService.getStunResults()) {
-                    if (!di.isOpenAccess())
-                        bOpenAccess = false;
-                }
-                if (bOpenAccess)
+                if (stunService.isDirectConnectionAvailable())
                     return;
 
                 // Now we are ready to display the notification from SWT
