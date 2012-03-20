@@ -13,6 +13,7 @@ import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IPathVariableManager;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceProxy;
 import org.eclipse.core.resources.IResourceProxyVisitor;
 import org.eclipse.core.resources.IResourceVisitor;
@@ -173,8 +174,7 @@ public class FileStub implements IFile {
     }
 
     public String getName() {
-        throw new RuntimeException("Unexpected call to Stub");
-
+        return path.lastSegment();
     }
 
     public void move(IPath destination, boolean force, boolean keepHistory,
@@ -391,8 +391,7 @@ public class FileStub implements IFile {
     }
 
     public int getType() {
-        throw new RuntimeException("Unexpected call to Stub");
-
+        return IResource.FILE;
     }
 
     public IWorkspace getWorkspace() {

@@ -22,9 +22,12 @@ package de.fu_berlin.inf.dpp;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Deque;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -38,13 +41,13 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 import de.fu_berlin.inf.dpp.project.IChecksumCache;
-import de.fu_berlin.inf.dpp.util.ArrayUtils;
 import de.fu_berlin.inf.dpp.util.FileUtils;
 import de.fu_berlin.inf.dpp.util.xstream.IPathConverter;
 import de.fu_berlin.inf.dpp.vcs.VCSAdapter;
@@ -189,7 +192,6 @@ public class FileList {
      * @param useVersionControl
      *            If false, the FileList won't include version control
      *            information.
-     * @param subMonitor
      * @throws CoreException
      *             Exception that might happen while fetching the files from the
      *             given container.
@@ -200,9 +202,7 @@ public class FileList {
         throws CoreException {
         this(useVersionControl);
         container.refreshLocal(IResource.DEPTH_INFINITE, null);
-        List<IResource> resources = ArrayUtils.getAdaptableObjects(
-            container.members(), IResource.class);
-        addMembers(resources, checksumCache, monitor);
+        addMembers(Arrays.asList(container.members()), checksumCache, monitor);
     }
 
     /**
@@ -368,6 +368,12 @@ public class FileList {
         if (resources.size() == 0)
             return;
 
+        if (monitor == null)
+            monitor = new NullProgressMonitor();
+
+        if (resources.size() == 0)
+            return;
+
         IProject project = null;
         VCSAdapter vcs = null;
 
@@ -377,90 +383,98 @@ public class FileList {
 
             if (vcs != null) {
                 String providerID = vcs.getProviderID(project);
-                this.vcsProviderID = providerID;
-                this.vcsRepositoryRoot = vcs.getRepositoryString(project);
-                this.vcsProjectInfo = vcs.getCurrentResourceInfo(project);
+
+                vcsProviderID = providerID;
+                vcsRepositoryRoot = vcs.getRepositoryString(project);
+                vcsProjectInfo = vcs.getCurrentResourceInfo(project);
             }
         }
 
-        final boolean isManagedProject = vcs != null;
-        for (IResource resource : resources) {
-            if (resource.isDerived()) {
+        Deque<IResource> stack = new LinkedList<IResource>();
+
+        stack.addAll(resources);
+
+        List<IFile> files = new LinkedList<IFile>();
+
+        while (!stack.isEmpty()) {
+            IResource resource = stack.pop();
+
+            if (resource.isDerived() || !resource.exists())
                 continue;
-            }
+
+            IPath path = resource.getProjectRelativePath();
+
+            if (entries.containsKey(path))
+                continue;
+
+            VCSResourceInfo info = null;
+
+            if (vcs != null)
+                info = vcs.getCurrentResourceInfo(resource);
 
             assert !useVersionControl
                 || (project != null && project.equals(resource.getProject()));
 
-            if (resource instanceof IFile
-                && !this.entries.containsKey(resource.getProjectRelativePath())) {
-                IFile file = (IFile) resource;
-                if (!file.exists()) {
-                    continue;
-                }
+            FileListData data = null;
 
-                try {
-                    FileListData data = new FileListData();
+            switch (resource.getType()) {
+            case IResource.FILE:
+                files.add((IFile) resource);
+                data = new FileListData();
+                data.vcsInfo = info;
+                entries.put(path, data);
+                break;
+            case IResource.FOLDER:
+                stack.addAll(Arrays.asList(((IFolder) resource).members()));
 
-                    Long checksum = null;
-                    String path = file.getFullPath().toPortableString();
-
-                    if (checksumCache != null)
-                        checksum = checksumCache.getChecksum(path);
-
-                    data.checksum = checksum == null ? FileUtils.checksum(file)
-                        : checksum;
-
-                    if (checksumCache != null)
-                        checksumCache.addChecksum(path, data.checksum);
-
-                    if (isManagedProject)
-                        addVCSInfo(resource, data, vcs);
-
-                    if (monitor != null)
-                        monitor.subTask(file.getProject().getName() + ": "
-                            + file.getName());
-
-                    this.entries.put(file.getProjectRelativePath(), data);
-                } catch (IOException e) {
-                    log.error(e);
-                }
-
-            } else if (resource instanceof IFolder
-                && !this.entries.containsKey(resource.getProjectRelativePath())) {
-                IFolder folder = (IFolder) resource;
-
-                IPath path = folder.getProjectRelativePath();
-                if (!path.hasTrailingSeparator()) {
+                if (!path.hasTrailingSeparator())
                     path = path.addTrailingSeparator();
-                }
 
-                FileListData data = null;
-                if (isManagedProject) {
+                if (info != null) {
                     data = new FileListData();
-                    if (!addVCSInfo(resource, data, vcs))
-                        data = null;
+                    data.vcsInfo = info;
                 }
-                if (monitor != null)
-                    monitor.subTask(folder.getProject().getName() + ": "
-                        + folder.getName());
 
-                this.entries.put(path, data);
-
-                addMembers(ArrayUtils.getAdaptableObjects(folder.members(),
-                    IResource.class), checksumCache, monitor);
+                entries.put(path, data);
+                break;
             }
         }
-    }
 
-    private boolean addVCSInfo(IResource resource, FileListData data,
-        VCSAdapter vcs) {
-        final VCSResourceInfo info = vcs.getCurrentResourceInfo(resource);
-        if (info == null)
-            return false;
+        monitor.beginTask("Calculating checksums...", files.size());
 
-        data.vcsInfo = info;
-        return true;
+        for (IFile file : files) {
+            try {
+                monitor.subTask(file.getProject().getName() + ": "
+                    + file.getName());
+
+                FileListData data = entries.get(file.getProjectRelativePath());
+
+                Long checksum = null;
+
+                /** {@link IChecksumCache} **/
+                String path = file.getFullPath().toPortableString();
+
+                if (checksumCache != null)
+                    checksum = checksumCache.getChecksum(path);
+
+                data.checksum = checksum == null ? FileUtils.checksum(file)
+                    : checksum;
+
+                if (checksumCache != null) {
+                    boolean isInvalid = checksumCache.addChecksum(path,
+                        data.checksum);
+
+                    if (isInvalid)
+                        log.warn("calculated checksum on dirty data or checksum was invalidated: "
+                            + file.getFullPath());
+                }
+
+            } catch (IOException e) {
+                log.error(e);
+            }
+
+            monitor.worked(1);
+        }
     }
 
     // FIXME ndh remove/fix tests

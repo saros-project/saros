@@ -29,7 +29,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import org.easymock.EasyMock;
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
@@ -54,14 +56,22 @@ import de.fu_berlin.inf.dpp.test.stubs.FileStub;
  */
 public class FileListTest {
 
-    protected IFile fileInRoot1 = new FileStub("root1", "fileInRoot1");
-    protected IFile fileInRoot2 = new FileStub("root2", "fileInRoot2");
-    protected IFile fileInSubDir1 = new FileStub("subdir/file1",
+    private static IProject project;
+
+    static {
+        project = EasyMock.createNiceMock(IProject.class);
+        EasyMock.expect(project.getName()).andReturn("Foo").anyTimes();
+        EasyMock.replay(project);
+    }
+
+    protected IFile fileInRoot1 = new FileStub(project, "root1", "fileInRoot1");
+    protected IFile fileInRoot2 = new FileStub(project, "root2", "fileInRoot2");
+    protected IFile fileInSubDir1 = new FileStub(project, "subdir/file1",
         "fileInSubDir1");
-    protected IFile fileInSubDir2 = new FileStub("subdir/file2",
+    protected IFile fileInSubDir2 = new FileStub(project, "subdir/file2",
         "fileInSubDir2");
-    protected IFile fileInSubDir1changed = new FileStub("subdir/file1",
-        "changed fileInSubDir1");
+    protected IFile fileInSubDir1changed = new FileStub(project,
+        "subdir/file1", "changed fileInSubDir1");
 
     protected List<IResource> threeFileList = new ArrayList<IResource>();
 
