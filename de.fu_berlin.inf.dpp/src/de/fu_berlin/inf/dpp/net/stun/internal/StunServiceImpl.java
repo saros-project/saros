@@ -32,28 +32,28 @@ public final class StunServiceImpl implements IStunService {
 
     private boolean isDirectConnection = false;
 
-    private Set<InetSocketAddress> discoveredPublicIpAddresses = new HashSet<InetSocketAddress>();
+    private Set<InetSocketAddress> publicIPAddresses = new HashSet<InetSocketAddress>();
 
     public synchronized boolean isDirectConnectionAvailable() {
         return isDirectConnection;
     }
 
     public synchronized Collection<InetSocketAddress> getPublicIpAddresses() {
-        return new ArrayList<InetSocketAddress>(discoveredPublicIpAddresses);
+        return new ArrayList<InetSocketAddress>(publicIPAddresses);
     }
 
     public Collection<InetSocketAddress> discover(String stunAddress,
         int stunPort, int timeout) {
 
         if (stunAddress == null)
-            throw new NullPointerException("stun address is null");
+            throw new NullPointerException("STUN address is null");
 
         if (stunPort <= 0 || stunPort >= 65536)
             throw new IllegalArgumentException(
                 "stun port is not in range of 1 - 65535");
 
         synchronized (this) {
-            discoveredPublicIpAddresses.clear();
+            publicIPAddresses.clear();
             isDirectConnection = false;
         }
 
@@ -67,7 +67,7 @@ public final class StunServiceImpl implements IStunService {
 
         } catch (IOException e) {
             log.error(
-                "error retrieving local IP addresses or Stun Server IP address: "
+                "error retrieving local IP addresses or STUN Server IP address: "
                     + e.getMessage(), e);
             return new ArrayList<InetSocketAddress>();
         }
@@ -84,9 +84,10 @@ public final class StunServiceImpl implements IStunService {
             discoveryThread.start();
         }
 
-        while (discoveryThreads.isEmpty()) {
+        while (!discoveryThreads.isEmpty()) {
             try {
-                discoveryThreads.get(0).wait();
+                Thread discoveryThread = discoveryThreads.remove(0);
+                discoveryThread.join();
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
                 break;
@@ -135,6 +136,7 @@ public final class StunServiceImpl implements IStunService {
             this.timeout = timeout;
         }
 
+        @Override
         public void run() {
 
             InetSocketAddress publicInetAddress = null;
@@ -144,24 +146,26 @@ public final class StunServiceImpl implements IStunService {
                     stunAddress, stunPort), new InetSocketAddress(localAddress,
                     0), timeout);
             } catch (IOException e) {
-                log.error("an error occured while performing a stun discovery",
-                    e);
+                log.error(
+                    "an error occured while performing a STUN discovery: "
+                        + e.getMessage(), e);
                 return;
 
             }
-            if (publicInetAddress != null
-                && !publicInetAddress.getAddress().isAnyLocalAddress()) {
 
-                synchronized (StunServiceImpl.this) {
-                    if (publicInetAddress.getAddress().equals(localAddress))
-                        isDirectConnection = true;
+            if (publicInetAddress.getAddress().isAnyLocalAddress())
+                return;
 
-                    log.info("added public WAN-IP: "
-                        + publicInetAddress.getAddress().getHostAddress()
-                        + " (through " + localAddress.getHostAddress() + ")");
-                    discoveredPublicIpAddresses.add(publicInetAddress);
-                }
+            synchronized (StunServiceImpl.this) {
+                if (publicInetAddress.getAddress().equals(localAddress))
+                    isDirectConnection = true;
+
+                log.debug("discovered public WAN-IP: "
+                    + publicInetAddress.getAddress().getHostAddress()
+                    + " through interface " + localAddress.getHostAddress());
+                publicIPAddresses.add(publicInetAddress);
             }
+
         }
 
         /**
@@ -230,13 +234,13 @@ public final class StunServiceImpl implements IStunService {
                 final CountDownLatch responeReceived = new CountDownLatch(1);
 
                 // we are using UDP, and since there is no guarantee that these
-                // packets ever reach the destination we have to resent them
+                // packets ever reach their destination we have to resent them
                 senderThread = new Thread(new Runnable() {
                     public void run() {
                         long sendDelay = 500;
                         while (!Thread.currentThread().isInterrupted()) {
                             try {
-                                log.trace("sending stun request");
+                                log.trace("sending STUN request");
                                 socket.send(packet);
                                 if (responeReceived.await(sendDelay,
                                     TimeUnit.MILLISECONDS))
@@ -245,7 +249,8 @@ public final class StunServiceImpl implements IStunService {
                                 sendDelay *= 2;
                             } catch (IOException e) {
                                 if (!Thread.currentThread().isInterrupted())
-                                    log.error("error sending stun request", e);
+                                    log.error("error sending STUN request", e);
+
                                 break;
                             } catch (InterruptedException e) {
                                 break;
@@ -268,14 +273,14 @@ public final class StunServiceImpl implements IStunService {
                     responseData = response.getData();
 
                     if (responseData.length <= STUN_HEADER_SIZE) {
-                        log.warn("received stun response with invalid header");
+                        log.warn("received STUN response with invalid header");
                         continue;
                     }
 
                     // compare the transaction ID / Magic cookie
                     for (int i = 4; i < STUN_HEADER_SIZE; i++) {
                         if (requestData[i] != responseData[i]) {
-                            log.warn("received stun response with invalid transaction id");
+                            log.warn("received STUN response with invalid transaction id");
                             continue;
                         }
                     }
@@ -297,14 +302,14 @@ public final class StunServiceImpl implements IStunService {
 
                 int attributesLength = in.readUnsignedShort();
 
-                log.trace("received stun response, payload length is: "
+                log.trace("received STUN response, payload length is: "
                     + attributesLength + " bytes");
 
                 byte[] transactionId = new byte[16];
                 in.read(transactionId);
 
                 if (responseCode != BINDING_RESPONSE)
-                    log.warn("received bad stun response code from server: 0x"
+                    log.warn("received bad STUN response code from server: 0x"
                         + Integer.toHexString(responseCode & 0xFFFF));
 
                 while (attributesLength > 4) {
@@ -314,13 +319,14 @@ public final class StunServiceImpl implements IStunService {
 
                     attributesLength -= length + 4;
 
-                    log.trace("processing stun value code: 0x"
+                    log.trace("processing STUN value code: 0x"
                         + Integer.toHexString(code & 0xFFFF) + ", length: "
                         + length);
 
                     if (attributesLength < 0) {
-                        log.warn("stun response is corrupted: 0x"
-                            + Integer.toHexString(code & 0xFFFF));
+                        log.warn("STUN response code 0x"
+                            + Integer.toHexString(code & 0xFFFF)
+                            + " is corrupted");
                         break;
                     }
 
@@ -393,13 +399,13 @@ public final class StunServiceImpl implements IStunService {
                         break;
 
                     default:
-                        log.trace("skipping stun value with code: 0x"
+                        log.trace("skipping STUN value with code: 0x"
                             + Integer.toHexString(code & 0xFFFF));
                         skipFully(in, length);
                     }
                 }
             } catch (SocketTimeoutException e) {
-                log.warn("received no response from stun server " + stunServer
+                log.warn("received no response from STUN server " + stunServer
                     + " at local address " + localAddress);
             } finally {
                 if (senderThread != null && senderThread.isAlive())
@@ -475,9 +481,7 @@ public final class StunServiceImpl implements IStunService {
                     + " [" + message + "]");
                 return false;
             }
-
             return false;
         }
-
     }
 }
