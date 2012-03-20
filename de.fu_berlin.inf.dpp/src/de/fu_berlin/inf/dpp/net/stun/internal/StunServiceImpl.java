@@ -150,7 +150,11 @@ public final class StunServiceImpl implements IStunService {
                     "an error occured while performing a STUN discovery: "
                         + e.getMessage(), e);
                 return;
-
+            } catch (Exception e) {
+                log.error(
+                    "an internal error occured while performing a STUN discovery: "
+                        + e.getMessage(), e);
+                return;
             }
 
             if (publicInetAddress.getAddress().isAnyLocalAddress())
@@ -179,7 +183,7 @@ public final class StunServiceImpl implements IStunService {
          * @param timeout
          *            how long this method should wait for a response from the
          *            stun server
-         * @return the public IP address and port or <code>null</code> if the
+         * @return the public IP address and port or a wildcard address if the
          *         discovery failed
          * @throws IOException
          *             if an I/O error occurs
@@ -293,7 +297,7 @@ public final class StunServiceImpl implements IStunService {
                 socket.close();
 
                 if (retries == 0)
-                    return null;
+                    return new InetSocketAddress((InetAddress) null, 0);
 
                 DataInputStream in = new DataInputStream(
                     new ByteArrayInputStream(responseData));
@@ -412,7 +416,6 @@ public final class StunServiceImpl implements IStunService {
                     senderThread.interrupt();
 
                 socket.close();
-
             }
 
             return xorMappedInetAddress == null ? new InetSocketAddress(
