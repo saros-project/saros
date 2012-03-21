@@ -1,13 +1,13 @@
 package de.fu_berlin.inf.dpp.project;
 
-import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import de.fu_berlin.inf.dpp.activities.business.IActivity;
 
 public abstract class AbstractActivityProvider implements IActivityProvider {
 
-    protected List<IActivityListener> activityListeners = new LinkedList<IActivityListener>();
+    protected List<IActivityListener> activityListeners = new CopyOnWriteArrayList<IActivityListener>();
 
     public void addActivityListener(IActivityListener listener) {
         if (!activityListeners.contains(listener)) {

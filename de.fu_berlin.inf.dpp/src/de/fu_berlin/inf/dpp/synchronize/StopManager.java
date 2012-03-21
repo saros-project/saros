@@ -59,7 +59,7 @@ public final class StopManager extends AbstractActivityProvider {
     // Waits MILLISTOWAIT ms until the next test for progress cancellation
     public final int MILLISTOWAIT = 100;
 
-    protected List<Blockable> blockables = new LinkedList<Blockable>();
+    protected List<Blockable> blockables = new CopyOnWriteArrayList<Blockable>();
 
     protected ObservableValue<Boolean> blocked = new ObservableValue<Boolean>(
         false);
