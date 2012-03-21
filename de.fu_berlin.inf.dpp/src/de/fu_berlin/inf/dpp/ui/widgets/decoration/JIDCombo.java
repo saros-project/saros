@@ -1,5 +1,7 @@
 package de.fu_berlin.inf.dpp.ui.widgets.decoration;
 
+import java.util.List;
+
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
@@ -49,12 +51,43 @@ public class JIDCombo {
     }
 
     protected void fill() {
-        JIDComboUtils.fillJIDCombo(this.control, this.preferenceUtils,
-            this.xmppAccountStore);
+        String defaultServer = this.preferenceUtils.getDefaultServer();
+        
+        List<String> servers = this.xmppAccountStore.getDomains();
+        if (servers.size() == 0)
+            servers.add(defaultServer);
+        this.control.removeAll();
+        int selectIndex = 0;
+        for (int i = 0, j = servers.size(); i < j; i++) {
+            String server = servers.get(i);
+            this.control.add("@" + server);
+            if (defaultServer.equals(server))
+                selectIndex = i;
+        }
+        this.control.select(selectIndex);
     }
 
     protected void update() {
-        JIDComboUtils.updateJIDCombo(this.control);
+        /*
+         * Save the current selection
+         */
+        Point selection = this.control.getSelection();
+        
+        String jid = this.control.getText();
+        String username = (jid.contains("@")) ? jid.split("@")[0] : jid;
+        
+        String[] items = this.control.getItems();
+        for (int i = 0; i < items.length; i++) {
+            String item = items[i];
+            item = username + "@" + item.split("@")[1];
+            this.control.setItem(i, item);
+        }
+        
+        /*
+         * The modification of the list items changes the selection. Now, the
+         * saved selection have to be set again.
+         */
+        this.control.setSelection(new Point(selection.x, selection.y));
     }
 
     protected void registerListeners() {
