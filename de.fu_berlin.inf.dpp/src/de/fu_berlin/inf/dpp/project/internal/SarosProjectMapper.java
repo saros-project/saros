@@ -67,14 +67,17 @@ class SarosProjectMapper {
     }
 
     public synchronized void addUserToProjectMapping(JID senderJID,
-        IProject project, String projectID) {
-        if (userToProjectIDMapping.containsValue(project))
-            return;
+        IProject project) {
+
         ArrayList<IProject> ownedProjects = userToProjectIDMapping
             .get(senderJID);
+
         if (ownedProjects == null)
             ownedProjects = new ArrayList<IProject>();
-        ownedProjects.add(project);
+
+        if (!ownedProjects.contains(project))
+            ownedProjects.add(project);
+
         userToProjectIDMapping.put(senderJID, ownedProjects);
     }
 
@@ -113,7 +116,7 @@ class SarosProjectMapper {
         return isSharedResource(localResource);
     }
 
-    public boolean isSharedResource(IResource resource) {
+    public synchronized boolean isSharedResource(IResource resource) {
         if (resource == null)
             return false;
         IProject project = resource.getProject();

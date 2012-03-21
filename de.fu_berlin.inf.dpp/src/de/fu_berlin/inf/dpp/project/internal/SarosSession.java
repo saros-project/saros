@@ -325,7 +325,7 @@ public class SarosSession implements ISarosSession, Disposable {
                 project, this));
             projectMapper.addResourceMapping(project, dependentResources);
             projectMapper.addUserToProjectMapping(getLocalUser().getJID(),
-                project, projectID);
+                project);
         } else {
             List<IResource> resources = getSharedResources(project);
             if (resources != null && dependentResources != null) {
@@ -1256,7 +1256,7 @@ public class SarosSession implements ISarosSession, Disposable {
                 project, this));
             projectMapper.addResourceMapping(project,
                 new ArrayList<IResource>());
-            projectMapper.addUserToProjectMapping(ownerJID, project, projectID);
+            projectMapper.addUserToProjectMapping(ownerJID, project);
         }
     }
 
