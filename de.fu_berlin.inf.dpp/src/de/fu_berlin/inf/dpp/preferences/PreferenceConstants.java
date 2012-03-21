@@ -241,4 +241,11 @@ public class PreferenceConstants {
      */
     public static final String PROJECTSELECTION_FILTERCLOSEDPROJECTS = "projectselection.filterClosedProjects";
     public static final String BUDDYSELECTION_FILTERNONSAROSBUDDIES = "projectselection.filterNonSarosBuddies";
+
+    /*
+     * Preferences to remember the saros view settings
+     */
+    public static final String SAROSVIEW_SASH_WEIGHT_LEFT = "ui.sarosview.sashweight.left";
+    public static final String SAROSVIEW_SASH_WEIGHT_RIGHT = "ui.sarosview.sashweight.right";
+
 }

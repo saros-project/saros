@@ -35,6 +35,8 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
+import org.eclipse.swt.events.ControlEvent;
+import org.eclipse.swt.events.ControlListener;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.graphics.Point;
@@ -63,6 +65,7 @@ import de.fu_berlin.inf.dpp.net.IRosterListener;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.RosterAdapter;
 import de.fu_berlin.inf.dpp.net.RosterTracker;
+import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
 import de.fu_berlin.inf.dpp.project.SarosSessionManager;
 import de.fu_berlin.inf.dpp.ui.BalloonNotification;
 import de.fu_berlin.inf.dpp.ui.actions.ChangeColorAction;
@@ -235,7 +238,7 @@ public class SarosView extends ViewPart {
 
         parent.setLayout(new FillLayout());
 
-        SashForm baseSashForm = new SashForm(parent, SWT.SMOOTH);
+        final SashForm baseSashForm = new SashForm(parent, SWT.SMOOTH);
 
         /*
          * LEFT COLUMN
@@ -244,6 +247,26 @@ public class SarosView extends ViewPart {
         leftComposite.setLayout(LayoutUtils.createGridLayout());
         leftComposite.setBackground(Display.getCurrent().getSystemColor(
             SWT.COLOR_WHITE));
+
+        /**
+         * Sash weight remembering
+         */
+        leftComposite.addControlListener(new ControlListener() {
+            @Override
+            public void controlResized(ControlEvent e) {
+                saros.getPreferenceStore().setValue(
+                    PreferenceConstants.SAROSVIEW_SASH_WEIGHT_LEFT,
+                    baseSashForm.getWeights()[0]);
+                saros.getPreferenceStore().setValue(
+                    PreferenceConstants.SAROSVIEW_SASH_WEIGHT_RIGHT,
+                    baseSashForm.getWeights()[1]);
+            }
+
+            @Override
+            public void controlMoved(ControlEvent e) {
+                // NOP
+            }
+        });
 
         ConnectionStateComposite connectionStateComposite = new ConnectionStateComposite(
             leftComposite, SWT.NONE);
@@ -326,6 +349,21 @@ public class SarosView extends ViewPart {
          */
         Composite rightComposite = new Composite(baseSashForm, SWT.NONE);
         rightComposite.setLayout(new FillLayout());
+
+        /*
+         * Initialize sash form weights from preferences (remembering the layout
+         * of the saros view), if no prefs exist (first start) use a 50/50 space
+         * distribution.
+         * 
+         * Can only set the sash weights after adding all direct child elements
+         * of the baseSashForm.
+         */
+        int[] weights = new int[] {
+            saros.getPreferenceStore().getInt(
+                PreferenceConstants.SAROSVIEW_SASH_WEIGHT_LEFT),
+            saros.getPreferenceStore().getInt(
+                PreferenceConstants.SAROSVIEW_SASH_WEIGHT_RIGHT) };
+        baseSashForm.setWeights(weights);
 
         chatRooms = new ChatRoomsComposite(rightComposite, SWT.NONE,
             rosterTracker);

@@ -150,6 +150,12 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
         prefs.setValue(PreferenceConstants.SCREEN_MOUSE_AREA_WIDTH, 320);
         prefs.setValue(PreferenceConstants.SCREEN_MOUSE_AREA_HEIGHT, 240);
         prefs.setValue(PreferenceConstants.SCREEN_SHOW_MOUSEPOINTER, true);
+
+        /*
+         * Initially 50/50 distribution Roster/Chatpart in saros view
+         */
+        prefs.setValue(PreferenceConstants.SAROSVIEW_SASH_WEIGHT_LEFT, 1);
+        prefs.setValue(PreferenceConstants.SAROSVIEW_SASH_WEIGHT_RIGHT, 1);
     }
 
     private static interface PreferenceHolderWrapper {
