@@ -23,7 +23,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 
 import org.eclipse.core.runtime.SubMonitor;
 import org.jivesoftware.smack.packet.IQ;
@@ -207,25 +206,6 @@ public interface ITransmitter {
      * Sends queued messages.
      */
     public void sendRemainingMessages();
-
-    /**
-     * Sends a request for activityDataObjects to all users.
-     * 
-     * TODO SS MR Dependency Violation - ITransmitter should not need a shared
-     * project
-     * 
-     * @param sarosSession
-     *            the Saros session
-     * @param requestedSequenceNumbers
-     *            a map containing the sequence number to be requested as a
-     *            value and the user to request them from as key
-     * @param andUp
-     *            true if all activityDataObjects after the requested one are
-     *            requested too, false if only the activityDataObject with the
-     *            requestedSequenceNumber is requested
-     */
-    public void sendRequestForActivity(ISarosSession sarosSession,
-        Map<JID, Integer> requestedSequenceNumbers, boolean andUp);
 
     /* ---------- etc --------- */
 

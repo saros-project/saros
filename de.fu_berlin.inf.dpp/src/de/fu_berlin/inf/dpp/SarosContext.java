@@ -60,7 +60,6 @@ import de.fu_berlin.inf.dpp.net.business.ConsistencyWatchdogHandler;
 import de.fu_berlin.inf.dpp.net.business.DispatchThreadContext;
 import de.fu_berlin.inf.dpp.net.business.InvitationHandler;
 import de.fu_berlin.inf.dpp.net.business.LeaveHandler;
-import de.fu_berlin.inf.dpp.net.business.RequestForActivityHandler;
 import de.fu_berlin.inf.dpp.net.business.UserListHandler;
 import de.fu_berlin.inf.dpp.net.internal.ActivitiesExtensionProvider;
 import de.fu_berlin.inf.dpp.net.internal.ConnectionTestManager;
@@ -267,7 +266,6 @@ public class SarosContext {
         Component.create(UserListHandler.class),
         Component.create(InvitationHandler.class),
         Component.create(LeaveHandler.class),
-        Component.create(RequestForActivityHandler.class),
         Component.create(ConsistencyWatchdogHandler.class),
         Component.create(ActivitiesHandler.class),
 

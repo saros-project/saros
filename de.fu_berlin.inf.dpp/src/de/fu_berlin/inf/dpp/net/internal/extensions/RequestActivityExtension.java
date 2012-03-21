@@ -6,7 +6,6 @@ package de.fu_berlin.inf.dpp.net.internal.extensions;
 import org.apache.log4j.Logger;
 import org.jivesoftware.smack.packet.DefaultPacketExtension;
 import org.jivesoftware.smack.packet.Message;
-import org.jivesoftware.smack.packet.PacketExtension;
 
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.net.JID;
@@ -20,19 +19,6 @@ public class RequestActivityExtension extends SessionDefaultPacketExtension {
 
     public RequestActivityExtension(SessionIDObservable sessionIDObservable) {
         super(sessionIDObservable, "requestActivity");
-    }
-
-    public PacketExtension create(int timestamp, boolean andup) {
-        DefaultPacketExtension extension = create();
-
-        // TODO create string constants for the used keys
-        extension.setValue("ID", String.valueOf(timestamp));
-
-        if (andup) {
-            extension.setValue("ANDUP", "true");
-        }
-
-        return extension;
     }
 
     @Override

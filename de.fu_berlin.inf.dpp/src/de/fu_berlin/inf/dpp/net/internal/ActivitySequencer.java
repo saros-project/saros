@@ -155,15 +155,6 @@ public class ActivitySequencer {
         /** Queue of activityDataObjects received. */
         protected final PriorityQueue<TimedActivityDataObject> queuedActivities = new PriorityQueue<TimedActivityDataObject>();
 
-        /**
-         * History of activityDataObjects sent.
-         * 
-         * TODO Not really used at the moment. File creation activityDataObjects
-         * don't store the content at the time they were sent, so they can't be
-         * re-send.
-         */
-        protected final List<TimedActivityDataObject> history = new LinkedList<TimedActivityDataObject>();
-
         public ActivityQueue(JID jid) {
             this.jid = jid;
         }
@@ -178,7 +169,6 @@ public class ActivitySequencer {
 
             TimedActivityDataObject result = new TimedActivityDataObject(
                 activityDataObject, localJID, nextSequenceNumber++);
-            history.add(result);
             return result;
         }
 
@@ -408,24 +398,6 @@ public class ActivitySequencer {
             ArrayList<TimedActivityDataObject> result = new ArrayList<TimedActivityDataObject>();
             for (ActivityQueue queue : jid2queue.values()) {
                 result.addAll(queue.removeActivities());
-            }
-            return result;
-        }
-
-        /**
-         * @see ActivitySequencer#getActivityHistory(JID, int, boolean)
-         */
-        public List<TimedActivityDataObject> getHistory(JID user,
-            int fromSequenceNumber, boolean andUp) {
-
-            LinkedList<TimedActivityDataObject> result = new LinkedList<TimedActivityDataObject>();
-            for (TimedActivityDataObject activity : getActivityQueue(user).history) {
-                if (activity.getSequenceNumber() >= fromSequenceNumber) {
-                    result.add(activity);
-                    if (!andUp) {
-                        break;
-                    }
-                }
             }
             return result;
         }
@@ -823,21 +795,6 @@ public class ActivitySequencer {
         JID recipient, List<IActivityDataObject> activityDataObjects) {
         return incomingQueues.createTimedActivities(recipient,
             activityDataObjects);
-    }
-
-    /**
-     * Get the activityDataObject history for given user and given timestamp.
-     * 
-     * If andUp is <code>true</code> all activityDataObjects that are equal or
-     * greater than the timestamp are returned, otherwise just the
-     * activityDataObject that matches the timestamp exactly.
-     * 
-     * If no activityDataObject matches the criteria an empty list is returned.
-     */
-    public List<TimedActivityDataObject> getActivityHistory(JID user,
-        int fromSequenceNumber, boolean andUp) {
-
-        return incomingQueues.getHistory(user, fromSequenceNumber, andUp);
     }
 
     /**

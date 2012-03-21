@@ -34,7 +34,6 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.NullProgressMonitor;
@@ -90,7 +89,6 @@ import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.util.ActivityUtils;
 import de.fu_berlin.inf.dpp.util.CausedIOException;
-import de.fu_berlin.inf.dpp.util.StackTrace;
 import de.fu_berlin.inf.dpp.util.Utils;
 import de.fu_berlin.inf.dpp.util.VersionManager.VersionInfo;
 
@@ -449,29 +447,6 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
                 + errorMsg));
         sendMessageToUser(user, cancelProjectSharingExtension.create(
             sessionID.getValue(), errorMsg));
-    }
-
-    public void sendRequestForActivity(ISarosSession sarosSession,
-        Map<JID, Integer> expectedSequenceNumbers, boolean andup) {
-
-        // TODO this method is currently not used. Probably they interfere with
-        // Jupiter
-        if (true) {
-            log.error("Unexpected Call to Request for Activity,"
-                + " which is currently disabled:", new StackTrace());
-            return;
-        }
-
-        for (Entry<JID, Integer> entry : expectedSequenceNumbers.entrySet()) {
-            JID recipient = entry.getKey();
-            int expectedSequenceNumber = entry.getValue();
-            log.info("Requesting old activityDataObject (sequence number="
-                + expectedSequenceNumber + "," + andup + ") from "
-                + Utils.prefix(recipient));
-            sendMessageToUser(recipient,
-                requestActivityExtension.create(expectedSequenceNumber, andup),
-                true);
-        }
     }
 
     /*
