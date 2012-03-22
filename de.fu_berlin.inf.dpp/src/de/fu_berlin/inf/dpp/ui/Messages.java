@@ -74,6 +74,7 @@ public class Messages extends NLS {
     public static String CollaborationUtils_confirm_need_based_file_text;
     public static String CollaborationUtils_confirm_need_based_file_balloon_text;
 
+    public static String PublicXMPPServerComposite_more_information;
     public static String ConfigurationSettingsWizardPage_0;
     public static String ConfigurationSettingsWizardPage_button_autoconnect;
     public static String ConfigurationSettingsWizardPage_button_portmapping;

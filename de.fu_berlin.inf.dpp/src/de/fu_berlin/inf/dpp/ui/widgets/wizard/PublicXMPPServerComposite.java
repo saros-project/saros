@@ -4,27 +4,23 @@ import org.apache.log4j.Logger;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StyleRange;
 import org.eclipse.swt.custom.StyledText;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Layout;
+import org.eclipse.swt.widgets.Link;
 import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
-import de.fu_berlin.inf.dpp.ui.util.DialogUtils;
-import de.fu_berlin.inf.dpp.util.Utils;
+import de.fu_berlin.inf.dpp.ui.Messages;
+import de.fu_berlin.inf.dpp.util.LinkListener;
 import de.fu_berlin.inf.nebula.explanation.note.NoteComposite;
 import de.fu_berlin.inf.nebula.utils.LayoutUtils;
 
 public class PublicXMPPServerComposite extends NoteComposite {
     private static final Logger log = Logger
         .getLogger(PublicXMPPServerComposite.class);
-
-    public static final String LIST_OF_XMPP_SERVERS = "http://www.saros-project.org/InstallUsing#Using_Public_XMPP_Servers";
 
     @Inject
     PreferenceUtils preferenceUtils;
@@ -86,22 +82,11 @@ public class PublicXMPPServerComposite extends NoteComposite {
     }
 
     protected void createMoreInformation(Composite composite) {
-        Button moreInformationButton = new Button(composite, SWT.PUSH);
-        moreInformationButton.setLayoutData(new GridData(SWT.FILL,
-            SWT.BEGINNING, true, false));
-        moreInformationButton.setText("More Information...");
-        moreInformationButton.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent e) {
-                if (!Utils.openExternalBrowser(LIST_OF_XMPP_SERVERS)) {
-                    log.error("Couldn't open link " + LIST_OF_XMPP_SERVERS
-                        + " in external browser.");
-                    DialogUtils.openWarningMessageDialog(getShell(), "Warning",
-                        "The list of Public XMPP/Jabbers server could not be opened.\n\n"
-                            + "Please open " + LIST_OF_XMPP_SERVERS
-                            + " manually in your browser.");
-                }
-            }
-        });
+        Link moreInformationLink = new Link(composite, SWT.NONE);
+        moreInformationLink
+            .setText(Messages.PublicXMPPServerComposite_more_information);
+        moreInformationLink.addListener(SWT.Selection, new LinkListener());
+        moreInformationLink.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING,
+            true, false));
     }
 }
