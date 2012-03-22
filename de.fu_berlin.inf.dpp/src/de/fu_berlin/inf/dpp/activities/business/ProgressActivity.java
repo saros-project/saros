@@ -26,7 +26,7 @@ public class ProgressActivity extends AbstractActivity {
     protected ProgressAction action;
 
     public enum ProgressAction {
-        UPDATE, DONE;
+        BEGINTASK, SUBTASK, SETTASKNAME, UPDATE, DONE, CANCEL;
     }
 
     public ProgressActivity(User source, String progressID, int workCurrent,

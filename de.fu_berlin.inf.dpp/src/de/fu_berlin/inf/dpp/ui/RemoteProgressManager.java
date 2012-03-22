@@ -1,19 +1,19 @@
 package de.fu_berlin.inf.dpp.ui;
 
-import java.lang.reflect.InvocationTargetException;
 import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
-import java.util.concurrent.CancellationException;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
-import org.eclipse.jface.dialogs.ProgressMonitorDialog;
-import org.eclipse.jface.operation.IRunnableWithProgress;
+import org.eclipse.core.runtime.jobs.Job;
 
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.User;
@@ -23,7 +23,6 @@ import de.fu_berlin.inf.dpp.activities.business.IActivityReceiver;
 import de.fu_berlin.inf.dpp.activities.business.ProgressActivity;
 import de.fu_berlin.inf.dpp.activities.business.ProgressActivity.ProgressAction;
 import de.fu_berlin.inf.dpp.annotations.Component;
-import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.project.AbstractActivityProvider;
 import de.fu_berlin.inf.dpp.project.AbstractSarosSessionListener;
 import de.fu_berlin.inf.dpp.project.AbstractSharedProjectListener;
@@ -78,34 +77,24 @@ public class RemoteProgressManager {
             this.source = source;
 
             // Run async, so we can continue to receive messages over the
-            // network...
-            Utils.runSafeSWTAsync(log, new Runnable() {
-                public void run() {
-                    ProgressMonitorDialog dialog = new ProgressMonitorDialog(
-                        EditorAPI.getAWorkbenchWindow().getShell());
-
+            // network. Run as a job, so that it can be run in background
+            // for remote hosts
+            Job job = new Job("Observing remote progress for "
+                + Utils.prefix(source.getJID())) {
+                @Override
+                protected IStatus run(IProgressMonitor monitor) {
                     try {
-                        dialog.run(true, true, new IRunnableWithProgress() {
-                            public void run(IProgressMonitor monitor) {
-                                mainloop(SubMonitor.convert(monitor));
-                            }
-                        });
-                    } catch (InvocationTargetException e) {
-                        try {
-                            throw e.getCause();
-                        } catch (CancellationException c) {
-                            log.info("Progress was cancelled by local user");
-                        } catch (Throwable t) {
-                            log.error("Internal Error: ", t);
-                        }
-                    } catch (InterruptedException e) {
-                        log.error("Code not designed to be interruptable", e);
+                        mainloop(SubMonitor.convert(monitor));
+                    } catch (Exception e) {
+                        log.error("", e);
+                        return Status.CANCEL_STATUS;
                     }
-                    synchronized (RemoteProgress.this) {
-                        activities = null; // Discard remaining activities
-                    }
+                    return Status.OK_STATUS;
                 }
-            });
+            };
+            job.setPriority(Job.SHORT);
+            job.setUser(true);
+            job.schedule();
         }
 
         public synchronized void close() {
@@ -137,25 +126,48 @@ public class RemoteProgressManager {
             boolean firstTime = true;
 
             while (true) {
-                ProgressActivity nextActivity;
+                ProgressActivity activity;
                 try {
-                    nextActivity = activities.take();
+                    if (subMonitor.isCanceled()) {
+                        return;
+                    }
+                    activity = activities.poll(1000, TimeUnit.MILLISECONDS);
+                    if (activity == null) {
+                        continue;
+                    }
                 } catch (InterruptedException e) {
                     return;
                 }
+                String taskName = activity.getTaskName();
+                int newWorked;
+                log.debug("RemoteProgressActivity: " + taskName + " / "
+                    + activity.getAction());
 
-                switch (nextActivity.getAction()) {
+                switch (activity.getAction()) {
+                case BEGINTASK:
+                    subMonitor.beginTask(taskName, activity.getWorkTotal());
+                    break;
+                case SETTASKNAME:
+                    subMonitor.setTaskName(taskName);
+                    break;
+                case SUBTASK:
+                    if (taskName != null)
+                        subMonitor.subTask(taskName);
+                    newWorked = activity.getWorkCurrent();
+                    if (newWorked > worked) {
+                        subMonitor.worked(newWorked - worked);
+                        worked = newWorked;
+                    }
+                    break;
                 case UPDATE:
-                    String taskName = nextActivity.getTaskName();
                     if (firstTime) {
-                        subMonitor.beginTask(taskName,
-                            nextActivity.getWorkTotal());
+                        subMonitor.beginTask(taskName, activity.getWorkTotal());
                         firstTime = false;
                     } else {
                         if (taskName != null)
                             subMonitor.subTask(taskName);
 
-                        int newWorked = nextActivity.getWorkCurrent();
+                        newWorked = activity.getWorkCurrent();
                         if (newWorked > worked) {
                             subMonitor.worked(newWorked - worked);
                             worked = newWorked;
@@ -164,6 +176,10 @@ public class RemoteProgressManager {
                     break;
                 case DONE:
                     subMonitor.done();
+                    return;
+                case CANCEL:
+                    log.info("Progress was cancelled by remote user");
+                    subMonitor.setCanceled(true);
                     return;
                 }
             }
@@ -306,6 +322,99 @@ public class RemoteProgressManager {
             }
 
             public void worked(int work) {
+                worked += work;
+                if (worked > totalWorked)
+                    log.warn(
+                        MessageFormat
+                            .format(
+                                "Worked ({0})is greater than totalWork ({1}). Forgot to call beginTask?",
+                                worked, totalWorked), new StackTrace());
+                sarosSession.sendActivity(recipients, new ProgressActivity(
+                    localUser, progressID, worked, totalWorked, null,
+                    ProgressAction.UPDATE));
+            }
+        };
+    }
+
+    /**
+     * This wraps the given progress monitor so that any progress reported via
+     * the original monitor is reported to the listed remote hosts too.
+     * 
+     * Background: Sometimes we run a process locally and need to show the user
+     * progress, so he/she can abort the process. But we also need to report the
+     * progress to remote users.
+     * 
+     * @param session
+     * @param recipients
+     * @param monitor
+     * @return
+     */
+    public IProgressMonitor mirrorLocalProgressMonitorToRemote(
+        final ISarosSession session, final List<User> recipients,
+        final IProgressMonitor monitor) {
+
+        return new IProgressMonitor() {
+            protected String progressID = getNextProgressID();
+            protected IProgressMonitor localMonitor = monitor;
+            protected User localUser = sarosSession.getLocalUser();
+            int worked = 0;
+            int totalWorked = -1;
+
+            public void beginTask(String name, int totalWorked) {
+                // update local progress monitor
+                monitor.beginTask(name, totalWorked);
+
+                // report to remote monitor!
+                this.totalWorked = totalWorked;
+                sarosSession.sendActivity(recipients, new ProgressActivity(
+                    localUser, progressID, 0, totalWorked, name,
+                    ProgressAction.BEGINTASK));
+            }
+
+            public void done() {
+                monitor.done();
+                sarosSession.sendActivity(recipients, new ProgressActivity(
+                    localUser, progressID, 0, 0, null, ProgressAction.DONE));
+            }
+
+            /**
+             * FIXME: This is not yet propagated remotely
+             */
+            public void internalWorked(double work) {
+                monitor.internalWorked(work);
+            }
+
+            public boolean isCanceled() {
+                return monitor.isCanceled();
+            }
+
+            /**
+             * FIXME: This is not yet propagated remotely
+             */
+            public void setCanceled(boolean value) {
+                // waldmann: yep this is a TODO
+                sarosSession.sendActivity(recipients, new ProgressActivity(
+                    localUser, progressID, worked, totalWorked, "Cancellation",
+                    ProgressAction.CANCEL));
+                monitor.setCanceled(value);
+            }
+
+            public void setTaskName(String name) {
+                monitor.setTaskName(name);
+                sarosSession.sendActivity(recipients, new ProgressActivity(
+                    localUser, progressID, worked, totalWorked, name,
+                    ProgressAction.SETTASKNAME));
+            }
+
+            public void subTask(String name) {
+                monitor.subTask(name);
+                sarosSession.sendActivity(recipients, new ProgressActivity(
+                    localUser, progressID, worked, totalWorked, name,
+                    ProgressAction.SUBTASK));
+            }
+
+            public void worked(int work) {
+                monitor.worked(work);
                 worked += work;
                 if (worked > totalWorked)
                     log.warn(

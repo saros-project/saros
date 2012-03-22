@@ -30,7 +30,6 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
@@ -44,6 +43,7 @@ import de.fu_berlin.inf.dpp.FileListDiff;
 import de.fu_berlin.inf.dpp.FileListFactory;
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.SarosContext;
+import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.activities.ProjectExchangeInfo;
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
@@ -52,8 +52,11 @@ import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
 import de.fu_berlin.inf.dpp.invitation.ProcessTools.CancelLocation;
 import de.fu_berlin.inf.dpp.invitation.ProcessTools.CancelOption;
 import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.observables.SarosSessionObservable;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
 import de.fu_berlin.inf.dpp.project.IChecksumCache;
+import de.fu_berlin.inf.dpp.project.ISarosSession;
+import de.fu_berlin.inf.dpp.ui.RemoteProgressManager;
 import de.fu_berlin.inf.dpp.ui.wizards.AddProjectToSessionWizard;
 import de.fu_berlin.inf.dpp.ui.wizards.pages.EnterProjectNamePage;
 import de.fu_berlin.inf.dpp.util.ArrayUtils;
@@ -76,6 +79,11 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
 
     @Inject
     protected PreferenceUtils preferenceUtils;
+    @Inject
+    protected SarosSessionObservable sarosSessionObservable;
+
+    @Inject
+    protected RemoteProgressManager rpm;
 
     @Inject
     protected IChecksumCache checksumCache;
@@ -396,17 +404,39 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
         if (vcs != null) {
             if (!isPartialRemoteProject(projectID)) {
                 try {
-
-                    newLocalProject = vcs.checkoutProject(newProjectName,
-                        remoteFileList, monitor);
-                } catch (OperationCanceledException e) {
+                    /*
+                     * Inform the host of the session that the current (local)
+                     * user has started the possibly time consuming SVN checkout
+                     * via a remoteProgressMonitor
+                     */
+                    ISarosSession sarosSession = sarosSessionObservable
+                        .getValue();
+                    List<User> notifiedUsers = new ArrayList<User>();
+                    if (sarosSession != null) {
+                        notifiedUsers.add(sarosSession.getHost());
+                        /*
+                         * The monitor that is created here is shown both
+                         * locally and remote and is handled like a regular
+                         * progress monitor.
+                         */
+                        IProgressMonitor remoteMonitor = rpm
+                            .mirrorLocalProgressMonitorToRemote(sarosSession,
+                                notifiedUsers, monitor);
+                        remoteMonitor
+                            .setTaskName("Project checkout via subversion");
+                        newLocalProject = vcs.checkoutProject(newProjectName,
+                            remoteFileList, remoteMonitor);
+                    } else {
+                        log.error("No Saros session!");
+                    }
+                } catch (org.eclipse.core.runtime.OperationCanceledException e) {
                     /*
                      * The exception is thrown if the user canceled the svn
                      * checkout process. We send the remote user a sophisticated
                      * message here.
                      */
                     throw new LocalCancellationException(
-                        "The VCS checkout process was canceled",
+                        "The CVS checkout process was canceled",
                         CancelOption.NOTIFY_PEER);
                 }
             }
