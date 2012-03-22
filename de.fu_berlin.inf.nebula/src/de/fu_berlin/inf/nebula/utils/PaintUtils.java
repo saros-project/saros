@@ -8,7 +8,7 @@ import org.eclipse.swt.graphics.Rectangle;
  * Utility class for paint actions
  */
 public class PaintUtils {
-	public static final int ARC = 15;
+	public static final int ARC = 5;
 	public static final int LINE_WEIGHT = 1;
 
 	public static void drawRoundedRectangle(GC gc, Rectangle bounds,
