@@ -4,7 +4,6 @@ import java.io.FileNotFoundException;
 import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.zip.Adler32;
@@ -18,9 +17,7 @@ import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
-import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
-import org.eclipse.core.resources.IResourceVisitor;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.IWorkspaceRunnable;
 import org.eclipse.core.resources.ResourceAttributes;
@@ -30,14 +27,11 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.SubMonitor;
-import org.eclipse.jface.dialogs.ProgressMonitorDialog;
-import org.eclipse.jface.operation.IRunnableWithProgress;
 
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.activities.business.FileActivity;
 import de.fu_berlin.inf.dpp.activities.business.FileActivity.Purpose;
-import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 
@@ -138,9 +132,9 @@ public class FileUtils {
      *             if the file could not be written.
      */
     public static void writeFile(InputStream input, IFile file,
-        SubMonitor monitor) throws CoreException {
-        if (file != null && file.exists()) {
-            replaceFileContent(input, file, monitor);
+        IProgressMonitor monitor) throws CoreException {
+        if (file.exists()) {
+            file.setContents(input, IResource.FORCE, monitor);
         } else {
             createFile(input, file, monitor);
         }
@@ -176,9 +170,9 @@ public class FileUtils {
      *             progress monitor and will throw an LocalCancellationException
      *             in this case.
      */
-    public static boolean writeArchive(InputStream input,
-        IContainer container, SubMonitor monitor, ISarosSession iSarosSession)
-        throws CoreException, LocalCancellationException {
+    public static boolean writeArchive(InputStream input, IContainer container,
+        SubMonitor monitor, ISarosSession iSarosSession) throws CoreException,
+        LocalCancellationException {
 
         ZipInputStream zip = new ZipInputStream(input);
 
@@ -234,7 +228,7 @@ public class FileUtils {
      *      handled.
      */
     public static void createFile(final InputStream input, final IFile file,
-        SubMonitor monitor) throws CoreException {
+        IProgressMonitor monitor) throws CoreException {
 
         IWorkspaceRunnable createFolderProcedure = new IWorkspaceRunnable() {
             public void run(IProgressMonitor monitor) throws CoreException {
@@ -247,16 +241,7 @@ public class FileUtils {
                 if (parent != null)
                     wasReadOnly = setReadOnly(parent, false);
 
-                BlockingProgressMonitor blockingMonitor = new BlockingProgressMonitor(
-                    monitor);
-                file.create(input, true, blockingMonitor);
-
-                try {
-                    blockingMonitor.await();
-                } catch (InterruptedException e) {
-                    log.error("Code not designed to be interruptable", e);
-                    Thread.currentThread().interrupt();
-                }
+                file.create(input, true, monitor);
 
                 // Reset permissions on parent
                 if (parent != null && wasReadOnly)
@@ -269,33 +254,6 @@ public class FileUtils {
         workspace.run(createFolderProcedure, workspace.getRoot(),
             IWorkspace.AVOID_UPDATE, null);
 
-    }
-
-    /**
-     * Replace the data in the file with the data from the given InputStream.
-     * 
-     * @blocking This operations blocks until the operation is reported as
-     *           finished by Eclipse.
-     * 
-     * @pre the file must exist
-     */
-    public static void replaceFileContent(InputStream input, IFile file,
-        SubMonitor monitor) throws CoreException {
-
-        boolean wasReadOnly = setReadOnly(file, false);
-
-        BlockingProgressMonitor blockingMonitor = new BlockingProgressMonitor(
-            monitor);
-        file.setContents(input, IResource.FORCE, blockingMonitor);
-        try {
-            blockingMonitor.await();
-        } catch (InterruptedException e) {
-            log.error("Code not designed to be interruptable", e);
-            Thread.currentThread().interrupt();
-        }
-
-        if (wasReadOnly)
-            setReadOnly(file, true);
     }
 
     /**
@@ -383,53 +341,6 @@ public class FileUtils {
         workspace.run(createFolderProcedure, workspace.getRoot(),
             IWorkspace.AVOID_UPDATE, null);
 
-    }
-
-    /**
-     * @swt Must be called from the SWT thread
-     */
-    public static void setReadOnly(final IProject project,
-        final boolean readonly) {
-        ProgressMonitorDialog dialog = new ProgressMonitorDialog(
-            EditorAPI.getShell());
-        try {
-            dialog.run(true, false, new IRunnableWithProgress() {
-                public void run(final IProgressMonitor monitor) {
-                    FileUtils.setReadOnly(project, readonly, monitor);
-                }
-            });
-        } catch (InvocationTargetException e) {
-            log.error("Could not set project read-only: ", e);
-        } catch (InterruptedException e) {
-            log.error("Code not designed to be interruptable", e);
-            Thread.currentThread().interrupt();
-        }
-    }
-
-    public static void setReadOnly(IProject project, final boolean readonly,
-        final IProgressMonitor monitor) {
-        monitor.beginTask("Project settings ... ", IProgressMonitor.UNKNOWN);
-
-        try {
-            project.accept(new IResourceVisitor() {
-                public boolean visit(IResource resource) throws CoreException {
-
-                    // Don't set the project and derived
-                    // files read-only
-                    if (resource instanceof IProject || resource.isDerived())
-                        return true;
-
-                    setReadOnly(resource, readonly);
-                    monitor.worked(1);
-
-                    return true;
-                }
-            });
-        } catch (CoreException e) {
-            log.warn("Failure to set readonly to " + readonly + ":", e);
-        } finally {
-            monitor.done();
-        }
     }
 
     public static void delete(final IResource resource) throws CoreException {

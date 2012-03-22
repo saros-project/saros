@@ -469,13 +469,22 @@ public class SharedResourcesManager extends AbstractActivityProvider implements
         SPath path = activity.getPath();
         IFile file = path.getFile();
 
-        if (activity.isRecovery()) {
-            log.info("Received consistency file: " + activity);
+        boolean wasOpenedEditor = editorManager.isOpenEditor(path);
 
-            if (log.isInfoEnabled() && (activity.getContents() != null)) {
-                Utils.logDiff(log, activity.getSource().getJID(), path,
-                    activity.getContents(), file);
+        if (activity.isRecovery()) {
+
+            log.debug("performing recovery for file: "
+                + activity.getPath().getFullPath());
+
+            try {
+                editorManager.saveLazy(path);
+            } catch (FileNotFoundException e) {
+                log.error(e);
+                return;
             }
+
+            if (wasOpenedEditor)
+                editorManager.closeEditor(path);
         }
 
         // Create or remove file
@@ -483,7 +492,6 @@ public class SharedResourcesManager extends AbstractActivityProvider implements
         if (type == FileActivity.Type.Created) {
             // TODO The progress should be reported to the user.
             SubMonitor monitor = SubMonitor.convert(new NullProgressMonitor());
-            boolean wasOpenedEditor = editorManager.isOpenEditor(path);
             boolean needBased = activity.isNeedBased();
 
             if (needBased) {
@@ -555,13 +563,10 @@ public class SharedResourcesManager extends AbstractActivityProvider implements
 
             // while moving content of the file changed
             if (activity.getContents() != null) {
-
-                SubMonitor monitor = SubMonitor
-                    .convert(new NullProgressMonitor());
                 try {
                     FileUtils.writeFile(
                         new ByteArrayInputStream(activity.getContents()), file,
-                        monitor);
+                        new NullProgressMonitor());
                 } catch (Exception e) {
                     log.error("Could not write file: " + file);
                 }
@@ -574,6 +579,10 @@ public class SharedResourcesManager extends AbstractActivityProvider implements
             this.sarosSession.getConcurrentDocumentClient().reset(path);
 
             this.consistencyWatchdogClient.performCheck(path);
+
+            if (wasOpenedEditor)
+                editorManager.openEditor(path);
+
         }
     }
 
