@@ -222,7 +222,7 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
         final SubMonitor monitor, boolean forceWait) throws IOException,
         SarosCancellationException {
 
-        monitor.beginTask(null, 100);
+        monitor.beginTask("Receiving archive file", 100);
         log.debug("Receiving archive");
         final PacketFilter filter = PacketExtensionUtils
             .getIncomingTransferObjectFilter(incomingExtProv, sessionID,
@@ -237,7 +237,7 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
                 monitor);
         }
 
-        monitor.subTask("Waiting for archive...");
+        monitor.subTask("Waiting for archive file...");
         while (!collector.hasReceived()) {
             if (monitor.isCanceled()) {
                 throw new LocalCancellationException();
@@ -249,7 +249,7 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
             }
         }
 
-        monitor.subTask("Receiving archive...");
+        monitor.subTask("Receiving archive file...");
         try {
             IncomingTransferObject result = incomingExtProv.getPayload(receive(
                 monitor.newChild(packetListenerIBB == null ? 10 : 1),
@@ -690,7 +690,10 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
 
         byte[] content = xml.getBytes("UTF-8");
 
-        dataManager.sendData(data, content, progress.newChild(100));
+        // Not showing detailed progress here, because it is going fast, and the
+        // user would probably not understand what is happening here...
+        dataManager.sendData(data, content,
+            progress.newChild(100, SubMonitor.SUPPRESS_ALL_LABELS));
 
         progress.done();
     }
@@ -706,12 +709,7 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
         }
         progress.beginTask("Sending Archive", 100);
 
-        TransferDescription transfer = TransferDescription
-            .createArchiveTransferDescription(recipient, new JID(user),
-                sessionID.getValue(), invitationID);
-
-        progress.subTask("Reading archive");
-
+        progress.subTask("Reading archive to memory");
         byte[] content;
 
         if (archive == null) {
@@ -732,10 +730,13 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
 
         progress.worked(10);
 
-        progress.subTask("Sending archive");
-        dataManager.sendData(transfer, content, progress.newChild(90));
+        TransferDescription transfer = TransferDescription
+            .createArchiveTransferDescription(recipient, new JID(user),
+                sessionID.getValue(), invitationID, content.length);
 
-        progress.done();
+        progress.subTask("Sending project(s) archive ("
+            + Utils.formatByte(content.length) + ")");
+        dataManager.sendData(transfer, content, progress.newChild(90));
     }
 
     public void sendRemainingFiles() {

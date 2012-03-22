@@ -17,11 +17,11 @@ import de.fu_berlin.inf.dpp.exceptions.RemoteCancellationException;
 import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
 import de.fu_berlin.inf.dpp.invitation.ProcessTools.CancelOption;
 import de.fu_berlin.inf.dpp.net.IncomingTransferObject;
-import de.fu_berlin.inf.dpp.net.NetTransferMode;
 import de.fu_berlin.inf.dpp.net.internal.BinaryPacketProto.BinaryPacket;
 import de.fu_berlin.inf.dpp.net.internal.BinaryPacketProto.BinaryPacket.PacketType;
+import de.fu_berlin.inf.dpp.net.NetTransferMode;
+import de.fu_berlin.inf.dpp.util.StopWatch;
 import de.fu_berlin.inf.dpp.util.Utils;
-
 public class BinaryChannelTransferObject implements IncomingTransferObject {
 
     /**
@@ -68,6 +68,9 @@ public class BinaryChannelTransferObject implements IncomingTransferObject {
 
             LinkedList<BinaryPacket> resultList = new LinkedList<BinaryPacket>();
 
+            long receivedBytes = 0L;
+            StopWatch watch = new StopWatch().start();
+
             while (true) {
                 if (!this.binaryChannel.isConnected())
                     throw new LocalCancellationException(
@@ -112,6 +115,13 @@ public class BinaryChannelTransferObject implements IncomingTransferObject {
 
                 resultList.add(packet);
                 progress.worked(1);
+
+                receivedBytes += packet.getData().size();
+
+                progress.subTask("Received " + Utils.formatByte(receivedBytes)
+                    + " of " + Utils.formatByte(transferDescription.getSize())
+                    + watch.throughput(receivedBytes));
+
                 if (packet.getRemaining() == 0)
                     break;
             }
@@ -121,7 +131,8 @@ public class BinaryChannelTransferObject implements IncomingTransferObject {
             byte[] data = BinaryChannel.getData(resultList);
 
             transferredSize = data.length;
-
+            progress.subTask("Receiving finished");
+            
             if (transferDescription.compressContent())
                 data = Utils.inflate(data, progress.newChild(1));
 

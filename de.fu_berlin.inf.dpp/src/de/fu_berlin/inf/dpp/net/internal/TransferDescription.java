@@ -68,6 +68,8 @@ public class TransferDescription implements Serializable {
 
     private String archivePath;
 
+    public long size = 0L;
+    
     /**
      * Field used to indicate that the file is compressed already, like in
      * ARCHIVE_TRANSFER or RESOURCE_TRANSFER with a File like a jar, jpeg, ....
@@ -148,7 +150,8 @@ public class TransferDescription implements Serializable {
     }
 
     public static TransferDescription createArchiveTransferDescription(
-        JID recipient, JID sender, String sessionID, String invitationID) {
+        JID recipient, JID sender, String sessionID, String invitationID,
+        long size) {
 
         TransferDescription result = new TransferDescription();
         result.recipient = recipient;
@@ -157,7 +160,8 @@ public class TransferDescription implements Serializable {
         result.sessionID = sessionID;
         result.invitationID = invitationID;
         result.compress = false;
-
+        result.size = size;
+ 
         return result;
     }
 
@@ -318,6 +322,22 @@ public class TransferDescription implements Serializable {
 
     public boolean compressContent() {
         return compress;
+    }
+
+    /**
+     * Set the size of the object that is to be transferred (e.g. bytes, words,
+     * units)
+     */
+    public void setSize(long units) {
+        this.size = units;
+    }
+
+    /**
+     * Returns the size of the transferred object (in bytes or words or other
+     * units)
+     */
+    public long getSize() {
+        return this.size;
     }
 
 }

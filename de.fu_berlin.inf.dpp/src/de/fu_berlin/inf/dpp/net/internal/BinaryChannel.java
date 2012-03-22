@@ -30,6 +30,7 @@ import de.fu_berlin.inf.dpp.net.internal.BinaryPacketProto.BinaryPacket.PacketTy
 import de.fu_berlin.inf.dpp.util.AutoHashMap;
 import de.fu_berlin.inf.dpp.util.CausedIOException;
 import de.fu_berlin.inf.dpp.util.StackTrace;
+import de.fu_berlin.inf.dpp.util.StopWatch;
 import de.fu_berlin.inf.dpp.util.Utils;
 
 /**
@@ -319,7 +320,9 @@ public class BinaryChannel {
 
         int countData = Math.max(0, data.length / CHUNKSIZE) + 1;
         progress.beginTask("send direct", countData + 1);
-
+		 progress.subTask("Sending archive file: "
+            + Utils.formatByte(data.length));
+            
         int objectid = nextObjectId();
         transferDescription.setID(objectid);
 
@@ -399,11 +402,12 @@ public class BinaryChannel {
         byte[] data, SubMonitor progress) throws SarosCancellationException,
         IOException {
 
+        StopWatch watch = new StopWatch().start();
         int offset = 0;
         // splits into chunks with remaining == 0 is the last packet
         int size;
+        int sentChunks = 0;
         for (int idx = remaining; idx > 0; idx--) {
-
             if (isRejected(objectid))
                 return; /*
                          * Just return, sendDirect(byte[]) will take care of
@@ -420,7 +424,29 @@ public class BinaryChannel {
             send(buildPacket(type, idx - 1, objectid,
                 ByteString.copyFrom(data, offset, size)));
             offset += size;
+
+            sentChunks++;
             progress.worked(1);
+
+            // Estimate time left for transfer to finish
+            long mspassed = watch.getTime();
+            long timeForOneChunk = mspassed / sentChunks;
+            long secondsLeft = Math.round(idx * timeForOneChunk / 1000);
+
+            String taskname = "Sending archive file";
+            if (secondsLeft > 0) {
+                taskname += ": Approximately "
+                    + Utils.formatDuration(secondsLeft) + " left";
+            }
+            progress.setTaskName(taskname);
+            long remainingBytes = data.length - offset;
+            if (remainingBytes > 0) {
+                progress.subTask(" " + Utils.formatByte(remainingBytes)
+                    + " remaining - " + watch.throughput(offset) + ")");
+            } else {
+                progress.subTask("");
+            }
+
         }
     }
 

@@ -283,7 +283,7 @@ public class DataTransferManager implements IConnectionListener,
      * Dispatch to Transmitter.
      * 
      * @throws SarosCancellationException
-     *             It will be thrown if the local or buddy has canceled the
+     *             It will be thrown if the local user or buddy has canceled the
      *             transfer.
      * @throws IOException
      *             If a technical problem occurred.
@@ -330,7 +330,7 @@ public class DataTransferManager implements IConnectionListener,
                 payload = Utils.deflate(payload, progress.newChild(15));
             }
 
-            connection.send(transferData, payload, progress);
+            connection.send(transferData, payload, progress.newChild(85));
 
             watch.stop();
             transferModeDispatch.transferFinished(recipient,
