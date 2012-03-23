@@ -7,12 +7,16 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
+
 import de.fu_berlin.inf.dpp.project.IChecksumCache;
 
 /**
  * @author Stefan Rossbach
  */
 public final class ChecksumCacheImpl implements IChecksumCache {
+
+    private static final Logger LOG = Logger.getLogger(ChecksumCacheImpl.class);
 
     private static final int SEED = 0xDEADBEEF;
 
@@ -65,9 +69,17 @@ public final class ChecksumCacheImpl implements IChecksumCache {
                 Murmur3Hash<Long> hash = create128BitMurmur3Hash(path);
                 Murmur3Hash<Long> currentHash = getHash(path, hash);
 
-                if (currentHash != null)
+                if (currentHash != null) {
+                    if (LOG.isTraceEnabled())
+                        LOG.trace("invalidating checksum for existing file: "
+                            + path + " [" + currentHash + "]");
+
                     currentHash.setObject(null);
-                else {
+                } else {
+                    if (LOG.isTraceEnabled())
+                        LOG.trace("invalidating checksum for new file: " + path
+                            + " [" + hash + "]");
+
                     addChecksum(path, 0);
                     getHash(path, hash).setObject(null);
                 }
@@ -88,25 +100,35 @@ public final class ChecksumCacheImpl implements IChecksumCache {
     public synchronized Long getChecksum(String path) {
         Object object = cache.get(path.hashCode());
 
-        if (object == null)
+        if (object == null) {
+            logNoValidChecksum(path);
             return null;
+        }
 
         Murmur3Hash<Long> hash = create128BitMurmur3Hash(path);
 
         if (object instanceof Murmur3Hash) {
-            if (hash.equals(object))
-                return ((Murmur3Hash<Long>) object).getObject();
-            else
+            if (hash.equals(object)) {
+                Murmur3Hash<Long> currentHash = (Murmur3Hash<Long>) object;
+                logValidChecksum(path, currentHash);
+                return currentHash.getObject();
+            } else {
+                logNoValidChecksum(path);
                 return null;
+            }
         }
 
         List<Murmur3Hash<Long>> hashes = (List<Murmur3Hash<Long>>) object;
         int index = hashes.indexOf(hash);
 
-        if (index == -1)
+        if (index == -1) {
+            logNoValidChecksum(path);
             return null;
+        }
 
-        return hashes.get(index).getObject();
+        Murmur3Hash<Long> currentHash = hashes.get(index);
+        logValidChecksum(path, currentHash);
+        return currentHash.getObject();
     }
 
     @Override
@@ -311,5 +333,16 @@ public final class ChecksumCacheImpl implements IChecksumCache {
 
     private int toInt(byte b) {
         return b & 0xFF;
+    }
+
+    private void logNoValidChecksum(String path) {
+        if (LOG.isTraceEnabled())
+            LOG.trace("no valid checksum found for file: " + path);
+    }
+
+    private void logValidChecksum(String path, Murmur3Hash<Long> hash) {
+        if (LOG.isTraceEnabled())
+            LOG.trace("found valid checksum found for file: " + path + " ["
+                + hash.getObject() + "," + hash + "]");
     }
 }
