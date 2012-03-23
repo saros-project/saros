@@ -387,6 +387,20 @@ public class FileList {
                 vcsProviderID = providerID;
                 vcsRepositoryRoot = vcs.getRepositoryString(project);
                 vcsProjectInfo = vcs.getCurrentResourceInfo(project);
+                /*
+                 * FIXME we need to stop querying for VCS revisions the moment
+                 * we reach the first exception
+                 * 
+                 * Caused by:
+                 * org.tigris.subversion.svnclientadapter.SVNClientException:
+                 * org.apache.subversion.javahl.ClientException: The working
+                 * copy needs to be upgraded
+                 * 
+                 * which will significantly slow down the overall invitation
+                 * process. It doesn't make sense to check for other files. If
+                 * there is one resource that is not upgraded, this fails
+                 * overall...
+                 */
             }
         }
 
