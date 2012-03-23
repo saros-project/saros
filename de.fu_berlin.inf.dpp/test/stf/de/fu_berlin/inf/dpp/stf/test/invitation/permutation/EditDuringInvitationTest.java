@@ -31,6 +31,12 @@ public class EditDuringInvitationTest extends StfTestCase {
         Util.setUpSessionWithJavaProjectAndClass(Constants.PROJECT1,
             Constants.PKG1, Constants.CLS1, ALICE, BOB);
 
+        BOB.superBot()
+            .views()
+            .packageExplorerView()
+            .waitUntilClassExists(Constants.PROJECT1, Constants.PKG1,
+                Constants.CLS1);
+
         ALICE.superBot().views().sarosView().selectBuddy(CARL.getJID())
             .addToSarosSession();
 
@@ -77,6 +83,7 @@ public class EditDuringInvitationTest extends StfTestCase {
 
         ALICE.remoteBot().editor(Constants.CLS1_SUFFIX)
             .waitUntilIsTextSame(textByBob);
+
         String textByAlice = ALICE.remoteBot().editor(Constants.CLS1_SUFFIX)
             .getText();
 
