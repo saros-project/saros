@@ -13,6 +13,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 import org.picocontainer.MutablePicoContainer;
@@ -84,6 +85,8 @@ public class STFController {
     private static Registry registry;
 
     public static void start(int port, Saros saros) throws RemoteException {
+
+        LogManager.resetConfiguration();
 
         PropertyConfigurator.configure(STFController.class.getClassLoader()
             .getResource("saros_testmode.log4j.properties"));
