@@ -617,6 +617,18 @@ public class SarosView extends ViewPart {
         });
     }
 
+    /**
+     * Remove any balloon notifications that might be left, because they have
+     * become obsolete for a reason
+     */
+    public static void clearNotifications() {
+        Utils.runSafeSWTAsync(log, new Runnable() {
+            public void run() {
+                BalloonNotification.removeAllActiveNotifications();
+            }
+        });
+    }
+
     @Override
     public void setFocus() {
         // TODO Auto-generated method stub
