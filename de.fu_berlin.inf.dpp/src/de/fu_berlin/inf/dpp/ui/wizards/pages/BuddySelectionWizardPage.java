@@ -4,13 +4,13 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.eclipse.jface.dialogs.IMessageProvider;
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.ui.PlatformUI;
 import org.jivesoftware.smack.Roster;
 import org.picocontainer.annotations.Inject;
 
@@ -45,6 +45,9 @@ public class BuddySelectionWizardPage extends WizardPage {
 
     protected BuddySelectionComposite buddySelectionComposite;
 
+    @Inject
+    protected IPreferenceStore preferenceStore;
+
     /**
      * This {@link BuddySelectionListener} changes the {@link WizardPage}'s
      * state according to the selected {@link JID}s.
@@ -56,7 +59,8 @@ public class BuddySelectionWizardPage extends WizardPage {
 
         public void filterNonSarosBuddiesChanged(
             FilterNonSarosBuddiesChangedEvent event) {
-            PlatformUI.getPreferenceStore().setValue(
+
+            preferenceStore.setValue(
                 PreferenceConstants.BUDDYSELECTION_FILTERNONSAROSBUDDIES,
                 event.isFilterNonSarosBuddies());
         }
@@ -110,10 +114,11 @@ public class BuddySelectionWizardPage extends WizardPage {
         /*
          * Row 1
          */
-        Label buddytSelectionLabel = new Label(composite, SWT.NONE);
-        buddytSelectionLabel.setLayoutData(new GridData(SWT.BEGINNING, SWT.TOP,
+        Label buddySelectionLabel = new Label(composite, SWT.NONE);
+        buddySelectionLabel.setLayoutData(new GridData(SWT.BEGINNING, SWT.TOP,
             false, true));
-        buddytSelectionLabel.setText(Messages.BuddySelectionWizardPage_label_buddies);
+        buddySelectionLabel
+            .setText(Messages.BuddySelectionWizardPage_label_buddies);
 
         createBuddySelectionComposite(composite);
         this.buddySelectionComposite.setLayoutData(new GridData(SWT.FILL,
@@ -130,10 +135,20 @@ public class BuddySelectionWizardPage extends WizardPage {
             && !this.buddySelectionComposite.isDisposed())
             this.buddySelectionComposite.dispose();
 
+        boolean initialFilterConfig = true;
+
+        String preferredFilterConfig = preferenceStore
+            .getString(PreferenceConstants.BUDDYSELECTION_FILTERNONSAROSBUDDIES);
+        if (preferredFilterConfig.equals("true")
+            || preferredFilterConfig.equals("false")) {
+            initialFilterConfig = preferenceStore
+                .getBoolean(PreferenceConstants.BUDDYSELECTION_FILTERNONSAROSBUDDIES);
+        }
+
+        // if nothing is set yet, use YES as initial config...
+
         this.buddySelectionComposite = new BuddySelectionComposite(parent,
-            SWT.BORDER | SWT.V_SCROLL, PlatformUI.getPreferenceStore()
-                .getBoolean(
-                    PreferenceConstants.BUDDYSELECTION_FILTERNONSAROSBUDDIES));
+            SWT.BORDER | SWT.V_SCROLL, initialFilterConfig);
         this.buddySelectionComposite
             .setSelectedBuddies(SelectionRetrieverFactory
                 .getSelectionRetriever(JID.class).getOverallSelection());
