@@ -479,8 +479,8 @@ public class FileList {
                     boolean isInvalid = checksumCache.addChecksum(path,
                         data.checksum);
 
-                    if (isInvalid)
-                        log.warn("calculated checksum on dirty data or checksum was invalidated: "
+                    if (isInvalid && checksum != null)
+                        log.warn("calculated checksum on dirty data: "
                             + file.getFullPath());
                 }
 
