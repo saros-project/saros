@@ -59,7 +59,6 @@ import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.util.ActivityUtils;
 import de.fu_berlin.inf.dpp.util.AutoHashMap;
-import de.fu_berlin.inf.dpp.util.StackTrace;
 import de.fu_berlin.inf.dpp.util.Utils;
 
 /**
@@ -763,6 +762,9 @@ public class ActivitySequencer {
         ArrayList<User> toSendViaNetwork = new ArrayList<User>();
         for (User user : recipients) {
             if (user.isLocal()) {
+                log.trace("dispatching activity object " + activityDataObject
+                    + " to the local user: " + user.getJID());
+
                 dispatchThread.executeAsDispatch(new Runnable() {
                     public void run() {
                         sarosSession.exec(Collections
@@ -775,7 +777,6 @@ public class ActivitySequencer {
         }
 
         if (toSendViaNetwork.isEmpty()) {
-            log.trace(null, new StackTrace());
             return;
         }
         this.outgoingQueue.add(new DataObjectQueueItem(toSendViaNetwork,
