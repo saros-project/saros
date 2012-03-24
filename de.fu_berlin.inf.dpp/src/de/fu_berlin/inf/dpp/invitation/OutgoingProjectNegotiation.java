@@ -109,7 +109,8 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
 
         List<File> zipArchives = new ArrayList<File>();
 
-        monitor.beginTask("Negotiating project...", 100);
+        this.monitor.beginTask(
+            "Retrieving list of files needed for synchronization...", 100);
 
         try {
             sendFileList(monitor.newChild(0));
@@ -153,6 +154,16 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
         }
     }
 
+    /**
+     * Build the list of files (with checksums, so it might take a while) that
+     * should be present on the remote users computer to participate in the
+     * session. The filelists are contained in the {@see ProjectExchangeInfo}
+     * Objects for each Project, and wrapped in a {@see ProjectsAddedActivity}
+     * that is finally sent to the user
+     * 
+     * @param subMonitor
+     * @throws LocalCancellationException
+     */
     private void sendFileList(SubMonitor monitor)
         throws LocalCancellationException {
 
@@ -160,7 +171,8 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
 
             if (this.projectExchangeInfos == null) {
 
-                monitor.beginTask("Creating file list...", projects.size());
+                monitor.beginTask("Creating file lists with checksums",
+                    projects.size());
 
                 useVersionControl = sarosSession.useVersionControl();
                 projectExchangeInfos = new ArrayList<ProjectExchangeInfo>(
@@ -173,6 +185,19 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
                     String projectID = sarosSession.getProjectID(iProject);
                     String projectName = iProject.getName();
 
+                    /*
+                     * Create FileList involves computing checksums for all
+                     * files so expect this to take a while when large files are
+                     * included...
+                     */
+                    if (this.projectResources.get(iProject) != null) {
+                        monitor.subTask("Listung & Hashing "
+                            + this.projectResources.get(iProject).size()
+                            + " files in project " + iProject.getName());
+                    } else {
+                        monitor.subTask("Listung & Hashing files in project "
+                            + iProject.getName());
+                    }
                     FileList projectFileList = FileListFactory.createFileList(
                         iProject, projectResources.get(iProject),
                         checksumCache, useVersionControl, monitor.newChild(1));
@@ -214,8 +239,12 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
     }
 
     /**
-     * Wait for the peer's partial file list which contains the files that we
-     * must send.
+     * Retrieve the peer's partial file list and remember which files need to be
+     * sent to that user
+     * 
+     * @param subMonitor
+     * @throws IOException
+     * @throws SarosCancellationException
      */
     protected void getRemoteFileList(SubMonitor monitor) throws IOException,
         SarosCancellationException {
@@ -224,7 +253,8 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
             + ": Waiting for remote file list...");
 
         try {
-            monitor.beginTask("Waiting for the " + peer + " file list...", 1);
+            monitor.beginTask("Waiting for " + peer.getName()
+                + " to choose project(s) location", 1);
 
             checkCancellation(CancelOption.NOTIFY_PEER);
 
@@ -505,17 +535,16 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
     protected void sendArchive(SubMonitor monitor, File archive,
         String projectID) throws SarosCancellationException, IOException {
 
-        monitor.beginTask("Sending archive...", 1);
+        monitor.beginTask("Sending archive...", 100);
 
         log.debug("Inv" + Utils.prefix(peer) + ": Sending archive...");
-        monitor.setTaskName("Sending archive...");
 
         if (archive == null)
             log.debug("Inv" + Utils.prefix(peer) + ": The archive is empty.");
 
         try {
             transmitter.sendProjectArchive(peer, projectID, archive,
-                monitor.newChild(1, SubMonitor.SUPPRESS_ALL_LABELS));
+                monitor.newChild(100, SubMonitor.SUPPRESS_NONE));
         } finally {
             monitor.done();
         }

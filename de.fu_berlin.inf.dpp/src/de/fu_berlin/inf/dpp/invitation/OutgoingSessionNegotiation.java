@@ -39,6 +39,7 @@ import de.fu_berlin.inf.dpp.net.internal.discoveryManager.DiscoveryManager;
 import de.fu_berlin.inf.dpp.net.internal.extensions.PacketExtensionUtils;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
+import de.fu_berlin.inf.dpp.project.SarosSessionManager;
 import de.fu_berlin.inf.dpp.ui.wizards.InvitationWizard;
 import de.fu_berlin.inf.dpp.util.Utils;
 import de.fu_berlin.inf.dpp.util.VersionManager;
@@ -93,6 +94,9 @@ public class OutgoingSessionNegotiation extends InvitationProcess {
     @Inject
     protected DataTransferManager dataTransferManager;
 
+    @Inject
+    protected SarosSessionManager sessionManager;
+
     public OutgoingSessionNegotiation(JID peer, int colorID,
         ISarosSession sarosSession, String description,
         SarosContext sarosContext) {
@@ -129,7 +133,7 @@ public class OutgoingSessionNegotiation extends InvitationProcess {
     public void start(SubMonitor monitor) throws SarosCancellationException {
         log.debug("Inv" + Utils.prefix(peer) + ": Invitation has started.");
 
-        monitor.beginTask("Negotiating session...", 100);
+        monitor.beginTask("Invitation starting", 100);
         this.invitationID = String.valueOf(INVITATION_RAND.nextLong());
         this.monitor = monitor;
 
@@ -160,14 +164,17 @@ public class OutgoingSessionNegotiation extends InvitationProcess {
             monitor.subTask("");
             monitor.worked(7);
 
+            /*
+             * User accepted the invitation, so NOW we can create the
+             * filelists... not before the invitation was accepted!
+             */
             editorManager.setAllLocalOpenedEditorsLocked(true);
-
             // FIXME lock the projects on the workspace !
+
             List<ProjectExchangeInfo> projectExchangeInfos = sarosSessionManager
                 .createProjectExchangeInfoList(new ArrayList<IProject>(
                     sarosSession.getProjects()), monitor.newChild(85,
                     SubMonitor.SUPPRESS_NONE));
-
             monitor.subTask("");
 
             completeInvitation(monitor.newChild(5, SubMonitor.SUPPRESS_NONE),
@@ -256,8 +263,8 @@ public class OutgoingSessionNegotiation extends InvitationProcess {
         throws SarosCancellationException {
 
         log.debug("Inv" + Utils.prefix(peer) + ": Checking peer's version...");
-        subMonitor.beginTask("Checking version compatibility...", 1);
-
+       subMonitor.beginTask("Checking version compatibility...", 1);
+       
         VersionInfo versionInfo = versionManager.determineCompatibility(peer);
 
         checkCancellation(CancelOption.DO_NOT_NOTIFY_PEER);
@@ -303,8 +310,8 @@ public class OutgoingSessionNegotiation extends InvitationProcess {
      */
     protected void sendInvitation(SubMonitor subMonitor)
         throws SarosCancellationException, IOException {
-
         subMonitor.beginTask("Sending invitation...", 3);
+        subMonitor.subTask("Preparing data connection...");
 
         log.debug("Inv" + Utils.prefix(peer) + ": Sending invitation...");
         checkCancellation(CancelOption.DO_NOT_NOTIFY_PEER);
@@ -343,8 +350,7 @@ public class OutgoingSessionNegotiation extends InvitationProcess {
                     : "Missing Saros support.", CancelOption.DO_NOT_NOTIFY_PEER);
         }
 
-        subMonitor
-            .setTaskName("Invitation acknowledged. Waiting for user list request...");
+        subMonitor.setTaskName("Waiting for user to accept invitation");
 
         if (collectPacket(userListRequestCollector, USER_LIST_REQUEST_TIMEOUT,
             subMonitor) == null) {
@@ -356,7 +362,7 @@ public class OutgoingSessionNegotiation extends InvitationProcess {
         // Reply is send in addUserToSession !
 
         log.debug("Inv" + Utils.prefix(peer)
-            + ": User list request has received.");
+            + ": User list request was received.");
 
         subMonitor.done();
     }
@@ -405,6 +411,14 @@ public class OutgoingSessionNegotiation extends InvitationProcess {
         cancellationCause = new RemoteCancellationException(errorMsg);
     }
 
+    /**
+     * Receives an invitation complete message and finalizes the Invitation
+     * negotiation job, then starts the OutgoingProjectNegotiation
+     * 
+     * @param subMonitor
+     * @param projectExchangeInfos
+     * @throws SarosCancellationException
+     */
     protected void completeInvitation(SubMonitor subMonitor,
         List<ProjectExchangeInfo> projectExchangeInfos)
         throws SarosCancellationException {
@@ -429,19 +443,17 @@ public class OutgoingSessionNegotiation extends InvitationProcess {
             sarosSession.userInvitationCompleted(sarosSession.getUser(peer));
             checkCancellation(CancelOption.NOTIFY_PEER);
             sarosSession.synchronizeUserList(xmppTransmitter, peer,
-                invitationID,
-                subMonitor.newChild(1, SubMonitor.SUPPRESS_ALL_LABELS));
+                invitationID, subMonitor.newChild(1, SubMonitor.SUPPRESS_NONE)); // SUPPRESSALL
         }
 
         subMonitor.setTaskName("Invitation has completed successfully.");
+        subMonitor.done();
 
         invitationProcesses.removeInvitationProcess(this);
         log.debug("Inv" + Utils.prefix(peer)
             + ": Invitation has completed successfully.");
 
         sarosSessionManager.startSharingProjects(peer, projectExchangeInfos);
-        subMonitor.done();
-
     }
 
     public void localCancel(String errorMsg, CancelOption cancelOption) {

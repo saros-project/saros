@@ -110,7 +110,6 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
     public Map<String, String> getProjectNames() {
         Map<String, String> result = new HashMap<String, String>();
         for (ProjectExchangeInfo info : this.projectInfos) {
-            log.debug(info.getProjectID() + ": " + info.getProjectName());
             result.put(info.getProjectID(), info.getProjectName());
         }
         return result;

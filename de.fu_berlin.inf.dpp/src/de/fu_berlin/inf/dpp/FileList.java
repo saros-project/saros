@@ -410,6 +410,7 @@ public class FileList {
 
         List<IFile> files = new LinkedList<IFile>();
 
+        monitor.subTask("Reading SVN revisions for shared files...");
         while (!stack.isEmpty()) {
             IResource resource = stack.pop();
 

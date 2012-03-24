@@ -177,7 +177,7 @@ public class SarosSessionManager implements ISarosSessionManager {
      * 
      */
     public void startSession(
-        HashMap<IProject, List<IResource>> projectResourcesMapping)
+        final HashMap<IProject, List<IResource>> projectResourcesMapping)
         throws XMPPException {
 
         if (!connected) {
@@ -187,7 +187,7 @@ public class SarosSessionManager implements ISarosSessionManager {
         this.sessionID.setValue(String.valueOf(sessionRandom
             .nextInt(Integer.MAX_VALUE)));
 
-        SarosSession sarosSession = new SarosSession(this.transmitter,
+        final SarosSession sarosSession = new SarosSession(this.transmitter,
             dispatchThreadContext, new DateTime(), sarosContext);
 
         this.sarosSessionObservable.setValue(sarosSession);
@@ -196,22 +196,49 @@ public class SarosSessionManager implements ISarosSessionManager {
         sarosSession.start();
         notifySarosSessionStarted(sarosSession);
 
-        for (Entry<IProject, List<IResource>> mapEntry : projectResourcesMapping
-            .entrySet()) {
-            IProject iProject = mapEntry.getKey();
-            List<IResource> resourcesList = mapEntry.getValue();
-            if (!iProject.isOpen()) {
-                try {
-                    iProject.open(null);
-                } catch (CoreException e1) {
-                    log.debug("An error occur while opening project", e1);
-                    continue;
+        Job sessionStartupJob = new Job("Session Startup") {
+
+            @Override
+            protected IStatus run(IProgressMonitor monitor) {
+                monitor.setTaskName("Creating list of all project files");
+                monitor.beginTask("Creating list of all project files",
+                    IProgressMonitor.UNKNOWN);
+
+                for (Entry<IProject, List<IResource>> mapEntry : projectResourcesMapping
+                    .entrySet()) {
+                    if (monitor.isCanceled()) {
+                        log.error("Session startup was interrupted.");
+                        return Status.CANCEL_STATUS;
+                    }
+                    IProject iProject = mapEntry.getKey();
+                    List<IResource> resourcesList = mapEntry.getValue();
+                    if (!iProject.isOpen()) {
+                        try {
+                            iProject.open(null);
+                        } catch (CoreException e1) {
+                            log.debug(
+                                "An error occur while opening project", e1); //$NON-NLS-1$
+                            continue;
+                        }
+                    }
+                    String projectID = String.valueOf(sessionRandom
+                        .nextInt(Integer.MAX_VALUE));
+                    sarosSession.addSharedResources(iProject, projectID,
+                        resourcesList);
+                    notifyProjectAdded(iProject);
                 }
+                monitor.done();
+                return Status.OK_STATUS;
             }
-            String projectID = String.valueOf(sessionRandom
-                .nextInt(Integer.MAX_VALUE));
-            sarosSession.addSharedResources(iProject, projectID, resourcesList);
-            notifyProjectAdded(iProject);
+        };
+        sessionStartupJob.setPriority(Job.SHORT);
+        sessionStartupJob.setUser(true);
+        sessionStartupJob.schedule();
+        try {
+            sessionStartupJob.join();
+        } catch (InterruptedException e) {
+            log.error("Session startup was interrupted.", e);
+            Thread.currentThread().interrupt();
         }
 
         SarosSessionManager.log.info("Session started");
@@ -414,8 +441,9 @@ public class SarosSessionManager implements ISarosSessionManager {
 
         public OutgoingInvitationJob(OutgoingSessionNegotiation process) {
             super(MessageFormat.format(
-                Messages.SarosSessionManager_inviting_user, process.getPeer()
-                    .getBase()));
+                Messages.SarosSessionManager_inviting_user, User
+                    .getHumanReadableName(getSarosSession().getSaros()
+                        .getSarosNet(), process.getPeer())));
             this.process = process;
             this.peer = process.getPeer().getBase();
             this.setUser(true);
@@ -428,8 +456,16 @@ public class SarosSessionManager implements ISarosSessionManager {
         @Override
         protected IStatus run(IProgressMonitor monitor) {
             try {
-
                 registerCancelListener();
+                /*
+                 * Since in the end there is no real "progress" when waiting for
+                 * the remote user to accept the invitation, and the steps in
+                 * the session invitation process are executed rather fast, use
+                 * the "unknown" state progress monitor (progress bar marquee)
+                 * BUT: SubMonitors cannot use the IProgressMonitor.UNKNOWN
+                 * flag, and remain at 0%, so don't try to switch this ;-)
+                 */
+                monitor.beginTask("OutgoingInvitationJob", 100);
                 process.start(SubMonitor.convert(monitor));
 
             } catch (LocalCancellationException e) {
@@ -614,10 +650,8 @@ public class SarosSessionManager implements ISarosSessionManager {
                 FileList projectFileList = FileListFactory.createFileList(
                     iProject,
                     this.getSarosSession().getSharedResources(iProject),
-                    checksumCache,
-                    this.getSarosSession().useVersionControl(),
-                    subMonitor.newChild(1, SubMonitor.SUPPRESS_BEGINTASK
-                        | SubMonitor.SUPPRESS_SETTASKNAME));
+                    checksumCache, this.getSarosSession().useVersionControl(),
+                    subMonitor.newChild(100 / projectsToShare.size()));
 
                 projectFileList.setProjectID(projectID);
                 boolean partial = !this.getSarosSession().isCompletelyShared(
@@ -650,6 +684,11 @@ public class SarosSessionManager implements ISarosSessionManager {
 
         };
 
+        @Override
+        public boolean belongsTo(Object family) {
+            return family.equals("invitational");
+        }
+
         public OutgoingProjectJob(
             OutgoingProjectNegotiation outgoingProjectNegotiation) {
             super(MessageFormat.format(
@@ -668,7 +707,9 @@ public class SarosSessionManager implements ISarosSessionManager {
             try {
 
                 registerCancelListener();
-                process.start(SubMonitor.convert(monitor));
+                monitor.beginTask("OutgoingInvitationJob", 100);
+                process.start(SubMonitor.convert(monitor,
+                    SubMonitor.SUPPRESS_NONE));
 
             } catch (LocalCancellationException e) {
 
@@ -680,11 +721,8 @@ public class SarosSessionManager implements ISarosSessionManager {
                     String message = MessageFormat
                         .format(
                             Messages.SarosSessionManager_project_sharing_cancelled_text,
-                            peer);
-
-                    SarosView.showNotification(
-                        Messages.SarosSessionManager_project_sharing_cancelled,
-                        message);
+                            User.getHumanReadableName(getSarosSession()
+                                .getSaros().getSarosNet(), new JID(peer)));
 
                     return new Status(IStatus.ERROR, Saros.SAROS, message);
 
@@ -692,7 +730,9 @@ public class SarosSessionManager implements ISarosSessionManager {
                     String message = MessageFormat
                         .format(
                             Messages.SarosSessionManager_sharing_project_cancelled_remotely,
-                            peer, e.getMessage());
+                            User.getHumanReadableName(getSarosSession()
+                                .getSaros().getSarosNet(), new JID(peer)), e
+                                .getMessage());
                     SarosView
                         .showNotification(
                             Messages.SarosSessionManager_sharing_project_cancelled_remotely_text,

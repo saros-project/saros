@@ -24,6 +24,7 @@ import java.util.Date;
 import org.apache.log4j.Logger;
 
 import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.net.SarosNet;
 import de.fu_berlin.inf.dpp.net.util.RosterUtils;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.util.StackTrace;
@@ -165,8 +166,8 @@ public class User {
     }
 
     /**
-     * @return <code>true</code> if the invitation is currently in progress,
-     *         <code>false</code> if the invitation process is complete
+     * @return <code>false</code> if the invitation is currently in progress,
+     *         <code>true</code> if the invitation process is complete
      */
     public boolean isInvitationComplete() {
         return this.invitationComplete;
@@ -181,8 +182,7 @@ public class User {
      */
     public void invitationCompleted() {
         if (invitationComplete)
-            throw new IllegalStateException(
-                Messages.User_invitation);
+            throw new IllegalStateException(Messages.User_invitation);
         invitationComplete = true;
     }
 
@@ -221,9 +221,8 @@ public class User {
             return false;
         if (getClass() != obj.getClass()) {
             if (obj.getClass() == String.class || obj.getClass() == JID.class)
-                log.warn(
-                    Messages.User_comparing
-                        + obj.getClass(), new StackTrace());
+                log.warn(Messages.User_comparing + obj.getClass(),
+                    new StackTrace());
             return false;
         }
         User other = (User) obj;
@@ -286,6 +285,32 @@ public class User {
         if (isLocal()) {
             return Messages.User_you;
         }
+        return User.getHumanReadableName(getSarosSession().getSaros()
+            .getSarosNet(), getJID());
+    }
+
+    /**
+     * Returns the alias for the user (if any set) with JID in brackets,
+     * Example: "Alice (alice@saros-con.imp.fu-berlin.de)"
+     * 
+     * @param sarosNet
+     * @param user
+     * @return
+     */
+    public static String getHumanReadableName(SarosNet sarosNet, JID user) {
+        String nickName = RosterUtils.getNickname(sarosNet, user);
+        String jidBase = user.getBase();
+        if (nickName != null && !nickName.equals(jidBase)) {
+            jidBase = nickName + " (" + jidBase + ")";
+        }
+        return jidBase;
+    }
+
+    public String getShortHumanReadableName() {
+
+        if (isLocal()) {
+            return Messages.User_you;
+        }
 
         /*
          * TODO This should use a subscription based mechanism or cache the
@@ -293,12 +318,11 @@ public class User {
          */
         String nickName = RosterUtils.getNickname(getSarosSession().getSaros()
             .getSarosNet(), getJID());
-        String jidBase = getJID().getBase();
 
-        if (nickName != null && !nickName.equals(jidBase)) {
-            return nickName + " (" + jidBase + ")"; //$NON-NLS-1$ //$NON-NLS-2$
+        if (nickName != null && !nickName.equals(getJID().getBase())) {
+            return nickName; //$NON-NLS-1$ //$NON-NLS-2$
         }
 
-        return jidBase;
+        return getJID().getName();
     }
 }
