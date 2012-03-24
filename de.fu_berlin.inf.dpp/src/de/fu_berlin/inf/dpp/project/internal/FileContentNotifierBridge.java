@@ -1,10 +1,14 @@
 package de.fu_berlin.inf.dpp.project.internal;
 
+import java.util.Arrays;
+import java.util.Deque;
+import java.util.LinkedList;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceChangeEvent;
 import org.eclipse.core.resources.IResourceChangeListener;
+import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.resources.ResourcesPlugin;
 
 /**
@@ -26,13 +30,22 @@ public class FileContentNotifierBridge implements IFileContentChangedNotifier,
 
     @Override
     public void resourceChanged(IResourceChangeEvent event) {
-        if (event.getType() == IResourceChangeEvent.POST_CHANGE
-            && event.getResource() instanceof IFile) {
-            IFile file = (IFile) event.getResource();
+        if (event.getDelta() == null)
+            return;
 
-            for (IFileContentChangedListener listener : fileContentChangedListeners)
-                listener.fileContentChanged(file.getFullPath()
-                    .toPortableString());
+        Deque<IResourceDelta> stack = new LinkedList<IResourceDelta>();
+
+        stack.addAll(Arrays.asList(event.getDelta().getAffectedChildren()));
+
+        while (!stack.isEmpty()) {
+            IResourceDelta delta = stack.pop();
+            stack.addAll(Arrays.asList(delta.getAffectedChildren()));
+
+            if (delta.getResource().getType() == IResource.FILE) {
+                for (IFileContentChangedListener listener : fileContentChangedListeners)
+                    listener.fileContentChanged(delta.getResource()
+                        .getFullPath().toPortableString());
+            }
         }
     }
 
