@@ -20,7 +20,7 @@ import de.fu_berlin.inf.dpp.ui.dialogs.ErrorMessageDialog;
  * 
  * @author ologa
  */
-public class AudioReceiverRunnable {
+public class AudioReceiverRunnable implements Runnable {
 
     private static final Logger log = Logger
         .getLogger(AudioReceiverRunnable.class);
@@ -61,22 +61,6 @@ public class AudioReceiverRunnable {
     }
 
     /**
-     * <p>
-     * <ol>
-     * <li>Loading preference from preference store</li>
-     * <li>Initalize the decoder & playback device (mixer)</li>
-     * </ol>
-     * </p>
-     */
-
-    public void start() {
-        if (!started) {
-            started = true;
-            player.start();
-        }
-    }
-
-    /**
      * Close all receiver / playback related Threads
      */
     public void stop() {
@@ -89,6 +73,14 @@ public class AudioReceiverRunnable {
             started = false;
         }
 
+    }
+
+    @Override
+    public void run() {
+        if (!started) {
+            started = true;
+            player.start();
+        }
     }
 
 }

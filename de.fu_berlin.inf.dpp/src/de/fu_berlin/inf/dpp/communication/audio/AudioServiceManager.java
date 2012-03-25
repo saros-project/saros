@@ -228,6 +228,7 @@ public class AudioServiceManager {
                 "Another VoIP session is already started.");
 
         setStatus(VoIPStatus.RUNNING);
+
         log.debug("VoIP Status: RUNNING!");
         session = newSession;
         session.setListener(audioStreamSessionListener);
@@ -238,13 +239,13 @@ public class AudioServiceManager {
         if (recordDeviceOk) {
             audioSenderRunnable = new AudioSenderRunnable(
                 session.getOutputStream(0), this, preferenceUtils);
-            Utils.runSafeAsync("audioSenderRunnable", log, audioSenderRunnable);
+            Utils.runSafeAsync("Audio-Sender", log, audioSenderRunnable);
         }
 
         if (playbackDeviceOk) {
             audioReceiverRunnable = new AudioReceiverRunnable(
                 session.getInputStream(0), this, preferenceUtils);
-            audioReceiverRunnable.start();
+            Utils.runSafeAsync("Audio-Receiver", log, audioReceiverRunnable);
         }
     }
 
