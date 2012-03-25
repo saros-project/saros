@@ -38,7 +38,7 @@ public class ViewerUtils {
      * @see Viewer#setInput(Object)
      */
     public static void setInput(final Viewer viewer, final Object input) {
-        Display.getDefault().syncExec(new Runnable() {
+        Display.getDefault().asyncExec(new Runnable() {
             public void run() {
                 if (viewer == null || viewer.getControl().isDisposed())
                     return;
@@ -61,7 +61,7 @@ public class ViewerUtils {
      */
     public static void add(final Viewer viewer,
         final Object parentElementOrTreePath, final Object childElement) {
-        Display.getDefault().syncExec(new Runnable() {
+        Display.getDefault().asyncExec(new Runnable() {
             public void run() {
                 if (viewer == null || viewer.getControl().isDisposed())
                     return;
@@ -89,7 +89,7 @@ public class ViewerUtils {
      */
     public static void add(final Viewer viewer,
         final Object parentElementOrTreePath, final Object[] childElements) {
-        Display.getDefault().syncExec(new Runnable() {
+        Display.getDefault().asyncExec(new Runnable() {
             public void run() {
                 if (viewer == null || viewer.getControl().isDisposed())
                     return;
@@ -115,7 +115,7 @@ public class ViewerUtils {
      */
     public static void remove(final Viewer viewer,
         final Object elementsOrTreePaths) {
-        Display.getDefault().syncExec(new Runnable() {
+        Display.getDefault().asyncExec(new Runnable() {
             public void run() {
                 if (viewer == null || viewer.getControl().isDisposed())
                     return;
@@ -141,7 +141,7 @@ public class ViewerUtils {
      */
     public static void remove(final Viewer viewer,
         final Object[] elementsOrTreePaths) {
-        Display.getDefault().syncExec(new Runnable() {
+        Display.getDefault().asyncExec(new Runnable() {
             public void run() {
                 if (viewer == null || viewer.getControl().isDisposed())
                     return;
@@ -168,7 +168,7 @@ public class ViewerUtils {
      */
     public static void update(final Viewer viewer, final Object element,
         final String[] properties) {
-        Display.getDefault().syncExec(new Runnable() {
+        Display.getDefault().asyncExec(new Runnable() {
             public void run() {
                 if (viewer == null || viewer.getControl().isDisposed())
                     return;
@@ -195,7 +195,7 @@ public class ViewerUtils {
      */
     public static void update(final Viewer viewer, final Object[] elements,
         final String[] properties) {
-        Display.getDefault().syncExec(new Runnable() {
+        Display.getDefault().asyncExec(new Runnable() {
             public void run() {
                 if (viewer == null || viewer.getControl().isDisposed())
                     return;
@@ -220,7 +220,7 @@ public class ViewerUtils {
      * @see StructuredViewer#refresh(boolean)
      */
     public static void refresh(final Viewer viewer, final boolean updateLabels) {
-        Display.getDefault().syncExec(new Runnable() {
+        Display.getDefault().asyncExec(new Runnable() {
             public void run() {
                 if (viewer == null || viewer.getControl().isDisposed())
                     return;
@@ -239,7 +239,7 @@ public class ViewerUtils {
      * @see AbstractTreeViewer#expandToLevel(int)
      */
     public static void expandToLevel(final Viewer viewer, final int level) {
-        Display.getDefault().syncExec(new Runnable() {
+        Display.getDefault().asyncExec(new Runnable() {
             public void run() {
                 if (viewer == null || viewer.getControl().isDisposed())
                     return;
@@ -261,7 +261,7 @@ public class ViewerUtils {
      * @see AbstractTreeViewer#expandAll()
      */
     public static void expandAll(final Viewer viewer) {
-        Display.getDefault().syncExec(new Runnable() {
+        Display.getDefault().asyncExec(new Runnable() {
             public void run() {
                 if (viewer == null || viewer.getControl().isDisposed())
                     return;
