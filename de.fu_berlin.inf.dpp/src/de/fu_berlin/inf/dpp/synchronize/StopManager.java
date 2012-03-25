@@ -455,7 +455,6 @@ public final class StopManager extends AbstractActivityProvider {
             throw new IllegalArgumentException("StopActivity contains"
                 + " recipient which already left: " + stopActivity);
 
-        sarosSession.sendActivity(recipient, stopActivity);
         super.fireActivity(stopActivity);
     }
 

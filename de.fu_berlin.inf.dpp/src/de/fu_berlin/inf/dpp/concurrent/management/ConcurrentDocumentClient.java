@@ -14,6 +14,7 @@ import de.fu_berlin.inf.dpp.activities.business.FileActivity;
 import de.fu_berlin.inf.dpp.activities.business.IActivity;
 import de.fu_berlin.inf.dpp.activities.business.IActivityReceiver;
 import de.fu_berlin.inf.dpp.activities.business.JupiterActivity;
+import de.fu_berlin.inf.dpp.activities.business.StopActivity;
 import de.fu_berlin.inf.dpp.activities.business.TextEditActivity;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Operation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.TransformationException;
@@ -137,9 +138,11 @@ public class ConcurrentDocumentClient implements Disposable {
                  */
                 result.add(new QueueItem(remoteUsersWithReadOnlyAccess,
                     checksumActivityDataObject));
-        } else {
-            if (remoteUsers.size() > 0)
-                result.add(new QueueItem(remoteUsers, activity));
+        } else if (activity instanceof StopActivity) {
+            StopActivity stopActivity = (StopActivity) activity;
+            result.add(new QueueItem(stopActivity.getRecipient(), activity));
+        } else if (remoteUsers.size() > 0) {
+            result.add(new QueueItem(remoteUsers, activity));
         }
         return result;
     }
