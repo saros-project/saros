@@ -39,6 +39,17 @@ public class FreeColors {
     }
 
     /**
+     * Removes a colorID from the pool. If the <code>colorID</code> is not in
+     * the pool, this returns false.
+     * 
+     * @return <code>true</code> if <code>colorID</code> was removed;
+     *         <code>false</code> otherwise.
+     */
+    public synchronized boolean remove(int colorID) {
+        return freeColors.remove(colorID);
+    }
+
+    /**
      * Return a color ID to the pool.
      * 
      * @param colorID

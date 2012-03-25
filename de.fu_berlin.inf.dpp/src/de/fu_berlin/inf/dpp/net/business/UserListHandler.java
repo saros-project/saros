@@ -64,9 +64,9 @@ public class UserListHandler {
 
                 User fromUser = sarosSession.getUser(fromJID);
 
-                if (fromUser == null || !fromUser.isHost()) {
+                if (fromUser == null) {
                     log.error("Received userList from buddy who "
-                        + "is not part of our session or is not host: "
+                        + "is not part of our session: "
                         + Utils.prefix(fromJID));
                     return;
                 }

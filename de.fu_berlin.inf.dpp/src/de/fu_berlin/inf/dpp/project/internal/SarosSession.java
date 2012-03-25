@@ -266,6 +266,7 @@ public class SarosSession implements ISarosSession, Disposable {
 
         activityDispatcher.setDaemon(true);
         activityDispatcher.start();
+        freeColors = new FreeColors(MAX_USERCOLORS - 1);
     }
 
     /**
@@ -277,7 +278,6 @@ public class SarosSession implements ISarosSession, Disposable {
 
         this(transmitter, threadContext, 0, sessionStart, sarosContext);
 
-        freeColors = new FreeColors(MAX_USERCOLORS - 1);
         host = localUser;
         host.invitationCompleted();
 
@@ -293,15 +293,45 @@ public class SarosSession implements ISarosSession, Disposable {
      */
     public SarosSession(ITransmitter transmitter,
         DispatchThreadContext threadContext, JID hostID, int myColorID,
-        DateTime sessionStart, SarosContext sarosContext) {
+        DateTime sessionStart, SarosContext sarosContext, JID inviterID,
+        int inviterColorID) {
 
         this(transmitter, threadContext, myColorID, sessionStart, sarosContext);
 
         host = new User(this, hostID, 0);
         host.invitationCompleted();
 
+        if (freeColors.remove(myColorID)) {
+            log.debug("MY colorID (" + myColorID
+                + ") was removed from the list.");
+        } else {
+            log.warn("MY colorID (" + myColorID
+                + ") couldn't be removed from the list!");
+        }
+
         participants.put(hostID, host);
         participants.put(sarosNet.getMyJID(), localUser);
+
+        /*
+         * As the host is still a special person, we must find out if we were
+         * invited by the host...
+         */
+        if (!inviterID.equals(hostID)) {
+            /*
+             * ... or another participant whom we have to add to this session
+             * too!
+             */
+            if (freeColors.remove(inviterColorID)) {
+                log.debug("INVITERS colorID (" + inviterColorID
+                    + ") was removed from the list.");
+            } else {
+                log.warn("INVITERS colorID couldn't be removed from the list!");
+            }
+
+            User inviter = new User(this, inviterID, inviterColorID);
+            inviter.invitationCompleted();
+            participants.put(inviterID, inviter);
+        }
 
         concurrentDocumentClient = new ConcurrentDocumentClient(this);
     }
@@ -524,6 +554,10 @@ public class SarosSession implements ISarosSession, Disposable {
         assert user.getSarosSession().equals(this);
 
         JID jid = user.getJID();
+
+        if (!freeColors.remove(user.getColorID())) {
+            log.warn("ColorID of user: " + jid.toString() + "was not in pool!");
+        }
 
         if (participants.putIfAbsent(jid, user) != null) {
             log.error("Buddy " + Utils.prefix(jid) //$NON-NLS-1$

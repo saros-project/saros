@@ -248,10 +248,11 @@ public class SarosSessionManager implements ISarosSessionManager {
      * {@inheritDoc}
      */
     public ISarosSession joinSession(JID host, int colorID,
-        DateTime sessionStart) {
+        DateTime sessionStart, JID inviter, int inviterColorID) {
 
         SarosSession sarosSession = new SarosSession(transmitter,
-            dispatchThreadContext, host, colorID, sessionStart, sarosContext);
+            dispatchThreadContext, host, colorID, sessionStart, sarosContext,
+            inviter, inviterColorID);
 
         this.sarosSessionObservable.setValue(sarosSession);
 
@@ -323,14 +324,15 @@ public class SarosSessionManager implements ISarosSessionManager {
 
     public void invitationReceived(JID from, String sessionID, int colorID,
         VersionInfo versionInfo, DateTime sessionStart, final SarosUI sarosUI,
-        String invitationID, MUCSessionPreferences comPrefs, String description) {
+        String invitationID, MUCSessionPreferences comPrefs,
+        String description, JID host, int inviterColorID) {
 
         this.sessionID.setValue(sessionID);
 
         final IncomingSessionNegotiation process = new IncomingSessionNegotiation(
             this, transmitter, from, colorID, invitationProcesses,
             versionManager, versionInfo, sessionStart, sarosUI, invitationID,
-            description, sarosContext);
+            description, sarosContext, inviterColorID, host);
         comNegotiatingManager.setSessionPreferences(comPrefs);
 
         Utils.runSafeSWTAsync(log, new Runnable() {

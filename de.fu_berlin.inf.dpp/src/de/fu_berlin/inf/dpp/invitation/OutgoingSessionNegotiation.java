@@ -328,12 +328,17 @@ public class OutgoingSessionNegotiation extends InvitationProcess {
 
         hostVersionInfo.version = versionManager.getVersion();
 
-        MUCSessionPreferences comPrefs = comNegotiatingManager
-            .getOwnPreferences();
+        MUCSessionPreferences comPrefs;
+        if (sarosSession.isHost()) {
+            comPrefs = comNegotiatingManager.getOwnPreferences();
+        } else {
+            comPrefs = comNegotiatingManager.getSessionPreferences();
+        }
 
         InvitationInfo invInfo = new InvitationInfo(sessionID, invitationID,
             colorID, description, versionInfo, sarosSession.getSessionStart(),
-            comPrefs);
+            comPrefs, sarosSession.getHost().getJID(), sarosSession
+                .getLocalUser().getColorID());
 
         xmppTransmitter.sendMessageToUser(peer,
             new InvitationExtensionProvider().create(invInfo));

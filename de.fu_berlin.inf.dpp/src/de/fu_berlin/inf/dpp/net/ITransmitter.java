@@ -58,23 +58,6 @@ public interface ITransmitter {
     /* ---------- invitations --------- */
 
     /**
-     * Sends an invitation message for given shared project to given user.
-     * 
-     * @param projectID
-     *            the ID of the IProject to which the user should be invited to.
-     * @param jid
-     *            the JID of the user that is to be invited.
-     * @param description
-     *            a informal description text that can be provided with the
-     *            invitation. Can not be <code>null</code>.
-     * @param comPrefs
-     *            TODO
-     */
-    public void sendInvitation(String projectID, JID jid, String description,
-        int colorID, VersionInfo versionInfo, String invitationID,
-        DateTime sessionStart, MUCSessionPreferences comPrefs);
-
-    /**
      * Sends an cancellation message that tells the receiver that the invitation
      * is canceled.
      * 

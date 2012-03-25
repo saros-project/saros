@@ -40,6 +40,8 @@ public class IncomingSessionNegotiation extends InvitationProcess {
     protected DateTime sessionStart;
     protected ISarosSession sarosSession;
     protected String invitationID;
+    protected JID host;
+    protected int peerColorID;
 
     @Inject
     SessionIDObservable sessionID;
@@ -56,7 +58,7 @@ public class IncomingSessionNegotiation extends InvitationProcess {
         InvitationProcessObservable invitationProcesses,
         VersionManager versionManager, VersionInfo remoteVersionInfo,
         DateTime sessionStart, SarosUI sarosUI, String invitationID,
-        String description, SarosContext sarosContext) {
+        String description, SarosContext sarosContext, int peerColorID, JID host) {
         super(from, description, colorID, sarosContext);
 
         this.versionInfo = determineVersion(remoteVersionInfo);
@@ -65,6 +67,8 @@ public class IncomingSessionNegotiation extends InvitationProcess {
 
         this.sessionManager = sessionManager;
         this.versionManager = versionManager;
+        this.host = host;
+        this.peerColorID = peerColorID;
 
     }
 
@@ -206,8 +210,8 @@ public class IncomingSessionNegotiation extends InvitationProcess {
 
         try {
             checkCancellation();
-            sarosSession = sessionManager.joinSession(peer, colorID,
-                sessionStart);
+            sarosSession = sessionManager.joinSession(host, colorID,
+                sessionStart, peer, peerColorID);
             log.debug("Inv" + Utils.prefix(peer) + ": Joined the session.");
             checkCancellation();
             completeInvitation();

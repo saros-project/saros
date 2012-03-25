@@ -57,7 +57,7 @@ public interface ISarosSessionManager {
      * @return the new Saros session.
      */
     public ISarosSession joinSession(JID host, int myColorID,
-        DateTime sessionStart);
+        DateTime sessionStart, JID inviter, int inviterColorID);
 
     /**
      * Leaves the currently active session. If the local user is the host, this
@@ -102,7 +102,8 @@ public interface ISarosSessionManager {
      */
     public void invitationReceived(JID from, String sessionID, int colorID,
         VersionInfo versionInfo, DateTime sessionStart, SarosUI sarosUI,
-        String invitationID, MUCSessionPreferences comPrefs, String description);
+        String invitationID, MUCSessionPreferences comPrefs,
+        String description, JID host, int inviterColorID);
 
     /**
      * initiate the ({@link OutgoingProjectNegotiation project exchanging}) with

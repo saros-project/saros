@@ -191,19 +191,6 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
      * Invitation process' help functions --- START
      ********************************************************************************/
 
-    public void sendInvitation(String projectID, JID guest, String description,
-        int colorID, VersionInfo versionInfo, String invitationID,
-        DateTime sessionStart, MUCSessionPreferences comPrefs) {
-
-        log.trace("Sending invitation to " + Utils.prefix(guest)
-            + " with description " + description);
-
-        InvitationInfo invInfo = new InvitationInfo(sessionID, invitationID,
-            colorID, description, versionInfo, sessionStart, comPrefs);
-
-        sendMessageToUser(guest, invExtProv.create(invInfo));
-    }
-
     public void sendInvitationAcknowledgement(JID to, String invitationID) {
         log.trace("Sending invitation acknowledgment to " + Utils.prefix(to));
         sendMessageToUser(to,

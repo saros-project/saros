@@ -264,7 +264,7 @@ public class CollaborationUtils {
     protected static String getShareProjectDescription(
         ISarosSession sarosSession) {
 
-        JID inviter = sarosSession.getHost().getJID();
+        JID inviter = sarosSession.getLocalUser().getJID();
         Set<IProject> projects = sarosSession.getProjects();
 
         StringBuilder result = new StringBuilder();

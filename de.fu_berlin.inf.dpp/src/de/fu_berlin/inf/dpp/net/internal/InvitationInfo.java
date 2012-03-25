@@ -23,6 +23,7 @@ import org.joda.time.DateTime;
 
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.communication.muc.negotiation.MUCSessionPreferences;
+import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 import de.fu_berlin.inf.dpp.util.VersionManager.VersionInfo;
 
@@ -36,16 +37,21 @@ public class InvitationInfo extends DefaultInvitationInfo {
     public DateTime sessionStart;
     public MUCSessionPreferences comPrefs;
     public String description;
+    public JID host;
+    public int inviterColorID;
 
     public InvitationInfo(SessionIDObservable sessionID, String invitationID,
         int colorID, String description, VersionInfo versionInfo,
-        DateTime sessionStart, MUCSessionPreferences comPrefs) {
+        DateTime sessionStart, MUCSessionPreferences comPrefs, JID host,
+        int inviterColorID) {
         super(sessionID, invitationID);
         this.colorID = colorID;
         this.versionInfo = versionInfo;
         this.sessionStart = sessionStart;
         this.comPrefs = comPrefs;
         this.description = description;
+        this.host = host;
+        this.inviterColorID = inviterColorID;
     }
 
     public static class InvitationExtensionProvider extends
