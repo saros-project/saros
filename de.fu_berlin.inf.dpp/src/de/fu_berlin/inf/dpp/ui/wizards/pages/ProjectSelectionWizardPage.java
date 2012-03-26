@@ -7,10 +7,11 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.PlatformUI;
 import org.picocontainer.annotations.Inject;
 
@@ -26,7 +27,6 @@ import de.fu_berlin.inf.dpp.util.Utils;
 
 public class ProjectSelectionWizardPage extends WizardPage {
     Logger log = Logger.getLogger(this.getClass());
-    public static final String NO_PROJECT_SELECTED_ERROR_MESSAGE = Messages.ProjectSelectionWizardPage_selected_no_project;
 
     protected ResourceSelectionComposite resourceSelectionComposite;
 
@@ -39,7 +39,7 @@ public class ProjectSelectionWizardPage extends WizardPage {
             if (resourceSelectionComposite != null
                 && !resourceSelectionComposite.isDisposed()) {
                 if (!resourceSelectionComposite.hasSelectedResources()) {
-                    setErrorMessage(NO_PROJECT_SELECTED_ERROR_MESSAGE);
+                    setErrorMessage(Messages.ProjectSelectionWizardPage_selected_no_project);
                     setPageComplete(false);
                 } else {
                     setErrorMessage(null);
@@ -69,16 +69,7 @@ public class ProjectSelectionWizardPage extends WizardPage {
         Composite composite = new Composite(parent, SWT.NONE);
         setControl(composite);
 
-        composite.setLayout(new GridLayout(2, false));
-
-        /*
-         * Row 1
-         */
-        Label projectSelectionLabel = new Label(composite, SWT.NONE);
-        projectSelectionLabel.setLayoutData(new GridData(SWT.BEGINNING,
-            SWT.TOP, false, true));
-        projectSelectionLabel
-            .setText(Messages.ProjectSelectionWizardPage_projects);
+        composite.setLayout(new GridLayout(1, false));
 
         createProjectSelectionComposite(composite);
         this.resourceSelectionComposite.setLayoutData(new GridData(SWT.FILL,
@@ -106,36 +97,46 @@ public class ProjectSelectionWizardPage extends WizardPage {
          * Initialize the selection asynchronously, so the wizard opens
          * INSTANTLY instead of waiting up to XX seconds with flickering cursor
          * until the selection was applied.
-         * 
-         * FIXME: We still have a nasty flickering cursor, while the selection
-         * is applied and the user has to wait up to 5 seconds (when choosing
-         * many huge projects with many files are selected) but unless the
-         * checkboxTreeViewer itself is optimized, it's probably hard to further
-         * speed up this process(?)
          */
-        Utils.runSafeSWTAsync(log, new Runnable() {
+        Runnable takeOverPerspectiveSelection = new Runnable() {
             @Override
             public void run() {
-                List<IResource> selection = SelectionRetrieverFactory
-                    .getSelectionRetriever(IResource.class).getSelection();
-                resourceSelectionComposite.setSelectedResources(selection);
-                resourceSelectionComposite
-                    .addResourceSelectionListener(resourceSelectionListener);
-                /*
-                 * If nothing is selected and only one project exists in the
-                 * workspace, select it in the Wizard.
-                 */
-                if (selection.size() == 0) {
-                    if (resourceSelectionComposite.getProjectsCount() == 1) {
-                        List<IResource> resources = resourceSelectionComposite
-                            .getResources();
+                Utils.runSafeSWTAsync(log, new Runnable() {
+                    @Override
+                    public void run() {
+                        List<IResource> selection = SelectionRetrieverFactory
+                            .getSelectionRetriever(IResource.class)
+                            .getSelection();
                         resourceSelectionComposite
-                            .setSelectedResources(resources);
+                            .setSelectedResources(selection);
+                        resourceSelectionComposite
+                            .addResourceSelectionListener(resourceSelectionListener);
+                        /*
+                         * If nothing is selected and only one project exists in
+                         * the workspace, select it in the Wizard.
+                         */
+                        if (selection.size() == 0) {
+                            if (resourceSelectionComposite.getProjectsCount() == 1) {
+                                selection = resourceSelectionComposite
+                                    .getResources();
+                                resourceSelectionComposite
+                                    .setSelectedResources(selection);
+                            }
+                        }
+                        /*
+                         * Add the current automatically appliedselection to the
+                         * undo-stack, so the user can undo it, and undo/redo
+                         * works properly.
+                         */
+                        resourceSelectionComposite.rememberSelection();
+                        setPageComplete(selection.size() > 0);
                     }
-                }
-                setPageComplete(selection.size() > 0);
+                });
             }
-        });
+        };
+
+        BusyIndicator.showWhile(Display.getDefault(),
+            takeOverPerspectiveSelection);
     }
 
     @Override
@@ -143,7 +144,7 @@ public class ProjectSelectionWizardPage extends WizardPage {
         super.setVisible(visible);
         if (!visible)
             return;
-
+        de.fu_berlin.inf.dpp.ui.views.SarosView.clearNotifications();
         this.resourceSelectionComposite.setFocus();
     }
 
@@ -156,5 +157,12 @@ public class ProjectSelectionWizardPage extends WizardPage {
             || this.resourceSelectionComposite.isDisposed())
             return null;
         return this.resourceSelectionComposite.getSelectedResources();
+    }
+
+    /**
+     * Saves the current selection under a fixed name "-Last selection-"
+     */
+    public void rememberCurrentSelection() {
+        resourceSelectionComposite.saveSelectionWithName("-Last selection-");
     }
 }

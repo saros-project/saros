@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.eclipse.core.resources.IResource;
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.Wizard;
 import org.picocontainer.annotations.Inject;
 
@@ -12,6 +13,7 @@ import de.fu_berlin.inf.dpp.project.SarosSessionManager;
 import de.fu_berlin.inf.dpp.ui.ImageManager;
 import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.ui.util.CollaborationUtils;
+import de.fu_berlin.inf.dpp.ui.views.SarosView;
 import de.fu_berlin.inf.dpp.ui.wizards.pages.ProjectSelectionWizardPage;
 
 /**
@@ -37,6 +39,12 @@ public class ShareProjectAddProjectsWizard extends Wizard {
     }
 
     @Override
+    public IWizardPage getNextPage(IWizardPage page) {
+        SarosView.clearNotifications();
+        return super.getNextPage(page);
+    }
+
+    @Override
     public void addPages() {
         this.addPage(this.projectSelectionWizardPage);
     }
@@ -45,12 +53,15 @@ public class ShareProjectAddProjectsWizard extends Wizard {
     public boolean performFinish() {
         List<IResource> selectedResources = projectSelectionWizardPage
             .getSelectedResources();
-        if (selectedResources == null
-            || selectedResources.isEmpty())
+        if (selectedResources == null || selectedResources.isEmpty())
             return false;
 
-        CollaborationUtils.addResourcesToSarosSession(
-            sarosSessionManager, selectedResources);
+        projectSelectionWizardPage.rememberCurrentSelection();
+
+        SarosView.clearNotifications();
+
+        CollaborationUtils.addResourcesToSarosSession(sarosSessionManager,
+            selectedResources);
 
         return true;
     }

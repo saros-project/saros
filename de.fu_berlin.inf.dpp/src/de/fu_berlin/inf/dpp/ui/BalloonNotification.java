@@ -48,22 +48,30 @@ public class BalloonNotification {
      * The window will be hidden automatically after the value specified in the
      * timeout expires
      * 
+     * TODO wrap the contents so the ballon notification does not expand across
+     * two screens for a long text. OR even better: do not show long
+     * notifications. users tend to ignore them anyway!
+     * 
      * @param control
      *            the control, next to where the widget will appear
      * @param title
      *            the title of the balloon
      * @param text
      *            the text to display as contents
-     * @param timeout
-     *            the timeout in milliseconds for automatically hidding the
-     *            balloon
      */
     public static void showNotification(Control control, String title,
-        String text, int timeout) {
-        
+        String text) {
+
         if (control != null && control.isDisposed()) {
             control = null;
         }
+
+        /*
+         * show message at least 8 secs, but show it longer for longer messages
+         * Referenced by wikipedia, a user can read 2,5 words per second so we
+         * approximate 400ms per word
+         */
+        int timeout = Math.max(8000, text.split("\\s").length * 400);
 
         // close all previous balloon notifications like it is done in
         // windows to prevent overlapping of multiple balloons...
@@ -72,17 +80,19 @@ public class BalloonNotification {
         final BalloonWindow window = new BalloonWindow(
             control != null ? control.getShell() : null, SWT.TOOL | SWT.TITLE);
         windows.add(window);
-        // Note: if you add SWT.CLOSE to the style of the BalloonWindow, it will
-        // only be closed when directly clicking on the close icon (x) and
-        // therefore break user expectations.
-        // FIXME: find out a way to display the closing X AND make the bubble
-        // close on any click anywhere on it.
+        /*
+         * Note: if you add SWT.CLOSE to the style of the BalloonWindow, it will
+         * only be closed when directly clicking on the close icon (x) and
+         * therefore break user expectations. FIXME: find out a way to display
+         * the closing X AND make the bubble close on any click anywhere on it.
+         */
 
         window.setText(title);
 
-        // Adding the text to the contents. Pack() is required
-        // so the size of the composite is recalculated, else
-        // the contents won't show
+        /*
+         * Adding the text to the contents. Pack() is required so the size of
+         * the composite is recalculated, else the contents won't show
+         */
         Composite c = window.getContents();
         c.setLayout(new FillLayout());
 

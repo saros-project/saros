@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Stack;
 
 import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IContainer;
@@ -11,6 +12,8 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IWorkspaceRoot;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.jface.viewers.CheckStateChangedEvent;
 import org.eclipse.jface.viewers.CheckboxTreeViewer;
 import org.eclipse.jface.viewers.ICheckStateListener;
@@ -35,9 +38,13 @@ import de.fu_berlin.inf.dpp.ui.widgets.viewer.project.events.ResourceSelectionCh
 import de.fu_berlin.inf.dpp.util.ArrayUtils;
 
 /**
- * This {@link Composite} extends {@link ProjectDisplayComposite} and allows to
+ * This {@link Composite} extends {@link ResourceDisplayComposite} and allows to
  * check (via check boxes) {@link IProject}s, {@link IFolder}s and {@link IFile}
  * s.
+ * 
+ * This component remembers all selections and has methods to undo/redo the
+ * selection in the viewer.
+ * 
  * <p>
  * This composite does <strong>NOT</strong> handle setting the layout.
  * 
@@ -54,20 +61,37 @@ import de.fu_berlin.inf.dpp.util.ArrayUtils;
  * @author waldmann
  * 
  */
-public class BaseResourceSelectionComposite extends ResourceDisplayComposite {
+public abstract class BaseResourceSelectionComposite extends
+    ResourceDisplayComposite {
 
+    private static final String SAROS_RESOURCE_SELECTION_PRESET_NAMES = "Saros.resource_selection.preset_names";
     protected List<BaseResourceSelectionListener> resourceSelectionListeners = new ArrayList<BaseResourceSelectionListener>();
     protected CheckboxTreeViewer checkboxTreeViewer = (CheckboxTreeViewer) this.viewer;
     Logger log = Logger.getLogger(this.getClass());
 
-    protected ICheckStateListener checkStateListener = new ICheckStateListener() {
+    /*
+     * Stacks used for saving previous selections in the tree view, enabling
+     * undo/redo functionality
+     */
+    Stack<Object[]> lastChecked = new Stack<Object[]>();
+    Stack<Object[]> lastGrayed = new Stack<Object[]>();
+    Stack<Object[]> prevChecked = new Stack<Object[]>();
+    Stack<Object[]> prevGrayed = new Stack<Object[]>();
 
+    protected final static String SERIALIZATION_SEPARATOR = "**#**";
+    protected final static String SERIALIZATION_SEPARATOR_REGEX = "\\*\\*#\\*\\*";
+
+    protected ICheckStateListener checkStateListener = new ICheckStateListener() {
         public void checkStateChanged(CheckStateChangedEvent event) {
             final Object element = event.getElement();
             boolean isChecked = event.getChecked();
+
             IResource resource = (IResource) element;
+
             handleCheckStateChanged(resource, isChecked);
             notifyResourceSelectionChanged(resource, isChecked);
+
+            rememberSelection();
         }
     };
 
@@ -96,6 +120,290 @@ public class BaseResourceSelectionComposite extends ResourceDisplayComposite {
             this.checkboxTreeViewer.setGrayChecked(resource, false);
             this.checkboxTreeViewer.setSubtreeChecked(resource, checked);
         }
+    }
+
+    /**
+     * Remembers the current selection for undo/redo functionality.
+     * 
+     * Any click activity while "redo" is possible (which means something was
+     * undone) will clear the whole redo-stack.
+     * 
+     */
+    public void rememberSelection() {
+        if (isRedoEnabled()) {
+            prevChecked.clear();
+            prevGrayed.clear();
+        }
+
+        lastGrayed.push(((CheckboxTreeViewer) viewer).getGrayedElements());
+        lastChecked.push(((CheckboxTreeViewer) viewer).getCheckedElements());
+        log.debug("Remembered checked/grayed items: "
+            + lastChecked.lastElement().length + "/"
+            + lastGrayed.lastElement().length + " Saved " + lastChecked.size()
+            + " snapshots");
+
+        // Need to update the controls (if there are any)
+        updateRedoUndoControls();
+    }
+
+    /**
+     * Returns a list of all names of the saved selection presets
+     */
+    public List<String> getSavedSelectionNames() {
+        List<String> namesList = new ArrayList<String>();
+
+        String namesString = saros.getPreferenceStore().getString(
+            SAROS_RESOURCE_SELECTION_PRESET_NAMES);
+
+        String[] names = namesString.split(SERIALIZATION_SEPARATOR_REGEX);
+        for (String name : names) {
+            if (!name.isEmpty()) {
+                namesList.add(name);
+            }
+        }
+        log.debug("I got the names from the list: " + namesList.size());
+        return namesList;
+    }
+
+    /**
+     * Adds the given name to the list of saved selection preset names
+     * 
+     * @param name
+     */
+    protected void rememberSelectionName(String name) {
+        log.debug("Remembering new selection name: " + name);
+        /*
+         * Check if name already exists in list (it's more a set than a list),
+         * do nothing in that case..
+         */
+        if (getSavedSelectionNames().contains(name)) {
+            log.debug("Not adding name to list because already exists: " + name);
+            return;
+        }
+
+        StringBuilder namesString = new StringBuilder(saros
+            .getPreferenceStore().getString(
+                SAROS_RESOURCE_SELECTION_PRESET_NAMES));
+
+        namesString.append(name).append(SERIALIZATION_SEPARATOR);
+
+        log.debug("Storing namesString: " + namesString.toString());
+        saros.getPreferenceStore().setValue(
+            SAROS_RESOURCE_SELECTION_PRESET_NAMES, namesString.toString());
+    }
+
+    /**
+     * Adds the given name to the list of saved selection preset names
+     * 
+     * @param name
+     */
+    protected void removeStoredSelection(String name) {
+        log.debug("Removing stored selection with name: " + name);
+        List<String> savedSelectionNames = getSavedSelectionNames();
+        if (!savedSelectionNames.contains(name)) {
+            log.debug("cannot remove, name not present in list: " + name);
+            return;
+        }
+        // remove
+        savedSelectionNames.remove(name);
+
+        // rebuild string
+        StringBuilder namesString = new StringBuilder();
+        for (String theName : savedSelectionNames) {
+            namesString.append(theName).append(SERIALIZATION_SEPARATOR);
+        }
+        // save string
+        log.debug("Storing namesString: " + namesString.toString());
+        saros.getPreferenceStore().setValue(
+            SAROS_RESOURCE_SELECTION_PRESET_NAMES, namesString.toString());
+
+        // delete the preference
+        String checkedSelectionName = "Saros.resource_selection.checked."
+            + name;
+        saros.getPreferenceStore().setValue(checkedSelectionName, "");
+        // TODO: find out if there is some sort of delete method..
+    }
+
+    /**
+     * Save the current selection as a selection preset with the given name
+     * using the preferences api, serializing all URIs of the selected
+     * iResources.
+     * 
+     * Overwrites any existing selections with the same name without warning.
+     * Use hasSelectionWithName(String name) to find out if the user would
+     * overwrite an existing selection preset!
+     * 
+     * Adds the name to a set of saved preset names in the preferences too. Use
+     * getSavedSelectionNames() to retrieve a list of all names
+     * 
+     * @param name
+     */
+    public void saveSelectionWithName(String name) {
+        /*
+         * Load all checked elements, remove the ones that are grayed and store
+         * the rest as selection preset. SetSelection() automatically handles
+         * setting the grayed status AND fires the changelisteners which is
+         * important for the wizards next button to activate
+         */
+        Object[] checked = ((CheckboxTreeViewer) viewer).getCheckedElements();
+
+        StringBuilder checkedString = new StringBuilder();
+
+        for (Object resource : checked) {
+            if (((CheckboxTreeViewer) viewer).getGrayed(resource) == false) {
+                checkedString.append(((IResource) resource).getFullPath())
+                    .append(SERIALIZATION_SEPARATOR);
+            }
+        }
+
+        String checkedSelectionName = "Saros.resource_selection.checked."
+            + name;
+
+        log.debug("Storing checked elements (not grayed): "
+            + checkedString.toString());
+
+        saros.getPreferenceStore().setValue(checkedSelectionName,
+            checkedString.toString());
+
+        rememberSelectionName(name);
+    }
+
+    /**
+     * Removes any existing selection and applies the selection preset that was
+     * saved with the given name (if it exists). Returns false If no selection
+     * was made (e.g. there is no such preset) or true if the selection was
+     * applied..
+     * 
+     * @param name
+     *            The name of the preset that should be used
+     */
+    public boolean restoreSelectionWithName(String name) {
+        String checkedSelectionName = "Saros.resource_selection.checked."
+            + name;
+
+        String checked = saros.getPreferenceStore().getString(
+            checkedSelectionName);
+
+        if (checked.isEmpty()) {
+            log.debug("checked string is empty");
+            /*
+             * No empty selections can be saved, so this means that there is no
+             * selection preset with the given name
+             */
+            return false;
+        }
+
+        List<IResource> checkedList = new ArrayList<IResource>();
+
+        String[] uris;
+
+        IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
+
+        uris = checked.split(SERIALIZATION_SEPARATOR_REGEX);
+        for (String uri : uris) {
+            IResource resource = root.findMember(uri);
+            if (resource != null) {
+                checkedList.add(resource);
+            } else {
+                log.error("Did not find resource with uri in workspace root to apply selection: "
+                    + uri);
+            }
+        }
+
+        setSelectedResources(checkedList);
+
+        return true;
+    }
+
+    /**
+     * This needs to take care of enabling redo/undo controls
+     */
+    public abstract void updateRedoUndoControls();
+
+    /**
+     * Undo the last user action (this enables the redo button if not already
+     * enabled).
+     */
+    protected void undoSelection() {
+        if (!lastChecked.isEmpty()) {
+            /*
+             * This holds the CURRENT selection (rememberSelection is called
+             * after each selection event in the tree, so when the user triggers
+             * an undo, the first element in the lastXYZ stacks represent the
+             * selection which the user wants to undo) which we need to push
+             * onto the redo-stacks.
+             */
+            Object[] checked = lastChecked.pop();
+            Object[] grayed = lastGrayed.pop();
+
+            prevChecked.push(checked);
+            prevGrayed.push(grayed);
+        }
+        /*
+         * Do not combine the two ifs! lastChecked can be empty now because of
+         * the modifications...
+         */
+        if (!lastChecked.isEmpty()) {
+            /*
+             * Not using the checked/grayed variable as they contain the CURRENT
+             * selection (which we want to undo). Using them would not undo
+             * anything.
+             */
+            ((CheckboxTreeViewer) viewer).setGrayedElements(lastGrayed
+                .lastElement());
+            ((CheckboxTreeViewer) viewer).setCheckedElements(lastChecked
+                .lastElement());
+
+        } else {
+            /*
+             * No previous selection available, so unset all selections (set to
+             * initial state)
+             */
+            ((CheckboxTreeViewer) viewer).setCheckedElements(new Object[0]);
+            ((CheckboxTreeViewer) viewer).setGrayedElements(new Object[0]);
+        }
+
+        // Need to update the controls (if there are any)
+        updateRedoUndoControls();
+    }
+
+    /**
+     * Restores the last selection if there is one because of a previous undo
+     * action. Does nothing if there was no undo operation before the call to
+     * redoSelection()
+     */
+    protected void redoSelection() {
+        if (!prevChecked.isEmpty()) {
+            Object[] checkedElements = prevChecked.pop();
+            Object[] grayedElements = prevGrayed.pop();
+
+            lastChecked.push(checkedElements);
+            lastGrayed.push(grayedElements);
+
+            ((CheckboxTreeViewer) viewer).setGrayedElements(grayedElements);
+            ((CheckboxTreeViewer) viewer).setCheckedElements(checkedElements);
+
+            // Disable redo button if no redo possible anymore
+
+        } else {
+            log.debug("Cannot redo, no more snapshots!");
+        }
+        // Need to update the controls (if there are any)
+        updateRedoUndoControls();
+    }
+
+    /**
+     * @return true if redoing the last "undone" selection is possible..
+     */
+    protected boolean isRedoEnabled() {
+        return !prevChecked.isEmpty();
+    }
+
+    /**
+     * @return true if redoing the last "undone" selection is possible..
+     */
+    protected boolean isUndoEnabled() {
+        return !lastChecked.isEmpty();
     }
 
     /**
@@ -198,7 +506,7 @@ public class BaseResourceSelectionComposite extends ResourceDisplayComposite {
         Object[] allElements = structuredContentProvider
             .getElements(checkboxTreeViewer.getInput());
         Object[] checkedElements = checkboxTreeViewer.getCheckedElements();
-        
+
         List<IResource> allResources = ArrayUtils.getAdaptableObjects(
             allElements, IResource.class);
         List<IResource> checkedResources = ArrayUtils.getAdaptableObjects(
@@ -206,7 +514,7 @@ public class BaseResourceSelectionComposite extends ResourceDisplayComposite {
 
         Map<IResource, Boolean> checkStatesChanges = calculateCheckStateDiff(
             allResources, checkedResources, resources);
-            
+
         /*
          * Does not fire events...
          */
@@ -278,7 +586,7 @@ public class BaseResourceSelectionComposite extends ResourceDisplayComposite {
         return checkboxTreeViewer.getCheckedElements().length > 0;
     }
 
-	/**
+    /**
      * Adds a {@link BaseResourceSelectionListener}
      * 
      * @param resourceSelectionListener

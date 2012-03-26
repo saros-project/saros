@@ -409,6 +409,8 @@ public class Messages extends NLS {
     public static String RenameContactAction_tooltip;
     public static String ResourceSelectionComposite_hide_closed_projects;
     public static String ResourceSelectionComposite_new_project;
+    public static String ResourceSelectionComposite_undo;
+    public static String ResourceSelectionComposite_redo;
     public static String RestrictToReadOnlyAccessAction_title;
     public static String RestrictToReadOnlyAccessAction_tooltip;
     public static String RosterEntryElement_connected_using;
