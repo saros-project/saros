@@ -78,8 +78,10 @@ public final class NetworkManipulatorImpl extends StfRemoteObject implements
 
             boolean discard = discardIncomingSessionPackets.get(jid);
 
-            if (discard)
+            if (discard) {
+                LOG.trace("discarding incoming packet: " + object);
                 return false;
+            }
 
             blockIncomingSessionPackets.putIfAbsent(jid, false);
 
@@ -90,6 +92,7 @@ public final class NetworkManipulatorImpl extends StfRemoteObject implements
                 blockedIncomingSessionPackets.putIfAbsent(jid,
                     new ConcurrentLinkedQueue<IncomingTransferObject>());
 
+                LOG.trace("queuing incoming packet: " + object);
                 blockedIncomingSessionPackets.get(jid).add(object);
                 return false;
             }
@@ -108,14 +111,16 @@ public final class NetworkManipulatorImpl extends StfRemoteObject implements
 
             boolean discard = discardOutgoingSessionPackets.get(jid);
 
-            if (discard)
+            if (discard) {
+                LOG.trace("discarding outgoing packet: " + description);
                 return false;
+            }
 
             blockOutgoingSessionPackets.putIfAbsent(jid, false);
 
-            boolean blockIncomingPackets = blockOutgoingSessionPackets.get(jid);
+            boolean blockOutgoingPackets = blockOutgoingSessionPackets.get(jid);
 
-            if (blockIncomingPackets || blockAllOutgoingSessionPackets) {
+            if (blockOutgoingPackets || blockAllOutgoingSessionPackets) {
 
                 blockedOutgoingSessionPackets.putIfAbsent(jid,
                     new ConcurrentLinkedQueue<OutgoingPacketHolder>());
@@ -124,6 +129,7 @@ public final class NetworkManipulatorImpl extends StfRemoteObject implements
                 holder.description = description;
                 holder.payload = payload;
 
+                LOG.trace("queuing outgoing packet: " + description);
                 blockedOutgoingSessionPackets.get(jid).add(holder);
                 return false;
             }
@@ -189,11 +195,13 @@ public final class NetworkManipulatorImpl extends StfRemoteObject implements
 
     @Override
     public void blockIncomingSessionPackets(JID jid) throws RemoteException {
+        LOG.trace("blocking incoming packet transfer from " + jid);
         blockIncomingSessionPackets.put(jid, true);
     }
 
     @Override
     public void blockOutgoingSessionPackets(JID jid) throws RemoteException {
+        LOG.trace("blocking outgoing packet transfer to " + jid);
         blockOutgoingSessionPackets.put(jid, true);
     }
 
@@ -302,6 +310,7 @@ public final class NetworkManipulatorImpl extends StfRemoteObject implements
         if (!blockAllIncomingSessionPackets)
             return;
 
+        LOG.trace("unblocking all incoming packet transfer");
         blockAllIncomingSessionPackets = false;
 
         for (JID jid : blockIncomingSessionPackets.keySet())
@@ -313,6 +322,7 @@ public final class NetworkManipulatorImpl extends StfRemoteObject implements
         if (!blockAllOutgoingSessionPackets)
             return;
 
+        LOG.trace("unblocking all outgoing packet transfer");
         blockAllOutgoingSessionPackets = false;
 
         for (JID jid : blockOutgoingSessionPackets.keySet())
@@ -321,11 +331,13 @@ public final class NetworkManipulatorImpl extends StfRemoteObject implements
 
     @Override
     public void blockIncomingSessionPackets() throws RemoteException {
+        LOG.trace("blocking all incoming packet transfer");
         blockAllIncomingSessionPackets = true;
     }
 
     @Override
     public void blockOutgoingSessionPackets() throws RemoteException {
+        LOG.trace("blocking all outgoing packet transfer");
         blockAllOutgoingSessionPackets = true;
     }
 
