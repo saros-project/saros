@@ -19,6 +19,8 @@ public class Messages extends NLS {
     public static String User_comparing;
     public static String User_invitation;
     public static String User_you;
+    public static String Saros_tutorial_title;
+    public static String Saros_tutorial_url;
     static {
         // initialize resource bundle
         NLS.initializeMessages(BUNDLE_NAME, Messages.class);

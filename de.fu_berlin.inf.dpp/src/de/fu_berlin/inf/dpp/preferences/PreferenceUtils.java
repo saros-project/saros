@@ -202,16 +202,6 @@ public class PreferenceUtils {
             PreferenceConstants.LOCAL_SOCKS5_PROXY_DISABLED);
     }
 
-    public boolean isGettingStartedFinished() {
-        return saros.getPreferenceStore().getBoolean(
-            PreferenceConstants.GETTING_STARTED_FINISHED);
-    }
-
-    public void setGettingStartedFinished(boolean finished) {
-        saros.getPreferenceStore().setValue(
-            PreferenceConstants.GETTING_STARTED_FINISHED, finished);
-    }
-
     public String getStunIP() {
         return saros.getPreferenceStore().getString(PreferenceConstants.STUN);
     }

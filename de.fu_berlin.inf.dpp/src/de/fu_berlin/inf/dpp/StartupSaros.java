@@ -71,19 +71,21 @@ public class StartupSaros implements IStartup {
              * user is probably already experienced.
              */
 
-            showWizards(xmppAccountStore.isEmpty(),
-                !preferenceUtils.isGettingStartedFinished());
+            handleStartup(xmppAccountStore.isEmpty());
         }
     }
 
-    private void showWizards(boolean showConfigurationWizard,
-        boolean showGettingStartedWizard) {
-
-        if (showGettingStartedWizard)
-            WizardUtils.openSarosGettingStartedWizard(showConfigurationWizard);
-
-        if (showConfigurationWizard)
+    private void handleStartup(boolean showConfigurationWizard) {
+        if (showConfigurationWizard) {
+            Utils.runSafeSWTAsync(log, new Runnable() {
+                @Override
+                public void run() {
+                    Utils.openInternalBrowser(Messages.Saros_tutorial_url,
+                        Messages.Saros_tutorial_title);
+                }
+            });
             WizardUtils.openSarosConfigurationWizard();
+        }
     }
 
     private void startRmiBot(final int port) {
