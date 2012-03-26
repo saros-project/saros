@@ -33,7 +33,7 @@ public class WizardUtils {
         .getName());
 
     private static final boolean MODELESS = true;
-    private static final boolean MODAL = true;
+    private static final boolean MODAL = false;
 
     /**
      * Open a wizard in the SWT thread and returns the {@link WizardDialog}'s
