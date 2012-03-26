@@ -1,5 +1,8 @@
 package de.fu_berlin.inf.dpp.ui.model.rosterSession;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.graphics.Image;
@@ -8,10 +11,13 @@ import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.User;
+import de.fu_berlin.inf.dpp.awareness.AwarenessInformationCollector;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
+import de.fu_berlin.inf.dpp.observables.SarosSessionObservable;
 import de.fu_berlin.inf.dpp.ui.ImageManager;
 import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.ui.model.TreeElement;
+import de.fu_berlin.inf.dpp.ui.util.SWTBoldStyler;
 
 /**
  * Wrapper for {@link UserElement} in use with {@link Viewer Viewers}
@@ -19,21 +25,67 @@ import de.fu_berlin.inf.dpp.ui.model.TreeElement;
  * @author bkahlert
  */
 public class UserElement extends TreeElement {
+
     @Inject
     protected EditorManager editorManager;
+    @Inject
+    protected SarosSessionObservable sarosSession;
+    @Inject
+    protected AwarenessInformationCollector awarenessInformationCollector;
 
     protected User user;
     protected Roster roster;
+
+    /**
+     * Holds the children for this user element - in the future there might be
+     * multiple elements for each user, showing more details than one
+     * TreeElement could hold.
+     */
+    protected List<AwarenessInformationTreeElement> awarenessInformation = new ArrayList<AwarenessInformationTreeElement>();
 
     public UserElement(User user, Roster roster) {
         SarosPluginContext.initComponent(this);
 
         this.user = user;
         this.roster = roster;
+
+        // Comment this check if you want to display awareness information about
+        // the local user to himself..
+        updateChildren();
     }
 
     public Object getUser() {
         return this.user;
+    }
+
+    public boolean getExpanded() {
+        return false;
+
+    }
+
+    protected void updateChildren() {
+        this.awarenessInformation.clear();
+        // Comment this check if you want to display awareness information about
+        // the local user to himself..
+        if (!user.isLocal()) {
+            this.awarenessInformation.add(new AwarenessInformationTreeElement(
+                this.user));
+            FollowModeInformationTreeElement followModeIndicator;
+            if (awarenessInformationCollector.getFollowedUser(user) != null) {
+                followModeIndicator = new FollowModeInformationTreeElement(user);
+                this.awarenessInformation.add(followModeIndicator);
+            }
+        }
+    }
+
+    @Override
+    public Object[] getChildren() {
+        return this.awarenessInformation.toArray();
+    }
+
+    @Override
+    public boolean hasChildren() {
+        return this.awarenessInformation.size() != 0;
     }
 
     @Override
@@ -42,31 +94,39 @@ public class UserElement extends TreeElement {
         final String read_only = Messages.UserElement_read_only;
         final String following = Messages.UserElement_following;
         final String joining = Messages.UserElement_joining;
+        final String host = Messages.UserElement_host;
 
         /*
-         * Name
+         * Blank space in the front for the highlighting color square
          */
-        styledString.append(user.getHumanReadableName());
+        styledString.append("    ");
+
+        if (user.isHost()) {
+            styledString.append(host, StyledString.COUNTER_STYLER);
+        }
+
+        /*
+         * Name of user without server-part (if no alias is set), because only
+         * users from the same XMPP server can be in a session anyway..
+         */
+        styledString.append(user.getShortHumanReadableName());
 
         /*
          * Right level
          */
         if (user.hasReadOnlyAccess()) {
-            styledString.append(" (" + read_only + ")", //$NON-NLS-1$ //$NON-NLS-2$
-                StyledString.COUNTER_STYLER);
+            styledString.append(" " + read_only, StyledString.COUNTER_STYLER);
         }
 
         /*
          * Other
          */
         if (user.equals(editorManager.getFollowedUser())) {
-            styledString.append(" (" + following + ")", //$NON-NLS-1$ //$NON-NLS-2$
-                StyledString.QUALIFIER_STYLER);
+            styledString.append(" " + following, SWTBoldStyler.STYLER);
         }
 
         if (!user.isInvitationComplete()) {
-            styledString.append(" (" + joining + ")", //$NON-NLS-1$ //$NON-NLS-2$
-                StyledString.COUNTER_STYLER);
+            styledString.append(" " + joining, StyledString.COUNTER_STYLER);
         }
 
         return styledString;

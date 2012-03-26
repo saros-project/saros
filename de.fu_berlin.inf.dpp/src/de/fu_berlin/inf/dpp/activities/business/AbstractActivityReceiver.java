@@ -71,4 +71,14 @@ public class AbstractActivityReceiver implements IActivityReceiver {
         // do nothing
 
     }
+
+    public void receive(StartFollowingActivity startFollowingActivity) {
+        // do nothing
+
+    }
+
+    public void receive(StopFollowingActivity stopFollowingActivity) {
+        // do nothing
+
+    }
 }

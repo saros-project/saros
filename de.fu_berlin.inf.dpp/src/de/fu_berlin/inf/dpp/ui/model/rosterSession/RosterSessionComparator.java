@@ -44,10 +44,10 @@ public class RosterSessionComparator extends ViewerComparator {
 
             if (user1.equals(user2))
                 return 0;
-            if (user1.isHost())
-                return -1;
-            if (user2.isHost())
+            if (user1.isLocal())
                 return +1;
+            if (user2.isLocal())
+                return -1;
             return user1.getJID().toString()
                 .compareToIgnoreCase(user2.getJID().toString());
         }

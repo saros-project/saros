@@ -634,4 +634,16 @@ public class SarosView extends ViewPart {
         // TODO Auto-generated method stub
 
     }
+
+    /**
+     * TODO: seriously refactor this and references to this, so that the
+     * FollowModeAction implements a Roster/Session-View selection change
+     * listener, and updates itself....
+     * 
+     * @return
+     */
+    public FollowModeAction getFollowModeAction() {
+        return fmAction;
+    }
+
 }

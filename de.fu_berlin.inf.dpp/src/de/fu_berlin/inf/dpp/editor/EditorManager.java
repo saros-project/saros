@@ -910,13 +910,21 @@ public class EditorManager implements IActivityProvider {
         if (user.equals(getFollowedUser()) && path != null) {
             editorAPI.openEditor(path);
         } else if (user.equals(getFollowedUser()) && path == null) {
-            // Notify the follower that the followed selected a not shared file.
-            // Follow mode is "paused".
-            SarosView
-                .showNotification(
-                    "Follow mode paused!",
-                    user.getHumanReadableName()
-                        + " selected an editor that is not shared. \nFollow mode stays active and follows as soon as possible.");
+            /*
+             * Changed waldmann 22.01.2012: Since the currently opened file and
+             * the information if no shared files are opened is permanently
+             * shown in the saros view, this is no longer necessary and has
+             * proven to be quite annoying to users too. This should only be
+             * activated again if a preference is added to enable users to
+             * disable this type of notification
+             */
+
+            // SarosView
+            // .showNotification(
+            // "Follow mode paused!",
+            // user.getHumanReadableName()
+            // +
+            // " selected an editor that is not shared. \nFollow mode stays active and follows as soon as possible.");
         }
     }
 
@@ -1697,6 +1705,10 @@ public class EditorManager implements IActivityProvider {
         }
     }
 
+    public RemoteEditorManager getRemoteEditorManager() {
+        return this.remoteEditorManager;
+    }
+
     public void jumpToUser(User jumpTo) {
 
         RemoteEditor activeEditor = remoteEditorManager.getEditorState(jumpTo)
@@ -1708,10 +1720,17 @@ public class EditorManager implements IActivityProvider {
 
         if (activeEditor == null) {
             log.info(Utils.prefix(jumpTo.getJID()) + "has no editor open");
+
+            // changed waldmann, 22.01.2012: this balloon Notification became
+            // annoying as the awareness information, which file is opened is
+            // now shown in the session view all the time (unless the user has
+            // collapsed the tree element)
+
             // no active editor on target subject
-            SarosView.showNotification("Following " + jumpTo.getJID().getBase()
-                + "!", jumpTo.getJID().getName()
-                + " has no shared file opened yet.");
+            // SarosView.showNotification("Following " +
+            // jumpTo.getJID().getBase()
+            // + "!", jumpTo.getJID().getName()
+            // + " has no shared file opened yet.");
             return;
         }
 

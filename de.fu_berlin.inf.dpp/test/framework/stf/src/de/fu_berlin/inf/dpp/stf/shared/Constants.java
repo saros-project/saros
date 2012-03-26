@@ -1,5 +1,6 @@
 package de.fu_berlin.inf.dpp.stf.shared;
 
+
 public interface Constants {
     public enum TypeOfCreateProject {
         NEW_PROJECT, EXIST_PROJECT, EXIST_PROJECT_WITH_COPY, EXIST_PROJECT_WITH_COPY_AFTER_CANCEL_LOCAL_CHANGE
@@ -405,6 +406,8 @@ public interface Constants {
         .getString("tree_item_label_buddies");
     public final static String NODE_SESSION = Configuration
         .getString("tree_item_label_session");
+    public final static String HOST_INDICATION = Configuration
+        .getString("UserElement_host");
     public final static String NODE_NO_SESSION_RUNNING = Configuration
         .getString("tree_item_label_no_session_running");
 

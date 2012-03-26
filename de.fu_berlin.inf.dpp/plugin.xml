@@ -1628,5 +1628,27 @@
                type="de.fu_berlin.inf.dpp.User">
          </adapter>
       </factory>
+      <factory
+            adaptableType="de.fu_berlin.inf.dpp.ui.model.rosterSession.AwarenessInformationTreeElement"
+            class="de.fu_berlin.inf.dpp.ui.model.rosterSession.RosterSessionAdapterFactory">
+         <adapter
+               type="de.fu_berlin.inf.dpp.User">
+         </adapter>
+      </factory>
+      <factory
+            adaptableType="de.fu_berlin.inf.dpp.ui.model.rosterSession.AwarenessInformationTreeElement"
+            class="de.fu_berlin.inf.dpp.ui.model.rosterSession.RosterSessionAdapterFactory">
+         <adapter
+               type="de.fu_berlin.inf.dpp.User">
+         </adapter>
+      </factory>
+   </extension>
+   <extension
+         point="org.eclipse.ui.contexts">
+      <context
+            id="Saros.whiteboard"
+            name="name"
+            parentId="org.eclipse.ui.contexts.window">
+      </context>
    </extension>
 </plugin>

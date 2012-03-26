@@ -239,8 +239,8 @@ public final class SarosView extends StfRemoteObject implements ISarosView {
         if (!isInSession())
             throw new IllegalStateException("you are not in a session");
         String participantLabel = getParticipantLabel(participantJID);
-        initSessionContextMenuWrapper(Pattern.quote(NODE_SESSION),
-            Pattern.quote(participantLabel) + ".*");
+        initSessionContextMenuWrapper(Pattern.quote(NODE_SESSION), ".*"
+            + Pattern.quote(participantLabel) + ".*");
         ContextMenusInSessionArea.getInstance().setParticipantJID(
             participantJID);
         return ContextMenusInSessionArea.getInstance();
@@ -320,7 +320,7 @@ public final class SarosView extends StfRemoteObject implements ISarosView {
         try {
             String participantLabel = getParticipantLabel(participantJID);
 
-            participantLabel = Pattern.quote(participantLabel) + ".*";
+            participantLabel = ".*" + Pattern.quote(participantLabel) + ".*";
             for (String label : tree.getTreeItem(NODE_SESSION).getNodes())
                 if (label.matches(participantLabel))
                     return true;
@@ -341,13 +341,9 @@ public final class SarosView extends StfRemoteObject implements ISarosView {
             .hasNickName(participantJID)) {
 
             contactLabel = SuperBot.getInstance().views().sarosView()
-                .getNickname(participantJID)
-                + " (" + participantJID.getBase() + ")";
-
+                .getNickname(participantJID);
         } else {
-
-            contactLabel = participantJID.getBase();
-
+            contactLabel = participantJID.getName();
         }
         return contactLabel;
     }
@@ -375,9 +371,19 @@ public final class SarosView extends StfRemoteObject implements ISarosView {
             List<String> participants = tree.getTreeItem(NODE_SESSION)
                 .getNodes();
 
-            return participants.size() > 0
-                && participants.get(0).equals(
-                    getParticipantLabel(SuperBot.getInstance().getJID()));
+            if (participants.size() == 0)
+                return false;
+
+            for (String participant : participants) {
+                if (participant.contains(HOST_INDICATION)) {
+                    if (participant.contains(getParticipantLabel(SuperBot
+                        .getInstance().getJID()))) {
+                        return true;
+                    }
+                }
+            }
+            return false;
+
         } catch (Exception e) {
             log.error(e.getMessage(), e);
             return false;
@@ -531,8 +537,8 @@ public final class SarosView extends StfRemoteObject implements ISarosView {
     }
 
     private void clickToolbarButtonWithTooltip(String tooltipText) {
-        WidgetUtil.getToolbarButtonWithRegex(view, Pattern.quote(tooltipText) + ".*")
-            .click();
+        WidgetUtil.getToolbarButtonWithRegex(view,
+            Pattern.quote(tooltipText) + ".*").click();
     }
 
     private void selectParticipant(JID jidOfSelectedUser, String message)

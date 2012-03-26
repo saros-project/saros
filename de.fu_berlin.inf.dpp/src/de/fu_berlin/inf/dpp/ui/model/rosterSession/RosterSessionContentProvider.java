@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.eclipse.jface.viewers.IContentProvider;
 import org.eclipse.jface.viewers.Viewer;
 import org.jivesoftware.smack.Roster;
@@ -15,6 +16,7 @@ import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.User;
+import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.editor.AbstractSharedEditorListener;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.editor.ISharedEditorListener;
@@ -34,6 +36,8 @@ import de.fu_berlin.inf.nebula.utils.ViewerUtils;
  * @author bkahlert
  */
 public class RosterSessionContentProvider extends TreeContentProvider {
+    private static final Logger log = Logger
+        .getLogger(RosterSessionContentProvider.class);
 
     protected Viewer viewer;
     protected RosterContentProvider rosterContentProvider = new RosterContentProvider();
@@ -55,12 +59,22 @@ public class RosterSessionContentProvider extends TreeContentProvider {
         }
 
         @Override
+        public void activeEditorChanged(final User user, SPath path) {
+            Utils.runSafeSWTAsync(null, new Runnable() {
+                public void run() {
+                    viewer.refresh();
+                    viewer.getControl().redraw();
+                }
+            });
+        }
+
+        @Override
         public void colorChanged() {
 
             // does not force a redraw
             // ViewerUtils.refresh(viewer, true);
 
-            Utils.runSafeSWTSync(null, new Runnable() {
+            Utils.runSafeSWTAsync(null, new Runnable() {
                 public void run() {
                     viewer.getControl().redraw();
                 }

@@ -23,6 +23,7 @@ import org.picocontainer.injectors.ProviderAdapter;
 import org.picocontainer.injectors.Reinjector;
 
 import de.fu_berlin.inf.dpp.accountManagement.XMPPAccountStore;
+import de.fu_berlin.inf.dpp.awareness.AwarenessInformationCollector;
 import de.fu_berlin.inf.dpp.communication.SkypeManager;
 import de.fu_berlin.inf.dpp.communication.audio.AudioService;
 import de.fu_berlin.inf.dpp.communication.audio.AudioServiceManager;
@@ -100,6 +101,7 @@ import de.fu_berlin.inf.dpp.project.SharedResourcesManager;
 import de.fu_berlin.inf.dpp.project.internal.ChangeColorManager;
 import de.fu_berlin.inf.dpp.project.internal.ChecksumCacheImpl;
 import de.fu_berlin.inf.dpp.project.internal.FileContentNotifierBridge;
+import de.fu_berlin.inf.dpp.project.internal.FollowingActivitiesManager;
 import de.fu_berlin.inf.dpp.project.internal.PermissionManager;
 import de.fu_berlin.inf.dpp.project.internal.ProjectsAddedManager;
 import de.fu_berlin.inf.dpp.ui.LocalPresenceTracker;
@@ -259,6 +261,8 @@ public class SarosContext {
         Component.create(SarosSessionObservable.class),
         Component.create(VoIPSessionObservable.class),
         Component.create(VideoSessionObservable.class),
+        Component.create(AwarenessInformationCollector.class),
+        Component.create(FollowingActivitiesManager.class),
 
         // Handlers
         Component.create(CancelInviteHandler.class),

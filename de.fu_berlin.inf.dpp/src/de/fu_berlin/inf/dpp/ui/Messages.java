@@ -420,6 +420,7 @@ public class Messages extends NLS {
     public static String UserElement_following;
     public static String UserElement_joining;
     public static String UserElement_read_only;
+    public static String UserElement_host;
     public static String VideoPlayerView_bitrate;
     public static String VideoPlayerView_bitrate_text;
     public static String VideoPlayerView_change_image_source;
