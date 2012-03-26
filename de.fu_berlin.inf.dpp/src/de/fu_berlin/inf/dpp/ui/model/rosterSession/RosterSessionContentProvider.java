@@ -62,6 +62,9 @@ public class RosterSessionContentProvider extends TreeContentProvider {
         public void activeEditorChanged(final User user, SPath path) {
             Utils.runSafeSWTAsync(null, new Runnable() {
                 public void run() {
+                    if (viewer.getControl().isDisposed())
+                        return;
+
                     viewer.refresh();
                     viewer.getControl().redraw();
                 }
@@ -76,6 +79,9 @@ public class RosterSessionContentProvider extends TreeContentProvider {
 
             Utils.runSafeSWTAsync(null, new Runnable() {
                 public void run() {
+                    if (viewer.getControl().isDisposed())
+                        return;
+
                     viewer.getControl().redraw();
                 }
             });
