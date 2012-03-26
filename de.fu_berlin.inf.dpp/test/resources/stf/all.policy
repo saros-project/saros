@@ -1,4 +1,3 @@
-# Test
 grant {
 	permission java.security.AllPermission;
 };
