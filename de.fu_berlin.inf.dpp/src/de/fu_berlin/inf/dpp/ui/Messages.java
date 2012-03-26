@@ -34,6 +34,7 @@ public class Messages extends NLS {
     public static String AdvancedPreferencePage_peer_update;
     public static String AdvancedPreferencePage_ping_pong;
     public static String AdvancedPreferencePage_show_xmpp_debug;
+    public static String AdvancedPreferencePage_enable_balloon_notifications;
     public static String AdvancedPreferencePage_skip_synchronization;
     public static String ChangeColorAction_dialog_text;
     public static String ChangeColorAction_message_text;

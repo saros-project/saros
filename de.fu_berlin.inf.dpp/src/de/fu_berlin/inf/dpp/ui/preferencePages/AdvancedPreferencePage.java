@@ -48,6 +48,11 @@ public class AdvancedPreferencePage extends FieldEditorPreferencePage implements
 
         assert (debugMode = true) == true;
 
+        addField(new BooleanFieldEditor(
+            PreferenceConstants.ENABLE_BALLOON_NOTIFICATION,
+            Messages.AdvancedPreferencePage_enable_balloon_notifications,
+            getFieldEditorParent()));
+
         IntegerFieldEditor millisUpdateField = new IntegerFieldEditor(
             PreferenceConstants.MILLIS_UPDATE,
             Messages.AdvancedPreferencePage_peer_update, getFieldEditorParent());

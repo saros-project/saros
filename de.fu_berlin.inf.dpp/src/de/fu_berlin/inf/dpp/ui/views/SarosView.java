@@ -31,6 +31,8 @@ import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
+import org.eclipse.jface.util.IPropertyChangeListener;
+import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.SWT;
@@ -193,6 +195,16 @@ public class SarosView extends ViewPart {
         }
     };
 
+    protected IPropertyChangeListener propertyListener = new IPropertyChangeListener() {
+        public void propertyChange(PropertyChangeEvent event) {
+            if (event.getProperty().equals(
+                PreferenceConstants.ENABLE_BALLOON_NOTIFICATION)) {
+                showBallonNotifications = Boolean.valueOf(event.getNewValue()
+                    .toString());
+            }
+        }
+    };
+
     protected Composite leftComposite;
     protected BuddySessionDisplayComposite buddySessionDisplayComposite;
 
@@ -213,9 +225,14 @@ public class SarosView extends ViewPart {
     @Inject
     protected ChildContainer container;
 
+    private static volatile boolean showBallonNotifications;
+
     public SarosView() {
         super();
         SarosPluginContext.initComponent(this);
+        saros.getPreferenceStore().addPropertyChangeListener(propertyListener);
+        showBallonNotifications = saros.getPreferenceStore().getBoolean(
+            PreferenceConstants.ENABLE_BALLOON_NOTIFICATION);
     }
 
     /**
@@ -580,9 +597,34 @@ public class SarosView extends ViewPart {
         if (text == null)
             throw new NullPointerException("text is null");
 
+        if (!showBallonNotifications)
+            return;
+
         Utils.runSafeSWTAsync(log, new Runnable() {
             public void run() {
-                BalloonNotification.showNotification(control, title, text);
+
+                if (control != null) {
+                    BalloonNotification.showNotification(control, title, text);
+                    return;
+                }
+
+                IViewPart sarosView = Utils.findView(SarosView.ID);
+                /*
+                 * If no session view is open then show the balloon notification
+                 * in the control which has the keyboard focus
+                 */
+
+                Control sarosViewControl;
+
+                if (sarosView != null) {
+                    sarosViewControl = ((SarosView) sarosView).leftComposite;
+                } else {
+                    sarosViewControl = Display.getDefault().getFocusControl();
+
+                }
+
+                BalloonNotification.showNotification(sarosViewControl, title,
+                    text);
             }
         });
     }
@@ -602,25 +644,7 @@ public class SarosView extends ViewPart {
      *             if title or text is <code>null</code>
      */
     public static void showNotification(final String title, final String text) {
-
-        Utils.runSafeSWTAsync(log, new Runnable() {
-            public void run() {
-                IViewPart sarosView = Utils.findView(SarosView.ID);
-                /*
-                 * If no session view is open then show the balloon notification
-                 * in the control which has the keyboard focus
-                 */
-                Control control;
-
-                if (sarosView != null) {
-                    control = ((SarosView) sarosView).leftComposite;
-                } else {
-                    control = Display.getDefault().getFocusControl();
-
-                }
-                showNotification(title, text, control);
-            }
-        });
+        showNotification(title, text, null);
     }
 
     /**
@@ -638,7 +662,6 @@ public class SarosView extends ViewPart {
     @Override
     public void setFocus() {
         // TODO Auto-generated method stub
-
     }
 
     /**

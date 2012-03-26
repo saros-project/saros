@@ -88,9 +88,12 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 
         prefs.setValue(PreferenceConstants.DEFAULT_XMPP_PORT, 5222);
 
+        // Advanced Preferences
+        prefs.setValue(PreferenceConstants.SKIP_SYNC_SELECTABLE, false);
+        prefs.setValue(PreferenceConstants.ENABLE_BALLOON_NOTIFICATION, true);
+
         // InvitationDialog
         prefs.setValue(PreferenceConstants.AUTO_CLOSE_DIALOG, true);
-        prefs.setValue(PreferenceConstants.SKIP_SYNC_SELECTABLE, false);
         prefs.setValue(
             PreferenceConstants.BUDDYSELECTION_FILTERNONSAROSBUDDIES, true);
 
