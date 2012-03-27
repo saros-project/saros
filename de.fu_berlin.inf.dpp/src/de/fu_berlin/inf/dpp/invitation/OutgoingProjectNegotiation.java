@@ -428,7 +428,7 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
             monitor.setTaskName("Invitation failed.");
         }
 
-        if (sessionManager.getSarosSession().getRemoteUsers().isEmpty())
+        if (sarosSession.getRemoteUsers().isEmpty())
             sessionManager.stopSarosSession();
 
         projectExchangeProcesses.removeProjectExchangeProcess(this);
