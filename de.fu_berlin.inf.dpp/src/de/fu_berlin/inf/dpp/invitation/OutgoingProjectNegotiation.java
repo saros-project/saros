@@ -9,6 +9,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.concurrent.CancellationException;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.log4j.Logger;
@@ -118,10 +119,13 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
             getRemoteFileList(monitor.newChild(0));
             monitor.subTask("");
             editorManager.setAllLocalOpenedEditorsLocked(false);
-            // pack each project into one archive
+            // pack each project into one archive and check if it was
+            // cancelled.
             zipArchives = createProjectArchives(monitor.newChild(30),
                 this.projectFilesToSend);
+            checkCancellation(CancelOption.NOTIFY_PEER);
             if (zipArchives.size() > 0) {
+
                 // pack all archive files into one big archive
                 zipArchive = File.createTempFile("SarosSyncArchive", ".zip");
                 FileZipper.zipFiles(zipArchives, zipArchive, false,
@@ -330,7 +334,7 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
     /**
      * This method does <strong>not</strong> execute the cancellation but only
      * sets the {@link #cancellationCause}. It should be called if the
-     * cancellation was initated by the <strong>local</strong> user. The
+     * cancellation was initiated by the <strong>local</strong> user. The
      * cancellation will be ignored if the invitation has already been cancelled
      * before. <br>
      * In order to cancel the invitation process {@link #executeCancellation()}
@@ -493,9 +497,14 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
         List<StartHandle> startHandles;
 
         synchronized (sarosSession) {
-            startHandles = sarosSession.getStopManager().stop(usersToStop,
-                "Synchronizing invitation",
+            try {
+                startHandles = sarosSession.getStopManager().stop(usersToStop,
+                    "Synchronizing invitation",
                 monitor.newChild(0, SubMonitor.SUPPRESS_ALL_LABELS));
+            } catch (CancellationException e) {
+                checkCancellation(CancelOption.NOTIFY_PEER);
+                return null;
+            }
         }
 
         try {

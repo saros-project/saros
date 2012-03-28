@@ -280,6 +280,11 @@ public class SarosSessionStub implements ISarosSession {
         throw new RuntimeException("Unexpected call to Stub");
     }
 
+    public void removeProjectOwnership(String projectID, IProject project,
+        JID ownerJID) {
+        throw new RuntimeException("Unexpected call to Stub");
+    }
+
     public StopManager getStopManager() {
         throw new RuntimeException("Unexpected call to Stub");
     }

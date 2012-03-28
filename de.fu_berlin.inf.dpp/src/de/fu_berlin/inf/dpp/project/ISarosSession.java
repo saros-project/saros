@@ -453,8 +453,21 @@ public interface ISarosSession extends IActivityListener {
         JID ownerJID);
 
     /**
+     * Removes the mapping of the project from the SarosProjectMapper.
+     * 
+     * @param projectID
+     *            ID of the project
+     * @param project
+     *            the IProject itself
+     * @param ownerJID
+     *            the inviter to this project
+     */
+    public void removeProjectOwnership(String projectID, IProject project,
+        JID ownerJID);
+
+    /**
      * Return the stop manager of this session.
-     *
+     * 
      * @return
      */
     public StopManager getStopManager();

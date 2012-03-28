@@ -81,6 +81,23 @@ class SarosProjectMapper {
         userToProjectIDMapping.put(senderJID, ownedProjects);
     }
 
+    public synchronized void removeUserToProjectMapping(JID senderJID,
+        IProject project) {
+
+        ArrayList<IProject> ownedProjects = userToProjectIDMapping
+            .get(senderJID);
+
+        if (ownedProjects == null)
+            return;
+
+        if (!ownedProjects.contains(project))
+            return;
+
+        ownedProjects.remove(project);
+
+        userToProjectIDMapping.put(senderJID, ownedProjects);
+    }
+
     public synchronized void addResourceMapping(IProject localProject,
         List<IResource> dependentResources) {
         if (!completeProjectsList.contains(localProject)) {
@@ -91,6 +108,13 @@ class SarosProjectMapper {
                 completeProjectsList.add(localProject);
             }
         }
+    }
+
+    public synchronized void removeResourceMapping(IProject localProject) {
+        if (!completeProjectsList.contains(localProject)) {
+            resourceMapping.remove(localProject);
+        }
+        completeProjectsList.remove(localProject);
     }
 
     public synchronized void removeMapping(String id) {
