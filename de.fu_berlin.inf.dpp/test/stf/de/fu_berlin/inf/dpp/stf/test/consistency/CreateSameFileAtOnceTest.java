@@ -35,13 +35,15 @@ public class CreateSameFileAtOnceTest extends StfTestCase {
     @Test
     public void testCreateSameFileAtOnce() throws Exception {
         ALICE.superBot().internal().createProject("foo");
+        ALICE.superBot().internal().createFile("foo", "sync.dummy", "dummy");
+
         Util.buildSessionSequentially("foo", TypeOfCreateProject.NEW_PROJECT,
             ALICE, BOB, CARL);
 
         BOB.superBot().views().packageExplorerView()
-            .waitUntilResourceIsShared("foo");
+            .waitUntilResourceIsShared("foo/sync.dummy");
         CARL.superBot().views().packageExplorerView()
-            .waitUntilResourceIsShared("foo");
+            .waitUntilResourceIsShared("foo/sync.dummy");
 
         AbstractTester firstTester = BOB;
         AbstractTester secondTester = CARL;
