@@ -43,8 +43,6 @@ import org.eclipse.equinox.security.storage.SecurePreferencesFactory;
 import org.eclipse.jface.wizard.IWizard;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.jivesoftware.smack.ConnectionConfiguration;
-import org.jivesoftware.smack.Roster;
-import org.jivesoftware.smack.Roster.SubscriptionMode;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.proxy.ProxyInfo;
 import org.osgi.framework.Bundle;
@@ -189,10 +187,6 @@ public class Saros extends AbstractUIPlugin {
      */
 
     protected SarosContext sarosContext;
-
-    static {
-        Roster.setDefaultSubscriptionMode(SubscriptionMode.accept_all);
-    }
 
     /**
      * Create the shared instance.

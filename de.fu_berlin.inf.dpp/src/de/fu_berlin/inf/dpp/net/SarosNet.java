@@ -293,6 +293,8 @@ public class SarosNet {
         loginUsername = username;
         loginPassword = password;
 
+        Roster.setDefaultSubscriptionMode(Roster.SubscriptionMode.manual);
+
         this.connection = new XMPPConnection(connectionConfiguration);
 
         try {
@@ -305,8 +307,6 @@ public class SarosNet {
                     new XMPPConnectionListener());
             }
             connection.addConnectionListener(this.smackConnectionListener);
-
-            Roster.setDefaultSubscriptionMode(Roster.SubscriptionMode.manual);
 
             /*
              * TODO SS Possible race condition, as our packet listeners are

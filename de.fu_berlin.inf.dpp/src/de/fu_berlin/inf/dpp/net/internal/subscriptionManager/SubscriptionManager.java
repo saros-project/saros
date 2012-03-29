@@ -159,8 +159,10 @@ public class SubscriptionManager {
         // create one
         RosterEntry entry = connection.getRoster().getEntry(presence.getFrom());
 
-        if (entry != null)
+        if (entry != null) {
+            sendPresence(Presence.Type.subscribe, presence.getFrom());
             return;
+        }
 
         try {
             connection.getRoster().createEntry(presence.getFrom(),
