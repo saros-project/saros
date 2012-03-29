@@ -7,12 +7,10 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.zip.Adler32;
-import java.util.zip.CheckedInputStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.io.output.NullOutputStream;
 import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
@@ -45,6 +43,8 @@ public class FileUtils {
 
     private static Logger log = Logger.getLogger(FileUtils.class);
 
+    private static final int BUFFER_SIZE = 32 * 1024;
+
     private FileUtils() {
         // no instantiation allowed
     }
@@ -59,22 +59,27 @@ public class FileUtils {
      */
     public static long checksum(IFile file) throws IOException {
 
-        InputStream contents;
+        InputStream in;
         try {
-            contents = file.getContents();
+            in = file.getContents();
         } catch (CoreException e) {
-            throw new CausedIOException("Failed to calculate checksum.", e);
+            throw new IOException("failed to calculate checksum.", e);
         }
 
-        CheckedInputStream in = new CheckedInputStream(contents, new Adler32());
+        byte[] buffer = new byte[BUFFER_SIZE];
+
+        Adler32 adler = new Adler32();
+
+        int read;
+
         try {
-            IOUtils.copy(in, new NullOutputStream());
-        } catch (IOException e) {
-            throw new CausedIOException("Failed to calculate checksum.", e);
+            while ((read = in.read(buffer)) != -1)
+                adler.update(buffer, 0, read);
         } finally {
             IOUtils.closeQuietly(in);
         }
-        return in.getChecksum().getValue();
+
+        return adler.getValue();
     }
 
     /**
@@ -134,7 +139,7 @@ public class FileUtils {
     public static void writeFile(InputStream input, IFile file,
         IProgressMonitor monitor) throws CoreException {
         if (file.exists()) {
-            file.setContents(input, IResource.FORCE, monitor);
+            updateFile(input, file, monitor);
         } else {
             createFile(input, file, monitor);
         }
@@ -230,7 +235,7 @@ public class FileUtils {
     public static void createFile(final InputStream input, final IFile file,
         IProgressMonitor monitor) throws CoreException {
 
-        IWorkspaceRunnable createFolderProcedure = new IWorkspaceRunnable() {
+        IWorkspaceRunnable createFileProcedure = new IWorkspaceRunnable() {
             public void run(IProgressMonitor monitor) throws CoreException {
                 // Make sure directory exists
                 mkdirs(file);
@@ -251,9 +256,28 @@ public class FileUtils {
         };
 
         IWorkspace workspace = ResourcesPlugin.getWorkspace();
-        workspace.run(createFolderProcedure, workspace.getRoot(),
+        workspace.run(createFileProcedure, workspace.getRoot(),
             IWorkspace.AVOID_UPDATE, null);
 
+    }
+
+    /**
+     * Updates the data in the file with the data from the given InputStream.
+     * 
+     * @pre the file must exist
+     */
+    public static void updateFile(final InputStream input, final IFile file,
+        IProgressMonitor monitor) throws CoreException {
+
+        IWorkspaceRunnable replaceFileProcedure = new IWorkspaceRunnable() {
+            public void run(IProgressMonitor monitor) throws CoreException {
+                file.setContents(input, IResource.FORCE, monitor);
+            }
+        };
+
+        IWorkspace workspace = ResourcesPlugin.getWorkspace();
+        workspace.run(replaceFileProcedure, workspace.getRoot(),
+            IWorkspace.AVOID_UPDATE, null);
     }
 
     /**
