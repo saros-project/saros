@@ -116,7 +116,9 @@ public class ConnectionStateComposite extends Composite {
             return Messages.ConnectionStateComposite_connecting;
         case CONNECTED:
             JID jid = new JID(saros.getSarosNet().getConnection().getUser());
-            return jid.getBase();
+            String displayText = jid.getBase()
+                + Messages.ConnectionStateComposite_connected;
+            return displayText;
         case DISCONNECTING:
             return Messages.ConnectionStateComposite_disconnecting;
         case ERROR:
