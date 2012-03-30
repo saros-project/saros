@@ -41,6 +41,8 @@ public class ImageManager {
     public static final Image ETOOL_CRASH_REPORT = getImage("icons/etool16/crash_report_misc.png"); //$NON-NLS-1$
     public static final Image DTOOL_CRASH_REPORT = getImage("icons/dtool16/crash_report_misc.png"); //$NON-NLS-1$
     public static final Image ETOOL_NEW_PROJECT = getImage("icons/etool16/new_project.gif"); //$NON-NLS-1$
+    public static final ImageDescriptor ETOOL_EDIT = getImageDescriptor("icons/etool16/edit.gif"); //$NON-NLS-1$
+    public static final ImageDescriptor ETOOL_TEST_CONNECTION = getImageDescriptor("icons/etool16/test_con.gif"); //$NON-NLS-1$
 
     /*
      * local tool bar
@@ -101,22 +103,6 @@ public class ImageManager {
 
     public static final Image ICON_BUDDY_SAROS_AWAY = new DecorationOverlayIcon(
         ICON_BUDDY_SAROS, OVERLAY_AWAY, IDecoration.TOP_RIGHT).createImage();
-
-    /*
-     * Getting Started
-     */
-    public static final ImageDescriptor WIZBAN_GETTING_STARTED_STEP0 = getImageDescriptor("icons/wizban/getting_started_step0_wiz.gif"); //$NON-NLS-1$
-    public static final ImageDescriptor WIZBAN_GETTING_STARTED_STEP1 = getImageDescriptor("icons/wizban/getting_started_step1_wiz.gif"); //$NON-NLS-1$
-    public static final ImageDescriptor WIZBAN_GETTING_STARTED_STEP2 = getImageDescriptor("icons/wizban/getting_started_step2_wiz.gif"); //$NON-NLS-1$
-    public static final ImageDescriptor WIZBAN_GETTING_STARTED_STEP3 = getImageDescriptor("icons/wizban/getting_started_step3_wiz.gif"); //$NON-NLS-1$
-    public static final ImageDescriptor WIZBAN_GETTING_STARTED_STEP4 = getImageDescriptor("icons/wizban/getting_started_step4_wiz.gif"); //$NON-NLS-1$
-
-    public static final ImageDescriptor IMAGE_GETTING_STARTED_STEP0 = getImageDescriptor("assets/images/getting_started/step0.png"); //$NON-NLS-1$
-    public static final ImageDescriptor IMAGE_GETTING_STARTED_STEP1 = getImageDescriptor("assets/images/getting_started/step1.png"); //$NON-NLS-1$
-    public static final ImageDescriptor IMAGE_GETTING_STARTED_STEP2 = getImageDescriptor("assets/images/getting_started/step2.png"); //$NON-NLS-1$
-    public static final ImageDescriptor IMAGE_GETTING_STARTED_STEP3 = getImageDescriptor("assets/images/getting_started/step3.png"); //$NON-NLS-1$
-    public static final ImageDescriptor IMAGE_GETTING_STARTED_STEP4_CONFIG = getImageDescriptor("assets/images/getting_started/step4_config.png"); //$NON-NLS-1$
-    public static final ImageDescriptor IMAGE_GETTING_STARTED_STEP4_NOCONFIG = getImageDescriptor("assets/images/getting_started/step4_noconfig.png"); //$NON-NLS-1$
 
     /**
      * Returns an image from the file at the given plug-in relative path.
