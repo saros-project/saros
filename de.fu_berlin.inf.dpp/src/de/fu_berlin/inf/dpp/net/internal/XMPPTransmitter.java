@@ -51,14 +51,12 @@ import org.jivesoftware.smack.packet.IQ;
 import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.Packet;
 import org.jivesoftware.smack.packet.PacketExtension;
-import org.joda.time.DateTime;
 import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.FileList;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.User.UserConnectionState;
 import de.fu_berlin.inf.dpp.annotations.Component;
-import de.fu_berlin.inf.dpp.communication.muc.negotiation.MUCSessionPreferences;
 import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
 import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
 import de.fu_berlin.inf.dpp.invitation.InvitationProcess;
@@ -90,7 +88,6 @@ import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.util.ActivityUtils;
 import de.fu_berlin.inf.dpp.util.CausedIOException;
 import de.fu_berlin.inf.dpp.util.Utils;
-import de.fu_berlin.inf.dpp.util.VersionManager.VersionInfo;
 
 /**
  * The one ITransmitter implementation which uses Smack Chat objects.
@@ -224,7 +221,8 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
                 monitor);
         }
 
-        monitor.subTask("Waiting for archive file...");
+        monitor
+            .subTask("Host is compressing project files. Waiting for the archive file...");
         while (!collector.hasReceived()) {
             if (monitor.isCanceled()) {
                 throw new LocalCancellationException();

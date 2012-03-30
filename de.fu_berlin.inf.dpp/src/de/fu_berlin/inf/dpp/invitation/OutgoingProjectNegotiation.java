@@ -257,6 +257,8 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
             + ": Waiting for remote file list...");
 
         try {
+            monitor.setTaskName("Waiting for " + peer.getName()
+                + " to choose project(s) location");
             monitor.beginTask("Waiting for " + peer.getName()
                 + " to choose project(s) location", 1);
 
@@ -545,6 +547,7 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
         String projectID) throws SarosCancellationException, IOException {
 
         monitor.beginTask("Sending archive...", 100);
+        monitor.setTaskName("Sending archive...");
 
         log.debug("Inv" + Utils.prefix(peer) + ": Sending archive...");
 

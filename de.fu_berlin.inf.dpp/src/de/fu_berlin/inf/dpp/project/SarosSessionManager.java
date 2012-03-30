@@ -693,9 +693,7 @@ public class SarosSessionManager implements ISarosSessionManager {
 
         public OutgoingProjectJob(
             OutgoingProjectNegotiation outgoingProjectNegotiation) {
-            super(MessageFormat.format(
-                Messages.SarosSessionManager_sharing_project,
-                outgoingProjectNegotiation.getProjectNames()));
+            super(Messages.SarosSessionManager_sharing_project);
             this.process = outgoingProjectNegotiation;
             this.peer = process.getPeer().getBase();
             this.setUser(true);
