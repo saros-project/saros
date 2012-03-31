@@ -53,13 +53,11 @@ public class FollowModeInformationTreeElement extends
             if (followTarget != null) {
                 User followTargetUser = sarosSession.getValue().getUser(
                     followTarget);
-                styledString.append(
-                    "Following " + followTargetUser.getShortHumanReadableName()
-                        + "", StyledString.COUNTER_STYLER);
+                styledString.append("Following "
+                    + followTargetUser.getShortHumanReadableName());
             }
         } else {
-            styledString.append("Not following anyone",
-                StyledString.COUNTER_STYLER);
+            styledString.append("Not following anyone");
         }
         return styledString;
     }
