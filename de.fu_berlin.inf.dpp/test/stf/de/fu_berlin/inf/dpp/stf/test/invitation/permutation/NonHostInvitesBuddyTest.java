@@ -36,7 +36,7 @@ public class NonHostInvitesBuddyTest extends StfTestCase {
     }
 
     @Before
-    public static void tidyUp() throws Exception {
+    public void tidyUp() throws Exception {
         closeAllShells();
         closeAllEditors();
         clearWorkspaces();
