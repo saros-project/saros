@@ -17,7 +17,6 @@ import java.io.Writer;
 import java.net.MalformedURLException;
 import java.net.Socket;
 import java.net.URL;
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -842,29 +841,23 @@ public class Utils {
         if (deltaMs == 0) {
             return " (" + formatByte(length) + " in < 1 ms)";
         } else {
-            return " ("
-                + formatByte(length)
-                + " in "
-                + formatDuration(deltaMs / 1000)
-                + " at "
-                + new DecimalFormat("#0.00").format((1000d * length / 1024d)
-                    / deltaMs) + " KiB/s)";
-
+            return " (" + formatByte(length) + " in "
+                + formatDuration(deltaMs / 1000) + " at "
+                + formatByte(length / deltaMs) + "/s)";
         }
     }
 
     /**
      * Turn an integer representing a file size into a human readable
-     * representation. For instance 573 becomes 573 byte, 16787 becomes 16 KiB.
+     * representation based on 1KB = 1000 Byte, 1000 KB=1MB, etc. (SI)
      */
-    public static String formatByte(long length) {
-        if (length < 1024L) {
-            return length + " byte";
-        }
-        if (length < 1024L * 1024L) {
-            return (length / 1024L) + " KiB";
-        }
-        return length / 1024L / 1024L + " MiB";
+    public static String formatByte(long bytes) {
+        int unit = 1000;
+        if (bytes < unit)
+            return bytes + " B";
+        int exp = (int) (Math.log(bytes) / Math.log(unit));
+        char pre = ("kMGTPE").charAt(exp - 1);
+        return String.format("%.1f %sB", bytes / Math.pow(unit, exp), pre);
     }
 
     /**
