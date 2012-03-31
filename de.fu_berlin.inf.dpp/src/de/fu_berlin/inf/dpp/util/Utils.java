@@ -843,7 +843,7 @@ public class Utils {
         } else {
             return " (" + formatByte(length) + " in "
                 + formatDuration(deltaMs / 1000) + " at "
-                + formatByte(length / deltaMs) + "/s)";
+                + formatByte(length / deltaMs * 1000) + "/s)";
         }
     }
 
