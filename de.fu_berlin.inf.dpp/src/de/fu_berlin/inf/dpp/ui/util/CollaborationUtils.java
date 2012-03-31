@@ -431,10 +431,10 @@ public class CollaborationUtils {
             return "< 1 KB";
 
         if (size < 1000 * 1000)
-            return String.format(Locale.US, "%.2f KB", size / (1024F));
+            return String.format(Locale.US, "%.2f KB", size / (1000F));
 
         if (size < 1000 * 1000 * 1000)
-            return String.format(Locale.US, "%.2f MB", size / (1024F * 1024F));
+            return String.format(Locale.US, "%.2f MB", size / (1000F * 1000F));
 
         return String.format(Locale.US, "%.2f GB", size
             / (1000F * 1000F * 1000F));
