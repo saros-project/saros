@@ -10,6 +10,7 @@ public abstract class AbstractActivityProvider implements IActivityProvider {
     protected List<IActivityListener> activityListeners = new CopyOnWriteArrayList<IActivityListener>();
 
     public void addActivityListener(IActivityListener listener) {
+        assert listener != null;
         if (!activityListeners.contains(listener)) {
             this.activityListeners.add(listener);
         }

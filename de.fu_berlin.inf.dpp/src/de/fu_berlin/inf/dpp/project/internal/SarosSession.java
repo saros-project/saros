@@ -139,8 +139,6 @@ public class SarosSession implements ISarosSession, Disposable {
 
     protected final CopyOnWriteArrayList<IActivityProvider> activityProviders = new CopyOnWriteArrayList<IActivityProvider>();
 
-    protected StopManager stopManager = new StopManager(this);
-
     private MappedList<String, IActivityDataObject> queuedActivities = new MappedList<String, IActivityDataObject>();
 
     /* Instance fields */
@@ -173,6 +171,12 @@ public class SarosSession implements ISarosSession, Disposable {
             handleActivityCreated(activityData);
         }
     };
+
+    /*
+     * NOTE: The StopManager will call the SarosSession on creation. Make sure
+     * the above activityListener is created before the StopManager.
+     */
+    protected StopManager stopManager = new StopManager(this);
 
     /**
      * This thread executes pending activities in the SWT thread.<br>
