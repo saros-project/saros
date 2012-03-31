@@ -48,11 +48,9 @@ import de.fu_berlin.inf.dpp.synchronize.StopManager;
  * concept of this plugin. They are associated with Eclipse projects and make
  * them available for synchronous/real-time collaboration.
  * 
- * TODO Is this interface really necessary?
- * 
  * @author rdjemili
  */
-public interface ISarosSession extends IActivityListener {
+public interface ISarosSession {
 
     /**
      * @return a collection of all participants of the shared project. This
@@ -259,19 +257,6 @@ public interface ISarosSession extends IActivityListener {
     public void exec(List<IActivityDataObject> activityDataObjects);
 
     /**
-     * All the ActivityProviders will call this method when new events occurred
-     * in the UI.
-     * 
-     * The given activity will be transformed by the ConcurrentDocumentManager
-     * and then send to all buddies.
-     * 
-     * @see IActivityListener
-     * 
-     * @swt MUST be called from the SWT thread to ensure synchronization!
-     */
-    public void activityCreated(IActivity activity);
-
-    /**
      * Sends the given activity to the given list of users.
      * 
      * This method will by-pass the ConcurrentDocumentManager.
@@ -454,7 +439,7 @@ public interface ISarosSession extends IActivityListener {
 
     /**
      * Return the stop manager of this session.
-     *
+     * 
      * @return
      */
     public StopManager getStopManager();

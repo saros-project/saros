@@ -86,6 +86,8 @@ import de.fu_berlin.inf.dpp.net.internal.SarosPacketCollector;
 import de.fu_berlin.inf.dpp.observables.ProjectNegotiationObservable;
 import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
+import de.fu_berlin.inf.dpp.project.AbstractActivityProvider;
+import de.fu_berlin.inf.dpp.project.IActivityListener;
 import de.fu_berlin.inf.dpp.project.IActivityProvider;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
@@ -165,6 +167,12 @@ public class SarosSession implements ISarosSession, Disposable {
     public boolean cancelActivityDispatcher = false;
 
     protected IPreferenceStore prefStore;
+
+    private final IActivityListener activityListener = new IActivityListener() {
+        public void activityCreated(IActivity activityData) {
+            handleActivityCreated(activityData);
+        }
+    };
 
     /**
      * This thread executes pending activities in the SWT thread.<br>
@@ -442,7 +450,7 @@ public class SarosSession implements ISarosSession, Disposable {
 
             Utils.runSafeSWTSync(log, new Runnable() {
                 public void run() {
-                    activityCreated(new PermissionActivity(getLocalUser(),
+                    abuseActivityCreated(new PermissionActivity(getLocalUser(),
                         user, newPermission));
 
                     setPermission(user, newPermission);
@@ -455,7 +463,7 @@ public class SarosSession implements ISarosSession, Disposable {
 
             Utils.runSafeSWTSync(log, new Runnable() {
                 public void run() {
-                    activityCreated(new PermissionActivity(getLocalUser(),
+                    abuseActivityCreated(new PermissionActivity(getLocalUser(),
                         user, newPermission));
 
                     setPermission(user, newPermission);
@@ -833,7 +841,19 @@ public class SarosSession implements ISarosSession, Disposable {
         exec(list);
     }
 
-    public void activityCreated(IActivity activity) {
+    /**
+     * TODO: Methods calling this function need to become an IActivityProvider
+     * and use the {@link AbstractActivityProvider#fireActivity} method to send
+     * their activities.
+     * 
+     * @param activity
+     */
+    @Deprecated
+    private void abuseActivityCreated(IActivity activity) {
+        handleActivityCreated(activity);
+    }
+
+    private void handleActivityCreated(IActivity activity) {
 
         assert Utils.isSWT() : "Must be called from the SWT Thread"; //$NON-NLS-1$
 
@@ -1160,12 +1180,12 @@ public class SarosSession implements ISarosSession, Disposable {
 
     public void addActivityProvider(IActivityProvider provider) {
         if (activityProviders.addIfAbsent(provider))
-            provider.addActivityListener(this);
+            provider.addActivityListener(this.activityListener);
     }
 
     public void removeActivityProvider(IActivityProvider provider) {
         activityProviders.remove(provider);
-        provider.removeActivityListener(this);
+        provider.removeActivityListener(this.activityListener);
     }
 
     public DateTime getSessionStart() {

@@ -221,11 +221,6 @@ public class SarosSessionStub implements ISarosSession {
 
     }
 
-    public void activityCreated(IActivity activity) {
-        throw new RuntimeException("Unexpected call to Stub");
-
-    }
-
     public List<SharedProject> getSharedProjects() {
         throw new RuntimeException("Unexpected call to Stub");
     }

@@ -35,7 +35,6 @@ import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.project.AbstractActivityProvider;
 import de.fu_berlin.inf.dpp.project.AbstractSarosSessionListener;
-import de.fu_berlin.inf.dpp.project.IActivityProvider;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ISarosSessionListener;
 import de.fu_berlin.inf.dpp.project.SarosSessionManager;
@@ -68,9 +67,11 @@ public class ConsistencyWatchdogHandler {
         }
     };
 
-    protected IActivityProvider activityProvider = new AbstractActivityProvider() {
+    protected AbstractActivityProvider activityProvider = new AbstractActivityProvider() {
         @Override
         public void exec(IActivity activity) {
+            if (!sarosSession.isHost())
+                return;
             activity.dispatch(activityReceiver);
         }
     };
@@ -79,14 +80,12 @@ public class ConsistencyWatchdogHandler {
         @Override
         public void sessionStarted(ISarosSession newSharedProject) {
             sarosSession = newSharedProject;
-            if (sarosSession.isHost())
-                newSharedProject.addActivityProvider(activityProvider);
+            newSharedProject.addActivityProvider(activityProvider);
         }
 
         @Override
         public void sessionEnded(ISarosSession oldSarosSession) {
-            if (sarosSession.isHost())
-                oldSarosSession.removeActivityProvider(activityProvider);
+            oldSarosSession.removeActivityProvider(activityProvider);
             sarosSession = null;
         }
     };
@@ -282,7 +281,7 @@ public class ConsistencyWatchdogHandler {
                     checksum.update();
                     Utils.runSafeSWTSync(log, new Runnable() {
                         public void run() {
-                            sarosSession.activityCreated(new ChecksumActivity(
+                            activityProvider.fireActivity(new ChecksumActivity(
                                 user, path, checksum.getHash(), checksum
                                     .getLength()));
                         }
@@ -305,8 +304,8 @@ public class ConsistencyWatchdogHandler {
                 FileActivity.removed(user, path, Purpose.RECOVERY));
             Utils.runSafeSWTSync(log, new Runnable() {
                 public void run() {
-                    sarosSession.activityCreated(ChecksumActivity.missing(user,
-                        path));
+                    activityProvider.fireActivity(ChecksumActivity.missing(
+                        user, path));
                 }
             });
 

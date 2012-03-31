@@ -163,11 +163,6 @@ public class NullSarosSession implements ISarosSession {
 
     }
 
-    public void activityCreated(IActivity activity) {
-        log.warn("unexpected method call");
-
-    }
-
     public void sendActivity(List<User> recipient, IActivity activity) {
         log.warn("unexpected method call");
 

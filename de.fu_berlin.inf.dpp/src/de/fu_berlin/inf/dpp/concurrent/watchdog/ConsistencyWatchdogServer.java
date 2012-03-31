@@ -18,12 +18,14 @@ import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.activities.business.ChecksumActivity;
+import de.fu_berlin.inf.dpp.activities.business.IActivity;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.concurrent.management.DocumentChecksum;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.net.ConnectionState;
 import de.fu_berlin.inf.dpp.net.SarosNet;
 import de.fu_berlin.inf.dpp.net.internal.XMPPTransmitter;
+import de.fu_berlin.inf.dpp.project.AbstractActivityProvider;
 import de.fu_berlin.inf.dpp.project.AbstractSarosSessionListener;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.SarosSessionManager;
@@ -70,6 +72,13 @@ public class ConsistencyWatchdogServer extends Job {
 
     protected ISarosSession sarosSession;
 
+    protected final AbstractActivityProvider activityProvider = new AbstractActivityProvider() {
+        @Override
+        public void exec(IActivity activity) {
+            /* Needed to be able to dispatch activities */
+        }
+    };
+
     public ConsistencyWatchdogServer(SarosSessionManager sessionManager) {
         super("ConsistencyWatchdog");
 
@@ -79,6 +88,8 @@ public class ConsistencyWatchdogServer extends Job {
             .addSarosSessionListener(new AbstractSarosSessionListener() {
                 @Override
                 public void sessionStarted(ISarosSession newSarosSession) {
+
+                    newSarosSession.addActivityProvider(activityProvider);
 
                     if (newSarosSession.isHost()) {
                         sarosSession = newSarosSession;
@@ -92,6 +103,8 @@ public class ConsistencyWatchdogServer extends Job {
 
                 @Override
                 public void sessionEnded(ISarosSession oldSarosSession) {
+
+                    oldSarosSession.removeActivityProvider(activityProvider);
 
                     if (sarosSession != null) {
                         // Cancel Job
@@ -232,7 +245,7 @@ public class ConsistencyWatchdogServer extends Job {
                         sarosSession.getLocalUser(), checksum.getPath(),
                         checksum.getHash(), checksum.getLength());
 
-                    sarosSession.activityCreated(checksumActivity);
+                    activityProvider.fireActivity(checksumActivity);
 
                 } finally {
                     if (provider != null) {
