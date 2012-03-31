@@ -132,6 +132,11 @@ public class VersionManager {
      * compatibility should be listed.
      */
     static {
+        /**
+         * Version 12.3.30.r3893
+         */
+        COMPATIBILITY_CHART.put(new Version("12.3.30.r3893"),
+            Arrays.asList(new Version("12.3.30.r3893")));
 
         /**
          * Version 11.12.9.r3685
