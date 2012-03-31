@@ -51,9 +51,19 @@ public class OutgoingSessionNegotiation extends InvitationProcess {
     private final static Logger log = Logger
         .getLogger(OutgoingSessionNegotiation.class);
 
-    private static final long INVITATION_ACKNOWLEDGEMENT_TIMEOUT = 30000;
-    private static final long USER_LIST_REQUEST_TIMEOUT = 30000;
-    private static final long INVITATION_COMPLETED_RESPONSE_TIMEOUT = 30000;
+    private static final long INVITATION_ACKNOWLEDGEMENT_TIMEOUT = Long
+        .getLong(
+            "de.fu_berlin.inf.dpp.invitation.session.INVITATION_ACKNOWLEDGEMENT_TIMEOUT",
+            30000);
+
+    private static final long USER_LIST_REQUEST_TIMEOUT = Long.getLong(
+        "de.fu_berlin.inf.dpp.invitation.session.USER_LIST_REQUEST_TIMEOUT",
+        30000);
+
+    private static final long INVITATION_COMPLETED_RESPONSE_TIMEOUT = Long
+        .getLong(
+            "de.fu_berlin.inf.dpp.invitation.session.INVITATION_COMPLETED_RESPONSE_TIMEOUT",
+            30000);
 
     private final static Random INVITATION_RAND = new Random();
 
@@ -263,8 +273,8 @@ public class OutgoingSessionNegotiation extends InvitationProcess {
         throws SarosCancellationException {
 
         log.debug("Inv" + Utils.prefix(peer) + ": Checking peer's version...");
-       subMonitor.beginTask("Checking version compatibility...", 1);
-       
+        subMonitor.beginTask("Checking version compatibility...", 1);
+
         VersionInfo versionInfo = versionManager.determineCompatibility(peer);
 
         checkCancellation(CancelOption.DO_NOT_NOTIFY_PEER);
@@ -361,7 +371,7 @@ public class OutgoingSessionNegotiation extends InvitationProcess {
             subMonitor) == null) {
             throw new LocalCancellationException(
                 peerAdvertisesSarosSupport ? "No user list request received."
-                    : "Missing Saros support.", CancelOption.DO_NOT_NOTIFY_PEER);
+                    : "Missing Saros support.", CancelOption.NOTIFY_PEER);
         }
 
         // Reply is send in addUserToSession !
