@@ -9,7 +9,8 @@ import de.fu_berlin.inf.dpp.activities.serializable.IActivityDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.ViewportActivityDataObject;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 
-public class ViewportActivity extends AbstractActivity {
+public class ViewportActivity extends AbstractActivity implements
+    IResourceActivity {
 
     protected final int topIndex;
     protected final int bottomIndex;

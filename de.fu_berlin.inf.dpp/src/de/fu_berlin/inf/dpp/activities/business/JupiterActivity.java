@@ -12,7 +12,8 @@ import de.fu_berlin.inf.dpp.project.ISarosSession;
  * A JupiterActivity is an Activity that can be handled by the Jupiter
  * Algorithm.
  */
-public class JupiterActivity extends AbstractActivity {
+public class JupiterActivity extends AbstractActivity implements
+    IResourceActivity {
 
     /**
      * Timestamp that specifies the definition context of the enclosed

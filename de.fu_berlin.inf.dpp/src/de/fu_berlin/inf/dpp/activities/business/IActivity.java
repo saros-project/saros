@@ -20,7 +20,6 @@
 package de.fu_berlin.inf.dpp.activities.business;
 
 import de.fu_berlin.inf.dpp.User;
-import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.activities.serializable.IActivityDataObject;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 
@@ -55,13 +54,6 @@ public interface IActivity {
      * Returns the the user which has caused this activity.
      */
     public User getSource();
-
-    /**
-     * @return the path of the resource this activity concerns. Returns
-     *         <b>null</b> if the activity does not contain a resource dependent
-     *         path.
-     */
-    public SPath getPath();
 
     /**
      * The activity will call the receive method of the given receiver with the

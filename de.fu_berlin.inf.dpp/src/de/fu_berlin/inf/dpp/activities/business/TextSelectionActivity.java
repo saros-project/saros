@@ -29,7 +29,8 @@ import de.fu_berlin.inf.dpp.activities.serializable.IActivityDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.TextSelectionActivityDataObject;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 
-public class TextSelectionActivity extends AbstractActivity {
+public class TextSelectionActivity extends AbstractActivity implements
+    IResourceActivity {
 
     protected final int offset;
     protected final int length;

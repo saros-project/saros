@@ -39,7 +39,8 @@ import de.fu_berlin.inf.dpp.project.ISarosSession;
  * 
  * @author rdjemili
  */
-public class EditorActivity extends AbstractActivity {
+public class EditorActivity extends AbstractActivity implements
+    IResourceActivity {
 
     public static enum Type {
         Activated, Closed, Saved

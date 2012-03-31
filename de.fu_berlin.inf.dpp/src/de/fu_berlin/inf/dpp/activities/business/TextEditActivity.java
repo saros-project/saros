@@ -38,7 +38,8 @@ import de.fu_berlin.inf.dpp.util.Utils;
  * 
  * @author rdjemili
  */
-public class TextEditActivity extends AbstractActivity {
+public class TextEditActivity extends AbstractActivity implements
+    IResourceActivity {
 
     protected final int offset;
     protected final String text;

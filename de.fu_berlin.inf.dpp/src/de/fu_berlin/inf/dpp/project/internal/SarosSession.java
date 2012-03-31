@@ -61,6 +61,7 @@ import de.fu_berlin.inf.dpp.activities.business.EditorActivity;
 import de.fu_berlin.inf.dpp.activities.business.FileActivity;
 import de.fu_berlin.inf.dpp.activities.business.FolderActivity;
 import de.fu_berlin.inf.dpp.activities.business.IActivity;
+import de.fu_berlin.inf.dpp.activities.business.IResourceActivity;
 import de.fu_berlin.inf.dpp.activities.business.JupiterActivity;
 import de.fu_berlin.inf.dpp.activities.business.PermissionActivity;
 import de.fu_berlin.inf.dpp.activities.business.TextSelectionActivity;
@@ -890,11 +891,12 @@ public class SarosSession implements ISarosSession, Disposable {
 
         // avoid sending of unwanted editor related activities
 
-        if (activity instanceof TextSelectionActivity
-            || activity instanceof ViewportActivity
-            || activity instanceof JupiterActivity) {
-            if (!needBasedPathsList.contains(activity.getPath())
-                && !isShared(activity.getPath().getResource()))
+        if (activity instanceof IResourceActivity
+            && (activity instanceof TextSelectionActivity
+                || activity instanceof ViewportActivity || activity instanceof JupiterActivity)) {
+            IResourceActivity resActivity = (IResourceActivity) activity;
+            if (!needBasedPathsList.contains(resActivity.getPath())
+                && !isShared(resActivity.getPath().getResource()))
                 return;
         }
 
@@ -927,7 +929,10 @@ public class SarosSession implements ISarosSession, Disposable {
         if (activity == null)
             throw new IllegalArgumentException();
 
-        SPath path = activity.getPath();
+        if (!(activity instanceof IResourceActivity))
+            return false;
+
+        SPath path = ((IResourceActivity) activity).getPath();
         if (path == null)
             return false;
 

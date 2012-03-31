@@ -6,7 +6,6 @@ import java.util.List;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.activities.ProjectExchangeInfo;
 import de.fu_berlin.inf.dpp.activities.ProjectExchangeInfoDataObject;
-import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.activities.serializable.IActivityDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.ProjectsAddedActivityDataObject;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
@@ -48,9 +47,5 @@ public class ProjectsAddedActivity extends AbstractActivity {
 
     public String getProcessID() {
         return processID;
-    }
-
-    public SPath getPath() {
-        return null;
     }
 }

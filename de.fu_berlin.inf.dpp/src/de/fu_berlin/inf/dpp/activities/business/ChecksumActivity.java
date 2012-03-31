@@ -24,7 +24,8 @@ import de.fu_berlin.inf.dpp.project.ISarosSession;
  * or whether the local user has already written additional text which
  * invalidates the checksum.
  */
-public class ChecksumActivity extends AbstractActivity {
+public class ChecksumActivity extends AbstractActivity implements
+    IResourceActivity {
 
     /**
      * Constant used for representing a missing file

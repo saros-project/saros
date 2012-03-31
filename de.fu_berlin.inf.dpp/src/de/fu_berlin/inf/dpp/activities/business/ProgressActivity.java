@@ -1,7 +1,6 @@
 package de.fu_berlin.inf.dpp.activities.business;
 
 import de.fu_berlin.inf.dpp.User;
-import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.activities.serializable.IActivityDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.ProgressActivityDataObject;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
@@ -148,9 +147,5 @@ public class ProgressActivity extends AbstractActivity {
      */
     public ProgressAction getAction() {
         return action;
-    }
-
-    public SPath getPath() {
-        return null;
     }
 }
