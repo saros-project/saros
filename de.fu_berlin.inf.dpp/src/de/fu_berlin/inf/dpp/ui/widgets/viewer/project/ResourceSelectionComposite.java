@@ -190,7 +190,7 @@ public class ResourceSelectionComposite extends BaseResourceSelectionComposite {
 
         Button restoreSelection = new Button(controlComposite, SWT.PUSH);
         GridData gd2 = new GridData(SWT.BEGINNING, SWT.CENTER, false, false);
-        gd2.widthHint = 60;
+        gd2.widthHint = 80;
         restoreSelection.setLayoutData(gd2);
         restoreSelection.addSelectionListener(new SelectionAdapter() {
             @Override

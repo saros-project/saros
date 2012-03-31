@@ -207,8 +207,8 @@ public class EnterProjectNamePage extends WizardPage {
                 // Show throughput of recent IBB transfer in warning
                 speedInfo = "(" //$NON-NLS-1$
                     + Math.round(dataTransferManager
-                        .getIncomingIBBTransferSpeed(this.peer) / 1024 * 10.)
-                    / 10. + " KiB/s only!)"; //$NON-NLS-1$
+                        .getIncomingIBBTransferSpeed(this.peer) / 1000 * 10.)
+                    / 10. + " KB/s only!)"; //$NON-NLS-1$
             }
 
             if (preferenceUtils.forceFileTranserByChat()) {

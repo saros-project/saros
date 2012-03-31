@@ -525,10 +525,10 @@ public final class ImageTileEncoder extends Encoder {
         videoSharingSession
             .reportError(new EncodingException(
                 "Your PC cannot handle the current frame rate. Maximum bandwidth used was "
-                    + (maxBandwidthUsed / 1024)
-                    + " KiB per frame and can result in "
-                    + ((maxBandwidthUsed / 1024) * framerate)
-                    + " KiB/s at the current frame rate("
+                    + (maxBandwidthUsed / 1000)
+                    + " KB per frame and can result in "
+                    + ((maxBandwidthUsed / 1000) * framerate)
+                    + " KB/s at the current frame rate("
                     + framerate
                     + " FPS)."
                     + " Please choose a lower frames per second rate or switch to"

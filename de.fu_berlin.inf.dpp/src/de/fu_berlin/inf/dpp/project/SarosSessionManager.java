@@ -693,9 +693,7 @@ public class SarosSessionManager implements ISarosSessionManager {
 
         public OutgoingProjectJob(
             OutgoingProjectNegotiation outgoingProjectNegotiation) {
-            super(MessageFormat.format(
-                Messages.SarosSessionManager_sharing_project,
-                outgoingProjectNegotiation.getProjectNames()));
+            super(Messages.SarosSessionManager_sharing_project);
             this.process = outgoingProjectNegotiation;
             this.peer = process.getPeer().getBase();
             this.setUser(true);
@@ -718,13 +716,22 @@ public class SarosSessionManager implements ISarosSessionManager {
                 return Status.CANCEL_STATUS;
 
             } catch (RemoteCancellationException e) {
+                ISarosSession session = getSarosSession();
+                SarosNet sarosNet = null;
+                String peerName;
+                if (session != null) {
+                    sarosNet = session.getSaros().getSarosNet();
+                    peerName = User.getHumanReadableName(sarosNet,
+                        new JID(peer));
+                } else {
+                    peerName = Utils.prefix(new JID(peer));
+                }
 
                 if (e.getMessage() == null) { // remote user canceled purposely
                     String message = MessageFormat
                         .format(
                             Messages.SarosSessionManager_project_sharing_cancelled_text,
-                            User.getHumanReadableName(getSarosSession()
-                                .getSaros().getSarosNet(), new JID(peer)));
+                            peerName);
 
                     return new Status(IStatus.ERROR, Saros.SAROS, message);
 
@@ -732,9 +739,7 @@ public class SarosSessionManager implements ISarosSessionManager {
                     String message = MessageFormat
                         .format(
                             Messages.SarosSessionManager_sharing_project_cancelled_remotely,
-                            User.getHumanReadableName(getSarosSession()
-                                .getSaros().getSarosNet(), new JID(peer)), e
-                                .getMessage());
+                            peerName, e.getMessage());
                     SarosView
                         .showNotification(
                             Messages.SarosSessionManager_sharing_project_cancelled_remotely_text,

@@ -283,4 +283,9 @@ public class NullSarosSession implements ISarosSession {
         log.warn("unexpected method call");
         return null;
     }
+
+    public void removeProjectOwnership(String projectID, IProject project,
+        JID ownerJID) {
+        log.warn("unexpected method call");
+    }
 }

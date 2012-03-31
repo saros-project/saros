@@ -1319,6 +1319,15 @@ public class SarosSession implements ISarosSession, Disposable {
         }
     }
 
+    public void removeProjectOwnership(String projectID, IProject project,
+        JID ownerJID) {
+        if (projectMapper.getSharedProject(projectID) != null) {
+            projectMapper.removeResourceMapping(project);
+            projectMapper.removeMapping(projectID);
+            projectMapper.removeUserToProjectMapping(ownerJID, project);
+        }
+    }
+
     public StopManager getStopManager() {
         return stopManager;
     }

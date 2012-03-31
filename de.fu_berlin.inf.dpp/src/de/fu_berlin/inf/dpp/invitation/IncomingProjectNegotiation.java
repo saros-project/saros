@@ -541,6 +541,14 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
             throw new IllegalStateException(
                 "executeCancellation should only be called after localCancel or remoteCancel!");
 
+        /*
+         * Remove the entries from the mapping in the SarosSession.
+         */
+        for (Entry<String, IProject> entry : localProjects.entrySet()) {
+            sessionManager.getSarosSession().removeProjectOwnership(
+                entry.getKey(), entry.getValue(), jid);
+        }
+
         String errorMsg;
         String cancelMessage;
         if (cancellationCause instanceof LocalCancellationException) {
@@ -585,18 +593,14 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
                 cancellationCause);
         }
 
-        if (sessionManager.getSarosSession().getProjectResourcesMapping()
-            .keySet().isEmpty()
-            || sessionManager.getSarosSession().getRemoteUsers().isEmpty())
-            sessionManager.stopSarosSession();
+        // The session might have been stopped already, if not we will stop it.
+        ISarosSession session = sessionManager.getSarosSession();
+        if (session != null) {
+            if (session.getProjectResourcesMapping().keySet().isEmpty()
+                || session.getRemoteUsers().isEmpty())
+                sessionManager.stopSarosSession();
+        }
 
-        /*
-         * If the sarosSession is null, stopSarosSession() does not clear the
-         * sessionID, so we have to do this manually.
-         * 
-         * sarosSession can't be null at this point
-         */
-        // sessionManager.clearSessionID();
         projectExchangeProcesses.removeProjectExchangeProcess(this);
         throw cancellationCause;
     }

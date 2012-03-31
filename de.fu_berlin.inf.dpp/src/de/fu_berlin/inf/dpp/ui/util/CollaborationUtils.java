@@ -427,16 +427,16 @@ public class CollaborationUtils {
 
     private static String format(long size) {
 
-        if (size < 1024)
-            return "< 1 KiB";
+        if (size < 1000)
+            return "< 1 KB";
 
-        if (size < 1024 * 1024)
-            return String.format(Locale.US, "%.2f KiB", size / (1024F));
+        if (size < 1000 * 1000)
+            return String.format(Locale.US, "%.2f KB", size / (1000F));
 
-        if (size < 1024 * 1024 * 1024)
-            return String.format(Locale.US, "%.2f MiB", size / (1024F * 1024F));
+        if (size < 1000 * 1000 * 1000)
+            return String.format(Locale.US, "%.2f MB", size / (1000F * 1000F));
 
-        return String.format(Locale.US, "%.2f GiB", size
-            / (1024F * 1024F * 1024F));
+        return String.format(Locale.US, "%.2f GB", size
+            / (1000F * 1000F * 1000F));
     }
 }

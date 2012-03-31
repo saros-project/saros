@@ -1,3 +1,40 @@
+12.3.30
+=======
+[FEATURE] #3414942: Detailed progress reporting during invitation
+[FEATURE] Host can now watch the progress of remote partner's SVN checkout. 
+  Host can now cancel SVN checkout.
+[FEATURE] Possibility to save and restore complex selections for partial sharing
+[FEATURE] Added suffices "(shared)" or "(partial share)" to shared projects 
+  names
+[FEATURE] The size distribution in the Saros view is now save and restored
+[FEATURE] Replaced button "more information" in a wizard by an equivalent link
+[FEATURE] Improved follow mode: Session view now displays the currently opened 
+  file for each user. Double click on the file jumps to current position. 
+  Double click on user toggles follow mode.
+[FEATURE] Session view now highlights the Host of the Session
+[FEATURE] Added suffix "(connected)" to user names
+[FEATURE] Users will be set "away" after 5 min instead of 5 sec
+
+
+[FIX] #3439851: Overlapping partial sharing no longer unshares files
+[FIX] #3476010: Non-host inviting now works
+[FIX] #3475099: Improved performance of invitation process
+[FIX] #3424116: Balloon notification when user got disconnected instead of error 
+  message
+[FIX] #3472496: Aborting on SVN checkout no longer yields unclear error message
+[FIX] #3482208: User is now notified if he is using a 32 bit Xuggler version 
+  with a 64 bit JVM (windows only)
+[FIX] #3414938: Replaced "Getting Started" wizard by web based tutorial
+[FIX] #3440679: Improved balloon notifications 
+[FIX] #3469236: Better advanced configuration options for the XMPP server
+[FIX] #3488115: Account dropdown list now longer shows active account (if logged
+  in)
+[FIX] #3462522: Buddy selection now initially shows only online buddies with 
+  Saros support.
+[FIX] The project/folder/file selection wizard now sorts the items: Projects, 
+  Folders, Files; then alphabetically.
+
+
 11.12.9
 =======
 [FEATURE] Cascading annotation on folders containing open files - ID:
