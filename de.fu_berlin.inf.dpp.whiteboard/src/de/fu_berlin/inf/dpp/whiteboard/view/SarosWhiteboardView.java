@@ -1,6 +1,7 @@
 package de.fu_berlin.inf.dpp.whiteboard.view;
 
 import org.apache.log4j.Logger;
+import org.eclipse.gef.GraphicalViewer;
 import org.eclipse.gef.editparts.ZoomManager;
 import org.eclipse.gef.ui.actions.ActionRegistry;
 import org.eclipse.gef.ui.actions.GEFActionConstants;
@@ -58,7 +59,7 @@ public class SarosWhiteboardView extends ViewPart {
 	@Override
 	@SuppressWarnings("rawtypes")
 	public Object getAdapter(Class type) {
-		if (type == ZoomManager.class)
+		if (type == ZoomManager.class || type == GraphicalViewer.class)
 			return gEditor.getAdapter(type);
 		return super.getAdapter(type);
 	}
