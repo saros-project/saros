@@ -123,11 +123,11 @@ public class EditorManager implements IActivityProvider {
      *               needed functionality to them.
      * 
      *               EditorManager is one of the most important classes in this
-     *               respect. Remember than every change done in an Editor needs
+     *               respect. Remember that every change done in an Editor needs
      *               to be intercepted, translated into an Activity and sent to
      *               all other participants. Furthermore every Activity from
      *               other participants needs to be replayed in your local
-     *               editor when it received.
+     *               editor when it is received.
      */
 
     protected static final Logger log = Logger.getLogger(EditorManager.class

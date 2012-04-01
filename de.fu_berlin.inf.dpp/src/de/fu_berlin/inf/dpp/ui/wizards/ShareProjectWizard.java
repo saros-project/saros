@@ -67,18 +67,18 @@ public class ShareProjectWizard extends Wizard {
     /**
      * @JTourBusStop 2, Invitation Process:
      * 
-     *               The the chosen resources are put into collections to be
-     *               sent to the chosen buddies.
+     *               The chosen resources are put into collections to be sent to
+     *               the chosen buddies.
      * 
      *               As a slight detour, notice that the call to
      *               CollaborationUtils.shareResourcesWith includes
      *               sarosSessionManager as an argument. However, when you look
      *               through this class you should find this variable is
-     *               declared but never initialised! It is not null however.
+     *               declared but never initialized! It is not null however.
      * 
      *               Notice that "@Inject" annotation above the
      *               sarosSessionManager declaration? That means that our
-     *               PicoContainer has taken care of initialising the variable
+     *               PicoContainer has taken care of initializing the variable
      *               for us. Look up PicoContainer to find out more about this.
      */
     @Override

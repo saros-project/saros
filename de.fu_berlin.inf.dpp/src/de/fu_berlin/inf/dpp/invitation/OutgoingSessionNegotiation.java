@@ -129,7 +129,7 @@ public class OutgoingSessionNegotiation extends InvitationProcess {
      *               (OutgoingSessionNegotiation)
      * 
      *               - Sending project resources included in a session
-     *               (OutgoingProcjectNegotiation)
+     *               (OutgoingProjectNegotiation)
      * 
      *               All other participants need negotiations for:
      * 

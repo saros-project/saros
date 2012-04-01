@@ -22,7 +22,7 @@ import de.fu_berlin.inf.dpp.ui.util.WizardUtils;
  *               plugin.xml to see how it works.
  * 
  *               (Also see ProjectShareProjects and ProjectShareBuddies for
- *               alternative invitation methds.)
+ *               alternative invitation methods.)
  * 
  *               This begins a process that includes:
  * 
