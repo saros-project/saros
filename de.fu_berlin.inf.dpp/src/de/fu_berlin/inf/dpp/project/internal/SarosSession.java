@@ -569,7 +569,7 @@ public class SarosSession implements ISarosSession, Disposable {
         JID jid = user.getJID();
 
         if (!freeColors.remove(user.getColorID())) {
-            log.warn("ColorID of user: " + jid.toString() + "was not in pool!");
+            log.warn("ColorID of user: " + jid.toString() + " was not in pool!");
         }
 
         if (participants.putIfAbsent(jid, user) != null) {
