@@ -8,6 +8,7 @@ import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.StructuredViewer;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
@@ -35,6 +36,8 @@ import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.editor.annotations.SarosAnnotation;
 import de.fu_berlin.inf.dpp.net.ConnectionState;
 import de.fu_berlin.inf.dpp.net.IConnectionListener;
+import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.observables.SarosSessionObservable;
 import de.fu_berlin.inf.dpp.project.AbstractSarosSessionListener;
 import de.fu_berlin.inf.dpp.project.AbstractSharedProjectListener;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
@@ -45,6 +48,7 @@ import de.fu_berlin.inf.dpp.project.internal.FollowingActivitiesManager;
 import de.fu_berlin.inf.dpp.project.internal.IFollowModeChangesListener;
 import de.fu_berlin.inf.dpp.project.internal.SarosSession;
 import de.fu_berlin.inf.dpp.ui.model.TreeLabelProvider;
+import de.fu_berlin.inf.dpp.ui.model.roster.RosterEntryElement;
 import de.fu_berlin.inf.dpp.ui.model.rosterSession.RosterSessionComparator;
 import de.fu_berlin.inf.dpp.ui.model.rosterSession.RosterSessionContentProvider;
 import de.fu_berlin.inf.dpp.ui.model.rosterSession.RosterSessionInput;
@@ -81,6 +85,8 @@ public class BuddySessionDisplayComposite extends ViewerComposite {
 
     @Inject
     protected SarosSessionManager sarosSessionManager;
+    @Inject
+    protected SarosSessionObservable sarosSessionObservable;
 
     @Inject
     protected EditorManager editorManager;
@@ -370,6 +376,32 @@ public class BuddySessionDisplayComposite extends ViewerComposite {
         this.viewer.setContentProvider(new RosterSessionContentProvider());
         this.viewer.setLabelProvider(new TreeLabelProvider());
         this.viewer.setComparator(new RosterSessionComparator());
+        this.viewer.addFilter(new ViewerFilter() {
+            @Override
+            public boolean select(Viewer viewer, Object parentElement,
+                Object element) {
+                /*
+                 * Don't show buddies in the buddylist that are part of the
+                 * session
+                 */
+                if (element instanceof RosterEntryElement) {
+                    RosterEntryElement entry = (RosterEntryElement) element;
+                    // Don't filter out the groups
+                    if (entry.getChildren().length != 0) {
+                        return true;
+                    }
+                    ISarosSession session = sarosSessionObservable.getValue();
+                    if (session != null) {
+                        JID resJID = session.getResourceQualifiedJID(entry
+                            .getJID());
+                        if (resJID != null && session.getUser(resJID) != null) {
+                            return false;
+                        }
+                    }
+                }
+                return true;
+            }
+        });
         this.viewer.setUseHashlookup(true);
 
         /*
