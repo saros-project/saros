@@ -30,6 +30,36 @@ public class StartFollowingActivityDataObject extends
     }
 
     @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = super.hashCode();
+        result = prime * result + ((target == null) ? 0 : target.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (!super.equals(obj))
+            return false;
+        if (!(obj instanceof StartFollowingActivityDataObject))
+            return false;
+        StartFollowingActivityDataObject other = (StartFollowingActivityDataObject) obj;
+        if (target == null) {
+            if (other.target != null)
+                return false;
+        } else if (!target.equals(other.target))
+            return false;
+
+        return true;
+    }
+
+    public JID getTarget() {
+        return target;
+    }
+
+    @Override
     public String toString() {
         return "StartFollowingActivityDataObject(" + source + " > " + target
             + ")";

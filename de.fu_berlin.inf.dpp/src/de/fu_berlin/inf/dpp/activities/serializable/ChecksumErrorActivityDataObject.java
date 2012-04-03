@@ -46,6 +46,18 @@ public class ChecksumErrorActivityDataObject extends AbstractActivityDataObject 
     @XStreamImplicit
     protected List<SPathDataObject> paths;
 
+    public List<SPathDataObject> getPaths() {
+        return paths;
+    }
+
+    /**
+     * Each ChecksumError has a unique ID, which should be used to identify a
+     * recovery session
+     */
+    public String getRecoveryID() {
+        return recoveryID;
+    }
+
     public ChecksumErrorActivityDataObject(JID source,
         List<SPathDataObject> paths, String recoveryID) {
         super(source);

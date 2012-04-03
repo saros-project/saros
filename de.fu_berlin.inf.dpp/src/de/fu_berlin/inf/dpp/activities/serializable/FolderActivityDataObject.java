@@ -17,9 +17,12 @@ public class FolderActivityDataObject extends AbstractProjectActivityDataObject
     @XStreamAsAttribute
     protected final Type type;
 
+    protected final SPathDataObject path;
+
     public FolderActivityDataObject(JID source, Type type, SPathDataObject path) {
-        super(source, path);
+        super(source);
         this.type = type;
+        this.path = path;
     }
 
     @Override
