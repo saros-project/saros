@@ -3,8 +3,6 @@ package de.fu_berlin.inf.dpp.project.internal;
 import java.text.MessageFormat;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 import java.util.Vector;
 
@@ -20,10 +18,9 @@ import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.editor.annotations.SarosAnnotation;
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
+import de.fu_berlin.inf.dpp.project.AbstractActivityProvider;
 import de.fu_berlin.inf.dpp.project.AbstractSarosSessionListener;
 import de.fu_berlin.inf.dpp.project.AbstractSharedProjectListener;
-import de.fu_berlin.inf.dpp.project.IActivityListener;
-import de.fu_berlin.inf.dpp.project.IActivityProvider;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ISarosSessionListener;
 import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
@@ -37,12 +34,11 @@ import de.fu_berlin.inf.dpp.util.Utils;
  * @author cnk and tobi
  */
 @Component(module = "core")
-public class ChangeColorManager implements IActivityProvider {
+public class ChangeColorManager extends AbstractActivityProvider {
 
     private static final Logger log = Logger
         .getLogger(ChangeColorManager.class);
 
-    protected final List<IActivityListener> activityListeners = new LinkedList<IActivityListener>();
     protected SarosSessionManager sessionManager;
     protected ISarosSession sarosSession;
     protected EditorManager editorManager;
@@ -56,10 +52,7 @@ public class ChangeColorManager implements IActivityProvider {
         sessionManager.addSarosSessionListener(sessionListener);
     }
 
-    public void addActivityListener(IActivityListener listener) {
-        this.activityListeners.add(listener);
-    }
-
+    @Override
     public void exec(IActivity activity) {
         activity.dispatch(receiver);
     }
@@ -88,22 +81,18 @@ public class ChangeColorManager implements IActivityProvider {
         editorManager.refreshAnnotations();
     }
 
-    public void removeActivityListener(IActivityListener listener) {
-        this.activityListeners.remove(listener);
-    }
-
     protected ISarosSessionListener sessionListener = new AbstractSarosSessionListener() {
 
         @Override
-        public void sessionStarted(ISarosSession project) {
-            project.addActivityProvider(ChangeColorManager.this);
-            sarosSession = project;
+        public void sessionStarted(ISarosSession session) {
+            sarosSession = session;
+            sarosSession.addActivityProvider(ChangeColorManager.this);
             sarosSession.addListener(sharedProjectListener);
         }
 
         @Override
-        public void sessionEnded(ISarosSession project) {
-            project.removeActivityProvider(ChangeColorManager.this);
+        public void sessionEnded(ISarosSession session) {
+            session.removeActivityProvider(ChangeColorManager.this);
             sarosSession = null;
         }
     };

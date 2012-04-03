@@ -76,9 +76,9 @@ import de.fu_berlin.inf.dpp.editor.internal.ContributionAnnotationManager;
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.editor.internal.IEditorAPI;
 import de.fu_berlin.inf.dpp.observables.FileReplacementInProgressObservable;
+import de.fu_berlin.inf.dpp.project.AbstractActivityProvider;
 import de.fu_berlin.inf.dpp.project.AbstractSarosSessionListener;
 import de.fu_berlin.inf.dpp.project.AbstractSharedProjectListener;
-import de.fu_berlin.inf.dpp.project.IActivityListener;
 import de.fu_berlin.inf.dpp.project.IActivityProvider;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ISarosSessionListener;
@@ -113,7 +113,7 @@ import de.fu_berlin.inf.dpp.util.Utils;
  *         of activityDataObjects, dirty state management,...
  */
 @Component(module = "core")
-public class EditorManager implements IActivityProvider {
+public class EditorManager extends AbstractActivityProvider {
 
     /**
      * @JTourBusStop 6, Some Basics:
@@ -142,8 +142,6 @@ public class EditorManager implements IActivityProvider {
     protected RemoteWriteAccessManager remoteWriteAccessManager;
 
     protected ISarosSession sarosSession;
-
-    protected final List<IActivityListener> activityListeners = new LinkedList<IActivityListener>();
 
     /**
      * The user that is followed or <code>null</code> if no user is followed.
@@ -708,19 +706,12 @@ public class EditorManager implements IActivityProvider {
         }
     }
 
-    public void addActivityListener(IActivityListener listener) {
-        this.activityListeners.add(listener);
-    }
-
-    public void removeActivityListener(IActivityListener listener) {
-        this.activityListeners.remove(listener);
-    }
-
     /**
      * @see IActivityProvider
      * 
      * @swt This must be called from the SWT thread.
      */
+    @Override
     public void exec(final IActivity activity) {
 
         assert Utils.isSWT();
@@ -1483,17 +1474,6 @@ public class EditorManager implements IActivityProvider {
         editorListenerDispatch.userWithWriteAccessEditorSaved(path, false);
         fireActivity(new EditorActivity(sarosSession.getLocalUser(),
             Type.Saved, path));
-    }
-
-    /**
-     * Sends given activityDataObject to all registered activityDataObject
-     * listeners (most importantly the ActivitySequencer).
-     */
-    protected void fireActivity(IActivity activityDataObject) {
-
-        for (IActivityListener listener : this.activityListeners) {
-            listener.activityCreated(activityDataObject);
-        }
     }
 
     /**

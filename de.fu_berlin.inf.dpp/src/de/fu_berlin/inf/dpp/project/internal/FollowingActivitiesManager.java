@@ -15,9 +15,8 @@ import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.awareness.AwarenessInformationCollector;
 import de.fu_berlin.inf.dpp.editor.AbstractSharedEditorListener;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
+import de.fu_berlin.inf.dpp.project.AbstractActivityProvider;
 import de.fu_berlin.inf.dpp.project.AbstractSarosSessionListener;
-import de.fu_berlin.inf.dpp.project.IActivityListener;
-import de.fu_berlin.inf.dpp.project.IActivityProvider;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ISarosSessionListener;
 import de.fu_berlin.inf.dpp.project.SarosSessionManager;
@@ -29,12 +28,11 @@ import de.fu_berlin.inf.dpp.project.SarosSessionManager;
  * @author Alexander Waldmann (contact@net-corps.de)
  */
 @Component(module = "core")
-public class FollowingActivitiesManager implements IActivityProvider {
+public class FollowingActivitiesManager extends AbstractActivityProvider {
 
     private static final Logger log = Logger
         .getLogger(FollowingActivitiesManager.class);
 
-    protected final List<IActivityListener> activityListeners = new LinkedList<IActivityListener>();
     protected final List<IFollowModeChangesListener> internalListeners = new LinkedList<IFollowModeChangesListener>();
     protected SarosSessionManager sessionManager;
     protected ISarosSession sarosSession;
@@ -74,10 +72,7 @@ public class FollowingActivitiesManager implements IActivityProvider {
             });
     }
 
-    public void addActivityListener(IActivityListener listener) {
-        this.activityListeners.add(listener);
-    }
-
+    @Override
     public void exec(IActivity activity) {
         activity.dispatch(receiver);
     }
@@ -115,10 +110,6 @@ public class FollowingActivitiesManager implements IActivityProvider {
             notifyListeners();
         }
     };
-
-    public void removeActivityListener(IActivityListener listener) {
-        this.activityListeners.remove(listener);
-    }
 
     protected ISarosSessionListener sessionListener = new AbstractSarosSessionListener() {
         @Override

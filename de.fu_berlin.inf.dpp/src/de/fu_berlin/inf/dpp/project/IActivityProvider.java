@@ -16,6 +16,9 @@ import de.fu_berlin.inf.dpp.activities.business.IActivity;
  * the provider can fire activities for a Saros session by calling
  * activityCreated().
  * 
+ * In most cases you want to extend {@link AbstractActivityProvider} instead of
+ * implementing this interface.
+ * 
  * @see AbstractActivityProvider
  */
 public interface IActivityProvider {

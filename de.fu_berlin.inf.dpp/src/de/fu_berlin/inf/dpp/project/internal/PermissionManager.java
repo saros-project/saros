@@ -1,18 +1,15 @@
 package de.fu_berlin.inf.dpp.project.internal;
 
 import java.text.MessageFormat;
-import java.util.LinkedList;
-import java.util.List;
 
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.User.Permission;
 import de.fu_berlin.inf.dpp.activities.business.IActivity;
 import de.fu_berlin.inf.dpp.activities.business.PermissionActivity;
 import de.fu_berlin.inf.dpp.annotations.Component;
+import de.fu_berlin.inf.dpp.project.AbstractActivityProvider;
 import de.fu_berlin.inf.dpp.project.AbstractSarosSessionListener;
 import de.fu_berlin.inf.dpp.project.AbstractSharedProjectListener;
-import de.fu_berlin.inf.dpp.project.IActivityListener;
-import de.fu_berlin.inf.dpp.project.IActivityProvider;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ISarosSessionListener;
 import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
@@ -26,10 +23,7 @@ import de.fu_berlin.inf.dpp.ui.views.SarosView;
  * @author rdjemili
  */
 @Component(module = "core")
-public class PermissionManager implements IActivityProvider {
-
-    private final List<IActivityListener> activityListeners = new LinkedList<IActivityListener>();
-
+public class PermissionManager extends AbstractActivityProvider {
     private ISarosSession sarosSession;
 
     private ISharedProjectListener sharedProjectListener = new AbstractSharedProjectListener() {
@@ -108,24 +102,7 @@ public class PermissionManager implements IActivityProvider {
      * 
      * @see de.fu_berlin.inf.dpp.IActivityProvider
      */
-    public void addActivityListener(IActivityListener listener) {
-        this.activityListeners.add(listener);
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see de.fu_berlin.inf.dpp.IActivityProvider
-     */
-    public void removeActivityListener(IActivityListener listener) {
-        this.activityListeners.remove(listener);
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see de.fu_berlin.inf.dpp.IActivityProvider
-     */
+    @Override
     public void exec(IActivity activity) {
         if (activity instanceof PermissionActivity) {
             PermissionActivity permissionActivity = (PermissionActivity) activity;

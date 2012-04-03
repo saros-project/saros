@@ -49,6 +49,7 @@ import de.fu_berlin.inf.dpp.editor.AbstractSharedEditorListener;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.editor.ISharedEditorListener;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
+import de.fu_berlin.inf.dpp.project.AbstractActivityProvider;
 import de.fu_berlin.inf.dpp.project.AbstractSarosSessionListener;
 import de.fu_berlin.inf.dpp.project.IActivityListener;
 import de.fu_berlin.inf.dpp.project.IActivityProvider;
@@ -70,7 +71,7 @@ import de.fu_berlin.inf.dpp.util.Utils;
  * Saros.class.
  */
 @Component(module = "undo")
-public class UndoManager implements Disposable, IActivityProvider {
+public class UndoManager extends AbstractActivityProvider implements Disposable {
 
 	private static final Logger log = Logger.getLogger(UndoManager.class);
 
@@ -107,9 +108,6 @@ public class UndoManager implements Disposable, IActivityProvider {
 
 	protected List<IActivityProvider> providers =
 		new LinkedList<IActivityProvider>();
-
-	protected List<IActivityListener> activityListeners =
-		new LinkedList<IActivityListener>();
 
 	protected SPath currentActiveEditor = null;
 
@@ -600,18 +598,8 @@ public class UndoManager implements Disposable, IActivityProvider {
 		}
 	}
 
-	public void addActivityListener(IActivityListener listener) {
-		if (!activityListeners.contains(listener)) {
-			activityListeners.add(listener);
-		}
-	}
-
 	public void exec(IActivity activityDataObject) {
 		activityDataObject.dispatch(activityDataObjectReceiver);
-	}
-
-	public void removeActivityListener(IActivityListener listener) {
-		activityListeners.remove(listener);
 	}
 
 	/**

@@ -1,8 +1,6 @@
 package de.fu_berlin.inf.dpp.project.internal;
 
 import java.text.MessageFormat;
-import java.util.LinkedList;
-import java.util.List;
 
 import org.apache.log4j.Logger;
 
@@ -11,9 +9,8 @@ import de.fu_berlin.inf.dpp.activities.business.AbstractActivityReceiver;
 import de.fu_berlin.inf.dpp.activities.business.IActivity;
 import de.fu_berlin.inf.dpp.activities.business.ProjectsAddedActivity;
 import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.project.AbstractActivityProvider;
 import de.fu_berlin.inf.dpp.project.AbstractSarosSessionListener;
-import de.fu_berlin.inf.dpp.project.IActivityListener;
-import de.fu_berlin.inf.dpp.project.IActivityProvider;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ISarosSessionListener;
 import de.fu_berlin.inf.dpp.project.Messages;
@@ -25,13 +22,12 @@ import de.fu_berlin.inf.dpp.util.Utils;
  * This class processes incoming {@link ProjectsAddedActivity
  * ProjectsAddedActivities}
  */
-public class ProjectsAddedManager implements IActivityProvider {
+public class ProjectsAddedManager extends AbstractActivityProvider {
 
     private static final Logger log = Logger
         .getLogger(ProjectsAddedManager.class);
 
     protected SarosSessionManager sessionManager;
-    protected final List<IActivityListener> activityListeners = new LinkedList<IActivityListener>();
     protected SarosUI sarosUI;
 
     public ProjectsAddedManager(SarosSessionManager sessionManager,
@@ -68,16 +64,9 @@ public class ProjectsAddedManager implements IActivityProvider {
                 fileListActivity.getProcessID());
     }
 
+    @Override
     public void exec(IActivity activity) {
         activity.dispatch(receiver);
-    }
-
-    public void addActivityListener(IActivityListener listener) {
-        this.activityListeners.add(listener);
-    }
-
-    public void removeActivityListener(IActivityListener listener) {
-        this.activityListeners.remove(listener);
     }
 
     protected ISarosSessionListener sessionListener = new AbstractSarosSessionListener() {
