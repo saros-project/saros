@@ -15,6 +15,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 
 import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.ui.ImageManager;
 import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.ui.model.roster.RosterEntryElement;
 import de.fu_berlin.inf.dpp.ui.model.roster.RosterGroupElement;
@@ -114,6 +115,7 @@ public class BuddySelectionComposite extends BaseBuddySelectionComposite {
         addBuddyButton.setLayoutData(new GridData(SWT.END, SWT.CENTER, true,
             false));
         addBuddyButton.setText(Messages.BuddySelectionComposite_add_buddy);
+        addBuddyButton.setImage(ImageManager.ELCL_BUDDY_ADD);
         addBuddyButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
