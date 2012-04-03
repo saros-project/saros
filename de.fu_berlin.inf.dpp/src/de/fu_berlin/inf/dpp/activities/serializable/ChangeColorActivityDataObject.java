@@ -35,36 +35,6 @@ public class ChangeColorActivityDataObject extends AbstractActivityDataObject {
     }
 
     @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = super.hashCode();
-        result = prime * result + ((target == null) ? 0 : target.hashCode());
-        return result;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj)
-            return true;
-        if (!super.equals(obj))
-            return false;
-        if (!(obj instanceof ChangeColorActivityDataObject))
-            return false;
-        ChangeColorActivityDataObject other = (ChangeColorActivityDataObject) obj;
-        if (target == null) {
-            if (other.target != null)
-                return false;
-        } else if (!target.equals(other.target))
-            return false;
-
-        return true;
-    }
-
-    public JID getTarget() {
-        return target;
-    }
-
-    @Override
     public String toString() {
         return "ChangeColorActivityDataObject(" + source + " " + target + ")";
     }

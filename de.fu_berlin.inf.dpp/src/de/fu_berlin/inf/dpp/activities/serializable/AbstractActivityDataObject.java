@@ -1,6 +1,5 @@
 package de.fu_berlin.inf.dpp.activities.serializable;
 
-import org.apache.commons.lang.ObjectUtils;
 import org.apache.log4j.Logger;
 
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
@@ -28,23 +27,5 @@ public abstract class AbstractActivityDataObject implements IActivityDataObject 
 
     public JID getSource() {
         return this.source;
-    }
-
-    @Override
-    public int hashCode() {
-        return (source == null) ? 0 : source.hashCode();
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj)
-            return true;
-        if (obj == null)
-            return false;
-        if (!(obj instanceof AbstractActivityDataObject))
-            return false;
-
-        AbstractActivityDataObject other = (AbstractActivityDataObject) obj;
-        return ObjectUtils.equals(this.source, other.source);
     }
 }

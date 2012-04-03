@@ -22,7 +22,6 @@ public class VCSActivityDataObject extends AbstractProjectActivityDataObject
     protected String param1;
     protected String url;
     protected String directory;
-    protected SPathDataObject path;
     @XStreamAsAttribute
     protected Type type;
     public Vector<IResourceActivityDataObject> containedActivity;
@@ -30,11 +29,10 @@ public class VCSActivityDataObject extends AbstractProjectActivityDataObject
     public VCSActivityDataObject(JID source, VCSActivity.Type type, String url,
         SPathDataObject path, String directory, String param1,
         Vector<IResourceActivityDataObject> containedActivity) {
-        super(source);
+        super(source, path);
         this.type = type;
         this.url = url;
         this.directory = directory;
-        this.path = path;
         this.param1 = param1;
         this.containedActivity = containedActivity;
     }
@@ -53,10 +51,6 @@ public class VCSActivityDataObject extends AbstractProjectActivityDataObject
     }
 
     @Override
-    public SPathDataObject getPath() {
-        return path;
-    }
-
     public SPathDataObject getOldPath() {
         return null;
     }

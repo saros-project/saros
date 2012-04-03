@@ -6,15 +6,18 @@ import de.fu_berlin.inf.dpp.net.JID;
 public abstract class AbstractProjectActivityDataObject extends
     AbstractActivityDataObject implements IProjectActivityDataObject {
 
-    protected String projectID;
+    protected SPathDataObject path;
 
-    public AbstractProjectActivityDataObject(JID source) {
+    public AbstractProjectActivityDataObject(JID source, SPathDataObject path) {
         super(source);
+        this.path = path;
     }
 
     public String getProjectID() {
         return (getPath() == null) ? null : getPath().getProjectID();
     }
 
-    public abstract SPathDataObject getPath();
+    public SPathDataObject getPath() {
+        return path;
+    }
 }

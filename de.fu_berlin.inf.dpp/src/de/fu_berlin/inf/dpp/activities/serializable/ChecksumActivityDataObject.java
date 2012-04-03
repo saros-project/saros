@@ -37,8 +37,6 @@ public class ChecksumActivityDataObject extends
      */
     public static final int NON_EXISTING_DOC = -1;
 
-    protected SPathDataObject path;
-
     @XStreamAsAttribute
     protected long hash;
 
@@ -66,81 +64,16 @@ public class ChecksumActivityDataObject extends
         SPathDataObject sPathDataObject, long hash, long length,
         @Nullable Timestamp jupiterTimestamp) {
 
-        super(source);
-        this.path = sPathDataObject;
+        super(source, sPathDataObject);
         this.hash = hash;
         this.length = length;
         this.jupiterTimestamp = jupiterTimestamp;
-    }
-
-    /**
-     * Returns a new checksum activityDataObject which is identical to this
-     * activityDataObject, but has the timestamp set to the given value.
-     */
-    public ChecksumActivityDataObject withTimestamp(Timestamp jupiterTimestamp) {
-        return new ChecksumActivityDataObject(source, path, hash, length,
-            jupiterTimestamp);
-    }
-
-    /**
-     * Returns the path this checksum is about
-     */
-    @Override
-    public SPathDataObject getPath() {
-        return this.path;
     }
 
     @Override
     public String toString() {
         return "Checksum(path:" + this.path + ",hash:" + hash + ",length:"
             + length + ",vectorTime:" + jupiterTimestamp + ")";
-    }
-
-    @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = super.hashCode();
-        result = prime * result + (int) (hash ^ (hash >>> 32));
-        result = prime * result + (int) (length ^ (length >>> 32));
-        result = prime * result + ((path == null) ? 0 : path.hashCode());
-        return result;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj)
-            return true;
-        if (!super.equals(obj))
-            return false;
-        if (getClass() != obj.getClass())
-            return false;
-        ChecksumActivityDataObject other = (ChecksumActivityDataObject) obj;
-        if (hash != other.hash)
-            return false;
-        if (length != other.length)
-            return false;
-        if (path == null) {
-            if (other.path != null)
-                return false;
-        } else if (!path.equals(other.path))
-            return false;
-        return true;
-    }
-
-    public Timestamp getTimestamp() {
-        return jupiterTimestamp;
-    }
-
-    public long getLength() {
-        return length;
-    }
-
-    public long getHash() {
-        return hash;
-    }
-
-    public boolean existsFile() {
-        return !(this.length == NON_EXISTING_DOC && this.hash == NON_EXISTING_DOC);
     }
 
     public IActivity getActivity(ISarosSession sarosSession) {

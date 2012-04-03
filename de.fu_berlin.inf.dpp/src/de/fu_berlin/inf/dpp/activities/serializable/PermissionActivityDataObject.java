@@ -57,50 +57,9 @@ public class PermissionActivityDataObject extends AbstractActivityDataObject {
     }
 
     @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = super.hashCode();
-        result = prime * result
-            + ((affectedUser == null) ? 0 : affectedUser.hashCode());
-        result = prime * result
-            + ((permission == null) ? 0 : permission.hashCode());
-        return result;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj)
-            return true;
-        if (!super.equals(obj))
-            return false;
-        if (!(obj instanceof PermissionActivityDataObject))
-            return false;
-        PermissionActivityDataObject other = (PermissionActivityDataObject) obj;
-        if (affectedUser == null) {
-            if (other.affectedUser != null)
-                return false;
-        } else if (!affectedUser.equals(other.affectedUser))
-            return false;
-        if (permission == null) {
-            if (other.permission != null)
-                return false;
-        } else if (!permission.equals(other.permission))
-            return false;
-        return true;
-    }
-
-    public JID getAffectedUser() {
-        return affectedUser;
-    }
-
-    public Permission getPermission() {
-        return permission;
-    }
-
-    @Override
     public String toString() {
-        return "PermissionActivityDataObject(user:" + this.getAffectedUser()
-            + ",new permission:" + this.getPermission() + ")";
+        return "PermissionActivityDataObject(user:" + affectedUser
+            + ",new permission:" + permission + ")";
     }
 
     public IActivity getActivity(ISarosSession sarosSession) {
