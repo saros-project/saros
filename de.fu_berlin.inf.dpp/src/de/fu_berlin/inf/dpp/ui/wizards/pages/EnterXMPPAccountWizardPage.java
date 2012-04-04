@@ -219,6 +219,16 @@ public class EnterXMPPAccountWizardPage extends WizardPage {
 
     private void updatePageCompletion() {
 
+        if (showSarosXMPPRestriction)
+            setMessage(Messages.xmpp_saros_restriction_short, WARNING);
+        else
+            setMessage(null);
+
+        if (isXMPPAccountCreated) {
+            setPageComplete(true);
+            return;
+        }
+
         boolean isJIDValid = getJID().isValid();
         boolean isPasswordValid = !getPassword().isEmpty();
         boolean isServerValid = (getServer().isEmpty() && getPort().isEmpty())
@@ -256,11 +266,6 @@ public class EnterXMPPAccountWizardPage extends WizardPage {
 
         if (isServerValid)
             wasServerValid = true;
-
-        if (showSarosXMPPRestriction)
-            setMessage(Messages.xmpp_saros_restriction_short, WARNING);
-        else
-            setMessage(null);
 
         setPageComplete(false);
         String errorMessage = null;
