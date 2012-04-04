@@ -15,7 +15,7 @@ import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.whiteboard.IS
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.whiteboard.IWhiteboardFigure;
 import de.fu_berlin.inf.dpp.stf.shared.Constants;
 
-public class TestObjectCreation extends StfTestCase {
+public class ObjectCreationTest extends StfTestCase {
     private static final String fileContent = "1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n1\n";
 
     @BeforeClass
