@@ -119,11 +119,16 @@ class SarosProjectMapper {
 
     public synchronized void removeMapping(String id) {
         idMapping.remove(id);
-        sharedProjects.remove(id);
+        SharedProject sharedProject = sharedProjects.remove(id);
+        if (sharedProject != null)
+            sharedProject.delete();
     }
 
     public synchronized void removeMapping(IProject localProject) {
-        idMapping.inverse().remove(localProject);
+        String id = idMapping.inverse().get(localProject);
+
+        if (id != null)
+            removeMapping(id);
     }
 
     public synchronized String getID(IProject localProject) {

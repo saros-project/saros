@@ -489,4 +489,9 @@ public class SharedProject {
     public String getName() {
         return this.project.getName();
     }
+
+    public void delete() {
+        if (sarosSession.useVersionControl())
+            sarosSession.removeListener(sharedProjectListener);
+    }
 }
