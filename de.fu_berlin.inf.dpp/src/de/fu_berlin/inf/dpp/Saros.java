@@ -267,29 +267,6 @@ public class Saros extends AbstractUIPlugin {
         sarosContext.getComponent(IUPnPService.class).init(
             new UPnPAccessImpl(), getPreferenceStore());
 
-        /*
-         * REMOVE ME this code must be removed after the MARCH 2012 release this
-         * is currently a hack to stop annoying the user because we had made
-         * some changes. Google users cannot connect until they blank the
-         * fields, so we do it for them now !
-         */
-
-        XMPPAccountStore store = sarosContext
-            .getComponent(XMPPAccountStore.class);
-
-        for (XMPPAccount account : store.getAllAccounts()) {
-            try {
-                if (account.getDomain().equalsIgnoreCase(account.getServer())
-                    && account.getPort() == 5222) {
-                    store.changeAccountData(account, account.getUsername(),
-                        account.getPassword(), account.getDomain(), "", 0,
-                        account.useTSL(), account.useSASL());
-                }
-            } catch (IllegalArgumentException e) {
-                // ignore
-            }
-        }
-
         // determine if auto-connect can and should be performed
         if (getPreferenceStore().getBoolean(PreferenceConstants.AUTO_CONNECT)
             && !sarosContext.getComponent(XMPPAccountStore.class).isEmpty()
