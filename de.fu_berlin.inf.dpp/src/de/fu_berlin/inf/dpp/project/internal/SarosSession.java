@@ -501,6 +501,9 @@ public class SarosSession implements ISarosSession, Disposable {
      * {@inheritDoc}
      */
     public void userInvitationCompleted(final User user) {
+        user.invitationCompleted();
+
+        // WTF ... let the UI handle the synch.
         Utils.runSafeSWTAsync(log, new Runnable() {
             public void run() {
                 userInvitationCompletedWrapped(user);
@@ -508,14 +511,11 @@ public class SarosSession implements ISarosSession, Disposable {
         });
     }
 
-    public void userInvitationCompletedWrapped(final User user) {
-
-        assert Utils.isSWT() : "Must be called from SWT Thread"; //$NON-NLS-1$
+    @Deprecated
+    private void userInvitationCompletedWrapped(final User user) {
 
         if (user == null)
             throw new IllegalArgumentException();
-
-        user.invitationCompleted();
 
         log.debug("The invitation of " + Utils.prefix(user.getJID()) //$NON-NLS-1$
             + " is now complete"); //$NON-NLS-1$
