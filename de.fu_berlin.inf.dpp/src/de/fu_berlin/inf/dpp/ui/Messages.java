@@ -486,6 +486,8 @@ public class Messages extends NLS {
     public static String SharedProjectDecorator_shared_partial;
     public static String ResourceSelectionComposite_overwrite_dialog_title;
     public static String ResourceSelectionComposite_overwrite_dialog_message;
+    public static String ResourceSelectionComposite_delete_dialog_title;
+    public static String ResourceSelectionComposite_delete_dialog_message;
 
     static {
         // initialize resource bundle

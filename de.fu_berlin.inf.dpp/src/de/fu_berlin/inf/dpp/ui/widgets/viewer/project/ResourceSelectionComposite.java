@@ -310,10 +310,14 @@ public class ResourceSelectionComposite extends BaseResourceSelectionComposite {
                     return;
                 }
 
-                if (DialogUtils.openQuestionMessageDialog(getShell(),
-                    "Remove stored selection?",
-                    "Do you want to remote the saved selection with name '"
-                        + theName + "' from the list?") == false) {
+                if (DialogUtils
+                    .openQuestionMessageDialog(
+                        getShell(),
+                        Messages.ResourceSelectionComposite_delete_dialog_title,
+                        MessageFormat
+                            .format(
+                                Messages.ResourceSelectionComposite_delete_dialog_message,
+                                theName)) == false) {
                     return;
                 }
 
