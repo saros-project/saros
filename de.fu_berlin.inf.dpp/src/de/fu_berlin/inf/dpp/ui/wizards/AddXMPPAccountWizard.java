@@ -29,6 +29,7 @@ import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.accountManagement.XMPPAccount;
 import de.fu_berlin.inf.dpp.accountManagement.XMPPAccountStore;
 import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
 import de.fu_berlin.inf.dpp.ui.ImageManager;
 import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.ui.util.DialogUtils;
@@ -49,9 +50,9 @@ public class AddXMPPAccountWizard extends Wizard {
     protected Saros saros;
 
     @Inject
-    protected XMPPAccountStore accountStore;
+    private XMPPAccountStore accountStore;
 
-    EnterXMPPAccountWizardPage enterXMPPAccountWizardPage = new EnterXMPPAccountWizardPage();
+    private EnterXMPPAccountWizardPage enterXMPPAccountWizardPage = new EnterXMPPAccountWizardPage();
 
     public AddXMPPAccountWizard() {
         SarosPluginContext.initComponent(this);
@@ -98,38 +99,36 @@ public class AddXMPPAccountWizard extends Wizard {
      * Adds the {@link EnterXMPPAccountWizardPage}'s account data to the
      * {@link XMPPAccountStore}.
      * 
-     * @return
      */
-    protected XMPPAccount addXMPPAccount() {
-        if (enterXMPPAccountWizardPage.isXMPPAccountCreated())
-            return null;
+    private void addXMPPAccount() {
 
-        JID jid = enterXMPPAccountWizardPage.getJID();
+        if (!enterXMPPAccountWizardPage.isXMPPAccountCreated()) {
+            JID jid = enterXMPPAccountWizardPage.getJID();
 
-        String username = jid.getName();
-        String password = enterXMPPAccountWizardPage.getPassword();
-        String domain = jid.getDomain().toLowerCase();
-        String server = enterXMPPAccountWizardPage.getServer();
+            String username = jid.getName();
+            String password = enterXMPPAccountWizardPage.getPassword();
+            String domain = jid.getDomain().toLowerCase();
+            String server = enterXMPPAccountWizardPage.getServer();
 
-        int port;
+            int port;
 
-        if (enterXMPPAccountWizardPage.getPort().length() != 0)
-            port = Integer.valueOf(enterXMPPAccountWizardPage.getPort());
-        else
-            port = 0;
+            if (enterXMPPAccountWizardPage.getPort().length() != 0)
+                port = Integer.valueOf(enterXMPPAccountWizardPage.getPort());
+            else
+                port = 0;
 
-        boolean useTSL = enterXMPPAccountWizardPage.isUsingTSL();
-        boolean useSASL = enterXMPPAccountWizardPage.isUsingSASL();
+            boolean useTSL = enterXMPPAccountWizardPage.isUsingTSL();
+            boolean useSASL = enterXMPPAccountWizardPage.isUsingSASL();
 
-        boolean wasEmpty = accountStore.isEmpty();
+            accountStore.createAccount(username, password, domain, server,
+                port, useTSL, useSASL);
+        }
 
-        XMPPAccount account = accountStore.createAccount(username, password,
-            domain, server, port, useTSL, useSASL);
+        if (accountStore.getAllAccounts().size() == 1
+            && saros.getPreferenceStore().getBoolean(
+                PreferenceConstants.AUTO_CONNECT))
+            saros.asyncConnect();
 
-        if (wasEmpty)
-            saros.connect(false);
-
-        return account;
     }
 
     /*

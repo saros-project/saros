@@ -28,7 +28,6 @@ import de.fu_berlin.inf.dpp.feedback.ErrorLogManager;
 import de.fu_berlin.inf.dpp.feedback.StatisticManager;
 import de.fu_berlin.inf.dpp.net.upnp.IUPnPService;
 import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
-import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
 import de.fu_berlin.inf.dpp.ui.ImageManager;
 import de.fu_berlin.inf.dpp.ui.wizards.pages.ConfigurationSettingsWizardPage;
 import de.fu_berlin.inf.dpp.ui.wizards.pages.ConfigurationSummaryWizardPage;
@@ -42,19 +41,16 @@ import de.fu_berlin.inf.dpp.ui.wizards.pages.ConfigurationSummaryWizardPage;
 public class ConfigurationWizard extends AddXMPPAccountWizard {
 
     @Inject
-    protected PreferenceUtils preferenceUtils;
+    private StatisticManager statisticManager;
 
     @Inject
-    protected StatisticManager statisticManager;
+    private ErrorLogManager errorLogManager;
 
     @Inject
-    protected ErrorLogManager errorLogManager;
+    private IUPnPService upnpService;
 
-    @Inject
-    protected IUPnPService upnpService;
-
-    ConfigurationSettingsWizardPage configurationSettingsWizardPage = new ConfigurationSettingsWizardPage();
-    ConfigurationSummaryWizardPage configurationSummaryWizardPage = new ConfigurationSummaryWizardPage();
+    private ConfigurationSettingsWizardPage configurationSettingsWizardPage = new ConfigurationSettingsWizardPage();
+    private ConfigurationSummaryWizardPage configurationSummaryWizardPage = new ConfigurationSummaryWizardPage();
 
     public ConfigurationWizard() {
         SarosPluginContext.initComponent(this);
@@ -72,10 +68,8 @@ public class ConfigurationWizard extends AddXMPPAccountWizard {
 
     @Override
     public boolean performFinish() {
-        if (!super.performFinish())
-            return false;
         setConfiguration();
-        return true;
+        return super.performFinish();
     }
 
     @Override
@@ -90,31 +84,28 @@ public class ConfigurationWizard extends AddXMPPAccountWizard {
     protected void setConfiguration() {
         IPreferenceStore preferences = saros.getPreferenceStore();
 
-        /*
-         * network
-         */
-        String skypeUsername = (this.configurationSettingsWizardPage
-            .isSkypeUsage()) ? this.configurationSettingsWizardPage
+        String skypeUsername = (configurationSettingsWizardPage.isSkypeUsage()) ? configurationSettingsWizardPage
             .getSkypeUsername() : "";
+
         preferences.setValue(PreferenceConstants.AUTO_CONNECT,
-            this.configurationSettingsWizardPage.isAutoConnect());
+            configurationSettingsWizardPage.isAutoConnect());
 
         preferences.setValue(PreferenceConstants.SKYPE_USERNAME, skypeUsername);
 
-        /*
-         * statistic
-         */
         boolean statisticSubmissionAllowed = this.configurationSettingsWizardPage
             .isStatisticSubmissionAllowed();
+
         boolean errorLogSubmissionAllowed = this.configurationSettingsWizardPage
             .isErrorLogSubmissionAllowed();
+
         statisticManager
             .setStatisticSubmissionAllowed(statisticSubmissionAllowed);
+
         errorLogManager.setErrorLogSubmissionAllowed(errorLogSubmissionAllowed);
 
-        // Gateway setting
         GatewayDevice selGwDevice = this.configurationSettingsWizardPage
             .getPortmappingDevice();
+
         upnpService.setSelectedGateway(selGwDevice);
 
     }
