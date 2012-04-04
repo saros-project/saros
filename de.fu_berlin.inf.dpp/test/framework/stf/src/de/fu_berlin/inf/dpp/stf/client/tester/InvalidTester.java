@@ -77,4 +77,5 @@ class InvalidTester implements AbstractTester {
     public String getPassword() {
         return password;
     }
+
 }

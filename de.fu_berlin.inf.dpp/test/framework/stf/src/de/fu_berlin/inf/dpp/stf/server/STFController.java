@@ -70,6 +70,8 @@ import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.impl.Views;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.saros.impl.Chatroom;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.saros.impl.RSView;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.saros.impl.SarosView;
+import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.whiteboard.impl.SarosWhiteboardView;
+import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.whiteboard.impl.WhiteboardFigure;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.impl.SuperBot;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.internal.impl.InternalImpl;
 
@@ -183,6 +185,12 @@ public class STFController {
         exportObject(SarosView.getInstance(), "rosterView");
         exportObject(RSView.getInstance(), "remoteScreenView");
         exportObject(ConsoleView.getInstance(), "consoleView");
+        exportObject(SarosWhiteboardView.getInstance(), "sarosWhiteboardView");
+
+        /*
+         * whiteboard specific components
+         */
+        exportObject(WhiteboardFigure.getInstance(), "whiteboardFigure");
 
         exportObject(NewC.getInstance(), "fileM");
         exportObject(RefactorC.getInstance(), "refactorM");

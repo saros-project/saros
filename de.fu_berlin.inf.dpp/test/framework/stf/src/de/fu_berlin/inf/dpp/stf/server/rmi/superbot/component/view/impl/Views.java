@@ -17,6 +17,8 @@ import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.saros.IRSView
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.saros.ISarosView;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.saros.impl.RSView;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.saros.impl.SarosView;
+import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.whiteboard.ISarosWhiteboardView;
+import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.whiteboard.impl.SarosWhiteboardView;
 
 public final class Views extends StfRemoteObject implements IViews {
 
@@ -26,6 +28,7 @@ public final class Views extends StfRemoteObject implements IViews {
         return INSTANCE;
     }
 
+    @Override
     public ISarosView sarosView() throws RemoteException {
         SWTWorkbenchBot bot = new SWTWorkbenchBot();
         RemoteWorkbenchBot.getInstance().openViewById(VIEW_SAROS_ID);
@@ -33,6 +36,16 @@ public final class Views extends StfRemoteObject implements IViews {
         return SarosView.getInstance().setView(bot.viewByTitle(VIEW_SAROS));
     }
 
+    @Override
+    public ISarosWhiteboardView sarosWhiteboardView() throws RemoteException {
+        SWTWorkbenchBot bot = new SWTWorkbenchBot();
+        RemoteWorkbenchBot.getInstance().openViewById(VIEW_SAROS_WHITEBOARD_ID);
+        bot.viewByTitle(VIEW_SAROS_WHITEBOARD).show();
+        return SarosWhiteboardView.getInstance().setView(
+            bot.viewByTitle(VIEW_SAROS_WHITEBOARD), bot);
+    }
+
+    @Override
     public IRSView remoteScreenView() throws RemoteException {
 
         SWTWorkbenchBot bot = new SWTWorkbenchBot();
@@ -43,6 +56,7 @@ public final class Views extends StfRemoteObject implements IViews {
             .setView(bot.viewByTitle(VIEW_REMOTE_SCREEN));
     }
 
+    @Override
     public IConsoleView consoleView() throws RemoteException {
         SWTWorkbenchBot bot = new SWTWorkbenchBot();
         RemoteWorkbenchBot.getInstance().openViewById(VIEW_CONSOLE_ID);
@@ -51,6 +65,7 @@ public final class Views extends StfRemoteObject implements IViews {
         return ConsoleView.getInstance().setView(bot.viewByTitle(VIEW_CONSOLE));
     }
 
+    @Override
     public IPackageExplorerView packageExplorerView() throws RemoteException {
 
         SWTWorkbenchBot bot = new SWTWorkbenchBot();
@@ -60,6 +75,7 @@ public final class Views extends StfRemoteObject implements IViews {
             bot.viewByTitle(VIEW_PACKAGE_EXPLORER));
     }
 
+    @Override
     public IProgressView progressView() throws RemoteException {
         RemoteWorkbenchBot.getInstance().openViewById(VIEW_PROGRESS_ID);
 

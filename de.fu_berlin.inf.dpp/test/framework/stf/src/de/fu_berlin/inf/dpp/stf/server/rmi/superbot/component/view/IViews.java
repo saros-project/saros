@@ -8,10 +8,13 @@ import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.eclipse.IPack
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.eclipse.IProgressView;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.saros.IRSView;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.saros.ISarosView;
+import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.whiteboard.ISarosWhiteboardView;
 
 public interface IViews extends Remote {
 
     public ISarosView sarosView() throws RemoteException;
+
+    public ISarosWhiteboardView sarosWhiteboardView() throws RemoteException;
 
     public IRSView remoteScreenView() throws RemoteException;
 

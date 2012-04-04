@@ -315,6 +315,10 @@ public interface Constants {
         .getString("view_saros");
     public final static String VIEW_SAROS_ID = Configuration
         .getString("view_saros_id");
+    public final static String VIEW_SAROS_WHITEBOARD = Configuration
+        .getString("view_saros_whiteboard");
+    public final static String VIEW_SAROS_WHITEBOARD_ID = Configuration
+        .getString("view_saros_whiteboard_id");
 
     public final static String SHELL_REQUEST_OF_SUBSCRIPTION_RECEIVED = Configuration
         .getString("SubscriptionManager_incoming_buddy_request_title");

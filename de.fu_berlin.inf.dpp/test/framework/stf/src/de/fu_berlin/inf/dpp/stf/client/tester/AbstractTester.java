@@ -78,5 +78,4 @@ public interface AbstractTester {
      * @throws RemoteException
      */
     public IControlBot controlBot() throws RemoteException;
-
 }

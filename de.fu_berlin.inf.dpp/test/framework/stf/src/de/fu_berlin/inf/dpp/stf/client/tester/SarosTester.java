@@ -65,4 +65,5 @@ public enum SarosTester implements AbstractTester {
     public IControlBot controlBot() throws RemoteException {
         return this.tester.controlBot();
     }
+
 }
