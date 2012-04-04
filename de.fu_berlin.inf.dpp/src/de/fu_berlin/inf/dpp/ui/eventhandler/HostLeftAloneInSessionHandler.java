@@ -43,11 +43,13 @@ public class HostLeftAloneInSessionHandler {
                 log.debug("sessionManager.userLeft");
                 ISarosSession session = sessionManager.getSarosSession();
                 if (session.getParticipants().size() == 1) {
-                    // only ask to close session if there are no running
-                    // negotiation processes because if there are, and the last
-                    // user "left", it was because he cancelled an
-                    // IncomingProjectNegotiation, and the session will be
-                    // closed anyway.
+                    /*
+                     * only ask to close session if there are no running
+                     * negotiation processes because if there are, and the last
+                     * user "left", it was because he cancelled an
+                     * IncomingProjectNegotiation, and the session will be
+                     * closed anyway.
+                     */
                     if (processes.getProcesses().size() == 0) {
                         handleHostLeftAlone();
                     }
@@ -60,11 +62,12 @@ public class HostLeftAloneInSessionHandler {
             .addSarosSessionListener(new AbstractSarosSessionListener() {
                 @Override
                 public void sessionEnded(ISarosSession oldSarosSession) {
-                    // we need to clear any open notifications because there
-                    // might be stuff left, like follow mode notifications,
-                    // or "buddy joined" notification in case a buddy joined
-                    // the session but aborted the incoming project
-                    // negotiation...
+                    /*
+                     * we need to clear any open notifications because there
+                     * might be stuff left, like follow mode notifications, or
+                     * "buddy joined" notification in case a buddy joined the
+                     * session but aborted the incoming project negotiation...
+                     */
                     SarosView.clearNotifications();
                 }
 
