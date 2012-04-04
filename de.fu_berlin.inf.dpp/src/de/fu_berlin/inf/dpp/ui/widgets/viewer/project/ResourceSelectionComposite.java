@@ -276,8 +276,9 @@ public class ResourceSelectionComposite extends BaseResourceSelectionComposite {
                 }
 
                 saveSelectionWithName(theName);
-                savedSelectionPresetsCombo.setItems(savedSelectionNames
-                    .toArray(new String[savedSelectionNames.size()]));
+                final List<String> selectionNames = getSavedSelectionNames();
+                savedSelectionPresetsCombo.setItems(selectionNames
+                    .toArray(new String[selectionNames.size()]));
                 savedSelectionPresetsCombo.setText(theName);
                 SarosView
                     .showNotification(
