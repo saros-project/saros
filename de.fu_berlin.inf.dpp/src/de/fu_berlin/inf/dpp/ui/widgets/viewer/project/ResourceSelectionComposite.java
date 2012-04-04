@@ -1,5 +1,6 @@
 package de.fu_berlin.inf.dpp.ui.widgets.viewer.project;
 
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -263,10 +264,14 @@ public class ResourceSelectionComposite extends BaseResourceSelectionComposite {
                 }
 
                 if (savedSelectionNames.contains(theName)
-                    && DialogUtils.openQuestionMessageDialog(getShell(),
-                        "Overwrite stored selection?",
-                        "Do you want to overwrite the existing saved selection with name '"
-                            + theName + "'") == false) {
+                    && DialogUtils
+                        .openQuestionMessageDialog(
+                            getShell(),
+                            Messages.ResourceSelectionComposite_overwrite_dialog_title,
+                            MessageFormat
+                                .format(
+                                    Messages.ResourceSelectionComposite_overwrite_dialog_message,
+                                    theName)) == false) {
                     return;
                 }
 
