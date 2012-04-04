@@ -96,30 +96,6 @@ public class BuddySessionDisplayComposite extends ViewerComposite {
 
     public static void expandAllSessionNodes(final Viewer viewer) {
         ViewerUtils.expandAll(viewer);
-        // Display.getDefault().syncExec(new Runnable() {
-        // public void run() {
-        // if (viewer == null || viewer.getControl().isDisposed())
-        // return;
-        //
-        // if (viewer instanceof AbstractTreeViewer) {
-        // AbstractTreeViewer treeViewer = (AbstractTreeViewer) viewer;
-        // RosterSessionInput input = (RosterSessionInput) treeViewer
-        // .getInput();
-        //
-        // if (input != null) {
-        // Collection<RosterEntry> entries = input.getRoster()
-        // .getEntries();
-        //
-        // for (RosterEntry entry : entries) {
-        // log.debug("Expanding rosterentry: "
-        // + entry.getName());
-        // treeViewer.expandToLevel(entry,
-        // AbstractTreeViewer.ALL_LEVELS);
-        // }
-        // }
-        // }
-        // }
-        // });
     }
 
     protected IFollowModeChangesListener followModeChangesListener = new IFollowModeChangesListener() {
@@ -127,7 +103,6 @@ public class BuddySessionDisplayComposite extends ViewerComposite {
         @Override
         public void followModeChanged() {
             ViewerUtils.refresh(viewer, true);
-            // ViewerUtils.expandAll(viewer);
             expandAllSessionNodes(viewer);
         }
     };
@@ -229,11 +204,9 @@ public class BuddySessionDisplayComposite extends ViewerComposite {
             .setLayoutData(LayoutUtils.createFillGridData());
         updateViewer();
         expandAllSessionNodes(viewer);
-        // ViewerUtils.expandAll(this.viewer);
 
         saros.getSarosNet().addListener(connectionListener);
         this.sarosSessionManager.addSarosSessionListener(sarosSessionListener);
-        // this.sarosSessionManager.getSarosSession().addListener(projectListener);
 
         this.followingActivitiesManager
             .addIinternalListener(followModeChangesListener);
@@ -279,12 +252,14 @@ public class BuddySessionDisplayComposite extends ViewerComposite {
             protected TreeItem findTreeItemNear(MouseEvent event) {
                 TreeItem treeItem = ((Tree) control).getItem(new Point(event.x,
                     event.y));
-                // Background: the items are only targetable at their
-                // text-labels and icons. In the session view, the tree
-                // items get a rectangle withbackground color that expands
-                // beyond the text label. Users think that they can interact
-                // with the element by clicking anywhere on the background
-                // color, but actually miss the element.
+                /*
+                 * Background: the items are only targetable at their
+                 * text-labels and icons. In the session view, the tree items
+                 * get a rectangle withbackground color that expands beyond the
+                 * text label. Users think that they can interact with the
+                 * element by clicking anywhere on the background color, but
+                 * actually miss the element.
+                 */
                 int x = event.x;
                 while (treeItem == null && x > 0) {
                     x -= 5; // try 5 px to the left...
@@ -314,8 +289,10 @@ public class BuddySessionDisplayComposite extends ViewerComposite {
                         if (user != null && !user.isLocal()) {
                             SarosView sarosView = ((SarosView) Utils
                                 .findView(SarosView.ID));
-                            // toggle follow mode when doubleclicked on user
-                            // element in session tree
+                            /*
+                             * toggle follow mode when doubleclicked on user
+                             * element in session tree
+                             */
                             if (treeItem.getData() instanceof UserElement) {
                                 log.debug("Starting to follow "
                                     + user
@@ -323,12 +300,12 @@ public class BuddySessionDisplayComposite extends ViewerComposite {
                                 sarosView.getFollowModeAction()
                                     .setFollowModeActionStatus(user);
                                 sarosView.getFollowModeAction().run();
-                                // editorManager.setFollowing(user);
-                                // editorManager.jumpToUser(user);
                             } else {
-                                // jump to editor position of the user if
-                                // doubleclicked on
-                                // AwarenessTreeInformationElement
+                                /*
+                                 * jump to editor position of the user if
+                                 * doubleclicked on
+                                 * AwarenessTreeInformationElement
+                                 */
                                 editorManager.jumpToUser(user);
                             }
                             return;
@@ -343,8 +320,6 @@ public class BuddySessionDisplayComposite extends ViewerComposite {
              * This enables/disables the "follow mode action" ICON button in the
              * icon bar of the Saros view, and registers the user that was
              * clicked on as target for the follow mode button.
-             * 
-             * This does not work properly: 1)
              */
             @Override
             public void mouseDown(MouseEvent event) {
@@ -431,9 +406,6 @@ public class BuddySessionDisplayComposite extends ViewerComposite {
                             .getBounds(event.index);
                         bounds.width = 15;
                         bounds.x += 15;
-                        // bounds.width =
-                        // Math.max(bounds.width,BuddySessionDisplayComposite.this.getClientArea().width
-                        // - 2 * bounds.x);
 
                         PaintUtils.drawRoundedRectangle(gc, bounds,
                             SarosAnnotation.getUserColor(user));
