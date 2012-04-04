@@ -250,4 +250,8 @@ public class PreferenceConstants {
     public static final String SAROSVIEW_SASH_WEIGHT_LEFT = "ui.sarosview.sashweight.left";
     public static final String SAROSVIEW_SASH_WEIGHT_RIGHT = "ui.sarosview.sashweight.right";
 
+    /*
+     * Leave sessions when alone as host?
+     */
+    public static final String STOP_EMPTY_SESSIONS = "stop_empty_sessions";
 }

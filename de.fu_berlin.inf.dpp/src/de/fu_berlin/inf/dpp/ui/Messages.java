@@ -494,6 +494,8 @@ public class Messages extends NLS {
 
     public static String SubscriptionManager_incoming_buddy_denied_title;
     public static String SubscriptionManager_incoming_buddy_denied_message;
+    public static String HostLeftAloneInSessionDialog_title;
+    public static String HostLeftAloneInSessionDialog_message;
 
     static {
         // initialize resource bundle

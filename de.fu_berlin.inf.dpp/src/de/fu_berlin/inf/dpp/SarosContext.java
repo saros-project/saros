@@ -108,6 +108,7 @@ import de.fu_berlin.inf.dpp.ui.LocalPresenceTracker;
 import de.fu_berlin.inf.dpp.ui.RemoteProgressManager;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
 import de.fu_berlin.inf.dpp.ui.actions.SendFileAction;
+import de.fu_berlin.inf.dpp.ui.eventhandler.HostLeftAloneInSessionHandler;
 import de.fu_berlin.inf.dpp.util.StackTrace;
 import de.fu_berlin.inf.dpp.util.VersionManager;
 import de.fu_berlin.inf.dpp.util.pico.ChildContainer;
@@ -303,6 +304,7 @@ public class SarosContext {
         Component.create(TextEditCollector.class),
         Component.create(JumpFeatureUsageCollector.class),
         Component.create(FollowModeCollector.class),
+        Component.create(HostLeftAloneInSessionHandler.class),
         Component.create(SelectionCollector.class),
         Component.create(VoIPCollector.class),
 
