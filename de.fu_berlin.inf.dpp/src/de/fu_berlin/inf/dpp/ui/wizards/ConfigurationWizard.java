@@ -54,6 +54,7 @@ public class ConfigurationWizard extends AddXMPPAccountWizard {
     protected IUPnPService upnpService;
 
     ConfigurationSettingsWizardPage configurationSettingsWizardPage = new ConfigurationSettingsWizardPage();
+    ConfigurationSummaryWizardPage configurationSummaryWizardPage = new ConfigurationSummaryWizardPage();
 
     public ConfigurationWizard() {
         SarosPluginContext.initComponent(this);
@@ -66,7 +67,7 @@ public class ConfigurationWizard extends AddXMPPAccountWizard {
     public void addPages() {
         super.addPages();
         addPage(configurationSettingsWizardPage);
-        addPage(new ConfigurationSummaryWizardPage());
+        addPage(configurationSummaryWizardPage);
     }
 
     @Override
@@ -75,6 +76,11 @@ public class ConfigurationWizard extends AddXMPPAccountWizard {
             return false;
         setConfiguration();
         return true;
+    }
+
+    @Override
+    public boolean canFinish() {
+        return getContainer().getCurrentPage() == configurationSummaryWizardPage;
     }
 
     /**
