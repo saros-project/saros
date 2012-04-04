@@ -221,6 +221,11 @@ public interface Constants {
     public final static String LABEL_REPEAT_PASSWORD = Configuration
         .getString("text_label_repeat_password");
 
+    public final static String ResourceSelectionComposite_delete_dialog_title = Configuration
+        .getString("ResourceSelectionComposite_delete_dialog_title");
+    public final static String ResourceSelectionComposite_overwrite_dialog_title = Configuration
+        .getString("ResourceSelectionComposite_overwrite_dialog_title");
+
     public final static String ERROR_MESSAGE_PASSWORDS_NOT_MATCH = Configuration
         .getString("CreateXMPPAccountWizardPage_error_password_no_match");
     public final static String ERROR_MESSAGE_COULD_NOT_CONNECT = Configuration
