@@ -455,6 +455,7 @@ public class OutgoingSessionNegotiation extends InvitationProcess {
 
         subMonitor.setTaskName("Completing invitation...");
         synchronized (sarosSession) {
+            sarosSession.getUser(peer).invitationCompleted();
             sarosSession.userInvitationCompleted(sarosSession.getUser(peer));
             checkCancellation(CancelOption.NOTIFY_PEER);
             sarosSession.synchronizeUserList(xmppTransmitter, peer,

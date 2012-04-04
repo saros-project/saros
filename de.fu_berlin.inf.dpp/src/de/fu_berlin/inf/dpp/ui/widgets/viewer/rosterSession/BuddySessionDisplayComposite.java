@@ -155,6 +155,13 @@ public class BuddySessionDisplayComposite extends ViewerComposite {
         public void userJoined(User user) {
             expandAllSessionNodes(viewer);
         }
+
+        @Override
+        public void invitationCompleted(User user) {
+            // FIXME make an update, not a refresh !
+            ViewerUtils.refresh(viewer, true);
+        }
+
     };
 
     protected ISarosSessionListener sarosSessionListener = new AbstractSarosSessionListener() {
