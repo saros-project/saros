@@ -41,6 +41,7 @@ import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.net.ConnectionState;
 import de.fu_berlin.inf.dpp.net.IConnectionListener;
 import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.ui.ImageManager;
 import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.ui.util.selection.SelectionUtils;
 import de.fu_berlin.inf.dpp.ui.util.selection.retriever.SelectionRetrieverFactory;
@@ -75,6 +76,7 @@ public class RenameContactAction extends Action {
     public RenameContactAction() {
         super(Messages.RenameContactAction_title);
         setToolTipText(Messages.RenameContactAction_tooltip);
+        setImageDescriptor(ImageManager.ETOOL_EDIT);
 
         SarosPluginContext.initComponent(this);
 
@@ -130,13 +132,17 @@ public class RenameContactAction extends Action {
                     Messages.RenameContactAction_rename_message,
                     rosterEntry.getUser());
 
-                if (rosterEntry.getName() != null) {
-                    message += MessageFormat.format(
-                        Messages.RenameContactAction_rename_current_nickname_message, rosterEntry.getName());
+                if (rosterEntry.getName() != null
+                    && !rosterEntry.getName().equals(rosterEntry.getUser())) {
+                    message += MessageFormat
+                        .format(
+                            Messages.RenameContactAction_rename_current_nickname_message,
+                            rosterEntry.getName());
                 }
                 message += ":"; //$NON-NLS-1$
 
-                InputDialog dialog = new InputDialog(shell, Messages.RenameContactAction_new_nickname_dialog_title,
+                InputDialog dialog = new InputDialog(shell,
+                    Messages.RenameContactAction_new_nickname_dialog_title,
                     message, rosterEntry.getName(), null);
 
                 if (dialog.open() == Window.OK) {

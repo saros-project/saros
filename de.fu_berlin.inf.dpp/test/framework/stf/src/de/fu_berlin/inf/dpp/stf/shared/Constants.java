@@ -1,6 +1,5 @@
 package de.fu_berlin.inf.dpp.stf.shared;
 
-
 public interface Constants {
     public enum TypeOfCreateProject {
         NEW_PROJECT, EXIST_PROJECT, EXIST_PROJECT_WITH_COPY, EXIST_PROJECT_WITH_COPY_AFTER_CANCEL_LOCAL_CHANGE
@@ -313,7 +312,7 @@ public interface Constants {
         .getString("view_saros_id");
 
     public final static String SHELL_REQUEST_OF_SUBSCRIPTION_RECEIVED = Configuration
-        .getString("shell_request_of_subscription_received");
+        .getString("SubscriptionManager_incoming_buddy_request_title");
     public final static String SHELL_BUDDY_ALREADY_ADDED = Configuration
         .getString("shell_buddy_already_added");
     public final static String SHELL_BUDDY_LOOKUP_FAILED = Configuration
@@ -321,9 +320,9 @@ public interface Constants {
     public final static String SHELL_SERVER_NOT_FOUND = Configuration
         .getString("shell_server_not_found");
     public final static String SHELL_REMOVAL_OF_SUBSCRIPTION = Configuration
-        .getString("shell_removal_of_subscription");
+        .getString("SubscriptionManager_incoming_buddy_denied_title");
     public final static String SHELL_SET_NEW_NICKNAME = Configuration
-        .getString("shell_set_new_nickname");
+        .getString("RenameContactAction_new_nickname_dialog_title");
     public final static String SHELL_CONFIRM_CLOSING_SESSION = Configuration
         .getString("shell_confirm_closing_session");
     public final static String SHELL_INCOMING_SCREENSHARING_SESSION = Configuration

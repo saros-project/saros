@@ -489,6 +489,12 @@ public class Messages extends NLS {
     public static String ResourceSelectionComposite_delete_dialog_title;
     public static String ResourceSelectionComposite_delete_dialog_message;
 
+    public static String SubscriptionManager_incoming_buddy_request_title;
+    public static String SubscriptionManager_incoming_buddy_request_message;
+
+    public static String SubscriptionManager_incoming_buddy_denied_title;
+    public static String SubscriptionManager_incoming_buddy_denied_message;
+
     static {
         // initialize resource bundle
         NLS.initializeMessages(BUNDLE_NAME, Messages.class);

@@ -51,6 +51,7 @@ import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.internal.ConnectionTestManager;
 import de.fu_berlin.inf.dpp.net.internal.ConnectionTestManager.TestResult;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
+import de.fu_berlin.inf.dpp.ui.ImageManager;
 import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.ui.util.selection.SelectionUtils;
 import de.fu_berlin.inf.dpp.ui.util.selection.retriever.SelectionRetrieverFactory;
@@ -88,6 +89,8 @@ public class ConnectionTestAction extends Action {
     public ConnectionTestAction() {
         super(Messages.ConnectionTestAction_title);
         setToolTipText(Messages.ConnectionTestAction_tooltip);
+
+        setImageDescriptor(ImageManager.ETOOL_TEST_CONNECTION);
 
         SarosPluginContext.initComponent(this);
 
@@ -163,10 +166,10 @@ public class ConnectionTestAction extends Action {
             return;
         }
         MessageDialog.openInformation(EditorAPI.getShell(),
-            Messages.ConnectionTestAction_successful_title, MessageFormat.format(
-                Messages.ConnectionTestAction_successful_message, recipient,
-                testResult[0].mode.toString(), Utils.throughput(
-                    testResult[0].dataSize, testResult[0].transferTime)));
+            Messages.ConnectionTestAction_successful_title, MessageFormat
+                .format(Messages.ConnectionTestAction_successful_message,
+                    recipient, testResult[0].mode.toString(), Utils.throughput(
+                        testResult[0].dataSize, testResult[0].transferTime)));
 
     }
 

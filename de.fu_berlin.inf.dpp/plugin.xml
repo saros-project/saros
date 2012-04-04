@@ -892,7 +892,7 @@
       </menuContribution>
       <menuContribution
             allPopups="false"
-            locationURI="popup:de.fu_berlin.inf.dpp.ui.views.SarosView?after=additions">
+            locationURI="popup:de.fu_berlin.inf.dpp.ui.views.SarosView?before=menustart">
          <command
                commandId="de.fu_berlin.inf.dpp.ui.commands.ShareResource"
                disabledIcon="icons/dlcl16/spacer.png"
@@ -1039,7 +1039,7 @@
       </menuContribution>
       <menuContribution
             allPopups="false"
-            locationURI="popup:org.eclipse.ui.popup.any?after=additions">
+            locationURI="popup:org.eclipse.ui.popup.any?after=additions"> 
          <separator
                name="CollaborationStart"
                visible="true">
@@ -1051,7 +1051,7 @@
       </menuContribution>
       <menuContribution
             allPopups="false"
-            locationURI="popup:org.eclipse.ui.popup.any?after=CollaborationStart">
+            locationURI="popup:org.eclipse.ui.popup.any?after=additions">
             <menu
                   icon="icons/elcl16/project_share_tsk.png"
                   label="%menu.label.0"
@@ -1141,7 +1141,7 @@
       </menuContribution>
       <menuContribution
             allPopups="false"
-            locationURI="popup:org.eclipse.ui.popup.any?after=CollaborationStart">
+            locationURI="popup:org.eclipse.ui.popup.any?before=menustart">
          <menu
                icon="icons/elcl16/project_share_tsk.png"
                label="%plugin.workTogetherOn"
@@ -1230,7 +1230,7 @@
       </menuContribution>
       <menuContribution
             allPopups="false"
-            locationURI="popup:org.eclipse.ui.popup.any?before=CollaborationEnd">
+            locationURI="popup:org.eclipse.ui.popup.any?after=additions">
          <command
                commandId="de.fu_berlin.inf.dpp.ui.commands.SharedProjectLeave"
                disabledIcon="icons/dlcl16/project_share_leave_tsk.png"

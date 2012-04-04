@@ -421,6 +421,7 @@ public class SarosView extends ViewPart {
          */
         MenuManager menuManager = new MenuManager();
         menuManager.setRemoveAllWhenShown(true);
+        addMenuStartSeparator(menuManager);
         addRosterMenuItems(menuManager);
         addSessionMenuItems(menuManager);
         addAdditionsSeparator(menuManager);
@@ -489,9 +490,9 @@ public class SarosView extends ViewPart {
 
                 manager.add(skypeAction);
                 manager.add(new Separator());
+                manager.add(connectionTestAction);
                 manager.add(renameContactAction);
                 manager.add(deleteContactAction);
-                manager.add(connectionTestAction);
             }
         });
     }
@@ -562,6 +563,16 @@ public class SarosView extends ViewPart {
             public void menuAboutToShow(IMenuManager manager) {
                 manager.add(new Separator(
                     IWorkbenchActionConstants.MB_ADDITIONS));
+            }
+        });
+    }
+
+    protected void addMenuStartSeparator(MenuManager menuManager) {
+        menuManager.addMenuListener(new IMenuListener() {
+            public void menuAboutToShow(IMenuManager manager) {
+                Separator menuStart = new Separator("menustart");
+                menuStart.setVisible(false);
+                manager.add(menuStart);
             }
         });
     }

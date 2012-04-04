@@ -23,6 +23,7 @@ import de.fu_berlin.inf.dpp.net.SarosNet;
 import de.fu_berlin.inf.dpp.net.internal.SafePacketListener;
 import de.fu_berlin.inf.dpp.net.internal.subscriptionManager.events.IncomingSubscriptionEvent;
 import de.fu_berlin.inf.dpp.net.internal.subscriptionManager.events.SubscriptionManagerListener;
+import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.util.Utils;
 
 /**
@@ -223,9 +224,12 @@ public class SubscriptionManager {
             public void run() {
                 // TODO Should flash dialog
                 boolean accept = MessageDialog.openConfirm(
-                    EditorAPI.getShell(), "Request of subscription received",
-                    "The buddy " + presence.getFrom()
-                        + " has requested subscription.");
+                    EditorAPI.getShell(),
+                    Messages.SubscriptionManager_incoming_buddy_request_title,
+                    MessageFormat
+                        .format(
+                            Messages.SubscriptionManager_incoming_buddy_request_message,
+                            presence.getFrom()));
 
                 if (accept)
                     addSubscription(presence);
@@ -249,11 +253,13 @@ public class SubscriptionManager {
 
         Utils.runSafeSWTAsync(log, new Runnable() {
             public void run() {
-                MessageDialog.openInformation(EditorAPI.getShell(),
-                    "Removal of subscription", "Buddy " + from
-                        + " has rejected your request"
-                        + " of subsription or has removed"
-                        + " you from her or his roster.");
+                MessageDialog.openInformation(
+                    EditorAPI.getShell(),
+                    Messages.SubscriptionManager_incoming_buddy_denied_title,
+                    MessageFormat
+                        .format(
+                            Messages.SubscriptionManager_incoming_buddy_denied_message,
+                            from));
             }
         });
     }
