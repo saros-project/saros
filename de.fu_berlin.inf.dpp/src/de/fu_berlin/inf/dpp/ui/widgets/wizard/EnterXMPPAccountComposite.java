@@ -120,14 +120,14 @@ public class EnterXMPPAccountComposite extends Composite {
      * @see Text#addModifyListener(ModifyListener)
      */
     public void addModifyListener(ModifyListener modifyListener) {
-        this.modifyListeners.add(modifyListener);
+        modifyListeners.add(modifyListener);
     }
 
     /**
      * @see Text#removeModifyListener(ModifyListener)
      */
     public void removeModifyListener(ModifyListener modifyListener) {
-        this.modifyListeners.remove(modifyListener);
+        modifyListeners.remove(modifyListener);
     }
 
     private void notifyModifyText(ModifyEvent e) {
@@ -143,14 +143,17 @@ public class EnterXMPPAccountComposite extends Composite {
 
     @Override
     public boolean setFocus() {
-        return this.jidCombo.setFocus();
+        return jidCombo.setFocus();
     }
 
     @Override
     public void setEnabled(boolean enabled) {
-        this.jidCombo.setEnabled(enabled);
-        this.passwordText.setEnabled(enabled);
-        this.serverText.setEnabled(enabled);
+        jidCombo.setEnabled(enabled);
+        passwordText.setEnabled(enabled);
+        serverText.setEnabled(enabled);
+        portText.setEnabled(enabled);
+        useTSLButton.setEnabled(enabled);
+        useSASLButton.setEnabled(enabled);
     }
 
     private void hookListeners() {
