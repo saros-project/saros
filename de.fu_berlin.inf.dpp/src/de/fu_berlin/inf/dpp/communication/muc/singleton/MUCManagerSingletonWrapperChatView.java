@@ -44,26 +44,24 @@ public class MUCManagerSingletonWrapperChatView extends
             Utils.runSafeAsync(log, new Runnable() {
                 @Override
                 public void run() {
-                    MUCManagerSingletonWrapperChatView.this.mucSession = mucManager
-                        .connectMUC(preferences);
-                    log.debug(MUCManagerSingletonWrapperChatView.class
-                        .getSimpleName() + " created / joined.");
+                    synchronized (MUCManagerSingletonWrapperChatView.this) {
+                        mucSession = mucManager.connectMUC(preferences);
+                    }
+                    log.debug("created / joined MUC" + preferences.getService());
                 }
             });
         }
 
         @Override
         public void sessionEnding(ISarosSession oldSarosSession) {
-            assert MUCManagerSingletonWrapperChatView.this.mucSession != null : MUCManagerSingletonWrapperChatView.class
-                .getSimpleName()
-                + " wants to leave a "
-                + MUCSession.class.getSimpleName()
-                + " that has never been created / joined.";
+            synchronized (MUCManagerSingletonWrapperChatView.this) {
+                if (mucSession == null)
+                    return;
 
-            MUCManagerSingletonWrapperChatView.this.mucSession.disconnect();
-            MUCManagerSingletonWrapperChatView.this.mucSession = null;
-            log.debug(MUCManagerSingletonWrapperChatView.class.getSimpleName()
-                + " left / destroyed.");
+                mucSession.disconnect();
+                mucSession = null;
+            }
+            log.debug("left / destroyed MUC " + preferences.getService());
         }
     };
 
@@ -76,6 +74,6 @@ public class MUCManagerSingletonWrapperChatView extends
 
     @Override
     public MUCSessionPreferences getPreferences() {
-        return this.preferences;
+        return preferences;
     }
 }

@@ -98,6 +98,7 @@ public class MUCManager {
         try {
             createdRoom = mucSession.connect();
         } catch (XMPPException e) {
+            notifyMUCSessionConnectionError(mucSession, e);
             log.error("Couldn't join chat: " + preferences.getRoom(), e);
             return null;
         }
@@ -156,41 +157,35 @@ public class MUCManager {
         this.mucManagerListeners.remove(mucManagerListener);
     }
 
-    /**
-     * Notify all {@link IMUCManagerListener}s about a created
-     * {@link MUCSession}
-     */
-    public void notifyMUCSessionCreated(MUCSession mucSession) {
+    void notifyMUCSessionCreated(MUCSession mucSession) {
         for (IMUCManagerListener mucManagerListener : this.mucManagerListeners) {
             mucManagerListener.mucSessionCreated(mucSession);
         }
     }
 
-    /**
-     * Notify all {@link IMUCManagerListener}s about a joined {@link MUCSession}
-     */
-    public void notifyMUCSessionJoined(MUCSession mucSession) {
+    void notifyMUCSessionJoined(MUCSession mucSession) {
         for (IMUCManagerListener mucManagerListener : this.mucManagerListeners) {
             mucManagerListener.mucSessionJoined(mucSession);
         }
     }
 
-    /**
-     * Notify all {@link IMUCManagerListener}s about a left {@link MUCSession}
-     */
-    public void notifyMUCSessionLeft(MUCSession mucSession) {
+    void notifyMUCSessionLeft(MUCSession mucSession) {
         for (IMUCManagerListener mucManagerListener : this.mucManagerListeners) {
             mucManagerListener.mucSessionLeft(mucSession);
         }
     }
 
-    /**
-     * Notify all {@link IMUCManagerListener}s about a destroyed
-     * {@link MUCSession}
-     */
-    public void notifyMUCSessionDestroyed(MUCSession mucSession) {
+    void notifyMUCSessionDestroyed(MUCSession mucSession) {
         for (IMUCManagerListener mucManagerListener : this.mucManagerListeners) {
             mucManagerListener.mucSessionDestroyed(mucSession);
         }
     }
+
+    void notifyMUCSessionConnectionError(MUCSession mucSession,
+        XMPPException exception) {
+        for (IMUCManagerListener mucManagerListener : this.mucManagerListeners) {
+            mucManagerListener.mucSessionConnectionError(mucSession, exception);
+        }
+    }
+
 }

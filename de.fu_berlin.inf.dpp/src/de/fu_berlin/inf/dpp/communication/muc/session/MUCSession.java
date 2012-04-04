@@ -229,6 +229,8 @@ public class MUCSession {
         boolean joined = false;
         this.createdRoom = false;
 
+        XMPPException exception = null;
+
         /*
          * Try to create and then join the room TODO: Check whether the case
          * happens that the room was not joined, that is: No room creation is
@@ -240,7 +242,7 @@ public class MUCSession {
             this.createdRoom = true;
             joined = true;
         } catch (XMPPException e) {
-            log.debug(e);
+            exception = e;
         }
 
         /*
@@ -256,7 +258,7 @@ public class MUCSession {
                 muc.join(connection.getUser(), preferences.getPassword());
                 joined = true;
             } catch (XMPPException e) {
-                log.debug(e);
+                throw exception != null ? exception : e;
             }
         }
 

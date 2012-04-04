@@ -1,5 +1,7 @@
 package de.fu_berlin.inf.dpp.communication.muc.events;
 
+import org.jivesoftware.smack.XMPPException;
+
 import de.fu_berlin.inf.dpp.communication.muc.session.MUCSession;
 import de.fu_berlin.inf.dpp.net.JID;
 
@@ -7,6 +9,9 @@ import de.fu_berlin.inf.dpp.net.JID;
  * Listener for {@link MUCSession} events.
  */
 public interface IMUCManagerListener {
+
+    public void mucSessionConnectionError(MUCSession mucSession,
+        XMPPException exception);
 
     /**
      * Gets called whenever a {@link MUCSession} was created.

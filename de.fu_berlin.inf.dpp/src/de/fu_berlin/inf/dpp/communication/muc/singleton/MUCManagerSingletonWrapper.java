@@ -3,6 +3,8 @@ package de.fu_berlin.inf.dpp.communication.muc.singleton;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.jivesoftware.smack.XMPPException;
+
 import de.fu_berlin.inf.dpp.communication.muc.MUCManager;
 import de.fu_berlin.inf.dpp.communication.muc.events.IMUCManagerListener;
 import de.fu_berlin.inf.dpp.communication.muc.negotiation.MUCSessionPreferences;
@@ -67,6 +69,18 @@ public abstract class MUCManagerSingletonWrapper {
                 .getPreferences()) {
                 for (IMUCManagerListener mucManagerListener : MUCManagerSingletonWrapper.this.mucManagerListeners) {
                     mucManagerListener.mucSessionDestroyed(mucSession);
+                }
+            }
+        }
+
+        @Override
+        public void mucSessionConnectionError(MUCSession mucSession,
+            XMPPException exception) {
+            if (mucSession.getPreferences() == MUCManagerSingletonWrapper.this
+                .getPreferences()) {
+                for (IMUCManagerListener mucManagerListener : MUCManagerSingletonWrapper.this.mucManagerListeners) {
+                    mucManagerListener.mucSessionConnectionError(mucSession,
+                        exception);
                 }
             }
         }
