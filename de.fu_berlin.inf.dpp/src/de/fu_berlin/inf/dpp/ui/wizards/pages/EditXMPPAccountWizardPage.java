@@ -34,12 +34,12 @@ public class EditXMPPAccountWizardPage extends WizardPage {
     /**
      * This flag is true if {@link JID} was already valid.
      */
-    private boolean wasJIDValid = false;
+    private boolean wasJIDValid = true;
 
     /**
      * This flag is true if the password was already valid.
      */
-    private boolean wasPasswordValid = false;
+    private boolean wasPasswordValid = true;
 
     /**
      * This flag is true if the server was already valid.
@@ -78,6 +78,9 @@ public class EditXMPPAccountWizardPage extends WizardPage {
 
         useTSL = account.useTSL();
         useSASL = account.useSASL();
+
+        wasServerValid = initialServer.length() != 0;
+        wasPortValid = initialPort.length() != 0;
     }
 
     public void createControl(Composite parent) {
