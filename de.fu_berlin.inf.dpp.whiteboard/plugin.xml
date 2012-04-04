@@ -22,8 +22,8 @@
          <view
                id="de.fu_berlin.inf.dpp.whiteboard.view.SarosWhiteboardView"
                ratio="0.5"
-               relationship="right"
-               relative="org.eclipse.ui.views.ContentOutline"/>
+               relationship="stack"
+               relative="de.fu_berlin.inf.dpp.ui.views.SarosView"/>
       </perspectiveExtension>
    </extension>
    
