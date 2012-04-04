@@ -5,6 +5,8 @@ import java.util.List;
 
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.FocusEvent;
+import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.layout.GridData;
@@ -32,6 +34,7 @@ import de.fu_berlin.inf.dpp.ui.widgets.decoration.JIDCombo;
 public class EnterXMPPAccountComposite extends Composite {
 
     private List<ModifyListener> modifyListeners = new ArrayList<ModifyListener>();
+    private List<FocusListener> focusListeners = new ArrayList<FocusListener>();
 
     private JIDCombo jidCombo;
     private Text passwordText;
@@ -116,24 +119,22 @@ public class EnterXMPPAccountComposite extends Composite {
         hookListeners();
     }
 
-    /**
-     * @see Text#addModifyListener(ModifyListener)
-     */
     public void addModifyListener(ModifyListener modifyListener) {
         modifyListeners.add(modifyListener);
     }
 
-    /**
-     * @see Text#removeModifyListener(ModifyListener)
-     */
     public void removeModifyListener(ModifyListener modifyListener) {
         modifyListeners.remove(modifyListener);
     }
 
-    private void notifyModifyText(ModifyEvent e) {
-        for (ModifyListener modifyListener : this.modifyListeners) {
-            modifyListener.modifyText(e);
-        }
+    @Override
+    public void addFocusListener(FocusListener focusListener) {
+        focusListeners.add(focusListener);
+    }
+
+    @Override
+    public void removeFocusListener(FocusListener focusListener) {
+        focusListeners.remove(focusListener);
     }
 
     @Override
@@ -154,20 +155,6 @@ public class EnterXMPPAccountComposite extends Composite {
         portText.setEnabled(enabled);
         useTSLButton.setEnabled(enabled);
         useSASLButton.setEnabled(enabled);
-    }
-
-    private void hookListeners() {
-
-        ModifyListener modifyListener = new ModifyListener() {
-            public void modifyText(ModifyEvent e) {
-                notifyModifyText(e);
-            }
-        };
-
-        jidCombo.getControl().addModifyListener(modifyListener);
-        passwordText.addModifyListener(modifyListener);
-        serverText.addModifyListener(modifyListener);
-        portText.addModifyListener(modifyListener);
     }
 
     /**
@@ -271,4 +258,55 @@ public class EnterXMPPAccountComposite extends Composite {
             server = getJID().getDomain();
         return server.equalsIgnoreCase(preferenceUtils.getSarosXMPPServer());
     }
+
+    private void hookListeners() {
+
+        ModifyListener modifyListener = new ModifyListener() {
+            public void modifyText(ModifyEvent e) {
+                notifyModifyText(e);
+            }
+        };
+
+        FocusListener focusListener = new FocusListener() {
+            @Override
+            public void focusGained(FocusEvent e) {
+                notifyFocusGained(e);
+
+            }
+
+            @Override
+            public void focusLost(FocusEvent e) {
+                notifyFocusLost(e);
+            }
+        };
+
+        jidCombo.getControl().addModifyListener(modifyListener);
+        passwordText.addModifyListener(modifyListener);
+        serverText.addModifyListener(modifyListener);
+        portText.addModifyListener(modifyListener);
+
+        jidCombo.getControl().addFocusListener(focusListener);
+        passwordText.addFocusListener(focusListener);
+        serverText.addFocusListener(focusListener);
+        portText.addFocusListener(focusListener);
+    }
+
+    private void notifyModifyText(ModifyEvent e) {
+        for (ModifyListener modifyListener : modifyListeners) {
+            modifyListener.modifyText(e);
+        }
+    }
+
+    private void notifyFocusGained(FocusEvent e) {
+        for (FocusListener focusListener : focusListeners) {
+            focusListener.focusGained(e);
+        }
+    }
+
+    private void notifyFocusLost(FocusEvent e) {
+        for (FocusListener focusListener : focusListeners) {
+            focusListener.focusLost(e);
+        }
+    }
+
 }

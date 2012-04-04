@@ -2,6 +2,8 @@ package de.fu_berlin.inf.dpp.ui.wizards.pages;
 
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.FocusEvent;
+import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -177,12 +179,25 @@ public class EnterXMPPAccountWizardPage extends WizardPage {
     }
 
     private void hookListeners() {
-        this.enterXMPPAccountComposite.addModifyListener(new ModifyListener() {
+        enterXMPPAccountComposite.addModifyListener(new ModifyListener() {
             public void modifyText(ModifyEvent e) {
                 updatePageCompletion();
             }
         });
 
+        enterXMPPAccountComposite.addFocusListener(new FocusListener() {
+            @Override
+            public void focusGained(FocusEvent e) {
+                // NOP
+            }
+
+            // JID combo has always the focus if the page is shown
+            @Override
+            public void focusLost(FocusEvent e) {
+                wasJIDValid = true;
+                updatePageCompletion();
+            }
+        });
     }
 
     /**
