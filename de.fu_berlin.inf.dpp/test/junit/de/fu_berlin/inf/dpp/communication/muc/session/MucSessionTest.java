@@ -51,8 +51,8 @@ public class MucSessionTest {
     }
 
     private MUCSessionPreferences createMUCPrefernce(String roomName) {
-        return new MUCSessionPreferences("conference.jabber.ccc.de", roomName,
-            "defaul1234#ABC");
+        return new MUCSessionPreferences("conference.jabber.se", roomName,
+            "backebackekuchen");
     }
 
     @Test(timeout = 30000)
