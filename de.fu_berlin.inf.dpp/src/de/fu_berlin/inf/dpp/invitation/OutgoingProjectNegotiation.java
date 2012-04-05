@@ -135,6 +135,7 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
             }
             // send the big archive
             monitor.subTask("");
+
             sendArchive(monitor.newChild(50), zipArchive, processID);
 
             projectExchangeProcesses.removeProjectExchangeProcess(this);
@@ -502,7 +503,7 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
             try {
                 startHandles = sarosSession.getStopManager().stop(usersToStop,
                     "Synchronizing invitation",
-                monitor.newChild(0, SubMonitor.SUPPRESS_ALL_LABELS));
+                    monitor.newChild(0, SubMonitor.SUPPRESS_ALL_LABELS));
             } catch (CancellationException e) {
                 checkCancellation(CancelOption.NOTIFY_PEER);
                 return null;
@@ -551,8 +552,11 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
 
         log.debug("Inv" + Utils.prefix(peer) + ": Sending archive...");
 
-        if (archive == null)
+        if (archive == null) {
             log.debug("Inv" + Utils.prefix(peer) + ": The archive is empty.");
+            monitor.done();
+            return;
+        }
 
         try {
             transmitter.sendProjectArchive(peer, projectID, archive,

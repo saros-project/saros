@@ -687,36 +687,28 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
         File archive, SubMonitor progress) throws SarosCancellationException,
         IOException {
 
-        String user = connection.getUser();
-        if (user == null) {
-            log.warn("Local user is not logged in to the connection, yet.");
-            return;
-        }
         progress.beginTask("Sending Archive", 100);
 
         progress.subTask("Reading archive to memory");
+
         byte[] content;
 
-        if (archive == null) {
-            content = new byte[0];
-        } else {
-            int archiveSize = (int) archive.length();
-            content = new byte[archiveSize];
-            FileInputStream in = new FileInputStream(archive);
-            FileChannel channel = in.getChannel();
-            ByteBuffer buffer = ByteBuffer.wrap(content);
+        int archiveSize = (int) archive.length();
+        content = new byte[archiveSize];
+        FileInputStream in = new FileInputStream(archive);
+        FileChannel channel = in.getChannel();
+        ByteBuffer buffer = ByteBuffer.wrap(content);
 
-            while (!progress.isCanceled() && archiveSize > 0)
-                archiveSize -= channel.read(buffer);
+        while (!progress.isCanceled() && archiveSize > 0)
+            archiveSize -= channel.read(buffer);
 
-            channel.close();
-            in.close();
-        }
+        channel.close();
+        in.close();
 
         progress.worked(10);
 
         TransferDescription transfer = TransferDescription
-            .createArchiveTransferDescription(recipient, new JID(user),
+            .createArchiveTransferDescription(recipient, /* set by DTM */null,
                 sessionID.getValue(), invitationID, content.length);
 
         progress.subTask("Sending project(s) archive ("

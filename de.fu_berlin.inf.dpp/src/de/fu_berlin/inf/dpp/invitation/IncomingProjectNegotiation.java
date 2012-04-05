@@ -174,8 +174,14 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
                 subMonitor.newChild(10));
             checkCancellation();
 
+            boolean filesMissing = false;
+
+            for (FileList list : missingFiles)
+                filesMissing |= list.getPaths().size() > 0;
+
             // Host/Inviter decided to transmit files with one big archive
-            acceptArchive(localProjects.size(), subMonitor.newChild(80));
+            if (filesMissing)
+                acceptArchive(localProjects.size(), subMonitor.newChild(80));
 
             // We are finished with the exchanging process. Add all projects
             // resources to the session.
@@ -199,6 +205,8 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
         } catch (Exception e) {
             processException(e);
         } finally {
+            subMonitor.done();
+
             // Re-enable auto-building...
             if (wasAutobuilding) {
                 desc.setAutoBuilding(true);
@@ -214,7 +222,6 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
                 .containsValue(this))
                 this.projectExchangeProcesses
                     .removeProjectExchangeProcess(this);
-            subMonitor.done();
         }
     }
 
