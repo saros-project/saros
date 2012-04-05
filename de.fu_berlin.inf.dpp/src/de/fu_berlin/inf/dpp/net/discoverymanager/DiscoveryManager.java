@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.net.internal.discoveryManager;
+package de.fu_berlin.inf.dpp.net.discoverymanager;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -24,7 +24,6 @@ import de.fu_berlin.inf.dpp.net.IRosterListener;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.RosterTracker;
 import de.fu_berlin.inf.dpp.net.SarosNet;
-import de.fu_berlin.inf.dpp.net.internal.discoveryManager.events.DiscoveryManagerListener;
 import de.fu_berlin.inf.dpp.util.StackTrace;
 import de.fu_berlin.inf.dpp.util.Utils;
 

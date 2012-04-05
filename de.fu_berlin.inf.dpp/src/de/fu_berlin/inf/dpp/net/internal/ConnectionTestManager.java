@@ -23,7 +23,7 @@ import de.fu_berlin.inf.dpp.net.IncomingTransferObject.IncomingTransferObjectExt
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.NetTransferMode;
 import de.fu_berlin.inf.dpp.net.SarosNet;
-import de.fu_berlin.inf.dpp.net.internal.discoveryManager.DiscoveryManager;
+import de.fu_berlin.inf.dpp.net.discoverymanager.DiscoveryManager;
 import de.fu_berlin.inf.dpp.util.StopWatch;
 import de.fu_berlin.inf.dpp.util.Utils;
 

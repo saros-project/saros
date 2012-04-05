@@ -1,7 +1,6 @@
-package de.fu_berlin.inf.dpp.net.internal.discoveryManager.events;
+package de.fu_berlin.inf.dpp.net.discoverymanager;
 
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.net.internal.discoveryManager.DiscoveryManager;
 
 /**
  * Listener for {@link DiscoveryManager} events
