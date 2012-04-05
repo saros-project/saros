@@ -2,7 +2,7 @@ package de.fu_berlin.inf.dpp.net.internal;
 
 import java.io.IOException;
 
-import org.eclipse.core.runtime.SubMonitor;
+import org.eclipse.core.runtime.IProgressMonitor;
 
 import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
 import de.fu_berlin.inf.dpp.net.JID;
@@ -20,9 +20,9 @@ public interface IByteStreamConnection {
     public boolean isConnected();
 
     /**
-     * If this call returns the data has been send successfully, otherwise
-     * an IOException is thrown with the reason why the transfer failed.
-     *
+     * If this call returns the data has been send successfully, otherwise an
+     * IOException is thrown with the reason why the transfer failed.
+     * 
      * @param data
      *            The data to be sent.
      * @throws IOException
@@ -33,7 +33,8 @@ public interface IByteStreamConnection {
      * @blocking Send the given data as a blocking operation.
      */
     public void send(TransferDescription data, byte[] content,
-        SubMonitor callback) throws IOException, SarosCancellationException;
+        IProgressMonitor monitor) throws IOException,
+        SarosCancellationException;
 
     public NetTransferMode getMode();
 }

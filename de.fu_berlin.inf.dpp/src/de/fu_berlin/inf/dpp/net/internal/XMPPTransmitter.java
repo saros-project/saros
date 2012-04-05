@@ -656,7 +656,7 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
             log.warn("Local user is not logged in to the connection, yet.");
             return;
         }
-        progress.beginTask("Sending FileList", 100);
+        progress.beginTask("Sending file list", 100);
 
         TransferDescription data = TransferDescription
             .createFileListTransferDescription(recipient, new JID(user),
@@ -674,6 +674,8 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
         String xml = Utils.join("---next---", xmlFileLists);
 
         byte[] content = xml.getBytes("UTF-8");
+
+        data.setSize(content.length);
 
         // Not showing detailed progress here, because it is going fast, and the
         // user would probably not understand what is happening here...

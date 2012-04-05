@@ -26,8 +26,8 @@ public class TransferDescriptionTest {
     }
 
     @Test
-    public void testByteArray() throws ClassNotFoundException {
-        byte[] data = td.toByteArray();
+    public void testByteArray() throws Exception {
+        byte[] data = TransferDescription.toByteArray(td);
         TransferDescription td2 = TransferDescription.fromByteArray(data);
         assertEquals(td.getSessionID(), td2.getSessionID());
         assertEquals(td.getProcessID(), td2.getProcessID());

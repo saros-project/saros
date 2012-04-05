@@ -50,12 +50,6 @@ public class TransferDescription implements Serializable {
      */
     public static final String CONNECTION_TEST = "connection-test";
 
-    /**
-     * This field is for internal use by BinaryChannel to identify an object.
-     */
-
-    private int id;
-
     private String type;
 
     private String namespace;
@@ -68,8 +62,8 @@ public class TransferDescription implements Serializable {
 
     private String archivePath;
 
-    public long size = 0L;
-    
+    private long size = 0L;
+
     /**
      * Field used to indicate that the file is compressed already, like in
      * ARCHIVE_TRANSFER or RESOURCE_TRANSFER with a File like a jar, jpeg, ....
@@ -161,7 +155,7 @@ public class TransferDescription implements Serializable {
         result.invitationID = invitationID;
         result.compress = false;
         result.size = size;
- 
+
         return result;
     }
 
@@ -189,40 +183,29 @@ public class TransferDescription implements Serializable {
         return result;
     }
 
-    public byte[] toByteArray() {
+    public static byte[] toByteArray(TransferDescription descrption)
+        throws IOException {
         ByteArrayOutputStream os = new ByteArrayOutputStream();
 
         ObjectOutputStream object = null;
-        try {
-            object = new ObjectOutputStream(os);
-            object.writeObject(this);
-            object.close();
-            os.close();
-        } catch (IOException e) {
-            // should not happen
-            throw new RuntimeException(
-                "Could not serialize: ObjectOutputStream failed: " + e);
-        }
+        object = new ObjectOutputStream(os);
+        object.writeObject(descrption);
+        object.close();
+        os.close();
         return os.toByteArray();
     }
 
     public static TransferDescription fromByteArray(byte[] data)
-        throws ClassNotFoundException {
+        throws IOException, ClassNotFoundException {
         ByteArrayInputStream in = new ByteArrayInputStream(data);
 
         ObjectInputStream object = null;
-        try {
-            object = new ObjectInputStream(in);
-            Object o = object.readObject();
-            object.close();
-            in.close();
-            return (TransferDescription) o;
-        } catch (IOException e) {
-            // should not happen
-            throw new RuntimeException(
-                "Could not deserialize the transfer description object: "
-                    + e.getMessage());
-        }
+
+        object = new ObjectInputStream(in);
+        Object o = object.readObject();
+        object.close();
+        in.close();
+        return (TransferDescription) o;
     }
 
     TransferDescription setNamespace(String namespace) {
@@ -259,15 +242,6 @@ public class TransferDescription implements Serializable {
 
     public JID getSender() {
         return sender;
-    }
-
-    TransferDescription setID(int id) {
-        this.id = id;
-        return this;
-    }
-
-    public int getID() {
-        return id;
     }
 
     TransferDescription setTestID(String testID) {
@@ -328,8 +302,9 @@ public class TransferDescription implements Serializable {
      * Set the size of the object that is to be transferred (e.g. bytes, words,
      * units)
      */
-    public void setSize(long units) {
-        this.size = units;
+    TransferDescription setSize(long size) {
+        this.size = size;
+        return this;
     }
 
     /**

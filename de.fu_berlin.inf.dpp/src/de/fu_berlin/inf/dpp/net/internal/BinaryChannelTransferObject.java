@@ -1,57 +1,53 @@
-/**
- * 
- */
 package de.fu_berlin.inf.dpp.net.internal;
 
 import java.io.IOException;
+import java.io.InterruptedIOException;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.apache.log4j.Logger;
-import org.eclipse.core.runtime.SubMonitor;
+import org.apache.commons.lang.time.StopWatch;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.NullProgressMonitor;
 
 import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
 import de.fu_berlin.inf.dpp.exceptions.RemoteCancellationException;
 import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
 import de.fu_berlin.inf.dpp.invitation.ProcessTools.CancelOption;
 import de.fu_berlin.inf.dpp.net.IncomingTransferObject;
-import de.fu_berlin.inf.dpp.net.internal.BinaryPacketProto.BinaryPacket;
-import de.fu_berlin.inf.dpp.net.internal.BinaryPacketProto.BinaryPacket.PacketType;
 import de.fu_berlin.inf.dpp.net.NetTransferMode;
-import de.fu_berlin.inf.dpp.util.StopWatch;
 import de.fu_berlin.inf.dpp.util.Utils;
+
 public class BinaryChannelTransferObject implements IncomingTransferObject {
 
-    /**
-     * 
-     */
     private BinaryChannel binaryChannel;
 
-    private static final Logger log = Logger
-        .getLogger(BinaryChannelTransferObject.class);
+    private TransferDescription transferDescription;
 
-    protected final TransferDescription transferDescription;
+    private int fragmentId;
+    private int chunkCount;
+    private long transferredSize;
+    private long uncompressedSize;
+    private BlockingQueue<byte[]> chunks;
 
-    protected final int objectid;
-
-    protected long transferredSize;
-    protected long uncompressedSize;
-
-    protected AtomicBoolean acceptedOrRejected = new AtomicBoolean(false);
+    private AtomicBoolean acceptedOrRejected = new AtomicBoolean(false);
 
     public BinaryChannelTransferObject(BinaryChannel binaryChannel,
-        TransferDescription transferDescription, int objectid) {
+        TransferDescription transferDescription, int fragmentId,
+        int chunkCount, BlockingQueue<byte[]> chunks) {
 
         this.binaryChannel = binaryChannel;
         this.transferDescription = transferDescription;
-        this.objectid = objectid;
+        this.fragmentId = fragmentId;
+        this.chunkCount = chunkCount;
+        this.chunks = chunks;
         transferredSize = 0;
         uncompressedSize = 0;
     }
 
-    public byte[] accept(SubMonitor progress)
+    public byte[] accept(IProgressMonitor monitor)
         throws SarosCancellationException, IOException {
 
         try {
@@ -61,86 +57,107 @@ public class BinaryChannelTransferObject implements IncomingTransferObject {
                     "This IncomingTransferObject has already"
                         + " been accepted or rejected");
 
-            BlockingQueue<BinaryPacket> myPackets = this.binaryChannel.incomingPackets
-                .get(objectid);
-
-            boolean first = true;
-
-            LinkedList<BinaryPacket> resultList = new LinkedList<BinaryPacket>();
+            List<byte[]> resultList = new LinkedList<byte[]>();
 
             long receivedBytes = 0L;
-            StopWatch watch = new StopWatch().start();
 
-            while (true) {
-                if (!this.binaryChannel.isConnected())
+            StopWatch watch = new StopWatch();
+            watch.start();
+
+            monitor.beginTask("", chunkCount);
+
+            while (chunkCount > 0) {
+                if (!binaryChannel.isConnected())
                     throw new LocalCancellationException(
                         "Data connection lost.", CancelOption.NOTIFY_PEER);
-                if (progress.isCanceled()) {
-                    // reject();
-                    /*
-                     * @TODO: For sending, the BinaryChannel actually also
-                     * expects a Reject packet to detect the cancel; see
-                     * BinaryChannel.sendDirect() and the confirmation packet
-                     * where else an IOException is thrown.
-                     */
+
+                if (monitor.isCanceled()) {
+                    binaryChannel.sendReject(fragmentId);
 
                     throw new LocalCancellationException(
                         "Data reception was manually cancelled.",
                         CancelOption.NOTIFY_PEER);
                 }
 
-                BinaryPacket packet;
+                if (binaryChannel.isCanceled(fragmentId))
+                    throw new RemoteCancellationException();
+
+                byte[] payload;
+
                 try {
-                    packet = myPackets.poll(5, TimeUnit.SECONDS);
-                    if (packet == null)
+                    payload = chunks.poll(5, TimeUnit.SECONDS);
+                    if (payload == null)
                         continue;
 
+                    long duration = watch.getTime();
+
+                    chunkCount--;
+
+                    receivedBytes += payload.length;
+
+                    long bytesPerSecond = Math.round((payload.length * 1000D)
+                        / (duration + 1D));
+
+                    long secondsLeft = Math.round((transferDescription
+                        .getSize() - receivedBytes) / (bytesPerSecond + 1D));
+
+                    monitor.subTask("Received: "
+                        + Utils.formatByte(receivedBytes) + " of "
+                        + Utils.formatByte(transferDescription.getSize())
+                        + "\nRemaining time: "
+                        + Utils.formatDuration(secondsLeft) + " ("
+                        + Utils.formatByte(bytesPerSecond) + "/s)");
+
+                    watch.reset();
+                    watch.start();
+
                 } catch (InterruptedException e) {
-                    log.error("Code not designed to be interrupted");
-                    Thread.currentThread().interrupt();
-                    return null;
+                    Thread.interrupted();
+                    throw new InterruptedIOException(
+                        "interrupted while reading stream data");
                 }
 
-                if (packet.getType() == PacketType.CANCEL) {
-                    assert packet.getObjectid() == objectid;
-
-                    throw new RemoteCancellationException();
-                }
-
-                if (first) {
-                    progress.beginTask("Receiving", packet.getRemaining()
-                        + (transferDescription.compressContent() ? 1 : 0));
-                    first = false;
-                }
-
-                resultList.add(packet);
-                progress.worked(1);
-
-                receivedBytes += packet.getData().size();
-
-                progress.subTask("Received " + Utils.formatByte(receivedBytes)
-                    + " of " + Utils.formatByte(transferDescription.getSize())
-                    + watch.throughput(receivedBytes));
-
-                if (packet.getRemaining() == 0)
-                    break;
+                resultList.add(payload);
+                monitor.worked(1);
             }
 
-            this.binaryChannel.send(BinaryChannel.buildPacket(
-                PacketType.FINISHED, objectid));
-            byte[] data = BinaryChannel.getData(resultList);
+            monitor.subTask("");
+
+            binaryChannel.sendFinished(fragmentId);
+
+            int length = 0;
+
+            for (byte[] payload : resultList)
+                length += payload.length;
+
+            // OOM Exception incoming at least here if the binary channel not
+            // thrown it already !
+            byte[] data = new byte[length];
+
+            int offset = 0;
+
+            for (byte[] payload : resultList) {
+                System.arraycopy(payload, 0, data, offset, payload.length);
+                offset += payload.length;
+            }
 
             transferredSize = data.length;
-            progress.subTask("Receiving finished");
-            
+
+            /*
+             * HOW cool is that, got 50 MB compressed data ... deflate it ..
+             * trash the heap !
+             */
+
+            // OOM Exception !
             if (transferDescription.compressContent())
-                data = Utils.inflate(data, progress.newChild(1));
+                data = Utils.inflate(data, new NullProgressMonitor());
 
             uncompressedSize = data.length;
 
             return data;
         } finally {
-            this.binaryChannel.incomingPackets.remove(objectid);
+            binaryChannel.removeFragments(fragmentId);
+            monitor.done();
         }
     }
 
@@ -154,12 +171,15 @@ public class BinaryChannelTransferObject implements IncomingTransferObject {
                 "This IncomingTransferObject has already"
                     + " been accepted or rejected");
 
-        this.binaryChannel.send(BinaryChannel.buildPacket(PacketType.REJECT,
-            objectid));
+        try {
+            binaryChannel.sendReject(fragmentId);
+        } finally {
+            binaryChannel.removeFragments(fragmentId);
+        }
     }
 
     public NetTransferMode getTransferMode() {
-        return this.binaryChannel.transferMode;
+        return binaryChannel.getTransferMode();
     }
 
     public long getTransferredSize() {

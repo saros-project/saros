@@ -14,6 +14,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.apache.log4j.Logger;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.swt.dnd.TransferData;
 import org.jivesoftware.smack.Connection;
@@ -183,7 +184,7 @@ public class DataTransferManager implements IConnectionListener,
         /**
          * Accepts a transfer and returns the incoming data.
          */
-        public byte[] accept(final SubMonitor progress)
+        public byte[] accept(final IProgressMonitor progress)
             throws SarosCancellationException, IOException {
             addIncomingFileTransfer(description);
             try {

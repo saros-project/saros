@@ -2,7 +2,7 @@ package de.fu_berlin.inf.dpp.net;
 
 import java.io.IOException;
 
-import org.eclipse.core.runtime.SubMonitor;
+import org.eclipse.core.runtime.IProgressMonitor;
 
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
@@ -26,7 +26,7 @@ public interface IncomingTransferObject {
      *           for instance). So do not call this from the
      *           {@link DispatchThreadContext} or from the SWT Thread.
      */
-    public byte[] accept(SubMonitor progress)
+    public byte[] accept(IProgressMonitor progress)
         throws SarosCancellationException, IOException;
 
     /**
