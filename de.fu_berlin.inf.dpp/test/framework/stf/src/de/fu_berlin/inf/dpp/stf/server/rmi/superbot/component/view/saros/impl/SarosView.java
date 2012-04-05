@@ -266,7 +266,11 @@ public final class SarosView extends StfRemoteObject implements ISarosView {
     }
 
     public String getNickname(JID buddyJID) throws RemoteException {
-        Roster roster = getSaros().getSarosNet().getRoster();
+        Roster roster = getSarosNet().getRoster();
+
+        if (roster == null)
+            throw new IllegalStateException("not connected to a xmpp server");
+
         if (roster.getEntry(buddyJID.getBase()) == null)
             return null;
         if (roster.getEntry(buddyJID.getBase()).getName() == null)

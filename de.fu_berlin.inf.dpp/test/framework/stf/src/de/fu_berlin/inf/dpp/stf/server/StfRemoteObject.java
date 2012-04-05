@@ -7,6 +7,7 @@ import de.fu_berlin.inf.dpp.accountManagement.XMPPAccountStore;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.feedback.FeedbackManager;
+import de.fu_berlin.inf.dpp.net.SarosNet;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
 import de.fu_berlin.inf.dpp.project.SarosSessionManager;
 import de.fu_berlin.inf.dpp.stf.shared.Constants;
@@ -22,6 +23,10 @@ public abstract class StfRemoteObject implements Constants {
 
     protected Saros getSaros() {
         return container.getComponent(Saros.class);
+    }
+
+    protected SarosNet getSarosNet() {
+        return container.getComponent(SarosNet.class);
     }
 
     protected SarosSessionManager getSessionManager() {
