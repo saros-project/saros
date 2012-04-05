@@ -80,7 +80,6 @@ import de.fu_berlin.inf.dpp.net.internal.extensions.CancelInviteExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.CancelProjectSharingExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.LeaveExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.PacketExtensionUtils;
-import de.fu_berlin.inf.dpp.net.internal.extensions.RequestActivityExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.UserListExtension;
 import de.fu_berlin.inf.dpp.observables.SarosSessionObservable;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
@@ -132,9 +131,6 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
 
     @Inject
     protected LeaveExtension leaveExtension;
-
-    @Inject
-    protected RequestActivityExtension requestActivityExtension;
 
     @Inject
     protected UserListExtension userListExtension;

@@ -77,7 +77,6 @@ import de.fu_berlin.inf.dpp.net.internal.XMPPTransmitter;
 import de.fu_berlin.inf.dpp.net.internal.extensions.CancelInviteExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.CancelProjectSharingExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.LeaveExtension;
-import de.fu_berlin.inf.dpp.net.internal.extensions.RequestActivityExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.UserListExtension;
 import de.fu_berlin.inf.dpp.net.stun.IStunService;
 import de.fu_berlin.inf.dpp.net.stun.internal.StunServiceImpl;
@@ -278,7 +277,6 @@ public class SarosContext {
         Component.create(CancelInviteExtension.class),
         Component.create(CancelProjectSharingExtension.class),
         Component.create(UserListExtension.class),
-        Component.create(RequestActivityExtension.class),
         Component.create(LeaveExtension.class),
 
         // Extension Providers
