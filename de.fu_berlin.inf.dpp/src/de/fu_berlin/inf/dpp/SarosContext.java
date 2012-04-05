@@ -79,9 +79,9 @@ import de.fu_berlin.inf.dpp.net.internal.extensions.CancelProjectSharingExtensio
 import de.fu_berlin.inf.dpp.net.internal.extensions.LeaveExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.RequestActivityExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.UserListExtension;
-import de.fu_berlin.inf.dpp.net.internal.subscriptionManager.SubscriptionManager;
 import de.fu_berlin.inf.dpp.net.stun.IStunService;
 import de.fu_berlin.inf.dpp.net.stun.internal.StunServiceImpl;
+import de.fu_berlin.inf.dpp.net.subscriptionmanager.SubscriptionManager;
 import de.fu_berlin.inf.dpp.net.upnp.IUPnPService;
 import de.fu_berlin.inf.dpp.net.upnp.internal.UPnPServiceImpl;
 import de.fu_berlin.inf.dpp.observables.FileReplacementInProgressObservable;
