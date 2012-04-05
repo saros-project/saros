@@ -52,6 +52,7 @@ import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
 import de.fu_berlin.inf.dpp.invitation.ProcessTools.CancelLocation;
 import de.fu_berlin.inf.dpp.invitation.ProcessTools.CancelOption;
 import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.observables.FileReplacementInProgressObservable;
 import de.fu_berlin.inf.dpp.observables.SarosSessionObservable;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
 import de.fu_berlin.inf.dpp.project.IChecksumCache;
@@ -88,6 +89,8 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
     @Inject
     protected IChecksumCache checksumCache;
 
+    @Inject
+    protected FileReplacementInProgressObservable fileReplacementInProgressObservable;
     /**
      * maps the projectID to the project in workspace
      */
@@ -154,6 +157,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
         boolean wasAutobuilding = desc.isAutoBuilding();
 
         subMonitor.beginTask("Initializing shared project", 100);
+        fileReplacementInProgressObservable.startReplacement();
         try {
             if (wasAutobuilding) {
                 desc.setAutoBuilding(false);
@@ -205,6 +209,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
         } catch (Exception e) {
             processException(e);
         } finally {
+            fileReplacementInProgressObservable.replacementDone();
             subMonitor.done();
 
             // Re-enable auto-building...
