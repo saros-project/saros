@@ -147,6 +147,10 @@ public class STFController {
                 chatServerJID);
         }
 
+        if (preferenceStore != null)
+            preferenceStore.setDefault(PreferenceConstants.STOP_EMPTY_SESSIONS,
+                "true");
+
         try {
             registry = LocateRegistry.createRegistry(port);
         } catch (RemoteException e) {
