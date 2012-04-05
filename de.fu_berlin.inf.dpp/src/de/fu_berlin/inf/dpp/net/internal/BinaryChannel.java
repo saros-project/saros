@@ -19,7 +19,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.apache.commons.lang.time.StopWatch;
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.jivesoftware.smackx.bytestreams.BytestreamSession;
 
 import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
@@ -175,8 +174,7 @@ public class BinaryChannel {
                 inputStream.readFully(transferDescriptionData);
 
                 TransferDescription transferDescription = TransferDescription
-                    .fromByteArray(Utils.inflate(transferDescriptionData,
-                        new NullProgressMonitor()));
+                    .fromByteArray(transferDescriptionData);
 
                 /* Side effects are cool, aren't they ?????? */
 
@@ -287,9 +285,7 @@ public class BinaryChannel {
         transmissionStatus.put(fragmentId, /* unknown */-1);
         transmissionReply.put(fragmentId, new CountDownLatch(1));
 
-        byte[] descData = Utils.deflate(
-            TransferDescription.toByteArray(transferDescription),
-            new NullProgressMonitor());
+        byte[] descData = TransferDescription.toByteArray(transferDescription);
 
         assert data.length > 0;
 

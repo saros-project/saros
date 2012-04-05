@@ -5,10 +5,9 @@ package de.fu_berlin.inf.dpp.net.internal;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.Serializable;
 
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.util.Utils;
@@ -20,13 +19,10 @@ import de.fu_berlin.inf.dpp.util.Utils;
  * Instances of this class may not be reused but should be treated as value
  * objects, otherwise serialization will fail.
  */
-public class TransferDescription implements Serializable {
-
-    private static final long serialVersionUID = -3775431613174873948L;
+public class TransferDescription {
 
     protected TransferDescription() {
-        // prevent access to this class except through helper methods
-        // maybe you should had have make this ctor private ...
+        // NOP
     }
 
     /**
@@ -62,7 +58,7 @@ public class TransferDescription implements Serializable {
 
     private String archivePath;
 
-    private long size = 0L;
+    private long size;
 
     /**
      * Field used to indicate that the file is compressed already, like in
@@ -183,29 +179,57 @@ public class TransferDescription implements Serializable {
         return result;
     }
 
-    public static byte[] toByteArray(TransferDescription descrption)
+    public static byte[] toByteArray(TransferDescription description)
         throws IOException {
-        ByteArrayOutputStream os = new ByteArrayOutputStream();
+        ByteArrayOutputStream serialized = new ByteArrayOutputStream();
 
-        ObjectOutputStream object = null;
-        object = new ObjectOutputStream(os);
-        object.writeObject(descrption);
-        object.close();
-        os.close();
-        return os.toByteArray();
+        DataOutputStream out = new DataOutputStream(serialized);
+
+        out.writeUTF(description.type != null ? description.type : "");
+        out.writeUTF(description.namespace != null ? description.namespace : "");
+        out.writeUTF(description.sessionID != null ? description.sessionID : "");
+        out.writeUTF(description.archivePath != null ? description.archivePath
+            : "");
+        out.writeUTF(description.invitationID != null ? description.invitationID
+            : "");
+        out.writeUTF(description.testID != null ? description.testID : "");
+        out.writeUTF(description.processID != null ? description.processID : "");
+
+        out.writeUTF(description.recipient != null ? description.recipient
+            .toString() : "");
+        out.writeUTF(description.sender != null ? description.sender.toString()
+            : "");
+
+        out.writeLong(description.size);
+        out.writeBoolean(description.compress);
+
+        out.close();
+
+        return serialized.toByteArray();
     }
 
     public static TransferDescription fromByteArray(byte[] data)
-        throws IOException, ClassNotFoundException {
-        ByteArrayInputStream in = new ByteArrayInputStream(data);
+        throws IOException {
+        DataInputStream in = new DataInputStream(new ByteArrayInputStream(data));
 
-        ObjectInputStream object = null;
+        TransferDescription description = new TransferDescription();
 
-        object = new ObjectInputStream(in);
-        Object o = object.readObject();
-        object.close();
-        in.close();
-        return (TransferDescription) o;
+        description.type = in.readUTF();
+        description.namespace = in.readUTF();
+        description.sessionID = in.readUTF();
+        description.archivePath = in.readUTF();
+        description.invitationID = in.readUTF();
+        description.testID = in.readUTF();
+        description.processID = in.readUTF();
+
+        description.recipient = new JID(in.readUTF());
+        description.sender = new JID(in.readUTF());
+
+        description.size = in.readLong();
+        description.compress = in.readBoolean();
+
+        return description;
+
     }
 
     TransferDescription setNamespace(String namespace) {
@@ -314,5 +338,4 @@ public class TransferDescription implements Serializable {
     public long getSize() {
         return this.size;
     }
-
 }
