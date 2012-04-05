@@ -16,10 +16,12 @@ import java.util.List;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.picocontainer.MutablePicoContainer;
 
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.SarosContext;
+import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
 import de.fu_berlin.inf.dpp.stf.server.rmi.controlbot.impl.ControlBotImpl;
 import de.fu_berlin.inf.dpp.stf.server.rmi.controlbot.manipulation.impl.NetworkManipulatorImpl;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.impl.RemoteWorkbenchBot;
@@ -74,6 +76,7 @@ import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.whiteboard.im
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.whiteboard.impl.WhiteboardFigure;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.impl.SuperBot;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.internal.impl.InternalImpl;
+import de.fu_berlin.inf.dpp.stf.shared.Configuration;
 
 /**
  * STFController is responsible to register all exported objects.
@@ -99,7 +102,7 @@ public class STFController {
         Collections.sort(propertyKeys);
 
         for (String key : propertyKeys)
-            log.info("Java property: " + key + " = " + System.getProperty(key));
+            log.info("java property: " + key + " = " + System.getProperty(key));
 
         MutablePicoContainer container = null;
         try {
@@ -110,6 +113,7 @@ public class STFController {
 
             Field mutablePicoContainerField = SarosContext.class
                 .getDeclaredField("container");
+
             mutablePicoContainerField.setAccessible(true);
 
             SarosContext sarosContext = (SarosContext) sarosContextField
@@ -127,6 +131,21 @@ public class STFController {
             log.debug("container component: " + object.getClass().getName());
 
         StfRemoteObject.setPicoContainer(container);
+
+        IPreferenceStore preferenceStore = container
+            .getComponent(IPreferenceStore.class);
+
+        String chatServerJID = Configuration.getString("xmpp_chat_server");
+
+        if (preferenceStore != null && chatServerJID != null) {
+
+            log.info("overwriting default chat server '"
+                + preferenceStore.getString(PreferenceConstants.CHATSERVER)
+                + "' with '" + chatServerJID + "'");
+
+            preferenceStore.setValue(PreferenceConstants.CHATSERVER,
+                chatServerJID);
+        }
 
         try {
             registry = LocateRegistry.createRegistry(port);
@@ -185,37 +204,40 @@ public class STFController {
         exportObject(SarosView.getInstance(), "rosterView");
         exportObject(RSView.getInstance(), "remoteScreenView");
         exportObject(ConsoleView.getInstance(), "consoleView");
-        exportObject(SarosWhiteboardView.getInstance(), "sarosWhiteboardView");
 
         /*
          * whiteboard specific components
          */
+        exportObject(SarosWhiteboardView.getInstance(), "sarosWhiteboardView");
         exportObject(WhiteboardFigure.getInstance(), "whiteboardFigure");
+
+        /*
+         * SuperBot components
+         */
 
         exportObject(NewC.getInstance(), "fileM");
         exportObject(RefactorC.getInstance(), "refactorM");
         exportObject(WindowMenu.getInstance(), "windowM");
         exportObject(SarosMenu.getInstance(), "sarosM");
-
         exportObject(TeamC.getInstance(), "teamC");
         exportObject(ShareWithC.getInstance(), "shareWithC");
         exportObject(ContextMenusInPEView.getInstance(), "contextMenu");
-
         exportObject(ContextMenusInBuddiesArea.getInstance(),
             "buddiesContextMenu");
+
         exportObject(ContextMenusInSessionArea.getInstance(),
             "sessionContextMenu");
+
         exportObject(WorkTogetherOnContextMenu.getInstance(), "workTogetherOnC");
         exportObject(Chatroom.getInstance(), "chatroom");
-
         exportObject(SarosPreferences.getInstance(), "sarosPreferences");
-
         exportObject(Views.getInstance(), "views");
         exportObject(MenuBar.getInstance(), "menuBar");
-
         exportObject(InternalImpl.getInstance(), "internal");
 
-        /* ultimate bot :P, only Chuck Norris can do it better ! */
+        /*
+         * ControlBot components
+         */
 
         exportObject(NetworkManipulatorImpl.getInstance(), "networkManipulator");
 
