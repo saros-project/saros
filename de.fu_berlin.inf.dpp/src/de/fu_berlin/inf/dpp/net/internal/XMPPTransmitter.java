@@ -36,6 +36,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
 import org.jivesoftware.smack.Chat;
@@ -66,7 +67,6 @@ import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.IncomingTransferObject;
 import de.fu_berlin.inf.dpp.net.IncomingTransferObject.IncomingTransferObjectExtensionProvider;
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.net.NetTransferMode;
 import de.fu_berlin.inf.dpp.net.SarosNet;
 import de.fu_berlin.inf.dpp.net.TimedActivityDataObject;
 import de.fu_berlin.inf.dpp.net.business.DispatchThreadContext;
@@ -103,11 +103,9 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
      * Maximum retry attempts to send an activity. Retry attempts will switch to
      * prefer IBB on MAX_TRANSFER_RETRIES/2.
      */
-    public static final int MAX_TRANSFER_RETRIES = 4;
-
-    public static final int MAX_PARALLEL_SENDS = 10;
-    public static final int FORCEDPART_OFFLINEUSER_AFTERSECS = 60;
-    public static final int MAX_XMPP_MESSAGE_SIZE = 16378;
+    private static final int MAX_TRANSFER_RETRIES = 4;
+    private static final int FORCEDPART_OFFLINEUSER_AFTERSECS = 60;
+    private static final int MAX_XMPP_MESSAGE_SIZE = 4096;
 
     protected Connection connection;
 
@@ -137,12 +135,6 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
 
     @Inject
     protected CancelProjectSharingExtension cancelProjectSharingExtension;
-
-    @Inject
-    protected ActivitiesExtensionProvider activitiesProvider;
-
-    @Inject
-    protected InvitationInfo.InvitationExtensionProvider invExtProv;
 
     @Inject
     protected InvitationAcknowledgementExtensionProvider invAcknowledgementExtProv;
@@ -199,20 +191,13 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
         final SubMonitor monitor, boolean forceWait) throws IOException,
         SarosCancellationException {
 
-        monitor.beginTask("Receiving archive file", 100);
+        monitor.beginTask("Receiving archive file", 1);
         log.debug("Receiving archive");
         final PacketFilter filter = PacketExtensionUtils
             .getIncomingTransferObjectFilter(incomingExtProv, sessionID,
                 processID, TransferDescription.ARCHIVE_TRANSFER);
 
         SarosPacketCollector collector = installReceiver(filter);
-
-        // provide visual feedback of ongoing IBB transfer
-        PacketListener packetListenerIBB = null;
-        if (dataManager.getTransferMode(peer) == NetTransferMode.IBB) {
-            packetListenerIBB = createIBBTransferProgressPacketListener(peer,
-                monitor);
-        }
 
         monitor
             .subTask("Host is compressing project files. Waiting for the archive file...");
@@ -230,67 +215,18 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
         monitor.subTask("Receiving archive file...");
         try {
             IncomingTransferObject result = incomingExtProv.getPayload(receive(
-                monitor.newChild(packetListenerIBB == null ? 10 : 1),
-                collector, 10000, forceWait));
+                monitor.newChild(0), collector, 10000, forceWait));
 
             if (monitor.isCanceled()) {
                 result.reject();
                 throw new LocalCancellationException();
             }
-            byte[] data = result.accept(monitor
-                .newChild(packetListenerIBB == null ? 90 : 9));
+            byte[] data = result.accept(monitor.newChild(1));
 
             return new ByteArrayInputStream(data);
         } finally {
             monitor.done();
-            if (packetListenerIBB != null)
-                receiver.removePacketListener(packetListenerIBB);
         }
-    }
-
-    /**
-     * Initializes a {@link PacketListener} to visualize incoming packets as
-     * progress in the given {@link SubMonitor}. This is an infinite,
-     * logarithmic progress display.
-     * 
-     * @param peer
-     *            The source {@link JID} of packets to show progress for
-     * @param monitor
-     *            The {@link SubMonitor} of the progress
-     */
-    protected PacketListener createIBBTransferProgressPacketListener(
-        final JID peer, final SubMonitor monitor) {
-
-        PacketListener packetListener = new PacketListener() {
-
-            public void processPacket(Packet packet) {
-                // we dont process
-            }
-        };
-
-        receiver.addPacketListener(packetListener, new PacketFilter() {
-
-            public boolean accept(Packet packet) {
-
-                if (packet.getClass().equals((IQ.class)))
-                    return false;
-
-                if (packet.getFrom() == null)
-                    return false;
-
-                JID fromJid = new JID(packet.getFrom());
-                if (peer.equals(fromJid) == false)
-                    return false;
-
-                // increase infinite (logarithmic) progress
-                monitor.setWorkRemaining(100);
-                monitor.worked(5);
-
-                // we dont process
-                return false;
-            }
-        });
-        return packetListener;
     }
 
     /**
@@ -301,9 +237,9 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
         return receiver.createCollector(filter);
     }
 
-    public Packet receive(SubMonitor monitor, SarosPacketCollector collector,
-        long timeout, boolean forceWait) throws LocalCancellationException,
-        IOException {
+    public Packet receive(IProgressMonitor monitor,
+        SarosPacketCollector collector, long timeout, boolean forceWait)
+        throws LocalCancellationException, IOException {
 
         if (isConnectionInvalid())
             return null;
@@ -436,13 +372,6 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
         sendMessageToAll(sarosSession, leaveExtension.create());
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see de.fu_berlin.inf.dpp.ITransmitter
-     * 
-     * TODO: Add Progress
-     */
     public void sendTimedActivities(JID recipient,
         List<TimedActivityDataObject> timedActivities) {
 
@@ -504,6 +433,8 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
      *             if sending by bytestreams fails and the extension raw data is
      *             longer than {@value #MAX_XMPP_MESSAGE_SIZE}
      */
+
+    // TODO WHITEBOARD
     public void sendToProjectUser(JID recipient, PacketExtension extension)
         throws IOException {
         /*
@@ -713,16 +644,7 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
         dataManager.sendData(transfer, content, progress.newChild(90));
     }
 
-    public void sendRemainingFiles() {
-
-        log.warn("Sending remaining files is not implemented!");
-        //
-        // if (this.fileTransferQueue.size() > 0) {
-        // // sendNextFile();
-        // }
-    }
-
-    public void sendRemainingMessages() {
+    private void sendRemainingMessages() {
 
         List<MessageTransfer> toTransfer = null;
 
@@ -740,7 +662,7 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
      * Convenience method for sending the given {@link PacketExtension} to all
      * participants of the given {@link ISarosSession}.
      */
-    public void sendMessageToAll(ISarosSession sarosSession,
+    private void sendMessageToAll(ISarosSession sarosSession,
         PacketExtension extension) {
 
         JID myJID = sarosNet.getMyJID();
@@ -874,19 +796,6 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
         } catch (XMPPException e) {
             throw new CausedIOException("Failed to send message", e);
         }
-    }
-
-    public Packet sendAndReceive(SubMonitor monitor, JID jid,
-        PacketExtension extension, PacketFilter filter, long timeout,
-        boolean forceWait, boolean sessionMembersOnly)
-        throws LocalCancellationException, IOException {
-
-        SarosPacketCollector collector = installReceiver(filter);
-
-        sendMessageToUser(jid, extension, sessionMembersOnly);
-
-        return receive(monitor, collector, timeout, forceWait);
-
     }
 
     /**

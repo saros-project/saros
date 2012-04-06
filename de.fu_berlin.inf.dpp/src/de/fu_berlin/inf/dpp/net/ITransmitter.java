@@ -24,6 +24,7 @@ import java.io.InputStream;
 import java.util.Collection;
 import java.util.List;
 
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
 import org.jivesoftware.smack.packet.IQ;
 import org.jivesoftware.smack.packet.Packet;
@@ -126,9 +127,9 @@ public interface ITransmitter {
      * @throws LocalCancellationException
      * @throws IOException
      */
-    public Packet receive(SubMonitor monitor, SarosPacketCollector collector,
-        long timeout, boolean forceWait) throws LocalCancellationException,
-        IOException;
+    public Packet receive(IProgressMonitor monitor,
+        SarosPacketCollector collector, long timeout, boolean forceWait)
+        throws LocalCancellationException, IOException;
 
     // FIXME Add Javadoc. Why is an invitationID needed?
     public void sendUserList(JID to, String invitationID, Collection<User> user);
@@ -176,18 +177,6 @@ public interface ITransmitter {
     public void sendProjectArchive(JID recipient, String invitationID,
         File archive, SubMonitor monitor) throws IOException,
         SarosCancellationException;
-
-    /**
-     * Sends queued file transfers.
-     */
-    public void sendRemainingFiles();
-
-    /**
-     * Sends queued messages.
-     */
-    public void sendRemainingMessages();
-
-    /* ---------- etc --------- */
 
     /**
      * Sends a leave message to the participants of given Saros session. See
