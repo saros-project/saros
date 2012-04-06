@@ -31,7 +31,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -56,7 +55,6 @@ import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.FileList;
 import de.fu_berlin.inf.dpp.User;
-import de.fu_berlin.inf.dpp.User.UserConnectionState;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
 import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
@@ -104,7 +102,6 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
      * prefer IBB on MAX_TRANSFER_RETRIES/2.
      */
     private static final int MAX_TRANSFER_RETRIES = 4;
-    private static final int FORCEDPART_OFFLINEUSER_AFTERSECS = 60;
     private static final int MAX_XMPP_MESSAGE_SIZE = 4096;
 
     protected Connection connection;
@@ -114,8 +111,6 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
     protected Map<JID, Chat> chats;
 
     protected Map<JID, InvitationProcess> processes;
-
-    protected List<MessageTransfer> messageTransferQueue;
 
     protected XMPPReceiver receiver;
 
@@ -333,17 +328,10 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
                 invitationID)), true);
     }
 
-    /********************************************************************************
-     * Invitation process' help functions --- END
-     ********************************************************************************/
-
-    /**
-     * A simple struct that is used to queue message transfers.
+    /* *********************************************
+     * Invitation process' help functions --- END *
+     * *********************************************
      */
-    protected static class MessageTransfer {
-        public JID receipient;
-        public Message message;
-    }
 
     public void sendCancelInvitationMessage(JID user, String errorMsg) {
         log.debug("Send request to cancel Invitation to "
@@ -644,20 +632,6 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
         dataManager.sendData(transfer, content, progress.newChild(90));
     }
 
-    private void sendRemainingMessages() {
-
-        List<MessageTransfer> toTransfer = null;
-
-        synchronized (messageTransferQueue) {
-            toTransfer = new ArrayList<MessageTransfer>(messageTransferQueue);
-            messageTransferQueue.clear();
-        }
-
-        for (MessageTransfer pex : toTransfer) {
-            sendMessageToUser(pex.receipient, pex.message, true);
-        }
-    }
-
     /**
      * Convenience method for sending the given {@link PacketExtension} to all
      * participants of the given {@link ISarosSession}.
@@ -673,13 +647,6 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
                 continue;
             sendMessageToUser(participant.getJID(), extension, true);
         }
-    }
-
-    private void queueMessage(JID jid, Message message) {
-        MessageTransfer msg = new MessageTransfer();
-        msg.receipient = jid;
-        msg.message = message;
-        this.messageTransferQueue.add(msg);
     }
 
     /**
@@ -719,42 +686,27 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
     public void sendMessageToUser(JID jid, Message message,
         boolean sessionMembersOnly) {
 
-        if (sessionMembersOnly) {
+        ISarosSession session = sarosSessionObservable.getValue();
 
-            ISarosSession session = sarosSessionObservable.getValue();
+        if (session == null)
+            return;
 
-            if (session == null)
-                return;
+        User user = session.getUser(jid);
 
-            User participant = session.getUser(jid);
-
-            if (participant == null) {
-                log.warn("Buddy not in session:" + Utils.prefix(jid));
-                return;
-            }
-
-            if (participant.getConnectionState() == UserConnectionState.OFFLINE) {
-                /*
-                 * TODO This probably does not work anymore! See Feature Request
-                 * #2577390
-                 */
-                // remove participant if he/she is offline too long
-                if (participant.getOfflineSeconds() > XMPPTransmitter.FORCEDPART_OFFLINEUSER_AFTERSECS) {
-                    log.info("Removing offline buddy from session...");
-                    sarosSessionObservable.getValue().removeUser(participant);
-                } else {
-                    queueMessage(jid, message);
-                    log.info("Buddy known as offline - Message queued!");
-                }
-                return;
-            }
+        if (sessionMembersOnly && user == null) {
+            log.warn("user is not in the current session:" + Utils.prefix(jid));
+            return;
         }
 
         try {
             sendMessageWithoutQueueing(jid, message);
         } catch (IOException e) {
-            log.info("Could not send message, thus queueing", e);
-            queueMessage(jid, message);
+            // FIXME the session should do that
+            log.error("could not send message to user: " + jid, e);
+            if (user != null) {
+                log.info("removing user " + user + " from the session");
+                session.removeUser(user);
+            }
         }
     }
 
@@ -856,8 +808,6 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
         this.chats = new HashMap<JID, Chat>();
         this.processes = Collections
             .synchronizedMap(new HashMap<JID, InvitationProcess>());
-        this.messageTransferQueue = Collections
-            .synchronizedList(new LinkedList<MessageTransfer>());
 
         this.connection = connection;
 
@@ -901,7 +851,6 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
         }
         chats.clear();
         processes.clear();
-        messageTransferQueue.clear();
         chatmanager = null;
         connection = null;
     }
