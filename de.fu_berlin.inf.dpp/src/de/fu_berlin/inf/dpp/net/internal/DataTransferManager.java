@@ -15,6 +15,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.swt.dnd.TransferData;
 import org.jivesoftware.smack.Connection;
@@ -902,5 +903,16 @@ public class DataTransferManager implements IConnectionListener,
         message.addExtension(new XMPPTunnelPacketExtension(packet));
 
         currentConnection.sendPacket(message);
+    }
+
+    public void sendPacket(Packet packet) throws IOException {
+        try {
+            IByteStreamConnection connection = getConnection(
+                packet.getReceiver(),
+                SubMonitor.convert(new NullProgressMonitor()));
+            connection.sendPacket(packet);
+        } catch (SarosCancellationException e) {
+            // cannot happen
+        }
     }
 }

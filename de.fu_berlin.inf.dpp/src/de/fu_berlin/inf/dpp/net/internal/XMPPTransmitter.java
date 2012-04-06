@@ -80,6 +80,7 @@ import de.fu_berlin.inf.dpp.net.internal.extensions.CancelInviteExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.CancelProjectSharingExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.LeaveExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.PacketExtensionUtils;
+import de.fu_berlin.inf.dpp.net.packet.TimedActivitiesPacket;
 import de.fu_berlin.inf.dpp.observables.SarosSessionObservable;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
@@ -455,11 +456,13 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
         }
 
         String sID = sessionID.getValue();
-        PacketExtension extensionToSend = activitiesProvider.create(sID,
-            timedActivities);
+
+        de.fu_berlin.inf.dpp.net.packet.Packet packet = new TimedActivitiesPacket(
+            new TimedActivities(sID, timedActivities));
+        packet.setReceiver(recipient);
 
         try {
-            sendToProjectUser(recipient, extensionToSend);
+            dataManager.sendPacket(packet);
         } catch (IOException e) {
             log.error("Failed to sent activityDataObjects: " + timedActivities,
                 e);

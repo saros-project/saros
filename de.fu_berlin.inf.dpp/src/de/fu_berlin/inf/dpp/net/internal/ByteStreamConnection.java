@@ -181,6 +181,7 @@ public class ByteStreamConnection implements IByteStreamConnection {
         connected = true;
 
         receiver = new Receiver();
+        receiver.setName("Receiver-" + remoteJID.getBase());
         receiver.start();
     }
 
@@ -389,7 +390,6 @@ public class ByteStreamConnection implements IByteStreamConnection {
 
     @Override
     public void sendPacket(Packet packet) throws IOException {
-        // TODO Auto-generated method stub
 
         short id = packet.getType().getID();
         

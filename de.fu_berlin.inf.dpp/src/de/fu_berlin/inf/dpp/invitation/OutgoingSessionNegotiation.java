@@ -156,15 +156,13 @@ public class OutgoingSessionNegotiation extends InvitationProcess {
 
             sendInvitation(monitor.newChild(1, SubMonitor.SUPPRESS_NONE));
 
-            User newUser = addUserToSession(monitor.newChild(0,
-                SubMonitor.SUPPRESS_ALL_LABELS));
-
-            monitor.setTaskName("Negotiating data connection...");
-
             /*
              * HACK Ensure byte stream connection to peer so the project wizard
              * always show the currently used connection (IBB, Socks5(D/M)
              */
+
+            // FIMXE: MUST BE CALLED HERE, or the Network Layer will crash
+            // on the first activity that is send
 
             dataTransferManager.getConnection(
                 peer,
@@ -173,6 +171,11 @@ public class OutgoingSessionNegotiation extends InvitationProcess {
 
             monitor.subTask("");
             monitor.worked(7);
+
+            User newUser = addUserToSession(monitor.newChild(0,
+                SubMonitor.SUPPRESS_ALL_LABELS));
+
+            monitor.setTaskName("Negotiating data connection...");
 
             /*
              * User accepted the invitation, so NOW we can create the

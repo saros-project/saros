@@ -2,20 +2,18 @@ package de.fu_berlin.inf.dpp.net.business;
 
 import java.util.List;
 
-import org.apache.commons.lang.ObjectUtils;
 import org.apache.log4j.Logger;
-import org.jivesoftware.smack.PacketListener;
-import org.jivesoftware.smack.packet.Packet;
-import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.activities.serializable.IActivityDataObject;
 import de.fu_berlin.inf.dpp.annotations.Component;
-import de.fu_berlin.inf.dpp.net.IncomingTransferObject.IncomingTransferObjectExtensionProvider;
+import de.fu_berlin.inf.dpp.net.IPacketListener;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.TimedActivityDataObject;
-import de.fu_berlin.inf.dpp.net.internal.ActivitiesExtensionProvider;
+import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
 import de.fu_berlin.inf.dpp.net.internal.TimedActivities;
-import de.fu_berlin.inf.dpp.net.internal.XMPPReceiver;
+import de.fu_berlin.inf.dpp.net.packet.Packet;
+import de.fu_berlin.inf.dpp.net.packet.PacketType;
+import de.fu_berlin.inf.dpp.net.packet.TimedActivitiesPacket;
 import de.fu_berlin.inf.dpp.observables.SarosSessionObservable;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
@@ -26,56 +24,44 @@ import de.fu_berlin.inf.dpp.util.Utils;
  * Handler for all {@link TimedActivities}
  */
 @Component(module = "net")
-public class ActivitiesHandler {
+public class ActivitiesHandler implements IPacketListener {
 
     private static final Logger log = Logger.getLogger(ActivitiesHandler.class
         .getName());
 
-    @Inject
-    protected SarosSessionObservable sarosSessionObservable;
+    private SarosSessionObservable sarosSessionObservable;
+    private SessionIDObservable sessionIDObervable;
 
-    @Inject
-    protected DispatchThreadContext dispatchThread;
+    public ActivitiesHandler(DataTransferManager dataTransfermanager,
+        SarosSessionObservable sarosSessionObservable,
+        SessionIDObservable sessionIDObervable) {
 
-    public ActivitiesHandler(XMPPReceiver receiver,
-        final ActivitiesExtensionProvider provider,
-        final IncomingTransferObjectExtensionProvider incomingExtProv,
-        final SessionIDObservable sessionID) {
+        this.sarosSessionObservable = sarosSessionObservable;
+        this.sessionIDObervable = sessionIDObervable;
 
-        /**
-         * Add a PacketListener for all TimedActivityDataObject packets
-         */
-        receiver.addPacketListener(new PacketListener() {
-            public void processPacket(Packet packet) {
-                try {
-                    TimedActivities payload = provider.getPayload(packet);
-                    if (payload == null) {
-                        log.warn("Invalid ActivitiesExtensionPacket"
-                            + " does not contain a payload: " + packet);
-                        return;
-                    }
-                    JID from = new JID(packet.getFrom());
-                    List<TimedActivityDataObject> timedActivities = payload
-                        .getTimedActivities();
+        dataTransfermanager.getDispatcher().addPacketListener(this,
+            PacketType.TIMED_ACTIVITIES);
+    }
 
-                    if (!ObjectUtils.equals(sessionID.getValue(),
-                        payload.getSessionID())) {
-                        log.warn("Rcvd ("
-                            + String.format("%03d", timedActivities.size())
-                            + ") " + Utils.prefix(from)
-                            + "from an old/unknown session: " + timedActivities);
-                        return;
-                    }
+    @Override
+    public void processPacket(Packet packet) {
 
-                    receiveActivities(from, timedActivities);
+        TimedActivities activites = ((TimedActivitiesPacket) packet)
+            .getTimedActivities();
 
-                } catch (Exception e) {
-                    log.error(
-                        "An internal error occurred while processing packets",
-                        e);
-                }
-            }
-        }, provider.getPacketFilter());
+        JID from = packet.getSender();
+
+        List<TimedActivityDataObject> timedActivities = activites
+            .getTimedActivities();
+
+        if (!activites.getSessionID().equals(sessionIDObervable.getValue())) {
+            log.warn("Rcvd (" + String.format("%03d", timedActivities.size())
+                + ") " + Utils.prefix(from) + "from an old/unknown session: "
+                + timedActivities);
+            return;
+        }
+
+        receiveActivities(from, timedActivities);
     }
 
     /**
@@ -88,10 +74,8 @@ public class ActivitiesHandler {
      *            the activityDataObjects might be different!)
      * @param timedActivities
      *            The received activityDataObjects including sequence numbers.
-     * 
-     * @sarosThread must be called from the Dispatch Thread
      */
-    public void receiveActivities(JID fromJID,
+    private void receiveActivities(JID fromJID,
         List<TimedActivityDataObject> timedActivities) {
 
         final ISarosSession session = sarosSessionObservable.getValue();

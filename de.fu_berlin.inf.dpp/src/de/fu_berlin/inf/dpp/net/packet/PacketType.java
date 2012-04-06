@@ -17,6 +17,12 @@ public enum PacketType {
 
     VERSION_RESPONSE(0x2, VersionResponsePacket.class),
 
+    INVITATION_REQUEST(0x3, InvitationRequestPacket.class),
+
+    INVITATION_RESPONSE(0x4, InvitationResponsePacket.class),
+
+    TIMED_ACTIVITIES(0x100, TimedActivitiesPacket.class),
+
     TEST(0xFFFF, TestPacket.class);
 
     private final short id;
