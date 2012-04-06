@@ -49,7 +49,8 @@ public class PacketDispatcherImpl implements IPacketDispatcher {
 
         @Override
         public boolean equals(Object object) {
-            return listener.equals(((PacketListenerHolder) object).listener);
+            return object != null
+                && listener.equals(((PacketListenerHolder) object).listener);
         }
 
         @Override

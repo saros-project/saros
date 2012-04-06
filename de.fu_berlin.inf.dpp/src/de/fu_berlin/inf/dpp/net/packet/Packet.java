@@ -1,8 +1,8 @@
 package de.fu_berlin.inf.dpp.net.packet;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 
 import de.fu_berlin.inf.dpp.net.JID;
 
@@ -26,9 +26,9 @@ public abstract class Packet {
         return type;
     }
 
-    public abstract void serialize(DataOutputStream out) throws IOException;
+    public abstract void serialize(OutputStream out) throws IOException;
 
-    public abstract void deserialize(DataInputStream in) throws IOException;
+    public abstract void deserialize(InputStream in) throws IOException;
 
     /**
      * Returns the JID from which this packet was received.

@@ -22,7 +22,7 @@ import de.fu_berlin.inf.dpp.util.Utils;
 
 public class BinaryChannelTransferObject implements IncomingTransferObject {
 
-    private BinaryChannel binaryChannel;
+    private ByteStreamConnection binaryChannel;
 
     private TransferDescription transferDescription;
 
@@ -34,7 +34,7 @@ public class BinaryChannelTransferObject implements IncomingTransferObject {
 
     private AtomicBoolean acceptedOrRejected = new AtomicBoolean(false);
 
-    public BinaryChannelTransferObject(BinaryChannel binaryChannel,
+    public BinaryChannelTransferObject(ByteStreamConnection binaryChannel,
         TransferDescription transferDescription, int fragmentId,
         int chunkCount, BlockingQueue<byte[]> chunks) {
 
@@ -179,7 +179,7 @@ public class BinaryChannelTransferObject implements IncomingTransferObject {
     }
 
     public NetTransferMode getTransferMode() {
-        return binaryChannel.getTransferMode();
+        return binaryChannel.getTransportMode();
     }
 
     public long getTransferredSize() {

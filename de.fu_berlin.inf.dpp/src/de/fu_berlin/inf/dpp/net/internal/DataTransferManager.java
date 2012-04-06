@@ -18,8 +18,12 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.swt.dnd.TransferData;
 import org.jivesoftware.smack.Connection;
+import org.jivesoftware.smack.PacketListener;
 import org.jivesoftware.smack.Roster;
+import org.jivesoftware.smack.filter.PacketFilter;
+import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.Presence;
+import org.jivesoftware.smack.provider.ProviderManager;
 import org.jivesoftware.smackx.bytestreams.socks5.Socks5Proxy;
 import org.picocontainer.annotations.Inject;
 
@@ -27,6 +31,7 @@ import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
 import de.fu_berlin.inf.dpp.net.ConnectionState;
 import de.fu_berlin.inf.dpp.net.IConnectionListener;
+import de.fu_berlin.inf.dpp.net.IPacketDispatcher;
 import de.fu_berlin.inf.dpp.net.IPacketInterceptor;
 import de.fu_berlin.inf.dpp.net.IRosterListener;
 import de.fu_berlin.inf.dpp.net.ITransferModeListener;
@@ -37,6 +42,8 @@ import de.fu_berlin.inf.dpp.net.NetTransferMode;
 import de.fu_berlin.inf.dpp.net.RosterTracker;
 import de.fu_berlin.inf.dpp.net.SarosNet;
 import de.fu_berlin.inf.dpp.net.business.DispatchThreadContext;
+import de.fu_berlin.inf.dpp.net.internal.extensions.XMPPTunnelPacketExtension;
+import de.fu_berlin.inf.dpp.net.packet.Packet;
 import de.fu_berlin.inf.dpp.net.upnp.IUPnPService;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
@@ -109,10 +116,46 @@ public class DataTransferManager implements IConnectionListener,
 
     SarosNet sarosNet;
 
+    private IPacketDispatcher dispatcher = new PacketDispatcherImpl();
     /**
      * Collection of {@link JID}s, flagged to prefer IBB transfer mode
      */
     protected Collection<JID> peersForIBB = new ArrayList<JID>();
+
+    static {
+        ProviderManager.getInstance().addExtensionProvider(
+            XMPPTunnelPacketExtension.ELEMENT_NAME,
+            XMPPTunnelPacketExtension.NAMESPACE,
+            new XMPPTunnelPacketExtension.Provider());
+    }
+
+    private PacketListener packetListener = new PacketListener() {
+        @Override
+        public void processPacket(org.jivesoftware.smack.packet.Packet packet) {
+            try {
+
+                Packet tunneledPacket = ((XMPPTunnelPacketExtension) packet
+                    .getExtension(XMPPTunnelPacketExtension.ELEMENT_NAME,
+                        XMPPTunnelPacketExtension.NAMESPACE)).getPacket();
+
+                tunneledPacket.setSender(new JID(packet.getFrom()));
+                tunneledPacket.setReceiver(new JID(packet.getTo()));
+                dispatcher.dispatch(tunneledPacket);
+
+            } catch (Exception e) {
+                log.error("error while processing xmpp packet + " + packet
+                    + ": " + e.getMessage(), e);
+            }
+        }
+    };
+
+    private PacketFilter packetFilter = new PacketFilter() {
+        @Override
+        public boolean accept(org.jivesoftware.smack.packet.Packet packet) {
+            return XMPPTunnelPacketExtension.PACKET_ID.equals(packet
+                .getPacketID());
+        }
+    };
 
     public DataTransferManager(SarosNet sarosNet,
         SessionIDObservable sessionID, PreferenceUtils preferenceUtils,
@@ -335,13 +378,13 @@ public class DataTransferManager implements IConnectionListener,
 
             watch.stop();
             transferModeDispatch.transferFinished(recipient,
-                connection.getMode(), false, payload.length, sizeUncompressed,
-                watch.getTime());
+                connection.getTransportMode(), false, payload.length,
+                sizeUncompressed, watch.getTime());
         } catch (IOException e) {
-            log.error(Utils.prefix(transferData.getRecipient())
-                + "Failed to send " + transferData + " with "
-                + connection.getMode().toString() + ":" + e.getMessage() + ":",
-                e.getCause());
+            log.error(
+                Utils.prefix(transferData.getRecipient()) + "Failed to send "
+                    + transferData + " with " + connection.getTransportMode()
+                    + ":" + e.getMessage() + ":", e.getCause());
             throw e;
         } finally {
             synchronized (outgoingTransfers) {
@@ -367,7 +410,8 @@ public class DataTransferManager implements IConnectionListener,
         IByteStreamConnection connection = connections.get(recipient);
 
         if (connection != null) {
-            log.trace("Reuse bytestream connection " + connection.getMode());
+            log.trace("Reuse bytestream connection "
+                + connection.getTransportMode());
             return connection;
         }
 
@@ -400,20 +444,20 @@ public class DataTransferManager implements IConnectionListener,
         for (ITransport transport : transportModesToUse) {
             log.info("Try to establish a bytestream connection to "
                 + recipient.getBase() + " from " + sarosNet.getMyJID()
-                + " using " + transport.getDefaultNetTransferMode());
+                + " using " + transport.getTransportMode());
             try {
                 connection = transport.connect(recipient, progress);
             } catch (IOException e) {
                 log.error(Utils.prefix(recipient) + "Failed to connect using "
                     + transport.toString() + ":",
                     e.getCause() == null ? e : e.getCause());
-                errors.put(transport.getDefaultNetTransferMode(), e.getCause());
+                errors.put(transport.getTransportMode(), e.getCause());
             } catch (InterruptedException e) {
                 throw e;
             } catch (Exception e) {
                 log.error(Utils.prefix(recipient) + "Failed to connect using "
                     + transport.toString() + " because of an unknown error:", e);
-                errors.put(transport.getDefaultNetTransferMode(), e);
+                errors.put(transport.getTransportMode(), e);
             }
             if (connection != null)
                 break;
@@ -463,12 +507,13 @@ public class DataTransferManager implements IConnectionListener,
         IByteStreamConnection old = connections.get(peer);
         assert (old == null || !old.isConnected());
 
-        log.debug("Bytestream connection changed " + connection2.getMode());
+        log.debug("Bytestream connection changed "
+            + connection2.getTransportMode());
         connections.put(peer, connection2);
         transferModeDispatch.connectionChanged(peer, connection2);
 
-        if (connection2.getMode() == NetTransferMode.IBB && incomingRequest
-            && upnpService != null)
+        if (connection2.getTransportMode() == NetTransferMode.IBB
+            && incomingRequest && upnpService != null)
             upnpService.checkAndInformAboutUPnP();
     }
 
@@ -481,7 +526,7 @@ public class DataTransferManager implements IConnectionListener,
         IByteStreamConnection connection = connections.get(jid);
         if (connection == null)
             return NetTransferMode.NONE;
-        return connection.getMode();
+        return connection.getTransportMode();
     }
 
     // Listens for completed transfers to store speed of incoming IBB transfers
@@ -617,17 +662,20 @@ public class DataTransferManager implements IConnectionListener,
         this.connection = connection;
         this.fileTransferQueue = new ConcurrentLinkedQueue<TransferData>();
         this.currentLocalJID = new JID(connection.getUser());
+        this.connection.addPacketListener(packetListener, packetFilter);
 
         for (ITransport transport : transports) {
-            transport.prepareXMPPConnection(connection, this);
+            transport.initializeTransport(connection, currentLocalJID,
+                dispatcher, this);
         }
     }
 
     protected void disposeConnection() {
 
-        for (ITransport transport : transports) {
-            transport.disposeXMPPConnection();
-        }
+        connection.removePacketListener(packetListener);
+
+        for (ITransport transport : transports)
+            transport.disposeTransport();
 
         fileTransferQueue.clear();
 
@@ -639,12 +687,14 @@ public class DataTransferManager implements IConnectionListener,
         for (IByteStreamConnection connection : openConnections) {
             if (connection != null) {
                 // TODO switch to trace
-                log.debug("Close " + connection.getMode() + " connection");
+                log.debug("Close " + connection.getTransportMode()
+                    + " connection");
                 try {
                     connection.close();
                 } catch (RuntimeException e) {
-                    log.error("Error while closing " + connection.getMode()
-                        + " connection ", e);
+                    log.error(
+                        "Error while closing " + connection.getTransportMode()
+                            + " connection ", e);
                 }
             }
         }
@@ -800,11 +850,11 @@ public class DataTransferManager implements IConnectionListener,
         boolean isTransfering = false;
         for (IByteStreamConnection connection : openConnections) {
             if (connection != null
-                && connection.getMode() == NetTransferMode.IBB) {
+                && connection.getTransportMode() == NetTransferMode.IBB) {
 
                 // If this connection is currently in use, dont disconnect
-                if (isReceiving(connection.getPeer())
-                    || isSending(connection.getPeer())) {
+                if (isReceiving(connection.getRemoteJID())
+                    || isSending(connection.getRemoteJID())) {
                     isTransfering = true;
                     continue;
                 }
@@ -812,10 +862,11 @@ public class DataTransferManager implements IConnectionListener,
                 try {
                     connection.close();
                     log.info("Closing IBB connection to "
-                        + connection.getPeer().getBareJID());
+                        + connection.getRemoteJID().getBareJID());
                 } catch (RuntimeException e) {
-                    log.error("Error while closing " + connection.getMode()
-                        + " connection ", e);
+                    log.error(
+                        "Error while closing " + connection.getTransportMode()
+                            + " connection ", e);
                 }
             }
         }
@@ -830,4 +881,26 @@ public class DataTransferManager implements IConnectionListener,
         packetInterceptors.remove(interceptor);
     }
 
+    public IPacketDispatcher getDispatcher() {
+        return dispatcher;
+    }
+
+    public void sendPacketViaXMPP(Packet packet) {
+        Connection currentConnection = connection;
+
+        if (currentConnection == null)
+            throw new IllegalStateException("not connected to a xmpp server");
+
+        if (packet.getReceiver() == null)
+            throw new UnsupportedOperationException(
+                "broadcasting via XMPP is not allowed");
+
+        Message message = new Message();
+        message.setFrom(currentLocalJID.toString());
+        message.setTo(packet.getReceiver().toString());
+
+        message.addExtension(new XMPPTunnelPacketExtension(packet));
+
+        currentConnection.sendPacket(message);
+    }
 }

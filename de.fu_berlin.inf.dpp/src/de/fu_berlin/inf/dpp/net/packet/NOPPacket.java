@@ -1,7 +1,7 @@
 package de.fu_berlin.inf.dpp.net.packet;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
 
 public class NOPPacket extends Packet {
 
@@ -10,12 +10,12 @@ public class NOPPacket extends Packet {
     }
 
     @Override
-    public void serialize(DataOutputStream out) {
-        //
+    public void serialize(OutputStream out) {
+        // NOP
     }
 
     @Override
-    public void deserialize(DataInputStream in) {
-        //
+    public void deserialize(InputStream in) {
+        // NOP
     }
 }

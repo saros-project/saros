@@ -21,6 +21,8 @@ import de.fu_berlin.inf.dpp.net.packet.PacketType;
  */
 public class XMPPTunnelPacketExtension implements PacketExtension {
 
+    public static final String PACKET_ID = "SAROS-DPP-V1";
+
     public static final String ELEMENT_NAME = "packet";
     public static final String NAMESPACE = "http://saros-project.org/protocol/tunnel";
 

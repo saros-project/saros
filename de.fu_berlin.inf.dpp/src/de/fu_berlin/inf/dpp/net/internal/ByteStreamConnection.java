@@ -2,13 +2,17 @@ package de.fu_berlin.inf.dpp.net.internal;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.EOFException;
 import java.io.IOException;
 import java.io.InterruptedIOException;
 import java.net.ProtocolException;
+import java.net.SocketException;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
@@ -24,8 +28,12 @@ import org.jivesoftware.smackx.bytestreams.BytestreamSession;
 import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
 import de.fu_berlin.inf.dpp.exceptions.RemoteCancellationException;
 import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
+import de.fu_berlin.inf.dpp.net.IPacketDispatcher;
 import de.fu_berlin.inf.dpp.net.IncomingTransferObject;
+import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.NetTransferMode;
+import de.fu_berlin.inf.dpp.net.packet.Packet;
+import de.fu_berlin.inf.dpp.net.packet.PacketType;
 import de.fu_berlin.inf.dpp.util.AutoHashMap;
 import de.fu_berlin.inf.dpp.util.Utils;
 
@@ -44,13 +52,46 @@ import de.fu_berlin.inf.dpp.util.Utils;
  * @author coezbek
  * @author Stefan Rossbach
  */
-public class BinaryChannel {
+public class ByteStreamConnection implements IByteStreamConnection {
+
+    private class Receiver extends Thread {
+
+        @Override
+        public void run() {
+            try {
+                while (!isInterrupted())
+                    listener
+                        .addIncomingTransferObject(receiveIncomingTransferObject());
+
+            } catch (SocketException e) {
+                log.debug("connection was closed by me. " + e.getMessage());
+                return;
+            } catch (EOFException e) {
+                log.debug("connection was closed by peer. " + e.getMessage());
+                return;
+            } catch (IOException e) {
+                log.error("network IO Exception: " + e.getMessage(), e);
+                return;
+            } catch (ClassNotFoundException e) {
+                log.error("received unexpected object in ReceiveThread", e);
+                return;
+            } catch (Exception e) {
+                log.error("internal Error in Receive Thread: ", e);
+                return;
+            } finally {
+                close();
+            }
+        }
+    }
 
     private static class Opcode {
         /* these opcodes will be cropped to byte values, do not exceed 0xFF ! */
 
         // private static final int CIPHER_REQUEST = 0xA0;
         // private static final int CIPHER_RESPONSE = 0xA1;
+
+        private static final int PACKET = 0x10;
+        private static final int FRAGMENTED_PACKET = 0x11;
 
         @Deprecated
         private static final int TRANSFERDESCRIPTION = 0xFA;
@@ -71,7 +112,7 @@ public class BinaryChannel {
         "service-unavailable(503)" /* peer closed stream already (SOCKS5) */,
         "recipient-unavailable(404)" /* peer is offline (IBB) */};
 
-    private static final Logger log = Logger.getLogger(BinaryChannel.class);
+    private static final Logger log = Logger.getLogger(ByteStreamConnection.class);
 
     /**
      * Max size of data chunks
@@ -98,6 +139,8 @@ public class BinaryChannel {
     private ConcurrentHashMap<Integer, Integer> transmissionStatus = new ConcurrentHashMap<Integer, Integer>();
     private ConcurrentHashMap<Integer, CountDownLatch> transmissionReply = new ConcurrentHashMap<Integer, CountDownLatch>();
 
+    private Map<Integer, ByteArrayOutputStream> pendingFragmentedPackets = new HashMap<Integer, ByteArrayOutputStream>();
+    
     private DataInputStream inputStream;
     private DataOutputStream outputStream;
     private BytestreamSession session;
@@ -108,10 +151,21 @@ public class BinaryChannel {
      */
     private NetTransferMode transferMode;
 
-    public BinaryChannel(BytestreamSession session, NetTransferMode mode)
-        throws IOException {
+    private JID localJID;
+    private JID remoteJID;
+    private IPacketDispatcher dispatcher;
+    private IByteStreamConnectionListener listener;
+    private Receiver receiver;
+
+    public ByteStreamConnection(BytestreamSession session,
+        IPacketDispatcher dispatcher, IByteStreamConnectionListener listener,
+        NetTransferMode mode, JID localJID, JID remoteJID) throws IOException {
         this.session = session;
         this.session.setReadTimeout(0); // keep connection alive
+        this.dispatcher = dispatcher;
+        this.listener = listener;
+        this.localJID = localJID;
+        this.remoteJID = remoteJID;
         this.transferMode = mode;
 
         /*
@@ -125,6 +179,9 @@ public class BinaryChannel {
             session.getInputStream()));
 
         connected = true;
+
+        receiver = new Receiver();
+        receiver.start();
     }
 
     /**
@@ -158,18 +215,69 @@ public class BinaryChannel {
             CountDownLatch latch;
 
             int payloadLength;
-
+            byte[] payload;
+            short packetID;
+            Packet packet;
             switch (opcode) {
+            case Opcode.PACKET:
+                packetID = inputStream.readShort();
+                payloadLength = inputStream.readInt();
+                checkPayloadLength(payloadLength);
+                payload = new byte[payloadLength];
+                inputStream.readFully(payload);
+                
+                try {
+                    packet = PacketType.CLASS.get(packetID).newInstance();
+                } catch (Exception e) {
+                    throw new IOException(e.getMessage(), e);
+                }
+                
+                packet.deserialize(new ByteArrayInputStream(payload));
+                packet.setReceiver(localJID);
+                packet.setSender(remoteJID);
+                dispatcher.dispatch(packet);
+                break;
+            case Opcode.FRAGMENTED_PACKET:
+                fragmentId = inputStream.readShort();
+                payloadLength = inputStream.readInt();
+                boolean lastFragment = (payloadLength & 0x80000000) != 0;
+                
+                payloadLength &= 0x7FFFFFFF;
+                checkPayloadLength(payloadLength);
+                payload = new byte[payloadLength];
+
+                inputStream.readFully(payload);
+                
+                ByteArrayOutputStream out = pendingFragmentedPackets.get(fragmentId);
+                if (out == null)
+                {
+                    out = new ByteArrayOutputStream(payloadLength * 2);
+                    pendingFragmentedPackets.put(fragmentId, out);
+                }
+                
+                out.write(payload);
+                
+                if (!lastFragment)
+                    break;
+
+                pendingFragmentedPackets.remove(fragmentId);
+                packetID = inputStream.readShort();
+
+                try {
+                    packet = PacketType.CLASS.get(packetID).newInstance();
+                } catch (Exception e) {
+                    throw new IOException(e.getMessage(), e);
+                }
+                packet.deserialize(new ByteArrayInputStream(out.toByteArray()));
+                packet.setReceiver(localJID);
+                packet.setSender(remoteJID);
+                dispatcher.dispatch(packet);
+                break;               
             case Opcode.TRANSFERDESCRIPTION:
                 fragmentId = inputStream.readShort();
                 int chunks = inputStream.readInt();
                 payloadLength = inputStream.readInt();
-
-                if (payloadLength <= 0 || payloadLength > CHUNKSIZE)
-                    throw new ProtocolException(
-                        "payload length field contains corrupted value: 0 < "
-                            + payloadLength + " <= " + CHUNKSIZE);
-
+                checkPayloadLength(payloadLength);
                 byte[] transferDescriptionData = new byte[payloadLength];
                 inputStream.readFully(transferDescriptionData);
 
@@ -188,13 +296,8 @@ public class BinaryChannel {
             case Opcode.DATA:
                 fragmentId = inputStream.readShort();
                 payloadLength = inputStream.readInt();
-
-                if (payloadLength <= 0 || payloadLength > CHUNKSIZE)
-                    throw new ProtocolException(
-                        "payload length field contains corrupted value: 0 < "
-                            + payloadLength + " <= " + CHUNKSIZE);
-
-                byte[] payload = new byte[payloadLength];
+                checkPayloadLength(payloadLength);
+                payload = new byte[payloadLength];
                 inputStream.readFully(payload);
                 incomingPackets.get(fragmentId).add(payload);
                 break;
@@ -232,11 +335,35 @@ public class BinaryChannel {
             "interrupted while reading stream data");
     }
 
+    private void checkPayloadLength(int length) throws IOException
+    {
+        if (length < 0 || length > CHUNKSIZE)
+            throw new ProtocolException(
+                "payload length field contains corrupted value: 0 < "
+                    + length + " <= " + CHUNKSIZE);
+    }
+    
     public synchronized boolean isConnected() {
         return connected;
     }
 
-    public NetTransferMode getTransferMode() {
+    @Override
+    public JID getRemoteJID() {
+        return remoteJID;
+    }
+
+    @Override
+    public JID getLocalJID() {
+        return localJID;
+    }
+
+    @Override
+    public synchronized boolean isClosed() {
+        return !isConnected();
+    }
+
+    @Override
+    public NetTransferMode getTransportMode() {
         return transferMode;
     }
 
@@ -250,12 +377,43 @@ public class BinaryChannel {
             return;
 
         try {
+            receiver.interrupt();
             session.close();
         } catch (IOException e) {
             if (!isAcceptedOnClosure(e))
                 log.debug("Close failed cause: " + e.getMessage(), e);
         } finally {
             connected = false;
+        }
+    }
+
+    @Override
+    public void sendPacket(Packet packet) throws IOException {
+        // TODO Auto-generated method stub
+
+        short id = packet.getType().getID();
+        
+        ByteArrayOutputStream out = new ByteArrayOutputStream(512);
+        packet.serialize(out);
+
+        byte[] payload = out.toByteArray();
+
+        if (payload.length <= CHUNKSIZE) {
+            sendPacket(id, payload);
+            return;
+        }
+        
+        int fragmentId = nextFragmentId.getAndIncrement() & 0x7FFF;
+ 
+        int chunks = ((payload.length - 1) / CHUNKSIZE) + 1;
+
+        int offset = 0;
+        int length = 0;
+
+        while (chunks-- > 0) {
+            length = Math.min(payload.length - offset, CHUNKSIZE);
+            sendPacketFragment(id, fragmentId, payload, offset, length, chunks == 0);
+            offset += length;
         }
     }
 
@@ -369,6 +527,26 @@ public class BinaryChannel {
     synchronized void sendReject(int fragmentId) throws IOException {
         outputStream.write(Opcode.REJECT);
         outputStream.writeShort(fragmentId);
+        outputStream.flush();
+    }
+
+    private synchronized void sendPacket(short id, byte[] payload)
+        throws IOException {
+        outputStream.write(Opcode.PACKET);
+        outputStream.writeShort(id);
+        outputStream.writeInt(payload.length);
+        outputStream.write(payload);
+        outputStream.flush();
+    }
+
+    private synchronized void sendPacketFragment(short id, int fragmentId, byte[] payload,
+        int offset, int length, boolean lastChunk) throws IOException {
+        outputStream.write(Opcode.FRAGMENTED_PACKET);
+        outputStream.writeShort(fragmentId);
+        outputStream.writeInt(length | (0x80000000 * (lastChunk ? 1 : 0)));
+        outputStream.write(payload, offset, length);
+        if (lastChunk)
+            outputStream.writeShort(id);
         outputStream.flush();
     }
 

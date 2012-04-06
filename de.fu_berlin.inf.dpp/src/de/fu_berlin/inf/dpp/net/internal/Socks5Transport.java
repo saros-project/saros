@@ -30,8 +30,9 @@ import org.jivesoftware.smackx.bytestreams.socks5.Socks5BytestreamManager;
 import org.jivesoftware.smackx.bytestreams.socks5.Socks5BytestreamSession;
 import org.jivesoftware.smackx.bytestreams.socks5.Socks5Proxy;
 
+import de.fu_berlin.inf.dpp.net.IPacketDispatcher;
+import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.NetTransferMode;
-import de.fu_berlin.inf.dpp.util.CausedIOException;
 import de.fu_berlin.inf.dpp.util.NamedThreadFactory;
 import de.fu_berlin.inf.dpp.util.Utils;
 
@@ -41,47 +42,52 @@ import de.fu_berlin.inf.dpp.util.Utils;
  * used to distinguish connect requests and response requests. If there is a
  * direct connection, we keep it, the other one discarded. If the is no one, a
  * SMACK will establish a mediated connection by the server.
- *
+ * 
  * Are both connection direct, we use the one of the connect request (same for
  * mediated).
- *
+ * 
  * However, still there might be a server that only supports unidirectional
  * SOCKS5 bytestreams (i.e. OpenFire). In that case both mediated unidirectional
  * connections are wrapped into a bidirectional one. (see {#link
  * WrappedBidirectionalSocks5BytestreamSession})
- *
+ * 
  * @author jurke
  */
 public class Socks5Transport extends ByteStreamTransport {
 
-    private static final Logger log = Logger.getLogger(Socks5Transport.class);
+    private static final Logger LOG = Logger.getLogger(Socks5Transport.class);
     private static final byte BIDIRECTIONAL_TEST_BYTE = 0x1A;
     private static final int TEST_STREAM_TIMEOUT = 2000;
+
+    /*
+     * Hennings Socks5 implementation has a major flaw. It divides the timeout
+     * by the actual used IP addresses for Socks 5. If we have 5 candidates,
+     * every connection attempt will only receive 2 seconds.
+     */
+
     /*
      * 3s might not be enough always, especially when local SOCKS5 proxy port is
      * bound by another application or Ubuntu is used.
-     *
+     * 
      * With Ubuntu we experienced delays of about 7 to 10s.
-     *
+     * 
      * However, should be greater than TEST_STREAM_TIMEOUT always
      */
-    private static final int WAIT_FOR_RESPONSE_CONNECTION = TEST_STREAM_TIMEOUT + 7000;
+    private static final int WAIT_FOR_RESPONSE_CONNECTION = TEST_STREAM_TIMEOUT + 15000;
     private static final int TARGET_RESPONSE_TIMEOUT = WAIT_FOR_RESPONSE_CONNECTION + 1000;
-    private static final String RESPONSE_SESSION_ID_PREFIX = "response_js5";
-    private static final Random randomGenerator = new Random();
-    private static final int NUMBER_OF_RESPONSE_THREADS = 10;
+    private static final String RESPONSE_SESSION_ID_PREFIX = "SS5IDx";
+    private static final int NUMBER_OF_RESPONSE_THREADS = 2;
+    private static final Random RANDOM = new Random();
 
     private boolean socketOptionNoDelay = Boolean.valueOf(System.getProperty(
         "de.fu_berlin.inf.dpp.net.socks5.TCP_NODELAY", "true"));
 
-    protected HashMap<String, Exchanger<Socks5BytestreamSession>> runningConnects = new HashMap<String, Exchanger<Socks5BytestreamSession>>();
+    protected HashMap<JID, Exchanger<Socks5BytestreamSession>> runningConnects = new HashMap<JID, Exchanger<Socks5BytestreamSession>>();
     protected ExecutorService executorService;
 
     protected String getNextResponseSessionID() {
-        StringBuilder buffer = new StringBuilder();
-        buffer.append(RESPONSE_SESSION_ID_PREFIX);
-        buffer.append(Math.abs(randomGenerator.nextLong()));
-        return buffer.toString();
+        return RESPONSE_SESSION_ID_PREFIX
+            + Long.toHexString(RANDOM.nextLong()).toUpperCase();
     }
 
     protected boolean isResponse(BytestreamRequest request) {
@@ -89,17 +95,17 @@ public class Socks5Transport extends ByteStreamTransport {
     }
 
     /**
-     *
-     * @param peer
+     * 
+     * @param remoteJID
      * @return a Future that tries to establish a second connection to the
      *         peer's local SOCKS5 proxy
      */
     protected Future<Socks5BytestreamSession> futureToEstablishResponseSession(
-        final String peer) {
+        final JID remoteJID) {
 
         return executorService.submit(new Callable<Socks5BytestreamSession>() {
             public Socks5BytestreamSession call() throws Exception {
-                return (Socks5BytestreamSession) establishResponseSession(peer);
+                return (Socks5BytestreamSession) establishResponseSession(remoteJID);
             }
         });
     }
@@ -107,12 +113,12 @@ public class Socks5Transport extends ByteStreamTransport {
     /**
      * Starts a new thread that waits until the connection is established to
      * close it correctly.
-     *
+     * 
      * @param future
      */
     protected void waitToCloseResponse(
         final Future<Socks5BytestreamSession> future) {
-        log.debug(prefix()
+        LOG.debug(prefix()
             + "cancelling response connection as it is not needed");
 
         Thread waitToCloseResponse = new Thread(
@@ -125,7 +131,7 @@ public class Socks5Transport extends ByteStreamTransport {
                 } catch (InterruptedException e) {
                     // nothing to do here
                 } catch (ExecutionException e) {
-                    log.debug(prefix()
+                    LOG.debug(prefix()
                         + "Exception while waiting to close unneeded connection: "
                         + e.getMessage());
                 }
@@ -137,7 +143,7 @@ public class Socks5Transport extends ByteStreamTransport {
     protected boolean localSOCKS5ProxyIsRunning() {
         if (SmackConfiguration.isLocalSocks5ProxyEnabled()) {
             if (!Socks5Proxy.getSocks5Proxy().isRunning()) {
-                log.warn(prefix()
+                LOG.warn(prefix()
                     + "Local SOCKS5 proxy enabled but couldn't start");
                 // TODO inform user
                 return false;
@@ -152,7 +158,7 @@ public class Socks5Transport extends ByteStreamTransport {
         int realPort = Socks5Proxy.getSocks5Proxy().getPort();
 
         if (port != realPort && -port != realPort)
-            log.trace(prefix() + "proxy port is " + realPort
+            LOG.trace(prefix() + "proxy port is " + realPort
                 + " (configured to " + port + ")");
         return realPort;
     }
@@ -179,9 +185,9 @@ public class Socks5Transport extends ByteStreamTransport {
      * returns it if bidirectional or tries to wrap two unidirectional streams
      * if possible. Else an exception is thrown. The testing order is defined by
      * the boolean preferInSession.
-     *
+     * 
      * @pre inSession!=null || outSession!=null
-     *
+     * 
      * @param inSession
      * @param outSession
      * @param preferInSession
@@ -205,12 +211,12 @@ public class Socks5Transport extends ByteStreamTransport {
             session = preferInSession ? inSession : outSession;
         }
 
-        log.debug(prefix() + "trying if "
+        LOG.debug(prefix() + "trying if "
             + (preferInSession ? "incoming " : "outgoing")
             + " session is bidirectional");
 
         if (streamIsBidirectional(session, preferInSession)) {
-            log.debug(msg
+            LOG.debug(msg
                 + "but at least the server allows bidirectional connections. (using "
                 + (preferInSession ? "incoming session" : "outgoing session")
                 + ")");
@@ -225,7 +231,7 @@ public class Socks5Transport extends ByteStreamTransport {
                 "Could only establish one unidirectional connection but need two for wrapping.");
         }
 
-        log.debug(msg
+        LOG.debug(msg
             + "and the server does not allow bidirectional connections. Wrapped session established.");
 
         return new WrappedBidirectionalSocks5BytestreamSession(inSession,
@@ -235,7 +241,7 @@ public class Socks5Transport extends ByteStreamTransport {
     /**
      * Sends and receives an INT to distinguish between bidirectional and
      * unidirectional streams.
-     *
+     * 
      * @param session
      * @param sendFirst
      * @return whether a stream is bidirectional
@@ -260,11 +266,11 @@ public class Socks5Transport extends ByteStreamTransport {
             }
 
             if (test == BIDIRECTIONAL_TEST_BYTE) {
-                log.trace(prefix() + "stream is bidirectional. ("
+                LOG.trace(prefix() + "stream is bidirectional. ("
                     + (sendFirst ? "sending" : "receiving") + ")");
                 return true;
             } else {
-                log.error(prefix()
+                LOG.error(prefix()
                     + "stream can send and receive but got wrong result: "
                     + test);
                 throw new IOException(
@@ -280,7 +286,7 @@ public class Socks5Transport extends ByteStreamTransport {
             /*
              * At least we have to wait TEST_STREAM_TIMEOUT to cause a timeout
              * on the peer side, too.
-             *
+             * 
              * Else the first package might be read and the above error occurs
              * (test != BIDIRECTIONAL_TEST_BYTE).
              */
@@ -296,21 +302,21 @@ public class Socks5Transport extends ByteStreamTransport {
          * as setting the timeout later on would throw an exception
          */
 
-        log.debug(prefix()
+        LOG.debug(prefix()
             + "stream is unidirectional. Trying to wrap bidirectional one.");
 
         return false;
     }
 
     protected String prefix() {
-        return "[" + getDefaultNetTransferMode().name() + "] ";
+        return "[" + getTransportMode().name() + "] ";
     }
 
     /**
      * Handles a response request.
-     *
+     * 
      * The session is exchanged to the connecting thread.
-     *
+     * 
      * @param request
      * @throws XMPPException
      * @throws InterruptedException
@@ -318,8 +324,8 @@ public class Socks5Transport extends ByteStreamTransport {
     protected void handleResponse(BytestreamRequest request)
         throws XMPPException, InterruptedException {
 
-        String peer = request.getFrom();
-        log.debug(prefix() + "receiving response connection from " + peer
+        JID remoteJID = new JID(request.getFrom());
+        LOG.debug(prefix() + "receiving response connection from " + remoteJID
             + verboseLocalProxyInfo());
 
         Socks5BytestreamSession inSession = (Socks5BytestreamSession) request
@@ -327,10 +333,10 @@ public class Socks5Transport extends ByteStreamTransport {
 
         // get running connect
         Exchanger<Socks5BytestreamSession> exchanger = runningConnects
-            .get(peer);
+            .get(remoteJID);
 
         if (exchanger == null) {
-            log.warn(prefix()
+            LOG.warn(prefix()
                 + "Received response connection without a running connect");
             Utils.closeQuietly(inSession);
             return;
@@ -340,11 +346,11 @@ public class Socks5Transport extends ByteStreamTransport {
             exchanger.exchange(inSession, WAIT_FOR_RESPONSE_CONNECTION,
                 TimeUnit.MILLISECONDS);
         } catch (InterruptedException e) {
-            log.debug(prefix()
+            LOG.debug(prefix()
                 + "Wrapping bidirectional stream was interrupted.");
             Utils.closeQuietly(inSession);
         } catch (TimeoutException e) {
-            log.error(prefix()
+            LOG.error(prefix()
                 + "Wrapping bidirectional stream timed out in Request! Shouldn't have happened.");
             Utils.closeQuietly(inSession);
         }
@@ -353,31 +359,32 @@ public class Socks5Transport extends ByteStreamTransport {
 
     /**
      * Accepts a Request and returns an established BinaryChannel.
-     *
+     * 
      * Immediately tries to establish a second session to the requesting peer
      * but also accepts this request to achieve a direct connection although one
      * peer might be behind a NAT.
-     *
+     * 
      * A direct connection is used, the other discarded where the requesting
      * session is preferred.
-     *
+     * 
      * In case of unidirectional connections both sessions a wrapped into a
      * bidirectional one.
-     *
+     * 
      * @param request
      * @return established BinaryChannel
-     * @throws XMPPException
      * @throws InterruptedException
      * @throws IOException
      */
-    protected BinaryChannel acceptNewRequest(BytestreamRequest request)
-        throws Exception, InterruptedException {
-        String peer = request.getFrom();
-        log.debug(prefix() + "receiving request from " + peer
+    protected ByteStreamConnection acceptNewRequest(BytestreamRequest request)
+        throws IOException, InterruptedException {
+
+        JID remoteJID = new JID(request.getFrom());
+
+        LOG.debug(prefix() + "receiving request from " + remoteJID
             + verboseLocalProxyInfo());
 
         // start to establish response
-        Future<Socks5BytestreamSession> responseFuture = futureToEstablishResponseSession(peer);
+        Future<Socks5BytestreamSession> responseFuture = futureToEstablishResponseSession(remoteJID);
         Socks5BytestreamSession inSession = null;
 
         try {
@@ -387,14 +394,16 @@ public class Socks5Transport extends ByteStreamTransport {
             if (inSession.isDirect()) {
                 waitToCloseResponse(responseFuture);
                 configureSocks5Socket(inSession);
-                return new BinaryChannel(inSession,
-                    NetTransferMode.SOCKS5_DIRECT);
+
+                return new ByteStreamConnection(inSession, dispatcher,
+                    connectionListener, NetTransferMode.SOCKS5_DIRECT,
+                    localJID, remoteJID);
             } else {
-                log.debug(prefix() + "incoming connection is mediated.");
+                LOG.debug(prefix() + "incoming connection is mediated.");
             }
 
         } catch (Exception e) {
-            log.warn(prefix()
+            LOG.warn(prefix()
                 + "Couldn't accept request but still trying to establish a response connection: "
                 + e.getMessage());
         }
@@ -406,21 +415,24 @@ public class Socks5Transport extends ByteStreamTransport {
             outSession = responseFuture.get();
 
             if (outSession.isDirect()) {
-                log.debug(prefix()
+                LOG.debug(prefix()
                     + "newly established session is direct! Discarding the other.");
                 Utils.closeQuietly(inSession);
                 configureSocks5Socket(outSession);
-                return new BinaryChannel(outSession,
-                    NetTransferMode.SOCKS5_DIRECT);
+
+                return new ByteStreamConnection(outSession, dispatcher,
+                    connectionListener, NetTransferMode.SOCKS5_DIRECT,
+                    localJID, remoteJID);
+
             }
 
         } catch (IOException e) {
-            log.error(
+            LOG.error(
                 prefix()
                     + "Socket crashed while initiating sending session (for wrapping)",
                 e);
         } catch (ExecutionException e) {
-            log.error(
+            LOG.error(
                 "An error occured while establishing a response connection ",
                 e.getCause());
         }
@@ -431,24 +443,30 @@ public class Socks5Transport extends ByteStreamTransport {
 
         BytestreamSession session = testAndGetMediatedBidirectionalBytestream(
             inSession, outSession, true);
-        return new BinaryChannel(session, NetTransferMode.SOCKS5_MEDIATED);
+
+        return new ByteStreamConnection(session, dispatcher, connectionListener,
+            NetTransferMode.SOCKS5_MEDIATED, localJID, remoteJID);
     }
 
     /**
      * Handles the SOCKS5Bytestream Request and distinguishes between connect
      * requests and response requests.
-     *
+     * 
      * see handleResponse() and acceptNewRequest()
      */
     @Override
-    protected BinaryChannel acceptRequest(BytestreamRequest request)
-        throws InterruptedException, Exception {
+    protected ByteStreamConnection acceptRequest(BytestreamRequest request)
+        throws InterruptedException, IOException {
 
-        if (isResponse(request)) {
-            handleResponse(request);
-            return null;
-        } else {
-            return acceptNewRequest(request);
+        try {
+            if (isResponse(request)) {
+                handleResponse(request);
+                return null;
+            } else {
+                return acceptNewRequest(request);
+            }
+        } catch (XMPPException e) {
+            throw new IOException(e.getMessage(), e);
         }
     }
 
@@ -457,15 +475,15 @@ public class Socks5Transport extends ByteStreamTransport {
      * See handleResponse().
      */
     @Override
-    protected BinaryChannel establishBinaryChannel(String peer,
-        SubMonitor progress) throws XMPPException, IOException,
-        InterruptedException {
+    protected ByteStreamConnection establishBinaryChannel(JID remoteJID,
+        SubMonitor progress) throws XMPPException, InterruptedException,
+        IOException {
 
         // before establishing, we have to put the exchanger to the map
         Exchanger<Socks5BytestreamSession> exchanger = new Exchanger<Socks5BytestreamSession>();
-        runningConnects.put(peer, exchanger);
+        runningConnects.put(remoteJID, exchanger);
 
-        log.debug(prefix() + "establishing new connection to " + peer
+        LOG.debug(prefix() + "establishing new connection to " + remoteJID
             + verboseLocalProxyInfo());
 
         try {
@@ -476,15 +494,17 @@ public class Socks5Transport extends ByteStreamTransport {
             try {
 
                 outSession = (Socks5BytestreamSession) manager
-                    .establishSession(peer);
+                    .establishSession(remoteJID.toString());
 
                 if (outSession.isDirect()) {
                     configureSocks5Socket(outSession);
-                    return new BinaryChannel(outSession,
-                        NetTransferMode.SOCKS5_DIRECT);
+
+                    return new ByteStreamConnection(outSession, dispatcher,
+                        connectionListener, NetTransferMode.SOCKS5_DIRECT,
+                        localJID, remoteJID);
                 }
 
-                log.debug(prefix()
+                LOG.debug(prefix()
                     + "session is mediated. Waiting for peer to connect ...");
 
                 progress
@@ -505,11 +525,11 @@ public class Socks5Transport extends ByteStreamTransport {
 
             if (exception != null) {
 
-                log.warn(prefix() + "could not connect to " + peer
+                LOG.warn(prefix() + "could not connect to " + remoteJID
                     + " because: " + exception.getMessage()
                     + ". Waiting for peer to connect ...");
 
-                progress.subTask("Could not connect to " + peer
+                progress.subTask("Could not connect to " + remoteJID
                     + ". Waiting for peer to connect ...");
                 progress.worked(5);
             }
@@ -522,12 +542,14 @@ public class Socks5Transport extends ByteStreamTransport {
                     WAIT_FOR_RESPONSE_CONNECTION, TimeUnit.MILLISECONDS);
 
                 if (inSession.isDirect()) {
-                    log.debug(prefix()
+                    LOG.debug(prefix()
                         + "response connection is direct! Discarding the other.");
                     Utils.closeQuietly(outSession);
                     configureSocks5Socket(inSession);
-                    return new BinaryChannel(inSession,
-                        NetTransferMode.SOCKS5_DIRECT);
+
+                    return new ByteStreamConnection(inSession, dispatcher,
+                        connectionListener, NetTransferMode.SOCKS5_DIRECT,
+                        localJID, remoteJID);
                 }
 
             } catch (TimeoutException e) {
@@ -535,38 +557,40 @@ public class Socks5Transport extends ByteStreamTransport {
                 String msg = "waiting for a response session timed out ("
                     + WAIT_FOR_RESPONSE_CONNECTION + "ms)";
                 if (exception != null)
-                    throw new CausedIOException(
+                    throw new IOException(
                         prefix()
                             + msg
                             + " and could not establish a connection from this side, too:",
                         exception);
                 else
-                    log.debug(msg);
+                    LOG.debug(msg);
             }
 
             BytestreamSession session = testAndGetMediatedBidirectionalBytestream(
                 inSession, outSession, false);
-            return new BinaryChannel(session, NetTransferMode.SOCKS5_MEDIATED);
+
+            return new ByteStreamConnection(session, dispatcher, connectionListener,
+                NetTransferMode.SOCKS5_MEDIATED, localJID, remoteJID);
 
         } finally {
-            runningConnects.remove(peer);
+            runningConnects.remove(remoteJID);
         }
     }
 
     /**
-     *
-     * @param peer
+     * 
+     * @param remoteJID
      * @return a BytestreamSession with a response ID
      * @throws XMPPException
      * @throws IOException
      * @throws InterruptedException
      */
-    protected BytestreamSession establishResponseSession(String peer)
+    protected BytestreamSession establishResponseSession(JID remoteJID)
         throws XMPPException, IOException, InterruptedException {
 
-        log.debug(prefix() + "Start to establish new response connection");
+        LOG.debug(prefix() + "Start to establish new response connection");
 
-        return manager.establishSession(peer.toString(),
+        return manager.establishSession(remoteJID.toString(),
             this.getNextResponseSessionID());
     }
 
@@ -574,35 +598,38 @@ public class Socks5Transport extends ByteStreamTransport {
     protected BytestreamManager getManager(Connection connection) {
         Socks5BytestreamManager socks5ByteStreamManager = Socks5BytestreamManager
             .getBytestreamManager(connection);
+
         socks5ByteStreamManager
             .setTargetResponseTimeout(TARGET_RESPONSE_TIMEOUT);
+
         return socks5ByteStreamManager;
     }
 
     @Override
-    public NetTransferMode getDefaultNetTransferMode() {
+    public NetTransferMode getTransportMode() {
         return NetTransferMode.SOCKS5;
     }
 
     @Override
-    public void prepareXMPPConnection(Connection connection,
-        IByteStreamConnectionListener listener) {
-        super.prepareXMPPConnection(connection, listener);
+    public void initializeTransport(Connection connection, JID localJID,
+        IPacketDispatcher dispatcher, IByteStreamConnectionListener listener) {
+        super.initializeTransport(connection, localJID, dispatcher, listener);
         executorService = Executors.newFixedThreadPool(
             NUMBER_OF_RESPONSE_THREADS, new NamedThreadFactory(
                 "SOCKS5_Establish_response_connection"));
     }
 
     @Override
-    public void disposeXMPPConnection() {
+    public void disposeTransport() {
         assert (executorService != null);
 
         List<Runnable> notCommenced = executorService.shutdownNow();
         if (notCommenced.size() > 0)
-            log.warn(prefix()
+            LOG.warn(prefix()
                 + "threads for response connections found that didn't commence yet");
+
         executorService = null;
-        super.disposeXMPPConnection();
+        super.disposeTransport();
     }
 
     /**
@@ -667,16 +694,16 @@ public class Socks5Transport extends ByteStreamTransport {
             socket = Socks5BytestreamSession.class.getDeclaredField("socket");
             socket.setAccessible(true);
         } catch (Exception e) {
-            log.warn("Smack API has changed, cannot access socket options", e);
+            LOG.warn("Smack API has changed, cannot access socket options", e);
             return;
         }
 
         try {
             ((Socket) socket.get(session)).setTcpNoDelay(socketOptionNoDelay);
-            log.debug("nagle algorithm for socket disabled: "
+            LOG.debug("nagle algorithm for socket disabled: "
                 + socketOptionNoDelay);
         } catch (Exception e) {
-            log.warn("could not modifiy socket options", e);
+            LOG.warn("could not modifiy socket options", e);
         }
     }
 }

@@ -14,9 +14,9 @@ public interface IByteStreamConnectionListener {
     public void addIncomingTransferObject(
         final IncomingTransferObject incomingTransferObject);
 
-    public void connectionClosed(JID peer, IByteStreamConnection connection);
+    public void connectionClosed(JID remoteJID, IByteStreamConnection connection);
 
-    public void connectionChanged(JID peer, IByteStreamConnection connection,
-        boolean incomingRequest);
+    public void connectionChanged(JID remoteJID,
+        IByteStreamConnection connection, boolean incomingRequest);
 
 }

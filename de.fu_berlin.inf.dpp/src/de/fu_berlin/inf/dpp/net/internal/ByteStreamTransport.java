@@ -11,9 +11,9 @@ import org.jivesoftware.smackx.bytestreams.BytestreamManager;
 import org.jivesoftware.smackx.bytestreams.BytestreamRequest;
 import org.jivesoftware.smackx.bytestreams.BytestreamSession;
 
+import de.fu_berlin.inf.dpp.net.IPacketDispatcher;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.NetTransferMode;
-import de.fu_berlin.inf.dpp.util.CausedIOException;
 
 /**
  * Abstract skeleton for different transport methods
@@ -24,36 +24,46 @@ public abstract class ByteStreamTransport implements ITransport {
 
     protected BytestreamManager manager;
     protected IByteStreamConnectionListener connectionListener;
+    protected IPacketDispatcher dispatcher;
+    protected JID localJID;
 
     /**
-     * @param peer
+     * @param remoteJID
      *            the JID of the user we'd like to connect
      * 
      * @return a new connection to peer
      */
-    public IByteStreamConnection connect(final JID peer, SubMonitor progress)
+    @Override
+    public IByteStreamConnection connect(JID remoteJID, SubMonitor progress)
         throws IOException, InterruptedException {
 
         progress.subTask("Try to initiate bytestream with " + toString());
 
-        BinaryChannel channel = null;
-
         try {
 
-            channel = establishBinaryChannel(peer.toString(), progress);
-            return new BinaryChannelConnection(peer, channel,
-                connectionListener);
+            return establishBinaryChannel(remoteJID, progress);
 
         } catch (XMPPException e) {
-            throw new CausedIOException(e);
+            throw new IOException(e.getMessage(), e);
         }
+    }
+
+    @Override
+    public void initializeTransport(Connection connection, JID localJID,
+        IPacketDispatcher dispatcher, IByteStreamConnectionListener listener) {
+        this.connectionListener = listener;
+        this.dispatcher = dispatcher;
+        this.localJID = localJID;
+        manager = getManager(connection);
+        manager.addIncomingBytestreamListener(streamListener);
     }
 
     /**
      * Disposes the transport method. Doesn't close running connections (to be
      * done by DataTransferManager).
      */
-    public void disposeXMPPConnection() {
+    @Override
+    public void disposeTransport() {
         if (manager != null) {
             manager.removeIncomingBytestreamListener(streamListener);
             manager = null;
@@ -68,25 +78,24 @@ public abstract class ByteStreamTransport implements ITransport {
 
         public void incomingBytestreamRequest(BytestreamRequest request) {
 
-            log.info("Received request to establish a "
-                + getDefaultNetTransferMode() + " bytestream connection from "
-                + request.getFrom());
+            log.info("Received request to establish a " + getTransportMode()
+                + " bytestream connection from " + request.getFrom());
 
             try {
 
-                BinaryChannel channel = acceptRequest(request);
+                ByteStreamConnection channel = acceptRequest(request);
 
                 if (channel == null)
                     return;
 
-                JID peer = new JID(request.getFrom());
-                connectionListener.connectionChanged(peer,
-                    new BinaryChannelConnection(peer, channel,
-                        connectionListener), true);
+                JID remoteJID = new JID(request.getFrom());
+
+                connectionListener.connectionChanged(remoteJID, channel, true);
 
             } catch (InterruptedException e) {
                 log.debug("Interrupted while initiating new session.");
-            } catch (Exception e) {
+                Thread.currentThread().interrupt();
+            } catch (IOException e) {
                 log.error(
                     "Socket crashed, no session for request established: ", e);
             }
@@ -96,19 +105,21 @@ public abstract class ByteStreamTransport implements ITransport {
     /**
      * Establishes a BinaryChannel to a peer.
      * 
-     * @param peer
+     * @param remoteJID
      * @param progress
      * @return BinaryChannel to peer
      * @throws XMPPException
      * @throws IOException
      * @throws InterruptedException
      */
-    protected BinaryChannel establishBinaryChannel(String peer,
+    protected ByteStreamConnection establishBinaryChannel(JID remoteJID,
         SubMonitor progress) throws XMPPException, IOException,
         InterruptedException {
-        BytestreamSession session = manager.establishSession(peer.toString());
+        BytestreamSession session = manager.establishSession(remoteJID
+            .toString());
 
-        return new BinaryChannel(session, getDefaultNetTransferMode());
+        return new ByteStreamConnection(session, dispatcher, connectionListener,
+            getTransportMode(), localJID, remoteJID);
     }
 
     /**
@@ -120,32 +131,22 @@ public abstract class ByteStreamTransport implements ITransport {
      * @param request
      * @return BinaryChannel or null if handled in different manner
      * @throws InterruptedException
-     * @throws XMPPException
      * @throws IOException
      */
-    protected BinaryChannel acceptRequest(BytestreamRequest request)
-        throws InterruptedException, Exception {
+    protected ByteStreamConnection acceptRequest(BytestreamRequest request)
+        throws InterruptedException, IOException {
 
-        BytestreamSession session = request.accept();
-        BinaryChannel channel = new BinaryChannel(session,
-            getDefaultNetTransferMode());
-
-        return channel;
+        try {
+            JID remoteJID = new JID(request.getFrom());
+            BytestreamSession session = request.accept();
+            return new ByteStreamConnection(session, dispatcher, connectionListener,
+                getTransportMode(), localJID, remoteJID);
+        } catch (XMPPException e) {
+            throw new IOException(e.getMessage(), e);
+        }
     }
 
-    public void prepareXMPPConnection(Connection connection,
-        IByteStreamConnectionListener listener) {
-        this.connectionListener = listener;
-        manager = getManager(connection);
-        manager.addIncomingBytestreamListener(streamListener);
-    }
-
-    @Override
-    public String toString() {
-        return getDefaultNetTransferMode().getXEP();
-    }
-
-    abstract public NetTransferMode getDefaultNetTransferMode();
+    abstract public NetTransferMode getTransportMode();
 
     /**
      * @param connection
@@ -153,5 +154,10 @@ public abstract class ByteStreamTransport implements ITransport {
      *         method
      */
     abstract protected BytestreamManager getManager(Connection connection);
+
+    @Override
+    public String toString() {
+        return getTransportMode().getXEP();
+    }
 
 }

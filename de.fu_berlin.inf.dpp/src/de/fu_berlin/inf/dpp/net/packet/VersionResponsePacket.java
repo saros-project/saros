@@ -3,6 +3,8 @@ package de.fu_berlin.inf.dpp.net.packet;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 
 public class VersionResponsePacket extends Packet {
 
@@ -23,15 +25,17 @@ public class VersionResponsePacket extends Packet {
     }
 
     @Override
-    public void serialize(DataOutputStream out) throws IOException {
-        out.writeUTF(version);
-        out.write(compatibility);
+    public void serialize(OutputStream out) throws IOException {
+        DataOutputStream dos = new DataOutputStream(out);
+        dos.writeUTF(version);
+        dos.write(compatibility);
     }
 
     @Override
-    public void deserialize(DataInputStream in) throws IOException {
-        version = in.readUTF();
-        compatibility = in.readByte();
+    public void deserialize(InputStream in) throws IOException {
+        DataInputStream dis = new DataInputStream(in);
+        version = dis.readUTF();
+        compatibility = dis.readByte();
     }
 
 }

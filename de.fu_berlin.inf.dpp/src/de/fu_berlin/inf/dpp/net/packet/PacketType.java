@@ -15,12 +15,14 @@ public enum PacketType {
 
     VERSION_REQUEST(0x1, VersionRequestPacket.class),
 
-    VERSION_RESPONSE(0x2, VersionResponsePacket.class);
+    VERSION_RESPONSE(0x2, VersionResponsePacket.class),
+
+    TEST(0xFFFF, TestPacket.class);
 
     private final short id;
-    private final Class<?> clazz;
+    private final Class<? extends Packet> clazz;
 
-    private PacketType(int id, Class<?> clazz) {
+    private PacketType(int id, Class<? extends Packet> clazz) {
         this.id = (short) (id & 0xFFFF);
         this.clazz = clazz;
     }
@@ -29,14 +31,14 @@ public enum PacketType {
         return this.id;
     }
 
-    public Class<?> getPacketClass() {
+    public Class<? extends Packet> getPacketClass() {
         return this.clazz;
     }
 
-    public static final Map<Short, Class<?>> CLASS;
+    public static final Map<Short, Class<? extends Packet>> CLASS;
 
     static {
-        Map<Short, Class<?>> clazz = new HashMap<Short, Class<?>>();
+        Map<Short, Class<? extends Packet>> clazz = new HashMap<Short, Class<? extends Packet>>();
 
         for (PacketType type : PacketType.values())
             clazz.put(type.getID(), type.getPacketClass());
