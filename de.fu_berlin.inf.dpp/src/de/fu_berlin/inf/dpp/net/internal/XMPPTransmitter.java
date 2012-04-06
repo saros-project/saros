@@ -720,7 +720,14 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
         boolean sessionMembersOnly) {
 
         if (sessionMembersOnly) {
-            User participant = sarosSessionObservable.getValue().getUser(jid);
+
+            ISarosSession session = sarosSessionObservable.getValue();
+
+            if (session == null)
+                return;
+
+            User participant = session.getUser(jid);
+
             if (participant == null) {
                 log.warn("Buddy not in session:" + Utils.prefix(jid));
                 return;
