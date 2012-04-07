@@ -633,8 +633,6 @@ public class SarosSession implements ISarosSession, Disposable {
         return projectMapper.getProjects();
     }
 
-    public Thread requestTransmitter = null;
-
     public void start() {
         if (!stopped) {
             throw new IllegalStateException();
