@@ -688,14 +688,22 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
 
         ISarosSession session = sarosSessionObservable.getValue();
 
-        if (session == null)
-            return;
+        User user = null;
 
-        User user = session.getUser(jid);
+        if (session != null)
+            user = session.getUser(jid);
 
-        if (sessionMembersOnly && user == null) {
-            log.warn("user is not in the current session:" + Utils.prefix(jid));
-            return;
+        if (sessionMembersOnly) {
+            if (session == null) {
+                log.error("could not send message because there is no active session");
+                return;
+            }
+
+            if (user == null) {
+                log.warn("user is not in the current session:"
+                    + Utils.prefix(jid));
+                return;
+            }
         }
 
         try {
@@ -703,8 +711,8 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
         } catch (IOException e) {
             // FIXME the session should do that
             log.error("could not send message to user: " + jid, e);
-            if (user != null) {
-                log.info("removing user " + user + " from the session");
+            if (user != null && session != null) {
+                log.info("removing user " + user + " from the current session");
                 session.removeUser(user);
             }
         }
