@@ -68,6 +68,7 @@ public class ImageManager {
     public static final Image DLCL_PROJECT_SHARE_ADD_BUDDIES = getImage("icons/dlcl16/project_share_add_buddies_tsk.png"); //$NON-NLS-1$
     public static final Image ELCL_SAROS_SESSION_STOP_PROCESS = getImage("icons/elcl16/saros_session_stop_process_tsk.png"); //$NON-NLS-1$
     public static final Image DLCL_SAROS_SESSION_STOP_PROCESS = getImage("icons/dlcl16/saros_session_stop_process_tsk.png"); //$NON-NLS-1$
+    public static final Image ELCL_DIALOG = getImage("icons/elcl16/dialog.gif"); //$NON-NLS-1$
     public static final Image ELCL_DELETE = getImage("icons/btn/deleteaccount.png"); //$NON-NLS-1$
 
     /*
