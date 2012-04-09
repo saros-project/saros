@@ -128,6 +128,8 @@ public class EnterProjectNamePage extends WizardPage {
         this.peer = peer;
         this.remoteProjectNames = remoteProjectNames;
 
+        EnterProjectNamePageUtils.setPreferenceUtils(preferenceUtils);
+
         if (wizardDialog == null)
             throw new NullPointerException(
                 Messages.EnterProjectNamePage_error_wizard_isNull);
@@ -202,14 +204,6 @@ public class EnterProjectNamePage extends WizardPage {
 
         case IBB:
             String speedInfo = ""; //$NON-NLS-1$
-
-            if (dataTransferManager.getIncomingIBBTransferSpeed(this.peer) != 0) {
-                // Show throughput of recent IBB transfer in warning
-                speedInfo = "(" //$NON-NLS-1$
-                    + Math.round(dataTransferManager
-                        .getIncomingIBBTransferSpeed(this.peer) / 1000 * 10.)
-                    / 10. + " KB/s only!)"; //$NON-NLS-1$
-            }
 
             if (preferenceUtils.forceFileTranserByChat()) {
 
