@@ -97,7 +97,13 @@ public class HostLeftAloneInSessionHandler {
         }
 
         if (stopSession) {
-            CollaborationUtils.leaveSession(sessionManager);
+            Utils.runSafeSWTAsync(log, new Runnable() {
+                @Override
+                public void run() {
+                    CollaborationUtils.leaveSession(sessionManager);
+                }
+            });
+
         }
     }
 }
