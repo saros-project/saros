@@ -1,9 +1,7 @@
 package de.fu_berlin.inf.dpp;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -18,7 +16,7 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
 
-import de.fu_berlin.inf.dpp.FileList.FileListData;
+import de.fu_berlin.inf.dpp.FileList.MetaData;
 import de.fu_berlin.inf.dpp.util.FileUtils;
 
 /**
@@ -31,7 +29,7 @@ import de.fu_berlin.inf.dpp.util.FileUtils;
 public class FileListDiff {
     // TODO Make this a public static internal class of FileList?
 
-    protected FileListDiff() {
+    private FileListDiff() {
         // Empty but non-public. Only FileListDiff#diff should create
         // FileListDiffs.
     }
@@ -70,91 +68,62 @@ public class FileListDiff {
             return result;
         // we have to copy the set because we should not work on references when
         // deleting
-        Set<IPath> baseEntries = new HashSet<IPath>(base.entries.keySet());
-        Set<IPath> targetEntries = new HashSet<IPath>(target.entries.keySet());
+        Set<IPath> baseEntries = new HashSet<IPath>(base.getPaths());
+        Set<IPath> targetEntries = new HashSet<IPath>(target.getPaths());
 
         // determine the paths that don't match the target to delete them
         baseEntries.removeAll(targetEntries);
         result.removed.addAll(baseEntries);
 
         // determine the paths that are not already present in local workspace
-        baseEntries = new HashSet<IPath>(base.entries.keySet());
+        baseEntries = new HashSet<IPath>(base.getPaths());
         targetEntries.removeAll(baseEntries);
         result.added.addAll(targetEntries);
 
         // determine for all matching paths if files are altered
-        targetEntries = new HashSet<IPath>(target.entries.keySet());
+        targetEntries = new HashSet<IPath>(target.getPaths());
         baseEntries.retainAll(targetEntries);
         for (IPath path : baseEntries) {
             if (path.hasTrailingSeparator()) {
                 result.unaltered.add(path);
+                continue;
+            }
+
+            MetaData fileData = base.getMetaData(path);
+            MetaData otherFileData = target.getMetaData(path);
+            if ((fileData == null && otherFileData == null)
+                || (fileData != null && otherFileData != null)
+                && (fileData.checksum == otherFileData.checksum)) {
+                result.unaltered.add(path);
             } else {
-                FileListData fileData = base.entries.get(path);
-                FileListData otherFileData = target.entries.get(path);
-                if (fileData != null && otherFileData != null) {
-                    if (fileData.checksum == otherFileData.checksum) {
-                        result.unaltered.add(path);
-                    } else {
-                        result.altered.add(path);
-                    }
-                } else {
-                    result.unaltered.add(path);
-                }
+                result.altered.add(path);
             }
         }
-
-        FileList.PathLengthComparator pathLengthComparator = new FileList.PathLengthComparator();
-        Collections.sort(result.added, pathLengthComparator);
-        Collections.sort(result.removed, pathLengthComparator);
-        Collections.sort(result.unaltered, pathLengthComparator);
-        Collections.sort(result.altered, pathLengthComparator);
 
         return result;
     }
 
-    /**
-     * @return The sorted list of paths that were removed.
-     */
     public List<IPath> getRemovedPaths() {
-        return sorted(this.removed);
+        return removed;
     }
 
     public void clearRemovedPaths() {
-        this.removed.clear();
+        removed.clear();
     }
 
     public List<IPath> getUnalteredPaths() {
-        return sorted(this.unaltered);
+        return unaltered;
     }
 
     public List<IPath> getAddedPaths() {
-        return sorted(this.added);
+        return added;
     }
 
     public List<IPath> getAlteredPaths() {
-        return sorted(this.altered);
+        return altered;
     }
 
-    private boolean issorted(List<IPath> paths) {
-        FileList.PathLengthComparator pathLengthComparator = new FileList.PathLengthComparator();
-        Iterator<IPath> it = paths.iterator();
-        if (!it.hasNext())
-            return true;
-        IPath prev = it.next();
-        IPath current;
-        while (it.hasNext()) {
-            current = it.next();
-            if (pathLengthComparator.compare(prev, current) > 0)
-                return false;
-            prev = current;
-        }
-        return true;
-    }
-
-    private List<IPath> sorted(List<IPath> paths) {
-        assert issorted(paths);
-        return new ArrayList<IPath>(paths);
-    }
+    /* FIXME THIS PERFORMS LOGIC THAT SHOULD BE PLACED ELSEWHERE */
 
     /**
      * Will create all folders contained in this FileList for the given project
@@ -190,6 +159,8 @@ public class FileListDiff {
         monitor.done();
         return result;
     }
+
+    /* FIXME THIS PERFORMS LOGIC THAT SHOULD BE PLACED ELSEWHERE */
 
     /**
      * Removes all resources marked as removed in this FileList from the given

@@ -25,6 +25,17 @@ public class FileListFactory {
             monitor);
     }
 
+    /**
+     * Creates a new file list from given paths. It does not compute checksums
+     * or location information.
+     * 
+     * @NOTE This method does not check the input. The caller is
+     *       <b>responsible</b> for the <b>correct</b> input !
+     * 
+     * @param paths
+     *            a list of paths that <b>refers</b> to <b>files</b> that should
+     *            be added to this file list.
+     */
     public static FileList createPathFileList(List<IPath> paths) {
         return new FileList(paths);
     }

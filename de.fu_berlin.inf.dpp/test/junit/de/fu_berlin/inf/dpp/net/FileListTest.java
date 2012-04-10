@@ -26,8 +26,10 @@ import static org.junit.Assert.assertTrue;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.Random;
 
 import org.easymock.EasyMock;
 import org.eclipse.core.resources.IFile;
@@ -237,30 +239,44 @@ public class FileListTest {
                 actual.contains(path));
         }
 
-        assertEquals("Expected: '" + expected.toString() + "' actual: '"
-            + actual + "'", expected.length, actual.size());
+        assertEquals(
+            Arrays.toString(expected) + " != "
+                + Arrays.toString(actual.toArray()), expected.length,
+            actual.size());
     }
 
     @Test
-    public void testToXmlAndBack() {
+    public void testToXmlAndBack() throws Exception {
         List<IPath> files = new ArrayList<IPath>();
-        for (int i = 0; i < 100; i++)
-            files.add(new Path("xml_me_" + i + "/<![CDATA["));
+        StringBuilder builder = new StringBuilder();
+        Random random = new Random();
+        for (int a = 0; a < 10; a++) {
+            for (int i = 0; i < 10; i++) {
+                for (int k = 0; k < 10; k++) {
+                    builder.setLength(0);
+                    builder.append("string12345");
+                    for (int j = 0; j < 5; j++) {
+                        builder.append((char) random.nextInt());
+                    }
+                    files.add(new Path("foo1234567890" + i + "/bar1234567890"
+                        + a + "/" + builder.toString()));
+                }
+            }
+        }
 
         FileList list = FileListFactory.createPathFileList(files);
-
         String xml = list.toXML();
+        // System.out.println(xml);
         FileList listFromXml = FileList.fromXML(xml);
-
         assertEquals(list, listFromXml);
     }
 
     @Test
     public void testEmptyTempFiles() throws IOException {
         List<IPath> files = new ArrayList<IPath>();
-        for (int i = 0; i < 100; i++)
+        for (int i = 0; i < 10; i++)
             files.add(new Path(File.createTempFile("saros_flt_junit", null)
-                .getPath()));
+                .getAbsolutePath()));
 
         FileList list1 = FileListFactory.createPathFileList(files);
         FileList list2 = FileListFactory.createPathFileList(files);
