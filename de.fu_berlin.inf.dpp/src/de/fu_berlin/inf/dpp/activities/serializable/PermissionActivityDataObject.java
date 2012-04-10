@@ -89,18 +89,10 @@ public class PermissionActivityDataObject extends AbstractActivityDataObject {
         return true;
     }
 
-    public JID getAffectedUser() {
-        return affectedUser;
-    }
-
-    public Permission getPermission() {
-        return permission;
-    }
-
     @Override
     public String toString() {
-        return "PermissionActivityDataObject(user:" + this.getAffectedUser()
-            + ",new permission:" + this.getPermission() + ")";
+        return "PermissionActivityDataObject(user:" + affectedUser
+            + ",new permission:" + permission + ")";
     }
 
     public IActivity getActivity(ISarosSession sarosSession) {

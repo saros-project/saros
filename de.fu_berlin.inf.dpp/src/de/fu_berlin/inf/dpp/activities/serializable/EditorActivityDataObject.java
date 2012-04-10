@@ -43,8 +43,6 @@ public class EditorActivityDataObject extends AbstractProjectActivityDataObject 
     @XStreamAsAttribute
     protected final Type type;
 
-    protected final SPathDataObject path;
-
     /**
      * @param sPathDataObject
      *            a valid project-relative path or <code>null</code> if former
@@ -53,7 +51,7 @@ public class EditorActivityDataObject extends AbstractProjectActivityDataObject 
     public EditorActivityDataObject(JID source, Type type,
         @Nullable SPathDataObject sPathDataObject) {
 
-        super(source);
+        super(source, sPathDataObject);
         if ((type != Type.Activated) && (sPathDataObject == null)) {
             throw new IllegalArgumentException(
                 "Null path for non-activation type editor activityDataObject given.");
@@ -61,19 +59,6 @@ public class EditorActivityDataObject extends AbstractProjectActivityDataObject 
 
         this.type = type;
         this.path = sPathDataObject;
-    }
-
-    /**
-     * @return the project-relative path to the resource that should be
-     *         activated.
-     */
-    @Override
-    public SPathDataObject getPath() {
-        return this.path;
-    }
-
-    public Type getType() {
-        return this.type;
     }
 
     @Override

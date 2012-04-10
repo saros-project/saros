@@ -60,10 +60,6 @@ public class ChangeColorActivityDataObject extends AbstractActivityDataObject {
         return true;
     }
 
-    public JID getTarget() {
-        return target;
-    }
-
     @Override
     public String toString() {
         return "ChangeColorActivityDataObject(" + source + " " + target + ")";

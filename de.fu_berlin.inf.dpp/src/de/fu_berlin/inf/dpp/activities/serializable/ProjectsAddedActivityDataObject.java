@@ -36,9 +36,4 @@ public class ProjectsAddedActivityDataObject extends AbstractActivityDataObject 
         return new ProjectsAddedActivity(sarosSession.getUser(source), pInfos,
             processID);
     }
-
-    public List<ProjectExchangeInfoDataObject> getProjectInfos() {
-        return this.projectInfos;
-    }
-
 }

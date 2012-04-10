@@ -28,38 +28,12 @@ public class JupiterActivityDataObject extends
     @XStreamAlias("o")
     protected final Operation operation;
 
-    @XStreamAlias("p")
-    protected final SPathDataObject path;
-
     public JupiterActivityDataObject(Timestamp timestamp, Operation operation,
         JID source, SPathDataObject path) {
-        super(source);
+        super(source, path);
         this.timestamp = timestamp;
         this.operation = operation;
         this.path = path;
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see de.fu_berlin.inf.dpp.jupiter.Request#getOperation()
-     */
-    public Operation getOperation() {
-        return this.operation;
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see de.fu_berlin.inf.dpp.jupiter.Request#getTimestamp()
-     */
-    public Timestamp getTimestamp() {
-        return this.timestamp;
-    }
-
-    @Override
-    public SPathDataObject getPath() {
-        return this.path;
     }
 
     @Override

@@ -32,13 +32,6 @@ import de.fu_berlin.inf.dpp.project.ISarosSession;
 public class ChecksumActivityDataObject extends
     AbstractProjectActivityDataObject {
 
-    /**
-     * Constant used for representing a missing file
-     */
-    public static final int NON_EXISTING_DOC = -1;
-
-    protected SPathDataObject path;
-
     @XStreamAsAttribute
     protected long hash;
 
@@ -66,28 +59,10 @@ public class ChecksumActivityDataObject extends
         SPathDataObject sPathDataObject, long hash, long length,
         @Nullable Timestamp jupiterTimestamp) {
 
-        super(source);
-        this.path = sPathDataObject;
+        super(source, sPathDataObject);
         this.hash = hash;
         this.length = length;
         this.jupiterTimestamp = jupiterTimestamp;
-    }
-
-    /**
-     * Returns a new checksum activityDataObject which is identical to this
-     * activityDataObject, but has the timestamp set to the given value.
-     */
-    public ChecksumActivityDataObject withTimestamp(Timestamp jupiterTimestamp) {
-        return new ChecksumActivityDataObject(source, path, hash, length,
-            jupiterTimestamp);
-    }
-
-    /**
-     * Returns the path this checksum is about
-     */
-    @Override
-    public SPathDataObject getPath() {
-        return this.path;
     }
 
     @Override
@@ -125,22 +100,6 @@ public class ChecksumActivityDataObject extends
         } else if (!path.equals(other.path))
             return false;
         return true;
-    }
-
-    public Timestamp getTimestamp() {
-        return jupiterTimestamp;
-    }
-
-    public long getLength() {
-        return length;
-    }
-
-    public long getHash() {
-        return hash;
-    }
-
-    public boolean existsFile() {
-        return !(this.length == NON_EXISTING_DOC && this.hash == NON_EXISTING_DOC);
     }
 
     public IActivity getActivity(ISarosSession sarosSession) {

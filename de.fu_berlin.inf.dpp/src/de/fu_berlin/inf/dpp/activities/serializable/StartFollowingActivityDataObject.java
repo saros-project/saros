@@ -55,10 +55,6 @@ public class StartFollowingActivityDataObject extends
         return true;
     }
 
-    public JID getTarget() {
-        return target;
-    }
-
     @Override
     public String toString() {
         return "StartFollowingActivityDataObject(" + source + " > " + target

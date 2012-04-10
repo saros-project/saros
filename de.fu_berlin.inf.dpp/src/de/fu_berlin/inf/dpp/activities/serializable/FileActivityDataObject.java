@@ -20,8 +20,6 @@ public class FileActivityDataObject extends AbstractProjectActivityDataObject
     @XStreamAsAttribute
     protected Type type;
 
-    protected SPathDataObject newPath;
-
     protected SPathDataObject oldPath;
 
     @XStreamAsAttribute
@@ -50,7 +48,7 @@ public class FileActivityDataObject extends AbstractProjectActivityDataObject
     public FileActivityDataObject(JID source, Type type,
         SPathDataObject newPath, SPathDataObject oldPath, byte[] data,
         Purpose purpose, Long checksum) {
-        super(source);
+        super(source, newPath);
 
         if (type == null || purpose == null)
             throw new IllegalArgumentException();
@@ -71,16 +69,10 @@ public class FileActivityDataObject extends AbstractProjectActivityDataObject
         }
 
         this.type = type;
-        this.newPath = newPath;
         this.oldPath = oldPath;
         this.data = data;
         this.purpose = purpose;
         this.checksum = checksum;
-    }
-
-    @Override
-    public SPathDataObject getPath() {
-        return this.newPath;
     }
 
     public SPathDataObject getOldPath() {
@@ -91,22 +83,13 @@ public class FileActivityDataObject extends AbstractProjectActivityDataObject
         return this.type;
     }
 
-    /**
-     * @return the contents of this file for incoming file creation
-     *         activityDataObjects ( {@link #getType()} == {@link Type#Created}.
-     *         <code>null</code> otherwise.
-     */
-    public byte[] getContents() {
-        return this.data;
-    }
-
     @Override
     public String toString() {
         if (type == Type.Moved)
             return "FileActivityDataObject(type: Moved, old path: "
-                + this.oldPath + ", new path: " + this.newPath + ")";
+                + this.oldPath + ", new path: " + this.path + ")";
         return "FileActivityDataObject(type: " + this.type + ", path: "
-            + this.newPath + ")";
+            + this.path + ")";
     }
 
     @Override
@@ -115,7 +98,7 @@ public class FileActivityDataObject extends AbstractProjectActivityDataObject
         int result = super.hashCode();
         result = prime * result + Arrays.hashCode(data);
         result = prime * result + ((oldPath == null) ? 0 : oldPath.hashCode());
-        result = prime * result + ((newPath == null) ? 0 : newPath.hashCode());
+        result = prime * result + ((path == null) ? 0 : path.hashCode());
         result = prime * result + ((type == null) ? 0 : type.hashCode());
         return result;
     }
@@ -134,10 +117,10 @@ public class FileActivityDataObject extends AbstractProjectActivityDataObject
                 return false;
         } else if (!oldPath.equals(other.oldPath))
             return false;
-        if (newPath == null) {
-            if (other.newPath != null)
+        if (path == null) {
+            if (other.path != null)
                 return false;
-        } else if (!newPath.equals(other.newPath))
+        } else if (!path.equals(other.path))
             return false;
         if (type == null) {
             if (other.type != null)
@@ -155,7 +138,7 @@ public class FileActivityDataObject extends AbstractProjectActivityDataObject
 
     public IActivity getActivity(ISarosSession sarosSession) {
         return new FileActivity(sarosSession.getUser(source), type,
-            newPath.toSPath(sarosSession),
+            path.toSPath(sarosSession),
             (oldPath != null ? oldPath.toSPath(sarosSession) : null), data,
             purpose, checksum);
     }

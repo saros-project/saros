@@ -1,7 +1,6 @@
 package de.fu_berlin.inf.dpp.activities.serializable;
 
 import org.eclipse.jface.text.source.ILineRange;
-import org.eclipse.jface.text.source.LineRange;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
@@ -23,11 +22,9 @@ public class ViewportActivityDataObject extends
     @XStreamAsAttribute
     protected final int bottomIndex;
 
-    protected final SPathDataObject path;
-
     public ViewportActivityDataObject(JID source, int topIndex,
         int bottomIndex, SPathDataObject path) {
-        super(source);
+        super(source, path);
 
         if (path == null) {
             throw new IllegalArgumentException("editor must not be null");
@@ -38,7 +35,6 @@ public class ViewportActivityDataObject extends
 
         this.topIndex = topIndex;
         this.bottomIndex = bottomIndex;
-        this.path = path;
     }
 
     public ViewportActivityDataObject(JID source, ILineRange viewport,
@@ -47,23 +43,6 @@ public class ViewportActivityDataObject extends
         this(source, Math.max(0, viewport.getStartLine()), Math.max(0,
             viewport.getStartLine())
             + Math.max(0, viewport.getNumberOfLines()), editor);
-    }
-
-    public ILineRange getLineRange() {
-        return new LineRange(topIndex, bottomIndex - topIndex);
-    }
-
-    public int getBottomIndex() {
-        return this.bottomIndex;
-    }
-
-    public int getTopIndex() {
-        return this.topIndex;
-    }
-
-    @Override
-    public SPathDataObject getPath() {
-        return this.path;
     }
 
     @Override

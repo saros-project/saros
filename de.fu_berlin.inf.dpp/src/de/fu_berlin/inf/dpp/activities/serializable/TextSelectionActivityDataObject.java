@@ -20,8 +20,6 @@
 package de.fu_berlin.inf.dpp.activities.serializable;
 
 import org.apache.commons.lang.ObjectUtils;
-import org.eclipse.jface.text.ITextSelection;
-import org.eclipse.jface.text.TextSelection;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
@@ -44,35 +42,14 @@ public class TextSelectionActivityDataObject extends
     @XStreamAsAttribute
     private final int length;
 
-    @XStreamAlias("p")
-    private final SPathDataObject path;
-
     public TextSelectionActivityDataObject(JID source, int offset, int length,
         SPathDataObject path) {
-        super(source);
+        super(source, path);
         if (path == null) {
             throw new IllegalArgumentException("path must not be null");
         }
         this.offset = offset;
         this.length = length;
-        this.path = path;
-    }
-
-    public int getLength() {
-        return this.length;
-    }
-
-    public int getOffset() {
-        return this.offset;
-    }
-
-    @Override
-    public SPathDataObject getPath() {
-        return this.path;
-    }
-
-    public ITextSelection getSelection() {
-        return new TextSelection(this.offset, this.length);
     }
 
     @Override

@@ -102,58 +102,6 @@ public class StopActivityDataObject extends AbstractActivityDataObject {
         return true;
     }
 
-    /**
-     * The user to be locked/unlocked by this activityDataObject
-     */
-    public JID getUser() {
-        return user;
-    }
-
-    /**
-     * The user who requested the lock/unlock.
-     * 
-     * (in most cases this should be the host)
-     */
-    public JID getInitiator() {
-        return initiator;
-    }
-
-    /**
-     * Returns the JID of the user to which this StopActivityDataObject should
-     * be sent.
-     * 
-     * This method is a convenience method for getting the user or initiator
-     * based on the state of this stop activityDataObject.
-     */
-    public JID getRecipient() {
-        switch (getState()) {
-        case INITIATED:
-            return getUser();
-        case ACKNOWLEDGED:
-            return getInitiator();
-        default:
-            throw new IllegalStateException(
-                "StopActivityDataObject is in an illegal state to return a recipient");
-        }
-    }
-
-    public State getState() {
-        return state;
-    }
-
-    public StopActivityDataObject generateAcknowledgment(JID source) {
-        return new StopActivityDataObject(source, initiator, user, type,
-            State.ACKNOWLEDGED, stopActivityID);
-    }
-
-    public Type getType() {
-        return type;
-    }
-
-    public String getActivityID() {
-        return stopActivityID;
-    }
-
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
@@ -167,8 +115,8 @@ public class StopActivityDataObject extends AbstractActivityDataObject {
     }
 
     public IActivity getActivity(ISarosSession sarosSession) {
-        return new StopActivity(sarosSession.getUser(source), sarosSession
-            .getUser(initiator), sarosSession.getUser(user), type, state,
-            stopActivityID);
+        return new StopActivity(sarosSession.getUser(source),
+            sarosSession.getUser(initiator), sarosSession.getUser(user), type,
+            state, stopActivityID);
     }
 }
