@@ -15,10 +15,10 @@ import de.fu_berlin.inf.dpp.util.Utils;
  */
 public class IPathConverter extends AbstractSingleValueConverter {
 
-    @SuppressWarnings({ "unchecked", "rawtypes" })
+    @SuppressWarnings("rawtypes")
     @Override
     public boolean canConvert(Class c) {
-        return c.isAssignableFrom(IPath.class);
+        return IPath.class.isAssignableFrom(c);
     }
 
     @Override
