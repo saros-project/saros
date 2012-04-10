@@ -47,16 +47,19 @@ import de.fu_berlin.inf.dpp.util.xstream.UrlEncodingStringConverter;
 public class TextEditActivityDataObject extends
     AbstractProjectActivityDataObject {
 
+    @XStreamAlias("o")
     @XStreamAsAttribute
     protected final int offset;
 
+    @XStreamAlias("t")
     @XStreamConverter(UrlEncodingStringConverter.class)
     protected final String text;
 
-    @XStreamAlias("replaced")
+    @XStreamAlias("r")
     @XStreamConverter(UrlEncodingStringConverter.class)
     protected final String replacedText;
 
+    @XStreamAlias("p")
     protected final SPathDataObject path;
 
     /**

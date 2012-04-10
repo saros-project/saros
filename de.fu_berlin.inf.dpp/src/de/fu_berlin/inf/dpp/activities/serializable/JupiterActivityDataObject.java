@@ -22,10 +22,13 @@ public class JupiterActivityDataObject extends
      * Timestamp that specifies the definition context of the enclosed
      * operation.
      */
+    @XStreamAlias("t")
     protected final Timestamp timestamp;
 
+    @XStreamAlias("o")
     protected final Operation operation;
 
+    @XStreamAlias("p")
     protected final SPathDataObject path;
 
     public JupiterActivityDataObject(Timestamp timestamp, Operation operation,

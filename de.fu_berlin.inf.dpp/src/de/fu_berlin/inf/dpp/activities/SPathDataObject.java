@@ -6,8 +6,10 @@ import org.picocontainer.annotations.Nullable;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
+import com.thoughtworks.xstream.annotations.XStreamConverter;
 
 import de.fu_berlin.inf.dpp.project.ISarosSession;
+import de.fu_berlin.inf.dpp.util.xstream.IPathConverter;
 
 /**
  * "Stupid" Data Object for transmitting an SPath. Serialized using XStream.
@@ -15,12 +17,16 @@ import de.fu_berlin.inf.dpp.project.ISarosSession;
 @XStreamAlias("SPath")
 public class SPathDataObject {
 
+    @XStreamAlias("i")
     @XStreamAsAttribute
     protected String projectID;
 
+    @XStreamAlias("p")
     @XStreamAsAttribute
+    @XStreamConverter(IPathConverter.class)
     protected IPath path;
 
+    @XStreamAlias("e")
     @XStreamAsAttribute
     protected String editorType;
 

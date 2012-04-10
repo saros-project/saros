@@ -15,12 +15,12 @@ import de.fu_berlin.inf.dpp.project.ISarosSession;
 @XStreamAlias("viewportActivity")
 public class ViewportActivityDataObject extends
     AbstractProjectActivityDataObject {
+    @XStreamAlias("t")
     @XStreamAsAttribute
-    @XStreamAlias("top")
     protected final int topIndex;
 
+    @XStreamAlias("b")
     @XStreamAsAttribute
-    @XStreamAlias("bottom")
     protected final int bottomIndex;
 
     protected final SPathDataObject path;

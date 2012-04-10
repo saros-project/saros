@@ -36,12 +36,15 @@ import de.fu_berlin.inf.dpp.project.ISarosSession;
 public class TextSelectionActivityDataObject extends
     AbstractProjectActivityDataObject {
 
+    @XStreamAlias("o")
     @XStreamAsAttribute
     private final int offset;
 
+    @XStreamAlias("l")
     @XStreamAsAttribute
     private final int length;
 
+    @XStreamAlias("p")
     private final SPathDataObject path;
 
     public TextSelectionActivityDataObject(JID source, int offset, int length,
