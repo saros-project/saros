@@ -210,6 +210,9 @@ public interface Constants {
     public final static String SHELL_EDIT_XMPP_JABBER_ACCOUNT = Configuration
         .getString("shell_edit_xmpp_jabber_account");
 
+    public final static String CHATROOM_TAB_LABEL = Configuration
+        .getString("ChatRoomsComposite_roundtable");
+
     public final static String LABEL_XMPP_JABBER_ID = Configuration
         .getString("text_label_xmpp_jabber_id");
     public final static String LABEL_XMPP_JABBER_SERVER = Configuration

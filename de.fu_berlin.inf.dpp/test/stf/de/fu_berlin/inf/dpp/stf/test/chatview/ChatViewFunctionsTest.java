@@ -10,6 +10,7 @@ import org.junit.Test;
 
 import de.fu_berlin.inf.dpp.stf.client.StfTestCase;
 import de.fu_berlin.inf.dpp.stf.client.util.Util;
+import de.fu_berlin.inf.dpp.stf.shared.Constants;
 
 public class ChatViewFunctionsTest extends StfTestCase {
 
@@ -29,8 +30,8 @@ public class ChatViewFunctionsTest extends StfTestCase {
         BOB.superBot().views().packageExplorerView()
             .waitUntilResourceIsShared("foo/src/bar/test.java");
 
-        assertEquals("Roundtable", ALICE.remoteBot().view(VIEW_SAROS).bot()
-            .cTabItem().getText());
+        assertEquals(Constants.CHATROOM_TAB_LABEL,
+            ALICE.remoteBot().view(VIEW_SAROS).bot().cTabItem().getText());
 
         ALICE.superBot().views().sarosView().selectChatroom()
             .sendChatMessage(messageBob);
