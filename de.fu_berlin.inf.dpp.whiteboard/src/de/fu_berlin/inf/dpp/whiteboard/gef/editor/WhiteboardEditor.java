@@ -43,9 +43,7 @@ import org.eclipse.jface.dialogs.InputDialog;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.dnd.DND;
-import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.ui.actions.ActionFactory;
 
 import de.fu_berlin.inf.dpp.whiteboard.gef.actions.ChangeBackgroundColorAction;
 import de.fu_berlin.inf.dpp.whiteboard.gef.actions.ChangeForegroundColorAction;
@@ -306,40 +304,9 @@ public class WhiteboardEditor extends SarosPermissionsGraphicalEditor {
 		zoomContributions.add(ZoomManager.FIT_WIDTH);
 		manager.setZoomLevelContributions(zoomContributions);
 
-		/*
-		 * A workaround because - when embedded in a ViewPart - the SWT.DEL key
-		 * is not recognized. This problem might be related to the GEF
-		 * EditDomain, that should be hooked separately in the ViewPart.
-		 */
-		keyHandler = new KeyHandler() {
-
-			@Override
-			public boolean keyPressed(KeyEvent event) {
-				if (event.keyCode == 127) {
-					return performDelete();
-				}
-				return super.keyPressed(event);
-			}
-
-			private boolean performDelete() {
-				IAction action = getActionRegistry().getAction(
-						ActionFactory.DELETE.getId());
-				if (action == null)
-					return false;
-				if (action.isEnabled())
-					action.run();
-				return true;
-			}
-
-		};
-		;
-
-		keyHandler.put(KeyStroke.getPressed(SWT.DEL, 127, 0),
-				getActionRegistry().getAction(ActionFactory.DELETE.getId()));
-
+		keyHandler = new KeyHandler();
 		keyHandler.put(KeyStroke.getPressed('+', SWT.KEYPAD_ADD, 0),
 				getActionRegistry().getAction(GEFActionConstants.ZOOM_IN));
-
 		keyHandler.put(KeyStroke.getPressed('-', SWT.KEYPAD_SUBTRACT, 0),
 				getActionRegistry().getAction(GEFActionConstants.ZOOM_OUT));
 

@@ -54,6 +54,7 @@ public class SarosWhiteboardView extends ViewPart {
 		}
 
 		contributeToToolBar(getViewSite().getActionBars().getToolBarManager());
+		contributeRetargetActions();
 	}
 
 	@Override
@@ -100,23 +101,31 @@ public class SarosWhiteboardView extends ViewPart {
 
 		ZoomComboContributionItem zoomItem = new ZoomComboContributionItem(
 				getViewSite().getPage());
-		// {
-		//
-		// /*
-		// * This method is overridden to ensure to only set the editor's
-		// * ZoomManager. Another manager could be set if another part of the
-		// * workbench is selected.
-		// */
-		// @Override
-		// public void setZoomManager(ZoomManager zm) {
-		// if (zm != gEditor.getAdapter(ZoomManager.class))
-		// super.setZoomManager(null);
-		// else
-		// super.setZoomManager(zm);
-		// }
-		// };
 
 		toolBarManager.add(zoomItem);
+	}
+
+	/**
+	 * Registers the supported retargetable actions. These are actions whose ids
+	 * match already registered and contributed actions of eclipse. The existing
+	 * actions are retargeted so they point to the respective methods provided.
+	 */
+	private void contributeRetargetActions() {
+		setRetargetAction(ActionFactory.COPY.getId());
+		setRetargetAction(ActionFactory.PASTE.getId());
+		setRetargetAction(ActionFactory.REDO.getId());
+		setRetargetAction(ActionFactory.UNDO.getId());
+		setRetargetAction(ActionFactory.SELECT_ALL.getId());
+		setRetargetAction(ActionFactory.DELETE.getId());
+	}
+
+	/**
+	 * helper to register an action as retargetable action
+	 * 
+	 * @param id
+	 */
+	private void setRetargetAction(String id) {
+		getViewSite().getActionBars().setGlobalActionHandler(id, getAction(id));
 	}
 
 	@Override
