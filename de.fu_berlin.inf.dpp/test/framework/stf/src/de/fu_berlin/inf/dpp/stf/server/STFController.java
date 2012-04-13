@@ -1,5 +1,6 @@
 package de.fu_berlin.inf.dpp.stf.server;
 
+import java.lang.Thread.UncaughtExceptionHandler;
 import java.lang.reflect.Field;
 import java.rmi.AccessException;
 import java.rmi.AlreadyBoundException;
@@ -91,6 +92,15 @@ public class STFController {
 
     public static void start(int port, Saros saros) throws RemoteException {
 
+        Thread
+            .setDefaultUncaughtExceptionHandler(new UncaughtExceptionHandler() {
+
+                @Override
+                public void uncaughtException(Thread thread, Throwable error) {
+                    log.error("uncaught exception in thread: " + thread, error);
+                }
+
+            });
         LogManager.resetConfiguration();
 
         PropertyConfigurator.configure(STFController.class.getClassLoader()
