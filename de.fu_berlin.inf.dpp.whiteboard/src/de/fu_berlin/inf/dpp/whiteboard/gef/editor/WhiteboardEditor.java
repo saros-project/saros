@@ -50,6 +50,7 @@ import org.eclipse.ui.actions.ActionFactory;
 import de.fu_berlin.inf.dpp.whiteboard.gef.actions.ChangeBackgroundColorAction;
 import de.fu_berlin.inf.dpp.whiteboard.gef.actions.ChangeForegroundColorAction;
 import de.fu_berlin.inf.dpp.whiteboard.gef.actions.CopyRecordAction;
+import de.fu_berlin.inf.dpp.whiteboard.gef.actions.ExportToImageAction;
 import de.fu_berlin.inf.dpp.whiteboard.gef.actions.PasteRecordAction;
 import de.fu_berlin.inf.dpp.whiteboard.gef.actions.SXEDeleteAction;
 import de.fu_berlin.inf.dpp.whiteboard.gef.commands.ElementRecordCreateCommand;
@@ -404,6 +405,10 @@ public class WhiteboardEditor extends SarosPermissionsGraphicalEditor {
 		action = new PasteRecordAction(this);
 		registry.registerAction(action);
 		getSelectionActions().add(action.getId());
+
+		action = new ExportToImageAction(this);
+		registry.registerAction(action);
+		getStackActions().add(action.getId());
 	}
 
 	@Override

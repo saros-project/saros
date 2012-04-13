@@ -74,6 +74,10 @@ public class SarosWhiteboardView extends ViewPart {
 	 * @param toolBarManager
 	 */
 	public void contributeToToolBar(IToolBarManager toolBarManager) {
+		toolBarManager.add(getAction(ActionFactory.EXPORT.getId()));
+
+		toolBarManager.add(new Separator());
+
 		toolBarManager.add(getAction(ActionFactory.UNDO.getId()));
 		toolBarManager.add(getAction(ActionFactory.REDO.getId()));
 
