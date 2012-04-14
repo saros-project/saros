@@ -235,6 +235,22 @@ public class EditorAPI implements IEditorAPI {
         return null;
     }
 
+    public boolean openEditor(IEditorPart part) {
+        IWorkbenchWindow window = EditorAPI.getActiveWindow();
+        if (window == null)
+            return false;
+
+        IWorkbenchPage page = window.getActivePage();
+        try {
+            page.openEditor(part.getEditorInput(), part.getEditorSite().getId());
+            return true;
+        } catch (PartInitException e) {
+            log.error(
+                "failed to open editor part with title: " + part.getTitle(), e);
+        }
+        return false;
+    }
+
     /**
      * {@inheritDoc}
      */

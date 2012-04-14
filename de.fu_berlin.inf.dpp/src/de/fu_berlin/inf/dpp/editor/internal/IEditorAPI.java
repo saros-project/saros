@@ -29,6 +29,16 @@ public interface IEditorAPI {
     public IEditorPart openEditor(SPath path);
 
     /**
+     * Opens the given editor part.
+     * 
+     * Needs to be called from an UI thread.
+     * 
+     * @return <code>true</code> if the editor part was successfully opened,
+     *         <code>false</code> otherwise
+     */
+    public boolean openEditor(IEditorPart part);
+
+    /**
      * Closes the given editorpart.
      * 
      * Needs to be called from an UI thread.

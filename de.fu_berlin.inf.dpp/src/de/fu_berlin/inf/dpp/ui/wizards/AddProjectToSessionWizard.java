@@ -1,27 +1,33 @@
 package de.fu_berlin.inf.dpp.ui.wizards;
 
 import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.Callable;
 
 import org.apache.log4j.Logger;
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.dialogs.IDialogConstants;
-import org.eclipse.jface.dialogs.IPageChangingListener;
 import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.jface.dialogs.PageChangingEvent;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.IFileEditorInput;
 import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.FileList;
@@ -29,6 +35,7 @@ import de.fu_berlin.inf.dpp.FileListDiff;
 import de.fu_berlin.inf.dpp.FileListFactory;
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.SarosPluginContext;
+import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
 import de.fu_berlin.inf.dpp.invitation.IncomingProjectNegotiation;
 import de.fu_berlin.inf.dpp.invitation.ProcessTools.CancelLocation;
@@ -66,7 +73,9 @@ public class AddProjectToSessionWizard extends Wizard {
 
     private SarosSessionManager sessionManager;
 
-    // FIXME should not be injected
+    @Inject
+    protected EditorAPI editorAPI;
+
     @Inject
     private IChecksumCache checksumCache;
 
@@ -119,6 +128,67 @@ public class AddProjectToSessionWizard extends Wizard {
                 namePage.isSyncSkippingSelected(fList.getProjectID()));
         }
 
+        final Collection<IEditorPart> openEditors = getOpenEditorsForSharedProjects(sources
+            .values());
+
+        final List<IEditorPart> dirtyEditors = new ArrayList<IEditorPart>();
+
+        boolean containsDirtyEditors = false;
+
+        for (IEditorPart editor : openEditors) {
+            if (editor.isDirty()) {
+                containsDirtyEditors = true;
+                dirtyEditors.add(editor);
+            }
+        }
+
+        if (containsDirtyEditors) {
+            Utils.runSafeSWTAsync(log, new Runnable() {
+                @Override
+                public void run() {
+                    if (AddProjectToSessionWizard.this.getShell().isDisposed()) {
+                        return;
+                    }
+
+                    int max = Math.min(20, dirtyEditors.size());
+                    int more = dirtyEditors.size() - max;
+
+                    List<String> dirtyEditorNames = new ArrayList<String>();
+
+                    for (IEditorPart editor : dirtyEditors.subList(0, max))
+                        dirtyEditorNames.add(editor.getTitle());
+
+                    Collections.sort(dirtyEditorNames);
+
+                    if (more > 0)
+                        dirtyEditorNames.add(MessageFormat
+                            .format(
+                                Messages.AddProjectToSessionWizard_unsaved_changes_dialog_more,
+                                more));
+
+                    String allDirtyEditorNames = Utils.join(", ",
+                        dirtyEditorNames);
+
+                    String dialogText = MessageFormat
+                        .format(
+                            Messages.AddProjectToSessionWizard_unsaved_changes_dialog_text,
+                            allDirtyEditorNames);
+
+                    boolean proceed = DialogUtils.openQuestionMessageDialog(
+                        AddProjectToSessionWizard.this.getShell(),
+                        Messages.AddProjectToSessionWizard_unsaved_changes_dialog_title,
+                        dialogText);
+
+                    if (proceed) {
+                        for (IEditorPart editor : openEditors)
+                            editor.doSave(new NullProgressMonitor());
+                    }
+                }
+            });
+
+            return false;
+        }
+
         /*
          * Ask the user whether to overwrite local resources only if resources
          * are supposed to be overwritten based on the synchronization options
@@ -139,7 +209,7 @@ public class AddProjectToSessionWizard extends Wizard {
                         project.open(null);
                     } catch (CoreException e) {
                         log.debug(
-                            "An error occur while opening the source file", e); //$NON-NLS-1$
+                            "An error occur while opening the source file", e);
                     }
                 }
 
@@ -177,15 +247,32 @@ public class AddProjectToSessionWizard extends Wizard {
         if (!confirmOverwritingResources(projectsToOverrideWithDiff))
             return false;
 
+        /*
+         * close all editors to avoid any conflicts. this will be needed for
+         * rsync as it needs to move files around the file system
+         */
+        for (IEditorPart editor : openEditors)
+            editorAPI.closeEditor(editor);
+
         Job job = new Job("Synchronizing") {
             @Override
             protected IStatus run(IProgressMonitor monitor) {
                 try {
-                    AddProjectToSessionWizard.this.process.accept(projectNames,
-                        SubMonitor.convert(monitor), skipProjectSyncing,
-                        useVersionControl);
+                    process.accept(projectNames, SubMonitor.convert(monitor),
+                        skipProjectSyncing, useVersionControl);
                 } catch (SarosCancellationException e) {
                     return Status.CANCEL_STATUS;
+                } finally {
+                    Utils.runSafeSWTAsync(log, new Runnable() {
+                        @Override
+                        public void run() {
+                            for (IEditorPart editor : openEditors) {
+                                if (((IFileEditorInput) editor.getEditorInput())
+                                    .getFile().exists())
+                                    editorAPI.openEditor(editor);
+                            }
+                        }
+                    });
                 }
                 return Status.OK_STATUS;
             }
@@ -340,17 +427,24 @@ public class AddProjectToSessionWizard extends Wizard {
 
     public void setWizardDlg(WizardDialogAccessable wizardDialog) {
         this.wizardDialog = wizardDialog;
-
-        /**
-         * Listen to page changes so we can cancel our automatic clicking the
-         * next button
-         */
-        this.wizardDialog.addPageChangingListener(new IPageChangingListener() {
-            public void handlePageChanging(PageChangingEvent event) {
-                pageChanges++;
-            }
-        });
     }
 
-    private int pageChanges = 0;
+    private Collection<IEditorPart> getOpenEditorsForSharedProjects(
+        Collection<IProject> projects) {
+
+        List<IEditorPart> openEditors = new ArrayList<IEditorPart>();
+        Set<IEditorPart> editors = EditorAPI.getOpenEditors();
+
+        for (IProject project : projects) {
+            for (IEditorPart editor : editors) {
+                if (editor.getEditorInput() instanceof IFileEditorInput) {
+                    IFile file = ((IFileEditorInput) editor.getEditorInput())
+                        .getFile();
+                    if (project.equals(file.getProject()))
+                        openEditors.add(editor);
+                }
+            }
+        }
+        return openEditors;
+    }
 }

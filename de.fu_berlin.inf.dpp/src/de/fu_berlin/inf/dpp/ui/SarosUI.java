@@ -73,8 +73,9 @@ public class SarosUI {
     final protected DataTransferManager dataTransferManager;
     final protected PreferenceUtils preferenceUtils;
 
-    public SarosUI(SarosSessionManager sessionManager, VersionManager versionManager,
-        DataTransferManager dataTransferManager, PreferenceUtils preferenceUtils) {
+    public SarosUI(SarosSessionManager sessionManager,
+        VersionManager versionManager, DataTransferManager dataTransferManager,
+        PreferenceUtils preferenceUtils) {
 
         this.sessionManager = sessionManager;
         this.manager = versionManager;
@@ -118,8 +119,10 @@ public class SarosUI {
         AddProjectToSessionWizard projectWizard = new AddProjectToSessionWizard(
             process, dataTransferManager, preferenceUtils, process.getPeer(),
             fileLists, process.getProjectNames(), sessionManager);
+
         final WizardDialogAccessable wizardDialog = new WizardDialogAccessable(
-            EditorAPI.getShell(), projectWizard);
+            EditorAPI.getShell(), projectWizard, SWT.MIN | SWT.MAX,
+            SWT.SYSTEM_MODAL | SWT.APPLICATION_MODAL | SWT.PRIMARY_MODAL);
 
         wizardDialog.setHelpAvailable(false);
         projectWizard.setWizardDlg(wizardDialog);

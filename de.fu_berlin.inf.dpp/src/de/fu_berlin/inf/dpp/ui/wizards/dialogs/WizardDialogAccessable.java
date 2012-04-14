@@ -11,6 +11,14 @@ public class WizardDialogAccessable extends WizardDialog {
         super(parentShell, newWizard);
     }
 
+    public WizardDialogAccessable(Shell parentShell, IWizard newWizard,
+        int includeStyle, int excludeStyle) {
+        super(parentShell, newWizard);
+
+        setShellStyle(getShellStyle() | includeStyle);
+        setShellStyle(getShellStyle() & (~excludeStyle));
+    }
+
     public Button getWizardButton(int id) {
         return getButton(id);
     }

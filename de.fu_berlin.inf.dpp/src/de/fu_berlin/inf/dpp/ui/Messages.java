@@ -23,6 +23,10 @@ public class Messages extends NLS {
     public static String AddProjectToSessionWizard_leave_session_text;
     public static String AddProjectToSessionWizard_synchronize_projects;
     public static String AddProjectToSessionWizard_title;
+    public static String AddProjectToSessionWizard_unsaved_changes_dialog_title;
+    public static String AddProjectToSessionWizard_unsaved_changes_dialog_text;
+    public static String AddProjectToSessionWizard_unsaved_changes_dialog_more;
+
     public static String AddXMPPAccountWizard_account_created;
     public static String AddXMPPAccountWizard_account_created_text;
     public static String AddXMPPAccountWizard_title;
