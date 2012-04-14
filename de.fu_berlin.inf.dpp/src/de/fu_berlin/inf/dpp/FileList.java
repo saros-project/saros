@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Deque;
 import java.util.LinkedList;
 import java.util.List;
@@ -236,35 +237,49 @@ public class FileList {
         }
 
         @Override
-        public boolean equals(Object o) {
-            if (o == this)
-                return true;
-
-            if (o == null)
-                return false;
-
-            if (!(o instanceof File) && ((File) o).path.equals(path))
-                return false;
-
-            if (metaData == null && ((File) o).metaData == null)
-                return true;
-
-            if (files == null && ((File) o).files == null)
-                return true;
-
-            if (metaData == null)
-                return false;
-
-            if (files == null)
-                return false;
-
-            return metaData.equals(((File) o).metaData)
-                && files.equals(((File) o).files);
+        public int hashCode() {
+            final int prime = 31;
+            int result = 1;
+            result = prime * result + ((files == null) ? 0 : files.hashCode());
+            result = prime * result + (isDirectory ? 1231 : 1237);
+            result = prime * result
+                + ((metaData == null) ? 0 : metaData.hashCode());
+            result = prime * result + ((path == null) ? 0 : path.hashCode());
+            return result;
         }
 
         @Override
-        public int hashCode() {
-            return path.hashCode();
+        public boolean equals(Object obj) {
+            if (this == obj)
+                return true;
+            if (obj == null)
+                return false;
+            if (getClass() != obj.getClass())
+                return false;
+            File other = (File) obj;
+
+            if (isDirectory != other.isDirectory)
+                return false;
+
+            if (path == null) {
+                if (other.path != null)
+                    return false;
+            } else if (!path.equals(other.path))
+                return false;
+
+            if (metaData == null) {
+                if (other.metaData != null)
+                    return false;
+            } else if (!metaData.equals(other.metaData))
+                return false;
+
+            if (files == null) {
+                if (other.files != null)
+                    return false;
+            } else if (!files.equals(other.files))
+                return false;
+
+            return true;
         }
     }
 
@@ -525,20 +540,18 @@ public class FileList {
 
     @Override
     public int hashCode() {
-        return 0;
+        return root.hashCode();
     }
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) {
+        if (this == o)
             return true;
-        }
 
-        if (!(o instanceof FileList)) {
+        if (!(o instanceof FileList))
             return false;
-        }
 
-        return getPaths().equals(((FileList) o).getPaths());
+        return root.equals(((FileList) o).root);
     }
 
     private void addMembers(List<IResource> resources,
@@ -690,5 +703,23 @@ public class FileList {
 
     public void setProjectID(String projectID) {
         this.projectID = projectID;
+    }
+
+    @XStreamOmitField
+    private String toString;
+
+    @Override
+    public String toString() {
+        if (toString != null)
+            return toString;
+
+        List<String> paths = new ArrayList<String>();
+
+        for (IPath path : getPaths())
+            paths.add(path.toString());
+
+        Collections.sort(paths);
+        toString = Arrays.toString(paths.toArray());
+        return toString;
     }
 }
