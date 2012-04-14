@@ -247,16 +247,17 @@ public class FileListTest {
 
     @Test
     public void testToXmlAndBack() throws Exception {
+
         List<IPath> files = new ArrayList<IPath>();
         StringBuilder builder = new StringBuilder();
         Random random = new Random();
-        for (int a = 0; a < 10; a++) {
-            for (int i = 0; i < 10; i++) {
-                for (int k = 0; k < 10; k++) {
+        for (int a = 0; a < 2; a++) {
+            for (int i = 0; i < 2; i++) {
+                for (int k = 0; k < 2; k++) {
                     builder.setLength(0);
                     builder.append("string12345");
                     for (int j = 0; j < 5; j++) {
-                        builder.append((char) random.nextInt());
+                        builder.append((char) (random.nextInt(26) + 65));
                     }
                     files.add(new Path("foo1234567890" + i + "/bar1234567890"
                         + a + "/" + builder.toString()));
@@ -266,7 +267,6 @@ public class FileListTest {
 
         FileList list = FileListFactory.createPathFileList(files);
         String xml = list.toXML();
-        // System.out.println(xml);
         FileList listFromXml = FileList.fromXML(xml);
         assertEquals(list, listFromXml);
     }
