@@ -9,7 +9,7 @@ import static org.junit.Assert.assertTrue;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import de.fu_berlin.inf.dpp.User;
+import de.fu_berlin.inf.dpp.User.Permission;
 import de.fu_berlin.inf.dpp.stf.client.StfTestCase;
 import de.fu_berlin.inf.dpp.stf.client.util.Util;
 import de.fu_berlin.inf.dpp.stf.shared.Constants.TypeOfCreateProject;
@@ -40,9 +40,8 @@ public class Share3UsersSequentiallyTest extends StfTestCase {
      * Result:
      * <ol>
      * <li>Alice and Bob are participants and have both
-     * {@link User.Permission#WRITE_ACCESS}.</li>
-     * <li>Alice and BOB have no {@link User.Permission}s after leaving the
-     * session.</li>
+     * {@link Permission#WRITE_ACCESS}.</li>
+     * <li>Alice and BOB have no {@link Permission}s after leaving the session.</li>
      * </ol>
      * 
      * @throws InterruptedException

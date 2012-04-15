@@ -14,7 +14,7 @@ import org.eclipse.core.runtime.Status;
 import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.SarosPluginContext;
-import de.fu_berlin.inf.dpp.User;
+import de.fu_berlin.inf.dpp.User.Permission;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.project.AbstractSarosSessionListener;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
@@ -27,8 +27,8 @@ import de.fu_berlin.inf.dpp.project.SarosSessionManager;
  * <br>
  * Ignoring the warnings will lead to inconsistencies. Note that we can't
  * prevent these actions, just detect them. Currently detected: File/folder
- * activities as a user with {@link User.Permission#READONLY_ACCESS}, and
- * deletion of a shared project.
+ * activities as a user with {@link Permission#READONLY_ACCESS}, and deletion of
+ * a shared project.
  */
 @Component(module = "core")
 public class ResourceChangeValidator extends ModelProvider {
@@ -53,7 +53,7 @@ public class ResourceChangeValidator extends ModelProvider {
 
     /**
      * Check each resource delta whether it is in a shared project. If we are
-     * not the exclusive user with {@link User.Permission#WRITE_ACCESS} set the
+     * not the exclusive user with {@link Permission#WRITE_ACCESS} set the
      * appropriate flag.
      */
     private class ResourceDeltaVisitor implements IResourceDeltaVisitor {

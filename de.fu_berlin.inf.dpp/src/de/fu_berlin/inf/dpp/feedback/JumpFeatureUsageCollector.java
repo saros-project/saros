@@ -22,6 +22,7 @@ package de.fu_berlin.inf.dpp.feedback;
 import org.apache.log4j.Logger;
 
 import de.fu_berlin.inf.dpp.User;
+import de.fu_berlin.inf.dpp.User.Permission;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.editor.AbstractSharedEditorListener;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
@@ -32,8 +33,7 @@ import de.fu_berlin.inf.dpp.project.SarosSessionManager;
 /**
  * This Collector collects data about the jump feature usage. It stores data
  * about the total count of jumps performed as well as the jumps to a user with
- * {@link User.Permission#WRITE_ACCESS} or
- * {@link User.Permission#READONLY_ACCESS}.
+ * {@link Permission#WRITE_ACCESS} or {@link Permission#READONLY_ACCESS}.
  */
 @Component(module = "feedback")
 public class JumpFeatureUsageCollector extends AbstractStatisticCollector {

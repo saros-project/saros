@@ -7,6 +7,7 @@ import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.User;
+import de.fu_berlin.inf.dpp.User.Permission;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.project.AbstractSarosSessionListener;
 import de.fu_berlin.inf.dpp.project.AbstractSharedProjectListener;
@@ -17,7 +18,7 @@ import de.fu_berlin.inf.dpp.project.SarosSessionManager;
 
 /**
  * This Document provider tries tell others that files are not editable if
- * {@link User.Permission#READONLY_ACCESS}.
+ * {@link Permission#READONLY_ACCESS}.
  */
 @Component(module = "util")
 public class SharedDocumentProvider extends TextFileDocumentProvider {

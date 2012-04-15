@@ -12,6 +12,7 @@ import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.texteditor.IDocumentProvider;
 
 import de.fu_berlin.inf.dpp.User;
+import de.fu_berlin.inf.dpp.User.Permission;
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.activities.business.AbstractActivityReceiver;
 import de.fu_berlin.inf.dpp.activities.business.EditorActivity;
@@ -25,14 +26,14 @@ import de.fu_berlin.inf.dpp.util.StackTrace;
 
 /**
  * This class manages state of open editors of all users with
- * {@link User.Permission#WRITE_ACCESS} and connects to/disconnects from the
+ * {@link Permission#WRITE_ACCESS} and connects to/disconnects from the
  * corresponding DocumentProviders to make sure that TextEditActivities can be
  * executed.
  * 
  * The main idea is to connect at the site of user with
- * {@link User.Permission#READONLY_ACCESS}, when a user with
- * {@link User.Permission#WRITE_ACCESS} activates his editor with the document.
- * Disconnect happens, when last user with {@link User.Permission#WRITE_ACCESS}
+ * {@link Permission#READONLY_ACCESS}, when a user with
+ * {@link Permission#WRITE_ACCESS} activates his editor with the document.
+ * Disconnect happens, when last user with {@link Permission#WRITE_ACCESS}
  * closes the editor.
  */
 public class RemoteWriteAccessManager {
@@ -45,7 +46,7 @@ public class RemoteWriteAccessManager {
 
     /**
      * stores files (identified by their path) connected by at least user with
-     * {@link User.Permission#WRITE_ACCESS}
+     * {@link Permission#WRITE_ACCESS}
      */
     protected Set<SPath> connectedUserWithWriteAccessFiles = new HashSet<SPath>();
 
@@ -142,8 +143,8 @@ public class RemoteWriteAccessManager {
 
     /**
      * Connects a document under the given path as a reaction on a remote
-     * activityDataObject of a user with {@link User.Permission#WRITE_ACCESS}
-     * (e.g. Activate Editor).
+     * activityDataObject of a user with {@link Permission#WRITE_ACCESS} (e.g.
+     * Activate Editor).
      */
     protected void connectDocumentProvider(SPath path) {
 
@@ -171,8 +172,8 @@ public class RemoteWriteAccessManager {
 
     /**
      * Disconnects a document under the given path as a reaction on a remote
-     * activityDataObject of a user with {@link User.Permission#WRITE_ACCESS}
-     * (e.g. Close Editor)
+     * activityDataObject of a user with {@link Permission#WRITE_ACCESS} (e.g.
+     * Close Editor)
      */
     protected void disconnectDocumentProvider(final SPath path) {
 

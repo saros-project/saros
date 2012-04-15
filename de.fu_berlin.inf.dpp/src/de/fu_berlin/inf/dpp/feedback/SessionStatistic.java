@@ -36,7 +36,7 @@ import org.eclipse.core.runtime.IPath;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
-import de.fu_berlin.inf.dpp.User;
+import de.fu_berlin.inf.dpp.User.Permission;
 import de.fu_berlin.inf.dpp.util.Utils;
 
 /**
@@ -144,14 +144,12 @@ public class SessionStatistic {
 
     // Keys for jumpFeatureUsageCollector
     /**
-     * Count of jumps to a user with {@link User.Permission#READONLY_ACCESS}
-     * position
+     * Count of jumps to a user with {@link Permission#READONLY_ACCESS} position
      */
     protected static final String KEY_JUMPED_TO_USER_WITH_READONLY_ACCESS = "jumped.observer.count";
 
     /**
-     * Count of jumps to a user with {@link User.Permission#WRITE_ACCESS}
-     * position
+     * Count of jumps to a user with {@link Permission#WRITE_ACCESS} position
      */
     protected static final String KEY_JUMPED_TO_USER_WITH_WRITE_ACCESS = "jumped.driver.count";
 
@@ -178,13 +176,13 @@ public class SessionStatistic {
 
     // Keys for selections and gestures
     /**
-     * Key for total users with {@link User.Permission#READONLY_ACCESS}
-     * selection count
+     * Key for total users with {@link Permission#READONLY_ACCESS} selection
+     * count
      */
     protected static final String KEY_TOTAL_USER_WITH_READONLY_ACCESS_SELECTION_COUNT = "observer.selection.count";
 
     /**
-     * Key for witnessed users with {@link User.Permission#READONLY_ACCESS}
+     * Key for witnessed users with {@link Permission#READONLY_ACCESS}
      * selections
      */
     protected static final String KEY_WITNESSED_USER_WITH_READONLY_ACCESS_SELECTION_COUNT = "observer.selection.count.witnessed";
@@ -657,7 +655,7 @@ public class SessionStatistic {
 
     /**
      * Sets the number of jumps to the position of a user with
-     * {@link User.Permission#READONLY_ACCESS}
+     * {@link Permission#READONLY_ACCESS}
      */
     public void setJumpedToUserWithReadOnlyAccessCount(
         int jumpedToUserWithReadOnlyAccess) {
@@ -667,7 +665,7 @@ public class SessionStatistic {
 
     /**
      * Sets the number of jumps to the position of a user with
-     * {@link User.Permission#WRITE_ACCESS}
+     * {@link Permission#WRITE_ACCESS}
      */
     public void setJumpedToUserWithWriteAccessCount(
         int jumpedToUserWithWriteAccess) {
@@ -685,7 +683,7 @@ public class SessionStatistic {
 
     /**
      * Returns the number of jumps to the position of a user with
-     * {@link User.Permission#READONLY_ACCESS}
+     * {@link Permission#READONLY_ACCESS}
      */
     public int getJumpedToUserWithReadOnlyAccessCount() {
         return Integer.parseInt(data
@@ -694,7 +692,7 @@ public class SessionStatistic {
 
     /**
      * Returns the number of jumps to the position of a user with
-     * {@link User.Permission#WRITE_ACCESS}
+     * {@link Permission#WRITE_ACCESS}
      */
     public int getJumpedToUserWithWriteAccessCount() {
         return Integer.parseInt(data
@@ -770,7 +768,7 @@ public class SessionStatistic {
 
     /**
      * Sets the count of selections made by users with
-     * {@link User.Permission#READONLY_ACCESS}
+     * {@link Permission#READONLY_ACCESS}
      * 
      * @param userWithReadOnlyAccessSelectionCount
      */
@@ -782,8 +780,8 @@ public class SessionStatistic {
     }
 
     /**
-     * Sets the count of user with {@link User.Permission#READONLY_ACCESS}
-     * selections that were witnessed by another user
+     * Sets the count of user with {@link Permission#READONLY_ACCESS} selections
+     * that were witnessed by another user
      * 
      * @param numberOfWitnessedUserWithReadOnlyAccessSelections
      */
@@ -795,7 +793,7 @@ public class SessionStatistic {
     }
 
     /**
-     * Sets the number of user with {@link User.Permission#READONLY_ACCESS}
+     * Sets the number of user with {@link Permission#READONLY_ACCESS}
      * selections where an edit occured.
      * 
      * @param userWithWriteAccessSelectionCount
@@ -806,7 +804,7 @@ public class SessionStatistic {
     }
 
     /**
-     * Returns the number of user with {@link User.Permission#READONLY_ACCESS}
+     * Returns the number of user with {@link Permission#READONLY_ACCESS}
      * selections made
      */
     public int getTotalOberserverSelectionCount() {
@@ -815,7 +813,8 @@ public class SessionStatistic {
     }
 
     /**
-     * Returns the number of witnessed user with {@link User.Permission#READONLY_ACCESS} selections
+     * Returns the number of witnessed user with
+     * {@link Permission#READONLY_ACCESS} selections
      */
     public int getWitnessedUserWithReadOnlyAccessSelections() {
         return Integer

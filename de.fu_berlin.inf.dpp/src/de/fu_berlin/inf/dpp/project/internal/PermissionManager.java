@@ -18,7 +18,7 @@ import de.fu_berlin.inf.dpp.project.SarosSessionManager;
 import de.fu_berlin.inf.dpp.ui.views.SarosView;
 
 /**
- * This manager is responsible for handling {@link User.Permission} changes.
+ * This manager is responsible for handling {@link Permission} changes.
  * 
  * @author rdjemili
  */

@@ -7,6 +7,7 @@ import org.apache.log4j.Logger;
 import org.picocontainer.Disposable;
 
 import de.fu_berlin.inf.dpp.User;
+import de.fu_berlin.inf.dpp.User.Permission;
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.activities.business.AbstractActivityReceiver;
 import de.fu_berlin.inf.dpp.activities.business.ChecksumActivity;
@@ -26,7 +27,7 @@ import de.fu_berlin.inf.dpp.util.Utils;
 
 /**
  * ConcurrentDocumentClient is responsible for managing the Jupiter interaction
- * on the local side of users with {@link User.Permission#WRITE_ACCESS}.
+ * on the local side of users with {@link Permission#WRITE_ACCESS}.
  * 
  * A client exists for every participant (also the host!) to take local
  * TextEdits and transforms them into JupiterActivities to send to the host.
@@ -63,7 +64,7 @@ public class ConcurrentDocumentClient implements Disposable {
 
     /**
      * ISharedProjectListener which is used to reset Jupiter on the client side,
-     * when the user has no longer {@link User.Permission#WRITE_ACCESS}.
+     * when the user has no longer {@link Permission#WRITE_ACCESS}.
      */
     public class ClientSideProjectListener extends
         AbstractSharedProjectListener {

@@ -38,6 +38,7 @@ import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.User;
+import de.fu_berlin.inf.dpp.User.Permission;
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.editor.AbstractSharedEditorListener;
@@ -56,8 +57,8 @@ import de.fu_berlin.inf.dpp.util.Utils;
  * Decorates Shared Project files.
  * 
  * TODO CO SharedProjectFileDecorator does support multiple users but the
- * awareness shows all users with {@link User.Permission#WRITE_ACCESS} and the
- * person followed which is kind of confusing.
+ * awareness shows all users with {@link Permission#WRITE_ACCESS} and the person
+ * followed which is kind of confusing.
  * 
  * @see ILightweightLabelDecorator *
  */
@@ -81,7 +82,7 @@ public class SharedProjectFileDecorator implements ILightweightLabelDecorator {
 
     /**
      * SharedProjectListener responsible for triggering an update on the
-     * decorations if there is a {@link User.Permission} change.
+     * decorations if there is a {@link Permission} change.
      */
     protected ISharedProjectListener projectListener = new AbstractSharedProjectListener() {
 

@@ -57,6 +57,7 @@ import org.picocontainer.annotations.Inject;
 import org.picocontainer.annotations.Nullable;
 
 import de.fu_berlin.inf.dpp.User;
+import de.fu_berlin.inf.dpp.User.Permission;
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.activities.business.AbstractActivityReceiver;
 import de.fu_berlin.inf.dpp.activities.business.EditorActivity;
@@ -94,8 +95,7 @@ import de.fu_berlin.inf.dpp.util.Utils;
 /**
  * The EditorManager is responsible for handling all editors in a DPP-session.
  * This includes the functionality of listening for user inputs in an editor,
- * locking the editors of the users with {@link User.Permission#READONLY_ACCESS}
- * .
+ * locking the editors of the users with {@link Permission#READONLY_ACCESS} .
  * 
  * The EditorManager contains the testable logic. All untestable logic should
  * only appear in an class of the {@link IEditorAPI} type. (CO: This is the
@@ -104,9 +104,9 @@ import de.fu_berlin.inf.dpp.util.Utils;
  * @author rdjemili
  * 
  *         TODO CO Since it was forgotten to reset the Editors of users with
- *         {@link User.Permission#WRITE_ACCESS} after a session closed, it is
- *         highly likely that this whole class needs to be reviewed for
- *         restarting issues
+ *         {@link Permission#WRITE_ACCESS} after a session closed, it is highly
+ *         likely that this whole class needs to be reviewed for restarting
+ *         issues
  * 
  *         TODO CO This class contains too many different concerns: TextEdits,
  *         Editor opening and closing, Parsing of activityDataObjects, executing
@@ -1460,7 +1460,7 @@ public class EditorManager extends AbstractActivityProvider {
      * 
      * @param path
      *            the project relative path to the resource that the user with
-     *            {@link User.Permission#WRITE_ACCESS} was editing.
+     *            {@link Permission#WRITE_ACCESS} was editing.
      */
     public void sendEditorActivitySaved(SPath path) {
 

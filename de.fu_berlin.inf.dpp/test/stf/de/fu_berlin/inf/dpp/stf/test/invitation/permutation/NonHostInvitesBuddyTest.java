@@ -13,7 +13,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import de.fu_berlin.inf.dpp.User;
+import de.fu_berlin.inf.dpp.User.Permission;
 import de.fu_berlin.inf.dpp.stf.client.StfTestCase;
 import de.fu_berlin.inf.dpp.stf.client.util.Util;
 import de.fu_berlin.inf.dpp.stf.shared.Constants.TypeOfCreateProject;
@@ -52,7 +52,7 @@ public class NonHostInvitesBuddyTest extends StfTestCase {
      * Result:
      * <ol>
      * <li>Alice, Bob and Carl are participants and have
-     * {@link User.Permission#WRITE_ACCESS}.</li>
+     * {@link Permission#WRITE_ACCESS}.</li>
      * </ol>
      * 
      * @throws Exception

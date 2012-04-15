@@ -9,6 +9,7 @@ import org.apache.log4j.Logger;
 import org.picocontainer.Disposable;
 
 import de.fu_berlin.inf.dpp.User;
+import de.fu_berlin.inf.dpp.User.Permission;
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.activities.business.AbstractActivityReceiver;
 import de.fu_berlin.inf.dpp.activities.business.ChecksumActivity;
@@ -28,9 +29,9 @@ import de.fu_berlin.inf.dpp.util.Utils;
  * The ConcurrentDocumentServer is responsible for coordinating all
  * JupiterActivities.
  * 
- * All users with {@link User.Permission#WRITE_ACCESS} (also the host!) will
- * send their JupiterActivities to the ConcurrentDocumentServer on the host,
- * which transforms them (using Jupiter) and then sends them to everybody else.
+ * All users with {@link Permission#WRITE_ACCESS} (also the host!) will send
+ * their JupiterActivities to the ConcurrentDocumentServer on the host, which
+ * transforms them (using Jupiter) and then sends them to everybody else.
  * 
  * A ConcurrentDocumentServer exists only on the host!
  */

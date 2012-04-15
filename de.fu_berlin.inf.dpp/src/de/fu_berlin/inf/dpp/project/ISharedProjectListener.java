@@ -20,6 +20,7 @@
 package de.fu_berlin.inf.dpp.project;
 
 import de.fu_berlin.inf.dpp.User;
+import de.fu_berlin.inf.dpp.User.Permission;
 
 /**
  * Listens for events that can happen during a Saros session. For life-cycle
@@ -33,16 +34,16 @@ import de.fu_berlin.inf.dpp.User;
 public interface ISharedProjectListener {
     /**
      * TODO add some easy way to check if given user with
-     * {@link User.Permission#WRITE_ACCESS} is the client (you)
+     * {@link Permission#WRITE_ACCESS} is the client (you)
      */
 
     /**
-     * The user {@link User.Permission} of the given participant has been
-     * changed. This is called after the {@link User.Permission} of the user has
-     * been updated to represent the new state.
+     * The user {@link Permission} of the given participant has been changed.
+     * This is called after the {@link Permission} of the user has been updated
+     * to represent the new state.
      * 
      * @param user
-     *            the user who's {@link User.Permission} changed.
+     *            the user who's {@link Permission} changed.
      */
     public void permissionChanged(User user);
 

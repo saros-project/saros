@@ -14,11 +14,12 @@ import org.eclipse.ui.texteditor.AnnotationPreference;
 import org.eclipse.ui.texteditor.AnnotationPreferenceLookup;
 
 import de.fu_berlin.inf.dpp.User;
+import de.fu_berlin.inf.dpp.User.Permission;
 import de.fu_berlin.inf.nebula.utils.ColorUtils;
 
 /**
  * The annotation that shows the viewports of users with
- * {@link User.Permission#WRITE_ACCESS}.
+ * {@link Permission#WRITE_ACCESS}.
  * 
  * Configuration of this annotation is done in the plugin-xml.
  * 

@@ -12,6 +12,7 @@ import org.picocontainer.annotations.Inject;
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.User;
+import de.fu_berlin.inf.dpp.User.Permission;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.editor.AbstractSharedEditorListener;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
@@ -172,7 +173,7 @@ public class FollowModeAction extends Action implements Disposable {
      * 
      * If there is already a user followed <code>null</code> is returned, i.e.
      * this is a toggeling method, otherwise a random user with
-     * {@link User.Permission#WRITE_ACCESS} is returned.
+     * {@link Permission#WRITE_ACCESS} is returned.
      */
     protected User getNewToFollow() {
         ISarosSession sarosSession = sessionManager.getSarosSession();

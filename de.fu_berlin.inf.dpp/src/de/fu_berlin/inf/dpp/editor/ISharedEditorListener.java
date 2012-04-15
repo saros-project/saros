@@ -4,6 +4,7 @@ import org.eclipse.jface.text.source.ILineRange;
 import org.eclipse.ui.IEditorPart;
 
 import de.fu_berlin.inf.dpp.User;
+import de.fu_berlin.inf.dpp.User.Permission;
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.activities.business.TextSelectionActivity;
 import de.fu_berlin.inf.dpp.activities.business.ViewportActivity;
@@ -17,7 +18,7 @@ public interface ISharedEditorListener {
      * 
      * @param path
      *            the project-relative path of the resource that is the new user
-     *            with {@link User.Permission#WRITE_ACCESS} resource.
+     *            with {@link Permission#WRITE_ACCESS} resource.
      * @param user
      *            the user which removed an editor (can be the local user)
      * 
@@ -30,7 +31,7 @@ public interface ISharedEditorListener {
      * 
      * @param path
      *            the path to the resource that the user with
-     *            {@link User.Permission#WRITE_ACCESS} was editing.
+     *            {@link Permission#WRITE_ACCESS} was editing.
      * 
      * @param user
      *            the user which removed an editor (can be the local user)
@@ -38,12 +39,12 @@ public interface ISharedEditorListener {
     public void editorRemoved(User user, SPath path);
 
     /**
-     * Is fired when the user with {@link User.Permission#WRITE_ACCESS} editor
-     * is saved.
+     * Is fired when the user with {@link Permission#WRITE_ACCESS} editor is
+     * saved.
      * 
      * @param path
      *            the project-relative path of the resource that is the new user
-     *            with {@link User.Permission#WRITE_ACCESS} resource.
+     *            with {@link Permission#WRITE_ACCESS} resource.
      * 
      * @param replicated
      *            <code>false</code> if this action originates on this client.

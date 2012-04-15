@@ -17,7 +17,7 @@ import org.eclipse.ui.ide.ResourceUtil;
 import org.eclipse.ui.texteditor.IDocumentProvider;
 import org.eclipse.ui.texteditor.IElementStateListener;
 
-import de.fu_berlin.inf.dpp.User;
+import de.fu_berlin.inf.dpp.User.Permission;
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.editor.internal.EditorListener;
@@ -57,7 +57,7 @@ class EditorPool {
      * Tries to add an {@link IEditorPart} to the {@link EditorPool}. This
      * method also connects the editorPart with its data source (identified by
      * associated {@link IFile}), makes it editable for user with
-     * {@link User.Permission#WRITE_ACCESS}, and registers listeners:
+     * {@link Permission#WRITE_ACCESS}, and registers listeners:
      * <ul>
      * <li>{@link IElementStateListener} on {@link IDocumentProvider} - listens
      * for the changes in the file connected with the editor (e.g. file gets
@@ -300,8 +300,8 @@ class EditorPool {
 
     /**
      * Will set all IEditorParts in the EditorPool to be editable by the local
-     * user if has {@link User.Permission#WRITE_ACCESS}. The editors will be
-     * locked otherwise.
+     * user if has {@link Permission#WRITE_ACCESS}. The editors will be locked
+     * otherwise.
      */
     public void setWriteAccessEnabled(boolean hasWriteAccess) {
 

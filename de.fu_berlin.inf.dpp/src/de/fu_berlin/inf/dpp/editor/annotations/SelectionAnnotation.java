@@ -1,10 +1,11 @@
 package de.fu_berlin.inf.dpp.editor.annotations;
 
 import de.fu_berlin.inf.dpp.User;
+import de.fu_berlin.inf.dpp.User.Permission;
 
 /**
- * Marks text selected by both users with {@link User.Permission#WRITE_ACCESS}
- * and {@link User.Permission#READONLY_ACCESS}.
+ * Marks text selected by both users with {@link Permission#WRITE_ACCESS} and
+ * {@link Permission#READONLY_ACCESS}.
  * 
  * Configuration of this annotation is done in the plugin-xml.
  * 

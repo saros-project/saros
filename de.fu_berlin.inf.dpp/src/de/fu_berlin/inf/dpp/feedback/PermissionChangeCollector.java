@@ -16,9 +16,8 @@ import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
 import de.fu_berlin.inf.dpp.project.SarosSessionManager;
 
 /**
- * Collects the {@link User.Permission} changes of the local user. It is
- * measured how long the user stayed in each {@link User.Permission} and how
- * often he changed it.<br>
+ * Collects the {@link Permission} changes of the local user. It is measured how
+ * long the user stayed in each {@link Permission} and how often he changed it.<br>
  * <br>
  * <code>
  * role.1=observer               <br>
@@ -39,10 +38,10 @@ public class PermissionChangeCollector extends AbstractStatisticCollector {
         .getLogger(PermissionChangeCollector.class.getName());
 
     /**
-     * The map to hold the local users {@link User.Permission} changes and
-     * times. A LinkedHashMap that preserves insertion order is used to be able
-     * to calculate the time differences between two consecutive
-     * {@link User.Permission} changes.
+     * The map to hold the local users {@link Permission} changes and times. A
+     * LinkedHashMap that preserves insertion order is used to be able to
+     * calculate the time differences between two consecutive {@link Permission}
+     * changes.
      */
     protected Map<Long, Permission> permissions = new LinkedHashMap<Long, Permission>();
 
@@ -52,12 +51,11 @@ public class PermissionChangeCollector extends AbstractStatisticCollector {
 
     /**
      * accumulators for the total duration of the
-     * {@link User.Permission#READONLY_ACCESS}
+     * {@link Permission#READONLY_ACCESS}
      */
     protected long readOnlyAccessDuration = 0;
     /**
-     * accumulator for the total duration of the
-     * {@link User.Permission#WRITE_ACCESS}
+     * accumulator for the total duration of the {@link Permission#WRITE_ACCESS}
      */
     protected long writeAccessDuration = 0;
 
@@ -119,23 +117,22 @@ public class PermissionChangeCollector extends AbstractStatisticCollector {
             .getTimeInMinutes(writeAccessDuration));
         data.setTotalPermissionPercentReadOnlyAccess(getPercentage(
             readOnlyAccessDuration, sessionTime));
-        data.setTotalPermissionPercentWriteAccess(getPercentage(writeAccessDuration,
-            sessionTime));
+        data.setTotalPermissionPercentWriteAccess(getPercentage(
+            writeAccessDuration, sessionTime));
     }
 
     /**
-     * Stores the {@link User.Permission} change in the data map (name and
-     * duration) and accumulates the duration per {@link User.Permission}.
+     * Stores the {@link Permission} change in the data map (name and duration)
+     * and accumulates the duration per {@link Permission}.
      * 
      * @param start
-     *            the start time of the {@link User.Permission} change event in
-     *            ms
+     *            the start time of the {@link Permission} change event in ms
      * @param end
-     *            the end time of the {@link User.Permission} change event in ms
+     *            the end time of the {@link Permission} change event in ms
      * @param permission
-     *            the {@link User.Permission} name
+     *            the {@link Permission} name
      * @param count
-     *            the {@link User.Permission} number, starting with 1
+     *            the {@link Permission} number, starting with 1
      */
     protected void processSinglePermissionChange(long start, long end,
         Permission permission, int count) {

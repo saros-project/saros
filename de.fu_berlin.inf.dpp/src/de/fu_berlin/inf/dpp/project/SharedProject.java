@@ -22,6 +22,7 @@ import org.eclipse.team.core.subscribers.ISubscriberChangeListener;
 import org.eclipse.team.core.subscribers.Subscriber;
 
 import de.fu_berlin.inf.dpp.User;
+import de.fu_berlin.inf.dpp.User.Permission;
 import de.fu_berlin.inf.dpp.vcs.VCSAdapter;
 import de.fu_berlin.inf.dpp.vcs.VCSResourceInfo;
 
@@ -32,11 +33,11 @@ import de.fu_berlin.inf.dpp.vcs.VCSResourceInfo;
  * Saros replicates a shared project, i.e. keeps copies of the project on the
  * peers in sync with the local project. A SharedProject represents the state
  * that these remote copies are supposed to be in. Whenever a user with
- * {@link User.Permission#WRITE_ACCESS} detects a mismatch between the IProject
- * and the corresponding SharedProject, we know that we need to send activities.<br>
+ * {@link Permission#WRITE_ACCESS} detects a mismatch between the IProject and
+ * the corresponding SharedProject, we know that we need to send activities.<br>
  * <br>
  * Currently, the SharedProject is only accessed (updated) when the client has
- * {@link User.Permission#WRITE_ACCESS}.
+ * {@link Permission#WRITE_ACCESS}.
  */
 /*
  * What if SharedProject became a little smarter, what if SharedProject actually

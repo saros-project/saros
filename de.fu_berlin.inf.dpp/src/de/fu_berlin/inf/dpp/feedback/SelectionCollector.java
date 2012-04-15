@@ -29,6 +29,7 @@ import org.eclipse.jface.text.source.ILineRange;
 import org.eclipse.ui.IEditorPart;
 
 import de.fu_berlin.inf.dpp.User;
+import de.fu_berlin.inf.dpp.User.Permission;
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.activities.business.TextSelectionActivity;
 import de.fu_berlin.inf.dpp.annotations.Component;
@@ -41,17 +42,17 @@ import de.fu_berlin.inf.dpp.project.SarosSessionManager;
 
 /**
  * This collector collects information about selections made by users with
- * {@link User.Permission#READONLY_ACCESS} that are witnessed by the local user.
- * The total selections are counted and it is checked, if each selection was
- * within the file the local user was viewing. He might either see that
- * selection directly within his viewport or through viewport annotation.
+ * {@link Permission#READONLY_ACCESS} that are witnessed by the local user. The
+ * total selections are counted and it is checked, if each selection was within
+ * the file the local user was viewing. He might either see that selection
+ * directly within his viewport or through viewport annotation.
  * 
- * Selection made by users with {@link User.Permission#WRITE_ACCESS} are not
- * analyzed as those will be misleading.
+ * Selection made by users with {@link Permission#WRITE_ACCESS} are not analyzed
+ * as those will be misleading.
  * 
- * Furthermore, if a user with {@link User.Permission#READONLY_ACCESS} selects
- * some text and a change to that specific text is done later on, this is stored
- * as an (probable) successful gesture.
+ * Furthermore, if a user with {@link Permission#READONLY_ACCESS} selects some
+ * text and a change to that specific text is done later on, this is stored as
+ * an (probable) successful gesture.
  */
 @Component(module = "feedback")
 public class SelectionCollector extends AbstractStatisticCollector {
@@ -104,7 +105,7 @@ public class SelectionCollector extends AbstractStatisticCollector {
 
     /**
      * A list where all selection events made by an remote user with
-     * {@link User.Permission#READONLY_ACCESS} are being stored<br>
+     * {@link Permission#READONLY_ACCESS} are being stored<br>
      */
     protected List<SelectionEvent> userWithReadOnlyAccessSelectionEvents = new ArrayList<SelectionEvent>();
 

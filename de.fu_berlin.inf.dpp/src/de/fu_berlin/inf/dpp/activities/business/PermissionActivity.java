@@ -27,7 +27,7 @@ import de.fu_berlin.inf.dpp.project.ISarosSession;
 
 /**
  * A {@link PermissionActivityDataObject} indicates that a user has a new
- * {@link User.Permission}.
+ * {@link Permission}.
  */
 public class PermissionActivity extends AbstractActivity {
 
@@ -36,7 +36,7 @@ public class PermissionActivity extends AbstractActivity {
 
     /**
      * Creates a new {@link PermissionActivity} which indicates that the given
-     * user should change into the given {@link User.Permission}.
+     * user should change into the given {@link Permission}.
      */
     public PermissionActivity(User source, User affectedUser,
         Permission permission) {

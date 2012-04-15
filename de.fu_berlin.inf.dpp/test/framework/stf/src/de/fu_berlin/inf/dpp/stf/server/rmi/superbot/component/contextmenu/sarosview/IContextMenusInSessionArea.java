@@ -2,7 +2,7 @@ package de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.contextmenu.saros
 
 import java.rmi.RemoteException;
 
-import de.fu_berlin.inf.dpp.User;
+import de.fu_berlin.inf.dpp.User.Permission;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.stf.server.StfRemoteObject;
 
@@ -85,7 +85,7 @@ public interface IContextMenusInSessionArea extends IContextMenusInSarosView {
      * {@link IContextMenusInSessionArea#hasWriteAccess()} is true . This method
      * should be used after performing the action
      * {@link IContextMenusInSessionArea#grantWriteAccess()} to guarantee the
-     * invitee has really got {@link User.Permission#WRITE_ACCESS} .
+     * invitee has really got {@link Permission#WRITE_ACCESS} .
      * 
      * @throws RemoteException
      */

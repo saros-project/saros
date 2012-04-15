@@ -3,6 +3,7 @@ package de.fu_berlin.inf.dpp.activities.business;
 import org.picocontainer.annotations.Nullable;
 
 import de.fu_berlin.inf.dpp.User;
+import de.fu_berlin.inf.dpp.User.Permission;
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.activities.serializable.ChecksumActivityDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.IActivityDataObject;
@@ -40,7 +41,7 @@ public class ChecksumActivity extends AbstractActivity implements
     /**
      * Constructor for a ChecksumActivity with no jupiterTimestamp set (such is
      * used when communicating with users who have
-     * {@link User.Permission#READONLY_ACCESS})
+     * {@link Permission#READONLY_ACCESS})
      */
     public ChecksumActivity(User source, SPath path, long hash, long length) {
         this(source, path, hash, length, null);
@@ -48,7 +49,7 @@ public class ChecksumActivity extends AbstractActivity implements
 
     /**
      * Constructor for checksum activities including a Timestamp (for users who
-     * have {@link User.Permission#WRITE_ACCESS});
+     * have {@link Permission#WRITE_ACCESS});
      */
     public ChecksumActivity(User source, SPath path, long hash, long length,
         @Nullable Timestamp jupiterTimestamp) {

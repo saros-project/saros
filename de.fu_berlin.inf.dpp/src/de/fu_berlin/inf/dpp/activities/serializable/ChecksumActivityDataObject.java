@@ -5,7 +5,7 @@ import org.picocontainer.annotations.Nullable;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 
-import de.fu_berlin.inf.dpp.User;
+import de.fu_berlin.inf.dpp.User.Permission;
 import de.fu_berlin.inf.dpp.activities.SPathDataObject;
 import de.fu_berlin.inf.dpp.activities.business.ChecksumActivity;
 import de.fu_berlin.inf.dpp.activities.business.IActivity;
@@ -44,7 +44,7 @@ public class ChecksumActivityDataObject extends
     /**
      * Constructor for a ChecksumActivityDataObject with no jupiterTimestamp set
      * (such is used when communicating with users who have
-     * {@link User.Permission#READONLY_ACCESS})
+     * {@link Permission#READONLY_ACCESS})
      */
     public ChecksumActivityDataObject(JID source,
         SPathDataObject sPathDataObject, long hash, long length) {
@@ -53,7 +53,7 @@ public class ChecksumActivityDataObject extends
 
     /**
      * Constructor for checksum activityDataObjects including a Timestamp (for
-     * users who have {@link User.Permission#WRITE_ACCESS})
+     * users who have {@link Permission#WRITE_ACCESS})
      */
     public ChecksumActivityDataObject(JID source,
         SPathDataObject sPathDataObject, long hash, long length,
