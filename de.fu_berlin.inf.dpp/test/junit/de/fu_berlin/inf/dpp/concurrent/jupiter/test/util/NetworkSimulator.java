@@ -61,12 +61,11 @@ public class NetworkSimulator {
             throw new IllegalArgumentException();
 
         presentTime = newPresentTime;
-        int result = 0;
+
         while (sendQueue.size() > 0
             && sendQueue.peek().getDelay() <= presentTime) {
             NetworkRequest nextRequest = sendQueue.poll();
             clients.get(nextRequest.getTo()).receiveNetworkEvent(nextRequest);
-            result++;
         }
     }
 

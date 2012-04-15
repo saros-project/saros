@@ -17,6 +17,7 @@ import com.thoughtworks.xstream.io.xml.XmlFriendlyReplacer;
  * Based on {@link com.thoughtworks.xstream.io.xml.XppReader} by
  * <em>Joe Walnes</em>.
  */
+@SuppressWarnings("deprecation")
 public class XppReader extends AbstractPullReader {
 
     protected final XmlPullParser parser;
@@ -29,9 +30,9 @@ public class XppReader extends AbstractPullReader {
         this.parser = parser;
 
         /*
-         * As addition to the "hack" beyond we have to ensure that the parser works,
-         * too, if XStream really pulls the very first
-         * element from the underlying parser. ;)
+         * As addition to the "hack" beyond we have to ensure that the parser
+         * works, too, if XStream really pulls the very first element from the
+         * underlying parser. ;)
          */
         if (parser.getName() == null)
             justStarted = false;

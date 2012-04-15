@@ -9,7 +9,6 @@ import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.accountManagement.XMPPAccountStore;
 import de.fu_berlin.inf.dpp.annotations.Component;
-import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
 import de.fu_berlin.inf.dpp.stf.server.STFController;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
 import de.fu_berlin.inf.dpp.ui.util.WizardUtils;
@@ -38,9 +37,6 @@ public class StartupSaros implements IStartup {
 
     @Inject
     private XMPPAccountStore xmppAccountStore;
-
-    @Inject
-    private PreferenceUtils preferenceUtils;
 
     public StartupSaros() {
         SarosPluginContext.reinject(this);

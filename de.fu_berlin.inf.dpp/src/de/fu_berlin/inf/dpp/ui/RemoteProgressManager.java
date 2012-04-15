@@ -355,7 +355,6 @@ public class RemoteProgressManager {
 
         return new IProgressMonitor() {
             protected String progressID = getNextProgressID();
-            protected IProgressMonitor localMonitor = monitor;
             protected User localUser = sarosSession.getLocalUser();
             int worked = 0;
             int totalWorked = -1;

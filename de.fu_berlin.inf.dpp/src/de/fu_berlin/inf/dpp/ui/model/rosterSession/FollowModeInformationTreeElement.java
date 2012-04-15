@@ -7,7 +7,6 @@ import org.eclipse.swt.graphics.Image;
 import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.User;
-import de.fu_berlin.inf.dpp.awareness.AwarenessInformationCollector;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.observables.SarosSessionObservable;
 import de.fu_berlin.inf.dpp.ui.ImageManager;
@@ -27,8 +26,6 @@ public class FollowModeInformationTreeElement extends
 
     @Inject
     protected SarosSessionObservable sarosSession;
-    @Inject
-    protected AwarenessInformationCollector awarenessInformationCollector;
 
     public FollowModeInformationTreeElement(User user) {
         super(user);

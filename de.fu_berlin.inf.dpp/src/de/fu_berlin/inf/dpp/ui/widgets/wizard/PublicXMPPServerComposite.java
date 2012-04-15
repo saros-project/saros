@@ -1,6 +1,5 @@
 package de.fu_berlin.inf.dpp.ui.widgets.wizard;
 
-import org.apache.log4j.Logger;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StyleRange;
 import org.eclipse.swt.custom.StyledText;
@@ -19,8 +18,6 @@ import de.fu_berlin.inf.nebula.explanation.note.NoteComposite;
 import de.fu_berlin.inf.nebula.utils.LayoutUtils;
 
 public class PublicXMPPServerComposite extends NoteComposite {
-    private static final Logger log = Logger
-        .getLogger(PublicXMPPServerComposite.class);
 
     @Inject
     PreferenceUtils preferenceUtils;

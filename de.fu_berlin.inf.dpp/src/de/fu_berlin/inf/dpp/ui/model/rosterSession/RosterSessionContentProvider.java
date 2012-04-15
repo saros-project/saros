@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import org.apache.log4j.Logger;
 import org.eclipse.jface.viewers.IContentProvider;
 import org.eclipse.jface.viewers.Viewer;
 import org.jivesoftware.smack.Roster;
@@ -36,8 +35,6 @@ import de.fu_berlin.inf.nebula.utils.ViewerUtils;
  * @author bkahlert
  */
 public class RosterSessionContentProvider extends TreeContentProvider {
-    private static final Logger log = Logger
-        .getLogger(RosterSessionContentProvider.class);
 
     protected Viewer viewer;
     protected RosterContentProvider rosterContentProvider = new RosterContentProvider();

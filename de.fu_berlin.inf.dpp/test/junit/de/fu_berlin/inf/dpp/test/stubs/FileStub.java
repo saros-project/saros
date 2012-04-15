@@ -350,7 +350,7 @@ public class FileStub implements IFile {
 
     }
 
-    @SuppressWarnings("rawtypes")
+    @SuppressWarnings({ "rawtypes", "unchecked" })
     public Map getPersistentProperties() throws CoreException {
         throw new RuntimeException("Unexpected call to Stub");
     }
@@ -379,7 +379,7 @@ public class FileStub implements IFile {
 
     }
 
-    @SuppressWarnings("rawtypes")
+    @SuppressWarnings({ "rawtypes", "unchecked" })
     public Map getSessionProperties() throws CoreException {
         throw new RuntimeException("Unexpected call to Stub");
 

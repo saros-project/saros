@@ -490,6 +490,7 @@ public class Saros extends AbstractUIPlugin {
      * Returns @link{IProxyService} if there is a registered service otherwise
      * null.
      */
+    @SuppressWarnings({ "rawtypes", "unchecked" })
     protected IProxyService getProxyService() {
         BundleContext bundleContext = getBundle().getBundleContext();
         ServiceReference serviceReference = bundleContext

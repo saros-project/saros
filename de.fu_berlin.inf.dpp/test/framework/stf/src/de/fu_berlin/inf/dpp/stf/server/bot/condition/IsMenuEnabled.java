@@ -5,7 +5,6 @@ import org.eclipse.swtbot.swt.finder.waits.DefaultCondition;
 
 public class IsMenuEnabled extends DefaultCondition {
 
-    private SWTWorkbenchBot bot;
     private String[] labels;
 
     IsMenuEnabled(SWTWorkbenchBot bot, String... labels) {

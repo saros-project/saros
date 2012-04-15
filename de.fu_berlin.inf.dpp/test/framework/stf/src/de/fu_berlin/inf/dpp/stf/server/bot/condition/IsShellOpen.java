@@ -5,7 +5,7 @@ import org.eclipse.swtbot.swt.finder.waits.DefaultCondition;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 
 public class IsShellOpen extends DefaultCondition {
-    private SWTWorkbenchBot bot;
+
     private String title;
 
     IsShellOpen(SWTWorkbenchBot bot, String title) {

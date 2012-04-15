@@ -353,7 +353,7 @@ public final class ImageTileEncoder extends Encoder {
         List<List<Integer>> dirtyXTilesPerRow = new ArrayList<List<Integer>>(
             tilesY);
 
-        for (int y = 0, ty = 0; y < height; y += 8, ty++) {
+        for (int y = 0; y < height; y += 8) {
             offset = offsetY;
 
             List<Integer> dirtyXTiles = new ArrayList<Integer>(tilesX);

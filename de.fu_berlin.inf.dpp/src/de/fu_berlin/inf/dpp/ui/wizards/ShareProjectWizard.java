@@ -2,7 +2,6 @@ package de.fu_berlin.inf.dpp.ui.wizards;
 
 import java.util.List;
 
-import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.wizard.IWizardPage;
@@ -28,8 +27,6 @@ import de.fu_berlin.inf.dpp.ui.wizards.pages.ProjectSelectionWizardPage;
  * @author kheld
  */
 public class ShareProjectWizard extends Wizard {
-    private static final Logger log = Logger
-        .getLogger(ShareProjectWizard.class);
 
     public static final String TITLE = Messages.ShareProjectWizard_title;
     public static final ImageDescriptor IMAGE = ImageManager.WIZBAN_SHARE_PROJECT_OUTGOING;
