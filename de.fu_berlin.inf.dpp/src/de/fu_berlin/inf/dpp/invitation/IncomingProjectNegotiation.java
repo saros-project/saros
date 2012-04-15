@@ -147,16 +147,17 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
      *            value is the name of the project in the workspace of the
      *            invited buddy (given from the {@link EnterProjectNamePage})
      */
-    public void accept(Map<String, String> projectNames, SubMonitor subMonitor,
-        Map<String, Boolean> skipSyncs, boolean useVersionControl)
-        throws SarosCancellationException {
+    public void accept(Map<String, String> projectNames,
+        IProgressMonitor monitor, Map<String, Boolean> skipSyncs,
+        boolean useVersionControl) throws SarosCancellationException {
 
-        this.monitor = subMonitor;
+        this.monitor = SubMonitor.convert(monitor,
+            "Initializing shared project", 100);
+
         IWorkspace ws = ResourcesPlugin.getWorkspace();
         IWorkspaceDescription desc = ws.getDescription();
         boolean wasAutobuilding = desc.isAutoBuilding();
 
-        subMonitor.beginTask("Initializing shared project", 100);
         fileReplacementInProgressObservable.startReplacement();
         try {
             if (wasAutobuilding) {
@@ -165,7 +166,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
             }
 
             List<FileList> missingFiles = calculateMissingFiles(projectNames,
-                skipSyncs, useVersionControl, subMonitor.newChild(10));
+                skipSyncs, useVersionControl, this.monitor.newChild(10));
 
             // the user who sends this ProjectNegotiation is now responsible for
             // all resources from that project
@@ -175,7 +176,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
             }
 
             transmitter.sendFileLists(peer, processID, missingFiles,
-                subMonitor.newChild(10));
+                this.monitor.newChild(10));
             checkCancellation();
 
             boolean filesMissing = false;
@@ -185,7 +186,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
 
             // Host/Inviter decided to transmit files with one big archive
             if (filesMissing)
-                acceptArchive(localProjects.size(), subMonitor.newChild(80));
+                acceptArchive(localProjects.size(), this.monitor.newChild(80));
 
             // We are finished with the exchanging process. Add all projects
             // resources to the session.
@@ -210,7 +211,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
             processException(e);
         } finally {
             fileReplacementInProgressObservable.replacementDone();
-            subMonitor.done();
+            this.monitor.done();
 
             // Re-enable auto-building...
             if (wasAutobuilding) {

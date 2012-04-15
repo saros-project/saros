@@ -20,7 +20,6 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -258,8 +257,8 @@ public class AddProjectToSessionWizard extends Wizard {
             @Override
             protected IStatus run(IProgressMonitor monitor) {
                 try {
-                    process.accept(projectNames, SubMonitor.convert(monitor),
-                        skipProjectSyncing, useVersionControl);
+                    process.accept(projectNames, monitor, skipProjectSyncing,
+                        useVersionControl);
                 } catch (SarosCancellationException e) {
                     return Status.CANCEL_STATUS;
                 } finally {
