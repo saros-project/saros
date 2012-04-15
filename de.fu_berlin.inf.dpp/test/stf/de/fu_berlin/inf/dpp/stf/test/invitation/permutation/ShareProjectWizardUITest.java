@@ -13,14 +13,11 @@ import java.rmi.RemoteException;
 import java.util.Random;
 
 import org.apache.commons.lang.ArrayUtils;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 import de.fu_berlin.inf.dpp.stf.client.StfTestCase;
-import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotShell;
-import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotTree;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotTreeItem;
 import de.fu_berlin.inf.dpp.stf.test.Constants;
 
@@ -45,9 +42,6 @@ public class ShareProjectWizardUITest extends StfTestCase {
      * </ol>
      * 
      */
-
-    protected IRemoteBotShell shell;
-    private IRemoteBotTree tree;
 
     private static final int UNDO_BUTTON = 0;
     private static final int REDO_BUTTON = 1;
@@ -94,12 +88,7 @@ public class ShareProjectWizardUITest extends StfTestCase {
     public void runBeforeEveryTest() throws Exception {
         closeAllShells();
         closeAllEditors();
-    }
-
-    @After
-    public void runAfterEveryTest() throws Exception {
         clearWorkspaces();
-
     }
 
     protected IRemoteBotTreeItem getClass(String name) throws RemoteException {
