@@ -166,7 +166,7 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
      * Objects for each Project, and wrapped in a {@link ProjectsAddedActivity}
      * that is finally sent to the user
      * 
-     * @param subMonitor
+     * @param monitor
      * @throws LocalCancellationException
      */
     private void sendFileList(SubMonitor monitor)
@@ -247,7 +247,7 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
      * Retrieve the peer's partial file list and remember which files need to be
      * sent to that user
      * 
-     * @param subMonitor
+     * @param monitor
      * @throws IOException
      * @throws SarosCancellationException
      */
