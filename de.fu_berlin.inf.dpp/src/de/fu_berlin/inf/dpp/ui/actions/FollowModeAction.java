@@ -172,7 +172,7 @@ public class FollowModeAction extends Action implements Disposable {
      * Returns the new user to follow.
      * 
      * If there is already a user followed <code>null</code> is returned, i.e.
-     * this is a toggeling method, otherwise a random user with
+     * this is a toggling method, otherwise a random user with
      * {@link Permission#WRITE_ACCESS} is returned.
      */
     protected User getNewToFollow() {
