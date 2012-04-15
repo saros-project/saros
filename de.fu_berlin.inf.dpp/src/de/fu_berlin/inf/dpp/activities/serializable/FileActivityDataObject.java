@@ -14,8 +14,7 @@ import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 
 @XStreamAlias("fileActivity")
-public class FileActivityDataObject extends AbstractProjectActivityDataObject
-    implements IResourceActivityDataObject {
+public class FileActivityDataObject extends AbstractProjectActivityDataObject {
 
     @XStreamAsAttribute
     protected Type type;
@@ -73,10 +72,6 @@ public class FileActivityDataObject extends AbstractProjectActivityDataObject
         this.data = data;
         this.purpose = purpose;
         this.checksum = checksum;
-    }
-
-    public SPathDataObject getOldPath() {
-        return this.oldPath;
     }
 
     public Type getType() {

@@ -10,7 +10,6 @@ import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.activities.SPathDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.IActivityDataObject;
-import de.fu_berlin.inf.dpp.activities.serializable.IResourceActivityDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.VCSActivityDataObject;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 
@@ -110,11 +109,10 @@ public class VCSActivity extends AbstractActivity implements IResourceActivity {
     public IActivityDataObject getActivityDataObject(ISarosSession sarosSession) {
         SPathDataObject sPathDataObject = path == null ? null : path
             .toSPathDataObject(sarosSession);
-        Vector<IResourceActivityDataObject> ados = new Vector<IResourceActivityDataObject>(
+        Vector<IActivityDataObject> ados = new Vector<IActivityDataObject>(
             containedActivity.size());
         for (IResourceActivity a : containedActivity) {
-            ados.add((IResourceActivityDataObject) a
-                .getActivityDataObject(sarosSession));
+            ados.add(a.getActivityDataObject(sarosSession));
         }
         return new VCSActivityDataObject(source.getJID(), getType(), url,
             sPathDataObject, directory, param1, ados);

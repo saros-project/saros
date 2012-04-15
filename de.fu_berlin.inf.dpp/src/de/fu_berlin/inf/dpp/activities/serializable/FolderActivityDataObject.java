@@ -11,8 +11,7 @@ import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 
 @XStreamAlias("folderActivity")
-public class FolderActivityDataObject extends AbstractProjectActivityDataObject
-    implements IResourceActivityDataObject {
+public class FolderActivityDataObject extends AbstractProjectActivityDataObject {
 
     @XStreamAsAttribute
     protected final Type type;
@@ -24,10 +23,6 @@ public class FolderActivityDataObject extends AbstractProjectActivityDataObject
 
     public Type getType() {
         return this.type;
-    }
-
-    public SPathDataObject getOldPath() {
-        return null;
     }
 
     /**

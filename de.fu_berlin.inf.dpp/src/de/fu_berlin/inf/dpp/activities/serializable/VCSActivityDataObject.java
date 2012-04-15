@@ -16,19 +16,18 @@ import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 
 @XStreamAlias("vcsActivity")
-public class VCSActivityDataObject extends AbstractProjectActivityDataObject
-    implements IResourceActivityDataObject {
+public class VCSActivityDataObject extends AbstractProjectActivityDataObject {
 
     protected String param1;
     protected String url;
     protected String directory;
     @XStreamAsAttribute
     protected Type type;
-    public Vector<IResourceActivityDataObject> containedActivity;
+    public Vector<IActivityDataObject> containedActivity;
 
     public VCSActivityDataObject(JID source, VCSActivity.Type type, String url,
         SPathDataObject path, String directory, String param1,
-        Vector<IResourceActivityDataObject> containedActivity) {
+        Vector<IActivityDataObject> containedActivity) {
         super(source, path);
         this.type = type;
         this.url = url;
@@ -43,15 +42,10 @@ public class VCSActivityDataObject extends AbstractProjectActivityDataObject
         final VCSActivity vcsActivity = new VCSActivity(type, user, sPath, url,
             directory, param1);
         vcsActivity.containedActivity.ensureCapacity(containedActivity.size());
-        for (IResourceActivityDataObject ado : containedActivity) {
+        for (IActivityDataObject ado : containedActivity) {
             vcsActivity.containedActivity.add((IResourceActivity) ado
                 .getActivity(sarosSession));
         }
         return vcsActivity;
-    }
-
-    @Override
-    public SPathDataObject getOldPath() {
-        return null;
     }
 }
