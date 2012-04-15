@@ -10,8 +10,8 @@ import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
 import de.fu_berlin.inf.dpp.project.AbstractSarosSessionListener;
 import de.fu_berlin.inf.dpp.project.AbstractSharedProjectListener;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
+import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
-import de.fu_berlin.inf.dpp.project.SarosSessionManager;
 import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.ui.util.CollaborationUtils;
 import de.fu_berlin.inf.dpp.ui.views.SarosView;
@@ -31,10 +31,10 @@ public class HostLeftAloneInSessionHandler {
     @Inject
     Saros saros;
 
-    protected final SarosSessionManager sessionManager;
+    protected final ISarosSessionManager sessionManager;
     private ISharedProjectListener projectListener;
 
-    public HostLeftAloneInSessionHandler(SarosSessionManager sManager,
+    public HostLeftAloneInSessionHandler(ISarosSessionManager sManager,
         final ProjectNegotiationObservable processes) {
         sessionManager = sManager;
         projectListener = new AbstractSharedProjectListener() {

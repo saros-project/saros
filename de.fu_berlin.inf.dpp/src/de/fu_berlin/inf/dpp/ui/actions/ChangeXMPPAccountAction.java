@@ -22,7 +22,7 @@ import de.fu_berlin.inf.dpp.accountManagement.XMPPAccountStore;
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.net.ConnectionState;
 import de.fu_berlin.inf.dpp.net.IConnectionListener;
-import de.fu_berlin.inf.dpp.project.SarosSessionManager;
+import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.ui.ImageManager;
 import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.ui.util.DialogUtils;
@@ -44,7 +44,7 @@ public class ChangeXMPPAccountAction extends Action implements IMenuCreator {
     Saros saros;
 
     @Inject
-    SarosSessionManager sarosSessionManager;
+    ISarosSessionManager sarosSessionManager;
 
     protected int currentAccountId;
     private static final Logger log = Logger

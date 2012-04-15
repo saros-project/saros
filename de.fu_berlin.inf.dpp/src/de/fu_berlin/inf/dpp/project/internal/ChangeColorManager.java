@@ -23,9 +23,9 @@ import de.fu_berlin.inf.dpp.project.AbstractSarosSessionListener;
 import de.fu_berlin.inf.dpp.project.AbstractSharedProjectListener;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ISarosSessionListener;
+import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
 import de.fu_berlin.inf.dpp.project.Messages;
-import de.fu_berlin.inf.dpp.project.SarosSessionManager;
 import de.fu_berlin.inf.dpp.util.Utils;
 
 /**
@@ -39,13 +39,13 @@ public class ChangeColorManager extends AbstractActivityProvider {
     private static final Logger log = Logger
         .getLogger(ChangeColorManager.class);
 
-    protected SarosSessionManager sessionManager;
+    protected ISarosSessionManager sessionManager;
     protected ISarosSession sarosSession;
     protected EditorManager editorManager;
 
     protected RGB rgbOfNewParticipant;
 
-    public ChangeColorManager(SarosSessionManager sessionManager,
+    public ChangeColorManager(ISarosSessionManager sessionManager,
         EditorManager editorManager) {
         this.sessionManager = sessionManager;
         this.editorManager = editorManager;

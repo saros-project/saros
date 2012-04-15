@@ -22,7 +22,7 @@ import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
 import de.fu_berlin.inf.dpp.project.AbstractSarosSessionListener;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ISarosSessionListener;
-import de.fu_berlin.inf.dpp.project.SarosSessionManager;
+import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.ui.preferencePages.FeedbackPreferencePage;
 
 /**
@@ -44,7 +44,7 @@ public class ErrorLogManager extends AbstractFeedbackManager {
     protected static final Logger log = Logger.getLogger(ErrorLogManager.class
         .getName());
 
-    protected SarosSessionManager sessionManager;
+    protected ISarosSessionManager sessionManager;
     protected StatisticManager statisticManager;
     protected SessionIDObservable sessionID;
     protected String currentSessionID;
@@ -65,7 +65,7 @@ public class ErrorLogManager extends AbstractFeedbackManager {
 
     };
 
-    public ErrorLogManager(Saros saros, SarosSessionManager sessionManager,
+    public ErrorLogManager(Saros saros, ISarosSessionManager sessionManager,
         StatisticManager statisticManager, SessionIDObservable sessionID) {
         super(saros);
         this.sessionManager = sessionManager;

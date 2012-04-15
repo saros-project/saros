@@ -43,7 +43,7 @@ import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
 import de.fu_berlin.inf.dpp.project.IChecksumCache;
-import de.fu_berlin.inf.dpp.project.SarosSessionManager;
+import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.ui.util.DialogUtils;
 import de.fu_berlin.inf.dpp.ui.wizards.JoinSessionWizard.OverwriteErrorDialog;
@@ -70,7 +70,7 @@ public class AddProjectToSessionWizard extends Wizard {
     protected DataTransferManager dataTransferManager;
     protected PreferenceUtils preferenceUtils;
 
-    private SarosSessionManager sessionManager;
+    private ISarosSessionManager sessionManager;
 
     @Inject
     protected EditorAPI editorAPI;
@@ -81,7 +81,7 @@ public class AddProjectToSessionWizard extends Wizard {
     public AddProjectToSessionWizard(IncomingProjectNegotiation process,
         DataTransferManager dataTransferManager,
         PreferenceUtils preferenceUtils, JID peer, List<FileList> fileLists,
-        Map<String, String> projectNames, SarosSessionManager sessionManager) {
+        Map<String, String> projectNames, ISarosSessionManager sessionManager) {
 
         SarosPluginContext.initComponent(this);
 

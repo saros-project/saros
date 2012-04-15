@@ -13,8 +13,8 @@ import de.fu_berlin.inf.dpp.project.AbstractActivityProvider;
 import de.fu_berlin.inf.dpp.project.AbstractSarosSessionListener;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ISarosSessionListener;
+import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.project.Messages;
-import de.fu_berlin.inf.dpp.project.SarosSessionManager;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
 import de.fu_berlin.inf.dpp.util.Utils;
 
@@ -27,10 +27,10 @@ public class ProjectsAddedManager extends AbstractActivityProvider {
     private static final Logger log = Logger
         .getLogger(ProjectsAddedManager.class);
 
-    protected SarosSessionManager sessionManager;
+    protected ISarosSessionManager sessionManager;
     protected SarosUI sarosUI;
 
-    public ProjectsAddedManager(SarosSessionManager sessionManager,
+    public ProjectsAddedManager(ISarosSessionManager sessionManager,
         SarosUI sarosUI) {
         this.sessionManager = sessionManager;
         this.sarosUI = sarosUI;

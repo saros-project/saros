@@ -19,7 +19,7 @@ import de.fu_berlin.inf.dpp.project.AbstractActivityProvider;
 import de.fu_berlin.inf.dpp.project.AbstractSarosSessionListener;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ISarosSessionListener;
-import de.fu_berlin.inf.dpp.project.SarosSessionManager;
+import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 
 /**
  * This manager is responsible for distributing knowledge about changes in
@@ -34,12 +34,12 @@ public class FollowingActivitiesManager extends AbstractActivityProvider {
         .getLogger(FollowingActivitiesManager.class);
 
     protected final List<IFollowModeChangesListener> internalListeners = new LinkedList<IFollowModeChangesListener>();
-    protected SarosSessionManager sessionManager;
+    protected ISarosSessionManager sessionManager;
     protected ISarosSession sarosSession;
     protected EditorManager editorManager;
     protected AwarenessInformationCollector awarenessInformationCollector;
 
-    public FollowingActivitiesManager(SarosSessionManager sessionManager,
+    public FollowingActivitiesManager(ISarosSessionManager sessionManager,
         EditorManager editorManager,
         AwarenessInformationCollector awarenessInformationCollector) {
         this.sessionManager = sessionManager;

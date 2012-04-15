@@ -21,7 +21,7 @@ import de.fu_berlin.inf.dpp.net.SarosNet;
 import de.fu_berlin.inf.dpp.net.discoverymanager.DiscoveryManager;
 import de.fu_berlin.inf.dpp.observables.InvitationProcessObservable;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
-import de.fu_berlin.inf.dpp.project.SarosSessionManager;
+import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.ui.wizards.pages.InvitationWizardUserSelectionPage;
 import de.fu_berlin.inf.dpp.util.StackTrace;
@@ -37,13 +37,13 @@ public class InvitationWizard extends Wizard {
     protected RosterTracker rosterTracker;
     protected DiscoveryManager discoveryManager;
     protected InvitationWizardUserSelectionPage userSelection;
-    protected SarosSessionManager sessionManager;
+    protected ISarosSessionManager sessionManager;
     protected VersionManager versionManager;
     protected InvitationProcessObservable invitationProcesses;
 
     public InvitationWizard(SarosNet sarosNet, ISarosSession sarosSession,
         RosterTracker rosterTracker, DiscoveryManager discoveryManager,
-        SarosSessionManager sessionManager, VersionManager versionManager,
+        ISarosSessionManager sessionManager, VersionManager versionManager,
         InvitationProcessObservable invitationProcesses) {
         this.sarosNet = sarosNet;
         this.sarosSession = sarosSession;

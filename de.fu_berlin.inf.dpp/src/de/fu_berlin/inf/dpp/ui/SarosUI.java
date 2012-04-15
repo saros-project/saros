@@ -50,7 +50,7 @@ import de.fu_berlin.inf.dpp.invitation.IncomingProjectNegotiation;
 import de.fu_berlin.inf.dpp.invitation.IncomingSessionNegotiation;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
-import de.fu_berlin.inf.dpp.project.SarosSessionManager;
+import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.ui.util.DialogUtils;
 import de.fu_berlin.inf.dpp.ui.views.SarosView;
 import de.fu_berlin.inf.dpp.ui.views.VideoPlayerView;
@@ -68,12 +68,12 @@ public class SarosUI {
 
     private static final Logger log = Logger.getLogger(SarosUI.class);
 
-    final protected SarosSessionManager sessionManager;
+    final protected ISarosSessionManager sessionManager;
     final protected VersionManager manager;
     final protected DataTransferManager dataTransferManager;
     final protected PreferenceUtils preferenceUtils;
 
-    public SarosUI(SarosSessionManager sessionManager,
+    public SarosUI(ISarosSessionManager sessionManager,
         VersionManager versionManager, DataTransferManager dataTransferManager,
         PreferenceUtils preferenceUtils) {
 

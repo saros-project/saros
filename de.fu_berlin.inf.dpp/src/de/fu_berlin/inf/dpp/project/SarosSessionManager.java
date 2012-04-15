@@ -20,7 +20,6 @@
 package de.fu_berlin.inf.dpp.project;
 
 import java.text.MessageFormat;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -49,7 +48,6 @@ import org.picocontainer.annotations.Inject;
 import org.picocontainer.annotations.Nullable;
 
 import de.fu_berlin.inf.dpp.FileList;
-import de.fu_berlin.inf.dpp.FileListFactory;
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.SarosContext;
 import de.fu_berlin.inf.dpp.User;
@@ -94,7 +92,8 @@ import de.fu_berlin.inf.dpp.util.VersionManager.VersionInfo;
  * @author rdjemili
  */
 @Component(module = "core")
-public class SarosSessionManager implements ISarosSessionManager {
+public class SarosSessionManager implements ISarosSessionManager,
+    ISarosSessionListener {
 
     private static final Logger log = Logger
         .getLogger(SarosSessionManager.class.getName());
@@ -132,9 +131,6 @@ public class SarosSessionManager implements ISarosSessionManager {
 
     @Inject
     protected SarosContext sarosContext;
-
-    @Inject
-    protected IChecksumCache checksumCache;
 
     protected SarosNet sarosNet;
 
@@ -192,9 +188,9 @@ public class SarosSessionManager implements ISarosSessionManager {
 
         this.sarosSessionObservable.setValue(sarosSession);
 
-        notifySarosSessionStarting(sarosSession);
+        sessionStarting(sarosSession);
         sarosSession.start();
-        notifySarosSessionStarted(sarosSession);
+        sessionStarted(sarosSession);
 
         Job sessionStartupJob = new Job("Session Startup") {
 
@@ -225,7 +221,7 @@ public class SarosSessionManager implements ISarosSessionManager {
                         .nextInt(Integer.MAX_VALUE));
                     sarosSession.addSharedResources(iProject, projectID,
                         resourcesList);
-                    notifyProjectAdded(iProject);
+                    projectAdded(projectID);
                 }
                 monitor.done();
                 return Status.OK_STATUS;
@@ -283,14 +279,16 @@ public class SarosSessionManager implements ISarosSessionManager {
         }
 
         try {
+
             SarosSession sarosSession = (SarosSession) sarosSessionObservable
                 .getValue();
 
             if (sarosSession == null) {
+                sessionID.setValue(SessionIDObservable.NOT_IN_SESSION);
                 return;
             }
 
-            notifySessionEnding(sarosSession);
+            sessionEnding(sarosSession);
 
             this.transmitter.sendLeaveMessage(sarosSession);
             log.debug("Leave message sent.");
@@ -305,17 +303,14 @@ public class SarosSessionManager implements ISarosSessionManager {
 
             this.sarosSessionObservable.setValue(null);
 
-            notifySessionEnd(sarosSession);
+            sessionEnded(sarosSession);
 
-            clearSessionID();
+            sessionID.setValue(SessionIDObservable.NOT_IN_SESSION);
+
             log.info("Session left");
         } finally {
             stopSharedProjectLock.unlock();
         }
-    }
-
-    public void clearSessionID() {
-        sessionID.setValue(SessionIDObservable.NOT_IN_SESSION);
     }
 
     public ISarosSession getSarosSession() {
@@ -330,7 +325,7 @@ public class SarosSessionManager implements ISarosSessionManager {
         this.sessionID.setValue(sessionID);
 
         final IncomingSessionNegotiation process = new IncomingSessionNegotiation(
-            this, transmitter, from, colorID, invitationProcesses,
+            this, this, transmitter, from, colorID, invitationProcesses,
             versionManager, versionInfo, sessionStart, sarosUI, invitationID,
             description, sarosContext, inviterColorID, host);
         comNegotiatingManager.setSessionPreferences(comPrefs);
@@ -358,7 +353,7 @@ public class SarosSessionManager implements ISarosSessionManager {
     public void incomingProjectReceived(JID from, final SarosUI sarosUI,
         List<ProjectExchangeInfo> projectInfos, String processID) {
         final IncomingProjectNegotiation process = new IncomingProjectNegotiation(
-            from, processID, projectInfos, sarosContext);
+            this, from, processID, projectInfos, sarosContext);
 
         Utils.runSafeSWTAsync(log, new Runnable() {
 
@@ -394,18 +389,13 @@ public class SarosSessionManager implements ISarosSessionManager {
 
     }
 
-    /**
-     * Invites a user to the shared project.
-     * 
-     * @param toInvite
-     *            the JID of the user that is to be invited.
-     */
+    @Override
     public void invite(JID toInvite, String description) {
         ISarosSession sarosSession = sarosSessionObservable.getValue();
 
         OutgoingSessionNegotiation result = new OutgoingSessionNegotiation(
-            toInvite, sarosSession.getFreeColor(), sarosSession, description,
-            sarosContext);
+            this, toInvite, sarosSession.getFreeColor(), sarosSession,
+            description, sarosContext);
 
         OutgoingInvitationJob outgoingInvitationJob = new OutgoingInvitationJob(
             result);
@@ -576,7 +566,7 @@ public class SarosSessionManager implements ISarosSessionManager {
                     .nextInt(Integer.MAX_VALUE));
                 this.getSarosSession().addSharedResources(iProject, projectID,
                     resourcesList);
-                notifyProjectAdded(iProject);
+                projectAdded(projectID);
             }
         }
 
@@ -618,59 +608,6 @@ public class SarosSessionManager implements ISarosSessionManager {
             job.schedule();
         }
 
-    }
-
-    /**
-     * Method to create list of ProjectExchangeInfo.
-     * 
-     * @param projectsToShare
-     *            List of projects initially to share
-     * @param subMonitor
-     *            Show progress
-     * @return
-     * @throws LocalCancellationException
-     */
-    public List<ProjectExchangeInfo> createProjectExchangeInfoList(
-        List<IProject> projectsToShare, SubMonitor subMonitor)
-        throws LocalCancellationException {
-
-        subMonitor.beginTask(Messages.SarosSessionManager_creating_file_list,
-            projectsToShare.size());
-
-        List<ProjectExchangeInfo> pInfos = new ArrayList<ProjectExchangeInfo>(
-            projectsToShare.size());
-
-        for (IProject iProject : projectsToShare) {
-            if (subMonitor.isCanceled())
-                throw new LocalCancellationException(null,
-                    CancelOption.DO_NOT_NOTIFY_PEER);
-            try {
-                String projectID = this.getSarosSession()
-                    .getProjectID(iProject);
-                String projectName = iProject.getName();
-
-                FileList projectFileList = FileListFactory.createFileList(
-                    iProject,
-                    this.getSarosSession().getSharedResources(iProject),
-                    checksumCache, this.getSarosSession().useVersionControl(),
-                    subMonitor.newChild(100 / projectsToShare.size()));
-
-                projectFileList.setProjectID(projectID);
-                boolean partial = !this.getSarosSession().isCompletelyShared(
-                    iProject);
-
-                ProjectExchangeInfo pInfo = new ProjectExchangeInfo(projectID,
-                    "", projectName, partial, projectFileList); //$NON-NLS-1$
-                pInfos.add(pInfo);
-
-            } catch (CoreException e) {
-                throw new LocalCancellationException(e.getMessage(),
-                    CancelOption.DO_NOT_NOTIFY_PEER);
-            }
-        }
-        subMonitor.subTask("");
-        subMonitor.done();
-        return pInfos;
     }
 
     protected class OutgoingProjectJob extends Job {
@@ -808,7 +745,8 @@ public class SarosSessionManager implements ISarosSessionManager {
         this.sarosSessionListeners.remove(listener);
     }
 
-    public void notifyPreIncomingInvitationCompleted(SubMonitor subMonitor) {
+    @Override
+    public void preIncomingInvitationCompleted(SubMonitor subMonitor) {
         try {
             for (ISarosSessionListener sarosSessionListener : this.sarosSessionListeners) {
                 sarosSessionListener.preIncomingInvitationCompleted(subMonitor);
@@ -819,8 +757,8 @@ public class SarosSessionManager implements ISarosSessionManager {
         }
     }
 
-    public void notifyPostOutgoingInvitationCompleted(SubMonitor subMonitor,
-        User user) {
+    @Override
+    public void postOutgoingInvitationCompleted(SubMonitor subMonitor, User user) {
         try {
             for (ISarosSessionListener sarosSessionListener : this.sarosSessionListeners) {
                 sarosSessionListener.postOutgoingInvitationCompleted(
@@ -832,7 +770,8 @@ public class SarosSessionManager implements ISarosSessionManager {
         }
     }
 
-    public void notifySarosSessionStarting(ISarosSession sarosSession) {
+    @Override
+    public void sessionStarting(ISarosSession sarosSession) {
         try {
             for (ISarosSessionListener sarosSessionListener : this.sarosSessionListeners) {
                 sarosSessionListener.sessionStarting(sarosSession);
@@ -843,7 +782,8 @@ public class SarosSessionManager implements ISarosSessionManager {
         }
     }
 
-    public void notifySarosSessionStarted(ISarosSession sarosSession) {
+    @Override
+    public void sessionStarted(ISarosSession sarosSession) {
         for (ISarosSessionListener sarosSessionListener : this.sarosSessionListeners) {
             try {
                 sarosSessionListener.sessionStarted(sarosSession);
@@ -854,7 +794,8 @@ public class SarosSessionManager implements ISarosSessionManager {
         }
     }
 
-    public void notifySessionEnding(ISarosSession sarosSession) {
+    @Override
+    public void sessionEnding(ISarosSession sarosSession) {
         for (ISarosSessionListener saroSessionListener : this.sarosSessionListeners) {
             try {
                 saroSessionListener.sessionEnding(sarosSession);
@@ -865,7 +806,8 @@ public class SarosSessionManager implements ISarosSessionManager {
         }
     }
 
-    public void notifySessionEnd(ISarosSession sarosSession) {
+    @Override
+    public void sessionEnded(ISarosSession sarosSession) {
         for (ISarosSessionListener listener : this.sarosSessionListeners) {
             try {
                 listener.sessionEnded(sarosSession);
@@ -876,10 +818,11 @@ public class SarosSessionManager implements ISarosSessionManager {
         }
     }
 
-    public void notifyProjectAdded(IProject project) {
+    @Override
+    public void projectAdded(String projectID) {
         for (ISarosSessionListener listener : this.sarosSessionListeners) {
             try {
-                listener.projectAdded(getSarosSession().getProjectID(project));
+                listener.projectAdded(projectID);
             } catch (RuntimeException e) {
                 log.error("Internal error in notifying listener"
                     + " of an added project: ", e);

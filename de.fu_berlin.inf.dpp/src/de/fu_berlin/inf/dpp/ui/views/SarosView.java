@@ -68,7 +68,7 @@ import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.RosterAdapter;
 import de.fu_berlin.inf.dpp.net.RosterTracker;
 import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
-import de.fu_berlin.inf.dpp.project.SarosSessionManager;
+import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.ui.BalloonNotification;
 import de.fu_berlin.inf.dpp.ui.actions.ChangeColorAction;
 import de.fu_berlin.inf.dpp.ui.actions.ChangeXMPPAccountAction;
@@ -214,7 +214,7 @@ public class SarosView extends ViewPart {
     protected Saros saros;
 
     @Inject
-    protected SarosSessionManager sarosSessionManager;
+    protected ISarosSessionManager sarosSessionManager;
 
     @Inject
     protected EditorManager editorManager;

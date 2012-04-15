@@ -13,8 +13,8 @@ import de.fu_berlin.inf.dpp.project.AbstractSarosSessionListener;
 import de.fu_berlin.inf.dpp.project.AbstractSharedProjectListener;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ISarosSessionListener;
+import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
-import de.fu_berlin.inf.dpp.project.SarosSessionManager;
 
 /**
  * This Document provider tries tell others that files are not editable if
@@ -29,7 +29,7 @@ public class SharedDocumentProvider extends TextFileDocumentProvider {
     protected ISarosSession sarosSession;
 
     @Inject
-    protected SarosSessionManager sessionManager;
+    protected ISarosSessionManager sessionManager;
 
     protected boolean hasWriteAccess;
 
@@ -56,13 +56,12 @@ public class SharedDocumentProvider extends TextFileDocumentProvider {
             if (sarosSession != null) {
                 hasWriteAccess = sarosSession.hasWriteAccess();
             } else {
-                log
-                    .warn("Internal error: Shared project null in permissionChanged!");
+                log.warn("Internal error: Shared project null in permissionChanged!");
             }
         }
     };
 
-    public SharedDocumentProvider(SarosSessionManager sessionManager) {
+    public SharedDocumentProvider(ISarosSessionManager sessionManager) {
         this.sessionManager = sessionManager;
 
         if (sessionManager.getSarosSession() != null) {

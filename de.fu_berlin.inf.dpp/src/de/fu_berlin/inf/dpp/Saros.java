@@ -51,7 +51,6 @@ import org.osgi.framework.ServiceReference;
 import org.osgi.service.prefs.BackingStoreException;
 import org.osgi.service.prefs.Preferences;
 import org.picocontainer.PicoContainer;
-import org.picocontainer.annotations.Inject;
 import org.picocontainer.injectors.Reinjector;
 
 import de.fu_berlin.inf.dpp.accountManagement.XMPPAccount;
@@ -64,7 +63,7 @@ import de.fu_berlin.inf.dpp.net.upnp.IUPnPService;
 import de.fu_berlin.inf.dpp.net.upnp.internal.UPnPAccessImpl;
 import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
-import de.fu_berlin.inf.dpp.project.SarosSessionManager;
+import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.ui.util.WizardUtils;
 import de.fu_berlin.inf.dpp.ui.wizards.ConfigurationWizard;
 import de.fu_berlin.inf.dpp.util.StackTrace;
@@ -128,7 +127,15 @@ public class Saros extends AbstractUIPlugin {
 
     private String sarosFeatureID;
 
-    protected SarosSessionManager sessionManager;
+    protected ISarosSessionManager sessionManager;
+
+    protected XMPPAccountStore xmppAccountStore;
+
+    protected PreferenceUtils preferenceUtils;
+
+    protected IUPnPService upnpService;
+
+    protected SarosNet sarosNet;
 
     /**
      * The reinjector used to inject dependencies into those objects that are
@@ -253,19 +260,25 @@ public class Saros extends AbstractUIPlugin {
         sarosContext.removeComponent(Bundle.class);
         sarosContext.addComponent(Bundle.class, getBundle());
 
+        /*
+         * must invoked here otherwise some components will fail to initialize
+         * due NPE... see getSarosNet()
+         */
+        sarosNet = sarosContext.getComponent(SarosNet.class);
+        sessionManager = sarosContext.getComponent(ISarosSessionManager.class);
+        xmppAccountStore = sarosContext.getComponent(XMPPAccountStore.class);
+        preferenceUtils = sarosContext.getComponent(PreferenceUtils.class);
+        upnpService = sarosContext.getComponent(IUPnPService.class);
+
         // Make sure that all components in the container are
         // instantiated
         sarosContext.getComponents(Object.class);
 
-        this.sessionManager = sarosContext
-            .getComponent(SarosSessionManager.class);
-
         isInitialized = true;
 
-        getSarosNet().initialize();
+        sarosNet.initialize();
 
-        sarosContext.getComponent(IUPnPService.class).init(
-            new UPnPAccessImpl(), getPreferenceStore());
+        upnpService.init(new UPnPAccessImpl(), getPreferenceStore());
 
         // determine if auto-connect can and should be performed
         if (getPreferenceStore().getBoolean(PreferenceConstants.AUTO_CONNECT)
@@ -303,8 +316,7 @@ public class Saros extends AbstractUIPlugin {
                 "Saros-Shutdown-Process", log, new Runnable() {
                     @Override
                     public void run() {
-                        sarosContext.getComponent(SarosSessionManager.class)
-                            .stopSarosSession();
+                        sessionManager.stopSarosSession();
 
                         getSarosNet().uninitialize();
                         // Remove UPnP port mapping for Saros
@@ -423,9 +435,6 @@ public class Saros extends AbstractUIPlugin {
         return securePrefs;
     }
 
-    @Inject
-    XMPPAccountStore xmppAccountStore;
-
     public synchronized void saveSecurePrefs() {
         try {
             if (securePrefs != null) {
@@ -463,7 +472,7 @@ public class Saros extends AbstractUIPlugin {
     }
 
     public SarosNet getSarosNet() {
-        return sarosContext.getComponent(SarosNet.class);
+        return sarosNet;
     }
 
     /**
@@ -568,9 +577,6 @@ public class Saros extends AbstractUIPlugin {
      * @return
      */
     public boolean configureXMPPAccount() {
-        if (xmppAccountStore == null)
-            SarosPluginContext.initComponent(this);
-
         if (xmppAccountStore.isEmpty())
             return (WizardUtils.openSarosConfigurationWizard() != null);
 
@@ -589,11 +595,6 @@ public class Saros extends AbstractUIPlugin {
             });
     }
 
-    @Inject
-    PreferenceUtils preferenceUtils;
-    @Inject
-    IUPnPService upnpManager;
-
     /**
      * Connects using the credentials from the preferences. If no credentials
      * are present a wizard is opened before. It uses TLS if possible.
@@ -609,14 +610,11 @@ public class Saros extends AbstractUIPlugin {
         if (preferenceUtils == null)
             sarosContext.reinject(this);
 
-        getSarosNet().setSettings(preferenceUtils.isDebugEnabled(),
+        sarosNet.setSettings(preferenceUtils.isDebugEnabled(),
             preferenceUtils.isLocalSOCKS5ProxyEnabled(),
             preferenceUtils.getFileTransferPort(), preferenceUtils.getStunIP(),
             preferenceUtils.getStunPort(),
             preferenceUtils.isAutoPortmappingEnabled());
-
-        if (xmppAccountStore == null)
-            SarosPluginContext.initComponent(this);
 
         if (xmppAccountStore.isEmpty() && !configureXMPPAccount())
             return;

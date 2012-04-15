@@ -19,7 +19,7 @@ import de.fu_berlin.inf.dpp.net.IConnectionListener;
 import de.fu_berlin.inf.dpp.project.AbstractSarosSessionListener;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ISarosSessionListener;
-import de.fu_berlin.inf.dpp.project.SarosSessionManager;
+import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.util.Utils;
 
 /**
@@ -56,7 +56,7 @@ public class SarosSourceProvider extends AbstractSourceProvider {
     @Inject
     protected Saros saros;
     @Inject
-    protected SarosSessionManager sarosSessionManager;
+    protected ISarosSessionManager sarosSessionManager;
 
     protected IConnectionListener connectionListener = new IConnectionListener() {
         public void connectionStateChanged(Connection connection,

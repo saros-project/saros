@@ -22,7 +22,8 @@ import de.fu_berlin.inf.dpp.net.internal.DefaultInvitationInfo.UserListRequestEx
 import de.fu_berlin.inf.dpp.observables.InvitationProcessObservable;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
-import de.fu_berlin.inf.dpp.project.SarosSessionManager;
+import de.fu_berlin.inf.dpp.project.ISarosSessionListener;
+import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
 import de.fu_berlin.inf.dpp.ui.wizards.JoinSessionWizard;
 import de.fu_berlin.inf.dpp.util.Utils;
@@ -34,7 +35,7 @@ public class IncomingSessionNegotiation extends InvitationProcess {
     private static Logger log = Logger
         .getLogger(IncomingSessionNegotiation.class);
 
-    protected SarosSessionManager sessionManager;
+    protected ISarosSessionManager sessionManager;
     protected JoinSessionWizard inInvitationUI;
     protected VersionManager versionManager;
     protected DateTime sessionStart;
@@ -44,7 +45,7 @@ public class IncomingSessionNegotiation extends InvitationProcess {
     protected int peerColorID;
 
     @Inject
-    SessionIDObservable sessionID;
+    protected SessionIDObservable sessionID;
 
     protected SarosCancellationException cancellationCause;
     public VersionInfo versionInfo;
@@ -53,9 +54,11 @@ public class IncomingSessionNegotiation extends InvitationProcess {
 
     protected SubMonitor monitor;
 
-    public IncomingSessionNegotiation(SarosSessionManager sessionManager,
-        ITransmitter transmitter, JID from, int colorID,
-        InvitationProcessObservable invitationProcesses,
+    protected ISarosSessionListener sessionListener;
+
+    public IncomingSessionNegotiation(ISarosSessionManager sessionManager,
+        ISarosSessionListener sessionListener, ITransmitter transmitter,
+        JID from, int colorID, InvitationProcessObservable invitationProcesses,
         VersionManager versionManager, VersionInfo remoteVersionInfo,
         DateTime sessionStart, SarosUI sarosUI, String invitationID,
         String description, SarosContext sarosContext, int peerColorID, JID host) {
@@ -65,6 +68,7 @@ public class IncomingSessionNegotiation extends InvitationProcess {
         this.sessionStart = sessionStart;
         this.invitationID = invitationID;
 
+        this.sessionListener = sessionListener;
         this.sessionManager = sessionManager;
         this.versionManager = versionManager;
         this.host = host;
@@ -189,11 +193,7 @@ public class IncomingSessionNegotiation extends InvitationProcess {
         }
 
         sessionManager.stopSarosSession();
-        /*
-         * If the sarosSession is null, stopSarosSession() does not clear the
-         * sessionID, so we have to do this manually.
-         */
-        sessionManager.clearSessionID();
+
         invitationProcesses.removeInvitationProcess(this);
         throw cancellationCause;
     }
@@ -239,11 +239,11 @@ public class IncomingSessionNegotiation extends InvitationProcess {
          * that.
          */
 
-        sessionManager.notifySarosSessionStarting(sarosSession);
+        sessionListener.sessionStarting(sarosSession);
         sarosSession.start();
-        sessionManager.notifySarosSessionStarted(sarosSession);
+        sessionListener.sessionStarted(sarosSession);
 
-        sessionManager.notifyPreIncomingInvitationCompleted(monitor);
+        sessionListener.preIncomingInvitationCompleted(monitor);
 
         sarosSession.userInvitationCompleted(sarosSession.getLocalUser());
         log.debug("Inv" + Utils.prefix(peer)

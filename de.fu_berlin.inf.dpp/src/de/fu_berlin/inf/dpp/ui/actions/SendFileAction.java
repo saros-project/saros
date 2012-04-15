@@ -63,7 +63,7 @@ import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
 import de.fu_berlin.inf.dpp.net.internal.StreamService;
 import de.fu_berlin.inf.dpp.net.internal.StreamServiceManager;
 import de.fu_berlin.inf.dpp.net.internal.StreamSession;
-import de.fu_berlin.inf.dpp.project.SarosSessionManager;
+import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.ui.util.DialogUtils;
 import de.fu_berlin.inf.dpp.ui.util.selection.SelectionUtils;
@@ -92,7 +92,7 @@ public class SendFileAction extends Action implements Disposable {
     protected Saros saros;
 
     @Inject
-    protected SarosSessionManager sessionManager;
+    protected ISarosSessionManager sessionManager;
 
     @Inject
     protected StreamServiceManager streamServiceManager;

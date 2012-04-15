@@ -23,7 +23,7 @@ import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
 import de.fu_berlin.inf.dpp.project.AbstractSarosSessionListener;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ISarosSessionListener;
-import de.fu_berlin.inf.dpp.project.SarosSessionManager;
+import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.ui.preferencePages.FeedbackPreferencePage;
 import de.fu_berlin.inf.dpp.util.StackTrace;
 
@@ -67,7 +67,7 @@ public class StatisticManager extends AbstractFeedbackManager {
 
     };
 
-    public StatisticManager(Saros saros, SarosSessionManager sessionManager,
+    public StatisticManager(Saros saros, ISarosSessionManager sessionManager,
         FeedbackManager feedbackManager) {
         super(saros);
         this.feedbackManager = feedbackManager;

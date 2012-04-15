@@ -28,7 +28,7 @@ import de.fu_berlin.inf.dpp.project.AbstractActivityProvider;
 import de.fu_berlin.inf.dpp.project.AbstractSarosSessionListener;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ISarosSessionListener;
-import de.fu_berlin.inf.dpp.project.SarosSessionManager;
+import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.util.AutoHashMap;
 import de.fu_berlin.inf.dpp.util.Function;
 import de.fu_berlin.inf.dpp.util.NamedThreadFactory;
@@ -42,7 +42,7 @@ public class PingPongCentral extends AbstractActivityProvider {
     protected AtomicReference<ISarosSession> sarosSession = new AtomicReference<ISarosSession>(
         null);
 
-    protected SarosSessionManager sessionManager;
+    protected ISarosSessionManager sessionManager;
 
     protected boolean sendPings = false;
 
@@ -191,7 +191,7 @@ public class PingPongCentral extends AbstractActivityProvider {
         }
     };
 
-    public PingPongCentral(Saros saros, SarosSessionManager manager,
+    public PingPongCentral(Saros saros, ISarosSessionManager manager,
         PreferenceUtils preferenceUtils) {
         this.sessionManager = manager;
         this.sessionManager.addSarosSessionListener(sessionListener);

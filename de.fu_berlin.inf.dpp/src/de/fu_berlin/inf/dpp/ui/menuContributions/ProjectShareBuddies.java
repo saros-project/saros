@@ -22,7 +22,7 @@ import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.discoverymanager.DiscoveryManager;
 import de.fu_berlin.inf.dpp.net.discoverymanager.DiscoveryManager.CacheMissException;
 import de.fu_berlin.inf.dpp.net.util.RosterUtils;
-import de.fu_berlin.inf.dpp.project.SarosSessionManager;
+import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.ui.model.roster.RosterEntryElement;
 import de.fu_berlin.inf.dpp.ui.util.CollaborationUtils;
@@ -39,7 +39,7 @@ public class ProjectShareBuddies extends ContributionItem {
     protected Saros saros;
 
     @Inject
-    protected SarosSessionManager sarosSessionManager;
+    protected ISarosSessionManager sarosSessionManager;
 
     @Inject
     protected DiscoveryManager discoveryManager;
@@ -147,7 +147,8 @@ public class ProjectShareBuddies extends ContributionItem {
      */
     protected MenuItem createNoBuddiesMenuItem(Menu parentMenu, int index) {
         MenuItem menuItem = new MenuItem(parentMenu, SWT.NONE, index);
-        menuItem.setText(Messages.ProjectShareBuddies_no_buddies_online_with_saros);
+        menuItem
+            .setText(Messages.ProjectShareBuddies_no_buddies_online_with_saros);
         menuItem.setEnabled(false);
         return menuItem;
     }

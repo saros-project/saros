@@ -41,8 +41,8 @@ import de.fu_berlin.inf.dpp.project.AbstractSarosSessionListener;
 import de.fu_berlin.inf.dpp.project.AbstractSharedProjectListener;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ISarosSessionListener;
+import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
-import de.fu_berlin.inf.dpp.project.SarosSessionManager;
 import de.fu_berlin.inf.dpp.ui.RemoteProgressManager;
 import de.fu_berlin.inf.dpp.ui.actions.ConsistencyAction;
 import de.fu_berlin.inf.dpp.ui.views.SarosView;
@@ -74,7 +74,7 @@ public class ConsistencyWatchdogClient extends AbstractActivityProvider {
     /**
      * @Inject Injected via Constructor Injection
      */
-    protected SarosSessionManager sessionManager;
+    protected ISarosSessionManager sessionManager;
 
     @Inject
     protected RemoteProgressManager remoteProgressManager;
@@ -128,7 +128,7 @@ public class ConsistencyWatchdogClient extends AbstractActivityProvider {
         }
     };
 
-    public ConsistencyWatchdogClient(SarosSessionManager sessionManager) {
+    public ConsistencyWatchdogClient(ISarosSessionManager sessionManager) {
         this.sessionManager = sessionManager;
         this.sessionManager.addSarosSessionListener(sessionListener);
     }

@@ -10,7 +10,7 @@ import de.fu_berlin.inf.dpp.optional.jdt.JDTFacade;
 import de.fu_berlin.inf.dpp.preferences.IPreferenceManipulator.IRestorePoint;
 import de.fu_berlin.inf.dpp.project.AbstractSarosSessionListener;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
-import de.fu_berlin.inf.dpp.project.SarosSessionManager;
+import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 
 /**
  * The Preference Manager is responsible for
@@ -39,7 +39,7 @@ public class PreferenceManager extends AbstractSarosSessionListener {
     protected List<IRestorePoint> restorePoints = new ArrayList<IRestorePoint>();
 
     public PreferenceManager(JDTFacade jdtFacade,
-        SarosSessionManager sessionManager) {
+        ISarosSessionManager sessionManager) {
 
         // collect PreferenceManipulators
         if (jdtFacade.isJDTAvailable()) {

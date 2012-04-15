@@ -12,9 +12,9 @@ import de.fu_berlin.inf.dpp.project.AbstractSarosSessionListener;
 import de.fu_berlin.inf.dpp.project.AbstractSharedProjectListener;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ISarosSessionListener;
+import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
 import de.fu_berlin.inf.dpp.project.Messages;
-import de.fu_berlin.inf.dpp.project.SarosSessionManager;
 import de.fu_berlin.inf.dpp.ui.views.SarosView;
 
 /**
@@ -75,7 +75,7 @@ public class PermissionManager extends AbstractActivityProvider {
         }
     };
 
-    public PermissionManager(SarosSessionManager sessionManager) {
+    public PermissionManager(ISarosSessionManager sessionManager) {
         sessionManager.addSarosSessionListener(sessionListener);
     }
 

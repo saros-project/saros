@@ -37,7 +37,7 @@ import de.fu_berlin.inf.dpp.project.AbstractActivityProvider;
 import de.fu_berlin.inf.dpp.project.AbstractSarosSessionListener;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ISarosSessionListener;
-import de.fu_berlin.inf.dpp.project.SarosSessionManager;
+import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.synchronize.StartHandle;
 import de.fu_berlin.inf.dpp.util.Utils;
 
@@ -56,7 +56,7 @@ public class ConsistencyWatchdogHandler {
     @Inject
     protected ConsistencyWatchdogClient watchdogClient;
 
-    protected SarosSessionManager sessionManager;
+    protected ISarosSessionManager sessionManager;
 
     protected ISarosSession sarosSession;
 
@@ -90,7 +90,7 @@ public class ConsistencyWatchdogHandler {
         }
     };
 
-    public ConsistencyWatchdogHandler(SarosSessionManager sessionManager) {
+    public ConsistencyWatchdogHandler(ISarosSessionManager sessionManager) {
         this.sessionManager = sessionManager;
         this.sessionManager.addSarosSessionListener(sessionListener);
     }

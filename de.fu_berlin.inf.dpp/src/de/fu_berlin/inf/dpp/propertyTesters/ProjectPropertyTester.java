@@ -7,7 +7,7 @@ import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
-import de.fu_berlin.inf.dpp.project.SarosSessionManager;
+import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 
 /**
  * Adds tests to the {@link IResource}. <br/>
@@ -17,7 +17,7 @@ import de.fu_berlin.inf.dpp.project.SarosSessionManager;
 public class ProjectPropertyTester extends PropertyTester {
 
     @Inject
-    SarosSessionManager sarosSessionManager;
+    ISarosSessionManager sarosSessionManager;
 
     public ProjectPropertyTester() {
         SarosPluginContext.initComponent(this);

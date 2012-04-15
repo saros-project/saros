@@ -42,6 +42,7 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
@@ -1220,7 +1221,8 @@ public class SarosSession implements ISarosSession, Disposable {
             List<IResource> childResources = null;
             try {
                 childResources = ArrayUtils.getAdaptableObjects(
-                    ((IContainer) iResource).members(), IResource.class);
+                    ((IContainer) iResource).members(), IResource.class,
+                    Platform.getAdapterManager());
             } catch (CoreException e) {
                 log.debug("Can't get children of Project/Folder. ", e); //$NON-NLS-1$
             }

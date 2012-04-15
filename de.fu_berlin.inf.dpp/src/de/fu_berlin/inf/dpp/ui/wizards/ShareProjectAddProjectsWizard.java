@@ -9,7 +9,7 @@ import org.eclipse.jface.wizard.Wizard;
 import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.SarosPluginContext;
-import de.fu_berlin.inf.dpp.project.SarosSessionManager;
+import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.ui.ImageManager;
 import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.ui.util.CollaborationUtils;
@@ -26,7 +26,7 @@ public class ShareProjectAddProjectsWizard extends Wizard {
     public static final ImageDescriptor IMAGE = ImageManager.WIZBAN_SHARE_PROJECT_ADD_PROJECTS;
 
     @Inject
-    protected SarosSessionManager sarosSessionManager;
+    protected ISarosSessionManager sarosSessionManager;
 
     protected ProjectSelectionWizardPage projectSelectionWizardPage = new ProjectSelectionWizardPage();
 

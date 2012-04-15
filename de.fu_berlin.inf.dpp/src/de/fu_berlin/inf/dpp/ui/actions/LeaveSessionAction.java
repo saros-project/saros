@@ -28,7 +28,7 @@ import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.project.AbstractSarosSessionListener;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
-import de.fu_berlin.inf.dpp.project.SarosSessionManager;
+import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.ui.ImageManager;
 import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.ui.util.CollaborationUtils;
@@ -44,7 +44,7 @@ import de.fu_berlin.inf.dpp.ui.util.CollaborationUtils;
 public class LeaveSessionAction extends Action {
 
     @Inject
-    protected SarosSessionManager sessionManager;
+    protected ISarosSessionManager sessionManager;
 
     public LeaveSessionAction() {
         setToolTipText(Messages.LeaveSessionAction_leave_session_tooltip);

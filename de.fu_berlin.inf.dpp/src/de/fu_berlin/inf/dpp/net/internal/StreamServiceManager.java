@@ -78,8 +78,8 @@ import de.fu_berlin.inf.dpp.observables.SarosSessionObservable;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 import de.fu_berlin.inf.dpp.project.AbstractSarosSessionListener;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
+import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
-import de.fu_berlin.inf.dpp.project.SarosSessionManager;
 import de.fu_berlin.inf.dpp.util.NamedThreadFactory;
 import de.fu_berlin.inf.dpp.util.Utils;
 import de.fu_berlin.inf.dpp.util.ValueChangeListener;
@@ -124,7 +124,7 @@ public class StreamServiceManager implements Startable {
 
     protected SarosNet sarosNet;
 
-    protected SarosSessionManager sessionManager;
+    protected ISarosSessionManager sessionManager;
 
     @Inject
     protected SessionIDObservable sarosSessionID;
@@ -197,7 +197,7 @@ public class StreamServiceManager implements Startable {
         DataTransferManager dataTransferManager,
         SarosSessionObservable sarosSessionObservable,
         SarosNet sarosNet,
-        SarosSessionManager sessionManager,
+        ISarosSessionManager sessionManager,
         List<StreamService> streamServices,
         IncomingTransferObjectExtensionProvider incomingTransferObjectExtensionProvider) {
 

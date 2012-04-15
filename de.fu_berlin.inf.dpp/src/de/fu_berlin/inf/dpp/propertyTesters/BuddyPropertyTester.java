@@ -9,7 +9,7 @@ import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
-import de.fu_berlin.inf.dpp.project.SarosSessionManager;
+import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 
 /**
  * Adds tests to the {@link JID}. <br/>
@@ -19,7 +19,7 @@ import de.fu_berlin.inf.dpp.project.SarosSessionManager;
 public class BuddyPropertyTester extends PropertyTester {
 
     @Inject
-    SarosSessionManager sarosSessionManager;
+    ISarosSessionManager sarosSessionManager;
 
     public BuddyPropertyTester() {
         SarosPluginContext.initComponent(this);

@@ -32,7 +32,7 @@ import de.fu_berlin.inf.dpp.editor.AbstractSharedEditorListener;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.editor.ISharedEditorListener;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
-import de.fu_berlin.inf.dpp.project.SarosSessionManager;
+import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 
 /**
  * A Collector class that collects the number of local follow-mode toggles
@@ -122,7 +122,7 @@ public class FollowModeCollector extends AbstractStatisticCollector {
     };
 
     public FollowModeCollector(StatisticManager statisticManager,
-        SarosSessionManager sessionManager, EditorManager editorManager) {
+        ISarosSessionManager sessionManager, EditorManager editorManager) {
         super(statisticManager, sessionManager);
         editorManager.addSharedEditorListener(editorListener);
     }

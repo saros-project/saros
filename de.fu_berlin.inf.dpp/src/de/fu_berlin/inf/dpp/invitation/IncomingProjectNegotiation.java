@@ -31,6 +31,7 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
@@ -57,6 +58,7 @@ import de.fu_berlin.inf.dpp.observables.SarosSessionObservable;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
 import de.fu_berlin.inf.dpp.project.IChecksumCache;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
+import de.fu_berlin.inf.dpp.project.ISarosSessionListener;
 import de.fu_berlin.inf.dpp.ui.RemoteProgressManager;
 import de.fu_berlin.inf.dpp.ui.wizards.AddProjectToSessionWizard;
 import de.fu_berlin.inf.dpp.ui.wizards.pages.EnterProjectNamePage;
@@ -96,12 +98,16 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
      */
     Map<String, IProject> localProjects;
 
+    protected ISarosSessionListener sessionListener;
+
     protected JID jid;
 
-    public IncomingProjectNegotiation(JID peer, String processID,
-        List<ProjectExchangeInfo> projectInfos, SarosContext sarosContext) {
+    public IncomingProjectNegotiation(ISarosSessionListener sessionListener,
+        JID peer, String processID, List<ProjectExchangeInfo> projectInfos,
+        SarosContext sarosContext) {
         super(peer, sarosContext);
 
+        this.sessionListener = sessionListener;
         this.processID = processID;
         this.projectInfos = projectInfos;
         this.localProjects = new HashMap<String, IProject>();
@@ -205,7 +211,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
                         iProject, projectID, null);
                 }
 
-                sessionManager.notifyProjectAdded(iProject);
+                sessionListener.projectAdded(projectID);
             }
         } catch (Exception e) {
             processException(e);
@@ -969,7 +975,8 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
             // Recurse.
             try {
                 List<IResource> children = ArrayUtils.getAdaptableObjects(
-                    ((IContainer) resource).members(), IResource.class);
+                    ((IContainer) resource).members(), IResource.class,
+                    Platform.getAdapterManager());
                 for (IResource child : children) {
                     if (remoteFileList.getPaths().contains(child.getFullPath()))
                         initVcState(child, vcs, monitor, remoteFileList);

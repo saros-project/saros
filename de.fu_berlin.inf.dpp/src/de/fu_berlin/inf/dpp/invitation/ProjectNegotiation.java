@@ -8,7 +8,7 @@ import de.fu_berlin.inf.dpp.SarosContext;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.observables.ProjectNegotiationObservable;
-import de.fu_berlin.inf.dpp.project.SarosSessionManager;
+import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 
 /**
  * 
@@ -37,7 +37,7 @@ public abstract class ProjectNegotiation {
     protected final String projectIDDelimiter = "&&&&";
 
     @Inject
-    protected SarosSessionManager sessionManager;
+    protected ISarosSessionManager sessionManager;
 
     public ProjectNegotiation(JID peer, SarosContext sarosContext) {
         this.peer = peer;

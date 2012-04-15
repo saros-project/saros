@@ -10,7 +10,7 @@ import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
-import de.fu_berlin.inf.dpp.project.SarosSessionManager;
+import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.ui.util.CollaborationUtils;
 import de.fu_berlin.inf.dpp.ui.util.selection.retriever.SelectionRetrieverFactory;
 
@@ -21,7 +21,7 @@ import de.fu_berlin.inf.dpp.ui.util.selection.retriever.SelectionRetrieverFactor
 public class SharedProjectAddSelectedProjectsHandler extends AbstractHandler {
 
     @Inject
-    protected SarosSessionManager sarosSessionManager;
+    protected ISarosSessionManager sarosSessionManager;
 
     public Object execute(ExecutionEvent event) throws ExecutionException {
         if (sarosSessionManager == null)
@@ -29,8 +29,8 @@ public class SharedProjectAddSelectedProjectsHandler extends AbstractHandler {
 
         List<IResource> selectedResources = SelectionRetrieverFactory
             .getSelectionRetriever(IResource.class).getSelection();
-        CollaborationUtils.addResourcesToSarosSession(
-            sarosSessionManager, selectedResources);
+        CollaborationUtils.addResourcesToSarosSession(sarosSessionManager,
+            selectedResources);
         return null;
     }
 

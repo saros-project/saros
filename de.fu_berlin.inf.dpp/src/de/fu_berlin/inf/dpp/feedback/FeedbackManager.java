@@ -20,13 +20,13 @@ import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
 import de.fu_berlin.inf.dpp.project.AbstractSarosSessionListener;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ISarosSessionListener;
-import de.fu_berlin.inf.dpp.project.SarosSessionManager;
+import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.ui.dialogs.FeedbackDialog;
 import de.fu_berlin.inf.dpp.util.Utils;
 
 /**
  * The FeedbackManager registers himself as a listener with the
- * {@link SarosSessionManager} to show a {@link FeedbackDialog} at the end of a
+ * {@link ISarosSessionManager} to show a {@link FeedbackDialog} at the end of a
  * session. But before he actually shows anything, it is determined from the
  * global preferences if the user wants to participate in general and in which
  * interval.
@@ -136,7 +136,8 @@ public class FeedbackManager extends AbstractFeedbackManager {
     protected Date startTime;
     protected long sessionTime;
 
-    public FeedbackManager(final Saros saros, SarosSessionManager sessionManager) {
+    public FeedbackManager(final Saros saros,
+        ISarosSessionManager sessionManager) {
         super(saros);
         // listen for start and end of a session
         sessionManager.addSarosSessionListener(sessionListener);

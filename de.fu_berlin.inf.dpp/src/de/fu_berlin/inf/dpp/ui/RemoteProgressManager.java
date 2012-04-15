@@ -29,8 +29,8 @@ import de.fu_berlin.inf.dpp.project.AbstractSharedProjectListener;
 import de.fu_berlin.inf.dpp.project.IActivityProvider;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ISarosSessionListener;
+import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
-import de.fu_berlin.inf.dpp.project.SarosSessionManager;
 import de.fu_berlin.inf.dpp.util.StackTrace;
 import de.fu_berlin.inf.dpp.util.Utils;
 
@@ -44,7 +44,7 @@ public class RemoteProgressManager {
     private static final Logger log = Logger
         .getLogger(RemoteProgressManager.class);
 
-    protected SarosSessionManager sessionManager;
+    protected ISarosSessionManager sessionManager;
 
     protected ISarosSession sarosSession;
 
@@ -242,7 +242,7 @@ public class RemoteProgressManager {
         }
     };
 
-    public RemoteProgressManager(SarosSessionManager sessionManager) {
+    public RemoteProgressManager(ISarosSessionManager sessionManager) {
         this.sessionManager = sessionManager;
         this.sessionManager.addSarosSessionListener(sessionListener);
     }

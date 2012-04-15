@@ -93,6 +93,7 @@ import de.fu_berlin.inf.dpp.optional.jdt.JDTFacade;
 import de.fu_berlin.inf.dpp.preferences.PreferenceManager;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
 import de.fu_berlin.inf.dpp.project.IChecksumCache;
+import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.project.SarosRosterListener;
 import de.fu_berlin.inf.dpp.project.SarosSessionManager;
 import de.fu_berlin.inf.dpp.project.SharedResourcesManager;
@@ -219,7 +220,7 @@ public class SarosContext {
         Component.create(PreferenceUtils.class),
         Component.create(PermissionManager.class),
         Component.create(SarosUI.class),
-        Component.create(SarosSessionManager.class),
+        Component.create(ISarosSessionManager.class, SarosSessionManager.class),
         Component.create(SessionViewOpener.class),
         Component.create(SharedResourcesManager.class),
         Component.create(StatisticManager.class),

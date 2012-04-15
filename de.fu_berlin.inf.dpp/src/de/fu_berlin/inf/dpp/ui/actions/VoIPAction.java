@@ -20,14 +20,14 @@ import de.fu_berlin.inf.dpp.communication.audio.AudioServiceManager;
 import de.fu_berlin.inf.dpp.net.internal.StreamServiceManager;
 import de.fu_berlin.inf.dpp.net.internal.StreamSession;
 import de.fu_berlin.inf.dpp.observables.VoIPSessionObservable;
-import de.fu_berlin.inf.dpp.project.SarosSessionManager;
+import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.ui.ImageManager;
 import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.ui.dialogs.ErrorMessageDialog;
 import de.fu_berlin.inf.dpp.ui.dialogs.WarningMessageDialog;
-import de.fu_berlin.inf.dpp.ui.views.SarosView;
 import de.fu_berlin.inf.dpp.ui.util.selection.SelectionUtils;
 import de.fu_berlin.inf.dpp.ui.util.selection.retriever.SelectionRetrieverFactory;
+import de.fu_berlin.inf.dpp.ui.views.SarosView;
 import de.fu_berlin.inf.dpp.util.ValueChangeListener;
 
 /**
@@ -61,7 +61,7 @@ public class VoIPAction extends Action {
     };
 
     @Inject
-    protected SarosSessionManager sessionManager;
+    protected ISarosSessionManager sessionManager;
 
     protected StreamServiceManager streamServiceManager;
 
@@ -113,10 +113,9 @@ public class VoIPAction extends Action {
                 }
 
                 if (!audioServiceManager.isRecordConfigured()) {
-                    WarningMessageDialog
-                        .showWarningMessage(
-                            Messages.VoIPAction_warning_no_record_device_title,
-                            Messages.VoIPAction_warning_no_record_device_text);
+                    WarningMessageDialog.showWarningMessage(
+                        Messages.VoIPAction_warning_no_record_device_title,
+                        Messages.VoIPAction_warning_no_record_device_text);
                     audioServiceManager.setRecordDeviceOk(false);
                 }
 

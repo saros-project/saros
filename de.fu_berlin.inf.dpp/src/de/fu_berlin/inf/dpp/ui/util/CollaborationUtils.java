@@ -28,7 +28,7 @@ import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
-import de.fu_berlin.inf.dpp.project.SarosSessionManager;
+import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.project.internal.SarosSession;
 import de.fu_berlin.inf.dpp.ui.BalloonNotification;
 import de.fu_berlin.inf.dpp.ui.Messages;
@@ -57,7 +57,7 @@ public class CollaborationUtils {
      * @nonBlocking
      */
     public static void shareResourcesWith(
-        final SarosSessionManager sarosSessionManager,
+        final ISarosSessionManager sarosSessionManager,
         List<IResource> selectedResources, final List<JID> buddies) {
 
         final HashMap<IProject, List<IResource>> newResources = acquireResources(
@@ -99,7 +99,7 @@ public class CollaborationUtils {
      * @param sarosSessionManager
      */
     public static void leaveSession(
-        final SarosSessionManager sarosSessionManager) {
+        final ISarosSessionManager sarosSessionManager) {
         ISarosSession sarosSession = sarosSessionManager.getSarosSession();
 
         Shell shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow()
@@ -151,7 +151,7 @@ public class CollaborationUtils {
      * @nonBlocking
      */
     public static void addResourcesToSarosSession(
-        final SarosSessionManager sarosSessionManager,
+        final ISarosSessionManager sarosSessionManager,
         List<IResource> resourcesToAdd) {
         final ISarosSession sarosSession = sarosSessionManager
             .getSarosSession();
@@ -187,7 +187,7 @@ public class CollaborationUtils {
      * @nonBlocking
      */
     public static void addBuddiesToSarosSession(
-        final SarosSessionManager sarosSessionManager, final List<JID> buddies) {
+        final ISarosSessionManager sarosSessionManager, final List<JID> buddies) {
 
         Utils.runSafeAsync(log, new Runnable() {
             public void run() {

@@ -31,7 +31,7 @@ import de.fu_berlin.inf.dpp.communication.audio.AudioServiceManager;
 import de.fu_berlin.inf.dpp.communication.audio.IAudioServiceListener;
 import de.fu_berlin.inf.dpp.net.internal.StreamSession;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
-import de.fu_berlin.inf.dpp.project.SarosSessionManager;
+import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 
 /**
  * A Collector which collects information about VoIP usage. It calculates the
@@ -106,7 +106,7 @@ public class VoIPCollector extends AbstractStatisticCollector {
     };
 
     public VoIPCollector(StatisticManager statisticManager,
-        SarosSessionManager sessionManager, AudioServiceManager audioManager) {
+        ISarosSessionManager sessionManager, AudioServiceManager audioManager) {
         super(statisticManager, sessionManager);
 
         audioManager.addAudioListener(audioListener);

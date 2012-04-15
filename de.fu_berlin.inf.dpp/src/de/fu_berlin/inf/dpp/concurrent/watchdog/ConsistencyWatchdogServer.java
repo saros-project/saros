@@ -28,7 +28,7 @@ import de.fu_berlin.inf.dpp.net.internal.XMPPTransmitter;
 import de.fu_berlin.inf.dpp.project.AbstractActivityProvider;
 import de.fu_berlin.inf.dpp.project.AbstractSarosSessionListener;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
-import de.fu_berlin.inf.dpp.project.SarosSessionManager;
+import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.util.Utils;
 
 /**
@@ -68,7 +68,7 @@ public class ConsistencyWatchdogServer extends Job {
     @Inject
     protected XMPPTransmitter transmitter;
 
-    protected SarosSessionManager sessionManager;
+    protected ISarosSessionManager sessionManager;
 
     protected ISarosSession sarosSession;
 
@@ -79,7 +79,7 @@ public class ConsistencyWatchdogServer extends Job {
         }
     };
 
-    public ConsistencyWatchdogServer(SarosSessionManager sessionManager) {
+    public ConsistencyWatchdogServer(ISarosSessionManager sessionManager) {
         super("ConsistencyWatchdog");
 
         this.sessionManager = sessionManager;

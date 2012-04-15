@@ -3,7 +3,7 @@ package de.fu_berlin.inf.dpp.feedback;
 import de.fu_berlin.inf.dpp.project.AbstractSarosSessionListener;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ISarosSessionListener;
-import de.fu_berlin.inf.dpp.project.SarosSessionManager;
+import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 
 /**
  * Abstract base class for a StatisticCollector which registers itself with a
@@ -52,7 +52,7 @@ public abstract class AbstractStatisticCollector {
      * @param sessionManager
      */
     public AbstractStatisticCollector(StatisticManager statisticManager,
-        SarosSessionManager sessionManager) {
+        ISarosSessionManager sessionManager) {
         this.statisticManager = statisticManager;
         this.data = new SessionStatistic();
 

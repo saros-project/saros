@@ -28,7 +28,7 @@ import de.fu_berlin.inf.dpp.editor.AbstractSharedEditorListener;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.editor.ISharedEditorListener;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
-import de.fu_berlin.inf.dpp.project.SarosSessionManager;
+import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 
 /**
  * This Collector collects data about the jump feature usage. It stores data
@@ -56,7 +56,7 @@ public class JumpFeatureUsageCollector extends AbstractStatisticCollector {
     };
 
     public JumpFeatureUsageCollector(StatisticManager statisticManager,
-        SarosSessionManager sessionManager, EditorManager editorManager) {
+        ISarosSessionManager sessionManager, EditorManager editorManager) {
         super(statisticManager, sessionManager);
         editorManager.addSharedEditorListener(editorListener);
     }

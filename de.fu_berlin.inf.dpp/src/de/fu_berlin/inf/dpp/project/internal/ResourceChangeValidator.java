@@ -18,8 +18,8 @@ import de.fu_berlin.inf.dpp.User.Permission;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.project.AbstractSarosSessionListener;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
+import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.project.Messages;
-import de.fu_berlin.inf.dpp.project.SarosSessionManager;
 
 /**
  * This model provider is responsible for warning a session participant when
@@ -99,7 +99,7 @@ public class ResourceChangeValidator extends ModelProvider {
     }
 
     @Inject
-    protected SarosSessionManager sessionManager;
+    protected ISarosSessionManager sessionManager;
 
     @Override
     protected void initialize() {

@@ -1,5 +1,6 @@
 package de.fu_berlin.inf.dpp.project;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 
@@ -8,6 +9,7 @@ import org.eclipse.core.resources.IResource;
 import org.jivesoftware.smack.XMPPException;
 import org.joda.time.DateTime;
 
+import de.fu_berlin.inf.dpp.FileList;
 import de.fu_berlin.inf.dpp.activities.ProjectExchangeInfo;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.communication.muc.negotiation.MUCSessionPreferences;
@@ -68,11 +70,6 @@ public interface ISarosSessionManager {
     public void stopSarosSession();
 
     /**
-     * Sets the sessionID to <code>NOT_IN_SESSION</code>
-     */
-    public void clearSessionID();
-
-    /**
      * Add the given session listener. Is ignored if the listener is already
      * listening.
      * 
@@ -111,5 +108,44 @@ public interface ISarosSessionManager {
      */
     public void startSharingProjects(JID user,
         List<ProjectExchangeInfo> projectExchangeInfos);
+
+    /**
+     * Invites a user to the shared project.
+     * 
+     * @param toInvite
+     *            the JID of the user that is to be invited.
+     */
+    public void invite(JID toInvite, String description);
+
+    /**
+     * Invites users to the shared project.
+     * 
+     * @param jidsToInvite
+     *            the JIDs of the users that should be invited.
+     */
+    public void invite(Collection<JID> jidsToInvite, String description);
+
+    /**
+     * Adds project resources to an existing session.
+     * 
+     * @param projectResourcesMapping
+     * 
+     */
+    public void addResourcesToSession(
+        HashMap<IProject, List<IResource>> projectResourcesMapping);
+
+    /**
+     * This method is called when a new project was added to the session
+     * 
+     * @param from
+     *            The one who added the project.
+     * @param projectInfos
+     *            what projects where added ({@link FileList}, projectName etc.)
+     *            see: {@link ProjectExchangeInfo}
+     * @param processID
+     *            ID of the exchanging process
+     */
+    public void incomingProjectReceived(JID from, final SarosUI sarosUI,
+        List<ProjectExchangeInfo> projectInfos, String processID);
 
 }

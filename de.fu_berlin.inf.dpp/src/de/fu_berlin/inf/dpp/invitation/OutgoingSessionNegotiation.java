@@ -8,12 +8,15 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.jivesoftware.smack.packet.Packet;
 import org.picocontainer.annotations.Inject;
 
+import de.fu_berlin.inf.dpp.FileList;
+import de.fu_berlin.inf.dpp.FileListFactory;
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.SarosContext;
 import de.fu_berlin.inf.dpp.User;
@@ -38,8 +41,11 @@ import de.fu_berlin.inf.dpp.net.internal.XMPPReceiver;
 import de.fu_berlin.inf.dpp.net.internal.XMPPTransmitter;
 import de.fu_berlin.inf.dpp.net.internal.extensions.PacketExtensionUtils;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
+import de.fu_berlin.inf.dpp.project.IChecksumCache;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
-import de.fu_berlin.inf.dpp.project.SarosSessionManager;
+import de.fu_berlin.inf.dpp.project.ISarosSessionListener;
+import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
+import de.fu_berlin.inf.dpp.project.Messages;
 import de.fu_berlin.inf.dpp.ui.wizards.InvitationWizard;
 import de.fu_berlin.inf.dpp.util.Utils;
 import de.fu_berlin.inf.dpp.util.VersionManager;
@@ -105,13 +111,19 @@ public class OutgoingSessionNegotiation extends InvitationProcess {
     protected DataTransferManager dataTransferManager;
 
     @Inject
-    protected SarosSessionManager sessionManager;
+    protected ISarosSessionManager sessionManager;
 
-    public OutgoingSessionNegotiation(JID peer, int colorID,
-        ISarosSession sarosSession, String description,
+    @Inject
+    protected IChecksumCache checksumCache;
+
+    protected ISarosSessionListener sessionListener;
+
+    public OutgoingSessionNegotiation(ISarosSessionListener sessionListener,
+        JID peer, int colorID, ISarosSession sarosSession, String description,
         SarosContext sarosContext) {
         super(peer, description, colorID, sarosContext);
 
+        this.sessionListener = sessionListener;
         this.sarosSession = sarosSession;
 
     }
@@ -184,16 +196,15 @@ public class OutgoingSessionNegotiation extends InvitationProcess {
             editorManager.setAllLocalOpenedEditorsLocked(true);
             // FIXME lock the projects on the workspace !
 
-            List<ProjectExchangeInfo> projectExchangeInfos = sarosSessionManager
-                .createProjectExchangeInfoList(new ArrayList<IProject>(
-                    sarosSession.getProjects()), monitor.newChild(85,
-                    SubMonitor.SUPPRESS_NONE));
+            List<ProjectExchangeInfo> projectExchangeInfos = createProjectExchangeInfoList(
+                new ArrayList<IProject>(sarosSession.getProjects()),
+                monitor.newChild(85, SubMonitor.SUPPRESS_NONE));
             monitor.subTask("");
 
             completeInvitation(monitor.newChild(5, SubMonitor.SUPPRESS_NONE),
                 projectExchangeInfos);
 
-            sarosSessionManager.notifyPostOutgoingInvitationCompleted(
+            sessionListener.postOutgoingInvitationCompleted(
                 monitor.newChild(0, SubMonitor.SUPPRESS_ALL_LABELS), newUser);
 
         } catch (LocalCancellationException e) {
@@ -635,5 +646,55 @@ public class OutgoingSessionNegotiation extends InvitationProcess {
             .createCollector(PacketExtensionUtils
                 .getInvitationFilter(new UserListRequestExtensionProvider(),
                     sessionID, invitationID));
+    }
+
+    /**
+     * Method to create list of ProjectExchangeInfo.
+     * 
+     * @param projectsToShare
+     *            List of projects initially to share
+     * @param subMonitor
+     *            Show progress
+     * @return
+     * @throws LocalCancellationException
+     */
+    protected List<ProjectExchangeInfo> createProjectExchangeInfoList(
+        List<IProject> projectsToShare, SubMonitor subMonitor)
+        throws LocalCancellationException {
+
+        subMonitor.beginTask(Messages.SarosSessionManager_creating_file_list,
+            projectsToShare.size());
+
+        List<ProjectExchangeInfo> pInfos = new ArrayList<ProjectExchangeInfo>(
+            projectsToShare.size());
+
+        for (IProject iProject : projectsToShare) {
+            if (subMonitor.isCanceled())
+                throw new LocalCancellationException(null,
+                    CancelOption.DO_NOT_NOTIFY_PEER);
+            try {
+                String projectID = sarosSession.getProjectID(iProject);
+                String projectName = iProject.getName();
+
+                FileList projectFileList = FileListFactory.createFileList(
+                    iProject, sarosSession.getSharedResources(iProject),
+                    checksumCache, sarosSession.useVersionControl(),
+                    subMonitor.newChild(100 / projectsToShare.size()));
+
+                projectFileList.setProjectID(projectID);
+                boolean partial = !sarosSession.isCompletelyShared(iProject);
+
+                ProjectExchangeInfo pInfo = new ProjectExchangeInfo(projectID,
+                    "", projectName, partial, projectFileList); //$NON-NLS-1$
+                pInfos.add(pInfo);
+
+            } catch (CoreException e) {
+                throw new LocalCancellationException(e.getMessage(),
+                    CancelOption.DO_NOT_NOTIFY_PEER);
+            }
+        }
+        subMonitor.subTask("");
+        subMonitor.done();
+        return pInfos;
     }
 }

@@ -10,7 +10,7 @@ import de.fu_berlin.inf.dpp.net.NetTransferMode;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
 import de.fu_berlin.inf.dpp.net.internal.IByteStreamConnection;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
-import de.fu_berlin.inf.dpp.project.SarosSessionManager;
+import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.util.Function;
 import de.fu_berlin.inf.dpp.util.Pair;
 
@@ -84,7 +84,7 @@ public class DataTransferCollector extends AbstractStatisticCollector {
     protected List<TransferEvent> transferEvents = new ArrayList<TransferEvent>();
 
     public DataTransferCollector(StatisticManager statisticManager,
-        SarosSessionManager sessionManager,
+        ISarosSessionManager sessionManager,
         DataTransferManager dataTransferManager) {
         super(statisticManager, sessionManager);
         this.dataTransferManager = dataTransferManager;

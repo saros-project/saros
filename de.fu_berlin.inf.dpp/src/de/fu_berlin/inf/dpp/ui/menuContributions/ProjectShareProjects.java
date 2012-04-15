@@ -22,7 +22,7 @@ import org.picocontainer.annotations.Inject;
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.project.SarosSessionManager;
+import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.ui.util.CollaborationUtils;
 import de.fu_berlin.inf.dpp.ui.util.selection.retriever.SelectionRetrieverFactory;
@@ -38,7 +38,7 @@ public class ProjectShareProjects extends ContributionItem {
     protected Saros saros;
 
     @Inject
-    protected SarosSessionManager sarosSessionManager;
+    protected ISarosSessionManager sarosSessionManager;
 
     protected WorkbenchLabelProvider workbenchLabelProvider = new WorkbenchLabelProvider();
 
@@ -125,7 +125,8 @@ public class ProjectShareProjects extends ContributionItem {
      */
     protected MenuItem createNoProjectsMenuItem(Menu parentMenu, int index) {
         MenuItem menuItem = new MenuItem(parentMenu, SWT.NONE, index);
-        menuItem.setText(Messages.ProjectShareProjects_no_projects_in_workspace);
+        menuItem
+            .setText(Messages.ProjectShareProjects_no_projects_in_workspace);
         menuItem.setEnabled(false);
         return menuItem;
     }

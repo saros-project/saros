@@ -45,7 +45,7 @@ import de.fu_berlin.inf.dpp.net.IConnectionListener;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.util.RosterUtils;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
-import de.fu_berlin.inf.dpp.project.SarosSessionManager;
+import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.ui.util.selection.SelectionUtils;
 import de.fu_berlin.inf.dpp.ui.util.selection.retriever.SelectionRetrieverFactory;
@@ -73,7 +73,7 @@ public class DeleteContactAction extends Action implements Disposable {
     protected Saros saros;
 
     @Inject
-    protected SarosSessionManager sessionManager;
+    protected ISarosSessionManager sessionManager;
 
     protected final String DELETE_ERROR_IN_SESSION = Messages.DeleteContactAction_delete_error_in_session;
 
@@ -111,7 +111,9 @@ public class DeleteContactAction extends Action implements Disposable {
         StringBuilder sb = new StringBuilder();
         String name = entry.getName();
         if (name != null && name.trim().length() > 0) {
-            sb.append(Messages.DeleteContactAction_name_begin_deco).append(name).append(Messages.DeleteContactAction_name_end_deco);
+            sb.append(Messages.DeleteContactAction_name_begin_deco)
+                .append(name)
+                .append(Messages.DeleteContactAction_name_end_deco);
         }
         sb.append(entry.getUser());
         return sb.toString();
@@ -162,8 +164,9 @@ public class DeleteContactAction extends Action implements Disposable {
             }
         }
 
-        if (MessageDialog.openQuestion(null, Messages.DeleteContactAction_confirm_title, MessageFormat
-            .format(Messages.DeleteContactAction_confirm_message,
+        if (MessageDialog.openQuestion(null,
+            Messages.DeleteContactAction_confirm_title, MessageFormat.format(
+                Messages.DeleteContactAction_confirm_message,
                 toString(rosterEntry)))) {
 
             try {

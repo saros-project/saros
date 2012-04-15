@@ -83,8 +83,8 @@ import de.fu_berlin.inf.dpp.project.AbstractSharedProjectListener;
 import de.fu_berlin.inf.dpp.project.IActivityProvider;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ISarosSessionListener;
+import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
-import de.fu_berlin.inf.dpp.project.SarosSessionManager;
 import de.fu_berlin.inf.dpp.synchronize.Blockable;
 import de.fu_berlin.inf.dpp.ui.views.SarosView;
 import de.fu_berlin.inf.dpp.util.BlockingProgressMonitor;
@@ -426,7 +426,8 @@ public class EditorManager extends AbstractActivityProvider {
     /**
      * @Inject
      */
-    public EditorManager(SarosSessionManager sessionManager, EditorAPI editorApi) {
+    public EditorManager(ISarosSessionManager sessionManager,
+        EditorAPI editorApi) {
 
         log.trace("EditorManager initialized");
 

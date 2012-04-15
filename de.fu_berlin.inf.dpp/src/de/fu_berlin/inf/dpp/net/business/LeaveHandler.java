@@ -12,7 +12,7 @@ import de.fu_berlin.inf.dpp.net.internal.extensions.LeaveExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.PacketExtensionUtils;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
-import de.fu_berlin.inf.dpp.project.SarosSessionManager;
+import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.ui.views.SarosView;
 import de.fu_berlin.inf.dpp.util.Utils;
 
@@ -26,11 +26,11 @@ public class LeaveHandler {
     private static final Logger log = Logger.getLogger(LeaveHandler.class
         .getName());
 
-    protected SarosSessionManager sessionManager;
+    protected ISarosSessionManager sessionManager;
 
     protected Handler handler;
 
-    public LeaveHandler(SarosSessionManager sessionManager,
+    public LeaveHandler(ISarosSessionManager sessionManager,
         XMPPReceiver receiver, SessionIDObservable sessionIDObservable) {
 
         this.sessionManager = sessionManager;

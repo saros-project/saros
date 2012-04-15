@@ -38,7 +38,7 @@ import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.editor.ISharedEditorListener;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
-import de.fu_berlin.inf.dpp.project.SarosSessionManager;
+import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.util.Utils;
 
 /**
@@ -50,8 +50,7 @@ import de.fu_berlin.inf.dpp.util.Utils;
  * e.g. when a new line is started), how many text edit activityDataObjects he
  * produced (which can be different to the number of characters he wrote, e.g.
  * when copy&paste or Eclipse's method generation was used) and how concurrent
- * the local user's writing was to buddies using different sample
- * intervals. <br>
+ * the local user's writing was to buddies using different sample intervals. <br>
  * Furthermore, it accumulates the characters edited for all remote
  * participants. <br>
  * A little addition was made to track possible paste / auto generations. If a
@@ -60,15 +59,15 @@ import de.fu_berlin.inf.dpp.util.Utils;
  * The threshold was chosen to be 16 due to some testing. The characters within
  * a textEditActivity heavily depends on the connection speed. When a the local
  * user fires several textEdits within a short interval he might see those edits
- * as several single edits with a few characters but a buddy will most
- * likely get less textEditActivities containing a bunch of characters. The
- * manual tests results were: When "typing" (rather thrashing the keyboard) as
- * fast as one could, the buddy received text edits with up to 20
- * characters. As this typing speed is beyond human capabilities, I've decided
- * to set the threshold to 16 which will most likely prevent getting false
- * positives (e.g. a really fast typer is typing instead of a paste).
- * Unfortunately, this relatively high threshold will cause the collector to
- * slip some true pastes as well. (E.g. an auto completion of a comment block)
+ * as several single edits with a few characters but a buddy will most likely
+ * get less textEditActivities containing a bunch of characters. The manual
+ * tests results were: When "typing" (rather thrashing the keyboard) as fast as
+ * one could, the buddy received text edits with up to 20 characters. As this
+ * typing speed is beyond human capabilities, I've decided to set the threshold
+ * to 16 which will most likely prevent getting false positives (e.g. a really
+ * fast typer is typing instead of a paste). Unfortunately, this relatively high
+ * threshold will cause the collector to slip some true pastes as well. (E.g. an
+ * auto completion of a comment block)
  * 
  * NOTE: Text edit activityDataObjects that are triggered by Eclipse (e.g. when
  * restoring an editor) are counted as well. And refactorings can produce quite
@@ -111,8 +110,8 @@ import de.fu_berlin.inf.dpp.util.Utils;
  * null) { currentPasteCount = 0; } possiblePastes.put(id, currentPasteCount +
  * 1);
  * 
- * TODO: synchronize the numbers the buddies get with the other collectors
- * (E.g. Alice as buddy should appear as user.2 in all statistic fields.
+ * TODO: synchronize the numbers the buddies get with the other collectors (E.g.
+ * Alice as buddy should appear as user.2 in all statistic fields.
  * 
  * @author Lisa Dohrmann, Moritz von Hoffen
  */
@@ -258,7 +257,7 @@ public class TextEditCollector extends AbstractStatisticCollector {
     };
 
     public TextEditCollector(StatisticManager statisticManager,
-        SarosSessionManager sessionManager, EditorManager editorManager) {
+        ISarosSessionManager sessionManager, EditorManager editorManager) {
         super(statisticManager, sessionManager);
 
         editorManager.addSharedEditorListener(editorListener);
@@ -276,8 +275,8 @@ public class TextEditCollector extends AbstractStatisticCollector {
     protected void processGatheredData() {
 
         /*
-         * a variable to distinguish between buddies and assign a number to
-         * each of these buddies.
+         * a variable to distinguish between buddies and assign a number to each
+         * of these buddies.
          */
         int userNumber = 1;
 

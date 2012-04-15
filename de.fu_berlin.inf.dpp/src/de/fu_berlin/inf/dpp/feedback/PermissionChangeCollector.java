@@ -12,8 +12,8 @@ import de.fu_berlin.inf.dpp.User.Permission;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.project.AbstractSharedProjectListener;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
+import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
-import de.fu_berlin.inf.dpp.project.SarosSessionManager;
 
 /**
  * Collects the {@link Permission} changes of the local user. It is measured how
@@ -74,7 +74,7 @@ public class PermissionChangeCollector extends AbstractStatisticCollector {
     };
 
     public PermissionChangeCollector(StatisticManager statisticManager,
-        SarosSessionManager sessionManager) {
+        ISarosSessionManager sessionManager) {
         super(statisticManager, sessionManager);
     }
 
