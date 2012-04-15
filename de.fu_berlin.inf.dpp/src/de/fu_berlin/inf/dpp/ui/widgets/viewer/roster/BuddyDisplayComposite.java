@@ -3,6 +3,7 @@ package de.fu_berlin.inf.dpp.ui.widgets.viewer.roster;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.StructuredViewer;
 import org.eclipse.jface.viewers.TreeViewer;
@@ -115,7 +116,8 @@ public class BuddyDisplayComposite extends ViewerComposite {
      */
     public List<JID> getBuddies() {
         List<RosterEntryElement> objects = collectAllRosterEntryElement((TreeViewer) this.viewer);
-        return ArrayUtils.getAdaptableObjects(objects.toArray(), JID.class);
+        return ArrayUtils.getAdaptableObjects(objects.toArray(), JID.class,
+            Platform.getAdapterManager());
     }
 
     /**

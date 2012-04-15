@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.viewers.CheckStateChangedEvent;
 import org.eclipse.jface.viewers.CheckboxTableViewer;
 import org.eclipse.jface.viewers.ICheckStateListener;
@@ -84,9 +85,9 @@ public class BaseProjectSelectionComposite extends ProjectDisplayComposite {
         Object[] checkedElements = checkboxTableViewer.getCheckedElements();
 
         List<IProject> allProjects = ArrayUtils.getAdaptableObjects(
-            allElements, IProject.class);
+            allElements, IProject.class, Platform.getAdapterManager());
         List<IProject> checkedProjects = ArrayUtils.getAdaptableObjects(
-            checkedElements, IProject.class);
+            checkedElements, IProject.class, Platform.getAdapterManager());
 
         Map<IProject, Boolean> checkStatesChanges = calculateCheckStateDiff(
             allProjects, checkedProjects, projects);

@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.viewers.StructuredViewer;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.swt.widgets.Composite;
@@ -84,7 +85,8 @@ public class ProjectDisplayComposite extends ViewerComposite {
             .getContentProvider();
         Object[] objects = contentProvider
             .getElements(((TableViewer) this.viewer).getInput());
-        return ArrayUtils.getAdaptableObjects(objects, IProject.class);
+        return ArrayUtils.getAdaptableObjects(objects, IProject.class,
+            Platform.getAdapterManager());
     }
 
     @Override

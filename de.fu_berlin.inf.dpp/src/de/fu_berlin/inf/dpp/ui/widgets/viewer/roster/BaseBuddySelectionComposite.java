@@ -110,7 +110,7 @@ public class BaseBuddySelectionComposite extends BuddyDisplayComposite {
         List<RosterEntryElement> allElements = collectAllRosterEntryElement(treeViewer);
         List<RosterEntryElement> checkedElements = ArrayUtils
             .getAdaptableObjects(treeViewer.getCheckedElements(),
-                RosterEntryElement.class);
+                RosterEntryElement.class, Platform.getAdapterManager());
         List<RosterEntryElement> elementsToCheck = new ArrayList<RosterEntryElement>();
         for (JID buddy : buddies) {
             elementsToCheck.add(new RosterEntryElement(saros.getSarosNet()

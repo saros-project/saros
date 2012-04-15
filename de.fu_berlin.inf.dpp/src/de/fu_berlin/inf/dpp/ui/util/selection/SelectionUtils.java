@@ -3,6 +3,7 @@ package de.fu_berlin.inf.dpp.ui.util.selection;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ui.IEditorReference;
@@ -97,16 +98,14 @@ public class SelectionUtils {
         ISelection selection, Class<? extends Adapter> adapter) {
         List<Object> objectsToAdapt = new ArrayList<Object>();
 
-        if (selection == null) {
-            // do nothing
-        } else if (selection instanceof IStructuredSelection) {
+        if (selection instanceof IStructuredSelection) {
             IStructuredSelection structuredSelection = (IStructuredSelection) selection;
             for (Object structuredSelectionItem : structuredSelection.toArray()) {
                 objectsToAdapt.add(structuredSelectionItem);
             }
         }
-        return ArrayUtils
-            .getAdaptableObjects(objectsToAdapt.toArray(), adapter);
-    }
 
+        return ArrayUtils.getAdaptableObjects(objectsToAdapt.toArray(),
+            adapter, Platform.getAdapterManager());
+    }
 }

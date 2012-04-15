@@ -14,6 +14,7 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.viewers.CheckStateChangedEvent;
 import org.eclipse.jface.viewers.CheckboxTreeViewer;
 import org.eclipse.jface.viewers.ICheckStateListener;
@@ -32,7 +33,7 @@ import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
-import de.fu_berlin.inf.dpp.project.SarosSessionManager;
+import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.ui.widgets.viewer.project.events.BaseResourceSelectionListener;
 import de.fu_berlin.inf.dpp.ui.widgets.viewer.project.events.ResourceSelectionChangedEvent;
 import de.fu_berlin.inf.dpp.util.ArrayUtils;
@@ -466,7 +467,7 @@ public abstract class BaseResourceSelectionComposite extends
     }
 
     @Inject
-    protected SarosSessionManager sessionManager;
+    protected ISarosSessionManager sessionManager;
 
     /**
      * Filter for already shared resources.
@@ -508,9 +509,9 @@ public abstract class BaseResourceSelectionComposite extends
         Object[] checkedElements = checkboxTreeViewer.getCheckedElements();
 
         List<IResource> allResources = ArrayUtils.getAdaptableObjects(
-            allElements, IResource.class);
+            allElements, IResource.class, Platform.getAdapterManager());
         List<IResource> checkedResources = ArrayUtils.getAdaptableObjects(
-            checkedElements, IResource.class);
+            checkedElements, IResource.class, Platform.getAdapterManager());
 
         Map<IResource, Boolean> checkStatesChanges = calculateCheckStateDiff(
             allResources, checkedResources, resources);
@@ -572,9 +573,11 @@ public abstract class BaseResourceSelectionComposite extends
         CheckboxTreeViewer checkboxTreeViewer = ((CheckboxTreeViewer) this.viewer);
 
         List<IResource> resources = ArrayUtils.getAdaptableObjects(
-            checkboxTreeViewer.getCheckedElements(), IResource.class);
+            checkboxTreeViewer.getCheckedElements(), IResource.class,
+            Platform.getAdapterManager());
         resources.removeAll(ArrayUtils.getAdaptableObjects(
-            checkboxTreeViewer.getGrayedElements(), IResource.class));
+            checkboxTreeViewer.getGrayedElements(), IResource.class,
+            Platform.getAdapterManager()));
         return resources;
     }
 

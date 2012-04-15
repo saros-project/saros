@@ -5,6 +5,7 @@ import java.util.List;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.viewers.StructuredViewer;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.SWT;
@@ -85,7 +86,8 @@ public class ResourceDisplayComposite extends ViewerComposite {
             .getContentProvider();
 
         Object[] objects = contentProvider.getElements(this.viewer.getInput());
-        return ArrayUtils.getAdaptableObjects(objects, IResource.class);
+        return ArrayUtils.getAdaptableObjects(objects, IResource.class,
+            Platform.getAdapterManager());
     }
 
     /**
@@ -99,7 +101,8 @@ public class ResourceDisplayComposite extends ViewerComposite {
 
         Object[] objects = contentProvider
             .getElements(((TreeViewer) this.viewer).getInput());
-        return ArrayUtils.getAdaptableObjects(objects, IProject.class).size();
+        return ArrayUtils.getAdaptableObjects(objects, IProject.class,
+            Platform.getAdapterManager()).size();
     }
 
     @Override
