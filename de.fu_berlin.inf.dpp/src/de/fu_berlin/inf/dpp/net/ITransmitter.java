@@ -26,12 +26,11 @@ import java.util.List;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
-import org.jivesoftware.smack.packet.IQ;
 import org.jivesoftware.smack.packet.Packet;
 
 import de.fu_berlin.inf.dpp.FileList;
 import de.fu_berlin.inf.dpp.User;
-import de.fu_berlin.inf.dpp.activities.business.FileActivity;
+import de.fu_berlin.inf.dpp.activities.business.FileActivity.Type;
 import de.fu_berlin.inf.dpp.activities.serializable.FileActivityDataObject;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
@@ -192,9 +191,8 @@ public interface ITransmitter {
      * Sends given list of TimedActivities to the given recipient.
      * 
      * This list MUST not contain any {@link FileActivityDataObject}s where
-     * {@link FileActivityDataObject#getType()} ==
-     * {@link FileActivity.Type#Created} as binary data is not supported in
-     * messages bodies.
+     * {@link FileActivityDataObject#getType()} == {@link Type#Created} as
+     * binary data is not supported in messages bodies.
      * 
      * @param recipient
      *            The JID of the user who is to receive the given list of timed
@@ -216,19 +214,27 @@ public interface ITransmitter {
         List<TimedActivityDataObject> timedActivities);
 
     /**
-     * Sends a query, a {@link IQ.Type} GET, to the user with given {@link JID}.
+     * Sends a {@link org.jivesoftware.smack.packet.IQ.Type#GET} query to the
+     * user with given {@link JID}.
      * 
+     * <pre>
      * Example using provider:
-     * <p>
-     * <code>XStreamExtensionProvider<VersionInfo> versionProvider = new
-     * XStreamExtensionProvider<VersionInfo>( "sarosVersion", VersionInfo.class,
-     * Version.class, Compatibility.class);<br>
+     * 
+     * <code>XStreamExtensionProvider<VersionInfo> versionProvider = 
+     * new XStreamExtensionProvider<VersionInfo>
+     * (
+     *   "sarosVersion",
+     *    VersionInfo.class, 
+     *    Version.class, 
+     *    Compatibility.class
+     * );
      * sendQuery(jid, versionProvider, 5000);
      * </code>
-     * </p>
+     * 
      * In this example this sends a request to the user with jid and waits 5
      * seconds for an answer. If it arrives in time, a payload of type T (in
      * this case VersionInfo) will be returned, else the result is null.
+     * </pre>
      */
     public <T> T sendQuery(JID jid, XStreamExtensionProvider<T> provider,
         T payload, long timeout);

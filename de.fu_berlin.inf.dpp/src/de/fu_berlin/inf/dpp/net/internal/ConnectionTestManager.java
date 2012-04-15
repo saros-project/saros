@@ -41,7 +41,7 @@ public class ConnectionTestManager {
 
     /**
      * Data returned from the user who received a {@link TransferDescription}
-     * with type {@value FileTransferType#CONNECTION_TEST}
+     * with type {@value TransferDescription#CONNECTION_TEST}
      */
     public static class ConnectionTestResponse {
 
