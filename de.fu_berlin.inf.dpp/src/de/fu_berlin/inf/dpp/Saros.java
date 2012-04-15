@@ -299,22 +299,34 @@ public class Saros extends AbstractUIPlugin {
         }
 
         try {
+            Thread shutdownThread = Utils.runSafeAsync(
+                "Saros-Shutdown-Process", log, new Runnable() {
+                    @Override
+                    public void run() {
+                        sarosContext.getComponent(SarosSessionManager.class)
+                            .stopSarosSession();
 
-            sarosContext.getComponent(SarosSessionManager.class)
-                .stopSarosSession();
+                        getSarosNet().uninitialize();
+                        // Remove UPnP port mapping for Saros
+                        IUPnPService upnpManager = sarosContext
+                            .getComponent(IUPnPService.class);
 
-            getSarosNet().uninitialize();
-            // Remove UPnP port mapping for Saros
-            IUPnPService upnpManager = sarosContext
-                .getComponent(IUPnPService.class);
-            if (upnpManager.isMapped())
-                upnpManager.removeSarosPortMapping();
+                        if (upnpManager.isMapped())
+                            upnpManager.removeSarosPortMapping();
 
-            /**
-             * This will cause dispose() to be called on all components managed
-             * by PicoContainer which implement {@link Disposable}.
-             */
-            sarosContext.dispose();
+                        /**
+                         * This will cause dispose() to be called on all
+                         * components managed by PicoContainer which implement
+                         * {@link Disposable}.
+                         */
+                        sarosContext.dispose();
+                    }
+                });
+
+            shutdownThread.join(10000);
+            if (shutdownThread.isAlive())
+                log.error("could not shutdown Saros gracefully");
+
         } finally {
             super.stop(context);
         }
