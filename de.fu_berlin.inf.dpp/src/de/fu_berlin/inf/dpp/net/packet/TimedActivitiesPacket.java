@@ -5,10 +5,12 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.StringWriter;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
 import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.io.xml.CompactWriter;
 
 import de.fu_berlin.inf.dpp.activities.SPathDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.AbstractActivityDataObject;
@@ -118,12 +120,16 @@ public class TimedActivitiesPacket extends Packet {
         GZIPOutputStream gzip = new GZIPOutputStream(out, GZIP_BUFFER_SIZE);
         DataOutputStream dos = new DataOutputStream(gzip);
 
-        byte[] xml = XSTREAM.toXML(timedActivities).getBytes("UTF-8");
+        // some activities are too large ( > 1 MB !)
+        // dos.writeUTF(XSTREAM.toXML(timedActivities));
+
+        StringWriter writer = new StringWriter(512);
+        XSTREAM.marshal(timedActivities, new CompactWriter(writer));
+
+        byte[] xml = writer.toString().getBytes("UTF-8");
         dos.writeInt(xml.length);
         dos.write(xml);
 
-        // some activities are too large ( > 1 MB !)
-        // dos.writeUTF(XSTREAM.toXML(timedActivities));
         dos.flush();
         gzip.finish();
     }
