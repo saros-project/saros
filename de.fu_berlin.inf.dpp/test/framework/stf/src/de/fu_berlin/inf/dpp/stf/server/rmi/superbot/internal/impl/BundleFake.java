@@ -54,7 +54,7 @@ class BundleFake implements Bundle {
         //
     }
 
-    @SuppressWarnings("rawtypes")
+    @SuppressWarnings({ "rawtypes", "unchecked" })
     public Dictionary getHeaders() {
         return null;
     }
@@ -67,10 +67,12 @@ class BundleFake implements Bundle {
         return null;
     }
 
+    @SuppressWarnings({ "rawtypes", "unchecked" })
     public ServiceReference[] getRegisteredServices() {
         return null;
     }
 
+    @SuppressWarnings({ "rawtypes", "unchecked" })
     public ServiceReference[] getServicesInUse() {
         return null;
     }
@@ -83,7 +85,7 @@ class BundleFake implements Bundle {
         return null;
     }
 
-    @SuppressWarnings("rawtypes")
+    @SuppressWarnings({ "rawtypes", "unchecked" })
     public Dictionary getHeaders(String locale) {
         return null;
     }
@@ -92,17 +94,17 @@ class BundleFake implements Bundle {
         return null;
     }
 
-    @SuppressWarnings("rawtypes")
+    @SuppressWarnings({ "rawtypes", "unchecked" })
     public Class loadClass(String name) throws ClassNotFoundException {
         return null;
     }
 
-    @SuppressWarnings("rawtypes")
+    @SuppressWarnings({ "rawtypes", "unchecked" })
     public Enumeration getResources(String name) throws IOException {
         return null;
     }
 
-    @SuppressWarnings("rawtypes")
+    @SuppressWarnings({ "rawtypes", "unchecked" })
     public Enumeration getEntryPaths(String path) {
         return null;
     }
@@ -115,7 +117,7 @@ class BundleFake implements Bundle {
         return 0;
     }
 
-    @SuppressWarnings("rawtypes")
+    @SuppressWarnings({ "rawtypes", "unchecked" })
     public Enumeration findEntries(String path, String filePattern,
         boolean recurse) {
         return null;
@@ -125,7 +127,7 @@ class BundleFake implements Bundle {
         return null;
     }
 
-    @SuppressWarnings("rawtypes")
+    @SuppressWarnings({ "rawtypes", "unchecked" })
     public Map getSignerCertificates(int signersType) {
         return null;
     }
