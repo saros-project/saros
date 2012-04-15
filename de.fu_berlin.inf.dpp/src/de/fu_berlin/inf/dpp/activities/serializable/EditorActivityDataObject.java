@@ -102,4 +102,8 @@ public class EditorActivityDataObject extends AbstractProjectActivityDataObject 
         return new EditorActivity(sarosSession.getUser(source), type,
             (path != null ? path.toSPath(sarosSession) : null));
     }
+
+    public String getProjectID() {
+        return (getPath() == null) ? null : getPath().getProjectID();
+    }
 }
