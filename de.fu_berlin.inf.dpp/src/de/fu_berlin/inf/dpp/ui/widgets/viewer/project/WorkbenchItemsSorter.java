@@ -4,7 +4,7 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.jface.viewers.ViewerSorter;
 
 /**
- * Sorter for TreeViews of {@see ResourceDisplayComposite} which sorts the
+ * Sorter for TreeViews of {@link ResourceDisplayComposite} which sorts the
  * Workbench Resources the same way the Package Explorer/Project
  * Explorer/Navigator does:
  * 

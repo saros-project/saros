@@ -162,8 +162,8 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
     /**
      * Build the list of files (with checksums, so it might take a while) that
      * should be present on the remote users computer to participate in the
-     * session. The filelists are contained in the {@see ProjectExchangeInfo}
-     * Objects for each Project, and wrapped in a {@see ProjectsAddedActivity}
+     * session. The filelists are contained in the {@link ProjectExchangeInfo}
+     * Objects for each Project, and wrapped in a {@link ProjectsAddedActivity}
      * that is finally sent to the user
      * 
      * @param subMonitor
