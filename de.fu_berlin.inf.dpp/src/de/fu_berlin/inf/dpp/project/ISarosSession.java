@@ -64,14 +64,14 @@ public interface ISarosSession {
     public List<User> getRemoteUsers();
 
     /**
-     * Initiates a {@link User.Permission} change. This method is called when
-     * the user wants to change user {@link User.Permission}s via the UI.
+     * Initiates a {@link Permission} change. This method is called when the
+     * user wants to change user {@link Permission}s via the UI.
      * 
      * @host This method may only called by the host.
      * @noSWT This method mustn't be called from the SWT UI thread
      * @param user
-     *            The user which {@link User.Permission} has to be changed.
-     * @blocking Returning after the {@link User.Permission} change is complete
+     *            The user which {@link Permission} has to be changed.
+     * @blocking Returning after the {@link Permission} change is complete
      * @cancelable
      * 
      * @Throws CancellationException
@@ -81,14 +81,14 @@ public interface ISarosSession {
         SubMonitor progress) throws CancellationException, InterruptedException;
 
     /**
-     * Set the {@link User.Permission} of the given user. This is called on
-     * incoming activityDataObjects from the network.
+     * Set the {@link Permission} of the given user. This is called on incoming
+     * activityDataObjects from the network.
      * 
      * @swt This method MUST to be called from the SWT UI thread
      * @param user
-     *            the user which {@link User.Permission} has to be set.
+     *            the user which {@link Permission} has to be set.
      * @param permission
-     *            The new {@link User.Permission} of the user.
+     *            The new {@link Permission} of the user.
      */
     public void setPermission(User user, Permission permission);
 
@@ -102,7 +102,7 @@ public interface ISarosSession {
 
     /**
      * @return <code>true</code> if the local client is a user with
-     *         {@link User.Permission#WRITE_ACCESS} of this shared project.
+     *         {@link Permission#WRITE_ACCESS} of this shared project.
      *         <code>false</code> otherwise.
      */
     public boolean hasWriteAccess();
@@ -211,7 +211,7 @@ public interface ISarosSession {
 
     /**
      * @return true, if there is exactly one user with
-     *         {@link User.Permission#WRITE_ACCESS}, false otherwise.
+     *         {@link Permission#WRITE_ACCESS}, false otherwise.
      */
     public boolean hasExclusiveWriteAccess();
 
@@ -287,10 +287,10 @@ public interface ISarosSession {
 
     /**
      * Returns a list of all users in this project which have
-     * {@link User.Permission#WRITE_ACCESS} right now.
+     * {@link Permission#WRITE_ACCESS} right now.
      * 
      * @snapshot This is a snapshot copy. This list does not change if users'
-     *           {@link User.Permission} change.
+     *           {@link Permission} change.
      * 
      *           There is no guarantee that the users in this list will be part
      *           of the project after you exit the SWT thread context.
@@ -299,10 +299,10 @@ public interface ISarosSession {
 
     /**
      * Returns a list of all users in this project have
-     * {@link User.Permission#READONLY_ACCESS} right now.
+     * {@link Permission#READONLY_ACCESS} right now.
      * 
      * @snapshot This is a snapshot copy. This list does not change if users'
-     *           {@link User.Permission} change.
+     *           {@link Permission} change.
      * 
      *           There is no guarantee that the users in this list will be part
      *           of the project after you exit the SWT thread context.
@@ -311,10 +311,10 @@ public interface ISarosSession {
 
     /**
      * Returns all users in this project which are both remotely and have
-     * {@link User.Permission#READONLY_ACCESS} right now.
+     * {@link Permission#READONLY_ACCESS} right now.
      * 
      * @snapshot This is a snapshot copy. This list does not change if users'
-     *           {@link User.Permission} change.
+     *           {@link Permission} change.
      * 
      *           There is no guarantee that the users in this list will be part
      *           of the project after you exit the SWT thread context.
