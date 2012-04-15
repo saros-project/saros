@@ -46,6 +46,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.apache.commons.lang.ObjectUtils;
 import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
 import org.jivesoftware.smack.ConnectionListener;
@@ -1645,7 +1646,7 @@ public class StreamServiceManager implements Startable {
     public class StreamPacket {
         /**
          * Timeout for receiving data (
-         * {@link IncomingTransferObject#accept(SubMonitor)}) in seconds.
+         * {@link IncomingTransferObject#accept(IProgressMonitor)}) in seconds.
          */
         public static final int DATA_RECEIVE_TIMEOUT = 10;
 
