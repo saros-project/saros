@@ -8,7 +8,7 @@ import org.xmlpull.v1.XmlPullParserException;
 import com.thoughtworks.xstream.converters.ErrorWriter;
 import com.thoughtworks.xstream.io.StreamException;
 import com.thoughtworks.xstream.io.xml.AbstractPullReader;
-import com.thoughtworks.xstream.io.xml.XmlFriendlyReplacer;
+import com.thoughtworks.xstream.io.xml.XmlFriendlyNameCoder;
 
 /**
  * XStream reader that pulls from a given {@link XmlPullParser} which is already
@@ -26,7 +26,7 @@ public class XppReader extends AbstractPullReader {
     protected boolean justStarted = true;
 
     public XppReader(XmlPullParser parser) {
-        super(new XmlFriendlyReplacer());
+        super(new XmlFriendlyNameCoder());
         this.parser = parser;
 
         /*
