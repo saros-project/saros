@@ -8,7 +8,6 @@ import java.util.List;
 
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.swt.graphics.RGB;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -44,10 +43,6 @@ public class ActivityUtilsTest {
             timedActivities.add(tmp1);
         }
 
-    }
-
-    @After
-    public void tearDown() throws Exception {
     }
 
     @Test
