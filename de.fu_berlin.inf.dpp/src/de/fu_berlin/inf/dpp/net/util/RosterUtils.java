@@ -1,6 +1,7 @@
 package de.fu_berlin.inf.dpp.net.util;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.Iterator;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CancellationException;
 
@@ -23,6 +24,9 @@ import org.jivesoftware.smack.packet.IQ;
 import org.jivesoftware.smack.packet.Registration;
 import org.jivesoftware.smack.packet.XMPPError;
 import org.jivesoftware.smackx.ServiceDiscoveryManager;
+import org.jivesoftware.smackx.packet.DiscoverInfo.Identity;
+import org.jivesoftware.smackx.packet.DiscoverItems;
+import org.jivesoftware.smackx.search.UserSearch;
 
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.SarosNet;
@@ -463,5 +467,70 @@ public class RosterUtils {
         } else {
             return (Registration) result;
         }
+    }
+
+    /**
+     * Returns the service for a user directory. The user directory can be used
+     * to perform search queries.
+     * 
+     * @param connection
+     *            the current XMPP connection
+     * @param service
+     *            a service, normally the domain of a XMPP server
+     * @return the service for the user directory or <code>null</code> if it
+     *         could not be determined
+     * 
+     * @See {@link UserSearch#getSearchForm(Connection con, String searchService)}
+     */
+    public static String getUserDirectoryService(Connection connection,
+        String service) {
+
+        ServiceDiscoveryManager manager = ServiceDiscoveryManager
+            .getInstanceFor(connection);
+
+        DiscoverItems items;
+
+        try {
+            items = manager.discoverItems(service);
+        } catch (XMPPException e) {
+            log.error("discovery for service '" + service + "' failed", e);
+            return null;
+        }
+
+        Iterator<DiscoverItems.Item> iter = items.getItems();
+        while (iter.hasNext()) {
+            DiscoverItems.Item item = iter.next();
+            try {
+                Iterator<Identity> identities = manager.discoverInfo(
+                    item.getEntityID()).getIdentities();
+                while (identities.hasNext()) {
+                    Identity identity = identities.next();
+                    if ("user".equalsIgnoreCase(identity.getType())) {
+                        return item.getEntityID();
+                    }
+                }
+            } catch (XMPPException e) {
+                log.warn("could not query identity: " + item.getEntityID(), e);
+            }
+        }
+
+        iter = items.getItems();
+
+        // make a good guess
+        while (iter.hasNext()) {
+            DiscoverItems.Item item = iter.next();
+
+            String entityID = item.getEntityID();
+
+            if (entityID == null)
+                continue;
+
+            if (entityID.startsWith("vjud.") || entityID.startsWith("search.")
+                || entityID.startsWith("users.") || entityID.startsWith("jud.")
+                || entityID.startsWith("id."))
+                return entityID;
+        }
+
+        return null;
     }
 }
