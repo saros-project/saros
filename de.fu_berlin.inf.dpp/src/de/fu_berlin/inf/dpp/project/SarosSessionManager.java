@@ -313,6 +313,11 @@ public class SarosSessionManager implements ISarosSessionManager,
         }
     }
 
+    /**
+     * @deprecated Error prone method, which produces NPE if not handled
+     *             correctly. Will soon get removed.
+     */
+    @Deprecated
     public ISarosSession getSarosSession() {
         return this.sarosSessionObservable.getValue();
     }
