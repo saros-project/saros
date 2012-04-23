@@ -40,8 +40,6 @@ public class GEFRecordFactory extends SXEDefaultRecordFactory {
 		ElementRecord r = null;
 		if (tag.equals(SVGConstants.SVG_RECT_TAG)) {
 			r = new SVGRectRecord(documentRecord);
-		} else if (tag.equals(SVGConstants.SVG_ANNOTATION_TAG)) {
-			r = new SVGAnnotationRecord(documentRecord);
 		} else if (tag.equals(SVGConstants.SVG_POLYLINE_TAG)) {
 			r = new SVGPolylineRecord(documentRecord);
 		} else if (tag.equals(SVGConstants.SVG_ELLIPSE_TAG)) {

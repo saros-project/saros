@@ -152,8 +152,7 @@ public class WhiteboardEditor extends SarosPermissionsGraphicalEditor {
 					if (command instanceof ElementRecordCreateCommand) {
 						String cName = ((ElementRecordCreateCommand) command)
 								.getChildName();
-						if (cName.equals(SVGConstants.SVG_TEXT_VALUE)
-								|| cName.equals(SVGConstants.SVG_ANNOTATION_TAG)) {
+						if (cName.equals(SVGConstants.SVG_TEXT_VALUE)) {
 
 							// Open dialog to enter the text
 							InputDialog d = new InputDialog(null, "Enter Text",
@@ -413,7 +412,6 @@ public class WhiteboardEditor extends SarosPermissionsGraphicalEditor {
 		instGroup.add(createTextToolEntry());
 		instGroup.add(createLineToolEntry());
 		instGroup.add(createArrowToolEntry());
-		instGroup.add(createAnnotationToolEntry());
 
 		PaletteSeparator sep3 = new PaletteSeparator();
 		root.add(sep3);
@@ -436,24 +434,6 @@ public class WhiteboardEditor extends SarosPermissionsGraphicalEditor {
 				"Creation of a textbox", template, template,
 				ImageDescriptor.createFromImage(IconUtils.getTextBoxImage()),
 				ImageDescriptor.createFromImage(IconUtils.getTextBoxImage()));
-		entry.setToolProperty(AbstractTool.PROPERTY_UNLOAD_WHEN_FINISHED, false);
-		entry.setToolClass(TextboxCreationTool.class);
-		return entry;
-	}
-
-	protected static ToolEntry createAnnotationToolEntry() {
-
-		// Note: same template for Drag and Drop as well as click and drag
-		CombinedTargetRecordCreationFactory template = new CombinedTargetRecordCreationFactory(
-				SVGConstants.SVG_ANNOTATION_TAG);
-
-		CreationToolEntry entry = new CombinedTemplateCreationEntry(
-				"Annotation",
-				"Creation of an annotation",
-				template,
-				template,
-				ImageDescriptor.createFromImage(IconUtils.getAnnotationImage()),
-				ImageDescriptor.createFromImage(IconUtils.getAnnotationImage()));
 		entry.setToolProperty(AbstractTool.PROPERTY_UNLOAD_WHEN_FINISHED, false);
 		entry.setToolClass(TextboxCreationTool.class);
 		return entry;

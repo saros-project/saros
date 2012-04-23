@@ -26,7 +26,6 @@ import de.fu_berlin.inf.dpp.whiteboard.gef.commands.TextboxCreateCommand;
 import de.fu_berlin.inf.dpp.whiteboard.gef.model.LayoutElementRecord;
 import de.fu_berlin.inf.dpp.whiteboard.gef.model.SVGPolylineRecord;
 import de.fu_berlin.inf.dpp.whiteboard.gef.part.ElementRecordPart;
-import de.fu_berlin.inf.dpp.whiteboard.gef.part.SVGAnnotationPart;
 import de.fu_berlin.inf.dpp.whiteboard.gef.request.CreatePointlistRequest;
 import de.fu_berlin.inf.dpp.whiteboard.gef.request.CreateTextBoxRequest;
 import de.fu_berlin.inf.dpp.whiteboard.gef.util.ColorUtils;
@@ -187,22 +186,13 @@ public class ElementModelLayoutEditPolicy extends
 				zoom = zoomManager.getZoom() * zoomManager.getUIMultiplier();
 
 			// created by Drag and Drop or click
-			if (request.getNewObjectType().equals(
-					SVGConstants.SVG_ANNOTATION_TAG)) {
-				constraint.width = (int) (SVGAnnotationPart.IMAGE_WIDTH / zoom);
-				constraint.height = (int) (SVGAnnotationPart.IMAGE_HEIGHT / zoom);
-
-			} else {
-				if (constraint.width == -1 && constraint.height == -1) {
-					normalizeConstraint(constraint,
-							(int) (DEFAULT_WIDTH / zoom),
-							(int) (DEFAULT_HEIGHT / zoom));
-				}
-				// else if(request.getNewObject() instanceof SVGAnnotationPart)
-				// created by selection rectangle
-				else {
-					normalizeConstraint(constraint, MIN_WIDTH, MIN_HEIGHT);
-				}
+			if (constraint.width == -1 && constraint.height == -1) {
+				normalizeConstraint(constraint, (int) (DEFAULT_WIDTH / zoom),
+						(int) (DEFAULT_HEIGHT / zoom));
+			}
+			// created by selection rectangle
+			else {
+				normalizeConstraint(constraint, MIN_WIDTH, MIN_HEIGHT);
 			}
 			TextboxCreateCommand cmd = new TextboxCreateCommand();
 

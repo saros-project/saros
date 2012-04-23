@@ -4,7 +4,6 @@ import org.eclipse.gef.EditPart;
 import org.eclipse.gef.EditPartFactory;
 import org.eclipse.gef.editparts.AbstractGraphicalEditPart;
 
-import de.fu_berlin.inf.dpp.whiteboard.gef.model.SVGAnnotationRecord;
 import de.fu_berlin.inf.dpp.whiteboard.gef.model.SVGEllipseRecord;
 import de.fu_berlin.inf.dpp.whiteboard.gef.model.SVGPolylineRecord;
 import de.fu_berlin.inf.dpp.whiteboard.gef.model.SVGRectRecord;
@@ -25,8 +24,6 @@ public class RecordPartFactory implements EditPartFactory {
 
 		if (model instanceof SVGRootRecord) {
 			part = new SVGRootPart();
-		} else if (model instanceof SVGAnnotationRecord) {
-			part = new SVGAnnotationPart();
 		} else if (model instanceof SVGTextBoxRecord) {
 			part = new SVGTextBoxPart();
 		} else if (model instanceof SVGRectRecord) {
