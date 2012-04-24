@@ -255,7 +255,7 @@ public class BuddySessionDisplayComposite extends ViewerComposite {
                 /*
                  * Background: the items are only targetable at their
                  * text-labels and icons. In the session view, the tree items
-                 * get a rectangle withbackground color that expands beyond the
+                 * get a rectangle with background color that expands beyond the
                  * text label. Users think that they can interact with the
                  * element by clicking anywhere on the background color, but
                  * actually miss the element.
