@@ -56,6 +56,7 @@ import org.picocontainer.annotations.Inject;
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.activities.business.FileActivity;
+import de.fu_berlin.inf.dpp.activities.business.FileActivity.Type;
 import de.fu_berlin.inf.dpp.activities.business.FolderActivity;
 import de.fu_berlin.inf.dpp.activities.business.IActivity;
 import de.fu_berlin.inf.dpp.activities.business.IResourceActivity;
@@ -477,7 +478,8 @@ public class SharedResourcesManager extends AbstractActivityProvider implements
                 + activity.getPath().getFullPath());
 
             try {
-                editorManager.saveLazy(path);
+                if (file.exists())
+                    editorManager.saveLazy(path);
             } catch (FileNotFoundException e) {
                 log.error(e);
                 return;
@@ -485,6 +487,9 @@ public class SharedResourcesManager extends AbstractActivityProvider implements
 
             if (wasOpenedEditor)
                 editorManager.closeEditor(path);
+
+            wasOpenedEditor &= activity.getType() != Type.Removed;
+
         }
 
         // Create or remove file
