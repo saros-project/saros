@@ -2,7 +2,6 @@ package de.fu_berlin.inf.dpp.whiteboard.sxe.net;
 
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
-import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.util.List;
 import java.util.Map;
@@ -108,19 +107,15 @@ public class SXEMessageWriter {
 				throws TransformerConfigurationException {
 			closeOutputStream();
 			stream = os;
-			/*
-			 * PrintWriter is preferable for String output. Change if writing to
-			 * stream.
-			 */
-			PrintWriter out = new PrintWriter(stream);
-			StreamResult streamResult = new StreamResult(out);
+			StreamResult streamResult = new StreamResult(stream);
 			SAXTransformerFactory tf = (SAXTransformerFactory) SAXTransformerFactory
 					.newInstance();
 			handler = tf.newTransformerHandler();
 			Transformer serializer = handler.getTransformer();
 			serializer
 					.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
-			serializer.setOutputProperty(OutputKeys.METHOD, "html");
+			serializer.setOutputProperty(OutputKeys.METHOD, "xml");
+			serializer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
 			handler.setResult(streamResult);
 		}
 
