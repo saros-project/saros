@@ -32,7 +32,8 @@ public class MUCSessionPreferences {
      * @param roomName
      * @param password
      */
-    public MUCSessionPreferences(String service, String roomName, String password) {
+    public MUCSessionPreferences(String service, String roomName,
+        String password) {
         this.service = service;
         this.roomName = roomName;
         this.password = password;

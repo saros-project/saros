@@ -515,8 +515,8 @@ public class FeedbackPreferencePage extends PreferencePage implements
 
         @Override
         public String toString() {
-            return this.name().toLowerCase().replace('_', ' ').concat(
-                " session"); //$NON-NLS-1$
+            return this.name().toLowerCase().replace('_', ' ')
+                .concat(" session"); //$NON-NLS-1$
         }
 
         /**

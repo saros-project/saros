@@ -26,8 +26,8 @@ public abstract class SessionDefaultPacketExtension extends
     public DefaultPacketExtension create() {
         DefaultPacketExtension extension = super.create();
 
-        extension.setValue(PacketExtensionUtils.SESSION_ID, sessionID
-            .getValue());
+        extension.setValue(PacketExtensionUtils.SESSION_ID,
+            sessionID.getValue());
 
         return extension;
     }

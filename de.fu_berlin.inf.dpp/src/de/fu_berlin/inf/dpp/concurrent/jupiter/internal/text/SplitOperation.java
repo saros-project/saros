@@ -201,14 +201,12 @@ public class SplitOperation implements Operation {
             // Ins(2,"ab") + Ins(4,"cd") -> Ins(2,"abcd")
             if (insert1.getPosition() + insert1.getTextLength() == insert2
                 .getPosition()) {
-                return new InsertOperation(insert1.getPosition(), insert1
-                    .getText()
-                    + insert2.getText());
+                return new InsertOperation(insert1.getPosition(),
+                    insert1.getText() + insert2.getText());
             } else if (insert1.getPosition() == insert2.getPosition()
                 + insert2.getTextLength()) {
-                return new InsertOperation(insert2.getPosition(), insert2
-                    .getText()
-                    + insert1.getText());
+                return new InsertOperation(insert2.getPosition(),
+                    insert2.getText() + insert1.getText());
             }
 
         } else if (op1 instanceof DeleteOperation
@@ -218,16 +216,14 @@ public class SplitOperation implements Operation {
 
             // Del(5,"ab") + Del(5,"cde") -> Del(5,"abcde")
             if (delete1.getPosition() == delete2.getPosition()) {
-                return new DeleteOperation(delete1.getPosition(), delete1
-                    .getText()
-                    + delete2.getText());
+                return new DeleteOperation(delete1.getPosition(),
+                    delete1.getText() + delete2.getText());
             }
             // Del(8,"c") + Del(6,"ab") -> Del(6,"abc")
             if (delete1.getPosition() == delete2.getPosition()
                 + delete2.getTextLength()) {
-                return new DeleteOperation(delete2.getPosition(), delete2
-                    .getText()
-                    + delete1.getText());
+                return new DeleteOperation(delete2.getPosition(),
+                    delete2.getText() + delete1.getText());
             }
         }
         // Nothing can be combined

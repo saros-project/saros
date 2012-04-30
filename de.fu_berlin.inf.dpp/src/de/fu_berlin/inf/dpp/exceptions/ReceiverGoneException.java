@@ -1,6 +1,6 @@
 /*
  * DPP - Serious Distributed Pair Programming
- * (c) Freie Universität Berlin - Fachbereich Mathematik und Informatik - 2010
+ * (c) Freie Universitï¿½t Berlin - Fachbereich Mathematik und Informatik - 2010
  * (c) Stephan Lau - 2010
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -18,7 +18,6 @@
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 package de.fu_berlin.inf.dpp.exceptions;
-
 
 /**
  * Streaming operation can not be performed because the remote side left the

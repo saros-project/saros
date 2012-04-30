@@ -444,8 +444,9 @@ public class Socks5Transport extends ByteStreamTransport {
         BytestreamSession session = testAndGetMediatedBidirectionalBytestream(
             inSession, outSession, true);
 
-        return new ByteStreamConnection(session, dispatcher, connectionListener,
-            NetTransferMode.SOCKS5_MEDIATED, localJID, remoteJID);
+        return new ByteStreamConnection(session, dispatcher,
+            connectionListener, NetTransferMode.SOCKS5_MEDIATED, localJID,
+            remoteJID);
     }
 
     /**
@@ -569,8 +570,9 @@ public class Socks5Transport extends ByteStreamTransport {
             BytestreamSession session = testAndGetMediatedBidirectionalBytestream(
                 inSession, outSession, false);
 
-            return new ByteStreamConnection(session, dispatcher, connectionListener,
-                NetTransferMode.SOCKS5_MEDIATED, localJID, remoteJID);
+            return new ByteStreamConnection(session, dispatcher,
+                connectionListener, NetTransferMode.SOCKS5_MEDIATED, localJID,
+                remoteJID);
 
         } finally {
             runningConnects.remove(remoteJID);

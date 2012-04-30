@@ -118,8 +118,8 @@ public abstract class ByteStreamTransport implements ITransport {
         BytestreamSession session = manager.establishSession(remoteJID
             .toString());
 
-        return new ByteStreamConnection(session, dispatcher, connectionListener,
-            getTransportMode(), localJID, remoteJID);
+        return new ByteStreamConnection(session, dispatcher,
+            connectionListener, getTransportMode(), localJID, remoteJID);
     }
 
     /**
@@ -139,8 +139,8 @@ public abstract class ByteStreamTransport implements ITransport {
         try {
             JID remoteJID = new JID(request.getFrom());
             BytestreamSession session = request.accept();
-            return new ByteStreamConnection(session, dispatcher, connectionListener,
-                getTransportMode(), localJID, remoteJID);
+            return new ByteStreamConnection(session, dispatcher,
+                connectionListener, getTransportMode(), localJID, remoteJID);
         } catch (XMPPException e) {
             throw new IOException(e.getMessage(), e);
         }

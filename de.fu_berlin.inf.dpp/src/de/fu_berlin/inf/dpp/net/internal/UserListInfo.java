@@ -19,8 +19,9 @@ public class UserListInfo extends DefaultInvitationInfo {
         Collection<User> users) {
         super(sessionID, invitationID);
         for (User user : users) {
-            UserListEntry newUser = new UserListEntry(user.getJID(), user
-                .getColorID(), user.getPermission(), user.isInvitationComplete());
+            UserListEntry newUser = new UserListEntry(user.getJID(),
+                user.getColorID(), user.getPermission(),
+                user.isInvitationComplete());
             userList.add(newUser);
         }
     }

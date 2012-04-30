@@ -126,9 +126,10 @@ public class VideoSharingAction extends Action implements Disposable {
                             setEnabled(false);
                             videoSharing.startSharing(participants.get(0));
                         } catch (final SarosCancellationException e) {
-                            Utils.popUpFailureMessage(
-                                Messages.VideoSharingAction_error_could_not_establish_screensharing_text,
-                                e.getMessage(), false);
+                            Utils
+                                .popUpFailureMessage(
+                                    Messages.VideoSharingAction_error_could_not_establish_screensharing_text,
+                                    e.getMessage(), false);
                             log.error("Could not establish screensharing: ", e); //$NON-NLS-1$
                         }
                     } else {

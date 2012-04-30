@@ -24,57 +24,57 @@ import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
  */
 public class MUCSessionPreferencesNegotiatingManager {
 
-	private static final Logger log = Logger
-		.getLogger(MUCSessionPreferencesNegotiatingManager.class);
+    private static final Logger log = Logger
+        .getLogger(MUCSessionPreferencesNegotiatingManager.class);
 
-	@Inject
-	protected IPreferenceStore preferences;
+    @Inject
+    protected IPreferenceStore preferences;
 
-	protected SessionIDObservable sessionID;
+    protected SessionIDObservable sessionID;
 
-	protected MUCSessionPreferences localPreferences;
-	protected MUCSessionPreferences sessionPreferences;
+    protected MUCSessionPreferences localPreferences;
+    protected MUCSessionPreferences sessionPreferences;
 
-	protected String password;
+    protected String password;
 
-	private Random random = new Random();
+    private Random random = new Random();
 
-	public MUCSessionPreferencesNegotiatingManager(
-		SessionIDObservable sessionID, IPreferenceStore preferences) {
-		this.sessionID = sessionID;
-		this.password = Integer.toString(random.nextInt());
-	}
+    public MUCSessionPreferencesNegotiatingManager(
+        SessionIDObservable sessionID, IPreferenceStore preferences) {
+        this.sessionID = sessionID;
+        this.password = Integer.toString(random.nextInt());
+    }
 
-	/**
-	 * Load communication settings from PreferenceStore and generate chat room
-	 * and chat room password.
-	 */
-	public MUCSessionPreferences getOwnPreferences() {
-		String service = preferences.getString(PreferenceConstants.CHATSERVER);
-		String roomName = "SAROS" + sessionID.getValue();
-		return new MUCSessionPreferences(service, roomName, this.password);
-	}
+    /**
+     * Load communication settings from PreferenceStore and generate chat room
+     * and chat room password.
+     */
+    public MUCSessionPreferences getOwnPreferences() {
+        String service = preferences.getString(PreferenceConstants.CHATSERVER);
+        String roomName = "SAROS" + sessionID.getValue();
+        return new MUCSessionPreferences(service, roomName, this.password);
+    }
 
-	/**
-	 * @return temporarily session preferences
-	 */
-	public MUCSessionPreferences getSessionPreferences() {
-		return sessionPreferences;
-	}
+    /**
+     * @return temporarily session preferences
+     */
+    public MUCSessionPreferences getSessionPreferences() {
+        return sessionPreferences;
+    }
 
-	/**
-	 * Set temporarily communication shared project settings
-	 * 
-	 * @param remotePreferences
-	 *            received communication settings
-	 */
-	public void setSessionPreferences(MUCSessionPreferences remotePreferences) {
-		log.debug("Got hosts Communication Config: server "
-				+ remotePreferences.getService() + " room "
-				+ remotePreferences.getRoomName() + " pw "
-				+ remotePreferences.getPassword());
+    /**
+     * Set temporarily communication shared project settings
+     * 
+     * @param remotePreferences
+     *            received communication settings
+     */
+    public void setSessionPreferences(MUCSessionPreferences remotePreferences) {
+        log.debug("Got hosts Communication Config: server "
+            + remotePreferences.getService() + " room "
+            + remotePreferences.getRoomName() + " pw "
+            + remotePreferences.getPassword());
 
-		sessionPreferences = remotePreferences;
-	}
+        sessionPreferences = remotePreferences;
+    }
 
 }

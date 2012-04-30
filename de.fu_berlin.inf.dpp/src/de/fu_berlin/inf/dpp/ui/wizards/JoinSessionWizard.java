@@ -147,8 +147,8 @@ public class JoinSessionWizard extends Wizard {
             super.createButtonsForButtonBar(parent);
             Button ok = getButton(IDialogConstants.OK_ID);
             ok.setText(Messages.JoinSessionWizard_yes);
-            Button no = createButton(parent, IDialogConstants.CANCEL_ID, Messages.JoinSessionWizard_no,
-                true);
+            Button no = createButton(parent, IDialogConstants.CANCEL_ID,
+                Messages.JoinSessionWizard_no, true);
             no.moveBelow(ok);
             no.setFocus();
         }
@@ -278,29 +278,21 @@ public class JoinSessionWizard extends Wizard {
                         + Messages.JoinSessionWizard_8 + errorMsg);
                 break;
             case REMOTE:
-                DialogUtils
-                    .openErrorMessageDialog(
-                        getShell(),
+                DialogUtils.openErrorMessageDialog(getShell(),
 
-                        Messages.JoinSessionWizard_inv_cancelled,
-                        MessageFormat
-                            .format(
-                                Messages.JoinSessionWizard_inv_cancelled_text2,
-                                peer, errorMsg));
+                Messages.JoinSessionWizard_inv_cancelled, MessageFormat.format(
+                    Messages.JoinSessionWizard_inv_cancelled_text2, peer,
+                    errorMsg));
             }
         } else {
             switch (cancelLocation) {
             case LOCAL:
                 break;
             case REMOTE:
-                DialogUtils
-                    .openInformationMessageDialog(
-                        getShell(),
-                        Messages.JoinSessionWizard_inv_cancelled,
-                        MessageFormat
-                            .format(
-                                Messages.JoinSessionWizard_inv_cancelled_text3,
-                                peer));
+                DialogUtils.openInformationMessageDialog(getShell(),
+                    Messages.JoinSessionWizard_inv_cancelled, MessageFormat
+                        .format(Messages.JoinSessionWizard_inv_cancelled_text3,
+                            peer));
             }
         }
     }

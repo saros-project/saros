@@ -46,8 +46,7 @@ public class JDTFacade implements IJDTSupport {
                     .newInstance();
             } catch (Throwable t) {
                 // We were unable to enable the JDT-Support
-                log
-                    .warn("IJDTSupport could not be instantiated, despite JDT Plugin being installed");
+                log.warn("IJDTSupport could not be instantiated, despite JDT Plugin being installed");
             }
         }
     }

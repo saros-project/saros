@@ -105,26 +105,27 @@ public class SkypeAction extends Action implements Disposable {
 
                 if (participants.size() == 1) {
                     Utils.runSafeAsync("SkypeAction-", log, new Runnable() { //$NON-NLS-1$
-                        public void run() {
-                            Utils.runSafeSWTSync(log, new Runnable() {
-                                public void run() {
-                                    setEnabled(false);
-                                }
-                            });
-                            final String skypeURL = skypeManager
-                                .getSkypeURL(participants.get(0).getBareJID());
-                            if (skypeURL != null) {
+                            public void run() {
                                 Utils.runSafeSWTSync(log, new Runnable() {
                                     public void run() {
-                                        URLHyperlink link = new URLHyperlink(
-                                            new Region(0, 0), skypeURL);
-                                        link.open();
+                                        setEnabled(false);
                                     }
                                 });
-                            }
+                                final String skypeURL = skypeManager
+                                    .getSkypeURL(participants.get(0)
+                                        .getBareJID());
+                                if (skypeURL != null) {
+                                    Utils.runSafeSWTSync(log, new Runnable() {
+                                        public void run() {
+                                            URLHyperlink link = new URLHyperlink(
+                                                new Region(0, 0), skypeURL);
+                                            link.open();
+                                        }
+                                    });
+                                }
 
-                        }
-                    });
+                            }
+                        });
                 } else {
                     log.warn("More than one participant selected."); //$NON-NLS-1$
                 }

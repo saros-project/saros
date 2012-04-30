@@ -1,6 +1,5 @@
 package de.fu_berlin.inf.dpp.ui.widgets.viewer.roster.events;
 
-
 /**
  * Listener for {@link BaseBuddySelectionListener} events.
  */

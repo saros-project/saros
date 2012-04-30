@@ -94,8 +94,8 @@ public class GOTOInclusionTransformation implements InclusionTransformation {
 
             SplitOperation s = (SplitOperation) op1;
             return new SplitOperation(transform(s.getFirst(), op2, param),
-                transform(s.getSecond(), transform(op2, s.getFirst(),
-                    !privileged), param));
+                transform(s.getSecond(),
+                    transform(op2, s.getFirst(), !privileged), param));
         }
         if (op2 instanceof SplitOperation) {
             /**
@@ -184,8 +184,8 @@ public class GOTOInclusionTransformation implements InclusionTransformation {
              * Operation A starts in or behind operation B. Index of operation
              * A' must be increased by the length of the text of operation B.
              */
-            return new InsertOperation(posA + lenB, insA.getText(), insA
-                .getOrigin());
+            return new InsertOperation(posA + lenB, insA.getText(),
+                insA.getOrigin());
         }
     }
 
@@ -205,8 +205,8 @@ public class GOTOInclusionTransformation implements InclusionTransformation {
              * Operation A starts after operation B. Index of operation A' must
              * be reduced by the length of the text of operation B.
              */
-            return new InsertOperation(posA - lenB, insA.getText(), insA
-                .getOrigin());
+            return new InsertOperation(posA - lenB, insA.getText(),
+                insA.getOrigin());
         } else {
             /*
              * Operation A starts in operation B. Index of A' must be the index

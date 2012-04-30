@@ -9,7 +9,8 @@ import org.junit.Test;
 import de.fu_berlin.inf.dpp.project.SharedProject.UpdatableValue;
 
 public class SharedProjectUpdatableValuePluginTest {
-    public @Test void update() {
+    public @Test
+    void update() {
         UpdatableValue<String> x = new UpdatableValue<String>(null);
         assertFalse(x.update(null));
 
@@ -23,7 +24,8 @@ public class SharedProjectUpdatableValuePluginTest {
         assertFalse(x.update(null));
     }
 
-    public @Test void getValue() {
+    public @Test
+    void getValue() {
         UpdatableValue<String> x = new UpdatableValue<String>(null);
         assertEquals(null, x.getValue());
         x.update("hello");

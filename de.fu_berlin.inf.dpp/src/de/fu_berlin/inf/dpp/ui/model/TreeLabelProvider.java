@@ -4,7 +4,6 @@ import org.eclipse.jface.viewers.StyledCellLabelProvider;
 import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.jface.viewers.ViewerCell;
 
-
 /**
  * Instances of this class are used in conjunction with {@link ITreeElement}s as
  * generic {@link TreeLabelProvider}s.

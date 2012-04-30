@@ -92,10 +92,10 @@ public class FeedbackDialog extends MessageDialog {
 
     @Override
     protected void createButtonsForButtonBar(Composite parent) {
-        Button yes = createButton(parent, IDialogConstants.YES_ID, Messages
-            .getString("feedback.dialog.yes"), true); //$NON-NLS-1$
-        createButton(parent, IDialogConstants.NO_ID, Messages
-            .getString("feedback.dialog.no"), false); //$NON-NLS-1$
+        Button yes = createButton(parent, IDialogConstants.YES_ID,
+            Messages.getString("feedback.dialog.yes"), true); //$NON-NLS-1$
+        createButton(parent, IDialogConstants.NO_ID,
+            Messages.getString("feedback.dialog.no"), false); //$NON-NLS-1$
 
         // set the initial keyboard focus to the yes button
         yes.setFocus();

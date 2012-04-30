@@ -7,8 +7,8 @@ import de.fu_berlin.inf.dpp.stf.server.StfRemoteObject;
 
 /**
  * This interface contains convenience API to perform actions activated by
- * clicking subMenus of contextMenu {@link StfRemoteObject#CM_TEAM} in the package explorer
- * view. STF users would start off as follows:
+ * clicking subMenus of contextMenu {@link StfRemoteObject#CM_TEAM} in the
+ * package explorer view. STF users would start off as follows:
  * 
  * <pre>
  * //

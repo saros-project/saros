@@ -126,7 +126,8 @@ public class ChangeColorAction extends Action implements Disposable {
                         done = true;
                     } else {
                         MessageDialog.openInformation(EditorAPI.getShell(),
-                            Messages.ChangeColorAction_message_title, Messages.ChangeColorAction_message_text);
+                            Messages.ChangeColorAction_message_title,
+                            Messages.ChangeColorAction_message_text);
                     }
                 }
             }
@@ -138,4 +139,3 @@ public class ChangeColorAction extends Action implements Disposable {
             selectionListener);
     }
 }
-

@@ -66,7 +66,8 @@ public class JupiterServer {
             docServer.addProxyClient(sarosSession.getHost().getJID());
 
             /** Add all users with {@link User.Permission#WRITE_ACCESS} */
-            for (User userWithWriteAccess : sarosSession.getUsersWithWriteAccess()) {
+            for (User userWithWriteAccess : sarosSession
+                .getUsersWithWriteAccess()) {
                 docServer.addProxyClient(userWithWriteAccess.getJID());
             }
 

@@ -41,7 +41,7 @@ import de.fu_berlin.inf.dpp.util.StateChangeNotifier;
  * {@link CleanUpSaveParticipantPreferenceConfiguration } - This is the actual
  * Save Action Preference Page
  */
-@SuppressWarnings( { "restriction" })
+@SuppressWarnings({ "restriction" })
 public class SaveActionConfigurator implements IPreferenceManipulator {
 
     private static final Logger log = Logger

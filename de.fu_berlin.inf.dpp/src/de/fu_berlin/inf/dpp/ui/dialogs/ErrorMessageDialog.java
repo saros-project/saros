@@ -28,8 +28,8 @@ public class ErrorMessageDialog {
     public static void showErrorMessage(final Exception exception) {
         Utils.runSafeSWTSync(log, new Runnable() {
             public void run() {
-                MessageDialog.openError(EditorAPI.getShell(), exception
-                    .toString(), exception.getMessage());
+                MessageDialog.openError(EditorAPI.getShell(),
+                    exception.toString(), exception.getMessage());
             }
         });
     }

@@ -14,23 +14,23 @@ import de.fu_berlin.inf.dpp.util.ValueChangeListener;
  */
 @Component(module = "util")
 public class SessionViewOpener {
-	private static final Logger log = Logger.getLogger(SessionViewOpener.class
-			.getName());
+    private static final Logger log = Logger.getLogger(SessionViewOpener.class
+        .getName());
 
-	public SessionViewOpener(IsInconsistentObservable isInconsistentObservable,
-			final SarosUI sarosUI) {
-		isInconsistentObservable.add(new ValueChangeListener<Boolean>() {
-			public void setValue(Boolean inconsistency) {
-				if (!inconsistency) {
-					return;
-				}
+    public SessionViewOpener(IsInconsistentObservable isInconsistentObservable,
+        final SarosUI sarosUI) {
+        isInconsistentObservable.add(new ValueChangeListener<Boolean>() {
+            public void setValue(Boolean inconsistency) {
+                if (!inconsistency) {
+                    return;
+                }
 
-				Utils.runSafeSWTSync(log, new Runnable() {
-					public void run() {
-						sarosUI.openSarosView();
-					}
-				});
-			}
-		});
-	}
+                Utils.runSafeSWTSync(log, new Runnable() {
+                    public void run() {
+                        sarosUI.openSarosView();
+                    }
+                });
+            }
+        });
+    }
 }

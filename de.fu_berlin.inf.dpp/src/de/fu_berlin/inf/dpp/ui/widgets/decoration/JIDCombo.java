@@ -52,7 +52,7 @@ public class JIDCombo {
 
     protected void fill() {
         String defaultServer = this.preferenceUtils.getDefaultServer();
-        
+
         List<String> servers = this.xmppAccountStore.getDomains();
         if (servers.size() == 0)
             servers.add(defaultServer);
@@ -72,17 +72,17 @@ public class JIDCombo {
          * Save the current selection
          */
         Point selection = this.control.getSelection();
-        
+
         String jid = this.control.getText();
         String username = (jid.contains("@")) ? jid.split("@")[0] : jid;
-        
+
         String[] items = this.control.getItems();
         for (int i = 0; i < items.length; i++) {
             String item = items[i];
             item = username + "@" + item.split("@")[1];
             this.control.setItem(i, item);
         }
-        
+
         /*
          * The modification of the list items changes the selection. Now, the
          * saved selection have to be set again.

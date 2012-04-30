@@ -250,11 +250,13 @@ public class ConcurrentDocumentClient implements Disposable {
          * {@link User.Permission#READONLY_ACCESS}
          */
         if (sarosSession.isHost()) {
-            List<User> usersWithReadOnlyAccess = sarosSession.getUsersWithReadOnlyAccess();
+            List<User> usersWithReadOnlyAccess = sarosSession
+                .getUsersWithReadOnlyAccess();
             usersWithReadOnlyAccess.remove(host);
             if (!usersWithReadOnlyAccess.isEmpty()) {
                 for (IActivity activity : result.executeLocally) {
-                    result.add(new QueueItem(usersWithReadOnlyAccess, activity));
+                    result
+                        .add(new QueueItem(usersWithReadOnlyAccess, activity));
                 }
             }
         }

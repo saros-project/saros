@@ -1,6 +1,6 @@
 /*
  * DPP - Serious Distributed Pair Programming
- * (c) Freie Universität Berlin - Fachbereich Mathematik und Informatik - 2010
+ * (c) Freie Universitï¿½t Berlin - Fachbereich Mathematik und Informatik - 2010
  * (c) Stephan Lau - 2010
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -108,12 +108,12 @@ public class Screen implements ImageSource {
         throws InitializationException {
         SarosPluginContext.initComponent(this);
         preferences = saros.getPreferenceStore();
-        mode = Enum.valueOf(Mode.class, preferences
-            .getString(PreferenceConstants.SCREEN_INITIAL_MODE));
-        mouseArea = new Dimension(Math.min(preferences
-            .getInt(PreferenceConstants.SCREEN_MOUSE_AREA_WIDTH),
-            fullScreenArea.width), Math.min(preferences
-            .getInt(PreferenceConstants.SCREEN_MOUSE_AREA_HEIGHT),
+        mode = Enum.valueOf(Mode.class,
+            preferences.getString(PreferenceConstants.SCREEN_INITIAL_MODE));
+        mouseArea = new Dimension(Math.min(
+            preferences.getInt(PreferenceConstants.SCREEN_MOUSE_AREA_WIDTH),
+            fullScreenArea.width), Math.min(
+            preferences.getInt(PreferenceConstants.SCREEN_MOUSE_AREA_HEIGHT),
             fullScreenArea.height));
 
         showMousePointer = preferences

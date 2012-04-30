@@ -4,10 +4,12 @@ import java.util.Date;
 
 import de.fu_berlin.inf.dpp.net.JID;
 
-public class MUCSessionHistoryMessageReceptionElement extends MUCSessionHistoryElement {
+public class MUCSessionHistoryMessageReceptionElement extends
+    MUCSessionHistoryElement {
     protected String message;
 
-    public MUCSessionHistoryMessageReceptionElement(JID jid, Date date, String message) {
+    public MUCSessionHistoryMessageReceptionElement(JID jid, Date date,
+        String message) {
         super(jid, date);
         this.message = message;
     }

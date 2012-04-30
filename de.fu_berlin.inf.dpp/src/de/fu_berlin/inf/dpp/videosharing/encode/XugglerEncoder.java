@@ -1,6 +1,6 @@
 /*
  * DPP - Serious Distributed Pair Programming
- * (c) Freie Universität Berlin - Fachbereich Mathematik und Informatik - 2010
+ * (c) Freie Universitï¿½t Berlin - Fachbereich Mathematik und Informatik - 2010
  * (c) Stephan Lau - 2010
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -98,8 +98,8 @@ public class XugglerEncoder extends Encoder {
 
         container = IContainer.make();
 
-        initializeContainer(preferences
-            .getString(PreferenceConstants.XUGGLER_CONTAINER_FORMAT),
+        initializeContainer(
+            preferences.getString(PreferenceConstants.XUGGLER_CONTAINER_FORMAT),
             preferences.getString(PreferenceConstants.XUGGLER_CODEC));
         useVBV = preferences.getBoolean(PreferenceConstants.XUGGLER_USE_VBV);
 
@@ -177,8 +177,8 @@ public class XugglerEncoder extends Encoder {
         if (converter == null || lastRenderedPictureSize == null
             || image.getWidth() != lastRenderedPictureSize.width
             || image.getHeight() != lastRenderedPictureSize.height) {
-            lastRenderedPictureSize = new Dimension(image.getWidth(), image
-                .getHeight());
+            lastRenderedPictureSize = new Dimension(image.getWidth(),
+                image.getHeight());
             // close old converter if necessary
             if (converter != null)
                 converter.delete();
@@ -277,8 +277,8 @@ public class XugglerEncoder extends Encoder {
         // framerate
         IRational fps = IRational.make(framerate);
         // timebase = 1/fps
-        coder.setTimeBase(IRational.make(fps.getDenominator(), fps
-            .getNumerator()));
+        coder.setTimeBase(IRational.make(fps.getDenominator(),
+            fps.getNumerator()));
         coder.setPixelType(pixelformat);
         // set resolution
         coder.setHeight(height);

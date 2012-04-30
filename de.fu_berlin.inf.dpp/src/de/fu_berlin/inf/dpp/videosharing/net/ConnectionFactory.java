@@ -1,6 +1,6 @@
 /*
  * DPP - Serious Distributed Pair Programming
- * (c) Freie Universität Berlin - Fachbereich Mathematik und Informatik - 2010
+ * (c) Freie Universitï¿½t Berlin - Fachbereich Mathematik und Informatik - 2010
  * (c) Stephan Lau - 2010
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -75,11 +75,11 @@ public class ConnectionFactory implements Disposable {
             case CLIENT:
                 clientVideoIn = session.getInputStream(0);
 
-                clientStatisticsOut = new ObjectOutputStream(session
-                    .getOutputStream(0));
+                clientStatisticsOut = new ObjectOutputStream(
+                    session.getOutputStream(0));
                 clientStatisticsOut.flush();
-                clientActivitiesOut = new ObjectOutputStream(session
-                    .getOutputStream(1));
+                clientActivitiesOut = new ObjectOutputStream(
+                    session.getOutputStream(1));
                 clientActivitiesOut.flush();
                 clientErrorIn = new ObjectInputStream(session.getInputStream(1));
 
@@ -87,12 +87,12 @@ public class ConnectionFactory implements Disposable {
             case HOST:
                 hostVideoOut = session.getOutputStream(0);
 
-                hostStatisticsIn = new ObjectInputStream(session
-                    .getInputStream(0));
-                hostActivitiesIn = new ObjectInputStream(session
-                    .getInputStream(1));
-                hostErrorOut = new ObjectOutputStream(session
-                    .getOutputStream(1));
+                hostStatisticsIn = new ObjectInputStream(
+                    session.getInputStream(0));
+                hostActivitiesIn = new ObjectInputStream(
+                    session.getInputStream(1));
+                hostErrorOut = new ObjectOutputStream(
+                    session.getOutputStream(1));
                 hostErrorOut.flush();
                 break;
             default:

@@ -203,8 +203,8 @@ public class GOTOInclusionTransformationTest extends JupiterTestCase {
         Operation op2 = S(D(4, "AB"), I(4, "D"));
 
         // op1'(op2)
-        assertOpEquals(new NoOperation(), inclusion.transform(op1, op2,
-            Boolean.FALSE));
+        assertOpEquals(new NoOperation(),
+            inclusion.transform(op1, op2, Boolean.FALSE));
 
         // op2'(op1)
         assertOpEquals(op2, inclusion.transform(op2, op1, Boolean.FALSE));
@@ -218,16 +218,16 @@ public class GOTOInclusionTransformationTest extends JupiterTestCase {
             Operation op2 = D(5, "BC");
 
             // op1'(op2)
-            assertOpEquals(D(4, "A"), inclusion.transform(op1, op2,
-                Boolean.FALSE));
+            assertOpEquals(D(4, "A"),
+                inclusion.transform(op1, op2, Boolean.FALSE));
         }
         {
             Operation op1 = D(4, "ABC");
             Operation op2 = D(4, "AB");
 
             // op1'(op2)
-            assertOpEquals(D(4, "C"), inclusion.transform(op1, op2,
-                Boolean.FALSE));
+            assertOpEquals(D(4, "C"),
+                inclusion.transform(op1, op2, Boolean.FALSE));
         }
 
         {
@@ -235,16 +235,16 @@ public class GOTOInclusionTransformationTest extends JupiterTestCase {
             Operation op2 = D(5, "BCDEF");
 
             // op1'(op2)
-            assertOpEquals(D(4, "A"), inclusion.transform(op1, op2,
-                Boolean.FALSE));
+            assertOpEquals(D(4, "A"),
+                inclusion.transform(op1, op2, Boolean.FALSE));
         }
         {
             Operation op1 = D(4, "ABC");
             Operation op2 = D(2, "89AB");
 
             // op1'(op2)
-            assertOpEquals(D(2, "C"), inclusion.transform(op1, op2,
-                Boolean.FALSE));
+            assertOpEquals(D(2, "C"),
+                inclusion.transform(op1, op2, Boolean.FALSE));
         }
 
     }
@@ -257,16 +257,16 @@ public class GOTOInclusionTransformationTest extends JupiterTestCase {
             Operation op2 = D(4, "AB");
 
             // op1'(op2)
-            assertOpEquals(new NoOperation(), inclusion.transform(op1, op2,
-                Boolean.FALSE));
+            assertOpEquals(new NoOperation(),
+                inclusion.transform(op1, op2, Boolean.FALSE));
         }
         {
             Operation op1 = D(5, "B");
             Operation op2 = D(4, "AB");
 
             // op1'(op2)
-            assertOpEquals(new NoOperation(), inclusion.transform(op1, op2,
-                Boolean.FALSE));
+            assertOpEquals(new NoOperation(),
+                inclusion.transform(op1, op2, Boolean.FALSE));
         }
 
         {
@@ -274,8 +274,8 @@ public class GOTOInclusionTransformationTest extends JupiterTestCase {
             Operation op2 = D(4, "ABC");
 
             // op1'(op2)
-            assertOpEquals(new NoOperation(), inclusion.transform(op1, op2,
-                Boolean.FALSE));
+            assertOpEquals(new NoOperation(),
+                inclusion.transform(op1, op2, Boolean.FALSE));
         }
 
     }

@@ -136,8 +136,8 @@ public class XStreamExtensionProvider<T> implements PacketExtensionProvider,
          * given provider
          */
         public boolean accept(XStreamExtensionProvider<?> provider) {
-            return ObjectUtils.equals(getElementName(), provider
-                .getElementName())
+            return ObjectUtils.equals(getElementName(),
+                provider.getElementName())
                 && ObjectUtils.equals(getNamespace(), provider.getNamespace());
         }
 

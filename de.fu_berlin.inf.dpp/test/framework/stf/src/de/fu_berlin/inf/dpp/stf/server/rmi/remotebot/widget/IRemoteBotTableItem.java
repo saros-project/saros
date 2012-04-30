@@ -11,7 +11,8 @@ public interface IRemoteBotTableItem extends Remote {
      * 
      **********************************************/
 
-    public abstract IRemoteBotMenu contextMenu(String text) throws RemoteException;
+    public abstract IRemoteBotMenu contextMenu(String text)
+        throws RemoteException;
 
     public abstract void select() throws RemoteException;
 

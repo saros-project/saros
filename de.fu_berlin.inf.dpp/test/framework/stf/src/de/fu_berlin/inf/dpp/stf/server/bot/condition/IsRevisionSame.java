@@ -46,6 +46,7 @@ public class IsRevisionSame extends DefaultCondition {
             return false;
         }
         String revisionString = vcs.getRevisionString(resource);
-        return revisionString != null && revisionString.equals(expectedRevision);
+        return revisionString != null
+            && revisionString.equals(expectedRevision);
     }
 }

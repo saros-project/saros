@@ -38,8 +38,8 @@ public class DropSilentlyPacketExtension implements PacketExtension {
 
     public String toXML() {
         StringBuilder buf = new StringBuilder();
-        buf.append("<").append(getElementName()).append(" xmlns=\"").append(
-            getNamespace()).append("\"/>");
+        buf.append("<").append(getElementName()).append(" xmlns=\"")
+            .append(getNamespace()).append("\"/>");
         return buf.toString();
     }
 }

@@ -177,8 +177,7 @@ public final class DotGraphMonitor extends AbstractComponentMonitor implements
 
             if (cluster) {
                 sb.append("subgraph cluster").append(i++).append("{\n");
-                sb
-                    .append("  style=rounded;  style=filled; color=gray92; fontsize=40;\n");
+                sb.append("  style=rounded;  style=filled; color=gray92; fontsize=40;\n");
                 sb.append("  label=\"").append(p.p).append("\";\n");
             }
 

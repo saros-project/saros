@@ -4,7 +4,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
 @RunWith(Suite.class)
-@Suite.SuiteClasses( { ConvergenceProblemTest.class, CounterExampleTest.class,
+@Suite.SuiteClasses({ ConvergenceProblemTest.class, CounterExampleTest.class,
     DOptPuzzleTest.class, GOTOInclusionTransformationTest.class,
     InclusionTransformationTest.class, SimpleClientServerTest.class,
     SimpleJupiterDocumentTest.class, SimpleServerProxyTest.class })

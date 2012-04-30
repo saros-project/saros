@@ -45,10 +45,9 @@ public class ShowDescriptionPage extends WizardPage {
         switch (vInfo.compatibility) {
 
         case TOO_NEW:
-            setMessage(
-                MessageFormat.format(
-                    Messages.ShowDescriptionPage_error_too_new,
-                    manager.getVersion(), remoteSarosVersion), WARNING);
+            setMessage(MessageFormat.format(
+                Messages.ShowDescriptionPage_error_too_new,
+                manager.getVersion(), remoteSarosVersion), WARNING);
             break;
 
         case OK:
@@ -56,11 +55,9 @@ public class ShowDescriptionPage extends WizardPage {
 
         case TOO_OLD:
         default:
-            setMessage(
-                MessageFormat.format(
-                    Messages.ShowDescriptionPage_error_too_old,
-                    manager.getVersion().toString(), remoteSarosVersion),
-                WARNING);
+            setMessage(MessageFormat.format(
+                Messages.ShowDescriptionPage_error_too_old, manager
+                    .getVersion().toString(), remoteSarosVersion), WARNING);
         }
     }
 

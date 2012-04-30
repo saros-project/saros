@@ -1,6 +1,6 @@
 /*
  * DPP - Serious Distributed Pair Programming
- * (c) Freie Universität Berlin - Fachbereich Mathematik und Informatik - 2010
+ * (c) Freie Universitï¿½t Berlin - Fachbereich Mathematik und Informatik - 2010
  * (c) Stephan Lau - 2010
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -71,8 +71,9 @@ public class VideoPlayerPreferencePage extends FieldEditorPreferencePage
         keepAspectRatioField = new BooleanFieldEditor(
             PreferenceConstants.PLAYER_KEEP_ASPECT_RATIO, "Keep aspect ratio",
             parent);
-        keepAspectRatioField.setEnabled(getPreferenceStore().getBoolean(
-            PreferenceConstants.PLAYER_RESAMPLE), parent);
+        keepAspectRatioField.setEnabled(
+            getPreferenceStore()
+                .getBoolean(PreferenceConstants.PLAYER_RESAMPLE), parent);
 
         addField(resampleField);
         addField(keepAspectRatioField);

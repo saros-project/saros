@@ -112,7 +112,8 @@ public class ByteStreamConnection implements IByteStreamConnection {
         "service-unavailable(503)" /* peer closed stream already (SOCKS5) */,
         "recipient-unavailable(404)" /* peer is offline (IBB) */};
 
-    private static final Logger log = Logger.getLogger(ByteStreamConnection.class);
+    private static final Logger log = Logger
+        .getLogger(ByteStreamConnection.class);
 
     /**
      * Max size of data chunks
@@ -140,7 +141,7 @@ public class ByteStreamConnection implements IByteStreamConnection {
     private ConcurrentHashMap<Integer, CountDownLatch> transmissionReply = new ConcurrentHashMap<Integer, CountDownLatch>();
 
     private Map<Integer, ByteArrayOutputStream> pendingFragmentedPackets = new HashMap<Integer, ByteArrayOutputStream>();
-    
+
     private DataInputStream inputStream;
     private DataOutputStream outputStream;
     private BytestreamSession session;
@@ -226,13 +227,13 @@ public class ByteStreamConnection implements IByteStreamConnection {
                 checkPayloadLength(payloadLength);
                 payload = new byte[payloadLength];
                 inputStream.readFully(payload);
-                
+
                 try {
                     packet = PacketType.CLASS.get(packetID).newInstance();
                 } catch (Exception e) {
                     throw new IOException(e.getMessage(), e);
                 }
-                
+
                 packet.deserialize(new ByteArrayInputStream(payload));
                 packet.setReceiver(localJID);
                 packet.setSender(remoteJID);
@@ -242,22 +243,22 @@ public class ByteStreamConnection implements IByteStreamConnection {
                 fragmentId = inputStream.readShort();
                 payloadLength = inputStream.readInt();
                 boolean lastFragment = (payloadLength & 0x80000000) != 0;
-                
+
                 payloadLength &= 0x7FFFFFFF;
                 checkPayloadLength(payloadLength);
                 payload = new byte[payloadLength];
 
                 inputStream.readFully(payload);
-                
-                ByteArrayOutputStream out = pendingFragmentedPackets.get(fragmentId);
-                if (out == null)
-                {
+
+                ByteArrayOutputStream out = pendingFragmentedPackets
+                    .get(fragmentId);
+                if (out == null) {
                     out = new ByteArrayOutputStream(payloadLength * 2);
                     pendingFragmentedPackets.put(fragmentId, out);
                 }
-                
+
                 out.write(payload);
-                
+
                 if (!lastFragment)
                     break;
 
@@ -273,7 +274,7 @@ public class ByteStreamConnection implements IByteStreamConnection {
                 packet.setReceiver(localJID);
                 packet.setSender(remoteJID);
                 dispatcher.dispatch(packet);
-                break;               
+                break;
             case Opcode.TRANSFERDESCRIPTION:
                 fragmentId = inputStream.readShort();
                 int chunks = inputStream.readInt();
@@ -336,14 +337,13 @@ public class ByteStreamConnection implements IByteStreamConnection {
             "interrupted while reading stream data");
     }
 
-    private void checkPayloadLength(int length) throws IOException
-    {
+    private void checkPayloadLength(int length) throws IOException {
         if (length < 0 || length > CHUNKSIZE)
             throw new ProtocolException(
-                "payload length field contains corrupted value: 0 < "
-                    + length + " <= " + CHUNKSIZE);
+                "payload length field contains corrupted value: 0 < " + length
+                    + " <= " + CHUNKSIZE);
     }
-    
+
     public synchronized boolean isConnected() {
         return connected;
     }
@@ -392,7 +392,7 @@ public class ByteStreamConnection implements IByteStreamConnection {
     public void sendPacket(Packet packet) throws IOException {
 
         short id = packet.getType().getID();
-        
+
         ByteArrayOutputStream out = new ByteArrayOutputStream(512);
         packet.serialize(out);
 
@@ -402,9 +402,9 @@ public class ByteStreamConnection implements IByteStreamConnection {
             sendPacket(id, payload);
             return;
         }
-        
+
         int fragmentId = nextFragmentId.getAndIncrement() & 0x7FFF;
- 
+
         int chunks = ((payload.length - 1) / CHUNKSIZE) + 1;
 
         int offset = 0;
@@ -412,7 +412,8 @@ public class ByteStreamConnection implements IByteStreamConnection {
 
         while (chunks-- > 0) {
             length = Math.min(payload.length - offset, CHUNKSIZE);
-            sendPacketFragment(id, fragmentId, payload, offset, length, chunks == 0);
+            sendPacketFragment(id, fragmentId, payload, offset, length,
+                chunks == 0);
             offset += length;
         }
     }
@@ -539,8 +540,9 @@ public class ByteStreamConnection implements IByteStreamConnection {
         outputStream.flush();
     }
 
-    private synchronized void sendPacketFragment(short id, int fragmentId, byte[] payload,
-        int offset, int length, boolean lastChunk) throws IOException {
+    private synchronized void sendPacketFragment(short id, int fragmentId,
+        byte[] payload, int offset, int length, boolean lastChunk)
+        throws IOException {
         outputStream.write(Opcode.FRAGMENTED_PACKET);
         outputStream.writeShort(fragmentId);
         outputStream.writeInt(length | (0x80000000 * (lastChunk ? 1 : 0)));

@@ -6,10 +6,12 @@ import org.jivesoftware.smackx.ChatState;
 
 import de.fu_berlin.inf.dpp.net.JID;
 
-public class MUCSessionHistoryStateChangeElement extends MUCSessionHistoryElement {
+public class MUCSessionHistoryStateChangeElement extends
+    MUCSessionHistoryElement {
     protected ChatState state;
 
-    public MUCSessionHistoryStateChangeElement(JID jid, Date date, ChatState state) {
+    public MUCSessionHistoryStateChangeElement(JID jid, Date date,
+        ChatState state) {
         super(jid, date);
         this.state = state;
     }

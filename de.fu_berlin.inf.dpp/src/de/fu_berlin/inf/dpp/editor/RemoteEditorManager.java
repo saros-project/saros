@@ -25,8 +25,8 @@ import de.fu_berlin.inf.dpp.project.ISarosSession;
 
 /**
  * This class contains the state of the editors, viewports and selections of all
- * buddies as we believe it to be by listening to the activityDataObjects
- * we receive.
+ * buddies as we believe it to be by listening to the activityDataObjects we
+ * receive.
  */
 public class RemoteEditorManager {
 
@@ -232,8 +232,8 @@ public class RemoteEditorManager {
         }
 
         /**
-         * Returns a snapshot copy of the editors open for the buddy
-         * represented by this RemoteEditorState.
+         * Returns a snapshot copy of the editors open for the buddy represented
+         * by this RemoteEditorState.
          */
         public Set<SPath> getRemoteOpenEditors() {
             return new HashSet<SPath>(openEditors.keySet());
@@ -321,8 +321,8 @@ public class RemoteEditorManager {
 
     /**
      * Returns a snapshot copy of all paths representing the editors which are
-     * currently opened by the given buddy of this shared session (i.e.
-     * not our own).
+     * currently opened by the given buddy of this shared session (i.e. not our
+     * own).
      * 
      * If no editors are opened by the given user an empty set is being
      * returned.

@@ -78,7 +78,8 @@ public class InvitationWizardUserSelectionPage extends WizardPage {
         composite.setLayout(new GridLayout(2, false));
 
         Label projectLabel = new Label(composite, SWT.NONE);
-        projectLabel.setText(Messages.InvitationWizardUserSelectionPage_label_projects);
+        projectLabel
+            .setText(Messages.InvitationWizardUserSelectionPage_label_projects);
 
         Text projectName = new Text(composite, SWT.READ_ONLY | SWT.SINGLE
             | SWT.BORDER);
@@ -106,7 +107,8 @@ public class InvitationWizardUserSelectionPage extends WizardPage {
         TableColumn sarosEnabledColumn = new TableColumn(userListTable,
             SWT.CENTER);
         sarosEnabledColumn.setWidth(100);
-        sarosEnabledColumn.setText(Messages.InvitationWizardUserSelectionPage_saros_support);
+        sarosEnabledColumn
+            .setText(Messages.InvitationWizardUserSelectionPage_saros_support);
 
         GridData gd = new GridData(SWT.FILL, SWT.FILL, true, true);
         gd.minimumHeight = 150;
@@ -134,7 +136,8 @@ public class InvitationWizardUserSelectionPage extends WizardPage {
         // CheckBox to show only users with Saros support.
         onlySaros = new Button(composite, SWT.CHECK);
         onlySaros.setSelection(false);
-        onlySaros.setText(Messages.InvitationWizardUserSelectionPage_hide_saros_support);
+        onlySaros
+            .setText(Messages.InvitationWizardUserSelectionPage_hide_saros_support);
         onlySaros
             .setToolTipText(Messages.InvitationWizardUserSelectionPage_hide_buddies_offline);
         onlySarosListener = new SelectionListener() {
@@ -186,7 +189,8 @@ public class InvitationWizardUserSelectionPage extends WizardPage {
                     refreshSarosSupport(jid);
                     return "?"; //$NON-NLS-1$
                 }
-                return supported ? Messages.InvitationWizardUserSelectionPage_yes : Messages.InvitationWizardUserSelectionPage_no;
+                return supported ? Messages.InvitationWizardUserSelectionPage_yes
+                    : Messages.InvitationWizardUserSelectionPage_no;
             default:
                 return Messages.InvitationWizardUserSelectionPage_default_value;
             }
