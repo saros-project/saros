@@ -419,11 +419,7 @@ public final class StopManager extends AbstractActivityProvider {
             handle.getUser(), Type.UNLOCKREQUEST, State.INITIATED,
             handle.getHandleID());
 
-        Utils.runSafeSWTSync(log, new Runnable() {
-            public void run() {
-                fireActivity(activity);
-            }
-        });
+        fireActivity(activity);
     }
 
     /**
