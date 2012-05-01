@@ -2,7 +2,6 @@ package de.fu_berlin.inf.dpp.util;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -152,16 +151,6 @@ public class Utils {
 
         try {
             socketToClose.close();
-        } catch (IOException e) {
-            // ignore
-        }
-    }
-
-    public static void close(Closeable closeable) {
-        if (closeable == null)
-            return;
-        try {
-            closeable.close();
         } catch (IOException e) {
             // ignore
         }
