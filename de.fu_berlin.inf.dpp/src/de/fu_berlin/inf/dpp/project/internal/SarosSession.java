@@ -168,8 +168,15 @@ public class SarosSession implements ISarosSession, Disposable {
     protected IPreferenceStore prefStore;
 
     private final IActivityListener activityListener = new IActivityListener() {
-        public void activityCreated(IActivity activityData) {
-            handleActivityCreated(activityData);
+        public void activityCreated(final IActivity activityData) {
+            Utils.runSafeSWTSync(log, new Runnable() {
+
+                @Override
+                public void run() {
+                    handleActivityCreated(activityData);
+                }
+
+            });
         }
     };
 

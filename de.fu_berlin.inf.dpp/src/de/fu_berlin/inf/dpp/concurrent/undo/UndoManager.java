@@ -308,8 +308,14 @@ public class UndoManager extends AbstractActivityProvider implements Disposable 
 
     protected IActivityListener activityListener = new IActivityListener() {
 
-        public void activityCreated(IActivity activityDataObject) {
-            activityDataObject.dispatch(activityDataObjectReceiver);
+        public void activityCreated(final IActivity activityDataObject) {
+            Utils.runSafeSWTSync(log, new Runnable() {
+
+                @Override
+                public void run() {
+                    activityDataObject.dispatch(activityDataObjectReceiver);
+                }
+            });
         }
     };
 

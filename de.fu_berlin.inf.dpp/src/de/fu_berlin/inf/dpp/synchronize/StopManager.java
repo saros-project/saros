@@ -123,14 +123,11 @@ public final class StopManager extends AbstractActivityProvider {
                 if (stopActivity.getState() == State.INITIATED) {
                     addStartHandle(generateStartHandle(stopActivity));
                     // locks project and acknowledges
-                    Utils.runSafeSWTSync(log, new Runnable() {
-                        public void run() {
-                            lockProject(true);
-                            fireActivity(stopActivity
-                                .generateAcknowledgment(sarosSession
-                                    .getLocalUser()));
-                        }
-                    });
+
+                    lockProject(true);
+                    fireActivity(stopActivity
+                        .generateAcknowledgment(sarosSession.getLocalUser()));
+
                     return;
                 }
                 if (stopActivity.getState() == State.ACKNOWLEDGED) {
@@ -310,22 +307,14 @@ public final class StopManager extends AbstractActivityProvider {
 
         // Short cut if affected user is local
         if (user.isLocal()) {
-            Utils.runSafeSWTSync(log, new Runnable() {
-                public void run() {
-                    lockProject(true);
-                }
-            });
+            lockProject(true);
             return handle;
         }
 
         StopActivity expectedAck = stopActivity.generateAcknowledgment(user);
         expectedAcknowledgments.add(expectedAck);
 
-        Utils.runSafeSWTSync(log, new Runnable() {
-            public void run() {
-                fireActivity(stopActivity);
-            }
-        });
+        fireActivity(stopActivity);
 
         // Block until user acknowledged
         log.debug("Waiting for acknowledgment " + Utils.prefix(user.getJID()));
@@ -401,11 +390,8 @@ public final class StopManager extends AbstractActivityProvider {
             log.debug(remainingHandles + " startHandles remaining.");
             return false;
         }
-        Utils.runSafeSWTSync(log, new Runnable() {
-            public void run() {
-                lockProject(false);
-            }
-        });
+
+        lockProject(false);
         return true;
     }
 

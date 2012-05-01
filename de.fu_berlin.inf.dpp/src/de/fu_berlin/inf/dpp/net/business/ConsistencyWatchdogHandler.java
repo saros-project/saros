@@ -279,13 +279,9 @@ public class ConsistencyWatchdogHandler {
                     final DocumentChecksum checksum = new DocumentChecksum(path);
                     checksum.bind(doc);
                     checksum.update();
-                    Utils.runSafeSWTSync(log, new Runnable() {
-                        public void run() {
-                            activityProvider.fireActivity(new ChecksumActivity(
-                                user, path, checksum.getHash(), checksum
-                                    .getLength()));
-                        }
-                    });
+
+                    activityProvider.fireActivity(new ChecksumActivity(user,
+                        path, checksum.getHash(), checksum.getLength()));
                 } catch (CoreException e) {
                     log.warn("Could not check checksum of file "
                         + path.toString());
@@ -302,12 +298,7 @@ public class ConsistencyWatchdogHandler {
             // Tell the client to delete the file
             sarosSession.sendActivity(from,
                 FileActivity.removed(user, path, Purpose.RECOVERY));
-            Utils.runSafeSWTSync(log, new Runnable() {
-                public void run() {
-                    activityProvider.fireActivity(ChecksumActivity.missing(
-                        user, path));
-                }
-            });
+            activityProvider.fireActivity(ChecksumActivity.missing(user, path));
 
             progress.worked(8);
         }

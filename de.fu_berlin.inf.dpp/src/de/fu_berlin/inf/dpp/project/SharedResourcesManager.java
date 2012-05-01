@@ -372,22 +372,18 @@ public class SharedResourcesManager extends AbstractActivityProvider implements
         final List<IResourceActivity> orderedActivities = pendingActivities
             .retrieveAll();
         log.trace("Sending activities " + orderedActivities.toString());
-        Utils.runSafeSWTSync(log, new Runnable() {
-            public void run() {
-                for (final IActivity activity : orderedActivities) {
-                    /*
-                     * Make sure we only send a VCSActivity if VC is enabled for
-                     * this session.
-                     */
-                    if (sarosSession.useVersionControl()
-                        || !(activity instanceof VCSActivity)) {
-                        fireActivity(activity);
-                    } else {
-                        log.error("Tried to send VCSActivity with VC support disabled.");
-                    }
-                }
+        for (final IActivity activity : orderedActivities) {
+            /*
+             * Make sure we only send a VCSActivity if VC is enabled for this
+             * session.
+             */
+            if (sarosSession.useVersionControl()
+                || !(activity instanceof VCSActivity)) {
+                fireActivity(activity);
+            } else {
+                log.error("Tried to send VCSActivity with VC support disabled.");
             }
-        });
+        }
     }
 
     /*

@@ -201,11 +201,23 @@ public class EditorManager extends AbstractActivityProvider {
 
     private Blockable stopManagerListener = new Blockable() {
         public void unblock() {
-            lockAllEditors(false);
+            Utils.runSafeSWTSync(log, new Runnable() {
+
+                @Override
+                public void run() {
+                    lockAllEditors(false);
+                }
+            });
         }
 
         public void block() {
-            lockAllEditors(true);
+            Utils.runSafeSWTSync(log, new Runnable() {
+
+                @Override
+                public void run() {
+                    lockAllEditors(true);
+                }
+            });
         }
     };
 
