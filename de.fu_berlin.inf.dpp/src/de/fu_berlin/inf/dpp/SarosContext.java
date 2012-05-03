@@ -133,7 +133,7 @@ import de.fu_berlin.inf.dpp.videosharing.VideoSharingService;
  * @author philipp.cordes
  * @author Stefan Rossbach
  */
-public class SarosContext {
+public class SarosContext implements ISarosContext {
 
     private static class Component {
         private Class<?> intf;
@@ -483,5 +483,9 @@ public class SarosContext {
         public SarosContext build() {
             return new SarosContext(saros, dotMonitor);
         }
+    }
+
+    public MutablePicoContainer createSimpleChildContainer() {
+        return container.makeChildContainer();
     }
 }

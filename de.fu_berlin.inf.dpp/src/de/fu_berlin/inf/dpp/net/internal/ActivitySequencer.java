@@ -38,7 +38,7 @@ import java.util.concurrent.TimeUnit;
 import org.apache.log4j.Logger;
 import org.picocontainer.annotations.Inject;
 
-import de.fu_berlin.inf.dpp.SarosPluginContext;
+import de.fu_berlin.inf.dpp.ISarosContext;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.activities.SPathDataObject;
 import de.fu_berlin.inf.dpp.activities.business.FolderActivity.Type;
@@ -440,8 +440,9 @@ public class ActivitySequencer {
     @Inject
     protected PreferenceUtils preferenceUtils;
 
-    public ActivitySequencer(final ISarosSession sarosSession,
-        ITransmitter transmitter, DataTransferManager transferManager,
+    public ActivitySequencer(ISarosContext context,
+        final ISarosSession sarosSession, ITransmitter transmitter,
+        DataTransferManager transferManager,
         DispatchThreadContext threadContext, int updateInterval) {
 
         this.dispatchThread = threadContext;
@@ -477,7 +478,7 @@ public class ActivitySequencer {
                 }
             });
 
-        SarosPluginContext.initComponent(this);
+        context.initComponent(this);
     }
 
     /**

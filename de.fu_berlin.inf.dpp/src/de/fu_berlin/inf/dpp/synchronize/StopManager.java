@@ -21,6 +21,7 @@ import java.util.concurrent.locks.ReentrantLock;
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
+import org.picocontainer.Startable;
 
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.activities.business.AbstractActivityReceiver;
@@ -50,7 +51,8 @@ import de.fu_berlin.inf.dpp.util.Utils;
  * remove the block of remote users.
  */
 @Component(module = "core")
-public final class StopManager extends AbstractActivityProvider {
+public final class StopManager extends AbstractActivityProvider implements
+    Startable {
 
     private static final Logger log = Logger.getLogger(StopManager.class);
 
@@ -512,5 +514,15 @@ public final class StopManager extends AbstractActivityProvider {
         removeStartHandle(startHandle);
         initiateUnlock(startHandle);
         return getStartHandles(startHandle.getUser()).isEmpty();
+    }
+
+    @Override
+    public void start() {
+        //
+    }
+
+    @Override
+    public void stop() {
+        sessionStopped();
     }
 }

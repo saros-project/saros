@@ -50,10 +50,11 @@ import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.widgets.Display;
 import org.joda.time.DateTime;
 import org.picocontainer.Disposable;
+import org.picocontainer.MutablePicoContainer;
 import org.picocontainer.annotations.Inject;
 
+import de.fu_berlin.inf.dpp.ISarosContext;
 import de.fu_berlin.inf.dpp.Saros;
-import de.fu_berlin.inf.dpp.SarosContext;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.User.Permission;
 import de.fu_berlin.inf.dpp.activities.SPath;
@@ -134,6 +135,8 @@ public class SarosSession implements ISarosSession, Disposable {
 
     protected ActivitySequencer activitySequencer;
 
+    protected final ISarosContext sarosContext;
+
     protected ConcurrentDocumentClient concurrentDocumentClient;
 
     protected ConcurrentDocumentServer concurrentDocumentServer;
@@ -156,7 +159,6 @@ public class SarosSession implements ISarosSession, Disposable {
     protected DateTime sessionStart;
 
     protected SarosProjectMapper projectMapper = new SarosProjectMapper();
-
     protected boolean useVersionControl = true;
 
     protected BlockingQueue<List<IActivity>> pendingActivityLists = new LinkedBlockingQueue<List<IActivity>>();
@@ -180,11 +182,7 @@ public class SarosSession implements ISarosSession, Disposable {
         }
     };
 
-    /*
-     * NOTE: The StopManager will call the SarosSession on creation. Make sure
-     * the above activityListener is created before the StopManager.
-     */
-    protected StopManager stopManager = new StopManager(this);
+    protected MutablePicoContainer sessionContainer;
 
     /**
      * This thread executes pending activities in the SWT thread.<br>
@@ -267,13 +265,14 @@ public class SarosSession implements ISarosSession, Disposable {
      */
     protected SarosSession(ITransmitter transmitter,
         DispatchThreadContext threadContext, int myColorID,
-        DateTime sessionStart, SarosContext sarosContext) {
+        DateTime sessionStart, ISarosContext sarosContext) {
 
         sarosContext.initComponent(this);
 
         assert transmitter != null;
         assert sarosNet.getMyJID() != null;
 
+        this.sarosContext = sarosContext;
         this.sessionStart = sessionStart;
 
         this.localUser = new User(this, sarosNet.getMyJID(), myColorID);
@@ -282,12 +281,15 @@ public class SarosSession implements ISarosSession, Disposable {
         int updateInterval = prefStore
             .getInt(PreferenceConstants.MILLIS_UPDATE);
 
-        this.activitySequencer = new ActivitySequencer(this, transmitter,
-            transferManager, threadContext, updateInterval);
+        this.activitySequencer = new ActivitySequencer(sarosContext, this,
+            transmitter, transferManager, threadContext, updateInterval);
+
+        freeColors = new FreeColors(MAX_USERCOLORS - 1);
 
         activityDispatcher.setDaemon(true);
+
+        initializeSessionContainer(sarosContext);
         activityDispatcher.start();
-        freeColors = new FreeColors(MAX_USERCOLORS - 1);
     }
 
     /**
@@ -295,7 +297,7 @@ public class SarosSession implements ISarosSession, Disposable {
      */
     public SarosSession(ITransmitter transmitter,
         DispatchThreadContext threadContext, DateTime sessionStart,
-        SarosContext sarosContext) {
+        ISarosContext sarosContext) {
 
         this(transmitter, threadContext, 0, sessionStart, sarosContext);
 
@@ -314,7 +316,7 @@ public class SarosSession implements ISarosSession, Disposable {
      */
     public SarosSession(ITransmitter transmitter,
         DispatchThreadContext threadContext, JID hostID, int myColorID,
-        DateTime sessionStart, SarosContext sarosContext, JID inviterID,
+        DateTime sessionStart, ISarosContext sarosContext, JID inviterID,
         int inviterColorID) {
 
         this(transmitter, threadContext, myColorID, sessionStart, sarosContext);
@@ -470,7 +472,7 @@ public class SarosSession implements ISarosSession, Disposable {
             });
 
         } else {
-            StartHandle startHandle = stopManager.stop(user,
+            StartHandle startHandle = getStopManager().stop(user,
                 Messages.SarosSession_performing_permission_change, progress);
 
             Utils.runSafeSWTSync(log, new Runnable() {
@@ -646,6 +648,7 @@ public class SarosSession implements ISarosSession, Disposable {
             throw new IllegalStateException();
         }
         activitySequencer.start();
+        sessionContainer.start();
 
         stopped = false;
 
@@ -670,7 +673,8 @@ public class SarosSession implements ISarosSession, Disposable {
         }
 
         activitySequencer.stop();
-        stopManager.sessionStopped();
+        sessionContainer.stop();
+        sarosContext.removeChildContainer(sessionContainer);
 
         stopped = true;
     }
@@ -1340,6 +1344,15 @@ public class SarosSession implements ISarosSession, Disposable {
     }
 
     public StopManager getStopManager() {
-        return stopManager;
+        return sessionContainer.getComponent(StopManager.class);
+    }
+
+    private void initializeSessionContainer(ISarosContext context) {
+        sessionContainer = context.createSimpleChildContainer();
+        sessionContainer.addComponent(ISarosSession.class, this);
+        sessionContainer.addComponent(StopManager.class);
+
+        // Force the creation of the above components.
+        sessionContainer.getComponents();
     }
 }
