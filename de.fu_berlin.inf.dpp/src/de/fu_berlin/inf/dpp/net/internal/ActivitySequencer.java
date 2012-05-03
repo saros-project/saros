@@ -33,7 +33,6 @@ import java.util.TimerTask;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -103,6 +102,10 @@ public class ActivitySequencer implements Startable {
             this(Collections.singletonList(host), transformedActivity);
         }
     }
+
+    /** Special queue item that termins the processing */
+    private static final DataObjectQueueItem POISON = new DataObjectQueueItem(
+        (User) null, null);
 
     /** Buffer for outgoing activityDataObjects. */
     protected final BlockingQueue<DataObjectQueueItem> outgoingQueue = new LinkedBlockingQueue<DataObjectQueueItem>();
@@ -533,27 +536,12 @@ public class ActivitySequencer implements Startable {
                 List<DataObjectQueueItem> activities = new ArrayList<DataObjectQueueItem>(
                     outgoingQueue.size());
 
-                try {
-                    /*
-                     * Wait until the queue is not empty.
-                     * 
-                     * If the timer is cancelled, we don't want our TimerTask to
-                     * wait indefinitely. To get a chance to cancel the task, we
-                     * use poll with a timeout here instead of take.
-                     */
-                    DataObjectQueueItem item = outgoingQueue.poll(30,
-                        TimeUnit.SECONDS);
-                    if (item == null) {
-                        // poll() timed out, nothing to do.
-                        return;
-                    }
-                    activities.add(item);
-                } catch (InterruptedException e1) {
-                    if (!started)
-                        return;
-                    log.error("Interrupted while waiting for outgoing object",
-                        e1);
-                }
+                DataObjectQueueItem queueItem = outgoingQueue.poll();
+                if (queueItem == POISON)
+                    return;
+
+                activities.add(queueItem);
+
                 // If there was more than one ADO waiting, get the rest now.
                 outgoingQueue.drainTo(activities);
 
@@ -719,6 +707,18 @@ public class ActivitySequencer implements Startable {
             throw new IllegalStateException();
         }
 
+        /**
+         * Try to poison the flush task using the "Poison Pill" as known from
+         * the Java Concurrency in Practice book.
+         */
+        while (true) {
+            try {
+                this.outgoingQueue.put(POISON);
+                break;
+            } catch (InterruptedException e) {
+                //
+            }
+        }
         this.flushTimer.cancel();
         this.flushTimer = null;
 
