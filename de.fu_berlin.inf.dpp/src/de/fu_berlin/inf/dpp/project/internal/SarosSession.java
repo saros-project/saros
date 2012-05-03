@@ -46,7 +46,6 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
-import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.widgets.Display;
 import org.joda.time.DateTime;
 import org.picocontainer.Disposable;
@@ -81,12 +80,10 @@ import de.fu_berlin.inf.dpp.invitation.ProjectNegotiation;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.SarosNet;
-import de.fu_berlin.inf.dpp.net.business.DispatchThreadContext;
 import de.fu_berlin.inf.dpp.net.internal.ActivitySequencer;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
 import de.fu_berlin.inf.dpp.net.internal.SarosPacketCollector;
 import de.fu_berlin.inf.dpp.observables.ProjectNegotiationObservable;
-import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
 import de.fu_berlin.inf.dpp.project.AbstractActivityProvider;
 import de.fu_berlin.inf.dpp.project.IActivityListener;
@@ -133,8 +130,6 @@ public class SarosSession implements ISarosSession, Disposable {
     @Inject
     protected EditorManager editorManager;
 
-    protected ActivitySequencer activitySequencer;
-
     protected final ISarosContext sarosContext;
 
     protected ConcurrentDocumentClient concurrentDocumentClient;
@@ -166,8 +161,6 @@ public class SarosSession implements ISarosSession, Disposable {
     protected List<IResource> selectedResources = new ArrayList<IResource>();
 
     public boolean cancelActivityDispatcher = false;
-
-    protected IPreferenceStore prefStore;
 
     private final IActivityListener activityListener = new IActivityListener() {
         public void activityCreated(final IActivity activityData) {
@@ -259,30 +252,17 @@ public class SarosSession implements ISarosSession, Disposable {
     /**
      * Common constructor code for host and client side.
      */
-    /*
-     * FIXME ITransmitter, DataTransferManager, and DispatchThreadContext are
-     * dependencies of ActivitySequencer, not SarosSession.
-     */
-    protected SarosSession(ITransmitter transmitter,
-        DispatchThreadContext threadContext, int myColorID,
-        DateTime sessionStart, ISarosContext sarosContext) {
+    protected SarosSession(int myColorID, DateTime sessionStart,
+        ISarosContext sarosContext) {
 
         sarosContext.initComponent(this);
 
-        assert transmitter != null;
         assert sarosNet.getMyJID() != null;
 
         this.sarosContext = sarosContext;
         this.sessionStart = sessionStart;
 
         this.localUser = new User(this, sarosNet.getMyJID(), myColorID);
-
-        this.prefStore = saros.getPreferenceStore();
-        int updateInterval = prefStore
-            .getInt(PreferenceConstants.MILLIS_UPDATE);
-
-        this.activitySequencer = new ActivitySequencer(sarosContext, this,
-            transmitter, transferManager, threadContext, updateInterval);
 
         freeColors = new FreeColors(MAX_USERCOLORS - 1);
 
@@ -295,11 +275,9 @@ public class SarosSession implements ISarosSession, Disposable {
     /**
      * Constructor called for SarosSession of the host
      */
-    public SarosSession(ITransmitter transmitter,
-        DispatchThreadContext threadContext, DateTime sessionStart,
-        ISarosContext sarosContext) {
+    public SarosSession(DateTime sessionStart, ISarosContext sarosContext) {
 
-        this(transmitter, threadContext, 0, sessionStart, sarosContext);
+        this(0, sessionStart, sarosContext);
 
         host = localUser;
         host.invitationCompleted();
@@ -314,12 +292,10 @@ public class SarosSession implements ISarosSession, Disposable {
     /**
      * Constructor of client
      */
-    public SarosSession(ITransmitter transmitter,
-        DispatchThreadContext threadContext, JID hostID, int myColorID,
-        DateTime sessionStart, ISarosContext sarosContext, JID inviterID,
-        int inviterColorID) {
+    public SarosSession(JID hostID, int myColorID, DateTime sessionStart,
+        ISarosContext sarosContext, JID inviterID, int inviterColorID) {
 
-        this(transmitter, threadContext, myColorID, sessionStart, sarosContext);
+        this(myColorID, sessionStart, sarosContext);
 
         host = new User(this, hostID, 0);
         host.invitationCompleted();
@@ -445,7 +421,7 @@ public class SarosSession implements ISarosSession, Disposable {
     }
 
     public ActivitySequencer getSequencer() {
-        return activitySequencer;
+        return sessionContainer.getComponent(ActivitySequencer.class);
     }
 
     /**
@@ -604,7 +580,7 @@ public class SarosSession implements ISarosSession, Disposable {
             returnColor(user.getColorID());
         }
 
-        activitySequencer.userLeft(user);
+        getSequencer().userLeft(user);
 
         // TODO what is to do here if no user with write access exists anymore?
         listenerDispatch.userLeft(user);
@@ -647,9 +623,8 @@ public class SarosSession implements ISarosSession, Disposable {
         if (!stopped) {
             throw new IllegalStateException();
         }
-        activitySequencer.start();
-        sessionContainer.start();
 
+        sessionContainer.start();
         stopped = false;
 
     }
@@ -672,7 +647,6 @@ public class SarosSession implements ISarosSession, Disposable {
             throw new IllegalStateException();
         }
 
-        activitySequencer.stop();
         sessionContainer.stop();
         sarosContext.removeChildContainer(sessionContainer);
 
@@ -944,7 +918,7 @@ public class SarosSession implements ISarosSession, Disposable {
             return;
 
         try {
-            activitySequencer.sendActivity(toWhom,
+            getSequencer().sendActivity(toWhom,
                 activity.getActivityDataObject(this));
         } catch (IllegalArgumentException e) {
             log.warn("Could not convert Activity to DataObject: ", e);
@@ -1351,6 +1325,7 @@ public class SarosSession implements ISarosSession, Disposable {
         sessionContainer = context.createSimpleChildContainer();
         sessionContainer.addComponent(ISarosSession.class, this);
         sessionContainer.addComponent(StopManager.class);
+        sessionContainer.addComponent(ActivitySequencer.class);
 
         // Force the creation of the above components.
         sessionContainer.getComponents();

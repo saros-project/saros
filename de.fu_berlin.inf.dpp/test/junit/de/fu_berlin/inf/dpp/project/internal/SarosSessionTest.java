@@ -170,17 +170,18 @@ public class SarosSessionTest {
         EasyMock.replay(context);
 
         // Test creating, starting and stopping the session.
-        DispatchThreadContext dispatcher = container
-            .getComponent(DispatchThreadContext.class);
-        ITransmitter transmitter = container.getComponent(ITransmitter.class);
-        SarosSession session = new SarosSession(transmitter, dispatcher,
-            new DateTime(), context);
+        SarosSession session = new SarosSession(new DateTime(), context);
+        Assert.assertFalse(session.getSequencer().isStarted());
         session.start();
 
         StopManager stopManager1 = session.getStopManager();
         StopManager stopManager2 = session.getStopManager();
         Assert.assertSame(stopManager1, stopManager2);
+        Assert.assertTrue(session.getSequencer().isStarted());
+
         session.stop();
+        Assert.assertFalse(session.getSequencer().isStarted());
+
         session.dispose();
     }
 

@@ -68,7 +68,6 @@ import de.fu_berlin.inf.dpp.net.IConnectionListener;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.RosterTracker;
 import de.fu_berlin.inf.dpp.net.SarosNet;
-import de.fu_berlin.inf.dpp.net.business.DispatchThreadContext;
 import de.fu_berlin.inf.dpp.net.discoverymanager.DiscoveryManager;
 import de.fu_berlin.inf.dpp.net.internal.XMPPTransmitter;
 import de.fu_berlin.inf.dpp.observables.InvitationProcessObservable;
@@ -126,10 +125,6 @@ public class SarosSessionManager implements ISarosSessionManager,
     protected RosterTracker rosterTracker;
 
     @Inject
-    // FIXME dependency of other class
-    protected DispatchThreadContext dispatchThreadContext;
-
-    @Inject
     protected SarosContext sarosContext;
 
     protected SarosNet sarosNet;
@@ -183,8 +178,8 @@ public class SarosSessionManager implements ISarosSessionManager,
         this.sessionID.setValue(String.valueOf(sessionRandom
             .nextInt(Integer.MAX_VALUE)));
 
-        final SarosSession sarosSession = new SarosSession(this.transmitter,
-            dispatchThreadContext, new DateTime(), sarosContext);
+        final SarosSession sarosSession = new SarosSession(new DateTime(),
+            sarosContext);
 
         this.sarosSessionObservable.setValue(sarosSession);
 
@@ -246,9 +241,8 @@ public class SarosSessionManager implements ISarosSessionManager,
     public ISarosSession joinSession(JID host, int colorID,
         DateTime sessionStart, JID inviter, int inviterColorID) {
 
-        SarosSession sarosSession = new SarosSession(transmitter,
-            dispatchThreadContext, host, colorID, sessionStart, sarosContext,
-            inviter, inviterColorID);
+        SarosSession sarosSession = new SarosSession(host, colorID,
+            sessionStart, sarosContext, inviter, inviterColorID);
 
         this.sarosSessionObservable.setValue(sarosSession);
 

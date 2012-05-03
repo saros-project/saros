@@ -36,9 +36,10 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
-import org.picocontainer.annotations.Inject;
+import org.eclipse.jface.preference.IPreferenceStore;
+import org.picocontainer.Startable;
 
-import de.fu_berlin.inf.dpp.ISarosContext;
+import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.activities.SPathDataObject;
 import de.fu_berlin.inf.dpp.activities.business.FolderActivity.Type;
@@ -55,6 +56,7 @@ import de.fu_berlin.inf.dpp.net.NetTransferMode;
 import de.fu_berlin.inf.dpp.net.TimedActivityDataObject;
 import de.fu_berlin.inf.dpp.net.business.DispatchThreadContext;
 import de.fu_berlin.inf.dpp.observables.ProjectNegotiationObservable;
+import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.util.ActivityUtils;
@@ -73,7 +75,7 @@ import de.fu_berlin.inf.dpp.util.Utils;
  * @author coezbek
  * @author marrin
  */
-public class ActivitySequencer {
+public class ActivitySequencer implements Startable {
 
     private static final Logger log = Logger.getLogger(ActivitySequencer.class
         .getName());
@@ -434,24 +436,27 @@ public class ActivitySequencer {
 
     protected final DispatchThreadContext dispatchThread;
 
-    @Inject
     protected ProjectNegotiationObservable projectExchangeProcesses;
 
-    @Inject
     protected PreferenceUtils preferenceUtils;
 
-    public ActivitySequencer(ISarosContext context,
-        final ISarosSession sarosSession, ITransmitter transmitter,
-        DataTransferManager transferManager,
-        DispatchThreadContext threadContext, int updateInterval) {
+    public ActivitySequencer(Saros saros,
+        ProjectNegotiationObservable projectExchangeProcess,
+        PreferenceUtils preferenceUtils, final ISarosSession sarosSession,
+        ITransmitter transmitter, DataTransferManager transferManager,
+        DispatchThreadContext threadContext) {
 
         this.dispatchThread = threadContext;
         this.sarosSession = sarosSession;
         this.transmitter = transmitter;
         this.transferManager = transferManager;
+        this.projectExchangeProcesses = projectExchangeProcess;
+        this.preferenceUtils = preferenceUtils;
 
+        IPreferenceStore prefStore = saros.getPreferenceStore();
+        this.MILLIS_UPDATE = prefStore
+            .getInt(PreferenceConstants.MILLIS_UPDATE);
         this.localJID = sarosSession.getLocalUser().getJID();
-        this.MILLIS_UPDATE = updateInterval;
 
         this.queuedOutgoingActivitiesOfUsers = Collections
             .synchronizedMap(new HashMap<User, List<IActivityDataObject>>());
@@ -477,8 +482,13 @@ public class ActivitySequencer {
                     // do nothing
                 }
             });
+    }
 
-        context.initComponent(this);
+    /**
+     * Used by the unit test
+     */
+    public boolean isStarted() {
+        return started;
     }
 
     /**
