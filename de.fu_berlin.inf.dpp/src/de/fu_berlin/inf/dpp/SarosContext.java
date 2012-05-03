@@ -51,7 +51,6 @@ import de.fu_berlin.inf.dpp.feedback.StatisticManager;
 import de.fu_berlin.inf.dpp.feedback.TextEditCollector;
 import de.fu_berlin.inf.dpp.feedback.VoIPCollector;
 import de.fu_berlin.inf.dpp.net.IncomingTransferObject;
-import de.fu_berlin.inf.dpp.net.PingPongCentral;
 import de.fu_berlin.inf.dpp.net.RosterTracker;
 import de.fu_berlin.inf.dpp.net.SarosNet;
 import de.fu_berlin.inf.dpp.net.business.ActivitiesHandler;
@@ -239,7 +238,6 @@ public class SarosContext implements ISarosContext {
         Component.create(DataTransferManager.class),
         Component.create(DiscoveryManager.class),
         Component.create(IBBTransport.class),
-        Component.create(PingPongCentral.class),
         Component.create(RosterTracker.class),
         Component.create(SarosNet.class),
         Component.create(SarosRosterListener.class),

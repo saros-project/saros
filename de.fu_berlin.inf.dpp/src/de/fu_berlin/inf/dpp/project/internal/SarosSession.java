@@ -79,6 +79,7 @@ import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
 import de.fu_berlin.inf.dpp.invitation.ProjectNegotiation;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.net.PingPongCentral;
 import de.fu_berlin.inf.dpp.net.SarosNet;
 import de.fu_berlin.inf.dpp.net.internal.ActivitySequencer;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
@@ -1326,6 +1327,9 @@ public class SarosSession implements ISarosSession, Disposable {
         sessionContainer.addComponent(ISarosSession.class, this);
         sessionContainer.addComponent(StopManager.class);
         sessionContainer.addComponent(ActivitySequencer.class);
+
+        // Classes belonging to a session
+        sessionContainer.addComponent(PingPongCentral.class);
 
         // Force the creation of the above components.
         sessionContainer.getComponents();

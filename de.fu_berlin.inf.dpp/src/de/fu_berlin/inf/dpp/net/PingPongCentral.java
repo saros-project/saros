@@ -14,6 +14,7 @@ import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.joda.time.DateTime;
 import org.joda.time.Duration;
+import org.picocontainer.Startable;
 
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.User;
@@ -25,24 +26,19 @@ import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
 import de.fu_berlin.inf.dpp.project.AbstractActivityProvider;
-import de.fu_berlin.inf.dpp.project.AbstractSarosSessionListener;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
-import de.fu_berlin.inf.dpp.project.ISarosSessionListener;
-import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.util.AutoHashMap;
 import de.fu_berlin.inf.dpp.util.Function;
 import de.fu_berlin.inf.dpp.util.NamedThreadFactory;
 import de.fu_berlin.inf.dpp.util.Utils;
 
 @Component(module = "net")
-public class PingPongCentral extends AbstractActivityProvider {
+public class PingPongCentral extends AbstractActivityProvider implements
+    Startable {
 
     private static final Logger log = Logger.getLogger(PingPongCentral.class);
 
-    protected AtomicReference<ISarosSession> sarosSession = new AtomicReference<ISarosSession>(
-        null);
-
-    protected ISarosSessionManager sessionManager;
+    protected final ISarosSession sarosSession;
 
     protected boolean sendPings = false;
 
@@ -148,54 +144,44 @@ public class PingPongCentral extends AbstractActivityProvider {
     protected AtomicReference<ScheduledFuture<?>> pingPongHandle = new AtomicReference<ScheduledFuture<?>>(
         null);
 
-    protected ISarosSessionListener sessionListener = new AbstractSarosSessionListener() {
-        @Override
-        public void sessionEnded(ISarosSession oldSarosSession) {
+    @Override
+    public void stop() {
+        sarosSession.removeActivityProvider(this);
 
-            oldSarosSession.removeActivityProvider(PingPongCentral.this);
+        ScheduledFuture<?> pingPongFuture = pingPongHandle.getAndSet(null);
 
-            ScheduledFuture<?> pingPongFuture = pingPongHandle.getAndSet(null);
+        if (pingPongFuture != null)
+            pingPongFuture.cancel(true);
+        else
+            log.warn("saros session listener error, session ended but has not started at all");
 
-            if (pingPongFuture != null)
-                pingPongFuture.cancel(true);
-            else
-                log.warn("saros session listener error, session ended but has not started at all");
+        log.info(toString());
+        scheduler.shutdown();
+    }
 
-            sarosSession.set(null);
-
-            log.info(PingPongCentral.this.toString());
-        }
-
-        @Override
-        public void sessionStarted(ISarosSession newSarosSession) {
-            sarosSession.set(newSarosSession);
-
-            stats.clear();
-
-            newSarosSession.addActivityProvider(PingPongCentral.this);
-
-            pingPongHandle.set(scheduler.scheduleAtFixedRate(new Runnable() {
-                public void run() {
-                    if (!sendPings)
-                        return;
-                    Utils.runSafeSWTSync(log, new Runnable() {
-                        public void run() {
-                            if (log.isDebugEnabled()) {
-                                log.debug(PingPongCentral.this.toString());
-                            }
-                            sendPings();
+    @Override
+    public void start() {
+        sarosSession.addActivityProvider(this);
+        pingPongHandle.set(scheduler.scheduleAtFixedRate(new Runnable() {
+            public void run() {
+                if (!sendPings)
+                    return;
+                Utils.runSafeSWTSync(log, new Runnable() {
+                    public void run() {
+                        if (log.isDebugEnabled()) {
+                            log.debug(toString());
                         }
-                    });
-                }
-            }, 10, 10, TimeUnit.SECONDS));
-        }
-    };
+                        sendPings();
+                    }
+                });
+            }
+        }, 10, 10, TimeUnit.SECONDS));
+    }
 
-    public PingPongCentral(Saros saros, ISarosSessionManager manager,
+    public PingPongCentral(Saros saros, ISarosSession session,
         PreferenceUtils preferenceUtils) {
-        this.sessionManager = manager;
-        this.sessionManager.addSarosSessionListener(sessionListener);
 
+        this.sarosSession = session;
         this.sendPings = preferenceUtils.isPingPongActivated();
         /*
          * register a property change listeners to keep sendPings up-to-date
@@ -219,18 +205,9 @@ public class PingPongCentral extends AbstractActivityProvider {
         }
     };
 
-    public void dispose() {
-        this.sessionManager.removeSarosSessionListener(sessionListener);
-    }
-
     protected IActivityReceiver activityDataObjectReceiver = new AbstractActivityReceiver() {
         @Override
         public void receive(PingPongActivity pingPongActivity) {
-
-            ISarosSession session = sarosSession.get();
-
-            if (session == null)
-                return;
 
             User initiator = pingPongActivity.getInitiator();
 
@@ -239,8 +216,8 @@ public class PingPongCentral extends AbstractActivityProvider {
                 stats.get(sender).add(pingPongActivity);
             } else {
                 // This is the ping from another user
-                session.sendActivity(initiator,
-                    pingPongActivity.createPong(session.getLocalUser()));
+                sarosSession.sendActivity(initiator,
+                    pingPongActivity.createPong(sarosSession.getLocalUser()));
             }
         }
     };
@@ -254,20 +231,14 @@ public class PingPongCentral extends AbstractActivityProvider {
      * @swt
      */
     protected synchronized void sendPings() {
-
-        ISarosSession session = sarosSession.get();
-
-        if (session == null)
-            return;
-
-        List<User> remoteUsers = session.getRemoteUsers();
+        List<User> remoteUsers = sarosSession.getRemoteUsers();
 
         for (User remoteUser : remoteUsers) {
 
             stats.get(remoteUser).pingsSent++;
 
-            session.sendActivity(remoteUser,
-                PingPongActivity.create(session.getLocalUser()));
+            sarosSession.sendActivity(remoteUser,
+                PingPongActivity.create(sarosSession.getLocalUser()));
 
         }
     }
