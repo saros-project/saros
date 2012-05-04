@@ -28,7 +28,6 @@ import de.fu_berlin.inf.dpp.editor.AbstractSharedEditorListener;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.editor.ISharedEditorListener;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
-import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 
 /**
  * This Collector collects data about the jump feature usage. It stores data
@@ -43,6 +42,8 @@ public class JumpFeatureUsageCollector extends AbstractStatisticCollector {
     protected int jumpedToWriteAccessHolder = 0;
     protected int jumpedToReadOnlyAccessHolder = 0;
 
+    private final EditorManager editorManager;
+
     protected ISharedEditorListener editorListener = new AbstractSharedEditorListener() {
 
         @Override
@@ -56,9 +57,9 @@ public class JumpFeatureUsageCollector extends AbstractStatisticCollector {
     };
 
     public JumpFeatureUsageCollector(StatisticManager statisticManager,
-        ISarosSessionManager sessionManager, EditorManager editorManager) {
-        super(statisticManager, sessionManager);
-        editorManager.addSharedEditorListener(editorListener);
+        ISarosSession session, EditorManager editorManager) {
+        super(statisticManager, session);
+        this.editorManager = editorManager;
     }
 
     @Override
@@ -71,22 +72,13 @@ public class JumpFeatureUsageCollector extends AbstractStatisticCollector {
     }
 
     @Override
-    protected void clearPreviousData() {
-        // set the counts to null again
-        jumpedToWriteAccessHolder = 0;
-        jumpedToReadOnlyAccessHolder = 0;
-
-        super.clearPreviousData();
-    }
-
-    @Override
     protected void doOnSessionStart(ISarosSession sarosSession) {
-        // nothing to be done
+        editorManager.addSharedEditorListener(editorListener);
     }
 
     @Override
     protected void doOnSessionEnd(ISarosSession sarosSession) {
-        // nothing to be done
+        editorManager.removeSharedEditorListener(editorListener);
     }
 
 }

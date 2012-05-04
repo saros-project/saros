@@ -13,16 +13,13 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
+import org.picocontainer.Startable;
 
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
-import de.fu_berlin.inf.dpp.project.AbstractSarosSessionListener;
-import de.fu_berlin.inf.dpp.project.ISarosSession;
-import de.fu_berlin.inf.dpp.project.ISarosSessionListener;
-import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.ui.preferencePages.FeedbackPreferencePage;
 
 /**
@@ -39,40 +36,33 @@ import de.fu_berlin.inf.dpp.ui.preferencePages.FeedbackPreferencePage;
  * 
  */
 @Component(module = "feedback")
-public class ErrorLogManager extends AbstractFeedbackManager {
+public class ErrorLogManager extends AbstractFeedbackManager implements
+    Startable {
 
     protected static final Logger log = Logger.getLogger(ErrorLogManager.class
         .getName());
 
-    protected ISarosSessionManager sessionManager;
     protected StatisticManager statisticManager;
     protected SessionIDObservable sessionID;
     protected String currentSessionID;
 
-    protected ISarosSessionListener sessionListener = new AbstractSarosSessionListener() {
+    @Override
+    public void start() {
+        // save the id of the just started session
+        currentSessionID = sessionID.getValue();
+    }
 
-        @Override
-        public void sessionStarted(ISarosSession newSarosSession) {
-            // save the id of the just started session
-            currentSessionID = sessionID.getValue();
-        }
+    @Override
+    public void stop() {
+        if (isErrorLogSubmissionAllowed())
+            submitErrorLog();
+    }
 
-        @Override
-        public void sessionEnded(ISarosSession oldSarosSession) {
-            if (isErrorLogSubmissionAllowed())
-                submitErrorLog();
-        }
-
-    };
-
-    public ErrorLogManager(Saros saros, ISarosSessionManager sessionManager,
-        StatisticManager statisticManager, SessionIDObservable sessionID) {
+    public ErrorLogManager(Saros saros, StatisticManager statisticManager,
+        SessionIDObservable sessionID) {
         super(saros);
-        this.sessionManager = sessionManager;
         this.statisticManager = statisticManager;
         this.sessionID = sessionID;
-
-        sessionManager.addSarosSessionListener(sessionListener);
 
         logErrorLogSettings();
     }
@@ -83,7 +73,7 @@ public class ErrorLogManager extends AbstractFeedbackManager {
      * @return true if it is allowed
      */
     public boolean isErrorLogSubmissionAllowed() {
-        return getErrorLogSubmissionStatus() == ALLOW;
+        return getErrorLogSubmissionStatus(saros) == ALLOW;
     }
 
     /**
@@ -94,7 +84,7 @@ public class ErrorLogManager extends AbstractFeedbackManager {
      * 
      * @return 0 = unknown, 1 = allowed, 2 = forbidden
      */
-    public int getErrorLogSubmissionStatus() {
+    public static int getErrorLogSubmissionStatus(Saros saros) {
         int status = saros.getConfigPrefs().getInt(
             PreferenceConstants.ERROR_LOG_ALLOW_SUBMISSION, UNDEFINED);
 
@@ -127,8 +117,8 @@ public class ErrorLogManager extends AbstractFeedbackManager {
      * @return true if the user either allowed or forbade the submission,
      *         otherwise false
      */
-    public boolean hasErrorLogAgreement() {
-        return getErrorLogSubmissionStatus() != UNKNOWN;
+    public static boolean hasErrorLogAgreement(Saros saros) {
+        return getErrorLogSubmissionStatus(saros) != UNKNOWN;
     }
 
     /**

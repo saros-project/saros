@@ -12,7 +12,6 @@ import de.fu_berlin.inf.dpp.User.Permission;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.project.AbstractSharedProjectListener;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
-import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
 
 /**
@@ -74,8 +73,8 @@ public class PermissionChangeCollector extends AbstractStatisticCollector {
     };
 
     public PermissionChangeCollector(StatisticManager statisticManager,
-        ISarosSessionManager sessionManager) {
-        super(statisticManager, sessionManager);
+        ISarosSession session) {
+        super(statisticManager, session);
     }
 
     @Override
@@ -158,15 +157,6 @@ public class PermissionChangeCollector extends AbstractStatisticCollector {
             diffTime = Math.abs(diffTime);
         }
         return diffTime;
-    }
-
-    @Override
-    protected void clearPreviousData() {
-        permissions.clear();
-        countLocalPermissionChanges = 0;
-        readOnlyAccessDuration = 0;
-        writeAccessDuration = 0;
-        super.clearPreviousData();
     }
 
     @Override

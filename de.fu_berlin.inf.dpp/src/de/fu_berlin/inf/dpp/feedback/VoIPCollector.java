@@ -31,7 +31,6 @@ import de.fu_berlin.inf.dpp.communication.audio.AudioServiceManager;
 import de.fu_berlin.inf.dpp.communication.audio.IAudioServiceListener;
 import de.fu_berlin.inf.dpp.net.internal.StreamSession;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
-import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 
 /**
  * A Collector which collects information about VoIP usage. It calculates the
@@ -84,6 +83,8 @@ public class VoIPCollector extends AbstractStatisticCollector {
     protected List<VoIPEvent> voIPEvents = Collections
         .synchronizedList(new ArrayList<VoIPEvent>());
 
+    private final AudioServiceManager audioManager;
+
     protected IAudioServiceListener audioListener = new AbstractAudioServiceListener() {
         @Override
         public void startSession(StreamSession newSession) {
@@ -106,10 +107,9 @@ public class VoIPCollector extends AbstractStatisticCollector {
     };
 
     public VoIPCollector(StatisticManager statisticManager,
-        ISarosSessionManager sessionManager, AudioServiceManager audioManager) {
-        super(statisticManager, sessionManager);
-
-        audioManager.addAudioListener(audioListener);
+        ISarosSession session, AudioServiceManager audioManager) {
+        super(statisticManager, session);
+        this.audioManager = audioManager;
     }
 
     /** Process the collected data */
@@ -176,27 +176,16 @@ public class VoIPCollector extends AbstractStatisticCollector {
     }
 
     @Override
-    protected void clearPreviousData() {
-        // reset previous data
-        voIPEvents.clear();
-        timeInVoIPSession = 0;
-        sessionStart = 0;
-        sessionEnd = 0;
-        sessionDuration = 0;
-        numberVoIPSessions = 0;
-
-        super.clearPreviousData();
-    }
-
-    @Override
     protected void doOnSessionStart(ISarosSession sarosSession) {
         // get starting time of session
         sessionStart = System.currentTimeMillis();
+        audioManager.addAudioListener(audioListener);
     }
 
     @Override
     protected void doOnSessionEnd(ISarosSession sarosSession) {
         // get the time the session ended
         sessionEnd = System.currentTimeMillis();
+        audioManager.removeAudioListener(audioListener);
     }
 }

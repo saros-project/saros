@@ -38,7 +38,6 @@ import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.editor.ISharedEditorListener;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
-import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 
 /**
  * This collector collects information about selections made by users with
@@ -108,6 +107,8 @@ public class SelectionCollector extends AbstractStatisticCollector {
      * {@link Permission#READONLY_ACCESS} are being stored<br>
      */
     protected List<SelectionEvent> userWithReadOnlyAccessSelectionEvents = new ArrayList<SelectionEvent>();
+
+    private final EditorManager editorManager;
 
     protected ISharedEditorListener editorListener = new AbstractSharedEditorListener() {
 
@@ -202,10 +203,10 @@ public class SelectionCollector extends AbstractStatisticCollector {
     };
 
     public SelectionCollector(StatisticManager statisticManager,
-        ISarosSessionManager sessionManager, EditorManager editorManager) {
-        super(statisticManager, sessionManager);
+        ISarosSession session, EditorManager editorManager) {
+        super(statisticManager, session);
 
-        editorManager.addSharedEditorListener(editorListener);
+        this.editorManager = editorManager;
     }
 
     @Override
@@ -237,20 +238,12 @@ public class SelectionCollector extends AbstractStatisticCollector {
     }
 
     @Override
-    protected void doOnSessionEnd(ISarosSession sarosSession) {
-        // nothing to do here
-    }
-
-    @Override
     protected void doOnSessionStart(ISarosSession sarosSession) {
-        // nothing to do here
+        editorManager.addSharedEditorListener(editorListener);
     }
 
     @Override
-    protected synchronized void clearPreviousData() {
-        userWithReadOnlyAccessSelectionEvents.clear();
-        localPath = null;
-
-        super.clearPreviousData();
+    protected void doOnSessionEnd(ISarosSession sarosSession) {
+        editorManager.removeSharedEditorListener(editorListener);
     }
 }

@@ -21,6 +21,7 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Text;
 import org.picocontainer.annotations.Inject;
 
+import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.feedback.ErrorLogManager;
 import de.fu_berlin.inf.dpp.feedback.StatisticManager;
@@ -51,7 +52,7 @@ public class ConfigurationSettingsWizardPage extends WizardPage {
     protected PreferenceUtils preferenceUtils;
 
     @Inject
-    protected StatisticManager statisticManager;
+    protected Saros saros;
 
     @Inject
     protected ErrorLogManager errorLogManager;
@@ -273,8 +274,8 @@ public class ConfigurationSettingsWizardPage extends WizardPage {
         this.skypeUsageButton.setSelection(!skypeUsername.isEmpty());
         this.skypeUsernameText.setText(skypeUsername);
 
-        this.statisticSubmissionButton.setSelection(statisticManager
-            .isStatisticSubmissionAllowed());
+        this.statisticSubmissionButton.setSelection(StatisticManager
+            .isStatisticSubmissionAllowed(saros));
 
         this.errorLogSubmissionButton.setSelection(errorLogManager
             .isErrorLogSubmissionAllowed());

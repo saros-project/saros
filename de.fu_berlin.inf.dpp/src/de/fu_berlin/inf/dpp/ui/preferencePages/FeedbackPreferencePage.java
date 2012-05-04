@@ -7,7 +7,6 @@ import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
 
-import de.fu_berlin.inf.dpp.SarosPluginContext;
 import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
@@ -30,6 +29,7 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
 import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.Saros;
+import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.feedback.AbstractFeedbackManager;
 import de.fu_berlin.inf.dpp.feedback.ErrorLogManager;
@@ -57,9 +57,6 @@ public class FeedbackPreferencePage extends PreferencePage implements
 
     @Inject
     protected FeedbackManager feedbackManager;
-
-    @Inject
-    protected StatisticManager statisticManager;
 
     @Inject
     protected ErrorLogManager errorLogManager;
@@ -97,9 +94,11 @@ public class FeedbackPreferencePage extends PreferencePage implements
         isFeedbackDisabled = feedbackManager.isFeedbackDisabled();
         int interval = feedbackManager.getSurveyInterval();
         currentInterval = FeedbackInterval.getFromInterval(interval);
-        isSubmissionAllowed = statisticManager.isStatisticSubmissionAllowed();
-        isPseudonymAllowed = statisticManager.isPseudonymSubmissionAllowed();
-        pseudonymID = statisticManager.getStatisticsPseudonymID();
+        isSubmissionAllowed = StatisticManager
+            .isStatisticSubmissionAllowed(saros);
+        isPseudonymAllowed = StatisticManager
+            .isPseudonymSubmissionAllowed(saros);
+        pseudonymID = StatisticManager.getStatisticsPseudonymID(saros);
         isErrorLogSubmissionAllowed = errorLogManager
             .isErrorLogSubmissionAllowed();
         isFullErrorLogSubmissionAllowed = errorLogManager
@@ -471,9 +470,11 @@ public class FeedbackPreferencePage extends PreferencePage implements
         feedbackManager.setFeedbackDisabled(isFeedbackDisabled);
         feedbackManager.setSurveyInterval(currentInterval.getInterval());
 
-        statisticManager.setStatisticSubmissionAllowed(isSubmissionAllowed);
-        statisticManager.setPseudonymSubmissionAllowed(isPseudonymAllowed);
-        statisticManager.setStatisticsPseudonymID(pseudonymID);
+        StatisticManager.setStatisticSubmissionAllowed(saros,
+            isSubmissionAllowed);
+        StatisticManager.setPseudonymSubmissionAllowed(saros,
+            isPseudonymAllowed);
+        StatisticManager.setStatisticsPseudonymID(saros, pseudonymID);
         errorLogManager
             .setErrorLogSubmissionAllowed(isErrorLogSubmissionAllowed);
         errorLogManager

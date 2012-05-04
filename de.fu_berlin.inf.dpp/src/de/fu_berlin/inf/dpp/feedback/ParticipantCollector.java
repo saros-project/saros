@@ -12,7 +12,6 @@ import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.project.AbstractSharedProjectListener;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
-import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
 import de.fu_berlin.inf.dpp.util.Utils;
 
@@ -86,8 +85,8 @@ public class ParticipantCollector extends AbstractStatisticCollector {
     };
 
     public ParticipantCollector(StatisticManager statisticManager,
-        ISarosSessionManager sessionManager) {
-        super(statisticManager, sessionManager);
+        ISarosSession session) {
+        super(statisticManager, session);
     }
 
     /**
@@ -121,15 +120,6 @@ public class ParticipantCollector extends AbstractStatisticCollector {
                 StatisticManager.getTimeInMinutes(e.getValue()));
             data.setSessionTimePercentForUsers(e.getKey(), percent);
         }
-    }
-
-    @Override
-    protected void clearPreviousData() {
-        participantTimes.clear();
-        users.clear();
-        currentNumberOfParticipants = 0;
-        timeOfLastEvent = 0;
-        super.clearPreviousData();
     }
 
     @Override

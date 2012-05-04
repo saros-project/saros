@@ -38,7 +38,6 @@ import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.editor.ISharedEditorListener;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
-import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.util.Utils;
 
 /**
@@ -176,6 +175,8 @@ public class TextEditCollector extends AbstractStatisticCollector {
      */
     protected Map<JID, Integer> remoteCharCount = new HashMap<JID, Integer>();
 
+    private final EditorManager editorManager;
+
     protected ISharedEditorListener editorListener = new AbstractSharedEditorListener() {
 
         @Override
@@ -257,10 +258,11 @@ public class TextEditCollector extends AbstractStatisticCollector {
     };
 
     public TextEditCollector(StatisticManager statisticManager,
-        ISarosSessionManager sessionManager, EditorManager editorManager) {
-        super(statisticManager, sessionManager);
+        ISarosSession session, EditorManager editorManager) {
+        super(statisticManager, session);
 
-        editorManager.addSharedEditorListener(editorListener);
+        // TODO: remove
+        this.editorManager = editorManager;
     }
 
     protected synchronized void addToCharsWritten(int chars) {
@@ -441,27 +443,13 @@ public class TextEditCollector extends AbstractStatisticCollector {
 
     @Override
     protected void doOnSessionStart(ISarosSession sarosSession) {
+        editorManager.addSharedEditorListener(editorListener);
         // set local users JID at the beginning of the session
         localUserJID = sarosSession.getLocalUser().getJID();
     }
 
     @Override
     protected void doOnSessionEnd(ISarosSession sarosSession) {
-        // nothing to do here
-    }
-
-    @Override
-    protected synchronized void clearPreviousData() {
-        charsWritten = 0;
-        localEvents.clear();
-        remoteEvents.clear();
-        parallelTextEdits.clear();
-        parallelTextEditsCount.clear();
-        remoteCharCount.clear();
-        pastes.clear();
-        pastesCharCount.clear();
-        localUserJID = null;
-
-        super.clearPreviousData();
+        editorManager.removeSharedEditorListener(editorListener);
     }
 }

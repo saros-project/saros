@@ -76,6 +76,18 @@ import de.fu_berlin.inf.dpp.concurrent.management.TransformationResult;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
+import de.fu_berlin.inf.dpp.feedback.DataTransferCollector;
+import de.fu_berlin.inf.dpp.feedback.ErrorLogManager;
+import de.fu_berlin.inf.dpp.feedback.FeedbackManager;
+import de.fu_berlin.inf.dpp.feedback.FollowModeCollector;
+import de.fu_berlin.inf.dpp.feedback.JumpFeatureUsageCollector;
+import de.fu_berlin.inf.dpp.feedback.ParticipantCollector;
+import de.fu_berlin.inf.dpp.feedback.PermissionChangeCollector;
+import de.fu_berlin.inf.dpp.feedback.SelectionCollector;
+import de.fu_berlin.inf.dpp.feedback.SessionDataCollector;
+import de.fu_berlin.inf.dpp.feedback.StatisticManager;
+import de.fu_berlin.inf.dpp.feedback.TextEditCollector;
+import de.fu_berlin.inf.dpp.feedback.VoIPCollector;
 import de.fu_berlin.inf.dpp.invitation.ProjectNegotiation;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.JID;
@@ -1333,6 +1345,22 @@ public class SarosSession implements ISarosSession, Disposable {
 
         // Core Managers
         sessionContainer.addComponent(ChangeColorManager.class);
+
+        // Statistic collectors
+        sessionContainer.addComponent(StatisticManager.class);
+        sessionContainer.addComponent(DataTransferCollector.class);
+        sessionContainer.addComponent(PermissionChangeCollector.class);
+        sessionContainer.addComponent(ParticipantCollector.class);
+        sessionContainer.addComponent(SessionDataCollector.class);
+        sessionContainer.addComponent(TextEditCollector.class);
+        sessionContainer.addComponent(JumpFeatureUsageCollector.class);
+        sessionContainer.addComponent(FollowModeCollector.class);
+        sessionContainer.addComponent(SelectionCollector.class);
+        sessionContainer.addComponent(VoIPCollector.class);
+
+        // Feedback
+        sessionContainer.addComponent(ErrorLogManager.class);
+        sessionContainer.addComponent(FeedbackManager.class);
 
         // Force the creation of the above components.
         sessionContainer.getComponents();

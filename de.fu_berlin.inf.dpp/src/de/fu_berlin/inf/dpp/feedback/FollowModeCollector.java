@@ -32,7 +32,6 @@ import de.fu_berlin.inf.dpp.editor.AbstractSharedEditorListener;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.editor.ISharedEditorListener;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
-import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 
 /**
  * A Collector class that collects the number of local follow-mode toggles
@@ -89,6 +88,8 @@ public class FollowModeCollector extends AbstractStatisticCollector {
     protected List<FollowModeToggleEvent> followModeChangeEvents = Collections
         .synchronizedList(new ArrayList<FollowModeToggleEvent>());
 
+    private final EditorManager editorManager;
+
     protected ISharedEditorListener editorListener = new AbstractSharedEditorListener() {
 
         @Override
@@ -122,9 +123,9 @@ public class FollowModeCollector extends AbstractStatisticCollector {
     };
 
     public FollowModeCollector(StatisticManager statisticManager,
-        ISarosSessionManager sessionManager, EditorManager editorManager) {
-        super(statisticManager, sessionManager);
-        editorManager.addSharedEditorListener(editorListener);
+        ISarosSession session, EditorManager editorManager) {
+        super(statisticManager, session);
+        this.editorManager = editorManager;
     }
 
     /** Process the collected data */
@@ -192,28 +193,17 @@ public class FollowModeCollector extends AbstractStatisticCollector {
     }
 
     @Override
-    protected void clearPreviousData() {
-        // reset previous data
-        followModeChangeEvents.clear();
-        followModeEnabled = false;
-        timeInFollowMode = 0;
-        sessionStart = 0;
-        sessionEnd = 0;
-        sessionDuration = 0;
-
-        super.clearPreviousData();
-    }
-
-    @Override
     protected void doOnSessionStart(ISarosSession sarosSession) {
         // get starting time of session
         sessionStart = System.currentTimeMillis();
+        editorManager.addSharedEditorListener(editorListener);
     }
 
     @Override
     protected void doOnSessionEnd(ISarosSession sarosSession) {
         // get the time the session ended
         sessionEnd = System.currentTimeMillis();
+        editorManager.removeSharedEditorListener(editorListener);
     }
 
 }

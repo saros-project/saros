@@ -1,5 +1,6 @@
 package de.fu_berlin.inf.dpp.project.internal;
 
+import java.io.File;
 import junit.framework.Assert;
 
 import org.easymock.EasyMock;
@@ -10,6 +11,7 @@ import org.eclipse.jface.util.IPropertyChangeListener;
 import org.joda.time.DateTime;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.picocontainer.MutablePicoContainer;
 import org.picocontainer.PicoBuilder;
 import org.picocontainer.PicoContainer;
@@ -17,6 +19,9 @@ import org.picocontainer.injectors.AnnotatedFieldInjection;
 import org.picocontainer.injectors.CompositeInjection;
 import org.picocontainer.injectors.ConstructorInjection;
 import org.picocontainer.injectors.Reinjector;
+import org.powermock.api.easymock.PowerMock;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
 
 import de.fu_berlin.inf.dpp.ISarosContext;
 import de.fu_berlin.inf.dpp.Saros;
@@ -24,6 +29,8 @@ import de.fu_berlin.inf.dpp.awareness.AwarenessInformationCollector;
 import de.fu_berlin.inf.dpp.communication.audio.AudioServiceManager;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.feedback.FeedbackManager;
+import de.fu_berlin.inf.dpp.feedback.SessionStatistic;
+import de.fu_berlin.inf.dpp.feedback.StatisticManager;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.SarosNet;
@@ -36,7 +43,10 @@ import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
 import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.synchronize.StopManager;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
+import de.fu_berlin.inf.dpp.util.Utils;
 
+@RunWith(PowerMockRunner.class)
+@PrepareForTest({ Utils.class, StatisticManager.class })
 public class SarosSessionTest {
     static private SarosNet createSarosNetMock() {
         SarosNet net = EasyMock.createMock(SarosNet.class);
@@ -169,6 +179,27 @@ public class SarosSessionTest {
 
         EasyMock.replay(context);
 
+        PowerMock.mockStaticPartial(Utils.class, "getEclipsePlatformInfo");
+        Utils.getEclipsePlatformInfo();
+        EasyMock.expectLastCall().andReturn("JUnit-Test").anyTimes();
+        PowerMock.replayAll(Utils.class);
+
+        PowerMock.mockStaticPartial(StatisticManager.class,
+            "createStatisticFile");
+        StatisticManager.createStatisticFile(
+            EasyMock.isA(SessionStatistic.class), EasyMock.isA(Saros.class),
+            EasyMock.isA(String.class));
+        EasyMock.expectLastCall().andAnswer(new IAnswer<Object>() {
+
+            @Override
+            public Object answer() throws Throwable {
+                File file = File.createTempFile("saros-junit-test", "tst");
+                file.deleteOnExit();
+                return file;
+            }
+        }).anyTimes();
+        PowerMock.replayAll(StatisticManager.class);
+
         // Test creating, starting and stopping the session.
         SarosSession session = new SarosSession(new DateTime(), context);
         Assert.assertFalse(session.getSequencer().isStarted());
@@ -183,6 +214,8 @@ public class SarosSessionTest {
         Assert.assertFalse(session.getSequencer().isStarted());
 
         session.dispose();
+
+        PowerMock.verifyAll();
     }
 
     /**

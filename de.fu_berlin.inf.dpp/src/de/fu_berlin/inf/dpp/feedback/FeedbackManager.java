@@ -12,14 +12,12 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.window.Window;
+import org.picocontainer.Startable;
 
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
-import de.fu_berlin.inf.dpp.project.AbstractSarosSessionListener;
-import de.fu_berlin.inf.dpp.project.ISarosSession;
-import de.fu_berlin.inf.dpp.project.ISarosSessionListener;
 import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.ui.dialogs.FeedbackDialog;
 import de.fu_berlin.inf.dpp.util.Utils;
@@ -34,7 +32,8 @@ import de.fu_berlin.inf.dpp.util.Utils;
  * @author Lisa Dohrmann
  */
 @Component(module = "feedback")
-public class FeedbackManager extends AbstractFeedbackManager {
+public class FeedbackManager extends AbstractFeedbackManager implements
+    Startable {
     /** the URL to the website that contains our survey */
     public static final String SURVEY_URL = "http://saros-build.imp.fu-berlin.de/phpESP/public/survey.php?name=SarosFastUserFeedback_1";
 
@@ -57,58 +56,54 @@ public class FeedbackManager extends AbstractFeedbackManager {
     protected static final Logger log = Logger.getLogger(FeedbackManager.class
         .getName());
 
-    protected ISarosSessionListener sessionListener = new AbstractSarosSessionListener() {
+    @Override
+    public void start() {
+        startTime = new Date();
+    }
 
-        @Override
-        public void sessionStarted(ISarosSession newSarosSession) {
-            startTime = new Date();
+    @Override
+    public void stop() {
+        sessionTime = (new Date().getTime() - startTime.getTime()) / 1000;
+        log.info(String.format("Session lasted %s min %s s", sessionTime / 60,
+            sessionTime % 60));
+
+        // If the -ea switch is enabled don't use MIN_SESSION_TIME
+        assert debugSessionTime();
+
+        // don't show the survey if session was very short
+        if (sessionTime < MIN_SESSION_TIME)
+            return;
+
+        // decrement session until next
+        int sessionsUntilNext = getSessionsUntilNext() - 1;
+        setSessionsUntilNext(sessionsUntilNext);
+
+        if (!showNow()) {
+            log.info("Sessions until next survey: " + sessionsUntilNext);
+            return;
         }
 
-        @Override
-        public void sessionEnded(ISarosSession oldSarosSession) {
-            sessionTime = (new Date().getTime() - startTime.getTime()) / 1000;
-            log.info(String.format("Session lasted %s min %s s",
-                sessionTime / 60, sessionTime % 60));
+        /*
+         * The following is executed asynchronously, because
+         * showFeedbackDialog() is blocking, and other SessionListeners would be
+         * blocked as long as the user doesn't answer the dialog. NOTE: If one
+         * ever wants to count the number of declined dialogs, threading
+         * problems must be newly considered.
+         */
+        Utils.runSafeAsync(log, new Runnable() {
 
-            // If the -ea switch is enabled don't use MIN_SESSION_TIME
-            assert debugSessionTime();
-
-            // don't show the survey if session was very short
-            if (sessionTime < MIN_SESSION_TIME)
-                return;
-
-            // decrement session until next
-            int sessionsUntilNext = getSessionsUntilNext() - 1;
-            setSessionsUntilNext(sessionsUntilNext);
-
-            if (!showNow()) {
-                log.info("Sessions until next survey: " + sessionsUntilNext);
-                return;
+            public void run() {
+                if (showFeedbackDialog(FEEDBACK_REQUEST)) {
+                    int browserType = showSurvey();
+                    log.info("Asking for feedback survey: User agreed ("
+                        + getBrowserTypeAsString(browserType) + ")");
+                } else {
+                    log.info("Asking for feedback survey: User declined");
+                }
             }
 
-            /*
-             * The following is executed asynchronously, because
-             * showFeedbackDialog() is blocking, and other SessionListeners
-             * would be blocked as long as the user doesn't answer the dialog.
-             * NOTE: If one ever wants to count the number of declined dialogs,
-             * threading problems must be newly considered.
-             */
-            Utils.runSafeAsync(log, new Runnable() {
-
-                public void run() {
-                    if (showFeedbackDialog(FEEDBACK_REQUEST)) {
-                        int browserType = showSurvey();
-                        log.info("Asking for feedback survey: User agreed ("
-                            + getBrowserTypeAsString(browserType) + ")");
-                    } else {
-                        log.info("Asking for feedback survey: User declined");
-                    }
-                }
-
-            });
-        }
-
-    };
+        });
+    }
 
     protected IPropertyChangeListener propertyListener = new IPropertyChangeListener() {
 
@@ -136,11 +131,8 @@ public class FeedbackManager extends AbstractFeedbackManager {
     protected Date startTime;
     protected long sessionTime;
 
-    public FeedbackManager(final Saros saros,
-        ISarosSessionManager sessionManager) {
+    public FeedbackManager(final Saros saros) {
         super(saros);
-        // listen for start and end of a session
-        sessionManager.addSarosSessionListener(sessionListener);
         // listen for feedback preference changes
         saros.getPreferenceStore().addPropertyChangeListener(propertyListener);
     }

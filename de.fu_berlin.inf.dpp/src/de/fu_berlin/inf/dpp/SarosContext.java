@@ -38,18 +38,6 @@ import de.fu_berlin.inf.dpp.concurrent.watchdog.IsInconsistentObservable;
 import de.fu_berlin.inf.dpp.concurrent.watchdog.SessionViewOpener;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
-import de.fu_berlin.inf.dpp.feedback.DataTransferCollector;
-import de.fu_berlin.inf.dpp.feedback.ErrorLogManager;
-import de.fu_berlin.inf.dpp.feedback.FeedbackManager;
-import de.fu_berlin.inf.dpp.feedback.FollowModeCollector;
-import de.fu_berlin.inf.dpp.feedback.JumpFeatureUsageCollector;
-import de.fu_berlin.inf.dpp.feedback.ParticipantCollector;
-import de.fu_berlin.inf.dpp.feedback.PermissionChangeCollector;
-import de.fu_berlin.inf.dpp.feedback.SelectionCollector;
-import de.fu_berlin.inf.dpp.feedback.SessionDataCollector;
-import de.fu_berlin.inf.dpp.feedback.StatisticManager;
-import de.fu_berlin.inf.dpp.feedback.TextEditCollector;
-import de.fu_berlin.inf.dpp.feedback.VoIPCollector;
 import de.fu_berlin.inf.dpp.net.IncomingTransferObject;
 import de.fu_berlin.inf.dpp.net.RosterTracker;
 import de.fu_berlin.inf.dpp.net.SarosNet;
@@ -207,8 +195,6 @@ public class SarosContext implements ISarosContext {
         Component.create(ConsistencyWatchdogServer.class),
         Component.create(EditorAPI.class),
         Component.create(EditorManager.class),
-        Component.create(ErrorLogManager.class),
-        Component.create(FeedbackManager.class),
         Component.create(JDTFacade.class),
         Component.create(LocalPresenceTracker.class),
         Component.create(MUCManager.class),
@@ -220,7 +206,6 @@ public class SarosContext implements ISarosContext {
         Component.create(ISarosSessionManager.class, SarosSessionManager.class),
         Component.create(SessionViewOpener.class),
         Component.create(SharedResourcesManager.class),
-        Component.create(StatisticManager.class),
         Component.create(AudioServiceManager.class),
         Component.create(MixerManager.class),
         Component.create(UndoManager.class),
@@ -289,17 +274,7 @@ public class SarosContext implements ISarosContext {
         Component
             .create(DefaultInvitationInfo.InvitationCompleteExtensionProvider.class),
 
-        // Statistic collectors
-        Component.create(DataTransferCollector.class),
-        Component.create(PermissionChangeCollector.class),
-        Component.create(ParticipantCollector.class),
-        Component.create(SessionDataCollector.class),
-        Component.create(TextEditCollector.class),
-        Component.create(JumpFeatureUsageCollector.class),
-        Component.create(FollowModeCollector.class),
         Component.create(HostLeftAloneInSessionHandler.class),
-        Component.create(SelectionCollector.class),
-        Component.create(VoIPCollector.class),
 
         // streaming services
         Component.create(SendFileAction.SendFileStreamService.class),

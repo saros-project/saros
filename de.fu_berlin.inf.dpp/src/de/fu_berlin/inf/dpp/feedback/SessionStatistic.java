@@ -270,6 +270,10 @@ public class SessionStatistic {
      *         writing
      */
     public File toFile(IPath path, String filename) {
+        // TODO: This method is hard to test, let the caller pass a 'File'. The
+        // caller should allocate the file and this way could make it point to a
+        // temporary one.
+
         // create a subfolder with the current date, if nonexistent
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
         String dirName = "statistic_" + dateFormat.format(new Date());

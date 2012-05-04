@@ -41,9 +41,6 @@ import de.fu_berlin.inf.dpp.ui.wizards.pages.ConfigurationSummaryWizardPage;
 public class ConfigurationWizard extends AddXMPPAccountWizard {
 
     @Inject
-    private StatisticManager statisticManager;
-
-    @Inject
     private ErrorLogManager errorLogManager;
 
     @Inject
@@ -98,8 +95,8 @@ public class ConfigurationWizard extends AddXMPPAccountWizard {
         boolean errorLogSubmissionAllowed = this.configurationSettingsWizardPage
             .isErrorLogSubmissionAllowed();
 
-        statisticManager
-            .setStatisticSubmissionAllowed(statisticSubmissionAllowed);
+        StatisticManager.setStatisticSubmissionAllowed(saros,
+            statisticSubmissionAllowed);
 
         errorLogManager.setErrorLogSubmissionAllowed(errorLogSubmissionAllowed);
 

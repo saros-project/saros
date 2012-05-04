@@ -283,10 +283,8 @@ public class Saros extends AbstractUIPlugin {
         // determine if auto-connect can and should be performed
         if (getPreferenceStore().getBoolean(PreferenceConstants.AUTO_CONNECT)
             && !sarosContext.getComponent(XMPPAccountStore.class).isEmpty()
-            && sarosContext.getComponent(StatisticManager.class)
-                .hasStatisticAgreement()
-            && sarosContext.getComponent(ErrorLogManager.class)
-                .hasErrorLogAgreement()) {
+            && StatisticManager.hasStatisticAgreement(this)
+            && ErrorLogManager.hasErrorLogAgreement(this)) {
             asyncConnect();
         }
     }

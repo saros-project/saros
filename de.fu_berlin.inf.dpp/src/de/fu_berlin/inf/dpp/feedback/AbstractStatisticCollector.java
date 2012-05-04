@@ -1,9 +1,8 @@
 package de.fu_berlin.inf.dpp.feedback;
 
-import de.fu_berlin.inf.dpp.project.AbstractSarosSessionListener;
+import org.picocontainer.Startable;
+
 import de.fu_berlin.inf.dpp.project.ISarosSession;
-import de.fu_berlin.inf.dpp.project.ISarosSessionListener;
-import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 
 /**
  * Abstract base class for a StatisticCollector which registers itself with a
@@ -13,7 +12,9 @@ import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
  * @author Lisa Dohrmann
  */
 
-public abstract class AbstractStatisticCollector {
+public abstract class AbstractStatisticCollector implements Startable {
+
+    protected final ISarosSession sarosSession;
 
     protected StatisticManager statisticManager;
     /**
@@ -25,39 +26,32 @@ public abstract class AbstractStatisticCollector {
      */
     protected SessionStatistic data;
 
-    /**
-     * The listener gets notified on session start and session end. It clears
-     * the previous data on session end and notifies the StatisticManager.
-     */
-    protected ISarosSessionListener sessionListener = new AbstractSarosSessionListener() {
-        @Override
-        public void sessionStarted(ISarosSession newSarosSession) {
-            doOnSessionStart(newSarosSession);
-        }
+    @Override
+    public void start() {
+        doOnSessionStart(sarosSession);
+    }
 
-        @Override
-        public void sessionEnded(ISarosSession oldSarosSession) {
-            doOnSessionEnd(oldSarosSession);
-            notifyCollectionCompleted();
-            clearPreviousData();
-        }
-    };
+    @Override
+    public void stop() {
+        doOnSessionEnd(sarosSession);
+        notifyCollectionCompleted();
+    }
 
     /**
      * The constructor that has to be called from all implementing classes. It
      * initializes the {@link SessionStatistic}, registers this collector with
-     * the {@link StatisticManager} and adds a {@link #sessionListener}.
+     * the {@link StatisticManager}.
      * 
      * @param statisticManager
-     * @param sessionManager
+     * @param sarosSession
      */
     public AbstractStatisticCollector(StatisticManager statisticManager,
-        ISarosSessionManager sessionManager) {
+        ISarosSession sarosSession) {
         this.statisticManager = statisticManager;
         this.data = new SessionStatistic();
+        this.sarosSession = sarosSession;
 
         statisticManager.registerCollector(this);
-        sessionManager.addSarosSessionListener(sessionListener);
     }
 
     /**
@@ -68,17 +62,6 @@ public abstract class AbstractStatisticCollector {
     protected void notifyCollectionCompleted() {
         processGatheredData();
         statisticManager.addData(this, data);
-    }
-
-    /**
-     * Ensures that all previously collected data is cleared. It is
-     * automatically called on session end. After the collected data was handed
-     * to the StatisticManager. <br>
-     * Clients can override this method to add their own data to be cleared.
-     * However they are supposed to call <code>super.clearPreviousData()</code>.
-     */
-    protected void clearPreviousData() {
-        data.clear();
     }
 
     /**

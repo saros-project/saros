@@ -297,7 +297,7 @@ public class AudioServiceManager {
         this.audioListener.add(audioListener);
     }
 
-    public void remove(IAudioServiceListener audioListener) {
+    public void removeAudioListener(IAudioServiceListener audioListener) {
         this.audioListener.remove(audioListener);
     }
 }

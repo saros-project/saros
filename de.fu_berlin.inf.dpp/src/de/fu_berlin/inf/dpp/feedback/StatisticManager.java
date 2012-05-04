@@ -16,14 +16,11 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
+import org.picocontainer.Startable;
 
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
-import de.fu_berlin.inf.dpp.project.AbstractSarosSessionListener;
-import de.fu_berlin.inf.dpp.project.ISarosSession;
-import de.fu_berlin.inf.dpp.project.ISarosSessionListener;
-import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.ui.preferencePages.FeedbackPreferencePage;
 import de.fu_berlin.inf.dpp.util.StackTrace;
 
@@ -34,7 +31,8 @@ import de.fu_berlin.inf.dpp.util.StackTrace;
  * @author Lisa Dohrmann
  */
 @Component(module = "feedback")
-public class StatisticManager extends AbstractFeedbackManager {
+public class StatisticManager extends AbstractFeedbackManager implements
+    Startable {
 
     protected static final Logger log = Logger.getLogger(StatisticManager.class
         .getName());
@@ -52,28 +50,26 @@ public class StatisticManager extends AbstractFeedbackManager {
     protected Set<AbstractStatisticCollector> allCollectors;
     protected Set<AbstractStatisticCollector> activeCollectors;
 
-    protected ISarosSessionListener sessionListener = new AbstractSarosSessionListener() {
+    public void start() {
+        statistic = new SessionStatistic();
+        activeCollectors = Collections
+            .synchronizedSet(new HashSet<AbstractStatisticCollector>(
+                allCollectors));
 
-        @Override
-        public void sessionStarted(ISarosSession newSarosSession) {
-            statistic = new SessionStatistic();
-            activeCollectors = Collections
-                .synchronizedSet(new HashSet<AbstractStatisticCollector>(
-                    allCollectors));
+        // count all started sessions
+        countSessions();
+    }
 
-            // count all started sessions
-            countSessions();
-        }
+    public void stop() {
+        // Everything should have been submitted by now.
+        assert activeCollectors.isEmpty();
+    }
 
-    };
-
-    public StatisticManager(Saros saros, ISarosSessionManager sessionManager,
-        FeedbackManager feedbackManager) {
+    public StatisticManager(Saros saros, FeedbackManager feedbackManager) {
         super(saros);
         this.feedbackManager = feedbackManager;
         this.allCollectors = new HashSet<AbstractStatisticCollector>();
 
-        sessionManager.addSarosSessionListener(sessionListener);
         logFeedbackSettings();
     }
 
@@ -114,7 +110,7 @@ public class StatisticManager extends AbstractFeedbackManager {
      * Registers a collector with this StatisticManager. The manager needs this
      * information to determine when all gathered information has arrived.<br>
      * <br>
-     * NOTE: It is allowed to register the same collector multiple times. It has
+     * NOTE: It is allowed to register the same collector multiple times.
      * 
      * @param collector
      */
@@ -128,10 +124,18 @@ public class StatisticManager extends AbstractFeedbackManager {
      * @return true if it is allowed
      */
     public boolean isStatisticSubmissionAllowed() {
-        return getStatisticSubmissionStatus() == ALLOW;
+        return isStatisticSubmissionAllowed(saros);
+    }
+
+    public static boolean isStatisticSubmissionAllowed(Saros saros) {
+        return getStatisticSubmissionStatus(saros) == ALLOW;
     }
 
     public boolean isPseudonymSubmissionAllowed() {
+        return isPseudonymSubmissionAllowed(saros);
+    }
+
+    public static boolean isPseudonymSubmissionAllowed(Saros saros) {
 
         String result = saros.getPreferenceStore().getString(
             PreferenceConstants.STATISTIC_ALLOW_PSEUDONYM);
@@ -145,7 +149,8 @@ public class StatisticManager extends AbstractFeedbackManager {
             PreferenceConstants.STATISTIC_ALLOW_PSEUDONYM, false);
     }
 
-    public void setPseudonymSubmissionAllowed(boolean isPseudonymAllowed) {
+    public static void setPseudonymSubmissionAllowed(Saros saros,
+        boolean isPseudonymAllowed) {
         // store in configuration and preference scope
         saros.getConfigPrefs().putBoolean(
             PreferenceConstants.STATISTIC_ALLOW_PSEUDONYM, isPseudonymAllowed);
@@ -163,7 +168,7 @@ public class StatisticManager extends AbstractFeedbackManager {
      * 
      * @return 0 = unknown, 1 = allowed, 2 = forbidden
      */
-    public int getStatisticSubmissionStatus() {
+    public static int getStatisticSubmissionStatus(Saros saros) {
         int status = saros.getConfigPrefs().getInt(
             PreferenceConstants.STATISTIC_ALLOW_SUBMISSION, UNDEFINED);
 
@@ -177,9 +182,9 @@ public class StatisticManager extends AbstractFeedbackManager {
      * Saves in the workspace and globally if the user wants to submit statistic
      * data.
      */
-    public void setStatisticSubmissionAllowed(boolean allow) {
+    public static void setStatisticSubmissionAllowed(Saros saros, boolean allow) {
         int submission = allow ? ALLOW : FORBID;
-        setStatisticSubmission(submission);
+        setStatisticSubmission(saros, submission);
     }
 
     /**
@@ -189,10 +194,12 @@ public class StatisticManager extends AbstractFeedbackManager {
      * Note: It must be set globally first, so the PropertyChangeListener for
      * the local setting is working with latest global data.
      * 
+     * @param saros
+     *            The preferences to be used
      * @param submission
      *            (see constants of {@link AbstractFeedbackManager})
      */
-    protected void setStatisticSubmission(int submission) {
+    protected static void setStatisticSubmission(Saros saros, int submission) {
         // store in configuration and preference scope
         saros.getConfigPrefs().putInt(
             PreferenceConstants.STATISTIC_ALLOW_SUBMISSION, submission);
@@ -201,7 +208,7 @@ public class StatisticManager extends AbstractFeedbackManager {
             PreferenceConstants.STATISTIC_ALLOW_SUBMISSION, submission);
     }
 
-    public void setStatisticsPseudonymID(String userID) {
+    public static void setStatisticsPseudonymID(Saros saros, String userID) {
         // store in configuration and preference scope
         saros.getConfigPrefs().put(PreferenceConstants.STATISTICS_PSEUDONYM_ID,
             userID);
@@ -224,6 +231,10 @@ public class StatisticManager extends AbstractFeedbackManager {
      *         {@link FeedbackPreferencePage}
      */
     public String getStatisticsPseudonymID() {
+        return getStatisticsPseudonymID(saros);
+    }
+
+    public static String getStatisticsPseudonymID(Saros saros) {
 
         // First look in the Preferences
         String userID = saros.getPreferenceStore().getString(
@@ -244,7 +255,11 @@ public class StatisticManager extends AbstractFeedbackManager {
      *         otherwise false
      */
     public boolean hasStatisticAgreement() {
-        return getStatisticSubmissionStatus() != UNKNOWN;
+        return hasStatisticAgreement(saros);
+    }
+
+    public static boolean hasStatisticAgreement(Saros saros) {
+        return getStatisticSubmissionStatus(saros) != UNKNOWN;
     }
 
     /**
@@ -294,7 +309,7 @@ public class StatisticManager extends AbstractFeedbackManager {
         sb.append("  Pseudonym submission allowed: "
             + isPseudonymSubmissionAllowed());
         if (isPseudonymSubmissionAllowed())
-            sb.append("\n  Pseudonym is: " + getStatisticsPseudonymID());
+            sb.append("\n  Pseudonym is: " + getStatisticsPseudonymID(saros));
         log.info(sb.toString());
     }
 
@@ -321,7 +336,7 @@ public class StatisticManager extends AbstractFeedbackManager {
         if (saros.getVersion().endsWith("DEVEL"))
             userID = "sarosTeam-" + userID;
         if (isPseudonymSubmissionAllowed())
-            userID += "-" + getStatisticsPseudonymID();
+            userID += "-" + getStatisticsPseudonymID(saros);
         return userID;
     }
 
@@ -368,8 +383,7 @@ public class StatisticManager extends AbstractFeedbackManager {
      */
     protected void saveAndSubmitStatistic() {
         // save to disk
-        File file = statistic.toFile(getSaros().getStateLocation(),
-            createFileName());
+        File file = createStatisticFile(statistic, saros, createFileName());
 
         // only submit, if user permitted submission
         if (isStatisticSubmissionAllowed()) {
@@ -380,6 +394,20 @@ public class StatisticManager extends AbstractFeedbackManager {
                 + "submission is forbidden by the user.",
                 file.getAbsolutePath()));
         }
+    }
+
+    /**
+     * Helper method to create and populate the statistic file. It is static so
+     * it can be mocked for unit tests.
+     * 
+     * @param statistic
+     * @param saros
+     * @param fileName
+     * @return
+     */
+    public static File createStatisticFile(SessionStatistic statistic,
+        Saros saros, String fileName) {
+        return statistic.toFile(saros.getStateLocation(), fileName);
     }
 
     /**
