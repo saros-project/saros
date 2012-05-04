@@ -124,97 +124,13 @@ public class StatisticManager extends AbstractFeedbackManager implements
      * @return true if it is allowed
      */
     public boolean isStatisticSubmissionAllowed() {
-        return isStatisticSubmissionAllowed(saros);
-    }
-
-    public static boolean isStatisticSubmissionAllowed(Saros saros) {
-        return getStatisticSubmissionStatus(saros) == ALLOW;
+        return StatisticManagerConfiguration
+            .isStatisticSubmissionAllowed(saros);
     }
 
     public boolean isPseudonymSubmissionAllowed() {
-        return isPseudonymSubmissionAllowed(saros);
-    }
-
-    public static boolean isPseudonymSubmissionAllowed(Saros saros) {
-
-        String result = saros.getPreferenceStore().getString(
-            PreferenceConstants.STATISTIC_ALLOW_PSEUDONYM);
-
-        if (result != null && result.trim().length() > 0) {
-            return saros.getPreferenceStore().getBoolean(
-                PreferenceConstants.STATISTIC_ALLOW_PSEUDONYM);
-        }
-
-        return saros.getConfigPrefs().getBoolean(
-            PreferenceConstants.STATISTIC_ALLOW_PSEUDONYM, false);
-    }
-
-    public static void setPseudonymSubmissionAllowed(Saros saros,
-        boolean isPseudonymAllowed) {
-        // store in configuration and preference scope
-        saros.getConfigPrefs().putBoolean(
-            PreferenceConstants.STATISTIC_ALLOW_PSEUDONYM, isPseudonymAllowed);
-        saros.saveConfigPrefs();
-        saros.getPreferenceStore().setValue(
-            PreferenceConstants.STATISTIC_ALLOW_PSEUDONYM, isPseudonymAllowed);
-
-    }
-
-    /**
-     * Returns whether the submission of statistic is allowed, forbidden or
-     * unknown. The global preferences have priority but if the value wasn't
-     * found there the value from the PreferenceStore (with fall back to the
-     * default) is used.
-     * 
-     * @return 0 = unknown, 1 = allowed, 2 = forbidden
-     */
-    public static int getStatisticSubmissionStatus(Saros saros) {
-        int status = saros.getConfigPrefs().getInt(
-            PreferenceConstants.STATISTIC_ALLOW_SUBMISSION, UNDEFINED);
-
-        if (status == UNDEFINED)
-            status = saros.getPreferenceStore().getInt(
-                PreferenceConstants.STATISTIC_ALLOW_SUBMISSION);
-        return status;
-    }
-
-    /**
-     * Saves in the workspace and globally if the user wants to submit statistic
-     * data.
-     */
-    public static void setStatisticSubmissionAllowed(Saros saros, boolean allow) {
-        int submission = allow ? ALLOW : FORBID;
-        setStatisticSubmission(saros, submission);
-    }
-
-    /**
-     * Saves in the workspace and globally if the user wants to submit statistic
-     * data.<br>
-     * <br>
-     * Note: It must be set globally first, so the PropertyChangeListener for
-     * the local setting is working with latest global data.
-     * 
-     * @param saros
-     *            The preferences to be used
-     * @param submission
-     *            (see constants of {@link AbstractFeedbackManager})
-     */
-    protected static void setStatisticSubmission(Saros saros, int submission) {
-        // store in configuration and preference scope
-        saros.getConfigPrefs().putInt(
-            PreferenceConstants.STATISTIC_ALLOW_SUBMISSION, submission);
-        saros.saveConfigPrefs();
-        saros.getPreferenceStore().setValue(
-            PreferenceConstants.STATISTIC_ALLOW_SUBMISSION, submission);
-    }
-
-    public static void setStatisticsPseudonymID(Saros saros, String userID) {
-        // store in configuration and preference scope
-        saros.getConfigPrefs().put(PreferenceConstants.STATISTICS_PSEUDONYM_ID,
-            userID);
-        saros.saveConfigPrefs();
-        saros.getPreferenceStore().setValue(
-            PreferenceConstants.STATISTICS_PSEUDONYM_ID, userID);
+        return StatisticManagerConfiguration
+            .isPseudonymSubmissionAllowed(saros);
     }
 
     /**
@@ -231,21 +147,7 @@ public class StatisticManager extends AbstractFeedbackManager implements
      *         {@link FeedbackPreferencePage}
      */
     public String getStatisticsPseudonymID() {
-        return getStatisticsPseudonymID(saros);
-    }
-
-    public static String getStatisticsPseudonymID(Saros saros) {
-
-        // First look in the Preferences
-        String userID = saros.getPreferenceStore().getString(
-            PreferenceConstants.STATISTICS_PSEUDONYM_ID);
-
-        if (userID != null && userID.trim().length() > 0)
-            return userID;
-
-        // Fall back to the Configuration
-        return saros.getConfigPrefs().get(
-            PreferenceConstants.STATISTICS_PSEUDONYM_ID, "");
+        return StatisticManagerConfiguration.getStatisticsPseudonymID(saros);
     }
 
     /**
@@ -255,11 +157,7 @@ public class StatisticManager extends AbstractFeedbackManager implements
      *         otherwise false
      */
     public boolean hasStatisticAgreement() {
-        return hasStatisticAgreement(saros);
-    }
-
-    public static boolean hasStatisticAgreement(Saros saros) {
-        return getStatisticSubmissionStatus(saros) != UNKNOWN;
+        return StatisticManagerConfiguration.hasStatisticAgreement(saros);
     }
 
     /**
@@ -309,7 +207,8 @@ public class StatisticManager extends AbstractFeedbackManager implements
         sb.append("  Pseudonym submission allowed: "
             + isPseudonymSubmissionAllowed());
         if (isPseudonymSubmissionAllowed())
-            sb.append("\n  Pseudonym is: " + getStatisticsPseudonymID(saros));
+            sb.append("\n  Pseudonym is: "
+                + StatisticManagerConfiguration.getStatisticsPseudonymID(saros));
         log.info(sb.toString());
     }
 
@@ -336,7 +235,8 @@ public class StatisticManager extends AbstractFeedbackManager implements
         if (saros.getVersion().endsWith("DEVEL"))
             userID = "sarosTeam-" + userID;
         if (isPseudonymSubmissionAllowed())
-            userID += "-" + getStatisticsPseudonymID(saros);
+            userID += "-"
+                + StatisticManagerConfiguration.getStatisticsPseudonymID(saros);
         return userID;
     }
 

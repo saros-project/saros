@@ -36,6 +36,7 @@ import de.fu_berlin.inf.dpp.feedback.ErrorLogManager;
 import de.fu_berlin.inf.dpp.feedback.FeedbackManager;
 import de.fu_berlin.inf.dpp.feedback.Messages;
 import de.fu_berlin.inf.dpp.feedback.StatisticManager;
+import de.fu_berlin.inf.dpp.feedback.StatisticManagerConfiguration;
 import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
 import de.fu_berlin.inf.dpp.util.LinkListener;
 import de.fu_berlin.inf.dpp.util.Utils;
@@ -94,11 +95,12 @@ public class FeedbackPreferencePage extends PreferencePage implements
         isFeedbackDisabled = feedbackManager.isFeedbackDisabled();
         int interval = feedbackManager.getSurveyInterval();
         currentInterval = FeedbackInterval.getFromInterval(interval);
-        isSubmissionAllowed = StatisticManager
+        isSubmissionAllowed = StatisticManagerConfiguration
             .isStatisticSubmissionAllowed(saros);
-        isPseudonymAllowed = StatisticManager
+        isPseudonymAllowed = StatisticManagerConfiguration
             .isPseudonymSubmissionAllowed(saros);
-        pseudonymID = StatisticManager.getStatisticsPseudonymID(saros);
+        pseudonymID = StatisticManagerConfiguration
+            .getStatisticsPseudonymID(saros);
         isErrorLogSubmissionAllowed = errorLogManager
             .isErrorLogSubmissionAllowed();
         isFullErrorLogSubmissionAllowed = errorLogManager
@@ -470,11 +472,12 @@ public class FeedbackPreferencePage extends PreferencePage implements
         feedbackManager.setFeedbackDisabled(isFeedbackDisabled);
         feedbackManager.setSurveyInterval(currentInterval.getInterval());
 
-        StatisticManager.setStatisticSubmissionAllowed(saros,
+        StatisticManagerConfiguration.setStatisticSubmissionAllowed(saros,
             isSubmissionAllowed);
-        StatisticManager.setPseudonymSubmissionAllowed(saros,
+        StatisticManagerConfiguration.setPseudonymSubmissionAllowed(saros,
             isPseudonymAllowed);
-        StatisticManager.setStatisticsPseudonymID(saros, pseudonymID);
+        StatisticManagerConfiguration.setStatisticsPseudonymID(saros,
+            pseudonymID);
         errorLogManager
             .setErrorLogSubmissionAllowed(isErrorLogSubmissionAllowed);
         errorLogManager

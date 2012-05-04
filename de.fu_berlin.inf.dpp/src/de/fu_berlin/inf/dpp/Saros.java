@@ -57,7 +57,7 @@ import de.fu_berlin.inf.dpp.accountManagement.XMPPAccount;
 import de.fu_berlin.inf.dpp.accountManagement.XMPPAccountStore;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.feedback.ErrorLogManager;
-import de.fu_berlin.inf.dpp.feedback.StatisticManager;
+import de.fu_berlin.inf.dpp.feedback.StatisticManagerConfiguration;
 import de.fu_berlin.inf.dpp.net.SarosNet;
 import de.fu_berlin.inf.dpp.net.upnp.IUPnPService;
 import de.fu_berlin.inf.dpp.net.upnp.internal.UPnPAccessImpl;
@@ -283,7 +283,7 @@ public class Saros extends AbstractUIPlugin {
         // determine if auto-connect can and should be performed
         if (getPreferenceStore().getBoolean(PreferenceConstants.AUTO_CONNECT)
             && !sarosContext.getComponent(XMPPAccountStore.class).isEmpty()
-            && StatisticManager.hasStatisticAgreement(this)
+            && StatisticManagerConfiguration.hasStatisticAgreement(this)
             && ErrorLogManager.hasErrorLogAgreement(this)) {
             asyncConnect();
         }

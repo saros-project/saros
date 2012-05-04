@@ -24,7 +24,7 @@ import org.picocontainer.annotations.Inject;
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.feedback.ErrorLogManager;
-import de.fu_berlin.inf.dpp.feedback.StatisticManager;
+import de.fu_berlin.inf.dpp.feedback.StatisticManagerConfiguration;
 import de.fu_berlin.inf.dpp.net.upnp.IUPnPService;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
 import de.fu_berlin.inf.dpp.ui.ImageManager;
@@ -274,8 +274,9 @@ public class ConfigurationSettingsWizardPage extends WizardPage {
         this.skypeUsageButton.setSelection(!skypeUsername.isEmpty());
         this.skypeUsernameText.setText(skypeUsername);
 
-        this.statisticSubmissionButton.setSelection(StatisticManager
-            .isStatisticSubmissionAllowed(saros));
+        this.statisticSubmissionButton
+            .setSelection(StatisticManagerConfiguration
+                .isStatisticSubmissionAllowed(saros));
 
         this.errorLogSubmissionButton.setSelection(errorLogManager
             .isErrorLogSubmissionAllowed());

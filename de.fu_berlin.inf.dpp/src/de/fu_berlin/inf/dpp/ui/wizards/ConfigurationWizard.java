@@ -25,7 +25,7 @@ import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.feedback.ErrorLogManager;
-import de.fu_berlin.inf.dpp.feedback.StatisticManager;
+import de.fu_berlin.inf.dpp.feedback.StatisticManagerConfiguration;
 import de.fu_berlin.inf.dpp.net.upnp.IUPnPService;
 import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
 import de.fu_berlin.inf.dpp.ui.ImageManager;
@@ -95,7 +95,7 @@ public class ConfigurationWizard extends AddXMPPAccountWizard {
         boolean errorLogSubmissionAllowed = this.configurationSettingsWizardPage
             .isErrorLogSubmissionAllowed();
 
-        StatisticManager.setStatisticSubmissionAllowed(saros,
+        StatisticManagerConfiguration.setStatisticSubmissionAllowed(saros,
             statisticSubmissionAllowed);
 
         errorLogManager.setErrorLogSubmissionAllowed(errorLogSubmissionAllowed);
