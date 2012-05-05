@@ -1346,7 +1346,8 @@ public class SarosSession implements ISarosSession, Disposable {
         // Core Managers
         sessionContainer.addComponent(ChangeColorManager.class);
 
-        // Statistic collectors
+        // Statistic collectors. Make sure to add new collectors to the
+        // StatisticCollectorTest as well
         sessionContainer.addComponent(StatisticManager.class);
         sessionContainer.addComponent(DataTransferCollector.class);
         sessionContainer.addComponent(PermissionChangeCollector.class);

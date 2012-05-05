@@ -376,4 +376,13 @@ public class StatisticManager extends AbstractFeedbackManager implements
             saveAndSubmitStatistic();
         }
     }
+
+    // Support for JUnit tests
+    public int getAvailableCollectorCount() {
+        return allCollectors.size();
+    }
+
+    public int getActiveCollectorCount() {
+        return activeCollectors == null ? 0 : activeCollectors.size();
+    }
 }

@@ -62,7 +62,7 @@ public class SarosSessionTest {
         return net;
     }
 
-    static private Saros createSarosMock() {
+    static public Saros createSarosMock() {
         IPreferenceStore store = EasyMock.createMock(IPreferenceStore.class);
         store.getInt(PreferenceConstants.MILLIS_UPDATE);
         EasyMock.expectLastCall().andReturn(new Integer(30)).anyTimes();
@@ -93,7 +93,7 @@ public class SarosSessionTest {
         return saros;
     }
 
-    static private DataTransferManager createDataTransferManagerMock() {
+    static public DataTransferManager createDataTransferManagerMock() {
         DataTransferManager mock = EasyMock
             .createMock(DataTransferManager.class);
         mock.getTransferModeDispatch();
