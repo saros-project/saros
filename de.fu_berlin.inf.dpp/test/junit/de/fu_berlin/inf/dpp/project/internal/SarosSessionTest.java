@@ -1,6 +1,9 @@
 package de.fu_berlin.inf.dpp.project.internal;
 
 import java.io.File;
+import java.util.LinkedList;
+import java.util.List;
+
 import junit.framework.Assert;
 
 import org.easymock.EasyMock;
@@ -30,6 +33,7 @@ import de.fu_berlin.inf.dpp.communication.audio.AudioServiceManager;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.feedback.FeedbackManager;
 import de.fu_berlin.inf.dpp.feedback.SessionStatistic;
+import de.fu_berlin.inf.dpp.feedback.StatisticCollectorTest;
 import de.fu_berlin.inf.dpp.feedback.StatisticManager;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.JID;
@@ -123,9 +127,11 @@ public class SarosSessionTest {
         container.addComponent(DataTransferManager.class,
             createDataTransferManagerMock());
 
-        // Mocks that stay in the replay state
+        List<Object> editorListeners = new LinkedList<Object>();
         container.addComponent(EditorManager.class,
-            EasyMock.createMock(EditorManager.class));
+            StatisticCollectorTest.createEditorManagerMock(editorListeners));
+
+        // Mocks that stay in the replay state
         container.addComponent(ProjectNegotiationObservable.class,
             EasyMock.createMock(ProjectNegotiationObservable.class));
         container.addComponent(PreferenceUtils.class,
@@ -212,6 +218,7 @@ public class SarosSessionTest {
 
         session.stop();
         Assert.assertFalse(session.getSequencer().isStarted());
+        Assert.assertTrue(editorListeners.isEmpty());
 
         session.dispose();
 

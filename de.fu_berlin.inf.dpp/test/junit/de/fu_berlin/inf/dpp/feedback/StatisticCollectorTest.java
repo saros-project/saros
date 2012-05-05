@@ -72,7 +72,7 @@ public class StatisticCollectorTest {
         return session;
     }
 
-    private static EditorManager createEditorManagerMock(
+    public static EditorManager createEditorManagerMock(
         final List<Object> editorListeners) {
         EditorManager editorManager = EasyMock.createMock(EditorManager.class);
         editorManager.addSharedEditorListener(EasyMock
