@@ -1,6 +1,6 @@
 /*
  * DPP - Serious Distributed Pair Programming
- * (c) Moritz v. Hoffen, Freie Universitaet Berlin 2010
+ * (c) Moritz v. Hoffen, Freie Universität Berlin 2010
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by

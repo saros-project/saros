@@ -1,6 +1,6 @@
 /*
  * DPP - Serious Distributed Pair Programming
- * (c) Freie Universitaet Berlin - Fachbereich Mathematik und Informatik - 2006
+ * (c) Freie Universität Berlin - Fachbereich Mathematik und Informatik - 2006
  * (c) Riad Djemili - 2006
  * (c) Christopher Oezbek - 2006
  * 

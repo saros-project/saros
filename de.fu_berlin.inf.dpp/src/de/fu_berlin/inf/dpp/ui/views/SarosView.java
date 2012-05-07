@@ -2,7 +2,7 @@ package de.fu_berlin.inf.dpp.ui.views;
 
 /*
  * DPP - Serious Distributed Pair Programming
- * (c) Freie Universitaet Berlin - Fachbereich Mathematik und Informatik - 2010
+ * (c) Freie Universität Berlin - Fachbereich Mathematik und Informatik - 2010
  * (c) Patrick Bitterling - 2010
  *
  * This program is free software; you can redistribute it and/or modify

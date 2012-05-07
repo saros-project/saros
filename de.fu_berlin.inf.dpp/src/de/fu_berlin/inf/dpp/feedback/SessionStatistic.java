@@ -1,6 +1,6 @@
 /*
  * DPP - Serious Distributed Pair Programming
- * (c) Lisa Dohrmann, Freie Universitaet Berlin 2009
+ * (c) Lisa Dohrmann, Freie Universität Berlin 2009
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
