@@ -25,7 +25,7 @@ import de.fu_berlin.inf.dpp.stf.test.Constants;
  * 1. open the invitation wizard 
  * 2. make a selection
  * 3. save a selection
- * 4. undoe all selections  until no undo is possible any longer
+ * 4. undo all selections  until no undo is possible any longer
  * 5. redo all selections until no redo possible 
  * 6. undo again
  * 7. restore saved selection.
