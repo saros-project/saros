@@ -34,6 +34,7 @@ import de.fu_berlin.inf.nebula.utils.FontUtils;
  * @author bkahlert
  */
 public class EnterXMPPAccountWizardPage extends WizardPage {
+
     public static final String TITLE = Messages.EnterXMPPAccountWizardPage_title;
     public static final String DESCRIPTION = Messages.EnterXMPPAccountWizardPage_description;
 
@@ -195,7 +196,11 @@ public class EnterXMPPAccountWizardPage extends WizardPage {
             @Override
             public void focusLost(FocusEvent e) {
                 wasJIDValid = true;
-                updatePageCompletion();
+                /*
+                 * do not call updatePageCompletion here or the wizard will ****
+                 * up, redirecting clicks on the Finish button to the wrong
+                 * widget
+                 */
             }
         });
     }
