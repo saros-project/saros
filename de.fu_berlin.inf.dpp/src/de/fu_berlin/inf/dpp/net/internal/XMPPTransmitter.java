@@ -31,11 +31,11 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
 import org.jivesoftware.smack.Chat;
@@ -55,6 +55,7 @@ import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.FileList;
 import de.fu_berlin.inf.dpp.User;
+import de.fu_berlin.inf.dpp.User.UserConnectionState;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
 import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
@@ -65,6 +66,7 @@ import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.IncomingTransferObject;
 import de.fu_berlin.inf.dpp.net.IncomingTransferObject.IncomingTransferObjectExtensionProvider;
 import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.net.NetTransferMode;
 import de.fu_berlin.inf.dpp.net.SarosNet;
 import de.fu_berlin.inf.dpp.net.TimedActivityDataObject;
 import de.fu_berlin.inf.dpp.net.business.DispatchThreadContext;
@@ -78,7 +80,6 @@ import de.fu_berlin.inf.dpp.net.internal.extensions.CancelInviteExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.CancelProjectSharingExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.LeaveExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.PacketExtensionUtils;
-import de.fu_berlin.inf.dpp.net.packet.TimedActivitiesPacket;
 import de.fu_berlin.inf.dpp.observables.SarosSessionObservable;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
@@ -101,8 +102,11 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
      * Maximum retry attempts to send an activity. Retry attempts will switch to
      * prefer IBB on MAX_TRANSFER_RETRIES/2.
      */
-    private static final int MAX_TRANSFER_RETRIES = 4;
-    private static final int MAX_XMPP_MESSAGE_SIZE = 4096;
+    public static final int MAX_TRANSFER_RETRIES = 4;
+
+    public static final int MAX_PARALLEL_SENDS = 10;
+    public static final int FORCEDPART_OFFLINEUSER_AFTERSECS = 60;
+    public static final int MAX_XMPP_MESSAGE_SIZE = 16378;
 
     protected Connection connection;
 
@@ -111,6 +115,8 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
     protected Map<JID, Chat> chats;
 
     protected Map<JID, InvitationProcess> processes;
+
+    protected List<MessageTransfer> messageTransferQueue;
 
     protected XMPPReceiver receiver;
 
@@ -130,6 +136,12 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
 
     @Inject
     protected CancelProjectSharingExtension cancelProjectSharingExtension;
+
+    @Inject
+    protected ActivitiesExtensionProvider activitiesProvider;
+
+    @Inject
+    protected InvitationInfo.InvitationExtensionProvider invExtProv;
 
     @Inject
     protected InvitationAcknowledgementExtensionProvider invAcknowledgementExtProv;
@@ -186,13 +198,20 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
         final SubMonitor monitor, boolean forceWait) throws IOException,
         SarosCancellationException {
 
-        monitor.beginTask("Receiving archive file", 1);
+        monitor.beginTask("Receiving archive file", 100);
         log.debug("Receiving archive");
         final PacketFilter filter = PacketExtensionUtils
             .getIncomingTransferObjectFilter(incomingExtProv, sessionID,
                 processID, TransferDescription.ARCHIVE_TRANSFER);
 
         SarosPacketCollector collector = installReceiver(filter);
+
+        // provide visual feedback of ongoing IBB transfer
+        PacketListener packetListenerIBB = null;
+        if (dataManager.getTransferMode(peer) == NetTransferMode.IBB) {
+            packetListenerIBB = createIBBTransferProgressPacketListener(peer,
+                monitor);
+        }
 
         monitor
             .subTask("Host is compressing project files. Waiting for the archive file...");
@@ -210,18 +229,67 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
         monitor.subTask("Receiving archive file...");
         try {
             IncomingTransferObject result = incomingExtProv.getPayload(receive(
-                monitor.newChild(0), collector, 10000, forceWait));
+                monitor.newChild(packetListenerIBB == null ? 10 : 1),
+                collector, 10000, forceWait));
 
             if (monitor.isCanceled()) {
                 result.reject();
                 throw new LocalCancellationException();
             }
-            byte[] data = result.accept(monitor.newChild(1));
+            byte[] data = result.accept(monitor
+                .newChild(packetListenerIBB == null ? 90 : 9));
 
             return new ByteArrayInputStream(data);
         } finally {
             monitor.done();
+            if (packetListenerIBB != null)
+                receiver.removePacketListener(packetListenerIBB);
         }
+    }
+
+    /**
+     * Initializes a {@link PacketListener} to visualize incoming packets as
+     * progress in the given {@link SubMonitor}. This is an infinite,
+     * logarithmic progress display.
+     * 
+     * @param peer
+     *            The source {@link JID} of packets to show progress for
+     * @param monitor
+     *            The {@link SubMonitor} of the progress
+     */
+    protected PacketListener createIBBTransferProgressPacketListener(
+        final JID peer, final SubMonitor monitor) {
+
+        PacketListener packetListener = new PacketListener() {
+
+            public void processPacket(Packet packet) {
+                // we dont process
+            }
+        };
+
+        receiver.addPacketListener(packetListener, new PacketFilter() {
+
+            public boolean accept(Packet packet) {
+
+                if (packet.getClass().equals((IQ.class)))
+                    return false;
+
+                if (packet.getFrom() == null)
+                    return false;
+
+                JID fromJid = new JID(packet.getFrom());
+                if (peer.equals(fromJid) == false)
+                    return false;
+
+                // increase infinite (logarithmic) progress
+                monitor.setWorkRemaining(100);
+                monitor.worked(5);
+
+                // we dont process
+                return false;
+            }
+        });
+        return packetListener;
     }
 
     /**
@@ -232,9 +300,9 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
         return receiver.createCollector(filter);
     }
 
-    public Packet receive(IProgressMonitor monitor,
-        SarosPacketCollector collector, long timeout, boolean forceWait)
-        throws LocalCancellationException, IOException {
+    public Packet receive(SubMonitor monitor, SarosPacketCollector collector,
+        long timeout, boolean forceWait) throws LocalCancellationException,
+        IOException {
 
         if (isConnectionInvalid())
             return null;
@@ -328,10 +396,17 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
                 invitationID)), true);
     }
 
-    /* *********************************************
-     * Invitation process' help functions --- END *
-     * *********************************************
+    /********************************************************************************
+     * Invitation process' help functions --- END
+     ********************************************************************************/
+
+    /**
+     * A simple struct that is used to queue message transfers.
      */
+    protected static class MessageTransfer {
+        public JID receipient;
+        public Message message;
+    }
 
     public void sendCancelInvitationMessage(JID user, String errorMsg) {
         log.debug("Send request to cancel Invitation to "
@@ -360,6 +435,13 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
         sendMessageToAll(sarosSession, leaveExtension.create());
     }
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see de.fu_berlin.inf.dpp.ITransmitter
+     * 
+     * TODO: Add Progress
+     */
     public void sendTimedActivities(JID recipient,
         List<TimedActivityDataObject> timedActivities) {
 
@@ -373,13 +455,11 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
         }
 
         String sID = sessionID.getValue();
-
-        de.fu_berlin.inf.dpp.net.packet.Packet packet = new TimedActivitiesPacket(
-            new TimedActivities(sID, timedActivities));
-        packet.setReceiver(recipient);
+        PacketExtension extensionToSend = activitiesProvider.create(sID,
+            timedActivities);
 
         try {
-            dataManager.sendPacket(packet);
+            sendToProjectUser(recipient, extensionToSend);
         } catch (IOException e) {
             log.error("Failed to sent activityDataObjects: " + timedActivities,
                 e);
@@ -421,8 +501,6 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
      *             if sending by bytestreams fails and the extension raw data is
      *             longer than {@value #MAX_XMPP_MESSAGE_SIZE}
      */
-
-    // TODO WHITEBOARD
     public void sendToProjectUser(JID recipient, PacketExtension extension)
         throws IOException {
         /*
@@ -632,11 +710,34 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
         dataManager.sendData(transfer, content, progress.newChild(90));
     }
 
+    public void sendRemainingFiles() {
+
+        log.warn("Sending remaining files is not implemented!");
+        //
+        // if (this.fileTransferQueue.size() > 0) {
+        // // sendNextFile();
+        // }
+    }
+
+    public void sendRemainingMessages() {
+
+        List<MessageTransfer> toTransfer = null;
+
+        synchronized (messageTransferQueue) {
+            toTransfer = new ArrayList<MessageTransfer>(messageTransferQueue);
+            messageTransferQueue.clear();
+        }
+
+        for (MessageTransfer pex : toTransfer) {
+            sendMessageToUser(pex.receipient, pex.message, true);
+        }
+    }
+
     /**
      * Convenience method for sending the given {@link PacketExtension} to all
      * participants of the given {@link ISarosSession}.
      */
-    private void sendMessageToAll(ISarosSession sarosSession,
+    public void sendMessageToAll(ISarosSession sarosSession,
         PacketExtension extension) {
 
         JID myJID = sarosNet.getMyJID();
@@ -647,6 +748,13 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
                 continue;
             sendMessageToUser(participant.getJID(), extension, true);
         }
+    }
+
+    private void queueMessage(JID jid, Message message) {
+        MessageTransfer msg = new MessageTransfer();
+        msg.receipient = jid;
+        msg.message = message;
+        this.messageTransferQueue.add(msg);
     }
 
     /**
@@ -686,22 +794,26 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
     public void sendMessageToUser(JID jid, Message message,
         boolean sessionMembersOnly) {
 
-        ISarosSession session = sarosSessionObservable.getValue();
-
-        User user = null;
-
-        if (session != null)
-            user = session.getUser(jid);
-
         if (sessionMembersOnly) {
-            if (session == null) {
-                log.error("could not send message because there is no active session");
+            User participant = sarosSessionObservable.getValue().getUser(jid);
+            if (participant == null) {
+                log.warn("Buddy not in session:" + Utils.prefix(jid));
                 return;
             }
 
-            if (user == null) {
-                log.warn("user is not in the current session:"
-                    + Utils.prefix(jid));
+            if (participant.getConnectionState() == UserConnectionState.OFFLINE) {
+                /*
+                 * TODO This probably does not work anymore! See Feature Request
+                 * #2577390
+                 */
+                // remove participant if he/she is offline too long
+                if (participant.getOfflineSeconds() > XMPPTransmitter.FORCEDPART_OFFLINEUSER_AFTERSECS) {
+                    log.info("Removing offline buddy from session...");
+                    sarosSessionObservable.getValue().removeUser(participant);
+                } else {
+                    queueMessage(jid, message);
+                    log.info("Buddy known as offline - Message queued!");
+                }
                 return;
             }
         }
@@ -709,12 +821,8 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
         try {
             sendMessageWithoutQueueing(jid, message);
         } catch (IOException e) {
-            // FIXME the session should do that
-            log.error("could not send message to user: " + jid, e);
-            if (user != null && session != null) {
-                log.info("removing user " + user + " from the current session");
-                session.removeUser(user);
-            }
+            log.info("Could not send message, thus queueing", e);
+            queueMessage(jid, message);
         }
     }
 
@@ -763,6 +871,19 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
         } catch (XMPPException e) {
             throw new CausedIOException("Failed to send message", e);
         }
+    }
+
+    public Packet sendAndReceive(SubMonitor monitor, JID jid,
+        PacketExtension extension, PacketFilter filter, long timeout,
+        boolean forceWait, boolean sessionMembersOnly)
+        throws LocalCancellationException, IOException {
+
+        SarosPacketCollector collector = installReceiver(filter);
+
+        sendMessageToUser(jid, extension, sessionMembersOnly);
+
+        return receive(monitor, collector, timeout, forceWait);
+
     }
 
     /**
@@ -816,6 +937,8 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
         this.chats = new HashMap<JID, Chat>();
         this.processes = Collections
             .synchronizedMap(new HashMap<JID, InvitationProcess>());
+        this.messageTransferQueue = Collections
+            .synchronizedList(new LinkedList<MessageTransfer>());
 
         this.connection = connection;
 
@@ -859,6 +982,7 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
         }
         chats.clear();
         processes.clear();
+        messageTransferQueue.clear();
         chatmanager = null;
         connection = null;
     }

@@ -2,18 +2,20 @@ package de.fu_berlin.inf.dpp.net.business;
 
 import java.util.List;
 
+import org.apache.commons.lang.ObjectUtils;
 import org.apache.log4j.Logger;
+import org.jivesoftware.smack.PacketListener;
+import org.jivesoftware.smack.packet.Packet;
+import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.activities.serializable.IActivityDataObject;
 import de.fu_berlin.inf.dpp.annotations.Component;
-import de.fu_berlin.inf.dpp.net.IPacketListener;
+import de.fu_berlin.inf.dpp.net.IncomingTransferObject.IncomingTransferObjectExtensionProvider;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.TimedActivityDataObject;
-import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
+import de.fu_berlin.inf.dpp.net.internal.ActivitiesExtensionProvider;
 import de.fu_berlin.inf.dpp.net.internal.TimedActivities;
-import de.fu_berlin.inf.dpp.net.packet.Packet;
-import de.fu_berlin.inf.dpp.net.packet.PacketType;
-import de.fu_berlin.inf.dpp.net.packet.TimedActivitiesPacket;
+import de.fu_berlin.inf.dpp.net.internal.XMPPReceiver;
 import de.fu_berlin.inf.dpp.observables.SarosSessionObservable;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
@@ -24,44 +26,56 @@ import de.fu_berlin.inf.dpp.util.Utils;
  * Handler for all {@link TimedActivities}
  */
 @Component(module = "net")
-public class ActivitiesHandler implements IPacketListener {
+public class ActivitiesHandler {
 
     private static final Logger log = Logger.getLogger(ActivitiesHandler.class
         .getName());
 
-    private SarosSessionObservable sarosSessionObservable;
-    private SessionIDObservable sessionIDObervable;
+    @Inject
+    protected SarosSessionObservable sarosSessionObservable;
 
-    public ActivitiesHandler(DataTransferManager dataTransfermanager,
-        SarosSessionObservable sarosSessionObservable,
-        SessionIDObservable sessionIDObervable) {
+    @Inject
+    protected DispatchThreadContext dispatchThread;
 
-        this.sarosSessionObservable = sarosSessionObservable;
-        this.sessionIDObervable = sessionIDObervable;
+    public ActivitiesHandler(XMPPReceiver receiver,
+        final ActivitiesExtensionProvider provider,
+        final IncomingTransferObjectExtensionProvider incomingExtProv,
+        final SessionIDObservable sessionID) {
 
-        dataTransfermanager.getDispatcher().addPacketListener(this,
-            PacketType.TIMED_ACTIVITIES);
-    }
+        /**
+         * Add a PacketListener for all TimedActivityDataObject packets
+         */
+        receiver.addPacketListener(new PacketListener() {
+            public void processPacket(Packet packet) {
+                try {
+                    TimedActivities payload = provider.getPayload(packet);
+                    if (payload == null) {
+                        log.warn("Invalid ActivitiesExtensionPacket"
+                            + " does not contain a payload: " + packet);
+                        return;
+                    }
+                    JID from = new JID(packet.getFrom());
+                    List<TimedActivityDataObject> timedActivities = payload
+                        .getTimedActivities();
 
-    @Override
-    public void processPacket(Packet packet) {
+                    if (!ObjectUtils.equals(sessionID.getValue(),
+                        payload.getSessionID())) {
+                        log.warn("Rcvd ("
+                            + String.format("%03d", timedActivities.size())
+                            + ") " + Utils.prefix(from)
+                            + "from an old/unknown session: " + timedActivities);
+                        return;
+                    }
 
-        TimedActivities activites = ((TimedActivitiesPacket) packet)
-            .getTimedActivities();
+                    receiveActivities(from, timedActivities);
 
-        JID from = packet.getSender();
-
-        List<TimedActivityDataObject> timedActivities = activites
-            .getTimedActivities();
-
-        if (!activites.getSessionID().equals(sessionIDObervable.getValue())) {
-            log.warn("Rcvd (" + String.format("%03d", timedActivities.size())
-                + ") " + Utils.prefix(from) + "from an old/unknown session: "
-                + timedActivities);
-            return;
-        }
-
-        receiveActivities(from, timedActivities);
+                } catch (Exception e) {
+                    log.error(
+                        "An internal error occurred while processing packets",
+                        e);
+                }
+            }
+        }, provider.getPacketFilter());
     }
 
     /**
@@ -74,8 +88,10 @@ public class ActivitiesHandler implements IPacketListener {
      *            the activityDataObjects might be different!)
      * @param timedActivities
      *            The received activityDataObjects including sequence numbers.
+     * 
+     * @sarosThread must be called from the Dispatch Thread
      */
-    private void receiveActivities(JID fromJID,
+    public void receiveActivities(JID fromJID,
         List<TimedActivityDataObject> timedActivities) {
 
         final ISarosSession session = sarosSessionObservable.getValue();
