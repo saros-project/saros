@@ -308,6 +308,12 @@ public class SarosSessionManager implements ISarosSessionManager,
     }
 
     /**
+     * This method and the sarosSessionObservable are dangerous to use. The
+     * session might be in the process of being destroyed while you call this
+     * method. The caller needs to save the returned value to a local variable
+     * and do a null check. For new code you should consider being scoped by the
+     * SarosSession and get the SarosSession in the constructor.
+     * 
      * @deprecated Error prone method, which produces NPE if not handled
      *             correctly. Will soon get removed.
      */
