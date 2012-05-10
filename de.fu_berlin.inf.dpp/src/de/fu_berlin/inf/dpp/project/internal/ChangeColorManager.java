@@ -9,6 +9,7 @@ import java.util.Vector;
 import org.apache.log4j.Logger;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.ColorDialog;
+import org.picocontainer.Startable;
 
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.activities.business.AbstractActivityReceiver;
@@ -19,11 +20,8 @@ import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.editor.annotations.SarosAnnotation;
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.project.AbstractActivityProvider;
-import de.fu_berlin.inf.dpp.project.AbstractSarosSessionListener;
 import de.fu_berlin.inf.dpp.project.AbstractSharedProjectListener;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
-import de.fu_berlin.inf.dpp.project.ISarosSessionListener;
-import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
 import de.fu_berlin.inf.dpp.project.Messages;
 import de.fu_berlin.inf.dpp.util.Utils;
@@ -34,22 +32,21 @@ import de.fu_berlin.inf.dpp.util.Utils;
  * @author cnk and tobi
  */
 @Component(module = "core")
-public class ChangeColorManager extends AbstractActivityProvider {
+public class ChangeColorManager extends AbstractActivityProvider implements
+    Startable {
 
     private static final Logger log = Logger
         .getLogger(ChangeColorManager.class);
 
-    protected ISarosSessionManager sessionManager;
-    protected ISarosSession sarosSession;
-    protected EditorManager editorManager;
+    protected final ISarosSession sarosSession;
+    protected final EditorManager editorManager;
 
     protected RGB rgbOfNewParticipant;
 
-    public ChangeColorManager(ISarosSessionManager sessionManager,
+    public ChangeColorManager(ISarosSession sarosSession,
         EditorManager editorManager) {
-        this.sessionManager = sessionManager;
+        this.sarosSession = sarosSession;
         this.editorManager = editorManager;
-        sessionManager.addSarosSessionListener(sessionListener);
     }
 
     @Override
@@ -81,21 +78,15 @@ public class ChangeColorManager extends AbstractActivityProvider {
         editorManager.refreshAnnotations();
     }
 
-    protected ISarosSessionListener sessionListener = new AbstractSarosSessionListener() {
+    public void start() {
+        sarosSession.addActivityProvider(ChangeColorManager.this);
+        sarosSession.addListener(sharedProjectListener);
+    }
 
-        @Override
-        public void sessionStarted(ISarosSession session) {
-            sarosSession = session;
-            sarosSession.addActivityProvider(ChangeColorManager.this);
-            sarosSession.addListener(sharedProjectListener);
-        }
-
-        @Override
-        public void sessionEnded(ISarosSession session) {
-            session.removeActivityProvider(ChangeColorManager.this);
-            sarosSession = null;
-        }
-    };
+    public void stop() {
+        sarosSession.removeActivityProvider(ChangeColorManager.this);
+        sarosSession.removeListener(sharedProjectListener);
+    }
 
     private ISharedProjectListener sharedProjectListener = new AbstractSharedProjectListener() {
 

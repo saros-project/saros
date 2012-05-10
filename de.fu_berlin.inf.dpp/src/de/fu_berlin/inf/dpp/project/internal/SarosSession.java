@@ -1331,6 +1331,9 @@ public class SarosSession implements ISarosSession, Disposable {
         // Classes belonging to a session
         sessionContainer.addComponent(PingPongCentral.class);
 
+        // Core Managers
+        sessionContainer.addComponent(ChangeColorManager.class);
+
         // Force the creation of the above components.
         sessionContainer.getComponents();
     }

@@ -96,7 +96,6 @@ import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.project.SarosRosterListener;
 import de.fu_berlin.inf.dpp.project.SarosSessionManager;
 import de.fu_berlin.inf.dpp.project.SharedResourcesManager;
-import de.fu_berlin.inf.dpp.project.internal.ChangeColorManager;
 import de.fu_berlin.inf.dpp.project.internal.ChecksumCacheImpl;
 import de.fu_berlin.inf.dpp.project.internal.FileContentNotifierBridge;
 import de.fu_berlin.inf.dpp.project.internal.FollowingActivitiesManager;
@@ -204,7 +203,6 @@ public class SarosContext implements ISarosContext {
         Component.create(DispatchThreadContext.class),
 
         // Core Managers
-        Component.create(ChangeColorManager.class),
         Component.create(ConsistencyWatchdogClient.class),
         Component.create(ConsistencyWatchdogServer.class),
         Component.create(EditorAPI.class),
