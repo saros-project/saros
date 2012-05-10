@@ -33,6 +33,7 @@ import java.util.TimerTask;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -523,12 +524,16 @@ public class ActivitySequencer implements Startable {
             public void run() {
                 Utils.runSafeSync(log, new Runnable() {
                     public void run() {
-                        flushTask();
+                        try {
+                            flushTask();
+                        } catch (InterruptedException e) {
+                            log.error("Flush got interrupted.", e);
+                        }
                     }
                 });
             }
 
-            private void flushTask() {
+            private void flushTask() throws InterruptedException {
                 // Just to assert that after stop() no task is executed anymore
                 if (!started)
                     return;
@@ -536,8 +541,9 @@ public class ActivitySequencer implements Startable {
                 List<DataObjectQueueItem> activities = new ArrayList<DataObjectQueueItem>(
                     outgoingQueue.size());
 
-                DataObjectQueueItem queueItem = outgoingQueue.poll();
-                if (queueItem == POISON)
+                DataObjectQueueItem queueItem = outgoingQueue.poll(30,
+                    TimeUnit.SECONDS);
+                if (queueItem == POISON || queueItem == null)
                     return;
 
                 activities.add(queueItem);
