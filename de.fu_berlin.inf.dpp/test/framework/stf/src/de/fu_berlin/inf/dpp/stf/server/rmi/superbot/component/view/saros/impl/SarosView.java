@@ -438,7 +438,7 @@ public final class SarosView extends StfRemoteObject implements ISarosView {
             public String getFailureMessage() {
                 return "unable to connect to server";
             }
-        });
+        }, SarosSWTBotPreferences.SAROS_DEFAULT_TIMEOUT);
     }
 
     public void waitUntilIsDisconnected() throws RemoteException {
@@ -450,7 +450,7 @@ public final class SarosView extends StfRemoteObject implements ISarosView {
             public String getFailureMessage() {
                 return "unable to disconnect from server";
             }
-        });
+        }, SarosSWTBotPreferences.SAROS_DEFAULT_TIMEOUT);
     }
 
     public void waitUntilIsInSession() throws RemoteException {
