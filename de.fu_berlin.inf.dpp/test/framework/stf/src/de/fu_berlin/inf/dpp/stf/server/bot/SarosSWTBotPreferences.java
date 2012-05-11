@@ -4,7 +4,7 @@ import org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences;
 
 public class SarosSWTBotPreferences extends SWTBotPreferences {
 
-    public static final long SAROS_DEFAUL_TIMEOUT;
+    public static final long SAROS_DEFAULT_TIMEOUT;
 
     public static final long SAROS_LONG_TIMEOUT;
 
@@ -13,7 +13,7 @@ public class SarosSWTBotPreferences extends SWTBotPreferences {
     static {
         SAROS_SHORT_TIMEOUT = fromSystemProperty(
             "de.fu_berlin.inf.dpp.stf.server.bot.short.timeout", 10 * 1000);
-        SAROS_DEFAUL_TIMEOUT = fromSystemProperty(
+        SAROS_DEFAULT_TIMEOUT = fromSystemProperty(
             "de.fu_berlin.inf.dpp.stf.server.bot.default.timeout", 30 * 1000);
         SAROS_LONG_TIMEOUT = fromSystemProperty(
             "de.fu_berlin.inf.dpp.stf.server.bot.long.timeout", 60 * 1000);

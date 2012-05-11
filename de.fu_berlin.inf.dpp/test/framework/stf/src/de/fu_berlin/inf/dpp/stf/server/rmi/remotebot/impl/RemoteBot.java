@@ -1582,7 +1582,7 @@ public abstract class RemoteBot extends StfRemoteObject implements IRemoteBot {
 
     public void waitUntil(ICondition condition) throws RemoteException {
         swtBot
-            .waitUntil(condition, SarosSWTBotPreferences.SAROS_DEFAUL_TIMEOUT);
+            .waitUntil(condition, SarosSWTBotPreferences.SAROS_DEFAULT_TIMEOUT);
     }
 
     public void waitLongUntil(ICondition condition) throws RemoteException {
