@@ -76,7 +76,6 @@ import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 import de.fu_berlin.inf.dpp.observables.VideoSessionObservable;
 import de.fu_berlin.inf.dpp.observables.VoIPSessionObservable;
 import de.fu_berlin.inf.dpp.optional.jdt.JDTFacade;
-import de.fu_berlin.inf.dpp.preferences.PreferenceManager;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
 import de.fu_berlin.inf.dpp.project.IChecksumCache;
 import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
@@ -195,7 +194,6 @@ public class SarosContext implements ISarosContext {
         Component.create(LocalPresenceTracker.class),
         Component.create(MUCManager.class),
         Component.create(MUCManagerSingletonWrapperChatView.class),
-        Component.create(PreferenceManager.class),
         Component.create(PreferenceUtils.class),
         Component.create(SarosUI.class),
         Component.create(ISarosSessionManager.class, SarosSessionManager.class),

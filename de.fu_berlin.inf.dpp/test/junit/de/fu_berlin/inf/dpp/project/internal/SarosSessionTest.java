@@ -47,6 +47,7 @@ import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
 import de.fu_berlin.inf.dpp.observables.FileReplacementInProgressObservable;
 import de.fu_berlin.inf.dpp.observables.ProjectNegotiationObservable;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
+import de.fu_berlin.inf.dpp.optional.jdt.JDTFacade;
 import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
 import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
@@ -161,6 +162,7 @@ public class SarosSessionTest {
         container.addComponent(SessionIDObservable.class);
         container.addComponent(FeedbackManager.class);
         container.addComponent(FileReplacementInProgressObservable.class);
+        container.addComponent(JDTFacade.class);
 
         ISarosContext context = EasyMock.createMock(ISarosContext.class);
         context.initComponent(EasyMock.isA(Object.class));

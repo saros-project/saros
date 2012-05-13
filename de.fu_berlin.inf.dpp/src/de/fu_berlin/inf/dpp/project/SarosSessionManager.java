@@ -73,7 +73,6 @@ import de.fu_berlin.inf.dpp.net.internal.XMPPTransmitter;
 import de.fu_berlin.inf.dpp.observables.InvitationProcessObservable;
 import de.fu_berlin.inf.dpp.observables.SarosSessionObservable;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
-import de.fu_berlin.inf.dpp.preferences.PreferenceManager;
 import de.fu_berlin.inf.dpp.project.internal.SarosSession;
 import de.fu_berlin.inf.dpp.ui.ImageManager;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
@@ -730,19 +729,7 @@ public class SarosSessionManager implements ISarosSessionManager,
 
     public void addSarosSessionListener(ISarosSessionListener listener) {
         if (!this.sarosSessionListeners.contains(listener)) {
-            /*
-             * HACK PreferencesManager relies on the fact that a project is
-             * added only when a session is started, and it might create a new
-             * file ".settings/org.eclipse.core.resources.prefs" for the project
-             * specific settings. Adding PreferencesManager as the last listener
-             * makes sure that the file creation is registered by the
-             * SharedResourcesManager.
-             */
-            if (listener instanceof PreferenceManager) {
-                this.sarosSessionListeners.add(listener);
-            } else {
-                this.sarosSessionListeners.add(0, listener);
-            }
+            this.sarosSessionListeners.add(0, listener);
         }
     }
 

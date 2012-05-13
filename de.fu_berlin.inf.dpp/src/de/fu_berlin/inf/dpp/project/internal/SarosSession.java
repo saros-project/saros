@@ -97,6 +97,7 @@ import de.fu_berlin.inf.dpp.net.internal.ActivitySequencer;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
 import de.fu_berlin.inf.dpp.net.internal.SarosPacketCollector;
 import de.fu_berlin.inf.dpp.observables.ProjectNegotiationObservable;
+import de.fu_berlin.inf.dpp.preferences.PreferenceManager;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
 import de.fu_berlin.inf.dpp.project.AbstractActivityProvider;
 import de.fu_berlin.inf.dpp.project.IActivityListener;
@@ -1347,6 +1348,7 @@ public class SarosSession implements ISarosSession, Disposable {
         sessionContainer.addComponent(SharedResourcesManager.class);
         sessionContainer.addComponent(ProjectsAddedManager.class);
         sessionContainer.addComponent(PermissionManager.class);
+        sessionContainer.addComponent(PreferenceManager.class);
 
         // Statistic collectors. Make sure to add new collectors to the
         // StatisticCollectorTest as well
