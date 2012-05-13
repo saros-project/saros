@@ -20,7 +20,6 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.SubMonitor;
 import org.picocontainer.Startable;
 
 import de.fu_berlin.inf.dpp.User;
@@ -208,7 +207,7 @@ public final class StopManager extends AbstractActivityProvider implements
      * @throws CancellationException
      */
     public List<StartHandle> stop(final Collection<User> users,
-        final String cause, final SubMonitor monitor)
+        final String cause, final IProgressMonitor monitor)
         throws CancellationException {
 
         final List<StartHandle> resultingHandles = Collections
