@@ -92,6 +92,7 @@ import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.PingPongCentral;
 import de.fu_berlin.inf.dpp.net.SarosNet;
+import de.fu_berlin.inf.dpp.net.business.ConsistencyWatchdogHandler;
 import de.fu_berlin.inf.dpp.net.internal.ActivitySequencer;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
 import de.fu_berlin.inf.dpp.net.internal.SarosPacketCollector;
@@ -1359,6 +1360,9 @@ public class SarosSession implements ISarosSession, Disposable {
         // Feedback
         sessionContainer.addComponent(ErrorLogManager.class);
         sessionContainer.addComponent(FeedbackManager.class);
+
+        // Handlers
+        sessionContainer.addComponent(ConsistencyWatchdogHandler.class);
 
         // Force the creation of the above components.
         sessionContainer.getComponents();

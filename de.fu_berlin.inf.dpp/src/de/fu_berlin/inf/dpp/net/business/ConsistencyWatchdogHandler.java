@@ -17,7 +17,7 @@ import org.eclipse.jface.text.IDocument;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.texteditor.IDocumentProvider;
-import org.picocontainer.annotations.Inject;
+import org.picocontainer.Startable;
 
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.activities.SPath;
@@ -34,10 +34,7 @@ import de.fu_berlin.inf.dpp.concurrent.watchdog.ConsistencyWatchdogClient;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.project.AbstractActivityProvider;
-import de.fu_berlin.inf.dpp.project.AbstractSarosSessionListener;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
-import de.fu_berlin.inf.dpp.project.ISarosSessionListener;
-import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.synchronize.StartHandle;
 import de.fu_berlin.inf.dpp.util.Utils;
 
@@ -45,20 +42,16 @@ import de.fu_berlin.inf.dpp.util.Utils;
  * This component is responsible for handling Consistency Errors on the host
  */
 @Component(module = "consistency")
-public class ConsistencyWatchdogHandler {
+public class ConsistencyWatchdogHandler implements Startable {
 
     private static Logger log = Logger
         .getLogger(ConsistencyWatchdogHandler.class);
 
-    @Inject
-    protected EditorManager editorManager;
+    protected final EditorManager editorManager;
 
-    @Inject
-    protected ConsistencyWatchdogClient watchdogClient;
+    protected final ConsistencyWatchdogClient watchdogClient;
 
-    protected ISarosSessionManager sessionManager;
-
-    protected ISarosSession sarosSession;
+    protected final ISarosSession sarosSession;
 
     protected IActivityReceiver activityReceiver = new AbstractActivityReceiver() {
         @Override
@@ -76,23 +69,19 @@ public class ConsistencyWatchdogHandler {
         }
     };
 
-    protected ISarosSessionListener sessionListener = new AbstractSarosSessionListener() {
-        @Override
-        public void sessionStarted(ISarosSession newSharedProject) {
-            sarosSession = newSharedProject;
-            newSharedProject.addActivityProvider(activityProvider);
-        }
+    public void start() {
+        sarosSession.addActivityProvider(activityProvider);
+    }
 
-        @Override
-        public void sessionEnded(ISarosSession oldSarosSession) {
-            oldSarosSession.removeActivityProvider(activityProvider);
-            sarosSession = null;
-        }
-    };
+    public void stop() {
+        sarosSession.removeActivityProvider(activityProvider);
+    }
 
-    public ConsistencyWatchdogHandler(ISarosSessionManager sessionManager) {
-        this.sessionManager = sessionManager;
-        this.sessionManager.addSarosSessionListener(sessionListener);
+    public ConsistencyWatchdogHandler(ISarosSession sarosSession,
+        EditorManager editorManager, ConsistencyWatchdogClient watchdogClient) {
+        this.sarosSession = sarosSession;
+        this.editorManager = editorManager;
+        this.watchdogClient = watchdogClient;
     }
 
     /**

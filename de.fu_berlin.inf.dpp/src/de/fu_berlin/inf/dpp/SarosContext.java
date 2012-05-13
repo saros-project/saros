@@ -44,7 +44,6 @@ import de.fu_berlin.inf.dpp.net.SarosNet;
 import de.fu_berlin.inf.dpp.net.business.ActivitiesHandler;
 import de.fu_berlin.inf.dpp.net.business.CancelInviteHandler;
 import de.fu_berlin.inf.dpp.net.business.CancelProjectSharingHandler;
-import de.fu_berlin.inf.dpp.net.business.ConsistencyWatchdogHandler;
 import de.fu_berlin.inf.dpp.net.business.DispatchThreadContext;
 import de.fu_berlin.inf.dpp.net.business.InvitationHandler;
 import de.fu_berlin.inf.dpp.net.business.LeaveHandler;
@@ -251,7 +250,6 @@ public class SarosContext implements ISarosContext {
         Component.create(UserListHandler.class),
         Component.create(InvitationHandler.class),
         Component.create(LeaveHandler.class),
-        Component.create(ConsistencyWatchdogHandler.class),
         Component.create(ActivitiesHandler.class),
 
         // Extensions
