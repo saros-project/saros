@@ -258,8 +258,11 @@ public final class StopManager extends AbstractActivityProvider implements
         if (monitor.isCanceled()) {
             // Restart the already stopped users
             log.debug("Monitor was canceled. Restarting already stopped buddies.");
-            for (StartHandle startHandle : resultingHandles)
+            for (StartHandle startHandle : resultingHandles) {
+                if (!startHandle.getUser().isInSarosSession())
+                    continue;
                 startHandle.start();
+            }
             throw new CancellationException();
         }
         return resultingHandles;

@@ -367,6 +367,95 @@ public class StopManagerTest {
         EasyMock.verify(carlsSession);
     }
 
+    /**
+     * This tests what happens when a user is leaving a session during the
+     * stop/pause process is on.
+     */
+    @Test
+    public void testCancelAndLeaveSession() {
+        final IProgressMonitor monitor = new NullProgressMonitor();
+
+        // Create a special session that allows us to kick bob out of the
+        // session and test the cancellation for that case.
+        alicesSession = EasyMock.createMock(ISarosSession.class);
+        alicesSession.addActivityProvider(EasyMock.isA(StopManager.class));
+
+        alicesAlice = new User(alicesSession, new JID("alice"), 1);
+        alicesBob = new User(alicesSession, new JID("bob"), 2);
+        alicesCarl = new User(alicesSession, new JID("carl"), 3);
+        alicesSession.getLocalUser();
+        EasyMock.expectLastCall().andReturn(alicesAlice).anyTimes();
+        alicesSession.getUser(alicesAlice.getJID());
+        EasyMock.expectLastCall().andReturn(alicesAlice).anyTimes();
+        alicesSession.getUser(alicesCarl.getJID());
+        EasyMock.expectLastCall().andReturn(alicesCarl).anyTimes();
+        alicesSession.getUser(alicesBob.getJID());
+        EasyMock.expectLastCall().andAnswer(new IAnswer<Object>() {
+
+            @Override
+            public Object answer() throws Throwable {
+                if (monitor.isCanceled())
+                    return null;
+                return alicesBob;
+            }
+        }).anyTimes();
+
+        EasyMock.replay(alicesSession);
+
+        final StopManager alicesStopManager = new StopManager(alicesSession);
+        final StopManager bobsStopManager = new StopManager(bobsSession);
+        final StopManager carlsStopManager = new StopManager(carlsSession);
+
+        // Now make both listeners data to each other
+        IActivityListener alicesListener = createForwarder(bobsStopManager,
+            carlsStopManager);
+        alicesStopManager.addActivityListener(alicesListener);
+        IActivityListener bobsListener = createForwarder(alicesSession,
+            alicesStopManager);
+        bobsStopManager.addActivityListener(bobsListener);
+        IActivityListener carlsListener = createForwarder(alicesSession,
+            alicesStopManager);
+        carlsStopManager.addActivityListener(carlsListener);
+
+        // verify that everything is unlocked
+        assertFalse(alicesStopManager.getBlockedObservable().getValue());
+        assertFalse(bobsStopManager.getBlockedObservable().getValue());
+        assertFalse(carlsStopManager.getBlockedObservable().getValue());
+
+        // prepare to cancel early
+        bobsStopManager.addBlockable(new Blockable() {
+            @Override
+            public void unblock() {
+                // nothing to do
+            }
+
+            @Override
+            public void block() {
+                monitor.setCanceled(true);
+            }
+        });
+
+        // now start to lock
+        List<User> users = new LinkedList<User>();
+        users.add(alicesBob);
+        users.add(alicesCarl);
+
+        try {
+            alicesStopManager.stop(users, "test", monitor);
+            Assert.fail("Should not be reached");
+        } catch (CancellationException e) {
+            //
+        }
+
+        // Only test alice and carl as bob is not part of the session anymore.
+        assertFalse(alicesStopManager.getBlockedObservable().getValue());
+        assertFalse(carlsStopManager.getBlockedObservable().getValue());
+
+        EasyMock.verify(alicesSession);
+        EasyMock.verify(bobsSession);
+        EasyMock.verify(carlsSession);
+    }
+
     private static User rewriteUser(User user, ISarosSession target) {
         return new User(target, user.getJID(), user.getColorID());
     }
