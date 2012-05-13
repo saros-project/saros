@@ -133,9 +133,8 @@ public class ProjectDeltaVisitor implements IResourceDeltaVisitor {
                         move(resource, oldFullPath, oldProject, contentChange);
                         return;
                     } catch (IOException e) {
-                        SharedResourcesManager.log
-                            .warn("Resource could not be read for"
-                                + " sending to peers:" + resource.getLocation());
+                        log.warn("Resource could not be read for"
+                            + " sending to peers:" + resource.getLocation());
                     }
                 } else {
                     // Moving a file into the shared project
@@ -259,14 +258,12 @@ public class ProjectDeltaVisitor implements IResourceDeltaVisitor {
             return;
         }
 
-        SharedResourcesManager.log.debug("Resource " + resource.getName()
-            + " changed");
+        log.debug("Resource " + resource.getName() + " changed");
         try {
             addActivity(FileActivity.created(user, spath, Purpose.ACTIVITY));
         } catch (IOException e) {
-            SharedResourcesManager.log.warn(
-                "Resource could not be read for sending to peers:"
-                    + resource.getLocation(), e);
+            log.warn("Resource could not be read for sending to peers:"
+                + resource.getLocation(), e);
             return;
         }
     }

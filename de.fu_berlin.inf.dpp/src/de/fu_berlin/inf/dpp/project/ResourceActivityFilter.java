@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.apache.log4j.Logger;
+
 import de.fu_berlin.inf.dpp.activities.business.FileActivity;
 import de.fu_berlin.inf.dpp.activities.business.FolderActivity;
 import de.fu_berlin.inf.dpp.activities.business.IResourceActivity;
@@ -14,6 +16,9 @@ import de.fu_berlin.inf.dpp.activities.business.VCSActivity;
  * {@link SharedResourcesManager}, then orders and filters them.
  */
 class ResourceActivityFilter {
+    private static final Logger log = Logger
+        .getLogger(ResourceActivityFilter.class);
+
     private List<IResourceActivity> enteredActivities = new ArrayList<IResourceActivity>();
 
     public void enterAll(List<? extends IResourceActivity> activities) {
@@ -93,8 +98,7 @@ class ResourceActivityFilter {
                     if (!(otherActivity instanceof VCSActivity)) {
                         vcsActivity.containedActivity.add(0, otherActivity);
                     }
-                    SharedResourcesManager.log
-                        .debug("Ignoring redundant activity " + otherActivity);
+                    log.debug("Ignoring redundant activity " + otherActivity);
                     result.remove(j);
                 }
             }
