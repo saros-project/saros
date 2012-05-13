@@ -307,6 +307,66 @@ public class StopManagerTest {
         EasyMock.verify(carlsSession);
     }
 
+    /**
+     * This tests the cancellation after a user has been stopped.
+     */
+    @Test
+    public void testCancelStopMultipleUser() {
+        final StopManager alicesStopManager = new StopManager(alicesSession);
+        final StopManager bobsStopManager = new StopManager(bobsSession);
+        final StopManager carlsStopManager = new StopManager(carlsSession);
+
+        // Now make both listeners data to each other
+        IActivityListener alicesListener = createForwarder(bobsStopManager,
+            carlsStopManager);
+        alicesStopManager.addActivityListener(alicesListener);
+        IActivityListener bobsListener = createForwarder(alicesSession,
+            alicesStopManager);
+        bobsStopManager.addActivityListener(bobsListener);
+        IActivityListener carlsListener = createForwarder(alicesSession,
+            alicesStopManager);
+        carlsStopManager.addActivityListener(carlsListener);
+
+        // verify that everything is unlocked
+        assertFalse(alicesStopManager.getBlockedObservable().getValue());
+        assertFalse(bobsStopManager.getBlockedObservable().getValue());
+        assertFalse(carlsStopManager.getBlockedObservable().getValue());
+
+        // prepare to cancel early
+        final IProgressMonitor monitor = new NullProgressMonitor();
+        bobsStopManager.addBlockable(new Blockable() {
+            @Override
+            public void unblock() {
+                // nothing to do
+            }
+
+            @Override
+            public void block() {
+                monitor.setCanceled(true);
+            }
+        });
+
+        // now start to lock
+        List<User> users = new LinkedList<User>();
+        users.add(alicesBob);
+        users.add(alicesCarl);
+
+        try {
+            alicesStopManager.stop(users, "test", monitor);
+            Assert.fail("Should not be reached");
+        } catch (CancellationException e) {
+            //
+        }
+
+        assertFalse(alicesStopManager.getBlockedObservable().getValue());
+        assertFalse(bobsStopManager.getBlockedObservable().getValue());
+        assertFalse(carlsStopManager.getBlockedObservable().getValue());
+
+        EasyMock.verify(alicesSession);
+        EasyMock.verify(bobsSession);
+        EasyMock.verify(carlsSession);
+    }
+
     private static User rewriteUser(User user, ISarosSession target) {
         return new User(target, user.getJID(), user.getColorID());
     }
