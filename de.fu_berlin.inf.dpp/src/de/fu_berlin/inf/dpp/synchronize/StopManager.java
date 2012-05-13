@@ -100,7 +100,6 @@ public final class StopManager extends AbstractActivityProvider implements
 
     public StopManager(ISarosSession session) {
         this.sarosSession = session;
-        session.addActivityProvider(this);
     }
 
     protected IActivityReceiver activityDataObjectReceiver = new AbstractActivityReceiver() {
@@ -520,11 +519,12 @@ public final class StopManager extends AbstractActivityProvider implements
 
     @Override
     public void start() {
-        //
+        sarosSession.addActivityProvider(this);
     }
 
     @Override
     public void stop() {
+        sarosSession.removeActivityProvider(this);
         sessionStopped();
     }
 }

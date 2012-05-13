@@ -209,16 +209,19 @@ public class SarosSessionTest {
         // Test creating, starting and stopping the session.
         SarosSession session = new SarosSession(new DateTime(), context);
         Assert.assertFalse(session.getSequencer().isStarted());
+        Assert.assertEquals(0, session.getActivityProviderCount());
         session.start();
 
         StopManager stopManager1 = session.getStopManager();
         StopManager stopManager2 = session.getStopManager();
         Assert.assertSame(stopManager1, stopManager2);
         Assert.assertTrue(session.getSequencer().isStarted());
+        Assert.assertTrue(session.getActivityProviderCount() > 0);
 
         session.stop();
         Assert.assertFalse(session.getSequencer().isStarted());
         Assert.assertTrue(editorListeners.isEmpty());
+        Assert.assertEquals(0, session.getActivityProviderCount());
 
         session.dispose();
 

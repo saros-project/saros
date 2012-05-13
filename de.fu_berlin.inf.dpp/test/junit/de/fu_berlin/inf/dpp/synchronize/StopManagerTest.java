@@ -43,6 +43,7 @@ public class StopManagerTest {
     public void createSessionMocks() {
         alicesSession = EasyMock.createMock(ISarosSession.class);
         alicesSession.addActivityProvider(EasyMock.isA(StopManager.class));
+        alicesSession.removeActivityProvider(EasyMock.isA(StopManager.class));
 
         alicesAlice = new User(alicesSession, new JID("alice"), 1);
         alicesBob = new User(alicesSession, new JID("bob"), 2);
@@ -60,6 +61,7 @@ public class StopManagerTest {
 
         bobsSession = EasyMock.createMock(ISarosSession.class);
         bobsSession.addActivityProvider(EasyMock.isA(StopManager.class));
+        bobsSession.removeActivityProvider(EasyMock.isA(StopManager.class));
 
         bobsAlice = new User(bobsSession, new JID("alice"), 1);
         bobsBob = new User(bobsSession, new JID("bob"), 2);
@@ -76,6 +78,7 @@ public class StopManagerTest {
 
         carlsSession = EasyMock.createMock(ISarosSession.class);
         carlsSession.addActivityProvider(EasyMock.isA(StopManager.class));
+        carlsSession.removeActivityProvider(EasyMock.isA(StopManager.class));
 
         carlsAlice = new User(carlsSession, new JID("alice"), 1);
         carlsBob = new User(carlsSession, new JID("bob"), 2);
@@ -97,7 +100,9 @@ public class StopManagerTest {
      */
     @Test
     public void testCreation() {
-        new StopManager(alicesSession);
+        StopManager stopManager = new StopManager(alicesSession);
+        stopManager.start();
+        stopManager.stop();
         EasyMock.verify(alicesSession);
     }
 
@@ -110,6 +115,7 @@ public class StopManagerTest {
         IProgressMonitor canceledProgress = new NullProgressMonitor();
         canceledProgress.setCanceled(true);
         StopManager stopManager = new StopManager(alicesSession);
+        stopManager.start();
         assertFalse(stopManager.getBlockedObservable().getValue());
 
         try {
@@ -122,6 +128,7 @@ public class StopManagerTest {
         }
 
         assertFalse(stopManager.getBlockedObservable().getValue());
+        stopManager.stop();
         EasyMock.verify(alicesSession);
     }
 
@@ -176,6 +183,7 @@ public class StopManagerTest {
         EasyMock.replay(listener);
 
         StopManager manager = new StopManager(alicesSession);
+        manager.start();
         manager.addActivityListener(listener);
 
         try {
@@ -188,6 +196,7 @@ public class StopManagerTest {
         }
 
         EasyMock.verify(listener);
+        manager.stop();
         EasyMock.verify(alicesSession);
     }
 
@@ -206,6 +215,7 @@ public class StopManagerTest {
 
         // create
         StopManager manager = new StopManager(alicesSession);
+        manager.start();
         manager.addActivityListener(listener);
         assertFalse(manager.getBlockedObservable().getValue());
 
@@ -220,6 +230,7 @@ public class StopManagerTest {
 
         // verify that nothing has been called on the activity listener
         EasyMock.verify(listener);
+        manager.stop();
         EasyMock.verify(alicesSession);
     }
 
@@ -233,7 +244,9 @@ public class StopManagerTest {
     public void testStopStart() throws CancellationException,
         InterruptedException {
         final StopManager alicesStopManager = new StopManager(alicesSession);
+        alicesStopManager.start();
         final StopManager bobsStopManager = new StopManager(bobsSession);
+        bobsStopManager.start();
 
         // Now make both listeners data to each other
         IActivityListener alicesListener = createForwarder(bobsSession,
@@ -258,7 +271,9 @@ public class StopManagerTest {
         assertFalse(alicesStopManager.getBlockedObservable().getValue());
         assertFalse(bobsStopManager.getBlockedObservable().getValue());
 
+        alicesStopManager.stop();
         EasyMock.verify(alicesSession);
+        bobsStopManager.stop();
         EasyMock.verify(bobsSession);
     }
 
@@ -267,6 +282,9 @@ public class StopManagerTest {
         final StopManager alicesStopManager = new StopManager(alicesSession);
         final StopManager bobsStopManager = new StopManager(bobsSession);
         final StopManager carlsStopManager = new StopManager(carlsSession);
+        alicesStopManager.start();
+        bobsStopManager.start();
+        carlsStopManager.start();
 
         // Now make both listeners data to each other
         IActivityListener alicesListener = createForwarder(bobsStopManager,
@@ -302,6 +320,10 @@ public class StopManagerTest {
         assertFalse(bobsStopManager.getBlockedObservable().getValue());
         assertFalse(carlsStopManager.getBlockedObservable().getValue());
 
+        alicesStopManager.stop();
+        bobsStopManager.stop();
+        carlsStopManager.stop();
+
         EasyMock.verify(alicesSession);
         EasyMock.verify(bobsSession);
         EasyMock.verify(carlsSession);
@@ -315,6 +337,9 @@ public class StopManagerTest {
         final StopManager alicesStopManager = new StopManager(alicesSession);
         final StopManager bobsStopManager = new StopManager(bobsSession);
         final StopManager carlsStopManager = new StopManager(carlsSession);
+        alicesStopManager.start();
+        bobsStopManager.start();
+        carlsStopManager.start();
 
         // Now make both listeners data to each other
         IActivityListener alicesListener = createForwarder(bobsStopManager,
@@ -362,6 +387,10 @@ public class StopManagerTest {
         assertFalse(bobsStopManager.getBlockedObservable().getValue());
         assertFalse(carlsStopManager.getBlockedObservable().getValue());
 
+        alicesStopManager.stop();
+        bobsStopManager.stop();
+        carlsStopManager.stop();
+
         EasyMock.verify(alicesSession);
         EasyMock.verify(bobsSession);
         EasyMock.verify(carlsSession);
@@ -379,6 +408,7 @@ public class StopManagerTest {
         // session and test the cancellation for that case.
         alicesSession = EasyMock.createMock(ISarosSession.class);
         alicesSession.addActivityProvider(EasyMock.isA(StopManager.class));
+        alicesSession.removeActivityProvider(EasyMock.isA(StopManager.class));
 
         alicesAlice = new User(alicesSession, new JID("alice"), 1);
         alicesBob = new User(alicesSession, new JID("bob"), 2);
@@ -405,6 +435,10 @@ public class StopManagerTest {
         final StopManager alicesStopManager = new StopManager(alicesSession);
         final StopManager bobsStopManager = new StopManager(bobsSession);
         final StopManager carlsStopManager = new StopManager(carlsSession);
+
+        alicesStopManager.start();
+        bobsStopManager.start();
+        carlsStopManager.start();
 
         // Now make both listeners data to each other
         IActivityListener alicesListener = createForwarder(bobsStopManager,
@@ -450,6 +484,10 @@ public class StopManagerTest {
         // Only test alice and carl as bob is not part of the session anymore.
         assertFalse(alicesStopManager.getBlockedObservable().getValue());
         assertFalse(carlsStopManager.getBlockedObservable().getValue());
+
+        alicesStopManager.stop();
+        bobsStopManager.stop();
+        carlsStopManager.stop();
 
         EasyMock.verify(alicesSession);
         EasyMock.verify(bobsSession);

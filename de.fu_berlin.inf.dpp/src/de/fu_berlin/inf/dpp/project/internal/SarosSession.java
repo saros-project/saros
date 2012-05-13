@@ -1363,4 +1363,14 @@ public class SarosSession implements ISarosSession, Disposable {
         // Force the creation of the above components.
         sessionContainer.getComponents();
     }
+
+    /**
+     * This method is only meant to be used by a unit tests to verify the
+     * cleanup of activity providers.
+     * 
+     * @return the size of the internal activity providers collection
+     */
+    public int getActivityProviderCount() {
+        return activityProviders.size();
+    }
 }
