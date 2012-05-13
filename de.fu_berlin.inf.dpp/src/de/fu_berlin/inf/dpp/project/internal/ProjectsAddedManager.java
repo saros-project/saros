@@ -15,7 +15,6 @@ import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ISarosSessionListener;
 import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.project.Messages;
-import de.fu_berlin.inf.dpp.ui.SarosUI;
 import de.fu_berlin.inf.dpp.util.Utils;
 
 /**
@@ -28,12 +27,9 @@ public class ProjectsAddedManager extends AbstractActivityProvider {
         .getLogger(ProjectsAddedManager.class);
 
     protected ISarosSessionManager sessionManager;
-    protected SarosUI sarosUI;
 
-    public ProjectsAddedManager(ISarosSessionManager sessionManager,
-        SarosUI sarosUI) {
+    public ProjectsAddedManager(ISarosSessionManager sessionManager) {
         this.sessionManager = sessionManager;
-        this.sarosUI = sarosUI;
         sessionManager.addSarosSessionListener(sessionListener);
     }
 
@@ -59,8 +55,7 @@ public class ProjectsAddedManager extends AbstractActivityProvider {
         }
         JID from = fileListActivity.getSource().getJID();
         sessionManager
-            .incomingProjectReceived(from, sarosUI,
-                fileListActivity.getProjectInfos(),
+            .incomingProjectReceived(from, fileListActivity.getProjectInfos(),
                 fileListActivity.getProcessID());
     }
 

@@ -145,7 +145,7 @@ public interface ISarosSessionManager {
      * @param processID
      *            ID of the exchanging process
      */
-    public void incomingProjectReceived(JID from, final SarosUI sarosUI,
+    public void incomingProjectReceived(JID from,
         List<ProjectExchangeInfo> projectInfos, String processID);
 
 }
