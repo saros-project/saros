@@ -85,7 +85,6 @@ import de.fu_berlin.inf.dpp.project.SarosSessionManager;
 import de.fu_berlin.inf.dpp.project.internal.ChecksumCacheImpl;
 import de.fu_berlin.inf.dpp.project.internal.FileContentNotifierBridge;
 import de.fu_berlin.inf.dpp.project.internal.FollowingActivitiesManager;
-import de.fu_berlin.inf.dpp.project.internal.PermissionManager;
 import de.fu_berlin.inf.dpp.ui.LocalPresenceTracker;
 import de.fu_berlin.inf.dpp.ui.RemoteProgressManager;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
@@ -198,7 +197,6 @@ public class SarosContext implements ISarosContext {
         Component.create(MUCManagerSingletonWrapperChatView.class),
         Component.create(PreferenceManager.class),
         Component.create(PreferenceUtils.class),
-        Component.create(PermissionManager.class),
         Component.create(SarosUI.class),
         Component.create(ISarosSessionManager.class, SarosSessionManager.class),
         Component.create(SessionViewOpener.class),

@@ -2,17 +2,16 @@ package de.fu_berlin.inf.dpp.project.internal;
 
 import java.text.MessageFormat;
 
+import org.picocontainer.Startable;
+
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.User.Permission;
 import de.fu_berlin.inf.dpp.activities.business.IActivity;
 import de.fu_berlin.inf.dpp.activities.business.PermissionActivity;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.project.AbstractActivityProvider;
-import de.fu_berlin.inf.dpp.project.AbstractSarosSessionListener;
 import de.fu_berlin.inf.dpp.project.AbstractSharedProjectListener;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
-import de.fu_berlin.inf.dpp.project.ISarosSessionListener;
-import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
 import de.fu_berlin.inf.dpp.project.Messages;
 import de.fu_berlin.inf.dpp.ui.views.SarosView;
@@ -23,8 +22,9 @@ import de.fu_berlin.inf.dpp.ui.views.SarosView;
  * @author rdjemili
  */
 @Component(module = "core")
-public class PermissionManager extends AbstractActivityProvider {
-    private ISarosSession sarosSession;
+public class PermissionManager extends AbstractActivityProvider implements
+    Startable {
+    private final ISarosSession sarosSession;
 
     private ISharedProjectListener sharedProjectListener = new AbstractSharedProjectListener() {
 
@@ -75,27 +75,21 @@ public class PermissionManager extends AbstractActivityProvider {
         }
     };
 
-    public PermissionManager(ISarosSessionManager sessionManager) {
-        sessionManager.addSarosSessionListener(sessionListener);
+    public PermissionManager(ISarosSession sarosSession) {
+        this.sarosSession = sarosSession;
     }
 
-    public final ISarosSessionListener sessionListener = new AbstractSarosSessionListener() {
+    @Override
+    public void start() {
+        sarosSession.addListener(sharedProjectListener);
+        sarosSession.addActivityProvider(this);
+    }
 
-        @Override
-        public void sessionStarted(ISarosSession newSarosSession) {
-            sarosSession = newSarosSession;
-            sarosSession.addListener(sharedProjectListener);
-            sarosSession.addActivityProvider(PermissionManager.this);
-        }
-
-        @Override
-        public void sessionEnded(ISarosSession oldSarosSession) {
-            assert sarosSession == oldSarosSession;
-            sarosSession.removeListener(sharedProjectListener);
-            sarosSession.removeActivityProvider(PermissionManager.this);
-            sarosSession = null;
-        }
-    };
+    @Override
+    public void stop() {
+        sarosSession.removeListener(sharedProjectListener);
+        sarosSession.removeActivityProvider(this);
+    }
 
     /*
      * (non-Javadoc)
