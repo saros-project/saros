@@ -53,7 +53,6 @@ import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.swt.widgets.Shell;
 import org.picocontainer.annotations.Inject;
 
-import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.activities.business.FileActivity;
 import de.fu_berlin.inf.dpp.activities.business.FileActivity.Type;
@@ -123,9 +122,6 @@ public class SharedResourcesManager extends AbstractActivityProvider implements
      */
     @Inject
     protected FileReplacementInProgressObservable fileReplacementInProgressObservable;
-
-    @Inject
-    protected Saros saros;
 
     @Inject
     protected EditorManager editorManager;
