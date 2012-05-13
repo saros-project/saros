@@ -42,7 +42,7 @@ import de.fu_berlin.inf.dpp.vcs.VCSResourceInfo;
 /*
  * What if SharedProject became a little smarter, what if SharedProject actually
  * represented the shared project, not only its state? E.g. if
- * SharedResourceManager detects that a file was added to the local project, it
+ * SharedResourcesManager detects that a file was added to the local project, it
  * notifies the corresponding SharedProject, which then creates and sends a
  * FileActivity if we have write access. On peers, the SharedProject would be
  * responsible for updating the local project upon receiving resource
