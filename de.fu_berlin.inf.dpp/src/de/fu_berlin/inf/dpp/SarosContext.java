@@ -86,7 +86,6 @@ import de.fu_berlin.inf.dpp.project.internal.ChecksumCacheImpl;
 import de.fu_berlin.inf.dpp.project.internal.FileContentNotifierBridge;
 import de.fu_berlin.inf.dpp.project.internal.FollowingActivitiesManager;
 import de.fu_berlin.inf.dpp.project.internal.PermissionManager;
-import de.fu_berlin.inf.dpp.project.internal.ProjectsAddedManager;
 import de.fu_berlin.inf.dpp.ui.LocalPresenceTracker;
 import de.fu_berlin.inf.dpp.ui.RemoteProgressManager;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
@@ -211,7 +210,6 @@ public class SarosContext implements ISarosContext {
         Component.create(MUCSessionPreferencesNegotiatingManager.class),
         Component.create(RemoteProgressManager.class),
         Component.create(XMPPAccountStore.class),
-        Component.create(ProjectsAddedManager.class),
 
         // Network
         Component.create(ConnectionTestManager.class),

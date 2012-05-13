@@ -3,6 +3,7 @@ package de.fu_berlin.inf.dpp.project.internal;
 import java.text.MessageFormat;
 
 import org.apache.log4j.Logger;
+import org.picocontainer.Startable;
 
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.activities.business.AbstractActivityReceiver;
@@ -10,9 +11,7 @@ import de.fu_berlin.inf.dpp.activities.business.IActivity;
 import de.fu_berlin.inf.dpp.activities.business.ProjectsAddedActivity;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.project.AbstractActivityProvider;
-import de.fu_berlin.inf.dpp.project.AbstractSarosSessionListener;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
-import de.fu_berlin.inf.dpp.project.ISarosSessionListener;
 import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.project.Messages;
 import de.fu_berlin.inf.dpp.util.Utils;
@@ -21,16 +20,19 @@ import de.fu_berlin.inf.dpp.util.Utils;
  * This class processes incoming {@link ProjectsAddedActivity
  * ProjectsAddedActivities}
  */
-public class ProjectsAddedManager extends AbstractActivityProvider {
+public class ProjectsAddedManager extends AbstractActivityProvider implements
+    Startable {
 
     private static final Logger log = Logger
         .getLogger(ProjectsAddedManager.class);
 
-    protected ISarosSessionManager sessionManager;
+    protected final ISarosSessionManager sessionManager;
+    protected final ISarosSession sarosSession;
 
-    public ProjectsAddedManager(ISarosSessionManager sessionManager) {
+    public ProjectsAddedManager(ISarosSessionManager sessionManager,
+        ISarosSession sarosSession) {
         this.sessionManager = sessionManager;
-        sessionManager.addSarosSessionListener(sessionListener);
+        this.sarosSession = sarosSession;
     }
 
     protected AbstractActivityReceiver receiver = new AbstractActivityReceiver() {
@@ -64,17 +66,13 @@ public class ProjectsAddedManager extends AbstractActivityProvider {
         activity.dispatch(receiver);
     }
 
-    protected ISarosSessionListener sessionListener = new AbstractSarosSessionListener() {
+    @Override
+    public void start() {
+        sarosSession.addActivityProvider(this);
+    }
 
-        @Override
-        public void sessionStarted(ISarosSession session) {
-            session.addActivityProvider(ProjectsAddedManager.this);
-        }
-
-        @Override
-        public void sessionEnded(ISarosSession project) {
-            project.removeActivityProvider(ProjectsAddedManager.this);
-        }
-    };
-
+    @Override
+    public void stop() {
+        sarosSession.removeActivityProvider(this);
+    }
 }
