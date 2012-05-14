@@ -2,9 +2,7 @@ package de.fu_berlin.inf.dpp.feedback;
 
 import java.io.File;
 import java.io.IOException;
-import java.text.SimpleDateFormat;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.Random;
 import java.util.Set;
@@ -83,22 +81,6 @@ public class StatisticManager extends AbstractFeedbackManager implements
      */
     public static double getTimeInMinutes(long millisecs) {
         return Math.round(millisecs / 600.0) / 100.0;
-    }
-
-    /**
-     * Generates a random user ID. The ID consists of the current date and time
-     * plus a random positive Integer. Thus identical IDs for different users
-     * should be very unlikely.
-     * 
-     * @return a random user ID e.g. 2009-06-11_14-53-59_1043704453
-     */
-    public static String generateUserID() {
-        int randInt = random.nextInt(Integer.MAX_VALUE);
-        SimpleDateFormat dateFormat = new SimpleDateFormat(
-            "yyyy-MM-dd_HH-mm-ss");
-        String userID = dateFormat.format(new Date()) + "_" + randInt;
-
-        return userID;
     }
 
     @Override
@@ -217,27 +199,12 @@ public class StatisticManager extends AbstractFeedbackManager implements
      * created and saved yet. If none was found, a newly generated ID is stored
      * and returned.
      * 
-     * @see StatisticManager#generateUserID()
+     * @see StatisticManagerConfiguration#generateUserID()
      * 
      * @return the random user ID for this eclipse installation
      */
     public synchronized String getUserID() {
-        String userID = saros.getConfigPrefs().get(
-            PreferenceConstants.RANDOM_USER_ID, null);
-        if (userID == null) {
-            userID = generateUserID();
-            // save ID in the global preferences
-            saros.getConfigPrefs().put(PreferenceConstants.RANDOM_USER_ID,
-                userID);
-            saros.saveConfigPrefs();
-        }
-        // HACK if we are a developer, add this info to our user ID
-        if (saros.getVersion().endsWith("DEVEL"))
-            userID = "sarosTeam-" + userID;
-        if (isPseudonymSubmissionAllowed())
-            userID += "-"
-                + StatisticManagerConfiguration.getStatisticsPseudonymID(saros);
-        return userID;
+        return StatisticManagerConfiguration.getUserID(saros);
     }
 
     /*------------------------------------------*

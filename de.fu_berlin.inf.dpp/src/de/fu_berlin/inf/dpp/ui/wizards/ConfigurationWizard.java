@@ -41,9 +41,6 @@ import de.fu_berlin.inf.dpp.ui.wizards.pages.ConfigurationSummaryWizardPage;
 public class ConfigurationWizard extends AddXMPPAccountWizard {
 
     @Inject
-    private ErrorLogManager errorLogManager;
-
-    @Inject
     private IUPnPService upnpService;
 
     private ConfigurationSettingsWizardPage configurationSettingsWizardPage = new ConfigurationSettingsWizardPage();
@@ -98,7 +95,8 @@ public class ConfigurationWizard extends AddXMPPAccountWizard {
         StatisticManagerConfiguration.setStatisticSubmissionAllowed(saros,
             statisticSubmissionAllowed);
 
-        errorLogManager.setErrorLogSubmissionAllowed(errorLogSubmissionAllowed);
+        ErrorLogManager.setErrorLogSubmissionAllowed(saros,
+            errorLogSubmissionAllowed);
 
         GatewayDevice selGwDevice = this.configurationSettingsWizardPage
             .getPortmappingDevice();

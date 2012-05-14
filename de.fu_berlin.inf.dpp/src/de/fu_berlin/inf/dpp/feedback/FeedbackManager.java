@@ -161,6 +161,10 @@ public class FeedbackManager extends AbstractFeedbackManager implements
      * @param untilNext
      */
     public void setSessionsUntilNext(int untilNext) {
+        setSessionsUntilNext(saros, untilNext);
+    }
+
+    public static void setSessionsUntilNext(Saros saros, int untilNext) {
         if (untilNext < 0)
             untilNext = -1;
         saros.getConfigPrefs().putInt(PreferenceConstants.SESSIONS_UNTIL_NEXT,
@@ -176,6 +180,17 @@ public class FeedbackManager extends AbstractFeedbackManager implements
      * @return 0 - undefined, 1 - enabled, 2 - disabled
      */
     public int getFeedbackStatus() {
+        return getFeedbackStatus(saros);
+    }
+
+    /**
+     * Returns whether the feedback is disabled or enabled by the user. The
+     * global preferences have priority but if the value wasn't found there the
+     * value from the PreferenceStore (with fall back to the default) is used.
+     * 
+     * @return 0 - undefined, 1 - enabled, 2 - disabled
+     */
+    public static int getFeedbackStatus(Saros saros) {
         int disabled = saros.getConfigPrefs().getInt(
             PreferenceConstants.FEEDBACK_SURVEY_DISABLED, -1);
 
@@ -191,7 +206,11 @@ public class FeedbackManager extends AbstractFeedbackManager implements
      * @return true if it is disabled
      */
     public boolean isFeedbackDisabled() {
-        return getFeedbackStatus() != FEEDBACK_ENABLED;
+        return isFeedbackDisabled(saros);
+    }
+
+    public static boolean isFeedbackDisabled(Saros saros) {
+        return getFeedbackStatus(saros) != FEEDBACK_ENABLED;
     }
 
     /**
@@ -204,6 +223,19 @@ public class FeedbackManager extends AbstractFeedbackManager implements
      * @param disabled
      */
     public void setFeedbackDisabled(boolean disabled) {
+        setFeedbackDisabled(saros, disabled);
+    }
+
+    /**
+     * Saves in the global preferences and in the workspace if the feedback is
+     * disabled or not. <br>
+     * <br>
+     * Note: It must be set globally first, so the PropertyChangeListener for
+     * the local setting is working with latest global data.
+     * 
+     * @param disabled
+     */
+    public static void setFeedbackDisabled(Saros saros, boolean disabled) {
         int status = disabled ? FEEDBACK_DISABLED : FEEDBACK_ENABLED;
 
         saros.getConfigPrefs().putInt(
@@ -211,7 +243,6 @@ public class FeedbackManager extends AbstractFeedbackManager implements
         saros.saveConfigPrefs();
         saros.getPreferenceStore().setValue(
             PreferenceConstants.FEEDBACK_SURVEY_DISABLED, status);
-
     }
 
     /**
@@ -222,6 +253,17 @@ public class FeedbackManager extends AbstractFeedbackManager implements
      * @return
      */
     public int getSurveyInterval() {
+        return getSurveyInterval(saros);
+    }
+
+    /**
+     * Returns the interval in which the survey should be shown. The global
+     * preferences have priority but if the value wasn't found there the value
+     * from the PreferenceStore (with fall back to the default) is used.
+     * 
+     * @return
+     */
+    public static int getSurveyInterval(Saros saros) {
         int interval = saros.getConfigPrefs().getInt(
             PreferenceConstants.FEEDBACK_SURVEY_INTERVAL, -1);
 
@@ -240,6 +282,18 @@ public class FeedbackManager extends AbstractFeedbackManager implements
      * @param interval
      */
     public void setSurveyInterval(int interval) {
+        setSurveyInterval(saros, interval);
+    }
+
+    /**
+     * Stores the interval globally and per workspace.<br>
+     * <br>
+     * Note: It must be set globally first, so the PropertyChangeListener for
+     * the local setting is working with latest global data.
+     * 
+     * @param interval
+     */
+    public static void setSurveyInterval(Saros saros, int interval) {
         saros.getConfigPrefs().putInt(
             PreferenceConstants.FEEDBACK_SURVEY_INTERVAL, interval);
         saros.saveConfigPrefs();
@@ -252,7 +306,15 @@ public class FeedbackManager extends AbstractFeedbackManager implements
      * time to the current interval length.
      */
     public void resetSessionsUntilNextToInterval() {
-        setSessionsUntilNext(getSurveyInterval());
+        resetSessionsUntilNextToInterval(saros);
+    }
+
+    /**
+     * Resets the counter of sessions until the survey request is shown the next
+     * time to the current interval length.
+     */
+    public static void resetSessionsUntilNextToInterval(Saros saros) {
+        setSessionsUntilNext(saros, getSurveyInterval(saros));
     }
 
     /**
@@ -296,7 +358,7 @@ public class FeedbackManager extends AbstractFeedbackManager implements
      *         FeedbackManagers constants (BROWSER_EXT, BROWSER_INT or
      *         BROWSER_NONE)
      */
-    public int showSurvey() {
+    public static int showSurvey() {
         int browserType = BROWSER_EXT;
 
         if (!Utils.openExternalBrowser(SURVEY_URL)) {

@@ -55,9 +55,6 @@ public class ConfigurationSettingsWizardPage extends WizardPage {
     protected Saros saros;
 
     @Inject
-    protected ErrorLogManager errorLogManager;
-
-    @Inject
     protected IUPnPService upnpService;
 
     public ConfigurationSettingsWizardPage() {
@@ -278,8 +275,8 @@ public class ConfigurationSettingsWizardPage extends WizardPage {
             .setSelection(StatisticManagerConfiguration
                 .isStatisticSubmissionAllowed(saros));
 
-        this.errorLogSubmissionButton.setSelection(errorLogManager
-            .isErrorLogSubmissionAllowed());
+        this.errorLogSubmissionButton.setSelection(ErrorLogManager
+            .isErrorLogSubmissionAllowed(saros));
     }
 
     protected void hookListeners() {

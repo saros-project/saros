@@ -56,12 +56,6 @@ public class FeedbackPreferencePage extends PreferencePage implements
     @Inject
     protected Saros saros;
 
-    @Inject
-    protected FeedbackManager feedbackManager;
-
-    @Inject
-    protected ErrorLogManager errorLogManager;
-
     protected Button radioDisable;
     protected Button radioEnable;
     protected Button allowSubmission;
@@ -92,8 +86,8 @@ public class FeedbackPreferencePage extends PreferencePage implements
     }
 
     protected void initialize() {
-        isFeedbackDisabled = feedbackManager.isFeedbackDisabled();
-        int interval = feedbackManager.getSurveyInterval();
+        isFeedbackDisabled = FeedbackManager.isFeedbackDisabled(saros);
+        int interval = FeedbackManager.getSurveyInterval(saros);
         currentInterval = FeedbackInterval.getFromInterval(interval);
         isSubmissionAllowed = StatisticManagerConfiguration
             .isStatisticSubmissionAllowed(saros);
@@ -101,10 +95,6 @@ public class FeedbackPreferencePage extends PreferencePage implements
             .isPseudonymSubmissionAllowed(saros);
         pseudonymID = StatisticManagerConfiguration
             .getStatisticsPseudonymID(saros);
-        isErrorLogSubmissionAllowed = errorLogManager
-            .isErrorLogSubmissionAllowed();
-        isFullErrorLogSubmissionAllowed = errorLogManager
-            .isFullErrorLogSubmissionAllowed();
 
         initComponents();
     }
@@ -207,8 +197,8 @@ public class FeedbackPreferencePage extends PreferencePage implements
         startSurveyButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
-                feedbackManager.resetSessionsUntilNextToInterval();
-                int browserType = feedbackManager.showSurvey();
+                FeedbackManager.resetSessionsUntilNextToInterval(saros);
+                int browserType = FeedbackManager.showSurvey();
                 /*
                  * close the preferences window if the internal browser is used
                  * so the user can actually see the window
@@ -389,7 +379,7 @@ public class FeedbackPreferencePage extends PreferencePage implements
         startErrorSubmissionButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
-                errorLogManager.submitErrorLog();
+                ErrorLogManager.submitErrorLog(saros);
             }
         });
 
@@ -469,8 +459,8 @@ public class FeedbackPreferencePage extends PreferencePage implements
     @Override
     public boolean performOk() {
 
-        feedbackManager.setFeedbackDisabled(isFeedbackDisabled);
-        feedbackManager.setSurveyInterval(currentInterval.getInterval());
+        FeedbackManager.setFeedbackDisabled(saros, isFeedbackDisabled);
+        FeedbackManager.setSurveyInterval(saros, currentInterval.getInterval());
 
         StatisticManagerConfiguration.setStatisticSubmissionAllowed(saros,
             isSubmissionAllowed);
@@ -478,10 +468,10 @@ public class FeedbackPreferencePage extends PreferencePage implements
             isPseudonymAllowed);
         StatisticManagerConfiguration.setStatisticsPseudonymID(saros,
             pseudonymID);
-        errorLogManager
-            .setErrorLogSubmissionAllowed(isErrorLogSubmissionAllowed);
-        errorLogManager
-            .setFullErrorLogSubmissionAllowed(isFullErrorLogSubmissionAllowed);
+        ErrorLogManager.setErrorLogSubmissionAllowed(saros,
+            isErrorLogSubmissionAllowed);
+        ErrorLogManager.setFullErrorLogSubmissionAllowed(saros,
+            isFullErrorLogSubmissionAllowed);
 
         return super.performOk();
     }

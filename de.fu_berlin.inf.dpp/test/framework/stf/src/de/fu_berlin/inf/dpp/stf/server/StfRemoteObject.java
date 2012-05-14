@@ -6,7 +6,6 @@ import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.accountManagement.XMPPAccountStore;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
-import de.fu_berlin.inf.dpp.feedback.FeedbackManager;
 import de.fu_berlin.inf.dpp.net.SarosNet;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
 import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
@@ -43,10 +42,6 @@ public abstract class StfRemoteObject implements Constants {
 
     protected XMPPAccountStore getXmppAccountStore() {
         return container.getComponent(XMPPAccountStore.class);
-    }
-
-    protected FeedbackManager getFeedbackManager() {
-        return container.getComponent(FeedbackManager.class);
     }
 
     protected VersionManager getVersionManager() {

@@ -1,9 +1,15 @@
 package de.fu_berlin.inf.dpp.feedback;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Random;
+
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
 
 public class StatisticManagerConfiguration {
+
+    private static final Random RANDOM = new Random();
 
     public static String getStatisticsPseudonymID(Saros saros) {
 
@@ -109,5 +115,49 @@ public class StatisticManagerConfiguration {
         saros.saveConfigPrefs();
         saros.getPreferenceStore().setValue(
             PreferenceConstants.STATISTICS_PSEUDONYM_ID, userID);
+    }
+
+    /**
+     * Returns the random user ID from the global preferences, if one was
+     * created and saved yet. If none was found, a newly generated ID is stored
+     * and returned.
+     * 
+     * @see StatisticManagerConfiguration#generateUserID()
+     * 
+     * @return the random user ID for this eclipse installation
+     */
+    public static String getUserID(Saros saros) {
+        String userID = saros.getConfigPrefs().get(
+            PreferenceConstants.RANDOM_USER_ID, null);
+        if (userID == null) {
+            userID = generateUserID();
+            // save ID in the global preferences
+            saros.getConfigPrefs().put(PreferenceConstants.RANDOM_USER_ID,
+                userID);
+            saros.saveConfigPrefs();
+        }
+        // HACK if we are a developer, add this info to our user ID
+        if (saros.getVersion().endsWith("DEVEL"))
+            userID = "sarosTeam-" + userID;
+        if (isPseudonymSubmissionAllowed(saros))
+            userID += "-"
+                + StatisticManagerConfiguration.getStatisticsPseudonymID(saros);
+        return userID;
+    }
+
+    /**
+     * Generates a random user ID. The ID consists of the current date and time
+     * plus a random positive Integer. Thus identical IDs for different users
+     * should be very unlikely.
+     * 
+     * @return a random user ID e.g. 2009-06-11_14-53-59_1043704453
+     */
+    public static String generateUserID() {
+        int randInt = RANDOM.nextInt(Integer.MAX_VALUE);
+        SimpleDateFormat dateFormat = new SimpleDateFormat(
+            "yyyy-MM-dd_HH-mm-ss");
+        String userID = dateFormat.format(new Date()) + "_" + randInt;
+
+        return userID;
     }
 }

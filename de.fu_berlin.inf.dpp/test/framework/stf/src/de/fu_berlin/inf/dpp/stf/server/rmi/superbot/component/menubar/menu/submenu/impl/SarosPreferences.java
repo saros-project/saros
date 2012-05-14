@@ -10,6 +10,7 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotCheckBox;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 
 import de.fu_berlin.inf.dpp.accountManagement.XMPPAccount;
+import de.fu_berlin.inf.dpp.feedback.FeedbackManager;
 import de.fu_berlin.inf.dpp.feedback.Messages;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.stf.server.StfRemoteObject;
@@ -251,7 +252,7 @@ public final class SarosPreferences extends StfRemoteObject implements
     }
 
     public void disableAutomaticReminder() throws RemoteException {
-        if (!getFeedbackManager().isFeedbackDisabled()) {
+        if (!FeedbackManager.isFeedbackDisabled(getSaros())) {
             clickMenuSarosPreferences();
 
             SWTBotShell shell = new SWTBot().shell(SHELL_PREFERNCES);
@@ -271,8 +272,8 @@ public final class SarosPreferences extends StfRemoteObject implements
     }
 
     public void disableAutomaticReminderNoGUI() throws RemoteException {
-        if (!getFeedbackManager().isFeedbackDisabled()) {
-            getFeedbackManager().setFeedbackDisabled(true);
+        if (!FeedbackManager.isFeedbackDisabled(getSaros())) {
+            FeedbackManager.setFeedbackDisabled(getSaros(), true);
         }
     }
 
