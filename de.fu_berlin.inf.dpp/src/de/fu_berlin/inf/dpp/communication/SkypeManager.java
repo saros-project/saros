@@ -17,11 +17,11 @@ import org.jivesoftware.smack.packet.IQ;
 import org.jivesoftware.smack.packet.Packet;
 import org.jivesoftware.smack.packet.Presence;
 
-import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.net.ConnectionState;
 import de.fu_berlin.inf.dpp.net.IConnectionListener;
 import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.net.SarosNet;
 import de.fu_berlin.inf.dpp.net.internal.XStreamExtensionProvider;
 import de.fu_berlin.inf.dpp.net.internal.XStreamExtensionProvider.XStreamIQPacket;
 import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
@@ -47,7 +47,8 @@ public class SkypeManager implements IConnectionListener {
 
     protected final Map<JID, String> skypeNames = new HashMap<JID, String>();
 
-    protected Saros saros;
+    private final SarosNet sarosNet;
+    private final IPreferenceStore preferenceStore;
 
     private PacketListener packetListener = new PacketListener() {
         public void processPacket(Packet packet) {
@@ -61,7 +62,7 @@ public class SkypeManager implements IConnectionListener {
                 reply.setPacketID(iq.getPacketID());
                 reply.setTo(iq.getFrom());
 
-                saros.getSarosNet().getConnection().sendPacket(reply);
+                sarosNet.getConnection().sendPacket(reply);
             }
             if (iq.getType() == IQ.Type.SET) {
                 String skypeName = iq.getPayload();
@@ -77,23 +78,24 @@ public class SkypeManager implements IConnectionListener {
         }
     };
 
-    public SkypeManager(Saros saros) {
-        this.saros = saros;
-        saros.getSarosNet().addListener(this);
+    public SkypeManager(SarosNet sarosNet, IPreferenceStore preferenceStore) {
+        this.sarosNet = sarosNet;
+        this.preferenceStore = preferenceStore;
+        this.sarosNet.addListener(this);
 
         /**
          * Register for our preference store, so we can be notified if the Skype
          * Username changes.
          */
-        IPreferenceStore prefs = saros.getPreferenceStore();
-        prefs.addPropertyChangeListener(new IPropertyChangeListener() {
-            public void propertyChange(PropertyChangeEvent event) {
-                if (event.getProperty().equals(
-                    PreferenceConstants.SKYPE_USERNAME)) {
-                    publishSkypeIQ(event.getNewValue().toString());
+        preferenceStore
+            .addPropertyChangeListener(new IPropertyChangeListener() {
+                public void propertyChange(PropertyChangeEvent event) {
+                    if (event.getProperty().equals(
+                        PreferenceConstants.SKYPE_USERNAME)) {
+                        publishSkypeIQ(event.getNewValue().toString());
+                    }
                 }
-            }
-        });
+            });
     }
 
     /**
@@ -107,7 +109,7 @@ public class SkypeManager implements IConnectionListener {
      */
     public String getSkypeURLNonBlock(String jid) {
 
-        Connection connection = saros.getSarosNet().getConnection();
+        Connection connection = sarosNet.getConnection();
         if (connection == null)
             return null;
 
@@ -166,7 +168,7 @@ public class SkypeManager implements IConnectionListener {
      */
     public String getSkypeURL(String jid) {
 
-        Connection connection = saros.getSarosNet().getConnection();
+        Connection connection = sarosNet.getConnection();
         if (connection == null)
             return null;
 
@@ -197,7 +199,7 @@ public class SkypeManager implements IConnectionListener {
      */
     public String getSkypeURL(JID rqJID) {
 
-        Connection connection = saros.getSarosNet().getConnection();
+        Connection connection = sarosNet.getConnection();
 
         if (connection == null)
             return null;
@@ -227,7 +229,7 @@ public class SkypeManager implements IConnectionListener {
      * TODO SS only send to those, that we know use Saros.
      */
     public void publishSkypeIQ(String newSkypeName) {
-        Connection connection = saros.getSarosNet().getConnection();
+        Connection connection = sarosNet.getConnection();
 
         if (connection == null)
             return;
@@ -258,8 +260,8 @@ public class SkypeManager implements IConnectionListener {
             connection.addPacketListener(packetListener,
                 skypeProvider.getIQFilter());
 
-            String skypeUsername = saros.getPreferenceStore().getString(
-                PreferenceConstants.SKYPE_USERNAME);
+            String skypeUsername = preferenceStore
+                .getString(PreferenceConstants.SKYPE_USERNAME);
             if (skypeUsername != null && !skypeUsername.isEmpty())
                 publishSkypeIQ(skypeUsername);
             refreshCache(connection);
@@ -288,8 +290,7 @@ public class SkypeManager implements IConnectionListener {
      * @return the local Skype name or <code>null</code> if none is set.
      */
     protected String getLocalSkypeName() {
-        IPreferenceStore prefs = saros.getPreferenceStore();
-        return prefs.getString(PreferenceConstants.SKYPE_USERNAME);
+        return preferenceStore.getString(PreferenceConstants.SKYPE_USERNAME);
     }
 
     /**
