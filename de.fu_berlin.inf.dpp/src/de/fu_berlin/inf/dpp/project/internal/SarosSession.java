@@ -69,7 +69,6 @@ import de.fu_berlin.inf.dpp.activities.business.TextSelectionActivity;
 import de.fu_berlin.inf.dpp.activities.business.ViewportActivity;
 import de.fu_berlin.inf.dpp.activities.serializable.EditorActivityDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.IActivityDataObject;
-import de.fu_berlin.inf.dpp.activities.serializable.IProjectActivityDataObject;
 import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentClient;
 import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentServer;
 import de.fu_berlin.inf.dpp.concurrent.management.TransformationResult;
@@ -786,42 +785,40 @@ public class SarosSession implements ISarosSession, Disposable {
      * @return <code>true</code> if this activity can be executed now
      */
     private boolean hadToBeQueued(IActivityDataObject dataObject) {
-        if (dataObject instanceof IProjectActivityDataObject) {
-            String projectID = ((IProjectActivityDataObject) dataObject)
-                .getProjectID();
+        if (!(dataObject instanceof EditorActivityDataObject))
+            return false;
 
-            /*
-             * some activities (e.g. EditorActivity) can return null for
-             * projectID
-             */
-            if (dataObject instanceof EditorActivityDataObject) {
-                IProject project;
-                if (projectID != null) {
-                    lastID = projectID;
-                    project = getProject(projectID);
+        String projectID = ((EditorActivityDataObject) dataObject)
+            .getProjectID();
+
+        /*
+         * some activities (e.g. EditorActivity) can return null for projectID
+         */
+        IProject project;
+        if (projectID != null) {
+            lastID = projectID;
+            project = getProject(projectID);
+        } else {
+            project = getProject(lastID);
+        }
+        /*
+         * If we don't have that shared project, but will have it in future we
+         * will queue the activity.
+         * 
+         * When the project negotiation is done the method
+         * execQueuedActivities() will be executed
+         */
+        if (project == null) {
+            log.info("Activity " + dataObject.toString() + " for Project "
+                + projectID + " was queued.");
+            if (!queuedActivities.containsValue(dataObject)) {
+                if (projectID == null) {
+                    queuedActivities.put(lastID, dataObject);
                 } else {
-                    project = getProject(lastID);
-                }
-                /*
-                 * If we don't have that shared project, but will have it in
-                 * future we will queue the activity.
-                 * 
-                 * When the project negotiation is done the method
-                 * execQueuedActivities() will be executed
-                 */
-                if (project == null) {
-                    log.info("Activity " + dataObject.toString()
-                        + " for Project " + projectID + " was queued.");
-                    if (!queuedActivities.containsValue(dataObject)) {
-                        if (projectID == null) {
-                            queuedActivities.put(lastID, dataObject);
-                        } else {
-                            queuedActivities.put(projectID, dataObject);
-                        }
-                    }
-                    return true;
+                    queuedActivities.put(projectID, dataObject);
                 }
             }
+            return true;
         }
         return false;
     }
