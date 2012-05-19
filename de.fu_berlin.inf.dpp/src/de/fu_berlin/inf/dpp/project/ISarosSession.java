@@ -457,4 +457,8 @@ public interface ISarosSession {
      */
     public StopManager getStopManager();
 
+    /**
+     * Return if the session has been stopped
+     */
+    public boolean isStopped();
 }

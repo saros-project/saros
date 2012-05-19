@@ -283,4 +283,9 @@ public class SarosSessionStub implements ISarosSession {
     public StopManager getStopManager() {
         throw new RuntimeException("Unexpected call to Stub");
     }
+
+    @Override
+    public boolean isStopped() {
+        throw new RuntimeException("Unexpected call to Stub");
+    }
 }

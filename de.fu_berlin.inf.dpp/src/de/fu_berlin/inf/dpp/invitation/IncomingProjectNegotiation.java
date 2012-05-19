@@ -58,7 +58,6 @@ import de.fu_berlin.inf.dpp.observables.SarosSessionObservable;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
 import de.fu_berlin.inf.dpp.project.IChecksumCache;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
-import de.fu_berlin.inf.dpp.project.ISarosSessionListener;
 import de.fu_berlin.inf.dpp.ui.RemoteProgressManager;
 import de.fu_berlin.inf.dpp.ui.wizards.AddProjectToSessionWizard;
 import de.fu_berlin.inf.dpp.ui.wizards.pages.EnterProjectNamePage;
@@ -98,21 +97,20 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
      */
     Map<String, IProject> localProjects;
 
-    protected ISarosSessionListener sessionListener;
-
     protected JID jid;
 
-    public IncomingProjectNegotiation(ISarosSessionListener sessionListener,
-        JID peer, String processID, List<ProjectExchangeInfo> projectInfos,
+    private final ISarosSession sarosSession;
+
+    public IncomingProjectNegotiation(ISarosSession sarosSession, JID peer,
+        String processID, List<ProjectExchangeInfo> projectInfos,
         SarosContext sarosContext) {
         super(peer, sarosContext);
 
-        this.sessionListener = sessionListener;
+        this.sarosSession = sarosSession;
         this.processID = processID;
         this.projectInfos = projectInfos;
         this.localProjects = new HashMap<String, IProject>();
         this.jid = peer;
-
     }
 
     @Override
@@ -177,8 +175,8 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
             // the user who sends this ProjectNegotiation is now responsible for
             // all resources from that project
             for (Entry<String, IProject> entry : localProjects.entrySet()) {
-                sessionManager.getSarosSession().addProjectOwnership(
-                    entry.getKey(), entry.getValue(), jid);
+                sarosSession.addProjectOwnership(entry.getKey(),
+                    entry.getValue(), jid);
             }
 
             transmitter.sendFileLists(peer, processID, missingFiles,
@@ -204,14 +202,13 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
                     for (IPath iPath : paths) {
                         dependentResources.add(iProject.findMember(iPath));
                     }
-                    sessionManager.getSarosSession().addSharedResources(
-                        iProject, projectID, dependentResources);
+                    sarosSession.addSharedResources(iProject, projectID,
+                        dependentResources);
                 } else {
-                    sessionManager.getSarosSession().addSharedResources(
-                        iProject, projectID, null);
+                    sarosSession.addSharedResources(iProject, projectID, null);
                 }
 
-                sessionListener.projectAdded(projectID);
+                sessionManager.projectAdded(projectID);
             }
         } catch (Exception e) {
             processException(e);
@@ -564,8 +561,8 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
          * Remove the entries from the mapping in the SarosSession.
          */
         for (Entry<String, IProject> entry : localProjects.entrySet()) {
-            sessionManager.getSarosSession().removeProjectOwnership(
-                entry.getKey(), entry.getValue(), jid);
+            sarosSession.removeProjectOwnership(entry.getKey(),
+                entry.getValue(), jid);
         }
 
         String errorMsg;
@@ -612,11 +609,9 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
                 cancellationCause);
         }
 
-        // The session might have been stopped already, if not we will stop it.
-        ISarosSession session = sessionManager.getSarosSession();
-        if (session != null) {
-            if (session.getProjectResourcesMapping().keySet().isEmpty()
-                || session.getRemoteUsers().isEmpty())
+        if (sarosSession.isStopped()) {
+            if (sarosSession.getProjectResourcesMapping().keySet().isEmpty()
+                || sarosSession.getRemoteUsers().isEmpty())
                 sessionManager.stopSarosSession();
         }
 
@@ -891,7 +886,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
                 public void run(IProgressMonitor monitor) throws CoreException {
                     try {
                         FileUtils.writeArchive(archiveStream, project,
-                            subMonitor, sessionManager.getSarosSession());
+                            subMonitor, sarosSession);
                     } catch (LocalCancellationException e) {
                         throw new CoreException(new Status(IStatus.CANCEL,
                             Saros.SAROS, null, e));

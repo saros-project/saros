@@ -6,10 +6,12 @@ import java.util.List;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.jivesoftware.smack.XMPPException;
 import org.joda.time.DateTime;
 
 import de.fu_berlin.inf.dpp.FileList;
+import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.activities.ProjectExchangeInfo;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.communication.muc.negotiation.MUCSessionPreferences;
@@ -148,4 +150,32 @@ public interface ISarosSessionManager {
     public void incomingProjectReceived(JID from,
         List<ProjectExchangeInfo> projectInfos, String processID);
 
+    /**
+     * Call this when a new project was added.
+     * 
+     * @param projectID
+     *            TODO
+     */
+    void projectAdded(String projectID);
+
+    /**
+     * Call this before a ISarosSession is started.
+     */
+    void sessionStarting(ISarosSession sarosSession);
+
+    /**
+     * Call this after a ISarosSession has been started.
+     */
+    void sessionStarted(ISarosSession sarosSession);
+
+    /**
+     * Call this on the client after the invitation has been completed.
+     */
+    void preIncomingInvitationCompleted(IProgressMonitor monitor);
+
+    /**
+     * Call this on the host after the invitation was accepted and has been
+     * completed.
+     */
+    void postOutgoingInvitationCompleted(IProgressMonitor monitor, User newUser);
 }

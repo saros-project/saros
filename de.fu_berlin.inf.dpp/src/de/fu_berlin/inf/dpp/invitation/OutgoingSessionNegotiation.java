@@ -43,7 +43,6 @@ import de.fu_berlin.inf.dpp.net.internal.extensions.PacketExtensionUtils;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 import de.fu_berlin.inf.dpp.project.IChecksumCache;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
-import de.fu_berlin.inf.dpp.project.ISarosSessionListener;
 import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.project.Messages;
 import de.fu_berlin.inf.dpp.ui.wizards.InvitationWizard;
@@ -116,16 +115,12 @@ public class OutgoingSessionNegotiation extends InvitationProcess {
     @Inject
     protected IChecksumCache checksumCache;
 
-    protected ISarosSessionListener sessionListener;
-
-    public OutgoingSessionNegotiation(ISarosSessionListener sessionListener,
-        JID peer, int colorID, ISarosSession sarosSession, String description,
+    public OutgoingSessionNegotiation(JID peer, int colorID,
+        ISarosSession sarosSession, String description,
         SarosContext sarosContext) {
         super(peer, description, colorID, sarosContext);
 
-        this.sessionListener = sessionListener;
         this.sarosSession = sarosSession;
-
     }
 
     /**
@@ -204,7 +199,7 @@ public class OutgoingSessionNegotiation extends InvitationProcess {
             completeInvitation(monitor.newChild(5, SubMonitor.SUPPRESS_NONE),
                 projectExchangeInfos);
 
-            sessionListener.postOutgoingInvitationCompleted(
+            sessionManager.postOutgoingInvitationCompleted(
                 monitor.newChild(0, SubMonitor.SUPPRESS_ALL_LABELS), newUser);
 
         } catch (LocalCancellationException e) {

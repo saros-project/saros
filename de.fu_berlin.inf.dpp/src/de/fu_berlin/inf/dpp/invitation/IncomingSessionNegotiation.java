@@ -22,7 +22,6 @@ import de.fu_berlin.inf.dpp.net.internal.DefaultInvitationInfo.UserListRequestEx
 import de.fu_berlin.inf.dpp.observables.InvitationProcessObservable;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
-import de.fu_berlin.inf.dpp.project.ISarosSessionListener;
 import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
 import de.fu_berlin.inf.dpp.ui.wizards.JoinSessionWizard;
@@ -54,11 +53,9 @@ public class IncomingSessionNegotiation extends InvitationProcess {
 
     protected SubMonitor monitor;
 
-    protected ISarosSessionListener sessionListener;
-
     public IncomingSessionNegotiation(ISarosSessionManager sessionManager,
-        ISarosSessionListener sessionListener, ITransmitter transmitter,
-        JID from, int colorID, InvitationProcessObservable invitationProcesses,
+        ITransmitter transmitter, JID from, int colorID,
+        InvitationProcessObservable invitationProcesses,
         VersionManager versionManager, VersionInfo remoteVersionInfo,
         DateTime sessionStart, SarosUI sarosUI, String invitationID,
         String description, SarosContext sarosContext, int peerColorID, JID host) {
@@ -68,7 +65,6 @@ public class IncomingSessionNegotiation extends InvitationProcess {
         this.sessionStart = sessionStart;
         this.invitationID = invitationID;
 
-        this.sessionListener = sessionListener;
         this.sessionManager = sessionManager;
         this.versionManager = versionManager;
         this.host = host;
@@ -239,11 +235,10 @@ public class IncomingSessionNegotiation extends InvitationProcess {
          * that.
          */
 
-        sessionListener.sessionStarting(sarosSession);
+        sessionManager.sessionStarting(sarosSession);
         sarosSession.start();
-        sessionListener.sessionStarted(sarosSession);
-
-        sessionListener.preIncomingInvitationCompleted(monitor);
+        sessionManager.sessionStarted(sarosSession);
+        sessionManager.preIncomingInvitationCompleted(monitor);
 
         sarosSession.userInvitationCompleted(sarosSession.getLocalUser());
         log.debug("Inv" + Utils.prefix(peer)

@@ -90,8 +90,7 @@ import de.fu_berlin.inf.dpp.util.VersionManager.VersionInfo;
  * @author rdjemili
  */
 @Component(module = "core")
-public class SarosSessionManager implements ISarosSessionManager,
-    ISarosSessionListener {
+public class SarosSessionManager implements ISarosSessionManager {
 
     private static final Logger log = Logger
         .getLogger(SarosSessionManager.class.getName());
@@ -329,7 +328,7 @@ public class SarosSessionManager implements ISarosSessionManager,
         this.sessionID.setValue(sessionID);
 
         final IncomingSessionNegotiation process = new IncomingSessionNegotiation(
-            this, this, transmitter, from, colorID, invitationProcesses,
+            this, transmitter, from, colorID, invitationProcesses,
             versionManager, versionInfo, sessionStart, sarosUI, invitationID,
             description, sarosContext, inviterColorID, host);
         comNegotiatingManager.setSessionPreferences(comPrefs);
@@ -357,7 +356,7 @@ public class SarosSessionManager implements ISarosSessionManager,
     public void incomingProjectReceived(JID from,
         List<ProjectExchangeInfo> projectInfos, String processID) {
         final IncomingProjectNegotiation process = new IncomingProjectNegotiation(
-            this, from, processID, projectInfos, sarosContext);
+            getSarosSession(), from, processID, projectInfos, sarosContext);
 
         Utils.runSafeSWTAsync(log, new Runnable() {
 
@@ -398,8 +397,8 @@ public class SarosSessionManager implements ISarosSessionManager,
         ISarosSession sarosSession = sarosSessionObservable.getValue();
 
         OutgoingSessionNegotiation result = new OutgoingSessionNegotiation(
-            this, toInvite, sarosSession.getFreeColor(), sarosSession,
-            description, sarosContext);
+            toInvite, sarosSession.getFreeColor(), sarosSession, description,
+            sarosContext);
 
         OutgoingInvitationJob outgoingInvitationJob = new OutgoingInvitationJob(
             result);
@@ -750,11 +749,12 @@ public class SarosSessionManager implements ISarosSessionManager,
     }
 
     @Override
-    public void postOutgoingInvitationCompleted(IProgressMonitor monitor, User user) {
+    public void postOutgoingInvitationCompleted(IProgressMonitor monitor,
+        User user) {
         try {
             for (ISarosSessionListener sarosSessionListener : this.sarosSessionListeners) {
-                sarosSessionListener.postOutgoingInvitationCompleted(
-                    monitor, user);
+                sarosSessionListener.postOutgoingInvitationCompleted(monitor,
+                    user);
             }
         } catch (RuntimeException e) {
             log.error("Internal error in notifying listener"
@@ -786,8 +786,7 @@ public class SarosSessionManager implements ISarosSessionManager,
         }
     }
 
-    @Override
-    public void sessionEnding(ISarosSession sarosSession) {
+    private void sessionEnding(ISarosSession sarosSession) {
         for (ISarosSessionListener saroSessionListener : this.sarosSessionListeners) {
             try {
                 saroSessionListener.sessionEnding(sarosSession);
@@ -798,8 +797,7 @@ public class SarosSessionManager implements ISarosSessionManager,
         }
     }
 
-    @Override
-    public void sessionEnded(ISarosSession sarosSession) {
+    private void sessionEnded(ISarosSession sarosSession) {
         for (ISarosSessionListener listener : this.sarosSessionListeners) {
             try {
                 listener.sessionEnded(sarosSession);
@@ -810,7 +808,6 @@ public class SarosSessionManager implements ISarosSessionManager,
         }
     }
 
-    @Override
     public void projectAdded(String projectID) {
         for (ISarosSessionListener listener : this.sarosSessionListeners) {
             try {

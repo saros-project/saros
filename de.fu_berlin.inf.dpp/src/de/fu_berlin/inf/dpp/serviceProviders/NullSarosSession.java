@@ -288,4 +288,10 @@ public class NullSarosSession implements ISarosSession {
         JID ownerJID) {
         log.warn("unexpected method call");
     }
+
+    @Override
+    public boolean isStopped() {
+        log.warn("unexpected method call");
+        return true;
+    }
 }
