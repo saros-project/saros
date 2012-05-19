@@ -321,7 +321,7 @@ public final class StopManager extends AbstractActivityProvider implements
         reentrantLock.lock();
         try {
             while (expectedAcknowledgments.contains(expectedAck)
-                && !progress.isCanceled()) {
+                && !progress.isCanceled() && user.isInSarosSession()) {
                 if (acknowledged.await(MILLISTOWAIT, TimeUnit.MILLISECONDS)) {
                     continue; /*
                                * Used to make FindBugs happy that we don't do
@@ -329,6 +329,7 @@ public final class StopManager extends AbstractActivityProvider implements
                                */
                 }
             }
+            // The monitor was canceled or the user has left the session.
             if (expectedAcknowledgments.contains(expectedAck)) {
                 log.warn("No acknowlegment arrived, gave up waiting");
                 expectedAcknowledgments.remove(expectedAck);

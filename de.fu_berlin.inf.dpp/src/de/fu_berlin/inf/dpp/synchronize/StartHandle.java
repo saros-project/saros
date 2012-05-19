@@ -107,7 +107,8 @@ public class StartHandle {
      */
     public boolean await(final IProgressMonitor progress) {
         try {
-            while (!acknowledged.get() && !progress.isCanceled())
+            while (!acknowledged.get() && !progress.isCanceled()
+                && user.isInSarosSession())
                 Thread.sleep(stopManager.MILLISTOWAIT);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
