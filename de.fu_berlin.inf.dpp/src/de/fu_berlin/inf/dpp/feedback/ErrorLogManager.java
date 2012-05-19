@@ -46,10 +46,14 @@ public class ErrorLogManager extends AbstractFeedbackManager implements
     protected SessionIDObservable sessionID;
     private static String mostRecentSessionID;
 
+    private static synchronized void rememberSession(String sessionId) {
+        mostRecentSessionID = sessionId;
+    }
+
     @Override
     public void start() {
         // save the id of the just started session
-        mostRecentSessionID = sessionID.getValue();
+        rememberSession(sessionID.getValue());
     }
 
     @Override
