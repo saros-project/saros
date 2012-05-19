@@ -80,7 +80,7 @@ public class ImageManager {
     public static final Image ICON_BUDDY_AWAY = new DecorationOverlayIcon(
         ICON_BUDDY, OVERLAY_AWAY, IDecoration.TOP_RIGHT).createImage();
     public static final Image ICON_BUDDY_SAROS = getImage("icons/obj16/buddy_saros_obj.png"); //$NON-NLS-1$
-    public static Image ICON_UPNP = getImage("icons/obj16/upnp_obj.png"); //$NON-NLS-1$
+    public static final Image ICON_UPNP = getImage("icons/obj16/upnp_obj.png"); //$NON-NLS-1$
 
     public static final Image ICON_BUDDY_SAROS_FOLLOWMODE = new DecorationOverlayIcon(
         ICON_BUDDY_SAROS, OVERLAY_FOLLOWMODE, IDecoration.TOP_LEFT)

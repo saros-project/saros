@@ -55,7 +55,7 @@ public final class StopManager extends AbstractActivityProvider implements
 
     private static final Logger log = Logger.getLogger(StopManager.class);
 
-    protected static Random random = new Random();
+    private static final Random RANDOM = new Random();
 
     // Waits MILLISTOWAIT ms until the next test for progress cancellation
     public final int MILLISTOWAIT = 100;
@@ -303,7 +303,7 @@ public final class StopManager extends AbstractActivityProvider implements
         final StopActivity stopActivity = new StopActivity(localUser,
             localUser, user, Type.LOCKREQUEST, State.INITIATED,
             new SimpleDateFormat("HHmmssSS").format(new Date())
-                + random.nextLong());
+                + RANDOM.nextLong());
 
         StartHandle handle = generateStartHandle(stopActivity);
         addStartHandle(handle);
