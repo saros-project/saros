@@ -500,9 +500,12 @@ public final class StopManager extends AbstractActivityProvider implements
          * blocked in the stop method that there will be no response.
          */
         reentrantLock.lock();
-        expectedAcknowledgments.clear();
-        acknowledged.signalAll();
-        reentrantLock.unlock();
+        try {
+            expectedAcknowledgments.clear();
+            acknowledged.signalAll();
+        } finally {
+            reentrantLock.unlock();
+        }
     }
 
     /**
