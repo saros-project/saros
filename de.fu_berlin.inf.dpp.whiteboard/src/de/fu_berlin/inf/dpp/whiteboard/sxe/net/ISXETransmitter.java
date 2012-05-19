@@ -2,7 +2,7 @@ package de.fu_berlin.inf.dpp.whiteboard.sxe.net;
 
 import java.io.IOException;
 
-import org.eclipse.core.runtime.SubMonitor;
+import org.eclipse.core.runtime.IProgressMonitor;
 
 import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
 import de.fu_berlin.inf.dpp.whiteboard.sxe.SXEController;
@@ -37,7 +37,7 @@ public interface ISXETransmitter {
 	 * @param awaitFor
 	 * @return the response message
 	 */
-	public SXEMessage sendAndAwait(SubMonitor monitor, SXEMessage msg,
+	public SXEMessage sendAndAwait(IProgressMonitor monitor, SXEMessage msg,
 			SXEMessageType... awaitFor) throws IOException,
 			LocalCancellationException;
 

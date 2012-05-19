@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.concurrent.Callable;
 
 import org.apache.log4j.Logger;
-import org.eclipse.core.runtime.SubMonitor;
+import org.eclipse.core.runtime.IProgressMonitor;
 
 import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
 import de.fu_berlin.inf.dpp.util.Utils;
@@ -43,7 +43,7 @@ public class SXEOutgoingSynchronizationProcess extends SXESynchronization {
 
 	}
 
-	public void start(SubMonitor monitor) {
+	public void start(IProgressMonitor monitor) {
 		try {
 
 			log.debug(prefix() + " send state-offer to " + peer);

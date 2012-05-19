@@ -19,7 +19,7 @@
  */
 package de.fu_berlin.inf.dpp.project;
 
-import org.eclipse.core.runtime.SubMonitor;
+import org.eclipse.core.runtime.IProgressMonitor;
 
 import de.fu_berlin.inf.dpp.User;
 
@@ -44,12 +44,12 @@ public interface ISarosSessionListener {
      * TODO: remove this method as soon as external components like the
      * whiteboard are maintained in another way (i.e. a component interface)
      * 
-     * @param subMonitor
+     * @param monitor
      *            the invitation process's monitor to track process and
      *            cancellation
      * 
      */
-    public void preIncomingInvitationCompleted(SubMonitor subMonitor);
+    public void preIncomingInvitationCompleted(IProgressMonitor monitor);
 
     /**
      * <p>
@@ -66,12 +66,12 @@ public interface ISarosSessionListener {
      * TODO: remove this method as soon as external components like the
      * whiteboard are maintained in another way (i.e. a component interface)
      * 
-     * @param subMonitor
+     * @param monitor
      *            the invitation process's monitor to track process and
      *            cancellation
      * 
      */
-    public void postOutgoingInvitationCompleted(SubMonitor subMonitor, User user);
+    public void postOutgoingInvitationCompleted(IProgressMonitor monitor, User user);
 
     /**
      * Is fired when a new session is about to start.

@@ -738,10 +738,10 @@ public class SarosSessionManager implements ISarosSessionManager,
     }
 
     @Override
-    public void preIncomingInvitationCompleted(SubMonitor subMonitor) {
+    public void preIncomingInvitationCompleted(IProgressMonitor monitor) {
         try {
             for (ISarosSessionListener sarosSessionListener : this.sarosSessionListeners) {
-                sarosSessionListener.preIncomingInvitationCompleted(subMonitor);
+                sarosSessionListener.preIncomingInvitationCompleted(monitor);
             }
         } catch (RuntimeException e) {
             log.error("Internal error in notifying listener"
@@ -750,11 +750,11 @@ public class SarosSessionManager implements ISarosSessionManager,
     }
 
     @Override
-    public void postOutgoingInvitationCompleted(SubMonitor subMonitor, User user) {
+    public void postOutgoingInvitationCompleted(IProgressMonitor monitor, User user) {
         try {
             for (ISarosSessionListener sarosSessionListener : this.sarosSessionListeners) {
                 sarosSessionListener.postOutgoingInvitationCompleted(
-                    subMonitor, user);
+                    monitor, user);
             }
         } catch (RuntimeException e) {
             log.error("Internal error in notifying listener"

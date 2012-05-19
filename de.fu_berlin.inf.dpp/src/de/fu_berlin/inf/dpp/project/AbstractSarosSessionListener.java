@@ -19,7 +19,7 @@
  */
 package de.fu_berlin.inf.dpp.project;
 
-import org.eclipse.core.runtime.SubMonitor;
+import org.eclipse.core.runtime.IProgressMonitor;
 
 import de.fu_berlin.inf.dpp.User;
 
@@ -30,30 +30,37 @@ import de.fu_berlin.inf.dpp.User;
  */
 public class AbstractSarosSessionListener implements ISarosSessionListener {
 
-    public void preIncomingInvitationCompleted(SubMonitor subMonitor) {
+    @Override
+    public void preIncomingInvitationCompleted(IProgressMonitor monitor) {
         // do nothing
     }
 
-    public void postOutgoingInvitationCompleted(SubMonitor subMonitor, User user) {
+    @Override
+    public void postOutgoingInvitationCompleted(IProgressMonitor monitor, User user) {
         // do nothing
     }
 
+    @Override
     public void sessionStarting(ISarosSession newSarosSession) {
         // do nothing
     }
 
+    @Override
     public void sessionStarted(ISarosSession newSarosSession) {
         // do nothing
     }
 
+    @Override
     public void sessionEnding(ISarosSession oldSarosSession) {
         // do nothing
     }
 
+    @Override
     public void sessionEnded(ISarosSession oldSarosSession) {
         // do nothing
     }
 
+    @Override
     public void projectAdded(String projectID) {
         // do nothing
     }

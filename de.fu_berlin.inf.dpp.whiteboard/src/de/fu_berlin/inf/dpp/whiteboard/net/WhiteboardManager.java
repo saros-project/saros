@@ -1,7 +1,7 @@
 package de.fu_berlin.inf.dpp.whiteboard.net;
 
 import org.apache.log4j.Logger;
-import org.eclipse.core.runtime.SubMonitor;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.SarosPluginContext;
@@ -63,8 +63,8 @@ public class WhiteboardManager {
 		}
 
 		@Override
-		public void preIncomingInvitationCompleted(SubMonitor subMonitor) {
-			sxeTransmitter.enableInvitation(controller, subMonitor);
+		public void preIncomingInvitationCompleted(IProgressMonitor monitor) {
+			sxeTransmitter.enableInvitation(controller, monitor);
 		}
 
 		@Override
@@ -75,11 +75,11 @@ public class WhiteboardManager {
 		}
 
 		@Override
-		public void postOutgoingInvitationCompleted(SubMonitor subMonitor,
+		public void postOutgoingInvitationCompleted(IProgressMonitor monitor,
 				User user) {
 			SXEOutgoingSynchronizationProcess inv = new SXEOutgoingSynchronizationProcess(
 					controller, sxeTransmitter, user.getJID().toString());
-			inv.start(subMonitor);
+			inv.start(monitor);
 		}
 
 		@Override

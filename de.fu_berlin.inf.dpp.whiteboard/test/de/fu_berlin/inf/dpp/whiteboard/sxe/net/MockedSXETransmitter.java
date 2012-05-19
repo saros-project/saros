@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.eclipse.core.runtime.SubMonitor;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.xmlpull.v1.XmlPullParserException;
 
 import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
@@ -35,7 +35,7 @@ public class MockedSXETransmitter implements ISXETransmitter {
 	}
 
 	@Override
-	public SXEMessage sendAndAwait(SubMonitor monitor, SXEMessage msg,
+	public SXEMessage sendAndAwait(IProgressMonitor monitor, SXEMessage msg,
 			SXEMessageType... awaitFor) throws IOException,
 			LocalCancellationException {
 		// TODO incorporate to enable proper invitation testing

@@ -1,8 +1,8 @@
 package de.fu_berlin.inf.dpp.ui.widgets.viewer.rosterSession;
 
 import org.apache.log4j.Logger;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.StructuredViewer;
@@ -168,13 +168,13 @@ public class BuddySessionDisplayComposite extends ViewerComposite {
         }
 
         @Override
-        public void preIncomingInvitationCompleted(SubMonitor subMonitor) {
+        public void preIncomingInvitationCompleted(IProgressMonitor monitor) {
             ViewerUtils.refresh(viewer, true);
             expandAllSessionNodes(viewer);
         }
 
         @Override
-        public void postOutgoingInvitationCompleted(SubMonitor subMonitor,
+        public void postOutgoingInvitationCompleted(IProgressMonitor monitor,
             User user) {
             ViewerUtils.refresh(viewer, true);
             expandAllSessionNodes(viewer);

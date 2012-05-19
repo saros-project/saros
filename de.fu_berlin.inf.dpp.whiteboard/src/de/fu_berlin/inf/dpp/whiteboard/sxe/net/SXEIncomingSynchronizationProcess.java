@@ -3,7 +3,7 @@ package de.fu_berlin.inf.dpp.whiteboard.sxe.net;
 import java.io.IOException;
 
 import org.apache.log4j.Logger;
-import org.eclipse.core.runtime.SubMonitor;
+import org.eclipse.core.runtime.IProgressMonitor;
 
 import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
 import de.fu_berlin.inf.dpp.util.Utils;
@@ -48,9 +48,9 @@ public class SXEIncomingSynchronizationProcess extends SXESynchronization {
 	 * 
 	 * @see
 	 * de.fu_berlin.inf.dpp.whiteboard.sxe.net.SXESynchronization#start(org.
-	 * eclipse.core.runtime.SubMonitor)
+	 * eclipse.core.runtime.IProgressMonitor)
 	 */
-	public void start(final SubMonitor monitor) {
+	public void start(final IProgressMonitor monitor) {
 		/*
 		 * Has to run in another thread because else this would block Smack
 		 * dispatching listener thread when awaiting answers (could not process
@@ -80,7 +80,8 @@ public class SXEIncomingSynchronizationProcess extends SXESynchronization {
 												.getNextMessage(
 														SXEMessageType.REFUSE_STATE,
 														peer);
-										controller.getTransmitter().sendAsync(msg);
+										controller.getTransmitter().sendAsync(
+												msg);
 										return;
 									}
 								}

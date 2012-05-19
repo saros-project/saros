@@ -7,6 +7,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import org.apache.log4j.Logger;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
 import org.jivesoftware.smack.PacketListener;
 import org.jivesoftware.smack.filter.PacketFilter;
@@ -139,7 +140,7 @@ public class SarosSXETransmitter implements ISXETransmitter {
 	}
 
 	@Override
-	public synchronized SXEMessage sendAndAwait(SubMonitor monitor,
+	public synchronized SXEMessage sendAndAwait(IProgressMonitor monitor,
 			SXEMessage msg, SXEMessageType... awaitFor) throws IOException,
 			LocalCancellationException {
 
@@ -188,7 +189,7 @@ public class SarosSXETransmitter implements ISXETransmitter {
 	 * invitation process
 	 */
 	public void enableInvitation(final SXEController controller,
-			final SubMonitor subMonitor) {
+			final IProgressMonitor monitor) {
 
 		invitationListener = new PacketListener() {
 			@Override
@@ -201,7 +202,7 @@ public class SarosSXETransmitter implements ISXETransmitter {
 						controller, SarosSXETransmitter.this,
 						extension.getMessage());
 
-				inv.start(subMonitor);
+				inv.start(monitor);
 			}
 		};
 
