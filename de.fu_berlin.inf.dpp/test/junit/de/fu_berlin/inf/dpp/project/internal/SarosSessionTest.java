@@ -8,6 +8,9 @@ import junit.framework.Assert;
 
 import org.easymock.EasyMock;
 import org.easymock.IAnswer;
+import org.eclipse.core.resources.IResourceChangeListener;
+import org.eclipse.core.resources.IWorkspace;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.preferences.ConfigurationScope;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.util.IPropertyChangeListener;
@@ -41,6 +44,7 @@ import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.SarosNet;
 import de.fu_berlin.inf.dpp.net.business.DispatchThreadContext;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
+import de.fu_berlin.inf.dpp.observables.FileReplacementInProgressObservable;
 import de.fu_berlin.inf.dpp.observables.ProjectNegotiationObservable;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
@@ -51,7 +55,7 @@ import de.fu_berlin.inf.dpp.ui.SarosUI;
 import de.fu_berlin.inf.dpp.util.Utils;
 
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({ Utils.class, StatisticManager.class })
+@PrepareForTest({ Utils.class, StatisticManager.class, ResourcesPlugin.class })
 public class SarosSessionTest {
     static private SarosNet createSarosNetMock() {
         SarosNet net = EasyMock.createMock(SarosNet.class);
@@ -156,6 +160,7 @@ public class SarosSessionTest {
         container.addComponent(DispatchThreadContext.class);
         container.addComponent(SessionIDObservable.class);
         container.addComponent(FeedbackManager.class);
+        container.addComponent(FileReplacementInProgressObservable.class);
 
         ISarosContext context = EasyMock.createMock(ISarosContext.class);
         context.initComponent(EasyMock.isA(Object.class));
@@ -209,10 +214,39 @@ public class SarosSessionTest {
         }).anyTimes();
         PowerMock.replayAll(StatisticManager.class);
 
+        final List<Object> workspaceListeners = new LinkedList<Object>();
+        IWorkspace workspace = EasyMock.createMock(IWorkspace.class);
+        workspace.addResourceChangeListener(
+            EasyMock.isA(IResourceChangeListener.class), EasyMock.anyInt());
+        EasyMock.expectLastCall().andAnswer(new IAnswer<Object>() {
+
+            @Override
+            public Object answer() throws Throwable {
+                workspaceListeners.add(EasyMock.getCurrentArguments()[0]);
+                return null;
+            }
+        }).anyTimes();
+        workspace.removeResourceChangeListener(EasyMock
+            .isA(IResourceChangeListener.class));
+        EasyMock.expectLastCall().andAnswer(new IAnswer<Object>() {
+
+            @Override
+            public Object answer() throws Throwable {
+                workspaceListeners.remove(EasyMock.getCurrentArguments()[0]);
+                return null;
+            }
+        }).anyTimes();
+        EasyMock.replay(workspace);
+        PowerMock.mockStaticPartial(ResourcesPlugin.class, "getWorkspace");
+        ResourcesPlugin.getWorkspace();
+        EasyMock.expectLastCall().andReturn(workspace).anyTimes();
+        PowerMock.replay(ResourcesPlugin.class);
+
         // Test creating, starting and stopping the session.
         SarosSession session = new SarosSession(new DateTime(), context);
         Assert.assertFalse(session.getSequencer().isStarted());
         Assert.assertEquals(0, session.getActivityProviderCount());
+        Assert.assertTrue(workspaceListeners.isEmpty());
         session.start();
 
         StopManager stopManager1 = session.getStopManager();
@@ -220,11 +254,13 @@ public class SarosSessionTest {
         Assert.assertSame(stopManager1, stopManager2);
         Assert.assertTrue(session.getSequencer().isStarted());
         Assert.assertTrue(session.getActivityProviderCount() > 0);
+        Assert.assertFalse(workspaceListeners.isEmpty());
 
         session.stop();
         Assert.assertFalse(session.getSequencer().isStarted());
         Assert.assertTrue(editorListeners.isEmpty());
         Assert.assertEquals(0, session.getActivityProviderCount());
+        Assert.assertTrue(workspaceListeners.isEmpty());
 
         session.dispose();
 

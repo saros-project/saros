@@ -82,7 +82,6 @@ import de.fu_berlin.inf.dpp.project.IChecksumCache;
 import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.project.SarosRosterListener;
 import de.fu_berlin.inf.dpp.project.SarosSessionManager;
-import de.fu_berlin.inf.dpp.project.SharedResourcesManager;
 import de.fu_berlin.inf.dpp.project.internal.ChecksumCacheImpl;
 import de.fu_berlin.inf.dpp.project.internal.FileContentNotifierBridge;
 import de.fu_berlin.inf.dpp.project.internal.FollowingActivitiesManager;
@@ -204,7 +203,6 @@ public class SarosContext implements ISarosContext {
         Component.create(SarosUI.class),
         Component.create(ISarosSessionManager.class, SarosSessionManager.class),
         Component.create(SessionViewOpener.class),
-        Component.create(SharedResourcesManager.class),
         Component.create(AudioServiceManager.class),
         Component.create(MixerManager.class),
         Component.create(UndoManager.class),

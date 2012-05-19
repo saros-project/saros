@@ -105,6 +105,7 @@ import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
 import de.fu_berlin.inf.dpp.project.Messages;
 import de.fu_berlin.inf.dpp.project.SharedProject;
+import de.fu_berlin.inf.dpp.project.SharedResourcesManager;
 import de.fu_berlin.inf.dpp.synchronize.StartHandle;
 import de.fu_berlin.inf.dpp.synchronize.StopManager;
 import de.fu_berlin.inf.dpp.ui.util.CollaborationUtils;
@@ -1343,6 +1344,7 @@ public class SarosSession implements ISarosSession, Disposable {
 
         // Core Managers
         sessionContainer.addComponent(ChangeColorManager.class);
+        sessionContainer.addComponent(SharedResourcesManager.class);
 
         // Statistic collectors. Make sure to add new collectors to the
         // StatisticCollectorTest as well

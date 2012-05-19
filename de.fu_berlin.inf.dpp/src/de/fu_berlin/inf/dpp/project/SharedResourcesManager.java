@@ -51,6 +51,7 @@ import org.eclipse.core.runtime.jobs.JobChangeAdapter;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.swt.widgets.Shell;
+import org.picocontainer.Startable;
 import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.activities.SPath;
@@ -66,6 +67,7 @@ import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.observables.FileReplacementInProgressObservable;
 import de.fu_berlin.inf.dpp.synchronize.Blockable;
+import de.fu_berlin.inf.dpp.synchronize.StopManager;
 import de.fu_berlin.inf.dpp.ui.util.CollaborationUtils;
 import de.fu_berlin.inf.dpp.util.FileUtils;
 import de.fu_berlin.inf.dpp.util.Utils;
@@ -87,7 +89,7 @@ import de.fu_berlin.inf.dpp.vcs.VCSResourceInfo;
  */
 @Component(module = "core")
 public class SharedResourcesManager extends AbstractActivityProvider implements
-    IResourceChangeListener {
+    IResourceChangeListener, Startable {
     /** The {@link IResourceChangeEvent}s we're going to register for. */
     /*
      * haferburg: We're really only interested in
@@ -114,7 +116,9 @@ public class SharedResourcesManager extends AbstractActivityProvider implements
      */
     protected boolean pause = false;
 
-    protected ISarosSession sarosSession;
+    protected final ISarosSession sarosSession;
+
+    protected final StopManager stopManager;
 
     /**
      * Should return <code>true</code> while executing resource changes to avoid
@@ -129,8 +133,6 @@ public class SharedResourcesManager extends AbstractActivityProvider implements
     @Inject
     protected ConsistencyWatchdogClient consistencyWatchdogClient;
 
-    protected ISarosSessionManager sessionManager;
-
     protected Blockable stopManagerListener = new Blockable() {
         public void unblock() {
             SharedResourcesManager.this.pause = false;
@@ -141,28 +143,19 @@ public class SharedResourcesManager extends AbstractActivityProvider implements
         }
     };
 
-    public ISarosSessionListener sessionListener = new AbstractSarosSessionListener() {
+    public void start() {
+        sarosSession.addActivityProvider(SharedResourcesManager.this);
+        stopManager.addBlockable(stopManagerListener);
+        ResourcesPlugin.getWorkspace().addResourceChangeListener(this,
+            INTERESTING_EVENTS);
+    }
 
-        @Override
-        public void sessionStarted(ISarosSession newSarosSession) {
-            sarosSession = newSarosSession;
-            sarosSession.addActivityProvider(SharedResourcesManager.this);
-            sarosSession.getStopManager().addBlockable(stopManagerListener);
-            ResourcesPlugin.getWorkspace().addResourceChangeListener(
-                SharedResourcesManager.this, INTERESTING_EVENTS);
-        }
-
-        @Override
-        public void sessionEnded(ISarosSession oldSarosSession) {
-            ResourcesPlugin.getWorkspace().removeResourceChangeListener(
-                SharedResourcesManager.this);
-
-            assert sarosSession == oldSarosSession;
-            sarosSession.removeActivityProvider(SharedResourcesManager.this);
-            sarosSession.getStopManager().removeBlockable(stopManagerListener);
-            sarosSession = null;
-        }
-    };
+    @Override
+    public void stop() {
+        ResourcesPlugin.getWorkspace().removeResourceChangeListener(this);
+        sarosSession.removeActivityProvider(this);
+        stopManager.removeBlockable(stopManagerListener);
+    }
 
     private IJobChangeListener jobChangeListener = new JobChangeAdapter() {
         @Override
@@ -175,9 +168,10 @@ public class SharedResourcesManager extends AbstractActivityProvider implements
 
     private ResourceActivityFilter pendingActivities = new ResourceActivityFilter();
 
-    public SharedResourcesManager(ISarosSessionManager sessionManager) {
-        this.sessionManager = sessionManager;
-        this.sessionManager.addSarosSessionListener(sessionListener);
+    public SharedResourcesManager(ISarosSession sarosSession,
+        StopManager stopManager) {
+        this.sarosSession = sarosSession;
+        this.stopManager = stopManager;
     }
 
     /**
