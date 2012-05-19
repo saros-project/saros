@@ -257,11 +257,8 @@ public final class StopManager extends AbstractActivityProvider implements
         if (monitor.isCanceled()) {
             // Restart the already stopped users
             log.debug("Monitor was canceled. Restarting already stopped buddies.");
-            for (StartHandle startHandle : resultingHandles) {
-                if (!startHandle.getUser().isInSarosSession())
-                    continue;
+            for (StartHandle startHandle : resultingHandles)
                 startHandle.start();
-            }
             throw new CancellationException();
         }
         return resultingHandles;
@@ -431,16 +428,6 @@ public final class StopManager extends AbstractActivityProvider implements
     @Override
     public void exec(IActivity activityDataObject) {
         activityDataObject.dispatch(activityDataObjectReceiver);
-    }
-
-    private void fireActivity(StopActivity stopActivity) {
-
-        User recipient = stopActivity.getRecipient();
-        if (!recipient.isInSarosSession())
-            throw new IllegalArgumentException("StopActivity contains"
-                + " recipient which already left: " + stopActivity);
-
-        super.fireActivity(stopActivity);
     }
 
     /**
