@@ -881,7 +881,7 @@ public class SarosSession implements ISarosSession, Disposable {
         sendActivity(Collections.singletonList(recipient), activity);
     }
 
-    public void sendActivity(List<User> toWhom, final IActivity activity) {
+    private void sendActivity(List<User> toWhom, final IActivity activity) {
         if (toWhom == null)
             throw new IllegalArgumentException();
 

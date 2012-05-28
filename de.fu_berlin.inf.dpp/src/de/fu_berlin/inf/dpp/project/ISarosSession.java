@@ -259,15 +259,10 @@ public interface ISarosSession {
     /**
      * Sends the given activity to the given list of users.
      * 
-     * This method will by-pass the ConcurrentDocumentManager.
+     * This method will by-pass the ConcurrentDocumentManager and should not be
+     * used in new code.
      */
-    public void sendActivity(List<User> recipient, IActivity activity);
-
-    /**
-     * Convenience method to address a single recipient.
-     * 
-     * @see #sendActivity(List, IActivity)
-     */
+    @Deprecated()
     public void sendActivity(User recipient, IActivity activity);
 
     /**
