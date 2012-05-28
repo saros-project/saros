@@ -248,18 +248,18 @@ public class EditorManager extends AbstractActivityProvider {
 
             User localUser = sarosSession.getLocalUser();
             for (SPath path : getLocallyOpenEditors()) {
-                sarosSession.sendActivity(recipient, new EditorActivity(
-                    localUser, Type.Activated, path));
+                fireActivity(recipient, new EditorActivity(localUser,
+                    Type.Activated, path));
             }
 
-            sarosSession.sendActivity(recipient, new EditorActivity(localUser,
+            fireActivity(recipient, new EditorActivity(localUser,
                 Type.Activated, locallyActiveEditor));
 
             if (locallyActiveEditor == null)
                 return;
             if (localViewport != null) {
-                sarosSession.sendActivity(recipient, new ViewportActivity(
-                    localUser, localViewport, locallyActiveEditor));
+                fireActivity(recipient, new ViewportActivity(localUser,
+                    localViewport, locallyActiveEditor));
             } else {
                 log.warn("No viewport for locallyActivateEditor: "
                     + locallyActiveEditor);
@@ -269,8 +269,8 @@ public class EditorManager extends AbstractActivityProvider {
                 int offset = localSelection.getOffset();
                 int length = localSelection.getLength();
 
-                sarosSession.sendActivity(recipient, new TextSelectionActivity(
-                    localUser, offset, length, locallyActiveEditor));
+                fireActivity(recipient, new TextSelectionActivity(localUser,
+                    offset, length, locallyActiveEditor));
             } else {
                 log.warn("No selection for locallyActivateEditor: "
                     + locallyActiveEditor);

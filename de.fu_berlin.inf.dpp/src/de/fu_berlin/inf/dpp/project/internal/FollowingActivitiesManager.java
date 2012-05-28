@@ -56,15 +56,11 @@ public class FollowingActivitiesManager extends AbstractActivityProvider {
                     }
                     for (User user : sarosSession.getParticipants()) {
                         if (isFollowed) {
-                            sarosSession.sendActivity(
-                                user,
-                                new StartFollowingActivity(sarosSession
-                                    .getLocalUser(), target));
+                            fireActivity(user, new StartFollowingActivity(
+                                sarosSession.getLocalUser(), target));
                         } else {
-                            sarosSession.sendActivity(
-                                user,
-                                new StopFollowingActivity(sarosSession
-                                    .getLocalUser()));
+                            fireActivity(user, new StopFollowingActivity(
+                                sarosSession.getLocalUser()));
 
                         }
                     }

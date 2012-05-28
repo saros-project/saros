@@ -3,7 +3,10 @@ package de.fu_berlin.inf.dpp.project;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.activities.business.IActivity;
+import de.fu_berlin.inf.dpp.activities.business.ITargetedActivity;
+import de.fu_berlin.inf.dpp.activities.business.TargetedActivityWrapper;
 
 public abstract class AbstractActivityProvider implements IActivityProvider {
 
@@ -28,4 +31,13 @@ public abstract class AbstractActivityProvider implements IActivityProvider {
         }
     }
 
+    public void fireActivity(User user, IActivity activity) {
+        ITargetedActivity target = new TargetedActivityWrapper(user, activity);
+        fireActivity(target);
+    }
+
+    public void fireActivity(List<User> users, IActivity activity) {
+        ITargetedActivity target = new TargetedActivityWrapper(users, activity);
+        fireActivity(target);
+    }
 }

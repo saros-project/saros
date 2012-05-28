@@ -8,7 +8,7 @@ import de.fu_berlin.inf.dpp.User;
  * This is an interface for activities that are only sent to a specific set of
  * users.
  */
-public interface ITargetedActivity {
+public interface ITargetedActivity extends IActivity {
     /**
      * @return the users that should receive this activity
      */

@@ -26,7 +26,6 @@ import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.project.AbstractActivityProvider;
 import de.fu_berlin.inf.dpp.project.AbstractSarosSessionListener;
 import de.fu_berlin.inf.dpp.project.AbstractSharedProjectListener;
-import de.fu_berlin.inf.dpp.project.IActivityProvider;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ISarosSessionListener;
 import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
@@ -201,7 +200,7 @@ public class RemoteProgressManager {
         }
     };
 
-    protected IActivityProvider activityProvider = new AbstractActivityProvider() {
+    protected AbstractActivityProvider activityProvider = new AbstractActivityProvider() {
         @Override
         public void exec(IActivity activity) {
             activity.dispatch(activityReceiver);
@@ -285,13 +284,13 @@ public class RemoteProgressManager {
 
             public void beginTask(String name, int totalWorked) {
                 this.totalWorked = totalWorked;
-                sarosSession.sendActivity(recipients, new ProgressActivity(
+                activityProvider.fireActivity(recipients, new ProgressActivity(
                     localUser, progressID, 0, totalWorked, name,
                     ProgressAction.UPDATE));
             }
 
             public void done() {
-                sarosSession.sendActivity(recipients, new ProgressActivity(
+                activityProvider.fireActivity(recipients, new ProgressActivity(
                     localUser, progressID, 0, 0, null, ProgressAction.DONE));
             }
 
@@ -310,13 +309,13 @@ public class RemoteProgressManager {
             }
 
             public void setTaskName(String name) {
-                sarosSession.sendActivity(recipients, new ProgressActivity(
+                activityProvider.fireActivity(recipients, new ProgressActivity(
                     localUser, progressID, worked, totalWorked, name,
                     ProgressAction.UPDATE));
             }
 
             public void subTask(String name) {
-                sarosSession.sendActivity(recipients, new ProgressActivity(
+                activityProvider.fireActivity(recipients, new ProgressActivity(
                     localUser, progressID, worked, totalWorked, name,
                     ProgressAction.UPDATE));
             }
@@ -329,7 +328,7 @@ public class RemoteProgressManager {
                             .format(
                                 "Worked ({0})is greater than totalWork ({1}). Forgot to call beginTask?",
                                 worked, totalWorked), new StackTrace());
-                sarosSession.sendActivity(recipients, new ProgressActivity(
+                activityProvider.fireActivity(recipients, new ProgressActivity(
                     localUser, progressID, worked, totalWorked, null,
                     ProgressAction.UPDATE));
             }
@@ -365,14 +364,14 @@ public class RemoteProgressManager {
 
                 // report to remote monitor!
                 this.totalWorked = totalWorked;
-                sarosSession.sendActivity(recipients, new ProgressActivity(
+                activityProvider.fireActivity(recipients, new ProgressActivity(
                     localUser, progressID, 0, totalWorked, name,
                     ProgressAction.BEGINTASK));
             }
 
             public void done() {
                 monitor.done();
-                sarosSession.sendActivity(recipients, new ProgressActivity(
+                activityProvider.fireActivity(recipients, new ProgressActivity(
                     localUser, progressID, 0, 0, null, ProgressAction.DONE));
             }
 
@@ -392,7 +391,7 @@ public class RemoteProgressManager {
              */
             public void setCanceled(boolean value) {
                 // waldmann: yep this is a TODO
-                sarosSession.sendActivity(recipients, new ProgressActivity(
+                activityProvider.fireActivity(recipients, new ProgressActivity(
                     localUser, progressID, worked, totalWorked, "Cancellation",
                     ProgressAction.CANCEL));
                 monitor.setCanceled(value);
@@ -400,14 +399,14 @@ public class RemoteProgressManager {
 
             public void setTaskName(String name) {
                 monitor.setTaskName(name);
-                sarosSession.sendActivity(recipients, new ProgressActivity(
+                activityProvider.fireActivity(recipients, new ProgressActivity(
                     localUser, progressID, worked, totalWorked, name,
                     ProgressAction.SETTASKNAME));
             }
 
             public void subTask(String name) {
                 monitor.subTask(name);
-                sarosSession.sendActivity(recipients, new ProgressActivity(
+                activityProvider.fireActivity(recipients, new ProgressActivity(
                     localUser, progressID, worked, totalWorked, name,
                     ProgressAction.SUBTASK));
             }
@@ -421,7 +420,7 @@ public class RemoteProgressManager {
                             .format(
                                 "Worked ({0})is greater than totalWork ({1}). Forgot to call beginTask?",
                                 worked, totalWorked), new StackTrace());
-                sarosSession.sendActivity(recipients, new ProgressActivity(
+                activityProvider.fireActivity(recipients, new ProgressActivity(
                     localUser, progressID, worked, totalWorked, null,
                     ProgressAction.UPDATE));
             }

@@ -216,7 +216,7 @@ public class PingPongCentral extends AbstractActivityProvider implements
                 stats.get(sender).add(pingPongActivity);
             } else {
                 // This is the ping from another user
-                sarosSession.sendActivity(initiator,
+                fireActivity(initiator,
                     pingPongActivity.createPong(sarosSession.getLocalUser()));
             }
         }
@@ -237,7 +237,7 @@ public class PingPongCentral extends AbstractActivityProvider implements
 
             stats.get(remoteUser).pingsSent++;
 
-            sarosSession.sendActivity(remoteUser,
+            fireActivity(remoteUser,
                 PingPongActivity.create(sarosSession.getLocalUser()));
 
         }

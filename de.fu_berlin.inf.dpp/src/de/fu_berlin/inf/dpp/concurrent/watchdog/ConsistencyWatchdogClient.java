@@ -303,8 +303,9 @@ public class ConsistencyWatchdogClient extends AbstractActivityProvider {
                 + session.getLocalUser().getJID().getBase(),
                 filesRemaining.get());
 
-            session.sendActivity(session.getHost(), new ChecksumErrorActivity(
-                session.getLocalUser(), pathsOfHandledFiles, recoveryID));
+            fireActivity(session.getHost(),
+                new ChecksumErrorActivity(session.getLocalUser(),
+                    pathsOfHandledFiles, recoveryID));
 
             try {
                 // block until all inconsistencies are resolved

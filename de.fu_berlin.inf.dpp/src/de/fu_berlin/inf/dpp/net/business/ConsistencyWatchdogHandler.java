@@ -213,7 +213,7 @@ public class ConsistencyWatchdogHandler implements Startable {
             }
 
             // Tell the user that we sent all files
-            sarosSession.sendActivity(checksumError.getSource(),
+            activityProvider.fireActivity(checksumError.getSource(),
                 new ChecksumErrorActivity(sarosSession.getLocalUser(), null,
                     checksumError.getRecoveryID()));
         } finally {
@@ -253,7 +253,7 @@ public class ConsistencyWatchdogHandler implements Startable {
 
             try {
                 // Send the file to client
-                sarosSession.sendActivity(from,
+                activityProvider.fireActivity(from,
                     FileActivity.created(user, path, Purpose.RECOVERY));
 
                 // Immediately follow up with a new checksum
@@ -285,7 +285,7 @@ public class ConsistencyWatchdogHandler implements Startable {
         } else {
             // TODO Warn the user...
             // Tell the client to delete the file
-            sarosSession.sendActivity(from,
+            activityProvider.fireActivity(from,
                 FileActivity.removed(user, path, Purpose.RECOVERY));
             activityProvider.fireActivity(ChecksumActivity.missing(user, path));
 
