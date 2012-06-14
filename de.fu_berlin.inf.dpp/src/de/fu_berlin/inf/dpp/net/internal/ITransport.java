@@ -5,7 +5,6 @@ import java.io.IOException;
 import org.eclipse.core.runtime.SubMonitor;
 import org.jivesoftware.smack.Connection;
 
-import de.fu_berlin.inf.dpp.net.IPacketDispatcher;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.NetTransferMode;
 
@@ -23,10 +22,12 @@ public interface ITransport {
     public IByteStreamConnection connect(JID peer, SubMonitor progress)
         throws IOException, InterruptedException;
 
-    public void initializeTransport(Connection connection, JID localJID,
-        IPacketDispatcher dispatcher, IByteStreamConnectionListener listener);
+    public void prepareXMPPConnection(Connection connection,
+        IByteStreamConnectionListener listener);
 
-    public void disposeTransport();
+    public void disposeXMPPConnection();
 
-    public NetTransferMode getTransportMode();
+    public String toString();
+
+    public NetTransferMode getDefaultNetTransferMode();
 }

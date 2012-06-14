@@ -127,8 +127,14 @@ public class AddProjectToSessionWizard extends Wizard {
                 namePage.isSyncSkippingSelected(fList.getProjectID()));
         }
 
-        final Collection<IEditorPart> openEditors = getOpenEditorsForSharedProjects(sources
-            .values());
+        List<IProject> existingProjects = new ArrayList<IProject>();
+
+        for (IProject project : sources.values()) {
+            if (project != null)
+                existingProjects.add(project);
+        }
+
+        final Collection<IEditorPart> openEditors = getOpenEditorsForSharedProjects(existingProjects);
 
         final List<IEditorPart> dirtyEditors = new ArrayList<IEditorPart>();
 
