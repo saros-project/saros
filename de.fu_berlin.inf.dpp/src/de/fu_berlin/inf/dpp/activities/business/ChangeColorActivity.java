@@ -27,6 +27,18 @@ public class ChangeColorActivity extends AbstractActivity {
         receiver.receive(this);
     }
 
+    /**
+     * @JTourBusStop 3, Activity creation, Creating another representation:
+     * 
+     *               The SarosSession will turn instances of IActivity into
+     *               instances of IActivityDataObject before passing them to the
+     *               ActivitySequencer. The reason for now is that the IActivity
+     *               instances might use types that can not be easily
+     *               serialized, e.g. an instance of a User.
+     */
+    /**
+     * {@inheritDoc}
+     */
     public IActivityDataObject getActivityDataObject(ISarosSession sarosSession) {
         return new ChangeColorActivityDataObject(source.getJID(),
             target.getJID(), this.color);

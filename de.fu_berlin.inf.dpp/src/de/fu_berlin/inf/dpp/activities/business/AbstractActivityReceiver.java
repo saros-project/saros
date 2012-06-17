@@ -1,6 +1,13 @@
 package de.fu_berlin.inf.dpp.activities.business;
 
 /**
+ * @JTourBusStop 6, Activity creation, Triple dispatch abstract class:
+ * 
+ *               Instead of having to create stubs for all IActivity implementations
+ *               not handled you can extend this abstract class and just re-implement
+ *               the method for your new IActivity implementation.
+ */
+/**
  * Abstract implementation of IActivityReceiver which does nothing.
  * 
  * Useful, if just interested in some particular IActivity

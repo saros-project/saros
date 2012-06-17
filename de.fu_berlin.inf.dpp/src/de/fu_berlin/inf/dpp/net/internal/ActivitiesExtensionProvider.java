@@ -52,6 +52,16 @@ import de.fu_berlin.inf.dpp.net.TimedActivityDataObject;
 public class ActivitiesExtensionProvider extends
     XStreamExtensionProvider<TimedActivities> {
 
+    /**
+     * @JTourBusStop 7, Activity creation, IActivityDataObject registration:
+     * 
+     *               All IActivityDataObject implementations should be
+     *               registered with the XStream extensions provider, otherwise
+     *               annotations like XStreamAlias will not be honored.
+     */
+    /**
+     * {@inheritDoc}
+     */
     public ActivitiesExtensionProvider() {
         super("activityDataObjects", TimedActivities.class,
             AbstractActivityDataObject.class, EditorActivityDataObject.class,

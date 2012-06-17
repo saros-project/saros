@@ -8,6 +8,12 @@ import de.fu_berlin.inf.dpp.User;
 public abstract class AbstractActivity implements IActivity {
     protected final User source;
 
+    /**
+     * @JTourBusStop 2, Activity creation, The abstract class to extend from:
+     * 
+     *               A new activity implementation should inherit this class.
+     */
+
     public AbstractActivity(User source) {
         if (source == null)
             throw new IllegalArgumentException("Source cannot be null");

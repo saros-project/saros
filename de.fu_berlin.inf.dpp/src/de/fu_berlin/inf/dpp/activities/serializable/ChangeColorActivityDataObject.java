@@ -29,6 +29,18 @@ public class ChangeColorActivityDataObject extends AbstractActivityDataObject {
         this.color = color;
     }
 
+    /**
+     * @JTourBusStop 4, Activity creation, Going back to the IActivity:
+     * 
+     *               When the SarosSession receives an IActivityDataObject from
+     *               the ActivitySequencer it will call the method below to
+     *               create an IActivity instance again. That method converts
+     *               from JID instances to User instances.
+     * 
+     */
+    /**
+     * {@inheritDoc}
+     */
     public IActivity getActivity(ISarosSession sharedProject) {
         return new ChangeColorActivity(sharedProject.getUser(source),
             sharedProject.getUser(target), this.color);

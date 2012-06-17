@@ -39,6 +39,18 @@ import de.fu_berlin.inf.dpp.project.ISarosSession;
 public interface IActivity {
 
     /**
+     * @JTourBusStop 1, Activity creation, The activity interface:
+     * 
+     *               This is the interface for all activity implementations,
+     *               there is a specialization called IResourceActivity. An
+     *               activity implementation that refers to a resource, e.g. a
+     *               file, should implement the IResourceActivity interface.
+     * 
+     *               The only attribute of an activity instance is the source,
+     *               that is the user that caused the initial creation of the
+     *               activity instance.
+     */
+    /**
      * @JTourBusStop 4, Some Basics:
      * 
      *               When a session has begun, messages are passed between all

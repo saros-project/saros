@@ -1,6 +1,14 @@
 package de.fu_berlin.inf.dpp.activities.business;
 
 /**
+ * @JTourBusStop 5, Activity creation, Triple dispatch interface:
+ * 
+ *               The below interface is used for the triple dispatch of the
+ *               activity providers. For a new IActivity implementation you will
+ *               need to add a new receive overload to the interface and fix the
+ *               compilation in the AbstractActivityReceiver class.
+ */
+/**
  * A Receiver is an interface for handling multiple dispatch in Java.
  * 
  * In our case we want to call one of the specialized receive methods in
