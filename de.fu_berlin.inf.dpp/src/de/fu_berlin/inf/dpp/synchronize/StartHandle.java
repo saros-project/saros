@@ -67,6 +67,15 @@ public class StartHandle {
     }
 
     /**
+     * @JTourBusStop 4, StopManager:
+     * 
+     *               When a remote user has been stopped by StopManager#stop() a
+     *               StartHandle will be returned. Using the
+     *               StartHandle#startAndAwait() method on the handle one can
+     *               allow a remote user to make modifications again.
+     */
+
+    /**
      * Notifies the StopManager, that the operation for which this StartHandle
      * was returned by a call to stop has finished.
      * 

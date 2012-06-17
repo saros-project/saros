@@ -108,6 +108,17 @@ public final class StopManager extends AbstractActivityProvider implements
      *               This class extends the AbstractActivityReceiver and
      *               overrides the method with the right overload.
      */
+
+    /**
+     * @JTourBusStop 2, StopManager:
+     * 
+     *               This is where lock/unlock requests and acknowledgments will
+     *               be handled. When there are outgoing lock requests the
+     *               expected answers will be put into the
+     *               expectedAcknowledgements set and when the acknowledgment
+     *               arrives it will be removed from the set. For incoming lock
+     *               requests lockProject(true) will be called.
+     */
     protected IActivityReceiver activityDataObjectReceiver = new AbstractActivityReceiver() {
         @Override
         public void receive(final StopActivity stopActivity) {
@@ -267,6 +278,20 @@ public final class StopManager extends AbstractActivityProvider implements
         }
         return resultingHandles;
     }
+
+    /**
+     * @JTourBusStop 1, StopManager:
+     * 
+     *               Sometimes it is necessary to prevent others from making
+     *               modifications, e.g. during the OutgoingProjectNegotiation
+     *               or during the recovery by ConsistencyWatchdogHandler and
+     *               this class is responsible for managing this process.
+     *               Objects that want to implement a lock need to register a
+     *               Blockable with the StopManager, the Blockable will be
+     *               called when the StopManager is locked or unlocked. The stop
+     *               method will either stop a single user or a list of users
+     *               and then will return a single handle or a list of handles.
+     */
 
     /**
      * Blocking method that asks the given user to halt all user-input and
