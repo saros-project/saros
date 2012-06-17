@@ -3,6 +3,15 @@ package de.fu_berlin.inf.dpp.project;
 import de.fu_berlin.inf.dpp.activities.business.IActivity;
 
 /**
+ * @JTourBusStop 1, Activity sending, The IActivityProvider interface:
+ *
+ *      Activities are used to exchange information in a session. A class that
+ *      creates or handles activities must implement this interface. Activities
+ *      are "sent" by invoking IActivityListener#activityCreated on the registered
+ *      listeners.
+ */
+
+/**
  * An activity provider is responsible for creating and executing one or more
  * activity types.<br>
  * <br>

@@ -25,6 +25,14 @@ public abstract class AbstractActivityProvider implements IActivityProvider {
         this.activityListeners.remove(listener);
     }
 
+    /**
+     * @JTourBusStop 2, Activity sending, The abstract class to extend:
+     * 
+     *               But instead of implementing the IActivityProvider interface
+     *               one should extend the AbstractActivityProvider class and
+     *               call the fireActivity method on newly created activities to
+     *               inform all listeners.
+     */
     public void fireActivity(IActivity activity) {
         for (IActivityListener activityListener : activityListeners) {
             activityListener.activityCreated(activity);

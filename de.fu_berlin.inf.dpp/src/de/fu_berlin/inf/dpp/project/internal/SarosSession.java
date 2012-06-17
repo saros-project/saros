@@ -178,6 +178,14 @@ public class SarosSession implements ISarosSession, Disposable {
     public boolean cancelActivityDispatcher = false;
 
     private final IActivityListener activityListener = new IActivityListener() {
+
+        /**
+         * @JTourBusStop 5, Activity sending, Forwarding the IActivity:
+         * 
+         *               This is where the SarosSession will receive the
+         *               activity, it is not part of the ISarosSession interface
+         *               to avoid misuse.
+         */
         public void activityCreated(final IActivity activityData) {
             Utils.runSafeSWTSync(log, new Runnable() {
 
@@ -741,6 +749,15 @@ public class SarosSession implements ISarosSession, Disposable {
         freeColors.add(colorID);
     }
 
+    /**
+     * @JTourBusStop 7, Activity sending, Incoming activities:
+     * 
+     *               The ActivitySequencer will call this function for new
+     *               activities, they are transformed again, forwarded and put
+     *               into the queue of the activity dispatcher.
+     * 
+     */
+
     public void exec(List<IActivityDataObject> activityDataObjects) {
         // Convert me
 
@@ -854,6 +871,13 @@ public class SarosSession implements ISarosSession, Disposable {
         handleActivityCreated(activity);
     }
 
+    /**
+     * @JTourBusStop 6, Activity sending, Transforming the IActivity:
+     * 
+     *               This function will transform activities and then forward
+     *               them to the ActivitySequencer. E.g. this will turn
+     *               TextEditActivity into Jupiter actitivities.
+     */
     private void handleActivityCreated(IActivity activity) {
 
         assert Utils.isSWT() : "Must be called from the SWT Thread"; //$NON-NLS-1$

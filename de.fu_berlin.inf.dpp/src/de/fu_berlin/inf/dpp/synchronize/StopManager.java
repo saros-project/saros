@@ -102,6 +102,12 @@ public final class StopManager extends AbstractActivityProvider implements
         this.sarosSession = session;
     }
 
+    /**
+     * @JTourBusStop 9, Activity sending, Triple dispatch:
+     * 
+     *               This class extends the AbstractActivityReceiver and
+     *               overrides the method with the right overload.
+     */
     protected IActivityReceiver activityDataObjectReceiver = new AbstractActivityReceiver() {
         @Override
         public void receive(final StopActivity stopActivity) {
@@ -413,9 +419,22 @@ public final class StopManager extends AbstractActivityProvider implements
             handle.getUser(), Type.UNLOCKREQUEST, State.INITIATED,
             handle.getHandleID());
 
+        /**
+         * @JTourBusStop 4, Activity sending, Firing the activity:
+         * 
+         *               The following fires the activity and all listeners will
+         *               be called.
+         */
         fireActivity(activity);
     }
 
+    /**
+     * @JTourBusStop 8, Activity sending, Handling activities:
+     * 
+     *               The activity dispatcher of the session has called us. This
+     *               class will use the triple dispatch to filter for the
+     *               activities the class is interested in.
+     */
     /**
      * {@inheritDoc}
      */
@@ -503,6 +522,14 @@ public final class StopManager extends AbstractActivityProvider implements
 
     @Override
     public void start() {
+        /**
+         * @JTourBusStop 3, Activity sending, An example of an
+         *               IActivityProvider:
+         * 
+         *               This is the canonical way of registering an activity
+         *               provider with the session. The session will install a
+         *               listener on this provider.
+         */
         sarosSession.addActivityProvider(this);
     }
 
