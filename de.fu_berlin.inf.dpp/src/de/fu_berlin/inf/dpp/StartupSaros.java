@@ -49,7 +49,9 @@ public class StartupSaros implements IStartup {
 
     public void earlyStartup() {
 
-        showSarosView();
+        if (xmppAccountStore.isEmpty()) {
+            showSarosView();
+        }
 
         Integer port = Integer.getInteger("de.fu_berlin.inf.dpp.testmode");
 
