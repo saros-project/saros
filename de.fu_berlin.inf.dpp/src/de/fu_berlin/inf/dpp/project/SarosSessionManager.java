@@ -728,7 +728,7 @@ public class SarosSessionManager implements ISarosSessionManager {
 
     public void addSarosSessionListener(ISarosSessionListener listener) {
         if (!this.sarosSessionListeners.contains(listener)) {
-            this.sarosSessionListeners.add(0, listener);
+            this.sarosSessionListeners.add(listener);
         }
     }
 
