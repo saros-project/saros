@@ -575,4 +575,8 @@ public class FileStub implements IFile {
         return false;
     }
 
+    public void accept(IResourceProxyVisitor visitor, int depth, int memberFlags) {
+        throw new RuntimeException("Unexpected call to Stub");
+    }
+
 }
