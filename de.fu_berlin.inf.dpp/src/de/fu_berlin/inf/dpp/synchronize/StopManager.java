@@ -105,9 +105,7 @@ public final class StopManager extends AbstractActivityProvider implements
     protected IActivityReceiver activityDataObjectReceiver = new AbstractActivityReceiver() {
         @Override
         public void receive(final StopActivity stopActivity) {
-            if (sarosSession == null)
-                throw new IllegalStateException(
-                    "Cannot receive StopActivities without a shared project");
+            assert sarosSession != null;
 
             User user = stopActivity.getRecipient();
             if (!user.isInSarosSession() || user.isRemote())
@@ -117,14 +115,14 @@ public final class StopManager extends AbstractActivityProvider implements
             if (stopActivity.getType() == Type.LOCKREQUEST) {
 
                 /*
-                 * local user locks his project and adds a startHandle so he
-                 * knows he is locked. Then he acknowledges
+                 * local user locks his session and adds a startHandle so he
+                 * knows he is locked. Then he acknowledges.
                  */
                 if (stopActivity.getState() == State.INITIATED) {
                     addStartHandle(generateStartHandle(stopActivity));
-                    // locks project and acknowledges
+                    // locks session and acknowledges
 
-                    lockProject(true);
+                    lockSession(true);
                     fireActivity(stopActivity
                         .generateAcknowledgment(sarosSession.getLocalUser()));
 
@@ -290,10 +288,7 @@ public final class StopManager extends AbstractActivityProvider implements
     public StartHandle stop(User user, String cause,
         final IProgressMonitor progress) throws CancellationException,
         InterruptedException {
-
-        if (sarosSession == null)
-            throw new IllegalStateException(
-                "Stop cannot be called without a shared project");
+        assert sarosSession != null;
 
         // Creating StopActivity for asking user to stop
         User localUser = sarosSession.getLocalUser();
@@ -307,7 +302,7 @@ public final class StopManager extends AbstractActivityProvider implements
 
         // Short cut if affected user is local
         if (user.isLocal()) {
-            lockProject(true);
+            lockSession(true);
             return handle;
         }
 
@@ -351,10 +346,10 @@ public final class StopManager extends AbstractActivityProvider implements
      * editing activityDataObjects (FileActivities and TextEditActivities).
      * 
      * @param lock
-     *            if true the project gets locked, else it gets unlocked
+     *            if true the session gets locked, else it gets unlocked
      */
     // TODO: Make private when StoppedAction is removed.
-    public void lockProject(boolean lock) {
+    public void lockSession(boolean lock) {
         for (Blockable blockable : blockables) {
             if (lock)
                 blockable.block();
@@ -365,7 +360,7 @@ public final class StopManager extends AbstractActivityProvider implements
     }
 
     /**
-     * Unlocks project without sending an acknowledgment if there don't exist
+     * Unlocks session without sending an acknowledgment if there don't exist
      * any more startHandles.
      * 
      * @return true if the affected user is unlocked afterwards
@@ -392,7 +387,7 @@ public final class StopManager extends AbstractActivityProvider implements
             return false;
         }
 
-        lockProject(false);
+        lockSession(false);
         return true;
     }
 
@@ -403,9 +398,7 @@ public final class StopManager extends AbstractActivityProvider implements
      *            the startHandle whose start() initiated the unlocking
      */
     private void initiateUnlock(StartHandle handle) {
-        if (sarosSession == null)
-            throw new IllegalStateException(
-                "Cannot initiate unlock without a shared project");
+        assert sarosSession != null;
 
         // short cut for local user
         if (handle.getUser().isLocal()) {
@@ -478,7 +471,7 @@ public final class StopManager extends AbstractActivityProvider implements
     }
 
     public void sessionStopped() {
-        lockProject(false);
+        lockSession(false);
         clearExpectedAcknowledgments();
     }
 

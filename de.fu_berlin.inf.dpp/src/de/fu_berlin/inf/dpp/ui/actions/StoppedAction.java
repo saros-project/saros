@@ -22,10 +22,10 @@ import de.fu_berlin.inf.dpp.util.ValueChangeListener;
 
 /**
  * The icon of this action is used as visual indicator for the user if the
- * {@link StopManager} blocked the project.
+ * {@link StopManager} blocked the session.
  * 
  * Pressing the button has no effect for users, unless eclipse is started with
- * assertions enabled. Then it is possible to manually unblock the project for
+ * assertions enabled. Then it is possible to manually unblock the session for
  * debugging purposes.
  */
 @Component(module = "action")
@@ -95,9 +95,9 @@ public class StoppedAction extends Action implements Disposable {
         boolean isDebug = false;
         assert (isDebug = true) == true;
         if (isDebug && sessionManager.getSarosSession() != null) {
-            log.warn("Manually unblocking project."); //$NON-NLS-1$
+            log.warn("Manually unblocking session."); //$NON-NLS-1$
             sessionManager.getSarosSession().getStopManager()
-                .lockProject(false);
+                .lockSession(false);
         }
     }
 
