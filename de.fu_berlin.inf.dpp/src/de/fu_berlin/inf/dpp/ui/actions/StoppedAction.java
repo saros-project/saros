@@ -88,16 +88,16 @@ public class StoppedAction extends Action implements Disposable {
 
     @Override
     public void run() {
-        // The Action should be disabled when there is no session.
-        assert sessionManager.getSarosSession() != null;
+        ISarosSession session = sessionManager.getSarosSession();
+        if (session == null)
+            return;
 
         // Attention: Assertion with side effect ahead.
         boolean isDebug = false;
         assert (isDebug = true) == true;
-        if (isDebug && sessionManager.getSarosSession() != null) {
+        if (isDebug) {
             log.warn("Manually unblocking session."); //$NON-NLS-1$
-            sessionManager.getSarosSession().getStopManager()
-                .lockSession(false);
+            session.getStopManager().lockSession(false);
         }
     }
 
