@@ -105,7 +105,6 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
      */
     public static final int MAX_TRANSFER_RETRIES = 4;
 
-    public static final int MAX_PARALLEL_SENDS = 10;
     public static final int FORCEDPART_OFFLINEUSER_AFTERSECS = 60;
     public static final int MAX_XMPP_MESSAGE_SIZE = 16378;
 
