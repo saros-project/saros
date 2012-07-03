@@ -237,7 +237,8 @@ public class MUCSession {
          * ever necessary.
          */
         try {
-            log.debug("Trying to create room.");
+            log.debug("Trying to create room on server "
+                + this.preferences.getService());
             muc.create(connection.getUser());
             this.createdRoom = true;
             joined = true;

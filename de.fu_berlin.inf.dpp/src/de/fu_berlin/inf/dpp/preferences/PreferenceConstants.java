@@ -155,7 +155,7 @@ public class PreferenceConstants {
      * Preferences for Communication
      */
 
-    /** Chatserver for MUC e.g. conference.jabber.ccc.de **/
+    /** Preference Key for chatserver (used for MUC) **/
     public static final String CHATSERVER = "chatserver";
 
     /**
