@@ -757,7 +757,9 @@ public class EnterProjectNamePage extends WizardPage {
                 this.errorProjectNames.put(projectID, errorMessage);
 
             } else {
-                if (!EnterProjectNamePageUtils.projectNameIsUnique(newText)) {
+
+                if (ResourcesPlugin.getWorkspace().getRoot()
+                    .getProject(newText).exists()) {
 
                     if (this.copyCheckboxes.get(projectID).getSelection()) {
                         errorMessage = setPageCompleteTargetProject(
