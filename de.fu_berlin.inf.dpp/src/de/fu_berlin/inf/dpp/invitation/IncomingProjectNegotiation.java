@@ -622,7 +622,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
     /**
      * This method does <strong>not</strong> execute the cancellation but only
      * sets the {@link #cancellationCause}. It should be called if the
-     * cancellation was initated by the <strong>local</strong> user. The
+     * cancellation was initiated by the <strong>local</strong> user. The
      * cancellation will be ignored if the invitation has already been cancelled
      * before. <br>
      * In order to cancel the invitation process {@link #executeCancellation()}
