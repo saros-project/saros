@@ -17,6 +17,7 @@ import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.jivesoftware.smack.Roster;
+import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.packet.Presence;
 import org.jivesoftware.smackx.ChatState;
 import org.picocontainer.annotations.Inject;
@@ -39,7 +40,9 @@ import de.fu_berlin.inf.dpp.editor.annotations.SarosAnnotation;
 import de.fu_berlin.inf.dpp.net.IRosterListener;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.RosterTracker;
+import de.fu_berlin.inf.dpp.project.AbstractSarosSessionListener;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
+import de.fu_berlin.inf.dpp.project.ISarosSessionListener;
 import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.ui.ImageManager;
 import de.fu_berlin.inf.dpp.ui.Messages;
@@ -81,6 +84,10 @@ public class ChatRoomsComposite extends ListExplanatoryComposite {
     protected ListExplanation howTo = new ListExplanation(SWT.ICON_INFORMATION,
         "To share projects you can either:", "Right-click on a project",
         "Right-click on a buddy", "Use the Saros menu in the Eclipse menu bar");
+
+    protected ListExplanation chatError;
+
+    protected boolean isSessionRunning;
 
     protected RosterTracker rosterTracker;
 
@@ -140,6 +147,37 @@ public class ChatRoomsComposite extends ListExplanatoryComposite {
         }
     };
 
+    protected ISarosSessionListener sessionListener = new AbstractSarosSessionListener() {
+
+        @Override
+        public void sessionStarting(ISarosSession session) {
+            Utils.runSafeSWTAsync(log, new Runnable() {
+                @Override
+                public void run() {
+                    isSessionRunning = true;
+                }
+            });
+        }
+
+        @Override
+        public void sessionEnded(ISarosSession session) {
+            Utils.runSafeSWTAsync(log, new Runnable() {
+                @Override
+                public void run() {
+                    isSessionRunning = false;
+
+                    if (ChatRoomsComposite.this.isDisposed())
+                        return;
+
+                    if (chatError == null)
+                        return;
+
+                    showErrorMessage(null);
+                }
+            });
+        }
+    };
+
     /**
      * Adds/removes an {@link IMUCSessionListener} to/from the
      * {@link MUCManagerSingletonWrapperChatView} depending on its availability.
@@ -153,6 +191,27 @@ public class ChatRoomsComposite extends ListExplanatoryComposite {
         @Override
         public void mucSessionLeft(MUCSession mucSession) {
             detachFromMUCSession(mucSession);
+        }
+
+        @Override
+        public void mucSessionConnectionError(MUCSession mucSession,
+            XMPPException exception) {
+
+            final String errorMessage = "Could not connect to "
+                + mucSession.getPreferences().getService()
+                + "\nNo chat will be available for your current session";
+
+            Utils.runSafeSWTAsync(log, new Runnable() {
+
+                @Override
+                public void run() {
+                    if (ChatRoomsComposite.this.isDisposed())
+                        return;
+
+                    showErrorMessage(errorMessage);
+                }
+
+            });
         }
     };
 
@@ -308,6 +367,7 @@ public class ChatRoomsComposite extends ListExplanatoryComposite {
 
         SarosPluginContext.initComponent(this);
 
+        this.sessionManager.addSarosSessionListener(sessionListener);
         this.editorManager.addSharedEditorListener(sharedEditorListener);
         this.mucManager.addMUCManagerListener(mucManagerListener);
 
@@ -329,6 +389,9 @@ public class ChatRoomsComposite extends ListExplanatoryComposite {
          * global MUCSession. Therefore we need to correctly validate the
          * MUCSession's state when this ChatView is reopened.
          */
+
+        isSessionRunning = sessionManager.getSarosSession() != null;
+
         if (this.joinedSession()) {
             this.attachToMUCSession(mucManager.getMUCSession());
             chatRoom1 = new CTabItem(chatRooms, SWT.NONE);
@@ -348,6 +411,8 @@ public class ChatRoomsComposite extends ListExplanatoryComposite {
         this.addDisposeListener(new DisposeListener() {
 
             public void widgetDisposed(DisposeEvent e) {
+
+                sessionManager.removeSarosSessionListener(sessionListener);
 
                 chatControl.removeChatControlListener(chatControlListener);
                 if (mucManager.getMUCSession() != null) {
@@ -486,4 +551,32 @@ public class ChatRoomsComposite extends ListExplanatoryComposite {
     public ChatControl getActiveChatControl() {
         return chatControl;
     }
+
+    /**
+     * Hides the explanation window and shows a error message instead. Calling
+     * this method with a <code>null</code> argument or while no session is
+     * running will display the explanation window instead.
+     * 
+     * @param message
+     *            the message to show
+     * 
+     * @Note must be called within the SWT thread.
+     */
+    protected void showErrorMessage(String message) {
+        assert Utils.isSWT();
+
+        // FIXME there is no dispose method
+        // if (chatError != null)
+        // chatError.dispose();
+
+        if (!isSessionRunning || message == null) {
+            chatError = null;
+            showExplanation(howTo);
+            return;
+        }
+
+        chatError = new ListExplanation(SWT.ICON_ERROR, message);
+        showExplanation(chatError);
+    }
+
 }
