@@ -1,6 +1,7 @@
 package de.fu_berlin.inf.dpp.net.internal.extensions;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 
 import java.io.IOException;
 import java.io.StringReader;
@@ -121,6 +122,28 @@ public class ActivitiesExtensionProviderTest {
             timedActivities);
 
         assertRoundtrip(extension);
+    }
+
+    @Test
+    public void testNoPrettyPrintInMarshalledObjects() throws Exception {
+        IActivityDataObject activityDataObject = new EditorActivityDataObject(
+            jid, EditorActivity.Type.Activated, null);
+
+        List<TimedActivityDataObject> timedActivities = new ArrayList<TimedActivityDataObject>(
+            2);
+        timedActivities.add(new TimedActivityDataObject(activityDataObject,
+            jid, 20));
+        timedActivities.add(new TimedActivityDataObject(activityDataObject,
+            jid, 22));
+
+        PacketExtension extension = aProvider.create("Session-ID",
+            timedActivities);
+
+        String marshalled = extension.toXML();
+        assertFalse(marshalled.contains("\r"));
+        assertFalse(marshalled.contains("\n"));
+        assertFalse(marshalled.contains("\t"));
+        assertFalse(marshalled.contains("  "));
     }
 
     @Test

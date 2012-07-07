@@ -20,6 +20,7 @@
 package de.fu_berlin.inf.dpp.net.internal;
 
 import java.io.IOException;
+import java.io.StringWriter;
 
 import org.apache.commons.lang.ObjectUtils;
 import org.apache.log4j.Logger;
@@ -36,6 +37,7 @@ import org.xmlpull.v1.XmlPullParser;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import com.thoughtworks.xstream.annotations.XStreamOmitField;
+import com.thoughtworks.xstream.io.xml.CompactWriter;
 
 import de.fu_berlin.inf.dpp.net.internal.extensions.DropSilentlyPacketExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.PacketExtensionUtils;
@@ -154,7 +156,9 @@ public class XStreamExtensionProvider<T> implements PacketExtensionProvider,
         }
 
         public String toXML() {
-            return provider.xstream.toXML(this);
+            StringWriter writer = new StringWriter(512);
+            provider.xstream.marshal(this, new CompactWriter(writer));
+            return writer.toString();
         }
     }
 
