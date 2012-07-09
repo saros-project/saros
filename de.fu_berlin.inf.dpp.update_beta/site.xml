@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<site>
+   <description url="http://dpp.sf.net/update-beta">
+      Site to install the Beta version of the Saros Feature for Distributed Party Programming
+   </description>
+   <feature url="features/de.fu_berlin.inf.dpp.feature_12.7.6.TESTING.jar" id="de.fu_berlin.inf.dpp.feature" version="12.7.6.TESTING">
+      <category name="DPP_beta"/>
+   </feature>
+   <archive path="plugins/de.fu_berlin.inf.dpp.12.7.6.TESTING.jar" url="plugins/de.fu_berlin.inf.dpp.12.7.6.TESTING.jar"/>
+   <archive path="plugins/de.fu_berlin.inf.dpp.whiteboard_12.7.6.TESTING.jar" url="plugins/de.fu_berlin.inf.dpp.whiteboard_12.7.6.TESTING.jar"/>
+   <archive path="plugins/de.fu_berlin.inf.nebula_12.7.6.TESTING.jar" url="plugins/de.fu_berlin.inf.nebula_12.7.6.TESTING.jar"/>
+   <category-def name="DPP_beta" label="Saros Beta"/>
+</site>
