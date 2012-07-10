@@ -173,7 +173,7 @@ public class XMPPAccountStoreTest {
         assertEquals(account.getDomain(), "b");
         assertEquals(account.getUsername(), "b");
         assertEquals(account.getPort(), 5);
-        assertEquals(account.useTSL(), false);
+        assertEquals(account.useTLS(), false);
         assertEquals(account.useSASL(), false);
     }
 

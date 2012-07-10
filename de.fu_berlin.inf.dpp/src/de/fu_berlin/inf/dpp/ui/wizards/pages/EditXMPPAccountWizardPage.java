@@ -56,7 +56,7 @@ public class EditXMPPAccountWizardPage extends WizardPage {
     private final String initialServer;
     private final String initialPort;
 
-    private boolean useTSL;
+    private boolean useTLS;
     private boolean useSASL;
 
     public EditXMPPAccountWizardPage(XMPPAccount account) {
@@ -76,7 +76,7 @@ public class EditXMPPAccountWizardPage extends WizardPage {
         else
             initialPort = String.valueOf(account.getPort());
 
-        useTSL = account.useTSL();
+        useTLS = account.useTLS();
         useSASL = account.useSASL();
 
         wasServerValid = initialServer.length() != 0;
@@ -104,7 +104,7 @@ public class EditXMPPAccountWizardPage extends WizardPage {
         enterXMPPAccountComposite.setPassword(initialPassword);
         enterXMPPAccountComposite.setServer(initialServer);
         enterXMPPAccountComposite.setPort(initialPort);
-        enterXMPPAccountComposite.setUsingTSL(useTSL);
+        enterXMPPAccountComposite.setUsingTLS(useTLS);
         enterXMPPAccountComposite.setUsingSASL(useSASL);
     }
 
@@ -257,8 +257,8 @@ public class EditXMPPAccountWizardPage extends WizardPage {
         return enterXMPPAccountComposite.getPort();
     }
 
-    public boolean isUsingTSL() {
-        return enterXMPPAccountComposite.isUsingTSL();
+    public boolean isUsingTLS() {
+        return enterXMPPAccountComposite.isUsingTLS();
     }
 
     public boolean isUsingSASL() {

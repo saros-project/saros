@@ -117,11 +117,11 @@ public class AddXMPPAccountWizard extends Wizard {
             else
                 port = 0;
 
-            boolean useTSL = enterXMPPAccountWizardPage.isUsingTSL();
+            boolean useTLS = enterXMPPAccountWizardPage.isUsingTLS();
             boolean useSASL = enterXMPPAccountWizardPage.isUsingSASL();
 
             accountStore.createAccount(username, password, domain, server,
-                port, useTSL, useSASL);
+                port, useTLS, useSASL);
         }
 
         if (accountStore.getAllAccounts().size() == 1

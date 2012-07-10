@@ -533,7 +533,7 @@ public class Saros extends AbstractUIPlugin {
     }
 
     protected ConnectionConfiguration createConnectionConfiguration(
-        String domain, String server, int port, boolean useTSL, boolean useSASL) {
+        String domain, String server, int port, boolean useTLS, boolean useSASL) {
 
         ProxyInfo proxyInfo;
 
@@ -558,7 +558,7 @@ public class Saros extends AbstractUIPlugin {
 
         connectionConfiguration.setSASLAuthenticationEnabled(useSASL);
 
-        if (!useTSL)
+        if (!useTLS)
             connectionConfiguration
                 .setSecurityMode(ConnectionConfiguration.SecurityMode.disabled);
 
@@ -625,7 +625,7 @@ public class Saros extends AbstractUIPlugin {
         String domain = account.getDomain();
         String server = account.getServer();
         int port = account.getPort();
-        boolean useTSL = account.useTSL();
+        boolean useTLS = account.useTLS();
         boolean useSASL = account.useSASL();
 
         /*
@@ -640,7 +640,7 @@ public class Saros extends AbstractUIPlugin {
 
         try {
             getSarosNet().connect(
-                createConnectionConfiguration(domain, server, port, useTSL,
+                createConnectionConfiguration(domain, server, port, useTLS,
                     useSASL), username, password, failSilently);
         } catch (IllegalArgumentException e) {
             log.info("Illegal argument: " + e.getMessage()); //$NON-NLS-1$

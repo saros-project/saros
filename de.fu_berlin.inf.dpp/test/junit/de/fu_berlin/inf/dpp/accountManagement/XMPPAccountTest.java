@@ -29,7 +29,7 @@ public class XMPPAccountTest {
         assertEquals(alice0.getDomain(), "localhost");
         assertEquals(alice0.getUsername(), "alice");
         assertEquals(alice0.getPort(), 1);
-        assertEquals(alice0.useTSL(), true);
+        assertEquals(alice0.useTLS(), true);
         assertEquals(alice0.useSASL(), true);
 
         // make code coverage happy

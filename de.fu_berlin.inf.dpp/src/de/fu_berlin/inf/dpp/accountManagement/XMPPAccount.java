@@ -19,11 +19,11 @@ public final class XMPPAccount implements Serializable {
 
     private int port;
 
-    private boolean useTSL;
+    private boolean useTLS;
     private boolean useSASL;
 
     XMPPAccount(String username, String password, String domain, String server,
-        int port, boolean useTSL, boolean useSASL) {
+        int port, boolean useTLS, boolean useSASL) {
 
         if (username == null)
             throw new NullPointerException("user name is null");
@@ -66,7 +66,7 @@ public final class XMPPAccount implements Serializable {
         this.port = port;
 
         this.useSASL = useSASL;
-        this.useTSL = useTSL;
+        this.useTLS = useTLS;
     }
 
     public boolean useSASL() {
@@ -77,12 +77,12 @@ public final class XMPPAccount implements Serializable {
         this.useSASL = useSASL;
     }
 
-    public boolean useTSL() {
-        return this.useTSL;
+    public boolean useTLS() {
+        return this.useTLS;
     }
 
-    void setUseTSL(boolean useTSL) {
-        this.useTSL = useTSL;
+    void setUseTLS(boolean useTLS) {
+        this.useTLS = useTLS;
     }
 
     public int getPort() {
@@ -128,7 +128,7 @@ public final class XMPPAccount implements Serializable {
     @Override
     public String toString() {
         return "username: '" + username + "', domain: '" + domain
-            + "', server: '" + server + "', port: " + port + ", TSL: " + useTSL
+            + "', server: '" + server + "', port: " + port + ", TLS: " + useTLS
             + ", SASL: " + useSASL + " : ";
     }
 

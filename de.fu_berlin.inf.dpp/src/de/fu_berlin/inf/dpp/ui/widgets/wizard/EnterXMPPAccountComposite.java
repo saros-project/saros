@@ -42,7 +42,7 @@ public class EnterXMPPAccountComposite extends Composite {
     private Text serverText;
     private Text portText;
 
-    private Button useTSLButton;
+    private Button useTLSButton;
     private Button useSASLButton;
 
     @Inject
@@ -110,8 +110,8 @@ public class EnterXMPPAccountComposite extends Composite {
         portText = new Text(expandableCompositeContent, SWT.BORDER);
         portText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
 
-        useTSLButton = new Button(expandableCompositeContent, SWT.CHECK);
-        useTSLButton.setText("Use TSL");
+        useTLSButton = new Button(expandableCompositeContent, SWT.CHECK);
+        useTLSButton.setText("Use TLS");
 
         useSASLButton = new Button(expandableCompositeContent, SWT.CHECK);
         useSASLButton.setText("Use SASL");
@@ -153,7 +153,7 @@ public class EnterXMPPAccountComposite extends Composite {
         passwordText.setEnabled(enabled);
         serverText.setEnabled(enabled);
         portText.setEnabled(enabled);
-        useTSLButton.setEnabled(enabled);
+        useTLSButton.setEnabled(enabled);
         useSASLButton.setEnabled(enabled);
     }
 
@@ -215,12 +215,12 @@ public class EnterXMPPAccountComposite extends Composite {
         }
     }
 
-    public boolean isUsingTSL() {
-        return useTSLButton.getSelection();
+    public boolean isUsingTLS() {
+        return useTLSButton.getSelection();
     }
 
-    public void setUsingTSL(boolean use) {
-        useTSLButton.setSelection(use);
+    public void setUsingTLS(boolean use) {
+        useTLSButton.setSelection(use);
     }
 
     public boolean isUsingSASL() {

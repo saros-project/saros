@@ -61,11 +61,11 @@ public class EditXMPPAccountWizard extends Wizard {
         else
             port = 0;
 
-        boolean useTSL = editXMPPAccountWizardPage.isUsingTSL();
+        boolean useTLS = editXMPPAccountWizardPage.isUsingTLS();
         boolean useSASL = editXMPPAccountWizardPage.isUsingSASL();
 
         xmppAccountStore.changeAccountData(account, username, password, domain,
-            server, port, useTSL, useSASL);
+            server, port, useTLS, useSASL);
 
         return true;
     }

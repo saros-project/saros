@@ -173,7 +173,7 @@ public class EnterXMPPAccountWizardPage extends WizardPage {
         gridData2.verticalIndent = 23;
         gridData2.minimumWidth = 350;
         enterXMPPAccountComposite.setLayoutData(gridData2);
-        enterXMPPAccountComposite.setUsingTSL(true);
+        enterXMPPAccountComposite.setUsingTLS(true);
         enterXMPPAccountComposite.setUsingSASL(true);
 
         return existingAccountColumnGroup;
@@ -229,7 +229,7 @@ public class EnterXMPPAccountWizardPage extends WizardPage {
             enterXMPPAccountComposite.setPassword(account.getPassword());
             enterXMPPAccountComposite.setServer("");
             enterXMPPAccountComposite.setPort("");
-            enterXMPPAccountComposite.setUsingTSL(true);
+            enterXMPPAccountComposite.setUsingTLS(true);
             enterXMPPAccountComposite.setUsingSASL(true);
         }
 
@@ -391,8 +391,8 @@ public class EnterXMPPAccountWizardPage extends WizardPage {
         return enterXMPPAccountComposite.getPort();
     }
 
-    public boolean isUsingTSL() {
-        return enterXMPPAccountComposite.isUsingTSL();
+    public boolean isUsingTLS() {
+        return enterXMPPAccountComposite.isUsingTLS();
     }
 
     public boolean isUsingSASL() {

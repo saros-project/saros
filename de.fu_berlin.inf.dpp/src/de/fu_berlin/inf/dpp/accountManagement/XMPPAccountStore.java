@@ -313,8 +313,8 @@ public final class XMPPAccountStore {
      *            string if not used
      * @param port
      *            the port of the server or 0 if not used
-     * @param useTSL
-     *            if the connection should be secured using TSL
+     * @param useTLS
+     *            if the connection should be secured using TLS
      * @param useSASL
      *            if the authentication should be negotiated using SASL
      * @throws NullPointerException
@@ -331,10 +331,10 @@ public final class XMPPAccountStore {
 
     public synchronized XMPPAccount createAccount(String username,
         String password, String domain, String server, int port,
-        boolean useTSL, boolean useSASL) {
+        boolean useTLS, boolean useSASL) {
 
         XMPPAccount newAccount = new XMPPAccount(username, password, domain,
-            server, port, useTSL, useSASL);
+            server, port, useTLS, useSASL);
 
         if (accounts.contains(newAccount))
             throw new IllegalArgumentException("account already exists");
@@ -362,8 +362,8 @@ public final class XMPPAccountStore {
      *            the server ip / name
      * @param port
      *            the port of the server
-     * @param useTSL
-     *            if the connection should be secured using TSL
+     * @param useTLS
+     *            if the connection should be secured using TLS
      * @param useSASL
      *            if the authentication should be negotiated using SASL
      * @throws IllegalArgumentException
@@ -377,10 +377,10 @@ public final class XMPPAccountStore {
      */
     public synchronized void changeAccountData(XMPPAccount account,
         String username, String password, String domain, String server,
-        int port, boolean useTSL, boolean useSASL) {
+        int port, boolean useTLS, boolean useSASL) {
 
         XMPPAccount changedAccount = new XMPPAccount(username, password,
-            domain, server, port, useTSL, useSASL);
+            domain, server, port, useTLS, useSASL);
 
         accounts.remove(account);
 
@@ -397,7 +397,7 @@ public final class XMPPAccountStore {
         account.setServer(server);
         account.setPort(port);
         account.setUseSASL(useSASL);
-        account.setUseTSL(useTSL);
+        account.setUseTLS(useTLS);
 
         accounts.add(account);
 
