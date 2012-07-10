@@ -1,2 +1,8 @@
 bin/
+/de.fu_berlin.inf.dpp.update/logs.zip
+/de.fu_berlin.inf.dpp.update/features/
+/de.fu_berlin.inf.dpp.update/plugins/
+/de.fu_berlin.inf.dpp.update_beta/logs.zip
+/de.fu_berlin.inf.dpp.update_beta/features/
+/de.fu_berlin.inf.dpp.update_beta/plugins/
 /de.fu_berlin.inf.dpp/test/framework/stf/src/de/fu_berlin/inf/dpp/stf/client/configuration.properties
