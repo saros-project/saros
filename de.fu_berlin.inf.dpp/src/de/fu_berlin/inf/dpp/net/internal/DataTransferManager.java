@@ -38,7 +38,6 @@ import de.fu_berlin.inf.dpp.net.RosterTracker;
 import de.fu_berlin.inf.dpp.net.SarosNet;
 import de.fu_berlin.inf.dpp.net.business.DispatchThreadContext;
 import de.fu_berlin.inf.dpp.net.upnp.IUPnPService;
-import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
 import de.fu_berlin.inf.dpp.util.StopWatch;
 import de.fu_berlin.inf.dpp.util.Utils;
@@ -105,8 +104,6 @@ public class DataTransferManager implements IConnectionListener,
 
     protected Map<NetTransferMode, Throwable> errors = new LinkedHashMap<NetTransferMode, Throwable>();
 
-    protected SessionIDObservable sessionID = null;
-
     SarosNet sarosNet;
 
     /**
@@ -115,11 +112,9 @@ public class DataTransferManager implements IConnectionListener,
     protected Collection<JID> peersForIBB = new ArrayList<JID>();
 
     public DataTransferManager(SarosNet sarosNet,
-        SessionIDObservable sessionID, PreferenceUtils preferenceUtils,
-        RosterTracker rosterTracker, IBBTransport ibbTransport,
-        Socks5Transport socks5Transport) {
+        PreferenceUtils preferenceUtils, RosterTracker rosterTracker,
+        IBBTransport ibbTransport, Socks5Transport socks5Transport) {
 
-        this.sessionID = sessionID;
         this.preferenceUtils = preferenceUtils;
         this.ibbTransport = ibbTransport;
         this.socks5Transport = socks5Transport;

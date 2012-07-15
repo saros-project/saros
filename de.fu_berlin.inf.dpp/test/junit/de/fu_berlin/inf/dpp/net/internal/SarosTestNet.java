@@ -33,9 +33,6 @@ public class SarosTestNet {
         net.setSettings(false, true, 0, "", 0, false);
         net.initialize();
 
-        sessionID = new SessionIDObservable();
-        sessionID.setValue("X");
-
         ibb = new IBBTransport();
         socks5Transport = new Socks5Transport();
 
@@ -44,7 +41,7 @@ public class SarosTestNet {
 
         rosterTracker = new RosterTracker(net);
 
-        dtm = new DataTransferManager(net, sessionID, null, rosterTracker, ibb,
+        dtm = new DataTransferManager(net, null, rosterTracker, ibb,
             socks5Transport);
         xmppReceiver = new XMPPReceiver();
         dtm.inject(xmppReceiver, dispatchThreadContext,
