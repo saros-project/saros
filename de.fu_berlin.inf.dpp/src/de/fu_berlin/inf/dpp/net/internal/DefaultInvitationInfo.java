@@ -25,13 +25,6 @@ public class DefaultInvitationInfo extends DefaultSessionInfo {
         }
     }
 
-    public static class FileListRequestExtensionProvider extends
-        XStreamExtensionProvider<DefaultInvitationInfo> {
-        public FileListRequestExtensionProvider() {
-            super("fileListRequest", DefaultInvitationInfo.class);
-        }
-    }
-
     public static class UserListRequestExtensionProvider extends
         XStreamExtensionProvider<DefaultInvitationInfo> {
         public UserListRequestExtensionProvider() {

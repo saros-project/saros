@@ -24,10 +24,8 @@ import java.io.InputStream;
 import java.util.Collection;
 import java.util.List;
 
-import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
 import org.jivesoftware.smack.packet.IQ;
-import org.jivesoftware.smack.packet.Packet;
 
 import de.fu_berlin.inf.dpp.FileList;
 import de.fu_berlin.inf.dpp.User;
@@ -37,10 +35,9 @@ import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
 import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
 import de.fu_berlin.inf.dpp.invitation.InvitationProcess;
-import de.fu_berlin.inf.dpp.net.internal.DefaultInvitationInfo;
+import de.fu_berlin.inf.dpp.net.internal.InvitationInfo;
 import de.fu_berlin.inf.dpp.net.internal.SarosPacketCollector;
 import de.fu_berlin.inf.dpp.net.internal.XStreamExtensionProvider;
-import de.fu_berlin.inf.dpp.net.internal.XStreamExtensionProvider.XStreamPacketExtension;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 
 /**
@@ -115,36 +112,12 @@ public interface ITransmitter {
         SubMonitor monitor, boolean forceWait) throws IOException,
         SarosCancellationException;
 
-    /**
-     * a generic receive method
-     * 
-     * @param collector
-     *            - {@link SarosPacketCollector} knows what to collect
-     * @param timeout
-     *            - how long do we wait
-     * @param forceWait
-     * @return
-     * @throws LocalCancellationException
-     * @throws IOException
-     */
-    public Packet receive(IProgressMonitor monitor,
-        SarosPacketCollector collector, long timeout, boolean forceWait)
-        throws LocalCancellationException, IOException;
-
     // FIXME Add Javadoc. Why is an invitationID needed?
     public void sendUserList(JID to, String invitationID, Collection<User> user);
 
     public boolean receiveUserListConfirmation(SarosPacketCollector collector,
         List<User> fromUsers, SubMonitor monitor)
         throws LocalCancellationException;
-
-    /**
-     * Sends a request-for-file-list-message to given user.
-     * 
-     * @param recipient
-     *            the JID of the recipient.
-     */
-    public void sendFileListRequest(JID recipient, String invitationID);
 
     /**
      * Sends given archive file to given recipient.
@@ -178,16 +151,6 @@ public interface ITransmitter {
         File archive, SubMonitor monitor) throws IOException,
         SarosCancellationException;
 
-    /**
-     * Sends queued file transfers.
-     */
-    public void sendRemainingFiles();
-
-    /**
-     * Sends queued messages.
-     */
-    public void sendRemainingMessages();
-
     /* ---------- etc --------- */
 
     /**
@@ -207,6 +170,8 @@ public interface ITransmitter {
      * {@link FileActivityDataObject#getType()} ==
      * {@link FileActivity.Type#Created} as binary data is not supported in
      * messages bodies.
+     * 
+     * TODO: Add progress.
      * 
      * @param recipient
      *            The JID of the user who is to receive the given list of timed
@@ -260,6 +225,10 @@ public interface ITransmitter {
 
     public void sendCancelSharingProjectMessage(JID peer, String errorMsg);
 
-    public void sendMessageToUser(JID peer,
-        XStreamPacketExtension<DefaultInvitationInfo> create);
+    public void sendCancelInvitationMessage(JID to, String sessionID,
+        String message);
+
+    public void sendUserListRequest(JID peer, String invitationID);
+
+    public void sendInvitation(JID peer, InvitationInfo invInfo);
 }

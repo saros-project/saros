@@ -6,11 +6,11 @@ import org.jivesoftware.smack.packet.Packet;
 import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.annotations.Component;
+import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.internal.InvitationInfo;
 import de.fu_berlin.inf.dpp.net.internal.InvitationInfo.InvitationExtensionProvider;
 import de.fu_berlin.inf.dpp.net.internal.XMPPReceiver;
-import de.fu_berlin.inf.dpp.net.internal.XMPPTransmitter;
 import de.fu_berlin.inf.dpp.net.internal.extensions.CancelInviteExtension;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
@@ -27,7 +27,7 @@ public class InvitationHandler {
         .getName());
 
     @Inject
-    protected XMPPTransmitter transmitter;
+    protected ITransmitter transmitter;
 
     @Inject
     protected ISarosSessionManager sessionManager;
@@ -75,10 +75,10 @@ public class InvitationHandler {
                         invitationID, invInfo.comPrefs, invInfo.description,
                         invInfo.host, invInfo.inviterColorID);
                 } else {
-                    transmitter.sendMessageToUser(new JID(packet.getFrom()),
-                        cancelInviteExtension.create(sessionID,
-                            "I am already in a Saros session "
-                                + "and so cannot accept your invitation."));
+                    transmitter.sendCancelInvitationMessage(
+                        new JID(packet.getFrom()), sessionID,
+                        "I am already in a Saros session "
+                            + "and so cannot accept your invitation.");
                 }
             }
         }, invExtProv.getPacketFilter());

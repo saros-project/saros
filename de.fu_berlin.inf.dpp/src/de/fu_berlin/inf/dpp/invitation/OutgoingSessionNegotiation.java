@@ -35,10 +35,8 @@ import de.fu_berlin.inf.dpp.net.internal.DefaultInvitationInfo.InvitationAcknowl
 import de.fu_berlin.inf.dpp.net.internal.DefaultInvitationInfo.InvitationCompleteExtensionProvider;
 import de.fu_berlin.inf.dpp.net.internal.DefaultInvitationInfo.UserListRequestExtensionProvider;
 import de.fu_berlin.inf.dpp.net.internal.InvitationInfo;
-import de.fu_berlin.inf.dpp.net.internal.InvitationInfo.InvitationExtensionProvider;
 import de.fu_berlin.inf.dpp.net.internal.SarosPacketCollector;
 import de.fu_berlin.inf.dpp.net.internal.XMPPReceiver;
-import de.fu_berlin.inf.dpp.net.internal.XMPPTransmitter;
 import de.fu_berlin.inf.dpp.net.internal.extensions.PacketExtensionUtils;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 import de.fu_berlin.inf.dpp.project.IChecksumCache;
@@ -96,9 +94,6 @@ public class OutgoingSessionNegotiation extends InvitationProcess {
 
     @Inject
     protected SessionIDObservable sessionID;
-
-    @Inject
-    protected XMPPTransmitter xmppTransmitter;
 
     @Inject
     protected XMPPReceiver xmppReceiver;
@@ -359,8 +354,7 @@ public class OutgoingSessionNegotiation extends InvitationProcess {
             comPrefs, sarosSession.getHost().getJID(), sarosSession
                 .getLocalUser().getColorID());
 
-        xmppTransmitter.sendMessageToUser(peer,
-            new InvitationExtensionProvider().create(invInfo));
+        transmitter.sendInvitation(peer, invInfo);
 
         subMonitor.worked(1);
 
@@ -404,8 +398,8 @@ public class OutgoingSessionNegotiation extends InvitationProcess {
                 + colorID);
 
             checkCancellation(CancelOption.NOTIFY_PEER);
-            sarosSession.synchronizeUserList(xmppTransmitter, peer,
-                invitationID, subMonitor);
+            sarosSession.synchronizeUserList(transmitter, peer, invitationID,
+                subMonitor);
             return newUser;
         }
     }
@@ -466,8 +460,8 @@ public class OutgoingSessionNegotiation extends InvitationProcess {
         synchronized (sarosSession) {
             sarosSession.userInvitationCompleted(sarosSession.getUser(peer));
             checkCancellation(CancelOption.NOTIFY_PEER);
-            sarosSession.synchronizeUserList(xmppTransmitter, peer,
-                invitationID, subMonitor.newChild(1, SubMonitor.SUPPRESS_NONE)); // SUPPRESSALL
+            sarosSession.synchronizeUserList(transmitter, peer, invitationID,
+                subMonitor.newChild(1, SubMonitor.SUPPRESS_NONE)); // SUPPRESSALL
         }
 
         subMonitor.setTaskName("Invitation has completed successfully.");

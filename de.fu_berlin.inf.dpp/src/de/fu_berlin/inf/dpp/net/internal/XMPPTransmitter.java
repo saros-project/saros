@@ -71,12 +71,12 @@ import de.fu_berlin.inf.dpp.net.NetTransferMode;
 import de.fu_berlin.inf.dpp.net.SarosNet;
 import de.fu_berlin.inf.dpp.net.TimedActivityDataObject;
 import de.fu_berlin.inf.dpp.net.business.DispatchThreadContext;
-import de.fu_berlin.inf.dpp.net.internal.DefaultInvitationInfo.FileListRequestExtensionProvider;
 import de.fu_berlin.inf.dpp.net.internal.DefaultInvitationInfo.InvitationAcknowledgementExtensionProvider;
 import de.fu_berlin.inf.dpp.net.internal.DefaultInvitationInfo.InvitationCompleteExtensionProvider;
+import de.fu_berlin.inf.dpp.net.internal.DefaultInvitationInfo.UserListRequestExtensionProvider;
 import de.fu_berlin.inf.dpp.net.internal.DefaultSessionInfo.UserListConfirmationExtensionProvider;
+import de.fu_berlin.inf.dpp.net.internal.InvitationInfo.InvitationExtensionProvider;
 import de.fu_berlin.inf.dpp.net.internal.UserListInfo.JoinExtensionProvider;
-import de.fu_berlin.inf.dpp.net.internal.XStreamExtensionProvider.XStreamPacketExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.CancelInviteExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.CancelProjectSharingExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.LeaveExtension;
@@ -122,7 +122,6 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
 
     protected SarosNet sarosNet;
 
-    @Inject
     protected SessionIDObservable sessionID;
 
     @Inject
@@ -141,13 +140,7 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
     protected ActivitiesExtensionProvider activitiesProvider;
 
     @Inject
-    protected InvitationInfo.InvitationExtensionProvider invExtProv;
-
-    @Inject
     protected InvitationAcknowledgementExtensionProvider invAcknowledgementExtProv;
-
-    @Inject
-    protected FileListRequestExtensionProvider fileListRequestExtProv;
 
     @Inject
     protected JoinExtensionProvider userListExtProv;
@@ -166,20 +159,27 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
 
     protected DataTransferManager dataManager;
 
+    protected final UserListRequestExtensionProvider userListRequestExtProv;
+    protected final InvitationExtensionProvider inviteExtProv;
+
     public XMPPTransmitter(SessionIDObservable sessionID,
         DataTransferManager dataManager, SarosNet sarosNet,
-        XMPPReceiver receiver) {
+        XMPPReceiver receiver,
+        UserListRequestExtensionProvider userListRequestExtProv,
+        InvitationExtensionProvider inviteExtProv) {
         sarosNet.addListener(this);
         this.dataManager = dataManager;
         this.sessionID = sessionID;
         this.sarosNet = sarosNet;
         this.receiver = receiver;
+        this.userListRequestExtProv = userListRequestExtProv;
+        this.inviteExtProv = inviteExtProv;
     }
 
     /********************************************************************************
      * Invitation process' help functions --- START
      ********************************************************************************/
-
+    @Override
     public void sendInvitationAcknowledgement(JID to, String invitationID) {
         log.trace("Sending invitation acknowledgment to " + Utils.prefix(to));
         sendMessageToUser(to,
@@ -187,13 +187,7 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
                 sessionID, invitationID)));
     }
 
-    public void sendFileListRequest(JID to, String invitationID) {
-        log.trace("Sending request for FileList to " + Utils.prefix(to));
-        sendMessageToUser(to,
-            fileListRequestExtProv.create(new DefaultInvitationInfo(sessionID,
-                invitationID)));
-    }
-
+    @Override
     public InputStream receiveArchive(String processID, final JID peer,
         final SubMonitor monitor, boolean forceWait) throws IOException,
         SarosCancellationException {
@@ -339,6 +333,7 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
     }
 
     // FIXME move to XMPPReceiver
+    @Override
     public SarosPacketCollector getUserListConfirmationCollector() {
 
         PacketFilter filter = PacketExtensionUtils.getSessionIDFilter(
@@ -348,6 +343,7 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
     }
 
     // FIXME move to XMPPReceiver
+    @Override
     public boolean receiveUserListConfirmation(SarosPacketCollector collector,
         List<User> fromUsers, SubMonitor monitor)
         throws LocalCancellationException {
@@ -390,6 +386,7 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
         }
     }
 
+    @Override
     public void sendInvitationCompleteConfirmation(JID to, String invitationID) {
         sendMessageToUser(to,
             invCompleteExtProv.create(new DefaultInvitationInfo(sessionID,
@@ -408,15 +405,12 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
         public Message message;
     }
 
+    @Override
     public void sendCancelInvitationMessage(JID user, String errorMsg) {
-        log.debug("Send request to cancel Invitation to "
-            + Utils.prefix(user)
-            + (errorMsg == null ? "on user request" : "with message: "
-                + errorMsg));
-        sendMessageToUser(user,
-            cancelInviteExtension.create(sessionID.getValue(), errorMsg));
+        sendCancelInvitationMessage(user, sessionID.getValue(), errorMsg);
     }
 
+    @Override
     public void sendCancelSharingProjectMessage(JID user, String errorMsg) {
         log.debug("Send request to cancel project sharing to "
             + Utils.prefix(user)
@@ -426,22 +420,12 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
             sessionID.getValue(), errorMsg));
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see de.fu_berlin.inf.dpp.ITransmitter
-     */
+    @Override
     public void sendLeaveMessage(ISarosSession sarosSession) {
         sendMessageToAll(sarosSession, leaveExtension.create());
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see de.fu_berlin.inf.dpp.ITransmitter
-     * 
-     * TODO: Add Progress
-     */
+    @Override
     public void sendTimedActivities(JID recipient,
         List<TimedActivityDataObject> timedActivities) {
 
@@ -544,12 +528,12 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
      *             longer than {@value #MAX_XMPP_MESSAGE_SIZE}
      */
 
-    public void sendToProjectUser(JID recipient, PacketExtension extension,
+    private void sendToProjectUser(JID recipient, PacketExtension extension,
         TransferDescription transferDescription) throws IOException {
         sendToProjectUser(recipient, extension, transferDescription, true);
     }
 
-    public void sendToProjectUser(JID recipient, PacketExtension extension,
+    private void sendToProjectUser(JID recipient, PacketExtension extension,
         TransferDescription transferDescription, boolean onlyInSession)
         throws IOException {
 
@@ -636,9 +620,7 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public void sendFileLists(JID recipient, String processID,
         List<FileList> fileLists, SubMonitor progress) throws IOException,
         SarosCancellationException {
@@ -677,6 +659,7 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
         progress.done();
     }
 
+    @Override
     public void sendProjectArchive(JID recipient, String invitationID,
         File archive, SubMonitor progress) throws SarosCancellationException,
         IOException {
@@ -710,34 +693,11 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
         dataManager.sendData(transfer, content, progress.newChild(90));
     }
 
-    public void sendRemainingFiles() {
-
-        log.warn("Sending remaining files is not implemented!");
-        //
-        // if (this.fileTransferQueue.size() > 0) {
-        // // sendNextFile();
-        // }
-    }
-
-    public void sendRemainingMessages() {
-
-        List<MessageTransfer> toTransfer = null;
-
-        synchronized (messageTransferQueue) {
-            toTransfer = new ArrayList<MessageTransfer>(messageTransferQueue);
-            messageTransferQueue.clear();
-        }
-
-        for (MessageTransfer pex : toTransfer) {
-            sendMessageToUser(pex.receipient, pex.message, true);
-        }
-    }
-
     /**
      * Convenience method for sending the given {@link PacketExtension} to all
      * participants of the given {@link ISarosSession}.
      */
-    public void sendMessageToAll(ISarosSession sarosSession,
+    private void sendMessageToAll(ISarosSession sarosSession,
         PacketExtension extension) {
 
         JID myJID = sarosNet.getMyJID();
@@ -768,7 +728,7 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
      *            if true extension is only send if the buddy is in the same
      *            session
      */
-    public void sendMessageToUser(JID jid, PacketExtension extension,
+    private void sendMessageToUser(JID jid, PacketExtension extension,
         boolean sessionMembersOnly) {
         Message message = new Message();
         message.addExtension(extension);
@@ -791,7 +751,7 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
      * @param sessionMembersOnly
      *            TODO
      */
-    public void sendMessageToUser(JID jid, Message message,
+    private void sendMessageToUser(JID jid, Message message,
         boolean sessionMembersOnly) {
 
         if (sessionMembersOnly) {
@@ -826,6 +786,7 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
         }
     }
 
+    @Override
     public <T> T sendQuery(JID rqJID, XStreamExtensionProvider<T> provider,
         T payload, long timeout) {
         if (isConnectionInvalid())
@@ -871,19 +832,6 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
         } catch (XMPPException e) {
             throw new CausedIOException("Failed to send message", e);
         }
-    }
-
-    public Packet sendAndReceive(SubMonitor monitor, JID jid,
-        PacketExtension extension, PacketFilter filter, long timeout,
-        boolean forceWait, boolean sessionMembersOnly)
-        throws LocalCancellationException, IOException {
-
-        SarosPacketCollector collector = installReceiver(filter);
-
-        sendMessageToUser(jid, extension, sessionMembersOnly);
-
-        return receive(monitor, collector, timeout, forceWait);
-
     }
 
     /**
@@ -987,6 +935,7 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
         connection = null;
     }
 
+    @Override
     public void connectionStateChanged(Connection connection,
         ConnectionState newState) {
         if (newState == ConnectionState.CONNECTED)
@@ -995,8 +944,24 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
             disposeConnection();
     }
 
-    public void sendMessageToUser(JID peer,
-        XStreamPacketExtension<DefaultInvitationInfo> create) {
-        sendMessageToUser(peer, create, false);
+    public void sendCancelInvitationMessage(JID user, String sessionID,
+        String errorMsg) {
+        log.debug("Send request to cancel Invitation to "
+            + Utils.prefix(user)
+            + (errorMsg == null ? "on user request" : "with message: "
+                + errorMsg));
+        sendMessageToUser(user,
+            cancelInviteExtension.create(sessionID, errorMsg));
+    }
+
+    public void sendUserListRequest(JID user, String invitationID) {
+        sendMessageToUser(user,
+            userListRequestExtProv.create(new DefaultInvitationInfo(sessionID,
+                invitationID)));
+    }
+
+    @Override
+    public void sendInvitation(JID peer, InvitationInfo invInfo) {
+        sendMessageToUser(peer, inviteExtProv.create(invInfo));
     }
 }

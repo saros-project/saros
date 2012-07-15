@@ -5,6 +5,8 @@ import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.RosterTracker;
 import de.fu_berlin.inf.dpp.net.SarosNet;
 import de.fu_berlin.inf.dpp.net.business.DispatchThreadContext;
+import de.fu_berlin.inf.dpp.net.internal.DefaultInvitationInfo.UserListRequestExtensionProvider;
+import de.fu_berlin.inf.dpp.net.internal.InvitationInfo.InvitationExtensionProvider;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 
 /**
@@ -50,7 +52,9 @@ public class SarosTestNet {
         xmppReceiver.inject(incomingTransferObjectExtensionProvider,
             dispatchThreadContext);
 
-        xmppTransmitter = new XMPPTransmitter(sessionID, dtm, net, xmppReceiver);
+        xmppTransmitter = new XMPPTransmitter(sessionID, dtm, net,
+            xmppReceiver, new UserListRequestExtensionProvider(),
+            new InvitationExtensionProvider());
 
     }
 }

@@ -17,8 +17,6 @@ import de.fu_berlin.inf.dpp.invitation.ProcessTools.CancelLocation;
 import de.fu_berlin.inf.dpp.invitation.ProcessTools.CancelOption;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.net.internal.DefaultInvitationInfo;
-import de.fu_berlin.inf.dpp.net.internal.DefaultInvitationInfo.UserListRequestExtensionProvider;
 import de.fu_berlin.inf.dpp.observables.InvitationProcessObservable;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
@@ -225,9 +223,7 @@ public class IncomingSessionNegotiation extends InvitationProcess {
      */
     protected void completeInvitation() {
         log.debug("Inv" + Utils.prefix(peer) + ": Completing invitation...");
-        UserListRequestExtensionProvider extProv = new UserListRequestExtensionProvider();
-        transmitter.sendMessageToUser(peer,
-            extProv.create(new DefaultInvitationInfo(sessionID, invitationID)));
+        transmitter.sendUserListRequest(peer, invitationID);
 
         /*
          * TODO: Wait until all of the activities in the queue (which arrived

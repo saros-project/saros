@@ -53,6 +53,7 @@ import de.fu_berlin.inf.dpp.net.internal.ActivitiesExtensionProvider;
 import de.fu_berlin.inf.dpp.net.internal.ConnectionTestManager;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
 import de.fu_berlin.inf.dpp.net.internal.DefaultInvitationInfo;
+import de.fu_berlin.inf.dpp.net.internal.DefaultInvitationInfo.UserListRequestExtensionProvider;
 import de.fu_berlin.inf.dpp.net.internal.IBBTransport;
 import de.fu_berlin.inf.dpp.net.internal.InvitationInfo;
 import de.fu_berlin.inf.dpp.net.internal.Socks5Transport;
@@ -256,13 +257,12 @@ public class SarosContext implements ISarosContext {
             .create(IncomingTransferObject.IncomingTransferObjectExtensionProvider.class),
         Component
             .create(DefaultInvitationInfo.InvitationAcknowledgementExtensionProvider.class),
-        Component
-            .create(DefaultInvitationInfo.FileListRequestExtensionProvider.class),
         Component.create(UserListInfo.JoinExtensionProvider.class),
         Component
             .create(DefaultInvitationInfo.UserListConfirmationExtensionProvider.class),
         Component
             .create(DefaultInvitationInfo.InvitationCompleteExtensionProvider.class),
+        Component.create(UserListRequestExtensionProvider.class),
 
         Component.create(HostLeftAloneInSessionHandler.class),
 
