@@ -564,46 +564,29 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
         int retry = 0;
         do {
 
-            if (data == null
-                || transferDescription == null
-                || (!dataManager.getTransferMode(recipient).isP2P() && data.length < MAX_XMPP_MESSAGE_SIZE)) {
-
+            if (data == null || transferDescription == null) {
                 sendMessageToUser(recipient, extension, onlyInSession);
-                break;
+                return;
+            }
 
-            } else {
-                try {
+            try {
+                sendByBytestreamToProjectUser(recipient, data,
+                    transferDescription);
+                return;
+            } catch (IOException e) {
+                log.error("Failed to sent packet extension by bytestream ("
+                    + Utils.formatByte(data.length) + "): " + e.getMessage());
 
-                    sendByBytestreamToProjectUser(recipient, data,
-                        transferDescription);
-                    break;
-
-                } catch (IOException e) {
-                    // else send by chat if applicable
-                    if (data.length < MAX_XMPP_MESSAGE_SIZE) {
-                        log.info("Retry failed bytestream transfer by chat.");
-                        sendMessageToUser(recipient, extension, true);
-                        break;
-                    } else {
-
-                        log.error("Failed to sent packet extension by bytestream ("
-                            + Utils.formatByte(data.length)
-                            + "): "
-                            + e.getMessage());
-
-                        if (retry == MAX_TRANSFER_RETRIES / 2) {
-                            // set bytestream connections prefer IBB
-                            dataManager.setFallbackConnectionMode(recipient);
-                        }
-
-                        if (retry < MAX_TRANSFER_RETRIES) {
-                            log.info("Transfer retry #" + retry + "...");
-                            continue;
-                        }
-                        throw e;
-
-                    }
+                if (retry == MAX_TRANSFER_RETRIES / 2) {
+                    // set bytestream connections prefer IBB
+                    dataManager.setFallbackConnectionMode(recipient);
                 }
+
+                if (retry < MAX_TRANSFER_RETRIES) {
+                    log.info("Transfer retry #" + retry + "...");
+                    continue;
+                }
+                throw e;
             }
         } while (++retry <= MAX_TRANSFER_RETRIES);
     }
