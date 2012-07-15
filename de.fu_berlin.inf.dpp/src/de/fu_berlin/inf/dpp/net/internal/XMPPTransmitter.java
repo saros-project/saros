@@ -263,7 +263,7 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
         PacketListener packetListener = new PacketListener() {
 
             public void processPacket(Packet packet) {
-                // we dont process
+                // we don't process
             }
         };
 
@@ -285,7 +285,7 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
                 monitor.setWorkRemaining(100);
                 monitor.worked(5);
 
-                // we dont process
+                // we don't process
                 return false;
             }
         });

@@ -198,7 +198,7 @@ public class EnterProjectNamePage extends WizardPage {
         case NONE:
             // no bytestream connection established yet (small filelist transfer
             // before was done by chat willingly), so we cant say something
-            // about the transfer type so we dont give a message to not
+            // about the transfer type so we don't give a message to not
             // worry/confuse the user
             break;
 

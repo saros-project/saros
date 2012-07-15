@@ -249,7 +249,7 @@ public abstract class XYLayoutWithFreehandEditPolicy extends XYLayoutEditPolicy 
 	protected static PointList getNormalizedPointList(PointList points) {
 		PointList ps = new PointList(points.size());
 		int[] rawPoints = points.toIntArray();
-		// dont do overhead for a small list of points
+		// don't do overhead for a small list of points
 		if (points.size() < 20) {
 			for (int i = 0; i < rawPoints.length; i += 2)
 				ps.addPoint(rawPoints[i], rawPoints[i + 1]);

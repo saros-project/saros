@@ -636,7 +636,7 @@ public class ActivitySequencer implements Startable {
                     activityDataObjects = userqueue;
                 }
 
-                // Dont send activities to peers that are not in the session
+                // Don't send activities to peers that are not in the session
                 // (anymore)
                 if (!recipient.isInSarosSession()) {
                     log.warn("Activities for peer not in session are dropped.");

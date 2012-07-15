@@ -62,7 +62,7 @@ public class DataTransferManager implements IConnectionListener,
     protected Map<JID, List<TransferDescription>> incomingTransfers = new HashMap<JID, List<TransferDescription>>();
 
     /**
-     * Maps JIDs to the number of currently running, ougoing transfers - send
+     * Maps JIDs to the number of currently running, outgoing transfers - send
      */
     protected Map<JID, Integer> outgoingTransfers = new HashMap<JID, Integer>();
 
@@ -802,7 +802,7 @@ public class DataTransferManager implements IConnectionListener,
             if (connection != null
                 && connection.getMode() == NetTransferMode.IBB) {
 
-                // If this connection is currently in use, dont disconnect
+                // If this connection is currently in use, don't disconnect
                 if (isReceiving(connection.getPeer())
                     || isSending(connection.getPeer())) {
                     isTransfering = true;
