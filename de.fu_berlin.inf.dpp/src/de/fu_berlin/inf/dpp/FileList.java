@@ -453,56 +453,6 @@ public class FileList {
             root.addPath(path, null, false);
     }
 
-    /**
-     * Calculate an approximation of how equal <code>this</code> file list is to
-     * the <code>other</code> file list.
-     * 
-     * @param other
-     * @return Percentage of "sameness" of <code>this</code> and
-     *         <code>other</code> counting the number of identical files
-     *         relative to the size of the larger list. 100 means identical
-     *         <code>FileList</code>s.
-     */
-    public int computeMatch(FileList other) {
-        // calculate "sameness" of ratio of longer list
-        List<IPath> otherPaths = other.getPaths();
-        int nPaths = Math.max(getPaths().size(), otherPaths.size());
-
-        if (nPaths == 0 && otherPaths.isEmpty())
-            return 100; // both are empty -> perfect match
-
-        if (nPaths == 0) // other is empty
-            return 0;
-
-        FileListDiff difference = FileListDiff.diff(this, other);
-        int nUnalteredPaths = difference.getUnalteredPaths().size();
-
-        return (int) ((nUnalteredPaths * 100L) / nPaths);
-    }
-
-    /**
-     * Calculate an approximation of how equal this <code>FileList</code> is to
-     * <code>project</code>. NOTE: This is a long-running method linear to size
-     * of the length of the two file lists.
-     * 
-     * @param project
-     * @return Percentage of "sameness" of <code>this</code> and
-     *         <code>other</code> counting the number of identical files
-     *         relative to the size of the larger list. 100 means identical
-     *         <code>FileList</code>s. On error, returns 0.
-     */
-    public int computeMatch(IProject project) {
-        try {
-            return computeMatch(FileListFactory.createFileList(project, null,
-                null, useVersionControl, null));
-        } catch (CoreException e) {
-            log.error(
-                "failed to generate file list for project: "
-                    + project.getName(), e);
-        }
-        return 0;
-    }
-
     @XStreamOmitField
     private List<IPath> cachedList = null;
 

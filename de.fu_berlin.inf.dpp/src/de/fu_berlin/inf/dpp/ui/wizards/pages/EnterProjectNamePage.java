@@ -37,7 +37,6 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.dialogs.ContainerSelectionDialog;
 
 import de.fu_berlin.inf.dpp.FileList;
-import de.fu_berlin.inf.dpp.FileListFactory;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
@@ -88,20 +87,13 @@ public class EnterProjectNamePage extends WizardPage {
 
     protected Map<String, Button> browseUpdateProjectButtons = new HashMap<String, Button>();
 
-    protected Map<String, Label> updateProjectStatusResults = new HashMap<String, Label>();
-
     protected Map<String, Label> updateProjectNameLabels = new HashMap<String, Label>();
-
-    protected Map<String, Button> scanWorkspaceProjectsButtons = new HashMap<String, Button>();
 
     protected Map<String, String> reservedProjectNames = new HashMap<String, String>();
 
     protected Button disableVCSCheckbox;
 
     protected int pageChanges = 0;
-
-    /* project for update or base project for copy into new project */
-    protected Map<String, IProject> similarProjects = new HashMap<String, IProject>();
 
     protected DataTransferManager dataTransferManager;
 
@@ -146,30 +138,6 @@ public class EnterProjectNamePage extends WizardPage {
 
         setPageComplete(false);
         setTitle(Messages.EnterProjectNamePage_title2);
-
-    }
-
-    protected void setUpdateProject(IProject project, String projectID) {
-        this.similarProjects.put(projectID, project);
-
-        if (project == null) {
-
-            this.updateProjectStatusResults.get(projectID).setText(
-                Messages.EnterProjectNamePage_no_matching_project);
-
-        } else {
-            this.errorProjectNames.remove(projectID);
-            this.updateProjectStatusResults.get(projectID).setText(
-                MessageFormat.format(
-                    Messages.EnterProjectNamePage_projectA_matches_projectB,
-                    project.getName(),
-                    this.fileLists.get(0).computeMatch(project)));
-
-            this.updateProjectTexts.get(projectID).setText(
-                this.similarProjects.get(projectID).getName());
-            this.updatePageComplete(null);
-        }
-        updatePageComplete(projectID);
 
     }
 
@@ -368,50 +336,6 @@ public class EnterProjectNamePage extends WizardPage {
             .findProjectNameProposal(this.remoteProjectNames.get(projectID)
                 + "-copy")); //$NON-NLS-1$
         this.copyToBeforeUpdateTexts.put(projectID, copyToBeforeUpdateText);
-
-        Composite scanGroup = new Composite(workArea, SWT.NONE);
-        layout = new GridLayout();
-        layout.numColumns = 2;
-        layout.makeColumnsEqualWidth = false;
-        layout.marginWidth = 10;
-        scanGroup.setLayout(layout);
-        data = new GridData(GridData.FILL_HORIZONTAL | GridData.GRAB_VERTICAL);
-        data.verticalIndent = 10;
-        data.horizontalIndent = 10;
-        scanGroup.setLayoutData(data);
-
-        Button scanWorkspaceProjectsButton = new Button(scanGroup, SWT.PUSH);
-        scanWorkspaceProjectsButton
-            .setText(Messages.EnterProjectNamePage_scan_workspace);
-        scanWorkspaceProjectsButton
-            .setToolTipText(Messages.EnterProjectNamePage_scan_workspace2);
-        setButtonLayoutData(scanWorkspaceProjectsButton);
-
-        scanWorkspaceProjectsButton
-            .addSelectionListener(new SelectionAdapter() {
-                @Override
-                public void widgetSelected(SelectionEvent e) {
-                    FileList fileList = FileListFactory.createEmptyFileList();
-                    for (FileList fList : EnterProjectNamePage.this.fileLists) {
-                        if (fList.getProjectID().equals(projectID)) {
-                            fileList = fList;
-                        }
-                    }
-                    setUpdateProject(
-                        EnterProjectNamePageUtils.getBestScanMatch(fileList),
-                        projectID);
-                }
-            });
-        this.scanWorkspaceProjectsButtons.put(projectID,
-            scanWorkspaceProjectsButton);
-
-        Label updateProjectStatusResult = new Label(scanGroup, SWT.NONE);
-        updateProjectStatusResult
-            .setText(Messages.EnterProjectNamePage_scan_no_result);
-        updateProjectStatusResult.setLayoutData(new GridData(
-            GridData.FILL_HORIZONTAL | GridData.GRAB_VERTICAL));
-        this.updateProjectStatusResults.put(projectID,
-            updateProjectStatusResult);
     }
 
     /**
@@ -712,10 +636,6 @@ public class EnterProjectNamePage extends WizardPage {
         this.copyCheckboxes.get(projectID).setEnabled(updateSelected);
         this.copyToBeforeUpdateTexts.get(projectID).setEnabled(
             updateSelected && copySelected);
-        this.scanWorkspaceProjectsButtons.get(projectID).setEnabled(
-            updateSelected);
-        this.updateProjectStatusResults.get(projectID).setEnabled(
-            updateSelected);
 
         updatePageComplete(projectID);
     }

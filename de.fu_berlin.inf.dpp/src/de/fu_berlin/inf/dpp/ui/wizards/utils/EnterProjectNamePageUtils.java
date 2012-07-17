@@ -1,8 +1,6 @@
 package de.fu_berlin.inf.dpp.ui.wizards.utils;
 
 import java.io.File;
-import java.lang.reflect.InvocationTargetException;
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -12,16 +10,8 @@ import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.jface.dialogs.ProgressMonitorDialog;
-import org.eclipse.jface.operation.IRunnableWithProgress;
 
-import de.fu_berlin.inf.dpp.FileList;
-import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
-import de.fu_berlin.inf.dpp.ui.Messages;
-import de.fu_berlin.inf.dpp.util.Utils;
 
 public class EnterProjectNamePageUtils {
 
@@ -35,111 +25,6 @@ public class EnterProjectNamePageUtils {
      * is done to propose the same project directly for partial sharing.
      */
     static List<String> alreadySharedProjectsIDs = new ArrayList<String>();
-
-    public static class ScanRunner implements Runnable {
-
-        public ScanRunner(FileList remoteFileList) {
-            this.remoteFileList = remoteFileList;
-        }
-
-        FileList remoteFileList;
-
-        IProject project = null;
-
-        public void run() {
-
-            ProgressMonitorDialog dialog = new ProgressMonitorDialog(
-                EditorAPI.getShell());
-            try {
-                dialog.run(true, true, new IRunnableWithProgress() {
-                    public void run(IProgressMonitor monitor)
-                        throws InterruptedException {
-
-                        monitor
-                            .beginTask(
-                                Messages.EnterProjectNamePageUtils_monitar_scanning,
-                                IProgressMonitor.UNKNOWN);
-                        IProject project = EnterProjectNamePageUtils
-                            .getLocalProject(ScanRunner.this.remoteFileList,
-                                monitor);
-                        monitor.done();
-
-                        ScanRunner.this.project = project;
-                    }
-
-                });
-            } catch (InvocationTargetException e) {
-                log.error("An error occurred while scanning " //$NON-NLS-1$
-                    + "for best matching project: ", e); //$NON-NLS-1$
-                MessageDialog.openError(EditorAPI.getShell(),
-                    Messages.EnterProjectNamePageUtils_scan_error,
-                    MessageFormat.format(
-                        Messages.EnterProjectNamePageUtils_scan_error_text,
-                        e.getMessage()));
-            } catch (InterruptedException e) {
-                this.project = null;
-            }
-        }
-    }
-
-    /**
-     * Run the scan for the best matching project as a blocking operation.
-     * 
-     */
-    public static IProject getBestScanMatch(FileList remoteFileList) {
-
-        ScanRunner runner = new ScanRunner(remoteFileList);
-
-        Utils.runSafeSWTSync(log, runner);
-
-        return runner.project;
-    }
-
-    /**
-     * Return the best match among all project from workspace with the given
-     * remote file list or null if no best match could be found or if the
-     * operation was canceled by the user.
-     * 
-     * To be considered a match, projects have to match at least 80%.
-     * 
-     */
-    public static IProject getLocalProject(FileList hostFileList,
-        IProgressMonitor monitor) throws InterruptedException {
-
-        IWorkspace workspace = ResourcesPlugin.getWorkspace();
-        IProject[] projects = workspace.getRoot().getProjects();
-
-        IProject bestMatch = null;
-
-        // A match needs to be at least 80% for us to consider.
-        int bestMatchScore = 80;
-
-        for (int i = 0; i < projects.length; i++) {
-            monitor.worked(1);
-
-            if (monitor.isCanceled()) {
-                if (bestMatch == null)
-                    throw new InterruptedException();
-                else
-                    return bestMatch;
-            }
-
-            if (!projects[i].isOpen()) {
-                continue;
-            }
-
-            int matchScore = hostFileList.computeMatch(projects[i]);
-
-            if (matchScore > bestMatchScore) {
-                bestMatchScore = matchScore;
-                bestMatch = projects[i];
-                if (matchScore == 100)
-                    return bestMatch;
-            }
-        }
-
-        return bestMatch;
-    }
 
     /**
      * 

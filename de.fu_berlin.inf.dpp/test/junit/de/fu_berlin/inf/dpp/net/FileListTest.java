@@ -23,8 +23,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -205,17 +203,6 @@ public class FileListTest {
     }
 
     @Test
-    public void testMatch() {
-        assertEquals(75, threeEntryList.computeMatch(fourEntryList));
-        assertEquals(75, fourEntryList.computeMatch(threeEntryList));
-        assertEquals(100, threeEntryList.computeMatch(threeEntryList));
-        assertEquals(0, threeEntryList.computeMatch(emptyFileList));
-        assertEquals(0, emptyFileList.computeMatch(threeEntryList));
-        assertEquals(50, threeEntryList.computeMatch(modifiedFourEntryList));
-        assertEquals(50, modifiedFourEntryList.computeMatch(threeEntryList));
-    }
-
-    @Test
     public void testEquals() throws CoreException {
         FileList sameFileList = FileListFactory.createFileList(null,
             threeFileList, null, false, null);
@@ -269,18 +256,5 @@ public class FileListTest {
         String xml = list.toXML();
         FileList listFromXml = FileList.fromXML(xml);
         assertEquals(list, listFromXml);
-    }
-
-    @Test
-    public void testEmptyTempFiles() throws IOException {
-        List<IPath> files = new ArrayList<IPath>();
-        for (int i = 0; i < 10; i++)
-            files.add(new Path(File.createTempFile("saros_flt_junit", null)
-                .getAbsolutePath()));
-
-        FileList list1 = FileListFactory.createPathFileList(files);
-        FileList list2 = FileListFactory.createPathFileList(files);
-
-        assertEquals(100, list1.computeMatch(list2));
     }
 }
