@@ -609,11 +609,10 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
                 cancellationCause);
         }
 
-        if (sarosSession.isStopped()) {
-            if (sarosSession.getProjectResourcesMapping().keySet().isEmpty()
-                || sarosSession.getRemoteUsers().isEmpty())
-                sessionManager.stopSarosSession();
-        }
+        // The session might have been stopped already, if not we will stop it.
+        if (sarosSession.getProjectResourcesMapping().keySet().isEmpty()
+            || sarosSession.getRemoteUsers().isEmpty())
+            sessionManager.stopSarosSession();
 
         projectExchangeProcesses.removeProjectExchangeProcess(this);
         throw cancellationCause;

@@ -1,3 +1,27 @@
+12.7.6
+=======
+[PERFORMANCE] Various changes to reduce the size of marshalled objects. This is reducing the data that needs to be transmitted in a session.
+
+[FEATURE] Sending a single file during a Session now shows a progress dialog
+[FEATURE] Session participants are now listed only in the Session list and removed from the buddylist
+[FEATURE] Improving aesthetic aspects of the buddy context menu
+
+[FIX] #3539687: Default chat server denies room creation
+[FIX] #3489409: No project exists with this name to update from. The finish button is now enabled if an existing project can be used for synchronization.
+[FIX] Dropdown of saved selections in the resource selection was not updated after adding a new selection.
+[FIX] #3512781: Zip / Unzip takes too long.  The SharedResourceManager was enabled during decompression, this led to unwanted activities creations which delayed the decompression.
+[FIX] #3515619: File list size is too big. Instead of saving every file with its full path a complete tree is now build, containing each element only once.
+[FIX] #3348949: Correct but confusing inconsistency message. Users can no longer proceed until all dirty editors used in a shared project are saved. Affected editors will now be closed and reopened after the synchronization.
+[FIX] Recovery is now restoring files correctly.
+[FIX] #3539670: Cancellation of initial invitation does not quit the session
+[FIX] #3524623: Bad UI behaviour for Saros view to open when Eclipse starts
+[FIX] Adding a physically existing project to session. This should fix a failure that occurs if one participant previously removed a project without deleting the underlying files and folders and reuses the name of this project in a subsequent session.
+[FIX] the Finish button is no longer needed to be pushed twice
+[FIX] #3514797: Add XMPP account, No proper validation. There have been no validation messages on the "add xmpp/jabber account" wizard if the user mistyped his/her xmpp id. 
+[FIX] #3514674: "joining..." remains forever on 3rd participant
+[FIX] Auto-connect is now only performed if it is enabled.
+[FIX] #3511057: Fix the initial view-placement/proportions of the Whiteboard. The whiteboard is now initially opened stacked behind the Saros View.
+
 12.3.30
 =======
 [FEATURE] #3414942: Detailed progress reporting during invitation
