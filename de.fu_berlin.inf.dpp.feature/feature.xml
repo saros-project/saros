@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <feature
       id="de.fu_berlin.inf.dpp.feature"
-      label="Saros Feature"
+      label="Saros"
       version="12.7.6">
 
    <description>
