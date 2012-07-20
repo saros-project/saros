@@ -1,5 +1,6 @@
 package de.fu_berlin.inf.dpp.stf.shared;
 
+import java.util.Arrays;
 import java.util.Locale;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
@@ -34,11 +35,14 @@ public class Configuration {
      * Returns the value for the given key.
      * 
      * @param key
-     * @return the value for the key as a String
+     * @return the value for the key as a String or <code>null</code> if the
+     *         value could not been found
      */
     public static String getString(String key) {
 
         String value = null;
+
+        assert RESOURCE_BUNDLES.length > 0;
 
         for (ResourceBundle bundle : RESOURCE_BUNDLES) {
 
@@ -53,6 +57,14 @@ public class Configuration {
             }
         }
 
-        return value;
+        /*
+         * do not throw an exception as this will cause the JVM to throw an
+         * error during class initialization in the static part segments
+         */
+        System.err.println("key '" + key
+            + "' was not found in any of the following bundles: "
+            + Arrays.toString(BUNDLE_NAMES));
+
+        return null;
     }
 }

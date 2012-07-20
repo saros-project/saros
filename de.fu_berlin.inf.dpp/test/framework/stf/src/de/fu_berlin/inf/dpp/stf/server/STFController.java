@@ -2,6 +2,7 @@ package de.fu_berlin.inf.dpp.stf.server;
 
 import java.lang.Thread.UncaughtExceptionHandler;
 import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.rmi.AccessException;
 import java.rmi.AlreadyBoundException;
 import java.rmi.NotBoundException;
@@ -78,6 +79,7 @@ import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.whiteboard.im
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.impl.SuperBot;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.internal.impl.InternalImpl;
 import de.fu_berlin.inf.dpp.stf.shared.Configuration;
+import de.fu_berlin.inf.dpp.stf.shared.Constants;
 
 /**
  * STFController is responsible to register all exported objects.
@@ -105,6 +107,8 @@ public class STFController {
 
         PropertyConfigurator.configure(STFController.class.getClassLoader()
             .getResource("saros_testmode.log4j.properties"));
+
+        performConfigurationCheck();
 
         List<String> propertyKeys = Arrays.asList(System.getProperties()
             .keySet().toArray(new String[0]));
@@ -302,5 +306,43 @@ public class STFController {
                 + ", because it is bound already.", e);
         }
         return null;
+    }
+
+    private static void performConfigurationCheck() {
+
+        log.info("checking initialization of constants class: "
+            + Constants.class);
+        Class<Constants> constantClass = Constants.class;
+
+        Field[] fields = constantClass.getDeclaredFields();
+
+        for (Field field : fields) {
+
+            int modifiers = field.getModifiers();
+
+            if (!(Modifier.isPublic(modifiers) && Modifier.isStatic(modifiers) && Modifier
+                .isFinal(modifiers)))
+                throw new IllegalArgumentException(field
+                    + " is not public, static and final");
+
+            if (!String.class.isAssignableFrom(field.getType()))
+                continue;
+
+            Object object;
+            try {
+                object = field.get(null);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+
+            if (object == null)
+                throw new IllegalStateException(field
+                    + " has not been initialized");
+
+            log.trace("field '" + field.getName() + "' initialized with '"
+                + object + "'");
+
+        }
+
     }
 }
