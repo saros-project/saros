@@ -68,6 +68,7 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
      * projectID => List of {@link IPath files} that will be send to peer
      */
     protected MappedList<String, IPath> projectFilesToSend = new MappedList<String, IPath>();
+
     @Inject
     protected SessionIDObservable sessionID;
     protected final static Random INVITATION_RAND = new Random();
@@ -86,7 +87,7 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
     protected HashMap<IProject, List<IResource>> projectResources;
     protected List<ProjectExchangeInfo> projectExchangeInfos;
 
-    protected SarosPacketCollector remoteUserListResponseCollector;
+    protected SarosPacketCollector remoteFileListResponseCollector;
 
     public OutgoingProjectNegotiation(JID to, ISarosSession sarosSession,
         HashMap<IProject, List<IResource>> partialResources,
@@ -265,7 +266,7 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
 
             checkCancellation(CancelOption.NOTIFY_PEER);
 
-            Packet packet = collectPacket(remoteUserListResponseCollector,
+            Packet packet = collectPacket(remoteFileListResponseCollector,
                 60 * 60 * 1000, monitor);
 
             if (packet == null)
@@ -618,14 +619,14 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
     }
 
     private void createCollectors() {
-        remoteUserListResponseCollector = xmppReceiver
+        remoteFileListResponseCollector = xmppReceiver
             .createCollector(PacketExtensionUtils.getIncomingFileListFilter(
                 new IncomingTransferObjectExtensionProvider(),
                 sessionID.getValue(), processID, peer));
     }
 
     private void deleteCollectors() {
-        remoteUserListResponseCollector.cancel();
+        remoteFileListResponseCollector.cancel();
     }
 
     private List<FileList> deserializeRemoteFileList(Packet packet,
