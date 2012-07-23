@@ -199,13 +199,21 @@ public class EnterProjectNamePage extends WizardPage {
      */
     protected void startIBBLogoFlash() {
 
-        new Timer().schedule(new TimerTask() {
+        final Timer timer = new Timer();
+
+        timer.schedule(new TimerTask() {
 
             @Override
             public void run() {
                 Utils.runSafeSWTSync(log, new Runnable() {
 
                     public void run() {
+
+                        if (EnterProjectNamePage.this.getControl().isDisposed()) {
+                            timer.cancel();
+                            return;
+                        }
+
                         flashState = !flashState;
                         if (flashState)
                             setImageDescriptor(ImageManager
