@@ -50,7 +50,14 @@ public class MUCSessionPreferencesNegotiatingManager {
      * and chat room password.
      */
     public MUCSessionPreferences getOwnPreferences() {
-        String service = preferences.getString(PreferenceConstants.CHATSERVER);
+        String service;
+
+        if (preferences.getBoolean(PreferenceConstants.USE_DEFAULT_CHATSERVER))
+            service = preferences
+                .getDefaultString(PreferenceConstants.CHATSERVER);
+        else
+            service = preferences.getString(PreferenceConstants.CHATSERVER);
+
         String roomName = "SAROS" + sessionID.getValue();
         return new MUCSessionPreferences(service, roomName, this.password);
     }
