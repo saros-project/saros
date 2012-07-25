@@ -28,11 +28,9 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.LinkedBlockingQueue;
 
 import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IContainer;
@@ -46,7 +44,6 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
-import org.eclipse.swt.widgets.Display;
 import org.joda.time.DateTime;
 import org.picocontainer.Disposable;
 import org.picocontainer.MutablePicoContainer;
@@ -171,11 +168,7 @@ public class SarosSession implements ISarosSession, Disposable {
     protected SarosProjectMapper projectMapper = new SarosProjectMapper();
     protected boolean useVersionControl = true;
 
-    protected BlockingQueue<List<IActivity>> pendingActivityLists = new LinkedBlockingQueue<List<IActivity>>();
-
     protected List<IResource> selectedResources = new ArrayList<IResource>();
-
-    public boolean cancelActivityDispatcher = false;
 
     private final IActivityListener activityListener = new IActivityListener() {
 
@@ -199,60 +192,6 @@ public class SarosSession implements ISarosSession, Disposable {
     };
 
     protected MutablePicoContainer sessionContainer;
-
-    /**
-     * This thread executes pending activities in the SWT thread.<br>
-     * Reason: When a batch of activities arrives, it's not enough to exec them
-     * in a new Runnable with Util.runSafeSWTAsync(). Activity messages are
-     * ~1000ms apart, but a VCSActivity typically takes longer than that. Let's
-     * say this activity is dispatched to the SWT thread in a new Runnable r1.
-     * It now runs an SVN operation in a new thread t1. After 1000ms, another
-     * activity arrives, and is dispatched to SWT in runSafeSWTAsync(r2). Since
-     * r1 is mostly waiting on t1, the SWT thread is available to run the next
-     * runnable r2, because we used runSafeSWTAsync(r1).<br>
-     * That's also the reason why we have to use Util.runSafeSWTSync in the
-     * activityDispatcher thread.
-     * 
-     * @see Utils#runSafeSWTAsync(Logger, Runnable)
-     * @see Display#asyncExec(Runnable)
-     */
-    /*
-     * Note: transformation and executing has to be performed together in the
-     * SWT thread. Else, it would be possible that local activities are executed
-     * between transformation and application of remote operations. In other
-     * words, the transformation would be applied to an out-dated state.
-     */
-    private Thread activityDispatcher = new Thread("Saros Activity Dispatcher") { //$NON-NLS-1$
-        @Override
-        public void run() {
-            try {
-                while (!cancelActivityDispatcher) {
-                    final List<IActivity> activities = pendingActivityLists
-                        .take();
-                    Utils.runSafeSWTSync(log, new Runnable() {
-                        public void run() {
-                            TransformationResult transformed = concurrentDocumentClient
-                                .transformIncoming(activities);
-
-                            for (QueueItem item : transformed.getSendToPeers()) {
-                                sendActivity(item.recipients, item.activity);
-                            }
-
-                            for (IActivity activity : transformed.executeLocally) {
-                                for (IActivityProvider executor : activityProviders) {
-                                    executor.exec(activity);
-                                    handleFileAndFolderActivities(activity);
-                                }
-                            }
-                        }
-                    });
-                }
-            } catch (InterruptedException e) {
-                if (!cancelActivityDispatcher)
-                    log.error("activityDispatcher interrupted prematurely!", e); //$NON-NLS-1$
-            }
-        }
-    };
 
     public static class QueueItem {
 
@@ -289,10 +228,7 @@ public class SarosSession implements ISarosSession, Disposable {
 
         freeColors = new FreeColors(MAX_USERCOLORS - 1);
 
-        activityDispatcher.setDaemon(true);
-
         initializeSessionContainer(sarosContext);
-        activityDispatcher.start();
     }
 
     /**
@@ -677,12 +613,12 @@ public class SarosSession implements ISarosSession, Disposable {
     }
 
     public void dispose() {
+
         if (concurrentDocumentServer != null) {
             concurrentDocumentServer.dispose();
         }
         concurrentDocumentClient.dispose();
-        cancelActivityDispatcher = true;
-        activityDispatcher.interrupt();
+
     }
 
     /**
@@ -760,25 +696,85 @@ public class SarosSession implements ISarosSession, Disposable {
 
     public void exec(List<IActivityDataObject> activityDataObjects) {
         // Convert me
-
         List<IActivity> activities = convertAndQueueProjectActivities(activityDataObjects);
         if (isHost()) {
             TransformationResult transformed = concurrentDocumentServer
                 .transformIncoming(activities);
-
             activities = transformed.getLocalActivities();
-
             for (QueueItem item : transformed.getSendToPeers()) {
                 sendActivity(item.recipients, item.activity);
             }
         }
 
-        pendingActivityLists.add(activities);
+        execActivities(activities);
+    }
+
+    /**
+     * Starts an synchronous or asynchronous runnable to transform and execute
+     * incoming activities. The activityDispatcher was deleted, because the
+     * execution/transformation of an Activity was not started until the
+     * previous one was done. The asynchronous execution doesn't wait for the
+     * "return" from the previous Runnable, so the average time between arrival
+     * and execution of the incoming Activities drops. Incoming activities were
+     * transformed and executed too slow, so the users thought that it might
+     * have been an inconsistency.
+     * 
+     * <li><b>synchronous</b> processing is important during the invitation,
+     * because Saros is time-critical at this time. It will be aborted if the
+     * user takes to long to respond.</li>
+     * 
+     * <li><b>asynchronous</b> processing is used during the session. The async
+     * usage ensures that Saros gets more CPU time for transforming and
+     * executing of incoming activities. It will increase the throughput.</li>
+     * 
+     * If the invitation ends, an asynchronous runnable can just start, when the
+     * synchronous runnables have been finished. We don't need extra concurrent
+     * mechanisms to ensure that asynchronous Runnables do not influence the
+     * time-critical synchronous runnables during the invitation process.
+     * 
+     * @param activities
+     */
+    /*
+     * Note: transformation and executing has to be performed together in the
+     * SWT thread. Else, it would be possible that local activities are executed
+     * between transformation and application of remote operations. In other
+     * words, the transformation would be applied to an out-dated state.
+     */
+    protected void execActivities(final List<IActivity> activities) {
+        Runnable transformingRunnable = new Runnable() {
+            public void run() {
+                TransformationResult transformed = concurrentDocumentClient
+                    .transformIncoming(activities);
+                for (QueueItem item : transformed.getSendToPeers()) {
+                    sendActivity(item.recipients, item.activity);
+                }
+
+                for (final IActivity activity : transformed.executeLocally) {
+                    for (final IActivityProvider executor : activityProviders) {
+                        executor.exec(activity);
+                        handleFileAndFolderActivities(activity);
+                    }
+                }
+            }
+        };
+        /*
+         * FIXME The if-else-query and its change from synchronous usage to
+         * asynchronous shouldn't exist. A better solution would be a complete
+         * asynchronous handling.
+         * 
+         * HACK The change is needed, because the invitation couldn't be
+         * finished under the operating system Ubuntu, if an asynchronous
+         * handling was used
+         */
+        if (projectNegotiationObservable.getProcesses().values().size() > 0) {
+            Utils.runSafeSWTSync(log, transformingRunnable);
+        } else {
+            Utils.runSafeSWTAsync(log, transformingRunnable);
+        }
     }
 
     private List<IActivity> convertAndQueueProjectActivities(
         List<IActivityDataObject> activityDataObjects) {
-
         List<IActivity> result = new ArrayList<IActivity>(
             activityDataObjects.size());
 
@@ -884,7 +880,6 @@ public class SarosSession implements ISarosSession, Disposable {
 
         if (activity == null)
             throw new IllegalArgumentException("Activity cannot be null"); //$NON-NLS-1$
-
         /*
          * Let ConcurrentDocumentManager have a look at the activities first
          */
