@@ -67,7 +67,7 @@ public class AudioServiceManager {
     protected AudioServiceListenerDispatch audioListener = new AudioServiceListenerDispatch();
 
     public enum VoIPStatus {
-        STOPPED, RUNNING, STOPPING;
+        STOPPED, RUNNING, STOPPING, DISABLED;
     }
 
     protected VoIPStatus status = VoIPStatus.STOPPED;
@@ -134,6 +134,8 @@ public class AudioServiceManager {
         this.audioService = audioService;
         this.audioService.setAudioServiceManager(this);
         this.preferenceUtils = preferenceUtils;
+        if (!preferenceUtils.isVOIPEnabled())
+            status = VoIPStatus.DISABLED;
     }
 
     /**
@@ -144,6 +146,8 @@ public class AudioServiceManager {
     public IStatus invite(final User target, SubMonitor monitor) {
 
         switch (getStatus()) {
+        case DISABLED:
+            break;
         case STOPPED:
             log.info("Inviting " + target.toString() + " to new VoIP Session");
 

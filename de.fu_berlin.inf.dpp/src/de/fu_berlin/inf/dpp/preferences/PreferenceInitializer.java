@@ -117,6 +117,8 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
             "conference.saros-con.imp.fu-berlin.de");
         prefs.setValue(PreferenceConstants.USE_DEFAULT_CHATSERVER, true);
         prefs.setValue(PreferenceConstants.BEEP_UPON_IM, true);
+
+        prefs.setValue(PreferenceConstants.VOIP_ENABLED, false);
         prefs.setValue(PreferenceConstants.AUDIO_VBR, true);
         prefs.setValue(PreferenceConstants.AUDIO_ENABLE_DTX, true);
         prefs.setValue(PreferenceConstants.AUDIO_SAMPLERATE, "44100");
@@ -124,6 +126,7 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 
         // videosharing
 
+        prefs.setValue(PreferenceConstants.VIDEOSHARING_ENABLED, false);
         prefs.setValue(PreferenceConstants.ENCODING_VIDEO_FRAMERATE, 5);
         prefs.setValue(PreferenceConstants.ENCODING_VIDEO_RESOLUTION,
             VideoSharingPreferenceHelper.RESOLUTIONS[2][1]);

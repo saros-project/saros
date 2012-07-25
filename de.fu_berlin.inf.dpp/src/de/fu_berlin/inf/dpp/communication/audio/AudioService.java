@@ -60,7 +60,8 @@ public class AudioService extends StreamService {
         // Is user already in a voip session and are the devices properly
         // configured?
         if (audioServiceManager.getStatus() == AudioServiceManager.VoIPStatus.RUNNING
-            || audioServiceManager.getStatus() == AudioServiceManager.VoIPStatus.STOPPING) {
+            || audioServiceManager.getStatus() == AudioServiceManager.VoIPStatus.STOPPING
+            || audioServiceManager.getStatus() == AudioServiceManager.VoIPStatus.DISABLED) {
             return false;
         }
 

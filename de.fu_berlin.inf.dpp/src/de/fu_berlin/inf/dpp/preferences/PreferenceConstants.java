@@ -169,6 +169,8 @@ public class PreferenceConstants {
     /** Beep when receiving an IM **/
     public static final String BEEP_UPON_IM = "BEEP_UPON_IM";
 
+    public static final String VOIP_ENABLED = "voip.enabled";
+
     /** Audio quality level (1-10, 10 is best) **/
     public static final String AUDIO_QUALITY_LEVEL = "AUDIO_QUALITY_LEVEL";
 
@@ -190,6 +192,8 @@ public class PreferenceConstants {
     /*
      * VideoSharing
      */
+
+    public static final String VIDEOSHARING_ENABLED = "vs.enabled";
 
     /*
      * encoder constants

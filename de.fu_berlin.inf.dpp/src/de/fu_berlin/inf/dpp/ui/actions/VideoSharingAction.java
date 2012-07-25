@@ -90,6 +90,7 @@ public class VideoSharingAction extends Action implements Disposable {
 
     protected void updateEnablement() {
         try {
+
             List<User> participants = SelectionRetrieverFactory
                 .getSelectionRetriever(User.class).getSelection();
             setEnabled(participants.size() == 1
@@ -110,6 +111,8 @@ public class VideoSharingAction extends Action implements Disposable {
         setImageDescriptor(ImageManager
             .getImageDescriptor("icons/elcl16/startvideo.png")); //$NON-NLS-1$
         setToolTipText(TOOLTIP_START_SESSION);
+
+        setEnabled(videoSharing.ready());
     }
 
     @Override
