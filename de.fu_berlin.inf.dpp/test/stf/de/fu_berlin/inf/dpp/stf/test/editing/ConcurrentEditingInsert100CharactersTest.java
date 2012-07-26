@@ -29,7 +29,7 @@ import de.fu_berlin.inf.dpp.test.util.TestThread;
  * - the texts of the buddies will be compared
  */
 
-public class ConcurrentEditingTestJustInsert1000Chars extends StfTestCase {
+public class ConcurrentEditingInsert100CharactersTest extends StfTestCase {
     private TestThread aliceEditTaskThread;
     public volatile static int A_ALICE = 0;
 

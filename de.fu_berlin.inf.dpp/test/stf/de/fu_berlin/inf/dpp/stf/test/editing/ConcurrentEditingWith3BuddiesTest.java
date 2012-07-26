@@ -20,7 +20,7 @@ import de.fu_berlin.inf.dpp.test.util.TestThread;
  * @author nwarnatsch
  */
 
-public class ConcurrentEditingTestWith3Buddies extends StfTestCase {
+public class ConcurrentEditingWith3BuddiesTest extends StfTestCase {
     private TestThread aliceEditTaskThread;
     private TestThread bobEditTaskThread;
     private TestThread carlEditTaskThread;
