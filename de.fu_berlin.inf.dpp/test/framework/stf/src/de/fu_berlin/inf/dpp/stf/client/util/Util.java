@@ -761,6 +761,45 @@ public class Util {
         }
     }
 
+    /**
+     * Waits until all threads terminate.
+     * 
+     * @param timeout
+     *            how long to wait in milliseconds until timeout
+     * @param threads
+     *            the threads to observe
+     * 
+     * @return <code>true</code> if all threads terminated, <code>false</code>
+     *         if the timeout is exceeded
+     */
+    public static boolean joinAll(long timeout, Thread... threads) {
+
+        long currentTime;
+        long lastTime = System.currentTimeMillis();
+
+        for (Thread thread : threads) {
+            try {
+                thread.join(timeout);
+
+                if (thread.isAlive())
+                    return false;
+
+                currentTime = System.currentTimeMillis();
+                timeout -= (System.currentTimeMillis() - lastTime);
+                lastTime = currentTime;
+
+                if (timeout <= 0)
+                    timeout = 1;
+
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                return false;
+            }
+        }
+
+        return true;
+    }
+
     private static void assertStates(Boolean isConnected, Boolean isInSession,
         AbstractTester tester, AbstractTester... testers) throws Exception {
         AbstractTester[] t = new AbstractTester[testers.length + 1];
@@ -787,5 +826,4 @@ public class Util {
 
         }
     }
-
 }
