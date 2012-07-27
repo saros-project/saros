@@ -2,7 +2,7 @@
 <feature
       id="de.fu_berlin.inf.dpp.feature"
       label="Saros Feature"
-      version="12.7.6">
+      version="12.7.27">
 
    <description>
       Distributed Party Programming for Eclipse.
@@ -371,21 +371,21 @@ Public License instead of this License.
          id="de.fu_berlin.inf.dpp"
          download-size="0"
          install-size="0"
-         version="12.7.6"
+         version="12.7.27"
          unpack="false"/>
 
    <plugin
          id="de.fu_berlin.inf.dpp.whiteboard"
          download-size="0"
          install-size="0"
-         version="12.7.6"
+         version="12.7.27"
          unpack="false"/>
 
    <plugin
          id="de.fu_berlin.inf.nebula"
          download-size="0"
          install-size="0"
-         version="12.7.6"
+         version="12.7.27"
          unpack="false"/>
 
 </feature>
