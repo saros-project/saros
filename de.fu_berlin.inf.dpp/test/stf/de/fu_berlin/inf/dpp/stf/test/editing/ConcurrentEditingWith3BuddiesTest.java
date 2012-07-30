@@ -29,7 +29,7 @@ public class ConcurrentEditingWith3BuddiesTest extends StfTestCase {
      * The interval is the period of time in which the users edit the file. The
      * interval is set in minutes
      */
-    private final static int interval = 5;
+    private final static int INTERVAL = 1;
 
     @BeforeClass
     public static void selectTesters() throws Exception {
@@ -39,7 +39,6 @@ public class ConcurrentEditingWith3BuddiesTest extends StfTestCase {
     @Before
     public void runBeforeEveryTest() throws Exception {
         clearWorkspaces();
-        resetDefaultAccount();
     }
 
     @After
@@ -57,25 +56,7 @@ public class ConcurrentEditingWith3BuddiesTest extends StfTestCase {
             carlEditTaskThread.join(10000);
         }
 
-        try {
-            ALICE.superBot().menuBar().saros().stopSession();
-        } catch (Exception ex) {
-            System.out.println(ex.getMessage());
-        }
-        try {
-            CARL.superBot().menuBar().saros().stopSession();
-        } catch (Exception ex) {
-            System.out.println(ex.getMessage());
-        }
-        try {
-            BOB.superBot().menuBar().saros().stopSession();
-        } catch (Exception ex) {
-            System.out.println(ex.getMessage());
-        }
         leaveSessionHostFirst(ALICE);
-        ALICE.remoteBot().sleep(1000);
-        BOB.remoteBot().sleep(1000);
-        CARL.remoteBot().sleep(1000);
     }
 
     /**
@@ -86,15 +67,12 @@ public class ConcurrentEditingWith3BuddiesTest extends StfTestCase {
      */
     @Test
     public void testTwoInsertOneDelete() throws Exception {
-        try {
-            Util.setUpSessionWithProjectAndFile(
-                "foo",
-                "readme.txt",
-                "\nVerbesserung des algorithmischen Kerns, Gleichzeitiges Editieren\n",
-                ALICE, CARL, BOB);
-        } catch (Exception ex) {
-            System.out.println(ex.getMessage());
-        }
+        Util.setUpSessionWithProjectAndFile(
+            "foo",
+            "readme.txt",
+            "\nVerbesserung des algorithmischen Kerns, Gleichzeitiges Editieren\n",
+            ALICE, CARL, BOB);
+
         BOB.superBot().views().packageExplorerView()
             .waitUntilResourceIsShared("foo/readme.txt");
         CARL.superBot().views().packageExplorerView()
@@ -189,12 +167,12 @@ public class ConcurrentEditingWith3BuddiesTest extends StfTestCase {
         carlEditTaskThread = new TestThread(carlEditTask);
         carlEditTaskThread.start();
 
-        // Let the Users make keystrokes until the interval is finished.
-        aliceEditTaskThread.join(interval * 60 * 1000);
+        Thread.sleep(INTERVAL * 60 * 1000);
 
         aliceEditTaskThread.interrupt();
         bobEditTaskThread.interrupt();
         carlEditTaskThread.interrupt();
+
         aliceEditTaskThread.join(10000);
         bobEditTaskThread.join(10000);
         carlEditTaskThread.join(10000);
@@ -203,9 +181,8 @@ public class ConcurrentEditingWith3BuddiesTest extends StfTestCase {
         bobEditTaskThread.verify();
         carlEditTaskThread.verify();
 
-        ALICE.remoteBot().sleep(1000);
-        BOB.remoteBot().sleep(1000);
-        CARL.remoteBot().sleep(1000);
+        // ensure that all queues on the client sides are flushed
+        Thread.sleep(10 * 1000);
 
         String aliceText = ALICE.remoteBot().editor("readme.txt").getText();
         String bobText = BOB.remoteBot().editor("readme.txt").getText();
@@ -220,8 +197,6 @@ public class ConcurrentEditingWith3BuddiesTest extends StfTestCase {
         CARL.remoteBot().editor("readme.txt").closeWithoutSave();
         CARL.remoteBot().waitUntilEditorClosed("readme.txt");
 
-        assertEquals(aliceText.length(), bobText.length());
-        assertEquals(carlText.length(), bobText.length());
         assertEquals(bobText, carlText);
         assertEquals(aliceText, bobText);
     }
@@ -234,15 +209,12 @@ public class ConcurrentEditingWith3BuddiesTest extends StfTestCase {
      */
     @Test
     public void testThreeInsert() throws Exception {
-        try {
-            Util.setUpSessionWithProjectAndFile(
-                "foo",
-                "readme.txt",
-                "\nVerbesserung des algorithmischen Kerns, Gleichzeitiges Editieren\n",
-                ALICE, CARL, BOB);
-        } catch (Exception ex) {
-            System.out.println(ex.getMessage());
-        }
+        Util.setUpSessionWithProjectAndFile(
+            "foo",
+            "readme.txt",
+            "\nVerbesserung des algorithmischen Kerns, Gleichzeitiges Editieren\n",
+            ALICE, CARL, BOB);
+
         BOB.superBot().views().packageExplorerView()
             .waitUntilResourceIsShared("foo/readme.txt");
         CARL.superBot().views().packageExplorerView()
@@ -331,8 +303,7 @@ public class ConcurrentEditingWith3BuddiesTest extends StfTestCase {
         carlEditTaskThread = new TestThread(carlEditTask);
         carlEditTaskThread.start();
 
-        // Let the Users make keystrokes until the interval is finished.
-        aliceEditTaskThread.join(interval * 60 * 1000);
+        Thread.sleep(INTERVAL * 60 * 1000);
 
         aliceEditTaskThread.interrupt();
         bobEditTaskThread.interrupt();
@@ -344,6 +315,9 @@ public class ConcurrentEditingWith3BuddiesTest extends StfTestCase {
         aliceEditTaskThread.verify();
         bobEditTaskThread.verify();
         carlEditTaskThread.verify();
+
+        // ensure that all queues on the client sides are flushed
+        Thread.sleep(10 * 1000);
 
         String aliceText = ALICE.remoteBot().editor("readme.txt").getText();
         String bobText = BOB.remoteBot().editor("readme.txt").getText();
@@ -358,8 +332,6 @@ public class ConcurrentEditingWith3BuddiesTest extends StfTestCase {
         CARL.remoteBot().editor("readme.txt").closeWithoutSave();
         CARL.remoteBot().waitUntilEditorClosed("readme.txt");
 
-        assertEquals(aliceText.length(), bobText.length());
-        assertEquals(carlText.length(), bobText.length());
         assertEquals(bobText, carlText);
         assertEquals(aliceText, bobText);
     }
