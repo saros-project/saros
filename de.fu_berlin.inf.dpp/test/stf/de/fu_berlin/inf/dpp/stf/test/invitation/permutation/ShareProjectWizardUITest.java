@@ -84,13 +84,6 @@ public class ShareProjectWizardUITest extends StfTestCase {
             .cls(Constants.PROJECT1, Constants.PKG1, Constants.CLS3);
     }
 
-    @Before
-    public void runBeforeEveryTest() throws Exception {
-        closeAllShells();
-        closeAllEditors();
-        clearWorkspaces();
-    }
-
     protected IRemoteBotTreeItem getClass(String name) throws RemoteException {
         IRemoteBotTreeItem projectTreeItem = ALICE.remoteBot().tree()
             .expandNode(Constants.PROJECT1, true);
