@@ -235,9 +235,6 @@ public class Messages extends NLS {
     public static String GettingStartedWizard_title;
     public static String GiveWriteAccessAction_title;
     public static String GiveWriteAccessAction_tooltip;
-    public static String IMBeepAction_off_tooltip;
-    public static String IMBeepAction_on_tooltip;
-    public static String IMBeepAction_title;
     public static String InvitationWizard_buddy_offline;
     public static String InvitationWizard_buddy_offline_text;
     public static String InvitationWizard_invite_error;

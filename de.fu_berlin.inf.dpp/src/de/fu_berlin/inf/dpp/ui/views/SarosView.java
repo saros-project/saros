@@ -78,7 +78,6 @@ import de.fu_berlin.inf.dpp.ui.actions.DeleteContactAction;
 import de.fu_berlin.inf.dpp.ui.actions.FollowModeAction;
 import de.fu_berlin.inf.dpp.ui.actions.FollowThisPersonAction;
 import de.fu_berlin.inf.dpp.ui.actions.GiveWriteAccessAction;
-import de.fu_berlin.inf.dpp.ui.actions.IMBeepAction;
 import de.fu_berlin.inf.dpp.ui.actions.JumpToUserWithWriteAccessPositionAction;
 import de.fu_berlin.inf.dpp.ui.actions.LeaveSessionAction;
 import de.fu_berlin.inf.dpp.ui.actions.NewContactAction;
@@ -456,7 +455,6 @@ public class SarosView extends ViewPart {
         toolBar.add(new ConsistencyAction());
         fmAction = new FollowModeAction();
         toolBar.add(fmAction);
-        toolBar.add(new IMBeepAction());
         toolBar.add(new OpenPreferencesAction());
         toolBar.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
         toolBar.add(new LeaveSessionAction());
