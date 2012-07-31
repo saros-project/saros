@@ -219,4 +219,9 @@ public class PreferenceUtils {
         saros.getPreferenceStore().setValue(
             PreferenceConstants.NEEDS_BASED_SYNC, value);
     }
+
+    public boolean isVOIPEnabled() {
+        return saros.getPreferenceStore().getBoolean(
+            PreferenceConstants.VOIP_ENABLED);
+    }
 }

@@ -1,3 +1,13 @@
+12.7.27
+=======
+[PERFORMANCE] Reduced size of marshalled objects by 10%
+
+[FIX] Use asynchronous processing for incoming activities
+[FIX] #3502940 Removed feature "Scan Workspace"
+[FIX] leaked thread when displaying IBB warn icon
+[UI] Changed "TSL" to "TLS" (Transport Layer Security)
+[UI] Inserted missing whitespace in error message
+
 12.7.6
 =======
 [PERFORMANCE] Various changes to reduce the size of marshalled objects. This is reducing the data that needs to be transmitted in a session.

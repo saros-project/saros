@@ -33,7 +33,6 @@ import org.picocontainer.annotations.Inject;
 
 import com.thoughtworks.xstream.InitializationException;
 
-import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
@@ -93,7 +92,6 @@ public class VideoSharing {
     @Inject
     protected VideoSessionObservable videoSharingSessionObservable;
 
-    protected Saros saros;
     protected IPreferenceStore preferences;
 
     /**
@@ -101,11 +99,15 @@ public class VideoSharing {
      */
     protected boolean requestingSession = false;
 
-    public VideoSharing(Saros saros, VideoSharingService videoSharingService) {
-        this.saros = saros;
-        this.preferences = saros.getPreferenceStore();
+    private boolean enabled;
+
+    public VideoSharing(IPreferenceStore preferences,
+        VideoSharingService videoSharingService) {
+        this.preferences = preferences;
         this.videoSharingService = videoSharingService;
         videoSharingService.setVideoSharing(this);
+        enabled = preferences
+            .getBoolean(PreferenceConstants.VIDEOSHARING_ENABLED);
     }
 
     /**
@@ -178,7 +180,7 @@ public class VideoSharing {
      * @return whether creation of a new session is possible
      */
     public synchronized boolean ready() {
-        return videoSharingSessionObservable.getValue() == null
+        return enabled && videoSharingSessionObservable.getValue() == null
             && !requestingSession;
     }
 

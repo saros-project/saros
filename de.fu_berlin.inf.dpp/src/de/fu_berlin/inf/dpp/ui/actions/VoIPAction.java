@@ -17,6 +17,7 @@ import org.picocontainer.annotations.Inject;
 import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.communication.audio.AudioServiceManager;
+import de.fu_berlin.inf.dpp.communication.audio.AudioServiceManager.VoIPStatus;
 import de.fu_berlin.inf.dpp.net.internal.StreamServiceManager;
 import de.fu_berlin.inf.dpp.net.internal.StreamSession;
 import de.fu_berlin.inf.dpp.observables.VoIPSessionObservable;
@@ -86,6 +87,10 @@ public class VoIPAction extends Action {
                 .getSelectionRetriever(User.class).getSelection();
             setEnabled(sessionManager.getSarosSession() != null
                 && participants.size() == 1 && !participants.get(0).isLocal());
+
+            if (audioServiceManager.getStatus() == VoIPStatus.DISABLED)
+                setEnabled(false);
+
         } catch (NullPointerException e) {
             this.setEnabled(false);
         } catch (Exception e) {
