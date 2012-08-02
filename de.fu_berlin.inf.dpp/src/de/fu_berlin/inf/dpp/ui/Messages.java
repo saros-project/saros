@@ -504,6 +504,9 @@ public class Messages extends NLS {
     public static String HostLeftAloneInSessionDialog_title;
     public static String HostLeftAloneInSessionDialog_message;
 
+    public static String OpenPreferencesAction_title;
+    public static String OpenPreferencesAction_tooltip;
+
     static {
         // initialize resource bundle
         NLS.initializeMessages(BUNDLE_NAME, Messages.class);

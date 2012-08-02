@@ -70,6 +70,7 @@ public class ImageManager {
     public static final Image DLCL_SAROS_SESSION_STOP_PROCESS = getImage("icons/dlcl16/saros_session_stop_process_tsk.png"); //$NON-NLS-1$
     public static final Image ELCL_DIALOG = getImage("icons/elcl16/dialog.gif"); //$NON-NLS-1$
     public static final Image ELCL_DELETE = getImage("icons/btn/deleteaccount.png"); //$NON-NLS-1$
+    public static final ImageDescriptor ELCL_OPEN_PREFERENCES = getImageDescriptor("icons/elcl16/preferences_open_tsk.png"); //$NON-NLS-1$
 
     /*
      * objects
