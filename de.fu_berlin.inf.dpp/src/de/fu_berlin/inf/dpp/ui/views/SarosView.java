@@ -199,7 +199,7 @@ public class SarosView extends ViewPart {
         public void propertyChange(PropertyChangeEvent event) {
             if (event.getProperty().equals(
                 PreferenceConstants.ENABLE_BALLOON_NOTIFICATION)) {
-                showBallonNotifications = Boolean.valueOf(event.getNewValue()
+                showBalloonNotifications = Boolean.valueOf(event.getNewValue()
                     .toString());
             }
         }
@@ -225,13 +225,13 @@ public class SarosView extends ViewPart {
     @Inject
     protected ChildContainer container;
 
-    private static volatile boolean showBallonNotifications;
+    private static volatile boolean showBalloonNotifications;
 
     public SarosView() {
         super();
         SarosPluginContext.initComponent(this);
         saros.getPreferenceStore().addPropertyChangeListener(propertyListener);
-        showBallonNotifications = saros.getPreferenceStore().getBoolean(
+        showBalloonNotifications = saros.getPreferenceStore().getBoolean(
             PreferenceConstants.ENABLE_BALLOON_NOTIFICATION);
     }
 
@@ -608,7 +608,7 @@ public class SarosView extends ViewPart {
         if (text == null)
             throw new NullPointerException("text is null");
 
-        if (!showBallonNotifications)
+        if (!showBalloonNotifications)
             return;
 
         Utils.runSafeSWTAsync(log, new Runnable() {

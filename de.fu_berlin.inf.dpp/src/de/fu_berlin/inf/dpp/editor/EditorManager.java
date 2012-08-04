@@ -1008,7 +1008,7 @@ public class EditorManager extends AbstractActivityProvider {
      */
     public void partActivated(IEditorPart editorPart) {
 
-        log.trace(".partActiveted invoked");
+        log.trace(".partActivated invoked");
 
         // First check for last editor being closed (which is a null editorPart)
         if (editorPart == null) {
@@ -1029,7 +1029,7 @@ public class EditorManager extends AbstractActivityProvider {
                 setFollowing(null);
                 SarosView
                     .showNotification(
-                        "Follow mode stopped!",
+                        "Follow Mode stopped!",
                         "You switched to another editor that is not shared \nor closed the followed editor.");
             }
             return;
@@ -1050,7 +1050,7 @@ public class EditorManager extends AbstractActivityProvider {
                 // follower switched to another shared editor or closed followed
                 // editor (shared editor gets activated)
                 SarosView
-                    .showNotification("Follow mode stopped!",
+                    .showNotification("Follow Mode stopped!",
                         "You switched to another editor \nor closed the followed editor.");
             }
         }
@@ -1126,7 +1126,7 @@ public class EditorManager extends AbstractActivityProvider {
                 // follower closed the followed editor (no other editor gets
                 // activated)
                 setFollowing(null);
-                SarosView.showNotification("Follow mode stopped!",
+                SarosView.showNotification("Follow Mode stopped!",
                     "You closed the followed editor.");
             }
         }
@@ -1158,8 +1158,8 @@ public class EditorManager extends AbstractActivityProvider {
      * 
      * @param path
      *            the project-relative path to the resource.
-     * @return <code>true</code> if the given resource is opened accoring to the
-     *         editor pool.
+     * @return <code>true</code> if the given resource is opened according to
+     *         the editor pool.
      */
     public boolean isOpened(SPath path) {
         return this.editorPool.getEditors(path).size() > 0;
@@ -1316,7 +1316,7 @@ public class EditorManager extends AbstractActivityProvider {
     /**
      * Save file denoted by the given project relative path if necessary
      * according to isDirty(IPath) and call saveText(IPath) if necessary in the
-     * SWT thead.
+     * SWT thread.
      * 
      * @blocking This method returns after the file has been saved in the SWT
      *           Thread.
