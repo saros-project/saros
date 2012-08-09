@@ -397,7 +397,7 @@ public interface Constants {
     public final static String CM_ADD_TO_SAROS_SESSION = Configuration
         .getString("cm_add_to_saros_session");
     public final static String CM_TEST_DATA_TRANSFER = Configuration
-        .getString("cm_test_data_transfer_connection");
+        .getString("ConnectionTestAction_title");
     public final static String CM_GRANT_WRITE_ACCESS = Configuration
         .getString("cm_grant_write_access");
     public final static String CM_RESTRICT_TO_READ_ONLY_ACCESS = Configuration
