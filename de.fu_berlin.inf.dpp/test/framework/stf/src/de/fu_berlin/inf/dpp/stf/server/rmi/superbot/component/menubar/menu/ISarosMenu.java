@@ -43,6 +43,19 @@ public interface ISarosMenu extends Remote {
     public void shareProjects(String[] projectNames, JID... jids)
         throws RemoteException;
 
+    /**
+     * Adds the files of the given project to the current session.
+     * 
+     * @param project
+     *            the name of the project that should be added to the current
+     *            session
+     * @param files
+     *            the files of the project that should be added
+     * @throws RemoteException
+     */
+    public void addProject(String project, String[] files)
+        throws RemoteException;
+
     public void addProjects(String... projectNames) throws RemoteException;
 
     public void stopSession() throws RemoteException;

@@ -53,7 +53,7 @@ public final class SuperBot extends StfRemoteObject implements ISuperBot {
         return localJID;
     }
 
-    public void confirmShellAddProjectWithNewProject(String projectname)
+    public void confirmShellAddProjectWithNewProject(String projectName)
         throws RemoteException {
 
         SWTBot bot = new SWTBot();
@@ -64,6 +64,7 @@ public final class SuperBot extends StfRemoteObject implements ISuperBot {
         shell.activate();
 
         shell.bot().radio(RADIO_CREATE_NEW_PROJECT).click();
+        shell.bot().textWithLabel("Project name", 0).setText(projectName);
         shell.bot().button(FINISH).click();
         shell.bot().waitUntil(Conditions.shellCloses(shell));
     }
@@ -381,6 +382,24 @@ public final class SuperBot extends StfRemoteObject implements ISuperBot {
         bot.waitUntil(Conditions.shellCloses(shell));
     }
 
+    @Override
+    public void confirmShellAddProjectToSession(String project, String[] files)
+        throws RemoteException {
+        SWTBot bot = new SWTBot();
+        SWTBotShell shell = bot.shell(SHELL_ADD_PROJECTS_TO_SESSION);
+        shell.activate();
+
+        // wait for tree update
+        bot.sleep(500);
+
+        SWTBotTree tree = shell.bot().tree();
+
+        selectProjectFiles(tree, project, files);
+
+        shell.bot().button(FINISH).click();
+        bot.waitUntil(Conditions.shellCloses(shell));
+    }
+
     public void confirmShellSessionInvitationAndShellAddProject(
         String projectName, TypeOfCreateProject usingWhichProject)
         throws RemoteException {
@@ -470,21 +489,7 @@ public final class SuperBot extends StfRemoteObject implements ISuperBot {
 
         SWTBotTree tree = shell.bot().tree();
 
-        for (SWTBotTreeItem item : tree.getAllItems())
-            while (item.isChecked())
-                item.uncheck();
-
-        for (String file : files) {
-            String[] nodes = file.split("/|\\\\");
-            List<String> regex = new ArrayList<String>(nodes.length + 1);
-            regex.add(Pattern.quote(project));
-
-            for (String node : nodes)
-                regex.add(Pattern.quote(node));
-
-            WidgetUtil.getTreeItemWithRegex(tree, regex.toArray(new String[0]))
-                .check();
-        }
+        selectProjectFiles(tree, project, files);
 
         shell.bot().button(NEXT).click();
 
@@ -522,5 +527,24 @@ public final class SuperBot extends StfRemoteObject implements ISuperBot {
             shell.bot().checkBox("Remember my decision.").click();
         shell.bot().button(decsision).click();
         bot.waitUntil(Conditions.shellCloses(shell));
+    }
+
+    private void selectProjectFiles(SWTBotTree tree, String project,
+        String[] files) {
+        for (SWTBotTreeItem item : tree.getAllItems())
+            while (item.isChecked())
+                item.uncheck();
+
+        for (String file : files) {
+            String[] nodes = file.split("/|\\\\");
+            List<String> regex = new ArrayList<String>(nodes.length + 1);
+            regex.add(Pattern.quote(project));
+
+            for (String node : nodes)
+                regex.add(Pattern.quote(node));
+
+            WidgetUtil.getTreeItemWithRegex(tree, regex.toArray(new String[0]))
+                .check();
+        }
     }
 }

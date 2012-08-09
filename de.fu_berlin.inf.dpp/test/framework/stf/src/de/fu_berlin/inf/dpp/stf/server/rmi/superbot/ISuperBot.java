@@ -9,6 +9,7 @@ import de.fu_berlin.inf.dpp.stf.server.StfRemoteObject;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.menubar.IMenuBar;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.IViews;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.internal.IInternal;
+import de.fu_berlin.inf.dpp.stf.shared.Constants;
 import de.fu_berlin.inf.dpp.stf.shared.Constants.TypeOfCreateProject;
 
 public interface ISuperBot extends Remote {
@@ -183,6 +184,21 @@ public interface ISuperBot extends Remote {
         throws RemoteException;
 
     public void confirmShellAddProjectsToSession(String... projectNames)
+        throws RemoteException;
+
+    /**
+     * Confirms the shell with title
+     * {@link Constants#SHELL_ADD_PROJECTS_TO_SESSION}
+     * 
+     * @param project
+     *            the name of the project that should be added to the current
+     *            session
+     * @param files
+     *            the files of the project that should be added
+     * @throws RemoteException
+     */
+
+    public void confirmShellAddProjectToSession(String project, String[] files)
         throws RemoteException;
 
     /**

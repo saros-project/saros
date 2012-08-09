@@ -1,5 +1,7 @@
 package de.fu_berlin.inf.dpp.stf.shared;
 
+// TODO sort by wizards / context menus instead of widget types !
+
 public interface Constants {
     public enum TypeOfCreateProject {
         NEW_PROJECT, EXIST_PROJECT, EXIST_PROJECT_WITH_COPY, EXIST_PROJECT_WITH_COPY_AFTER_CANCEL_LOCAL_CHANGE
@@ -102,6 +104,7 @@ public interface Constants {
     static public final String NODE_GENERAL = "General";
     static public final String NODE_PROJECT = "Project";
 
+    /* Eclipse Project Wizard */
     static public final String LABEL_PROJECT_NAME = "Project name:";
     static public final String LABEL_FILE_NAME = "File name:";
     static public final String LABEL_FOLDER_NAME = "Folder name:";
