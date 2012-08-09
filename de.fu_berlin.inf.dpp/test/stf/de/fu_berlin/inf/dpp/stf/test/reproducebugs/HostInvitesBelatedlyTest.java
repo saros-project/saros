@@ -99,7 +99,7 @@ public class HostInvitesBelatedlyTest extends StfTestCase {
             .setTextFromFile(Constants.CP2_CHANGE);
 
         Util.buildSessionConcurrently(Constants.PROJECT1,
-            TypeOfCreateProject.NEW_PROJECT, ALICE, BOB);
+            TypeOfCreateProject.EXIST_PROJECT, ALICE, BOB);
 
         ALICE.remoteBot().sleep(5000);
 

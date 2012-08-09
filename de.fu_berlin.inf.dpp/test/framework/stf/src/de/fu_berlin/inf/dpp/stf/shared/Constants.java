@@ -397,7 +397,7 @@ public interface Constants {
     public final static String CM_ADD_TO_SAROS_SESSION = Configuration
         .getString("cm_add_to_saros_session");
     public final static String CM_TEST_DATA_TRANSFER = Configuration
-        .getString("ConnectionTestAction_title");
+        .getString("cm_test_data_transfer_connection");
     public final static String CM_GRANT_WRITE_ACCESS = Configuration
         .getString("cm_grant_write_access");
     public final static String CM_RESTRICT_TO_READ_ONLY_ACCESS = Configuration
@@ -492,6 +492,9 @@ public interface Constants {
         .getString("shell_new_file_shared");
     public final static String SHELL_NEED_BASED_SYNC = Configuration
         .getString("shell_need_based_sync");
+
+    public final static String SHELL_CONFIRM_SAVE_UNCHANGED_CHANGES = Configuration
+        .getString("AddProjectToSessionWizard_unsaved_changes_dialog_title");
 
     /* Context menu of a selected tree item on the package explorer view */
     public final static String CM_SHARE_WITH = Configuration

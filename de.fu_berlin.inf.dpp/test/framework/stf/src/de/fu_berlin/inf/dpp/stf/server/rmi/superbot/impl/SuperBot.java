@@ -81,16 +81,33 @@ public final class SuperBot extends StfRemoteObject implements ISuperBot {
         shell.bot().textWithLabel("Project name", 1).setText(projectName);
         shell.bot().button(FINISH).click();
 
-        bot.sleep(2000);
+        // prevent STF from entering an endless loop
 
-        for (SWTBotShell currentShell : bot.shells()) {
-            if (currentShell.getText().equals(
-                SHELL_WARNING_LOCAL_CHANGES_DELETED)
-                || currentShell.getText().equals(SHELL_SAVE_RESOURCE)) {
-                currentShell.activate();
-                currentShell.bot().button(YES).click();
-                currentShell.bot().waitUntil(
-                    Conditions.shellCloses(currentShell));
+        int timeout = 5;
+        confirmDialogs: while (timeout-- > 0) {
+            bot.sleep(2000);
+
+            for (SWTBotShell currentShell : bot.shells()) {
+                if (currentShell.getText().equals(
+                    SHELL_WARNING_LOCAL_CHANGES_DELETED)
+                    || currentShell.getText().equals(SHELL_SAVE_RESOURCE)) {
+                    currentShell.activate();
+                    currentShell.bot().button(YES).click();
+                    currentShell.bot().waitUntil(
+                        Conditions.shellCloses(currentShell));
+                    break confirmDialogs;
+
+                } else if (currentShell.getText().equals(
+                    SHELL_CONFIRM_SAVE_UNCHANGED_CHANGES)) {
+                    currentShell.activate();
+                    currentShell.bot().button(YES).click();
+                    currentShell.bot().waitUntil(
+                        Conditions.shellCloses(currentShell));
+
+                    shell.bot().button(FINISH).click();
+
+                    continue confirmDialogs;
+                }
             }
         }
 
