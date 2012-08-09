@@ -71,7 +71,7 @@ public class UserElement extends TreeElement {
             this.awarenessInformation.add(new AwarenessInformationTreeElement(
                 this.user));
             FollowModeInformationTreeElement followModeIndicator;
-            if (awarenessInformationCollector.getFollowedUser(user) != null) {
+            if (awarenessInformationCollector.getFollowedJID(user) != null) {
                 followModeIndicator = new FollowModeInformationTreeElement(user);
                 this.awarenessInformation.add(followModeIndicator);
             }
@@ -93,6 +93,7 @@ public class UserElement extends TreeElement {
         StyledString styledString = new StyledString();
         final String read_only = Messages.UserElement_read_only;
         final String following = Messages.UserElement_following;
+        final String following_paused = Messages.UserElement_following_paused;
         final String joining = Messages.UserElement_joining;
         final String host = Messages.UserElement_host;
 
@@ -119,12 +120,24 @@ public class UserElement extends TreeElement {
         }
 
         /*
-         * Other
+         * Follow Mode: Who am I following? If this equals the user element we
+         * are looking at, append the follow information to the user. Don't
+         * append this info for any other users, because they have a
+         * FollowModeTreeElement for this.
          */
-        if (user.equals(editorManager.getFollowedUser())) {
-            styledString.append(" " + following, SWTBoldStyler.STYLER);
+        User followee = editorManager.getFollowedUser();
+        if (user.equals(followee)) {
+            if (awarenessInformationCollector.isActiveEditorShared(user)) {
+                styledString.append(" " + following, SWTBoldStyler.STYLER);
+            } else {
+                styledString.append(" " + following_paused,
+                    SWTBoldStyler.STYLER);
+            }
         }
 
+        /*
+         * Other
+         */
         if (!user.isInvitationComplete()) {
             styledString.append(" " + joining, StyledString.COUNTER_STYLER);
         }

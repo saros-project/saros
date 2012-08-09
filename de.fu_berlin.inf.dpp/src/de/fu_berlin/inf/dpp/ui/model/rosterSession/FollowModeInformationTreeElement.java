@@ -4,18 +4,16 @@ import org.apache.log4j.Logger;
 import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.graphics.Image;
-import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.User;
-import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.observables.SarosSessionObservable;
 import de.fu_berlin.inf.dpp.ui.ImageManager;
+import de.fu_berlin.inf.dpp.ui.Messages;
 
 /**
  * This is a tree element that can be displayed as a child element of the user
  * entry in the Saros session view {@link Viewer Viewers} showing information
  * about the state of that user / his past actions or whatever awareness
- * information migh help to be more productive in a session.
+ * information might help to be more productive in a session.
  * 
  * @author Alexander Waldmann (contact@net-corps.de)
  */
@@ -23,9 +21,6 @@ public class FollowModeInformationTreeElement extends
     AwarenessInformationTreeElement {
     private static final Logger log = Logger
         .getLogger(FollowModeInformationTreeElement.class);
-
-    @Inject
-    protected SarosSessionObservable sarosSession;
 
     public FollowModeInformationTreeElement(User user) {
         super(user);
@@ -40,18 +35,17 @@ public class FollowModeInformationTreeElement extends
     @Override
     public StyledString getStyledText() {
         log.debug("FollowModeInformation getStyledText()");
-        StyledString styledString = new StyledString();
 
-        JID followTarget = awarenessInformationCollector.getFollowedUser(user);
-        if (followTarget != null) {
-            // user is following someone: show it
-            followTarget = sarosSession.getValue().getResourceQualifiedJID(
-                followTarget);
-            if (followTarget != null) {
-                User followTargetUser = sarosSession.getValue().getUser(
-                    followTarget);
-                styledString.append("Following "
-                    + followTargetUser.getShortHumanReadableName());
+        StyledString styledString = new StyledString();
+        final String following_paused = Messages.UserElement_following_paused;
+
+        User followee = awarenessInformationCollector.getFollowedUser(user);
+        if (followee != null) {
+            if (awarenessInformationCollector.isActiveEditorShared(followee)) {
+                styledString.append("following "
+                    + followee.getShortHumanReadableName());
+            } else {
+                styledString.append(following_paused);
             }
         } else {
             styledString.append("Not following anyone");

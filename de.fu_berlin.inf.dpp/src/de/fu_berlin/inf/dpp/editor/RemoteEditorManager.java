@@ -330,4 +330,28 @@ public class RemoteEditorManager {
     public Set<SPath> getRemoteOpenEditors(User user) {
         return getEditorState(user).getRemoteOpenEditors();
     }
+
+    /**
+     * Returns the active Editor which is currently open by the given user of
+     * this shared session (i.e. not our own).
+     * 
+     * @return the active RemoteEditor or <code>null</code> if the given user
+     *         has no editor open.
+     */
+    public RemoteEditor getRemoteActiveEditor(User user) {
+        return getEditorState(user).getActiveEditor();
+    }
+
+    /**
+     * Checks if the active editor of the given user is part of the Saros
+     * session, or not. Convenience method for calling
+     * getEditorState(user).getActiveEditor() != null.
+     * 
+     * @return <code>true</code>, if the currently active remote editor of the
+     *         given user is shared via the Saros session, <code>false</code>
+     *         otherwise.
+     */
+    public boolean isRemoteActiveEditorShared(User user) {
+        return getRemoteActiveEditor(user) != null;
+    }
 }

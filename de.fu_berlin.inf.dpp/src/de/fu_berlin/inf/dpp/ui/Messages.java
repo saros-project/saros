@@ -428,6 +428,7 @@ public class Messages extends NLS {
     public static String UPnPUIUtils_no_gateway;
     public static String UPnPUIUtils_no_valid_gateway;
     public static String UserElement_following;
+    public static String UserElement_following_paused;
     public static String UserElement_joining;
     public static String UserElement_read_only;
     public static String UserElement_host;

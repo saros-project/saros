@@ -13,7 +13,6 @@ import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.editor.RemoteEditorManager;
 import de.fu_berlin.inf.dpp.editor.RemoteEditorManager.RemoteEditor;
-import de.fu_berlin.inf.dpp.editor.RemoteEditorManager.RemoteEditorState;
 import de.fu_berlin.inf.dpp.invitation.OutgoingProjectNegotiation;
 import de.fu_berlin.inf.dpp.invitation.ProjectNegotiation;
 import de.fu_berlin.inf.dpp.net.JID;
@@ -81,8 +80,10 @@ public class AwarenessInformationCollector {
     public List<String> getAwarenessDetails(User user) {
         List<String> details = new ArrayList<String>();
 
-        // Differentiate between "invitation in progress" and awareness
-        // information shown while the session is running
+        /*
+         * Differentiate between "invitation in progress" and awareness
+         * information shown while the session is running
+         */
         if (!user.isInvitationComplete()) {
             details.add("Joining");
         }
@@ -99,28 +100,28 @@ public class AwarenessInformationCollector {
         } else {
             RemoteEditorManager rem = editorManager.getRemoteEditorManager();
             if (rem != null) {
-                RemoteEditorState res = editorManager.getRemoteEditorManager()
-                    .getEditorState(user);
-                if (res != null) {
-                    RemoteEditor activeEditor = res.getActiveEditor();
-                    if (activeEditor != null) {
-                        SPath activeFile = res.getActiveEditor().getPath();
-                        if (activeFile != null) {
-                            /*
-                             * path.getProjectRelativePath() could be too long,
-                             * sometimes the name would be enough...
-                             * 
-                             * TODO: make this configurable?
-                             */
-                            details.add(activeFile.getProject().getName()
-                                + ": "
-                                + activeFile.getFile().getProjectRelativePath()
-                                    .toString());
-                        }
-                    }
-                    if (editorManager.getRemoteOpenEditors(user).size() == 0) {
-                        details.add("No shared files opened");
-                    }
+                RemoteEditor activeEditor = rem.getRemoteActiveEditor(user);
+                /*
+                 * The other user has a non-shared editor open, i.e. the remote
+                 * editor shows a file which is not part of the session.
+                 */
+                if (activeEditor == null) {
+                    details.add("non-shared file open");
+                    return details;
+                }
+
+                SPath activeFile = activeEditor.getPath();
+                if (activeFile != null) {
+                    /*
+                     * path.getProjectRelativePath() could be too long,
+                     * sometimes the name would be enough...
+                     * 
+                     * TODO: make this configurable?
+                     */
+                    details.add(activeFile.getProject().getName()
+                        + ": "
+                        + activeFile.getFile().getProjectRelativePath()
+                            .toString());
                 }
             }
         }
@@ -166,7 +167,7 @@ public class AwarenessInformationCollector {
      * @param user
      * @return
      */
-    public JID getFollowedUser(User user) {
+    public JID getFollowedJID(User user) {
         assert user != null;
 
         ISarosSession session = sarosSession.getValue();
@@ -175,5 +176,52 @@ public class AwarenessInformationCollector {
             return null;
         JID resJID = session.getResourceQualifiedJID(user.getJID());
         return resJID == null ? resJID : followModes.get(resJID);
+    }
+
+    /**
+     * Returns the followee of the given user, or <code>null</code> if that user
+     * does not follow anyone at the moment, or there is no active session.
+     * 
+     * @param user
+     * @return
+     */
+    public User getFollowedUser(User user) {
+        assert user != null;
+
+        ISarosSession session = sarosSession.getValue();
+        // should not be called outside of a running session
+        if (session == null)
+            return null;
+
+        JID userJID = session.getResourceQualifiedJID(user.getJID());
+        if (userJID == null)
+            return null;
+
+        JID followeeJID = followModes.get(userJID);
+        if (followeeJID == null)
+            return null;
+
+        User followee = session.getUser(followeeJID);
+        return followee;
+    }
+
+    /**
+     * Checks if the currently active editor of the given user is shared. The
+     * user can be the local or remote one.
+     * 
+     * @return <code>true</code>, if the active editor of the given user is
+     *         shared, <code>false</code> otherwise
+     */
+    public boolean isActiveEditorShared(User user) {
+        boolean editorActive = false;
+
+        RemoteEditorManager rem = editorManager.getRemoteEditorManager();
+        if (rem != null && user != null) {
+            if (user.isLocal() && editorManager.isActiveEditorShared()
+                || rem.isRemoteActiveEditorShared(user)) {
+                editorActive = true;
+            }
+        }
+        return editorActive;
     }
 }

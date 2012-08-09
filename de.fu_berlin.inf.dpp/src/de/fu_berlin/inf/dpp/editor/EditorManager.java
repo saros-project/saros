@@ -1190,6 +1190,18 @@ public class EditorManager extends AbstractActivityProvider {
     }
 
     /**
+     * Checks if the local currently active editor is part of the running Saros
+     * session.
+     * 
+     * @return <code>true</code>, if active editor is part of the Saros session,
+     *         <code>false</code> otherwise.
+     */
+    public boolean isActiveEditorShared() {
+        IEditorPart editorPart = editorAPI.getActiveEditor();
+        return editorPart == null ? false : isSharedEditor(editorPart);
+    }
+
+    /**
      * This method verifies if the given EditorPart is supported by Saros, which
      * is based basically on two facts:
      * 
