@@ -5,7 +5,6 @@ import org.junit.runners.Suite;
 
 @RunWith(Suite.class)
 @Suite.SuiteClasses({ AllParticipantsFollowUserWithWriteAccessTest.class,
-    ChangingUserWithWriteAccessWhileOtherFollowTest.class,
     FollowModeTest.class, WriteAccessChangeAndImmediateWriteTest.class })
 public class TestSuite {
     // the class remains completely empty,
