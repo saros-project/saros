@@ -94,7 +94,7 @@ public class CreateXMPPAccountWizard extends Wizard {
         this.createXMPPAccountPage = new CreateXMPPAccountWizardPage(
             showUseNowButton);
         setNeedsProgressMonitor(true);
-        setHelpAvailable(false);
+        setHelpAvailable(true);
     }
 
     @Override
@@ -121,8 +121,8 @@ public class CreateXMPPAccountWizard extends Wizard {
                     throws InvocationTargetException {
                     RosterUtils.createAccount(cachedServer, cachedUsername,
                         cachedPassword, monitor);
-                    log.debug("Account creation succeeded: username=" //$NON-NLS-1$
-                        + cachedUsername + ", server=" + cachedServer); //$NON-NLS-1$
+                    log.debug("Account creation succeeded: username="
+                        + cachedUsername + ", server=" + cachedServer);
                 }
             });
         } catch (InvocationTargetException e) {
@@ -133,8 +133,8 @@ public class CreateXMPPAccountWizard extends Wizard {
             // Leave the wizard open
             return false;
         } catch (InterruptedException e) {
-            log.error("An internal error occurred: InterruptedException" //$NON-NLS-1$
-                + " thrown from uninterruptable method", e); //$NON-NLS-1$
+            log.error("An internal error occurred: InterruptedException"
+                + " thrown from uninterruptable method", e);
             this.createXMPPAccountPage.setErrorMessage(e.getCause()
                 .getMessage());
             return false;
