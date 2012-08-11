@@ -116,8 +116,14 @@ public class BinaryChannelTest {
                 testThread = new TestThread(new TestThread.Runnable() {
                     @Override
                     public void run() throws Exception {
-                        incomingTransferObject
-                            .accept(new NullProgressMonitor());
+                        try {
+                            incomingTransferObject
+                                .accept(new NullProgressMonitor());
+                        } finally {
+                            synchronized (BinaryChannelTest.this) {
+                                BinaryChannelTest.this.notifyAll();
+                            }
+                        }
                     }
                 });
 
@@ -133,14 +139,14 @@ public class BinaryChannelTest {
         try {
             alice.send(description, new byte[100], monitor);
         } catch (Exception e) {
-            // if you remove this sleep testThread will be always null
-            Thread.sleep(1000);
             assertTrue(e instanceof LocalCancellationException);
+            synchronized (this) {
+                wait(10000);
+            }
+            testThread.join();
         } finally {
             bob.close();
         }
-
-        testThread.join();
         testThread.verify();
     }
 
