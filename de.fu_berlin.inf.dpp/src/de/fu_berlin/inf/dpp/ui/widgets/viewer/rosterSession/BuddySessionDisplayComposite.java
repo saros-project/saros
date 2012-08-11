@@ -81,43 +81,42 @@ public class BuddySessionDisplayComposite extends ViewerComposite {
         .getLogger(BuddySessionDisplayComposite.class);
 
     @Inject
-    protected Saros saros;
+    private Saros saros;
 
     @Inject
-    protected ISarosSessionManager sarosSessionManager;
-    @Inject
-    protected SarosSessionObservable sarosSessionObservable;
+    private ISarosSessionManager sarosSessionManager;
 
     @Inject
-    protected EditorManager editorManager;
+    private SarosSessionObservable sarosSessionObservable;
 
     @Inject
-    protected FollowingActivitiesManager followingActivitiesManager;
+    private EditorManager editorManager;
 
-    public static void expandAllSessionNodes(final Viewer viewer) {
-        ViewerUtils.expandAll(viewer);
-    }
+    @Inject
+    private FollowingActivitiesManager followingActivitiesManager;
 
-    protected IFollowModeChangesListener followModeChangesListener = new IFollowModeChangesListener() {
+    private volatile ISarosSession currentSession;
+
+    private IFollowModeChangesListener followModeChangesListener = new IFollowModeChangesListener() {
 
         @Override
         public void followModeChanged() {
             ViewerUtils.refresh(viewer, true);
-            expandAllSessionNodes(viewer);
+            ViewerUtils.expandAll(viewer);
         }
     };
 
-    protected IConnectionListener connectionListener = new IConnectionListener() {
+    private IConnectionListener connectionListener = new IConnectionListener() {
         public void connectionStateChanged(Connection connection,
             ConnectionState newState) {
             switch (newState) {
             case CONNECTED:
                 updateViewer();
-                expandAllSessionNodes(viewer);
+                ViewerUtils.expandAll(viewer);
                 break;
             case NOT_CONNECTED:
                 updateViewer();
-                expandAllSessionNodes(viewer);
+                ViewerUtils.expandAll(viewer);
                 break;
             default:
                 break;
@@ -125,10 +124,15 @@ public class BuddySessionDisplayComposite extends ViewerComposite {
         }
     };
 
-    protected ISharedProjectListener projectListener = new AbstractSharedProjectListener() {
+    private ISharedProjectListener projectListener = new AbstractSharedProjectListener() {
         @Override
         public void userJoined(User user) {
-            expandAllSessionNodes(viewer);
+            ViewerUtils.expandAll(viewer);
+        }
+
+        @Override
+        public void userLeft(User user) {
+            ViewerUtils.refresh(viewer, true);
         }
 
         @Override
@@ -139,11 +143,13 @@ public class BuddySessionDisplayComposite extends ViewerComposite {
 
     };
 
-    protected ISarosSessionListener sarosSessionListener = new AbstractSarosSessionListener() {
+    private ISarosSessionListener sarosSessionListener = new AbstractSarosSessionListener() {
         @Override
         public void sessionStarting(ISarosSession newSarosSession) {
+            currentSession = newSarosSession;
+            newSarosSession.addListener(projectListener);
             updateViewer();
-            expandAllSessionNodes(viewer);
+            ViewerUtils.expandAll(viewer);
         }
 
         @Override
@@ -153,13 +159,15 @@ public class BuddySessionDisplayComposite extends ViewerComposite {
 
         @Override
         public void sessionEnding(ISarosSession oldSarosSession) {
+            currentSession = null;
+            oldSarosSession.removeListener(projectListener);
             ViewerUtils.refresh(viewer, true);
         }
 
         @Override
         public void sessionEnded(ISarosSession oldSarosSession) {
             updateViewer();
-            expandAllSessionNodes(viewer);
+            ViewerUtils.expandAll(viewer);
         }
 
         @Override
@@ -170,24 +178,24 @@ public class BuddySessionDisplayComposite extends ViewerComposite {
         @Override
         public void preIncomingInvitationCompleted(IProgressMonitor monitor) {
             ViewerUtils.refresh(viewer, true);
-            expandAllSessionNodes(viewer);
+            ViewerUtils.expandAll(viewer);
         }
 
         @Override
         public void postOutgoingInvitationCompleted(IProgressMonitor monitor,
             User user) {
             ViewerUtils.refresh(viewer, true);
-            expandAllSessionNodes(viewer);
+            ViewerUtils.expandAll(viewer);
         }
     };
 
-    protected IPropertyChangeListener editorPrefsListener = new IPropertyChangeListener() {
+    private IPropertyChangeListener editorPrefsListener = new IPropertyChangeListener() {
         public void propertyChange(PropertyChangeEvent event) {
             ViewerUtils.refresh(viewer, true);
         }
     };
 
-    protected Tree tree;
+    private Tree tree;
 
     /**
      * Used to display the {@link Roster} even in case the user is disconnected.
@@ -203,10 +211,26 @@ public class BuddySessionDisplayComposite extends ViewerComposite {
         this.viewer.getControl()
             .setLayoutData(LayoutUtils.createFillGridData());
         updateViewer();
-        expandAllSessionNodes(viewer);
+        ViewerUtils.expandAll(viewer);
 
         saros.getSarosNet().addListener(connectionListener);
         this.sarosSessionManager.addSarosSessionListener(sarosSessionListener);
+
+        ISarosSession session = sarosSessionManager.getSarosSession();
+
+        /*
+         * TODO: very rare race condition that will not GC the current session
+         * until a new session is created or this widget is disposed.
+         * 
+         * E.G listener calls us that the session had ended and now we are
+         * installing a listener to a dead session. This behavior can only
+         * happen if the Saros View is destroyed and recreated.
+         */
+
+        if (session != null) {
+            session.addListener(projectListener);
+            currentSession = session;
+        }
 
         this.followingActivitiesManager
             .addIinternalListener(followModeChangesListener);
@@ -228,6 +252,10 @@ public class BuddySessionDisplayComposite extends ViewerComposite {
                 if (saros.getSarosNet() != null) {
                     saros.getSarosNet().removeListener(connectionListener);
                 }
+
+                ISarosSession session = currentSession;
+                if (session != null)
+                    session.removeListener(projectListener);
             }
         });
 
@@ -417,7 +445,7 @@ public class BuddySessionDisplayComposite extends ViewerComposite {
         });
     }
 
-    protected void updateViewer() {
+    private void updateViewer() {
         if (saros.getSarosNet().getRoster() != null)
             cachedRoster = saros.getSarosNet().getRoster();
         ViewerUtils.setInput(viewer, new RosterSessionInput(cachedRoster,
