@@ -65,6 +65,7 @@ public class Messages extends NLS {
     public static String ChatRoomsComposite_method3;
     public static String ChatRoomsComposite_roundtable;
     public static String ChatRoomsComposite_share_projects;
+
     public static String CollaborationUtils_confirm_closing;
     public static String CollaborationUtils_confirm_closing_text;
     public static String CollaborationUtils_confirm_leaving;
@@ -81,6 +82,8 @@ public class Messages extends NLS {
     public static String CollaborationUtils_confirm_need_based_file;
     public static String CollaborationUtils_confirm_need_based_file_text;
     public static String CollaborationUtils_confirm_need_based_file_balloon_text;
+    public static String CollaborationUtils_insufficient_privileges;
+    public static String CollaborationUtils_insufficient_privileges_text;
 
     public static String PublicXMPPServerComposite_more_information;
     public static String ConfigurationSettingsWizardPage_0;

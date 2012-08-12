@@ -551,10 +551,29 @@ public class SarosSessionManager implements ISarosSessionManager {
      */
     public void addResourcesToSession(
         HashMap<IProject, List<IResource>> projectResourcesMapping) {
+
+        ISarosSession session = getSarosSession();
+
+        if (session == null) {
+            log.warn("could not add resources because there is no active session");
+            return;
+        }
+
+        /*
+         * TODO: there are race conditions, USER A restricts USER B to read-only
+         * while this code is executed
+         */
+
+        if (!session.hasWriteAccess()) {
+            log.error("current local user has not enough privileges to add resources to the current session");
+            return;
+        }
+
         for (Entry<IProject, List<IResource>> mapEntry : projectResourcesMapping
             .entrySet()) {
             IProject iProject = mapEntry.getKey();
             List<IResource> resourcesList = mapEntry.getValue();
+
             if (!iProject.isOpen()) {
                 try {
                     iProject.open(null);
@@ -564,19 +583,18 @@ public class SarosSessionManager implements ISarosSessionManager {
                 }
             }
 
-            if (!this.getSarosSession().isCompletelyShared(iProject)) {
+            if (!session.isCompletelyShared(iProject)) {
                 String projectID = String.valueOf(sessionRandom
                     .nextInt(Integer.MAX_VALUE));
-                this.getSarosSession().addSharedResources(iProject, projectID,
-                    resourcesList);
+                session.addSharedResources(iProject, projectID, resourcesList);
                 projectAdded(projectID);
             }
         }
 
-        for (User user : this.getSarosSession().getRemoteUsers()) {
+        for (User user : session.getRemoteUsers()) {
             OutgoingProjectNegotiation out = new OutgoingProjectNegotiation(
-                user.getJID(), this.getSarosSession(), projectResourcesMapping,
-                sarosContext, null);
+                user.getJID(), session, projectResourcesMapping, sarosContext,
+                null);
 
             OutgoingProjectJob job = new OutgoingProjectJob(out);
             job.setPriority(Job.SHORT);

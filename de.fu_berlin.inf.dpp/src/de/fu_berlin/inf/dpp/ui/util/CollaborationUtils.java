@@ -164,6 +164,14 @@ public class CollaborationUtils {
                 if (sarosSession != null) {
                     Utils.runSafeSync(log, new Runnable() {
                         public void run() {
+                            if (!sarosSession.hasWriteAccess()) {
+                                Utils
+                                    .popUpFailureMessage(
+                                        Messages.CollaborationUtils_insufficient_privileges,
+                                        Messages.CollaborationUtils_insufficient_privileges_text,
+                                        false);
+                                return;
+                            }
                             sarosSessionManager
                                 .addResourcesToSession(projectResources);
                         }
