@@ -1,8 +1,8 @@
 package de.fu_berlin.inf.dpp.project;
 
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
@@ -47,7 +47,7 @@ public interface ISarosSessionManager {
      * @throws XMPPException
      *             if this method is called with no established XMPP-connection.
      */
-    public void startSession(HashMap<IProject, List<IResource>> projectResources)
+    public void startSession(Map<IProject, List<IResource>> projectResources)
         throws XMPPException;
 
     /**
@@ -134,7 +134,7 @@ public interface ISarosSessionManager {
      * 
      */
     public void addResourcesToSession(
-        HashMap<IProject, List<IResource>> projectResourcesMapping);
+        Map<IProject, List<IResource>> projectResourcesMapping);
 
     /**
      * This method is called when a new project was added to the session

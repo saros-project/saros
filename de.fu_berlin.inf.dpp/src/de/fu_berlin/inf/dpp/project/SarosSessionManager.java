@@ -23,6 +23,7 @@ import java.text.MessageFormat;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Random;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -166,7 +167,7 @@ public class SarosSessionManager implements ISarosSessionManager {
      * 
      */
     public void startSession(
-        final HashMap<IProject, List<IResource>> projectResourcesMapping)
+        final Map<IProject, List<IResource>> projectResourcesMapping)
         throws XMPPException {
 
         if (!connected) {
@@ -550,7 +551,7 @@ public class SarosSessionManager implements ISarosSessionManager {
      * 
      */
     public void addResourcesToSession(
-        HashMap<IProject, List<IResource>> projectResourcesMapping) {
+        Map<IProject, List<IResource>> projectResourcesMapping) {
 
         ISarosSession session = getSarosSession();
 

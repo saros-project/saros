@@ -84,13 +84,13 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
     @Inject
     protected IChecksumCache checksumCache;
 
-    protected HashMap<IProject, List<IResource>> projectResources;
+    protected Map<IProject, List<IResource>> projectResources;
     protected List<ProjectExchangeInfo> projectExchangeInfos;
 
     protected SarosPacketCollector remoteFileListResponseCollector;
 
     public OutgoingProjectNegotiation(JID to, ISarosSession sarosSession,
-        HashMap<IProject, List<IResource>> partialResources,
+        Map<IProject, List<IResource>> partialResources,
         SarosContext sarosContext,
         List<ProjectExchangeInfo> projectExchangeInfos) {
         super(to, sarosContext);
