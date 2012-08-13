@@ -5,6 +5,7 @@ import java.io.DataInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Field;
 import java.rmi.RemoteException;
 import java.util.Arrays;
@@ -43,6 +44,31 @@ public final class InternalImpl extends StfRemoteObject implements IInternal {
     private Field versionManagerBundleField;
 
     private Bundle sarosBundle;
+
+    private static class GeneratingInputStream extends InputStream {
+
+        private Random random = null;
+        private int size;
+
+        public GeneratingInputStream(int size, boolean compressAble) {
+            this.size = size;
+            if (!compressAble)
+                this.random = new Random();
+        }
+
+        @Override
+        public int read() throws IOException {
+            if (size == 0)
+                return -1;
+
+            size--;
+
+            if (random != null)
+                return random.nextInt() & 0xFF;
+
+            return 'A';
+        }
+    }
 
     public static IInternal getInstance() {
         return INSTANCE;
@@ -140,42 +166,22 @@ public final class InternalImpl extends StfRemoteObject implements IInternal {
         if (idx != -1)
             createFolder(projectName, path.substring(0, idx));
 
-        IFile file = ResourcesPlugin.getWorkspace().getRoot()
-            .getProject(projectName).getFile(path);
+        IProject project = ResourcesPlugin.getWorkspace().getRoot()
+            .getProject(projectName);
+
+        IFile file = project.getFile(path);
 
         try {
-            file.create(new ByteArrayInputStream(content.getBytes()), true,
-                null);
+            file.create(
+                new ByteArrayInputStream(content.getBytes(project
+                    .getDefaultCharset())), true, null);
         } catch (CoreException e) {
-            log.debug(e.getMessage(), e);
+            log.error(e.getMessage(), e);
+            throw new RemoteException(e.getMessage(), e.getCause());
+        } catch (UnsupportedEncodingException e) {
+            log.error(e.getMessage(), e);
             throw new RemoteException(e.getMessage(), e.getCause());
         }
-    }
-
-    private static class GeneratingInputStream extends InputStream {
-
-        private Random random = null;
-        private int size;
-
-        public GeneratingInputStream(int size, boolean compressAble) {
-            this.size = size;
-            if (!compressAble)
-                this.random = new Random();
-        }
-
-        @Override
-        public int read() throws IOException {
-            if (size == 0)
-                return -1;
-
-            size--;
-
-            if (random != null)
-                return random.nextInt() & 0xFF;
-
-            return 'A';
-        }
-
     }
 
     public void append(String projectName, String path, String content)
@@ -387,4 +393,37 @@ public final class InternalImpl extends StfRemoteObject implements IInternal {
 
         return content;
     }
+
+    @Override
+    public void changeProjectEncoding(String projectName, String charset)
+        throws RemoteException {
+
+        IProject project = ResourcesPlugin.getWorkspace().getRoot()
+            .getProject(projectName);
+
+        try {
+            project.setDefaultCharset(charset, null);
+        } catch (CoreException e) {
+            log.error(e.getMessage(), e);
+            throw new RemoteException(e.getMessage(), e.getCause());
+        }
+    }
+
+    @Override
+    public void changeFileEncoding(String projectName, String path,
+        String charset) throws RemoteException {
+        IProject project = ResourcesPlugin.getWorkspace().getRoot()
+            .getProject(projectName);
+
+        IFile file = project.getFile(path);
+
+        try {
+            file.setCharset(charset, null);
+        } catch (CoreException e) {
+            log.error(e.getMessage(), e);
+            throw new RemoteException(e.getMessage(), e.getCause());
+        }
+
+    }
+
 }

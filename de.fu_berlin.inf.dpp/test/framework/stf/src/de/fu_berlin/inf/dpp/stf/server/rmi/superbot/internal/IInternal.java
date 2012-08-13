@@ -61,6 +61,39 @@ public interface IInternal extends Remote {
     public void createProject(String projectName) throws RemoteException;
 
     /**
+     * Changes the encoding of a project
+     * 
+     * @param projectName
+     *            the name of the project
+     * @param charset
+     *            the charset to use for this project
+     * @throws RemoteException
+     *             if the project does not exists or the charset is not
+     *             available on the current remote platform
+     */
+
+    public void changeProjectEncoding(String projectName, String charset)
+        throws RemoteException;
+
+    /**
+     * Changes the encoding of a file.
+     * 
+     * @Note the project must already exists
+     * @param projectName
+     *            the project the file belongs to
+     * 
+     * @param path
+     *            the relative path of the file e.g my/foo/bar/hello.java
+     * @param charset
+     *            the charset to use for this file
+     * @throws RemoteException
+     *             if the new encoding could not be applied
+     */
+
+    public void changeFileEncoding(String projectName, String path,
+        String charset) throws RemoteException;
+
+    /**
      * Creates a Java project
      * 
      * @param projectName
@@ -112,7 +145,6 @@ public interface IInternal extends Remote {
      *            the content of the file
      * @throws RemoteException
      *             if the file could not be created or already exists
-     * 
      */
 
     public void createFile(String projectName, String path, String content)
