@@ -3,9 +3,9 @@ package de.fu_berlin.inf.dpp.ui.util;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Deque;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
@@ -65,28 +65,17 @@ public class CollaborationUtils {
 
         Utils.runSafeAsync(log, new Runnable() {
             public void run() {
-                if (sarosSessionManager.getSarosSession() == null) {
-                    try {
-                        sarosSessionManager.startSession(newResources);
-                    } catch (final XMPPException e) {
-                        Utils.runSafeSWTSync(log, new Runnable() {
-                            public void run() {
-                                MessageDialog
-                                    .openError(
-                                        null,
-                                        Messages.CollaborationUtils_offline,
-                                        getShareResourcesFailureMessage(newResources
-                                            .keySet()));
-                                log.warn("Start share project failed", e); //$NON-NLS-1$
-                            }
-                        });
-                    }
 
+                try {
+                    sarosSessionManager.startSession(newResources);
                     addBuddiesToSarosSession(sarosSessionManager, buddies);
-                } else {
-                    log.warn("Tried to start " //$NON-NLS-1$
-                        + SarosSession.class.getSimpleName()
-                        + " although one is already running"); //$NON-NLS-1$
+                } catch (final XMPPException e) {
+                    log.error("starting the session failed", e);
+
+                    Utils.popUpFailureMessage(
+                        Messages.CollaborationUtils_offline,
+                        getShareResourcesFailureMessage(newResources.keySet()),
+                        false);
                 }
             }
         });
@@ -105,40 +94,36 @@ public class CollaborationUtils {
         Shell shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow()
             .getShell();
 
-        if (sarosSession != null) {
-            boolean reallyLeave;
+        if (sarosSession == null) {
+            log.warn("cannot leave a non-running session");
+            return;
+        }
 
-            if (sarosSession.isHost()) {
-                if (sarosSession.getParticipants().size() == 1) {
-                    // Do not ask when host is alone...
-                    reallyLeave = true;
-                } else {
-                    reallyLeave = MessageDialog.openQuestion(shell,
-                        Messages.CollaborationUtils_confirm_closing,
-                        Messages.CollaborationUtils_confirm_closing_text);
-                }
+        boolean reallyLeave;
+
+        if (sarosSession.isHost()) {
+            if (sarosSession.getParticipants().size() == 1) {
+                // Do not ask when host is alone...
+                reallyLeave = true;
             } else {
                 reallyLeave = MessageDialog.openQuestion(shell,
-                    Messages.CollaborationUtils_confirm_leaving,
-                    Messages.CollaborationUtils_confirm_leaving_text);
+                    Messages.CollaborationUtils_confirm_closing,
+                    Messages.CollaborationUtils_confirm_closing_text);
             }
-
-            if (!reallyLeave)
-                return;
-
-            Utils.runSafeAsync(log, new Runnable() {
-                public void run() {
-                    try {
-                        sarosSessionManager.stopSarosSession();
-                    } catch (Exception e) {
-                        log.error("Session could not be left: ", e); //$NON-NLS-1$
-                    }
-                }
-            });
         } else {
-            log.warn("Tried to leave " + SarosSession.class.getSimpleName() //$NON-NLS-1$
-                + " although there is no one running"); //$NON-NLS-1$
+            reallyLeave = MessageDialog.openQuestion(shell,
+                Messages.CollaborationUtils_confirm_leaving,
+                Messages.CollaborationUtils_confirm_leaving_text);
         }
+
+        if (!reallyLeave)
+            return;
+
+        Utils.runSafeAsync(log, new Runnable() {
+            public void run() {
+                sarosSessionManager.stopSarosSession();
+            }
+        });
     }
 
     /**
@@ -153,34 +138,33 @@ public class CollaborationUtils {
     public static void addResourcesToSarosSession(
         final ISarosSessionManager sarosSessionManager,
         List<IResource> resourcesToAdd) {
+
         final ISarosSession sarosSession = sarosSessionManager
             .getSarosSession();
+
+        if (sarosSession == null) {
+            log.warn("cannot add resources to a non-running session");
+            return;
+        }
+
         final HashMap<IProject, List<IResource>> projectResources = acquireResources(
             resourcesToAdd, sarosSession);
+
         if (projectResources.isEmpty())
             return;
+
         Utils.runSafeAsync(log, new Runnable() {
             public void run() {
-                if (sarosSession != null) {
-                    Utils.runSafeSync(log, new Runnable() {
-                        public void run() {
-                            if (!sarosSession.hasWriteAccess()) {
-                                Utils
-                                    .popUpFailureMessage(
-                                        Messages.CollaborationUtils_insufficient_privileges,
-                                        Messages.CollaborationUtils_insufficient_privileges_text,
-                                        false);
-                                return;
-                            }
-                            sarosSessionManager
-                                .addResourcesToSession(projectResources);
-                        }
-                    });
-                } else {
-                    log.warn("Tried to add project resources to " //$NON-NLS-1$
-                        + SarosSession.class.getSimpleName()
-                        + " although there is no one running"); //$NON-NLS-1$
+
+                if (sarosSession.hasWriteAccess()) {
+                    sarosSessionManager.addResourcesToSession(projectResources);
+                    return;
                 }
+
+                Utils.popUpFailureMessage(
+                    Messages.CollaborationUtils_insufficient_privileges,
+                    Messages.CollaborationUtils_insufficient_privileges_text,
+                    false);
             }
         });
     }
@@ -197,42 +181,25 @@ public class CollaborationUtils {
     public static void addBuddiesToSarosSession(
         final ISarosSessionManager sarosSessionManager, final List<JID> buddies) {
 
+        final ISarosSession sarosSession = sarosSessionManager
+            .getSarosSession();
+
+        if (sarosSession == null) {
+            log.warn("cannot add buddies to a non-running session");
+            return;
+        }
+
         Utils.runSafeAsync(log, new Runnable() {
             public void run() {
-                final ISarosSession sarosSession = sarosSessionManager
-                    .getSarosSession();
-                if (sarosSession != null) {
-                    Utils.runSafeSync(log, new Runnable() {
-                        public void run() {
-                            Collection<User> addedUsers = sarosSession
-                                .getParticipants();
-                            List<JID> buddiesToAdd = new LinkedList<JID>();
-                            for (JID buddy : buddies) {
-                                boolean addBuddyToSession = true;
-                                for (User addedUser : addedUsers) {
-                                    JID addedBuddy = addedUser.getJID();
-                                    if (buddy.equals(addedBuddy)) {
-                                        addBuddyToSession = false;
-                                        break;
-                                    }
-                                }
-                                if (addBuddyToSession) {
-                                    buddiesToAdd.add(buddy);
-                                }
-                            }
 
-                            String description = getShareProjectDescription(sarosSession);
+                Set<JID> participantsToAdd = new HashSet<JID>(buddies);
 
-                            if (buddiesToAdd.size() > 0) {
-                                sarosSessionManager.invite(buddiesToAdd,
-                                    description);
-                            }
-                        }
-                    });
-                } else {
-                    log.warn("Tried to add buddies to " //$NON-NLS-1$
-                        + SarosSession.class.getSimpleName()
-                        + " although there is no one running"); //$NON-NLS-1$
+                for (User user : sarosSession.getParticipants())
+                    participantsToAdd.remove(user.getJID());
+
+                if (participantsToAdd.size() > 0) {
+                    sarosSessionManager.invite(participantsToAdd,
+                        getShareProjectDescription(sarosSession));
                 }
             }
         });
@@ -251,13 +218,14 @@ public class CollaborationUtils {
                 Messages.CollaborationUtils_error_not_connected,
                 ((projects.size() == 1) ? Messages.CollaborationUtils_project_singular_ending
                     : Messages.CollaborationUtils_project_plural_ending));
+
         StringBuilder message = new StringBuilder();
         message.append(msg);
-        while (projects.iterator().hasNext()) {
-            IProject project = projects.iterator().next();
-            message.append("\t" + project.getName() + "\n"); //$NON-NLS-1$ //$NON-NLS-2$
-        }
-        message.append("\n"); //$NON-NLS-1$
+
+        for (IProject project : projects)
+            message.append("\t" + project.getName() + "\n");
+
+        message.append("\n");
         message.append(Messages.CollaborationUtils_make_sure_connected_to);
         return message.toString();
     }
@@ -269,8 +237,7 @@ public class CollaborationUtils {
      * @param sarosSession
      * @return
      */
-    protected static String getShareProjectDescription(
-        ISarosSession sarosSession) {
+    private static String getShareProjectDescription(ISarosSession sarosSession) {
 
         JID inviter = sarosSession.getLocalUser().getJID();
         Set<IProject> projects = sarosSession.getProjects();
@@ -342,43 +309,46 @@ public class CollaborationUtils {
      * project recognition.
      * 
      * @param selectedResources
-     * @param iSarosSession
+     * @param sarosSession
      * @return
      * 
      */
-    protected static HashMap<IProject, List<IResource>> acquireResources(
-        List<IResource> selectedResources, ISarosSession iSarosSession) {
+    private static HashMap<IProject, List<IResource>> acquireResources(
+        List<IResource> selectedResources, ISarosSession sarosSession) {
 
-        HashMap<IProject, List<IResource>> allResources = new HashMap<IProject, List<IResource>>();
+        HashMap<IProject, List<IResource>> newResources = new HashMap<IProject, List<IResource>>();
 
-        if (iSarosSession != null) {
-            List<IResource> alreadySharedResources = iSarosSession
-                .getAllSharedResources();
-            selectedResources.removeAll(alreadySharedResources);
-        }
+        if (sarosSession != null)
+            selectedResources.removeAll(sarosSession.getAllSharedResources());
+
         for (int i = 0; i < selectedResources.size(); i++) {
-            IResource iResource = selectedResources.get(i);
-            if (iResource instanceof IProject) {
-                allResources.put((IProject) iResource, null);
-            } else if (!allResources.containsKey(iResource.getProject())) {
-                IProject project = iResource.getProject();
-                List<IResource> tempResources = new ArrayList<IResource>();
+            IResource resource = selectedResources.get(i);
+
+            if (resource instanceof IProject) {
+                newResources.put((IProject) resource, null);
+                continue;
+            }
+
+            // partial sharing stuff
+            if (!newResources.containsKey(resource.getProject())) {
+                IProject project = resource.getProject();
+                List<IResource> projectResources = new ArrayList<IResource>();
 
                 for (int j = i; j < selectedResources.size(); j++) {
                     if (!project.equals(selectedResources.get(j).getProject())) {
                         i = j - 1;
                         break;
                     }
-                    tempResources.add(selectedResources.get(j));
+                    projectResources.add(selectedResources.get(j));
                 }
-                if (!tempResources.contains(project.getFile(".project"))) //$NON-NLS-1$
-                    tempResources.add(project.getFile(".project")); //$NON-NLS-1$
-                if (!tempResources.contains(project.getFile(".classpath"))) //$NON-NLS-1$
-                    tempResources.add(project.getFile(".classpath")); //$NON-NLS-1$
-                allResources.put(project, tempResources);
+                if (!projectResources.contains(project.getFile(".project")))
+                    projectResources.add(project.getFile(".project"));
+                if (!projectResources.contains(project.getFile(".classpath")))
+                    projectResources.add(project.getFile(".classpath"));
+                newResources.put(project, projectResources);
             }
         }
-        return allResources;
+        return newResources;
     }
 
     /**
