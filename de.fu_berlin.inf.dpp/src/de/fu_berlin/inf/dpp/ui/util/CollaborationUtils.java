@@ -3,17 +3,23 @@ package de.fu_berlin.inf.dpp.ui.util;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.RandomAccess;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
@@ -60,7 +66,7 @@ public class CollaborationUtils {
         final ISarosSessionManager sarosSessionManager,
         List<IResource> selectedResources, final List<JID> buddies) {
 
-        final HashMap<IProject, List<IResource>> newResources = acquireResources(
+        final Map<IProject, List<IResource>> newResources = acquireResources(
             selectedResources, null);
 
         Utils.runSafeAsync(log, new Runnable() {
@@ -147,7 +153,7 @@ public class CollaborationUtils {
             return;
         }
 
-        final HashMap<IProject, List<IResource>> projectResources = acquireResources(
+        final Map<IProject, List<IResource>> projectResources = acquireResources(
             resourcesToAdd, sarosSession);
 
         if (projectResources.isEmpty())
@@ -305,50 +311,125 @@ public class CollaborationUtils {
      * <li>complete shared project: {@link IProject} --> null
      * <li>partial shared project: {@link IProject} --> List<IResource>
      * </ul>
-     * Adds to partial shared projects ".project" and ".classpath" files for
-     * project recognition.
+     * Adds to partial shared projects additional files which are needed for
+     * proper project synchronization.
      * 
      * @param selectedResources
      * @param sarosSession
      * @return
      * 
      */
-    private static HashMap<IProject, List<IResource>> acquireResources(
+    private static Map<IProject, List<IResource>> acquireResources(
         List<IResource> selectedResources, ISarosSession sarosSession) {
 
-        HashMap<IProject, List<IResource>> newResources = new HashMap<IProject, List<IResource>>();
+        Map<IProject, Set<IResource>> projectsResources = new HashMap<IProject, Set<IResource>>();
 
         if (sarosSession != null)
             selectedResources.removeAll(sarosSession.getAllSharedResources());
 
-        for (int i = 0; i < selectedResources.size(); i++) {
-            IResource resource = selectedResources.get(i);
+        // do not sort LinkedLists which would be a complete overkill
+        if (!(selectedResources instanceof RandomAccess))
+            selectedResources = new ArrayList<IResource>(selectedResources);
 
-            if (resource instanceof IProject) {
-                newResources.put((IProject) resource, null);
+        // move projects to the front so the algorithm is working as expected
+        Collections.sort(selectedResources, new Comparator<IResource>() {
+
+            @Override
+            public int compare(IResource a, IResource b) {
+                if (a.getType() == b.getType())
+                    return 0;
+
+                if (a.getType() == IResource.PROJECT)
+                    return -1;
+
+                return 1;
+            }
+
+        });
+
+        for (IResource resource : selectedResources) {
+
+            if (resource.getType() == IResource.PROJECT) {
+                projectsResources.put((IProject) resource, null);
                 continue;
             }
 
-            // partial sharing stuff
-            if (!newResources.containsKey(resource.getProject())) {
-                IProject project = resource.getProject();
-                List<IResource> projectResources = new ArrayList<IResource>();
+            IProject project = resource.getProject();
 
-                for (int j = i; j < selectedResources.size(); j++) {
-                    if (!project.equals(selectedResources.get(j).getProject())) {
-                        i = j - 1;
-                        break;
-                    }
-                    projectResources.add(selectedResources.get(j));
-                }
-                if (!projectResources.contains(project.getFile(".project")))
-                    projectResources.add(project.getFile(".project"));
-                if (!projectResources.contains(project.getFile(".classpath")))
-                    projectResources.add(project.getFile(".classpath"));
-                newResources.put(project, projectResources);
-            }
+            if (project == null)
+                continue;
+
+            if (!projectsResources.containsKey(project))
+                projectsResources.put(project, new HashSet<IResource>());
+
+            Set<IResource> resources = projectsResources.get(project);
+
+            // if the resource set is null, it is a full shared project
+            if (resources != null)
+                resources.add(resource);
         }
-        return newResources;
+
+        List<IResource> additionalFilesForPartialSharing = new ArrayList<IResource>();
+
+        for (Entry<IProject, Set<IResource>> entry : projectsResources
+            .entrySet()) {
+
+            IProject project = entry.getKey();
+            Set<IResource> resources = entry.getValue();
+
+            if (resources == /* full shared */null)
+                continue;
+
+            additionalFilesForPartialSharing.clear();
+
+            IFile projectFile = project.getFile(".project");
+            IFile classpathFile = project.getFile(".classpath");
+            IFolder settingsFolder = project.getFolder(".settings");
+
+            if (projectFile.exists())
+                additionalFilesForPartialSharing.add(projectFile);
+
+            if (classpathFile.exists())
+                additionalFilesForPartialSharing.add(classpathFile);
+
+            /*
+             * FIXME adding files from this folder may "corrupt" a lot of remote
+             * files. The byte content will not be corrupted, but the document
+             * provider (editor) will fail to render the file input correctly. I
+             * think we should negotiate the project encodings and forbid
+             * further proceeding if they do not match ! The next step should be
+             * to also transmit the encoding in FileActivites, because it is
+             * possible to change the encoding of files independently of the
+             * project encoding settings.
+             */
+
+            if (settingsFolder.exists() /* remove to execute block */&& false) {
+
+                additionalFilesForPartialSharing.add(settingsFolder);
+
+                try {
+                    for (IResource resource : settingsFolder.members()) {
+                        // TODO are sub folders possible ?
+                        if (resource.getType() == IResource.FILE)
+                            additionalFilesForPartialSharing.add(resource);
+                    }
+                } catch (CoreException e) {
+                    log.warn(
+                        "could not read the contents of the settings folder", e);
+                }
+            }
+
+            resources.addAll(additionalFilesForPartialSharing);
+        }
+
+        HashMap<IProject, List<IResource>> resources = new HashMap<IProject, List<IResource>>();
+
+        for (Entry<IProject, Set<IResource>> entry : projectsResources
+            .entrySet())
+            resources.put(entry.getKey(), entry.getValue() == null ? null
+                : new ArrayList<IResource>(entry.getValue()));
+
+        return resources;
     }
 
     /**
