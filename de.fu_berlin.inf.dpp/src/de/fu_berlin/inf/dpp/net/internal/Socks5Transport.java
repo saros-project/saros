@@ -69,6 +69,7 @@ public class Socks5Transport extends ByteStreamTransport {
     private static final int TARGET_RESPONSE_TIMEOUT = WAIT_FOR_RESPONSE_CONNECTION + 1000;
     private static final String RESPONSE_SESSION_ID_PREFIX = "response_js5";
     private static final Random randomGenerator = new Random();
+    private static final int NUMBER_OF_RESPONSE_THREADS = 10;
 
     private boolean socketOptionNoDelay = Boolean.valueOf(System.getProperty(
         "de.fu_berlin.inf.dpp.net.socks5.TCP_NODELAY", "true"));
@@ -587,8 +588,9 @@ public class Socks5Transport extends ByteStreamTransport {
     public void prepareXMPPConnection(Connection connection,
         IByteStreamConnectionListener listener) {
         super.prepareXMPPConnection(connection, listener);
-        executorService = Executors.newCachedThreadPool(new NamedThreadFactory(
-            "SOCKS5-Connection-Response-"));
+        executorService = Executors.newFixedThreadPool(
+            NUMBER_OF_RESPONSE_THREADS, new NamedThreadFactory(
+                "SOCKS5_Establish_response_connection"));
     }
 
     @Override
