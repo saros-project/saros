@@ -254,7 +254,16 @@ public class SharedResourcesManager extends AbstractActivityProvider implements
                 visitor = vcs.getProjectDeltaVisitor(editorManager,
                     sarosSession, sharedProject);
             }
+
             try {
+                /*
+                 * There is some magic involved here. The ProjectDeltaVisitor
+                 * will ignore changed files that are currently opened in an
+                 * editor to prevent transmitting the whole file content of the
+                 * modified file.
+                 * 
+                 * FIXME document this behavior in the ProjectDeltaVisitor !
+                 */
                 projectDelta.accept(visitor, IContainer.INCLUDE_HIDDEN);
             } catch (CoreException e) {
                 // The Eclipse documentation doesn't specify when
