@@ -121,7 +121,7 @@ public class Messages extends NLS {
     public static String ConnectionStateComposite_error;
     public static String ConnectionStateComposite_error_ressource_conflict;
     public static String ConnectionStateComposite_error_unknown;
-    public static String ConnectionStateComposite_error_with_message;
+    public static String ConnectionStateComposite_error_connection_lost;
     public static String ConnectionStateComposite_info_add_jabber_account;
     public static String ConnectionStateComposite_not_connected;
     public static String ConnectionStateComposite_tooltip_connected;

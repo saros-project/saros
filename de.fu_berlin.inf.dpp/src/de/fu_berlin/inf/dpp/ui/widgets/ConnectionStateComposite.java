@@ -1,7 +1,5 @@
 package de.fu_berlin.inf.dpp.ui.widgets;
 
-import java.text.MessageFormat;
-
 import org.apache.log4j.Logger;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
@@ -128,9 +126,7 @@ public class ConnectionStateComposite extends Composite {
             } else if (e.toString().equalsIgnoreCase("stream:error (conflict)")) { //$NON-NLS-1$
                 return Messages.ConnectionStateComposite_error_ressource_conflict;
             } else {
-                return MessageFormat.format(
-                    Messages.ConnectionStateComposite_error_with_message,
-                    e.getMessage());
+                return Messages.ConnectionStateComposite_error_connection_lost;
             }
         default:
             return Messages.ConnectionStateComposite_error_unknown;
