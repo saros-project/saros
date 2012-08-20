@@ -162,18 +162,40 @@ public final class RemoteBotShell extends StfRemoteObject implements
 
     public String getErrorMessage() throws RemoteException {
         activate();
-        final String errorMessage = UIThreadRunnable
-            .syncExec(new StringResult() {
-                public String run() {
-                    WizardDialog dialog = (WizardDialog) widget.widget
-                        .getData();
-                    return dialog.getErrorMessage();
-                }
-            });
-        if (errorMessage == null) {
-            throw new WidgetNotFoundException("could not find error message");
-        }
+
+        String errorMessage = UIThreadRunnable.syncExec(new StringResult() {
+            public String run() {
+                WizardDialog dialog = (WizardDialog) widget.widget.getData();
+                return dialog.getErrorMessage();
+            }
+        });
+
+        if (errorMessage != null)
+            return errorMessage;
+
+        /*
+         * public void setMessage(String newMessage, int newType)
+         * 
+         * Note that for backward compatibility, a message of type ERROR is
+         * different than an error message (set using setErrorMessage). An error
+         * message overrides the current message until the error message is
+         * cleared. This method replaces the current message and does not affect
+         * the error message.
+         */
+
+        errorMessage = UIThreadRunnable.syncExec(new StringResult() {
+            public String run() {
+                WizardDialog dialog = (WizardDialog) widget.widget.getData();
+                return dialog.getMessage();
+            }
+        });
+
+        if (errorMessage == null)
+            throw new WidgetNotFoundException(
+                "current wizard dialog does not display any message at all");
+
         return errorMessage;
+
     }
 
     public String getMessage() throws RemoteException {
