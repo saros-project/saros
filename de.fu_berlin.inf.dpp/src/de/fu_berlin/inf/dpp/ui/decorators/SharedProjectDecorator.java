@@ -23,8 +23,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.IDecoration;
@@ -59,7 +57,7 @@ public class SharedProjectDecorator implements ILightweightLabelDecorator {
     public static final ImageDescriptor projectDescriptor = ImageManager
         .getImageDescriptor("icons/ovr16/shared.png"); // NON-NLS-1
 
-    protected ISarosSession sarosSession;
+    protected volatile ISarosSession sarosSession;
 
     protected List<ILabelProviderListener> listeners = new ArrayList<ILabelProviderListener>();
 
@@ -105,29 +103,26 @@ public class SharedProjectDecorator implements ILightweightLabelDecorator {
     List<IResource> resources = new ArrayList<IResource>();
 
     public void decorate(Object element, IDecoration decoration) {
-        if (this.sarosSession == null) {
-            return;
-        }
-        IResource iResource = (IResource) element;
+        ISarosSession session = sarosSession;
 
-        if ((sarosSession.isCompletelyShared(iResource.getProject()))
-            || (sarosSession.isShared(iResource))) {
-            resources.add(iResource);
-            if ((iResource instanceof IFile)) {
-                decoration.addOverlay(SharedProjectDecorator.projectDescriptor,
-                    IDecoration.TOP_LEFT);
-            } else {
-                decoration.addOverlay(SharedProjectDecorator.projectDescriptor,
-                    IDecoration.TOP_LEFT);
-            }
-            if ((iResource instanceof IProject)) {
-                if (sarosSession.isCompletelyShared(iResource.getProject())) {
-                    decoration
-                        .addSuffix(Messages.SharedProjectDecorator_shared);
-                } else {
-                    decoration
-                        .addSuffix(Messages.SharedProjectDecorator_shared_partial);
-                }
+        if (session == null)
+            return;
+
+        IResource resource = (IResource) element;
+
+        if (session.isShared(resource)) {
+            resources.add(resource);
+
+            decoration.addOverlay(SharedProjectDecorator.projectDescriptor,
+                IDecoration.TOP_LEFT);
+
+            if (resource.getType() == IResource.PROJECT) {
+                boolean isCompletelyShared = session
+                    .isCompletelyShared(resource.getProject());
+
+                decoration
+                    .addSuffix(isCompletelyShared ? Messages.SharedProjectDecorator_shared
+                        : Messages.SharedProjectDecorator_shared_partial);
             }
         }
     }

@@ -150,8 +150,10 @@ class SarosProjectMapper {
             return false;
         IProject project = resource.getProject();
         if (idMapping.containsValue(project)) {
-            if (isCompletelyShared(project))
-                return true;
+            if (isCompletelyShared(project)) {
+                // TODO how should partial sharing handle this case ?
+                return !resource.isDerived(IResource.CHECK_ANCESTORS);
+            }
             List<IResource> resources = resourceMapping.get(project);
             return resources.contains(resource);
         }
