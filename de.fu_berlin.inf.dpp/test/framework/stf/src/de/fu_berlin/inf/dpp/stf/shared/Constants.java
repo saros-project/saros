@@ -440,6 +440,9 @@ public interface Constants {
     public static final String FOLLOW_MODE_ENABLED = Configuration
         .getString("follow_mode_enabled");
 
+    public static final String FOLLOW_MODE_PAUSED = Configuration
+        .getString("follow_mode_paused");
+
     /**********************************************
      * 
      * View Remote Screen

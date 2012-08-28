@@ -234,7 +234,8 @@ public final class ContextMenusInSessionArea extends ContextMenusInSarosView
 
         SWTBotTreeItem treeItem = null;
         try {
-            return getTreeItem().getText().contains(FOLLOW_MODE_ENABLED);
+            return getTreeItem().getText().contains(FOLLOW_MODE_ENABLED)
+                || getTreeItem().getText().contains(FOLLOW_MODE_PAUSED);
         } catch (RuntimeException e) {
             logError(log, e, tree, treeItem);
             return false;
