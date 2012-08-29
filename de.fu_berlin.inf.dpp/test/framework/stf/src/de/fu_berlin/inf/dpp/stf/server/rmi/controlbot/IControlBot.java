@@ -3,12 +3,14 @@ package de.fu_berlin.inf.dpp.stf.server.rmi.controlbot;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 
+import de.fu_berlin.inf.dpp.stf.server.rmi.controlbot.manipulation.IAccountManipulator;
 import de.fu_berlin.inf.dpp.stf.server.rmi.controlbot.manipulation.INetworkManipulator;
 
 /**
- * The Saros Control robot allows to change how Saros behaves during execution.
- * It does <b>NOT</b> perform any GUI operations but manipulate Saros via
- * reflection and other hooks. This robot should only be used in very few cases.
+ * The Saros Control robot allows you to change the behavior of Saros during
+ * runtime and accessing business logic directly. It does <b>NOT</b> perform any
+ * GUI operations but manipulate Saros via reflection, direct method calls and
+ * other hooks. This robot should only be used in very few cases.
  */
 public interface IControlBot extends Remote {
 
@@ -19,4 +21,12 @@ public interface IControlBot extends Remote {
      * @throws RemoteException
      */
     public INetworkManipulator getNetworkManipulator() throws RemoteException;
+
+    /**
+     * Returns an interface to manipulate the Saros account store
+     * 
+     * @return
+     * @throws RemoteException
+     */
+    public IAccountManipulator getAccountManipulator() throws RemoteException;
 }

@@ -25,6 +25,7 @@ import org.jivesoftware.smack.Roster;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.stf.server.StfRemoteObject;
 import de.fu_berlin.inf.dpp.stf.server.bot.SarosSWTBotPreferences;
+import de.fu_berlin.inf.dpp.stf.server.rmi.controlbot.impl.ControlBotImpl;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.impl.RemoteWorkbenchBot;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotView;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.ISuperBot;
@@ -61,36 +62,28 @@ public final class SarosView extends StfRemoteObject implements ISarosView {
     }
 
     public void connectWith(JID jid, String password) throws RemoteException {
-        if (!SuperBot.getInstance().menuBar().saros().preferences()
-            .existsAccount(jid))
-            SuperBot.getInstance().menuBar().saros().preferences()
-                .addAccount(jid, password);
 
-        if (!SuperBot.getInstance().menuBar().saros().preferences()
-            .isAccountActive(jid))
-            SuperBot.getInstance().menuBar().saros().preferences()
-                .activateAccount(jid);
+        ControlBotImpl.getInstance().getAccountManipulator()
+            .addAccount(jid.getName(), password, jid.getDomain());
 
-        if (!isConnected()) {
-            clickToolbarButtonWithTooltip(TB_CONNECT);
-            waitUntilIsConnected();
-        } else {
+        ControlBotImpl.getInstance().getAccountManipulator()
+            .activateAccount(jid.getName(), jid.getDomain());
+
+        if (isConnected()) {
             clickToolbarButtonWithTooltip(TB_DISCONNECT);
             waitUntilIsDisconnected();
-
-            clickToolbarButtonWithTooltip(TB_CONNECT);
-            waitUntilIsConnected();
         }
 
+        clickToolbarButtonWithTooltip(TB_CONNECT);
+        waitUntilIsConnected();
     }
 
     public void connectWithActiveAccount() throws RemoteException {
         if (isDisconnected()) {
-            if (!SuperBot.getInstance().menuBar().saros().preferences()
-                .existsAccount()) {
+            if (getXmppAccountStore().isEmpty())
                 throw new RuntimeException(
                     "unable to connect with the active account, it does not exists");
-            }
+
             clickToolbarButtonWithTooltip(TB_CONNECT);
             waitUntilIsConnected();
         }
