@@ -51,7 +51,7 @@ public interface IActivity {
      *               activity instance.
      */
     /**
-     * @JTourBusStop 4, Some Basics:
+     * @JTourBusStop 3, Some Basics:
      * 
      *               When a session has begun, messages are passed between all
      *               participants to keep the session synchronized. The messages

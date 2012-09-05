@@ -116,7 +116,7 @@ import de.fu_berlin.inf.dpp.util.Utils;
 public class EditorManager extends AbstractActivityProvider {
 
     /**
-     * @JTourBusStop 6, Some Basics:
+     * @JTourBusStop 5, Some Basics:
      * 
      *               When you work on a project using Saros, you still use the
      *               standard Eclipse Editor, however Saros adds a little extra

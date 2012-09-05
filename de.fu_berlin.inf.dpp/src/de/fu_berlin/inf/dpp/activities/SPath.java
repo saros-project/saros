@@ -21,7 +21,7 @@ import de.fu_berlin.inf.dpp.project.ISarosSession;
 public class SPath {
 
     /**
-     * @JTourBusStop 5, Some Basics:
+     * @JTourBusStop 4, Some Basics:
      * 
      *               Individual Eclipse projects use IPaths to identify their
      *               resources. However, because Saros needs to keep track of
