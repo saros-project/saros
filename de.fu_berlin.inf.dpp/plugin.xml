@@ -1636,7 +1636,7 @@
          </adapter>
       </factory>
       <factory
-            adaptableType="de.fu_berlin.inf.dpp.ui.model.rosterSession.AwarenessInformationTreeElement"
+            adaptableType="de.fu_berlin.inf.dpp.ui.model.rosterSession.FollowModeInformationTreeElement"
             class="de.fu_berlin.inf.dpp.ui.model.rosterSession.RosterSessionAdapterFactory">
          <adapter
                type="de.fu_berlin.inf.dpp.User">

@@ -47,9 +47,9 @@ public class RosterSessionAdapterFactory implements IAdapterFactory {
             }
         }
 
-        if (adaptableObject instanceof AwarenessInformationTreeElement) {
+        if (adaptableObject instanceof FollowModeInformationTreeElement) {
             if (adapterType == User.class) {
-                return ((AwarenessInformationTreeElement) adaptableObject)
+                return ((FollowModeInformationTreeElement) adaptableObject)
                     .getUser();
             }
         }
