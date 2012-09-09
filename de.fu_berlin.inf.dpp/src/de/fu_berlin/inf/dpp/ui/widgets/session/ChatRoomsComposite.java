@@ -57,6 +57,7 @@ import de.fu_berlin.inf.dpp.ui.widgets.chatControl.events.MessageEnteredEvent;
 import de.fu_berlin.inf.dpp.util.Utils;
 import de.fu_berlin.inf.nebula.explanation.ListExplanationComposite.ListExplanation;
 import de.fu_berlin.inf.nebula.explanation.explanatory.ListExplanatoryComposite;
+import de.fu_berlin.inf.nebula.utils.ColorUtils;
 
 /**
  * This component shows chat he right side of the {@link SarosView}
@@ -462,8 +463,10 @@ public class ChatRoomsComposite extends ListExplanatoryComposite {
             senderCache.put(jid, user.getHumanReadableName());
             colorCache.put(jid, SarosAnnotation.getUserColor(user));
         }
+        // add default lightness to cached color
         final String sender = senderCache.get(jid);
-        final Color color = colorCache.get(jid);
+        final Color color = ColorUtils.addLightness(colorCache.get(jid),
+            SarosAnnotation.getLightnessScale());
 
         Utils.runSafeSWTAsync(log, new Runnable() {
             public void run() {
@@ -472,6 +475,7 @@ public class ChatRoomsComposite extends ListExplanatoryComposite {
                     return;
                 log.debug("Sender: " + sender); //$NON-NLS-1$
                 log.debug("Color: " + color); //$NON-NLS-1$
+
                 chatControl.addChatLine(sender, color, message, receivedOn);
             }
         });

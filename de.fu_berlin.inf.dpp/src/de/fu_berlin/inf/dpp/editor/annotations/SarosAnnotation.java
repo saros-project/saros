@@ -12,6 +12,7 @@ import org.eclipse.ui.texteditor.AnnotationPreferenceLookup;
 
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.util.Utils;
+import de.fu_berlin.inf.nebula.utils.ColorUtils;
 
 /**
  * Abstract base class for {@link Annotation}s.
@@ -27,6 +28,12 @@ public abstract class SarosAnnotation extends Annotation {
      * All access should use getSource()
      */
     private User source;
+
+    /**
+     * Scale by which the user color's lightness should be modified for the
+     * viewport and highlighting.
+     */
+    private static final float LIGHTNESS_SCALE = 0.12f;
 
     /**
      * Creates a SarosAnnotation.
@@ -56,6 +63,18 @@ public abstract class SarosAnnotation extends Annotation {
     }
 
     /**
+     * Returns the default lightness scale.<br />
+     * Can be used in combination with
+     * {@link ColorUtils#addLightness(RGB,float)} to get a slightly lighter
+     * color of the default one.
+     * 
+     * @return
+     */
+    public static float getLightnessScale() {
+        return LIGHTNESS_SCALE;
+    }
+
+    /**
      * Returns the color that corresponds to a user.
      * <p>
      * <b>Important notice:</b> Every returned color instance allocates OS
@@ -68,9 +87,9 @@ public abstract class SarosAnnotation extends Annotation {
 
         int colorID = user.getColorID();
 
-        // TODO This should not depend on the SelectionAnnotation, but be
+        // TODO This should not depend on the ContributionAnnotation, but be
         // configurable like all colors!
-        String annotationType = SelectionAnnotation.TYPE + "."
+        String annotationType = ContributionAnnotation.TYPE + "."
             + String.valueOf(colorID + 1);
 
         AnnotationPreferenceLookup lookup = EditorsUI
@@ -92,14 +111,24 @@ public abstract class SarosAnnotation extends Annotation {
         return new Color(Display.getDefault(), rgb);
     }
 
+    /**
+     * Sets the color of given user.
+     * <p>
+     * More precisely the three different annotation types selection, viewport
+     * and annotation are set. Whereby a slightly different shade of color is
+     * used for the selection annotation.
+     * 
+     * @param user
+     * @param userRGB
+     */
     public static void setUserColor(User user, final RGB userRGB) {
         int colorID = user.getColorID();
 
         // TODO This should not depend on the SelectionAnnotation, but be
         // configurable like all colors!
-        String annotationType = SelectionAnnotation.TYPE + "."
+        String annotationTypeForSelection = SelectionAnnotation.TYPE + "."
             + String.valueOf(colorID + 1);
-        String annotationTypeForViewPort = ViewportAnnotation.TYPE + "."
+        String annotationTypeForViewport = ViewportAnnotation.TYPE + "."
             + String.valueOf(colorID + 1);
         String annotationTypeForContribution = ContributionAnnotation.TYPE
             + "." + String.valueOf(colorID + 1);
@@ -107,16 +136,16 @@ public abstract class SarosAnnotation extends Annotation {
         AnnotationPreferenceLookup lookup = EditorsUI
             .getAnnotationPreferenceLookup();
 
-        final AnnotationPreference ap = lookup
-            .getAnnotationPreference(annotationType);
+        final AnnotationPreference apForSelection = lookup
+            .getAnnotationPreference(annotationTypeForSelection);
 
         final AnnotationPreference apForViewPort = lookup
-            .getAnnotationPreference(annotationTypeForViewPort);
+            .getAnnotationPreference(annotationTypeForViewport);
 
         final AnnotationPreference apForContribution = lookup
             .getAnnotationPreference(annotationTypeForContribution);
 
-        if (ap == null) {
+        if (apForSelection == null) {
             return;
         }
 
@@ -130,28 +159,30 @@ public abstract class SarosAnnotation extends Annotation {
 
         Utils.runSafeSWTSync(log, new Runnable() {
             public void run() {
-                int r = userRGB.red;
-                int g = userRGB.green;
-                int b = userRGB.blue;
+                RGB scaledUserRGB = ColorUtils.addLightness(userRGB,
+                    LIGHTNESS_SCALE);
 
                 log.info("Set new User Color: " + userRGB);
-                // Highlighting color of buddy
-                EditorsUI.getPreferenceStore().setValue(
-                    ap.getColorPreferenceKey(), r + "," + g + "," + b);
+                log.debug("Set new User Color (scaled): " + scaledUserRGB);
 
-                // viewport color (side bar, displays what buddy is looking
-                // at)
+                // selection color
+                // (highlighting and cursor position)
+                EditorsUI.getPreferenceStore().setValue(
+                    apForSelection.getColorPreferenceKey(),
+                    scaledUserRGB.red + "," + scaledUserRGB.green + ","
+                        + scaledUserRGB.blue);
+
+                // viewport color
+                // (side bar, displays what a participant is looking at)
                 EditorsUI.getPreferenceStore().setValue(
                     apForViewPort.getColorPreferenceKey(),
-                    r + "," + g + "," + b);
+                    userRGB.red + "," + userRGB.green + "," + userRGB.blue);
 
-                // color for things, that the buddy writes
-                // make a small different color for selection and
                 // contribution color
+                // (the last editor changes made by a participant)
                 EditorsUI.getPreferenceStore().setValue(
                     apForContribution.getColorPreferenceKey(),
-                    (int) (r * 0.9) + "," + (int) (g * 0.9) + ","
-                        + (int) (b * 0.9));
+                    userRGB.red + "," + userRGB.green + "," + userRGB.blue);
             }
         });
     }

@@ -30,7 +30,7 @@ public class ChatLineSeparator extends SimpleRoundedComposite {
 
     public ChatLineSeparator(Composite parent, String username, Color color,
         Date date) {
-        super(parent, SWT.SEPARATOR);
+        super(parent, SWT.SEPARATOR | SWT.BORDER);
         this.setBackground(color);
 
         String receivedOn = dateFormatter.format(date);
