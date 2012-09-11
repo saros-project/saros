@@ -88,13 +88,13 @@ import de.fu_berlin.inf.dpp.project.internal.FollowingActivitiesManager;
 import de.fu_berlin.inf.dpp.ui.LocalPresenceTracker;
 import de.fu_berlin.inf.dpp.ui.RemoteProgressManager;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
-import de.fu_berlin.inf.dpp.ui.actions.SendFileAction;
 import de.fu_berlin.inf.dpp.ui.eventhandler.HostLeftAloneInSessionHandler;
 import de.fu_berlin.inf.dpp.util.StackTrace;
 import de.fu_berlin.inf.dpp.util.VersionManager;
 import de.fu_berlin.inf.dpp.util.pico.ChildContainer;
 import de.fu_berlin.inf.dpp.util.pico.ChildContainerProvider;
 import de.fu_berlin.inf.dpp.util.pico.DotGraphMonitor;
+import de.fu_berlin.inf.dpp.util.sendfile.FileStreamService;
 import de.fu_berlin.inf.dpp.videosharing.VideoSharing;
 import de.fu_berlin.inf.dpp.videosharing.VideoSharingService;
 
@@ -267,7 +267,7 @@ public class SarosContext implements ISarosContext {
         Component.create(HostLeftAloneInSessionHandler.class),
 
         // streaming services
-        Component.create(SendFileAction.SendFileStreamService.class),
+        Component.create(FileStreamService.class),
         Component.create(AudioService.class),
         Component.create(VideoSharingService.class),
 

@@ -1,9 +1,14 @@
 package de.fu_berlin.inf.dpp.ui.util;
 
+import org.apache.log4j.Logger;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.widgets.Shell;
+
+import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
+import de.fu_berlin.inf.dpp.util.Utils;
 
 public class DialogUtils {
 
@@ -46,6 +51,36 @@ public class DialogUtils {
             dialogMessage, MessageDialog.ERROR,
             new String[] { IDialogConstants.OK_LABEL }, 0);
         return openWindow(md);
+    }
+
+    /**
+     * Shows an error window and sets monitors subTask to <code>message</code>
+     * or exceptions message.
+     * 
+     * @param title
+     *            Title of error window
+     * @param message
+     *            Message of error window
+     * @param e
+     *            Exception caused this error, may be <code>null</code>
+     * @param monitor
+     *            May be <code>null</code>
+     */
+    public static void showErrorPopup(final Logger log, final String title,
+        final String message, Exception e, IProgressMonitor monitor) {
+        Utils.runSafeSWTAsync(log, new Runnable() {
+            public void run() {
+                DialogUtils.openErrorMessageDialog(EditorAPI.getShell(), title,
+                    message);
+            }
+        });
+        if (monitor != null) {
+            if (e != null && e.getMessage() != null
+                && !(e.getMessage().length() == 0))
+                monitor.subTask(e.getMessage());
+            else
+                monitor.subTask(message);
+        }
     }
 
     /**

@@ -17,7 +17,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
-package de.fu_berlin.inf.dpp.util;
+package de.fu_berlin.inf.dpp.util.sendfile;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
@@ -28,6 +28,7 @@ import org.eclipse.core.runtime.jobs.Job;
 import de.fu_berlin.inf.dpp.exceptions.StreamException;
 import de.fu_berlin.inf.dpp.net.internal.StreamSession;
 import de.fu_berlin.inf.dpp.net.internal.StreamSession.StreamSessionListener;
+import de.fu_berlin.inf.dpp.util.Utils;
 
 /**
  * Abstract {@link Job} for using {@link StreamSession}s. It contains a set up
