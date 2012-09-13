@@ -10,9 +10,8 @@ Usage
    directory. (X and Y correspond to the script's version number)
 
 1.b) Windows users
-   Place the script "saros-connectivity-diagnosis_X_Y.bat" and the netcat
-   application nc.exe in a writeable directory. You're free to replace
-   nc.exe by another netcat implementation.
+   Place the script "saros-connectivity-diagnosis_X_Y.bat" and a netcat
+   implementation (as nc.exe) in a writeable directory. 
    (X and Y correspond to the script's version number)
 
 2) Run "sh saros-connectivity-diagnosis_X_Y.sh" resp.
