@@ -25,6 +25,7 @@ import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.SarosContext;
 import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
 import de.fu_berlin.inf.dpp.stf.server.rmi.controlbot.impl.ControlBotImpl;
+import de.fu_berlin.inf.dpp.stf.server.rmi.controlbot.manipulation.impl.AccountManipulatorImpl;
 import de.fu_berlin.inf.dpp.stf.server.rmi.controlbot.manipulation.impl.NetworkManipulatorImpl;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.impl.RemoteWorkbenchBot;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.impl.RemoteBotButton;
@@ -258,6 +259,7 @@ public class STFController {
          */
 
         exportObject(NetworkManipulatorImpl.getInstance(), "networkManipulator");
+        exportObject(AccountManipulatorImpl.getInstance(), "accountManipulator");
 
         try {
             for (String s : registry.list())

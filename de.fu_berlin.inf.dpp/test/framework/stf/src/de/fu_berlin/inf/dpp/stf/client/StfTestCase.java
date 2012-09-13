@@ -262,6 +262,13 @@ public abstract class StfTestCase {
                 tester.superBot().menuBar().saros().preferences()
                     .restoreDefaults();
                 Util.openSarosView(tester);
+
+                tester
+                    .controlBot()
+                    .getAccountManipulator()
+                    .restoreDefaultAccount(tester.getName(),
+                        tester.getPassword(), tester.getDomain());
+
                 tester.superBot().views().sarosView()
                     .connectWith(tester.getJID(), tester.getPassword());
             } catch (Exception e) {
@@ -273,7 +280,8 @@ public abstract class StfTestCase {
                 resetBuddyNames(tester);
                 resetBuddies(tester);
             } catch (Exception e) {
-                exception = e;
+                if (exception != null)
+                    exception = e;
             }
         }
 
@@ -334,26 +342,12 @@ public abstract class StfTestCase {
      *             if a (internal) failure occur
      */
     public static void resetDefaultAccount() throws Exception {
-        for (AbstractTester tester : currentTesters) {
-
-            if (!tester.superBot().menuBar().saros().preferences()
-                .existsAccount(tester.getJID())) {
-
-                tester.superBot().menuBar().saros().preferences()
-                    .addAccount(tester.getJID(), tester.getPassword());
-            }
-
-            if (!tester.superBot().menuBar().saros().preferences()
-                .isAccountActive(tester.getJID())) {
-
-                tester.superBot().menuBar().saros().preferences()
-                    .activateAccount(tester.getJID());
-            }
-
-            tester.superBot().menuBar().saros().preferences()
-                .removeAllNonActiveAccounts();
-
-        }
+        for (AbstractTester tester : currentTesters)
+            tester
+                .controlBot()
+                .getAccountManipulator()
+                .restoreDefaultAccount(tester.getName(), tester.getPassword(),
+                    tester.getDomain());
     }
 
     /**

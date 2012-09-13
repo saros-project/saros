@@ -49,6 +49,8 @@ public class ShareProjectWizardUITest extends StfTestCase {
     private static final int SAVE_SELECTION_BUTTON = 4;
     private static final int DELETE_SELECTION_BUTTON = 5;
 
+    private static final Random RANDOM = new Random();
+
     @BeforeClass
     public static void selectTesters() throws Exception {
         select(ALICE);
@@ -139,7 +141,7 @@ public class ShareProjectWizardUITest extends StfTestCase {
         ALICE.remoteBot().sleep(500);
 
         String selectionName = "test";
-        Long.toHexString(new Random().nextLong());
+        Long.toHexString(RANDOM.nextLong());
 
         // Store a selection
         storeSelection(selectionName);

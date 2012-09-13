@@ -4,7 +4,9 @@ import java.rmi.RemoteException;
 
 import de.fu_berlin.inf.dpp.stf.server.StfRemoteObject;
 import de.fu_berlin.inf.dpp.stf.server.rmi.controlbot.IControlBot;
+import de.fu_berlin.inf.dpp.stf.server.rmi.controlbot.manipulation.IAccountManipulator;
 import de.fu_berlin.inf.dpp.stf.server.rmi.controlbot.manipulation.INetworkManipulator;
+import de.fu_berlin.inf.dpp.stf.server.rmi.controlbot.manipulation.impl.AccountManipulatorImpl;
 import de.fu_berlin.inf.dpp.stf.server.rmi.controlbot.manipulation.impl.NetworkManipulatorImpl;
 
 public final class ControlBotImpl extends StfRemoteObject implements
@@ -19,6 +21,11 @@ public final class ControlBotImpl extends StfRemoteObject implements
     @Override
     public INetworkManipulator getNetworkManipulator() throws RemoteException {
         return NetworkManipulatorImpl.getInstance();
+    }
+
+    @Override
+    public IAccountManipulator getAccountManipulator() throws RemoteException {
+        return AccountManipulatorImpl.getInstance();
     }
 
 }
