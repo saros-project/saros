@@ -42,8 +42,10 @@ Saros team over the years and have contributed to the product:
 	* Lin Chen
 	* Lisa Dohrmann
 	* Marc Rintsch
+	* Maria Spiering
 	* Meike Johannsen
 	* Michael Jurke
+	* Norman Warnatsch
 	* Olaf Loga
 	* Oliver Rieger
 	* Patrick Bitterling
@@ -51,9 +53,11 @@ Saros team over the years and have contributed to the product:
 	* Riad Djemili
 	* Sandor Szücs
 	* Sebastian Bauch
+	* Sebastian Starroske
 	* Sebastian Ziller
 	* Stefan Rossbach
 	* Stephan Lau
+	* Stephan Salinger
 	* Tas Sóti
 	* Umut Erdogan
 	* Wjatscheslaw Belousow
