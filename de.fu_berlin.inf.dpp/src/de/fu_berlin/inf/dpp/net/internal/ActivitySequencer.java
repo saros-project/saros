@@ -655,7 +655,7 @@ public class ActivitySequencer implements Startable {
             }
 
             /**
-             * During an project transmission over IBB to the same recipient as
+             * During a project transmission over IBB to the same recipient as
              * these timedActivities, activities that are not time-critical will
              * be queued and send as bundles to reduce message traffic (which in
              * extreme situation could crash IBB connection)

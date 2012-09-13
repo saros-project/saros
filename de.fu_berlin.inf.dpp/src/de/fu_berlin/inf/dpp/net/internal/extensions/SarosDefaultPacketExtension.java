@@ -34,7 +34,7 @@ public abstract class SarosDefaultPacketExtension implements PacketListener {
 
     /**
      * Every subclass that represents a PackageExtension is supposed to
-     * implement this method by unpacking the data in message an calling a
+     * implement this method by unpacking the data in a message and calling a
      * method that subclasses in PacketExtensions can implement.
      */
     public abstract void processMessage(JID sender, Message message);

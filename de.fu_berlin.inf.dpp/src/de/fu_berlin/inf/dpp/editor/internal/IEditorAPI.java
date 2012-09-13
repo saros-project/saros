@@ -11,7 +11,7 @@ import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 
 /**
- * An humble interface that is responsible for editor functionality. The idea
+ * A humble interface that is responsible for editor functionality. The idea
  * behind this interface is to only capsulates the least possible amount of
  * functionality - the one that can't be easily tested. All higher logic can be
  * found in {@link EditorManager}.
@@ -76,7 +76,7 @@ public interface IEditorAPI {
     public SPath getEditorPath(IEditorPart editorPart);
 
     /**
-     * Show an viewport annotation in the given editorPart at the given viewport
+     * Show a viewport annotation in the given editorPart at the given viewport
      * for the given user.
      */
     public void setViewportAnnotation(IEditorPart editorPart,

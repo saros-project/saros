@@ -30,10 +30,10 @@ import de.fu_berlin.inf.dpp.activities.serializable.IActivityDataObject;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 
 /**
- * A Checksum Error is an notification sent to the host and the peers by a user
+ * A Checksum Error is a notification sent to the host and the peers by a user
  * who wants inconsistencies to be recovered.
  * 
- * The host will reply with an ChecksumError of the same recoveryID after having
+ * The host will reply with a ChecksumError of the same recoveryID after having
  * sent the last FileActivity (with {@link FileActivity#isRecovery()} being set
  * related to this checksum recovery.
  */

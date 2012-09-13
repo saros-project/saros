@@ -34,7 +34,7 @@ import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 
 /**
- * A Checksum Error is an notification send to the host and peers by a user, who
+ * A Checksum Error is a notification send to the host and peers by a user, who
  * wants inconsistencies to be recovered.
  */
 @XStreamAlias("ChecksumError")

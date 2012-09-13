@@ -240,7 +240,7 @@ public class ConsistencyWatchdogServer extends Job {
                     checksum.bind(doc);
                     checksum.update();
 
-                    // Sent an checksum to everybody
+                    // Send a checksum to everybody
                     ChecksumActivity checksumActivity = new ChecksumActivity(
                         sarosSession.getLocalUser(), checksum.getPath(),
                         checksum.getHash(), checksum.getLength());

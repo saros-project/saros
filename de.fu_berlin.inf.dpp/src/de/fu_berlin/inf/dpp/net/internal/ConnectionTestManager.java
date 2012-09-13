@@ -92,7 +92,7 @@ public class ConnectionTestManager {
                         + " bytes, hashCode==" + result.dataHash);
                 } catch (SarosCancellationException e) {
                     log.error(
-                        "Connection Test failed because of an CancelationException",
+                        "Connection Test failed because of a CancelationException",
                         e);
                     result.errorMessage = "SarosCancellationException: "
                         + Utils.getMessage(e);

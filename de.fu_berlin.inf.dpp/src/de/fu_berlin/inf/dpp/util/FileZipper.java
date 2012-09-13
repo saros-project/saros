@@ -184,7 +184,7 @@ public class FileZipper {
      * @blocking
      * @cancelable This operation can be canceled via the given progress
      *             monitor. If the operation was canceled, the archive file is
-     *             deleted and an SarosCancellationException is thrown
+     *             deleted and a SarosCancellationException is thrown
      * @throws IOException
      *             if an error occurred while trying to zip a file. The archive
      *             is then deleted.

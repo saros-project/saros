@@ -10,7 +10,7 @@ import de.fu_berlin.inf.dpp.util.ObservableValue;
  * If not in an invitation or shared project session the value of this
  * Observable equals {@link SessionIDObservable#NOT_IN_SESSION}.
  * 
- * If in an shared project session the value of this Observable is the string
+ * If in a shared project session the value of this Observable is the string
  * representation of a random integer.
  */
 @Component(module = "observables")

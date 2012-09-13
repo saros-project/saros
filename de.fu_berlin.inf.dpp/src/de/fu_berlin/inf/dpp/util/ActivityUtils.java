@@ -39,7 +39,7 @@ public class ActivityUtils {
      * {@link JupiterActivityDataObject},
      * {@link TextSelectionActivityDataObject}, or
      * {@link TextEditActivityDataObject} - activities that can be created by
-     * the inviter during an project synchronization and are uncritically to
+     * the inviter during a project synchronization and are uncritically to
      * delay (during an IBB transfer).
      * 
      * @param activities

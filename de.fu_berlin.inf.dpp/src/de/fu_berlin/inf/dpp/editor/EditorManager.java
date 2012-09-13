@@ -98,7 +98,7 @@ import de.fu_berlin.inf.dpp.util.Utils;
  * locking the editors of the users with {@link Permission#READONLY_ACCESS} .
  * 
  * The EditorManager contains the testable logic. All untestable logic should
- * only appear in an class of the {@link IEditorAPI} type. (CO: This is the
+ * only appear in a class of the {@link IEditorAPI} type. (CO: This is the
  * theory at least)
  * 
  * @author rdjemili
@@ -996,7 +996,7 @@ public class EditorManager extends AbstractActivityProvider {
     }
 
     /**
-     * Called when the local user activated an shared editor.
+     * Called when the local user activated a shared editor.
      * 
      * This can be called twice for a single IEditorPart, because it is called
      * from partActivated and from partBroughtToTop.
@@ -1840,7 +1840,8 @@ public class EditorManager extends AbstractActivityProvider {
     }
 
     /**
-     * Convenient method to determine if an file is currently opened as editor.
+     * Convenient method to determine if a file is currently opened as an
+     * editor.
      * 
      * @param path
      *            Path of the file to check if it is opened.

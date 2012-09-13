@@ -11,7 +11,7 @@ import de.fu_berlin.inf.dpp.activities.serializable.FileActivityDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.IActivityDataObject;
 
 /**
- * A simple {@link IActivityDataObject} wrapper that add an time stamp.
+ * A simple {@link IActivityDataObject} wrapper that adds a time stamp.
  * 
  * @author rdjemili
  */

@@ -17,7 +17,7 @@ import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
 import de.fu_berlin.inf.dpp.util.Utils;
 
 /**
- * Extend's an {@link JID} displaying {@link Combo}.<br/>
+ * Extends a {@link JID} displaying {@link Combo}.<br/>
  * The {@link Combo} is pre-filled with the domains as defined in
  * {@link XMPPAccountStore}.<br/>
  * When the user edits the user portion of the selected {@link JID} all

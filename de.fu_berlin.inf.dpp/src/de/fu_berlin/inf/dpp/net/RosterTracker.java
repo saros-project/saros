@@ -13,7 +13,7 @@ import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.util.Utils;
 
 /**
- * The RosterTracker is responsible for offering an convenient access for
+ * The RosterTracker is responsible for offering a convenient access for
  * receiving roster listener changes, if one is not interested in tracking
  * whether the connection is changed.
  */

@@ -163,7 +163,7 @@ public class XStreamExtensionProvider<T> implements PacketExtensionProvider,
     }
 
     /**
-     * PacketFilter for Packets which contain an PacketExtension matching the
+     * PacketFilter for Packets which contain a PacketExtension matching the
      * {@link XStreamExtensionProvider#elementName} and
      * {@link PacketExtensionUtils#NAMESPACE}.
      */
@@ -215,7 +215,7 @@ public class XStreamExtensionProvider<T> implements PacketExtensionProvider,
      * is returned.
      * 
      * @throws ClassCastException
-     *             if somebody has registered an PacketExtension under our
+     *             if somebody has registered a PacketExtension under our
      *             {@link XStreamExtensionProvider#elementName}
      */
     @SuppressWarnings("unchecked")

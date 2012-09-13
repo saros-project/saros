@@ -50,8 +50,8 @@ import de.fu_berlin.inf.dpp.project.ISarosSession;
  * as those will be misleading.
  * 
  * Furthermore, if a user with {@link Permission#READONLY_ACCESS} selects some
- * text and a change to that specific text is done later on, this is stored as
- * an (probable) successful gesture.
+ * text and a change to that specific text is done later on, this is stored as a
+ * (probable) successful gesture.
  */
 @Component(module = "feedback")
 public class SelectionCollector extends AbstractStatisticCollector {
@@ -103,7 +103,7 @@ public class SelectionCollector extends AbstractStatisticCollector {
     protected Map<JID, SelectionEvent> activeSelections = new HashMap<JID, SelectionEvent>();
 
     /**
-     * A list where all selection events made by an remote user with
+     * A list where all selection events made by a remote user with
      * {@link Permission#READONLY_ACCESS} are being stored<br>
      */
     protected List<SelectionEvent> userWithReadOnlyAccessSelectionEvents = new ArrayList<SelectionEvent>();

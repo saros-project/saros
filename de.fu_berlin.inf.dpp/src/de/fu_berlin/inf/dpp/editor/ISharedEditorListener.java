@@ -48,7 +48,7 @@ public interface ISharedEditorListener {
      * 
      * @param replicated
      *            <code>false</code> if this action originates on this client.
-     *            <code>false</code> if it is an replication of an action from
+     *            <code>false</code> if it is a replication of an action from
      *            another participant of the shared project.
      */
     public void userWithWriteAccessEditorSaved(SPath path, boolean replicated);

@@ -41,7 +41,7 @@ import de.fu_berlin.inf.dpp.net.internal.XStreamExtensionProvider;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 
 /**
- * An humble interface that is responsible for network functionality. The idea
+ * A humble interface that is responsible for network functionality. The idea
  * behind this interface is to only encapsulates the least possible amount of
  * functionality - the one that can't be easily tested.
  * 
@@ -53,7 +53,7 @@ public interface ITransmitter {
     /* ---------- invitations --------- */
 
     /**
-     * Sends an cancellation message that tells the receiver that the invitation
+     * Sends a cancellation message that tells the receiver that the invitation
      * is canceled.
      * 
      * @param jid
@@ -82,7 +82,7 @@ public interface ITransmitter {
      * 
      * @throws SarosCancellationException
      *             if the operation was canceled via the given progress monitor
-     *             an LocalCancellationException is thrown. If the operation was
+     *             a LocalCancellationException is thrown. If the operation was
      *             canceled via the monitor and the exception is not received,
      *             the operation completed successfully, before noticing the
      *             cancellation.
@@ -137,7 +137,7 @@ public interface ITransmitter {
      *             sending or a technical error happened.
      * @throws SarosCancellationException
      *             if the operation was canceled via the given progress monitor
-     *             an LocalCancellationException is thrown. If the operation was
+     *             a LocalCancellationException is thrown. If the operation was
      *             canceled via the monitor and the exception is not received,
      *             the operation completed successfully, before noticing the
      *             cancellation.

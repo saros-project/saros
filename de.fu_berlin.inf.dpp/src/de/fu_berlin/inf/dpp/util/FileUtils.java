@@ -98,7 +98,7 @@ public class FileUtils {
         ResourceAttributes attributes = file.getResourceAttributes();
 
         if (attributes == null) {
-            // TODO Throw an FileNotFoundException and deal with it everywhere!
+            // TODO Throw a FileNotFoundException and deal with it everywhere!
             log.error("File does not exist for setting readOnly == " + readOnly
                 + ": " + file, new StackTrace());
             return false;
@@ -172,7 +172,7 @@ public class FileUtils {
      * @param iSarosSession
      * 
      * @cancelable This long-running operation can be canceled via the given
-     *             progress monitor and will throw an LocalCancellationException
+     *             progress monitor and will throw a LocalCancellationException
      *             in this case.
      */
     public static boolean writeArchive(InputStream input, IContainer container,

@@ -52,7 +52,7 @@ import de.fu_berlin.inf.dpp.ui.wizards.pages.CreateXMPPAccountWizardPage;
  */
 
 /**
- * An wizard that is used to create XMPP accounts.
+ * A wizard that is used to create XMPP accounts.
  * 
  * @author rdjemili
  * @author coezbek

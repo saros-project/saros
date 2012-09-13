@@ -710,7 +710,7 @@ public class SarosSession implements ISarosSession, Disposable {
     }
 
     /**
-     * Starts an synchronous or asynchronous runnable to transform and execute
+     * Starts a synchronous or asynchronous runnable to transform and execute
      * incoming activities. The activityDispatcher was deleted, because the
      * execution/transformation of an Activity was not started until the
      * previous one was done. The asynchronous execution doesn't wait for the

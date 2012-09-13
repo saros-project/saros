@@ -218,9 +218,9 @@ public final class StunServiceImpl implements IStunService {
                 dout.writeInt(transactionId2);
 
                 /*
-                 * this should not be send using RFC 5389, because we will get
-                 * an response error. Normally a server should send the public
-                 * IP even if an error occurs, so it is fine for now
+                 * this should not be send using RFC 5389, because we will get a
+                 * response error. Normally a server should send the public IP
+                 * even if an error occurs, so it is fine for now
                  */
                 dout.writeShort(CHANGE_REQUEST);
                 dout.writeShort(4);

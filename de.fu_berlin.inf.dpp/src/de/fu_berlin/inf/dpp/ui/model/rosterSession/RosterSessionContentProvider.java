@@ -235,7 +235,7 @@ public class RosterSessionContentProvider extends TreeContentProvider {
     }
 
     /**
-     * Creates an {@link UserElement} from an input element and some
+     * Creates a {@link UserElement} from an input element and some
      * {@link Presence} instance.
      * 
      * @param inputElement
@@ -259,7 +259,7 @@ public class RosterSessionContentProvider extends TreeContentProvider {
     }
 
     /**
-     * Creates an {@link UserElement} from an input element and a {@link User}.
+     * Creates a {@link UserElement} from an input element and a {@link User}.
      * 
      * @param inputElement
      *            only {@link RosterSessionInput} is supported; other input

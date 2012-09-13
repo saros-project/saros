@@ -7,7 +7,7 @@ import org.eclipse.jface.text.IDocumentListener;
 import de.fu_berlin.inf.dpp.activities.SPath;
 
 /**
- * This Class represents a checksum of an document. It contains the path, the
+ * This Class represents a checksum of a document. It contains the path, the
  * length and the hash code of the document.
  * 
  * @author chjacob

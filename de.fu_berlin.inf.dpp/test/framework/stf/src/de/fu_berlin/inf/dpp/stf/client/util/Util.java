@@ -696,7 +696,7 @@ public class Util {
      * @param projectName
      *            the name of an Eclipse project
      * @param pkg
-     *            an java package name
+     *            a java package name
      * @param className
      *            a class name
      * @return the path to that class

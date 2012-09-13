@@ -875,8 +875,8 @@ public class Utils {
     }
 
     /**
-     * Serializes an {@link Serializable}. Errors are logged to
-     * {@link Utils#log} . .
+     * Serializes a {@link Serializable}. Errors are logged to {@link Utils#log}
+     * . .
      * 
      * @param o
      *            {@link Serializable} to serialize
@@ -942,7 +942,7 @@ public class Utils {
     }
 
     /**
-     * Ask the User a given question. It pops up an QuestionDialog with given
+     * Ask the User a given question. It pops up a QuestionDialog with given
      * title and message.
      * 
      * @return boolean indicating whether the user said Yes or No
@@ -967,7 +967,7 @@ public class Utils {
     }
 
     /**
-     * Ask the User a given question. It pops up an QuestionDialog with given
+     * Ask the User a given question. It pops up a QuestionDialog with given
      * title and message. Additionally custom button labels are applicable.
      * 
      * @param title
@@ -1005,7 +1005,7 @@ public class Utils {
     }
 
     /**
-     * Ask the User a given question. It pops up an {@link MessageDialog} with
+     * Ask the User a given question. It pops up a {@link MessageDialog} with
      * given title and message. It stores the decision in the
      * {@link PreferenceStore} it the checkbox is selected.
      * 

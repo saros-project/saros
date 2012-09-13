@@ -14,7 +14,7 @@ import java.util.concurrent.LinkedBlockingQueue;
  * Map which will automatically insert a value for a given key if the Map does
  * not already contain one.
  * 
- * This Map is backed by an HashMap and inherits all characteristics by it.
+ * This Map is backed by a HashMap and inherits all characteristics by it.
  */
 public class AutoHashMap<K, V> implements Map<K, V> {
 
@@ -30,8 +30,8 @@ public class AutoHashMap<K, V> implements Map<K, V> {
     protected Function<K, V> provider;
 
     /**
-     * Returns a AutoHashMap which automatically will initialize an ArrayList<V>
-     * when queried for a key for which there is no value.
+     * Returns an AutoHashMap which automatically will initialize an
+     * ArrayList<V> when queried for a key for which there is no value.
      */
     public static <K, V> AutoHashMap<K, List<V>> getListHashMap() {
         return new AutoHashMap<K, List<V>>(new Function<K, List<V>>() {
@@ -42,7 +42,7 @@ public class AutoHashMap<K, V> implements Map<K, V> {
     }
 
     /**
-     * Returns a AutoHashMap which automatically will initialize an
+     * Returns an AutoHashMap which automatically will initialize a
      * LinkedBlockingQueue<V> when queried for a key for which there is no
      * value.
      */
@@ -56,7 +56,7 @@ public class AutoHashMap<K, V> implements Map<K, V> {
     }
 
     /**
-     * Returns a AutoHashMap which automatically will initialize an HashSet<V>
+     * Returns an AutoHashMap which automatically will initialize a HashSet<V>
      * when queried for a key for which there is no value.
      */
     public static <K, V> AutoHashMap<K, Set<V>> getSetHashMap() {
