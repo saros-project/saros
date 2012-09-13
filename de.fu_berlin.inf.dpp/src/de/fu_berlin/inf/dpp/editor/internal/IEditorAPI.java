@@ -29,6 +29,17 @@ public interface IEditorAPI {
     public IEditorPart openEditor(SPath path);
 
     /**
+     * Opens the editor with given path. Needs to be called from an UI thread.
+     * 
+     * @param activate
+     *            <code>true</code>, if editor should get focus, otherwise
+     *            <code>false</code>
+     * @return the opened editor or <code>null</code> if the editor couldn't be
+     *         opened.
+     */
+    public IEditorPart openEditor(SPath path, boolean activate);
+
+    /**
      * Opens the given editor part.
      * 
      * Needs to be called from an UI thread.

@@ -172,6 +172,13 @@ public class EditorAPI implements IEditorAPI {
      * {@inheritDoc}
      */
     public IEditorPart openEditor(SPath path) {
+        return openEditor(path, true);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public IEditorPart openEditor(SPath path, boolean activate) {
         IFile file = path.getFile();
 
         if (!file.exists()) {
@@ -226,7 +233,8 @@ public class EditorAPI implements IEditorAPI {
                     }
                     return null;
                 }
-                return IDE.openEditor(page, file);
+
+                return IDE.openEditor(page, file, activate);
             } catch (PartInitException e) {
                 log.error("Could not initialize part: ", e);
             }

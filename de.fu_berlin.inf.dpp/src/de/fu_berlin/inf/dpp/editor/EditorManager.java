@@ -912,7 +912,10 @@ public class EditorManager extends AbstractActivityProvider {
          * has no active editor any more
          */
         if (user.equals(getFollowedUser()) && path != null) {
-            editorAPI.openEditor(path);
+
+            // open editor but don't change focus
+            editorAPI.openEditor(path, false);
+
         } else if (user.equals(getFollowedUser()) && path == null) {
             /*
              * Changed waldmann 22.01.2012: Since the currently opened file and
