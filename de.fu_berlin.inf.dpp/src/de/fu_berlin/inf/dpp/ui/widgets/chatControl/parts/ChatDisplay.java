@@ -44,6 +44,14 @@ public class ChatDisplay extends ScrolledComposite {
         this.setContent(contentComposite);
         this.setExpandHorizontal(true);
         this.setExpandVertical(true);
+        this.getVerticalBar().setIncrement(50);
+
+        // Focus content composite on activation to enable scrolling.
+        this.addListener(SWT.Activate, new Listener() {
+            public void handleEvent(Event e) {
+                contentComposite.setFocus();
+            }
+        });
 
         this.setBackgroundMode(SWT.INHERIT_DEFAULT);
         contentComposite.setBackground(backgroundColor);
