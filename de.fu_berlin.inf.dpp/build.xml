@@ -161,7 +161,7 @@
 
 	<target name="findbugs">
 		<mkdir dir="${findbugs.report.dir}" />
-		<findbugs home="${findbugs.home}" output="xml" outputFile="${findbugs.reportfile}" effort="max" >
+		<findbugs home="${findbugs.home}" output="xml" outputFile="${findbugs.reportfile}" effort="max" jvmargs="-Xmx256m">
 			<sourcePath path="${src.dir}" />
 			<class location="${bin.dir}" />
 			</findbugs>
