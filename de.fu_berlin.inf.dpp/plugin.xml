@@ -174,7 +174,7 @@
             textPreferenceValue="false"
             textStylePreferenceValue="NONE"
             verticalRulerPreferenceKey="de.fu_berlin.inf.dpp.annotations.viewport.ruler.1"
-            verticalRulerPreferenceValue="true"/>
+            verticalRulerPreferenceValue="false"/>
       <specification
             annotationType="de.fu_berlin.inf.dpp.annotations.viewport.2"
             colorPreferenceKey="de.fu_berlin.inf.dpp.annotations.viewport.color.2"
@@ -191,7 +191,7 @@
             textPreferenceValue="false"
             textStylePreferenceValue="NONE"
             verticalRulerPreferenceKey="de.fu_berlin.inf.dpp.annotations.viewport.ruler.2"
-            verticalRulerPreferenceValue="true"/>
+            verticalRulerPreferenceValue="false"/>
       <specification
             annotationType="de.fu_berlin.inf.dpp.annotations.viewport.3"
             colorPreferenceKey="de.fu_berlin.inf.dpp.annotations.viewport.color.3"
@@ -208,7 +208,7 @@
             textPreferenceValue="false"
             textStylePreferenceValue="NONE"
             verticalRulerPreferenceKey="de.fu_berlin.inf.dpp.annotations.viewport.ruler.3"
-            verticalRulerPreferenceValue="true"/>
+            verticalRulerPreferenceValue="false"/>
       <specification
             annotationType="de.fu_berlin.inf.dpp.annotations.viewport.4"
             colorPreferenceKey="de.fu_berlin.inf.dpp.annotations.viewport.color.4"
@@ -225,7 +225,7 @@
             textPreferenceValue="false"
             textStylePreferenceValue="NONE"
             verticalRulerPreferenceKey="de.fu_berlin.inf.dpp.annotations.viewport.ruler.4"
-            verticalRulerPreferenceValue="true"/>
+            verticalRulerPreferenceValue="false"/>
       <specification
             annotationType="de.fu_berlin.inf.dpp.annotations.viewport.5"
             colorPreferenceKey="de.fu_berlin.inf.dpp.annotations.viewport.color.5"
@@ -242,7 +242,7 @@
             textPreferenceValue="false"
             textStylePreferenceValue="NONE"
             verticalRulerPreferenceKey="de.fu_berlin.inf.dpp.annotations.viewport.ruler.5"
-            verticalRulerPreferenceValue="true"/>
+            verticalRulerPreferenceValue="false"/>
 
       <specification
             annotationType="de.fu_berlin.inf.dpp.annotations.contribution"
