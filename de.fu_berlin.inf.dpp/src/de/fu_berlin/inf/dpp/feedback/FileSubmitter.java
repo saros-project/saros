@@ -86,17 +86,14 @@ public class FileSubmitter {
     public static void uploadErrorLog(String zipLocation, String zipName,
         File file, SubMonitor monitor) throws IOException,
         SarosCancellationException {
-        monitor.beginTask("Upload error log...", 3);
+        monitor.beginTask("Upload error log...", 1);
 
         try {
             File archive = new File(zipLocation, zipName + ".zip");
             archive.deleteOnExit();
 
-            monitor.worked(1);
-
-            // zip the file before uploading it
-            FileZipper.zipFiles(Collections.singletonList(file), archive,
-                monitor.newChild(1));
+            FileZipper.zipFiles(Collections.singletonList(file), archive, true,
+                null);
 
             uploadFile(archive, SERVER_URL + SERVLET_PATH + ERROR_LOG_ID_PARAM,
                 monitor.newChild(1));

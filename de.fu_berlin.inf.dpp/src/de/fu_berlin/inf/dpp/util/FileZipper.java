@@ -1,6 +1,5 @@
 package de.fu_berlin.inf.dpp.util;
 
-import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -9,12 +8,10 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.zip.Adler32;
-import java.util.zip.CheckedOutputStream;
 import java.util.zip.Deflater;
 import java.util.zip.ZipEntry;
-import java.util.zip.ZipException;
 import java.util.zip.ZipOutputStream;
 
 import org.apache.commons.io.IOUtils;
@@ -23,9 +20,7 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.SubMonitor;
-
-import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
+import org.eclipse.core.runtime.OperationCanceledException;
 
 /**
  * This class contains method to create a zip archive out of a list of files.
@@ -44,286 +39,182 @@ public class FileZipper {
      */
     private static final int BUFFER_SIZE = 32 * 1024;
 
-    /**
-     * To create a checksum when unzipping one could use
-     * 
-     * CheckedInputStream cis = new CheckedInputStream(inputStream, new
-     * Adler32());
-     */
-    public final static boolean calculateChecksum = false;
+    // this method does not create a Zip file !
 
     /**
-     * Given a list of *files* belonging to the given project, this method will
-     * create a zip file at the given archive location (overwriting any existing
-     * content).
+     * Creates a Zip archive of all files referenced by their paths. The paths
+     * must be relative to the project the files belong to. All directories that
+     * are included in the path of a file will be stored too. The archive will
+     * automatically be deleted if the operation fails or is canceled.
      * 
-     * Progress is reported coarsely to the progress monitor.
+     * @param project
+     *            an Eclipse project
+     * @param paths
+     *            the paths of the files relative to the project that should be
+     *            compressed and archived
+     * @param archive
+     *            the archive file that will contain the compressed content, if
+     *            the archive file already exists it will be overwritten
+     * @param listener
+     *            a {@link ZipListener} which will receive status updates or
+     *            <code>null</code>
      * 
-     * @cancelable This operation can be canceled via the given progress
-     *             monitor. If the operation was canceled the zip file is
-     *             deleted prior to throwing an OperationCanceledException.
+     * @cancelable This operation can be canceled via the given listener.
      * 
-     * @throws IllegalArgumentException
-     *             if the list of files contains a directory or a nonexistent
-     *             file. The archive is then deleted
      * @throws IOException
-     *             if an error occurred while trying to zip a file. The archive
-     *             is then deleted.
-     * @throws ZipException
-     *             if empty list of files given
+     *             if an I/O error occurred while creating the archive
+     * @throws OperationCanceledException
+     *             if the user canceled the operation, see also
+     *             {@link ZipListener}
+     * 
      */
-    public static void createProjectZipArchive(List<IPath> files, File archive,
-        IProject project, SubMonitor progress) throws IOException,
-        SarosCancellationException {
-
-        StopWatch stopWatch = new StopWatch();
-        stopWatch.start();
+    public static void createProjectZipArchive(IProject project,
+        List<IPath> paths, File archive, ZipListener listener)
+        throws IOException, OperationCanceledException {
 
         long totalFileSizes = 0;
 
-        for (IPath path : files) {
-            IFile file = project.getFile(path);
-            try {
-                long filesize = org.eclipse.core.filesystem.EFS
-                    .getStore(file.getLocationURI()).fetchInfo().getLength();
-                totalFileSizes += filesize;
-            } catch (CoreException e) {
-                // TODO Auto-generated catch block
-                log.warn(
-                    "Failed to retrieve file size of file "
-                        + file.getLocationURI(), e);
-            }
+        List<FileWrapper> filesToZip = new ArrayList<FileWrapper>(paths.size());
+
+        for (IPath path : paths) {
+            IPath fileSystemPath = project.getFile(path).getLocation();
+            if (fileSystemPath != null)
+                totalFileSizes += fileSystemPath.toFile().length();
+
+            filesToZip.add(new EclipseFileWrapper(project.getFile(path)));
         }
-        progress.beginTask("Creating the archive", files.size());
-        progress.setTaskName("Creating archive for project \""
-            + project.getName() + "\" (" + files.size() + " files, "
-            + Utils.formatByte(totalFileSizes) + ")");
+
+        internalZipFiles(filesToZip, archive, true, true, totalFileSizes,
+            listener);
+    }
+
+    /**
+     * Creates a Zip archive containing all files of the given list. Only files
+     * are included <b>without</b> their directory names. The archive will
+     * automatically be deleted if the operation fails or is canceled.
+     * 
+     * @param files
+     *            the file that should be included in the archive
+     * @param archive
+     *            the archive file that will contain the content, if the archive
+     *            file already exists it will be overwritten
+     * @param compress
+     *            <code>true</code> if the content should be compressed or
+     *            <code>false</code> if it should only be stored
+     * @param listener
+     *            a {@link ZipListener} which will receive status updates or
+     *            <code>null</code>
+     * 
+     * @cancelable This operation can be canceled via the given listener.
+     * 
+     * @throws IOException
+     *             if an I/O error occurred while creating the archive
+     * @throws OperationCanceledException
+     *             if the user canceled the operation, see also
+     *             {@link ZipListener}
+     * 
+     */
+    public static void zipFiles(List<File> files, File archive,
+        boolean compress, ZipListener listener) throws IOException,
+        OperationCanceledException {
+        List<FileWrapper> filesToZip = new ArrayList<FileWrapper>(files.size());
+
+        for (File file : files)
+            if (file.isFile()) {
+                filesToZip.add(new JavaFileWrapper(file));
+            }
+
+        internalZipFiles(filesToZip, archive, compress, false, -1L, listener);
+    }
+
+    private static void internalZipFiles(List<FileWrapper> files, File archive,
+        boolean compress, boolean includeDirectories, long totalSize,
+        ZipListener listener) throws IOException, OperationCanceledException {
 
         byte[] buffer = new byte[BUFFER_SIZE];
 
         OutputStream outputStream = new BufferedOutputStream(
             new FileOutputStream(archive), BUFFER_SIZE);
 
-        CheckedOutputStream cos = null;
-
-        if (calculateChecksum) {
-            outputStream = cos = new CheckedOutputStream(outputStream,
-                new Adler32());
-        }
-
         ZipOutputStream zipStream = new ZipOutputStream(outputStream);
 
-        int i = 1;
-        for (IPath path : files) {
-            IFile file = project.getFile(path);
+        zipStream.setLevel(compress ? Deflater.DEFAULT_COMPRESSION
+            : Deflater.NO_COMPRESSION);
 
-            try {
-                progress.subTask("Compressing file " + (i++) + "/"
-                    + files.size() + ": " + path.toPortableString());
-                zipSingleFile(new WrappedIFile(file), path.toPortableString(),
-                    zipStream, buffer, progress.newChild(1));
-                totalFileSizes -= org.eclipse.core.filesystem.EFS
-                    .getStore(file.getLocationURI()).fetchInfo().getLength();
-            } catch (SarosCancellationException e) {
-                cleanup(archive);
-                throw e;
-            } catch (IllegalArgumentException e) {
-                cleanup(archive);
-                throw e;
-            } catch (IOException e) {
-                cleanup(archive);
-                throw e;
-            } catch (CoreException e) {
-                // TODO Auto-generated catch block
-                log.debug("", e);
-            }
-            if (totalFileSizes > 0) {
-                progress.setTaskName("Creating archive for project \""
-                    + project.getName() + "\": " + (files.size() - i + 1)
-                    + " files and " + Utils.formatByte(totalFileSizes)
-                    + " left");
-            } else {
-                progress.setTaskName("Creating archive for project \""
-                    + project.getName() + "\": done");
-            }
-        }
-        zipStream.close();
+        boolean cleanup = true;
+        boolean isCanceled = false;
 
-        // Checksum
-        if (calculateChecksum && cos != null) {
-            FileZipper.log.debug("Checksum: " + cos.getChecksum().getValue());
+        StopWatch stopWatch = new StopWatch();
+        stopWatch.start();
+
+        long totalRead = 0L;
+
+           try {
+            for (FileWrapper file : files) {
+                String entryName = includeDirectories ? file.getPath() : file
+                    .getName();
+
+                if (listener != null)
+                    isCanceled = listener.update(file.getPath());
+
+                log.trace("compressing file: " + entryName);
+
+                zipStream.putNextEntry(new ZipEntry(entryName));
+
+                InputStream in = null;
+
+                try {
+                    int read = 0;
+                    in = file.getInputStream();
+                    while (-1 != (read = in.read(buffer))) {
+
+                        if (isCanceled)
+                            throw new OperationCanceledException(
+                                "compressing of file '" + entryName
+                                    + "' was canceled");
+
+                        zipStream.write(buffer, 0, read);
+
+                        totalRead += read;
+
+                        if (listener != null)
+                            listener.update(totalRead, totalSize);
+
+                    }
+                } finally {
+                    IOUtils.closeQuietly(in);
+                }
+                zipStream.closeEntry();
+            }
+            cleanup = false;
+        } finally {
+            IOUtils.closeQuietly(zipStream);
+            if (cleanup && archive != null && archive.exists()
+                && !archive.delete())
+                log.warn("could not delete archive file: " + archive);
         }
+
         stopWatch.stop();
 
-        log.debug(String.format("Created project archive %s at %s",
+        log.debug(String.format("created archive %s at %s",
             stopWatch.throughput(archive.length()), archive.getAbsolutePath()));
 
-        // we should not call DONE on a subMonitor, since the progress is marked
-        // as finished anyway when the parent progress is touched again
-        progress.subTask(""); // ex: .done()
     }
 
-    public static void cleanup(File archive) {
-        if (archive != null && archive.exists() && !archive.delete()) {
-            log.warn("Could not delete archive file: " + archive);
-        }
-    }
-
-    public static void zipFiles(List<File> files, File archive,
-        SubMonitor progress) throws IOException, SarosCancellationException {
-        zipFiles(files, archive, true, progress);
-    }
-
-    /**
-     * Given a list of files this method will create a zip file at the given
-     * archive location (overwriting any existing content). The archive will
-     * contain all given files at top level, i.e. subfolders are not created. <br>
-     * If the list of files contains directories or nonexistent files, they are
-     * ignored. Therefore the archive might be empty at the end.
-     * 
-     * @blocking
-     * @cancelable This operation can be canceled via the given progress
-     *             monitor. If the operation was canceled, the archive file is
-     *             deleted and a SarosCancellationException is thrown
-     * @throws IOException
-     *             if an error occurred while trying to zip a file. The archive
-     *             is then deleted.
-     * @throws IllegalArgumentException
-     *             if the list of files is empty. The archive is then deleted.
-     */
-    public static void zipFiles(List<File> files, File archive,
-        boolean compress, SubMonitor progress) throws IOException,
-        SarosCancellationException {
-        try {
-            if (files.isEmpty()) {
-                log.warn("The list with files to zip was empty.");
-                return;
-            }
-
-            byte[] buffer = new byte[BUFFER_SIZE];
-
-            progress.beginTask("Creating Archive", files.size());
-
-            OutputStream outputStream = new BufferedOutputStream(
-                new FileOutputStream(archive), BUFFER_SIZE);
-
-            ZipOutputStream zipStream = new ZipOutputStream(outputStream);
-
-            zipStream.setLevel(compress ? Deflater.DEFAULT_COMPRESSION
-                : Deflater.NO_COMPRESSION);
-
-            int filesZipped = 0;
-
-            for (File file : files) {
-                try {
-                    zipSingleFile(new WrappedFile(file), file.getName(),
-                        zipStream, buffer, progress.newChild(1));
-                    ++filesZipped;
-                } catch (SarosCancellationException e) {
-                    cleanup(archive);
-                    throw e;
-                } catch (IllegalArgumentException e) {
-                    log.warn(e.getMessage());
-                    continue;
-                } catch (IOException e) {
-                    cleanup(archive);
-                    throw e;
-                }
-            }
-            zipStream.close();
-            if (filesZipped == 0) {
-                log.warn("No files could be added to the archive.");
-            }
-        } finally {
-            progress.done();
-        }
-    }
-
-    /**
-     * Adds the given file to the ZipStream. The file might be a {@link File} or
-     * an {@link IFile} which is concealed by the {@link FileWrapper} interface
-     * 
-     * @param filename
-     *            the name of the file that should be added to the archive. It
-     *            might as well be a relative path name. In this case the
-     *            specified subdirectories are automatically created inside the
-     *            archive.
-     * @cancelable
-     * @throws IOException
-     *             if an error occurred while trying to zip the file
-     * @throws IllegalArgumentException
-     *             if the file was null or a directory or didn't exist
-     */
-    protected static void zipSingleFile(FileWrapper file, String filename,
-        ZipOutputStream zipStream, byte[] buffer, SubMonitor progress)
-        throws IOException, SarosCancellationException {
-
-        try {
-
-            if (progress.isCanceled()) {
-                throw new SarosCancellationException();
-            }
-
-            progress.beginTask("Compressing: " + filename, 1);
-            log.debug("Compress file: " + filename);
-
-            if (file == null || !file.exists()) {
-                throw new IllegalArgumentException(
-                    "The file to zip does not exist: " + filename);
-            }
-
-            zipStream.putNextEntry(new ZipEntry(filename));
-            writeFileToStream(file, filename, zipStream, buffer);
-            zipStream.closeEntry();
-
-        } finally {
-            progress.done();
-        }
-    }
-
-    protected static void writeFileToStream(FileWrapper file, String filename,
-        ZipOutputStream out, byte[] buffer) throws CausedIOException,
-        IOException {
-        InputStream in;
-        try {
-            in = file.getInputStream();
-        } catch (Exception e) {
-            throw new CausedIOException("Could not obtain InputStream for "
-                + filename, e);
-        }
-
-        try {
-            int n = 0;
-            while (-1 != (n = in.read(buffer)))
-                out.write(buffer, 0, n);
-
-        } finally {
-            IOUtils.closeQuietly(in);
-        }
-    }
-
-    /**
-     * An interface that allows us to use different file classes.
-     * 
-     * @see WrappedFile
-     * @see WrappedIFile
-     */
     interface FileWrapper {
         public boolean exists();
 
-        public InputStream getInputStream() throws FileNotFoundException,
-            CoreException;
+        public InputStream getInputStream() throws IOException;
 
         public String getName();
+
+        public String getPath();
     }
 
-    /**
-     * A class that wraps a {@link File}.
-     */
-    static class WrappedFile implements FileWrapper {
+    private static class JavaFileWrapper implements FileWrapper {
         protected File file;
 
-        public WrappedFile(File file) {
+        public JavaFileWrapper(File file) {
             this.file = file;
         }
 
@@ -332,21 +223,22 @@ public class FileZipper {
         }
 
         public InputStream getInputStream() throws FileNotFoundException {
-            return new BufferedInputStream(new FileInputStream(file));
+            return new FileInputStream(file);
         }
 
         public String getName() {
             return file.getName();
         }
+
+        public String getPath() {
+            return file.getPath().replace('\\', '/');
+        }
     }
 
-    /**
-     * A class that wraps an {@link IFile}.
-     */
-    static class WrappedIFile implements FileWrapper {
+    private static class EclipseFileWrapper implements FileWrapper {
         protected IFile file;
 
-        public WrappedIFile(IFile file) {
+        public EclipseFileWrapper(IFile file) {
             this.file = file;
         }
 
@@ -354,12 +246,20 @@ public class FileZipper {
             return file.exists();
         }
 
-        public InputStream getInputStream() throws CoreException {
-            return file.getContents();
+        public InputStream getInputStream() throws IOException {
+            try {
+                return file.getContents();
+            } catch (CoreException e) {
+                throw new IOException(e.getMessage(), e);
+            }
         }
 
         public String getName() {
             return file.getName();
+        }
+
+        public String getPath() {
+            return file.getProjectRelativePath().toPortableString();
         }
     }
 }

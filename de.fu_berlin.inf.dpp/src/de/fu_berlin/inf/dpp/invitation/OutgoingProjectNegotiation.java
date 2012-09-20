@@ -18,6 +18,7 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.SubMonitor;
 import org.jivesoftware.smack.packet.Packet;
 import org.picocontainer.annotations.Inject;
@@ -47,6 +48,7 @@ import de.fu_berlin.inf.dpp.synchronize.StartHandle;
 import de.fu_berlin.inf.dpp.util.FileZipper;
 import de.fu_berlin.inf.dpp.util.MappedList;
 import de.fu_berlin.inf.dpp.util.Utils;
+import de.fu_berlin.inf.dpp.util.ZipProgressMonitor;
 
 public class OutgoingProjectNegotiation extends ProjectNegotiation {
 
@@ -129,9 +131,14 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
 
                 // pack all archive files into one big archive
                 zipArchive = File.createTempFile("SarosSyncArchive", ".zip");
-                FileZipper.zipFiles(zipArchives, zipArchive, false,
-                    monitor.newChild(20));
+                try {
+                    FileZipper.zipFiles(zipArchives, zipArchive, false,
+                        new ZipProgressMonitor(monitor.newChild(20),
+                            zipArchives.size(), false));
 
+                } catch (OperationCanceledException e) {
+                    throw new LocalCancellationException();
+                }
                 zipArchives.add(zipArchive);
             }
             // send the big archive
@@ -567,8 +574,9 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
         }
     }
 
-    private File createProjectArchive(SubMonitor monitor, List<IPath> toSend,
-        String projectID) throws IOException, SarosCancellationException {
+    private File createProjectArchive(IProgressMonitor monitor,
+        List<IPath> toSend, String projectID) throws IOException,
+        SarosCancellationException {
         IProject project = sarosSession.getProject(projectID);
         log.debug("Got project from session");
         /*
@@ -587,11 +595,13 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
         File tempArchive = null;
         try {
             if (toSend.size() > 0) {
-
                 tempArchive = File.createTempFile(prefix, ".zip");
-                FileZipper.createProjectZipArchive(toSend, tempArchive,
-                    project, monitor);
+                FileZipper.createProjectZipArchive(project, toSend,
+                    tempArchive, new ZipProgressMonitor(monitor, toSend.size(),
+                        true));
             }
+        } catch (OperationCanceledException e) {
+            throw new LocalCancellationException();
         } finally {
             monitor.done();
         }
