@@ -8,4 +8,4 @@
  * one or more users are behind a NAT.
  */
 
-package de.fu_berlin.inf.dpp.net.UPnP;
+package de.fu_berlin.inf.dpp.net.upnp;

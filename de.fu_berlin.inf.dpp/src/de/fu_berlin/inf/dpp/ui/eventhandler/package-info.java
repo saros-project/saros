@@ -7,4 +7,4 @@
  * </ul>
  */
 
-package de.fu_berlin.inf.dpp.ui.dialogs;
+package de.fu_berlin.inf.dpp.ui.eventhandler;
