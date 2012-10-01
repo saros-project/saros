@@ -1,3 +1,24 @@
+12.9.28
+=======
+[UI] Change of "Test data transfer connection..." label
+[UI] Add Icon to open Preferences
+[UI] Remove the IMBeep preference toggle icon
+[UI] Inform participants about Follow Mode state
+[UI] Default color attribution for Saros annotations - part 1
+[UI] Disable left Viewport Annotation by default
+[UI] Reorder icons in SarosView
+[FIX] #3515311 Use default chat server does not do what it says
+[FIX] #3544357 Buddies temporarily disappear at Session end
+[FIX] #3455399 no adding project to session by non-host (read-only)
+[FIX] #3514796 "Create XMPP Account" fails vs. eclipse Guideline
+[FIX] #3552437 Smack Error Messages are shown to the User
+[FIX] not all files may be shared through partial sharing
+[FIX] #3562501 adding buddy while in read-only mode
+[FIX] #3512584 Fix scroll speed in chat
+[FIX] #3514675 Useless notifications for 3rd person joining session
+[FIX] #3455372 No more focus change in Follow Mode
+[FIX] #3496219 Saros marks compiled files as shared
+
 12.7.27
 =======
 [PERFORMANCE] Reduced size of marshalled objects by 10%

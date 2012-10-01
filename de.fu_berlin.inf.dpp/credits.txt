@@ -45,10 +45,13 @@ Saros team over the years and have contributed to the product:
 	* Maria Spiering
 	* Meike Johannsen
 	* Michael Jurke
+	* Michael Scheppat
+	* Nils Bussas
 	* Norman Warnatsch
 	* Olaf Loga
 	* Oliver Rieger
 	* Patrick Bitterling
+	* Patrick Steinhardt
 	* Philipp Cordes
 	* Riad Djemili
 	* Sandor Szücs
@@ -60,4 +63,5 @@ Saros team over the years and have contributed to the product:
 	* Stephan Salinger
 	* Tas Sóti
 	* Umut Erdogan
+	* Vera Schlemm
 	* Wjatscheslaw Belousow
