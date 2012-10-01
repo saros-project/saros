@@ -447,6 +447,7 @@ public class SarosView extends ViewPart {
 
         toolBar.add(new ChangeXMPPAccountAction());
         toolBar.add(new NewContactAction());
+        toolBar.add(new OpenPreferencesAction());
         toolBar.add(new Separator());
 
         if (isDebug)
@@ -455,7 +456,6 @@ public class SarosView extends ViewPart {
         toolBar.add(new ConsistencyAction());
         fmAction = new FollowModeAction();
         toolBar.add(fmAction);
-        toolBar.add(new OpenPreferencesAction());
         toolBar.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
         toolBar.add(new LeaveSessionAction());
     }
