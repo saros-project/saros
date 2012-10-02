@@ -104,7 +104,8 @@ public final class NetworkPreferencePage extends PreferencePage implements
 
         getPreferenceStore().setValue(
             PreferenceConstants.LOCAL_SOCKS5_PROXY_DISABLED,
-            buttonOnlyAllowMediatedSocks5.getSelection());
+            buttonOnlyAllowMediatedSocks5.getSelection()
+                || buttonOnlyAllowIBB.getSelection());
 
         getPreferenceStore().setValue(PreferenceConstants.FILE_TRANSFER_PORT,
             Integer.valueOf(localSocks5PortText.getText()));
