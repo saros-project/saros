@@ -95,7 +95,6 @@ import de.fu_berlin.inf.dpp.ui.sounds.SoundManager;
 import de.fu_berlin.inf.dpp.ui.sounds.SoundPlayer;
 import de.fu_berlin.inf.dpp.ui.util.selection.retriever.SelectionRetrieverFactory;
 import de.fu_berlin.inf.dpp.ui.widgets.ConnectionStateComposite;
-import de.fu_berlin.inf.dpp.ui.widgets.chatControl.ChatControl;
 import de.fu_berlin.inf.dpp.ui.widgets.session.ChatRoomsComposite;
 import de.fu_berlin.inf.dpp.ui.widgets.viewer.rosterSession.BuddySessionDisplayComposite;
 import de.fu_berlin.inf.dpp.util.Utils;
@@ -326,22 +325,7 @@ public class SarosView extends ViewPart {
                             .getAdapterManager().getAdapter(treeItem.getData(),
                                 RosterEntryElement.class);
 
-                        ChatControl chatControl = chatRooms
-                            .getSelectedChatControl();
-
-                        /*
-                         * TODO create links like those of the World of Warcraft
-                         * chat which then can be clicked to execute some action
-                         * e.g inviting user to a session are add them to the
-                         * roster (but should not be done here at all)
-                         */
-
-                        if (rosterEntryElement != null && chatControl != null) {
-                            String currentText = chatControl.getInputText();
-                            chatControl.setInputText(currentText + "["
-                                + rosterEntryElement.getJID().getBase() + "]");
-                        }
-
+                        chatRooms.openChat(rosterEntryElement.getJID(), true);
                     }
                 } else {
                     log.warn("Control is not instance of Tree.");
