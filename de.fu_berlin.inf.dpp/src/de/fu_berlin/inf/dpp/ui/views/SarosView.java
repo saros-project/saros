@@ -81,6 +81,7 @@ import de.fu_berlin.inf.dpp.ui.actions.GiveWriteAccessAction;
 import de.fu_berlin.inf.dpp.ui.actions.JumpToUserWithWriteAccessPositionAction;
 import de.fu_berlin.inf.dpp.ui.actions.LeaveSessionAction;
 import de.fu_berlin.inf.dpp.ui.actions.NewContactAction;
+import de.fu_berlin.inf.dpp.ui.actions.OpenChatAction;
 import de.fu_berlin.inf.dpp.ui.actions.OpenPreferencesAction;
 import de.fu_berlin.inf.dpp.ui.actions.RenameContactAction;
 import de.fu_berlin.inf.dpp.ui.actions.RestrictToReadOnlyAccessAction;
@@ -209,6 +210,8 @@ public class SarosView extends ViewPart {
     protected BuddySessionDisplayComposite buddySessionDisplayComposite;
 
     protected ChatRoomsComposite chatRooms;
+
+    protected OpenChatAction openChatAction;
 
     @Inject
     protected Saros saros;
@@ -465,6 +468,8 @@ public class SarosView extends ViewPart {
      */
     protected void addRosterMenuItems(MenuManager menuManager) {
         final SkypeAction skypeAction = new SkypeAction();
+        openChatAction = new OpenChatAction(chatRooms);
+
         final RenameContactAction renameContactAction = new RenameContactAction();
         final DeleteContactAction deleteContactAction = new DeleteContactAction();
         final ConnectionTestAction connectionTestAction = new ConnectionTestAction();
@@ -491,6 +496,7 @@ public class SarosView extends ViewPart {
                 manager.add(skypeAction);
                 manager.add(new Separator());
                 manager.add(connectionTestAction);
+                manager.add(openChatAction);
                 manager.add(renameContactAction);
                 manager.add(deleteContactAction);
             }
@@ -509,6 +515,9 @@ public class SarosView extends ViewPart {
         final VideoSharingAction videoSharingAction = new VideoSharingAction();
         final VoIPAction voipAction = new VoIPAction();
         final ChangeColorAction changedColorAction = new ChangeColorAction();
+
+        openChatAction = new OpenChatAction(chatRooms);
+
         menuManager.addMenuListener(new IMenuListener() {
             public void menuAboutToShow(IMenuManager manager) {
                 /*
@@ -542,6 +551,7 @@ public class SarosView extends ViewPart {
                         manager.add(followModeAction);
                         manager.add(jumpToUserWithWriteAccessPositionAction);
                         manager.add(new Separator());
+                        manager.add(openChatAction);
                         manager.add(sendFileAction);
                         manager.add(videoSharingAction);
                         manager.add(voipAction);
@@ -582,6 +592,7 @@ public class SarosView extends ViewPart {
         super.dispose();
 
         rosterTracker.removeRosterListener(rosterListenerBuddys);
+        openChatAction.dispose();
 
         /*
          * Stop container and remove it from its parent.

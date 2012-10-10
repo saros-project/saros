@@ -66,6 +66,10 @@ public class Messages extends NLS {
     public static String ChatRoomsComposite_roundtable;
     public static String ChatRoomsComposite_share_projects;
 
+    /* chat */
+    public static String OpenChatAction_MenuItem;
+    public static String OpenChatAction_tooltip;
+
     public static String CollaborationUtils_confirm_closing;
     public static String CollaborationUtils_confirm_closing_text;
     public static String CollaborationUtils_confirm_leaving;
