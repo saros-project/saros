@@ -184,6 +184,20 @@ public class ChatRoomsComposite extends ListExplanatoryComposite {
     @Inject
     protected SingleUserChatService singleUserChatService;
 
+    protected DisposeListener disposeListener = new DisposeListener() {
+
+        @Override
+        public void widgetDisposed(DisposeEvent e) {
+            CTabItem source = (CTabItem) e.getSource();
+            source.getControl().dispose();
+
+            if (chatRooms.getItemCount() == 0) {
+                showExplanation(howTo);
+            }
+        }
+
+    };
+
     protected IChatServiceListener chatServiceListener = new IChatServiceListener() {
 
         @Override
@@ -315,6 +329,7 @@ public class ChatRoomsComposite extends ListExplanatoryComposite {
         chatTab.setImage(chatViewImage);
         chatTab.setData(chat);
         chatTab.setControl(control);
+        chatTab.addDisposeListener(disposeListener);
 
         return chatTab;
     }

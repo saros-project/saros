@@ -179,6 +179,7 @@ public class ChatControl extends Composite {
                     if (ChatControl.this.isDisposed()) {
                         chat.removeChatListener(chatListener);
                         chatRooms.openChat(chat, false);
+                        return;
                     }
 
                     addChatLine(new ChatElement(message, sender, new Date()));
@@ -347,7 +348,6 @@ public class ChatControl extends Composite {
     @Override
     public void dispose() {
         super.dispose();
-        chat.removeChatListener(chatListener);
         sessionManager.removeSarosSessionListener(sessionListener);
     }
 
