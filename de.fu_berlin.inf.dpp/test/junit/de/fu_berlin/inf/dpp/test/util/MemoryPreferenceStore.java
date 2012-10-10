@@ -46,7 +46,7 @@ public class MemoryPreferenceStore implements IPreferenceStore {
         Object object = currentPreferences.get(name);
 
         if (object == null)
-            return false;
+            return getDefaultBoolean(name);
 
         try {
             return (Boolean) object;
@@ -60,7 +60,7 @@ public class MemoryPreferenceStore implements IPreferenceStore {
         Object object = currentPreferences.get(name);
 
         if (object == null)
-            return 0D;
+            return getDefaultDouble(name);
 
         try {
             return (Double) object;
@@ -74,7 +74,7 @@ public class MemoryPreferenceStore implements IPreferenceStore {
         Object object = currentPreferences.get(name);
 
         if (object == null)
-            return 0F;
+            return getDefaultFloat(name);
 
         try {
             return (Float) object;
@@ -88,7 +88,7 @@ public class MemoryPreferenceStore implements IPreferenceStore {
         Object object = currentPreferences.get(name);
 
         if (object == null)
-            return 0;
+            return getDefaultInt(name);
 
         try {
             return (Integer) object;
@@ -102,7 +102,7 @@ public class MemoryPreferenceStore implements IPreferenceStore {
         Object object = currentPreferences.get(name);
 
         if (object == null)
-            return 0L;
+            return getDefaultLong(name);
 
         try {
             return (Long) object;
@@ -116,7 +116,7 @@ public class MemoryPreferenceStore implements IPreferenceStore {
         Object object = currentPreferences.get(name);
 
         if (object == null)
-            return "";
+            return getDefaultString(name);
 
         try {
             return (String) object;
