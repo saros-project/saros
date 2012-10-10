@@ -30,7 +30,7 @@ public interface IChatListener {
     public void stateChanged(JID jid, ChatState state);
 
     /**
-     * Gets called whenever a participant connected from the chat.
+     * Gets called whenever a participant connected to the chat.
      * 
      * @param jid
      *            the JID of the users that will receive the messages
@@ -44,23 +44,5 @@ public interface IChatListener {
      *            the JID of the user that will not receive any messages
      */
     public void disconnected(JID jid);
-
-    /**
-     * Gets called whenever a contact joined the chat. This will only happen
-     * with multi user chats.
-     * 
-     * @param jid
-     *            the JID of the user that joined the chat
-     */
-    public void joined(JID jid);
-
-    /**
-     * Gets called whenever a contact left the chat. This will probably only
-     * happen with multi user chats.
-     * 
-     * @param jid
-     *            the JID of the user that left the chat
-     */
-    public void left(JID jid);
 
 }

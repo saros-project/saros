@@ -120,16 +120,6 @@ public class MultiUserChat extends AbstractChat {
         public void disconnected(JID jid) {
             /* do nothing */
         }
-
-        @Override
-        public void joined(JID jid) {
-            /* do nothing */
-        }
-
-        @Override
-        public void left(JID jid) {
-            /* do nothing */
-        }
     };
 
     /**

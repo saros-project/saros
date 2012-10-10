@@ -215,41 +215,35 @@ public class ChatControl extends Composite {
         }
 
         @Override
-        public void connected(JID jid) {
+        public void connected(final JID jid) {
             Utils.runSafeSWTAsync(null, new Runnable() {
 
                 @Override
                 public void run() {
-                    chatInput.setEnabled(true);
+                    if (!isOwnJID(jid)) {
+                        addChatLine(new ChatElement(jid, new Date(),
+                            ChatElementType.JOIN));
+                    } else {
+                        chatInput.setEnabled(true);
+                    }
                 }
             });
         }
 
         @Override
-        public void disconnected(JID jid) {
+        public void disconnected(final JID jid) {
             Utils.runSafeSWTAsync(null, new Runnable() {
 
                 @Override
                 public void run() {
-                    chatInput.setEnabled(false);
+                    if (!isOwnJID(jid)) {
+                        addChatLine(new ChatElement(jid, new Date(),
+                            ChatElementType.LEAVE));
+                    } else {
+                        chatInput.setEnabled(false);
+                    }
                 }
             });
-        }
-
-        @Override
-        public void joined(JID jid) {
-            if (!isOwnJID(jid)) {
-                addChatLine(new ChatElement(jid, new Date(),
-                    ChatElementType.JOIN));
-            }
-        }
-
-        @Override
-        public void left(JID jid) {
-            if (!isOwnJID(jid)) {
-                addChatLine(new ChatElement(jid, new Date(),
-                    ChatElementType.LEAVE));
-            }
         }
 
     };

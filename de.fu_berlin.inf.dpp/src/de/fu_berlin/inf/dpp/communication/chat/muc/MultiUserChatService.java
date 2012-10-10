@@ -155,7 +155,6 @@ public class MultiUserChatService extends AbstractChatService {
         muc.setCurrentState(ChatState.gone);
         destroyedRoom = chat.disconnect();
 
-        muc.notifyJIDDisconnected(chat.getJID());
         if (destroyedRoom) {
             this.notifyChatDestroyed(chat);
         }

@@ -46,7 +46,8 @@ public class SingleUserChatService extends AbstractChatService {
                     for (SingleUserChat chat : currentChats.values())
                         chat.setConnected(true);
 
-                } else {
+                } else if (newState == ConnectionState.DISCONNECTING
+                    || newState == ConnectionState.ERROR) {
                     if (chatManager != null)
                         chatManager.removeChatListener(chatManagerListener);
 

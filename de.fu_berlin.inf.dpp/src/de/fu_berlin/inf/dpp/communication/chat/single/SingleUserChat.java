@@ -111,7 +111,9 @@ public class SingleUserChat extends AbstractChat {
 
         if (isConnected) {
             notifyJIDConnected(participant);
+            notifyJIDConnected(this.getJID());
         } else {
+            notifyJIDDisconnected(this.getJID());
             notifyJIDDisconnected(participant);
         }
     }
