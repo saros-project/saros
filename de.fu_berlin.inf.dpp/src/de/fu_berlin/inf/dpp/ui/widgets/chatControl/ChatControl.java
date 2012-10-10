@@ -31,6 +31,8 @@ import de.fu_berlin.inf.dpp.communication.chat.IChat;
 import de.fu_berlin.inf.dpp.communication.chat.IChatListener;
 import de.fu_berlin.inf.dpp.editor.annotations.SarosAnnotation;
 import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.net.SarosNet;
+import de.fu_berlin.inf.dpp.net.util.RosterUtils;
 import de.fu_berlin.inf.dpp.project.AbstractSarosSessionListener;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ISarosSessionListener;
@@ -70,6 +72,9 @@ public class ChatControl extends Composite {
     protected List<IChatControlListener> chatControlListeners = new ArrayList<IChatControlListener>();
 
     private static final Logger log = Logger.getLogger(ChatControl.class);
+
+    @Inject
+    protected SarosNet sarosNet;
 
     @Inject
     protected ISarosSessionManager sessionManager;
@@ -381,7 +386,12 @@ public class ChatControl extends Composite {
             }
         }
 
-        chatDisplay.addChatLine(sender, color, element.toString(),
+        String name = RosterUtils.getNickname(sarosNet, sender);
+        if (name == null) {
+            name = sender.toString();
+        }
+
+        chatDisplay.addChatLine(name, color, element.toString(),
             element.getDate());
     }
 
