@@ -51,7 +51,8 @@ public class MucSessionTest {
     }
 
     private MUCSessionPreferences createMUCPrefernce(String roomName) {
-        return new MUCSessionPreferences("conference.jabber.se", roomName,
+        return new MUCSessionPreferences(
+            "conference.saros-con.imp.fu-berlin.de", roomName,
             "backebackekuchen");
     }
 
