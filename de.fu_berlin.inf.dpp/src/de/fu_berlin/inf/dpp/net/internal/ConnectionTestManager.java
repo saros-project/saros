@@ -16,7 +16,6 @@ import org.jivesoftware.smack.packet.Packet;
 import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.Saros;
-import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
 import de.fu_berlin.inf.dpp.net.IncomingTransferObject;
 import de.fu_berlin.inf.dpp.net.IncomingTransferObject.IncomingTransferObjectExtensionProvider;
 import de.fu_berlin.inf.dpp.net.JID;
@@ -85,12 +84,6 @@ public class ConnectionTestManager {
                     log.info(Utils.prefix(new JID(packet.getFrom()))
                         + "Connection Test Data received: " + data.length
                         + " bytes, hashCode==" + result.dataHash);
-                } catch (SarosCancellationException e) {
-                    log.error(
-                        "Connection Test failed because of a CancelationException",
-                        e);
-                    result.errorMessage = "SarosCancellationException: "
-                        + Utils.getMessage(e);
                 } catch (IOException e) {
                     log.error(
                         "Connection Test failed because of an IOException", e);
@@ -200,9 +193,6 @@ public class ConnectionTestManager {
                     progress.worked(40);
                 } catch (IOException e) {
                     throw new XMPPException("IOException sending data", e);
-                } catch (SarosCancellationException e) {
-                    throw new XMPPException(
-                        "CancellationException sending data", e);
                 }
 
                 progress.subTask("Waiting for reply");

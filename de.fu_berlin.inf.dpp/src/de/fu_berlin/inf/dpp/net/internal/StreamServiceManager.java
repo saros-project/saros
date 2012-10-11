@@ -970,7 +970,6 @@ public class StreamServiceManager implements Startable {
          */
         protected synchronized void rejectSession() {
             notifyWaiting(true);
-
         }
 
         /**
@@ -1075,11 +1074,6 @@ public class StreamServiceManager implements Startable {
                         new ConnectionException(e));
                     removeData(packet.getSession());
                 }
-            } catch (SarosCancellationException e) {
-                /*
-                 * ignore: user gone (will be reported by SharedProjectListener)
-                 * or stream closed (drop data silently)
-                 */
             }
         }
 
@@ -1264,13 +1258,6 @@ public class StreamServiceManager implements Startable {
             disposed = true;
 
             receiverThread.interrupt();
-            for (StreamPacket p : incomingPackets) {
-                try {
-                    p.reject();
-                } catch (IOException e1) {
-                    break;
-                }
-            }
             incomingPackets.clear();
         }
 
@@ -1280,14 +1267,8 @@ public class StreamServiceManager implements Startable {
          * @param packet
          */
         protected void offerPacket(StreamPacket packet) {
-            if (disposed) {
-                try {
-                    packet.reject();
-                } catch (IOException e) {
-                    // ignore
-                }
+            if (disposed)
                 return;
-            }
 
             incomingPackets.add(packet);
         }
@@ -1310,11 +1291,6 @@ public class StreamServiceManager implements Startable {
                 if (session == null) {
                     log.error("Received packet for an unknown session. Path is "
                         + packet.getStreamPath());
-                    try {
-                        packet.reject();
-                    } catch (IOException e) {
-                        log.warn("Could not reject unknown data packet: ", e);
-                    }
                     return;
                 }
                 session.addPacket(packet);
@@ -1653,17 +1629,6 @@ public class StreamServiceManager implements Startable {
         }
 
         /**
-         * Reject this packet (when incoming).
-         * 
-         * @throws IOException
-         * @see IncomingTransferObject#reject()
-         */
-        public void reject() throws IOException {
-            if (ito != null)
-                ito.reject();
-        }
-
-        /**
          * Returns the data this packet contains. When this packet is incoming,
          * the first call blocks, then cached. When an error occurs and can not
          * receive any data, it's is reported to packets session, if there is
@@ -1680,12 +1645,6 @@ public class StreamServiceManager implements Startable {
 
             try {
                 data = ito.accept();
-
-            } catch (SarosCancellationException cancellation) {
-                log.error("Receiver cancelled unexpected: ", cancellation);
-                if (this.getSession() != null)
-                    this.getSession().reportErrorAndDispose(
-                        new ReceiverGoneException(cancellation));
             } catch (IOException ioe) {
                 log.error("Connection broken: ", ioe);
                 if (this.getSession() != null)

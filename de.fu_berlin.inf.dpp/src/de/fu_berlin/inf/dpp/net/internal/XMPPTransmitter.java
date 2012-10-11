@@ -52,7 +52,6 @@ import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.User.UserConnectionState;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
-import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
 import de.fu_berlin.inf.dpp.invitation.InvitationProcess;
 import de.fu_berlin.inf.dpp.net.ConnectionState;
 import de.fu_berlin.inf.dpp.net.IConnectionListener;
@@ -548,12 +547,7 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
             return;
         }
 
-        try {
-            dataManager.sendData(transferDescription, data);
-        } catch (SarosCancellationException e) {
-            log.error("Cancellation cannot occur, because NullProgressMonitors"
-                + " are used on both sides!", e);
-        }
+        dataManager.sendData(transferDescription, data);
     }
 
     @Override
@@ -590,11 +584,8 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
          * to block a short amount of time in which the user is not able to
          * cancel the project negotiation
          */
-        try {
-            dataManager.sendData(data, content);
-        } catch (SarosCancellationException e) {
-            // FIXME this is never thrown
-        }
+
+        dataManager.sendData(data, content);
     }
 
     /**

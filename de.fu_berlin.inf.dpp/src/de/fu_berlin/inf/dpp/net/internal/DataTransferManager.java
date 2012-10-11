@@ -1,6 +1,7 @@
 package de.fu_berlin.inf.dpp.net.internal;
 
 import java.io.IOException;
+import java.io.InterruptedIOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -22,7 +23,6 @@ import org.jivesoftware.smackx.bytestreams.socks5.Socks5Proxy;
 import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.annotations.Component;
-import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
 import de.fu_berlin.inf.dpp.net.ConnectionState;
 import de.fu_berlin.inf.dpp.net.IConnectionListener;
 import de.fu_berlin.inf.dpp.net.IPacketInterceptor;
@@ -177,7 +177,7 @@ public class DataTransferManager implements IConnectionListener,
         /**
          * Accepts a transfer and returns the incoming data.
          */
-        public byte[] accept() throws SarosCancellationException, IOException {
+        public byte[] accept() throws IOException {
             addIncomingFileTransfer(description);
             try {
                 // TODO Put size in TransferDescription, so we can
@@ -211,13 +211,6 @@ public class DataTransferManager implements IConnectionListener,
 
         public TransferDescription getTransferDescription() {
             return description;
-        }
-
-        /**
-         * Rejects the incoming transfer data.
-         */
-        public void reject() throws IOException {
-            transferObject.reject();
         }
 
         public NetTransferMode getTransferMode() {
@@ -273,16 +266,13 @@ public class DataTransferManager implements IConnectionListener,
     }
 
     /**
-     * Dispatch to Transmitter.
+     * Dispatch to the used {@link BinaryChannelConnection}.
      * 
-     * @throws SarosCancellationException
-     *             It will be thrown if the local user or buddy has canceled the
-     *             transfer.
      * @throws IOException
      *             If a technical problem occurred.
      */
     public void sendData(TransferDescription transferData, byte[] payload)
-        throws IOException, SarosCancellationException {
+        throws IOException {
 
         // Think about how to synchronize this, that multiple people can connect
         // at the same time.
@@ -349,11 +339,11 @@ public class DataTransferManager implements IConnectionListener,
      *         yet, a new one will be created.
      * @throws IOException
      *             if establishing a new connection failed
-     * @throws SarosCancellationException
+     * @throws InterruptedIOException
      *             if establishing a new connection was interrupted
      */
     public IByteStreamConnection getConnection(JID recipient)
-        throws IOException, SarosCancellationException {
+        throws IOException {
 
         IByteStreamConnection connection = connections.get(recipient);
 
@@ -363,10 +353,12 @@ public class DataTransferManager implements IConnectionListener,
         }
 
         try {
-
             return connect(recipient);
         } catch (InterruptedException e) {
-            throw new SarosCancellationException("Connecting cancelled");
+            IOException io = new InterruptedIOException(
+                "connecting cancelled: " + e.getMessage());
+            io.initCause(e);
+            throw io;
         }
     }
 

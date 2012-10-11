@@ -2,7 +2,6 @@ package de.fu_berlin.inf.dpp.net.internal;
 
 import java.io.IOException;
 
-import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.NetTransferMode;
 
@@ -25,13 +24,10 @@ public interface IByteStreamConnection {
      *            The data to be sent.
      * @throws IOException
      *             if the send failed
-     * @throws SarosCancellationException
-     *             It will be thrown if the user (locally or remotely) has
-     *             canceled the transfer.
      * @blocking Send the given data as a blocking operation.
      */
     public void send(TransferDescription data, byte[] content)
-        throws IOException, SarosCancellationException;
+        throws IOException;
 
     public NetTransferMode getMode();
 }

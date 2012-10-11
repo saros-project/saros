@@ -791,17 +791,8 @@ public class StreamSession implements Disposable {
             this.closed = true;
             this.threadAccessRecorder.interrupt();
 
-            if (remainingPackets != null) {
-                for (StreamPacket p : remainingPackets) {
-                    try {
-                        p.reject();
-                    } catch (IOException e) {
-                        // connection broken, don't need to cancel rest
-                        break;
-                    }
-                }
+            if (remainingPackets != null)
                 remainingPackets.clear();
-            }
         }
 
         @Override
@@ -903,14 +894,9 @@ public class StreamSession implements Disposable {
         }
 
         protected void addPacket(StreamPacket packet) {
-            if (isClosed()) {
-                try {
-                    packet.reject();
-                } catch (IOException e) {
-                    log.error("Could not reject packet: ", e);
-                }
+            if (isClosed())
                 return;
-            }
+
             remainingPackets.add(packet);
             fillBuffer();
         }

@@ -8,6 +8,8 @@ import java.io.OutputStream;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
 import java.util.Arrays;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 import org.jivesoftware.smackx.bytestreams.BytestreamSession;
 import org.junit.Before;
@@ -98,113 +100,13 @@ public class BinaryChannelTest {
         bobSession = new PipedBytestreamSession(bobIn, bobOut);
     }
 
-    // Will be removed in the component
-
-    // @Test(expected = RemoteCancellationException.class)
-    // public void testCancellationOnLocalSite() throws Exception {
-    // BinaryChannel alice = new BinaryChannel(aliceSession,
-    // NetTransferMode.SOCKS5_DIRECT);
-    //
-    // BinaryChannelConnection bob = new BinaryChannelConnection(new JID(
-    // "bob@baumeister.de"), new BinaryChannel(bobSession,
-    // NetTransferMode.SOCKS5_DIRECT), new StreamConnectionListener() {
-    // @Override
-    // public void addIncomingTransferObject(
-    // final IncomingTransferObject incomingTransferObject) {
-    //
-    // testThread = new TestThread(new TestThread.Runnable() {
-    // @Override
-    // public void run() throws Exception {
-    // try {
-    // incomingTransferObject
-    // .accept(new NullProgressMonitor());
-    // } finally {
-    // synchronized (BinaryChannelTest.this) {
-    // BinaryChannelTest.this.notifyAll();
-    // }
-    // }
-    // }
-    // });
-    //
-    // testThread.start();
-    // }
-    // });
-    //
-    // TransferDescription description = new TransferDescription();
-    //
-    // NullProgressMonitor monitor = new NullProgressMonitor();
-    // monitor.setCanceled(true);
-    //
-    // try {
-    // alice.send(description, new byte[100], monitor);
-    // } catch (Exception e) {
-    // assertTrue(e instanceof LocalCancellationException);
-    // synchronized (this) {
-    // wait(10000);
-    // }
-    // testThread.join();
-    // } finally {
-    // bob.close();
-    // }
-    // testThread.verify();
-    // }
-
-    // Will be removed in the component
-
-    // @Test(expected = LocalCancellationException.class)
-    // public void testCancellationOnRemoteSite() throws Exception {
-    //
-    // BinaryChannelConnection alice = new BinaryChannelConnection(new JID(
-    // "alice@baumeister.de"), new BinaryChannel(aliceSession,
-    // NetTransferMode.SOCKS5_DIRECT), new StreamConnectionListener() {
-    // @Override
-    // public void addIncomingTransferObject(
-    // final IncomingTransferObject incomingTransferObject) {
-    // // NOP
-    // }
-    // });
-    //
-    // BinaryChannelConnection bob = new BinaryChannelConnection(new JID(
-    // "bob@baumeister.de"), new BinaryChannel(bobSession,
-    // NetTransferMode.SOCKS5_DIRECT), new StreamConnectionListener() {
-    // @Override
-    // public void addIncomingTransferObject(
-    // final IncomingTransferObject incomingTransferObject) {
-    //
-    // testThread = new TestThread(new TestThread.Runnable() {
-    // @Override
-    // public void run() throws Exception {
-    // NullProgressMonitor monitor = new NullProgressMonitor();
-    // monitor.setCanceled(true);
-    // incomingTransferObject.accept(monitor);
-    // }
-    // });
-    //
-    // testThread.start();
-    // }
-    // });
-    //
-    // TransferDescription description = new TransferDescription();
-    //
-    // NullProgressMonitor monitor = new NullProgressMonitor();
-    //
-    // try {
-    // alice.send(description, new byte[100], monitor);
-    // } catch (Exception e) {
-    // assertTrue(e instanceof RemoteCancellationException);
-    // } finally {
-    // alice.close();
-    // bob.close();
-    // }
-    //
-    // testThread.join();
-    // testThread.verify();
-    // }
-
     private volatile byte[] receivedBytes;
 
     @Test
     public void testFragmentationOnLargeDataToBeSend() throws Exception {
+
+        final CountDownLatch threadStart = new CountDownLatch(1);
+
         BinaryChannelConnection alice = new BinaryChannelConnection(new JID(
             "alice@baumeister.de"), new BinaryChannel(aliceSession,
             NetTransferMode.SOCKS5_DIRECT), new StreamConnectionListener() {
@@ -230,6 +132,7 @@ public class BinaryChannelTest {
                 });
 
                 testThread.start();
+                threadStart.countDown();
             }
         });
 
@@ -242,13 +145,13 @@ public class BinaryChannelTest {
 
         try {
             alice.send(description, bytesToSend);
+            threadStart.await(10000, TimeUnit.MILLISECONDS);
+            testThread.join(10000);
+            testThread.verify();
         } finally {
             alice.close();
             bob.close();
         }
-
-        testThread.join();
-        testThread.verify();
 
         assertTrue("fragmentation error",
             Arrays.equals(bytesToSend, receivedBytes));

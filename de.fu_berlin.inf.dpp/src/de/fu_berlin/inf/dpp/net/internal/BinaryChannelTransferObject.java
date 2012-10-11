@@ -8,10 +8,6 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
-import de.fu_berlin.inf.dpp.exceptions.RemoteCancellationException;
-import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
-import de.fu_berlin.inf.dpp.invitation.ProcessTools.CancelOption;
 import de.fu_berlin.inf.dpp.net.IncomingTransferObject;
 import de.fu_berlin.inf.dpp.net.NetTransferMode;
 import de.fu_berlin.inf.dpp.util.Utils;
@@ -28,7 +24,7 @@ public class BinaryChannelTransferObject implements IncomingTransferObject {
     private long uncompressedSize;
     private BlockingQueue<byte[]> chunks;
 
-    private AtomicBoolean acceptedOrRejected = new AtomicBoolean(false);
+    private AtomicBoolean accepted = new AtomicBoolean(false);
 
     public BinaryChannelTransferObject(BinaryChannel binaryChannel,
         TransferDescription transferDescription, int fragmentId,
@@ -44,24 +40,19 @@ public class BinaryChannelTransferObject implements IncomingTransferObject {
     }
 
     @Override
-    public byte[] accept() throws SarosCancellationException, IOException {
+    public byte[] accept() throws IOException {
 
         try {
 
-            if (!acceptedOrRejected.compareAndSet(false, true))
+            if (!accepted.compareAndSet(false, true))
                 throw new IllegalStateException(
-                    "This IncomingTransferObject has already"
-                        + " been accepted or rejected");
+                    "This IncomingTransferObject has already been accepted");
 
             List<byte[]> resultList = new LinkedList<byte[]>();
 
             while (chunkCount > 0) {
                 if (!binaryChannel.isConnected())
-                    throw new LocalCancellationException(
-                        "Data connection lost.", CancelOption.NOTIFY_PEER);
-
-                if (binaryChannel.isCanceled(fragmentId))
-                    throw new RemoteCancellationException();
+                    throw new IOException("data connection lost");
 
                 byte[] payload;
 
@@ -80,8 +71,6 @@ public class BinaryChannelTransferObject implements IncomingTransferObject {
 
                 resultList.add(payload);
             }
-
-            binaryChannel.sendFinished(fragmentId);
 
             int length = 0;
 
@@ -120,19 +109,6 @@ public class BinaryChannelTransferObject implements IncomingTransferObject {
 
     public TransferDescription getTransferDescription() {
         return transferDescription;
-    }
-
-    public void reject() throws IOException {
-        if (!acceptedOrRejected.compareAndSet(false, true))
-            throw new IllegalStateException(
-                "This IncomingTransferObject has already"
-                    + " been accepted or rejected");
-
-        try {
-            binaryChannel.sendReject(fragmentId);
-        } finally {
-            binaryChannel.removeFragments(fragmentId);
-        }
     }
 
     public NetTransferMode getTransferMode() {

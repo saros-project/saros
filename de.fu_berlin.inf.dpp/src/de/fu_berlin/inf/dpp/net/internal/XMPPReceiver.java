@@ -22,7 +22,6 @@ import org.xmlpull.mxp1.MXParser;
 import org.xmlpull.v1.XmlPullParserException;
 
 import de.fu_berlin.inf.dpp.annotations.Component;
-import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
 import de.fu_berlin.inf.dpp.net.IncomingTransferObject;
 import de.fu_berlin.inf.dpp.net.IncomingTransferObject.IncomingTransferObjectExtensionProvider;
 import de.fu_berlin.inf.dpp.net.business.DispatchThreadContext;
@@ -216,20 +215,11 @@ public class XMPPReceiver {
         byte[] data;
         try {
 
-            if (provider == null) {
-                /*
-                 * We MUST reject. Else the peer will remain in a endless cycle
-                 * in BinaryChannel.sendDirect()
-                 */
-                transferObject.reject();
+            if (provider == null)
                 return;
-            }
 
             data = transferObject.accept();
 
-        } catch (SarosCancellationException e) {
-            log.error("User canceled. This is unexpected", e);
-            return;
         } catch (IOException e) {
             log.error("Could not deserialize incoming "
                 + "transfer object or a connection error occurred", e);

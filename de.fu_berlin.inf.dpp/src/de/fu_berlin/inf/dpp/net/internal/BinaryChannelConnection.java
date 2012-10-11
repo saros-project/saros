@@ -6,7 +6,6 @@ import java.net.SocketException;
 
 import org.apache.log4j.Logger;
 
-import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.NetTransferMode;
 import de.fu_berlin.inf.dpp.util.Utils;
@@ -104,7 +103,7 @@ public class BinaryChannelConnection implements IByteStreamConnection {
     }
 
     public void send(TransferDescription data, byte[] content)
-        throws IOException, SarosCancellationException {
+        throws IOException {
 
         try {
             binaryChannel.send(data, content);

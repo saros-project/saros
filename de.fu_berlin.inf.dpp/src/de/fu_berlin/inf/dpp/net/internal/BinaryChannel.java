@@ -11,17 +11,11 @@ import java.net.ProtocolException;
 import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.log4j.Logger;
 import org.jivesoftware.smackx.bytestreams.BytestreamSession;
 
-import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
-import de.fu_berlin.inf.dpp.exceptions.RemoteCancellationException;
-import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
 import de.fu_berlin.inf.dpp.net.IncomingTransferObject;
 import de.fu_berlin.inf.dpp.net.NetTransferMode;
 import de.fu_berlin.inf.dpp.util.AutoHashMap;
@@ -46,19 +40,8 @@ public class BinaryChannel {
     private static class Opcode {
         /* these opcodes will be cropped to byte values, do not exceed 0xFF ! */
 
-        // private static final int CIPHER_REQUEST = 0xA0;
-        // private static final int CIPHER_RESPONSE = 0xA1;
-
-        @Deprecated
         private static final int TRANSFERDESCRIPTION = 0xFA;
-        @Deprecated
         private static final int DATA = 0xFB;
-        @Deprecated
-        private static final int CANCEL = 0xFC;
-        @Deprecated
-        private static final int FINISHED = 0xFD;
-        @Deprecated
-        private static final int REJECT = 0xFE;
     }
 
     /**
@@ -77,8 +60,6 @@ public class BinaryChannel {
 
     private AtomicInteger nextFragmentId = new AtomicInteger(0);
 
-    // private boolean enableEncryption;
-
     private boolean connected;
 
     /**
@@ -91,9 +72,6 @@ public class BinaryChannel {
     {
         incomingPackets = Collections.synchronizedMap(incomingPackets);
     }
-
-    private ConcurrentHashMap<Integer, Integer> transmissionStatus = new ConcurrentHashMap<Integer, Integer>();
-    private ConcurrentHashMap<Integer, CountDownLatch> transmissionReply = new ConcurrentHashMap<Integer, CountDownLatch>();
 
     private DataInputStream inputStream;
     private DataOutputStream outputStream;
@@ -110,11 +88,6 @@ public class BinaryChannel {
         this.session = session;
         this.session.setReadTimeout(0); // keep connection alive
         this.transferMode = mode;
-
-        /*
-         * enableEncryption = Boolean.valueOf(System.getProperty(
-         * "de.fu_berlin.inf.dpp.net.connection.ENCRYPT", "false"));
-         */
 
         outputStream = new DataOutputStream(new BufferedOutputStream(
             session.getOutputStream()));
@@ -151,8 +124,6 @@ public class BinaryChannel {
             if (log.isTraceEnabled())
                 log.trace("processing opcode: "
                     + Integer.toHexString(opcode).toUpperCase());
-
-            CountDownLatch latch;
 
             int payloadLength;
 
@@ -195,27 +166,6 @@ public class BinaryChannel {
                 inputStream.readFully(payload);
                 incomingPackets.get(fragmentId).add(payload);
                 break;
-            case Opcode.CANCEL:
-                fragmentId = inputStream.readShort();
-                transmissionStatus.put(fragmentId, Opcode.CANCEL);
-                latch = transmissionReply.get(fragmentId);
-                if (latch != null)
-                    latch.countDown();
-                break;
-            case Opcode.FINISHED:
-                fragmentId = inputStream.readShort();
-                transmissionStatus.put(fragmentId, Opcode.FINISHED);
-                latch = transmissionReply.get(fragmentId);
-                if (latch != null)
-                    latch.countDown();
-                break;
-            case Opcode.REJECT:
-                fragmentId = inputStream.readShort();
-                transmissionStatus.put(fragmentId, Opcode.REJECT);
-                latch = transmissionReply.get(fragmentId);
-                if (latch != null)
-                    latch.countDown();
-                break;
             default:
                 close();
                 throw new ProtocolException("unknown opcode: 0x"
@@ -257,78 +207,30 @@ public class BinaryChannel {
     }
 
     /**
-     * It sends the given transferDescription and data direct. Supports
-     * cancellation by given SubMonitor.
-     * 
+     * Sends the given transfer description and the data.
      * 
      * @blocking
      * 
      * @throws IOException
-     *             If there was an error sending (for instance the socket is
-     *             closed) or
-     * 
-     * @throws SarosCancellationException
-     *             if either the local or remote user aborted the transfer
+     *             if a network failure occurs
      */
     public void send(TransferDescription transferDescription, byte[] data)
-        throws IOException, SarosCancellationException {
+        throws IOException {
 
         if (!isConnected())
             throw new IOException("connection is closed");
 
         int fragmentId = nextFragmentId.getAndIncrement() & 0x7FFF;
 
-        transmissionStatus.put(fragmentId, /* unknown */-1);
-        transmissionReply.put(fragmentId, new CountDownLatch(1));
-
         byte[] descData = TransferDescription.toByteArray(transferDescription);
 
         assert data.length > 0;
 
-        try {
-            int chunks = ((data.length - 1) / CHUNKSIZE) + 1;
+        int chunks = ((data.length - 1) / CHUNKSIZE) + 1;
 
-            sendTransferDescription(descData, fragmentId, chunks);
+        sendTransferDescription(descData, fragmentId, chunks);
 
-            splitAndSend(data, chunks, fragmentId);
-
-            int confirmation = -1;
-            boolean transmitted = false;
-
-            /* omg */
-
-            try {
-                for (int i = 0; i < 10; i++) {
-                    transmitted = transmissionReply.get(fragmentId).await(1000,
-                        TimeUnit.MILLISECONDS);
-                }
-
-            } catch (InterruptedException e) {
-                Thread.interrupted();
-                throw new InterruptedIOException(
-                    "interrupted while waiting for transmission reply");
-            }
-
-            if (!transmitted)
-                throw new IOException("transmission reply timed out");
-
-            confirmation = transmissionStatus.get(fragmentId);
-
-            if (confirmation == Opcode.REJECT)
-                throw new RemoteCancellationException();
-
-            assert confirmation == Opcode.FINISHED;
-
-        } catch (LocalCancellationException e) {
-
-            log.debug("send was canceled:" + fragmentId);
-
-            sendCancel(fragmentId);
-            throw e;
-        } finally {
-            transmissionStatus.remove(fragmentId);
-            transmissionReply.remove(fragmentId);
-        }
+        splitAndSend(data, chunks, fragmentId);
     }
 
     synchronized void sendData(int fragmentId, byte[] data, int offset,
@@ -350,59 +252,20 @@ public class BinaryChannel {
         outputStream.flush();
     }
 
-    synchronized void sendFinished(int fragmentId) throws IOException {
-        outputStream.write(Opcode.FINISHED);
-        outputStream.writeShort(fragmentId);
-        outputStream.flush();
-    }
-
-    synchronized void sendCancel(int fragmentId) throws IOException {
-        outputStream.write(Opcode.CANCEL);
-        outputStream.writeShort(fragmentId);
-        outputStream.flush();
-    }
-
-    synchronized void sendReject(int fragmentId) throws IOException {
-        outputStream.write(Opcode.REJECT);
-        outputStream.writeShort(fragmentId);
-        outputStream.flush();
-    }
-
     void removeFragments(int fragmentId) {
         incomingPackets.get(fragmentId).clear();
-        transmissionStatus.remove(fragmentId);
-        transmissionReply.remove(fragmentId);
-    }
-
-    boolean isRejected(int fragmentId) {
-        Integer opcode = transmissionStatus.get(fragmentId);
-        if (opcode != null) {
-            return opcode == Opcode.REJECT;
-        }
-        return false;
-    }
-
-    boolean isCanceled(int fragmentId) {
-        Integer opcode = transmissionStatus.get(fragmentId);
-        if (opcode != null) {
-            return opcode == Opcode.CANCEL;
-        }
-        return false;
     }
 
     /**
      * Splits the given data into chunks of CHUNKSIZE to send the BinaryPackets.
      */
     private void splitAndSend(byte[] data, int chunks, int fragmentId)
-        throws IOException, SarosCancellationException {
+        throws IOException {
 
         int offset = 0;
         int length = 0;
 
         while (chunks-- > 0) {
-
-            if (isRejected(fragmentId))
-                throw new RemoteCancellationException();
 
             length = Math.min(data.length - offset, CHUNKSIZE);
 
