@@ -19,14 +19,8 @@
  */
 package de.fu_berlin.inf.dpp.net.internal;
 
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
-import java.nio.ByteBuffer;
-import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -64,10 +58,8 @@ import de.fu_berlin.inf.dpp.invitation.InvitationProcess;
 import de.fu_berlin.inf.dpp.net.ConnectionState;
 import de.fu_berlin.inf.dpp.net.IConnectionListener;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
-import de.fu_berlin.inf.dpp.net.IncomingTransferObject;
 import de.fu_berlin.inf.dpp.net.IncomingTransferObject.IncomingTransferObjectExtensionProvider;
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.net.NetTransferMode;
 import de.fu_berlin.inf.dpp.net.SarosNet;
 import de.fu_berlin.inf.dpp.net.TimedActivityDataObject;
 import de.fu_berlin.inf.dpp.net.business.DispatchThreadContext;
@@ -185,60 +177,6 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
         sendMessageToUser(to,
             invAcknowledgementExtProv.create(new DefaultInvitationInfo(
                 sessionID, invitationID)));
-    }
-
-    @Override
-    public InputStream receiveArchive(String processID, final JID peer,
-        final SubMonitor monitor, boolean forceWait) throws IOException,
-        SarosCancellationException {
-
-        monitor.beginTask("Receiving archive file", 100);
-        log.debug("Receiving archive");
-        final PacketFilter filter = PacketExtensionUtils
-            .getIncomingTransferObjectFilter(incomingExtProv, sessionID,
-                processID, TransferDescription.ARCHIVE_TRANSFER);
-
-        SarosPacketCollector collector = installReceiver(filter);
-
-        // provide visual feedback of ongoing IBB transfer
-        PacketListener packetListenerIBB = null;
-        if (dataManager.getTransferMode(peer) == NetTransferMode.IBB) {
-            packetListenerIBB = createIBBTransferProgressPacketListener(peer,
-                monitor);
-        }
-
-        monitor
-            .subTask("Host is compressing project files. Waiting for the archive file...");
-        while (!collector.hasReceived()) {
-            if (monitor.isCanceled()) {
-                throw new LocalCancellationException();
-            }
-            try {
-                Thread.sleep(100);
-            } catch (InterruptedException e) {
-                throw new LocalCancellationException();
-            }
-        }
-
-        monitor.subTask("Receiving archive file...");
-        try {
-            IncomingTransferObject result = incomingExtProv.getPayload(receive(
-                monitor.newChild(packetListenerIBB == null ? 10 : 1),
-                collector, 10000, forceWait));
-
-            if (monitor.isCanceled()) {
-                result.reject();
-                throw new LocalCancellationException();
-            }
-            byte[] data = result.accept(monitor
-                .newChild(packetListenerIBB == null ? 90 : 9));
-
-            return new ByteArrayInputStream(data);
-        } finally {
-            monitor.done();
-            if (packetListenerIBB != null)
-                receiver.removePacketListener(packetListenerIBB);
-        }
     }
 
     /**
@@ -657,40 +595,6 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
             progress.newChild(100, SubMonitor.SUPPRESS_ALL_LABELS));
 
         progress.done();
-    }
-
-    @Override
-    public void sendProjectArchive(JID recipient, String invitationID,
-        File archive, SubMonitor progress) throws SarosCancellationException,
-        IOException {
-
-        progress.beginTask("Sending Archive", 100);
-
-        progress.subTask("Reading archive to memory");
-
-        byte[] content;
-
-        int archiveSize = (int) archive.length();
-        content = new byte[archiveSize];
-        FileInputStream in = new FileInputStream(archive);
-        FileChannel channel = in.getChannel();
-        ByteBuffer buffer = ByteBuffer.wrap(content);
-
-        while (!progress.isCanceled() && archiveSize > 0)
-            archiveSize -= channel.read(buffer);
-
-        channel.close();
-        in.close();
-
-        progress.worked(10);
-
-        TransferDescription transfer = TransferDescription
-            .createArchiveTransferDescription(recipient, /* set by DTM */null,
-                sessionID.getValue(), invitationID, content.length);
-
-        progress.subTask("Sending project(s) archive ("
-            + Utils.formatByte(content.length) + ")");
-        dataManager.sendData(transfer, content, progress.newChild(90));
     }
 
     /**

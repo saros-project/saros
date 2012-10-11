@@ -18,9 +18,7 @@
 
 package de.fu_berlin.inf.dpp.net;
 
-import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.Collection;
 import java.util.List;
 
@@ -98,60 +96,12 @@ public interface ITransmitter {
         List<FileList> fileLists, SubMonitor monitor) throws IOException,
         SarosCancellationException;
 
-    /**
-     * 
-     * @param processID
-     *            ID to separate the project exchanging processes from one
-     *            another
-     * @param peer
-     *            {@link JID} of the peer receiving from
-     * @param forceWait
-     * @return The archive as an {@link InputStream}
-     */
-    public InputStream receiveArchive(String processID, JID peer,
-        SubMonitor monitor, boolean forceWait) throws IOException,
-        SarosCancellationException;
-
     // FIXME Add Javadoc. Why is an invitationID needed?
     public void sendUserList(JID to, String invitationID, Collection<User> user);
 
     public boolean receiveUserListConfirmation(SarosPacketCollector collector,
         List<User> fromUsers, SubMonitor monitor)
         throws LocalCancellationException;
-
-    /**
-     * Sends given archive file to given recipient.
-     * 
-     * This is a blocking method.
-     * 
-     * @param recipient
-     *            the JID of the recipient.
-     * @param archive
-     *            the project-relative path of the resource that is to be sent.
-     * @param monitor
-     *            a monitor to which progress will be reported and which is
-     *            queried for cancellation.
-     * 
-     * @throws IOException
-     *             If the file could not be read or an error occurred while
-     *             sending or a technical error happened.
-     * @throws SarosCancellationException
-     *             if the operation was canceled via the given progress monitor
-     *             a LocalCancellationException is thrown. If the operation was
-     *             canceled via the monitor and the exception is not received,
-     *             the operation completed successfully, before noticing the
-     *             cancellation.
-     * 
-     *             if the operation was canceled by the recipient a
-     *             RemoteCancellationException is thrown
-     * 
-     * @blocking Blocks until the transfer is complete.
-     */
-    public void sendProjectArchive(JID recipient, String invitationID,
-        File archive, SubMonitor monitor) throws IOException,
-        SarosCancellationException;
-
-    /* ---------- etc --------- */
 
     /**
      * Sends a leave message to the participants of given Saros session. See
