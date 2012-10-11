@@ -27,6 +27,7 @@ import java.util.concurrent.CancellationException;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
 import org.joda.time.DateTime;
 
@@ -392,7 +393,7 @@ public interface ISarosSession {
      * @throws SarosCancellationException
      */
     public void synchronizeUserList(ITransmitter transmitter, JID peer,
-        String invitationID, SubMonitor monitor)
+        String invitationID, IProgressMonitor monitor)
         throws SarosCancellationException;
 
     /**

@@ -8,10 +8,6 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.apache.commons.lang.time.StopWatch;
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.NullProgressMonitor;
-
 import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
 import de.fu_berlin.inf.dpp.exceptions.RemoteCancellationException;
 import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
@@ -47,8 +43,8 @@ public class BinaryChannelTransferObject implements IncomingTransferObject {
         uncompressedSize = 0;
     }
 
-    public byte[] accept(IProgressMonitor monitor)
-        throws SarosCancellationException, IOException {
+    @Override
+    public byte[] accept() throws SarosCancellationException, IOException {
 
         try {
 
@@ -59,25 +55,10 @@ public class BinaryChannelTransferObject implements IncomingTransferObject {
 
             List<byte[]> resultList = new LinkedList<byte[]>();
 
-            long receivedBytes = 0L;
-
-            StopWatch watch = new StopWatch();
-            watch.start();
-
-            monitor.beginTask("", chunkCount);
-
             while (chunkCount > 0) {
                 if (!binaryChannel.isConnected())
                     throw new LocalCancellationException(
                         "Data connection lost.", CancelOption.NOTIFY_PEER);
-
-                if (monitor.isCanceled()) {
-                    binaryChannel.sendReject(fragmentId);
-
-                    throw new LocalCancellationException(
-                        "Data reception was manually cancelled.",
-                        CancelOption.NOTIFY_PEER);
-                }
 
                 if (binaryChannel.isCanceled(fragmentId))
                     throw new RemoteCancellationException();
@@ -89,27 +70,7 @@ public class BinaryChannelTransferObject implements IncomingTransferObject {
                     if (payload == null)
                         continue;
 
-                    long duration = watch.getTime();
-
                     chunkCount--;
-
-                    receivedBytes += payload.length;
-
-                    long bytesPerSecond = Math.round((payload.length * 1000D)
-                        / (duration + 1D));
-
-                    long secondsLeft = Math.round((transferDescription
-                        .getSize() - receivedBytes) / (bytesPerSecond + 1D));
-
-                    monitor.subTask("Received: "
-                        + Utils.formatByte(receivedBytes) + " of "
-                        + Utils.formatByte(transferDescription.getSize())
-                        + "\nRemaining time: "
-                        + Utils.formatDuration(secondsLeft) + " ("
-                        + Utils.formatByte(bytesPerSecond) + "/s)");
-
-                    watch.reset();
-                    watch.start();
 
                 } catch (InterruptedException e) {
                     Thread.interrupted();
@@ -118,10 +79,7 @@ public class BinaryChannelTransferObject implements IncomingTransferObject {
                 }
 
                 resultList.add(payload);
-                monitor.worked(1);
             }
-
-            monitor.subTask("");
 
             binaryChannel.sendFinished(fragmentId);
 
@@ -150,14 +108,13 @@ public class BinaryChannelTransferObject implements IncomingTransferObject {
 
             // OOM Exception !
             if (transferDescription.compressContent())
-                data = Utils.inflate(data, new NullProgressMonitor());
+                data = Utils.inflate(data, null);
 
             uncompressedSize = data.length;
 
             return data;
         } finally {
             binaryChannel.removeFragments(fragmentId);
-            monitor.done();
         }
     }
 

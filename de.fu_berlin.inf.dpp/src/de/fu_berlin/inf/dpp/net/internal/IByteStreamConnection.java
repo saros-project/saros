@@ -2,8 +2,6 @@ package de.fu_berlin.inf.dpp.net.internal;
 
 import java.io.IOException;
 
-import org.eclipse.core.runtime.IProgressMonitor;
-
 import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.NetTransferMode;
@@ -32,9 +30,8 @@ public interface IByteStreamConnection {
      *             canceled the transfer.
      * @blocking Send the given data as a blocking operation.
      */
-    public void send(TransferDescription data, byte[] content,
-        IProgressMonitor monitor) throws IOException,
-        SarosCancellationException;
+    public void send(TransferDescription data, byte[] content)
+        throws IOException, SarosCancellationException;
 
     public NetTransferMode getMode();
 }

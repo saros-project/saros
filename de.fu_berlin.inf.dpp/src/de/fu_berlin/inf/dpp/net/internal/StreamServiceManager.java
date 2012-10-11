@@ -47,7 +47,6 @@ import org.apache.commons.lang.ObjectUtils;
 import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
 import org.jivesoftware.smack.ConnectionListener;
 import org.jivesoftware.smack.PacketListener;
@@ -348,14 +347,12 @@ public class StreamServiceManager implements Startable {
      *            stream where data arrived
      * @param forceSend
      *            force sending no matter how many bytes (>0) are written
-     * @param progress
      */
     protected void notifyDataAvailable(StreamSessionOutputStream out,
-        boolean forceSend, final SubMonitor progress) {
+        boolean forceSend) {
 
         if (sender != null)
-            sender.addNotification(sender.new DataNotification(out, progress,
-                forceSend));
+            sender.addNotification(sender.new DataNotification(out, forceSend));
     }
 
     /**
@@ -374,8 +371,7 @@ public class StreamServiceManager implements Startable {
 
         if (sender != null)
             sender.sendPacket(session.getTransferDescription(),
-                StreamMetaPacketData.CLOSE.serializeInto(closeDescription),
-                null);
+                StreamMetaPacketData.CLOSE.serializeInto(closeDescription));
 
     }
 
@@ -401,7 +397,7 @@ public class StreamServiceManager implements Startable {
 
         if (sender != null)
             sender.sendPacket(transferDescription,
-                StreamMetaPacketData.STOP.getIdentifier(), null);
+                StreamMetaPacketData.STOP.getIdentifier());
 
         Runnable stopThread = Utils.wrapSafe(log, new SessionKiller(session));
 
@@ -433,7 +429,7 @@ public class StreamServiceManager implements Startable {
 
         if (sender != null)
             sender.sendPacket(session.getTransferDescription(),
-                StreamMetaPacketData.END.getIdentifier(), null);
+                StreamMetaPacketData.END.getIdentifier());
     }
 
     /**
@@ -547,8 +543,7 @@ public class StreamServiceManager implements Startable {
 
         if (sender != null)
             sender.sendPacket(transferDescription,
-                StreamMetaPacketData.INIT.serializeInto(initiationDescription),
-                SubMonitor.convert(new NullProgressMonitor()));
+                StreamMetaPacketData.INIT.serializeInto(initiationDescription));
         else
             throw new ConnectionException();
 
@@ -1060,18 +1055,7 @@ public class StreamServiceManager implements Startable {
                 } catch (InterruptedException e) {
                     // shutdown
                     return;
-                } finally {
-                    /*
-                     * TODO .done() wrong when skipped notification: stream
-                     * contained less than minimal-chunk-size and force send is
-                     * false -> cache monitor until data is send
-                     */
-
-                    if (packetToSend != null && notification != null
-                        && notification.progress != null)
-                        notification.progress.done();
                 }
-
             }
         }
 
@@ -1082,7 +1066,7 @@ public class StreamServiceManager implements Startable {
             try {
                 currentPacket = packet;
                 dataTransferManager.sendData(packet.getTransferDescription(),
-                    packet.data, packet.progress);
+                    packet.data);
 
             } catch (IOException e) {
                 log.error("Connection broken: ", e);
@@ -1119,9 +1103,9 @@ public class StreamServiceManager implements Startable {
          * @see #sendPacket(StreamPacket)
          */
         protected void sendPacket(TransferDescription transferDescription,
-            byte[] data, SubMonitor progress) {
+            byte[] data) {
             try {
-                sendPacket(new StreamPacket(transferDescription, data, progress));
+                sendPacket(new StreamPacket(transferDescription, data));
             } catch (IllegalArgumentException e) {
                 // packet invalid
                 return;
@@ -1154,9 +1138,7 @@ public class StreamServiceManager implements Startable {
 
             synchronized (notifications) {
                 blockedSessions.add(session);
-                if (currentPacket != null
-                    && session.getStreamPath().equals(currentPacket.streamPath))
-                    currentPacket.progress.setCanceled(true);
+
                 for (DataNotification notification : notifications) {
                     StreamPath streamPath = notification.getStreamPath();
                     if (streamPath.equals(session.getStreamPath()))
@@ -1171,15 +1153,7 @@ public class StreamServiceManager implements Startable {
             disposed = true;
 
             senderThread.interrupt();
-
-            synchronized (notifications) {
-                for (DataNotification dn : notifications) {
-                    if (dn.progress != null)
-                        dn.progress.setCanceled(true);
-                }
-                notifications.clear();
-            }
-
+            notifications.clear();
         }
 
         /**
@@ -1191,15 +1165,13 @@ public class StreamServiceManager implements Startable {
          */
         protected class DataNotification {
             StreamSessionOutputStream stream;
-            SubMonitor progress;
             boolean removeAllAvailableData = false;
             StreamPacket packet;
 
             public DataNotification(StreamSessionOutputStream stream,
-                SubMonitor progress, boolean removeAllAvailableData) {
+                boolean removeAllAvailableData) {
                 super();
                 this.stream = stream;
-                this.progress = progress;
                 this.removeAllAvailableData = removeAllAvailableData;
             }
 
@@ -1226,8 +1198,7 @@ public class StreamServiceManager implements Startable {
 
                     byte[] data = stream.getData(removeAllAvailableData);
 
-                    if (data == null
-                        || (progress != null && progress.isCanceled()))
+                    if (data == null)
                         return null;
 
                     TransferDescription transferDescription = TransferDescription
@@ -1237,8 +1208,7 @@ public class StreamServiceManager implements Startable {
                             stream.getStreamPath(data.length).toString());
 
                     try {
-                        return new StreamPacket(transferDescription, data,
-                            progress);
+                        return new StreamPacket(transferDescription, data);
                     } catch (IllegalArgumentException e) {
                         // packet invalid
                         return null;
@@ -1470,8 +1440,7 @@ public class StreamServiceManager implements Startable {
                             if (sender != null) {
                                 sender.sendPacket(
                                     newSession.getTransferDescription(),
-                                    StreamMetaPacketData.ACCEPT.getIdentifier(),
-                                    null);
+                                    StreamMetaPacketData.ACCEPT.getIdentifier());
                                 log.debug("Accept-packet send.");
                                 sessions.put(streamPath, newSession);
                             } else
@@ -1489,15 +1458,13 @@ public class StreamServiceManager implements Startable {
                             log.debug("Session rejected, will send reject-packet.");
 
                             if (sender != null) {
-                                sender.sendPacket(
-                                    TransferDescription
-                                        .createStreamMetaTransferDescription(
-                                            transferDescription.getSender(),
-                                            transferDescription.getRecipient(),
-                                            streamPath.toString(),
-                                            sarosSessionID.getValue()),
-                                    StreamMetaPacketData.REJECT.getIdentifier(),
-                                    null);
+                                sender.sendPacket(TransferDescription
+                                    .createStreamMetaTransferDescription(
+                                        transferDescription.getSender(),
+                                        transferDescription.getRecipient(),
+                                        streamPath.toString(),
+                                        sarosSessionID.getValue()),
+                                    StreamMetaPacketData.REJECT.getIdentifier());
 
                                 log.debug("Reject-packet send.");
                             }
@@ -1654,7 +1621,6 @@ public class StreamServiceManager implements Startable {
         protected IncomingTransferObject ito = null;
         protected byte[] data = null;
         protected StreamPath streamPath;
-        protected SubMonitor progress = null;
 
         /**
          * Incoming packet.
@@ -1679,12 +1645,10 @@ public class StreamServiceManager implements Startable {
          * @throws IllegalArgumentException
          *             When descriptions file-path is not a {@link StreamPath}
          */
-        public StreamPacket(TransferDescription desc, byte[] data,
-            SubMonitor progress) throws IllegalArgumentException {
+        public StreamPacket(TransferDescription desc, byte[] data)
+            throws IllegalArgumentException {
             this.transferDescription = desc;
             this.data = data;
-            this.progress = progress == null ? SubMonitor
-                .convert(new NullProgressMonitor()) : progress;
             this.streamPath = new StreamPath(desc.getArchivePath());
         }
 
@@ -1710,13 +1674,12 @@ public class StreamServiceManager implements Startable {
          * @throws StreamException
          *             when any error occurs and no data can be retrieved
          */
-        public byte[] getData(final SubMonitor progress) throws StreamException {
+        public byte[] getData() throws StreamException {
             if (this.data != null)
                 return this.data;
 
             try {
-                data = ito.accept(progress == null ? SubMonitor.convert(null)
-                    : progress);
+                data = ito.accept();
 
             } catch (SarosCancellationException cancellation) {
                 log.error("Receiver cancelled unexpected: ", cancellation);
@@ -1750,23 +1713,6 @@ public class StreamServiceManager implements Startable {
                 data = new_data;
             }
             return this.data;
-        }
-
-        /**
-         * Returns the data this packet contains. When this packet is incoming,
-         * the first call blocks, then cached. When an error occurs and can not
-         * receive any data, it's is reported to packets session, if there is
-         * one, and {@link StreamException} will be thrown.
-         * 
-         * @blocking
-         * @caching
-         * @throws StreamException
-         *             when any error occurs and no data can be retrieved
-         * 
-         * @see #getData(SubMonitor)
-         */
-        public byte[] getData() throws StreamException {
-            return getData(null);
         }
 
         /**

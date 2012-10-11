@@ -1279,7 +1279,7 @@ public class SarosSession implements ISarosSession, Disposable {
     }
 
     public void synchronizeUserList(ITransmitter transmitter, JID peer,
-        String invitationID, SubMonitor monitor)
+        String invitationID, IProgressMonitor monitor)
         throws SarosCancellationException {
 
         Collection<User> participants = this.getParticipants();

@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.net.SocketException;
 
 import org.apache.log4j.Logger;
-import org.eclipse.core.runtime.IProgressMonitor;
 
 import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
 import de.fu_berlin.inf.dpp.net.JID;
@@ -104,12 +103,11 @@ public class BinaryChannelConnection implements IByteStreamConnection {
         return peer;
     }
 
-    public void send(TransferDescription data, byte[] content,
-        IProgressMonitor monitor) throws IOException,
-        SarosCancellationException {
+    public void send(TransferDescription data, byte[] content)
+        throws IOException, SarosCancellationException {
 
         try {
-            binaryChannel.send(data, content, monitor);
+            binaryChannel.send(data, content);
         } catch (IOException e) {
             close();
             throw e;

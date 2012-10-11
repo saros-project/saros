@@ -648,8 +648,8 @@ public class StreamSession implements Disposable {
          *            send without restrictions.
          */
         protected void notifyStreamServiceManager(boolean sendAllAvailableData) {
-            streamServiceManager.notifyDataAvailable(this,
-                sendAllAvailableData, null);
+            streamServiceManager
+                .notifyDataAvailable(this, sendAllAvailableData);
         }
 
         public StreamSession getSession() {

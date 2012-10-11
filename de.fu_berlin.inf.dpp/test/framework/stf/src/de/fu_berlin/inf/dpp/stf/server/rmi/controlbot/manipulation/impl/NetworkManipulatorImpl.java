@@ -6,8 +6,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.apache.log4j.Logger;
-import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.core.runtime.SubMonitor;
 
 import de.fu_berlin.inf.dpp.net.IPacketInterceptor;
 import de.fu_berlin.inf.dpp.net.IncomingTransferObject;
@@ -297,8 +295,7 @@ public final class NetworkManipulatorImpl extends StfRemoteObject implements
                     + ", payload length: " + holder.payload.length);
 
                 getDataTransferManager().sendData(holder.description,
-                    holder.payload,
-                    SubMonitor.convert(new NullProgressMonitor()));
+                    holder.payload);
             } catch (Exception e) {
                 LOG.error(e.getMessage(), e);
             }

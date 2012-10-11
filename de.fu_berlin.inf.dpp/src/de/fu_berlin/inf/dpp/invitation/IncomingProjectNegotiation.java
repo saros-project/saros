@@ -196,8 +196,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
                     entry.getValue(), jid);
             }
 
-            transmitter.sendFileLists(peer, processID, missingFiles,
-                this.monitor.newChild(10));
+            transmitter.sendFileLists(peer, processID, missingFiles);
             checkCancellation();
 
             boolean filesMissing = false;

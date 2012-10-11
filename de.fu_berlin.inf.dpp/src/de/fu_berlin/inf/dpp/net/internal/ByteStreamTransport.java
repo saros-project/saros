@@ -3,7 +3,6 @@ package de.fu_berlin.inf.dpp.net.internal;
 import java.io.IOException;
 
 import org.apache.log4j.Logger;
-import org.eclipse.core.runtime.SubMonitor;
 import org.jivesoftware.smack.Connection;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smackx.bytestreams.BytestreamListener;
@@ -31,16 +30,15 @@ public abstract class ByteStreamTransport implements ITransport {
      * 
      * @return a new connection to peer
      */
-    public IByteStreamConnection connect(final JID peer, SubMonitor progress)
-        throws IOException, InterruptedException {
-
-        progress.subTask("Try to initiate bytestream with " + toString());
+    @Override
+    public IByteStreamConnection connect(final JID peer) throws IOException,
+        InterruptedException {
 
         BinaryChannel channel = null;
 
         try {
 
-            channel = establishBinaryChannel(peer.toString(), progress);
+            channel = establishBinaryChannel(peer.toString());
             return new BinaryChannelConnection(peer, channel,
                 connectionListener);
 
@@ -97,15 +95,13 @@ public abstract class ByteStreamTransport implements ITransport {
      * Establishes a BinaryChannel to a peer.
      * 
      * @param peer
-     * @param progress
      * @return BinaryChannel to peer
      * @throws XMPPException
      * @throws IOException
      * @throws InterruptedException
      */
-    protected BinaryChannel establishBinaryChannel(String peer,
-        SubMonitor progress) throws XMPPException, IOException,
-        InterruptedException {
+    protected BinaryChannel establishBinaryChannel(String peer)
+        throws XMPPException, IOException, InterruptedException {
         BytestreamSession session = manager.establishSession(peer.toString());
 
         return new BinaryChannel(session, getDefaultNetTransferMode());

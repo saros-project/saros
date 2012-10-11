@@ -16,9 +16,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.apache.commons.lang.time.StopWatch;
 import org.apache.log4j.Logger;
-import org.eclipse.core.runtime.IProgressMonitor;
 import org.jivesoftware.smackx.bytestreams.BytestreamSession;
 
 import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
@@ -27,7 +25,6 @@ import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
 import de.fu_berlin.inf.dpp.net.IncomingTransferObject;
 import de.fu_berlin.inf.dpp.net.NetTransferMode;
 import de.fu_berlin.inf.dpp.util.AutoHashMap;
-import de.fu_berlin.inf.dpp.util.Utils;
 
 /**
  * BinaryChannel is a class that encapsulates a bidirectional communication
@@ -273,9 +270,8 @@ public class BinaryChannel {
      * @throws SarosCancellationException
      *             if either the local or remote user aborted the transfer
      */
-    public void send(TransferDescription transferDescription, byte[] data,
-        IProgressMonitor monitor) throws IOException,
-        SarosCancellationException {
+    public void send(TransferDescription transferDescription, byte[] data)
+        throws IOException, SarosCancellationException {
 
         if (!isConnected())
             throw new IOException("connection is closed");
@@ -294,7 +290,7 @@ public class BinaryChannel {
 
             sendTransferDescription(descData, fragmentId, chunks);
 
-            splitAndSend(data, chunks, fragmentId, monitor);
+            splitAndSend(data, chunks, fragmentId);
 
             int confirmation = -1;
             boolean transmitted = false;
@@ -397,51 +393,23 @@ public class BinaryChannel {
     /**
      * Splits the given data into chunks of CHUNKSIZE to send the BinaryPackets.
      */
-    private void splitAndSend(byte[] data, int chunks, int fragmentId,
-        IProgressMonitor monitor) throws SarosCancellationException,
-        IOException {
+    private void splitAndSend(byte[] data, int chunks, int fragmentId)
+        throws IOException, SarosCancellationException {
 
         int offset = 0;
         int length = 0;
-
-        StopWatch watch = new StopWatch();
-
-        monitor.beginTask("", chunks);
 
         while (chunks-- > 0) {
 
             if (isRejected(fragmentId))
                 throw new RemoteCancellationException();
 
-            if (monitor.isCanceled())
-                throw new LocalCancellationException();
-
             length = Math.min(data.length - offset, CHUNKSIZE);
-
-            watch.start();
 
             sendData(fragmentId, data, offset, length);
 
             offset += length;
-
-            long duration = watch.getTime();
-
-            watch.reset();
-
-            long bytesPerSecond = Math
-                .round((length * 1000D) / (duration + 1D));
-
-            long secondsLeft = Math.round((data.length - offset)
-                / (bytesPerSecond + 1D));
-
-            monitor.subTask("Remaining time: "
-                + Utils.formatDuration(secondsLeft) + " ("
-                + Utils.formatByte(bytesPerSecond) + "/s)");
-
-            monitor.worked(1);
-
         }
-        monitor.subTask("");
     }
 
     /**

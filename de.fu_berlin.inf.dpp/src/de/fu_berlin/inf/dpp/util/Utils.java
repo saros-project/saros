@@ -42,6 +42,7 @@ import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -677,8 +678,12 @@ public class Utils {
     /**
      * Compresses the given byte array using a Java Deflater.
      */
-    public static byte[] deflate(byte[] input, IProgressMonitor subMonitor) {
-        subMonitor.beginTask("Deflate bytearray", input.length / CHUNKSIZE + 1);
+    public static byte[] deflate(byte[] input, IProgressMonitor monitor) {
+
+        if (monitor == null)
+            monitor = new NullProgressMonitor();
+
+        monitor.beginTask("Deflate bytearray", input.length / CHUNKSIZE + 1);
 
         Deflater compressor = new Deflater(Deflater.DEFLATED);
         compressor.setInput(input);
@@ -686,14 +691,14 @@ public class Utils {
         ByteArrayOutputStream bos = new ByteArrayOutputStream(input.length);
 
         byte[] buf = new byte[CHUNKSIZE];
-        while (!compressor.finished() && !subMonitor.isCanceled()) {
+        while (!compressor.finished() && !monitor.isCanceled()) {
             int count = compressor.deflate(buf);
             bos.write(buf, 0, count);
-            subMonitor.worked(1);
+            monitor.worked(1);
         }
         IOUtils.closeQuietly(bos);
 
-        subMonitor.done();
+        monitor.done();
 
         return bos.toByteArray();
     }
@@ -705,10 +710,13 @@ public class Utils {
      *             If the operation fails (because the given byte array does not
      *             contain data accepted by the inflater)
      */
-    public static byte[] inflate(byte[] input, IProgressMonitor subMonitor)
+    public static byte[] inflate(byte[] input, IProgressMonitor monitor)
         throws IOException {
 
-        subMonitor.beginTask("Inflate bytearray", input.length / CHUNKSIZE + 1);
+        if (monitor == null)
+            monitor = new NullProgressMonitor();
+
+        monitor.beginTask("Inflate bytearray", input.length / CHUNKSIZE + 1);
 
         ByteArrayOutputStream bos;
         Inflater decompressor = new Inflater();
@@ -717,10 +725,10 @@ public class Utils {
         byte[] buf = new byte[CHUNKSIZE];
 
         try {
-            while (!decompressor.finished() && !subMonitor.isCanceled()) {
+            while (!decompressor.finished() && !monitor.isCanceled()) {
                 int count = decompressor.inflate(buf);
                 bos.write(buf, 0, count);
-                subMonitor.worked(1);
+                monitor.worked(1);
             }
             return bos.toByteArray();
         } catch (java.util.zip.DataFormatException ex) {
@@ -728,7 +736,7 @@ public class Utils {
             throw new CausedIOException(ex);
         } finally {
             IOUtils.closeQuietly(bos);
-            subMonitor.done();
+            monitor.done();
         }
     }
 

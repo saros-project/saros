@@ -108,15 +108,15 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
         this.projectExchangeInfos = projectExchangeInfos;
     }
 
-    public void start(SubMonitor monitor) throws SarosCancellationException {
-        this.monitor = monitor;
+    public void start(IProgressMonitor progressMonitor)
+        throws SarosCancellationException {
 
         createCollectors();
         File zipArchive = null;
 
         List<File> zipArchives = new ArrayList<File>();
 
-        this.monitor.beginTask(
+        monitor = SubMonitor.convert(progressMonitor,
             "Retrieving list of files needed for synchronization...", 100);
 
         try {
@@ -131,8 +131,8 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
             editorManager.setAllLocalOpenedEditorsLocked(false);
             // pack each project into one archive and check if it was
             // cancelled.
-            zipArchives = createProjectArchives(monitor.newChild(30),
-                this.projectFilesToSend);
+            zipArchives = createProjectArchives(projectFilesToSend,
+                monitor.newChild(30));
             checkCancellation(CancelOption.NOTIFY_PEER);
             if (zipArchives.size() > 0) {
 
@@ -290,8 +290,7 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
                         + " while waiting for the file list",
                     CancelOption.DO_NOT_NOTIFY_PEER);
 
-            List<FileList> remoteFileLists = deserializeRemoteFileList(packet,
-                monitor);
+            List<FileList> remoteFileLists = deserializeRemoteFileList(packet);
 
             log.debug("Inv" + Utils.prefix(peer)
                 + ": Remote file list has been received.");
@@ -490,9 +489,9 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
      *            peer
      * @return List of project archives
      */
-    protected List<File> createProjectArchives(SubMonitor monitor,
-        MappedList<String, IPath> projectFilesToSend) throws IOException,
-        SarosCancellationException {
+    private List<File> createProjectArchives(
+        MappedList<String, IPath> projectFilesToSend, SubMonitor monitor)
+        throws IOException, SarosCancellationException {
 
         log.debug("Inv" + Utils.prefix(peer) + ": Creating archive...");
         checkCancellation(CancelOption.NOTIFY_PEER);
@@ -633,17 +632,12 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
         remoteFileListResponseCollector.cancel();
     }
 
-    private List<FileList> deserializeRemoteFileList(Packet packet,
-        SubMonitor monitor) throws SarosCancellationException, IOException {
+    private List<FileList> deserializeRemoteFileList(Packet packet)
+        throws SarosCancellationException, IOException {
         IncomingTransferObject result = new IncomingTransferObjectExtensionProvider()
             .getPayload(packet);
 
-        if (monitor.isCanceled()) {
-            result.reject();
-            throw new LocalCancellationException();
-        }
-
-        String fileListAsString = new String(result.accept(monitor), "UTF-8");
+        String fileListAsString = new String(result.accept(), "UTF-8");
 
         // We disassemble the complete fileListString to an array of
         // fileListStrings...

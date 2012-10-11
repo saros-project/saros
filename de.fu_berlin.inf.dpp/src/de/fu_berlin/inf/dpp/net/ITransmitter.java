@@ -22,7 +22,7 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 
-import org.eclipse.core.runtime.SubMonitor;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.jivesoftware.smack.packet.IQ;
 
 import de.fu_berlin.inf.dpp.FileList;
@@ -31,7 +31,6 @@ import de.fu_berlin.inf.dpp.activities.business.FileActivity;
 import de.fu_berlin.inf.dpp.activities.serializable.FileActivityDataObject;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
-import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
 import de.fu_berlin.inf.dpp.invitation.InvitationProcess;
 import de.fu_berlin.inf.dpp.net.internal.InvitationInfo;
 import de.fu_berlin.inf.dpp.net.internal.SarosPacketCollector;
@@ -74,33 +73,19 @@ public interface ITransmitter {
      * @param fileLists
      *            the file lists that are to be sent.
      * 
-     * @param monitor
-     *            a monitor to which progress will be reported and which is
-     *            queried for cancellation.
-     * 
-     * @throws SarosCancellationException
-     *             if the operation was canceled via the given progress monitor
-     *             a LocalCancellationException is thrown. If the operation was
-     *             canceled via the monitor and the exception is not received,
-     *             the operation completed successfully, before noticing the
-     *             cancellation.
-     * 
-     *             if the operation was canceled by the recipient (remotely) a
-     *             RemoteCancellationException is thrown
      * 
      * @throws IOException
      *             if the operation fails because of a problem with the XMPP
      *             Connection.
      */
     public void sendFileLists(JID jid, String processID,
-        List<FileList> fileLists, SubMonitor monitor) throws IOException,
-        SarosCancellationException;
+        List<FileList> fileLists) throws IOException;
 
     // FIXME Add Javadoc. Why is an invitationID needed?
     public void sendUserList(JID to, String invitationID, Collection<User> user);
 
     public boolean receiveUserListConfirmation(SarosPacketCollector collector,
-        List<User> fromUsers, SubMonitor monitor)
+        List<User> fromUsers, IProgressMonitor monitor)
         throws LocalCancellationException;
 
     /**

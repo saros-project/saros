@@ -14,8 +14,6 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.apache.log4j.Logger;
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.swt.dnd.TransferData;
 import org.jivesoftware.smack.Connection;
 import org.jivesoftware.smack.Roster;
@@ -179,8 +177,7 @@ public class DataTransferManager implements IConnectionListener,
         /**
          * Accepts a transfer and returns the incoming data.
          */
-        public byte[] accept(final IProgressMonitor progress)
-            throws SarosCancellationException, IOException {
+        public byte[] accept() throws SarosCancellationException, IOException {
             addIncomingFileTransfer(description);
             try {
                 // TODO Put size in TransferDescription, so we can
@@ -191,7 +188,7 @@ public class DataTransferManager implements IConnectionListener,
 
                 long startTime = System.nanoTime();
 
-                byte[] content = transferObject.accept(progress);
+                byte[] content = transferObject.accept();
 
                 long duration = Math.max(0, System.nanoTime() - startTime) / 1000000;
 
@@ -284,8 +281,8 @@ public class DataTransferManager implements IConnectionListener,
      * @throws IOException
      *             If a technical problem occurred.
      */
-    public void sendData(TransferDescription transferData, byte[] payload,
-        SubMonitor progress) throws IOException, SarosCancellationException {
+    public void sendData(TransferDescription transferData, byte[] payload)
+        throws IOException, SarosCancellationException {
 
         // Think about how to synchronize this, that multiple people can connect
         // at the same time.
@@ -295,8 +292,7 @@ public class DataTransferManager implements IConnectionListener,
         JID recipient = transferData.getRecipient();
         transferData.setSender(currentLocalJID);
 
-        IByteStreamConnection connection = getConnection(recipient,
-            progress.newChild(1));
+        IByteStreamConnection connection = getConnection(recipient);
 
         synchronized (outgoingTransfers) {
             Integer currentSendingOperations = outgoingTransfers.get(recipient);
@@ -323,10 +319,10 @@ public class DataTransferManager implements IConnectionListener,
             long sizeUncompressed = payload.length;
 
             if (transferData.compressContent()) {
-                payload = Utils.deflate(payload, progress.newChild(15));
+                payload = Utils.deflate(payload, null);
             }
 
-            connection.send(transferData, payload, progress.newChild(85));
+            connection.send(transferData, payload);
 
             watch.stop();
             transferModeDispatch.transferFinished(recipient,
@@ -356,8 +352,8 @@ public class DataTransferManager implements IConnectionListener,
      * @throws SarosCancellationException
      *             if establishing a new connection was interrupted
      */
-    public IByteStreamConnection getConnection(JID recipient,
-        SubMonitor progress) throws IOException, SarosCancellationException {
+    public IByteStreamConnection getConnection(JID recipient)
+        throws IOException, SarosCancellationException {
 
         IByteStreamConnection connection = connections.get(recipient);
 
@@ -368,14 +364,14 @@ public class DataTransferManager implements IConnectionListener,
 
         try {
 
-            return connect(recipient, progress);
+            return connect(recipient);
         } catch (InterruptedException e) {
             throw new SarosCancellationException("Connecting cancelled");
         }
     }
 
-    public IByteStreamConnection connect(JID recipient, SubMonitor progress)
-        throws IOException, InterruptedException {
+    public IByteStreamConnection connect(JID recipient) throws IOException,
+        InterruptedException {
 
         IByteStreamConnection connection = null;
 
@@ -397,7 +393,7 @@ public class DataTransferManager implements IConnectionListener,
                 + recipient.getBase() + " from " + sarosNet.getMyJID()
                 + " using " + transport.getDefaultNetTransferMode());
             try {
-                connection = transport.connect(recipient, progress);
+                connection = transport.connect(recipient);
             } catch (IOException e) {
                 log.error(Utils.prefix(recipient) + "Failed to connect using "
                     + transport.toString() + ":",

@@ -19,7 +19,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 import org.apache.log4j.Logger;
-import org.eclipse.core.runtime.SubMonitor;
 import org.jivesoftware.smack.Connection;
 import org.jivesoftware.smack.SmackConfiguration;
 import org.jivesoftware.smack.XMPPException;
@@ -457,9 +456,8 @@ public class Socks5Transport extends ByteStreamTransport {
      * See handleResponse().
      */
     @Override
-    protected BinaryChannel establishBinaryChannel(String peer,
-        SubMonitor progress) throws XMPPException, IOException,
-        InterruptedException {
+    protected BinaryChannel establishBinaryChannel(String peer)
+        throws XMPPException, IOException, InterruptedException {
 
         // before establishing, we have to put the exchanger to the map
         Exchanger<Socks5BytestreamSession> exchanger = new Exchanger<Socks5BytestreamSession>();
@@ -487,10 +485,6 @@ public class Socks5Transport extends ByteStreamTransport {
                 log.debug(prefix()
                     + "session is mediated. Waiting for peer to connect ...");
 
-                progress
-                    .subTask("SOCKS5 stream is mediated. Waiting for peer to connect ...");
-                progress.worked(5);
-
             } catch (IOException e) {
                 exception = e;
             } catch (XMPPException e) {
@@ -508,10 +502,6 @@ public class Socks5Transport extends ByteStreamTransport {
                 log.warn(prefix() + "could not connect to " + peer
                     + " because: " + exception.getMessage()
                     + ". Waiting for peer to connect ...");
-
-                progress.subTask("Could not connect to " + peer
-                    + ". Waiting for peer to connect ...");
-                progress.worked(5);
             }
 
             Socks5BytestreamSession inSession = null;

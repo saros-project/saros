@@ -10,8 +10,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import org.apache.log4j.Logger;
-import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.core.runtime.SubMonitor;
 import org.jivesoftware.smack.PacketListener;
 import org.jivesoftware.smack.filter.PacketFilter;
 import org.jivesoftware.smack.packet.Message;
@@ -207,7 +205,6 @@ public class XMPPReceiver {
      */
     protected void processTransferObjectToPacket(
         TransferDescription description, IncomingTransferObject transferObject) {
-        SubMonitor monitor = SubMonitor.convert(new NullProgressMonitor());
 
         String name = description.getType();
         String namespace = description.getNamespace();
@@ -228,7 +225,7 @@ public class XMPPReceiver {
                 return;
             }
 
-            data = transferObject.accept(monitor);
+            data = transferObject.accept();
 
         } catch (SarosCancellationException e) {
             log.error("User canceled. This is unexpected", e);

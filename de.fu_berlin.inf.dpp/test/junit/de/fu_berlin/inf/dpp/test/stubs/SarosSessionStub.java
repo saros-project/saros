@@ -8,6 +8,7 @@ import java.util.concurrent.CancellationException;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
 import org.joda.time.DateTime;
 
@@ -226,7 +227,7 @@ public class SarosSessionStub implements ISarosSession {
     }
 
     public void synchronizeUserList(ITransmitter transmitter, JID peer,
-        String invitationID, SubMonitor monitor)
+        String invitationID, IProgressMonitor monitor)
         throws SarosCancellationException {
         throw new RuntimeException("Unexpected call to Stub");
     }

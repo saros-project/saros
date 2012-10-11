@@ -2,7 +2,6 @@ package de.fu_berlin.inf.dpp.net.internal;
 
 import java.io.IOException;
 
-import org.eclipse.core.runtime.SubMonitor;
 import org.jivesoftware.smack.Connection;
 
 import de.fu_berlin.inf.dpp.net.JID;
@@ -19,8 +18,8 @@ public interface ITransport {
      * 
      * @throws IOException
      */
-    public IByteStreamConnection connect(JID peer, SubMonitor progress)
-        throws IOException, InterruptedException;
+    public IByteStreamConnection connect(JID peer) throws IOException,
+        InterruptedException;
 
     public void prepareXMPPConnection(Connection connection,
         IByteStreamConnectionListener listener);

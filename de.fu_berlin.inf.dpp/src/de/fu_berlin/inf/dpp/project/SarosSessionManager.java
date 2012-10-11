@@ -37,7 +37,6 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.ui.progress.IProgressConstants;
 import org.jivesoftware.smack.Connection;
@@ -424,16 +423,7 @@ public class SarosSessionManager implements ISarosSessionManager {
         protected IStatus run(IProgressMonitor monitor) {
             try {
                 registerCancelListener();
-                /*
-                 * Since in the end there is no real "progress" when waiting for
-                 * the remote user to accept the invitation, and the steps in
-                 * the session invitation process are executed rather fast, use
-                 * the "unknown" state progress monitor (progress bar marquee)
-                 * BUT: SubMonitors cannot use the IProgressMonitor.UNKNOWN
-                 * flag, and remain at 0%, so don't try to switch this ;-)
-                 */
-                monitor.beginTask("OutgoingInvitationJob", 100);
-                process.start(SubMonitor.convert(monitor));
+                process.start(monitor);
 
             } catch (LocalCancellationException e) {
 
@@ -635,12 +625,8 @@ public class SarosSessionManager implements ISarosSessionManager {
         @Override
         protected IStatus run(IProgressMonitor monitor) {
             try {
-
                 registerCancelListener();
-                monitor.beginTask("OutgoingInvitationJob", 100);
-                process.start(SubMonitor.convert(monitor,
-                    SubMonitor.SUPPRESS_NONE));
-
+                process.start(monitor);
             } catch (LocalCancellationException e) {
 
                 return Status.CANCEL_STATUS;

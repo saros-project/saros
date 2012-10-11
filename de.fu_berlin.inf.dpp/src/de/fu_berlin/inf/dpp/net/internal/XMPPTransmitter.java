@@ -31,7 +31,6 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
 import org.jivesoftware.smack.Chat;
 import org.jivesoftware.smack.ChatManager;
@@ -283,7 +282,7 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
     // FIXME move to XMPPReceiver
     @Override
     public boolean receiveUserListConfirmation(SarosPacketCollector collector,
-        List<User> fromUsers, SubMonitor monitor)
+        List<User> fromUsers, IProgressMonitor monitor)
         throws LocalCancellationException {
 
         if (isConnectionInvalid())
@@ -550,8 +549,7 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
         }
 
         try {
-            dataManager.sendData(transferDescription, data,
-                SubMonitor.convert(new NullProgressMonitor()));
+            dataManager.sendData(transferDescription, data);
         } catch (SarosCancellationException e) {
             log.error("Cancellation cannot occur, because NullProgressMonitors"
                 + " are used on both sides!", e);
@@ -560,15 +558,13 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
 
     @Override
     public void sendFileLists(JID recipient, String processID,
-        List<FileList> fileLists, SubMonitor progress) throws IOException,
-        SarosCancellationException {
+        List<FileList> fileLists) throws IOException {
 
         String user = connection.getUser();
         if (user == null) {
             log.warn("Local user is not logged in to the connection, yet.");
             return;
         }
-        progress.beginTask("Sending file list", 100);
 
         TransferDescription data = TransferDescription
             .createFileListTransferDescription(recipient, new JID(user),
@@ -589,12 +585,16 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
 
         data.setSize(content.length);
 
-        // Not showing detailed progress here, because it is going fast, and the
-        // user would probably not understand what is happening here...
-        dataManager.sendData(data, content,
-            progress.newChild(100, SubMonitor.SUPPRESS_ALL_LABELS));
-
-        progress.done();
+        /*
+         * As these lists are very small ( normally < 10 kBytes) it should be ok
+         * to block a short amount of time in which the user is not able to
+         * cancel the project negotiation
+         */
+        try {
+            dataManager.sendData(data, content);
+        } catch (SarosCancellationException e) {
+            // FIXME this is never thrown
+        }
     }
 
     /**

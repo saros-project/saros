@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.util.Arrays;
 
 import org.apache.log4j.Logger;
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
 import org.jivesoftware.smack.Connection;
 import org.jivesoftware.smack.PacketCollector;
@@ -79,8 +78,7 @@ public class ConnectionTestManager {
                 result.transferMode = ito.getTransferMode();
 
                 try {
-                    byte[] data = ito.accept(SubMonitor
-                        .convert(new NullProgressMonitor()));
+                    byte[] data = ito.accept();
 
                     result.dataHash = Arrays.hashCode(data);
 
@@ -198,8 +196,8 @@ public class ConnectionTestManager {
             try {
                 try {
                     progress.subTask("Sending Data");
-                    dataTransferManager.sendData(transferData, testData,
-                        progress.newChild(40));
+                    dataTransferManager.sendData(transferData, testData);
+                    progress.worked(40);
                 } catch (IOException e) {
                     throw new XMPPException("IOException sending data", e);
                 } catch (SarosCancellationException e) {
