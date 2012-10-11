@@ -113,6 +113,8 @@ public class SingleUserChatService extends AbstractChatService {
 
     };
 
+    private SarosNet sarosNet;
+
     private Map<JID, SingleUserChat> currentChats = new HashMap<JID, SingleUserChat>();
 
     private ChatManager chatManager;
@@ -122,7 +124,8 @@ public class SingleUserChatService extends AbstractChatService {
     private boolean connected;
 
     public SingleUserChatService(SarosNet sarosNet) {
-        connected = false;
+        this.connected = false;
+        this.sarosNet = sarosNet;
         sarosNet.addListener(connectionLister);
     }
 
@@ -163,7 +166,7 @@ public class SingleUserChatService extends AbstractChatService {
             LOG.trace("creating new chat between " + userJID + " <->"
                 + chat.getParticipant());
 
-            createdChat = new SingleUserChat();
+            createdChat = new SingleUserChat(sarosNet);
 
             createdChat.initChat(userJID, chat, chatStateManager);
             createdChat.setConnected(true);

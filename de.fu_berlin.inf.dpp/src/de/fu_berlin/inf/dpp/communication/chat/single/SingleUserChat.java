@@ -17,12 +17,16 @@ import de.fu_berlin.inf.dpp.communication.chat.AbstractChat;
 import de.fu_berlin.inf.dpp.communication.chat.ChatElement;
 import de.fu_berlin.inf.dpp.communication.chat.ChatHistory;
 import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.net.SarosNet;
+import de.fu_berlin.inf.dpp.net.util.RosterUtils;
 
 /**
  * This object represents a chat with a single user.
  */
 public class SingleUserChat extends AbstractChat {
     private static final Logger LOG = Logger.getLogger(SingleUserChat.class);
+
+    private SarosNet sarosNet;
 
     private final ChatStateListener chatStateListener = new ChatStateListener() {
 
@@ -54,6 +58,10 @@ public class SingleUserChat extends AbstractChat {
     private String userJID;
 
     private boolean isConnected;
+
+    SingleUserChat(SarosNet sarosNet) {
+        this.sarosNet = sarosNet;
+    }
 
     /**
      * Initializes the chat so that it is possible to exchange messages with the
@@ -94,15 +102,17 @@ public class SingleUserChat extends AbstractChat {
      * @param isConnected
      */
     void setConnected(boolean isConnected) {
+        JID participant;
         synchronized (SingleUserChat.this) {
             LOG.trace("new connection state, connected=" + isConnected);
             this.isConnected = isConnected;
+            participant = new JID(chat.getParticipant());
         }
 
         if (isConnected) {
-            notifyJIDConnected(new JID(chat.getParticipant()));
+            notifyJIDConnected(participant);
         } else {
-            notifyJIDDisconnected(new JID(chat.getParticipant()));
+            notifyJIDDisconnected(participant);
         }
     }
 
@@ -119,7 +129,6 @@ public class SingleUserChat extends AbstractChat {
      */
     @Override
     public synchronized Set<JID> getParticipants() {
-        /* TODO: get all participants for MUC or SingleChat */
         return Collections.singleton(new JID(chat.getParticipant()));
     }
 
@@ -153,8 +162,16 @@ public class SingleUserChat extends AbstractChat {
      */
     @Override
     public void sendMessage(String text) throws XMPPException {
-        Message message = new Message(chat.getParticipant(), Message.Type.chat);
-        message.setThread(chat.getThreadID());
+        String participant;
+        String threadId;
+
+        synchronized (SingleUserChat.this) {
+            threadId = chat.getThreadID();
+            participant = chat.getParticipant();
+        }
+
+        Message message = new Message(participant, Message.Type.chat);
+        message.setThread(threadId);
         message.setBody(text);
         sendMessage(message);
     }
@@ -173,7 +190,15 @@ public class SingleUserChat extends AbstractChat {
      */
     @Override
     public String getTitle() {
-        return chat.getParticipant();
+        JID participant;
+        synchronized (SingleUserChat.this) {
+            participant = new JID(chat.getParticipant());
+        }
+
+        String nickname = RosterUtils.getNickname(sarosNet, participant);
+
+        return nickname != null ? nickname : participant.getBareJID()
+            .toString();
     }
 
     /**

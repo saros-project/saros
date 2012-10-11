@@ -26,6 +26,7 @@ import de.fu_berlin.inf.dpp.communication.chat.IChatListener;
 import de.fu_berlin.inf.dpp.communication.chat.muc.negotiation.MUCSessionPreferences;
 import de.fu_berlin.inf.dpp.communication.chat.muc.states.MUCStateManager;
 import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.ui.Messages;
 
 /**
  * This class encapsulates Smacks {@link MultiUserChat} and offers
@@ -460,7 +461,8 @@ public class MultiUserChat extends AbstractChat {
      */
     @Override
     public String getTitle() {
-        return muc.getRoom();
+        /* TODO: return proper title, as there could be multiple MUCs. */
+        return Messages.ChatRoomsComposite_roundtable;
     }
 
     /**
