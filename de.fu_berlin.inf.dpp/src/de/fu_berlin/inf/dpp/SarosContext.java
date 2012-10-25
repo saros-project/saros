@@ -31,6 +31,8 @@ import de.fu_berlin.inf.dpp.communication.audio.MixerManager;
 import de.fu_berlin.inf.dpp.communication.muc.MUCManager;
 import de.fu_berlin.inf.dpp.communication.muc.negotiation.MUCSessionPreferencesNegotiatingManager;
 import de.fu_berlin.inf.dpp.communication.muc.singleton.MUCManagerSingletonWrapperChatView;
+import de.fu_berlin.inf.dpp.communication.chat.IChatService;
+import de.fu_berlin.inf.dpp.communication.chat.single.ChatServiceImpl;
 import de.fu_berlin.inf.dpp.concurrent.undo.UndoManager;
 import de.fu_berlin.inf.dpp.concurrent.watchdog.ConsistencyWatchdogClient;
 import de.fu_berlin.inf.dpp.concurrent.watchdog.ConsistencyWatchdogServer;
@@ -224,6 +226,9 @@ public class SarosContext implements ISarosContext {
         Component.create(IUPnPService.class, UPnPServiceImpl.class),
         Component.create(XMPPReceiver.class),
         Component.create(XMPPTransmitter.class),
+
+        // Chat
+        Component.create(IChatService.class, ChatServiceImpl.class),
 
         // Observables
         Component.create(FileReplacementInProgressObservable.class),

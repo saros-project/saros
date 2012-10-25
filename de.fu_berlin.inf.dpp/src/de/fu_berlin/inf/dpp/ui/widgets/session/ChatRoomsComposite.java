@@ -24,6 +24,8 @@ import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.User;
+import de.fu_berlin.inf.dpp.communication.chat.IChat;
+import de.fu_berlin.inf.dpp.communication.chat.single.ChatServiceImpl;
 import de.fu_berlin.inf.dpp.communication.muc.events.IMUCManagerListener;
 import de.fu_berlin.inf.dpp.communication.muc.events.MUCManagerAdapter;
 import de.fu_berlin.inf.dpp.communication.muc.session.MUCSession;
@@ -347,6 +349,9 @@ public class ChatRoomsComposite extends ListExplanatoryComposite {
 
     protected CTabItem chatRoom1;
 
+    @Inject
+    protected ChatServiceImpl chatService;
+
     /**
      * Used to cache the sender names belonging to a {@link JID} determined
      * {@link User}
@@ -432,6 +437,71 @@ public class ChatRoomsComposite extends ListExplanatoryComposite {
 
     }
 
+    /**
+     * Create a new single user chat with the given JID and open it.
+     * 
+     * @param jid
+     * @param activateAfterCreation
+     *            see {@link ChatRoomsComposite#openChat(IChat, boolean)} *
+     */
+    public void openChat(JID jid, boolean activateAfterCreation) {
+        openChat(chatService.createChat(jid), activateAfterCreation);
+    }
+
+    /**
+     * Open the tab for a given chat.
+     * 
+     * If the the corresponding tab already exists, it will be activated,
+     * otherwise a new tab will be created.
+     * 
+     * @param chat
+     *            The chat that should be displayed. If no corresponding chat
+     *            tab exists, a new one will be created.
+     * @param activateAfterCreation
+     *            If a new tab is created, setting this parameter
+     *            <code>false</code> will open the tab in background,
+     *            <code>true</code> will activate it. If the newly created chat
+     *            tab is the only one, it will of course be active anyway. If
+     *            the chat tab already exists, this parameter has no effect: the
+     *            tab will be activated anyway.
+     */
+    public void openChat(IChat chat, boolean activateAfterCreation) {
+        if (selectExistentTab(chat)) {
+            return;
+        }
+
+        hideExplanation();
+
+        CTabItem chatTab = createChatTab(chat);
+        if (activateAfterCreation || chatRooms.getItemCount() == 1) {
+            chatRooms.setSelection(chatTab);
+        }
+    }
+
+    private CTabItem createChatTab(IChat chat) {
+        ChatControl control = new ChatControl(this, SWT.BORDER, white, white, 2);
+
+        CTabItem chatTab = new CTabItem(chatRooms, SWT.CLOSE);
+        chatTab.setText(chat.getTitle());
+        /* Messages.ChatRoomsComposite_roundtable); */
+        chatTab.setImage(chatViewImage);
+        chatTab.setData(chat);
+        chatTab.setControl(control);
+
+        return chatTab;
+    }
+
+    private boolean selectExistentTab(IChat chat) {
+        for (CTabItem item : chatRooms.getItems()) {
+            if (item.getData().equals(chat)) {
+                chatRooms.setSelection(item);
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     public void attachToMUCSession(MUCSession mucSession) {
         mucSession.addMUCSessionListener(mucSessionListener);
     }
@@ -483,7 +553,7 @@ public class ChatRoomsComposite extends ListExplanatoryComposite {
 
     protected void addChatLine(MUCSessionHistoryJoinElement join) {
         addChatLine(join.getSender(),
-            Messages.ChatRoomsComposite_joint_the_chat, join.getDate());
+            Messages.ChatRoomsComposite_joined_the_chat, join.getDate());
     }
 
     protected void addChatLine(MUCSessionHistoryLeaveElement leave) {

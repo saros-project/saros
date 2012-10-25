@@ -58,7 +58,7 @@ public class Messages extends NLS {
     public static String ChatInput_hint_text;
     public static String ChatLinePartnerChangeSeparator_date_formatter_pattern;
     public static String ChatLineSeparator_date_formatter_pattern;
-    public static String ChatRoomsComposite_joint_the_chat;
+    public static String ChatRoomsComposite_joined_the_chat;
     public static String ChatRoomsComposite_left_the_chat;
     public static String ChatRoomsComposite_method1;
     public static String ChatRoomsComposite_method2;
