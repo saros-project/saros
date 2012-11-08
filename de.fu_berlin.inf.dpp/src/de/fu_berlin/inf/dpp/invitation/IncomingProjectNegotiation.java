@@ -881,7 +881,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
                 public void run(IProgressMonitor monitor) throws CoreException {
                     try {
                         FileUtils.writeArchive(archiveStream, project,
-                            subMonitor, sarosSession);
+                            subMonitor);
                     } catch (LocalCancellationException e) {
                         throw new CoreException(new Status(IStatus.CANCEL,
                             Saros.SAROS, null, e));

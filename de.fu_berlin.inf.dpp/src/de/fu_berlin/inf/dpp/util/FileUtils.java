@@ -167,7 +167,7 @@ public class FileUtils {
 
     /**
      * Unzip the data in the given InputStream as a Zip archive to the given
-     * IContainer. Already shared files will not be overwritten.
+     * IContainer.
      * 
      * @param iSarosSession
      * 
@@ -176,8 +176,7 @@ public class FileUtils {
      *             in this case.
      */
     public static boolean writeArchive(InputStream input, IContainer container,
-        SubMonitor monitor, ISarosSession iSarosSession) throws CoreException,
-        LocalCancellationException {
+        SubMonitor monitor) throws CoreException, LocalCancellationException {
 
         ZipInputStream zip = new ZipInputStream(input);
 
@@ -196,17 +195,16 @@ public class FileUtils {
                 IPath path = Path.fromPortableString(entry.getName());
                 IFile file = container.getFile(path);
 
-                if (!iSarosSession.isShared(file)) {
-                    writeFile(new FilterInputStream(zip) {
-                        @Override
-                        public void close() throws IOException {
-                            // prevent the ZipInputStream from being closed
-                        }
-                    }, file, monitor.newChild(1));
+                writeFile(new FilterInputStream(zip) {
+                    @Override
+                    public void close() throws IOException {
+                        // prevent the ZipInputStream from being closed
+                    }
+                }, file, monitor.newChild(1));
 
-                    monitor.subTask("Unpacked " + path);
-                    log.debug("File written to disk: " + path);
-                }
+                monitor.subTask("Unpacked " + path);
+                log.debug("File written to disk: " + path);
+
                 zip.closeEntry();
             }
             log.debug(String.format("Unpacked archive in %d s",

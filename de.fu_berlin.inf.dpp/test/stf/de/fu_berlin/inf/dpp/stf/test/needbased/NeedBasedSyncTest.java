@@ -7,8 +7,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import java.util.List;
-
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -16,7 +14,6 @@ import org.junit.Test;
 
 import de.fu_berlin.inf.dpp.stf.client.StfTestCase;
 import de.fu_berlin.inf.dpp.stf.client.util.Util;
-import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotShell;
 import de.fu_berlin.inf.dpp.stf.shared.Constants;
 import de.fu_berlin.inf.dpp.stf.shared.Constants.TypeOfCreateProject;
 
@@ -410,102 +407,5 @@ public class NeedBasedSyncTest extends StfTestCase {
         assertEquals(contentAlice1, contentCarl1);
         assertEquals(contentAlice2, contentCarl2);
         assertEquals(contentAlice3, contentCarl3);
-    }
-
-    @Test
-    public void testNeedBasedSyncDuringSynchronization() throws Exception {
-
-        String[] filesToShare = new String[101];
-
-        filesToShare[0] = "file1";
-
-        Util.createProjectWithEmptyFile("foo", "file1", ALICE);
-        ALICE.superBot().internal().createFile("foo", "file2", "bla123");
-        ALICE.superBot().internal().createFile("foo", "file3", "bla345bla");
-
-        for (int i = 0; i < 100; i++) {
-            ALICE.superBot().internal()
-                .createFile("foo", "fileX" + i, 1024 * 512, false);
-            filesToShare[i + 1] = "fileX" + i;
-        }
-
-        Util.buildFileSessionConcurrently("foo", filesToShare,
-            TypeOfCreateProject.NEW_PROJECT, ALICE, BOB, CARL);
-
-        BOB.superBot().views().packageExplorerView()
-            .waitUntilFolderExists("foo");
-        CARL.superBot().views().packageExplorerView()
-            .waitUntilFolderExists("foo");
-
-        List<String> shellNamesAlice = ALICE.remoteBot().getOpenShellNames();
-
-        // if the test fails here, either your PC is to fast
-        // or sometime a shell pops up for just a short period
-        // cannot find the source of this bug
-        for (String string : shellNamesAlice) {
-            if (string.startsWith("Sharing project")) {
-                IRemoteBotShell shellAlice = ALICE.remoteBot().shell(string);
-                shellAlice.activate();
-                shellAlice.bot().button(Constants.RUN_IN_BACKGROUND).click();
-            }
-        }
-
-        BOB.superBot().views().sarosView().selectParticipant(ALICE.getJID())
-            .followParticipant();
-
-        CARL.superBot().views().sarosView().selectParticipant(ALICE.getJID())
-            .followParticipant();
-
-        BOB.superBot().views().sarosView().selectParticipant(ALICE.getJID())
-            .waitUntilIsFollowing();
-
-        CARL.superBot().views().sarosView().selectParticipant(ALICE.getJID())
-            .waitUntilIsFollowing();
-
-        assertTrue(BOB.superBot().views().sarosView().isFollowing());
-        assertTrue(CARL.superBot().views().sarosView().isFollowing());
-
-        ALICE.superBot().views().packageExplorerView()
-            .selectFile("foo", "file2").open();
-
-        ALICE.remoteBot().editor("file2").typeText("Hallo ihr Beiden! ");
-        CARL.remoteBot().editor("file2").typeText("Hallo ich bin Carl ");
-        BOB.remoteBot().editor("file2").typeText("und ich bin Bob");
-
-        assertFalse(BOB.superBot().views().packageExplorerView()
-            .selectProject("foo").exists("file1"));
-        assertFalse(BOB.superBot().views().packageExplorerView()
-            .selectProject("foo").exists("file3"));
-        assertTrue(BOB.superBot().views().packageExplorerView()
-            .selectProject("foo").exists("file2"));
-
-        assertFalse(CARL.superBot().views().packageExplorerView()
-            .selectProject("foo").exists("file1"));
-        assertFalse(CARL.superBot().views().packageExplorerView()
-            .selectProject("foo").exists("file3"));
-        assertTrue(CARL.superBot().views().packageExplorerView()
-            .selectProject("foo").exists("file2"));
-
-        String contentA2 = ALICE.superBot().views().packageExplorerView()
-            .getFileContent("foo/file2");
-        String contentB2 = BOB.superBot().views().packageExplorerView()
-            .getFileContent("foo/file2");
-        String contentC2 = CARL.superBot().views().packageExplorerView()
-            .getFileContent("foo/file2");
-
-        assertEquals(contentB2, contentA2);
-        assertEquals(contentC2, contentA2);
-
-        ALICE.superBot().views().packageExplorerView()
-            .selectFile("foo", "file3").open();
-
-        ALICE.remoteBot().editor("file3").typeText("Hallo ihr Beiden! ");
-        CARL.superBot().views().packageExplorerView()
-            .waitUntilResourceIsShared("foo/file3");
-        BOB.superBot().views().packageExplorerView()
-            .waitUntilResourceIsShared("foo/file3");
-
-        CARL.remoteBot().editor("file3").typeText("Hallo ich bin Carl ");
-        BOB.remoteBot().editor("file3").typeText("und ich bin Bob");
     }
 }

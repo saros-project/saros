@@ -1016,14 +1016,10 @@ public class SarosSession implements ISarosSession, Disposable {
         if (needBasedPathsList.contains(path))
             return;
 
-        boolean isProjectTransmitted = isInProjectNegotiation(jupiterActivity);
-
         /*
-         * need-based transmission when file is not shared or file is in
-         * transmission process
+         * quick adding when file is not shared
          */
-        if (isProjectTransmitted
-            || (!isShared(path.getFile()) && !isProjectTransmitted)) {
+        if (!isShared(path.getFile())) {
             if (preferenceUtils.isNeedsBasedSyncEnabled().equals("undefined")) {
                 if (!CollaborationUtils.activateNeedBasedSynchronization(saros))
                     return;
@@ -1033,7 +1029,6 @@ public class SarosSession implements ISarosSession, Disposable {
 
             try {
                 sendSingleFile(path);
-                sendActivity(toWhom, jupiterActivity);
             } catch (FileNotFoundException e) {
                 log.error("File could not be found, despite existing: " + path,
                     e);
