@@ -36,19 +36,19 @@ import de.fu_berlin.inf.dpp.util.Utils;
  */
 public class ChangeXMPPAccountAction extends Action implements IMenuCreator {
 
-    Menu accountMenu;
-    @Inject
-    XMPPAccountStore accountService;
-
-    @Inject
-    Saros saros;
-
-    @Inject
-    ISarosSessionManager sarosSessionManager;
-
-    protected int currentAccountId;
     private static final Logger log = Logger
         .getLogger(ChangeXMPPAccountAction.class);
+
+    protected Menu accountMenu;
+
+    @Inject
+    protected XMPPAccountStore accountService;
+
+    @Inject
+    protected Saros saros;
+
+    @Inject
+    protected ISarosSessionManager sarosSessionManager;
 
     protected IConnectionListener connectionListener = new IConnectionListener() {
         public void connectionStateChanged(Connection connection,
@@ -72,8 +72,9 @@ public class ChangeXMPPAccountAction extends Action implements IMenuCreator {
     public void run() {
         if (saros.getSarosNet().isConnected())
             disconnect();
-        else if (!accountService.isEmpty())
-            connect(accountService.getActiveAccount());
+        else
+            connect(accountService.isEmpty() ? null : accountService
+                .getActiveAccount());
     }
 
     @Override
@@ -111,10 +112,10 @@ public class ChangeXMPPAccountAction extends Action implements IMenuCreator {
                 try {
                     service
                         .executeCommand(
-                            "de.fu_berlin.inf.dpp.ui.commands.OpenSarosPreferences", //$NON-NLS-1$
+                            "de.fu_berlin.inf.dpp.ui.commands.OpenSarosPreferences",
                             null);
                 } catch (Exception e) {
-                    log.debug("Could execute command", e); //$NON-NLS-1$
+                    log.debug("Could execute command", e);
                 }
             }
         });
@@ -158,37 +159,38 @@ public class ChangeXMPPAccountAction extends Action implements IMenuCreator {
     }
 
     protected void connect(XMPPAccount account) {
-        accountService.setAccountActive(account);
+        if (account != null)
+            accountService.setAccountActive(account);
 
-        Utils.runSafeAsync("ConnectAction-", log, new Runnable() { //$NON-NLS-1$
-                public void run() {
-                    try {
-                        if (running.getAndSet(true)) {
-                            log.info("User clicked too fast, running already a connect or disconnect."); //$NON-NLS-1$
-                            return;
-                        }
-                        saros.connect(false);
-                    } finally {
-                        running.set(false);
+        Utils.runSafeAsync("ConnectAction-", log, new Runnable() {
+            public void run() {
+                try {
+                    if (running.getAndSet(true)) {
+                        log.info("User clicked too fast, running already a connect or disconnect.");
+                        return;
                     }
+                    saros.connect(false);
+                } finally {
+                    running.set(false);
                 }
-            });
+            }
+        });
     }
 
     protected void disconnect() {
-        Utils.runSafeAsync("DisconnectAction-", log, new Runnable() { //$NON-NLS-1$
-                public void run() {
-                    try {
-                        if (running.getAndSet(true)) {
-                            log.info("User clicked too fast, running already a connect or disconnect."); //$NON-NLS-1$
-                            return;
-                        }
-                        saros.getSarosNet().disconnect();
-                    } finally {
-                        running.set(false);
+        Utils.runSafeAsync("DisconnectAction-", log, new Runnable() {
+            public void run() {
+                try {
+                    if (running.getAndSet(true)) {
+                        log.info("User clicked too fast, running already a connect or disconnect.");
+                        return;
                     }
+                    saros.getSarosNet().disconnect();
+                } finally {
+                    running.set(false);
                 }
-            });
+            }
+        });
     }
 
     protected void addActionToMenu(Menu parent, Action action) {
@@ -203,27 +205,27 @@ public class ChangeXMPPAccountAction extends Action implements IMenuCreator {
             case CONNECTED:
                 setText(Messages.ChangeXMPPAccountAction_disconnect);
                 setImageDescriptor(ImageManager
-                    .getImageDescriptor("/icons/elcl16/connect.png")); //$NON-NLS-1$
+                    .getImageDescriptor("/icons/elcl16/connect.png"));
                 break;
             case CONNECTING:
                 setText(Messages.ChangeXMPPAccountAction_connecting);
                 setImageDescriptor(ImageManager
-                    .getImageDescriptor("/icons/elcl16/connecting.png")); //$NON-NLS-1$
+                    .getImageDescriptor("/icons/elcl16/connecting.png"));
                 break;
             case ERROR:
                 setImageDescriptor(ImageManager
-                    .getImageDescriptor("/icons/elcl16/conn_err.png")); //$NON-NLS-1$
+                    .getImageDescriptor("/icons/elcl16/conn_err.png"));
                 break;
             case NOT_CONNECTED:
                 setText(Messages.ChangeXMPPAccountAction_connect);
                 setImageDescriptor(ImageManager
-                    .getImageDescriptor("/icons/elcl16/disconnected.png")); //$NON-NLS-1$
+                    .getImageDescriptor("/icons/elcl16/disconnected.png"));
                 break;
             case DISCONNECTING:
             default:
                 setText(Messages.ChangeXMPPAccountAction_disconnecting);
                 setImageDescriptor(ImageManager
-                    .getImageDescriptor("/icons/elcl16/disconnecting.png")); //$NON-NLS-1$
+                    .getImageDescriptor("/icons/elcl16/disconnecting.png"));
                 break;
             }
 
@@ -232,16 +234,17 @@ public class ChangeXMPPAccountAction extends Action implements IMenuCreator {
                 || state == ConnectionState.ERROR);
 
         } catch (RuntimeException e) {
-            log.error("Internal error in ChangeXMPPAccountAction:", e); //$NON-NLS-1$
+            log.error("Internal error in ChangeXMPPAccountAction:", e);
         }
     }
 
+    @Override
     public void dispose() {
-        // Auto-generated method
+        // NOP
     }
 
+    @Override
     public Menu getMenu(Menu parent) {
-        // Auto-generated method
         return null;
     }
 

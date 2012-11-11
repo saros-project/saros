@@ -281,8 +281,7 @@ public class Saros extends AbstractUIPlugin {
         upnpService.init(new UPnPAccessImpl(), getPreferenceStore());
 
         // determine if auto-connect can and should be performed
-        if (getPreferenceStore().getBoolean(PreferenceConstants.AUTO_CONNECT)
-            && !sarosContext.getComponent(XMPPAccountStore.class).isEmpty()
+        if (preferenceUtils.isAutoConnecting() && !xmppAccountStore.isEmpty()
             && StatisticManagerConfiguration.hasStatisticAgreement(this)
             && ErrorLogManager.hasErrorLogAgreement(this)) {
             asyncConnect();
@@ -595,28 +594,38 @@ public class Saros extends AbstractUIPlugin {
     }
 
     /**
-     * Connects using the credentials from the preferences. If no credentials
-     * are present a wizard is opened before. It uses TLS if possible.
+     * Connects using the active account from the {@link XMPPAccountStore}. If
+     * no active account is present a wizard is opened before.
      * 
      * If there is already an established connection when calling this method,
      * it disconnects before connecting (including state transitions!).
      * 
+     * @param failSilently
+     *            if set to <code>true</code> a connection failure will not be
+     *            reported to the user
      * @blocking
+     * @see XMPPAccountStore#setAccountActive(XMPPAccount)
      */
     public void connect(boolean failSilently) {
 
-        // check if we need to do a re-inject
-        if (preferenceUtils == null)
-            sarosContext.reinject(this);
+        /*
+         * the Saros Configuration Wizard may call this again when invoking the
+         * configureXMPPAccount method call, so abort here to prevent an already
+         * logged in error
+         */
 
-        sarosNet.setSettings(preferenceUtils.isDebugEnabled(),
-            preferenceUtils.isLocalSOCKS5ProxyEnabled(),
-            preferenceUtils.getFileTransferPort(), preferenceUtils.getStunIP(),
-            preferenceUtils.getStunPort(),
-            preferenceUtils.isAutoPortmappingEnabled());
+        // FIXME this "logic" should not be done here !
 
-        if (xmppAccountStore.isEmpty() && !configureXMPPAccount())
-            return;
+        if (xmppAccountStore.isEmpty()) {
+            boolean configured = /*
+                                  * side effect to:
+                                  * preferenceUtils.isAutoConnecting()
+                                  */configureXMPPAccount();
+
+            if (!configured
+                || (configured && preferenceUtils.isAutoConnecting()))
+                return;
+        }
 
         XMPPAccount account = xmppAccountStore.getActiveAccount();
 
@@ -638,16 +647,16 @@ public class Saros extends AbstractUIPlugin {
             username += "@" + domain;
         }
 
+        sarosNet.setSettings(preferenceUtils.isDebugEnabled(),
+            preferenceUtils.isLocalSOCKS5ProxyEnabled(),
+            preferenceUtils.getFileTransferPort(), preferenceUtils.getStunIP(),
+            preferenceUtils.getStunPort(),
+            preferenceUtils.isAutoPortmappingEnabled());
+
         try {
             getSarosNet().connect(
                 createConnectionConfiguration(domain, server, port, useTLS,
                     useSASL), username, password, failSilently);
-        } catch (IllegalArgumentException e) {
-            log.info("Illegal argument: " + e.getMessage()); //$NON-NLS-1$
-
-            Utils.popUpFailureMessage(Messages.Saros_2, e.getMessage(),
-                failSilently);
-
         } catch (XMPPException e) {
             Throwable t = e.getWrappedThrowable();
             Exception cause = (t != null) ? (Exception) t : e;
@@ -658,17 +667,15 @@ public class Saros extends AbstractUIPlugin {
             } else {
                 String question;
                 if (cause instanceof UnknownHostException) {
-                    log.info("Unknown host: " + cause); //$NON-NLS-1$
+                    log.info("Unknown host: " + cause);
 
                     question = Messages.Saros_28 + Messages.Saros_29
                         + Messages.Saros_30;
                 } else {
-                    log.info("xmpp: " + cause.getMessage(), cause); //$NON-NLS-1$
+                    log.info("xmpp: " + cause.getMessage(), cause);
 
-                    question = Messages.Saros_32
-                    // + "Server: " + this.connection.getHost() + "\n"
-                        + Messages.Saros_33 + username + "\n\n" //$NON-NLS-2$
-                        + Messages.Saros_30;
+                    question = Messages.Saros_32 + Messages.Saros_33 + username
+                        + "\n\n" + Messages.Saros_30;
                 }
                 if (Utils.popUpYesNoQuestion(Messages.Saros_36, question,
                     failSilently)) {
@@ -677,7 +684,8 @@ public class Saros extends AbstractUIPlugin {
                 }
             }
         } catch (Exception e) {
-            log.warn("Unhandled exception:", e); //$NON-NLS-1$
+            log.error("internal error while connecting to the XMPP server: "
+                + e.getMessage(), e);
             Utils.popUpFailureMessage(Messages.Saros_36, Messages.Saros_39
                 + username + Messages.Saros_40 + e.getMessage(), failSilently);
         }
