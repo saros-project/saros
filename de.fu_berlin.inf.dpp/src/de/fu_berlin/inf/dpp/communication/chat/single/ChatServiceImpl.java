@@ -155,17 +155,17 @@ public class ChatServiceImpl extends AbstractChatService {
      *         otherwise the existing {@link ChatSingleUser} is returned.
      */
     public synchronized ChatSingleUser createChat(Chat chat) {
-        ChatSingleUser createdChat = currentChats.get(chat.getParticipant());
+        JID jid = new JID(chat.getParticipant());
+        ChatSingleUser createdChat = currentChats.get(jid);
 
         if (createdChat == null) {
-            LOG.trace("creating new chat between " + userJID + " <->"
-                + chat.getParticipant());
+            LOG.trace("creating new chat between " + userJID + " <->" + jid);
 
             createdChat = new ChatSingleUser();
 
             createdChat.initChat(userJID, chat, chatStateManager);
             createdChat.setConnected(true);
-            currentChats.put(new JID(chat.getParticipant()), createdChat);
+            currentChats.put(jid, createdChat);
         }
 
         return createdChat;
