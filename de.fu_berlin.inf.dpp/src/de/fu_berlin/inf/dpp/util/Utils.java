@@ -319,34 +319,24 @@ public class Utils {
      *            {@link Utils#log} is used.
      * 
      */
-    public static Runnable wrapSafe(@Nullable Logger log,
-        final Runnable runnable) {
+    public static Runnable wrapSafe(Logger log, final Runnable runnable) {
 
-        if (log == null) {
+        if (log == null)
             log = Utils.log;
-        }
-        final Logger logToUse = log;
 
-        StackTrace tmp = null;
-        // Assign tmp = new StackTrace() iff assertions are enabled.
-        assert (tmp = new StackTrace()) != null;
-        final StackTrace stackTrace = tmp;
+        final Logger logToUse = log;
+        final StackTrace stackTrace = new StackTrace();
+
         return new Runnable() {
-            @SuppressWarnings("null")
             public void run() {
                 try {
                     runnable.run();
-                } catch (RuntimeException e) {
+                } catch (Exception e) {
                     logToUse.error("Internal Error:", e);
-                    if (stackTrace != null) {
-                        logToUse.error("Original caller:", stackTrace);
-                    }
+                    logToUse.error("Original caller:", stackTrace);
                 } catch (Error e) {
                     logToUse.error("Internal Fatal Error:", e);
-                    if (stackTrace != null) {
-                        logToUse.error("Original caller:", stackTrace);
-                    }
-
+                    logToUse.error("Original caller:", stackTrace);
                     // Re-throw errors (such as an OutOfMemoryError)
                     throw e;
                 }
