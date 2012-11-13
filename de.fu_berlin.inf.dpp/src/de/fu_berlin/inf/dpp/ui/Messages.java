@@ -173,6 +173,7 @@ public class Messages extends NLS {
     public static String EnterProjectNamePage_error_set_projectname2;
     public static String EnterProjectNamePage_error_wizard_isNull;
     public static String EnterProjectNamePage_error_wrong_name;
+    public static String EnterProjectNamePage_warning_project_artifacts_found;
     public static String EnterProjectNamePage_faq;
     public static String EnterProjectNamePage_no_matching_project;
     public static String EnterProjectNamePage_p2p_jingle_connection;

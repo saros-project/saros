@@ -1,9 +1,11 @@
 package de.fu_berlin.inf.dpp.ui.wizards.pages;
 
 import java.awt.Desktop;
+import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -14,6 +16,7 @@ import java.util.TimerTask;
 import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IMessageProvider;
@@ -57,6 +60,10 @@ public class EnterProjectNamePage extends WizardPage {
     /*
      * IMPORTANT: for every Map in this class that the key is the projectID.
      * Exceptions from that rule have to be declared!
+     * 
+     * IMPORTANT: refactor this code, make every a tab a composite with its own
+     * class to get rid of this hash map nightmare! The code is currently hardly
+     * maintainable!
      */
 
     private static final Logger log = Logger
@@ -153,14 +160,14 @@ public class EnterProjectNamePage extends WizardPage {
             else
                 setDescription(Messages.EnterProjectNamePage_description_file_transfer);
             setImageDescriptor(ImageManager
-                .getImageDescriptor("icons/wizban/socks5m.png")); //$NON-NLS-1$
+                .getImageDescriptor("icons/wizban/socks5m.png"));
             break;
 
         case SOCKS5:
         case SOCKS5_DIRECT:
             setDescription(Messages.EnterProjectNamePage_description_direct_filetranfser);
             setImageDescriptor(ImageManager
-                .getImageDescriptor("icons/wizban/socks5.png")); //$NON-NLS-1$
+                .getImageDescriptor("icons/wizban/socks5.png"));
             break;
 
         case NONE:
@@ -171,7 +178,7 @@ public class EnterProjectNamePage extends WizardPage {
             break;
 
         case IBB:
-            String speedInfo = ""; //$NON-NLS-1$
+            String speedInfo = "";
 
             if (preferenceUtils.forceFileTranserByChat()) {
 
@@ -217,10 +224,10 @@ public class EnterProjectNamePage extends WizardPage {
                         flashState = !flashState;
                         if (flashState)
                             setImageDescriptor(ImageManager
-                                .getImageDescriptor("icons/wizban/ibb.png")); //$NON-NLS-1$
+                                .getImageDescriptor("icons/wizban/ibb.png"));
                         else
                             setImageDescriptor(ImageManager
-                                .getImageDescriptor("icons/wizban/ibbFaded.png")); //$NON-NLS-1$
+                                .getImageDescriptor("icons/wizban/ibbFaded.png"));
                     }
                 });
             }
@@ -383,7 +390,7 @@ public class EnterProjectNamePage extends WizardPage {
         setControl(composite);
 
         for (String projectID : this.remoteProjectNames.keySet()) {
-            log.debug(projectID + ": " + this.remoteProjectNames.get(projectID)); //$NON-NLS-1$
+            log.debug(projectID + ": " + this.remoteProjectNames.get(projectID));
         }
 
         for (final FileList fileList : this.fileLists) {
@@ -414,7 +421,7 @@ public class EnterProjectNamePage extends WizardPage {
             projUpd.setSelection(selection);
             this.projUpdates.put(fileList.getProjectID(), projUpd);
 
-            String newProjectName = ""; //$NON-NLS-1$
+            String newProjectName = "";
             if (selection) {
                 newProjectName = this.remoteProjectNames.get(fileList
                     .getProjectID());
@@ -471,6 +478,7 @@ public class EnterProjectNamePage extends WizardPage {
         }
     }
 
+    // NO LONGER NEEDED, PLEASE REMOVE ME !
     private void pressWizardButton(final int buttonID) {
         final int pageChangesAtStart = pageChanges;
 
@@ -567,35 +575,36 @@ public class EnterProjectNamePage extends WizardPage {
 
     /**
      * Sets page messages and disables finish button in case of the given
-     * projectname already exists. If no errors occur the finish button will be
+     * project name already exists. If no errors occur the finish button will be
      * enabled.
      * 
-     * @param newText
-     *            Projectname for which to test. Must not be null.
+     * @param projectName
+     *            project name for which to test. Must not be null.
      */
-    protected String setPageCompleteTargetProject(String newText,
+    protected String setPageCompleteTargetProject(String projectName,
         String projectID) {
 
         String errorMessage = null;
 
-        if (newText.length() == 0) {
+        if (projectName.length() == 0) {
             errorMessage = Messages.EnterProjectNamePage_set_project_name;
             this.errorProjectNames.put(projectID, errorMessage);
         } else {
-            if (EnterProjectNamePageUtils.projectNameIsUnique(newText,
+            if (EnterProjectNamePageUtils.projectNameIsUnique(projectName,
                 this.reservedProjectNames.values().toArray(new String[0]))) {
                 this.errorProjectNames.remove(projectID);
-            } else if (!EnterProjectNamePageUtils.projectNameIsUnique(newText)) {
+            } else if (!EnterProjectNamePageUtils
+                .projectNameIsUnique(projectName)) {
                 // Project with name exists already in workspace
                 errorMessage = MessageFormat.format(
                     Messages.EnterProjectNamePage_error_projectname_exists,
-                    newText);
+                    projectName);
                 this.errorProjectNames.put(projectID, errorMessage);
             } else {
                 // Project with name has already been declared
                 errorMessage = MessageFormat.format(
                     Messages.EnterProjectNamePage_error_projectname_in_use,
-                    newText);
+                    projectName);
                 this.errorProjectNames.put(projectID, errorMessage);
             }
         }
@@ -606,14 +615,15 @@ public class EnterProjectNamePage extends WizardPage {
 
     /**
      * Updates the error message if any others still exist, otherwise activates
-     * the finish button.
+     * the finish button. This method also auto updates the warning message.
      * 
      * If the project name is correct, no error message should exist and it is
      * set to null. If null and there is a fault in any of the other tabs the
      * errorMessage is replaced by one of the current errors.
      * 
      * @param errorMessage
-     *            Current error message. (the message can be null)
+     *            the error message or <code>null</code> to clear the error
+     *            message
      */
     protected void updatePageState(String errorMessage) {
         if (this.errorProjectNames.isEmpty()) {
@@ -626,6 +636,45 @@ public class EnterProjectNamePage extends WizardPage {
             setPageComplete(false);
         }
         setErrorMessage(errorMessage);
+
+        findAndReportProjectArtifacts();
+    }
+
+    /**
+     * Scans the current Eclipse Workspace for project artifacts and shows a
+     * warning message if it will find any.
+     */
+    private void findAndReportProjectArtifacts() {
+        IPath workspacePath = ResourcesPlugin.getWorkspace().getRoot()
+            .getLocation();
+
+        if (workspacePath == null)
+            return;
+
+        File workspaceDirectory = workspacePath.toFile();
+
+        List<String> dirtyProjectNames = new ArrayList<String>();
+
+        for (String projectID : remoteProjectNames.keySet()) {
+            if (isUpdateSelected(projectID))
+                continue;
+
+            String projectName = newProjectNameTexts.get(projectID).getText();
+
+            if (new File(workspaceDirectory, projectName).exists())
+                dirtyProjectNames.add(projectName);
+        }
+
+        String warningMessage = null;
+
+        if (!dirtyProjectNames.isEmpty()) {
+            warningMessage = MessageFormat.format(
+                Messages.EnterProjectNamePage_warning_project_artifacts_found,
+                Utils.join(", ", dirtyProjectNames));
+        }
+
+        setMessage(warningMessage, WARNING);
+
     }
 
     protected void updateEnabled(String projectID) {

@@ -1,6 +1,5 @@
 package de.fu_berlin.inf.dpp.invitation;
 
-import java.io.File;
 import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -716,10 +715,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
         IWorkspaceRoot workspaceRoot = ResourcesPlugin.getWorkspace().getRoot();
         final IProject project = workspaceRoot.getProject(newProjectName);
 
-        final File projectDir = new File(
-            workspaceRoot.getLocation().toString(), newProjectName);
-
-        if (projectDir.exists()) {
+        if (project.exists()) {
             throw new CoreException(new Status(IStatus.ERROR, Saros.SAROS,
                 MessageFormat.format("Project {0} already exists!",
                     newProjectName)));

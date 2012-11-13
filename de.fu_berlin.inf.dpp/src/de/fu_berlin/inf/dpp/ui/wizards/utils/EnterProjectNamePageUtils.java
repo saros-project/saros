@@ -1,14 +1,13 @@
 package de.fu_berlin.inf.dpp.ui.wizards.utils;
 
-import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.ResourcesPlugin;
 
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
@@ -18,13 +17,15 @@ public class EnterProjectNamePageUtils {
     private static final Logger log = Logger
         .getLogger(EnterProjectNamePageUtils.class);
 
-    public static PreferenceUtils preferenceUtils;
+    static PreferenceUtils preferenceUtils;
 
     /**
      * Stores the unique project ID if a project is once shared in session. This
      * is done to propose the same project directly for partial sharing.
      */
-    static List<String> alreadySharedProjectsIDs = new ArrayList<String>();
+
+    // FIXME the list should be cleared when the session is stopped
+    static List<String> alreadySharedProjectIDs = new ArrayList<String>();
 
     /**
      * 
@@ -36,151 +37,120 @@ public class EnterProjectNamePageUtils {
     }
 
     /**
-     * Tests, if the given projectname does not already exist in the current
-     * workspace. In Addition the method also accepts an array of further
-     * reserved names.
+     * Tests if the given project name does not already exist in the current
+     * workspace.
      * 
      * @param projectName
-     *            to test.
-     * @param reservedNames
-     *            Array of reserved project names. May be empty but not null.
-     * @return true, if projectName does not exist in the current workspace and
-     *         does not exist in the reservedNames
+     *            the name of the project
+     * @param reservedProjectNames
+     *            further project names that are already reserved even if the
+     *            projects do not exist
+     * @return <code>true</code> if the project name does not exist in the
+     *         current workspace and does not exist in the reserved project
+     *         names, <code>false</code> if the project name is an empty string
+     *         or the project already exists in the current workspace
      */
     public static boolean projectNameIsUnique(String projectName,
-        String... reservedNames) {
+        String... reservedProjectNames) {
 
         if (projectName == null)
-            throw new IllegalArgumentException("Illegal project name given");
+            throw new NullPointerException("projectName is null");
 
-        if (new File(ResourcesPlugin.getWorkspace().getRoot().getLocation()
-            .toFile(), projectName).exists()) {
-            if (!getProjectForName(projectName).exists()) {
-                log.warn("Eclipse does not think there is a project "
-                    + "already for the given name " + projectName
-                    + " but on the file system there is");
-            }
+        if (projectName.length() == 0)
             return false;
+
+        Set<IProject> projects = new HashSet<IProject>(
+            Arrays.asList(ResourcesPlugin.getWorkspace().getRoot()
+                .getProjects()));
+
+        for (String reservedProjectName : reservedProjectNames) {
+            projects.add(ResourcesPlugin.getWorkspace().getRoot()
+                .getProject(reservedProjectName));
         }
 
-        // Use File to compare so the comparison is case-sensitive depending on
-        // the underlying platform
-        File newProjectName = new File(projectName);
-
-        for (String reserved : reservedNames) {
-            if (new File(reserved).equals(newProjectName)) {
-                return false;
-            }
-        }
-        return true;
+        return !projects.contains(ResourcesPlugin.getWorkspace().getRoot()
+            .getProject(projectName));
     }
 
     /**
-     * Proposes a projectname based on the existing projectnames in the current
-     * workspace and based on the array reservedNames. The proposed projectname
-     * is unique.
+     * Proposes a project name based on the existing project names in the
+     * current workspace. The proposed project name is unique.
      * 
      * @see EnterProjectNamePageUtils#projectNameIsUnique
      * 
      * @param projectName
-     *            Projectname which shall be checked.
-     * @return a unique projectname based on "projectName". If "projectName" is
-     *         already unique, it will be returned without changes.
+     *            project name which shall be checked
+     * @param reservedProjectNames
+     *            additional project names that should not be returned when
+     *            finding a name proposal for a project
+     * @return a unique project name based on the original project name
      */
     public static String findProjectNameProposal(String projectName,
-        String... reservedNames) {
+        String... reservedProjectNames) {
 
-        // Start with the projects name
-        String projectProposal = projectName;
+        int idx;
 
-        // Then check with all the projects
-        IWorkspace workspace = ResourcesPlugin.getWorkspace();
-        IProject[] projects = workspace.getRoot().getProjects();
-
-        // Make String-Array from project names
-        String[] projectNames = new String[projects.length
-            + reservedNames.length];
-        for (int i = 0; i < projects.length; i++) {
-            projectNames[i] = projects[i].getName();
-        }
-        for (int i = projects.length; i < projects.length
-            + reservedNames.length; i++) {
-            projectNames[i] = reservedNames[i - projects.length];
+        for (idx = projectName.length() - 1; idx >= 0
+            && Character.isDigit(projectName.charAt(idx)); idx--) {
+            // NOP
         }
 
-        if (EnterProjectNamePageUtils.projectNameIsUnique(projectProposal,
-            projectNames)) {
-            return projectProposal;
+        String newProjectName;
 
-        } else {
-            // Name is already in use!
-            Pattern p = Pattern.compile("^(.+?)(\\d+)$");
-            Matcher m = p.matcher(projectProposal);
+        if (idx < 0)
+            newProjectName = "";
+        else
+            newProjectName = projectName.substring(0, idx + 1);
 
-            int i;
-            // Check whether the name ends in a number or not
-            if (m.find()) {
-                projectProposal = m.group(1).trim();
-                i = Integer.parseInt(m.group(2));
-            } else {
-                i = 2;
+        if (idx == projectName.length() - 1)
+            idx = 2;
+        else {
+            try {
+                idx = Integer.valueOf(projectName.substring(idx + 1));
+            } catch (NumberFormatException e) {
+                idx = 2;
             }
-
-            // Then find the next available number
-            while (!EnterProjectNamePageUtils.projectNameIsUnique(
-                projectProposal + " " + i, projectNames)) {
-                i++;
-            }
-
-            return projectProposal + " " + i;
         }
+
+        projectName = newProjectName;
+
+        while (!projectNameIsUnique(projectName, reservedProjectNames)) {
+            projectName = newProjectName + idx;
+            idx++;
+        }
+
+        return projectName;
+
     }
 
     /**
-     * This method decides whether the given Project should be automatically
-     * updated
+     * This method decides whether the given project should be automatically
+     * updated.
      * 
-     * @param remoteProjectNames
+     * @param projectName
      * 
      * @return <code>true</code> if automatically reuse of existing project is
-     *         selected in preferences and the a project with the given name
-     *         exists
+     *         selected in preferences and the project with the given name
+     *         exists or is already partial shared, <code>false</code> otherwise
      */
-    public static boolean autoUpdateProject(String id, String remoteProjectNames) {
+    public static boolean autoUpdateProject(String projectID, String projectName) {
         if (preferenceUtils == null) {
-            log.warn("preferenceUtils is null"); //$NON-NLS-1$
+            log.warn("preferenceUtils is null");
             return false;
         }
         if (preferenceUtils.isAutoReuseExisting()
-            && existsProjects(remoteProjectNames)) {
+            && ResourcesPlugin.getWorkspace().getRoot().getProject(projectName)
+                .exists()) {
             return true;
-        } else if (alreadySharedProjectsIDs.contains(id)) {
+        } else if (alreadySharedProjectIDs.contains(projectID)) {
             return true;
         } else {
-            alreadySharedProjectsIDs.add(id);
+            alreadySharedProjectIDs.add(projectID);
             return false;
         }
     }
 
     public static void setPreferenceUtils(PreferenceUtils preferenceUtils) {
         EnterProjectNamePageUtils.preferenceUtils = preferenceUtils;
-    }
-
-    /**
-     * @param projectName
-     * @return <code><b>true</b></code> if a project with the given Name exists
-     *         in the workspace
-     */
-    public static boolean existsProjects(String projectName) {
-        // Start with the projects name
-        File proposedName = new File(projectName);
-
-        // Then check with all the projects
-        IWorkspace workspace = ResourcesPlugin.getWorkspace();
-        for (IProject project : workspace.getRoot().getProjects()) {
-            if (new File(project.getName()).equals(proposedName))
-                return true;
-        }
-        return false;
     }
 }
