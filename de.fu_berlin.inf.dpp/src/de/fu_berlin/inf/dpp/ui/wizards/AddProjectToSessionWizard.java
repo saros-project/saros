@@ -46,6 +46,7 @@ import de.fu_berlin.inf.dpp.project.IChecksumCache;
 import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.ui.util.DialogUtils;
+import de.fu_berlin.inf.dpp.ui.views.SarosView;
 import de.fu_berlin.inf.dpp.ui.wizards.JoinSessionWizard.OverwriteErrorDialog;
 import de.fu_berlin.inf.dpp.ui.wizards.dialogs.WizardDialogAccessable;
 import de.fu_berlin.inf.dpp.ui.wizards.pages.EnterProjectNamePage;
@@ -264,6 +265,15 @@ public class AddProjectToSessionWizard extends Wizard {
                 try {
                     process.accept(projectNames, monitor, skipProjectSyncing,
                         useVersionControl);
+
+                    SarosView
+                        .showNotification(
+                            Messages.AddProjectToSessionWizard_synchronize_finished_notification_title,
+                            MessageFormat
+                                .format(
+                                    Messages.AddProjectToSessionWizard_synchronize_finished_notification_text,
+                                    Utils.join(", ", projectNames.values())));
+
                 } catch (SarosCancellationException e) {
                     return Status.CANCEL_STATUS;
                 } finally {
