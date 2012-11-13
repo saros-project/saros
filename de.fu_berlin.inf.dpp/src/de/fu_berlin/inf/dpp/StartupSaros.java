@@ -11,7 +11,6 @@ import de.fu_berlin.inf.dpp.accountManagement.XMPPAccountStore;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.stf.server.STFController;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
-import de.fu_berlin.inf.dpp.ui.util.WizardUtils;
 import de.fu_berlin.inf.dpp.util.Utils;
 
 /**
@@ -49,9 +48,8 @@ public class StartupSaros implements IStartup {
 
     public void earlyStartup() {
 
-        if (xmppAccountStore.isEmpty()) {
+        if (xmppAccountStore.isEmpty())
             showSarosView();
-        }
 
         Integer port = Integer.getInteger("de.fu_berlin.inf.dpp.testmode");
 
@@ -82,7 +80,6 @@ public class StartupSaros implements IStartup {
                         Messages.Saros_tutorial_title);
                 }
             });
-            WizardUtils.openSarosConfigurationWizard();
         }
     }
 
