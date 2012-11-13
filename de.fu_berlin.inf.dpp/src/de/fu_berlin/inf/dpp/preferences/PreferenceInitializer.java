@@ -79,7 +79,6 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
         prefs.setValue(PreferenceConstants.STUN, "stunserver.org");
         prefs.setValue(PreferenceConstants.STUN_PORT, 3478);
         prefs.setValue(PreferenceConstants.MILLIS_UPDATE, 300);
-        prefs.setValue(PreferenceConstants.AUTO_ACCEPT_INVITATION, false);
         prefs.setValue(PreferenceConstants.CONCURRENT_UNDO, false);
         prefs.setValue(PreferenceConstants.PING_PONG, false);
         prefs.setValue(PreferenceConstants.DISABLE_VERSION_CONTROL, false);

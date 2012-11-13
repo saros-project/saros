@@ -18,10 +18,7 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
-import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IMessageProvider;
-import org.eclipse.jface.dialogs.IPageChangingListener;
-import org.eclipse.jface.dialogs.PageChangingEvent;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
@@ -47,7 +44,6 @@ import de.fu_berlin.inf.dpp.ui.ImageManager;
 import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.ui.preferencePages.GeneralPreferencePage;
 import de.fu_berlin.inf.dpp.ui.views.SarosView;
-import de.fu_berlin.inf.dpp.ui.wizards.dialogs.WizardDialogAccessable;
 import de.fu_berlin.inf.dpp.ui.wizards.utils.EnterProjectNamePageUtils;
 import de.fu_berlin.inf.dpp.util.Utils;
 
@@ -72,7 +68,6 @@ public class EnterProjectNamePage extends WizardPage {
     protected final List<FileList> fileLists;
     protected final JID peer;
     protected final Map<String, String> remoteProjectNames;
-    protected WizardDialogAccessable wizardDialog;
 
     protected Map<String, Label> newProjectNameLabels = new HashMap<String, Label>();
 
@@ -100,13 +95,10 @@ public class EnterProjectNamePage extends WizardPage {
 
     protected Button disableVCSCheckbox;
 
-    protected int pageChanges = 0;
-
     protected DataTransferManager dataTransferManager;
 
     protected PreferenceUtils preferenceUtils;
 
-    private boolean disposed;
     protected boolean flashState;
 
     /**
@@ -119,8 +111,7 @@ public class EnterProjectNamePage extends WizardPage {
      */
     public EnterProjectNamePage(DataTransferManager dataTransferManager,
         PreferenceUtils preferenceUtils, List<FileList> fileLists, JID peer,
-        Map<String, String> remoteProjectNames,
-        WizardDialogAccessable wizardDialog) {
+        Map<String, String> remoteProjectNames) {
         super(Messages.EnterProjectNamePage_title);
         this.dataTransferManager = dataTransferManager;
         this.preferenceUtils = preferenceUtils;
@@ -128,18 +119,6 @@ public class EnterProjectNamePage extends WizardPage {
         this.remoteProjectNames = remoteProjectNames;
 
         EnterProjectNamePageUtils.setPreferenceUtils(preferenceUtils);
-
-        if (wizardDialog == null)
-            throw new NullPointerException(
-                Messages.EnterProjectNamePage_error_wizard_isNull);
-
-        this.wizardDialog = wizardDialog;
-
-        this.wizardDialog.addPageChangingListener(new IPageChangingListener() {
-            public void handlePageChanging(PageChangingEvent event) {
-                pageChanges++;
-            }
-        });
 
         this.fileLists = fileLists;
 
@@ -472,45 +451,6 @@ public class EnterProjectNamePage extends WizardPage {
         explanation.pack();
 
         updateConnectionStatus();
-
-        if (preferenceUtils.isAutoAcceptInvitation()) {
-            pressWizardButton(IDialogConstants.FINISH_ID);
-        }
-    }
-
-    // NO LONGER NEEDED, PLEASE REMOVE ME !
-    private void pressWizardButton(final int buttonID) {
-        final int pageChangesAtStart = pageChanges;
-
-        Utils.runSafeAsync(log, new Runnable() {
-            public void run() {
-                try {
-                    Thread.sleep(1000);
-                } catch (InterruptedException e) {
-                    log.error("Code not designed to be interruptable", e); //$NON-NLS-1$
-                    Thread.currentThread().interrupt();
-                    return;
-                }
-                Utils.runSafeSWTAsync(log, new Runnable() {
-                    public void run() {
-
-                        // User clicked next in the meantime
-                        if (pageChangesAtStart != pageChanges)
-                            return;
-
-                        // Dialog already closed
-                        if (disposed)
-                            return;
-
-                        // Button not enabled
-                        if (!wizardDialog.getWizardButton(buttonID).isEnabled())
-                            return;
-
-                        wizardDialog.buttonPressed(buttonID);
-                    }
-                });
-            }
-        });
     }
 
     public boolean isUpdateSelected(String projectID) {
@@ -823,12 +763,6 @@ public class EnterProjectNamePage extends WizardPage {
             return true;
         }
         return false;
-    }
-
-    @Override
-    public void dispose() {
-        this.disposed = true;
-        super.dispose();
     }
 
     @Override

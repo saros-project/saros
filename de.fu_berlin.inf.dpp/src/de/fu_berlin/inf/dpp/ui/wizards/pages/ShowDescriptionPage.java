@@ -2,7 +2,6 @@ package de.fu_berlin.inf.dpp.ui.wizards.pages;
 
 import java.text.MessageFormat;
 
-import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridLayout;
@@ -21,13 +20,11 @@ import de.fu_berlin.inf.dpp.util.VersionManager;
  */
 public class ShowDescriptionPage extends WizardPage {
 
-    private final JoinSessionWizard joinSessionWizard;
     private String description;
 
     public ShowDescriptionPage(JoinSessionWizard joinSessionWizard,
         VersionManager manager, IncomingSessionNegotiation invProcess) {
         super(Messages.ShowDescriptionPage_title);
-        this.joinSessionWizard = joinSessionWizard;
         this.description = joinSessionWizard.process.getDescription();
 
         setTitle(Messages.ShowDescriptionPage_title2);
@@ -75,9 +72,5 @@ public class ShowDescriptionPage extends WizardPage {
         inviterText.setText(this.description);
 
         setControl(composite);
-
-        if (joinSessionWizard.getPreferenceUtils().isAutoAcceptInvitation()) {
-            joinSessionWizard.pressWizardButton(IDialogConstants.NEXT_ID);
-        }
     }
 }

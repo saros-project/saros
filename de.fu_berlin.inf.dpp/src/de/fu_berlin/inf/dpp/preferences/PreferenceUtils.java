@@ -30,11 +30,6 @@ public class PreferenceUtils {
             PreferenceConstants.AUTO_REUSE_PROJECT);
     }
 
-    public boolean isAutoAcceptInvitation() {
-        return saros.getPreferenceStore().getBoolean(
-            PreferenceConstants.AUTO_ACCEPT_INVITATION);
-    }
-
     /**
      * Returns Saros's XMPP/Jabber server dns address.
      * 

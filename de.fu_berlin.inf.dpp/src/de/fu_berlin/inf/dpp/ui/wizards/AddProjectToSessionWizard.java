@@ -105,8 +105,7 @@ public class AddProjectToSessionWizard extends Wizard {
     @Override
     public void addPages() {
         this.namePage = new EnterProjectNamePage(dataTransferManager,
-            preferenceUtils, fileLists, peer, this.remoteProjectNames,
-            wizardDialog);
+            preferenceUtils, fileLists, peer, this.remoteProjectNames);
         addPage(namePage);
     }
 
