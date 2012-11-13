@@ -1237,48 +1237,6 @@
             </visibleWhen>
          </command>
       </menuContribution>
-      <menuContribution
-            allPopups="false"
-            locationURI="popup:org.eclipse.ui.popup.any?after=additions">
-         <command
-               commandId="de.fu_berlin.inf.dpp.ui.commands.SharedProjectLeave"
-               disabledIcon="icons/dlcl16/project_share_leave_tsk.png"
-               icon="icons/elcl16/project_share_leave_tsk.png"
-               label="%command.label.10"
-               style="push">
-            <visibleWhen
-                  checkEnabled="false">
-               <and>
-                  <reference
-                        definitionId="de.fu_berlin.inf.dpp.ui.definitions.isSarosSessionRunning">
-                  </reference>
-                  <not>
-                     <reference
-                           definitionId="de.fu_berlin.inf.dpp.ui.definitions.isSarosSessionHost">
-                     </reference>
-                  </not>
-               </and>
-            </visibleWhen>
-         </command>
-         <command
-               commandId="de.fu_berlin.inf.dpp.ui.commands.SharedProjectLeave"
-               disabledIcon="icons/dlcl16/project_share_terminate_tsk.png"
-               icon="icons/elcl16/project_share_terminate_tsk.png"
-               label="%command.label.11"
-               style="push">
-            <visibleWhen
-                  checkEnabled="false">
-               <and>
-                  <reference
-                        definitionId="de.fu_berlin.inf.dpp.ui.definitions.isSarosSessionRunning">
-                  </reference>
-                  <reference
-                        definitionId="de.fu_berlin.inf.dpp.ui.definitions.isSarosSessionHost">
-                  </reference>
-               </and>
-            </visibleWhen>
-         </command>
-      </menuContribution>
    </extension>
    <extension
          id="de.fu_berlin.inf.dpp.ui.definitions.isResource"
