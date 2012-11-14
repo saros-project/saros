@@ -148,9 +148,6 @@ public class UserTest {
         assertTrue(u1.isLocal());
         assertFalse(u1.isRemote());
 
-        // Human readable name should be "You" because u1 is local User
-        assertEquals("You", u1.getHumanReadableName());
-
         assertTrue(u1.isHost());
         assertFalse(u1.isClient());
     }

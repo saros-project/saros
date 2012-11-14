@@ -432,8 +432,6 @@ public interface Constants {
         .getString("group_title_create_new_xmpp_jabber_account");
 
     // Permission: Write Access
-    static public final String OWN_PARTICIPANT_NAME = Configuration
-        .getString("own_participant_name");
     public final static String READ_ONLY_ACCESS = Configuration
         .getString("read_only_access");
 

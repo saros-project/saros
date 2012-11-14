@@ -332,9 +332,8 @@ public final class SarosView extends StfRemoteObject implements ISarosView {
     public String getParticipantLabel(JID participantJID)
         throws RemoteException {
         String contactLabel;
-        if (SuperBot.getInstance().getJID().equals(participantJID)) {
-            contactLabel = OWN_PARTICIPANT_NAME;
-        } else if (SuperBot.getInstance().views().sarosView()
+
+        if (SuperBot.getInstance().views().sarosView()
             .hasNickName(participantJID)) {
 
             contactLabel = SuperBot.getInstance().views().sarosView()

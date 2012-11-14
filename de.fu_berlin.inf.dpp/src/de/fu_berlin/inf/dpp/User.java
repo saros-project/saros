@@ -281,10 +281,6 @@ public class User {
      * known, only the JID is returned.
      */
     public String getHumanReadableName() {
-
-        if (isLocal()) {
-            return Messages.User_you;
-        }
         return User.getHumanReadableName(getSarosSession().getSaros()
             .getSarosNet(), getJID());
     }
@@ -308,19 +304,11 @@ public class User {
 
     public String getShortHumanReadableName() {
 
-        if (isLocal()) {
-            return Messages.User_you;
-        }
-
-        /*
-         * TODO This should use a subscription based mechanism or cache the
-         * nick, to prevent this being called too many times
-         */
         String nickName = RosterUtils.getNickname(getSarosSession().getSaros()
             .getSarosNet(), getJID());
 
         if (nickName != null && !nickName.equals(getJID().getBase())) {
-            return nickName; //$NON-NLS-1$ //$NON-NLS-2$
+            return nickName;
         }
 
         return getJID().getName();
