@@ -5,4 +5,4 @@
  * to all other participants of the shared
  * project during the Invitation process.
  */
-package de.fu_berlin.inf.dpp.communication.muc.negotiation;
+package de.fu_berlin.inf.dpp.communication.chat.muc.negotiation;

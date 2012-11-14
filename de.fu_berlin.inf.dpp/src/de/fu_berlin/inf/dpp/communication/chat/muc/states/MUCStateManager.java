@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.communication.muc.session.states;
+package de.fu_berlin.inf.dpp.communication.chat.muc.states;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,6 +18,7 @@ import org.jivesoftware.smackx.ServiceDiscoveryManager;
 import org.jivesoftware.smackx.muc.MultiUserChat;
 import org.jivesoftware.smackx.packet.ChatStateExtension;
 
+import de.fu_berlin.inf.dpp.communication.chat.IChatListener;
 import de.fu_berlin.inf.dpp.net.JID;
 
 /**
@@ -71,12 +72,12 @@ public class MUCStateManager {
     protected Connection connection;
     protected MultiUserChat muc;
     protected ChatState lastState = null;
-    protected List<IMUCStateListener> mucStateListeners = new ArrayList<IMUCStateListener>();
+    protected List<IChatListener> stateListeners = new ArrayList<IChatListener>();
 
     /**
      * Checks every incoming {@link Message} for the {@link PacketExtension}
      * {@link MUCStateManager#CHATSTATES_FEATURE} and notifies all
-     * {@link IMUCStateListener}s in case of a {@link ChatState} change.
+     * {@link IChatListener}s in case of a {@link ChatState} change.
      */
     protected PacketListener incomingMessageInterceptor = new PacketListener() {
         public void processPacket(Packet packet) {
@@ -159,29 +160,29 @@ public class MUCStateManager {
     }
 
     /**
-     * Adds a {@link IMUCStateListener}
+     * Adds a {@link IChatListener}
      * 
-     * @param mucStateListener
+     * @param stateListener
      */
-    public void addMUCStateListener(IMUCStateListener mucStateListener) {
-        this.mucStateListeners.add(mucStateListener);
+    public void addMUCStateListener(IChatListener stateListener) {
+        this.stateListeners.add(stateListener);
     }
 
     /**
-     * Removes a {@link IMUCStateListener}
+     * Removes a {@link IChatListener}
      * 
-     * @param mucStateListener
+     * @param stateListener
      */
-    public void removeMUCStateListener(IMUCStateListener mucStateListener) {
-        this.mucStateListeners.remove(mucStateListener);
+    public void removeMUCStateListener(IChatListener stateListener) {
+        this.stateListeners.remove(stateListener);
     }
 
     /**
-     * Notify all {@link IMUCStateListener}s about a changed chat status
+     * Notify all {@link IChatListener}s about a changed chat status
      */
     public void notifyMUCStateChanged(JID sender, ChatState state) {
-        for (IMUCStateListener mucStateListener : this.mucStateListeners) {
-            mucStateListener.stateChanged(sender, state);
+        for (IChatListener stateListener : this.stateListeners) {
+            stateListener.stateChanged(sender, state);
         }
     }
 }

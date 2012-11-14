@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.communication.muc.negotiation;
+package de.fu_berlin.inf.dpp.communication.chat.muc.negotiation;
 
 import org.jivesoftware.smackx.muc.MultiUserChat;
 

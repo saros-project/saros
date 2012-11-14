@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.communication.muc.session;
+package de.fu_berlin.inf.dpp.communication.chat.muc;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.jivesoftware.smack.Chat;
@@ -17,18 +18,13 @@ import org.jivesoftware.smack.packet.Packet;
 import org.jivesoftware.smackx.ChatState;
 import org.jivesoftware.smackx.Form;
 import org.jivesoftware.smackx.FormField;
-import org.jivesoftware.smackx.muc.MultiUserChat;
 
-import de.fu_berlin.inf.dpp.communication.muc.negotiation.MUCSessionPreferences;
-import de.fu_berlin.inf.dpp.communication.muc.session.events.IMUCSessionListener;
-import de.fu_berlin.inf.dpp.communication.muc.session.history.MUCSessionHistory;
-import de.fu_berlin.inf.dpp.communication.muc.session.history.elements.MUCSessionHistoryElement;
-import de.fu_berlin.inf.dpp.communication.muc.session.history.elements.MUCSessionHistoryJoinElement;
-import de.fu_berlin.inf.dpp.communication.muc.session.history.elements.MUCSessionHistoryLeaveElement;
-import de.fu_berlin.inf.dpp.communication.muc.session.history.elements.MUCSessionHistoryMessageReceptionElement;
-import de.fu_berlin.inf.dpp.communication.muc.session.history.elements.MUCSessionHistoryStateChangeElement;
-import de.fu_berlin.inf.dpp.communication.muc.session.states.IMUCStateListener;
-import de.fu_berlin.inf.dpp.communication.muc.session.states.MUCStateManager;
+import de.fu_berlin.inf.dpp.communication.chat.AbstractChat;
+import de.fu_berlin.inf.dpp.communication.chat.ChatElement;
+import de.fu_berlin.inf.dpp.communication.chat.ChatElement.ChatElementType;
+import de.fu_berlin.inf.dpp.communication.chat.IChatListener;
+import de.fu_berlin.inf.dpp.communication.chat.muc.negotiation.MUCSessionPreferences;
+import de.fu_berlin.inf.dpp.communication.chat.muc.states.MUCStateManager;
 import de.fu_berlin.inf.dpp.net.JID;
 
 /**
@@ -38,56 +34,46 @@ import de.fu_berlin.inf.dpp.net.JID;
  * 
  * @author bkahlert
  */
-public class MUCSession {
-    private final Logger log = Logger.getLogger(MUCSession.class);
+public class MultiUserChat extends AbstractChat {
+    private final Logger log = Logger.getLogger(MultiUserChat.class);
 
     /**
-     * {@link Connection} this {@link MUCSession} uses
+     * {@link Connection} this {@link MultiUserChat} uses
      */
-    protected Connection connection;
+    private Connection connection;
 
     /**
-     * {@link MUCSessionPreferences} this {@link MUCSession} uses
+     * {@link MUCSessionPreferences} this {@link MultiUserChat} uses
      */
-    protected MUCSessionPreferences preferences;
+    private MUCSessionPreferences preferences;
 
     /**
-     * Saves whether this {@link MUCSession} instance created the
+     * Saves whether this {@link MultiUserChat} instance created the
      * {@link MultiUserChat}. This information is used for the decision whether
      * to destroy or simply leave the {@link MultiUserChat} on disconnection.
      */
-    protected boolean createdRoom;
+    private boolean createdRoom;
 
     /**
      * The encapsulated {@link MultiUserChat}
      */
-    protected MultiUserChat muc;
+    private org.jivesoftware.smackx.muc.MultiUserChat muc;
 
     /**
-     * Keeps track of all events that occur to this {@link MUCSession}
-     */
-    protected MUCSessionHistory history = new MUCSessionHistory();
-
-    /**
-     * {@link JID}s taking part at the running {@link MUCSession} with their
+     * {@link JID}s taking part at the running {@link MultiUserChat} with their
      * current {@link ChatState}
      */
-    protected HashMap<JID, ChatState> participants = new HashMap<JID, ChatState>();
-
-    /**
-     * {@link IMUCSessionListener} for events on the {@link MUCSession} level
-     */
-    protected List<IMUCSessionListener> mucSessionListeners = new ArrayList<IMUCSessionListener>();
+    private HashMap<JID, ChatState> participants = new HashMap<JID, ChatState>();
 
     /**
      * {@link MUCStateManager} used for {@link ChatState} events
      */
-    protected MUCStateManager mucStateManager;
+    private MUCStateManager mucStateManager;
 
     /**
-     * {@link IMUCStateListener} used for {@link ChatState} propagation
+     * {@link IChatListener} used for {@link ChatState} propagation
      */
-    protected IMUCStateListener mucStateListener = new IMUCStateListener() {
+    private IChatListener mucStateListener = new IChatListener() {
         public void stateChanged(JID jid, ChatState state) {
             log.debug("stateChanged fired with state: " + state.toString());
 
@@ -96,35 +82,59 @@ public class MUCSession {
                  * joined notification
                  */
                 participants.put(jid, state);
-                history.addEntry(new MUCSessionHistoryJoinElement(jid,
-                    new Date()));
-                MUCSession.this.notifyJIDJoined(jid);
+                addHistoryEntry(new ChatElement(jid, new Date(),
+                    ChatElementType.JOIN));
+                MultiUserChat.this.notifyJIDConnected(jid);
                 return;
             } else if (participants.containsKey(jid) && state == ChatState.gone) {
                 /*
                  * left notification
                  */
                 participants.remove(jid);
-                history.addEntry(new MUCSessionHistoryLeaveElement(jid,
-                    new Date()));
-                MUCSession.this.notifyJIDLeft(jid);
+                addHistoryEntry(new ChatElement(jid, new Date(),
+                    ChatElementType.LEAVE));
+                MultiUserChat.this.notifyJIDDisconnected(jid);
                 return;
             } else {
                 /*
                  * state changed notification
                  */
                 participants.put(jid, state);
-                history.addEntry(new MUCSessionHistoryStateChangeElement(jid,
-                    new Date(), state));
-                MUCSession.this.notifyJIDStateChanged(jid, state);
+                addHistoryEntry(new ChatElement(jid, new Date(), state));
+                MultiUserChat.this.notifyJIDStateChanged(jid, state);
             }
+        }
+
+        @Override
+        public void messageReceived(JID sender, String message) {
+            /* do nothing */
+        }
+
+        @Override
+        public void connected(JID jid) {
+            /* do nothing */
+        }
+
+        @Override
+        public void disconnected(JID jid) {
+            /* do nothing */
+        }
+
+        @Override
+        public void joined(JID jid) {
+            /* do nothing */
+        }
+
+        @Override
+        public void left(JID jid) {
+            /* do nothing */
         }
     };
 
     /**
      * {@link PacketListener} for processing incoming messages
      */
-    protected PacketListener packetListener = new PacketListener() {
+    private PacketListener packetListener = new PacketListener() {
         public void processPacket(Packet packet) {
             log.debug("processPacket called");
 
@@ -136,23 +146,22 @@ public class MUCSession {
 
                 JID sender = JID
                     .createFromServicePerspective(message.getFrom());
-                history.addEntry(new MUCSessionHistoryMessageReceptionElement(
-                    sender, new Date(), message.getBody()));
-                MUCSession.this.notifyJIDMessageReceived(sender,
+                addHistoryEntry(new ChatElement(message, new Date()));
+                MultiUserChat.this.notifyJIDMessageReceived(sender,
                     message.getBody());
             }
         }
     };
 
     /**
-     * Creates a new {@link MUCSession}. You need to call
-     * {@link MUCSession#connect()} in order to effectively create and join the
-     * {@link MUCSession}.
+     * Creates a new {@link MultiUserChat}. You need to call
+     * {@link MultiUserChat#connect()} in order to effectively create and join
+     * the {@link MultiUserChat}.
      * 
      * @param connection
      * @param communicationPreferences
      */
-    public MUCSession(Connection connection,
+    public MultiUserChat(Connection connection,
         MUCSessionPreferences communicationPreferences) {
         this.connection = connection;
         this.preferences = communicationPreferences;
@@ -168,6 +177,7 @@ public class MUCSession {
      *             TODO connect should be split into create and join; bkahlert
      *             2010/11/23
      */
+    @Override
     public boolean connect() throws XMPPException {
         if (preferences == null)
             throw new IllegalStateException("No comPrefs found!");
@@ -185,6 +195,7 @@ public class MUCSession {
      * @return TODO disconnect should be split into leave and destroy; bkahlert
      *         2010/11/23
      */
+    @Override
     public boolean disconnect() {
         if (this.muc == null)
             return this.createdRoom;
@@ -195,10 +206,10 @@ public class MUCSession {
          * Because no ChatState changes can be received anymore we need to
          * manually propagate them locally.
          */
-        MUCSession.this.notifyJIDLeft(this.getJID());
-        this.setState(ChatState.gone);
+        MultiUserChat.this.notifyJIDDisconnected(this.getJID());
+        this.setCurrentState(ChatState.gone);
         this.mucStateManager = null;
-        this.history.clear();
+        clearHistory();
 
         if (this.createdRoom) {
             try {
@@ -221,11 +232,12 @@ public class MUCSession {
      *             TODO connect should be split into create and join; bkahlert
      *             2010/11/23
      */
-    protected boolean createAndJoinMUC() throws XMPPException {
+    private boolean createAndJoinMUC() throws XMPPException {
         /*
          * Connect to a room
          */
-        MultiUserChat muc = new MultiUserChat(connection, preferences.getRoom());
+        org.jivesoftware.smackx.muc.MultiUserChat muc = new org.jivesoftware.smackx.muc.MultiUserChat(
+            connection, preferences.getRoom());
         boolean joined = false;
         this.createdRoom = false;
 
@@ -277,7 +289,10 @@ public class MUCSession {
         return createdRoom;
     }
 
-    protected void configureRoom() {
+    /**
+     * Create and dispatch configuration for a multi user chat room.
+     */
+    private void configureRoom() {
         try {
             log.debug("Configuring room");
             // Get the the room's configuration form
@@ -330,34 +345,12 @@ public class MUCSession {
     }
 
     /**
-     * Sends a message to all participants
-     * 
-     * @param message
-     */
-    public void sendMessage(String message) {
-        if (muc == null) {
-            log.error("MUC does not exist");
-            return;
-        }
-
-        if (message == null)
-            return;
-
-        try {
-            Message msg = muc.createMessage();
-            msg.setBody(message);
-            muc.sendMessage(msg);
-        } catch (XMPPException e) {
-            log.error("Error sending message to: " + getPreferences().getRoom());
-        }
-    }
-
-    /**
      * Sets the own {@link ChatState} and notifies all participants
      * 
      * @param state
      */
-    public void setState(ChatState state) {
+    @Override
+    public void setCurrentState(ChatState state) {
         if (muc == null) {
             log.error("MUC does not exist");
             return;
@@ -375,7 +368,7 @@ public class MUCSession {
 
     /**
      * Returns the {@link MUCSessionPreferences} used for this
-     * {@link MUCSession}
+     * {@link MultiUserChat}
      * 
      * @return
      */
@@ -388,6 +381,7 @@ public class MUCSession {
      * 
      * @return
      */
+    @Override
     public JID getJID() {
         if (this.connection == null)
             return null;
@@ -395,7 +389,7 @@ public class MUCSession {
     }
 
     /**
-     * Returns true if the {@link JID} has joined the {@link MUCSession}
+     * Returns true if the {@link JID} has joined the {@link MultiUserChat}
      * 
      * @param jid
      * @return
@@ -406,7 +400,7 @@ public class MUCSession {
 
     /**
      * Returns true if the {@link JID} used for connection has joined the
-     * {@link MUCSession}
+     * {@link MultiUserChat}
      * 
      * @return
      */
@@ -419,7 +413,8 @@ public class MUCSession {
      * 
      * @param jid
      *            the participant
-     * @return null if {@link JID} is no participant of this {@link MUCSession}
+     * @return null if {@link JID} is no participant of this
+     *         {@link MultiUserChat}
      */
     public ChatState getState(JID jid) {
         return this.participants.get(jid);
@@ -461,74 +456,67 @@ public class MUCSession {
     }
 
     /**
-     * Returns all {@link MUCSessionHistoryElement} that make up the
-     * {@link MUCSessionHistory}
+     * {@inheritDoc}
+     */
+    @Override
+    public String getTitle() {
+        return muc.getRoom();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Set<JID> getParticipants() {
+        return this.participants.keySet();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void sendMessage(String body) throws XMPPException {
+        Message message = muc.createMessage();
+        message.setBody(body);
+
+        this.sendMessage(message);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void sendMessage(Message message) throws XMPPException {
+        if (muc == null) {
+            log.error("MUC does not exist");
+            return;
+        }
+
+        if (message == null)
+            return;
+
+        this.muc.sendMessage(message);
+    }
+
+    /**
+     * {@inheritDoc}
      * 
-     * @return
+     * @return <code>null</code>
      */
-    public MUCSessionHistoryElement[] getHistory() {
-        return this.history.getEntries();
+    @Override
+    public String getThreadID() {
+        return null;
     }
 
     /**
-     * Clears the {@link MUCSessionHistory}
-     */
-    public void clearHistory() {
-        this.history.clear();
-    }
-
-    /**
-     * Adds a {@link IMUCSessionListener}
+     * {@inheritDoc}
      * 
-     * @param mucSessionListener
+     * @return <code>true</code> if Smack is connected and the room has been
+     *         joined
      */
-    public void addMUCSessionListener(IMUCSessionListener mucSessionListener) {
-        this.mucSessionListeners.add(mucSessionListener);
-    }
-
-    /**
-     * Removes a {@link IMUCSessionListener}
-     * 
-     * @param mucSessionListener
-     */
-    public void removeMUCSessionListener(IMUCSessionListener mucSessionListener) {
-        this.mucSessionListeners.remove(mucSessionListener);
-    }
-
-    /**
-     * Notify all {@link IMUCSessionListener}s about a joined {@link JID}
-     */
-    public void notifyJIDJoined(JID jid) {
-        for (IMUCSessionListener mucSessionListener : this.mucSessionListeners) {
-            mucSessionListener.joined(jid);
-        }
-    }
-
-    /**
-     * Notify all {@link IMUCSessionListener}s about a left {@link JID}
-     */
-    public void notifyJIDLeft(JID jid) {
-        for (IMUCSessionListener mucSessionListener : this.mucSessionListeners) {
-            mucSessionListener.left(jid);
-        }
-    }
-
-    /**
-     * Notify all {@link IMUCSessionListener}s about a received message
-     */
-    public void notifyJIDMessageReceived(JID sender, String message) {
-        for (IMUCSessionListener mucSessionListener : this.mucSessionListeners) {
-            mucSessionListener.messageReceived(sender, message);
-        }
-    }
-
-    /**
-     * Notify all {@link IMUCSessionListener}s about a changed {@link ChatState}
-     */
-    public void notifyJIDStateChanged(JID jid, ChatState state) {
-        for (IMUCSessionListener mucSessionListener : this.mucSessionListeners) {
-            mucSessionListener.stateChanged(jid, state);
-        }
+    @Override
+    public boolean isConnected() {
+        return connection.isConnected() && isJoined();
     }
 
 }

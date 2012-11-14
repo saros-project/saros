@@ -324,7 +324,7 @@ public class SarosView extends ViewPart {
                                 RosterEntryElement.class);
 
                         ChatControl chatControl = chatRooms
-                            .getActiveChatControl();
+                            .getSelectedChatControl();
 
                         /*
                          * TODO create links like those of the World of Warcraft

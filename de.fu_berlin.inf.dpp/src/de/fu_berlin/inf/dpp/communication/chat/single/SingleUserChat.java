@@ -21,9 +21,8 @@ import de.fu_berlin.inf.dpp.net.JID;
 /**
  * This object represents a chat with a single user.
  */
-public class ChatSingleUser extends AbstractChat {
-
-    private static final Logger LOG = Logger.getLogger(ChatSingleUser.class);
+public class SingleUserChat extends AbstractChat {
+    private static final Logger LOG = Logger.getLogger(SingleUserChat.class);
 
     private final ChatStateListener chatStateListener = new ChatStateListener() {
 
@@ -88,15 +87,17 @@ public class ChatSingleUser extends AbstractChat {
     }
 
     /**
-     * Connect/disconnect the chat which notifies the listeners what eventually
-     * leads to new {@link ChatElement}s in its {@link ChatHistory} representing
-     * this event.
+     * Notify the chat that it has been connected or disconnected which causes
+     * it to notify listeners and add {@link ChatElement}s to its
+     * {@link ChatHistory} representing the event.
      * 
      * @param isConnected
      */
     void setConnected(boolean isConnected) {
-        LOG.trace("new connection state, connected=" + isConnected);
-        this.isConnected = isConnected;
+        synchronized (SingleUserChat.this) {
+            LOG.trace("new connection state, connected=" + isConnected);
+            this.isConnected = isConnected;
+        }
 
         if (isConnected) {
             notifyJIDConnected(new JID(chat.getParticipant()));
@@ -137,7 +138,7 @@ public class ChatSingleUser extends AbstractChat {
     public void sendMessage(Message message) throws XMPPException {
         Chat currentChat;
 
-        synchronized (ChatSingleUser.this) {
+        synchronized (SingleUserChat.this) {
             currentChat = chat;
 
             chat.sendMessage(message);
@@ -176,7 +177,7 @@ public class ChatSingleUser extends AbstractChat {
     }
 
     /**
-     * This method does nothing as {@link ChatSingleUser}s are stateless despite
+     * This method does nothing as {@link SingleUserChat}s are stateless despite
      * the global connection status.
      * 
      * @return <code>true</code>
@@ -187,7 +188,7 @@ public class ChatSingleUser extends AbstractChat {
     }
 
     /**
-     * This method does nothing as {@link ChatSingleUser}s are stateless despite
+     * This method does nothing as {@link SingleUserChat}s are stateless despite
      * the global connection status.
      * 
      * @return <code>true</code>

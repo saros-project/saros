@@ -22,7 +22,7 @@ package de.fu_berlin.inf.dpp.net.internal;
 import org.joda.time.DateTime;
 
 import de.fu_berlin.inf.dpp.annotations.Component;
-import de.fu_berlin.inf.dpp.communication.muc.negotiation.MUCSessionPreferences;
+import de.fu_berlin.inf.dpp.communication.chat.muc.negotiation.MUCSessionPreferences;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 import de.fu_berlin.inf.dpp.util.VersionManager.VersionInfo;

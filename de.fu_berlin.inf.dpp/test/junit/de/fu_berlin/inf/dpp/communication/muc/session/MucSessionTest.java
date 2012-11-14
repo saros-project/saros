@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.jivesoftware.smack.Connection;
@@ -15,9 +16,10 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import de.fu_berlin.inf.dpp.communication.muc.negotiation.MUCSessionPreferences;
-import de.fu_berlin.inf.dpp.communication.muc.session.history.elements.MUCSessionHistoryElement;
-import de.fu_berlin.inf.dpp.communication.muc.session.history.elements.MUCSessionHistoryMessageReceptionElement;
+import de.fu_berlin.inf.dpp.communication.chat.ChatElement;
+import de.fu_berlin.inf.dpp.communication.chat.ChatElement.ChatElementType;
+import de.fu_berlin.inf.dpp.communication.chat.muc.MultiUserChat;
+import de.fu_berlin.inf.dpp.communication.chat.muc.negotiation.MUCSessionPreferences;
 import de.fu_berlin.inf.dpp.net.JID;
 
 public class MucSessionTest {
@@ -62,16 +64,16 @@ public class MucSessionTest {
         for (int i = 0; i < 5; i++) {
             MUCSessionPreferences preferences = createMUCPrefernce("saros_muc_test"
                 + String.valueOf(System.currentTimeMillis()));
-            MUCSession alice = new MUCSession(connectionAlice, preferences);
-            MUCSession bob = new MUCSession(connectionBob, preferences);
+            MultiUserChat alice = new MultiUserChat(connectionAlice, preferences);
+            MultiUserChat bob = new MultiUserChat(connectionBob, preferences);
 
             alice.connect();
             bob.connect();
             assertTrue(alice.isJoined());
             assertTrue(bob.isJoined());
 
-            alice.setState(ChatState.active);
-            bob.setState(ChatState.active);
+            alice.setCurrentState(ChatState.active);
+            bob.setCurrentState(ChatState.active);
 
             Set<String> messagesSendToAlice = new HashSet<String>();
             Set<String> messagesSendToBob = new HashSet<String>();
@@ -92,30 +94,30 @@ public class MucSessionTest {
             int aliceRevMessageCount = 0;
             int bobRevMessageCount = 0;
 
-            MUCSessionHistoryElement[] aliceHistory = alice.getHistory();
-            MUCSessionHistoryElement[] bobHistory = bob.getHistory();
+            List<ChatElement> aliceHistory = alice.getHistory();
+            List<ChatElement> bobHistory = bob.getHistory();
 
-            for (MUCSessionHistoryElement element : aliceHistory) {
+            for (ChatElement element : aliceHistory) {
 
                 if (!element.getSender().equals(BOB_JID))
                     continue;
 
-                if (element instanceof MUCSessionHistoryMessageReceptionElement) {
-                    String message = ((MUCSessionHistoryMessageReceptionElement) element)
-                        .getMessage();
+                if (element.getChatElementType().equals(
+                    ChatElementType.MESSAGERECEPTION)) {
+                    String message = element.getMessage().getBody();
                     assertTrue(messagesSendToAlice.contains(message));
                     aliceRevMessageCount++;
                 }
             }
 
-            for (MUCSessionHistoryElement element : bobHistory) {
+            for (ChatElement element : bobHistory) {
 
                 if (!element.getSender().equals(ALICE_JID))
                     continue;
 
-                if (element instanceof MUCSessionHistoryMessageReceptionElement) {
-                    String message = ((MUCSessionHistoryMessageReceptionElement) element)
-                        .getMessage();
+                if (element.getChatElementType().equals(
+                    ChatElementType.MESSAGERECEPTION)) {
+                    String message = element.getMessage().getBody();
                     assertTrue(messagesSendToBob.contains(message));
                     bobRevMessageCount++;
                 }

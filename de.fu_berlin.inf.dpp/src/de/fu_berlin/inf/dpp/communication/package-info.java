@@ -9,7 +9,9 @@
  * <ul>
  * <li>audio - component for realizing the Saros internal VoIP functionality</li>
  * 
- * <li>muc - component for realizing the Saros multi user chatroom (MUC) that is created for each Saros session
- * and to which all participants of a session are automatically added</li>
+ * <li>chat - component for realizing the Saros multi user chatroom (MUC) that is created for each Saros session
+ * and to which all participants of a session are automatically added, and the direct one-to-one chat (single)
+ * which is session-independent.</li>
  * </ul>
- */package de.fu_berlin.inf.dpp.communication;
+ */
+package de.fu_berlin.inf.dpp.communication;

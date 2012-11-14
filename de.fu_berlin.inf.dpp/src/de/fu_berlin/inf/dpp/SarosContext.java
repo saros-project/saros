@@ -28,11 +28,9 @@ import de.fu_berlin.inf.dpp.communication.SkypeManager;
 import de.fu_berlin.inf.dpp.communication.audio.AudioService;
 import de.fu_berlin.inf.dpp.communication.audio.AudioServiceManager;
 import de.fu_berlin.inf.dpp.communication.audio.MixerManager;
-import de.fu_berlin.inf.dpp.communication.muc.MUCManager;
-import de.fu_berlin.inf.dpp.communication.muc.negotiation.MUCSessionPreferencesNegotiatingManager;
-import de.fu_berlin.inf.dpp.communication.muc.singleton.MUCManagerSingletonWrapperChatView;
-import de.fu_berlin.inf.dpp.communication.chat.IChatService;
-import de.fu_berlin.inf.dpp.communication.chat.single.ChatServiceImpl;
+import de.fu_berlin.inf.dpp.communication.chat.muc.MultiUserChatService;
+import de.fu_berlin.inf.dpp.communication.chat.muc.negotiation.MUCSessionPreferencesNegotiatingManager;
+import de.fu_berlin.inf.dpp.communication.chat.single.SingleUserChatService;
 import de.fu_berlin.inf.dpp.concurrent.undo.UndoManager;
 import de.fu_berlin.inf.dpp.concurrent.watchdog.ConsistencyWatchdogClient;
 import de.fu_berlin.inf.dpp.concurrent.watchdog.ConsistencyWatchdogServer;
@@ -195,8 +193,8 @@ public class SarosContext implements ISarosContext {
         Component.create(EditorManager.class),
         Component.create(JDTFacade.class),
         Component.create(LocalPresenceTracker.class),
-        Component.create(MUCManager.class),
-        Component.create(MUCManagerSingletonWrapperChatView.class),
+        Component.create(MultiUserChatService.class),
+        Component.create(SingleUserChatService.class),
         Component.create(PreferenceUtils.class),
         Component.create(SarosUI.class),
         Component.create(ISarosSessionManager.class, SarosSessionManager.class),
@@ -226,9 +224,6 @@ public class SarosContext implements ISarosContext {
         Component.create(IUPnPService.class, UPnPServiceImpl.class),
         Component.create(XMPPReceiver.class),
         Component.create(XMPPTransmitter.class),
-
-        // Chat
-        Component.create(IChatService.class, ChatServiceImpl.class),
 
         // Observables
         Component.create(FileReplacementInProgressObservable.class),

@@ -23,15 +23,16 @@ import de.fu_berlin.inf.dpp.net.IConnectionListener;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.SarosNet;
 
-public class ChatServiceImpl extends AbstractChatService {
+public class SingleUserChatService extends AbstractChatService {
 
-    private static final Logger LOG = Logger.getLogger(ChatServiceImpl.class);
+    private static final Logger LOG = Logger
+        .getLogger(SingleUserChatService.class);
 
     private IConnectionListener connectionLister = new IConnectionListener() {
         @Override
         public void connectionStateChanged(Connection connection,
             ConnectionState newState) {
-            synchronized (ChatServiceImpl.this) {
+            synchronized (SingleUserChatService.this) {
                 if (newState == ConnectionState.CONNECTING) {
                     chatManager = connection.getChatManager();
                     chatManager.addChatListener(chatManagerListener);
@@ -42,7 +43,7 @@ public class ChatServiceImpl extends AbstractChatService {
                     userJID = connection.getUser();
                     updateChats();
 
-                    for (ChatSingleUser chat : currentChats.values())
+                    for (SingleUserChat chat : currentChats.values())
                         chat.setConnected(true);
 
                 } else {
@@ -54,7 +55,7 @@ public class ChatServiceImpl extends AbstractChatService {
                     chatStateManager = null;
                     connected = false;
 
-                    for (ChatSingleUser chat : currentChats.values()) {
+                    for (SingleUserChat chat : currentChats.values()) {
                         chat.setConnected(false);
                     }
                 }
@@ -66,7 +67,7 @@ public class ChatServiceImpl extends AbstractChatService {
 
         @Override
         public void chatCreated(Chat chat, boolean createdLocally) {
-            synchronized (ChatServiceImpl.this) {
+            synchronized (SingleUserChatService.this) {
                 chat.addMessageListener(messageListener);
             }
         }
@@ -83,12 +84,12 @@ public class ChatServiceImpl extends AbstractChatService {
                     + chat.getParticipant() + ", created local: " + false);
 
                 JID jid = new JID(chat.getParticipant());
-                ChatSingleUser createdChat = currentChats.get(jid);
+                SingleUserChat singleUserChat = currentChats.get(jid);
 
                 boolean exists = true;
-                if (createdChat == null) {
+                if (singleUserChat == null) {
                     exists = false;
-                    createdChat = createChat(chat);
+                    singleUserChat = createChat(chat);
 
                     /*
                      * The SUC has registered for messages now. As this happened
@@ -96,7 +97,7 @@ public class ChatServiceImpl extends AbstractChatService {
                      * receive the current, first message. Thus, we have to add
                      * it manually.
                      */
-                    createdChat.addHistoryEntry(new ChatElement(message,
+                    singleUserChat.addHistoryEntry(new ChatElement(message,
                         new Date()));
                 }
 
@@ -106,13 +107,13 @@ public class ChatServiceImpl extends AbstractChatService {
                     return;
                 }
 
-                notifyChatCreated(createdChat, false);
+                notifyChatCreated(singleUserChat, false);
             }
         }
 
     };
 
-    private Map<JID, ChatSingleUser> currentChats = new HashMap<JID, ChatSingleUser>();
+    private Map<JID, SingleUserChat> currentChats = new HashMap<JID, SingleUserChat>();
 
     private ChatManager chatManager;
     private ChatStateManager chatStateManager;
@@ -120,25 +121,26 @@ public class ChatServiceImpl extends AbstractChatService {
     private String userJID;
     private boolean connected;
 
-    public ChatServiceImpl(SarosNet sarosNet) {
+    public SingleUserChatService(SarosNet sarosNet) {
         connected = false;
         sarosNet.addListener(connectionLister);
     }
 
     /**
-     * Create a new {@link ChatSingleUser} with the given {@link JID} as
+     * Create a new {@link SingleUserChat} with the given {@link JID} as
      * participant.
      * 
      * @param toUserJID
      *            participant of the new chat
-     * @return a new {@link ChatSingleUser} if it has not been created yet,
-     *         otherwise the existing {@link ChatSingleUser} is returned
+     * @return a new {@link SingleUserChat} if it has not been created yet,
+     *         otherwise the existing {@link SingleUserChat} is returned
      */
-    public synchronized ChatSingleUser createChat(JID toUserJID) {
+    public synchronized SingleUserChat createChat(JID toUserJID) {
         if (!connected)
             throw new IllegalStateException("not connected to a xmpp server");
 
-        ChatSingleUser chat = currentChats.get(toUserJID);
+        SingleUserChat chat = currentChats.get(toUserJID);
+
         if (chat == null) {
             chat = createChat(chatManager.createChat(toUserJID.getBase(), null));
         }
@@ -147,25 +149,25 @@ public class ChatServiceImpl extends AbstractChatService {
     }
 
     /**
-     * Creates a new {@link ChatSingleUser} with the given {@link Chat}.
+     * Creates a new {@link SingleUserChat} with the given {@link Chat}.
      * 
      * @param chat
      *            {@link Chat} which specifies the participant
-     * @return a new {@link ChatSingleUser} if it has not been created yet,
-     *         otherwise the existing {@link ChatSingleUser} is returned.
+     * @return a new {@link SingleUserChat} if it has not been created yet,
+     *         otherwise the existing {@link SingleUserChat} is returned.
      */
-    public synchronized ChatSingleUser createChat(Chat chat) {
-        JID jid = new JID(chat.getParticipant());
-        ChatSingleUser createdChat = currentChats.get(jid);
+    public synchronized SingleUserChat createChat(Chat chat) {
+        SingleUserChat createdChat = currentChats.get(chat.getParticipant());
 
         if (createdChat == null) {
-            LOG.trace("creating new chat between " + userJID + " <->" + jid);
+            LOG.trace("creating new chat between " + userJID + " <->"
+                + chat.getParticipant());
 
-            createdChat = new ChatSingleUser();
+            createdChat = new SingleUserChat();
 
             createdChat.initChat(userJID, chat, chatStateManager);
             createdChat.setConnected(true);
-            currentChats.put(jid, createdChat);
+            currentChats.put(new JID(chat.getParticipant()), createdChat);
         }
 
         return createdChat;
@@ -180,11 +182,11 @@ public class ChatServiceImpl extends AbstractChatService {
     }
 
     private synchronized void updateChats() {
-        for (ChatSingleUser chat : currentChats.values())
+        for (SingleUserChat chat : currentChats.values())
             updateChat(chat);
     }
 
-    private synchronized void updateChat(ChatSingleUser chat) {
+    private synchronized void updateChat(SingleUserChat chat) {
         LOG.trace("updating chat between " + userJID + " <->"
             + chat.getParticipants().iterator().next());
 
