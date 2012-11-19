@@ -16,7 +16,7 @@ public class SarosPluginContext {
 
     private static SarosContext sarosContext;
 
-    public static void setSarosContext(SarosContext sarosContext) {
+    static void setSarosContext(SarosContext sarosContext) {
         SarosPluginContext.sarosContext = sarosContext;
     }
 
