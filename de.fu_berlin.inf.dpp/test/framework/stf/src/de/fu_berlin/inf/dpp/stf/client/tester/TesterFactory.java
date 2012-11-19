@@ -73,10 +73,8 @@ final class TesterFactory {
             return createInvalidTester(e, name, jid, password, host, port);
         }
 
-        LOGGER
-            .info("created bot '" + name + "' with JID: " + jid
-                + ", password: " + password + ", host: " + host + ", port: "
-                + port);
+        LOGGER.info("created bot '" + name + "' with JID: " + jid + ", host: "
+            + host + ", port: " + port);
 
         return tester;
 
