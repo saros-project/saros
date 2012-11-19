@@ -43,7 +43,7 @@ import de.fu_berlin.inf.dpp.project.IChecksumCache;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.project.Messages;
-import de.fu_berlin.inf.dpp.ui.wizards.InvitationWizard;
+import de.fu_berlin.inf.dpp.ui.util.DialogUtils;
 import de.fu_berlin.inf.dpp.util.Utils;
 import de.fu_berlin.inf.dpp.util.VersionManager;
 import de.fu_berlin.inf.dpp.util.VersionManager.Compatibility;
@@ -247,10 +247,10 @@ public class OutgoingSessionNegotiation extends InvitationProcess {
                 + ": Saros is not supported or User is offline.");
 
             if (!discoveryManager.isOnline(peer)) {
-                InvitationWizard.notifyUserOffline(peer);
+                DialogUtils.notifyUserOffline(peer);
                 localCancel(null, CancelOption.DO_NOT_NOTIFY_PEER);
                 throw new LocalCancellationException();
-            } else if (!InvitationWizard.confirmUnsupportedSaros(peer)) {
+            } else if (!DialogUtils.confirmUnsupportedSaros(peer)) {
                 localCancel(null, CancelOption.DO_NOT_NOTIFY_PEER);
                 throw new LocalCancellationException();
             }
@@ -295,7 +295,7 @@ public class OutgoingSessionNegotiation extends InvitationProcess {
             } else {
                 log.debug("Inv" + Utils.prefix(peer)
                     + ": Saros versions are not compatible.");
-                if (InvitationWizard.confirmVersionConflict(versionInfo, peer,
+                if (DialogUtils.confirmVersionConflict(versionInfo, peer,
                     versionManager.getVersion()))
                     this.versionInfo = versionInfo;
                 else {
@@ -306,7 +306,7 @@ public class OutgoingSessionNegotiation extends InvitationProcess {
         } else {
             log.debug("Inv" + Utils.prefix(peer)
                 + ": Unable to obtain peer's version information.");
-            if (!InvitationWizard.confirmUnknownVersion(peer,
+            if (!DialogUtils.confirmUnknownVersion(peer,
                 versionManager.getVersion()))
                 localCancel(null, CancelOption.DO_NOT_NOTIFY_PEER);
         }

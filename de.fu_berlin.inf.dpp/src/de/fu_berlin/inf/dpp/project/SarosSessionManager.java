@@ -39,14 +39,11 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.jface.wizard.WizardDialog;
-import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.progress.IProgressConstants;
 import org.jivesoftware.smack.Connection;
 import org.jivesoftware.smack.XMPPException;
 import org.joda.time.DateTime;
 import org.picocontainer.annotations.Inject;
-import org.picocontainer.annotations.Nullable;
 
 import de.fu_berlin.inf.dpp.FileList;
 import de.fu_berlin.inf.dpp.Saros;
@@ -56,7 +53,6 @@ import de.fu_berlin.inf.dpp.activities.ProjectExchangeInfo;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.communication.chat.muc.negotiation.MUCSessionPreferences;
 import de.fu_berlin.inf.dpp.communication.chat.muc.negotiation.MUCSessionPreferencesNegotiatingManager;
-import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
 import de.fu_berlin.inf.dpp.exceptions.RemoteCancellationException;
 import de.fu_berlin.inf.dpp.invitation.IncomingProjectNegotiation;
@@ -78,7 +74,6 @@ import de.fu_berlin.inf.dpp.project.internal.SarosSession;
 import de.fu_berlin.inf.dpp.ui.ImageManager;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
 import de.fu_berlin.inf.dpp.ui.views.SarosView;
-import de.fu_berlin.inf.dpp.ui.wizards.InvitationWizard;
 import de.fu_berlin.inf.dpp.util.StackTrace;
 import de.fu_berlin.inf.dpp.util.Utils;
 import de.fu_berlin.inf.dpp.util.VersionManager;
@@ -367,30 +362,6 @@ public class SarosSessionManager implements ISarosSessionManager {
             }
 
         });
-    }
-
-    public void openInviteDialog(final @Nullable List<JID> toInvite) {
-        final ISarosSession sarosSession = sarosSessionObservable.getValue();
-
-        Utils.runSafeSWTAsync(log, new Runnable() {
-            public void run() {
-                // Instantiates and initializes the wizard
-                InvitationWizard wizard = new InvitationWizard(sarosNet,
-                    sarosSession, rosterTracker, discoveryManager,
-                    SarosSessionManager.this, versionManager,
-                    invitationProcesses);
-
-                // Instantiates the wizard container with the wizard and opens
-                // it
-                Shell dialogShell = EditorAPI.getShell();
-                if (dialogShell == null)
-                    dialogShell = new Shell();
-                WizardDialog dialog = new WizardDialog(dialogShell, wizard);
-                dialog.create();
-                dialog.open();
-            }
-        });
-
     }
 
     @Override
