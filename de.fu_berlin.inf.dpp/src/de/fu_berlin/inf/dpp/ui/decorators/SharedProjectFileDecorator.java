@@ -44,6 +44,7 @@ import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.editor.AbstractSharedEditorListener;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.editor.ISharedEditorListener;
+import de.fu_berlin.inf.dpp.editor.RemoteEditorManager;
 import de.fu_berlin.inf.dpp.project.AbstractSarosSessionListener;
 import de.fu_berlin.inf.dpp.project.AbstractSharedProjectListener;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
@@ -245,7 +246,23 @@ public class SharedProjectFileDecorator implements ILightweightLabelDecorator {
             if (!session.isShared(resource))
                 return false;
 
-            Set<SPath> openRemoteEditors = editorManager.getRemoteOpenEditors();
+            Set<SPath> openRemoteEditors;
+
+            /*
+             * this may cause a NPE although it would not matter because this
+             * only happens when the session already ended and so this method is
+             * 1. be called again even if the NPE happens 2. returns false in
+             * case of an exception
+             */
+            // openRemoteEditors = editorManager.getRemoteOpenEditors();
+
+            RemoteEditorManager remoteEditorManager = editorManager
+                .getRemoteEditorManager();
+
+            if (remoteEditorManager == null)
+                openRemoteEditors = new HashSet<SPath>();
+            else
+                openRemoteEditors = remoteEditorManager.getRemoteOpenEditors();
 
             // TODO refactor the body of these to loops to a method
             for (SPath path : openRemoteEditors) {
