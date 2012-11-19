@@ -220,10 +220,10 @@ public class ChatControl extends Composite {
 
                 @Override
                 public void run() {
-                    if (!isOwnJID(jid)) {
-                        addChatLine(new ChatElement(jid, new Date(),
-                            ChatElementType.JOIN));
-                    } else {
+                    addChatLine(new ChatElement(jid, new Date(),
+                        ChatElementType.JOIN));
+
+                    if (isOwnJID(jid)) {
                         chatInput.setEnabled(true);
                     }
                 }
@@ -236,10 +236,10 @@ public class ChatControl extends Composite {
 
                 @Override
                 public void run() {
-                    if (!isOwnJID(jid)) {
-                        addChatLine(new ChatElement(jid, new Date(),
-                            ChatElementType.LEAVE));
-                    } else {
+                    addChatLine(new ChatElement(jid, new Date(),
+                        ChatElementType.LEAVE));
+
+                    if (isOwnJID(jid)) {
                         chatInput.setEnabled(false);
                     }
                 }

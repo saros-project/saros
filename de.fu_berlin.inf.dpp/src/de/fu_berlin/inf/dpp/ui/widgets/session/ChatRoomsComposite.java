@@ -131,6 +131,7 @@ public class ChatRoomsComposite extends ListExplanatoryComposite {
     };
 
     protected ISarosSessionListener sessionListener = new AbstractSarosSessionListener() {
+        IChat sessionChat;
 
         @Override
         public void sessionStarting(final ISarosSession session) {
@@ -144,8 +145,7 @@ public class ChatRoomsComposite extends ListExplanatoryComposite {
                 public void run() {
                     isSessionRunning = true;
 
-                    IChat sessionChat = multiUserChatService
-                        .createChat(session);
+                    sessionChat = multiUserChatService.createChat(session);
                     ChatRoomsComposite.this.openChat(sessionChat, false);
                 }
             });
@@ -160,6 +160,8 @@ public class ChatRoomsComposite extends ListExplanatoryComposite {
 
                     if (ChatRoomsComposite.this.isDisposed())
                         return;
+
+                    closeChatTab(sessionChat);
 
                     if (chatError == null)
                         return;
@@ -212,7 +214,7 @@ public class ChatRoomsComposite extends ListExplanatoryComposite {
 
         @Override
         public void chatDestroyed(IChat chat) {
-            /* do nothing */
+            closeChatTab(chat);
         }
 
         @Override
@@ -344,6 +346,21 @@ public class ChatRoomsComposite extends ListExplanatoryComposite {
         }
 
         return null;
+    }
+
+    private boolean closeChatTab(IChat chat) {
+        CTabItem tab = getChatTab(chat);
+        if (tab != null && !tab.isDisposed()) {
+            tab.dispose();
+
+            if (chatRooms.getItemCount() == 0) {
+                showExplanation(howTo);
+            }
+
+            return true;
+        }
+
+        return false;
     }
 
     private boolean selectExistentTab(IChat chat) {

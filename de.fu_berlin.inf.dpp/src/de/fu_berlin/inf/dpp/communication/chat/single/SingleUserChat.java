@@ -15,6 +15,7 @@ import org.jivesoftware.smackx.ChatStateManager;
 
 import de.fu_berlin.inf.dpp.communication.chat.AbstractChat;
 import de.fu_berlin.inf.dpp.communication.chat.ChatElement;
+import de.fu_berlin.inf.dpp.communication.chat.ChatElement.ChatElementType;
 import de.fu_berlin.inf.dpp.communication.chat.ChatHistory;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.SarosNet;
@@ -107,6 +108,18 @@ public class SingleUserChat extends AbstractChat {
             LOG.trace("new connection state, connected=" + isConnected);
             this.isConnected = isConnected;
             participant = new JID(chat.getParticipant());
+        }
+
+        if (isConnected) {
+            addHistoryEntry(new ChatElement(participant, new Date(),
+                ChatElementType.JOIN));
+            addHistoryEntry(new ChatElement(this.getJID(), new Date(),
+                ChatElementType.JOIN));
+        } else {
+            addHistoryEntry(new ChatElement(this.getJID(), new Date(),
+                ChatElementType.LEAVE));
+            addHistoryEntry(new ChatElement(participant, new Date(),
+                ChatElementType.LEAVE));
         }
 
         if (isConnected) {

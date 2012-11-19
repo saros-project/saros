@@ -45,16 +45,6 @@ public abstract class AbstractChat implements IChat {
     @Override
     public void addChatListener(IChatListener chatListener) {
         chatListeners.add(chatListener);
-
-        if (isConnected()) {
-            for (JID jid : getParticipants()) {
-                chatListener.connected(jid);
-            }
-        } else {
-            for (JID jid : getParticipants()) {
-                chatListener.disconnected(jid);
-            }
-        }
     }
 
     /**
