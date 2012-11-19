@@ -307,7 +307,7 @@ public class ChatRoomsComposite extends ListExplanatoryComposite {
 
     private CTabItem createChatTab(IChat chat) {
         ChatControl control = new ChatControl(this, chat, chatRooms,
-            SWT.BORDER, WHITE, WHITE, 2);
+            SWT.BORDER, WHITE, 2);
 
         CTabItem chatTab = new CTabItem(chatRooms, SWT.CLOSE);
         chatTab.setText(chat.getTitle());

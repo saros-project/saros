@@ -35,6 +35,18 @@ public class ChatInput extends Composite {
     public static final Color TEXT_COLOR = Display.getDefault().getSystemColor(
         SWT.COLOR_WIDGET_FOREGROUND);
 
+    /**
+     * Background color for an active (usable) input field.
+     */
+    private static final Color BACKGROUND_ACTIVE = Display.getDefault()
+        .getSystemColor(SWT.COLOR_WHITE);
+
+    /**
+     * Background color for an inactive (unusable) input field.
+     */
+    private static final Color BACKGROUND_INACTIVE = Display.getDefault()
+        .getSystemColor(SWT.COLOR_GRAY);
+
     protected StyledText text;
 
     public ChatInput(Composite parent, int style) {
@@ -112,6 +124,13 @@ public class ChatInput extends Composite {
     @Override
     public boolean setFocus() {
         return this.text.setFocus();
+    }
+
+    @Override
+    public void setEnabled(boolean enabled) {
+        super.setEnabled(enabled);
+
+        this.setBackground(enabled ? BACKGROUND_ACTIVE : BACKGROUND_INACTIVE);
     }
 
 }

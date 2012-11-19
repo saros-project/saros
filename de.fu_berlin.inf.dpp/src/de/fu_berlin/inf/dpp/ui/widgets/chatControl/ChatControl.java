@@ -81,7 +81,7 @@ public class ChatControl extends Composite {
      */
     protected IChatDisplayListener chatDisplayListener = new IChatDisplayListener() {
         public void chatCleared(ChatClearedEvent event) {
-            colorCache.clear();
+            clearColorCache();
 
             ChatControl.this.chat.clearHistory();
             ChatControl.this.notifyChatCleared(event);
@@ -166,7 +166,6 @@ public class ChatControl extends Composite {
             // color cache and use the pre-session colors again.
             refreshFromHistoryInSWT();
         }
-
     };
 
     private IChatListener chatListener = new IChatListener() {
@@ -265,7 +264,7 @@ public class ChatControl extends Composite {
 
     public ChatControl(ChatRoomsComposite chatRooms, IChat chat,
         Composite parent, int style, Color displayBackgroundColor,
-        Color inputBackgroundColor, final int minVisibleInputLines) {
+        final int minVisibleInputLines) {
         super(parent, style & ~SWT.BORDER);
 
         SarosPluginContext.initComponent(this);
@@ -288,6 +287,7 @@ public class ChatControl extends Composite {
         // ChatInput
         this.chatInput = new ChatInput(sashForm, chatInputStyle);
         this.chatInput.addKeyListener(this.chatInputListener);
+        this.chatInput.setEnabled(true);
 
         /*
          * Updates SashForm weights to emulate a fixed ChatInput height
@@ -336,7 +336,7 @@ public class ChatControl extends Composite {
     public void refreshFromHistory() {
         List<ChatElement> entries = chat.getHistory();
 
-        ChatControl.colorCache.clear();
+        clearColorCache();
         silentClear();
 
         for (ChatElement element : entries) {
@@ -348,6 +348,17 @@ public class ChatControl extends Composite {
     public void dispose() {
         super.dispose();
         chat.removeChatListener(chatListener);
+        sessionManager.removeSarosSessionListener(sessionListener);
+    }
+
+    /**
+     * Clears the color cache and disposes the stored colors
+     */
+    private static void clearColorCache() {
+        for (Map.Entry<JID, Color> entry : colorCache.entrySet()) {
+            entry.getValue().dispose();
+        }
+        colorCache.clear();
     }
 
     private static final Map<JID, Color> colorCache = new HashMap<JID, Color>();
