@@ -50,7 +50,6 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.prefs.BackingStoreException;
 import org.osgi.service.prefs.Preferences;
-import org.picocontainer.PicoContainer;
 import org.picocontainer.injectors.Reinjector;
 
 import de.fu_berlin.inf.dpp.accountManagement.XMPPAccount;
@@ -342,10 +341,6 @@ public class Saros extends AbstractUIPlugin {
 
         isInitialized = false;
         setDefault(null);
-    }
-
-    public void removeChildContainer(PicoContainer child) {
-        sarosContext.removeChildContainer(child);
     }
 
     public static void setDefault(Saros newPlugin) {

@@ -98,7 +98,6 @@ import de.fu_berlin.inf.dpp.ui.widgets.ConnectionStateComposite;
 import de.fu_berlin.inf.dpp.ui.widgets.session.ChatRoomsComposite;
 import de.fu_berlin.inf.dpp.ui.widgets.viewer.rosterSession.BuddySessionDisplayComposite;
 import de.fu_berlin.inf.dpp.util.Utils;
-import de.fu_berlin.inf.dpp.util.pico.ChildContainer;
 import de.fu_berlin.inf.nebula.utils.LayoutUtils;
 
 /**
@@ -223,9 +222,6 @@ public class SarosView extends ViewPart {
 
     @Inject
     protected RosterTracker rosterTracker;
-
-    @Inject
-    protected ChildContainer container;
 
     private static volatile boolean showBalloonNotifications;
 
@@ -371,17 +367,6 @@ public class SarosView extends ViewPart {
 
         chatRooms = new ChatRoomsComposite(rightComposite, SWT.NONE,
             rosterTracker);
-
-        /*
-         * contributeToActionBars: TODO the creation of actions through the
-         * PicoContainer is an old heritage. Actions (especially new ones)
-         * should be implemented with commands and command handlers.
-         */
-
-        container.addComponent(SarosView.class, this);
-
-        // Make sure all components are registered
-        container.getComponents(Object.class);
 
         /**
          * @JTourBusStop 3, The Interface Tour:
@@ -577,15 +562,6 @@ public class SarosView extends ViewPart {
 
         rosterTracker.removeRosterListener(rosterListenerBuddys);
         openChatAction.dispose();
-
-        /*
-         * Stop container and remove it from its parent.
-         */
-        container.dispose();
-        /*
-         * Unfortunately, child.getParent is immutable, so we have to ask Saros.
-         */
-        saros.removeChildContainer(container.getDelegate());
     }
 
     /**
