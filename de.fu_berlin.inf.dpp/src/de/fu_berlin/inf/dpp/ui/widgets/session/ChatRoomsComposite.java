@@ -1,6 +1,8 @@
 package de.fu_berlin.inf.dpp.ui.widgets.session;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 
 import org.apache.log4j.Logger;
 import org.eclipse.swt.SWT;
@@ -82,15 +84,17 @@ public class ChatRoomsComposite extends ListExplanatoryComposite {
          * This method is mainly called, if the user name is changed, rebuild
          * Chat with uptodate nicknames from history
          */
-        public void entriesUpdated(Collection<String> addresses) {
-
+        public void entriesUpdated(final Collection<String> addresses) {
             Utils.runSafeSWTAsync(log, new Runnable() {
                 public void run() {
-                    if (!isDisposed()) {
-                        log.info("roster entries changed, refreshing chat history");
-                        ChatRoomsComposite.this.getSelectedChatControl()
-                            .refreshFromHistory();
+                    log.info("roster entries changed, refreshing chat tabs");
+
+                    Collection<JID> jids = new ArrayList<JID>();
+                    for (String address : addresses) {
+                        jids.add(new JID(address));
                     }
+
+                    updateChatTabs(jids);
                 }
             });
         }
@@ -361,6 +365,30 @@ public class ChatRoomsComposite extends ListExplanatoryComposite {
         }
 
         return false;
+    }
+
+    /**
+     * Update title and history for chats. A chat is updated if its participants
+     * contains any of the given {@link JID}s.
+     * 
+     * @param jids
+     *            JIDs whom the chats should be updated for
+     */
+    private void updateChatTabs(Collection<JID> jids) {
+        if (isDisposed()) {
+            return;
+        }
+
+        for (CTabItem tab : chatRooms.getItems()) {
+            IChat chat = (IChat) tab.getData();
+            ChatControl control = (ChatControl) tab
+                .getControl();
+
+            if (!Collections.disjoint(jids, chat.getParticipants())) {
+                control.refreshFromHistory();
+                tab.setText(chat.getTitle());
+            }
+        }
     }
 
     private boolean selectExistentTab(IChat chat) {
