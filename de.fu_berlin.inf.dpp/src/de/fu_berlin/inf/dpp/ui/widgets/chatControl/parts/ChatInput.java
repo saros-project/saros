@@ -129,7 +129,11 @@ public class ChatInput extends Composite {
     @Override
     public void setEnabled(boolean enabled) {
         super.setEnabled(enabled);
-
+        if (enabled) {
+            this.showHint();
+        } else {
+            this.hideHint();
+        }
         this.setBackground(enabled ? BACKGROUND_ACTIVE : BACKGROUND_INACTIVE);
     }
 
