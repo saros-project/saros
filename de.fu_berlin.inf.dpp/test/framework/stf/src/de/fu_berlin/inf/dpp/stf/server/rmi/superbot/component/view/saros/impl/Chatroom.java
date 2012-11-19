@@ -37,6 +37,20 @@ public final class Chatroom extends StfRemoteObject implements IChatroom {
         }
     }
 
+    @Override
+    public void enterChatMessage(String message) throws RemoteException {
+        RemoteWorkbenchBot.getInstance().activateWorkbench();
+        SarosSWTBotChatInput chatInput = new SarosSWTBot().chatInput();
+        chatInput.typeText(message);
+    }
+
+    @Override
+    public void clearChatMessage() throws RemoteException {
+        RemoteWorkbenchBot.getInstance().activateWorkbench();
+        SarosSWTBotChatInput chatInput = new SarosSWTBot().chatInput();
+        chatInput.setText("");
+    }
+
     public void sendChatMessage() throws RemoteException {
         RemoteWorkbenchBot.getInstance().activateWorkbench();
         SarosSWTBotChatInput chatInput = new SarosSWTBot().chatInput();
@@ -44,13 +58,17 @@ public final class Chatroom extends StfRemoteObject implements IChatroom {
     }
 
     public void sendChatMessage(String message) throws RemoteException {
-
         RemoteWorkbenchBot.getInstance().activateWorkbench();
         SarosSWTBotChatInput chatInput = new SarosSWTBot().chatInput();
         chatInput.setText(message);
-        log.debug("inserted message in chat view: " + chatInput.getText());
         // chatInput.pressShortcut(Keystrokes.LF);
         chatInput.pressEnterKey();
+    }
+
+    public String getChatMessage() throws RemoteException {
+        RemoteWorkbenchBot.getInstance().activateWorkbench();
+        SarosSWTBotChatInput chatInput = new SarosSWTBot().chatInput();
+        return chatInput.getText();
     }
 
     public String getUserNameOnChatLinePartnerChangeSeparator()

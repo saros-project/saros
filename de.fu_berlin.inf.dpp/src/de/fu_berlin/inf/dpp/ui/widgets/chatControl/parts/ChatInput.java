@@ -49,42 +49,33 @@ public class ChatInput extends Composite {
 
     protected StyledText text;
 
+    protected boolean isHintShown;
+
     public ChatInput(Composite parent, int style) {
         super(parent, SWT.NONE);
-        this.setLayout(new FillLayout());
+        setLayout(new FillLayout());
 
-        this.text = new StyledText(this, style);
+        text = new StyledText(this, style);
 
-        /*
-         * Show/hide the hint appropriately
-         */
-        this.text.addFocusListener(new FocusListener() {
+        text.addFocusListener(new FocusListener() {
             public void focusLost(FocusEvent e) {
-                String message = ChatInput.this.text.getText();
-                if (message.equals("")) { //$NON-NLS-1$
-                    ChatInput.this.showHint();
-                }
+                if (text.getText().length() == 0)
+                    showHint();
             }
 
             public void focusGained(FocusEvent e) {
-                String message = ChatInput.this.text.getText();
-                ChatInput.this.hideHint();
-
-                /*
-                 * Hide clears the text; we need to recover the text
-                 */
-                if (!message.equals(HINT_TEXT))
-                    ChatInput.this.setText(message);
+                if (isHintShown)
+                    hideHint();
             }
         });
 
-        this.showHint();
+        showHint();
     }
 
     @Override
     public void setBackground(Color color) {
         super.setBackground(color);
-        this.text.setBackground(color);
+        text.setBackground(color);
     }
 
     @Override
@@ -93,13 +84,15 @@ public class ChatInput extends Composite {
     }
 
     protected void showHint() {
-        this.text.setForeground(HINT_COLOR);
-        this.text.setText(HINT_TEXT);
+        text.setForeground(HINT_COLOR);
+        text.setText(HINT_TEXT);
+        isHintShown = true;
     }
 
     protected void hideHint() {
-        this.text.setForeground(TEXT_COLOR);
-        this.text.setText(""); //$NON-NLS-1$
+        text.setForeground(TEXT_COLOR);
+        text.setText("");
+        isHintShown = false;
     }
 
     /**
@@ -123,18 +116,18 @@ public class ChatInput extends Composite {
 
     @Override
     public boolean setFocus() {
-        return this.text.setFocus();
+        return text.setFocus();
     }
 
     @Override
     public void setEnabled(boolean enabled) {
         super.setEnabled(enabled);
-        if (enabled) {
-            this.showHint();
-        } else {
-            this.hideHint();
-        }
-        this.setBackground(enabled ? BACKGROUND_ACTIVE : BACKGROUND_INACTIVE);
-    }
 
+        if (enabled)
+            showHint();
+        else
+            hideHint();
+
+        setBackground(enabled ? BACKGROUND_ACTIVE : BACKGROUND_INACTIVE);
+    }
 }

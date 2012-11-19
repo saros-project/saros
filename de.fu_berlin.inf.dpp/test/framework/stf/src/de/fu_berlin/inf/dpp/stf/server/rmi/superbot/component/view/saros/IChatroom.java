@@ -9,11 +9,29 @@ public interface IChatroom extends Remote {
         throws RemoteException;
 
     /**
+     * Enters the given message at the current cursor position of the chat
+     * input.
+     * 
+     * @param message
+     *            the message to insert
+     * @throws RemoteException
+     */
+    public void enterChatMessage(String message) throws RemoteException;
+
+    /**
+     * Clears the chat input.
+     * 
+     * @throws RemoteException
+     */
+    public void clearChatMessage() throws RemoteException;
+
+    /**
      * Sends the current content of the chat input to the chat server by
      * pressing the ENTER key.
      * 
      * @throws RemoteException
      */
+
     public void sendChatMessage() throws RemoteException;
 
     /**
@@ -24,6 +42,14 @@ public interface IChatroom extends Remote {
      * @throws RemoteException
      */
     public void sendChatMessage(String message) throws RemoteException;
+
+    /**
+     * Returns the current unsent chat message of the chat input.
+     * 
+     * @return the current unsent chat message
+     * @throws RemoteException
+     */
+    public String getChatMessage() throws RemoteException;
 
     public String getUserNameOnChatLinePartnerChangeSeparator()
         throws RemoteException;
