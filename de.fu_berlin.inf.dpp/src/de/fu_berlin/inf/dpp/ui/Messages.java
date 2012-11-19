@@ -8,8 +8,6 @@ public class Messages extends NLS {
     public static String AddBuddyWizardPage_nickname;
     public static String AddBuddyWizardPage_optional;
     public static String AddProjectToSessionWizard_delete_local_changes;
-    public static String AddProjectToSessionWizard_error_filelist;
-    public static String AddProjectToSessionWizard_error_local_filelist;
     public static String AddProjectToSessionWizard_file_added;
     public static String AddProjectToSessionWizard_file_overwritten;
     public static String AddProjectToSessionWizard_file_toRemove;
@@ -18,7 +16,6 @@ public class Messages extends NLS {
     public static String AddProjectToSessionWizard_invitation_cancelled_text;
     public static String AddProjectToSessionWizard_invitation_cancelled_text2;
     public static String AddProjectToSessionWizard_invitation_cancelled_text3;
-    public static String AddProjectToSessionWizard_job_synchronizing;
     public static String AddProjectToSessionWizard_leave_session;
     public static String AddProjectToSessionWizard_leave_session_text;
     public static String AddProjectToSessionWizard_synchronize_projects;
@@ -30,11 +27,8 @@ public class Messages extends NLS {
     public static String AddXMPPAccountWizard_account_created;
     public static String AddXMPPAccountWizard_account_created_text;
     public static String AddXMPPAccountWizard_title;
-    public static String AdvancedPreferencePage_auto_accept_invite;
-    public static String AdvancedPreferencePage_auto_accept_invite_info;
     public static String AdvancedPreferencePage_description;
     public static String AdvancedPreferencePage_interval_between_editings;
-    public static String AdvancedPreferencePage_invitation;
     public static String AdvancedPreferencePage_peer_update;
     public static String AdvancedPreferencePage_ping_pong;
     public static String AdvancedPreferencePage_show_xmpp_debug;
@@ -60,15 +54,10 @@ public class Messages extends NLS {
     public static String ChatLineSeparator_date_formatter_pattern;
     public static String ChatRoomsComposite_joined_the_chat;
     public static String ChatRoomsComposite_left_the_chat;
-    public static String ChatRoomsComposite_method1;
-    public static String ChatRoomsComposite_method2;
-    public static String ChatRoomsComposite_method3;
     public static String ChatRoomsComposite_roundtable;
-    public static String ChatRoomsComposite_share_projects;
 
     /* chat */
     public static String OpenChatAction_MenuItem;
-    public static String OpenChatAction_tooltip;
 
     public static String CollaborationUtils_confirm_closing;
     public static String CollaborationUtils_confirm_closing_text;
@@ -159,11 +148,6 @@ public class Messages extends NLS {
     public static String EditXMPPAccountWizardPage_description;
     public static String EditXMPPAccountWizardPage_title;
 
-    public static String EnterProjectNamePageUtils_illegal_project_name;
-    public static String EnterProjectNamePageUtils_monitar_scanning;
-    public static String EnterProjectNamePageUtils_scan_error;
-    public static String EnterProjectNamePageUtils_scan_error_text;
-
     public static String EnterProjectNamePage_browse;
     public static String EnterProjectNamePage_create_copy;
     public static String EnterProjectNamePage_create_new_project;
@@ -175,18 +159,11 @@ public class Messages extends NLS {
     public static String EnterProjectNamePage_error_browser_open;
     public static String EnterProjectNamePage_error_projectname_exists;
     public static String EnterProjectNamePage_error_set_projectname2;
-    public static String EnterProjectNamePage_error_wizard_isNull;
     public static String EnterProjectNamePage_error_wrong_name;
     public static String EnterProjectNamePage_warning_project_artifacts_found;
     public static String EnterProjectNamePage_faq;
-    public static String EnterProjectNamePage_no_matching_project;
-    public static String EnterProjectNamePage_p2p_jingle_connection;
     public static String EnterProjectNamePage_project_name;
-    public static String EnterProjectNamePage_projectA_matches_projectB;
     public static String EnterProjectNamePage_saros_url;
-    public static String EnterProjectNamePage_scan_no_result;
-    public static String EnterProjectNamePage_scan_workspace;
-    public static String EnterProjectNamePage_scan_workspace2;
     public static String EnterProjectNamePage_select_project_for_update;
     public static String EnterProjectNamePage_set_project_name;
     public static String EnterProjectNamePage_skip_synchronizing;
@@ -206,7 +183,6 @@ public class Messages extends NLS {
     public static String ErrorMessageDialog_error_plugin;
     public static String ErrorMessageDialog_error_unspecified;
     public static String Explain_version_control;
-    public static String ExplanatoryComposite_content_control_not_set;
 
     public static String GeneralPreferencePage_ACCOUNT_GROUP_TITLE;
     public static String GeneralPreferencePage_ACTIVATE_BTN_TEXT;
@@ -214,7 +190,6 @@ public class Messages extends NLS {
     public static String GeneralPreferencePage_ADD_BTN_TEXT;
     public static String GeneralPreferencePage_CHANGE_BTN_TEXT;
     public static String GeneralPreferencePage_CONCURRENT_UNDO_TEXT;
-    public static String GeneralPreferencePage_delete_active_account;
     public static String GeneralPreferencePage_DELETE_ACTIVE_TEXT;
     public static String GeneralPreferencePage_REMOVE_BTN_TEXT;
     public static String GeneralPreferencePage_DISABLE_VERSION_CONTROL_TEXT;
@@ -223,7 +198,6 @@ public class Messages extends NLS {
     public static String GeneralPreferencePage_ENABLE_NEEDS_BASED_SYNC_TEXT;
     public static String GeneralPreferencePage_GROUP_ACTIVE_LABEL;
     public static String GeneralPreferencePage_GROUP_DEACTIVE_LABEL;
-    public static String GeneralPreferencePage_no_account_selected;
     public static String GeneralPreferencePage_NO_ENTRY_SELECTED_TEXT;
     public static String GeneralPreferencePage_STARTUP_CONNECT_TEXT;
     public static String GeneralPreferencePage_REMOVE_ACCOUNT_DIALOG_TITLE;
@@ -231,16 +205,6 @@ public class Messages extends NLS {
     public static String GeneralPreferencePage_ACTIVATE_ACCOUNT_DIALOG_TITLE;
     public static String GeneralPreferencePage_ACTIVATE_ACCOUNT_DIALOG_MESSAGE;
 
-    public static String GettingStartedWizard_finish;
-    public static String GettingStartedWizard_show_again;
-    public static String GettingStartedWizard_show_again_text;
-    public static String GettingStartedWizard_step1_account;
-    public static String GettingStartedWizard_step1_account_text;
-    public static String GettingStartedWizard_step2_buddy;
-    public static String GettingStartedWizard_step2_buddy_text;
-    public static String GettingStartedWizard_step3_workTogether;
-    public static String GettingStartedWizard_step3_workTogether_text;
-    public static String GettingStartedWizard_title;
     public static String GiveWriteAccessAction_title;
     public static String GiveWriteAccessAction_tooltip;
     public static String InvitationWizard_buddy_offline;
@@ -347,16 +311,13 @@ public class Messages extends NLS {
     public static String StoppedAction_tooltip;
     // TODO names for ui.wirzard.pages
     public static String jid_example;
-    public static String jid_explanation;
     public static String jid_format_errorMessage;
     public static String jid_longform;
     public static String password_empty_errorMessage;
-    public static String xmpp_saros_restriction;
     public static String xmpp_saros_restriction_short;
     public static String roster_addself_errorMessage;
     public static String roster_alreadyadded_errorMessage;
     public static String wizard_finish_noeffect;
-    public static String server_unresolvable_errorMessage;
     public static String account_exists_errorMessage;
     public static String BuddySelectionComposite_add_buddy;
     public static String BuddySelectionComposite_hide_buddies_no_saros;
@@ -410,7 +371,6 @@ public class Messages extends NLS {
     public static String ProjectSelectionComposite_hide_closed_projects;
     public static String ProjectSelectionComposite_new_project;
     public static String ProjectSelectionWizardPage_description;
-    public static String ProjectSelectionWizardPage_projects;
     public static String ProjectSelectionWizardPage_selected_no_project;
     public static String ProjectSelectionWizardPage_title;
     public static String ProjectShareBuddies_no_buddies_online_with_saros;
@@ -420,7 +380,6 @@ public class Messages extends NLS {
     public static String RenameContactAction_rename_message;
     public static String RenameContactAction_title;
     public static String RenameContactAction_tooltip;
-    public static String ResourceSelectionComposite_hide_closed_projects;
     public static String ResourceSelectionComposite_new_project;
     public static String ResourceSelectionComposite_undo;
     public static String ResourceSelectionComposite_redo;
@@ -463,21 +422,7 @@ public class Messages extends NLS {
     public static String VoIPAction_title;
     public static String VoIPAction_warning_no_record_device_text;
     public static String VoIPAction_warning_no_record_device_title;
-    public static String CommunicationPreferencePage_audio_rate_title;
-    public static String CommunicationPreferencePage_audio_playback_device_title;
-    public static String CommunicationPreferencePage_audio_quality_title;
-    public static String CommunicationPreferencePage_audio_record_device_title;
-    public static String CommunicationPreferencePage_beep_on_im_title;
-    public static String CommunicationPreferencePage_chatgroup_title;
-    public static String CommunicationPreferencePage_chatserver_empty_message;
-    public static String CommunicationPreferencePage_chatserver_title;
-    public static String CommunicationPreferencePage_default_chatserver_title;
-    public static String CommunicationPreferencePage_description;
-    public static String CommunicationPreferencePage_dtx_transmission_title;
-    public static String CommunicationPreferencePage_skype_name_title;
     public static String CommunicationPreferencePage_unknown;
-    public static String CommunicationPreferencePage_variable_bitrate_title;
-    public static String CommunicationPreferencePage_voipgroup_title;
     public static String DeleteContactAction_confirm_message;
     public static String DeleteContactAction_confirm_title;
     public static String DeleteContactAction_delete_error_in_session;

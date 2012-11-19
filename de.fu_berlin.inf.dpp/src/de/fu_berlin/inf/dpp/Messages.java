@@ -3,10 +3,7 @@ package de.fu_berlin.inf.dpp;
 import org.eclipse.osgi.util.NLS;
 
 public class Messages extends NLS {
-    private static final String BUNDLE_NAME = "de.fu_berlin.inf.dpp.messages"; //$NON-NLS-1$
-    public static String Saros_0;
-    public static String Saros_1;
-    public static String Saros_2;
+    private static final String BUNDLE_NAME = "de.fu_berlin.inf.dpp.messages";
     public static String Saros_28;
     public static String Saros_29;
     public static String Saros_3;
