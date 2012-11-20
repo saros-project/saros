@@ -164,8 +164,7 @@ public class SubscriptionManager {
         }
 
         try {
-            connection.getRoster().createEntry(presence.getFrom(),
-                presence.getFrom(), null);
+            connection.getRoster().createEntry(presence.getFrom(), null, null);
         } catch (XMPPException e) {
             log.error("adding user to roster failed", e);
             return;
