@@ -1,6 +1,7 @@
 package de.fu_berlin.inf.dpp.stf.server.bot.widget;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 
 import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swtbot.swt.finder.ReferenceBy;
@@ -79,12 +80,17 @@ public class SarosSWTBotChatInput extends AbstractSWTBot<ChatInput> {
             public void run() {
                 try {
                     String message = styledText.widget.getText().trim();
-                    if (message.length() == 0)
-                        return;
-                    styledText.widget.setText("");
+
                     ChatControl control = (ChatControl) widget.getParent()
                         .getParent();
-                    control.notifyMessageEntered(message);
+
+                    Method sendChatMessageMethod = ChatControl.class
+                        .getDeclaredMethod("sendMessage",
+                            new Class<?>[] { String.class });
+
+                    sendChatMessageMethod.setAccessible(true);
+
+                    sendChatMessageMethod.invoke(control, message);
                 } catch (Exception e) {
                     log.error("sending chat message failed", e);
                 }
