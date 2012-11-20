@@ -13,7 +13,7 @@ import de.fu_berlin.inf.dpp.stf.client.StfTestCase;
 import de.fu_berlin.inf.dpp.stf.client.util.Util;
 import de.fu_berlin.inf.dpp.stf.shared.Constants.TypeOfCreateProject;
 
-public class OverlappingSharing extends StfTestCase {
+public class OverlappingSharingTest extends StfTestCase {
 
     @BeforeClass
     public static void selectTesters() throws Exception {
