@@ -17,10 +17,10 @@ final class TesterFactory {
         return new InvalidTester(new JID(jid == null ? "not@set.in/config"
             : jid.toString()), password == null ? "" : password.toString(),
             new RuntimeException("could not connect to RMI of bot '" + name
-                + "' with JID: " + jid + ", host: " + host + ", port: " + port
-                + ", " + exception.getMessage(), exception.getCause()
+                + "' with JID: " + jid + ", host: " + host + ", port: " + port,
+                exception)
 
-            ));
+        );
     }
 
     public synchronized static AbstractTester createTester(String name) {
