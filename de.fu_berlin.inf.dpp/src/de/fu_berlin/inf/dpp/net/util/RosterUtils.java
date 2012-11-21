@@ -28,6 +28,7 @@ import org.jivesoftware.smackx.packet.DiscoverInfo.Identity;
 import org.jivesoftware.smackx.packet.DiscoverItems;
 import org.jivesoftware.smackx.search.UserSearch;
 
+import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.SarosNet;
 import de.fu_berlin.inf.dpp.ui.util.DialogUtils;
@@ -415,9 +416,9 @@ public class RosterUtils {
             boolean discovered = sdm.discoverInfo(jid.getRAW()).getIdentities()
                 .hasNext();
 
-            if (!discovered && jid.isBareJID()) // FIXME: removed the hard coded
-                                                // suffix
-                discovered = sdm.discoverInfo(jid.getRAW() + "/Saros")
+            if (!discovered && jid.isBareJID())
+                discovered = sdm
+                    .discoverInfo(jid.getBase() + "/" + Saros.RESOURCE)
                     .getIdentities().hasNext();
 
             /*
