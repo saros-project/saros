@@ -34,9 +34,11 @@ import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.SarosNet;
 import de.fu_berlin.inf.dpp.net.util.RosterUtils;
 import de.fu_berlin.inf.dpp.project.AbstractSarosSessionListener;
+import de.fu_berlin.inf.dpp.project.AbstractSharedProjectListener;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ISarosSessionListener;
 import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
+import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
 import de.fu_berlin.inf.dpp.ui.sounds.SoundManager;
 import de.fu_berlin.inf.dpp.ui.sounds.SoundPlayer;
 import de.fu_berlin.inf.dpp.ui.widgets.chatControl.events.CharacterEnteredEvent;
@@ -138,38 +140,37 @@ public class ChatControl extends Composite {
     private ISarosSession session;
 
     private ISarosSessionListener sessionListener = new AbstractSarosSessionListener() {
-        /**
-         * Makes sure refreshing the chat is done in the SWT thread
-         */
-        private void refreshFromHistoryInSWT() {
-            Utils.runSafeSWTAsync(log, new Runnable() {
-                @Override
-                public void run() {
-                    ChatControl.this.refreshFromHistory();
-                }
-            });
-        }
 
         @Override
         public void sessionStarted(ISarosSession newSarosSession) {
             synchronized (ChatControl.this) {
                 session = newSarosSession;
+                session.addListener(projectListener);
             }
 
             // The chat contains the pre-session colors. Refresh it, to clear
             // the cache and use the in-session colors.
-            refreshFromHistoryInSWT();
+            refreshFromHistoryInSWTAsync();
         }
 
         @Override
         public void sessionEnding(ISarosSession oldSarosSession) {
             synchronized (ChatControl.this) {
+                session.removeListener(projectListener);
                 session = null;
             }
 
             // The chat contains the in-session colors. Refresh it, to clear the
             // color cache and use the pre-session colors again.
-            refreshFromHistoryInSWT();
+            refreshFromHistoryInSWTAsync();
+        }
+    };
+
+    private ISharedProjectListener projectListener = new AbstractSharedProjectListener() {
+
+        @Override
+        public void userJoined(User user) {
+            refreshFromHistoryInSWTAsync();
         }
     };
 
@@ -363,14 +364,22 @@ public class ChatControl extends Composite {
     private static final Map<JID, Color> colorCache = new HashMap<JID, Color>();
 
     public void addChatLine(ChatElement element) {
-        JID sender = element.getSender();
+        JID sender = element.getSender().getBareJID();
 
         Color color = colorCache.get(sender);
         if (color == null) {
             synchronized (ChatControl.this) {
-                if (session != null) {
-                    User user = session.getUser(sender);
 
+                User user = null;
+                if (session != null) {
+                    JID resourceQualifiedJID = session
+                        .getResourceQualifiedJID(sender);
+
+                    if (resourceQualifiedJID != null)
+                        user = session.getUser(resourceQualifiedJID);
+                }
+
+                if (user != null) {
                     // add default lightness to cached color
                     Color userColor = SarosAnnotation.getUserColor(user);
                     color = ColorUtils.addLightness(userColor,
@@ -514,4 +523,18 @@ public class ChatControl extends Composite {
     public boolean setFocus() {
         return chatInput.setFocus();
     }
+
+    /**
+     * Makes sure refreshing the chat is done in the SWT thread. Performed
+     * asynchronously to prevent dead locks.
+     */
+    private void refreshFromHistoryInSWTAsync() {
+        Utils.runSafeSWTAsync(log, new Runnable() {
+            @Override
+            public void run() {
+                refreshFromHistory();
+            }
+        });
+    }
+
 }
