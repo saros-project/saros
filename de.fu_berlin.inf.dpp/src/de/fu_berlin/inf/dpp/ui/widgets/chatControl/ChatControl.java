@@ -75,6 +75,10 @@ public class ChatControl extends Composite {
 
     private static final Logger log = Logger.getLogger(ChatControl.class);
 
+    private final Map<JID, Color> colorCache = new HashMap<JID, Color>();
+
+    private ISarosSession session;
+
     @Inject
     protected SarosNet sarosNet;
 
@@ -136,8 +140,6 @@ public class ChatControl extends Composite {
             ChatControl.this.notifyCharacterEntered(e.character);
         }
     };
-
-    private ISarosSession session;
 
     private ISarosSessionListener sessionListener = new AbstractSarosSessionListener() {
 
@@ -337,8 +339,8 @@ public class ChatControl extends Composite {
     public void refreshFromHistory() {
         List<ChatElement> entries = chat.getHistory();
 
-        clearColorCache();
         silentClear();
+        clearColorCache();
 
         for (ChatElement element : entries) {
             addChatLine(element);
@@ -349,19 +351,18 @@ public class ChatControl extends Composite {
     public void dispose() {
         super.dispose();
         sessionManager.removeSarosSessionListener(sessionListener);
+        clearColorCache();
     }
 
     /**
      * Clears the color cache and disposes the stored colors
      */
-    private static void clearColorCache() {
+    private void clearColorCache() {
         for (Map.Entry<JID, Color> entry : colorCache.entrySet()) {
             entry.getValue().dispose();
         }
         colorCache.clear();
     }
-
-    private static final Map<JID, Color> colorCache = new HashMap<JID, Color>();
 
     public void addChatLine(ChatElement element) {
         JID sender = element.getSender().getBareJID();
