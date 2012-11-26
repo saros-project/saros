@@ -13,4 +13,9 @@ public interface IContextMenusInSarosView extends Remote {
 
     public void stopSarosSession() throws RemoteException;
 
+    /**
+     * This function opens a chat by selecting the respective context menu item.
+     */
+    public void openChat() throws RemoteException;
+
 }

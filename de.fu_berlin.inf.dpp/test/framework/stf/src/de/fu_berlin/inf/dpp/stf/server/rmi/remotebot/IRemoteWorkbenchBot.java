@@ -184,6 +184,10 @@ public interface IRemoteWorkbenchBot extends IRemoteBot {
 
     public void closeAllShells() throws RemoteException;
 
+    /*
+     * chat
+     */
+
     public RemoteBotChatLine chatLine() throws RemoteException;
 
     public RemoteBotChatLine chatLine(int index) throws RemoteException;

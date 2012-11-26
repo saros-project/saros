@@ -1,5 +1,9 @@
 package de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.saros.impl;
 
+import static org.eclipse.swtbot.swt.finder.matchers.WidgetMatcherFactory.allOf;
+import static org.eclipse.swtbot.swt.finder.matchers.WidgetMatcherFactory.widgetOfType;
+import static org.eclipse.swtbot.swt.finder.matchers.WidgetMatcherFactory.withRegex;
+
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.List;
@@ -8,12 +12,15 @@ import java.util.regex.Pattern;
 import org.apache.log4j.Logger;
 import org.eclipse.jface.bindings.keys.KeyStroke;
 import org.eclipse.jface.bindings.keys.ParseException;
+import org.eclipse.swt.custom.CTabItem;
 import org.eclipse.swt.widgets.MenuItem;
+import org.eclipse.swt.widgets.Widget;
 import org.eclipse.swtbot.eclipse.finder.matchers.WidgetMatcherFactory;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.SWTBot;
 import org.eclipse.swtbot.swt.finder.waits.Conditions;
 import org.eclipse.swtbot.swt.finder.waits.DefaultCondition;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotCTabItem;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotToolbarButton;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotToolbarDropDownButton;
@@ -415,11 +422,43 @@ public final class SarosView extends StfRemoteObject implements ISarosView {
             return null;
     }
 
-    /**********************************************
-     * 
+    @Override
+    public IChatroom selectChatroom(String name) throws RemoteException {
+        return selectChatroomWithRegex(Pattern.quote(name));
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public IChatroom selectChatroomWithRegex(String regex)
+        throws RemoteException {
+        Chatroom.getInstance().setChatTab(
+            new SWTBotCTabItem((CTabItem) view.bot().widget(
+                allOf(widgetOfType(CTabItem.class), withRegex(regex)),
+                view.getWidget())));
+
+        return Chatroom.getInstance();
+    }
+
+    @Override
+    public void closeChatroom(String name) throws RemoteException {
+        closeChatroom(Pattern.quote(name));
+
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public void closeChatroomWithRegex(String regex) throws RemoteException {
+        List<? extends Widget> chatTabs = view.bot().widgets(
+            allOf(widgetOfType(CTabItem.class), withRegex(regex)),
+            view.getWidget());
+
+        for (Widget chatTab : chatTabs)
+            new SWTBotCTabItem((CTabItem) chatTab).close();
+    }
+
+    /*
      * waits until
-     * 
-     **********************************************/
+     */
 
     public void waitUntilIsConnected() throws RemoteException {
         new SWTBot().waitUntil(new DefaultCondition() {
@@ -561,5 +600,4 @@ public final class SarosView extends StfRemoteObject implements ISarosView {
         ContextMenusInBuddiesArea.getInstance().setTreeItemNodes(treeItemNodes);
         ContextMenusInBuddiesArea.getInstance().setSarosView(this);
     }
-
 }

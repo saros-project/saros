@@ -11,6 +11,7 @@ import org.junit.Test;
 
 import de.fu_berlin.inf.dpp.stf.client.StfTestCase;
 import de.fu_berlin.inf.dpp.stf.client.util.Util;
+import de.fu_berlin.inf.dpp.stf.shared.Constants;
 
 public class ChatViewFunctionsTest extends StfTestCase {
 
@@ -44,23 +45,27 @@ public class ChatViewFunctionsTest extends StfTestCase {
         BOB.superBot().views().packageExplorerView()
             .waitUntilResourceIsShared("foo/src/bar/test.java");
 
-        ALICE.superBot().views().sarosView().selectChatroom()
+        ALICE.superBot().views().sarosView()
+            .selectChatroom(Constants.CHATROOM_TAB_LABEL)
             .sendChatMessage(messageBob);
 
         /* Wait so that the message is received on the other side */
         Thread.sleep(5000);
 
         assertEquals(messageBob, BOB.superBot().views().sarosView()
-            .selectChatroom().getTextOfLastChatLine());
+            .selectChatroom(Constants.CHATROOM_TAB_LABEL)
+            .getTextOfLastChatLine());
 
-        BOB.superBot().views().sarosView().selectChatroom()
+        BOB.superBot().views().sarosView()
+            .selectChatroom(Constants.CHATROOM_TAB_LABEL)
             .sendChatMessage(messageAlice);
 
         /* Wait so that the message is received on the other side */
         Thread.sleep(5000);
 
         assertEquals(messageAlice, ALICE.superBot().views().sarosView()
-            .selectChatroom().getTextOfLastChatLine());
+            .selectChatroom(Constants.CHATROOM_TAB_LABEL)
+            .getTextOfLastChatLine());
     }
 
     /*
@@ -81,7 +86,8 @@ public class ChatViewFunctionsTest extends StfTestCase {
         BOB.superBot().views().sarosView().selectParticipant(ALICE.getJID())
             .followParticipant();
 
-        BOB.superBot().views().sarosView().selectChatroom()
+        BOB.superBot().views().sarosView()
+            .selectChatroom(Constants.CHATROOM_TAB_LABEL)
             .enterChatMessage("Hello how");
 
         ALICE.superBot().views().packageExplorerView()
@@ -90,12 +96,13 @@ public class ChatViewFunctionsTest extends StfTestCase {
         /* Wait a short time so the editor change is executed on Bobs side */
         Thread.sleep(5000);
 
-        BOB.superBot().views().sarosView().selectChatroom()
+        BOB.superBot().views().sarosView()
+            .selectChatroom(Constants.CHATROOM_TAB_LABEL)
             .enterChatMessage(" are you?");
 
         assertEquals(
             "cursor position changed during focus lost and focus regain",
             "Hello how are you?", BOB.superBot().views().sarosView()
-                .selectChatroom().getChatMessage());
+                .selectChatroom(Constants.CHATROOM_TAB_LABEL).getChatMessage());
     }
 }

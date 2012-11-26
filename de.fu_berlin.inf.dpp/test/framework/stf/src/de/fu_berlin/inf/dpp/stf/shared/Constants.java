@@ -395,6 +395,10 @@ public interface Constants {
 
     public final static String CM_DELETE = Configuration.getString("cm_delete");
     public final static String CM_RENAME = Configuration.getString("cm_rename");
+
+    public final static String CM_OPEN_CHAT = Configuration
+        .getString("OpenChatAction_MenuItem");
+
     public final static String CM_SKYPE_THIS_BUDDY = Configuration
         .getString("cm_skype_this_buddy");
     public final static String CM_ADD_TO_SAROS_SESSION = Configuration

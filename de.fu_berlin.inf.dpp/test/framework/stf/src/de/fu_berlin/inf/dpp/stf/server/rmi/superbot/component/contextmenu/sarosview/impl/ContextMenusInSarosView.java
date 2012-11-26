@@ -33,10 +33,17 @@ public abstract class ContextMenusInSarosView extends StfRemoteObject implements
         this.sarosView = sarosView;
     }
 
+    @Override
     public void stopSarosSession() throws RemoteException {
         getTreeItem().select();
         ContextMenuHelper.clickContextMenu(tree, CM_STOP_SAROS_SESSION);
         SuperBot.getInstance().confirmShellLeavingClosingSession();
+    }
+
+    @Override
+    public void openChat() throws RemoteException {
+        getTreeItem().select();
+        ContextMenuHelper.clickContextMenu(tree, CM_OPEN_CHAT);
     }
 
     protected final void logError(Logger log, Throwable t, SWTBotTree tree,

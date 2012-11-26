@@ -25,6 +25,7 @@ import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotToggleButt
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotToolbarButton;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotTree;
 
+/* FIXME either just link to the wrapped SWTBot methods or copy the IFSPEC */
 public interface IRemoteBot extends Remote {
 
     /**********************************************
@@ -1314,11 +1315,9 @@ public interface IRemoteBot extends Remote {
     public IRemoteBotText textWithTooltipInGroup(String tooltip,
         String inGroup, int index) throws RemoteException;
 
-    /**********************************************
-     * 
+    /*
      * Widget table
-     * 
-     **********************************************/
+     */
     public boolean existsTable() throws RemoteException;
 
     public boolean existsTableInGroup(String groupName) throws RemoteException;
@@ -2311,25 +2310,24 @@ public interface IRemoteBot extends Remote {
 
     public IRemoteBotCTabItem cTabItem() throws RemoteException;
 
-    /**********************************************
-     * 
+    /*
      * Wait until
-     * 
-     **********************************************/
+     */
     public void waitUntil(ICondition condition) throws RemoteException;
 
     public void waitLongUntil(ICondition condition) throws RemoteException;
 
     public void waitShortUntil(ICondition condition) throws RemoteException;
 
-    /**********************************************
-     * 
-     * Others
-     * 
-     **********************************************/
-
     public void logMessage(String message) throws RemoteException;
 
+    /**
+     * @deprecated Use {@link Thread#sleep(long)}
+     * @param millis
+     * @throws RemoteException
+     * 
+     */
+    @Deprecated
     public void sleep(long millis) throws RemoteException;
 
     /**

@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotEditor;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotPerspective;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
@@ -44,7 +45,7 @@ public final class RemoteWorkbenchBot extends RemoteBot implements
     private RemoteBotPerspective perspective;
     private RemoteBotEditor editor;
 
-    private SarosSWTBot swtWorkBenchBot;
+    private SWTWorkbenchBot swtWorkBenchBot;
 
     private RemoteBotChatLine chatLine;
 
@@ -54,7 +55,7 @@ public final class RemoteWorkbenchBot extends RemoteBot implements
         perspective = RemoteBotPerspective.getInstance();
         editor = RemoteBotEditor.getInstance();
         chatLine = RemoteBotChatLine.getInstance();
-        swtWorkBenchBot = new SarosSWTBot();
+        swtWorkBenchBot = new SWTWorkbenchBot();
 
     }
 
@@ -323,21 +324,21 @@ public final class RemoteWorkbenchBot extends RemoteBot implements
     }
 
     public RemoteBotChatLine chatLine(int index) throws RemoteException {
-        chatLine.setWidget(swtWorkBenchBot.chatLine(index));
+        chatLine.setWidget(new SarosSWTBot().chatLine(index));
         return chatLine;
     }
 
     public RemoteBotChatLine lastChatLine() throws RemoteException {
-        chatLine.setWidget(swtWorkBenchBot.lastChatLine());
+        chatLine.setWidget(new SarosSWTBot().lastChatLine());
         return chatLine;
     }
 
     public RemoteBotChatLine chatLine(final String regex)
         throws RemoteException {
-        chatLine.setWidget(swtWorkBenchBot.chatLine(regex));
+        chatLine.setWidget(new SarosSWTBot().chatLine(regex));
         return chatLine;
     }
-
+    
     public void resetBot() throws RemoteException {
         this.setBot(new SWTBot());
     }

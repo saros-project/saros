@@ -171,12 +171,18 @@ public abstract class StfTestCase {
 
         for (AbstractTester tester : currentTesters) {
             try {
+                tester.superBot().internal().resetSarosVersion();
+
                 if (tester.superBot().views().sarosView().isConnected())
                     tester.superBot().views().sarosView().disconnect();
 
                 tester.superBot().views().sarosView().disconnect();
-                tester.superBot().internal().resetSarosVersion();
                 tester.remoteBot().resetWorkbench();
+
+                // TODO clear the chat history, should be done via non-gui
+                // access
+                tester.superBot().views().sarosView()
+                    .closeChatroomWithRegex(".*");
 
                 // Consistency watch dog seems to lock some files from time to
                 // time

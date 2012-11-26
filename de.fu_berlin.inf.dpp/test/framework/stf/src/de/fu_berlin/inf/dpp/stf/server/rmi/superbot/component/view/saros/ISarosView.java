@@ -127,7 +127,55 @@ public interface ISarosView extends Remote {
     public IContextMenusInSessionArea selectParticipant(final JID jid)
         throws RemoteException;
 
-    public IChatroom selectChatroom() throws RemoteException;
+    /*
+     * Chat stuff
+     */
+
+    /**
+     * Selects the chat room with the given title.
+     * 
+     * @param name
+     *            the name of the chat (as displayed in the chat tab)
+     * @return an {@link IChatroom} interface
+     * @throws RemoteException
+     *             if the chat does not exist
+     */
+    public IChatroom selectChatroom(String name) throws RemoteException;
+
+    /**
+     * Selects the chat room with the given regular expression.
+     * 
+     * @param regex
+     *            the regular expression to find the chat
+     * @return an {@link IChatroom} interface for the first found match
+     * @throws RemoteException
+     *             if no matches where found
+     */
+
+    public IChatroom selectChatroomWithRegex(String regex)
+        throws RemoteException;
+
+    /**
+     * Closes the chat room with the given title.
+     * 
+     * @param name
+     *            the name of the chat (as displayed in the chat tab)
+     * @throws RemoteException
+     * 
+     */
+
+    public void closeChatroom(String name) throws RemoteException;
+
+    /**
+     * Closes all chat rooms that matches the given regular expression.
+     * 
+     * @param regex
+     *            the regular expression to find the chat
+     * @throws RemoteException
+     * 
+     */
+
+    public void closeChatroomWithRegex(String regex) throws RemoteException;
 
     /**********************************************
      * 

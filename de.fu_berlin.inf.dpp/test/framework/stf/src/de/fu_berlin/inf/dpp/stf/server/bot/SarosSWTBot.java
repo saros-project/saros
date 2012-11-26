@@ -9,7 +9,7 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Widget;
-import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
+import org.eclipse.swtbot.swt.finder.SWTBot;
 import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
 import org.eclipse.swtbot.swt.finder.finders.UIThreadRunnable;
 import org.eclipse.swtbot.swt.finder.results.WidgetResult;
@@ -25,15 +25,23 @@ import de.fu_berlin.inf.dpp.ui.widgets.chatControl.parts.ChatDisplay;
 import de.fu_berlin.inf.dpp.ui.widgets.chatControl.parts.ChatInput;
 
 /**
- * SarosSWTBot is a {@link SWTWorkbenchBot} with capabilities for testing
- * specific GUI items only defined for saros like chatInput and chatLine and
- * fixing some methods defined by SWTBot which are not really working yet .
+ * SarosSWTBot is a {@link SWTBot} with capabilities for testing specific GUI
+ * items only defined for Saros like chatInput and chatLine and fixing some
+ * methods defined by SWTBot which are not really working yet .
  * 
  * @author lchen
  */
-public final class SarosSWTBot extends SWTWorkbenchBot {
+public final class SarosSWTBot extends SWTBot {
 
     private static final Logger log = Logger.getLogger(SarosSWTBot.class);
+
+    public SarosSWTBot() {
+        super();
+    }
+
+    public SarosSWTBot(Widget widget) {
+        super(widget);
+    }
 
     /**
      * @return a {@link SarosSWTBotChatInput} with the specified
@@ -181,8 +189,8 @@ public final class SarosSWTBot extends SWTWorkbenchBot {
     }
 
     /**
-     * This method does the same as {@link SWTWorkbenchBot#shells()}, but
-     * doesn't throw an exception if a shell was already disposed.
+     * This method does the same as {@link SWTBot#shells()}, but doesn't throw
+     * an exception if a shell was already disposed.
      */
     @Override
     public SWTBotShell[] shells() {
