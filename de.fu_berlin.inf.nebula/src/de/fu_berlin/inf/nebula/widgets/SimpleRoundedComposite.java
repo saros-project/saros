@@ -56,6 +56,7 @@ public class SimpleRoundedComposite extends RoundedComposite {
 			return;
 		this.usedText = texts;
 
+
 		/*
 		 * Sets layout Because the number of grid columns depends on the number
 		 * of text to display, each time you set the texts the layout needs to
@@ -95,6 +96,9 @@ public class SimpleRoundedComposite extends RoundedComposite {
 			label.setLayoutData(new GridData(horizontalAlignment,
 					SWT.BEGINNING, grabExcessHorizontalSpace, false));
 		}
+
+		// Explicitly request layout in case the label(s) changed
+		layout();
 	}
 
 	/**
@@ -126,6 +130,12 @@ public class SimpleRoundedComposite extends RoundedComposite {
 	@Override
 	public void setForeground(Color color) {
 		super.setForeground(color);
+		this.refresh();
+	}
+
+	@Override
+	public void setBackground(Color color) {
+		super.setBackground(color);
 		this.refresh();
 	}
 
