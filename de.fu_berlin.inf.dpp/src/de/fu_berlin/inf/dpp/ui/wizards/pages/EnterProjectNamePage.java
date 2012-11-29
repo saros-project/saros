@@ -421,9 +421,6 @@ public class EnterProjectNamePage extends WizardPage {
                 });
                 skipCheckBoxes.put(fileList.getProjectID(), skipCheckBox);
             }
-            attachListeners(fileList.getProjectID());
-            updateEnabled(fileList.getProjectID());
-
         }
 
         Composite vcsComposite = new Composite(composite, SWT.NONE);
@@ -451,6 +448,11 @@ public class EnterProjectNamePage extends WizardPage {
         explanation.pack();
 
         updateConnectionStatus();
+
+        for (FileList fileList : this.fileLists) {
+            attachListeners(fileList.getProjectID());
+            updateEnabled(fileList.getProjectID());
+        }
     }
 
     public boolean isUpdateSelected(String projectID) {
