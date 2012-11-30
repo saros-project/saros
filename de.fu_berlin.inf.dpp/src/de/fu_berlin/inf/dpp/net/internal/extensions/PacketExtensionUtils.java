@@ -56,12 +56,6 @@ public class PacketExtensionUtils {
 
     public static final String SESSION_ID = "sessionID";
 
-    public static final String DESCRIPTION = "description";
-
-    public static final String PROJECTNAME = "description";
-
-    public static final String COLOR_ID = "ColorID";
-
     /**
      * Retrieves the SessionID from the given message by checking all supported
      * PacketExtensions-types.

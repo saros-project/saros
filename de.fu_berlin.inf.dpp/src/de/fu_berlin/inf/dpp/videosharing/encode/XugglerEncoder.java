@@ -62,7 +62,6 @@ public class XugglerEncoder extends Encoder {
     /* ffmpeg settings */
     protected boolean useVBV = false;
     protected double bitrateVariation = 0.65;
-    protected double keyframeRate = 1;
 
     /* xuggler settings */
     protected IContainerFormat containerFormat;

@@ -63,15 +63,11 @@ public final class GeneralPreferencePage extends FieldEditorPreferencePage
     public static final int COLUMNS_IN_ACCOUNTGROUP = 2;
 
     // labels
-    public static final String GROUP_ACTIVE_LABEL = Messages.GeneralPreferencePage_GROUP_ACTIVE_LABEL;
-    public static final String GROUP_DEACTIVE_LABEL = Messages.GeneralPreferencePage_GROUP_DEACTIVE_LABEL;
     public static final String ACCOUNT_GROUP_TITLE = Messages.GeneralPreferencePage_ACCOUNT_GROUP_TITLE;
     public static final String ACTIVATE_BTN_TEXT = Messages.GeneralPreferencePage_ACTIVATE_BTN_TEXT;
     public static final String CHANGE_BTN_TEXT = Messages.GeneralPreferencePage_CHANGE_BTN_TEXT;
     public static final String ADD_BTN_TEXT = Messages.GeneralPreferencePage_ADD_BTN_TEXT;
     public static final String REMOVE_BTN_TEXT = Messages.GeneralPreferencePage_REMOVE_BTN_TEXT;
-    public static final String DELETE_ACTIVE_TEXT = Messages.GeneralPreferencePage_DELETE_ACTIVE_TEXT;
-    public static final String NO_ENTRY_SELECTED_TEXT = Messages.GeneralPreferencePage_NO_ENTRY_SELECTED_TEXT;
     public static final String ENCRYPT_PASSWORD_TEXT = Messages.GeneralPreferencePage_ENCRYPT_PASSWORD_TEXT;
     public static final String STARTUP_CONNECT_TEXT = Messages.GeneralPreferencePage_STARTUP_CONNECT_TEXT;
     public static final String FOLLOW_MODE_TEXT = Messages.GeneralPreferencePage_FOLLOW_MODE_TEXT;

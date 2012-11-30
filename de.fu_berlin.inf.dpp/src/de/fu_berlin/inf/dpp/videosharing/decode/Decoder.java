@@ -64,6 +64,7 @@ public abstract class Decoder implements Runnable, Disposable {
     protected Thread decoderThread;
 
     protected Dimension videoDimension;
+
     protected String encodingFormatName;
 
     /* statistics */

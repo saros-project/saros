@@ -19,8 +19,6 @@ import de.fu_berlin.inf.dpp.activities.serializable.IActivityDataObject;
 public class TimedActivityDataObject implements
     Comparable<TimedActivityDataObject> {
 
-    /** Sequence number for Activities that don't have to wait. */
-    public static final int NO_SEQUENCE_NR = -1;
     /**
      * Unknown sequence number. It is illegal to use it in
      * {@link TimedActivityDataObject} instances.

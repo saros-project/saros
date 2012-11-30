@@ -24,7 +24,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
 import org.eclipse.jface.text.source.ILineRange;
 import org.eclipse.ui.IEditorPart;
 
@@ -89,9 +88,6 @@ public class SelectionCollector extends AbstractStatisticCollector {
             this.gestured = gestured;
         }
     }
-
-    protected static final Logger log = Logger
-        .getLogger(SelectionCollector.class.getName());
 
     /** Represents the current active editor of the local {@link User} */
     protected SPath localPath = null;

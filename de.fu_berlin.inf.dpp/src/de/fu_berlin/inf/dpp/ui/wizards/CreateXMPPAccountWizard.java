@@ -33,7 +33,6 @@ import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.accountManagement.XMPPAccount;
 import de.fu_berlin.inf.dpp.accountManagement.XMPPAccountStore;
 import de.fu_berlin.inf.dpp.net.util.RosterUtils;
-import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
 import de.fu_berlin.inf.dpp.ui.ImageManager;
 import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.ui.util.DialogUtils;
@@ -64,9 +63,6 @@ public class CreateXMPPAccountWizard extends Wizard {
 
     @Inject
     protected Saros saros;
-
-    @Inject
-    protected PreferenceUtils preferenceUtils;
 
     @Inject
     protected XMPPAccountStore accountStore;

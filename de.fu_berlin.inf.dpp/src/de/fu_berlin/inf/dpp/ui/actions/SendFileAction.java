@@ -39,7 +39,6 @@ import org.eclipse.ui.PlatformUI;
 import org.picocontainer.Disposable;
 import org.picocontainer.annotations.Inject;
 
-import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
@@ -67,9 +66,6 @@ public class SendFileAction extends Action implements Disposable {
             updateEnablement();
         }
     };
-
-    @Inject
-    protected Saros saros;
 
     @Inject
     protected ISarosSessionManager sessionManager;

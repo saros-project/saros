@@ -34,16 +34,12 @@ public class FollowingActivitiesManager extends AbstractActivityProvider {
         .getLogger(FollowingActivitiesManager.class);
 
     protected final List<IFollowModeChangesListener> internalListeners = new LinkedList<IFollowModeChangesListener>();
-    protected ISarosSessionManager sessionManager;
     protected ISarosSession sarosSession;
-    protected EditorManager editorManager;
     protected AwarenessInformationCollector awarenessInformationCollector;
 
     public FollowingActivitiesManager(ISarosSessionManager sessionManager,
         EditorManager editorManager,
         AwarenessInformationCollector awarenessInformationCollector) {
-        this.sessionManager = sessionManager;
-        this.editorManager = editorManager;
         this.awarenessInformationCollector = awarenessInformationCollector;
         sessionManager.addSarosSessionListener(sessionListener);
         editorManager

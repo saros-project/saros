@@ -37,8 +37,6 @@ public class OpenChatAction extends Action {
         }
     };
 
-    public static final String ACTION_ID = OpenChatAction.class.getName();
-
     public OpenChatAction(ChatRoomsComposite chatRoomsComposite) {
         super(Messages.OpenChatAction_MenuItem);
         SarosPluginContext.initComponent(this);

@@ -14,7 +14,6 @@ import de.fu_berlin.inf.dpp.net.ConnectionState;
 import de.fu_berlin.inf.dpp.net.IConnectionListener;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.ui.Messages;
-import de.fu_berlin.inf.dpp.ui.SarosUI;
 import de.fu_berlin.inf.dpp.ui.views.SarosView;
 import de.fu_berlin.inf.dpp.util.Utils;
 import de.fu_berlin.inf.nebula.utils.FontUtils;
@@ -39,9 +38,6 @@ public class ConnectionStateComposite extends Composite {
 
     @Inject
     protected Saros saros;
-
-    @Inject
-    protected SarosUI sarosUI;
 
     @Inject
     protected XMPPAccountStore accountStore;

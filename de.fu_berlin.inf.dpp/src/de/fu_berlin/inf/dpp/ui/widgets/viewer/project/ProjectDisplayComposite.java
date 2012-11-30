@@ -13,9 +13,7 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.model.WorkbenchContentProvider;
 import org.eclipse.ui.model.WorkbenchLabelProvider;
-import org.picocontainer.annotations.Inject;
 
-import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.ui.model.project.ProjectOnlyWorkbenchContentProvider;
 import de.fu_berlin.inf.dpp.ui.widgets.viewer.ViewerComposite;
@@ -39,8 +37,6 @@ import de.fu_berlin.inf.nebula.utils.LayoutUtils;
  * 
  */
 public class ProjectDisplayComposite extends ViewerComposite {
-    @Inject
-    protected Saros saros;
 
     public ProjectDisplayComposite(Composite parent, int style) {
         super(parent, style);

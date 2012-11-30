@@ -13,7 +13,6 @@ import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.awareness.AwarenessInformationCollector;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
-import de.fu_berlin.inf.dpp.observables.SarosSessionObservable;
 import de.fu_berlin.inf.dpp.ui.ImageManager;
 import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.ui.model.TreeElement;
@@ -28,8 +27,7 @@ public class UserElement extends TreeElement {
 
     @Inject
     protected EditorManager editorManager;
-    @Inject
-    protected SarosSessionObservable sarosSession;
+
     @Inject
     protected AwarenessInformationCollector awarenessInformationCollector;
 

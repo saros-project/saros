@@ -1,7 +1,5 @@
 package de.fu_berlin.inf.dpp.ui.model.rosterSession;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Set;
 
 import org.eclipse.jface.viewers.StyledString;
@@ -17,7 +15,6 @@ import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.awareness.AwarenessInformationCollector;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.editor.RemoteEditorManager;
-import de.fu_berlin.inf.dpp.observables.ProjectNegotiationObservable;
 import de.fu_berlin.inf.dpp.ui.model.TreeElement;
 
 /**
@@ -31,13 +28,11 @@ import de.fu_berlin.inf.dpp.ui.model.TreeElement;
 public class AwarenessInformationTreeElement extends TreeElement {
     @Inject
     protected EditorManager editorManager;
-    @Inject
-    protected ProjectNegotiationObservable projectNegotiationObservable;
+
     @Inject
     protected AwarenessInformationCollector awarenessInformationCollector;
 
     protected User user;
-    protected List<TreeElement> awarenessInformation = new ArrayList<TreeElement>();
 
     public AwarenessInformationTreeElement(User user) {
         SarosPluginContext.initComponent(this);

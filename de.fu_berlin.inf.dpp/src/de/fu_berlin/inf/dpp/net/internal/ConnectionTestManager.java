@@ -62,9 +62,6 @@ public class ConnectionTestManager {
     protected DataTransferManager dataTransferManager;
 
     @Inject
-    protected XMPPTransmitter transmitter;
-
-    @Inject
     protected DiscoveryManager discoManager;
 
     public ConnectionTestManager(

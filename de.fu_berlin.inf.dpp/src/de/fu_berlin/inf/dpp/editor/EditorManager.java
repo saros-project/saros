@@ -25,9 +25,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.Callable;
 
@@ -174,8 +172,6 @@ public class EditorManager extends AbstractActivityProvider {
     protected HashMap<SPath, Long> lastRemoteEditTimes = new HashMap<SPath, Long>();
 
     ContributionAnnotationManager contributionAnnotationManager;
-
-    Queue<IActivity> queuedActivities = new LinkedList<IActivity>();
 
     private IActivityReceiver activityReceiver = new AbstractActivityReceiver() {
         @Override

@@ -11,13 +11,10 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
-import org.picocontainer.annotations.Inject;
 
-import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.feedback.Messages;
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
 import de.fu_berlin.inf.dpp.ui.ImageManager;
 import de.fu_berlin.inf.dpp.ui.widgets.wizard.SummaryItemComposite;
 import de.fu_berlin.inf.dpp.ui.wizards.ConfigurationWizard;
@@ -37,12 +34,6 @@ import de.fu_berlin.inf.nebula.widgets.SimpleIllustratedComposite.IllustratedTex
 public class ConfigurationSummaryWizardPage extends WizardPage {
     public static final String TITLE = de.fu_berlin.inf.dpp.ui.Messages.ConfigurationSummaryWizardPage_title;
     public static final String DESCRIPTION = de.fu_berlin.inf.dpp.ui.Messages.ConfigurationSummaryWizardPage_description;
-
-    @Inject
-    protected Saros saros;
-
-    @Inject
-    protected PreferenceUtils preferenceUtils;
 
     Composite composite;
     SimpleIllustratedComposite jid;

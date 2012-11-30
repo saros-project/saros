@@ -42,7 +42,6 @@ public class ErrorLogManager extends AbstractFeedbackManager implements
     protected static final Logger log = Logger.getLogger(ErrorLogManager.class
         .getName());
 
-    protected StatisticManager statisticManager;
     protected SessionIDObservable sessionID;
     private static String mostRecentSessionID;
 
@@ -62,10 +61,8 @@ public class ErrorLogManager extends AbstractFeedbackManager implements
             submitErrorLog(saros);
     }
 
-    public ErrorLogManager(Saros saros, StatisticManager statisticManager,
-        SessionIDObservable sessionID) {
+    public ErrorLogManager(Saros saros, SessionIDObservable sessionID) {
         super(saros);
-        this.statisticManager = statisticManager;
         this.sessionID = sessionID;
 
         logErrorLogSettings();

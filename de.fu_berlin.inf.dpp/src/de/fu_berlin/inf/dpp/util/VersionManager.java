@@ -366,7 +366,6 @@ public class VersionManager {
     }
 
     protected Bundle bundle;
-    protected Saros saros;
     protected ITransmitter transmitter;
 
     protected XStreamExtensionProvider<VersionInfo> versionProvider = new XStreamExtensionProvider<VersionInfo>(
@@ -376,7 +375,6 @@ public class VersionManager {
         ITransmitter transmitter) {
 
         this.bundle = saros.getBundle();
-        this.saros = saros;
         this.transmitter = transmitter;
 
         receiver.addPacketListener(new PacketListener() {

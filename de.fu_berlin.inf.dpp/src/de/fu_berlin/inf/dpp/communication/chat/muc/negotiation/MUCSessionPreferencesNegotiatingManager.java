@@ -4,7 +4,6 @@ import java.util.Random;
 
 import org.apache.log4j.Logger;
 import org.eclipse.jface.preference.IPreferenceStore;
-import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
@@ -27,12 +26,10 @@ public class MUCSessionPreferencesNegotiatingManager {
     private static final Logger log = Logger
         .getLogger(MUCSessionPreferencesNegotiatingManager.class);
 
-    @Inject
     protected IPreferenceStore preferences;
 
     protected SessionIDObservable sessionID;
 
-    protected MUCSessionPreferences localPreferences;
     protected MUCSessionPreferences sessionPreferences;
 
     protected String password;
@@ -43,6 +40,7 @@ public class MUCSessionPreferencesNegotiatingManager {
         SessionIDObservable sessionID, IPreferenceStore preferences) {
         this.sessionID = sessionID;
         this.password = Integer.toString(random.nextInt());
+        this.preferences = preferences;
     }
 
     /**

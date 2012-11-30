@@ -25,7 +25,6 @@ import de.fu_berlin.inf.dpp.net.discoverymanager.DiscoveryManager;
 import de.fu_berlin.inf.dpp.net.discoverymanager.DiscoveryManager.CacheMissException;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
 import de.fu_berlin.inf.dpp.net.util.RosterUtils;
-import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
 import de.fu_berlin.inf.dpp.ui.ImageManager;
 import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.ui.model.ITreeElement;
@@ -44,13 +43,8 @@ public class RosterEntryElement extends TreeElement {
     @Inject
     protected DiscoveryManager discoveryManager;
 
-    @Inject
-    protected PreferenceUtils preferenceUtils;
-
     protected Roster roster;
     protected JID jid;
-
-    boolean checked = false;
 
     public static RosterEntryElement[] createAll(Roster roster,
         Collection<String> addresses) {

@@ -11,7 +11,6 @@ import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.internal.InvitationInfo;
 import de.fu_berlin.inf.dpp.net.internal.InvitationInfo.InvitationExtensionProvider;
 import de.fu_berlin.inf.dpp.net.internal.XMPPReceiver;
-import de.fu_berlin.inf.dpp.net.internal.extensions.CancelInviteExtension;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
@@ -31,9 +30,6 @@ public class InvitationHandler {
 
     @Inject
     protected ISarosSessionManager sessionManager;
-
-    @Inject
-    protected CancelInviteExtension cancelInviteExtension;
 
     @Inject
     protected SarosUI sarosUI;

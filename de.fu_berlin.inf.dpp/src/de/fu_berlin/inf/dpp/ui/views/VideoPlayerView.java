@@ -35,8 +35,6 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.text.MessageFormat;
-import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.BlockingQueue;
 
 import org.apache.log4j.Logger;
 import org.eclipse.jface.action.Action;
@@ -72,7 +70,6 @@ import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.ui.actions.VideoSharingAction;
 import de.fu_berlin.inf.dpp.util.Utils;
 import de.fu_berlin.inf.dpp.util.ValueChangeListener;
-import de.fu_berlin.inf.dpp.videosharing.VideoSharing;
 import de.fu_berlin.inf.dpp.videosharing.VideoSharing.Mode;
 import de.fu_berlin.inf.dpp.videosharing.VideoSharing.VideoSharingSession;
 import de.fu_berlin.inf.dpp.videosharing.activities.KeyPressedVideoActivity;
@@ -97,8 +94,6 @@ public class VideoPlayerView extends ListExplanatoryViewPart implements
 
     public static final String ID = "de.fu_berlin.inf.dpp.ui.views.VideoPlayerView"; //$NON-NLS-1$
 
-    @Inject
-    protected VideoSharing videoSharing;
     @Inject
     protected Saros saros;
     @Inject
@@ -128,12 +123,6 @@ public class VideoPlayerView extends ListExplanatoryViewPart implements
     protected Label fps;
     protected Label bitrate;
     protected Label delay;
-
-    protected Rectangle imageSize;
-    protected BufferedImage nextImage = null;
-
-    protected BlockingQueue<BufferedImage> images = new ArrayBlockingQueue<BufferedImage>(
-        1);
 
     protected ObjectOutputStream activityOutput;
 

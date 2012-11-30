@@ -18,7 +18,6 @@ import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.communication.audio.AudioServiceManager;
 import de.fu_berlin.inf.dpp.communication.audio.AudioServiceManager.VoIPStatus;
-import de.fu_berlin.inf.dpp.net.internal.StreamServiceManager;
 import de.fu_berlin.inf.dpp.net.internal.StreamSession;
 import de.fu_berlin.inf.dpp.observables.VoIPSessionObservable;
 import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
@@ -63,8 +62,6 @@ public class VoIPAction extends Action {
 
     @Inject
     protected ISarosSessionManager sessionManager;
-
-    protected StreamServiceManager streamServiceManager;
 
     @Inject
     protected AudioServiceManager audioServiceManager;

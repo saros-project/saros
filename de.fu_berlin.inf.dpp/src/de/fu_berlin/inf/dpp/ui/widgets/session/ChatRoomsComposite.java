@@ -381,8 +381,7 @@ public class ChatRoomsComposite extends ListExplanatoryComposite {
 
         for (CTabItem tab : chatRooms.getItems()) {
             IChat chat = (IChat) tab.getData();
-            ChatControl control = (ChatControl) tab
-                .getControl();
+            ChatControl control = (ChatControl) tab.getControl();
 
             if (!Collections.disjoint(jids, chat.getParticipants())) {
                 control.refreshFromHistory();

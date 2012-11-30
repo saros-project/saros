@@ -17,7 +17,6 @@ import org.eclipse.ui.PlatformUI;
 import org.picocontainer.Disposable;
 import org.picocontainer.annotations.Inject;
 
-import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.communication.SkypeManager;
@@ -40,7 +39,7 @@ public class SkypeAction extends Action implements Disposable {
     private static final Logger log = Logger.getLogger(SkypeAction.class
         .getName());
 
-    IPropertyChangeListener propertyChangeListener = new IPropertyChangeListener() {
+    protected IPropertyChangeListener propertyChangeListener = new IPropertyChangeListener() {
         public void propertyChange(PropertyChangeEvent event) {
             if (event.getProperty().equals(PreferenceConstants.SKYPE_USERNAME)) {
                 updateEnablement();
@@ -53,9 +52,6 @@ public class SkypeAction extends Action implements Disposable {
             updateEnablement();
         }
     };
-
-    @Inject
-    protected Saros saros;
 
     @Inject
     protected SkypeManager skypeManager;

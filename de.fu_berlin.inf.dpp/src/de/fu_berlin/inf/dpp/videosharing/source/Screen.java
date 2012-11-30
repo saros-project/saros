@@ -32,13 +32,13 @@ import java.awt.Robot;
 import java.awt.Toolkit;
 import java.awt.image.BufferedImage;
 
-import de.fu_berlin.inf.dpp.SarosPluginContext;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.picocontainer.annotations.Inject;
 
 import com.thoughtworks.xstream.InitializationException;
 
 import de.fu_berlin.inf.dpp.Saros;
+import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
 import de.fu_berlin.inf.dpp.videosharing.VideoSharing.VideoSharingSession;
 import de.fu_berlin.inf.dpp.videosharing.activities.KeyPressedVideoActivity;
@@ -86,12 +86,6 @@ public class Screen implements ImageSource {
     protected Dimension mouseArea;
 
     protected boolean showMousePointer;
-
-    /**
-     * the position of mousepointer at the last screenshot in followmode. should
-     * only be updated when {@link #lastMouseRectangle} is updated.
-     */
-    protected Point lastMousePosition = null;
 
     /**
      * last capturearea in followmode

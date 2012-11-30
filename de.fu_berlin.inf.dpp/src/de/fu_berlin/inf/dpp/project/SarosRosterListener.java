@@ -101,9 +101,6 @@ public class SarosRosterListener {
     @Inject
     protected SarosSessionObservable sarosSessionObservable;
 
-    @Inject
-    protected RosterTracker rosterTracker;
-
     public SarosRosterListener(RosterTracker rosterTracker) {
         rosterTracker.addRosterListener(listener);
     }

@@ -19,7 +19,6 @@
  */
 package de.fu_berlin.inf.dpp.preferences;
 
-import de.fu_berlin.inf.dpp.StartupSaros;
 
 /**
  * Constant definitions for plug-in preferences
@@ -120,15 +119,6 @@ public class PreferenceConstants {
     /** Can be set and read by the FeedbackManager */
     public static final String SESSIONS_UNTIL_NEXT = "sessions.until.next.survey";
 
-    /**
-     * Preference key for preference containing the version of Saros with which
-     * Eclipse was last started.
-     * 
-     * Used by {@link StartupSaros} to determine whether there was a version
-     * update.
-     */
-    public static final String SAROS_VERSION = "saros.version";
-
     /** Can be read by the StatisticManager */
     public static final String RANDOM_USER_ID = "user.id";
 
@@ -153,12 +143,6 @@ public class PreferenceConstants {
 
     /** Preference Key for chatserver (used for MUC) **/
     public static final String CHATSERVER = "chatserver";
-
-    /**
-     * User specified chatroom name. If no chatroom is specified the session ID
-     * is chatroom name
-     **/
-    public static final String CHATROOM = "chatroom";
 
     public static final String USE_DEFAULT_CHATSERVER = "USE_DEFAULT_CHATSERVER";
 

@@ -13,7 +13,6 @@ import org.eclipse.ui.PlatformUI;
 import org.picocontainer.Disposable;
 import org.picocontainer.annotations.Inject;
 
-import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.annotations.Component;
@@ -75,9 +74,6 @@ public class FollowThisPersonAction extends Action implements Disposable {
 
     @Inject
     protected EditorManager editorManager;
-
-    @Inject
-    protected Saros saros;
 
     public FollowThisPersonAction() {
         super(Messages.FollowThisPersonAction_follow_title);

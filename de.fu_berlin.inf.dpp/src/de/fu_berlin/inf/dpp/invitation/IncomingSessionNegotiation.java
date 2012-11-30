@@ -6,7 +6,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.SubMonitor;
 import org.joda.time.DateTime;
-import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.SarosContext;
 import de.fu_berlin.inf.dpp.User.Permission;
@@ -18,7 +17,6 @@ import de.fu_berlin.inf.dpp.invitation.ProcessTools.CancelOption;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.observables.InvitationProcessObservable;
-import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
@@ -40,9 +38,6 @@ public class IncomingSessionNegotiation extends InvitationProcess {
     protected String invitationID;
     protected JID host;
     protected int peerColorID;
-
-    @Inject
-    protected SessionIDObservable sessionID;
 
     protected SarosCancellationException cancellationCause;
     public VersionInfo versionInfo;

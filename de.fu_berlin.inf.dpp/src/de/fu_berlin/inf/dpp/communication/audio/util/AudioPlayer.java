@@ -31,8 +31,7 @@ public class AudioPlayer {
 
     // Buffer to read from audioInputStream and write to SourceDataLine
     protected byte[] buffer;
-    // Thread the player will run
-    protected Thread playerThread;
+
     // player started?
     protected boolean started;
 

@@ -34,9 +34,6 @@ public class ActivitiesHandler {
     @Inject
     protected SarosSessionObservable sarosSessionObservable;
 
-    @Inject
-    protected DispatchThreadContext dispatchThread;
-
     public ActivitiesHandler(XMPPReceiver receiver,
         final ActivitiesExtensionProvider provider,
         final IncomingTransferObjectExtensionProvider incomingExtProv,

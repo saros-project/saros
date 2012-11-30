@@ -481,7 +481,6 @@ public class DataTransferManager implements IConnectionListener,
 
     // Listens for completed transfers to store speed of incoming IBB transfers
     protected class TransferCompleteListener implements ITransferModeListener {
-        protected DataTransferManager dataTransferManager;
 
         // store transfer speed for incoming IBB transfers, user specific
         public void transferFinished(JID jid, NetTransferMode newMode,

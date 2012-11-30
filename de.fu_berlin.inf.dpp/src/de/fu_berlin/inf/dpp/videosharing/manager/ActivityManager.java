@@ -31,7 +31,6 @@ import de.fu_berlin.inf.dpp.videosharing.VideoSharing;
 import de.fu_berlin.inf.dpp.videosharing.VideoSharing.VideoSharingSession;
 import de.fu_berlin.inf.dpp.videosharing.activities.SessionErrorVideoActivity;
 import de.fu_berlin.inf.dpp.videosharing.activities.VideoActivity;
-import de.fu_berlin.inf.dpp.videosharing.encode.Encoder;
 import de.fu_berlin.inf.dpp.videosharing.source.ImageSource;
 
 /**
@@ -49,8 +48,6 @@ public class ActivityManager implements Disposable {
     ActivityManagerReceiver receiver = new ActivityManagerReceiver();
     Thread activityReceiverThread = null;
     VideoSharingSession videoSharingSession;
-
-    protected Encoder encoder;
 
     public ActivityManager(ImageSource imageSource,
         VideoSharingSession videoSharingSession, ObjectInputStream objectIn) {

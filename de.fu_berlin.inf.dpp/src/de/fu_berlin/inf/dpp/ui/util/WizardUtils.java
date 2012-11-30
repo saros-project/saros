@@ -90,8 +90,6 @@ public class WizardUtils {
         return openWizardSuccessfully(null, wizard, initialSize);
     }
 
-    public static final Point GettingStartedWizardSize = new Point(950, 740);
-
     /**
      * Runs the {@link NewProjectAction} in the SWT thread in order to create a
      * new project wizard.

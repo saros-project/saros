@@ -30,8 +30,6 @@ public class ViewportAnnotation extends SarosAnnotation implements
 
     protected static final String TYPE = "de.fu_berlin.inf.dpp.annotations.viewport";
 
-    public static final int LAYER = 6;
-
     private static final int INSET = 2;
 
     private static final float STROKE_SCALE = 1.05f;

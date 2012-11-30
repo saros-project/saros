@@ -13,9 +13,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.PlatformUI;
-import org.picocontainer.annotations.Inject;
 
-import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
 import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.ui.util.selection.retriever.SelectionRetrieverFactory;
@@ -55,9 +53,6 @@ public class ProjectSelectionWizardPage extends WizardPage {
                 event.isFilterClosedProjects());
         }
     };
-
-    @Inject
-    Saros saros;
 
     public ProjectSelectionWizardPage() {
         super(ProjectSelectionWizardPage.class.getName());

@@ -19,8 +19,6 @@
 
 package de.fu_berlin.inf.dpp.feedback;
 
-import org.apache.log4j.Logger;
-
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.User.Permission;
 import de.fu_berlin.inf.dpp.annotations.Component;
@@ -37,8 +35,6 @@ import de.fu_berlin.inf.dpp.project.ISarosSession;
 @Component(module = "feedback")
 public class JumpFeatureUsageCollector extends AbstractStatisticCollector {
 
-    protected static final Logger log = Logger
-        .getLogger(PermissionChangeCollector.class.getName());
     protected int jumpedToWriteAccessHolder = 0;
     protected int jumpedToReadOnlyAccessHolder = 0;
 

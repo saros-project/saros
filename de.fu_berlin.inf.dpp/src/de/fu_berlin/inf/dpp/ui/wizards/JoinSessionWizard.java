@@ -72,7 +72,6 @@ public class JoinSessionWizard extends Wizard {
     public IncomingSessionNegotiation process;
 
     protected ShowDescriptionPage descriptionPage;
-    protected boolean requested = false;
     protected DataTransferManager dataTransferManager;
     protected PreferenceUtils preferenceUtils;
     protected VersionManager manager;

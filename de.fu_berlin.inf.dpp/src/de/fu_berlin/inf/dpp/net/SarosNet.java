@@ -39,8 +39,6 @@ public class SarosNet {
     protected String loginPassword;
     protected ConnectionConfiguration prevConnectionConfiguration;
 
-    // Config
-    protected boolean enableDebug;
     protected int proxyPort;
     protected boolean proxyEnabled;
     protected String stunServer;
@@ -96,7 +94,6 @@ public class SarosNet {
     public void setSettings(boolean enableDebug, boolean proxyEnabled,
         int proxyPort, String stunServer, int stunPort, boolean autoPortMapping) {
         Connection.DEBUG_ENABLED = enableDebug;
-        this.enableDebug = enableDebug;
         this.proxyPort = proxyPort;
         this.proxyEnabled = proxyEnabled;
         this.stunServer = stunServer;

@@ -26,9 +26,7 @@ import java.io.OutputStream;
 
 import org.apache.log4j.Logger;
 import org.picocontainer.Disposable;
-import org.picocontainer.annotations.Inject;
 
-import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.util.Utils;
 import de.fu_berlin.inf.dpp.videosharing.VideoSharing.VideoSharingSession;
 import de.fu_berlin.inf.dpp.videosharing.encode.Encoder;
@@ -43,9 +41,6 @@ import de.fu_berlin.inf.dpp.videosharing.encode.Encoder;
 public class ConnectionManager implements Disposable {
 
     private static final Logger log = Logger.getLogger(ConnectionManager.class);
-
-    @Inject
-    protected Saros saros;
 
     protected OutputStream out;
     protected ObjectInputStream decodeStatistics;

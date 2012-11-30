@@ -10,7 +10,6 @@ import java.util.Enumeration;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.apache.log4j.Logger;
 import org.jivesoftware.smack.SmackConfiguration;
 import org.jivesoftware.smackx.bytestreams.socks5.Socks5Proxy;
 
@@ -18,9 +17,6 @@ import org.jivesoftware.smackx.bytestreams.socks5.Socks5Proxy;
  * Static networking class, dealing with local IP retrieval
  */
 public class NetworkingUtils {
-
-    protected static final Logger log = Logger
-        .getLogger("de.fu_berlin.inf.dpp.net");
 
     /**
      * Retrieves all IP addresses from all non-loopback-, running network

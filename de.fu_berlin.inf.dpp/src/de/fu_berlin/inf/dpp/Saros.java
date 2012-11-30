@@ -50,7 +50,7 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.prefs.BackingStoreException;
 import org.osgi.service.prefs.Preferences;
-import org.picocontainer.injectors.Reinjector;
+
 
 import de.fu_berlin.inf.dpp.accountManagement.XMPPAccount;
 import de.fu_berlin.inf.dpp.accountManagement.XMPPAccountStore;
@@ -135,12 +135,6 @@ public class Saros extends AbstractUIPlugin {
     protected IUPnPService upnpService;
 
     protected SarosNet sarosNet;
-
-    /**
-     * The reinjector used to inject dependencies into those objects that are
-     * created by Eclipse and not by our PicoContainer.
-     */
-    protected Reinjector reinjector;
 
     /**
      * To print an architecture diagram at the end of the plug-in life-cycle

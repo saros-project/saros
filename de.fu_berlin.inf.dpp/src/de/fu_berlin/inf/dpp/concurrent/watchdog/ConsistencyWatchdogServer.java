@@ -24,7 +24,6 @@ import de.fu_berlin.inf.dpp.concurrent.management.DocumentChecksum;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.net.ConnectionState;
 import de.fu_berlin.inf.dpp.net.SarosNet;
-import de.fu_berlin.inf.dpp.net.internal.XMPPTransmitter;
 import de.fu_berlin.inf.dpp.project.AbstractActivityProvider;
 import de.fu_berlin.inf.dpp.project.AbstractSarosSessionListener;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
@@ -64,9 +63,6 @@ public class ConsistencyWatchdogServer extends Job {
 
     @Inject
     protected EditorManager editorManager;
-
-    @Inject
-    protected XMPPTransmitter transmitter;
 
     protected ISarosSessionManager sessionManager;
 

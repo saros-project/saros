@@ -16,7 +16,6 @@ import org.eclipse.ui.PlatformUI;
 import org.picocontainer.Disposable;
 import org.picocontainer.annotations.Inject;
 
-import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.activities.business.ChangeColorActivity;
@@ -53,9 +52,6 @@ public class ChangeColorAction extends Action implements Disposable {
 
     @Inject
     protected ISarosSessionManager sessionManager;
-
-    @Inject
-    protected Saros saros;
 
     @Inject
     protected EditorManager editorManager;
