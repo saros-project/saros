@@ -333,8 +333,7 @@ public class SarosContext implements ISarosContext {
             container.addComponent(component.getInterface(),
                 component.getImplementation());
 
-        // add this context itself because some components need it ...
-        container.addComponent(SarosContext.class, this);
+        container.addComponent(ISarosContext.class, this);
 
         /*
          * The following classes are initialized by the re-injector because they

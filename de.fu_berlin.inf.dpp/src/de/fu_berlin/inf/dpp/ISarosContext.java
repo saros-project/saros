@@ -12,7 +12,11 @@ public interface ISarosContext {
      * Injects dependencies into the annotated fields of the given object. This
      * method should be used for objects that were created by Eclipse, which
      * have a different life cycle than the Saros plug-in.
+     * 
+     * @deprecated using annotated field injection inside the business logic is
+     *             a bad design choice
      */
+    @Deprecated
     void initComponent(Object object);
 
     /**
@@ -30,4 +34,14 @@ public interface ISarosContext {
      * @return
      */
     boolean removeChildContainer(PicoContainer picoContainer);
+
+    /**
+     * Retrieve a component keyed by the component type.
+     * 
+     * @param componentType
+     *            the type of the component
+     * @return the typed resulting object instance or <code>null</code> if the
+     *         object does not exist.
+     */
+    <T> T getComponent(Class<T> componentType);
 }

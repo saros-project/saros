@@ -19,9 +19,8 @@ import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 import org.eclipse.jface.preference.IPreferenceStore;
-import org.picocontainer.MutablePicoContainer;
 
-import de.fu_berlin.inf.dpp.Saros;
+import de.fu_berlin.inf.dpp.ISarosContext;
 import de.fu_berlin.inf.dpp.SarosContext;
 import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
 import de.fu_berlin.inf.dpp.stf.server.rmi.controlbot.impl.ControlBotImpl;
@@ -83,8 +82,9 @@ import de.fu_berlin.inf.dpp.stf.shared.Configuration;
 import de.fu_berlin.inf.dpp.stf.shared.Constants;
 
 /**
- * STFController is responsible to register all exported objects.
- * 
+ * The STF Controller is responsible to register all exported objects and also
+ * changes some Saros configurations to ensure proper execution of the STF test
+ * cases.
  */
 public class STFController {
 
@@ -93,7 +93,8 @@ public class STFController {
 
     private static Registry registry;
 
-    public static void start(int port, Saros saros) throws RemoteException {
+    public static void start(int port, ISarosContext context)
+        throws RemoteException {
 
         Thread
             .setDefaultUncaughtExceptionHandler(new UncaughtExceptionHandler() {
@@ -104,6 +105,7 @@ public class STFController {
                 }
 
             });
+
         LogManager.resetConfiguration();
 
         PropertyConfigurator.configure(STFController.class.getClassLoader()
@@ -119,35 +121,16 @@ public class STFController {
         for (String key : propertyKeys)
             log.info("java property: " + key + " = " + System.getProperty(key));
 
-        MutablePicoContainer container = null;
-        try {
-
-            Field sarosContextField = Saros.class
-                .getDeclaredField("sarosContext");
-            sarosContextField.setAccessible(true);
-
-            Field mutablePicoContainerField = SarosContext.class
-                .getDeclaredField("container");
-
-            mutablePicoContainerField.setAccessible(true);
-
-            SarosContext sarosContext = (SarosContext) sarosContextField
-                .get(saros);
-
-            container = (MutablePicoContainer) mutablePicoContainerField
-                .get(sarosContext);
-        } catch (Exception e) {
-            throw new RemoteException(e.getMessage(), e);
-        }
-
-        assert container != null;
-
-        for (Object object : container.getComponents())
+        /*
+         * cast is ok for now, do not flood the interface with seldom used
+         * methods
+         */
+        for (Object object : ((SarosContext) context).getComponents())
             log.debug("container component: " + object.getClass().getName());
 
-        StfRemoteObject.setPicoContainer(container);
+        StfRemoteObject.setContext(context);
 
-        IPreferenceStore preferenceStore = container
+        IPreferenceStore preferenceStore = context
             .getComponent(IPreferenceStore.class);
 
         String chatServerJID = Configuration.getString("xmpp_chat_server");
@@ -345,6 +328,5 @@ public class STFController {
                 + object + "'");
 
         }
-
     }
 }

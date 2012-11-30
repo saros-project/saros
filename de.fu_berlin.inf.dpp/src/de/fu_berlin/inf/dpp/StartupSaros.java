@@ -29,7 +29,7 @@ public class StartupSaros implements IStartup {
     private static final Logger log = Logger.getLogger(StartupSaros.class);
 
     @Inject
-    private Saros saros;
+    private ISarosContext context;
 
     @Inject
     private SarosUI sarosUI;
@@ -38,7 +38,7 @@ public class StartupSaros implements IStartup {
     private XMPPAccountStore xmppAccountStore;
 
     public StartupSaros() {
-        SarosPluginContext.reinject(this);
+        SarosPluginContext.initComponent(this);
     }
 
     /*
@@ -88,7 +88,7 @@ public class StartupSaros implements IStartup {
         Utils.runSafeAsync("RmiSWTWorkbenchBot-", log, new Runnable() {
             public void run() {
                 try {
-                    STFController.start(port, saros);
+                    STFController.start(port, context);
                 } catch (Exception e) {
                     log.error("starting RMI bot failed", e);
                 }
