@@ -161,17 +161,19 @@ public class SingleUserChatService extends AbstractChatService {
      *         otherwise the existing {@link SingleUserChat} is returned.
      */
     public synchronized SingleUserChat createChat(Chat chat) {
-        SingleUserChat createdChat = currentChats.get(chat.getParticipant());
+
+        JID jid = new JID(chat.getParticipant());
+
+        SingleUserChat createdChat = currentChats.get(jid);
 
         if (createdChat == null) {
-            LOG.trace("creating new chat between " + userJID + " <->"
-                + chat.getParticipant());
+            LOG.trace("creating new chat between " + userJID + " <->" + jid);
 
             createdChat = new SingleUserChat(sarosNet);
 
             createdChat.initChat(userJID, chat, chatStateManager);
             createdChat.setConnected(true);
-            currentChats.put(new JID(chat.getParticipant()), createdChat);
+            currentChats.put(jid, createdChat);
         }
 
         return createdChat;
