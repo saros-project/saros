@@ -181,8 +181,15 @@ public abstract class StfTestCase {
 
                 // TODO clear the chat history, should be done via non-gui
                 // access
-                tester.superBot().views().sarosView()
-                    .closeChatroomWithRegex(".*");
+                if (tester.superBot().views().sarosView().hasOpenChatrooms()) {
+                    try {
+                        tester.superBot().views().sarosView()
+                            .closeChatroomWithRegex(".*");
+                    } catch (Exception e) {
+                        LOGGER.log(Level.WARNING,
+                            "chatsrooms were closed lately by Saros", e);
+                    }
+                }
 
                 // Consistency watch dog seems to lock some files from time to
                 // time

@@ -456,6 +456,17 @@ public final class SarosView extends StfRemoteObject implements ISarosView {
             new SWTBotCTabItem((CTabItem) chatTab).close();
     }
 
+    @SuppressWarnings("unchecked")
+    @Override
+    public boolean hasOpenChatrooms() throws RemoteException {
+        return !view
+            .bot()
+            .getFinder()
+            .findControls(view.getWidget(),
+                allOf(widgetOfType(CTabItem.class), withRegex(".*")), true)
+            .isEmpty();
+    }
+
     /*
      * waits until
      */

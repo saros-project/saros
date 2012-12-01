@@ -138,7 +138,7 @@ public interface ISarosView extends Remote {
      *            the name of the chat (as displayed in the chat tab)
      * @return an {@link IChatroom} interface
      * @throws RemoteException
-     *             if the chat does not exist
+     *             if the chat room does not exist
      */
     public IChatroom selectChatroom(String name) throws RemoteException;
 
@@ -149,7 +149,7 @@ public interface ISarosView extends Remote {
      *            the regular expression to find the chat
      * @return an {@link IChatroom} interface for the first found match
      * @throws RemoteException
-     *             if no matches where found
+     *             if no matches are found
      */
 
     public IChatroom selectChatroomWithRegex(String regex)
@@ -159,9 +159,9 @@ public interface ISarosView extends Remote {
      * Closes the chat room with the given title.
      * 
      * @param name
-     *            the name of the chat (as displayed in the chat tab)
+     *            the name of the chat room (as displayed in the chat tab)
      * @throws RemoteException
-     * 
+     *             if the chat room does not exist
      */
 
     public void closeChatroom(String name) throws RemoteException;
@@ -170,12 +170,22 @@ public interface ISarosView extends Remote {
      * Closes all chat rooms that matches the given regular expression.
      * 
      * @param regex
-     *            the regular expression to find the chat
+     *            the regular expression to find the chat(s)
      * @throws RemoteException
-     * 
+     *             if no matches are found
      */
 
     public void closeChatroomWithRegex(String regex) throws RemoteException;
+
+    /**
+     * Checks if one or multiple chat rooms are currently opened in the Saros
+     * view.
+     * 
+     * @return <code>true</code> if at least one chat room is open in the
+     *         current Saros view, <code>false</code> otherwise
+     * @throws RemoteException
+     */
+    public boolean hasOpenChatrooms() throws RemoteException;
 
     /**********************************************
      * 
