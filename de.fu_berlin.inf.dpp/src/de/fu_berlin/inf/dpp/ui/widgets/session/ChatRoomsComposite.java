@@ -124,13 +124,19 @@ public class ChatRoomsComposite extends ListExplanatoryComposite {
      * =167540&atid=843362
      */
     protected EditorManager editorManager;
+
     protected AbstractSharedEditorListener sharedEditorListener = new AbstractSharedEditorListener() {
         @Override
         public void colorChanged() {
-            for (CTabItem tab : chatRooms.getItems()) {
-                ChatControl control = (ChatControl) tab.getControl();
-                control.refreshFromHistory();
-            }
+            Utils.runSafeSWTAsync(log, new Runnable() {
+                @Override
+                public void run() {
+                    for (CTabItem tab : chatRooms.getItems()) {
+                        ChatControl control = (ChatControl) tab.getControl();
+                        control.updateColors();
+                    }
+                }
+            });
         }
     };
 
@@ -384,7 +390,7 @@ public class ChatRoomsComposite extends ListExplanatoryComposite {
             ChatControl control = (ChatControl) tab.getControl();
 
             if (!Collections.disjoint(jids, chat.getParticipants())) {
-                control.refreshFromHistory();
+                control.updateDisplayNames();
                 tab.setText(chat.getTitle());
             }
         }

@@ -7,8 +7,6 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.widgets.Composite;
 
-import de.fu_berlin.inf.dpp.User;
-import de.fu_berlin.inf.dpp.editor.annotations.SarosAnnotation;
 import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.nebula.widgets.SimpleRoundedComposite;
 
@@ -23,18 +21,19 @@ public class ChatLineSeparator extends SimpleRoundedComposite {
     protected final SimpleDateFormat dateFormatter = new SimpleDateFormat(
         Messages.ChatLineSeparator_date_formatter_pattern);
 
-    public ChatLineSeparator(Composite parent, User user, Date date) {
-        this(parent, user.getHumanReadableName(), SarosAnnotation
-            .getUserColor(user), date);
-    }
+    protected String username;
 
     public ChatLineSeparator(Composite parent, String username, Color color,
         Date date) {
         super(parent, SWT.SEPARATOR | SWT.BORDER);
         this.setBackground(color);
+        this.username = username;
 
         String receivedOn = dateFormatter.format(date);
         setTexts(new String[] { receivedOn });
     }
 
+    public String getUsername() {
+        return this.username;
+    }
 }

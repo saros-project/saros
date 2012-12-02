@@ -1,7 +1,8 @@
 package de.fu_berlin.inf.dpp.ui.widgets.chatControl.parts;
 
+import java.util.ArrayList;
 import java.util.Date;
-import java.util.Vector;
+import java.util.List;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
@@ -17,6 +18,7 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 
+import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.ui.widgets.chatControl.events.ChatClearedEvent;
 import de.fu_berlin.inf.dpp.ui.widgets.chatControl.events.IChatDisplayListener;
@@ -31,11 +33,13 @@ import de.fu_berlin.inf.nebula.widgets.SimpleRoundedComposite;
  * @author bkahlert
  */
 public class ChatDisplay extends ScrolledComposite {
-    protected Vector<IChatDisplayListener> chatDisplayListeners = new Vector<IChatDisplayListener>();
+
+    protected List<IChatDisplayListener> chatDisplayListeners = new ArrayList<IChatDisplayListener>();
 
     protected Composite contentComposite;
     protected Composite optionsComposite;
-    protected Object lastUser;
+
+    protected JID lastUser;
 
     public ChatDisplay(Composite parent, int style, Color backgroundColor) {
         super(parent, style);
@@ -110,30 +114,32 @@ public class ChatDisplay extends ScrolledComposite {
      * Displays a new line containing the supplied message and a separator line
      * if necessary.
      * 
-     * @param sender
-     *            who composed the message
+     * @param jid
+     *            JID of the sender who composed the message
      * @param color
-     *            to be used to mark the user
+     *            the color to be used to mark the user
      * @param message
      *            composed by the sender
      * @param receivedOn
      *            the date the message was received
      */
-    public void addChatLine(Object sender, Color color, String message,
-        Date receivedOn) {
+    public void addChatLine(JID jid, String displayName, Color color,
+        String message, Date receivedOn) {
         /*
          * Sender line
          */
-        if (lastUser != null && lastUser.equals(sender)) { // same user
+        if (lastUser != null && lastUser.equals(jid)) { // same user
             ChatLineSeparator chatLineSeparator = new ChatLineSeparator(
-                contentComposite, sender.toString(), color, receivedOn);
+                contentComposite, displayName, color, receivedOn);
             chatLineSeparator.setLayoutData(new GridData(SWT.FILL,
                 SWT.BEGINNING, true, false));
+            chatLineSeparator.setData(jid);
         } else { // new / different user
             ChatLinePartnerChangeSeparator chatPartnerChangeLine = new ChatLinePartnerChangeSeparator(
-                contentComposite, sender.toString(), color, receivedOn);
+                contentComposite, displayName, color, receivedOn);
             chatPartnerChangeLine.setLayoutData(new GridData(SWT.FILL,
                 SWT.BEGINNING, true, false));
+            chatPartnerChangeLine.setData(jid);
         }
 
         /*
@@ -152,7 +158,48 @@ public class ChatDisplay extends ScrolledComposite {
 
         this.refresh();
 
-        lastUser = sender;
+        lastUser = jid;
+    }
+
+    /**
+     * Updates the color of the chat line separators for a specific JID.
+     * 
+     * @param jid
+     *            JID whose color should be updated
+     * @param color
+     *            the new color
+     */
+    public void updateColor(JID jid, Color color) {
+
+        for (Control control : contentComposite.getChildren()) {
+            if (!jid.equals(control.getData()))
+                continue;
+
+            if (control instanceof ChatLineSeparator
+                || control instanceof ChatLinePartnerChangeSeparator)
+                control.setBackground(color);
+        }
+    }
+
+    /**
+     * Updates the display name of the chat line separators for a specific JID.
+     * 
+     * @param jid
+     *            the JID whose display name should be updated
+     * @param displayName
+     *            the new display name
+     */
+    public void updateDisplayName(JID jid, String displayName) {
+        for (Control control : contentComposite.getChildren()) {
+            if (!jid.equals(control.getData()))
+                continue;
+
+            if (control instanceof ChatLinePartnerChangeSeparator) {
+                ChatLinePartnerChangeSeparator separator = (ChatLinePartnerChangeSeparator) control;
+                separator.setUsername(displayName);
+            }
+        }
+
     }
 
     /**
@@ -185,8 +232,8 @@ public class ChatDisplay extends ScrolledComposite {
     }
 
     /**
-     * Layouts the contents anew, updates the scrollbar min size and scrolls to
-     * the bottom
+     * Layouts the current contents, updates the scroll bar minimum size and
+     * scrolls to the bottom.
      */
     public void refresh() {
         /*
@@ -231,7 +278,7 @@ public class ChatDisplay extends ScrolledComposite {
      * @param chatListener
      */
     public void addChatDisplayListener(IChatDisplayListener chatListener) {
-        this.chatDisplayListeners.addElement(chatListener);
+        this.chatDisplayListeners.add(chatListener);
     }
 
     /**
@@ -240,7 +287,7 @@ public class ChatDisplay extends ScrolledComposite {
      * @param chatListener
      */
     public void removeChatListener(IChatDisplayListener chatListener) {
-        this.chatDisplayListeners.removeElement(chatListener);
+        this.chatDisplayListeners.remove(chatListener);
     }
 
     /**

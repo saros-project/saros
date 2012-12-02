@@ -1,10 +1,13 @@
 package de.fu_berlin.inf.dpp.ui.widgets.chatControl;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.eclipse.swt.SWT;
@@ -16,6 +19,7 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.jivesoftware.smack.XMPPException;
@@ -26,7 +30,6 @@ import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.communication.chat.ChatElement;
 import de.fu_berlin.inf.dpp.communication.chat.ChatElement.ChatElementType;
-import de.fu_berlin.inf.dpp.communication.chat.ChatHistory;
 import de.fu_berlin.inf.dpp.communication.chat.IChat;
 import de.fu_berlin.inf.dpp.communication.chat.IChatListener;
 import de.fu_berlin.inf.dpp.editor.annotations.SarosAnnotation;
@@ -74,6 +77,12 @@ public class ChatControl extends Composite {
     protected List<IChatControlListener> chatControlListeners = new ArrayList<IChatControlListener>();
 
     private static final Logger log = Logger.getLogger(ChatControl.class);
+
+    private static final Color LOCAL_USER_DEFAULT_COLOR = Display.getDefault()
+        .getSystemColor(SWT.COLOR_CYAN);
+
+    private static final Color REMOTE_USER_DEFAULT_COLOR = Display.getDefault()
+        .getSystemColor(SWT.COLOR_GRAY);
 
     private final Map<JID, Color> colorCache = new HashMap<JID, Color>();
 
@@ -152,7 +161,7 @@ public class ChatControl extends Composite {
 
             // The chat contains the pre-session colors. Refresh it, to clear
             // the cache and use the in-session colors.
-            refreshFromHistoryInSWTAsync();
+            updateColorsInSWTAsync();
         }
 
         @Override
@@ -164,7 +173,7 @@ public class ChatControl extends Composite {
 
             // The chat contains the in-session colors. Refresh it, to clear the
             // color cache and use the pre-session colors again.
-            refreshFromHistoryInSWTAsync();
+            updateColorsInSWTAsync();
         }
     };
 
@@ -172,7 +181,7 @@ public class ChatControl extends Composite {
 
         @Override
         public void userJoined(User user) {
-            refreshFromHistoryInSWTAsync();
+            updateColorsInSWTAsync();
         }
     };
 
@@ -333,18 +342,25 @@ public class ChatControl extends Composite {
     }
 
     /**
-     * Recreates the {@link ChatControl}s contents on the base of the
-     * {@link ChatHistory}
+     * Updates the colors for the current chat contents.
      */
-    public void refreshFromHistory() {
-        List<ChatElement> entries = chat.getHistory();
+    public void updateColors() {
 
-        silentClear();
         clearColorCache();
 
-        for (ChatElement element : entries) {
-            addChatLine(element);
-        }
+        for (JID jid : getChatJIDsFromHistory())
+            chatDisplay.updateColor(jid, getColorForJID(jid));
+    }
+
+    /**
+     * Updates the display names for the current chat contents.
+     */
+    public void updateDisplayNames() {
+        for (JID jid : getChatJIDsFromHistory())
+            chatDisplay.updateDisplayName(jid, getNickname(jid));
+
+        // TODO: this currently scrolls to the bottom
+        chatDisplay.refresh();
     }
 
     @Override
@@ -355,7 +371,7 @@ public class ChatControl extends Composite {
     }
 
     /**
-     * Clears the color cache and disposes the stored colors
+     * Clears the color cache and disposes the stored colors.
      */
     private void clearColorCache() {
         for (Map.Entry<JID, Color> entry : colorCache.entrySet()) {
@@ -365,16 +381,36 @@ public class ChatControl extends Composite {
     }
 
     public void addChatLine(ChatElement element) {
-        JID sender = element.getSender().getBareJID();
+        /*
+         * FIXME: MUC JIDs are returned with perspective
+         * saros419397963@conference
+         * .saros-con.imp.fu-berlin.de/jenkins_bob_stf@saros
+         * -con.imp.fu-berlin.de/Saros
+         * 
+         * which will become jenkins_bob_stf@saros-con.imp.fu-berlin.de/Saros
+         * after getBareJID() and this is not the BARE JID!
+         */
+        JID jid = element.getSender().getBareJID();
+        Color color = getColorForJID(jid);
+        chatDisplay.addChatLine(jid, getNickname(jid), color,
+            element.toString(), element.getDate());
+    }
 
-        Color color = colorCache.get(sender);
+    /**
+     * Retrieves the color for a the JID. If the JID is used by a user in the
+     * currently running Saros session its session color will be returned.
+     * Otherwise a default color is returned.
+     * 
+     */
+    protected Color getColorForJID(JID jid) {
+        Color color = colorCache.get(jid);
         if (color == null) {
             synchronized (ChatControl.this) {
 
                 User user = null;
                 if (session != null) {
                     JID resourceQualifiedJID = session
-                        .getResourceQualifiedJID(sender);
+                        .getResourceQualifiedJID(jid);
 
                     if (resourceQualifiedJID != null)
                         user = session.getUser(resourceQualifiedJID);
@@ -387,22 +423,24 @@ public class ChatControl extends Composite {
                         SarosAnnotation.getLightnessScale());
                     userColor.dispose();
 
-                    colorCache.put(sender, color);
-                } else if (isOwnJID(element.getSender())) {
-                    color = this.getDisplay().getSystemColor(SWT.COLOR_CYAN);
+                    colorCache.put(jid, color);
+                } else if (isOwnJID(jid)) {
+                    color = LOCAL_USER_DEFAULT_COLOR;
                 } else {
-                    color = this.getDisplay().getSystemColor(SWT.COLOR_GRAY);
+                    color = REMOTE_USER_DEFAULT_COLOR;
                 }
             }
         }
+        return color;
+    }
 
-        String name = RosterUtils.getNickname(sarosNet, sender);
+    private String getNickname(JID jid) {
+        String name = RosterUtils.getNickname(sarosNet, jid);
         if (name == null) {
-            name = sender.toString();
+            name = jid.toString();
         }
 
-        chatDisplay.addChatLine(name, color, element.toString(),
-            element.getDate());
+        return name;
     }
 
     /**
@@ -529,13 +567,31 @@ public class ChatControl extends Composite {
      * Makes sure refreshing the chat is done in the SWT thread. Performed
      * asynchronously to prevent dead locks.
      */
-    private void refreshFromHistoryInSWTAsync() {
+    private void updateColorsInSWTAsync() {
         Utils.runSafeSWTAsync(log, new Runnable() {
             @Override
             public void run() {
-                refreshFromHistory();
+                updateColors();
             }
         });
     }
 
+    private Collection<JID> getChatJIDsFromHistory() {
+        /*
+         * FIXME: MUC JIDs are returned with perspective
+         * saros419397963@conference
+         * .saros-con.imp.fu-berlin.de/jenkins_bob_stf@saros
+         * -con.imp.fu-berlin.de/Saros
+         * 
+         * which will become jenkins_bob_stf@saros-con.imp.fu-berlin.de/Saros
+         * after getBareJID() and this is not the BARE JID!
+         */
+
+        Set<JID> jids = new HashSet<JID>();
+
+        for (ChatElement element : chat.getHistory())
+            jids.add(element.getSender().getBareJID());
+
+        return jids;
+    }
 }

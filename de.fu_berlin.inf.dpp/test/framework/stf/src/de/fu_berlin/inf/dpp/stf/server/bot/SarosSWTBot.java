@@ -156,7 +156,7 @@ public final class SarosSWTBot extends SWTBot {
     }
 
     /**
-     * @param plainID
+     * @param username
      *            the user name.
      * @return a {@link SarosSWTBotChatLinePartnerChangeSeparator} with the
      *         specified <code>plainID</code>.
@@ -165,8 +165,13 @@ public final class SarosSWTBot extends SWTBot {
      */
     @SuppressWarnings({ "unchecked", "rawtypes" })
     public SarosSWTBotChatLinePartnerChangeSeparator chatLinePartnerChangeSeparator(
-        final String plainID) {
+        final String username) {
         Matcher matcher = allOf(widgetOfType(ChatLinePartnerChangeSeparator.class));
+
+        /*
+         * FIXME: a list of widgets in the ->>>>> !!! active shell !!! <<<<<-
+         * that match the matcher.
+         */
         final List<? extends ChatLinePartnerChangeSeparator> allWidgets = widgets(matcher);
 
         final ChatLinePartnerChangeSeparator matchedSeparator = UIThreadRunnable
@@ -174,9 +179,7 @@ public final class SarosSWTBot extends SWTBot {
                 public ChatLinePartnerChangeSeparator run() {
                     ChatLinePartnerChangeSeparator matchedSeparator = null;
                     for (final ChatLinePartnerChangeSeparator separator : allWidgets) {
-                        log.debug("separator's user name: "
-                            + separator.getPlainID());
-                        if (separator.getPlainID().equals(plainID)) {
+                        if (separator.getUsername().equals(username)) {
                             matchedSeparator = separator;
                             break;
                         }
