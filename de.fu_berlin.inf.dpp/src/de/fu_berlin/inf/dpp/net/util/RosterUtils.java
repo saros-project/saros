@@ -281,19 +281,20 @@ public class RosterUtils {
      * @throws InvocationTargetException
      */
     public static void addToRoster(Connection connection, final JID jid,
-        String nickname, SubMonitor monitor) throws InvocationTargetException {
+        String nickname, IProgressMonitor monitor)
+        throws InvocationTargetException {
 
-        if (monitor == null)
-            monitor = SubMonitor.convert(monitor);
         if (connection == null)
             throw new InvocationTargetException(new NullPointerException(),
                 "You need to be connected to an XMPP/Jabber server.");
 
-        monitor.beginTask("Adding buddy " + jid + "...", 3);
+        SubMonitor subMonitor = SubMonitor.convert(monitor);
+
+        subMonitor.beginTask("Adding buddy " + jid + "...", 3);
         try {
             try {
                 boolean jidOnServer = isJIDonServer(connection, jid,
-                    monitor.newChild(1));
+                    subMonitor.newChild(1));
                 if (!jidOnServer) {
                     boolean cancel = false;
                     try {
@@ -348,21 +349,21 @@ public class RosterUtils {
             }
 
             try {
-                monitor.worked(1);
+                subMonitor.worked(1);
 
                 /*
                  * Add the buddy to the Roster
                  */
-                connection.getRoster().createEntry(jid.toString(), nickname,
+                connection.getRoster().createEntry(jid.getBase(), nickname,
                     null);
             } catch (XMPPException e) {
                 throw new InvocationTargetException(e, "Unknown error: "
                     + e.getMessage());
             } finally {
-                monitor.done();
+                subMonitor.done();
             }
         } finally {
-            monitor.done();
+            subMonitor.done();
         }
     }
 

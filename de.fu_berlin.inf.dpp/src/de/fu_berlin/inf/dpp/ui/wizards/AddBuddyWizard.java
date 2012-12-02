@@ -23,7 +23,6 @@ import java.util.concurrent.CancellationException;
 
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.wizard.Wizard;
@@ -115,8 +114,7 @@ public class AddBuddyWizard extends Wizard {
                             .addSubscriptionManagerListener(subscriptionManagerListener);
 
                         RosterUtils.addToRoster(saros.getSarosNet()
-                            .getConnection(), jid, nickname, SubMonitor
-                            .convert(monitor));
+                            .getConnection(), jid, nickname, monitor);
                         cachedBuddy = jid;
                     } catch (CancellationException e) {
                         throw new InterruptedException();

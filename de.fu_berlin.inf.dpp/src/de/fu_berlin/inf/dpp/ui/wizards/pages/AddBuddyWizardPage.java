@@ -134,7 +134,8 @@ public class AddBuddyWizardPage extends WizardPage {
         JID ownJid = saros.getSarosNet().getMyJID();
         JID foreignJid = this.getBuddy();
 
-        if (foreignJid.isValid() && !foreignJid.equals(ownJid)) {
+        if (foreignJid.isValid() && !foreignJid.equals(ownJid)
+            && !foreignJid.isResourceQualifiedJID()) {
             /*
              * Page is complete
              */
