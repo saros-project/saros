@@ -45,7 +45,7 @@ public class OverlappingSharingTest extends StfTestCase {
      * 
      * result: ALICE and BOB have the shared files A and B in the session
      * 
-     * @throws Exception
+     * 
      */
     @Test
     public void testOverlappingSharingInExistingProject() throws Exception {

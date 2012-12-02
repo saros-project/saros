@@ -8,7 +8,6 @@ import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import de.fu_berlin.inf.dpp.net.JID;
@@ -77,7 +76,6 @@ public class NetworkManipulatorTest extends StfTestCase {
     }
 
     @Test
-    @Ignore("does not work currently because of the network refactoring stuff")
     public void testBlockAndUnblockOutgoingTrafficOnAlice() throws Exception {
         ALICE.controlBot().getNetworkManipulator()
             .blockOutgoingSessionPackets();
@@ -97,7 +95,6 @@ public class NetworkManipulatorTest extends StfTestCase {
     }
 
     @Test
-    @Ignore("does not work currently because of the network refactoring stuff")
     public void testBlockAndUnblockIncommingTrafficOnBob() throws Exception {
         BOB.controlBot().getNetworkManipulator().blockIncomingSessionPackets();
 
@@ -116,7 +113,6 @@ public class NetworkManipulatorTest extends StfTestCase {
     }
 
     @Test
-    @Ignore("does not work currently because of the network refactoring stuff")
     public void testBlockNonExistingSessionJID() throws Exception {
         BOB.controlBot().getNetworkManipulator()
             .blockIncomingSessionPackets(new JID("my@example.com"));
@@ -130,7 +126,6 @@ public class NetworkManipulatorTest extends StfTestCase {
     }
 
     @Test
-    @Ignore("does not work currently because of the network refactoring stuff")
     public void testBlockAndUnblockOutgoingTrafficOnAliceToSingleJID()
         throws Exception {
         ALICE.controlBot().getNetworkManipulator()
@@ -149,5 +144,4 @@ public class NetworkManipulatorTest extends StfTestCase {
 
         assertEquals("foobla", BOB.remoteBot().editor("bar.txt").getText());
     }
-
 }

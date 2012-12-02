@@ -21,20 +21,20 @@ import de.fu_berlin.inf.dpp.stf.test.Constants;
 
 public class FileOperationsTest extends StfTestCase {
 
+    @BeforeClass
+    public static void selectTesters() throws Exception {
+        select(ALICE, BOB, CARL);
+    }
+
     /**
      * Preconditions:
      * <ol>
-     * <li>ALICE (Host, Write Access), aclice share a java project with BOB and
-     * CARL.</li>
+     * <li>ALICE (Host, Write Access) shares a Java project with BOB and CARL.</li>
      * <li>BOB (Read-Only Access)</li>
      * <li>CARL (Read-Only Access)</li>
      * </ol>
      * 
      */
-    @BeforeClass
-    public static void selectTesters() throws Exception {
-        select(ALICE, BOB, CARL);
-    }
 
     @Before
     public void beforeEveryTest() throws Exception {

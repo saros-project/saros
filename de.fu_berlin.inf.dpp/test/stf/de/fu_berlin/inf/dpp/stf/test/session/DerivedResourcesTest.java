@@ -5,6 +5,7 @@ import static de.fu_berlin.inf.dpp.stf.client.tester.SarosTester.BOB;
 import static org.junit.Assert.assertFalse;
 
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import de.fu_berlin.inf.dpp.stf.client.StfTestCase;
@@ -23,6 +24,7 @@ public class DerivedResourcesTest extends StfTestCase {
      * resources !
      */
     @Test
+    @Ignore("Does not work under *NIX because the context menu does not contain the Buidl Project option")
     public void testDerivedResourcesMustNotMarkedAsSharedInAFullSharedProject()
         throws Exception {
 
