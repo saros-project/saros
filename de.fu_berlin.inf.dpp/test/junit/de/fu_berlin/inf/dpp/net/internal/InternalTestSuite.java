@@ -7,7 +7,6 @@ import de.fu_berlin.inf.dpp.net.internal.extensions.InternalExtensionsTestSuite;
 
 @RunWith(Suite.class)
 @Suite.SuiteClasses({ BinaryChannelTest.class, TransferDescriptionTest.class,
-    SarosNetConnectTest.class, SarosNetTest.class, UserTest.class,
     InternalExtensionsTestSuite.class })
 public class InternalTestSuite {
     // the class remains completely empty,
