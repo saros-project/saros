@@ -28,6 +28,7 @@ import de.fu_berlin.inf.dpp.FileListFactory;
 import de.fu_berlin.inf.dpp.SarosContext;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.activities.ProjectExchangeInfo;
+import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.activities.business.ProjectsAddedActivity;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
@@ -518,8 +519,16 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
             }
         }
 
+        /*
+         * Use editorManager.saveText() because the EditorAPI.saveProject() will
+         * not save files which were modified in the background. This is what
+         * hapens for example if a user edits a file which is not opended by the
+         * local user.
+         */
+        for (SPath path : editorManager.getOpenEditorsOfAllParticipants()) {
+            editorManager.saveText(path);
+        }
         try {
-
             List<File> archivesToSend = new LinkedList<File>();
 
             for (Map.Entry<String, List<IPath>> entry : projectFilesToSend
@@ -585,8 +594,8 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
          * if (outInvitationUI.confirmProjectSave(peer)) getOpenEditors =>
          * filter per Project => if dirty ask to save
          */
-
         EditorAPI.saveProject(project, false);
+
         String prefix = projectID + this.projectIDDelimiter;
         if (project == null) {
             log.debug(projectID + ": is null");
