@@ -441,7 +441,7 @@ public final class SarosView extends StfRemoteObject implements ISarosView {
 
     @Override
     public void closeChatroom(String name) throws RemoteException {
-        closeChatroom(Pattern.quote(name));
+        closeChatroomWithRegex(Pattern.quote(name));
 
     }
 
