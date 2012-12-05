@@ -148,6 +148,8 @@ public class EditorManager extends AbstractActivityProvider {
 
     protected boolean hasWriteAccess;
 
+    protected boolean isLocked;
+
     protected final EditorPool editorPool = new EditorPool(this);
 
     protected final DirtyStateListener dirtyStateListener = new DirtyStateListener(
@@ -682,7 +684,7 @@ public class EditorManager extends AbstractActivityProvider {
         TextEditActivity textEdit = new TextEditActivity(
             sarosSession.getLocalUser(), offset, text, replacedText, path);
 
-        if (!this.hasWriteAccess) {
+        if (!hasWriteAccess || isLocked) {
             /**
              * TODO If we don't have {@link User.Permission#WRITE_ACCESS}, then
              * receiving this event might indicate that the user somehow
@@ -691,8 +693,9 @@ public class EditorManager extends AbstractActivityProvider {
              * 
              * But watch out for changes because of a consistency check!
              */
-            log.warn("Local buddy with read-only access caused text changes: "
-                + textEdit);
+            log.warn("local user caused text changes: " + textEdit
+                + " | write access : " + hasWriteAccess + ", session locked : "
+                + isLocked);
             return;
         }
 
@@ -1828,6 +1831,8 @@ public class EditorManager extends AbstractActivityProvider {
             log.debug("Unlock all editors");
         editorPool
             .setWriteAccessEnabled(!lock && sarosSession.hasWriteAccess());
+
+        isLocked = lock;
     }
 
     public Set<SPath> getRemoteOpenEditors() {
