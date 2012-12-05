@@ -28,6 +28,7 @@ import de.fu_berlin.inf.dpp.project.AbstractActivityProvider;
 import de.fu_berlin.inf.dpp.project.AbstractSarosSessionListener;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
+import de.fu_berlin.inf.dpp.synchronize.Blockable;
 import de.fu_berlin.inf.dpp.util.Utils;
 
 /**
@@ -68,11 +69,37 @@ public class ConsistencyWatchdogServer extends Job {
 
     protected ISarosSession sarosSession;
 
+    private boolean locked = false;
+
     protected final AbstractActivityProvider activityProvider = new AbstractActivityProvider() {
         @Override
         public void exec(IActivity activity) {
             /* Needed to be able to dispatch activities */
         }
+    };
+
+    private final Blockable executionState = new Blockable() {
+
+        @Override
+        public void block() {
+
+            Utils.runSafeSWTSync(log, new Runnable() {
+                @Override
+                public void run() {
+                    /*
+                     * set in SWT thread to ensure that all outstanding
+                     * activities are fired when we return
+                     */
+                    locked = true;
+                }
+            });
+        }
+
+        @Override
+        public void unblock() {
+            locked = false;
+        }
+
     };
 
     public ConsistencyWatchdogServer(ISarosSessionManager sessionManager) {
@@ -86,9 +113,11 @@ public class ConsistencyWatchdogServer extends Job {
                 public void sessionStarted(ISarosSession newSarosSession) {
 
                     newSarosSession.addActivityProvider(activityProvider);
-
                     if (newSarosSession.isHost()) {
                         sarosSession = newSarosSession;
+                        sarosSession.getStopManager().addBlockable(
+                            executionState);
+
                         log.debug("Starting consistency watchdog");
                         if (!isSystem())
                             setSystem(true);
@@ -103,6 +132,8 @@ public class ConsistencyWatchdogServer extends Job {
                     oldSarosSession.removeActivityProvider(activityProvider);
 
                     if (sarosSession != null) {
+                        sarosSession.getStopManager().removeBlockable(
+                            executionState);
                         // Cancel Job
                         cancel();
                         sarosSession = null;
@@ -179,6 +210,9 @@ public class ConsistencyWatchdogServer extends Job {
 
         Utils.runSafeSWTSync(log, new Runnable() {
             public void run() {
+
+                if (locked)
+                    return;
 
                 IFile file = docPath.getFile();
 
