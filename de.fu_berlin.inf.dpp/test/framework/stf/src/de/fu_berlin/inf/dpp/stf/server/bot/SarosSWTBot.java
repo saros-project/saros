@@ -35,12 +35,15 @@ public final class SarosSWTBot extends SWTBot {
 
     private static final Logger log = Logger.getLogger(SarosSWTBot.class);
 
+    private Widget widget;
+
     public SarosSWTBot() {
         super();
     }
 
     public SarosSWTBot(Widget widget) {
         super(widget);
+        this.widget = widget;
     }
 
     /**
@@ -96,6 +99,7 @@ public final class SarosSWTBot extends SWTBot {
     public SarosSWTBotChatLine lastChatLine() {
         Matcher matcher = allOf(widgetOfType(ChatLine.class));
         List<? extends Widget> allWidgets = widgets(matcher);
+
         Widget lastChatLine = allWidgets.get(allWidgets.size() - 1);
         return new SarosSWTBotChatLine((ChatLine) lastChatLine, matcher);
     }
@@ -168,10 +172,6 @@ public final class SarosSWTBot extends SWTBot {
         final String username) {
         Matcher matcher = allOf(widgetOfType(ChatLinePartnerChangeSeparator.class));
 
-        /*
-         * FIXME: a list of widgets in the ->>>>> !!! active shell !!! <<<<<-
-         * that match the matcher.
-         */
         final List<? extends ChatLinePartnerChangeSeparator> allWidgets = widgets(matcher);
 
         final ChatLinePartnerChangeSeparator matchedSeparator = UIThreadRunnable
@@ -210,6 +210,11 @@ public final class SarosSWTBot extends SWTBot {
         }
 
         return result.toArray(new SWTBotShell[] {});
+    }
 
+    @Override
+    public <T extends Widget> List<? extends T> widgets(Matcher<T> matcher) {
+        return widget != null ? super.widgets(matcher, widget) : super
+            .widgets(matcher);
     }
 }
