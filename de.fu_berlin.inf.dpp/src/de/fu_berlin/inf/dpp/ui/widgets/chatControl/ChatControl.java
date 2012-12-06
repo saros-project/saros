@@ -436,9 +436,9 @@ public class ChatControl extends Composite {
 
     private String getNickname(JID jid) {
         String name = RosterUtils.getNickname(sarosNet, jid);
-        if (name == null) {
-            name = jid.toString();
-        }
+
+        if (name == null)
+            name = jid.getBase().toString();
 
         return name;
     }
