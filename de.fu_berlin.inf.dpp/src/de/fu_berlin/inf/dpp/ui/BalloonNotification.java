@@ -10,6 +10,7 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 
@@ -21,6 +22,11 @@ public class BalloonNotification {
 
     private static final Logger log = Logger
         .getLogger(BalloonNotification.class.getName());
+
+    private static Color BLACK = Display.getDefault().getSystemColor(
+        SWT.COLOR_BLACK);
+    private static Color WHITE = Display.getDefault().getSystemColor(
+        SWT.COLOR_WHITE);
 
     private static List<BalloonWindow> windows = new ArrayList<BalloonWindow>();
 
@@ -48,7 +54,7 @@ public class BalloonNotification {
      * The window will be hidden automatically after the value specified in the
      * timeout expires
      * 
-     * TODO wrap the contents so the ballon notification does not expand across
+     * TODO wrap the contents so the balloon notification does not expand across
      * two screens for a long text. OR even better: do not show long
      * notifications. users tend to ignore them anyway!
      * 
@@ -78,7 +84,9 @@ public class BalloonNotification {
         BalloonNotification.removeAllActiveNotifications();
 
         final BalloonWindow window = new BalloonWindow(
-            control != null ? control.getShell() : null, SWT.TOOL | SWT.TITLE);
+            control != null ? control.getShell() : null, SWT.NO_FOCUS
+                | SWT.TOOL | SWT.TITLE);
+
         windows.add(window);
         /*
          * Note: if you add SWT.CLOSE to the style of the BalloonWindow, it will
@@ -93,20 +101,18 @@ public class BalloonNotification {
          * Adding the text to the contents. Pack() is required so the size of
          * the composite is recalculated, else the contents won't show
          */
-        Composite c = window.getContents();
-        c.setLayout(new FillLayout());
+        Composite content = window.getContents();
+        content.setLayout(new FillLayout());
 
-        Label l = new Label(c, SWT.NONE);
-        l.setText(text);
-        c.pack(true);
+        Label message = new Label(content, SWT.NONE);
+        message.setText(text);
+        content.pack(true);
 
-        Shell shell = window.getShell();
-        final Color col = new Color(shell.getDisplay(), 255, 255, 225);
-        l.setBackground(col);
-        l.setForeground(shell.getDisplay().getSystemColor(SWT.COLOR_BLACK));
+        message.setBackground(WHITE);
+        message.setForeground(BLACK);
 
         // make window close when clicking on balloon text, too
-        window.addSelectionControl(l);
+        window.addSelectionControl(message);
 
         // Locate the balloon to the widget location
         if (control != null) {
@@ -125,9 +131,18 @@ public class BalloonNotification {
                 window.close();
             }
         });
+
         window.getShell().getDisplay().timerExec(timeout, closeWindow);
+
+        Display display = control != null ? control.getDisplay() : Display
+            .getCurrent();
+
+        Control lastControlWithFocus = display != null ? display
+            .getFocusControl() : null;
 
         window.open();
 
+        if (lastControlWithFocus != null)
+            lastControlWithFocus.setFocus();
     }
 }
