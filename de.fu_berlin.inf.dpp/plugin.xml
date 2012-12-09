@@ -821,6 +821,9 @@
                      <reference
                            definitionId="de.fu_berlin.inf.dpp.ui.definitions.isSarosSessionRunning">
                      </reference>
+                     <reference
+                           definitionId="de.fu_berlin.inf.dpp.ui.definitions.isSarosSessionHost">
+                     </reference>
                   </and>
                </visibleWhen>
             </command>
@@ -1033,6 +1036,9 @@
                   <reference
                         definitionId="de.fu_berlin.inf.dpp.ui.definitions.sessionHeadlineSelected">
                   </reference>
+                  <reference
+                        definitionId="de.fu_berlin.inf.dpp.ui.definitions.isSarosSessionHost">
+                  </reference>
                </and>
             </visibleWhen>
          </command>
@@ -1223,6 +1229,9 @@
                   </reference>
                   <reference
                         definitionId="de.fu_berlin.inf.dpp.ui.definitions.buddiesSelected">
+                  </reference>
+                  <reference
+                        definitionId="de.fu_berlin.inf.dpp.ui.definitions.isSarosSessionHost">
                   </reference>
                </and>
             </visibleWhen>

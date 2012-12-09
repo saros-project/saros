@@ -11,6 +11,7 @@ import static org.junit.Assert.assertTrue;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import de.fu_berlin.inf.dpp.User.Permission;
@@ -58,6 +59,7 @@ public class NonHostInvitesBuddyTest extends StfTestCase {
      * @throws Exception
      */
     @Test
+    @Ignore("Non-Host Invitation is currently deactivated")
     public void AliceInvitesBobAndBobInvitesCarlTest() throws Exception {
         ALICE
             .superBot()
@@ -99,6 +101,7 @@ public class NonHostInvitesBuddyTest extends StfTestCase {
     }
 
     @Test
+    @Ignore("Non-Host Invitation is currently deactivated")
     public void CarlTypesAndEverybodyGetsCarlsTextTest() throws Exception {
         ALICE
             .superBot()
@@ -175,6 +178,7 @@ public class NonHostInvitesBuddyTest extends StfTestCase {
     }
 
     @Test
+    @Ignore("Non-Host Invitation is currently deactivated")
     public void NonHostBobInvitesCarlAndLeavesTest() throws Exception {
         ALICE
             .superBot()

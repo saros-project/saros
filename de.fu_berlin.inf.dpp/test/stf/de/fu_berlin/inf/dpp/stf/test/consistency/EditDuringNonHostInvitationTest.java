@@ -11,6 +11,7 @@ import org.eclipse.swtbot.swt.finder.widgets.TimeoutException;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import de.fu_berlin.inf.dpp.stf.client.StfTestCase;
@@ -47,6 +48,7 @@ public class EditDuringNonHostInvitationTest extends StfTestCase {
     }
 
     @Test
+    @Ignore("Non-Host Invitation is currently deactivated")
     public void testEditDuringInvitationNonHostInvites() throws Exception {
 
         Util.setUpSessionWithJavaProjectAndClass(Constants.PROJECT1,
