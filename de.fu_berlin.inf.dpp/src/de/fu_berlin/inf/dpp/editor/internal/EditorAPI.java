@@ -24,6 +24,7 @@ import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.ITextViewerExtension;
 import org.eclipse.jface.text.ITextViewerExtension5;
+import org.eclipse.jface.text.ITextViewerExtension6;
 import org.eclipse.jface.text.Position;
 import org.eclipse.jface.text.Region;
 import org.eclipse.jface.text.TextSelection;
@@ -35,7 +36,6 @@ import org.eclipse.jface.text.source.IAnnotationModelExtension;
 import org.eclipse.jface.text.source.ILineRange;
 import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.jface.text.source.LineRange;
-import org.eclipse.jface.text.source.SourceViewer;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.swt.custom.VerifyKeyListener;
 import org.eclipse.swt.events.VerifyEvent;
@@ -595,8 +595,7 @@ public class EditorAPI implements IEditorAPI {
 
         Utils.runSafeSWTSync(log, new Runnable() {
             public void run() {
-                ITextViewerExtension textViewer = (ITextViewerExtension) EditorAPI
-                    .getViewer(editorPart);
+                ITextViewer textViewer = EditorAPI.getViewer(editorPart);
 
                 if (textViewer == null)
                     return;
@@ -609,29 +608,37 @@ public class EditorAPI implements IEditorAPI {
 
                 log.trace(editorPart.getEditorInput().getName()
                     + " set to editable: " + newIsEditable);
+
                 updateStatusLine(editorPart, newIsEditable);
 
                 if (newIsEditable) {
                     lockedEditors.remove(editorPart);
-                    textViewer
-                        .removeVerifyKeyListener(EditorAPI.this.keyVerifier);
+
+                    if (textViewer instanceof ITextViewerExtension)
+                        ((ITextViewerExtension) textViewer)
+                            .removeVerifyKeyListener(EditorAPI.this.keyVerifier);
 
                     // enable editing and undo-manager
-                    SourceViewer sourceViewer = (SourceViewer) textViewer;
-                    sourceViewer.setEditable(true);
+                    textViewer.setEditable(true);
 
                     // TODO use undoLevel from Preferences (TextEditorPlugin)
-                    sourceViewer.getUndoManager().setMaximalUndoLevel(200);
+                    if (textViewer instanceof ITextViewerExtension6)
+                        ((ITextViewerExtension6) textViewer).getUndoManager()
+                            .setMaximalUndoLevel(200);
 
                 } else {
                     lockedEditors.add(editorPart);
-                    textViewer
-                        .prependVerifyKeyListener(EditorAPI.this.keyVerifier);
+
+                    if (textViewer instanceof ITextViewerExtension)
+                        ((ITextViewerExtension) textViewer)
+                            .prependVerifyKeyListener(EditorAPI.this.keyVerifier);
 
                     // disable editing and undo-manager
-                    SourceViewer sourceViewer = (SourceViewer) textViewer;
-                    sourceViewer.setEditable(false);
-                    sourceViewer.getUndoManager().setMaximalUndoLevel(0);
+                    textViewer.setEditable(false);
+
+                    if (textViewer instanceof ITextViewerExtension6)
+                        ((ITextViewerExtension6) textViewer).getUndoManager()
+                            .setMaximalUndoLevel(0);
                 }
             }
         });
