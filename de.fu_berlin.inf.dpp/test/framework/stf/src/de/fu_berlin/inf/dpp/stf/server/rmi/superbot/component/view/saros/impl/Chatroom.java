@@ -37,6 +37,10 @@ public final class Chatroom extends StfRemoteObject implements IChatroom {
         }
     }
 
+    public void setChatTab(SWTBotCTabItem chatTab) {
+        this.chatTab = chatTab;
+    }
+
     @Override
     public void enterChatMessage(String message) throws RemoteException {
         RemoteWorkbenchBot.getInstance().activateWorkbench();
@@ -55,6 +59,7 @@ public final class Chatroom extends StfRemoteObject implements IChatroom {
         chatInput.setText("");
     }
 
+    @Override
     public void sendChatMessage() throws RemoteException {
         RemoteWorkbenchBot.getInstance().activateWorkbench();
         chatTab.activate();
@@ -63,6 +68,7 @@ public final class Chatroom extends StfRemoteObject implements IChatroom {
         chatInput.pressEnterKey();
     }
 
+    @Override
     public void sendChatMessage(String message) throws RemoteException {
         RemoteWorkbenchBot.getInstance().activateWorkbench();
         chatTab.activate();
@@ -73,6 +79,7 @@ public final class Chatroom extends StfRemoteObject implements IChatroom {
         chatInput.pressEnterKey();
     }
 
+    @Override
     public String getChatMessage() throws RemoteException {
         RemoteWorkbenchBot.getInstance().activateWorkbench();
         chatTab.activate();
@@ -81,6 +88,7 @@ public final class Chatroom extends StfRemoteObject implements IChatroom {
         return chatInput.getText();
     }
 
+    @Override
     public String getUserNameOnChatLinePartnerChangeSeparator()
         throws RemoteException {
         chatTab.activate();
@@ -90,6 +98,7 @@ public final class Chatroom extends StfRemoteObject implements IChatroom {
         return bot.chatLinePartnerChangeSeparator().getPlainID();
     }
 
+    @Override
     public String getUserNameOnChatLinePartnerChangeSeparator(int index)
         throws RemoteException {
 
@@ -103,6 +112,7 @@ public final class Chatroom extends StfRemoteObject implements IChatroom {
         return bot.chatLinePartnerChangeSeparator(index).getPlainID();
     }
 
+    @Override
     public String getUserNameOnChatLinePartnerChangeSeparator(String plainID)
         throws RemoteException {
 
@@ -116,6 +126,7 @@ public final class Chatroom extends StfRemoteObject implements IChatroom {
         return bot.chatLinePartnerChangeSeparator(plainID).getPlainID();
     }
 
+    @Override
     public String getTextOfFirstChatLine() throws RemoteException {
 
         chatTab.activate();
@@ -125,6 +136,7 @@ public final class Chatroom extends StfRemoteObject implements IChatroom {
         return bot.chatLine().getText();
     }
 
+    @Override
     public String getTextOfChatLine(int index) throws RemoteException {
 
         chatTab.activate();
@@ -135,6 +147,7 @@ public final class Chatroom extends StfRemoteObject implements IChatroom {
         return bot.chatLine(index).getText();
     }
 
+    @Override
     public String getTextOfLastChatLine() throws RemoteException {
 
         chatTab.activate();
@@ -144,6 +157,7 @@ public final class Chatroom extends StfRemoteObject implements IChatroom {
         return bot.lastChatLine().getText();
     }
 
+    @Override
     public String getTextOfChatLine(String regex) throws RemoteException {
 
         chatTab.activate();
@@ -154,6 +168,7 @@ public final class Chatroom extends StfRemoteObject implements IChatroom {
         return bot.chatLine(regex).getText();
     }
 
+    @Override
     public void waitUntilGetChatMessage(String jid, String message)
         throws RemoteException {
         chatTab.activate();
@@ -161,7 +176,21 @@ public final class Chatroom extends StfRemoteObject implements IChatroom {
             .isChatMessageExist(this, jid, message));
     }
 
-    public void setChatTab(SWTBotCTabItem chatTab) {
-        this.chatTab = chatTab;
+    @Override
+    public String getTitle() throws RemoteException {
+
+        String tabTitle = chatTab.getText();
+        log.debug("tab title text: " + tabTitle);
+        return tabTitle;
+    }
+
+    @Override
+    public boolean isActive() throws RemoteException {
+        return chatTab.isActive();
+    }
+
+    @Override
+    public void activate() throws RemoteException {
+        chatTab.activate();
     }
 }

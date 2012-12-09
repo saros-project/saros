@@ -51,6 +51,30 @@ public interface IChatroom extends Remote {
      */
     public String getChatMessage() throws RemoteException;
 
+    /**
+     * Returns the title of the current chat (as displayed on the chat tab).
+     * 
+     * @return the title of the current chat
+     * @throws RemoteException
+     */
+    public String getTitle() throws RemoteException;
+
+    /**
+     * Returns the selection state of the chat.
+     * 
+     * @return <code>true</code> if the chat is selected, <code>false</code>
+     *         otherwise
+     * @throws RemoteException
+     */
+    public boolean isActive() throws RemoteException;
+
+    /**
+     * Selects the chat, making it active and gaining the focus.
+     * 
+     * @throws RemoteException
+     */
+    public void activate() throws RemoteException;
+
     public String getUserNameOnChatLinePartnerChangeSeparator()
         throws RemoteException;
 

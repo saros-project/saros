@@ -16,6 +16,8 @@ import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.Font;
+import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -203,6 +205,7 @@ public class ChatControl extends Composite {
 
                     if (!isOwnJID(sender)) {
                         SoundPlayer.playSound(SoundManager.MESSAGE_RECEIVED);
+                        incrementUnseenMessages();
                     } else {
                         SoundPlayer.playSound(SoundManager.MESSAGE_SENT);
                     }
@@ -273,6 +276,7 @@ public class ChatControl extends Composite {
     protected ChatDisplay chatDisplay;
     protected ChatInput chatInput;
     protected IChat chat;
+    protected int missedMessages;
 
     public ChatControl(ChatRoomsComposite chatRooms, IChat chat,
         Composite parent, int style, Color displayBackgroundColor,
@@ -335,6 +339,16 @@ public class ChatControl extends Composite {
         for (ChatElement chatElement : this.chat.getHistory()) {
             addChatLine(chatElement);
         }
+
+        this.missedMessages = 0;
+
+        Listener showListener = new Listener() {
+            public void handleEvent(Event event) {
+                resetUnseenMessages();
+            }
+        };
+
+        this.addListener(SWT.Show, showListener);
     }
 
     public boolean isOwnJID(JID jid) {
@@ -541,6 +555,36 @@ public class ChatControl extends Composite {
     public void notifyChatCleared(ChatClearedEvent event) {
         for (IChatControlListener chatControlListener : this.chatControlListeners) {
             chatControlListener.chatCleared(event);
+        }
+    }
+
+    protected void toggleChatBoldFontStyle() {
+        FontData[] fds = chatRooms.getChatTab(chat).getFont().getFontData();
+        if (fds.length > 0) {
+            chatRooms.getChatTab(chat).setFont(
+                new Font(getDisplay(), fds[0].getName(), fds[0].getHeight(),
+                    fds[0].getStyle() ^ SWT.BOLD));
+        }
+    }
+
+    protected void incrementUnseenMessages() {
+        if (!chatRooms.isVisible()
+            || chatRooms.getSelectedChatControl() != this) {
+
+            if (missedMessages == 0) {
+                toggleChatBoldFontStyle();
+            }
+            missedMessages++;
+            chatRooms.getChatTab(chat).setText(
+                "(" + missedMessages + ") " + chat.getTitle());
+        }
+    }
+
+    protected void resetUnseenMessages() {
+        if (missedMessages > 0) {
+            toggleChatBoldFontStyle();
+            missedMessages = 0;
+            chatRooms.getChatTab(chat).setText(chat.getTitle());
         }
     }
 
