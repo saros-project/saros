@@ -117,8 +117,9 @@ class EditorPool {
 
         this.editorManager.editorAPI.addSharedEditorListener(
             this.editorManager, editorPart);
+
         this.editorManager.editorAPI.setEditable(editorPart,
-            this.editorManager.hasWriteAccess);
+            this.editorManager.hasWriteAccess && !this.editorManager.isLocked);
 
         IDocumentProvider documentProvider = EditorManager
             .getDocumentProvider(input);

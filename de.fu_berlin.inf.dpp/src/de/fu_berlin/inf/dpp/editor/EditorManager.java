@@ -975,6 +975,10 @@ public class EditorManager extends AbstractActivityProvider {
             return;
         }
 
+        /*
+         * side effect: this method call also locks the editor part if the user
+         * has no write access or if the session is currently locked
+         */
         this.editorPool.add(editorPart);
 
         refreshAnnotations(editorPart);
