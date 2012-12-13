@@ -484,6 +484,7 @@ public class ChatControl extends Composite {
         if (message.length() != 0) {
             try {
                 chat.sendMessage(message);
+                chat.setCurrentState(ChatState.inactive);
                 setInputText("");
             } catch (Exception exception) {
                 addChatLine(new ChatElement("error while sending message: "
@@ -494,11 +495,8 @@ public class ChatControl extends Composite {
 
     private void determineCurrentState() {
         try {
-            if (ChatControl.this.getInputText().length() == 0) {
-                ChatControl.this.chat.setCurrentState(ChatState.inactive);
-            } else {
-                ChatControl.this.chat.setCurrentState(ChatState.composing);
-            }
+            chat.setCurrentState(getInputText().isEmpty() ? ChatState.inactive
+                : ChatState.composing);
         } catch (XMPPException ex) {
             log.error(ex.getMessage(), ex);
         }
