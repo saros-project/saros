@@ -157,6 +157,9 @@ public class ChatControl extends Composite {
         @Override
         public void sessionStarted(ISarosSession newSarosSession) {
             synchronized (ChatControl.this) {
+                if (session != null)
+                    session.removeListener(projectListener);
+
                 session = newSarosSession;
                 session.addListener(projectListener);
             }
@@ -334,7 +337,13 @@ public class ChatControl extends Composite {
         this.chat = chat;
         this.chat.addChatListener(chatListener);
 
-        this.sessionManager.addSarosSessionListener(sessionListener);
+        synchronized (this) {
+            this.session = sessionManager.getSarosSession();
+            this.sessionManager.addSarosSessionListener(sessionListener);
+
+            if (this.session != null)
+                this.session.addListener(projectListener);
+        }
 
         for (ChatElement chatElement : this.chat.getHistory()) {
             addChatLine(chatElement);
@@ -381,6 +390,10 @@ public class ChatControl extends Composite {
     public void dispose() {
         super.dispose();
         sessionManager.removeSarosSessionListener(sessionListener);
+        synchronized (this) {
+            if (session != null)
+                session.removeListener(projectListener);
+        }
         clearColorCache();
     }
 
