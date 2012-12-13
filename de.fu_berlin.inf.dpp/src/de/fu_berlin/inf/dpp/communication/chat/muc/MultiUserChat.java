@@ -168,7 +168,7 @@ public class MultiUserChat extends AbstractChat {
      *             TODO connect should be split into create and join; bkahlert
      *             2010/11/23
      */
-    @Override
+
     public boolean connect() throws XMPPException {
         if (preferences == null)
             throw new IllegalStateException("No comPrefs found!");
@@ -198,7 +198,16 @@ public class MultiUserChat extends AbstractChat {
          * manually propagate them locally.
          */
         MultiUserChat.this.notifyJIDDisconnected(this.getJID());
-        this.setCurrentState(ChatState.gone);
+
+        /*
+         * FIXME: it is possible that the chat room no longer exists (already
+         * destroyed) by the host. Sending a message to the room will result in
+         * an error message response which will trigger the Smack chat manager
+         * and so open a complete senseless new single chat window in the Saros
+         * view. Use the correct way: install listeners to the MUC !
+         */
+        // this.setCurrentState(ChatState.gone);
+
         this.mucStateManager = null;
         clearHistory();
 

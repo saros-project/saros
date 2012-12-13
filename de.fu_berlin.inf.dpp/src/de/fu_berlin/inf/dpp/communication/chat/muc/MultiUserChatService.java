@@ -103,8 +103,11 @@ public class MultiUserChatService extends AbstractChatService {
      * {@link MUCSessionPreferences}.
      * 
      * @param preferences
-     * @return TODO connectMUC should be split into create and join; bkahlert
-     *         2010/11/23
+     * @return an {@link IChat} interface for the created chat or
+     *         <code>null</code> if the chat creation failed
+     */
+    /*
+     * TODO connectMUC should be split into create and join; bkahlert 2010/11/23
      */
     public IChat createChat(MUCSessionPreferences preferences) {
         Connection connection = this.connection.get();
@@ -117,7 +120,9 @@ public class MultiUserChatService extends AbstractChatService {
         log.debug("Joining MUC...");
 
         boolean createdRoom = false;
+
         MultiUserChat chat = new MultiUserChat(connection, preferences);
+
         try {
             createdRoom = chat.connect();
         } catch (XMPPException e) {
@@ -125,12 +130,12 @@ public class MultiUserChatService extends AbstractChatService {
             log.error("Couldn't join chat: " + preferences.getRoom(), e);
             return null;
         }
-        this.chats.add(chat);
+
+        chats.add(chat);
         chat.setCurrentState(ChatState.active);
 
-        if (createdRoom) {
-            notifyChatCreated(chat, true);
-        }
+        notifyChatCreated(chat, createdRoom);
+
         chat.notifyJIDConnected(chat.getJID());
 
         return chat;
@@ -141,23 +146,16 @@ public class MultiUserChatService extends AbstractChatService {
      * {@link MultiUserChat} if the participant created it.
      * 
      * @param chat
-     *            TODO disconnectMUC should be split into create and join;
-     *            bkahlert 2010/11/23
      */
     @Override
     public void destroyChat(IChat chat) {
-        MultiUserChat muc = (MultiUserChat) chat;
-        boolean destroyedRoom = false;
-
         log.debug("Leaving multi user chat " + chat.getTitle() + ".");
         assert chat != null;
 
-        muc.setCurrentState(ChatState.gone);
-        destroyedRoom = chat.disconnect();
+        chats.remove(chat);
 
-        if (destroyedRoom) {
-            this.notifyChatDestroyed(chat);
-        }
+        chat.disconnect();
+        notifyChatDestroyed(chat);
     }
 
     /**

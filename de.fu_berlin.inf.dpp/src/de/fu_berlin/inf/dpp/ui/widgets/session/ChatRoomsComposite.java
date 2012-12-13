@@ -3,6 +3,7 @@ package de.fu_berlin.inf.dpp.ui.widgets.session;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.concurrent.CountDownLatch;
 
 import org.apache.log4j.Logger;
 import org.eclipse.swt.SWT;
@@ -23,6 +24,7 @@ import org.picocontainer.annotations.Inject;
 import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.communication.chat.IChat;
 import de.fu_berlin.inf.dpp.communication.chat.IChatServiceListener;
+import de.fu_berlin.inf.dpp.communication.chat.muc.MultiUserChat;
 import de.fu_berlin.inf.dpp.communication.chat.muc.MultiUserChatService;
 import de.fu_berlin.inf.dpp.communication.chat.single.SingleUserChatService;
 import de.fu_berlin.inf.dpp.editor.AbstractSharedEditorListener;
@@ -75,6 +77,8 @@ public class ChatRoomsComposite extends ListExplanatoryComposite {
     protected RosterTracker rosterTracker;
 
     protected IChat sessionChat;
+
+    protected Object mucCreationLock = new Object();
 
     /**
      * This RosterListener closure is added to the RosterTracker to get
@@ -146,33 +150,55 @@ public class ChatRoomsComposite extends ListExplanatoryComposite {
 
         @Override
         public void sessionStarting(final ISarosSession session) {
-            /*
-             * We need the created chat to register itself as a session listener
-             * before sessionStarted(...) has been called. Thus, we need to run
-             * this thread in SWTSync.
-             */
+
             Utils.runSafeSWTSync(log, new Runnable() {
                 @Override
                 public void run() {
                     isSessionRunning = true;
-
-                    sessionChat = multiUserChatService.createChat(session);
-                    ChatRoomsComposite.this.openChat(sessionChat, false);
                 }
             });
+
+            final CountDownLatch mucCreationStart = new CountDownLatch(1);
+
+            /*
+             * FIXME: the clients should be notified after the chat has been
+             * created to join that chat. For slow connections it is possible
+             * that ALICE invites BOB, but BOB creates the chat room first. If
+             * no CARL joins the session and BOB leaves afterwards, ALICE and
+             * CARLs MUC is broken !
+             */
+            Utils.runSafeAsync(log, new Runnable() {
+                @Override
+                public void run() {
+                    synchronized (mucCreationLock) {
+                        mucCreationStart.countDown();
+                        multiUserChatService.createChat(session);
+                    }
+                }
+            });
+
+            try {
+                mucCreationStart.await();
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
         }
 
         @Override
-        public void sessionEnded(ISarosSession session) {
+        public void sessionEnded(final ISarosSession session) {
             Utils.runSafeSWTAsync(log, new Runnable() {
                 @Override
                 public void run() {
+
+                    if (sessionChat != null)
+                        multiUserChatService.destroyChat(sessionChat);
+
                     isSessionRunning = false;
+
+                    sessionChat = null;
 
                     if (ChatRoomsComposite.this.isDisposed())
                         return;
-
-                    closeChatTab(sessionChat);
 
                     if (chatError == null)
                         return;
@@ -217,15 +243,50 @@ public class ChatRoomsComposite extends ListExplanatoryComposite {
         public void chatCreated(final IChat chat, boolean createdLocally) {
             Utils.runSafeSWTAsync(log, new Runnable() {
                 @Override
+                // FIXME: disposed ?!
                 public void run() {
-                    openChat(chat, false);
+                    boolean isSessionChat = false;
+
+                    if (chat instanceof MultiUserChat) {
+
+                        /*
+                         * creation of the session chat is done async., so it is
+                         * possible to receive multiple requests from different
+                         * Saros sessions
+                         */
+                        if (sessionChat != null)
+                            multiUserChatService.destroyChat(sessionChat);
+
+                        sessionChat = chat;
+                        isSessionChat = true;
+                    }
+
+                    /*
+                     * creation of the session chat is done async., so the
+                     * session may have already ended
+                     */
+                    if (!isSessionRunning && isSessionChat) {
+                        multiUserChatService.destroyChat(sessionChat);
+                        sessionChat = null;
+                    } else {
+                        openChat(chat, false);
+                    }
                 }
             });
         }
 
         @Override
-        public void chatDestroyed(IChat chat) {
-            closeChatTab(chat);
+        public void chatDestroyed(final IChat chat) {
+            Utils.runSafeSWTAsync(log, new Runnable() {
+
+                @Override
+                public void run() {
+                    if (ChatRoomsComposite.this.isDisposed())
+                        return;
+
+                    closeChatTab(chat);
+                }
+            });
         }
 
         @Override
@@ -254,6 +315,7 @@ public class ChatRoomsComposite extends ListExplanatoryComposite {
         this.sessionManager.addSarosSessionListener(sessionListener);
         this.editorManager.addSharedEditorListener(sharedEditorListener);
         this.singleUserChatService.addChatServiceListener(chatServiceListener);
+        this.multiUserChatService.addChatServiceListener(chatServiceListener);
 
         this.setLayout(new FillLayout());
 
@@ -264,8 +326,8 @@ public class ChatRoomsComposite extends ListExplanatoryComposite {
         this.chatRooms.setBorderVisible(true);
 
         /*
-         * IMPORTANT: The user can open and close Views as he wishes. This means
-         * that the live cycle of this ChatView is completely independent of the
+         * TODO: The user can open and close Views as he wishes. This means that
+         * the live cycle of this ChatView is completely independent of the
          * global MultiUserChat. Therefore we need to correctly validate the
          * MultiUserChat's state when this ChatView is reopened.
          */
@@ -281,6 +343,10 @@ public class ChatRoomsComposite extends ListExplanatoryComposite {
 
                 editorManager.removeSharedEditorListener(sharedEditorListener);
 
+                singleUserChatService
+                    .removeChatServiceListener(chatServiceListener);
+                multiUserChatService
+                    .removeChatServiceListener(chatServiceListener);
                 /**
                  * This must be called before finalization otherwise you will
                  * get NPE on RosterTracker.
@@ -357,9 +423,9 @@ public class ChatRoomsComposite extends ListExplanatoryComposite {
         for (CTabItem tab : this.chatRooms.getItems()) {
             IChat data = (IChat) tab.getData();
 
-            if (data.equals(chat)) {
+            // do the equal check this way to allow null values in the tab data
+            if (chat.equals(data))
                 return tab;
-            }
         }
 
         return null;
@@ -438,10 +504,6 @@ public class ChatRoomsComposite extends ListExplanatoryComposite {
      */
     protected void showErrorMessage(String message) {
         assert Utils.isSWT();
-
-        // FIXME there is no dispose method
-        // if (chatError != null)
-        // chatError.dispose();
 
         if (!isSessionRunning || message == null) {
             chatError = null;

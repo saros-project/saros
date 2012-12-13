@@ -115,16 +115,8 @@ public interface IChat {
     public boolean isConnected();
 
     /**
-     * Connects the chat if applicable.
-     * 
-     * @return <code>true</code> if the chat has been connected
-     * @throws XMPPException
-     * 
-     */
-    public boolean connect() throws XMPPException;
-
-    /**
-     * Disconnects the chat.
+     * For internal use: use {@link IChatService#destroyChat(IChat)} to
+     * disconnect the chat
      */
     public boolean disconnect();
 

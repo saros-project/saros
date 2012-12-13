@@ -223,17 +223,6 @@ public class SingleUserChat extends AbstractChat {
      * @return <code>true</code>
      */
     @Override
-    public boolean connect() {
-        return true;
-    }
-
-    /**
-     * This method does nothing as {@link SingleUserChat}s are stateless despite
-     * the global connection status.
-     * 
-     * @return <code>true</code>
-     */
-    @Override
     public boolean disconnect() {
         return true;
     }
