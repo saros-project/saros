@@ -74,6 +74,8 @@ public class ChatRoomsComposite extends ListExplanatoryComposite {
 
     protected RosterTracker rosterTracker;
 
+    protected IChat sessionChat;
+
     /**
      * This RosterListener closure is added to the RosterTracker to get
      * notifications when the roster changes.
@@ -117,12 +119,12 @@ public class ChatRoomsComposite extends ListExplanatoryComposite {
 
     };
 
-    @Inject
     /*
      * TODO: see
      * https://sourceforge.net/tracker/?func=detail&aid=3102858&group_id
      * =167540&atid=843362
      */
+    @Inject
     protected EditorManager editorManager;
 
     protected AbstractSharedEditorListener sharedEditorListener = new AbstractSharedEditorListener() {
@@ -141,7 +143,6 @@ public class ChatRoomsComposite extends ListExplanatoryComposite {
     };
 
     protected ISarosSessionListener sessionListener = new AbstractSarosSessionListener() {
-        IChat sessionChat;
 
         @Override
         public void sessionStarting(final ISarosSession session) {
@@ -188,7 +189,7 @@ public class ChatRoomsComposite extends ListExplanatoryComposite {
     static final Color WHITE = Display.getDefault().getSystemColor(
         SWT.COLOR_WHITE);
 
-    CTabFolder chatRooms;
+    protected CTabFolder chatRooms;
 
     @Inject
     protected MultiUserChatService multiUserChatService;
@@ -335,7 +336,13 @@ public class ChatRoomsComposite extends ListExplanatoryComposite {
         ChatControl control = new ChatControl(this, chat, chatRooms,
             SWT.BORDER, WHITE, 2);
 
-        CTabItem chatTab = new CTabItem(chatRooms, SWT.CLOSE);
+        CTabItem chatTab;
+
+        if (chat == sessionChat)
+            chatTab = new CTabItem(chatRooms, SWT.NONE, 0);
+        else
+            chatTab = new CTabItem(chatRooms, SWT.CLOSE);
+
         chatTab.setText(chat.getTitle());
         /* Messages.ChatRoomsComposite_roundtable); */
         chatTab.setImage(chatViewImage);
