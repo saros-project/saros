@@ -15,6 +15,7 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.jivesoftware.smack.Roster;
 import org.jivesoftware.smack.XMPPException;
@@ -70,13 +71,13 @@ public class ChatRoomsComposite extends ListExplanatoryComposite {
         "To share projects you can either:", "Right-click on a project",
         "Right-click on a buddy", "Use the Saros menu in the Eclipse menu bar");
 
-    protected ListExplanation chatError;
-
     protected boolean isSessionRunning;
 
     protected RosterTracker rosterTracker;
 
     protected IChat sessionChat;
+
+    protected CTabItem sessionChatErrorTab;
 
     protected Object mucCreationLock = new Object();
 
@@ -138,8 +139,9 @@ public class ChatRoomsComposite extends ListExplanatoryComposite {
                 @Override
                 public void run() {
                     for (CTabItem tab : chatRooms.getItems()) {
-                        ChatControl control = (ChatControl) tab.getControl();
-                        control.updateColors();
+                        Control control = tab.getControl();
+                        if (control instanceof ChatControl)
+                            ((ChatControl) control).updateColors();
                     }
                 }
             });
@@ -164,7 +166,7 @@ public class ChatRoomsComposite extends ListExplanatoryComposite {
              * FIXME: the clients should be notified after the chat has been
              * created to join that chat. For slow connections it is possible
              * that ALICE invites BOB, but BOB creates the chat room first. If
-             * no CARL joins the session and BOB leaves afterwards, ALICE and
+             * now CARL joins the session and BOB leaves afterwards, ALICE and
              * CARLs MUC is broken !
              */
             Utils.runSafeAsync(log, new Runnable() {
@@ -200,10 +202,10 @@ public class ChatRoomsComposite extends ListExplanatoryComposite {
                     if (ChatRoomsComposite.this.isDisposed())
                         return;
 
-                    if (chatError == null)
-                        return;
+                    if (sessionChatErrorTab != null
+                        && !sessionChatErrorTab.isDisposed())
+                        sessionChatErrorTab.dispose();
 
-                    showErrorMessage(null);
                 }
             });
         }
@@ -297,7 +299,7 @@ public class ChatRoomsComposite extends ListExplanatoryComposite {
             Utils.runSafeSWTAsync(log, new Runnable() {
                 @Override
                 public void run() {
-                    showErrorMessage(errorMessage);
+                    setErrorMessage(errorMessage);
                 }
             });
         }
@@ -410,7 +412,6 @@ public class ChatRoomsComposite extends ListExplanatoryComposite {
             chatTab = new CTabItem(chatRooms, SWT.CLOSE);
 
         chatTab.setText(chat.getTitle());
-        /* Messages.ChatRoomsComposite_roundtable); */
         chatTab.setImage(chatViewImage);
         chatTab.setData(chat);
         chatTab.setControl(control);
@@ -492,27 +493,34 @@ public class ChatRoomsComposite extends ListExplanatoryComposite {
         return chatRooms.getSelection() != null;
     }
 
-    /**
-     * Hides the explanation window and shows a error message instead. Calling
-     * this method with a <code>null</code> argument or while no session is
-     * running will display the explanation window instead.
-     * 
-     * @param message
-     *            the message to show
-     * 
-     * @Note must be called within the SWT thread.
-     */
-    protected void showErrorMessage(String message) {
-        assert Utils.isSWT();
+    private void setErrorMessage(String message) {
 
-        if (!isSessionRunning || message == null) {
-            chatError = null;
-            showExplanation(howTo);
+        if (!isSessionRunning || message == null)
             return;
-        }
 
-        chatError = new ListExplanation(SWT.ICON_ERROR, message);
-        showExplanation(chatError);
+        if (sessionChatErrorTab != null && !sessionChatErrorTab.isDisposed())
+            sessionChatErrorTab.dispose();
+
+        ListExplanatoryComposite errorComposite = new ListExplanatoryComposite(
+            chatRooms, SWT.NONE);
+
+        ListExplanation explanation = new ListExplanation(SWT.ICON_ERROR,
+            message);
+
+        errorComposite.showExplanation(explanation);
+
+        sessionChatErrorTab = new CTabItem(chatRooms, SWT.CLOSE, 0);
+
+        sessionChatErrorTab.setText("Session Chat Error");
+
+        // TODO add an icon
+
+        sessionChatErrorTab.setData(null);
+        sessionChatErrorTab.setControl(errorComposite);
+        sessionChatErrorTab.addDisposeListener(disposeListener);
+        chatRooms.setSelection(sessionChatErrorTab);
+
+        hideExplanation();
+
     }
-
 }
