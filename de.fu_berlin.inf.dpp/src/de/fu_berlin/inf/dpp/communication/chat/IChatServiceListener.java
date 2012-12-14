@@ -35,7 +35,8 @@ public interface IChatServiceListener {
      * @param chat
      *            the {@link IChat} that has been aborted
      * @param exception
-     *            {@link XMPPException} that has been thrown
+     *            {@link XMPPException} that has been thrown or
+     *            <code>null</code> if the chat has not been created yet
      */
     public void chatAborted(IChat chat, XMPPException exception);
 

@@ -169,7 +169,7 @@ public class MultiUserChat extends AbstractChat {
      *             2010/11/23
      */
 
-    public boolean connect() throws XMPPException {
+    boolean connect() throws XMPPException {
         if (preferences == null)
             throw new IllegalStateException("No comPrefs found!");
         this.createdRoom = createAndJoinMUC();

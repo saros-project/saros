@@ -117,11 +117,17 @@ public class MultiUserChatService extends AbstractChatService {
             return null;
         }
 
+        MultiUserChat chat = new MultiUserChat(connection, preferences);
+
         log.debug("Joining MUC...");
 
-        boolean createdRoom = false;
+        if (preferences.getService() == null) {
+            log.warn("MUC service is not available, aborting connection request");
+            notifyChatAborted(chat, null);
+            return null;
+        }
 
-        MultiUserChat chat = new MultiUserChat(connection, preferences);
+        boolean createdRoom = false;
 
         try {
             createdRoom = chat.connect();
@@ -133,9 +139,7 @@ public class MultiUserChatService extends AbstractChatService {
 
         chats.add(chat);
         chat.setCurrentState(ChatState.active);
-
         notifyChatCreated(chat, createdRoom);
-
         chat.notifyJIDConnected(chat.getJID());
 
         return chat;

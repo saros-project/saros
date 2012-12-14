@@ -5,63 +5,57 @@ import org.jivesoftware.smackx.muc.MultiUserChat;
 /**
  * Preferences for a {@link MultiUserChat}
  */
-public class MUCSessionPreferences {
+public final class MUCSessionPreferences {
+
+    private String service;
+    private String roomName;
+    private String password;
+    private String roomAddress;
 
     /**
-     * The room's hostname or IP at which the multi-user chat service is
-     * running.
-     */
-    protected String service;
-
-    /**
-     * The room's name part.
-     */
-    protected String roomName;
-
-    /**
-     * The room's password.
-     */
-    protected String password;
-
-    /**
-     * the name of the room in the form "roomName@service", where "service" is
-     * the hostname at which the multi-user chat service is running. Make sure
-     * to provide a valid JID.
+     * The name of the room in the form "roomName@service", where "service" is
+     * the domain at which the multi-user chat service is running. Make sure to
+     * provide a valid JID.
      * 
      * @param service
+     *            the hostname for the multi-user chat service which may be
+     *            <code>null</code> to indicate that no multi-user chat service
+     *            was found
      * @param roomName
+     *            the name of the room
      * @param password
+     *            the password for the room
      */
     public MUCSessionPreferences(String service, String roomName,
         String password) {
         this.service = service;
         this.roomName = roomName;
         this.password = password;
+        this.roomAddress = service == null ? null : roomName + "@" + service;
     }
 
     /**
-     * Returns room's hostname or IP at which the multi-user chat service is
-     * running.
+     * Returns the hostname for at which the multi-user chat service is running.
      * 
-     * @return
+     * @return the hostname or <code>null</code> if no service was provided
      */
     public String getService() {
         return service;
     }
 
     /**
-     * Returns room's name part.
+     * Returns the room name.
      * 
-     * @return
+     * @return the room name
      */
     public String getRoomName() {
         return roomName;
     }
 
     /**
-     * Returns the room's password.
+     * Returns the password for the room.
      * 
-     * @return
+     * @return the password for the room
      */
     public String getPassword() {
         return password;
@@ -72,12 +66,12 @@ public class MUCSessionPreferences {
      * "service" is the hostname at which the multi-user chat service is
      * running.
      * 
-     * @return
+     * @return the name of the room or <code>null</code> if no service was
+     *         provided
      * @see MultiUserChat#MultiUserChat(org.jivesoftware.smack.Connection,
      *      String)
      */
     public String getRoom() {
-        return this.roomName + "@" + this.service;
+        return roomAddress;
     }
-
 }
