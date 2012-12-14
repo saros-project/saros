@@ -17,9 +17,7 @@ import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
-import org.jivesoftware.smack.Roster;
 import org.jivesoftware.smack.XMPPException;
-import org.jivesoftware.smack.packet.Presence;
 import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.SarosPluginContext;
@@ -32,6 +30,7 @@ import de.fu_berlin.inf.dpp.editor.AbstractSharedEditorListener;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.net.IRosterListener;
 import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.net.RosterAdapter;
 import de.fu_berlin.inf.dpp.net.RosterTracker;
 import de.fu_berlin.inf.dpp.project.AbstractSarosSessionListener;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
@@ -85,43 +84,27 @@ public class ChatRoomsComposite extends ListExplanatoryComposite {
      * This RosterListener closure is added to the RosterTracker to get
      * notifications when the roster changes.
      */
-    protected IRosterListener rosterListener = new IRosterListener() {
+    protected IRosterListener rosterListener = new RosterAdapter() {
 
-        /**
-         * This method is mainly called, if the user name is changed, rebuild
-         * Chat with uptodate nicknames from history
-         */
+        @Override
         public void entriesUpdated(final Collection<String> addresses) {
             Utils.runSafeSWTAsync(log, new Runnable() {
                 public void run() {
-                    log.info("roster entries changed, refreshing chat tabs");
+
+                    if (ChatRoomsComposite.this.isDisposed())
+                        return;
+
+                    log.trace("roster entries changed, refreshing chat tabs");
 
                     Collection<JID> jids = new ArrayList<JID>();
-                    for (String address : addresses) {
+
+                    for (String address : addresses)
                         jids.add(new JID(address));
-                    }
 
                     updateChatTabs(jids);
                 }
             });
         }
-
-        public void entriesDeleted(Collection<String> addresses) {
-            // do nothing
-        }
-
-        public void presenceChanged(Presence presence) {
-            // do nothing
-        }
-
-        public void rosterChanged(Roster roster) {
-            // do nothing
-        }
-
-        public void entriesAdded(Collection<String> addresses) {
-            // do nothing
-        }
-
     };
 
     /*
@@ -297,8 +280,12 @@ public class ChatRoomsComposite extends ListExplanatoryComposite {
                 + chat.getTitle() + " has been reset.";
 
             Utils.runSafeSWTAsync(log, new Runnable() {
+
                 @Override
                 public void run() {
+                    if (ChatRoomsComposite.this.isDisposed())
+                        return;
+
                     setErrorMessage(errorMessage);
                 }
             });
@@ -420,6 +407,10 @@ public class ChatRoomsComposite extends ListExplanatoryComposite {
         return chatTab;
     }
 
+    /*
+     * TODO make this protected / private and use a listener to update the chat
+     * tabs text
+     */
     public CTabItem getChatTab(IChat chat) {
         for (CTabItem tab : this.chatRooms.getItems()) {
             IChat data = (IChat) tab.getData();
@@ -455,13 +446,13 @@ public class ChatRoomsComposite extends ListExplanatoryComposite {
      *            JIDs whom the chats should be updated for
      */
     private void updateChatTabs(Collection<JID> jids) {
-        if (isDisposed()) {
-            return;
-        }
-
         for (CTabItem tab : chatRooms.getItems()) {
-            IChat chat = (IChat) tab.getData();
+
+            if (!(tab.getControl() instanceof ChatControl))
+                continue;
+
             ChatControl control = (ChatControl) tab.getControl();
+            IChat chat = (IChat) tab.getData();
 
             if (!Collections.disjoint(jids, chat.getParticipants())) {
                 control.updateDisplayNames();
@@ -472,7 +463,8 @@ public class ChatRoomsComposite extends ListExplanatoryComposite {
 
     private boolean selectExistentTab(IChat chat) {
         for (CTabItem item : chatRooms.getItems()) {
-            if (item.getData().equals(chat)) {
+            // do the equal check this way to allow null values in the tab data
+            if (chat.equals(item.getData())) {
                 chatRooms.setSelection(item);
                 return true;
             }
@@ -482,15 +474,13 @@ public class ChatRoomsComposite extends ListExplanatoryComposite {
     }
 
     public ChatControl getSelectedChatControl() {
-        if (!isChatExistent()) {
-            return null;
-        }
-
-        return (ChatControl) chatRooms.getSelection().getControl();
+        return !isChatExistent() ? null : (ChatControl) chatRooms
+            .getSelection().getControl();
     }
 
     public boolean isChatExistent() {
-        return chatRooms.getSelection() != null;
+        return chatRooms.getSelection() != null
+            && (chatRooms.getSelection().getControl() instanceof ChatControl);
     }
 
     private void setErrorMessage(String message) {
