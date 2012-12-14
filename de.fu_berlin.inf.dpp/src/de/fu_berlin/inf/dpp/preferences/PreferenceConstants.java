@@ -19,7 +19,6 @@
  */
 package de.fu_berlin.inf.dpp.preferences;
 
-
 /**
  * Constant definitions for plug-in preferences
  * 
@@ -141,10 +140,10 @@ public class PreferenceConstants {
      * Preferences for Communication
      */
 
-    /** Preference Key for chatserver (used for MUC) **/
-    public static final String CHATSERVER = "chatserver";
+    /** Custom multiuser-chat service name **/
+    public static final String CUSTOM_MUC_SERVICE = "custom_muc_service";
 
-    public static final String USE_DEFAULT_CHATSERVER = "USE_DEFAULT_CHATSERVER";
+    public static final String FORCE_CUSTOM_MUC_SERVICE = "force_custom_muc_service";
 
     /** Beep when receiving an IM **/
     public static final String BEEP_UPON_IM = "BEEP_UPON_IM";

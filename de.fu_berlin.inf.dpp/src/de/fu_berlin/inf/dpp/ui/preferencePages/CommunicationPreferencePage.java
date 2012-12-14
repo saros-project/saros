@@ -41,7 +41,7 @@ public class CommunicationPreferencePage extends FieldEditorPreferencePage
 
     protected Composite parent;
     protected StringFieldEditor chatserver;
-    protected BooleanFieldEditor useDefaultChatServer;
+    protected BooleanFieldEditor useCustomChatServer;
     protected StringFieldEditor skypeName;
     protected BooleanFieldEditor beepUponIM;
     protected BooleanFieldEditor audio_vbr;
@@ -94,12 +94,13 @@ public class CommunicationPreferencePage extends FieldEditorPreferencePage
         chatServerGroup.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true,
             false));
 
-        chatserver = new StringFieldEditor(PreferenceConstants.CHATSERVER,
-            "Chatserver:", chatServerGroup);
+        chatserver = new StringFieldEditor(
+            PreferenceConstants.CUSTOM_MUC_SERVICE, "Custom chatserver: ",
+            chatServerGroup);
 
-        useDefaultChatServer = new BooleanFieldEditor(
-            PreferenceConstants.USE_DEFAULT_CHATSERVER,
-            "Use default chatserver", chatGroup);
+        useCustomChatServer = new BooleanFieldEditor(
+            PreferenceConstants.FORCE_CUSTOM_MUC_SERVICE,
+            "Always use custom chatserver", chatGroup);
 
         beepUponIM = new BooleanFieldEditor(PreferenceConstants.BEEP_UPON_IM,
             "Beep when receiving a chat message", chatGroup);
@@ -163,7 +164,7 @@ public class CommunicationPreferencePage extends FieldEditorPreferencePage
         audioRecordDevices.setEnabled(enabled, voipGroup);
 
         addField(chatserver);
-        addField(useDefaultChatServer);
+        addField(useCustomChatServer);
         addField(beepUponIM);
         addField(skypeName);
         addField(audioQuality);
@@ -176,37 +177,16 @@ public class CommunicationPreferencePage extends FieldEditorPreferencePage
     }
 
     @Override
-    protected void checkState() {
-        super.checkState();
-
-        if (!isValid())
-            return;
-
-        if (chatserver.getStringValue() == "") {
-            setErrorMessage("Chatserver Field is empty!");
-            setValid(false);
-        } else {
-            setErrorMessage(null);
-            setValid(true);
-        }
-    }
-
-    @Override
     public void initialize() {
         super.initialize();
-        if (prefs.getBoolean(PreferenceConstants.USE_DEFAULT_CHATSERVER)) {
-            chatserver.setEnabled(false, chatServerGroup);
+        if (prefs.getBoolean(PreferenceConstants.FORCE_CUSTOM_MUC_SERVICE)) {
+            useCustomChatServer.setEnabled(!chatserver.getStringValue()
+                .isEmpty(), chatGroup);
         }
     }
 
     @Override
     public void propertyChange(PropertyChangeEvent event) {
-
-        if (event.getProperty().equals(FieldEditor.VALUE)) {
-            if (event.getSource().equals(chatserver)
-                || event.getSource().equals(audioQuality))
-                checkState();
-        }
 
         if (event.getSource() instanceof FieldEditor) {
             FieldEditor field = (FieldEditor) event.getSource();
@@ -214,17 +194,13 @@ public class CommunicationPreferencePage extends FieldEditorPreferencePage
             if (field.getPreferenceName().equals(PreferenceConstants.AUDIO_VBR)) {
                 if (event.getNewValue() instanceof Boolean) {
                     Boolean newValue = (Boolean) event.getNewValue();
-                    audio_dtx.setEnabled(newValue, parent);
+                    audio_dtx.setEnabled(newValue, voipGroup);
                 }
-            }
-
-            if (field.getPreferenceName().equals(
-                PreferenceConstants.USE_DEFAULT_CHATSERVER)) {
-                if (event.getNewValue() instanceof Boolean) {
-                    boolean useDefault = ((Boolean) event.getNewValue())
-                        .booleanValue();
-                    chatserver.setEnabled(!useDefault, chatServerGroup);
-                }
+            } else if (field.getPreferenceName().equals(
+                PreferenceConstants.CUSTOM_MUC_SERVICE)) {
+                String serverName = event.getNewValue().toString();
+                useCustomChatServer
+                    .setEnabled(!serverName.isEmpty(), chatGroup);
             }
         }
     }

@@ -112,9 +112,8 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
             AbstractFeedbackManager.FORBID);
 
         // Communication default settings
-        prefs.setValue(PreferenceConstants.CHATSERVER,
-            "conference.saros-con.imp.fu-berlin.de");
-        prefs.setValue(PreferenceConstants.USE_DEFAULT_CHATSERVER, true);
+        prefs.setValue(PreferenceConstants.CUSTOM_MUC_SERVICE, "");
+        prefs.setValue(PreferenceConstants.FORCE_CUSTOM_MUC_SERVICE, true);
         prefs.setValue(PreferenceConstants.BEEP_UPON_IM, true);
 
         prefs.setValue(PreferenceConstants.VOIP_ENABLED, false);

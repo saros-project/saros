@@ -78,7 +78,6 @@ import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.whiteboard.im
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.component.view.whiteboard.impl.WhiteboardFigure;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.impl.SuperBot;
 import de.fu_berlin.inf.dpp.stf.server.rmi.superbot.internal.impl.InternalImpl;
-import de.fu_berlin.inf.dpp.stf.shared.Configuration;
 import de.fu_berlin.inf.dpp.stf.shared.Constants;
 
 /**
@@ -132,18 +131,6 @@ public class STFController {
 
         IPreferenceStore preferenceStore = context
             .getComponent(IPreferenceStore.class);
-
-        String chatServerJID = Configuration.getString("xmpp_chat_server");
-
-        if (preferenceStore != null && chatServerJID != null) {
-
-            log.info("overwriting default chat server '"
-                + preferenceStore.getString(PreferenceConstants.CHATSERVER)
-                + "' with '" + chatServerJID + "'");
-
-            preferenceStore.setValue(PreferenceConstants.CHATSERVER,
-                chatServerJID);
-        }
 
         if (preferenceStore != null)
             preferenceStore.setDefault(PreferenceConstants.STOP_EMPTY_SESSIONS,
