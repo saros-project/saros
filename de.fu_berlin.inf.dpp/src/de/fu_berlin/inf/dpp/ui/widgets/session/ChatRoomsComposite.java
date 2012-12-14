@@ -1,5 +1,6 @@
 package de.fu_berlin.inf.dpp.ui.widgets.session;
 
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -25,6 +26,7 @@ import de.fu_berlin.inf.dpp.communication.chat.IChat;
 import de.fu_berlin.inf.dpp.communication.chat.IChatServiceListener;
 import de.fu_berlin.inf.dpp.communication.chat.muc.MultiUserChat;
 import de.fu_berlin.inf.dpp.communication.chat.muc.MultiUserChatService;
+import de.fu_berlin.inf.dpp.communication.chat.muc.negotiation.MUCSessionPreferences;
 import de.fu_berlin.inf.dpp.communication.chat.single.SingleUserChatService;
 import de.fu_berlin.inf.dpp.editor.AbstractSharedEditorListener;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
@@ -37,6 +39,7 @@ import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ISarosSessionListener;
 import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.ui.ImageManager;
+import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.ui.views.SarosView;
 import de.fu_berlin.inf.dpp.ui.widgets.chatControl.ChatControl;
 import de.fu_berlin.inf.dpp.util.Utils;
@@ -71,6 +74,8 @@ public class ChatRoomsComposite extends ListExplanatoryComposite {
         "Right-click on a buddy", "Use the Saros menu in the Eclipse menu bar");
 
     protected boolean isSessionRunning;
+
+    protected boolean isSessionHost;
 
     protected RosterTracker rosterTracker;
 
@@ -140,6 +145,7 @@ public class ChatRoomsComposite extends ListExplanatoryComposite {
                 @Override
                 public void run() {
                     isSessionRunning = true;
+                    isSessionHost = session.isHost();
                 }
             });
 
@@ -179,7 +185,7 @@ public class ChatRoomsComposite extends ListExplanatoryComposite {
                         multiUserChatService.destroyChat(sessionChat);
 
                     isSessionRunning = false;
-
+                    isSessionHost = false;
                     sessionChat = null;
 
                     if (ChatRoomsComposite.this.isDisposed())
@@ -188,7 +194,6 @@ public class ChatRoomsComposite extends ListExplanatoryComposite {
                     if (sessionChatErrorTab != null
                         && !sessionChatErrorTab.isDisposed())
                         sessionChatErrorTab.dispose();
-
                 }
             });
         }
@@ -230,6 +235,7 @@ public class ChatRoomsComposite extends ListExplanatoryComposite {
                 @Override
                 // FIXME: disposed ?!
                 public void run() {
+
                     boolean isSessionChat = false;
 
                     if (chat instanceof MultiUserChat) {
@@ -276,8 +282,28 @@ public class ChatRoomsComposite extends ListExplanatoryComposite {
 
         @Override
         public void chatAborted(IChat chat, XMPPException exception) {
-            final String errorMessage = "The connection to the chat "
-                + chat.getTitle() + " has been reset.";
+
+            if (!(chat instanceof MultiUserChat))
+                return;
+
+            MUCSessionPreferences preferences = ((MultiUserChat) chat)
+                .getPreferences();
+
+            String mucService = preferences.getService();
+
+            final String errorMessage;
+
+            if (mucService == null) {
+                errorMessage = isSessionHost ? Messages.ChatRoomsComposite_muc_error_host_no_service_found
+                    : Messages.ChatRoomsComposite_muc_error_client_no_service_found;
+            } else {
+                errorMessage = MessageFormat
+                    .format(
+                        Messages.ChatRoomsComposite_muc_error_connecting_failed,
+                        mucService,
+                        exception == null ? Messages.ChatRoomsComposite_muc_error_connecting_failed_unknown_error
+                            : exception.getMessage());
+            }
 
             Utils.runSafeSWTAsync(log, new Runnable() {
 
@@ -321,7 +347,10 @@ public class ChatRoomsComposite extends ListExplanatoryComposite {
          * MultiUserChat's state when this ChatView is reopened.
          */
 
+        ISarosSession session = sessionManager.getSarosSession();
+
         isSessionRunning = sessionManager.getSarosSession() != null;
+        isSessionHost = session != null && session.isHost();
 
         showExplanation(howTo);
 
@@ -336,6 +365,7 @@ public class ChatRoomsComposite extends ListExplanatoryComposite {
                     .removeChatServiceListener(chatServiceListener);
                 multiUserChatService
                     .removeChatServiceListener(chatServiceListener);
+
                 /**
                  * This must be called before finalization otherwise you will
                  * get NPE on RosterTracker.
@@ -501,7 +531,8 @@ public class ChatRoomsComposite extends ListExplanatoryComposite {
 
         sessionChatErrorTab = new CTabItem(chatRooms, SWT.CLOSE, 0);
 
-        sessionChatErrorTab.setText("Session Chat Error");
+        sessionChatErrorTab
+            .setText(Messages.ChatRoomsComposite_muc_error_tab_text);
 
         // TODO add an icon
 

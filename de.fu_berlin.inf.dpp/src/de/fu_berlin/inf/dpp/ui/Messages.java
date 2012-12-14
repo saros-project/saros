@@ -58,6 +58,11 @@ public class Messages extends NLS {
     public static String ChatRoomsComposite_joined_the_chat;
     public static String ChatRoomsComposite_left_the_chat;
     public static String ChatRoomsComposite_roundtable;
+    public static String ChatRoomsComposite_muc_error_tab_text;
+    public static String ChatRoomsComposite_muc_error_host_no_service_found;
+    public static String ChatRoomsComposite_muc_error_client_no_service_found;
+    public static String ChatRoomsComposite_muc_error_connecting_failed;
+    public static String ChatRoomsComposite_muc_error_connecting_failed_unknown_error;
 
     /* chat */
     public static String OpenChatAction_MenuItem;
