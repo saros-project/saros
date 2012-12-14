@@ -535,4 +535,51 @@ public class RosterUtils {
 
         return null;
     }
+
+    /**
+     * Returns the service for multiuser chat.
+     * 
+     * @param connection
+     *            the current XMPP connection
+     * @param service
+     *            a service, normally the domain of a XMPP server
+     * @return the service for the multiuser chat or <code>null</code> if it
+     *         could not be determined
+     */
+    public static String getMultiUserChatService(Connection connection,
+        String service) {
+
+        ServiceDiscoveryManager manager = ServiceDiscoveryManager
+            .getInstanceFor(connection);
+
+        DiscoverItems items;
+
+        try {
+            items = manager.discoverItems(service);
+        } catch (XMPPException e) {
+            log.error("discovery for service '" + service + "' failed", e);
+            return null;
+        }
+
+        Iterator<DiscoverItems.Item> iter = items.getItems();
+        while (iter.hasNext()) {
+            DiscoverItems.Item item = iter.next();
+            try {
+                Iterator<Identity> identities = manager.discoverInfo(
+                    item.getEntityID()).getIdentities();
+                while (identities.hasNext()) {
+                    Identity identity = identities.next();
+                    if ("text".equalsIgnoreCase(identity.getType())
+                        && "conference"
+                            .equalsIgnoreCase(identity.getCategory())) {
+                        return item.getEntityID();
+                    }
+                }
+            } catch (XMPPException e) {
+                log.warn("could not query identity: " + item.getEntityID(), e);
+            }
+        }
+
+        return null;
+    }
 }
