@@ -15,8 +15,10 @@ import java.util.TimerTask;
 
 import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.wizard.WizardPage;
@@ -528,8 +530,14 @@ public class EnterProjectNamePage extends WizardPage {
 
         String errorMessage = null;
 
+        IStatus status = ResourcesPlugin.getWorkspace().validateName(
+            projectName, IResource.PROJECT);
+
         if (projectName.length() == 0) {
             errorMessage = Messages.EnterProjectNamePage_set_project_name;
+            this.errorProjectNames.put(projectID, errorMessage);
+        } else if (!status.isOK()) {
+            errorMessage = status.getMessage();
             this.errorProjectNames.put(projectID, errorMessage);
         } else {
             if (EnterProjectNamePageUtils.projectNameIsUnique(projectName,
