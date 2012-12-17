@@ -20,7 +20,9 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.SubMonitor;
+import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.packet.Packet;
+import org.jivesoftware.smackx.filetransfer.OutgoingFileTransfer;
 import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.FileList;
@@ -118,6 +120,10 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
             "Retrieving list of files needed for synchronization...", 100);
 
         try {
+            if (fileTransferManager == null)
+                // FIXME: the logic will try to send this to the remote contact
+                throw new IOException("not connected to a XMPP server");
+
             sendFileList(monitor.newChild(0));
             monitor.subTask("");
             getRemoteFileList(monitor.newChild(0));
@@ -145,7 +151,8 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
             // send the big archive
             monitor.subTask("");
 
-            sendArchive(monitor.newChild(50), zipArchive, processID);
+            sendArchive(zipArchive, peer, processID,
+                monitor.newChild(50, SubMonitor.SUPPRESS_NONE));
 
             projectExchangeProcesses.removeProjectExchangeProcess(this);
         } catch (IOException e) {
@@ -561,31 +568,9 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
         }
     }
 
-    protected void sendArchive(SubMonitor monitor, File archive,
-        String projectID) throws SarosCancellationException, IOException {
+    private File createProjectArchive(SubMonitor monitor, List<IPath> toSend,
+        String projectID) throws IOException, SarosCancellationException {
 
-        monitor.beginTask("Sending archive...", 100);
-        monitor.setTaskName("Sending archive...");
-
-        log.debug("Inv" + Utils.prefix(peer) + ": Sending archive...");
-
-        if (archive == null) {
-            log.debug("Inv" + Utils.prefix(peer) + ": The archive is empty.");
-            monitor.done();
-            return;
-        }
-
-        try {
-            transmitter.sendProjectArchive(peer, projectID, archive,
-                monitor.newChild(100, SubMonitor.SUPPRESS_NONE));
-        } finally {
-            monitor.done();
-        }
-    }
-
-    private File createProjectArchive(IProgressMonitor monitor,
-        List<IPath> toSend, String projectID) throws IOException,
-        SarosCancellationException {
         IProject project = sarosSession.getProject(projectID);
         log.debug("Got project from session");
         /*
@@ -675,5 +660,36 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
         }
 
         return fileLists;
+    }
+
+    private void sendArchive(File archive, JID remoteContact,
+        String transferID, IProgressMonitor monitor)
+        throws SarosCancellationException, IOException {
+
+        if (archive == null) {
+            log.debug("Inv" + Utils.prefix(peer) + ": The archive is empty.");
+            monitor.done();
+            return;
+        }
+
+        monitor.beginTask("Sending archive file...", 100);
+
+        log.debug("Inv" + Utils.prefix(peer) + ": Sending archive...");
+
+        assert fileTransferManager != null;
+
+        try {
+            OutgoingFileTransfer transfer = fileTransferManager
+                .createOutgoingFileTransfer(remoteContact.toString());
+
+            transfer.sendFile(archive, transferID);
+            monitorFileTransfer(transfer, monitor);
+        } catch (XMPPException e) {
+            throw new IOException(e.getMessage(), e.getCause());
+        } finally {
+            monitor.done();
+        }
+
+        log.debug("Inv" + Utils.prefix(peer) + ": Archive send.");
     }
 }

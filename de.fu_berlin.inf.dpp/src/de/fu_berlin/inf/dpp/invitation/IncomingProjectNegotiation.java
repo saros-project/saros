@@ -1,5 +1,8 @@
 package de.fu_berlin.inf.dpp.invitation;
 
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -15,9 +18,9 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IContainer;
-import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspace;
@@ -29,13 +32,17 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.ui.actions.WorkspaceModifyOperation;
+import org.jivesoftware.smack.XMPPException;
+import org.jivesoftware.smackx.filetransfer.FileTransferListener;
+import org.jivesoftware.smackx.filetransfer.FileTransferRequest;
+import org.jivesoftware.smackx.filetransfer.IncomingFileTransfer;
 import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.FileList;
@@ -162,11 +169,22 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
         boolean wasAutobuilding = desc.isAutoBuilding();
 
         fileReplacementInProgressObservable.startReplacement();
+
+        ArchiveTransferListener archiveTransferListener = new ArchiveTransferListener(
+            processID);
+
         try {
             if (wasAutobuilding) {
                 desc.setAutoBuilding(false);
                 ws.setDescription(desc);
             }
+
+            if (fileTransferManager == null)
+                // FIXME: the logic will try to send this to the remote contact
+                throw new IOException("not connected to a XMPP server");
+
+            fileTransferManager
+                .addFileTransferListener(archiveTransferListener);
 
             List<FileList> missingFiles = calculateMissingFiles(projectNames,
                 skipSyncs, useVersionControl, this.monitor.newChild(10));
@@ -189,7 +207,8 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
 
             // Host/Inviter decided to transmit files with one big archive
             if (filesMissing)
-                acceptArchive(localProjects.size(), this.monitor.newChild(80));
+                acceptArchive(archiveTransferListener, localProjects.size(),
+                    this.monitor.newChild(80));
 
             // We are finished with the exchanging process. Add all projects
             // resources to the session.
@@ -212,6 +231,11 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
         } catch (Exception e) {
             processException(e);
         } finally {
+
+            if (fileTransferManager != null)
+                fileTransferManager
+                    .removeFileTransferListener(archiveTransferListener);
+
             fileReplacementInProgressObservable.replacementDone();
             this.monitor.done();
 
@@ -245,62 +269,82 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
      * The archive with all missing files sorted by project will be received and
      * unpacked project by project.
      * 
-     * @param numberOfLoops
+     * @param projectCount
      *            how many projects will be in the big archive
      */
-    private void acceptArchive(int numberOfLoops, SubMonitor submonitor)
-        throws IOException, SarosCancellationException, CoreException {
+    private void acceptArchive(ArchiveTransferListener archiveTransferListener,
+        int projectCount, SubMonitor monitor) throws IOException,
+        SarosCancellationException {
 
         // waiting for the big archive to come in
 
-        submonitor.beginTask(null, 100);
-        submonitor.subTask("Receiving archive");
+        monitor.beginTask(null, 100);
 
-        InputStream archiveStream = transmitter.receiveArchive(processID,
-            getPeer(), submonitor.newChild(70), false);
-        checkCancellation();
+        File archiveFile = receiveArchive(archiveTransferListener, processID,
+            monitor.newChild(50, SubMonitor.SUPPRESS_NONE));
 
-        ZipInputStream zipStream = new ZipInputStream(archiveStream);
+        /*
+         * FIXME at this point it makes no sense to report the cancellation to
+         * the remote side, because his negotiation is already finished !
+         */
+
+        ZipInputStream zipInputStream = null;
         ZipEntry zipEntry;
-        // unpacking the big archive
-        SubMonitor zipStreamLoopMonitor = submonitor.newChild(30);
-        while ((zipEntry = zipStream.getNextEntry()) != null) {
-            // Every zipEntry is (again) a ZipArchive, which contains all
-            // missing files for one project.
-            SubMonitor lMonitor = zipStreamLoopMonitor
-                .newChild(100 / numberOfLoops);
-            /*
-             * For every entry (which is a zipArchive for a single project) we
-             * have to find out which project it is meant for. So we need the
-             * projectID.
-             * 
-             * The archive name contains the projectID.
-             * 
-             * archiveName = projectID + this.projectIDDelimiter + randomNumber
-             * + '.zip'
-             */
-            String projectID = zipEntry.getName().substring(0,
-                zipEntry.getName().indexOf(this.projectIDDelimiter));
-            IProject project = localProjects.get(projectID);
-            IPath path = Path.fromPortableString(zipEntry.getName());
-            // store the archive temporary
-            IFile file = project.getFile(path);
-            // Archive needs to be stored temporarily to be accessed
-            FileUtils.writeFile(new FilterInputStream(zipStream) {
-                @Override
-                public void close() throws IOException {
-                    // prevent the ZipInputStream from being closed
-                }
-            }, file, lMonitor.newChild(10));
 
-            InputStream inputStream = file.getContents();
-            log.debug(file.getProjectRelativePath().toString());
-            // write all files in archive to project
-            writeArchive(inputStream, project, lMonitor.newChild(80));
-            zipStream.closeEntry();
-            file.delete(true, false, lMonitor.newChild(10));
+        SubMonitor zipStreamLoopMonitor = monitor.newChild(50,
+            SubMonitor.SUPPRESS_NONE);
+
+        zipStreamLoopMonitor.beginTask(null, 100);
+
+        try {
+
+            zipInputStream = new ZipInputStream(new BufferedInputStream(
+                new FileInputStream(archiveFile)));
+
+            while ((zipEntry = zipInputStream.getNextEntry()) != null) {
+                // Every zipEntry is (again) a ZipArchive, which contains all
+                // missing files for one project.
+                SubMonitor currentArchiveMonitor = zipStreamLoopMonitor
+                    .newChild(100 / projectCount, SubMonitor.SUPPRESS_NONE);
+                /*
+                 * For every entry (which is a zipArchive for a single project)
+                 * we have to find out which project it is meant for. So we need
+                 * the projectID.
+                 * 
+                 * The archive name contains the projectID.
+                 * 
+                 * archiveName = projectID + this.projectIDDelimiter +
+                 * randomNumber + '.zip'
+                 */
+                String projectID = zipEntry.getName().substring(0,
+                    zipEntry.getName().indexOf(this.projectIDDelimiter));
+
+                IProject project = localProjects.get(projectID);
+
+                /*
+                 * see FileUtils.writeArchive ... do not wrap the zip input
+                 * stream here
+                 */
+                writeArchive(new FilterInputStream(zipInputStream) {
+                    @Override
+                    public void close() throws IOException {
+                        // prevent the ZipInputStream from being closed
+                    }
+                }, project, currentArchiveMonitor);
+
+                zipInputStream.closeEntry();
+                currentArchiveMonitor.done();
+            }
+        } catch (OperationCanceledException e) {
+            throw new LocalCancellationException();
+        } finally {
+            IOUtils.closeQuietly(zipInputStream);
+
+            if (archiveFile != null)
+                archiveFile.delete();
+
+            monitor.done();
         }
-        submonitor.done();
     }
 
     /**
@@ -876,18 +920,27 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
         throws LocalCancellationException {
 
         log.debug("Inv" + Utils.prefix(peer) + ": Writing archive to disk...");
+        /*
+         * TODO: calculate the ADLER32 checksums during decompression and add
+         * them into the ChecksumCache. The insertion must be done after the
+         * WorkspaceRunnable has run or all checksums will be invalidated during
+         * the IResourceChangeListener updates inside the WorkspaceRunnable or
+         * after it finished!
+         */
         try {
             ResourcesPlugin.getWorkspace().run(new IWorkspaceRunnable() {
                 public void run(IProgressMonitor monitor) throws CoreException {
                     try {
                         FileUtils.writeArchive(archiveStream, project,
-                            subMonitor);
+                            SubMonitor.convert(monitor));
                     } catch (LocalCancellationException e) {
                         throw new CoreException(new Status(IStatus.CANCEL,
                             Saros.SAROS, null, e));
                     }
                 }
             }, subMonitor);
+
+            // TODO: now add the checksums into the cache
         } catch (CoreException e) {
             try {
                 throw e.getCause();
@@ -992,5 +1045,86 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
 
     public List<ProjectExchangeInfo> getProjectInfos() {
         return projectInfos;
+    }
+
+    private File receiveArchive(
+        ArchiveTransferListener archiveTransferListener, String transferID,
+        IProgressMonitor monitor) throws IOException,
+        SarosCancellationException {
+
+        monitor.beginTask("Receiving archive file...", 100);
+        log.debug("waiting for incoming archive stream request");
+
+        monitor
+            .subTask("Host is compressing project files. Waiting for the archive file...");
+
+        try {
+            while (!archiveTransferListener.hasReceived()) {
+                if (monitor.isCanceled())
+                    throw new LocalCancellationException();
+
+                Thread.sleep(200);
+            }
+        } catch (InterruptedException e) {
+            monitor.setCanceled(true);
+            monitor.done();
+            Thread.currentThread().interrupt();
+            throw new LocalCancellationException();
+        }
+
+        monitor.subTask("Receiving archive file...");
+
+        log.debug("receiving archive");
+
+        IncomingFileTransfer transfer = archiveTransferListener.getRequest()
+            .accept();
+
+        File archiveFile = File.createTempFile(
+            "saros_archive_" + System.currentTimeMillis(), null);
+
+        boolean transferFailed = true;
+
+        try {
+            transfer.recieveFile(archiveFile);
+            monitorFileTransfer(transfer, monitor);
+            transferFailed = false;
+        } catch (XMPPException e) {
+            throw new IOException(e.getMessage(), e.getCause());
+        } finally {
+            if (transferFailed)
+                archiveFile.delete();
+
+            monitor.done();
+        }
+
+        log.debug("stored archive in file " + archiveFile.getAbsolutePath()
+            + ", size: " + Utils.formatByte(archiveFile.length()));
+
+        return archiveFile;
+    }
+
+    private static class ArchiveTransferListener implements
+        FileTransferListener {
+        private String description;
+        private volatile FileTransferRequest request;
+
+        public ArchiveTransferListener(String description) {
+            this.description = description;
+        }
+
+        @Override
+        public void fileTransferRequest(FileTransferRequest request) {
+            if (request.getDescription().equals(description)) {
+                this.request = request;
+            }
+        }
+
+        public boolean hasReceived() {
+            return this.request != null;
+        }
+
+        public FileTransferRequest getRequest() {
+            return this.request;
+        }
     }
 }
