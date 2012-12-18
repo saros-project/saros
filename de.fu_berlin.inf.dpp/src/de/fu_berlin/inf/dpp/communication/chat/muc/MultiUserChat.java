@@ -211,19 +211,20 @@ public class MultiUserChat extends AbstractChat {
          */
         // this.setCurrentState(ChatState.gone);
 
-        mucStateManager = null;
         clearHistory();
 
         // TODO just leave as the room is not persistent
-        if (createdRoom) {
-            try {
+        try {
+            if (createdRoom)
                 muc.destroy(null, null);
-            } catch (XMPPException e) {
-                log.debug("Could not destroy room: " + preferences.getRoom(), e);
-            }
-        } else {
-            muc.leave();
+            else
+                muc.leave();
+        } catch (Exception e) {
+            log.warn(
+                "could not leave or destroy room: " + preferences.getRoom(), e);
         }
+
+        mucStateManager = null;
         muc = null;
         return createdRoom;
     }
