@@ -222,9 +222,11 @@ public class ChatControl extends Composite {
             Utils.runSafeSWTAsync(log, new Runnable() {
                 @Override
                 public void run() {
-                    if (isOwnJID(jid)) {
+                    if (ChatControl.this.isDisposed())
                         return;
-                    }
+
+                    if (isOwnJID(jid))
+                        return;
 
                     CTabItem tab = chatRooms.getChatTab(chat);
 
@@ -243,12 +245,14 @@ public class ChatControl extends Composite {
 
                 @Override
                 public void run() {
+                    if (ChatControl.this.isDisposed())
+                        return;
+
                     addChatLine(new ChatElement(jid, new Date(),
                         ChatElementType.JOIN));
 
-                    if (isOwnJID(jid)) {
+                    if (isOwnJID(jid))
                         chatInput.setEnabled(true);
-                    }
                 }
             });
         }
@@ -259,12 +263,14 @@ public class ChatControl extends Composite {
 
                 @Override
                 public void run() {
+                    if (ChatControl.this.isDisposed())
+                        return;
+
                     addChatLine(new ChatElement(jid, new Date(),
                         ChatElementType.LEAVE));
 
-                    if (isOwnJID(jid)) {
+                    if (isOwnJID(jid))
                         chatInput.setEnabled(false);
-                    }
                 }
             });
         }
@@ -626,6 +632,8 @@ public class ChatControl extends Composite {
         Utils.runSafeSWTAsync(log, new Runnable() {
             @Override
             public void run() {
+                if (isDisposed())
+                    return;
                 updateColors();
             }
         });
