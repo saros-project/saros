@@ -5,14 +5,6 @@ import java.rmi.RemoteException;
 
 public interface IContextMenusInSarosView extends Remote {
 
-    /**********************************************
-     * 
-     * contextMenus showed in sarosview
-     * 
-     **********************************************/
-
-    public void stopSarosSession() throws RemoteException;
-
     /**
      * This function opens a chat by selecting the respective context menu item.
      */

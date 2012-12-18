@@ -67,7 +67,7 @@ public class Share3UsersLeavingSessionTest extends StfTestCase {
 
         CARL.remoteBot().waitLongUntilShellIsOpen(SHELL_SESSION_INVITATION);
 
-        ALICE.superBot().views().sarosView().selectSession().stopSarosSession();
+        ALICE.superBot().views().sarosView().leaveSession();
 
         ALICE.superBot().views().sarosView().waitUntilIsNotInSession();
         BOB.superBot().views().sarosView().waitUntilIsNotInSession();

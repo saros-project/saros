@@ -186,7 +186,7 @@ public class MenuSarosByAliceBobTest extends StfTestCase {
             .waitUntilClassExists(Constants.PROJECT1, Constants.PKG1,
                 Constants.CLS1);
 
-        ALICE.superBot().views().sarosView().selectBuddies().stopSarosSession();
+        ALICE.superBot().views().sarosView().leaveSession();
 
         ALICE.superBot().views().sarosView().waitUntilIsNotInSession();
         BOB.superBot().views().sarosView().waitUntilIsNotInSession();
