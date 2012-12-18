@@ -1,13 +1,9 @@
 package de.fu_berlin.inf.dpp.net.util;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.Iterator;
 import java.util.concurrent.Callable;
-import java.util.concurrent.CancellationException;
 
 import org.apache.log4j.Logger;
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.SubMonitor;
 import org.jivesoftware.smack.AccountManager;
 import org.jivesoftware.smack.Connection;
 import org.jivesoftware.smack.PacketCollector;
@@ -22,7 +18,6 @@ import org.jivesoftware.smack.filter.PacketIDFilter;
 import org.jivesoftware.smack.filter.PacketTypeFilter;
 import org.jivesoftware.smack.packet.IQ;
 import org.jivesoftware.smack.packet.Registration;
-import org.jivesoftware.smack.packet.XMPPError;
 import org.jivesoftware.smackx.ServiceDiscoveryManager;
 import org.jivesoftware.smackx.packet.DiscoverInfo.Identity;
 import org.jivesoftware.smackx.packet.DiscoverItems;
@@ -167,60 +162,30 @@ public class RosterUtils {
      * @blocking
      * 
      * @param server
-     *            the server on which to create the account.
+     *            the server on which to create the account
      * @param username
-     *            for the new account.
+     *            for the new account
      * @param password
-     *            for the new account.
-     * @param monitor
-     *            for the operation.
-     * @throws InvocationTargetException
-     *             exception that occurs while registering.
+     *            for the new account
+     * @throws XMPPException
+     *             exception that occurs while registering
      */
     public static void createAccount(String server, String username,
-        String password, IProgressMonitor monitor)
-        throws InvocationTargetException {
+        String password) throws XMPPException {
 
-        if (monitor == null)
-            monitor = SubMonitor.convert(monitor);
+        Connection connection = new XMPPConnection(server);
 
-        monitor.beginTask("Registering account...", 3);
+        connection.connect();
 
-        try {
-            Connection connection = new XMPPConnection(server);
-            monitor.worked(1);
+        String errorMessage = isAccountCreationPossible(connection, username);
 
-            connection.connect();
-            monitor.worked(1);
+        if (errorMessage != null)
+            throw new XMPPException(errorMessage);
 
-            String errorMessage = isAccountCreationPossible(connection,
-                username);
-            if (errorMessage != null)
-                throw new XMPPException(errorMessage);
+        AccountManager manager = connection.getAccountManager();
+        manager.createAccount(username, password);
 
-            monitor.worked(1);
-
-            AccountManager manager = connection.getAccountManager();
-            manager.createAccount(username, password);
-            monitor.worked(1);
-
-            connection.disconnect();
-        } catch (XMPPException e) {
-            String message = e.getMessage();
-            XMPPError error = e.getXMPPError();
-            if (error != null) {
-                message = error.getMessage();
-                if (message == null) {
-                    if (error.getCode() == 409)
-                        message = "The XMPP/Jabber account already exists.";
-                    else
-                        message = "An unknown error occured. Please register on provider's website.";
-                }
-            }
-            throw new InvocationTargetException(e, message);
-        } finally {
-            monitor.done();
-        }
+        connection.disconnect();
     }
 
     /**
@@ -273,99 +238,77 @@ public class RosterUtils {
     }
 
     /**
-     * Adds given buddy to the {@link Roster}.
+     * Adds given contact to the {@link Roster}.
      * 
      * @param connection
      * @param jid
      * @param nickname
-     * @param monitor
-     * @throws InvocationTargetException
      */
     public static void addToRoster(Connection connection, final JID jid,
-        String nickname, IProgressMonitor monitor)
-        throws InvocationTargetException {
+        String nickname) throws XMPPException {
 
         if (connection == null)
-            throw new InvocationTargetException(new NullPointerException(),
-                "You need to be connected to an XMPP/Jabber server.");
+            throw new NullPointerException("connection is null");
 
-        SubMonitor subMonitor = SubMonitor.convert(monitor);
+        if (jid == null)
+            throw new NullPointerException("jid is null");
 
-        subMonitor.beginTask("Adding buddy " + jid + "...", 3);
         try {
-            try {
-                boolean jidOnServer = isJIDonServer(connection, jid,
-                    subMonitor.newChild(1));
-                if (!jidOnServer) {
-                    boolean cancel = false;
-                    try {
-                        cancel = Utils.runSWTSync(new Callable<Boolean>() {
-                            public Boolean call() throws Exception {
-                                return !DialogUtils
-                                    .openQuestionMessageDialog(
-                                        null,
-                                        "Buddy Unknown",
-                                        "You entered a valid XMPP/Jabber server.\n\n"
-                                            + "Unfortunately your entered JID is unknown to the server.\n"
-                                            + "Please make sure you spelled the JID correctly.\n\n"
-                                            + "Do you want to add the buddy anyway?");
-                            }
-                        });
-                    } catch (Exception e) {
-                        log.debug("Error opening questionMessageDialog", e);
-                    }
-
-                    if (cancel) {
-                        throw new InvocationTargetException(new XMPPException(
-                            "Please make sure you spelled the JID correctly."));
-                    }
-                    log.debug("The buddy " + jid
-                        + " couldn't be found on the server."
-                        + " The user chose to add it anyway.");
-
-                }
-            } catch (XMPPException e) {
-                final DialogContent dialogContent = getDialogContent(e);
-
+            boolean jidOnServer = isJIDonServer(connection, jid);
+            if (!jidOnServer) {
                 boolean cancel = false;
-
                 try {
                     cancel = Utils.runSWTSync(new Callable<Boolean>() {
                         public Boolean call() throws Exception {
-                            return !DialogUtils.openQuestionMessageDialog(null,
-                                dialogContent.dialogTitle,
-                                dialogContent.dialogMessage);
+                            return !DialogUtils
+                                .openQuestionMessageDialog(
+                                    null,
+                                    "Buddy Unknown",
+                                    "You entered a valid XMPP/Jabber server.\n\n"
+                                        + "Unfortunately your entered JID is unknown to the server.\n"
+                                        + "Please make sure you spelled the JID correctly.\n\n"
+                                        + "Do you want to add the buddy anyway?");
                         }
                     });
-                } catch (Exception e1) {
+                } catch (Exception e) {
                     log.debug("Error opening questionMessageDialog", e);
                 }
 
-                if (cancel)
-                    throw new InvocationTargetException(e,
-                        dialogContent.invocationTargetExceptionMessage);
+                if (cancel) {
+                    throw new XMPPException(
+                        "Please make sure you spelled the JID correctly.");
+                }
+                log.debug("The buddy " + jid
+                    + " couldn't be found on the server."
+                    + " The user chose to add it anyway.");
 
-                log.warn("Problem while adding a buddy. User decided to add buddy anyway. Problem:\n"
-                    + e.getMessage());
             }
+        } catch (XMPPException e) {
+            final DialogContent dialogContent = getDialogContent(e);
+
+            boolean cancel = false;
 
             try {
-                subMonitor.worked(1);
-
-                /*
-                 * Add the buddy to the Roster
-                 */
-                connection.getRoster().createEntry(jid.getBase(), nickname,
-                    null);
-            } catch (XMPPException e) {
-                throw new InvocationTargetException(e, "Unknown error: "
-                    + e.getMessage());
-            } finally {
-                subMonitor.done();
+                cancel = Utils.runSWTSync(new Callable<Boolean>() {
+                    public Boolean call() throws Exception {
+                        return !DialogUtils.openQuestionMessageDialog(null,
+                            dialogContent.dialogTitle,
+                            dialogContent.dialogMessage);
+                    }
+                });
+            } catch (Exception e1) {
+                log.debug("Error opening questionMessageDialog", e);
             }
-        } finally {
-            subMonitor.done();
+
+            if (cancel)
+                throw new XMPPException(
+                    dialogContent.invocationTargetExceptionMessage);
+
+            log.warn("Problem while adding a buddy. User decided to add buddy anyway. Problem:\n"
+                + e.getMessage());
         }
+
+        connection.getRoster().createEntry(jid.getBase(), nickname, null);
     }
 
     /**
@@ -390,48 +333,25 @@ public class RosterUtils {
      * Returns whether the given JID can be found on the server.
      * 
      * @blocking
-     * @cancelable
      * 
      * @param connection
-     * @param monitor
-     *            a {@link SubMonitor} to report progress to; may be null
      * @throws XMPPException
      *             if the service discovery failed
      */
-    public static boolean isJIDonServer(Connection connection, JID jid,
-        SubMonitor monitor) throws XMPPException {
-        if (monitor != null)
-            monitor.beginTask("Performing Service Discovery on JID " + jid, 2);
+    public static boolean isJIDonServer(Connection connection, JID jid)
+        throws XMPPException {
 
         ServiceDiscoveryManager sdm = ServiceDiscoveryManager
             .getInstanceFor(connection);
 
-        if (monitor != null) {
-            monitor.worked(1);
-            if (monitor.isCanceled())
-                throw new CancellationException();
-        }
+        boolean discovered = sdm.discoverInfo(jid.getRAW()).getIdentities()
+            .hasNext();
 
-        try {
-            boolean discovered = sdm.discoverInfo(jid.getRAW()).getIdentities()
-                .hasNext();
+        if (!discovered && jid.isBareJID())
+            discovered = sdm.discoverInfo(jid.getBase() + "/" + Saros.RESOURCE)
+                .getIdentities().hasNext();
 
-            if (!discovered && jid.isBareJID())
-                discovered = sdm
-                    .discoverInfo(jid.getBase() + "/" + Saros.RESOURCE)
-                    .getIdentities().hasNext();
-
-            /*
-             * discovery does not change any state, if the user wanted to cancel
-             * it, we can do that even after the execution finished
-             */
-            if (monitor != null && monitor.isCanceled())
-                throw new CancellationException();
-            return discovered;
-        } finally {
-            if (monitor != null)
-                monitor.done();
-        }
+        return discovered;
     }
 
     /**

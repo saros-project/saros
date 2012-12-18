@@ -26,6 +26,8 @@ import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.wizard.Wizard;
+import org.jivesoftware.smack.XMPPException;
+import org.jivesoftware.smack.packet.XMPPError;
 import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.Saros;
@@ -95,7 +97,7 @@ public class CreateXMPPAccountWizard extends Wizard {
 
     @Override
     public void addPages() {
-        addPage(this.createXMPPAccountPage);
+        addPage(createXMPPAccountPage);
     }
 
     /**
@@ -106,33 +108,51 @@ public class CreateXMPPAccountWizard extends Wizard {
      */
     @Override
     public boolean performFinish() {
-        this.cachedServer = this.getServer();
-        this.cachedUsername = this.getUsername();
-        this.cachedPassword = this.getPassword();
+        cachedServer = getServer();
+        cachedUsername = getUsername();
+        cachedPassword = getPassword();
 
         try {
             // fork a new thread to prevent the GUI from hanging
             getContainer().run(true, false, new IRunnableWithProgress() {
                 public void run(IProgressMonitor monitor)
                     throws InvocationTargetException {
-                    RosterUtils.createAccount(cachedServer, cachedUsername,
-                        cachedPassword, monitor);
-                    log.debug("Account creation succeeded: username="
-                        + cachedUsername + ", server=" + cachedServer);
+
+                    monitor.beginTask("Registering account...",
+                        IProgressMonitor.UNKNOWN);
+
+                    try {
+                        RosterUtils.createAccount(cachedServer, cachedUsername,
+                            cachedPassword);
+
+                        log.debug("Account creation succeeded: username="
+                            + cachedUsername + ", server=" + cachedServer);
+                    } catch (XMPPException e) {
+                        throw new InvocationTargetException(e);
+                    } finally {
+                        monitor.done();
+                    }
                 }
             });
         } catch (InvocationTargetException e) {
-            log.warn(e.getCause().getMessage(), e.getCause());
+            log.error(e.getCause().getMessage(), e.getCause());
 
-            this.createXMPPAccountPage.setErrorMessage(e.getMessage());
+            String message = null;
+            Throwable t = e.getCause();
+
+            if (t instanceof XMPPException)
+                message = getErrorMessage((XMPPException) t);
+
+            if (message == null && t != null)
+                message = t.getMessage();
+
+            createXMPPAccountPage.setErrorMessage(message);
 
             // Leave the wizard open
             return false;
         } catch (InterruptedException e) {
-            log.error("An internal error occurred: InterruptedException"
-                + " thrown from uninterruptable method", e);
-            this.createXMPPAccountPage.setErrorMessage(e.getCause()
-                .getMessage());
+            log.error("uninterruptable context was interrupted", e);
+            createXMPPAccountPage.setErrorMessage(e.getMessage());
             return false;
         }
 
@@ -150,7 +170,7 @@ public class CreateXMPPAccountWizard extends Wizard {
             }
 
             if (reconnect) {
-                accountStore.setAccountActive(this.createdXMPPAccount);
+                accountStore.setAccountActive(createdXMPPAccount);
                 saros.connect(false);
             }
         }
@@ -169,7 +189,7 @@ public class CreateXMPPAccountWizard extends Wizard {
      */
     protected String getServer() {
         try {
-            return this.createXMPPAccountPage.getServer();
+            return createXMPPAccountPage.getServer();
         } catch (Exception e) {
             return cachedServer;
         }
@@ -182,7 +202,7 @@ public class CreateXMPPAccountWizard extends Wizard {
      */
     protected String getUsername() {
         try {
-            return this.createXMPPAccountPage.getUsername();
+            return createXMPPAccountPage.getUsername();
         } catch (Exception e) {
             return cachedUsername;
         }
@@ -195,7 +215,7 @@ public class CreateXMPPAccountWizard extends Wizard {
      */
     protected String getPassword() {
         try {
-            return this.createXMPPAccountPage.getPassword();
+            return createXMPPAccountPage.getPassword();
         } catch (Exception e) {
             return cachedPassword;
         }
@@ -207,6 +227,21 @@ public class CreateXMPPAccountWizard extends Wizard {
      * @return null if the {@link XMPPAccount} has not (yet) been created.
      */
     public XMPPAccount getCreatedXMPPAccount() {
-        return this.createdXMPPAccount;
+        return createdXMPPAccount;
+    }
+
+    private String getErrorMessage(XMPPException e) {
+        String message = null;
+        XMPPError error = e.getXMPPError();
+
+        if (error == null)
+            return null;
+
+        if (error.getCode() == 409)
+            message = "The XMPP/Jabber account already exists.";
+        else
+            message = "An unknown error occured. Please register on provider's website.";
+
+        return message;
     }
 }

@@ -28,11 +28,12 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.jface.wizard.WizardPage;
 import org.jivesoftware.smack.Roster;
+import org.jivesoftware.smack.XMPPException;
 import org.picocontainer.annotations.Inject;
 
-import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.net.SarosNet;
 import de.fu_berlin.inf.dpp.net.subscriptionmanager.IncomingSubscriptionEvent;
 import de.fu_berlin.inf.dpp.net.subscriptionmanager.SubscriptionManager;
 import de.fu_berlin.inf.dpp.net.subscriptionmanager.SubscriptionManagerListener;
@@ -54,7 +55,7 @@ public class AddBuddyWizard extends Wizard {
     public static final ImageDescriptor IMAGE = ImageManager.WIZBAN_ADD_BUDDY;
 
     @Inject
-    protected Saros saros;
+    protected SarosNet sarosNet;
 
     @Inject
     protected SubscriptionManager subscriptionManager;
@@ -69,10 +70,9 @@ public class AddBuddyWizard extends Wizard {
 
     public AddBuddyWizard() {
         SarosPluginContext.initComponent(this);
-        this.setWindowTitle(TITLE);
-        this.setDefaultPageImageDescriptor(IMAGE);
-
-        this.setNeedsProgressMonitor(true);
+        setWindowTitle(TITLE);
+        setDefaultPageImageDescriptor(IMAGE);
+        setNeedsProgressMonitor(true);
     }
 
     @Override
@@ -86,7 +86,7 @@ public class AddBuddyWizard extends Wizard {
         final String nickname = this.addBuddyWizardPage.getNickname();
 
         if (this.addBuddyWizardPage.isBuddyAlreadyAdded()) {
-            log.debug("Buddy " + jid.toString() + " already added."); //$NON-NLS-1$ //$NON-NLS-2$
+            log.debug("Buddy " + jid.toString() + " already added.");
             return true;
         }
 
@@ -101,10 +101,15 @@ public class AddBuddyWizard extends Wizard {
                 subscriptionManager.removeSubscriptionManagerListener(this);
             }
         };
+
         try {
-            getContainer().run(true, true, new IRunnableWithProgress() {
+            getContainer().run(true, false, new IRunnableWithProgress() {
                 public void run(IProgressMonitor monitor)
                     throws InvocationTargetException, InterruptedException {
+
+                    monitor.beginTask("Adding buddy " + jid + "...",
+                        IProgressMonitor.UNKNOWN);
+
                     try {
                         /*
                          * Register for incoming subscription request from
@@ -113,28 +118,28 @@ public class AddBuddyWizard extends Wizard {
                         subscriptionManager
                             .addSubscriptionManagerListener(subscriptionManagerListener);
 
-                        RosterUtils.addToRoster(saros.getSarosNet()
-                            .getConnection(), jid, nickname, monitor);
+                        RosterUtils.addToRoster(sarosNet.getConnection(), jid,
+                            nickname);
+
                         cachedBuddy = jid;
                     } catch (CancellationException e) {
                         throw new InterruptedException();
+                    } catch (XMPPException e) {
+                        throw new InvocationTargetException(e);
+                    } finally {
+                        monitor.done();
                     }
                 }
             });
         } catch (InvocationTargetException e) {
             log.warn(e.getCause().getMessage(), e.getCause());
-
+            addBuddyWizardPage.setErrorMessage(e.getMessage());
             subscriptionManager
                 .removeSubscriptionManagerListener(subscriptionManagerListener);
-
-            this.addBuddyWizardPage.setErrorMessage(e.getMessage());
-
             // Leave the wizard open
             return false;
         } catch (InterruptedException e) {
-            log.debug("Adding buddy " + jid.toString() //$NON-NLS-1$
-                + " was canceled by the user."); //$NON-NLS-1$
-
+            log.error("uninterruptable context was interrupted", e);
             subscriptionManager
                 .removeSubscriptionManagerListener(subscriptionManagerListener);
         }
@@ -153,6 +158,6 @@ public class AddBuddyWizard extends Wizard {
      * @return
      */
     public JID getBuddy() {
-        return this.cachedBuddy;
+        return cachedBuddy;
     }
 }
