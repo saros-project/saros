@@ -4,30 +4,31 @@ import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioFormat.Encoding;
 import javax.sound.sampled.Mixer;
 
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.xiph.speex.spi.SpeexEncoding;
 
-import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.communication.audio.MixerManager;
 
 @Component(module = "prefs")
 public class PreferenceUtils {
 
-    private Saros saros;
+    private IPreferenceStore preferenceStore;
     private MixerManager mixerManager;
 
-    public PreferenceUtils(Saros saros, MixerManager mixerManager) {
-        this.saros = saros;
+    public PreferenceUtils(IPreferenceStore preferenceStore,
+        MixerManager mixerManager) {
+        this.preferenceStore = preferenceStore;
         this.mixerManager = mixerManager;
     }
 
     public boolean isDebugEnabled() {
-        return saros.getPreferenceStore().getBoolean(PreferenceConstants.DEBUG);
+        return preferenceStore.getBoolean(PreferenceConstants.DEBUG);
     }
 
     public boolean isAutoReuseExisting() {
-        return saros.getPreferenceStore().getBoolean(
-            PreferenceConstants.AUTO_REUSE_PROJECT);
+        return preferenceStore
+            .getBoolean(PreferenceConstants.AUTO_REUSE_PROJECT);
     }
 
     /**
@@ -55,8 +56,7 @@ public class PreferenceUtils {
      * @return true if auto-connect is enabled.
      */
     public boolean isAutoConnecting() {
-        return saros.getPreferenceStore().getBoolean(
-            PreferenceConstants.AUTO_CONNECT);
+        return preferenceStore.getBoolean(PreferenceConstants.AUTO_CONNECT);
     }
 
     /**
@@ -66,8 +66,8 @@ public class PreferenceUtils {
      * @return true of port mapping is enabled, false otherwise
      */
     public boolean isAutoPortmappingEnabled() {
-        return saros.getPreferenceStore()
-            .getString(PreferenceConstants.AUTO_PORTMAPPING_DEVICEID).isEmpty() == false;
+        return preferenceStore.getString(
+            PreferenceConstants.AUTO_PORTMAPPING_DEVICEID).isEmpty() == false;
     }
 
     /**
@@ -76,13 +76,13 @@ public class PreferenceUtils {
      * @return Device ID of the gateway or empty String if disabled.
      */
     public String getAutoPortmappingGatewayID() {
-        return saros.getPreferenceStore().getString(
-            PreferenceConstants.AUTO_PORTMAPPING_DEVICEID);
+        return preferenceStore
+            .getString(PreferenceConstants.AUTO_PORTMAPPING_DEVICEID);
     }
 
     public int getAutoPortmappingLastPort() {
-        return saros.getPreferenceStore().getInt(
-            PreferenceConstants.AUTO_PORTMAPPING_LASTMAPPEDPORT);
+        return preferenceStore
+            .getInt(PreferenceConstants.AUTO_PORTMAPPING_LASTMAPPEDPORT);
     }
 
     /**
@@ -91,8 +91,7 @@ public class PreferenceUtils {
      * @return the user name.for Skype or an empty string
      */
     public String getSkypeUserName() {
-        return saros.getPreferenceStore().getString(
-            PreferenceConstants.SKYPE_USERNAME);
+        return preferenceStore.getString(PreferenceConstants.SKYPE_USERNAME);
     }
 
     /**
@@ -105,64 +104,61 @@ public class PreferenceUtils {
      *         above)
      */
     public int getFileTransferPort() {
-        int port = saros.getPreferenceStore().getInt(
-            PreferenceConstants.FILE_TRANSFER_PORT);
+        int port = preferenceStore
+            .getInt(PreferenceConstants.FILE_TRANSFER_PORT);
 
-        if (saros.getPreferenceStore().getBoolean(
-            PreferenceConstants.USE_NEXT_PORTS_FOR_FILE_TRANSFER))
+        if (preferenceStore
+            .getBoolean(PreferenceConstants.USE_NEXT_PORTS_FOR_FILE_TRANSFER))
             return -port;
         else
             return port;
     }
 
     public boolean isSkipSyncSelectable() {
-        return saros.getPreferenceStore().getBoolean(
-            PreferenceConstants.SKIP_SYNC_SELECTABLE);
+        return preferenceStore
+            .getBoolean(PreferenceConstants.SKIP_SYNC_SELECTABLE);
     }
 
     public boolean forceFileTranserByChat() {
-        return saros.getPreferenceStore().getBoolean(
-            PreferenceConstants.FORCE_FILETRANSFER_BY_CHAT);
+        return preferenceStore
+            .getBoolean(PreferenceConstants.FORCE_FILETRANSFER_BY_CHAT);
     }
 
     public boolean isConcurrentUndoActivated() {
-        return saros.getPreferenceStore().getBoolean(
-            PreferenceConstants.CONCURRENT_UNDO);
+        return preferenceStore.getBoolean(PreferenceConstants.CONCURRENT_UNDO);
     }
 
     public boolean isPingPongActivated() {
-        return saros.getPreferenceStore().getBoolean(
-            PreferenceConstants.PING_PONG);
+        return preferenceStore.getBoolean(PreferenceConstants.PING_PONG);
     }
 
     public boolean useVersionControl() {
-        return !saros.getPreferenceStore().getBoolean(
-            PreferenceConstants.DISABLE_VERSION_CONTROL);
+        return !preferenceStore
+            .getBoolean(PreferenceConstants.DISABLE_VERSION_CONTROL);
     }
 
     public void setUseVersionControl(boolean value) {
-        saros.getPreferenceStore().setValue(
-            PreferenceConstants.DISABLE_VERSION_CONTROL, !value);
+        preferenceStore.setValue(PreferenceConstants.DISABLE_VERSION_CONTROL,
+            !value);
     }
 
     public Mixer getRecordingMixer() {
-        return mixerManager.getMixerByName(saros.getPreferenceStore()
+        return mixerManager.getMixerByName(preferenceStore
             .getString(PreferenceConstants.AUDIO_RECORD_DEVICE));
     }
 
     public Mixer getPlaybackMixer() {
-        return mixerManager.getMixerByName(saros.getPreferenceStore()
+        return mixerManager.getMixerByName(preferenceStore
             .getString(PreferenceConstants.AUDIO_PLAYBACK_DEVICE));
     }
 
     public AudioFormat getEncodingFormat() {
         Encoding encoding;
-        float sampleRate = Float.parseFloat(saros.getPreferenceStore()
+        float sampleRate = Float.parseFloat(preferenceStore
             .getString(PreferenceConstants.AUDIO_SAMPLERATE));
-        int quality = Integer.parseInt(saros.getPreferenceStore().getString(
-            PreferenceConstants.AUDIO_QUALITY_LEVEL));
-        boolean vbr = saros.getPreferenceStore().getBoolean(
-            PreferenceConstants.AUDIO_VBR);
+        int quality = Integer.parseInt(preferenceStore
+            .getString(PreferenceConstants.AUDIO_QUALITY_LEVEL));
+        boolean vbr = preferenceStore.getBoolean(PreferenceConstants.AUDIO_VBR);
 
         Encoding encodingsVbr[] = new Encoding[] { SpeexEncoding.SPEEX_VBR0,
             SpeexEncoding.SPEEX_VBR1, SpeexEncoding.SPEEX_VBR2,
@@ -188,35 +184,31 @@ public class PreferenceUtils {
     }
 
     public boolean isDtxEnabled() {
-        return saros.getPreferenceStore().getBoolean(
-            PreferenceConstants.AUDIO_ENABLE_DTX);
+        return preferenceStore.getBoolean(PreferenceConstants.AUDIO_ENABLE_DTX);
     }
 
     public boolean isLocalSOCKS5ProxyEnabled() {
-        return !saros.getPreferenceStore().getBoolean(
-            PreferenceConstants.LOCAL_SOCKS5_PROXY_DISABLED);
+        return !preferenceStore
+            .getBoolean(PreferenceConstants.LOCAL_SOCKS5_PROXY_DISABLED);
     }
 
     public String getStunIP() {
-        return saros.getPreferenceStore().getString(PreferenceConstants.STUN);
+        return preferenceStore.getString(PreferenceConstants.STUN);
     }
 
     public int getStunPort() {
-        return saros.getPreferenceStore().getInt(PreferenceConstants.STUN_PORT);
+        return preferenceStore.getInt(PreferenceConstants.STUN_PORT);
     }
 
     public String isNeedsBasedSyncEnabled() {
-        return saros.getPreferenceStore().getString(
-            PreferenceConstants.NEEDS_BASED_SYNC);
+        return preferenceStore.getString(PreferenceConstants.NEEDS_BASED_SYNC);
     }
 
     public void setNeedsBasedSyncEnabled(boolean value) {
-        saros.getPreferenceStore().setValue(
-            PreferenceConstants.NEEDS_BASED_SYNC, value);
+        preferenceStore.setValue(PreferenceConstants.NEEDS_BASED_SYNC, value);
     }
 
     public boolean isVOIPEnabled() {
-        return saros.getPreferenceStore().getBoolean(
-            PreferenceConstants.VOIP_ENABLED);
+        return preferenceStore.getBoolean(PreferenceConstants.VOIP_ENABLED);
     }
 }
