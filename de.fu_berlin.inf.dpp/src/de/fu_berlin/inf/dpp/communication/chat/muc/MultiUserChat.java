@@ -43,6 +43,8 @@ public class MultiUserChat extends AbstractChat {
      */
     private Connection connection;
 
+    /** the user of the current connection */
+    private JID user;
     /**
      * {@link MUCSessionPreferences} this {@link MultiUserChat} uses
      */
@@ -85,7 +87,8 @@ public class MultiUserChat extends AbstractChat {
                 participants.put(jid, state);
                 addHistoryEntry(new ChatElement(jid, new Date(),
                     ChatElementType.JOIN));
-                MultiUserChat.this.notifyJIDConnected(jid);
+
+                notifyJIDConnected(jid);
                 return;
             } else if (participants.containsKey(jid) && state == ChatState.gone) {
                 /*
@@ -94,7 +97,8 @@ public class MultiUserChat extends AbstractChat {
                 participants.remove(jid);
                 addHistoryEntry(new ChatElement(jid, new Date(),
                     ChatElementType.LEAVE));
-                MultiUserChat.this.notifyJIDDisconnected(jid);
+
+                notifyJIDDisconnected(jid);
                 return;
             } else {
                 /*
@@ -102,7 +106,7 @@ public class MultiUserChat extends AbstractChat {
                  */
                 participants.put(jid, state);
                 addHistoryEntry(new ChatElement(jid, new Date(), state));
-                MultiUserChat.this.notifyJIDStateChanged(jid, state);
+                notifyJIDStateChanged(jid, state);
             }
         }
 
@@ -138,8 +142,7 @@ public class MultiUserChat extends AbstractChat {
                 JID sender = JID
                     .createFromServicePerspective(message.getFrom());
                 addHistoryEntry(new ChatElement(message, new Date()));
-                MultiUserChat.this.notifyJIDMessageReceived(sender,
-                    message.getBody());
+                notifyJIDMessageReceived(sender, message.getBody());
             }
         }
     };
@@ -172,12 +175,11 @@ public class MultiUserChat extends AbstractChat {
     boolean connect() throws XMPPException {
         if (preferences == null)
             throw new IllegalStateException("No comPrefs found!");
-        this.createdRoom = createAndJoinMUC();
-        this.mucStateManager = MUCStateManager
-            .getInstance(this.connection, muc);
-        this.mucStateManager.addMUCStateListener(mucStateListener);
-        this.muc.addMessageListener(packetListener);
-        return this.createdRoom;
+        createdRoom = createAndJoinMUC();
+        mucStateManager = MUCStateManager.getInstance(connection, muc);
+        mucStateManager.addMUCStateListener(mucStateListener);
+        muc.addMessageListener(packetListener);
+        return createdRoom;
     }
 
     /**
@@ -188,16 +190,17 @@ public class MultiUserChat extends AbstractChat {
      */
     @Override
     public boolean disconnect() {
-        if (this.muc == null)
+        if (muc == null)
             return this.createdRoom;
-        this.muc.removeMessageListener(packetListener);
-        this.mucStateManager.removeMUCStateListener(mucStateListener);
+
+        muc.removeMessageListener(packetListener);
+        mucStateManager.removeMUCStateListener(mucStateListener);
 
         /*
          * Because no ChatState changes can be received anymore we need to
          * manually propagate them locally.
          */
-        MultiUserChat.this.notifyJIDDisconnected(this.getJID());
+        notifyJIDDisconnected(getJID());
 
         /*
          * FIXME: it is possible that the chat room no longer exists (already
@@ -208,10 +211,11 @@ public class MultiUserChat extends AbstractChat {
          */
         // this.setCurrentState(ChatState.gone);
 
-        this.mucStateManager = null;
+        mucStateManager = null;
         clearHistory();
 
-        if (this.createdRoom) {
+        // TODO just leave as the room is not persistent
+        if (createdRoom) {
             try {
                 muc.destroy(null, null);
             } catch (XMPPException e) {
@@ -220,8 +224,8 @@ public class MultiUserChat extends AbstractChat {
         } else {
             muc.leave();
         }
-        this.muc = null;
-        return this.createdRoom;
+        muc = null;
+        return createdRoom;
     }
 
     /**
@@ -238,8 +242,9 @@ public class MultiUserChat extends AbstractChat {
          */
         org.jivesoftware.smackx.muc.MultiUserChat muc = new org.jivesoftware.smackx.muc.MultiUserChat(
             connection, preferences.getRoom());
+
         boolean joined = false;
-        this.createdRoom = false;
+        createdRoom = false;
 
         XMPPException exception = null;
 
@@ -248,11 +253,17 @@ public class MultiUserChat extends AbstractChat {
          * happens that the room was not joined, that is: No room creation is
          * ever necessary.
          */
+
+        String user = connection.getUser();
+
+        if (user == null)
+            throw new XMPPException("not connected to a server");
+
         try {
             log.debug("Trying to create room on server "
                 + this.preferences.getService());
-            muc.create(connection.getUser());
-            this.createdRoom = true;
+            muc.create(user);
+            createdRoom = true;
             joined = true;
         } catch (XMPPException e) {
             exception = e;
@@ -268,7 +279,7 @@ public class MultiUserChat extends AbstractChat {
          */
         if (!joined) {
             try {
-                muc.join(connection.getUser(), preferences.getPassword());
+                muc.join(user, preferences.getPassword());
                 joined = true;
             } catch (XMPPException e) {
                 throw exception != null ? exception : e;
@@ -276,8 +287,9 @@ public class MultiUserChat extends AbstractChat {
         }
 
         this.muc = muc;
+        this.user = new JID(user);
 
-        if (this.createdRoom) {
+        if (createdRoom) {
             configureRoom();
         }
 
@@ -340,7 +352,7 @@ public class MultiUserChat extends AbstractChat {
             // Send the completed form to the server to configure the room
             muc.sendConfigurationForm(submitForm);
         } catch (XMPPException e) {
-            log.debug(e);
+            log.warn("could not configure MUC room", e);
         }
     }
 
@@ -373,7 +385,7 @@ public class MultiUserChat extends AbstractChat {
      * @return
      */
     public MUCSessionPreferences getPreferences() {
-        return this.preferences;
+        return preferences;
     }
 
     /**
@@ -383,9 +395,7 @@ public class MultiUserChat extends AbstractChat {
      */
     @Override
     public JID getJID() {
-        if (this.connection == null)
-            return null;
-        return new JID(this.connection.getUser());
+        return user;
     }
 
     /**
@@ -395,7 +405,7 @@ public class MultiUserChat extends AbstractChat {
      * @return
      */
     public boolean isJoined(JID jid) {
-        return this.participants.get(jid) != null;
+        return participants.get(jid) != null;
     }
 
     /**
@@ -417,7 +427,7 @@ public class MultiUserChat extends AbstractChat {
      *         {@link MultiUserChat}
      */
     public ChatState getState(JID jid) {
-        return this.participants.get(jid);
+        return participants.get(jid);
     }
 
     /**
@@ -426,12 +436,12 @@ public class MultiUserChat extends AbstractChat {
      * @return
      */
     public List<ChatState> getForeignStates() {
-        JID self = this.getJID();
+        JID self = getJID();
         List<ChatState> foreignStates = new ArrayList<ChatState>();
-        for (JID jid : this.participants.keySet()) {
+        for (JID jid : participants.keySet()) {
             if (jid.equals(self))
                 continue;
-            foreignStates.add(this.participants.get(jid));
+            foreignStates.add(participants.get(jid));
         }
         return foreignStates;
     }
@@ -469,7 +479,7 @@ public class MultiUserChat extends AbstractChat {
      */
     @Override
     public Set<JID> getParticipants() {
-        return this.participants.keySet();
+        return participants.keySet();
     }
 
     /**
@@ -479,8 +489,7 @@ public class MultiUserChat extends AbstractChat {
     public void sendMessage(String body) throws XMPPException {
         Message message = muc.createMessage();
         message.setBody(body);
-
-        this.sendMessage(message);
+        sendMessage(message);
     }
 
     /**
@@ -496,7 +505,7 @@ public class MultiUserChat extends AbstractChat {
         if (message == null)
             return;
 
-        this.muc.sendMessage(message);
+        muc.sendMessage(message);
     }
 
     /**
