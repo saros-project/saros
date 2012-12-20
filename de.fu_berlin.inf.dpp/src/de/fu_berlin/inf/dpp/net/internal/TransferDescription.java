@@ -21,7 +21,7 @@ import de.fu_berlin.inf.dpp.util.Utils;
  */
 public class TransferDescription {
 
-    protected TransferDescription() {
+    private TransferDescription() {
         // NOP
     }
 
@@ -29,10 +29,7 @@ public class TransferDescription {
      * Transfer of a FileList
      */
     public static final String FILELIST_TRANSFER = "filelist-transfer";
-    /**
-     * Transfer of several resources in a ZIP-File
-     */
-    public static final String ARCHIVE_TRANSFER = "archive-transfer";
+
     /**
      * data in a stream
      */
@@ -91,10 +88,7 @@ public class TransferDescription {
     @Override
     public String toString() {
 
-        if (ARCHIVE_TRANSFER.equals(type)) {
-            return "Archive from " + Utils.prefix(sender) + " [SID="
-                + sessionID + "]";
-        } else if (FILELIST_TRANSFER.equals(type)) {
+        if (FILELIST_TRANSFER.equals(type)) {
             return "FileList from " + Utils.prefix(sender) + " [SID="
                 + sessionID + "]";
         } else if (STREAM_DATA.equals(type)) {
@@ -116,6 +110,10 @@ public class TransferDescription {
         }
     }
 
+    public static TransferDescription createCustomTransferDescription() {
+        return new TransferDescription();
+    }
+
     public static TransferDescription createFileListTransferDescription(
         JID recipient, JID sender, String sessionID, String processID) {
         TransferDescription result = new TransferDescription();
@@ -124,7 +122,7 @@ public class TransferDescription {
         result.type = FILELIST_TRANSFER;
         result.sessionID = sessionID;
         result.processID = processID;
-        result.compress = false;
+        result.compress = true;
         return result;
     }
 
@@ -136,22 +134,6 @@ public class TransferDescription {
         result.testID = testID;
         result.type = CONNECTION_TEST;
         result.compress = false;
-        return result;
-    }
-
-    public static TransferDescription createArchiveTransferDescription(
-        JID recipient, JID sender, String sessionID, String invitationID,
-        long size) {
-
-        TransferDescription result = new TransferDescription();
-        result.recipient = recipient;
-        result.sender = sender;
-        result.type = ARCHIVE_TRANSFER;
-        result.sessionID = sessionID;
-        result.invitationID = invitationID;
-        result.compress = false;
-        result.size = size;
-
         return result;
     }
 

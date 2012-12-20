@@ -136,7 +136,8 @@ public class BinaryChannelTest {
             }
         });
 
-        TransferDescription description = new TransferDescription();
+        TransferDescription description = TransferDescription
+            .createCustomTransferDescription();
 
         byte[] bytesToSend = new byte[512 * 1024];
 

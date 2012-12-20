@@ -31,7 +31,6 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.SubMonitor;
 import org.jivesoftware.smack.Chat;
 import org.jivesoftware.smack.ChatManager;
 import org.jivesoftware.smack.Connection;
@@ -56,27 +55,27 @@ import de.fu_berlin.inf.dpp.invitation.InvitationProcess;
 import de.fu_berlin.inf.dpp.net.ConnectionState;
 import de.fu_berlin.inf.dpp.net.IConnectionListener;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
-import de.fu_berlin.inf.dpp.net.SarosPacketCollector;
 import de.fu_berlin.inf.dpp.net.IncomingTransferObject.IncomingTransferObjectExtensionProvider;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.SarosNet;
+import de.fu_berlin.inf.dpp.net.SarosPacketCollector;
 import de.fu_berlin.inf.dpp.net.business.DispatchThreadContext;
 import de.fu_berlin.inf.dpp.net.internal.extensions.ActivitiesExtensionProvider;
 import de.fu_berlin.inf.dpp.net.internal.extensions.CancelInviteExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.CancelProjectSharingExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.DefaultInvitationInfo;
-import de.fu_berlin.inf.dpp.net.internal.extensions.DefaultSessionInfo;
-import de.fu_berlin.inf.dpp.net.internal.extensions.InvitationInfo;
-import de.fu_berlin.inf.dpp.net.internal.extensions.LeaveExtension;
-import de.fu_berlin.inf.dpp.net.internal.extensions.PacketExtensionUtils;
-import de.fu_berlin.inf.dpp.net.internal.extensions.UserListInfo;
-import de.fu_berlin.inf.dpp.net.internal.extensions.XStreamExtensionProvider;
 import de.fu_berlin.inf.dpp.net.internal.extensions.DefaultInvitationInfo.InvitationAcknowledgementExtensionProvider;
 import de.fu_berlin.inf.dpp.net.internal.extensions.DefaultInvitationInfo.InvitationCompleteExtensionProvider;
 import de.fu_berlin.inf.dpp.net.internal.extensions.DefaultInvitationInfo.UserListRequestExtensionProvider;
+import de.fu_berlin.inf.dpp.net.internal.extensions.DefaultSessionInfo;
 import de.fu_berlin.inf.dpp.net.internal.extensions.DefaultSessionInfo.UserListConfirmationExtensionProvider;
+import de.fu_berlin.inf.dpp.net.internal.extensions.InvitationInfo;
 import de.fu_berlin.inf.dpp.net.internal.extensions.InvitationInfo.InvitationExtensionProvider;
+import de.fu_berlin.inf.dpp.net.internal.extensions.LeaveExtension;
+import de.fu_berlin.inf.dpp.net.internal.extensions.PacketExtensionUtils;
+import de.fu_berlin.inf.dpp.net.internal.extensions.UserListInfo;
 import de.fu_berlin.inf.dpp.net.internal.extensions.UserListInfo.JoinExtensionProvider;
+import de.fu_berlin.inf.dpp.net.internal.extensions.XStreamExtensionProvider;
 import de.fu_berlin.inf.dpp.observables.SarosSessionObservable;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
@@ -183,85 +182,6 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
                 sessionID, invitationID)));
     }
 
-    /**
-     * Initializes a {@link PacketListener} to visualize incoming packets as
-     * progress in the given {@link SubMonitor}. This is an infinite,
-     * logarithmic progress display.
-     * 
-     * @param peer
-     *            The source {@link JID} of packets to show progress for
-     * @param monitor
-     *            The {@link SubMonitor} of the progress
-     */
-    protected PacketListener createIBBTransferProgressPacketListener(
-        final JID peer, final SubMonitor monitor) {
-
-        PacketListener packetListener = new PacketListener() {
-
-            public void processPacket(Packet packet) {
-                // we don't process
-            }
-        };
-
-        receiver.addPacketListener(packetListener, new PacketFilter() {
-
-            public boolean accept(Packet packet) {
-
-                if (packet.getClass().equals((IQ.class)))
-                    return false;
-
-                if (packet.getFrom() == null)
-                    return false;
-
-                JID fromJid = new JID(packet.getFrom());
-                if (peer.equals(fromJid) == false)
-                    return false;
-
-                // increase infinite (logarithmic) progress
-                monitor.setWorkRemaining(100);
-                monitor.worked(5);
-
-                // we don't process
-                return false;
-            }
-        });
-        return packetListener;
-    }
-
-    /**
-     * Helper for receiving a Packet via XMPPReceiver using
-     * SarosPacketCollector.
-     */
-    public SarosPacketCollector installReceiver(PacketFilter filter) {
-        return receiver.createCollector(filter);
-    }
-
-    public Packet receive(IProgressMonitor monitor,
-        SarosPacketCollector collector, long timeout, boolean forceWait)
-        throws LocalCancellationException, IOException {
-
-        if (isConnectionInvalid())
-            return null;
-
-        try {
-            Packet result;
-            do {
-                if (monitor.isCanceled())
-                    throw new LocalCancellationException();
-                monitor.worked(1);
-                // Wait up to [timeout] seconds for a result.
-                result = collector.nextResult(timeout);
-            } while (forceWait && result == null);
-
-            if (result != null)
-                return result;
-            throw new IOException("Collector timeout: no packet received.");
-
-        } finally {
-            collector.cancel();
-        }
-    }
-
     public void sendUserList(JID to, String invitationID, Collection<User> users) {
         log.trace("Sending buddy list to " + Utils.prefix(to));
         sendMessageToUser(to, userListExtProv.create(new UserListInfo(
@@ -272,6 +192,11 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
         log.trace("Sending buddy list confirmation to " + Utils.prefix(to));
         sendMessageToUser(to,
             userListConfExtProv.create(new DefaultSessionInfo(sessionID)), true);
+    }
+
+    // FIXME remove this method !
+    private SarosPacketCollector installReceiver(PacketFilter filter) {
+        return receiver.createCollector(filter);
     }
 
     // FIXME move to XMPPReceiver
@@ -340,9 +265,9 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
      ********************************************************************************/
 
     /**
-     * A simple struct that is used to queue message transfers.
+     * A simple ADT that is used to queue message transfers.
      */
-    protected static class MessageTransfer {
+    private static class MessageTransfer {
         public JID receipient;
         public Message message;
     }
@@ -434,7 +359,8 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
          * and namespace of the packet extension and standard values and thus
          * transparent to users of this method.
          */
-        TransferDescription result = new TransferDescription()
+        TransferDescription result = TransferDescription
+            .createCustomTransferDescription()
             .setRecipient(recipient)
             .setSender(
                 sarosSessionObservable.getValue().getLocalUser().getJID())

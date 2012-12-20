@@ -11,7 +11,8 @@ public class TransferDescriptionTest {
     @Test
     public void testByteArray() throws Exception {
 
-        TransferDescription td = new TransferDescription();
+        TransferDescription td = TransferDescription
+            .createCustomTransferDescription();
 
         td.setType("foo");
         td.setNamespace("bar");
