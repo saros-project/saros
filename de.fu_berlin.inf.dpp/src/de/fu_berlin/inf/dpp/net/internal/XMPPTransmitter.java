@@ -493,19 +493,13 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
 
     /**
      * Convenience method for sending the given {@link PacketExtension} to all
-     * participants of the given {@link ISarosSession}.
+     * remote participants of the given {@link ISarosSession}.
      */
     private void sendMessageToAll(ISarosSession sarosSession,
         PacketExtension extension) {
 
-        JID myJID = sarosNet.getMyJID();
-
-        for (User participant : sarosSession.getParticipants()) {
-
-            if (participant.getJID().equals(myJID))
-                continue;
+        for (User participant : sarosSession.getRemoteUsers())
             sendMessageToUser(participant.getJID(), extension, true);
-        }
     }
 
     /**
@@ -531,7 +525,7 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
      * Sends a message to a user who is not necessarily in the session.
      */
     public void sendMessageToUser(JID jid, PacketExtension extension) {
-        this.sendMessageToUser(jid, extension, false);
+        sendMessageToUser(jid, extension, false);
     }
 
     /**

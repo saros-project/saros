@@ -54,13 +54,13 @@ import de.fu_berlin.inf.dpp.synchronize.StopManager;
 public interface ISarosSession {
 
     /**
-     * @return a collection of all participants of the shared project. This
-     *         collection includes the local user.
+     * @return a collection of all participants of the current session which
+     *         includes the local user too
      */
     public Collection<User> getParticipants();
 
     /**
-     * @return a snap-shot copy of all buddies.
+     * @return a collection of all remote participants of the current session
      */
     public List<User> getRemoteUsers();
 
