@@ -612,6 +612,11 @@
                </reference>
             </and>
          </activeWhen>
+         <enabledWhen>
+            <reference
+                  definitionId="de.fu_berlin.inf.dpp.ui.definitions.hasWriteAccess">
+            </reference>
+         </enabledWhen>
       </handler>
       <handler
             class="de.fu_berlin.inf.dpp.ui.commandHandlers.SharedProjectAddBuddiesHandler"
@@ -648,6 +653,11 @@
                </not>
             </and>
          </activeWhen>
+         <enabledWhen>
+            <reference
+                  definitionId="de.fu_berlin.inf.dpp.ui.definitions.hasWriteAccess">
+            </reference>
+         </enabledWhen>
       </handler>
       <handler
             class="de.fu_berlin.inf.dpp.ui.commandHandlers.SharedProjectAddSelectedBuddiesHandler"
@@ -1517,6 +1527,15 @@
             </iterate>
          </with>
       </definition>
+      <definition
+            id="de.fu_berlin.inf.dpp.ui.definitions.hasWriteAccess">
+         <with
+               variable="de.fu_berlin.inf.dpp.SarosSession">
+            <test
+                  property="de.fu_berlin.inf.dpp.hasWriteAccess">
+            </test>
+         </with>
+      </definition>
    </extension>
    <extension
          point="org.eclipse.ui.services">
@@ -1544,7 +1563,7 @@
       <propertyTester
             class="de.fu_berlin.inf.dpp.propertyTesters.SarosSessionPropertyTester"
             id="de.fu_berlin.inf.dpp.propertyTesters.SarosSessionPropertyTester"  namespace="de.fu_berlin.inf.dpp"
-            properties="isHost"
+            properties="isHost,hasWriteAccess"
             type="de.fu_berlin.inf.dpp.project.ISarosSession">
       </propertyTester>
       <propertyTester

@@ -19,6 +19,9 @@ public class SarosSessionPropertyTester extends PropertyTester {
             if ("isHost".equals(property)) {
                 return sarosSession.isHost();
             }
+            if ("hasWriteAccess".equals(property)) {
+                return sarosSession.hasWriteAccess();
+            }
         }
         return false;
     }
