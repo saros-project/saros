@@ -30,7 +30,6 @@ import org.jivesoftware.smackx.bytestreams.socks5.Socks5BytestreamSession;
 import org.jivesoftware.smackx.bytestreams.socks5.Socks5Proxy;
 
 import de.fu_berlin.inf.dpp.net.NetTransferMode;
-import de.fu_berlin.inf.dpp.util.CausedIOException;
 import de.fu_berlin.inf.dpp.util.NamedThreadFactory;
 import de.fu_berlin.inf.dpp.util.Utils;
 
@@ -525,7 +524,7 @@ public class Socks5Transport extends ByteStreamTransport {
                 String msg = "waiting for a response session timed out ("
                     + WAIT_FOR_RESPONSE_CONNECTION + "ms)";
                 if (exception != null)
-                    throw new CausedIOException(
+                    throw new IOException(
                         prefix()
                             + msg
                             + " and could not establish a connection from this side, too:",

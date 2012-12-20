@@ -12,7 +12,6 @@ import org.jivesoftware.smackx.bytestreams.BytestreamSession;
 
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.NetTransferMode;
-import de.fu_berlin.inf.dpp.util.CausedIOException;
 
 /**
  * Abstract skeleton for different transport methods
@@ -43,7 +42,7 @@ public abstract class ByteStreamTransport implements ITransport {
                 connectionListener);
 
         } catch (XMPPException e) {
-            throw new CausedIOException(e);
+            throw new IOException(e);
         }
     }
 

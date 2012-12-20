@@ -79,7 +79,6 @@ import de.fu_berlin.inf.dpp.observables.SarosSessionObservable;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.util.ActivityUtils;
-import de.fu_berlin.inf.dpp.util.CausedIOException;
 import de.fu_berlin.inf.dpp.util.Utils;
 
 /**
@@ -630,7 +629,7 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
             Chat chat = getChat(jid);
             chat.sendMessage(message);
         } catch (XMPPException e) {
-            throw new CausedIOException("Failed to send message", e);
+            throw new IOException("Failed to send message", e);
         }
     }
 

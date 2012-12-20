@@ -39,7 +39,6 @@ import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import com.thoughtworks.xstream.annotations.XStreamOmitField;
 import com.thoughtworks.xstream.io.xml.CompactWriter;
 
-import de.fu_berlin.inf.dpp.util.CausedIOException;
 import de.fu_berlin.inf.dpp.util.xstream.IPathConverter;
 import de.fu_berlin.inf.dpp.util.xstream.XppReader;
 
@@ -251,7 +250,7 @@ public class XStreamExtensionProvider<T> implements PacketExtensionProvider,
             return ((XStreamPacketExtension<T>) xstream.fromXML(string))
                 .getPayload();
         } catch (Exception e) {
-            throw new CausedIOException(e);
+            throw new IOException(e);
         }
     }
 

@@ -19,7 +19,6 @@ import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.SubMonitor;
 
 import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
-import de.fu_berlin.inf.dpp.util.CausedIOException;
 import de.fu_berlin.inf.dpp.util.FileZipper;
 
 /**
@@ -127,7 +126,7 @@ public class FileSubmitter {
         throws IOException {
         try {
             if (file == null || !file.exists()) {
-                throw new CausedIOException("Upload not possible",
+                throw new IOException("Upload not possible",
                     new IllegalArgumentException(
                         "The file that should be uploaded was"
                             + " either null or nonexistent"));
@@ -190,17 +189,16 @@ public class FileSubmitter {
 
             } catch (ConnectTimeoutException e) {
                 // couldn't connect within the timeout
-                throw new CausedIOException("Couldn't connect to host "
-                    + server, e);
+                throw new IOException("Couldn't connect to host " + server, e);
             } catch (Exception e) {
-                throw new CausedIOException(
+                throw new IOException(
                     "An internal error occurred while trying to upload file "
                         + file.getName(), e);
             } finally {
                 post.releaseConnection();
             }
             // upload failed
-            throw new CausedIOException("Upload failed", new RuntimeException(
+            throw new IOException("Upload failed", new RuntimeException(
                 "Server response: " + status + " "
                     + HttpStatus.getStatusText(status)));
         } finally {

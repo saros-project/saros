@@ -733,7 +733,7 @@ public class Utils {
             return bos.toByteArray();
         } catch (java.util.zip.DataFormatException ex) {
             log.error("Failed to inflate bytearray", ex);
-            throw new CausedIOException(ex);
+            throw new IOException(ex);
         } finally {
             IOUtils.closeQuietly(bos);
             monitor.done();
