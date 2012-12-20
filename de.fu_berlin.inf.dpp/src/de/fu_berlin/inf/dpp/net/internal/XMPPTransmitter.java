@@ -25,7 +25,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -110,8 +109,6 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
     protected Map<JID, Chat> chats;
 
     protected Map<JID, InvitationProcess> processes;
-
-    protected List<MessageTransfer> messageTransferQueue;
 
     protected XMPPReceiver receiver;
 
@@ -263,14 +260,6 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
     /********************************************************************************
      * Invitation process' help functions --- END
      ********************************************************************************/
-
-    /**
-     * A simple ADT that is used to queue message transfers.
-     */
-    private static class MessageTransfer {
-        public JID receipient;
-        public Message message;
-    }
 
     @Override
     public void sendCancelInvitationMessage(JID user, String errorMsg) {
@@ -537,13 +526,6 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
         }
     }
 
-    private void queueMessage(JID jid, Message message) {
-        MessageTransfer msg = new MessageTransfer();
-        msg.receipient = jid;
-        msg.message = message;
-        this.messageTransferQueue.add(msg);
-    }
-
     /**
      * Sends a message to a buddy
      * 
@@ -581,35 +563,50 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
     private void sendMessageToUser(JID jid, Message message,
         boolean sessionMembersOnly) {
 
+        final ISarosSession session = sarosSessionObservable.getValue();
+
         if (sessionMembersOnly) {
-            User participant = sarosSessionObservable.getValue().getUser(jid);
-            if (participant == null) {
-                log.warn("Buddy not in session:" + Utils.prefix(jid));
+            if (session == null) {
+                log.warn("could not send message because session has ended");
                 return;
             }
 
+            final User participant = session.getUser(jid);
+
+            if (participant == null) {
+                log.warn("could not send message to participant "
+                    + Utils.prefix(jid)
+                    + ", because he/she is no longer part of the current session");
+                return;
+            }
+
+            /*
+             * FIXME: it is possible that a user goes to invisible state ! Once
+             * again. Sending data over a state less protocol is not the best
+             * design decision !!!
+             * 
+             * FIXME: the network layer should not handle the state of the
+             * current Saros session !!!
+             */
             if (participant.getConnectionState() == UserConnectionState.OFFLINE) {
-                /*
-                 * TODO This probably does not work anymore! See Feature Request
-                 * #2577390
-                 */
-                // remove participant if he/she is offline too long
-                if (participant.getOfflineSeconds() > XMPPTransmitter.FORCEDPART_OFFLINEUSER_AFTERSECS) {
-                    log.info("Removing offline buddy from session...");
-                    sarosSessionObservable.getValue().removeUser(participant);
-                } else {
-                    queueMessage(jid, message);
-                    log.info("Buddy known as offline - Message queued!");
-                }
+                // FIXME: let the method handle the synchronization, not the
+                // caller !
+                Utils.runSafeSWTAsync(log, new Runnable() {
+                    @Override
+                    public void run() {
+                        log.info("removing participant " + participant
+                            + " from the session because he/she is offline");
+                        session.removeUser(participant);
+                    }
+                });
                 return;
             }
         }
 
         try {
-            sendMessageWithoutQueueing(jid, message);
+            sendMessageOverXMPPChat(jid, message);
         } catch (IOException e) {
-            log.info("Could not send message, thus queueing", e);
-            queueMessage(jid, message);
+            log.error("could not send message to " + Utils.prefix(jid), e);
         }
     }
 
@@ -646,7 +643,7 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
      * If no connection is set or sending fails, this method fails by throwing
      * an IOException
      */
-    protected void sendMessageWithoutQueueing(JID jid, Message message)
+    protected void sendMessageOverXMPPChat(JID jid, Message message)
         throws IOException {
 
         if (isConnectionInvalid()) {
@@ -712,8 +709,6 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
         this.chats = new HashMap<JID, Chat>();
         this.processes = Collections
             .synchronizedMap(new HashMap<JID, InvitationProcess>());
-        this.messageTransferQueue = Collections
-            .synchronizedList(new LinkedList<MessageTransfer>());
 
         this.connection = connection;
 
@@ -757,7 +752,6 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
         }
         chats.clear();
         processes.clear();
-        messageTransferQueue.clear();
         chatmanager = null;
         connection = null;
     }
