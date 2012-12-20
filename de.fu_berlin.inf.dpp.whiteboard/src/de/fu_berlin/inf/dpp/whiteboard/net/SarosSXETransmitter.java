@@ -147,15 +147,27 @@ public class SarosSXETransmitter implements ISXETransmitter {
 		log.debug(prefix() + "send " + msg.getMessageType() + " to "
 				+ msg.getTo() + " waiting for " + Arrays.toString(awaitFor));
 
+		Packet packet;
+
 		PacketFilter filter = new SXEPacketFilter(msg.getSession(),
 				msg.getTo(), awaitFor);
-		SarosPacketCollector collector = transmitter.installReceiver(filter);
 
-		sendWithoutDispatch(msg);
+		SarosPacketCollector collector = receiver.createCollector(filter);
 
-		// receiving automatically removes collector
-		Packet packet = transmitter.receive(monitor, collector,
-				SXE_TIMEOUT_INTERVAL, true);
+		try {
+			sendWithoutDispatch(msg);
+
+			do {
+				packet = collector.nextResult(SXE_TIMEOUT_INTERVAL);
+
+				if (monitor.isCanceled())
+					throw new LocalCancellationException();
+
+			} while (packet == null);
+
+		} finally {
+			collector.cancel();
+		}
 
 		SXEMessage response = ((SXEExtension) packet.getExtension(
 				SXEMessage.SXE_TAG, SXEMessage.SXE_XMLNS)).getMessage();
