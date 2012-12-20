@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.net.internal;
+package de.fu_berlin.inf.dpp.net;
 
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;

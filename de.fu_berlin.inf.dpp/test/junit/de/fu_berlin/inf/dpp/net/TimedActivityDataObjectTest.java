@@ -10,6 +10,7 @@ import de.fu_berlin.inf.dpp.activities.SPathDataObject;
 import de.fu_berlin.inf.dpp.activities.business.EditorActivity;
 import de.fu_berlin.inf.dpp.activities.serializable.EditorActivityDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.IActivityDataObject;
+import de.fu_berlin.inf.dpp.net.internal.TimedActivityDataObject;
 
 public class TimedActivityDataObjectTest {
     static TimedActivityDataObject timedADO;
@@ -28,7 +29,7 @@ public class TimedActivityDataObjectTest {
 
     /**
      * Test method for
-     * {@link de.fu_berlin.inf.dpp.net.TimedActivityDataObject#TimedActivityDataObject(de.fu_berlin.inf.dpp.activities.serializable.IActivityDataObject, de.fu_berlin.inf.dpp.net.JID, int)}
+     * {@link de.fu_berlin.inf.dpp.net.internal.TimedActivityDataObject#TimedActivityDataObject(de.fu_berlin.inf.dpp.activities.serializable.IActivityDataObject, de.fu_berlin.inf.dpp.net.JID, int)}
      * .
      */
     @Test
@@ -46,7 +47,7 @@ public class TimedActivityDataObjectTest {
 
     /**
      * Test method for
-     * {@link de.fu_berlin.inf.dpp.net.TimedActivityDataObject#getActivity()}.
+     * {@link de.fu_berlin.inf.dpp.net.internal.TimedActivityDataObject#getActivity()}.
      */
     @Test
     public void testGetActivity() {
@@ -61,7 +62,7 @@ public class TimedActivityDataObjectTest {
 
     /**
      * Test method for
-     * {@link de.fu_berlin.inf.dpp.net.TimedActivityDataObject#getSender()}.
+     * {@link de.fu_berlin.inf.dpp.net.internal.TimedActivityDataObject#getSender()}.
      */
     @Test
     public void testGetSender() {
@@ -72,7 +73,7 @@ public class TimedActivityDataObjectTest {
 
     /**
      * Test method for
-     * {@link de.fu_berlin.inf.dpp.net.TimedActivityDataObject#getSequenceNumber()}
+     * {@link de.fu_berlin.inf.dpp.net.internal.TimedActivityDataObject#getSequenceNumber()}
      * .
      */
     @Test
@@ -84,7 +85,7 @@ public class TimedActivityDataObjectTest {
 
     /**
      * Test method for
-     * {@link de.fu_berlin.inf.dpp.net.TimedActivityDataObject#toString()}.
+     * {@link de.fu_berlin.inf.dpp.net.internal.TimedActivityDataObject#toString()}.
      */
     @Test
     public void testToString() {
@@ -101,7 +102,7 @@ public class TimedActivityDataObjectTest {
 
     /**
      * Test method for
-     * {@link de.fu_berlin.inf.dpp.net.TimedActivityDataObject#equals(java.lang.Object)}
+     * {@link de.fu_berlin.inf.dpp.net.internal.TimedActivityDataObject#equals(java.lang.Object)}
      * .
      */
     @Test
@@ -177,7 +178,7 @@ public class TimedActivityDataObjectTest {
 
     /**
      * Test method for
-     * {@link de.fu_berlin.inf.dpp.net.TimedActivityDataObject#compareTo(de.fu_berlin.inf.dpp.net.TimedActivityDataObject)}
+     * {@link de.fu_berlin.inf.dpp.net.internal.TimedActivityDataObject#compareTo(de.fu_berlin.inf.dpp.net.internal.TimedActivityDataObject)}
      * .
      */
     @Test
@@ -196,7 +197,7 @@ public class TimedActivityDataObjectTest {
 
     /**
      * Test method for
-     * {@link de.fu_berlin.inf.dpp.net.TimedActivityDataObject#setLocalTimestamp(long)}
+     * {@link de.fu_berlin.inf.dpp.net.internal.TimedActivityDataObject#setLocalTimestamp(long)}
      * .
      */
     @Test

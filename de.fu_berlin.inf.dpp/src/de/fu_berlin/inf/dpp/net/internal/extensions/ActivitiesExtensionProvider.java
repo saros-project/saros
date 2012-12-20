@@ -46,8 +46,8 @@ import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.NoOperation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.SplitOperation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.TimestampOperation;
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.net.TimedActivityDataObject;
 import de.fu_berlin.inf.dpp.net.internal.TimedActivities;
+import de.fu_berlin.inf.dpp.net.internal.TimedActivityDataObject;
 
 @Component(module = "net")
 public class ActivitiesExtensionProvider extends

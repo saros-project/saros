@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.net;
+package de.fu_berlin.inf.dpp.net.internal;
 
 import java.util.List;
 
@@ -9,6 +9,7 @@ import com.thoughtworks.xstream.annotations.XStreamOmitField;
 import de.fu_berlin.inf.dpp.activities.business.FileActivity;
 import de.fu_berlin.inf.dpp.activities.serializable.FileActivityDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.IActivityDataObject;
+import de.fu_berlin.inf.dpp.net.JID;
 
 /**
  * A simple {@link IActivityDataObject} wrapper that adds a time stamp.

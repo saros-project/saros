@@ -22,7 +22,7 @@ import de.fu_berlin.inf.dpp.activities.serializable.ViewportActivityDataObject;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Operation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Timestamp;
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.net.TimedActivityDataObject;
+import de.fu_berlin.inf.dpp.net.internal.TimedActivityDataObject;
 
 public class ActivityUtilsTest {
 

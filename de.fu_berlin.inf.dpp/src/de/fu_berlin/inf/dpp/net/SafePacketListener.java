@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.net.internal;
+package de.fu_berlin.inf.dpp.net;
 
 import org.apache.log4j.Logger;
 import org.jivesoftware.smack.PacketListener;

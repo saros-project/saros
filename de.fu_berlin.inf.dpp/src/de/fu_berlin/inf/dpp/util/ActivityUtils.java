@@ -8,7 +8,7 @@ import de.fu_berlin.inf.dpp.activities.serializable.JupiterActivityDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.TextEditActivityDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.TextSelectionActivityDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.ViewportActivityDataObject;
-import de.fu_berlin.inf.dpp.net.TimedActivityDataObject;
+import de.fu_berlin.inf.dpp.net.internal.TimedActivityDataObject;
 
 /**
  * Class contains static helper methods on activities

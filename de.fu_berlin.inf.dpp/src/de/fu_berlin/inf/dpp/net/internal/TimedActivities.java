@@ -7,7 +7,6 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import com.thoughtworks.xstream.annotations.XStreamImplicit;
 
-import de.fu_berlin.inf.dpp.net.TimedActivityDataObject;
 
 /**
  * Data Object for (de)serializion of {@link TimedActivityDataObject}s with
