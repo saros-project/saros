@@ -343,19 +343,23 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
      */
     public void sendToProjectUser(JID recipient, PacketExtension extension)
         throws IOException {
+
+        String currentSessionID = sessionID.getValue();
+        ISarosSession session = sarosSessionObservable.getValue();
+
+        if (session == null)
+            throw new IOException("no session running");
         /*
          * The TransferDescription can be created out of the session, the name
          * and namespace of the packet extension and standard values and thus
          * transparent to users of this method.
          */
         TransferDescription result = TransferDescription
-            .createCustomTransferDescription()
-            .setRecipient(recipient)
-            .setSender(
-                sarosSessionObservable.getValue().getLocalUser().getJID())
+            .createCustomTransferDescription().setRecipient(recipient)
+            .setSender(session.getLocalUser().getJID())
             .setType(extension.getElementName())
             .setNamespace(extension.getNamespace())
-            .setSessionID(this.sessionID.getValue()).setCompressContent(false);
+            .setSessionID(currentSessionID).setCompressContent(false);
 
         sendToProjectUser(recipient, extension, result);
     }
@@ -399,7 +403,8 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
         try {
             data = extension.toXML().getBytes("UTF-8");
         } catch (UnsupportedEncodingException e) {
-            log.error("UTF-8 is unsupported", e);
+            throw new IOException(
+                "corrupt JVM installation - UTF-8 charset is not supported", e);
         }
 
         int retry = 0;
@@ -414,9 +419,8 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
 
             } else {
                 try {
-
-                    sendByBytestreamToProjectUser(recipient, data,
-                        transferDescription);
+                    // recipient is included in the transfer description
+                    dataManager.sendData(transferDescription, data);
                     break;
 
                 } catch (IOException e) {
@@ -449,41 +453,19 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
         } while (++retry <= MAX_TRANSFER_RETRIES);
     }
 
-    /**
-     * Tries to send the passed byte array to the given {@link JID}.
-     * 
-     * @param recipient
-     * @param data
-     * @param transferDescription
-     *            to coordinate the the bytestream using XMPP packets
-     * @throws IOException
-     *             if sending by bytestream fails
-     */
-    protected void sendByBytestreamToProjectUser(JID recipient, byte[] data,
-        TransferDescription transferDescription) throws IOException {
-        String user = connection.getUser();
-
-        if (user == null) {
-            log.warn("Local user is not logged in to the connection, yet.");
-            return;
-        }
-
-        dataManager.sendData(transferDescription, data);
-    }
-
     @Override
     public void sendFileLists(JID recipient, String processID,
         List<FileList> fileLists) throws IOException {
 
-        String user = connection.getUser();
-        if (user == null) {
-            log.warn("Local user is not logged in to the connection, yet.");
-            return;
-        }
+        String currentSessionID = sessionID.getValue();
+        ISarosSession session = sarosSessionObservable.getValue();
+
+        if (session == null)
+            throw new IOException("no session running");
 
         TransferDescription data = TransferDescription
-            .createFileListTransferDescription(recipient, new JID(user),
-                sessionID.getValue(), processID);
+            .createFileListTransferDescription(recipient, session
+                .getLocalUser().getJID(), currentSessionID, processID);
 
         log.debug("fileLists.size(): " + fileLists.size());
 
