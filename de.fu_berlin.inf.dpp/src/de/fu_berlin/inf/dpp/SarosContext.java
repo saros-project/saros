@@ -49,21 +49,21 @@ import de.fu_berlin.inf.dpp.net.business.InvitationHandler;
 import de.fu_berlin.inf.dpp.net.business.LeaveHandler;
 import de.fu_berlin.inf.dpp.net.business.UserListHandler;
 import de.fu_berlin.inf.dpp.net.discoverymanager.DiscoveryManager;
-import de.fu_berlin.inf.dpp.net.internal.ActivitiesExtensionProvider;
 import de.fu_berlin.inf.dpp.net.internal.ConnectionTestManager;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
-import de.fu_berlin.inf.dpp.net.internal.DefaultInvitationInfo;
-import de.fu_berlin.inf.dpp.net.internal.DefaultInvitationInfo.UserListRequestExtensionProvider;
 import de.fu_berlin.inf.dpp.net.internal.IBBTransport;
-import de.fu_berlin.inf.dpp.net.internal.InvitationInfo;
 import de.fu_berlin.inf.dpp.net.internal.Socks5Transport;
 import de.fu_berlin.inf.dpp.net.internal.StreamServiceManager;
-import de.fu_berlin.inf.dpp.net.internal.UserListInfo;
 import de.fu_berlin.inf.dpp.net.internal.XMPPReceiver;
 import de.fu_berlin.inf.dpp.net.internal.XMPPTransmitter;
+import de.fu_berlin.inf.dpp.net.internal.extensions.ActivitiesExtensionProvider;
 import de.fu_berlin.inf.dpp.net.internal.extensions.CancelInviteExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.CancelProjectSharingExtension;
+import de.fu_berlin.inf.dpp.net.internal.extensions.DefaultInvitationInfo;
+import de.fu_berlin.inf.dpp.net.internal.extensions.DefaultInvitationInfo.UserListRequestExtensionProvider;
+import de.fu_berlin.inf.dpp.net.internal.extensions.InvitationInfo;
 import de.fu_berlin.inf.dpp.net.internal.extensions.LeaveExtension;
+import de.fu_berlin.inf.dpp.net.internal.extensions.UserListInfo;
 import de.fu_berlin.inf.dpp.net.stun.IStunService;
 import de.fu_berlin.inf.dpp.net.stun.internal.StunServiceImpl;
 import de.fu_berlin.inf.dpp.net.subscriptionmanager.SubscriptionManager;
@@ -244,6 +244,11 @@ public class SarosContext implements ISarosContext {
         Component.create(InvitationHandler.class),
         Component.create(LeaveHandler.class),
         Component.create(ActivitiesHandler.class),
+
+        /*
+         * The packet extensions must be inserted here so they are added to the
+         * Smack ExtensionProvider at context startup.
+         */
 
         // Extensions
         Component.create(CancelInviteExtension.class),

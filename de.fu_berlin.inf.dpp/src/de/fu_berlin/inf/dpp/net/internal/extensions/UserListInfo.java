@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.net.internal;
+package de.fu_berlin.inf.dpp.net.internal.extensions;
 
 import java.util.ArrayList;
 import java.util.Collection;

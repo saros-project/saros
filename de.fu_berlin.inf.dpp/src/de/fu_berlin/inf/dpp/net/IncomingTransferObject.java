@@ -5,7 +5,7 @@ import java.io.IOException;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.net.business.DispatchThreadContext;
 import de.fu_berlin.inf.dpp.net.internal.TransferDescription;
-import de.fu_berlin.inf.dpp.net.internal.XStreamExtensionProvider;
+import de.fu_berlin.inf.dpp.net.internal.extensions.XStreamExtensionProvider;
 
 @Component(module = "net")
 public interface IncomingTransferObject {

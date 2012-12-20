@@ -17,7 +17,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
-package de.fu_berlin.inf.dpp.net.internal;
+package de.fu_berlin.inf.dpp.net.internal.extensions;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -47,6 +47,7 @@ import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.SplitOperation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.TimestampOperation;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.TimedActivityDataObject;
+import de.fu_berlin.inf.dpp.net.internal.TimedActivities;
 
 @Component(module = "net")
 public class ActivitiesExtensionProvider extends
@@ -59,8 +60,9 @@ public class ActivitiesExtensionProvider extends
      *               registered with the XStream extensions provider, otherwise
      *               annotations like XStreamAlias will not be honored.
      */
+
     /**
-     * {@inheritDoc}
+     * 
      */
     public ActivitiesExtensionProvider() {
         super("activityDataObjects", TimedActivities.class,
