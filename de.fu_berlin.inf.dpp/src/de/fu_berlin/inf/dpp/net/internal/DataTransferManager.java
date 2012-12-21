@@ -459,7 +459,7 @@ public class DataTransferManager implements IConnectionListener,
         ConnectionState newState) {
         if (newState == ConnectionState.CONNECTED)
             prepareConnection(connection);
-        else if (!(connection == null))
+        else if (this.connection != null)
             disposeConnection();
     }
 
