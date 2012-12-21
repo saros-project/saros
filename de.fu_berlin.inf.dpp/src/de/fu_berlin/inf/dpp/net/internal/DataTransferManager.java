@@ -20,7 +20,7 @@ import org.jivesoftware.smack.Connection;
 import org.jivesoftware.smack.Roster;
 import org.jivesoftware.smack.packet.Presence;
 import org.jivesoftware.smackx.bytestreams.socks5.Socks5Proxy;
-import org.picocontainer.annotations.Inject;
+import org.picocontainer.annotations.Nullable;
 
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.net.ConnectionState;
@@ -29,12 +29,10 @@ import de.fu_berlin.inf.dpp.net.IPacketInterceptor;
 import de.fu_berlin.inf.dpp.net.IRosterListener;
 import de.fu_berlin.inf.dpp.net.ITransferModeListener;
 import de.fu_berlin.inf.dpp.net.IncomingTransferObject;
-import de.fu_berlin.inf.dpp.net.IncomingTransferObject.IncomingTransferObjectExtensionProvider;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.NetTransferMode;
 import de.fu_berlin.inf.dpp.net.RosterTracker;
 import de.fu_berlin.inf.dpp.net.SarosNet;
-import de.fu_berlin.inf.dpp.net.business.DispatchThreadContext;
 import de.fu_berlin.inf.dpp.net.upnp.IUPnPService;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
 import de.fu_berlin.inf.dpp.util.StopWatch;
@@ -56,72 +54,67 @@ public class DataTransferManager implements IConnectionListener,
     /**
      * Maps JIDs to a list of currently running incoming transfers - receptions
      */
-    protected Map<JID, List<TransferDescription>> incomingTransfers = new HashMap<JID, List<TransferDescription>>();
+    private Map<JID, List<TransferDescription>> incomingTransfers = new HashMap<JID, List<TransferDescription>>();
 
     /**
      * Maps JIDs to the number of currently running, outgoing transfers - send
      */
-    protected Map<JID, Integer> outgoingTransfers = new HashMap<JID, Integer>();
+    private Map<JID, Integer> outgoingTransfers = new HashMap<JID, Integer>();
 
     /**
      * Maps JIDs to the last known throughput of an incoming IBB reception
      */
-    protected Map<JID, Double> incomingIBBTransferSpeeds = new HashMap<JID, Double>();
+    private Map<JID, Double> incomingIBBTransferSpeeds = new HashMap<JID, Double>();
 
-    protected TransferModeDispatch transferModeDispatch = new TransferModeDispatch();
+    private TransferModeDispatch transferModeDispatch = new TransferModeDispatch();
 
     private CopyOnWriteArrayList<IPacketInterceptor> packetInterceptors = new CopyOnWriteArrayList<IPacketInterceptor>();
 
     private JID currentLocalJID;
 
-    protected ConcurrentLinkedQueue<TransferData> fileTransferQueue;
+    private ConcurrentLinkedQueue<TransferData> fileTransferQueue;
 
-    protected Connection connection;
+    private Connection connection;
 
-    @Inject
-    protected XMPPReceiver receiver;
+    private XMPPReceiver receiver;
 
-    @Inject
-    protected DispatchThreadContext dispatchThreadContext;
-
-    @Inject
-    protected IncomingTransferObjectExtensionProvider incomingExtProv;
-
-    @Inject
     private IBBTransport ibbTransport;
 
-    @Inject
-    protected IUPnPService upnpService;
+    private IUPnPService upnpService;
 
-    @Inject
     private Socks5Transport socks5Transport;
 
-    protected PreferenceUtils preferenceUtils;
+    private PreferenceUtils preferenceUtils;
 
-    protected ArrayList<ITransport> transports = null;
+    private ArrayList<ITransport> transports = null;
 
-    protected Map<NetTransferMode, Throwable> errors = new LinkedHashMap<NetTransferMode, Throwable>();
+    private Map<NetTransferMode, Throwable> errors = new LinkedHashMap<NetTransferMode, Throwable>();
 
-    SarosNet sarosNet;
+    private SarosNet sarosNet;
 
     /**
      * Collection of {@link JID}s, flagged to prefer IBB transfer mode
      */
     protected Collection<JID> peersForIBB = new ArrayList<JID>();
 
-    public DataTransferManager(SarosNet sarosNet,
-        PreferenceUtils preferenceUtils, RosterTracker rosterTracker,
-        IBBTransport ibbTransport, Socks5Transport socks5Transport) {
+    public DataTransferManager(SarosNet sarosNet, XMPPReceiver receiver,
+        IBBTransport ibbTransport, Socks5Transport socks5Transport,
+        @Nullable IUPnPService upnpService,
+        @Nullable RosterTracker rosterTracker,
+        @Nullable PreferenceUtils preferenceUtils) {
 
-        this.preferenceUtils = preferenceUtils;
+        this.sarosNet = sarosNet;
+        this.receiver = receiver;
         this.ibbTransport = ibbTransport;
         this.socks5Transport = socks5Transport;
+        this.upnpService = upnpService;
+        this.preferenceUtils = preferenceUtils;
         this.initTransports();
 
         if (rosterTracker != null)
             addRosterListener(rosterTracker);
+
         sarosNet.addListener(this);
-        this.sarosNet = sarosNet;
 
         transferModeDispatch.add(new TransferCompleteListener());
     }
@@ -256,13 +249,7 @@ public class DataTransferManager implements IConnectionListener,
         if (!dispatchPacket)
             return;
 
-        // ask upper layer to accept
-        dispatchThreadContext.executeAsDispatch(new Runnable() {
-            public void run() {
-                receiver.processIncomingTransferObject(description,
-                    transferObjectData);
-            }
-        });
+        receiver.processIncomingTransferObject(description, transferObjectData);
     }
 
     /**
@@ -744,13 +731,6 @@ public class DataTransferManager implements IConnectionListener,
      */
     protected void setIncomingIBBTransferSpeed(JID jid, double value) {
         incomingIBBTransferSpeeds.put(jid, value);
-    }
-
-    protected void inject(XMPPReceiver xmppReceiver, DispatchThreadContext dtc,
-        IncomingTransferObjectExtensionProvider iep) {
-        this.receiver = xmppReceiver;
-        this.dispatchThreadContext = dtc;
-        this.incomingExtProv = iep;
     }
 
     /**

@@ -23,8 +23,8 @@ import org.xmlpull.v1.XmlPullParserException;
 
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.net.IncomingTransferObject;
-import de.fu_berlin.inf.dpp.net.SarosPacketCollector;
 import de.fu_berlin.inf.dpp.net.IncomingTransferObject.IncomingTransferObjectExtensionProvider;
+import de.fu_berlin.inf.dpp.net.SarosPacketCollector;
 import de.fu_berlin.inf.dpp.net.SarosPacketCollector.CancelHook;
 import de.fu_berlin.inf.dpp.net.business.DispatchThreadContext;
 import de.fu_berlin.inf.dpp.util.NamedThreadFactory;
@@ -111,6 +111,8 @@ public class XMPPReceiver {
      * @param packet
      *            that contains an IncomingTransferObject packet extension
      * @return if the packet containing an IncomingTransferObject was processed
+     * 
+     * @sarosThread must be called from the Dispatch Thread
      */
     /*
      * Note: left as a separate method because of different functionality.
@@ -175,7 +177,6 @@ public class XMPPReceiver {
      * This is method is used by the DataTransferManager to inform the upper
      * Layer about incoming Packet based Objects.
      * 
-     * @sarosThread must be called from the Dispatch Thread
      */
     public void processIncomingTransferObject(
         final TransferDescription description,
@@ -184,17 +185,25 @@ public class XMPPReceiver {
         packet.setPacketID(Packet.ID_NOT_AVAILABLE);
         packet.setFrom(description.getSender().toString());
         packet.addExtension(incomingExtProv.create(incomingTransferObject));
-        if (processIncomingTransferDescription(packet)) {
-            return;
-        }
 
-        extensionDownloadThreadPool.execute(Utils.wrapSafe(log, new Runnable() {
+        dispatchThreadContext.executeAsDispatch(new Runnable() {
+
+            @Override
             public void run() {
 
-                processTransferObjectToPacket(description,
-                    incomingTransferObject);
+                if (processIncomingTransferDescription(packet))
+                    return;
+
+                extensionDownloadThreadPool.execute(Utils.wrapSafe(log,
+                    new Runnable() {
+                        @Override
+                        public void run() {
+                            processTransferObjectToPacket(description,
+                                incomingTransferObject);
+                        }
+                    }));
             }
-        }));
+        });
     }
 
     /**
