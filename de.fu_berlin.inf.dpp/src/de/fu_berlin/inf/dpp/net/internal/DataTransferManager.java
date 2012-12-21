@@ -13,7 +13,6 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.apache.log4j.Logger;
 import org.jivesoftware.smack.Connection;
-import org.jivesoftware.smack.packet.Presence;
 import org.jivesoftware.smackx.bytestreams.socks5.Socks5Proxy;
 import org.picocontainer.annotations.Nullable;
 
@@ -26,8 +25,6 @@ import de.fu_berlin.inf.dpp.net.IPacketInterceptor;
 import de.fu_berlin.inf.dpp.net.IncomingTransferObject;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.NetTransferMode;
-import de.fu_berlin.inf.dpp.net.RosterAdapter;
-import de.fu_berlin.inf.dpp.net.RosterTracker;
 import de.fu_berlin.inf.dpp.net.SarosNet;
 import de.fu_berlin.inf.dpp.net.upnp.IUPnPService;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
@@ -89,7 +86,6 @@ public class DataTransferManager implements IConnectionListener,
         @Nullable @Socks5Transport ITransport mainTransport,
         @Nullable @IBBTransport ITransport fallbackTransport,
         @Nullable IUPnPService upnpService,
-        @Nullable RosterTracker rosterTracker,
         @Nullable PreferenceUtils preferenceUtils) {
 
         this.receiver = receiver;
@@ -99,32 +95,7 @@ public class DataTransferManager implements IConnectionListener,
         this.preferenceUtils = preferenceUtils;
         this.initTransports();
 
-        if (rosterTracker != null)
-            addRosterListener(rosterTracker);
-
         sarosNet.addListener(this);
-    }
-
-    /**
-     * Adds a RosterListener to the tracker to remove connections when peer gets
-     * unavailable.
-     * 
-     * Else IBB connections would remain if no leave package is send.
-     * 
-     * @param rosterTracker
-     */
-    private void addRosterListener(RosterTracker rosterTracker) {
-        rosterTracker.addRosterListener(new RosterAdapter() {
-
-            @Override
-            public void presenceChanged(Presence presence) {
-
-                if (!presence.isAvailable())
-                    if (closeConnection(new JID(presence.getFrom())))
-                        log.debug(presence.getFrom()
-                            + " is not available anymore. Bytestream connection closed.");
-            }
-        });
     }
 
     private final class LoggingTransferObject implements IncomingTransferObject {
