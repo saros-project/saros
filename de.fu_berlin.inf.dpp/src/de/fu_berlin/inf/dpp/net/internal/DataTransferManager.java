@@ -7,10 +7,8 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -82,8 +80,6 @@ public class DataTransferManager implements IConnectionListener,
     private PreferenceUtils preferenceUtils;
 
     private ArrayList<ITransport> transports = null;
-
-    private Map<NetTransferMode, Throwable> errors = new LinkedHashMap<NetTransferMode, Throwable>();
 
     private SarosNet sarosNet;
 
@@ -357,31 +353,19 @@ public class DataTransferManager implements IConnectionListener,
                 log.error(Utils.prefix(recipient) + "Failed to connect using "
                     + transport.toString() + ":",
                     e.getCause() == null ? e : e.getCause());
-                errors.put(transport.getDefaultNetTransferMode(), e.getCause());
             } catch (InterruptedException e) {
                 throw e;
             } catch (Exception e) {
                 log.error(Utils.prefix(recipient) + "Failed to connect using "
                     + transport.toString() + " because of an unknown error:", e);
-                errors.put(transport.getDefaultNetTransferMode(), e);
             }
             if (connection != null)
                 break;
         }
 
         if (connection == null) {
-
-            StringBuilder errorMsg = new StringBuilder(
-                "Exhausted all transport options: ");
-
-            for (Entry<NetTransferMode, Throwable> entry : errors.entrySet()) {
-                errorMsg.append(entry.getKey() + ": "
-                    + entry.getValue().getMessage() + ", ");
-            }
-
-            errorMsg.delete(errorMsg.length() - 2, errorMsg.length());
-
-            throw new IOException(Utils.prefix(recipient) + errorMsg.toString());
+            throw new IOException("could not connect to: "
+                + Utils.prefix(recipient));
         } else
             connectionChanged(recipient, connection, false);
         return connection;
