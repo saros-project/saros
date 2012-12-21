@@ -77,8 +77,6 @@ public class DataTransferManager implements IConnectionListener,
 
     private ArrayList<ITransport> transports = null;
 
-    private SarosNet sarosNet;
-
     private Map<JID, IByteStreamConnection> connections = Collections
         .synchronizedMap(new HashMap<JID, IByteStreamConnection>());
 
@@ -94,7 +92,6 @@ public class DataTransferManager implements IConnectionListener,
         @Nullable RosterTracker rosterTracker,
         @Nullable PreferenceUtils preferenceUtils) {
 
-        this.sarosNet = sarosNet;
         this.receiver = receiver;
         this.fallbackTransport = fallbackTransport;
         this.mainTransport = mainTransport;
@@ -234,7 +231,7 @@ public class DataTransferManager implements IConnectionListener,
 
         // Think about how to synchronize this, that multiple people can connect
         // at the same time.
-        log.trace("sending data ... from " + sarosNet.getMyJID() + " to "
+        log.trace("sending data ... from " + currentLocalJID + " to "
             + transferData.getRecipient());
 
         JID recipient = transferData.getRecipient();
@@ -341,8 +338,8 @@ public class DataTransferManager implements IConnectionListener,
 
         for (ITransport transport : transportModesToUse) {
             log.info("Try to establish a bytestream connection to "
-                + recipient.getBase() + " from " + sarosNet.getMyJID()
-                + " using " + transport.getDefaultNetTransferMode());
+                + recipient.getBase() + " from " + currentLocalJID + " using "
+                + transport.getDefaultNetTransferMode());
             try {
                 connection = transport.connect(recipient);
             } catch (IOException e) {
