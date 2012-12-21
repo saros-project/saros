@@ -9,11 +9,9 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.apache.log4j.Logger;
-import org.eclipse.swt.dnd.TransferData;
 import org.jivesoftware.smack.Connection;
 import org.jivesoftware.smack.packet.Presence;
 import org.jivesoftware.smackx.bytestreams.socks5.Socks5Proxy;
@@ -64,8 +62,6 @@ public class DataTransferManager implements IConnectionListener,
     private CopyOnWriteArrayList<IPacketInterceptor> packetInterceptors = new CopyOnWriteArrayList<IPacketInterceptor>();
 
     private JID currentLocalJID;
-
-    private ConcurrentLinkedQueue<TransferData> fileTransferQueue;
 
     private Connection connection;
 
@@ -447,7 +443,6 @@ public class DataTransferManager implements IConnectionListener,
             + Arrays.toString(transports.toArray()));
 
         this.connection = connection;
-        this.fileTransferQueue = new ConcurrentLinkedQueue<TransferData>();
         this.currentLocalJID = new JID(connection.getUser());
 
         for (ITransport transport : transports) {
@@ -457,11 +452,8 @@ public class DataTransferManager implements IConnectionListener,
 
     protected void disposeConnection() {
 
-        for (ITransport transport : transports) {
+        for (ITransport transport : transports)
             transport.disposeXMPPConnection();
-        }
-
-        fileTransferQueue.clear();
 
         List<IByteStreamConnection> openConnections;
         synchronized (connections) {
