@@ -27,7 +27,6 @@ import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.net.ConnectionState;
 import de.fu_berlin.inf.dpp.net.IConnectionListener;
 import de.fu_berlin.inf.dpp.net.IPacketInterceptor;
-import de.fu_berlin.inf.dpp.net.ITransferModeListener;
 import de.fu_berlin.inf.dpp.net.IncomingTransferObject;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.NetTransferMode;
@@ -435,55 +434,6 @@ public class DataTransferManager implements IConnectionListener,
         if (connection == null)
             return NetTransferMode.NONE;
         return connection.getMode();
-    }
-
-    public static class TransferModeDispatch implements ITransferModeListener {
-
-        protected List<ITransferModeListener> listeners = new ArrayList<ITransferModeListener>();
-
-        public synchronized void add(ITransferModeListener listener) {
-            listeners.add(listener);
-        }
-
-        public synchronized void remove(ITransferModeListener listener) {
-            listeners.remove(listener);
-        }
-
-        public synchronized void clear() {
-            for (ITransferModeListener listener : listeners) {
-                try {
-                    listener.clear();
-                } catch (RuntimeException e) {
-                    log.error("Listener crashed: ", e);
-                }
-            }
-        }
-
-        public synchronized void transferFinished(JID jid,
-            NetTransferMode newMode, boolean incoming, long sizeTransferred,
-            long sizeUncompressed, long transmissionMillisecs) {
-
-            for (ITransferModeListener listener : listeners) {
-                try {
-                    listener.transferFinished(jid, newMode, incoming,
-                        sizeTransferred, sizeUncompressed,
-                        transmissionMillisecs);
-                } catch (RuntimeException e) {
-                    log.error("Listener crashed: ", e);
-                }
-            }
-        }
-
-        public synchronized void connectionChanged(JID jid,
-            IByteStreamConnection connection) {
-            for (ITransferModeListener listener : listeners) {
-                try {
-                    listener.connectionChanged(jid, connection);
-                } catch (RuntimeException e) {
-                    log.error("Listener crashed: ", e);
-                }
-            }
-        }
     }
 
     private void initTransports() {

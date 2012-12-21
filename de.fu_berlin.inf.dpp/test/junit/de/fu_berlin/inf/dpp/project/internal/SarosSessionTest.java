@@ -44,6 +44,7 @@ import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.SarosNet;
 import de.fu_berlin.inf.dpp.net.business.DispatchThreadContext;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
+import de.fu_berlin.inf.dpp.net.internal.TransferModeDispatch;
 import de.fu_berlin.inf.dpp.observables.FileReplacementInProgressObservable;
 import de.fu_berlin.inf.dpp.observables.ProjectNegotiationObservable;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
@@ -108,7 +109,7 @@ public class SarosSessionTest {
             .createMock(DataTransferManager.class);
         mock.getTransferModeDispatch();
         EasyMock.expectLastCall().andAnswer(new IAnswer<Object>() {
-            DataTransferManager.TransferModeDispatch dispatch = new DataTransferManager.TransferModeDispatch();
+            TransferModeDispatch dispatch = new TransferModeDispatch();
 
             @Override
             public Object answer() throws Throwable {
