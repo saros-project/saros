@@ -64,10 +64,8 @@ import de.fu_berlin.inf.dpp.net.internal.extensions.DefaultInvitationInfo.UserLi
 import de.fu_berlin.inf.dpp.net.internal.extensions.InvitationInfo;
 import de.fu_berlin.inf.dpp.net.internal.extensions.LeaveExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.UserListInfo;
-import de.fu_berlin.inf.dpp.net.stun.IStunService;
 import de.fu_berlin.inf.dpp.net.stun.internal.StunServiceImpl;
 import de.fu_berlin.inf.dpp.net.subscriptionmanager.SubscriptionManager;
-import de.fu_berlin.inf.dpp.net.upnp.IUPnPService;
 import de.fu_berlin.inf.dpp.net.upnp.internal.UPnPServiceImpl;
 import de.fu_berlin.inf.dpp.observables.FileReplacementInProgressObservable;
 import de.fu_berlin.inf.dpp.observables.InvitationProcessObservable;
@@ -78,8 +76,6 @@ import de.fu_berlin.inf.dpp.observables.VideoSessionObservable;
 import de.fu_berlin.inf.dpp.observables.VoIPSessionObservable;
 import de.fu_berlin.inf.dpp.optional.jdt.JDTFacade;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
-import de.fu_berlin.inf.dpp.project.IChecksumCache;
-import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.project.SarosRosterListener;
 import de.fu_berlin.inf.dpp.project.SarosSessionManager;
 import de.fu_berlin.inf.dpp.project.internal.ChecksumCacheImpl;
@@ -118,32 +114,35 @@ import de.fu_berlin.inf.dpp.videosharing.VideoSharingService;
 public class SarosContext implements ISarosContext {
 
     private static class Component {
-        private Class<?> intf;
         private Class<?> clazz;
         private Object instance;
+        private Object bindKey;
 
-        private Component(Class<?> intf, Class<?> clazz, Object instance) {
-            this.intf = intf;
+        private Component(Object bindKey, Class<?> clazz, Object instance) {
+            this.bindKey = bindKey;
             this.clazz = clazz;
             this.instance = instance;
         }
 
-        public static <T> Component create(Class<T> intf,
-            Class<? extends T> clazz) {
-            return new Component(intf, clazz, null);
+        public static Component create(Object bindKey, Class<?> clazz) {
+            return new Component(bindKey, clazz, null);
         }
 
         public static Component create(Class<?> clazz) {
             return new Component(clazz, clazz, null);
         }
 
-        public static <T> Component create(Class<T> intf,
-            Class<? extends T> clazz, Object instance) {
-            return new Component(intf, clazz, instance);
+        public static <T> Component create(Class<T> clazz, T instance) {
+            return new Component(clazz, clazz, instance);
         }
 
-        public Class<?> getInterface() {
-            return intf;
+        public static <T> Component create(Object bindKey, Class<T> clazz,
+            T instance) {
+            return new Component(bindKey, clazz, instance);
+        }
+
+        public Object getBindKey() {
+            return bindKey;
         }
 
         public Object getImplementation() {
@@ -152,12 +151,12 @@ public class SarosContext implements ISarosContext {
 
         @Override
         public boolean equals(Object obj) {
-            return ((obj instanceof Component) && ((Component) obj).intf == this.intf);
+            return ((obj instanceof Component) && ((Component) obj).bindKey == this.bindKey);
         }
 
         @Override
         public int hashCode() {
-            return intf.hashCode();
+            return bindKey.hashCode();
         }
     }
 
@@ -197,7 +196,7 @@ public class SarosContext implements ISarosContext {
         Component.create(SingleUserChatService.class),
         Component.create(PreferenceUtils.class),
         Component.create(SarosUI.class),
-        Component.create(ISarosSessionManager.class, SarosSessionManager.class),
+        Component.create(SarosSessionManager.class),
         Component.create(SessionViewOpener.class),
         Component.create(AudioServiceManager.class),
         Component.create(MixerManager.class),
@@ -219,9 +218,9 @@ public class SarosContext implements ISarosContext {
         Component.create(SkypeManager.class),
         Component.create(Socks5Transport.class),
         Component.create(StreamServiceManager.class),
-        Component.create(IStunService.class, StunServiceImpl.class),
+        Component.create(StunServiceImpl.class),
         Component.create(SubscriptionManager.class),
-        Component.create(IUPnPService.class, UPnPServiceImpl.class),
+        Component.create(UPnPServiceImpl.class),
         Component.create(XMPPReceiver.class),
         Component.create(XMPPTransmitter.class),
 
@@ -278,8 +277,8 @@ public class SarosContext implements ISarosContext {
 
         // cache support
 
-        Component.create(IChecksumCache.class, ChecksumCacheImpl.class,
-            new ChecksumCacheImpl(new FileContentNotifierBridge())), };
+        Component.create(ChecksumCacheImpl.class, new ChecksumCacheImpl(
+            new FileContentNotifierBridge())), };
 
     /*
      * Use the SarosContextBuilder to build a SarosContext. {@link
@@ -335,7 +334,7 @@ public class SarosContext implements ISarosContext {
             Arrays.asList(COMPONENTS));
 
         for (Component component : contextComponents)
-            container.addComponent(component.getInterface(),
+            container.addComponent(component.getBindKey(),
                 component.getImplementation());
 
         container.addComponent(ISarosContext.class, this);
