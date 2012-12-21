@@ -62,11 +62,6 @@ public class DataTransferManager implements IConnectionListener,
      */
     private Map<JID, Integer> outgoingTransfers = new HashMap<JID, Integer>();
 
-    /**
-     * Maps JIDs to the last known throughput of an incoming IBB reception
-     */
-    private Map<JID, Double> incomingIBBTransferSpeeds = new HashMap<JID, Double>();
-
     private TransferModeDispatch transferModeDispatch = new TransferModeDispatch();
 
     private CopyOnWriteArrayList<IPacketInterceptor> packetInterceptors = new CopyOnWriteArrayList<IPacketInterceptor>();
@@ -120,8 +115,6 @@ public class DataTransferManager implements IConnectionListener,
             addRosterListener(rosterTracker);
 
         sarosNet.addListener(this);
-
-        transferModeDispatch.add(new TransferCompleteListener());
     }
 
     /**
@@ -444,34 +437,6 @@ public class DataTransferManager implements IConnectionListener,
         return connection.getMode();
     }
 
-    // Listens for completed transfers to store speed of incoming IBB transfers
-    private class TransferCompleteListener implements ITransferModeListener {
-
-        // store transfer speed for incoming IBB transfers, user specific
-        @Override
-        public void transferFinished(JID jid, NetTransferMode newMode,
-            boolean incoming, long sizeTransferred, long sizeUncompressed,
-            long transmissionMillisecs) {
-            if (newMode == NetTransferMode.IBB && incoming) {
-
-                double ibbSpeed = sizeTransferred
-                    / ((double) transmissionMillisecs / 1000);
-
-                setIncomingIBBTransferSpeed(jid, ibbSpeed);
-            }
-        }
-
-        @Override
-        public void connectionChanged(JID jid, IByteStreamConnection connection) {
-            // do nothing
-        }
-
-        @Override
-        public void clear() {
-            // do nothing
-        }
-    }
-
     public static class TransferModeDispatch implements ITransferModeListener {
 
         protected List<ITransferModeListener> listeners = new ArrayList<ITransferModeListener>();
@@ -665,36 +630,6 @@ public class DataTransferManager implements IConnectionListener,
             transferCount = outgoingTransfers.get(recipient);
         }
         return (transferCount != null && transferCount > 0);
-    }
-
-    /**
-     * Returns the last known speed of incoming IBB transfer for the given
-     * {@link JID}.
-     * 
-     * @param jid
-     *            The {@link JID} of the peer to get the throughput information
-     *            about
-     * @return speed in bytes/second, or 0 if not known
-     */
-    public double getIncomingIBBTransferSpeed(JID jid) {
-        Double value = incomingIBBTransferSpeeds.get(jid);
-
-        if (value == null)
-            return 0;
-        else
-            return value.doubleValue();
-    }
-
-    /**
-     * Sets a speed value for a given {@link JID}
-     * 
-     * @param jid
-     *            {@link JID} of the transfer source peer
-     * @param value
-     *            transfer speed in bytes/second
-     */
-    protected void setIncomingIBBTransferSpeed(JID jid, double value) {
-        incomingIBBTransferSpeeds.put(jid, value);
     }
 
     /**
