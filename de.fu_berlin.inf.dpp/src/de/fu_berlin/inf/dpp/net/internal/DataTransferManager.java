@@ -159,11 +159,11 @@ public class DataTransferManager implements IConnectionListener,
                 log.trace("[" + getTransferMode()
                     + "] Starting incoming data transfer: " + description);
 
-                long startTime = System.nanoTime();
+                long startTime = System.currentTimeMillis();
 
                 byte[] content = transferObject.accept();
 
-                long duration = Math.max(0, System.nanoTime() - startTime) / 1000000;
+                long duration = System.currentTimeMillis() - startTime;
 
                 log.trace("[" + getTransferMode()
                     + "] Finished incoming data transfer: " + description
