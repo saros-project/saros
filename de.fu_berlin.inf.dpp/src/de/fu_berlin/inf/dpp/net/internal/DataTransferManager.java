@@ -22,6 +22,8 @@ import org.jivesoftware.smack.packet.Presence;
 import org.jivesoftware.smackx.bytestreams.socks5.Socks5Proxy;
 import org.picocontainer.annotations.Nullable;
 
+import de.fu_berlin.inf.dpp.SarosContext.Bindings.IBBTransport;
+import de.fu_berlin.inf.dpp.SarosContext.Bindings.Socks5Transport;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.net.ConnectionState;
 import de.fu_berlin.inf.dpp.net.IConnectionListener;
@@ -78,11 +80,11 @@ public class DataTransferManager implements IConnectionListener,
 
     private XMPPReceiver receiver;
 
-    private IBBTransport ibbTransport;
-
     private IUPnPService upnpService;
 
-    private Socks5Transport socks5Transport;
+    private ITransport mainTransport;
+
+    private ITransport fallbackTransport;
 
     private PreferenceUtils preferenceUtils;
 
@@ -95,18 +97,19 @@ public class DataTransferManager implements IConnectionListener,
     /**
      * Collection of {@link JID}s, flagged to prefer IBB transfer mode
      */
-    protected Collection<JID> peersForIBB = new ArrayList<JID>();
+    private Collection<JID> peersForIBB = new ArrayList<JID>();
 
     public DataTransferManager(SarosNet sarosNet, XMPPReceiver receiver,
-        IBBTransport ibbTransport, Socks5Transport socks5Transport,
+        @Nullable @Socks5Transport ITransport mainTransport,
+        @Nullable @IBBTransport ITransport fallbackTransport,
         @Nullable IUPnPService upnpService,
         @Nullable RosterTracker rosterTracker,
         @Nullable PreferenceUtils preferenceUtils) {
 
         this.sarosNet = sarosNet;
         this.receiver = receiver;
-        this.ibbTransport = ibbTransport;
-        this.socks5Transport = socks5Transport;
+        this.fallbackTransport = fallbackTransport;
+        this.mainTransport = mainTransport;
         this.upnpService = upnpService;
         this.preferenceUtils = preferenceUtils;
         this.initTransports();
@@ -358,10 +361,10 @@ public class DataTransferManager implements IConnectionListener,
 
         // Move IBB to front for peers preferring IBB
         if (peersForIBB.contains(recipient)) {
-            int ibbIndex = transports.indexOf(ibbTransport);
+            int ibbIndex = transports.indexOf(fallbackTransport);
             if (ibbIndex != -1)
                 transports.remove(ibbIndex);
-            transports.add(0, ibbTransport);
+            transports.add(0, fallbackTransport);
         }
 
         log.debug("Currently used IP addresses for Socks5Proxy: "
@@ -555,8 +558,8 @@ public class DataTransferManager implements IConnectionListener,
         if (!chatOnly) {
             addPrimaryTransports();
         }
-        if (ibbTransport != null)
-            transports.add(ibbTransport);
+        if (fallbackTransport != null)
+            transports.add(fallbackTransport);
     }
 
     /**
@@ -564,8 +567,8 @@ public class DataTransferManager implements IConnectionListener,
      * are tried in order they are inserted here.
      */
     protected void addPrimaryTransports() {
-        if (socks5Transport != null)
-            transports.add(0, socks5Transport);
+        if (mainTransport != null)
+            transports.add(0, mainTransport);
     }
 
     public boolean connectionIsDisposed() {

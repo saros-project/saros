@@ -1,5 +1,9 @@
 package de.fu_berlin.inf.dpp;
 
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -9,6 +13,7 @@ import org.apache.log4j.Logger;
 import org.eclipse.equinox.security.storage.ISecurePreferences;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.osgi.service.prefs.Preferences;
+import org.picocontainer.BindKey;
 import org.picocontainer.Characteristics;
 import org.picocontainer.ComponentAdapter;
 import org.picocontainer.MutablePicoContainer;
@@ -16,6 +21,7 @@ import org.picocontainer.Parameter;
 import org.picocontainer.PicoBuilder;
 import org.picocontainer.PicoCompositionException;
 import org.picocontainer.PicoContainer;
+import org.picocontainer.annotations.Bind;
 import org.picocontainer.injectors.AnnotatedFieldInjection;
 import org.picocontainer.injectors.CompositeInjection;
 import org.picocontainer.injectors.ConstructorInjection;
@@ -52,6 +58,7 @@ import de.fu_berlin.inf.dpp.net.discoverymanager.DiscoveryManager;
 import de.fu_berlin.inf.dpp.net.internal.ConnectionTestManager;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
 import de.fu_berlin.inf.dpp.net.internal.IBBTransport;
+import de.fu_berlin.inf.dpp.net.internal.ITransport;
 import de.fu_berlin.inf.dpp.net.internal.Socks5Transport;
 import de.fu_berlin.inf.dpp.net.internal.StreamServiceManager;
 import de.fu_berlin.inf.dpp.net.internal.XMPPReceiver;
@@ -112,6 +119,22 @@ import de.fu_berlin.inf.dpp.videosharing.VideoSharingService;
  * @author Stefan Rossbach
  */
 public class SarosContext implements ISarosContext {
+
+    public static class Bindings {
+        @Retention(RetentionPolicy.RUNTIME)
+        @Target({ ElementType.FIELD, ElementType.PARAMETER })
+        @Bind
+        public @interface IBBTransport {
+            // marker interface
+        }
+
+        @Retention(RetentionPolicy.RUNTIME)
+        @Target({ ElementType.FIELD, ElementType.PARAMETER })
+        @Bind
+        public @interface Socks5Transport {
+            // marker interface
+        }
+    }
 
     private static class Component {
         private Class<?> clazz;
@@ -211,12 +234,19 @@ public class SarosContext implements ISarosContext {
         Component.create(ConnectionTestManager.class),
         Component.create(DataTransferManager.class),
         Component.create(DiscoveryManager.class),
-        Component.create(IBBTransport.class),
+
+        Component.create(
+            BindKey.bindKey(ITransport.class, Bindings.IBBTransport.class),
+            IBBTransport.class),
+
+        Component.create(
+            BindKey.bindKey(ITransport.class, Bindings.Socks5Transport.class),
+            Socks5Transport.class),
+
         Component.create(RosterTracker.class),
         Component.create(SarosNet.class),
         Component.create(SarosRosterListener.class),
         Component.create(SkypeManager.class),
-        Component.create(Socks5Transport.class),
         Component.create(StreamServiceManager.class),
         Component.create(StunServiceImpl.class),
         Component.create(SubscriptionManager.class),
