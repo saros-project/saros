@@ -17,7 +17,6 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import org.apache.log4j.Logger;
 import org.eclipse.swt.dnd.TransferData;
 import org.jivesoftware.smack.Connection;
-import org.jivesoftware.smack.Roster;
 import org.jivesoftware.smack.packet.Presence;
 import org.jivesoftware.smackx.bytestreams.socks5.Socks5Proxy;
 import org.picocontainer.annotations.Nullable;
@@ -28,11 +27,11 @@ import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.net.ConnectionState;
 import de.fu_berlin.inf.dpp.net.IConnectionListener;
 import de.fu_berlin.inf.dpp.net.IPacketInterceptor;
-import de.fu_berlin.inf.dpp.net.IRosterListener;
 import de.fu_berlin.inf.dpp.net.ITransferModeListener;
 import de.fu_berlin.inf.dpp.net.IncomingTransferObject;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.NetTransferMode;
+import de.fu_berlin.inf.dpp.net.RosterAdapter;
 import de.fu_berlin.inf.dpp.net.RosterTracker;
 import de.fu_berlin.inf.dpp.net.SarosNet;
 import de.fu_berlin.inf.dpp.net.upnp.IUPnPService;
@@ -94,6 +93,9 @@ public class DataTransferManager implements IConnectionListener,
 
     private SarosNet sarosNet;
 
+    private Map<JID, IByteStreamConnection> connections = Collections
+        .synchronizedMap(new HashMap<JID, IByteStreamConnection>());
+
     /**
      * Collection of {@link JID}s, flagged to prefer IBB transfer mode
      */
@@ -130,21 +132,10 @@ public class DataTransferManager implements IConnectionListener,
      * 
      * @param rosterTracker
      */
-    protected void addRosterListener(RosterTracker rosterTracker) {
-        rosterTracker.addRosterListener(new IRosterListener() {
+    private void addRosterListener(RosterTracker rosterTracker) {
+        rosterTracker.addRosterListener(new RosterAdapter() {
 
-            public void entriesAdded(Collection<String> addresses) {
-                // nothing to do here
-            }
-
-            public void entriesDeleted(Collection<String> addresses) {
-                // nothing to do here
-            }
-
-            public void entriesUpdated(Collection<String> addresses) {
-                // nothing to do here
-            }
-
+            @Override
             public void presenceChanged(Presence presence) {
 
                 if (!presence.isAvailable())
@@ -152,11 +143,6 @@ public class DataTransferManager implements IConnectionListener,
                         log.debug(presence.getFrom()
                             + " is not available anymore. Bytestream connection closed.");
             }
-
-            public void rosterChanged(Roster roster) {
-                // nothing to do here
-            }
-
         });
     }
 
@@ -170,9 +156,7 @@ public class DataTransferManager implements IConnectionListener,
             this.description = transferObject.getTransferDescription();
         }
 
-        /**
-         * Accepts a transfer and returns the incoming data.
-         */
+        @Override
         public byte[] accept() throws IOException {
             addIncomingFileTransfer(description);
             try {
@@ -205,26 +189,26 @@ public class DataTransferManager implements IConnectionListener,
             }
         }
 
+        @Override
         public TransferDescription getTransferDescription() {
             return description;
         }
 
+        @Override
         public NetTransferMode getTransferMode() {
             return transferObject.getTransferMode();
         }
 
+        @Override
         public long getTransferredSize() {
             return transferObject.getTransferredSize();
         }
 
+        @Override
         public long getUncompressedSize() {
             return transferObject.getUncompressedSize();
         }
-
     }
-
-    protected Map<JID, IByteStreamConnection> connections = Collections
-        .synchronizedMap(new HashMap<JID, IByteStreamConnection>());
 
     /**
      * Adds an incoming transfer.
@@ -360,7 +344,7 @@ public class DataTransferManager implements IConnectionListener,
         ArrayList<ITransport> transportModesToUse = transports;
 
         // Move IBB to front for peers preferring IBB
-        if (peersForIBB.contains(recipient)) {
+        if (fallbackTransport != null && peersForIBB.contains(recipient)) {
             int ibbIndex = transports.indexOf(fallbackTransport);
             if (ibbIndex != -1)
                 transports.remove(ibbIndex);
@@ -370,6 +354,7 @@ public class DataTransferManager implements IConnectionListener,
         log.debug("Currently used IP addresses for Socks5Proxy: "
             + Arrays.toString(Socks5Proxy.getSocks5Proxy().getLocalAddresses()
                 .toArray()));
+
         for (ITransport transport : transportModesToUse) {
             log.info("Try to establish a bytestream connection to "
                 + recipient.getBase() + " from " + sarosNet.getMyJID()
@@ -430,6 +415,7 @@ public class DataTransferManager implements IConnectionListener,
         return true;
     }
 
+    @Override
     public synchronized void connectionChanged(JID peer,
         IByteStreamConnection connection2, boolean incomingRequest) {
         // TODO: remove these lines
@@ -445,6 +431,7 @@ public class DataTransferManager implements IConnectionListener,
             upnpService.checkAndInformAboutUPnP();
     }
 
+    @Override
     public void connectionClosed(JID peer, IByteStreamConnection connection2) {
         connections.remove(peer);
         transferModeDispatch.connectionChanged(peer, null);
@@ -458,9 +445,10 @@ public class DataTransferManager implements IConnectionListener,
     }
 
     // Listens for completed transfers to store speed of incoming IBB transfers
-    protected class TransferCompleteListener implements ITransferModeListener {
+    private class TransferCompleteListener implements ITransferModeListener {
 
         // store transfer speed for incoming IBB transfers, user specific
+        @Override
         public void transferFinished(JID jid, NetTransferMode newMode,
             boolean incoming, long sizeTransferred, long sizeUncompressed,
             long transmissionMillisecs) {
@@ -473,10 +461,12 @@ public class DataTransferManager implements IConnectionListener,
             }
         }
 
+        @Override
         public void connectionChanged(JID jid, IByteStreamConnection connection) {
             // do nothing
         }
 
+        @Override
         public void clear() {
             // do nothing
         }
@@ -531,57 +521,28 @@ public class DataTransferManager implements IConnectionListener,
         }
     }
 
-    /*
-     * On Henning's suggestion, Saros is not the place to implement free
-     * transport negotiation because this is actually part of XMP-protocol: the
-     * smack API would be the place to implement it and there we should put our
-     * effort.
-     */
-    protected void initTransports() {
-        initTransports(isForceFileTransferByChatEnabled());
-    }
+    private void initTransports() {
+        boolean forceIBBOnly = false;
 
-    protected boolean isForceFileTransferByChatEnabled() {
         if (preferenceUtils != null)
-            return preferenceUtils.forceFileTranserByChat();
-        else
-            return false;
-    }
+            forceIBBOnly = preferenceUtils.forceFileTranserByChat();
 
-    /**
-     * Initializes transport methods respective the set property
-     * (PreferenceConstants.FORCE_FILETRANSFER_BY_CHAT only). The last method is
-     * the in-band bytestream. see also addPrimaryTransports()
-     */
-    protected void initTransports(boolean chatOnly) {
-        this.transports = new ArrayList<ITransport>();
-        if (!chatOnly) {
-            addPrimaryTransports();
-        }
+        transports = new ArrayList<ITransport>();
+
+        if (!forceIBBOnly && mainTransport != null)
+            transports.add(0, mainTransport);
+
         if (fallbackTransport != null)
             transports.add(fallbackTransport);
-    }
-
-    /**
-     * Method to add all primary transport methods (except chat). The transports
-     * are tried in order they are inserted here.
-     */
-    protected void addPrimaryTransports() {
-        if (mainTransport != null)
-            transports.add(0, mainTransport);
-    }
-
-    public boolean connectionIsDisposed() {
-        return connection == null;
     }
 
     /**
      * Sets up the transports for the given XMPPConnection
      */
     protected void prepareConnection(final Connection connection) {
-        assert (this.connectionIsDisposed());
+        assert (this.connection == null);
 
-        this.initTransports();
+        initTransports();
 
         log.debug("Prepare bytestreams for XMPP connection. Used transport order: "
             + Arrays.toString(transports.toArray()));
@@ -631,11 +592,12 @@ public class DataTransferManager implements IConnectionListener,
         connection = null;
     }
 
+    @Override
     public void connectionStateChanged(Connection connection,
         ConnectionState newState) {
         if (newState == ConnectionState.CONNECTED)
             prepareConnection(connection);
-        else if (!connectionIsDisposed())
+        else if (!(connection == null))
             disposeConnection();
     }
 
@@ -669,7 +631,7 @@ public class DataTransferManager implements IConnectionListener,
         }
     }
 
-    protected void removeIncomingFileTransfer(
+    private void removeIncomingFileTransfer(
         TransferDescription transferDescription) {
 
         synchronized (incomingTransfers) {
@@ -684,8 +646,7 @@ public class DataTransferManager implements IConnectionListener,
         }
     }
 
-    protected void addIncomingFileTransfer(
-        TransferDescription transferDescription) {
+    private void addIncomingFileTransfer(TransferDescription transferDescription) {
 
         synchronized (incomingTransfers) {
             JID from = transferDescription.getSender();
@@ -794,5 +755,4 @@ public class DataTransferManager implements IConnectionListener,
     public void removePacketInterceptor(IPacketInterceptor interceptor) {
         packetInterceptors.remove(interceptor);
     }
-
 }
