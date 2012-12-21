@@ -293,14 +293,17 @@ public class DataTransferManager implements IConnectionListener,
 
         IByteStreamConnection connection = null;
 
-        ArrayList<ITransport> transportModesToUse = transports;
+        ArrayList<ITransport> transportModesToUse = new ArrayList<ITransport>(
+            transports);
 
         // Move IBB to front for peers preferring IBB
-        if (fallbackTransport != null && peersForIBB.contains(recipient)) {
-            int ibbIndex = transports.indexOf(fallbackTransport);
-            if (ibbIndex != -1)
-                transports.remove(ibbIndex);
-            transports.add(0, fallbackTransport);
+        synchronized (peersForIBB) {
+            if (fallbackTransport != null && peersForIBB.contains(recipient)) {
+                int ibbIndex = transportModesToUse.indexOf(fallbackTransport);
+                if (ibbIndex != -1)
+                    transportModesToUse.remove(ibbIndex);
+                transportModesToUse.add(0, fallbackTransport);
+            }
         }
 
         log.debug("Currently used IP addresses for Socks5Proxy: "
@@ -534,8 +537,10 @@ public class DataTransferManager implements IConnectionListener,
      *            {@link JID} of the peer to set IBB as preferred transfer mode
      */
     public void setFallbackConnectionMode(JID peer) {
-        if (!peersForIBB.contains(peer))
-            peersForIBB.add(peer);
+        synchronized (peersForIBB) {
+            if (!peersForIBB.contains(peer))
+                peersForIBB.add(peer);
+        }
     }
 
     /**
