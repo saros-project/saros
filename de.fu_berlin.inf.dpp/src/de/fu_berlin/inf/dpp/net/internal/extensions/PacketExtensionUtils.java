@@ -34,8 +34,6 @@ import de.fu_berlin.inf.dpp.net.IncomingTransferObject.IncomingTransferObjectExt
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.internal.TransferDescription;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
-import de.fu_berlin.inf.dpp.project.ISarosSession;
-import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.util.Utils;
 
 /**
@@ -66,36 +64,6 @@ public class PacketExtensionUtils {
             return ((DefaultPacketExtension) extension).getValue(SESSION_ID);
         }
         return null;
-    }
-
-    /**
-     * @return A PacketFilter that only accepts Packets if there is currently a
-     *         SarosSession
-     */
-    public static PacketFilter getInSessionFilter(
-        final ISarosSessionManager sessionManager) {
-        return new PacketFilter() {
-            public boolean accept(Packet arg0) {
-                return sessionManager.getSarosSession() != null;
-            }
-        };
-    }
-
-    /**
-     * @return filter that returns true iff currently a shared project exists
-     *         and the message was from the host of this shared project.
-     */
-    public static PacketFilter getFromHostFilter(
-        final ISarosSessionManager sessionManager) {
-        return new PacketFilter() {
-            public boolean accept(Packet packet) {
-                ISarosSession sarosSession = sessionManager.getSarosSession();
-
-                return sarosSession != null
-                    && sarosSession.getHost().getJID()
-                        .equals(new JID(packet.getFrom()));
-            }
-        };
     }
 
     /**
