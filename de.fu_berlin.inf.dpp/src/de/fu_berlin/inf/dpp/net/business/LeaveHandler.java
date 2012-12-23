@@ -1,17 +1,18 @@
 package de.fu_berlin.inf.dpp.net.business;
 
 import org.apache.log4j.Logger;
-import org.jivesoftware.smack.filter.AndFilter;
-import org.jivesoftware.smack.filter.PacketFilter;
+import org.jivesoftware.smack.PacketListener;
+import org.jivesoftware.smack.packet.Packet;
 
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.internal.XMPPReceiver;
-import de.fu_berlin.inf.dpp.net.internal.extensions.LeaveExtension;
-import de.fu_berlin.inf.dpp.net.internal.extensions.PacketExtensionUtils;
+import de.fu_berlin.inf.dpp.net.internal.extensions.SarosLeaveExtension;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
+import de.fu_berlin.inf.dpp.project.AbstractSarosSessionListener;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
+import de.fu_berlin.inf.dpp.project.ISarosSessionListener;
 import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.ui.views.SarosView;
 import de.fu_berlin.inf.dpp.util.Utils;
@@ -20,73 +21,91 @@ import de.fu_berlin.inf.dpp.util.Utils;
  * Business logic for handling Leave Message
  * 
  */
+
+// FIXME move this class into the session context
 @Component(module = "net")
 public class LeaveHandler {
 
     private static final Logger log = Logger.getLogger(LeaveHandler.class
         .getName());
 
-    protected ISarosSessionManager sessionManager;
+    private ISarosSessionManager sessionManager;
 
-    protected Handler handler;
+    private SessionIDObservable sessionIDObservable;
 
-    public LeaveHandler(ISarosSessionManager sessionManager,
-        XMPPReceiver receiver, SessionIDObservable sessionIDObservable) {
+    private XMPPReceiver receiver;
+    private SarosLeaveExtension.Provider provider;
+
+    private ISarosSessionListener sessionListener = new AbstractSarosSessionListener() {
+
+        @Override
+        public void sessionStarted(ISarosSession session) {
+            receiver.addPacketListener(leaveExtensionListener,
+                provider.getPacketFilter(sessionIDObservable.getValue()));
+        }
+
+        @Override
+        public void sessionEnded(ISarosSession session) {
+            receiver.removePacketListener(leaveExtensionListener);
+        }
+    };
+
+    private PacketListener leaveExtensionListener = new PacketListener() {
+
+        @Override
+        public void processPacket(Packet packet) {
+            leaveReceived(new JID(packet.getFrom()));
+        }
+    };
+
+    public LeaveHandler(XMPPReceiver receiver,
+        SarosLeaveExtension.Provider provider,
+        ISarosSessionManager sessionManager,
+        SessionIDObservable sessionIDObservable) {
+
+        this.provider = provider;
+        this.receiver = receiver;
 
         this.sessionManager = sessionManager;
-        this.handler = new Handler(sessionIDObservable);
-        receiver.addPacketListener(handler, handler.getFilter());
+        this.sessionIDObservable = sessionIDObservable;
+
+        this.sessionManager.addSarosSessionListener(sessionListener);
     }
 
-    protected class Handler extends LeaveExtension {
+    public void leaveReceived(JID fromJID) {
 
-        public Handler(SessionIDObservable sessionID) {
-            super(sessionID);
+        final ISarosSession sarosSession = sessionManager.getSarosSession();
+
+        if (sarosSession == null) {
+            log.warn("Received leave message but shared"
+                + " project has already ended: " + fromJID);
+            return;
         }
 
-        @Override
-        public PacketFilter getFilter() {
-            return new AndFilter(super.getFilter(),
-                PacketExtensionUtils.getSessionIDPacketFilter(sessionID));
+        final User user = sarosSession.getUser(fromJID);
+        if (user == null) {
+            log.warn("Received leave message from buddy who"
+                + " is not part of our shared project session: " + fromJID);
+            return;
         }
 
-        @Override
-        public void leaveReceived(JID fromJID) {
+        // FIXME LeaveEvents need to be Activities, otherwise
+        // RaceConditions can occur when two users leave a the "same" time
 
-            final ISarosSession sarosSession = sessionManager.getSarosSession();
+        if (user.isHost()) {
+            sessionManager.stopSarosSession();
 
-            if (sarosSession == null) {
-                log.warn("Received leave message but shared"
-                    + " project has already ended: " + fromJID);
-                return;
-            }
-
-            final User user = sarosSession.getUser(fromJID);
-            if (user == null) {
-                log.warn("Received leave message from buddy who"
-                    + " is not part of our shared project session: " + fromJID);
-                return;
-            }
-
-            // FIXME LeaveEvents need to be Activities, otherwise
-            // RaceConditions can occur when two users leave a the "same" time
-
-            if (user.isHost()) {
-                sessionManager.stopSarosSession();
-
-                SarosView.showNotification(
-                    "Closing the session",
-                    "Session was closed by inviter "
-                        + user.getHumanReadableName() + ".");
-            } else {
-                // Client
-                Utils.runSafeSWTSync(log, new Runnable() {
-                    public void run() {
-                        // FIXME see above...
-                        sarosSession.removeUser(user);
-                    }
-                });
-            }
+            SarosView.showNotification("Closing the session",
+                "Session was closed by inviter " + user.getHumanReadableName()
+                    + ".");
+        } else {
+            // Client
+            Utils.runSafeSWTSync(log, new Runnable() {
+                public void run() {
+                    // FIXME see above...
+                    sarosSession.removeUser(user);
+                }
+            });
         }
     }
 }

@@ -241,8 +241,7 @@ public class NullSarosSession implements ISarosSession {
     }
 
     public void synchronizeUserList(ITransmitter transmitter, JID peer,
-        String invitationID, IProgressMonitor monitor)
-        throws SarosCancellationException {
+        IProgressMonitor monitor) throws SarosCancellationException {
         log.warn("unexpected method call");
 
     }

@@ -218,7 +218,6 @@ public class IncomingSessionNegotiation extends InvitationProcess {
      */
     protected void completeInvitation() {
         log.debug("Inv" + Utils.prefix(peer) + ": Completing invitation...");
-        transmitter.sendUserListRequest(peer, invitationID);
 
         /*
          * TODO: Wait until all of the activities in the queue (which arrived
@@ -229,6 +228,11 @@ public class IncomingSessionNegotiation extends InvitationProcess {
         sessionManager.sessionStarting(sarosSession);
         sarosSession.start();
         sessionManager.sessionStarted(sarosSession);
+
+        /*
+         * Only the Witheboard plugin uses this listener to enable incoming
+         * requests
+         */
         sessionManager.preIncomingInvitationCompleted(monitor);
 
         sarosSession.userInvitationCompleted(sarosSession.getLocalUser());

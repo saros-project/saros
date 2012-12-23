@@ -1279,8 +1279,7 @@ public class SarosSession implements ISarosSession, Disposable {
     }
 
     public void synchronizeUserList(ITransmitter transmitter, JID peer,
-        String invitationID, IProgressMonitor monitor)
-        throws SarosCancellationException {
+        IProgressMonitor monitor) throws SarosCancellationException {
 
         Collection<User> participants = this.getParticipants();
         log.debug("Inv" + Utils.prefix(peer) + ": Synchronizing userlist " //$NON-NLS-1$ //$NON-NLS-2$
@@ -1290,7 +1289,7 @@ public class SarosSession implements ISarosSession, Disposable {
             .getUserListConfirmationCollector();
 
         for (User user : this.getRemoteUsers()) {
-            transmitter.sendUserList(user.getJID(), invitationID, participants);
+            transmitter.sendUserList(user.getJID(), participants);
         }
 
         log.debug("Inv" + Utils.prefix(peer) //$NON-NLS-1$

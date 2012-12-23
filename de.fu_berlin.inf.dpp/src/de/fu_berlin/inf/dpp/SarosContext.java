@@ -65,12 +65,14 @@ import de.fu_berlin.inf.dpp.net.internal.XMPPReceiver;
 import de.fu_berlin.inf.dpp.net.internal.XMPPTransmitter;
 import de.fu_berlin.inf.dpp.net.internal.extensions.ActivitiesExtensionProvider;
 import de.fu_berlin.inf.dpp.net.internal.extensions.CancelInviteExtension;
-import de.fu_berlin.inf.dpp.net.internal.extensions.CancelProjectSharingExtension;
-import de.fu_berlin.inf.dpp.net.internal.extensions.DefaultInvitationInfo;
-import de.fu_berlin.inf.dpp.net.internal.extensions.DefaultInvitationInfo.UserListRequestExtensionProvider;
-import de.fu_berlin.inf.dpp.net.internal.extensions.InvitationInfo;
-import de.fu_berlin.inf.dpp.net.internal.extensions.LeaveExtension;
-import de.fu_berlin.inf.dpp.net.internal.extensions.UserListInfo;
+import de.fu_berlin.inf.dpp.net.internal.extensions.CancelProjectNegotiationExtension;
+import de.fu_berlin.inf.dpp.net.internal.extensions.InvitationAcceptedExtension;
+import de.fu_berlin.inf.dpp.net.internal.extensions.InvitationAcknowledgedExtension;
+import de.fu_berlin.inf.dpp.net.internal.extensions.InvitationParametersExtension;
+import de.fu_berlin.inf.dpp.net.internal.extensions.SarosLeaveExtension;
+import de.fu_berlin.inf.dpp.net.internal.extensions.UserListExtension;
+import de.fu_berlin.inf.dpp.net.internal.extensions.UserListReceivedExtension;
+import de.fu_berlin.inf.dpp.net.internal.extensions.UserListRequestExtension;
 import de.fu_berlin.inf.dpp.net.stun.internal.StunServiceImpl;
 import de.fu_berlin.inf.dpp.net.subscriptionmanager.SubscriptionManager;
 import de.fu_berlin.inf.dpp.net.upnp.internal.UPnPServiceImpl;
@@ -279,25 +281,24 @@ public class SarosContext implements ISarosContext {
          * Smack ExtensionProvider at context startup.
          */
 
-        // Extensions
-        Component.create(CancelInviteExtension.class),
-        Component.create(CancelProjectSharingExtension.class),
-        Component.create(LeaveExtension.class),
-
         // Extension Providers
         Component.create(ActivitiesExtensionProvider.class),
-        Component.create(InvitationInfo.InvitationExtensionProvider.class),
         Component
             .create(IncomingTransferObject.IncomingTransferObjectExtensionProvider.class),
-        Component
-            .create(DefaultInvitationInfo.InvitationAcknowledgementExtensionProvider.class),
-        Component.create(UserListInfo.JoinExtensionProvider.class),
-        Component
-            .create(DefaultInvitationInfo.UserListConfirmationExtensionProvider.class),
-        Component
-            .create(DefaultInvitationInfo.InvitationCompleteExtensionProvider.class),
-        Component.create(UserListRequestExtensionProvider.class),
 
+        Component.create(InvitationAcknowledgedExtension.Provider.class),
+        Component.create(InvitationParametersExtension.Provider.class),
+        Component.create(InvitationAcceptedExtension.Provider.class),
+
+        Component.create(UserListExtension.Provider.class),
+        Component.create(UserListRequestExtension.Provider.class),
+        Component.create(UserListReceivedExtension.Provider.class),
+
+        Component.create(SarosLeaveExtension.Provider.class),
+        Component.create(CancelInviteExtension.Provider.class),
+        Component.create(CancelProjectNegotiationExtension.Provider.class),
+
+        // UI handlers
         Component.create(HostLeftAloneInSessionHandler.class),
 
         // streaming services

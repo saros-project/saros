@@ -8,9 +8,9 @@ import org.picocontainer.annotations.Inject;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.net.internal.extensions.InvitationInfo;
-import de.fu_berlin.inf.dpp.net.internal.extensions.InvitationInfo.InvitationExtensionProvider;
 import de.fu_berlin.inf.dpp.net.internal.XMPPReceiver;
+import de.fu_berlin.inf.dpp.net.internal.extensions.InvitationParametersExtension;
+import de.fu_berlin.inf.dpp.net.internal.extensions.InvitationParametersExtension.Provider;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
@@ -38,13 +38,13 @@ public class InvitationHandler {
 
     public InvitationHandler(XMPPReceiver receiver,
         SessionIDObservable sessionIDObservablePar,
-        final InvitationExtensionProvider invExtProv) {
+        final Provider invExtProv) {
         this.sessionIDObservable = sessionIDObservablePar;
         receiver.addPacketListener(new PacketListener() {
 
             public void processPacket(Packet packet) {
                 JID fromJID = new JID(packet.getFrom());
-                InvitationInfo invInfo = invExtProv.getPayload(packet);
+                InvitationParametersExtension invInfo = invExtProv.getPayload(packet);
 
                 if (invInfo == null) {
                     log.warn("Inv" + Utils.prefix(fromJID)
@@ -55,13 +55,13 @@ public class InvitationHandler {
 
                 log.debug("Inv" + Utils.prefix(fromJID)
                     + ": Received invitation (invitationID: "
-                    + invInfo.invitationID + ", sessionID: "
-                    + invInfo.sessionID + ", colorID: " + invInfo.colorID
+                    + invInfo.getInvitationID() + ", sessionID: "
+                    + invInfo.getSessionID() + ", colorID: " + invInfo.colorID
                     + ", sarosVersion: " + invInfo.versionInfo.version
                     + ", sarosComp: " + invInfo.versionInfo.compatibility + ")");
 
-                String sessionID = invInfo.sessionID;
-                String invitationID = invInfo.invitationID;
+                String sessionID = invInfo.getSessionID();
+                String invitationID = invInfo.getInvitationID();
 
                 if (sessionIDObservable.getValue().equals(
                     SessionIDObservable.NOT_IN_SESSION)) {

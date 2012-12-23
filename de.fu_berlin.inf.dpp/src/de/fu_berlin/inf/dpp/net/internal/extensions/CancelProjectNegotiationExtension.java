@@ -1,16 +1,10 @@
-/**
- *
- */
 package de.fu_berlin.inf.dpp.net.internal.extensions;
 
-import de.fu_berlin.inf.dpp.annotations.Component;
-
-@Component(module = "net")
-public class CancelInviteExtension extends SarosSessionPacketExtension {
+public class CancelProjectNegotiationExtension extends SarosSessionPacketExtension {
 
     private String errorMessage;
 
-    public CancelInviteExtension(String sessionID, String errorMessage) {
+    public CancelProjectNegotiationExtension(String sessionID, String errorMessage) {
         super(sessionID);
         if ((errorMessage != null) && (errorMessage.length() > 0))
             this.errorMessage = errorMessage;
@@ -20,16 +14,16 @@ public class CancelInviteExtension extends SarosSessionPacketExtension {
      * Returns the error message for this cancellation.
      * 
      * @return the error message or <code>null</code> if the remote contact
-     *         cancelled the invitation manually
+     *         cancelled the project negotiation manually
      */
     public String getErrorMessage() {
         return errorMessage;
     }
 
     public static class Provider extends
-        SarosSessionPacketExtension.Provider<CancelInviteExtension> {
+        SarosSessionPacketExtension.Provider<CancelProjectNegotiationExtension> {
         public Provider() {
-            super("cancelInvitation", CancelInviteExtension.class);
+            super("cancelProjectSharing", CancelProjectNegotiationExtension.class);
         }
     }
 }

@@ -8,11 +8,10 @@ import org.picocontainer.annotations.Inject;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.net.internal.extensions.UserListInfo;
-import de.fu_berlin.inf.dpp.net.internal.extensions.UserListInfo.JoinExtensionProvider;
-import de.fu_berlin.inf.dpp.net.internal.extensions.UserListInfo.UserListEntry;
 import de.fu_berlin.inf.dpp.net.internal.XMPPReceiver;
 import de.fu_berlin.inf.dpp.net.internal.XMPPTransmitter;
+import de.fu_berlin.inf.dpp.net.internal.extensions.UserListExtension;
+import de.fu_berlin.inf.dpp.net.internal.extensions.UserListExtension.UserListEntry;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.util.Utils;
@@ -33,7 +32,7 @@ public class UserListHandler {
     protected ISarosSessionManager sessionManager;
 
     public UserListHandler(XMPPReceiver receiver,
-        final JoinExtensionProvider userListExtProv) {
+        final UserListExtension.Provider userListExtProv) {
         // TODO SessionID-Filter
         receiver.addPacketListener(new PacketListener() {
 
@@ -41,7 +40,8 @@ public class UserListHandler {
                 JID fromJID = new JID(packet.getFrom());
 
                 log.debug("Inv" + Utils.prefix(fromJID) + ": Received userList");
-                UserListInfo userListInfo = userListExtProv.getPayload(packet);
+                UserListExtension userListInfo = userListExtProv
+                    .getPayload(packet);
 
                 if (userListInfo == null) {
                     log.warn("Inv" + Utils.prefix(fromJID)

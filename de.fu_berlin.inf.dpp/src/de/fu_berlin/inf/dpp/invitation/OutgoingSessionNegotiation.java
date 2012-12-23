@@ -33,11 +33,10 @@ import de.fu_berlin.inf.dpp.net.SarosPacketCollector;
 import de.fu_berlin.inf.dpp.net.discoverymanager.DiscoveryManager;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
 import de.fu_berlin.inf.dpp.net.internal.XMPPReceiver;
-import de.fu_berlin.inf.dpp.net.internal.extensions.InvitationInfo;
+import de.fu_berlin.inf.dpp.net.internal.extensions.InvitationAcceptedExtension;
+import de.fu_berlin.inf.dpp.net.internal.extensions.InvitationAcknowledgedExtension;
+import de.fu_berlin.inf.dpp.net.internal.extensions.InvitationParametersExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.PacketExtensionUtils;
-import de.fu_berlin.inf.dpp.net.internal.extensions.DefaultInvitationInfo.InvitationAcknowledgementExtensionProvider;
-import de.fu_berlin.inf.dpp.net.internal.extensions.DefaultInvitationInfo.InvitationCompleteExtensionProvider;
-import de.fu_berlin.inf.dpp.net.internal.extensions.DefaultInvitationInfo.UserListRequestExtensionProvider;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 import de.fu_berlin.inf.dpp.project.IChecksumCache;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
@@ -57,18 +56,13 @@ public final class OutgoingSessionNegotiation extends InvitationProcess {
     private static final long INVITATION_ACKNOWLEDGEMENT_TIMEOUT = Long
         .getLong(
             "de.fu_berlin.inf.dpp.invitation.session.INVITATION_ACKNOWLEDGEMENT_TIMEOUT",
-            30000);
+            30000L);
 
-    private static final long USER_LIST_REQUEST_TIMEOUT = Long.getLong(
-        "de.fu_berlin.inf.dpp.invitation.session.USER_LIST_REQUEST_TIMEOUT",
-        30000);
+    private static final long INVITATION_ACCEPTED_TIMEOUT = Long.getLong(
+        "de.fu_berlin.inf.dpp.invitation.session.INVITATION_ACCEPTED_TIMEOUT",
+        600000L);
 
-    private static final long INVITATION_COMPLETED_RESPONSE_TIMEOUT = Long
-        .getLong(
-            "de.fu_berlin.inf.dpp.invitation.session.INVITATION_COMPLETED_RESPONSE_TIMEOUT",
-            30000);
-
-    private final static Random INVITATION_RAND = new Random();
+    private final static Random INVITATION_ID_GENERATOR = new Random();
 
     protected ISarosSession sarosSession;
     protected SubMonitor monitor;
@@ -79,9 +73,8 @@ public final class OutgoingSessionNegotiation extends InvitationProcess {
 
     protected VersionInfo versionInfo;
 
-    protected SarosPacketCollector invitationCompleteCollector;
+    protected SarosPacketCollector invitationAcceptedCollector;
     protected SarosPacketCollector invitationAcknowledgedCollector;
-    protected SarosPacketCollector userListRequestCollector;
 
     @Inject
     protected VersionManager versionManager;
@@ -149,7 +142,7 @@ public final class OutgoingSessionNegotiation extends InvitationProcess {
         monitor = SubMonitor.convert(progressMonitor, "Starting invitation...",
             100);
 
-        invitationID = String.valueOf(INVITATION_RAND.nextLong());
+        invitationID = String.valueOf(INVITATION_ID_GENERATOR.nextLong());
 
         createCollectors();
 
@@ -178,9 +171,18 @@ public final class OutgoingSessionNegotiation extends InvitationProcess {
              * User accepted the invitation, so NOW we can create the file
              * lists... not before the invitation was accepted!
              */
-            editorManager.setAllLocalOpenedEditorsLocked(true);
+
             // FIXME lock the projects on the workspace !
 
+            editorManager.setAllLocalOpenedEditorsLocked(true);
+
+            /*
+             * FIXME this should not be calculated here but in the
+             * OutgoingProjectNegotiation !
+             * 
+             * FIXME the file list may contain dirty checksums after this call
+             * because dirty editors are NOT saved !
+             */
             List<ProjectExchangeInfo> projectExchangeInfos = createProjectExchangeInfoList(
                 new ArrayList<IProject>(sarosSession.getProjects()),
                 monitor.newChild(100, SubMonitor.SUPPRESS_NONE));
@@ -339,10 +341,10 @@ public final class OutgoingSessionNegotiation extends InvitationProcess {
             comPrefs = comNegotiatingManager.getSessionPreferences();
         }
 
-        InvitationInfo invInfo = new InvitationInfo(sessionID, invitationID,
-            colorID, description, versionInfo, sarosSession.getSessionStart(),
-            comPrefs, sarosSession.getHost().getJID(), sarosSession
-                .getLocalUser().getColorID());
+        InvitationParametersExtension invInfo = new InvitationParametersExtension(
+            sessionID.getValue(), invitationID, colorID, description,
+            versionInfo, sarosSession.getSessionStart(), comPrefs, sarosSession
+                .getHost().getJID(), sarosSession.getLocalUser().getColorID());
 
         transmitter.sendInvitation(peer, invInfo);
 
@@ -357,11 +359,11 @@ public final class OutgoingSessionNegotiation extends InvitationProcess {
 
         monitor.setTaskName("Waiting for user to accept invitation");
 
-        if (collectPacket(userListRequestCollector, USER_LIST_REQUEST_TIMEOUT,
-            monitor) == null) {
+        if (collectPacket(invitationAcceptedCollector,
+            INVITATION_ACCEPTED_TIMEOUT, monitor) == null) {
             throw new LocalCancellationException(
-                peerAdvertisesSarosSupport ? "No user list request received."
-                    : "Missing Saros support.", CancelOption.NOTIFY_PEER);
+                peerAdvertisesSarosSupport ? "no invitation complete response received"
+                    : "Missing Saros support.", CancelOption.DO_NOT_NOTIFY_PEER);
         }
 
         // Reply is send in addUserToSession !
@@ -383,8 +385,7 @@ public final class OutgoingSessionNegotiation extends InvitationProcess {
                 + colorID);
 
             checkCancellation(CancelOption.NOTIFY_PEER);
-            sarosSession.synchronizeUserList(transmitter, peer, invitationID,
-                monitor);
+            sarosSession.synchronizeUserList(transmitter, peer, monitor);
             return newUser;
         }
     }
@@ -426,30 +427,14 @@ public final class OutgoingSessionNegotiation extends InvitationProcess {
         List<ProjectExchangeInfo> projectExchangeInfos, IProgressMonitor monitor)
         throws SarosCancellationException {
 
-        log.debug("Inv" + Utils.prefix(peer)
-            + ": Waiting for invitation complete confirmation...");
+        log.debug("Inv" + Utils.prefix(peer) + ": synchronizing user list");
 
-        monitor.setTaskName("Waiting for peer to complete invitation...");
-
-        if (collectPacket(invitationCompleteCollector,
-            INVITATION_COMPLETED_RESPONSE_TIMEOUT, monitor) == null) {
-            throw new LocalCancellationException(
-                peerAdvertisesSarosSupport ? "no invitation complete response received"
-                    : "Missing Saros support.", CancelOption.DO_NOT_NOTIFY_PEER);
-        }
-
-        log.debug("Inv" + Utils.prefix(peer)
-            + ": Notifying participants that the invitation is complete.");
-
-        monitor.setTaskName("Completing invitation...");
+        monitor.setTaskName("Synchronizing user list ...");
         synchronized (sarosSession) {
             sarosSession.userInvitationCompleted(sarosSession.getUser(peer));
             checkCancellation(CancelOption.NOTIFY_PEER);
-            sarosSession.synchronizeUserList(transmitter, peer, invitationID,
-                monitor); // SUPPRESSALL
+            sarosSession.synchronizeUserList(transmitter, peer, monitor); // SUPPRESSALL
         }
-
-        monitor.setTaskName("Invitation has completed successfully.");
 
         invitationProcesses.removeInvitationProcess(this);
         log.debug("Inv" + Utils.prefix(peer)
@@ -599,26 +584,20 @@ public final class OutgoingSessionNegotiation extends InvitationProcess {
     }
 
     protected void deleteCollectors() {
-        invitationCompleteCollector.cancel();
+        invitationAcceptedCollector.cancel();
         invitationAcknowledgedCollector.cancel();
-        userListRequestCollector.cancel();
     }
 
     protected void createCollectors() {
-        invitationCompleteCollector = xmppReceiver
+        invitationAcceptedCollector = xmppReceiver
             .createCollector(PacketExtensionUtils.getInvitationFilter(
-                new InvitationCompleteExtensionProvider(), sessionID,
+                new InvitationAcceptedExtension.Provider(), sessionID,
                 invitationID));
 
         invitationAcknowledgedCollector = xmppReceiver
             .createCollector(PacketExtensionUtils.getInvitationFilter(
-                new InvitationAcknowledgementExtensionProvider(), sessionID,
+                new InvitationAcknowledgedExtension.Provider(), sessionID,
                 invitationID));
-
-        userListRequestCollector = xmppReceiver
-            .createCollector(PacketExtensionUtils
-                .getInvitationFilter(new UserListRequestExtensionProvider(),
-                    sessionID, invitationID));
     }
 
     /**

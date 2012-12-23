@@ -7,17 +7,23 @@ import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.User.Permission;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 
 @Component(module = "net")
-public class UserListInfo extends DefaultInvitationInfo {
+public class UserListExtension extends SarosSessionPacketExtension {
     // TODO: send the Collection<User>
     // It causes a marshallation exception... why??
+
+    /*
+     * Stefan Rossbach: because a user object contains a SarosSession object.
+     * That object has so many references to other objects that may not be
+     * serializeable. Luckily you got the exception instead of sending approx.
+     * 50 MB serialized data per user object !
+     */
+
     public ArrayList<UserListEntry> userList = new ArrayList<UserListEntry>();
 
-    public UserListInfo(SessionIDObservable sessionID, String invitationID,
-        Collection<User> users) {
-        super(sessionID, invitationID);
+    public UserListExtension(String sessionID, Collection<User> users) {
+        super(sessionID);
         for (User user : users) {
             UserListEntry newUser = new UserListEntry(user.getJID(),
                 user.getColorID(), user.getPermission(),
@@ -41,11 +47,11 @@ public class UserListInfo extends DefaultInvitationInfo {
         }
     }
 
-    public static class JoinExtensionProvider extends
-        XStreamExtensionProvider<UserListInfo> {
+    public static class Provider extends
+        XStreamExtensionProvider<UserListExtension> {
 
-        public JoinExtensionProvider() {
-            super("userListInfo", UserListInfo.class);
+        public Provider() {
+            super("userList", UserListExtension.class);
         }
     }
 

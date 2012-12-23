@@ -227,8 +227,7 @@ public class SarosSessionStub implements ISarosSession {
     }
 
     public void synchronizeUserList(ITransmitter transmitter, JID peer,
-        String invitationID, IProgressMonitor monitor)
-        throws SarosCancellationException {
+        IProgressMonitor monitor) throws SarosCancellationException {
         throw new RuntimeException("Unexpected call to Stub");
     }
 

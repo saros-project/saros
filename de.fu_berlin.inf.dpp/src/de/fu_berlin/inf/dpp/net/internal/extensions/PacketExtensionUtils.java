@@ -42,6 +42,11 @@ import de.fu_berlin.inf.dpp.util.Utils;
  * 
  * @author rdjemili
  */
+
+/*
+ * Stefan Rossbach: delete this utility class. the XStreamExtensionProvider(s)
+ * should offer the package filter for their extensions !
+ */
 public class PacketExtensionUtils {
 
     private static final Logger log = Logger
@@ -88,50 +93,17 @@ public class PacketExtensionUtils {
      *         the current invitation.
      */
     public static PacketFilter getInvitationIDFilter(
-        final XStreamExtensionProvider<? extends DefaultInvitationInfo> extProv,
+        final XStreamExtensionProvider<? extends InvitationExtension> extProv,
         final String invitationID) {
 
         return new PacketFilter() {
             public boolean accept(Packet arg0) {
-                DefaultInvitationInfo invInfo = extProv.getPayload(arg0);
+                InvitationExtension invInfo = extProv.getPayload(arg0);
 
-                return ObjectUtils.equals(invInfo.invitationID, invitationID);
+                return ObjectUtils.equals(invInfo.getInvitationID(),
+                    invitationID);
             }
         };
-    }
-
-    public static PacketFilter getIncomingTransferObjectFilter(
-        final IncomingTransferObjectExtensionProvider extProv,
-        final SessionIDObservable sessionID, final String invitationID,
-        final String type) {
-
-        return new AndFilter(extProv.getPacketFilter(), new PacketFilter() {
-
-            public boolean accept(Packet packet) {
-                IncomingTransferObject payload = extProv.getPayload(packet);
-
-                if (payload == null) {
-                    log.error("Invalid payload in packet: " + packet);
-                    return false;
-                }
-
-                TransferDescription transferDescription = payload
-                    .getTransferDescription();
-                if (!Utils.equals(transferDescription.getSessionID(),
-                    sessionID.getValue()))
-                    return false;
-
-                if (!ObjectUtils.equals(transferDescription.getInvitationID(),
-                    invitationID))
-                    return false;
-
-                if (!ObjectUtils.equals(transferDescription.getType(), type))
-                    return false;
-
-                return true;
-
-            }
-        });
     }
 
     public static PacketFilter getIncomingFileListFilter(
@@ -168,7 +140,7 @@ public class PacketExtensionUtils {
      *         the current session and invitation.
      */
     public static PacketFilter getInvitationFilter(
-        XStreamExtensionProvider<? extends DefaultInvitationInfo> extProv,
+        XStreamExtensionProvider<? extends InvitationExtension> extProv,
         SessionIDObservable sessionID, final String invitationID) {
 
         return new AndFilter(getSessionIDFilter(extProv, sessionID),
@@ -180,19 +152,21 @@ public class PacketExtensionUtils {
      *         the current session.
      */
     public static PacketFilter getSessionIDFilter(
-        final XStreamExtensionProvider<? extends DefaultSessionInfo> extProv,
+        final XStreamExtensionProvider<? extends SarosSessionPacketExtension> extProv,
         final SessionIDObservable sessionID) {
 
         return new AndFilter(extProv.getPacketFilter(), new PacketFilter() {
             public boolean accept(Packet packet) {
-                DefaultSessionInfo info = extProv.getPayload(packet);
+                SarosSessionPacketExtension extension = extProv
+                    .getPayload(packet);
 
-                if (info == null) {
+                if (extension == null) {
                     log.error("Invalid payload in packet: " + packet);
                     return false;
                 }
 
-                if (!Utils.equals(info.sessionID, sessionID.getValue()))
+                if (!Utils.equals(extension.getSessionID(),
+                    sessionID.getValue()))
                     return false;
 
                 return true;

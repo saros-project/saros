@@ -33,7 +33,7 @@ import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
 import de.fu_berlin.inf.dpp.invitation.InvitationProcess;
 import de.fu_berlin.inf.dpp.net.internal.TimedActivityDataObject;
-import de.fu_berlin.inf.dpp.net.internal.extensions.InvitationInfo;
+import de.fu_berlin.inf.dpp.net.internal.extensions.InvitationParametersExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.XStreamExtensionProvider;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 
@@ -81,8 +81,7 @@ public interface ITransmitter {
     public void sendFileLists(JID jid, String processID,
         List<FileList> fileLists) throws IOException;
 
-    // FIXME Add Javadoc. Why is an invitationID needed?
-    public void sendUserList(JID to, String invitationID, Collection<User> user);
+    public void sendUserList(JID to, Collection<User> user);
 
     public boolean receiveUserListConfirmation(SarosPacketCollector collector,
         List<User> fromUsers, IProgressMonitor monitor)
@@ -163,7 +162,7 @@ public interface ITransmitter {
     public void sendCancelInvitationMessage(JID to, String sessionID,
         String message);
 
-    public void sendUserListRequest(JID peer, String invitationID);
+    public void sendUserListRequest(JID peer);
 
-    public void sendInvitation(JID peer, InvitationInfo invInfo);
+    public void sendInvitation(JID peer, InvitationParametersExtension invInfo);
 }

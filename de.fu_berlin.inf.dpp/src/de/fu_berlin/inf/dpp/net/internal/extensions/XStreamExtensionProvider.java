@@ -54,20 +54,25 @@ public class XStreamExtensionProvider<T> implements PacketExtensionProvider,
     private static final Logger log = Logger
         .getLogger(XStreamExtensionProvider.class);
 
-    protected String namespace;
+    public static final String NAMESPACE = "de.fu_berlin.inf.dpp";
 
-    protected String elementName;
+    protected final String namespace;
 
-    protected XStream xstream;
+    protected final String elementName;
+
+    protected final XStream xstream;
 
     /**
      * Create a new XStreamExtensionProvider using the given elementName as the
      * XML root element. The Provider is able to understand the given classes,
-     * which should be annotated using XStream annotations.
+     * which should be annotated using XStream annotations. <br/>
+     * <br/>
+     * <b>Important</b>: use valid XML element names or the receiving side will
+     * be unable to decode the extension !
      */
     public XStreamExtensionProvider(String elementName, Class<?>... classes) {
         this.elementName = elementName;
-        this.namespace = PacketExtensionUtils.NAMESPACE;
+        this.namespace = NAMESPACE;
 
         xstream = new XStream();
         xstream.registerConverter(new IPathConverter());

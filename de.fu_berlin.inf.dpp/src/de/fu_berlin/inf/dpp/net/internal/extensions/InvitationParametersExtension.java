@@ -24,14 +24,13 @@ import org.joda.time.DateTime;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.communication.chat.muc.negotiation.MUCSessionPreferences;
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 import de.fu_berlin.inf.dpp.util.VersionManager.VersionInfo;
 
 /**
  * Small class used by the invitation process as a first message
  */
 @Component(module = "net")
-public class InvitationInfo extends DefaultInvitationInfo {
+public class InvitationParametersExtension extends InvitationExtension {
     public int colorID;
     public VersionInfo versionInfo;
     public DateTime sessionStart;
@@ -40,7 +39,7 @@ public class InvitationInfo extends DefaultInvitationInfo {
     public JID host;
     public int inviterColorID;
 
-    public InvitationInfo(SessionIDObservable sessionID, String invitationID,
+    public InvitationParametersExtension(String sessionID, String invitationID,
         int colorID, String description, VersionInfo versionInfo,
         DateTime sessionStart, MUCSessionPreferences comPrefs, JID host,
         int inviterColorID) {
@@ -54,11 +53,11 @@ public class InvitationInfo extends DefaultInvitationInfo {
         this.inviterColorID = inviterColorID;
     }
 
-    public static class InvitationExtensionProvider extends
-        XStreamExtensionProvider<InvitationInfo> {
+    public static class Provider extends
+        XStreamExtensionProvider<InvitationParametersExtension> {
 
-        public InvitationExtensionProvider() {
-            super("invitation", InvitationInfo.class);
+        public Provider() {
+            super("invitationParameters", InvitationParametersExtension.class);
         }
     }
 }

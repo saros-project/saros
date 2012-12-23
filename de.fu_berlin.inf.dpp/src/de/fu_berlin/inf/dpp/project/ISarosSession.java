@@ -389,12 +389,10 @@ public interface ISarosSession {
      * session
      * 
      * @param peer
-     * @param invitationID
      * @throws SarosCancellationException
      */
     public void synchronizeUserList(ITransmitter transmitter, JID peer,
-        String invitationID, IProgressMonitor monitor)
-        throws SarosCancellationException;
+        IProgressMonitor monitor) throws SarosCancellationException;
 
     /**
      * Returns all resources of session.
