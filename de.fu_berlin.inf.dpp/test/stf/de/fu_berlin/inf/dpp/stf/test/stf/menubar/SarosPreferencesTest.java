@@ -52,7 +52,7 @@ public class SarosPreferencesTest extends StfTestCase {
     }
 
     @Test
-    public void createAccountWhichAlreadyExisted() throws RemoteException {
+    public void createAccountWhichAlreadyExisted() throws Exception {
         ALICE.remoteBot().menu(MENU_SAROS).menu(MENU_CREATE_ACCOUNT).click();
 
         ALICE.remoteBot()
@@ -67,7 +67,7 @@ public class SarosPreferencesTest extends StfTestCase {
         shell.bot().textWithLabel(LABEL_PASSWORD).setText(ALICE.getPassword());
         shell.bot().textWithLabel(LABEL_REPEAT_PASSWORD)
             .setText(ALICE.getPassword());
-        shell.bot().sleep(1000);
+        Thread.sleep(1000);
         assertFalse("could create a duplicated account",
             shell.bot().button(FINISH).isEnabled());
         assertEquals(ERROR_MESSAGE_ACCOUNT_ALREADY_EXISTS,

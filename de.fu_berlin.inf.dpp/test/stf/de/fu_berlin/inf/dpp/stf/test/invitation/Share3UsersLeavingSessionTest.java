@@ -72,7 +72,7 @@ public class Share3UsersLeavingSessionTest extends StfTestCase {
         ALICE.superBot().views().sarosView().waitUntilIsNotInSession();
         BOB.superBot().views().sarosView().waitUntilIsNotInSession();
 
-        CARL.remoteBot().sleep(2000);
+        Thread.sleep(2000);
 
         try {
             CARL.remoteBot().shell("Invitation Cancelled").confirm(OK);

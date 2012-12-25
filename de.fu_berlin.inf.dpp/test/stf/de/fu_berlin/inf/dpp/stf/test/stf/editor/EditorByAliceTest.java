@@ -47,7 +47,7 @@ public class EditorByAliceTest extends StfTestCase {
     }
 
     @Test
-    public void testDeleteInEditor() throws RemoteException {
+    public void testDeleteInEditor() throws Exception {
 
         ALICE
             .superBot()
@@ -64,7 +64,7 @@ public class EditorByAliceTest extends StfTestCase {
 
         ALICE.remoteBot().editor(Constants.CLS1_SUFFIX).navigateTo(3, 0);
         ALICE.remoteBot().editor(Constants.CLS1_SUFFIX).typeText("testtext");
-        ALICE.remoteBot().sleep(100);
+        Thread.sleep(100);
         ALICE.remoteBot().editor(Constants.CLS1_SUFFIX).navigateTo(3, 4);
 
         for (int i = 0; i < 4; i++) {
@@ -211,7 +211,7 @@ public class EditorByAliceTest extends StfTestCase {
     }
 
     @Test
-    public void quickFixWithSpellChecker() throws RemoteException {
+    public void quickFixWithSpellChecker() throws Exception {
         ALICE.superBot().views().packageExplorerView().tree().newC()
             .project(Constants.PROJECT1);
         ALICE.superBot().views().packageExplorerView()
@@ -222,7 +222,7 @@ public class EditorByAliceTest extends StfTestCase {
         ALICE.remoteBot().editor("readme.txt").navigateTo(0, 0);
 
         // just wait so that eclipse recognize the spelling error
-        ALICE.remoteBot().sleep(3000);
+        Thread.sleep(3000);
         ALICE.remoteBot().editor("readme.txt").quickfix(0);
 
         assertContains("please", ALICE.remoteBot().editor("readme.txt")

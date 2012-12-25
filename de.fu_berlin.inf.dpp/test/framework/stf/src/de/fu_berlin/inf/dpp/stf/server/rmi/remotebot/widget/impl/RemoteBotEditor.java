@@ -19,6 +19,7 @@ import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
 import org.eclipse.swtbot.swt.finder.finders.UIThreadRunnable;
 import org.eclipse.swtbot.swt.finder.results.ListResult;
 import org.eclipse.swtbot.swt.finder.utils.FileUtils;
+import org.eclipse.swtbot.swt.finder.utils.SWTUtils;
 import org.eclipse.swtbot.swt.finder.waits.DefaultCondition;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
@@ -106,7 +107,7 @@ public class RemoteBotEditor extends StfRemoteObject implements
         widget.selectCurrentLine();
         // It's is necessary to sleep a litte time so that the following
         // operation like quickfix will be successfully performed.
-        RemoteWorkbenchBot.getInstance().sleep(500);
+        SWTUtils.sleep(500);
     }
 
     @Override
@@ -114,8 +115,7 @@ public class RemoteBotEditor extends StfRemoteObject implements
         widget.selectLine(line);
         // It's is necessary to sleep a litte time so that the following
         // operation like quickfix will be successfully performed.
-        RemoteWorkbenchBot.getInstance().sleep(1000);
-
+        SWTUtils.sleep(1000);
     }
 
     @Override
@@ -124,7 +124,7 @@ public class RemoteBotEditor extends StfRemoteObject implements
         widget.selectRange(line, column, length);
         // It's is necessary to sleep a litte time so that the following
         // operation like quickfix will be successfully performed.
-        RemoteWorkbenchBot.getInstance().sleep(800);
+        SWTUtils.sleep(800);
     }
 
     @Override
@@ -169,7 +169,9 @@ public class RemoteBotEditor extends StfRemoteObject implements
             widget.pressShortcut(SWT.ALT | SWT.COMMAND, 'x');
         else
             widget.pressShortcut(SWT.ALT | SWT.SHIFT, 'x');
-        RemoteWorkbenchBot.getInstance().sleep(1000);
+
+        SWTUtils.sleep(1000);
+
         widget.pressShortcut(SWT.NONE, 'j');
     }
 
@@ -180,7 +182,7 @@ public class RemoteBotEditor extends StfRemoteObject implements
         else
             widget.pressShortcut(SWT.CTRL, '.');
 
-        RemoteWorkbenchBot.getInstance().sleep(20);
+        SWTUtils.sleep(100);
     }
 
     @Override
@@ -190,7 +192,9 @@ public class RemoteBotEditor extends StfRemoteObject implements
             widget.pressShortcut(SWT.COMMAND, '2');
         else
             widget.pressShortcut(SWT.CTRL, '2');
-        RemoteWorkbenchBot.getInstance().sleep(1000);
+
+        SWTUtils.sleep(1000);
+
         widget.pressShortcut(SWT.NONE, 'l');
 
     }

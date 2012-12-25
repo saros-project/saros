@@ -27,7 +27,7 @@ public class InviteWithDifferentVersionsTest extends StfTestCase {
     }
 
     @Test
-    public void testInvitationWithDifferentVersions() throws RemoteException {
+    public void testInvitationWithDifferentVersions() throws Exception {
         BOB.superBot().views().sarosView().disconnect();
 
         BOB.superBot().internal().changeSarosVersion("1.1.1");
@@ -42,7 +42,7 @@ public class InviteWithDifferentVersionsTest extends StfTestCase {
 
         ALICE.superBot().menuBar().saros().shareProjects("foo", BOB.getJID());
 
-        ALICE.remoteBot().sleep(5000);
+        Thread.sleep(5000);
         List<String> shellNamesAlice = ALICE.remoteBot().getOpenShellNames();
         List<String> shellNamesBob = BOB.remoteBot().getOpenShellNames();
 

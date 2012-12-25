@@ -3,8 +3,6 @@ package de.fu_berlin.inf.dpp.stf.test.stf.contextmenu;
 import static de.fu_berlin.inf.dpp.stf.client.tester.SarosTester.ALICE;
 import static de.fu_berlin.inf.dpp.stf.client.tester.SarosTester.BOB;
 
-import java.rmi.RemoteException;
-
 import org.junit.After;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -26,7 +24,7 @@ public class ContextMenuShareWithTest extends StfTestCase {
     }
 
     @Test
-    public void testShareWithMultipleBuddies() throws RemoteException {
+    public void testShareWithMultipleBuddies() throws Exception {
         ALICE
             .superBot()
             .views()
@@ -44,6 +42,6 @@ public class ContextMenuShareWithTest extends StfTestCase {
         BOB.superBot().views().sarosView().waitUntilIsInSession();
 
         // TODO remove this line
-        BOB.remoteBot().sleep(10000);
+        Thread.sleep(10000);
     }
 }

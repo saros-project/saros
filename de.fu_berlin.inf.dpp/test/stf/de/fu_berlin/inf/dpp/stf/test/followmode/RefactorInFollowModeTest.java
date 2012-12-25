@@ -68,14 +68,14 @@ public class RefactorInFollowModeTest extends StfTestCase {
         ALICE.remoteBot().editor("HelloWorld.java").navigateTo(4, 8);
 
         // wait for the text to be selected
-        ALICE.remoteBot().sleep(10000);
+        Thread.sleep(10000);
 
         ALICE.remoteBot().activateWorkbench();
         ALICE.remoteBot().menu("Refactor").menu("Rename...").click();
         ALICE.remoteBot().editor("HelloWorld.java").typeText("bar\n");
 
         // refactor might take a while
-        ALICE.remoteBot().sleep(10000);
+        Thread.sleep(10000);
 
         List<Integer> viewPortAfterRefactor = BOB.remoteBot()
             .editor("HelloWorld.java").getViewport();

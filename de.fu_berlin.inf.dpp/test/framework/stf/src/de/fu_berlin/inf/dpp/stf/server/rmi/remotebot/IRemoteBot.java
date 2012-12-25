@@ -2322,15 +2322,6 @@ public interface IRemoteBot extends Remote {
     public void logMessage(String message) throws RemoteException;
 
     /**
-     * @deprecated Use {@link Thread#sleep(long)}
-     * @param millis
-     * @throws RemoteException
-     * 
-     */
-    @Deprecated
-    public void sleep(long millis) throws RemoteException;
-
-    /**
      * @see SWTBot#captureScreenshot(String)
      * @throws RemoteException
      */

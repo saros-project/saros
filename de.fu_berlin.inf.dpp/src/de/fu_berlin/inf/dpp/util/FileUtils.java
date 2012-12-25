@@ -54,7 +54,7 @@ public class FileUtils {
      * 
      * @return checksum of file
      * 
-     * @throws CausedIOException
+     * @throws IOException
      *             if checksum calculation has been failed.
      */
     public static long checksum(IFile file) throws IOException {
@@ -169,7 +169,6 @@ public class FileUtils {
      * Unzip the data in the given InputStream as a Zip archive to the given
      * IContainer.
      * 
-     * @param iSarosSession
      * 
      * @cancelable This long-running operation can be canceled via the given
      *             progress monitor and will throw a LocalCancellationException

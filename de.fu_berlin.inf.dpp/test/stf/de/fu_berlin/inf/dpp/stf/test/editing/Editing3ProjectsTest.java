@@ -88,7 +88,7 @@ public class Editing3ProjectsTest extends StfTestCase {
 
         ALICE.remoteBot().editor("HelloCarl.java").typeText("testtext");
 
-        ALICE.remoteBot().sleep(2000);
+        Thread.sleep(2000);
 
         assertEquals(ALICE.remoteBot().editor("HelloAlice.java").getText(), BOB
             .remoteBot().editor("HelloAlice.java").getText());

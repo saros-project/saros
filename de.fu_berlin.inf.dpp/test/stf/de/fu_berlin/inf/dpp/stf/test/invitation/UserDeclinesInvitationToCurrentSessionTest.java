@@ -39,7 +39,7 @@ public class UserDeclinesInvitationToCurrentSessionTest extends StfTestCase {
 
         shell.bot().button(CANCEL).click();
 
-        ALICE.remoteBot().sleep(5000);
+        Thread.sleep(5000);
 
         assertTrue(
             "Alice closed the session because Carl cancels the invitation but Bob was in the session",

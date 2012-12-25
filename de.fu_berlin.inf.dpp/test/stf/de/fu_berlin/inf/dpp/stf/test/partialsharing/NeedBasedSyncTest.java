@@ -126,7 +126,7 @@ public class NeedBasedSyncTest extends StfTestCase {
         String contentAliceFile1 = ALICE.superBot().views()
             .packageExplorerView().getFileContent("foo/file1");
 
-        ALICE.remoteBot().sleep(1000);
+        Thread.sleep(1000);
 
         String contentBobFile1 = BOB.superBot().views().packageExplorerView()
             .getFileContent("foo/file1");
@@ -327,7 +327,7 @@ public class NeedBasedSyncTest extends StfTestCase {
         String contentAliceFile3 = ALICE.superBot().views()
             .packageExplorerView().getFileContent("foo/file3");
 
-        ALICE.remoteBot().sleep(1000);
+        Thread.sleep(1000);
 
         String contentBobFile1 = BOB.superBot().views().packageExplorerView()
             .getFileContent("foo/file1");
@@ -351,7 +351,7 @@ public class NeedBasedSyncTest extends StfTestCase {
 
         ALICE.remoteBot().editor("file2").typeText("new Text ");
         ALICE.remoteBot().editor("file3").typeText("some new Text ");
-        ALICE.remoteBot().sleep(1000);
+        Thread.sleep(1000);
 
         BOB.superBot().confirmShellNewSharedFile(Constants.OVERWRITE);
         CARL.superBot().confirmShellNewSharedFile(Constants.OVERWRITE);

@@ -58,7 +58,7 @@ public class ConcurrentEditingTest extends StfTestCase {
         BOB.remoteBot().waitUntilEditorOpen(FILE);
         BOB.remoteBot().editor(FILE).navigateTo(0, 30);
 
-        BOB.remoteBot().sleep(1000);
+        Thread.sleep(1000);
 
         // Alice goes to 0,6 and hits Delete
         ALICE.remoteBot().activateWorkbench();
@@ -68,11 +68,11 @@ public class ConcurrentEditingTest extends StfTestCase {
         ALICE.remoteBot().editor(FILE).waitUntilIsActive();
         // at the same time, Bob enters L at 0,30
         BOB.remoteBot().activateWorkbench();
-        BOB.remoteBot().sleep(waitActivate);
+        Thread.sleep(waitActivate);
         BOB.remoteBot().editor(FILE).show();
         BOB.remoteBot().editor(FILE).waitUntilIsActive();
 
-        ALICE.remoteBot().sleep(waitActivate);
+        Thread.sleep(waitActivate);
         ALICE.remoteBot().editor(FILE).pressShortcut(IKeyLookup.BACKSPACE_NAME);
 
         BOB.remoteBot().editor(FILE).typeText("L");
@@ -83,7 +83,7 @@ public class ConcurrentEditingTest extends StfTestCase {
         // Bob enters o
         BOB.remoteBot().editor(FILE).typeText("o");
 
-        ALICE.remoteBot().sleep(1000);
+        Thread.sleep(1000);
         String ALICEText = ALICE.remoteBot().editor(FILE).getText();
         String BOBText = BOB.remoteBot().editor(FILE).getText();
 

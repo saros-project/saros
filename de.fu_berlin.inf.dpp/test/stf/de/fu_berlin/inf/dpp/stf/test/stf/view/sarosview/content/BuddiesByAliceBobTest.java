@@ -115,7 +115,7 @@ public class BuddiesByAliceBobTest extends StfTestCase {
         Util.removeBuddiesFromContactList(ALICE, BOB);
         assertFalse(ALICE.superBot().views().sarosView().hasBuddy(BOB.getJID()));
         assertFalse(BOB.superBot().views().sarosView().hasBuddy(ALICE.getJID()));
-        ALICE.remoteBot().sleep(5000);
+        Thread.sleep(5000);
     }
 
     @Test

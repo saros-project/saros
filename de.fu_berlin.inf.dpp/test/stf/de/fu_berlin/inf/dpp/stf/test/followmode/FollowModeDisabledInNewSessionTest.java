@@ -51,7 +51,7 @@ public class FollowModeDisabledInNewSessionTest extends StfTestCase {
         ALICE.superBot().views().packageExplorerView()
             .selectFile("foo", "readme.txt").open();
 
-        ALICE.remoteBot().sleep(1000);
+        Thread.sleep(1000);
 
         // this passes WTF !
         assertFalse("BOB is following ALICE", BOB.superBot().views()

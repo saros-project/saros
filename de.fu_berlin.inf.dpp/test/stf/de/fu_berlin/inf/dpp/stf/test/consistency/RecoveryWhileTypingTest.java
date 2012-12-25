@@ -72,7 +72,8 @@ public class RecoveryWhileTypingTest extends StfTestCase {
         aliceEditTaskThread.join(10000);
         aliceEditTaskThread.verify();
 
-        ALICE.remoteBot().sleep(1000);
+        Thread.sleep(1000);
+
         String aliceText = ALICE.remoteBot().editor("readme.txt").getText();
         String bobText = BOB.remoteBot().editor("readme.txt").getText();
         assertEquals(aliceText, bobText);

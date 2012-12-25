@@ -71,10 +71,10 @@ public class MenuSarosByAliceBobTest extends StfTestCase {
 
         IRemoteBotShell shell = ALICE.remoteBot().shell(SHELL_SHARE_PROJECT);
         shell.activate();
-        shell.bot().sleep(1000);
+        Thread.sleep(1000);
         shell.bot().tree().selectTreeItem(Constants.PROJECT1).check();
         shell.bot().button(NEXT).click();
-        shell.bot().sleep(1000);
+        Thread.sleep(1000);
         shell.bot().tree()
             .selectTreeItemWithRegex(Pattern.quote(BOB.getBaseJid()) + ".*")
             .check();

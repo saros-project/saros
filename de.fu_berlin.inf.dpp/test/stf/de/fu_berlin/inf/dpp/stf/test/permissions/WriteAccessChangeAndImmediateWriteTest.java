@@ -69,7 +69,8 @@ public class WriteAccessChangeAndImmediateWriteTest extends StfTestCase {
             .grantWriteAccess();
         BOB.remoteBot().editor(Constants.CLS1_SUFFIX)
             .setTextFromFile(Constants.CP2);
-        BOB.remoteBot().sleep(5000);
+
+        Thread.sleep(5000);
 
         assertFalse(BOB.remoteBot().view(VIEW_SAROS)
             .toolbarButton(TB_NO_INCONSISTENCIES).isEnabled());

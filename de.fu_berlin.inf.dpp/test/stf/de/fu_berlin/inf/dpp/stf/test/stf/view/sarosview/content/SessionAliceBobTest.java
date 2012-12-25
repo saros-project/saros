@@ -86,7 +86,7 @@ public class SessionAliceBobTest extends StfTestCase {
     }
 
     @Test
-    public void testFollowMode() throws RemoteException {
+    public void testFollowMode() throws Exception {
         assertFalse(ALICE.superBot().views().sarosView()
             .selectParticipant(BOB.getJID()).isFollowing());
         assertFalse(BOB.superBot().views().sarosView()
@@ -97,7 +97,7 @@ public class SessionAliceBobTest extends StfTestCase {
             .open();
 
         // wait for the activity to reach BOB
-        ALICE.remoteBot().sleep(2000);
+        Thread.sleep(2000);
 
         BOB.superBot().views().sarosView().selectParticipant(ALICE.getJID())
             .followParticipant();
@@ -120,7 +120,7 @@ public class SessionAliceBobTest extends StfTestCase {
     }
 
     @Test
-    public void testStopFollowing() throws RemoteException {
+    public void testStopFollowing() throws Exception {
         assertFalse(ALICE.superBot().views().sarosView()
             .selectParticipant(BOB.getJID()).isFollowing());
         assertFalse(BOB.superBot().views().sarosView()
@@ -131,7 +131,7 @@ public class SessionAliceBobTest extends StfTestCase {
             .open();
 
         // wait for the activity to reach BOB
-        ALICE.remoteBot().sleep(2000);
+        Thread.sleep(2000);
 
         BOB.superBot().views().sarosView().selectParticipant(ALICE.getJID())
             .followParticipant();
@@ -155,7 +155,7 @@ public class SessionAliceBobTest extends StfTestCase {
      * @throws RemoteException
      */
     @Test
-    public void jumpToSelectedBuddy() throws RemoteException {
+    public void jumpToSelectedBuddy() throws Exception {
 
         BOB.remoteBot().closeAllEditors();
 
@@ -171,7 +171,7 @@ public class SessionAliceBobTest extends StfTestCase {
         BOB.superBot().views().sarosView().selectParticipant(ALICE.getJID())
             .jumpToPositionOfSelectedBuddy();
 
-        BOB.remoteBot().sleep(500);
+        Thread.sleep(500);
 
         assertTrue(BOB.remoteBot().editor(Constants.CLS2_SUFFIX).isActive());
 
@@ -185,7 +185,7 @@ public class SessionAliceBobTest extends StfTestCase {
 
         assertFalse(BOB.remoteBot().isEditorOpen(Constants.CLS1_SUFFIX));
 
-        BOB.remoteBot().sleep(500);
+        Thread.sleep(500);
 
         BOB.superBot().views().sarosView().selectParticipant(ALICE.getJID())
             .jumpToPositionOfSelectedBuddy();
@@ -194,7 +194,7 @@ public class SessionAliceBobTest extends StfTestCase {
     }
 
     @Test
-    public void inconsistencyDetected() throws RemoteException {
+    public void inconsistencyDetected() throws Exception {
         ALICE.superBot().views().packageExplorerView()
             .selectClass(Constants.PROJECT1, Constants.PKG1, Constants.CLS1)
             .open();
@@ -212,7 +212,9 @@ public class SessionAliceBobTest extends StfTestCase {
         String editorTextOfBob = BOB.remoteBot().editor(Constants.CLS1_SUFFIX)
             .getText();
         assertFalse(editorTextOfAlice.equals(editorTextOfBob));
-        BOB.remoteBot().sleep(10000);
+
+        Thread.sleep(10000);
+
         BOB.superBot().views().sarosView().waitUntilIsInconsistencyDetected();
         BOB.superBot().views().sarosView().resolveInconsistency();
         editorTextOfAlice = ALICE.remoteBot().editor(Constants.CLS1_SUFFIX)
@@ -265,7 +267,7 @@ public class SessionAliceBobTest extends StfTestCase {
     }
 
     @Test
-    public void addProjects() throws RemoteException {
+    public void addProjects() throws Exception {
         ALICE.superBot().views().packageExplorerView().tree().newC()
             .javaProject(Constants.PROJECT2);
         ALICE.superBot().views().sarosView().selectSession()
@@ -275,7 +277,7 @@ public class SessionAliceBobTest extends StfTestCase {
 
         // TODO remove this, we have to wait for project arrival
         // or next test cases will fail because of an uncloseable window
-        BOB.remoteBot().sleep(10000);
+        Thread.sleep(10000);
 
     }
 }

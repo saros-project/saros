@@ -39,11 +39,11 @@ public class SimpleFollowModeITest extends StfTestCase {
             .followParticipant();
 
         ALICE.remoteBot().editor("readme.txt").typeText("123456789");
-        ALICE.remoteBot().sleep(1000);
+        Thread.sleep(1000);
 
         ALICE.remoteBot().editor("readme.txt").selectCurrentLine();
 
-        ALICE.remoteBot().sleep(1000);
+        Thread.sleep(1000);
 
         assertEquals(ALICE.remoteBot().editor("readme.txt").getSelection(), BOB
             .remoteBot().editor("readme.txt").getSelectionByAnnotation());
@@ -55,7 +55,7 @@ public class SimpleFollowModeITest extends StfTestCase {
             .editor("readme.txt")
             .pressShortcut(IKeyLookup.BACKSPACE_NAME, IKeyLookup.BACKSPACE_NAME);
 
-        ALICE.remoteBot().sleep(1000);
+        Thread.sleep(1000);
 
         assertEquals(ALICE.remoteBot().editor("readme.txt")
             .getTextOnCurrentLine(), BOB.remoteBot().editor("readme.txt")
@@ -69,7 +69,7 @@ public class SimpleFollowModeITest extends StfTestCase {
         // navigateTo does not trigger events
 
         ALICE.remoteBot().editor("readme.txt").typeText("0");
-        ALICE.remoteBot().sleep(1000);
+        Thread.sleep(1000);
 
         List<Integer> viewport = BOB.remoteBot().editor("readme.txt")
             .getViewport();

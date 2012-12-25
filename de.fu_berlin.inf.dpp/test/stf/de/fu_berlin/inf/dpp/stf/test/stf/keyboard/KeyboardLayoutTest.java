@@ -28,7 +28,6 @@ public class KeyboardLayoutTest extends StfTestCase {
 
         ALICE.remoteBot().editor("text.txt").typeText(textToTest);
 
-        ALICE.remoteBot().sleep(500);
         assertEquals("keyboard layout is misconfigured", textToTest, ALICE
             .remoteBot().editor("text.txt").getText());
     }

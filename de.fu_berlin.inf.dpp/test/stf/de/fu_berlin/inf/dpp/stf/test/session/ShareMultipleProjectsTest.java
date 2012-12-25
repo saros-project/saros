@@ -92,12 +92,12 @@ public class ShareMultipleProjectsTest extends StfTestCase {
         IRemoteBotShell shell = ALICE.remoteBot().shell(
             SHELL_ADD_PROJECTS_TO_SESSION);
         shell.activate();
-        shell.bot().sleep(1000);
+        Thread.sleep(1000);
 
         List<String> items = shell.bot().tree().getTextOfItems();
 
         shell.bot().button(CANCEL).click();
-        shell.bot().sleep(1000);
+        Thread.sleep(1000);
         shell.waitShortUntilIsClosed();
 
         for (String item : items)

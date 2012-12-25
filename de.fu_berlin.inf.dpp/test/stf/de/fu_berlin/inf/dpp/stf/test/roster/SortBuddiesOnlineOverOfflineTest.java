@@ -6,7 +6,6 @@ import static de.fu_berlin.inf.dpp.stf.client.tester.SarosTester.CARL;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-import java.rmi.RemoteException;
 import java.util.List;
 
 import org.junit.BeforeClass;
@@ -24,10 +23,10 @@ public class SortBuddiesOnlineOverOfflineTest extends StfTestCase {
     }
 
     @Test
-    public void testSortBuddiesOnlineOverOffline() throws RemoteException {
+    public void testSortBuddiesOnlineOverOffline() throws Exception {
 
         // wait for roster update
-        ALICE.remoteBot().sleep(1000);
+        Thread.sleep(1000);
 
         List<String> buddies = ALICE.superBot().views().sarosView()
             .getAllBuddies();
@@ -42,7 +41,7 @@ public class SortBuddiesOnlineOverOfflineTest extends StfTestCase {
         BOB.superBot().views().sarosView().waitUntilIsDisconnected();
 
         // wait for roster update
-        ALICE.remoteBot().sleep(1000);
+        Thread.sleep(1000);
 
         buddies = ALICE.superBot().views().sarosView().getAllBuddies();
 
@@ -56,7 +55,7 @@ public class SortBuddiesOnlineOverOfflineTest extends StfTestCase {
         BOB.superBot().views().sarosView().waitUntilIsConnected();
 
         // wait for roster update
-        ALICE.remoteBot().sleep(1000);
+        Thread.sleep(1000);
 
         buddies = ALICE.superBot().views().sarosView().getAllBuddies();
 
@@ -70,7 +69,7 @@ public class SortBuddiesOnlineOverOfflineTest extends StfTestCase {
         CARL.superBot().views().sarosView().disconnect();
 
         // wait for roster update
-        ALICE.remoteBot().sleep(1000);
+        Thread.sleep(1000);
 
         buddies = ALICE.superBot().views().sarosView().getAllBuddies();
 

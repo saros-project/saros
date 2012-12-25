@@ -213,7 +213,7 @@ public class BasicWidgetTreeTest extends StfTestCase {
     }
 
     @Test
-    public void selectTreeItemWithRegexs() throws RemoteException {
+    public void selectTreeItemWithRegexs() throws Exception {
         ALICE.superBot().views().packageExplorerView().tree().newC()
             .javaProject(Constants.SVN_PROJECT_COPY);
 
@@ -227,7 +227,7 @@ public class BasicWidgetTreeTest extends StfTestCase {
                 Constants.SVN_PROJECT_PATH);
 
         IRemoteBotView view = ALICE.remoteBot().view(VIEW_PACKAGE_EXPLORER);
-        ALICE.remoteBot().sleep(1000);
+        Thread.sleep(1000);
 
         view.show();
         view.bot()

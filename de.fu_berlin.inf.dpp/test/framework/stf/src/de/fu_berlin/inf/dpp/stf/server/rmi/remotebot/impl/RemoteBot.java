@@ -1826,8 +1826,8 @@ public abstract class RemoteBot extends StfRemoteObject implements IRemoteBot {
 
     @Override
     public void waitUntil(ICondition condition) throws RemoteException {
-        swtBot
-            .waitUntil(condition, SarosSWTBotPreferences.SAROS_DEFAULT_TIMEOUT);
+        swtBot.waitUntil(condition,
+            SarosSWTBotPreferences.SAROS_DEFAULT_TIMEOUT);
     }
 
     @Override
@@ -1843,11 +1843,6 @@ public abstract class RemoteBot extends StfRemoteObject implements IRemoteBot {
     @Override
     public void logMessage(String message) throws RemoteException {
         log.info(message);
-    }
-
-    @Override
-    public void sleep(long millis) throws RemoteException {
-        swtBot.sleep(millis);
     }
 
     @Override

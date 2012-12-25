@@ -101,7 +101,7 @@ public class HostInvitesBelatedlyTest extends StfTestCase {
         Util.buildSessionConcurrently(Constants.PROJECT1,
             TypeOfCreateProject.EXIST_PROJECT, ALICE, BOB);
 
-        ALICE.remoteBot().sleep(5000);
+        Thread.sleep(5000);
 
         String CLSContentOfAlice = ALICE.remoteBot()
             .editor(Constants.CLS1_SUFFIX).getText();
