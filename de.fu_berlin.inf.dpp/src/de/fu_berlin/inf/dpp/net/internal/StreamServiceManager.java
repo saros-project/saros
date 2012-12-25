@@ -46,8 +46,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.apache.commons.lang.ObjectUtils;
 import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.SubMonitor;
 import org.jivesoftware.smack.ConnectionListener;
 import org.jivesoftware.smack.PacketListener;
 import org.jivesoftware.smack.filter.PacketFilter;
@@ -1007,7 +1005,7 @@ public class StreamServiceManager implements Startable {
      * </p>
      * <p>
      * Another purpose is sending data immediately via
-     * {@link PacketSender#sendPacket(TransferDescription, byte[], SubMonitor)}.
+     * {@link PacketSender#sendPacket(TransferDescription, byte[])}.
      * </p>
      * <p>
      * Interrupting the Thread will cause a shutdown.
@@ -1597,8 +1595,8 @@ public class StreamServiceManager implements Startable {
      */
     public class StreamPacket {
         /**
-         * Timeout for receiving data (
-         * {@link IncomingTransferObject#accept(IProgressMonitor)}) in seconds.
+         * Timeout for receiving data ( {@link IncomingTransferObject#accept})
+         * in seconds.
          */
         public static final int DATA_RECEIVE_TIMEOUT = 10;
 

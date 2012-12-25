@@ -23,12 +23,10 @@ import java.util.Collection;
 import java.util.List;
 
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.jivesoftware.smack.packet.IQ;
+import org.jivesoftware.smack.packet.IQ.Type;
 
 import de.fu_berlin.inf.dpp.FileList;
 import de.fu_berlin.inf.dpp.User;
-import de.fu_berlin.inf.dpp.activities.business.FileActivity;
-import de.fu_berlin.inf.dpp.activities.serializable.FileActivityDataObject;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
 import de.fu_berlin.inf.dpp.invitation.InvitationProcess;
@@ -100,16 +98,10 @@ public interface ITransmitter {
     /**
      * Sends given list of TimedActivities to the given recipient.
      * 
-     * This list MUST not contain any {@link FileActivityDataObject}s where
-     * {@link FileActivityDataObject#getType()} ==
-     * {@link FileActivity.Type#Created} as binary data is not supported in
-     * messages bodies.
-     * 
-     * TODO: Add progress.
-     * 
      * @param recipient
      *            The JID of the user who is to receive the given list of timed
      *            activityDataObjects.
+     * 
      * @param timedActivities
      *            The list of timed activityDataObjects to send to the user.
      * 
@@ -118,16 +110,13 @@ public interface ITransmitter {
      *             as returned by {@link SarosNet#getMyJID()} or the given list
      *             is null or contains no activityDataObjects.
      * 
-     * @throws AssertionError
-     *             if the given list of timed activityDataObjects contains
-     *             FileActivities of type created AND the application is run
-     *             using asserts.
      */
     public void sendTimedActivities(JID recipient,
         List<TimedActivityDataObject> timedActivities);
 
     /**
-     * Sends a query, a {@link IQ.Type} GET, to the user with given {@link JID}.
+     * Sends an IQ {@linkplain Type#GET GET} query to the user with given
+     * {@link JID} .
      * 
      * Example using provider:
      * <p>

@@ -384,16 +384,15 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
      * object, so even if an another object "cancels" the invitation (
      * {@link #localCancel(String, CancelOption)}, {@link #remoteCancel(String)}
      * ), the exceptions will be thrown up on the stack to the caller of
-     * {@link #start(SubMonitor)}, and not to the object which has "cancelled"
-     * the process. The cancel methods (
-     * {@link #localCancel(String, CancelOption)}, {@link #remoteCancel(String)}
-     * ) do not cancel the invitation alone, but they set the
-     * {@link #cancellationCause} and cancel the {@link #monitor}. Now it is the
-     * responsibility of the objects which use the {@link #monitor} to throw a
-     * {@link SarosCancellationException} (or it's subclasses), which will be
-     * caught by this object causing a call to this method. If this does not
-     * happen, the next {@link #checkCancellation(CancelOption)} cancels the
-     * invitation.
+     * {@link #start}, and not to the object which has "cancelled" the process.
+     * The cancel methods ( {@link #localCancel(String, CancelOption)},
+     * {@link #remoteCancel(String)} ) do not cancel the invitation alone, but
+     * they set the {@link #cancellationCause} and cancel the {@link #monitor}.
+     * Now it is the responsibility of the objects which use the
+     * {@link #monitor} to throw a {@link SarosCancellationException} (or it's
+     * subclasses), which will be caught by this object causing a call to this
+     * method. If this does not happen, the next
+     * {@link #checkCancellation(CancelOption)} cancels the invitation.
      */
     protected void executeCancellation() throws SarosCancellationException {
 
@@ -633,7 +632,7 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
     }
 
     private List<FileList> deserializeRemoteFileList(Packet packet)
-        throws SarosCancellationException, IOException {
+        throws IOException {
         IncomingTransferObject result = new IncomingTransferObjectExtensionProvider()
             .getPayload(packet);
 

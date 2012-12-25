@@ -260,11 +260,6 @@ public final class SarosView extends StfRemoteObject implements ISarosView {
         return ContextMenusInSessionArea.getInstance();
     }
 
-    public IChatroom selectChatroom() throws RemoteException {
-        view.bot().cTabItem();
-        return Chatroom.getInstance();
-    }
-
     /**********************************************
      * 
      * state
