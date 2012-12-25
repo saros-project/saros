@@ -16,10 +16,12 @@ public class ExistsChatMessage extends DefaultCondition {
         this.message = message;
     }
 
+    @Override
     public String getFailureMessage() {
         return null;
     }
 
+    @Override
     public boolean test() throws Exception {
         return chatroom.compareChatMessage(jid, message);
     }

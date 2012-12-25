@@ -41,6 +41,7 @@ public class ChangeColorActivityDataObject extends AbstractActivityDataObject {
     /**
      * {@inheritDoc}
      */
+    @Override
     public IActivity getActivity(ISarosSession sharedProject) {
         return new ChangeColorActivity(sharedProject.getUser(source),
             sharedProject.getUser(target), this.color);

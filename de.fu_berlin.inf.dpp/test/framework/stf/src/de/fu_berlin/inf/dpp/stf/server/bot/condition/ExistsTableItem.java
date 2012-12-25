@@ -14,11 +14,13 @@ public class ExistsTableItem extends DefaultCondition {
         this.itemText = itemText;
     }
 
+    @Override
     public String getFailureMessage() {
 
         return null;
     }
 
+    @Override
     public boolean test() throws Exception {
         return table.containsItem(itemText);
     }

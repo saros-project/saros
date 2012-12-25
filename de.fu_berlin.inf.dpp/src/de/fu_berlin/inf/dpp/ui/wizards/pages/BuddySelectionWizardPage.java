@@ -53,10 +53,12 @@ public class BuddySelectionWizardPage extends WizardPage {
      * state according to the selected {@link JID}s.
      */
     protected BuddySelectionListener buddySelectionListener = new BuddySelectionListener() {
+        @Override
         public void buddySelectionChanged(BuddySelectionChangedEvent event) {
             updatePageCompletion();
         }
 
+        @Override
         public void filterNonSarosBuddiesChanged(
             FilterNonSarosBuddiesChangedEvent event) {
 
@@ -72,10 +74,12 @@ public class BuddySelectionWizardPage extends WizardPage {
      * This listener update the page completion if someone's presence changed.
      */
     protected DiscoveryManagerListener discoveryManagerListener = new DiscoveryManagerListener() {
+        @Override
         public void featureSupportUpdated(final JID jid, String feature,
             boolean isSupported) {
             if (Saros.NAMESPACE.equals(feature)) {
                 Utils.runSafeSWTAsync(log, new Runnable() {
+                    @Override
                     public void run() {
                         updatePageCompletion();
                     }
@@ -105,6 +109,7 @@ public class BuddySelectionWizardPage extends WizardPage {
         super.dispose();
     }
 
+    @Override
     public void createControl(Composite parent) {
         Composite composite = new Composite(parent, SWT.NONE);
         setControl(composite);

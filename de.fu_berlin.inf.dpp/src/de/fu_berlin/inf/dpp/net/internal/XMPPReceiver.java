@@ -149,6 +149,7 @@ public class XMPPReceiver {
     public SarosPacketCollector createCollector(PacketFilter filter) {
         final SarosPacketCollector collector = new SarosPacketCollector(
             new CancelHook() {
+                @Override
                 public void cancelPacketCollector(SarosPacketCollector collector) {
                     removePacketListener(collector);
                 }
@@ -270,6 +271,7 @@ public class XMPPReceiver {
         packet.addExtension(extension);
 
         dispatchThreadContext.executeAsDispatch(new Runnable() {
+            @Override
             public void run() {
                 processPacket(packet);
             }

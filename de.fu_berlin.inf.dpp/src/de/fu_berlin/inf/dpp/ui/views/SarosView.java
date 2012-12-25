@@ -108,7 +108,7 @@ import de.fu_berlin.inf.nebula.utils.LayoutUtils;
  *               used by Saros, an idea about how to code the user interface and
  *               how it communicates with the underlying business logic.
  * 
- *               We begin here at the SarosView, the central class that implements 
+ *               We begin here at the SarosView, the central class that implements
  *               the Saros Eclipse view. Notice that each view inherits from the
  *               Eclipse ViewPart, which manages most of the view's mechanics,
  *               leaving us to fill in the missing parts specific to our view.
@@ -153,27 +153,33 @@ public class SarosView extends ViewPart {
     };
 
     protected IPartListener2 partListener = new IPartListener2() {
+        @Override
         public void partInputChanged(IWorkbenchPartReference partRef) {
             // do nothing
         }
 
+        @Override
         public void partVisible(IWorkbenchPartReference partRef) {
             // do nothing
         }
 
+        @Override
         public void partHidden(IWorkbenchPartReference partRef) {
             // do nothing
         }
 
+        @Override
         public void partOpened(IWorkbenchPartReference partRef) {
             // do nothing
         }
 
+        @Override
         public void partDeactivated(IWorkbenchPartReference partRef) {
             if (buddySessionDisplayComposite != null
                 && !buddySessionDisplayComposite.isDisposed()) {
                 buddySessionDisplayComposite.getViewer().setSelection(
                     new ISelection() {
+                        @Override
                         public boolean isEmpty() {
                             return true;
                         }
@@ -181,20 +187,24 @@ public class SarosView extends ViewPart {
             }
         }
 
+        @Override
         public void partClosed(IWorkbenchPartReference partRef) {
             getViewSite().getPage().removePartListener(partListener);
         }
 
+        @Override
         public void partBroughtToTop(IWorkbenchPartReference partRef) {
             // do nothing
         }
 
+        @Override
         public void partActivated(IWorkbenchPartReference partRef) {
             // do nothing
         }
     };
 
     protected IPropertyChangeListener propertyListener = new IPropertyChangeListener() {
+        @Override
         public void propertyChange(PropertyChangeEvent event) {
             if (event.getProperty().equals(
                 PreferenceConstants.ENABLE_BALLOON_NOTIFICATION)) {
@@ -443,6 +453,7 @@ public class SarosView extends ViewPart {
         final DeleteContactAction deleteContactAction = new DeleteContactAction();
         final ConnectionTestAction connectionTestAction = new ConnectionTestAction();
         menuManager.addMenuListener(new IMenuListener() {
+            @Override
             public void menuAboutToShow(final IMenuManager manager) {
                 /*
                  * Do not display the following actions if participants are
@@ -488,6 +499,7 @@ public class SarosView extends ViewPart {
         openChatAction = new OpenChatAction(chatRooms);
 
         menuManager.addMenuListener(new IMenuListener() {
+            @Override
             public void menuAboutToShow(IMenuManager manager) {
                 /*
                  * Do not display the following actions if no participants are
@@ -539,6 +551,7 @@ public class SarosView extends ViewPart {
      */
     protected void addAdditionsSeparator(MenuManager menuManager) {
         menuManager.addMenuListener(new IMenuListener() {
+            @Override
             public void menuAboutToShow(IMenuManager manager) {
                 manager.add(new Separator(
                     IWorkbenchActionConstants.MB_ADDITIONS));
@@ -548,6 +561,7 @@ public class SarosView extends ViewPart {
 
     protected void addMenuStartSeparator(MenuManager menuManager) {
         menuManager.addMenuListener(new IMenuListener() {
+            @Override
             public void menuAboutToShow(IMenuManager manager) {
                 Separator menuStart = new Separator("menustart");
                 menuStart.setVisible(false);
@@ -583,6 +597,7 @@ public class SarosView extends ViewPart {
             return;
 
         Utils.runSafeSWTAsync(log, new Runnable() {
+            @Override
             public void run() {
 
                 if (control != null) {
@@ -635,6 +650,7 @@ public class SarosView extends ViewPart {
      */
     public static void clearNotifications() {
         Utils.runSafeSWTAsync(log, new Runnable() {
+            @Override
             public void run() {
                 BalloonNotification.removeAllActiveNotifications();
             }

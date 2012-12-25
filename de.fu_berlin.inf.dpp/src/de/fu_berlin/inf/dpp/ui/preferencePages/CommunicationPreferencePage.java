@@ -245,6 +245,7 @@ public class CommunicationPreferencePage extends FieldEditorPreferencePage
         return outputArray;
     }
 
+    @Override
     public void init(IWorkbench workbench) {
         // TODO Auto-generated method stub
     }

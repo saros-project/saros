@@ -88,6 +88,7 @@ public class AdvancedPreferencePage extends FieldEditorPreferencePage implements
 
     }
 
+    @Override
     public void init(IWorkbench workbench) {
         // No init necessary
     }

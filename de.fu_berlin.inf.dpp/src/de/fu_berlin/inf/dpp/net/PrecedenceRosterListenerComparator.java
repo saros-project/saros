@@ -36,6 +36,7 @@ public class PrecedenceRosterListenerComparator implements
         return Integer.MAX_VALUE - 1;
     }
 
+    @Override
     public int compare(IRosterListener o1, IRosterListener o2) {
 
         int p1 = precedenceIndex(o1);

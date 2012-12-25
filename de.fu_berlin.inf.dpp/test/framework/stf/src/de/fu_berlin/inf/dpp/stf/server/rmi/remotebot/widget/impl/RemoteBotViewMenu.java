@@ -24,18 +24,22 @@ public final class RemoteBotViewMenu extends StfRemoteObject implements
 
     }
 
+    @Override
     public void click() throws RemoteException {
         widget.click();
     }
 
+    @Override
     public String getToolTipText() throws RemoteException {
         return widget.getText();
     }
 
+    @Override
     public String getText() throws RemoteException {
         return widget.getText();
     }
 
+    @Override
     public boolean isChecked() throws RemoteException {
         return widget.isChecked();
     }

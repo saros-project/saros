@@ -82,6 +82,7 @@ public class ViewportActivityDataObject extends
             + this.topIndex + "," + this.bottomIndex + "))";
     }
 
+    @Override
     public IActivity getActivity(ISarosSession sarosSession) {
         return new ViewportActivity(sarosSession.getUser(source), topIndex,
             bottomIndex, path.toSPath(sarosSession));

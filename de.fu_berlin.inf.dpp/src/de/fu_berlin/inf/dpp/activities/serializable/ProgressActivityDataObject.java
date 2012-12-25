@@ -48,6 +48,7 @@ public class ProgressActivityDataObject extends AbstractActivityDataObject {
             + ",action:" + action + ")";
     }
 
+    @Override
     public IActivity getActivity(ISarosSession sarosSession) {
 
         User user = sarosSession.getUser(source);

@@ -67,6 +67,7 @@ public class ResourceChangeValidator extends ModelProvider {
          * 
          * @see org.eclipse.core.resources.IResourceDeltaVisitor
          */
+        @Override
         public boolean visit(IResourceDelta delta) throws CoreException {
 
             // We already check this in validateChange

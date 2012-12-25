@@ -27,10 +27,12 @@ public class ProjectsAddedActivity extends AbstractActivity {
         this.processID = processID;
     }
 
+    @Override
     public void dispatch(IActivityReceiver receiver) {
         receiver.receive(this);
     }
 
+    @Override
     public IActivityDataObject getActivityDataObject(ISarosSession sarosSession) {
         List<ProjectExchangeInfoDataObject> pInfos = new ArrayList<ProjectExchangeInfoDataObject>(
             this.projectInfos.size());

@@ -44,6 +44,7 @@ public class JIDCombo {
         registerListeners();
 
         Utils.runSafeSWTAsync(null, new Runnable() {
+            @Override
             public void run() {
                 JIDCombo.this.control.setSelection(new Point(0, 0));
             }

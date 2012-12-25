@@ -61,6 +61,7 @@ public class ProjectDeltaVisitor implements IResourceDeltaVisitor {
      */
     private boolean postponeSending = false;
 
+    @Override
     public boolean visit(IResourceDelta delta) {
         IResource resource = delta.getResource();
         if (resource.isDerived()) {

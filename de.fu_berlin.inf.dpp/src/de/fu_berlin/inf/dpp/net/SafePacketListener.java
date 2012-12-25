@@ -33,8 +33,10 @@ public class SafePacketListener implements PacketListener {
         this.log = log;
     }
 
+    @Override
     public void processPacket(final Packet packet) {
         Utils.runSafeSync(log, new Runnable() {
+            @Override
             public void run() {
                 toForwardTo.processPacket(packet);
             }

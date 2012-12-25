@@ -90,14 +90,17 @@ public abstract class StreamJob extends Job {
      */
     protected class StreamJobListener implements StreamSessionListener {
 
+        @Override
         public void errorOccured(StreamException e) {
             StreamJob.this.streamException = e;
             StreamJob.this.cancel();
         }
 
+        @Override
         public void sessionStopped() {
             StreamJob.this.stopped = true;
             Utils.runSafeAsync(log, new Runnable() {
+                @Override
                 public void run() {
                     StreamJob.this.cancel();
                     try {

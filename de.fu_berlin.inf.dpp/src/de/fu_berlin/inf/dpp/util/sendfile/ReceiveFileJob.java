@@ -202,6 +202,7 @@ public class ReceiveFileJob extends StreamJob {
         throws SarosCancellationException {
         Callable<String> getFile = new Callable<String>() {
 
+            @Override
             public String call() throws Exception {
                 FileDialog fd = new FileDialog(EditorAPI.getShell(), SWT.SAVE);
                 fd.setText(Messages.SendFileAction_dialog_choose_location_title);

@@ -29,10 +29,12 @@ public class SelectionRetriever<AdapterType> implements
         this.adapter = adapter;
     }
 
+    @Override
     public List<AdapterType> getSelection() {
         return this.getSelection(null);
     }
 
+    @Override
     public List<AdapterType> getSelection(String partId) {
         List<AdapterType> objects = new ArrayList<AdapterType>();
 
@@ -47,6 +49,7 @@ public class SelectionRetriever<AdapterType> implements
         return objects;
     }
 
+    @Override
     public List<AdapterType> getOverallSelection() {
         List<AdapterType> objects = new ArrayList<AdapterType>();
 

@@ -52,6 +52,7 @@ public class Pair<P, V> {
      */
     public static <P extends Comparable<P>, V> Comparator<Pair<P, V>> pCompare() {
         return new Comparator<Pair<P, V>>() {
+            @Override
             public int compare(Pair<P, V> arg0, Pair<P, V> arg1) {
                 return arg0.p.compareTo(arg1.p);
             }
@@ -61,6 +62,7 @@ public class Pair<P, V> {
     public static <P, V> Comparator<Pair<P, V>> pCompare(
         final Comparator<P> comp) {
         return new Comparator<Pair<P, V>>() {
+            @Override
             public int compare(Pair<P, V> arg0, Pair<P, V> arg1) {
                 return comp.compare(arg0.p, arg1.p);
             }
@@ -131,6 +133,7 @@ public class Pair<P, V> {
 
     public static <P, V extends Comparable<V>> Comparator<Pair<P, V>> vCompare() {
         return new Comparator<Pair<P, V>>() {
+            @Override
             public int compare(Pair<P, V> arg0, Pair<P, V> arg1) {
                 return arg0.v.compareTo(arg1.v);
             }
@@ -140,6 +143,7 @@ public class Pair<P, V> {
     public static <P, V> Comparator<Pair<P, V>> vCompare(
         final Comparator<V> vComp) {
         return new Comparator<Pair<P, V>>() {
+            @Override
             public int compare(Pair<P, V> arg0, Pair<P, V> arg1) {
                 return vComp.compare(arg0.v, arg1.v);
             }

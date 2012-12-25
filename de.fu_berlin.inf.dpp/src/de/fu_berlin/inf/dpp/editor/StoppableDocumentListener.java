@@ -38,6 +38,7 @@ public class StoppableDocumentListener implements IDocumentListener {
 
     boolean enabled = true;
 
+    @Override
     public void documentAboutToBeChanged(final DocumentEvent event) {
 
         if (enabled) {
@@ -51,6 +52,7 @@ public class StoppableDocumentListener implements IDocumentListener {
         }
     }
 
+    @Override
     public void documentChanged(final DocumentEvent event) {
         // do nothing. We handled everything in documentAboutToBeChanged
     }

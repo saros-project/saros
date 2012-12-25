@@ -28,14 +28,17 @@ public class DropSilentlyPacketExtension implements PacketExtension {
 
     public static final String ELEMENT = "drop";
 
+    @Override
     public String getElementName() {
         return DropSilentlyPacketExtension.ELEMENT;
     }
 
+    @Override
     public String getNamespace() {
         return DropSilentlyPacketExtension.NAMESPACE;
     }
 
+    @Override
     public String toXML() {
         StringBuilder buf = new StringBuilder();
         buf.append("<").append(getElementName()).append(" xmlns=\"")

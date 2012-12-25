@@ -131,6 +131,7 @@ public class FileActivityDataObject extends AbstractProjectActivityDataObject {
         return Purpose.RECOVERY.equals(purpose);
     }
 
+    @Override
     public IActivity getActivity(ISarosSession sarosSession) {
         return new FileActivity(sarosSession.getUser(source), type,
             path.toSPath(sarosSession),

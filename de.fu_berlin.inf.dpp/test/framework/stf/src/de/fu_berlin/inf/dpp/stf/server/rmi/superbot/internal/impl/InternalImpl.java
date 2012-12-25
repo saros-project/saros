@@ -88,6 +88,7 @@ public final class InternalImpl extends StfRemoteObject implements IInternal {
         }
     }
 
+    @Override
     public void changeSarosVersion(String version) throws RemoteException {
 
         Version v;
@@ -128,6 +129,7 @@ public final class InternalImpl extends StfRemoteObject implements IInternal {
 
     }
 
+    @Override
     public void resetSarosVersion() throws RemoteException {
 
         log.trace("attempting to reset saros version");
@@ -153,6 +155,7 @@ public final class InternalImpl extends StfRemoteObject implements IInternal {
         sarosBundle = null;
     }
 
+    @Override
     public void createFile(String projectName, String path, String content)
         throws RemoteException {
 
@@ -184,6 +187,7 @@ public final class InternalImpl extends StfRemoteObject implements IInternal {
         }
     }
 
+    @Override
     public void append(String projectName, String path, String content)
         throws RemoteException {
         log.trace("appending content '" + content + "' to file '" + path
@@ -204,6 +208,7 @@ public final class InternalImpl extends StfRemoteObject implements IInternal {
 
     }
 
+    @Override
     public void createFile(String projectName, String path, int size,
         boolean compressAble) throws RemoteException {
 
@@ -229,6 +234,7 @@ public final class InternalImpl extends StfRemoteObject implements IInternal {
         }
     }
 
+    @Override
     public boolean clearWorkspace() throws RemoteException {
         boolean error = false;
 
@@ -246,6 +252,7 @@ public final class InternalImpl extends StfRemoteObject implements IInternal {
         return !error;
     }
 
+    @Override
     public long getFileSize(String projectName, String path)
         throws RemoteException {
 
@@ -254,6 +261,7 @@ public final class InternalImpl extends StfRemoteObject implements IInternal {
 
     }
 
+    @Override
     public void createProject(String projectName) throws RemoteException {
 
         log.trace("creating project: " + projectName);
@@ -270,6 +278,7 @@ public final class InternalImpl extends StfRemoteObject implements IInternal {
         }
     }
 
+    @Override
     public void createJavaProject(String projectName) throws RemoteException {
 
         log.trace("creating java project: " + projectName);
@@ -313,6 +322,7 @@ public final class InternalImpl extends StfRemoteObject implements IInternal {
         }
     }
 
+    @Override
     public void createFolder(String projectName, String path)
         throws RemoteException {
 
@@ -344,6 +354,7 @@ public final class InternalImpl extends StfRemoteObject implements IInternal {
         }
     }
 
+    @Override
     public void createJavaClass(String projectName, String packageName,
         String className) throws RemoteException {
         String path = "src/" + packageName.replace(".", "/") + "/" + className
@@ -361,10 +372,12 @@ public final class InternalImpl extends StfRemoteObject implements IInternal {
 
     }
 
+    @Override
     public boolean existsResource(String path) throws RemoteException {
         return ResourcesPlugin.getWorkspace().getRoot().exists(new Path(path));
     }
 
+    @Override
     public byte[] getFileContent(String projectName, String path)
         throws RemoteException {
 

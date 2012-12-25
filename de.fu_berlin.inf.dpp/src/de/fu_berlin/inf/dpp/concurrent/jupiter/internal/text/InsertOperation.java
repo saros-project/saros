@@ -115,6 +115,7 @@ public class InsertOperation implements ITextOperation {
         this(position, text, origin);
     }
 
+    @Override
     public int getPosition() {
         return this.position;
     }
@@ -122,10 +123,12 @@ public class InsertOperation implements ITextOperation {
     /**
      * @return the text to be inserted
      */
+    @Override
     public String getText() {
         return this.text;
     }
 
+    @Override
     public int getTextLength() {
         return this.text.length();
     }
@@ -178,11 +181,13 @@ public class InsertOperation implements ITextOperation {
         return result;
     }
 
+    @Override
     public List<TextEditActivity> toTextEdit(SPath path, User source) {
         return Collections.singletonList(new TextEditActivity(source,
             getPosition(), getText(), "", path));
     }
 
+    @Override
     public List<ITextOperation> getTextOperations() {
         return Collections.singletonList((ITextOperation) this);
     }
@@ -190,6 +195,7 @@ public class InsertOperation implements ITextOperation {
     /**
      * {@inheritDoc}
      */
+    @Override
     public ITextOperation invert() {
         return new DeleteOperation(getPosition(), getText());
     }

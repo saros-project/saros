@@ -25,6 +25,7 @@ public class DispatchingRosterListener implements IRosterListener {
     protected List<IRosterListener> listeners = new CopyOnWriteArrayList<IRosterListener>();
     protected Comparator<IRosterListener> listenerComparator = new PrecedenceRosterListenerComparator();
 
+    @Override
     public void entriesAdded(Collection<String> addresses) {
         for (IRosterListener listener : this.listeners) {
             try {
@@ -35,6 +36,7 @@ public class DispatchingRosterListener implements IRosterListener {
         }
     }
 
+    @Override
     public void entriesUpdated(Collection<String> addresses) {
         for (IRosterListener listener : this.listeners) {
             try {
@@ -45,6 +47,7 @@ public class DispatchingRosterListener implements IRosterListener {
         }
     }
 
+    @Override
     public void entriesDeleted(Collection<String> addresses) {
         for (IRosterListener listener : this.listeners) {
             try {
@@ -55,6 +58,7 @@ public class DispatchingRosterListener implements IRosterListener {
         }
     }
 
+    @Override
     public void presenceChanged(Presence presence) {
         for (IRosterListener listener : this.listeners) {
             try {
@@ -65,6 +69,7 @@ public class DispatchingRosterListener implements IRosterListener {
         }
     }
 
+    @Override
     public void rosterChanged(Roster roster) {
         for (IRosterListener listener : this.listeners) {
             try {

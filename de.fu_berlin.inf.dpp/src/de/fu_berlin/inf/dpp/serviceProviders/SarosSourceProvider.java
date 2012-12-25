@@ -59,6 +59,7 @@ public class SarosSourceProvider extends AbstractSourceProvider {
     protected ISarosSessionManager sarosSessionManager;
 
     protected IConnectionListener connectionListener = new IConnectionListener() {
+        @Override
         public void connectionStateChanged(Connection connection,
             ConnectionState newState) {
             connectionChanged();
@@ -90,16 +91,19 @@ public class SarosSourceProvider extends AbstractSourceProvider {
             sarosSessionManager.getSarosSession());
     }
 
+    @Override
     public void dispose() {
         this.sarosSessionManager
             .removeSarosSessionListener(this.sarosSessionListener);
         saros.getSarosNet().removeListener(this.connectionListener);
     }
 
+    @Override
     public String[] getProvidedSourceNames() {
         return new String[] { SAROS, SAROS_SESSION };
     }
 
+    @Override
     public Map<Object, Object> getCurrentState() {
         ISarosSession sarosSession = this.sarosSessionManager.getSarosSession();
         if (sarosSession == null)
@@ -113,6 +117,7 @@ public class SarosSourceProvider extends AbstractSourceProvider {
 
     private final void connectionChanged() {
         Utils.runSafeSWTAsync(null, new Runnable() {
+            @Override
             public void run() {
                 fireSourceChanged(ISources.WORKBENCH, SAROS, saros);
                 refreshUIElements(SAROS_DEPENDENT_COMMANDS);
@@ -122,6 +127,7 @@ public class SarosSourceProvider extends AbstractSourceProvider {
 
     private final void sessionChanged(final ISarosSession sarosSession) {
         Utils.runSafeSWTAsync(null, new Runnable() {
+            @Override
             public void run() {
                 fireSourceChanged(ISources.WORKBENCH, SAROS_SESSION,
                     sarosSession);

@@ -84,6 +84,7 @@ public class EnterXMPPAccountWizardPage extends WizardPage {
         setDescription(DESCRIPTION);
     }
 
+    @Override
     public void createControl(Composite parent) {
         Composite composite = new Composite(parent, SWT.NONE);
         setControl(composite);
@@ -181,6 +182,7 @@ public class EnterXMPPAccountWizardPage extends WizardPage {
 
     private void hookListeners() {
         enterXMPPAccountComposite.addModifyListener(new ModifyListener() {
+            @Override
             public void modifyText(ModifyEvent e) {
                 updatePageCompletion();
             }

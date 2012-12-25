@@ -22,6 +22,7 @@ public class CreateXMPPAccountHandler extends AbstractHandler {
         SarosPluginContext.initComponent(this);
     }
 
+    @Override
     public Object execute(ExecutionEvent event) throws ExecutionException {
 
         WizardUtils.openCreateXMPPAccountWizard(true);

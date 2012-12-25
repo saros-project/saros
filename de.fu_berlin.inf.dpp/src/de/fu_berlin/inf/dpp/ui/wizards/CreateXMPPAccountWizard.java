@@ -48,7 +48,7 @@ import de.fu_berlin.inf.dpp.ui.wizards.pages.CreateXMPPAccountWizardPage;
  *               be extended with your concrete functionality.
  * 
  *               In this example, the CreateXMPPAccountWizard allows the user
- *               to enter the details of a new account, validate them and 
+ *               to enter the details of a new account, validate them and
  *               store them in our account store.
  */
 
@@ -115,6 +115,7 @@ public class CreateXMPPAccountWizard extends Wizard {
         try {
             // fork a new thread to prevent the GUI from hanging
             getContainer().run(true, false, new IRunnableWithProgress() {
+                @Override
                 public void run(IProgressMonitor monitor)
                     throws InvocationTargetException {
 

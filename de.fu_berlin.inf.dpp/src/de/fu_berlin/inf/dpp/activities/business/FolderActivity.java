@@ -22,6 +22,7 @@ public class FolderActivity extends AbstractActivity implements
         this.path = path;
     }
 
+    @Override
     public SPath getPath() {
         return this.path;
     }
@@ -66,10 +67,12 @@ public class FolderActivity extends AbstractActivity implements
         return "FolderActivity(type: " + type + ", path: " + path + ")";
     }
 
+    @Override
     public void dispatch(IActivityReceiver receiver) {
         receiver.receive(this);
     }
 
+    @Override
     public IActivityDataObject getActivityDataObject(ISarosSession sarosSession) {
         return new FolderActivityDataObject(source.getJID(), type,
             path.toSPathDataObject(sarosSession));

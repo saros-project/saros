@@ -25,6 +25,7 @@ public class NewProjectListener implements IResourceChangeListener {
     /**
      * @see IResourceChangeListener#resourceChanged(IResourceChangeEvent)
      */
+    @Override
     public void resourceChanged(IResourceChangeEvent event) {
         if (event.getType() != IResourceChangeEvent.POST_CHANGE)
             return;

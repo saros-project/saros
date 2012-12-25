@@ -218,18 +218,22 @@ public class FileZipper {
             this.file = file;
         }
 
+        @Override
         public boolean exists() {
             return (file).exists();
         }
 
+        @Override
         public InputStream getInputStream() throws FileNotFoundException {
             return new FileInputStream(file);
         }
 
+        @Override
         public String getName() {
             return file.getName();
         }
 
+        @Override
         public String getPath() {
             return file.getPath().replace('\\', '/');
         }
@@ -242,10 +246,12 @@ public class FileZipper {
             this.file = file;
         }
 
+        @Override
         public boolean exists() {
             return file.exists();
         }
 
+        @Override
         public InputStream getInputStream() throws IOException {
             try {
                 return file.getContents();
@@ -254,10 +260,12 @@ public class FileZipper {
             }
         }
 
+        @Override
         public String getName() {
             return file.getName();
         }
 
+        @Override
         public String getPath() {
             return file.getProjectRelativePath().toPortableString();
         }

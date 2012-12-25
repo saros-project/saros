@@ -303,6 +303,7 @@ public class Util {
         List<Callable<Void>> joinSessionTasks = new ArrayList<Callable<Void>>();
         for (final AbstractTester invitee : invitees) {
             joinSessionTasks.add(new Callable<Void>() {
+                @Override
                 public Void call() throws Exception {
                     invitee.superBot()
                         .confirmShellSessionInvitationAndShellAddProject(
@@ -353,6 +354,7 @@ public class Util {
         List<Callable<Void>> joinSessionTasks = new ArrayList<Callable<Void>>();
         for (final AbstractTester invitee : invitees) {
             joinSessionTasks.add(new Callable<Void>() {
+                @Override
                 public Void call() throws Exception {
                     invitee.superBot()
                         .confirmShellSessionInvitationAndShellAddProject(
@@ -504,6 +506,7 @@ public class Util {
 
         for (final AbstractTester tester : invitees) {
             joinSessionTasks.add(new Callable<Void>() {
+                @Override
                 public Void call() throws Exception {
                     tester.remoteBot().shell(SHELL_SESSION_INVITATION)
                         .confirm(ACCEPT);
@@ -631,6 +634,7 @@ public class Util {
         for (int i = 0; i < participants.length; i++) {
             final AbstractTester tester = participants[i];
             stopFollowTasks.add(new Callable<Void>() {
+                @Override
                 public Void call() throws Exception {
                     JID followedBuddyJID = tester.superBot().views()
                         .sarosView().getFollowedBuddy();

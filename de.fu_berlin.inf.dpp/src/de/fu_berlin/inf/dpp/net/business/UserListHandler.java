@@ -36,6 +36,7 @@ public class UserListHandler {
         // TODO SessionID-Filter
         receiver.addPacketListener(new PacketListener() {
 
+            @Override
             public void processPacket(Packet packet) {
                 JID fromJID = new JID(packet.getFrom());
 

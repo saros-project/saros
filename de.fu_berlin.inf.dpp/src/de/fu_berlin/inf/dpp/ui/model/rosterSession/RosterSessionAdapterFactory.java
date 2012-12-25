@@ -27,11 +27,13 @@ import de.fu_berlin.inf.dpp.project.internal.SarosSession;
  */
 public class RosterSessionAdapterFactory implements IAdapterFactory {
 
+    @Override
     @SuppressWarnings("rawtypes")
     public Class[] getAdapterList() {
         return new Class[] { User.class };
     }
 
+    @Override
     @SuppressWarnings("rawtypes")
     public Object getAdapter(Object adaptableObject, Class adapterType) {
         if (adaptableObject instanceof UserElement) {

@@ -173,6 +173,7 @@ public class FileActivity extends AbstractActivity implements IResourceActivity 
         this.checksum = checksum;
     }
 
+    @Override
     public SPath getPath() {
         return this.newPath;
     }
@@ -247,6 +248,7 @@ public class FileActivity extends AbstractActivity implements IResourceActivity 
         return true;
     }
 
+    @Override
     public void dispatch(IActivityReceiver receiver) {
         receiver.receive(this);
     }
@@ -263,6 +265,7 @@ public class FileActivity extends AbstractActivity implements IResourceActivity 
         return checksum;
     }
 
+    @Override
     public IActivityDataObject getActivityDataObject(ISarosSession sarosSession) {
         return new FileActivityDataObject(source.getJID(), type,
             newPath.toSPathDataObject(sarosSession),

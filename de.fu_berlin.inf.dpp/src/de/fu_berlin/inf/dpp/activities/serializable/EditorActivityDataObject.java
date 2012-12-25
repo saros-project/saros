@@ -98,6 +98,7 @@ public class EditorActivityDataObject extends AbstractProjectActivityDataObject 
             + (this.path != null ? this.path : "no path") + ")";
     }
 
+    @Override
     public IActivity getActivity(ISarosSession sarosSession) {
         return new EditorActivity(sarosSession.getUser(source), type,
             (path != null ? path.toSPath(sarosSession) : null));

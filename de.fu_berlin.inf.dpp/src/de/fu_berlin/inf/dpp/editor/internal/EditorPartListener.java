@@ -1,6 +1,6 @@
 /**
- * The EditorPartListener listens to changes to the editors view, e.g. if the view is opened, activated, 
- * closed, brought to the top or the source has changed. The Listener notifies the EditorManager about 
+ * The EditorPartListener listens to changes to the editors view, e.g. if the view is opened, activated,
+ * closed, brought to the top or the source has changed. The Listener notifies the EditorManager about
  * the state of the view, so the Manager can react on it, e.g. to update followers.
  * 
  * @author awaldmann and nwarnatsch
@@ -22,6 +22,7 @@ public class EditorPartListener implements IPartListener2 {
         this.editorManager = editorManager;
     }
 
+    @Override
     public void partActivated(IWorkbenchPartReference partRef) {
         IWorkbenchPart part = partRef.getPart(false);
 
@@ -31,6 +32,7 @@ public class EditorPartListener implements IPartListener2 {
         }
     }
 
+    @Override
     public void partOpened(IWorkbenchPartReference partRef) {
         IWorkbenchPart part = partRef.getPart(false);
 
@@ -40,6 +42,7 @@ public class EditorPartListener implements IPartListener2 {
         }
     }
 
+    @Override
     public void partClosed(IWorkbenchPartReference partRef) {
         IWorkbenchPart part = partRef.getPart(false);
 
@@ -53,6 +56,7 @@ public class EditorPartListener implements IPartListener2 {
      * We need to catch partBroughtToTop events because partActivate events are
      * missing if Editors are opened programmatically.
      */
+    @Override
     public void partBroughtToTop(IWorkbenchPartReference partRef) {
         IWorkbenchPart part = partRef.getPart(false);
 
@@ -62,14 +66,17 @@ public class EditorPartListener implements IPartListener2 {
         }
     }
 
+    @Override
     public void partDeactivated(IWorkbenchPartReference partRef) {
         // do nothing
     }
 
+    @Override
     public void partHidden(IWorkbenchPartReference partRef) {
         // do nothing
     }
 
+    @Override
     public void partVisible(IWorkbenchPartReference partRef) {
         // do nothing
     }
@@ -78,6 +85,7 @@ public class EditorPartListener implements IPartListener2 {
      * Called for instance when a file was renamed. We just close and open the
      * editor.
      */
+    @Override
     public void partInputChanged(IWorkbenchPartReference partRef) {
         IWorkbenchPart part = partRef.getPart(false);
 

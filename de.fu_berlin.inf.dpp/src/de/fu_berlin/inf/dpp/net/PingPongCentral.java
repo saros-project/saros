@@ -44,6 +44,7 @@ public class PingPongCentral extends AbstractActivityProvider implements
 
     protected AutoHashMap<User, PingStats> stats = new AutoHashMap<User, PingStats>(
         new Function<User, PingStats>() {
+            @Override
             public PingStats apply(User newKey) {
                 return new PingStats(newKey);
             }
@@ -163,10 +164,12 @@ public class PingPongCentral extends AbstractActivityProvider implements
     public void start() {
         sarosSession.addActivityProvider(this);
         pingPongHandle.set(scheduler.scheduleAtFixedRate(new Runnable() {
+            @Override
             public void run() {
                 if (!sendPings)
                     return;
                 Utils.runSafeSWTSync(log, new Runnable() {
+                    @Override
                     public void run() {
                         if (log.isDebugEnabled()) {
                             log.debug(toString());
@@ -190,6 +193,7 @@ public class PingPongCentral extends AbstractActivityProvider implements
     }
 
     protected IPropertyChangeListener propertyListener = new IPropertyChangeListener() {
+        @Override
         public void propertyChange(PropertyChangeEvent event) {
             if (event.getProperty().equals(PreferenceConstants.PING_PONG)) {
                 Object value = event.getNewValue();

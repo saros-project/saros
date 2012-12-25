@@ -24,6 +24,7 @@ public class TransferModeDispatch implements ITransferModeListener {
         listeners.remove(listener);
     }
 
+    @Override
     public synchronized void clear() {
         for (ITransferModeListener listener : listeners) {
             try {
@@ -34,6 +35,7 @@ public class TransferModeDispatch implements ITransferModeListener {
         }
     }
 
+    @Override
     public synchronized void transferFinished(JID jid,
         NetTransferMode newMode, boolean incoming, long sizeTransferred,
         long sizeUncompressed, long transmissionMillisecs) {
@@ -49,6 +51,7 @@ public class TransferModeDispatch implements ITransferModeListener {
         }
     }
 
+    @Override
     public synchronized void connectionChanged(JID jid,
         IByteStreamConnection connection) {
         for (ITransferModeListener listener : listeners) {

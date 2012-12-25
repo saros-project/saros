@@ -178,6 +178,7 @@ public final class ImageTileEncoder extends Encoder {
 
     /* main encoder loop */
 
+    @Override
     public void run() {
 
         while (isEncoding) {

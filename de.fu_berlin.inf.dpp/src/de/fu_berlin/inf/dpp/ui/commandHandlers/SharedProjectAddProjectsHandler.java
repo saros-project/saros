@@ -16,6 +16,7 @@ import de.fu_berlin.inf.dpp.ui.wizards.ShareProjectAddProjectsWizard;
  */
 public class SharedProjectAddProjectsHandler extends AbstractHandler {
 
+    @Override
     public Object execute(ExecutionEvent event) throws ExecutionException {
         WizardUtils.openShareProjectAddProjectsWizard();
         return null;

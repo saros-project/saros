@@ -119,6 +119,7 @@ public class XugglerEncoder extends Encoder {
         codec = ICodec.findEncodingCodecByName(codecFormatName);
     }
 
+    @Override
     public void run() {
         int errorNumber;
         if ((errorNumber = coder.open()) < 0) {

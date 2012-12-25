@@ -25,6 +25,7 @@ public class AccountManipulatorImpl extends StfRemoteObject implements
         return AccountManipulatorImpl.INSTANCE;
     }
 
+    @Override
     public void restoreDefaultAccount(String username, String password,
         String domain) throws RemoteException {
 
@@ -61,6 +62,7 @@ public class AccountManipulatorImpl extends StfRemoteObject implements
         accountStore.deleteAccount(activeAccount);
     }
 
+    @Override
     public void addAccount(String username, String password, String domain)
         throws RemoteException {
 
@@ -78,6 +80,7 @@ public class AccountManipulatorImpl extends StfRemoteObject implements
             true);
     }
 
+    @Override
     public void activateAccount(String username, String domain)
         throws RemoteException {
 

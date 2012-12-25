@@ -669,6 +669,7 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
             if (chat == null) {
                 chat = this.chatmanager.createChat(jid.toString(),
                     new MessageListener() {
+                        @Override
                         public void processMessage(Chat arg0, Message arg1) {
                             /*
                              * We don't care about the messages here, because we
@@ -700,8 +701,10 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
             protected PacketFilter sessionFilter = PacketExtensionUtils
                 .getSessionIDPacketFilter(sessionID);
 
+            @Override
             public void processPacket(final Packet packet) {
                 dispatchThread.executeAsDispatch(new Runnable() {
+                    @Override
                     public void run() {
                         if (sessionFilter.accept(packet)) {
                             try {
@@ -744,6 +747,7 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
             disposeConnection();
     }
 
+    @Override
     public void sendCancelInvitationMessage(JID user, String sessionID,
         String errorMsg) {
         log.debug("Send request to cancel Invitation to "
@@ -755,6 +759,7 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
                 sessionID, errorMsg)));
     }
 
+    @Override
     public void sendUserListRequest(JID user) {
         sendMessageToUser(user,
             userListRequestExtProv.create(new UserListRequestExtension(

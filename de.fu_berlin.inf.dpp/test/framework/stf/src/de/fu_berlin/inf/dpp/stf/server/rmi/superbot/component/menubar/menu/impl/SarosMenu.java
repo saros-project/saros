@@ -27,6 +27,7 @@ public final class SarosMenu extends StfRemoteObject implements ISarosMenu {
         return this;
     }
 
+    @Override
     public void createAccount(JID jid, String password) throws RemoteException {
         RemoteWorkbenchBot.getInstance().activateWorkbench();
         menu.menu(MENU_CREATE_ACCOUNT).click();
@@ -34,18 +35,21 @@ public final class SarosMenu extends StfRemoteObject implements ISarosMenu {
             password);
     }
 
+    @Override
     public void addBuddy(JID jid) throws RemoteException {
         RemoteWorkbenchBot.getInstance().activateWorkbench();
         menu.menu(MENU_ADD_BUDDY).click();
         SuperBot.getInstance().confirmShellAddBuddy(jid);
     }
 
+    @Override
     public void addBuddies(String... jidOfInvitees) throws RemoteException {
         RemoteWorkbenchBot.getInstance().activateWorkbench();
         menu.menu(ADD_BUDDIES).click();
         SuperBot.getInstance().confirmShellAddBuddyToSession(jidOfInvitees);
     }
 
+    @Override
     public void shareProjects(String projectName, JID... jids)
         throws RemoteException {
         RemoteWorkbenchBot.getInstance().activateWorkbench();
@@ -53,6 +57,7 @@ public final class SarosMenu extends StfRemoteObject implements ISarosMenu {
         SuperBot.getInstance().confirmShellShareProjects(projectName, jids);
     }
 
+    @Override
     public void shareProjectFiles(String project, String[] files, JID... jids)
         throws RemoteException {
         RemoteWorkbenchBot.getInstance().activateWorkbench();
@@ -61,6 +66,7 @@ public final class SarosMenu extends StfRemoteObject implements ISarosMenu {
             jids);
     }
 
+    @Override
     public void shareProjects(String[] projectNames, JID... jids)
         throws RemoteException {
         RemoteWorkbenchBot.getInstance().activateWorkbench();
@@ -76,18 +82,21 @@ public final class SarosMenu extends StfRemoteObject implements ISarosMenu {
         SuperBot.getInstance().confirmShellAddProjectToSession(project, files);
     }
 
+    @Override
     public void addProjects(String... projectNames) throws RemoteException {
         RemoteWorkbenchBot.getInstance().activateWorkbench();
         menu.menu(ADD_PROJECTS).click();
         SuperBot.getInstance().confirmShellAddProjectsToSession(projectNames);
     }
 
+    @Override
     public void stopSession() throws RemoteException {
         RemoteWorkbenchBot.getInstance().activateWorkbench();
         menu.menu(CM_STOP_SAROS_SESSION).click();
         SuperBot.getInstance().confirmShellLeavingClosingSession();
     }
 
+    @Override
     public ISarosPreferences preferences() throws RemoteException {
         return SarosPreferences.getInstance();
     }

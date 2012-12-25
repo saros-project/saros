@@ -92,6 +92,7 @@ public class ProjectShareBuddies extends ContributionItem {
         RosterEntry[] rosterEntries = saros.getSarosNet().getRoster()
             .getEntries().toArray(new RosterEntry[0]);
         Arrays.sort(rosterEntries, new Comparator<RosterEntry>() {
+            @Override
             public int compare(RosterEntry o1, RosterEntry o2) {
                 String name1 = RosterUtils.getDisplayableName(o1);
                 String name2 = RosterUtils.getDisplayableName(o2);

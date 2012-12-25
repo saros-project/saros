@@ -94,6 +94,7 @@ public class PermissionActivityDataObject extends AbstractActivityDataObject {
             + ",new permission:" + permission + ")";
     }
 
+    @Override
     public IActivity getActivity(ISarosSession sarosSession) {
         return new PermissionActivity(sarosSession.getUser(source),
             sarosSession.getUser(affectedUser), permission);

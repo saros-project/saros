@@ -47,6 +47,7 @@ public class SarosWhiteboardView extends StfRemoteObject implements
         createObjectFromActiveTool(x, y, x + width, y + height);
     }
 
+    @Override
     public void createObjectFromActiveTool(int x, int y, int width, int height) {
         viewer.drag(x, y, x + width - 1, y + height - 1);
     }
@@ -72,6 +73,7 @@ public class SarosWhiteboardView extends StfRemoteObject implements
      * returns the figure that is selected when clicking at the given
      * coordinates.
      */
+    @Override
     public IWhiteboardFigure getFigureAt(int x, int y) throws RemoteException {
         ToolEntry entry = viewer.getActiveTool();
         viewer.activateTool("Select");

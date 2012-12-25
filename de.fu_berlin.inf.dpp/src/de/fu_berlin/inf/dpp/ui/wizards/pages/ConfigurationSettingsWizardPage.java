@@ -76,6 +76,7 @@ public class ConfigurationSettingsWizardPage extends WizardPage {
     protected Button statisticSubmissionButton;
     protected Button errorLogSubmissionButton;
 
+    @Override
     public void createControl(Composite parent) {
         Composite composite = new Composite(parent, SWT.NONE);
         composite.setLayout(LayoutUtils.createGridLayout(2, true, 5, 10));
@@ -307,6 +308,7 @@ public class ConfigurationSettingsWizardPage extends WizardPage {
             });
 
         Listener listener = new Listener() {
+            @Override
             public void handleEvent(Event event) {
                 updatePageCompletion();
             }
@@ -350,12 +352,14 @@ public class ConfigurationSettingsWizardPage extends WizardPage {
         // do not block during discovery
         Utils.runSafeAsync(null, new Runnable() {
 
+            @Override
             public void run() {
                 upnpService.discoverGateways();
 
                 // GUI work from SWT thread
                 Utils.runSafeSWTAsync(null, new Runnable() {
 
+                    @Override
                     public void run() {
                         if (ConfigurationSettingsWizardPage.this.getControl()
                             .isDisposed())

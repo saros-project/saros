@@ -102,6 +102,7 @@ public class ChecksumActivityDataObject extends
         return true;
     }
 
+    @Override
     public IActivity getActivity(ISarosSession sarosSession) {
         return new ChecksumActivity(sarosSession.getUser(source),
             path.toSPath(sarosSession), hash, length, jupiterTimestamp);

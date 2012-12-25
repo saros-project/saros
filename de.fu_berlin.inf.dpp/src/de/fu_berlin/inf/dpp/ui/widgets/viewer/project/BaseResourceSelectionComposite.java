@@ -83,6 +83,7 @@ public abstract class BaseResourceSelectionComposite extends
     protected final static String SERIALIZATION_SEPARATOR_REGEX = "\\*\\*#\\*\\*";
 
     protected ICheckStateListener checkStateListener = new ICheckStateListener() {
+        @Override
         public void checkStateChanged(CheckStateChangedEvent event) {
             final Object element = event.getElement();
             boolean isChecked = event.getChecked();
@@ -455,6 +456,7 @@ public abstract class BaseResourceSelectionComposite extends
             .addCheckStateListener(checkStateListener);
 
         addDisposeListener(new DisposeListener() {
+            @Override
             public void widgetDisposed(DisposeEvent e) {
                 if (viewer != null)
                     ((CheckboxTreeViewer) viewer)

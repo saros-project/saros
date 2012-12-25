@@ -145,6 +145,7 @@ public class TextEditActivityDataObject extends
         return true;
     }
 
+    @Override
     public IActivity getActivity(ISarosSession sarosSession) {
         return new TextEditActivity(sarosSession.getUser(source), offset, text,
             replacedText, path.toSPath(sarosSession));

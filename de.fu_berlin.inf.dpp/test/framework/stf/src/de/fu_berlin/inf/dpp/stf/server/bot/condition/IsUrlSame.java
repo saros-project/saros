@@ -19,6 +19,7 @@ public class IsUrlSame extends DefaultCondition {
         this.url = url;
     }
 
+    @Override
     public String getFailureMessage() {
         String message = "Expected URL of \"" + fullPath + "\" to become \""
             + url + "\", but ";
@@ -39,6 +40,7 @@ public class IsUrlSame extends DefaultCondition {
             return message + "the URL is \"" + resourceInfo.url + "\".";
     }
 
+    @Override
     public boolean test() throws Exception {
         IPath path = new Path(fullPath);
         IResource resource = ResourcesPlugin.getWorkspace().getRoot()

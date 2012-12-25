@@ -30,11 +30,13 @@ import de.fu_berlin.inf.dpp.net.JID;
  */
 public class RosterAdapterFactory implements IAdapterFactory {
 
+    @Override
     @SuppressWarnings("rawtypes")
     public Class[] getAdapterList() {
         return new Class[] { RosterGroup.class, RosterEntry.class, JID.class };
     }
 
+    @Override
     @SuppressWarnings("rawtypes")
     public Object getAdapter(Object adaptableObject, Class adapterType) {
         if (adaptableObject instanceof RosterGroupElement) {

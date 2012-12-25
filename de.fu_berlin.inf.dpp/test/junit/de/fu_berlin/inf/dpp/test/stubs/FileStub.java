@@ -49,10 +49,12 @@ public class FileStub implements IFile {
         this.content = content;
     }
 
+    @Override
     public IPath getProjectRelativePath() {
         return path;
     }
 
+    @Override
     public InputStream getContents() throws CoreException {
         return new ByteArrayInputStream(content.getBytes());
     }
@@ -83,494 +85,587 @@ public class FileStub implements IFile {
         return true;
     }
 
+    @Override
     public boolean isReadOnly() {
         return false;
     }
 
+    @Override
     public boolean exists() {
         return true;
     }
 
+    @Override
     public void appendContents(InputStream source, int updateFlags,
         IProgressMonitor monitor) throws CoreException {
         throw new RuntimeException("Unexpected call to Stub");
 
     }
 
+    @Override
     public void appendContents(InputStream source, boolean force,
         boolean keepHistory, IProgressMonitor monitor) throws CoreException {
         throw new RuntimeException("Unexpected call to Stub");
 
     }
 
+    @Override
     public void create(InputStream source, boolean force,
         IProgressMonitor monitor) throws CoreException {
         throw new RuntimeException("Unexpected call to Stub");
 
     }
 
+    @Override
     public void create(InputStream source, int updateFlags,
         IProgressMonitor monitor) throws CoreException {
         throw new RuntimeException("Unexpected call to Stub");
 
     }
 
+    @Override
     public void createLink(IPath localLocation, int updateFlags,
         IProgressMonitor monitor) throws CoreException {
         throw new RuntimeException("Unexpected call to Stub");
 
     }
 
+    @Override
     public void createLink(URI location, int updateFlags,
         IProgressMonitor monitor) throws CoreException {
         throw new RuntimeException("Unexpected call to Stub");
 
     }
 
+    @Override
     public void delete(boolean force, boolean keepHistory,
         IProgressMonitor monitor) throws CoreException {
         throw new RuntimeException("Unexpected call to Stub");
 
     }
 
+    @Override
     public String getCharset() throws CoreException {
         throw new RuntimeException("Unexpected call to Stub");
 
     }
 
+    @Override
     public String getCharset(boolean checkImplicit) throws CoreException {
         throw new RuntimeException("Unexpected call to Stub");
 
     }
 
+    @Override
     public String getCharsetFor(Reader reader) throws CoreException {
         throw new RuntimeException("Unexpected call to Stub");
 
     }
 
+    @Override
     public IContentDescription getContentDescription() throws CoreException {
         throw new RuntimeException("Unexpected call to Stub");
 
     }
 
+    @Override
     public InputStream getContents(boolean force) throws CoreException {
         throw new RuntimeException("Unexpected call to Stub");
 
     }
 
+    @Override
     public int getEncoding() throws CoreException {
         throw new RuntimeException("Unexpected call to Stub");
 
     }
 
+    @Override
     public IPath getFullPath() {
         return this.path;
     }
 
+    @Override
     public IFileState[] getHistory(IProgressMonitor monitor)
         throws CoreException {
         throw new RuntimeException("Unexpected call to Stub");
 
     }
 
+    @Override
     public String getName() {
         return path.lastSegment();
     }
 
+    @Override
     public void move(IPath destination, boolean force, boolean keepHistory,
         IProgressMonitor monitor) throws CoreException {
         throw new RuntimeException("Unexpected call to Stub");
 
     }
 
+    @Override
     public void setCharset(String newCharset) throws CoreException {
         throw new RuntimeException("Unexpected call to Stub");
 
     }
 
+    @Override
     public void setCharset(String newCharset, IProgressMonitor monitor)
         throws CoreException {
         throw new RuntimeException("Unexpected call to Stub");
 
     }
 
+    @Override
     public void setContents(InputStream source, int updateFlags,
         IProgressMonitor monitor) throws CoreException {
         throw new RuntimeException("Unexpected call to Stub");
 
     }
 
+    @Override
     public void setContents(IFileState source, int updateFlags,
         IProgressMonitor monitor) throws CoreException {
         throw new RuntimeException("Unexpected call to Stub");
 
     }
 
+    @Override
     public void setContents(InputStream source, boolean force,
         boolean keepHistory, IProgressMonitor monitor) throws CoreException {
         throw new RuntimeException("Unexpected call to Stub");
 
     }
 
+    @Override
     public void setContents(IFileState source, boolean force,
         boolean keepHistory, IProgressMonitor monitor) throws CoreException {
         throw new RuntimeException("Unexpected call to Stub");
 
     }
 
+    @Override
     public void accept(IResourceVisitor visitor) throws CoreException {
         throw new RuntimeException("Unexpected call to Stub");
 
     }
 
+    @Override
     public void accept(IResourceProxyVisitor visitor, int memberFlags)
         throws CoreException {
         throw new RuntimeException("Unexpected call to Stub");
 
     }
 
+    @Override
     public void accept(IResourceVisitor visitor, int depth,
         boolean includePhantoms) throws CoreException {
         throw new RuntimeException("Unexpected call to Stub");
 
     }
 
+    @Override
     public void accept(IResourceVisitor visitor, int depth, int memberFlags)
         throws CoreException {
         throw new RuntimeException("Unexpected call to Stub");
 
     }
 
+    @Override
     public void clearHistory(IProgressMonitor monitor) throws CoreException {
         throw new RuntimeException("Unexpected call to Stub");
 
     }
 
+    @Override
     public void copy(IPath destination, boolean force, IProgressMonitor monitor)
         throws CoreException {
         throw new RuntimeException("Unexpected call to Stub");
 
     }
 
+    @Override
     public void copy(IPath destination, int updateFlags,
         IProgressMonitor monitor) throws CoreException {
         throw new RuntimeException("Unexpected call to Stub");
 
     }
 
+    @Override
     public void copy(IProjectDescription description, boolean force,
         IProgressMonitor monitor) throws CoreException {
         throw new RuntimeException("Unexpected call to Stub");
 
     }
 
+    @Override
     public void copy(IProjectDescription description, int updateFlags,
         IProgressMonitor monitor) throws CoreException {
         throw new RuntimeException("Unexpected call to Stub");
 
     }
 
+    @Override
     public IMarker createMarker(String type) throws CoreException {
         throw new RuntimeException("Unexpected call to Stub");
 
     }
 
+    @Override
     public IResourceProxy createProxy() {
         throw new RuntimeException("Unexpected call to Stub");
 
     }
 
+    @Override
     public void delete(boolean force, IProgressMonitor monitor)
         throws CoreException {
         throw new RuntimeException("Unexpected call to Stub");
 
     }
 
+    @Override
     public void delete(int updateFlags, IProgressMonitor monitor)
         throws CoreException {
         throw new RuntimeException("Unexpected call to Stub");
 
     }
 
+    @Override
     public void deleteMarkers(String type, boolean includeSubtypes, int depth)
         throws CoreException {
         throw new RuntimeException("Unexpected call to Stub");
 
     }
 
+    @Override
     public IMarker findMarker(long id) throws CoreException {
         throw new RuntimeException("Unexpected call to Stub");
 
     }
 
+    @Override
     public IMarker[] findMarkers(String type, boolean includeSubtypes, int depth)
         throws CoreException {
         throw new RuntimeException("Unexpected call to Stub");
 
     }
 
+    @Override
     public int findMaxProblemSeverity(String type, boolean includeSubtypes,
         int depth) throws CoreException {
         throw new RuntimeException("Unexpected call to Stub");
 
     }
 
+    @Override
     public String getFileExtension() {
         throw new RuntimeException("Unexpected call to Stub");
 
     }
 
+    @Override
     public long getLocalTimeStamp() {
         throw new RuntimeException("Unexpected call to Stub");
 
     }
 
+    @Override
     public IPath getLocation() {
         throw new RuntimeException("Unexpected call to Stub");
 
     }
 
+    @Override
     public URI getLocationURI() {
         throw new RuntimeException("Unexpected call to Stub");
 
     }
 
+    @Override
     public IMarker getMarker(long id) {
         throw new RuntimeException("Unexpected call to Stub");
 
     }
 
+    @Override
     public long getModificationStamp() {
         throw new RuntimeException("Unexpected call to Stub");
 
     }
 
+    @Override
     public IContainer getParent() {
         throw new RuntimeException("Unexpected call to Stub");
 
     }
 
+    @Override
     public Map<QualifiedName, String> getPersistentProperties()
         throws CoreException {
         throw new RuntimeException("Unexpected call to Stub");
     }
 
+    @Override
     public String getPersistentProperty(QualifiedName key) throws CoreException {
         throw new RuntimeException("Unexpected call to Stub");
 
     }
 
+    @Override
     public IProject getProject() {
         return project;
     }
 
+    @Override
     public IPath getRawLocation() {
         throw new RuntimeException("Unexpected call to Stub");
 
     }
 
+    @Override
     public URI getRawLocationURI() {
         throw new RuntimeException("Unexpected call to Stub");
 
     }
 
+    @Override
     public ResourceAttributes getResourceAttributes() {
         throw new RuntimeException("Unexpected call to Stub");
 
     }
 
+    @Override
     public Map<QualifiedName, Object> getSessionProperties()
         throws CoreException {
         throw new RuntimeException("Unexpected call to Stub");
 
     }
 
+    @Override
     public Object getSessionProperty(QualifiedName key) throws CoreException {
         throw new RuntimeException("Unexpected call to Stub");
 
     }
 
+    @Override
     public int getType() {
         return IResource.FILE;
     }
 
+    @Override
     public IWorkspace getWorkspace() {
         throw new RuntimeException("Unexpected call to Stub");
 
     }
 
+    @Override
     public boolean isAccessible() {
         throw new RuntimeException("Unexpected call to Stub");
 
     }
 
+    @Override
     public boolean isDerived() {
         return derived;
 
     }
 
+    @Override
     public boolean isDerived(int options) {
         throw new RuntimeException("Unexpected call to Stub");
 
     }
 
+    @Override
     public boolean isHidden() {
         throw new RuntimeException("Unexpected call to Stub");
 
     }
 
+    @Override
     public boolean isLinked() {
         throw new RuntimeException("Unexpected call to Stub");
 
     }
 
+    @Override
     public boolean isLinked(int options) {
         throw new RuntimeException("Unexpected call to Stub");
 
     }
 
+    @Override
     public boolean isLocal(int depth) {
         throw new RuntimeException("Unexpected call to Stub");
 
     }
 
+    @Override
     public boolean isPhantom() {
         throw new RuntimeException("Unexpected call to Stub");
 
     }
 
+    @Override
     public boolean isSynchronized(int depth) {
         throw new RuntimeException("Unexpected call to Stub");
 
     }
 
+    @Override
     public boolean isTeamPrivateMember() {
         throw new RuntimeException("Unexpected call to Stub");
 
     }
 
+    @Override
     public void move(IPath destination, boolean force, IProgressMonitor monitor)
         throws CoreException {
         throw new RuntimeException("Unexpected call to Stub");
 
     }
 
+    @Override
     public void move(IPath destination, int updateFlags,
         IProgressMonitor monitor) throws CoreException {
         throw new RuntimeException("Unexpected call to Stub");
 
     }
 
+    @Override
     public void move(IProjectDescription description, int updateFlags,
         IProgressMonitor monitor) throws CoreException {
         throw new RuntimeException("Unexpected call to Stub");
 
     }
 
+    @Override
     public void move(IProjectDescription description, boolean force,
         boolean keepHistory, IProgressMonitor monitor) throws CoreException {
         throw new RuntimeException("Unexpected call to Stub");
 
     }
 
+    @Override
     public void refreshLocal(int depth, IProgressMonitor monitor)
         throws CoreException {
         throw new RuntimeException("Unexpected call to Stub");
 
     }
 
+    @Override
     public void revertModificationStamp(long value) throws CoreException {
         throw new RuntimeException("Unexpected call to Stub");
 
     }
 
+    @Override
     public void setDerived(boolean isDerived) throws CoreException {
         setDerived(isDerived, null);
     }
 
+    @Override
     public void setDerived(boolean isDerived, IProgressMonitor monitor)
         throws CoreException {
         derived = isDerived;
     }
 
+    @Override
     public void setHidden(boolean isHidden) throws CoreException {
         throw new RuntimeException("Unexpected call to Stub");
 
     }
 
+    @Override
     public void setLocal(boolean flag, int depth, IProgressMonitor monitor)
         throws CoreException {
         throw new RuntimeException("Unexpected call to Stub");
 
     }
 
+    @Override
     public long setLocalTimeStamp(long value) throws CoreException {
         throw new RuntimeException("Unexpected call to Stub");
 
     }
 
+    @Override
     public void setPersistentProperty(QualifiedName key, String value)
         throws CoreException {
         throw new RuntimeException("Unexpected call to Stub");
 
     }
 
+    @Override
     public void setReadOnly(boolean readOnly) {
         throw new RuntimeException("Unexpected call to Stub");
 
     }
 
+    @Override
     public void setResourceAttributes(ResourceAttributes attributes)
         throws CoreException {
         throw new RuntimeException("Unexpected call to Stub");
 
     }
 
+    @Override
     public void setSessionProperty(QualifiedName key, Object value)
         throws CoreException {
         throw new RuntimeException("Unexpected call to Stub");
 
     }
 
+    @Override
     public void setTeamPrivateMember(boolean isTeamPrivate)
         throws CoreException {
         throw new RuntimeException("Unexpected call to Stub");
 
     }
 
+    @Override
     public void touch(IProgressMonitor monitor) throws CoreException {
         throw new RuntimeException("Unexpected call to Stub");
 
     }
 
+    @Override
     @SuppressWarnings("rawtypes")
     public Object getAdapter(Class adapter) {
         throw new RuntimeException("Unexpected call to Stub");
 
     }
 
+    @Override
     public boolean contains(ISchedulingRule rule) {
         throw new RuntimeException("Unexpected call to Stub");
 
     }
 
+    @Override
     public boolean isConflicting(ISchedulingRule rule) {
         throw new RuntimeException("Unexpected call to Stub");
 
     }
 
+    @Override
     public boolean isHidden(int options) {
         throw new RuntimeException("Unexpected call to Stub");
     }
 
+    @Override
     public boolean isTeamPrivateMember(int options) {
         throw new RuntimeException("Unexpected call to Stub");
     }
 
+    @Override
     public IPathVariableManager getPathVariableManager() {
         throw new RuntimeException("Unexpected call to Stub");
     }
 
+    @Override
     public boolean isVirtual() {
         return false;
     }

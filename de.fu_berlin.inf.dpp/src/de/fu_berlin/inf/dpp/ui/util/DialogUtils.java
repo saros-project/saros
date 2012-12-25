@@ -80,6 +80,7 @@ public class DialogUtils {
     public static void showErrorPopup(final Logger log, final String title,
         final String message, Exception e, IProgressMonitor monitor) {
         Utils.runSafeSWTAsync(log, new Runnable() {
+            @Override
             public void run() {
                 DialogUtils.openErrorMessageDialog(EditorAPI.getShell(), title,
                     message);
@@ -171,6 +172,7 @@ public class DialogUtils {
 
         try {
             return Utils.runSWTSync(new Callable<Boolean>() {
+                @Override
                 public Boolean call() {
                     return MessageDialog.openConfirm(getAShell(),
                         Messages.InvitationWizard_invite_no_support,
@@ -239,6 +241,7 @@ public class DialogUtils {
 
         try {
             return Utils.runSWTSync(new Callable<Boolean>() {
+                @Override
                 public Boolean call() {
                     return MessageDialog.openQuestion(getAShell(), title,
                         message);
@@ -261,6 +264,7 @@ public class DialogUtils {
 
         try {
             return Utils.runSWTSync(new Callable<Boolean>() {
+                @Override
                 public Boolean call() {
                     return MessageDialog.openQuestion(getAShell(), title,
                         message);

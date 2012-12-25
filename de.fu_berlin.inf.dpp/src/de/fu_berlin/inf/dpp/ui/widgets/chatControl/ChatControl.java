@@ -102,6 +102,7 @@ public class ChatControl extends Composite {
      * {@link ChatControl} and not on all its child components.
      */
     protected IChatDisplayListener chatDisplayListener = new IChatDisplayListener() {
+        @Override
         public void chatCleared(ChatClearedEvent event) {
             clearColorCache();
 
@@ -318,6 +319,7 @@ public class ChatControl extends Composite {
          * Updates SashForm weights to emulate a fixed ChatInput height
          */
         this.addListener(SWT.Resize, new Listener() {
+            @Override
             public void handleEvent(Event event) {
                 int fullHeight = ChatControl.this.getSize().y;
                 int chatInputHeight = ChatControl.this.chatInput.getSize().y;
@@ -358,6 +360,7 @@ public class ChatControl extends Composite {
         this.missedMessages = 0;
 
         Listener showListener = new Listener() {
+            @Override
             public void handleEvent(Event event) {
                 resetUnseenMessages();
             }

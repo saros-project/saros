@@ -145,6 +145,7 @@ public class XStreamExtensionProvider<T> implements PacketExtensionProvider,
                 && ObjectUtils.equals(getNamespace(), provider.getNamespace());
         }
 
+        @Override
         public String getElementName() {
             return provider.getElementName();
         }
@@ -153,10 +154,12 @@ public class XStreamExtensionProvider<T> implements PacketExtensionProvider,
             return payload;
         }
 
+        @Override
         public String getNamespace() {
             return provider.getNamespace();
         }
 
+        @Override
         public String toXML() {
             StringWriter writer = new StringWriter(512);
             provider.xstream.marshal(this, new CompactWriter(writer));
@@ -183,6 +186,7 @@ public class XStreamExtensionProvider<T> implements PacketExtensionProvider,
 
     public PacketFilter getIQFilter() {
         return new PacketFilter() {
+            @Override
             public boolean accept(Packet packet) {
                 if (!(packet instanceof XStreamIQPacket<?>))
                     return false;
@@ -193,6 +197,7 @@ public class XStreamExtensionProvider<T> implements PacketExtensionProvider,
         };
     }
 
+    @Override
     @SuppressWarnings("unchecked")
     public PacketExtension parseExtension(XmlPullParser parser) {
         try {
@@ -267,6 +272,7 @@ public class XStreamExtensionProvider<T> implements PacketExtensionProvider,
         return new XStreamIQPacket<T>(create(t));
     }
 
+    @Override
     @SuppressWarnings("unchecked")
     public IQ parseIQ(XmlPullParser parser) throws Exception {
         try {

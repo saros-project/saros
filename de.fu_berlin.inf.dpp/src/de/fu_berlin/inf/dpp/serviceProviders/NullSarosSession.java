@@ -42,123 +42,149 @@ public class NullSarosSession implements ISarosSession {
 
     private Logger log = Logger.getLogger(NullSarosSession.class);
 
+    @Override
     public Collection<User> getParticipants() {
         log.warn("unexpected method call");
         return null;
     }
 
+    @Override
     public List<User> getRemoteUsers() {
         log.warn("unexpected method call");
         return null;
     }
 
+    @Override
     public void initiatePermissionChange(User user, Permission newPermission,
         SubMonitor progress) throws CancellationException, InterruptedException {
         log.warn("unexpected method call");
     }
 
+    @Override
     public void setPermission(User user, Permission permission) {
         log.warn("unexpected method call");
     }
 
+    @Override
     public void userInvitationCompleted(User user) {
         log.warn("unexpected method call");
     }
 
+    @Override
     public boolean hasWriteAccess() {
         log.warn("unexpected method call");
         return false;
     }
 
+    @Override
     public User getHost() {
         log.warn("unexpected method call");
         return null;
     }
 
+    @Override
     public boolean isHost() {
         log.warn("unexpected method call");
         return false;
     }
 
+    @Override
     public void addUser(User user) {
         log.warn("unexpected method call");
     }
 
+    @Override
     public void removeUser(User user) {
         log.warn("unexpected method call");
     }
 
+    @Override
     public void addListener(ISharedProjectListener listener) {
         log.warn("unexpected method call");
     }
 
+    @Override
     public void removeListener(ISharedProjectListener listener) {
         log.warn("unexpected method call");
     }
 
+    @Override
     public Set<IProject> getProjects() {
         log.warn("unexpected method call");
         return null;
     }
 
+    @Override
     public ActivitySequencer getSequencer() {
         log.warn("unexpected method call");
         return null;
     }
 
+    @Override
     public void start() {
         log.warn("unexpected method call");
     }
 
+    @Override
     public void stop() {
         log.warn("unexpected method call");
     }
 
+    @Override
     public User getUser(JID jid) {
         log.warn("unexpected method call");
         return null;
     }
 
+    @Override
     public JID getResourceQualifiedJID(JID jid) {
         log.warn("unexpected method call");
         return null;
     }
 
+    @Override
     public User getLocalUser() {
         log.warn("unexpected method call");
         return null;
     }
 
+    @Override
     public boolean hasExclusiveWriteAccess() {
         log.warn("unexpected method call");
         return false;
     }
 
+    @Override
     public ConcurrentDocumentServer getConcurrentDocumentServer() {
         log.warn("unexpected method call");
         return null;
     }
 
+    @Override
     public ConcurrentDocumentClient getConcurrentDocumentClient() {
         log.warn("unexpected method call");
         return null;
     }
 
+    @Override
     public Saros getSaros() {
         log.warn("unexpected method call");
         return null;
     }
 
+    @Override
     public int getFreeColor() {
         log.warn("unexpected method call");
         return 0;
     }
 
+    @Override
     public void returnColor(int colorID) {
         log.warn("unexpected method call");
 
     }
 
+    @Override
     public void exec(List<IActivityDataObject> activityDataObjects) {
         log.warn("unexpected method call");
 
@@ -169,93 +195,111 @@ public class NullSarosSession implements ISarosSession {
 
     }
 
+    @Override
     public void sendActivity(User recipient, IActivity activity) {
         log.warn("unexpected method call");
 
     }
 
+    @Override
     public void addActivityProvider(IActivityProvider provider) {
         log.warn("unexpected method call");
 
     }
 
+    @Override
     public void removeActivityProvider(IActivityProvider provider) {
         log.warn("unexpected method call");
 
     }
 
+    @Override
     public List<User> getUsersWithWriteAccess() {
         log.warn("unexpected method call");
         return null;
     }
 
+    @Override
     public List<User> getUsersWithReadOnlyAccess() {
         log.warn("unexpected method call");
         return null;
     }
 
+    @Override
     public List<User> getRemoteUsersWithReadOnlyAccess() {
         log.warn("unexpected method call");
         return null;
     }
 
+    @Override
     public DateTime getSessionStart() {
         log.warn("unexpected method call");
         return null;
     }
 
+    @Override
     public boolean isShared(IResource resource) {
         log.warn("unexpected method call");
         return false;
     }
 
+    @Override
     public boolean useVersionControl() {
         log.warn("unexpected method call");
         return false;
     }
 
+    @Override
     public SharedProject getSharedProject(IProject project) {
         log.warn("unexpected method call");
         return null;
     }
 
+    @Override
     public String getProjectID(IProject project) {
         log.warn("unexpected method call");
         return null;
     }
 
+    @Override
     public IProject getProject(String projectID) {
         log.warn("unexpected method call");
         return null;
     }
 
+    @Override
     public void addSharedResources(IProject project, String projectID,
         List<IResource> dependentResources) {
         log.warn("unexpected method call");
 
     }
 
+    @Override
     public List<SharedProject> getSharedProjects() {
         log.warn("unexpected method call");
         return null;
     }
 
+    @Override
     public void synchronizeUserList(ITransmitter transmitter, JID peer,
         IProgressMonitor monitor) throws SarosCancellationException {
         log.warn("unexpected method call");
 
     }
 
+    @Override
     public List<IResource> getAllSharedResources() {
         log.warn("unexpected method call");
         return null;
     }
 
+    @Override
     public HashMap<IProject, List<IResource>> getProjectResourcesMapping() {
         log.warn("unexpected method call");
         return null;
     }
 
+    @Override
     public boolean isCompletelyShared(IProject project) {
         log.warn("unexpected method call");
         return false;
@@ -269,21 +313,25 @@ public class NullSarosSession implements ISarosSession {
         log.warn("unexpected method call");
     }
 
+    @Override
     public List<IResource> getSharedResources(IProject project) {
         log.warn("unexpected method call");
         return null;
     }
 
+    @Override
     public void addProjectOwnership(String projectID, IProject project,
         JID ownerJID) {
         log.warn("unexpected method call");
     }
 
+    @Override
     public StopManager getStopManager() {
         log.warn("unexpected method call");
         return null;
     }
 
+    @Override
     public void removeProjectOwnership(String projectID, IProject project,
         JID ownerJID) {
         log.warn("unexpected method call");

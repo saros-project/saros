@@ -31,6 +31,7 @@ public final class ShareWithC extends StfRemoteObject implements IShareWithC {
     }
 
     // FIXME can not click the context menu.
+    @Override
     public void multipleBuddies(String projectName, JID... baseJIDOfInvitees)
         throws RemoteException {
         treeItem.select();
@@ -40,11 +41,13 @@ public final class ShareWithC extends StfRemoteObject implements IShareWithC {
             baseJIDOfInvitees);
     }
 
+    @Override
     public void buddy(JID jid) throws RemoteException {
         treeItem.select();
         ContextMenuHelper.clickContextMenu(tree, CM_SHARE_WITH, jid.getBase());
     }
 
+    @Override
     public void addToSarosSession() throws RemoteException {
         /*
          * The menu is only activated if there are project existed in the

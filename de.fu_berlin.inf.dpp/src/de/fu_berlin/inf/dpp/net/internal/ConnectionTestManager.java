@@ -69,6 +69,7 @@ public class ConnectionTestManager {
 
         receiver.addPacketListener(new PacketListener() {
 
+            @Override
             public void processPacket(Packet packet) {
 
                 IncomingTransferObject ito = incomingTransferObjectExtensionProvider
@@ -106,6 +107,7 @@ public class ConnectionTestManager {
             }
         }, new PacketFilter() {
 
+            @Override
             public boolean accept(Packet packet) {
                 IncomingTransferObject payload = incomingTransferObjectExtensionProvider
                     .getPayload(packet);

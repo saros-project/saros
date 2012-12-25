@@ -34,6 +34,7 @@ public class JumpToUserWithWriteAccessPositionAction extends Action implements
         .getLogger(JumpToUserWithWriteAccessPositionAction.class.getName());
 
     protected ISelectionListener selectionListener = new ISelectionListener() {
+        @Override
         public void selectionChanged(IWorkbenchPart part, ISelection selection) {
             updateEnablement();
         }
@@ -81,6 +82,7 @@ public class JumpToUserWithWriteAccessPositionAction extends Action implements
     @Override
     public void run() {
         Utils.runSafeSync(log, new Runnable() {
+            @Override
             public void run() {
                 List<User> participants = SelectionRetrieverFactory
                     .getSelectionRetriever(User.class).getSelection();
@@ -93,6 +95,7 @@ public class JumpToUserWithWriteAccessPositionAction extends Action implements
         });
     }
 
+    @Override
     public void dispose() {
         SelectionUtils.getSelectionService().removeSelectionListener(
             selectionListener);

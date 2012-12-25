@@ -27,6 +27,7 @@ public class ErrorMessageDialog {
      */
     public static void showErrorMessage(final Exception exception) {
         Utils.runSafeSWTSync(log, new Runnable() {
+            @Override
             public void run() {
                 MessageDialog.openError(EditorAPI.getShell(),
                     exception.toString(), exception.getMessage());
@@ -40,6 +41,7 @@ public class ErrorMessageDialog {
     public static void showErrorMessage(final String windowTitle,
         final Exception exception) {
         Utils.runSafeSWTSync(log, new Runnable() {
+            @Override
             public void run() {
                 MessageDialog.openError(EditorAPI.getShell(), windowTitle,
                     exception.toString());
@@ -63,6 +65,7 @@ public class ErrorMessageDialog {
         final String error = exceptionMessage;
 
         Utils.runSafeSWTSync(log, new Runnable() {
+            @Override
             public void run() {
                 MessageDialog.openError(EditorAPI.getShell(),
                     Messages.ErrorMessageDialog_error_plugin, error);

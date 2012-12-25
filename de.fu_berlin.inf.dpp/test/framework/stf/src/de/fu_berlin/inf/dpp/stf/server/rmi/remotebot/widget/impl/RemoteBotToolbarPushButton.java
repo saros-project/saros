@@ -27,43 +27,53 @@ public final class RemoteBotToolbarPushButton extends StfRemoteObject implements
         return this;
     }
 
+    @Override
     public IRemoteBotMenu contextMenu(String text) throws RemoteException {
         return RemoteBotMenu.getInstance().setWidget(widget.contextMenu(text));
     }
 
+    @Override
     public void click() throws RemoteException {
         widget.click();
     }
 
+    @Override
     public void clickAndWait() throws RemoteException {
         waitUntilIsEnabled();
         click();
     }
 
+    @Override
     public void setFocus() throws RemoteException {
         widget.setFocus();
     }
 
+    @Override
     public boolean isEnabled() throws RemoteException {
         return widget.isEnabled();
     }
 
+    @Override
     public boolean isVisible() throws RemoteException {
         return widget.isVisible();
     }
 
+    @Override
     public boolean isActive() throws RemoteException {
         return widget.isActive();
     }
 
+    @Override
     public String getText() throws RemoteException {
         return widget.getText();
     }
 
+    @Override
     public String getToolTipText() throws RemoteException {
         return widget.getText();
     }
 
+    @Override
     public void waitUntilIsEnabled() throws RemoteException {
         RemoteWorkbenchBot.getInstance().waitUntil(
             Conditions.widgetIsEnabled(widget));

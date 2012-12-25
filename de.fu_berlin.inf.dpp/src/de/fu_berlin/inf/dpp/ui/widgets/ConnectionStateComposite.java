@@ -26,9 +26,11 @@ public class ConnectionStateComposite extends Composite {
         .getLogger(ConnectionStateComposite.class);
 
     protected final IConnectionListener connectionListener = new IConnectionListener() {
+        @Override
         public void connectionStateChanged(Connection connection,
             final ConnectionState newState) {
             Utils.runSafeSWTAsync(log, new Runnable() {
+                @Override
                 public void run() {
                     updateLabel(newState);
                 }

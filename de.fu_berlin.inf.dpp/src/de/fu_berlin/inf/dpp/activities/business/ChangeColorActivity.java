@@ -23,6 +23,7 @@ public class ChangeColorActivity extends AbstractActivity {
         this.color = color;
     }
 
+    @Override
     public void dispatch(IActivityReceiver receiver) {
         receiver.receive(this);
     }
@@ -39,6 +40,7 @@ public class ChangeColorActivity extends AbstractActivity {
     /**
      * {@inheritDoc}
      */
+    @Override
     public IActivityDataObject getActivityDataObject(ISarosSession sarosSession) {
         return new ChangeColorActivityDataObject(source.getJID(),
             target.getJID(), this.color);

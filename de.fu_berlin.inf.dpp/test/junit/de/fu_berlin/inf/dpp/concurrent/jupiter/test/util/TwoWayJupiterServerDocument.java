@@ -32,10 +32,12 @@ public class TwoWayJupiterServerDocument implements NetworkEventHandler,
         this.connection = con;
     }
 
+    @Override
     public JID getJID() {
         return server.getJID();
     }
 
+    @Override
     public User getUser() {
         return server;
     }
@@ -92,6 +94,7 @@ public class TwoWayJupiterServerDocument implements NetworkEventHandler,
 
     }
 
+    @Override
     public String getDocument() {
         return doc.getDocument();
     }
@@ -108,6 +111,7 @@ public class TwoWayJupiterServerDocument implements NetworkEventHandler,
     /**
      * receive network request.
      */
+    @Override
     public void receiveNetworkEvent(NetworkRequest req) {
         receiveOperation(req.getJupiterActivity());
     }

@@ -94,6 +94,7 @@ public class ChatRoomsComposite extends ListExplanatoryComposite {
         @Override
         public void entriesUpdated(final Collection<String> addresses) {
             Utils.runSafeSWTAsync(log, new Runnable() {
+                @Override
                 public void run() {
 
                     if (ChatRoomsComposite.this.isDisposed())
@@ -356,6 +357,7 @@ public class ChatRoomsComposite extends ListExplanatoryComposite {
 
         this.addDisposeListener(new DisposeListener() {
 
+            @Override
             public void widgetDisposed(DisposeEvent e) {
                 sessionManager.removeSarosSessionListener(sessionListener);
 

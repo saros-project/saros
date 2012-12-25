@@ -64,6 +64,7 @@ public class ConcurrentDocumentServer implements Disposable {
         this.sarosSession.addListener(projectListener);
     }
 
+    @Override
     public void dispose() {
         sarosSession.removeListener(projectListener);
     }

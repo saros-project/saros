@@ -57,6 +57,7 @@ public class DeleteContactAction extends Action implements Disposable {
         .getLogger(DeleteContactAction.class.getName());
 
     protected IConnectionListener connectionListener = new IConnectionListener() {
+        @Override
         public void connectionStateChanged(Connection connection,
             final ConnectionState newState) {
             updateEnablement();
@@ -64,6 +65,7 @@ public class DeleteContactAction extends Action implements Disposable {
     };
 
     protected ISelectionListener selectionListener = new ISelectionListener() {
+        @Override
         public void selectionChanged(IWorkbenchPart part, ISelection selection) {
             updateEnablement();
         }
@@ -125,6 +127,7 @@ public class DeleteContactAction extends Action implements Disposable {
     @Override
     public void run() {
         Utils.runSafeSync(log, new Runnable() {
+            @Override
             public void run() {
                 runDeleteAction();
             }
@@ -179,6 +182,7 @@ public class DeleteContactAction extends Action implements Disposable {
         }
     }
 
+    @Override
     public void dispose() {
         SelectionUtils.getSelectionService().removeSelectionListener(
             selectionListener);

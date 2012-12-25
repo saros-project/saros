@@ -67,6 +67,7 @@ public class AddBuddyWizardPage extends WizardPage {
         setDescription(DESCRIPTION);
     }
 
+    @Override
     public void createControl(Composite parent) {
         Composite composite = new Composite(parent, SWT.NONE);
         setControl(composite);
@@ -124,6 +125,7 @@ public class AddBuddyWizardPage extends WizardPage {
 
     protected void hookListeners() {
         this.jidCombo.getControl().addModifyListener(new ModifyListener() {
+            @Override
             public void modifyText(ModifyEvent e) {
                 updatePageCompletion();
             }

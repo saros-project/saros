@@ -80,6 +80,7 @@ public class PacketExtensionUtils {
 
         return new AndFilter(new MessageTypeFilter(Message.Type.chat),
             new PacketFilter() {
+                @Override
                 public boolean accept(Packet arg0) {
                     Message message = (Message) arg0;
                     return sessionIDObservable.getValue().equals(
@@ -97,6 +98,7 @@ public class PacketExtensionUtils {
         final String invitationID) {
 
         return new PacketFilter() {
+            @Override
             public boolean accept(Packet arg0) {
                 InvitationExtension invInfo = extProv.getPayload(arg0);
 
@@ -111,6 +113,7 @@ public class PacketExtensionUtils {
         final String sessionID, final String processID, final JID peer) {
         return new AndFilter(extProv.getPacketFilter(), new PacketFilter() {
 
+            @Override
             public boolean accept(Packet packet) {
                 IncomingTransferObject payload = extProv.getPayload(packet);
 
@@ -156,6 +159,7 @@ public class PacketExtensionUtils {
         final SessionIDObservable sessionID) {
 
         return new AndFilter(extProv.getPacketFilter(), new PacketFilter() {
+            @Override
             public boolean accept(Packet packet) {
                 SarosSessionPacketExtension extension = extProv
                     .getPayload(packet);

@@ -13,10 +13,12 @@ public class IsShellOpen extends DefaultCondition {
         this.bot = bot;
     }
 
+    @Override
     public String getFailureMessage() {
         return "Can't find the shell " + title;
     }
 
+    @Override
     public boolean test() throws Exception {
         SWTBotShell[] shells = bot.shells();
         for (SWTBotShell shell : shells) {

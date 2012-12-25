@@ -25,17 +25,20 @@ public final class RemoteBotMenu extends StfRemoteObject implements
         return this;
     }
 
+    @Override
     public RemoteBotMenu contextMenu(String text) throws RemoteException {
         widget = widget.contextMenu(text);
         return this;
 
     }
 
+    @Override
     public IRemoteBotMenu menu(String menuName) throws RemoteException {
         widget = widget.menu(menuName);
         return this;
     }
 
+    @Override
     public void click() throws RemoteException {
         widget.click();
     }
@@ -45,34 +48,42 @@ public final class RemoteBotMenu extends StfRemoteObject implements
         click();
     }
 
+    @Override
     public void setFocus() throws RemoteException {
         widget.setFocus();
     }
 
+    @Override
     public boolean isEnabled() throws RemoteException {
         return widget.isEnabled();
     }
 
+    @Override
     public boolean isVisible() throws RemoteException {
         return widget.isVisible();
     }
 
+    @Override
     public boolean isActive() throws RemoteException {
         return widget.isActive();
     }
 
+    @Override
     public boolean isChecked() throws RemoteException {
         return widget.isChecked();
     }
 
+    @Override
     public String getText() throws RemoteException {
         return widget.getText();
     }
 
+    @Override
     public String getToolTipText() throws RemoteException {
         return widget.getText();
     }
 
+    @Override
     public void waitUntilIsEnabled() throws RemoteException {
         RemoteWorkbenchBot.getInstance().waitUntil(
             Conditions.widgetIsEnabled(widget));

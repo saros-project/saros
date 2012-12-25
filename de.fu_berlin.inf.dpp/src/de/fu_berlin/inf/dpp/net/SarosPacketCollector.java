@@ -121,6 +121,7 @@ public class SarosPacketCollector implements PacketListener {
      *                 {@link de.fu_berlin.inf.dpp.net.business.DispatchThreadContext}
      * 
      */
+    @Override
     public void processPacket(Packet packet) {
         if (packet == null)
             return;

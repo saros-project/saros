@@ -24,6 +24,7 @@ public class StartFollowingActivityDataObject extends
         this.target = target;
     }
 
+    @Override
     public IActivity getActivity(ISarosSession sharedProject) {
         return new StartFollowingActivity(sharedProject.getUser(source),
             sharedProject.getUser(target));

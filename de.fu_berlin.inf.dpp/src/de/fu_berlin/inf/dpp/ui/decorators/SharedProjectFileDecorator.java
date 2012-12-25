@@ -209,6 +209,7 @@ public class SharedProjectFileDecorator implements ILightweightLabelDecorator {
         updateDecoratorsAsync(resources.toArray());
     }
 
+    @Override
     public void decorate(Object element, IDecoration decoration) {
         if (decorateInternal(element, decoration)) {
             decoratedElements.add(element);
@@ -316,14 +317,17 @@ public class SharedProjectFileDecorator implements ILightweightLabelDecorator {
         return false;
     }
 
+    @Override
     public void addListener(ILabelProviderListener listener) {
         this.listeners.add(listener);
     }
 
+    @Override
     public void removeListener(ILabelProviderListener listener) {
         this.listeners.remove(listener);
     }
 
+    @Override
     public void dispose() {
         sessionManager.removeSarosSessionListener(sessionListener);
         editorManager.removeSharedEditorListener(editorListener);
@@ -331,6 +335,7 @@ public class SharedProjectFileDecorator implements ILightweightLabelDecorator {
         this.sarosSession = null;
     }
 
+    @Override
     public boolean isLabelProperty(Object element, String property) {
         return false;
     }
@@ -338,6 +343,7 @@ public class SharedProjectFileDecorator implements ILightweightLabelDecorator {
     protected void updateDecoratorsAsync(final Object[] updateElements) {
 
         Utils.runSafeSWTAsync(log, new Runnable() {
+            @Override
             public void run() {
                 LabelProviderChangedEvent event = new LabelProviderChangedEvent(
                     SharedProjectFileDecorator.this, updateElements);

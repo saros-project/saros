@@ -45,6 +45,7 @@ public class ChangeColorAction extends Action implements Disposable {
     private static final Logger log = Logger.getLogger(ChangeColorAction.class);
 
     protected ISelectionListener selectionListener = new ISelectionListener() {
+        @Override
         public void selectionChanged(IWorkbenchPart part, ISelection selection) {
             updateEnablement();
         }
@@ -91,6 +92,7 @@ public class ChangeColorAction extends Action implements Disposable {
     @Override
     public void run() {
         Utils.runSafeSWTSync(log, new Runnable() {
+            @Override
             public void run() {
                 boolean done = false;
                 ColorDialog changeColor = new ColorDialog(EditorAPI.getShell());
@@ -130,6 +132,7 @@ public class ChangeColorAction extends Action implements Disposable {
         });
     }
 
+    @Override
     public void dispose() {
         SelectionUtils.getSelectionService().removeSelectionListener(
             selectionListener);

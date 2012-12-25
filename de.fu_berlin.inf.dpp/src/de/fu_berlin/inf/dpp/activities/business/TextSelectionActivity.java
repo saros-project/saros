@@ -55,6 +55,7 @@ public class TextSelectionActivity extends AbstractActivity implements
         return this.offset;
     }
 
+    @Override
     public SPath getPath() {
         return this.path;
     }
@@ -94,10 +95,12 @@ public class TextSelectionActivity extends AbstractActivity implements
             + this.length + ",src:" + getSource() + ",path:" + this.path + ")";
     }
 
+    @Override
     public void dispatch(IActivityReceiver receiver) {
         receiver.receive(this);
     }
 
+    @Override
     public IActivityDataObject getActivityDataObject(ISarosSession sarosSession) {
         return new TextSelectionActivityDataObject(source.getJID(), offset,
             length, path.toSPathDataObject(sarosSession));

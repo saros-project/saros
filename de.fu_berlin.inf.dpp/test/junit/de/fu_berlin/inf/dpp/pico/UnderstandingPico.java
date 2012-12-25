@@ -68,6 +68,7 @@ public class UnderstandingPico {
         @Inject
         private User user;
 
+        @Override
         public User getUser() {
             return user;
         }

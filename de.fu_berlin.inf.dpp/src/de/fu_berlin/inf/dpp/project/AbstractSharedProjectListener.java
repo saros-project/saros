@@ -10,18 +10,22 @@ import de.fu_berlin.inf.dpp.User;
 public abstract class AbstractSharedProjectListener implements
     ISharedProjectListener {
 
+    @Override
     public void permissionChanged(User user) {
         // Do nothing.
     }
 
+    @Override
     public void userJoined(User user) {
         // Do nothing.
     }
 
+    @Override
     public void userLeft(User user) {
         // Do nothing.
     }
 
+    @Override
     public void invitationCompleted(User user) {
         // Do nothing.
     }

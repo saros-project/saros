@@ -68,6 +68,7 @@ public final class SarosView extends StfRemoteObject implements ISarosView {
         return this;
     }
 
+    @Override
     public void connectWith(JID jid, String password) throws RemoteException {
 
         ControlBotImpl.getInstance().getAccountManipulator()
@@ -85,6 +86,7 @@ public final class SarosView extends StfRemoteObject implements ISarosView {
         waitUntilIsConnected();
     }
 
+    @Override
     public void connectWithActiveAccount() throws RemoteException {
         if (isDisconnected()) {
             if (getXmppAccountStore().isEmpty())
@@ -96,6 +98,7 @@ public final class SarosView extends StfRemoteObject implements ISarosView {
         }
     }
 
+    @Override
     public void disconnect() throws RemoteException {
         if (isConnected()) {
             clickToolbarButtonWithTooltip(TB_DISCONNECT);
@@ -120,6 +123,7 @@ public final class SarosView extends StfRemoteObject implements ISarosView {
         }
     }
 
+    @Override
     public void addNewBuddy(JID jid) throws RemoteException {
         if (!hasBuddy(jid)) {
             clickToolbarButtonWithTooltip(TB_ADD_A_NEW_BUDDY);
@@ -129,6 +133,7 @@ public final class SarosView extends StfRemoteObject implements ISarosView {
         new SWTBot().sleep(500);
     }
 
+    @Override
     public void shareYourScreenWithSelectedBuddy(JID jidOfPeer)
         throws RemoteException {
         selectParticipant(jidOfPeer, "you cannot share a screen with youself");
@@ -141,11 +146,13 @@ public final class SarosView extends StfRemoteObject implements ISarosView {
         clickToolbarButtonWithTooltip(TB_STOP_SESSION_WITH_BUDDY);
     }
 
+    @Override
     public void sendFileToSelectedBuddy(JID jidOfPeer) throws RemoteException {
         selectParticipant(jidOfPeer, "you cannot send a file to youself");
         clickToolbarButtonWithTooltip(TB_SEND_A_FILE_TO_SELECTED_BUDDY);
     }
 
+    @Override
     public void startAVoIPSessionWithSelectedBuddy(JID jidOfPeer)
         throws RemoteException {
         selectParticipant(jidOfPeer,
@@ -158,6 +165,7 @@ public final class SarosView extends StfRemoteObject implements ISarosView {
         }
     }
 
+    @Override
     public void leaveSession() throws RemoteException {
         if (isInSession()) {
             if (!isHost()) {
@@ -187,6 +195,7 @@ public final class SarosView extends StfRemoteObject implements ISarosView {
      * {@link IRemoteBotView#toolbarButtonWithRegex(String)} to perform this
      * action.
      */
+    @Override
     public void resolveInconsistency() throws RemoteException {
         WidgetUtil.getToolbarButtonWithRegex(view,
             Pattern.quote(TB_INCONSISTENCY_DETECTED) + ".*").click();
@@ -203,11 +212,13 @@ public final class SarosView extends StfRemoteObject implements ISarosView {
      * 
      **********************************************/
 
+    @Override
     public IContextMenusInBuddiesArea selectBuddies() throws RemoteException {
         initBuddiesContextMenuWrapper(Pattern.quote((NODE_BUDDIES)));
         return ContextMenusInBuddiesArea.getInstance();
     }
 
+    @Override
     public IContextMenusInBuddiesArea selectBuddy(JID buddyJID)
         throws RemoteException {
         if (getNickname(buddyJID) == null) {
@@ -219,6 +230,7 @@ public final class SarosView extends StfRemoteObject implements ISarosView {
         return ContextMenusInBuddiesArea.getInstance();
     }
 
+    @Override
     public IContextMenusInSessionArea selectSession() throws RemoteException {
         if (!isInSession())
             throw new RuntimeException("you are not in a session");
@@ -226,6 +238,7 @@ public final class SarosView extends StfRemoteObject implements ISarosView {
         return ContextMenusInSessionArea.getInstance();
     }
 
+    @Override
     public IContextMenusInSessionArea selectNoSessionRunning()
         throws RemoteException {
         if (isInSession())
@@ -234,6 +247,7 @@ public final class SarosView extends StfRemoteObject implements ISarosView {
         return ContextMenusInSessionArea.getInstance();
     }
 
+    @Override
     public IContextMenusInSessionArea selectParticipant(final JID participantJID)
         throws RemoteException {
         if (!isInSession())
@@ -257,6 +271,7 @@ public final class SarosView extends StfRemoteObject implements ISarosView {
      * 
      **********************************************/
 
+    @Override
     public boolean isConnected() {
         return isToolbarButtonEnabled(TB_DISCONNECT);
     }
@@ -265,6 +280,7 @@ public final class SarosView extends StfRemoteObject implements ISarosView {
         return isToolbarButtonEnabled(TB_CONNECT);
     }
 
+    @Override
     public String getNickname(JID buddyJID) throws RemoteException {
         Roster roster = getSarosNet().getRoster();
 
@@ -279,6 +295,7 @@ public final class SarosView extends StfRemoteObject implements ISarosView {
             return roster.getEntry(buddyJID.getBase()).getName();
     }
 
+    @Override
     public boolean hasNickName(JID buddyJID) throws RemoteException {
         try {
             if (getNickname(buddyJID) == null)
@@ -292,6 +309,7 @@ public final class SarosView extends StfRemoteObject implements ISarosView {
         }
     }
 
+    @Override
     public List<String> getAllBuddies() throws RemoteException {
         SWTBotTreeItem items = tree.getTreeItem(NODE_BUDDIES);
         List<String> buddies = new ArrayList<String>();
@@ -302,6 +320,7 @@ public final class SarosView extends StfRemoteObject implements ISarosView {
         return buddies;
     }
 
+    @Override
     public boolean hasBuddy(JID buddyJID) throws RemoteException {
         try {
             String nickName = getNickname(buddyJID);
@@ -320,6 +339,7 @@ public final class SarosView extends StfRemoteObject implements ISarosView {
         }
     }
 
+    @Override
     public boolean existsParticipant(JID participantJID) throws RemoteException {
         try {
             String participantLabel = getParticipantLabel(participantJID);
@@ -336,6 +356,7 @@ public final class SarosView extends StfRemoteObject implements ISarosView {
         }
     }
 
+    @Override
     public String getParticipantLabel(JID participantJID)
         throws RemoteException {
         String contactLabel;
@@ -351,6 +372,7 @@ public final class SarosView extends StfRemoteObject implements ISarosView {
         return contactLabel;
     }
 
+    @Override
     public boolean isInSession() {
         try {
             for (SWTBotToolbarButton button : view.getToolbarButtons()) {
@@ -366,6 +388,7 @@ public final class SarosView extends StfRemoteObject implements ISarosView {
         }
     }
 
+    @Override
     public boolean isHost() throws RemoteException {
         try {
             if (!isInSession())
@@ -393,6 +416,7 @@ public final class SarosView extends StfRemoteObject implements ISarosView {
         }
     }
 
+    @Override
     public boolean isFollowing() throws RemoteException {
         try {
             JID followedBuddy = getFollowedBuddy();
@@ -406,15 +430,18 @@ public final class SarosView extends StfRemoteObject implements ISarosView {
         }
     }
 
+    @Override
     public List<String> getAllParticipants() throws RemoteException {
         return tree.getTreeItem(NODE_SESSION).getNodes();
 
     }
 
+    @Override
     public JID getJID() {
         return SuperBot.getInstance().getJID();
     }
 
+    @Override
     public JID getFollowedBuddy() {
         if (getEditorManager().getFollowedUser() != null)
             return getEditorManager().getFollowedUser().getJID();
@@ -471,67 +498,83 @@ public final class SarosView extends StfRemoteObject implements ISarosView {
      * waits until
      */
 
+    @Override
     public void waitUntilIsConnected() throws RemoteException {
         new SWTBot().waitUntil(new DefaultCondition() {
+            @Override
             public boolean test() throws Exception {
                 return isConnected();
             }
 
+            @Override
             public String getFailureMessage() {
                 return "unable to connect to server";
             }
         }, SarosSWTBotPreferences.SAROS_DEFAULT_TIMEOUT);
     }
 
+    @Override
     public void waitUntilIsDisconnected() throws RemoteException {
         new SWTBot().waitUntil(new DefaultCondition() {
+            @Override
             public boolean test() throws Exception {
                 return isDisconnected();
             }
 
+            @Override
             public String getFailureMessage() {
                 return "unable to disconnect from server";
             }
         }, SarosSWTBotPreferences.SAROS_DEFAULT_TIMEOUT);
     }
 
+    @Override
     public void waitUntilIsInSession() throws RemoteException {
         new SWTBot().waitUntil(new DefaultCondition() {
+            @Override
             public boolean test() throws Exception {
                 return isInSession();
             }
 
+            @Override
             public String getFailureMessage() {
                 return "joining the session failed";
             }
         });
     }
 
+    @Override
     public void waitUntilIsInviteeInSession(ISuperBot sarosBot)
         throws RemoteException {
         sarosBot.views().sarosView().waitUntilIsInSession();
     }
 
+    @Override
     public void waitUntilIsNotInSession() throws RemoteException {
         new SWTBot().waitUntil(new DefaultCondition() {
+            @Override
             public boolean test() throws Exception {
                 return !isInSession();
             }
 
+            @Override
             public String getFailureMessage() {
                 return "leaving the session failed";
             }
         });
     }
 
+    @Override
     public void waitUntilIsInviteeNotInSession(ISuperBot sarosBot)
         throws RemoteException {
         sarosBot.views().sarosView().waitUntilIsNotInSession();
     }
 
+    @Override
     public void waitUntilAllPeersLeaveSession(
         final List<JID> jidsOfAllParticipants) throws RemoteException {
         new SWTBot().waitUntil(new DefaultCondition() {
+            @Override
             public boolean test() throws Exception {
                 for (JID jid : jidsOfAllParticipants) {
                     if (existsParticipant(jid))
@@ -540,20 +583,24 @@ public final class SarosView extends StfRemoteObject implements ISarosView {
                 return true;
             }
 
+            @Override
             public String getFailureMessage() {
                 return "there are still users in the session";
             }
         });
     }
 
+    @Override
     public void waitUntilIsInconsistencyDetected() throws RemoteException {
         RemoteWorkbenchBot.getInstance().waitUntil(new DefaultCondition() {
+            @Override
             public boolean test() throws Exception {
                 return WidgetUtil.getToolbarButtonWithRegex(view,
                     Pattern.quote(TB_INCONSISTENCY_DETECTED) + ".*")
                     .isEnabled();
             }
 
+            @Override
             public String getFailureMessage() {
                 return "the toolbar button " + TB_INCONSISTENCY_DETECTED
                     + " is not enabled";

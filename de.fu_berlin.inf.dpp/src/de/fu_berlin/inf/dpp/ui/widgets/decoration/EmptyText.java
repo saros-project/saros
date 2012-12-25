@@ -45,16 +45,19 @@ public class EmptyText {
 
     protected void registerListeners() {
         this.control.addFocusListener(new FocusListener() {
+            @Override
             public void focusGained(FocusEvent e) {
                 update(true);
             }
 
+            @Override
             public void focusLost(FocusEvent e) {
                 update(false);
             }
         });
 
         this.control.addDisposeListener(new DisposeListener() {
+            @Override
             public void widgetDisposed(DisposeEvent e) {
                 if (emptyTextForegroundColor != null
                     && !emptyTextForegroundColor.isDisposed()) {
@@ -91,6 +94,7 @@ public class EmptyText {
                  * not seem to work. We therefore defer the text change.
                  */
                 Utils.runSafeSWTSync(null, new Runnable() {
+                    @Override
                     public void run() {
                         control.setText(emptyText);
                         control.setForeground(emptyTextForegroundColor);

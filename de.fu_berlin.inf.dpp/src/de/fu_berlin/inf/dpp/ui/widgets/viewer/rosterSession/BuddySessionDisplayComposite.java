@@ -107,6 +107,7 @@ public class BuddySessionDisplayComposite extends ViewerComposite {
     };
 
     private IConnectionListener connectionListener = new IConnectionListener() {
+        @Override
         public void connectionStateChanged(Connection connection,
             ConnectionState newState) {
             switch (newState) {
@@ -190,6 +191,7 @@ public class BuddySessionDisplayComposite extends ViewerComposite {
     };
 
     private IPropertyChangeListener editorPrefsListener = new IPropertyChangeListener() {
+        @Override
         public void propertyChange(PropertyChangeEvent event) {
             ViewerUtils.refresh(viewer, true);
         }
@@ -239,6 +241,7 @@ public class BuddySessionDisplayComposite extends ViewerComposite {
             editorPrefsListener);
 
         this.addDisposeListener(new DisposeListener() {
+            @Override
             public void widgetDisposed(DisposeEvent e) {
 
                 if (EditorsUI.getPreferenceStore() != null) {
@@ -419,6 +422,7 @@ public class BuddySessionDisplayComposite extends ViewerComposite {
          * used for this participant in the current session
          */
         this.tree.addListener(SWT.EraseItem, new Listener() {
+            @Override
             public void handleEvent(Event event) {
                 event.detail &= ~SWT.HOT;
 

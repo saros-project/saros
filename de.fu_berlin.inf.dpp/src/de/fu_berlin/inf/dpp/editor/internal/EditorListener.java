@@ -104,10 +104,12 @@ public class EditorListener {
      */
     protected ControlListener controlListener = new ControlListener() {
 
+        @Override
         public void controlMoved(ControlEvent e) {
             generateViewport();
         }
 
+        @Override
         public void controlResized(ControlEvent e) {
             generateViewport();
         }
@@ -116,24 +118,29 @@ public class EditorListener {
 
     protected final MouseListener mouseListener = new MouseListener() {
 
+        @Override
         public void mouseDown(MouseEvent e) {
             generateSelection();
         }
 
+        @Override
         public void mouseUp(MouseEvent e) {
             generateSelection();
         }
 
+        @Override
         public void mouseDoubleClick(MouseEvent e) {
             // ignore
         }
     };
 
     protected final KeyListener keyListener = new KeyListener() {
+        @Override
         public void keyReleased(KeyEvent e) {
             generateSelection();
         }
 
+        @Override
         public void keyPressed(KeyEvent e) {
             // ignore
         }
@@ -144,12 +151,14 @@ public class EditorListener {
          * This does not report window resizes because of
          * https://bugs.eclipse.org/bugs/show_bug.cgi?id=171018
          */
+        @Override
         public void viewportChanged(int verticalOffset) {
             generateViewport();
         }
     };
 
     protected ISelectionChangedListener selectionChangedListener = new ISelectionChangedListener() {
+        @Override
         public void selectionChanged(SelectionChangedEvent event) {
             generateSelection();
         }
@@ -161,6 +170,7 @@ public class EditorListener {
      */
     protected ITextListener textListener = new ITextListener() {
 
+        @Override
         public void textChanged(TextEvent event) {
 
             String text = event.getText();

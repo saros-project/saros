@@ -74,6 +74,7 @@ public final class NetworkPreferencePage extends PreferencePage implements
         setDescription(Messages.NetworkPreferencePage_network_settings);
     }
 
+    @Override
     public void init(IWorkbench workbench) {
         // No init necessary
     }
@@ -272,6 +273,7 @@ public final class NetworkPreferencePage extends PreferencePage implements
             false));
 
         upnpDevicesTable.addListener(SWT.Selection, new Listener() {
+            @Override
             public void handleEvent(Event event) {
                 if (event.detail == SWT.CHECK)
                     handleGatewaySelection(event);
@@ -386,12 +388,14 @@ public final class NetworkPreferencePage extends PreferencePage implements
 
             Utils.runSafeAsync(null, new Runnable() {
 
+                @Override
                 public void run() {
 
                     upnpService.startGatewayDiscovery(false);
 
                     while (upnpService.getGateways() == null) {
                         Utils.runSafeSWTAsync(null, new Runnable() {
+                            @Override
                             public void run() {
                                 if (!gatewayInfo.isDisposed()) {
                                     gatewayInfo.setText(MessageFormat
@@ -416,6 +420,7 @@ public final class NetworkPreferencePage extends PreferencePage implements
                     }
 
                     Utils.runSafeSWTAsync(null, new Runnable() {
+                        @Override
                         public void run() {
                             List<GatewayDevice> gateways = upnpService
                                 .getGateways();

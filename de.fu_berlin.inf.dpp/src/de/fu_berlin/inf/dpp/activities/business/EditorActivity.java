@@ -74,6 +74,7 @@ public class EditorActivity extends AbstractActivity implements
         this.path = path;
     }
 
+    @Override
     public SPath getPath() {
         return this.path;
     }
@@ -119,10 +120,12 @@ public class EditorActivity extends AbstractActivity implements
             + (this.path != null ? this.path : "no path") + ")";
     }
 
+    @Override
     public void dispatch(IActivityReceiver receiver) {
         receiver.receive(this);
     }
 
+    @Override
     public IActivityDataObject getActivityDataObject(ISarosSession sarosSession) {
         return new EditorActivityDataObject(source.getJID(), type,
             (path != null ? path.toSPathDataObject(sarosSession) : null));

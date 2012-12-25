@@ -24,6 +24,7 @@ public class TotalOrderComparator<T> implements Comparator<T> {
         return nonce;
     }
 
+    @Override
     public int compare(T o1, T o2) {
         if (o1 == o2)
             return 0;

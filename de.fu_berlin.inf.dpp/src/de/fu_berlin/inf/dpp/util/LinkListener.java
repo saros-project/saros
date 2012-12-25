@@ -13,7 +13,7 @@ import org.eclipse.swt.widgets.Listener;
  * in an external browser. Is supposed to be used with {@link Link}. <br>
  * <br>
  * Example usage: <br>
- * <code> 
+ * <code>
  * Link link = new Link(parent, SWT.NONE); <br>
  * link.addListener(SWT.Selection, new LinkListener());
  * </code>
@@ -26,6 +26,7 @@ public class LinkListener implements Listener {
         // default constructor
     }
 
+    @Override
     public void handleEvent(Event event) {
         if (!Utils.openExternalBrowser(event.text)) {
             log.error("Couldn't open link " + event.text

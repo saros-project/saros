@@ -54,6 +54,7 @@ public class BuddyDisplayComposite extends ViewerComposite {
     protected Saros saros;
 
     protected IConnectionListener connectionListener = new IConnectionListener() {
+        @Override
         public void connectionStateChanged(Connection connection,
             ConnectionState newState) {
             switch (newState) {
@@ -88,6 +89,7 @@ public class BuddyDisplayComposite extends ViewerComposite {
         saros.getSarosNet().addListener(connectionListener);
 
         this.addDisposeListener(new DisposeListener() {
+            @Override
             public void widgetDisposed(DisposeEvent e) {
                 if (saros.getSarosNet() != null) {
                     saros.getSarosNet().removeListener(connectionListener);

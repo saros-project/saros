@@ -73,6 +73,7 @@ public class VideoSharingPreferencePage extends FieldEditorPreferencePage
             .getFollowMouseZoomFieldEditor(composite));
     }
 
+    @Override
     public void init(IWorkbench workbench) {
         // nothing to initialize
     }

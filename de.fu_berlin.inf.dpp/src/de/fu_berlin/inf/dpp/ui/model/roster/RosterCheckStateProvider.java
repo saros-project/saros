@@ -17,6 +17,7 @@ public class RosterCheckStateProvider implements ICheckStateProvider {
 
     protected Map<Object, Boolean> checkStates = new HashMap<Object, Boolean>();
 
+    @Override
     public boolean isChecked(Object element) {
         if (element instanceof RosterEntryElement) {
             Boolean checked = checkStates.get(element);
@@ -28,6 +29,7 @@ public class RosterCheckStateProvider implements ICheckStateProvider {
         return false;
     }
 
+    @Override
     public boolean isGrayed(Object element) {
         if (element instanceof RosterEntryElement) {
             return false;

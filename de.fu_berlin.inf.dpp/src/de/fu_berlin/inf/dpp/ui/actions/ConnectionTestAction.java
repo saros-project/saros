@@ -49,8 +49,8 @@ import de.fu_berlin.inf.dpp.net.ConnectionState;
 import de.fu_berlin.inf.dpp.net.IConnectionListener;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.internal.ConnectionTestManager;
-import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
 import de.fu_berlin.inf.dpp.net.internal.ConnectionTestManager.TestResult;
+import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
 import de.fu_berlin.inf.dpp.ui.ImageManager;
 import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.ui.util.selection.SelectionUtils;
@@ -68,6 +68,7 @@ public class ConnectionTestAction extends Action {
         .getLogger(ConnectionTestAction.class);
 
     protected IConnectionListener connectionListener = new IConnectionListener() {
+        @Override
         public void connectionStateChanged(Connection connection,
             final ConnectionState newState) {
             updateEnablement();
@@ -75,6 +76,7 @@ public class ConnectionTestAction extends Action {
     };
 
     protected ISelectionListener selectionListener = new ISelectionListener() {
+        @Override
         public void selectionChanged(IWorkbenchPart part, ISelection selection) {
             updateEnablement();
         }
@@ -139,6 +141,7 @@ public class ConnectionTestAction extends Action {
             new ProgressMonitorDialog(null).run(true, true,
                 new IRunnableWithProgress() {
 
+                    @Override
                     public void run(IProgressMonitor progress)
                         throws InvocationTargetException, InterruptedException {
                         try {

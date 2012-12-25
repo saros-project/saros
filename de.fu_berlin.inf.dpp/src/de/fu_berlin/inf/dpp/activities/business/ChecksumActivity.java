@@ -82,6 +82,7 @@ public class ChecksumActivity extends AbstractActivity implements
     /**
      * Returns the path this checksum is about.
      */
+    @Override
     public SPath getPath() {
         return this.path;
     }
@@ -92,6 +93,7 @@ public class ChecksumActivity extends AbstractActivity implements
             + length + ",vectorTime:" + jupiterTimestamp + ")";
     }
 
+    @Override
     public void dispatch(IActivityReceiver receiver) {
         receiver.receive(this);
     }
@@ -143,6 +145,7 @@ public class ChecksumActivity extends AbstractActivity implements
         return !(this.length == NON_EXISTING_DOC && this.hash == NON_EXISTING_DOC);
     }
 
+    @Override
     public IActivityDataObject getActivityDataObject(ISarosSession sarosSession) {
         return new ChecksumActivityDataObject(source.getJID(),
             path.toSPathDataObject(sarosSession), hash, length);

@@ -29,30 +29,35 @@ public class SharedEditorListenerDispatch implements ISharedEditorListener {
         this.editorListeners.remove(editorListener);
     }
 
+    @Override
     public void activeEditorChanged(User user, SPath path) {
         for (ISharedEditorListener listener : editorListeners) {
             listener.activeEditorChanged(user, path);
         }
     }
 
+    @Override
     public void editorRemoved(User user, SPath path) {
         for (ISharedEditorListener listener : editorListeners) {
             listener.editorRemoved(user, path);
         }
     }
 
+    @Override
     public void userWithWriteAccessEditorSaved(SPath path, boolean replicated) {
         for (ISharedEditorListener listener : editorListeners) {
             listener.userWithWriteAccessEditorSaved(path, replicated);
         }
     }
 
+    @Override
     public void followModeChanged(User user, boolean isFollowed) {
         for (ISharedEditorListener listener : editorListeners) {
             listener.followModeChanged(user, isFollowed);
         }
     }
 
+    @Override
     public void textEditRecieved(User user, SPath editor, String text,
         String replacedText, int offset) {
         for (ISharedEditorListener listener : editorListeners) {
@@ -60,6 +65,7 @@ public class SharedEditorListenerDispatch implements ISharedEditorListener {
         }
     }
 
+    @Override
     public void textSelectionMade(TextSelectionActivity selection) {
         for (ISharedEditorListener listener : editorListeners) {
             listener.textSelectionMade(selection);
@@ -67,18 +73,21 @@ public class SharedEditorListenerDispatch implements ISharedEditorListener {
 
     }
 
+    @Override
     public void viewportChanged(ViewportActivity viewport) {
         for (ISharedEditorListener listener : editorListeners) {
             listener.viewportChanged(viewport);
         }
     }
 
+    @Override
     public void jumpedToUser(User jumpedTo) {
         for (ISharedEditorListener listener : editorListeners) {
             listener.jumpedToUser(jumpedTo);
         }
     }
 
+    @Override
     public void viewportGenerated(IEditorPart part, ILineRange viewport,
         SPath path) {
         for (ISharedEditorListener listener : editorListeners) {
@@ -86,6 +95,7 @@ public class SharedEditorListenerDispatch implements ISharedEditorListener {
         }
     }
 
+    @Override
     public void colorChanged() {
         for (ISharedEditorListener listener : editorListeners) {
             listener.colorChanged();

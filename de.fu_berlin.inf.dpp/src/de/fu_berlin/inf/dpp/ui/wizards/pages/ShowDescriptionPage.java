@@ -64,6 +64,7 @@ public class ShowDescriptionPage extends WizardPage {
         return true;
     }
 
+    @Override
     public void createControl(Composite parent) {
         Composite composite = new Composite(parent, SWT.NONE);
         composite.setLayout(new GridLayout(2, false));

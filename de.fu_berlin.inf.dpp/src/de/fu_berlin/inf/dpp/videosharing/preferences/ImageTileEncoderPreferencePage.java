@@ -62,6 +62,7 @@ public class ImageTileEncoderPreferencePage extends FieldEditorPreferencePage
         // Currently no options are available for this encoder
     }
 
+    @Override
     public void init(IWorkbench workbench) {
         // NOP
     }

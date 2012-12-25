@@ -209,6 +209,7 @@ public class ConsistencyWatchdogServer extends Job {
         final SPath docPath) {
 
         Utils.runSafeSWTSync(log, new Runnable() {
+            @Override
             public void run() {
 
                 if (locked)

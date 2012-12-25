@@ -20,6 +20,7 @@ public abstract class AbstractActivity implements IActivity {
         this.source = source;
     }
 
+    @Override
     public User getSource() {
         return this.source;
     }

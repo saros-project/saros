@@ -33,10 +33,12 @@ public class RememberDecisionMessageDialog extends MessageDialog {
         final Button rememberDecisionButton = new Button(parent, SWT.CHECK);
         rememberDecisionButton.setText("Remember my decision.");
         rememberDecisionButton.addSelectionListener(new SelectionListener() {
+            @Override
             public void widgetDefaultSelected(SelectionEvent e) {
                 rememberDecision = false;
             }
 
+            @Override
             public void widgetSelected(SelectionEvent e) {
                 rememberDecision = rememberDecisionButton.getSelection();
             }

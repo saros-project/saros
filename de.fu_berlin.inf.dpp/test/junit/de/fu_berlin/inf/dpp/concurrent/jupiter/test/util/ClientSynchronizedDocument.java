@@ -39,10 +39,12 @@ public class ClientSynchronizedDocument implements NetworkEventHandler,
         this.user = user;
     }
 
+    @Override
     public JID getJID() {
         return user.getJID();
     }
 
+    @Override
     public User getUser() {
         return this.user;
     }
@@ -98,10 +100,12 @@ public class ClientSynchronizedDocument implements NetworkEventHandler,
         receiveOperation(jupiterActivity);
     }
 
+    @Override
     public String getDocument() {
         return doc.getDocument();
     }
 
+    @Override
     public void receiveNetworkEvent(NetworkRequest req) {
         log.info(this.user + " recv: "
             + req.getJupiterActivity().getOperation().toString()

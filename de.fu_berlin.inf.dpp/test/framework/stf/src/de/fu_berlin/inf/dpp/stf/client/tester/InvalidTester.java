@@ -74,6 +74,7 @@ class InvalidTester implements AbstractTester {
         return jid;
     }
 
+    @Override
     public String getPassword() {
         return password;
     }

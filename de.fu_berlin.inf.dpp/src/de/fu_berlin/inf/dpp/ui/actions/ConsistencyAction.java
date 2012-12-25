@@ -89,6 +89,7 @@ public class ConsistencyAction extends Action {
 
     ValueChangeListener<Boolean> isConsistencyListener = new ValueChangeListener<Boolean>() {
 
+        @Override
         public void setValue(Boolean newValue) {
 
             if (sarosSession.isHost() && newValue == true) {
@@ -105,6 +106,7 @@ public class ConsistencyAction extends Action {
                     watchdogClient.getPathsWithWrongChecksums());
 
                 Utils.runSafeSWTAsync(log, new Runnable() {
+                    @Override
                     public void run() {
 
                         String files = Utils.toOSString(paths);
@@ -140,6 +142,7 @@ public class ConsistencyAction extends Action {
     public void run() {
         Utils.runSafeSWTAsync(log, new Runnable() {
 
+            @Override
             public void run() {
                 log.debug("Buddy activated CW recovery."); //$NON-NLS-1$
 
@@ -151,6 +154,7 @@ public class ConsistencyAction extends Action {
                     dialogShell);
                 try {
                     dialog.run(true, true, new IRunnableWithProgress() {
+                        @Override
                         public void run(IProgressMonitor monitor)
                             throws InterruptedException {
 

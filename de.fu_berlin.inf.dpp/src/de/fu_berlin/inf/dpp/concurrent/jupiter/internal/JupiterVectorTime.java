@@ -50,6 +50,7 @@ public class JupiterVectorTime implements VectorTime {
     /**
      * @see VectorTime#getAt(int)
      */
+    @Override
     public int getAt(int index) {
         if (index == 0) {
             return getLocalOperationCount();
@@ -63,6 +64,7 @@ public class JupiterVectorTime implements VectorTime {
     /**
      * @see VectorTime#getLength()
      */
+    @Override
     public int getLength() {
         return 2;
     }
@@ -70,6 +72,7 @@ public class JupiterVectorTime implements VectorTime {
     /**
      * @see Timestamp#getComponents()
      */
+    @Override
     public int[] getComponents() {
         return new int[] { getLocalOperationCount(), getRemoteOperationCount() };
     }

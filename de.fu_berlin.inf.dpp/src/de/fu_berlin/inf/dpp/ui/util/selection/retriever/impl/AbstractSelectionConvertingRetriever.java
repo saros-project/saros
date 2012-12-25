@@ -19,7 +19,7 @@ import de.fu_berlin.inf.dpp.ui.util.selection.retriever.ISelectionRetriever;
  * For example,
  * 
  * <pre>
- * ISelectionRetriever&lt;IProject&gt; mySelectionRetriever = 
+ * ISelectionRetriever&lt;IProject&gt; mySelectionRetriever =
  *      new AbstractSelectionConvertingRetriever<IResource, IProject>(IResource.class) {
  *      protected IProject convert(IResource resource) {
  *              return resource.getProject();
@@ -45,14 +45,17 @@ public abstract class AbstractSelectionConvertingRetriever<AdapterType, ConvertT
         selectionRetriever = new SelectionRetriever<AdapterType>(adapter);
     }
 
+    @Override
     public List<ConvertType> getSelection() {
         return convert(selectionRetriever.getSelection());
     }
 
+    @Override
     public List<ConvertType> getSelection(String partId) {
         return convert(selectionRetriever.getSelection(partId));
     }
 
+    @Override
     public List<ConvertType> getOverallSelection() {
         return convert(selectionRetriever.getOverallSelection());
     }

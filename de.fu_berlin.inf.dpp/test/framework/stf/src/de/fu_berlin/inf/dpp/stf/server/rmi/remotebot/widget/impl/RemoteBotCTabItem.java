@@ -24,10 +24,12 @@ public final class RemoteBotCTabItem extends StfRemoteObject implements
 
     }
 
+    @Override
     public String getToolTipText() throws RemoteException {
         return widget.getText();
     }
 
+    @Override
     public String getText() throws RemoteException {
         return widget.getText();
     }

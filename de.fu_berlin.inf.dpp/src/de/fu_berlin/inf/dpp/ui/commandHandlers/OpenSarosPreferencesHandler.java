@@ -8,6 +8,7 @@ import org.eclipse.ui.dialogs.PreferencesUtil;
 
 public class OpenSarosPreferencesHandler extends AbstractHandler {
 
+    @Override
     public Object execute(ExecutionEvent event) throws ExecutionException {
         PreferenceDialog pref = PreferencesUtil.createPreferenceDialogOn(null,
             "de.fu_berlin.inf.dpp.preferences", null, null);

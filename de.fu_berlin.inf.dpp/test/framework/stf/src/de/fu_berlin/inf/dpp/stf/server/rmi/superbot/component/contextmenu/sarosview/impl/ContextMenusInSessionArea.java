@@ -30,6 +30,7 @@ public final class ContextMenusInSessionArea extends ContextMenusInSarosView
         this.participantJID = jid;
     }
 
+    @Override
     public void grantWriteAccess() throws RemoteException {
         log.trace("granting write access to: " + participantJID.getBase());
 
@@ -52,6 +53,7 @@ public final class ContextMenusInSessionArea extends ContextMenusInSarosView
         waitUntilHasWriteAccess();
     }
 
+    @Override
     public void restrictToReadOnlyAccess() throws RemoteException {
         log.trace("revoking write access from: " + participantJID.getBase());
 
@@ -77,6 +79,7 @@ public final class ContextMenusInSessionArea extends ContextMenusInSarosView
         waitUntilHasReadOnlyAccess();
     }
 
+    @Override
     public void followParticipant() throws RemoteException {
         log.trace("start following participant: " + participantJID.getBase());
 
@@ -105,6 +108,7 @@ public final class ContextMenusInSessionArea extends ContextMenusInSarosView
         waitUntilIsFollowing();
     }
 
+    @Override
     public void stopFollowing() throws RemoteException {
         log.trace("stop following user: " + participantJID.getBase());
 
@@ -129,6 +133,7 @@ public final class ContextMenusInSessionArea extends ContextMenusInSarosView
         waitUntilIsNotFollowing();
     }
 
+    @Override
     public void jumpToPositionOfSelectedBuddy() throws RemoteException {
         if (SuperBot.getInstance().getJID().equals(participantJID)) {
             throw new RuntimeException(
@@ -151,6 +156,7 @@ public final class ContextMenusInSessionArea extends ContextMenusInSarosView
 
     }
 
+    @Override
     public void addProjects(String... projectNames) throws RemoteException {
 
         SWTBotTreeItem treeItem = getTreeItem();
@@ -168,6 +174,7 @@ public final class ContextMenusInSessionArea extends ContextMenusInSarosView
         SuperBot.getInstance().confirmShellAddProjectsToSession(projectNames);
     }
 
+    @Override
     public void addBuddies(String... jidOfInvitees) throws RemoteException {
         SWTBotTreeItem treeItem = getTreeItem();
 
@@ -184,6 +191,7 @@ public final class ContextMenusInSessionArea extends ContextMenusInSarosView
         SuperBot.getInstance().confirmShellAddBuddyToSession(jidOfInvitees);
     }
 
+    @Override
     public void shareProjects(String projectName, JID... jids)
         throws RemoteException {
 
@@ -202,6 +210,7 @@ public final class ContextMenusInSessionArea extends ContextMenusInSarosView
         SuperBot.getInstance().confirmShellShareProjects(projectName, jids);
     }
 
+    @Override
     public boolean hasWriteAccess() throws RemoteException {
         log.trace("checking if participant '" + participantJID.getBase()
             + "' has write access");
@@ -215,6 +224,7 @@ public final class ContextMenusInSessionArea extends ContextMenusInSarosView
         }
     }
 
+    @Override
     public boolean hasReadOnlyAccess() throws RemoteException {
         log.trace("checking if participant '" + participantJID.getBase()
             + "' has read only access");
@@ -228,6 +238,7 @@ public final class ContextMenusInSessionArea extends ContextMenusInSarosView
 
     }
 
+    @Override
     public boolean isFollowing() throws RemoteException {
         log.trace("checking if local user is following participant: "
             + participantJID.getBase());
@@ -242,14 +253,17 @@ public final class ContextMenusInSessionArea extends ContextMenusInSarosView
         }
     }
 
+    @Override
     public void waitUntilHasWriteAccess() throws RemoteException {
         log.trace("waiting for participant '" + participantJID.getBase()
             + "' to gain write access");
         new SWTBot().waitUntil(new DefaultCondition() {
+            @Override
             public boolean test() throws Exception {
                 return hasWriteAccess();
             }
 
+            @Override
             public String getFailureMessage() {
                 return "unable to grant write access to "
                     + participantJID.getBase();
@@ -257,14 +271,17 @@ public final class ContextMenusInSessionArea extends ContextMenusInSarosView
         });
     }
 
+    @Override
     public void waitUntilHasReadOnlyAccess() throws RemoteException {
         log.trace("waiting for participant '" + participantJID.getBase()
             + "' to gain read only access");
         new SWTBot().waitUntil(new DefaultCondition() {
+            @Override
             public boolean test() throws Exception {
                 return hasReadOnlyAccess();
             }
 
+            @Override
             public String getFailureMessage() {
                 return "unable to restrict " + participantJID.getBase()
                     + " to read-only access";
@@ -272,27 +289,33 @@ public final class ContextMenusInSessionArea extends ContextMenusInSarosView
         });
     }
 
+    @Override
     public void waitUntilIsFollowing() throws RemoteException {
         log.trace("waiting to follow participant: " + participantJID.getBase());
         new SWTBot().waitUntil(new DefaultCondition() {
+            @Override
             public boolean test() throws Exception {
                 return isFollowing();
             }
 
+            @Override
             public String getFailureMessage() {
                 return "unable to follow " + participantJID.getBase();
             }
         });
     }
 
+    @Override
     public void waitUntilIsNotFollowing() throws RemoteException {
         log.trace("waiting to stop following participant: "
             + participantJID.getBase());
         new SWTBot().waitUntil(new DefaultCondition() {
+            @Override
             public boolean test() throws Exception {
                 return !isFollowing();
             }
 
+            @Override
             public String getFailureMessage() {
                 return "unable to stop following mode on user"
                     + participantJID.getBase();

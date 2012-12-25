@@ -178,14 +178,17 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
             this.preferences = preferences;
         }
 
+        @Override
         public void setValue(String s, int i) {
             preferences.putInt(s, i);
         }
 
+        @Override
         public void setValue(String s, boolean b) {
             preferences.putBoolean(s, b);
         }
 
+        @Override
         public void setValue(String s, String s1) {
             preferences.put(s, s1);
         }
@@ -199,14 +202,17 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
             this.preferenceStore = preferenceStore;
         }
 
+        @Override
         public void setValue(String s, int i) {
             preferenceStore.setValue(s, i);
         }
 
+        @Override
         public void setValue(String s, boolean b) {
             preferenceStore.setValue(s, b);
         }
 
+        @Override
         public void setValue(String s, String s1) {
             preferenceStore.setValue(s, s1);
         }

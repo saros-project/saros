@@ -234,6 +234,7 @@ public class StreamSession implements Disposable {
     /**
      * closes the session and it's streams
      */
+    @Override
     public synchronized void dispose() {
         if (disposed)
             return;
@@ -452,6 +453,7 @@ public class StreamSession implements Disposable {
             this.bufferSize = bufferSize;
         }
 
+        @Override
         public void closedByRemote() {
             closedByRemote = true;
         }
@@ -501,6 +503,7 @@ public class StreamSession implements Disposable {
             closedByInternal();
         }
 
+        @Override
         public void closedByInternal() {
             if (closed)
                 return;
@@ -607,6 +610,7 @@ public class StreamSession implements Disposable {
                             .runSafeAsync(StreamSession.this.toString()
                                 + "-dataWaiter-" + streamID, log,
                                 new Runnable() {
+                                    @Override
                                     public void run() {
                                         try {
                                             Thread
@@ -652,10 +656,12 @@ public class StreamSession implements Disposable {
                 .notifyDataAvailable(this, sendAllAvailableData);
         }
 
+        @Override
         public StreamSession getSession() {
             return StreamSession.this;
         }
 
+        @Override
         public int streamID() {
             return streamID;
         }
@@ -672,6 +678,7 @@ public class StreamSession implements Disposable {
             return bufferSize;
         }
 
+        @Override
         public boolean isClosed() {
             return closed || closedByRemote;
         }
@@ -720,6 +727,7 @@ public class StreamSession implements Disposable {
 
         }
 
+        @Override
         public void closedByRemote() {
             closedByRemote = true;
             try {
@@ -784,6 +792,7 @@ public class StreamSession implements Disposable {
             closed = true;
         }
 
+        @Override
         public void closedByInternal() {
             if (closed)
                 return;
@@ -901,10 +910,12 @@ public class StreamSession implements Disposable {
             fillBuffer();
         }
 
+        @Override
         public StreamSession getSession() {
             return StreamSession.this;
         }
 
+        @Override
         public int streamID() {
             return streamID;
         }
@@ -953,6 +964,7 @@ public class StreamSession implements Disposable {
             }
         }
 
+        @Override
         public boolean isClosed() {
             return closed || closedByRemote;
         }

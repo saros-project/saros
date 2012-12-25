@@ -87,6 +87,7 @@ public class EditDuringInvitationStressTest extends StfTestCase {
 
             private final Random random = new Random();
 
+            @Override
             public void run() throws Exception {
                 for (int i = 0; i < 100; i++) {
                     String nextClass = CLASS_NAMES[i % 5] + ".java";

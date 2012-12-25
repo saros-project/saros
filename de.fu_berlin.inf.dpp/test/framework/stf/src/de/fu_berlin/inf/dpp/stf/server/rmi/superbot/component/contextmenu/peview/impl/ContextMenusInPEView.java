@@ -52,23 +52,27 @@ public final class ContextMenusInPEView extends StfRemoteObject implements
         this.tree = tree;
     }
 
+    @Override
     public IShareWithC shareWith() throws RemoteException {
         ShareWithC.getInstance().setTree(tree);
         ShareWithC.getInstance().setTreeItem(treeItem);
         return ShareWithC.getInstance();
     }
 
+    @Override
     public INewC newC() throws RemoteException {
         NewC.getInstance().setTree(tree);
         return NewC.getInstance();
     }
 
+    @Override
     public ITeamC team() throws RemoteException {
         TeamC.getInstance().setTree(tree);
         TeamC.getInstance().setTreeItem(treeItem);
         return TeamC.getInstance();
     }
 
+    @Override
     public IRefactorC refactor() throws RemoteException {
         RefactorC.getInstance().setTree(tree);
         RefactorC.getInstance().setTreeItem(treeItem);
@@ -76,21 +80,25 @@ public final class ContextMenusInPEView extends StfRemoteObject implements
         return RefactorC.getInstance();
     }
 
+    @Override
     public void open() throws RemoteException {
         treeItem.select();
         ContextMenuHelper.clickContextMenu(tree, CM_OPEN);
     }
 
+    @Override
     public void copy() throws RemoteException {
         treeItem.select();
         ContextMenuHelper.clickContextMenu(tree, MENU_COPY);
     }
 
+    @Override
     public void refresh() throws RemoteException {
         treeItem.select();
         ContextMenuHelper.clickContextMenu(tree, MENU_REFRESH);
     }
 
+    @Override
     public void paste(String target) throws RemoteException {
         ContextMenuHelper.clickContextMenu(tree, MENU_PASTE);
         SWTBotShell shell = new SWTBot().shell(SHELL_COPY_PROJECT);
@@ -107,6 +115,7 @@ public final class ContextMenusInPEView extends StfRemoteObject implements
 
     }
 
+    @Override
     public void openWith(String editorType) throws RemoteException {
         treeItem.select();
         ContextMenuHelper.clickContextMenu(tree, CM_OPEN_WITH, CM_OTHER);
@@ -119,6 +128,7 @@ public final class ContextMenusInPEView extends StfRemoteObject implements
         shell.bot().waitUntil(Conditions.shellCloses(shell));
     }
 
+    @Override
     public void delete() throws RemoteException {
         treeItem.select();
         ContextMenuHelper.clickContextMenu(tree, CM_DELETE);
@@ -146,6 +156,7 @@ public final class ContextMenusInPEView extends StfRemoteObject implements
         shell.bot().waitUntil(Conditions.shellCloses(shell));
         shell.bot().waitWhile(new DefaultCondition() {
 
+            @Override
             public boolean test() throws Exception {
 
                 for (SWTBotTreeItem item : tree.getAllItems())
@@ -155,6 +166,7 @@ public final class ContextMenusInPEView extends StfRemoteObject implements
                 return false;
             }
 
+            @Override
             public String getFailureMessage() {
                 // TODO Auto-generated method stub
                 return "tree item '" + treeItem.getText()
@@ -164,6 +176,7 @@ public final class ContextMenusInPEView extends StfRemoteObject implements
         });
     }
 
+    @Override
     public boolean existsWithRegex(String regex) throws RemoteException {
         try {
             List<String> items;
@@ -184,6 +197,7 @@ public final class ContextMenusInPEView extends StfRemoteObject implements
         }
     }
 
+    @Override
     public boolean exists(String name) throws RemoteException {
         try {
             if (treeItem == null)

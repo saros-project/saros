@@ -167,6 +167,7 @@ public class Utils {
      */
     public static Runnable delay(final int milliseconds, final Runnable runnable) {
         return new Runnable() {
+            @Override
             public void run() {
                 try {
                     Thread.sleep(milliseconds);
@@ -191,6 +192,7 @@ public class Utils {
     public static <T> Callable<T> delay(final int milliseconds,
         final Callable<T> callable) {
         return new Callable<T>() {
+            @Override
             public T call() throws Exception {
 
                 Thread.sleep(milliseconds);
@@ -202,6 +204,7 @@ public class Utils {
     public static <T> Callable<T> retryEveryXms(final Callable<T> callable,
         final int retryMillis) {
         return new Callable<T>() {
+            @Override
             public T call() {
                 T t = null;
                 while (t == null && !Thread.currentThread().isInterrupted()) {
@@ -248,6 +251,7 @@ public class Utils {
 
             boolean returned = false;
 
+            @Override
             public Iterator<T> iterator() {
                 if (returned)
                     throw new IllegalStateException(
@@ -264,6 +268,7 @@ public class Utils {
 
         return new PacketFilter() {
 
+            @Override
             public boolean accept(Packet packet) {
 
                 for (PacketFilter filter : filters) {
@@ -329,6 +334,7 @@ public class Utils {
         final StackTrace stackTrace = new StackTrace();
 
         return new Runnable() {
+            @Override
             public void run() {
                 try {
                     runnable.run();
@@ -414,6 +420,7 @@ public class Utils {
         final CallableResult<T> result = new CallableResult<T>();
 
         Utils.runSafeSWTSync(log, new Runnable() {
+            @Override
             public void run() {
                 try {
                     result.result = callable.call();
@@ -933,6 +940,7 @@ public class Utils {
             return;
 
         Utils.runSafeSWTSync(log, new Runnable() {
+            @Override
             public void run() {
                 MessageDialog.openError(EditorAPI.getShell(), title, message);
             }
@@ -952,6 +960,7 @@ public class Utils {
 
         try {
             return Utils.runSWTSync(new Callable<Boolean>() {
+                @Override
                 public Boolean call() {
                     return MessageDialog.openQuestion(EditorAPI.getShell(),
                         title, message);
@@ -987,6 +996,7 @@ public class Utils {
 
         try {
             return Utils.runSWTSync(new Callable<Boolean>() {
+                @Override
                 public Boolean call() {
                     MessageDialog md = new MessageDialog(EditorAPI.getShell(),
                         title, null, message, MessageDialog.QUESTION,
@@ -1018,6 +1028,7 @@ public class Utils {
         final String message, final Saros saros, final String preferenceName) {
         try {
             return Utils.runSWTSync(new Callable<Boolean>() {
+                @Override
                 public Boolean call() {
                     RememberDecisionMessageDialog dialog = new RememberDecisionMessageDialog(
                         EditorAPI.getShell(), title, null, message,

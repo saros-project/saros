@@ -3,7 +3,6 @@ package de.fu_berlin.inf.dpp.util.log;
 import java.util.LinkedList;
 import java.util.List;
 
-import de.fu_berlin.inf.dpp.SarosPluginContext;
 import org.apache.log4j.AppenderSkeleton;
 import org.apache.log4j.Level;
 import org.apache.log4j.Priority;
@@ -14,6 +13,7 @@ import org.eclipse.core.runtime.Status;
 import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.Saros;
+import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.annotations.Component;
 
 /**
@@ -84,10 +84,12 @@ public class EclipseLogAppender extends AppenderSkeleton {
         return Level.WARN;
     }
 
+    @Override
     public void close() {
         // Do nothing
     }
 
+    @Override
     public boolean requiresLayout() {
         return true;
     }

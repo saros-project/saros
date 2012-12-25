@@ -12,11 +12,13 @@ public class IsShellClosed extends DefaultCondition {
         this.shell = shell;
     }
 
+    @Override
     public String getFailureMessage() {
 
         return "shell '" + shell.getText() + "' is still open";
     }
 
+    @Override
     public boolean test() throws Exception {
         return !shell.isOpen();
     }

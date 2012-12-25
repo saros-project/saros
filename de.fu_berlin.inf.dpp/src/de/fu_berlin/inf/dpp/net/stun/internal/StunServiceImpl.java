@@ -34,14 +34,17 @@ public final class StunServiceImpl implements IStunService {
 
     private Set<InetSocketAddress> publicIPAddresses = new HashSet<InetSocketAddress>();
 
+    @Override
     public synchronized boolean isDirectConnectionAvailable() {
         return isDirectConnection;
     }
 
+    @Override
     public synchronized Collection<InetSocketAddress> getPublicIpAddresses() {
         return new ArrayList<InetSocketAddress>(publicIPAddresses);
     }
 
+    @Override
     public Collection<InetSocketAddress> discover(String stunAddress,
         int stunPort, int timeout) {
 
@@ -240,6 +243,7 @@ public final class StunServiceImpl implements IStunService {
                 // we are using UDP, and since there is no guarantee that these
                 // packets ever reach their destination we have to resent them
                 senderThread = new Thread(new Runnable() {
+                    @Override
                     public void run() {
                         long sendDelay = 500;
                         while (!Thread.currentThread().isInterrupted()) {

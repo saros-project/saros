@@ -32,6 +32,7 @@ public class DirtyStateListener implements IElementStateListener {
 
     public boolean enabled = true;
 
+    @Override
     public void elementDirtyStateChanged(Object element, boolean isDirty) {
 
         if (!enabled)
@@ -55,6 +56,7 @@ public class DirtyStateListener implements IElementStateListener {
 
         Utils.runSafeSWTSync(log, new Runnable() {
 
+            @Override
             public void run() {
 
                 // Only trigger save events for files managed in the editor pool
@@ -69,18 +71,22 @@ public class DirtyStateListener implements IElementStateListener {
         });
     }
 
+    @Override
     public void elementContentAboutToBeReplaced(Object element) {
         // ignore
     }
 
+    @Override
     public void elementContentReplaced(Object element) {
         // ignore
     }
 
+    @Override
     public void elementDeleted(Object element) {
         // ignore
     }
 
+    @Override
     public void elementMoved(Object originalElement, Object movedElement) {
         // ignore
     }

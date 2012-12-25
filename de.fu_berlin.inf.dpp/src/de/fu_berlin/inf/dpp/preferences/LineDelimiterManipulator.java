@@ -27,6 +27,7 @@ public class LineDelimiterManipulator implements IPreferenceManipulator {
      */
     protected String oldLineDelimiter;
 
+    @Override
     public IRestorePoint change(final IProject project) {
 
         /* Read the line delimiter from the project specific configuration. */
@@ -49,6 +50,7 @@ public class LineDelimiterManipulator implements IPreferenceManipulator {
 
         return new IRestorePoint() {
 
+            @Override
             public void restore() {
                 putLineDelimiterPreference(project, oldLineDelimiter);
             }
@@ -88,6 +90,7 @@ public class LineDelimiterManipulator implements IPreferenceManipulator {
         }
     }
 
+    @Override
     public StateChangeNotifier<IPreferenceManipulator> getPreferenceStateChangeNotifier(
         IProject project) {
         return null;
@@ -98,6 +101,7 @@ public class LineDelimiterManipulator implements IPreferenceManipulator {
      * the client side as the client gets this setting with the project from the
      * host.
      */
+    @Override
     public boolean isDangerousForClient() {
         return false;
     }
@@ -106,6 +110,7 @@ public class LineDelimiterManipulator implements IPreferenceManipulator {
      * Returns <code>true</code> as for the host there must be a line delimiter
      * setting in the project specific configuration.
      */
+    @Override
     public boolean isDangerousForHost() {
         return true;
     }
@@ -114,6 +119,7 @@ public class LineDelimiterManipulator implements IPreferenceManipulator {
      * Returns <code>true</code> if there are no project specific line delimiter
      * settings.
      */
+    @Override
     public boolean isEnabled(IProject project) {
         return getLineDelimiterPreference(project) != null;
     }

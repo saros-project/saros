@@ -128,6 +128,7 @@ public class TimedActivityDataObject implements
             && other.activityDataObject.equals(this.activityDataObject);
     }
 
+    @Override
     public int compareTo(TimedActivityDataObject other) {
         if (other == null) {
             throw new NullPointerException();

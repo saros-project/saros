@@ -30,6 +30,7 @@ public class PingPongActivityDataObject extends AbstractActivityDataObject {
             + departureTime.toString("HH:mm:ss,SSS") + ")";
     }
 
+    @Override
     public IActivity getActivity(ISarosSession sarosSession) {
         return new PingPongActivity(sarosSession.getUser(source),
             sarosSession.getUser(initiator), departureTime);

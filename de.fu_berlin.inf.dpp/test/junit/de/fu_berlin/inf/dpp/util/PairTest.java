@@ -18,6 +18,7 @@ import org.junit.Test;
  */
 public class PairTest {
     Function<Integer, Double> functionMock = new Function<Integer, Double>() {
+        @Override
         public Double apply(Integer u) {
             return u.intValue() + 0.5;
         }
@@ -114,6 +115,7 @@ public class PairTest {
         final Double[] doubles = new Double[] { 5.0, 5.6, 6.5, 6.7, 8.4, 6.3 };
 
         Function<Integer, Collection<Double>> f = new Function<Integer, Collection<Double>>() {
+            @Override
             public Collection<Double> apply(Integer u) {
                 Collection<Double> ret = new ArrayList<Double>();
 
@@ -238,6 +240,7 @@ public class PairTest {
         assertTrue(cv.compare(pv56, pv76) == 0);
 
         cp = Pair.pCompare(new Comparator<Integer>() {
+            @Override
             public int compare(Integer o1, Integer o2) {
                 return o2.compareTo(o1);
             }
@@ -247,6 +250,7 @@ public class PairTest {
         assertTrue(cp.compare(pv76, pv56) < 0);
 
         cv = Pair.vCompare(new Comparator<Double>() {
+            @Override
             public int compare(Double o1, Double o2) {
                 return o2.compareTo(o1);
             }

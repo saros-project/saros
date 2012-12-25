@@ -38,6 +38,7 @@ public class ToStringResourceDeltaVisitor implements IResourceDeltaVisitor {
 
     StringBuilder sb = new StringBuilder();
 
+    @Override
     public boolean visit(IResourceDelta delta) throws CoreException {
         boolean result = true;
         switch (delta.getKind()) {

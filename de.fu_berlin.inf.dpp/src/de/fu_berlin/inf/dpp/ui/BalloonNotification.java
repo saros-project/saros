@@ -123,6 +123,7 @@ public class BalloonNotification {
         // Runnable that will close the window after time has been expired
         final Runnable closeWindow = Utils.wrapSafe(log, new Runnable() {
 
+            @Override
             public void run() {
                 final Shell shell = window.getShell();
                 if (shell.isDisposed())

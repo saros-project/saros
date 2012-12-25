@@ -19,10 +19,12 @@ public final class MenuBar extends StfRemoteObject implements IMenuBar {
         return INSTANCE;
     }
 
+    @Override
     public ISarosMenu saros() throws RemoteException {
         return SarosMenu.getInstance().setMenu(new SWTBot().menu(MENU_SAROS));
     }
 
+    @Override
     public IWindowMenu window() throws RemoteException {
         return WindowMenu.getInstance();
     }

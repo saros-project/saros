@@ -19,24 +19,28 @@ import de.fu_berlin.inf.dpp.net.upnp.IUPnPAccess;
  */
 public class UPnPAccessImpl implements IUPnPAccess {
 
+    @Override
     public Collection<GatewayDevice> performDiscovery() throws SocketException,
         UnknownHostException, IOException, SAXException,
         ParserConfigurationException {
         return new GatewayDiscover().discover();
     }
 
+    @Override
     public int deletePortMapping(GatewayDevice gateway, int port,
         String protocol) throws IOException, SAXException {
 
         return gateway.deletePortMapping(port, protocol);
     }
 
+    @Override
     public PortMappingEntry getSpecificPortMappingEntry(GatewayDevice gateway,
         int port, String protocol) throws IOException, SAXException {
 
         return gateway.getSpecificPortMappingEntry(port, protocol);
     }
 
+    @Override
     public int addPortMapping(GatewayDevice gateway, int externalPort,
         int internalPort, String internalClient, String protocol,
         String description, int leaseDuration) throws IOException, SAXException {

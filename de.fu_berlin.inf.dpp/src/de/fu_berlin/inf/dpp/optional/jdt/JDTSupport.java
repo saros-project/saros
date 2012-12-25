@@ -19,6 +19,7 @@ import de.fu_berlin.inf.dpp.preferences.IPreferenceManipulator;
  */
 class JDTSupport implements IJDTSupport {
 
+    @Override
     public List<IPreferenceManipulator> getPreferenceManipulators() {
         List<IPreferenceManipulator> result = new ArrayList<IPreferenceManipulator>();
 

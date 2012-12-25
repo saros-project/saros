@@ -22,11 +22,11 @@ import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.widget.IRemoteBotTreeItem;
 import de.fu_berlin.inf.dpp.stf.test.Constants;
 
 /*
- * 1. open the invitation wizard 
+ * 1. open the invitation wizard
  * 2. make a selection
  * 3. save a selection
  * 4. undo all selections  until no undo is possible any longer
- * 5. redo all selections until no redo possible 
+ * 5. redo all selections until no redo possible
  * 6. undo again
  * 7. restore saved selection.
  * 8. check if selection is restored successfully

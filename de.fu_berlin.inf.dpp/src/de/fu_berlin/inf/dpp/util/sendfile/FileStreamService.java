@@ -57,6 +57,7 @@ public class FileStreamService extends StreamService {
 
         Callable<Boolean> askUser = new Callable<Boolean>() {
 
+            @Override
             public Boolean call() throws Exception {
 
                 return DialogUtils

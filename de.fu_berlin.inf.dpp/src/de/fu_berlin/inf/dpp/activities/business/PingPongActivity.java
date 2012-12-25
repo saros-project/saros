@@ -49,10 +49,12 @@ public class PingPongActivity extends AbstractActivity {
             + departureTime.toString("HH:mm:ss,SSS") + ")";
     }
 
+    @Override
     public void dispatch(IActivityReceiver receiver) {
         receiver.receive(this);
     }
 
+    @Override
     public IActivityDataObject getActivityDataObject(ISarosSession sarosSession) {
         return new PingPongActivityDataObject(source.getJID(),
             initiator.getJID(), departureTime);

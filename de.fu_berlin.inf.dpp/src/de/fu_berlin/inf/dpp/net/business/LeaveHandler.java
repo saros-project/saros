@@ -101,6 +101,7 @@ public class LeaveHandler {
         } else {
             // Client
             Utils.runSafeSWTSync(log, new Runnable() {
+                @Override
                 public void run() {
                     // FIXME see above...
                     sarosSession.removeUser(user);

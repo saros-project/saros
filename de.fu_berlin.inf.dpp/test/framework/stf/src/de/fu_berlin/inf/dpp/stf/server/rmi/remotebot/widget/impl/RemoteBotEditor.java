@@ -46,23 +46,28 @@ public class RemoteBotEditor extends StfRemoteObject implements
         this.widget = editor;
     }
 
+    @Override
     public void show() throws RemoteException {
         widget.show();
     }
 
+    @Override
     public void setFocus() throws RemoteException {
         widget.setFocus();
     }
 
+    @Override
     public void closeWithSave() throws RemoteException {
         widget.save();
         widget.close();
     }
 
+    @Override
     public void save() throws RemoteException {
         widget.save();
     }
 
+    @Override
     public void closeWithoutSave() throws RemoteException {
         widget.close();
         if (RemoteWorkbenchBot.getInstance().isShellOpen(SHELL_SAVE_RESOURCE)
@@ -72,26 +77,31 @@ public class RemoteBotEditor extends StfRemoteObject implements
                 .confirm(NO);
     }
 
+    @Override
     public void setTextFromFile(String contentPath) throws RemoteException {
         String contents = FileUtils.read(getSaros().getBundle().getEntry(
             contentPath));
         widget.setText(contents);
     }
 
+    @Override
     public void setText(String text) throws RemoteException {
         widget.setText(text);
     }
 
+    @Override
     public void typeText(String text) throws RemoteException {
         widget.setFocus();
         widget.typeText(text);
     }
 
+    @Override
     public void navigateTo(int line, int column) throws RemoteException {
         widget.setFocus();
         widget.navigateTo(line, column);
     }
 
+    @Override
     public void selectCurrentLine() throws RemoteException {
         widget.selectCurrentLine();
         // It's is necessary to sleep a litte time so that the following
@@ -99,6 +109,7 @@ public class RemoteBotEditor extends StfRemoteObject implements
         RemoteWorkbenchBot.getInstance().sleep(500);
     }
 
+    @Override
     public void selectLine(int line) throws RemoteException {
         widget.selectLine(line);
         // It's is necessary to sleep a litte time so that the following
@@ -107,6 +118,7 @@ public class RemoteBotEditor extends StfRemoteObject implements
 
     }
 
+    @Override
     public void selectRange(int line, int column, int length)
         throws RemoteException {
         widget.selectRange(line, column, length);
@@ -115,6 +127,7 @@ public class RemoteBotEditor extends StfRemoteObject implements
         RemoteWorkbenchBot.getInstance().sleep(800);
     }
 
+    @Override
     public void pressShortcut(String... keys) throws RemoteException {
         widget.setFocus();
         for (String key : keys) {
@@ -126,19 +139,23 @@ public class RemoteBotEditor extends StfRemoteObject implements
         }
     }
 
+    @Override
     public void pressShortCut(int modificationKeys, char c)
         throws RemoteException {
         widget.pressShortcut(modificationKeys, c);
     }
 
+    @Override
     public void pressShortCutDelete() throws RemoteException {
         pressShortcut(IKeyLookup.DELETE_NAME);
     }
 
+    @Override
     public void pressShortCutEnter() throws RemoteException {
         pressShortcut(IKeyLookup.LF_NAME);
     }
 
+    @Override
     public void pressShortCutSave() throws RemoteException {
         if (WidgetUtil.getOperatingSystem() == WidgetUtil.OperatingSystem.MAC)
             widget.pressShortcut(SWT.COMMAND, 's');
@@ -146,6 +163,7 @@ public class RemoteBotEditor extends StfRemoteObject implements
             widget.pressShortcut(SWT.CTRL, 's');
     }
 
+    @Override
     public void pressShortRunAsJavaApplication() throws RemoteException {
         if (WidgetUtil.getOperatingSystem() == WidgetUtil.OperatingSystem.MAC)
             widget.pressShortcut(SWT.ALT | SWT.COMMAND, 'x');
@@ -155,6 +173,7 @@ public class RemoteBotEditor extends StfRemoteObject implements
         widget.pressShortcut(SWT.NONE, 'j');
     }
 
+    @Override
     public void pressShortCutNextAnnotation() throws RemoteException {
         if (WidgetUtil.getOperatingSystem() == WidgetUtil.OperatingSystem.MAC)
             widget.pressShortcut(SWT.COMMAND, '.');
@@ -164,6 +183,7 @@ public class RemoteBotEditor extends StfRemoteObject implements
         RemoteWorkbenchBot.getInstance().sleep(20);
     }
 
+    @Override
     public void pressShortCutQuickAssignToLocalVariable()
         throws RemoteException {
         if (WidgetUtil.getOperatingSystem() == WidgetUtil.OperatingSystem.MAC)
@@ -175,15 +195,18 @@ public class RemoteBotEditor extends StfRemoteObject implements
 
     }
 
+    @Override
     public void autoCompleteProposal(String insertText, String proposalText)
         throws RemoteException {
         widget.autoCompleteProposal(insertText, proposalText);
     }
 
+    @Override
     public void quickfix(String quickFixName) throws RemoteException {
         widget.quickfix(quickFixName);
     }
 
+    @Override
     public void quickfix(int index) throws RemoteException {
         widget.quickfix(index);
     }
@@ -193,42 +216,52 @@ public class RemoteBotEditor extends StfRemoteObject implements
      * states
      */
 
+    @Override
     public int getLineCount() throws RemoteException {
         return widget.getLineCount();
     }
 
+    @Override
     public List<String> getLines() throws RemoteException {
         return widget.getLines();
     }
 
+    @Override
     public String getText() throws RemoteException {
         return widget.getText();
     }
 
+    @Override
     public String getTextOnCurrentLine() throws RemoteException {
         return widget.getTextOnCurrentLine();
     }
 
+    @Override
     public String getTextOnLine(int line) throws RemoteException {
         return widget.getTextOnLine(line);
     }
 
+    @Override
     public int getCursorLine() throws RemoteException {
         return widget.cursorPosition().line;
     }
 
+    @Override
     public int getCursorColumn() throws RemoteException {
         return widget.cursorPosition().column;
     }
 
+    @Override
     public RGB getLineBackground(int line) throws RemoteException {
         return widget.getLineBackground(line);
     }
 
+    @Override
     public boolean isDirty() throws RemoteException {
         return widget.isDirty();
     }
 
+    @Override
     public List<Integer> getViewport() throws RemoteException {
         @SuppressWarnings("deprecation")
         final IEditorPart editorPart = widget.getEditorReference().getEditor(
@@ -240,6 +273,7 @@ public class RemoteBotEditor extends StfRemoteObject implements
 
         List<Integer> viewPort = UIThreadRunnable
             .syncExec(new ListResult<Integer>() {
+                @Override
                 public List<Integer> run() {
                     List<Integer> viewPort = new ArrayList<Integer>(2);
                     ILineRange r = getEditorAPI().getViewport(editorPart);
@@ -252,11 +286,13 @@ public class RemoteBotEditor extends StfRemoteObject implements
         return viewPort;
     }
 
+    @Override
     public String getSelection() throws RemoteException {
 
         return widget.getSelection();
     }
 
+    @Override
     public String getSelectionByAnnotation() throws RemoteException {
 
         @SuppressWarnings("deprecation")
@@ -273,6 +309,7 @@ public class RemoteBotEditor extends StfRemoteObject implements
 
         List<Integer> selectionRange = UIThreadRunnable
             .syncExec(new ListResult<Integer>() {
+                @Override
                 public List<Integer> run() {
 
                     List<Integer> selectionRange = new ArrayList<Integer>();
@@ -322,34 +359,42 @@ public class RemoteBotEditor extends StfRemoteObject implements
 
     }
 
+    @Override
     public List<String> getAutoCompleteProposals(String insertText)
         throws RemoteException {
         return widget.getAutoCompleteProposals(insertText);
     }
 
+    @Override
     public boolean isActive() throws RemoteException {
         return widget.isActive();
     }
 
+    @Override
     public void waitUntilIsActive() throws RemoteException {
         RemoteWorkbenchBot.getInstance().waitUntil(new DefaultCondition() {
+            @Override
             public boolean test() throws Exception {
                 return isActive();
             }
 
+            @Override
             public String getFailureMessage() {
                 return "editor '" + widget.getTitle() + "' is not open";
             }
         });
     }
 
+    @Override
     public void waitUntilIsTextSame(final String otherText)
         throws RemoteException {
         RemoteWorkbenchBot.getInstance().waitUntil(new DefaultCondition() {
+            @Override
             public boolean test() throws Exception {
                 return getText().equals(otherText);
             }
 
+            @Override
             public String getFailureMessage() {
                 return "content of editor '" + widget.getTitle()
                     + "' does not match: " + widget.getText() + " != "

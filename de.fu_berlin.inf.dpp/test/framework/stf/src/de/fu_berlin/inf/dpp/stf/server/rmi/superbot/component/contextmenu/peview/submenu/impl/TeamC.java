@@ -49,6 +49,7 @@ public final class TeamC extends StfRemoteObject implements ITeamC {
         this.treeItem = view;
     }
 
+    @Override
     public void shareProject(String repositoryURL) throws RemoteException {
         treeItem.select();
         ContextMenuHelper.clickContextMenu(tree, CM_TEAM,
@@ -70,6 +71,7 @@ public final class TeamC extends StfRemoteObject implements ITeamC {
         shell.bot().waitUntil(Conditions.shellCloses(shell));
     }
 
+    @Override
     public void shareProjectConfiguredWithSVNInfos(String repositoryURL)
         throws RemoteException {
         treeItem.select();
@@ -118,6 +120,7 @@ public final class TeamC extends StfRemoteObject implements ITeamC {
 
     }
 
+    @Override
     public void shareProjectUsingSpecifiedFolderName(String repositoryURL,
         String specifiedFolderName) throws RemoteException {
 
@@ -205,6 +208,7 @@ public final class TeamC extends StfRemoteObject implements ITeamC {
 
     }
 
+    @Override
     public void importProjectFromSVN(String repositoryURL)
         throws RemoteException {
         RemoteWorkbenchBot.getInstance().menu(MENU_FILE).menu("Import...")
@@ -242,6 +246,7 @@ public final class TeamC extends StfRemoteObject implements ITeamC {
             SarosSWTBotPreferences.SAROS_LONG_TIMEOUT);
     }
 
+    @Override
     public void disconnect() throws RemoteException {
         treeItem.select();
         ContextMenuHelper.clickContextMenu(tree, CM_TEAM, CM_DISCONNECT);
@@ -252,6 +257,7 @@ public final class TeamC extends StfRemoteObject implements ITeamC {
         shell.bot().waitUntil(Conditions.shellCloses(shell));
     }
 
+    @Override
     public void revert() throws RemoteException {
         treeItem.select();
         ContextMenuHelper.clickContextMenu(tree, CM_TEAM, CM_REVERT);
@@ -261,6 +267,7 @@ public final class TeamC extends StfRemoteObject implements ITeamC {
         shell.bot().waitUntil(Conditions.shellCloses(shell));
     }
 
+    @Override
     public void update(String versionID) throws RemoteException {
         switchToAnotherRevision(versionID);
     }
@@ -285,16 +292,19 @@ public final class TeamC extends StfRemoteObject implements ITeamC {
 
     }
 
+    @Override
     public void switchProject(String projectName, String url)
         throws RemoteException {
         switchResource(projectName, url, "HEAD");
     }
 
+    @Override
     public void switchResource(String fullPath, String url)
         throws RemoteException {
         switchResource(fullPath, url, "HEAD");
     }
 
+    @Override
     public void switchResource(String fullPath, String url, String revision)
         throws RemoteException {
 

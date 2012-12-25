@@ -71,10 +71,12 @@ public class DeleteOperation implements ITextOperation {
         this.text = text;
     }
 
+    @Override
     public int getPosition() {
         return this.position;
     }
 
+    @Override
     public int getTextLength() {
         return this.text.length();
     }
@@ -84,6 +86,7 @@ public class DeleteOperation implements ITextOperation {
      * 
      * @return the text to be deleted
      */
+    @Override
     public String getText() {
         return this.text;
     }
@@ -126,11 +129,13 @@ public class DeleteOperation implements ITextOperation {
         return result;
     }
 
+    @Override
     public List<TextEditActivity> toTextEdit(SPath path, User source) {
         return Collections.singletonList(new TextEditActivity(source,
             getPosition(), "", getText(), path));
     }
 
+    @Override
     public List<ITextOperation> getTextOperations() {
         return Collections.singletonList((ITextOperation) this);
     }
@@ -138,6 +143,7 @@ public class DeleteOperation implements ITextOperation {
     /**
      * {@inheritDoc}
      */
+    @Override
     public ITextOperation invert() {
         return new InsertOperation(getPosition(), getText());
     }

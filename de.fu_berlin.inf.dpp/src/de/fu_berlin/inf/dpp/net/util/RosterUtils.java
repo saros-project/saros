@@ -259,6 +259,7 @@ public class RosterUtils {
                 boolean cancel = false;
                 try {
                     cancel = Utils.runSWTSync(new Callable<Boolean>() {
+                        @Override
                         public Boolean call() throws Exception {
                             return !DialogUtils
                                 .openQuestionMessageDialog(
@@ -290,6 +291,7 @@ public class RosterUtils {
 
             try {
                 cancel = Utils.runSWTSync(new Callable<Boolean>() {
+                    @Override
                     public Boolean call() throws Exception {
                         return !DialogUtils.openQuestionMessageDialog(null,
                             dialogContent.dialogTitle,

@@ -537,6 +537,7 @@ public abstract class StfTestCase {
             if (tester != host) {
                 peerJIDs.add(tester.getJID());
                 leaveTasks.add(new Callable<Void>() {
+                    @Override
                     public Void call() throws Exception {
                         tester.superBot().views().sarosView().leaveSession();
                         return null;

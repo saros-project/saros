@@ -16,10 +16,12 @@ public class NamedThreadFactoryTest {
         NamedThreadFactory factory = new NamedThreadFactory(null);
 
         Thread t1 = factory.newThread(new Runnable() {
+            @Override
             public void run() { /**/
             }
         });
         Thread t2 = factory.newThread(new Runnable() {
+            @Override
             public void run() { /**/
             }
         });
@@ -36,10 +38,12 @@ public class NamedThreadFactoryTest {
         NamedThreadFactory factory = new NamedThreadFactory("");
 
         Thread t1 = factory.newThread(new Runnable() {
+            @Override
             public void run() { /**/
             }
         });
         Thread t2 = factory.newThread(new Runnable() {
+            @Override
             public void run() { /**/
             }
         });
@@ -54,10 +58,12 @@ public class NamedThreadFactoryTest {
         NamedThreadFactory factory = new NamedThreadFactory(name);
 
         Thread t1 = factory.newThread(new Runnable() {
+            @Override
             public void run() { /**/
             }
         });
         Thread t2 = factory.newThread(new Runnable() {
+            @Override
             public void run() { /**/
             }
         });

@@ -198,6 +198,7 @@ public class EditorManager extends AbstractActivityProvider {
     };
 
     private Blockable stopManagerListener = new Blockable() {
+        @Override
         public void unblock() {
             Utils.runSafeSWTSync(log, new Runnable() {
 
@@ -208,6 +209,7 @@ public class EditorManager extends AbstractActivityProvider {
             });
         }
 
+        @Override
         public void block() {
             Utils.runSafeSWTSync(log, new Runnable() {
 
@@ -283,6 +285,7 @@ public class EditorManager extends AbstractActivityProvider {
                 setFollowing(null);
 
             removeAllAnnotations(new Predicate<SarosAnnotation>() {
+                @Override
                 public boolean evaluate(SarosAnnotation annotation) {
                     return annotation.getSource().equals(user);
                 }
@@ -311,6 +314,7 @@ public class EditorManager extends AbstractActivityProvider {
                 sarosSession);
 
             Utils.runSafeSWTSync(log, new Runnable() {
+                @Override
                 public void run() {
 
                     editorAPI.addEditorPartListener(EditorManager.this);
@@ -325,6 +329,7 @@ public class EditorManager extends AbstractActivityProvider {
             sarosSession.getStopManager().removeBlockable(stopManagerListener);
 
             Utils.runSafeSWTSync(log, new Runnable() {
+                @Override
                 public void run() {
 
                     editorAPI.removeEditorPartListener(EditorManager.this);
@@ -334,6 +339,7 @@ public class EditorManager extends AbstractActivityProvider {
                      * editorPool
                      */
                     removeAllAnnotations(new Predicate<SarosAnnotation>() {
+                        @Override
                         public boolean evaluate(SarosAnnotation annotation) {
                             return true;
                         }
@@ -372,6 +378,7 @@ public class EditorManager extends AbstractActivityProvider {
                  * again everything is going back to normal. To prevent that
                  * from happening this method is needed.
                  */
+                @Override
                 public void run() {
                     // Calling this method might cause openPart events
                     Set<IEditorPart> allOpenEditorParts = EditorAPI
@@ -415,6 +422,7 @@ public class EditorManager extends AbstractActivityProvider {
                 return;
 
             Predicate<SarosAnnotation> p = new Predicate<SarosAnnotation>() {
+                @Override
                 public boolean evaluate(SarosAnnotation annotation) {
                     return annotation instanceof ViewportAnnotation;
                 }
@@ -994,6 +1002,7 @@ public class EditorManager extends AbstractActivityProvider {
      */
     public void sendPartActivated() {
         Utils.runSafeSWTSync(log, new Runnable() {
+            @Override
             public void run() {
                 partActivated(editorAPI.getActiveEditor());
             }
@@ -1349,6 +1358,7 @@ public class EditorManager extends AbstractActivityProvider {
 
         try {
             Utils.runSWTSync(new Callable<Object>() {
+                @Override
                 public Object call() throws Exception {
                     saveText(path);
                     return null;
@@ -1681,6 +1691,7 @@ public class EditorManager extends AbstractActivityProvider {
 
         // Clear all annotations
         removeAllAnnotations(editorPart, new Predicate<SarosAnnotation>() {
+            @Override
             public boolean evaluate(SarosAnnotation annotation) {
                 return annotation instanceof ViewportAnnotation
                     || annotation instanceof SelectionAnnotation;

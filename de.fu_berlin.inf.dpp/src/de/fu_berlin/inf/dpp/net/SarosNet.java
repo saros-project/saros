@@ -118,6 +118,7 @@ public class SarosNet {
          */
         Connection
             .addConnectionCreationListener(new ConnectionCreationListener() {
+                @Override
                 public void connectionCreated(Connection connection2) {
                     if (connection != connection2) {
                         // Ignore the connections created in createAccount.
@@ -452,11 +453,13 @@ public class SarosNet {
 
     protected class XMPPConnectionListener implements ConnectionListener {
 
+        @Override
         public void connectionClosed() {
             // self inflicted, controlled disconnect
             setConnectionState(ConnectionState.NOT_CONNECTED, null);
         }
 
+        @Override
         public void connectionClosedOnError(Exception e) {
 
             log.error("XMPP Connection Error: ", e);
@@ -483,6 +486,7 @@ public class SarosNet {
             disconnectInternal();
 
             Utils.runSafeAsync(log, new Runnable() {
+                @Override
                 public void run() {
 
                     // HACK Improve this hack to stop an infinite reconnect
@@ -522,18 +526,21 @@ public class SarosNet {
             });
         }
 
+        @Override
         public void reconnectingIn(int seconds) {
             // TODO maybe using Smack reconnect is better
             assert false : "Reconnecting is disabled";
             // setConnectionState(ConnectionState.CONNECTING, null);
         }
 
+        @Override
         public void reconnectionFailed(Exception e) {
             // TODO maybe using Smack reconnect is better
             assert false : "Reconnecting is disabled";
             // setConnectionState(ConnectionState.ERROR, e.getMessage());
         }
 
+        @Override
         public void reconnectionSuccessful() {
             // TODO maybe using Smack reconnect is better
             assert false : "Reconnecting is disabled";
@@ -564,6 +571,7 @@ public class SarosNet {
              * connecting/disconnecting is done.
              */
             Utils.runSafeAsync(log, new Runnable() {
+                @Override
                 public void run() {
                     disconnect();
                 }

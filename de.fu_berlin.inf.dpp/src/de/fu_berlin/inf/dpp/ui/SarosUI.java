@@ -100,6 +100,7 @@ public class SarosUI {
         // Fixes #2727848: InvitationDialog is opened in the
         // background
         Utils.runSafeSWTAsync(log, new Runnable() {
+            @Override
             public void run() {
                 DialogUtils.openWindow(wizardDialog);
             }
@@ -128,6 +129,7 @@ public class SarosUI {
         projectWizard.setWizardDlg(wizardDialog);
         Utils.runSafeSWTAsync(log, new Runnable() {
 
+            @Override
             public void run() {
                 DialogUtils.openWindow(wizardDialog);
             }
@@ -226,6 +228,7 @@ public class SarosUI {
 
         try {
             dialog.run(true, true, new IRunnableWithProgress() {
+                @Override
                 public void run(final IProgressMonitor monitor) {
 
                     final SubMonitor progress = SubMonitor.convert(monitor);
@@ -242,6 +245,7 @@ public class SarosUI {
                     } catch (CancellationException e) {
                         log.warn("Permission change failed because buddy canceled the permission change"); //$NON-NLS-1$
                         Utils.runSafeSWTSync(log, new Runnable() {
+                            @Override
                             public void run() {
                                 MessageDialog.openInformation(EditorAPI
                                     .getAWorkbenchWindow().getShell(),

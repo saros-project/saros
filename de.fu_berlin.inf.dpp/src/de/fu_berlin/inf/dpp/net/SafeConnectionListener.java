@@ -32,24 +32,30 @@ public class SafeConnectionListener implements ConnectionListener {
         this.log = log;
     }
 
+    @Override
     public void connectionClosed() {
         Utils.runSafeSync(log, new Runnable() {
+            @Override
             public void run() {
                 toForwardTo.connectionClosed();
             }
         });
     }
 
+    @Override
     public void connectionClosedOnError(final Exception e) {
         Utils.runSafeSync(log, new Runnable() {
+            @Override
             public void run() {
                 toForwardTo.connectionClosedOnError(e);
             }
         });
     }
 
+    @Override
     public void reconnectingIn(final int seconds) {
         Utils.runSafeSync(log, new Runnable() {
+            @Override
             public void run() {
                 toForwardTo.reconnectingIn(seconds);
             }
@@ -57,16 +63,20 @@ public class SafeConnectionListener implements ConnectionListener {
 
     }
 
+    @Override
     public void reconnectionFailed(final Exception e) {
         Utils.runSafeSync(log, new Runnable() {
+            @Override
             public void run() {
                 toForwardTo.reconnectionFailed(e);
             }
         });
     }
 
+    @Override
     public void reconnectionSuccessful() {
         Utils.runSafeSync(log, new Runnable() {
+            @Override
             public void run() {
                 toForwardTo.reconnectionSuccessful();
             }

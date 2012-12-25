@@ -12,6 +12,7 @@ import de.fu_berlin.inf.dpp.project.ISarosSession;
  */
 public class SarosPropertyTester extends PropertyTester {
 
+    @Override
     public boolean test(Object receiver, String property, Object[] args,
         Object expectedValue) {
         if (receiver instanceof Saros) {

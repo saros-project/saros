@@ -115,16 +115,19 @@ public class DiscoveryManager implements Disposable {
             }
         }
 
+        @Override
         public void entriesAdded(Collection<String> addresses) {
             log.trace("entriesAdded");
             clearCache(addresses);
         }
 
+        @Override
         public void entriesDeleted(Collection<String> addresses) {
             log.trace("entriesDeleted");
             clearCache(addresses);
         }
 
+        @Override
         public void entriesUpdated(Collection<String> addresses) {
             log.trace("entriesUpdated");
             // TODO This is called to frequently by smack and invalidates our
@@ -132,6 +135,7 @@ public class DiscoveryManager implements Disposable {
             clearCache(addresses);
         }
 
+        @Override
         public void presenceChanged(Presence current) {
             log.trace("presenceChanged: " + current.toString());
             if (hasOnlineStateChanged(current))
@@ -152,6 +156,7 @@ public class DiscoveryManager implements Disposable {
             return true;
         }
 
+        @Override
         public void rosterChanged(Roster roster) {
             cache.clear();
         }
@@ -165,6 +170,7 @@ public class DiscoveryManager implements Disposable {
      * This must be called before finalization otherwise you will get NPE on
      * RosterTracker.
      */
+    @Override
     public void dispose() {
         rosterTracker.removeRosterListener(rosterListener);
     }
@@ -322,8 +328,10 @@ public class DiscoveryManager implements Disposable {
             isSupportedNonBlock(buddy, Saros.NAMESPACE);
         } catch (CacheMissException e) {
             supportExecutor.execute(new Runnable() {
+                @Override
                 public void run() {
                     Utils.runSafeAsync(log, new Runnable() {
+                        @Override
                         public void run() {
                             isSarosSupported(buddy);
                         }

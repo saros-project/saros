@@ -139,6 +139,7 @@ public class UndoManager extends AbstractActivityProvider implements Disposable 
             return ("new " + operation.getLabel() + ": " + operation);
         }
 
+        @Override
         public IStatus proceedRedoing(final IUndoableOperation operation,
             IOperationHistory history, IAdaptable info) {
 
@@ -160,6 +161,7 @@ public class UndoManager extends AbstractActivityProvider implements Disposable 
                 storeCurrentLocalOperation();
 
                 Utils.runSafeSWTSync(log, new Runnable() {
+                    @Override
                     public void run() {
                         log.debug("redoing operation " + operation);
                         redo(currentActiveEditor);
@@ -178,6 +180,7 @@ public class UndoManager extends AbstractActivityProvider implements Disposable 
             return Status.OK_STATUS;
         }
 
+        @Override
         public IStatus proceedUndoing(final IUndoableOperation operation,
             IOperationHistory history, IAdaptable info) {
 
@@ -197,6 +200,7 @@ public class UndoManager extends AbstractActivityProvider implements Disposable 
                 storeCurrentLocalOperation();
 
                 Utils.runSafeSWTSync(log, new Runnable() {
+                    @Override
                     public void run() {
                         log.debug("undoing operation " + operation);
                         undo(currentActiveEditor);
@@ -308,6 +312,7 @@ public class UndoManager extends AbstractActivityProvider implements Disposable 
 
     protected IActivityListener activityListener = new IActivityListener() {
 
+        @Override
         public void activityCreated(final IActivity activityDataObject) {
             Utils.runSafeSWTSync(log, new Runnable() {
 
@@ -375,6 +380,7 @@ public class UndoManager extends AbstractActivityProvider implements Disposable 
 
     public IOperationHistoryListener historyListener = new IOperationHistoryListener() {
 
+        @Override
         public void historyNotification(OperationHistoryEvent event) {
 
             if (!enabled)
@@ -522,6 +528,7 @@ public class UndoManager extends AbstractActivityProvider implements Disposable 
         }
     }
 
+    @Override
     public void dispose() {
         OperationHistoryFactory.getOperationHistory()
             .removeOperationHistoryListener(historyListener);

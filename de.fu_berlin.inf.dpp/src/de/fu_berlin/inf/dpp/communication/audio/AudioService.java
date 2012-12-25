@@ -76,6 +76,7 @@ public class AudioService extends StreamService {
         if (!audioServiceManager.isRecordConfigured()) {
             askUser = new Callable<Boolean>() {
 
+                @Override
                 public Boolean call() throws Exception {
 
                     return DialogUtils
@@ -91,6 +92,7 @@ public class AudioService extends StreamService {
         } else {
             askUser = new Callable<Boolean>() {
 
+                @Override
                 public Boolean call() throws Exception {
 
                     return DialogUtils.openQuestionMessageDialog(

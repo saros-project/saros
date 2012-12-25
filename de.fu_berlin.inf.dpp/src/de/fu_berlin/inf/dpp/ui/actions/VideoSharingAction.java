@@ -61,12 +61,14 @@ public class VideoSharingAction extends Action implements Disposable {
     public static final String TOOLTIP_STOP_SESSION = Messages.VideoSharingAction_stop_session_tooltip;
 
     protected ValueChangeListener<VideoSharingSession> changeListener = new ValueChangeListener<VideoSharingSession>() {
+        @Override
         public void setValue(VideoSharingSession newValue) {
             updateEnablement();
         }
     };
 
     protected ISelectionListener selectionListener = new ISelectionListener() {
+        @Override
         public void selectionChanged(IWorkbenchPart part, ISelection selection) {
             updateEnablement();
         }
@@ -118,6 +120,7 @@ public class VideoSharingAction extends Action implements Disposable {
     @Override
     public void run() {
         Utils.runSafeSWTAsync(log, new Runnable() {
+            @Override
             public void run() {
                 List<User> participants = SelectionRetrieverFactory
                     .getSelectionRetriever(User.class).getSelection();
@@ -154,6 +157,7 @@ public class VideoSharingAction extends Action implements Disposable {
         });
     }
 
+    @Override
     public void dispose() {
         SelectionUtils.getSelectionService().removeSelectionListener(
             selectionListener);

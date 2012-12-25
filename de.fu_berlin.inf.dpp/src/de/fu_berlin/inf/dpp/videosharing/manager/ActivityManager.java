@@ -60,6 +60,7 @@ public class ActivityManager implements Disposable {
 
     protected class ActivityManagerReceiver implements Runnable {
 
+        @Override
         public void run() {
             while (!Thread.interrupted()) {
                 try {
@@ -104,6 +105,7 @@ public class ActivityManager implements Disposable {
         }
     }
 
+    @Override
     public void dispose() {
         // stream will be closed by ConnectionFactory
         if (activityReceiverThread != null)

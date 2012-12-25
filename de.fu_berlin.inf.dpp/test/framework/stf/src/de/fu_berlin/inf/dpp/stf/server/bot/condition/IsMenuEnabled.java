@@ -14,11 +14,13 @@ public class IsMenuEnabled extends DefaultCondition {
 
     }
 
+    @Override
     public String getFailureMessage() {
 
         return null;
     }
 
+    @Override
     public boolean test() throws Exception {
         try {
             for (String label : labels) {

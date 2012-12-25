@@ -23,14 +23,17 @@ public final class RemoteBotPerspective extends StfRemoteObject implements
         return this;
     }
 
+    @Override
     public void activate() throws RemoteException {
         widget.activate();
     }
 
+    @Override
     public String getLabel() throws RemoteException {
         return widget.getLabel();
     }
 
+    @Override
     public boolean isActive() throws RemoteException {
         return widget.isActive();
     }

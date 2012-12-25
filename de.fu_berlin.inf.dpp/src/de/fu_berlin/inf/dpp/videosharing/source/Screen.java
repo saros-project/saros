@@ -121,6 +121,7 @@ public class Screen implements ImageSource {
         }
     }
 
+    @Override
     public synchronized BufferedImage toImage() {
         final BufferedImage capture = robot
             .createScreenCapture(followsMouse() ? mouseRectangle() : screenArea);
@@ -232,6 +233,7 @@ public class Screen implements ImageSource {
         this.mode = newMode;
     }
 
+    @Override
     public void processActivity(VideoActivity activity) {
         switch (activity.getType()) {
         case MOUSE_CLICK:
@@ -251,6 +253,7 @@ public class Screen implements ImageSource {
         }
     }
 
+    @Override
     public void switchMode() {
         if (mode == Mode.FULL_SCREEN) {
             mode = Mode.FOLLOW_MOUSE;
@@ -260,6 +263,7 @@ public class Screen implements ImageSource {
         infoText.setText(mode.name());
     }
 
+    @Override
     public void dispose() {
         // nothing to dispose
     }

@@ -408,6 +408,7 @@ public class Diff {
      */
 
     static class ReverseScript implements ScriptBuilder {
+        @Override
         public Change build_script(final boolean[] changed0, int len0,
             final boolean[] changed1, int len1) {
             Change script = null;
@@ -441,6 +442,7 @@ public class Diff {
          * Scan the tables of which lines are inserted and deleted, producing an
          * edit script in forward order.
          */
+        @Override
         public Change build_script(final boolean[] changed0, int len0,
             final boolean[] changed1, int len1) {
             Change script = null;

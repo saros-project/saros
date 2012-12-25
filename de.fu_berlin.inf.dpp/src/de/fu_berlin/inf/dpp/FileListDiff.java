@@ -185,6 +185,7 @@ public class FileListDiff {
             }
         }
         IWorkspaceRunnable deleteProcedure = new IWorkspaceRunnable() {
+            @Override
             public void run(IProgressMonitor progress) throws CoreException {
                 // SubMonitor monitor = (SubMonitor) progress;// doesn't work?
                 for (IPath path : toDelete) {

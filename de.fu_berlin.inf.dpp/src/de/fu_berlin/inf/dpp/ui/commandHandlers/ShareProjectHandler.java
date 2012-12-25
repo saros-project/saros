@@ -47,6 +47,7 @@ public class ShareProjectHandler extends AbstractHandler {
     @Inject
     ISarosSessionManager sarosSessionManager;
 
+    @Override
     public Object execute(ExecutionEvent event) throws ExecutionException {
         WizardUtils.openShareProjectWizard();
         return null;

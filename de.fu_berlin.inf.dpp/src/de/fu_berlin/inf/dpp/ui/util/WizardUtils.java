@@ -48,6 +48,7 @@ public class WizardUtils {
         final Wizard wizard, final Point initialSize) {
         try {
             return Utils.runSWTSync(new Callable<Integer>() {
+                @Override
                 public Integer call() {
                     WizardDialog wizardDialog = new CenteredWizardDialog(
                         parentShell, wizard, initialSize, MODAL);
@@ -96,6 +97,7 @@ public class WizardUtils {
      */
     public static void openNewProjectWizard() {
         Utils.runSafeSWTSync(log, new Runnable() {
+            @Override
             public void run() {
                 IWorkbenchWindow window = PlatformUI.getWorkbench()
                     .getActiveWorkbenchWindow();
@@ -117,6 +119,7 @@ public class WizardUtils {
 
         try {
             if (Window.OK == Utils.runSWTSync(new Callable<Integer>() {
+                @Override
                 public Integer call() {
                     WizardDialog wizardDialog = new CenteredWizardDialog(null,
                         configWiz, initialSize, MODELESS);

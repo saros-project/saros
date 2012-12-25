@@ -102,10 +102,12 @@ public class VCSActivity extends AbstractActivity implements IResourceActivity {
             param1);
     }
 
+    @Override
     public void dispatch(IActivityReceiver receiver) {
         receiver.receive(this);
     }
 
+    @Override
     public IActivityDataObject getActivityDataObject(ISarosSession sarosSession) {
         SPathDataObject sPathDataObject = path == null ? null : path
             .toSPathDataObject(sarosSession);
@@ -118,6 +120,7 @@ public class VCSActivity extends AbstractActivity implements IResourceActivity {
             sPathDataObject, directory, param1, ados);
     }
 
+    @Override
     public SPath getPath() {
         return path;
     }

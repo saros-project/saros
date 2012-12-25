@@ -230,6 +230,7 @@ public final class StopManager extends AbstractActivityProvider implements
 
         for (final User user : users) {
             threads.add(Utils.runSafeAsync(log, new Runnable() {
+                @Override
                 public void run() {
                     try {
                         if (monitor.isCanceled())

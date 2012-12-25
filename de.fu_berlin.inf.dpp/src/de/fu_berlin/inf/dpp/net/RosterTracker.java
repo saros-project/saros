@@ -68,6 +68,7 @@ public class RosterTracker implements IConnectionListener {
         this.connection = null;
     }
 
+    @Override
     public void connectionStateChanged(Connection connection,
         ConnectionState newState) {
         if (newState == ConnectionState.CONNECTING) {

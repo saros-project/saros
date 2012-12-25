@@ -65,6 +65,7 @@ public class ViewportAnnotation extends SarosAnnotation implements
         // FIXME: dispose fillColor somewhere
     }
 
+    @Override
     public void paint(GC gc, Canvas canvas, Rectangle bounds) {
         Point canvasSize = canvas.getSize();
 
@@ -106,6 +107,7 @@ public class ViewportAnnotation extends SarosAnnotation implements
         this.multipleLines = multipleLines;
     }
 
+    @Override
     public int getLayer() {
         return IAnnotationPresentation.DEFAULT_LAYER;
     }

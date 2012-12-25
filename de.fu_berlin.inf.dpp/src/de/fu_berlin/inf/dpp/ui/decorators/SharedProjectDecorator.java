@@ -96,12 +96,14 @@ public class SharedProjectDecorator implements ILightweightLabelDecorator {
         }
     }
 
+    @Override
     public void dispose() {
         sessionManager.removeSarosSessionListener(sessionListener);
     }
 
     List<IResource> resources = new ArrayList<IResource>();
 
+    @Override
     public void decorate(Object element, IDecoration decoration) {
         ISarosSession session = sarosSession;
 
@@ -127,14 +129,17 @@ public class SharedProjectDecorator implements ILightweightLabelDecorator {
         }
     }
 
+    @Override
     public boolean isLabelProperty(Object element, String property) {
         return false;
     }
 
+    @Override
     public void addListener(ILabelProviderListener listener) {
         listeners.add(listener);
     }
 
+    @Override
     public void removeListener(ILabelProviderListener listener) {
         listeners.remove(listener);
     }
@@ -142,6 +147,7 @@ public class SharedProjectDecorator implements ILightweightLabelDecorator {
     protected void updateDecoratorsAsync(final Object[] objects) {
         log.debug("Decoration update");
         Utils.runSafeSWTAsync(log, new Runnable() {
+            @Override
             public void run() {
                 LabelProviderChangedEvent event = new LabelProviderChangedEvent(
                     SharedProjectDecorator.this, objects);

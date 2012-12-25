@@ -24,11 +24,13 @@ public class SubclipseConsoleListener implements IPatternMatchListenerDelegate {
 
     TextConsole console;
 
+    @Override
     public void connect(TextConsole console) {
         log.trace("SVN console found");
         this.console = console;
     }
 
+    @Override
     public void disconnect() {
         log.trace("SVN console lost");
         this.console = null;
@@ -40,6 +42,7 @@ public class SubclipseConsoleListener implements IPatternMatchListenerDelegate {
         operations = Arrays.asList(array);
     }
 
+    @Override
     public void matchFound(PatternMatchEvent event) {
         // TODO We could get old events here.
         if (!log.isTraceEnabled())

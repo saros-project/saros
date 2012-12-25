@@ -47,6 +47,7 @@ public class WhiteboardFigure extends StfRemoteObject implements
         Color foregroundColor;
         Color backgroundColor;
         backgroundColor = UIThreadRunnable.syncExec(new Result<Color>() {
+            @Override
             public Color run() {
                 org.eclipse.swt.graphics.Color color = figure
                     .getBackgroundColor();
@@ -55,6 +56,7 @@ public class WhiteboardFigure extends StfRemoteObject implements
             }
         });
         foregroundColor = UIThreadRunnable.syncExec(new Result<Color>() {
+            @Override
             public Color run() {
                 org.eclipse.swt.graphics.Color color = figure
                     .getForegroundColor();

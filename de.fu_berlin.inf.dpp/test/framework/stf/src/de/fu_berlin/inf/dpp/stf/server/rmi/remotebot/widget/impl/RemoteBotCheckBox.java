@@ -28,6 +28,7 @@ public final class RemoteBotCheckBox extends StfRemoteObject implements
      * 
      * @see SWTBotCheckBox#contextMenu(String)
      */
+    @Override
     public IRemoteBotMenu contextMenu(String text) throws RemoteException {
         return RemoteBotMenu.getInstance().setWidget(widget.contextMenu(text));
     }
@@ -36,6 +37,7 @@ public final class RemoteBotCheckBox extends StfRemoteObject implements
      * 
      * @see SWTBotCheckBox#click()
      */
+    @Override
     public void click() throws RemoteException {
         widget.click();
     }
@@ -44,6 +46,7 @@ public final class RemoteBotCheckBox extends StfRemoteObject implements
      * 
      * @see SWTBotCheckBox#select()
      */
+    @Override
     public void select() throws RemoteException {
         widget.select();
     }
@@ -52,6 +55,7 @@ public final class RemoteBotCheckBox extends StfRemoteObject implements
      * 
      * @see SWTBotCheckBox#deselect()
      */
+    @Override
     public void deselect() throws RemoteException {
         widget.deselect();
 
@@ -61,6 +65,7 @@ public final class RemoteBotCheckBox extends StfRemoteObject implements
      * 
      * @see SWTBotCheckBox#setFocus()
      */
+    @Override
     public void setFocus() throws RemoteException {
         widget.setFocus();
     }
@@ -69,6 +74,7 @@ public final class RemoteBotCheckBox extends StfRemoteObject implements
      * 
      * @see SWTBotCheckBox#isEnabled()
      */
+    @Override
     public boolean isEnabled() throws RemoteException {
         return widget.isEnabled();
     }
@@ -77,6 +83,7 @@ public final class RemoteBotCheckBox extends StfRemoteObject implements
      * 
      * @see SWTBotCheckBox#isVisible()
      */
+    @Override
     public boolean isVisible() throws RemoteException {
         return widget.isVisible();
     }
@@ -85,6 +92,7 @@ public final class RemoteBotCheckBox extends StfRemoteObject implements
      * 
      * @see SWTBotCheckBox#isActive()
      */
+    @Override
     public boolean isActive() throws RemoteException {
         return widget.isActive();
     }
@@ -93,6 +101,7 @@ public final class RemoteBotCheckBox extends StfRemoteObject implements
      * 
      * @see SWTBotCheckBox#isChecked()
      */
+    @Override
     public boolean isChecked() throws RemoteException {
         return widget.isChecked();
     }
@@ -101,6 +110,7 @@ public final class RemoteBotCheckBox extends StfRemoteObject implements
      * 
      * @see SWTBotCheckBox#getText()
      */
+    @Override
     public String getText() throws RemoteException {
         return widget.getText();
     }
@@ -109,6 +119,7 @@ public final class RemoteBotCheckBox extends StfRemoteObject implements
      * 
      * @see SWTBotCheckBox#getToolTipText()
      */
+    @Override
     public String getToolTipText() throws RemoteException {
         return widget.getText();
     }

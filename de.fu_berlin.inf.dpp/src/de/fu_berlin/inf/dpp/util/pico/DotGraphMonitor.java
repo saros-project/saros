@@ -282,6 +282,7 @@ public final class DotGraphMonitor extends AbstractComponentMonitor implements
 
     public static final class ModuleFunction implements
         Function<Class<?>, String> {
+        @Override
         public String apply(Class<?> u) {
             if (u.isArray()) {
                 u = u.getComponentType();

@@ -76,6 +76,7 @@ public class ProjectShareProjects extends ContributionItem {
         IProject[] workspaceProjects = ResourcesPlugin.getWorkspace().getRoot()
             .getProjects();
         Arrays.sort(workspaceProjects, new Comparator<IProject>() {
+            @Override
             public int compare(IProject o1, IProject o2) {
                 String name1 = o1.getName();
                 String name2 = o2.getName();

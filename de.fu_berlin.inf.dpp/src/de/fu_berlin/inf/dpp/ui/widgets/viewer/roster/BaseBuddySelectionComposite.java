@@ -51,6 +51,7 @@ public class BaseBuddySelectionComposite extends BuddyDisplayComposite {
     protected List<BaseBuddySelectionListener> buddySelectionListeners = new ArrayList<BaseBuddySelectionListener>();
 
     protected ICheckStateListener checkStateListener = new ICheckStateListener() {
+        @Override
         public void checkStateChanged(CheckStateChangedEvent event) {
             // Update the check state
             if (checkStateProvider != null) {
@@ -73,6 +74,7 @@ public class BaseBuddySelectionComposite extends BuddyDisplayComposite {
             .addCheckStateListener(checkStateListener);
 
         this.addDisposeListener(new DisposeListener() {
+            @Override
             public void widgetDisposed(DisposeEvent e) {
                 if (viewer != null) {
                     ((CheckboxTreeViewer) viewer)

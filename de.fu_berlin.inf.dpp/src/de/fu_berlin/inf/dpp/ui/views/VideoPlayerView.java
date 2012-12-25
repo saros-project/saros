@@ -136,6 +136,7 @@ public class VideoPlayerView extends ListExplanatoryViewPart implements
         updateKeepAspectRatio();
         preferences.addPropertyChangeListener(new IPropertyChangeListener() {
 
+            @Override
             public void propertyChange(PropertyChangeEvent event) {
                 if (event.getProperty().equals(
                     PreferenceConstants.PLAYER_RESAMPLE))
@@ -149,8 +150,10 @@ public class VideoPlayerView extends ListExplanatoryViewPart implements
         this.videoSharingSessionObservable
             .add(new ValueChangeListener<VideoSharingSession>() {
 
+                @Override
                 public void setValue(final VideoSharingSession newValue) {
                     Utils.runSafeSWTSync(log, new Runnable() {
+                        @Override
                         public void run() {
                             if (newValue == null)
                                 reset();
@@ -192,6 +195,7 @@ public class VideoPlayerView extends ListExplanatoryViewPart implements
 
         canvas.addListener(SWT.Resize, new Listener() {
 
+            @Override
             public void handleEvent(Event event) {
                 clientArea = canvas.getClientArea();
             }
@@ -250,6 +254,7 @@ public class VideoPlayerView extends ListExplanatoryViewPart implements
             videoCanvas.requestFocus();
     }
 
+    @Override
     public Dimension getImageDimension(Dimension dimension) {
         if (!resample)
             return null;
@@ -268,10 +273,12 @@ public class VideoPlayerView extends ListExplanatoryViewPart implements
         return new Dimension(iWidth, iHeight);
     }
 
+    @Override
     public void setActivityOutput(ObjectOutputStream out) {
         this.activityOutput = out;
     }
 
+    @Override
     public void updateImage(BufferedImage image) {
         if (image == null)
             return;
@@ -285,6 +292,7 @@ public class VideoPlayerView extends ListExplanatoryViewPart implements
     /**
      * @swt
      */
+    @Override
     public void initialize() {
         if (videoCanvas == null && !canvas.isDisposed())
             videoCanvas = new VideoCanvas(SWT_AWT.new_Frame(canvas));
@@ -295,6 +303,7 @@ public class VideoPlayerView extends ListExplanatoryViewPart implements
     /**
      * @swt
      */
+    @Override
     public void reset() {
         this.showExplanation(this.howTo);
         if (videoCanvas != null)
@@ -322,6 +331,7 @@ public class VideoPlayerView extends ListExplanatoryViewPart implements
         lastShownStatus = statistic;
 
         Utils.runSafeSWTAsync(log, new Runnable() {
+            @Override
             public void run() {
                 if (!parent.isDisposed()) {
                     fps.setText(String.valueOf(lastShownStatus.getFps()));
@@ -343,6 +353,7 @@ public class VideoPlayerView extends ListExplanatoryViewPart implements
             videoSharingSessionObservable
                 .addAndNotify(new ValueChangeListener<VideoSharingSession>() {
 
+                    @Override
                     public void setValue(VideoSharingSession newValue) {
                         setEnabled(newValue != null
                             && (newValue.getMode().equals(Mode.CLIENT) || newValue
@@ -354,6 +365,7 @@ public class VideoPlayerView extends ListExplanatoryViewPart implements
         @Override
         public void run() {
             Utils.runSafeAsync(log, new Runnable() {
+                @Override
                 public void run() {
                     VideoSharingSession session = VideoPlayerView.this.videoSharingSessionObservable
                         .getValue();
@@ -375,6 +387,7 @@ public class VideoPlayerView extends ListExplanatoryViewPart implements
             videoSharingSessionObservable
                 .addAndNotify(new ValueChangeListener<VideoSharingSession>() {
 
+                    @Override
                     public void setValue(VideoSharingSession newValue) {
                         setEnabled(newValue != null
                             && (newValue.getMode().equals(Mode.CLIENT) || newValue
@@ -386,6 +399,7 @@ public class VideoPlayerView extends ListExplanatoryViewPart implements
         @Override
         public void run() {
             Utils.runSafeAsync(log, new Runnable() {
+                @Override
                 public void run() {
                     VideoSharingSession session = VideoPlayerView.this.videoSharingSessionObservable
                         .getValue();
@@ -409,6 +423,7 @@ public class VideoPlayerView extends ListExplanatoryViewPart implements
             videoSharingSessionObservable
                 .add(new ValueChangeListener<VideoSharingSession>() {
 
+                    @Override
                     public void setValue(VideoSharingSession newValue) {
                         updateState();
                     }
@@ -418,6 +433,7 @@ public class VideoPlayerView extends ListExplanatoryViewPart implements
         @Override
         public void run() {
             Utils.runSafeAsync(log, new Runnable() {
+                @Override
                 public void run() {
                     VideoSharingSession session = VideoPlayerView.this.videoSharingSessionObservable
                         .getValue();
@@ -484,14 +500,17 @@ public class VideoPlayerView extends ListExplanatoryViewPart implements
             addKeyListener(new ActivityKeyboardListener());
         }
 
+        @Override
         public void setActivityOutput(ObjectOutputStream out) {
             activityOutput = out;
         }
 
+        @Override
         public Dimension getImageDimension(Dimension dimenesion) {
             return null;
         }
 
+        @Override
         public void updateImage(BufferedImage image) {
             updateImage(image, 0, 0);
         }
@@ -537,16 +556,19 @@ public class VideoPlayerView extends ListExplanatoryViewPart implements
             }
         }
 
+        @Override
         public void reset() {
             // nothing to do
         }
 
+        @Override
         public void initialize() {
             // nothing to do
         }
 
         protected class ActivityMouseClickListener implements MouseListener {
 
+            @Override
             public void mouseClicked(MouseEvent e) {
                 if (lastImageDimension == null)
                     return;
@@ -572,18 +594,22 @@ public class VideoPlayerView extends ListExplanatoryViewPart implements
                     pressedButton));
             }
 
+            @Override
             public void mouseEntered(MouseEvent e) {
                 // NOP
             }
 
+            @Override
             public void mouseExited(MouseEvent e) {
                 // NOP
             }
 
+            @Override
             public void mousePressed(MouseEvent e) {
                 // NOP
             }
 
+            @Override
             public void mouseReleased(MouseEvent e) {
                 // NOP
             }
@@ -593,6 +619,7 @@ public class VideoPlayerView extends ListExplanatoryViewPart implements
         protected class ActivityMouseWheelListener implements
             MouseWheelListener {
 
+            @Override
             public void mouseWheelMoved(MouseWheelEvent e) {
                 if (lastImageDimension == null)
                     return;
@@ -606,14 +633,17 @@ public class VideoPlayerView extends ListExplanatoryViewPart implements
 
         protected class ActivityKeyboardListener implements KeyListener {
 
+            @Override
             public void keyPressed(KeyEvent e) {
                 // NOP
             }
 
+            @Override
             public void keyReleased(KeyEvent e) {
                 // NOP
             }
 
+            @Override
             public void keyTyped(KeyEvent e) {
                 char c = e.getKeyChar();
                 if (c != KeyEvent.CHAR_UNDEFINED)

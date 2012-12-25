@@ -58,6 +58,7 @@ public class RosterSessionContentProvider extends TreeContentProvider {
         @Override
         public void activeEditorChanged(final User user, SPath path) {
             Utils.runSafeSWTAsync(null, new Runnable() {
+                @Override
                 public void run() {
                     if (viewer.getControl().isDisposed())
                         return;
@@ -75,6 +76,7 @@ public class RosterSessionContentProvider extends TreeContentProvider {
             // ViewerUtils.refresh(viewer, true);
 
             Utils.runSafeSWTAsync(null, new Runnable() {
+                @Override
                 public void run() {
                     if (viewer.getControl().isDisposed())
                         return;
@@ -86,42 +88,50 @@ public class RosterSessionContentProvider extends TreeContentProvider {
     };
 
     protected RosterListener rosterListener = new RosterListener() {
+        @Override
         public void entriesAdded(Collection<String> addresses) {
             ViewerUtils.refresh(viewer, true);
         }
 
+        @Override
         public void entriesUpdated(Collection<String> addresses) {
             ViewerUtils.refresh(viewer, true);
         }
 
+        @Override
         public void entriesDeleted(Collection<String> addresses) {
             ViewerUtils.refresh(viewer, true);
         }
 
+        @Override
         public void presenceChanged(Presence presence) {
             ViewerUtils.refresh(viewer, true);
         }
     };
 
     protected ISharedProjectListener sharedProjectListener = new ISharedProjectListener() {
+        @Override
         public void userLeft(User user) {
             UserElement userElement = getUserElement(rosterSessionInput, user);
             if (userElement != null)
                 ViewerUtils.remove(viewer, userElement);
         }
 
+        @Override
         public void userJoined(User user) {
             UserElement userElement = getUserElement(rosterSessionInput, user);
             if (userElement != null)
                 ViewerUtils.add(viewer, sessionHeaderElement, userElement);
         }
 
+        @Override
         public void permissionChanged(User user) {
             UserElement userElement = getUserElement(rosterSessionInput, user);
             if (userElement != null)
                 ViewerUtils.update(viewer, userElement, null);
         }
 
+        @Override
         public void invitationCompleted(User user) {
             UserElement userElement = getUserElement(rosterSessionInput, user);
             if (userElement != null)

@@ -54,6 +54,7 @@ public class GOTOInclusionTransformation implements InclusionTransformation {
      *            origin index.
      * @return the transformed operation <var>op1'</var>
      */
+    @Override
     public Operation transform(Operation op1, Operation op2, Object param) {
 
         log.trace("Transform " + op1 + " in the context of " + op2
@@ -107,9 +108,9 @@ public class GOTOInclusionTransformation implements InclusionTransformation {
              *           O
              *      s1 /   \ op1
              *       O       O
-             *  s2 /   \   /   
+             *  s2 /   \   /
              *   O       O
-             * op1'\   /    
+             * op1'\   /
              *       O
              *      </code>
              */
@@ -138,6 +139,7 @@ public class GOTOInclusionTransformation implements InclusionTransformation {
         throw new InvalidParameterException("op1: " + op1 + ", op2: " + op2);
     }
 
+    @Override
     public int transformIndex(int index, Operation op, Object param) {
         if (op instanceof SplitOperation) {
             SplitOperation s = (SplitOperation) op;

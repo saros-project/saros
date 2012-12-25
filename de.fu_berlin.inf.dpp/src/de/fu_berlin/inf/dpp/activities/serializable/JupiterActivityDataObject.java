@@ -93,6 +93,7 @@ public class JupiterActivityDataObject extends
         return buffer.toString();
     }
 
+    @Override
     public IActivity getActivity(ISarosSession sarosSession) {
         return new JupiterActivity(timestamp, operation,
             sarosSession.getUser(source), path.toSPath(sarosSession));

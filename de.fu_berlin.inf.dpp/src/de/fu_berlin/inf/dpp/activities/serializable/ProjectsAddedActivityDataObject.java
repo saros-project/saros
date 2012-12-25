@@ -27,6 +27,7 @@ public class ProjectsAddedActivityDataObject extends AbstractActivityDataObject 
         this.processID = processID;
     }
 
+    @Override
     public IActivity getActivity(ISarosSession sarosSession) {
         List<ProjectExchangeInfo> pInfos = new ArrayList<ProjectExchangeInfo>(
             this.projectInfos.size());

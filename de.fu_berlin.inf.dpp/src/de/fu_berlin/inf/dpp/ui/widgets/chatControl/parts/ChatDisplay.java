@@ -52,6 +52,7 @@ public class ChatDisplay extends ScrolledComposite {
 
         // Focus content composite on activation to enable scrolling.
         this.addListener(SWT.Activate, new Listener() {
+            @Override
             public void handleEvent(Event e) {
                 contentComposite.setFocus();
             }
@@ -71,6 +72,7 @@ public class ChatDisplay extends ScrolledComposite {
          * Scroll to bottom if resized
          */
         this.addListener(SWT.Resize, new Listener() {
+            @Override
             public void handleEvent(Event event) {
                 ChatDisplay.this.refresh();
             }
@@ -99,10 +101,12 @@ public class ChatDisplay extends ScrolledComposite {
         clearButton.setText(Messages.ChatDisplay_clear);
         clearButton.addSelectionListener(new SelectionListener() {
 
+            @Override
             public void widgetSelected(SelectionEvent e) {
                 ChatDisplay.this.clear();
             }
 
+            @Override
             public void widgetDefaultSelected(SelectionEvent e) {
                 // irrelevant
             }

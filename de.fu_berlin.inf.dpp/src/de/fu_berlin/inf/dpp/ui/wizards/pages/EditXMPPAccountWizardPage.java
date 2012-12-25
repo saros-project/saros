@@ -83,6 +83,7 @@ public class EditXMPPAccountWizardPage extends WizardPage {
         wasPortValid = initialPort.length() != 0;
     }
 
+    @Override
     public void createControl(Composite parent) {
         Composite composite = new Composite(parent, SWT.NONE);
         setControl(composite);
@@ -110,6 +111,7 @@ public class EditXMPPAccountWizardPage extends WizardPage {
 
     private void hookListeners() {
         this.enterXMPPAccountComposite.addModifyListener(new ModifyListener() {
+            @Override
             public void modifyText(ModifyEvent e) {
                 updatePageCompletion();
             }

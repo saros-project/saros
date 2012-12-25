@@ -22,18 +22,22 @@ public final class RSView extends StfRemoteObject implements IRSView {
         return this;
     }
 
+    @Override
     public void clickTBChangeModeOfImageSource() throws RemoteException {
         view.toolbarButton(TB_CHANGE_MODE_IMAGE_SOURCE).click();
     }
 
+    @Override
     public void clickTBStopRunningSession() throws RemoteException {
         view.toolbarButton(TB_STOP_RUNNING_SESSION).click();
     }
 
+    @Override
     public void clickTBResume() throws RemoteException {
         view.toolbarButton(TB_RESUME).click();
     }
 
+    @Override
     public void clickTBPause() throws RemoteException {
         view.toolbarButton(TB_PAUSE).click();
     }

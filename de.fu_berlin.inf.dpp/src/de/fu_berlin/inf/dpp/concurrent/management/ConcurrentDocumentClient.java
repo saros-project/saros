@@ -58,6 +58,7 @@ public class ConcurrentDocumentClient implements Disposable {
         sarosSession.addListener(projectListener);
     }
 
+    @Override
     public void dispose() {
         sarosSession.removeListener(projectListener);
     }

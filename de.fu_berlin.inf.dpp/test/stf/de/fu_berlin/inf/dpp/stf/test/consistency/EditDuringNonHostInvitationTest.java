@@ -71,6 +71,7 @@ public class EditDuringNonHostInvitationTest extends StfTestCase {
 
         aliceIsWriting = new TestThread(new TestThread.Runnable() {
 
+            @Override
             public void run() throws Exception {
                 for (int i = 0; i < 20; i++)
                     ALICE.remoteBot().editor(Constants.CLS1_SUFFIX)

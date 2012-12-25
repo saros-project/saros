@@ -135,15 +135,18 @@ public class SharedResourcesManager extends AbstractActivityProvider implements
     protected ConsistencyWatchdogClient consistencyWatchdogClient;
 
     protected Blockable stopManagerListener = new Blockable() {
+        @Override
         public void unblock() {
             SharedResourcesManager.this.pause = false;
         }
 
+        @Override
         public void block() {
             SharedResourcesManager.this.pause = true;
         }
     };
 
+    @Override
     public void start() {
         sarosSession.addActivityProvider(SharedResourcesManager.this);
         stopManager.addBlockable(stopManagerListener);
@@ -178,6 +181,7 @@ public class SharedResourcesManager extends AbstractActivityProvider implements
     /**
      * This method is called from Eclipse when changes to resource are detected
      */
+    @Override
     public void resourceChanged(IResourceChangeEvent event) {
 
         if (fileReplacementInProgressObservable.isReplacementInProgress())
@@ -642,6 +646,7 @@ public class SharedResourcesManager extends AbstractActivityProvider implements
             pmdShell.setText("Saros running VCS operation");
             log.trace("about to call progressMonitorDialog.run");
             progressMonitorDialog.run(true, false, new IRunnableWithProgress() {
+                @Override
                 public void run(IProgressMonitor progress)
 
                 throws InvocationTargetException, InterruptedException {

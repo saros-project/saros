@@ -96,6 +96,7 @@ public class Socks5Transport extends ByteStreamTransport {
         final String peer) {
 
         return executorService.submit(new Callable<Socks5BytestreamSession>() {
+            @Override
             public Socks5BytestreamSession call() throws Exception {
                 return (Socks5BytestreamSession) establishResponseSession(peer);
             }
@@ -611,6 +612,7 @@ public class Socks5Transport extends ByteStreamTransport {
 
         }
 
+        @Override
         public void close() throws IOException {
             IOException e = null;
 
@@ -630,18 +632,22 @@ public class Socks5Transport extends ByteStreamTransport {
                 throw e;
         }
 
+        @Override
         public InputStream getInputStream() throws IOException {
             return in.getInputStream();
         }
 
+        @Override
         public OutputStream getOutputStream() throws IOException {
             return out.getOutputStream();
         }
 
+        @Override
         public int getReadTimeout() throws IOException {
             return in.getReadTimeout();
         }
 
+        @Override
         public void setReadTimeout(int timeout) throws IOException {
             in.setReadTimeout(timeout);
         }

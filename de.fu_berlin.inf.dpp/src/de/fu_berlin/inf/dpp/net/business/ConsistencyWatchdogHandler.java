@@ -69,10 +69,12 @@ public class ConsistencyWatchdogHandler implements Startable {
         }
     };
 
+    @Override
     public void start() {
         sarosSession.addActivityProvider(activityProvider);
     }
 
+    @Override
     public void stop() {
         sarosSession.removeActivityProvider(activityProvider);
     }
@@ -98,6 +100,7 @@ public class ConsistencyWatchdogHandler implements Startable {
         log.debug("Received Checksum Error: " + checksumError);
 
         Utils.runSafeSWTSync(log, new Runnable() {
+            @Override
             public void run() {
 
                 final ProgressMonitorDialog dialog = new ProgressMonitorDialog(
@@ -119,9 +122,11 @@ public class ConsistencyWatchdogHandler implements Startable {
                 // Run async, so we can continue to receive messages over the
                 // network...
                 Utils.runSafeSWTAsync(log, new Runnable() {
+                    @Override
                     public void run() {
                         try {
                             dialog.run(true, true, new IRunnableWithProgress() {
+                                @Override
                                 public void run(IProgressMonitor monitor) {
                                     runRecovery(checksumError,
                                         SubMonitor.convert(monitor));

@@ -40,16 +40,19 @@ public final class RemoteBotView extends StfRemoteObject implements
         return this;
     }
 
+    @Override
     public IRemoteBot bot() {
         RemoteWorkbenchBot.getInstance().setBot(widget.bot());
         return RemoteWorkbenchBot.getInstance();
     }
 
     // menu
+    @Override
     public IRemoteBotViewMenu menu(String label) throws RemoteException {
         return RemoteBotViewMenu.getInstance().setWidget(widget.menu(label));
     }
 
+    @Override
     public IRemoteBotViewMenu menu(String label, int index)
         throws RemoteException {
         return RemoteBotViewMenu.getInstance().setWidget(
@@ -57,12 +60,14 @@ public final class RemoteBotView extends StfRemoteObject implements
     }
 
     // toolbarButton
+    @Override
     public IRemoteBotToolbarButton toolbarButton(String tooltip)
         throws RemoteException {
         SWTBotToolbarButton toolbarButton = widget.toolbarButton(tooltip);
         return RemoteBotToolbarButton.getInstance().setWidget(toolbarButton);
     }
 
+    @Override
     public IRemoteBotToolbarButton toolbarButtonWithRegex(String regex)
         throws RemoteException {
         for (String tooltip : getToolTipTextOfToolbarButtons()) {
@@ -78,6 +83,7 @@ public final class RemoteBotView extends StfRemoteObject implements
     }
 
     // toolbarDropDownButton
+    @Override
     public IRemoteBotToolbarDropDownButton toolbarDropDownButton(String tooltip)
         throws RemoteException {
         SWTBotToolbarDropDownButton toolbarButton = widget
@@ -87,6 +93,7 @@ public final class RemoteBotView extends StfRemoteObject implements
     }
 
     // toolbarRadioButton
+    @Override
     public IRemoteBotToolbarRadioButton toolbarRadioButton(String tooltip)
         throws RemoteException {
         SWTBotToolbarRadioButton toolbarButton = widget
@@ -96,6 +103,7 @@ public final class RemoteBotView extends StfRemoteObject implements
     }
 
     // toolbarPushButton
+    @Override
     public IRemoteBotToolbarPushButton toolbarPushButton(String tooltip)
         throws RemoteException {
         SWTBotToolbarPushButton toolbarButton = widget
@@ -105,6 +113,7 @@ public final class RemoteBotView extends StfRemoteObject implements
     }
 
     // toolbarToggleButton
+    @Override
     public IRemoteBotToolbarToggleButton toolbarToggleButton(String tooltip)
         throws RemoteException {
         SWTBotToolbarToggleButton toolbarButton = widget
@@ -113,18 +122,22 @@ public final class RemoteBotView extends StfRemoteObject implements
             toolbarButton);
     }
 
+    @Override
     public void close() throws RemoteException {
         widget.close();
     }
 
+    @Override
     public void show() throws RemoteException {
         widget.show();
     }
 
+    @Override
     public void setFocus() throws RemoteException {
         widget.setFocus();
     }
 
+    @Override
     public List<String> getToolTipOfAllToolbarbuttons() throws RemoteException {
         List<String> tooltips = new ArrayList<String>();
         for (SWTBotToolbarButton button : widget.getToolbarButtons()) {
@@ -133,18 +146,22 @@ public final class RemoteBotView extends StfRemoteObject implements
         return tooltips;
     }
 
+    @Override
     public boolean existsToolbarButton(String tooltip) throws RemoteException {
         return getToolTipOfAllToolbarbuttons().contains(tooltip);
     }
 
+    @Override
     public boolean isActive() throws RemoteException {
         return widget.isActive();
     }
 
+    @Override
     public String getTitle() throws RemoteException {
         return widget.getTitle();
     }
 
+    @Override
     public List<String> getToolTipTextOfToolbarButtons() throws RemoteException {
         List<String> toolbarButtons = new ArrayList<String>();
         for (SWTBotToolbarButton toolbarButton : widget.getToolbarButtons()) {
@@ -153,13 +170,16 @@ public final class RemoteBotView extends StfRemoteObject implements
         return toolbarButtons;
     }
 
+    @Override
     public void waitUntilIsActive() throws RemoteException {
 
         RemoteWorkbenchBot.getInstance().waitUntil(new DefaultCondition() {
+            @Override
             public boolean test() throws Exception {
                 return isActive();
             }
 
+            @Override
             public String getFailureMessage() {
                 return "unable to activate the view: " + widget.getTitle();
             }

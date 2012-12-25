@@ -18,6 +18,7 @@ public class IsRevisionSame extends DefaultCondition {
         this.expectedRevision = revisionID;
     }
 
+    @Override
     public String getFailureMessage() {
         String message = "Expected revision of \"" + fullPath
             + "\" to become \"" + expectedRevision + "\", but ";
@@ -35,6 +36,7 @@ public class IsRevisionSame extends DefaultCondition {
         return message + "the revision is \"" + revisionString + "\".";
     }
 
+    @Override
     public boolean test() throws Exception {
         IPath path = new Path(fullPath);
         IResource resource = ResourcesPlugin.getWorkspace().getRoot()

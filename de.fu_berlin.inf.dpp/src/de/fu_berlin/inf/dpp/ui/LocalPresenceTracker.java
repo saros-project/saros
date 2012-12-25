@@ -35,6 +35,7 @@ public class LocalPresenceTracker {
 
         sarosNet.addListener(new IConnectionListener() {
 
+            @Override
             public void connectionStateChanged(Connection connection,
                 ConnectionState newState) {
 
@@ -59,18 +60,22 @@ public class LocalPresenceTracker {
 
         bench.addWindowListener(new IWindowListener() {
 
+            @Override
             public void windowOpened(IWorkbenchWindow window) {
                 announceAvailable();
             }
 
+            @Override
             public void windowDeactivated(IWorkbenchWindow window) {
                 setAway(DELAY_UNTIL_SET_AWAY);
             }
 
+            @Override
             public void windowClosed(IWorkbenchWindow window) {
                 setAway(DELAY_UNTIL_SET_AWAY);
             }
 
+            @Override
             public void windowActivated(IWorkbenchWindow window) {
                 announceAvailable();
             }

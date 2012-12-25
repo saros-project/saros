@@ -185,6 +185,7 @@ public class ConnectionFactory implements Disposable {
     /**
      * Disposes this factory and all it's streams.
      */
+    @Override
     public void dispose() {
         // close streams
         if (mode.equals(Mode.HOST) || mode.equals(Mode.LOCAL)) {

@@ -81,6 +81,7 @@ public class FeedbackPreferencePage extends PreferencePage implements
         setDescription(Messages.getString("feedback.page.description")); //$NON-NLS-1$
     }
 
+    @Override
     public void init(IWorkbench workbench) {
         // nothing to initialize here
     }
@@ -339,6 +340,7 @@ public class FeedbackPreferencePage extends PreferencePage implements
         statisticsPseudonymText.setLayoutData(new GridData(SWT.FILL,
             SWT.CENTER, true, false));
         statisticsPseudonymText.addModifyListener(new ModifyListener() {
+            @Override
             public void modifyText(ModifyEvent e) {
                 pseudonymID = statisticsPseudonymText.getText();
             }

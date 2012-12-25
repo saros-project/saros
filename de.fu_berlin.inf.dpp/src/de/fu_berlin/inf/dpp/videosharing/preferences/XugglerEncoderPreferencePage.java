@@ -19,7 +19,6 @@
  */
 package de.fu_berlin.inf.dpp.videosharing.preferences;
 
-import de.fu_berlin.inf.dpp.SarosPluginContext;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.preference.BooleanFieldEditor;
 import org.eclipse.jface.preference.ComboFieldEditor;
@@ -33,6 +32,7 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
 import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.Saros;
+import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
 import de.fu_berlin.inf.dpp.videosharing.VideoSharing.Codec;
@@ -82,6 +82,7 @@ public class XugglerEncoderPreferencePage extends FieldEditorPreferencePage
             composite));
     }
 
+    @Override
     public void init(IWorkbench workbench) {
         // NOP
     }

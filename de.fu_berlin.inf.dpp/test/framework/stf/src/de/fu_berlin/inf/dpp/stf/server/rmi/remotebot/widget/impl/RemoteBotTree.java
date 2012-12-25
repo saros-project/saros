@@ -43,40 +43,48 @@ public final class RemoteBotTree extends StfRemoteObject implements
         return this;
     }
 
+    @Override
     public void clickContextMenu(String... texts) throws RemoteException {
         ContextMenuHelper.clickContextMenu(widget, texts);
     }
 
+    @Override
     public IRemoteBotTreeItem collapseNode(String nodeText)
         throws RemoteException {
         return RemoteBotTreeItem.getInstance().setWidget(
             widget.collapseNode(nodeText));
     }
 
+    @Override
     public IRemoteBotTreeItem expandNode(String nodeText, boolean recursive)
         throws RemoteException {
         return RemoteBotTreeItem.getInstance().setWidget(
             widget.expandNode(nodeText, recursive));
     }
 
+    @Override
     public IRemoteBotTreeItem expandNode(String... nodes)
         throws RemoteException {
         return RemoteBotTreeItem.getInstance().setWidget(
             widget.expandNode(nodes));
     }
 
+    @Override
     public IRemoteBotTree select(int... indices) throws RemoteException {
         return setWidget(widget.select(indices));
     }
 
+    @Override
     public IRemoteBotTree select(String... items) throws RemoteException {
         return setWidget(widget.select(items));
     }
 
+    @Override
     public IRemoteBotTree unselect() throws RemoteException {
         return setWidget(widget.unselect());
     }
 
+    @Override
     public IRemoteBotTreeItem selectTreeItem(String... pathToTreeItem)
         throws RemoteException {
         RemoteBotTreeItem.getInstance().setWidget(
@@ -85,6 +93,7 @@ public final class RemoteBotTree extends StfRemoteObject implements
         return RemoteBotTreeItem.getInstance();
     }
 
+    @Override
     public IRemoteBotTreeItem selectTreeItemWithRegex(String... regexNodes)
         throws RemoteException {
         assert widget != null : "the passed tree is null.";
@@ -132,6 +141,7 @@ public final class RemoteBotTree extends StfRemoteObject implements
 
     }
 
+    @Override
     public IRemoteBotTreeItem selectTreeItemAndWait(String... pathToTreeItem)
         throws RemoteException {
         SWTBotTreeItem selectedTreeItem = null;
@@ -169,26 +179,32 @@ public final class RemoteBotTree extends StfRemoteObject implements
      * states
      * 
      **********************************************/
+    @Override
     public boolean hasItems() throws RemoteException {
         return widget.hasItems();
     }
 
+    @Override
     public int rowCount() throws RemoteException {
         return widget.rowCount();
     }
 
+    @Override
     public int selectionCount() throws RemoteException {
         return widget.selectionCount();
     }
 
+    @Override
     public int columnCount() throws RemoteException {
         return widget.columnCount();
     }
 
+    @Override
     public List<String> columns() throws RemoteException {
         return widget.columns();
     }
 
+    @Override
     public List<String> getTextOfItems() throws RemoteException {
         List<String> allItemTexts = new ArrayList<String>();
         for (SWTBotTreeItem item : widget.getAllItems()) {
@@ -197,10 +213,12 @@ public final class RemoteBotTree extends StfRemoteObject implements
         return allItemTexts;
     }
 
+    @Override
     public boolean existsSubItem(String treeItemText) throws RemoteException {
         return getTextOfItems().contains(treeItemText);
     }
 
+    @Override
     public boolean existsSubItemWithRegex(String regex) throws RemoteException {
         for (String subItem : getTextOfItems()) {
             if (subItem.matches(regex))
@@ -214,14 +232,17 @@ public final class RemoteBotTree extends StfRemoteObject implements
      * waits until
      * 
      **********************************************/
+    @Override
     public void waitUntilItemExists(final String itemText)
         throws RemoteException {
 
         RemoteWorkbenchBot.getInstance().waitUntil(new DefaultCondition() {
+            @Override
             public boolean test() throws Exception {
                 return existsSubItem(itemText);
             }
 
+            @Override
             public String getFailureMessage() {
                 return "tree '" + widget.getText()
                     + "' does not contain the treeItem: " + itemText;
@@ -229,13 +250,16 @@ public final class RemoteBotTree extends StfRemoteObject implements
         });
     }
 
+    @Override
     public void waitUntilItemNotExists(final String itemText)
         throws RemoteException {
         RemoteWorkbenchBot.getInstance().waitUntil(new DefaultCondition() {
+            @Override
             public boolean test() throws Exception {
                 return !existsSubItem(itemText);
             }
 
+            @Override
             public String getFailureMessage() {
                 return "tree '" + widget.getText()
                     + "' still contains the treeItem: " + itemText;

@@ -14,76 +14,94 @@ package de.fu_berlin.inf.dpp.activities.business;
  */
 public class AbstractActivityReceiver implements IActivityReceiver {
 
+    @Override
     public void receive(ViewportActivity viewportActivity) {
         // do nothing
     }
 
+    @Override
     public void receive(TextSelectionActivity textSelectionActivity) {
         // do nothing
     }
 
+    @Override
     public void receive(TextEditActivity textEditActivity) {
         // do nothing
     }
 
+    @Override
     public void receive(PermissionActivity permissionActivity) {
         // do nothing
     }
 
+    @Override
     public void receive(FolderActivity folderActivity) {
         // do nothing
     }
 
+    @Override
     public void receive(FileActivity fileActivity) {
         // do nothing
     }
 
+    @Override
     public void receive(EditorActivity editorActivity) {
         // do nothing
     }
 
+    @Override
     public void receive(JupiterActivity jupiterActivity) {
         // do nothing
     }
 
+    @Override
     public void receive(StopActivity stopActivity) {
         // do nothing
     }
 
+    @Override
     public void receive(PingPongActivity pingPongActivity) {
         // do nothing
     }
 
+    @Override
     public void receive(ChecksumActivity checksumActivity) {
         // do nothing
     }
 
+    @Override
     public void receive(ChecksumErrorActivity checksumErrorActivity) {
         // do nothing
     }
 
+    @Override
     public void receive(ProgressActivity progressActivity) {
         // do nothing
     }
 
+    @Override
     public void receive(VCSActivity activity) {
         // do nothing
     }
 
+    @Override
     public void receive(ChangeColorActivity changeColorActivity) {
         // do nothing
     }
 
+    @Override
     public void receive(ProjectsAddedActivity fileListActivity) {
         // do nothing
 
     }
 
+    @Override
     public void receive(StartFollowingActivity startFollowingActivity) {
         // do nothing
 
     }
 
+    @Override
     public void receive(StopFollowingActivity stopFollowingActivity) {
         // do nothing
 

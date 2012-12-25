@@ -467,10 +467,12 @@ public class ActivitySequencer implements Startable {
         this.transferManager.getTransferModeDispatch().add(
             new ITransferModeListener() {
 
+                @Override
                 public void clear() {
                     // do nothing
                 }
 
+                @Override
                 public void transferFinished(JID jid, NetTransferMode newMode,
                     boolean incoming, long sizeTransferred,
                     long sizeUncompressed, long transmissionMillisecs) {
@@ -480,6 +482,7 @@ public class ActivitySequencer implements Startable {
                         (IActivityDataObject) null));
                 }
 
+                @Override
                 public void connectionChanged(JID jid,
                     IByteStreamConnection connection) {
                     // do nothing
@@ -504,6 +507,7 @@ public class ActivitySequencer implements Startable {
      * 
      * @see #stop()
      */
+    @Override
     public void start() {
 
         if (started) {
@@ -522,6 +526,7 @@ public class ActivitySequencer implements Startable {
             @Override
             public void run() {
                 Utils.runSafeSync(log, new Runnable() {
+                    @Override
                     public void run() {
                         try {
                             flushTask();
@@ -576,6 +581,7 @@ public class ActivitySequencer implements Startable {
                  * might have timed-out
                  */
                 dispatchThread.executeAsDispatch(new Runnable() {
+                    @Override
                     public void run() {
                         execQueue();
                     }
@@ -707,6 +713,7 @@ public class ActivitySequencer implements Startable {
      * 
      * @see #start()
      */
+    @Override
     public void stop() {
         if (!started) {
             throw new IllegalStateException();
@@ -782,6 +789,7 @@ public class ActivitySequencer implements Startable {
                     + " to the local user: " + user.getJID());
 
                 dispatchThread.executeAsDispatch(new Runnable() {
+                    @Override
                     public void run() {
                         sarosSession.exec(Collections
                             .singletonList(activityDataObject));

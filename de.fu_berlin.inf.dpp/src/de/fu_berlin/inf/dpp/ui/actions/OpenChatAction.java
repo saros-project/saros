@@ -32,6 +32,7 @@ public class OpenChatAction extends Action {
     private ChatRoomsComposite chatRoomsComposite;
 
     private ISelectionListener selectionListener = new ISelectionListener() {
+        @Override
         public void selectionChanged(IWorkbenchPart part, ISelection selection) {
             updateEnablement();
         }

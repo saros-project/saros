@@ -40,6 +40,7 @@ public class SkypeAction extends Action implements Disposable {
         .getName());
 
     protected IPropertyChangeListener propertyChangeListener = new IPropertyChangeListener() {
+        @Override
         public void propertyChange(PropertyChangeEvent event) {
             if (event.getProperty().equals(PreferenceConstants.SKYPE_USERNAME)) {
                 updateEnablement();
@@ -48,6 +49,7 @@ public class SkypeAction extends Action implements Disposable {
     };
 
     protected ISelectionListener selectionListener = new ISelectionListener() {
+        @Override
         public void selectionChanged(IWorkbenchPart part, ISelection selection) {
             updateEnablement();
         }
@@ -95,14 +97,17 @@ public class SkypeAction extends Action implements Disposable {
     @Override
     public void run() {
         Utils.runSafeSync(log, new Runnable() {
+            @Override
             public void run() {
                 final List<JID> participants = SelectionRetrieverFactory
                     .getSelectionRetriever(JID.class).getSelection();
 
                 if (participants.size() == 1) {
                     Utils.runSafeAsync("SkypeAction-", log, new Runnable() { //$NON-NLS-1$
+                            @Override
                             public void run() {
                                 Utils.runSafeSWTSync(log, new Runnable() {
+                                    @Override
                                     public void run() {
                                         setEnabled(false);
                                     }
@@ -112,6 +117,7 @@ public class SkypeAction extends Action implements Disposable {
                                         .getBareJID());
                                 if (skypeURL != null) {
                                     Utils.runSafeSWTSync(log, new Runnable() {
+                                        @Override
                                         public void run() {
                                             URLHyperlink link = new URLHyperlink(
                                                 new Region(0, 0), skypeURL);
@@ -129,6 +135,7 @@ public class SkypeAction extends Action implements Disposable {
         });
     }
 
+    @Override
     public void dispose() {
         SelectionUtils.getSelectionService().removeSelectionListener(
             selectionListener);

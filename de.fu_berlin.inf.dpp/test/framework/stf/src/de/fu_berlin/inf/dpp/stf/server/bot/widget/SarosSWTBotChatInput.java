@@ -77,6 +77,7 @@ public class SarosSWTBotChatInput extends AbstractSWTBot<ChatInput> {
         // the ChatControl key listener ignores the mock keyboard event
         // styledText.pressShortcut(Keystrokes.CR);
         syncExec(new VoidResult() {
+            @Override
             public void run() {
                 try {
                     String message = styledText.widget.getText().trim();

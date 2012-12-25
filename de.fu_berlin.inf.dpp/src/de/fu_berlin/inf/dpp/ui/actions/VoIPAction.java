@@ -49,12 +49,14 @@ public class VoIPAction extends Action {
 
     protected ValueChangeListener<StreamSession> valueChangeListener = new ValueChangeListener<StreamSession>() {
 
+        @Override
         public void setValue(StreamSession newValue) {
             changeButton();
         }
     };
 
     protected ISelectionListener selectionListener = new ISelectionListener() {
+        @Override
         public void selectionChanged(IWorkbenchPart part, ISelection selection) {
             updateEnablement();
         }

@@ -58,6 +58,7 @@ public class RenameContactAction extends Action {
         .getLogger(RenameContactAction.class.getName());
 
     protected IConnectionListener connectionListener = new IConnectionListener() {
+        @Override
         public void connectionStateChanged(Connection connection,
             final ConnectionState newState) {
             updateEnablement();
@@ -65,6 +66,7 @@ public class RenameContactAction extends Action {
     };
 
     protected ISelectionListener selectionListener = new ISelectionListener() {
+        @Override
         public void selectionChanged(IWorkbenchPart part, ISelection selection) {
             updateEnablement();
         }
@@ -103,6 +105,7 @@ public class RenameContactAction extends Action {
     @Override
     public void run() {
         Utils.runSafeSync(log, new Runnable() {
+            @Override
             public void run() {
                 RosterEntry rosterEntry = null;
                 List<RosterEntry> selectedRosterEntries = SelectionRetrieverFactory

@@ -120,6 +120,7 @@ public final class SarosSWTBot extends SWTBot {
 
         final ChatLine matchedChatLine = UIThreadRunnable
             .syncExec(new WidgetResult<ChatLine>() {
+                @Override
                 public ChatLine run() {
                     ChatLine matchedChatLine = null;
                     for (final ChatLine chatLine : allWidgets) {
@@ -176,6 +177,7 @@ public final class SarosSWTBot extends SWTBot {
 
         final ChatLinePartnerChangeSeparator matchedSeparator = UIThreadRunnable
             .syncExec(new WidgetResult<ChatLinePartnerChangeSeparator>() {
+                @Override
                 public ChatLinePartnerChangeSeparator run() {
                     ChatLinePartnerChangeSeparator matchedSeparator = null;
                     for (final ChatLinePartnerChangeSeparator separator : allWidgets) {

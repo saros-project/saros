@@ -26,6 +26,7 @@ public abstract class SarosSessionPacketExtension extends SarosPacketExtension {
         public PacketFilter getPacketFilter(final String sessionID) {
 
             return new AndFilter(super.getPacketFilter(), new PacketFilter() {
+                @Override
                 public boolean accept(Packet packet) {
                     SarosSessionPacketExtension extension = getPayload(packet);
 

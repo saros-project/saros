@@ -41,6 +41,7 @@ public class EditDifferentFilesTest extends StfTestCase {
             .waitUntilResourceIsShared("foo/src/bar/HelloWorld.java");
 
         TestThread.Runnable aliceEditTask = new TestThread.Runnable() {
+            @Override
             public void run() throws Exception {
                 String textToType = "This is a long, long, long and\n long working test that bla bla bla";
 
@@ -55,6 +56,7 @@ public class EditDifferentFilesTest extends StfTestCase {
         };
 
         TestThread.Runnable bobEditTask = new TestThread.Runnable() {
+            @Override
             public void run() throws Exception {
                 String textToType = "Dieses ist ein sehr, sehr, sehr,\n langer bla bla bla";
 

@@ -34,38 +34,46 @@ public final class RemoteBotShell extends StfRemoteObject implements
         return this;
     }
 
+    @Override
     public IRemoteBot bot() {
         RemoteWorkbenchBot.getInstance().setBot(widget.bot());
         return RemoteWorkbenchBot.getInstance();
     }
 
+    @Override
     public IRemoteBotMenu contextMenu(String text) throws RemoteException {
         return RemoteBotMenu.getInstance().setWidget(widget.contextMenu(text));
     }
 
+    @Override
     public void setFocus() throws RemoteException {
         widget.setFocus();
     }
 
+    @Override
     public boolean activate() throws RemoteException {
         widget.activate();
         return true;
     }
 
+    @Override
     public void close() throws RemoteException {
         widget.close();
     }
 
+    @Override
     public void confirm() throws RemoteException {
         activate();
         bot().button().click();
     }
 
+    @Override
     public void confirm(String buttonText) throws RemoteException {
         activate();
         bot().button(buttonText).click();
     }
 
+    @Override
     public void confirmWithTree(String buttonText, String... nodes)
         throws RemoteException {
         activate();
@@ -74,6 +82,7 @@ public final class RemoteBotShell extends StfRemoteObject implements
         bot().button(buttonText).click();
     }
 
+    @Override
     public void confirmWithTextField(String textLabel, String text,
         String buttonText) throws RemoteException {
         activate();
@@ -83,6 +92,7 @@ public final class RemoteBotShell extends StfRemoteObject implements
         bot().button(buttonText).click();
     }
 
+    @Override
     public void confirmWithTextFieldAndWait(Map<String, String> labelsAndTexts,
         String buttonText) throws RemoteException {
         activate();
@@ -96,12 +106,14 @@ public final class RemoteBotShell extends StfRemoteObject implements
 
     }
 
+    @Override
     public void confirmWithTreeWithWaitingExpand(String buttonText,
         String... nodes) throws RemoteException {
         bot().tree().selectTreeItemAndWait(nodes);
         bot().button(buttonText).click();
     }
 
+    @Override
     public void confirmWithCheckBox(String buttonText, boolean isChecked)
         throws RemoteException {
         activate();
@@ -111,6 +123,7 @@ public final class RemoteBotShell extends StfRemoteObject implements
 
     }
 
+    @Override
     public void confirmWithCheckBoxs(String buttonText, String... itemNames)
         throws RemoteException {
         waitUntilActive();
@@ -121,6 +134,7 @@ public final class RemoteBotShell extends StfRemoteObject implements
         bot().button(buttonText).click();
     }
 
+    @Override
     public void confirmWithTable(String itemName, String buttonText)
         throws RemoteException {
         waitUntilActive();
@@ -130,6 +144,7 @@ public final class RemoteBotShell extends StfRemoteObject implements
         bot().button(buttonText).click();
     }
 
+    @Override
     public void confirmWithTreeWithFilterText(String rootOfTreeNode,
         String treeNode, String buttonText) throws RemoteException {
         waitUntilActive();
@@ -140,30 +155,37 @@ public final class RemoteBotShell extends StfRemoteObject implements
         bot().button(buttonText).click();
     }
 
+    @Override
     public boolean isActive() throws RemoteException {
         return widget.isActive();
     }
 
+    @Override
     public boolean isEnabled() throws RemoteException {
         return widget.isEnabled();
     }
 
+    @Override
     public boolean isVisible() throws RemoteException {
         return widget.isVisible();
     }
 
+    @Override
     public String getText() throws RemoteException {
         return widget.getText();
     }
 
+    @Override
     public String getToolTipText() throws RemoteException {
         return widget.getToolTipText();
     }
 
+    @Override
     public String getErrorMessage() throws RemoteException {
         activate();
 
         String errorMessage = UIThreadRunnable.syncExec(new StringResult() {
+            @Override
             public String run() {
                 WizardDialog dialog = (WizardDialog) widget.widget.getData();
                 return dialog.getErrorMessage();
@@ -184,6 +206,7 @@ public final class RemoteBotShell extends StfRemoteObject implements
          */
 
         errorMessage = UIThreadRunnable.syncExec(new StringResult() {
+            @Override
             public String run() {
                 WizardDialog dialog = (WizardDialog) widget.widget.getData();
                 return dialog.getMessage();
@@ -198,9 +221,11 @@ public final class RemoteBotShell extends StfRemoteObject implements
 
     }
 
+    @Override
     public String getMessage() throws RemoteException {
         activate();
         final String message = UIThreadRunnable.syncExec(new StringResult() {
+            @Override
             public String run() {
                 WizardDialog dialog = (WizardDialog) widget.widget.getData();
                 return dialog.getMessage();
@@ -212,21 +237,25 @@ public final class RemoteBotShell extends StfRemoteObject implements
         return message;
     }
 
+    @Override
     public boolean existsTableItem(String label) throws RemoteException {
         activate();
         return bot().table().containsItem(label);
     }
 
+    @Override
     public void waitUntilActive() throws RemoteException {
         RemoteWorkbenchBot.getInstance().waitUntil(
             SarosConditions.isShellActive(widget));
     }
 
+    @Override
     public void waitShortUntilIsClosed() throws RemoteException {
         RemoteWorkbenchBot.getInstance().waitShortUntil(
             SarosConditions.isShellClosed(widget));
     }
 
+    @Override
     public void waitLongUntilIsClosed() throws RemoteException {
         RemoteWorkbenchBot.getInstance().waitLongUntil(
             SarosConditions.isShellClosed(widget));

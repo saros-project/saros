@@ -48,24 +48,28 @@ public class UPnPTest {
             gatewaysToServe.add(gateway);
         }
 
+        @Override
         public Collection<GatewayDevice> performDiscovery()
             throws SocketException, UnknownHostException, IOException,
             SAXException, ParserConfigurationException {
             return gatewaysToServe;
         }
 
+        @Override
         public int deletePortMapping(GatewayDevice gateway, int port,
             String protocol) throws IOException, SAXException {
 
             return portmappings.remove(port) != null ? 0 : 404;
         }
 
+        @Override
         public PortMappingEntry getSpecificPortMappingEntry(
             GatewayDevice gateway, int port, String protocol)
             throws IOException, SAXException {
             return portmappings.get(port);
         }
 
+        @Override
         public int addPortMapping(GatewayDevice gateway, int externalPort,
             int internalPort, String internalClient, String protocol,
             String description, int leaseDuration) throws IOException,

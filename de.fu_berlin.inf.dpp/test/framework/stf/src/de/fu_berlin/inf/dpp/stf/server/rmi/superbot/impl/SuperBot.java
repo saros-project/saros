@@ -36,15 +36,18 @@ public final class SuperBot extends StfRemoteObject implements ISuperBot {
         return INSTANCE;
     }
 
+    @Override
     public IViews views() throws RemoteException {
         return Views.getInstance();
     }
 
+    @Override
     public IMenuBar menuBar() throws RemoteException {
         RemoteWorkbenchBot.getInstance().activateWorkbench();
         return MenuBar.getInstance();
     }
 
+    @Override
     public void setJID(JID jid) throws RemoteException {
         localJID = jid;
     }
@@ -53,6 +56,7 @@ public final class SuperBot extends StfRemoteObject implements ISuperBot {
         return localJID;
     }
 
+    @Override
     public void confirmShellAddProjectWithNewProject(String projectName)
         throws RemoteException {
 
@@ -69,6 +73,7 @@ public final class SuperBot extends StfRemoteObject implements ISuperBot {
         shell.bot().waitUntil(Conditions.shellCloses(shell));
     }
 
+    @Override
     public void confirmShellAddProjectUsingExistProject(String projectName)
         throws RemoteException {
         SWTBot bot = new SWTBot();
@@ -115,6 +120,7 @@ public final class SuperBot extends StfRemoteObject implements ISuperBot {
         shell.bot().waitUntil(Conditions.shellCloses(shell));
     }
 
+    @Override
     public void confirmShellAddProjectUsingExistProjectWithCopyAfterCancelLocalChange(
         String projectName) throws RemoteException {
 
@@ -145,6 +151,7 @@ public final class SuperBot extends StfRemoteObject implements ISuperBot {
         confirmShellAddProjectUsingExistProjectWithCopy(projectName);
     }
 
+    @Override
     public void confirmShellAddProjectUsingExistProjectWithCopy(
         String projectName) throws RemoteException {
 
@@ -163,6 +170,7 @@ public final class SuperBot extends StfRemoteObject implements ISuperBot {
         shell.bot().waitUntil(Conditions.shellCloses(shell));
     }
 
+    @Override
     public void confirmShellAddProjectUsingWhichProject(String projectName,
         TypeOfCreateProject usingWhichProject) throws RemoteException {
         SWTBot bot = new SWTBot();
@@ -190,6 +198,7 @@ public final class SuperBot extends StfRemoteObject implements ISuperBot {
         }
     }
 
+    @Override
     public void confirmShellEditXMPPJabberAccount(String xmppJabberID,
         String newPassword) throws RemoteException {
         SWTBotShell shell = new SWTBot().shell(SHELL_EDIT_XMPP_JABBER_ACCOUNT);
@@ -202,6 +211,7 @@ public final class SuperBot extends StfRemoteObject implements ISuperBot {
         shell.bot().waitUntil(Conditions.shellCloses(shell));
     }
 
+    @Override
     public void confirmShellCreateNewXMPPJabberAccount(JID jid, String password)
         throws RemoteException {
         SWTBotShell shell = new SWTBot()
@@ -231,6 +241,7 @@ public final class SuperBot extends StfRemoteObject implements ISuperBot {
         }
     }
 
+    @Override
     public void confirmShellAddXMPPJabberAccount(JID jid, String password)
         throws RemoteException {
 
@@ -249,6 +260,7 @@ public final class SuperBot extends StfRemoteObject implements ISuperBot {
         shell.bot().waitUntil(Conditions.shellCloses(shell));
     }
 
+    @Override
     public void confirmShellClosingTheSession() throws RemoteException {
         SWTBotShell shell = new SWTBot().shell(SHELL_CLOSING_THE_SESSION);
         shell.activate();
@@ -259,6 +271,7 @@ public final class SuperBot extends StfRemoteObject implements ISuperBot {
 
     }
 
+    @Override
     public void confirmShellRemovelOfSubscription() throws RemoteException {
         SWTBotShell shell = new SWTBot().shell(SHELL_REMOVAL_OF_SUBSCRIPTION);
         shell.activate();
@@ -267,6 +280,7 @@ public final class SuperBot extends StfRemoteObject implements ISuperBot {
         new SWTBot().sleep(500);
     }
 
+    @Override
     public void confirmShellAddBuddyToSession(String... baseJIDOfinvitees)
         throws RemoteException {
 
@@ -293,6 +307,7 @@ public final class SuperBot extends StfRemoteObject implements ISuperBot {
 
     }
 
+    @Override
     public void confirmShellAddBuddy(JID jid) throws RemoteException {
         SWTBot bot = new SWTBot();
         SWTBotShell shell = bot.shell(SHELL_ADD_BUDDY);
@@ -319,11 +334,13 @@ public final class SuperBot extends StfRemoteObject implements ISuperBot {
 
     }
 
+    @Override
     public void confirmShellShareProjects(String projectName, JID... jids)
         throws RemoteException {
         confirmShellShareProjects(new String[] { projectName }, jids);
     }
 
+    @Override
     public void confirmShellShareProjects(String[] projectNames, JID... jids)
         throws RemoteException {
 
@@ -363,6 +380,7 @@ public final class SuperBot extends StfRemoteObject implements ISuperBot {
 
     }
 
+    @Override
     public void confirmShellAddProjectsToSession(String... projectNames)
         throws RemoteException {
 
@@ -400,6 +418,7 @@ public final class SuperBot extends StfRemoteObject implements ISuperBot {
         bot.waitUntil(Conditions.shellCloses(shell));
     }
 
+    @Override
     public void confirmShellSessionInvitationAndShellAddProject(
         String projectName, TypeOfCreateProject usingWhichProject)
         throws RemoteException {
@@ -414,6 +433,7 @@ public final class SuperBot extends StfRemoteObject implements ISuperBot {
         views().sarosView().waitUntilIsInSession();
     }
 
+    @Override
     public void confirmShellAddProjects(String projectName,
         TypeOfCreateProject usingWhichProject) throws RemoteException {
 
@@ -447,6 +467,7 @@ public final class SuperBot extends StfRemoteObject implements ISuperBot {
         bot.waitUntil(Conditions.shellCloses(shell));
     }
 
+    @Override
     public void confirmShellRequestOfSubscriptionReceived()
         throws RemoteException {
 
@@ -460,6 +481,7 @@ public final class SuperBot extends StfRemoteObject implements ISuperBot {
         bot.sleep(500);
     }
 
+    @Override
     public void confirmShellLeavingClosingSession() throws RemoteException {
         SWTBot bot = new SWTBot();
         SWTBotShell shell;
@@ -474,6 +496,7 @@ public final class SuperBot extends StfRemoteObject implements ISuperBot {
         Views.getInstance().sarosView().waitUntilIsNotInSession();
     }
 
+    @Override
     public IInternal internal() throws RemoteException {
         return InternalImpl.getInstance();
     }
@@ -510,6 +533,7 @@ public final class SuperBot extends StfRemoteObject implements ISuperBot {
         bot.waitUntil(Conditions.shellCloses(shell));
     }
 
+    @Override
     public void confirmShellNewSharedFile(String decision) {
         SWTBot bot = new SWTBot();
         SWTBotShell shell = bot.shell(SHELL_NEW_FILE_SHARED);
@@ -518,6 +542,7 @@ public final class SuperBot extends StfRemoteObject implements ISuperBot {
         bot.waitUntil(Conditions.shellCloses(shell));
     }
 
+    @Override
     public void confirmShellNeedBased(String decsision, boolean remember)
         throws RemoteException {
         SWTBot bot = new SWTBot();

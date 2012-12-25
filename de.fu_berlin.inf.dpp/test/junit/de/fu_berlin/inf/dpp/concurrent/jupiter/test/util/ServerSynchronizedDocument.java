@@ -34,10 +34,12 @@ public class ServerSynchronizedDocument implements JupiterServer,
         this.proxyQueues = new HashMap<JID, ProxySynchronizedQueue>();
     }
 
+    @Override
     public JID getJID() {
         return user.getJID();
     }
 
+    @Override
     public User getUser() {
         return user;
     }
@@ -164,20 +166,24 @@ public class ServerSynchronizedDocument implements JupiterServer,
 
     }
 
+    @Override
     public String getDocument() {
         return doc.getDocument();
     }
 
+    @Override
     public void addProxyClient(User user) {
         ProxySynchronizedQueue queue = new ProxySynchronizedQueue(user,
             this.connection);
         proxyQueues.put(user.getJID(), queue);
     }
 
+    @Override
     public void removeProxyClient(JID jid) {
         proxyQueues.remove(jid);
     }
 
+    @Override
     public void receiveNetworkEvent(NetworkRequest req) {
         receiveOperation(req.getJupiterActivity(), req.getFrom().getJID());
     }

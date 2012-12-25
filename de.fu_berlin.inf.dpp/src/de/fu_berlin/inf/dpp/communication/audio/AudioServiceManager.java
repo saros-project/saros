@@ -80,12 +80,14 @@ public class AudioServiceManager {
          * 
          * Display an error message an stop the running VoIP session
          */
+        @Override
         public void errorOccured(StreamException e) {
             stopSession();
             log.error(e.getMessage());
             openErrorDialog("VoIP Session Error", "Unknown session error");
         }
 
+        @Override
         public void sessionStopped() {
             setStatus(VoIPStatus.STOPPING);
             log.debug("VoIP Status: STOPPING!");
@@ -95,6 +97,7 @@ public class AudioServiceManager {
             session.dispose();
             Utils.runSafeSWTAsync(log, new Runnable() {
 
+                @Override
                 public void run() {
                     DialogUtils.openInformationMessageDialog(
                         EditorAPI.getShell(), "VoIP Session stopped",
@@ -105,6 +108,7 @@ public class AudioServiceManager {
             // shutdown Recorder, Player, Encoder + Decoder
             if (audioSenderRunnable != null)
                 Utils.runSafeSync(log, new Runnable() {
+                    @Override
                     public void run() {
                         audioSenderRunnable.stop();
 
@@ -113,6 +117,7 @@ public class AudioServiceManager {
 
             if (audioReceiverRunnable != null)
                 Utils.runSafeSync(log, new Runnable() {
+                    @Override
                     public void run() {
                         audioReceiverRunnable.stop();
                     }
@@ -188,6 +193,7 @@ public class AudioServiceManager {
             log.debug("Starting new VoIP Session...");
 
             Utils.runSafeAsync("VoIPSession", log, new Runnable() {
+                @Override
                 public void run() {
                     startSession(session);
                 }
@@ -207,6 +213,7 @@ public class AudioServiceManager {
 
     private void openErrorDialog(final String title, final String message) {
         Utils.runSafeSWTAsync(log, new Runnable() {
+            @Override
             public void run() {
                 DialogUtils.openErrorMessageDialog(EditorAPI.getShell(), title,
                     message);

@@ -29,6 +29,7 @@ public class EncodingManipulator implements IPreferenceManipulator {
      */
     protected String oldEncoding;
 
+    @Override
     public IRestorePoint change(final IProject project) {
         try {
             gotEncoding = false;
@@ -42,6 +43,7 @@ public class EncodingManipulator implements IPreferenceManipulator {
         }
 
         return new IRestorePoint() {
+            @Override
             public void restore() {
                 if (gotEncoding) {
                     setEncoding(project, oldEncoding);
@@ -77,6 +79,7 @@ public class EncodingManipulator implements IPreferenceManipulator {
         }
     }
 
+    @Override
     public StateChangeNotifier<IPreferenceManipulator> getPreferenceStateChangeNotifier(
         IProject project) {
 
@@ -88,6 +91,7 @@ public class EncodingManipulator implements IPreferenceManipulator {
      * 
      * @see #isDangerousForHost()
      */
+    @Override
     public boolean isDangerousForClient() {
 
         return false;
@@ -97,6 +101,7 @@ public class EncodingManipulator implements IPreferenceManipulator {
      * Returns <code>true</code>. This manipulator is only interesting for the
      * host, because the project setting is transferred to the client.
      */
+    @Override
     public boolean isDangerousForHost() {
 
         return true;
@@ -105,6 +110,7 @@ public class EncodingManipulator implements IPreferenceManipulator {
     /**
      * Checks if there is a need to set an encoding on the project level.
      */
+    @Override
     public boolean isEnabled(IProject project) {
         try {
             return getEncoding(project) == null;

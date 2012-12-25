@@ -127,6 +127,7 @@ public class SarosSessionManager implements ISarosSessionManager {
     protected volatile boolean connected = false;
 
     protected final IConnectionListener listener = new IConnectionListener() {
+        @Override
         public void connectionStateChanged(Connection connection,
             ConnectionState state) {
 
@@ -160,6 +161,7 @@ public class SarosSessionManager implements ISarosSessionManager {
      *               He/she must share a project in order to start a session.)
      * 
      */
+    @Override
     public void startSession(
         final Map<IProject, List<IResource>> projectResourcesMapping)
         throws XMPPException {
@@ -231,6 +233,7 @@ public class SarosSessionManager implements ISarosSessionManager {
     /**
      * {@inheritDoc}
      */
+    @Override
     public ISarosSession joinSession(JID host, int colorID,
         DateTime sessionStart, JID inviter, int inviterColorID) {
 
@@ -252,6 +255,7 @@ public class SarosSessionManager implements ISarosSessionManager {
     /**
      * @nonSWT
      */
+    @Override
     public void stopSarosSession() {
 
         if (Utils.isSWT()) {
@@ -310,11 +314,13 @@ public class SarosSessionManager implements ISarosSessionManager {
      * @deprecated Error prone method, which produces NPE if not handled
      *             correctly. Will soon get removed.
      */
+    @Override
     @Deprecated
     public ISarosSession getSarosSession() {
         return this.sarosSessionObservable.getValue();
     }
 
+    @Override
     public void invitationReceived(JID from, String sessionID, int colorID,
         VersionInfo versionInfo, DateTime sessionStart, final SarosUI sarosUI,
         String invitationID, MUCSessionPreferences comPrefs,
@@ -329,6 +335,7 @@ public class SarosSessionManager implements ISarosSessionManager {
         comNegotiatingManager.setSessionPreferences(comPrefs);
 
         Utils.runSafeSWTAsync(log, new Runnable() {
+            @Override
             public void run() {
                 process.acknowledgeInvitation();
                 sarosUI.showIncomingInvitationUI(process);
@@ -348,6 +355,7 @@ public class SarosSessionManager implements ISarosSessionManager {
      * @param processID
      *            ID of the exchanging process
      */
+    @Override
     public void incomingProjectReceived(JID from,
         List<ProjectExchangeInfo> projectInfos, String processID) {
         final IncomingProjectNegotiation process = new IncomingProjectNegotiation(
@@ -355,6 +363,7 @@ public class SarosSessionManager implements ISarosSessionManager {
 
         Utils.runSafeSWTAsync(log, new Runnable() {
 
+            @Override
             public void run() {
                 SarosUI sarosUI = sarosContext.getComponent(SarosUI.class);
                 sarosUI.showIncomingProjectUI(process);
@@ -377,6 +386,7 @@ public class SarosSessionManager implements ISarosSessionManager {
         outgoingInvitationJob.schedule();
     }
 
+    @Override
     public void invite(Collection<JID> jidsToInvite, String description) {
         for (JID jid : jidsToInvite)
             invite(jid, description);
@@ -485,6 +495,7 @@ public class SarosSessionManager implements ISarosSessionManager {
         protected void registerCancelListener() {
             Utils.runSafeSWTSync(log, new Runnable() {
 
+                @Override
                 public void run() {
                     SarosSessionManager.this
                         .addSarosSessionListener(cancelListener);
@@ -496,6 +507,7 @@ public class SarosSessionManager implements ISarosSessionManager {
         protected void releaseCancelListener() {
             Utils.runSafeSWTSync(log, new Runnable() {
 
+                @Override
                 public void run() {
                     SarosSessionManager.this
                         .removeSarosSessionListener(cancelListener);
@@ -511,6 +523,7 @@ public class SarosSessionManager implements ISarosSessionManager {
      * @param projectResourcesMapping
      * 
      */
+    @Override
     public void addResourcesToSession(
         Map<IProject, List<IResource>> projectResourcesMapping) {
 
@@ -575,6 +588,7 @@ public class SarosSessionManager implements ISarosSessionManager {
      *            List of ProjectExchangeInfo containing the project dependent
      *            FileList
      */
+    @Override
     public void startSharingProjects(JID user,
         List<ProjectExchangeInfo> projectExchangeInfos) {
 
@@ -681,6 +695,7 @@ public class SarosSessionManager implements ISarosSessionManager {
         protected void registerCancelListener() {
             Utils.runSafeSWTSync(log, new Runnable() {
 
+                @Override
                 public void run() {
                     SarosSessionManager.this
                         .addSarosSessionListener(cancelListener);
@@ -692,6 +707,7 @@ public class SarosSessionManager implements ISarosSessionManager {
         protected void releaseCancelListener() {
             Utils.runSafeSWTSync(log, new Runnable() {
 
+                @Override
                 public void run() {
                     SarosSessionManager.this
                         .removeSarosSessionListener(cancelListener);
@@ -702,12 +718,14 @@ public class SarosSessionManager implements ISarosSessionManager {
 
     }
 
+    @Override
     public void addSarosSessionListener(ISarosSessionListener listener) {
         if (!this.sarosSessionListeners.contains(listener)) {
             this.sarosSessionListeners.add(listener);
         }
     }
 
+    @Override
     public void removeSarosSessionListener(ISarosSessionListener listener) {
         this.sarosSessionListeners.remove(listener);
     }
@@ -784,6 +802,7 @@ public class SarosSessionManager implements ISarosSessionManager {
         }
     }
 
+    @Override
     public void projectAdded(String projectID) {
         for (ISarosSessionListener listener : this.sarosSessionListeners) {
             try {

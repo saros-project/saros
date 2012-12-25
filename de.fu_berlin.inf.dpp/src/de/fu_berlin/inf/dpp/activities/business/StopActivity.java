@@ -139,6 +139,7 @@ public class StopActivity extends AbstractActivity implements ITargetedActivity 
         }
     }
 
+    @Override
     public List<User> getRecipients() {
         return Collections.singletonList(getRecipient());
     }
@@ -172,10 +173,12 @@ public class StopActivity extends AbstractActivity implements ITargetedActivity 
         return sb.toString();
     }
 
+    @Override
     public void dispatch(IActivityReceiver receiver) {
         receiver.receive(this);
     }
 
+    @Override
     public IActivityDataObject getActivityDataObject(ISarosSession sarosSession) {
         return new StopActivityDataObject(source.getJID(), initiator.getJID(),
             user.getJID(), type, state, stopActivityID);

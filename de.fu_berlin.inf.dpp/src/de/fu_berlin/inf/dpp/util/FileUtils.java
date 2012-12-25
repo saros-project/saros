@@ -234,6 +234,7 @@ public class FileUtils {
         IProgressMonitor monitor) throws CoreException {
 
         IWorkspaceRunnable createFileProcedure = new IWorkspaceRunnable() {
+            @Override
             public void run(IProgressMonitor monitor) throws CoreException {
                 // Make sure directory exists
                 mkdirs(file);
@@ -268,6 +269,7 @@ public class FileUtils {
         IProgressMonitor monitor) throws CoreException {
 
         IWorkspaceRunnable replaceFileProcedure = new IWorkspaceRunnable() {
+            @Override
             public void run(IProgressMonitor monitor) throws CoreException {
                 file.setContents(input, IResource.FORCE, monitor);
             }
@@ -341,6 +343,7 @@ public class FileUtils {
             return;
         }
         IWorkspaceRunnable createFolderProcedure = new IWorkspaceRunnable() {
+            @Override
             public void run(IProgressMonitor monitor) throws CoreException {
 
                 // recursively create folders until parent folder exists
@@ -373,6 +376,7 @@ public class FileUtils {
         }
 
         IWorkspaceRunnable deleteProcedure = new IWorkspaceRunnable() {
+            @Override
             public void run(IProgressMonitor monitor) throws CoreException {
                 if (!resource.exists())
                     return;
@@ -421,6 +425,7 @@ public class FileUtils {
         }
 
         IWorkspaceRunnable moveProcedure = new IWorkspaceRunnable() {
+            @Override
             public void run(IProgressMonitor monitor) throws CoreException {
                 IPath absDestination = destination.makeAbsolute();
 

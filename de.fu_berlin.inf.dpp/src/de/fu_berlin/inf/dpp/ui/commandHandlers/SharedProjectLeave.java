@@ -14,6 +14,7 @@ public class SharedProjectLeave extends AbstractHandler {
     @Inject
     protected ISarosSessionManager sarosSessionManager;
 
+    @Override
     public Object execute(ExecutionEvent event) throws ExecutionException {
         if (sarosSessionManager == null)
             SarosPluginContext.initComponent(this);

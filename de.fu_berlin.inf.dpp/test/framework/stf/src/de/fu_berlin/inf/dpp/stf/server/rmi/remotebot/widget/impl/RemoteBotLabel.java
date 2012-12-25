@@ -24,34 +24,42 @@ public final class RemoteBotLabel extends StfRemoteObject implements
         return this;
     }
 
+    @Override
     public IRemoteBotMenu contextMenu(String text) throws RemoteException {
         return RemoteBotMenu.getInstance().setWidget(widget.contextMenu(text));
     }
 
+    @Override
     public void setFocus() throws RemoteException {
         widget.setFocus();
     }
 
+    @Override
     public int alignment() throws RemoteException {
         return widget.alignment();
     }
 
+    @Override
     public boolean isEnabled() throws RemoteException {
         return widget.isEnabled();
     }
 
+    @Override
     public boolean isVisible() throws RemoteException {
         return widget.isVisible();
     }
 
+    @Override
     public boolean isActive() throws RemoteException {
         return widget.isActive();
     }
 
+    @Override
     public String getToolTipText() throws RemoteException {
         return widget.getText();
     }
 
+    @Override
     public String getText() throws RemoteException {
         return widget.getText();
     }

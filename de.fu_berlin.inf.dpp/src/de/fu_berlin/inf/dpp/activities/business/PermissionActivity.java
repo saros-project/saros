@@ -93,10 +93,12 @@ public class PermissionActivity extends AbstractActivity {
             + ",new permission:" + this.getPermission() + ")";
     }
 
+    @Override
     public void dispatch(IActivityReceiver receiver) {
         receiver.receive(this);
     }
 
+    @Override
     public IActivityDataObject getActivityDataObject(ISarosSession sarosSession) {
         return new PermissionActivityDataObject(source.getJID(),
             affectedUser.getJID(), permission);

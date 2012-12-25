@@ -84,26 +84,32 @@ public class XppReader extends AbstractPullReader {
         return parser.getText();
     }
 
+    @Override
     public String getAttribute(String name) {
         return parser.getAttributeValue(null, escapeXmlName(name));
     }
 
+    @Override
     public String getAttribute(int index) {
         return parser.getAttributeValue(index);
     }
 
+    @Override
     public int getAttributeCount() {
         return parser.getAttributeCount();
     }
 
+    @Override
     public String getAttributeName(int index) {
         return unescapeXmlName(parser.getAttributeName(index));
     }
 
+    @Override
     public void appendErrors(ErrorWriter errorWriter) {
         errorWriter.add("line number", String.valueOf(parser.getLineNumber()));
     }
 
+    @Override
     public void close() {
         /*
          * Do nothing because there is no reader to close. Closing the reader of

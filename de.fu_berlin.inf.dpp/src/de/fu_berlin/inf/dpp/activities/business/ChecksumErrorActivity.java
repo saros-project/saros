@@ -62,10 +62,12 @@ public class ChecksumErrorActivity extends AbstractActivity {
         this.recoveryID = recoveryID;
     }
 
+    @Override
     public void dispatch(IActivityReceiver receiver) {
         receiver.receive(this);
     }
 
+    @Override
     public IActivityDataObject getActivityDataObject(ISarosSession sarosSession) {
         ArrayList<SPathDataObject> dataObjectPaths = new ArrayList<SPathDataObject>();
         if (this.paths != null)

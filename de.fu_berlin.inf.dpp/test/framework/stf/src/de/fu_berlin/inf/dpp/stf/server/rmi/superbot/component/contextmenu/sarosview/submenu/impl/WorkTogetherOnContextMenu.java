@@ -31,6 +31,7 @@ public final class WorkTogetherOnContextMenu extends StfRemoteObject implements
         this.treeItem = treeItem;
     }
 
+    @Override
     public void multipleProjects(String projectName, JID... baseJIDOfInvitees)
         throws RemoteException {
         treeItem.select();
@@ -40,6 +41,7 @@ public final class WorkTogetherOnContextMenu extends StfRemoteObject implements
             baseJIDOfInvitees);
     }
 
+    @Override
     public void project(String projectName) throws RemoteException {
         treeItem.select();
         ContextMenuHelper.clickContextMenu(tree, CM_WORK_TOGETHER_ON,

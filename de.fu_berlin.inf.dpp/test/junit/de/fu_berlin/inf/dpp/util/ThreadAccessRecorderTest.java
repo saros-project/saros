@@ -29,6 +29,7 @@ public class ThreadAccessRecorderTest extends ThreadAccessRecorder {
         for (int i = 0; i < amountThreads; i++) {
             Thread t1 = new Thread(new Runnable() {
 
+                @Override
                 public void run() {
                     try {
                         tAccessRec.record();
@@ -76,6 +77,7 @@ public class ThreadAccessRecorderTest extends ThreadAccessRecorder {
         for (int i = 0; i < amountThreads; i++) {
             Thread t1 = new Thread(new Runnable() {
 
+                @Override
                 public void run() {
                     try {
                         tAccessRec.record();
@@ -121,6 +123,7 @@ public class ThreadAccessRecorderTest extends ThreadAccessRecorder {
         final ThreadAccessRecorder tAccessRec = new ThreadAccessRecorder();
         Thread t1 = new Thread(new Runnable() {
 
+            @Override
             public void run() {
                 try {
                     tAccessRec.record();
@@ -154,6 +157,7 @@ public class ThreadAccessRecorderTest extends ThreadAccessRecorder {
         for (int i = 0; i < amountThreads; i++) {
             Thread t1 = new Thread(new Runnable() {
 
+                @Override
                 public void run() {
                     try {
                         tAccessRec.record();

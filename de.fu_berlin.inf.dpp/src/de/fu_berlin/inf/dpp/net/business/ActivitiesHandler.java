@@ -43,6 +43,7 @@ public class ActivitiesHandler {
          * Add a PacketListener for all TimedActivityDataObject packets
          */
         receiver.addPacketListener(new PacketListener() {
+            @Override
             public void processPacket(Packet packet) {
                 try {
                     TimedActivities payload = provider.getPayload(packet);

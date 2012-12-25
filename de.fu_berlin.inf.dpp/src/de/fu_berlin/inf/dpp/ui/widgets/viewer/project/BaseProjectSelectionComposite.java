@@ -44,6 +44,7 @@ public class BaseProjectSelectionComposite extends ProjectDisplayComposite {
     protected List<BaseProjectSelectionListener> projectSelectionListeners = new ArrayList<BaseProjectSelectionListener>();
 
     protected ICheckStateListener checkStateListener = new ICheckStateListener() {
+        @Override
         public void checkStateChanged(CheckStateChangedEvent event) {
             notifyProjectSelectionChanged((IProject) event.getElement(),
                 event.getChecked());
@@ -57,6 +58,7 @@ public class BaseProjectSelectionComposite extends ProjectDisplayComposite {
             .addCheckStateListener(checkStateListener);
 
         addDisposeListener(new DisposeListener() {
+            @Override
             public void widgetDisposed(DisposeEvent e) {
                 if (viewer != null)
                     ((CheckboxTableViewer) viewer)

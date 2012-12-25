@@ -8,6 +8,7 @@ import de.fu_berlin.inf.dpp.ui.util.WizardUtils;
 
 public class StartSarosConfigurationHandler extends AbstractHandler {
 
+    @Override
     public Object execute(ExecutionEvent event) throws ExecutionException {
         WizardUtils.openSarosConfigurationWizard();
         return null;

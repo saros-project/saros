@@ -35,6 +35,7 @@ public class AutoHashMap<K, V> implements Map<K, V> {
      */
     public static <K, V> AutoHashMap<K, List<V>> getListHashMap() {
         return new AutoHashMap<K, List<V>>(new Function<K, List<V>>() {
+            @Override
             public List<V> apply(K u) {
                 return new ArrayList<V>();
             }
@@ -49,6 +50,7 @@ public class AutoHashMap<K, V> implements Map<K, V> {
     public static <K, V> AutoHashMap<K, BlockingQueue<V>> getBlockingQueueHashMap() {
         return new AutoHashMap<K, BlockingQueue<V>>(
             new Function<K, BlockingQueue<V>>() {
+                @Override
                 public BlockingQueue<V> apply(K u) {
                     return new LinkedBlockingQueue<V>();
                 }
@@ -61,6 +63,7 @@ public class AutoHashMap<K, V> implements Map<K, V> {
      */
     public static <K, V> AutoHashMap<K, Set<V>> getSetHashMap() {
         return new AutoHashMap<K, Set<V>>(new Function<K, Set<V>>() {
+            @Override
             public Set<V> apply(K u) {
                 return new HashSet<V>();
             }
@@ -71,6 +74,7 @@ public class AutoHashMap<K, V> implements Map<K, V> {
         this.provider = provider;
     }
 
+    @Override
     @SuppressWarnings("unchecked")
     public V get(Object k) {
         if (!containsKey(k)) {
@@ -79,18 +83,22 @@ public class AutoHashMap<K, V> implements Map<K, V> {
         return backing.get(k);
     }
 
+    @Override
     public void clear() {
         backing.clear();
     }
 
+    @Override
     public boolean containsKey(Object key) {
         return backing.containsKey(key);
     }
 
+    @Override
     public boolean containsValue(Object value) {
         return backing.containsValue(value);
     }
 
+    @Override
     public Set<java.util.Map.Entry<K, V>> entrySet() {
         return backing.entrySet();
     }
@@ -105,30 +113,37 @@ public class AutoHashMap<K, V> implements Map<K, V> {
         return backing.hashCode();
     }
 
+    @Override
     public boolean isEmpty() {
         return backing.isEmpty();
     }
 
+    @Override
     public Set<K> keySet() {
         return backing.keySet();
     }
 
+    @Override
     public V put(K key, V value) {
         return backing.put(key, value);
     }
 
+    @Override
     public void putAll(Map<? extends K, ? extends V> t) {
         backing.putAll(t);
     }
 
+    @Override
     public V remove(Object key) {
         return backing.remove(key);
     }
 
+    @Override
     public int size() {
         return backing.size();
     }
 
+    @Override
     public Collection<V> values() {
         return backing.values();
     }

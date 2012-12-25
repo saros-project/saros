@@ -23,10 +23,12 @@ public final class RemoteBotCLabel extends StfRemoteObject implements
         return this;
     }
 
+    @Override
     public String getToolTipText() throws RemoteException {
         return widget.getText();
     }
 
+    @Override
     public String getText() throws RemoteException {
         return widget.getText();
     }

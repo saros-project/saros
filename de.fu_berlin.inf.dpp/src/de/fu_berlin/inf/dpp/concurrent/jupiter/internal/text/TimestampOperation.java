@@ -53,10 +53,12 @@ public class TimestampOperation implements Operation {
         return hashcode;
     }
 
+    @Override
     public List<TextEditActivity> toTextEdit(SPath path, User source) {
         return Collections.emptyList();
     }
 
+    @Override
     public List<ITextOperation> getTextOperations() {
         return Collections.emptyList();
     }
@@ -64,6 +66,7 @@ public class TimestampOperation implements Operation {
     /**
      * {@inheritDoc}
      */
+    @Override
     public Operation invert() {
         return new NoOperation(); // TimestampOperations don't cause effects
     }

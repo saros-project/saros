@@ -33,64 +33,80 @@ public class SafePartListener2 implements IPartListener2 {
         this.log = log;
     }
 
+    @Override
     public void partActivated(final IWorkbenchPartReference partRef) {
         Utils.runSafeSync(log, new Runnable() {
+            @Override
             public void run() {
                 toForwardTo.partActivated(partRef);
             }
         });
     }
 
+    @Override
     public void partBroughtToTop(final IWorkbenchPartReference partRef) {
         Utils.runSafeSync(log, new Runnable() {
+            @Override
             public void run() {
                 toForwardTo.partBroughtToTop(partRef);
             }
         });
     }
 
+    @Override
     public void partClosed(final IWorkbenchPartReference partRef) {
         Utils.runSafeSync(log, new Runnable() {
+            @Override
             public void run() {
                 toForwardTo.partClosed(partRef);
             }
         });
     }
 
+    @Override
     public void partDeactivated(final IWorkbenchPartReference partRef) {
         Utils.runSafeSync(log, new Runnable() {
+            @Override
             public void run() {
                 toForwardTo.partDeactivated(partRef);
             }
         });
     }
 
+    @Override
     public void partHidden(final IWorkbenchPartReference partRef) {
         Utils.runSafeSync(log, new Runnable() {
+            @Override
             public void run() {
                 toForwardTo.partHidden(partRef);
             }
         });
     }
 
+    @Override
     public void partInputChanged(final IWorkbenchPartReference partRef) {
         Utils.runSafeSync(log, new Runnable() {
+            @Override
             public void run() {
                 toForwardTo.partInputChanged(partRef);
             }
         });
     }
 
+    @Override
     public void partOpened(final IWorkbenchPartReference partRef) {
         Utils.runSafeSync(log, new Runnable() {
+            @Override
             public void run() {
                 toForwardTo.partOpened(partRef);
             }
         });
     }
 
+    @Override
     public void partVisible(final IWorkbenchPartReference partRef) {
         Utils.runSafeSync(log, new Runnable() {
+            @Override
             public void run() {
                 toForwardTo.partVisible(partRef);
             }

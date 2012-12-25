@@ -102,6 +102,7 @@ public class SplitOperation implements Operation {
         return result;
     }
 
+    @Override
     public List<ITextOperation> getTextOperations() {
         List<ITextOperation> result = new ArrayList<ITextOperation>();
 
@@ -111,6 +112,7 @@ public class SplitOperation implements Operation {
         return result;
     }
 
+    @Override
     public List<TextEditActivity> toTextEdit(SPath path, User source) {
 
         List<TextEditActivity> result = new ArrayList<TextEditActivity>();
@@ -254,6 +256,7 @@ public class SplitOperation implements Operation {
         return false;
     }
 
+    @Override
     public Operation invert() {
         Operation inverseOperation = new SplitOperation(getSecond().invert(),
             getFirst().invert());

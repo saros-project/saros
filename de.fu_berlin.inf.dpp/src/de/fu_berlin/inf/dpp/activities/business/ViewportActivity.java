@@ -52,6 +52,7 @@ public class ViewportActivity extends AbstractActivity implements
         return this.topIndex;
     }
 
+    @Override
     public SPath getPath() {
         return this.path;
     }
@@ -93,10 +94,12 @@ public class ViewportActivity extends AbstractActivity implements
             + this.topIndex + "," + this.bottomIndex + "))";
     }
 
+    @Override
     public void dispatch(IActivityReceiver receiver) {
         receiver.receive(this);
     }
 
+    @Override
     public IActivityDataObject getActivityDataObject(ISarosSession sarosSession) {
         return new ViewportActivityDataObject(source.getJID(), topIndex,
             bottomIndex, path.toSPathDataObject(sarosSession));

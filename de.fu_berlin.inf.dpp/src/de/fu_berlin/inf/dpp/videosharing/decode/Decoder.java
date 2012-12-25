@@ -150,6 +150,7 @@ public abstract class Decoder implements Runnable, Disposable {
                 this);
     }
 
+    @Override
     public void dispose() {
         statisticTimer.cancel();
         decoderThread.interrupt();

@@ -25,6 +25,7 @@ public class BuddyPropertyTester extends PropertyTester {
         SarosPluginContext.initComponent(this);
     }
 
+    @Override
     public boolean test(Object receiver, String property, Object[] args,
         Object expectedValue) {
         if (receiver instanceof JID) {

@@ -92,6 +92,7 @@ public class EditorAPI implements IEditorAPI {
     private static final Logger log = Logger.getLogger(EditorAPI.class);
 
     protected final VerifyKeyListener keyVerifier = new VerifyKeyListener() {
+        @Override
         public void verifyKey(VerifyEvent event) {
             if (event.character > 0) {
                 event.doit = false;
@@ -122,6 +123,7 @@ public class EditorAPI implements IEditorAPI {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void addEditorPartListener(EditorManager editorManager) {
         assert Utils.isSWT();
 
@@ -147,6 +149,7 @@ public class EditorAPI implements IEditorAPI {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void removeEditorPartListener(EditorManager editorManager) {
 
         if (editorManager == null)
@@ -171,6 +174,7 @@ public class EditorAPI implements IEditorAPI {
     /**
      * {@inheritDoc}
      */
+    @Override
     public IEditorPart openEditor(SPath path) {
         return openEditor(path, true);
     }
@@ -178,6 +182,7 @@ public class EditorAPI implements IEditorAPI {
     /**
      * {@inheritDoc}
      */
+    @Override
     public IEditorPart openEditor(SPath path, boolean activate) {
         IFile file = path.getFile();
 
@@ -243,6 +248,7 @@ public class EditorAPI implements IEditorAPI {
         return null;
     }
 
+    @Override
     public boolean openEditor(IEditorPart part) {
         IWorkbenchWindow window = EditorAPI.getActiveWindow();
         if (window == null)
@@ -262,6 +268,7 @@ public class EditorAPI implements IEditorAPI {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void closeEditor(IEditorPart part) {
         IWorkbenchWindow window = EditorAPI.getActiveWindow();
         if (window != null) {
@@ -336,6 +343,7 @@ public class EditorAPI implements IEditorAPI {
     /**
      * {@inheritDoc}
      */
+    @Override
     public IEditorPart getActiveEditor() {
         IWorkbenchWindow window = EditorAPI.getActiveWindow();
         if (window != null) {
@@ -351,6 +359,7 @@ public class EditorAPI implements IEditorAPI {
     /**
      * {@inheritDoc}
      */
+    @Override
     public IResource getEditorResource(IEditorPart editorPart) {
 
         IEditorInput input = editorPart.getEditorInput();
@@ -369,6 +378,7 @@ public class EditorAPI implements IEditorAPI {
      * selection annotation.
      * 
      */
+    @Override
     public void setSelection(IEditorPart editorPart, ITextSelection selection,
         User source, boolean following) {
 
@@ -433,6 +443,7 @@ public class EditorAPI implements IEditorAPI {
 
     public static Iterable<Annotation> toIterable(final IAnnotationModel model) {
         return new Iterable<Annotation>() {
+            @Override
             @SuppressWarnings("unchecked")
             public Iterator<Annotation> iterator() {
                 return model.getAnnotationIterator();
@@ -571,6 +582,7 @@ public class EditorAPI implements IEditorAPI {
     /**
      * {@inheritDoc}
      */
+    @Override
     public ITextSelection getSelection(IEditorPart editorPart) {
 
         if (!(editorPart instanceof ITextEditor)) {
@@ -590,10 +602,12 @@ public class EditorAPI implements IEditorAPI {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void setEditable(final IEditorPart editorPart,
         final boolean newIsEditable) {
 
         Utils.runSafeSWTSync(log, new Runnable() {
+            @Override
             public void run() {
                 ITextViewer textViewer = EditorAPI.getViewer(editorPart);
 
@@ -650,6 +664,7 @@ public class EditorAPI implements IEditorAPI {
      */
     protected Map<Pair<EditorManager, IEditorPart>, EditorListener> editorListeners = new HashMap<Pair<EditorManager, IEditorPart>, EditorListener>();
 
+    @Override
     public void addSharedEditorListener(EditorManager editorManager,
         IEditorPart editorPart) {
 
@@ -672,6 +687,7 @@ public class EditorAPI implements IEditorAPI {
         editorListeners.put(key, listener);
     }
 
+    @Override
     public void removeSharedEditorListener(EditorManager editorManager,
         IEditorPart editorPart) {
 
@@ -691,6 +707,7 @@ public class EditorAPI implements IEditorAPI {
         listener.unbind();
     }
 
+    @Override
     public void reveal(IEditorPart editorPart, ILineRange viewport) {
 
         int top = viewport.getStartLine();
@@ -717,6 +734,7 @@ public class EditorAPI implements IEditorAPI {
 
     }
 
+    @Override
     public void setViewportAnnotation(IEditorPart editorPart,
         ILineRange viewport, User user) {
 
@@ -745,6 +763,7 @@ public class EditorAPI implements IEditorAPI {
         return new LineRange(top, bottom - top);
     }
 
+    @Override
     public ILineRange getViewport(IEditorPart editorPart) {
 
         ITextViewer textViewer = EditorAPI.getViewer(editorPart);
@@ -822,6 +841,7 @@ public class EditorAPI implements IEditorAPI {
 
         // save document
         Utils.runSafeSWTSync(log, new Runnable() {
+            @Override
             public void run() {
                 editor.doSave(monitor);
             }
@@ -891,6 +911,7 @@ public class EditorAPI implements IEditorAPI {
         try {
             Boolean result = true;
             result = Utils.runSWTSync(new Callable<Boolean>() {
+                @Override
                 public Boolean call() throws Exception {
                     /**
                      * TODO saveAllEditors does not save the Documents that we
@@ -978,6 +999,7 @@ public class EditorAPI implements IEditorAPI {
      * Syntactic sugar for getting the path of the IEditorPart returned by
      * getActiveEditor()
      */
+    @Override
     public SPath getActiveEditorPath() {
         IEditorPart newActiveEditor = getActiveEditor();
         if (newActiveEditor == null)
@@ -989,6 +1011,7 @@ public class EditorAPI implements IEditorAPI {
     /**
      * Syntactic sugar for getting the path of the given editor part.
      */
+    @Override
     public SPath getEditorPath(IEditorPart editorPart) {
         IResource resource = getEditorResource(editorPart);
         if (resource == null) {

@@ -14,11 +14,13 @@ public class ExistsResource extends DefaultCondition {
         this.resourcePath = resourcePath;
     }
 
+    @Override
     public String getFailureMessage() {
 
         return "Waiting for resource \"" + resourcePath + "\"";
     }
 
+    @Override
     public boolean test() throws Exception {
         IPath path = new Path(resourcePath);
         IResource resource = ResourcesPlugin.getWorkspace().getRoot()

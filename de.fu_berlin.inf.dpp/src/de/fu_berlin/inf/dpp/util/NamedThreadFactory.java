@@ -19,6 +19,7 @@ public class NamedThreadFactory implements ThreadFactory {
         this.name = name;
     }
 
+    @Override
     public Thread newThread(Runnable r) {
 
         Thread result = defaultFactory.newThread(r);

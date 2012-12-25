@@ -158,6 +158,7 @@ public abstract class SarosAnnotation extends Annotation {
         }
 
         Utils.runSafeSWTSync(log, new Runnable() {
+            @Override
             public void run() {
                 RGB scaledUserRGB = ColorUtils.addLightness(userRGB,
                     LIGHTNESS_SCALE);

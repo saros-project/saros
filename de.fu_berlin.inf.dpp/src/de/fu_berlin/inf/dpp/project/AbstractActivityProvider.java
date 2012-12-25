@@ -12,6 +12,7 @@ public abstract class AbstractActivityProvider implements IActivityProvider {
 
     protected List<IActivityListener> activityListeners = new CopyOnWriteArrayList<IActivityListener>();
 
+    @Override
     public void addActivityListener(IActivityListener listener) {
         assert listener != null;
         if (!activityListeners.contains(listener)) {
@@ -19,8 +20,10 @@ public abstract class AbstractActivityProvider implements IActivityProvider {
         }
     }
 
+    @Override
     public abstract void exec(IActivity activity);
 
+    @Override
     public void removeActivityListener(IActivityListener listener) {
         this.activityListeners.remove(listener);
     }

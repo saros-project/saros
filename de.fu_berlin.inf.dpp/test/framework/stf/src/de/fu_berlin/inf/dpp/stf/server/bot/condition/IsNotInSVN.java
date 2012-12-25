@@ -15,11 +15,13 @@ public class IsNotInSVN extends DefaultCondition {
         this.projectName = projectName;
     }
 
+    @Override
     public String getFailureMessage() {
 
         return null;
     }
 
+    @Override
     public boolean test() throws Exception {
         IProject project = ResourcesPlugin.getWorkspace().getRoot()
             .getProject(projectName);

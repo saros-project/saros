@@ -417,6 +417,7 @@ public class SarosContext implements ISarosContext {
      * method should be used for objects that were created by Eclipse, which
      * have a different life cycle than the Saros plug-in.
      */
+    @Override
     public synchronized void initComponent(Object toInjectInto) {
         ChildContainer dummyContainer = container
             .getComponent(ChildContainer.class);
@@ -424,6 +425,7 @@ public class SarosContext implements ISarosContext {
         container.removeChildContainer(dummyContainer);
     }
 
+    @Override
     public <T> T getComponent(Class<T> tClass) {
         return container.getComponent(tClass);
     }
@@ -444,6 +446,7 @@ public class SarosContext implements ISarosContext {
         container.removeComponent(o);
     }
 
+    @Override
     public boolean removeChildContainer(PicoContainer picoContainer) {
         return container.removeChildContainer(picoContainer);
     }
@@ -480,6 +483,7 @@ public class SarosContext implements ISarosContext {
         }
     }
 
+    @Override
     public MutablePicoContainer createSimpleChildContainer() {
         return container.makeChildContainer();
     }

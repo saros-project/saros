@@ -18,6 +18,7 @@ public class WarningMessageDialog {
     public static void showWarningMessage(final String title,
         final String message) {
         Utils.runSafeSWTSync(log, new Runnable() {
+            @Override
             public void run() {
                 DialogUtils.openWarningMessageDialog(EditorAPI.getShell(),
                     title, message);

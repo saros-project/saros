@@ -179,6 +179,7 @@ public class SarosSession implements ISarosSession, Disposable {
          *               activity, it is not part of the ISarosSession interface
          *               to avoid misuse.
          */
+        @Override
         public void activityCreated(final IActivity activityData) {
             Utils.runSafeSWTSync(log, new Runnable() {
 
@@ -294,6 +295,7 @@ public class SarosSession implements ISarosSession, Disposable {
         concurrentDocumentClient = new ConcurrentDocumentClient(this);
     }
 
+    @Override
     public void addSharedResources(IProject project, String projectID,
         List<IResource> dependentResources) {
         if (!isCompletelyShared(project) && dependentResources != null) {
@@ -326,10 +328,12 @@ public class SarosSession implements ISarosSession, Disposable {
         execQueuedActivities(projectID);
     }
 
+    @Override
     public Collection<User> getParticipants() {
         return participants.values();
     }
 
+    @Override
     public List<User> getRemoteUsersWithReadOnlyAccess() {
         List<User> result = new ArrayList<User>();
         for (User user : getParticipants()) {
@@ -341,6 +345,7 @@ public class SarosSession implements ISarosSession, Disposable {
         return result;
     }
 
+    @Override
     public List<User> getUsersWithReadOnlyAccess() {
         List<User> result = new ArrayList<User>();
         for (User user : getParticipants()) {
@@ -350,6 +355,7 @@ public class SarosSession implements ISarosSession, Disposable {
         return result;
     }
 
+    @Override
     public List<User> getUsersWithWriteAccess() {
         List<User> result = new ArrayList<User>();
         for (User user : getParticipants()) {
@@ -370,6 +376,7 @@ public class SarosSession implements ISarosSession, Disposable {
         return result;
     }
 
+    @Override
     public List<User> getRemoteUsers() {
         List<User> result = new ArrayList<User>();
         for (User user : getParticipants()) {
@@ -379,6 +386,7 @@ public class SarosSession implements ISarosSession, Disposable {
         return result;
     }
 
+    @Override
     public ActivitySequencer getSequencer() {
         return sessionContainer.getComponent(ActivitySequencer.class);
     }
@@ -386,6 +394,7 @@ public class SarosSession implements ISarosSession, Disposable {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void initiatePermissionChange(final User user,
         final Permission newPermission, SubMonitor progress)
         throws CancellationException, InterruptedException {
@@ -398,6 +407,7 @@ public class SarosSession implements ISarosSession, Disposable {
         if (user.isHost()) {
 
             Utils.runSafeSWTSync(log, new Runnable() {
+                @Override
                 public void run() {
                     abuseActivityCreated(new PermissionActivity(getLocalUser(),
                         user, newPermission));
@@ -411,6 +421,7 @@ public class SarosSession implements ISarosSession, Disposable {
                 Messages.SarosSession_performing_permission_change, progress);
 
             Utils.runSafeSWTSync(log, new Runnable() {
+                @Override
                 public void run() {
                     abuseActivityCreated(new PermissionActivity(getLocalUser(),
                         user, newPermission));
@@ -428,6 +439,7 @@ public class SarosSession implements ISarosSession, Disposable {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void setPermission(final User user, final Permission permission) {
 
         assert Utils.isSWT() : "Must be called from SWT Thread"; //$NON-NLS-1$
@@ -445,11 +457,13 @@ public class SarosSession implements ISarosSession, Disposable {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void userInvitationCompleted(final User user) {
         user.invitationCompleted();
 
         // WTF ... let the UI handle the synch.
         Utils.runSafeSWTAsync(log, new Runnable() {
+            @Override
             public void run() {
                 userInvitationCompletedWrapped(user);
             }
@@ -473,6 +487,7 @@ public class SarosSession implements ISarosSession, Disposable {
      * 
      * @see de.fu_berlin.inf.dpp.ISharedProject
      */
+    @Override
     public User getHost() {
         return host;
     }
@@ -482,6 +497,7 @@ public class SarosSession implements ISarosSession, Disposable {
      * 
      * @see de.fu_berlin.inf.dpp.project.ISarosSession
      */
+    @Override
     public boolean isHost() {
         return localUser.isHost();
     }
@@ -491,10 +507,12 @@ public class SarosSession implements ISarosSession, Disposable {
      * 
      * @see de.fu_berlin.inf.dpp.ISharedProject
      */
+    @Override
     public boolean hasWriteAccess() {
         return localUser.hasWriteAccess();
     }
 
+    @Override
     public boolean hasExclusiveWriteAccess() {
         if (!hasWriteAccess()) {
             return false;
@@ -507,6 +525,7 @@ public class SarosSession implements ISarosSession, Disposable {
         return true;
     }
 
+    @Override
     public void addUser(User user) {
 
         assert user.getSarosSession().equals(this);
@@ -528,6 +547,7 @@ public class SarosSession implements ISarosSession, Disposable {
         log.info("Buddy " + Utils.prefix(jid) + " joined session."); //$NON-NLS-1$ //$NON-NLS-2$
     }
 
+    @Override
     public void removeUser(User user) {
         JID jid = user.getJID();
         if (participants.remove(jid) == null) {
@@ -556,6 +576,7 @@ public class SarosSession implements ISarosSession, Disposable {
      * 
      * @see de.fu_berlin.inf.dpp.project.ISarosSession
      */
+    @Override
     public void addListener(ISharedProjectListener listener) {
         listenerDispatch.add(listener);
     }
@@ -565,6 +586,7 @@ public class SarosSession implements ISarosSession, Disposable {
      * 
      * @see de.fu_berlin.inf.dpp.project.ISarosSession
      */
+    @Override
     public void removeListener(ISharedProjectListener listener) {
         listenerDispatch.remove(listener);
     }
@@ -574,10 +596,12 @@ public class SarosSession implements ISarosSession, Disposable {
      * 
      * @see de.fu_berlin.inf.dpp.project.ISarosSession
      */
+    @Override
     public Set<IProject> getProjects() {
         return projectMapper.getProjects();
     }
 
+    @Override
     public void start() {
         if (!stopped) {
             throw new IllegalStateException();
@@ -591,6 +615,7 @@ public class SarosSession implements ISarosSession, Disposable {
     // TODO Review sendRequest for InterruptedException and remove this flag.
     boolean stopped = true;
 
+    @Override
     public boolean isStopped() {
         return stopped;
     }
@@ -601,6 +626,7 @@ public class SarosSession implements ISarosSession, Disposable {
      * @throws IllegalStateException
      *             if the shared project is already stopped.
      */
+    @Override
     public void stop() {
         if (stopped) {
             throw new IllegalStateException();
@@ -612,6 +638,7 @@ public class SarosSession implements ISarosSession, Disposable {
         stopped = true;
     }
 
+    @Override
     public void dispose() {
 
         if (concurrentDocumentServer != null) {
@@ -624,6 +651,7 @@ public class SarosSession implements ISarosSession, Disposable {
     /**
      * {@inheritDoc}
      */
+    @Override
     public User getUser(JID jid) {
 
         if (jid == null)
@@ -648,6 +676,7 @@ public class SarosSession implements ISarosSession, Disposable {
      * JID associated with this user or null if no user for the given JID exists
      * in this SarosSession.
      */
+    @Override
     public JID getResourceQualifiedJID(JID jid) {
 
         if (jid == null)
@@ -661,26 +690,32 @@ public class SarosSession implements ISarosSession, Disposable {
         return user.getJID();
     }
 
+    @Override
     public User getLocalUser() {
         return localUser;
     }
 
+    @Override
     public ConcurrentDocumentClient getConcurrentDocumentClient() {
         return concurrentDocumentClient;
     }
 
+    @Override
     public ConcurrentDocumentServer getConcurrentDocumentServer() {
         return concurrentDocumentServer;
     }
 
+    @Override
     public Saros getSaros() {
         return saros;
     }
 
+    @Override
     public int getFreeColor() {
         return freeColors.get();
     }
 
+    @Override
     public void returnColor(int colorID) {
         freeColors.add(colorID);
     }
@@ -694,6 +729,7 @@ public class SarosSession implements ISarosSession, Disposable {
      * 
      */
 
+    @Override
     public void exec(List<IActivityDataObject> activityDataObjects) {
         // Convert me
         List<IActivity> activities = convertAndQueueProjectActivities(activityDataObjects);
@@ -742,6 +778,7 @@ public class SarosSession implements ISarosSession, Disposable {
      */
     protected void execActivities(final List<IActivity> activities) {
         Runnable transformingRunnable = new Runnable() {
+            @Override
             public void run() {
                 TransformationResult transformed = concurrentDocumentClient
                     .transformIncoming(activities);
@@ -896,6 +933,7 @@ public class SarosSession implements ISarosSession, Disposable {
      * 
      * @see #sendActivity(List, IActivity)
      */
+    @Override
     public void sendActivity(User recipient, IActivity activity) {
         sendActivity(Collections.singletonList(recipient), activity);
     }
@@ -1055,9 +1093,11 @@ public class SarosSession implements ISarosSession, Disposable {
                 EditorAPI.getAWorkbenchWindow().getShell());
             final SarosSession session = this;
             Utils.runSafeSWTSync(log, new Runnable() {
+                @Override
                 public void run() {
                     try {
                         dialog.run(true, true, new IRunnableWithProgress() {
+                            @Override
                             public void run(IProgressMonitor monitor) {
                                 // synchronize the file and check if it is
                                 // correctly transmitted
@@ -1193,24 +1233,29 @@ public class SarosSession implements ISarosSession, Disposable {
         return;
     }
 
+    @Override
     public void addActivityProvider(IActivityProvider provider) {
         if (activityProviders.addIfAbsent(provider))
             provider.addActivityListener(this.activityListener);
     }
 
+    @Override
     public void removeActivityProvider(IActivityProvider provider) {
         activityProviders.remove(provider);
         provider.removeActivityListener(this.activityListener);
     }
 
+    @Override
     public DateTime getSessionStart() {
         return sessionStart;
     }
 
+    @Override
     public boolean isShared(IResource resource) {
         return projectMapper.isShared(resource);
     }
 
+    @Override
     public List<IResource> getAllSharedResources() {
         List<IResource> allSharedResources = new ArrayList<IResource>();
         Collection<List<IResource>> resources = projectMapper.getResources();
@@ -1250,6 +1295,7 @@ public class SarosSession implements ISarosSession, Disposable {
         }
     }
 
+    @Override
     public boolean useVersionControl() {
         /*
          * It is not possible to enable version control support during a
@@ -1260,24 +1306,29 @@ public class SarosSession implements ISarosSession, Disposable {
         return useVersionControl = preferenceUtils.useVersionControl();
     }
 
+    @Override
     public SharedProject getSharedProject(IProject project) {
         if (!isShared(project))
             return null;
         return projectMapper.getSharedProject(projectMapper.getID(project));
     }
 
+    @Override
     public List<SharedProject> getSharedProjects() {
         return projectMapper.getSharedProjects();
     }
 
+    @Override
     public String getProjectID(IProject project) {
         return projectMapper.getID(project);
     }
 
+    @Override
     public IProject getProject(String projectID) {
         return projectMapper.getProject(projectID);
     }
 
+    @Override
     public void synchronizeUserList(ITransmitter transmitter, JID peer,
         IProgressMonitor monitor) throws SarosCancellationException {
 
@@ -1301,14 +1352,17 @@ public class SarosSession implements ISarosSession, Disposable {
 
     }
 
+    @Override
     public HashMap<IProject, List<IResource>> getProjectResourcesMapping() {
         return projectMapper.getProjectResourceMapping();
     }
 
+    @Override
     public List<IResource> getSharedResources(IProject project) {
         return projectMapper.getProjectResourceMapping().get(project);
     }
 
+    @Override
     public boolean isCompletelyShared(IProject project) {
         return projectMapper.isCompletelyShared(project);
     }
@@ -1323,6 +1377,7 @@ public class SarosSession implements ISarosSession, Disposable {
         return ownedProjects.contains(iProject);
     }
 
+    @Override
     public void addProjectOwnership(String projectID, IProject project,
         JID ownerJID) {
         if (projectMapper.getSharedProject(projectID) == null) {
@@ -1334,6 +1389,7 @@ public class SarosSession implements ISarosSession, Disposable {
         }
     }
 
+    @Override
     public void removeProjectOwnership(String projectID, IProject project,
         JID ownerJID) {
         if (projectMapper.getSharedProject(projectID) != null) {
@@ -1343,6 +1399,7 @@ public class SarosSession implements ISarosSession, Disposable {
         }
     }
 
+    @Override
     public StopManager getStopManager() {
         return sessionContainer.getComponent(StopManager.class);
     }

@@ -50,6 +50,7 @@ public abstract class ByteStreamTransport implements ITransport {
      * Disposes the transport method. Doesn't close running connections (to be
      * done by DataTransferManager).
      */
+    @Override
     public void disposeXMPPConnection() {
         if (manager != null) {
             manager.removeIncomingBytestreamListener(streamListener);
@@ -63,6 +64,7 @@ public abstract class ByteStreamTransport implements ITransport {
      */
     protected BytestreamListener streamListener = new BytestreamListener() {
 
+        @Override
         public void incomingBytestreamRequest(BytestreamRequest request) {
 
             log.info("Received request to establish a "
@@ -128,6 +130,7 @@ public abstract class ByteStreamTransport implements ITransport {
         return channel;
     }
 
+    @Override
     public void prepareXMPPConnection(Connection connection,
         IByteStreamConnectionListener listener) {
         this.connectionListener = listener;
@@ -140,6 +143,7 @@ public abstract class ByteStreamTransport implements ITransport {
         return getDefaultNetTransferMode().getXEP();
     }
 
+    @Override
     abstract public NetTransferMode getDefaultNetTransferMode();
 
     /**

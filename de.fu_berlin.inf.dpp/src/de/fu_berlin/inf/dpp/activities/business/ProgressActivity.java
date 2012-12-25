@@ -45,12 +45,14 @@ public class ProgressActivity extends AbstractActivity {
             + ",action:" + action + ")";
     }
 
+    @Override
     public IActivityDataObject getActivityDataObject(ISarosSession sarosSession) {
 
         return new ProgressActivityDataObject(getSource().getJID(), progressID,
             workCurrent, workTotal, taskName, action);
     }
 
+    @Override
     public void dispatch(IActivityReceiver receiver) {
         receiver.receive(this);
     }

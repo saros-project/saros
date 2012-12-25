@@ -14,6 +14,7 @@ public class StopFollowingActivityDataObject extends AbstractActivityDataObject 
         super(source);
     }
 
+    @Override
     public IActivity getActivity(ISarosSession sharedProject) {
         return new StopFollowingActivity(sharedProject.getUser(source));
     }

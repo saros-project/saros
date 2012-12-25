@@ -173,6 +173,7 @@ public class UPnPServiceImpl implements IUPnPService {
             discoverGateways();
         else
             Utils.runSafeAsync("Saros UPnP discovery", log, new Runnable() {
+                @Override
                 public void run() {
                     discoverGateways();
                 }
@@ -467,6 +468,7 @@ public class UPnPServiceImpl implements IUPnPService {
 
         Utils.runSafeAsync(null, new Runnable() {
 
+            @Override
             public void run() {
 
                 // return if IBB is forced
@@ -499,6 +501,7 @@ public class UPnPServiceImpl implements IUPnPService {
                 // thread
                 Utils.runSafeSWTAsync(null, new Runnable() {
 
+                    @Override
                     public void run() {
 
                         // Show notification

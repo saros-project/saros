@@ -51,6 +51,7 @@ public class ChangeXMPPAccountAction extends Action implements IMenuCreator {
     protected ISarosSessionManager sarosSessionManager;
 
     protected IConnectionListener connectionListener = new IConnectionListener() {
+        @Override
         public void connectionStateChanged(Connection connection,
             ConnectionState newState) {
             updateStatus();
@@ -146,6 +147,7 @@ public class ChangeXMPPAccountAction extends Action implements IMenuCreator {
         }
 
         Utils.runSafeSWTAsync(log, new Runnable() {
+            @Override
             public void run() {
                 boolean proceed = DialogUtils.openQuestionMessageDialog(
                     EditorAPI.getShell(),
@@ -163,6 +165,7 @@ public class ChangeXMPPAccountAction extends Action implements IMenuCreator {
             accountService.setAccountActive(account);
 
         Utils.runSafeAsync("ConnectAction-", log, new Runnable() {
+            @Override
             public void run() {
                 try {
                     if (running.getAndSet(true)) {
@@ -179,6 +182,7 @@ public class ChangeXMPPAccountAction extends Action implements IMenuCreator {
 
     protected void disconnect() {
         Utils.runSafeAsync("DisconnectAction-", log, new Runnable() {
+            @Override
             public void run() {
                 try {
                     if (running.getAndSet(true)) {

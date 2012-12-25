@@ -24,6 +24,7 @@ public final class Chatroom extends StfRemoteObject implements IChatroom {
         return INSTANCE;
     }
 
+    @Override
     public boolean compareChatMessage(String jid, String message)
         throws RemoteException {
         try {

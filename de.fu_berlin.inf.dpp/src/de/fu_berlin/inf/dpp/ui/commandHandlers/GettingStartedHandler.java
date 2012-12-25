@@ -9,6 +9,7 @@ import de.fu_berlin.inf.dpp.util.Utils;
 
 public class GettingStartedHandler extends AbstractHandler {
 
+    @Override
     public Object execute(ExecutionEvent event) throws ExecutionException {
 
         Utils.openInternalBrowser(Messages.Saros_tutorial_url,

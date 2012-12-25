@@ -518,6 +518,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
 
         try {
             newLocalProject = Utils.runSWTSync(new Callable<IProject>() {
+                @Override
                 public IProject call() throws CoreException,
                     InterruptedException {
                     try {
@@ -768,6 +769,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
             .getAWorkbenchWindow().getShell());
 
         dialog.run(true, true, new IRunnableWithProgress() {
+            @Override
             public void run(IProgressMonitor monitor)
                 throws InvocationTargetException {
                 try {
@@ -928,6 +930,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
          */
         try {
             ResourcesPlugin.getWorkspace().run(new IWorkspaceRunnable() {
+                @Override
                 public void run(IProgressMonitor monitor) throws CoreException {
                     try {
                         FileUtils.writeArchive(archiveStream, project,

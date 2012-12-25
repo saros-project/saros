@@ -48,6 +48,7 @@ public class StatisticManager extends AbstractFeedbackManager implements
     protected Set<AbstractStatisticCollector> allCollectors;
     protected Set<AbstractStatisticCollector> activeCollectors;
 
+    @Override
     public void start() {
         statistic = new SessionStatistic();
         activeCollectors = Collections
@@ -58,6 +59,7 @@ public class StatisticManager extends AbstractFeedbackManager implements
         countSessions();
     }
 
+    @Override
     public void stop() {
         // Everything should have been submitted by now.
         assert activeCollectors.isEmpty();

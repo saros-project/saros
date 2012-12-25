@@ -80,6 +80,7 @@ public class AddXMPPAccountWizard extends Wizard {
             boolean doCancel = true;
             try {
                 doCancel = Utils.runSWTSync(new Callable<Boolean>() {
+                    @Override
                     public Boolean call() throws Exception {
                         return DialogUtils.openQuestionMessageDialog(
                             getShell(),

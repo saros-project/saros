@@ -20,12 +20,14 @@ public class SessionViewOpener {
     public SessionViewOpener(IsInconsistentObservable isInconsistentObservable,
         final SarosUI sarosUI) {
         isInconsistentObservable.add(new ValueChangeListener<Boolean>() {
+            @Override
             public void setValue(Boolean inconsistency) {
                 if (!inconsistency) {
                     return;
                 }
 
                 Utils.runSafeSWTSync(log, new Runnable() {
+                    @Override
                     public void run() {
                         sarosUI.openSarosView();
                     }

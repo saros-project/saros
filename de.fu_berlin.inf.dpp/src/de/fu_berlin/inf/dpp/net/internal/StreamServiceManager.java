@@ -254,6 +254,7 @@ public class StreamServiceManager implements Startable {
             "StreamSessionNegotiation-"));
     }
 
+    @Override
     public synchronized void start() {
         if (started)
             return;
@@ -263,6 +264,7 @@ public class StreamServiceManager implements Startable {
         counter = 0;
     }
 
+    @Override
     public synchronized void stop() {
         if (!started)
             return;
@@ -318,6 +320,7 @@ public class StreamServiceManager implements Startable {
         sarosSessionObservable
             .addAndNotify(new ValueChangeListener<ISarosSession>() {
 
+                @Override
                 public void setValue(ISarosSession newValue) {
                     if (newValue != null)
                         newValue.addListener(sharedProjectListener);
@@ -941,6 +944,7 @@ public class StreamServiceManager implements Startable {
          *             Interrupted while waiting for result. This means
          *             {@link StreamServiceManager} is shutting down.
          */
+        @Override
         public StreamSession call() throws Exception {
             if (cancelled)
                 throw new InterruptedException("Initiation was cancelled");
@@ -1029,6 +1033,7 @@ public class StreamServiceManager implements Startable {
          */
         protected StreamPacket currentPacket = null;
 
+        @Override
         public void run() {
             senderThread = Thread.currentThread();
             while (true) {
@@ -1234,6 +1239,7 @@ public class StreamServiceManager implements Startable {
 
         protected volatile boolean disposed = false;
 
+        @Override
         public void run() {
             receiverThread = Thread.currentThread();
             while (true) {
@@ -1383,6 +1389,7 @@ public class StreamServiceManager implements Startable {
                  * accepted, a new session will be created.
                  */
                 negotiatesToUser.execute(Utils.wrapSafe(log, new Runnable() {
+                    @Override
                     public void run() {
                         log.debug("Starting session request to service");
 
@@ -1425,6 +1432,7 @@ public class StreamServiceManager implements Startable {
 
                             sessionDispatcher.execute(Utils.wrapSafe(log,
                                 new Runnable() {
+                                    @Override
                                     public void run() {
                                         service.startSession(newSession);
                                         log.debug("Session started");
@@ -1562,6 +1570,7 @@ public class StreamServiceManager implements Startable {
             this.session = session;
         }
 
+        @Override
         public void run() {
             log.debug("Killing session " + session);
             StreamPath streamPath = session.getStreamPath();
@@ -1707,6 +1716,7 @@ public class StreamServiceManager implements Startable {
 
     class StreamPacketListener implements PacketListener {
 
+        @Override
         public void processPacket(Packet packet) {
             IncomingTransferObject ito = incomingTransferObjectExtensionProvider
                 .getPayload(packet);
@@ -1722,6 +1732,7 @@ public class StreamServiceManager implements Startable {
 
     class StreamPacketFilter implements PacketFilter {
 
+        @Override
         public boolean accept(Packet packet) {
             IncomingTransferObject payload = incomingTransferObjectExtensionProvider
                 .getPayload(packet);
@@ -1748,6 +1759,7 @@ public class StreamServiceManager implements Startable {
      */
     protected final class SharedProjectListener implements
         ISharedProjectListener {
+        @Override
         public void userLeft(User user) {
 
             // avoid ConcurrentModificationException when a sessions removes
@@ -1762,14 +1774,17 @@ public class StreamServiceManager implements Startable {
             }
         }
 
+        @Override
         public void userJoined(User user) {
             // NOP
         }
 
+        @Override
         public void permissionChanged(User user) {
             // NOP
         }
 
+        @Override
         public void invitationCompleted(User user) {
             // NOP
         }

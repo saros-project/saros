@@ -9,6 +9,7 @@ import de.fu_berlin.inf.dpp.User;
  */
 public class ParticipantPropertyTester extends PropertyTester {
 
+    @Override
     public boolean test(Object receiver, String property, Object[] args,
         Object expectedValue) {
         if (receiver instanceof User) {

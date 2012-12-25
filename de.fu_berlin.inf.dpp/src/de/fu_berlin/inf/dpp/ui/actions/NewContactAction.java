@@ -50,6 +50,7 @@ public class NewContactAction extends Action {
         SarosPluginContext.initComponent(this);
 
         saros.getSarosNet().addListener(new IConnectionListener() {
+            @Override
             public void connectionStateChanged(Connection connection,
                 ConnectionState newState) {
                 updateEnablement();

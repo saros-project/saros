@@ -42,6 +42,7 @@ public class InvitationHandler {
         this.sessionIDObservable = sessionIDObservablePar;
         receiver.addPacketListener(new PacketListener() {
 
+            @Override
             public void processPacket(Packet packet) {
                 JID fromJID = new JID(packet.getFrom());
                 InvitationParametersExtension invInfo = invExtProv.getPayload(packet);

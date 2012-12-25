@@ -107,18 +107,22 @@ public class BinaryChannelTransferObject implements IncomingTransferObject {
         }
     }
 
+    @Override
     public TransferDescription getTransferDescription() {
         return transferDescription;
     }
 
+    @Override
     public NetTransferMode getTransferMode() {
         return binaryChannel.getTransferMode();
     }
 
+    @Override
     public long getTransferredSize() {
         return transferredSize;
     }
 
+    @Override
     public long getUncompressedSize() {
         return uncompressedSize;
     }

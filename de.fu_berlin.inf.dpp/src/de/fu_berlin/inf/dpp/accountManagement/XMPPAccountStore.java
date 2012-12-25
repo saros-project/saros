@@ -171,6 +171,7 @@ public final class XMPPAccountStore {
 
         Comparator<XMPPAccount> comparator = new Comparator<XMPPAccount>() {
 
+            @Override
             public int compare(XMPPAccount a, XMPPAccount b) {
                 int c = a.getUsername().compareToIgnoreCase(b.getUsername());
 

@@ -58,11 +58,13 @@ public class ChatInput extends Composite {
         text = new StyledText(this, style);
 
         text.addFocusListener(new FocusListener() {
+            @Override
             public void focusLost(FocusEvent e) {
                 if (text.getText().length() == 0)
                     showHint();
             }
 
+            @Override
             public void focusGained(FocusEvent e) {
                 if (isHintShown)
                     hideHint();

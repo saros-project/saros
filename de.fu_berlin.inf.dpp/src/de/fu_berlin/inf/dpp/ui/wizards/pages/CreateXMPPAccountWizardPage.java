@@ -229,6 +229,7 @@ public class CreateXMPPAccountWizardPage extends WizardPage {
 
     private void hookListeners() {
         ModifyListener listener = new ModifyListener() {
+            @Override
             public void modifyText(ModifyEvent e) {
                 updatePageCompletion();
             }

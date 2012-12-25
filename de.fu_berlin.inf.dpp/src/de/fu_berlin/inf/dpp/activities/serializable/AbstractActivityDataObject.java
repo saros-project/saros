@@ -26,6 +26,7 @@ public abstract class AbstractActivityDataObject implements IActivityDataObject 
         this.source = source;
     }
 
+    @Override
     public JID getSource() {
         return this.source;
     }

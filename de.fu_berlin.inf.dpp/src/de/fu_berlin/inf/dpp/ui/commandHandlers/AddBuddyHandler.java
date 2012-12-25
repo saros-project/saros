@@ -8,6 +8,7 @@ import de.fu_berlin.inf.dpp.ui.util.WizardUtils;
 
 public class AddBuddyHandler extends AbstractHandler {
 
+    @Override
     public Object execute(ExecutionEvent event) throws ExecutionException {
         WizardUtils.openAddBuddyWizard();
         return null;

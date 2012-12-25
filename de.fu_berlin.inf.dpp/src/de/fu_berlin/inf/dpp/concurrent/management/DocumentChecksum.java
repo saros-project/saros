@@ -21,10 +21,12 @@ public class DocumentChecksum {
 
     protected IDocumentListener dirtyListener = new IDocumentListener() {
 
+        @Override
         public void documentAboutToBeChanged(DocumentEvent event) {
             // we are only interested in events after the change
         }
 
+        @Override
         public void documentChanged(DocumentEvent event) {
             dirty = true;
         }

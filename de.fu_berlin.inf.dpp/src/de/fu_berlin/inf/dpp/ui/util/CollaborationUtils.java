@@ -70,6 +70,7 @@ public class CollaborationUtils {
             selectedResources, null);
 
         Utils.runSafeAsync(log, new Runnable() {
+            @Override
             public void run() {
 
                 try {
@@ -126,6 +127,7 @@ public class CollaborationUtils {
             return;
 
         Utils.runSafeAsync(log, new Runnable() {
+            @Override
             public void run() {
                 sarosSessionManager.stopSarosSession();
             }
@@ -160,6 +162,7 @@ public class CollaborationUtils {
             return;
 
         Utils.runSafeAsync(log, new Runnable() {
+            @Override
             public void run() {
 
                 if (sarosSession.hasWriteAccess()) {
@@ -196,6 +199,7 @@ public class CollaborationUtils {
         }
 
         Utils.runSafeAsync(log, new Runnable() {
+            @Override
             public void run() {
 
                 Set<JID> participantsToAdd = new HashSet<JID>(buddies);

@@ -65,6 +65,7 @@ public class RestrictToReadOnlyAccessAction extends Action implements
     };
 
     protected ISelectionListener selectionListener = new ISelectionListener() {
+        @Override
         public void selectionChanged(IWorkbenchPart part, ISelection selection) {
             updateEnablement();
         }
@@ -106,6 +107,7 @@ public class RestrictToReadOnlyAccessAction extends Action implements
     @Override
     public void run() {
         Utils.runSafeSync(log, new Runnable() {
+            @Override
             public void run() {
                 List<User> participants = SelectionRetrieverFactory
                     .getSelectionRetriever(User.class).getSelection();
@@ -140,6 +142,7 @@ public class RestrictToReadOnlyAccessAction extends Action implements
         }
     }
 
+    @Override
     public void dispose() {
         SelectionUtils.getSelectionService().removeSelectionListener(
             selectionListener);

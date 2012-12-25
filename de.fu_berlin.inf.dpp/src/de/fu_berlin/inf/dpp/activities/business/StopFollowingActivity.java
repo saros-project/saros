@@ -17,10 +17,12 @@ public class StopFollowingActivity extends AbstractActivity {
         super(source);
     }
 
+    @Override
     public void dispatch(IActivityReceiver receiver) {
         receiver.receive(this);
     }
 
+    @Override
     public IActivityDataObject getActivityDataObject(ISarosSession sarosSession) {
         return new StopFollowingActivityDataObject(source.getJID());
     }

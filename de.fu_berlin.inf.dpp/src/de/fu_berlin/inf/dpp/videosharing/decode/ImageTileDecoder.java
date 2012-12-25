@@ -70,6 +70,7 @@ public class ImageTileDecoder extends Decoder {
 
     // Main encoder loop
 
+    @Override
     public void run() {
 
         while (!Thread.interrupted()) {

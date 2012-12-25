@@ -38,10 +38,12 @@ public class WidgetUtil {
 
         try {
             new SWTBot().waitUntil(new DefaultCondition() {
+                @Override
                 public String getFailureMessage() {
                     return "Could not find toolbar button matching " + regex;
                 }
 
+                @Override
                 public boolean test() throws Exception {
                     return getToolbarButton(view, regex) != null;
                 }
@@ -69,11 +71,13 @@ public class WidgetUtil {
 
         try {
             new SWTBot().waitUntil(new DefaultCondition() {
+                @Override
                 public String getFailureMessage() {
                     return "Could not find node matching "
                         + Arrays.asList(regexNodes);
                 }
 
+                @Override
                 public boolean test() throws Exception {
                     return getTreeItem(tree.getAllItems(), regexNodes) != null;
                 }

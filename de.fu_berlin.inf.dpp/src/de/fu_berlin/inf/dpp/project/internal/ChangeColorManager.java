@@ -78,11 +78,13 @@ public class ChangeColorManager extends AbstractActivityProvider implements
         editorManager.refreshAnnotations();
     }
 
+    @Override
     public void start() {
         sarosSession.addActivityProvider(ChangeColorManager.this);
         sarosSession.addListener(sharedProjectListener);
     }
 
+    @Override
     public void stop() {
         sarosSession.removeActivityProvider(ChangeColorManager.this);
         sarosSession.removeListener(sharedProjectListener);
@@ -114,6 +116,7 @@ public class ChangeColorManager extends AbstractActivityProvider implements
                 if (!ChangeColorManager.checkColor(rgbOfNewParticipant,
                     userList)) {
                     Utils.runSafeSWTSync(log, new Runnable() {
+                        @Override
                         public void run() {
                             ColorDialog changeColor = new ColorDialog(EditorAPI
                                 .getShell());

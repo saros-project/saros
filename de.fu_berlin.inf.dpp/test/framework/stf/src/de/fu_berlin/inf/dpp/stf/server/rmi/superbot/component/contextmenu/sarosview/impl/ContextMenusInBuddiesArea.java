@@ -23,6 +23,7 @@ public final class ContextMenusInBuddiesArea extends ContextMenusInSarosView
         return INSTANCE;
     }
 
+    @Override
     public void delete() throws RemoteException {
         getTreeItem().select();
         ContextMenuHelper.clickContextMenu(tree, CM_DELETE);
@@ -34,6 +35,7 @@ public final class ContextMenusInBuddiesArea extends ContextMenusInSarosView
         new SWTBot().sleep(500);
     }
 
+    @Override
     public void rename(String newBuddyName) throws RemoteException {
         getTreeItem().select();
         ContextMenuHelper.clickContextMenu(tree, CM_RENAME);
@@ -48,6 +50,7 @@ public final class ContextMenusInBuddiesArea extends ContextMenusInSarosView
     }
 
     // this method does not operate on the context menu
+    @Override
     public void addJIDToChat() throws RemoteException {
         SWTBotTreeItem treeItem = getTreeItem();
 
@@ -55,6 +58,7 @@ public final class ContextMenusInBuddiesArea extends ContextMenusInSarosView
         treeItem.doubleClick();
     }
 
+    @Override
     public void addToSarosSession() throws RemoteException {
         SWTBotTreeItem treeItem = getTreeItem();
 
@@ -68,6 +72,7 @@ public final class ContextMenusInBuddiesArea extends ContextMenusInSarosView
         new SWTBot().sleep(500);
     }
 
+    @Override
     public void addBuddy(JID jid) throws RemoteException {
         if (!sarosView.hasBuddy(jid)) {
             getTreeItem().select();
@@ -78,6 +83,7 @@ public final class ContextMenusInBuddiesArea extends ContextMenusInSarosView
         }
     }
 
+    @Override
     public IWorkTogetherOnContextMenu workTogetherOn() throws RemoteException {
         WorkTogetherOnContextMenu.getInstance().setTree(tree);
         WorkTogetherOnContextMenu.getInstance().setTreeItem(getTreeItem());

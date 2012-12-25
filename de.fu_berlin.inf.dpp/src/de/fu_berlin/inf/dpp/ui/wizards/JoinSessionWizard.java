@@ -110,6 +110,7 @@ public class JoinSessionWizard extends Wizard {
     public boolean performFinish() {
         try {
             getContainer().run(true, true, new IRunnableWithProgress() {
+                @Override
                 public void run(IProgressMonitor monitor)
                     throws InvocationTargetException, InterruptedException {
                     try {
@@ -156,6 +157,7 @@ public class JoinSessionWizard extends Wizard {
     @Override
     public boolean performCancel() {
         Utils.runSafeAsync(log, new Runnable() {
+            @Override
             public void run() {
                 process.localCancel(null, CancelOption.NOTIFY_PEER);
             }
@@ -171,6 +173,7 @@ public class JoinSessionWizard extends Wizard {
          * next button
          */
         this.wizardDialog.addPageChangingListener(new IPageChangingListener() {
+            @Override
             public void handlePageChanging(PageChangingEvent event) {
                 pageChanges++;
             }
@@ -199,6 +202,7 @@ public class JoinSessionWizard extends Wizard {
         final int pageChangesAtStart = pageChanges;
 
         Utils.runSafeAsync(log, new Runnable() {
+            @Override
             public void run() {
                 try {
                     Thread.sleep(1000);
@@ -208,6 +212,7 @@ public class JoinSessionWizard extends Wizard {
                     return;
                 }
                 Utils.runSafeSWTAsync(log, new Runnable() {
+                    @Override
                     public void run() {
 
                         // User clicked next in the meantime
@@ -247,6 +252,7 @@ public class JoinSessionWizard extends Wizard {
         final CancelLocation cancelLocation) {
 
         Utils.runSafeSWTAsync(log, new Runnable() {
+            @Override
             public void run() {
                 Shell shell = wizardDialog.getShell();
                 if (shell == null || shell.isDisposed())
@@ -256,6 +262,7 @@ public class JoinSessionWizard extends Wizard {
         });
 
         Utils.runSafeSWTAsync(log, new Runnable() {
+            @Override
             public void run() {
                 showCancelMessage(jid, errorMsg, cancelLocation);
             }

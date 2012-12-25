@@ -80,6 +80,7 @@ public class MUCStateManager {
      * {@link IChatListener}s in case of a {@link ChatState} change.
      */
     protected PacketListener incomingMessageInterceptor = new PacketListener() {
+        @Override
         public void processPacket(Packet packet) {
             assert packet instanceof Message : "This interceptor is only intended to handle XMPP Messages";
             Message message = (Message) packet;

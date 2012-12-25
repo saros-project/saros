@@ -44,17 +44,20 @@ public class RosterContentProvider extends TreeContentProvider {
     @Inject
     protected DataTransferManager dataTransferManager;
     protected ITransferModeListener transferModeListener = new ITransferModeListener() {
+        @Override
         public void transferFinished(JID jid, NetTransferMode newMode,
             boolean incoming, long sizeTransferred, long sizeUncompressed,
             long transmissionMillisecs) {
             // do nothing
         }
 
+        @Override
         public void connectionChanged(JID jid, IByteStreamConnection connection) {
             ViewerUtils.update(viewer, new RosterEntryElement(roster, jid),
                 null);
         }
 
+        @Override
         public void clear() {
             ViewerUtils.refresh(viewer, true);
         }
@@ -63,10 +66,12 @@ public class RosterContentProvider extends TreeContentProvider {
     @Inject
     protected DiscoveryManager discoveryManager;
     protected DiscoveryManagerListener discoveryManagerListener = new DiscoveryManagerListener() {
+        @Override
         public void featureSupportUpdated(final JID jid, String feature,
             boolean isSupported) {
             if (Saros.NAMESPACE.equals(feature)) {
                 Utils.runSafeSWTAsync(log, new Runnable() {
+                    @Override
                     public void run() {
                         // ViewerUtils.refresh(viewer, true);
                         ViewerUtils.update(viewer, new RosterEntryElement(
@@ -79,19 +84,23 @@ public class RosterContentProvider extends TreeContentProvider {
 
     protected Roster roster;
     protected RosterListener rosterListener = new RosterListener() {
+        @Override
         public void presenceChanged(Presence presence) {
             ViewerUtils.update(viewer, new RosterEntryElement(roster, new JID(
                 presence.getFrom())), null);
         }
 
+        @Override
         public void entriesUpdated(Collection<String> addresses) {
             ViewerUtils.refresh(viewer, true);
         }
 
+        @Override
         public void entriesDeleted(Collection<String> addresses) {
             ViewerUtils.refresh(viewer, true);
         }
 
+        @Override
         public void entriesAdded(Collection<String> addresses) {
             for (Iterator<String> iterator = addresses.iterator(); iterator
                 .hasNext();) {

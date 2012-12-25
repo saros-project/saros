@@ -94,6 +94,7 @@ public class ConcurrentEditingWith3BuddiesTest extends StfTestCase {
          * The Alice-Thread insert the lower case characters
          */
         TestThread.Runnable aliceEditTask = new TestThread.Runnable() {
+            @Override
             public void run() throws Exception {
 
                 int i = 97;
@@ -117,6 +118,7 @@ public class ConcurrentEditingWith3BuddiesTest extends StfTestCase {
          * The Carl-Thread delete a range of characters
          */
         TestThread.Runnable carlEditTask = new TestThread.Runnable() {
+            @Override
             public void run() throws Exception {
                 int i = 48;
                 while (!Thread.currentThread().isInterrupted()) {
@@ -142,6 +144,7 @@ public class ConcurrentEditingWith3BuddiesTest extends StfTestCase {
          * The Bob-Thread insert the upper case characters
          */
         TestThread.Runnable bobEditTask = new TestThread.Runnable() {
+            @Override
             public void run() throws Exception {
                 int i = 65;
                 while (!Thread.currentThread().isInterrupted()) {
@@ -236,6 +239,7 @@ public class ConcurrentEditingWith3BuddiesTest extends StfTestCase {
          * The Alice-Thread insert the lower case characters
          */
         TestThread.Runnable aliceEditTask = new TestThread.Runnable() {
+            @Override
             public void run() throws Exception {
                 int i = 97;
                 while (!Thread.currentThread().isInterrupted()) {
@@ -257,6 +261,7 @@ public class ConcurrentEditingWith3BuddiesTest extends StfTestCase {
          * The Carl-Thread insert numbers
          */
         TestThread.Runnable carlEditTask = new TestThread.Runnable() {
+            @Override
             public void run() throws Exception {
                 int i = 48;
                 while (!Thread.currentThread().isInterrupted()) {
@@ -278,6 +283,7 @@ public class ConcurrentEditingWith3BuddiesTest extends StfTestCase {
          * The Bob-Thread insert the upper case characters
          */
         TestThread.Runnable bobEditTask = new TestThread.Runnable() {
+            @Override
             public void run() throws Exception {
                 int i = 65;
                 while (!Thread.currentThread().isInterrupted()) {

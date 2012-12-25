@@ -28,6 +28,7 @@ public class StateChangeNotifier<T> extends HashSet<StateChangeListener<T>> {
      */
     public void chain(StateChangeNotifier<T> sender) {
         sender.add(new StateChangeListener<T>() {
+            @Override
             public void stateChangedNotification(T t) {
                 StateChangeNotifier.this.notify(t);
             }
@@ -43,6 +44,7 @@ public class StateChangeNotifier<T> extends HashSet<StateChangeListener<T>> {
      */
     public <S> void chain(StateChangeNotifier<S> sender, final T toSender) {
         sender.add(new StateChangeListener<S>() {
+            @Override
             public void stateChangedNotification(S s) {
                 StateChangeNotifier.this.notify(toSender);
             }

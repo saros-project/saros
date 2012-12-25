@@ -91,10 +91,12 @@ public class DataTransferCollector extends AbstractStatisticCollector {
         this.dataTransferManager.getTransferModeDispatch().add(
             new ITransferModeListener() {
 
+                @Override
                 public void clear() {
                     // do nothing
                 }
 
+                @Override
                 public void transferFinished(JID jid, NetTransferMode newMode,
                     boolean incoming, long sizeTransferred,
                     long sizeUncompressed, long transmissionMillisecs) {
@@ -103,6 +105,7 @@ public class DataTransferCollector extends AbstractStatisticCollector {
                         transmissionMillisecs));
                 }
 
+                @Override
                 public void connectionChanged(JID jid,
                     IByteStreamConnection connection) {
                     // do nothing
@@ -117,6 +120,7 @@ public class DataTransferCollector extends AbstractStatisticCollector {
         List<Pair<NetTransferMode, List<TransferEvent>>> transferClasses = Pair
             .partition(transferEvents,
                 new Function<TransferEvent, NetTransferMode>() {
+                    @Override
                     public NetTransferMode apply(TransferEvent u) {
                         return u.getMode();
                     }

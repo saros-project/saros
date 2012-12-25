@@ -81,10 +81,12 @@ public class BinaryChannelConnection implements IByteStreamConnection {
         this.receiveThread.start();
     }
 
+    @Override
     public synchronized boolean isConnected() {
         return binaryChannel.isConnected();
     }
 
+    @Override
     public synchronized void close() {
         if (!isConnected())
             return;
@@ -94,14 +96,17 @@ public class BinaryChannelConnection implements IByteStreamConnection {
         binaryChannel.close();
     }
 
+    @Override
     public NetTransferMode getMode() {
         return binaryChannel.getTransferMode();
     }
 
+    @Override
     public JID getPeer() {
         return peer;
     }
 
+    @Override
     public void send(TransferDescription data, byte[] content)
         throws IOException {
 

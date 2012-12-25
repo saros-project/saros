@@ -195,6 +195,7 @@ public class EnterProjectNamePage extends WizardPage {
             public void run() {
                 Utils.runSafeSWTSync(log, new Runnable() {
 
+                    @Override
                     public void run() {
 
                         if (EnterProjectNamePage.this.getControl().isDisposed()) {
@@ -464,6 +465,7 @@ public class EnterProjectNamePage extends WizardPage {
     protected void attachListeners(final String projectID) {
 
         ModifyListener m = new ModifyListener() {
+            @Override
             public void modifyText(ModifyEvent e) {
                 updatePageComplete(projectID);
             }
@@ -485,6 +487,7 @@ public class EnterProjectNamePage extends WizardPage {
         this.projUpdates.get(projectID).addSelectionListener(
             new SelectionListener() {
 
+                @Override
                 public void widgetSelected(SelectionEvent e) {
 
                     // remove the reserved name, because it's not used anymore
@@ -509,6 +512,7 @@ public class EnterProjectNamePage extends WizardPage {
 
                 }
 
+                @Override
                 public void widgetDefaultSelected(SelectionEvent e) {
                     // do nothing
                 }

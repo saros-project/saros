@@ -88,6 +88,7 @@ public class TextEditActivity extends AbstractActivity implements
         return replacedText;
     }
 
+    @Override
     public SPath getPath() {
         return this.path;
     }
@@ -187,10 +188,12 @@ public class TextEditActivity extends AbstractActivity implements
         return null;
     }
 
+    @Override
     public void dispatch(IActivityReceiver receiver) {
         receiver.receive(this);
     }
 
+    @Override
     public IActivityDataObject getActivityDataObject(ISarosSession sarosSession) {
         return new TextEditActivityDataObject(source.getJID(), offset, text,
             replacedText, path.toSPathDataObject(sarosSession));

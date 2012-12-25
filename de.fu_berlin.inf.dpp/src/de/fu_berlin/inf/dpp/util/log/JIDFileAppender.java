@@ -84,6 +84,7 @@ public class JIDFileAppender extends FileAppender {
 
     private IConnectionListener listener = new IConnectionListener() {
 
+        @Override
         public void connectionStateChanged(Connection connection,
             ConnectionState newState) {
 

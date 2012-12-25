@@ -32,16 +32,19 @@ public final class NewC extends StfRemoteObject implements INewC {
         this.tree = tree;
     }
 
+    @Override
     public void project(String projectName) throws RemoteException {
         ContextMenuHelper.clickContextMenu(tree, MENU_NEW, MENU_PROJECT);
         confirmWizardNewProject(projectName);
     }
 
+    @Override
     public void javaProject(String projectName) throws RemoteException {
         ContextMenuHelper.clickContextMenu(tree, MENU_NEW, MENU_JAVA_PROJECT);
         confirmShellNewJavaProject(projectName);
     }
 
+    @Override
     public void folder(String folderName) throws RemoteException {
 
         ContextMenuHelper.clickContextMenu(tree, MENU_NEW, MENU_FOLDER);
@@ -49,24 +52,28 @@ public final class NewC extends StfRemoteObject implements INewC {
 
     }
 
+    @Override
     public void pkg(String projectName, String pkg) throws RemoteException {
 
         ContextMenuHelper.clickContextMenu(tree, MENU_NEW, MENU_PACKAGE);
         confirmShellNewJavaPackage(projectName, pkg);
     }
 
+    @Override
     public void file(String fileName) throws RemoteException {
 
         ContextMenuHelper.clickContextMenu(tree, MENU_NEW, MENU_FILE);
         confirmShellNewFile(fileName);
     }
 
+    @Override
     public void cls(String className) throws RemoteException {
 
         ContextMenuHelper.clickContextMenu(tree, MENU_NEW, MENU_CLASS);
         confirmShellNewJavaClass(className);
     }
 
+    @Override
     public void cls(String projectName, String pkg, String className)
         throws RemoteException {
 
@@ -83,6 +90,7 @@ public final class NewC extends StfRemoteObject implements INewC {
         // }
     }
 
+    @Override
     public void clsImplementsRunnable(String className) throws RemoteException {
 
         RemoteWorkbenchBot.getInstance().menu(MENU_FILE).menu(MENU_NEW)
@@ -108,6 +116,7 @@ public final class NewC extends StfRemoteObject implements INewC {
         shell.waitLongUntilIsClosed();
     }
 
+    @Override
     public void javaProjectWithClasses(String projectName, String pkg,
         String... classNames) throws RemoteException {
         javaProject(projectName);

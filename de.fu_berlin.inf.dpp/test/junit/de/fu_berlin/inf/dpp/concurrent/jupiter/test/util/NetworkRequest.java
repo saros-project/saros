@@ -42,6 +42,7 @@ public class NetworkRequest implements Comparable<NetworkRequest> {
         return jupiterActivity;
     }
 
+    @Override
     public int compareTo(NetworkRequest o) {
         return Integer.valueOf(delay).compareTo(o.delay);
     }

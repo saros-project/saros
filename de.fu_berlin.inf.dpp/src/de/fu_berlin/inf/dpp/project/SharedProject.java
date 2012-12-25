@@ -167,6 +167,7 @@ public class SharedProject {
 
     /** Used only for logging. */
     private ISubscriberChangeListener subscriberChangeListener = new ISubscriberChangeListener() {
+        @Override
         public void subscriberResourceChanged(ISubscriberChangeEvent[] deltas) {
             if (!log.isTraceEnabled())
                 return;
@@ -446,6 +447,7 @@ public class SharedProject {
         IResourceVisitor visitor = new IResourceVisitor() {
             boolean result = false;
 
+            @Override
             public boolean visit(IResource resource) {
                 if (resource == null)
                     return result;

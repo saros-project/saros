@@ -47,6 +47,7 @@ public class SaveActionConfigurator implements IPreferenceManipulator {
     private static final Logger log = Logger
         .getLogger(SaveActionConfigurator.class.getName());
 
+    @Override
     public boolean isEnabled(IProject project) {
 
         // We could access the preferences directly as in {@link
@@ -68,6 +69,7 @@ public class SaveActionConfigurator implements IPreferenceManipulator {
         return EDITOR_SAVE_PARTICIPANT_PREFIX + POSTSAVELISTENER_ID;
     }
 
+    @Override
     public IRestorePoint change(final IProject project) {
 
         IEclipsePreferences prefs = new ProjectScope(project)
@@ -84,6 +86,7 @@ public class SaveActionConfigurator implements IPreferenceManipulator {
 
         return new IRestorePoint() {
 
+            @Override
             public void restore() {
                 IEclipsePreferences prefs = new ProjectScope(project)
                     .getNode(JavaUI.ID_PLUGIN);
@@ -99,15 +102,18 @@ public class SaveActionConfigurator implements IPreferenceManipulator {
         };
     }
 
+    @Override
     public StateChangeNotifier<IPreferenceManipulator> getPreferenceStateChangeNotifier(
         IProject project) {
         return null;
     }
 
+    @Override
     public boolean isDangerousForClient() {
         return true;
     }
 
+    @Override
     public boolean isDangerousForHost() {
         return true;
     }

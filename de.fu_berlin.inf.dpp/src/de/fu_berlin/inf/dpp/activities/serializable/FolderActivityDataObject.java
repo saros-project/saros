@@ -79,6 +79,7 @@ public class FolderActivityDataObject extends AbstractProjectActivityDataObject 
             + ")";
     }
 
+    @Override
     public IActivity getActivity(ISarosSession sarosSession) {
         return new FolderActivity(sarosSession.getUser(source), type,
             path.toSPath(sarosSession));

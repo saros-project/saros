@@ -33,6 +33,7 @@ public class ProjectSelectionWizardPage extends WizardPage {
      * state according to the selected {@link IProject}.
      */
     protected ResourceSelectionListener resourceSelectionListener = new ResourceSelectionListener() {
+        @Override
         public void resourceSelectionChanged(ResourceSelectionChangedEvent event) {
             if (resourceSelectionComposite != null
                 && !resourceSelectionComposite.isDisposed()) {
@@ -46,6 +47,7 @@ public class ProjectSelectionWizardPage extends WizardPage {
             }
         }
 
+        @Override
         public void filterClosedProjectsChanged(
             FilterClosedProjectsChangedEvent event) {
             PlatformUI.getPreferenceStore().setValue(
@@ -60,6 +62,7 @@ public class ProjectSelectionWizardPage extends WizardPage {
         setDescription(Messages.ProjectSelectionWizardPage_description);
     }
 
+    @Override
     public void createControl(Composite parent) {
         Composite composite = new Composite(parent, SWT.NONE);
         setControl(composite);

@@ -92,6 +92,7 @@ public class FeedbackManager extends AbstractFeedbackManager implements
          */
         Utils.runSafeAsync(log, new Runnable() {
 
+            @Override
             public void run() {
                 if (showFeedbackDialog(FEEDBACK_REQUEST)) {
                     int browserType = showSurvey();
@@ -107,6 +108,7 @@ public class FeedbackManager extends AbstractFeedbackManager implements
 
     protected IPropertyChangeListener propertyListener = new IPropertyChangeListener() {
 
+        @Override
         public void propertyChange(PropertyChangeEvent event) {
             if (event.getProperty().equals(
                 PreferenceConstants.FEEDBACK_SURVEY_INTERVAL)) {
@@ -333,6 +335,7 @@ public class FeedbackManager extends AbstractFeedbackManager implements
         try {
             return Utils.runSWTSync(new Callable<Boolean>() {
 
+                @Override
                 public Boolean call() {
                     Dialog dialog = new FeedbackDialog(EditorAPI.getShell(),
                         saros, FeedbackManager.this, message);

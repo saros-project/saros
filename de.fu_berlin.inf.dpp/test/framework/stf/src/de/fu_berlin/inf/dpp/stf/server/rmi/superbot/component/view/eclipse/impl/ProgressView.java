@@ -24,11 +24,13 @@ public final class ProgressView extends StfRemoteObject implements
         return this;
     }
 
+    @Override
     public void removeProgress() throws RemoteException {
         view.bot().toolbarButton().click();
 
     }
 
+    @Override
     public void removeProcess(int index) throws RemoteException {
         view.toolbarButton(TB_REMOVE_ALL_FINISHED_OPERATIONS).click();
         view.bot().toolbarButton(index).click();

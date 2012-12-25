@@ -56,6 +56,7 @@ public class SubscriptionManager {
     private CopyOnWriteArrayList<SubscriptionManagerListener> subscriptionManagerListeners = new CopyOnWriteArrayList<SubscriptionManagerListener>();
 
     private IConnectionListener connectionListener = new IConnectionListener() {
+        @Override
         public void connectionStateChanged(Connection connection,
             ConnectionState connectionSate) {
 
@@ -68,6 +69,7 @@ public class SubscriptionManager {
 
     private PacketListener packetListener = new SafePacketListener(log,
         new PacketListener() {
+            @Override
             public void processPacket(Packet packet) {
                 processPresence((Presence) packet);
             }
@@ -218,6 +220,7 @@ public class SubscriptionManager {
     private void askUserForSubscriptionConfirmation(final Presence presence) {
 
         Utils.runSafeSWTAsync(log, new Runnable() {
+            @Override
             public void run() {
                 // TODO Should flash dialog
                 boolean accept = MessageDialog.openConfirm(
@@ -249,6 +252,7 @@ public class SubscriptionManager {
     private void informUserAboutUnsubscription(final String from) {
 
         Utils.runSafeSWTAsync(log, new Runnable() {
+            @Override
             public void run() {
                 MessageDialog.openInformation(
                     EditorAPI.getShell(),

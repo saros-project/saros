@@ -38,17 +38,20 @@ public final class RefactorC extends StfRemoteObject implements IRefactorC {
         this.type = type;
     }
 
+    @Override
     public void moveTo(String targetProject, String folder)
         throws RemoteException {
         moveTo(SHELL_MOVE, OK, targetProject.concat("/").concat(folder)
             .replace('\\', '/').split("/"));
     }
 
+    @Override
     public void moveClassTo(String targetProject, String targetPkg)
         throws RemoteException {
         moveTo(SHELL_MOVE, OK, targetProject, SRC, targetPkg);
     }
 
+    @Override
     public void rename(String newName) throws RemoteException {
         switch (type) {
         case JAVA_PROJECT:

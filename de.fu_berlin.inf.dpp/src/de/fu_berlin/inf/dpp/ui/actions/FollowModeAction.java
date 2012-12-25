@@ -95,8 +95,10 @@ public class FollowModeAction extends Action implements Disposable {
                  * called.
                  */
                 Utils.runSafeAsync(log, Utils.delay(1000, new Runnable() {
+                    @Override
                     public void run() {
                         Utils.runSafeSWTAsync(log, new Runnable() {
+                            @Override
                             public void run() {
                                 if (sessionManager.getSarosSession() != null) {
                                     FollowModeAction.this.run();
@@ -218,6 +220,7 @@ public class FollowModeAction extends Action implements Disposable {
         setEnabled(canFollow());
     }
 
+    @Override
     public void dispose() {
         sessionManager.removeSarosSessionListener(sessionListener);
         editorManager.removeSharedEditorListener(editorListener);

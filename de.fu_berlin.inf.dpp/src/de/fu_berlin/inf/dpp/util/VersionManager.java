@@ -378,6 +378,7 @@ public class VersionManager {
         this.transmitter = transmitter;
 
         receiver.addPacketListener(new PacketListener() {
+            @Override
             public void processPacket(Packet packet) {
 
                 @SuppressWarnings("unchecked")

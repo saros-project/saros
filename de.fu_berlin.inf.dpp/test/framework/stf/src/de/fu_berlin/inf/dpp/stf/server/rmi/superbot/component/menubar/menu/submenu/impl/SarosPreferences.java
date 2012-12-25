@@ -32,6 +32,7 @@ public final class SarosPreferences extends StfRemoteObject implements
         return INSTANCE;
     }
 
+    @Override
     public void createAccount(JID jid, String password) throws RemoteException {
         SWTBotShell preferencesShell = preCondition();
 
@@ -63,6 +64,7 @@ public final class SarosPreferences extends StfRemoteObject implements
 
     }
 
+    @Override
     public void addAccount(JID jid, String password) throws RemoteException {
         SWTBotShell shell = preCondition();
         shell
@@ -77,6 +79,7 @@ public final class SarosPreferences extends StfRemoteObject implements
         shell.bot().waitUntil(SarosConditions.isShellClosed(shell));
     }
 
+    @Override
     public void activateAccount(JID jid) throws RemoteException {
         assert existsAccount(jid) : "the account (" + jid.getBase()
             + ") doesn't exist yet!";
@@ -109,6 +112,7 @@ public final class SarosPreferences extends StfRemoteObject implements
         shell.bot().waitUntil(SarosConditions.isShellClosed(shell));
     }
 
+    @Override
     public void editAccount(JID jid, String newXmppJabberID, String newPassword)
         throws RemoteException {
         SWTBotShell shell = preCondition();
@@ -126,6 +130,7 @@ public final class SarosPreferences extends StfRemoteObject implements
         shell.bot().waitUntil(SarosConditions.isShellClosed(shell));
     }
 
+    @Override
     public void removeAccount(JID jid) throws RemoteException {
 
         if (!isAccountExistNoGUI(jid))
@@ -160,6 +165,7 @@ public final class SarosPreferences extends StfRemoteObject implements
                 "it is not allowed to remove an active account");
     }
 
+    @Override
     public void removeAllNonActiveAccounts() throws RemoteException {
 
         SWTBotShell shell = preCondition();
@@ -199,6 +205,7 @@ public final class SarosPreferences extends StfRemoteObject implements
         shell.bot().waitUntil(Conditions.shellCloses(shell));
     }
 
+    @Override
     public void setupSettingForScreensharing(int encoder, int videoResolution,
         int bandWidth, int capturedArea) throws RemoteException {
         clickMenuSarosPreferences();
@@ -217,10 +224,12 @@ public final class SarosPreferences extends StfRemoteObject implements
         shell.bot().waitUntil(SarosConditions.isShellClosed(shell));
     }
 
+    @Override
     public void enableIBBOnlyTransfer() throws RemoteException {
         setIBBOnlyTransfer(true);
     }
 
+    @Override
     public void disableIBBOnlyTransfer() throws RemoteException {
         setIBBOnlyTransfer(false);
     }
@@ -251,6 +260,7 @@ public final class SarosPreferences extends StfRemoteObject implements
         shell.bot().waitUntil(SarosConditions.isShellClosed(shell));
     }
 
+    @Override
     public void disableAutomaticReminder() throws RemoteException {
         if (!FeedbackManager.isFeedbackDisabled(getSaros())) {
             clickMenuSarosPreferences();
@@ -271,12 +281,14 @@ public final class SarosPreferences extends StfRemoteObject implements
         }
     }
 
+    @Override
     public void disableAutomaticReminderNoGUI() throws RemoteException {
         if (!FeedbackManager.isFeedbackDisabled(getSaros())) {
             FeedbackManager.setFeedbackDisabled(getSaros(), true);
         }
     }
 
+    @Override
     public boolean existsAccount() throws RemoteException {
         try {
             SWTBotShell shell = preCondition();
@@ -296,6 +308,7 @@ public final class SarosPreferences extends StfRemoteObject implements
 
     }
 
+    @Override
     public boolean existsAccount(JID jid) throws RemoteException {
         try {
             SWTBotShell shell = preCondition();
@@ -321,6 +334,7 @@ public final class SarosPreferences extends StfRemoteObject implements
         }
     }
 
+    @Override
     public JID getActiveAccount() throws RemoteException {
 
         SWTBotShell shell = preCondition();
@@ -339,6 +353,7 @@ public final class SarosPreferences extends StfRemoteObject implements
         }
     }
 
+    @Override
     public boolean isAccountActive(JID jid) throws RemoteException {
         try {
 
@@ -399,6 +414,7 @@ public final class SarosPreferences extends StfRemoteObject implements
             0);
     }
 
+    @Override
     public void setNeedBasedActivated(boolean activate) throws RemoteException {
         SWTBotShell shell = preCondition();
         shell.bot().sleep(500);
@@ -416,6 +432,7 @@ public final class SarosPreferences extends StfRemoteObject implements
         shell.bot().waitUntil(SarosConditions.isShellClosed(shell));
     }
 
+    @Override
     public void restoreDefaults() throws RemoteException {
         SWTBotShell shell = preCondition();
         shell.bot().button(RESTORE_DEFAULTS).click();

@@ -62,6 +62,7 @@ public class GiveWriteAccessAction extends Action implements Disposable {
     };
 
     protected ISelectionListener selectionListener = new ISelectionListener() {
+        @Override
         public void selectionChanged(IWorkbenchPart part, ISelection selection) {
             updateEnablement();
         }
@@ -100,6 +101,7 @@ public class GiveWriteAccessAction extends Action implements Disposable {
     @Override
     public void run() {
         Utils.runSafeSync(log, new Runnable() {
+            @Override
             public void run() {
                 List<User> participants = SelectionRetrieverFactory
                     .getSelectionRetriever(User.class).getSelection();
@@ -134,6 +136,7 @@ public class GiveWriteAccessAction extends Action implements Disposable {
         }
     }
 
+    @Override
     public void dispose() {
         SelectionUtils.getSelectionService().removeSelectionListener(
             selectionListener);

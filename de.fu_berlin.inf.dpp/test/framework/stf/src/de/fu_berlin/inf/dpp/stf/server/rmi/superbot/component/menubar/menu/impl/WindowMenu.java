@@ -22,6 +22,7 @@ public final class WindowMenu extends StfRemoteObject implements IWindowMenu {
         return INSTANCE;
     }
 
+    @Override
     public void setNewTextFileLineDelimiter(String OS) throws RemoteException {
         clickMenuPreferences();
         IRemoteBotShell shell = RemoteWorkbenchBot.getInstance().shell(
@@ -45,6 +46,7 @@ public final class WindowMenu extends StfRemoteObject implements IWindowMenu {
             SHELL_PREFERNCES);
     }
 
+    @Override
     public void clickMenuPreferences() throws RemoteException {
         if (WidgetUtil.getOperatingSystem() == WidgetUtil.OperatingSystem.MAC)
             RemoteWorkbenchBot.getInstance().menu("Eclipse")
@@ -54,16 +56,19 @@ public final class WindowMenu extends StfRemoteObject implements IWindowMenu {
                 .menu(MENU_PREFERENCES).click();
     }
 
+    @Override
     public void showViewProblems() throws RemoteException {
         showViewWithName(TREE_ITEM_GENERAL_IN_SHELL_SHOW_VIEW,
             TREE_ITEM_PROBLEM_IN_SHELL_SHOW_VIEW);
     }
 
+    @Override
     public void showViewProjectExplorer() throws RemoteException {
         showViewWithName(TREE_ITEM_GENERAL_IN_SHELL_SHOW_VIEW,
             TREE_ITEM_PROJECT_EXPLORER_IN_SHELL_SHOW_VIEW);
     }
 
+    @Override
     public void showViewWithName(String parentNode, String node)
         throws RemoteException {
         RemoteWorkbenchBot.getInstance().activateWorkbench();
@@ -73,6 +78,7 @@ public final class WindowMenu extends StfRemoteObject implements IWindowMenu {
             .confirmWithTreeWithFilterText(parentNode, node, OK);
     }
 
+    @Override
     public void openPerspective() throws RemoteException {
         switch (Perspective.WHICH_PERSPECTIVE) {
         case JAVA:
@@ -90,21 +96,25 @@ public final class WindowMenu extends StfRemoteObject implements IWindowMenu {
         }
     }
 
+    @Override
     public void openPerspectiveResource() throws RemoteException {
         RemoteWorkbenchBot.getInstance().openPerspectiveWithId(
             ID_RESOURCE_PERSPECTIVE);
     }
 
+    @Override
     public void openPerspectiveJava() throws RemoteException {
         RemoteWorkbenchBot.getInstance().openPerspectiveWithId(
             ID_JAVA_PERSPECTIVE);
     }
 
+    @Override
     public void openPerspectiveDebug() throws RemoteException {
         RemoteWorkbenchBot.getInstance().openPerspectiveWithId(
             ID_DEBUG_PERSPECTIVE);
     }
 
+    @Override
     public String getTextFileLineDelimiter() throws RemoteException {
         clickMenuPreferences();
         IRemoteBotShell shell = RemoteWorkbenchBot.getInstance().shell(
@@ -129,6 +139,7 @@ public final class WindowMenu extends StfRemoteObject implements IWindowMenu {
         return "";
     }
 
+    @Override
     public boolean isJavaPerspectiveActive() throws RemoteException {
         try {
             return RemoteWorkbenchBot.getInstance().isPerspectiveActive(
@@ -139,6 +150,7 @@ public final class WindowMenu extends StfRemoteObject implements IWindowMenu {
         }
     }
 
+    @Override
     public boolean isDebugPerspectiveActive() throws RemoteException {
         try {
             return RemoteWorkbenchBot.getInstance().isPerspectiveActive(

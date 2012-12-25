@@ -46,6 +46,7 @@ public class StartupSaros implements IStartup {
      * from a separate thread
      */
 
+    @Override
     public void earlyStartup() {
 
         if (xmppAccountStore.isEmpty())
@@ -86,6 +87,7 @@ public class StartupSaros implements IStartup {
     private void startRmiBot(final int port) {
 
         Utils.runSafeAsync("RmiSWTWorkbenchBot-", log, new Runnable() {
+            @Override
             public void run() {
                 try {
                     STFController.start(port, context);
@@ -98,6 +100,7 @@ public class StartupSaros implements IStartup {
 
     private void showSarosView() {
         Utils.runSafeSWTAsync(log, new Runnable() {
+            @Override
             public void run() {
                 IIntroManager m = PlatformUI.getWorkbench().getIntroManager();
                 IIntroPart i = m.getIntro();

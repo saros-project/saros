@@ -9,24 +9,28 @@ import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
 public class SharedProjectListenerDispatch implements ISharedProjectListener {
     protected List<ISharedProjectListener> listeners = new CopyOnWriteArrayList<ISharedProjectListener>();
 
+    @Override
     public void invitationCompleted(User user) {
         for (ISharedProjectListener listener : this.listeners) {
             listener.invitationCompleted(user);
         }
     }
 
+    @Override
     public void permissionChanged(User user) {
         for (ISharedProjectListener listener : this.listeners) {
             listener.permissionChanged(user);
         }
     }
 
+    @Override
     public void userJoined(User user) {
         for (ISharedProjectListener listener : this.listeners) {
             listener.userJoined(user);
         }
     }
 
+    @Override
     public void userLeft(User user) {
         for (ISharedProjectListener listener : this.listeners) {
             listener.userLeft(user);

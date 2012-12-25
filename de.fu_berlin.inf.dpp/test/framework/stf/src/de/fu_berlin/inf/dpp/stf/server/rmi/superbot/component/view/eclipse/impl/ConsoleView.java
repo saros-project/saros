@@ -26,10 +26,12 @@ public final class ConsoleView extends StfRemoteObject implements IConsoleView {
         return this;
     }
 
+    @Override
     public String getFirstTextInConsole() throws RemoteException {
         return view.bot().styledText().getText();
     }
 
+    @Override
     public boolean existTextInConsole() throws RemoteException {
         try {
             if (view.bot().styledText().getText().equals(""))
@@ -41,12 +43,15 @@ public final class ConsoleView extends StfRemoteObject implements IConsoleView {
         }
     }
 
+    @Override
     public void waitUntilExistsTextInConsole() throws RemoteException {
         RemoteWorkbenchBot.getInstance().waitUntil(new DefaultCondition() {
+            @Override
             public boolean test() throws Exception {
                 return existTextInConsole();
             }
 
+            @Override
             public String getFailureMessage() {
                 return "the console view contains no text";
             }

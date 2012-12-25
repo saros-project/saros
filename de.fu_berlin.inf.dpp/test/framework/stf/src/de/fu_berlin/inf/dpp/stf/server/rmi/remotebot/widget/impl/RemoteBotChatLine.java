@@ -22,6 +22,7 @@ public final class RemoteBotChatLine extends StfRemoteObject implements
         return this;
     }
 
+    @Override
     public String getText() throws RemoteException {
         return widget.getText();
     }

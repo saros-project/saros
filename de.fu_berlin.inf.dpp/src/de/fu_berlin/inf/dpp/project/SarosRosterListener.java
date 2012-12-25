@@ -27,18 +27,22 @@ import de.fu_berlin.inf.dpp.util.Utils;
 public class SarosRosterListener {
 
     public class Listener implements IRosterListener {
+        @Override
         public void entriesAdded(Collection<String> addresses) {
             // ignore
         }
 
+        @Override
         public void entriesUpdated(Collection<String> addresses) {
             // TODO Check if it affects one of our participants in a session
         }
 
+        @Override
         public void entriesDeleted(Collection<String> addresses) {
             // TODO Check if it affects one of our participants in a session
         }
 
+        @Override
         public void presenceChanged(Presence presence) {
 
             ISarosSession sarosSession = sarosSessionObservable.getValue();
@@ -81,6 +85,7 @@ public class SarosRosterListener {
                 user.setConnectionState(User.UserConnectionState.OFFLINE);
         }
 
+        @Override
         public void rosterChanged(Roster roster) {
 
             if (roster == null) {

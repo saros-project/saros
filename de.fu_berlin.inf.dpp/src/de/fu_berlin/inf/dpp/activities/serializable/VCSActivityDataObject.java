@@ -36,6 +36,7 @@ public class VCSActivityDataObject extends AbstractProjectActivityDataObject {
         this.containedActivity = containedActivity;
     }
 
+    @Override
     public IActivity getActivity(ISarosSession sarosSession) {
         SPath sPath = path == null ? null : path.toSPath(sarosSession);
         User user = sarosSession == null ? null : sarosSession.getUser(source);

@@ -375,10 +375,12 @@ public final class PackageExplorerView extends StfRemoteObject implements
         final String... fileNodes) throws RemoteException {
 
         RemoteWorkbenchBot.getInstance().waitUntil(new DefaultCondition() {
+            @Override
             public boolean test() throws Exception {
                 return getFileContent(fileNodes).equals(otherClassContent);
             }
 
+            @Override
             public String getFailureMessage() {
                 return "the content of the file " + Arrays.toString(fileNodes)
                     + " does not match: " + otherClassContent;
@@ -390,10 +392,12 @@ public final class PackageExplorerView extends StfRemoteObject implements
     public void waitUntilResourceIsShared(final String path)
         throws RemoteException {
         RemoteWorkbenchBot.getInstance().waitLongUntil(new DefaultCondition() {
+            @Override
             public boolean test() throws Exception {
                 return isResourceShared(path);
             }
 
+            @Override
             public String getFailureMessage() {
                 return "the resource " + path
                     + " is not shared in the current session";

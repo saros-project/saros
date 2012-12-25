@@ -161,10 +161,12 @@ public final class GeneralPreferencePage extends FieldEditorPreferencePage
 
         accountList.addSelectionListener(new SelectionListener() {
 
+            @Override
             public void widgetSelected(SelectionEvent e) {
                 handleEvent();
             }
 
+            @Override
             public void widgetDefaultSelected(SelectionEvent e) {
                 handleEvent();
             }
@@ -250,6 +252,7 @@ public final class GeneralPreferencePage extends FieldEditorPreferencePage
     private void createAddAccountButton(Composite composite) {
         createAccountGroupButton(composite, ADD_IMAGE, ADD_BTN_TEXT,
             new Listener() {
+                @Override
                 public void handleEvent(Event event) {
                     WizardUtils.openAddXMPPAccountWizard();
                     activateAccountButton.setEnabled(false);
@@ -264,6 +267,7 @@ public final class GeneralPreferencePage extends FieldEditorPreferencePage
     private void createEditAccountButton(Composite composite) {
         editAccountButton = createAccountGroupButton(composite, CHANGE_IMAGE,
             CHANGE_BTN_TEXT, new Listener() {
+                @Override
                 public void handleEvent(Event event) {
                     if (WizardUtils
                         .openEditXMPPAccountWizard(getSelectedAccount()) != null) {
@@ -281,6 +285,7 @@ public final class GeneralPreferencePage extends FieldEditorPreferencePage
     private void createRemoveAccountButton(Composite composite) {
         removeAccountButton = createAccountGroupButton(composite, DELETE_IMAGE,
             REMOVE_BTN_TEXT, new Listener() {
+                @Override
                 public void handleEvent(Event event) {
                     if (MessageDialog.openQuestion(
                         GeneralPreferencePage.this.getShell(),
@@ -305,6 +310,7 @@ public final class GeneralPreferencePage extends FieldEditorPreferencePage
     private void createActivateAccountButton(Composite composite) {
         activateAccountButton = createAccountGroupButton(composite,
             ACTIVATE_IMAGE, ACTIVATE_BTN_TEXT, new Listener() {
+                @Override
                 public void handleEvent(Event event) {
                     accountStore.setAccountActive(getSelectedAccount());
                     updateInfoLabel();
@@ -354,6 +360,7 @@ public final class GeneralPreferencePage extends FieldEditorPreferencePage
             NEEDS_BASED_SYNC_TEXT, group));
     }
 
+    @Override
     public void init(IWorkbench workbench) {
         // Nothing to initialize
     }

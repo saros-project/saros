@@ -91,6 +91,7 @@ public class Jupiter implements Algorithm {
     /**
      * @see Algorithm#generateJupiterActivity(Operation, User, SPath)
      */
+    @Override
     public JupiterActivity generateJupiterActivity(Operation op, User source,
         SPath editor) {
 
@@ -158,6 +159,7 @@ public class Jupiter implements Algorithm {
     /**
      * @see de.fu_berlin.inf.dpp.concurrent.jupiter.Algorithm#receiveJupiterActivity(de.fu_berlin.inf.dpp.activities.business.JupiterActivity)
      */
+    @Override
     public Operation receiveJupiterActivity(JupiterActivity jupiterActivity)
         throws TransformationException {
 
@@ -188,6 +190,7 @@ public class Jupiter implements Algorithm {
      * @see de.fu_berlin.inf.dpp.concurrent.jupiter.Algorithm#acknowledge(int,
      *      de.fu_berlin.inf.dpp.concurrent.jupiter.Timestamp)
      */
+    @Override
     public void acknowledge(int siteId, Timestamp timestamp)
         throws TransformationException {
         discardAcknowledgedOperations((JupiterVectorTime) timestamp);
@@ -197,6 +200,7 @@ public class Jupiter implements Algorithm {
      * @see de.fu_berlin.inf.dpp.concurrent.jupiter.Algorithm#transformIndices(de.fu_berlin.inf.dpp.concurrent.jupiter.Timestamp,
      *      int[])
      */
+    @Override
     public int[] transformIndices(Timestamp timestamp, int[] indices)
         throws TransformationException {
         checkPreconditions((JupiterVectorTime) timestamp);
@@ -377,6 +381,7 @@ public class Jupiter implements Algorithm {
     /**
      * @see de.fu_berlin.inf.dpp.concurrent.jupiter.Algorithm#getTimestamp()
      */
+    @Override
     public synchronized Timestamp getTimestamp() {
         return this.vectorTime;
     }
@@ -390,6 +395,7 @@ public class Jupiter implements Algorithm {
         return this.isClientSide;
     }
 
+    @Override
     public void updateVectorTime(Timestamp timestamp)
         throws TransformationException {
         if (this.ackJupiterActivityList.size() > 0) {

@@ -210,6 +210,7 @@ public class VideoSharing {
     protected VideoPlayerView getVideoPlayer() {
         Callable<VideoPlayerView> getView = new Callable<VideoPlayerView>() {
 
+            @Override
             public VideoPlayerView call() throws Exception {
                 sarosUI.createVideoPlayerView();
                 IViewPart view = Utils
@@ -272,6 +273,7 @@ public class VideoSharing {
         final String message = e.getMessage();
 
         Utils.runSafeSWTAsync(log, new Runnable() {
+            @Override
             public void run() {
                 DialogUtils.openErrorMessageDialog(EditorAPI.getShell(), title,
                     message);
@@ -494,6 +496,7 @@ public class VideoSharing {
             videoDisplay = getVideoPlayer();
 
             Utils.runSafeSWTAsync(log, new Runnable() {
+                @Override
                 public void run() {
                     sarosUI.activateVideoPlayerView();
                 }
@@ -508,6 +511,7 @@ public class VideoSharing {
 
             errorThread = Utils.runSafeAsync("VideoSharing-ErrorReceiver", log,
                 new Runnable() {
+                    @Override
                     public void run() {
                         try {
                             Object errorRaw = connectionFactory
@@ -591,6 +595,7 @@ public class VideoSharing {
         /**
          * Stops this session and disposes all components.
          */
+        @Override
         public synchronized void dispose() {
             if (isDisposing)
                 return;
@@ -749,11 +754,13 @@ public class VideoSharing {
             this.videoSharingSession = videoSharingSession;
         }
 
+        @Override
         public void sessionStopped() {
             videoSharingSession.dispose();
             videoSharingSession.streamSession.shutdownFinished();
         }
 
+        @Override
         public void errorOccured(StreamException e) {
             videoSharingSession.reportError(e);
         }

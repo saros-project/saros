@@ -95,6 +95,7 @@ public class AddBuddyWizard extends Wizard {
          * from the subscriptionManager.
          */
         final SubscriptionManagerListener subscriptionManagerListener = new SubscriptionManagerListener() {
+            @Override
             public void subscriptionReceived(IncomingSubscriptionEvent event) {
                 if (jid.equals(event.getBuddy()))
                     event.autoSubscribe = true;
@@ -104,6 +105,7 @@ public class AddBuddyWizard extends Wizard {
 
         try {
             getContainer().run(true, false, new IRunnableWithProgress() {
+                @Override
                 public void run(IProgressMonitor monitor)
                     throws InvocationTargetException, InterruptedException {
 

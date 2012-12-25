@@ -62,6 +62,7 @@ public class SendFileAction extends Action implements Disposable {
     public static final String ACTION_ID = SendFileAction.class.getName();
 
     protected ISelectionListener selectionListener = new ISelectionListener() {
+        @Override
         public void selectionChanged(IWorkbenchPart part, ISelection selection) {
             updateEnablement();
         }
@@ -156,6 +157,7 @@ public class SendFileAction extends Action implements Disposable {
         job.schedule();
     }
 
+    @Override
     public void dispose() {
         SelectionUtils.getSelectionService().removeSelectionListener(
             selectionListener);

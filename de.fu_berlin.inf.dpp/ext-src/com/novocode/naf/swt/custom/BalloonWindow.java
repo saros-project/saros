@@ -1,6 +1,6 @@
 /*******************************************************************************
  * Copyright (c) 2004 Stefan Zeiger and others.
- * All rights reserved. This program and the accompanying materials 
+ * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.novocode.com/legal/epl-v10.html
@@ -96,6 +96,7 @@ public class BalloonWindow {
         selectionControls.add(contents);
 
         final Listener globalListener = new Listener() {
+            @Override
             public void handleEvent(Event event) {
                 Widget w = event.widget;
                 for (int i = selectionControls.size() - 1; i >= 0; i--) {
@@ -113,6 +114,7 @@ public class BalloonWindow {
         };
 
         shell.addListener(SWT.Show, new Listener() {
+            @Override
             public void handleEvent(Event event) {
                 if (!addedGlobalListener) {
                     shell.getDisplay().addFilter(SWT.MouseDown, globalListener);
@@ -122,6 +124,7 @@ public class BalloonWindow {
         });
 
         shell.addListener(SWT.Hide, new Listener() {
+            @Override
             public void handleEvent(Event event) {
                 if (addedGlobalListener) {
                     shell.getDisplay().removeFilter(SWT.MouseDown,
@@ -132,6 +135,7 @@ public class BalloonWindow {
         });
 
         shell.addListener(SWT.Dispose, new Listener() {
+            @Override
             public void handleEvent(Event event) {
                 if (addedGlobalListener) {
                     shell.getDisplay().removeFilter(SWT.MouseDown,
@@ -247,6 +251,7 @@ public class BalloonWindow {
                 }
                 final Font font = new Font(shell.getDisplay(), fds);
                 titleLabel.addListener(SWT.Dispose, new Listener() {
+                    @Override
                     public void handleEvent(Event event) {
                         font.dispose();
                     }
@@ -265,6 +270,7 @@ public class BalloonWindow {
                 titleImageLabel.setBackground(shell.getBackground());
                 titleImageLabel.setBounds(titleImage.getBounds());
                 titleImageLabel.addListener(SWT.Paint, new Listener() {
+                    @Override
                     public void handleEvent(Event event) {
                         event.gc.drawImage(titleImage, 0, 0);
                     }
@@ -288,6 +294,7 @@ public class BalloonWindow {
                 final Image closeImage = createCloseImage(shell.getDisplay(),
                     closeBG, closeFG);
                 shell.addListener(SWT.Dispose, new Listener() {
+                    @Override
                     public void handleEvent(Event event) {
                         closeImage.dispose();
                     }
@@ -298,6 +305,7 @@ public class BalloonWindow {
                 ToolItem closeItem = new ToolItem(systemControlsBar, SWT.PUSH);
                 closeItem.setImage(closeImage);
                 closeItem.addListener(SWT.Selection, new Listener() {
+                    @Override
                     public void handleEvent(Event event) {
                         shell.close();
                     }
@@ -381,6 +389,7 @@ public class BalloonWindow {
 
         shell.setRegion(region);
         shell.addListener(SWT.Dispose, new Listener() {
+            @Override
             public void handleEvent(Event event) {
                 region.dispose();
             }
@@ -388,6 +397,7 @@ public class BalloonWindow {
 
         final int[] outline = createOutline(shellSize, anchor, false);
         shell.addListener(SWT.Paint, new Listener() {
+            @Override
             public void handleEvent(Event event) {
                 event.gc.drawPolygon(outline);
             }

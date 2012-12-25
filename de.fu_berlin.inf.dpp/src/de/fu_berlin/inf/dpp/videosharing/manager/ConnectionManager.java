@@ -66,6 +66,7 @@ public class ConnectionManager implements Disposable {
             "DecodingStatisticManager", log, decodingStatisticManager);
     }
 
+    @Override
     public void dispose() {
         // streams will be closed by ConnectionFactory
         encoderManagerThread.interrupt();
@@ -74,6 +75,7 @@ public class ConnectionManager implements Disposable {
 
     public class DecodingStatisticManager implements Runnable {
 
+        @Override
         public void run() {
             while (true && !Thread.interrupted()) {
                 try {
@@ -93,6 +95,7 @@ public class ConnectionManager implements Disposable {
 
     public class EncoderManager implements Runnable {
 
+        @Override
         public void run() {
             if (!encoder.isEncoding())
                 try {

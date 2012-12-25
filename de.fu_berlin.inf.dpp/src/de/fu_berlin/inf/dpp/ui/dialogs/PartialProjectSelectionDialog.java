@@ -63,6 +63,7 @@ public class PartialProjectSelectionDialog {
             setDescription(Messages.PartialProjectSelectionDialog_description);
         }
 
+        @Override
         public void handleEvent(Event event) {
             // Do nothing
 

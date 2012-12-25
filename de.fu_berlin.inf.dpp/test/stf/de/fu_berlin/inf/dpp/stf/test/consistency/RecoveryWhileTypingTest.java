@@ -47,6 +47,7 @@ public class RecoveryWhileTypingTest extends StfTestCase {
             .selectFile("foo", "readme.txt").open();
 
         TestThread.Runnable aliceEditTask = new TestThread.Runnable() {
+            @Override
             public void run() throws Exception {
 
                 ALICE.remoteBot().editor("readme.txt").waitUntilIsActive();

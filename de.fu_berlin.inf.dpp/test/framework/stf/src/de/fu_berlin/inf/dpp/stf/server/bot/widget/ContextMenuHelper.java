@@ -52,6 +52,7 @@ public class ContextMenuHelper {
 
         // hide
         UIThreadRunnable.syncExec(new VoidResult() {
+            @Override
             public void run() {
                 hide(menuItem.getParent());
             }
@@ -77,6 +78,7 @@ public class ContextMenuHelper {
         // hide
         if (menuItem != null) {
             UIThreadRunnable.syncExec(new VoidResult() {
+                @Override
                 public void run() {
                     hide(menuItem.getParent());
                 }
@@ -110,6 +112,7 @@ public class ContextMenuHelper {
         }
 
         return UIThreadRunnable.syncExec(new BoolResult() {
+            @Override
             public Boolean run() {
                 boolean enabled = menuItem.isEnabled();
                 hide(menuItem.getParent());
@@ -146,6 +149,7 @@ public class ContextMenuHelper {
         event.type = SWT.Selection;
 
         UIThreadRunnable.asyncExec(menuItem.getDisplay(), new VoidResult() {
+            @Override
             public void run() {
                 menuItem.notifyListeners(SWT.Selection, event);
             }
@@ -163,6 +167,7 @@ public class ContextMenuHelper {
         final AbstractSWTBot<? extends Control> bot, final String... texts) {
         final MenuItem menuItem = UIThreadRunnable
             .syncExec(new WidgetResult<MenuItem>() {
+                @Override
                 public MenuItem run() {
                     MenuItem menuItem = null;
                     Control control = bot.widget;

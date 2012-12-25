@@ -48,6 +48,7 @@ public class StoppedAction extends Action implements Disposable {
                 .getBlockedObservable();
             isBlockedObservable
                 .addAndNotify(new ValueChangeListener<Boolean>() {
+                    @Override
                     public void setValue(Boolean newValue) {
                         setUnblockEnabled(newValue);
                     }

@@ -51,6 +51,7 @@ public class JDTFacade implements IJDTSupport {
         }
     }
 
+    @Override
     public List<IPreferenceManipulator> getPreferenceManipulators() {
 
         if (!isJDTAvailable())

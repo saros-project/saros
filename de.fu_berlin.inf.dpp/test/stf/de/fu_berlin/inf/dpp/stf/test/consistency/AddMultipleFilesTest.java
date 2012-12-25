@@ -52,6 +52,7 @@ public class AddMultipleFilesTest extends StfTestCase {
             .waitUntilResourceIsShared("foo/main");
 
         TestThread.Runnable aliceFileTask = new TestThread.Runnable() {
+            @Override
             public void run() throws Exception {
                 for (int i = 0; i < 10; i++)
                     ALICE
@@ -63,6 +64,7 @@ public class AddMultipleFilesTest extends StfTestCase {
         };
 
         TestThread.Runnable bobFileTask = new TestThread.Runnable() {
+            @Override
             public void run() throws Exception {
                 for (int i = 0; i < 1000; i++)
                     BOB.superBot().internal()

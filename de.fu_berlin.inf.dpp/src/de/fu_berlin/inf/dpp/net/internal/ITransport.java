@@ -26,6 +26,7 @@ public interface ITransport {
 
     public void disposeXMPPConnection();
 
+    @Override
     public String toString();
 
     public NetTransferMode getDefaultNetTransferMode();

@@ -53,6 +53,7 @@ public class ConfigurationSummaryWizardPage extends WizardPage {
         setDescription(DESCRIPTION);
     }
 
+    @Override
     public void createControl(Composite parent) {
         composite = new Composite(parent, SWT.NONE);
         composite.setLayout(LayoutUtils.createGridLayout(2, true, 5, 10));

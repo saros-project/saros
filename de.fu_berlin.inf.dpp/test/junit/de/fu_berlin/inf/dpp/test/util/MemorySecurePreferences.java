@@ -35,23 +35,28 @@ public class MemorySecurePreferences implements ISecurePreferences {
                 new IllegalStateException("put disabled"));
     }
 
+    @Override
     public String absolutePath() {
         throw new UnsupportedOperationException();
     }
 
+    @Override
     public String[] childrenNames() {
         throw new UnsupportedOperationException();
     }
 
+    @Override
     public void clear() {
         preferences.clear();
     }
 
+    @Override
     public void flush() throws IOException {
         if (!this.allowPut)
             throw new IOException("put disabled");
     }
 
+    @Override
     public String get(String key, String def) throws StorageException {
         checkGetOperation();
 
@@ -67,6 +72,7 @@ public class MemorySecurePreferences implements ISecurePreferences {
         }
     }
 
+    @Override
     public boolean getBoolean(String key, boolean def) throws StorageException {
         checkGetOperation();
 
@@ -82,6 +88,7 @@ public class MemorySecurePreferences implements ISecurePreferences {
         }
     }
 
+    @Override
     public byte[] getByteArray(String key, byte[] def) throws StorageException {
         checkGetOperation();
 
@@ -97,6 +104,7 @@ public class MemorySecurePreferences implements ISecurePreferences {
         }
     }
 
+    @Override
     public double getDouble(String key, double def) throws StorageException {
         checkGetOperation();
 
@@ -112,6 +120,7 @@ public class MemorySecurePreferences implements ISecurePreferences {
         }
     }
 
+    @Override
     public float getFloat(String key, float def) throws StorageException {
         checkGetOperation();
 
@@ -127,6 +136,7 @@ public class MemorySecurePreferences implements ISecurePreferences {
         }
     }
 
+    @Override
     public int getInt(String key, int def) throws StorageException {
         checkGetOperation();
 
@@ -142,6 +152,7 @@ public class MemorySecurePreferences implements ISecurePreferences {
         }
     }
 
+    @Override
     public long getLong(String key, long def) throws StorageException {
         checkGetOperation();
 
@@ -157,76 +168,91 @@ public class MemorySecurePreferences implements ISecurePreferences {
         }
     }
 
+    @Override
     public boolean isEncrypted(String key) throws StorageException {
         return true;
     }
 
+    @Override
     public String[] keys() {
         return preferences.keySet().toArray(new String[0]);
     }
 
+    @Override
     public String name() {
         return this.getClass().getName();
     }
 
+    @Override
     public ISecurePreferences node(String name) {
         throw new UnsupportedOperationException();
     }
 
+    @Override
     public boolean nodeExists(String name) {
         throw new UnsupportedOperationException();
     }
 
+    @Override
     public ISecurePreferences parent() {
         throw new UnsupportedOperationException();
     }
 
+    @Override
     public void put(String key, String value, boolean encrypt)
         throws StorageException {
         checkPutOperation();
         preferences.put(key, value);
     }
 
+    @Override
     public void putBoolean(String key, boolean value, boolean encrypt)
         throws StorageException {
         checkPutOperation();
         preferences.put(key, value);
     }
 
+    @Override
     public void putByteArray(String key, byte[] value, boolean encrypt)
         throws StorageException {
         checkPutOperation();
         preferences.put(key, value);
     }
 
+    @Override
     public void putDouble(String key, double value, boolean encrypt)
         throws StorageException {
         checkPutOperation();
         preferences.put(key, value);
     }
 
+    @Override
     public void putFloat(String key, float value, boolean encrypt)
         throws StorageException {
         checkPutOperation();
         preferences.put(key, value);
     }
 
+    @Override
     public void putInt(String key, int value, boolean encrypt)
         throws StorageException {
         checkPutOperation();
         preferences.put(key, value);
     }
 
+    @Override
     public void putLong(String key, long value, boolean encrypt)
         throws StorageException {
         checkPutOperation();
         preferences.put(key, value);
     }
 
+    @Override
     public void remove(String key) {
         preferences.remove(key);
     }
 
+    @Override
     public void removeNode() {
         throw new UnsupportedOperationException();
     }

@@ -11,10 +11,12 @@ public class IsShellActive extends DefaultCondition {
         this.shell = shell;
     }
 
+    @Override
     public String getFailureMessage() {
         return "STFBotShell  not found.";
     }
 
+    @Override
     public boolean test() throws Exception {
         return shell.isActive();
     }

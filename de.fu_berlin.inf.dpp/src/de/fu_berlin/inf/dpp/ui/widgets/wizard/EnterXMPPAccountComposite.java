@@ -262,6 +262,7 @@ public class EnterXMPPAccountComposite extends Composite {
     private void hookListeners() {
 
         ModifyListener modifyListener = new ModifyListener() {
+            @Override
             public void modifyText(ModifyEvent e) {
                 notifyModifyText(e);
             }

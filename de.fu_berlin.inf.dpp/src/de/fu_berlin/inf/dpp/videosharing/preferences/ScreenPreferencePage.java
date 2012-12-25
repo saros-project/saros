@@ -82,6 +82,7 @@ public class ScreenPreferencePage extends FieldEditorPreferencePage implements
             composite));
     }
 
+    @Override
     public void init(IWorkbench workbench) {
         // NOP
 

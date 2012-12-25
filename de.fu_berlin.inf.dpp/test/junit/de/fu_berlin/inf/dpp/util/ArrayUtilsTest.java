@@ -27,6 +27,7 @@ public class ArrayUtilsTest {
                 adapterManager.getAdapter(EasyMock.anyObject(),
                     EasyMock.anyObject(Class.class)))
             .andAnswer(new IAnswer<Object>() {
+                @Override
                 public Object answer() throws Throwable {
                     return EasyMock.getCurrentArguments()[0];
                 }

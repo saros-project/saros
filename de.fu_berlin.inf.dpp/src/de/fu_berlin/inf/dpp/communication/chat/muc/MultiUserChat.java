@@ -77,6 +77,7 @@ public class MultiUserChat extends AbstractChat {
      * {@link IChatListener} used for {@link ChatState} propagation
      */
     private IChatListener mucStateListener = new IChatListener() {
+        @Override
         public void stateChanged(JID jid, ChatState state) {
             log.debug("stateChanged fired with state: " + state.toString());
 
@@ -130,6 +131,7 @@ public class MultiUserChat extends AbstractChat {
      * {@link PacketListener} for processing incoming messages
      */
     private PacketListener packetListener = new PacketListener() {
+        @Override
         public void processPacket(Packet packet) {
             log.debug("processPacket called");
 

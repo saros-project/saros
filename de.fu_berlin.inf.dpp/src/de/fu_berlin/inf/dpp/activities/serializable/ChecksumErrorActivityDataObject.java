@@ -53,6 +53,7 @@ public class ChecksumErrorActivityDataObject extends AbstractActivityDataObject 
         this.recoveryID = recoveryID;
     }
 
+    @Override
     public IActivity getActivity(ISarosSession sarosSession) {
         ArrayList<SPath> sPaths = new ArrayList<SPath>();
         if (this.paths != null)

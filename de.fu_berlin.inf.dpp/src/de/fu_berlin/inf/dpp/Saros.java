@@ -51,7 +51,6 @@ import org.osgi.framework.ServiceReference;
 import org.osgi.service.prefs.BackingStoreException;
 import org.osgi.service.prefs.Preferences;
 
-
 import de.fu_berlin.inf.dpp.accountManagement.XMPPAccount;
 import de.fu_berlin.inf.dpp.accountManagement.XMPPAccountStore;
 import de.fu_berlin.inf.dpp.annotations.Component;
@@ -576,6 +575,7 @@ public class Saros extends AbstractUIPlugin {
      */
     public void asyncConnect() {
         Utils.runSafeAsync("Saros-AsyncConnect-", log, new Runnable() { //$NON-NLS-1$
+                @Override
                 public void run() {
                     connect(false);
                 }

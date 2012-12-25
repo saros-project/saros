@@ -301,6 +301,7 @@ public class AddProjectToSessionWizard extends Wizard {
         final CancelLocation cancelLocation) {
 
         Utils.runSafeSWTAsync(log, new Runnable() {
+            @Override
             public void run() {
                 Shell shell = wizardDialog.getShell();
                 if (shell == null || shell.isDisposed())
@@ -321,6 +322,7 @@ public class AddProjectToSessionWizard extends Wizard {
                 return false;
             }
             Utils.runSafeAsync(log, new Runnable() {
+                @Override
                 public void run() {
                     process.localCancel(null, CancelOption.NOTIFY_PEER);
                 }
@@ -334,6 +336,7 @@ public class AddProjectToSessionWizard extends Wizard {
         final Map<String, FileListDiff> everyThing) {
         try {
             return Utils.runSWTSync(new Callable<Boolean>() {
+                @Override
                 public Boolean call() {
 
                     String message = Messages.AddProjectToSessionWizard_synchronize_projects;

@@ -62,6 +62,7 @@ public class SarosSWTBotChatLinePartnerChangeSeparator extends
      */
     public String getPlainID() {
         return syncExec(new StringResult() {
+            @Override
             public String run() {
                 return widget.getUsername();
             }

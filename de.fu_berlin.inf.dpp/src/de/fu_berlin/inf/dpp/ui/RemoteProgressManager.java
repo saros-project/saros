@@ -282,6 +282,7 @@ public class RemoteProgressManager {
 
             int totalWorked = -1;
 
+            @Override
             public void beginTask(String name, int totalWorked) {
                 this.totalWorked = totalWorked;
                 activityProvider.fireActivity(recipients, new ProgressActivity(
@@ -289,37 +290,44 @@ public class RemoteProgressManager {
                     ProgressAction.UPDATE));
             }
 
+            @Override
             public void done() {
                 activityProvider.fireActivity(recipients, new ProgressActivity(
                     localUser, progressID, 0, 0, null, ProgressAction.DONE));
             }
 
+            @Override
             public void internalWorked(double work) {
                 // do nothing
             }
 
+            @Override
             public boolean isCanceled() {
                 // It would be cool to support communicating cancellation
                 // to the originator
                 return false;
             }
 
+            @Override
             public void setCanceled(boolean value) {
                 throw new UnsupportedOperationException();
             }
 
+            @Override
             public void setTaskName(String name) {
                 activityProvider.fireActivity(recipients, new ProgressActivity(
                     localUser, progressID, worked, totalWorked, name,
                     ProgressAction.UPDATE));
             }
 
+            @Override
             public void subTask(String name) {
                 activityProvider.fireActivity(recipients, new ProgressActivity(
                     localUser, progressID, worked, totalWorked, name,
                     ProgressAction.UPDATE));
             }
 
+            @Override
             public void worked(int work) {
                 worked += work;
                 if (worked > totalWorked)
@@ -358,6 +366,7 @@ public class RemoteProgressManager {
             int worked = 0;
             int totalWorked = -1;
 
+            @Override
             public void beginTask(String name, int totalWorked) {
                 // update local progress monitor
                 monitor.beginTask(name, totalWorked);
@@ -369,6 +378,7 @@ public class RemoteProgressManager {
                     ProgressAction.BEGINTASK));
             }
 
+            @Override
             public void done() {
                 monitor.done();
                 activityProvider.fireActivity(recipients, new ProgressActivity(
@@ -378,10 +388,12 @@ public class RemoteProgressManager {
             /**
              * FIXME: This is not yet propagated remotely
              */
+            @Override
             public void internalWorked(double work) {
                 monitor.internalWorked(work);
             }
 
+            @Override
             public boolean isCanceled() {
                 return monitor.isCanceled();
             }
@@ -389,6 +401,7 @@ public class RemoteProgressManager {
             /**
              * FIXME: This is not yet propagated remotely
              */
+            @Override
             public void setCanceled(boolean value) {
                 // waldmann: yep this is a TODO
                 activityProvider.fireActivity(recipients, new ProgressActivity(
@@ -397,6 +410,7 @@ public class RemoteProgressManager {
                 monitor.setCanceled(value);
             }
 
+            @Override
             public void setTaskName(String name) {
                 monitor.setTaskName(name);
                 activityProvider.fireActivity(recipients, new ProgressActivity(
@@ -404,6 +418,7 @@ public class RemoteProgressManager {
                     ProgressAction.SETTASKNAME));
             }
 
+            @Override
             public void subTask(String name) {
                 monitor.subTask(name);
                 activityProvider.fireActivity(recipients, new ProgressActivity(
@@ -411,6 +426,7 @@ public class RemoteProgressManager {
                     ProgressAction.SUBTASK));
             }
 
+            @Override
             public void worked(int work) {
                 monitor.worked(work);
                 worked += work;

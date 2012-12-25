@@ -51,6 +51,7 @@ public class SkypeManager implements IConnectionListener {
     private final IPreferenceStore preferenceStore;
 
     private PacketListener packetListener = new PacketListener() {
+        @Override
         public void processPacket(Packet packet) {
 
             @SuppressWarnings("unchecked")
@@ -89,6 +90,7 @@ public class SkypeManager implements IConnectionListener {
          */
         preferenceStore
             .addPropertyChangeListener(new IPropertyChangeListener() {
+                @Override
                 public void propertyChange(PropertyChangeEvent event) {
                     if (event.getProperty().equals(
                         PreferenceConstants.SKYPE_USERNAME)) {
@@ -143,6 +145,7 @@ public class SkypeManager implements IConnectionListener {
         }
 
         Utils.runSafeAsync(log, new Runnable() {
+            @Override
             public void run() {
                 getSkypeURL(rqJID);
             }
@@ -254,6 +257,7 @@ public class SkypeManager implements IConnectionListener {
     /**
      * Register a new PacketListener for intercepting SkypeIQ packets.
      */
+    @Override
     public void connectionStateChanged(final Connection connection,
         ConnectionState newState) {
         if (newState == ConnectionState.CONNECTED) {

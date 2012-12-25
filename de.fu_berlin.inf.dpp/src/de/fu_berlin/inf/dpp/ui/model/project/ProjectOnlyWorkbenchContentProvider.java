@@ -40,6 +40,7 @@ public class ProjectOnlyWorkbenchContentProvider extends
             viewer.refresh();
         } else {
             ctrl.getDisplay().asyncExec(new Runnable() {
+                @Override
                 public void run() {
                     // Abort if this happens after disposes
                     Control ctrl = viewer.getControl();
