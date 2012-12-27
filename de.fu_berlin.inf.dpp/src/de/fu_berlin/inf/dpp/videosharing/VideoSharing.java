@@ -47,6 +47,7 @@ import de.fu_berlin.inf.dpp.observables.VideoSessionObservable;
 import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
 import de.fu_berlin.inf.dpp.ui.util.DialogUtils;
+import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 import de.fu_berlin.inf.dpp.ui.views.VideoPlayerView;
 import de.fu_berlin.inf.dpp.util.Utils;
 import de.fu_berlin.inf.dpp.videosharing.activities.ImageSourceSwitchModeVideoActivity;
@@ -213,7 +214,7 @@ public class VideoSharing {
             @Override
             public VideoPlayerView call() throws Exception {
                 sarosUI.createVideoPlayerView();
-                IViewPart view = Utils
+                IViewPart view = SWTUtils
                     .findView(VideoPlayerView.class.getName());
                 if (view instanceof VideoPlayerView) {
                     VideoPlayerView playerView = (VideoPlayerView) view;
@@ -228,7 +229,7 @@ public class VideoSharing {
         };
 
         try {
-            return Utils.runSWTSync(getView);
+            return SWTUtils.runSWTSync(getView);
         } catch (Exception e) {
             log.error("Received unexpected exception: ", e);
         }
@@ -272,7 +273,7 @@ public class VideoSharing {
     public static void reportErrorToUser(Exception e, final String title) {
         final String message = e.getMessage();
 
-        Utils.runSafeSWTAsync(log, new Runnable() {
+        SWTUtils.runSafeSWTAsync(log, new Runnable() {
             @Override
             public void run() {
                 DialogUtils.openErrorMessageDialog(EditorAPI.getShell(), title,
@@ -495,7 +496,7 @@ public class VideoSharing {
 
             videoDisplay = getVideoPlayer();
 
-            Utils.runSafeSWTAsync(log, new Runnable() {
+            SWTUtils.runSafeSWTAsync(log, new Runnable() {
                 @Override
                 public void run() {
                     sarosUI.activateVideoPlayerView();

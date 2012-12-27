@@ -14,8 +14,8 @@ import de.fu_berlin.inf.dpp.project.AbstractSarosSessionListener;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ISarosSessionListener;
 import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
+import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 import de.fu_berlin.inf.dpp.ui.views.SarosView;
-import de.fu_berlin.inf.dpp.util.Utils;
 
 /**
  * Business logic for handling Leave Message
@@ -100,7 +100,7 @@ public class LeaveHandler {
                     + ".");
         } else {
             // Client
-            Utils.runSafeSWTSync(log, new Runnable() {
+            SWTUtils.runSafeSWTSync(log, new Runnable() {
                 @Override
                 public void run() {
                     // FIXME see above...

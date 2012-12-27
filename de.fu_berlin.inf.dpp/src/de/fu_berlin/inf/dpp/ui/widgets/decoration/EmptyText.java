@@ -8,7 +8,7 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Text;
 
-import de.fu_berlin.inf.dpp.util.Utils;
+import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 import de.fu_berlin.inf.nebula.utils.ColorUtils;
 
 /**
@@ -93,7 +93,7 @@ public class EmptyText {
                  * Modifying the control's test while the focus out occurs does
                  * not seem to work. We therefore defer the text change.
                  */
-                Utils.runSafeSWTSync(null, new Runnable() {
+                SWTUtils.runSafeSWTSync(null, new Runnable() {
                     @Override
                     public void run() {
                         control.setText(emptyText);

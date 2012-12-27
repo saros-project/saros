@@ -16,12 +16,12 @@ import org.eclipse.ui.PlatformUI;
 
 import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
 import de.fu_berlin.inf.dpp.ui.Messages;
+import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 import de.fu_berlin.inf.dpp.ui.util.selection.retriever.SelectionRetrieverFactory;
 import de.fu_berlin.inf.dpp.ui.widgets.viewer.project.ResourceSelectionComposite;
 import de.fu_berlin.inf.dpp.ui.widgets.viewer.project.events.FilterClosedProjectsChangedEvent;
 import de.fu_berlin.inf.dpp.ui.widgets.viewer.project.events.ResourceSelectionChangedEvent;
 import de.fu_berlin.inf.dpp.ui.widgets.viewer.project.events.ResourceSelectionListener;
-import de.fu_berlin.inf.dpp.util.Utils;
 
 public class ProjectSelectionWizardPage extends WizardPage {
     Logger log = Logger.getLogger(this.getClass());
@@ -99,7 +99,7 @@ public class ProjectSelectionWizardPage extends WizardPage {
         Runnable takeOverPerspectiveSelection = new Runnable() {
             @Override
             public void run() {
-                Utils.runSafeSWTAsync(log, new Runnable() {
+                SWTUtils.runSafeSWTAsync(log, new Runnable() {
                     @Override
                     public void run() {
                         List<IResource> selection = SelectionRetrieverFactory

@@ -46,6 +46,7 @@ import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
 import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.ui.util.DialogUtils;
+import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 import de.fu_berlin.inf.dpp.ui.wizards.dialogs.WizardDialogAccessable;
 import de.fu_berlin.inf.dpp.ui.wizards.pages.ShowDescriptionPage;
 import de.fu_berlin.inf.dpp.ui.wizards.utils.EnterProjectNamePageUtils;
@@ -211,7 +212,7 @@ public class JoinSessionWizard extends Wizard {
                     Thread.currentThread().interrupt();
                     return;
                 }
-                Utils.runSafeSWTAsync(log, new Runnable() {
+                SWTUtils.runSafeSWTAsync(log, new Runnable() {
                     @Override
                     public void run() {
 
@@ -251,7 +252,7 @@ public class JoinSessionWizard extends Wizard {
     public void cancelWizard(final JID jid, final String errorMsg,
         final CancelLocation cancelLocation) {
 
-        Utils.runSafeSWTAsync(log, new Runnable() {
+        SWTUtils.runSafeSWTAsync(log, new Runnable() {
             @Override
             public void run() {
                 Shell shell = wizardDialog.getShell();
@@ -261,7 +262,7 @@ public class JoinSessionWizard extends Wizard {
             }
         });
 
-        Utils.runSafeSWTAsync(log, new Runnable() {
+        SWTUtils.runSafeSWTAsync(log, new Runnable() {
             @Override
             public void run() {
                 showCancelMessage(jid, errorMsg, cancelLocation);

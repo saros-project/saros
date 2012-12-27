@@ -23,6 +23,7 @@ import de.fu_berlin.inf.dpp.project.AbstractSharedProjectListener;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
 import de.fu_berlin.inf.dpp.project.internal.SarosSession.QueueItem;
+import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 import de.fu_berlin.inf.dpp.util.Utils;
 
 /**
@@ -130,7 +131,7 @@ public class ConcurrentDocumentServer implements Disposable {
 
         assert sarosSession.isHost() : "CDS.transformIncoming may not be called on the Client!!";
 
-        assert !Utils.isSWT() : "CDS.transformIncoming may not be called from SWT!!";
+        assert !SWTUtils.isSWT() : "CDS.transformIncoming may not be called from SWT!!";
 
         TransformationResult result = new TransformationResult(
             sarosSession.getLocalUser());

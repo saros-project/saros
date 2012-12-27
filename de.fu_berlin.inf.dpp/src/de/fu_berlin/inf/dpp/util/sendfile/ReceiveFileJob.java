@@ -27,8 +27,8 @@ import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
 import de.fu_berlin.inf.dpp.net.internal.StreamSession;
 import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.ui.util.DialogUtils;
+import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 import de.fu_berlin.inf.dpp.util.StopWatch;
-import de.fu_berlin.inf.dpp.util.Utils;
 
 public class ReceiveFileJob extends StreamJob {
     private static final Logger log = Logger.getLogger(ReceiveFileJob.class);
@@ -235,7 +235,7 @@ public class ReceiveFileJob extends StreamJob {
 
         String filename = null;
         try {
-            filename = Utils.runSWTSync(getFile);
+            filename = SWTUtils.runSWTSync(getFile);
         } catch (Exception e) {
             // should not happen
             log.error("Unexpected error: ", e); //$NON-NLS-1$

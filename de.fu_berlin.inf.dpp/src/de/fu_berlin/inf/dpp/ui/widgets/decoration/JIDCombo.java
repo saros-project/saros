@@ -14,7 +14,7 @@ import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.accountManagement.XMPPAccountStore;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
-import de.fu_berlin.inf.dpp.util.Utils;
+import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 
 /**
  * Extends a {@link JID} displaying {@link Combo}.<br/>
@@ -43,7 +43,7 @@ public class JIDCombo {
         update();
         registerListeners();
 
-        Utils.runSafeSWTAsync(null, new Runnable() {
+        SWTUtils.runSafeSWTAsync(null, new Runnable() {
             @Override
             public void run() {
                 JIDCombo.this.control.setSelection(new Point(0, 0));

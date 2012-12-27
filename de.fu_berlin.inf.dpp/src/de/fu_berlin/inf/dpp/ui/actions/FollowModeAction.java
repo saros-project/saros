@@ -26,6 +26,7 @@ import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
 import de.fu_berlin.inf.dpp.ui.ImageManager;
 import de.fu_berlin.inf.dpp.ui.Messages;
+import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 import de.fu_berlin.inf.dpp.util.Utils;
 
 /**
@@ -97,7 +98,7 @@ public class FollowModeAction extends Action implements Disposable {
                 Utils.runSafeAsync(log, Utils.delay(1000, new Runnable() {
                     @Override
                     public void run() {
-                        Utils.runSafeSWTAsync(log, new Runnable() {
+                        SWTUtils.runSafeSWTAsync(log, new Runnable() {
                             @Override
                             public void run() {
                                 if (sessionManager.getSarosSession() != null) {

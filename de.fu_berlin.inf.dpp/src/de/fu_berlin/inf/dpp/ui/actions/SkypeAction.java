@@ -24,6 +24,7 @@ import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
 import de.fu_berlin.inf.dpp.ui.ImageManager;
 import de.fu_berlin.inf.dpp.ui.Messages;
+import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 import de.fu_berlin.inf.dpp.ui.util.selection.SelectionUtils;
 import de.fu_berlin.inf.dpp.ui.util.selection.retriever.SelectionRetrieverFactory;
 import de.fu_berlin.inf.dpp.util.Utils;
@@ -106,7 +107,7 @@ public class SkypeAction extends Action implements Disposable {
                     Utils.runSafeAsync("SkypeAction-", log, new Runnable() { //$NON-NLS-1$
                             @Override
                             public void run() {
-                                Utils.runSafeSWTSync(log, new Runnable() {
+                                SWTUtils.runSafeSWTSync(log, new Runnable() {
                                     @Override
                                     public void run() {
                                         setEnabled(false);
@@ -116,7 +117,7 @@ public class SkypeAction extends Action implements Disposable {
                                     .getSkypeURL(participants.get(0)
                                         .getBareJID());
                                 if (skypeURL != null) {
-                                    Utils.runSafeSWTSync(log, new Runnable() {
+                                    SWTUtils.runSafeSWTSync(log, new Runnable() {
                                         @Override
                                         public void run() {
                                             URLHyperlink link = new URLHyperlink(

@@ -56,8 +56,8 @@ import de.fu_berlin.inf.dpp.project.IActivityProvider;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ISarosSessionListener;
 import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
+import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 import de.fu_berlin.inf.dpp.util.StackTrace;
-import de.fu_berlin.inf.dpp.util.Utils;
 
 /**
  * This UndoManager is not an implementation of the Eclipse IUndoManager. It
@@ -160,7 +160,7 @@ public class UndoManager extends AbstractActivityProvider implements Disposable 
                 updateCurrentLocalAtomicOperation(null);
                 storeCurrentLocalOperation();
 
-                Utils.runSafeSWTSync(log, new Runnable() {
+                SWTUtils.runSafeSWTSync(log, new Runnable() {
                     @Override
                     public void run() {
                         log.debug("redoing operation " + operation);
@@ -199,7 +199,7 @@ public class UndoManager extends AbstractActivityProvider implements Disposable 
                 updateCurrentLocalAtomicOperation(null);
                 storeCurrentLocalOperation();
 
-                Utils.runSafeSWTSync(log, new Runnable() {
+                SWTUtils.runSafeSWTSync(log, new Runnable() {
                     @Override
                     public void run() {
                         log.debug("undoing operation " + operation);
@@ -314,7 +314,7 @@ public class UndoManager extends AbstractActivityProvider implements Disposable 
 
         @Override
         public void activityCreated(final IActivity activityDataObject) {
-            Utils.runSafeSWTSync(log, new Runnable() {
+            SWTUtils.runSafeSWTSync(log, new Runnable() {
 
                 @Override
                 public void run() {

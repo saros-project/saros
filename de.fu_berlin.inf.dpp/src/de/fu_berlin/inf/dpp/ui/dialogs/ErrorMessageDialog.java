@@ -6,7 +6,7 @@ import org.picocontainer.annotations.Nullable;
 
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.ui.Messages;
-import de.fu_berlin.inf.dpp.util.Utils;
+import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 
 /**
  * Eclipse Dialog to show Exception Messages.
@@ -26,7 +26,7 @@ public class ErrorMessageDialog {
      * @param exception
      */
     public static void showErrorMessage(final Exception exception) {
-        Utils.runSafeSWTSync(log, new Runnable() {
+        SWTUtils.runSafeSWTSync(log, new Runnable() {
             @Override
             public void run() {
                 MessageDialog.openError(EditorAPI.getShell(),
@@ -40,7 +40,7 @@ public class ErrorMessageDialog {
      */
     public static void showErrorMessage(final String windowTitle,
         final Exception exception) {
-        Utils.runSafeSWTSync(log, new Runnable() {
+        SWTUtils.runSafeSWTSync(log, new Runnable() {
             @Override
             public void run() {
                 MessageDialog.openError(EditorAPI.getShell(), windowTitle,
@@ -64,7 +64,7 @@ public class ErrorMessageDialog {
         }
         final String error = exceptionMessage;
 
-        Utils.runSafeSWTSync(log, new Runnable() {
+        SWTUtils.runSafeSWTSync(log, new Runnable() {
             @Override
             public void run() {
                 MessageDialog.openError(EditorAPI.getShell(),

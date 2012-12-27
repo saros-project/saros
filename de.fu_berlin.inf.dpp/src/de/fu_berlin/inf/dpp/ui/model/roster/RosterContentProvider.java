@@ -25,7 +25,7 @@ import de.fu_berlin.inf.dpp.net.discoverymanager.DiscoveryManagerListener;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
 import de.fu_berlin.inf.dpp.net.internal.IByteStreamConnection;
 import de.fu_berlin.inf.dpp.ui.model.TreeContentProvider;
-import de.fu_berlin.inf.dpp.util.Utils;
+import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 import de.fu_berlin.inf.nebula.utils.ViewerUtils;
 
 /**
@@ -70,7 +70,7 @@ public class RosterContentProvider extends TreeContentProvider {
         public void featureSupportUpdated(final JID jid, String feature,
             boolean isSupported) {
             if (Saros.NAMESPACE.equals(feature)) {
-                Utils.runSafeSWTAsync(log, new Runnable() {
+                SWTUtils.runSafeSWTAsync(log, new Runnable() {
                     @Override
                     public void run() {
                         // ViewerUtils.refresh(viewer, true);

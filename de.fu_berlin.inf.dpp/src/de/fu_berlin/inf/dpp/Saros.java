@@ -62,6 +62,7 @@ import de.fu_berlin.inf.dpp.net.upnp.internal.UPnPAccessImpl;
 import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
 import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
+import de.fu_berlin.inf.dpp.ui.util.DialogUtils;
 import de.fu_berlin.inf.dpp.ui.util.WizardUtils;
 import de.fu_berlin.inf.dpp.ui.wizards.ConfigurationWizard;
 import de.fu_berlin.inf.dpp.util.StackTrace;
@@ -651,7 +652,7 @@ public class Saros extends AbstractUIPlugin {
             Exception cause = (t != null) ? (Exception) t : e;
 
             if (cause instanceof SaslException) {
-                Utils.popUpFailureMessage(Messages.Saros_3, cause.getMessage(),
+                DialogUtils.popUpFailureMessage(Messages.Saros_3, cause.getMessage(),
                     failSilently);
             } else {
                 String question;
@@ -666,7 +667,7 @@ public class Saros extends AbstractUIPlugin {
                     question = Messages.Saros_32 + Messages.Saros_33 + username
                         + "\n\n" + Messages.Saros_30;
                 }
-                if (Utils.popUpYesNoQuestion(Messages.Saros_36, question,
+                if (DialogUtils.popUpYesNoQuestion(Messages.Saros_36, question,
                     failSilently)) {
                     if (configureXMPPAccount())
                         connect(failSilently);
@@ -675,7 +676,7 @@ public class Saros extends AbstractUIPlugin {
         } catch (Exception e) {
             log.error("internal error while connecting to the XMPP server: "
                 + e.getMessage(), e);
-            Utils.popUpFailureMessage(Messages.Saros_36, Messages.Saros_39
+            DialogUtils.popUpFailureMessage(Messages.Saros_36, Messages.Saros_39
                 + username + Messages.Saros_40 + e.getMessage(), failSilently);
         }
     }

@@ -14,8 +14,8 @@ import de.fu_berlin.inf.dpp.net.ConnectionState;
 import de.fu_berlin.inf.dpp.net.IConnectionListener;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.ui.Messages;
+import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 import de.fu_berlin.inf.dpp.ui.views.SarosView;
-import de.fu_berlin.inf.dpp.util.Utils;
 import de.fu_berlin.inf.nebula.utils.FontUtils;
 import de.fu_berlin.inf.nebula.utils.LayoutUtils;
 
@@ -29,7 +29,7 @@ public class ConnectionStateComposite extends Composite {
         @Override
         public void connectionStateChanged(Connection connection,
             final ConnectionState newState) {
-            Utils.runSafeSWTAsync(log, new Runnable() {
+            SWTUtils.runSafeSWTAsync(log, new Runnable() {
                 @Override
                 public void run() {
                     updateLabel(newState);

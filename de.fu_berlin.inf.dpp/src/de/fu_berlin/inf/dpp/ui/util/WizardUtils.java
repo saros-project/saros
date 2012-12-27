@@ -22,7 +22,6 @@ import de.fu_berlin.inf.dpp.ui.wizards.EditXMPPAccountWizard;
 import de.fu_berlin.inf.dpp.ui.wizards.ShareProjectAddBuddiesWizard;
 import de.fu_berlin.inf.dpp.ui.wizards.ShareProjectAddProjectsWizard;
 import de.fu_berlin.inf.dpp.ui.wizards.ShareProjectWizard;
-import de.fu_berlin.inf.dpp.util.Utils;
 import de.fu_berlin.inf.nebula.wizards.dialogs.CenteredWizardDialog;
 
 /**
@@ -47,7 +46,7 @@ public class WizardUtils {
     public static Integer openWizard(final Shell parentShell,
         final Wizard wizard, final Point initialSize) {
         try {
-            return Utils.runSWTSync(new Callable<Integer>() {
+            return SWTUtils.runSWTSync(new Callable<Integer>() {
                 @Override
                 public Integer call() {
                     WizardDialog wizardDialog = new CenteredWizardDialog(
@@ -96,7 +95,7 @@ public class WizardUtils {
      * new project wizard.
      */
     public static void openNewProjectWizard() {
-        Utils.runSafeSWTSync(log, new Runnable() {
+        SWTUtils.runSafeSWTSync(log, new Runnable() {
             @Override
             public void run() {
                 IWorkbenchWindow window = PlatformUI.getWorkbench()
@@ -118,7 +117,7 @@ public class WizardUtils {
         final Point initialSize = new Point(850, 440);
 
         try {
-            if (Window.OK == Utils.runSWTSync(new Callable<Integer>() {
+            if (Window.OK == SWTUtils.runSWTSync(new Callable<Integer>() {
                 @Override
                 public Integer call() {
                     WizardDialog wizardDialog = new CenteredWizardDialog(null,

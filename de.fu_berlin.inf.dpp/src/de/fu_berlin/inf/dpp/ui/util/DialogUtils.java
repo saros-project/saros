@@ -7,15 +7,17 @@ import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.preference.PreferenceStore;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.widgets.Shell;
 import org.osgi.framework.Version;
 
+import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.ui.Messages;
+import de.fu_berlin.inf.dpp.ui.dialogs.RememberDecisionMessageDialog;
 import de.fu_berlin.inf.dpp.util.StackTrace;
-import de.fu_berlin.inf.dpp.util.Utils;
 import de.fu_berlin.inf.dpp.util.VersionManager;
 import de.fu_berlin.inf.dpp.util.VersionManager.VersionInfo;
 
@@ -79,7 +81,7 @@ public class DialogUtils {
      */
     public static void showErrorPopup(final Logger log, final String title,
         final String message, Exception e, IProgressMonitor monitor) {
-        Utils.runSafeSWTAsync(log, new Runnable() {
+        SWTUtils.runSafeSWTAsync(log, new Runnable() {
             @Override
             public void run() {
                 DialogUtils.openErrorMessageDialog(EditorAPI.getShell(), title,
@@ -171,7 +173,7 @@ public class DialogUtils {
     public static synchronized boolean confirmUnsupportedSaros(final JID peer) {
 
         try {
-            return Utils.runSWTSync(new Callable<Boolean>() {
+            return SWTUtils.runSWTSync(new Callable<Boolean>() {
                 @Override
                 public Boolean call() {
                     return MessageDialog.openConfirm(getAShell(),
@@ -240,7 +242,7 @@ public class DialogUtils {
         }
 
         try {
-            return Utils.runSWTSync(new Callable<Boolean>() {
+            return SWTUtils.runSWTSync(new Callable<Boolean>() {
                 @Override
                 public Boolean call() {
                     return MessageDialog.openQuestion(getAShell(), title,
@@ -263,7 +265,7 @@ public class DialogUtils {
             peer.getBase(), localVersion.toString());
 
         try {
-            return Utils.runSWTSync(new Callable<Boolean>() {
+            return SWTUtils.runSWTSync(new Callable<Boolean>() {
                 @Override
                 public Boolean call() {
                     return MessageDialog.openQuestion(getAShell(), title,
@@ -278,9 +280,9 @@ public class DialogUtils {
     }
 
     public static void notifyUserOffline(JID peer) {
-        Utils.popUpFailureMessage(Messages.InvitationWizard_buddy_offline,
-            MessageFormat.format(Messages.InvitationWizard_buddy_offline_text,
-                peer), false);
+        DialogUtils.popUpFailureMessage(
+            Messages.InvitationWizard_buddy_offline, MessageFormat.format(
+                Messages.InvitationWizard_buddy_offline_text, peer), false);
     }
 
     private static Shell getAShell() {
@@ -288,5 +290,126 @@ public class DialogUtils {
         if (shell == null)
             shell = new Shell();
         return shell;
+    }
+
+    /**
+     * Ask the User a given question. It pops up a {@link MessageDialog} with
+     * given title and message. It stores the decision in the
+     * {@link PreferenceStore} it the checkbox is selected.
+     * 
+     * @param saros
+     *            is needed to set the selection to preference store
+     * @param preferenceName
+     *            constant where to store in the preference store
+     * 
+     * @return boolean indicating whether the user said Yes or No
+     */
+    public static boolean popUpRememberDecisionDialog(final String title,
+        final String message, final Saros saros, final String preferenceName) {
+        try {
+            return SWTUtils.runSWTSync(new Callable<Boolean>() {
+                @Override
+                public Boolean call() {
+                    RememberDecisionMessageDialog dialog = new RememberDecisionMessageDialog(
+                        EditorAPI.getShell(), title, null, message,
+                        MessageDialog.QUESTION, new String[] {
+                            IDialogConstants.YES_LABEL,
+                            IDialogConstants.NO_LABEL }, 0);
+                    int result = dialog.open();
+                    if (dialog.isRememberDecision()) {
+                        saros.getPreferenceStore().setValue(preferenceName,
+                            Boolean.toString(result == 0));
+                    }
+
+                    return result == 0;
+                }
+            });
+        } catch (Exception e) {
+            log.error("An internal error ocurred while trying"
+                + " to open the question dialog.");
+            return false;
+        }
+    }
+
+    /**
+     * Ask the User a given question. It pops up a QuestionDialog with given
+     * title and message. Additionally custom button labels are applicable.
+     * 
+     * @param title
+     *            dialog title
+     * @param message
+     *            displayed message
+     * @param dialogButtonLabels
+     *            custom button labels
+     * @param failSilently
+     *            don`t open the dialog
+     * 
+     * @return boolean indicating whether the user said Yes or No
+     */
+    public static boolean popUpCustomQuestion(final String title,
+        final String message, final String[] dialogButtonLabels,
+        boolean failSilently) {
+        if (failSilently)
+            return false;
+
+        try {
+            return SWTUtils.runSWTSync(new Callable<Boolean>() {
+                @Override
+                public Boolean call() {
+                    MessageDialog md = new MessageDialog(EditorAPI.getShell(),
+                        title, null, message, MessageDialog.QUESTION,
+                        dialogButtonLabels, 0);
+                    md.open();
+                    return md.getReturnCode() == 0;
+                }
+            });
+        } catch (Exception e) {
+            log.error("An internal error ocurred while trying"
+                + " to open the question dialog.");
+            return false;
+        }
+    }
+
+    /**
+     * Ask the User a given question. It pops up a QuestionDialog with given
+     * title and message.
+     * 
+     * @return boolean indicating whether the user said Yes or No
+     */
+    public static boolean popUpYesNoQuestion(final String title,
+        final String message, boolean failSilently) {
+        if (failSilently)
+            return false;
+
+        try {
+            return SWTUtils.runSWTSync(new Callable<Boolean>() {
+                @Override
+                public Boolean call() {
+                    return MessageDialog.openQuestion(EditorAPI.getShell(),
+                        title, message);
+                }
+            });
+        } catch (Exception e) {
+            log.error("An internal error ocurred while trying"
+                + " to open the question dialog.");
+            return false;
+        }
+    }
+
+    /**
+     * Indicate the User that there was an error. It pops up an ErrorDialog with
+     * given title and message.
+     */
+    public static void popUpFailureMessage(final String title,
+        final String message, boolean failSilently) {
+        if (failSilently)
+            return;
+
+        SWTUtils.runSafeSWTSync(log, new Runnable() {
+            @Override
+            public void run() {
+                MessageDialog.openError(EditorAPI.getShell(), title, message);
+            }
+        });
     }
 }

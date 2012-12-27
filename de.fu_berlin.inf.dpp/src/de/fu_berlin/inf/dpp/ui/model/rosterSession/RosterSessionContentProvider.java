@@ -24,7 +24,7 @@ import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
 import de.fu_berlin.inf.dpp.ui.model.TreeContentProvider;
 import de.fu_berlin.inf.dpp.ui.model.roster.RosterContentProvider;
-import de.fu_berlin.inf.dpp.util.Utils;
+import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 import de.fu_berlin.inf.nebula.utils.ViewerUtils;
 
 /**
@@ -57,7 +57,7 @@ public class RosterSessionContentProvider extends TreeContentProvider {
 
         @Override
         public void activeEditorChanged(final User user, SPath path) {
-            Utils.runSafeSWTAsync(null, new Runnable() {
+            SWTUtils.runSafeSWTAsync(null, new Runnable() {
                 @Override
                 public void run() {
                     if (viewer.getControl().isDisposed())
@@ -75,7 +75,7 @@ public class RosterSessionContentProvider extends TreeContentProvider {
             // does not force a redraw
             // ViewerUtils.refresh(viewer, true);
 
-            Utils.runSafeSWTAsync(null, new Runnable() {
+            SWTUtils.runSafeSWTAsync(null, new Runnable() {
                 @Override
                 public void run() {
                     if (viewer.getControl().isDisposed())

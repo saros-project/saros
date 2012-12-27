@@ -22,6 +22,7 @@ import de.fu_berlin.inf.dpp.net.internal.StreamSession.StreamSessionListener;
 import de.fu_berlin.inf.dpp.observables.VoIPSessionObservable;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
 import de.fu_berlin.inf.dpp.ui.util.DialogUtils;
+import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 import de.fu_berlin.inf.dpp.util.Utils;
 
 /**
@@ -95,7 +96,7 @@ public class AudioServiceManager {
             audioListener.sessionStopped(session);
 
             session.dispose();
-            Utils.runSafeSWTAsync(log, new Runnable() {
+            SWTUtils.runSafeSWTAsync(log, new Runnable() {
 
                 @Override
                 public void run() {
@@ -212,7 +213,7 @@ public class AudioServiceManager {
     }
 
     private void openErrorDialog(final String title, final String message) {
-        Utils.runSafeSWTAsync(log, new Runnable() {
+        SWTUtils.runSafeSWTAsync(log, new Runnable() {
             @Override
             public void run() {
                 DialogUtils.openErrorMessageDialog(EditorAPI.getShell(), title,

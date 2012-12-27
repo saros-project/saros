@@ -20,6 +20,7 @@ import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
 import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.ui.dialogs.FeedbackDialog;
+import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 import de.fu_berlin.inf.dpp.util.Utils;
 
 /**
@@ -333,7 +334,7 @@ public class FeedbackManager extends AbstractFeedbackManager implements
         resetSessionsUntilNextToInterval();
 
         try {
-            return Utils.runSWTSync(new Callable<Boolean>() {
+            return SWTUtils.runSWTSync(new Callable<Boolean>() {
 
                 @Override
                 public Boolean call() {
@@ -364,10 +365,10 @@ public class FeedbackManager extends AbstractFeedbackManager implements
     public static int showSurvey() {
         int browserType = BROWSER_EXT;
 
-        if (!Utils.openExternalBrowser(SURVEY_URL)) {
+        if (!SWTUtils.openExternalBrowser(SURVEY_URL)) {
             browserType = BROWSER_INT;
 
-            if (!Utils.openInternalBrowser(SURVEY_URL,
+            if (!SWTUtils.openInternalBrowser(SURVEY_URL,
                 Messages.getString("feedback.dialog.title"))) {
                 browserType = BROWSER_NONE;
                 // last resort: present a link to the survey

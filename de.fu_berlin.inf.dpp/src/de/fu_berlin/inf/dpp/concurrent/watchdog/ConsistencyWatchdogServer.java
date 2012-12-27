@@ -29,7 +29,7 @@ import de.fu_berlin.inf.dpp.project.AbstractSarosSessionListener;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.synchronize.Blockable;
-import de.fu_berlin.inf.dpp.util.Utils;
+import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 
 /**
  * This class is an eclipse job run on the host side ONLY.
@@ -83,7 +83,7 @@ public class ConsistencyWatchdogServer extends Job {
         @Override
         public void block() {
 
-            Utils.runSafeSWTSync(log, new Runnable() {
+            SWTUtils.runSafeSWTSync(log, new Runnable() {
                 @Override
                 public void run() {
                     /*
@@ -208,7 +208,7 @@ public class ConsistencyWatchdogServer extends Job {
         final Set<SPath> localEditors, final Set<SPath> remoteEditors,
         final SPath docPath) {
 
-        Utils.runSafeSWTSync(log, new Runnable() {
+        SWTUtils.runSafeSWTSync(log, new Runnable() {
             @Override
             public void run() {
 

@@ -74,6 +74,7 @@ import de.fu_berlin.inf.dpp.net.internal.extensions.XStreamExtensionProvider;
 import de.fu_berlin.inf.dpp.observables.SarosSessionObservable;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
+import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 import de.fu_berlin.inf.dpp.util.ActivityUtils;
 import de.fu_berlin.inf.dpp.util.Utils;
 
@@ -570,7 +571,7 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
             if (participant.getConnectionState() == UserConnectionState.OFFLINE) {
                 // FIXME: let the method handle the synchronization, not the
                 // caller !
-                Utils.runSafeSWTAsync(log, new Runnable() {
+                SWTUtils.runSafeSWTAsync(log, new Runnable() {
                     @Override
                     public void run() {
                         log.info("removing participant " + participant

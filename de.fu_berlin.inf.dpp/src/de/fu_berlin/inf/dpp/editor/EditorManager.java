@@ -84,6 +84,7 @@ import de.fu_berlin.inf.dpp.project.ISarosSessionListener;
 import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
 import de.fu_berlin.inf.dpp.synchronize.Blockable;
+import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 import de.fu_berlin.inf.dpp.ui.views.SarosView;
 import de.fu_berlin.inf.dpp.util.BlockingProgressMonitor;
 import de.fu_berlin.inf.dpp.util.Predicate;
@@ -200,7 +201,7 @@ public class EditorManager extends AbstractActivityProvider {
     private Blockable stopManagerListener = new Blockable() {
         @Override
         public void unblock() {
-            Utils.runSafeSWTSync(log, new Runnable() {
+            SWTUtils.runSafeSWTSync(log, new Runnable() {
 
                 @Override
                 public void run() {
@@ -211,7 +212,7 @@ public class EditorManager extends AbstractActivityProvider {
 
         @Override
         public void block() {
-            Utils.runSafeSWTSync(log, new Runnable() {
+            SWTUtils.runSafeSWTSync(log, new Runnable() {
 
                 @Override
                 public void run() {
@@ -313,7 +314,7 @@ public class EditorManager extends AbstractActivityProvider {
             remoteWriteAccessManager = new RemoteWriteAccessManager(
                 sarosSession);
 
-            Utils.runSafeSWTSync(log, new Runnable() {
+            SWTUtils.runSafeSWTSync(log, new Runnable() {
                 @Override
                 public void run() {
 
@@ -328,7 +329,7 @@ public class EditorManager extends AbstractActivityProvider {
             assert sarosSession == oldSarosSession;
             sarosSession.getStopManager().removeBlockable(stopManagerListener);
 
-            Utils.runSafeSWTSync(log, new Runnable() {
+            SWTUtils.runSafeSWTSync(log, new Runnable() {
                 @Override
                 public void run() {
 
@@ -368,7 +369,7 @@ public class EditorManager extends AbstractActivityProvider {
 
         @Override
         public void projectAdded(String projectID) {
-            Utils.runSafeSWTSync(log, new Runnable() {
+            SWTUtils.runSafeSWTSync(log, new Runnable() {
 
                 /*
                  * When Alice invites Bob to a session with a project and Alice
@@ -734,7 +735,7 @@ public class EditorManager extends AbstractActivityProvider {
     @Override
     public void exec(final IActivity activity) {
 
-        assert Utils.isSWT();
+        assert SWTUtils.isSWT();
 
         User sender = activity.getSource();
         if (!sender.isInSarosSession()) {
@@ -1001,7 +1002,7 @@ public class EditorManager extends AbstractActivityProvider {
      * of the currently opened {@link IEditorPart}.
      */
     public void sendPartActivated() {
-        Utils.runSafeSWTSync(log, new Runnable() {
+        SWTUtils.runSafeSWTSync(log, new Runnable() {
             @Override
             public void run() {
                 partActivated(editorAPI.getActiveEditor());
@@ -1357,7 +1358,7 @@ public class EditorManager extends AbstractActivityProvider {
         }
 
         try {
-            Utils.runSWTSync(new Callable<Object>() {
+            SWTUtils.runSWTSync(new Callable<Object>() {
                 @Override
                 public Object call() throws Exception {
                     saveText(path);

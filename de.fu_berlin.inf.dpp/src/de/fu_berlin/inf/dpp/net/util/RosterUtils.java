@@ -27,7 +27,7 @@ import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.SarosNet;
 import de.fu_berlin.inf.dpp.ui.util.DialogUtils;
-import de.fu_berlin.inf.dpp.util.Utils;
+import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 
 /**
  * Utility class for classic {@link Roster} operations
@@ -258,7 +258,7 @@ public class RosterUtils {
             if (!jidOnServer) {
                 boolean cancel = false;
                 try {
-                    cancel = Utils.runSWTSync(new Callable<Boolean>() {
+                    cancel = SWTUtils.runSWTSync(new Callable<Boolean>() {
                         @Override
                         public Boolean call() throws Exception {
                             return !DialogUtils
@@ -290,7 +290,7 @@ public class RosterUtils {
             boolean cancel = false;
 
             try {
-                cancel = Utils.runSWTSync(new Callable<Boolean>() {
+                cancel = SWTUtils.runSWTSync(new Callable<Boolean>() {
                     @Override
                     public Boolean call() throws Exception {
                         return !DialogUtils.openQuestionMessageDialog(null,

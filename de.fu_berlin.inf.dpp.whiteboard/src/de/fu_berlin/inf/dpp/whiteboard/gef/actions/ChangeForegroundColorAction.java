@@ -9,7 +9,7 @@ import org.eclipse.swt.widgets.ColorDialog;
 
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.ui.actions.ChangeColorAction;
-import de.fu_berlin.inf.dpp.util.Utils;
+import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 import de.fu_berlin.inf.dpp.whiteboard.gef.util.ColorUtils;
 import de.fu_berlin.inf.dpp.whiteboard.gef.util.IconUtils;
 
@@ -58,7 +58,7 @@ public class ChangeForegroundColorAction extends Action implements
 	 */
 	@Override
 	public void run() {
-		Utils.runSafeSWTSync(log, new Runnable() {
+		SWTUtils.runSafeSWTSync(log, new Runnable() {
 			@Override
 			public void run() {
 				ColorDialog changeColor = new ColorDialog(EditorAPI.getShell());

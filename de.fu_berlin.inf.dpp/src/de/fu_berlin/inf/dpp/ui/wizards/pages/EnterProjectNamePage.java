@@ -45,6 +45,7 @@ import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
 import de.fu_berlin.inf.dpp.ui.ImageManager;
 import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.ui.preferencePages.GeneralPreferencePage;
+import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 import de.fu_berlin.inf.dpp.ui.views.SarosView;
 import de.fu_berlin.inf.dpp.ui.wizards.utils.EnterProjectNamePageUtils;
 import de.fu_berlin.inf.dpp.util.Utils;
@@ -193,7 +194,7 @@ public class EnterProjectNamePage extends WizardPage {
 
             @Override
             public void run() {
-                Utils.runSafeSWTSync(log, new Runnable() {
+                SWTUtils.runSafeSWTSync(log, new Runnable() {
 
                     @Override
                     public void run() {

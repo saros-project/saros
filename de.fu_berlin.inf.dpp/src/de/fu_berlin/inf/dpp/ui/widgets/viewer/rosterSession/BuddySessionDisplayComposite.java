@@ -53,9 +53,9 @@ import de.fu_berlin.inf.dpp.ui.model.rosterSession.RosterSessionComparator;
 import de.fu_berlin.inf.dpp.ui.model.rosterSession.RosterSessionContentProvider;
 import de.fu_berlin.inf.dpp.ui.model.rosterSession.RosterSessionInput;
 import de.fu_berlin.inf.dpp.ui.model.rosterSession.UserElement;
+import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 import de.fu_berlin.inf.dpp.ui.views.SarosView;
 import de.fu_berlin.inf.dpp.ui.widgets.viewer.ViewerComposite;
-import de.fu_berlin.inf.dpp.util.Utils;
 import de.fu_berlin.inf.nebula.utils.LayoutUtils;
 import de.fu_berlin.inf.nebula.utils.PaintUtils;
 import de.fu_berlin.inf.nebula.utils.ViewerUtils;
@@ -318,7 +318,7 @@ public class BuddySessionDisplayComposite extends ViewerComposite {
                         User user = (User) Platform.getAdapterManager()
                             .getAdapter(treeItem.getData(), User.class);
                         if (user != null && !user.isLocal()) {
-                            SarosView sarosView = ((SarosView) Utils
+                            SarosView sarosView = ((SarosView) SWTUtils
                                 .findView(SarosView.ID));
                             /*
                              * toggle follow mode when doubleclicked on user
@@ -364,7 +364,7 @@ public class BuddySessionDisplayComposite extends ViewerComposite {
                             return;
                         }
                         if (!user.isLocal()) {
-                            SarosView sarosView = ((SarosView) Utils
+                            SarosView sarosView = ((SarosView) SWTUtils
                                 .findView(SarosView.ID));
                             sarosView.getFollowModeAction()
                                 .setFollowModeActionStatus(user);

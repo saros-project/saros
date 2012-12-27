@@ -11,8 +11,8 @@ import org.eclipse.ui.texteditor.IElementStateListener;
 
 import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
+import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 import de.fu_berlin.inf.dpp.util.AutoHashMap;
-import de.fu_berlin.inf.dpp.util.Utils;
 
 /**
  * Listener registered on Editors to be informed about their dirty state.
@@ -54,7 +54,7 @@ public class DirtyStateListener implements IElementStateListener {
             return;
         }
 
-        Utils.runSafeSWTSync(log, new Runnable() {
+        SWTUtils.runSafeSWTSync(log, new Runnable() {
 
             @Override
             public void run() {

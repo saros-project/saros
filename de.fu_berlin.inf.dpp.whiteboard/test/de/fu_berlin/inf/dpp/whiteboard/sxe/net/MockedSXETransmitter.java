@@ -8,7 +8,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.xmlpull.v1.XmlPullParserException;
 
 import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
-import de.fu_berlin.inf.dpp.util.Utils;
+import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 import de.fu_berlin.inf.dpp.whiteboard.sxe.SXEController;
 import de.fu_berlin.inf.dpp.whiteboard.sxe.constants.SXEMessageType;
 import de.fu_berlin.inf.dpp.whiteboard.sxe.records.serializable.RecordDataObject;
@@ -77,7 +77,7 @@ public class MockedSXETransmitter implements ISXETransmitter {
 	}
 
 	protected void handleReceiveRecords(final SXEMessage message) {
-		Utils.runSafeSWTAsync(log, new Runnable() {
+		SWTUtils.runSafeSWTAsync(log, new Runnable() {
 
 			@Override
 			public void run() {
@@ -88,7 +88,7 @@ public class MockedSXETransmitter implements ISXETransmitter {
 	}
 
 	protected void handleReceiveState(final SXEMessage message) {
-		Utils.runSafeSWTAsync(log, new Runnable() {
+		SWTUtils.runSafeSWTAsync(log, new Runnable() {
 
 			@Override
 			public void run() {

@@ -29,6 +29,7 @@ import de.fu_berlin.inf.dpp.net.upnp.IUPnPService;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
 import de.fu_berlin.inf.dpp.ui.ImageManager;
 import de.fu_berlin.inf.dpp.ui.Messages;
+import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 import de.fu_berlin.inf.dpp.ui.widgets.decoration.EmptyText;
 import de.fu_berlin.inf.dpp.util.LinkListener;
 import de.fu_berlin.inf.dpp.util.Utils;
@@ -357,7 +358,7 @@ public class ConfigurationSettingsWizardPage extends WizardPage {
                 upnpService.discoverGateways();
 
                 // GUI work from SWT thread
-                Utils.runSafeSWTAsync(null, new Runnable() {
+                SWTUtils.runSafeSWTAsync(null, new Runnable() {
 
                     @Override
                     public void run() {

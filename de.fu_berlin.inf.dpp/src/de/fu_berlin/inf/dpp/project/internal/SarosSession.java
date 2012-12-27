@@ -107,6 +107,7 @@ import de.fu_berlin.inf.dpp.project.SharedResourcesManager;
 import de.fu_berlin.inf.dpp.synchronize.StartHandle;
 import de.fu_berlin.inf.dpp.synchronize.StopManager;
 import de.fu_berlin.inf.dpp.ui.util.CollaborationUtils;
+import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 import de.fu_berlin.inf.dpp.util.ArrayUtils;
 import de.fu_berlin.inf.dpp.util.FileUtils;
 import de.fu_berlin.inf.dpp.util.MappedList;
@@ -181,7 +182,7 @@ public class SarosSession implements ISarosSession, Disposable {
          */
         @Override
         public void activityCreated(final IActivity activityData) {
-            Utils.runSafeSWTSync(log, new Runnable() {
+            SWTUtils.runSafeSWTSync(log, new Runnable() {
 
                 @Override
                 public void run() {
@@ -406,7 +407,7 @@ public class SarosSession implements ISarosSession, Disposable {
 
         if (user.isHost()) {
 
-            Utils.runSafeSWTSync(log, new Runnable() {
+            SWTUtils.runSafeSWTSync(log, new Runnable() {
                 @Override
                 public void run() {
                     abuseActivityCreated(new PermissionActivity(getLocalUser(),
@@ -420,7 +421,7 @@ public class SarosSession implements ISarosSession, Disposable {
             StartHandle startHandle = getStopManager().stop(user,
                 Messages.SarosSession_performing_permission_change, progress);
 
-            Utils.runSafeSWTSync(log, new Runnable() {
+            SWTUtils.runSafeSWTSync(log, new Runnable() {
                 @Override
                 public void run() {
                     abuseActivityCreated(new PermissionActivity(getLocalUser(),
@@ -442,7 +443,7 @@ public class SarosSession implements ISarosSession, Disposable {
     @Override
     public void setPermission(final User user, final Permission permission) {
 
-        assert Utils.isSWT() : "Must be called from SWT Thread"; //$NON-NLS-1$
+        assert SWTUtils.isSWT() : "Must be called from SWT Thread"; //$NON-NLS-1$
 
         if (user == null || permission == null)
             throw new IllegalArgumentException();
@@ -462,7 +463,7 @@ public class SarosSession implements ISarosSession, Disposable {
         user.invitationCompleted();
 
         // WTF ... let the UI handle the synch.
-        Utils.runSafeSWTAsync(log, new Runnable() {
+        SWTUtils.runSafeSWTAsync(log, new Runnable() {
             @Override
             public void run() {
                 userInvitationCompletedWrapped(user);
@@ -804,9 +805,9 @@ public class SarosSession implements ISarosSession, Disposable {
          * handling was used
          */
         if (projectNegotiationObservable.getProcesses().values().size() > 0) {
-            Utils.runSafeSWTSync(log, transformingRunnable);
+            SWTUtils.runSafeSWTSync(log, transformingRunnable);
         } else {
-            Utils.runSafeSWTAsync(log, transformingRunnable);
+            SWTUtils.runSafeSWTAsync(log, transformingRunnable);
         }
     }
 
@@ -913,7 +914,7 @@ public class SarosSession implements ISarosSession, Disposable {
      */
     private void handleActivityCreated(IActivity activity) {
 
-        assert Utils.isSWT() : "Must be called from the SWT Thread"; //$NON-NLS-1$
+        assert SWTUtils.isSWT() : "Must be called from the SWT Thread"; //$NON-NLS-1$
 
         if (activity == null)
             throw new IllegalArgumentException("Activity cannot be null"); //$NON-NLS-1$
@@ -1092,7 +1093,7 @@ public class SarosSession implements ISarosSession, Disposable {
             final ProgressMonitorDialog dialog = new ProgressMonitorDialog(
                 EditorAPI.getAWorkbenchWindow().getShell());
             final SarosSession session = this;
-            Utils.runSafeSWTSync(log, new Runnable() {
+            SWTUtils.runSafeSWTSync(log, new Runnable() {
                 @Override
                 public void run() {
                     try {

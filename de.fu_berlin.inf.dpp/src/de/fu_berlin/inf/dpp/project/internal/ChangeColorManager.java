@@ -24,7 +24,7 @@ import de.fu_berlin.inf.dpp.project.AbstractSharedProjectListener;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
 import de.fu_berlin.inf.dpp.project.Messages;
-import de.fu_berlin.inf.dpp.util.Utils;
+import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 
 /**
  * This manager is responsible for handling color changes.
@@ -115,7 +115,7 @@ public class ChangeColorManager extends AbstractActivityProvider implements
 
                 if (!ChangeColorManager.checkColor(rgbOfNewParticipant,
                     userList)) {
-                    Utils.runSafeSWTSync(log, new Runnable() {
+                    SWTUtils.runSafeSWTSync(log, new Runnable() {
                         @Override
                         public void run() {
                             ColorDialog changeColor = new ColorDialog(EditorAPI

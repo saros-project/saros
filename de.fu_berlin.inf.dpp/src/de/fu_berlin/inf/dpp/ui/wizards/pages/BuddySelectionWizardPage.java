@@ -21,12 +21,12 @@ import de.fu_berlin.inf.dpp.net.discoverymanager.DiscoveryManager;
 import de.fu_berlin.inf.dpp.net.discoverymanager.DiscoveryManagerListener;
 import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
 import de.fu_berlin.inf.dpp.ui.Messages;
+import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 import de.fu_berlin.inf.dpp.ui.util.selection.retriever.SelectionRetrieverFactory;
 import de.fu_berlin.inf.dpp.ui.widgets.viewer.roster.BuddySelectionComposite;
 import de.fu_berlin.inf.dpp.ui.widgets.viewer.roster.events.BuddySelectionChangedEvent;
 import de.fu_berlin.inf.dpp.ui.widgets.viewer.roster.events.BuddySelectionListener;
 import de.fu_berlin.inf.dpp.ui.widgets.viewer.roster.events.FilterNonSarosBuddiesChangedEvent;
-import de.fu_berlin.inf.dpp.util.Utils;
 
 /**
  * Allows the user to select a {@link JID} from the {@link Roster}.
@@ -78,7 +78,7 @@ public class BuddySelectionWizardPage extends WizardPage {
         public void featureSupportUpdated(final JID jid, String feature,
             boolean isSupported) {
             if (Saros.NAMESPACE.equals(feature)) {
-                Utils.runSafeSWTAsync(log, new Runnable() {
+                SWTUtils.runSafeSWTAsync(log, new Runnable() {
                     @Override
                     public void run() {
                         updatePageCompletion();

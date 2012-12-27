@@ -22,7 +22,7 @@ import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.SafePacketListener;
 import de.fu_berlin.inf.dpp.net.SarosNet;
 import de.fu_berlin.inf.dpp.ui.Messages;
-import de.fu_berlin.inf.dpp.util.Utils;
+import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 
 /**
  * This is class is responsible for handling XMPP subscriptions requests.
@@ -219,7 +219,7 @@ public class SubscriptionManager {
 
     private void askUserForSubscriptionConfirmation(final Presence presence) {
 
-        Utils.runSafeSWTAsync(log, new Runnable() {
+        SWTUtils.runSafeSWTAsync(log, new Runnable() {
             @Override
             public void run() {
                 // TODO Should flash dialog
@@ -251,7 +251,7 @@ public class SubscriptionManager {
     // logic
     private void informUserAboutUnsubscription(final String from) {
 
-        Utils.runSafeSWTAsync(log, new Runnable() {
+        SWTUtils.runSafeSWTAsync(log, new Runnable() {
             @Override
             public void run() {
                 MessageDialog.openInformation(

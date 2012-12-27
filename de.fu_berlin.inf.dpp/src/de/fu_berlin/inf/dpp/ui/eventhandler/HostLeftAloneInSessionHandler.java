@@ -14,8 +14,9 @@ import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
 import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.ui.util.CollaborationUtils;
+import de.fu_berlin.inf.dpp.ui.util.DialogUtils;
+import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 import de.fu_berlin.inf.dpp.ui.views.SarosView;
-import de.fu_berlin.inf.dpp.util.Utils;
 
 /**
  * Checks if the host remains alone after a user left the session. If so, ask if
@@ -88,7 +89,7 @@ public class HostLeftAloneInSessionHandler {
         // if user did not save a decision in preferences yet: ask!
         if (!stopSessionPreference.equals("false")
             && !stopSessionPreference.equals("true")) {
-            stopSession = Utils.popUpRememberDecisionDialog(
+            stopSession = DialogUtils.popUpRememberDecisionDialog(
                 Messages.HostLeftAloneInSessionDialog_title,
                 Messages.HostLeftAloneInSessionDialog_message, saros,
                 PreferenceConstants.STOP_EMPTY_SESSIONS);
@@ -97,7 +98,7 @@ public class HostLeftAloneInSessionHandler {
         }
 
         if (stopSession) {
-            Utils.runSafeSWTAsync(log, new Runnable() {
+            SWTUtils.runSafeSWTAsync(log, new Runnable() {
                 @Override
                 public void run() {
                     CollaborationUtils.leaveSession(sessionManager);

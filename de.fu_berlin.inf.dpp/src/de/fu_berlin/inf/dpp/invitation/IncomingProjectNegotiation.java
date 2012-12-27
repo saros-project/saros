@@ -65,6 +65,7 @@ import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
 import de.fu_berlin.inf.dpp.project.IChecksumCache;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.ui.RemoteProgressManager;
+import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 import de.fu_berlin.inf.dpp.ui.wizards.AddProjectToSessionWizard;
 import de.fu_berlin.inf.dpp.ui.wizards.pages.EnterProjectNamePage;
 import de.fu_berlin.inf.dpp.util.ArrayUtils;
@@ -517,7 +518,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
         }
 
         try {
-            newLocalProject = Utils.runSWTSync(new Callable<IProject>() {
+            newLocalProject = SWTUtils.runSWTSync(new Callable<IProject>() {
                 @Override
                 public IProject call() throws CoreException,
                     InterruptedException {

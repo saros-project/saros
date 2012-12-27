@@ -46,6 +46,7 @@ import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
 import de.fu_berlin.inf.dpp.ui.sounds.SoundManager;
 import de.fu_berlin.inf.dpp.ui.sounds.SoundPlayer;
+import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 import de.fu_berlin.inf.dpp.ui.widgets.chatControl.events.CharacterEnteredEvent;
 import de.fu_berlin.inf.dpp.ui.widgets.chatControl.events.ChatClearedEvent;
 import de.fu_berlin.inf.dpp.ui.widgets.chatControl.events.IChatControlListener;
@@ -54,7 +55,6 @@ import de.fu_berlin.inf.dpp.ui.widgets.chatControl.events.MessageEnteredEvent;
 import de.fu_berlin.inf.dpp.ui.widgets.chatControl.parts.ChatDisplay;
 import de.fu_berlin.inf.dpp.ui.widgets.chatControl.parts.ChatInput;
 import de.fu_berlin.inf.dpp.ui.widgets.session.ChatRoomsComposite;
-import de.fu_berlin.inf.dpp.util.Utils;
 import de.fu_berlin.inf.nebula.explanation.ExplanationComposite;
 import de.fu_berlin.inf.nebula.utils.ColorUtils;
 
@@ -195,7 +195,7 @@ public class ChatControl extends Composite {
 
         @Override
         public void messageReceived(final JID sender, final String message) {
-            Utils.runSafeSWTAsync(log, new Runnable() {
+            SWTUtils.runSafeSWTAsync(log, new Runnable() {
 
                 @Override
                 public void run() {
@@ -220,7 +220,7 @@ public class ChatControl extends Composite {
 
         @Override
         public void stateChanged(final JID jid, final ChatState state) {
-            Utils.runSafeSWTAsync(log, new Runnable() {
+            SWTUtils.runSafeSWTAsync(log, new Runnable() {
                 @Override
                 public void run() {
                     if (ChatControl.this.isDisposed())
@@ -242,7 +242,7 @@ public class ChatControl extends Composite {
 
         @Override
         public void connected(final JID jid) {
-            Utils.runSafeSWTAsync(null, new Runnable() {
+            SWTUtils.runSafeSWTAsync(null, new Runnable() {
 
                 @Override
                 public void run() {
@@ -260,7 +260,7 @@ public class ChatControl extends Composite {
 
         @Override
         public void disconnected(final JID jid) {
-            Utils.runSafeSWTAsync(null, new Runnable() {
+            SWTUtils.runSafeSWTAsync(null, new Runnable() {
 
                 @Override
                 public void run() {
@@ -632,7 +632,7 @@ public class ChatControl extends Composite {
      * asynchronously to prevent dead locks.
      */
     private void updateColorsInSWTAsync() {
-        Utils.runSafeSWTAsync(log, new Runnable() {
+        SWTUtils.runSafeSWTAsync(log, new Runnable() {
             @Override
             public void run() {
                 if (isDisposed())

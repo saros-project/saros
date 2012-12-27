@@ -12,6 +12,7 @@ import de.fu_berlin.inf.dpp.net.internal.StreamSession;
 import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.ui.actions.SendFileAction;
 import de.fu_berlin.inf.dpp.ui.util.DialogUtils;
+import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 import de.fu_berlin.inf.dpp.util.Utils;
 
 public class FileStreamService extends StreamService {
@@ -73,7 +74,7 @@ public class FileStreamService extends StreamService {
         };
 
         try {
-            return Utils.runSWTSync(askUser);
+            return SWTUtils.runSWTSync(askUser);
         } catch (Exception e) {
             log.error("Unexpected exception: ", e); //$NON-NLS-1$
             return false;

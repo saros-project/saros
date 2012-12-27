@@ -67,11 +67,11 @@ import de.fu_berlin.inf.dpp.editor.annotations.SarosAnnotation;
 import de.fu_berlin.inf.dpp.editor.annotations.SelectionAnnotation;
 import de.fu_berlin.inf.dpp.editor.annotations.ViewportAnnotation;
 import de.fu_berlin.inf.dpp.ui.dialogs.WarningMessageDialog;
+import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 import de.fu_berlin.inf.dpp.ui.views.SarosView;
 import de.fu_berlin.inf.dpp.util.BlockingProgressMonitor;
 import de.fu_berlin.inf.dpp.util.Pair;
 import de.fu_berlin.inf.dpp.util.StackTrace;
-import de.fu_berlin.inf.dpp.util.Utils;
 
 /**
  * The central implementation of the IEditorAPI which basically encapsulates the
@@ -125,7 +125,7 @@ public class EditorAPI implements IEditorAPI {
      */
     @Override
     public void addEditorPartListener(EditorManager editorManager) {
-        assert Utils.isSWT();
+        assert SWTUtils.isSWT();
 
         if (editorManager == null)
             throw new IllegalArgumentException();
@@ -606,7 +606,7 @@ public class EditorAPI implements IEditorAPI {
     public void setEditable(final IEditorPart editorPart,
         final boolean newIsEditable) {
 
-        Utils.runSafeSWTSync(log, new Runnable() {
+        SWTUtils.runSafeSWTSync(log, new Runnable() {
             @Override
             public void run() {
                 ITextViewer textViewer = EditorAPI.getViewer(editorPart);
@@ -668,7 +668,7 @@ public class EditorAPI implements IEditorAPI {
     public void addSharedEditorListener(EditorManager editorManager,
         IEditorPart editorPart) {
 
-        assert Utils.isSWT();
+        assert SWTUtils.isSWT();
 
         if (editorManager == null || editorPart == null)
             throw new IllegalArgumentException();
@@ -691,7 +691,7 @@ public class EditorAPI implements IEditorAPI {
     public void removeSharedEditorListener(EditorManager editorManager,
         IEditorPart editorPart) {
 
-        assert Utils.isSWT();
+        assert SWTUtils.isSWT();
 
         if (editorManager == null || editorPart == null)
             throw new IllegalArgumentException();
@@ -840,7 +840,7 @@ public class EditorAPI implements IEditorAPI {
         final BlockingProgressMonitor monitor = new BlockingProgressMonitor();
 
         // save document
-        Utils.runSafeSWTSync(log, new Runnable() {
+        SWTUtils.runSafeSWTSync(log, new Runnable() {
             @Override
             public void run() {
                 editor.doSave(monitor);
@@ -910,7 +910,7 @@ public class EditorAPI implements IEditorAPI {
         final boolean confirm) {
         try {
             Boolean result = true;
-            result = Utils.runSWTSync(new Callable<Boolean>() {
+            result = SWTUtils.runSWTSync(new Callable<Boolean>() {
                 @Override
                 public Boolean call() throws Exception {
                     /**

@@ -23,7 +23,7 @@ import de.fu_berlin.inf.dpp.project.AbstractSharedProjectListener;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
 import de.fu_berlin.inf.dpp.project.internal.SarosSession.QueueItem;
-import de.fu_berlin.inf.dpp.util.Utils;
+import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 
 /**
  * ConcurrentDocumentClient is responsible for managing the Jupiter interaction
@@ -99,7 +99,7 @@ public class ConcurrentDocumentClient implements Disposable {
      */
     public List<QueueItem> transformOutgoing(IActivity activity) {
 
-        assert Utils.isSWT() : "CDC.transformOutgoing must be called on the SWT Thread";
+        assert SWTUtils.isSWT() : "CDC.transformOutgoing must be called on the SWT Thread";
 
         List<QueueItem> result = new ArrayList<QueueItem>();
 
@@ -165,7 +165,7 @@ public class ConcurrentDocumentClient implements Disposable {
     public TransformationResult transformIncoming(
         List<IActivity> activityDataObjects) {
 
-        assert Utils.isSWT() : "CDC.transformIncoming must be called on the SWT Thread";
+        assert SWTUtils.isSWT() : "CDC.transformIncoming must be called on the SWT Thread";
 
         TransformationResult result = new TransformationResult(
             sarosSession.getLocalUser());

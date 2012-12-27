@@ -8,6 +8,8 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Link;
 import org.eclipse.swt.widgets.Listener;
 
+import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
+
 /**
  * A simple Listener that handles link selection events by opening the link text
  * in an external browser. Is supposed to be used with {@link Link}. <br>
@@ -28,7 +30,7 @@ public class LinkListener implements Listener {
 
     @Override
     public void handleEvent(Event event) {
-        if (!Utils.openExternalBrowser(event.text)) {
+        if (!SWTUtils.openExternalBrowser(event.text)) {
             log.error("Couldn't open link " + event.text
                 + " in external browser.");
         }

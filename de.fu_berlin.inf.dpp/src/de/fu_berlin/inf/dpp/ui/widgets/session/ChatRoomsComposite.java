@@ -40,6 +40,7 @@ import de.fu_berlin.inf.dpp.project.ISarosSessionListener;
 import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.ui.ImageManager;
 import de.fu_berlin.inf.dpp.ui.Messages;
+import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 import de.fu_berlin.inf.dpp.ui.views.SarosView;
 import de.fu_berlin.inf.dpp.ui.widgets.chatControl.ChatControl;
 import de.fu_berlin.inf.dpp.util.Utils;
@@ -93,7 +94,7 @@ public class ChatRoomsComposite extends ListExplanatoryComposite {
 
         @Override
         public void entriesUpdated(final Collection<String> addresses) {
-            Utils.runSafeSWTAsync(log, new Runnable() {
+            SWTUtils.runSafeSWTAsync(log, new Runnable() {
                 @Override
                 public void run() {
 
@@ -124,7 +125,7 @@ public class ChatRoomsComposite extends ListExplanatoryComposite {
     protected AbstractSharedEditorListener sharedEditorListener = new AbstractSharedEditorListener() {
         @Override
         public void colorChanged() {
-            Utils.runSafeSWTAsync(log, new Runnable() {
+            SWTUtils.runSafeSWTAsync(log, new Runnable() {
                 @Override
                 public void run() {
                     for (CTabItem tab : chatRooms.getItems()) {
@@ -142,7 +143,7 @@ public class ChatRoomsComposite extends ListExplanatoryComposite {
         @Override
         public void sessionStarting(final ISarosSession session) {
 
-            Utils.runSafeSWTSync(log, new Runnable() {
+            SWTUtils.runSafeSWTSync(log, new Runnable() {
                 @Override
                 public void run() {
                     isSessionRunning = true;
@@ -178,7 +179,7 @@ public class ChatRoomsComposite extends ListExplanatoryComposite {
 
         @Override
         public void sessionEnded(final ISarosSession session) {
-            Utils.runSafeSWTAsync(log, new Runnable() {
+            SWTUtils.runSafeSWTAsync(log, new Runnable() {
                 @Override
                 public void run() {
 
@@ -232,7 +233,7 @@ public class ChatRoomsComposite extends ListExplanatoryComposite {
 
         @Override
         public void chatCreated(final IChat chat, boolean createdLocally) {
-            Utils.runSafeSWTAsync(log, new Runnable() {
+            SWTUtils.runSafeSWTAsync(log, new Runnable() {
                 @Override
                 // FIXME: disposed ?!
                 public void run() {
@@ -269,7 +270,7 @@ public class ChatRoomsComposite extends ListExplanatoryComposite {
 
         @Override
         public void chatDestroyed(final IChat chat) {
-            Utils.runSafeSWTAsync(log, new Runnable() {
+            SWTUtils.runSafeSWTAsync(log, new Runnable() {
 
                 @Override
                 public void run() {
@@ -306,7 +307,7 @@ public class ChatRoomsComposite extends ListExplanatoryComposite {
                             : exception.getMessage());
             }
 
-            Utils.runSafeSWTAsync(log, new Runnable() {
+            SWTUtils.runSafeSWTAsync(log, new Runnable() {
 
                 @Override
                 public void run() {

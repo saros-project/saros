@@ -20,7 +20,7 @@ import de.fu_berlin.inf.dpp.project.AbstractSarosSessionListener;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ISarosSessionListener;
 import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
-import de.fu_berlin.inf.dpp.util.Utils;
+import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 
 /**
  * Adds variables to Eclipse's Core {@link Expression}s in order to be used in
@@ -116,7 +116,7 @@ public class SarosSourceProvider extends AbstractSourceProvider {
     }
 
     private final void connectionChanged() {
-        Utils.runSafeSWTAsync(null, new Runnable() {
+        SWTUtils.runSafeSWTAsync(null, new Runnable() {
             @Override
             public void run() {
                 fireSourceChanged(ISources.WORKBENCH, SAROS, saros);
@@ -126,7 +126,7 @@ public class SarosSourceProvider extends AbstractSourceProvider {
     }
 
     private final void sessionChanged(final ISarosSession sarosSession) {
-        Utils.runSafeSWTAsync(null, new Runnable() {
+        SWTUtils.runSafeSWTAsync(null, new Runnable() {
             @Override
             public void run() {
                 fireSourceChanged(ISources.WORKBENCH, SAROS_SESSION,

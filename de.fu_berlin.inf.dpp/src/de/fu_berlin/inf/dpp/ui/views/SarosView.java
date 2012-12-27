@@ -93,11 +93,11 @@ import de.fu_berlin.inf.dpp.ui.actions.VoIPAction;
 import de.fu_berlin.inf.dpp.ui.model.roster.RosterEntryElement;
 import de.fu_berlin.inf.dpp.ui.sounds.SoundManager;
 import de.fu_berlin.inf.dpp.ui.sounds.SoundPlayer;
+import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 import de.fu_berlin.inf.dpp.ui.util.selection.retriever.SelectionRetrieverFactory;
 import de.fu_berlin.inf.dpp.ui.widgets.ConnectionStateComposite;
 import de.fu_berlin.inf.dpp.ui.widgets.session.ChatRoomsComposite;
 import de.fu_berlin.inf.dpp.ui.widgets.viewer.rosterSession.BuddySessionDisplayComposite;
-import de.fu_berlin.inf.dpp.util.Utils;
 import de.fu_berlin.inf.nebula.utils.LayoutUtils;
 
 /**
@@ -596,7 +596,7 @@ public class SarosView extends ViewPart {
         if (!showBalloonNotifications)
             return;
 
-        Utils.runSafeSWTAsync(log, new Runnable() {
+        SWTUtils.runSafeSWTAsync(log, new Runnable() {
             @Override
             public void run() {
 
@@ -605,7 +605,7 @@ public class SarosView extends ViewPart {
                     return;
                 }
 
-                IViewPart sarosView = Utils.findView(SarosView.ID);
+                IViewPart sarosView = SWTUtils.findView(SarosView.ID);
                 /*
                  * If no session view is open then show the balloon notification
                  * in the control which has the keyboard focus
@@ -649,7 +649,7 @@ public class SarosView extends ViewPart {
      * become obsolete for a reason
      */
     public static void clearNotifications() {
-        Utils.runSafeSWTAsync(log, new Runnable() {
+        SWTUtils.runSafeSWTAsync(log, new Runnable() {
             @Override
             public void run() {
                 BalloonNotification.removeAllActiveNotifications();

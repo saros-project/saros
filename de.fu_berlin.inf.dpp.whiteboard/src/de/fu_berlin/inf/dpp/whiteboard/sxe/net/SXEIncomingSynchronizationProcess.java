@@ -6,6 +6,7 @@ import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.IProgressMonitor;
 
 import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
+import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 import de.fu_berlin.inf.dpp.util.Utils;
 import de.fu_berlin.inf.dpp.whiteboard.sxe.SXEController;
 import de.fu_berlin.inf.dpp.whiteboard.sxe.constants.SXEMessageType;
@@ -66,7 +67,7 @@ public class SXEIncomingSynchronizationProcess extends SXESynchronization {
 							log.debug(prefix() + "invitation from " + peer
 									+ " received");
 
-							Utils.runSafeSWTSync(log, new Runnable() {
+							SWTUtils.runSafeSWTSync(log, new Runnable() {
 
 								@Override
 								public void run() {
@@ -99,7 +100,7 @@ public class SXEIncomingSynchronizationProcess extends SXESynchronization {
 
 							log.debug(prefix() + "state received");
 
-							Utils.runSafeSWTSync(log, new Runnable() {
+							SWTUtils.runSafeSWTSync(log, new Runnable() {
 
 								@Override
 								public void run() {

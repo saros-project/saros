@@ -4,7 +4,7 @@ import org.apache.log4j.Logger;
 
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.ui.util.DialogUtils;
-import de.fu_berlin.inf.dpp.util.Utils;
+import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 
 public class WarningMessageDialog {
 
@@ -17,7 +17,7 @@ public class WarningMessageDialog {
      */
     public static void showWarningMessage(final String title,
         final String message) {
-        Utils.runSafeSWTSync(log, new Runnable() {
+        SWTUtils.runSafeSWTSync(log, new Runnable() {
             @Override
             public void run() {
                 DialogUtils.openWarningMessageDialog(EditorAPI.getShell(),

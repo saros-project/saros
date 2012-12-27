@@ -21,6 +21,7 @@ import de.fu_berlin.inf.dpp.net.upnp.IUPnPAccess;
 import de.fu_berlin.inf.dpp.net.upnp.IUPnPService;
 import de.fu_berlin.inf.dpp.net.util.NetworkingUtils;
 import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
+import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 import de.fu_berlin.inf.dpp.ui.views.SarosView;
 import de.fu_berlin.inf.dpp.util.Utils;
 
@@ -499,7 +500,7 @@ public class UPnPServiceImpl implements IUPnPService {
 
                 // Now we are ready to display the notification from SWT
                 // thread
-                Utils.runSafeSWTAsync(null, new Runnable() {
+                SWTUtils.runSafeSWTAsync(null, new Runnable() {
 
                     @Override
                     public void run() {

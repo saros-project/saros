@@ -68,6 +68,7 @@ import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
 import de.fu_berlin.inf.dpp.ui.ImageManager;
 import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.ui.actions.VideoSharingAction;
+import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 import de.fu_berlin.inf.dpp.util.Utils;
 import de.fu_berlin.inf.dpp.util.ValueChangeListener;
 import de.fu_berlin.inf.dpp.videosharing.VideoSharing.Mode;
@@ -152,7 +153,7 @@ public class VideoPlayerView extends ListExplanatoryViewPart implements
 
                 @Override
                 public void setValue(final VideoSharingSession newValue) {
-                    Utils.runSafeSWTSync(log, new Runnable() {
+                    SWTUtils.runSafeSWTSync(log, new Runnable() {
                         @Override
                         public void run() {
                             if (newValue == null)
@@ -330,7 +331,7 @@ public class VideoPlayerView extends ListExplanatoryViewPart implements
 
         lastShownStatus = statistic;
 
-        Utils.runSafeSWTAsync(log, new Runnable() {
+        SWTUtils.runSafeSWTAsync(log, new Runnable() {
             @Override
             public void run() {
                 if (!parent.isDisposed()) {

@@ -37,9 +37,10 @@ import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
 import de.fu_berlin.inf.dpp.observables.VideoSessionObservable;
 import de.fu_berlin.inf.dpp.ui.ImageManager;
 import de.fu_berlin.inf.dpp.ui.Messages;
+import de.fu_berlin.inf.dpp.ui.util.DialogUtils;
+import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 import de.fu_berlin.inf.dpp.ui.util.selection.SelectionUtils;
 import de.fu_berlin.inf.dpp.ui.util.selection.retriever.SelectionRetrieverFactory;
-import de.fu_berlin.inf.dpp.util.Utils;
 import de.fu_berlin.inf.dpp.util.ValueChangeListener;
 import de.fu_berlin.inf.dpp.videosharing.VideoSharing;
 import de.fu_berlin.inf.dpp.videosharing.VideoSharing.VideoSharingSession;
@@ -119,7 +120,7 @@ public class VideoSharingAction extends Action implements Disposable {
 
     @Override
     public void run() {
-        Utils.runSafeSWTAsync(log, new Runnable() {
+        SWTUtils.runSafeSWTAsync(log, new Runnable() {
             @Override
             public void run() {
                 List<User> participants = SelectionRetrieverFactory
@@ -132,7 +133,7 @@ public class VideoSharingAction extends Action implements Disposable {
                             setEnabled(false);
                             videoSharing.startSharing(participants.get(0));
                         } catch (final SarosCancellationException e) {
-                            Utils
+                            DialogUtils
                                 .popUpFailureMessage(
                                     Messages.VideoSharingAction_error_could_not_establish_screensharing_text,
                                     e.getMessage(), false);

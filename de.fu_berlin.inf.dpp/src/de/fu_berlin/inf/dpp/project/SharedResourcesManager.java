@@ -69,8 +69,8 @@ import de.fu_berlin.inf.dpp.observables.FileReplacementInProgressObservable;
 import de.fu_berlin.inf.dpp.synchronize.Blockable;
 import de.fu_berlin.inf.dpp.synchronize.StopManager;
 import de.fu_berlin.inf.dpp.ui.util.CollaborationUtils;
+import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 import de.fu_berlin.inf.dpp.util.FileUtils;
-import de.fu_berlin.inf.dpp.util.Utils;
 import de.fu_berlin.inf.dpp.vcs.VCSAdapter;
 import de.fu_berlin.inf.dpp.vcs.VCSResourceInfo;
 
@@ -651,7 +651,7 @@ public class SharedResourcesManager extends AbstractActivityProvider implements
 
                 throws InvocationTargetException, InterruptedException {
                     log.trace("progressMonitorDialog.run started");
-                    if (!Utils.isSWT())
+                    if (!SWTUtils.isSWT())
                         log.trace("not in SWT thread");
                     if (activityType == VCSActivity.Type.Connect) {
                         vcs.connect(project, url, directory, progress);

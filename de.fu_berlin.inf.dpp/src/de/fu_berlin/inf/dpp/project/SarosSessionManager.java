@@ -72,6 +72,7 @@ import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 import de.fu_berlin.inf.dpp.project.internal.SarosSession;
 import de.fu_berlin.inf.dpp.ui.ImageManager;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
+import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 import de.fu_berlin.inf.dpp.ui.views.SarosView;
 import de.fu_berlin.inf.dpp.util.StackTrace;
 import de.fu_berlin.inf.dpp.util.Utils;
@@ -258,7 +259,7 @@ public class SarosSessionManager implements ISarosSessionManager {
     @Override
     public void stopSarosSession() {
 
-        if (Utils.isSWT()) {
+        if (SWTUtils.isSWT()) {
             log.warn("StopSharedProject should not be called from SWT",
                 new StackTrace());
         }
@@ -334,7 +335,7 @@ public class SarosSessionManager implements ISarosSessionManager {
             description, sarosContext, inviterColorID, host);
         comNegotiatingManager.setSessionPreferences(comPrefs);
 
-        Utils.runSafeSWTAsync(log, new Runnable() {
+        SWTUtils.runSafeSWTAsync(log, new Runnable() {
             @Override
             public void run() {
                 process.acknowledgeInvitation();
@@ -361,7 +362,7 @@ public class SarosSessionManager implements ISarosSessionManager {
         final IncomingProjectNegotiation process = new IncomingProjectNegotiation(
             getSarosSession(), from, processID, projectInfos, sarosContext);
 
-        Utils.runSafeSWTAsync(log, new Runnable() {
+        SWTUtils.runSafeSWTAsync(log, new Runnable() {
 
             @Override
             public void run() {
@@ -493,7 +494,7 @@ public class SarosSessionManager implements ISarosSessionManager {
         }
 
         protected void registerCancelListener() {
-            Utils.runSafeSWTSync(log, new Runnable() {
+            SWTUtils.runSafeSWTSync(log, new Runnable() {
 
                 @Override
                 public void run() {
@@ -505,7 +506,7 @@ public class SarosSessionManager implements ISarosSessionManager {
         }
 
         protected void releaseCancelListener() {
-            Utils.runSafeSWTSync(log, new Runnable() {
+            SWTUtils.runSafeSWTSync(log, new Runnable() {
 
                 @Override
                 public void run() {
@@ -693,7 +694,7 @@ public class SarosSessionManager implements ISarosSessionManager {
         }
 
         protected void registerCancelListener() {
-            Utils.runSafeSWTSync(log, new Runnable() {
+            SWTUtils.runSafeSWTSync(log, new Runnable() {
 
                 @Override
                 public void run() {
@@ -705,7 +706,7 @@ public class SarosSessionManager implements ISarosSessionManager {
         }
 
         protected void releaseCancelListener() {
-            Utils.runSafeSWTSync(log, new Runnable() {
+            SWTUtils.runSafeSWTSync(log, new Runnable() {
 
                 @Override
                 public void run() {

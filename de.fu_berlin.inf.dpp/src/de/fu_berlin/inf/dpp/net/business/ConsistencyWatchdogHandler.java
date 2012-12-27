@@ -36,7 +36,7 @@ import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.project.AbstractActivityProvider;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.synchronize.StartHandle;
-import de.fu_berlin.inf.dpp.util.Utils;
+import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 
 /**
  * This component is responsible for handling Consistency Errors on the host
@@ -99,7 +99,7 @@ public class ConsistencyWatchdogHandler implements Startable {
 
         log.debug("Received Checksum Error: " + checksumError);
 
-        Utils.runSafeSWTSync(log, new Runnable() {
+        SWTUtils.runSafeSWTSync(log, new Runnable() {
             @Override
             public void run() {
 
@@ -121,7 +121,7 @@ public class ConsistencyWatchdogHandler implements Startable {
 
                 // Run async, so we can continue to receive messages over the
                 // network...
-                Utils.runSafeSWTAsync(log, new Runnable() {
+                SWTUtils.runSafeSWTAsync(log, new Runnable() {
                     @Override
                     public void run() {
                         try {

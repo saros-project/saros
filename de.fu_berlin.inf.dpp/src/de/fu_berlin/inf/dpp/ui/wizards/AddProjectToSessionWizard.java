@@ -46,6 +46,7 @@ import de.fu_berlin.inf.dpp.project.IChecksumCache;
 import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.ui.util.DialogUtils;
+import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 import de.fu_berlin.inf.dpp.ui.views.SarosView;
 import de.fu_berlin.inf.dpp.ui.wizards.JoinSessionWizard.OverwriteErrorDialog;
 import de.fu_berlin.inf.dpp.ui.wizards.dialogs.WizardDialogAccessable;
@@ -148,7 +149,7 @@ public class AddProjectToSessionWizard extends Wizard {
         }
 
         if (containsDirtyEditors) {
-            Utils.runSafeSWTAsync(log, new Runnable() {
+            SWTUtils.runSafeSWTAsync(log, new Runnable() {
                 @Override
                 public void run() {
                     if (AddProjectToSessionWizard.this.getShell().isDisposed()) {
@@ -277,7 +278,7 @@ public class AddProjectToSessionWizard extends Wizard {
                 } catch (SarosCancellationException e) {
                     return Status.CANCEL_STATUS;
                 } finally {
-                    Utils.runSafeSWTAsync(log, new Runnable() {
+                    SWTUtils.runSafeSWTAsync(log, new Runnable() {
                         @Override
                         public void run() {
                             for (IEditorPart editor : openEditors) {
@@ -300,7 +301,7 @@ public class AddProjectToSessionWizard extends Wizard {
     public void cancelWizard(final JID jid, final String errorMsg,
         final CancelLocation cancelLocation) {
 
-        Utils.runSafeSWTAsync(log, new Runnable() {
+        SWTUtils.runSafeSWTAsync(log, new Runnable() {
             @Override
             public void run() {
                 Shell shell = wizardDialog.getShell();
@@ -316,7 +317,7 @@ public class AddProjectToSessionWizard extends Wizard {
     @Override
     public boolean performCancel() {
         if (!isExceptionCancel) {
-            if (!Utils.popUpYesNoQuestion(
+            if (!DialogUtils.popUpYesNoQuestion(
                 Messages.AddProjectToSessionWizard_leave_session,
                 Messages.AddProjectToSessionWizard_leave_session_text, false)) {
                 return false;
@@ -335,7 +336,7 @@ public class AddProjectToSessionWizard extends Wizard {
     public boolean confirmOverwritingResources(
         final Map<String, FileListDiff> everyThing) {
         try {
-            return Utils.runSWTSync(new Callable<Boolean>() {
+            return SWTUtils.runSWTSync(new Callable<Boolean>() {
                 @Override
                 public Boolean call() {
 

@@ -11,6 +11,7 @@ import de.fu_berlin.inf.dpp.accountManagement.XMPPAccountStore;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.stf.server.STFController;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
+import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 import de.fu_berlin.inf.dpp.util.Utils;
 
 /**
@@ -74,10 +75,10 @@ public class StartupSaros implements IStartup {
 
     private void handleStartup(boolean showConfigurationWizard) {
         if (showConfigurationWizard) {
-            Utils.runSafeSWTAsync(log, new Runnable() {
+            SWTUtils.runSafeSWTAsync(log, new Runnable() {
                 @Override
                 public void run() {
-                    Utils.openInternalBrowser(Messages.Saros_tutorial_url,
+                    SWTUtils.openInternalBrowser(Messages.Saros_tutorial_url,
                         Messages.Saros_tutorial_title);
                 }
             });
@@ -99,7 +100,7 @@ public class StartupSaros implements IStartup {
     }
 
     private void showSarosView() {
-        Utils.runSafeSWTAsync(log, new Runnable() {
+        SWTUtils.runSafeSWTAsync(log, new Runnable() {
             @Override
             public void run() {
                 IIntroManager m = PlatformUI.getWorkbench().getIntroManager();

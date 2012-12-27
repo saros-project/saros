@@ -34,6 +34,7 @@ import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
 import de.fu_berlin.inf.dpp.net.upnp.IUPnPService;
 import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
 import de.fu_berlin.inf.dpp.ui.Messages;
+import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 import de.fu_berlin.inf.dpp.ui.views.SarosView;
 import de.fu_berlin.inf.dpp.util.Utils;
 
@@ -394,7 +395,7 @@ public final class NetworkPreferencePage extends PreferencePage implements
                     upnpService.startGatewayDiscovery(false);
 
                     while (upnpService.getGateways() == null) {
-                        Utils.runSafeSWTAsync(null, new Runnable() {
+                        SWTUtils.runSafeSWTAsync(null, new Runnable() {
                             @Override
                             public void run() {
                                 if (!gatewayInfo.isDisposed()) {
@@ -419,7 +420,7 @@ public final class NetworkPreferencePage extends PreferencePage implements
                         }
                     }
 
-                    Utils.runSafeSWTAsync(null, new Runnable() {
+                    SWTUtils.runSafeSWTAsync(null, new Runnable() {
                         @Override
                         public void run() {
                             List<GatewayDevice> gateways = upnpService

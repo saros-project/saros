@@ -79,7 +79,7 @@ public class CollaborationUtils {
                 } catch (final XMPPException e) {
                     log.error("starting the session failed", e);
 
-                    Utils.popUpFailureMessage(
+                    DialogUtils.popUpFailureMessage(
                         Messages.CollaborationUtils_offline,
                         getShareResourcesFailureMessage(newResources.keySet()),
                         false);
@@ -170,7 +170,7 @@ public class CollaborationUtils {
                     return;
                 }
 
-                Utils.popUpFailureMessage(
+                DialogUtils.popUpFailureMessage(
                     Messages.CollaborationUtils_insufficient_privileges,
                     Messages.CollaborationUtils_insufficient_privileges_text,
                     false);
@@ -449,7 +449,7 @@ public class CollaborationUtils {
      *         based synchronization
      */
     public static boolean activateNeedBasedSynchronization(Saros saros) {
-        return (Utils.popUpRememberDecisionDialog(
+        return (DialogUtils.popUpRememberDecisionDialog(
             Messages.CollaborationUtils_confirm_need_based,
             Messages.CollaborationUtils_confirm_need_based_text, saros,
             PreferenceConstants.NEEDS_BASED_SYNC));
@@ -479,7 +479,7 @@ public class CollaborationUtils {
             Messages.CollaborationUtils_confirm_need_based_file_balloon_text,
             userName, fileName);
         if (showDialog) {
-            return Utils.popUpCustomQuestion(
+            return DialogUtils.popUpCustomQuestion(
                 Messages.CollaborationUtils_confirm_need_based_file, message,
                 new String[] { "Create Backup", "Overwrite" }, false);
         } else {

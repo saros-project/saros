@@ -52,12 +52,12 @@ import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
 import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.ui.util.DialogUtils;
+import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 import de.fu_berlin.inf.dpp.ui.views.SarosView;
 import de.fu_berlin.inf.dpp.ui.views.VideoPlayerView;
 import de.fu_berlin.inf.dpp.ui.wizards.AddProjectToSessionWizard;
 import de.fu_berlin.inf.dpp.ui.wizards.JoinSessionWizard;
 import de.fu_berlin.inf.dpp.ui.wizards.dialogs.WizardDialogAccessable;
-import de.fu_berlin.inf.dpp.util.Utils;
 import de.fu_berlin.inf.dpp.util.VersionManager;
 
 /**
@@ -99,7 +99,7 @@ public class SarosUI {
 
         // Fixes #2727848: InvitationDialog is opened in the
         // background
-        Utils.runSafeSWTAsync(log, new Runnable() {
+        SWTUtils.runSafeSWTAsync(log, new Runnable() {
             @Override
             public void run() {
                 DialogUtils.openWindow(wizardDialog);
@@ -127,7 +127,7 @@ public class SarosUI {
 
         wizardDialog.setHelpAvailable(false);
         projectWizard.setWizardDlg(wizardDialog);
-        Utils.runSafeSWTAsync(log, new Runnable() {
+        SWTUtils.runSafeSWTAsync(log, new Runnable() {
 
             @Override
             public void run() {
@@ -160,7 +160,7 @@ public class SarosUI {
      * @swt
      */
     public void createVideoPlayerView() {
-        if (Utils.findView(VideoPlayerView.ID) == null)
+        if (SWTUtils.findView(VideoPlayerView.ID) == null)
             createView(VideoPlayerView.ID);
     }
 
@@ -244,7 +244,7 @@ public class SarosUI {
 
                     } catch (CancellationException e) {
                         log.warn("Permission change failed because buddy canceled the permission change"); //$NON-NLS-1$
-                        Utils.runSafeSWTSync(log, new Runnable() {
+                        SWTUtils.runSafeSWTSync(log, new Runnable() {
                             @Override
                             public void run() {
                                 MessageDialog.openInformation(EditorAPI

@@ -13,9 +13,7 @@ import java.io.Serializable;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.io.Writer;
-import java.net.MalformedURLException;
 import java.net.Socket;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -44,18 +42,6 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.jface.dialogs.IDialogConstants;
-import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.jface.preference.PreferenceStore;
-import org.eclipse.swt.SWTException;
-import org.eclipse.swt.widgets.Display;
-import org.eclipse.ui.IViewPart;
-import org.eclipse.ui.IWorkbench;
-import org.eclipse.ui.IWorkbenchPage;
-import org.eclipse.ui.IWorkbenchWindow;
-import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.browser.IWebBrowser;
-import org.eclipse.ui.browser.IWorkbenchBrowserSupport;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.filter.PacketFilter;
 import org.jivesoftware.smack.packet.Packet;
@@ -64,11 +50,8 @@ import org.picocontainer.annotations.Nullable;
 
 import bmsi.util.Diff;
 import bmsi.util.DiffPrint;
-import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.activities.SPath;
-import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.ui.dialogs.RememberDecisionMessageDialog;
 
 /**
  * Static Utility functions
@@ -383,59 +366,6 @@ public class Utils {
         return runSafeAsync(null, log, runnable);
     }
 
-    /**
-     * Run the given runnable in the SWT-Thread, log any RuntimeExceptions to
-     * the given log and block until the runnable returns.
-     * 
-     * @blocking
-     */
-
-    public static void runSafeSWTSync(final Logger log, final Runnable runnable) {
-        try {
-            Display.getDefault().syncExec(wrapSafe(log, runnable));
-        } catch (SWTException e) {
-            if (!PlatformUI.getWorkbench().isClosing()) {
-                throw e;
-            }
-        }
-    }
-
-    /**
-     * Class used for reporting the results of a Callable<T> inside a different
-     * thread.
-     * 
-     * It is kind of like a Future Light.
-     */
-    public static class CallableResult<T> {
-        public T result;
-        public Exception e;
-    }
-
-    /**
-     * Runs the given callable in the SWT Thread returning the result of the
-     * computation or throwing an exception that was thrown by the callable.
-     */
-    public static <T> T runSWTSync(final Callable<T> callable) throws Exception {
-
-        final CallableResult<T> result = new CallableResult<T>();
-
-        Utils.runSafeSWTSync(log, new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    result.result = callable.call();
-                } catch (Exception e) {
-                    result.e = e;
-                }
-            }
-        });
-
-        if (result.e != null)
-            throw result.e;
-        else
-            return result.result;
-    }
-
     public static String escapeForLogging(String s) {
         if (s == null)
             return null;
@@ -446,22 +376,6 @@ public class Utils {
          * return s.replace(' ', '\uc2b7').replace('\t',
          * '\uc2bb').replace('\n','\uc2b6').replace('\r', '\uc2a4');
          */
-    }
-
-    /**
-     * Run the given runnable in the SWT-Thread and log any RuntimeExceptions to
-     * the given log.
-     * 
-     * @nonBlocking
-     */
-    public static void runSafeSWTAsync(final Logger log, final Runnable runnable) {
-        try {
-            Display.getDefault().asyncExec(wrapSafe(log, runnable));
-        } catch (SWTException e) {
-            if (!PlatformUI.getWorkbench().isClosing()) {
-                throw e;
-            }
-        }
     }
 
     /**
@@ -491,26 +405,6 @@ public class Utils {
     }
 
     /**
-     * @swt Needs to be called from the SWT-UI thread, otherwise
-     *      <code>null</code> is returned.
-     */
-    public static IViewPart findView(String id) {
-        IWorkbench workbench = PlatformUI.getWorkbench();
-        if (workbench == null)
-            return null;
-
-        IWorkbenchWindow window = workbench.getActiveWorkbenchWindow();
-        if (window == null)
-            return null;
-
-        IWorkbenchPage page = window.getActivePage();
-        if (page == null)
-            return null;
-
-        return page.findView(id);
-    }
-
-    /**
      * Return a string representation of the given paths suitable for debugging
      * by joining their OS dependent full path representation by ', '
      */
@@ -523,26 +417,6 @@ public class Utils {
             sb.append(path.getFullPath().toOSString());
         }
         return sb.toString();
-    }
-
-    /**
-     * Crude check whether we are on the SWT thread
-     */
-    public static boolean isSWT() {
-        if (Display.getCurrent() != null) {
-            return true;
-        }
-        try {
-            boolean platformSWT = PlatformUI.getWorkbench().getDisplay()
-                .getThread() == Thread.currentThread();
-            if (platformSWT) {
-                log.warn("Running in PlatformSWT Thread"
-                    + " which is not found with Display.getCurrent()");
-            }
-            return platformSWT;
-        } catch (SWTException e) {
-            return false;
-        }
     }
 
     public static String getEclipsePlatformInfo() {
@@ -600,74 +474,6 @@ public class Utils {
             return false;
         } else
             return true;
-    }
-
-    /**
-     * Tries to open the given URL string in the default external browser. The
-     * Desktop API is deliberately not used for this because it only works with
-     * Java 1.6.
-     * 
-     * @param urlString
-     *            the URL to show as a String
-     * @return true if the browser could be opened, false otherwise
-     */
-    public static boolean openExternalBrowser(String urlString) {
-        URL url;
-        try {
-            url = new URL(urlString);
-        } catch (MalformedURLException e) {
-            log.error("Couldn't parse URL from string " + urlString, e);
-            return false;
-        }
-
-        IWorkbenchBrowserSupport browserSupport = PlatformUI.getWorkbench()
-            .getBrowserSupport();
-        IWebBrowser browser;
-        try {
-            browser = browserSupport.getExternalBrowser();
-            browser.openURL(url);
-            return true;
-        } catch (Exception e) {
-            log.error("Couldn't open external browser", e);
-            return false;
-        }
-
-    }
-
-    /**
-     * Tries to open the given URL string in Eclipse's internal browser. However
-     * if the user specified in the preferences to use an external browser
-     * instead, the external browser is tried to open.
-     * 
-     * @param urlString
-     *            the URL to show as a String
-     * @param title
-     *            a string displayed in the browsers title area
-     * @return true if the browser could be opened, false otherwise
-     */
-    public static boolean openInternalBrowser(String urlString, String title) {
-        URL url;
-        try {
-            url = new URL(urlString);
-        } catch (MalformedURLException e) {
-            log.error("Couldn't parse URL from string " + urlString, e);
-            return false;
-        }
-
-        IWorkbenchBrowserSupport browserSupport = PlatformUI.getWorkbench()
-            .getBrowserSupport();
-        IWebBrowser browser;
-        try {
-            browser = browserSupport.createBrowser(
-                IWorkbenchBrowserSupport.AS_EDITOR
-                    | IWorkbenchBrowserSupport.LOCATION_BAR
-                    | IWorkbenchBrowserSupport.NAVIGATION_BAR, null, title, "");
-            browser.openURL(url);
-            return true;
-        } catch (Exception e) {
-            log.error("Couldn't open internal Browser", e);
-            return false;
-        }
     }
 
     public static String getMessage(Throwable e) {
@@ -928,127 +734,6 @@ public class Utils {
         }
 
         return o;
-    }
-
-    /**
-     * Indicate the User that there was an error. It pops up an ErrorDialog with
-     * given title and message.
-     */
-    public static void popUpFailureMessage(final String title,
-        final String message, boolean failSilently) {
-        if (failSilently)
-            return;
-
-        Utils.runSafeSWTSync(log, new Runnable() {
-            @Override
-            public void run() {
-                MessageDialog.openError(EditorAPI.getShell(), title, message);
-            }
-        });
-    }
-
-    /**
-     * Ask the User a given question. It pops up a QuestionDialog with given
-     * title and message.
-     * 
-     * @return boolean indicating whether the user said Yes or No
-     */
-    public static boolean popUpYesNoQuestion(final String title,
-        final String message, boolean failSilently) {
-        if (failSilently)
-            return false;
-
-        try {
-            return Utils.runSWTSync(new Callable<Boolean>() {
-                @Override
-                public Boolean call() {
-                    return MessageDialog.openQuestion(EditorAPI.getShell(),
-                        title, message);
-                }
-            });
-        } catch (Exception e) {
-            log.error("An internal error ocurred while trying"
-                + " to open the question dialog.");
-            return false;
-        }
-    }
-
-    /**
-     * Ask the User a given question. It pops up a QuestionDialog with given
-     * title and message. Additionally custom button labels are applicable.
-     * 
-     * @param title
-     *            dialog title
-     * @param message
-     *            displayed message
-     * @param dialogButtonLabels
-     *            custom button labels
-     * @param failSilently
-     *            don`t open the dialog
-     * 
-     * @return boolean indicating whether the user said Yes or No
-     */
-    public static boolean popUpCustomQuestion(final String title,
-        final String message, final String[] dialogButtonLabels,
-        boolean failSilently) {
-        if (failSilently)
-            return false;
-
-        try {
-            return Utils.runSWTSync(new Callable<Boolean>() {
-                @Override
-                public Boolean call() {
-                    MessageDialog md = new MessageDialog(EditorAPI.getShell(),
-                        title, null, message, MessageDialog.QUESTION,
-                        dialogButtonLabels, 0);
-                    md.open();
-                    return md.getReturnCode() == 0;
-                }
-            });
-        } catch (Exception e) {
-            log.error("An internal error ocurred while trying"
-                + " to open the question dialog.");
-            return false;
-        }
-    }
-
-    /**
-     * Ask the User a given question. It pops up a {@link MessageDialog} with
-     * given title and message. It stores the decision in the
-     * {@link PreferenceStore} it the checkbox is selected.
-     * 
-     * @param saros
-     *            is needed to set the selection to preference store
-     * @param preferenceName
-     *            constant where to store in the preference store
-     * 
-     * @return boolean indicating whether the user said Yes or No
-     */
-    public static boolean popUpRememberDecisionDialog(final String title,
-        final String message, final Saros saros, final String preferenceName) {
-        try {
-            return Utils.runSWTSync(new Callable<Boolean>() {
-                @Override
-                public Boolean call() {
-                    RememberDecisionMessageDialog dialog = new RememberDecisionMessageDialog(
-                        EditorAPI.getShell(), title, null, message,
-                        MessageDialog.QUESTION, new String[] {
-                            IDialogConstants.YES_LABEL,
-                            IDialogConstants.NO_LABEL }, 0);
-                    int result = dialog.open();
-                    if (dialog.isRememberDecision()) {
-                        saros.getPreferenceStore().setValue(preferenceName,
-                            Boolean.toString(result == 0));
-                    }
-
-                    return result == 0;
-                }
-            });
-        } catch (Exception e) {
-            log.error("An internal error ocurred while trying"
-                + " to open the question dialog.");
-            return false;
-        }
     }
 
     /**

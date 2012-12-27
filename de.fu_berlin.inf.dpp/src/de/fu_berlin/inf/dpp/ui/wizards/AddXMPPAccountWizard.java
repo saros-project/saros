@@ -33,8 +33,8 @@ import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
 import de.fu_berlin.inf.dpp.ui.ImageManager;
 import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.ui.util.DialogUtils;
+import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 import de.fu_berlin.inf.dpp.ui.wizards.pages.EnterXMPPAccountWizardPage;
-import de.fu_berlin.inf.dpp.util.Utils;
 
 /**
  * A wizard that allows to enter an existing {@link XMPPAccount} or to create
@@ -79,7 +79,7 @@ public class AddXMPPAccountWizard extends Wizard {
         if (enterXMPPAccountWizardPage.isXMPPAccountCreated()) {
             boolean doCancel = true;
             try {
-                doCancel = Utils.runSWTSync(new Callable<Boolean>() {
+                doCancel = SWTUtils.runSWTSync(new Callable<Boolean>() {
                     @Override
                     public Boolean call() throws Exception {
                         return DialogUtils.openQuestionMessageDialog(
