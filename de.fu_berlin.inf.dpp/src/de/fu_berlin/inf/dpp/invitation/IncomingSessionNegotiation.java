@@ -147,7 +147,8 @@ public class IncomingSessionNegotiation extends InvitationProcess {
 
             switch (e.getCancelOption()) {
             case NOTIFY_PEER:
-                transmitter.sendCancelInvitationMessage(peer, errorMsg);
+                transmitter.sendCancelInvitationMessage(peer, invitationID,
+                    errorMsg);
                 break;
             case DO_NOT_NOTIFY_PEER:
                 break;

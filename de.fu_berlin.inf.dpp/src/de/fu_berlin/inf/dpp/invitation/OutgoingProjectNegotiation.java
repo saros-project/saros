@@ -409,7 +409,9 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
 
             switch (e.getCancelOption()) {
             case NOTIFY_PEER:
-                transmitter.sendCancelInvitationMessage(peer, errorMsg);
+                // WTF ?!
+                transmitter.sendCancelInvitationMessage(peer, processID,
+                    errorMsg);
                 break;
             case DO_NOT_NOTIFY_PEER:
                 break;

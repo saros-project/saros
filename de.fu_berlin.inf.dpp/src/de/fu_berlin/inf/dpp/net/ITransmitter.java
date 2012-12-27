@@ -45,20 +45,6 @@ import de.fu_berlin.inf.dpp.project.ISarosSession;
 @Component(module = "net")
 public interface ITransmitter {
 
-    /* ---------- invitations --------- */
-
-    /**
-     * Sends a cancellation message that tells the receiver that the invitation
-     * is canceled.
-     * 
-     * @param jid
-     *            the JID of the recipient.
-     * @param errorMsg
-     *            the reason why the invitation was canceled or
-     *            <code>null</code>.
-     */
-    public void sendCancelInvitationMessage(JID jid, String errorMsg);
-
     /* ---------- files --------- */
 
     /**
@@ -148,7 +134,20 @@ public interface ITransmitter {
 
     public void sendCancelSharingProjectMessage(JID peer, String errorMsg);
 
-    public void sendCancelInvitationMessage(JID to, String sessionID,
+    /**
+     * Sends a cancellation message that tells the receiver that the invitation
+     * is canceled.
+     * 
+     * @param to
+     *            the JID of the recipient.
+     * @param invitationID
+     *            the ID of the invitation
+     * @param message
+     *            the reason why the invitation was canceled or
+     *            <code>null</code>.
+     */
+
+    public void sendCancelInvitationMessage(JID to, String invitationID,
         String message);
 
     public void sendUserListRequest(JID peer);

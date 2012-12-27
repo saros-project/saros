@@ -6,12 +6,13 @@ package de.fu_berlin.inf.dpp.net.internal.extensions;
 import de.fu_berlin.inf.dpp.annotations.Component;
 
 @Component(module = "net")
-public class CancelInviteExtension extends SarosSessionPacketExtension {
+public class CancelInviteExtension extends SarosPacketExtension {
 
     private String errorMessage;
+    private String invitationID;
 
-    public CancelInviteExtension(String sessionID, String errorMessage) {
-        super(sessionID);
+    public CancelInviteExtension(String invitationID, String errorMessage) {
+        this.invitationID = invitationID;
         if ((errorMessage != null) && (errorMessage.length() > 0))
             this.errorMessage = errorMessage;
     }
@@ -26,8 +27,12 @@ public class CancelInviteExtension extends SarosSessionPacketExtension {
         return errorMessage;
     }
 
+    public String getInvitationID() {
+        return invitationID;
+    }
+
     public static class Provider extends
-        SarosSessionPacketExtension.Provider<CancelInviteExtension> {
+        XStreamExtensionProvider<CancelInviteExtension> {
         public Provider() {
             super("cancelInvitation", CancelInviteExtension.class);
         }

@@ -262,11 +262,6 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
      ********************************************************************************/
 
     @Override
-    public void sendCancelInvitationMessage(JID user, String errorMsg) {
-        sendCancelInvitationMessage(user, sessionID.getValue(), errorMsg);
-    }
-
-    @Override
     public void sendCancelSharingProjectMessage(JID user, String errorMsg) {
         log.debug("Send request to cancel project sharing to "
             + Utils.prefix(user)
@@ -274,8 +269,8 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
                 + errorMsg));
         sendMessageToUser(user,
             cancelProjectSharingExtensionProvider
-                .create(new CancelProjectNegotiationExtension(sessionID.getValue(),
-                    errorMsg)));
+                .create(new CancelProjectNegotiationExtension(sessionID
+                    .getValue(), errorMsg)));
     }
 
     @Override
@@ -749,15 +744,14 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
     }
 
     @Override
-    public void sendCancelInvitationMessage(JID user, String sessionID,
-        String errorMsg) {
+    public void sendCancelInvitationMessage(JID user, String invitationID,
+        String message) {
         log.debug("Send request to cancel Invitation to "
             + Utils.prefix(user)
-            + (errorMsg == null ? "on user request" : "with message: "
-                + errorMsg));
+            + (message == null ? "on user request" : "with message: " + message));
         sendMessageToUser(user,
             cancelInviteExtensionProvider.create(new CancelInviteExtension(
-                sessionID, errorMsg)));
+                invitationID, message)));
     }
 
     @Override
