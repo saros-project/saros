@@ -6,9 +6,9 @@ import org.jivesoftware.smack.packet.Packet;
 import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.annotations.Component;
+import de.fu_berlin.inf.dpp.net.IReceiver;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.net.internal.XMPPReceiver;
 import de.fu_berlin.inf.dpp.net.internal.extensions.InvitationParametersExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.InvitationParametersExtension.Provider;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
@@ -36,7 +36,7 @@ public class InvitationHandler {
 
     protected final SessionIDObservable sessionIDObservable;
 
-    public InvitationHandler(XMPPReceiver receiver,
+    public InvitationHandler(IReceiver receiver,
         SessionIDObservable sessionIDObservablePar,
         final Provider invExtProv) {
         this.sessionIDObservable = sessionIDObservablePar;

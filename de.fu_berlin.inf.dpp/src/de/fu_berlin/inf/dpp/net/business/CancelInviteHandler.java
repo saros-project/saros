@@ -10,8 +10,8 @@ import org.jivesoftware.smack.packet.Packet;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.invitation.InvitationProcess;
 import de.fu_berlin.inf.dpp.invitation.ProjectNegotiation;
+import de.fu_berlin.inf.dpp.net.IReceiver;
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.net.internal.XMPPReceiver;
 import de.fu_berlin.inf.dpp.net.internal.extensions.CancelInviteExtension;
 import de.fu_berlin.inf.dpp.observables.InvitationProcessObservable;
 import de.fu_berlin.inf.dpp.observables.ProjectNegotiationObservable;
@@ -38,7 +38,7 @@ public class CancelInviteHandler {
         }
     };
 
-    public CancelInviteHandler(XMPPReceiver receiver,
+    public CancelInviteHandler(IReceiver receiver,
         CancelInviteExtension.Provider provider,
         ProjectNegotiationObservable projectNegotiationObservable,
         InvitationProcessObservable invitationProcessObservable) {

@@ -53,6 +53,7 @@ import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
 import de.fu_berlin.inf.dpp.invitation.InvitationProcess;
 import de.fu_berlin.inf.dpp.net.ConnectionState;
 import de.fu_berlin.inf.dpp.net.IConnectionListener;
+import de.fu_berlin.inf.dpp.net.IReceiver;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.IncomingTransferObject.IncomingTransferObjectExtensionProvider;
 import de.fu_berlin.inf.dpp.net.JID;
@@ -103,7 +104,7 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
 
     protected Map<JID, InvitationProcess> processes;
 
-    protected XMPPReceiver receiver;
+    protected IReceiver receiver;
 
     protected SarosNet sarosNet;
 
@@ -149,7 +150,7 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
 
     public XMPPTransmitter(SessionIDObservable sessionID,
         DataTransferManager dataManager, SarosNet sarosNet,
-        XMPPReceiver receiver) {
+        IReceiver receiver) {
         sarosNet.addListener(this);
         this.dataManager = dataManager;
         this.sessionID = sessionID;
@@ -274,31 +275,7 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
                 .getValue())));
     }
 
-    /**
-     * <p>
-     * Sends the given {@link PacketExtension} to the given {@link JID}. The
-     * recipient has to be in the session or the extension will not be sent.
-     * </p>
-     * 
-     * <p>
-     * If the extension's raw data (bytes) is longer than
-     * {@value #MAX_XMPP_MESSAGE_SIZE} or if there is a peer-to-peer bytestream
-     * to the recipient the extension will be sent using the bytestream. Else it
-     * will be sent by chat.
-     * </p>
-     * 
-     * <p>
-     * Note: Does NOT ensure that peers receive messages in order because there
-     * may be two completely different communication ways. See
-     * {@link de.fu_berlin.inf.dpp.net.internal.ActivitySequencer} for details.
-     * </p>
-     * 
-     * @param recipient
-     * @param extension
-     * @throws IOException
-     *             if sending by bytestreams fails and the extension raw data is
-     *             longer than {@value #MAX_XMPP_MESSAGE_SIZE}
-     */
+    @Override
     public void sendToSessionUser(JID recipient, PacketExtension extension)
         throws IOException {
 
@@ -658,26 +635,21 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
 
             @Override
             public void processPacket(final Packet packet) {
-                dispatchThread.executeAsDispatch(new Runnable() {
-                    @Override
-                    public void run() {
-                        if (sessionFilter.accept(packet)) {
-                            try {
-                                Message message = (Message) packet;
+                if (sessionFilter.accept(packet)) {
+                    try {
+                        Message message = (Message) packet;
 
-                                JID fromJID = new JID(message.getFrom());
+                        JID fromJID = new JID(message.getFrom());
 
-                                // Change the input method to get the right
-                                // chats
-                                putIncomingChat(fromJID, message.getThread());
-                            } catch (Exception e) {
-                                log.error("An internal error occurred "
-                                    + "while processing packets", e);
-                            }
-                        }
-                        receiver.processPacket(packet);
+                        // Change the input method to get the right
+                        // chats
+                        putIncomingChat(fromJID, message.getThread());
+                    } catch (Exception e) {
+                        log.error("An internal error occurred "
+                            + "while processing packets", e);
                     }
-                });
+                }
+                receiver.processPacket(packet);
             }
         }, null);
     }

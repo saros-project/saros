@@ -17,11 +17,11 @@ import org.jivesoftware.smack.packet.Packet;
 import org.jivesoftware.smack.packet.PacketExtension;
 import org.jivesoftware.smack.provider.PacketExtensionProvider;
 import org.jivesoftware.smack.provider.ProviderManager;
-import org.picocontainer.annotations.Inject;
 import org.xmlpull.mxp1.MXParser;
 import org.xmlpull.v1.XmlPullParserException;
 
 import de.fu_berlin.inf.dpp.annotations.Component;
+import de.fu_berlin.inf.dpp.net.IReceiver;
 import de.fu_berlin.inf.dpp.net.IncomingTransferObject;
 import de.fu_berlin.inf.dpp.net.IncomingTransferObject.IncomingTransferObjectExtensionProvider;
 import de.fu_berlin.inf.dpp.net.SarosPacketCollector;
@@ -40,18 +40,38 @@ import de.fu_berlin.inf.dpp.util.Utils;
  * 
  */
 @Component(module = "net")
-public class XMPPReceiver {
+public class XMPPReceiver implements IReceiver {
 
     private static final Logger log = Logger.getLogger(XMPPReceiver.class);
 
-    @Inject
-    protected IncomingTransferObjectExtensionProvider incomingExtProv;
+    private IncomingTransferObjectExtensionProvider incomingExtProv;
 
-    @Inject
-    protected DispatchThreadContext dispatchThreadContext;
+    private DispatchThreadContext dispatchThreadContext;
 
-    protected Map<PacketListener, PacketFilter> listeners = Collections
+    private Map<PacketListener, PacketFilter> listeners = Collections
         .synchronizedMap(new HashMap<PacketListener, PacketFilter>());
+
+    /**
+     * <p>
+     * Extensions sent by bytestreams can by arbitrary long, thus they are
+     * received in a separate thread.
+     * </p>
+     * 
+     * <p>
+     * Note, as we have two completely different communication ways sequencing
+     * is not ensured in neither case, if done in the dispatch thread or not.
+     * </p>
+     */
+    private ExecutorService extensionDownloadThreadPool = Executors
+        .newCachedThreadPool(new NamedThreadFactory(
+            "Bytestream-Extension-receiver-"));
+
+    public XMPPReceiver(DispatchThreadContext dispatchThreadContext,
+        IncomingTransferObjectExtensionProvider incomingExtProv) {
+
+        this.dispatchThreadContext = dispatchThreadContext;
+        this.incomingExtProv = incomingExtProv;
+    }
 
     /**
      * Adds the given listener to the list of listeners notified when a new
@@ -66,12 +86,67 @@ public class XMPPReceiver {
      *            The filter to use when trying to identify Packets to send to
      *            the listener. may be null, in which case all Packets are sent.
      */
+    @Override
     public void addPacketListener(PacketListener listener, PacketFilter filter) {
         listeners.put(listener, filter);
     }
 
+    @Override
     public void removePacketListener(PacketListener listener) {
         listeners.remove(listener);
+    }
+
+    @Override
+    public void processPacket(final Packet packet) {
+        dispatchThreadContext.executeAsDispatch(new Runnable() {
+            @Override
+            public void run() {
+                forwardPacket(packet);
+            }
+        });
+    }
+
+    @Override
+    public SarosPacketCollector createCollector(PacketFilter filter) {
+        final SarosPacketCollector collector = new SarosPacketCollector(
+            new CancelHook() {
+                @Override
+                public void cancelPacketCollector(SarosPacketCollector collector) {
+                    removePacketListener(collector);
+                }
+            }, filter);
+        addPacketListener(collector, filter);
+
+        return collector;
+    }
+
+    @Override
+    public void processIncomingTransferObject(
+        final TransferDescription description,
+        final IncomingTransferObject incomingTransferObject) {
+        final Packet packet = new Message();
+        packet.setPacketID(Packet.ID_NOT_AVAILABLE);
+        packet.setFrom(description.getSender().toString());
+        packet.addExtension(incomingExtProv.create(incomingTransferObject));
+
+        dispatchThreadContext.executeAsDispatch(new Runnable() {
+
+            @Override
+            public void run() {
+
+                if (processIncomingTransferDescription(packet))
+                    return;
+
+                extensionDownloadThreadPool.execute(Utils.wrapSafe(log,
+                    new Runnable() {
+                        @Override
+                        public void run() {
+                            processTransferObjectToPacket(description,
+                                incomingTransferObject);
+                        }
+                    }));
+            }
+        });
     }
 
     /**
@@ -80,7 +155,7 @@ public class XMPPReceiver {
      * 
      * @sarosThread must be called from the Dispatch Thread
      */
-    protected void processPacket(Packet packet) {
+    private void forwardPacket(Packet packet) {
         Map<PacketListener, PacketFilter> copy;
 
         synchronized (listeners) {
@@ -120,7 +195,7 @@ public class XMPPReceiver {
      * IncomingTransferObject listener. It does not make sense to convert it to
      * a packet first.
      */
-    protected boolean processIncomingTransferDescription(Packet packet) {
+    private boolean processIncomingTransferDescription(Packet packet) {
         Map<PacketListener, PacketFilter> copy;
 
         synchronized (listeners) {
@@ -146,75 +221,14 @@ public class XMPPReceiver {
         return false;
     }
 
-    public SarosPacketCollector createCollector(PacketFilter filter) {
-        final SarosPacketCollector collector = new SarosPacketCollector(
-            new CancelHook() {
-                @Override
-                public void cancelPacketCollector(SarosPacketCollector collector) {
-                    removePacketListener(collector);
-                }
-            }, filter);
-        addPacketListener(collector, filter);
-
-        return collector;
-    }
-
-    /**
-     * <p>
-     * Extensions sent by bytestreams can by arbitrary long, thus they are
-     * received in a separate thread.
-     * </p>
-     * 
-     * <p>
-     * Note, as we have two completely different communication ways sequencing
-     * is not ensured in neither case, if done in the dispatch thread or not.
-     * </p>
-     */
-    protected ExecutorService extensionDownloadThreadPool = Executors
-        .newCachedThreadPool(new NamedThreadFactory(
-            "Bytestream-Extension-receiver-"));
-
-    /**
-     * This is method is used by the DataTransferManager to inform the upper
-     * Layer about incoming Packet based Objects.
-     * 
-     */
-    public void processIncomingTransferObject(
-        final TransferDescription description,
-        final IncomingTransferObject incomingTransferObject) {
-        final Packet packet = new Message();
-        packet.setPacketID(Packet.ID_NOT_AVAILABLE);
-        packet.setFrom(description.getSender().toString());
-        packet.addExtension(incomingExtProv.create(incomingTransferObject));
-
-        dispatchThreadContext.executeAsDispatch(new Runnable() {
-
-            @Override
-            public void run() {
-
-                if (processIncomingTransferDescription(packet))
-                    return;
-
-                extensionDownloadThreadPool.execute(Utils.wrapSafe(log,
-                    new Runnable() {
-                        @Override
-                        public void run() {
-                            processTransferObjectToPacket(description,
-                                incomingTransferObject);
-                        }
-                    }));
-            }
-        });
-    }
-
     /**
      * This method receives the bytestream message from the incoming transfer
      * object and parsed it to the respective Smack {@link PacketExtension}
      * 
      * @sarosThread must be called by the extensionDownloadThreadPool
      */
-    protected void processTransferObjectToPacket(
-        TransferDescription description, IncomingTransferObject transferObject) {
+    private void processTransferObjectToPacket(TransferDescription description,
+        IncomingTransferObject transferObject) {
 
         String name = description.getType();
         String namespace = description.getNamespace();
@@ -273,14 +287,8 @@ public class XMPPReceiver {
         dispatchThreadContext.executeAsDispatch(new Runnable() {
             @Override
             public void run() {
-                processPacket(packet);
+                forwardPacket(packet);
             }
         });
-    }
-
-    void inject(IncomingTransferObjectExtensionProvider incomingExtProv,
-        DispatchThreadContext dispatchThreadContext) {
-        this.incomingExtProv = incomingExtProv;
-        this.dispatchThreadContext = dispatchThreadContext;
     }
 }

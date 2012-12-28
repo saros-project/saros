@@ -65,6 +65,7 @@ import de.fu_berlin.inf.dpp.exceptions.StreamException;
 import de.fu_berlin.inf.dpp.exceptions.StreamServiceNotValidException;
 import de.fu_berlin.inf.dpp.net.IncomingTransferObject;
 import de.fu_berlin.inf.dpp.net.IncomingTransferObject.IncomingTransferObjectExtensionProvider;
+import de.fu_berlin.inf.dpp.net.IReceiver;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.SarosNet;
 import de.fu_berlin.inf.dpp.net.internal.StreamServiceManager.StreamMetaPacketData.StreamClose;
@@ -190,7 +191,7 @@ public class StreamServiceManager implements Startable {
     private long counter = 0;
 
     public StreamServiceManager(
-        XMPPReceiver xmppReceiver,
+        IReceiver xmppReceiver,
         DataTransferManager dataTransferManager,
         SarosSessionObservable sarosSessionObservable,
         SarosNet sarosNet,

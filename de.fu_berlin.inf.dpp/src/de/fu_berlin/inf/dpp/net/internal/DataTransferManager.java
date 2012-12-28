@@ -22,6 +22,7 @@ import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.net.ConnectionState;
 import de.fu_berlin.inf.dpp.net.IConnectionListener;
 import de.fu_berlin.inf.dpp.net.IPacketInterceptor;
+import de.fu_berlin.inf.dpp.net.IReceiver;
 import de.fu_berlin.inf.dpp.net.IncomingTransferObject;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.NetTransferMode;
@@ -62,7 +63,7 @@ public class DataTransferManager implements IConnectionListener,
 
     private Connection connection;
 
-    private XMPPReceiver receiver;
+    private IReceiver receiver;
 
     private IUPnPService upnpService;
 
@@ -82,7 +83,7 @@ public class DataTransferManager implements IConnectionListener,
      */
     private Collection<JID> peersForIBB = new ArrayList<JID>();
 
-    public DataTransferManager(SarosNet sarosNet, XMPPReceiver receiver,
+    public DataTransferManager(SarosNet sarosNet, IReceiver receiver,
         @Nullable @Socks5Transport ITransport mainTransport,
         @Nullable @IBBTransport ITransport fallbackTransport,
         @Nullable IUPnPService upnpService,

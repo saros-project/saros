@@ -18,6 +18,7 @@ import org.picocontainer.annotations.Inject;
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.net.IncomingTransferObject;
 import de.fu_berlin.inf.dpp.net.IncomingTransferObject.IncomingTransferObjectExtensionProvider;
+import de.fu_berlin.inf.dpp.net.IReceiver;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.NetTransferMode;
 import de.fu_berlin.inf.dpp.net.SarosNet;
@@ -64,7 +65,7 @@ public class ConnectionTestManager {
     protected DiscoveryManager discoManager;
 
     public ConnectionTestManager(
-        XMPPReceiver receiver,
+        IReceiver receiver,
         final IncomingTransferObjectExtensionProvider incomingTransferObjectExtensionProvider) {
 
         receiver.addPacketListener(new PacketListener() {

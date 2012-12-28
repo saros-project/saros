@@ -5,8 +5,8 @@ import org.jivesoftware.smack.PacketListener;
 import org.jivesoftware.smack.packet.Packet;
 
 import de.fu_berlin.inf.dpp.invitation.ProjectNegotiation;
+import de.fu_berlin.inf.dpp.net.IReceiver;
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.net.internal.XMPPReceiver;
 import de.fu_berlin.inf.dpp.net.internal.extensions.CancelProjectNegotiationExtension;
 import de.fu_berlin.inf.dpp.observables.ProjectNegotiationObservable;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
@@ -26,7 +26,7 @@ public class CancelProjectSharingHandler {
     private SessionIDObservable sessionIDObservable;
     private ProjectNegotiationObservable projectExchangeProcesses;
 
-    private XMPPReceiver receiver;
+    private IReceiver receiver;
     private CancelProjectNegotiationExtension.Provider provider;
 
     private ISarosSessionListener sessionListener = new AbstractSarosSessionListener() {
@@ -54,7 +54,7 @@ public class CancelProjectSharingHandler {
         }
     };
 
-    public CancelProjectSharingHandler(XMPPReceiver receiver,
+    public CancelProjectSharingHandler(IReceiver receiver,
         CancelProjectNegotiationExtension.Provider provider,
         ISarosSessionManager sessionManager,
         SessionIDObservable sessionIDObservable,

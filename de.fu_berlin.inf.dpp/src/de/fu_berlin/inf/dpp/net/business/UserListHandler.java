@@ -7,8 +7,8 @@ import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.annotations.Component;
+import de.fu_berlin.inf.dpp.net.IReceiver;
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.net.internal.XMPPReceiver;
 import de.fu_berlin.inf.dpp.net.internal.XMPPTransmitter;
 import de.fu_berlin.inf.dpp.net.internal.extensions.UserListExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.UserListExtension.UserListEntry;
@@ -31,7 +31,7 @@ public class UserListHandler {
     @Inject
     protected ISarosSessionManager sessionManager;
 
-    public UserListHandler(XMPPReceiver receiver,
+    public UserListHandler(IReceiver receiver,
         final UserListExtension.Provider userListExtProv) {
         // TODO SessionID-Filter
         receiver.addPacketListener(new PacketListener() {

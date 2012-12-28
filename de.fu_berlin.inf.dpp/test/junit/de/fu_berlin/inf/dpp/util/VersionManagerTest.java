@@ -40,8 +40,8 @@ import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
 import de.fu_berlin.inf.dpp.Saros;
+import de.fu_berlin.inf.dpp.net.IReceiver;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
-import de.fu_berlin.inf.dpp.net.internal.XMPPReceiver;
 import de.fu_berlin.inf.dpp.util.VersionManager.Compatibility;
 import de.fu_berlin.inf.dpp.util.VersionManager.VersionInfo;
 
@@ -56,7 +56,7 @@ public class VersionManagerTest {
     Bundle bundeRemote;
 
     ITransmitter transmitter;
-    XMPPReceiver receiver;
+    IReceiver receiver;
 
     VersionManager versionManagerRemote;
     VersionManager versionManagerLocal;
@@ -78,7 +78,7 @@ public class VersionManagerTest {
 
         transmitter = PowerMock.createMock(ITransmitter.class);
 
-        receiver = PowerMock.createMock(XMPPReceiver.class);
+        receiver = PowerMock.createMock(IReceiver.class);
 
         receiver.addPacketListener(EasyMock.isA(PacketListener.class),
             EasyMock.isA(PacketFilter.class));

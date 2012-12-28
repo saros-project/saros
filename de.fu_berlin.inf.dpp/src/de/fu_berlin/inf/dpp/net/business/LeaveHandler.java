@@ -6,8 +6,8 @@ import org.jivesoftware.smack.packet.Packet;
 
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.annotations.Component;
+import de.fu_berlin.inf.dpp.net.IReceiver;
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.net.internal.XMPPReceiver;
 import de.fu_berlin.inf.dpp.net.internal.extensions.SarosLeaveExtension;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 import de.fu_berlin.inf.dpp.project.AbstractSarosSessionListener;
@@ -33,7 +33,7 @@ public class LeaveHandler {
 
     private SessionIDObservable sessionIDObservable;
 
-    private XMPPReceiver receiver;
+    private IReceiver receiver;
     private SarosLeaveExtension.Provider provider;
 
     private ISarosSessionListener sessionListener = new AbstractSarosSessionListener() {
@@ -58,7 +58,7 @@ public class LeaveHandler {
         }
     };
 
-    public LeaveHandler(XMPPReceiver receiver,
+    public LeaveHandler(IReceiver receiver,
         SarosLeaveExtension.Provider provider,
         ISarosSessionManager sessionManager,
         SessionIDObservable sessionIDObservable) {
