@@ -59,7 +59,6 @@ import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.SarosNet;
 import de.fu_berlin.inf.dpp.net.SarosPacketCollector;
 import de.fu_berlin.inf.dpp.net.business.DispatchThreadContext;
-import de.fu_berlin.inf.dpp.net.internal.extensions.ActivitiesExtensionProvider;
 import de.fu_berlin.inf.dpp.net.internal.extensions.CancelInviteExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.CancelProjectNegotiationExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.InvitationAcceptedExtension;
@@ -75,7 +74,6 @@ import de.fu_berlin.inf.dpp.observables.SarosSessionObservable;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
-import de.fu_berlin.inf.dpp.util.ActivityUtils;
 import de.fu_berlin.inf.dpp.util.Utils;
 
 /**
@@ -96,7 +94,6 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
     public static final int MAX_TRANSFER_RETRIES = 4;
 
     public static final int FORCEDPART_OFFLINEUSER_AFTERSECS = 60;
-    public static final int MAX_XMPP_MESSAGE_SIZE = 16378;
 
     protected Connection connection;
 
@@ -123,9 +120,6 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
 
     @Inject
     protected CancelProjectNegotiationExtension.Provider cancelProjectSharingExtensionProvider;
-
-    @Inject
-    protected ActivitiesExtensionProvider activitiesProvider;
 
     @Inject
     protected InvitationAcknowledgedExtension.Provider invAcknowledgementExtProv;
@@ -280,41 +274,6 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
                 .getValue())));
     }
 
-    @Override
-    public void sendTimedActivities(JID recipient,
-        List<TimedActivityDataObject> timedActivities) {
-
-        if (recipient == null || recipient.equals(sarosNet.getMyJID())) {
-            throw new IllegalArgumentException(
-                "Recipient may not be null or equal to the local user");
-        }
-        if (timedActivities == null || timedActivities.size() == 0) {
-            throw new IllegalArgumentException(
-                "TimedActivities may not be null or empty");
-        }
-
-        String sID = sessionID.getValue();
-        PacketExtension extensionToSend = activitiesProvider.create(sID,
-            timedActivities);
-
-        try {
-            sendToProjectUser(recipient, extensionToSend);
-        } catch (IOException e) {
-            log.error("Failed to sent activityDataObjects: " + timedActivities,
-                e);
-            return;
-        }
-
-        String msg = "Sent (" + String.format("%03d", timedActivities.size())
-            + ") " + Utils.prefix(recipient) + timedActivities;
-
-        // only log on debug level if there is more than a checksum
-        if (ActivityUtils.containsChecksumsOnly(timedActivities))
-            log.trace(msg);
-        else
-            log.debug(msg);
-    }
-
     /**
      * <p>
      * Sends the given {@link PacketExtension} to the given {@link JID}. The
@@ -340,7 +299,7 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
      *             if sending by bytestreams fails and the extension raw data is
      *             longer than {@value #MAX_XMPP_MESSAGE_SIZE}
      */
-    public void sendToProjectUser(JID recipient, PacketExtension extension)
+    public void sendToSessionUser(JID recipient, PacketExtension extension)
         throws IOException {
 
         String currentSessionID = sessionID.getValue();

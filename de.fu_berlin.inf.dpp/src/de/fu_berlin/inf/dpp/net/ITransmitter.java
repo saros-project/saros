@@ -24,13 +24,13 @@ import java.util.List;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.jivesoftware.smack.packet.IQ.Type;
+import org.jivesoftware.smack.packet.PacketExtension;
 
 import de.fu_berlin.inf.dpp.FileList;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
 import de.fu_berlin.inf.dpp.invitation.InvitationProcess;
-import de.fu_berlin.inf.dpp.net.internal.TimedActivityDataObject;
 import de.fu_berlin.inf.dpp.net.internal.extensions.InvitationParametersExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.XStreamExtensionProvider;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
@@ -44,6 +44,36 @@ import de.fu_berlin.inf.dpp.project.ISarosSession;
  */
 @Component(module = "net")
 public interface ITransmitter {
+
+    public static final int MAX_XMPP_MESSAGE_SIZE = 16378;
+
+    /**
+     * <p>
+     * Sends the given {@link PacketExtension} to the given {@link JID}. The
+     * recipient has to be in the session or the extension will not be sent.
+     * </p>
+     * 
+     * <p>
+     * If the extension's raw data (bytes) is longer than
+     * {@value #MAX_XMPP_MESSAGE_SIZE} or if there is a peer-to-peer bytestream
+     * to the recipient the extension will be sent using the bytestream. Else it
+     * will be sent by chat.
+     * </p>
+     * 
+     * <p>
+     * Note: Does NOT ensure that peers receive messages in order because there
+     * may be two completely different communication ways. See
+     * {@link de.fu_berlin.inf.dpp.net.internal.ActivitySequencer} for details.
+     * </p>
+     * 
+     * @param recipient
+     * @param extension
+     * @throws IOException
+     *             if sending by bytestreams fails and the extension raw data is
+     *             longer than {@value #MAX_XMPP_MESSAGE_SIZE}
+     */
+    public void sendToSessionUser(JID recipient, PacketExtension extension)
+        throws IOException;
 
     /* ---------- files --------- */
 
@@ -80,25 +110,6 @@ public interface ITransmitter {
      *            the Saros session that this join message refers to.
      */
     public void sendLeaveMessage(ISarosSession sarosSession);
-
-    /**
-     * Sends given list of TimedActivities to the given recipient.
-     * 
-     * @param recipient
-     *            The JID of the user who is to receive the given list of timed
-     *            activityDataObjects.
-     * 
-     * @param timedActivities
-     *            The list of timed activityDataObjects to send to the user.
-     * 
-     * @throws IllegalArgumentException
-     *             if the recipient is null, the recipient equals the local user
-     *             as returned by {@link SarosNet#getMyJID()} or the given list
-     *             is null or contains no activityDataObjects.
-     * 
-     */
-    public void sendTimedActivities(JID recipient,
-        List<TimedActivityDataObject> timedActivities);
 
     /**
      * Sends an IQ {@linkplain Type#GET GET} query to the user with given

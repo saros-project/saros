@@ -40,6 +40,7 @@ import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.SplitOperation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.TimestampOperation;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.internal.TimedActivityDataObject;
+import de.fu_berlin.inf.dpp.net.internal.extensions.ActivitiesExtension.Provider;
 
 public class ActivitiesExtensionProviderTest {
 
@@ -47,7 +48,6 @@ public class ActivitiesExtensionProviderTest {
     protected static final SPathDataObject path = new SPathDataObject("pid",
         new Path("testpath"), "xtx");
     protected static final Timestamp jupiterTime = new JupiterVectorTime(1, 3);
-    protected static final ActivitiesExtensionProvider provider = new ActivitiesExtensionProvider();
 
     protected static final Operation timestamp = new TimestampOperation();
     protected static final Operation noOp = new NoOperation();
@@ -72,7 +72,7 @@ public class ActivitiesExtensionProviderTest {
             path), new TextSelectionActivityDataObject(jid, 1, 2, path),
         new ViewportActivityDataObject(jid, 5, 10, path) };
 
-    protected ActivitiesExtensionProvider aProvider = new ActivitiesExtensionProvider();
+    protected Provider aProvider = ActivitiesExtension.PROVIDER;
 
     @Test
     public void testJupiterActivities() throws XmlPullParserException,
@@ -190,6 +190,6 @@ public class ActivitiesExtensionProviderTest {
         parser.setInput(new StringReader(xml));
         parser.next();
 
-        return provider.parseExtension(parser);
+        return aProvider.parseExtension(parser);
     }
 }

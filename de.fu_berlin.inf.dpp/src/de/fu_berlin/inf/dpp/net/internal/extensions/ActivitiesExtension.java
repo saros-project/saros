@@ -50,8 +50,9 @@ import de.fu_berlin.inf.dpp.net.internal.TimedActivities;
 import de.fu_berlin.inf.dpp.net.internal.TimedActivityDataObject;
 
 @Component(module = "net")
-public class ActivitiesExtensionProvider extends
-    XStreamExtensionProvider<TimedActivities> {
+public class ActivitiesExtension extends SarosPacketExtension {
+
+    public static final Provider PROVIDER = new Provider();
 
     /**
      * @JTourBusStop 7, Activity creation, IActivityDataObject registration:
@@ -64,25 +65,31 @@ public class ActivitiesExtensionProvider extends
     /**
      * 
      */
-    public ActivitiesExtensionProvider() {
-        super("activityDataObjects", TimedActivities.class,
-            AbstractActivityDataObject.class, EditorActivityDataObject.class,
-            FileActivityDataObject.class, FolderActivityDataObject.class,
-            PermissionActivityDataObject.class,
-            TextEditActivityDataObject.class,
-            TextSelectionActivityDataObject.class,
-            ViewportActivityDataObject.class, TimedActivityDataObject.class,
-            JupiterActivityDataObject.class, JupiterVectorTime.class,
-            DeleteOperation.class, InsertOperation.class, NoOperation.class,
-            SplitOperation.class, TimestampOperation.class, JID.class,
-            SPathDataObject.class, ChecksumActivityDataObject.class,
-            ChecksumErrorActivityDataObject.class,
-            ProgressActivityDataObject.class, VCSActivityDataObject.class);
-    }
 
-    public PacketExtension create(String sessionID,
-        List<TimedActivityDataObject> activities) {
-        return create(new TimedActivities(sessionID,
-            new ArrayList<TimedActivityDataObject>(activities)));
+    public static class Provider extends
+        XStreamExtensionProvider<TimedActivities> {
+        private Provider() {
+            super("activityDataObjects", TimedActivities.class,
+                AbstractActivityDataObject.class,
+                EditorActivityDataObject.class, FileActivityDataObject.class,
+                FolderActivityDataObject.class,
+                PermissionActivityDataObject.class,
+                TextEditActivityDataObject.class,
+                TextSelectionActivityDataObject.class,
+                ViewportActivityDataObject.class,
+                TimedActivityDataObject.class, JupiterActivityDataObject.class,
+                JupiterVectorTime.class, DeleteOperation.class,
+                InsertOperation.class, NoOperation.class, SplitOperation.class,
+                TimestampOperation.class, JID.class, SPathDataObject.class,
+                ChecksumActivityDataObject.class,
+                ChecksumErrorActivityDataObject.class,
+                ProgressActivityDataObject.class, VCSActivityDataObject.class);
+        }
+
+        public PacketExtension create(String sessionID,
+            List<TimedActivityDataObject> activities) {
+            return create(new TimedActivities(sessionID,
+                new ArrayList<TimedActivityDataObject>(activities)));
+        }
     }
 }

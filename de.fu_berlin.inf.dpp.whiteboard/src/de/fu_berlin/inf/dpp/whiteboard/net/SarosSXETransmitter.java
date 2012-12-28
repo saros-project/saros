@@ -126,11 +126,11 @@ public class SarosSXETransmitter implements ISXETransmitter {
 		try {
 			if (msg.getTo() == null) {
 				for (User u : sarosSession.getRemoteUsers()) {
-					transmitter.sendToProjectUser(u.getJID(), extension);
+					transmitter.sendToSessionUser(u.getJID(), extension);
 				}
 			} else {
 				JID jid = new JID(msg.getTo());
-				transmitter.sendToProjectUser(jid, extension);
+				transmitter.sendToSessionUser(jid, extension);
 			}
 		} catch (Exception e) {
 			log.error(

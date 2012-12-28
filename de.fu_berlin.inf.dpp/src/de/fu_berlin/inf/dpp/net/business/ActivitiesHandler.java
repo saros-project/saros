@@ -15,7 +15,7 @@ import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.internal.TimedActivities;
 import de.fu_berlin.inf.dpp.net.internal.TimedActivityDataObject;
 import de.fu_berlin.inf.dpp.net.internal.XMPPReceiver;
-import de.fu_berlin.inf.dpp.net.internal.extensions.ActivitiesExtensionProvider;
+import de.fu_berlin.inf.dpp.net.internal.extensions.ActivitiesExtension;
 import de.fu_berlin.inf.dpp.observables.SarosSessionObservable;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
@@ -25,6 +25,8 @@ import de.fu_berlin.inf.dpp.util.Utils;
 /**
  * Handler for all {@link TimedActivities}
  */
+
+// FIXME: move to session scope
 @Component(module = "net")
 public class ActivitiesHandler {
 
@@ -35,7 +37,6 @@ public class ActivitiesHandler {
     protected SarosSessionObservable sarosSessionObservable;
 
     public ActivitiesHandler(XMPPReceiver receiver,
-        final ActivitiesExtensionProvider provider,
         final IncomingTransferObjectExtensionProvider incomingExtProv,
         final SessionIDObservable sessionID) {
 
@@ -46,7 +47,8 @@ public class ActivitiesHandler {
             @Override
             public void processPacket(Packet packet) {
                 try {
-                    TimedActivities payload = provider.getPayload(packet);
+                    TimedActivities payload = ActivitiesExtension.PROVIDER
+                        .getPayload(packet);
                     if (payload == null) {
                         log.warn("Invalid ActivitiesExtensionPacket"
                             + " does not contain a payload: " + packet);
@@ -73,7 +75,7 @@ public class ActivitiesHandler {
                         e);
                 }
             }
-        }, provider.getPacketFilter());
+        }, ActivitiesExtension.PROVIDER.getPacketFilter());
     }
 
     /**

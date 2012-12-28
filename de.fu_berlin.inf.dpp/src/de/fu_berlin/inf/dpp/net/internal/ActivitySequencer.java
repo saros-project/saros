@@ -19,6 +19,7 @@
  */
 package de.fu_berlin.inf.dpp.net.internal;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -37,9 +38,9 @@ import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.jivesoftware.smack.packet.PacketExtension;
 import org.picocontainer.Startable;
 
-import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.activities.SPathDataObject;
 import de.fu_berlin.inf.dpp.activities.business.FolderActivity.Type;
@@ -54,7 +55,9 @@ import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.NetTransferMode;
 import de.fu_berlin.inf.dpp.net.business.DispatchThreadContext;
+import de.fu_berlin.inf.dpp.net.internal.extensions.ActivitiesExtension;
 import de.fu_berlin.inf.dpp.observables.ProjectNegotiationObservable;
+import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
@@ -431,6 +434,8 @@ public class ActivitySequencer implements Startable {
 
     protected final ISarosSession sarosSession;
 
+    protected final SessionIDObservable sessionIDObservable;
+
     protected final ITransmitter transmitter;
 
     protected final JID localJID;
@@ -443,11 +448,12 @@ public class ActivitySequencer implements Startable {
 
     protected PreferenceUtils preferenceUtils;
 
-    public ActivitySequencer(Saros saros,
+    public ActivitySequencer(IPreferenceStore prefStore,
         ProjectNegotiationObservable projectExchangeProcess,
         PreferenceUtils preferenceUtils, final ISarosSession sarosSession,
         ITransmitter transmitter, DataTransferManager transferManager,
-        DispatchThreadContext threadContext) {
+        DispatchThreadContext threadContext,
+        SessionIDObservable sessionIDObservable) {
 
         this.dispatchThread = threadContext;
         this.sarosSession = sarosSession;
@@ -455,8 +461,8 @@ public class ActivitySequencer implements Startable {
         this.transferManager = transferManager;
         this.projectExchangeProcesses = projectExchangeProcess;
         this.preferenceUtils = preferenceUtils;
+        this.sessionIDObservable = sessionIDObservable;
 
-        IPreferenceStore prefStore = saros.getPreferenceStore();
         this.MILLIS_UPDATE = prefStore
             .getInt(PreferenceConstants.MILLIS_UPDATE);
         this.localJID = sarosSession.getLocalUser().getJID();
@@ -656,7 +662,7 @@ public class ActivitySequencer implements Startable {
                 log.trace("Sending " + timedActivities.size()
                     + " activities to " + recipientJID + ": " + timedActivities);
 
-                transmitter.sendTimedActivities(recipientJID, timedActivities);
+                sendTimedActivities(recipientJID, timedActivities);
             }
 
             /**
@@ -957,5 +963,40 @@ public class ActivitySequencer implements Startable {
 
         queuedOutgoingActivitiesOfUsers.remove(user);
 
+    }
+
+    private void sendTimedActivities(JID recipient,
+        List<TimedActivityDataObject> timedActivities) {
+
+        if (recipient == null
+            || recipient.equals(sarosSession.getLocalUser().getJID())) {
+            throw new IllegalArgumentException(
+                "Recipient may not be null or equal to the local user");
+        }
+        if (timedActivities == null || timedActivities.size() == 0) {
+            throw new IllegalArgumentException(
+                "TimedActivities may not be null or empty");
+        }
+
+        String sID = sessionIDObservable.getValue();
+
+        PacketExtension extensionToSend = ActivitiesExtension.PROVIDER.create(
+            sID, timedActivities);
+
+        String msg = "Sent (" + String.format("%03d", timedActivities.size())
+            + ") " + Utils.prefix(recipient) + timedActivities;
+
+        // only log on debug level if there is more than a checksum
+        if (ActivityUtils.containsChecksumsOnly(timedActivities))
+            log.trace(msg);
+        else
+            log.debug(msg);
+
+        try {
+            transmitter.sendToSessionUser(recipient, extensionToSend);
+        } catch (IOException e) {
+            log.error("Failed to sent activityDataObjects: " + timedActivities,
+                e);
+        }
     }
 }

@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.easymock.EasyMock;
 import org.easymock.IAnswer;
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -27,9 +28,11 @@ import de.fu_berlin.inf.dpp.editor.ISharedEditorListener;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
+import de.fu_berlin.inf.dpp.preferences.PreferenceInitializer;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
 import de.fu_berlin.inf.dpp.project.internal.SarosSessionTest;
+import de.fu_berlin.inf.dpp.test.util.MemoryPreferenceStore;
 import de.fu_berlin.inf.dpp.util.Utils;
 
 @RunWith(PowerMockRunner.class)
@@ -171,7 +174,11 @@ public class StatisticCollectorTest {
         AudioServiceManager audioManager = createAudioServiceManagerMock(audioListeners);
         container.addComponent(AudioServiceManager.class, audioManager);
 
-        container.addComponent(Saros.class, SarosSessionTest.createSarosMock());
+        IPreferenceStore store = new MemoryPreferenceStore();
+        PreferenceInitializer.setPreferences(store);
+
+        container.addComponent(Saros.class,
+            SarosSessionTest.createSarosMock(store));
         container.addComponent(DataTransferManager.class,
             SarosSessionTest.createDataTransferManagerMock());
         container.addComponent(SessionIDObservable.class);

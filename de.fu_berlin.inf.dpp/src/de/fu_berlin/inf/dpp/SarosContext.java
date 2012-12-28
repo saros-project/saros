@@ -63,7 +63,7 @@ import de.fu_berlin.inf.dpp.net.internal.Socks5Transport;
 import de.fu_berlin.inf.dpp.net.internal.StreamServiceManager;
 import de.fu_berlin.inf.dpp.net.internal.XMPPReceiver;
 import de.fu_berlin.inf.dpp.net.internal.XMPPTransmitter;
-import de.fu_berlin.inf.dpp.net.internal.extensions.ActivitiesExtensionProvider;
+import de.fu_berlin.inf.dpp.net.internal.extensions.ActivitiesExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.CancelInviteExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.CancelProjectNegotiationExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.InvitationAcceptedExtension;
@@ -282,7 +282,7 @@ public class SarosContext implements ISarosContext {
          */
 
         // Extension Providers
-        Component.create(ActivitiesExtensionProvider.class),
+        Component.create(ActivitiesExtension.class),
         Component
             .create(IncomingTransferObject.IncomingTransferObjectExtensionProvider.class),
 

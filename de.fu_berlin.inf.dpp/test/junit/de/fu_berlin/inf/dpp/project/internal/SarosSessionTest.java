@@ -13,7 +13,6 @@ import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.preferences.ConfigurationScope;
 import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.jface.util.IPropertyChangeListener;
 import org.joda.time.DateTime;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -49,10 +48,11 @@ import de.fu_berlin.inf.dpp.observables.FileReplacementInProgressObservable;
 import de.fu_berlin.inf.dpp.observables.ProjectNegotiationObservable;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 import de.fu_berlin.inf.dpp.optional.jdt.JDTFacade;
-import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
+import de.fu_berlin.inf.dpp.preferences.PreferenceInitializer;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
 import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.synchronize.StopManager;
+import de.fu_berlin.inf.dpp.test.util.MemoryPreferenceStore;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
 import de.fu_berlin.inf.dpp.util.Utils;
 
@@ -73,22 +73,14 @@ public class SarosSessionTest {
         return net;
     }
 
-    static public Saros createSarosMock() {
-        IPreferenceStore store = EasyMock.createMock(IPreferenceStore.class);
-        store.getInt(PreferenceConstants.MILLIS_UPDATE);
-        EasyMock.expectLastCall().andReturn(new Integer(30)).anyTimes();
-        store.addPropertyChangeListener(EasyMock
-            .isA(IPropertyChangeListener.class));
-        EasyMock.expectLastCall().anyTimes();
-        store.getInt(EasyMock.isA(String.class));
-        EasyMock.expectLastCall().andReturn(0).anyTimes();
-        store.getString(EasyMock.isA(String.class));
-        EasyMock.expectLastCall().andReturn("").anyTimes();
-        EasyMock.replay(store);
+    static public Saros createSarosMock(IPreferenceStore store) {
 
         Saros saros = EasyMock.createMock(Saros.class);
+
+        // REMOVE THIS MOCK METHOD !!!
         saros.getPreferenceStore();
         EasyMock.expectLastCall().andReturn(store).anyTimes();
+
         saros.getConfigPrefs();
         EasyMock.expectLastCall()
             .andReturn(new ConfigurationScope().getNode(Saros.SAROS))
@@ -128,9 +120,12 @@ public class SarosSessionTest {
         final MutablePicoContainer container = picoBuilder.build();
         container.start();
 
+        IPreferenceStore store = new MemoryPreferenceStore();
+        PreferenceInitializer.setPreferences(store);
+
         // Special/Proper mocks
         container.addComponent(SarosNet.class, createSarosNetMock());
-        container.addComponent(Saros.class, createSarosMock());
+        container.addComponent(Saros.class, createSarosMock(store));
         container.addComponent(DataTransferManager.class,
             createDataTransferManagerMock());
 
@@ -159,6 +154,9 @@ public class SarosSessionTest {
             EasyMock.createMock(ConsistencyWatchdogClient.class));
 
         // Adding the real class here.
+
+        container.addComponent(store);
+
         container.addComponent(DispatchThreadContext.class);
         container.addComponent(SessionIDObservable.class);
         container.addComponent(FeedbackManager.class);
