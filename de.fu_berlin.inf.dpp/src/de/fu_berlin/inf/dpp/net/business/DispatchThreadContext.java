@@ -40,4 +40,12 @@ public class DispatchThreadContext {
         return dispatch;
     }
 
+    @Override
+    protected void finalize() throws Throwable {
+        try {
+            dispatch.shutdownNow();
+        } finally {
+            super.finalize();
+        }
+    }
 }
