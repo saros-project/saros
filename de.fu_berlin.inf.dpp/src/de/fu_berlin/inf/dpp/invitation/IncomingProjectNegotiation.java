@@ -14,7 +14,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.Callable;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -77,34 +76,35 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
     private static Logger log = Logger
         .getLogger(IncomingProjectNegotiation.class);
 
-    protected SubMonitor monitor;
-    protected AtomicBoolean cancelled = new AtomicBoolean(false);
-    protected SarosCancellationException cancellationCause;
-    protected AddProjectToSessionWizard addIncomingProjectUI;
+    private SubMonitor monitor;
+    private AddProjectToSessionWizard addIncomingProjectUI;
 
-    protected List<ProjectExchangeInfo> projectInfos;
+    private List<ProjectExchangeInfo> projectInfos;
 
     @Inject
-    protected PreferenceUtils preferenceUtils;
-    @Inject
-    protected SarosSessionObservable sarosSessionObservable;
+    private PreferenceUtils preferenceUtils;
 
     @Inject
-    protected RemoteProgressManager rpm;
+    private SarosSessionObservable sarosSessionObservable;
 
     @Inject
-    protected IChecksumCache checksumCache;
+    private RemoteProgressManager rpm;
 
     @Inject
-    protected FileReplacementInProgressObservable fileReplacementInProgressObservable;
+    private IChecksumCache checksumCache;
+
+    @Inject
+    private FileReplacementInProgressObservable fileReplacementInProgressObservable;
     /**
      * maps the projectID to the project in workspace
      */
-    Map<String, IProject> localProjects;
+    private Map<String, IProject> localProjects;
 
-    protected JID jid;
+    private JID jid;
 
     private final ISarosSession sarosSession;
+
+    private boolean running;
 
     public IncomingProjectNegotiation(ISarosSession sarosSession, JID peer,
         String processID, List<ProjectExchangeInfo> projectInfos,
@@ -160,6 +160,10 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
         IProgressMonitor monitor, Map<String, Boolean> skipSyncs,
         boolean useVersionControl) {
 
+        synchronized (this) {
+            running = true;
+        }
+
         this.monitor = SubMonitor.convert(monitor,
             "Initializing shared project", 100);
 
@@ -177,6 +181,8 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
         Exception exception = null;
 
         try {
+            checkCancellation(CancelOption.NOTIFY_PEER);
+
             if (wasAutobuilding) {
                 desc.setAutoBuilding(false);
                 ws.setDescription(desc);
@@ -573,7 +579,8 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
             addIncomingProjectUI.cancelWizard(peer, errorMsg,
                 CancelLocation.REMOTE);
 
-        terminateProcess(null);
+        if (!running)
+            terminateProcess(null);
 
         return true;
     }
@@ -588,7 +595,8 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
             addIncomingProjectUI.cancelWizard(peer, errorMsg,
                 CancelLocation.LOCAL);
 
-        terminateProcess(null);
+        if (!running)
+            terminateProcess(null);
 
         return true;
     }

@@ -31,6 +31,8 @@ public class IncomingSessionNegotiation extends InvitationProcess {
 
     private IProgressMonitor monitor;
 
+    private boolean running;
+
     public IncomingSessionNegotiation(ISarosSessionManager sessionManager,
         JID from, int colorID, VersionManager versionManager,
         VersionInfo remoteVersionInfo, DateTime sessionStart,
@@ -57,7 +59,8 @@ public class IncomingSessionNegotiation extends InvitationProcess {
         if (inInvitationUI != null)
             inInvitationUI.cancelWizard(peer, errorMsg, CancelLocation.REMOTE);
 
-        terminateProcess(null);
+        if (!running)
+            terminateProcess(null);
 
         return true;
     }
@@ -71,7 +74,8 @@ public class IncomingSessionNegotiation extends InvitationProcess {
         if (inInvitationUI != null)
             inInvitationUI.cancelWizard(peer, errorMsg, CancelLocation.LOCAL);
 
-        terminateProcess(null);
+        if (!running)
+            terminateProcess(null);
 
         return true;
     }
@@ -89,15 +93,19 @@ public class IncomingSessionNegotiation extends InvitationProcess {
     }
 
     public Status accept(IProgressMonitor monitor) {
-
         log.debug(this + " : Invitation accepted");
-        // The second monitor we use during the invitation.
+
+        synchronized (this) {
+            running = true;
+        }
+
         this.monitor = monitor;
         observeMonitor(monitor);
 
         Exception exception = null;
 
         try {
+            checkCancellation(CancelOption.NOTIFY_PEER);
             sarosSession = sessionManager.joinSession(host, colorID,
                 sessionStart, peer, peerColorID);
             completeInvitation();
@@ -105,6 +113,7 @@ public class IncomingSessionNegotiation extends InvitationProcess {
             exception = e;
         } finally {
             monitor.done();
+            invitationProcesses.removeInvitationProcess(this);
         }
 
         return terminateProcess(exception);
@@ -113,7 +122,6 @@ public class IncomingSessionNegotiation extends InvitationProcess {
     @Override
     protected void executeCancellation() {
         sessionManager.stopSarosSession();
-        invitationProcesses.removeInvitationProcess(this);
     }
 
     private VersionInfo determineVersion(VersionInfo remoteVersionInfo) {
@@ -160,9 +168,6 @@ public class IncomingSessionNegotiation extends InvitationProcess {
 
         transmitter.sendInvitationCompleteConfirmation(peer, invitationID);
         log.debug(this + " : Invitation complete confirmation sent");
-
-        invitationProcesses.removeInvitationProcess(this);
-        monitor.done();
         log.debug(this + " : Invitation has completed successfully");
     }
 
