@@ -52,14 +52,13 @@ import de.fu_berlin.inf.dpp.activities.ProjectExchangeInfo;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.communication.chat.muc.negotiation.MUCSessionPreferences;
 import de.fu_berlin.inf.dpp.communication.chat.muc.negotiation.MUCSessionPreferencesNegotiatingManager;
-import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
-import de.fu_berlin.inf.dpp.exceptions.RemoteCancellationException;
 import de.fu_berlin.inf.dpp.invitation.IncomingProjectNegotiation;
 import de.fu_berlin.inf.dpp.invitation.IncomingSessionNegotiation;
 import de.fu_berlin.inf.dpp.invitation.InvitationProcess;
 import de.fu_berlin.inf.dpp.invitation.OutgoingProjectNegotiation;
 import de.fu_berlin.inf.dpp.invitation.OutgoingSessionNegotiation;
 import de.fu_berlin.inf.dpp.invitation.ProcessTools.CancelOption;
+import de.fu_berlin.inf.dpp.invitation.ProjectNegotiation;
 import de.fu_berlin.inf.dpp.net.ConnectionState;
 import de.fu_berlin.inf.dpp.net.IConnectionListener;
 import de.fu_berlin.inf.dpp.net.JID;
@@ -439,8 +438,10 @@ public class SarosSessionManager implements ISarosSessionManager {
 
                 switch (status) {
                 case CANCEL:
-                case ERROR:
                     return Status.CANCEL_STATUS;
+                case ERROR:
+                    return new Status(IStatus.ERROR, Saros.SAROS,
+                        process.getErrorMessage());
                 case OK:
                     break;
                 case REMOTE_CANCEL:
@@ -636,12 +637,8 @@ public class SarosSessionManager implements ISarosSessionManager {
         protected IStatus run(IProgressMonitor monitor) {
             try {
                 registerCancelListener();
-                process.start(monitor);
-            } catch (LocalCancellationException e) {
+                ProjectNegotiation.Status status = process.start(monitor);
 
-                return Status.CANCEL_STATUS;
-
-            } catch (RemoteCancellationException e) {
                 ISarosSession session = getSarosSession();
                 SarosNet sarosNet = null;
                 String peerName;
@@ -653,19 +650,29 @@ public class SarosSessionManager implements ISarosSessionManager {
                     peerName = Utils.prefix(new JID(peer));
                 }
 
-                if (e.getMessage() == null) { // remote user canceled purposely
-                    String message = MessageFormat
+                String message;
+
+                switch (status) {
+                case CANCEL:
+                    return Status.CANCEL_STATUS;
+                case ERROR:
+                    return new Status(IStatus.ERROR, Saros.SAROS,
+                        process.getErrorMessage());
+                case OK:
+                    break;
+                case REMOTE_CANCEL:
+                    message = MessageFormat
                         .format(
                             Messages.SarosSessionManager_project_sharing_cancelled_text,
                             peerName);
 
                     return new Status(IStatus.ERROR, Saros.SAROS, message);
 
-                } else {
-                    String message = MessageFormat
+                case REMOTE_ERROR:
+                    message = MessageFormat
                         .format(
                             Messages.SarosSessionManager_sharing_project_cancelled_remotely,
-                            peerName, e.getMessage());
+                            peerName, process.getErrorMessage());
                     SarosView
                         .showNotification(
                             Messages.SarosSessionManager_sharing_project_cancelled_remotely_text,
@@ -673,16 +680,12 @@ public class SarosSessionManager implements ISarosSessionManager {
 
                     return new Status(IStatus.ERROR, Saros.SAROS, message);
                 }
-
             } catch (Exception e) {
-
                 log.error("This exception is not expected here: ", e);
                 return new Status(IStatus.ERROR, Saros.SAROS, e.getMessage(), e);
 
             } finally {
-
                 releaseCancelListener();
-
             }
 
             return Status.OK_STATUS;

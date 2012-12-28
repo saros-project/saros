@@ -35,7 +35,6 @@ import de.fu_berlin.inf.dpp.activities.business.ProjectsAddedActivity;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
-import de.fu_berlin.inf.dpp.exceptions.RemoteCancellationException;
 import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
 import de.fu_berlin.inf.dpp.invitation.ProcessTools.CancelOption;
 import de.fu_berlin.inf.dpp.net.IncomingTransferObject;
@@ -89,7 +88,7 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
     @Inject
     protected IChecksumCache checksumCache;
 
-    protected Map<IProject, List<IResource>> projectResources;
+    protected Map<IProject, List<IResource>> partialSharedProjectResources;
     protected List<ProjectExchangeInfo> projectExchangeInfos;
 
     protected SarosPacketCollector remoteFileListResponseCollector;
@@ -103,13 +102,13 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
         this.processID = String.valueOf(INVITATION_RAND.nextLong());
         this.sarosSession = sarosSession;
 
-        this.projectResources = partialResources;
-        this.projects = new ArrayList<IProject>(projectResources.keySet());
+        this.partialSharedProjectResources = partialResources;
+        this.projects = new ArrayList<IProject>(
+            partialSharedProjectResources.keySet());
         this.projectExchangeInfos = projectExchangeInfos;
     }
 
-    public void start(IProgressMonitor progressMonitor)
-        throws SarosCancellationException {
+    public Status start(IProgressMonitor progressMonitor) {
 
         createCollectors();
         File zipArchive = null;
@@ -118,6 +117,10 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
 
         monitor = SubMonitor.convert(progressMonitor,
             "Retrieving list of files needed for synchronization...", 100);
+
+        observeMonitor(monitor);
+
+        Exception exception = null;
 
         try {
             if (fileTransferManager == null)
@@ -155,15 +158,8 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
                 monitor.newChild(50, SubMonitor.SUPPRESS_NONE));
 
             projectExchangeProcesses.removeProjectExchangeProcess(this);
-        } catch (IOException e) {
-            String errorMsg = "Unknown error: " + e;
-            if (e.getMessage() != null)
-                errorMsg = e.getMessage();
-            localCancel(errorMsg, CancelOption.NOTIFY_PEER);
-            executeCancellation();
-        } catch (SarosCancellationException cancel) {
-            localCancel("", CancelOption.NOTIFY_PEER);
-            executeCancellation();
+        } catch (Exception e) {
+            exception = e;
         } finally {
             for (File archive : zipArchives) {
                 if (!archive.delete())
@@ -173,12 +169,14 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
             deleteCollectors();
             monitor.done();
         }
+
+        return terminateProcess(exception);
     }
 
     /**
      * Build the list of files (with checksums, so it might take a while) that
      * should be present on the remote users computer to participate in the
-     * session. The filelists are contained in the {@link ProjectExchangeInfo}
+     * session. The file lists are contained in the {@link ProjectExchangeInfo}
      * Objects for each Project, and wrapped in a {@link ProjectsAddedActivity}
      * that is finally sent to the user
      * 
@@ -211,16 +209,17 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
                      * files so expect this to take a while when large files are
                      * included...
                      */
-                    if (this.projectResources.get(iProject) != null) {
+                    if (this.partialSharedProjectResources.get(iProject) != null) {
                         monitor.subTask("Listung & Hashing "
-                            + this.projectResources.get(iProject).size()
-                            + " files in project " + iProject.getName());
+                            + this.partialSharedProjectResources.get(iProject)
+                                .size() + " files in project "
+                            + iProject.getName());
                     } else {
                         monitor.subTask("Listung & Hashing files in project "
                             + iProject.getName());
                     }
                     FileList projectFileList = FileListFactory.createFileList(
-                        iProject, projectResources.get(iProject),
+                        iProject, partialSharedProjectResources.get(iProject),
                         checksumCache, useVersionControl, monitor.newChild(1));
 
                     if (monitor.isCanceled())
@@ -243,7 +242,7 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
                     CancelOption.NOTIFY_PEER);
 
             monitor.subTask("");
-            log.debug("Inv" + Utils.prefix(peer) + ": Sending file list...");
+            log.debug(this + " : Sending file list");
             monitor.setTaskName("Sending file list...");
 
             sarosSession.sendActivity(sarosSession.getUser(peer),
@@ -270,8 +269,7 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
     protected void getRemoteFileList(SubMonitor monitor) throws IOException,
         SarosCancellationException {
 
-        log.debug("Inv" + Utils.prefix(peer)
-            + ": Waiting for remote file list...");
+        log.debug(this + " : Waiting for remote file list");
 
         try {
             monitor.setTaskName("Waiting for " + peer.getName()
@@ -292,8 +290,7 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
 
             List<FileList> remoteFileLists = deserializeRemoteFileList(packet);
 
-            log.debug("Inv" + Utils.prefix(peer)
-                + ": Remote file list has been received.");
+            log.debug(this + " : Remote file list has been received");
 
             checkCancellation(CancelOption.NOTIFY_PEER);
 
@@ -321,166 +318,12 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
         return this.processID;
     }
 
-    /**
-     * Checks whether the invitation process or the monitor has been canceled.
-     * If the monitor has been canceled but the invitation process has not yet,
-     * it cancels the invitation process.
-     * 
-     * @throws SarosCancellationException
-     *             if the invitation process or the monitor has already been
-     *             canceled.
-     */
-    protected void checkCancellation(CancelOption cancelOption)
-        throws SarosCancellationException {
-        if (cancelled.get()) {
-            log.debug("Inv" + Utils.prefix(peer) + ": Cancellation checkpoint");
-            throw new SarosCancellationException();
-        }
-
-        if (monitor == null) {
-            log.warn("Inv" + Utils.prefix(peer) + ": The monitor is null.");
-            return;
-        }
-
-        if (monitor.isCanceled()) {
-            log.debug("Inv" + Utils.prefix(peer) + ": Cancellation checkpoint");
-            localCancel(null, cancelOption);
-            throw new SarosCancellationException();
-        }
-    }
-
-    /**
-     * This method does <strong>not</strong> execute the cancellation but only
-     * sets the {@link #cancellationCause}. It should be called if the
-     * cancellation was initiated by the <strong>local</strong> user. The
-     * cancellation will be ignored if the invitation has already been cancelled
-     * before. <br>
-     * In order to cancel the invitation process {@link #executeCancellation()}
-     * should be called.
-     * 
-     * @param errorMsg
-     *            the error that caused the cancellation. This should be some
-     *            user-friendly text as it might be presented to the user.
-     *            <code>null</code> if the cancellation was caused by the user's
-     *            request and not by some error.
-     * 
-     * @param cancelOption
-     *            If <code>NOTIFY_PEER</code> we send a cancellation message to
-     *            our peer.
-     */
-    public void localCancel(String errorMsg, CancelOption cancelOption) {
-        if (!cancelled.compareAndSet(false, true))
-            return;
-        log.debug("Inv" + Utils.prefix(peer) + ": localCancel: " + errorMsg);
-        if (monitor != null)
-            monitor.setCanceled(true);
-        cancellationCause = new LocalCancellationException(errorMsg,
-            cancelOption);
-    }
-
-    /**
-     * Cancels the invitation process based on the exception stored in
-     * {@link #cancellationCause}. This method is always called by this local
-     * object, so even if an another object "cancels" the invitation (
-     * {@link #localCancel(String, CancelOption)}, {@link #remoteCancel(String)}
-     * ), the exceptions will be thrown up on the stack to the caller of
-     * {@link #start}, and not to the object which has "cancelled" the process.
-     * The cancel methods ( {@link #localCancel(String, CancelOption)},
-     * {@link #remoteCancel(String)} ) do not cancel the invitation alone, but
-     * they set the {@link #cancellationCause} and cancel the {@link #monitor}.
-     * Now it is the responsibility of the objects which use the
-     * {@link #monitor} to throw a {@link SarosCancellationException} (or it's
-     * subclasses), which will be caught by this object causing a call to this
-     * method. If this does not happen, the next
-     * {@link #checkCancellation(CancelOption)} cancels the invitation.
-     */
-    protected void executeCancellation() throws SarosCancellationException {
-
-        log.debug("Inv" + Utils.prefix(peer) + ": executeCancellation");
-        if (!cancelled.get())
-            throw new IllegalStateException(
-                "executeCancellation should only be called after localCancel or remoteCancel!");
-
-        String errorMsg;
-        String cancelMessage;
-        if (cancellationCause instanceof LocalCancellationException) {
-            LocalCancellationException e = (LocalCancellationException) cancellationCause;
-            errorMsg = e.getMessage();
-
-            switch (e.getCancelOption()) {
-            case NOTIFY_PEER:
-                // WTF ?!
-                transmitter.sendCancelInvitationMessage(peer, processID,
-                    errorMsg);
-                break;
-            case DO_NOT_NOTIFY_PEER:
-                break;
-            default:
-                log.warn("Inv" + Utils.prefix(peer)
-                    + ": This case is not expected here.");
-            }
-
-            if (errorMsg != null) {
-                cancelMessage = "Invitation was cancelled locally"
-                    + " because of an error: " + errorMsg;
-                log.error("Inv" + Utils.prefix(peer) + ": " + cancelMessage);
-                monitor.setTaskName("Invitation failed. (" + errorMsg + ")");
-            } else {
-                cancelMessage = "Invitation was cancelled by local user.";
-                log.debug("Inv" + Utils.prefix(peer) + ": " + cancelMessage);
-                monitor.setTaskName("Invitation has been cancelled.");
-            }
-
-        } else if (cancellationCause instanceof RemoteCancellationException) {
-            RemoteCancellationException e = (RemoteCancellationException) cancellationCause;
-
-            errorMsg = e.getMessage();
-            if (errorMsg != null) {
-                cancelMessage = "Invitation was cancelled by the remote user "
-                    + " because of an error on his/her side: " + errorMsg;
-                log.error("Inv" + Utils.prefix(peer) + ": " + cancelMessage);
-                monitor.setTaskName("Invitation failed.");
-            } else {
-                cancelMessage = "Invitation was cancelled by the remote user.";
-                log.debug("Inv" + Utils.prefix(peer) + ": " + cancelMessage);
-                monitor.setTaskName("Invitation has been cancelled.");
-            }
-        } else {
-            log.error("This type of exception is not expected here: ",
-                cancellationCause);
-            monitor.setTaskName("Invitation failed.");
-        }
-
+    @Override
+    protected void executeCancellation() {
         if (sarosSession.getRemoteUsers().isEmpty())
             sessionManager.stopSarosSession();
 
         projectExchangeProcesses.removeProjectExchangeProcess(this);
-        throw cancellationCause;
-    }
-
-    /**
-     * This method does <strong>not</strong> execute the cancellation but only
-     * sets the {@link #cancellationCause}. It should be called if the
-     * cancellation was initiated by the <strong>remote</strong> user. The
-     * cancellation will be ignored if the invitation has already been cancelled
-     * before. <br>
-     * In order to cancel the invitation process {@link #executeCancellation()}
-     * should be called.
-     * 
-     * @param errorMsg
-     *            the error that caused the cancellation. This should be some
-     *            user-friendly text as it might be presented to the user.
-     *            <code>null</code> if the cancellation was caused by the user's
-     *            request and not by some error.
-     */
-    @Override
-    public void remoteCancel(String errorMsg) {
-        if (!cancelled.compareAndSet(false, true))
-            return;
-        log.debug("Inv" + Utils.prefix(peer) + ": remoteCancel: " + errorMsg);
-        if (monitor != null)
-            monitor.setCanceled(true);
-        cancellationCause = new RemoteCancellationException(errorMsg);
     }
 
     /**
@@ -494,7 +337,7 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
         MappedList<String, IPath> projectFilesToSend, SubMonitor monitor)
         throws IOException, SarosCancellationException {
 
-        log.debug("Inv" + Utils.prefix(peer) + ": Creating archive...");
+        log.debug(this + " : Creating archive");
         checkCancellation(CancelOption.NOTIFY_PEER);
 
         monitor.beginTask("Creating archives...", projectFilesToSend.size());
@@ -510,8 +353,7 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
             if (user.isInvitationComplete())
                 usersToStop.add(user);
         }
-        log.debug("Inv" + Utils.prefix(peer) + ": Stopping users: "
-            + usersToStop);
+        log.debug(this + " : Stopping users : " + usersToStop);
         // TODO: startHandles outside of sync block?
         List<StartHandle> startHandles;
 
@@ -529,12 +371,15 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
         /*
          * Use editorManager.saveText() because the EditorAPI.saveProject() will
          * not save files which were modified in the background. This is what
-         * hapens for example if a user edits a file which is not opended by the
+         * happens for example if a user edits a file which is not opened by the
          * local user.
+         * 
+         * Stefan Rossbach: this will still fail if a user edited a file and
+         * then closes the editor without saving it.
          */
-        for (SPath path : editorManager.getOpenEditorsOfAllParticipants()) {
+        for (SPath path : editorManager.getOpenEditorsOfAllParticipants())
             editorManager.saveText(path);
-        }
+
         try {
             List<File> archivesToSend = new LinkedList<File>();
 
@@ -548,9 +393,9 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
                     monitor.newChild(1, SubMonitor.SUPPRESS_NONE), toSend,
                     projectID);
 
-                if (projectArchive != null) {
+                if (projectArchive != null)
                     archivesToSend.add(projectArchive);
-                }
+
             }
 
             return archivesToSend;
@@ -561,7 +406,7 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
 
             // START all users
             for (StartHandle startHandle : startHandles) {
-                log.debug("Inv" + Utils.prefix(peer) + ": Starting user "
+                log.debug(this + " : Starting user "
                     + Utils.prefix(startHandle.getUser().getJID()));
                 startHandle.start();
             }
@@ -662,14 +507,14 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
         throws SarosCancellationException, IOException {
 
         if (archive == null) {
-            log.debug("Inv" + Utils.prefix(peer) + ": The archive is empty.");
+            log.debug(this + " : The archive is empty.");
             monitor.done();
             return;
         }
 
         monitor.beginTask("Sending archive file...", 100);
 
-        log.debug("Inv" + Utils.prefix(peer) + ": Sending archive...");
+        log.debug(this + " : Sending archive...");
 
         assert fileTransferManager != null;
 
@@ -685,6 +530,11 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
             monitor.done();
         }
 
-        log.debug("Inv" + Utils.prefix(peer) + ": Archive send.");
+        log.debug(this + " : Archive send.");
+    }
+
+    @Override
+    public String toString() {
+        return "OPN [remote side: " + peer + "]";
     }
 }

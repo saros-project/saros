@@ -35,10 +35,10 @@ import de.fu_berlin.inf.dpp.FileListFactory;
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
-import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
 import de.fu_berlin.inf.dpp.invitation.IncomingProjectNegotiation;
 import de.fu_berlin.inf.dpp.invitation.ProcessTools.CancelLocation;
 import de.fu_berlin.inf.dpp.invitation.ProcessTools.CancelOption;
+import de.fu_berlin.inf.dpp.invitation.ProjectNegotiation;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
@@ -264,8 +264,12 @@ public class AddProjectToSessionWizard extends Wizard {
             @Override
             protected IStatus run(IProgressMonitor monitor) {
                 try {
-                    process.accept(projectNames, monitor, skipProjectSyncing,
+                    ProjectNegotiation.Status status = process.accept(
+                        projectNames, monitor, skipProjectSyncing,
                         useVersionControl);
+
+                    if (status != ProjectNegotiation.Status.OK)
+                        return Status.CANCEL_STATUS;
 
                     SarosView
                         .showNotification(
@@ -275,7 +279,10 @@ public class AddProjectToSessionWizard extends Wizard {
                                     Messages.AddProjectToSessionWizard_synchronize_finished_notification_text,
                                     Utils.join(", ", projectNames.values())));
 
-                } catch (SarosCancellationException e) {
+                } catch (Exception e) {
+                    log.error(
+                        "unkown error during project negotiation: "
+                            + e.getMessage(), e);
                     return Status.CANCEL_STATUS;
                 } finally {
                     SWTUtils.runSafeSWTAsync(log, new Runnable() {

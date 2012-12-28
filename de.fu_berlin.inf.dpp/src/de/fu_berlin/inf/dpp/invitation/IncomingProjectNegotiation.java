@@ -34,7 +34,6 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
@@ -54,7 +53,6 @@ import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.activities.ProjectExchangeInfo;
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
-import de.fu_berlin.inf.dpp.exceptions.RemoteCancellationException;
 import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
 import de.fu_berlin.inf.dpp.invitation.ProcessTools.CancelLocation;
 import de.fu_berlin.inf.dpp.invitation.ProcessTools.CancelOption;
@@ -145,7 +143,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
         return null;
     }
 
-    public void setProjectInvitationUI(
+    public synchronized void setProjectInvitationUI(
         AddProjectToSessionWizard addIncomingProjectUI) {
         this.addIncomingProjectUI = addIncomingProjectUI;
     }
@@ -158,12 +156,14 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
      *            value is the name of the project in the workspace of the
      *            invited buddy (given from the {@link EnterProjectNamePage})
      */
-    public void accept(Map<String, String> projectNames,
+    public Status accept(Map<String, String> projectNames,
         IProgressMonitor monitor, Map<String, Boolean> skipSyncs,
-        boolean useVersionControl) throws SarosCancellationException {
+        boolean useVersionControl) {
 
         this.monitor = SubMonitor.convert(monitor,
             "Initializing shared project", 100);
+
+        observeMonitor(monitor);
 
         IWorkspace ws = ResourcesPlugin.getWorkspace();
         IWorkspaceDescription desc = ws.getDescription();
@@ -173,6 +173,8 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
 
         ArchiveTransferListener archiveTransferListener = new ArchiveTransferListener(
             processID);
+
+        Exception exception = null;
 
         try {
             if (wasAutobuilding) {
@@ -198,7 +200,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
             }
 
             transmitter.sendFileLists(peer, processID, missingFiles);
-            checkCancellation();
+            checkCancellation(CancelOption.NOTIFY_PEER);
 
             boolean filesMissing = false;
 
@@ -229,7 +231,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
                 sessionManager.projectAdded(projectID);
             }
         } catch (Exception e) {
-            processException(e);
+            exception = e;
         } finally {
 
             if (fileTransferManager != null)
@@ -255,6 +257,8 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
                 this.projectExchangeProcesses
                     .removeProjectExchangeProcess(this);
         }
+
+        return terminateProcess(exception);
     }
 
     public boolean isPartialRemoteProject(String projectID) {
@@ -370,7 +374,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
             SubMonitor lMonitor = subMonitor.newChild(100 / numberOfLoops);
             String projectID = entry.getKey();
             String projectName = entry.getValue();
-            checkCancellation();
+            checkCancellation(CancelOption.NOTIFY_PEER);
             ProjectExchangeInfo projectInfo = null;
             for (ProjectExchangeInfo pInfo : this.projectInfos) {
                 if (pInfo.getProjectID().equals(projectID))
@@ -405,13 +409,13 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
                 projectID, vcs, lMonitor.newChild(30), projectInfo);
             localProjects.put(projectID, localProject);
 
-            checkCancellation();
+            checkCancellation(CancelOption.NOTIFY_PEER);
             if (vcs != null && !isPartialRemoteProject(projectID)) {
                 log.debug("initVcState");
                 initVcState(localProject, vcs, lMonitor.newChild(40),
                     projectInfo.getFileList());
             }
-            checkCancellation();
+            checkCancellation(CancelOption.NOTIFY_PEER);
 
             log.debug("compute required Files for project " + projectName
                 + " with ID: " + projectID);
@@ -419,7 +423,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
                 projectInfo.getFileList(), projectID, skipSyncs.get(projectID)
                     .booleanValue(), vcs, lMonitor.newChild(30));
             requiredFiles.setProjectID(projectID);
-            checkCancellation();
+            checkCancellation(CancelOption.NOTIFY_PEER);
             missingFiles.add(requiredFiles);
             lMonitor.done();
         }
@@ -536,122 +540,21 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
         return newLocalProject;
     }
 
-    /**
-     * Checks whether the invitation process or the monitor has been cancelled.
-     * If the monitor has been cancelled but the invitation process has not yet,
-     * it cancels the invitation process.
-     * 
-     * @throws SarosCancellationException
-     *             if the invitation process or the monitor has already been
-     *             cancelled.
-     */
-    protected void checkCancellation() throws SarosCancellationException {
-        if (cancelled.get()) {
-            log.debug("Inv" + Utils.prefix(peer) + ": Cancellation checkpoint");
-            throw new SarosCancellationException();
-        }
-
-        if (monitor == null)
-            return;
-
-        if (monitor.isCanceled()) {
-            log.debug("Inv" + Utils.prefix(peer) + ": Cancellation checkpoint");
-            localCancel(null, CancelOption.NOTIFY_PEER);
-            throw new SarosCancellationException();
-        }
-
-        return;
-    }
-
-    protected void processException(Exception e)
-        throws SarosCancellationException {
-        if (e instanceof LocalCancellationException) {
-            localCancel(e.getMessage(), CancelOption.NOTIFY_PEER);
-        } else if (e instanceof RemoteCancellationException) {
-            remoteCancel(e.getMessage());
-        } else if (e instanceof SarosCancellationException) {
-            /**
-             * If this exception is thrown because of a local cancellation, we
-             * initiate a localCancel here.
-             * 
-             * If this exception is thrown because of a remote cancellation, the
-             * call of localCancel will be ignored.
-             */
-            localCancel(e.getMessage(), CancelOption.NOTIFY_PEER);
-        } else if (e instanceof IOException) {
-            String errorMsg = MessageFormat.format("Unknown error: {0}", e);
-            if (e.getMessage() != null)
-                errorMsg = e.getMessage();
-            localCancel(errorMsg, CancelOption.NOTIFY_PEER);
-        } else {
-            log.warn("Inv" + Utils.prefix(peer)
-                + ": This type of Exception is not expected: ", e);
-            String errorMsg = MessageFormat.format("Unknown error: {0}", e);
-            if (e.getMessage() != null)
-                errorMsg = e.getMessage();
-            localCancel(errorMsg, CancelOption.NOTIFY_PEER);
-        }
-        executeCancellation();
-    }
-
-    protected void executeCancellation() throws SarosCancellationException {
-
-        log.debug("Inv" + Utils.prefix(peer) + ": executeCancellation");
-        if (!cancelled.get())
-            throw new IllegalStateException(
-                "executeCancellation should only be called after localCancel or remoteCancel!");
+    @Override
+    protected void executeCancellation() {
 
         /*
          * Remove the entries from the mapping in the SarosSession.
+         * 
+         * Stefan Rossbach 28.12.2012: This will not gain you anything because
+         * the project is marked as shared on the remote side and so will never
+         * be able to be shared again to us. Again the whole architecture does
+         * currently NOT support cancellation of the project negotiation
+         * properly !
          */
-        for (Entry<String, IProject> entry : localProjects.entrySet()) {
+        for (Entry<String, IProject> entry : localProjects.entrySet())
             sarosSession.removeProjectOwnership(entry.getKey(),
                 entry.getValue(), jid);
-        }
-
-        String errorMsg;
-        String cancelMessage;
-        if (cancellationCause instanceof LocalCancellationException) {
-            LocalCancellationException e = (LocalCancellationException) cancellationCause;
-            errorMsg = e.getMessage();
-
-            switch (e.getCancelOption()) {
-            case NOTIFY_PEER:
-                transmitter.sendCancelSharingProjectMessage(peer, errorMsg);
-                break;
-            case DO_NOT_NOTIFY_PEER:
-                break;
-            default:
-                log.warn("Inv" + Utils.prefix(peer)
-                    + ": This case is not expected here.");
-            }
-
-            if (errorMsg != null) {
-                cancelMessage = "Sharing project was cancelled locally"
-                    + " because of an error: " + errorMsg;
-                log.error("Inv" + Utils.prefix(peer) + ": " + cancelMessage);
-            } else {
-                cancelMessage = "Sharing project was cancelled by local user.";
-                log.debug("Inv" + Utils.prefix(peer) + ": " + cancelMessage);
-            }
-
-        } else if (cancellationCause instanceof RemoteCancellationException) {
-            RemoteCancellationException e = (RemoteCancellationException) cancellationCause;
-            errorMsg = e.getMessage();
-            if (errorMsg != null) {
-                cancelMessage = MessageFormat
-                    .format(
-                        "Sharing project was cancelled by the remote user because of an error on his/her side: {0}",
-                        errorMsg);
-                log.error("Inv" + Utils.prefix(peer) + ": " + cancelMessage);
-            } else {
-                cancelMessage = "Sharing project was cancelled by the remote user.";
-                log.debug("Inv" + Utils.prefix(peer) + ": " + cancelMessage);
-            }
-        } else {
-            log.error("This type of exception is not expected here: ",
-                cancellationCause);
-        }
 
         // The session might have been stopped already, if not we will stop it.
         if (sarosSession.getProjectResourcesMapping().keySet().isEmpty()
@@ -659,85 +562,35 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
             sessionManager.stopSarosSession();
 
         projectExchangeProcesses.removeProjectExchangeProcess(this);
-        throw cancellationCause;
-    }
-
-    /**
-     * This method does <strong>not</strong> execute the cancellation but only
-     * sets the {@link #cancellationCause}. It should be called if the
-     * cancellation was initiated by the <strong>local</strong> user. The
-     * cancellation will be ignored if the invitation has already been cancelled
-     * before. <br>
-     * In order to cancel the invitation process {@link #executeCancellation()}
-     * should be called.
-     * 
-     * @param errorMsg
-     *            the error that caused the cancellation. This should be some
-     *            user-friendly text as it might be presented to the user.
-     *            <code>null</code> if the cancellation was caused by the user's
-     *            request and not by some error.
-     * 
-     * @param cancelOption
-     *            If <code>NOTIFY_PEER</code> we send a cancellation message to
-     *            our peer.
-     */
-    public void localCancel(String errorMsg, CancelOption cancelOption) {
-        if (!cancelled.compareAndSet(false, true))
-            return;
-        log.debug("Inv" + Utils.prefix(peer) + ": localCancel: " + errorMsg);
-        if (monitor != null)
-            monitor.setCanceled(true);
-        cancellationCause = new LocalCancellationException(errorMsg,
-            cancelOption);
-        if (monitor == null) {
-            log.debug("Inv" + Utils.prefix(peer)
-                + ": Closing JoinSessionWizard manually.");
-            try {
-                executeCancellation();
-            } catch (SarosCancellationException e) {
-                /**
-                 * This happens if the JoinSessionWizard is currently waiting
-                 * for user input.
-                 */
-                if (addIncomingProjectUI != null)
-                    addIncomingProjectUI.cancelWizard(peer, e.getMessage(),
-                        CancelLocation.LOCAL);
-                else
-                    log.error("The inInvitationUI is null, could not"
-                        + " close the JoinSessionWizard.");
-            }
-        }
     }
 
     @Override
-    public void remoteCancel(String errorMsg) {
-        if (!cancelled.compareAndSet(false, true))
-            return;
-        log.debug("Inv"
-            + Utils.prefix(peer)
-            + ": remoteCancel "
-            + (errorMsg == null ? " by user" : " because of error: " + errorMsg));
-        if (monitor != null)
-            monitor.setCanceled(true);
-        cancellationCause = new RemoteCancellationException(errorMsg);
-        if (monitor == null) {
-            log.debug("Inv" + Utils.prefix(peer)
-                + ": Closing JoinSessionWizard manually.");
-            try {
-                executeCancellation();
-            } catch (SarosCancellationException e) {
-                /**
-                 * This happens if the JoinSessionWizard is currently waiting
-                 * for user input.
-                 */
-                if (addIncomingProjectUI != null)
-                    addIncomingProjectUI.cancelWizard(peer, e.getMessage(),
-                        CancelLocation.REMOTE);
-                else
-                    log.error("The inInvitationUI is null, could not"
-                        + " close the JoinSessionWizard.");
-            }
-        }
+    public synchronized boolean remoteCancel(String errorMsg) {
+        if (!super.remoteCancel(errorMsg))
+            return false;
+
+        if (addIncomingProjectUI != null)
+            addIncomingProjectUI.cancelWizard(peer, errorMsg,
+                CancelLocation.REMOTE);
+
+        terminateProcess(null);
+
+        return true;
+    }
+
+    @Override
+    public synchronized boolean localCancel(String errorMsg,
+        CancelOption cancelOption) {
+        if (!super.localCancel(errorMsg, cancelOption))
+            return false;
+
+        if (addIncomingProjectUI != null)
+            addIncomingProjectUI.cancelWizard(peer, errorMsg,
+                CancelLocation.LOCAL);
+
+        terminateProcess(null);
+
+        return true;
     }
 
     /**
@@ -761,9 +614,9 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
         final IProject project = workspaceRoot.getProject(newProjectName);
 
         if (project.exists()) {
-            throw new CoreException(new Status(IStatus.ERROR, Saros.SAROS,
-                MessageFormat.format("Project {0} already exists!",
-                    newProjectName)));
+            throw new CoreException(new org.eclipse.core.runtime.Status(
+                IStatus.ERROR, Saros.SAROS, MessageFormat.format(
+                    "Project {0} already exists!", newProjectName)));
         }
 
         ProgressMonitorDialog dialog = new ProgressMonitorDialog(EditorAPI
@@ -921,7 +774,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
         final IProject project, final SubMonitor subMonitor)
         throws LocalCancellationException {
 
-        log.debug("Inv" + Utils.prefix(peer) + ": Writing archive to disk...");
+        log.debug(this + " : Writing archive to disk...");
         /*
          * TODO: calculate the ADLER32 checksums during decompression and add
          * them into the ChecksumCache. The insertion must be done after the
@@ -937,8 +790,9 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
                         FileUtils.writeArchive(archiveStream, project,
                             SubMonitor.convert(monitor));
                     } catch (LocalCancellationException e) {
-                        throw new CoreException(new Status(IStatus.CANCEL,
-                            Saros.SAROS, null, e));
+                        throw new CoreException(
+                            new org.eclipse.core.runtime.Status(IStatus.CANCEL,
+                                Saros.SAROS, null, e));
                     }
                 }
             }, subMonitor);
@@ -1077,7 +931,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
 
         monitor.subTask("Receiving archive file...");
 
-        log.debug("receiving archive");
+        log.debug(this + " : receiving archive");
 
         IncomingFileTransfer transfer = archiveTransferListener.getRequest()
             .accept();
@@ -1100,8 +954,9 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
             monitor.done();
         }
 
-        log.debug("stored archive in file " + archiveFile.getAbsolutePath()
-            + ", size: " + Utils.formatByte(archiveFile.length()));
+        log.debug(this + " : stored archive in file "
+            + archiveFile.getAbsolutePath() + ", size: "
+            + Utils.formatByte(archiveFile.length()));
 
         return archiveFile;
     }
@@ -1129,5 +984,10 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
         public FileTransferRequest getRequest() {
             return this.request;
         }
+    }
+
+    @Override
+    public String toString() {
+        return "IPN [remote side: " + peer + "]";
     }
 }

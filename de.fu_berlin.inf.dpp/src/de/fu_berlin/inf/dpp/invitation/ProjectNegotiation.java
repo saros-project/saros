@@ -4,11 +4,11 @@ import java.io.IOException;
 import java.util.Map;
 
 import org.apache.commons.lang.time.StopWatch;
+import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.jivesoftware.smack.Connection;
 import org.jivesoftware.smackx.filetransfer.FileTransfer;
-import org.jivesoftware.smackx.filetransfer.FileTransfer.Status;
 import org.jivesoftware.smackx.filetransfer.FileTransferManager;
 import org.picocontainer.annotations.Inject;
 
@@ -16,6 +16,7 @@ import de.fu_berlin.inf.dpp.SarosContext;
 import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
 import de.fu_berlin.inf.dpp.exceptions.RemoteCancellationException;
 import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
+import de.fu_berlin.inf.dpp.invitation.ProcessTools.CancelOption;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.SarosNet;
@@ -29,7 +30,10 @@ import de.fu_berlin.inf.dpp.util.Utils;
  * This abstract class is the superclass for {@link OutgoingProjectNegotiation}
  * and {@link IncomingProjectNegotiation}.
  */
-public abstract class ProjectNegotiation {
+public abstract class ProjectNegotiation extends CancelableProcess {
+
+    private static final Logger log = Logger
+        .getLogger(ProjectNegotiation.class);
 
     @Inject
     protected ProjectNegotiationObservable projectExchangeProcesses;
@@ -89,11 +93,23 @@ public abstract class ProjectNegotiation {
         return this.peer;
     }
 
-    /**
-     * 
-     * @param errorMsg
-     */
-    public abstract void remoteCancel(String errorMsg);
+    @Override
+    protected void notifyCancellation(SarosCancellationException exception) {
+
+        if (!(exception instanceof LocalCancellationException))
+            return;
+
+        LocalCancellationException cause = (LocalCancellationException) exception;
+
+        if (cause.getCancelOption() != CancelOption.NOTIFY_PEER)
+            return;
+
+        log.debug("notifying remote contact " + Utils.prefix(getPeer())
+            + " of the local project negotiation cancellation");
+
+        transmitter.sendCancelSharingProjectMessage(getPeer(),
+            cause.getMessage());
+    }
 
     /**
      * Monitors a {@link FileTransfer} and waits until it is completed or
@@ -175,18 +191,24 @@ public abstract class ProjectNegotiation {
             }
         }
 
-        Status status = transfer.getStatus();
+        org.jivesoftware.smackx.filetransfer.FileTransfer.Status status = transfer
+            .getStatus();
 
-        if (status.equals(Status.complete))
+        if (status
+            .equals(org.jivesoftware.smackx.filetransfer.FileTransfer.Status.complete))
             return;
 
-        if (status.equals(Status.cancelled) && monitor.isCanceled())
+        if (status
+            .equals(org.jivesoftware.smackx.filetransfer.FileTransfer.Status.cancelled)
+            && monitor.isCanceled())
             throw new LocalCancellationException();
 
-        if (status.equals(Status.cancelled))
+        if (status
+            .equals(org.jivesoftware.smackx.filetransfer.FileTransfer.Status.cancelled))
             throw new RemoteCancellationException(null);
 
-        if (status.equals(Status.error))
+        if (status
+            .equals(org.jivesoftware.smackx.filetransfer.FileTransfer.Status.error))
             throw new IOException(transfer.getError().getMessage(),
                 transfer.getException());
 
