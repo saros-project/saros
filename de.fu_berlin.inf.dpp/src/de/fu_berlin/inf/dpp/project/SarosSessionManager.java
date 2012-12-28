@@ -56,6 +56,7 @@ import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
 import de.fu_berlin.inf.dpp.exceptions.RemoteCancellationException;
 import de.fu_berlin.inf.dpp.invitation.IncomingProjectNegotiation;
 import de.fu_berlin.inf.dpp.invitation.IncomingSessionNegotiation;
+import de.fu_berlin.inf.dpp.invitation.InvitationProcess;
 import de.fu_berlin.inf.dpp.invitation.OutgoingProjectNegotiation;
 import de.fu_berlin.inf.dpp.invitation.OutgoingSessionNegotiation;
 import de.fu_berlin.inf.dpp.invitation.ProcessTools.CancelOption;
@@ -330,9 +331,9 @@ public class SarosSessionManager implements ISarosSessionManager {
         this.sessionID.setValue(sessionID);
 
         final IncomingSessionNegotiation process = new IncomingSessionNegotiation(
-            this, transmitter, from, colorID, invitationProcesses,
-            versionManager, versionInfo, sessionStart, sarosUI, invitationID,
-            description, sarosContext, inviterColorID, host);
+            this, from, colorID, versionManager, versionInfo, sessionStart,
+            invitationID, description, sarosContext, inviterColorID, host);
+
         comNegotiatingManager.setSessionPreferences(comPrefs);
 
         SWTUtils.runSafeSWTAsync(log, new Runnable() {
@@ -434,16 +435,15 @@ public class SarosSessionManager implements ISarosSessionManager {
         protected IStatus run(IProgressMonitor monitor) {
             try {
                 registerCancelListener();
-                process.start(monitor);
+                InvitationProcess.Status status = process.start(monitor);
 
-            } catch (LocalCancellationException e) {
-
-                return Status.CANCEL_STATUS;
-
-            } catch (RemoteCancellationException e) {
-
-                if (e.getMessage() == null) { // buddy canceled purposely
-
+                switch (status) {
+                case CANCEL:
+                case ERROR:
+                    return Status.CANCEL_STATUS;
+                case OK:
+                    break;
+                case REMOTE_CANCEL:
                     SarosView
                         .showNotification(
                             Messages.SarosSessionManager_canceled_invitation,
@@ -460,15 +460,14 @@ public class SarosSessionManager implements ISarosSessionManager {
                                 Messages.SarosSessionManager_canceled_invitation_text,
                                 peer));
 
-                } else {
-
+                case REMOTE_ERROR:
                     SarosView
                         .showNotification(
                             Messages.SarosSessionManager_error_during_invitation,
                             MessageFormat
                                 .format(
                                     Messages.SarosSessionManager_error_during_invitation_text,
-                                    peer, e.getMessage()));
+                                    peer, process.getErrorMessage()));
 
                     return new Status(
                         IStatus.ERROR,
@@ -476,18 +475,14 @@ public class SarosSessionManager implements ISarosSessionManager {
                         MessageFormat
                             .format(
                                 Messages.SarosSessionManager_error_during_invitation_text2,
-                                peer, e.getMessage()));
+                                peer, process.getErrorMessage()));
                 }
-
             } catch (Exception e) {
-
                 log.error("This exception is not expected here: ", e);
                 return new Status(IStatus.ERROR, Saros.SAROS, e.getMessage(), e);
 
             } finally {
-
                 releaseCancelListener();
-
             }
 
             return Status.OK_STATUS;

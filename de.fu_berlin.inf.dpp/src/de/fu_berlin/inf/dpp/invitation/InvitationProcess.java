@@ -19,19 +19,26 @@
  */
 package de.fu_berlin.inf.dpp.invitation;
 
+import org.apache.log4j.Logger;
 import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.SarosContext;
+import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
+import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
+import de.fu_berlin.inf.dpp.invitation.ProcessTools.CancelOption;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.observables.InvitationProcessObservable;
 import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
+import de.fu_berlin.inf.dpp.util.Utils;
 
 /**
  * @author rdjemili
  * @author sotitas
  */
-public abstract class InvitationProcess {
+public abstract class InvitationProcess extends CancelableProcess {
+
+    private static final Logger log = Logger.getLogger(InvitationProcess.class);
 
     @Inject
     protected ITransmitter transmitter;
@@ -45,8 +52,11 @@ public abstract class InvitationProcess {
     @Inject
     protected InvitationProcessObservable invitationProcesses;
 
-    public InvitationProcess(JID peer, String description, int colorID,
-        SarosContext sarosContext) {
+    protected final String invitationID;
+
+    public InvitationProcess(String invitationID, JID peer, String description,
+        int colorID, SarosContext sarosContext) {
+        this.invitationID = invitationID;
         this.peer = peer;
         this.description = description;
         this.colorID = colorID;
@@ -54,11 +64,6 @@ public abstract class InvitationProcess {
         this.invitationProcesses.addInvitationProcess(this);
     }
 
-    /**
-     * @return the peer that is participating with us in this process. For an
-     *         incoming invitation this is the inviter. For an outgoing
-     *         invitation this is the invitee.
-     */
     public JID getPeer() {
         return this.peer;
     }
@@ -72,10 +77,20 @@ public abstract class InvitationProcess {
     }
 
     @Override
-    public String toString() {
-        return "InvitationProcess(peer:" + this.peer + ")";
+    protected void notifyCancellation(SarosCancellationException exception) {
+
+        if (!(exception instanceof LocalCancellationException))
+            return;
+
+        LocalCancellationException cause = (LocalCancellationException) exception;
+
+        if (cause.getCancelOption() != CancelOption.NOTIFY_PEER)
+            return;
+
+        log.debug("notifying remote contact " + Utils.prefix(getPeer())
+            + " of the local cancellation");
+
+        transmitter.sendCancelInvitationMessage(getPeer(), invitationID,
+            cause.getMessage());
     }
-
-    public abstract void remoteCancel(String errorMsg);
-
 }

@@ -25,7 +25,6 @@ import java.text.MessageFormat;
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IPageChangingListener;
@@ -36,9 +35,8 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Shell;
 
-import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
-import de.fu_berlin.inf.dpp.exceptions.RemoteCancellationException;
 import de.fu_berlin.inf.dpp.invitation.IncomingSessionNegotiation;
+import de.fu_berlin.inf.dpp.invitation.InvitationProcess;
 import de.fu_berlin.inf.dpp.invitation.ProcessTools.CancelLocation;
 import de.fu_berlin.inf.dpp.invitation.ProcessTools.CancelOption;
 import de.fu_berlin.inf.dpp.net.JID;
@@ -77,6 +75,8 @@ public class JoinSessionWizard extends Wizard {
     protected PreferenceUtils preferenceUtils;
     protected VersionManager manager;
 
+    private InvitationProcess.Status invitationStatus;
+
     public JoinSessionWizard(IncomingSessionNegotiation process,
         DataTransferManager dataTransferManager,
         PreferenceUtils preferenceUtils, VersionManager manager) {
@@ -92,7 +92,7 @@ public class JoinSessionWizard extends Wizard {
         setHelpAvailable(false);
         setNeedsProgressMonitor(true);
 
-        descriptionPage = new ShowDescriptionPage(this, manager, process);
+        descriptionPage = new ShowDescriptionPage(manager, process);
         addPage(descriptionPage);
     }
 
@@ -109,14 +109,14 @@ public class JoinSessionWizard extends Wizard {
 
     @Override
     public boolean performFinish() {
+
         try {
             getContainer().run(true, true, new IRunnableWithProgress() {
                 @Override
                 public void run(IProgressMonitor monitor)
                     throws InvocationTargetException, InterruptedException {
                     try {
-                        JoinSessionWizard.this.process.accept(SubMonitor
-                            .convert(monitor));
+                        invitationStatus = process.accept(monitor);
                     } catch (Exception e) {
                         throw new InvocationTargetException(e);
                     }
@@ -131,7 +131,21 @@ public class JoinSessionWizard extends Wizard {
             return false;
         }
 
-        getShell().forceActive();
+        switch (invitationStatus) {
+        case OK:
+            break;
+        case CANCEL:
+        case ERROR:
+            showCancelMessage(process.getPeer(), process.getErrorMessage(),
+                CancelLocation.LOCAL);
+            break;
+        case REMOTE_CANCEL:
+        case REMOTE_ERROR:
+            showCancelMessage(process.getPeer(), process.getErrorMessage(),
+                CancelLocation.REMOTE);
+            break;
+
+        }
         return true;
     }
 
@@ -305,16 +319,8 @@ public class JoinSessionWizard extends Wizard {
     }
 
     protected void processException(Throwable t) {
-        if (t instanceof LocalCancellationException) {
-            cancelWizard(process.getPeer(), t.getMessage(),
-                CancelLocation.LOCAL);
-        } else if (t instanceof RemoteCancellationException) {
-            cancelWizard(process.getPeer(), t.getMessage(),
-                CancelLocation.REMOTE);
-        } else {
-            log.error("This type of exception is not expected here: ", t); //$NON-NLS-1$
-            cancelWizard(process.getPeer(), "Unkown error: " + t.getMessage(), //$NON-NLS-1$
-                CancelLocation.REMOTE);
-        }
+        log.error("This type of exception is not expected here: ", t); //$NON-NLS-1$
+        cancelWizard(process.getPeer(), "Unkown error: " + t.getMessage(), //$NON-NLS-1$
+            CancelLocation.REMOTE);
     }
 }

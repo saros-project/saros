@@ -11,7 +11,6 @@ import org.eclipse.swt.widgets.Label;
 import de.fu_berlin.inf.dpp.invitation.IncomingSessionNegotiation;
 import de.fu_berlin.inf.dpp.ui.ImageManager;
 import de.fu_berlin.inf.dpp.ui.Messages;
-import de.fu_berlin.inf.dpp.ui.wizards.JoinSessionWizard;
 import de.fu_berlin.inf.dpp.util.VersionManager;
 
 /**
@@ -22,10 +21,10 @@ public class ShowDescriptionPage extends WizardPage {
 
     private String description;
 
-    public ShowDescriptionPage(JoinSessionWizard joinSessionWizard,
-        VersionManager manager, IncomingSessionNegotiation invProcess) {
+    public ShowDescriptionPage(VersionManager manager,
+        IncomingSessionNegotiation invProcess) {
         super(Messages.ShowDescriptionPage_title);
-        this.description = joinSessionWizard.process.getDescription();
+        this.description = invProcess.getDescription();
 
         setTitle(Messages.ShowDescriptionPage_title2);
         setDescription(Messages.ShowDescriptionPage_description);
@@ -36,7 +35,7 @@ public class ShowDescriptionPage extends WizardPage {
          * Show compatibility issues and inform the user what to do (but the
          * user can always proceed).
          */
-        VersionManager.VersionInfo vInfo = invProcess.versionInfo;
+        VersionManager.VersionInfo vInfo = invProcess.getVersionInfo();
 
         String remoteSarosVersion = vInfo.version.toString();
         switch (vInfo.compatibility) {
