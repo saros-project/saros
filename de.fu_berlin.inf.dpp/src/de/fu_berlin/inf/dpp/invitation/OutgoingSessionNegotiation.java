@@ -393,7 +393,7 @@ public final class OutgoingSessionNegotiation extends InvitationProcess {
         if (sarosSession.getRemoteUsers().isEmpty())
             sarosSessionManager.stopSarosSession();
 
-        if (invitationProcesses.getProcesses().containsValue(this))
+        if (invitationProcesses.getProcesses().contains(this))
             invitationProcesses.removeInvitationProcess(this);
     }
 

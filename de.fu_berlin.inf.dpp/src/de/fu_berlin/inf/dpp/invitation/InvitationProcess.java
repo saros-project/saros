@@ -78,6 +78,15 @@ public abstract class InvitationProcess extends CancelableProcess {
         return this.description;
     }
 
+    /**
+     * Returns the ID of this invitation process.
+     * 
+     * @return the ID
+     */
+    public final String getID() {
+        return invitationID;
+    }
+
     @Override
     protected void notifyCancellation(SarosCancellationException exception) {
 
