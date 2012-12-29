@@ -31,6 +31,11 @@ import de.fu_berlin.inf.dpp.util.VersionManager.VersionInfo;
  */
 @Component(module = "net")
 public class InvitationParametersExtension extends InvitationExtension {
+
+    public static final Provider PROVIDER = new Provider();
+
+    private String sessionID;
+
     public int colorID;
     public VersionInfo versionInfo;
     public DateTime sessionStart;
@@ -43,7 +48,7 @@ public class InvitationParametersExtension extends InvitationExtension {
         int colorID, String description, VersionInfo versionInfo,
         DateTime sessionStart, MUCSessionPreferences comPrefs, JID host,
         int inviterColorID) {
-        super(sessionID, invitationID);
+        super(invitationID);
         this.colorID = colorID;
         this.versionInfo = versionInfo;
         this.sessionStart = sessionStart;
@@ -51,12 +56,17 @@ public class InvitationParametersExtension extends InvitationExtension {
         this.description = description;
         this.host = host;
         this.inviterColorID = inviterColorID;
+        this.sessionID = sessionID;
+    }
+
+    public String getSessionID() {
+        return sessionID;
     }
 
     public static class Provider extends
-        XStreamExtensionProvider<InvitationParametersExtension> {
+        InvitationExtension.Provider<InvitationParametersExtension> {
 
-        public Provider() {
+        private Provider() {
             super("invitationParameters", InvitationParametersExtension.class);
         }
     }

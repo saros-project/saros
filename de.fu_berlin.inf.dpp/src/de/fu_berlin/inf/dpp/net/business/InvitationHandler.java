@@ -3,14 +3,15 @@ package de.fu_berlin.inf.dpp.net.business;
 import org.apache.log4j.Logger;
 import org.jivesoftware.smack.PacketListener;
 import org.jivesoftware.smack.packet.Packet;
+import org.jivesoftware.smack.packet.PacketExtension;
 import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.net.IReceiver;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.net.internal.extensions.CancelInviteExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.InvitationParametersExtension;
-import de.fu_berlin.inf.dpp.net.internal.extensions.InvitationParametersExtension.Provider;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
@@ -26,26 +27,26 @@ public class InvitationHandler {
         .getName());
 
     @Inject
-    protected ITransmitter transmitter;
+    private ITransmitter transmitter;
 
     @Inject
-    protected ISarosSessionManager sessionManager;
+    private ISarosSessionManager sessionManager;
 
     @Inject
-    protected SarosUI sarosUI;
+    private SarosUI sarosUI;
 
-    protected final SessionIDObservable sessionIDObservable;
+    private final SessionIDObservable sessionIDObservable;
 
     public InvitationHandler(IReceiver receiver,
-        SessionIDObservable sessionIDObservablePar,
-        final Provider invExtProv) {
+        SessionIDObservable sessionIDObservablePar) {
         this.sessionIDObservable = sessionIDObservablePar;
         receiver.addPacketListener(new PacketListener() {
 
             @Override
             public void processPacket(Packet packet) {
                 JID fromJID = new JID(packet.getFrom());
-                InvitationParametersExtension invInfo = invExtProv.getPayload(packet);
+                InvitationParametersExtension invInfo = InvitationParametersExtension.PROVIDER
+                    .getPayload(packet);
 
                 if (invInfo == null) {
                     log.warn("Inv" + Utils.prefix(fromJID)
@@ -72,12 +73,13 @@ public class InvitationHandler {
                         invitationID, invInfo.comPrefs, invInfo.description,
                         invInfo.host, invInfo.inviterColorID);
                 } else {
-                    transmitter.sendCancelInvitationMessage(
-                        new JID(packet.getFrom()), sessionID,
-                        "I am already in a Saros session "
-                            + "and so cannot accept your invitation.");
+                    PacketExtension response = CancelInviteExtension.PROVIDER
+                        .create(new CancelInviteExtension(invitationID,
+                            "I am already in a Saros session and so cannot accept your invitation."));
+                    transmitter.sendMessageToUser(new JID(packet.getFrom()),
+                        response);
                 }
             }
-        }, invExtProv.getPacketFilter());
+        }, InvitationParametersExtension.PROVIDER.getPacketFilter());
     }
 }

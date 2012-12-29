@@ -19,7 +19,6 @@
  */
 package de.fu_berlin.inf.dpp.net.internal.extensions;
 
-import org.apache.commons.lang.ObjectUtils;
 import org.apache.log4j.Logger;
 import org.jivesoftware.smack.filter.AndFilter;
 import org.jivesoftware.smack.filter.MessageTypeFilter;
@@ -89,25 +88,6 @@ public class PacketExtensionUtils {
             });
     }
 
-    /**
-     * @return {@link PacketFilter} that only accepts messages which belong to
-     *         the current invitation.
-     */
-    public static PacketFilter getInvitationIDFilter(
-        final XStreamExtensionProvider<? extends InvitationExtension> extProv,
-        final String invitationID) {
-
-        return new PacketFilter() {
-            @Override
-            public boolean accept(Packet arg0) {
-                InvitationExtension invInfo = extProv.getPayload(arg0);
-
-                return ObjectUtils.equals(invInfo.getInvitationID(),
-                    invitationID);
-            }
-        };
-    }
-
     public static PacketFilter getIncomingFileListFilter(
         final IncomingTransferObjectExtensionProvider extProv,
         final String sessionID, final String processID, final JID peer) {
@@ -136,18 +116,6 @@ public class PacketExtensionUtils {
                 return true;
             }
         });
-    }
-
-    /**
-     * @return {@link PacketFilter} that only accepts messages which belong to
-     *         the current session and invitation.
-     */
-    public static PacketFilter getInvitationFilter(
-        XStreamExtensionProvider<? extends InvitationExtension> extProv,
-        SessionIDObservable sessionID, final String invitationID) {
-
-        return new AndFilter(getSessionIDFilter(extProv, sessionID),
-            getInvitationIDFilter(extProv, invitationID));
     }
 
     /**

@@ -327,6 +327,11 @@ public class SarosSessionManager implements ISarosSessionManager {
         String invitationID, MUCSessionPreferences comPrefs,
         String description, JID host, int inviterColorID) {
 
+        /*
+         * Side effect ! Setting the sessionID will reject further invitation
+         * requests
+         */
+
         this.sessionID.setValue(sessionID);
 
         final IncomingSessionNegotiation process = new IncomingSessionNegotiation(
@@ -475,7 +480,7 @@ public class SarosSessionManager implements ISarosSessionManager {
                         Saros.SAROS,
                         MessageFormat
                             .format(
-                                Messages.SarosSessionManager_error_during_invitation_text2,
+                                Messages.SarosSessionManager_error_during_invitation_text,
                                 peer, process.getErrorMessage()));
                 }
             } catch (Exception e) {

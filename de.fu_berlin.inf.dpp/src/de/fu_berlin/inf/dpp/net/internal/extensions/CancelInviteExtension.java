@@ -8,6 +8,8 @@ import de.fu_berlin.inf.dpp.annotations.Component;
 @Component(module = "net")
 public class CancelInviteExtension extends SarosPacketExtension {
 
+    public static final Provider PROVIDER = new Provider();
+
     private String errorMessage;
     private String invitationID;
 
@@ -33,7 +35,7 @@ public class CancelInviteExtension extends SarosPacketExtension {
 
     public static class Provider extends
         XStreamExtensionProvider<CancelInviteExtension> {
-        public Provider() {
+        private Provider() {
             super("cancelInvitation", CancelInviteExtension.class);
         }
     }

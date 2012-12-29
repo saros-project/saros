@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.CancellationException;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IProject;
@@ -37,13 +36,12 @@ import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
 import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
 import de.fu_berlin.inf.dpp.invitation.ProcessTools.CancelOption;
+import de.fu_berlin.inf.dpp.net.IReceiver;
 import de.fu_berlin.inf.dpp.net.IncomingTransferObject;
 import de.fu_berlin.inf.dpp.net.IncomingTransferObject.IncomingTransferObjectExtensionProvider;
-import de.fu_berlin.inf.dpp.net.IReceiver;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.SarosPacketCollector;
 import de.fu_berlin.inf.dpp.net.internal.extensions.PacketExtensionUtils;
-import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 import de.fu_berlin.inf.dpp.project.IChecksumCache;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.synchronize.StartHandle;
@@ -61,37 +59,34 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
      * this maps the currently exchanging projects. projectID => project in
      * workspace
      */
-    protected List<IProject> projects;
+    private List<IProject> projects;
 
-    protected ISarosSession sarosSession;
+    private ISarosSession sarosSession;
 
-    protected AtomicBoolean cancelled = new AtomicBoolean(false);
-    protected SubMonitor monitor;
-    protected SarosCancellationException cancellationCause;
+    private SubMonitor monitor;
+
     /**
      * projectID => List of {@link IPath files} that will be send to peer
      */
-    protected MappedList<String, IPath> projectFilesToSend = new MappedList<String, IPath>();
+    private MappedList<String, IPath> projectFilesToSend = new MappedList<String, IPath>();
+
+    private final static Random INVITATION_RAND = new Random();
+
+    private boolean useVersionControl;
 
     @Inject
-    protected SessionIDObservable sessionID;
-    protected final static Random INVITATION_RAND = new Random();
-
-    protected boolean useVersionControl;
+    private EditorManager editorManager;
 
     @Inject
-    protected EditorManager editorManager;
+    private IReceiver xmppReceiver;
 
     @Inject
-    protected IReceiver xmppReceiver;
+    private IChecksumCache checksumCache;
 
-    @Inject
-    protected IChecksumCache checksumCache;
+    private Map<IProject, List<IResource>> partialSharedProjectResources;
+    private List<ProjectExchangeInfo> projectExchangeInfos;
 
-    protected Map<IProject, List<IResource>> partialSharedProjectResources;
-    protected List<ProjectExchangeInfo> projectExchangeInfos;
-
-    protected SarosPacketCollector remoteFileListResponseCollector;
+    private SarosPacketCollector remoteFileListResponseCollector;
 
     public OutgoingProjectNegotiation(JID to, ISarosSession sarosSession,
         Map<IProject, List<IResource>> partialResources,

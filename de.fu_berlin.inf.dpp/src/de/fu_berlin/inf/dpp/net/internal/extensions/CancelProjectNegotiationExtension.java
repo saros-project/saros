@@ -1,10 +1,15 @@
 package de.fu_berlin.inf.dpp.net.internal.extensions;
 
-public class CancelProjectNegotiationExtension extends SarosSessionPacketExtension {
+
+public class CancelProjectNegotiationExtension extends
+    SarosSessionPacketExtension {
+
+    public static final Provider PROVIDER = new Provider();
 
     private String errorMessage;
 
-    public CancelProjectNegotiationExtension(String sessionID, String errorMessage) {
+    public CancelProjectNegotiationExtension(String sessionID,
+        String errorMessage) {
         super(sessionID);
         if ((errorMessage != null) && (errorMessage.length() > 0))
             this.errorMessage = errorMessage;
@@ -22,8 +27,9 @@ public class CancelProjectNegotiationExtension extends SarosSessionPacketExtensi
 
     public static class Provider extends
         SarosSessionPacketExtension.Provider<CancelProjectNegotiationExtension> {
-        public Provider() {
-            super("cancelProjectSharing", CancelProjectNegotiationExtension.class);
+        private Provider() {
+            super("cancelProjectSharing",
+                CancelProjectNegotiationExtension.class);
         }
     }
 }

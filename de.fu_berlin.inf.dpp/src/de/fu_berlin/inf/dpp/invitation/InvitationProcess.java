@@ -20,6 +20,7 @@
 package de.fu_berlin.inf.dpp.invitation;
 
 import org.apache.log4j.Logger;
+import org.jivesoftware.smack.packet.PacketExtension;
 import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.SarosContext;
@@ -28,6 +29,7 @@ import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
 import de.fu_berlin.inf.dpp.invitation.ProcessTools.CancelOption;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.net.internal.extensions.CancelInviteExtension;
 import de.fu_berlin.inf.dpp.observables.InvitationProcessObservable;
 import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.util.Utils;
@@ -90,7 +92,9 @@ public abstract class InvitationProcess extends CancelableProcess {
         log.debug("notifying remote contact " + Utils.prefix(getPeer())
             + " of the local cancellation");
 
-        transmitter.sendCancelInvitationMessage(getPeer(), invitationID,
-            cause.getMessage());
+        PacketExtension notification = CancelInviteExtension.PROVIDER
+            .create(new CancelInviteExtension(invitationID, cause.getMessage()));
+
+        transmitter.sendMessageToUser(getPeer(), notification);
     }
 }

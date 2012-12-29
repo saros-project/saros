@@ -8,6 +8,7 @@ import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.jivesoftware.smack.Connection;
+import org.jivesoftware.smack.packet.PacketExtension;
 import org.jivesoftware.smackx.filetransfer.FileTransfer;
 import org.jivesoftware.smackx.filetransfer.FileTransferManager;
 import org.picocontainer.annotations.Inject;
@@ -20,7 +21,9 @@ import de.fu_berlin.inf.dpp.invitation.ProcessTools.CancelOption;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.SarosNet;
+import de.fu_berlin.inf.dpp.net.internal.extensions.CancelProjectNegotiationExtension;
 import de.fu_berlin.inf.dpp.observables.ProjectNegotiationObservable;
+import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.util.Utils;
 
@@ -35,12 +38,17 @@ public abstract class ProjectNegotiation extends CancelableProcess {
     private static final Logger log = Logger
         .getLogger(ProjectNegotiation.class);
 
+    protected String processID;
+    protected JID peer;
+
     @Inject
     protected ProjectNegotiationObservable projectExchangeProcesses;
-    protected JID peer;
+
     @Inject
     protected ITransmitter transmitter;
-    protected String processID;
+
+    @Inject
+    protected SessionIDObservable sessionID;
 
     @Inject
     protected SarosNet sarosNet;
@@ -107,8 +115,11 @@ public abstract class ProjectNegotiation extends CancelableProcess {
         log.debug("notifying remote contact " + Utils.prefix(getPeer())
             + " of the local project negotiation cancellation");
 
-        transmitter.sendCancelSharingProjectMessage(getPeer(),
-            cause.getMessage());
+        PacketExtension notification = CancelProjectNegotiationExtension.PROVIDER
+            .create(new CancelProjectNegotiationExtension(sessionID.getValue(),
+                cause.getMessage()));
+
+        transmitter.sendMessageToUser(getPeer(), notification);
     }
 
     /**

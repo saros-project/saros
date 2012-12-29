@@ -276,27 +276,17 @@ public class SarosContext implements ISarosContext {
         Component.create(LeaveHandler.class),
         Component.create(ActivitiesHandler.class),
 
-        /*
-         * The packet extensions must be inserted here so they are added to the
-         * Smack ExtensionProvider at context startup.
-         */
+        // FIXME: remove all extensions providers here !
 
         // Extension Providers
-        Component.create(ActivitiesExtension.class),
         Component
             .create(IncomingTransferObject.IncomingTransferObjectExtensionProvider.class),
-
-        Component.create(InvitationAcknowledgedExtension.Provider.class),
-        Component.create(InvitationParametersExtension.Provider.class),
-        Component.create(InvitationAcceptedExtension.Provider.class),
 
         Component.create(UserListExtension.Provider.class),
         Component.create(UserListRequestExtension.Provider.class),
         Component.create(UserListReceivedExtension.Provider.class),
 
         Component.create(SarosLeaveExtension.Provider.class),
-        Component.create(CancelInviteExtension.Provider.class),
-        Component.create(CancelProjectNegotiationExtension.Provider.class),
 
         // UI handlers
         Component.create(HostLeftAloneInSessionHandler.class),
@@ -324,6 +314,24 @@ public class SarosContext implements ISarosContext {
     }
 
     private void init() {
+
+        /*
+         * The packet extensions must be loaded here so they are added to the
+         * Smack ExtensionProvider at context startup.
+         */
+
+        try {
+            Class.forName(ActivitiesExtension.class.getName());
+            Class.forName(CancelInviteExtension.class.getName());
+            Class.forName(InvitationParametersExtension.class.getName());
+            Class.forName(InvitationAcknowledgedExtension.class.getName());
+            Class.forName(InvitationAcceptedExtension.class.getName());
+            Class.forName(CancelProjectNegotiationExtension.class.getName());
+
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+
         PicoBuilder picoBuilder = new PicoBuilder(new CompositeInjection(
             new ConstructorInjection(), new AnnotatedFieldInjection()))
             .withCaching().withLifecycle();

@@ -8,6 +8,8 @@ import de.fu_berlin.inf.dpp.SarosContext;
 import de.fu_berlin.inf.dpp.invitation.ProcessTools.CancelLocation;
 import de.fu_berlin.inf.dpp.invitation.ProcessTools.CancelOption;
 import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.net.internal.extensions.InvitationAcceptedExtension;
+import de.fu_berlin.inf.dpp.net.internal.extensions.InvitationAcknowledgedExtension;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.ui.wizards.JoinSessionWizard;
@@ -89,7 +91,9 @@ public class IncomingSessionNegotiation extends InvitationProcess {
     }
 
     public void acknowledgeInvitation() {
-        transmitter.sendInvitationAcknowledgement(peer, invitationID);
+        transmitter.sendMessageToUser(peer,
+            InvitationAcknowledgedExtension.PROVIDER
+                .create(new InvitationAcknowledgedExtension(invitationID)));
     }
 
     public Status accept(IProgressMonitor monitor) {
@@ -166,7 +170,9 @@ public class IncomingSessionNegotiation extends InvitationProcess {
         sarosSession.userInvitationCompleted(sarosSession.getLocalUser());
         log.debug(this + " : isInvitationComplete has been set to true");
 
-        transmitter.sendInvitationCompleteConfirmation(peer, invitationID);
+        transmitter.sendMessageToUser(peer,
+            InvitationAcceptedExtension.PROVIDER
+                .create(new InvitationAcceptedExtension(invitationID)));
         log.debug(this + " : Invitation complete confirmation sent");
         log.debug(this + " : Invitation has completed successfully");
     }

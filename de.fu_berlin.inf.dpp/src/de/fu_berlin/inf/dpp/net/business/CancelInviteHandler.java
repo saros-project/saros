@@ -26,30 +26,27 @@ public class CancelInviteHandler {
     private ProjectNegotiationObservable projectExchangeProcesses;
     private InvitationProcessObservable invitationProcesses;
 
-    private CancelInviteExtension.Provider provider;
-
     private PacketListener cancelInvitationExtensionListener = new PacketListener() {
 
         @Override
         public void processPacket(Packet packet) {
-            CancelInviteExtension extension = provider.getPayload(packet);
+            CancelInviteExtension extension = CancelInviteExtension.PROVIDER
+                .getPayload(packet);
+
             invitationCanceled(new JID(packet.getFrom()),
                 extension.getInvitationID(), extension.getErrorMessage());
         }
     };
 
     public CancelInviteHandler(IReceiver receiver,
-        CancelInviteExtension.Provider provider,
         ProjectNegotiationObservable projectNegotiationObservable,
         InvitationProcessObservable invitationProcessObservable) {
-
-        this.provider = provider;
 
         this.projectExchangeProcesses = projectNegotiationObservable;
         this.invitationProcesses = invitationProcessObservable;
 
         receiver.addPacketListener(cancelInvitationExtensionListener,
-            provider.getPacketFilter());
+            CancelInviteExtension.PROVIDER.getPacketFilter());
     }
 
     public void invitationCanceled(JID sender, String invitationID,

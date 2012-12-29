@@ -27,14 +27,14 @@ public class CancelProjectSharingHandler {
     private ProjectNegotiationObservable projectExchangeProcesses;
 
     private IReceiver receiver;
-    private CancelProjectNegotiationExtension.Provider provider;
 
     private ISarosSessionListener sessionListener = new AbstractSarosSessionListener() {
 
         @Override
         public void sessionStarted(ISarosSession session) {
             receiver.addPacketListener(cancelProjectNegotiationListener,
-                provider.getPacketFilter(sessionIDObservable.getValue()));
+                CancelProjectNegotiationExtension.PROVIDER
+                    .getPacketFilter(sessionIDObservable.getValue()));
         }
 
         @Override
@@ -47,7 +47,7 @@ public class CancelProjectSharingHandler {
 
         @Override
         public void processPacket(Packet packet) {
-            CancelProjectNegotiationExtension extension = provider
+            CancelProjectNegotiationExtension extension = CancelProjectNegotiationExtension.PROVIDER
                 .getPayload(packet);
             projectSharingCanceled(new JID(packet.getFrom()),
                 extension.getErrorMessage());
@@ -55,12 +55,10 @@ public class CancelProjectSharingHandler {
     };
 
     public CancelProjectSharingHandler(IReceiver receiver,
-        CancelProjectNegotiationExtension.Provider provider,
         ISarosSessionManager sessionManager,
         SessionIDObservable sessionIDObservable,
         ProjectNegotiationObservable projectNegotiationObservable) {
 
-        this.provider = provider;
         this.receiver = receiver;
 
         this.sessionManager = sessionManager;
@@ -71,6 +69,7 @@ public class CancelProjectSharingHandler {
     }
 
     public void projectSharingCanceled(JID sender, String errorMsg) {
+
         ProjectNegotiation process = projectExchangeProcesses
             .getProjectExchangeProcess(sender);
         if (process != null) {

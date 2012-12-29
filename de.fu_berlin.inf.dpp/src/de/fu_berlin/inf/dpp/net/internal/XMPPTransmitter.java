@@ -55,16 +55,9 @@ import de.fu_berlin.inf.dpp.net.ConnectionState;
 import de.fu_berlin.inf.dpp.net.IConnectionListener;
 import de.fu_berlin.inf.dpp.net.IReceiver;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
-import de.fu_berlin.inf.dpp.net.IncomingTransferObject.IncomingTransferObjectExtensionProvider;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.SarosNet;
 import de.fu_berlin.inf.dpp.net.SarosPacketCollector;
-import de.fu_berlin.inf.dpp.net.business.DispatchThreadContext;
-import de.fu_berlin.inf.dpp.net.internal.extensions.CancelInviteExtension;
-import de.fu_berlin.inf.dpp.net.internal.extensions.CancelProjectNegotiationExtension;
-import de.fu_berlin.inf.dpp.net.internal.extensions.InvitationAcceptedExtension;
-import de.fu_berlin.inf.dpp.net.internal.extensions.InvitationAcknowledgedExtension;
-import de.fu_berlin.inf.dpp.net.internal.extensions.InvitationParametersExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.PacketExtensionUtils;
 import de.fu_berlin.inf.dpp.net.internal.extensions.SarosLeaveExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.UserListExtension;
@@ -96,80 +89,46 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
 
     public static final int FORCEDPART_OFFLINEUSER_AFTERSECS = 60;
 
-    protected Connection connection;
+    private Connection connection;
 
-    protected ChatManager chatmanager;
+    private ChatManager chatmanager;
 
-    protected Map<JID, Chat> chats;
+    private Map<JID, Chat> chats;
 
-    protected Map<JID, InvitationProcess> processes;
+    private Map<JID, InvitationProcess> processes;
 
-    protected IReceiver receiver;
+    private IReceiver receiver;
 
-    protected SarosNet sarosNet;
-
-    protected SessionIDObservable sessionID;
+    private SessionIDObservable sessionID;
 
     @Inject
-    protected SarosSessionObservable sarosSessionObservable;
+    private SarosSessionObservable sarosSessionObservable;
 
     @Inject
-    protected SarosLeaveExtension.Provider leaveExtensionProvider;
+    private SarosLeaveExtension.Provider leaveExtensionProvider;
 
     @Inject
-    protected CancelInviteExtension.Provider cancelInviteExtensionProvider;
+    private UserListExtension.Provider userListExtensionProvider;
 
     @Inject
-    protected CancelProjectNegotiationExtension.Provider cancelProjectSharingExtensionProvider;
+    private UserListReceivedExtension.Provider userListReceivedExtensionProvider;
 
     @Inject
-    protected InvitationAcknowledgedExtension.Provider invAcknowledgementExtProv;
+    private UserListRequestExtension.Provider userListRequestExtProv;
 
-    @Inject
-    protected UserListExtension.Provider userListExtensionProvider;
-
-    @Inject
-    protected UserListReceivedExtension.Provider userListReceivedExtensionProvider;
-
-    @Inject
-    protected UserListRequestExtension.Provider userListRequestExtProv;
-
-    @Inject
-    protected InvitationParametersExtension.Provider inviteExtProv;
-
-    @Inject
-    protected IncomingTransferObjectExtensionProvider incomingExtProv;
-
-    @Inject
-    protected InvitationAcceptedExtension.Provider invCompleteExtProv;
-
-    @Inject
-    protected DispatchThreadContext dispatchThread;
-
-    protected DataTransferManager dataManager;
+    private DataTransferManager dataManager;
 
     public XMPPTransmitter(SessionIDObservable sessionID,
-        DataTransferManager dataManager, SarosNet sarosNet,
-        IReceiver receiver) {
+        DataTransferManager dataManager, SarosNet sarosNet, IReceiver receiver) {
         sarosNet.addListener(this);
         this.dataManager = dataManager;
         this.sessionID = sessionID;
-        this.sarosNet = sarosNet;
         this.receiver = receiver;
     }
 
     /********************************************************************************
      * Invitation process' help functions --- START
      ********************************************************************************/
-    @Override
-    public void sendInvitationAcknowledgement(JID to, String invitationID) {
-        log.trace("Sending invitation acknowledgment to " + Utils.prefix(to));
-        sendMessageToUser(to,
-            invAcknowledgementExtProv
-                .create(new InvitationAcknowledgedExtension(sessionID
-                    .getValue(), invitationID)));
-    }
-
     @Override
     public void sendUserList(JID to, Collection<User> users) {
         log.trace("Sending buddy list to " + Utils.prefix(to));
@@ -245,28 +204,9 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
         }
     }
 
-    @Override
-    public void sendInvitationCompleteConfirmation(JID to, String invitationID) {
-        sendMessageToUser(to,
-            invCompleteExtProv.create(new InvitationAcceptedExtension(sessionID
-                .getValue(), invitationID)), true);
-    }
-
     /********************************************************************************
      * Invitation process' help functions --- END
      ********************************************************************************/
-
-    @Override
-    public void sendCancelSharingProjectMessage(JID user, String errorMsg) {
-        log.debug("Send request to cancel project sharing to "
-            + Utils.prefix(user)
-            + (errorMsg == null ? "on user request" : "with message: "
-                + errorMsg));
-        sendMessageToUser(user,
-            cancelProjectSharingExtensionProvider
-                .create(new CancelProjectNegotiationExtension(sessionID
-                    .getValue(), errorMsg)));
-    }
 
     @Override
     public void sendLeaveMessage(ISarosSession sarosSession) {
@@ -456,9 +396,7 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
         sendMessageToUser(jid, message, sessionMembersOnly);
     }
 
-    /**
-     * Sends a message to a user who is not necessarily in the session.
-     */
+    @Override
     public void sendMessageToUser(JID jid, PacketExtension extension) {
         sendMessageToUser(jid, extension, false);
     }
@@ -675,25 +613,9 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
     }
 
     @Override
-    public void sendCancelInvitationMessage(JID user, String invitationID,
-        String message) {
-        log.debug("Send request to cancel Invitation to "
-            + Utils.prefix(user)
-            + (message == null ? "on user request" : "with message: " + message));
-        sendMessageToUser(user,
-            cancelInviteExtensionProvider.create(new CancelInviteExtension(
-                invitationID, message)));
-    }
-
-    @Override
     public void sendUserListRequest(JID user) {
         sendMessageToUser(user,
             userListRequestExtProv.create(new UserListRequestExtension(
                 sessionID.getValue())));
-    }
-
-    @Override
-    public void sendInvitation(JID peer, InvitationParametersExtension invInfo) {
-        sendMessageToUser(peer, inviteExtProv.create(invInfo));
     }
 }

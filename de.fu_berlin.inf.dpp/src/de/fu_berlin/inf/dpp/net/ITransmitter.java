@@ -31,7 +31,6 @@ import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
 import de.fu_berlin.inf.dpp.invitation.InvitationProcess;
-import de.fu_berlin.inf.dpp.net.internal.extensions.InvitationParametersExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.XStreamExtensionProvider;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 
@@ -74,6 +73,19 @@ public interface ITransmitter {
      */
     public void sendToSessionUser(JID recipient, PacketExtension extension)
         throws IOException;
+
+    /**
+     * Sends the given {@link PacketExtension} to the given {@link JID} over the
+     * currently established XMPP connection. There is <b>no</b> guarantee that
+     * this message (extension) will arrive at the recipients side !
+     * 
+     * 
+     * @param jid
+     *            the recipient of the extension
+     * @param extension
+     *            the to send
+     */
+    public void sendMessageToUser(JID jid, PacketExtension extension);
 
     /* ---------- files --------- */
 
@@ -130,38 +142,7 @@ public interface ITransmitter {
     public <T> T sendQuery(JID jid, XStreamExtensionProvider<T> provider,
         T payload, long timeout);
 
-    /**
-     * @param to
-     *            peer that invited this user and where to send the
-     *            acknowledgment to
-     * @param invitationID
-     *            the ID of the invitation
-     */
-    public void sendInvitationAcknowledgement(JID to, String invitationID);
-
     public SarosPacketCollector getUserListConfirmationCollector();
 
-    public void sendInvitationCompleteConfirmation(JID to, String invitationID);
-
-    public void sendCancelSharingProjectMessage(JID peer, String errorMsg);
-
-    /**
-     * Sends a cancellation message that tells the receiver that the invitation
-     * is canceled.
-     * 
-     * @param to
-     *            the JID of the recipient.
-     * @param invitationID
-     *            the ID of the invitation
-     * @param message
-     *            the reason why the invitation was canceled or
-     *            <code>null</code>.
-     */
-
-    public void sendCancelInvitationMessage(JID to, String invitationID,
-        String message);
-
     public void sendUserListRequest(JID peer);
-
-    public void sendInvitation(JID peer, InvitationParametersExtension invInfo);
 }
