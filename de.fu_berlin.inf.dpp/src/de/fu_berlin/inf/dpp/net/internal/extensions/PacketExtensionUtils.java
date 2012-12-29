@@ -28,10 +28,6 @@ import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.Packet;
 import org.jivesoftware.smack.packet.PacketExtension;
 
-import de.fu_berlin.inf.dpp.net.IncomingTransferObject;
-import de.fu_berlin.inf.dpp.net.IncomingTransferObject.IncomingTransferObjectExtensionProvider;
-import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.net.internal.TransferDescription;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 import de.fu_berlin.inf.dpp.util.Utils;
 
@@ -86,36 +82,6 @@ public class PacketExtensionUtils {
                         getSessionID(message));
                 }
             });
-    }
-
-    public static PacketFilter getIncomingFileListFilter(
-        final IncomingTransferObjectExtensionProvider extProv,
-        final String sessionID, final String processID, final JID peer) {
-        return new AndFilter(extProv.getPacketFilter(), new PacketFilter() {
-
-            @Override
-            public boolean accept(Packet packet) {
-                IncomingTransferObject payload = extProv.getPayload(packet);
-
-                if (payload == null) {
-                    log.error("Invalid payload in packet: " + packet);
-                    return false;
-                }
-                TransferDescription transferDescription = payload
-                    .getTransferDescription();
-                if (!Utils.equals(transferDescription.getSender(), peer)) {
-                    return false;
-                }
-                if (!Utils.equals(transferDescription.getSessionID(), sessionID)) {
-                    return false;
-                }
-                if (!Utils.equals(transferDescription.getProcessID(), processID)) {
-                    return false;
-                }
-
-                return true;
-            }
-        });
     }
 
     /**

@@ -10,7 +10,6 @@ import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.activities.serializable.IActivityDataObject;
 import de.fu_berlin.inf.dpp.annotations.Component;
-import de.fu_berlin.inf.dpp.net.IncomingTransferObject.IncomingTransferObjectExtensionProvider;
 import de.fu_berlin.inf.dpp.net.IReceiver;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.internal.TimedActivities;
@@ -37,7 +36,6 @@ public class ActivitiesHandler {
     protected SarosSessionObservable sarosSessionObservable;
 
     public ActivitiesHandler(IReceiver receiver,
-        final IncomingTransferObjectExtensionProvider incomingExtProv,
         final SessionIDObservable sessionID) {
 
         /**
