@@ -83,6 +83,7 @@ import de.fu_berlin.inf.dpp.ui.actions.LeaveSessionAction;
 import de.fu_berlin.inf.dpp.ui.actions.NewContactAction;
 import de.fu_berlin.inf.dpp.ui.actions.OpenChatAction;
 import de.fu_berlin.inf.dpp.ui.actions.OpenPreferencesAction;
+import de.fu_berlin.inf.dpp.ui.actions.RemoveUserAction;
 import de.fu_berlin.inf.dpp.ui.actions.RenameContactAction;
 import de.fu_berlin.inf.dpp.ui.actions.RestrictToReadOnlyAccessAction;
 import de.fu_berlin.inf.dpp.ui.actions.SendFileAction;
@@ -220,6 +221,8 @@ public class SarosView extends ViewPart {
     protected ChatRoomsComposite chatRooms;
 
     protected OpenChatAction openChatAction;
+
+    protected RemoveUserAction kickUserAction;
 
     @Inject
     protected Saros saros;
@@ -498,6 +501,8 @@ public class SarosView extends ViewPart {
 
         openChatAction = new OpenChatAction(chatRooms);
 
+        kickUserAction = new RemoveUserAction();
+
         menuManager.addMenuListener(new IMenuListener() {
             @Override
             public void menuAboutToShow(IMenuManager manager) {
@@ -523,10 +528,17 @@ public class SarosView extends ViewPart {
                     if (participants.get(0).isLocal()) {
                         manager.add(changedColorAction);
                     } else {
+                        boolean debugMode = false;
+
+                        assert (debugMode = true) == true;
                         if (sarosSessionManager.getSarosSession() != null
                             && sarosSessionManager.getSarosSession().isHost()) {
                             manager.add(giveWriteAccessAction);
                             manager.add(restrictToReadOnlyAccessAction);
+
+                            if (debugMode)
+                                manager.add(kickUserAction);
+
                             manager.add(new Separator());
                         }
                         manager.add(followModeAction);
@@ -576,6 +588,7 @@ public class SarosView extends ViewPart {
 
         rosterTracker.removeRosterListener(rosterListenerBuddys);
         openChatAction.dispose();
+        kickUserAction.dispose();
     }
 
     /**

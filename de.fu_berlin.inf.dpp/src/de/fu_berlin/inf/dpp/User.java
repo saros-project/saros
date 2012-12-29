@@ -274,12 +274,10 @@ public class User {
     }
 
     /**
-     * Gets the name for a {@link User} for displaying.
-     * 
-     * If this is the local user "You" is returned, otherwise the nickname, if
-     * available and distinct from the JID, and the JID. If no nickname is
-     * known, only the JID is returned.
+     * Returns the alias for the user (if any set) with JID in brackets,
+     * Example: "Alice (alice@saros-con.imp.fu-berlin.de)"
      */
+
     public String getHumanReadableName() {
         return User.getHumanReadableName(getSarosSession().getSaros()
             .getSarosNet(), getJID());

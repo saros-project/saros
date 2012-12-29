@@ -143,6 +143,19 @@ public interface ISarosSession {
     public void removeUser(User user);
 
     /**
+     * Kicks and removes the user out of the current session.
+     * 
+     * @param user
+     *            the user that should be kicked from the session
+     * 
+     * @throws IllegalStateException
+     *             if the local user is not the host of the current session
+     * @throws IllegalArgumentException
+     *             if the user to kick is the local user
+     */
+    public void kickUser(User user);
+
+    /**
      * Adds the given shared project listener. This call is ignored if the
      * listener is all a listener of this shared project.
      * 

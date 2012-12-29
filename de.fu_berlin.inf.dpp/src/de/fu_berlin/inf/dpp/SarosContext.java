@@ -52,7 +52,7 @@ import de.fu_berlin.inf.dpp.net.business.CancelInviteHandler;
 import de.fu_berlin.inf.dpp.net.business.CancelProjectSharingHandler;
 import de.fu_berlin.inf.dpp.net.business.DispatchThreadContext;
 import de.fu_berlin.inf.dpp.net.business.InvitationHandler;
-import de.fu_berlin.inf.dpp.net.business.LeaveHandler;
+import de.fu_berlin.inf.dpp.net.business.LeaveAndKickHandler;
 import de.fu_berlin.inf.dpp.net.business.UserListHandler;
 import de.fu_berlin.inf.dpp.net.discoverymanager.DiscoveryManager;
 import de.fu_berlin.inf.dpp.net.internal.ConnectionTestManager;
@@ -70,6 +70,7 @@ import de.fu_berlin.inf.dpp.net.internal.extensions.FileListExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.InvitationAcceptedExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.InvitationAcknowledgedExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.InvitationParametersExtension;
+import de.fu_berlin.inf.dpp.net.internal.extensions.KickUserExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.SarosLeaveExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.UserListExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.UserListReceivedExtension;
@@ -274,7 +275,7 @@ public class SarosContext implements ISarosContext {
         Component.create(CancelProjectSharingHandler.class),
         Component.create(UserListHandler.class),
         Component.create(InvitationHandler.class),
-        Component.create(LeaveHandler.class),
+        Component.create(LeaveAndKickHandler.class),
         Component.create(ActivitiesHandler.class),
 
         // FIXME: remove all extensions providers here !
@@ -329,6 +330,7 @@ public class SarosContext implements ISarosContext {
             Class.forName(InvitationAcceptedExtension.class.getName());
             Class.forName(CancelProjectNegotiationExtension.class.getName());
             Class.forName(FileListExtension.class.getName());
+            Class.forName(KickUserExtension.class.getName());
 
         } catch (ClassNotFoundException e) {
             throw new RuntimeException(e);

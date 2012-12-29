@@ -20,6 +20,7 @@
 package de.fu_berlin.inf.dpp.project.internal;
 
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -93,7 +94,9 @@ import de.fu_berlin.inf.dpp.net.SarosPacketCollector;
 import de.fu_berlin.inf.dpp.net.business.ConsistencyWatchdogHandler;
 import de.fu_berlin.inf.dpp.net.internal.ActivitySequencer;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
+import de.fu_berlin.inf.dpp.net.internal.extensions.KickUserExtension;
 import de.fu_berlin.inf.dpp.observables.ProjectNegotiationObservable;
+import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 import de.fu_berlin.inf.dpp.preferences.PreferenceManager;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
 import de.fu_berlin.inf.dpp.project.AbstractActivityProvider;
@@ -127,6 +130,16 @@ public class SarosSession implements ISarosSession, Disposable {
     /* Dependencies */
     @Inject
     protected Saros saros;
+
+    /*
+     * isn't it wonderful that the Saros session does not even know its own ID
+     * ?!
+     */
+    @Inject
+    protected SessionIDObservable sessionIDObservable;
+
+    @Inject
+    protected ITransmitter transmitter;
 
     @Inject
     protected SarosNet sarosNet;
@@ -570,6 +583,35 @@ public class SarosSession implements ISarosSession, Disposable {
         transferManager.closeConnection(jid);
 
         log.info("Buddy " + Utils.prefix(jid) + " left session"); //$NON-NLS-1$ //$NON-NLS-2$
+    }
+
+    @Override
+    public void kickUser(final User user) {
+
+        if (!isHost())
+            throw new IllegalStateException(
+                "only the host can kick users from the current session");
+
+        if (user.equals(getLocalUser()))
+            throw new IllegalArgumentException(
+                "the local user cannot kick itself out of the session");
+
+        try {
+            transmitter.sendToSessionUser(user.getJID(),
+                KickUserExtension.PROVIDER.create(new KickUserExtension(
+                    sessionIDObservable.getValue())));
+        } catch (IOException e) {
+            log.warn("could not kick user "
+                + user
+                + " from the session because the connection to the user is already lost");
+        }
+
+        SWTUtils.runSafeSWTAsync(log, new Runnable() {
+            @Override
+            public void run() {
+                removeUser(user);
+            }
+        });
     }
 
     /*

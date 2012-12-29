@@ -8,6 +8,7 @@ import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.net.IReceiver;
 import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.net.internal.extensions.KickUserExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.SarosLeaveExtension;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 import de.fu_berlin.inf.dpp.project.AbstractSarosSessionListener;
@@ -24,10 +25,10 @@ import de.fu_berlin.inf.dpp.ui.views.SarosView;
 
 // FIXME move this class into the session context
 @Component(module = "net")
-public class LeaveHandler {
+public class LeaveAndKickHandler {
 
-    private static final Logger log = Logger.getLogger(LeaveHandler.class
-        .getName());
+    private static final Logger log = Logger
+        .getLogger(LeaveAndKickHandler.class.getName());
 
     private ISarosSessionManager sessionManager;
 
@@ -42,11 +43,16 @@ public class LeaveHandler {
         public void sessionStarted(ISarosSession session) {
             receiver.addPacketListener(leaveExtensionListener,
                 provider.getPacketFilter(sessionIDObservable.getValue()));
+
+            receiver.addPacketListener(kickExtensionListener,
+                KickUserExtension.PROVIDER.getPacketFilter(sessionIDObservable
+                    .getValue()));
         }
 
         @Override
         public void sessionEnded(ISarosSession session) {
             receiver.removePacketListener(leaveExtensionListener);
+            receiver.removePacketListener(kickExtensionListener);
         }
     };
 
@@ -58,7 +64,15 @@ public class LeaveHandler {
         }
     };
 
-    public LeaveHandler(IReceiver receiver,
+    private PacketListener kickExtensionListener = new PacketListener() {
+
+        @Override
+        public void processPacket(Packet packet) {
+            kickReceived(new JID(packet.getFrom()));
+        }
+    };
+
+    public LeaveAndKickHandler(IReceiver receiver,
         SarosLeaveExtension.Provider provider,
         ISarosSessionManager sessionManager,
         SessionIDObservable sessionIDObservable) {
@@ -72,20 +86,41 @@ public class LeaveHandler {
         this.sessionManager.addSarosSessionListener(sessionListener);
     }
 
-    public void leaveReceived(JID fromJID) {
+    private void kickReceived(JID from) {
+        final ISarosSession sarosSession = sessionManager.getSarosSession();
+
+        if (sarosSession == null)
+            return;
+
+        final User user = sarosSession.getUser(from);
+
+        if (user.equals(sarosSession.getLocalUser())) {
+            log.warn("the local user cannot kick itself out of the session");
+            return;
+        }
+
+        sessionManager.stopSarosSession();
+
+        SarosView.showNotification("Removed from the session",
+            user.getHumanReadableName()
+                + " removed you from the current session.");
+
+    }
+
+    private void leaveReceived(JID from) {
 
         final ISarosSession sarosSession = sessionManager.getSarosSession();
 
         if (sarosSession == null) {
             log.warn("Received leave message but shared"
-                + " project has already ended: " + fromJID);
+                + " project has already ended: " + from);
             return;
         }
 
-        final User user = sarosSession.getUser(fromJID);
+        final User user = sarosSession.getUser(from);
         if (user == null) {
             log.warn("Received leave message from buddy who"
-                + " is not part of our shared project session: " + fromJID);
+                + " is not part of our shared project session: " + from);
             return;
         }
 
