@@ -37,11 +37,9 @@ import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
 import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
 import de.fu_berlin.inf.dpp.invitation.ProcessTools.CancelOption;
 import de.fu_berlin.inf.dpp.net.IReceiver;
-import de.fu_berlin.inf.dpp.net.IncomingTransferObject;
-import de.fu_berlin.inf.dpp.net.IncomingTransferObject.IncomingTransferObjectExtensionProvider;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.SarosPacketCollector;
-import de.fu_berlin.inf.dpp.net.internal.extensions.PacketExtensionUtils;
+import de.fu_berlin.inf.dpp.net.internal.extensions.FileListExtension;
 import de.fu_berlin.inf.dpp.project.IChecksumCache;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.synchronize.StartHandle;
@@ -283,7 +281,8 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
                         + " while waiting for the file list",
                     CancelOption.DO_NOT_NOTIFY_PEER);
 
-            List<FileList> remoteFileLists = deserializeRemoteFileList(packet);
+            List<FileList> remoteFileLists = FileListExtension.PROVIDER
+                .getPayload(packet).getFileLists();
 
             log.debug(this + " : Remote file list has been received");
 
@@ -464,37 +463,12 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
 
     private void createCollectors() {
         remoteFileListResponseCollector = xmppReceiver
-            .createCollector(PacketExtensionUtils.getIncomingFileListFilter(
-                new IncomingTransferObjectExtensionProvider(),
-                sessionID.getValue(), processID, peer));
+            .createCollector(FileListExtension.PROVIDER.getPacketFilter(
+                sessionID.getValue(), processID));
     }
 
     private void deleteCollectors() {
         remoteFileListResponseCollector.cancel();
-    }
-
-    private List<FileList> deserializeRemoteFileList(Packet packet)
-        throws IOException {
-        IncomingTransferObject result = new IncomingTransferObjectExtensionProvider()
-            .getPayload(packet);
-
-        String fileListAsString = new String(result.accept(), "UTF-8");
-
-        // We disassemble the complete fileListString to an array of
-        // fileListStrings...
-        String[] fileListStrings = fileListAsString.split("---next---");
-
-        List<FileList> fileLists = new ArrayList<FileList>();
-
-        // and make a new FileList out of each XML-String
-        for (int i = 0; i < fileListStrings.length; i++) {
-            FileList fileList = FileList.fromXML(fileListStrings[i]);
-            if (fileList != null) {
-                fileLists.add(fileList);
-            }
-        }
-
-        return fileLists;
     }
 
     private void sendArchive(File archive, JID remoteContact,

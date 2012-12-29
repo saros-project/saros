@@ -26,11 +26,6 @@ public class TransferDescription {
     }
 
     /**
-     * Transfer of a FileList
-     */
-    public static final String FILELIST_TRANSFER = "filelist-transfer";
-
-    /**
      * data in a stream
      */
     public static final String STREAM_DATA = "stream-data";
@@ -88,10 +83,7 @@ public class TransferDescription {
     @Override
     public String toString() {
 
-        if (FILELIST_TRANSFER.equals(type)) {
-            return "FileList from " + Utils.prefix(sender) + " [SID="
-                + sessionID + "]";
-        } else if (STREAM_DATA.equals(type)) {
+        if (STREAM_DATA.equals(type)) {
             return "Stream data from " + Utils.prefix(sender) + ": stream= "
                 + archivePath + " [SID=" + sessionID + "]";
         } else if (STREAM_META.equals(type)) {
@@ -112,18 +104,6 @@ public class TransferDescription {
 
     public static TransferDescription createCustomTransferDescription() {
         return new TransferDescription();
-    }
-
-    public static TransferDescription createFileListTransferDescription(
-        JID recipient, JID sender, String sessionID, String processID) {
-        TransferDescription result = new TransferDescription();
-        result.sender = sender;
-        result.recipient = recipient;
-        result.type = FILELIST_TRANSFER;
-        result.sessionID = sessionID;
-        result.processID = processID;
-        result.compress = true;
-        return result;
     }
 
     public static TransferDescription createTestTransferDescription(

@@ -45,7 +45,6 @@ import org.jivesoftware.smack.packet.Packet;
 import org.jivesoftware.smack.packet.PacketExtension;
 import org.picocontainer.annotations.Inject;
 
-import de.fu_berlin.inf.dpp.FileList;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.User.UserConnectionState;
 import de.fu_berlin.inf.dpp.annotations.Component;
@@ -326,44 +325,6 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
                 }
             }
         } while (++retry <= MAX_TRANSFER_RETRIES);
-    }
-
-    @Override
-    public void sendFileLists(JID recipient, String processID,
-        List<FileList> fileLists) throws IOException {
-
-        String currentSessionID = sessionID.getValue();
-        ISarosSession session = sarosSessionObservable.getValue();
-
-        if (session == null)
-            throw new IOException("no session running");
-
-        TransferDescription data = TransferDescription
-            .createFileListTransferDescription(recipient, session
-                .getLocalUser().getJID(), currentSessionID, processID);
-
-        log.debug("fileLists.size(): " + fileLists.size());
-
-        int length = fileLists.size();
-
-        List<String> xmlFileLists = new ArrayList<String>(length);
-
-        for (FileList fileList : fileLists)
-            xmlFileLists.add(fileList.toXML());
-
-        String xml = Utils.join("---next---", xmlFileLists);
-
-        byte[] content = xml.getBytes("UTF-8");
-
-        data.setSize(content.length);
-
-        /*
-         * As these lists are very small ( normally < 10 kBytes) it should be ok
-         * to block a short amount of time in which the user is not able to
-         * cancel the project negotiation
-         */
-
-        dataManager.sendData(data, content);
     }
 
     /**

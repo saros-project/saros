@@ -26,7 +26,6 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.jivesoftware.smack.packet.IQ.Type;
 import org.jivesoftware.smack.packet.PacketExtension;
 
-import de.fu_berlin.inf.dpp.FileList;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
@@ -86,26 +85,6 @@ public interface ITransmitter {
      *            the to send
      */
     public void sendMessageToUser(JID jid, PacketExtension extension);
-
-    /* ---------- files --------- */
-
-    /**
-     * Sends given file list to given XMPP user. This methods blocks until the
-     * file transfer is done or failed.
-     * 
-     * @param jid
-     *            the JID of the user to which the file list is to be sent.
-     * 
-     * @param fileLists
-     *            the file lists that are to be sent.
-     * 
-     * 
-     * @throws IOException
-     *             if the operation fails because of a problem with the XMPP
-     *             Connection.
-     */
-    public void sendFileLists(JID jid, String processID,
-        List<FileList> fileLists) throws IOException;
 
     public void sendUserList(JID to, Collection<User> user);
 

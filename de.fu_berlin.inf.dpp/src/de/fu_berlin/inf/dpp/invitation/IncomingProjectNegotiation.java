@@ -56,6 +56,7 @@ import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
 import de.fu_berlin.inf.dpp.invitation.ProcessTools.CancelLocation;
 import de.fu_berlin.inf.dpp.invitation.ProcessTools.CancelOption;
 import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.net.internal.extensions.FileListExtension;
 import de.fu_berlin.inf.dpp.observables.FileReplacementInProgressObservable;
 import de.fu_berlin.inf.dpp.observables.SarosSessionObservable;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
@@ -205,7 +206,10 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
                     entry.getValue(), jid);
             }
 
-            transmitter.sendFileLists(peer, processID, missingFiles);
+            transmitter.sendToSessionUser(peer, FileListExtension.PROVIDER
+                .create(new FileListExtension(sessionID.getValue(), processID,
+                    missingFiles.toArray(new FileList[0]))));
+
             checkCancellation(CancelOption.NOTIFY_PEER);
 
             boolean filesMissing = false;
