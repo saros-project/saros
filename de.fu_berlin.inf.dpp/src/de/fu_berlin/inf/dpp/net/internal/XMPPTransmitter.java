@@ -23,20 +23,13 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.jivesoftware.smack.Chat;
-import org.jivesoftware.smack.ChatManager;
 import org.jivesoftware.smack.Connection;
-import org.jivesoftware.smack.MessageListener;
 import org.jivesoftware.smack.PacketCollector;
 import org.jivesoftware.smack.PacketListener;
-import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.filter.PacketFilter;
 import org.jivesoftware.smack.filter.PacketIDFilter;
 import org.jivesoftware.smack.packet.IQ;
@@ -49,7 +42,6 @@ import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.User.UserConnectionState;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
-import de.fu_berlin.inf.dpp.invitation.InvitationProcess;
 import de.fu_berlin.inf.dpp.net.ConnectionState;
 import de.fu_berlin.inf.dpp.net.IConnectionListener;
 import de.fu_berlin.inf.dpp.net.IReceiver;
@@ -86,15 +78,7 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
      */
     public static final int MAX_TRANSFER_RETRIES = 4;
 
-    public static final int FORCEDPART_OFFLINEUSER_AFTERSECS = 60;
-
     private Connection connection;
-
-    private ChatManager chatmanager;
-
-    private Map<JID, Chat> chats;
-
-    private Map<JID, InvitationProcess> processes;
 
     private IReceiver receiver;
 
@@ -354,6 +338,7 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
         Message message = new Message();
         message.addExtension(extension);
         message.setTo(jid.toString());
+        message.setPacketID(ITransmitter.PROTOCOL_VERSION);
         sendMessageToUser(jid, message, sessionMembersOnly);
     }
 
@@ -364,11 +349,10 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
 
     /**
      * Sends the given {@link Message} to the given {@link JID}. The recipient
-     * has to be in the session or the message will not be sent. It queues the
-     * Message if the participant is OFFLINE.
+     * has to be in the session or the message will not be sent.
      * 
      * @param sessionMembersOnly
-     *            TODO
+     * 
      */
     private void sendMessageToUser(JID jid, Message message,
         boolean sessionMembersOnly) {
@@ -431,6 +415,7 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
 
         request.setType(IQ.Type.GET);
         request.setTo(rqJID.toString());
+        request.setPacketID(ITransmitter.PROTOCOL_VERSION);
 
         // Create a packet collector to listen for a response.
         PacketCollector collector = connection
@@ -438,8 +423,6 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
 
         try {
             connection.sendPacket(request);
-
-            // Wait up to 5 seconds for a result.
             return provider.getPayload(collector.nextResult(timeout));
 
         } finally {
@@ -453,18 +436,18 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
      * If no connection is set or sending fails, this method fails by throwing
      * an IOException
      */
-    protected void sendMessageOverXMPPChat(JID jid, Message message)
+    private synchronized void sendMessageOverXMPPChat(JID jid, Message message)
         throws IOException {
 
         if (isConnectionInvalid()) {
-            throw new IOException("Connection is not open");
+            throw new IOException("not connected");
         }
 
         try {
-            Chat chat = getChat(jid);
-            chat.sendMessage(message);
-        } catch (XMPPException e) {
-            throw new IOException("Failed to send message", e);
+            connection.sendPacket(message);
+        } catch (Exception e) {
+            throw new IOException("error while sending message: "
+                + e.getMessage(), e);
         }
     }
 
@@ -474,98 +457,40 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
      * 
      * @return false if the connection can be used, true otherwise.
      */
-    protected boolean isConnectionInvalid() {
+    private synchronized boolean isConnectionInvalid() {
         return connection == null || !connection.isConnected();
     }
 
-    private void putIncomingChat(JID jid, String thread) {
-
-        synchronized (this.chats) {
-            if (!this.chats.containsKey(jid)) {
-                Chat chat = this.chatmanager.getThreadChat(thread);
-                this.chats.put(jid, chat);
-            }
-        }
-    }
-
-    protected Chat getChat(JID jid) {
-
-        if (this.connection == null) {
-            throw new NullPointerException("Connection can't be null.");
-        }
-
-        synchronized (this.chats) {
-            Chat chat = this.chats.get(jid);
-
-            if (chat == null) {
-                chat = this.chatmanager.createChat(jid.toString(),
-                    new MessageListener() {
-                        @Override
-                        public void processMessage(Chat arg0, Message arg1) {
-                            /*
-                             * We don't care about the messages here, because we
-                             * are registered as a PacketListener
-                             */
-                        }
-                    });
-                this.chats.put(jid, chat);
-            }
-            return chat;
-        }
-    }
-
-    protected void prepareConnection(final Connection connection) {
-
-        // Create Containers
-        this.chats = new HashMap<JID, Chat>();
-        this.processes = Collections
-            .synchronizedMap(new HashMap<JID, InvitationProcess>());
+    private synchronized void prepareConnection(final Connection connection) {
 
         this.connection = connection;
 
-        this.chatmanager = connection.getChatManager();
-
         // Register a PacketListener which takes care of decoupling the
         // processing of Packets from the Smack thread
-        this.connection.addPacketListener(new PacketListener() {
 
-            protected PacketFilter sessionFilter = PacketExtensionUtils
-                .getSessionIDPacketFilter(sessionID);
+        // FIXME: move to XMMPReceiver
+        this.connection.addPacketListener(new PacketListener() {
 
             @Override
             public void processPacket(final Packet packet) {
-                if (sessionFilter.accept(packet)) {
-                    try {
-                        Message message = (Message) packet;
+                if (!packet.getPacketID().equals(ITransmitter.PROTOCOL_VERSION))
+                    return;
 
-                        JID fromJID = new JID(message.getFrom());
-
-                        // Change the input method to get the right
-                        // chats
-                        putIncomingChat(fromJID, message.getThread());
-                    } catch (Exception e) {
-                        log.error("An internal error occurred "
-                            + "while processing packets", e);
-                    }
-                }
                 receiver.processPacket(packet);
             }
         }, null);
     }
 
-    protected void disposeConnection() {
+    private synchronized void disposeConnection() {
         if (connection == null) {
             log.error("disposeConnection() called twice.");
             return;
         }
-        chats.clear();
-        processes.clear();
-        chatmanager = null;
         connection = null;
     }
 
     @Override
-    public void connectionStateChanged(Connection connection,
+    public synchronized void connectionStateChanged(Connection connection,
         ConnectionState newState) {
         if (newState == ConnectionState.CONNECTED)
             prepareConnection(connection);

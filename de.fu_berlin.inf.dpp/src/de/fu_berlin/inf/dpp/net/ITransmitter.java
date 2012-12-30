@@ -43,6 +43,14 @@ import de.fu_berlin.inf.dpp.project.ISarosSession;
 @Component(module = "net")
 public interface ITransmitter {
 
+    /**
+     * The current used protocol version that is used for sending packets over a
+     * XMPP connection. <b>MUST</b> be the same as
+     * {@link IReceiver#PROTOCOL_VERSION}
+     */
+
+    public static final String PROTOCOL_VERSION = "de.fu_berlin.inf.dpp/protocol/V1";
+
     public static final int MAX_XMPP_MESSAGE_SIZE = 16378;
 
     /**
