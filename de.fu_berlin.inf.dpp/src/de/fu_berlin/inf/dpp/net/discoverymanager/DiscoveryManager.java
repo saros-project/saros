@@ -300,24 +300,6 @@ public class DiscoveryManager implements Disposable {
     }
 
     /**
-     * Determines if user is online.
-     * 
-     * @param recipient
-     * @return
-     */
-    public boolean isOnline(JID recipient) {
-        if (recipient == null)
-            throw new IllegalArgumentException("JID cannot be null");
-
-        for (Presence presence : rosterTracker.getPresences(recipient
-            .getBareJID())) {
-            if (!presence.isAvailable())
-                return false;
-        }
-        return true;
-    }
-
-    /**
      * Begin a thread that populates Saros-support information for all people in
      * the given list.
      * 

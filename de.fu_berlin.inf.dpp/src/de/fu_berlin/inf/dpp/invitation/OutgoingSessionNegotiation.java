@@ -214,26 +214,14 @@ public final class OutgoingSessionNegotiation extends InvitationProcess {
         JID rqPeer = discoveryManager.getSupportingPresence(peer,
             Saros.NAMESPACE);
 
-        if (rqPeer == null) {
-            log.debug(this + " : Saros is not supported or User is offline");
+        if (rqPeer == null)
+            throw new LocalCancellationException(
+                peer
+                    + " does not support Saros or the request timed out. Please try again.",
+                CancelOption.DO_NOT_NOTIFY_PEER);
 
-            if (!discoveryManager.isOnline(peer)) {
-                DialogUtils.notifyUserOffline(peer);
-                localCancel(null, CancelOption.DO_NOT_NOTIFY_PEER);
-                throw new LocalCancellationException();
-            } else if (!DialogUtils.confirmUnsupportedSaros(peer)) {
-                localCancel(null, CancelOption.DO_NOT_NOTIFY_PEER);
-                throw new LocalCancellationException();
-            }
-            /**
-             * In order to avoid inviting other XMPP clients, we construct an
-             * RQ-JID.
-             */
-            rqPeer = new JID(peer.getBareJID() + "/" + Saros.RESOURCE);
-            peerAdvertisesSarosSupport = false;
-        } else {
-            log.debug(this + ":  Saros is supported.");
-        }
+        log.debug(this + " :  remote contact offers Saros support");
+
         peer = rqPeer;
     }
 
