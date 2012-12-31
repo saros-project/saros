@@ -72,17 +72,24 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
 
     private static final Logger log = Logger.getLogger(XMPPTransmitter.class);
 
+    /*
+     * Stefan Rossbach: remove this retry "myth". Only fallback once, and if the
+     * fallback to IBB fails just give up.
+     */
+
     /**
      * Maximum retry attempts to send an activity. Retry attempts will switch to
      * prefer IBB on MAX_TRANSFER_RETRIES/2.
      */
     public static final int MAX_TRANSFER_RETRIES = 4;
 
+    private final IReceiver receiver;
+
+    private final SessionIDObservable sessionID;
+
+    private final DataTransferManager dataManager;
+
     private Connection connection;
-
-    private IReceiver receiver;
-
-    private SessionIDObservable sessionID;
 
     @Inject
     private SarosSessionObservable sarosSessionObservable;
@@ -99,8 +106,6 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
     @Inject
     private UserListRequestExtension.Provider userListRequestExtProv;
 
-    private DataTransferManager dataManager;
-
     public XMPPTransmitter(SessionIDObservable sessionID,
         DataTransferManager dataManager, SarosNet sarosNet, IReceiver receiver) {
         sarosNet.addListener(this);
@@ -109,9 +114,8 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
         this.receiver = receiver;
     }
 
-    /********************************************************************************
-     * Invitation process' help functions --- START
-     ********************************************************************************/
+    /* Methods to remove from the IFACE START */
+
     @Override
     public void sendUserList(JID to, Collection<User> users) {
         log.trace("Sending buddy list to " + Utils.prefix(to));
@@ -187,16 +191,24 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
         }
     }
 
-    /********************************************************************************
-     * Invitation process' help functions --- END
-     ********************************************************************************/
-
     @Override
     public void sendLeaveMessage(ISarosSession sarosSession) {
-        sendMessageToAll(sarosSession,
-            leaveExtensionProvider.create(new SarosLeaveExtension(sessionID
-                .getValue())));
+
+        PacketExtension extension = leaveExtensionProvider
+            .create(new SarosLeaveExtension(sessionID.getValue()));
+
+        for (User participant : sarosSession.getRemoteUsers())
+            sendMessageToUser(participant.getJID(), extension, true);
     }
+
+    @Override
+    public void sendUserListRequest(JID user) {
+        sendMessageToUser(user,
+            userListRequestExtProv.create(new UserListRequestExtension(
+                sessionID.getValue())));
+    }
+
+    /* Methods to remove from the IFACE END */
 
     @Override
     public void sendToSessionUser(JID recipient, PacketExtension extension)
@@ -212,49 +224,12 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
          * and namespace of the packet extension and standard values and thus
          * transparent to users of this method.
          */
-        TransferDescription result = TransferDescription
+        TransferDescription transferDescription = TransferDescription
             .createCustomTransferDescription().setRecipient(recipient)
             .setSender(session.getLocalUser().getJID())
             .setType(extension.getElementName())
             .setNamespace(extension.getNamespace())
             .setSessionID(currentSessionID).setCompressContent(false);
-
-        sendToProjectUser(recipient, extension, result);
-    }
-
-    /**
-     * <p>
-     * Sends the given {@link PacketExtension} to the given {@link JID}. The
-     * recipient has to be in the session or the extension will not be sent.
-     * </p>
-     * 
-     * <p>
-     * Callers may provide a {@link TransferDescription}.</br>
-     * 
-     * Then, if the extension's raw data (bytes) is longer than
-     * {@value #MAX_XMPP_MESSAGE_SIZE} or if there is a peer-to-peer bytestream
-     * to the recipient the extension will be sent using this bytestream. Else
-     * it will be sent by chat.
-     * </p>
-     * 
-     * @param recipient
-     * @param extension
-     * @param transferDescription
-     *            if sent by bytestreams, this data is used to coordinate the
-     *            streaming. May be null.
-     * @throws IOException
-     *             if sending by bytestreams fails and the extension raw data is
-     *             longer than {@value #MAX_XMPP_MESSAGE_SIZE}
-     */
-
-    private void sendToProjectUser(JID recipient, PacketExtension extension,
-        TransferDescription transferDescription) throws IOException {
-        sendToProjectUser(recipient, extension, transferDescription, true);
-    }
-
-    private void sendToProjectUser(JID recipient, PacketExtension extension,
-        TransferDescription transferDescription, boolean onlyInSession)
-        throws IOException {
 
         byte[] data = null;
 
@@ -272,7 +247,7 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
                 || transferDescription == null
                 || (!dataManager.getTransferMode(recipient).isP2P() && data.length < MAX_XMPP_MESSAGE_SIZE)) {
 
-                sendMessageToUser(recipient, extension, onlyInSession);
+                sendMessageToUser(recipient, extension, true);
                 break;
 
             } else {
@@ -311,15 +286,9 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
         } while (++retry <= MAX_TRANSFER_RETRIES);
     }
 
-    /**
-     * Convenience method for sending the given {@link PacketExtension} to all
-     * remote participants of the given {@link ISarosSession}.
-     */
-    private void sendMessageToAll(ISarosSession sarosSession,
-        PacketExtension extension) {
-
-        for (User participant : sarosSession.getRemoteUsers())
-            sendMessageToUser(participant.getJID(), extension, true);
+    @Override
+    public void sendMessageToUser(JID jid, PacketExtension extension) {
+        sendMessageToUser(jid, extension, false);
     }
 
     /**
@@ -338,13 +307,7 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
         Message message = new Message();
         message.addExtension(extension);
         message.setTo(jid.toString());
-        message.setPacketID(ITransmitter.PROTOCOL_VERSION);
         sendMessageToUser(jid, message, sessionMembersOnly);
-    }
-
-    @Override
-    public void sendMessageToUser(JID jid, PacketExtension extension) {
-        sendMessageToUser(jid, extension, false);
     }
 
     /**
@@ -397,8 +360,10 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
             }
         }
 
+        assert jid.toString().equals(message.getTo());
+
         try {
-            sendMessageOverXMPPChat(jid, message);
+            sendPacket(message, true);
         } catch (IOException e) {
             log.error("could not send message to " + Utils.prefix(jid), e);
         }
@@ -407,8 +372,6 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
     @Override
     public <T> T sendQuery(JID rqJID, XStreamExtensionProvider<T> provider,
         T payload, long timeout) {
-        if (isConnectionInvalid())
-            return null;
 
         // Request the version from a buddy
         IQ request = provider.createIQ(payload);
@@ -422,29 +385,41 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
             .createPacketCollector(new PacketIDFilter(request.getPacketID()));
 
         try {
-            connection.sendPacket(request);
+            sendPacket(request, false);
             return provider.getPayload(collector.nextResult(timeout));
-
+        } catch (IOException e) {
+            return null;
         } finally {
             collector.cancel();
         }
     }
 
     /**
-     * Send the given packet to the given user.
+     * Sends the specified packet to the server.
      * 
-     * If no connection is set or sending fails, this method fails by throwing
-     * an IOException
+     * @param forceSarosCompatibility
+     *            if set to <code>true</code> the
+     *            {@linkplain Packet#setPacketID(String) packet ID} will be
+     *            overwritten with the current Saros Protocol version:
+     *            {@value ITransmitter#PROTOCOL_VERSION}
+     * 
+     * @param packet
+     *            the packet to send
+     * @throws IOException
+     *             if an I/O error occurs or no connection is established to a
+     *             XMPP server
      */
-    private synchronized void sendMessageOverXMPPChat(JID jid, Message message)
-        throws IOException {
+    private synchronized void sendPacket(Packet packet,
+        boolean forceSarosCompatibility) throws IOException {
 
-        if (isConnectionInvalid()) {
-            throw new IOException("not connected");
-        }
+        if (isConnectionInvalid())
+            throw new IOException("not connected to a XMPP server");
 
         try {
-            connection.sendPacket(message);
+            if (forceSarosCompatibility)
+                packet.setPacketID(ITransmitter.PROTOCOL_VERSION);
+
+            connection.sendPacket(packet);
         } catch (Exception e) {
             throw new IOException("error while sending message: "
                 + e.getMessage(), e);
@@ -464,9 +439,6 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
     private synchronized void prepareConnection(final Connection connection) {
 
         this.connection = connection;
-
-        // Register a PacketListener which takes care of decoupling the
-        // processing of Packets from the Smack thread
 
         // FIXME: move to XMMPReceiver
         this.connection.addPacketListener(new PacketListener() {
@@ -496,12 +468,5 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
             prepareConnection(connection);
         else if (this.connection != null)
             disposeConnection();
-    }
-
-    @Override
-    public void sendUserListRequest(JID user) {
-        sendMessageToUser(user,
-            userListRequestExtProv.create(new UserListRequestExtension(
-                sessionID.getValue())));
     }
 }
