@@ -134,6 +134,7 @@ public class XMPPReceiver implements IReceiver {
             @Override
             public void run() {
 
+                // StreamServiceManager forward
                 if (processIncomingTransferDescription(packet))
                     return;
 
@@ -256,6 +257,10 @@ public class XMPPReceiver implements IReceiver {
             return;
         }
 
+        /*
+         * TODO: check how expensive it is to create an new MXParser for every
+         * packet
+         */
         MXParser parser = new MXParser();
         PacketExtension extension = null;
 
@@ -279,7 +284,7 @@ public class XMPPReceiver implements IReceiver {
         }
 
         final Packet packet = new Message();
-        packet.setPacketID(Packet.ID_NOT_AVAILABLE);
+        packet.setPacketID(description.getExtensionVersion());
         packet.setFrom(description.getSender().toString());
         packet.setTo(description.getRecipient().toString());
         packet.addExtension(extension);

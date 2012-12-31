@@ -9,13 +9,6 @@ import de.fu_berlin.inf.dpp.net.internal.TransferDescription;
 public interface IReceiver {
 
     /**
-     * The current used protocol version that is used for sending packets over a
-     * XMPP connection. <b>MUST</b> be the same as
-     * {@link ITransmitter#PROTOCOL_VERSION}
-     */
-    public static final String PROTOCOL_VERSION = "de.fu_berlin.inf.dpp/protocol/V1";
-
-    /**
      * Adds the given listener to the list of listeners notified when a new
      * packet arrives.
      * 

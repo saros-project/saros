@@ -20,7 +20,7 @@ public abstract class InvitationExtension extends SarosPacketExtension {
     }
 
     public abstract static class Provider<T extends InvitationExtension>
-        extends XStreamExtensionProvider<T> {
+        extends SarosPacketExtension.Provider<T> {
 
         public Provider(String elementName, Class<?>... classes) {
             super(elementName, classes);

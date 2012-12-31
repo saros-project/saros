@@ -51,6 +51,7 @@ import de.fu_berlin.inf.dpp.net.SarosNet;
 import de.fu_berlin.inf.dpp.net.SarosPacketCollector;
 import de.fu_berlin.inf.dpp.net.internal.extensions.PacketExtensionUtils;
 import de.fu_berlin.inf.dpp.net.internal.extensions.SarosLeaveExtension;
+import de.fu_berlin.inf.dpp.net.internal.extensions.SarosPacketExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.UserListExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.UserListReceivedExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.UserListRequestExtension;
@@ -229,6 +230,7 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
             .setSender(session.getLocalUser().getJID())
             .setType(extension.getElementName())
             .setNamespace(extension.getNamespace())
+            .setExtensionVersion(SarosPacketExtension.VERSION)
             .setSessionID(currentSessionID).setCompressContent(false);
 
         byte[] data = null;
@@ -378,7 +380,7 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
 
         request.setType(IQ.Type.GET);
         request.setTo(rqJID.toString());
-        request.setPacketID(ITransmitter.PROTOCOL_VERSION);
+        request.setPacketID(SarosPacketExtension.VERSION);
 
         // Create a packet collector to listen for a response.
         PacketCollector collector = connection
@@ -400,8 +402,8 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
      * @param forceSarosCompatibility
      *            if set to <code>true</code> the
      *            {@linkplain Packet#setPacketID(String) packet ID} will be
-     *            overwritten with the current Saros Protocol version:
-     *            {@value ITransmitter#PROTOCOL_VERSION}
+     *            overwritten with the current Saros Extension version:
+     *            {@value SarosPacketExtension#VERSION}
      * 
      * @param packet
      *            the packet to send
@@ -417,7 +419,7 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
 
         try {
             if (forceSarosCompatibility)
-                packet.setPacketID(ITransmitter.PROTOCOL_VERSION);
+                packet.setPacketID(SarosPacketExtension.VERSION);
 
             connection.sendPacket(packet);
         } catch (Exception e) {
@@ -445,9 +447,6 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
 
             @Override
             public void processPacket(final Packet packet) {
-                if (!packet.getPacketID().equals(ITransmitter.PROTOCOL_VERSION))
-                    return;
-
                 receiver.processPacket(packet);
             }
         }, null);

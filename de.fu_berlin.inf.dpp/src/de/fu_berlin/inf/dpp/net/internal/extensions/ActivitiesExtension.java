@@ -49,6 +49,8 @@ import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.internal.TimedActivities;
 import de.fu_berlin.inf.dpp.net.internal.TimedActivityDataObject;
 
+/* TODO correct this class to use the correct provider */
+
 @Component(module = "net")
 public class ActivitiesExtension extends SarosPacketExtension {
 

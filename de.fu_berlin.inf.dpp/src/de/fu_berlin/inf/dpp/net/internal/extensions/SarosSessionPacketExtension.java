@@ -17,7 +17,7 @@ public abstract class SarosSessionPacketExtension extends SarosPacketExtension {
     }
 
     public abstract static class Provider<T extends SarosSessionPacketExtension>
-        extends XStreamExtensionProvider<T> {
+        extends SarosPacketExtension.Provider<T> {
 
         public Provider(String elementName, Class<?>... classes) {
             super(elementName, classes);

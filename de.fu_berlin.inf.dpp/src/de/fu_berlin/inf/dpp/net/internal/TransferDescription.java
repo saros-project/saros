@@ -42,6 +42,8 @@ public class TransferDescription {
 
     private String namespace;
 
+    private String extensionVersion;
+
     private String sessionID;
 
     private JID recipient;
@@ -149,6 +151,8 @@ public class TransferDescription {
 
         out.writeUTF(description.type != null ? description.type : "");
         out.writeUTF(description.namespace != null ? description.namespace : "");
+        out.writeUTF(description.extensionVersion != null ? description.extensionVersion
+            : "");
         out.writeUTF(description.sessionID != null ? description.sessionID : "");
         out.writeUTF(description.archivePath != null ? description.archivePath
             : "");
@@ -178,6 +182,7 @@ public class TransferDescription {
 
         description.type = in.readUTF();
         description.namespace = in.readUTF();
+        description.extensionVersion = in.readUTF();
         description.sessionID = in.readUTF();
         description.archivePath = in.readUTF();
         description.invitationID = in.readUTF();
@@ -201,6 +206,15 @@ public class TransferDescription {
 
     public String getNamespace() {
         return namespace;
+    }
+
+    public String getExtensionVersion() {
+        return extensionVersion;
+    }
+
+    TransferDescription setExtensionVersion(String extensionVersion) {
+        this.extensionVersion = extensionVersion;
+        return this;
     }
 
     TransferDescription setType(String type) {
