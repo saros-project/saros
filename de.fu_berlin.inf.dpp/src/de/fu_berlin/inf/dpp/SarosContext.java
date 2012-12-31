@@ -12,6 +12,7 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 import org.eclipse.equinox.security.storage.ISecurePreferences;
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.osgi.framework.Version;
 import org.osgi.service.prefs.Preferences;
 import org.picocontainer.BindKey;
 import org.picocontainer.Characteristics;
@@ -138,6 +139,14 @@ public class SarosContext implements ISarosContext {
         public @interface Socks5Transport {
             // marker interface
         }
+
+        @Retention(RetentionPolicy.RUNTIME)
+        @Target({ ElementType.FIELD, ElementType.PARAMETER })
+        @Bind
+        public @interface SarosVersion {
+            // marker interface
+        }
+
     }
 
     private static class Component {
@@ -229,7 +238,6 @@ public class SarosContext implements ISarosContext {
         Component.create(MixerManager.class),
         Component.create(UndoManager.class),
         Component.create(VideoSharing.class),
-        Component.create(VersionManager.class),
         Component.create(MUCSessionPreferencesNegotiatingManager.class),
         Component.create(RemoteProgressManager.class),
         Component.create(XMPPAccountStore.class),
@@ -298,10 +306,14 @@ public class SarosContext implements ISarosContext {
         Component.create(AudioService.class),
         Component.create(VideoSharingService.class),
 
-        // cache support
-
+        // Cache support
         Component.create(ChecksumCacheImpl.class, new ChecksumCacheImpl(
-            new FileContentNotifierBridge())), };
+            new FileContentNotifierBridge())),
+
+        // Version support
+        Component.create(VersionManager.class)
+
+    };
 
     /*
      * Use the SarosContextBuilder to build a SarosContext. {@link
@@ -315,8 +327,7 @@ public class SarosContext implements ISarosContext {
         init();
     }
 
-    private void init() {
-
+    private void installPacketExtensionProviders() {
         /*
          * The packet extensions must be loaded here so they are added to the
          * Smack ExtensionProvider at context startup.
@@ -335,6 +346,11 @@ public class SarosContext implements ISarosContext {
         } catch (ClassNotFoundException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private void init() {
+
+        installPacketExtensionProviders();
 
         PicoBuilder picoBuilder = new PicoBuilder(new CompositeInjection(
             new ConstructorInjection(), new AnnotatedFieldInjection()))
@@ -344,9 +360,8 @@ public class SarosContext implements ISarosContext {
          * If given, the dotMonitor is used to capture an architecture diagram
          * of the application
          */
-        if (dotMonitor != null) {
+        if (dotMonitor != null)
             picoBuilder = picoBuilder.withMonitor(dotMonitor);
-        }
 
         // Initialize our dependency injection container
         container = picoBuilder.build();
@@ -364,6 +379,9 @@ public class SarosContext implements ISarosContext {
          */
 
         container.addComponent(Saros.class, saros);
+
+        container.addComponent(BindKey.bindKey(Version.class,
+            Bindings.SarosVersion.class), saros.getBundle().getVersion());
 
         container.addComponent(IPreferenceStore.class,
             saros.getPreferenceStore());
@@ -392,7 +410,7 @@ public class SarosContext implements ISarosContext {
          * CAUTION: Classes from which duplicates can exists, should not be
          * managed by PicoContainer.
          */
-        reinjector = new Reinjector(this.container);
+        reinjector = new Reinjector(container);
     }
 
     /**

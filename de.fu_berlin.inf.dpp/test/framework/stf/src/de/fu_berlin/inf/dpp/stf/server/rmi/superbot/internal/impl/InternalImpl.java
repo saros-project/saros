@@ -28,7 +28,6 @@ import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.launching.IVMInstall;
 import org.eclipse.jdt.launching.JavaRuntime;
 import org.eclipse.jdt.launching.LibraryLocation;
-import org.osgi.framework.Bundle;
 import org.osgi.framework.Version;
 
 import de.fu_berlin.inf.dpp.stf.server.StfRemoteObject;
@@ -41,9 +40,9 @@ public final class InternalImpl extends StfRemoteObject implements IInternal {
 
     private static final InternalImpl INSTANCE = new InternalImpl();
 
-    private Field versionManagerBundleField;
+    private Field versionField;
 
-    private Bundle sarosBundle;
+    private Version originalVersion;
 
     private static class GeneratingInputStream extends InputStream {
 
@@ -76,33 +75,33 @@ public final class InternalImpl extends StfRemoteObject implements IInternal {
 
     private InternalImpl() {
         try {
-            versionManagerBundleField = VersionManager.class
-                .getDeclaredField("bundle");
-            versionManagerBundleField.setAccessible(true);
+            versionField = VersionManager.class
+                .getDeclaredField("version");
+            versionField.setAccessible(true);
         } catch (SecurityException e) {
             log.error("reflection failed", e);
-            versionManagerBundleField = null;
+            versionField = null;
         } catch (NoSuchFieldException e) {
             log.error("reflection failed", e);
-            versionManagerBundleField = null;
+            versionField = null;
         }
     }
 
     @Override
     public void changeSarosVersion(String version) throws RemoteException {
 
-        Version v;
+        Version newVersion;
 
         log.trace("attempting to change saros version to: " + version);
 
-        if (versionManagerBundleField == null) {
+        if (versionField == null) {
             log.error("unable to change version, reflection failed during initialization");
             throw new IllegalStateException(
                 "unable to change version, reflection failed during initialization");
         }
 
         try {
-            v = Version.parseVersion(version);
+            newVersion = Version.parseVersion(version);
         } catch (IllegalArgumentException e) {
             log.error(e.getMessage(), e);
             throw e;
@@ -110,12 +109,11 @@ public final class InternalImpl extends StfRemoteObject implements IInternal {
 
         try {
 
-            if (sarosBundle == null)
-                sarosBundle = (Bundle) versionManagerBundleField
+            if (originalVersion == null)
+                originalVersion = (Version) versionField
                     .get(getVersionManager());
 
-            versionManagerBundleField.set(getVersionManager(),
-                new BundleFake(v));
+            versionField.set(getVersionManager(), newVersion);
 
         } catch (IllegalArgumentException e) {
             log.error("unable to change saros version, reflection failed", e);
@@ -134,13 +132,13 @@ public final class InternalImpl extends StfRemoteObject implements IInternal {
 
         log.trace("attempting to reset saros version");
 
-        if (sarosBundle == null) {
+        if (originalVersion == null) {
             log.trace("saros version was not changed");
             return;
         }
 
         try {
-            versionManagerBundleField.set(getVersionManager(), sarosBundle);
+            versionField.set(getVersionManager(), originalVersion);
         } catch (IllegalArgumentException e) {
             log.error("unable to reset saros version, reflection failed", e);
             throw new RemoteException(
@@ -152,7 +150,7 @@ public final class InternalImpl extends StfRemoteObject implements IInternal {
         }
 
         log.trace("changed saros version to its default state");
-        sarosBundle = null;
+        originalVersion = null;
     }
 
     @Override

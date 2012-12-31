@@ -10,14 +10,14 @@ import org.apache.log4j.Logger;
 import org.jivesoftware.smack.PacketListener;
 import org.jivesoftware.smack.packet.IQ;
 import org.jivesoftware.smack.packet.Packet;
-import org.osgi.framework.Bundle;
 import org.osgi.framework.Version;
 
-import de.fu_berlin.inf.dpp.Saros;
+import de.fu_berlin.inf.dpp.SarosContext.Bindings.SarosVersion;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.net.IReceiver;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.net.SarosNet;
 import de.fu_berlin.inf.dpp.net.internal.extensions.XStreamExtensionProvider;
 import de.fu_berlin.inf.dpp.net.internal.extensions.XStreamExtensionProvider.XStreamIQPacket;
 
@@ -365,16 +365,17 @@ public class VersionManager {
             Arrays.asList(new Version("9.8.21.DEVEL")));
     }
 
-    protected Bundle bundle;
-    protected ITransmitter transmitter;
+    private Version version;
+    private ITransmitter transmitter;
 
-    protected XStreamExtensionProvider<VersionInfo> versionProvider = new XStreamExtensionProvider<VersionInfo>(
+    private XStreamExtensionProvider<VersionInfo> versionProvider = new XStreamExtensionProvider<VersionInfo>(
         "sarosVersion", VersionInfo.class, Version.class, Compatibility.class);
 
-    public VersionManager(final Saros saros, final IReceiver receiver,
-        ITransmitter transmitter) {
+    public VersionManager(@SarosVersion Version version,
+        final IReceiver receiver, ITransmitter transmitter,
+        final SarosNet sarosnet) {
 
-        this.bundle = saros.getBundle();
+        this.version = version;
         this.transmitter = transmitter;
 
         receiver.addPacketListener(new PacketListener() {
@@ -399,7 +400,7 @@ public class VersionManager {
                 reply.setType(IQ.Type.RESULT);
                 reply.setPacketID(iq.getPacketID());
                 reply.setTo(iq.getFrom());
-                saros.getSarosNet().getConnection().sendPacket(reply);
+                sarosnet.getConnection().sendPacket(reply);
                 log.debug("Sending version info to " + iq.getFrom());
             }
         }, versionProvider.getIQFilter());
@@ -430,7 +431,7 @@ public class VersionManager {
      * Returns the Version of the locally running Saros plugin
      */
     public Version getVersion() {
-        return bundle.getVersion();
+        return version;
     }
 
     /**

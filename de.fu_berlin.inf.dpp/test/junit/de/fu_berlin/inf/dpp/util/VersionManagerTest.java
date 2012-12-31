@@ -32,65 +32,38 @@ import org.easymock.EasyMock;
 import org.jivesoftware.smack.PacketListener;
 import org.jivesoftware.smack.filter.PacketFilter;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.osgi.framework.Bundle;
 import org.osgi.framework.Version;
-import org.powermock.api.easymock.PowerMock;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
 
-import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.net.IReceiver;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.util.VersionManager.Compatibility;
 import de.fu_berlin.inf.dpp.util.VersionManager.VersionInfo;
 
-@RunWith(PowerMockRunner.class)
-@PrepareForTest(Saros.class)
 public class VersionManagerTest {
 
-    Saros sarosLocal;
-    Saros sarosRemote;
+    private ITransmitter transmitter;
+    private IReceiver receiver;
 
-    Bundle bundeLocal;
-    Bundle bundeRemote;
-
-    ITransmitter transmitter;
-    IReceiver receiver;
-
-    VersionManager versionManagerRemote;
-    VersionManager versionManagerLocal;
+    private VersionManager versionManagerRemote;
+    private VersionManager versionManagerLocal;
 
     private void createMocks(Version local, Version remote) {
-        sarosLocal = PowerMock.createMock(Saros.class);
-        sarosRemote = PowerMock.createMock(Saros.class);
 
-        bundeLocal = PowerMock.createMock(Bundle.class);
-        bundeRemote = PowerMock.createMock(Bundle.class);
+        transmitter = EasyMock.createMock(ITransmitter.class);
 
-        EasyMock.expect(sarosLocal.getBundle()).andReturn(bundeLocal);
-
-        EasyMock.expect(sarosRemote.getBundle()).andReturn(bundeRemote);
-
-        EasyMock.expect(bundeLocal.getVersion()).andReturn(local);
-
-        EasyMock.expect(bundeRemote.getVersion()).andReturn(remote);
-
-        transmitter = PowerMock.createMock(ITransmitter.class);
-
-        receiver = PowerMock.createMock(IReceiver.class);
+        receiver = EasyMock.createMock(IReceiver.class);
 
         receiver.addPacketListener(EasyMock.isA(PacketListener.class),
             EasyMock.isA(PacketFilter.class));
 
         EasyMock.expectLastCall().asStub();
 
-        PowerMock.replayAll();
+        EasyMock.replay(transmitter, receiver);
 
-        versionManagerLocal = new VersionManager(sarosLocal, receiver,
-            transmitter);
-        versionManagerRemote = new VersionManager(sarosRemote, receiver,
-            transmitter);
+        versionManagerLocal = new VersionManager(local, receiver, transmitter,
+            null);
+        versionManagerRemote = new VersionManager(remote, receiver,
+            transmitter, null);
 
     }
 
@@ -124,7 +97,6 @@ public class VersionManagerTest {
             remote, local);
         assertEquals(Compatibility.TOO_OLD,
             versionManagerLocal.determineCompatibility(info).compatibility);
-        // verifiyMocks();
     }
 
     @Test
@@ -141,7 +113,6 @@ public class VersionManagerTest {
             remote, local);
         assertEquals(Compatibility.TOO_NEW,
             versionManagerLocal.determineCompatibility(info).compatibility);
-        // verifiyMocks();
     }
 
     @SuppressWarnings("unchecked")
