@@ -24,13 +24,14 @@ import java.util.List;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.jivesoftware.smack.packet.IQ.Type;
+import org.jivesoftware.smack.packet.Packet;
 import org.jivesoftware.smack.packet.PacketExtension;
 
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
 import de.fu_berlin.inf.dpp.invitation.InvitationProcess;
-import de.fu_berlin.inf.dpp.net.internal.extensions.XStreamExtensionProvider;
+import de.fu_berlin.inf.dpp.net.internal.extensions.SarosPacketExtension;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 
 /**
@@ -44,6 +45,24 @@ import de.fu_berlin.inf.dpp.project.ISarosSession;
 public interface ITransmitter {
 
     public static final int MAX_XMPP_MESSAGE_SIZE = 16378;
+
+    /**
+     * Sends the specified packet to the server.
+     * 
+     * @param forceSarosCompatibility
+     *            if set to <code>true</code> the
+     *            {@linkplain Packet#setPacketID(String) packet ID} will be
+     *            overwritten with the current Saros Extension version:
+     *            {@value SarosPacketExtension#VERSION}
+     * 
+     * @param packet
+     *            the packet to send
+     * @throws IOException
+     *             if an I/O error occurs or no connection is established to a
+     *             XMPP server
+     */
+    public void sendPacket(Packet packet, boolean forceSarosCompatibility)
+        throws IOException;
 
     /**
      * <p>
@@ -118,8 +137,8 @@ public interface ITransmitter {
      * seconds for an answer. If it arrives in time, a payload of type T (in
      * this case VersionInfo) will be returned, else the result is null.
      */
-    public <T> T sendQuery(JID jid, XStreamExtensionProvider<T> provider,
-        T payload, long timeout);
+    // public <T> T sendQuery(JID jid, XStreamExtensionProvider<T> provider,
+    // T payload, long timeout);
 
     public SarosPacketCollector getUserListConfirmationCollector();
 

@@ -28,43 +28,51 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-import org.easymock.EasyMock;
-import org.jivesoftware.smack.PacketListener;
-import org.jivesoftware.smack.filter.PacketFilter;
+import org.junit.Before;
 import org.junit.Test;
 import org.osgi.framework.Version;
 
 import de.fu_berlin.inf.dpp.net.IReceiver;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
+import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.test.fakes.net.FakeConnectionFactory;
+import de.fu_berlin.inf.dpp.test.fakes.net.FakeConnectionFactory.FakeConnectionFactoryResult;
 import de.fu_berlin.inf.dpp.util.VersionManager.Compatibility;
 import de.fu_berlin.inf.dpp.util.VersionManager.VersionInfo;
 
 public class VersionManagerTest {
 
-    private ITransmitter transmitter;
-    private IReceiver receiver;
+    private ITransmitter aliceTransmitter;
+    private ITransmitter bobTransmitter;
+
+    private IReceiver aliceReceiver;
+    private IReceiver bobReceiver;
 
     private VersionManager versionManagerRemote;
     private VersionManager versionManagerLocal;
 
-    private void createMocks(Version local, Version remote) {
+    private final JID aliceJID = new JID("alice@alice.com/Saros");
+    private final JID bobJID = new JID("bob@bob.com/Saros");
 
-        transmitter = EasyMock.createMock(ITransmitter.class);
+    @Before
+    public void setUp() {
+        FakeConnectionFactoryResult result = FakeConnectionFactory
+            .createConnections(aliceJID, bobJID).get();
 
-        receiver = EasyMock.createMock(IReceiver.class);
+        aliceReceiver = result.getReceiver(aliceJID);
+        bobReceiver = result.getReceiver(bobJID);
 
-        receiver.addPacketListener(EasyMock.isA(PacketListener.class),
-            EasyMock.isA(PacketFilter.class));
+        aliceTransmitter = result.getTransmitter(aliceJID);
+        bobTransmitter = result.getTransmitter(bobJID);
+    }
 
-        EasyMock.expectLastCall().asStub();
+    private void init(Version local, Version remote) {
 
-        EasyMock.replay(transmitter, receiver);
+        versionManagerLocal = new VersionManager(local, aliceReceiver,
+            aliceTransmitter);
 
-        versionManagerLocal = new VersionManager(local, receiver, transmitter,
-            null);
-        versionManagerRemote = new VersionManager(remote, receiver,
-            transmitter, null);
-
+        versionManagerRemote = new VersionManager(remote, bobReceiver,
+            bobTransmitter);
     }
 
     @Test
@@ -73,14 +81,11 @@ public class VersionManagerTest {
         Version local = new Version("1.1.1.r1");
         Version remote = new Version("1.1.1.r1");
 
-        createMocks(local, remote);
+        init(local, remote);
 
-        VersionInfo info = new VersionInfo();
-        info.version = remote;
-        info.compatibility = versionManagerRemote.determineCompatibility(
-            remote, local);
-        assertEquals(Compatibility.OK,
-            versionManagerLocal.determineCompatibility(info).compatibility);
+        VersionInfo info = versionManagerLocal.determineCompatibility(bobJID);
+
+        assertEquals(Compatibility.OK, info.compatibility);
     }
 
     @Test
@@ -89,14 +94,11 @@ public class VersionManagerTest {
         Version local = new Version("1.1.1.r1");
         Version remote = new Version("1.1.2.r1");
 
-        createMocks(local, remote);
+        init(local, remote);
 
-        VersionInfo info = new VersionInfo();
-        info.version = remote;
-        info.compatibility = versionManagerRemote.determineCompatibility(
-            remote, local);
-        assertEquals(Compatibility.TOO_OLD,
-            versionManagerLocal.determineCompatibility(info).compatibility);
+        VersionInfo info = versionManagerLocal.determineCompatibility(bobJID);
+
+        assertEquals(Compatibility.TOO_OLD, info.compatibility);
     }
 
     @Test
@@ -105,14 +107,11 @@ public class VersionManagerTest {
         Version local = new Version("1.1.2.r1");
         Version remote = new Version("1.1.1.r1");
 
-        createMocks(local, remote);
+        init(local, remote);
 
-        VersionInfo info = new VersionInfo();
-        info.version = remote;
-        info.compatibility = versionManagerRemote.determineCompatibility(
-            remote, local);
-        assertEquals(Compatibility.TOO_NEW,
-            versionManagerLocal.determineCompatibility(info).compatibility);
+        VersionInfo info = versionManagerLocal.determineCompatibility(bobJID);
+
+        assertEquals(Compatibility.TOO_NEW, info.compatibility);
     }
 
     @SuppressWarnings("unchecked")
@@ -121,7 +120,7 @@ public class VersionManagerTest {
         Version local = new Version("999999.1.2.r1");
         Version remote = new Version("999999.1.1.r1");
 
-        createMocks(local, remote);
+        init(local, remote);
 
         Field f = versionManagerLocal.getClass().getDeclaredField(
             "COMPATIBILITY_CHART");
@@ -134,23 +133,36 @@ public class VersionManagerTest {
         chart.put(local, Arrays.asList(remote));
 
         VersionInfo info = new VersionInfo();
-        info.version = remote;
+        info.version = remote.toString();
+
         info.compatibility = versionManagerRemote.determineCompatibility(
             remote, local);
+
         assertEquals(Compatibility.TOO_OLD,
             versionManagerRemote.determineCompatibility(remote, local));
+
         assertEquals(Compatibility.OK,
             versionManagerLocal.determineCompatibility(info).compatibility);
+
+        // do the "real" network check:
+
+        VersionInfo remoteInfo = versionManagerRemote
+            .determineCompatibility(aliceJID);
+
+        VersionInfo localInfo = versionManagerLocal
+            .determineCompatibility(bobJID);
+
+        assertEquals(localInfo.compatibility, remoteInfo.compatibility);
 
     }
 
     @SuppressWarnings("unchecked")
     @Test
     public void testLocalVersionTooOldButCompatible() throws Exception {
-        Version local = new Version("999999.1.1.r1");
-        Version remote = new Version("999999.1.2.r1");
+        Version local = new Version("1999999.1.1.r1");
+        Version remote = new Version("1999999.1.2.r1");
 
-        createMocks(local, remote);
+        init(local, remote);
 
         Field f = versionManagerLocal.getClass().getDeclaredField(
             "COMPATIBILITY_CHART");
@@ -163,14 +175,25 @@ public class VersionManagerTest {
         chart.put(remote, Arrays.asList(local));
 
         VersionInfo info = new VersionInfo();
-        info.version = remote;
+        info.version = remote.toString();
+
         info.compatibility = versionManagerRemote.determineCompatibility(
             remote, local);
+
         assertEquals(Compatibility.TOO_OLD,
             versionManagerLocal.determineCompatibility(local, remote));
+
         assertEquals(Compatibility.OK,
             versionManagerLocal.determineCompatibility(info).compatibility);
 
-    }
+        // do the "real" network check:
 
+        VersionInfo remoteInfo = versionManagerRemote
+            .determineCompatibility(aliceJID);
+
+        VersionInfo localInfo = versionManagerLocal
+            .determineCompatibility(bobJID);
+
+        assertEquals(localInfo.compatibility, remoteInfo.compatibility);
+    }
 }

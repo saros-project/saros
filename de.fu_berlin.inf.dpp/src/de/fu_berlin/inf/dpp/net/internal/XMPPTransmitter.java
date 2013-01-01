@@ -28,11 +28,8 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.jivesoftware.smack.Connection;
-import org.jivesoftware.smack.PacketCollector;
 import org.jivesoftware.smack.PacketListener;
 import org.jivesoftware.smack.filter.PacketFilter;
-import org.jivesoftware.smack.filter.PacketIDFilter;
-import org.jivesoftware.smack.packet.IQ;
 import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.Packet;
 import org.jivesoftware.smack.packet.PacketExtension;
@@ -55,7 +52,6 @@ import de.fu_berlin.inf.dpp.net.internal.extensions.SarosPacketExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.UserListExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.UserListReceivedExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.UserListRequestExtension;
-import de.fu_berlin.inf.dpp.net.internal.extensions.XStreamExtensionProvider;
 import de.fu_berlin.inf.dpp.observables.SarosSessionObservable;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
@@ -372,46 +368,7 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
     }
 
     @Override
-    public <T> T sendQuery(JID rqJID, XStreamExtensionProvider<T> provider,
-        T payload, long timeout) {
-
-        // Request the version from a buddy
-        IQ request = provider.createIQ(payload);
-
-        request.setType(IQ.Type.GET);
-        request.setTo(rqJID.toString());
-        request.setPacketID(SarosPacketExtension.VERSION);
-
-        // Create a packet collector to listen for a response.
-        PacketCollector collector = connection
-            .createPacketCollector(new PacketIDFilter(request.getPacketID()));
-
-        try {
-            sendPacket(request, false);
-            return provider.getPayload(collector.nextResult(timeout));
-        } catch (IOException e) {
-            return null;
-        } finally {
-            collector.cancel();
-        }
-    }
-
-    /**
-     * Sends the specified packet to the server.
-     * 
-     * @param forceSarosCompatibility
-     *            if set to <code>true</code> the
-     *            {@linkplain Packet#setPacketID(String) packet ID} will be
-     *            overwritten with the current Saros Extension version:
-     *            {@value SarosPacketExtension#VERSION}
-     * 
-     * @param packet
-     *            the packet to send
-     * @throws IOException
-     *             if an I/O error occurs or no connection is established to a
-     *             XMPP server
-     */
-    private synchronized void sendPacket(Packet packet,
+    public synchronized void sendPacket(Packet packet,
         boolean forceSarosCompatibility) throws IOException {
 
         if (isConnectionInvalid())

@@ -292,7 +292,7 @@ public final class OutgoingSessionNegotiation extends InvitationProcess {
             hostVersionInfo.compatibility = null;
         }
 
-        hostVersionInfo.version = versionManager.getVersion();
+        hostVersionInfo.version = versionManager.getVersion().toString();
 
         MUCSessionPreferences comPrefs;
         if (sarosSession.isHost()) {

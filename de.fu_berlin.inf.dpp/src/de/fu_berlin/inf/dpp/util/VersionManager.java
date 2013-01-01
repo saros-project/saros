@@ -1,5 +1,6 @@
 package de.fu_berlin.inf.dpp.util;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -8,6 +9,8 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.jivesoftware.smack.PacketListener;
+import org.jivesoftware.smack.filter.AndFilter;
+import org.jivesoftware.smack.filter.PacketFilter;
 import org.jivesoftware.smack.packet.IQ;
 import org.jivesoftware.smack.packet.Packet;
 import org.osgi.framework.Version;
@@ -17,7 +20,7 @@ import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.net.IReceiver;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.net.SarosNet;
+import de.fu_berlin.inf.dpp.net.SarosPacketCollector;
 import de.fu_berlin.inf.dpp.net.internal.extensions.XStreamExtensionProvider;
 import de.fu_berlin.inf.dpp.net.internal.extensions.XStreamExtensionProvider.XStreamIQPacket;
 
@@ -36,12 +39,15 @@ public class VersionManager {
 
     private static final Logger log = Logger.getLogger(VersionManager.class);
 
+    private static final XStreamExtensionProvider<VersionInfo> VERSION_PROVIDER = new XStreamExtensionProvider<VersionInfo>(
+        "sarosVersion", VersionInfo.class, Version.class, Compatibility.class);
+
     /**
      * Data Object for sending version information
      */
     public static class VersionInfo {
 
-        public Version version;
+        public String version;
 
         public Compatibility compatibility;
 
@@ -120,7 +126,7 @@ public class VersionManager {
      * {@link Compatibility#OK} if and only if the version information are
      * {@link Version#equals(Object)} to each other.
      */
-    private static final Map<Version, List<Version>> COMPATIBILITY_CHART = new HashMap<Version, List<Version>>();
+    private final Map<Version, List<Version>> COMPATIBILITY_CHART = new HashMap<Version, List<Version>>();
 
     /**
      * Initialize the compatibility map.
@@ -131,7 +137,7 @@ public class VersionManager {
      * For the first version which is too old the commit which broke
      * compatibility should be listed.
      */
-    static {
+    {
 
         /**
          * Version 12.9.28
@@ -365,17 +371,15 @@ public class VersionManager {
             Arrays.asList(new Version("9.8.21.DEVEL")));
     }
 
-    private Version version;
-    private ITransmitter transmitter;
-
-    private XStreamExtensionProvider<VersionInfo> versionProvider = new XStreamExtensionProvider<VersionInfo>(
-        "sarosVersion", VersionInfo.class, Version.class, Compatibility.class);
+    private final Version version;
+    private final ITransmitter transmitter;
+    private final IReceiver receiver;
 
     public VersionManager(@SarosVersion Version version,
-        final IReceiver receiver, ITransmitter transmitter,
-        final SarosNet sarosnet) {
+        final IReceiver receiver, final ITransmitter transmitter) {
 
         this.version = version;
+        this.receiver = receiver;
         this.transmitter = transmitter;
 
         receiver.addPacketListener(new PacketListener() {
@@ -386,24 +390,34 @@ public class VersionManager {
                 XStreamIQPacket<VersionInfo> iq = (XStreamIQPacket<VersionInfo>) packet;
                 log.debug("Version request from " + iq.getFrom());
 
-                if (iq.getType() != IQ.Type.GET)
-                    return;
-
                 VersionInfo remote = iq.getPayload();
 
                 VersionInfo local = new VersionInfo();
-                local.version = getVersion();
-                local.compatibility = determineCompatibility(local.version,
-                    remote.version);
+                local.version = getVersion().toString();
 
-                IQ reply = versionProvider.createIQ(local);
+                local.compatibility = determineCompatibility(
+                    parseVersion(local.version), parseVersion(remote.version));
+
+                IQ reply = VERSION_PROVIDER.createIQ(local);
                 reply.setType(IQ.Type.RESULT);
-                reply.setPacketID(iq.getPacketID());
                 reply.setTo(iq.getFrom());
-                sarosnet.getConnection().sendPacket(reply);
-                log.debug("Sending version info to " + iq.getFrom());
+
+                try {
+                    transmitter.sendPacket(reply, false);
+                } catch (IOException e) {
+                    log.error("could not send version info to " + iq.getFrom(),
+                        e);
+                }
+
+                log.debug("send version info to " + iq.getFrom());
             }
-        }, versionProvider.getIQFilter());
+        }, new AndFilter(VERSION_PROVIDER.getIQFilter(), new PacketFilter() {
+            @Override
+            public boolean accept(Packet packet) {
+                return ((IQ) packet).getType() == IQ.Type.GET;
+
+            }
+        }));
     }
 
     /**
@@ -418,13 +432,40 @@ public class VersionManager {
      * whether his version is compatible with ours. We must then check by
      * ourselves.
      * 
-     * @blocking If the request times out (7,5s) or an error occurs null is
-     *           returned.
+     * @blocking If the request times out (10 seconds) or an error occurs null
+     *           is returned.
      */
-    public VersionInfo queryVersion(JID rqJID) {
+    public VersionInfo queryVersion(final JID rqJID) {
+
+        assert rqJID.isResourceQualifiedJID();
+
         VersionInfo versionInfo = new VersionInfo();
-        versionInfo.version = getVersion();
-        return transmitter.sendQuery(rqJID, versionProvider, versionInfo, 7500);
+        versionInfo.version = getVersion().toString();
+
+        IQ request = VERSION_PROVIDER.createIQ(versionInfo);
+
+        request.setType(IQ.Type.GET);
+        request.setTo(rqJID.toString());
+
+        SarosPacketCollector collector = receiver
+            .createCollector(new AndFilter(VERSION_PROVIDER.getIQFilter(),
+                new PacketFilter() {
+                    @Override
+                    public boolean accept(Packet packet) {
+                        return rqJID.toString().equals(packet.getFrom())
+                            && ((IQ) packet).getType() == IQ.Type.RESULT;
+                    }
+                }));
+
+        try {
+            transmitter.sendPacket(request, false);
+            return VERSION_PROVIDER.getPayload(collector.nextResult(10 * 1000));
+        } catch (IOException e) {
+            log.warn(e.getMessage(), e);
+            return null;
+        } finally {
+            collector.cancel();
+        }
     }
 
     /**
@@ -503,7 +544,8 @@ public class VersionManager {
         result.version = remoteVersionInfo.version;
 
         Compatibility localComp = determineCompatibility(getVersion(),
-            remoteVersionInfo.version);
+            parseVersion(remoteVersionInfo.version));
+
         Compatibility remoteComp = remoteVersionInfo.compatibility;
 
         if (localComp == Compatibility.TOO_OLD) {
@@ -529,20 +571,19 @@ public class VersionManager {
      */
     public Compatibility determineCompatibility(String remoteVersionString) {
 
-        Version remoteVersion = parseBundleVersion(remoteVersionString);
+        Version remoteVersion = parseVersion(remoteVersionString);
         Version localVersion = getVersion();
 
         return determineCompatibility(localVersion, remoteVersion);
     }
 
-    private Version parseBundleVersion(String bundleVersion) {
+    private Version parseVersion(String versionString) {
         Version version = Version.emptyVersion;
         try {
-            version = Version.parseVersion(bundleVersion);
+            version = Version.parseVersion(versionString);
         } catch (IllegalArgumentException e) {
-            log.warn(
-                "bundle version string of remote peer is illegally formatted: "
-                    + bundleVersion, e);
+            log.warn("version string of remote peer is illegally formatted: "
+                + versionString, e);
         }
         return version;
     }
