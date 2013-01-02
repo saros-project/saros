@@ -22,7 +22,6 @@ package de.fu_berlin.inf.dpp.net.internal;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -49,7 +48,6 @@ import de.fu_berlin.inf.dpp.net.SarosPacketCollector;
 import de.fu_berlin.inf.dpp.net.internal.extensions.PacketExtensionUtils;
 import de.fu_berlin.inf.dpp.net.internal.extensions.SarosLeaveExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.SarosPacketExtension;
-import de.fu_berlin.inf.dpp.net.internal.extensions.UserListExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.UserListReceivedExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.UserListRequestExtension;
 import de.fu_berlin.inf.dpp.observables.SarosSessionObservable;
@@ -95,9 +93,6 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
     private SarosLeaveExtension.Provider leaveExtensionProvider;
 
     @Inject
-    private UserListExtension.Provider userListExtensionProvider;
-
-    @Inject
     private UserListReceivedExtension.Provider userListReceivedExtensionProvider;
 
     @Inject
@@ -109,16 +104,6 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
         this.dataManager = dataManager;
         this.sessionID = sessionID;
         this.receiver = receiver;
-    }
-
-    /* Methods to remove from the IFACE START */
-
-    @Override
-    public void sendUserList(JID to, Collection<User> users) {
-        log.trace("Sending buddy list to " + Utils.prefix(to));
-        sendMessageToUser(to,
-            userListExtensionProvider.create(new UserListExtension(sessionID
-                .getValue(), users)), true);
     }
 
     public void sendUserListConfirmation(JID to) {

@@ -45,6 +45,7 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
+import org.jivesoftware.smack.packet.PacketExtension;
 import org.joda.time.DateTime;
 import org.picocontainer.Disposable;
 import org.picocontainer.MutablePicoContainer;
@@ -95,6 +96,7 @@ import de.fu_berlin.inf.dpp.net.business.ConsistencyWatchdogHandler;
 import de.fu_berlin.inf.dpp.net.internal.ActivitySequencer;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
 import de.fu_berlin.inf.dpp.net.internal.extensions.KickUserExtension;
+import de.fu_berlin.inf.dpp.net.internal.extensions.UserListExtension;
 import de.fu_berlin.inf.dpp.observables.ProjectNegotiationObservable;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 import de.fu_berlin.inf.dpp.preferences.PreferenceManager;
@@ -1376,22 +1378,38 @@ public class SarosSession implements ISarosSession, Disposable {
         IProgressMonitor monitor) throws SarosCancellationException {
 
         Collection<User> participants = this.getParticipants();
-        log.debug("Inv" + Utils.prefix(peer) + ": Synchronizing userlist " //$NON-NLS-1$ //$NON-NLS-2$
+        log.debug("Inv" + Utils.prefix(peer) + ": Synchronizing userlist "
             + participants);
 
         SarosPacketCollector userListConfirmationCollector = transmitter
             .getUserListConfirmationCollector();
 
-        for (User user : this.getRemoteUsers()) {
-            transmitter.sendUserList(user.getJID(), participants);
+        PacketExtension userList = UserListExtension.PROVIDER
+            .create(new UserListExtension(sessionIDObservable.getValue(),
+                participants));
+
+        List<User> remoteUsers = getRemoteUsers();
+
+        if (remoteUsers.isEmpty())
+            return;
+
+        for (User user : remoteUsers) {
+            try {
+                transmitter.sendToSessionUser(user.getJID(), userList);
+            } catch (IOException e) {
+                log.error("could not send user list to session user " + user, e);
+            }
         }
 
-        log.debug("Inv" + Utils.prefix(peer) //$NON-NLS-1$
-            + ": Waiting for user list confirmations..."); //$NON-NLS-1$
+        // see BUG #3544930 , the confirmation is useless
+        log.debug("Inv" + Utils.prefix(peer)
+            + ": Waiting for user list confirmations...");
+
         transmitter.receiveUserListConfirmation(userListConfirmationCollector,
-            this.getRemoteUsers(), monitor);
-        log.debug("Inv" + Utils.prefix(peer) //$NON-NLS-1$
-            + ": All user list confirmations have arrived."); //$NON-NLS-1$
+            remoteUsers, monitor);
+
+        log.debug("Inv" + Utils.prefix(peer)
+            + ": All user list confirmations have arrived.");
 
     }
 

@@ -292,7 +292,6 @@ public class SarosContext implements ISarosContext {
         Component
             .create(IncomingTransferObject.IncomingTransferObjectExtensionProvider.class),
 
-        Component.create(UserListExtension.Provider.class),
         Component.create(UserListRequestExtension.Provider.class),
         Component.create(UserListReceivedExtension.Provider.class),
 
@@ -342,6 +341,7 @@ public class SarosContext implements ISarosContext {
             Class.forName(CancelProjectNegotiationExtension.class.getName());
             Class.forName(FileListExtension.class.getName());
             Class.forName(KickUserExtension.class.getName());
+            Class.forName(UserListExtension.class.getName());
 
         } catch (ClassNotFoundException e) {
             throw new RuntimeException(e);

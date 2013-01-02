@@ -1,7 +1,6 @@
 package de.fu_berlin.inf.dpp.test.fakes.net;
 
 import java.io.IOException;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -74,11 +73,6 @@ class FakePacketTransmitter implements ITransmitter {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-    }
-
-    @Override
-    public void sendUserList(JID to, Collection<User> user) {
-        // NOP
     }
 
     @Override

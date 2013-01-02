@@ -10,6 +10,9 @@ import de.fu_berlin.inf.dpp.net.JID;
 
 @Component(module = "net")
 public class UserListExtension extends SarosSessionPacketExtension {
+
+    public static final Provider PROVIDER = new Provider();
+
     // TODO: send the Collection<User>
     // It causes a marshallation exception... why??
 
@@ -50,7 +53,7 @@ public class UserListExtension extends SarosSessionPacketExtension {
     public static class Provider extends
         XStreamExtensionProvider<UserListExtension> {
 
-        public Provider() {
+        private Provider() {
             super("userList", UserListExtension.class);
         }
     }

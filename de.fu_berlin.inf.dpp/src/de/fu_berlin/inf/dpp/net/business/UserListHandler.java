@@ -26,13 +26,12 @@ public class UserListHandler {
         .getName());
 
     @Inject
-    protected XMPPTransmitter transmitter;
+    private XMPPTransmitter transmitter;
 
     @Inject
-    protected ISarosSessionManager sessionManager;
+    private ISarosSessionManager sessionManager;
 
-    public UserListHandler(IReceiver receiver,
-        final UserListExtension.Provider userListExtProv) {
+    public UserListHandler(IReceiver receiver) {
         // TODO SessionID-Filter
         receiver.addPacketListener(new PacketListener() {
 
@@ -41,7 +40,7 @@ public class UserListHandler {
                 JID fromJID = new JID(packet.getFrom());
 
                 log.debug("Inv" + Utils.prefix(fromJID) + ": Received userList");
-                UserListExtension userListInfo = userListExtProv
+                UserListExtension userListInfo = UserListExtension.PROVIDER
                     .getPayload(packet);
 
                 if (userListInfo == null) {
@@ -100,10 +99,14 @@ public class UserListHandler {
                             sarosSession.userInvitationCompleted(user);
                         }
                     }
+                    /*
+                     * pretty cool that we cannot announce that a user has left
+                     * the session !
+                     */
                 }
                 transmitter.sendUserListConfirmation(fromJID);
             }
 
-        }, userListExtProv.getPacketFilter());
+        }, UserListExtension.PROVIDER.getPacketFilter());
     }
 }

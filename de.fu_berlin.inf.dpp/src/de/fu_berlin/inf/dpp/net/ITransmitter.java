@@ -19,7 +19,6 @@
 package de.fu_berlin.inf.dpp.net;
 
 import java.io.IOException;
-import java.util.Collection;
 import java.util.List;
 
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -104,8 +103,6 @@ public interface ITransmitter {
      *            the to send
      */
     public void sendMessageToUser(JID jid, PacketExtension extension);
-
-    public void sendUserList(JID to, Collection<User> user);
 
     public boolean receiveUserListConfirmation(SarosPacketCollector collector,
         List<User> fromUsers, IProgressMonitor monitor)
