@@ -29,6 +29,7 @@ import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.wizard.Wizard;
+import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Shell;
@@ -63,19 +64,39 @@ public class JoinSessionWizard extends Wizard {
 
     private static final Logger log = Logger.getLogger(JoinSessionWizard.class);
 
-    private WizardDialogAccessable wizardDialog;
-    private boolean updateSelected;
+    /*
+     * FIXME: this class is only used by the AddProjectToSessionWizard class and
+     * is misplaced here
+     */
+    public static class OverwriteErrorDialog extends ErrorDialog {
+
+        public OverwriteErrorDialog(Shell parentShell, String dialogTitle,
+            String dialogMessage, IStatus status) {
+            super(parentShell, dialogTitle, dialogMessage, status, IStatus.OK
+                | IStatus.INFO | IStatus.WARNING | IStatus.ERROR);
+        }
+
+        @Override
+        protected void createButtonsForButtonBar(Composite parent) {
+            super.createButtonsForButtonBar(parent);
+            Button ok = getButton(IDialogConstants.OK_ID);
+            ok.setText(Messages.JoinSessionWizard_yes);
+            Button no = createButton(parent, IDialogConstants.CANCEL_ID,
+                Messages.JoinSessionWizard_no, true);
+            no.moveBelow(ok);
+            no.setFocus();
+        }
+    }
+
     private IncomingSessionNegotiation process;
 
     private ShowDescriptionPage descriptionPage;
-    private PreferenceUtils preferenceUtils;
 
     private InvitationProcess.Status invitationStatus;
 
     public JoinSessionWizard(IncomingSessionNegotiation process,
         PreferenceUtils preferenceUtils, VersionManager manager) {
         this.process = process;
-        this.preferenceUtils = preferenceUtils;
 
         EnterProjectNamePageUtils.setPreferenceUtils(preferenceUtils);
 
@@ -88,15 +109,14 @@ public class JoinSessionWizard extends Wizard {
         addPage(descriptionPage);
     }
 
-    public PreferenceUtils getPreferenceUtils() {
-        return preferenceUtils;
-    }
-
     @Override
     public void createPageControls(Composite pageContainer) {
         this.descriptionPage.createControl(pageContainer);
-        this.wizardDialog.setWizardButtonLabel(IDialogConstants.FINISH_ID,
-            Messages.JoinSessionWizard_accept);
+
+        if (getContainer() instanceof WizardDialogAccessable) {
+            ((WizardDialogAccessable) getContainer()).setWizardButtonLabel(
+                IDialogConstants.FINISH_ID, Messages.JoinSessionWizard_accept);
+        }
     }
 
     @Override
@@ -141,26 +161,6 @@ public class JoinSessionWizard extends Wizard {
         return true;
     }
 
-    public static class OverwriteErrorDialog extends ErrorDialog {
-
-        public OverwriteErrorDialog(Shell parentShell, String dialogTitle,
-            String dialogMessage, IStatus status) {
-            super(parentShell, dialogTitle, dialogMessage, status, IStatus.OK
-                | IStatus.INFO | IStatus.WARNING | IStatus.ERROR);
-        }
-
-        @Override
-        protected void createButtonsForButtonBar(Composite parent) {
-            super.createButtonsForButtonBar(parent);
-            Button ok = getButton(IDialogConstants.OK_ID);
-            ok.setText(Messages.JoinSessionWizard_yes);
-            Button no = createButton(parent, IDialogConstants.CANCEL_ID,
-                Messages.JoinSessionWizard_no, true);
-            no.moveBelow(ok);
-            no.setFocus();
-        }
-    }
-
     @Override
     public boolean performCancel() {
         Utils.runSafeAsync(log, new Runnable() {
@@ -172,16 +172,9 @@ public class JoinSessionWizard extends Wizard {
         return true;
     }
 
-    protected boolean disposed = false;
-
     @Override
     public void dispose() {
-        disposed = true;
         super.dispose();
-    }
-
-    public boolean isUpdateSelected() {
-        return updateSelected;
     }
 
     public void cancelWizard(final JID jid, final String errorMsg,
@@ -190,10 +183,11 @@ public class JoinSessionWizard extends Wizard {
         SWTUtils.runSafeSWTAsync(log, new Runnable() {
             @Override
             public void run() {
-                Shell shell = wizardDialog.getShell();
+                Shell shell = JoinSessionWizard.this.getShell();
                 if (shell == null || shell.isDisposed())
                     return;
-                wizardDialog.close();
+
+                ((WizardDialog) JoinSessionWizard.this.getContainer()).close();
             }
         });
 
@@ -206,7 +200,7 @@ public class JoinSessionWizard extends Wizard {
 
     }
 
-    public void showCancelMessage(JID jid, String errorMsg,
+    private void showCancelMessage(JID jid, String errorMsg,
         CancelLocation cancelLocation) {
 
         String peer = jid.getBase();
@@ -239,7 +233,7 @@ public class JoinSessionWizard extends Wizard {
         }
     }
 
-    protected void processException(Throwable t) {
+    private void processException(Throwable t) {
         log.error("This type of exception is not expected here: ", t); //$NON-NLS-1$
         cancelWizard(process.getPeer(), "Unkown error: " + t.getMessage(), //$NON-NLS-1$
             CancelLocation.REMOTE);
