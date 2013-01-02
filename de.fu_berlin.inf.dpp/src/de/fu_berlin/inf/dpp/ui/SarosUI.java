@@ -68,10 +68,10 @@ public class SarosUI {
 
     private static final Logger log = Logger.getLogger(SarosUI.class);
 
-    final protected ISarosSessionManager sessionManager;
-    final protected VersionManager manager;
-    final protected DataTransferManager dataTransferManager;
-    final protected PreferenceUtils preferenceUtils;
+    final private ISarosSessionManager sessionManager;
+    final private VersionManager manager;
+    final private DataTransferManager dataTransferManager;
+    final private PreferenceUtils preferenceUtils;
 
     public SarosUI(ISarosSessionManager sessionManager,
         VersionManager versionManager, DataTransferManager dataTransferManager,
@@ -88,14 +88,12 @@ public class SarosUI {
         IncomingSessionNegotiation process) {
 
         JoinSessionWizard sessionWizard = new JoinSessionWizard(process,
-            dataTransferManager, preferenceUtils, manager);
+            preferenceUtils, manager);
         final WizardDialogAccessable wizardDialog = new WizardDialogAccessable(
             EditorAPI.getShell(), sessionWizard);
 
         // TODO Provide help :-)
         wizardDialog.setHelpAvailable(false);
-
-        sessionWizard.setWizardDlg(wizardDialog);
 
         // Fixes #2727848: InvitationDialog is opened in the
         // background
@@ -220,6 +218,7 @@ public class SarosUI {
     /**
      * @swt
      */
+
     public void performPermissionChange(final User user,
         final Permission newPermission) {
 
@@ -238,6 +237,7 @@ public class SarosUI {
                         progress.beginTask(Messages.SarosUI_permission_change,
                             IProgressMonitor.UNKNOWN);
 
+                        // NPE !!!!
                         sessionManager.getSarosSession()
                             .initiatePermissionChange(user, newPermission,
                                 progress);

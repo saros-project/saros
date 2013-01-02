@@ -27,8 +27,6 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
-import org.eclipse.jface.dialogs.IPageChangingListener;
-import org.eclipse.jface.dialogs.PageChangingEvent;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.swt.widgets.Button;
@@ -40,7 +38,6 @@ import de.fu_berlin.inf.dpp.invitation.InvitationProcess;
 import de.fu_berlin.inf.dpp.invitation.ProcessTools.CancelLocation;
 import de.fu_berlin.inf.dpp.invitation.ProcessTools.CancelOption;
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
 import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.ui.util.DialogUtils;
@@ -66,24 +63,19 @@ public class JoinSessionWizard extends Wizard {
 
     private static final Logger log = Logger.getLogger(JoinSessionWizard.class);
 
-    protected WizardDialogAccessable wizardDialog;
-    protected boolean updateSelected;
-    public IncomingSessionNegotiation process;
+    private WizardDialogAccessable wizardDialog;
+    private boolean updateSelected;
+    private IncomingSessionNegotiation process;
 
-    protected ShowDescriptionPage descriptionPage;
-    protected DataTransferManager dataTransferManager;
-    protected PreferenceUtils preferenceUtils;
-    protected VersionManager manager;
+    private ShowDescriptionPage descriptionPage;
+    private PreferenceUtils preferenceUtils;
 
     private InvitationProcess.Status invitationStatus;
 
     public JoinSessionWizard(IncomingSessionNegotiation process,
-        DataTransferManager dataTransferManager,
         PreferenceUtils preferenceUtils, VersionManager manager) {
         this.process = process;
-        this.dataTransferManager = dataTransferManager;
         this.preferenceUtils = preferenceUtils;
-        this.manager = manager;
 
         EnterProjectNamePageUtils.setPreferenceUtils(preferenceUtils);
 
@@ -180,78 +172,7 @@ public class JoinSessionWizard extends Wizard {
         return true;
     }
 
-    public void setWizardDlg(WizardDialogAccessable wd) {
-        this.wizardDialog = wd;
-
-        /**
-         * Listen to page changes so we can cancel our automatic clicking the
-         * next button
-         */
-        this.wizardDialog.addPageChangingListener(new IPageChangingListener() {
-            @Override
-            public void handlePageChanging(PageChangingEvent event) {
-                pageChanges++;
-            }
-        });
-
-    }
-
-    /**
-     * Variable is only used to count how many times pageChanges were registered
-     * so we only press the next button if no page changes occurred.
-     * 
-     * The only place this is needed is below in the pressWizardButton, if you
-     * want to know the number of page changes, count them yourself.
-     */
-    private int pageChanges = 0;
-
     protected boolean disposed = false;
-
-    /**
-     * Will wait one second and then press the next button, if the dialog is
-     * still on the given page (i.e. if the user presses next then this will not
-     * call next again).
-     */
-    public void pressWizardButton(final int buttonID) {
-
-        final int pageChangesAtStart = pageChanges;
-
-        Utils.runSafeAsync(log, new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    Thread.sleep(1000);
-                } catch (InterruptedException e) {
-                    log.error("Code not designed to be interruptable", e); //$NON-NLS-1$
-                    Thread.currentThread().interrupt();
-                    return;
-                }
-                SWTUtils.runSafeSWTAsync(log, new Runnable() {
-                    @Override
-                    public void run() {
-
-                        // User clicked next in the meantime
-                        if (pageChangesAtStart != pageChanges)
-                            return;
-
-                        // Dialog already closed
-                        if (disposed)
-                            return;
-
-                        // Button existent
-                        if (wizardDialog.getWizardButton(buttonID) == null) {
-                            return;
-                        }
-                        // Button not enabled
-                        if (!wizardDialog.getWizardButton(buttonID).isEnabled())
-                            return;
-
-                        wizardDialog.buttonPressed(buttonID);
-                    }
-                });
-            }
-        });
-    }
 
     @Override
     public void dispose() {
