@@ -93,6 +93,7 @@ import de.fu_berlin.inf.dpp.project.SarosSessionManager;
 import de.fu_berlin.inf.dpp.project.internal.ChecksumCacheImpl;
 import de.fu_berlin.inf.dpp.project.internal.FileContentNotifierBridge;
 import de.fu_berlin.inf.dpp.project.internal.FollowingActivitiesManager;
+import de.fu_berlin.inf.dpp.synchronize.internal.SWTSynchronizer;
 import de.fu_berlin.inf.dpp.ui.LocalPresenceTracker;
 import de.fu_berlin.inf.dpp.ui.RemoteProgressManager;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
@@ -310,7 +311,10 @@ public class SarosContext implements ISarosContext {
             new FileContentNotifierBridge())),
 
         // Version support
-        Component.create(VersionManager.class)
+        Component.create(VersionManager.class),
+
+        // SWT EDT support
+        Component.create(SWTSynchronizer.class)
 
     };
 

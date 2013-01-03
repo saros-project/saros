@@ -111,6 +111,7 @@ import de.fu_berlin.inf.dpp.project.SharedProject;
 import de.fu_berlin.inf.dpp.project.SharedResourcesManager;
 import de.fu_berlin.inf.dpp.synchronize.StartHandle;
 import de.fu_berlin.inf.dpp.synchronize.StopManager;
+import de.fu_berlin.inf.dpp.synchronize.UISynchronizer;
 import de.fu_berlin.inf.dpp.ui.util.CollaborationUtils;
 import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 import de.fu_berlin.inf.dpp.util.ArrayUtils;
@@ -128,6 +129,9 @@ public class SarosSession implements ISarosSession, Disposable {
     private static final Logger log = Logger.getLogger(SarosSession.class);
 
     public static final int MAX_USERCOLORS = 5;
+
+    @Inject
+    protected UISynchronizer synchronizer;
 
     /* Dependencies */
     @Inject
@@ -197,14 +201,14 @@ public class SarosSession implements ISarosSession, Disposable {
          */
         @Override
         public void activityCreated(final IActivity activityData) {
-            SWTUtils.runSafeSWTSync(log, new Runnable() {
+            synchronizer.syncExec(Utils.wrapSafe(log, new Runnable() {
 
                 @Override
                 public void run() {
                     handleActivityCreated(activityData);
                 }
 
-            });
+            }));
         }
     };
 
@@ -422,7 +426,7 @@ public class SarosSession implements ISarosSession, Disposable {
 
         if (user.isHost()) {
 
-            SWTUtils.runSafeSWTSync(log, new Runnable() {
+            synchronizer.syncExec(Utils.wrapSafe(log, new Runnable() {
                 @Override
                 public void run() {
                     abuseActivityCreated(new PermissionActivity(getLocalUser(),
@@ -430,13 +434,13 @@ public class SarosSession implements ISarosSession, Disposable {
 
                     setPermission(user, newPermission);
                 }
-            });
+            }));
 
         } else {
             StartHandle startHandle = getStopManager().stop(user,
                 Messages.SarosSession_performing_permission_change, progress);
 
-            SWTUtils.runSafeSWTSync(log, new Runnable() {
+            synchronizer.syncExec(Utils.wrapSafe(log, new Runnable() {
                 @Override
                 public void run() {
                     abuseActivityCreated(new PermissionActivity(getLocalUser(),
@@ -444,7 +448,7 @@ public class SarosSession implements ISarosSession, Disposable {
 
                     setPermission(user, newPermission);
                 }
-            });
+            }));
 
             if (!startHandle.start())
                 log.error("Didn't unblock. " //$NON-NLS-1$
@@ -478,12 +482,12 @@ public class SarosSession implements ISarosSession, Disposable {
         user.invitationCompleted();
 
         // WTF ... let the UI handle the synch.
-        SWTUtils.runSafeSWTAsync(log, new Runnable() {
+        synchronizer.asyncExec(Utils.wrapSafe(log, new Runnable() {
             @Override
             public void run() {
                 userInvitationCompletedWrapped(user);
             }
-        });
+        }));
     }
 
     @Deprecated
@@ -608,12 +612,12 @@ public class SarosSession implements ISarosSession, Disposable {
                 + " from the session because the connection to the user is already lost");
         }
 
-        SWTUtils.runSafeSWTAsync(log, new Runnable() {
+        synchronizer.asyncExec(Utils.wrapSafe(log, new Runnable() {
             @Override
             public void run() {
                 removeUser(user);
             }
-        });
+        }));
     }
 
     /*
@@ -847,11 +851,14 @@ public class SarosSession implements ISarosSession, Disposable {
          * HACK The change is needed, because the invitation couldn't be
          * finished under the operating system Ubuntu, if an asynchronous
          * handling was used
+         * 
+         * Stefan Rossbach: I think this HACK is NOT needed. There are no proofs
+         * that this will fail on Ubuntu !
          */
         if (projectNegotiationObservable.getProcesses().values().size() > 0) {
-            SWTUtils.runSafeSWTSync(log, transformingRunnable);
+            synchronizer.syncExec(Utils.wrapSafe(log, transformingRunnable));
         } else {
-            SWTUtils.runSafeSWTAsync(log, transformingRunnable);
+            synchronizer.asyncExec(Utils.wrapSafe(log, transformingRunnable));
         }
     }
 
@@ -1137,6 +1144,8 @@ public class SarosSession implements ISarosSession, Disposable {
             final ProgressMonitorDialog dialog = new ProgressMonitorDialog(
                 EditorAPI.getAWorkbenchWindow().getShell());
             final SarosSession session = this;
+
+            // GUI code in the business logic is a real WTF !
             SWTUtils.runSafeSWTSync(log, new Runnable() {
                 @Override
                 public void run() {

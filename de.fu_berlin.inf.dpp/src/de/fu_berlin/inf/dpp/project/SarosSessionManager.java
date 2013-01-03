@@ -495,27 +495,11 @@ public class SarosSessionManager implements ISarosSessionManager {
         }
 
         protected void registerCancelListener() {
-            SWTUtils.runSafeSWTSync(log, new Runnable() {
-
-                @Override
-                public void run() {
-                    SarosSessionManager.this
-                        .addSarosSessionListener(cancelListener);
-                }
-
-            });
+            SarosSessionManager.this.addSarosSessionListener(cancelListener);
         }
 
         protected void releaseCancelListener() {
-            SWTUtils.runSafeSWTSync(log, new Runnable() {
-
-                @Override
-                public void run() {
-                    SarosSessionManager.this
-                        .removeSarosSessionListener(cancelListener);
-                }
-
-            });
+            SarosSessionManager.this.removeSarosSessionListener(cancelListener);
         }
     }
 
@@ -697,29 +681,12 @@ public class SarosSessionManager implements ISarosSessionManager {
         }
 
         protected void registerCancelListener() {
-            SWTUtils.runSafeSWTSync(log, new Runnable() {
-
-                @Override
-                public void run() {
-                    SarosSessionManager.this
-                        .addSarosSessionListener(cancelListener);
-                }
-
-            });
+            SarosSessionManager.this.addSarosSessionListener(cancelListener);
         }
 
         protected void releaseCancelListener() {
-            SWTUtils.runSafeSWTSync(log, new Runnable() {
-
-                @Override
-                public void run() {
-                    SarosSessionManager.this
-                        .removeSarosSessionListener(cancelListener);
-                }
-
-            });
+            SarosSessionManager.this.removeSarosSessionListener(cancelListener);
         }
-
     }
 
     @Override

@@ -14,6 +14,8 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.preferences.ConfigurationScope;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.joda.time.DateTime;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -41,6 +43,7 @@ import de.fu_berlin.inf.dpp.feedback.StatisticManager;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.SarosNet;
+import de.fu_berlin.inf.dpp.net.business.ActivitiesHandler;
 import de.fu_berlin.inf.dpp.net.business.DispatchThreadContext;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
 import de.fu_berlin.inf.dpp.net.internal.TransferModeDispatch;
@@ -52,6 +55,7 @@ import de.fu_berlin.inf.dpp.preferences.PreferenceInitializer;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
 import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.synchronize.StopManager;
+import de.fu_berlin.inf.dpp.test.fakes.synchonize.NonUISynchronizer;
 import de.fu_berlin.inf.dpp.test.util.MemoryPreferenceStore;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
 import de.fu_berlin.inf.dpp.util.Utils;
@@ -112,13 +116,16 @@ public class SarosSessionTest {
         return mock;
     }
 
-    @Test
-    public void testCreateSarosSession() {
+    private MutablePicoContainer container;
+
+    @Before
+    public void setUp() {
+
         PicoBuilder picoBuilder = new PicoBuilder(new CompositeInjection(
             new ConstructorInjection(), new AnnotatedFieldInjection()))
             .withCaching().withLifecycle();
-        final MutablePicoContainer container = picoBuilder.build();
-        container.start();
+
+        container = picoBuilder.build();
 
         IPreferenceStore store = new MemoryPreferenceStore();
         PreferenceInitializer.setPreferences(store);
@@ -128,10 +135,6 @@ public class SarosSessionTest {
         container.addComponent(Saros.class, createSarosMock(store));
         container.addComponent(DataTransferManager.class,
             createDataTransferManagerMock());
-
-        List<Object> editorListeners = new LinkedList<Object>();
-        container.addComponent(EditorManager.class,
-            StatisticCollectorTest.createEditorManagerMock(editorListeners));
 
         // Mocks that stay in the replay state
         container.addComponent(ProjectNegotiationObservable.class,
@@ -156,12 +159,30 @@ public class SarosSessionTest {
         // Adding the real class here.
 
         container.addComponent(store);
-
+        container.addComponent(NonUISynchronizer.class);
         container.addComponent(DispatchThreadContext.class);
         container.addComponent(SessionIDObservable.class);
         container.addComponent(FeedbackManager.class);
         container.addComponent(FileReplacementInProgressObservable.class);
         container.addComponent(JDTFacade.class);
+        container.addComponent(ActivitiesHandler.class);
+    }
+
+    @After
+    public void tearDown() {
+
+        container.stop();
+        container.dispose();
+    }
+
+    @Test
+    public void testCreateSarosSession() {
+
+        List<Object> editorListeners = new LinkedList<Object>();
+        container.addComponent(EditorManager.class,
+            StatisticCollectorTest.createEditorManagerMock(editorListeners));
+
+        container.start();
 
         ISarosContext context = EasyMock.createMock(ISarosContext.class);
         context.initComponent(EasyMock.isA(Object.class));

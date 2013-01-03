@@ -27,7 +27,6 @@ import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
 import de.fu_berlin.inf.dpp.project.AbstractActivityProvider;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
-import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 import de.fu_berlin.inf.dpp.util.AutoHashMap;
 import de.fu_berlin.inf.dpp.util.Function;
 import de.fu_berlin.inf.dpp.util.NamedThreadFactory;
@@ -169,15 +168,12 @@ public class PingPongCentral extends AbstractActivityProvider implements
             public void run() {
                 if (!sendPings)
                     return;
-                SWTUtils.runSafeSWTSync(log, new Runnable() {
-                    @Override
-                    public void run() {
-                        if (log.isDebugEnabled()) {
-                            log.debug(toString());
-                        }
-                        sendPings();
-                    }
-                });
+
+                if (log.isDebugEnabled())
+                    log.debug(toString());
+
+                sendPings();
+
             }
         }, 10, 10, TimeUnit.SECONDS));
     }

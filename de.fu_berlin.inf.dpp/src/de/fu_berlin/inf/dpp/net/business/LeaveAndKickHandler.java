@@ -15,8 +15,9 @@ import de.fu_berlin.inf.dpp.project.AbstractSarosSessionListener;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ISarosSessionListener;
 import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
-import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
+import de.fu_berlin.inf.dpp.synchronize.UISynchronizer;
 import de.fu_berlin.inf.dpp.ui.views.SarosView;
+import de.fu_berlin.inf.dpp.util.Utils;
 
 /**
  * Business logic for handling Leave Message
@@ -29,6 +30,8 @@ public class LeaveAndKickHandler {
 
     private static final Logger log = Logger
         .getLogger(LeaveAndKickHandler.class.getName());
+
+    UISynchronizer synchronizer;
 
     private ISarosSessionManager sessionManager;
 
@@ -75,13 +78,15 @@ public class LeaveAndKickHandler {
     public LeaveAndKickHandler(IReceiver receiver,
         SarosLeaveExtension.Provider provider,
         ISarosSessionManager sessionManager,
-        SessionIDObservable sessionIDObservable) {
+        SessionIDObservable sessionIDObservable, UISynchronizer synchronizer) {
 
         this.provider = provider;
         this.receiver = receiver;
 
         this.sessionManager = sessionManager;
         this.sessionIDObservable = sessionIDObservable;
+
+        this.synchronizer = synchronizer;
 
         this.sessionManager.addSarosSessionListener(sessionListener);
     }
@@ -134,14 +139,13 @@ public class LeaveAndKickHandler {
                 "Session was closed by inviter " + user.getHumanReadableName()
                     + ".");
         } else {
-            // Client
-            SWTUtils.runSafeSWTSync(log, new Runnable() {
+            synchronizer.asyncExec(Utils.wrapSafe(log, new Runnable() {
                 @Override
                 public void run() {
                     // FIXME see above...
                     sarosSession.removeUser(user);
                 }
-            });
+            }));
         }
     }
 }
