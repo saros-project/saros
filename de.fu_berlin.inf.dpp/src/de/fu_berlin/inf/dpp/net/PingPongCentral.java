@@ -10,13 +10,13 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.apache.log4j.Logger;
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.joda.time.DateTime;
 import org.joda.time.Duration;
 import org.picocontainer.Startable;
 
-import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.activities.business.AbstractActivityReceiver;
 import de.fu_berlin.inf.dpp.activities.business.IActivity;
@@ -39,6 +39,10 @@ public class PingPongCentral extends AbstractActivityProvider implements
     private static final Logger log = Logger.getLogger(PingPongCentral.class);
 
     protected final ISarosSession sarosSession;
+
+    protected final IPreferenceStore preferenceStore;
+
+    protected final PreferenceUtils preferenceUtil;
 
     protected boolean sendPings = false;
 
@@ -147,6 +151,8 @@ public class PingPongCentral extends AbstractActivityProvider implements
 
     @Override
     public void stop() {
+        preferenceStore.removePropertyChangeListener(propertyListener);
+
         sarosSession.removeActivityProvider(this);
 
         ScheduledFuture<?> pingPongFuture = pingPongHandle.getAndSet(null);
@@ -163,6 +169,12 @@ public class PingPongCentral extends AbstractActivityProvider implements
     @Override
     public void start() {
         sarosSession.addActivityProvider(this);
+        sendPings = preferenceUtil.isPingPongActivated();
+        /*
+         * register a property change listeners to keep sendPings up-to-date
+         */
+        preferenceStore.addPropertyChangeListener(propertyListener);
+
         pingPongHandle.set(scheduler.scheduleAtFixedRate(new Runnable() {
             @Override
             public void run() {
@@ -178,15 +190,12 @@ public class PingPongCentral extends AbstractActivityProvider implements
         }, 10, 10, TimeUnit.SECONDS));
     }
 
-    public PingPongCentral(Saros saros, ISarosSession session,
-        PreferenceUtils preferenceUtils) {
+    public PingPongCentral(ISarosSession session,
+        IPreferenceStore preferenceStore, PreferenceUtils preferenceUtil) {
 
+        this.preferenceUtil = preferenceUtil;
         this.sarosSession = session;
-        this.sendPings = preferenceUtils.isPingPongActivated();
-        /*
-         * register a property change listeners to keep sendPings up-to-date
-         */
-        saros.getPreferenceStore().addPropertyChangeListener(propertyListener);
+        this.preferenceStore = preferenceStore;
     }
 
     protected IPropertyChangeListener propertyListener = new IPropertyChangeListener() {
