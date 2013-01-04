@@ -318,6 +318,43 @@ public class DataTransferManagerTest {
     }
 
     @Test
+    public void testClearForceFallback() throws Exception {
+        ITransport mainTransport = new Transport(NetTransferMode.SOCKS5_DIRECT);
+        ITransport fallbackTransport = new Transport(NetTransferMode.IBB);
+
+        DataTransferManager dtm = new DataTransferManager(sarosNetStub, null,
+            mainTransport, fallbackTransport, null, null);
+
+        connectionListener.getValue().connectionStateChanged(connectionMock,
+            ConnectionState.CONNECTED);
+
+        dtm.setFallbackConnectionMode(new JID("fallback@emergency"));
+
+        assertEquals("fallback mode change failed", NetTransferMode.IBB, dtm
+            .getConnection(new JID("fallback@emergency")).getMode());
+
+        dtm.closeConnection(new JID("fallback@emergency"));
+
+        assertEquals(
+            "fallback mode was not cleared after closing the connection",
+            NetTransferMode.SOCKS5_DIRECT,
+            dtm.getConnection(new JID("fallback@emergency")).getMode());
+
+        dtm.setFallbackConnectionMode(new JID("fallback@emergency"));
+
+        connectionListener.getValue().connectionStateChanged(connectionMock,
+            ConnectionState.NOT_CONNECTED);
+
+        connectionListener.getValue().connectionStateChanged(connectionMock,
+            ConnectionState.CONNECTED);
+
+        assertEquals(
+            "fallback mode was not cleared after XMPP connection reset",
+            NetTransferMode.SOCKS5_DIRECT,
+            dtm.getConnection(new JID("fallback@emergency")).getMode());
+    }
+
+    @Test
     public void testConcurrentConnectionToTheSameJID() throws Exception {
 
         final AtomicReference<IByteStreamConnection> connection0 = new AtomicReference<IByteStreamConnection>();

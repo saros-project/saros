@@ -354,7 +354,9 @@ public class DataTransferManager implements IConnectionListener,
      *            {@link IByteStreamConnection}
      */
     public boolean closeConnection(JID peer) {
+        peersForIBB.remove(peer);
         IByteStreamConnection c = connections.remove(peer);
+
         if (c == null)
             return false;
 
@@ -380,16 +382,14 @@ public class DataTransferManager implements IConnectionListener,
 
     @Override
     public void connectionClosed(JID peer, IByteStreamConnection connection) {
-        connections.remove(peer);
+        closeConnection(peer);
         transferModeDispatch.connectionChanged(peer, null);
     }
 
     public NetTransferMode getTransferMode(JID jid) {
         IByteStreamConnection connection = connections.get(jid);
-        if (connection == null)
-            return NetTransferMode.NONE;
 
-        return connection.getMode();
+        return connection == null ? NetTransferMode.NONE : connection.getMode();
     }
 
     private void initTransports() {
@@ -455,6 +455,7 @@ public class DataTransferManager implements IConnectionListener,
 
         connections.clear();
         transferModeDispatch.clear();
+        peersForIBB.clear();
 
         connection = null;
     }
