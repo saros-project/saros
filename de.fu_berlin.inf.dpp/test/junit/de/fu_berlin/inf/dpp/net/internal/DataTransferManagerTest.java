@@ -354,8 +354,8 @@ public class DataTransferManagerTest {
             dtm.getConnection(new JID("fallback@emergency")).getMode());
     }
 
-    @Test
-    public void testConcurrentConnectionToTheSameJID() throws Exception {
+    @Test(timeout = 30000)
+    public void testConcurrentConnections() throws Exception {
 
         final AtomicReference<IByteStreamConnection> connection0 = new AtomicReference<IByteStreamConnection>();
         final AtomicReference<IByteStreamConnection> connection1 = new AtomicReference<IByteStreamConnection>();
@@ -366,8 +366,10 @@ public class DataTransferManagerTest {
         ITransport mainTransport = new BlockableTransport(
             NetTransferMode.SOCKS5_DIRECT, connectAcknowledge, connectProceed);
 
+        ITransport fallbackTransport = new Transport(NetTransferMode.IBB);
+
         final DataTransferManager dtm = new DataTransferManager(sarosNetStub,
-            null, mainTransport, null, null, null);
+            null, mainTransport, fallbackTransport, null, null);
 
         connectionListener.getValue().connectionStateChanged(connectionMock,
             ConnectionState.CONNECTED);
@@ -385,6 +387,18 @@ public class DataTransferManagerTest {
                 connection1.set(dtm.getConnection(new JID("foo@bar.com")));
             }
         });
+
+        TestThread connectThread2 = new TestThread(new TestThread.Runnable() {
+            @Override
+            public void run() throws Exception {
+                dtm.getConnection(new JID("foo@bar.example"));
+            }
+        });
+
+        // connect here so connectThread2 will not block
+        // use fallback to not trigger the blocked transport method
+        dtm.setFallbackConnectionMode(new JID("foo@bar.example"));
+        dtm.getConnection(new JID("foo@bar.example"));
 
         connectThread0.start();
 
@@ -409,7 +423,16 @@ public class DataTransferManagerTest {
             fail("second connection request must be blocked");
         }
 
-        connectProceed.countDown();
+        // This MUST not be blocked
+        connectThread2.start();
+        connectThread2.join(10000);
+
+        try {
+            connectThread2.verify();
+        } finally {
+            // release lock so the other 2 thread will not idle forever
+            connectProceed.countDown();
+        }
 
         connectThread0.join(10000);
         connectThread1.join(10000);

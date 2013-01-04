@@ -293,22 +293,20 @@ public class DataTransferManager implements IConnectionListener {
     public IByteStreamConnection getConnection(JID recipient)
         throws IOException {
 
-        synchronized (connectLock) {
-            IByteStreamConnection connection = connections.get(recipient);
+        IByteStreamConnection connection = connections.get(recipient);
 
-            if (connection != null) {
-                log.trace("Reuse bytestream connection " + connection.getMode());
-                return connection;
-            }
+        if (connection != null) {
+            log.trace("Reuse bytestream connection " + connection.getMode());
+            return connection;
+        }
 
-            try {
-                return connect(recipient);
-            } catch (InterruptedException e) {
-                IOException io = new InterruptedIOException(
-                    "connecting cancelled: " + e.getMessage());
-                io.initCause(e);
-                throw io;
-            }
+        try {
+            return connect(recipient);
+        } catch (InterruptedException e) {
+            IOException io = new InterruptedIOException(
+                "connecting cancelled: " + e.getMessage());
+            io.initCause(e);
+            throw io;
         }
     }
 
@@ -316,7 +314,10 @@ public class DataTransferManager implements IConnectionListener {
         InterruptedException {
 
         synchronized (connectLock) {
-            IByteStreamConnection connection = null;
+            IByteStreamConnection connection = connections.get(recipient);
+
+            if (connection != null)
+                return connection;
 
             ArrayList<ITransport> transportModesToUse = new ArrayList<ITransport>(
                 transports);
