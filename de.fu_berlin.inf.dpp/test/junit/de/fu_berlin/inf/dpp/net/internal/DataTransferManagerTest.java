@@ -1,10 +1,15 @@
 package de.fu_berlin.inf.dpp.net.internal;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertSame;
+import static org.junit.Assert.fail;
 
 import java.io.IOException;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
 
 import org.easymock.Capture;
 import org.easymock.EasyMock;
@@ -22,6 +27,7 @@ import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
 import de.fu_berlin.inf.dpp.preferences.PreferenceInitializer;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
 import de.fu_berlin.inf.dpp.test.util.MemoryPreferenceStore;
+import de.fu_berlin.inf.dpp.test.util.TestThread;
 
 public class DataTransferManagerTest {
 
@@ -60,6 +66,28 @@ public class DataTransferManagerTest {
             return mode;
         }
 
+    }
+
+    private static class BlockableTransport extends Transport {
+
+        private CountDownLatch acknowledge;
+
+        private CountDownLatch proceed;
+
+        public BlockableTransport(NetTransferMode mode,
+            CountDownLatch acknowledge, CountDownLatch proceed) {
+            super(mode);
+            this.acknowledge = acknowledge;
+            this.proceed = proceed;
+        }
+
+        @Override
+        public IByteStreamConnection connect(JID peer) throws IOException,
+            InterruptedException {
+            acknowledge.countDown();
+            proceed.await();
+            return super.connect(peer);
+        }
     }
 
     private static class ChannelConnection implements IByteStreamConnection {
@@ -287,5 +315,77 @@ public class DataTransferManagerTest {
 
         assertEquals("fallback mode change failed", NetTransferMode.IBB, dtm
             .getConnection(new JID("fallback@emergency")).getMode());
+    }
+
+    @Test
+    public void testConcurrentConnectionToTheSameJID() throws Exception {
+
+        final AtomicReference<IByteStreamConnection> connection0 = new AtomicReference<IByteStreamConnection>();
+        final AtomicReference<IByteStreamConnection> connection1 = new AtomicReference<IByteStreamConnection>();
+
+        final CountDownLatch connectAcknowledge = new CountDownLatch(1);
+        final CountDownLatch connectProceed = new CountDownLatch(1);
+
+        ITransport mainTransport = new BlockableTransport(
+            NetTransferMode.SOCKS5_DIRECT, connectAcknowledge, connectProceed);
+
+        final DataTransferManager dtm = new DataTransferManager(sarosNetStub,
+            null, mainTransport, null, null, null);
+
+        connectionListener.getValue().connectionStateChanged(connectionMock,
+            ConnectionState.CONNECTED);
+
+        TestThread connectThread0 = new TestThread(new TestThread.Runnable() {
+            @Override
+            public void run() throws Exception {
+                connection0.set(dtm.getConnection(new JID("foo@bar.com")));
+            }
+        });
+
+        TestThread connectThread1 = new TestThread(new TestThread.Runnable() {
+            @Override
+            public void run() throws Exception {
+                connection1.set(dtm.getConnection(new JID("foo@bar.com")));
+            }
+        });
+
+        connectThread0.start();
+
+        if (!connectAcknowledge.await(10000, TimeUnit.MICROSECONDS)) {
+            connectThread0.interrupt();
+            fail("transport connect method was not called");
+        }
+
+        long currentTime = System.currentTimeMillis();
+
+        connectThread1.start();
+
+        // poll thread status
+        while (connectThread1.getState() != Thread.State.BLOCKED
+            && (System.currentTimeMillis() - currentTime < 10000))
+            Thread.sleep(100);
+
+        if (connectThread1.getState() != Thread.State.BLOCKED) {
+            connectProceed.countDown();
+            connectThread0.interrupt();
+            connectThread1.interrupt();
+            fail("second connection request must be blocked");
+        }
+
+        connectProceed.countDown();
+
+        connectThread0.join(10000);
+        connectThread1.join(10000);
+
+        connectThread0.verify();
+        connectThread1.verify();
+
+        assertNotNull(connection0.get());
+        assertNotNull(connection1.get());
+
+        assertSame(
+            "connection caching failed during multiple connection requests",
+            connection0.get(), connection1.get());
+
     }
 }

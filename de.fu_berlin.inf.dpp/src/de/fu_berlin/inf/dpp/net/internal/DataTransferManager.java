@@ -29,7 +29,6 @@ import de.fu_berlin.inf.dpp.net.NetTransferMode;
 import de.fu_berlin.inf.dpp.net.SarosNet;
 import de.fu_berlin.inf.dpp.net.upnp.IUPnPService;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
-import de.fu_berlin.inf.dpp.util.StopWatch;
 import de.fu_berlin.inf.dpp.util.Utils;
 
 /**
@@ -78,6 +77,7 @@ public class DataTransferManager implements IConnectionListener,
     private Map<JID, IByteStreamConnection> connections = Collections
         .synchronizedMap(new HashMap<JID, IByteStreamConnection>());
 
+    private final Object connectLock = new Object();
     /**
      * Collection of {@link JID}s, flagged to prefer IBB transfer mode
      */
@@ -202,8 +202,6 @@ public class DataTransferManager implements IConnectionListener,
     public void sendData(TransferDescription transferData, byte[] payload)
         throws IOException {
 
-        // Think about how to synchronize this, that multiple people can connect
-        // at the same time.
         log.trace("sending data ... from " + currentLocalJID + " to "
             + transferData.getRecipient());
 
@@ -232,20 +230,17 @@ public class DataTransferManager implements IConnectionListener,
             if (!sendPacket)
                 return;
 
-            StopWatch watch = new StopWatch().start();
-
             long sizeUncompressed = payload.length;
 
-            if (transferData.compressContent()) {
+            if (transferData.compressContent())
                 payload = Utils.deflate(payload, null);
-            }
 
+            long transferStartTime = System.currentTimeMillis();
             connection.send(transferData, payload);
 
-            watch.stop();
             transferModeDispatch.transferFinished(recipient,
                 connection.getMode(), false, payload.length, sizeUncompressed,
-                watch.getTime());
+                System.currentTimeMillis() - transferStartTime);
         } catch (IOException e) {
             log.error(Utils.prefix(transferData.getRecipient())
                 + "Failed to send " + transferData + " with "
@@ -273,71 +268,78 @@ public class DataTransferManager implements IConnectionListener,
     public IByteStreamConnection getConnection(JID recipient)
         throws IOException {
 
-        IByteStreamConnection connection = connections.get(recipient);
+        synchronized (connectLock) {
+            IByteStreamConnection connection = connections.get(recipient);
 
-        if (connection != null) {
-            log.trace("Reuse bytestream connection " + connection.getMode());
-            return connection;
-        }
+            if (connection != null) {
+                log.trace("Reuse bytestream connection " + connection.getMode());
+                return connection;
+            }
 
-        try {
-            return connect(recipient);
-        } catch (InterruptedException e) {
-            IOException io = new InterruptedIOException(
-                "connecting cancelled: " + e.getMessage());
-            io.initCause(e);
-            throw io;
+            try {
+                return connect(recipient);
+            } catch (InterruptedException e) {
+                IOException io = new InterruptedIOException(
+                    "connecting cancelled: " + e.getMessage());
+                io.initCause(e);
+                throw io;
+            }
         }
     }
 
     public IByteStreamConnection connect(JID recipient) throws IOException,
         InterruptedException {
 
-        IByteStreamConnection connection = null;
+        synchronized (connectLock) {
+            IByteStreamConnection connection = null;
 
-        ArrayList<ITransport> transportModesToUse = new ArrayList<ITransport>(
-            transports);
+            ArrayList<ITransport> transportModesToUse = new ArrayList<ITransport>(
+                transports);
 
-        // Move IBB to front for peers preferring IBB
-        synchronized (peersForIBB) {
-            if (fallbackTransport != null && peersForIBB.contains(recipient)) {
-                int ibbIndex = transportModesToUse.indexOf(fallbackTransport);
-                if (ibbIndex != -1)
-                    transportModesToUse.remove(ibbIndex);
-                transportModesToUse.add(0, fallbackTransport);
+            // Move IBB to front for peers preferring IBB
+            synchronized (peersForIBB) {
+                if (fallbackTransport != null
+                    && peersForIBB.contains(recipient)) {
+                    int ibbIndex = transportModesToUse
+                        .indexOf(fallbackTransport);
+                    if (ibbIndex != -1)
+                        transportModesToUse.remove(ibbIndex);
+                    transportModesToUse.add(0, fallbackTransport);
+                }
             }
-        }
 
-        log.debug("Currently used IP addresses for Socks5Proxy: "
-            + Arrays.toString(Socks5Proxy.getSocks5Proxy().getLocalAddresses()
-                .toArray()));
+            log.debug("Currently used IP addresses for Socks5Proxy: "
+                + Arrays.toString(Socks5Proxy.getSocks5Proxy()
+                    .getLocalAddresses().toArray()));
 
-        for (ITransport transport : transportModesToUse) {
-            log.info("Try to establish a bytestream connection to "
-                + recipient.getBase() + " from " + currentLocalJID + " using "
-                + transport.getDefaultNetTransferMode());
-            try {
-                connection = transport.connect(recipient);
-            } catch (IOException e) {
-                log.error(Utils.prefix(recipient) + "Failed to connect using "
-                    + transport.toString() + ":",
-                    e.getCause() == null ? e : e.getCause());
-            } catch (InterruptedException e) {
-                throw e;
-            } catch (Exception e) {
-                log.error(Utils.prefix(recipient) + "Failed to connect using "
-                    + transport.toString() + " because of an unknown error:", e);
+            for (ITransport transport : transportModesToUse) {
+                log.info("Try to establish a bytestream connection to "
+                    + recipient.getBase() + " from " + currentLocalJID
+                    + " using " + transport.getDefaultNetTransferMode());
+                try {
+                    connection = transport.connect(recipient);
+                } catch (IOException e) {
+                    log.error(Utils.prefix(recipient)
+                        + "Failed to connect using " + transport.toString()
+                        + ":", e.getCause() == null ? e : e.getCause());
+                } catch (InterruptedException e) {
+                    throw e;
+                } catch (Exception e) {
+                    log.error(Utils.prefix(recipient)
+                        + "Failed to connect using " + transport.toString()
+                        + " because of an unknown error:", e);
+                }
+                if (connection != null)
+                    break;
             }
-            if (connection != null)
-                break;
-        }
 
-        if (connection == null) {
-            throw new IOException("could not connect to: "
-                + Utils.prefix(recipient));
-        } else
-            connectionChanged(recipient, connection, false);
-        return connection;
+            if (connection == null) {
+                throw new IOException("could not connect to: "
+                    + Utils.prefix(recipient));
+            } else
+                connectionChanged(recipient, connection, false);
+            return connection;
+        }
     }
 
     public TransferModeDispatch getTransferModeDispatch() {
@@ -362,22 +364,22 @@ public class DataTransferManager implements IConnectionListener,
 
     @Override
     public synchronized void connectionChanged(JID peer,
-        IByteStreamConnection connection2, boolean incomingRequest) {
+        IByteStreamConnection connection, boolean incomingRequest) {
         // TODO: remove these lines
         IByteStreamConnection old = connections.get(peer);
         assert (old == null || !old.isConnected());
 
-        log.debug("Bytestream connection changed " + connection2.getMode());
-        connections.put(peer, connection2);
-        transferModeDispatch.connectionChanged(peer, connection2);
+        log.debug("Bytestream connection changed " + connection.getMode());
+        connections.put(peer, connection);
+        transferModeDispatch.connectionChanged(peer, connection);
 
-        if (connection2.getMode() == NetTransferMode.IBB && incomingRequest
+        if (connection.getMode() == NetTransferMode.IBB && incomingRequest
             && upnpService != null)
             upnpService.checkAndInformAboutUPnP();
     }
 
     @Override
-    public void connectionClosed(JID peer, IByteStreamConnection connection2) {
+    public void connectionClosed(JID peer, IByteStreamConnection connection) {
         connections.remove(peer);
         transferModeDispatch.connectionChanged(peer, null);
     }
@@ -386,6 +388,7 @@ public class DataTransferManager implements IConnectionListener,
         IByteStreamConnection connection = connections.get(jid);
         if (connection == null)
             return NetTransferMode.NONE;
+
         return connection.getMode();
     }
 
@@ -407,7 +410,7 @@ public class DataTransferManager implements IConnectionListener,
     /**
      * Sets up the transports for the given XMPPConnection
      */
-    protected void prepareConnection(final Connection connection) {
+    private void prepareConnection(final Connection connection) {
         assert (this.connection == null);
 
         initTransports();
@@ -423,7 +426,7 @@ public class DataTransferManager implements IConnectionListener,
         }
     }
 
-    protected void disposeConnection() {
+    private void disposeConnection() {
 
         for (ITransport transport : transports)
             transport.disposeXMPPConnection();
@@ -465,7 +468,7 @@ public class DataTransferManager implements IConnectionListener,
             disposeConnection();
     }
 
-    /**
+    /*
      * ------------------------------------------------------------------------
      * Support for monitoring ongoing transfers
      * ------------------------------------------------------------------------
