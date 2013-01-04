@@ -39,9 +39,7 @@ import de.fu_berlin.inf.dpp.util.Utils;
  * @author jurke
  */
 @Component(module = "net")
-public class DataTransferManager implements IConnectionListener,
-    IByteStreamConnectionListener {
-
+public class DataTransferManager implements IConnectionListener {
     private static final Logger log = Logger
         .getLogger(DataTransferManager.class);
     /**
@@ -72,7 +70,7 @@ public class DataTransferManager implements IConnectionListener,
 
     private PreferenceUtils preferenceUtils;
 
-    private ArrayList<ITransport> transports = null;
+    private List<ITransport> transports = null;
 
     private Map<JID, IByteStreamConnection> connections = Collections
         .synchronizedMap(new HashMap<JID, IByteStreamConnection>());
@@ -82,6 +80,63 @@ public class DataTransferManager implements IConnectionListener,
      * Collection of {@link JID}s, flagged to prefer IBB transfer mode
      */
     private Collection<JID> peersForIBB = new ArrayList<JID>();
+
+    private final IByteStreamConnectionListener byteStreamConnectionListener = new IByteStreamConnectionListener() {
+
+        /**
+         * Adds an incoming transfer.
+         * 
+         * @param transferObjectDescription
+         *            An IncomingTransferObject that has the TransferDescription
+         *            as content to provide information of the incoming transfer
+         *            to upper layers.
+         */
+        @Override
+        public void addIncomingTransferObject(
+            final IncomingTransferObject transferObjectDescription) {
+
+            final TransferDescription description = transferObjectDescription
+                .getTransferDescription();
+
+            final IncomingTransferObject transferObjectData = new LoggingTransferObject(
+                transferObjectDescription);
+
+            boolean dispatchPacket = true;
+
+            for (IPacketInterceptor packetInterceptor : packetInterceptors)
+                dispatchPacket &= packetInterceptor
+                    .receivedPacket(transferObjectDescription);
+
+            if (!dispatchPacket)
+                return;
+
+            receiver.processIncomingTransferObject(description,
+                transferObjectData);
+        }
+
+        @Override
+        public synchronized void connectionChanged(JID peer,
+            IByteStreamConnection connection, boolean incomingRequest) {
+            // TODO: remove these lines
+            IByteStreamConnection old = connections.get(peer);
+            assert (old == null || !old.isConnected());
+
+            log.debug("Bytestream connection changed " + connection.getMode());
+            connections.put(peer, connection);
+            transferModeDispatch.connectionChanged(peer, connection);
+
+            if (connection.getMode() == NetTransferMode.IBB && incomingRequest
+                && upnpService != null)
+                upnpService.checkAndInformAboutUPnP();
+        }
+
+        @Override
+        public void connectionClosed(JID peer, IByteStreamConnection connection) {
+            closeConnection(peer);
+            transferModeDispatch.connectionChanged(peer, null);
+        }
+
+    };
 
     public DataTransferManager(SarosNet sarosNet, IReceiver receiver,
         @Nullable @Socks5Transport ITransport mainTransport,
@@ -161,36 +216,6 @@ public class DataTransferManager implements IConnectionListener,
         public long getUncompressedSize() {
             return transferObject.getUncompressedSize();
         }
-    }
-
-    /**
-     * Adds an incoming transfer.
-     * 
-     * @param transferObjectDescription
-     *            An IncomingTransferObject that has the TransferDescription as
-     *            content to provide information of the incoming transfer to
-     *            upper layers.
-     */
-    @Override
-    public void addIncomingTransferObject(
-        final IncomingTransferObject transferObjectDescription) {
-
-        final TransferDescription description = transferObjectDescription
-            .getTransferDescription();
-
-        final IncomingTransferObject transferObjectData = new LoggingTransferObject(
-            transferObjectDescription);
-
-        boolean dispatchPacket = true;
-
-        for (IPacketInterceptor packetInterceptor : packetInterceptors)
-            dispatchPacket &= packetInterceptor
-                .receivedPacket(transferObjectDescription);
-
-        if (!dispatchPacket)
-            return;
-
-        receiver.processIncomingTransferObject(description, transferObjectData);
     }
 
     /**
@@ -318,6 +343,7 @@ public class DataTransferManager implements IConnectionListener,
                     + " using " + transport.getDefaultNetTransferMode());
                 try {
                     connection = transport.connect(recipient);
+                    break;
                 } catch (IOException e) {
                     log.error(Utils.prefix(recipient)
                         + "Failed to connect using " + transport.toString()
@@ -329,16 +355,17 @@ public class DataTransferManager implements IConnectionListener,
                         + "Failed to connect using " + transport.toString()
                         + " because of an unknown error:", e);
                 }
-                if (connection != null)
-                    break;
             }
 
-            if (connection == null) {
-                throw new IOException("could not connect to: "
-                    + Utils.prefix(recipient));
-            } else
-                connectionChanged(recipient, connection, false);
-            return connection;
+            if (connection != null) {
+                byteStreamConnectionListener.connectionChanged(recipient,
+                    connection, false);
+
+                return connection;
+            }
+
+            throw new IOException("could not connect to: "
+                + Utils.prefix(recipient));
         }
     }
 
@@ -364,28 +391,6 @@ public class DataTransferManager implements IConnectionListener,
         return true;
     }
 
-    @Override
-    public synchronized void connectionChanged(JID peer,
-        IByteStreamConnection connection, boolean incomingRequest) {
-        // TODO: remove these lines
-        IByteStreamConnection old = connections.get(peer);
-        assert (old == null || !old.isConnected());
-
-        log.debug("Bytestream connection changed " + connection.getMode());
-        connections.put(peer, connection);
-        transferModeDispatch.connectionChanged(peer, connection);
-
-        if (connection.getMode() == NetTransferMode.IBB && incomingRequest
-            && upnpService != null)
-            upnpService.checkAndInformAboutUPnP();
-    }
-
-    @Override
-    public void connectionClosed(JID peer, IByteStreamConnection connection) {
-        closeConnection(peer);
-        transferModeDispatch.connectionChanged(peer, null);
-    }
-
     public NetTransferMode getTransferMode(JID jid) {
         IByteStreamConnection connection = connections.get(jid);
 
@@ -398,7 +403,7 @@ public class DataTransferManager implements IConnectionListener,
         if (preferenceUtils != null)
             forceIBBOnly = preferenceUtils.forceFileTranserByChat();
 
-        transports = new ArrayList<ITransport>();
+        transports = new CopyOnWriteArrayList<ITransport>();
 
         if (!forceIBBOnly && mainTransport != null)
             transports.add(0, mainTransport);
@@ -422,7 +427,8 @@ public class DataTransferManager implements IConnectionListener,
         this.currentLocalJID = new JID(connection.getUser());
 
         for (ITransport transport : transports) {
-            transport.prepareXMPPConnection(connection, this);
+            transport.prepareXMPPConnection(connection,
+                byteStreamConnectionListener);
         }
     }
 
@@ -588,11 +594,26 @@ public class DataTransferManager implements IConnectionListener,
         return isTransfering == false;
     }
 
+    // TODO: move to ITransmitter
     public void addPacketInterceptor(IPacketInterceptor interceptor) {
         packetInterceptors.addIfAbsent(interceptor);
     }
 
+    // TODO: move to IReceiver
     public void removePacketInterceptor(IPacketInterceptor interceptor) {
         packetInterceptors.remove(interceptor);
+    }
+
+    /**
+     * Left over and <b>MUST</b> only used by the STF
+     * 
+     * @deprecated
+     * @param incomingTransferObject
+     */
+    @Deprecated
+    public void addIncomingTransferObject(
+        IncomingTransferObject incomingTransferObject) {
+        byteStreamConnectionListener
+            .addIncomingTransferObject(incomingTransferObject);
     }
 }
