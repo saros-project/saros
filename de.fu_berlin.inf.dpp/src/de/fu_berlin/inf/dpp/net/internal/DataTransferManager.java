@@ -7,8 +7,10 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.apache.log4j.Logger;
@@ -35,6 +37,7 @@ import de.fu_berlin.inf.dpp.util.Utils;
  * This class is responsible for handling all transfers of binary data. It
  * maintains a map of established connections and tries to reuse them.
  * 
+ * @author srossbach
  * @author coezbek
  * @author jurke
  */
@@ -45,14 +48,14 @@ public class DataTransferManager implements IConnectionListener {
     /**
      * Maps JIDs to a list of currently running incoming transfers - receptions
      */
-    private Map<JID, List<TransferDescription>> incomingTransfers = new HashMap<JID, List<TransferDescription>>();
+    private final Map<JID, List<TransferDescription>> incomingTransfers = new HashMap<JID, List<TransferDescription>>();
 
     /**
      * Maps JIDs to the number of currently running, outgoing transfers - send
      */
-    private Map<JID, Integer> outgoingTransfers = new HashMap<JID, Integer>();
+    private final Map<JID, Integer> outgoingTransfers = new HashMap<JID, Integer>();
 
-    private TransferModeDispatch transferModeDispatch = new TransferModeDispatch();
+    private final TransferModeDispatch transferModeDispatch = new TransferModeDispatch();
 
     private CopyOnWriteArrayList<IPacketInterceptor> packetInterceptors = new CopyOnWriteArrayList<IPacketInterceptor>();
 
@@ -60,26 +63,28 @@ public class DataTransferManager implements IConnectionListener {
 
     private Connection connection;
 
-    private IReceiver receiver;
+    private final IReceiver receiver;
 
-    private IUPnPService upnpService;
+    private final IUPnPService upnpService;
 
-    private ITransport mainTransport;
+    private final ITransport mainTransport;
 
-    private ITransport fallbackTransport;
+    private final ITransport fallbackTransport;
 
-    private PreferenceUtils preferenceUtils;
+    private final PreferenceUtils preferenceUtils;
 
-    private List<ITransport> transports = null;
-
-    private Map<JID, IByteStreamConnection> connections = Collections
-        .synchronizedMap(new HashMap<JID, IByteStreamConnection>());
+    private final Map<JID, ConnectionHolder> connections = Collections
+        .synchronizedMap(new HashMap<JID, ConnectionHolder>());
 
     private final Object connectLock = new Object();
     /**
      * Collection of {@link JID}s, flagged to prefer IBB transfer mode
      */
-    private Collection<JID> peersForIBB = new ArrayList<JID>();
+    private final Collection<JID> peersForIBB = new ArrayList<JID>();
+
+    private final Set<JID> currentOutgoingConnectionEstablishments = new HashSet<JID>();
+
+    private final List<ITransport> availableTransports = new CopyOnWriteArrayList<ITransport>();
 
     private final IByteStreamConnectionListener byteStreamConnectionListener = new IByteStreamConnectionListener() {
 
@@ -115,14 +120,31 @@ public class DataTransferManager implements IConnectionListener {
         }
 
         @Override
-        public synchronized void connectionChanged(JID peer,
+        public void connectionChanged(JID peer,
             IByteStreamConnection connection, boolean incomingRequest) {
-            // TODO: remove these lines
-            IByteStreamConnection old = connections.get(peer);
-            assert (old == null || !old.isConnected());
 
-            log.debug("Bytestream connection changed " + connection.getMode());
-            connections.put(peer, connection);
+            synchronized (connections) {
+                log.debug("bytestream connection changed "
+                    + connection.getMode() + " [to: " + peer + "|inc: "
+                    + incomingRequest + "]");
+
+                ConnectionHolder holder = connections.get(peer);
+                if (holder == null) {
+                    holder = new ConnectionHolder();
+                    connections.put(peer, holder);
+                }
+
+                if (!incomingRequest) {
+                    IByteStreamConnection old = holder.out;
+                    assert (old == null || !old.isConnected());
+                    holder.out = connection;
+                } else {
+                    IByteStreamConnection old = holder.in;
+                    assert (old == null || !old.isConnected());
+                    holder.in = connection;
+                }
+            }
+
             transferModeDispatch.connectionChanged(peer, connection);
 
             if (connection.getMode() == NetTransferMode.IBB && incomingRequest
@@ -135,24 +157,7 @@ public class DataTransferManager implements IConnectionListener {
             closeConnection(peer);
             transferModeDispatch.connectionChanged(peer, null);
         }
-
     };
-
-    public DataTransferManager(SarosNet sarosNet, IReceiver receiver,
-        @Nullable @Socks5Transport ITransport mainTransport,
-        @Nullable @IBBTransport ITransport fallbackTransport,
-        @Nullable IUPnPService upnpService,
-        @Nullable PreferenceUtils preferenceUtils) {
-
-        this.receiver = receiver;
-        this.fallbackTransport = fallbackTransport;
-        this.mainTransport = mainTransport;
-        this.upnpService = upnpService;
-        this.preferenceUtils = preferenceUtils;
-        this.initTransports();
-
-        sarosNet.addListener(this);
-    }
 
     private final class LoggingTransferObject implements IncomingTransferObject {
 
@@ -218,6 +223,27 @@ public class DataTransferManager implements IConnectionListener {
         }
     }
 
+    private static class ConnectionHolder {
+        private IByteStreamConnection out;
+        private IByteStreamConnection in;
+    }
+
+    public DataTransferManager(SarosNet sarosNet, IReceiver receiver,
+        @Nullable @Socks5Transport ITransport mainTransport,
+        @Nullable @IBBTransport ITransport fallbackTransport,
+        @Nullable IUPnPService upnpService,
+        @Nullable PreferenceUtils preferenceUtils) {
+
+        this.receiver = receiver;
+        this.fallbackTransport = fallbackTransport;
+        this.mainTransport = mainTransport;
+        this.upnpService = upnpService;
+        this.preferenceUtils = preferenceUtils;
+        this.initTransports();
+
+        sarosNet.addListener(this);
+    }
+
     /**
      * Dispatch to the used {@link BinaryChannelConnection}.
      * 
@@ -233,7 +259,7 @@ public class DataTransferManager implements IConnectionListener {
         JID recipient = transferData.getRecipient();
         transferData.setSender(currentLocalJID);
 
-        IByteStreamConnection connection = getConnection(recipient);
+        IByteStreamConnection connection = connectInternal(recipient);
 
         synchronized (outgoingTransfers) {
             Integer currentSendingOperations = outgoingTransfers.get(recipient);
@@ -267,10 +293,10 @@ public class DataTransferManager implements IConnectionListener {
                 connection.getMode(), false, payload.length, sizeUncompressed,
                 System.currentTimeMillis() - transferStartTime);
         } catch (IOException e) {
-            log.error(Utils.prefix(transferData.getRecipient())
-                + "Failed to send " + transferData + " with "
-                + connection.getMode().toString() + ":" + e.getMessage() + ":",
-                e.getCause());
+            log.error(
+                Utils.prefix(transferData.getRecipient()) + "failed to send "
+                    + transferData + " with " + connection.getMode() + ":"
+                    + e.getMessage(), e);
             throw e;
         } finally {
             synchronized (outgoingTransfers) {
@@ -281,93 +307,8 @@ public class DataTransferManager implements IConnectionListener {
         }
     }
 
-    /**
-     * 
-     * @return a connection to the recipient. If no connection is established
-     *         yet, a new one will be created.
-     * @throws IOException
-     *             if establishing a new connection failed
-     * @throws InterruptedIOException
-     *             if establishing a new connection was interrupted
-     */
-    public IByteStreamConnection getConnection(JID recipient)
-        throws IOException {
-
-        IByteStreamConnection connection = connections.get(recipient);
-
-        if (connection != null) {
-            log.trace("Reuse bytestream connection " + connection.getMode());
-            return connection;
-        }
-
-        try {
-            return connect(recipient);
-        } catch (InterruptedException e) {
-            IOException io = new InterruptedIOException(
-                "connecting cancelled: " + e.getMessage());
-            io.initCause(e);
-            throw io;
-        }
-    }
-
-    public IByteStreamConnection connect(JID recipient) throws IOException,
-        InterruptedException {
-
-        synchronized (connectLock) {
-            IByteStreamConnection connection = connections.get(recipient);
-
-            if (connection != null)
-                return connection;
-
-            ArrayList<ITransport> transportModesToUse = new ArrayList<ITransport>(
-                transports);
-
-            // Move IBB to front for peers preferring IBB
-            synchronized (peersForIBB) {
-                if (fallbackTransport != null
-                    && peersForIBB.contains(recipient)) {
-                    int ibbIndex = transportModesToUse
-                        .indexOf(fallbackTransport);
-                    if (ibbIndex != -1)
-                        transportModesToUse.remove(ibbIndex);
-                    transportModesToUse.add(0, fallbackTransport);
-                }
-            }
-
-            log.debug("Currently used IP addresses for Socks5Proxy: "
-                + Arrays.toString(Socks5Proxy.getSocks5Proxy()
-                    .getLocalAddresses().toArray()));
-
-            for (ITransport transport : transportModesToUse) {
-                log.info("Try to establish a bytestream connection to "
-                    + recipient.getBase() + " from " + currentLocalJID
-                    + " using " + transport.getDefaultNetTransferMode());
-                try {
-                    connection = transport.connect(recipient);
-                    break;
-                } catch (IOException e) {
-                    log.error(Utils.prefix(recipient)
-                        + "Failed to connect using " + transport.toString()
-                        + ":", e.getCause() == null ? e : e.getCause());
-                } catch (InterruptedException e) {
-                    throw e;
-                } catch (Exception e) {
-                    log.error(Utils.prefix(recipient)
-                        + "Failed to connect using " + transport.toString()
-                        + " because of an unknown error:", e);
-                }
-            }
-
-            if (connection != null) {
-                byteStreamConnectionListener.connectionChanged(recipient,
-                    connection, false);
-
-                return connection;
-            }
-
-            throw new IOException("could not connect to: "
-                + Utils.prefix(recipient));
-        }
+    public void connect(JID recipient) throws IOException {
+        connectInternal(recipient);
     }
 
     public TransferModeDispatch getTransferModeDispatch() {
@@ -383,19 +324,114 @@ public class DataTransferManager implements IConnectionListener {
      */
     public boolean closeConnection(JID peer) {
         peersForIBB.remove(peer);
-        IByteStreamConnection c = connections.remove(peer);
+        ConnectionHolder holder = connections.remove(peer);
 
-        if (c == null)
+        if (holder == null)
             return false;
 
-        c.close();
-        return true;
+        if (holder.out != null)
+            holder.out.close();
+
+        if (holder.in != null)
+            holder.in.close();
+
+        return holder.out != null || holder.in != null;
     }
 
     public NetTransferMode getTransferMode(JID jid) {
-        IByteStreamConnection connection = connections.get(jid);
-
+        IByteStreamConnection connection = getCurrentConnection(jid);
         return connection == null ? NetTransferMode.NONE : connection.getMode();
+    }
+
+    private IByteStreamConnection connectInternal(JID recipient)
+        throws IOException {
+
+        IByteStreamConnection connection = null;
+
+        synchronized (currentOutgoingConnectionEstablishments) {
+            if (!currentOutgoingConnectionEstablishments.contains(recipient)) {
+                connection = getCurrentConnection(recipient);
+
+                if (connection == null)
+                    currentOutgoingConnectionEstablishments.add(recipient);
+            }
+
+            if (connection != null) {
+                log.trace("Reuse bytestream connection " + connection.getMode());
+                return connection;
+            }
+        }
+
+        synchronized (connectLock) {
+            try {
+
+                connection = getCurrentConnection(recipient);
+
+                if (connection != null)
+                    return connection;
+
+                ArrayList<ITransport> transportModesToUse = new ArrayList<ITransport>(
+                    availableTransports);
+
+                // Move IBB to front for peers preferring IBB
+                synchronized (peersForIBB) {
+                    if (fallbackTransport != null
+                        && peersForIBB.contains(recipient)) {
+                        int ibbIndex = transportModesToUse
+                            .indexOf(fallbackTransport);
+                        if (ibbIndex != -1)
+                            transportModesToUse.remove(ibbIndex);
+                        transportModesToUse.add(0, fallbackTransport);
+                    }
+                }
+
+                log.debug("currently used IP addresses for Socks5Proxy: "
+                    + Arrays.toString(Socks5Proxy.getSocks5Proxy()
+                        .getLocalAddresses().toArray()));
+
+                for (ITransport transport : transportModesToUse) {
+                    log.info("establishing connection to "
+                        + recipient.getBase() + " from " + currentLocalJID
+                        + " using " + transport.getDefaultNetTransferMode());
+                    try {
+                        connection = transport.connect(recipient);
+                        break;
+                    } catch (IOException e) {
+                        log.error(
+                            Utils.prefix(recipient)
+                                + " failed to connect using "
+                                + transport.toString() + ": " + e.getMessage(),
+                            e);
+                    } catch (InterruptedException e) {
+                        IOException io = new InterruptedIOException(
+                            "connecting cancelled: " + e.getMessage());
+                        io.initCause(e);
+                        throw io;
+                    } catch (Exception e) {
+                        log.error(
+                            Utils.prefix(recipient)
+                                + " failed to connect using "
+                                + transport.toString()
+                                + " because of an unknown error: "
+                                + e.getMessage(), e);
+                    }
+                }
+
+                if (connection != null) {
+                    byteStreamConnectionListener.connectionChanged(recipient,
+                        connection, false);
+
+                    return connection;
+                }
+
+                throw new IOException("could not connect to: "
+                    + Utils.prefix(recipient));
+            } finally {
+                synchronized (currentOutgoingConnectionEstablishments) {
+                    currentOutgoingConnectionEstablishments.remove(recipient);
+                }
+            }
+        }
     }
 
     private void initTransports() {
@@ -404,13 +440,17 @@ public class DataTransferManager implements IConnectionListener {
         if (preferenceUtils != null)
             forceIBBOnly = preferenceUtils.forceFileTranserByChat();
 
-        transports = new CopyOnWriteArrayList<ITransport>();
+        availableTransports.clear();
 
         if (!forceIBBOnly && mainTransport != null)
-            transports.add(0, mainTransport);
+            availableTransports.add(0, mainTransport);
 
         if (fallbackTransport != null)
-            transports.add(fallbackTransport);
+            availableTransports.add(fallbackTransport);
+
+        log.debug("used transport order for the current XMPP connection: "
+            + Arrays.toString(availableTransports.toArray()));
+
     }
 
     /**
@@ -421,13 +461,10 @@ public class DataTransferManager implements IConnectionListener {
 
         initTransports();
 
-        log.debug("Prepare bytestreams for XMPP connection. Used transport order: "
-            + Arrays.toString(transports.toArray()));
-
         this.connection = connection;
         this.currentLocalJID = new JID(connection.getUser());
 
-        for (ITransport transport : transports) {
+        for (ITransport transport : availableTransports) {
             transport.prepareXMPPConnection(connection,
                 byteStreamConnectionListener);
         }
@@ -435,29 +472,49 @@ public class DataTransferManager implements IConnectionListener {
 
     private void disposeConnection() {
 
-        for (ITransport transport : transports)
+        for (ITransport transport : availableTransports)
             transport.disposeXMPPConnection();
 
-        List<IByteStreamConnection> openConnections;
+        ArrayList<ConnectionHolder> currentConnections;
+
         synchronized (connections) {
-            openConnections = new ArrayList<IByteStreamConnection>(
-                connections.values());
+            currentConnections = new ArrayList<ConnectionHolder>();
+
+            for (ConnectionHolder holder : connections.values()) {
+                ConnectionHolder current = new ConnectionHolder();
+                current.out = holder.out;
+                current.in = holder.in;
+                currentConnections.add(current);
+            }
         }
-        for (IByteStreamConnection connection : openConnections) {
-            if (connection != null) {
-                // TODO switch to trace
-                log.debug("Close " + connection.getMode() + " connection");
-                try {
-                    connection.close();
-                } catch (RuntimeException e) {
-                    log.error("Error while closing " + connection.getMode()
-                        + " connection ", e);
-                }
+
+        /*
+         * Just close one side as this will trigger closeConnection via the
+         * listener which will close the other side too
+         */
+
+        for (ConnectionHolder holder : currentConnections) {
+            IByteStreamConnection connection;
+
+            if (holder.out != null)
+                connection = holder.out;
+            else
+                connection = holder.in;
+
+            assert (connection != null);
+
+            log.trace("closing " + connection.getMode() + " connection");
+
+            try {
+                connection.close();
+            } catch (Exception e) {
+                log.error("error closing " + connection.getMode()
+                    + " connection ", e);
             }
         }
 
         if (connections.size() > 0)
-            log.warn("Connections object shoud be empty at this points: "
+            log.warn("new connections were established during connection shutdown: "
                 + connections.toString());
 
         connections.clear();
@@ -515,7 +572,7 @@ public class DataTransferManager implements IConnectionListener {
 
             List<TransferDescription> transfers = getIncomingTransfers(from);
             if (!transfers.remove(transferDescription)) {
-                log.warn("Removing incoming transfer description that was never added!:"
+                log.warn("removing incoming transfer description that was never added: "
                     + transferDescription);
             }
         }
@@ -562,37 +619,50 @@ public class DataTransferManager implements IConnectionListener {
      * 
      * @return false if not all IBBs could be closed because of ongoing
      *         transfers
+     * @deprecated
      */
+    @Deprecated
     public synchronized boolean disconnectInBandBytestreams() {
-        log.info("Closing all IBBs on request");
-        List<IByteStreamConnection> openConnections;
 
-        openConnections = new ArrayList<IByteStreamConnection>(
-            connections.values());
+        /*
+         * Stefan Rossbach: although a nice feature, it will not hurt anybody if
+         * UPNP port mapping activation will affect only the next Saros
+         * sessions.
+         * 
+         * Currently disabled as it is possible to close a connection that may
+         * have a pending send.
+         */
 
-        boolean isTransfering = false;
-        for (IByteStreamConnection connection : openConnections) {
-            if (connection != null
-                && connection.getMode() == NetTransferMode.IBB) {
-
-                // If this connection is currently in use, don't disconnect
-                if (isReceiving(connection.getPeer())
-                    || isSending(connection.getPeer())) {
-                    isTransfering = true;
-                    continue;
-                }
-
-                try {
-                    connection.close();
-                    log.info("Closing IBB connection to "
-                        + connection.getPeer().getBareJID());
-                } catch (RuntimeException e) {
-                    log.error("Error while closing " + connection.getMode()
-                        + " connection ", e);
-                }
-            }
-        }
-        return isTransfering == false;
+        return false;
+        // log.info("Closing all IBBs on request");
+        // List<IByteStreamConnection> openConnections;
+        //
+        // openConnections = new ArrayList<IByteStreamConnection>(
+        // connections.values());
+        //
+        // boolean isTransfering = false;
+        // for (IByteStreamConnection connection : openConnections) {
+        // if (connection != null
+        // && connection.getMode() == NetTransferMode.IBB) {
+        //
+        // // If this connection is currently in use, don't disconnect
+        // if (isReceiving(connection.getPeer())
+        // || isSending(connection.getPeer())) {
+        // isTransfering = true;
+        // continue;
+        // }
+        //
+        // try {
+        // connection.close();
+        // log.info("Closing IBB connection to "
+        // + connection.getPeer().getBareJID());
+        // } catch (RuntimeException e) {
+        // log.error("Error while closing " + connection.getMode()
+        // + " connection ", e);
+        // }
+        // }
+        // }
+        // return isTransfering == false;
     }
 
     // TODO: move to ITransmitter
@@ -616,5 +686,29 @@ public class DataTransferManager implements IConnectionListener {
         IncomingTransferObject incomingTransferObject) {
         byteStreamConnectionListener
             .addIncomingTransferObject(incomingTransferObject);
+    }
+
+    /**
+     * Returns the current connection for the remote side. If the local side is
+     * connected to the remote side as well as the remote side is connected to
+     * the local side the local to remote connection will be returned.
+     * 
+     * @param jid
+     *            JID of the remote side
+     * @return the connection to the remote side or <code>null</code> if no
+     *         connection exists
+     */
+    private IByteStreamConnection getCurrentConnection(JID jid) {
+        synchronized (connections) {
+            ConnectionHolder holder = connections.get(jid);
+
+            if (holder == null)
+                return null;
+
+            if (holder.out != null)
+                return holder.out;
+
+            return holder.in;
+        }
     }
 }

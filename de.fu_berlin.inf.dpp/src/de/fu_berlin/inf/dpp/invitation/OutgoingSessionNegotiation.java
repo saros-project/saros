@@ -160,7 +160,7 @@ public final class OutgoingSessionNegotiation extends InvitationProcess {
 
             monitor.setTaskName("Negotiating data connection...");
 
-            dataTransferManager.getConnection(peer);
+            dataTransferManager.connect(peer);
 
             User newUser = addUserToSession(monitor.newChild(0));
 
