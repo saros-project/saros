@@ -9,6 +9,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import org.apache.log4j.Logger;
+import org.jivesoftware.smack.Connection;
 import org.jivesoftware.smack.Roster;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.packet.Presence;
@@ -415,11 +416,13 @@ public class DiscoveryManager implements Disposable {
                 + "fail because resource is missing: " + recipient.toString(),
                 new StackTrace());
 
-        if (!sarosNet.isConnected())
+        Connection connection = sarosNet.getConnection();
+
+        if (connection == null)
             throw new IllegalStateException("Not Connected");
 
         ServiceDiscoveryManager sdm = ServiceDiscoveryManager
-            .getInstanceFor(sarosNet.getConnection());
+            .getInstanceFor(connection);
 
         try {
             return sdm.discoverInfo(recipient.toString());
@@ -427,7 +430,7 @@ public class DiscoveryManager implements Disposable {
 
             log.warn(
                 "Service Discovery failed on recipient " + recipient.toString()
-                    + " server:" + sarosNet.getConnection().getHost() + ":", e);
+                    + " server: " + connection.getHost(), e);
             return null;
         }
     }
