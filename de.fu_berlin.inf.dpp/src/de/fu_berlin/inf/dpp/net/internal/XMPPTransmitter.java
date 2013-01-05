@@ -67,8 +67,14 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
 
     private static final Logger log = Logger.getLogger(XMPPTransmitter.class);
 
-    /** Size in bytes that a packet extension must exceed to be compressed */
-    private static final int COMPRESS_THRESHOLD = 32;
+    /** size in bytes that a packet extension must exceed to be compressed */
+    private static final int PACKET_EXTENSION_COMPRESS_THRESHOLD = Integer
+        .getInteger(
+            "de.fu_berlin.inf.dpp.net.transmitter.PACKET_EXTENSION_COMPRESS_THRESHOLD",
+            32);
+
+    private static final boolean ALLOW_CHAT_TRANSFER_FALLBACK = Boolean
+        .getBoolean("de.fu_berlin.inf.dpp.net.transmitter.ALLOW_CHAT_TRANSFER_FALLBACK");
 
     /*
      * Stefan Rossbach: remove this retry "myth". Only fallback once, and if the
@@ -229,9 +235,9 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
         int retry = 0;
         do {
 
-            if (data == null
-                || transferDescription == null
-                || (!dataManager.getTransferMode(recipient).isP2P() && data.length < MAX_XMPP_MESSAGE_SIZE)) {
+            if (!dataManager.getTransferMode(recipient).isP2P()
+                && data.length < MAX_XMPP_MESSAGE_SIZE
+                && ALLOW_CHAT_TRANSFER_FALLBACK) {
 
                 sendMessageToUser(recipient, extension, true);
                 break;
@@ -239,7 +245,7 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
             } else {
                 try {
 
-                    if (data.length > COMPRESS_THRESHOLD)
+                    if (data.length > PACKET_EXTENSION_COMPRESS_THRESHOLD)
                         transferDescription.setCompressContent(true);
 
                     // recipient is included in the transfer description
@@ -248,19 +254,22 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
 
                 } catch (IOException e) {
                     // else send by chat if applicable
-                    if (data.length < MAX_XMPP_MESSAGE_SIZE) {
-                        log.info("Retry failed bytestream transfer by chat.");
+                    if (data.length < MAX_XMPP_MESSAGE_SIZE
+                        && ALLOW_CHAT_TRANSFER_FALLBACK) {
+                        log.warn("could not send packet extension through a direct connection, falling back to chat transfer");
                         sendMessageToUser(recipient, extension, true);
                         break;
                     } else {
 
-                        log.error("Failed to sent packet extension by bytestream ("
+                        log.error("could not send packet extension through a direct connection ("
                             + Utils.formatByte(data.length)
                             + "): "
                             + e.getMessage());
 
                         if (retry == MAX_TRANSFER_RETRIES / 2) {
                             // set bytestream connections prefer IBB
+                            log.info("enabling fallback mode for recipient: "
+                                + recipient);
                             dataManager.setFallbackConnectionMode(recipient);
                         }
 
@@ -372,7 +381,7 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
 
             connection.sendPacket(packet);
         } catch (Exception e) {
-            throw new IOException("error while sending message: "
+            throw new IOException("could not send packet " + packet + " : "
                 + e.getMessage(), e);
         }
     }
