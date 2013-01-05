@@ -67,6 +67,9 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
 
     private static final Logger log = Logger.getLogger(XMPPTransmitter.class);
 
+    /** Size in bytes that a packet extension must exceed to be compressed */
+    private static final int COMPRESS_THRESHOLD = 32;
+
     /*
      * Stefan Rossbach: remove this retry "myth". Only fallback once, and if the
      * fallback to IBB fails just give up.
@@ -212,7 +215,7 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
             .setType(extension.getElementName())
             .setNamespace(extension.getNamespace())
             .setExtensionVersion(SarosPacketExtension.VERSION)
-            .setSessionID(currentSessionID).setCompressContent(false);
+            .setSessionID(currentSessionID);
 
         byte[] data = null;
 
@@ -235,6 +238,10 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
 
             } else {
                 try {
+
+                    if (data.length > COMPRESS_THRESHOLD)
+                        transferDescription.setCompressContent(true);
+
                     // recipient is included in the transfer description
                     dataManager.sendData(transferDescription, data);
                     break;
