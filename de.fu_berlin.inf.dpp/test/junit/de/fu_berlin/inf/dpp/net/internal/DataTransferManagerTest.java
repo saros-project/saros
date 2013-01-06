@@ -442,7 +442,7 @@ public class DataTransferManagerTest {
 
         connectThread0.start();
 
-        if (!connectAcknowledge.await(10000, TimeUnit.MICROSECONDS)) {
+        if (!connectAcknowledge.await(10000, TimeUnit.MILLISECONDS)) {
             connectThread0.interrupt();
             fail("transport connect method was not called");
         }
@@ -531,7 +531,7 @@ public class DataTransferManagerTest {
 
         connectThread0.start();
 
-        if (!connectAcknowledge.await(10000, TimeUnit.MICROSECONDS)) {
+        if (!connectAcknowledge.await(10000, TimeUnit.MILLISECONDS)) {
             connectThread0.interrupt();
             fail("transport connect method was not called");
         }
