@@ -195,11 +195,19 @@ public class Saros extends AbstractUIPlugin {
 
         try {
             InputStream sarosProperties = Saros.class.getClassLoader()
-                .getResourceAsStream("de/fu_berlin/inf/dpp/saros.properties");
-            System.getProperties().load(sarosProperties);
-            sarosProperties.close();
+                .getResourceAsStream("saros.properties");
+
+            if (sarosProperties == null) {
+                LogLog
+                    .warn("could not initialize Saros properties because the 'saros.properties'"
+                        + " file could not be found on the current JAVA class path");
+            } else {
+                System.getProperties().load(sarosProperties);
+                sarosProperties.close();
+            }
         } catch (Exception e) {
-            LogLog.error("could not load saros property file", e);
+            LogLog.error(
+                "could not load saros property file 'saros.properties'", e);
         }
 
         // Only start a DotGraphMonitor if asserts are enabled (aka debug mode)
@@ -652,8 +660,8 @@ public class Saros extends AbstractUIPlugin {
             Exception cause = (t != null) ? (Exception) t : e;
 
             if (cause instanceof SaslException) {
-                DialogUtils.popUpFailureMessage(Messages.Saros_3, cause.getMessage(),
-                    failSilently);
+                DialogUtils.popUpFailureMessage(Messages.Saros_3,
+                    cause.getMessage(), failSilently);
             } else {
                 String question;
                 if (cause instanceof UnknownHostException) {
@@ -676,8 +684,10 @@ public class Saros extends AbstractUIPlugin {
         } catch (Exception e) {
             log.error("internal error while connecting to the XMPP server: "
                 + e.getMessage(), e);
-            DialogUtils.popUpFailureMessage(Messages.Saros_36, Messages.Saros_39
-                + username + Messages.Saros_40 + e.getMessage(), failSilently);
+            DialogUtils.popUpFailureMessage(
+                Messages.Saros_36,
+                Messages.Saros_39 + username + Messages.Saros_40
+                    + e.getMessage(), failSilently);
         }
     }
 }
