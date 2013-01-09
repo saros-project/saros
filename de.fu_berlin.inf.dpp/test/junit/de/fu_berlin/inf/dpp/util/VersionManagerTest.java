@@ -123,7 +123,7 @@ public class VersionManagerTest {
         init(local, remote);
 
         Field f = versionManagerLocal.getClass().getDeclaredField(
-            "COMPATIBILITY_CHART");
+            "compatibilityChart");
 
         f.setAccessible(true);
 
@@ -165,7 +165,7 @@ public class VersionManagerTest {
         init(local, remote);
 
         Field f = versionManagerLocal.getClass().getDeclaredField(
-            "COMPATIBILITY_CHART");
+            "compatibilityChart");
 
         f.setAccessible(true);
 

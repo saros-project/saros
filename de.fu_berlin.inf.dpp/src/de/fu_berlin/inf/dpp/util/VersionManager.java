@@ -1,12 +1,15 @@
 package de.fu_berlin.inf.dpp.util;
 
 import java.io.IOException;
-import java.util.Arrays;
+import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.jivesoftware.smack.PacketListener;
 import org.jivesoftware.smack.filter.AndFilter;
@@ -38,6 +41,8 @@ import de.fu_berlin.inf.dpp.net.internal.extensions.XStreamExtensionProvider.XSt
 public class VersionManager {
 
     private static final Logger log = Logger.getLogger(VersionManager.class);
+
+    private static final String COMPATIBILITY_PROPERTY_FILE = "version.comp";
 
     private static final XStreamExtensionProvider<VersionInfo> VERSION_PROVIDER = new XStreamExtensionProvider<VersionInfo>(
         "sarosVersion", VersionInfo.class, Version.class, Compatibility.class);
@@ -126,250 +131,7 @@ public class VersionManager {
      * {@link Compatibility#OK} if and only if the version information are
      * {@link Version#equals(Object)} to each other.
      */
-    private final Map<Version, List<Version>> COMPATIBILITY_CHART = new HashMap<Version, List<Version>>();
-
-    /**
-     * Initialize the compatibility map.
-     * 
-     * For each version, all older versions that are compatible should be added
-     * in order of release date.
-     * 
-     * For the first version which is too old the commit which broke
-     * compatibility should be listed.
-     */
-    {
-
-        /**
-         * Version 12.9.28
-         */
-        COMPATIBILITY_CHART.put(new Version("12.9.28"), Arrays.asList(
-            new Version("12.9.28"), new Version("12.7.27"), new Version(
-                "12.7.6")));
-
-        /**
-         * Version 12.7.27
-         */
-        COMPATIBILITY_CHART.put(new Version("12.7.27"),
-            Arrays.asList(new Version("12.7.27"), new Version("12.7.6")));
-
-        /**
-         * Version 12.7.6
-         */
-        COMPATIBILITY_CHART.put(new Version("12.7.6"),
-            Arrays.asList(new Version("12.7.6")));
-
-        /**
-         * Version 12.3.30.r3893
-         */
-        COMPATIBILITY_CHART.put(new Version("12.3.30.r3893"),
-            Arrays.asList(new Version("12.3.30.r3893")));
-
-        /**
-         * Version 11.12.9.r3685
-         */
-        COMPATIBILITY_CHART.put(new Version("11.12.9.r3685"), Arrays.asList(
-            new Version("11.12.9.r3685"), new Version("11.9.30.r3567"),
-            new Version("11.7.29.r3479"), new Version("11.7.1.r3426")));
-
-        /**
-         * Version 11.9.30.3567
-         */
-        COMPATIBILITY_CHART.put(new Version("11.9.30.r3567"), Arrays.asList(
-            new Version("11.9.30.r3567"), new Version("11.7.29.r3479"),
-            new Version("11.7.1.r3426")));
-
-        /**
-         * Version 11.7.29.3479
-         */
-        COMPATIBILITY_CHART.put(new Version("11.7.29.r3479"), Arrays.asList(
-            new Version("11.7.29.r3479"), new Version("11.7.1.r3426")));
-
-        /**
-         * Version 11.7.1.3426
-         */
-        COMPATIBILITY_CHART.put(new Version("11.7.1.r3426"),
-            Arrays.asList(new Version("11.7.1.r3426")));
-
-        /**
-         * Version 11.5.6.r3294
-         */
-        COMPATIBILITY_CHART.put(new Version("11.5.6.r3294"), Arrays.asList(
-            new Version("11.5.6.r3294"), new Version("11.3.25.r3201")));
-
-        /**
-         * Version 11.3.25.r3201
-         */
-        COMPATIBILITY_CHART.put(new Version("11.3.25.r3201"),
-            Arrays.asList(new Version("11.3.25.r3201")));
-
-        /**
-         * Version 11.2.25.r3105
-         */
-        COMPATIBILITY_CHART.put(new Version("11.2.25.r3105"),
-            Arrays.asList(new Version("11.2.25.r3105")));
-
-        /**
-         * Version 11.1.28.r2959
-         */
-        COMPATIBILITY_CHART.put(new Version("11.1.28.r2959"),
-            Arrays.asList(new Version("11.1.28.r2959")));
-
-        /**
-         * Version 11.1.7.r2897
-         */
-        COMPATIBILITY_CHART.put(new Version("11.1.7.r2897"), Arrays.asList(
-            new Version("11.1.7.r2897"), new Version("10.11.26.r2744"),
-            new Version("10.10.29.r2640"), new Version("10.10.01.r2552"),
-            new Version("10.8.27.r2333"), new Version("10.7.30.r2310")));
-
-        /**
-         * Version 10.11.26.r2744
-         */
-        COMPATIBILITY_CHART.put(new Version("10.11.26.r2744"), Arrays.asList(
-            new Version("10.11.26.r2744"), new Version("10.10.29.r2640"),
-            new Version("10.10.01.r2552"), new Version("10.8.27.r2333"),
-            new Version("10.7.30.r2310")));
-
-        /**
-         * Version 10.10.29.r2640
-         */
-        COMPATIBILITY_CHART.put(new Version("10.10.29.r2640"), Arrays.asList(
-            new Version("10.10.29.r2640"), new Version("10.10.01.r2552"),
-            new Version("10.8.27.r2333"), new Version("10.7.30.r2310")));
-
-        /**
-         * Version 10.10.01.r2552
-         */
-        COMPATIBILITY_CHART.put(new Version("10.10.01.r2552"), Arrays.asList(
-            new Version("10.10.01.r2552"), new Version("10.8.27.r2333"),
-            new Version("10.7.30.r2310")));
-
-        /**
-         * Version 10.8.27.r2333
-         */
-        COMPATIBILITY_CHART.put(new Version("10.8.27.r2333"), Arrays.asList(
-            new Version("10.8.27.r2333"), new Version("10.7.30.r2310")));
-
-        /**
-         * Version 10.7.30.r2310
-         * 
-         * CommunicationPreferences are now sent and received as part of the
-         * InvitationInfo.
-         */
-        COMPATIBILITY_CHART.put(new Version("10.7.30.r2310"),
-            Arrays.asList(new Version("10.7.30.r2310")));
-
-        /**
-         * Version 10.6.25.r2236
-         * 
-         * We are no longer backwards-compatible because of the changes in the
-         * net refactoring. 10.6.25 isn't compatible to 10.6.11.r2223
-         */
-        COMPATIBILITY_CHART.put(new Version("10.6.25.r2236"),
-            Arrays.asList(new Version("10.6.25.r2236")));
-
-        /**
-         * Version 10.6.11.r2223
-         * 
-         * We are no longer backwards-compatible because of the changes in the
-         * net refactoring.
-         */
-        COMPATIBILITY_CHART.put(new Version("10.6.11.r2223"),
-            Arrays.asList(new Version("10.6.11.r2223")));
-
-        /**
-         * Version 10.5.28.r2173
-         */
-        COMPATIBILITY_CHART.put(new Version("10.5.28.r2173"), Arrays.asList(
-            new Version("10.5.28.r2173"), new Version("10.4.14.r2128")));
-
-        /**
-         * Version 10.4.14.r2128
-         */
-        COMPATIBILITY_CHART.put(new Version("10.4.14.r2128"),
-            Arrays.asList(new Version("10.4.14.r2128")));
-
-        /**
-         * Version 10.3.26.r2105
-         */
-        COMPATIBILITY_CHART.put(new Version("10.3.26.r2105"),
-            Arrays.asList(new Version("10.3.26.r2105")));
-        /**
-         * Version 10.2.26.r2037
-         */
-        COMPATIBILITY_CHART.put(new Version("10.2.26.r2037"),
-            Arrays.asList(new Version("10.2.26.r2037")));
-
-        /**
-         * Version 10.1.29.r1970
-         */
-        COMPATIBILITY_CHART.put(new Version("10.1.29.r1970"),
-            Arrays.asList(new Version("10.1.29.r1970")));
-
-        /**
-         * Version 9.12.04.r1862
-         */
-        COMPATIBILITY_CHART.put(new Version("9.12.4.r1878"),
-            Arrays.asList(new Version("9.12.4.r1878")));
-
-        /**
-         * Version 9.10.30.r1833
-         */
-        COMPATIBILITY_CHART.put(new Version("9.10.30.r1833"),
-            Arrays.asList(new Version("9.10.30.r1833")));
-
-        /**
-         * Version 9.10.30.DEVEL
-         */
-        COMPATIBILITY_CHART.put(new Version("9.10.30.DEVEL"),
-            Arrays.asList(new Version("9.10.30.DEVEL")));
-
-        /**
-         * Version 9.10.2.r1803
-         * 
-         * We are not backward compatible because of changes in the invitation
-         * process.
-         */
-        COMPATIBILITY_CHART.put(new Version("9.10.2.r1803"),
-            Arrays.asList(new Version("9.10.2.r1803")));
-
-        /**
-         * Version 9.10.2.DEVEL
-         */
-        COMPATIBILITY_CHART.put(new Version("9.10.2.DEVEL"), Arrays.asList(
-            new Version("9.10.2.DEVEL"), new Version("9.9.11.r1706"),
-            new Version("9.9.11.DEVEL")));
-
-        /**
-         * Version 9.9.11.r1706
-         */
-        COMPATIBILITY_CHART.put(new Version("9.9.11.r1706"), Arrays.asList(
-            new Version("9.9.11.r1706"), new Version("9.9.11.DEVEL")));
-
-        /**
-         * Version 9.9.11.DEVEL
-         * 
-         * No longer compatible with 9.8.21 since r.1665 changed compression of
-         * Activities
-         */
-        COMPATIBILITY_CHART.put(new Version("9.9.11.DEVEL"),
-            Arrays.asList(new Version("9.9.11.DEVEL")));
-
-        /**
-         * Version 9.8.21.r1660
-         */
-        COMPATIBILITY_CHART.put(new Version("9.8.21.r1660"), Arrays.asList(
-            new Version("9.8.21.r1660"), new Version("9.8.21.DEVEL")));
-
-        /**
-         * Version 9.8.21.DEVEL
-         * 
-         * No longer compatible with 9.7.31 since r.1576 changed serialization
-         * of Activities
-         */
-        COMPATIBILITY_CHART.put(new Version("9.8.21.DEVEL"),
-            Arrays.asList(new Version("9.8.21.DEVEL")));
-    }
+    private final Map<Version, List<Version>> compatibilityChart = new HashMap<Version, List<Version>>();
 
     private final Version version;
     private final ITransmitter transmitter;
@@ -418,6 +180,8 @@ public class VersionManager {
 
             }
         }));
+
+        initializeCompatibilityChart();
     }
 
     /**
@@ -477,8 +241,8 @@ public class VersionManager {
 
     /**
      * Will compare the two given Versions for compatibility. The result
-     * indicates whether the localVersion passed first is compatible with the
-     * remoteVersion.
+     * indicates whether the local version passed first is compatible with the
+     * remote version.
      */
     public Compatibility determineCompatibility(Version localVersion,
         Version remoteVersion) {
@@ -488,15 +252,14 @@ public class VersionManager {
 
         // remote version is lower than our version
         if (compatibility == Compatibility.TOO_NEW) {
-            List<Version> compatibleVersions = COMPATIBILITY_CHART
+
+            List<Version> compatibleVersions = compatibilityChart
                 .get(localVersion);
-            if (compatibleVersions != null
-                && compatibleVersions.contains(remoteVersion)) {
+
+            assert compatibleVersions != null;
+
+            if (compatibleVersions.contains(remoteVersion))
                 compatibility = Compatibility.OK;
-            } else {
-                log.error("VersionManager does not know about current version."
-                    + " The release manager must have slept: " + localVersion);
-            }
         }
 
         return compatibility;
@@ -616,5 +379,74 @@ public class VersionManager {
             return compareTo;
 
         return a.getQualifier().compareTo(b.getQualifier());
+    }
+
+    private void initializeCompatibilityChart() {
+
+        Properties properties = loadCompatibilityProperties(COMPATIBILITY_PROPERTY_FILE);
+
+        for (Object versionKey : properties.keySet()) {
+            Version version = parseVersion(versionKey.toString());
+
+            if (version.equals(Version.emptyVersion))
+                continue;
+
+            List<Version> compatibleVersions = new ArrayList<Version>();
+
+            for (String compatibleVersionString : properties.get(versionKey)
+                .toString().split("&")) {
+
+                Version compatibleVersion = parseVersion(compatibleVersionString
+                    .trim());
+
+                if (!compatibleVersion.equals(Version.emptyVersion))
+                    compatibleVersions.add(compatibleVersion);
+            }
+
+            if (!compatibleVersions.contains(version))
+                compatibleVersions.add(version);
+
+            compatibilityChart.put(version, compatibleVersions);
+        }
+
+        Version currentVersion = getVersion();
+
+        List<Version> currentCompatibleVersions = compatibilityChart
+            .get(currentVersion);
+
+        if (currentCompatibleVersions == null) {
+            currentCompatibleVersions = new ArrayList<Version>();
+            compatibilityChart.put(currentVersion, currentCompatibleVersions);
+        }
+
+        if (!currentCompatibleVersions.contains(currentVersion))
+            currentCompatibleVersions.add(currentVersion);
+    }
+
+    private Properties loadCompatibilityProperties(String filename) {
+
+        InputStream in = VersionManager.class.getClassLoader()
+            .getResourceAsStream(filename);
+
+        Properties properties = new Properties();
+
+        if (in == null) {
+            log.warn("could not find compatibility property file: " + filename);
+
+            return properties;
+        }
+
+        try {
+            properties.load(in);
+        } catch (IOException e) {
+            log.warn("could not read compatibility property file: " + filename,
+                e);
+
+            properties.clear();
+        } finally {
+            IOUtils.closeQuietly(in);
+        }
+
+        return properties;
     }
 }
