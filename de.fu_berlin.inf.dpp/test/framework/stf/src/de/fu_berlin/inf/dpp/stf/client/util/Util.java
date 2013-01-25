@@ -432,10 +432,10 @@ public class Util {
      * buddies will have the tester removed from their contact list as well.
      * 
      * @param tester
-     *            the tester who wants to add buddies to his contact list e.g
-     *            ALICE
+     *            the tester who wants to remove buddies from his contact list
+     *            e.g ALICE
      * @param buddies
-     *            the buddies to add, e.g BOB, CARL
+     *            the buddies to remove, e.g BOB, CARL
      * @throws IllegalStateException
      *             if the tester or one of the buddies is not connected
      * @throws Exception
@@ -448,14 +448,41 @@ public class Util {
         assertStates(true, null, tester, buddies);
 
         for (AbstractTester deletedBuddy : buddies) {
+
             if (!tester.superBot().views().sarosView()
                 .hasBuddy(deletedBuddy.getJID()))
                 continue;
+
+            boolean isInRemoteContactList = deletedBuddy.superBot().views()
+                .sarosView().hasBuddy(tester.getJID());
+
             tester.superBot().views().sarosView()
                 .selectBuddy(deletedBuddy.getJID()).delete();
-            deletedBuddy.superBot().confirmShellRemovelOfSubscription();
-        }
 
+            if (!isInRemoteContactList)
+                continue;
+
+            // Dirty Hack, retry twice
+
+            for (int i = 0; i < 2; i++) {
+                try {
+                    /*
+                     * this may throw a widget is disposed exception or some
+                     * other stuff depending on how the content provider for the
+                     * session tree viewer updates the contents when the new
+                     * subscription state is received.
+                     */
+
+                    deletedBuddy.superBot().views().sarosView()
+                        .selectBuddy(tester.getJID()).delete();
+
+                    break;
+                } catch (Exception e) {
+                    if (i >= 1)
+                        throw e;
+                }
+            }
+        }
     }
 
     /**

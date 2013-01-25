@@ -373,8 +373,11 @@ public class Messages extends NLS {
     public static String ResourceSelectionComposite_redo;
     public static String RestrictToReadOnlyAccessAction_title;
     public static String RestrictToReadOnlyAccessAction_tooltip;
+
     public static String RosterEntryElement_connected_using;
     public static String RosterEntryElement_subscription_pending;
+    public static String RosterEntryElement_subscription_cancelled;
+
     public static String RosterHeaderElement_buddies;
     public static String UPnPUIUtils_disconnected;
     public static String UPnPUIUtils_no_gateway;
@@ -438,8 +441,6 @@ public class Messages extends NLS {
     public static String SubscriptionManager_incoming_buddy_request_title;
     public static String SubscriptionManager_incoming_buddy_request_message;
 
-    public static String SubscriptionManager_incoming_buddy_denied_title;
-    public static String SubscriptionManager_incoming_buddy_denied_message;
     public static String HostLeftAloneInSessionDialog_title;
     public static String HostLeftAloneInSessionDialog_message;
 

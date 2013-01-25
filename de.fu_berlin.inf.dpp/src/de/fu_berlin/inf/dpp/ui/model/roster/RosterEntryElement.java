@@ -13,8 +13,8 @@ import org.jivesoftware.smack.Roster;
 import org.jivesoftware.smack.RosterEntry;
 import org.jivesoftware.smack.RosterGroup;
 import org.jivesoftware.smack.packet.Presence;
-import org.jivesoftware.smack.packet.Presence.Type;
 import org.jivesoftware.smack.packet.RosterPacket;
+import org.jivesoftware.smack.packet.RosterPacket.ItemType;
 import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.Saros;
@@ -66,34 +66,44 @@ public class RosterEntryElement extends TreeElement {
     }
 
     protected RosterEntry getRosterEntry() {
-        if (this.roster == null)
+        if (roster == null)
             return null;
+
         return roster.getEntry(jid.getBase());
     }
 
     @Override
     public StyledString getStyledText() {
         StyledString styledString = new StyledString();
-        final String subscription_pending = Messages.RosterEntryElement_subscription_pending;
+
         final String connected_using = Messages.RosterEntryElement_connected_using;
 
-        /*
-         * Name
-         */
         RosterEntry rosterEntry = this.getRosterEntry();
-        styledString.append((rosterEntry == null) ? this.jid.toString()
+        styledString.append((rosterEntry == null) ? jid.toString()
             : RosterUtils.getDisplayableName(rosterEntry));
 
-        /*
-         * Append presence information if available. Otherwise append presence.
-         */
-        final Presence presence = roster.getPresence(this.jid.getBase());
+        final Presence presence = roster.getPresence(jid.getBase());
+
         if (rosterEntry != null
             && rosterEntry.getStatus() == RosterPacket.ItemStatus.SUBSCRIPTION_PENDING) {
-            styledString.append(" (" + subscription_pending + ")", //$NON-NLS-1$ //$NON-NLS-2$
+
+            styledString.append(" ").append( //$NON-NLS-1$
+                Messages.RosterEntryElement_subscription_pending,
                 StyledString.COUNTER_STYLER);
-        } else if (presence != null && presence.getType() != Type.available
-            && presence.getType() != Type.unavailable) {
+
+        } else if (rosterEntry != null
+            && (rosterEntry.getType() == ItemType.none || rosterEntry.getType() == ItemType.from)) {
+
+            /*
+             * see http://xmpp.org/rfcs/rfc3921.html chapter 8.2.1, 8.3.1 and
+             * 8.6
+             */
+
+            styledString.append(" ").append( //$NON-NLS-1$
+                Messages.RosterEntryElement_subscription_cancelled,
+                StyledString.COUNTER_STYLER);
+
+        } else if (presence.isAway()) {
             styledString.append(" (" + presence.getType() + ")", //$NON-NLS-1$ //$NON-NLS-2$
                 StyledString.COUNTER_STYLER);
         }
@@ -101,7 +111,7 @@ public class RosterEntryElement extends TreeElement {
         /*
          * Append DataTransfer state information if debug mode is enabled.
          */
-        if (presence != null && presence.isAvailable()) {
+        if (presence.isAvailable()) {
             final NetTransferMode transferMode = dataTransferManager
                 .getTransferMode(jid);
 
@@ -160,10 +170,11 @@ public class RosterEntryElement extends TreeElement {
 
     @Override
     public ITreeElement getParent() {
-        if (this.roster == null)
+        if (roster == null)
             return null;
 
         RosterEntry rosterEntry = this.getRosterEntry();
+
         if (rosterEntry == null)
             return null;
 
@@ -183,12 +194,12 @@ public class RosterEntryElement extends TreeElement {
         }
 
         RosterEntryElement rosterEntryElement = (RosterEntryElement) obj;
-        return (this.jid == null ? rosterEntryElement.jid == null : this.jid
+        return (jid == null ? rosterEntryElement.jid == null : jid
             .equals(rosterEntryElement.jid));
     }
 
     @Override
     public int hashCode() {
-        return (this.jid != null) ? this.jid.hashCode() : 0;
+        return (jid != null) ? jid.hashCode() : 0;
     }
 }

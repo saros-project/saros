@@ -142,15 +142,6 @@ public interface ISuperBot extends Remote {
     public void confirmShellClosingTheSession() throws RemoteException;
 
     /**
-     * Confirm the shell with title
-     * {@link StfRemoteObject#SHELL_REMOVAL_OF_SUBSCRIPTION} which would be
-     * appeared if someone delete your contact from his buddies list.
-     * 
-     * @throws RemoteException
-     */
-    public void confirmShellRemovelOfSubscription() throws RemoteException;
-
-    /**
      * Confirm the shell with title {@link StfRemoteObject#SHELL_ADD_BUDDY}
      * 
      * @param jid

@@ -7,7 +7,6 @@ import org.apache.log4j.Logger;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.jivesoftware.smack.Connection;
 import org.jivesoftware.smack.PacketListener;
-import org.jivesoftware.smack.Roster;
 import org.jivesoftware.smack.RosterEntry;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.filter.PacketTypeFilter;
@@ -27,17 +26,7 @@ import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 /**
  * This is class is responsible for handling XMPP subscriptions requests.
  * 
- * If a request for subscription is received (when a buddy added the local user)
- * all {@link SubscriptionManagerListener}s are notified. If at least one set
- * the {@link IncomingSubscriptionEvent#autoSubscribe} flag to true the
- * subscription request is automatically confirmed. Otherwise a dialog is shown
- * to the user asking him/her to confirm the request. If he accepts the request
- * a new entry in the {@link Roster} will be created and a subscribed-message
- * sent.
- * 
- * If a request for removal is received (when a buddy deleted the local user
- * from his or her roster or rejected a request of subscription) the
- * corresponding entry is removed from the roster.
+ * See also XMPP RFC 3921: http://xmpp.org/rfcs/rfc3921.html
  * 
  * @author chjacob
  * @author bkahlert
@@ -48,11 +37,7 @@ public class SubscriptionManager {
         .getLogger(SubscriptionManager.class);
 
     private Connection connection = null;
-    /**
-     * It is generally possible that a smack thread iterates over this list
-     * whereas the GUI thread removes its listeners when its job is done
-     * parallel. Therefore we need a {@link CopyOnWriteArrayList}.
-     */
+
     private CopyOnWriteArrayList<SubscriptionManagerListener> subscriptionManagerListeners = new CopyOnWriteArrayList<SubscriptionManagerListener>();
 
     private IConnectionListener connectionListener = new IConnectionListener() {
@@ -93,6 +78,11 @@ public class SubscriptionManager {
             connection.removePacketListener(packetListener);
     }
 
+    /*
+     * TODO the RFC states that we should send presence replies for subscribed
+     * and unsubscribed presences ... check if this this handled correctly by
+     * the server or we would create an infinite loop
+     */
     private synchronized void processPresence(Presence presence) {
 
         if (presence.getFrom() == null)
@@ -100,23 +90,25 @@ public class SubscriptionManager {
 
         switch (presence.getType()) {
         case error:
-            String message = MessageFormat.format("Received error "
-                + "presence package from {0}, condition: {1}, message: {2}",
-                presence.getFrom(), presence.getError().getCondition(),
-                presence.getError().getMessage());
+            String message = MessageFormat.format(
+                "received error presence package from "
+                    + "{0}, condition: {1}, message: {2}", presence.getFrom(),
+                presence.getError().getCondition(), presence.getError()
+                    .getMessage());
             log.warn(message);
             return;
 
         case subscribed:
-            log.info("Buddy subscribed to us: " + presence.getFrom());
+            log.debug("contact subscribed to us: " + presence.getFrom());
             break;
 
         case unsubscribed:
-            log.info("Buddy unsubscribed from us: " + presence.getFrom());
+            log.debug("contact unsubscribed from us: " + presence.getFrom());
             break;
 
         case subscribe:
-            log.info("Buddy requests to subscribe to us: " + presence.getFrom());
+            log.debug("contact requests to subscribe to us: "
+                + presence.getFrom());
 
             /*
              * Notify listeners; if at least one set the autoSubscribe flag to
@@ -127,46 +119,37 @@ public class SubscriptionManager {
 
             // ask user for confirmation of subscription
             if (autoSubscribe)
-                addSubscription(presence);
+                handleSubscriptionRequest(presence);
             else
                 askUserForSubscriptionConfirmation(presence);
 
             break;
 
         case unsubscribe:
-            log.info("Buddy requests to unsubscribe from us: "
+            log.debug("contact requests to unsubscribe from us: "
                 + presence.getFrom());
-            removeSubscription(presence);
-            informUserAboutUnsubscription(presence.getFrom());
+            acknowledgeUnsubscribingRequest(presence);
             break;
         default:
             // do nothing
         }
     }
 
-    private synchronized void addSubscription(Presence presence) {
+    private synchronized void handleSubscriptionRequest(Presence from) {
+        acknowledgeSubscriptionRequest(from);
+        requestSubscription(from);
+    }
+
+    private synchronized void requestSubscription(Presence to) {
+        RosterEntry entry = connection.getRoster().getEntry(to.getFrom());
 
         try {
-            // send message that we accept the request for
-            // subscription
-            sendPresence(Presence.Type.subscribed, presence.getFrom());
-        } catch (IllegalStateException e) {
-            log.warn(
-                "failed to send subscribe message, not connected to a XMPP server",
-                e);
-        }
+            if (entry != null)
+                sendPresence(Presence.Type.subscribe, to.getFrom());
+            else
+                // will send a subscribe presence
+                connection.getRoster().createEntry(to.getFrom(), null, null);
 
-        // if no appropriate entry for request exists
-        // create one
-        RosterEntry entry = connection.getRoster().getEntry(presence.getFrom());
-
-        if (entry != null) {
-            sendPresence(Presence.Type.subscribe, presence.getFrom());
-            return;
-        }
-
-        try {
-            connection.getRoster().createEntry(presence.getFrom(), null, null);
         } catch (XMPPException e) {
             log.error("adding user to roster failed", e);
             return;
@@ -175,35 +158,25 @@ public class SubscriptionManager {
                 "cannot add user to roster, not connected to a XMPP server", e);
             return;
         }
-
     }
 
-    private synchronized void removeSubscription(Presence presence) {
+    private synchronized void acknowledgeSubscriptionRequest(Presence to) {
+        try {
+            sendPresence(Presence.Type.subscribed, to.getFrom());
+        } catch (IllegalStateException e) {
+            log.error(
+                "failed to send subscribe message, not connected to a XMPP server",
+                e);
+        }
+    }
 
+    private synchronized void acknowledgeUnsubscribingRequest(Presence presence) {
         try {
             sendPresence(Presence.Type.unsubscribed, presence.getFrom());
         } catch (IllegalStateException e) {
-            log.warn(
+            log.error(
                 "failed to send unsubscribed message, not connected to a XMPP server",
                 e);
-        }
-
-        // if appropriate entry exists remove that
-        RosterEntry entry = connection.getRoster().getEntry(presence.getFrom());
-
-        if (entry == null)
-            return;
-
-        try {
-            connection.getRoster().removeEntry(entry);
-        } catch (XMPPException e) {
-            log.error("removing user from roster failed", e);
-            return;
-        } catch (IllegalStateException e) {
-            log.error(
-                "cannot remove user from roster, not connected to a XMPP server",
-                e);
-            return;
         }
     }
 
@@ -222,7 +195,6 @@ public class SubscriptionManager {
         SWTUtils.runSafeSWTAsync(log, new Runnable() {
             @Override
             public void run() {
-                // TODO Should flash dialog
                 boolean accept = MessageDialog.openConfirm(
                     EditorAPI.getShell(),
                     Messages.SubscriptionManager_incoming_buddy_request_title,
@@ -232,10 +204,10 @@ public class SubscriptionManager {
                             presence.getFrom()));
 
                 if (accept)
-                    addSubscription(presence);
+                    handleSubscriptionRequest(presence);
                 else {
                     try {
-                        sendPresence(Presence.Type.unsubscribe,
+                        sendPresence(Presence.Type.unsubscribed,
                             presence.getFrom());
                     } catch (IllegalStateException e) {
                         log.warn(
@@ -243,24 +215,6 @@ public class SubscriptionManager {
                             e);
                     }
                 }
-            }
-        });
-    }
-
-    // FIXME REMOVE THIS METHOD FROM THE CLASS !!! Belongs to the UI, not to the
-    // logic
-    private void informUserAboutUnsubscription(final String from) {
-
-        SWTUtils.runSafeSWTAsync(log, new Runnable() {
-            @Override
-            public void run() {
-                MessageDialog.openInformation(
-                    EditorAPI.getShell(),
-                    Messages.SubscriptionManager_incoming_buddy_denied_title,
-                    MessageFormat
-                        .format(
-                            Messages.SubscriptionManager_incoming_buddy_denied_message,
-                            from));
             }
         });
     }

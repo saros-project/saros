@@ -334,8 +334,6 @@ public interface Constants {
         .getString("shell_buddy_look_up_failed");
     public final static String SHELL_SERVER_NOT_FOUND = Configuration
         .getString("shell_server_not_found");
-    public final static String SHELL_REMOVAL_OF_SUBSCRIPTION = Configuration
-        .getString("SubscriptionManager_incoming_buddy_denied_title");
     public final static String SHELL_SET_NEW_NICKNAME = Configuration
         .getString("RenameContactAction_new_nickname_dialog_title");
     public final static String SHELL_CONFIRM_CLOSING_SESSION = Configuration

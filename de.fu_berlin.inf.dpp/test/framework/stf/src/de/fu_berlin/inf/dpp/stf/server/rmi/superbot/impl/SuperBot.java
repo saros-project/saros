@@ -272,15 +272,6 @@ public final class SuperBot extends StfRemoteObject implements ISuperBot {
     }
 
     @Override
-    public void confirmShellRemovelOfSubscription() throws RemoteException {
-        SWTBotShell shell = new SWTBot().shell(SHELL_REMOVAL_OF_SUBSCRIPTION);
-        shell.activate();
-        shell.bot().button(OK).click();
-        // wait for tree update in the saros session view
-        new SWTBot().sleep(500);
-    }
-
-    @Override
     public void confirmShellAddBuddyToSession(String... baseJIDOfinvitees)
         throws RemoteException {
 
