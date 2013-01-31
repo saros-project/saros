@@ -1,0 +1,214 @@
+package de.fu_berlin.inf.dpp.ui.widgets;
+
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.MouseAdapter;
+import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.events.MouseListener;
+import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.layout.RowLayout;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.ui.editors.text.EditorsUI;
+import org.eclipse.ui.texteditor.AnnotationPreference;
+import org.eclipse.ui.texteditor.AnnotationPreferenceLookup;
+import org.picocontainer.annotations.Inject;
+
+import de.fu_berlin.inf.dpp.SarosPluginContext;
+import de.fu_berlin.inf.dpp.project.ISarosSession;
+import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
+import de.fu_berlin.inf.dpp.project.internal.SarosSession;
+
+public class ColorChooser extends Composite {
+
+    @Inject
+    protected ISarosSessionManager sessionManager;
+
+    /**
+     * List of selection listeners
+     */
+    protected final List<ColorSelectionListener> selectionListeners = new ArrayList<ColorSelectionListener>();
+
+    /**
+     * Prefix for the annotation preference key for a selection
+     */
+    protected static final String TYPE = "de.fu_berlin.inf.dpp.annotations.selection";
+
+    /**
+     * Current selection. The selection has to be greater or equal to 0 and
+     * smaller than COLORS. -1 indicates no selection.
+     */
+    protected int selection = -1;
+    /**
+     * An array holding the color rectangles (color labels)
+     */
+    protected ArrayList<ColorLabel> colorLabels = new ArrayList<ColorLabel>(
+        SarosSession.MAX_USERCOLORS);
+
+    /**
+     * Updates all subscribers that selection has changed
+     */
+    protected MouseListener mouseListener = new MouseAdapter() {
+        @Override
+        public void mouseUp(MouseEvent e) {
+
+            int index = colorLabels.indexOf(e.getSource());
+
+            if (index == -1)
+                return;
+
+            if (!selectColor(index))
+                return;
+
+            List<ColorSelectionListener> listeners = new ArrayList<ColorSelectionListener>(
+                selectionListeners);
+
+            for (ColorSelectionListener selectionListener : listeners)
+                selectionListener.selectionChanged(index);
+
+        }
+    };
+
+    /**
+     * The GUI component used for choosing colors in Preferences -> Saros ->
+     * Appearance
+     * 
+     * @param parent
+     * @param style
+     */
+    public ColorChooser(Composite parent, int style) {
+        super(parent, style);
+
+        SarosPluginContext.initComponent(this);
+
+        RowLayout layout = new RowLayout(SWT.HORIZONTAL);
+        layout.center = true;
+        layout.justify = true;
+        layout.fill = true;
+
+        setLayout(layout);
+
+        for (int colorId = 0; colorId < SarosSession.MAX_USERCOLORS; colorId++) {
+            ColorLabel label = createColorLabel(this, style, colorId);
+            label.setPreferredSize(50, 50);
+            colorLabels.add(label);
+        }
+    }
+
+    private ColorLabel createColorLabel(Composite parent, int style, int colorId) {
+        ColorLabel label = new ColorLabel(this, style);
+
+        AnnotationPreferenceLookup lookup = EditorsUI
+            .getAnnotationPreferenceLookup();
+
+        String annotationTypeForSelection = TYPE + "."
+            + Integer.toString(colorId + 1);
+
+        AnnotationPreference ap = lookup
+            .getAnnotationPreference(annotationTypeForSelection);
+
+        Color labelColor = new Color(Display.getCurrent(),
+            ap.getColorPreferenceValue());
+
+        label.setData(labelColor);
+        label.setColor(labelColor);
+        label.addMouseListener(mouseListener);
+
+        return label;
+    }
+
+    @Override
+    public void dispose() {
+        super.dispose();
+
+        for (ColorLabel colorLabel : colorLabels)
+            ((Color) colorLabel.getData()).dispose();
+    }
+
+    /**
+     * Select color by its ID.
+     * 
+     * @param colorId
+     *            color to be selected or -1 to reset the current selection
+     * @return <code>true</code> if the color has been selected,
+     *         <code>false</code> if the color did not exist or was already
+     *         selected
+     */
+    public boolean selectColor(int colorId) {
+
+        if (colorId == selection)
+            return false;
+
+        if (selection != -1)
+            colorLabels.get(selection).setSelected(false);
+
+        selection = -1;
+
+        if (colorId < 0 || colorId >= SarosSession.MAX_USERCOLORS)
+            return false;
+
+        colorLabels.get(colorId).setSelected(true);
+        selection = colorId;
+
+        return true;
+    }
+
+    /**
+     * Enable or disable {@link ColorLabel}s depending on the availability of
+     * its color.
+     */
+    public void updateColorEnablement() {
+        ISarosSession session = sessionManager.getSarosSession();
+
+        Set<Integer> freeColors =
+
+        // TODO activate if the session color patch is applied
+        // session != null ?
+        // session.getFreeColors() :
+
+        new HashSet<Integer>();
+
+        for (int colorId = 0; colorId < colorLabels.size(); colorId++) {
+            ColorLabel colorLabel = colorLabels.get(colorId);
+            colorLabel.setEnabled(freeColors.contains(colorId));
+        }
+    }
+
+    /**
+     * Adds a selection listener
+     * 
+     * @param listener
+     */
+    public void addSelectionListener(ColorSelectionListener listener) {
+        selectionListeners.add(listener);
+    }
+
+    /**
+     * removes a selection listener
+     * 
+     * @param listener
+     */
+    public void removeSelectionListener(ColorSelectionListener listener) {
+        selectionListeners.remove(listener);
+    }
+
+    /**
+     * Listener that receives events when a new color has been selected.
+     */
+    public interface ColorSelectionListener {
+
+        /**
+         * Gets called whenever the user has selected a new color.
+         * 
+         * @param colorId
+         *            new color ID
+         */
+        void selectionChanged(int colorId);
+
+    }
+
+}

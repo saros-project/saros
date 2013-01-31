@@ -30,6 +30,7 @@ public class Messages extends NLS {
     public static String AddXMPPAccountWizard_account_created;
     public static String AddXMPPAccountWizard_account_created_text;
     public static String AddXMPPAccountWizard_title;
+
     public static String AdvancedPreferencePage_description;
     public static String AdvancedPreferencePage_interval_between_editings;
     public static String AdvancedPreferencePage_peer_update;
@@ -40,17 +41,28 @@ public class Messages extends NLS {
     public static String AdvancedPreferencePage_enable_videosharing;
     public static String AdvancedPreferencePage_enable_voip;
 
+    public static String AppearancePreferencePage_appearance_settings;
+    public static String AppearancePreferencePage_color;
+    public static String AppearancePreferencePage_colorgroup_title;
+    public static String AppearancePreferencePage_description;
+
     public static String ChangeColorAction_dialog_text;
     public static String ChangeColorAction_message_text;
     public static String ChangeColorAction_message_title;
     public static String ChangeColorAction_title;
     public static String ChangeColorAction_tooltip;
+
+    public static String ChangeColorWizard_title;
+    public static String ChangeColorWizardPage_title;
+    public static String ChangeColorWizardPage_description;
+
     public static String ChangeXMPPAccountAction_add_account;
     public static String ChangeXMPPAccountAction_configure_account;
     public static String ChangeXMPPAccountAction_connect;
     public static String ChangeXMPPAccountAction_connecting;
     public static String ChangeXMPPAccountAction_disconnect;
     public static String ChangeXMPPAccountAction_disconnecting;
+
     public static String ChatDisplay_clear;
     public static String ChatInput_hint_text;
     public static String ChatLinePartnerChangeSeparator_date_formatter_pattern;
