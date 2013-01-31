@@ -63,7 +63,7 @@ public class User {
 
     protected final JID jid;
 
-    protected final int colorID;
+    protected volatile int colorID;
 
     /**
      * The {@link #isInvitationComplete()} status is always false if a new
@@ -310,5 +310,17 @@ public class User {
         }
 
         return getJID().getName();
+    }
+
+    /**
+     * FOR INTERNAL USE ONLY
+     * 
+     * @param colorID
+     * @deprecated this must only be called by the component that handles color
+     *             changes
+     */
+    @Deprecated
+    public void setColorID(int colorID) {
+        this.colorID = colorID;
     }
 }

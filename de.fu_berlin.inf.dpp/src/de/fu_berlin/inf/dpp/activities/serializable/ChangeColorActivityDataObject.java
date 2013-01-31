@@ -1,7 +1,5 @@
 package de.fu_berlin.inf.dpp.activities.serializable;
 
-import org.eclipse.swt.graphics.RGB;
-
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import com.thoughtworks.xstream.annotations.XStreamConverter;
 
@@ -12,21 +10,30 @@ import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.util.xstream.JIDConverter;
 
 /**
- * This activityDataObject wraps the ChangeColorActivity
+ * Serializable representation of a ChangeColorActivity.
  * 
- * @author cnk and tobi
+ * @author cnk
+ * @author tobi
  */
 public class ChangeColorActivityDataObject extends AbstractActivityDataObject {
 
     @XStreamAsAttribute
     @XStreamConverter(JIDConverter.class)
     protected final JID target;
-    protected final RGB color;
 
-    public ChangeColorActivityDataObject(JID source, JID target, RGB color) {
+    @XStreamAsAttribute
+    @XStreamConverter(JIDConverter.class)
+    protected final JID affected;
+
+    @XStreamAsAttribute
+    protected final int colorID;
+
+    public ChangeColorActivityDataObject(JID source, JID target, JID affected,
+        int colorID) {
         super(source);
         this.target = target;
-        this.color = color;
+        this.affected = affected;
+        this.colorID = colorID;
     }
 
     /**
@@ -42,39 +49,14 @@ public class ChangeColorActivityDataObject extends AbstractActivityDataObject {
      * {@inheritDoc}
      */
     @Override
-    public IActivity getActivity(ISarosSession sharedProject) {
-        return new ChangeColorActivity(sharedProject.getUser(source),
-            sharedProject.getUser(target), this.color);
-    }
-
-    @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = super.hashCode();
-        result = prime * result + ((target == null) ? 0 : target.hashCode());
-        return result;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj)
-            return true;
-        if (!super.equals(obj))
-            return false;
-        if (!(obj instanceof ChangeColorActivityDataObject))
-            return false;
-        ChangeColorActivityDataObject other = (ChangeColorActivityDataObject) obj;
-        if (target == null) {
-            if (other.target != null)
-                return false;
-        } else if (!target.equals(other.target))
-            return false;
-
-        return true;
+    public IActivity getActivity(ISarosSession session) {
+        return new ChangeColorActivity(session.getUser(source),
+            session.getUser(target), session.getUser(affected), colorID);
     }
 
     @Override
     public String toString() {
-        return "ChangeColorActivityDataObject(" + source + " " + target + ")";
+        return "ChangeColorActivityDataObject(" + source + " " + affected + " "
+            + colorID + ")";
     }
 }

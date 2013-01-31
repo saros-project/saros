@@ -1,6 +1,7 @@
 package de.fu_berlin.inf.dpp.activities.business;
 
-import org.eclipse.swt.graphics.RGB;
+import java.util.Collections;
+import java.util.List;
 
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.activities.serializable.ChangeColorActivityDataObject;
@@ -8,19 +9,25 @@ import de.fu_berlin.inf.dpp.activities.serializable.IActivityDataObject;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 
 /**
- * This activity holds the color of the source.
+ * Activity for managing color changes.
  * 
- * @author cnk and tobi
+ * @author cnk
+ * @author tobi
+ * @author Stefan Rossbach
  */
-public class ChangeColorActivity extends AbstractActivity {
+public class ChangeColorActivity extends AbstractActivity implements
+    ITargetedActivity {
 
     protected final User target;
-    protected final RGB color;
+    protected final User affected;
+    protected final int colorID;
 
-    public ChangeColorActivity(User source, User target, RGB color) {
+    public ChangeColorActivity(User source, User target, User affected,
+        int colorID) {
         super(source);
         this.target = target;
-        this.color = color;
+        this.affected = affected;
+        this.colorID = colorID;
     }
 
     @Override
@@ -43,20 +50,36 @@ public class ChangeColorActivity extends AbstractActivity {
     @Override
     public IActivityDataObject getActivityDataObject(ISarosSession sarosSession) {
         return new ChangeColorActivityDataObject(source.getJID(),
-            target.getJID(), this.color);
+            target.getJID(), affected.getJID(), colorID);
     }
 
     @Override
     public String toString() {
-        return "ChangeColorActivity(" + source + " " + target + " " + color
+        return "ChangeColorActivity(" + source + " " + affected + " " + colorID
             + ")";
     }
 
-    public User getTarget() {
-        return target;
+    /**
+     * Returns the user that color id should be changed
+     * 
+     * @return the affected user or <code>null</code> if the user is no longer
+     *         part of the session
+     */
+    public User getAffected() {
+        return affected;
     }
 
-    public RGB getColor() {
-        return this.color;
+    /**
+     * Returns the new color id for the affected user.
+     * 
+     * @return the new color id
+     */
+    public int getColorID() {
+        return colorID;
+    }
+
+    @Override
+    public List<User> getRecipients() {
+        return Collections.singletonList(target);
     }
 }

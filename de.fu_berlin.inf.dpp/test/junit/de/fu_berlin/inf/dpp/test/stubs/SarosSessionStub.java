@@ -341,4 +341,9 @@ public class SarosSessionStub implements ISarosSession {
     public void kickUser(User user) {
         throw new RuntimeException("Unexpected call to Stub");
     }
+
+    @Override
+    public void changeColor(int colorID) {
+        throw new RuntimeException("Unexpected call to Stub");
+    }
 }

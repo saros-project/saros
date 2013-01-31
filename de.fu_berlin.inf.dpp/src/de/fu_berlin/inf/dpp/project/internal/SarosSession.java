@@ -240,14 +240,22 @@ public class SarosSession implements ISarosSession, Disposable {
 
         sarosContext.initComponent(this);
 
-        assert sarosNet.getMyJID() != null;
+        // FIXME that should be passed in !
+        JID localUserJID = sarosNet.getMyJID();
+
+        assert localUserJID != null;
 
         this.sarosContext = sarosContext;
         this.sessionStart = sessionStart;
 
-        this.localUser = new User(this, sarosNet.getMyJID(), myColorID);
+        this.localUser = new User(this, localUserJID, myColorID);
 
         freeColors = new FreeColors(MAX_USERCOLORS - 1);
+
+        if (freeColors.remove(myColorID))
+            log.debug("colorID " + myColorID + " was removed from the pool");
+        else
+            log.warn("colorID " + myColorID + " is not in the pool");
 
         initializeSessionContainer(sarosContext);
     }
@@ -277,19 +285,16 @@ public class SarosSession implements ISarosSession, Disposable {
 
         this(myColorID, sessionStart, sarosContext);
 
-        host = new User(this, hostID, 0);
+        /*
+         * HACK abuse the fact that non-host inviting is currently disabled and
+         * so the inviteColorID is always the colorID of the host
+         */
+
+        host = new User(this, hostID, inviterColorID);
         host.invitationCompleted();
 
-        if (freeColors.remove(myColorID)) {
-            log.debug("MY colorID (" + myColorID
-                + ") was removed from the list.");
-        } else {
-            log.warn("MY colorID (" + myColorID
-                + ") couldn't be removed from the list!");
-        }
-
         participants.put(hostID, host);
-        participants.put(sarosNet.getMyJID(), localUser);
+        participants.put(localUser.getJID(), localUser);
 
         /*
          * As the host is still a special person, we must find out if we were
@@ -1472,6 +1477,16 @@ public class SarosSession implements ISarosSession, Disposable {
     @Override
     public StopManager getStopManager() {
         return sessionContainer.getComponent(StopManager.class);
+    }
+
+    @Override
+    public void changeColor(int colorID) {
+        if (colorID < 0 || colorID >= MAX_USERCOLORS)
+            throw new IllegalArgumentException("color id '" + colorID
+                + "'  must be in range of 0 <= id < " + MAX_USERCOLORS);
+
+        sessionContainer.getComponent(ChangeColorManager.class).changeColorID(
+            colorID);
     }
 
     private void initializeSessionContainer(ISarosContext context) {

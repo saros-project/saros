@@ -20,14 +20,11 @@ public class FreeColorsTest {
      */
     @Test
     public void testFreeColors() {
-        FreeColors fc2 = new FreeColors(1);
-        assertEquals("The list should be empty because maxColorID<=1", 0,
-            fc2.freeColors.size());
         int number = 10;
         FreeColors fc = new FreeColors(number);
-        assertEquals("The list should contain" + (number - 1)
+        assertEquals("The list should contain " + number
             + " elements, but contains " + fc.freeColors.size() + " elements.",
-            number - 1, fc.freeColors.size());
+            number, fc.freeColors.size());
     }
 
     /**
@@ -39,21 +36,6 @@ public class FreeColorsTest {
         int number = 10;
         FreeColors fc = new FreeColors(number);
         assertFalse("The returned color shouldn't be maxColorID.",
-            fc.get() == number);
-
-    }
-
-    /**
-     * Test method for
-     * {@link de.fu_berlin.inf.dpp.project.internal.FreeColors#get()}.
-     * 
-     * Tests the try/catch block.
-     */
-    @Test
-    public void testGet2() {
-        int number = 1;
-        FreeColors fc = new FreeColors(number);
-        assertTrue("The returned color should be maxColorID.",
             fc.get() == number);
 
     }
@@ -72,21 +54,6 @@ public class FreeColorsTest {
         fc.add(freeColor);
         assertTrue("The list should conatain the color.",
             fc.freeColors.contains(freeColor));
-    }
-
-    /**
-     * Test method for
-     * {@link de.fu_berlin.inf.dpp.project.internal.FreeColors#add(int)}.
-     * 
-     * id<=0
-     */
-    @Test
-    public void testAdd2() {
-        int number = 10;
-        FreeColors fc = new FreeColors(number);
-        fc.add(0);
-        assertFalse("The list shouldn't conatain the color.",
-            fc.freeColors.contains(0));
     }
 
     /**

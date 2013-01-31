@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.core.runtime.IPath;
-import org.eclipse.swt.graphics.RGB;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -65,7 +64,7 @@ public class ActivityUtilsTest {
     public void testContainsChecksumsOnly2() {
 
         ChangeColorActivityDataObject tmp = new ChangeColorActivityDataObject(
-            new JID(""), new JID(""), new RGB(0, 0, 0));
+            new JID(""), new JID(""), new JID(""), 0);
 
         TimedActivityDataObject tmp1 = new TimedActivityDataObject(tmp,
             new JID(""), 0);
@@ -79,7 +78,7 @@ public class ActivityUtilsTest {
     public void testContainsQueueableActivitiesOnly1() {
         List<IActivityDataObject> activities = new ArrayList<IActivityDataObject>();
         ChangeColorActivityDataObject tmp = new ChangeColorActivityDataObject(
-            new JID(""), new JID(""), new RGB(0, 0, 0));
+            new JID(""), new JID(""), new JID(""), 0);
 
         activities.add(tmp);
 

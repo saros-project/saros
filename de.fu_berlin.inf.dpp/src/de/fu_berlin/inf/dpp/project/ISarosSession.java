@@ -468,4 +468,16 @@ public interface ISarosSession {
      * Return if the session has been stopped
      */
     public boolean isStopped();
+
+    /**
+     * Changes the color for the current session.
+     * 
+     * @param colorID
+     *            the new color id that should be used to select the new color
+     * 
+     * @throws IllegalArgumentException
+     *             if the color id is negative or exceeds the available color id
+     *             limit
+     */
+    public void changeColor(int colorID);
 }

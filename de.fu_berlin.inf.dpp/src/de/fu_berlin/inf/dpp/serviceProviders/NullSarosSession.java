@@ -347,4 +347,9 @@ public class NullSarosSession implements ISarosSession {
     public void kickUser(User user) {
         log.warn("unexpected method call");
     }
+
+    @Override
+    public void changeColor(int colorID) {
+        log.warn("unexpected method call");
+    }
 }

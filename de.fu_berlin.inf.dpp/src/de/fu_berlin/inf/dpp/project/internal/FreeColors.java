@@ -20,7 +20,7 @@ public class FreeColors {
         assert maxColorID > 1;
         this.maxColorID = maxColorID;
         freeColors = new LinkedList<Integer>();
-        for (int i = 1; i < maxColorID; ++i) {
+        for (int i = 0; i < maxColorID; ++i) {
             freeColors.add(i);
         }
     }
@@ -56,7 +56,7 @@ public class FreeColors {
      *            Color ID to return.
      */
     public synchronized void add(int colorID) {
-        if (colorID < 1 || colorID >= maxColorID)
+        if (colorID < 0 || colorID >= maxColorID)
             return;
 
         if (!freeColors.contains(colorID))
