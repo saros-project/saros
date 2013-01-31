@@ -160,6 +160,8 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
          */
         prefs.setValue(PreferenceConstants.SAROSVIEW_SASH_WEIGHT_LEFT, 1);
         prefs.setValue(PreferenceConstants.SAROSVIEW_SASH_WEIGHT_RIGHT, 1);
+
+        prefs.setValue(PreferenceConstants.FAVORITE_SESSION_COLOR_ID, -1);
     }
 
     private static interface PreferenceHolderWrapper {

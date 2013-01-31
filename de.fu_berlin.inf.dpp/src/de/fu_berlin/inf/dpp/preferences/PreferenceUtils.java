@@ -211,4 +211,14 @@ public class PreferenceUtils {
     public boolean isVOIPEnabled() {
         return preferenceStore.getBoolean(PreferenceConstants.VOIP_ENABLED);
     }
+
+    /**
+     * Returns the favorite color ID that should be used during a session.
+     * 
+     * @return the favorite color ID or -1 if no favorite color ID is available
+     */
+    public int getFavoriteColorID() {
+        return preferenceStore
+            .getInt(PreferenceConstants.FAVORITE_SESSION_COLOR_ID);
+    }
 }

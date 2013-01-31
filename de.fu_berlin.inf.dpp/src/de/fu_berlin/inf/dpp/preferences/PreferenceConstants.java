@@ -237,4 +237,10 @@ public class PreferenceConstants {
      * Leave sessions when alone as host?
      */
     public static final String STOP_EMPTY_SESSIONS = "stop_empty_sessions";
+
+    /**
+     * color ID that should be used in a session if it is not already occupied
+     */
+    public static final String FAVORITE_SESSION_COLOR_ID = "favorite.session.color.id";
+
 }
