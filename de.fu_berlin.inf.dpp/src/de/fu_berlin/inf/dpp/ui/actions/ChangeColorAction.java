@@ -3,9 +3,9 @@ package de.fu_berlin.inf.dpp.ui.actions;
 import java.util.List;
 
 import org.eclipse.jface.action.Action;
-import org.eclipse.jface.dialogs.InputDialog;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.window.Window;
+import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.IWorkbenchPart;
 import org.picocontainer.Disposable;
@@ -21,6 +21,7 @@ import de.fu_berlin.inf.dpp.ui.ImageManager;
 import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.ui.util.selection.SelectionUtils;
 import de.fu_berlin.inf.dpp.ui.util.selection.retriever.SelectionRetrieverFactory;
+import de.fu_berlin.inf.dpp.ui.wizards.ColorChooserWizard;
 
 /**
  * This action opens a color dialog and checks whether the chosen color is
@@ -71,24 +72,21 @@ public final class ChangeColorAction extends Action implements Disposable {
     @Override
     public void run() {
 
-        InputDialog dialog = new InputDialog(EditorAPI.getShell(), "Input",
-            "Number", "0", null);
+        ColorChooserWizard wizard = new ColorChooserWizard();
+        WizardDialog dialog = new WizardDialog(EditorAPI.getShell(), wizard);
+
+        dialog.setBlockOnOpen(true);
+        dialog.create();
 
         if (dialog.open() != Window.OK)
             return;
 
-        try {
-            int colorID = Integer.parseInt(dialog.getValue());
-            ISarosSession session = sessionManager.getSarosSession();
+        ISarosSession session = sessionManager.getSarosSession();
 
-            if (session == null)
-                return;
+        if (session == null)
+            return;
 
-            session.changeColor(colorID);
-
-        } catch (NumberFormatException e) {
-            // NOP
-        }
+        session.changeColor(wizard.getChosenColor());
     }
 
     @Override
