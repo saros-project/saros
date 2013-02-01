@@ -54,6 +54,7 @@ import org.osgi.service.prefs.Preferences;
 import de.fu_berlin.inf.dpp.accountManagement.XMPPAccount;
 import de.fu_berlin.inf.dpp.accountManagement.XMPPAccountStore;
 import de.fu_berlin.inf.dpp.annotations.Component;
+import de.fu_berlin.inf.dpp.editor.annotations.SarosAnnotation;
 import de.fu_berlin.inf.dpp.feedback.ErrorLogManager;
 import de.fu_berlin.inf.dpp.feedback.StatisticManagerConfiguration;
 import de.fu_berlin.inf.dpp.net.SarosNet;
@@ -287,6 +288,12 @@ public class Saros extends AbstractUIPlugin {
             && ErrorLogManager.hasErrorLogAgreement(this)) {
             asyncConnect();
         }
+
+        /*
+         * If other colors than the ones we support are set in the
+         * PreferenceStore, overwrite them
+         */
+        SarosAnnotation.resetColors();
     }
 
     /**

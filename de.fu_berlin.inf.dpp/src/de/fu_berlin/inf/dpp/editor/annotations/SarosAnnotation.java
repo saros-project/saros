@@ -1,6 +1,7 @@
 package de.fu_berlin.inf.dpp.editor.annotations;
 
 import org.apache.log4j.Logger;
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferenceConverter;
 import org.eclipse.jface.text.source.Annotation;
 import org.eclipse.swt.graphics.Color;
@@ -11,7 +12,7 @@ import org.eclipse.ui.texteditor.AnnotationPreference;
 import org.eclipse.ui.texteditor.AnnotationPreferenceLookup;
 
 import de.fu_berlin.inf.dpp.User;
-import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
+import de.fu_berlin.inf.dpp.project.internal.SarosSession;
 import de.fu_berlin.inf.nebula.utils.ColorUtils;
 
 /**
@@ -36,6 +37,16 @@ public abstract class SarosAnnotation extends Annotation {
     private static final float LIGHTNESS_SCALE = 0.12f;
 
     /**
+     * Color which is chosen, when an invalid colorId is set.
+     */
+    private static final RGB NO_COLOR_RGB_VALUES = new RGB(128, 128, 128);
+
+    // Keys used for loading the colors from plugin.xml
+    private static final String SELECTION_COLOR_KEY = "de.fu_berlin.inf.dpp.annotations.selection";
+    private static final String VIEWPORT_COLOR_KEY = "de.fu_berlin.inf.dpp.annotations.viewport";
+    private static final String CONTRIBUTION_COLOR_KEY = "de.fu_berlin.inf.dpp.annotations.contribution";
+
+    /**
      * Creates a SarosAnnotation.
      * 
      * @param type
@@ -53,9 +64,8 @@ public abstract class SarosAnnotation extends Annotation {
         super(type, false, text);
         this.source = source;
 
-        if (isNumbered) {
+        if (isNumbered)
             setType(type + "." + (source.getColorID() + 1));
-        }
     }
 
     public User getSource() {
@@ -84,107 +94,152 @@ public abstract class SarosAnnotation extends Annotation {
      * @return the corresponding color, <code>null</code> if no color is stored
      */
     public static Color getUserColor(User user) {
-
-        int colorID = user.getColorID();
-
-        // TODO This should not depend on the ContributionAnnotation, but be
-        // configurable like all colors!
-        String annotationType = ContributionAnnotation.TYPE + "."
-            + String.valueOf(colorID + 1);
-
-        AnnotationPreferenceLookup lookup = EditorsUI
-            .getAnnotationPreferenceLookup();
-        AnnotationPreference ap = lookup
-            .getAnnotationPreference(annotationType);
-        if (ap == null) {
-            return null;
-        }
-
-        RGB rgb;
-        try {
-            rgb = PreferenceConverter.getColor(EditorsUI.getPreferenceStore(),
-                ap.getColorPreferenceKey());
-        } catch (RuntimeException e) {
-            return null;
-        }
-
-        return new Color(Display.getDefault(), rgb);
+        return getColor(user.getColorID());
     }
 
     /**
-     * Sets the color of given user.
+     * Returns the color that corresponds to a user.
+     * <p>
+     * <b>Important notice:</b> Every returned color instance allocates OS
+     * resources that need to be disposed with {@link Color#dispose()}!
+     * 
+     * @param colorID
+     * @return the corresponding color or a default one if no color is stored
+     */
+    public static Color getColor(int colorID) {
+
+        String annotationType = ContributionAnnotation.TYPE + "."
+            + String.valueOf(colorID + 1);
+
+        try {
+            if (colorID < 0 || colorID >= SarosSession.MAX_USERCOLORS)
+                return new Color(Display.getDefault(), NO_COLOR_RGB_VALUES);
+
+            AnnotationPreferenceLookup lookup = EditorsUI
+                .getAnnotationPreferenceLookup();
+
+            AnnotationPreference ap = lookup
+                .getAnnotationPreference(annotationType);
+
+            if (ap == null) {
+                log.warn("could not read color value of annotation '"
+                    + annotationType + "' because it does not exists");
+                return new Color(Display.getDefault(), NO_COLOR_RGB_VALUES);
+            }
+
+            RGB rgb = PreferenceConverter.getColor(
+                EditorsUI.getPreferenceStore(), ap.getColorPreferenceKey());
+
+            return new Color(Display.getDefault(), rgb);
+
+        } catch (Exception e) {
+            log.error("failed to load color value of annotation: "
+                + annotationType, e);
+            return new Color(Display.getDefault(), NO_COLOR_RGB_VALUES);
+        }
+    }
+
+    /**
+     * Loads the colors from the plugin.xml and overwrites possible errors in
+     * the PreferenceStore
+     */
+    public static void resetColors() {
+        for (int i = 0; i < SarosSession.MAX_USERCOLORS; ++i) {
+
+            AnnotationPreferenceLookup lookup = EditorsUI
+                .getAnnotationPreferenceLookup();
+
+            RGB selectionRGB = readRGB(lookup, i, SELECTION_COLOR_KEY);
+            RGB viewportRGB = readRGB(lookup, i, VIEWPORT_COLOR_KEY);
+            RGB contributionRGB = readRGB(lookup, i, CONTRIBUTION_COLOR_KEY);
+
+            setColor(i, selectionRGB, contributionRGB, viewportRGB);
+        }
+    }
+
+    private static RGB readRGB(AnnotationPreferenceLookup lookup, int i,
+        String key) {
+        String annotationTypeForSelection = key + "." + Integer.toString(i + 1);
+
+        AnnotationPreference ap = lookup
+            .getAnnotationPreference(annotationTypeForSelection);
+
+        if (ap == null) {
+            log.warn("annotation preference '" + annotationTypeForSelection
+                + "' does not exists");
+            return null;
+        }
+        return ap.getColorPreferenceValue();
+    }
+
+    /**
+     * Sets the color of colorID.
      * <p>
      * More precisely the three different annotation types selection, viewport
-     * and annotation are set. Whereby a slightly different shade of color is
-     * used for the selection annotation.
+     * and contribution annotation are set.
      * 
-     * @param user
-     * @param userRGB
+     * @param colorID
+     * @param selectionRGB
+     * @param contributionRGB
+     * @param viewportRGB
      */
-    public static void setUserColor(User user, final RGB userRGB) {
-        int colorID = user.getColorID();
+    private static void setColor(int colorID, final RGB selectionRGB,
+        final RGB contributionRGB, final RGB viewportRGB) {
 
-        // TODO This should not depend on the SelectionAnnotation, but be
-        // configurable like all colors!
         String annotationTypeForSelection = SelectionAnnotation.TYPE + "."
             + String.valueOf(colorID + 1);
+
         String annotationTypeForViewport = ViewportAnnotation.TYPE + "."
             + String.valueOf(colorID + 1);
+
         String annotationTypeForContribution = ContributionAnnotation.TYPE
             + "." + String.valueOf(colorID + 1);
 
         AnnotationPreferenceLookup lookup = EditorsUI
             .getAnnotationPreferenceLookup();
 
-        final AnnotationPreference apForSelection = lookup
+        AnnotationPreference apForSelection = lookup
             .getAnnotationPreference(annotationTypeForSelection);
 
-        final AnnotationPreference apForViewPort = lookup
+        AnnotationPreference apForViewPort = lookup
             .getAnnotationPreference(annotationTypeForViewport);
 
-        final AnnotationPreference apForContribution = lookup
+        AnnotationPreference apForContribution = lookup
             .getAnnotationPreference(annotationTypeForContribution);
 
-        if (apForSelection == null) {
+        if (apForSelection == null || apForViewPort == null
+            || apForContribution == null) {
+            log.error("could not set colors for color id " + colorID
+                + " because at least one annotation preference does not exists");
             return;
         }
 
-        if (apForViewPort == null) {
+        if (selectionRGB == null || viewportRGB == null
+            || contributionRGB == null) {
+            log.error("could not set colors for color id " + colorID
+                + " because at least one color value does not exists");
             return;
         }
 
-        if (apForContribution == null) {
-            return;
-        }
+        log.debug("set color values [c:" + contributionRGB + "|s:"
+            + selectionRGB + "|v:" + viewportRGB + "] for color id: " + colorID);
 
-        SWTUtils.runSafeSWTSync(log, new Runnable() {
-            @Override
-            public void run() {
-                RGB scaledUserRGB = ColorUtils.addLightness(userRGB,
-                    LIGHTNESS_SCALE);
+        IPreferenceStore editorsUIStore = EditorsUI.getPreferenceStore();
 
-                log.info("Set new User Color: " + userRGB);
-                log.debug("Set new User Color (scaled): " + scaledUserRGB);
+        // selection color
+        // (highlighting and cursor position)
+        PreferenceConverter.setValue(editorsUIStore,
+            apForSelection.getColorPreferenceKey(), selectionRGB);
 
-                // selection color
-                // (highlighting and cursor position)
-                EditorsUI.getPreferenceStore().setValue(
-                    apForSelection.getColorPreferenceKey(),
-                    scaledUserRGB.red + "," + scaledUserRGB.green + ","
-                        + scaledUserRGB.blue);
+        // viewport color
+        // (side bar, displays what a participant is looking at)
 
-                // viewport color
-                // (side bar, displays what a participant is looking at)
-                EditorsUI.getPreferenceStore().setValue(
-                    apForViewPort.getColorPreferenceKey(),
-                    userRGB.red + "," + userRGB.green + "," + userRGB.blue);
+        PreferenceConverter.setValue(editorsUIStore,
+            apForViewPort.getColorPreferenceKey(), viewportRGB);
 
-                // contribution color
-                // (the last editor changes made by a participant)
-                EditorsUI.getPreferenceStore().setValue(
-                    apForContribution.getColorPreferenceKey(),
-                    userRGB.red + "," + userRGB.green + "," + userRGB.blue);
-            }
-        });
+        // contribution color
+        // (the last editor changes made by a participant)
+        PreferenceConverter.setValue(editorsUIStore,
+            apForContribution.getColorPreferenceKey(), contributionRGB);
     }
 }
