@@ -164,13 +164,8 @@ public class ColorChooser extends Composite {
     public void updateColorEnablement() {
         ISarosSession session = sessionManager.getSarosSession();
 
-        Set<Integer> freeColors =
-
-        // TODO activate if the session color patch is applied
-        // session != null ?
-        // session.getFreeColors() :
-
-        new HashSet<Integer>();
+        Set<Integer> freeColors = session != null ? session
+            .getAvailableColors() : new HashSet<Integer>();
 
         for (int colorId = 0; colorId < colorLabels.size(); colorId++) {
             ColorLabel colorLabel = colorLabels.get(colorId);
