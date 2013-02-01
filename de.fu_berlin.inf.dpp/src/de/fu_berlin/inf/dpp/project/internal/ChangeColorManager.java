@@ -54,6 +54,8 @@ public class ChangeColorManager extends AbstractActivityProvider implements
         User affected = activity.getAffected();
         int colorID = activity.getColorID();
 
+        int assignedColorID;
+
         if (affected == null) {
             log.warn("received color id change for a user that is no longer part of the session");
             return;
@@ -64,23 +66,50 @@ public class ChangeColorManager extends AbstractActivityProvider implements
 
         // host send us an update for a user
         if (source.isHost() && !sarosSession.isHost()) {
+            sarosSession.returnColor(affected.getColorID());
+
+            assignedColorID = sarosSession.getColor(colorID);
+
+            if (assignedColorID != colorID) {
+                log.error("received a color id change for an id that is already in use");
+                /*
+                 * We should stop the session here as something seriously had
+                 * gone wrong
+                 */
+
+                // try to revert
+                sarosSession.returnColor(assignedColorID);
+                assignedColorID = sarosSession.getColor(affected.getColorID());
+
+                // give up
+                if (assignedColorID != affected.getColorID())
+                    sarosSession.returnColor(assignedColorID);
+
+                return;
+            }
             // this fails if a new copy is returned !
-            affected.setColorID(activity.getColorID());
+            affected.setColorID(colorID);
         } else {
+
+            // FIXME race condition as remove and add are not atomic !
+
             assert sarosSession.isHost() : "only the session host can assign a color id";
 
-            if (!((SarosSession) sarosSession).freeColors.remove(colorID)) {
+            assignedColorID = sarosSession.getColor(colorID);
+
+            if (assignedColorID != colorID) {
                 log.debug("could not assign color id '" + colorID
                     + "' to user " + affected + " because it is already in use");
+                sarosSession.returnColor(assignedColorID);
                 return;
             }
 
             log.debug("readding color id " + affected.getColorID()
                 + " to the pool");
-            // race condition as this is not atomic
-            ((SarosSession) sarosSession).freeColors.add(affected.getColorID());
 
-            affected.setColorID(activity.getColorID());
+            sarosSession.returnColor(affected.getColorID());
+
+            affected.setColorID(colorID);
             broadcastColorChange(affected, affected.getColorID());
         }
 
