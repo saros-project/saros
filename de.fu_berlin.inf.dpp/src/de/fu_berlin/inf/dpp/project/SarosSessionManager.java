@@ -69,6 +69,7 @@ import de.fu_berlin.inf.dpp.net.internal.XMPPTransmitter;
 import de.fu_berlin.inf.dpp.observables.InvitationProcessObservable;
 import de.fu_berlin.inf.dpp.observables.SarosSessionObservable;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
+import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
 import de.fu_berlin.inf.dpp.project.internal.SarosSession;
 import de.fu_berlin.inf.dpp.ui.ImageManager;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
@@ -117,6 +118,9 @@ public class SarosSessionManager implements ISarosSessionManager {
     @Inject
     // FIXME dependency of other class
     protected RosterTracker rosterTracker;
+
+    @Inject
+    protected PreferenceUtils preferenceUtils;
 
     @Inject
     protected SarosContext sarosContext;
@@ -174,8 +178,8 @@ public class SarosSessionManager implements ISarosSessionManager {
         this.sessionID.setValue(String.valueOf(sessionRandom
             .nextInt(Integer.MAX_VALUE)));
 
-        final SarosSession sarosSession = new SarosSession(new DateTime(),
-            sarosContext);
+        final SarosSession sarosSession = new SarosSession(
+            preferenceUtils.getFavoriteColorID(), new DateTime(), sarosContext);
 
         this.sarosSessionObservable.setValue(sarosSession);
 

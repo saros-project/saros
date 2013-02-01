@@ -235,37 +235,46 @@ public class SarosSession implements ISarosSession, Disposable {
     /**
      * Common constructor code for host and client side.
      */
-    protected SarosSession(int myColorID, DateTime sessionStart,
-        ISarosContext sarosContext) {
+    protected SarosSession(int colorID, boolean reassignColorID,
+        DateTime sessionStart, ISarosContext sarosContext) {
 
         sarosContext.initComponent(this);
+
+        this.sarosContext = sarosContext;
+        this.sessionStart = sessionStart;
 
         // FIXME that should be passed in !
         JID localUserJID = sarosNet.getMyJID();
 
         assert localUserJID != null;
 
-        this.sarosContext = sarosContext;
-        this.sessionStart = sessionStart;
-
-        this.localUser = new User(this, localUserJID, myColorID);
-
         freeColors = new FreeColors(MAX_USERCOLORS);
 
-        if (freeColors.remove(myColorID))
-            log.debug("colorID " + myColorID + " was removed from the pool");
+        if (reassignColorID && (colorID < 0 || colorID >= MAX_USERCOLORS))
+            colorID = 0;
+        else if (colorID < 0 || colorID > MAX_USERCOLORS)
+            throw new IllegalArgumentException(
+                "cannot start a session with an invalid color id: 0 <= "
+                    + colorID + " <= " + MAX_USERCOLORS);
+
+        this.localUser = new User(this, localUserJID, colorID);
+
+        if (freeColors.remove(colorID))
+            log.debug("colorID " + colorID + " was removed from the pool");
         else
-            log.warn("colorID " + myColorID + " is not in the pool");
+            log.warn("colorID " + colorID + " is not in the pool");
 
         initializeSessionContainer(sarosContext);
+
     }
 
     /**
      * Constructor called for SarosSession of the host
      */
-    public SarosSession(DateTime sessionStart, ISarosContext sarosContext) {
+    public SarosSession(int colorID, DateTime sessionStart,
+        ISarosContext sarosContext) {
 
-        this(0, sessionStart, sarosContext);
+        this(colorID, true, sessionStart, sarosContext);
 
         host = localUser;
         host.invitationCompleted();
@@ -283,7 +292,7 @@ public class SarosSession implements ISarosSession, Disposable {
     public SarosSession(JID hostID, int myColorID, DateTime sessionStart,
         ISarosContext sarosContext, JID inviterID, int inviterColorID) {
 
-        this(myColorID, sessionStart, sarosContext);
+        this(myColorID, false, sessionStart, sarosContext);
 
         /*
          * HACK abuse the fact that non-host inviting is currently disabled and
