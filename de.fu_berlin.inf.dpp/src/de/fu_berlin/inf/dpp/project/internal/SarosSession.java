@@ -250,7 +250,7 @@ public class SarosSession implements ISarosSession, Disposable {
 
         this.localUser = new User(this, localUserJID, myColorID);
 
-        freeColors = new FreeColors(MAX_USERCOLORS - 1);
+        freeColors = new FreeColors(MAX_USERCOLORS);
 
         if (freeColors.remove(myColorID))
             log.debug("colorID " + myColorID + " was removed from the pool");
