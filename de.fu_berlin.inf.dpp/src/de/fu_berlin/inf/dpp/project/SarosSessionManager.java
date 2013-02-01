@@ -383,7 +383,7 @@ public class SarosSessionManager implements ISarosSessionManager {
         ISarosSession sarosSession = sarosSessionObservable.getValue();
 
         OutgoingSessionNegotiation result = new OutgoingSessionNegotiation(
-            toInvite, sarosSession.getFreeColor(), sarosSession, description,
+            toInvite, sarosSession.getColor(-1), sarosSession, description,
             sarosContext);
 
         OutgoingInvitationJob outgoingInvitationJob = new OutgoingInvitationJob(

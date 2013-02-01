@@ -173,7 +173,7 @@ public class NullSarosSession implements ISarosSession {
     }
 
     @Override
-    public int getFreeColor() {
+    public int getColor(int colorID) {
         log.warn("unexpected method call");
         return 0;
     }
@@ -351,5 +351,11 @@ public class NullSarosSession implements ISarosSession {
     @Override
     public void changeColor(int colorID) {
         log.warn("unexpected method call");
+    }
+
+    @Override
+    public Set<Integer> getAvailableColors() {
+        log.warn("unexpected method call");
+        return null;
     }
 }

@@ -1,7 +1,9 @@
 package de.fu_berlin.inf.dpp.project.internal;
 
 import java.util.Deque;
+import java.util.HashSet;
 import java.util.LinkedList;
+import java.util.Set;
 
 /**
  * A pool of free colors.
@@ -26,12 +28,19 @@ public class FreeColors {
     }
 
     /**
-     * Gets a color ID from the pool. If the pool is empty, the highest color ID
-     * will be returned.
+     * Gets and removes a color ID from the pool. If the pool is empty, the
+     * highest color ID will be returned.
      * 
-     * @return color ID.
+     * @param colorID
+     *            the color ID that should be removed
+     * @return either the color id that was specified by colorID or the next
+     *         available if the color id was not in the pool
      */
-    public synchronized int get() {
+    public synchronized int get(int colorID) {
+
+        if (freeColors.remove(colorID))
+            return colorID;
+
         if (freeColors.isEmpty())
             return maxColorID;
 
@@ -61,5 +70,12 @@ public class FreeColors {
 
         if (!freeColors.contains(colorID))
             freeColors.addFirst(colorID);
+    }
+
+    /**
+     * Returns the currently available color IDs.
+     */
+    public synchronized Set<Integer> getAvailable() {
+        return new HashSet<Integer>(freeColors);
     }
 }

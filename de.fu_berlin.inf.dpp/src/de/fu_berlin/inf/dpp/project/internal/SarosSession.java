@@ -765,13 +765,18 @@ public class SarosSession implements ISarosSession, Disposable {
     }
 
     @Override
-    public int getFreeColor() {
-        return freeColors.get();
+    public int getColor(int colorID) {
+        return freeColors.get(colorID);
     }
 
     @Override
     public void returnColor(int colorID) {
         freeColors.add(colorID);
+    }
+
+    @Override
+    public Set<Integer> getAvailableColors() {
+        return freeColors.getAvailable();
     }
 
     /**

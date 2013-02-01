@@ -36,8 +36,17 @@ public class FreeColorsTest {
         int number = 10;
         FreeColors fc = new FreeColors(number);
         assertFalse("The returned color shouldn't be maxColorID.",
-            fc.get() == number);
+            fc.get(-1) == number);
 
+    }
+
+    @Test
+    public void testGetColorID() {
+        int number = 10;
+        FreeColors fc = new FreeColors(number);
+
+        assertEquals(4, fc.get(4));
+        assertFalse("color id should be removed", fc.get(4) == 4);
     }
 
     /**
@@ -50,7 +59,7 @@ public class FreeColorsTest {
     public void testAdd() {
         int number = 10;
         FreeColors fc = new FreeColors(number);
-        int freeColor = fc.get();
+        int freeColor = fc.get(-1);
         fc.add(freeColor);
         assertTrue("The list should conatain the color.",
             fc.freeColors.contains(freeColor));

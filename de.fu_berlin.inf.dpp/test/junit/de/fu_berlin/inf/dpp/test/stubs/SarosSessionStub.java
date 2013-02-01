@@ -212,7 +212,7 @@ public class SarosSessionStub implements ISarosSession {
     }
 
     @Override
-    public int getFreeColor() {
+    public int getColor(int colorID) {
         throw new RuntimeException("Unexpected call to Stub");
     }
 
@@ -344,6 +344,11 @@ public class SarosSessionStub implements ISarosSession {
 
     @Override
     public void changeColor(int colorID) {
+        throw new RuntimeException("Unexpected call to Stub");
+    }
+
+    @Override
+    public Set<Integer> getAvailableColors() {
         throw new RuntimeException("Unexpected call to Stub");
     }
 }
