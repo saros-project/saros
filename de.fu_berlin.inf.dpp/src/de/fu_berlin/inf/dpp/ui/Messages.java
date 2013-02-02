@@ -43,10 +43,7 @@ public class Messages extends NLS {
 
     public static String AppearancePreferencePage_appearance_settings;
     public static String AppearancePreferencePage_color;
-    public static String AppearancePreferencePage_colorgroup_title;
-    public static String AppearancePreferencePage_description;
 
-    public static String ChangeColorAction_dialog_text;
     public static String ChangeColorAction_message_text;
     public static String ChangeColorAction_message_title;
     public static String ChangeColorAction_title;

@@ -3,6 +3,7 @@ package de.fu_berlin.inf.dpp.ui.actions;
 import java.util.List;
 
 import org.eclipse.jface.action.Action;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.window.Window;
 import org.eclipse.jface.wizard.WizardDialog;
@@ -66,14 +67,15 @@ public final class ChangeColorAction extends Action implements Disposable {
 
         setEnabled(session != null && participants.size() == 1
             && participants.get(0).equals(session.getLocalUser()));
-
     }
 
     @Override
     public void run() {
 
         ColorChooserWizard wizard = new ColorChooserWizard();
+
         WizardDialog dialog = new WizardDialog(EditorAPI.getShell(), wizard);
+        dialog.setHelpAvailable(false);
 
         dialog.setBlockOnOpen(true);
         dialog.create();
@@ -86,7 +88,14 @@ public final class ChangeColorAction extends Action implements Disposable {
         if (session == null)
             return;
 
-        session.changeColor(wizard.getChosenColor());
+        int colorID = wizard.getChosenColor();
+
+        if (session.getAvailableColors().contains(colorID))
+            session.changeColor(colorID);
+        else
+            MessageDialog.openInformation(EditorAPI.getShell(),
+                Messages.ChangeColorAction_message_title,
+                Messages.ChangeColorAction_message_text);
     }
 
     @Override
