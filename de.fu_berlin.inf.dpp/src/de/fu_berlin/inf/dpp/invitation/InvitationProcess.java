@@ -20,16 +20,22 @@
 package de.fu_berlin.inf.dpp.invitation;
 
 import org.apache.log4j.Logger;
+import org.jivesoftware.smack.packet.Packet;
 import org.jivesoftware.smack.packet.PacketExtension;
 import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.SarosContext;
+import de.fu_berlin.inf.dpp.communication.chat.muc.negotiation.MUCSessionPreferencesNegotiatingManager;
 import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
 import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
 import de.fu_berlin.inf.dpp.invitation.ProcessTools.CancelOption;
+import de.fu_berlin.inf.dpp.net.IReceiver;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.net.SarosNet;
+import de.fu_berlin.inf.dpp.net.SarosPacketCollector;
 import de.fu_berlin.inf.dpp.net.internal.extensions.CancelInviteExtension;
+import de.fu_berlin.inf.dpp.net.util.RosterUtils;
 import de.fu_berlin.inf.dpp.observables.InvitationProcessObservable;
 import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.util.Utils;
@@ -42,11 +48,28 @@ public abstract class InvitationProcess extends CancelableProcess {
 
     private static final Logger log = Logger.getLogger(InvitationProcess.class);
 
+    /**
+     * Timeout for all packet exchanges during the session negotiation
+     */
+    protected static final long PACKET_TIMEOUT = Long.getLong(
+        "de.fu_berlin.inf.dpp.invitation.session.PACKET_TIMEOUT", 30000L);
+
+    /**
+     * Timeout on how long the session negotiation should wait for the remote
+     * user to accept the invitation
+     */
+    protected static final long INVITATION_ACCEPTED_TIMEOUT = Long.getLong(
+        "de.fu_berlin.inf.dpp.invitation.session.INVITATION_ACCEPTED_TIMEOUT",
+        600000L);
+
     @Inject
     protected ITransmitter transmitter;
-    protected JID peer;
-    protected String description;
-    protected final int colorID;
+
+    @Inject
+    protected IReceiver receiver;
+
+    @Inject
+    protected MUCSessionPreferencesNegotiatingManager mucNegotiatingManager;
 
     @Inject
     protected ISarosSessionManager sarosSessionManager;
@@ -55,14 +78,24 @@ public abstract class InvitationProcess extends CancelableProcess {
     protected InvitationProcessObservable invitationProcesses;
 
     protected final String invitationID;
+    protected final String description;
+    protected JID peer;
+
+    protected final String peerNickname;
 
     public InvitationProcess(String invitationID, JID peer, String description,
-        int colorID, SarosContext sarosContext) {
+        SarosContext sarosContext) {
         this.invitationID = invitationID;
         this.peer = peer;
         this.description = description;
-        this.colorID = colorID;
         sarosContext.initComponent(this);
+
+        String nickname = RosterUtils.getNickname(
+            sarosContext.getComponent(SarosNet.class), peer);
+
+        peerNickname = nickname == null ? peer.getBareJID().toString()
+            : nickname;
+
         this.invitationProcesses.addInvitationProcess(this);
     }
 
@@ -106,4 +139,36 @@ public abstract class InvitationProcess extends CancelableProcess {
 
         transmitter.sendMessageToUser(getPeer(), notification);
     }
+
+    /**
+     * Returns the next packet from a collector.
+     * 
+     * @param collector
+     *            the collector to monitor
+     * @param timeout
+     *            the amount of time to wait for the next packet (in
+     *            milliseconds)
+     * @return the collected packet or <code>null</code> if no packet was
+     *         received
+     * @throws SarosCancellationException
+     *             if the process was canceled
+     */
+    protected final Packet collectPacket(SarosPacketCollector collector,
+        long timeout) throws SarosCancellationException {
+
+        Packet packet = null;
+
+        while (timeout > 0) {
+            checkCancellation(CancelOption.NOTIFY_PEER);
+
+            packet = collector.nextResult(1000);
+
+            if (packet != null)
+                break;
+
+            timeout -= 1000;
+        }
+        return packet;
+    }
+
 }

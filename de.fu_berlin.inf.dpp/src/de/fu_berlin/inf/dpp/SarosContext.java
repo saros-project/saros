@@ -70,7 +70,9 @@ import de.fu_berlin.inf.dpp.net.internal.extensions.CancelProjectNegotiationExte
 import de.fu_berlin.inf.dpp.net.internal.extensions.FileListExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.InvitationAcceptedExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.InvitationAcknowledgedExtension;
-import de.fu_berlin.inf.dpp.net.internal.extensions.InvitationParametersExtension;
+import de.fu_berlin.inf.dpp.net.internal.extensions.InvitationCompletedExtension;
+import de.fu_berlin.inf.dpp.net.internal.extensions.InvitationOfferingExtension;
+import de.fu_berlin.inf.dpp.net.internal.extensions.InvitationParameterExchangeExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.KickUserExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.SarosLeaveExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.UserListExtension;
@@ -339,9 +341,11 @@ public class SarosContext implements ISarosContext {
         try {
             Class.forName(ActivitiesExtension.class.getName());
             Class.forName(CancelInviteExtension.class.getName());
-            Class.forName(InvitationParametersExtension.class.getName());
+            Class.forName(InvitationOfferingExtension.class.getName());
+            Class.forName(InvitationParameterExchangeExtension.class.getName());
             Class.forName(InvitationAcknowledgedExtension.class.getName());
             Class.forName(InvitationAcceptedExtension.class.getName());
+            Class.forName(InvitationCompletedExtension.class.getName());
             Class.forName(CancelProjectNegotiationExtension.class.getName());
             Class.forName(FileListExtension.class.getName());
             Class.forName(KickUserExtension.class.getName());

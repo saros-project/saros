@@ -1,6 +1,5 @@
 package de.fu_berlin.inf.dpp.invitation;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -20,56 +19,52 @@ import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.SarosContext;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.activities.ProjectExchangeInfo;
-import de.fu_berlin.inf.dpp.communication.chat.muc.negotiation.MUCSessionPreferences;
-import de.fu_berlin.inf.dpp.communication.chat.muc.negotiation.MUCSessionPreferencesNegotiatingManager;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
 import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
 import de.fu_berlin.inf.dpp.invitation.ProcessTools.CancelOption;
-import de.fu_berlin.inf.dpp.net.IReceiver;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.SarosPacketCollector;
 import de.fu_berlin.inf.dpp.net.discoverymanager.DiscoveryManager;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
 import de.fu_berlin.inf.dpp.net.internal.extensions.InvitationAcceptedExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.InvitationAcknowledgedExtension;
-import de.fu_berlin.inf.dpp.net.internal.extensions.InvitationParametersExtension;
+import de.fu_berlin.inf.dpp.net.internal.extensions.InvitationCompletedExtension;
+import de.fu_berlin.inf.dpp.net.internal.extensions.InvitationOfferingExtension;
+import de.fu_berlin.inf.dpp.net.internal.extensions.InvitationParameterExchangeExtension;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 import de.fu_berlin.inf.dpp.project.IChecksumCache;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.project.Messages;
+import de.fu_berlin.inf.dpp.project.internal.SarosSession;
 import de.fu_berlin.inf.dpp.ui.util.DialogUtils;
 import de.fu_berlin.inf.dpp.util.Utils;
 import de.fu_berlin.inf.dpp.util.VersionManager;
 import de.fu_berlin.inf.dpp.util.VersionManager.Compatibility;
 import de.fu_berlin.inf.dpp.util.VersionManager.VersionInfo;
 
+/*
+ * IMPORTANT: All messages in the cancellation exception are SHOWN to the end user !
+ */
 public final class OutgoingSessionNegotiation extends InvitationProcess {
 
-    private final static Logger log = Logger
+    private static final Logger log = Logger
         .getLogger(OutgoingSessionNegotiation.class);
 
-    private static final long INVITATION_ACKNOWLEDGEMENT_TIMEOUT = Long
-        .getLong(
-            "de.fu_berlin.inf.dpp.invitation.session.INVITATION_ACKNOWLEDGEMENT_TIMEOUT",
-            30000L);
+    private static final Random INVITATION_ID_GENERATOR = new Random();
 
-    private static final long INVITATION_ACCEPTED_TIMEOUT = Long.getLong(
-        "de.fu_berlin.inf.dpp.invitation.session.INVITATION_ACCEPTED_TIMEOUT",
-        600000L);
-
-    private final static Random INVITATION_ID_GENERATOR = new Random();
+    private static final Object SESSION_JOIN_LOCK = new Object();
 
     private ISarosSession sarosSession;
     private SubMonitor monitor;
-
-    private boolean peerAdvertisesSarosSupport = true;
 
     private VersionInfo versionInfo;
 
     private SarosPacketCollector invitationAcceptedCollector;
     private SarosPacketCollector invitationAcknowledgedCollector;
+    private SarosPacketCollector invitationDataExchangeCollector;
+    private SarosPacketCollector invitationCompletedCollector;
 
     @Inject
     private VersionManager versionManager;
@@ -78,13 +73,7 @@ public final class OutgoingSessionNegotiation extends InvitationProcess {
     private DiscoveryManager discoveryManager;
 
     @Inject
-    private MUCSessionPreferencesNegotiatingManager comNegotiatingManager;
-
-    @Inject
     private SessionIDObservable sessionID;
-
-    @Inject
-    private IReceiver xmppReceiver;
 
     @Inject
     private EditorManager editorManager;
@@ -98,11 +87,12 @@ public final class OutgoingSessionNegotiation extends InvitationProcess {
     @Inject
     private IChecksumCache checksumCache;
 
-    public OutgoingSessionNegotiation(JID peer, int colorID,
-        ISarosSession sarosSession, String description,
-        SarosContext sarosContext) {
+    private int colorID = -1;
+
+    public OutgoingSessionNegotiation(JID peer, ISarosSession sarosSession,
+        String description, SarosContext sarosContext) {
         super(String.valueOf(INVITATION_ID_GENERATOR.nextLong()), peer,
-            description, colorID, sarosContext);
+            description, sarosContext);
 
         this.sarosSession = sarosSession;
     }
@@ -132,10 +122,10 @@ public final class OutgoingSessionNegotiation extends InvitationProcess {
      */
 
     public Status start(IProgressMonitor progressMonitor) {
-        log.debug(this + " : Invitation has started");
+        log.debug(this + " : starting invitation");
 
-        monitor = SubMonitor.convert(progressMonitor, "Starting invitation...",
-            100);
+        monitor = SubMonitor.convert(progressMonitor, "Inviting "
+            + peerNickname + "...", 100);
 
         observeMonitor(monitor);
 
@@ -150,6 +140,10 @@ public final class OutgoingSessionNegotiation extends InvitationProcess {
 
             sendInvitation(monitor.newChild(0));
 
+            awaitAcceptation(monitor.newChild(0));
+
+            modifiyAndSendSessionNegotiationData(awaitRemoteSessionNegotiationData(monitor
+                .newChild(0)));
             /*
              * HACK Ensure byte stream connection to peer so the project wizard
              * always show the currently used connection (IBB, Socks5(D/M)
@@ -157,6 +151,8 @@ public final class OutgoingSessionNegotiation extends InvitationProcess {
 
             // FIMXE: MUST BE CALLED HERE, or the Network Layer will crash
             // on the first activity that is send
+
+            awaitCompletion(monitor.newChild(0));
 
             monitor.setTaskName("Negotiating data connection...");
 
@@ -205,35 +201,40 @@ public final class OutgoingSessionNegotiation extends InvitationProcess {
         return terminateProcess(exception);
     }
 
+    /**
+     * Performs a discovery request on the remote side and checks for Saros
+     * support. When this method returns the remote JID has been properly
+     * updated to a full resource qualified JID.
+     */
     private void checkAvailability(IProgressMonitor monitor)
         throws LocalCancellationException {
 
-        log.debug(this + " : Checking Saros support");
+        log.debug(this + " : checking Saros support");
         monitor.setTaskName("Checking Saros support...");
 
-        JID rqPeer = discoveryManager.getSupportingPresence(peer,
+        JID resourceQualifiedJID = discoveryManager.getSupportingPresence(peer,
             Saros.NAMESPACE);
 
-        if (rqPeer == null)
+        if (resourceQualifiedJID == null)
             throw new LocalCancellationException(
-                peer
+                peerNickname
                     + " does not support Saros or the request timed out. Please try again.",
                 CancelOption.DO_NOT_NOTIFY_PEER);
 
         log.debug(this + " :  remote contact offers Saros support");
 
-        peer = rqPeer;
+        peer = resourceQualifiedJID;
     }
 
     /**
-     * Checks the compatibility of the local Saros version with the peer's one.
+     * Checks the compatibility of the local Saros version with the remote side.
      * If the versions are compatible, the invitation continues, otherwise a
      * confirmation of the user is required (a {@link MessageDialog} pops up).
      */
     private void checkVersion(IProgressMonitor monitor)
         throws SarosCancellationException {
 
-        log.debug(this + " : Checking peer's version");
+        log.debug(this + " : checking version compatibility");
         monitor.setTaskName("Checking version compatibility...");
 
         VersionInfo versionInfo = versionManager.determineCompatibility(peer);
@@ -246,7 +247,7 @@ public final class OutgoingSessionNegotiation extends InvitationProcess {
             comp = versionInfo.compatibility;
 
             if (comp == VersionManager.Compatibility.OK) {
-                log.debug(this + " : Saros versions are compatible, proceeding");
+                log.debug(this + " : Saros versions are compatible");
                 this.versionInfo = versionInfo;
             } else {
                 log.debug(this + " : Saros versions are not compatible");
@@ -259,7 +260,7 @@ public final class OutgoingSessionNegotiation extends InvitationProcess {
                 }
             }
         } else {
-            log.debug(this + " : Unable to obtain peer's version information");
+            log.debug(this + " : could not obtain remote version information");
             if (!DialogUtils.confirmUnknownVersion(peer,
                 versionManager.getVersion()))
                 throw new LocalCancellationException(null,
@@ -268,18 +269,16 @@ public final class OutgoingSessionNegotiation extends InvitationProcess {
     }
 
     /**
-     * Send an invitation, then wait for the peer to accept and request the file
-     * list.
+     * Sends an invitation and waits for acknowledgment. The acknowledgment is
+     * auto generated on the remote side and generates a packet reply that is
+     * different as if the remote user manually accepts the invitation.
      * 
-     * @param monitor
-     * @throws SarosCancellationException
-     * @throws IOException
      */
     private void sendInvitation(IProgressMonitor monitor)
-        throws SarosCancellationException, IOException {
+        throws SarosCancellationException {
         monitor.setTaskName("Sending invitation...");
 
-        log.debug(this + " : Sending invitation");
+        log.debug(this + " : sending invitation");
         checkCancellation(CancelOption.DO_NOT_NOTIFY_PEER);
 
         /*
@@ -294,55 +293,158 @@ public final class OutgoingSessionNegotiation extends InvitationProcess {
 
         hostVersionInfo.version = versionManager.getVersion().toString();
 
-        MUCSessionPreferences comPrefs;
-        if (sarosSession.isHost()) {
-            comPrefs = comNegotiatingManager.getOwnPreferences();
-        } else {
-            comPrefs = comNegotiatingManager.getSessionPreferences();
-        }
-
-        InvitationParametersExtension invInfo = new InvitationParametersExtension(
-            sessionID.getValue(), invitationID, colorID, description,
-            versionInfo, sarosSession.getSessionStart(), comPrefs, sarosSession
-                .getHost().getJID(), sarosSession.getLocalUser().getColorID());
+        InvitationOfferingExtension invitationOffering = new InvitationOfferingExtension(
+            invitationID, sessionID.getValue(), sarosSession.getSessionStart(),
+            versionInfo, description);
 
         transmitter.sendMessageToUser(peer,
-            InvitationParametersExtension.PROVIDER.create(invInfo));
+            InvitationOfferingExtension.PROVIDER.create(invitationOffering));
 
-        monitor.setTaskName("Invitation sent. Waiting for acknowledgement...");
+        log.debug(this + " : waiting for invitation acknowledgement");
 
-        if (collectPacket(invitationAcknowledgedCollector,
-            INVITATION_ACKNOWLEDGEMENT_TIMEOUT, monitor) == null) {
+        monitor.setTaskName("Waiting for " + peerNickname
+            + " to acknowledge the invitation...");
+
+        if (collectPacket(invitationAcknowledgedCollector, PACKET_TIMEOUT) == null) {
             throw new LocalCancellationException(
-                peerAdvertisesSarosSupport ? "No invitation acknowledgement received."
-                    : "Missing Saros support.", CancelOption.DO_NOT_NOTIFY_PEER);
+                "Received no invitation acknowledgement from " + peerNickname
+                    + ".", CancelOption.DO_NOT_NOTIFY_PEER);
         }
-
-        monitor.setTaskName("Waiting for user to accept invitation");
-
-        if (collectPacket(invitationAcceptedCollector,
-            INVITATION_ACCEPTED_TIMEOUT, monitor) == null) {
-            throw new LocalCancellationException(
-                peerAdvertisesSarosSupport ? "no invitation complete response received"
-                    : "Missing Saros support.", CancelOption.DO_NOT_NOTIFY_PEER);
-        }
-
-        // Reply is send in addUserToSession !
-
-        log.debug(this + " : peer accepted the invitation");
     }
 
     /**
-     * Adds the invited user to the current SarosSession.<br>
+     * Waits until the remote side accepted manually the invitation.
+     */
+    private void awaitAcceptation(IProgressMonitor monitor)
+        throws SarosCancellationException {
+
+        log.debug(this + " : waiting for peer to accept the invitation");
+
+        monitor.setTaskName("Waiting for " + peerNickname
+            + " to accept invitation...");
+
+        if (collectPacket(invitationAcceptedCollector,
+            INVITATION_ACCEPTED_TIMEOUT) == null) {
+            throw new LocalCancellationException(
+                "Invitation was not accepted.", CancelOption.NOTIFY_PEER);
+        }
+
+        log.debug(this + " : invitation accepted");
+    }
+
+    /**
+     * Waits until the remote side has completed the invitation which is the
+     * case after the remote side has started its {@link SarosSession}.
+     */
+    private void awaitCompletion(IProgressMonitor monitor)
+        throws SarosCancellationException {
+
+        log.debug(this
+            + " : waiting for remote side to start its Saros session");
+
+        monitor.setTaskName("Waiting for " + peerNickname
+            + " to perform final initialization...");
+
+        if (collectPacket(invitationCompletedCollector, PACKET_TIMEOUT) == null) {
+            throw new LocalCancellationException(
+                "Invitation was not accepted.", CancelOption.NOTIFY_PEER);
+        }
+
+        log.debug(this + " : remote side started its Saros session");
+    }
+
+    /**
+     * Waits for the remote parameters which may contain some desired default
+     * values that should be used on session start.
+     */
+    private InvitationParameterExchangeExtension awaitRemoteSessionNegotiationData(
+        IProgressMonitor monitor) throws SarosCancellationException {
+
+        log.debug(this + " : waiting for remote session negotiation data");
+
+        monitor.setTaskName("Waiting for remote session configuration...");
+
+        InvitationParameterExchangeExtension parameters;
+
+        Packet packet = collectPacket(invitationDataExchangeCollector,
+            PACKET_TIMEOUT);
+
+        if (packet == null)
+            throw new LocalCancellationException(peerNickname
+                + " does not respond. (Timeout)",
+                CancelOption.DO_NOT_NOTIFY_PEER);
+
+        parameters = InvitationParameterExchangeExtension.PROVIDER
+            .getPayload(packet);
+
+        if (parameters == null)
+            throw new LocalCancellationException(peerNickname
+                + " sent malformed data", CancelOption.DO_NOT_NOTIFY_PEER);
+
+        log.debug(this + " : received remote session negotiation data");
+
+        return parameters;
+    }
+
+    /**
+     * Checks and modifies the received remote parameters. The changes will be
+     * send back and must then be used on the remote side to configure the
+     * session environment.
+     */
+    private InvitationParameterExchangeExtension modifiyAndSendSessionNegotiationData(
+        InvitationParameterExchangeExtension remoteParameters) {
+
+        log.debug(this + " : sending updated session negotiation data");
+
+        monitor.setTaskName("Sending local session configuration...");
+
+        InvitationParameterExchangeExtension modifiedParameters = new InvitationParameterExchangeExtension(
+            invitationID);
+
+        modifiedParameters.setRemoteColorID(sarosSession.getLocalUser()
+            .getColorID());
+
+        modifiedParameters
+            .setMUCPreferences(sarosSession.isHost() ? mucNegotiatingManager
+                .getOwnPreferences() : mucNegotiatingManager
+                .getSessionPreferences());
+
+        modifiedParameters.setSessionHost(sarosSession.getHost().getJID());
+
+        // side effect !
+        colorID = sarosSession.getColor(remoteParameters.getLocalColorID());
+
+        modifiedParameters.setLocalColorID(colorID);
+
+        transmitter.sendMessageToUser(peer,
+            InvitationParameterExchangeExtension.PROVIDER
+                .create(modifiedParameters));
+
+        log.debug(this + " : sent updated session negotiation data");
+
+        return modifiedParameters;
+    }
+
+    /**
+     * Adds the invited user to the current SarosSession. After the user is
+     * added to the session an acknowledgment is send to the remote side that
+     * the remote user can now start working in this session.
      */
     // TODO move to SarosSession.
     private User addUserToSession(IProgressMonitor monitor)
         throws SarosCancellationException {
-        synchronized (sarosSession) {
+
+        synchronized (SESSION_JOIN_LOCK) {
+
             User newUser = new User(sarosSession, peer, colorID);
-            this.sarosSession.addUser(newUser);
-            log.debug(Utils.prefix(peer) + " added to project, colorID: "
-                + colorID);
+
+            sarosSession.addUser(newUser);
+            log.debug(this + " : added " + Utils.prefix(peer)
+                + " to the current session, colorID: " + colorID);
+
+            transmitter.sendMessageToUser(peer,
+                InvitationAcknowledgedExtension.PROVIDER
+                    .create(new InvitationAcknowledgedExtension(invitationID)));
 
             checkCancellation(CancelOption.NOTIFY_PEER);
             sarosSession.synchronizeUserList(transmitter, peer, monitor);
@@ -351,12 +453,9 @@ public final class OutgoingSessionNegotiation extends InvitationProcess {
     }
 
     /**
-     * Receives an invitation complete message and finalizes the Invitation
-     * negotiation job, then starts the OutgoingProjectNegotiation
+     * Completes the invitation by setting the appropriate flag in the user
+     * object and synchronize the user lists with all session users afterwards.
      * 
-     * @param monitor
-     * @param projectExchangeInfos
-     * @throws SarosCancellationException
      */
     private void completeInvitation(
         List<ProjectExchangeInfo> projectExchangeInfos, IProgressMonitor monitor)
@@ -364,19 +463,21 @@ public final class OutgoingSessionNegotiation extends InvitationProcess {
 
         log.debug(this + " : synchronizing user list");
 
-        monitor.setTaskName("Synchronizing user list ...");
-        synchronized (sarosSession) {
+        monitor.setTaskName("Synchronizing user list...");
+
+        synchronized (SESSION_JOIN_LOCK) {
             sarosSession.userInvitationCompleted(sarosSession.getUser(peer));
             checkCancellation(CancelOption.NOTIFY_PEER);
             sarosSession.synchronizeUserList(transmitter, peer, monitor); // SUPPRESSALL
         }
 
-        log.debug(this + " : Invitation has completed successfully");
+        log.debug(this + " : session negotiation finished");
     }
 
     @Override
     protected void executeCancellation() {
-        sarosSession.returnColor(this.colorID);
+        if (colorID >= 0)
+            sarosSession.returnColor(colorID);
 
         if (sarosSession.getRemoteUsers().isEmpty())
             sarosSessionManager.stopSarosSession();
@@ -385,37 +486,28 @@ public final class OutgoingSessionNegotiation extends InvitationProcess {
             invitationProcesses.removeInvitationProcess(this);
     }
 
-    private Packet collectPacket(SarosPacketCollector collector, long timeout,
-        IProgressMonitor monitor) throws SarosCancellationException {
-
-        Packet packet = null;
-
-        while (timeout > 0) {
-            checkCancellation(CancelOption.NOTIFY_PEER);
-
-            packet = collector.nextResult(1000);
-
-            if (packet != null)
-                break;
-
-            timeout -= 1000;
-        }
-
-        return packet;
-    }
-
     private void deleteCollectors() {
         invitationAcceptedCollector.cancel();
         invitationAcknowledgedCollector.cancel();
+        invitationDataExchangeCollector.cancel();
+        invitationCompletedCollector.cancel();
     }
 
     private void createCollectors() {
-        invitationAcceptedCollector = xmppReceiver
+        invitationAcceptedCollector = receiver
             .createCollector(InvitationAcceptedExtension.PROVIDER
                 .getPacketFilter(invitationID));
 
-        invitationAcknowledgedCollector = xmppReceiver
+        invitationAcknowledgedCollector = receiver
             .createCollector(InvitationAcknowledgedExtension.PROVIDER
+                .getPacketFilter(invitationID));
+
+        invitationDataExchangeCollector = receiver
+            .createCollector(InvitationParameterExchangeExtension.PROVIDER
+                .getPacketFilter(invitationID));
+
+        invitationCompletedCollector = receiver
+            .createCollector(InvitationCompletedExtension.PROVIDER
                 .getPacketFilter(invitationID));
     }
 

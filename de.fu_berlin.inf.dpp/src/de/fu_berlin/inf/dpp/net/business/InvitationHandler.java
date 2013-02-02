@@ -4,6 +4,7 @@ import org.apache.log4j.Logger;
 import org.jivesoftware.smack.PacketListener;
 import org.jivesoftware.smack.packet.Packet;
 import org.jivesoftware.smack.packet.PacketExtension;
+import org.joda.time.DateTime;
 import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.annotations.Component;
@@ -11,10 +12,11 @@ import de.fu_berlin.inf.dpp.net.IReceiver;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.internal.extensions.CancelInviteExtension;
-import de.fu_berlin.inf.dpp.net.internal.extensions.InvitationParametersExtension;
+import de.fu_berlin.inf.dpp.net.internal.extensions.InvitationOfferingExtension;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.util.Utils;
+import de.fu_berlin.inf.dpp.util.VersionManager.VersionInfo;
 
 /**
  * Business Logic for handling Invitation requests
@@ -41,33 +43,33 @@ public class InvitationHandler {
             @Override
             public void processPacket(Packet packet) {
                 JID fromJID = new JID(packet.getFrom());
-                InvitationParametersExtension invInfo = InvitationParametersExtension.PROVIDER
+
+                InvitationOfferingExtension invitation = InvitationOfferingExtension.PROVIDER
                     .getPayload(packet);
 
-                if (invInfo == null) {
-                    log.warn("Inv" + Utils.prefix(fromJID)
-                        + ": The received invitation packet's"
-                        + " payload is null.");
+                if (invitation == null) {
+                    log.warn("received invitation from "
+                        + Utils.prefix(fromJID)
+                        + " that contains malformed payload");
                     return;
                 }
 
-                log.debug("Inv" + Utils.prefix(fromJID)
-                    + ": Received invitation (invitationID: "
-                    + invInfo.getInvitationID() + ", sessionID: "
-                    + invInfo.getSessionID() + ", colorID: " + invInfo.colorID
-                    + ", sarosVersion: " + invInfo.versionInfo.version
-                    + ", sarosComp: " + invInfo.versionInfo.compatibility + ")");
+                String sessionID = invitation.getSessionID();
+                String invitationID = invitation.getInvitationID();
+                DateTime sessionStartTime = invitation.getSessionStartTime();
+                VersionInfo versionInfo = invitation.getVersionInfo();
+                String description = invitation.getDescription();
 
-                String sessionID = invInfo.getSessionID();
-                String invitationID = invInfo.getInvitationID();
+                log.info("received invitation from " + Utils.prefix(fromJID)
+                    + " [invitationID: " + invitationID + ", " + "sessionID: "
+                    + sessionID + ", " + "version: " + versionInfo.version
+                    + ", " + "compability: " + versionInfo.compatibility + "]");
 
                 if (sessionIDObservable.getValue().equals(
                     SessionIDObservable.NOT_IN_SESSION)) {
                     sessionManager.invitationReceived(
-                        new JID(packet.getFrom()), sessionID, invInfo.colorID,
-                        invInfo.versionInfo, invInfo.sessionStart,
-                        invitationID, invInfo.comPrefs, invInfo.description,
-                        invInfo.host, invInfo.inviterColorID);
+                        new JID(packet.getFrom()), sessionID, invitationID,
+                        sessionStartTime, versionInfo, description);
                 } else {
                     PacketExtension response = CancelInviteExtension.PROVIDER
                         .create(new CancelInviteExtension(invitationID,
@@ -76,6 +78,6 @@ public class InvitationHandler {
                         response);
                 }
             }
-        }, InvitationParametersExtension.PROVIDER.getPacketFilter());
+        }, InvitationOfferingExtension.PROVIDER.getPacketFilter());
     }
 }

@@ -50,8 +50,6 @@ import de.fu_berlin.inf.dpp.SarosContext;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.activities.ProjectExchangeInfo;
 import de.fu_berlin.inf.dpp.annotations.Component;
-import de.fu_berlin.inf.dpp.communication.chat.muc.negotiation.MUCSessionPreferences;
-import de.fu_berlin.inf.dpp.communication.chat.muc.negotiation.MUCSessionPreferencesNegotiatingManager;
 import de.fu_berlin.inf.dpp.invitation.IncomingProjectNegotiation;
 import de.fu_berlin.inf.dpp.invitation.IncomingSessionNegotiation;
 import de.fu_berlin.inf.dpp.invitation.InvitationProcess;
@@ -111,9 +109,6 @@ public class SarosSessionManager implements ISarosSessionManager {
     @Inject
     // FIXME dependency of other classes
     protected VersionManager versionManager;
-
-    @Inject
-    protected MUCSessionPreferencesNegotiatingManager comNegotiatingManager;
 
     @Inject
     // FIXME dependency of other class
@@ -329,10 +324,9 @@ public class SarosSessionManager implements ISarosSessionManager {
     }
 
     @Override
-    public void invitationReceived(JID from, String sessionID, int colorID,
-        VersionInfo versionInfo, DateTime sessionStart, String invitationID,
-        MUCSessionPreferences comPrefs, String description, JID host,
-        int inviterColorID) {
+    public void invitationReceived(JID from, String sessionID,
+        String invitationID, DateTime sessionStart, VersionInfo versionInfo,
+        String description) {
 
         /*
          * Side effect ! Setting the sessionID will reject further invitation
@@ -342,10 +336,8 @@ public class SarosSessionManager implements ISarosSessionManager {
         this.sessionID.setValue(sessionID);
 
         final IncomingSessionNegotiation process = new IncomingSessionNegotiation(
-            this, from, colorID, versionManager, versionInfo, sessionStart,
-            invitationID, description, sarosContext, inviterColorID, host);
-
-        comNegotiatingManager.setSessionPreferences(comPrefs);
+            this, from, versionManager, versionInfo, sessionStart,
+            invitationID, description, sarosContext);
 
         process.acknowledgeInvitation();
         sarosUI.showIncomingInvitationUI(process, true);
@@ -377,11 +369,11 @@ public class SarosSessionManager implements ISarosSessionManager {
         ISarosSession sarosSession = sarosSessionObservable.getValue();
 
         OutgoingSessionNegotiation result = new OutgoingSessionNegotiation(
-            toInvite, sarosSession.getColor(-1), sarosSession, description,
-            sarosContext);
+            toInvite, sarosSession, description, sarosContext);
 
         OutgoingInvitationJob outgoingInvitationJob = new OutgoingInvitationJob(
             result);
+
         outgoingInvitationJob.setPriority(Job.SHORT);
         outgoingInvitationJob.schedule();
     }

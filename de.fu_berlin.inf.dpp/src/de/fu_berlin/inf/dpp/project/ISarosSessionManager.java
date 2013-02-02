@@ -14,7 +14,6 @@ import de.fu_berlin.inf.dpp.FileList;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.activities.ProjectExchangeInfo;
 import de.fu_berlin.inf.dpp.annotations.Component;
-import de.fu_berlin.inf.dpp.communication.chat.muc.negotiation.MUCSessionPreferences;
 import de.fu_berlin.inf.dpp.invitation.OutgoingProjectNegotiation;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.util.VersionManager.VersionInfo;
@@ -89,19 +88,24 @@ public interface ISarosSessionManager {
     public void removeSarosSessionListener(ISarosSessionListener listener);
 
     /**
-     * Is fired when an incoming invitation is received.
+     * Handles the negotiation process for a received invitation.
      * 
      * @param from
-     *            the sender of this invitation.
-     * @param colorID
-     *            the assigned color id for the invited participant.
-     * @param comPrefs
-     *            multi user chat parameters.
+     *            the sender of this invitation
+     * @param sessionID
+     *            the unique session ID of the inviter side
+     * @param invitationID
+     *            a unique identifier for the negotiation process
+     * @param sessionStart
+     *            start time of the remote session
+     * @param versionInfo
+     *            information of the inviter side
+     * @param description
+     *            what this session invitation is about
      */
-    public void invitationReceived(JID from, String sessionID, int colorID,
-        VersionInfo versionInfo, DateTime sessionStart, String invitationID,
-        MUCSessionPreferences comPrefs, String description, JID host,
-        int inviterColorID);
+    public void invitationReceived(JID from, String sessionID,
+        String invitationID, DateTime sessionStart, VersionInfo versionInfo,
+        String description);
 
     /**
      * initiate the ({@link OutgoingProjectNegotiation project exchanging}) with
