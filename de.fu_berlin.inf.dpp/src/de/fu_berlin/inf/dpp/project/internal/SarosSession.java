@@ -296,7 +296,7 @@ public class SarosSession implements ISarosSession, Disposable {
 
         /*
          * HACK abuse the fact that non-host inviting is currently disabled and
-         * so the inviteColorID is always the colorID of the host
+         * so the inviterColorID is always the colorID of the host
          */
 
         host = new User(this, hostID, inviterColorID);
@@ -305,26 +305,33 @@ public class SarosSession implements ISarosSession, Disposable {
         participants.put(hostID, host);
         participants.put(localUser.getJID(), localUser);
 
+        if (freeColors.remove(inviterColorID))
+            log.debug("colorID " + inviterColorID
+                + " was removed from the pool");
+        else
+            log.warn("colorID " + inviterColorID + " is not in the pool");
+
+        assert inviterID.equals(hostID) : "non host inviting is disabled";
         /*
          * As the host is still a special person, we must find out if we were
          * invited by the host...
          */
-        if (!inviterID.equals(hostID)) {
-            /*
-             * ... or another participant whom we have to add to this session
-             * too!
-             */
-            if (freeColors.remove(inviterColorID)) {
-                log.debug("INVITERS colorID (" + inviterColorID
-                    + ") was removed from the list.");
-            } else {
-                log.warn("INVITERS colorID couldn't be removed from the list!");
-            }
-
-            User inviter = new User(this, inviterID, inviterColorID);
-            inviter.invitationCompleted();
-            participants.put(inviterID, inviter);
-        }
+        // if (!inviterID.equals(hostID)) {
+        // /*
+        // * ... or another participant whom we have to add to this session
+        // * too!
+        // */
+        // if (freeColors.remove(inviterColorID)) {
+        // log.debug("INVITERS colorID (" + inviterColorID
+        // + ") was removed from the list.");
+        // } else {
+        // log.warn("INVITERS colorID couldn't be removed from the list!");
+        // }
+        //
+        // User inviter = new User(this, inviterID, inviterColorID);
+        // inviter.invitationCompleted();
+        // participants.put(inviterID, inviter);
+        // }
 
         concurrentDocumentClient = new ConcurrentDocumentClient(this);
     }
