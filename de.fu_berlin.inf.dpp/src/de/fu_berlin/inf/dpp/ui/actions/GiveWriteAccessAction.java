@@ -103,12 +103,17 @@ public class GiveWriteAccessAction extends Action implements Disposable {
         Utils.runSafeSync(log, new Runnable() {
             @Override
             public void run() {
+                ISarosSession session = sessionManager.getSarosSession();
+
+                if (session == null)
+                    return;
+
                 List<User> participants = SelectionRetrieverFactory
                     .getSelectionRetriever(User.class).getSelection();
                 if (participants.size() == 1) {
                     if (!participants.get(0).hasWriteAccess()) {
-                        sarosUI.performPermissionChange(participants.get(0),
-                            Permission.WRITE_ACCESS);
+                        sarosUI.performPermissionChange(session,
+                            participants.get(0), Permission.WRITE_ACCESS);
                         updateEnablement();
                     } else {
                         log.warn("Participant has already write access: " //$NON-NLS-1$

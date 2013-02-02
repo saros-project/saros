@@ -14,7 +14,6 @@ import de.fu_berlin.inf.dpp.net.internal.extensions.CancelInviteExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.InvitationParametersExtension;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
-import de.fu_berlin.inf.dpp.ui.SarosUI;
 import de.fu_berlin.inf.dpp.util.Utils;
 
 /**
@@ -31,9 +30,6 @@ public class InvitationHandler {
 
     @Inject
     private ISarosSessionManager sessionManager;
-
-    @Inject
-    private SarosUI sarosUI;
 
     private final SessionIDObservable sessionIDObservable;
 
@@ -69,7 +65,7 @@ public class InvitationHandler {
                     SessionIDObservable.NOT_IN_SESSION)) {
                     sessionManager.invitationReceived(
                         new JID(packet.getFrom()), sessionID, invInfo.colorID,
-                        invInfo.versionInfo, invInfo.sessionStart, sarosUI,
+                        invInfo.versionInfo, invInfo.sessionStart,
                         invitationID, invInfo.comPrefs, invInfo.description,
                         invInfo.host, invInfo.inviterColorID);
                 } else {

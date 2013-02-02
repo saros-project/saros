@@ -17,7 +17,6 @@ import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.communication.chat.muc.negotiation.MUCSessionPreferences;
 import de.fu_berlin.inf.dpp.invitation.OutgoingProjectNegotiation;
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.ui.SarosUI;
 import de.fu_berlin.inf.dpp.util.VersionManager.VersionInfo;
 
 /**
@@ -100,9 +99,9 @@ public interface ISarosSessionManager {
      *            multi user chat parameters.
      */
     public void invitationReceived(JID from, String sessionID, int colorID,
-        VersionInfo versionInfo, DateTime sessionStart, SarosUI sarosUI,
-        String invitationID, MUCSessionPreferences comPrefs,
-        String description, JID host, int inviterColorID);
+        VersionInfo versionInfo, DateTime sessionStart, String invitationID,
+        MUCSessionPreferences comPrefs, String description, JID host,
+        int inviterColorID);
 
     /**
      * initiate the ({@link OutgoingProjectNegotiation project exchanging}) with

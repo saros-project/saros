@@ -33,7 +33,9 @@ import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Shell;
+import org.picocontainer.annotations.Inject;
 
+import de.fu_berlin.inf.dpp.SarosPluginContext;
 import de.fu_berlin.inf.dpp.invitation.IncomingSessionNegotiation;
 import de.fu_berlin.inf.dpp.invitation.InvitationProcess;
 import de.fu_berlin.inf.dpp.invitation.ProcessTools.CancelLocation;
@@ -94,9 +96,15 @@ public class JoinSessionWizard extends Wizard {
 
     private InvitationProcess.Status invitationStatus;
 
-    public JoinSessionWizard(IncomingSessionNegotiation process,
-        PreferenceUtils preferenceUtils, VersionManager manager) {
+    @Inject
+    private VersionManager manager;
+
+    @Inject
+    private PreferenceUtils preferenceUtils;
+
+    public JoinSessionWizard(IncomingSessionNegotiation process) {
         this.process = process;
+        SarosPluginContext.initComponent(this);
 
         EnterProjectNamePageUtils.setPreferenceUtils(preferenceUtils);
 

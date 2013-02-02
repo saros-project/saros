@@ -69,10 +69,6 @@ public class AddProjectToSessionWizard extends Wizard {
      * 
      */
     protected Map<String, String> remoteProjectNames;
-    protected DataTransferManager dataTransferManager;
-    protected PreferenceUtils preferenceUtils;
-
-    private ISarosSessionManager sessionManager;
 
     @Inject
     protected EditorAPI editorAPI;
@@ -80,20 +76,24 @@ public class AddProjectToSessionWizard extends Wizard {
     @Inject
     private IChecksumCache checksumCache;
 
+    @Inject
+    private DataTransferManager dataTransferManager;
+
+    @Inject
+    private PreferenceUtils preferenceUtils;
+
+    @Inject
+    private ISarosSessionManager sessionManager;
+
     public AddProjectToSessionWizard(IncomingProjectNegotiation process,
-        DataTransferManager dataTransferManager,
-        PreferenceUtils preferenceUtils, JID peer, List<FileList> fileLists,
-        Map<String, String> projectNames, ISarosSessionManager sessionManager) {
+        JID peer, List<FileList> fileLists, Map<String, String> projectNames) {
 
         SarosPluginContext.initComponent(this);
 
-        this.sessionManager = sessionManager;
         this.process = process;
         this.peer = peer;
         this.fileLists = fileLists;
         this.remoteProjectNames = projectNames;
-        this.dataTransferManager = dataTransferManager;
-        this.preferenceUtils = preferenceUtils;
         setWindowTitle(Messages.AddProjectToSessionWizard_title);
         setHelpAvailable(true);
 

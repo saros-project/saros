@@ -48,9 +48,7 @@ import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.invitation.IncomingProjectNegotiation;
 import de.fu_berlin.inf.dpp.invitation.IncomingSessionNegotiation;
-import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
-import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
-import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
+import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.ui.util.DialogUtils;
 import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 import de.fu_berlin.inf.dpp.ui.views.SarosView;
@@ -58,7 +56,6 @@ import de.fu_berlin.inf.dpp.ui.views.VideoPlayerView;
 import de.fu_berlin.inf.dpp.ui.wizards.AddProjectToSessionWizard;
 import de.fu_berlin.inf.dpp.ui.wizards.JoinSessionWizard;
 import de.fu_berlin.inf.dpp.ui.wizards.dialogs.WizardDialogAccessable;
-import de.fu_berlin.inf.dpp.util.VersionManager;
 
 /**
  * Some helper functionality to interface with Eclipse.
@@ -68,71 +65,66 @@ public class SarosUI {
 
     private static final Logger log = Logger.getLogger(SarosUI.class);
 
-    final private ISarosSessionManager sessionManager;
-    final private VersionManager manager;
-    final private DataTransferManager dataTransferManager;
-    final private PreferenceUtils preferenceUtils;
-
-    public SarosUI(ISarosSessionManager sessionManager,
-        VersionManager versionManager, DataTransferManager dataTransferManager,
-        PreferenceUtils preferenceUtils) {
-
-        this.sessionManager = sessionManager;
-        this.manager = versionManager;
-        this.dataTransferManager = dataTransferManager;
-        this.preferenceUtils = preferenceUtils;
+    public SarosUI() {
 
     }
 
-    public JoinSessionWizard showIncomingInvitationUI(
-        IncomingSessionNegotiation process) {
+    public void showIncomingInvitationUI(
+        final IncomingSessionNegotiation process, boolean openSarosView) {
 
-        JoinSessionWizard sessionWizard = new JoinSessionWizard(process,
-            preferenceUtils, manager);
-        final WizardDialogAccessable wizardDialog = new WizardDialogAccessable(
-            EditorAPI.getShell(), sessionWizard);
-
-        // TODO Provide help :-)
-        wizardDialog.setHelpAvailable(false);
+        if (openSarosView)
+            SWTUtils.runSafeSWTAsync(log, new Runnable() {
+                @Override
+                public void run() {
+                    openSarosView();
+                }
+            });
 
         // Fixes #2727848: InvitationDialog is opened in the
         // background
         SWTUtils.runSafeSWTAsync(log, new Runnable() {
             @Override
             public void run() {
+
+                JoinSessionWizard sessionWizard = new JoinSessionWizard(process);
+
+                final WizardDialogAccessable wizardDialog = new WizardDialogAccessable(
+                    EditorAPI.getShell(), sessionWizard);
+
+                // TODO Provide help :-)
+                wizardDialog.setHelpAvailable(false);
+
                 DialogUtils.openWindow(wizardDialog);
             }
         });
-        return sessionWizard;
     }
 
-    public AddProjectToSessionWizard showIncomingProjectUI(
-        IncomingProjectNegotiation process) {
+    public void showIncomingProjectUI(final IncomingProjectNegotiation process) {
         List<ProjectExchangeInfo> pInfos = process.getProjectInfos();
-        List<FileList> fileLists = new ArrayList<FileList>(pInfos.size());
+        final List<FileList> fileLists = new ArrayList<FileList>(pInfos.size());
 
-        for (ProjectExchangeInfo pInfo : pInfos) {
+        for (ProjectExchangeInfo pInfo : pInfos)
             fileLists.add(pInfo.getFileList());
-        }
 
-        AddProjectToSessionWizard projectWizard = new AddProjectToSessionWizard(
-            process, dataTransferManager, preferenceUtils, process.getPeer(),
-            fileLists, process.getProjectNames(), sessionManager);
-
-        final WizardDialogAccessable wizardDialog = new WizardDialogAccessable(
-            EditorAPI.getShell(), projectWizard, SWT.MIN | SWT.MAX,
-            SWT.SYSTEM_MODAL | SWT.APPLICATION_MODAL | SWT.PRIMARY_MODAL);
-
-        wizardDialog.setHelpAvailable(false);
-        projectWizard.setWizardDlg(wizardDialog);
         SWTUtils.runSafeSWTAsync(log, new Runnable() {
 
             @Override
             public void run() {
+                AddProjectToSessionWizard projectWizard = new AddProjectToSessionWizard(
+                    process, process.getPeer(), fileLists, process
+                        .getProjectNames());
+
+                final WizardDialogAccessable wizardDialog = new WizardDialogAccessable(
+                    EditorAPI.getShell(), projectWizard, SWT.MIN | SWT.MAX,
+                    SWT.SYSTEM_MODAL | SWT.APPLICATION_MODAL
+                        | SWT.PRIMARY_MODAL);
+
+                wizardDialog.setHelpAvailable(false);
+                projectWizard.setWizardDlg(wizardDialog);
+
                 DialogUtils.openWindow(wizardDialog);
             }
         });
-        return projectWizard;
     }
 
     /**
@@ -219,8 +211,8 @@ public class SarosUI {
      * @swt
      */
 
-    public void performPermissionChange(final User user,
-        final Permission newPermission) {
+    public void performPermissionChange(final ISarosSession session,
+        final User user, final Permission newPermission) {
 
         ProgressMonitorDialog dialog = new ProgressMonitorDialog(EditorAPI
             .getAWorkbenchWindow().getShell());
@@ -237,10 +229,8 @@ public class SarosUI {
                         progress.beginTask(Messages.SarosUI_permission_change,
                             IProgressMonitor.UNKNOWN);
 
-                        // NPE !!!!
-                        sessionManager.getSarosSession()
-                            .initiatePermissionChange(user, newPermission,
-                                progress);
+                        session.initiatePermissionChange(user, newPermission,
+                            progress);
 
                     } catch (CancellationException e) {
                         log.warn("Permission change failed because buddy canceled the permission change"); //$NON-NLS-1$

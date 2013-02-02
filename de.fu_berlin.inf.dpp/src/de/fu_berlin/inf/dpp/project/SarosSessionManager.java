@@ -125,6 +125,9 @@ public class SarosSessionManager implements ISarosSessionManager {
     @Inject
     protected SarosContext sarosContext;
 
+    @Inject
+    protected SarosUI sarosUI;
+
     protected SarosNet sarosNet;
 
     private final List<ISarosSessionListener> sarosSessionListeners = new CopyOnWriteArrayList<ISarosSessionListener>();
@@ -327,9 +330,9 @@ public class SarosSessionManager implements ISarosSessionManager {
 
     @Override
     public void invitationReceived(JID from, String sessionID, int colorID,
-        VersionInfo versionInfo, DateTime sessionStart, final SarosUI sarosUI,
-        String invitationID, MUCSessionPreferences comPrefs,
-        String description, JID host, int inviterColorID) {
+        VersionInfo versionInfo, DateTime sessionStart, String invitationID,
+        MUCSessionPreferences comPrefs, String description, JID host,
+        int inviterColorID) {
 
         /*
          * Side effect ! Setting the sessionID will reject further invitation
@@ -344,14 +347,8 @@ public class SarosSessionManager implements ISarosSessionManager {
 
         comNegotiatingManager.setSessionPreferences(comPrefs);
 
-        SWTUtils.runSafeSWTAsync(log, new Runnable() {
-            @Override
-            public void run() {
-                process.acknowledgeInvitation();
-                sarosUI.showIncomingInvitationUI(process);
-                sarosUI.openSarosView();
-            }
-        });
+        process.acknowledgeInvitation();
+        sarosUI.showIncomingInvitationUI(process, true);
     }
 
     /**
@@ -368,18 +365,11 @@ public class SarosSessionManager implements ISarosSessionManager {
     @Override
     public void incomingProjectReceived(JID from,
         List<ProjectExchangeInfo> projectInfos, String processID) {
-        final IncomingProjectNegotiation process = new IncomingProjectNegotiation(
+
+        IncomingProjectNegotiation process = new IncomingProjectNegotiation(
             getSarosSession(), from, processID, projectInfos, sarosContext);
 
-        SWTUtils.runSafeSWTAsync(log, new Runnable() {
-
-            @Override
-            public void run() {
-                SarosUI sarosUI = sarosContext.getComponent(SarosUI.class);
-                sarosUI.showIncomingProjectUI(process);
-            }
-
-        });
+        sarosUI.showIncomingProjectUI(process);
     }
 
     @Override

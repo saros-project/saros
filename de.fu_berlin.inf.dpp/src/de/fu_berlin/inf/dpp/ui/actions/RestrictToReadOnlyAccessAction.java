@@ -109,12 +109,17 @@ public class RestrictToReadOnlyAccessAction extends Action implements
         Utils.runSafeSync(log, new Runnable() {
             @Override
             public void run() {
+                ISarosSession session = sessionManager.getSarosSession();
+
+                if (session == null)
+                    return;
+
                 List<User> participants = SelectionRetrieverFactory
                     .getSelectionRetriever(User.class).getSelection();
                 if (participants.size() == 1) {
                     if (participants.get(0).hasWriteAccess()) {
-                        sarosUI.performPermissionChange(participants.get(0),
-                            Permission.READONLY_ACCESS);
+                        sarosUI.performPermissionChange(session,
+                            participants.get(0), Permission.READONLY_ACCESS);
                         updateEnablement();
                     } else {
                         log.warn("Participant has does not have write access: " //$NON-NLS-1$
