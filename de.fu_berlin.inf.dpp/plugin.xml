@@ -150,7 +150,6 @@
       <type name="de.fu_berlin.inf.dpp.annotations.viewport.3"/>
       <type name="de.fu_berlin.inf.dpp.annotations.viewport.4"/>
       <type name="de.fu_berlin.inf.dpp.annotations.viewport.5"/>
-      <type name="de.fu_berlin.inf.dpp.annotations.contribution"/>
       <type name="de.fu_berlin.inf.dpp.annotations.contribution.1"/>
       <type name="de.fu_berlin.inf.dpp.annotations.contribution.2"/>
       <type name="de.fu_berlin.inf.dpp.annotations.contribution.3"/>
@@ -248,25 +247,6 @@
             textPreferenceValue="false"
             textStylePreferenceValue="NONE"
             verticalRulerPreferenceKey="de.fu_berlin.inf.dpp.annotations.viewport.ruler.5"
-            verticalRulerPreferenceValue="false"/>
-
-      <specification
-            annotationType="de.fu_berlin.inf.dpp.annotations.contribution"
-            colorPreferenceKey="de.fu_berlin.inf.dpp.annotations.contribution.color"
-            highlightPreferenceKey="de.fu_berlin.inf.dpp.annotations.contribution.highlight"
-            overviewRulerPreferenceKey="de.fu_berlin.inf.dpp.annotations.contribution.overview"
-            textPreferenceKey="de.fu_berlin.inf.dpp.annotations.contribution.text"
-            textStylePreferenceKey="de.fu_berlin.inf.dpp.annotations.contribution.textstyle"
-            verticalRulerPreferenceKey="de.fu_berlin.inf.dpp.annotations.contribution.ruler"
-            colorPreferenceValue="128,128,128"
-            contributesToHeader="false"
-            highlightPreferenceValue="true"
-            includeOnPreferencePage="true"
-            label="%specification.label.4"
-            overviewRulerPreferenceValue="false"
-            presentationLayer="7"
-            textPreferenceValue="true"
-            textStylePreferenceValue="NONE"
             verticalRulerPreferenceValue="false"/>
       
       <specification
