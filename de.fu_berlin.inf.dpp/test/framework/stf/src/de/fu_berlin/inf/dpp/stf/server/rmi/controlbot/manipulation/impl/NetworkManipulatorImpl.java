@@ -10,6 +10,8 @@ import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.swtbot.swt.finder.finders.UIThreadRunnable;
+import org.eclipse.swtbot.swt.finder.results.VoidResult;
 import org.eclipse.swtbot.swt.finder.widgets.TimeoutException;
 
 import de.fu_berlin.inf.dpp.User;
@@ -24,6 +26,7 @@ import de.fu_berlin.inf.dpp.project.IActivityProvider;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ISarosSessionListener;
 import de.fu_berlin.inf.dpp.stf.server.StfRemoteObject;
+import de.fu_berlin.inf.dpp.stf.server.bot.SarosSWTBotPreferences;
 import de.fu_berlin.inf.dpp.stf.server.rmi.controlbot.manipulation.INetworkManipulator;
 
 /**
@@ -385,6 +388,25 @@ public final class NetworkManipulatorImpl extends StfRemoteObject implements
 
         if (listener == null)
             throw new IllegalStateException("no session running");
+
+        final CountDownLatch swtThreadSync = new CountDownLatch(1);
+
+        UIThreadRunnable.asyncExec(new VoidResult() {
+            @Override
+            public void run() {
+                swtThreadSync.countDown();
+            }
+        });
+
+        try {
+            if (!swtThreadSync.await(
+                SarosSWTBotPreferences.SAROS_DEFAULT_TIMEOUT,
+                TimeUnit.MILLISECONDS)) {
+                LOG.warn("could not synchronize on the SWT EDT");
+            }
+        } catch (InterruptedException e1) {
+            Thread.currentThread().interrupt();
+        }
 
         int id = RANDOM.nextInt();
 
