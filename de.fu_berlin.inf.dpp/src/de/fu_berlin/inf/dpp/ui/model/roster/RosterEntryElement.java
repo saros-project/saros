@@ -104,7 +104,7 @@ public class RosterEntryElement extends TreeElement {
                 StyledString.COUNTER_STYLER);
 
         } else if (presence.isAway()) {
-            styledString.append(" (" + presence.getType() + ")", //$NON-NLS-1$ //$NON-NLS-2$
+            styledString.append(" (" + presence.getMode() + ")", //$NON-NLS-1$ //$NON-NLS-2$
                 StyledString.COUNTER_STYLER);
         }
 
