@@ -6,12 +6,15 @@ import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.junit.AfterClass;
+import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.rules.MethodRule;
 import org.junit.rules.TestWatchman;
@@ -21,14 +24,18 @@ import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.stf.client.tester.AbstractTester;
 import de.fu_berlin.inf.dpp.stf.client.util.Util;
 import de.fu_berlin.inf.dpp.stf.server.rmi.remotebot.IRemoteWorkbenchBot;
+import de.fu_berlin.inf.dpp.test.util.TestThread;
 
 public abstract class StfTestCase {
 
     private static final Logger LOGGER = Logger.getLogger(StfTestCase.class
         .getName());
 
+    /**
+     * JUnit monitor. Do <b>NOT</b> call any method of this instance !
+     */
     @Rule
-    public MethodRule watchman = new TestWatchman() {
+    public final MethodRule watchman = new TestWatchman() {
         @Override
         public void failed(Throwable e, FrameworkMethod method) {
             logMessage("******* " + "TESTCASE "
@@ -58,6 +65,9 @@ public abstract class StfTestCase {
 
         @Override
         public void starting(FrameworkMethod method) {
+
+            lastTestClass = method.getMethod().getDeclaringClass();
+
             logMessage("******* " + "STARTING TESTCASE "
                 + method.getMethod().getDeclaringClass().getName() + ":"
                 + method.getName() + " *******");
@@ -92,6 +102,27 @@ public abstract class StfTestCase {
     };
 
     private static List<AbstractTester> currentTesters = new ArrayList<AbstractTester>();
+
+    private static List<TestThread> currentTestThreads = new ArrayList<TestThread>();
+
+    private static Class<?> lastTestClass;
+
+    /*
+     * Make sure that the JUNIT Ant task does not load every test case with a
+     * new class loader or this will NOT work during a regression !
+     */
+
+    private static boolean abortAllTests = false;
+
+    @BeforeClass
+    public static void checkThreadsBeforeClass() {
+        checkAndStopRunningTestThreads(true);
+    }
+
+    @Before
+    public final void checkThreadsBeforeTest() {
+        checkAndStopRunningTestThreads(false);
+    }
 
     /**
      * Calls
@@ -166,6 +197,12 @@ public abstract class StfTestCase {
      *             if a (internal) failure occur
      */
     public static void tearDownSaros() throws Exception {
+
+        try {
+            terminateTestThreads(60 * 1000);
+        } catch (Throwable t) {
+            checkAndStopRunningTestThreads(true);
+        }
 
         Exception exception = null;
 
@@ -554,4 +591,79 @@ public abstract class StfTestCase {
         host.superBot().views().sarosView().leaveSession();
         host.superBot().views().sarosView().waitUntilIsNotInSession();
     }
+
+    /**
+     * Creates a new {@link TestThread}. The test thread can be terminated by
+     * calling {@link #terminateTestThreads}. The test thread is automatically
+     * terminated after the <b>last</b> test of the test class is executed.
+     * 
+     * @param runnable
+     *            the runnable that should be executed in this test thread
+     * @return a new, not yet started, test thread
+     */
+    public static TestThread createTestThread(TestThread.Runnable runnable) {
+        TestThread thread = new TestThread(runnable);
+        currentTestThreads.add(thread);
+        return thread;
+    }
+
+    /**
+     * Terminates all test threads that were created with
+     * {@link #createTestThread}.
+     * 
+     * @param timeout
+     *            timeout in milliseconds to wait for the termination of all
+     *            test threads
+     * @throws IllegalStateException
+     *             if there are still test threads running
+     */
+    public static void terminateTestThreads(long timeout) {
+        for (TestThread thread : currentTestThreads)
+            thread.interrupt();
+
+        if (Util
+            .joinAll(timeout, currentTestThreads.toArray(new TestThread[0])))
+            return;
+
+        for (Iterator<TestThread> it = currentTestThreads.iterator(); it
+            .hasNext();) {
+
+            TestThread thread = it.next();
+
+            if (!thread.isAlive())
+                it.remove();
+        }
+
+        if (!currentTestThreads.isEmpty())
+            throw new IllegalStateException(currentTestThreads.size()
+                + " test threads are still alive");
+    }
+
+    @SuppressWarnings("deprecation")
+    private static void checkAndStopRunningTestThreads(boolean abortAllTests) {
+
+        if (currentTestThreads.isEmpty() && !StfTestCase.abortAllTests)
+            return;
+
+        assert lastTestClass != null;
+
+        IllegalStateException exception = new IllegalStateException(
+            "could not terminate all test threads for test class "
+                + lastTestClass.getName());
+
+        if (!abortAllTests)
+            throw exception;
+
+        // do it the hard way and give up
+
+        StfTestCase.abortAllTests = true;
+
+        for (TestThread thread : currentTestThreads)
+            thread.stop();
+
+        currentTestThreads.clear();
+
+        throw exception;
+    }
+
 }

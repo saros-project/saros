@@ -46,7 +46,7 @@ public class EditDuringInvitationTest extends StfTestCase {
 
         CARL.remoteBot().shell(SHELL_SESSION_INVITATION).confirm(ACCEPT);
 
-        TestThread bobIsWriting = new TestThread(new TestThread.Runnable() {
+        TestThread bobIsWriting = createTestThread(new TestThread.Runnable() {
 
             @Override
             public void run() throws Exception {

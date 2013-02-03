@@ -4,7 +4,6 @@ import static de.fu_berlin.inf.dpp.stf.client.tester.SarosTester.ALICE;
 import static de.fu_berlin.inf.dpp.stf.client.tester.SarosTester.BOB;
 import static org.junit.Assert.assertEquals;
 
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -20,23 +19,19 @@ public class EditDifferentFilesTest extends StfTestCase {
         select(ALICE, BOB);
     }
 
-    @Before
-    public void beforeEveryTest() throws Exception {
-        clearWorkspaces();
-        ALICE.superBot().views().packageExplorerView().tree().newC()
-            .javaProjectWithClasses("foo", "bar", "HelloWorld");
-
-        Util.buildSessionSequentially("foo", TypeOfCreateProject.NEW_PROJECT,
-            ALICE, BOB);
-
-    }
-
     // alice starts editing HelloWorld class
     // in the meantime bob adds a new class file HelloGermany and start editing
     // it
 
     @Test
     public void testEditingOnDifferentFiles() throws Exception {
+
+        ALICE.superBot().views().packageExplorerView().tree().newC()
+            .javaProjectWithClasses("foo", "bar", "HelloWorld");
+
+        Util.buildSessionSequentially("foo", TypeOfCreateProject.NEW_PROJECT,
+            ALICE, BOB);
+
         BOB.superBot().views().packageExplorerView()
             .waitUntilResourceIsShared("foo/src/bar/HelloWorld.java");
 
@@ -71,8 +66,8 @@ public class EditDifferentFilesTest extends StfTestCase {
             }
         };
 
-        TestThread alice = new TestThread(aliceEditTask);
-        TestThread bob = new TestThread(bobEditTask);
+        TestThread alice = createTestThread(aliceEditTask);
+        TestThread bob = createTestThread(bobEditTask);
 
         alice.start();
         bob.start();

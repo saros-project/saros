@@ -43,19 +43,7 @@ public class ConcurrentEditingWith3BuddiesTest extends StfTestCase {
 
     @After
     public void runAfterEveryTest() throws Exception {
-        if (aliceEditTaskThread != null && aliceEditTaskThread.isAlive()) {
-            aliceEditTaskThread.interrupt();
-            aliceEditTaskThread.join(10000);
-        }
-        if (bobEditTaskThread != null && bobEditTaskThread.isAlive()) {
-            bobEditTaskThread.interrupt();
-            bobEditTaskThread.join(10000);
-        }
-        if (carlEditTaskThread != null && carlEditTaskThread.isAlive()) {
-            carlEditTaskThread.interrupt();
-            carlEditTaskThread.join(10000);
-        }
-
+        terminateTestThreads(10000);
         leaveSessionHostFirst(ALICE);
     }
 
@@ -161,13 +149,13 @@ public class ConcurrentEditingWith3BuddiesTest extends StfTestCase {
             }
         };
 
-        aliceEditTaskThread = new TestThread(aliceEditTask);
+        aliceEditTaskThread = createTestThread(aliceEditTask);
         aliceEditTaskThread.start();
 
-        bobEditTaskThread = new TestThread(bobEditTask);
+        bobEditTaskThread = createTestThread(bobEditTask);
         bobEditTaskThread.start();
 
-        carlEditTaskThread = new TestThread(carlEditTask);
+        carlEditTaskThread = createTestThread(carlEditTask);
         carlEditTaskThread.start();
 
         Thread.sleep(INTERVAL * 60 * 1000);
@@ -310,13 +298,13 @@ public class ConcurrentEditingWith3BuddiesTest extends StfTestCase {
             }
         };
 
-        aliceEditTaskThread = new TestThread(aliceEditTask);
+        aliceEditTaskThread = createTestThread(aliceEditTask);
         aliceEditTaskThread.start();
 
-        bobEditTaskThread = new TestThread(bobEditTask);
+        bobEditTaskThread = createTestThread(bobEditTask);
         bobEditTaskThread.start();
 
-        carlEditTaskThread = new TestThread(carlEditTask);
+        carlEditTaskThread = createTestThread(carlEditTask);
         carlEditTaskThread.start();
 
         Thread.sleep(INTERVAL * 60 * 1000);

@@ -4,7 +4,6 @@ import static de.fu_berlin.inf.dpp.stf.client.tester.SarosTester.ALICE;
 import static de.fu_berlin.inf.dpp.stf.client.tester.SarosTester.BOB;
 import static org.junit.Assert.assertEquals;
 
-import org.junit.After;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -21,15 +20,6 @@ public class RecoveryWhileTypingTest extends StfTestCase {
     @BeforeClass
     public static void selectTesters() throws Exception {
         select(ALICE, BOB);
-    }
-
-    @After
-    public void stopAliceTask() throws Exception {
-
-        if (aliceEditTaskThread != null && aliceEditTaskThread.isAlive()) {
-            aliceEditTaskThread.interrupt();
-            aliceEditTaskThread.join(10000);
-        }
     }
 
     @Test
@@ -58,7 +48,7 @@ public class RecoveryWhileTypingTest extends StfTestCase {
             }
         };
 
-        aliceEditTaskThread = new TestThread(aliceEditTask);
+        aliceEditTaskThread = createTestThread(aliceEditTask);
         aliceEditTaskThread.start();
 
         BOB.superBot().views().packageExplorerView()

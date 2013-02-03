@@ -10,8 +10,6 @@ import static org.junit.Assert.assertEquals;
 import java.rmi.RemoteException;
 import java.util.Random;
 
-import org.junit.After;
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -33,9 +31,9 @@ public class EditDuringInvitationStressTest extends StfTestCase {
         select(ALICE, BOB, CARL);
     }
 
-    @Before
-    public void beforeEveryTest() throws Exception {
-        tidyUp();
+    @Test
+    public void testEditMultipleClassesDuringInvitation() throws Exception {
+
         ALICE
             .superBot()
             .views()
@@ -47,31 +45,6 @@ public class EditDuringInvitationStressTest extends StfTestCase {
 
         Util.buildSessionSequentially(Constants.PROJECT1,
             TypeOfCreateProject.NEW_PROJECT, ALICE, BOB);
-    }
-
-    private void tidyUp() throws Exception {
-        closeAllShells();
-        closeAllEditors();
-        clearWorkspaces();
-    }
-
-    @After
-    public void runAfterEveryTest() throws Exception {
-        if (bobIsWriting != null)
-            killThread(bobIsWriting);
-
-        leaveSessionHostFirst(ALICE);
-    }
-
-    private void killThread(Thread thread) throws InterruptedException {
-        if (thread != null && thread.isAlive()) {
-            thread.interrupt();
-            thread.join(10000);
-        }
-    }
-
-    @Test
-    public void testEditMultipleClassesDuringInvitation() throws Exception {
 
         BOB.superBot().views().packageExplorerView()
             .waitUntilClassExists(Constants.PROJECT1, Constants.PKG1, "ClassA");
@@ -83,7 +56,7 @@ public class EditDuringInvitationStressTest extends StfTestCase {
 
         CARL.remoteBot().shell(SHELL_SESSION_INVITATION).confirm(ACCEPT);
 
-        bobIsWriting = new TestThread(new TestThread.Runnable() {
+        bobIsWriting = createTestThread(new TestThread.Runnable() {
 
             private final Random random = new Random();
 

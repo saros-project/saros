@@ -4,7 +4,6 @@ import static de.fu_berlin.inf.dpp.stf.client.tester.SarosTester.ALICE;
 import static de.fu_berlin.inf.dpp.stf.client.tester.SarosTester.BOB;
 import static org.junit.Assert.assertTrue;
 
-import org.junit.After;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -21,18 +20,6 @@ public class AddMultipleFilesTest extends StfTestCase {
 
     private TestThread alice;
     private TestThread bob;
-
-    @After
-    public void killThreads() throws Exception {
-        if (alice != null)
-            alice.interrupt();
-
-        if (bob != null)
-            bob.interrupt();
-
-        alice.join(10000);
-        bob.join(10000);
-    }
 
     /*
      * So what is going wrong here ? Alice sends a big file, that is now
@@ -81,8 +68,8 @@ public class AddMultipleFilesTest extends StfTestCase {
             }
         };
 
-        alice = new TestThread(aliceFileTask);
-        bob = new TestThread(bobFileTask);
+        alice = createTestThread(aliceFileTask);
+        bob = createTestThread(bobFileTask);
 
         bob.start();
         alice.start();

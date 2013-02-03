@@ -5,8 +5,6 @@ import static de.fu_berlin.inf.dpp.stf.client.tester.SarosTester.BOB;
 import static de.fu_berlin.inf.dpp.stf.client.tester.SarosTester.CARL;
 import static org.junit.Assert.assertEquals;
 
-import org.junit.After;
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -71,19 +69,6 @@ public class ConcurrentEditingInsert100CharactersTest extends StfTestCase {
         select(ALICE, BOB, CARL);
     }
 
-    @Before
-    public void runBeforeEveryTest() throws Exception {
-        clearWorkspaces();
-    }
-
-    @After
-    public void runAfterEveryTest() throws Exception {
-        killThread(aliceEditTaskThread);
-        killThread(bobEditTaskThread);
-        killThread(carlEditTaskThread);
-        leaveSessionHostFirst(ALICE);
-    }
-
     @Test
     public void testInsertCharactersOnTheSameLine() throws Exception {
 
@@ -117,17 +102,17 @@ public class ConcurrentEditingInsert100CharactersTest extends StfTestCase {
             .selectFile("foo", "readme.txt").open();
         CARL.remoteBot().editor("readme.txt").waitUntilIsActive();
 
-        aliceEditTaskThread = new TestThread(new TypeTask(ALICE, "readme.txt",
-            'A', 'Z'));
+        aliceEditTaskThread = createTestThread(new TypeTask(ALICE,
+            "readme.txt", 'A', 'Z'));
 
         aliceEditTaskThread.start();
 
-        bobEditTaskThread = new TestThread(new TypeTask(BOB, "readme.txt", 'a',
-            'z'));
+        bobEditTaskThread = createTestThread(new TypeTask(BOB, "readme.txt",
+            'a', 'z'));
 
         bobEditTaskThread.start();
 
-        carlEditTaskThread = new TestThread(new TypeTask(CARL, "readme.txt",
+        carlEditTaskThread = createTestThread(new TypeTask(CARL, "readme.txt",
             '0', '9'));
 
         carlEditTaskThread.start();
@@ -172,12 +157,5 @@ public class ConcurrentEditingInsert100CharactersTest extends StfTestCase {
 
         assertEquals(bobText, carlText);
         assertEquals(aliceText, bobText);
-    }
-
-    private void killThread(Thread thread) throws InterruptedException {
-        if (thread != null && thread.isAlive()) {
-            thread.interrupt();
-            thread.join(10000);
-        }
     }
 }

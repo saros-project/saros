@@ -8,8 +8,6 @@ import static de.fu_berlin.inf.dpp.stf.shared.Constants.SHELL_SESSION_INVITATION
 import static org.junit.Assert.assertEquals;
 
 import org.eclipse.swtbot.swt.finder.widgets.TimeoutException;
-import org.junit.After;
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -21,30 +19,11 @@ import de.fu_berlin.inf.dpp.test.util.TestThread;
 
 public class EditDuringNonHostInvitationTest extends StfTestCase {
 
-    private TestThread bobIsWriting, aliceIsWriting;
+    private TestThread aliceIsWriting;
 
     @BeforeClass
     public static void selectTesters() throws Exception {
         select(ALICE, BOB, CARL);
-    }
-
-    @Before
-    public void tidyUp() throws Exception {
-        closeAllShells();
-        closeAllEditors();
-        clearWorkspaces();
-    }
-
-    @After
-    public void runAfterEveryTest() throws Exception {
-        if (bobIsWriting != null)
-            killThread(bobIsWriting);
-
-        if (aliceIsWriting != null)
-            killThread(aliceIsWriting);
-
-        leaveSessionHostFirst(ALICE);
-
     }
 
     @Test
@@ -69,7 +48,7 @@ public class EditDuringNonHostInvitationTest extends StfTestCase {
 
         CARL.remoteBot().shell(SHELL_SESSION_INVITATION).confirm(ACCEPT);
 
-        aliceIsWriting = new TestThread(new TestThread.Runnable() {
+        aliceIsWriting = createTestThread(new TestThread.Runnable() {
 
             @Override
             public void run() throws Exception {
@@ -122,12 +101,5 @@ public class EditDuringNonHostInvitationTest extends StfTestCase {
 
         assertEquals(textByBob, textByAlice);
         assertEquals(textByBob, textByCarl);
-    }
-
-    private void killThread(Thread thread) throws InterruptedException {
-        if (thread != null && thread.isAlive()) {
-            thread.interrupt();
-            thread.join(10000);
-        }
     }
 }
