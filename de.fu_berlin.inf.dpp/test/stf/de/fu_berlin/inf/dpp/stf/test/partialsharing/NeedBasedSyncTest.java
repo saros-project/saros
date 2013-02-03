@@ -126,8 +126,6 @@ public class NeedBasedSyncTest extends StfTestCase {
         String contentAliceFile1 = ALICE.superBot().views()
             .packageExplorerView().getFileContent("foo/file1");
 
-        Thread.sleep(1000);
-
         String contentBobFile1 = BOB.superBot().views().packageExplorerView()
             .getFileContent("foo/file1");
 

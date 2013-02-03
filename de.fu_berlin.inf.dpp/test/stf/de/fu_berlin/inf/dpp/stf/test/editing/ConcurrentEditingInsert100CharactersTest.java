@@ -119,14 +119,17 @@ public class ConcurrentEditingInsert100CharactersTest extends StfTestCase {
 
         aliceEditTaskThread = new TestThread(new TypeTask(ALICE, "readme.txt",
             'A', 'Z'));
+
         aliceEditTaskThread.start();
 
         bobEditTaskThread = new TestThread(new TypeTask(BOB, "readme.txt", 'a',
             'z'));
+
         bobEditTaskThread.start();
 
         carlEditTaskThread = new TestThread(new TypeTask(CARL, "readme.txt",
             '0', '9'));
+
         carlEditTaskThread.start();
 
         /*
@@ -142,7 +145,17 @@ public class ConcurrentEditingInsert100CharactersTest extends StfTestCase {
         carlEditTaskThread.verify();
 
         // ensure that all queues on the client sides are flushed
-        Thread.sleep(10 * 1000);
+        BOB.controlBot().getNetworkManipulator()
+            .synchronizeOnActivityQueue(ALICE.getJID(), 60 * 1000);
+
+        CARL.controlBot().getNetworkManipulator()
+            .synchronizeOnActivityQueue(ALICE.getJID(), 60 * 1000);
+
+        ALICE.controlBot().getNetworkManipulator()
+            .synchronizeOnActivityQueue(BOB.getJID(), 60 * 1000);
+
+        ALICE.controlBot().getNetworkManipulator()
+            .synchronizeOnActivityQueue(CARL.getJID(), 60 * 1000);
 
         String aliceText = ALICE.remoteBot().editor("readme.txt").getText();
         String bobText = BOB.remoteBot().editor("readme.txt").getText();

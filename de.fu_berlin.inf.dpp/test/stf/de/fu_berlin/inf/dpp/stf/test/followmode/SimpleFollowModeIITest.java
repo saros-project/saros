@@ -43,10 +43,13 @@ public class SimpleFollowModeIITest extends StfTestCase {
             .followParticipant();
 
         int lineCount = ALICE.remoteBot().editor("readme.txt").getLineCount();
+
         ALICE.remoteBot().editor("readme.txt").navigateTo(lineCount - 1, 0);
 
         ALICE.remoteBot().editor("readme.txt").typeText("123456789");
-        Thread.sleep(1000);
+
+        ALICE.controlBot().getNetworkManipulator()
+            .synchronizeOnActivityQueue(BOB.getJID(), 60 * 1000);
 
         List<Integer> viewport = BOB.remoteBot().editor("readme.txt")
             .getViewport();
@@ -65,7 +68,8 @@ public class SimpleFollowModeIITest extends StfTestCase {
 
         BOB.remoteBot().editor("readme.txt").selectCurrentLine();
 
-        Thread.sleep(1000);
+        BOB.controlBot().getNetworkManipulator()
+            .synchronizeOnActivityQueue(ALICE.getJID(), 60 * 1000);
 
         assertEquals(BOB.remoteBot().editor("readme.txt").getSelection(), ALICE
             .remoteBot().editor("readme.txt").getSelectionByAnnotation());

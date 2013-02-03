@@ -30,20 +30,23 @@ public class ModifyFileWithoutEditorTest extends StfTestCase {
         ALICE.superBot().internal().append("foo", "readme.txt", " finished");
 
         // do not make inconsistencies
-        Thread.sleep(2000);
+        ALICE.controlBot().getNetworkManipulator()
+            .synchronizeOnActivityQueue(BOB.getJID(), 10000);
 
         BOB.superBot().internal()
             .append("foo", "readme.txt", " World of Warcraft");
 
+        BOB.controlBot().getNetworkManipulator()
+            .synchronizeOnActivityQueue(ALICE.getJID(), 10000);
+
         ALICE.superBot().views().packageExplorerView()
             .selectFile("foo", "readme.txt").open();
+
         BOB.superBot().views().packageExplorerView()
             .selectFile("foo", "readme.txt").open();
 
         ALICE.remoteBot().editor("readme.txt").waitUntilIsActive();
         BOB.remoteBot().editor("readme.txt").waitUntilIsActive();
-
-        Thread.sleep(2000);
 
         String aliceText = ALICE.remoteBot().editor("readme.txt").getText();
         String bobText = BOB.remoteBot().editor("readme.txt").getText();

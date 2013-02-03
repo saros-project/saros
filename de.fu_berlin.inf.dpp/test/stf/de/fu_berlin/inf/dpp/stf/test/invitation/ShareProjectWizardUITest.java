@@ -34,15 +34,6 @@ import de.fu_berlin.inf.dpp.stf.test.Constants;
  */
 public class ShareProjectWizardUITest extends StfTestCase {
 
-    /**
-     * Preconditions:
-     * <ol>
-     * <li>Alice (Host, Write Access)</li>
-     * <li>Bob (Read-Only Access)</li>
-     * </ol>
-     * 
-     */
-
     private static final int UNDO_BUTTON = 0;
     private static final int REDO_BUTTON = 1;
     private static final int RESTORE_SELECTION_BUTTON = 3;
@@ -80,8 +71,10 @@ public class ShareProjectWizardUITest extends StfTestCase {
             .newC()
             .javaProjectWithClasses(Constants.PROJECT1, Constants.PKG1,
                 Constants.CLS1);
+
         ALICE.superBot().views().packageExplorerView().tree().newC()
             .cls(Constants.PROJECT1, Constants.PKG1, Constants.CLS2);
+
         ALICE.superBot().views().packageExplorerView().tree().newC()
             .cls(Constants.PROJECT1, Constants.PKG1, Constants.CLS3);
     }
@@ -101,7 +94,6 @@ public class ShareProjectWizardUITest extends StfTestCase {
     public void testShareProjectsUndoRedo() throws Exception {
         ALICE.remoteBot().activateWorkbench();
         ALICE.remoteBot().menu(MENU_SAROS).menu(SHARE_PROJECTS).click();
-        Thread.sleep(500);
         ALICE.remoteBot().shell(SHELL_SHARE_PROJECT).activate();
 
         assertNoneChecked();
@@ -111,8 +103,6 @@ public class ShareProjectWizardUITest extends StfTestCase {
         getClass(Constants.CLS2_SUFFIX).check();
         getClass(Constants.CLS3_SUFFIX).check();
         assertAllChecked();
-
-        Thread.sleep(500);
 
         undoAll();
         assertNoneChecked();
@@ -125,7 +115,6 @@ public class ShareProjectWizardUITest extends StfTestCase {
     public void testShareProjectsRestoreSelection() throws Exception {
         ALICE.remoteBot().activateWorkbench();
         ALICE.remoteBot().menu(MENU_SAROS).menu(SHARE_PROJECTS).click();
-        Thread.sleep(500);
         ALICE.remoteBot().shell(SHELL_SHARE_PROJECT).activate();
 
         // unselect all..
@@ -138,15 +127,12 @@ public class ShareProjectWizardUITest extends StfTestCase {
         getClass(Constants.CLS3_SUFFIX).check();
         assertAllChecked();
 
-        Thread.sleep(500);
-
         String selectionName = "test";
         Long.toHexString(RANDOM.nextLong());
 
         // Store a selection
         storeSelection(selectionName);
         assertAllChecked();
-        Thread.sleep(1000);
 
         // Remove it
         removeSelection(selectionName);
@@ -158,7 +144,7 @@ public class ShareProjectWizardUITest extends StfTestCase {
         getClass(Constants.CLS1_SUFFIX).uncheck();
         getClass(Constants.CLS2_SUFFIX).uncheck();
         getClass(Constants.CLS3_SUFFIX).uncheck();
-        Thread.sleep(5000);
+
         assertNoneChecked();
 
         // restore selection
@@ -172,25 +158,16 @@ public class ShareProjectWizardUITest extends StfTestCase {
         // done.
     }
 
-    private void refocusWizard() throws Exception {
-        // refocus after balloon notification
-        Thread.sleep(1000);
-        ALICE.remoteBot().shell(SHELL_SHARE_PROJECT).activate();
-        ALICE.remoteBot().shell(SHELL_SHARE_PROJECT).waitUntilActive();
-    }
-
     private void removeSelection(String name) throws Exception {
         ALICE.remoteBot().shell(SHELL_SHARE_PROJECT).bot().comboBox(0)
             .setText(name);
         ALICE.remoteBot().shell(SHELL_SHARE_PROJECT).bot()
             .button(DELETE_SELECTION_BUTTON).click();
 
-        Thread.sleep(500);
-
         // confirm deleting
         ALICE.remoteBot().shell(ResourceSelectionComposite_delete_dialog_title)
             .bot().button(YES).click();
-        refocusWizard();
+
         assertTrue(
             "Could not remove selection ",
             ArrayUtils.indexOf(ALICE.remoteBot().shell(SHELL_SHARE_PROJECT)
@@ -202,10 +179,6 @@ public class ShareProjectWizardUITest extends StfTestCase {
             .setText(name);
         ALICE.remoteBot().shell(SHELL_SHARE_PROJECT).bot()
             .button(RESTORE_SELECTION_BUTTON).click();
-
-        Thread.sleep(1000);
-
-        refocusWizard();
     }
 
     private void storeSelection(String name) throws Exception {
@@ -214,8 +187,6 @@ public class ShareProjectWizardUITest extends StfTestCase {
         ALICE.remoteBot().shell(SHELL_SHARE_PROJECT).bot()
             .button(SAVE_SELECTION_BUTTON).click();
 
-        Thread.sleep(500);
-
         // optionally confirm overwriting
         if (ALICE.remoteBot().isShellOpen(
             ResourceSelectionComposite_overwrite_dialog_title)) {
@@ -223,8 +194,6 @@ public class ShareProjectWizardUITest extends StfTestCase {
                 .shell(ResourceSelectionComposite_overwrite_dialog_title).bot()
                 .button(YES).click();
         }
-
-        refocusWizard();
 
         assertTrue(
             "Could not store selection",

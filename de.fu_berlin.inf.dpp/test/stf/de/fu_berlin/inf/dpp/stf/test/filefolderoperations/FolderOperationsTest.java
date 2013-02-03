@@ -2,6 +2,11 @@ package de.fu_berlin.inf.dpp.stf.test.filefolderoperations;
 
 import static de.fu_berlin.inf.dpp.stf.client.tester.SarosTester.ALICE;
 import static de.fu_berlin.inf.dpp.stf.client.tester.SarosTester.BOB;
+import static org.junit.Assert.assertTrue;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -40,36 +45,59 @@ public class FolderOperationsTest extends StfTestCase {
 
         BOB.superBot().views().packageExplorerView()
             .waitUntilResourceIsShared("foo/a/b/c");
+
         BOB.superBot().views().packageExplorerView()
             .waitUntilResourceIsShared("foo/a/c/a");
 
-        ALICE.superBot().views().packageExplorerView()
-            .selectFile("foo", "test", "foo.txt").refactor().moveTo("foo", "a");
+        /*
+         * 5 * 100 = 0.5 GB (that should not be transfered)
+         */
+
+        long duration = 0;
+
+        duration += moveAndMeasure("test", "a");
+
         BOB.superBot().views().packageExplorerView()
             .waitUntilFileExists("foo", "a", "foo.txt");
 
-        ALICE.superBot().views().packageExplorerView()
-            .selectFile("foo", "a", "foo.txt").refactor().moveTo("foo", "a/b");
+        duration += moveAndMeasure("a", "a/b");
+
         BOB.superBot().views().packageExplorerView()
             .waitUntilFileExists("foo", "a/b", "foo.txt");
 
-        ALICE.superBot().views().packageExplorerView()
-            .selectFile("foo", "a", "b", "foo.txt").refactor()
-            .moveTo("foo", "a/b/c");
+        duration += moveAndMeasure("a/b", "a/b/c");
+
         BOB.superBot().views().packageExplorerView()
             .waitUntilFileExists("foo", "a/b/c", "foo.txt");
 
-        ALICE.superBot().views().packageExplorerView()
-            .selectFile("foo", "a", "b", "c", "foo.txt").refactor()
-            .moveTo("foo", "a/c");
+        duration += moveAndMeasure("a/b/c", "a/c");
+
         BOB.superBot().views().packageExplorerView()
             .waitUntilFileExists("foo", "a/c", "foo.txt");
 
-        ALICE.superBot().views().packageExplorerView()
-            .selectFile("foo", "a", "c", "foo.txt").refactor()
-            .moveTo("foo", "a/c/a");
+        duration += moveAndMeasure("a/c", "a/c/a");
+
         BOB.superBot().views().packageExplorerView()
             .waitUntilFileExists("foo", "a/c/a", "foo.txt");
 
+        assertTrue("file was transmitted on every move", duration < 10000);
+    }
+
+    private long moveAndMeasure(String from, String to) throws Exception {
+        long start = System.currentTimeMillis();
+
+        List<String> source = new ArrayList<String>(Arrays.asList(from
+            .split("/")));
+
+        source.add("foo.txt");
+
+        ALICE.superBot().views().packageExplorerView()
+            .selectFile("foo", source.toArray(new String[0])).refactor()
+            .moveTo("foo", to);
+
+        ALICE.controlBot().getNetworkManipulator()
+            .synchronizeOnActivityQueue(BOB.getJID(), 60 * 1000);
+
+        return System.currentTimeMillis() - start;
     }
 }

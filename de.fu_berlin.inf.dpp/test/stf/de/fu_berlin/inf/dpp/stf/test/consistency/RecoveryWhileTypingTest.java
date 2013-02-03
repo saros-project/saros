@@ -68,11 +68,13 @@ public class RecoveryWhileTypingTest extends StfTestCase {
 
         BOB.superBot().views().sarosView().waitUntilIsInconsistencyDetected();
         BOB.superBot().views().sarosView().resolveInconsistency();
+
         aliceEditTaskThread.interrupt();
         aliceEditTaskThread.join(10000);
         aliceEditTaskThread.verify();
 
-        Thread.sleep(1000);
+        ALICE.controlBot().getNetworkManipulator()
+            .synchronizeOnActivityQueue(BOB.getJID(), 10000);
 
         String aliceText = ALICE.remoteBot().editor("readme.txt").getText();
         String bobText = BOB.remoteBot().editor("readme.txt").getText();

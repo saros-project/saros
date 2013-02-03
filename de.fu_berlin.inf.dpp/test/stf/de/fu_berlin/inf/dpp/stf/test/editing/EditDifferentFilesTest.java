@@ -50,7 +50,6 @@ public class EditDifferentFilesTest extends StfTestCase {
                         .waitUntilIsActive();
                     ALICE.remoteBot().editor("HelloWorld.java")
                         .typeText(String.valueOf(c));
-                    Thread.sleep(100);
                 }
             }
         };
@@ -68,7 +67,6 @@ public class EditDifferentFilesTest extends StfTestCase {
                         .waitUntilIsActive();
                     BOB.remoteBot().editor("HelloGermany.java")
                         .typeText(String.valueOf(c));
-                    Thread.sleep(100);
                 }
             }
         };
@@ -86,16 +84,23 @@ public class EditDifferentFilesTest extends StfTestCase {
         ALICE.remoteBot().saveAllEditors();
         BOB.remoteBot().saveAllEditors();
 
-        Thread.sleep(1000);
+        BOB.controlBot().getNetworkManipulator()
+            .synchronizeOnActivityQueue(ALICE.getJID(), 60 * 1000);
+
+        ALICE.controlBot().getNetworkManipulator()
+            .synchronizeOnActivityQueue(BOB.getJID(), 60 * 1000);
+
         String contentAliceHelloWorld = ALICE.superBot().views()
             .packageExplorerView()
             .getFileContent("foo/src/bar/HelloWorld.java");
+
         String contentBobHelloWorld = BOB.superBot().views()
             .packageExplorerView()
             .getFileContent("foo/src/bar/HelloWorld.java");
 
         String contentAliceHelloGermany = ALICE.superBot().views()
             .packageExplorerView().getFileContent("foo/src/HelloGermany.java");
+
         String contentBobHelloWorldGermany = BOB.superBot().views()
             .packageExplorerView().getFileContent("foo/src/HelloGermany.java");
 

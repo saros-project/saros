@@ -54,21 +54,30 @@ public class AddMultipleFilesTest extends StfTestCase {
         TestThread.Runnable aliceFileTask = new TestThread.Runnable() {
             @Override
             public void run() throws Exception {
-                for (int i = 0; i < 10; i++)
+                for (int i = 0; i < 10; i++) {
+
+                    if (Thread.currentThread().isInterrupted())
+                        break;
+
                     ALICE
                         .superBot()
                         .internal()
                         .createFile("foo", "bigfile" + i, 10 * 1024 * 1024,
                             true);
+                }
             }
         };
 
         TestThread.Runnable bobFileTask = new TestThread.Runnable() {
             @Override
             public void run() throws Exception {
-                for (int i = 0; i < 1000; i++)
+                for (int i = 0; i < 1000; i++) {
+                    if (Thread.currentThread().isInterrupted())
+                        break;
+
                     BOB.superBot().internal()
                         .createFile("foo", "smallfile" + i, 100 * 1024, true);
+                }
             }
         };
 
@@ -78,13 +87,16 @@ public class AddMultipleFilesTest extends StfTestCase {
         bob.start();
         alice.start();
 
-        Util.joinAll(60 * 1000, alice, bob);
+        Util.joinAll(2 * 60 * 1000, alice, bob);
 
         alice.verify();
         bob.verify();
 
-        // wait long enough to ensure all file activities are written do disk
-        Thread.sleep(30 * 1000);
+        BOB.controlBot().getNetworkManipulator()
+            .synchronizeOnActivityQueue(ALICE.getJID(), 2 * 60 * 1000);
+
+        ALICE.controlBot().getNetworkManipulator()
+            .synchronizeOnActivityQueue(BOB.getJID(), 2 * 60 * 1000);
 
         for (int i = 0; i < 1000; i++) {
             assertTrue("file " + "foo/smallfile" + i

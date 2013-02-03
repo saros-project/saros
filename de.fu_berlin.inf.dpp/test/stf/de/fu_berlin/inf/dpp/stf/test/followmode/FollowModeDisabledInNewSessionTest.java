@@ -3,6 +3,7 @@ package de.fu_berlin.inf.dpp.stf.test.followmode;
 import static de.fu_berlin.inf.dpp.stf.client.tester.SarosTester.ALICE;
 import static de.fu_berlin.inf.dpp.stf.client.tester.SarosTester.BOB;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -35,14 +36,19 @@ public class FollowModeDisabledInNewSessionTest extends StfTestCase {
         BOB.superBot().views().sarosView().selectParticipant(ALICE.getJID())
             .waitUntilIsFollowing();
 
+        ALICE.superBot().internal().createFile("foo", "info.txt", "info");
+
+        ALICE.controlBot().getNetworkManipulator()
+            .synchronizeOnActivityQueue(BOB.getJID(), 60 * 1000);
+
         leaveSessionPeersFirst(ALICE);
 
-        // if we close the editor before we leave the session all is fine
-
         BOB.remoteBot().closeAllEditors();
-        BOB.superBot().internal().clearWorkspace();
 
-        Util.buildSessionSequentially("foo", TypeOfCreateProject.NEW_PROJECT,
+        BOB.superBot().views().packageExplorerView()
+            .selectFile("foo", "readme.txt").open();
+
+        Util.buildSessionSequentially("foo", TypeOfCreateProject.EXIST_PROJECT,
             ALICE, BOB);
 
         BOB.superBot().views().packageExplorerView()
@@ -51,22 +57,13 @@ public class FollowModeDisabledInNewSessionTest extends StfTestCase {
         ALICE.superBot().views().packageExplorerView()
             .selectFile("foo", "readme.txt").open();
 
-        Thread.sleep(1000);
+        ALICE.controlBot().getNetworkManipulator()
+            .synchronizeOnActivityQueue(BOB.getJID(), 60 * 1000);
 
-        // this passes WTF !
         assertFalse("BOB is following ALICE", BOB.superBot().views()
             .sarosView().selectParticipant(ALICE.getJID()).isFollowing());
 
-        // so a little hack
-
-        boolean editorActive = true;
-
-        try {
-            editorActive = BOB.remoteBot().editor("readme.txt").isActive();
-        } catch (Exception e) {
-            editorActive = false;
-        }
-
-        assertFalse("BOB is following ALICE", editorActive);
+        assertTrue("editor changed", BOB.remoteBot().editor("readme.txt")
+            .isActive());
     }
 }

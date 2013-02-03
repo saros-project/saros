@@ -39,23 +39,29 @@ public class SimpleFollowModeITest extends StfTestCase {
             .followParticipant();
 
         ALICE.remoteBot().editor("readme.txt").typeText("123456789");
-        Thread.sleep(1000);
+
+        ALICE.controlBot().getNetworkManipulator()
+            .synchronizeOnActivityQueue(BOB.getJID(), 60 * 1000);
 
         ALICE.remoteBot().editor("readme.txt").selectCurrentLine();
 
-        Thread.sleep(1000);
+        ALICE.controlBot().getNetworkManipulator()
+            .synchronizeOnActivityQueue(BOB.getJID(), 60 * 1000);
 
         assertEquals(ALICE.remoteBot().editor("readme.txt").getSelection(), BOB
             .remoteBot().editor("readme.txt").getSelectionByAnnotation());
 
         ALICE.remoteBot().editor("readme.txt").navigateTo(0, 2);
+
         BOB.remoteBot().editor("readme.txt").navigateTo(0, 0);
+
         ALICE
             .remoteBot()
             .editor("readme.txt")
             .pressShortcut(IKeyLookup.BACKSPACE_NAME, IKeyLookup.BACKSPACE_NAME);
 
-        Thread.sleep(1000);
+        ALICE.controlBot().getNetworkManipulator()
+            .synchronizeOnActivityQueue(BOB.getJID(), 60 * 1000);
 
         assertEquals(ALICE.remoteBot().editor("readme.txt")
             .getTextOnCurrentLine(), BOB.remoteBot().editor("readme.txt")
@@ -69,7 +75,9 @@ public class SimpleFollowModeITest extends StfTestCase {
         // navigateTo does not trigger events
 
         ALICE.remoteBot().editor("readme.txt").typeText("0");
-        Thread.sleep(1000);
+
+        ALICE.controlBot().getNetworkManipulator()
+            .synchronizeOnActivityQueue(BOB.getJID(), 60 * 1000);
 
         List<Integer> viewport = BOB.remoteBot().editor("readme.txt")
             .getViewport();

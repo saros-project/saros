@@ -66,7 +66,17 @@ public class NonHostAddsProjectWithHostAcceptDelayedTest extends StfTestCase {
         ALICE.remoteBot().editor("text.txt").waitUntilIsActive();
         ALICE.remoteBot().editor("text.txt").typeText("Ich bin die " + ALICE);
 
-        Thread.sleep(5000);
+        BOB.controlBot().getNetworkManipulator()
+            .synchronizeOnActivityQueue(ALICE.getJID(), 60 * 1000);
+
+        CARL.controlBot().getNetworkManipulator()
+            .synchronizeOnActivityQueue(ALICE.getJID(), 60 * 1000);
+
+        ALICE.controlBot().getNetworkManipulator()
+            .synchronizeOnActivityQueue(BOB.getJID(), 60 * 1000);
+
+        ALICE.controlBot().getNetworkManipulator()
+            .synchronizeOnActivityQueue(CARL.getJID(), 60 * 1000);
 
         String alicesText = ALICE.remoteBot().editor("text.txt").getText();
         String bobsText = BOB.remoteBot().editor("text.txt").getText();
