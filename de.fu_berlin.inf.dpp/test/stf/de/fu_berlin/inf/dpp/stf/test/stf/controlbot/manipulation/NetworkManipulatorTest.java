@@ -3,6 +3,7 @@ package de.fu_berlin.inf.dpp.stf.test.stf.controlbot.manipulation;
 import static de.fu_berlin.inf.dpp.stf.client.tester.SarosTester.ALICE;
 import static de.fu_berlin.inf.dpp.stf.client.tester.SarosTester.BOB;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import org.junit.After;
 import org.junit.AfterClass;
@@ -89,7 +90,8 @@ public class NetworkManipulatorTest extends StfTestCase {
         ALICE.controlBot().getNetworkManipulator()
             .unblockOutgoingSessionPackets();
 
-        Thread.sleep(1000);
+        ALICE.controlBot().getNetworkManipulator()
+            .synchronizeOnActivityQueue(BOB.getJID(), 10000);
 
         assertEquals("foobla", BOB.remoteBot().editor("bar.txt").getText());
     }
@@ -107,7 +109,8 @@ public class NetworkManipulatorTest extends StfTestCase {
         BOB.controlBot().getNetworkManipulator()
             .unblockIncomingSessionPackets();
 
-        Thread.sleep(1000);
+        BOB.controlBot().getNetworkManipulator()
+            .synchronizeOnActivityQueue(ALICE.getJID(), 10000);
 
         assertEquals("foobla", BOB.remoteBot().editor("bar.txt").getText());
     }
@@ -119,7 +122,8 @@ public class NetworkManipulatorTest extends StfTestCase {
 
         ALICE.remoteBot().editor("bar.txt").typeText("foo");
 
-        Thread.sleep(1000);
+        ALICE.controlBot().getNetworkManipulator()
+            .synchronizeOnActivityQueue(BOB.getJID(), 10000);
 
         assertEquals("foobla", BOB.remoteBot().editor("bar.txt").getText());
 
@@ -140,8 +144,26 @@ public class NetworkManipulatorTest extends StfTestCase {
         ALICE.controlBot().getNetworkManipulator()
             .unblockOutgoingSessionPackets(BOB.getJID());
 
-        Thread.sleep(1000);
+        ALICE.controlBot().getNetworkManipulator()
+            .synchronizeOnActivityQueue(BOB.getJID(), 10000);
 
         assertEquals("foobla", BOB.remoteBot().editor("bar.txt").getText());
+    }
+
+    @Test
+    public void testSynchronizeOnActivityQueue() throws Exception {
+
+        BOB.superBot().internal()
+            .createFile("foo", "bigfile", 10 * 1024 * 1024, true);
+
+        BOB.controlBot().getNetworkManipulator()
+            .synchronizeOnActivityQueue(ALICE.getJID(), 60 * 1000);
+
+        assertTrue("synchronization failed", ALICE.superBot().internal()
+            .existsResource("foo/bigfile"));
+
+        assertEquals(10 * 1024 * 1024,
+            ALICE.superBot().internal().getFileSize("foo", "bigfile"));
+
     }
 }

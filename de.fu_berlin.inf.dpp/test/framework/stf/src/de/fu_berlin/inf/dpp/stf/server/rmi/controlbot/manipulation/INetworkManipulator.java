@@ -194,4 +194,19 @@ public interface INetworkManipulator extends Remote {
      */
     public void setDiscardOutgoingSessionPackets(JID jid, boolean discard)
         throws RemoteException;
+
+    /**
+     * Synchronizes on the activity queue for the given JID. When this method
+     * returns all outstanding activities are guaranteed to have been executed
+     * before this call was made.
+     * 
+     * @param jid
+     *            the JID to synchronize on
+     * @param timeout
+     *            the timeout how long this method should wait before giving up
+     * @throws RemoteException
+     *             if the timeout exceeded or there is no active session
+     */
+    public void synchronizeOnActivityQueue(JID jid, long timeout)
+        throws RemoteException;
 }

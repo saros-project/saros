@@ -106,4 +106,10 @@ public class AbstractActivityReceiver implements IActivityReceiver {
         // do nothing
 
     }
+
+    @Override
+    public void receive(NOPActivity nopActivity) {
+        // do nothing
+
+    }
 }

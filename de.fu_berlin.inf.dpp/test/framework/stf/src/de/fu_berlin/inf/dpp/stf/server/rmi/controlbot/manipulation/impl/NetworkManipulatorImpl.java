@@ -2,15 +2,27 @@ package de.fu_berlin.inf.dpp.stf.server.rmi.controlbot.manipulation.impl;
 
 import java.rmi.RemoteException;
 import java.util.Queue;
+import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.swtbot.swt.finder.widgets.TimeoutException;
 
+import de.fu_berlin.inf.dpp.User;
+import de.fu_berlin.inf.dpp.activities.business.IActivity;
+import de.fu_berlin.inf.dpp.activities.business.NOPActivity;
 import de.fu_berlin.inf.dpp.net.IPacketInterceptor;
 import de.fu_berlin.inf.dpp.net.IncomingTransferObject;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.internal.TransferDescription;
+import de.fu_berlin.inf.dpp.project.IActivityListener;
+import de.fu_berlin.inf.dpp.project.IActivityProvider;
+import de.fu_berlin.inf.dpp.project.ISarosSession;
+import de.fu_berlin.inf.dpp.project.ISarosSessionListener;
 import de.fu_berlin.inf.dpp.stf.server.StfRemoteObject;
 import de.fu_berlin.inf.dpp.stf.server.rmi.controlbot.manipulation.INetworkManipulator;
 
@@ -18,10 +30,12 @@ import de.fu_berlin.inf.dpp.stf.server.rmi.controlbot.manipulation.INetworkManip
  * @author Stefan Rossbach
  */
 public final class NetworkManipulatorImpl extends StfRemoteObject implements
-    INetworkManipulator {
+    INetworkManipulator, IActivityProvider, ISarosSessionListener {
 
     private static final Logger LOG = Logger
         .getLogger(NetworkManipulatorImpl.class);
+
+    private static final Random RANDOM = new Random();
 
     private static final INetworkManipulator INSTANCE = new NetworkManipulatorImpl();
 
@@ -33,6 +47,8 @@ public final class NetworkManipulatorImpl extends StfRemoteObject implements
         public TransferDescription description;
         public byte[] payload;
     }
+
+    private ConcurrentHashMap<Integer, CountDownLatch> synchronizeRequests = new ConcurrentHashMap<Integer, CountDownLatch>();
 
     private ConcurrentHashMap<JID, Boolean> discardIncomingSessionPackets = new ConcurrentHashMap<JID, Boolean>();
     private ConcurrentHashMap<JID, Boolean> discardOutgoingSessionPackets = new ConcurrentHashMap<JID, Boolean>();
@@ -63,6 +79,10 @@ public final class NetworkManipulatorImpl extends StfRemoteObject implements
 
     private volatile boolean blockAllOutgoingSessionPackets;
     private volatile boolean blockAllIncomingSessionPackets;
+
+    private volatile ISarosSession session;
+
+    private volatile IActivityListener listener;
 
     private IPacketInterceptor sessionPacketInterceptor = new IPacketInterceptor() {
 
@@ -138,6 +158,7 @@ public final class NetworkManipulatorImpl extends StfRemoteObject implements
     };
 
     private NetworkManipulatorImpl() {
+        this.getSessionManager().addSarosSessionListener(this);
         getDataTransferManager().addPacketInterceptor(sessionPacketInterceptor);
     }
 
@@ -350,4 +371,132 @@ public final class NetworkManipulatorImpl extends StfRemoteObject implements
         discardOutgoingSessionPackets.put(jid, discard);
     }
 
+    @Override
+    public void synchronizeOnActivityQueue(JID jid, long timeout)
+        throws RemoteException {
+
+        ISarosSession session = this.session;
+        IActivityListener listener = this.listener;
+
+        // this is too lazy, but ok for testing purposes
+
+        if (session == null)
+            throw new IllegalStateException("no session running");
+
+        if (listener == null)
+            throw new IllegalStateException("no session running");
+
+        int id = RANDOM.nextInt();
+
+        NOPActivity activity = new NOPActivity(session.getLocalUser(),
+            session.getUser(jid), id);
+
+        CountDownLatch latch = new CountDownLatch(1);
+
+        synchronizeRequests.put(id, latch);
+        listener.activityCreated(activity);
+
+        try {
+            if (!latch.await(timeout, TimeUnit.MILLISECONDS))
+                throw new TimeoutException("no reply from " + jid);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        } finally {
+            synchronizeRequests.remove(id);
+        }
+
+    }
+
+    // IActivityProvider interface implementation
+
+    @Override
+    public void exec(IActivity activity) {
+        if (!(activity instanceof NOPActivity)) {
+            return;
+        }
+
+        NOPActivity nop = (NOPActivity) activity;
+
+        ISarosSession session = this.session;
+        IActivityListener listener = this.listener;
+
+        if (session == null)
+            return;
+
+        if (listener == null)
+            return;
+
+        /*
+         * if we have not send this message to ourself then reply back , do not
+         * use our JID as source as this would cause a infinite loop
+         */
+        if (!nop.getSource().equals(session.getLocalUser())) {
+            NOPActivity response = new NOPActivity(nop.getSource(),
+                nop.getSource(), nop.getID());
+
+            listener.activityCreated(response);
+
+            return;
+        }
+
+        int id = nop.getID();
+
+        CountDownLatch latch = synchronizeRequests.get(id);
+
+        if (latch != null)
+            latch.countDown();
+    }
+
+    @Override
+    public void addActivityListener(IActivityListener listener) {
+        this.listener = listener;
+    }
+
+    @Override
+    public void removeActivityListener(IActivityListener listener) {
+        this.listener = null;
+    }
+
+    // ISarosSessionListener interface implementation
+
+    @Override
+    public void preIncomingInvitationCompleted(IProgressMonitor monitor) {
+        // NOP
+    }
+
+    @Override
+    public void postOutgoingInvitationCompleted(IProgressMonitor monitor,
+        User user) {
+        // NOP
+    }
+
+    @Override
+    public void sessionStarting(ISarosSession session) {
+        this.session = session;
+        this.session.addActivityProvider(this);
+
+    }
+
+    @Override
+    public void sessionStarted(ISarosSession session) {
+        // NOP
+    }
+
+    @Override
+    public void sessionEnding(ISarosSession session) {
+        if (this.session != null)
+            this.session.removeActivityProvider(this);
+        this.session = null;
+    }
+
+    @Override
+    public void sessionEnded(ISarosSession session) {
+        // NOP
+
+    }
+
+    @Override
+    public void projectAdded(String projectID) {
+        // NOP
+    }
 }

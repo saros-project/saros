@@ -55,4 +55,6 @@ public interface IActivityReceiver {
     void receive(StopFollowingActivity stopFollowingActivity);
 
     void receive(ProjectsAddedActivity fileListActivity);
+
+    void receive(NOPActivity nopActivity);
 }
