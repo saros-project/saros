@@ -4,7 +4,6 @@ import java.util.Random;
 
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.jivesoftware.smack.packet.Packet;
 import org.picocontainer.annotations.Inject;
@@ -47,7 +46,6 @@ public final class OutgoingSessionNegotiation extends InvitationProcess {
     private static final Object SESSION_JOIN_LOCK = new Object();
 
     private ISarosSession sarosSession;
-    private SubMonitor monitor;
 
     private VersionInfo versionInfo;
 
@@ -106,29 +104,29 @@ public final class OutgoingSessionNegotiation extends InvitationProcess {
      *               (IncomingProjectNegotiation)
      */
 
-    public Status start(IProgressMonitor progressMonitor) {
+    public Status start(IProgressMonitor monitor) {
         log.debug(this + " : starting invitation");
 
-        monitor = SubMonitor.convert(progressMonitor, "Inviting "
-            + peerNickname + "...", 100);
-
         observeMonitor(monitor);
+
+        monitor.beginTask("Inviting " + peerNickname + "...",
+            IProgressMonitor.UNKNOWN);
 
         createCollectors();
 
         Exception exception = null;
 
         try {
-            checkAvailability(monitor.newChild(0));
+            checkAvailability(monitor);
 
-            checkVersion(monitor.newChild(0));
+            checkVersion(monitor);
 
-            sendInvitation(monitor.newChild(0));
+            sendInvitation(monitor);
 
-            awaitAcceptation(monitor.newChild(0));
+            awaitAcceptation(monitor);
 
-            modifiyAndSendSessionNegotiationData(awaitRemoteSessionNegotiationData(monitor
-                .newChild(0)));
+            modifiyAndSendSessionNegotiationData(
+                awaitRemoteSessionNegotiationData(monitor), monitor);
             /*
              * HACK Ensure byte stream connection to peer so the project wizard
              * always show the currently used connection (IBB, Socks5(D/M)
@@ -137,22 +135,17 @@ public final class OutgoingSessionNegotiation extends InvitationProcess {
             // FIMXE: MUST BE CALLED HERE, or the Network Layer will crash
             // on the first activity that is send
 
-            awaitCompletion(monitor.newChild(0));
+            awaitCompletion(monitor);
 
             monitor.setTaskName("Negotiating data connection...");
 
             dataTransferManager.connect(peer);
 
-            User newUser = addUserToSession(monitor.newChild(0));
-
-            /*
-             * User accepted the invitation, so NOW we can create the file
-             * lists... not before the invitation was accepted!
-             */
-
-            monitor.subTask("");
+            User newUser = addUserToSession(monitor);
 
             completeInvitation(monitor);
+
+            monitor.done();
 
             // Whiteboard is using this listener
             sessionManager.postOutgoingInvitationCompleted(monitor, newUser);
@@ -361,7 +354,8 @@ public final class OutgoingSessionNegotiation extends InvitationProcess {
      * session environment.
      */
     private InvitationParameterExchangeExtension modifiyAndSendSessionNegotiationData(
-        InvitationParameterExchangeExtension remoteParameters) {
+        InvitationParameterExchangeExtension remoteParameters,
+        IProgressMonitor monitor) {
 
         log.debug(this + " : sending updated session negotiation data");
 
