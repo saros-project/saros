@@ -201,6 +201,8 @@ public abstract class StfTestCase {
         try {
             terminateTestThreads(60 * 1000);
         } catch (Throwable t) {
+            LOGGER.log(Level.SEVERE,
+                "aborting execution of all tests: " + t.getMessage(), t);
             checkAndStopRunningTestThreads(true);
         }
 
@@ -622,8 +624,10 @@ public abstract class StfTestCase {
             thread.interrupt();
 
         if (Util
-            .joinAll(timeout, currentTestThreads.toArray(new TestThread[0])))
+            .joinAll(timeout, currentTestThreads.toArray(new TestThread[0]))) {
+            currentTestThreads.clear();
             return;
+        }
 
         for (Iterator<TestThread> it = currentTestThreads.iterator(); it
             .hasNext();) {
