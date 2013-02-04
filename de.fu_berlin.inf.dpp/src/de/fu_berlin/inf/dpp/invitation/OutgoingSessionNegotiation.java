@@ -1,25 +1,17 @@
 package de.fu_berlin.inf.dpp.invitation;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Random;
 
 import org.apache.log4j.Logger;
-import org.eclipse.core.resources.IProject;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.jivesoftware.smack.packet.Packet;
 import org.picocontainer.annotations.Inject;
 
-import de.fu_berlin.inf.dpp.FileList;
-import de.fu_berlin.inf.dpp.FileListFactory;
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.SarosContext;
 import de.fu_berlin.inf.dpp.User;
-import de.fu_berlin.inf.dpp.activities.ProjectExchangeInfo;
-import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
 import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
 import de.fu_berlin.inf.dpp.invitation.ProcessTools.CancelOption;
@@ -33,10 +25,8 @@ import de.fu_berlin.inf.dpp.net.internal.extensions.InvitationCompletedExtension
 import de.fu_berlin.inf.dpp.net.internal.extensions.InvitationOfferingExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.InvitationParameterExchangeExtension;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
-import de.fu_berlin.inf.dpp.project.IChecksumCache;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
-import de.fu_berlin.inf.dpp.project.Messages;
 import de.fu_berlin.inf.dpp.project.internal.SarosSession;
 import de.fu_berlin.inf.dpp.ui.util.DialogUtils;
 import de.fu_berlin.inf.dpp.util.Utils;
@@ -76,21 +66,16 @@ public final class OutgoingSessionNegotiation extends InvitationProcess {
     private SessionIDObservable sessionID;
 
     @Inject
-    private EditorManager editorManager;
-
-    @Inject
     private DataTransferManager dataTransferManager;
 
     @Inject
     private ISarosSessionManager sessionManager;
 
-    @Inject
-    private IChecksumCache checksumCache;
-
     private int colorID = -1;
 
     public OutgoingSessionNegotiation(JID peer, ISarosSession sarosSession,
         String description, SarosContext sarosContext) {
+
         super(String.valueOf(INVITATION_ID_GENERATOR.nextLong()), peer,
             description, sarosContext);
 
@@ -165,30 +150,14 @@ public final class OutgoingSessionNegotiation extends InvitationProcess {
              * lists... not before the invitation was accepted!
              */
 
-            // FIXME lock the projects on the workspace !
-
-            editorManager.setAllLocalOpenedEditorsLocked(true);
-
-            /*
-             * FIXME this should not be calculated here but in the
-             * OutgoingProjectNegotiation !
-             * 
-             * FIXME the file list may contain dirty checksums after this call
-             * because dirty editors are NOT saved !
-             */
-            List<ProjectExchangeInfo> projectExchangeInfos = createProjectExchangeInfoList(
-                new ArrayList<IProject>(sarosSession.getProjects()),
-                monitor.newChild(100, SubMonitor.SUPPRESS_NONE));
-
             monitor.subTask("");
 
-            completeInvitation(projectExchangeInfos, monitor);
+            completeInvitation(monitor);
 
             // Whiteboard is using this listener
             sessionManager.postOutgoingInvitationCompleted(monitor, newUser);
 
-            sarosSessionManager
-                .startSharingProjects(peer, projectExchangeInfos);
+            sarosSessionManager.startSharingProjects(peer);
 
         } catch (Exception e) {
             exception = e;
@@ -457,8 +426,7 @@ public final class OutgoingSessionNegotiation extends InvitationProcess {
      * object and synchronize the user lists with all session users afterwards.
      * 
      */
-    private void completeInvitation(
-        List<ProjectExchangeInfo> projectExchangeInfos, IProgressMonitor monitor)
+    private void completeInvitation(IProgressMonitor monitor)
         throws SarosCancellationException {
 
         log.debug(this + " : synchronizing user list");
@@ -509,55 +477,6 @@ public final class OutgoingSessionNegotiation extends InvitationProcess {
         invitationCompletedCollector = receiver
             .createCollector(InvitationCompletedExtension.PROVIDER
                 .getPacketFilter(invitationID));
-    }
-
-    /**
-     * Method to create list of ProjectExchangeInfo.
-     * 
-     * @param projectsToShare
-     *            List of projects initially to share
-     * @param monitor
-     *            Show progress
-     * @return
-     * @throws LocalCancellationException
-     */
-    private List<ProjectExchangeInfo> createProjectExchangeInfoList(
-        List<IProject> projectsToShare, SubMonitor monitor)
-        throws LocalCancellationException {
-
-        monitor.beginTask(Messages.SarosSessionManager_creating_file_list,
-            projectsToShare.size());
-
-        List<ProjectExchangeInfo> pInfos = new ArrayList<ProjectExchangeInfo>(
-            projectsToShare.size());
-
-        for (IProject iProject : projectsToShare) {
-            if (monitor.isCanceled())
-                throw new LocalCancellationException(null,
-                    CancelOption.DO_NOT_NOTIFY_PEER);
-            try {
-                String projectID = sarosSession.getProjectID(iProject);
-                String projectName = iProject.getName();
-
-                FileList projectFileList = FileListFactory.createFileList(
-                    iProject, sarosSession.getSharedResources(iProject),
-                    checksumCache, sarosSession.useVersionControl(),
-                    monitor.newChild(100 / projectsToShare.size()));
-
-                projectFileList.setProjectID(projectID);
-                boolean partial = !sarosSession.isCompletelyShared(iProject);
-
-                ProjectExchangeInfo pInfo = new ProjectExchangeInfo(projectID,
-                    "", projectName, partial, projectFileList);
-
-                pInfos.add(pInfo);
-
-            } catch (CoreException e) {
-                throw new LocalCancellationException(e.getMessage(),
-                    CancelOption.DO_NOT_NOTIFY_PEER);
-            }
-        }
-        return pInfos;
     }
 
     @Override

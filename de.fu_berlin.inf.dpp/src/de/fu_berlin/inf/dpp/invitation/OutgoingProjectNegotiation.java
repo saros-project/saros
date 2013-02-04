@@ -13,7 +13,6 @@ import java.util.concurrent.CancellationException;
 
 import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -42,6 +41,7 @@ import de.fu_berlin.inf.dpp.net.SarosPacketCollector;
 import de.fu_berlin.inf.dpp.net.internal.extensions.FileListExtension;
 import de.fu_berlin.inf.dpp.project.IChecksumCache;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
+import de.fu_berlin.inf.dpp.project.Messages;
 import de.fu_berlin.inf.dpp.synchronize.StartHandle;
 import de.fu_berlin.inf.dpp.util.FileZipper;
 import de.fu_berlin.inf.dpp.util.MappedList;
@@ -81,24 +81,15 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
     @Inject
     private IChecksumCache checksumCache;
 
-    private Map<IProject, List<IResource>> partialSharedProjectResources;
-    private List<ProjectExchangeInfo> projectExchangeInfos;
-
     private SarosPacketCollector remoteFileListResponseCollector;
 
     public OutgoingProjectNegotiation(JID to, ISarosSession sarosSession,
-        Map<IProject, List<IResource>> partialResources,
-        SarosContext sarosContext,
-        List<ProjectExchangeInfo> projectExchangeInfos) {
+        List<IProject> projects, SarosContext sarosContext) {
         super(to, sarosContext);
 
         this.processID = String.valueOf(INVITATION_RAND.nextLong());
         this.sarosSession = sarosSession;
-
-        this.partialSharedProjectResources = partialResources;
-        this.projects = new ArrayList<IProject>(
-            partialSharedProjectResources.keySet());
-        this.projectExchangeInfos = projectExchangeInfos;
+        this.projects = projects;
     }
 
     public Status start(IProgressMonitor progressMonitor) {
@@ -120,7 +111,7 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
                 // FIXME: the logic will try to send this to the remote contact
                 throw new IOException("not connected to a XMPP server");
 
-            sendFileList(monitor.newChild(0));
+            sendFileList(monitor.newChild(10));
             monitor.subTask("");
             getRemoteFileList(monitor.newChild(0));
             monitor.subTask("");
@@ -128,8 +119,10 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
             // pack each project into one archive and check if it was
             // cancelled.
             zipArchives = createProjectArchives(projectFilesToSend,
-                monitor.newChild(30));
+                monitor.newChild(20));
+
             checkCancellation(CancelOption.NOTIFY_PEER);
+
             if (zipArchives.size() > 0) {
 
                 // pack all archive files into one big archive
@@ -181,54 +174,14 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
 
         try {
 
-            if (this.projectExchangeInfos == null) {
-
-                monitor.beginTask("Creating file lists with checksums",
-                    projects.size());
-
-                useVersionControl = sarosSession.useVersionControl();
-                projectExchangeInfos = new ArrayList<ProjectExchangeInfo>(
-                    this.projects.size());
-
-                for (IProject iProject : this.projects) {
-                    if (monitor.isCanceled())
-                        break;
-
-                    String projectID = sarosSession.getProjectID(iProject);
-                    String projectName = iProject.getName();
-
-                    /*
-                     * Create FileList involves computing checksums for all
-                     * files so expect this to take a while when large files are
-                     * included...
-                     */
-                    if (this.partialSharedProjectResources.get(iProject) != null) {
-                        monitor.subTask("Listung & Hashing "
-                            + this.partialSharedProjectResources.get(iProject)
-                                .size() + " files in project "
-                            + iProject.getName());
-                    } else {
-                        monitor.subTask("Listung & Hashing files in project "
-                            + iProject.getName());
-                    }
-                    FileList projectFileList = FileListFactory.createFileList(
-                        iProject, partialSharedProjectResources.get(iProject),
-                        checksumCache, useVersionControl, monitor.newChild(1));
-
-                    if (monitor.isCanceled())
-                        break;
-
-                    projectFileList.setProjectID(projectID);
-
-                    boolean partial = !sarosSession
-                        .isCompletelyShared(iProject);
-
-                    ProjectExchangeInfo pInfo = new ProjectExchangeInfo(
-                        projectID, "", projectName, partial, projectFileList);
-
-                    projectExchangeInfos.add(pInfo);
-                }
-            }
+            /*
+             * FIXME must be calculated while the session is blocked !
+             * 
+             * FIXME display the remote side something that will it receive
+             * something in the near future
+             */
+            List<ProjectExchangeInfo> projectExchangeInfos = createProjectExchangeInfoList(
+                projects, monitor);
 
             if (monitor.isCanceled())
                 throw new LocalCancellationException(null,
@@ -238,13 +191,17 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
             log.debug(this + " : Sending file list");
             monitor.setTaskName("Sending file list...");
 
+            /*
+             * For those who do not get the "magic". This activity is executed
+             * in the remote SarosSession and handled by the ProjectAddedManager
+             * which calls the SarosSessionManager which creates a
+             * IncomingProjectNegotiation instance and pass it to the SarosUI
+             * which finally opens the Wizard on the remote side
+             */
             sarosSession.sendActivity(sarosSession.getUser(peer),
                 new ProjectsAddedActivity(sarosSession.getLocalUser(),
                     projectExchangeInfos, processID));
 
-        } catch (CoreException e) {
-            throw new LocalCancellationException(e.getMessage(),
-                CancelOption.NOTIFY_PEER);
         } finally {
             monitor.done();
         }
@@ -500,6 +457,55 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
         }
 
         log.debug(this + " : Archive send.");
+    }
+
+    /**
+     * Method to create list of ProjectExchangeInfo.
+     * 
+     * @param projectsToShare
+     *            List of projects initially to share
+     * @param monitor
+     *            Show progress
+     * @return
+     * @throws LocalCancellationException
+     */
+    private List<ProjectExchangeInfo> createProjectExchangeInfoList(
+        List<IProject> projectsToShare, SubMonitor monitor)
+        throws LocalCancellationException {
+
+        monitor.beginTask(Messages.SarosSessionManager_creating_file_list,
+            projectsToShare.size());
+
+        List<ProjectExchangeInfo> pInfos = new ArrayList<ProjectExchangeInfo>(
+            projectsToShare.size());
+
+        for (IProject iProject : projectsToShare) {
+            if (monitor.isCanceled())
+                throw new LocalCancellationException(null,
+                    CancelOption.DO_NOT_NOTIFY_PEER);
+            try {
+                String projectID = sarosSession.getProjectID(iProject);
+                String projectName = iProject.getName();
+
+                FileList projectFileList = FileListFactory.createFileList(
+                    iProject, sarosSession.getSharedResources(iProject),
+                    checksumCache, useVersionControl,
+                    monitor.newChild(100 / projectsToShare.size()));
+
+                projectFileList.setProjectID(projectID);
+                boolean partial = !sarosSession.isCompletelyShared(iProject);
+
+                ProjectExchangeInfo pInfo = new ProjectExchangeInfo(projectID,
+                    "", projectName, partial, projectFileList);
+
+                pInfos.add(pInfo);
+
+            } catch (CoreException e) {
+                throw new LocalCancellationException(e.getMessage(),
+                    CancelOption.DO_NOT_NOTIFY_PEER);
+            }
+        }
+        return pInfos;
     }
 
     @Override

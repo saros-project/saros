@@ -20,8 +20,8 @@
 package de.fu_berlin.inf.dpp.project;
 
 import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -212,8 +212,10 @@ public class SarosSessionManager implements ISarosSessionManager {
                     }
                     String projectID = String.valueOf(sessionRandom
                         .nextInt(Integer.MAX_VALUE));
+
                     sarosSession.addSharedResources(iProject, projectID,
                         resourcesList);
+
                     projectAdded(projectID);
                 }
                 monitor.done();
@@ -516,32 +518,41 @@ public class SarosSessionManager implements ISarosSessionManager {
             return;
         }
 
+        List<IProject> projectsToShare = new ArrayList<IProject>();
+
         for (Entry<IProject, List<IResource>> mapEntry : projectResourcesMapping
             .entrySet()) {
-            IProject iProject = mapEntry.getKey();
+            IProject project = mapEntry.getKey();
             List<IResource> resourcesList = mapEntry.getValue();
 
-            if (!iProject.isOpen()) {
+            if (!project.isOpen()) {
                 try {
-                    iProject.open(null);
+                    project.open(null);
                 } catch (CoreException e1) {
                     log.debug("An error occur while opening project", e1);
                     continue;
                 }
             }
 
-            if (!session.isCompletelyShared(iProject)) {
+            // side effect: non shared projects are always partial -.-
+            if (!session.isCompletelyShared(project)) {
                 String projectID = String.valueOf(sessionRandom
                     .nextInt(Integer.MAX_VALUE));
-                session.addSharedResources(iProject, projectID, resourcesList);
+                session.addSharedResources(project, projectID, resourcesList);
                 projectAdded(projectID);
+                projectsToShare.add(project);
             }
         }
 
+        if (projectsToShare.isEmpty()) {
+            log.warn("skipping project negotitation because no new projects were added to the current session");
+            return;
+        }
+
         for (User user : session.getRemoteUsers()) {
+
             OutgoingProjectNegotiation out = new OutgoingProjectNegotiation(
-                user.getJID(), session, projectResourcesMapping, sarosContext,
-                null);
+                user.getJID(), session, projectsToShare, sarosContext);
 
             OutgoingProjectJob job = new OutgoingProjectJob(out);
             job.setPriority(Job.SHORT);
@@ -549,33 +560,36 @@ public class SarosSessionManager implements ISarosSessionManager {
         }
     }
 
-    /**
-     * Will start sharing all projects in session with a participant. This
-     * should be called after a the invitation to a session was completed
-     * successfully.
-     * 
-     * @param user
-     *            JID of session participant to share projects with
-     * @param projectExchangeInfos
-     *            List of ProjectExchangeInfo containing the project dependent
-     *            FileList
-     */
     @Override
-    public void startSharingProjects(JID user,
-        List<ProjectExchangeInfo> projectExchangeInfos) {
+    public void startSharingProjects(JID user) {
 
-        HashMap<IProject, List<IResource>> projectResourcesMapping = this
-            .getSarosSession().getProjectResourcesMapping();
+        ISarosSession session = getSarosSession();
 
-        if (!projectResourcesMapping.isEmpty()
-            && !projectExchangeInfos.isEmpty()) {
-            OutgoingProjectNegotiation out = new OutgoingProjectNegotiation(
-                user, this.getSarosSession(), projectResourcesMapping,
-                sarosContext, projectExchangeInfos);
-            OutgoingProjectJob job = new OutgoingProjectJob(out);
-            job.setPriority(Job.SHORT);
-            job.schedule();
+        if (session == null) {
+            /*
+             * as this currently only called by the OutgoingSessionNegotiation
+             * job just silently return
+             */
+            log.error("cannot share projects when no session is running");
+            return;
         }
+
+        /*
+         * this can trigger a ConcurrentModification exception as the
+         * SarosProjectMapper is completely broken
+         */
+        List<IProject> currentSharedProjects = new ArrayList<IProject>(
+            session.getProjects());
+
+        if (currentSharedProjects.isEmpty())
+            return;
+
+        OutgoingProjectNegotiation out = new OutgoingProjectNegotiation(user,
+            session, currentSharedProjects, sarosContext);
+
+        OutgoingProjectJob job = new OutgoingProjectJob(out);
+        job.setPriority(Job.SHORT);
+        job.schedule();
 
     }
 

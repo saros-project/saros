@@ -14,7 +14,6 @@ import de.fu_berlin.inf.dpp.FileList;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.activities.ProjectExchangeInfo;
 import de.fu_berlin.inf.dpp.annotations.Component;
-import de.fu_berlin.inf.dpp.invitation.OutgoingProjectNegotiation;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.util.VersionManager.VersionInfo;
 
@@ -108,11 +107,14 @@ public interface ISarosSessionManager {
         String description);
 
     /**
-     * initiate the ({@link OutgoingProjectNegotiation project exchanging}) with
-     * user
+     * Will start sharing all projects of the current session with a
+     * participant. This should be called after a the invitation to a session
+     * was completed successfully.
+     * 
+     * @param user
+     *            JID of session participant to share projects with
      */
-    public void startSharingProjects(JID user,
-        List<ProjectExchangeInfo> projectExchangeInfos);
+    public void startSharingProjects(JID user);
 
     /**
      * Invites a user to the shared project.
