@@ -329,11 +329,16 @@ public class EnterProjectNamePage extends WizardPage {
         Text copyToBeforeUpdateText = new Text(optionsGroup, SWT.BORDER);
         copyToBeforeUpdateText.setLayoutData(new GridData(
             GridData.FILL_HORIZONTAL | GridData.GRAB_HORIZONTAL));
-        copyToBeforeUpdateText.setFocus();
+
         copyToBeforeUpdateText.setText(EnterProjectNamePageUtils
             .findProjectNameProposal(this.remoteProjectNames.get(projectID)
                 + "-copy")); //$NON-NLS-1$
+
         this.copyToBeforeUpdateTexts.put(projectID, copyToBeforeUpdateText);
+
+        /* as this feature is currently broken, do not display it */
+        copyCheckbox.setVisible(false);
+        copyToBeforeUpdateText.setVisible(false);
     }
 
     /**
