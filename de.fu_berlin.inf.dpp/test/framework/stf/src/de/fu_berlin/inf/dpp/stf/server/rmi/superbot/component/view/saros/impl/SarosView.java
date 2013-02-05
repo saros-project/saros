@@ -568,21 +568,29 @@ public final class SarosView extends StfRemoteObject implements ISarosView {
     @Override
     public void waitUntilAllPeersLeaveSession(
         final List<JID> jidsOfAllParticipants) throws RemoteException {
-        new SWTBot().waitUntil(new DefaultCondition() {
-            @Override
-            public boolean test() throws Exception {
-                for (JID jid : jidsOfAllParticipants) {
-                    if (existsParticipant(jid))
-                        return false;
-                }
-                return true;
-            }
 
-            @Override
-            public String getFailureMessage() {
-                return "there are still users in the session";
-            }
-        });
+        /*
+         * see STFController which manipulates the behavior of how the
+         * HostAloneInSession dialog is displayed
+         */
+
+        // new SWTBot().waitUntil(new DefaultCondition() {
+        // @Override
+        // public boolean test() throws Exception {
+        // for (JID jid : jidsOfAllParticipants) {
+        // if (existsParticipant(jid))
+        // return false;
+        // }
+        // return true;
+        // }
+        //
+        // @Override
+        // public String getFailureMessage() {
+        // return "there are still users in the session";
+        // }
+        // });
+
+        waitUntilIsNotInSession();
     }
 
     @Override
