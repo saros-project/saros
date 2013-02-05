@@ -63,6 +63,7 @@ public class HostLeftAloneInSessionHandler {
             .addSarosSessionListener(new AbstractSarosSessionListener() {
                 @Override
                 public void sessionEnded(ISarosSession oldSarosSession) {
+                    oldSarosSession.removeListener(projectListener);
                     /*
                      * we need to clear any open notifications because there
                      * might be stuff left, like follow mode notifications, or
@@ -74,8 +75,7 @@ public class HostLeftAloneInSessionHandler {
 
                 @Override
                 public void sessionStarted(ISarosSession newSarosSession) {
-                    sessionManager.getSarosSession().addListener(
-                        projectListener);
+                    newSarosSession.addListener(projectListener);
                 }
             });
     }
