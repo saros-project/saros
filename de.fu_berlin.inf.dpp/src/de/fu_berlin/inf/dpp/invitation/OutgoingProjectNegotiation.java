@@ -157,7 +157,7 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
     }
 
     private void sendFileList(List<ProjectExchangeInfo> projectExchangeInfos,
-        IProgressMonitor monitor) throws LocalCancellationException {
+        IProgressMonitor monitor) throws SarosCancellationException {
 
         /*
          * FIXME must be calculated while the session is blocked !
@@ -166,8 +166,7 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
          * something in the near future
          */
 
-        if (monitor.isCanceled())
-            throw new LocalCancellationException(null, CancelOption.NOTIFY_PEER);
+        checkCancellation(CancelOption.NOTIFY_PEER);
 
         log.debug(this + " : sending file list");
 
@@ -311,6 +310,7 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
 
         try {
 
+            // FIXME this throws a NPE if the session has already been stopped
             for (SPath path : editorManager.getOpenEditorsOfAllParticipants())
                 editorManager.saveText(path);
 
