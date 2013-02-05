@@ -418,7 +418,11 @@ public final class SuperBot extends StfRemoteObject implements ISuperBot {
         bot.waitUntil(Conditions.shellIsActive(SHELL_SESSION_INVITATION),
             SarosSWTBotPreferences.SAROS_LONG_TIMEOUT);
 
-        bot.shell(SHELL_SESSION_INVITATION).bot().button(ACCEPT).click();
+        SWTBotShell invitationShell = bot.shell(SHELL_SESSION_INVITATION);
+        invitationShell.bot().button(ACCEPT).click();
+
+        bot.waitUntil(Conditions.shellCloses(invitationShell),
+            SarosSWTBotPreferences.SAROS_LONG_TIMEOUT);
 
         confirmShellAddProjectUsingWhichProject(projectName, usingWhichProject);
         views().sarosView().waitUntilIsInSession();
