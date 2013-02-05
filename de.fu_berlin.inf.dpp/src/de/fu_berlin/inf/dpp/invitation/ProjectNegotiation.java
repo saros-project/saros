@@ -219,9 +219,11 @@ public abstract class ProjectNegotiation extends CancelableProcess {
             throw new RemoteCancellationException(null);
 
         if (status
-            .equals(org.jivesoftware.smackx.filetransfer.FileTransfer.Status.error))
-            throw new IOException(transfer.getError().getMessage(),
-                transfer.getException());
+            .equals(org.jivesoftware.smackx.filetransfer.FileTransfer.Status.error)) {
+            FileTransfer.Error error = transfer.getError();
+            throw new IOException(error == null ? "unkown error"
+                : error.getMessage(), transfer.getException());
+        }
 
         throw new RemoteCancellationException(null);
     }
