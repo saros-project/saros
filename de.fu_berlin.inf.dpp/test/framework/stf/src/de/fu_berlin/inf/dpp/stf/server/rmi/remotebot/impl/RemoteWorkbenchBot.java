@@ -298,57 +298,36 @@ public final class RemoteWorkbenchBot extends RemoteBot implements
 
     @Override
     public void closeAllShells() throws RemoteException {
-        log.trace("try to close all shells with default SWTWorkbenchBot");
-        try {
-            swtWorkBenchBot.closeAllShells();
-        } catch (TimeoutException closeAllShellsTimeout) {
-            log.warn(
-                "default SWTWorkbenchBot could not close all shells, trying to resolve the problem",
-                closeAllShellsTimeout);
 
-            for (String shellName : this.getOpenShellNames()) {
-                try {
-                    SWTBotShell shell;
+        for (int i = 0; i < 5; i++) {
+            log.trace("try to close all shells with default SWTWorkbenchBot");
+            try {
+                swtWorkBenchBot.closeAllShells();
+                return;
+            } catch (TimeoutException closeAllShellsTimeout) {
+                log.warn(
+                    "default SWTWorkbenchBot could not close all shells, trying to resolve the problem",
+                    closeAllShellsTimeout);
+            }
 
-                    // TODO shell names currently hard coded
+            try {
+                closeShell(swtWorkBenchBot.activeShell());
+            } catch (Exception e) {
+                log.error(e.getMessage(), e);
+            }
 
-                    if (shellName.equals(SHELL_CONFIRM_DECLINE_INVITATION)) {
-                        shell = swtWorkBenchBot.shell(shellName);
-                        shell.activate();
-                        shell.bot().button(YES).click();
-                        shell.bot().waitUntil(Conditions.shellCloses(shell));
-                        continue;
-                    }
-
-                    if (shellName.equals("File Changed")) {
-                        shell = swtWorkBenchBot.shell(shellName);
-                        shell.activate();
-                        shell.bot().button(NO).click();
-                        continue;
-                    }
-
-                    if (shellName.equals(SHELL_NEED_BASED_SYNC)) {
-                        shell = swtWorkBenchBot.shell(shellName);
-                        shell.activate();
-                        shell.bot().button(NO).click();
-                        continue;
-                    }
-                    if (shellName.equals(SHELL_MONITOR_PROJECT_SYNCHRONIZATION)) {
-                        shell = swtWorkBenchBot.shell(shellName);
-                        shell.activate();
-                        shell.bot().button(CANCEL).click();
-                        continue;
-                    }
-
-                } catch (RuntimeException rte) {
-                    log.error(rte.getMessage(), rte);
-                }
+            try {
+                for (SWTBotShell shell : swtWorkBenchBot.shells())
+                    closeShell(shell);
+            } catch (Exception e) {
+                log.error(e.getMessage(), e);
             }
 
             // wait for shell(s) to update
             swtWorkBenchBot.sleep(SWTBotPreferences.TIMEOUT);
-            swtWorkBenchBot.closeAllShells();
         }
+
+        swtWorkBenchBot.closeAllShells();
     }
 
     @Override
@@ -374,10 +353,48 @@ public final class RemoteWorkbenchBot extends RemoteBot implements
         chatLine.setWidget(new SarosSWTBot().chatLine(regex));
         return chatLine;
     }
-    
+
     @Override
     public void resetBot() throws RemoteException {
         this.setBot(new SWTBot());
     }
 
+    private void closeShell(SWTBotShell shell) {
+        // TODO shell names currently hard coded
+
+        try {
+
+            String shellName = shell.getText();
+
+            try {
+                shell.activate();
+            } catch (Exception e) {
+                log.error(e.getMessage(), e);
+            }
+
+            if (shellName.equals(SHELL_CONFIRM_DECLINE_INVITATION)) {
+                shell.bot().button(YES).click();
+                shell.bot().waitUntil(Conditions.shellCloses(shell));
+            }
+
+            if (shellName.equals("File Changed")) {
+                shell.bot().button(NO).click();
+            }
+
+            if (shellName.equals("Wizard Closing")) {
+                shell.bot().button(OK).click();
+            }
+
+            if (shellName.equals(SHELL_NEED_BASED_SYNC)) {
+                shell.bot().button(NO).click();
+            }
+
+            if (shellName.contains(SHELL_MONITOR_PROJECT_SYNCHRONIZATION)) {
+                shell.bot().button(CANCEL).click();
+            }
+
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+        }
+    }
 }
