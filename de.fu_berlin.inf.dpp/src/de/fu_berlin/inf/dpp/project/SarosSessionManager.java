@@ -169,70 +169,46 @@ public class SarosSessionManager implements ISarosSessionManager {
         final Map<IProject, List<IResource>> projectResourcesMapping)
         throws XMPPException {
 
-        if (!connected) {
+        if (!connected)
             throw new XMPPException(Messages.SarosSessionManager_no_connection);
-        }
 
-        this.sessionID.setValue(String.valueOf(sessionRandom
+        sessionID.setValue(String.valueOf(sessionRandom
             .nextInt(Integer.MAX_VALUE)));
 
         final SarosSession sarosSession = new SarosSession(
             preferenceUtils.getFavoriteColorID(), new DateTime(), sarosContext);
 
-        this.sarosSessionObservable.setValue(sarosSession);
+        sarosSessionObservable.setValue(sarosSession);
 
         sessionStarting(sarosSession);
         sarosSession.start();
         sessionStarted(sarosSession);
 
-        Job sessionStartupJob = new Job("Session Startup") {
+        for (Entry<IProject, List<IResource>> mapEntry : projectResourcesMapping
+            .entrySet()) {
 
-            @Override
-            protected IStatus run(IProgressMonitor monitor) {
-                monitor.setTaskName("Creating list of all project files");
-                monitor.beginTask("Creating list of all project files",
-                    IProgressMonitor.UNKNOWN);
+            IProject project = mapEntry.getKey();
+            List<IResource> resourcesList = mapEntry.getValue();
 
-                for (Entry<IProject, List<IResource>> mapEntry : projectResourcesMapping
-                    .entrySet()) {
-                    if (monitor.isCanceled()) {
-                        log.error("Session startup was interrupted.");
-                        return Status.CANCEL_STATUS;
-                    }
-                    IProject iProject = mapEntry.getKey();
-                    List<IResource> resourcesList = mapEntry.getValue();
-                    if (!iProject.isOpen()) {
-                        try {
-                            iProject.open(null);
-                        } catch (CoreException e1) {
-                            log.debug(
-                                "An error occur while opening project", e1); //$NON-NLS-1$
-                            continue;
-                        }
-                    }
-                    String projectID = String.valueOf(sessionRandom
-                        .nextInt(Integer.MAX_VALUE));
-
-                    sarosSession.addSharedResources(iProject, projectID,
-                        resourcesList);
-
-                    projectAdded(projectID);
+            if (!project.isOpen()) {
+                try {
+                    project.open(null);
+                } catch (CoreException e) {
+                    log.debug("an error occur while opening project: "
+                        + project.getName(), e);
+                    continue;
                 }
-                monitor.done();
-                return Status.OK_STATUS;
             }
-        };
-        sessionStartupJob.setPriority(Job.SHORT);
-        sessionStartupJob.setUser(true);
-        sessionStartupJob.schedule();
-        try {
-            sessionStartupJob.join();
-        } catch (InterruptedException e) {
-            log.error("Session startup was interrupted.", e);
-            Thread.currentThread().interrupt();
+
+            String projectID = String.valueOf(sessionRandom
+                .nextInt(Integer.MAX_VALUE));
+
+            sarosSession.addSharedResources(project, projectID, resourcesList);
+
+            projectAdded(projectID);
         }
 
-        SarosSessionManager.log.info("Session started");
+        log.info("session started");
     }
 
     /**

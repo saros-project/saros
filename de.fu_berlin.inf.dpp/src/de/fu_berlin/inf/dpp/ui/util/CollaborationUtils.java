@@ -23,6 +23,10 @@ import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.preference.PreferenceStore;
 import org.eclipse.swt.widgets.Shell;
@@ -69,23 +73,48 @@ public class CollaborationUtils {
         final Map<IProject, List<IResource>> newResources = acquireResources(
             selectedResources, null);
 
-        Utils.runSafeAsync(log, new Runnable() {
+        Job sessionStartupJob = new Job("Session Startup") {
+
             @Override
-            public void run() {
+            protected IStatus run(IProgressMonitor monitor) {
+                monitor.beginTask("Starting session...",
+                    IProgressMonitor.UNKNOWN);
 
                 try {
                     sarosSessionManager.startSession(newResources);
-                    addBuddiesToSarosSession(sarosSessionManager, buddies);
-                } catch (final XMPPException e) {
-                    log.error("starting the session failed", e);
+                    Set<JID> participantsToAdd = new HashSet<JID>(buddies);
 
+                    ISarosSession session = sarosSessionManager
+                        .getSarosSession();
+
+                    if (session == null)
+                        return Status.CANCEL_STATUS;
+
+                    sarosSessionManager.invite(participantsToAdd,
+                        getShareProjectDescription(session));
+
+                } catch (XMPPException e) {
                     DialogUtils.popUpFailureMessage(
                         Messages.CollaborationUtils_offline,
                         getShareResourcesFailureMessage(newResources.keySet()),
                         false);
+
+                    return Status.OK_STATUS;
+
+                } catch (Exception e) {
+
+                    log.error("could not start a Saros session", e);
+                    return new Status(IStatus.ERROR, Saros.SAROS,
+                        e.getMessage(), e);
                 }
+
+                return Status.OK_STATUS;
             }
-        });
+        };
+
+        sessionStartupJob.setPriority(Job.SHORT);
+        sessionStartupJob.setUser(true);
+        sessionStartupJob.schedule();
     }
 
     /**
