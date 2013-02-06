@@ -402,7 +402,7 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
     private void createCollectors() {
         remoteFileListResponseCollector = xmppReceiver
             .createCollector(FileListExtension.PROVIDER.getPacketFilter(
-                sessionID.getValue(), processID));
+                sessionID, processID));
     }
 
     private void deleteCollectors() {

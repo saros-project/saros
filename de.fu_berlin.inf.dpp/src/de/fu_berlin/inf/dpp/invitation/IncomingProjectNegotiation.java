@@ -207,7 +207,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
             }
 
             transmitter.sendToSessionUser(peer, FileListExtension.PROVIDER
-                .create(new FileListExtension(sessionID.getValue(), processID,
+                .create(new FileListExtension(sessionID, processID,
                     missingFiles.toArray(new FileList[0]))));
 
             checkCancellation(CancelOption.NOTIFY_PEER);
@@ -929,9 +929,7 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
 
         try {
             while (!archiveTransferListener.hasReceived()) {
-                if (monitor.isCanceled())
-                    throw new LocalCancellationException();
-
+                checkCancellation(CancelOption.NOTIFY_PEER);
                 Thread.sleep(200);
             }
         } catch (InterruptedException e) {

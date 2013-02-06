@@ -47,8 +47,7 @@ public abstract class ProjectNegotiation extends CancelableProcess {
     @Inject
     protected ITransmitter transmitter;
 
-    @Inject
-    protected SessionIDObservable sessionID;
+    protected final String sessionID;
 
     @Inject
     protected SarosNet sarosNet;
@@ -78,6 +77,9 @@ public abstract class ProjectNegotiation extends CancelableProcess {
         this.peer = peer;
 
         sarosContext.initComponent(this);
+
+        sessionID = sarosContext.getComponent(SessionIDObservable.class)
+            .getValue();
 
         projectExchangeProcesses.addProjectExchangeProcess(this);
 
@@ -116,8 +118,8 @@ public abstract class ProjectNegotiation extends CancelableProcess {
             + " of the local project negotiation cancellation");
 
         PacketExtension notification = CancelProjectNegotiationExtension.PROVIDER
-            .create(new CancelProjectNegotiationExtension(sessionID.getValue(),
-                cause.getMessage()));
+            .create(new CancelProjectNegotiationExtension(sessionID, cause
+                .getMessage()));
 
         transmitter.sendMessageToUser(getPeer(), notification);
     }
