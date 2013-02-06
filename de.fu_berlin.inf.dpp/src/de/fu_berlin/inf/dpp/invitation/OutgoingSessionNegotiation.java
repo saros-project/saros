@@ -441,11 +441,12 @@ public final class OutgoingSessionNegotiation extends InvitationProcess {
         if (colorID >= 0)
             sarosSession.returnColor(colorID);
 
-        if (sarosSession.getRemoteUsers().isEmpty())
-            sarosSessionManager.stopSarosSession();
-
         if (invitationProcesses.getProcesses().contains(this))
             invitationProcesses.removeInvitationProcess(this);
+
+        if (invitationProcesses.getProcesses().size() == 0
+            && sarosSession.getRemoteUsers().isEmpty())
+            sarosSessionManager.stopSarosSession();
     }
 
     private void deleteCollectors() {
