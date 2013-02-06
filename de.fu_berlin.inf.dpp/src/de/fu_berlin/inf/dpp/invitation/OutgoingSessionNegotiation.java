@@ -127,15 +127,13 @@ public final class OutgoingSessionNegotiation extends InvitationProcess {
 
             modifiyAndSendSessionNegotiationData(
                 awaitRemoteSessionNegotiationData(monitor), monitor);
+
+            awaitCompletion(monitor);
+
             /*
              * HACK Ensure byte stream connection to peer so the project wizard
              * always show the currently used connection (IBB, Socks5(D/M)
              */
-
-            // FIMXE: MUST BE CALLED HERE, or the Network Layer will crash
-            // on the first activity that is send
-
-            awaitCompletion(monitor);
 
             monitor.setTaskName("Negotiating data connection...");
 
@@ -149,8 +147,6 @@ public final class OutgoingSessionNegotiation extends InvitationProcess {
 
             // Whiteboard is using this listener
             sessionManager.postOutgoingInvitationCompleted(monitor, newUser);
-
-            sarosSessionManager.startSharingProjects(peer);
 
         } catch (Exception e) {
             exception = e;

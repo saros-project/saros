@@ -447,6 +447,8 @@ public class SarosSessionManager implements ISarosSessionManager {
                 releaseCancelListener();
             }
 
+            startSharingProjects(process.getPeer());
+
             return Status.OK_STATUS;
         }
 
