@@ -7,7 +7,6 @@ import java.util.Map;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.jivesoftware.smack.XMPPException;
 import org.joda.time.DateTime;
 
 import de.fu_berlin.inf.dpp.FileList;
@@ -41,11 +40,8 @@ public interface ISarosSessionManager {
      * @param projectResources
      *            the local Eclipse project resources which should become
      *            shared.
-     * @throws XMPPException
-     *             if this method is called with no established XMPP-connection.
      */
-    public void startSession(Map<IProject, List<IResource>> projectResources)
-        throws XMPPException;
+    public void startSession(Map<IProject, List<IResource>> projectResources);
 
     /**
      * Creates a Saros session. The returned session is NOT started!

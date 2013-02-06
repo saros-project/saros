@@ -40,7 +40,6 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.ui.progress.IProgressConstants;
 import org.jivesoftware.smack.Connection;
-import org.jivesoftware.smack.XMPPException;
 import org.joda.time.DateTime;
 import org.picocontainer.annotations.Inject;
 
@@ -127,8 +126,6 @@ public class SarosSessionManager implements ISarosSessionManager {
 
     private final List<ISarosSessionListener> sarosSessionListeners = new CopyOnWriteArrayList<ISarosSessionListener>();
 
-    protected volatile boolean connected = false;
-
     protected final IConnectionListener listener = new IConnectionListener() {
         @Override
         public void connectionStateChanged(Connection connection,
@@ -137,7 +134,6 @@ public class SarosSessionManager implements ISarosSessionManager {
             if (state == ConnectionState.DISCONNECTING) {
                 stopSarosSession();
             }
-            connected = state == ConnectionState.CONNECTED ? true : false;
         }
     };
 
@@ -166,11 +162,7 @@ public class SarosSessionManager implements ISarosSessionManager {
      */
     @Override
     public void startSession(
-        final Map<IProject, List<IResource>> projectResourcesMapping)
-        throws XMPPException {
-
-        if (!connected)
-            throw new XMPPException(Messages.SarosSessionManager_no_connection);
+        final Map<IProject, List<IResource>> projectResourcesMapping) {
 
         sessionID.setValue(String.valueOf(sessionRandom
             .nextInt(Integer.MAX_VALUE)));

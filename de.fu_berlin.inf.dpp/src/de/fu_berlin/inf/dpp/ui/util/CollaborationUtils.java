@@ -31,7 +31,6 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.preference.PreferenceStore;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.PlatformUI;
-import org.jivesoftware.smack.XMPPException;
 
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.User;
@@ -92,14 +91,6 @@ public class CollaborationUtils {
 
                     sarosSessionManager.invite(participantsToAdd,
                         getShareProjectDescription(session));
-
-                } catch (XMPPException e) {
-                    DialogUtils.popUpFailureMessage(
-                        Messages.CollaborationUtils_offline,
-                        getShareResourcesFailureMessage(newResources.keySet()),
-                        false);
-
-                    return Status.OK_STATUS;
 
                 } catch (Exception e) {
 
@@ -242,31 +233,6 @@ public class CollaborationUtils {
                 }
             }
         });
-    }
-
-    /**
-     * Creates the error message in case the user is offline.
-     * 
-     * @param projects
-     * @return
-     */
-    private static String getShareResourcesFailureMessage(Set<IProject> projects) {
-
-        String msg = MessageFormat
-            .format(
-                Messages.CollaborationUtils_error_not_connected,
-                ((projects.size() == 1) ? Messages.CollaborationUtils_project_singular_ending
-                    : Messages.CollaborationUtils_project_plural_ending));
-
-        StringBuilder message = new StringBuilder();
-        message.append(msg);
-
-        for (IProject project : projects)
-            message.append("\t" + project.getName() + "\n");
-
-        message.append("\n");
-        message.append(Messages.CollaborationUtils_make_sure_connected_to);
-        return message.toString();
     }
 
     /**
