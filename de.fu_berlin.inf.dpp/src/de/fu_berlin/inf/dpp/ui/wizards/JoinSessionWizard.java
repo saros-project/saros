@@ -36,6 +36,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.SarosPluginContext;
+import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.invitation.IncomingSessionNegotiation;
 import de.fu_berlin.inf.dpp.invitation.InvitationProcess;
 import de.fu_berlin.inf.dpp.invitation.ProcessTools.CancelLocation;
@@ -90,6 +91,8 @@ public class JoinSessionWizard extends Wizard {
         }
     }
 
+    private boolean accepted = false;
+
     private IncomingSessionNegotiation process;
 
     private ShowDescriptionPage descriptionPage;
@@ -130,8 +133,10 @@ public class JoinSessionWizard extends Wizard {
     @Override
     public boolean performFinish() {
 
+        accepted = true;
+
         try {
-            getContainer().run(true, true, new IRunnableWithProgress() {
+            getContainer().run(true, false, new IRunnableWithProgress() {
                 @Override
                 public void run(IProgressMonitor monitor)
                     throws InvocationTargetException, InterruptedException {
@@ -142,13 +147,17 @@ public class JoinSessionWizard extends Wizard {
                     }
                 }
             });
-        } catch (InvocationTargetException e) {
-            processException(e.getCause());
-            return false;
-        } catch (InterruptedException e) {
-            log.error("Code not designed to be interrupted.", e); //$NON-NLS-1$
-            processException(e);
-            return false;
+        } catch (Exception e) {
+            Throwable cause = e.getCause();
+
+            if (cause == null)
+                cause = e;
+
+            asyncShowCancelMessage(process.getPeer(), e.getMessage(),
+                CancelLocation.LOCAL);
+
+            // give up, close the wizard as we cannot do anything here !
+            return true;
         }
 
         switch (invitationStatus) {
@@ -156,13 +165,13 @@ public class JoinSessionWizard extends Wizard {
             break;
         case CANCEL:
         case ERROR:
-            showCancelMessage(process.getPeer(), process.getErrorMessage(),
-                CancelLocation.LOCAL);
+            asyncShowCancelMessage(process.getPeer(),
+                process.getErrorMessage(), CancelLocation.LOCAL);
             break;
         case REMOTE_CANCEL:
         case REMOTE_ERROR:
-            showCancelMessage(process.getPeer(), process.getErrorMessage(),
-                CancelLocation.REMOTE);
+            asyncShowCancelMessage(process.getPeer(),
+                process.getErrorMessage(), CancelLocation.REMOTE);
             break;
 
         }
@@ -180,32 +189,44 @@ public class JoinSessionWizard extends Wizard {
         return true;
     }
 
-    @Override
-    public void dispose() {
-        super.dispose();
-    }
-
+    /**
+     * Get rid of this method, use a listener !
+     */
     public void cancelWizard(final JID jid, final String errorMsg,
         final CancelLocation cancelLocation) {
 
         SWTUtils.runSafeSWTAsync(log, new Runnable() {
             @Override
             public void run() {
+
+                /*
+                 * do NOT CLOSE the wizard if it performs async operations
+                 * 
+                 * see performFinish() -> getContainer().run(boolean, boolean,
+                 * IRunnableWithProgress)
+                 */
+                if (accepted)
+                    return;
+
                 Shell shell = JoinSessionWizard.this.getShell();
                 if (shell == null || shell.isDisposed())
                     return;
 
                 ((WizardDialog) JoinSessionWizard.this.getContainer()).close();
+
+                asyncShowCancelMessage(jid, errorMsg, cancelLocation);
             }
         });
+    }
 
+    private void asyncShowCancelMessage(final JID jid, final String errorMsg,
+        final CancelLocation cancelLocation) {
         SWTUtils.runSafeSWTAsync(log, new Runnable() {
             @Override
             public void run() {
                 showCancelMessage(jid, errorMsg, cancelLocation);
             }
         });
-
     }
 
     private void showCancelMessage(JID jid, String errorMsg,
@@ -213,16 +234,18 @@ public class JoinSessionWizard extends Wizard {
 
         String peer = jid.getBase();
 
+        Shell shell = EditorAPI.getShell();
+
         if (errorMsg != null) {
             switch (cancelLocation) {
             case LOCAL:
-                DialogUtils.openErrorMessageDialog(getShell(),
+                DialogUtils.openErrorMessageDialog(shell,
                     Messages.JoinSessionWizard_inv_cancelled,
                     Messages.JoinSessionWizard_inv_cancelled_text
                         + Messages.JoinSessionWizard_8 + errorMsg);
                 break;
             case REMOTE:
-                DialogUtils.openErrorMessageDialog(getShell(),
+                DialogUtils.openErrorMessageDialog(shell,
 
                 Messages.JoinSessionWizard_inv_cancelled, MessageFormat.format(
                     Messages.JoinSessionWizard_inv_cancelled_text2, peer,
@@ -233,17 +256,11 @@ public class JoinSessionWizard extends Wizard {
             case LOCAL:
                 break;
             case REMOTE:
-                DialogUtils.openInformationMessageDialog(getShell(),
+                DialogUtils.openInformationMessageDialog(shell,
                     Messages.JoinSessionWizard_inv_cancelled, MessageFormat
                         .format(Messages.JoinSessionWizard_inv_cancelled_text3,
                             peer));
             }
         }
-    }
-
-    private void processException(Throwable t) {
-        log.error("This type of exception is not expected here: ", t); //$NON-NLS-1$
-        cancelWizard(process.getPeer(), "Unkown error: " + t.getMessage(), //$NON-NLS-1$
-            CancelLocation.REMOTE);
     }
 }
