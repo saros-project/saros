@@ -27,6 +27,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Random;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -59,11 +60,8 @@ import de.fu_berlin.inf.dpp.invitation.ProjectNegotiation;
 import de.fu_berlin.inf.dpp.net.ConnectionState;
 import de.fu_berlin.inf.dpp.net.IConnectionListener;
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.net.RosterTracker;
 import de.fu_berlin.inf.dpp.net.SarosNet;
-import de.fu_berlin.inf.dpp.net.discoverymanager.DiscoveryManager;
 import de.fu_berlin.inf.dpp.net.internal.XMPPTransmitter;
-import de.fu_berlin.inf.dpp.observables.InvitationProcessObservable;
 import de.fu_berlin.inf.dpp.observables.SarosSessionObservable;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
@@ -89,44 +87,41 @@ public class SarosSessionManager implements ISarosSessionManager {
     private static final Logger log = Logger
         .getLogger(SarosSessionManager.class.getName());
 
-    @Inject
-    protected SarosSessionObservable sarosSessionObservable;
+    private static final Random SESSION_ID_GENERATOR = new Random();
+
+    private static final long LOCK_TIMEOUT = 10000L;
 
     @Inject
-    protected DiscoveryManager discoveryManager;
+    private SarosSessionObservable sarosSessionObservable;
 
     @Inject
-    protected XMPPTransmitter transmitter;
+    private XMPPTransmitter transmitter;
 
     @Inject
-    protected SessionIDObservable sessionID;
-
-    @Inject
-    // FIXME dependency of other classes
-    protected InvitationProcessObservable invitationProcesses;
+    private SessionIDObservable sessionID;
 
     @Inject
     // FIXME dependency of other classes
-    protected VersionManager versionManager;
+    private VersionManager versionManager;
 
     @Inject
-    // FIXME dependency of other class
-    protected RosterTracker rosterTracker;
+    private PreferenceUtils preferenceUtils;
 
     @Inject
-    protected PreferenceUtils preferenceUtils;
+    private SarosContext sarosContext;
 
     @Inject
-    protected SarosContext sarosContext;
+    private SarosUI sarosUI;
 
-    @Inject
-    protected SarosUI sarosUI;
-
-    protected SarosNet sarosNet;
+    private SarosNet sarosNet;
 
     private final List<ISarosSessionListener> sarosSessionListeners = new CopyOnWriteArrayList<ISarosSessionListener>();
 
-    protected final IConnectionListener listener = new IConnectionListener() {
+    private final Lock startStopSessionLock = new ReentrantLock();
+
+    private volatile boolean sessionStartup = false;
+
+    private final IConnectionListener listener = new IConnectionListener() {
         @Override
         public void connectionStateChanged(Connection connection,
             ConnectionState state) {
@@ -141,8 +136,6 @@ public class SarosSessionManager implements ISarosSessionManager {
         this.sarosNet = sarosNet;
         this.sarosNet.addListener(listener);
     }
-
-    protected static final Random sessionRandom = new Random();
 
     /**
      * @JTourBusStop 3, Invitation Process:
@@ -164,66 +157,90 @@ public class SarosSessionManager implements ISarosSessionManager {
     public void startSession(
         final Map<IProject, List<IResource>> projectResourcesMapping) {
 
-        sessionID.setValue(String.valueOf(sessionRandom
-            .nextInt(Integer.MAX_VALUE)));
-
-        final SarosSession sarosSession = new SarosSession(
-            preferenceUtils.getFavoriteColorID(), new DateTime(), sarosContext);
-
-        sarosSessionObservable.setValue(sarosSession);
-
-        sessionStarting(sarosSession);
-        sarosSession.start();
-        sessionStarted(sarosSession);
-
-        for (Entry<IProject, List<IResource>> mapEntry : projectResourcesMapping
-            .entrySet()) {
-
-            IProject project = mapEntry.getKey();
-            List<IResource> resourcesList = mapEntry.getValue();
-
-            if (!project.isOpen()) {
-                try {
-                    project.open(null);
-                } catch (CoreException e) {
-                    log.debug("an error occur while opening project: "
-                        + project.getName(), e);
-                    continue;
-                }
+        try {
+            if (!startStopSessionLock.tryLock(LOCK_TIMEOUT,
+                TimeUnit.MILLISECONDS)) {
+                log.warn("could not start a new session because another operation still tries to start or stop a session");
+                return;
             }
-
-            String projectID = String.valueOf(sessionRandom
-                .nextInt(Integer.MAX_VALUE));
-
-            sarosSession.addSharedResources(project, projectID, resourcesList);
-
-            projectAdded(projectID);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            return;
         }
 
-        log.info("session started");
+        try {
+            if (sarosSessionObservable.getValue() != null) {
+                log.warn("could not start a new session because a session has already been started");
+                return;
+            }
+
+            sessionStartup = true;
+
+            sessionID.setValue(String.valueOf(SESSION_ID_GENERATOR
+                .nextInt(Integer.MAX_VALUE)));
+
+            final SarosSession sarosSession = new SarosSession(
+                preferenceUtils.getFavoriteColorID(), new DateTime(),
+                sarosContext);
+
+            sarosSessionObservable.setValue(sarosSession);
+
+            sessionStarting(sarosSession);
+            sarosSession.start();
+            sessionStarted(sarosSession);
+
+            for (Entry<IProject, List<IResource>> mapEntry : projectResourcesMapping
+                .entrySet()) {
+
+                IProject project = mapEntry.getKey();
+                List<IResource> resourcesList = mapEntry.getValue();
+
+                if (!project.isOpen()) {
+                    try {
+                        project.open(null);
+                    } catch (CoreException e) {
+                        log.debug("an error occur while opening project: "
+                            + project.getName(), e);
+                        continue;
+                    }
+                }
+
+                String projectID = String.valueOf(SESSION_ID_GENERATOR
+                    .nextInt(Integer.MAX_VALUE));
+
+                sarosSession.addSharedResources(project, projectID,
+                    resourcesList);
+
+                projectAdded(projectID);
+            }
+
+            log.info("session started");
+        } finally {
+            sessionStartup = false;
+            startStopSessionLock.unlock();
+        }
     }
 
     /**
      * {@inheritDoc}
      */
+
+    // FIXME offer a startSession method for the client and host !
     @Override
     public ISarosSession joinSession(JID host, int colorID,
         DateTime sessionStart, JID inviter, int inviterColorID) {
 
+        assert getSarosSession() == null;
+
         SarosSession sarosSession = new SarosSession(host, colorID,
             sessionStart, sarosContext, inviter, inviterColorID);
 
-        this.sarosSessionObservable.setValue(sarosSession);
+        sarosSessionObservable.setValue(sarosSession);
 
-        log.info("Saros session joined");
+        log.info("joined uninitialized Saros session");
 
         return sarosSession;
     }
-
-    /**
-     * Used to make stopSharedProject reentrant
-     */
-    private Lock stopSharedProjectLock = new ReentrantLock();
 
     /**
      * @nonSWT
@@ -232,13 +249,18 @@ public class SarosSessionManager implements ISarosSessionManager {
     public void stopSarosSession() {
 
         if (SWTUtils.isSWT()) {
-            log.warn("StopSharedProject should not be called from SWT",
+            log.warn("stopSarosSession should not be called from SWT",
                 new StackTrace());
         }
 
-        if (!stopSharedProjectLock.tryLock()) {
-            log.debug("stopSharedProject() couldn't acquire "
-                + "stopSharedProjectLock.");
+        try {
+            if (!startStopSessionLock.tryLock(LOCK_TIMEOUT,
+                TimeUnit.MILLISECONDS)) {
+                log.warn("could not stop the current session because another operation still tries to start or stop a session");
+                return;
+            }
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
             return;
         }
 
@@ -252,9 +274,16 @@ public class SarosSessionManager implements ISarosSessionManager {
                 return;
             }
 
+            if (sessionStartup)
+                throw new IllegalStateException(
+                    "cannot stop the session from the same thread context that is currently about to start the session: "
+                        + Thread.currentThread().getName());
+
             sessionEnding(sarosSession);
 
-            this.transmitter.sendLeaveMessage(sarosSession);
+            // FIXME move to session
+            transmitter.sendLeaveMessage(sarosSession);
+
             log.debug("Leave message sent.");
             if (!sarosSession.isStopped()) {
                 try {
@@ -265,15 +294,15 @@ public class SarosSessionManager implements ISarosSessionManager {
             }
             sarosSession.dispose();
 
-            this.sarosSessionObservable.setValue(null);
+            sarosSessionObservable.setValue(null);
 
             sessionEnded(sarosSession);
 
             sessionID.setValue(SessionIDObservable.NOT_IN_SESSION);
 
-            log.info("Session left");
+            log.info("session stopped");
         } finally {
-            stopSharedProjectLock.unlock();
+            startStopSessionLock.unlock();
         }
     }
 
@@ -290,7 +319,7 @@ public class SarosSessionManager implements ISarosSessionManager {
     @Override
     @Deprecated
     public ISarosSession getSarosSession() {
-        return this.sarosSessionObservable.getValue();
+        return sarosSessionObservable.getValue();
     }
 
     @Override
@@ -506,7 +535,7 @@ public class SarosSessionManager implements ISarosSessionManager {
 
             // side effect: non shared projects are always partial -.-
             if (!session.isCompletelyShared(project)) {
-                String projectID = String.valueOf(sessionRandom
+                String projectID = String.valueOf(SESSION_ID_GENERATOR
                     .nextInt(Integer.MAX_VALUE));
                 session.addSharedResources(project, projectID, resourcesList);
                 projectAdded(projectID);
