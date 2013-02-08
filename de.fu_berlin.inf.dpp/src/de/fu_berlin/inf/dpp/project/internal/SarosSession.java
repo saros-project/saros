@@ -277,7 +277,6 @@ public class SarosSession implements ISarosSession, Disposable {
         this(colorID, true, sessionStart, sarosContext);
 
         host = localUser;
-        host.invitationCompleted();
 
         participants.put(host.getJID(), host);
 
@@ -300,7 +299,6 @@ public class SarosSession implements ISarosSession, Disposable {
          */
 
         host = new User(this, hostID, inviterColorID);
-        host.invitationCompleted();
 
         participants.put(hostID, host);
         participants.put(localUser.getJID(), localUser);
@@ -493,34 +491,6 @@ public class SarosSession implements ISarosSession, Disposable {
         log.info("Buddy " + user + " is now a " + permission); //$NON-NLS-1$ //$NON-NLS-2$
 
         listenerDispatch.permissionChanged(user);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void userInvitationCompleted(final User user) {
-        user.invitationCompleted();
-
-        // WTF ... let the UI handle the synch.
-        synchronizer.asyncExec(Utils.wrapSafe(log, new Runnable() {
-            @Override
-            public void run() {
-                userInvitationCompletedWrapped(user);
-            }
-        }));
-    }
-
-    @Deprecated
-    private void userInvitationCompletedWrapped(final User user) {
-
-        if (user == null)
-            throw new IllegalArgumentException();
-
-        log.debug("The invitation of " + Utils.prefix(user.getJID()) //$NON-NLS-1$
-            + " is now complete"); //$NON-NLS-1$
-
-        listenerDispatch.invitationCompleted(user);
     }
 
     /*

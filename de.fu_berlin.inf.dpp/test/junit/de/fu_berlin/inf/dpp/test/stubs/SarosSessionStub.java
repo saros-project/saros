@@ -43,12 +43,6 @@ public class SarosSessionStub implements ISarosSession {
     }
 
     @Override
-    public void userInvitationCompleted(User user) {
-        throw new RuntimeException("Unexpected call to Stub");
-
-    }
-
-    @Override
     public boolean useVersionControl() {
         return useVersionControl;
     }

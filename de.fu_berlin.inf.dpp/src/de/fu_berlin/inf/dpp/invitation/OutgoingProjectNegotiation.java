@@ -269,11 +269,8 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
          * it can cause a deadlock, because the StopManager does not answer if
          * someone is already stopped.
          */
-        Collection<User> usersToStop = new ArrayList<User>();
-        for (User user : sarosSession.getParticipants()) {
-            if (user.isInvitationComplete())
-                usersToStop.add(user);
-        }
+        Collection<User> usersToStop = new ArrayList<User>(
+            sarosSession.getParticipants());
 
         log.debug(this + " : stopping users " + usersToStop);
         // TODO: startHandles outside of sync block?

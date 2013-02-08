@@ -94,14 +94,6 @@ public interface ISarosSession {
     public void setPermission(User user, Permission permission);
 
     /**
-     * Sets the {@link User#invitationComplete} flag to true;
-     * 
-     * @param user
-     *            The user whose invitation process has completed.
-     */
-    public void userInvitationCompleted(final User user);
-
-    /**
      * @return <code>true</code> if the local client is a user with
      *         {@link Permission#WRITE_ACCESS} of this shared project.
      *         <code>false</code> otherwise.

@@ -24,9 +24,4 @@ public abstract class AbstractSharedProjectListener implements
     public void userLeft(User user) {
         // Do nothing.
     }
-
-    @Override
-    public void invitationCompleted(User user) {
-        // Do nothing.
-    }
 }

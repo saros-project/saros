@@ -45,7 +45,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.commons.lang.ObjectUtils;
 import org.apache.log4j.Logger;
-import org.eclipse.core.resources.IProject;
 import org.jivesoftware.smack.ConnectionListener;
 import org.jivesoftware.smack.PacketListener;
 import org.jivesoftware.smack.filter.PacketFilter;
@@ -63,9 +62,9 @@ import de.fu_berlin.inf.dpp.exceptions.RemoteCancellationException;
 import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
 import de.fu_berlin.inf.dpp.exceptions.StreamException;
 import de.fu_berlin.inf.dpp.exceptions.StreamServiceNotValidException;
+import de.fu_berlin.inf.dpp.net.IReceiver;
 import de.fu_berlin.inf.dpp.net.IncomingTransferObject;
 import de.fu_berlin.inf.dpp.net.IncomingTransferObject.IncomingTransferObjectExtensionProvider;
-import de.fu_berlin.inf.dpp.net.IReceiver;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.SarosNet;
 import de.fu_berlin.inf.dpp.net.internal.StreamServiceManager.StreamMetaPacketData.StreamClose;
@@ -1781,16 +1780,6 @@ public class StreamServiceManager implements Startable {
         @Override
         public void permissionChanged(User user) {
             // NOP
-        }
-
-        @Override
-        public void invitationCompleted(User user) {
-            // NOP
-        }
-
-        public void projectAdded(IProject project) {
-            // NOP
-
         }
     }
 

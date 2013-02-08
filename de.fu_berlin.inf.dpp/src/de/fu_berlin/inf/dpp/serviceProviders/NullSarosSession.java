@@ -66,11 +66,6 @@ public class NullSarosSession implements ISarosSession {
     }
 
     @Override
-    public void userInvitationCompleted(User user) {
-        log.warn("unexpected method call");
-    }
-
-    @Override
     public boolean hasWriteAccess() {
         log.warn("unexpected method call");
         return false;

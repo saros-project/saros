@@ -130,13 +130,6 @@ public class RosterSessionContentProvider extends TreeContentProvider {
             if (userElement != null)
                 ViewerUtils.update(viewer, userElement, null);
         }
-
-        @Override
-        public void invitationCompleted(User user) {
-            UserElement userElement = getUserElement(rosterSessionInput, user);
-            if (userElement != null)
-                ViewerUtils.update(viewer, userElement, null);
-        }
     };
 
     protected SessionHeaderElement sessionHeaderElement;

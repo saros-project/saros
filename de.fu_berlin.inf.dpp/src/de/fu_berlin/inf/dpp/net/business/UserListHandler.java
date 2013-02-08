@@ -69,40 +69,20 @@ public class UserListHandler {
                     // Check if we already know this user
                     User user = sarosSession.getUser(userEntry.jid);
 
+                    // new session user
                     if (user == null) {
-                        // This user is not part of our project
+
                         newUser = new User(sarosSession, userEntry.jid,
                             userEntry.colorID);
-                        newUser.setPermission(userEntry.permission);
-                        if (userEntry.invitationComplete)
-                            newUser.invitationCompleted();
 
-                        // Add him and send him a message, and tell him our
-                        // color
+                        newUser.setPermission(userEntry.permission);
                         sarosSession.addUser(newUser);
                     } else {
                         // User already exists
 
-                        // Check if the existing user has the color that we
-                        // expect
-                        if (user.getColorID() != userEntry.colorID) {
-                            log.warn("Received color id doesn't"
-                                + " match known color id");
-                        }
-
                         // Update his permission
                         user.setPermission(userEntry.permission);
-
-                        // Update invitation status
-                        if (userEntry.invitationComplete
-                            && !user.isInvitationComplete()) {
-                            sarosSession.userInvitationCompleted(user);
-                        }
                     }
-                    /*
-                     * pretty cool that we cannot announce that a user has left
-                     * the session !
-                     */
                 }
                 transmitter.sendUserListConfirmation(fromJID);
             }

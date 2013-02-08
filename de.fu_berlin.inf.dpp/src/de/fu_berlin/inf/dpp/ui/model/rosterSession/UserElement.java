@@ -133,13 +133,6 @@ public class UserElement extends TreeElement {
             }
         }
 
-        /*
-         * Other
-         */
-        if (!user.isInvitationComplete()) {
-            styledString.append(" " + joining, StyledString.COUNTER_STYLER);
-        }
-
         return styledString;
     }
 

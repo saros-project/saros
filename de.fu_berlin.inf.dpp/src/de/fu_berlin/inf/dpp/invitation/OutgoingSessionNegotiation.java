@@ -139,9 +139,7 @@ public final class OutgoingSessionNegotiation extends InvitationProcess {
 
             dataTransferManager.connect(peer);
 
-            User newUser = addUserToSession(monitor);
-
-            completeInvitation(monitor);
+            User newUser = completeInvitation(monitor);
 
             monitor.done();
 
@@ -385,51 +383,40 @@ public final class OutgoingSessionNegotiation extends InvitationProcess {
     }
 
     /**
-     * Adds the invited user to the current SarosSession. After the user is
-     * added to the session an acknowledgment is send to the remote side that
-     * the remote user can now start working in this session.
-     */
-    // TODO move to SarosSession.
-    private User addUserToSession(IProgressMonitor monitor)
-        throws SarosCancellationException {
-
-        synchronized (SESSION_JOIN_LOCK) {
-
-            User newUser = new User(sarosSession, peer, colorID);
-
-            sarosSession.addUser(newUser);
-            log.debug(this + " : added " + Utils.prefix(peer)
-                + " to the current session, colorID: " + colorID);
-
-            transmitter.sendMessageToUser(peer,
-                InvitationAcknowledgedExtension.PROVIDER
-                    .create(new InvitationAcknowledgedExtension(invitationID)));
-
-            checkCancellation(CancelOption.NOTIFY_PEER);
-            sarosSession.synchronizeUserList(transmitter, peer, monitor);
-            return newUser;
-        }
-    }
-
-    /**
-     * Completes the invitation by setting the appropriate flag in the user
-     * object and synchronize the user lists with all session users afterwards.
      * 
+     * Adds the invited user to the current SarosSession. After the user is
+     * added to the session the user list is synchronized and afterwards an
+     * acknowledgment is send to the remote side that the remote user can now
+     * start working in this session.
      */
-    private void completeInvitation(IProgressMonitor monitor)
+
+    private User completeInvitation(IProgressMonitor monitor)
         throws SarosCancellationException {
 
         log.debug(this + " : synchronizing user list");
 
         monitor.setTaskName("Synchronizing user list...");
 
+        User user = new User(sarosSession, peer, colorID);
+
         synchronized (SESSION_JOIN_LOCK) {
-            sarosSession.userInvitationCompleted(sarosSession.getUser(peer));
+
+            sarosSession.addUser(user);
+            log.debug(this + " : added " + Utils.prefix(peer)
+                + " to the current session, colorID: " + colorID);
+
             checkCancellation(CancelOption.NOTIFY_PEER);
+
             sarosSession.synchronizeUserList(transmitter, peer, monitor); // SUPPRESSALL
+
+            transmitter.sendMessageToUser(peer,
+                InvitationAcknowledgedExtension.PROVIDER
+                    .create(new InvitationAcknowledgedExtension(invitationID)));
         }
 
         log.debug(this + " : session negotiation finished");
+
+        return user;
     }
 
     @Override

@@ -84,9 +84,7 @@ public class AwarenessInformationCollector {
          * Differentiate between "invitation in progress" and awareness
          * information shown while the session is running
          */
-        if (!user.isInvitationComplete()) {
-            details.add("Joining");
-        }
+
         ProjectNegotiation negotiation = projectNegotiationObservable
             .getProjectExchangeProcess(user.getJID());
 

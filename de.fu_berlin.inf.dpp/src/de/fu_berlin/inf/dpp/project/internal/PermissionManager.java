@@ -61,10 +61,6 @@ public class PermissionManager extends AbstractActivityProvider implements
         @Override
         public void userJoined(User user) {
 
-            // do not notify of users that were already in the session
-            if (user.isInvitationComplete())
-                return;
-
             SarosView.showNotification(Messages.PermissionManager_buddy_joined,
                 MessageFormat.format(
                     Messages.PermissionManager_buddy_joined_text,

@@ -186,8 +186,6 @@ public class IncomingSessionNegotiation extends InvitationProcess {
          */
         sessionManager.preIncomingInvitationCompleted(monitor);
 
-        sarosSession.userInvitationCompleted(sarosSession.getLocalUser());
-
         log.debug(this + " : invitation has completed successfully");
 
         transmitter.sendMessageToUser(peer,
