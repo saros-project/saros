@@ -44,6 +44,7 @@ import de.fu_berlin.inf.dpp.concurrent.watchdog.ConsistencyWatchdogServer;
 import de.fu_berlin.inf.dpp.concurrent.watchdog.IsInconsistentObservable;
 import de.fu_berlin.inf.dpp.concurrent.watchdog.SessionViewOpener;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
+import de.fu_berlin.inf.dpp.editor.colorstorage.ColorIDSetStorage;
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.net.IncomingTransferObject;
 import de.fu_berlin.inf.dpp.net.RosterTracker;
@@ -244,6 +245,7 @@ public class SarosContext implements ISarosContext {
         Component.create(MUCSessionPreferencesNegotiatingManager.class),
         Component.create(RemoteProgressManager.class),
         Component.create(XMPPAccountStore.class),
+        Component.create(ColorIDSetStorage.class),
 
         // Network
         Component.create(ConnectionTestManager.class),
