@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CancellationException;
@@ -41,6 +42,7 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
@@ -73,7 +75,7 @@ import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentServer;
 import de.fu_berlin.inf.dpp.concurrent.management.TransformationResult;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
-import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
+import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
 import de.fu_berlin.inf.dpp.feedback.DataTransferCollector;
 import de.fu_berlin.inf.dpp.feedback.ErrorLogManager;
 import de.fu_berlin.inf.dpp.feedback.FeedbackManager;
@@ -539,6 +541,8 @@ public class SarosSession implements ISarosSession, Disposable {
     @Override
     public void addUser(User user) {
 
+        // TODO synchronize this method !
+
         assert user.getSarosSession().equals(this);
 
         JID jid = user.getJID();
@@ -552,6 +556,17 @@ public class SarosSession implements ISarosSession, Disposable {
                 + " added twice to SarosSession", new StackTrace()); //$NON-NLS-1$
             throw new IllegalArgumentException();
         }
+
+        /*
+         * welcome to a dual host-client and P2P architecture
+         * 
+         * as long as we do not know when something is send to someone this will
+         * always produce errors ... swapping synchronizeUserList and userJoined
+         * can produce different results
+         */
+
+        if (isHost())
+            synchronizeUserList();
 
         listenerDispatch.userJoined(user);
 
@@ -1378,13 +1393,14 @@ public class SarosSession implements ISarosSession, Disposable {
         return projectMapper.getProject(projectID);
     }
 
-    @Override
-    public void synchronizeUserList(ITransmitter transmitter, JID peer,
-        IProgressMonitor monitor) throws SarosCancellationException {
+    // TODO this needs a major refactor
+    private void synchronizeUserList() {
 
-        Collection<User> participants = this.getParticipants();
-        log.debug("Inv" + Utils.prefix(peer) + ": Synchronizing userlist "
-            + participants);
+        final IProgressMonitor monitor = new NullProgressMonitor();
+
+        log.debug("synchronizing user list");
+
+        Collection<User> participants = getParticipants();
 
         SarosPacketCollector userListConfirmationCollector = transmitter
             .getUserListConfirmationCollector();
@@ -1398,24 +1414,53 @@ public class SarosSession implements ISarosSession, Disposable {
         if (remoteUsers.isEmpty())
             return;
 
-        for (User user : remoteUsers) {
+        for (Iterator<User> it = remoteUsers.iterator(); it.hasNext();) {
+            User user = it.next();
             try {
                 transmitter.sendToSessionUser(user.getJID(), userList);
             } catch (IOException e) {
                 log.error("could not send user list to session user " + user, e);
+                it.remove();
             }
         }
 
+        /*
+         * the code below is NOT need IF sendToSessionUser will always use the
+         * stream connection and not the chat !
+         */
+
         // see BUG #3544930 , the confirmation is useless
-        log.debug("Inv" + Utils.prefix(peer)
-            + ": Waiting for user list confirmations...");
+        log.debug("waiting for confirmations");
 
-        transmitter.receiveUserListConfirmation(userListConfirmationCollector,
-            remoteUsers, monitor);
+        /*
+         * FIXME use the direct connection as this will throw an IOException so
+         * we can remove the user that is not responding
+         */
 
-        log.debug("Inv" + Utils.prefix(peer)
-            + ": All user list confirmations have arrived.");
+        Utils.runSafeAsync(log, new Runnable() {
 
+            @Override
+            public void run() {
+                try {
+                    Thread.sleep(15000);
+                } catch (InterruptedException e) {
+                    // NOP
+                } finally {
+                    monitor.setCanceled(true);
+                }
+
+            }
+        });
+
+        try {
+            transmitter.receiveUserListConfirmation(
+                userListConfirmationCollector, remoteUsers, monitor);
+        } catch (LocalCancellationException e) {
+            // HACK for now
+            throw new RuntimeException("synchronizing user list timed out");
+        }
+
+        log.debug("synchronized user list");
     }
 
     @Override

@@ -9,7 +9,6 @@ import java.util.concurrent.CancellationException;
 import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
-import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
 import org.joda.time.DateTime;
 
@@ -20,8 +19,6 @@ import de.fu_berlin.inf.dpp.activities.business.IActivity;
 import de.fu_berlin.inf.dpp.activities.serializable.IActivityDataObject;
 import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentClient;
 import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentServer;
-import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
-import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.internal.ActivitySequencer;
 import de.fu_berlin.inf.dpp.project.IActivityProvider;
@@ -273,13 +270,6 @@ public class NullSarosSession implements ISarosSession {
     public List<SharedProject> getSharedProjects() {
         log.warn("unexpected method call");
         return null;
-    }
-
-    @Override
-    public void synchronizeUserList(ITransmitter transmitter, JID peer,
-        IProgressMonitor monitor) throws SarosCancellationException {
-        log.warn("unexpected method call");
-
     }
 
     @Override

@@ -27,7 +27,6 @@ import java.util.concurrent.CancellationException;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
-import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
 import org.joda.time.DateTime;
 
@@ -38,8 +37,6 @@ import de.fu_berlin.inf.dpp.activities.business.IActivity;
 import de.fu_berlin.inf.dpp.activities.serializable.IActivityDataObject;
 import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentClient;
 import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentServer;
-import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
-import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.internal.ActivitySequencer;
 import de.fu_berlin.inf.dpp.synchronize.StopManager;
@@ -117,7 +114,9 @@ public interface ISarosSession {
     public boolean isHost();
 
     /**
-     * Adds the user.
+     * Adds the user to the current Saros session. If the session currently
+     * serves as host all other session participants will be noticed about the
+     * new user.
      * 
      * @param user
      *            the user that is to be added.
@@ -398,17 +397,6 @@ public interface ISarosSession {
      * @return
      */
     public List<SharedProject> getSharedProjects();
-
-    /**
-     * Synchronizing the userList with <code>peer</code>. This happens during
-     * invitation and while other participants are joining or leaving the
-     * session
-     * 
-     * @param peer
-     * @throws SarosCancellationException
-     */
-    public void synchronizeUserList(ITransmitter transmitter, JID peer,
-        IProgressMonitor monitor) throws SarosCancellationException;
 
     /**
      * Returns all resources of session.

@@ -390,8 +390,7 @@ public final class OutgoingSessionNegotiation extends InvitationProcess {
      * start working in this session.
      */
 
-    private User completeInvitation(IProgressMonitor monitor)
-        throws SarosCancellationException {
+    private User completeInvitation(IProgressMonitor monitor) {
 
         log.debug(this + " : synchronizing user list");
 
@@ -404,10 +403,6 @@ public final class OutgoingSessionNegotiation extends InvitationProcess {
             sarosSession.addUser(user);
             log.debug(this + " : added " + Utils.prefix(peer)
                 + " to the current session, colorID: " + colorID);
-
-            checkCancellation(CancelOption.NOTIFY_PEER);
-
-            sarosSession.synchronizeUserList(transmitter, peer, monitor); // SUPPRESSALL
 
             transmitter.sendMessageToUser(peer,
                 InvitationAcknowledgedExtension.PROVIDER
