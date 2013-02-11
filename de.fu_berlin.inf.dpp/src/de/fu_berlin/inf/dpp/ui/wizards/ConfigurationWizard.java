@@ -29,6 +29,8 @@ import de.fu_berlin.inf.dpp.feedback.StatisticManagerConfiguration;
 import de.fu_berlin.inf.dpp.net.upnp.IUPnPService;
 import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
 import de.fu_berlin.inf.dpp.ui.ImageManager;
+import de.fu_berlin.inf.dpp.ui.Messages;
+import de.fu_berlin.inf.dpp.ui.wizards.pages.ColorChooserWizardPage;
 import de.fu_berlin.inf.dpp.ui.wizards.pages.ConfigurationSettingsWizardPage;
 import de.fu_berlin.inf.dpp.ui.wizards.pages.ConfigurationSummaryWizardPage;
 
@@ -45,18 +47,26 @@ public class ConfigurationWizard extends AddXMPPAccountWizard {
 
     private ConfigurationSettingsWizardPage configurationSettingsWizardPage = new ConfigurationSettingsWizardPage();
     private ConfigurationSummaryWizardPage configurationSummaryWizardPage = new ConfigurationSummaryWizardPage();
+    private ColorChooserWizardPage colorChooserWizardPage = new ColorChooserWizardPage(
+        false);
 
     public ConfigurationWizard() {
         SarosPluginContext.initComponent(this);
 
         setWindowTitle("Saros Configuration");
         setDefaultPageImageDescriptor(ImageManager.WIZBAN_CONFIGURATION);
+        colorChooserWizardPage
+            .setTitle(Messages.ChangeColorWizardPage_configuration_mode_title);
+
+        colorChooserWizardPage
+            .setDescription(Messages.ChangeColorWizardPage_configuration_mode_description);
     }
 
     @Override
     public void addPages() {
         super.addPages();
         addPage(configurationSettingsWizardPage);
+        addPage(colorChooserWizardPage);
         addPage(configurationSummaryWizardPage);
     }
 
@@ -73,7 +83,8 @@ public class ConfigurationWizard extends AddXMPPAccountWizard {
 
     /**
      * Stores the Saros configuration on the base of the
-     * {@link ConfigurationSettingsWizardPage} into the PreferenceStore.
+     * {@link ConfigurationSettingsWizardPage} and
+     * {@link ColorChooserWizardPage}into the PreferenceStore.
      */
     protected void setConfiguration() {
         IPreferenceStore preferences = saros.getPreferenceStore();
@@ -86,10 +97,16 @@ public class ConfigurationWizard extends AddXMPPAccountWizard {
 
         preferences.setValue(PreferenceConstants.SKYPE_USERNAME, skypeUsername);
 
-        boolean statisticSubmissionAllowed = this.configurationSettingsWizardPage
+        int colorID = colorChooserWizardPage.getSelectedColor();
+
+        if (colorID != -1)
+            preferences.setValue(PreferenceConstants.FAVORITE_SESSION_COLOR_ID,
+                colorID);
+
+        boolean statisticSubmissionAllowed = configurationSettingsWizardPage
             .isStatisticSubmissionAllowed();
 
-        boolean errorLogSubmissionAllowed = this.configurationSettingsWizardPage
+        boolean errorLogSubmissionAllowed = configurationSettingsWizardPage
             .isErrorLogSubmissionAllowed();
 
         StatisticManagerConfiguration.setStatisticSubmissionAllowed(saros,
@@ -98,7 +115,7 @@ public class ConfigurationWizard extends AddXMPPAccountWizard {
         ErrorLogManager.setErrorLogSubmissionAllowed(saros,
             errorLogSubmissionAllowed);
 
-        GatewayDevice selGwDevice = this.configurationSettingsWizardPage
+        GatewayDevice selGwDevice = configurationSettingsWizardPage
             .getPortmappingDevice();
 
         upnpService.setSelectedGateway(selGwDevice);

@@ -52,7 +52,8 @@ public class Messages extends NLS {
     public static String ChangeColorWizard_title;
     public static String ChangeColorWizardPage_title;
     public static String ChangeColorWizardPage_description;
-
+    public static String ChangeColorWizardPage_configuration_mode_title;
+    public static String ChangeColorWizardPage_configuration_mode_description;
     public static String ChangeXMPPAccountAction_add_account;
     public static String ChangeXMPPAccountAction_configure_account;
     public static String ChangeXMPPAccountAction_connect;

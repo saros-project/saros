@@ -215,6 +215,7 @@ public class ConfigurationSummaryWizardPage extends WizardPage {
 
         EnterXMPPAccountWizardPage enterXMPPAccountWizardPage = enterXMPPAccountWizardPages
             .get(0);
+
         ConfigurationSettingsWizardPage configurationSettingsWizardPage = configurationSettingsWizardPages
             .get(0);
 

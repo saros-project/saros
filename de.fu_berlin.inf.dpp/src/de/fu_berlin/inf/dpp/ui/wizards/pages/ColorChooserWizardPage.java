@@ -5,7 +5,6 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 
 import de.fu_berlin.inf.dpp.project.internal.SarosSession;
-import de.fu_berlin.inf.dpp.ui.Messages;
 import de.fu_berlin.inf.dpp.ui.widgets.ColorChooser;
 import de.fu_berlin.inf.dpp.ui.widgets.ColorChooser.ColorSelectionListener;
 
@@ -13,11 +12,11 @@ public class ColorChooserWizardPage extends WizardPage {
 
     private ColorChooser colorChooser;
     private int selectedColor = -1;
+    private boolean hideUnavailableColors;
 
-    public ColorChooserWizardPage() {
+    public ColorChooserWizardPage(boolean hideUnavailableColors) {
         super(ColorChooserWizardPage.class.getName());
-        setTitle(Messages.ChangeColorWizardPage_title);
-        setDescription(Messages.ChangeColorWizardPage_description);
+        this.hideUnavailableColors = hideUnavailableColors;
     }
 
     @Override
@@ -25,7 +24,9 @@ public class ColorChooserWizardPage extends WizardPage {
         setPageComplete(selectedColor != -1);
 
         colorChooser = new ColorChooser(parent, SWT.NONE);
-        colorChooser.updateColorEnablement();
+
+        if (hideUnavailableColors)
+            colorChooser.updateColorEnablement();
 
         ColorSelectionListener listener = new ColorSelectionListener() {
             @Override
