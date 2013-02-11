@@ -133,7 +133,7 @@ public class VersionManagerTest {
         chart.put(local, Arrays.asList(remote));
 
         VersionInfo info = new VersionInfo();
-        info.version = remote.toString();
+        info.version = remote;
 
         info.compatibility = versionManagerRemote.determineCompatibility(
             remote, local);
@@ -175,7 +175,7 @@ public class VersionManagerTest {
         chart.put(remote, Arrays.asList(local));
 
         VersionInfo info = new VersionInfo();
-        info.version = remote.toString();
+        info.version = remote;
 
         info.compatibility = versionManagerRemote.determineCompatibility(
             remote, local);

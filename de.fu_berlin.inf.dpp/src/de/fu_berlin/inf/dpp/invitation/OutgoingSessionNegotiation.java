@@ -247,7 +247,7 @@ public final class OutgoingSessionNegotiation extends InvitationProcess {
             hostVersionInfo.compatibility = null;
         }
 
-        hostVersionInfo.version = versionManager.getVersion().toString();
+        hostVersionInfo.version = versionManager.getVersion();
 
         InvitationOfferingExtension invitationOffering = new InvitationOfferingExtension(
             invitationID, sessionID.getValue(), sarosSession.getSessionStart(),

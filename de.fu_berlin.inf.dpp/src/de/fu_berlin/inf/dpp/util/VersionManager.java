@@ -52,7 +52,7 @@ public class VersionManager {
      */
     public static class VersionInfo {
 
-        public String version;
+        public Version version;
 
         public Compatibility compatibility;
 
@@ -155,14 +155,15 @@ public class VersionManager {
                 VersionInfo remote = iq.getPayload();
 
                 VersionInfo local = new VersionInfo();
-                local.version = getVersion().toString();
+                local.version = getVersion();
 
-                local.compatibility = determineCompatibility(
-                    parseVersion(local.version), parseVersion(remote.version));
+                local.compatibility = determineCompatibility(local.version,
+                    remote.version);
 
                 IQ reply = VERSION_PROVIDER.createIQ(local);
                 reply.setType(IQ.Type.RESULT);
                 reply.setTo(iq.getFrom());
+                reply.setPacketID(iq.getPacketID());
 
                 try {
                     transmitter.sendPacket(reply, false);
@@ -204,12 +205,14 @@ public class VersionManager {
         assert rqJID.isResourceQualifiedJID();
 
         VersionInfo versionInfo = new VersionInfo();
-        versionInfo.version = getVersion().toString();
+        versionInfo.version = getVersion();
 
         IQ request = VERSION_PROVIDER.createIQ(versionInfo);
 
         request.setType(IQ.Type.GET);
         request.setTo(rqJID.toString());
+
+        final String packetID = request.getPacketID();
 
         SarosPacketCollector collector = receiver
             .createCollector(new AndFilter(VERSION_PROVIDER.getIQFilter(),
@@ -217,7 +220,8 @@ public class VersionManager {
                     @Override
                     public boolean accept(Packet packet) {
                         return rqJID.toString().equals(packet.getFrom())
-                            && ((IQ) packet).getType() == IQ.Type.RESULT;
+                            && ((IQ) packet).getType() == IQ.Type.RESULT
+                            && packet.getPacketID().equals(packetID);
                     }
                 }));
 
@@ -307,7 +311,7 @@ public class VersionManager {
         result.version = remoteVersionInfo.version;
 
         Compatibility localComp = determineCompatibility(getVersion(),
-            parseVersion(remoteVersionInfo.version));
+            remoteVersionInfo.version);
 
         Compatibility remoteComp = remoteVersionInfo.compatibility;
 
