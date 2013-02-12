@@ -690,9 +690,7 @@ public class SarosSessionManager implements ISarosSessionManager {
 
     @Override
     public void addSarosSessionListener(ISarosSessionListener listener) {
-        if (!this.sarosSessionListeners.contains(listener)) {
-            this.sarosSessionListeners.add(listener);
-        }
+        this.sarosSessionListeners.add(listener);
     }
 
     @Override
