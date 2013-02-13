@@ -115,7 +115,8 @@ public class IncomingSessionNegotiation extends InvitationProcess {
             running = true;
         }
 
-        observeMonitor(monitor);
+        // the process should not be cancelled manually !
+        // observeMonitor(monitor);
 
         Exception exception = null;
 
@@ -197,8 +198,8 @@ public class IncomingSessionNegotiation extends InvitationProcess {
         monitor.setTaskName("Waiting for " + peerNickname
             + " to perform final initialization...");
 
-        Packet packet = invitationAcknowledgedCollector
-            .nextResult(PACKET_TIMEOUT);
+        Packet packet = collectPacket(invitationAcknowledgedCollector,
+            PACKET_TIMEOUT);
 
         if (packet == null)
             throw new LocalCancellationException(peerNickname
@@ -249,7 +250,7 @@ public class IncomingSessionNegotiation extends InvitationProcess {
             PACKET_TIMEOUT);
 
         if (packet == null)
-            throw new LocalCancellationException(peer
+            throw new LocalCancellationException(peerNickname
                 + " does not respond. (Timeout)",
                 CancelOption.DO_NOT_NOTIFY_PEER);
 
