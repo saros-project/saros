@@ -10,7 +10,7 @@ import org.apache.commons.lang.ObjectUtils;
 
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.activities.business.IActivity;
-import de.fu_berlin.inf.dpp.project.internal.SarosSession.QueueItem;
+import de.fu_berlin.inf.dpp.project.internal.ActivityHandler.QueueItem;
 
 public class TransformationResult {
 

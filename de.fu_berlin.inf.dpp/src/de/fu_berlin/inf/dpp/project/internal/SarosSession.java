@@ -72,7 +72,6 @@ import de.fu_berlin.inf.dpp.activities.serializable.EditorActivityDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.IActivityDataObject;
 import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentClient;
 import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentServer;
-import de.fu_berlin.inf.dpp.concurrent.management.TransformationResult;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
@@ -126,71 +125,76 @@ import de.fu_berlin.inf.dpp.util.Utils;
  * TODO Review if SarosSession, ConcurrentDocumentManager, ActivitySequencer all
  * honor start() and stop() semantics.
  */
-public class SarosSession implements ISarosSession, Disposable {
+public final class SarosSession implements ISarosSession, Disposable {
 
     private static final Logger log = Logger.getLogger(SarosSession.class);
 
     public static final int MAX_USERCOLORS = 5;
 
     @Inject
-    protected UISynchronizer synchronizer;
+    private UISynchronizer synchronizer;
 
     /* Dependencies */
     @Inject
-    protected Saros saros;
+    private Saros saros;
 
     /*
      * isn't it wonderful that the Saros session does not even know its own ID
      * ?!
      */
     @Inject
-    protected SessionIDObservable sessionIDObservable;
+    private SessionIDObservable sessionIDObservable;
 
     @Inject
-    protected ITransmitter transmitter;
+    private ITransmitter transmitter;
 
     @Inject
-    protected SarosNet sarosNet;
+    private SarosNet sarosNet;
 
     @Inject
-    protected PreferenceUtils preferenceUtils;
+    private PreferenceUtils preferenceUtils;
 
     @Inject
-    protected DataTransferManager transferManager;
+    private DataTransferManager transferManager;
 
     @Inject
-    protected ProjectNegotiationObservable projectNegotiationObservable;
+    private ProjectNegotiationObservable projectNegotiationObservable;
 
     @Inject
-    protected EditorManager editorManager;
+    private EditorManager editorManager;
 
-    protected final ISarosContext sarosContext;
+    private final ISarosContext sarosContext;
 
-    protected ConcurrentDocumentClient concurrentDocumentClient;
+    private ConcurrentDocumentClient concurrentDocumentClient;
 
-    protected ConcurrentDocumentServer concurrentDocumentServer;
+    private ConcurrentDocumentServer concurrentDocumentServer;
 
-    protected final CopyOnWriteArrayList<IActivityProvider> activityProviders = new CopyOnWriteArrayList<IActivityProvider>();
+    private ActivityHandler activityHandler;
 
-    private MappedList<String, IActivityDataObject> queuedActivities = new MappedList<String, IActivityDataObject>();
+    private final CopyOnWriteArrayList<IActivityProvider> activityProviders = new CopyOnWriteArrayList<IActivityProvider>();
+
+    private final MappedList<String, IActivityDataObject> queuedActivities = new MappedList<String, IActivityDataObject>();
 
     /* Instance fields */
-    protected User localUser;
+    private User localUser;
 
-    protected ConcurrentHashMap<JID, User> participants = new ConcurrentHashMap<JID, User>();
+    private final ConcurrentHashMap<JID, User> participants = new ConcurrentHashMap<JID, User>();
 
-    protected SharedProjectListenerDispatch listenerDispatch = new SharedProjectListenerDispatch();
+    private final SharedProjectListenerDispatch listenerDispatch = new SharedProjectListenerDispatch();
 
-    protected User host;
+    private User host;
 
-    protected FreeColors freeColors = null;
+    private FreeColors freeColors = null;
 
-    protected DateTime sessionStart;
+    private final DateTime sessionStart;
 
-    protected SarosProjectMapper projectMapper = new SarosProjectMapper();
-    protected boolean useVersionControl = true;
+    private final SarosProjectMapper projectMapper = new SarosProjectMapper();
 
-    protected List<IResource> selectedResources = new ArrayList<IResource>();
+    private boolean useVersionControl = true;
+
+    private List<IResource> selectedResources = new ArrayList<IResource>();
+
+    private MutablePicoContainer sessionContainer;
 
     private final IActivityListener activityListener = new IActivityListener() {
 
@@ -203,36 +207,26 @@ public class SarosSession implements ISarosSession, Disposable {
          */
         @Override
         public void activityCreated(final IActivity activityData) {
-            synchronizer.syncExec(Utils.wrapSafe(log, new Runnable() {
-
-                @Override
-                public void run() {
-                    handleActivityCreated(activityData);
-                }
-
-            }));
+            handleActivityCreated(activityData);
         }
     };
 
-    protected MutablePicoContainer sessionContainer;
+    private final IActivityHandlerCallback activityCallback = new IActivityHandlerCallback() {
 
-    public static class QueueItem {
-
-        public final List<User> recipients;
-        public final IActivity activity;
-
-        public QueueItem(List<User> recipients, IActivity activity) {
-            if (recipients.size() == 0)
-                log.fatal("Empty list of recipients in constructor", //$NON-NLS-1$
-                    new StackTrace());
-            this.recipients = recipients;
-            this.activity = activity;
+        @Override
+        public void send(List<User> recipients, IActivity activity) {
+            sendActivity(recipients, activity);
         }
 
-        public QueueItem(User host, IActivity activity) {
-            this(Collections.singletonList(host), activity);
+        @Override
+        public void execute(IActivity activity) {
+            for (IActivityProvider executor : activityProviders) {
+                executor.exec(activity);
+                handleFileAndFolderActivities(activity);
+            }
         }
-    }
+
+    };
 
     /**
      * Common constructor code for host and client side.
@@ -265,9 +259,6 @@ public class SarosSession implements ISarosSession, Disposable {
             log.debug("colorID " + colorID + " was removed from the pool");
         else
             log.warn("colorID " + colorID + " is not in the pool");
-
-        initializeSessionContainer(sarosContext);
-
     }
 
     /**
@@ -282,9 +273,7 @@ public class SarosSession implements ISarosSession, Disposable {
 
         participants.put(host.getJID(), host);
 
-        /** add host to {@link User.Permission#WRITE_ACCESS} list. */
-        concurrentDocumentServer = new ConcurrentDocumentServer(this);
-        concurrentDocumentClient = new ConcurrentDocumentClient(this);
+        initializeSessionContainer(sarosContext);
     }
 
     /**
@@ -333,7 +322,7 @@ public class SarosSession implements ISarosSession, Disposable {
         // participants.put(inviterID, inviter);
         // }
 
-        concurrentDocumentClient = new ConcurrentDocumentClient(this);
+        initializeSessionContainer(sarosContext);
     }
 
     @Override
@@ -688,19 +677,17 @@ public class SarosSession implements ISarosSession, Disposable {
         }
 
         sessionContainer.stop();
-        sarosContext.removeChildContainer(sessionContainer);
-
         stopped = true;
     }
 
     @Override
     public void dispose() {
-
-        if (concurrentDocumentServer != null) {
-            concurrentDocumentServer.dispose();
-        }
-        concurrentDocumentClient.dispose();
-
+        /*
+         * BUG in Pico Container 2.7 ... lifecycle will throw already disposed
+         * exception ... found no bug entry on http://jira.codehaus.org
+         */
+        // sessionContainer.dispose();
+        sarosContext.removeChildContainer(sessionContainer);
     }
 
     /**
@@ -757,6 +744,10 @@ public class SarosSession implements ISarosSession, Disposable {
 
     @Override
     public ConcurrentDocumentServer getConcurrentDocumentServer() {
+        if (!isHost())
+            throw new IllegalStateException(
+                "the session is running in client mode");
+
         return concurrentDocumentServer;
     }
 
@@ -793,84 +784,7 @@ public class SarosSession implements ISarosSession, Disposable {
     public void exec(List<IActivityDataObject> activityDataObjects) {
         // Convert me
         List<IActivity> activities = convertAndQueueProjectActivities(activityDataObjects);
-        if (isHost()) {
-            TransformationResult transformed = concurrentDocumentServer
-                .transformIncoming(activities);
-            activities = transformed.getLocalActivities();
-            for (QueueItem item : transformed.getSendToPeers()) {
-                sendActivity(item.recipients, item.activity);
-            }
-        }
-
-        execActivities(activities);
-    }
-
-    /**
-     * Starts a synchronous or asynchronous runnable to transform and execute
-     * incoming activities. The activityDispatcher was deleted, because the
-     * execution/transformation of an Activity was not started until the
-     * previous one was done. The asynchronous execution doesn't wait for the
-     * "return" from the previous Runnable, so the average time between arrival
-     * and execution of the incoming Activities drops. Incoming activities were
-     * transformed and executed too slow, so the users thought that it might
-     * have been an inconsistency.
-     * 
-     * <li><b>synchronous</b> processing is important during the invitation,
-     * because Saros is time-critical at this time. It will be aborted if the
-     * user takes to long to respond.</li>
-     * 
-     * <li><b>asynchronous</b> processing is used during the session. The async
-     * usage ensures that Saros gets more CPU time for transforming and
-     * executing of incoming activities. It will increase the throughput.</li>
-     * 
-     * If the invitation ends, an asynchronous runnable can just start, when the
-     * synchronous runnables have been finished. We don't need extra concurrent
-     * mechanisms to ensure that asynchronous Runnables do not influence the
-     * time-critical synchronous runnables during the invitation process.
-     * 
-     * @param activities
-     */
-    /*
-     * Note: transformation and executing has to be performed together in the
-     * SWT thread. Else, it would be possible that local activities are executed
-     * between transformation and application of remote operations. In other
-     * words, the transformation would be applied to an out-dated state.
-     */
-    protected void execActivities(final List<IActivity> activities) {
-        Runnable transformingRunnable = new Runnable() {
-            @Override
-            public void run() {
-                TransformationResult transformed = concurrentDocumentClient
-                    .transformIncoming(activities);
-                for (QueueItem item : transformed.getSendToPeers()) {
-                    sendActivity(item.recipients, item.activity);
-                }
-
-                for (final IActivity activity : transformed.executeLocally) {
-                    for (final IActivityProvider executor : activityProviders) {
-                        executor.exec(activity);
-                        handleFileAndFolderActivities(activity);
-                    }
-                }
-            }
-        };
-        /*
-         * FIXME The if-else-query and its change from synchronous usage to
-         * asynchronous shouldn't exist. A better solution would be a complete
-         * asynchronous handling.
-         * 
-         * HACK The change is needed, because the invitation couldn't be
-         * finished under the operating system Ubuntu, if an asynchronous
-         * handling was used
-         * 
-         * Stefan Rossbach: I think this HACK is NOT needed. There are no proofs
-         * that this will fail on Ubuntu !
-         */
-        if (projectNegotiationObservable.getProcesses().values().size() > 0) {
-            synchronizer.syncExec(Utils.wrapSafe(log, transformingRunnable));
-        } else {
-            synchronizer.asyncExec(Utils.wrapSafe(log, transformingRunnable));
-        }
+        activityHandler.handleIncomingActivities(activities);
     }
 
     private List<IActivity> convertAndQueueProjectActivities(
@@ -967,28 +881,13 @@ public class SarosSession implements ISarosSession, Disposable {
         handleActivityCreated(activity);
     }
 
-    /**
-     * @JTourBusStop 6, Activity sending, Transforming the IActivity:
-     * 
-     *               This function will transform activities and then forward
-     *               them to the ActivitySequencer. E.g. this will turn
-     *               TextEditActivity into Jupiter actitivities.
-     */
     private void handleActivityCreated(IActivity activity) {
 
-        assert SWTUtils.isSWT() : "Must be called from the SWT Thread"; //$NON-NLS-1$
-
         if (activity == null)
-            throw new IllegalArgumentException("Activity cannot be null"); //$NON-NLS-1$
-        /*
-         * Let ConcurrentDocumentManager have a look at the activities first
-         */
-        List<QueueItem> toSend = concurrentDocumentClient
-            .transformOutgoing(activity);
+            throw new NullPointerException("activity is null");
 
-        for (QueueItem item : toSend) {
-            sendActivity(item.recipients, item.activity);
-        }
+        activityHandler.handleOutgoingActivities(Collections
+            .singletonList(activity));
     }
 
     /**
@@ -1197,6 +1096,10 @@ public class SarosSession implements ISarosSession, Disposable {
         }
     }
 
+    /*
+     * FIXME: this needs a serious code review as Saros is not a single threaded
+     * application
+     */
     boolean toSend = true;
 
     /**
@@ -1531,6 +1434,15 @@ public class SarosSession implements ISarosSession, Disposable {
         sessionContainer.addComponent(StopManager.class);
         sessionContainer.addComponent(ActivitySequencer.class);
 
+        // Concurrent Editing
+
+        sessionContainer.addComponent(ConcurrentDocumentClient.class);
+        /*
+         * as Pico Container complains about null, just add the server even in
+         * client mode as it will not matter because it is not accessed
+         */
+        sessionContainer.addComponent(ConcurrentDocumentServer.class);
+
         // Classes belonging to a session
         sessionContainer.addComponent(PingPongCentral.class);
 
@@ -1560,9 +1472,23 @@ public class SarosSession implements ISarosSession, Disposable {
 
         // Handlers
         sessionContainer.addComponent(ConsistencyWatchdogHandler.class);
+        sessionContainer.addComponent(ActivityHandler.class);
+        sessionContainer.addComponent(activityCallback);
 
         // Force the creation of the above components.
         sessionContainer.getComponents();
+
+        concurrentDocumentServer = sessionContainer
+            .getComponent(ConcurrentDocumentServer.class);
+
+        concurrentDocumentClient = sessionContainer
+            .getComponent(ConcurrentDocumentClient.class);
+
+        activityHandler = sessionContainer.getComponent(ActivityHandler.class);
+
+        // ensure that the container uses caching
+        assert sessionContainer.getComponent(ActivityHandler.class) == sessionContainer
+            .getComponent(ActivityHandler.class) : "container is wrongly configurated - no cache support";
     }
 
     /**

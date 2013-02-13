@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.picocontainer.Disposable;
+import org.picocontainer.Startable;
 
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.User.Permission;
@@ -22,7 +22,7 @@ import de.fu_berlin.inf.dpp.concurrent.jupiter.TransformationException;
 import de.fu_berlin.inf.dpp.project.AbstractSharedProjectListener;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
-import de.fu_berlin.inf.dpp.project.internal.SarosSession.QueueItem;
+import de.fu_berlin.inf.dpp.project.internal.ActivityHandler.QueueItem;
 import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 
 /**
@@ -36,7 +36,7 @@ import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
  * ConcurrentDocumentClient to TextEditActivities to execute locally again as
  * well.
  */
-public class ConcurrentDocumentClient implements Disposable {
+public class ConcurrentDocumentClient implements Startable {
 
     private static Logger log = Logger
         .getLogger(ConcurrentDocumentClient.class);
@@ -55,11 +55,15 @@ public class ConcurrentDocumentClient implements Disposable {
         this.host = sarosSession.getHost();
         this.jupiterClient = new JupiterClient(sarosSession);
         this.projectListener = new ClientSideProjectListener();
+    }
+
+    @Override
+    public void start() {
         sarosSession.addListener(projectListener);
     }
 
     @Override
-    public void dispose() {
+    public void stop() {
         sarosSession.removeListener(projectListener);
     }
 

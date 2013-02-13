@@ -6,7 +6,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
-import org.picocontainer.Disposable;
+import org.picocontainer.Startable;
 
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.User.Permission;
@@ -22,7 +22,7 @@ import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.project.AbstractSharedProjectListener;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
-import de.fu_berlin.inf.dpp.project.internal.SarosSession.QueueItem;
+import de.fu_berlin.inf.dpp.project.internal.ActivityHandler.QueueItem;
 import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 import de.fu_berlin.inf.dpp.util.Utils;
 
@@ -36,7 +36,7 @@ import de.fu_berlin.inf.dpp.util.Utils;
  * 
  * A ConcurrentDocumentServer exists only on the host!
  */
-public class ConcurrentDocumentServer implements Disposable {
+public class ConcurrentDocumentServer implements Startable {
 
     private static Logger log = Logger
         .getLogger(ConcurrentDocumentServer.class);
@@ -45,28 +45,22 @@ public class ConcurrentDocumentServer implements Disposable {
 
     protected JupiterServer server;
 
-    /**
-     * Cached since it never changes
-     */
-    protected final User host;
-
     protected final ISharedProjectListener projectListener;
 
     public ConcurrentDocumentServer(ISarosSession sarosSession) {
 
-        if (!sarosSession.isHost())
-            throw new IllegalStateException();
-
         this.sarosSession = sarosSession;
-        this.host = sarosSession.getHost();
-
         this.server = new JupiterServer(sarosSession);
         this.projectListener = new HostSideProjectListener();
-        this.sarosSession.addListener(projectListener);
     }
 
     @Override
-    public void dispose() {
+    public void start() {
+        sarosSession.addListener(projectListener);
+    }
+
+    @Override
+    public void stop() {
         sarosSession.removeListener(projectListener);
     }
 
@@ -129,9 +123,9 @@ public class ConcurrentDocumentServer implements Disposable {
     public TransformationResult transformIncoming(
         List<IActivity> activityDataObjects) {
 
-        assert sarosSession.isHost() : "CDS.transformIncoming may not be called on the Client!!";
+        assert sarosSession.isHost() : "CDS.transformIncoming must not be called on the client";
 
-        assert !SWTUtils.isSWT() : "CDS.transformIncoming may not be called from SWT!!";
+        assert !SWTUtils.isSWT() : "CDS.transformIncoming must not be called from SWT";
 
         TransformationResult result = new TransformationResult(
             sarosSession.getLocalUser());
