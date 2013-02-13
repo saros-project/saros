@@ -62,6 +62,8 @@ import de.fu_berlin.inf.dpp.net.IConnectionListener;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.SarosNet;
 import de.fu_berlin.inf.dpp.net.internal.XMPPTransmitter;
+import de.fu_berlin.inf.dpp.observables.InvitationProcessObservable;
+import de.fu_berlin.inf.dpp.observables.ProjectNegotiationObservable;
 import de.fu_berlin.inf.dpp.observables.SarosSessionObservable;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
@@ -70,7 +72,6 @@ import de.fu_berlin.inf.dpp.ui.ImageManager;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
 import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 import de.fu_berlin.inf.dpp.ui.views.SarosView;
-import de.fu_berlin.inf.dpp.util.StackTrace;
 import de.fu_berlin.inf.dpp.util.Utils;
 import de.fu_berlin.inf.dpp.util.VersionManager;
 import de.fu_berlin.inf.dpp.util.VersionManager.VersionInfo;
@@ -90,6 +91,8 @@ public class SarosSessionManager implements ISarosSessionManager {
     private static final Random SESSION_ID_GENERATOR = new Random();
 
     private static final long LOCK_TIMEOUT = 10000L;
+
+    private static final long NEGOTIATION_PROCESS_TIMEOUT = 10000L;
 
     @Inject
     private SarosSessionObservable sarosSessionObservable;
@@ -112,6 +115,12 @@ public class SarosSessionManager implements ISarosSessionManager {
 
     @Inject
     private SarosUI sarosUI;
+
+    @Inject
+    private InvitationProcessObservable currentSessionNegotiations;
+
+    @Inject
+    private ProjectNegotiationObservable currentProjectNeogtiations;
 
     private SarosNet sarosNet;
 
@@ -248,10 +257,7 @@ public class SarosSessionManager implements ISarosSessionManager {
     @Override
     public void stopSarosSession() {
 
-        if (SWTUtils.isSWT()) {
-            log.warn("stopSarosSession should not be called from SWT",
-                new StackTrace());
-        }
+        assert !SWTUtils.isSWT() : "stopSarosSession must not be called from SWT";
 
         try {
             if (!startStopSessionLock.tryLock(LOCK_TIMEOUT,
@@ -278,6 +284,11 @@ public class SarosSessionManager implements ISarosSessionManager {
                 throw new IllegalStateException(
                     "cannot stop the session from the same thread context that is currently about to start the session: "
                         + Thread.currentThread().getName());
+
+            log.debug("terminating all running negotiation processes");
+
+            if (!terminateNegotiationProcesses())
+                log.warn("there are still running negotiation processes");
 
             sessionEnding(sarosSession);
 
@@ -327,16 +338,28 @@ public class SarosSessionManager implements ISarosSessionManager {
         String invitationID, DateTime sessionStart, VersionInfo versionInfo,
         String description) {
 
-        /*
-         * Side effect ! Setting the sessionID will reject further invitation
-         * requests
-         */
+        if (!startStopSessionLock.tryLock()) {
+            log.warn("could not accept invitation because the current session is about to stop");
+            return;
+        }
 
-        this.sessionID.setValue(sessionID);
+        IncomingSessionNegotiation process;
 
-        final IncomingSessionNegotiation process = new IncomingSessionNegotiation(
-            this, from, versionManager, versionInfo, sessionStart,
-            invitationID, description, sarosContext);
+        try {
+            /*
+             * Side effect ! Setting the sessionID will reject further
+             * invitation requests
+             */
+
+            this.sessionID.setValue(sessionID);
+
+            // side effect in InvitationProcessObservable
+            process = new IncomingSessionNegotiation(this, from,
+                versionManager, versionInfo, sessionStart, invitationID,
+                description, sarosContext);
+        } finally {
+            startStopSessionLock.unlock();
+        }
 
         process.acknowledgeInvitation();
         sarosUI.showIncomingInvitationUI(process, true);
@@ -357,8 +380,20 @@ public class SarosSessionManager implements ISarosSessionManager {
     public void incomingProjectReceived(JID from,
         List<ProjectExchangeInfo> projectInfos, String processID) {
 
-        IncomingProjectNegotiation process = new IncomingProjectNegotiation(
-            getSarosSession(), from, processID, projectInfos, sarosContext);
+        if (!startStopSessionLock.tryLock()) {
+            log.warn("could not accept project negotation because the current session is about to stop");
+            return;
+        }
+
+        IncomingProjectNegotiation process;
+
+        try {
+            // side effect in ProjectNegotiationObservable
+            process = new IncomingProjectNegotiation(getSarosSession(), from,
+                processID, projectInfos, sarosContext);
+        } finally {
+            startStopSessionLock.unlock();
+        }
 
         sarosUI.showIncomingProjectUI(process);
     }
@@ -367,8 +402,20 @@ public class SarosSessionManager implements ISarosSessionManager {
     public void invite(JID toInvite, String description) {
         ISarosSession sarosSession = sarosSessionObservable.getValue();
 
-        OutgoingSessionNegotiation result = new OutgoingSessionNegotiation(
-            toInvite, sarosSession, description, sarosContext);
+        if (!startStopSessionLock.tryLock()) {
+            log.warn("could not start an invitation because the current session is about to stop");
+            return;
+        }
+
+        OutgoingSessionNegotiation result;
+
+        try {
+            // side effect in InvitationProcessObservable
+            result = new OutgoingSessionNegotiation(toInvite, sarosSession,
+                description, sarosContext);
+        } finally {
+            startStopSessionLock.unlock();
+        }
 
         OutgoingInvitationJob outgoingInvitationJob = new OutgoingInvitationJob(
             result);
@@ -393,18 +440,10 @@ public class SarosSessionManager implements ISarosSessionManager {
      * interrupts the process if the session closes.
      * 
      */
-    protected class OutgoingInvitationJob extends Job {
+    private class OutgoingInvitationJob extends Job {
 
-        protected OutgoingSessionNegotiation process;
-        protected String peer;
-        protected ISarosSessionListener cancelListener = new AbstractSarosSessionListener() {
-
-            @Override
-            public void sessionEnded(ISarosSession oldSharedProject) {
-                process.localCancel(null, CancelOption.NOTIFY_PEER);
-            }
-
-        };
+        private OutgoingSessionNegotiation process;
+        private String peer;
 
         public OutgoingInvitationJob(OutgoingSessionNegotiation process) {
             super(MessageFormat.format(
@@ -413,7 +452,8 @@ public class SarosSessionManager implements ISarosSessionManager {
                         .getSarosNet(), process.getPeer())));
             this.process = process;
             this.peer = process.getPeer().getBase();
-            this.setUser(true);
+
+            setUser(true);
             setProperty(IProgressConstants.KEEP_PROPERTY, Boolean.TRUE);
             setProperty(IProgressConstants.ICON_PROPERTY,
                 ImageManager
@@ -423,7 +463,6 @@ public class SarosSessionManager implements ISarosSessionManager {
         @Override
         protected IStatus run(IProgressMonitor monitor) {
             try {
-                registerCancelListener();
                 InvitationProcess.Status status = process.start(monitor);
 
                 switch (status) {
@@ -472,21 +511,11 @@ public class SarosSessionManager implements ISarosSessionManager {
                 log.error("This exception is not expected here: ", e);
                 return new Status(IStatus.ERROR, Saros.SAROS, e.getMessage(), e);
 
-            } finally {
-                releaseCancelListener();
             }
 
             startSharingProjects(process.getPeer());
 
             return Status.OK_STATUS;
-        }
-
-        protected void registerCancelListener() {
-            SarosSessionManager.this.addSarosSessionListener(cancelListener);
-        }
-
-        protected void releaseCancelListener() {
-            SarosSessionManager.this.removeSarosSessionListener(cancelListener);
         }
     }
 
@@ -548,14 +577,24 @@ public class SarosSessionManager implements ISarosSessionManager {
             return;
         }
 
-        for (User user : session.getRemoteUsers()) {
+        if (!startStopSessionLock.tryLock()) {
+            log.warn("could not start a project negotiation because the current session is about to stop");
+            return;
+        }
 
-            OutgoingProjectNegotiation out = new OutgoingProjectNegotiation(
-                user.getJID(), session, projectsToShare, sarosContext);
+        try {
+            for (User user : session.getRemoteUsers()) {
 
-            OutgoingProjectJob job = new OutgoingProjectJob(out);
-            job.setPriority(Job.SHORT);
-            job.schedule();
+                // side effect in ProjectNegotiationObservable
+                OutgoingProjectNegotiation out = new OutgoingProjectNegotiation(
+                    user.getJID(), session, projectsToShare, sarosContext);
+
+                OutgoingProjectJob job = new OutgoingProjectJob(out);
+                job.setPriority(Job.SHORT);
+                job.schedule();
+            }
+        } finally {
+            startStopSessionLock.unlock();
         }
     }
 
@@ -583,39 +622,37 @@ public class SarosSessionManager implements ISarosSessionManager {
         if (currentSharedProjects.isEmpty())
             return;
 
-        OutgoingProjectNegotiation out = new OutgoingProjectNegotiation(user,
-            session, currentSharedProjects, sarosContext);
+        if (!startStopSessionLock.tryLock()) {
+            log.warn("could not start a project negotiation because the current session is about to stop");
+            return;
+        }
 
+        OutgoingProjectNegotiation out;
+        try {
+            // side effect in ProjectNegotiationObservable
+            out = new OutgoingProjectNegotiation(user, session,
+                currentSharedProjects, sarosContext);
+        } finally {
+            startStopSessionLock.unlock();
+        }
         OutgoingProjectJob job = new OutgoingProjectJob(out);
         job.setPriority(Job.SHORT);
         job.schedule();
 
     }
 
-    protected class OutgoingProjectJob extends Job {
+    private class OutgoingProjectJob extends Job {
 
-        protected OutgoingProjectNegotiation process;
-        protected String peer;
-        protected ISarosSessionListener cancelListener = new AbstractSarosSessionListener() {
-
-            @Override
-            public void sessionEnded(ISarosSession oldSharedProject) {
-                process.localCancel(null, CancelOption.NOTIFY_PEER);
-            }
-
-        };
-
-        @Override
-        public boolean belongsTo(Object family) {
-            return family.equals("invitational");
-        }
+        private OutgoingProjectNegotiation process;
+        private String peer;
 
         public OutgoingProjectJob(
             OutgoingProjectNegotiation outgoingProjectNegotiation) {
             super(Messages.SarosSessionManager_sharing_project);
-            this.process = outgoingProjectNegotiation;
-            this.peer = process.getPeer().getBase();
-            this.setUser(true);
+            process = outgoingProjectNegotiation;
+            peer = process.getPeer().getBase();
+
+            setUser(true);
             setProperty(IProgressConstants.KEEP_PROPERTY, Boolean.TRUE);
             setProperty(IProgressConstants.ICON_PROPERTY,
                 ImageManager.getImageDescriptor("/icons/invites.png"));
@@ -624,7 +661,6 @@ public class SarosSessionManager implements ISarosSessionManager {
         @Override
         protected IStatus run(IProgressMonitor monitor) {
             try {
-                registerCancelListener();
                 ProjectNegotiation.Status status = process.start(monitor);
 
                 ISarosSession session = getSarosSession();
@@ -672,36 +708,26 @@ public class SarosSessionManager implements ISarosSessionManager {
                 log.error("This exception is not expected here: ", e);
                 return new Status(IStatus.ERROR, Saros.SAROS, e.getMessage(), e);
 
-            } finally {
-                releaseCancelListener();
             }
 
             return Status.OK_STATUS;
-        }
-
-        protected void registerCancelListener() {
-            SarosSessionManager.this.addSarosSessionListener(cancelListener);
-        }
-
-        protected void releaseCancelListener() {
-            SarosSessionManager.this.removeSarosSessionListener(cancelListener);
         }
     }
 
     @Override
     public void addSarosSessionListener(ISarosSessionListener listener) {
-        this.sarosSessionListeners.add(listener);
+        sarosSessionListeners.add(listener);
     }
 
     @Override
     public void removeSarosSessionListener(ISarosSessionListener listener) {
-        this.sarosSessionListeners.remove(listener);
+        sarosSessionListeners.remove(listener);
     }
 
     @Override
     public void preIncomingInvitationCompleted(IProgressMonitor monitor) {
         try {
-            for (ISarosSessionListener sarosSessionListener : this.sarosSessionListeners) {
+            for (ISarosSessionListener sarosSessionListener : sarosSessionListeners) {
                 sarosSessionListener.preIncomingInvitationCompleted(monitor);
             }
         } catch (RuntimeException e) {
@@ -714,7 +740,7 @@ public class SarosSessionManager implements ISarosSessionManager {
     public void postOutgoingInvitationCompleted(IProgressMonitor monitor,
         User user) {
         try {
-            for (ISarosSessionListener sarosSessionListener : this.sarosSessionListeners) {
+            for (ISarosSessionListener sarosSessionListener : sarosSessionListeners) {
                 sarosSessionListener.postOutgoingInvitationCompleted(monitor,
                     user);
             }
@@ -727,58 +753,89 @@ public class SarosSessionManager implements ISarosSessionManager {
     @Override
     public void sessionStarting(ISarosSession sarosSession) {
         try {
-            for (ISarosSessionListener sarosSessionListener : this.sarosSessionListeners) {
+            for (ISarosSessionListener sarosSessionListener : sarosSessionListeners) {
                 sarosSessionListener.sessionStarting(sarosSession);
             }
         } catch (RuntimeException e) {
-            log.error("Internal error in notifying listener"
-                + " of SarosSession starting: ", e);
+            log.error("error in notifying listener of session starting: ", e);
         }
     }
 
     @Override
     public void sessionStarted(ISarosSession sarosSession) {
-        for (ISarosSessionListener sarosSessionListener : this.sarosSessionListeners) {
+        for (ISarosSessionListener sarosSessionListener : sarosSessionListeners) {
             try {
                 sarosSessionListener.sessionStarted(sarosSession);
             } catch (RuntimeException e) {
-                log.error("Internal error in notifying listener"
-                    + " of SarosSession start: ", e);
+                log.error("error in notifying listener of session start: ", e);
             }
         }
     }
 
     private void sessionEnding(ISarosSession sarosSession) {
-        for (ISarosSessionListener saroSessionListener : this.sarosSessionListeners) {
+        for (ISarosSessionListener saroSessionListener : sarosSessionListeners) {
             try {
                 saroSessionListener.sessionEnding(sarosSession);
             } catch (RuntimeException e) {
-                log.error("Internal error in notifying listener"
-                    + " of SarosSession ending: ", e);
+                log.error("error in notifying listener of session ending: ", e);
             }
         }
     }
 
     private void sessionEnded(ISarosSession sarosSession) {
-        for (ISarosSessionListener listener : this.sarosSessionListeners) {
+        for (ISarosSessionListener listener : sarosSessionListeners) {
             try {
                 listener.sessionEnded(sarosSession);
             } catch (RuntimeException e) {
-                log.error("Internal error in notifying listener"
-                    + " of SarosSession end: ", e);
+                log.error("error in notifying listener of session end: ", e);
             }
         }
     }
 
     @Override
     public void projectAdded(String projectID) {
-        for (ISarosSessionListener listener : this.sarosSessionListeners) {
+        for (ISarosSessionListener listener : sarosSessionListeners) {
             try {
                 listener.projectAdded(projectID);
             } catch (RuntimeException e) {
-                log.error("Internal error in notifying listener"
-                    + " of an added project: ", e);
+                log.error("error in notifying listener of an added project: ",
+                    e);
             }
         }
+    }
+
+    private boolean terminateNegotiationProcesses() {
+
+        for (InvitationProcess process : currentSessionNegotiations
+            .getProcesses()) {
+            process.localCancel(null, CancelOption.NOTIFY_PEER);
+        }
+
+        for (ProjectNegotiation process : currentProjectNeogtiations
+            .getProcesses().values())
+            process.localCancel(null, CancelOption.NOTIFY_PEER);
+
+        log.trace("waiting for all invitation and project negotiation processes to terminate");
+
+        long startTime = System.currentTimeMillis();
+
+        boolean terminated = false;
+
+        while (System.currentTimeMillis() - startTime < NEGOTIATION_PROCESS_TIMEOUT) {
+            if (currentSessionNegotiations.getProcesses().isEmpty()
+                && currentProjectNeogtiations.getProcesses().isEmpty()) {
+                terminated = true;
+                break;
+            }
+
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                break;
+            }
+        }
+
+        return terminated;
     }
 }
