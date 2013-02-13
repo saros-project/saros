@@ -41,6 +41,9 @@ public final class OutgoingSessionNegotiation extends InvitationProcess {
     private static final Logger log = Logger
         .getLogger(OutgoingSessionNegotiation.class);
 
+    private static final boolean IGNORE_VERSION_COMPATIBILITY = Boolean
+        .getBoolean("de.fu_berlin.inf.dpp.invitation.session.IGNORE_VERSION_COMPATIBILITY");
+
     private static final Random INVITATION_ID_GENERATOR = new Random();
 
     private static final Object SESSION_JOIN_LOCK = new Object();
@@ -207,20 +210,27 @@ public final class OutgoingSessionNegotiation extends InvitationProcess {
                 this.versionInfo = versionInfo;
             } else {
                 log.debug(this + " : Saros versions are not compatible");
-                if (DialogUtils.confirmVersionConflict(versionInfo, peer,
-                    versionManager.getVersion()))
+                if (IGNORE_VERSION_COMPATIBILITY
+                    && DialogUtils.confirmVersionConflict(versionInfo, peer,
+                        versionManager.getVersion()))
                     this.versionInfo = versionInfo;
                 else {
-                    throw new LocalCancellationException(null,
+                    throw new LocalCancellationException(
+                        "The Saros plugin of "
+                            + peerNickname
+                            + " (Version "
+                            + versionInfo.version
+                            + ") is not compatible with your installed Saros plugin (Version "
+                            + versionManager.getVersion().toString() + ")",
                         CancelOption.DO_NOT_NOTIFY_PEER);
                 }
             }
         } else {
             log.debug(this + " : could not obtain remote version information");
-            if (!DialogUtils.confirmUnknownVersion(peer,
-                versionManager.getVersion()))
-                throw new LocalCancellationException(null,
-                    CancelOption.DO_NOT_NOTIFY_PEER);
+            throw new LocalCancellationException(
+                "Could not obtain the version of the Saros plugin from "
+                    + peerNickname + ". Please try again.",
+                CancelOption.DO_NOT_NOTIFY_PEER);
         }
     }
 

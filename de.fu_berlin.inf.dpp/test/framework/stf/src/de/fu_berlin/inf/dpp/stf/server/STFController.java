@@ -136,6 +136,12 @@ public class STFController {
             preferenceStore.setDefault(PreferenceConstants.STOP_EMPTY_SESSIONS,
                 "true");
 
+        System
+            .getProperties()
+            .put(
+                "de.fu_berlin.inf.dpp.invitation.session.IGNORE_VERSION_COMPATIBILITY",
+                "true");
+
         try {
             registry = LocateRegistry.createRegistry(port);
         } catch (RemoteException e) {
