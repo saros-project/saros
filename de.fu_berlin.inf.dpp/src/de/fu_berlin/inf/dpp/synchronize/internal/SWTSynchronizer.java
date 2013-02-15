@@ -28,12 +28,16 @@ public class SWTSynchronizer implements UISynchronizer {
         display.syncExec(runnable);
     }
 
-    private Display getDisplay() {
-        Display display = Display.getCurrent();
-        if (display == null)
-            display = Display.getDefault();
-
-        return display;
+    @Override
+    public boolean isUIThread() {
+        return Thread.currentThread() == getDisplay().getThread();
     }
 
+    /*
+     * always return the default display as some OS like Windows have the
+     * capability to support multiple displays.
+     */
+    private Display getDisplay() {
+        return Display.getDefault();
+    }
 }

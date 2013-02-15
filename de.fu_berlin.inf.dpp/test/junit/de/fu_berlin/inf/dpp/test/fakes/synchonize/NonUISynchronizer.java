@@ -5,6 +5,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.TimeUnit;
 
 import org.picocontainer.Disposable;
 import org.picocontainer.Startable;
@@ -25,12 +26,26 @@ public class NonUISynchronizer implements UISynchronizer, Startable, Disposable 
         excecutor = Executors.newSingleThreadExecutor(new ThreadFactory() {
 
             @Override
-            public Thread newThread(Runnable arg0) {
-                fakedGUIThread = new Thread();
+            public Thread newThread(Runnable runnable) {
+                fakedGUIThread = new Thread(runnable);
                 fakedGUIThread.setName("GUI-THREAD");
                 return fakedGUIThread;
             }
         });
+
+        Future<?> execution = excecutor.submit(new Runnable() {
+
+            @Override
+            public void run() {
+                // NOP ensure executor is running and created the thread
+            }
+        });
+
+        try {
+            execution.get(10000, TimeUnit.MILLISECONDS);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
@@ -71,7 +86,6 @@ public class NonUISynchronizer implements UISynchronizer, Startable, Disposable 
                 runnable.run();
                 return;
             }
-
             execution = excecutor.submit(runnable);
         }
 
@@ -91,5 +105,10 @@ public class NonUISynchronizer implements UISynchronizer, Startable, Disposable 
         } finally {
             super.finalize();
         }
+    }
+
+    @Override
+    public synchronized boolean isUIThread() {
+        return Thread.currentThread() == fakedGUIThread;
     }
 }
