@@ -65,8 +65,7 @@ public interface ISarosSessionManager {
     public void stopSarosSession();
 
     /**
-     * Add the given session listener. Is ignored if the listener is already
-     * listening.
+     * Add the given session listener.
      * 
      * @param listener
      *            the listener that is to be added.
@@ -74,8 +73,7 @@ public interface ISarosSessionManager {
     public void addSarosSessionListener(ISarosSessionListener listener);
 
     /**
-     * Removes the given session listener. Is ignored if the given listener
-     * wasn't listening.
+     * Removes the given session listener.
      * 
      * @param listener
      *            the listener that is to be removed.
