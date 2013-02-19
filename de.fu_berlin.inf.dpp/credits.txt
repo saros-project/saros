@@ -28,17 +28,20 @@ Saros team over the years and have contributed to the product:
 	* Björn Kahlert
 	* Christian Dohnert
 	* Christoph Jacob
+	* Christoph Viebig
 	* Christopher Oezbek
 	* Edna Rosen
 	* Eike Starkmann
 	* Florian Pütz
 	* Florian Thiel
 	* Franz Zieris	
+	* Hans-Christian Halfbrodt
 	* Hendrik Degener
 	* Henning Staib
 	* Holger Hans Peter Freyther   	
 	* Karl Beecher
 	* Karl Held
+	* Kevin Funk
 	* Lin Chen
 	* Lisa Dohrmann
 	* Marc Rintsch
@@ -51,6 +54,7 @@ Saros team over the years and have contributed to the product:
 	* Olaf Loga
 	* Oliver Rieger
 	* Patrick Bitterling
+	* Patrick Schlott
 	* Patrick Steinhardt
 	* Philipp Cordes
 	* Riad Djemili
