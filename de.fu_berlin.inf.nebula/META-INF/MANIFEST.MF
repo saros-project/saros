@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Saros Nebula
 Bundle-SymbolicName: de.fu_berlin.inf.nebula
-Bundle-Version: 12.10.26.DEVEL
+Bundle-Version: 13.3.29.DEVEL
 Bundle-Activator: de.fu_berlin.inf.nebula.Activator
 Bundle-Vendor: Freie Universität Berlin
 Require-Bundle: org.eclipse.ui,
