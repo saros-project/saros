@@ -19,7 +19,6 @@
  */
 package de.fu_berlin.inf.dpp.project;
 
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
@@ -51,10 +50,10 @@ import de.fu_berlin.inf.dpp.synchronize.StopManager;
 public interface ISarosSession {
 
     /**
-     * @return a collection of all participants of the current session which
-     *         includes the local user too
+     * @return a list of all participants of the current session which includes
+     *         the local user too
      */
-    public Collection<User> getParticipants();
+    public List<User> getParticipants();
 
     /**
      * @return a collection of all remote participants of the current session

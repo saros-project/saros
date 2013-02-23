@@ -1,6 +1,5 @@
 package de.fu_berlin.inf.dpp.serviceProviders;
 
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
@@ -40,7 +39,7 @@ public class NullSarosSession implements ISarosSession {
     private Logger log = Logger.getLogger(NullSarosSession.class);
 
     @Override
-    public Collection<User> getParticipants() {
+    public List<User> getParticipants() {
         log.warn("unexpected method call");
         return null;
     }

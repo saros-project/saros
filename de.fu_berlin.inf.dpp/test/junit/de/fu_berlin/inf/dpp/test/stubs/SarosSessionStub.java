@@ -1,6 +1,5 @@
 package de.fu_berlin.inf.dpp.test.stubs;
 
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
@@ -184,7 +183,7 @@ public class SarosSessionStub implements ISarosSession {
     }
 
     @Override
-    public Collection<User> getParticipants() {
+    public List<User> getParticipants() {
         throw new RuntimeException("Unexpected call to Stub");
     }
 

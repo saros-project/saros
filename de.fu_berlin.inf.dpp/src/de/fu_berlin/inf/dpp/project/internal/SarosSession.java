@@ -359,8 +359,8 @@ public final class SarosSession implements ISarosSession, Disposable {
     }
 
     @Override
-    public Collection<User> getParticipants() {
-        return participants.values();
+    public List<User> getParticipants() {
+        return new ArrayList<User>(participants.values());
     }
 
     @Override
