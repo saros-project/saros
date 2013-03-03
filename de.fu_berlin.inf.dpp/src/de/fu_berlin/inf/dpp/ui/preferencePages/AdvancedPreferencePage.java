@@ -47,6 +47,18 @@ public class AdvancedPreferencePage extends FieldEditorPreferencePage implements
 
         assert (debugMode = true) == true;
 
+        BooleanFieldEditor fieldEditor = new BooleanFieldEditor(
+            PreferenceConstants.SHOW_CONTRIBUTION_ANNOTATIONS,
+            Messages.AdvancedPreferencePage_show_contribution_annotations,
+            getFieldEditorParent());
+
+        fieldEditor
+            .getDescriptionControl(getFieldEditorParent())
+            .setToolTipText(
+                Messages.AdvancedPreferencePage_show_contribution_annotations_tooltip);
+
+        addField(fieldEditor);
+
         addField(new BooleanFieldEditor(
             PreferenceConstants.ENABLE_BALLOON_NOTIFICATION,
             Messages.AdvancedPreferencePage_enable_balloon_notifications,
@@ -73,7 +85,6 @@ public class AdvancedPreferencePage extends FieldEditorPreferencePage implements
 
         addField(new BooleanFieldEditor(PreferenceConstants.VOIP_ENABLED,
             Messages.AdvancedPreferencePage_enable_voip, getFieldEditorParent()));
-
     }
 
     @Override

@@ -37,6 +37,8 @@ public class Messages extends NLS {
     public static String AdvancedPreferencePage_ping_pong;
     public static String AdvancedPreferencePage_show_xmpp_debug;
     public static String AdvancedPreferencePage_enable_balloon_notifications;
+    public static String AdvancedPreferencePage_show_contribution_annotations;
+    public static String AdvancedPreferencePage_show_contribution_annotations_tooltip;
     public static String AdvancedPreferencePage_skip_synchronization;
     public static String AdvancedPreferencePage_enable_videosharing;
     public static String AdvancedPreferencePage_enable_voip;

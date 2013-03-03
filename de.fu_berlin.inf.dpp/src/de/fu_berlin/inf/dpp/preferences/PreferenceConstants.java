@@ -241,4 +241,9 @@ public class PreferenceConstants {
      */
     public static final String FAVORITE_SESSION_COLOR_ID = "favorite.session.color.id";
 
+    /*
+     * Annotation stuff for the editor
+     */
+
+    public static final String SHOW_CONTRIBUTION_ANNOTATIONS = "editor.annotation.contribution.enabled";
 }

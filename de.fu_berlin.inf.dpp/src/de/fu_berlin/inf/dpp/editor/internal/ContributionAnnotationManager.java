@@ -7,14 +7,20 @@ import java.util.Map;
 import java.util.Queue;
 
 import org.apache.log4j.Logger;
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.text.Position;
 import org.eclipse.jface.text.source.Annotation;
 import org.eclipse.jface.text.source.IAnnotationModel;
+import org.eclipse.jface.util.IPropertyChangeListener;
+import org.eclipse.jface.util.PropertyChangeEvent;
 
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.editor.annotations.ContributionAnnotation;
+import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
 import de.fu_berlin.inf.dpp.project.AbstractSharedProjectListener;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
+import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
+import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 
 /**
  * This class keeps a history of added {@link ContributionAnnotation}s and
@@ -27,27 +33,56 @@ public class ContributionAnnotationManager {
 
     private static int MAX_HISTORY_LENGTH = 20;
 
-    protected Map<User, Queue<ContributionAnnotation>> sourceToHistory = new HashMap<User, Queue<ContributionAnnotation>>();
+    private final Map<User, Queue<ContributionAnnotation>> sourceToHistory = new HashMap<User, Queue<ContributionAnnotation>>();
 
-    protected SharedProjectListener sharedProjectListener = new SharedProjectListener();
+    private final ISarosSession sarosSession;
 
-    protected class SharedProjectListener extends AbstractSharedProjectListener {
+    private final IPreferenceStore preferenceStore;
+
+    private boolean contribtionAnnotationsEnabled;
+
+    private final ISharedProjectListener sharedProjectListener = new AbstractSharedProjectListener() {
         @Override
         public void userLeft(User user) {
             /*
              * Just remove the annotations from the history. They are removed by
              * the EditorManager from the editors.
              */
-            ContributionAnnotationManager.this.sourceToHistory.remove(user);
+            sourceToHistory.remove(user);
         }
-    }
+    };
 
-    ISarosSession sarosSession;
+    private final IPropertyChangeListener propertyChangeListener = new IPropertyChangeListener() {
 
-    public ContributionAnnotationManager(ISarosSession sarosSession) {
+        @Override
+        public void propertyChange(final PropertyChangeEvent event) {
+
+            if (!PreferenceConstants.SHOW_CONTRIBUTION_ANNOTATIONS.equals(event
+                .getProperty()))
+                return;
+
+            SWTUtils.runSafeSWTAsync(log, new Runnable() {
+
+                @Override
+                public void run() {
+                    contribtionAnnotationsEnabled = Boolean.valueOf(event
+                        .getNewValue().toString());
+
+                    if (!contribtionAnnotationsEnabled)
+                        removeAllAnnotations();
+                }
+            });
+        }
+    };
+
+    public ContributionAnnotationManager(ISarosSession sarosSession,
+        IPreferenceStore preferenceStore) {
         this.sarosSession = sarosSession;
-        sharedProjectListener = new SharedProjectListener();
-        sarosSession.addListener(sharedProjectListener);
+        this.preferenceStore = preferenceStore;
+        this.preferenceStore.addPropertyChangeListener(propertyChangeListener);
+        this.sarosSession.addListener(sharedProjectListener);
+        contribtionAnnotationsEnabled = this.preferenceStore
+            .getBoolean(PreferenceConstants.SHOW_CONTRIBUTION_ANNOTATIONS);
     }
 
     /**
@@ -67,6 +102,9 @@ public class ContributionAnnotationManager {
     @SuppressWarnings("unchecked")
     public void insertAnnotation(IAnnotationModel model, int offset,
         int length, User source) {
+
+        if (!contribtionAnnotationsEnabled)
+            return;
 
         if (length > 0) {
             /* Return early if there already is an annotation at that offset */
@@ -101,6 +139,10 @@ public class ContributionAnnotationManager {
 
     @SuppressWarnings("unchecked")
     public void splitAnnotation(IAnnotationModel model, int offset) {
+
+        if (!contribtionAnnotationsEnabled)
+            return;
+
         for (Iterator<Annotation> it = model.getAnnotationIterator(); it
             .hasNext();) {
             Annotation annotation = it.next();
@@ -142,7 +184,8 @@ public class ContributionAnnotationManager {
     }
 
     public void dispose() {
-        this.sarosSession.removeListener(sharedProjectListener);
+        sarosSession.removeListener(sharedProjectListener);
+        preferenceStore.removePropertyChangeListener(propertyChangeListener);
         sourceToHistory.clear();
     }
 
@@ -153,7 +196,7 @@ public class ContributionAnnotationManager {
      *            source of the user who's history we want.
      * @return the history of source.
      */
-    protected Queue<ContributionAnnotation> getHistory(User source) {
+    private Queue<ContributionAnnotation> getHistory(User source) {
         Queue<ContributionAnnotation> result = sourceToHistory.get(source);
         if (result == null) {
             result = new LinkedList<ContributionAnnotation>();
@@ -167,7 +210,7 @@ public class ContributionAnnotationManager {
      * the history of the associated user. Old entries are removed from the
      * history and the annotation model.
      */
-    protected void addContributionAnnotation(ContributionAnnotation annotation,
+    private void addContributionAnnotation(ContributionAnnotation annotation,
         Position position) {
 
         annotation.getModel().addAnnotation(annotation, position);
@@ -186,8 +229,14 @@ public class ContributionAnnotationManager {
      * 
      * @param annotation
      */
-    protected void removeFromHistory(ContributionAnnotation annotation) {
+    private void removeFromHistory(ContributionAnnotation annotation) {
         getHistory(annotation.getSource()).remove(annotation);
         annotation.getModel().removeAnnotation(annotation);
+    }
+
+    private void removeAllAnnotations() {
+        for (Queue<ContributionAnnotation> queue : sourceToHistory.values())
+            while (!queue.isEmpty())
+                removeFromHistory(queue.peek());
     }
 }

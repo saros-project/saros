@@ -36,6 +36,7 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITextSelection;
@@ -135,6 +136,8 @@ public class EditorManager extends AbstractActivityProvider {
     protected SharedEditorListenerDispatch editorListenerDispatch = new SharedEditorListenerDispatch();
 
     protected IEditorAPI editorAPI;
+
+    protected final IPreferenceStore preferenceStore;
 
     protected RemoteEditorManager remoteEditorManager;
 
@@ -309,7 +312,7 @@ public class EditorManager extends AbstractActivityProvider {
 
             sarosSession.addActivityProvider(EditorManager.this);
             contributionAnnotationManager = new ContributionAnnotationManager(
-                newSarosSession);
+                newSarosSession, preferenceStore);
             remoteEditorManager = new RemoteEditorManager(sarosSession);
             remoteWriteAccessManager = new RemoteWriteAccessManager(
                 sarosSession);
@@ -446,11 +449,12 @@ public class EditorManager extends AbstractActivityProvider {
      * @Inject
      */
     public EditorManager(ISarosSessionManager sessionManager,
-        EditorAPI editorApi) {
+        EditorAPI editorApi, IPreferenceStore preferenceStore) {
 
         log.trace("EditorManager initialized");
 
         editorAPI = editorApi;
+        this.preferenceStore = preferenceStore;
         sessionManager.addSarosSessionListener(this.sessionListener);
         addSharedEditorListener(sharedEditorListener);
     }
