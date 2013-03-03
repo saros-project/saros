@@ -29,12 +29,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.PriorityQueue;
-import java.util.Timer;
-import java.util.TimerTask;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -58,7 +55,6 @@ import de.fu_berlin.inf.dpp.net.business.DispatchThreadContext;
 import de.fu_berlin.inf.dpp.net.internal.extensions.ActivitiesExtension;
 import de.fu_berlin.inf.dpp.observables.ProjectNegotiationObservable;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
-import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.util.ActivityUtils;
@@ -81,13 +77,6 @@ public class ActivitySequencer implements Startable {
 
     private static final Logger log = Logger.getLogger(ActivitySequencer.class
         .getName());
-
-    /**
-     * Number of milliseconds between each flushing and sending of outgoing
-     * activityDataObjects, and testing for too old queued incoming
-     * activityDataObjects.
-     */
-    protected int MILLIS_UPDATE;
 
     public static class DataObjectQueueItem {
 
@@ -430,7 +419,7 @@ public class ActivitySequencer implements Startable {
      */
     protected boolean started = false;
 
-    protected Timer flushTimer;
+    protected Thread activitySendThread;
 
     protected final ISarosSession sarosSession;
 
@@ -463,8 +452,6 @@ public class ActivitySequencer implements Startable {
         this.preferenceUtils = preferenceUtils;
         this.sessionIDObservable = sessionIDObservable;
 
-        this.MILLIS_UPDATE = prefStore
-            .getInt(PreferenceConstants.MILLIS_UPDATE);
         this.localJID = sarosSession.getLocalUser().getJID();
 
         this.queuedOutgoingActivitiesOfUsers = Collections
@@ -520,46 +507,41 @@ public class ActivitySequencer implements Startable {
             throw new IllegalStateException();
         }
 
-        this.flushTimer = new Timer(true);
-
         started = true;
 
-        /*
-         * Since our task is waiting for the next item, we have to use
-         * schedule() here, not scheduleAtFixedRate().
-         */
-        this.flushTimer.schedule(new TimerTask() {
+        activitySendThread = new Thread(Utils.wrapSafe(log, new Runnable() {
             @Override
             public void run() {
-                Utils.runSafeSync(log, new Runnable() {
-                    @Override
-                    public void run() {
-                        try {
-                            flushTask();
-                        } catch (InterruptedException e) {
-                            log.error("Flush got interrupted.", e);
-                        }
-                    }
-                });
+                try {
+                    boolean abort = false;
+                    while (!abort)
+                        abort = flushTask();
+                } catch (InterruptedException e) {
+                    log.error("Flush got interrupted.", e);
+                }
             }
 
-            private void flushTask() throws InterruptedException {
-                // Just to assert that after stop() no task is executed anymore
-                if (!started)
-                    return;
+            private boolean flushTask() throws InterruptedException {
 
                 List<DataObjectQueueItem> activities = new ArrayList<DataObjectQueueItem>(
                     outgoingQueue.size());
 
-                DataObjectQueueItem queueItem = outgoingQueue.poll(30,
-                    TimeUnit.SECONDS);
-                if (queueItem == POISON || queueItem == null)
-                    return;
-
-                activities.add(queueItem);
+                activities.add(outgoingQueue.take());
 
                 // If there was more than one ADO waiting, get the rest now.
                 outgoingQueue.drainTo(activities);
+
+                boolean abort = false;
+
+                int idx = activities.indexOf(POISON);
+
+                if (idx != -1) {
+                    abort = true;
+
+                    /* remove the poison pill and all activities after the pill */
+                    while (activities.size() != idx)
+                        activities.remove(idx);
+                }
 
                 Map<User, List<IActivityDataObject>> toSend = AutoHashMap
                     .getListHashMap();
@@ -592,6 +574,8 @@ public class ActivitySequencer implements Startable {
                         execQueue();
                     }
                 });
+
+                return abort;
             }
 
             /**
@@ -710,7 +694,10 @@ public class ActivitySequencer implements Startable {
                 }
                 queuedOutgoingActivitiesOfUsers.clear();
             }
-        }, 0, MILLIS_UPDATE);
+        }));
+
+        activitySendThread.setName("Activity-Sender");
+        activitySendThread.start();
     }
 
     /**
@@ -731,15 +718,15 @@ public class ActivitySequencer implements Startable {
          */
         while (true) {
             try {
-                this.outgoingQueue.put(POISON);
+                outgoingQueue.put(POISON);
+                activitySendThread.join();
                 break;
             } catch (InterruptedException e) {
                 //
             }
         }
-        this.flushTimer.cancel();
-        this.flushTimer = null;
 
+        activitySendThread = null;
         started = false;
     }
 

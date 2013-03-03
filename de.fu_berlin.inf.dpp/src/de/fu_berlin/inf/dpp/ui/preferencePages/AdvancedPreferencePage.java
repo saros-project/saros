@@ -2,7 +2,6 @@ package de.fu_berlin.inf.dpp.ui.preferencePages;
 
 import org.eclipse.jface.preference.BooleanFieldEditor;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
-import org.eclipse.jface.preference.IntegerFieldEditor;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 import org.picocontainer.annotations.Inject;
@@ -52,17 +51,6 @@ public class AdvancedPreferencePage extends FieldEditorPreferencePage implements
             PreferenceConstants.ENABLE_BALLOON_NOTIFICATION,
             Messages.AdvancedPreferencePage_enable_balloon_notifications,
             getFieldEditorParent()));
-
-        IntegerFieldEditor millisUpdateField = new IntegerFieldEditor(
-            PreferenceConstants.MILLIS_UPDATE,
-            Messages.AdvancedPreferencePage_peer_update, getFieldEditorParent());
-
-        millisUpdateField.setValidRange(100, 1000);
-        millisUpdateField.getLabelControl(getFieldEditorParent())
-            .setToolTipText(
-                Messages.AdvancedPreferencePage_interval_between_editings);
-
-        addField(millisUpdateField);
 
         addField(new BooleanFieldEditor(PreferenceConstants.PING_PONG,
             Messages.AdvancedPreferencePage_ping_pong, getFieldEditorParent()));

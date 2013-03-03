@@ -65,8 +65,6 @@ public class PreferenceConstants {
 
     public static final String STUN_PORT = "stun_server_port";
 
-    public static final String MILLIS_UPDATE = "millis.update.setting";
-
     public static final String ENABLE_BALLOON_NOTIFICATION = "enable_balloon_notification";
 
     public static final String AUTO_REUSE_PROJECT = "AUTO_REUSE_PROJECT";
