@@ -648,8 +648,8 @@ public class Saros extends AbstractUIPlugin {
          * for google servers)
          */
 
-        if (domain.equalsIgnoreCase("gmail.com")
-            || domain.equalsIgnoreCase("googlemail.com")) {
+        if ((domain.equalsIgnoreCase("gmail.com") || domain
+            .equalsIgnoreCase("googlemail.com")) && useSASL) {
             username += "@" + domain;
         }
 
