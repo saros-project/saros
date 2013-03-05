@@ -188,8 +188,37 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
         PacketExtension extension = leaveExtensionProvider
             .create(new SarosLeaveExtension(sessionID.getValue()));
 
+        /*
+         * FIXME the new Session-6 feature assumes that the host is the last
+         * user who must receive the leave message a.k.a as all other users have
+         * removed us from their sessions ... again using P2P here is WTF
+         */
+
+        /*
+         * HACK notify the host last, using an average amount of 2 seconds
+         * before sending the leave message which should be enough under normal
+         * circumstances to have the other packets reach their destination about
+         * the globe.
+         */
+
+        List<User> remoteUsers = sarosSession.getRemoteUsers();
+
+        User host = sarosSession.getHost();
+
+        remoteUsers.remove(host);
+
         for (User participant : sarosSession.getRemoteUsers())
             sendMessageToUser(participant.getJID(), extension, true);
+
+        if (!sarosSession.isHost()) {
+            try {
+                Thread.sleep(2000);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+
+            sendMessageToUser(host.getJID(), extension, true);
+        }
     }
 
     @Override
