@@ -643,8 +643,9 @@ public class Saros extends AbstractUIPlugin {
         boolean useSASL = account.useSASL();
 
         /*
-         * Google Talk users have to keep their server portion in the username;
-         * see http://code.google.com/apis/talk/talk_developers_home.html
+         * Append domain name to avoid bug
+         * http://community.igniterealtime.org/message/218661#218661 (at least
+         * for google servers)
          */
 
         if (domain.equalsIgnoreCase("gmail.com")
