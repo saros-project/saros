@@ -128,6 +128,7 @@ public class BuddySessionDisplayComposite extends ViewerComposite {
     private ISharedProjectListener projectListener = new AbstractSharedProjectListener() {
         @Override
         public void userJoined(User user) {
+            ViewerUtils.refresh(viewer, true);
             ViewerUtils.expandAll(viewer);
         }
 
