@@ -43,7 +43,8 @@ public class HostLeftAloneInSessionHandler {
             public void userLeft(User user) {
                 log.debug("sessionManager.userLeft");
                 ISarosSession session = sessionManager.getSarosSession();
-                if (session != null && session.getParticipants().size() == 1) {
+                if (session != null && session.isHost()
+                    && session.getParticipants().size() == 1) {
                     /*
                      * only ask to close session if there are no running
                      * negotiation processes because if there are, and the last

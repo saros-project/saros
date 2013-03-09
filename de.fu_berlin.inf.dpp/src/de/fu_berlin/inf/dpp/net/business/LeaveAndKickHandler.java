@@ -1,5 +1,7 @@
 package de.fu_berlin.inf.dpp.net.business;
 
+import java.util.List;
+
 import org.apache.log4j.Logger;
 import org.jivesoftware.smack.PacketListener;
 import org.jivesoftware.smack.packet.Packet;
@@ -104,12 +106,9 @@ public class LeaveAndKickHandler {
             return;
         }
 
-        sessionManager.stopSarosSession();
-
-        SarosView.showNotification("Removed from the session",
+        stopSession(sarosSession, "Removed from the session",
             user.getHumanReadableName()
                 + " removed you from the current session.");
-
     }
 
     private void leaveReceived(JID from) {
@@ -129,23 +128,52 @@ public class LeaveAndKickHandler {
             return;
         }
 
-        // FIXME LeaveEvents need to be Activities, otherwise
-        // RaceConditions can occur when two users leave a the "same" time
-
+        /*
+         * FIXME LeaveEvents need to be Activities, otherwise RaceConditions can
+         * occur when two users leave a the "same" time srossbach: it is not
+         * possible that multiple users can leave at the same time because this
+         * code is executed by the dispatch thread context which executes all
+         * incoming packets sequentially
+         */
         if (user.isHost()) {
-            sessionManager.stopSarosSession();
-
-            SarosView.showNotification("Closing the session",
+            stopSession(sarosSession, "Closing the session",
                 "Session was closed by inviter " + user.getHumanReadableName()
                     + ".");
+
         } else {
             synchronizer.asyncExec(Utils.wrapSafe(log, new Runnable() {
                 @Override
                 public void run() {
-                    // FIXME see above...
                     sarosSession.removeUser(user);
                 }
             }));
         }
+    }
+
+    // FIXME the session should handle the synchronization
+    private void stopSession(final ISarosSession session, final String topic,
+        final String reason) {
+        synchronizer.asyncExec(Utils.wrapSafe(log, new Runnable() {
+            @Override
+            public void run() {
+                List<User> currentRemoteSessionUsers = session.getRemoteUsers();
+
+                /*
+                 * remove all users so we do not send leave messages as the
+                 * other users already receive the message from the host
+                 */
+                for (User remoteSessionUser : currentRemoteSessionUsers)
+                    session.removeUser(remoteSessionUser);
+
+                Utils.runSafeAsync(log, new Runnable() {
+                    @Override
+                    public void run() {
+                        sessionManager.stopSarosSession();
+
+                        SarosView.showNotification(topic, reason);
+                    }
+                });
+            }
+        }));
     }
 }

@@ -205,12 +205,14 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
 
         User host = sarosSession.getHost();
 
+        boolean hostPresent = remoteUsers.contains(host);
+
         remoteUsers.remove(host);
 
-        for (User participant : sarosSession.getRemoteUsers())
-            sendMessageToUser(participant.getJID(), extension, true);
+        for (User user : remoteUsers)
+            sendMessageToUser(user.getJID(), extension, true);
 
-        if (!sarosSession.isHost()) {
+        if (!sarosSession.isHost() && hostPresent) {
             try {
                 Thread.sleep(2000);
             } catch (InterruptedException e) {
