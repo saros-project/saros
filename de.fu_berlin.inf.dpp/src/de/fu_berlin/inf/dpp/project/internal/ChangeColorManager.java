@@ -292,7 +292,8 @@ public class ChangeColorManager extends AbstractActivityProvider implements
             resolveColorConflicts: do {
 
                 // no conflict = OK
-                if (isUnique(assignedColors.values())) {
+                if (isUnique(assignedColors.values())
+                    && !assignedColors.containsValue(UserColorID.UNKNOWN)) {
                     log.debug("color conflict resolve result = NO CONFLICT");
                     break resolveColorConflicts;
                 }
@@ -315,8 +316,18 @@ public class ChangeColorManager extends AbstractActivityProvider implements
                         entry.setValue(colorIDSet.getColor(entry.getKey()
                             .getJID()));
                     }
-                    log.debug("color conflict resolve result = ALREADY SOLVED");
-                    break resolveColorConflicts;
+
+                    /*
+                     * on the first creation of a color id set all colors are
+                     * UserColorID.UNKNOWN so avoid the case where everybody's
+                     * favorite color is UserColorID.UNKNOWN and so would get
+                     * UserColorID.UNKNOWN as current color id
+                     */
+
+                    if (!assignedColors.containsValue(UserColorID.UNKNOWN)) {
+                        log.debug("color conflict resolve result = ALREADY SOLVED");
+                        break resolveColorConflicts;
+                    }
                 }
 
                 /*
