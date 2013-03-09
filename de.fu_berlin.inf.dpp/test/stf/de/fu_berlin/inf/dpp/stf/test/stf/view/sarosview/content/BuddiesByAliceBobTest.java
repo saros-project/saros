@@ -37,9 +37,9 @@ public class BuddiesByAliceBobTest extends StfTestCase {
 
     @After
     public void afterEveryTest() throws Exception {
+        clearWorkspaces();
         resetBuddies();
         resetBuddyNames();
-        clearWorkspaces();
     }
 
     @Test
@@ -141,6 +141,7 @@ public class BuddiesByAliceBobTest extends StfTestCase {
 
         ALICE.superBot().views().sarosView().leaveSession();
         ALICE.superBot().views().sarosView().waitUntilIsNotInSession();
+        BOB.superBot().views().sarosView().waitUntilIsNotInSession();
     }
 
     @Test
@@ -155,6 +156,7 @@ public class BuddiesByAliceBobTest extends StfTestCase {
 
         ALICE.superBot().views().sarosView().leaveSession();
         ALICE.superBot().views().sarosView().waitUntilIsNotInSession();
+        BOB.superBot().views().sarosView().waitUntilIsNotInSession();
 
     }
 
