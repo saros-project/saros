@@ -29,7 +29,8 @@ public class UserListExtension extends SarosSessionPacketExtension {
         super(sessionID);
         for (User user : users) {
             UserListEntry newUser = new UserListEntry(user.getJID(),
-                user.getColorID(), user.getPermission());
+                user.getColorID(), user.getFavoriteColorID(),
+                user.getPermission());
             userList.add(newUser);
         }
     }
@@ -37,11 +38,14 @@ public class UserListExtension extends SarosSessionPacketExtension {
     public static class UserListEntry {
         public JID jid;
         public int colorID;
+        public int favoriteColorID;
         public Permission permission;
 
-        public UserListEntry(JID jid, int colorID, Permission permission) {
+        public UserListEntry(JID jid, int colorID, int favoriteColorID,
+            Permission permission) {
             this.jid = jid;
             this.colorID = colorID;
+            this.favoriteColorID = favoriteColorID;
             this.permission = permission;
         }
     }

@@ -94,13 +94,12 @@ public class ColorIDSetStorageTest {
 
         ColorIDSet set = storage.getColorIDSet(jids);
 
-        storage.updateColor(set, alice, 0);
+        storage.updateColor(set, alice, 0, -1);
         assertEquals("Initial value of Alice's has changed.", 0,
-            set.getColorID(alice));
+            set.getColor(alice));
 
-        storage.updateColor(set, alice, 4);
-        assertEquals("New color has not been applied.", 4,
-            set.getColorID(alice));
+        storage.updateColor(set, alice, 4, -1);
+        assertEquals("New color has not been applied.", 4, set.getColor(alice));
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -110,10 +109,10 @@ public class ColorIDSetStorageTest {
         ColorIDSet set = storage.getColorIDSet(jids);
 
         // init
-        storage.updateColor(set, bob, 1);
+        storage.updateColor(set, bob, 1, -1);
 
         // set Alice to an already occupied color
-        storage.updateColor(set, alice, 1);
+        storage.updateColor(set, alice, 1, -1);
 
     }
 
@@ -123,7 +122,7 @@ public class ColorIDSetStorageTest {
 
         ColorIDSet set = storage.getColorIDSet(jids);
 
-        storage.updateColor(set, new JID("foo@bar"), 1);
+        storage.updateColor(set, new JID("foo@bar"), 1, -1);
     }
 
     @Test

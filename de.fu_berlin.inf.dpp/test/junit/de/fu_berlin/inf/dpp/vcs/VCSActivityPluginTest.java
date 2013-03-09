@@ -25,7 +25,7 @@ public class VCSActivityPluginTest {
         JID jid = new JID("");
         ISarosSession session = createMock(ISarosSession.class);
         replay(session);
-        User source = new User(session, jid, 0);
+        User source = new User(session, jid, 0, -1);
         IProject p = root.getProject("p");
         SPath p_a = new SPath(p, new Path("a"));
         VCSActivity switch_p_a = new VCSActivity(VCSActivity.Type.Switch,

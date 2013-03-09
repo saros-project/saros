@@ -24,6 +24,7 @@ import org.eclipse.jface.preference.IPreferenceStore;
 import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.SarosPluginContext;
+import de.fu_berlin.inf.dpp.editor.colorstorage.UserColorID;
 import de.fu_berlin.inf.dpp.feedback.ErrorLogManager;
 import de.fu_berlin.inf.dpp.feedback.StatisticManagerConfiguration;
 import de.fu_berlin.inf.dpp.net.upnp.IUPnPService;
@@ -99,7 +100,7 @@ public class ConfigurationWizard extends AddXMPPAccountWizard {
 
         int colorID = colorChooserWizardPage.getSelectedColor();
 
-        if (colorID != -1)
+        if (UserColorID.isValid(colorID))
             preferences.setValue(PreferenceConstants.FAVORITE_SESSION_COLOR_ID,
                 colorID);
 

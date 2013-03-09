@@ -26,6 +26,7 @@ import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.jface.preference.IPreferenceStore;
 
 import de.fu_berlin.inf.dpp.Saros;
+import de.fu_berlin.inf.dpp.editor.colorstorage.UserColorID;
 import de.fu_berlin.inf.dpp.feedback.AbstractFeedbackManager;
 import de.fu_berlin.inf.dpp.feedback.FeedbackManager;
 import de.fu_berlin.inf.dpp.videosharing.VideoSharing;
@@ -160,7 +161,8 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
         prefs.setValue(PreferenceConstants.SAROSVIEW_SASH_WEIGHT_LEFT, 1);
         prefs.setValue(PreferenceConstants.SAROSVIEW_SASH_WEIGHT_RIGHT, 1);
 
-        prefs.setValue(PreferenceConstants.FAVORITE_SESSION_COLOR_ID, -1);
+        prefs.setValue(PreferenceConstants.FAVORITE_SESSION_COLOR_ID,
+            UserColorID.UNKNOWN);
 
         /*
          * Editor stuff
@@ -168,6 +170,7 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 
         prefs.setValue(PreferenceConstants.SHOW_CONTRIBUTION_ANNOTATIONS,
             "true");
+
     }
 
     private static interface PreferenceHolderWrapper {

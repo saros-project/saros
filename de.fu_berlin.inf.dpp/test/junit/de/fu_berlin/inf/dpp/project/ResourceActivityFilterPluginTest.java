@@ -53,7 +53,7 @@ public class ResourceActivityFilterPluginTest {
         ISarosSession session = createMock(ISarosSession.class);
         replay(session);
 
-        User source = new User(session, jid, 0);
+        User source = new User(session, jid, 0, -1);
 
         add_p_a = new FolderActivity(source, FolderActivity.Type.Created,
             newSPath("/p/a"));

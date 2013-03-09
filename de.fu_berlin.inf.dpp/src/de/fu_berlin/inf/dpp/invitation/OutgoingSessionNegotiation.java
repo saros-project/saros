@@ -11,6 +11,7 @@ import org.picocontainer.annotations.Inject;
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.SarosContext;
 import de.fu_berlin.inf.dpp.User;
+import de.fu_berlin.inf.dpp.editor.colorstorage.UserColorID;
 import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
 import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
 import de.fu_berlin.inf.dpp.invitation.ProcessTools.CancelOption;
@@ -72,7 +73,8 @@ public final class OutgoingSessionNegotiation extends InvitationProcess {
     @Inject
     private ISarosSessionManager sessionManager;
 
-    private int colorID = -1;
+    private int colorID = UserColorID.UNKNOWN;
+    private int favoriteColorID = UserColorID.UNKNOWN;
 
     public OutgoingSessionNegotiation(JID peer, ISarosSession sarosSession,
         String description, SarosContext sarosContext) {
@@ -371,6 +373,9 @@ public final class OutgoingSessionNegotiation extends InvitationProcess {
         modifiedParameters.setRemoteColorID(sarosSession.getLocalUser()
             .getColorID());
 
+        modifiedParameters.setRemoteFavoriteColorID(sarosSession.getLocalUser()
+            .getFavoriteColorID());
+
         modifiedParameters
             .setMUCPreferences(sarosSession.isHost() ? mucNegotiatingManager
                 .getOwnPreferences() : mucNegotiatingManager
@@ -378,10 +383,11 @@ public final class OutgoingSessionNegotiation extends InvitationProcess {
 
         modifiedParameters.setSessionHost(sarosSession.getHost().getJID());
 
-        // side effect !
-        colorID = sarosSession.getColor(remoteParameters.getLocalColorID());
+        colorID = remoteParameters.getLocalColorID();
+        favoriteColorID = remoteParameters.getLocalFavoriteColorID();
 
         modifiedParameters.setLocalColorID(colorID);
+        modifiedParameters.setLocalFavoriteColorID(favoriteColorID);
 
         transmitter.sendMessageToUser(peer,
             InvitationParameterExchangeExtension.PROVIDER
@@ -406,7 +412,7 @@ public final class OutgoingSessionNegotiation extends InvitationProcess {
 
         monitor.setTaskName("Synchronizing user list...");
 
-        User user = new User(sarosSession, peer, colorID);
+        User user = new User(sarosSession, peer, colorID, favoriteColorID);
 
         synchronized (SESSION_JOIN_LOCK) {
 
@@ -426,8 +432,7 @@ public final class OutgoingSessionNegotiation extends InvitationProcess {
 
     @Override
     protected void executeCancellation() {
-        if (colorID >= 0)
-            sarosSession.returnColor(colorID);
+        // TODO remove the user from the session !
 
         if (invitationProcesses.getProcesses().contains(this))
             invitationProcesses.removeInvitationProcess(this);

@@ -46,9 +46,9 @@ public class StopManagerTest {
         alicesSession.addActivityProvider(EasyMock.isA(StopManager.class));
         alicesSession.removeActivityProvider(EasyMock.isA(StopManager.class));
 
-        alicesAlice = new User(alicesSession, new JID("alice"), 1);
-        alicesBob = new User(alicesSession, new JID("bob"), 2);
-        alicesCarl = new User(alicesSession, new JID("carl"), 3);
+        alicesAlice = new User(alicesSession, new JID("alice"), 1, -1);
+        alicesBob = new User(alicesSession, new JID("bob"), 2, -1);
+        alicesCarl = new User(alicesSession, new JID("carl"), 3, -1);
         alicesSession.getLocalUser();
         EasyMock.expectLastCall().andReturn(alicesAlice).anyTimes();
         alicesSession.getUser(alicesBob.getJID());
@@ -64,9 +64,9 @@ public class StopManagerTest {
         bobsSession.addActivityProvider(EasyMock.isA(StopManager.class));
         bobsSession.removeActivityProvider(EasyMock.isA(StopManager.class));
 
-        bobsAlice = new User(bobsSession, new JID("alice"), 1);
-        bobsBob = new User(bobsSession, new JID("bob"), 2);
-        bobsCarl = new User(bobsSession, new JID("carl"), 3);
+        bobsAlice = new User(bobsSession, new JID("alice"), 1, -1);
+        bobsBob = new User(bobsSession, new JID("bob"), 2, -1);
+        bobsCarl = new User(bobsSession, new JID("carl"), 3, -1);
         bobsSession.getLocalUser();
         EasyMock.expectLastCall().andReturn(bobsBob).anyTimes();
         bobsSession.getUser(bobsAlice.getJID());
@@ -81,9 +81,9 @@ public class StopManagerTest {
         carlsSession.addActivityProvider(EasyMock.isA(StopManager.class));
         carlsSession.removeActivityProvider(EasyMock.isA(StopManager.class));
 
-        carlsAlice = new User(carlsSession, new JID("alice"), 1);
-        carlsBob = new User(carlsSession, new JID("bob"), 2);
-        carlsCarl = new User(carlsSession, new JID("carl"), 3);
+        carlsAlice = new User(carlsSession, new JID("alice"), 1, -1);
+        carlsBob = new User(carlsSession, new JID("bob"), 2, -1);
+        carlsCarl = new User(carlsSession, new JID("carl"), 3, -1);
         carlsSession.getLocalUser();
         EasyMock.expectLastCall().andReturn(carlsCarl).anyTimes();
         carlsSession.getUser(carlsAlice.getJID());
@@ -415,9 +415,9 @@ public class StopManagerTest {
         alicesSession.addActivityProvider(EasyMock.isA(StopManager.class));
         alicesSession.removeActivityProvider(EasyMock.isA(StopManager.class));
 
-        alicesAlice = new User(alicesSession, new JID("alice"), 1);
-        alicesBob = new User(alicesSession, new JID("bob"), 2);
-        alicesCarl = new User(alicesSession, new JID("carl"), 3);
+        alicesAlice = new User(alicesSession, new JID("alice"), 1, -1);
+        alicesBob = new User(alicesSession, new JID("bob"), 2, -1);
+        alicesCarl = new User(alicesSession, new JID("carl"), 3, -1);
         alicesSession.getLocalUser();
         EasyMock.expectLastCall().andReturn(alicesAlice).anyTimes();
         alicesSession.getUser(alicesAlice.getJID());
@@ -514,9 +514,9 @@ public class StopManagerTest {
         alicesSession.addActivityProvider(EasyMock.isA(StopManager.class));
         alicesSession.removeActivityProvider(EasyMock.isA(StopManager.class));
 
-        alicesAlice = new User(alicesSession, new JID("alice"), 1);
-        alicesBob = new User(alicesSession, new JID("bob"), 2);
-        alicesCarl = new User(alicesSession, new JID("carl"), 3);
+        alicesAlice = new User(alicesSession, new JID("alice"), 1, -1);
+        alicesBob = new User(alicesSession, new JID("bob"), 2, -1);
+        alicesCarl = new User(alicesSession, new JID("carl"), 3, -1);
         alicesSession.getLocalUser();
         EasyMock.expectLastCall().andReturn(alicesAlice).anyTimes();
         alicesSession.getUser(alicesAlice.getJID());
@@ -587,9 +587,9 @@ public class StopManagerTest {
         alicesSession.addActivityProvider(EasyMock.isA(StopManager.class));
         alicesSession.removeActivityProvider(EasyMock.isA(StopManager.class));
 
-        alicesAlice = new User(alicesSession, new JID("alice"), 1);
-        alicesBob = new User(alicesSession, new JID("bob"), 2);
-        alicesCarl = new User(alicesSession, new JID("carl"), 3);
+        alicesAlice = new User(alicesSession, new JID("alice"), 1, -1);
+        alicesBob = new User(alicesSession, new JID("bob"), 2, -1);
+        alicesCarl = new User(alicesSession, new JID("carl"), 3, -1);
         alicesSession.getLocalUser();
         EasyMock.expectLastCall().andReturn(alicesAlice).anyTimes();
         alicesSession.getUser(alicesAlice.getJID());
@@ -666,7 +666,7 @@ public class StopManagerTest {
     }
 
     private static User rewriteUser(User user, ISarosSession target) {
-        return new User(target, user.getJID(), user.getColorID());
+        return new User(target, user.getJID(), user.getColorID(), -1);
     }
 
     private static StopActivity rewriteStopActivity(StopActivity inActivity,

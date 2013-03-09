@@ -73,7 +73,7 @@ public class UserListHandler {
                     if (user == null) {
 
                         newUser = new User(sarosSession, userEntry.jid,
-                            userEntry.colorID);
+                            userEntry.colorID, userEntry.favoriteColorID);
 
                         newUser.setPermission(userEntry.permission);
                         sarosSession.addUser(newUser);

@@ -125,18 +125,21 @@ public final class ColorIDSetStorage {
     }
 
     /**
-     * Changes the <color>colorId</code> of a user in a set.
+     * Changes the <code>colorID</code> and <code>favoriteColorID</code> of a
+     * user in a set.
      * 
      * @param set
      * @param jid
-     * @param colorId
+     * @param colorID
+     * @param favoriteColorID
      * @throws IllegalArgumentException
      *             when the caller tries to set a color multiple times or when
      *             he tries to add a new user.
      */
-    public synchronized void updateColor(ColorIDSet set, JID jid, int colorId)
-        throws IllegalArgumentException {
-        set.setColor(jid, colorId);
+    public synchronized void updateColor(ColorIDSet set, JID jid, int colorID,
+        int favoriteColorID) throws IllegalArgumentException {
+        set.setColor(jid, colorID);
+        set.setFavoriteColor(jid, favoriteColorID);
         set.resetTimestamp();
         save();
     }

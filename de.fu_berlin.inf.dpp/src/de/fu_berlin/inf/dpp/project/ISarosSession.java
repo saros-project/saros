@@ -241,30 +241,11 @@ public interface ISarosSession {
     public Saros getSaros();
 
     /**
-     * Returns the next available color ID. Color IDs that should no longer be
-     * used must be returned using {@link #returnColor(int colorID)}.
-     * 
-     * @param colorID
-     *            the color id that should be returned if it is currently
-     *            available or -1
-     * @return an unused color ID or a default ID if all color IDs are in use
-     */
-    public int getColor(int colorID);
-
-    /**
      * Returns a snapshot of the currently available (not in use) color IDs.
      * 
      * @return
      */
     public Set<Integer> getAvailableColors();
-
-    /**
-     * Returns a color to the pool of available colors.
-     * 
-     * @param colorID
-     *            the color ID that should be returned to the pool.
-     */
-    public void returnColor(int colorID);
 
     /**
      * Executes the given activityDataObjects locally.

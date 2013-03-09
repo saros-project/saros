@@ -24,20 +24,20 @@ import de.fu_berlin.inf.dpp.project.internal.SarosSession;
 public class ColorIDSetTest {
 
     private List<User> userList;
-    private Map<JID, Integer> userMap;
+    private Map<JID, UserColorID> userMap;
     private User alice, bob, carl, dave;
 
     @Before
     public void setUp() {
         userList = new ArrayList<User>();
-        userMap = new HashMap<JID, Integer>();
+        userMap = new HashMap<JID, UserColorID>();
 
         ISarosSession session = EasyMock.createMock(ISarosSession.class);
 
-        alice = new User(session, new JID("alice@saros.org/Wonderland"), 0);
-        bob = new User(session, new JID("bob@saros.org/Jamaica"), 1);
-        carl = new User(session, new JID("carl@lagerfeld.org/Paris"), 2);
-        dave = new User(session, new JID("dave@saros.org/Hell"), 0);
+        alice = new User(session, new JID("alice@saros.org/Wonderland"), 0, -1);
+        bob = new User(session, new JID("bob@saros.org/Jamaica"), 1, -1);
+        carl = new User(session, new JID("carl@lagerfeld.org/Paris"), 2, -1);
+        dave = new User(session, new JID("dave@saros.org/Hell"), 0, -1);
     }
 
     private ColorIDSet createColorIDSet(Collection<User> users) {
@@ -97,9 +97,9 @@ public class ColorIDSetTest {
         ColorIDSet set = createColorIDSet(userList);
 
         assertEquals("Qualified JID did not return correct color.",
-            alice.getColorID(), set.getColorID(alice.getJID()));
+            alice.getColorID(), set.getColor(alice.getJID()));
         assertEquals("Bare JID did not return correct color.",
-            alice.getColorID(), set.getColorID(alice.getJID().getBareJID()));
+            alice.getColorID(), set.getColor(alice.getJID().getBareJID()));
     }
 
     @Test
@@ -107,7 +107,7 @@ public class ColorIDSetTest {
         ColorIDSet set = createColorIDSet(userList);
         assertEquals(
             "Expected -1 as the user does not exist in the ColorIdSet.", -1,
-            set.getColorID(new JID("satan@hell.com/Dorm")));
+            set.getColor(new JID("satan@hell.com/Dorm")));
     }
 
     @Test
@@ -118,8 +118,19 @@ public class ColorIDSetTest {
         assertFalse("0 should not be available as it is used by Alice",
             set.isAvailable(0));
         for (int i = 1; i < SarosSession.MAX_USERCOLORS; i++) {
-            assertTrue(i + "should be available.", set.isAvailable(i));
+            assertTrue(i + " should be available.", set.isAvailable(i));
         }
+    }
+
+    @Test
+    public void testGetFavoriteColor() {
+        addUser(alice);
+        ColorIDSet set = createColorIDSet(userList);
+
+        set.setFavoriteColor(alice.getJID(), 4);
+
+        assertEquals("Alice favorite color does not match", 4,
+            set.getFavoriteColor(alice.getJID()));
     }
 
     @Test
@@ -140,7 +151,7 @@ public class ColorIDSetTest {
 
         for (User user : userList) {
             assertEquals("Color IDs do not match.", user.getColorID(),
-                set.getColorID(user.getJID()));
+                set.getColor(user.getJID()));
             assertTrue("User is not contained in the sets' participants",
                 users.contains(user.getJID()));
         }
@@ -149,7 +160,7 @@ public class ColorIDSetTest {
 
     private void addUser(User user) {
         userList.add(user);
-        userMap.put(user.getJID(), user.getColorID());
+        userMap.put(user.getJID(), new UserColorID(user.getColorID(), -1));
     }
 
 }

@@ -9,6 +9,7 @@ import org.xiph.speex.spi.SpeexEncoding;
 
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.communication.audio.MixerManager;
+import de.fu_berlin.inf.dpp.editor.colorstorage.UserColorID;
 
 @Component(module = "prefs")
 public class PreferenceUtils {
@@ -215,7 +216,8 @@ public class PreferenceUtils {
     /**
      * Returns the favorite color ID that should be used during a session.
      * 
-     * @return the favorite color ID or -1 if no favorite color ID is available
+     * @return the favorite color ID or {@value UserColorID#UNKNOWN} if no
+     *         favorite color ID is available
      */
     public int getFavoriteColorID() {
         return preferenceStore

@@ -164,18 +164,6 @@ public class NullSarosSession implements ISarosSession {
     }
 
     @Override
-    public int getColor(int colorID) {
-        log.warn("unexpected method call");
-        return 0;
-    }
-
-    @Override
-    public void returnColor(int colorID) {
-        log.warn("unexpected method call");
-
-    }
-
-    @Override
     public void exec(List<IActivityDataObject> activityDataObjects) {
         log.warn("unexpected method call");
 

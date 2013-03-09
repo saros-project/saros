@@ -34,9 +34,27 @@ public class InvitationParameterExchangeExtension extends InvitationExtension {
 
     private String sessionID;
     private int localColorID;
+    private int localFavoriteColorID;
     private int remoteColorID;
+    private int remoteFavoriteColorID;
     private MUCSessionPreferences mucPreferences;
     private JID sessionHost;
+
+    public int getLocalFavoriteColorID() {
+        return localFavoriteColorID;
+    }
+
+    public void setLocalFavoriteColorID(int localFavoriteColorID) {
+        this.localFavoriteColorID = localFavoriteColorID;
+    }
+
+    public int getRemoteFavoriteColorID() {
+        return remoteFavoriteColorID;
+    }
+
+    public void setRemoteFavoriteColorID(int remoteFavoriteColorID) {
+        this.remoteFavoriteColorID = remoteFavoriteColorID;
+    }
 
     public int getLocalColorID() {
         return localColorID;

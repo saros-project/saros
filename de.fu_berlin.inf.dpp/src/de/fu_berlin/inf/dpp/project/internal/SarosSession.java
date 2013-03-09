@@ -184,8 +184,6 @@ public final class SarosSession implements ISarosSession, Disposable {
 
     private User host;
 
-    private FreeColors freeColors = null;
-
     private final DateTime sessionStart;
 
     private final SarosProjectMapper projectMapper = new SarosProjectMapper();
@@ -231,8 +229,8 @@ public final class SarosSession implements ISarosSession, Disposable {
     /**
      * Common constructor code for host and client side.
      */
-    protected SarosSession(int colorID, boolean reassignColorID,
-        DateTime sessionStart, ISarosContext sarosContext) {
+    protected SarosSession(DateTime sessionStart, ISarosContext sarosContext,
+        int colorID) {
 
         sarosContext.initComponent(this);
 
@@ -244,21 +242,7 @@ public final class SarosSession implements ISarosSession, Disposable {
 
         assert localUserJID != null;
 
-        freeColors = new FreeColors(MAX_USERCOLORS);
-
-        if (reassignColorID && (colorID < 0 || colorID >= MAX_USERCOLORS))
-            colorID = 0;
-        else if (colorID < 0 || colorID > MAX_USERCOLORS)
-            throw new IllegalArgumentException(
-                "cannot start a session with an invalid color id: 0 <= "
-                    + colorID + " <= " + MAX_USERCOLORS);
-
-        this.localUser = new User(this, localUserJID, colorID);
-
-        if (freeColors.remove(colorID))
-            log.debug("colorID " + colorID + " was removed from the pool");
-        else
-            log.warn("colorID " + colorID + " is not in the pool");
+        this.localUser = new User(this, localUserJID, colorID, colorID);
     }
 
     /**
@@ -267,7 +251,7 @@ public final class SarosSession implements ISarosSession, Disposable {
     public SarosSession(int colorID, DateTime sessionStart,
         ISarosContext sarosContext) {
 
-        this(colorID, true, sessionStart, sarosContext);
+        this(sessionStart, sarosContext, colorID);
 
         host = localUser;
 
@@ -282,23 +266,17 @@ public final class SarosSession implements ISarosSession, Disposable {
     public SarosSession(JID hostID, int myColorID, DateTime sessionStart,
         ISarosContext sarosContext, JID inviterID, int inviterColorID) {
 
-        this(myColorID, false, sessionStart, sarosContext);
+        this(sessionStart, sarosContext, myColorID);
 
         /*
          * HACK abuse the fact that non-host inviting is currently disabled and
          * so the inviterColorID is always the colorID of the host
          */
 
-        host = new User(this, hostID, inviterColorID);
+        host = new User(this, hostID, inviterColorID, inviterColorID);
 
         participants.put(hostID, host);
         participants.put(localUser.getJID(), localUser);
-
-        if (freeColors.remove(inviterColorID))
-            log.debug("colorID " + inviterColorID
-                + " was removed from the pool");
-        else
-            log.warn("colorID " + inviterColorID + " is not in the pool");
 
         assert inviterID.equals(hostID) : "non host inviting is disabled";
         /*
@@ -528,17 +506,13 @@ public final class SarosSession implements ISarosSession, Disposable {
     }
 
     @Override
-    public void addUser(User user) {
+    public void addUser(final User user) {
 
         // TODO synchronize this method !
 
         assert user.getSarosSession().equals(this);
 
         JID jid = user.getJID();
-
-        if (!freeColors.remove(user.getColorID())) {
-            log.warn("ColorID of user: " + jid.toString() + " was not in pool!");
-        }
 
         if (participants.putIfAbsent(jid, user) != null) {
             log.error("Buddy " + Utils.prefix(jid) //$NON-NLS-1$
@@ -557,7 +531,12 @@ public final class SarosSession implements ISarosSession, Disposable {
         if (isHost())
             synchronizeUserList();
 
-        listenerDispatch.userJoined(user);
+        synchronizer.syncExec(Utils.wrapSafe(log, new Runnable() {
+            @Override
+            public void run() {
+                listenerDispatch.userJoined(user);
+            }
+        }));
 
         log.info("Buddy " + Utils.prefix(jid) + " joined session."); //$NON-NLS-1$ //$NON-NLS-2$
     }
@@ -569,9 +548,6 @@ public final class SarosSession implements ISarosSession, Disposable {
             log.warn("Tried to remove buddy who was not in participants:"
                 + Utils.prefix(jid));
             return;
-        }
-        if (isHost()) {
-            returnColor(user.getColorID());
         }
 
         getSequencer().userLeft(user);
@@ -754,21 +730,6 @@ public final class SarosSession implements ISarosSession, Disposable {
     @Override
     public Saros getSaros() {
         return saros;
-    }
-
-    @Override
-    public int getColor(int colorID) {
-        return freeColors.get(colorID);
-    }
-
-    @Override
-    public void returnColor(int colorID) {
-        freeColors.add(colorID);
-    }
-
-    @Override
-    public Set<Integer> getAvailableColors() {
-        return freeColors.getAvailable();
     }
 
     /**
@@ -1426,6 +1387,12 @@ public final class SarosSession implements ISarosSession, Disposable {
 
         sessionContainer.getComponent(ChangeColorManager.class).changeColorID(
             colorID);
+    }
+
+    @Override
+    public Set<Integer> getAvailableColors() {
+        return sessionContainer.getComponent(ChangeColorManager.class)
+            .getAvailableColors();
     }
 
     private void initializeSessionContainer(ISarosContext context) {

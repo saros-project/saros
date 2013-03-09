@@ -25,12 +25,9 @@ import de.fu_berlin.inf.dpp.net.JID;
  */
 public final class ColorIDSet implements Serializable {
 
-    private static final long serialVersionUID = 1209783943934281146L;
+    private static final long serialVersionUID = 1L;
 
-    // TODO move to a central class
-    private static final int DEFAULT_COLOR_ID = -1;
-
-    private final Map<JID, Integer> assignedColorIDs;
+    private final Map<JID, UserColorID> assignedUserColorIDs;
 
     private volatile long timestamp;
 
@@ -40,42 +37,57 @@ public final class ColorIDSet implements Serializable {
      * @param colorIDs
      *            a map from JIDs to ColorIds
      */
-    ColorIDSet(Map<JID, Integer> colorIDs) {
+    ColorIDSet(Map<JID, UserColorID> colorIDs) {
         if (!isValidMap(colorIDs))
             throw new IllegalArgumentException(
-                "Invalid map. A ColorId is set multiple times.");
+                "a color ID is set multiple times");
 
-        this.assignedColorIDs = colorIDs;
+        this.assignedUserColorIDs = colorIDs;
         resetTimestamp();
     }
 
     /**
      * Creates a {@link ColorIDSet} and sets color for each JID to
-     * {@value #DEFAULT_COLOR_ID}
+     * {@value UserColorID#UNKNOWN}
      * 
      * @param jids
      *            a set of JIDs
      */
     ColorIDSet(Collection<JID> jids) {
-        assignedColorIDs = new HashMap<JID, Integer>();
+        assignedUserColorIDs = new HashMap<JID, UserColorID>();
         for (JID jid : jids)
-            assignedColorIDs.put(jid, DEFAULT_COLOR_ID);
+            assignedUserColorIDs.put(jid, new UserColorID());
 
         resetTimestamp();
     }
 
     /**
-     * Gets the color id for a given JID
+     * Gets the color id for a given JID.
      * 
      * @param jid
-     * @return colorId or {@value #DEFAULT_COLOR_ID} if the JID was not found in
-     *         the set or no color id is assigned to that JID
+     * @return colorId or {@value UserColorID#UNKNOWN} if the JID was not found
+     *         in the set or no color id is assigned to that JID
      */
-    public int getColorID(JID jid) {
-        if (!assignedColorIDs.containsKey(jid))
-            return DEFAULT_COLOR_ID;
+    public int getColor(JID jid) {
+        if (!assignedUserColorIDs.containsKey(jid))
+            return UserColorID.UNKNOWN;
 
-        return assignedColorIDs.get(jid);
+        return assignedUserColorIDs.get(jid).getCurrent();
+    }
+
+    /**
+     * Gets the favorite color id for a given JID.
+     * 
+     * @param jid
+     * @return favorite colorId or {@value UserColorID#UNKNOWN} if the JID was
+     *         not found in the set or no favorite color id is assigned to that
+     *         JID
+     */
+    public int getFavoriteColor(JID jid) {
+        if (!assignedUserColorIDs.containsKey(jid))
+            return UserColorID.UNKNOWN;
+
+        return assignedUserColorIDs.get(jid).getFavorite();
     }
 
     /**
@@ -84,7 +96,7 @@ public final class ColorIDSet implements Serializable {
      * @return participants contained
      */
     public Set<JID> getParticipants() {
-        return new HashSet<JID>(assignedColorIDs.keySet());
+        return new HashSet<JID>(assignedUserColorIDs.keySet());
     }
 
     /**
@@ -104,7 +116,12 @@ public final class ColorIDSet implements Serializable {
      *         otherwise, because it is still available
      */
     public boolean isAvailable(int colorID) {
-        return (!assignedColorIDs.values().contains(colorID));
+
+        for (UserColorID c : assignedUserColorIDs.values())
+            if (c.getCurrent() == colorID)
+                return false;
+
+        return true;
     }
 
     /**
@@ -118,24 +135,24 @@ public final class ColorIDSet implements Serializable {
         }
 
         ColorIDSet other = (ColorIDSet) o;
-        return assignedColorIDs.keySet()
-            .equals(other.assignedColorIDs.keySet());
+        return assignedUserColorIDs.keySet().equals(
+            other.assignedUserColorIDs.keySet());
     }
 
     @Override
     public int hashCode() {
-        return assignedColorIDs.hashCode();
+        return assignedUserColorIDs.hashCode();
     }
 
     @Override
-    public synchronized String toString() {
+    public String toString() {
         StringBuilder result = new StringBuilder();
         String delim = ",";
 
-        for (Iterator<JID> it = assignedColorIDs.keySet().iterator(); it
+        for (Iterator<JID> it = assignedUserColorIDs.keySet().iterator(); it
             .hasNext();) {
             JID jid = it.next();
-            Integer id = getColorID(jid);
+            Integer id = getColor(jid);
 
             result.append(jid).append("=").append(id);
             if (it.hasNext()) {
@@ -172,28 +189,45 @@ public final class ColorIDSet implements Serializable {
      * @param colorID
      */
     void setColor(JID jid, int colorID) throws IllegalArgumentException {
-        if (containsColorConflicts(assignedColorIDs, jid, colorID))
+        if (containsColorConflicts(jid, colorID))
             throw new IllegalArgumentException(
-                "A ColorId is set multiple times.");
+                "a color ID is set multiple times");
 
-        if (!assignedColorIDs.containsKey(jid))
-            throw new IllegalArgumentException(
-                "ColorIdSet does not allow for injecting new JID.");
+        if (!assignedUserColorIDs.containsKey(jid))
+            throw new IllegalArgumentException(jid
+                + " cannot be found in the current set");
 
-        assignedColorIDs.put(jid, colorID);
+        assignedUserColorIDs.get(jid).setCurrent(colorID);
+    }
+
+    /**
+     * Set the favorite colorId of the set for a given user's JID
+     * 
+     * @param jid
+     * @param colorID
+     */
+    void setFavoriteColor(JID jid, int colorID) throws IllegalArgumentException {
+
+        if (!assignedUserColorIDs.containsKey(jid))
+            throw new IllegalArgumentException(jid
+                + " cannot be found in the current set");
+
+        assignedUserColorIDs.get(jid).setFavorite(colorID);
     }
 
     /**
      * Check whether a new colorId causes a conflict in a given map of colorIds.
      * 
-     * @param colorIDs
      * @param jid
      * @param colorID
      * @return
      */
-    private boolean containsColorConflicts(Map<JID, Integer> colorIDs, JID jid,
-        int colorID) {
-        return getColorID(jid) != colorID && colorIDs.containsValue(colorID);
+    private boolean containsColorConflicts(JID jid, int colorID) {
+
+        if (colorID == UserColorID.UNKNOWN || getColor(jid) == colorID)
+            return false;
+
+        return !isAvailable(colorID);
     }
 
     /**
@@ -203,18 +237,18 @@ public final class ColorIDSet implements Serializable {
      * @return <code>true</code> if no color id duplicates exist
      *         <code>false</code> otherwise
      */
-    private boolean isValidMap(Map<JID, Integer> colorIDs) {
+    private boolean isValidMap(Map<JID, UserColorID> colorIDs) {
 
-        HashSet<Integer> colorIDsSet = new HashSet<Integer>();
+        HashSet<Integer> usedColorIDs = new HashSet<Integer>();
 
-        for (int i : colorIDs.values()) {
-            if (i == DEFAULT_COLOR_ID)
+        for (UserColorID id : colorIDs.values()) {
+            if (id.getCurrent() == UserColorID.UNKNOWN)
                 continue;
 
-            if (colorIDsSet.contains(i))
+            if (usedColorIDs.contains(id.getCurrent()))
                 return false;
 
-            colorIDsSet.add(i);
+            usedColorIDs.add(id.getCurrent());
         }
 
         return true;
@@ -227,13 +261,13 @@ public final class ColorIDSet implements Serializable {
      * @return
      */
     ColorIDSet extendSet(Collection<JID> jids) {
-        Map<JID, Integer> newColorIDs = new HashMap<JID, Integer>();
+        Map<JID, UserColorID> newColorIDs = new HashMap<JID, UserColorID>();
 
-        newColorIDs.putAll(assignedColorIDs);
+        newColorIDs.putAll(assignedUserColorIDs);
 
         for (JID jid : jids) {
             if (!newColorIDs.containsKey(jid))
-                newColorIDs.put(jid, DEFAULT_COLOR_ID);
+                newColorIDs.put(jid, new UserColorID());
         }
 
         return new ColorIDSet(newColorIDs);

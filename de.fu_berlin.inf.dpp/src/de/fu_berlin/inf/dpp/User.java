@@ -34,7 +34,7 @@ import de.fu_berlin.inf.dpp.util.StackTrace;
  * instance for the use in one Saros session.
  * 
  * A user object always has the following immutable characteristics: He/she
- * belongs to a single ISarosSession, has a final color, and fixed JID.
+ * belongs to a single ISarosSession, has a final favorite color, and fixed JID.
  * 
  * There is one user who is the host, all others are clients.
  * 
@@ -65,6 +65,8 @@ public class User {
 
     protected volatile int colorID;
 
+    protected final int favoriteColorID;
+
     protected UserConnectionState connectionState = UserConnectionState.UNKNOWN;
 
     protected boolean away = false;
@@ -76,12 +78,14 @@ public class User {
 
     protected Permission permission = Permission.WRITE_ACCESS;
 
-    public User(ISarosSession sarosSession, JID jid, int colorID) {
+    public User(ISarosSession sarosSession, JID jid, int colorID,
+        int favoriteColorID) {
         if (sarosSession == null || jid == null)
             throw new IllegalArgumentException();
         this.sarosSession = sarosSession;
         this.jid = jid;
         this.colorID = colorID;
+        this.favoriteColorID = favoriteColorID;
     }
 
     public JID getJID() {
@@ -154,6 +158,10 @@ public class User {
 
     public int getColorID() {
         return this.colorID;
+    }
+
+    public int getFavoriteColorID() {
+        return this.favoriteColorID;
     }
 
     public UserConnectionState getConnectionState() {

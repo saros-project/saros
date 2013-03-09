@@ -36,6 +36,7 @@ import de.fu_berlin.inf.dpp.awareness.AwarenessInformationCollector;
 import de.fu_berlin.inf.dpp.communication.audio.AudioServiceManager;
 import de.fu_berlin.inf.dpp.concurrent.watchdog.ConsistencyWatchdogClient;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
+import de.fu_berlin.inf.dpp.editor.colorstorage.ColorIDSetStorage;
 import de.fu_berlin.inf.dpp.feedback.FeedbackManager;
 import de.fu_berlin.inf.dpp.feedback.SessionStatistic;
 import de.fu_berlin.inf.dpp.feedback.StatisticCollectorTest;
@@ -159,6 +160,7 @@ public class SarosSessionTest {
         // Adding the real class here.
 
         container.addComponent(store);
+        container.addComponent(ColorIDSetStorage.class);
         container.addComponent(NonUISynchronizer.class);
         container.addComponent(DispatchThreadContext.class);
         container.addComponent(SessionIDObservable.class);

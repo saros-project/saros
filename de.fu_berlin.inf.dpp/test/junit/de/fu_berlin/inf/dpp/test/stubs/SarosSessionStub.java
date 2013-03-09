@@ -73,12 +73,6 @@ public class SarosSessionStub implements ISarosSession {
     }
 
     @Override
-    public void returnColor(int colorID) {
-        throw new RuntimeException("Unexpected call to Stub");
-
-    }
-
-    @Override
     public void removeUser(User user) {
         throw new RuntimeException("Unexpected call to Stub");
 
@@ -199,11 +193,6 @@ public class SarosSessionStub implements ISarosSession {
 
     @Override
     public User getHost() {
-        throw new RuntimeException("Unexpected call to Stub");
-    }
-
-    @Override
-    public int getColor(int colorID) {
         throw new RuntimeException("Unexpected call to Stub");
     }
 

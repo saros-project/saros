@@ -228,6 +228,7 @@ public class IncomingSessionNegotiation extends InvitationProcess {
         log.debug(this + " : sending session negotiation data");
 
         parameters.setLocalColorID(preferenceUtils.getFavoriteColorID());
+        parameters.setLocalFavoriteColorID(parameters.getLocalColorID());
 
         transmitter.sendMessageToUser(peer,
             InvitationParameterExchangeExtension.PROVIDER.create(parameters));
@@ -278,7 +279,7 @@ public class IncomingSessionNegotiation extends InvitationProcess {
 
         sarosSession = sessionManager.joinSession(parameters.getSessionHost(),
             parameters.getLocalColorID(), sessionStart, peer,
-            parameters.getRemoteColorID());
+            parameters.getRemoteFavoriteColorID());
 
     }
 
