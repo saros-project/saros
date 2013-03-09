@@ -268,11 +268,22 @@ public final class ActivityHandler implements Startable {
                 TransformationResult transformed = documentClient
                     .transformIncoming(activities);
 
-                for (QueueItem item : transformed.getSendToPeers())
-                    callback.send(item.recipients, item.activity);
+                for (QueueItem item : transformed.getSendToPeers()) {
+                    try {
+                        callback.send(item.recipients, item.activity);
+                    } catch (Exception e) {
+                        LOG.error("failed to send activity: " + item.activity
+                            + " to session user(s): " + item.recipients, e);
+                    }
+                }
 
-                for (IActivity activity : transformed.executeLocally)
-                    callback.execute(activity);
+                for (IActivity activity : transformed.executeLocally) {
+                    try {
+                        callback.execute(activity);
+                    } catch (Exception e) {
+                        LOG.error("failed to execute activity: " + activity, e);
+                    }
+                }
             }
         };
 
