@@ -1,6 +1,5 @@
 package de.fu_berlin.inf.dpp.editor.annotations;
 
-import org.eclipse.jface.preference.PreferenceConverter;
 import org.eclipse.jface.text.source.IAnnotationPresentation;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
@@ -9,9 +8,6 @@ import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.ui.editors.text.EditorsUI;
-import org.eclipse.ui.texteditor.AnnotationPreference;
-import org.eclipse.ui.texteditor.AnnotationPreferenceLookup;
 
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.User.Permission;
@@ -43,21 +39,17 @@ public class ViewportAnnotation extends SarosAnnotation implements
     private boolean multipleLines = false;
 
     public ViewportAnnotation(User source) {
-        super(ViewportAnnotation.TYPE, false, "Visible scope of "
+        super(ViewportAnnotation.TYPE, true, "Visible scope of "
             + source.getHumanReadableName(), source);
 
-        String annotationType = ViewportAnnotation.TYPE + "."
-            + (source.getColorID() + 1);
-        setType(annotationType);
-
-        AnnotationPreferenceLookup lookup = EditorsUI
-            .getAnnotationPreferenceLookup();
-        AnnotationPreference annotationPreference = lookup
-            .getAnnotationPreference(annotationType);
-        RGB rgb = PreferenceConverter.getColor(EditorsUI.getPreferenceStore(),
-            annotationPreference.getColorPreferenceKey());
-
         Display display = Display.getDefault();
+
+        Color currentColor = getColor(TYPE, source.getColorID());
+
+        RGB rgb = currentColor.getRGB();
+
+        currentColor.dispose();
+
         strokeColor = new Color(display, ColorUtils.scaleColorBy(rgb,
             STROKE_SCALE));
         // FIXME: dispose strokeColor somewhere

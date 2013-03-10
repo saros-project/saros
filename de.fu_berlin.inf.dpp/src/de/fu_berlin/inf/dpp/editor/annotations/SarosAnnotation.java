@@ -37,16 +37,6 @@ public abstract class SarosAnnotation extends Annotation {
     private static final float LIGHTNESS_SCALE = 0.12f;
 
     /**
-     * Color which is chosen, when an invalid colorId is set.
-     */
-    private static final RGB NO_COLOR_RGB_VALUES = new RGB(128, 128, 128);
-
-    // Keys used for loading the colors from plugin.xml
-    private static final String SELECTION_COLOR_KEY = "de.fu_berlin.inf.dpp.annotations.selection";
-    private static final String VIEWPORT_COLOR_KEY = "de.fu_berlin.inf.dpp.annotations.viewport";
-    private static final String CONTRIBUTION_COLOR_KEY = "de.fu_berlin.inf.dpp.annotations.contribution";
-
-    /**
      * Creates a SarosAnnotation.
      * 
      * @param type
@@ -65,11 +55,11 @@ public abstract class SarosAnnotation extends Annotation {
         this.source = source;
 
         if (isNumbered)
-            setType(type + "." + (source.getColorID() + 1));
+            setType(getNumberedType(type, source.getColorID()));
     }
 
     public User getSource() {
-        return this.source;
+        return source;
     }
 
     /**
@@ -91,10 +81,10 @@ public abstract class SarosAnnotation extends Annotation {
      * resources that need to be disposed with {@link Color#dispose()}!
      * 
      * @param user
-     * @return the corresponding color, <code>null</code> if no color is stored
+     * @return the corresponding color
      */
     public static Color getUserColor(User user) {
-        return getColor(user.getColorID());
+        return getColor(ContributionAnnotation.TYPE, user.getColorID());
     }
 
     /**
@@ -103,40 +93,28 @@ public abstract class SarosAnnotation extends Annotation {
      * <b>Important notice:</b> Every returned color instance allocates OS
      * resources that need to be disposed with {@link Color#dispose()}!
      * 
+     * @param type
      * @param colorID
      * @return the corresponding color or a default one if no color is stored
      */
-    public static Color getColor(int colorID) {
+    protected static Color getColor(String type, int colorID) {
 
-        String annotationType = ContributionAnnotation.TYPE + "."
-            + String.valueOf(colorID + 1);
+        type = getNumberedType(type, colorID);
 
-        try {
-            if (colorID < 0 || colorID >= SarosSession.MAX_USERCOLORS)
-                return new Color(Display.getDefault(), NO_COLOR_RGB_VALUES);
+        AnnotationPreferenceLookup lookup = EditorsUI
+            .getAnnotationPreferenceLookup();
 
-            AnnotationPreferenceLookup lookup = EditorsUI
-                .getAnnotationPreferenceLookup();
+        AnnotationPreference ap = lookup.getAnnotationPreference(type);
 
-            AnnotationPreference ap = lookup
-                .getAnnotationPreference(annotationType);
+        if (ap == null)
+            throw new RuntimeException(
+                "could not read color value of annotation '" + type
+                    + "' because it does not exists");
 
-            if (ap == null) {
-                log.warn("could not read color value of annotation '"
-                    + annotationType + "' because it does not exists");
-                return new Color(Display.getDefault(), NO_COLOR_RGB_VALUES);
-            }
+        RGB rgb = PreferenceConverter.getColor(EditorsUI.getPreferenceStore(),
+            ap.getColorPreferenceKey());
 
-            RGB rgb = PreferenceConverter.getColor(
-                EditorsUI.getPreferenceStore(), ap.getColorPreferenceKey());
-
-            return new Color(Display.getDefault(), rgb);
-
-        } catch (Exception e) {
-            log.error("failed to load color value of annotation: "
-                + annotationType, e);
-            return new Color(Display.getDefault(), NO_COLOR_RGB_VALUES);
-        }
+        return new Color(Display.getDefault(), rgb);
     }
 
     /**
@@ -144,31 +122,31 @@ public abstract class SarosAnnotation extends Annotation {
      * the PreferenceStore
      */
     public static void resetColors() {
-        for (int i = 0; i < SarosSession.MAX_USERCOLORS; ++i) {
+        for (int i = 0; i <= SarosSession.MAX_USERCOLORS; ++i) {
 
             AnnotationPreferenceLookup lookup = EditorsUI
                 .getAnnotationPreferenceLookup();
 
-            RGB selectionRGB = readRGB(lookup, i, SELECTION_COLOR_KEY);
-            RGB viewportRGB = readRGB(lookup, i, VIEWPORT_COLOR_KEY);
-            RGB contributionRGB = readRGB(lookup, i, CONTRIBUTION_COLOR_KEY);
+            RGB selectionRGB = readRGB(lookup, i, SelectionAnnotation.TYPE);
+            RGB viewportRGB = readRGB(lookup, i, ViewportAnnotation.TYPE);
+            RGB contributionRGB = readRGB(lookup, i,
+                ContributionAnnotation.TYPE);
 
             setColor(i, selectionRGB, contributionRGB, viewportRGB);
         }
     }
 
     private static RGB readRGB(AnnotationPreferenceLookup lookup, int i,
-        String key) {
-        String annotationTypeForSelection = key + "." + Integer.toString(i + 1);
+        String type) {
 
-        AnnotationPreference ap = lookup
-            .getAnnotationPreference(annotationTypeForSelection);
+        type = getNumberedType(type, i);
 
-        if (ap == null) {
-            log.warn("annotation preference '" + annotationTypeForSelection
+        AnnotationPreference ap = lookup.getAnnotationPreference(type);
+
+        if (ap == null)
+            throw new RuntimeException("annotation preference '" + type
                 + "' does not exists");
-            return null;
-        }
+
         return ap.getColorPreferenceValue();
     }
 
@@ -186,14 +164,14 @@ public abstract class SarosAnnotation extends Annotation {
     private static void setColor(int colorID, final RGB selectionRGB,
         final RGB contributionRGB, final RGB viewportRGB) {
 
-        String annotationTypeForSelection = SelectionAnnotation.TYPE + "."
-            + String.valueOf(colorID + 1);
+        String annotationTypeForSelection = getNumberedType(
+            SelectionAnnotation.TYPE, colorID);
 
-        String annotationTypeForViewport = ViewportAnnotation.TYPE + "."
-            + String.valueOf(colorID + 1);
+        String annotationTypeForViewport = getNumberedType(
+            ViewportAnnotation.TYPE, colorID);
 
-        String annotationTypeForContribution = ContributionAnnotation.TYPE
-            + "." + String.valueOf(colorID + 1);
+        String annotationTypeForContribution = getNumberedType(
+            ContributionAnnotation.TYPE, colorID);
 
         AnnotationPreferenceLookup lookup = EditorsUI
             .getAnnotationPreferenceLookup();
@@ -241,5 +219,16 @@ public abstract class SarosAnnotation extends Annotation {
         // (the last editor changes made by a participant)
         PreferenceConverter.setValue(editorsUIStore,
             apForContribution.getColorPreferenceKey(), contributionRGB);
+    }
+
+    private static String getNumberedType(String type, int colorID) {
+        return type + "." + getColorIDSuffix(colorID);
+    }
+
+    private static String getColorIDSuffix(int colorID) {
+        if (colorID < 0 || colorID >= SarosSession.MAX_USERCOLORS)
+            return "default";
+
+        return String.valueOf(colorID + 1);
     }
 }
