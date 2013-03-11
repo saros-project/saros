@@ -4,7 +4,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
 @RunWith(Suite.class)
-@Suite.SuiteClasses({ NeedBasedSyncTest.class,
+@Suite.SuiteClasses({ ModifyNonSharedFilesTest.class, NeedBasedSyncTest.class,
     ShareFilesFromOneProjectToMultipleRemoteProjectsTest.class,
     ShareFilesToProjectsWithDifferentEncodingTest.class, })
 public class TestSuite {
