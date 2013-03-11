@@ -249,7 +249,9 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
                     .removeFileTransferListener(archiveTransferListener);
 
             fileReplacementInProgressObservable.replacementDone();
-            this.monitor.done();
+            monitor.done();
+
+            projectExchangeProcesses.removeProjectExchangeProcess(this);
 
             // Re-enable auto-building...
             if (wasAutobuilding) {
@@ -262,10 +264,6 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
                         CancelOption.NOTIFY_PEER);
                 }
             }
-            if (this.projectExchangeProcesses.getProcesses()
-                .containsValue(this))
-                this.projectExchangeProcesses
-                    .removeProjectExchangeProcess(this);
         }
 
         return terminateProcess(exception);
@@ -570,8 +568,6 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
         if (sarosSession.getProjectResourcesMapping().keySet().isEmpty()
             || sarosSession.getRemoteUsers().isEmpty())
             sessionManager.stopSarosSession();
-
-        projectExchangeProcesses.removeProjectExchangeProcess(this);
     }
 
     @Override

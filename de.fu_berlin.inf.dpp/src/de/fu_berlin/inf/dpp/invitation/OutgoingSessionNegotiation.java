@@ -434,9 +434,6 @@ public final class OutgoingSessionNegotiation extends InvitationProcess {
     protected void executeCancellation() {
         // TODO remove the user from the session !
 
-        if (invitationProcesses.getProcesses().contains(this))
-            invitationProcesses.removeInvitationProcess(this);
-
         if (invitationProcesses.getProcesses().size() == 0
             && sarosSession.getRemoteUsers().isEmpty())
             sarosSessionManager.stopSarosSession();

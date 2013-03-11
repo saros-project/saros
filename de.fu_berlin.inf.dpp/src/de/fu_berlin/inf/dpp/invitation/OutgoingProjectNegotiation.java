@@ -139,11 +139,11 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
 
                 sendArchive(zipArchive, peer, processID, monitor);
             }
-
-            projectExchangeProcesses.removeProjectExchangeProcess(this);
         } catch (Exception e) {
             exception = e;
         } finally {
+            projectExchangeProcesses.removeProjectExchangeProcess(this);
+
             for (File archive : zipArchives) {
                 if (!archive.delete())
                     log.warn("could not archive file: "
@@ -247,8 +247,6 @@ public class OutgoingProjectNegotiation extends ProjectNegotiation {
     protected void executeCancellation() {
         if (sarosSession.getRemoteUsers().isEmpty())
             sessionManager.stopSarosSession();
-
-        projectExchangeProcesses.removeProjectExchangeProcess(this);
     }
 
     /**
