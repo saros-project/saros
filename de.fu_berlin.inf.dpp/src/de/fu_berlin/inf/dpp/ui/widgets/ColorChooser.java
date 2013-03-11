@@ -12,13 +12,10 @@ import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Display;
-import org.eclipse.ui.editors.text.EditorsUI;
-import org.eclipse.ui.texteditor.AnnotationPreference;
-import org.eclipse.ui.texteditor.AnnotationPreferenceLookup;
 import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.SarosPluginContext;
+import de.fu_berlin.inf.dpp.editor.annotations.SarosAnnotation;
 import de.fu_berlin.inf.dpp.project.ISarosSession;
 import de.fu_berlin.inf.dpp.project.ISarosSessionManager;
 import de.fu_berlin.inf.dpp.project.internal.SarosSession;
@@ -32,11 +29,6 @@ public class ColorChooser extends Composite {
      * List of selection listeners
      */
     protected final List<ColorSelectionListener> selectionListeners = new ArrayList<ColorSelectionListener>();
-
-    /**
-     * Prefix for the annotation preference key for a selection
-     */
-    protected static final String TYPE = "de.fu_berlin.inf.dpp.annotations.selection";
 
     /**
      * Current selection. The selection has to be greater or equal to 0 and
@@ -102,20 +94,10 @@ public class ColorChooser extends Composite {
     private ColorLabel createColorLabel(Composite parent, int style, int colorId) {
         ColorLabel label = new ColorLabel(this, style);
 
-        AnnotationPreferenceLookup lookup = EditorsUI
-            .getAnnotationPreferenceLookup();
+        Color color = SarosAnnotation.getUserColor(colorId);
 
-        String annotationTypeForSelection = TYPE + "."
-            + Integer.toString(colorId + 1);
-
-        AnnotationPreference ap = lookup
-            .getAnnotationPreference(annotationTypeForSelection);
-
-        Color labelColor = new Color(Display.getCurrent(),
-            ap.getColorPreferenceValue());
-
-        label.setData(labelColor);
-        label.setColor(labelColor);
+        label.setData(color);
+        label.setColor(color);
         label.addMouseListener(mouseListener);
 
         return label;

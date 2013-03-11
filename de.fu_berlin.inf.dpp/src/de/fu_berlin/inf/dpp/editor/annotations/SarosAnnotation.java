@@ -84,7 +84,21 @@ public abstract class SarosAnnotation extends Annotation {
      * @return the corresponding color
      */
     public static Color getUserColor(User user) {
-        return getColor(ContributionAnnotation.TYPE, user.getColorID());
+        return getUserColor(user.getColorID());
+    }
+
+    /**
+     * Returns the color that corresponds to a user.
+     * <p>
+     * <b>Important notice:</b> Every returned color instance allocates OS
+     * resources that need to be disposed with {@link Color#dispose()}!
+     * 
+     * @param colorID
+     *            the color id of the user
+     * @return the corresponding color
+     */
+    public static Color getUserColor(int colorID) {
+        return getColor(ContributionAnnotation.TYPE, colorID);
     }
 
     /**

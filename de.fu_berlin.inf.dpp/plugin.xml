@@ -399,7 +399,7 @@
       <specification
             annotationType="de.fu_berlin.inf.dpp.annotations.selection.1"
             colorPreferenceKey="de.fu_berlin.inf.dpp.annotations.selection.color.1"
-            colorPreferenceValue="141,206,231"
+            colorPreferenceValue="183,224,240"
             contributesToHeader="false"
             highlightPreferenceKey="de.fu_berlin.inf.dpp.annotations.selection.highlight.1"
             highlightPreferenceValue="true"
@@ -417,7 +417,7 @@
       <specification
             annotationType="de.fu_berlin.inf.dpp.annotations.selection.2"
             colorPreferenceKey="de.fu_berlin.inf.dpp.annotations.selection.color.2"
-            colorPreferenceValue="191,187,130"
+            colorPreferenceValue="208,205,164"
             contributesToHeader="false"
             highlightPreferenceKey="de.fu_berlin.inf.dpp.annotations.selection.highlight.2"
             highlightPreferenceValue="true"
@@ -435,7 +435,7 @@
       <specification
             annotationType="de.fu_berlin.inf.dpp.annotations.selection.3"
             colorPreferenceKey="de.fu_berlin.inf.dpp.annotations.selection.color.3"
-            colorPreferenceValue="186,220,81"
+            colorPreferenceValue="220,237,166"
             contributesToHeader="false"
             highlightPreferenceKey="de.fu_berlin.inf.dpp.annotations.selection.highlight.3"
             highlightPreferenceValue="true"
@@ -453,7 +453,7 @@
       <specification
             annotationType="de.fu_berlin.inf.dpp.annotations.selection.4"
             colorPreferenceKey="de.fu_berlin.inf.dpp.annotations.selection.color.4"
-            colorPreferenceValue="237,237,169"
+            colorPreferenceValue="246,246,211"
             contributesToHeader="false"
             highlightPreferenceKey="de.fu_berlin.inf.dpp.annotations.selection.highlight.4"
             highlightPreferenceValue="true"
@@ -471,7 +471,7 @@
       <specification
             annotationType="de.fu_berlin.inf.dpp.annotations.selection.5"
             colorPreferenceKey="de.fu_berlin.inf.dpp.annotations.selection.color.5"
-            colorPreferenceValue="137,180,178"
+            colorPreferenceValue="184,210,209"
             contributesToHeader="false"
             highlightPreferenceKey="de.fu_berlin.inf.dpp.annotations.selection.highlight.5"
             highlightPreferenceValue="true"
