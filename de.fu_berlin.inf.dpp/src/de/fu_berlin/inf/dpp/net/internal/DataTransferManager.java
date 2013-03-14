@@ -80,7 +80,8 @@ public class DataTransferManager implements IConnectionListener {
     /**
      * Collection of {@link JID}s, flagged to prefer IBB transfer mode
      */
-    private final Collection<JID> peersForIBB = new ArrayList<JID>();
+    private final Collection<JID> peersForIBB = Collections
+        .synchronizedList(new ArrayList<JID>());
 
     private final Set<JID> currentOutgoingConnectionEstablishments = new HashSet<JID>();
 
