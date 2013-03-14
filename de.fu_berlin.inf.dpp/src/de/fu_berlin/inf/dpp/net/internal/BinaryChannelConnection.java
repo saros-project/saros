@@ -21,17 +21,15 @@ public class BinaryChannelConnection implements IByteStreamConnection {
     private static final Logger log = Logger
         .getLogger(BinaryChannelConnection.class);
 
+    private static final long TERMINATE_TIMEOUT = 10000L;
+
     private IByteStreamConnectionListener listener;
     private BinaryChannel binaryChannel;
     private ReceiverThread receiveThread;
 
-    private JID peer;
+    private final JID peer;
 
-    protected String prefix() {
-        return this.getMode().toString() + " " + Utils.prefix(peer);
-    }
-
-    protected class ReceiverThread extends Thread {
+    private class ReceiverThread extends Thread {
 
         private final BinaryChannel channel;
 
@@ -41,31 +39,22 @@ public class BinaryChannelConnection implements IByteStreamConnection {
 
         @Override
         public void run() {
-            log.debug(prefix() + "ReceiverThread started.");
+            String connection = BinaryChannelConnection.this.toString();
+
+            log.debug(connection + " ReceiverThread started.");
             try {
                 while (!isInterrupted())
                     listener.addIncomingTransferObject(channel
                         .receiveIncomingTransferObject());
 
             } catch (SocketException e) {
-                log.debug(prefix() + "Connection was closed by me. "
-                    + e.getMessage());
-                return;
+                log.debug(connection + " connection closed locally");
             } catch (EOFException e) {
-                log.debug(prefix() + "Connection was closed by peer. "
-                    + e.getMessage());
-                return;
+                log.debug(connection + " connection closed remotely");
             } catch (IOException e) {
-                log.error(prefix() + "Network IO Exception: " + e.getMessage(),
-                    e);
-                return;
-            } catch (ClassNotFoundException e) {
-                log.error(prefix()
-                    + "Received unexpected object in ReceiveThread", e);
-                return;
+                log.error(connection + " network error: " + e.getMessage(), e);
             } catch (Exception e) {
-                log.error(prefix() + "Internal Error in Receive Thread: ", e);
-                return;
+                log.error(connection + " internal error: " + e.getMessage(), e);
             } finally {
                 close();
             }
@@ -78,6 +67,7 @@ public class BinaryChannelConnection implements IByteStreamConnection {
         this.peer = peer;
         this.binaryChannel = channel;
         this.receiveThread = new ReceiverThread(binaryChannel);
+        this.receiveThread.setName("Binary-Channel-" + peer.getName());
         this.receiveThread.start();
     }
 
@@ -87,13 +77,30 @@ public class BinaryChannelConnection implements IByteStreamConnection {
     }
 
     @Override
-    public synchronized void close() {
-        if (!isConnected())
-            return;
+    public void close() {
+        synchronized (this) {
 
-        receiveThread.interrupt();
+            if (!isConnected())
+                return;
+
+            binaryChannel.close();
+        }
+
+        if (Thread.currentThread() != receiveThread) {
+            try {
+                receiveThread.join(TERMINATE_TIMEOUT);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+
+            if (receiveThread.isAlive()) {
+                log.warn("timeout while waiting for closure of binary channel "
+                    + this);
+                receiveThread.interrupt();
+            }
+        }
+
         listener.connectionClosed(getPeer(), this);
-        binaryChannel.close();
     }
 
     @Override
@@ -116,6 +123,11 @@ public class BinaryChannelConnection implements IByteStreamConnection {
             close();
             throw e;
         }
+    }
+
+    @Override
+    public String toString() {
+        return getMode().toString() + " " + Utils.prefix(peer);
     }
 
 }
