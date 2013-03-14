@@ -284,7 +284,7 @@ public class ChangeColorManager extends AbstractActivityProvider implements
             resolveColorConflicts: do {
 
                 // no conflict = OK
-                if (isValidColorAssignment(assignedColors)) {
+                if (isOptimalColorAssignment(assignedColors)) {
                     log.debug("color conflict resolve result = NO CONFLICT");
                     break resolveColorConflicts;
                 }
@@ -308,16 +308,19 @@ public class ChangeColorManager extends AbstractActivityProvider implements
                      * UserColorID.UNKNOWN as current color id
                      */
 
-                    if (isValidColorAssignment(assignedColors)) {
+                    if (isOptimalColorAssignment(assignedColors)) {
                         log.debug("color conflict resolve result = ALREADY SOLVED");
                         break resolveColorConflicts;
+                    } else {
+                        // the colorIdSet was not optimal, reassign colors
+                        assignedColors = assumeNoFavoriteColorCollisions(currentUsers);
                     }
                 }
 
                 // resolve the problem
                 autoAssignColors(assignedColors);
 
-                assert isValidColorAssignment(assignedColors);
+                assert isOptimalColorAssignment(assignedColors);
 
                 /* release all colors again as they will be removed again */
                 for (int colorID : assignedColors.values())
@@ -354,6 +357,24 @@ public class ChangeColorManager extends AbstractActivityProvider implements
         }
     }
 
+    /**
+     * Proofs the if the invariant for optimal color assignment holds true. Here
+     * we take this invariant to be:
+     * <ul>
+     * <li>Each favorite color is used in the final assignment</li>
+     * <li>The assignment is valid (i.e each color is unique, and none of the
+     * colors is UserColorId.UNKNOWN</li>
+     * </ul>
+     * 
+     * @param assignedColors
+     * @return
+     */
+    private boolean isOptimalColorAssignment(Map<User, Integer> assignedColors) {
+        return assignedColors.values().containsAll(
+            new HashSet<Integer>(favoriteUserColors.values()))
+            && isValidColorAssignment(assignedColors);
+    }
+
     private boolean isValidColorAssignment(Map<User, Integer> assignedColors) {
         return isUnique(assignedColors.values())
             && !assignedColors.containsValue(UserColorID.UNKNOWN);
@@ -383,7 +404,7 @@ public class ChangeColorManager extends AbstractActivityProvider implements
         List<User> usersToAutoAssignColors = new ArrayList<User>();
 
         for (Map.Entry<User, Integer> entry : assignedColors.entrySet()) {
-            // we assume here that assigned colors contains
+
             if (!isColorIDAvailable(entry.getValue())) {
                 usersToAutoAssignColors.add(entry.getKey());
                 continue;
