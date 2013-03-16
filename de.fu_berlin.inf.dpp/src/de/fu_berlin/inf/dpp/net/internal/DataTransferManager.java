@@ -45,10 +45,6 @@ import de.fu_berlin.inf.dpp.util.Utils;
 public class DataTransferManager implements IConnectionListener {
     private static final Logger log = Logger
         .getLogger(DataTransferManager.class);
-    /**
-     * Maps JIDs to a list of currently running incoming transfers - receptions
-     */
-    private final Map<JID, List<TransferDescription>> incomingTransfers = new HashMap<JID, List<TransferDescription>>();
 
     private final TransferModeDispatch transferModeDispatch = new TransferModeDispatch();
 
@@ -87,32 +83,42 @@ public class DataTransferManager implements IConnectionListener {
         /**
          * Adds an incoming transfer.
          * 
-         * @param transferObjectDescription
+         * @param transferObject
          *            An IncomingTransferObject that has the TransferDescription
          *            as content to provide information of the incoming transfer
          *            to upper layers.
          */
         @Override
         public void addIncomingTransferObject(
-            final IncomingTransferObject transferObjectDescription) {
+            final IncomingTransferObject transferObject) {
 
-            final TransferDescription description = transferObjectDescription
+            final TransferDescription description = transferObject
                 .getTransferDescription();
-
-            final IncomingTransferObject transferObjectData = new LoggingTransferObject(
-                transferObjectDescription);
 
             boolean dispatchPacket = true;
 
             for (IPacketInterceptor packetInterceptor : packetInterceptors)
                 dispatchPacket &= packetInterceptor
-                    .receivedPacket(transferObjectDescription);
+                    .receivedPacket(transferObject);
 
             if (!dispatchPacket)
                 return;
 
-            receiver.processIncomingTransferObject(description,
-                transferObjectData);
+            log.trace("["
+                + transferObject.getTransferMode()
+                + "] received incoming data transfer: "
+                + description
+                + ", throughput: "
+                + Utils.throughput(transferObject.getTransferredSize(),
+                    transferObject.getTransferDuration()));
+
+            transferModeDispatch.transferFinished(description.getSender(),
+                transferObject.getTransferMode(), true,
+                transferObject.getTransferredSize(),
+                transferObject.getUncompressedSize(),
+                transferObject.getTransferDuration());
+
+            receiver.processIncomingTransferObject(description, transferObject);
         }
 
         @Override
@@ -154,74 +160,6 @@ public class DataTransferManager implements IConnectionListener {
             transferModeDispatch.connectionChanged(peer, null);
         }
     };
-
-    // This class is outdated an will be removed !
-    private final class LoggingTransferObject implements IncomingTransferObject {
-
-        private final IncomingTransferObject transferObject;
-        private final TransferDescription description;
-
-        private LoggingTransferObject(IncomingTransferObject transferObject) {
-            this.transferObject = transferObject;
-            this.description = transferObject.getTransferDescription();
-        }
-
-        @Override
-        public byte[] getPayload() throws IOException {
-            addIncomingFileTransfer(description);
-            try {
-                // TODO Put size in TransferDescription, so we can
-                // display it here
-
-                log.trace("[" + getTransferMode()
-                    + "] Starting incoming data transfer: " + description);
-
-                byte[] content = transferObject.getPayload();
-
-                long duration = getTransferDuration();
-
-                log.trace("[" + getTransferMode()
-                    + "] Finished incoming data transfer: " + description
-                    + ", Throughput: "
-                    + Utils.throughput(getTransferredSize(), duration));
-
-                transferModeDispatch.transferFinished(description.getSender(),
-                    getTransferMode(), true,
-                    transferObject.getTransferredSize(),
-                    transferObject.getUncompressedSize(), duration);
-
-                return content;
-
-            } finally {
-                removeIncomingFileTransfer(description);
-            }
-        }
-
-        @Override
-        public TransferDescription getTransferDescription() {
-            return description;
-        }
-
-        @Override
-        public NetTransferMode getTransferMode() {
-            return transferObject.getTransferMode();
-        }
-
-        @Override
-        public long getTransferredSize() {
-            return transferObject.getTransferredSize();
-        }
-
-        @Override
-        public long getUncompressedSize() {
-            return transferObject.getUncompressedSize();
-        }
-
-        @Override
-        public long getTransferDuration() {
-            return transferObject.getTransferDuration();
-        }
-    }
 
     private static class ConnectionHolder {
         private IByteStreamConnection out;
@@ -523,54 +461,6 @@ public class DataTransferManager implements IConnectionListener {
      * Support for monitoring ongoing transfers
      * ------------------------------------------------------------------------
      */
-
-    /**
-     * Returns just whether there is currently a file transfer being received
-     * from the given user.
-     */
-    public boolean isReceiving(JID from) {
-        return getIncomingTransfers(from).size() > 0;
-    }
-
-    /**
-     * Returns a live copy of the file-transfers currently being received
-     */
-    public List<TransferDescription> getIncomingTransfers(JID from) {
-        synchronized (incomingTransfers) {
-
-            List<TransferDescription> transfers = incomingTransfers.get(from);
-            if (transfers == null) {
-                transfers = new ArrayList<TransferDescription>();
-                incomingTransfers.put(from, transfers);
-            }
-
-            return transfers;
-        }
-    }
-
-    private void removeIncomingFileTransfer(
-        TransferDescription transferDescription) {
-
-        synchronized (incomingTransfers) {
-
-            JID from = transferDescription.getSender();
-
-            List<TransferDescription> transfers = getIncomingTransfers(from);
-            if (!transfers.remove(transferDescription)) {
-                log.warn("removing incoming transfer description that was never added: "
-                    + transferDescription);
-            }
-        }
-    }
-
-    private void addIncomingFileTransfer(TransferDescription transferDescription) {
-
-        synchronized (incomingTransfers) {
-            JID from = transferDescription.getSender();
-            List<TransferDescription> transfers = getIncomingTransfers(from);
-            transfers.add(transferDescription);
-        }
-    }
 
     /**
      * Flag the specified peer to prefer IBB during a connect during this Saros

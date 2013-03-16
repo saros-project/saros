@@ -117,7 +117,7 @@ public class ActivitySequencer implements Startable {
          * How long to wait until ignore missing activityDataObjects in
          * milliseconds.
          */
-        protected static final long ACTIVITY_TIMEOUT = 30 * 1000;
+        protected static final long ACTIVITY_TIMEOUT = 60 * 1000;
 
         /**
          * Sequence numbers for outgoing and incoming activityDataObjects start
@@ -275,25 +275,19 @@ public class ActivitySequencer implements Startable {
              * -> Check for time-out
              */
             long age = System.currentTimeMillis() - oldestLocalTimestamp;
-            if (age > ACTIVITY_TIMEOUT) {
-                if (age < ACTIVITY_TIMEOUT * 2) {
-                    // Early exit if there is a file transfer running.
-                    if (transferManager.isReceiving(jid)) {
-                        // TODO SS need to be more flexible
-                        return;
-                    }
-                }
 
-                int skipCount = firstQueuedSequenceNumber
-                    - expectedSequenceNumber;
-                log.warn("Gave up waiting for activityDataObject # "
-                    + expectedSequenceNumber
-                    + ((skipCount == 1) ? "" : " to "
-                        + (firstQueuedSequenceNumber - 1)) + " from " + jid);
-                expectedSequenceNumber = firstQueuedSequenceNumber;
-                // TODO: Umut: Why do we need to recompute this here?
-                updateOldestLocalTimestamp();
-            }
+            if (age < ACTIVITY_TIMEOUT)
+                return;
+
+            int skipCount = firstQueuedSequenceNumber - expectedSequenceNumber;
+            log.warn("Gave up waiting for activityDataObject # "
+                + expectedSequenceNumber
+                + ((skipCount == 1) ? "" : " to "
+                    + (firstQueuedSequenceNumber - 1)) + " from " + jid);
+            expectedSequenceNumber = firstQueuedSequenceNumber;
+            // TODO: Umut: Why do we need to recompute this here?
+            updateOldestLocalTimestamp();
+
         }
 
         /**
