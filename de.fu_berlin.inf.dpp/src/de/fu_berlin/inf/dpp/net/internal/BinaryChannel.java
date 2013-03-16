@@ -2,15 +2,15 @@ package de.fu_berlin.inf.dpp.net.internal;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.EOFException;
 import java.io.IOException;
 import java.io.InterruptedIOException;
 import java.net.ProtocolException;
-import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.log4j.Logger;
@@ -18,7 +18,7 @@ import org.jivesoftware.smackx.bytestreams.BytestreamSession;
 
 import de.fu_berlin.inf.dpp.net.IncomingTransferObject;
 import de.fu_berlin.inf.dpp.net.NetTransferMode;
-import de.fu_berlin.inf.dpp.util.AutoHashMap;
+import de.fu_berlin.inf.dpp.util.Utils;
 
 /**
  * BinaryChannel is a class that encapsulates a bidirectional communication
@@ -62,16 +62,8 @@ public class BinaryChannel {
 
     private boolean connected;
 
-    /**
-     * Collect the Packets until an entire Object is received. objectid -->
-     * [Packet0, Packet1, ..]
-     */
-
-    private Map<Integer, BlockingQueue<byte[]>> incomingPackets = AutoHashMap
-        .getBlockingQueueHashMap();
-    {
-        incomingPackets = Collections.synchronizedMap(incomingPackets);
-    }
+    private Map<Integer, ByteArrayOutputStream> pendingFragmentedPackets = new HashMap<Integer, ByteArrayOutputStream>();
+    private Map<Integer, BinaryChannelTransferObject> pendingTransferObjects = new HashMap<Integer, BinaryChannelTransferObject>();
 
     private DataInputStream inputStream;
     private DataOutputStream outputStream;
@@ -144,14 +136,14 @@ public class BinaryChannel {
                 TransferDescription transferDescription = TransferDescription
                     .fromByteArray(transferDescriptionData);
 
-                /* Side effects are cool, aren't they ?????? */
+                BinaryChannelTransferObject oldTransferObject = pendingTransferObjects
+                    .put(fragmentId, new BinaryChannelTransferObject(
+                        transferMode, transferDescription, chunks));
 
-                // Side-effect! Create a new BlockingQueue in the
-                // incomingPackets AutoHashMap!
-                BlockingQueue<byte[]> queue = incomingPackets.get(fragmentId);
-                queue.clear();
-                return new BinaryChannelTransferObject(this,
-                    transferDescription, fragmentId, chunks, queue);
+                if (oldTransferObject != null)
+                    throw new IOException(
+                        "replaced an transfer object that is still transmitted");
+                break;
 
             case Opcode.DATA:
                 fragmentId = inputStream.readShort();
@@ -164,8 +156,38 @@ public class BinaryChannel {
 
                 byte[] payload = new byte[payloadLength];
                 inputStream.readFully(payload);
-                incomingPackets.get(fragmentId).add(payload);
-                break;
+
+                ByteArrayOutputStream out = pendingFragmentedPackets
+                    .get(fragmentId);
+
+                if (out == null) {
+                    out = new ByteArrayOutputStream(payloadLength * 2);
+                    pendingFragmentedPackets.put(fragmentId, out);
+                }
+
+                out.write(payload);
+                out.flush();
+
+                if (!pendingTransferObjects.get(fragmentId).isLastChunk())
+                    break;
+
+                pendingFragmentedPackets.remove(fragmentId);
+
+                BinaryChannelTransferObject fullyReceivedTransferObject = pendingTransferObjects
+                    .remove(fragmentId);
+
+                payload = out.toByteArray();
+                payloadLength = payload.length;
+
+                out = null; // help GC
+
+                if (fullyReceivedTransferObject.getTransferDescription()
+                    .compressContent())
+                    payload = Utils.inflate(payload, null);
+
+                fullyReceivedTransferObject.setPayload(payloadLength, payload);
+
+                return fullyReceivedTransferObject;
             default:
                 close();
                 throw new ProtocolException("unknown opcode: 0x"
@@ -250,10 +272,6 @@ public class BinaryChannel {
         outputStream.writeInt(description.length);
         outputStream.write(description);
         outputStream.flush();
-    }
-
-    void removeFragments(int fragmentId) {
-        incomingPackets.get(fragmentId).clear();
     }
 
     /**

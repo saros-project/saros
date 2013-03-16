@@ -50,4 +50,9 @@ public interface IncomingTransferObject {
      */
     public long getUncompressedSize();
 
+    /**
+     * Returns the time in milliseconds until the transfer was completed.
+     */
+    public long getTransferDuration();
+
 }

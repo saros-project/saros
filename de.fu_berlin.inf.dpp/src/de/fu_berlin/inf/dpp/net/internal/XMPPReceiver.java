@@ -6,8 +6,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 import org.apache.log4j.Logger;
 import org.jivesoftware.smack.PacketListener;
@@ -27,11 +25,9 @@ import de.fu_berlin.inf.dpp.net.IncomingTransferObject.IncomingTransferObjectExt
 import de.fu_berlin.inf.dpp.net.SarosPacketCollector;
 import de.fu_berlin.inf.dpp.net.SarosPacketCollector.CancelHook;
 import de.fu_berlin.inf.dpp.net.business.DispatchThreadContext;
-import de.fu_berlin.inf.dpp.util.NamedThreadFactory;
-import de.fu_berlin.inf.dpp.util.Utils;
 
 /**
- * Facade for receiving XMPP Packages. Kind of like the GodPacketListener!
+ * Facade for receiving XMPP Packages.
  * 
  * XMPPReceiver implements addPacketListener and removePacketListener just like
  * a XMPPConnection but hides the complexity of dealing with new connection
@@ -50,21 +46,6 @@ public class XMPPReceiver implements IReceiver {
 
     private Map<PacketListener, PacketFilter> listeners = Collections
         .synchronizedMap(new HashMap<PacketListener, PacketFilter>());
-
-    /**
-     * <p>
-     * Extensions sent by bytestreams can by arbitrary long, thus they are
-     * received in a separate thread.
-     * </p>
-     * 
-     * <p>
-     * Note, as we have two completely different communication ways sequencing
-     * is not ensured in neither case, if done in the dispatch thread or not.
-     * </p>
-     */
-    private ExecutorService extensionDownloadThreadPool = Executors
-        .newCachedThreadPool(new NamedThreadFactory(
-            "Bytestream-Extension-receiver-"));
 
     public XMPPReceiver(DispatchThreadContext dispatchThreadContext,
         IncomingTransferObjectExtensionProvider incomingExtProv) {
@@ -138,14 +119,8 @@ public class XMPPReceiver implements IReceiver {
                 if (processIncomingTransferDescription(packet))
                     return;
 
-                extensionDownloadThreadPool.execute(Utils.wrapSafe(log,
-                    new Runnable() {
-                        @Override
-                        public void run() {
-                            processTransferObjectToPacket(description,
-                                incomingTransferObject);
-                        }
-                    }));
+                processTransferObjectToPacket(description,
+                    incomingTransferObject);
             }
         });
     }
@@ -226,7 +201,7 @@ public class XMPPReceiver implements IReceiver {
      * This method receives the bytestream message from the incoming transfer
      * object and parsed it to the respective Smack {@link PacketExtension}
      * 
-     * @sarosThread must be called by the extensionDownloadThreadPool
+     * @sarosThread must be called from the Dispatch Thread
      */
     private void processTransferObjectToPacket(TransferDescription description,
         IncomingTransferObject transferObject) {
@@ -289,11 +264,6 @@ public class XMPPReceiver implements IReceiver {
         packet.setTo(description.getRecipient().toString());
         packet.addExtension(extension);
 
-        dispatchThreadContext.executeAsDispatch(new Runnable() {
-            @Override
-            public void run() {
-                forwardPacket(packet);
-            }
-        });
+        forwardPacket(packet);
     }
 }

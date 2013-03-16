@@ -1,5 +1,6 @@
 package de.fu_berlin.inf.dpp.net.internal;
 
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
@@ -7,18 +8,18 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
-import java.util.Arrays;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 import org.jivesoftware.smackx.bytestreams.BytestreamSession;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import de.fu_berlin.inf.dpp.net.IncomingTransferObject;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.NetTransferMode;
-import de.fu_berlin.inf.dpp.test.util.TestThread;
+import de.fu_berlin.inf.dpp.util.Utils;
 
 public class BinaryChannelTest {
 
@@ -83,7 +84,6 @@ public class BinaryChannelTest {
 
     private BytestreamSession aliceSession;
     private BytestreamSession bobSession;
-    private volatile TestThread testThread;
 
     @Before
     public void setUp() throws IOException {
@@ -105,7 +105,7 @@ public class BinaryChannelTest {
     @Test
     public void testFragmentationOnLargeDataToBeSend() throws Exception {
 
-        final CountDownLatch threadStart = new CountDownLatch(1);
+        final CountDownLatch received = new CountDownLatch(1);
 
         BinaryChannelConnection alice = new BinaryChannelConnection(new JID(
             "alice@baumeister.de"), new BinaryChannel(aliceSession,
@@ -124,15 +124,13 @@ public class BinaryChannelTest {
             public void addIncomingTransferObject(
                 final IncomingTransferObject incomingTransferObject) {
 
-                testThread = new TestThread(new TestThread.Runnable() {
-                    @Override
-                    public void run() throws Exception {
-                        receivedBytes = incomingTransferObject.getPayload();
-                    }
-                });
+                try {
+                    receivedBytes = incomingTransferObject.getPayload();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
 
-                testThread.start();
-                threadStart.countDown();
+                received.countDown();
             }
         });
 
@@ -146,15 +144,137 @@ public class BinaryChannelTest {
 
         try {
             alice.send(description, bytesToSend);
-            threadStart.await(10000, TimeUnit.MILLISECONDS);
-            testThread.join(10000);
-            testThread.verify();
+            received.await(10000, TimeUnit.MILLISECONDS);
         } finally {
             alice.close();
             bob.close();
         }
 
-        assertTrue("fragmentation error",
-            Arrays.equals(bytesToSend, receivedBytes));
+        assertTrue("no bytes were received", received.getCount() == 0);
+
+        assertArrayEquals("fragmentation error", bytesToSend, receivedBytes);
+    }
+
+    @Test
+    public void testDecompression() throws Exception {
+
+        final CountDownLatch received = new CountDownLatch(1);
+
+        BinaryChannelConnection alice = new BinaryChannelConnection(new JID(
+            "alice@baumeister.de"), new BinaryChannel(aliceSession,
+            NetTransferMode.SOCKS5_DIRECT), new StreamConnectionListener() {
+            @Override
+            public void addIncomingTransferObject(
+                final IncomingTransferObject incomingTransferObject) {
+                // NOP
+            }
+        });
+
+        BinaryChannelConnection bob = new BinaryChannelConnection(new JID(
+            "bob@baumeister.de"), new BinaryChannel(bobSession,
+            NetTransferMode.SOCKS5_DIRECT), new StreamConnectionListener() {
+            @Override
+            public void addIncomingTransferObject(
+                final IncomingTransferObject incomingTransferObject) {
+
+                try {
+                    receivedBytes = incomingTransferObject.getPayload();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+                received.countDown();
+            }
+        });
+
+        TransferDescription description = TransferDescription
+            .createCustomTransferDescription();
+
+        description.setCompressContent(true);
+
+        byte[] bytesToSend = new byte[512 * 1024];
+
+        for (int i = 0; i < bytesToSend.length; i++)
+            bytesToSend[i] = (byte) i;
+
+        try {
+            alice.send(description, Utils.deflate(bytesToSend, null));
+            received.await(10000, TimeUnit.MILLISECONDS);
+        } finally {
+            alice.close();
+            bob.close();
+        }
+
+        assertTrue("no bytes were received", received.getCount() == 0);
+
+        assertArrayEquals("fragmentation error", bytesToSend, receivedBytes);
+    }
+
+    @Test
+    @Ignore("this test consumes much CPU resources and should only executed manually when making changes")
+    public void testFragmentationCleanup() throws Exception {
+
+        long packetSize = 16 * 1024;
+        long bytesToTransfer = (1L << 31L); // send 2 GB of data;
+
+        long packetsToSend = bytesToTransfer / packetSize;
+
+        packetsToSend++;
+
+        final CountDownLatch received = new CountDownLatch((int) packetsToSend);
+
+        BinaryChannelConnection alice = new BinaryChannelConnection(new JID(
+            "alice@baumeister.de"), new BinaryChannel(aliceSession,
+            NetTransferMode.SOCKS5_DIRECT), new StreamConnectionListener() {
+            @Override
+            public void addIncomingTransferObject(
+                final IncomingTransferObject incomingTransferObject) {
+                // NOP
+            }
+        });
+
+        BinaryChannelConnection bob = new BinaryChannelConnection(new JID(
+            "bob@baumeister.de"), new BinaryChannel(bobSession,
+            NetTransferMode.SOCKS5_DIRECT), new StreamConnectionListener() {
+            @Override
+            public void addIncomingTransferObject(
+                final IncomingTransferObject incomingTransferObject) {
+                try {
+                    receivedBytes = incomingTransferObject.getPayload();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+                received.countDown();
+            }
+        });
+
+        TransferDescription description = TransferDescription
+            .createCustomTransferDescription();
+
+        byte[] bytesToSend = new byte[(int) packetSize];
+
+        for (int i = 0; i < bytesToSend.length; i++)
+            bytesToSend[i] = (byte) i;
+
+        try {
+            for (int i = 0; i < packetsToSend - 1; i++)
+                alice.send(description, bytesToSend);
+
+            for (int i = 0; i < bytesToSend.length; i++)
+                bytesToSend[i] = (byte) 0x7F;
+
+            alice.send(description, bytesToSend);
+
+            received.await(60000, TimeUnit.MILLISECONDS);
+        } finally {
+            alice.close();
+            bob.close();
+        }
+
+        assertTrue("remote side crashed", received.getCount() == 0);
+
+        assertArrayEquals("fragmentation error", bytesToSend, receivedBytes);
+
     }
 }

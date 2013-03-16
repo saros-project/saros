@@ -160,6 +160,7 @@ public class DataTransferManager implements IConnectionListener {
         }
     };
 
+    // This class is outdated an will be removed !
     private final class LoggingTransferObject implements IncomingTransferObject {
 
         private final IncomingTransferObject transferObject;
@@ -180,11 +181,9 @@ public class DataTransferManager implements IConnectionListener {
                 log.trace("[" + getTransferMode()
                     + "] Starting incoming data transfer: " + description);
 
-                long startTime = System.currentTimeMillis();
-
                 byte[] content = transferObject.getPayload();
 
-                long duration = System.currentTimeMillis() - startTime;
+                long duration = getTransferDuration();
 
                 log.trace("[" + getTransferMode()
                     + "] Finished incoming data transfer: " + description
@@ -221,6 +220,11 @@ public class DataTransferManager implements IConnectionListener {
         @Override
         public long getUncompressedSize() {
             return transferObject.getUncompressedSize();
+        }
+
+        @Override
+        public long getTransferDuration() {
+            return transferObject.getTransferDuration();
         }
     }
 
