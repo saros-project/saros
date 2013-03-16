@@ -80,7 +80,7 @@ public class ConnectionTestManager {
                 result.transferMode = ito.getTransferMode();
 
                 try {
-                    byte[] data = ito.accept();
+                    byte[] data = ito.getPayload();
 
                     result.dataHash = Arrays.hashCode(data);
 

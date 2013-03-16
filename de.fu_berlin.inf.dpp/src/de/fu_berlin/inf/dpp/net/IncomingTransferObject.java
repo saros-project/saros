@@ -20,16 +20,15 @@ public interface IncomingTransferObject {
      * @blocking This is a long running operation. So do not call this from the
      *           {@link DispatchThreadContext} or from the SWT Thread.
      */
-    public byte[] accept() throws IOException;
+    public byte[] getPayload() throws IOException;
 
     /**
-     * Returns the transfer description of this transfer object (which you can
-     * get by calling accept).
+     * Returns the transfer description of this transfer object.
      */
     public TransferDescription getTransferDescription();
 
     /**
-     * Returns the NetTransferMode using which this Transfer is going to be/has
+     * Returns the NetTransferMode using which this transfer is going to be/has
      * been received.
      */
     public NetTransferMode getTransferMode();

@@ -40,7 +40,7 @@ public class BinaryChannelTransferObject implements IncomingTransferObject {
     }
 
     @Override
-    public byte[] accept() throws IOException {
+    public byte[] getPayload() throws IOException {
 
         try {
 

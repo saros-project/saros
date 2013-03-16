@@ -171,7 +171,7 @@ public class DataTransferManager implements IConnectionListener {
         }
 
         @Override
-        public byte[] accept() throws IOException {
+        public byte[] getPayload() throws IOException {
             addIncomingFileTransfer(description);
             try {
                 // TODO Put size in TransferDescription, so we can
@@ -182,7 +182,7 @@ public class DataTransferManager implements IConnectionListener {
 
                 long startTime = System.currentTimeMillis();
 
-                byte[] content = transferObject.accept();
+                byte[] content = transferObject.getPayload();
 
                 long duration = System.currentTimeMillis() - startTime;
 

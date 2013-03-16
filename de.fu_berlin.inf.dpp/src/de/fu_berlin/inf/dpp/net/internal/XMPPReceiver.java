@@ -244,7 +244,7 @@ public class XMPPReceiver implements IReceiver {
             if (provider == null)
                 return;
 
-            data = transferObject.accept();
+            data = transferObject.getPayload();
 
         } catch (IOException e) {
             log.error("Could not deserialize incoming "

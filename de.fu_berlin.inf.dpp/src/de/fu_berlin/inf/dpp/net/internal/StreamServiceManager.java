@@ -1651,7 +1651,7 @@ public class StreamServiceManager implements Startable {
                 return this.data;
 
             try {
-                data = ito.accept();
+                data = ito.getPayload();
             } catch (IOException ioe) {
                 log.error("Connection broken: ", ioe);
                 if (this.getSession() != null)

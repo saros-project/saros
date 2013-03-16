@@ -127,7 +127,7 @@ public class BinaryChannelTest {
                 testThread = new TestThread(new TestThread.Runnable() {
                     @Override
                     public void run() throws Exception {
-                        receivedBytes = incomingTransferObject.accept();
+                        receivedBytes = incomingTransferObject.getPayload();
                     }
                 });
 
