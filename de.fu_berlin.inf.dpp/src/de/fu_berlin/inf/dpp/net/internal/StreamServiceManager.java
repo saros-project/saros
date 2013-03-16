@@ -1594,11 +1594,6 @@ public class StreamServiceManager implements Startable {
      * Abstraction for incoming and outgoing data-packets.
      */
     public class StreamPacket {
-        /**
-         * Timeout for receiving data ( {@link IncomingTransferObject#accept})
-         * in seconds.
-         */
-        public static final int DATA_RECEIVE_TIMEOUT = 10;
 
         protected TransferDescription transferDescription = null;
         protected IncomingTransferObject ito = null;
