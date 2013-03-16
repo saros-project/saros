@@ -3,7 +3,6 @@ package de.fu_berlin.inf.dpp.net.internal;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotSame;
-import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.io.IOException;
@@ -115,8 +114,6 @@ public class DataTransferManagerTest {
         private volatile boolean closed;
         private volatile int sendPackets;
 
-        private volatile int sendDelay;
-
         public ChannelConnection(JID to, NetTransferMode mode,
             IByteStreamConnectionListener listener) {
             this.to = to;
@@ -143,14 +140,6 @@ public class DataTransferManagerTest {
         @Override
         public void send(TransferDescription data, byte[] content)
             throws IOException {
-
-            if (sendDelay > 0)
-                try {
-                    Thread.sleep(sendDelay);
-                } catch (InterruptedException e) {
-                    Thread.currentThread().interrupt();
-                }
-
             sendPackets++;
         }
 
@@ -161,10 +150,6 @@ public class DataTransferManagerTest {
 
         public int getSendPacketsCount() {
             return sendPackets;
-        }
-
-        public void setSendDelay(int delay) {
-            sendDelay = delay;
         }
     }
 
@@ -605,50 +590,5 @@ public class DataTransferManagerTest {
 
         assertEquals(NetTransferMode.NONE,
             dtm.getTransferMode(new JID("fallback@emergency")));
-    }
-
-    @Test
-    public void testIsSending() throws Exception {
-        Transport mainTransport = new Transport(NetTransferMode.SOCKS5_DIRECT);
-
-        final DataTransferManager dtm = new DataTransferManager(sarosNetStub,
-            null, mainTransport, null, null, null);
-
-        connectionListener.getValue().connectionStateChanged(connectionMock,
-            ConnectionState.CONNECTED);
-
-        dtm.connect(new JID("foo@bar"));
-        assertFalse("there should be no pending sends",
-            dtm.isSending(new JID("foo@bar")));
-
-        mainTransport.getEstablishedConnections().get(0)
-            .setSendDelay(60 * 10000);
-
-        TestThread sendThread = new TestThread(new TestThread.Runnable() {
-            @Override
-            public void run() throws Exception {
-
-                TransferDescription description = TransferDescription
-                    .createCustomTransferDescription();
-
-                description.setRecipient(new JID("foo@bar"));
-
-                dtm.sendData(description, new byte[0]);
-            }
-        });
-
-        sendThread.start();
-
-        long currentTime = System.currentTimeMillis();
-
-        while (sendThread.getState() != Thread.State.TIMED_WAITING
-            && (System.currentTimeMillis() - currentTime < 1000))
-            Thread.yield();
-
-        boolean isSending = dtm.isSending(new JID("foo@bar"));
-
-        sendThread.interrupt();
-
-        assertTrue("there must be a pending send", isSending);
     }
 }

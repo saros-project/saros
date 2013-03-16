@@ -50,11 +50,6 @@ public class DataTransferManager implements IConnectionListener {
      */
     private final Map<JID, List<TransferDescription>> incomingTransfers = new HashMap<JID, List<TransferDescription>>();
 
-    /**
-     * Maps JIDs to the number of currently running, outgoing transfers - send
-     */
-    private final Map<JID, Integer> outgoingTransfers = new HashMap<JID, Integer>();
-
     private final TransferModeDispatch transferModeDispatch = new TransferModeDispatch();
 
     private CopyOnWriteArrayList<IPacketInterceptor> packetInterceptors = new CopyOnWriteArrayList<IPacketInterceptor>();
@@ -266,15 +261,6 @@ public class DataTransferManager implements IConnectionListener {
 
         IByteStreamConnection connection = connectInternal(recipient);
 
-        synchronized (outgoingTransfers) {
-            Integer currentSendingOperations = outgoingTransfers.get(recipient);
-
-            currentSendingOperations = currentSendingOperations == null ? 0
-                : currentSendingOperations;
-
-            outgoingTransfers.put(recipient, currentSendingOperations + 1);
-        }
-
         try {
 
             boolean sendPacket = true;
@@ -303,12 +289,6 @@ public class DataTransferManager implements IConnectionListener {
                     + transferData + " with " + connection.getMode() + ":"
                     + e.getMessage(), e);
             throw e;
-        } finally {
-            synchronized (outgoingTransfers) {
-                Integer count = outgoingTransfers.get(recipient);
-                if (count != null)
-                    outgoingTransfers.put(recipient, --count);
-            }
         }
     }
 
@@ -590,18 +570,6 @@ public class DataTransferManager implements IConnectionListener {
             List<TransferDescription> transfers = getIncomingTransfers(from);
             transfers.add(transferDescription);
         }
-    }
-
-    /**
-     * Returns whether there is currently a file being send to the given
-     * recipient.
-     */
-    public boolean isSending(JID recipient) {
-        Integer transferCount;
-        synchronized (outgoingTransfers) {
-            transferCount = outgoingTransfers.get(recipient);
-        }
-        return (transferCount != null && transferCount > 0);
     }
 
     /**
