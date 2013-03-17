@@ -40,7 +40,7 @@ public class BinaryChannelTransferObject implements IncomingTransferObject {
     }
 
     @Override
-    public long getTransferredSize() {
+    public long getCompressedSize() {
         return transferredSize;
     }
 

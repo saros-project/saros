@@ -15,7 +15,7 @@ import org.jivesoftware.smack.packet.PacketExtension;
 import org.jivesoftware.smack.provider.PacketExtensionProvider;
 import org.jivesoftware.smack.provider.ProviderManager;
 import org.xmlpull.mxp1.MXParser;
-import org.xmlpull.v1.XmlPullParserException;
+import org.xmlpull.v1.XmlPullParser;
 
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.net.IReceiver;
@@ -25,19 +25,10 @@ import de.fu_berlin.inf.dpp.net.SarosPacketCollector;
 import de.fu_berlin.inf.dpp.net.SarosPacketCollector.CancelHook;
 import de.fu_berlin.inf.dpp.net.business.DispatchThreadContext;
 
-/**
- * Facade for receiving XMPP Packages.
- * 
- * XMPPReceiver implements addPacketListener and removePacketListener just like
- * a XMPPConnection but hides the complexity of dealing with new connection
- * objects appearing and old one's disappearing. Users can just register with
- * the XMPPReceiver for the whole application life-cycle.
- * 
- */
 @Component(module = "net")
 public class XMPPReceiver implements IReceiver {
 
-    private static final Logger log = Logger.getLogger(XMPPReceiver.class);
+    private static final Logger LOG = Logger.getLogger(XMPPReceiver.class);
 
     private IncomingTransferObjectExtensionProvider incomingExtProv;
 
@@ -46,26 +37,16 @@ public class XMPPReceiver implements IReceiver {
     private Map<PacketListener, PacketFilter> listeners = Collections
         .synchronizedMap(new HashMap<PacketListener, PacketFilter>());
 
+    private XmlPullParser parser;
+
     public XMPPReceiver(DispatchThreadContext dispatchThreadContext,
         IncomingTransferObjectExtensionProvider incomingExtProv) {
 
         this.dispatchThreadContext = dispatchThreadContext;
         this.incomingExtProv = incomingExtProv;
+        this.parser = new MXParser();
     }
 
-    /**
-     * Adds the given listener to the list of listeners notified when a new
-     * packet arrives.
-     * 
-     * Will only pass those packets to the listener that are accepted by the
-     * given filter or all Packets if no filter is given.
-     * 
-     * @param listener
-     *            The listener to pass packets to.
-     * @param filter
-     *            The filter to use when trying to identify Packets to send to
-     *            the listener. may be null, in which case all Packets are sent.
-     */
     @Override
     public void addPacketListener(PacketListener listener, PacketFilter filter) {
         listeners.put(listener, filter);
@@ -101,13 +82,8 @@ public class XMPPReceiver implements IReceiver {
     }
 
     @Override
-    public void processIncomingTransferObject(
-        final TransferDescription description,
-        final IncomingTransferObject incomingTransferObject) {
-        final Packet packet = new Message();
-        packet.setPacketID(Packet.ID_NOT_AVAILABLE);
-        packet.setFrom(description.getSender().toString());
-        packet.addExtension(incomingExtProv.create(incomingTransferObject));
+    public void processTransferObject(
+        final IncomingTransferObject transferObject) {
 
         dispatchThreadContext.executeAsDispatch(new Runnable() {
 
@@ -115,18 +91,19 @@ public class XMPPReceiver implements IReceiver {
             public void run() {
 
                 // StreamServiceManager forward
-                if (processIncomingTransferDescription(packet))
+                if (forwardTransferObject(transferObject))
                     return;
 
-                processTransferObjectToPacket(description,
-                    incomingTransferObject);
+                Packet packet = convertTransferObjectToPacket(transferObject);
+
+                if (packet != null)
+                    forwardPacket(packet);
             }
         });
     }
 
     /**
-     * This is called from the XMPPConnection for each incoming Packet and will
-     * dispatch these to the registered listeners.
+     * Dispatches the packet to all registered listeners.
      * 
      * @sarosThread must be called from the Dispatch Thread
      */
@@ -147,20 +124,11 @@ public class XMPPReceiver implements IReceiver {
     }
 
     /**
-     * <p>
-     * Informs the the first listener about the received packet that has to
-     * contain an IncomingTransferObject packet extension and let it process it.
-     * <p>
+     * Forwards the transfer object to all registered listeners by wrapping the
+     * transfer object into a packet extension.
      * 
-     * <p>
-     * In difference to usual packets, IncomingTransferObjects can only by
-     * processed by ONE listener, because it accesses the DataTransferManager to
-     * receive a bytestream that can only be done once.
-     * </p>
-     * 
-     * @param packet
-     *            that contains an IncomingTransferObject packet extension
-     * @return if the packet containing an IncomingTransferObject was processed
+     * @return <code>true</code> if the transfer object was processed by a
+     *         listener, <code>false</code> otherwise
      * 
      * @sarosThread must be called from the Dispatch Thread
      */
@@ -170,40 +138,61 @@ public class XMPPReceiver implements IReceiver {
      * IncomingTransferObject listener. It does not make sense to convert it to
      * a packet first.
      */
-    private boolean processIncomingTransferDescription(Packet packet) {
+    private boolean forwardTransferObject(IncomingTransferObject transferObject) {
         Map<PacketListener, PacketFilter> copy;
+
+        Packet packet = wrapTransferObject(transferObject);
 
         synchronized (listeners) {
             copy = new HashMap<PacketListener, PacketFilter>(listeners);
         }
+
+        boolean processed = false;
+
         for (Entry<PacketListener, PacketFilter> entry : copy.entrySet()) {
             PacketListener listener = entry.getKey();
             PacketFilter filter = entry.getValue();
 
             if (filter == null || filter.accept(packet)) {
                 listener.processPacket(packet);
-                /*
-                 * A stream can only be accepted once. Else an exception is
-                 * thrown:
-                 * 
-                 * java.lang.IllegalStateException: This IncomingTransferObject
-                 * has already been accepted or rejected
-                 */
-                return true;
+                processed = true;
             }
         }
 
-        return false;
+        return processed;
+    }
+
+    // FIXME doc: what kind of extension !
+    /**
+     * Creates a new packet that contains the transfer object as packet
+     * extension.
+     */
+    private Packet wrapTransferObject(IncomingTransferObject transferObject) {
+
+        TransferDescription description = transferObject
+            .getTransferDescription();
+
+        Packet packet = new Message();
+        packet.setPacketID(Packet.ID_NOT_AVAILABLE);
+        packet.setFrom(description.getSender().toString());
+        packet.addExtension(incomingExtProv.create(transferObject));
+        return packet;
+
     }
 
     /**
-     * This method receives the bytestream message from the incoming transfer
-     * object and parsed it to the respective Smack {@link PacketExtension}
+     * Deserializes the payload of an {@link IncomingTransferObject} back to its
+     * original {@link PacketExtension} and returns a new packet containing the
+     * deserialized packet extension.
      * 
-     * @sarosThread must be called from the Dispatch Thread
+     * This method is <b>not</b> thread safe and <b>must not</b> accessed by
+     * multiple threads concurrently.
      */
-    private void processTransferObjectToPacket(TransferDescription description,
+    private Packet convertTransferObjectToPacket(
         IncomingTransferObject transferObject) {
+
+        TransferDescription description = transferObject
+            .getTransferDescription();
 
         String name = description.getType();
         String namespace = description.getNamespace();
@@ -212,45 +201,39 @@ public class XMPPReceiver implements IReceiver {
         PacketExtensionProvider provider = (PacketExtensionProvider) ProviderManager
             .getInstance().getExtensionProvider(name, namespace);
 
-        byte[] data;
+        if (provider == null) {
+            LOG.warn("could not deserialize transfer object because no provider with namespace '"
+                + namespace + "' and element name '" + name + "' is installed");
+            return null;
+        }
 
-        if (provider == null)
-            return;
-
-        data = transferObject.getPayload();
-
-        /*
-         * TODO: check how expensive it is to create an new MXParser for every
-         * packet
-         */
-        MXParser parser = new MXParser();
         PacketExtension extension = null;
 
         try {
-            parser.setInput(new ByteArrayInputStream(data), "UTF-8");
+            parser.setInput(
+                new ByteArrayInputStream(transferObject.getPayload()), "UTF-8");
             /*
              * We have to skip the empty start tag because Smack expects a
              * parser that already has started parsing.
              */
             parser.next();
             extension = provider.parseExtension(parser);
-
-        } catch (XmlPullParserException e) {
-            log.error("Unexpected encoding error:", e);
-            return;
         } catch (Exception e) {
-            log.error(
-                "Could not parse packet extension from bytestream. Maybe a wrong transfer description is used?",
-                e);
-            return;
+            LOG.error(
+                "could not deserialize transfer object payload: "
+                    + e.getMessage(), e);
+
+            // just to be safe
+            parser = new MXParser();
+            return null;
         }
 
-        final Packet packet = new Message();
+        Packet packet = new Message();
         packet.setPacketID(description.getExtensionVersion());
         packet.setFrom(description.getSender().toString());
         packet.setTo(description.getRecipient().toString());
         packet.addExtension(extension);
 
-        forwardPacket(packet);
+        return packet;
     }
 }

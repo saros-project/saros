@@ -12,7 +12,6 @@ import de.fu_berlin.inf.dpp.net.IReceiver;
 import de.fu_berlin.inf.dpp.net.IncomingTransferObject;
 import de.fu_berlin.inf.dpp.net.SarosPacketCollector;
 import de.fu_berlin.inf.dpp.net.SarosPacketCollector.CancelHook;
-import de.fu_berlin.inf.dpp.net.internal.TransferDescription;
 
 class NonThreadedReceiver implements IReceiver {
 
@@ -55,8 +54,7 @@ class NonThreadedReceiver implements IReceiver {
     }
 
     @Override
-    public void processIncomingTransferObject(TransferDescription description,
-        IncomingTransferObject incomingTransferObject) {
+    public void processTransferObject(IncomingTransferObject transferObject) {
         // NOP
     }
 }

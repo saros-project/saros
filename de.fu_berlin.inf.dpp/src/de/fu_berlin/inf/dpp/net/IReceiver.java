@@ -4,8 +4,6 @@ import org.jivesoftware.smack.PacketListener;
 import org.jivesoftware.smack.filter.PacketFilter;
 import org.jivesoftware.smack.packet.Packet;
 
-import de.fu_berlin.inf.dpp.net.internal.TransferDescription;
-
 public interface IReceiver {
 
     /**
@@ -13,13 +11,14 @@ public interface IReceiver {
      * packet arrives.
      * 
      * Will only pass those packets to the listener that are accepted by the
-     * given filter or all Packets if no filter is given.
+     * given filter or all packets if no filter is given.
      * 
      * @param listener
      *            The listener to pass packets to.
      * @param filter
-     *            The filter to use when trying to identify Packets to send to
-     *            the listener. may be null, in which case all Packets are sent.
+     *            The filter to use when trying to identify packets that should
+     *            be passed to the listener. If <code>null</code> all packets
+     *            are passed to the listener.
      */
     public void addPacketListener(PacketListener listener, PacketFilter filter);
 
@@ -37,7 +36,7 @@ public interface IReceiver {
      * @param packet
      *            the packet to dispatch
      */
-    public void processPacket(final Packet packet);
+    public void processPacket(Packet packet);
 
     /**
      * Installs a {@linkplain SarosPacketCollector collector}. Use this method
@@ -53,8 +52,13 @@ public interface IReceiver {
      */
     public SarosPacketCollector createCollector(PacketFilter filter);
 
-    public void processIncomingTransferObject(
-        final TransferDescription description,
-        final IncomingTransferObject incomingTransferObject);
+    /**
+     * Transforms a transfer object back into a packet and dispatches the given
+     * packet to all registered packet listeners.
+     * 
+     * @param transferObject
+     *            the transfer object to dispatch
+     */
+    public void processTransferObject(IncomingTransferObject transferObject);
 
 }

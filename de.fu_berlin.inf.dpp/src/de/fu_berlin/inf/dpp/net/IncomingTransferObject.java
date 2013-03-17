@@ -8,8 +8,11 @@ import de.fu_berlin.inf.dpp.net.internal.extensions.XStreamExtensionProvider;
 public interface IncomingTransferObject {
 
     /**
-     * Returns the payload of this transfer object.
+     * Returns the uncompressed payload of this transfer object.
      * 
+     * @Note For performance reason the underlying implementation may choose to
+     *       always return the original data and therefore the returned byte
+     *       array <b>must not</b> be modified.
      */
     public byte[] getPayload();
 
@@ -19,8 +22,8 @@ public interface IncomingTransferObject {
     public TransferDescription getTransferDescription();
 
     /**
-     * Returns the NetTransferMode using which this transfer is going to be/has
-     * been received.
+     * Returns the {@link NetTransferMode} that was used to receive the transfer
+     * object.
      */
     public NetTransferMode getTransferMode();
 
@@ -32,12 +35,12 @@ public interface IncomingTransferObject {
     }
 
     /**
-     * Returns the size of the transferred data in bytes.
+     * Returns the size of the payload in bytes before decompression.
      */
-    public long getTransferredSize();
+    public long getCompressedSize();
 
     /**
-     * Returns the size of the data in bytes after decompression.
+     * Returns the size of the payload in bytes after decompression.
      */
     public long getUncompressedSize();
 

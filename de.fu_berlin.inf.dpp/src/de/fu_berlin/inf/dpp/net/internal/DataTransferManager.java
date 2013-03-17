@@ -106,19 +106,19 @@ public class DataTransferManager implements IConnectionListener {
 
             log.trace("["
                 + transferObject.getTransferMode()
-                + "] received incoming data transfer: "
+                + "] received incoming transfer object: "
                 + description
                 + ", throughput: "
-                + Utils.throughput(transferObject.getTransferredSize(),
+                + Utils.throughput(transferObject.getCompressedSize(),
                     transferObject.getTransferDuration()));
 
             transferModeDispatch.transferFinished(description.getSender(),
                 transferObject.getTransferMode(), true,
-                transferObject.getTransferredSize(),
+                transferObject.getCompressedSize(),
                 transferObject.getUncompressedSize(),
                 transferObject.getTransferDuration());
 
-            receiver.processIncomingTransferObject(description, transferObject);
+            receiver.processTransferObject(transferObject);
         }
 
         @Override
