@@ -1,7 +1,5 @@
 package de.fu_berlin.inf.dpp.net.internal;
 
-import java.io.IOException;
-
 import de.fu_berlin.inf.dpp.net.IncomingTransferObject;
 import de.fu_berlin.inf.dpp.net.NetTransferMode;
 
@@ -27,7 +25,7 @@ public class BinaryChannelTransferObject implements IncomingTransferObject {
     }
 
     @Override
-    public byte[] getPayload() throws IOException {
+    public byte[] getPayload() {
         return payload;
     }
 

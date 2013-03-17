@@ -1,7 +1,6 @@
 package de.fu_berlin.inf.dpp.net.internal;
 
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -214,23 +213,11 @@ public class XMPPReceiver implements IReceiver {
             .getInstance().getExtensionProvider(name, namespace);
 
         byte[] data;
-        try {
 
-            if (provider == null)
-                return;
-
-            data = transferObject.getPayload();
-
-        } catch (IOException e) {
-            log.error("Could not deserialize incoming "
-                + "transfer object or a connection error occurred", e);
+        if (provider == null)
             return;
-        }
-        if (data == null) {
-            log.debug("Received empty transferobject. Discarding transferObject:"
-                + transferObject.toString() + ")");
-            return;
-        }
+
+        data = transferObject.getPayload();
 
         /*
          * TODO: check how expensive it is to create an new MXParser for every

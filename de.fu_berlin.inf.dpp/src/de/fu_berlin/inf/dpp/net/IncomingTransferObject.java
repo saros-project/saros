@@ -1,9 +1,6 @@
 package de.fu_berlin.inf.dpp.net;
 
-import java.io.IOException;
-
 import de.fu_berlin.inf.dpp.annotations.Component;
-import de.fu_berlin.inf.dpp.net.business.DispatchThreadContext;
 import de.fu_berlin.inf.dpp.net.internal.TransferDescription;
 import de.fu_berlin.inf.dpp.net.internal.extensions.XStreamExtensionProvider;
 
@@ -11,16 +8,10 @@ import de.fu_berlin.inf.dpp.net.internal.extensions.XStreamExtensionProvider;
 public interface IncomingTransferObject {
 
     /**
-     * Reads the data from the underlying transfer (for instance a
-     * BinaryChannel) and decompresses it if enabled in the TransferDescription
+     * Returns the payload of this transfer object.
      * 
-     * @throws IOException
-     *             If there was a technical problem.
-     * 
-     * @blocking This is a long running operation. So do not call this from the
-     *           {@link DispatchThreadContext} or from the SWT Thread.
      */
-    public byte[] getPayload() throws IOException;
+    public byte[] getPayload();
 
     /**
      * Returns the transfer description of this transfer object.

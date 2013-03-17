@@ -123,13 +123,7 @@ public class BinaryChannelTest {
             @Override
             public void addIncomingTransferObject(
                 final IncomingTransferObject incomingTransferObject) {
-
-                try {
-                    receivedBytes = incomingTransferObject.getPayload();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-
+                receivedBytes = incomingTransferObject.getPayload();
                 received.countDown();
             }
         });
@@ -176,13 +170,7 @@ public class BinaryChannelTest {
             @Override
             public void addIncomingTransferObject(
                 final IncomingTransferObject incomingTransferObject) {
-
-                try {
-                    receivedBytes = incomingTransferObject.getPayload();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-
+                receivedBytes = incomingTransferObject.getPayload();
                 received.countDown();
             }
         });
@@ -239,12 +227,7 @@ public class BinaryChannelTest {
             @Override
             public void addIncomingTransferObject(
                 final IncomingTransferObject incomingTransferObject) {
-                try {
-                    receivedBytes = incomingTransferObject.getPayload();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-
+                receivedBytes = incomingTransferObject.getPayload();
                 received.countDown();
             }
         });

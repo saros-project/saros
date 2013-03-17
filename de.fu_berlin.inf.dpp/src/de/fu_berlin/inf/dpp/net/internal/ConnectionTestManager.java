@@ -16,9 +16,9 @@ import org.jivesoftware.smack.packet.Packet;
 import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.Saros;
+import de.fu_berlin.inf.dpp.net.IReceiver;
 import de.fu_berlin.inf.dpp.net.IncomingTransferObject;
 import de.fu_berlin.inf.dpp.net.IncomingTransferObject.IncomingTransferObjectExtensionProvider;
-import de.fu_berlin.inf.dpp.net.IReceiver;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.NetTransferMode;
 import de.fu_berlin.inf.dpp.net.SarosNet;
@@ -79,19 +79,13 @@ public class ConnectionTestManager {
                 ConnectionTestResponse result = new ConnectionTestResponse();
                 result.transferMode = ito.getTransferMode();
 
-                try {
-                    byte[] data = ito.getPayload();
+                byte[] data = ito.getPayload();
 
-                    result.dataHash = Arrays.hashCode(data);
+                result.dataHash = Arrays.hashCode(data);
 
-                    log.info(Utils.prefix(new JID(packet.getFrom()))
-                        + "Connection Test Data received: " + data.length
-                        + " bytes, hashCode==" + result.dataHash);
-                } catch (IOException e) {
-                    log.error(
-                        "Connection Test failed because of an IOException", e);
-                    result.errorMessage = "IOException: " + Utils.getMessage(e);
-                }
+                log.info(Utils.prefix(new JID(packet.getFrom()))
+                    + "Connection Test Data received: " + data.length
+                    + " bytes, hashCode==" + result.dataHash);
 
                 try {
                     IQ iqResponse = responseProvider.createIQ(result);

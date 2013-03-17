@@ -1631,13 +1631,8 @@ public class StreamServiceManager implements Startable {
         }
 
         /**
-         * Returns the data this packet contains. When this packet is incoming,
-         * the first call blocks, then cached. When an error occurs and can not
-         * receive any data, it's is reported to packets session, if there is
-         * one, and {@link StreamException} will be thrown.
+         * Returns the data this packet contains.
          * 
-         * @blocking
-         * @caching
          * @throws StreamException
          *             when any error occurs and no data can be retrieved
          */
@@ -1645,15 +1640,7 @@ public class StreamServiceManager implements Startable {
             if (this.data != null)
                 return this.data;
 
-            try {
-                data = ito.getPayload();
-            } catch (IOException ioe) {
-                log.error("Connection broken: ", ioe);
-                if (this.getSession() != null)
-                    this.getSession().reportErrorAndDispose(
-                        new ConnectionException(ioe));
-
-            }
+            data = ito.getPayload();
 
             if (data == null || data.length == 0) {
                 // received none -> error
