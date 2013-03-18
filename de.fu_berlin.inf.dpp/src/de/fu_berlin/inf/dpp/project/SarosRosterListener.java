@@ -24,92 +24,82 @@ import de.fu_berlin.inf.dpp.util.Utils;
  * roster.
  */
 @Component(module = "net")
-public class SarosRosterListener {
-
-    public class Listener implements IRosterListener {
-        @Override
-        public void entriesAdded(Collection<String> addresses) {
-            // ignore
-        }
-
-        @Override
-        public void entriesUpdated(Collection<String> addresses) {
-            // TODO Check if it affects one of our participants in a session
-        }
-
-        @Override
-        public void entriesDeleted(Collection<String> addresses) {
-            // TODO Check if it affects one of our participants in a session
-        }
-
-        @Override
-        public void presenceChanged(Presence presence) {
-
-            ISarosSession sarosSession = sarosSessionObservable.getValue();
-
-            if (sarosSession == null)
-                return;
-
-            JID presenceJID = new JID(presence.getFrom());
-
-            // The presenceJID can be bare if the roster entry has gone off-line
-            if (presenceJID.isBareJID()) {
-                // Check if there is a user in this project using the user name
-                // part of the JID
-                presenceJID = sarosSession.getResourceQualifiedJID(presenceJID);
-
-                // No such user in the project
-                if (presenceJID == null)
-                    return;
-            }
-
-            // By now we should have returned or have a RQ-JID
-            assert presenceJID.isResourceQualifiedJID();
-
-            // Get the user (if any)
-            User user = sarosSession.getUser(presenceJID);
-            if (user == null)
-                return; // PresenceJID does not identify a user in the project
-
-            assert user.getJID().strictlyEquals(presenceJID);
-
-            if (presence.isAvailable()) {
-                if (user.getConnectionState() != UserConnectionState.ONLINE) {
-                    user.setConnectionState(User.UserConnectionState.ONLINE);
-                }
-                user.setAway(presence.isAway());
-            }
-
-            if (!presence.isAvailable()
-                && user.getConnectionState() != UserConnectionState.OFFLINE)
-                user.setConnectionState(User.UserConnectionState.OFFLINE);
-        }
-
-        @Override
-        public void rosterChanged(Roster roster) {
-
-            if (roster == null) {
-                // The connection is now offline
-                return;
-            }
-
-            // Update all presences
-            for (RosterEntry rosterEntry : roster.getEntries()) {
-                for (Presence presence : Utils.asIterable(roster
-                    .getPresences(rosterEntry.getUser()))) {
-                    listener.presenceChanged(presence);
-                }
-            }
-        }
-    }
+public class SarosRosterListener implements IRosterListener {
 
     @Inject
     protected SarosSessionObservable sarosSessionObservable;
 
-    public SarosRosterListener(RosterTracker rosterTracker) {
-        rosterTracker.addRosterListener(listener);
+    @Override
+    public void entriesAdded(Collection<String> addresses) {
+        // NOP
     }
 
-    protected IRosterListener listener = new Listener();
+    @Override
+    public void entriesUpdated(Collection<String> addresses) {
+        // TODO Check if it affects one of our participants in a session
+    }
+
+    @Override
+    public void entriesDeleted(Collection<String> addresses) {
+        // TODO Check if it affects one of our participants in a session
+    }
+
+    @Override
+    public void presenceChanged(Presence presence) {
+
+        ISarosSession sarosSession = sarosSessionObservable.getValue();
+
+        if (sarosSession == null)
+            return;
+
+        JID presenceJID = new JID(presence.getFrom());
+
+        // The presenceJID can be bare if the roster entry has gone off-line
+        if (presenceJID.isBareJID()) {
+            presenceJID = sarosSession.getResourceQualifiedJID(presenceJID);
+
+            if (presenceJID == null)
+                return;
+        }
+
+        // By now we should have returned or have a RQ-JID
+        assert presenceJID.isResourceQualifiedJID();
+
+        User user = sarosSession.getUser(presenceJID);
+
+        if (user == null)
+            return;
+
+        assert user.getJID().strictlyEquals(presenceJID);
+
+        if (presence.isAvailable()) {
+            if (user.getConnectionState() != UserConnectionState.ONLINE) {
+                user.setConnectionState(User.UserConnectionState.ONLINE);
+            }
+            user.setAway(presence.isAway());
+        }
+
+        if (!presence.isAvailable()
+            && user.getConnectionState() != UserConnectionState.OFFLINE)
+            user.setConnectionState(User.UserConnectionState.OFFLINE);
+    }
+
+    @Override
+    public void rosterChanged(Roster roster) {
+
+        if (roster == null)
+            return;
+
+        for (RosterEntry rosterEntry : roster.getEntries()) {
+            for (Presence presence : Utils.asIterable(roster
+                .getPresences(rosterEntry.getUser()))) {
+                presenceChanged(presence);
+            }
+        }
+    }
+
+    public SarosRosterListener(RosterTracker rosterTracker) {
+        rosterTracker.addRosterListener(this);
+    }
 
 }

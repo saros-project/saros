@@ -4,18 +4,16 @@
 package de.fu_berlin.inf.dpp.net;
 
 import java.util.Collection;
-import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.jivesoftware.smack.Roster;
 import org.jivesoftware.smack.packet.Presence;
 
+import de.fu_berlin.inf.dpp.project.SarosRosterListener;
+
 /**
- * Dispatches {@link IRosterListener} events to registered listeners. Listeners
- * get notified according to the order induced by
- * {@link PrecedenceRosterListenerComparator}.<br>
- * <br>
+ * Dispatches {@link IRosterListener} events to registered listeners. <br>
  * Concurrency: If an event is being dispatched while a listener is added or
  * removed concurrently, the listener may or may not get notified. Most notably,
  * a listener should be prepared to get notified even after it was removed from
@@ -23,11 +21,10 @@ import org.jivesoftware.smack.packet.Presence;
  */
 public class DispatchingRosterListener implements IRosterListener {
     protected List<IRosterListener> listeners = new CopyOnWriteArrayList<IRosterListener>();
-    protected Comparator<IRosterListener> listenerComparator = new PrecedenceRosterListenerComparator();
 
     @Override
     public void entriesAdded(Collection<String> addresses) {
-        for (IRosterListener listener : this.listeners) {
+        for (IRosterListener listener : listeners) {
             try {
                 listener.entriesAdded(addresses);
             } catch (RuntimeException e) {
@@ -38,7 +35,7 @@ public class DispatchingRosterListener implements IRosterListener {
 
     @Override
     public void entriesUpdated(Collection<String> addresses) {
-        for (IRosterListener listener : this.listeners) {
+        for (IRosterListener listener : listeners) {
             try {
                 listener.entriesUpdated(addresses);
             } catch (RuntimeException e) {
@@ -60,7 +57,7 @@ public class DispatchingRosterListener implements IRosterListener {
 
     @Override
     public void presenceChanged(Presence presence) {
-        for (IRosterListener listener : this.listeners) {
+        for (IRosterListener listener : listeners) {
             try {
                 listener.presenceChanged(presence);
             } catch (RuntimeException e) {
@@ -71,7 +68,7 @@ public class DispatchingRosterListener implements IRosterListener {
 
     @Override
     public void rosterChanged(Roster roster) {
-        for (IRosterListener listener : this.listeners) {
+        for (IRosterListener listener : listeners) {
             try {
                 listener.rosterChanged(roster);
             } catch (RuntimeException e) {
@@ -81,21 +78,15 @@ public class DispatchingRosterListener implements IRosterListener {
     }
 
     public void add(IRosterListener rosterListener) {
-        // Synchronize to avoid two threads adding the same listener.
-        synchronized (this) {
-            if (!listeners.contains(rosterListener)) {
-                // A CopyOnWriteArrayList doesn't handle sorting, so we have to
-                // find the index ourselves.
-                int index = 0;
-                for (IRosterListener listener : this.listeners) {
-                    if (listenerComparator.compare(rosterListener, listener) < 0)
-                        index++;
-                    else
-                        break;
-                }
-                listeners.add(index, rosterListener);
-            }
-        }
+        /*
+         * put this listener always to the front because it updates existing
+         * user objects from the current session which may be used by the GUI
+         * when the roster have changed
+         */
+        if (rosterListener instanceof SarosRosterListener)
+            listeners.add(0, rosterListener);
+        else
+            listeners.add(rosterListener);
     }
 
     public void remove(IRosterListener rosterListener) {
