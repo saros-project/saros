@@ -18,11 +18,9 @@ import de.fu_berlin.inf.dpp.util.Utils;
  * An instance of this class is instantiated when Eclipse starts, after the
  * Saros plugin has been started.
  * 
- * {@link #earlyStartup()} is called after the workbench is initialized. <br>
- * <br>
- * Checks whether the release number changed.
+ * {@link #earlyStartup()} is called after the workbench is initialized.
  * 
- * @author Lisa Dohrmann, Sandor Szücs
+ * @author Lisa Dohrmann, Sandor Szücs, Stefan Rossbach
  */
 @Component(module = "integration")
 public class StartupSaros implements IStartup {
@@ -56,11 +54,11 @@ public class StartupSaros implements IStartup {
         Integer port = Integer.getInteger("de.fu_berlin.inf.dpp.testmode");
 
         if (port != null && port > 0 && port <= 65535) {
-            log.info("starting  RMI bot listen on port " + port);
-            startRmiBot(port);
+            log.info("starting STF controller on port " + port);
+            startSTFController(port);
 
         } else if (port != null) {
-            log.error("could not start RMI bot, port " + port
+            log.error("could not start STF controller: port " + port
                 + " is not a valid port number");
         } else {
             /*
@@ -85,15 +83,15 @@ public class StartupSaros implements IStartup {
         }
     }
 
-    private void startRmiBot(final int port) {
+    private void startSTFController(final int port) {
 
-        Utils.runSafeAsync("RmiSWTWorkbenchBot-", log, new Runnable() {
+        Utils.runSafeAsync("STF-Controller-Starter", log, new Runnable() {
             @Override
             public void run() {
                 try {
                     STFController.start(port, context);
                 } catch (Exception e) {
-                    log.error("starting RMI bot failed", e);
+                    log.error("starting STF controller failed", e);
                 }
             }
         });
