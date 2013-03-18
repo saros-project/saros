@@ -14,6 +14,7 @@ import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
@@ -420,25 +421,31 @@ public class BuddySessionDisplayComposite extends ViewerComposite {
             public void handleEvent(Event event) {
                 event.detail &= ~SWT.HOT;
 
-                if (event.item != null && event.item.getData() != null) {
-                    User user = (User) Platform.getAdapterManager().getAdapter(
-                        event.item.getData(), User.class);
+                if (event.item == null
+                    || !(event.item.getData() instanceof UserElement))
+                    return;
 
-                    if (event.item.getData() instanceof UserElement
-                        && user != null) {
-                        GC gc = event.gc;
+                User user = (User) Platform.getAdapterManager().getAdapter(
+                    event.item.getData(), User.class);
 
-                        Rectangle bounds = ((TreeItem) event.item)
-                            .getBounds(event.index);
-                        bounds.width = 15;
-                        bounds.x += 15;
+                if (user == null)
+                    return;
 
-                        PaintUtils.drawRoundedRectangle(gc, bounds,
-                            SarosAnnotation.getUserColor(user));
+                GC gc = event.gc;
 
-                        event.detail &= ~SWT.BACKGROUND;
-                    }
-                }
+                Rectangle bounds = ((TreeItem) event.item)
+                    .getBounds(event.index);
+
+                bounds.width = 15;
+                bounds.x += 15;
+
+                Color backgroundColor = SarosAnnotation.getUserColor(user);
+
+                PaintUtils.drawRoundedRectangle(gc, bounds, backgroundColor);
+
+                event.detail &= ~SWT.BACKGROUND;
+
+                backgroundColor.dispose();
             }
         });
     }
