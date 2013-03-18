@@ -149,7 +149,7 @@ public class FileZipper {
 
         long totalRead = 0L;
 
-           try {
+        try {
             for (FileWrapper file : files) {
                 String entryName = includeDirectories ? file.getPath() : file
                     .getName();
@@ -196,8 +196,8 @@ public class FileZipper {
 
         stopWatch.stop();
 
-        log.debug(String.format("created archive %s at %s",
-            stopWatch.throughput(archive.length()), archive.getAbsolutePath()));
+        log.debug(String.format("created archive %s I/O: [%s]",
+            archive.getAbsolutePath(), stopWatch.throughput(archive.length())));
 
     }
 

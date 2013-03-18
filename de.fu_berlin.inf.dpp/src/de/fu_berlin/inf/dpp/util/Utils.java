@@ -638,17 +638,24 @@ public class Utils {
      * given number of bytes in the given time in milliseconds.
      */
     public static String throughput(long length, long deltaMs) {
+
+        String duration = null;
+
         if (deltaMs == 0) {
-            return " (" + formatByte(length) + " in < 1 ms)";
-        } else {
-            return " (" + formatByte(length) + " in "
-                + formatDuration(deltaMs / 1000) + " at "
-                + formatByte(length / deltaMs * 1000) + "/s)";
+            duration = "< 1 ms";
+            deltaMs = 1;
         }
+
+        if (duration == null)
+            duration = deltaMs < 1000 ? "< 1 s"
+                : formatDuration(deltaMs / 1000);
+
+        return formatByte(length) + " in " + duration + " at "
+            + formatByte(length / deltaMs * 1000) + "/s";
     }
 
     /**
-     * Turn an integer representing a file size into a human readable
+     * Turns a long representing a file size in bytes into a human readable
      * representation based on 1KB = 1000 Byte, 1000 KB=1MB, etc. (SI)
      */
     public static String formatByte(long bytes) {
