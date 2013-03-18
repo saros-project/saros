@@ -2,7 +2,6 @@ package de.fu_berlin.inf.dpp.net;
 
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
-import java.net.UnknownHostException;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
@@ -11,7 +10,6 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import org.apache.log4j.Logger;
 import org.jivesoftware.smack.Connection;
 import org.jivesoftware.smack.ConnectionConfiguration;
-import org.jivesoftware.smack.ConnectionCreationListener;
 import org.jivesoftware.smack.ConnectionListener;
 import org.jivesoftware.smack.Roster;
 import org.jivesoftware.smack.SmackConfiguration;
@@ -21,117 +19,281 @@ import org.jivesoftware.smackx.ServiceDiscoveryManager;
 import org.jivesoftware.smackx.bytestreams.socks5.Socks5Proxy;
 import org.picocontainer.annotations.Nullable;
 
-import de.fu_berlin.inf.dpp.Saros;
+import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.net.stun.IStunService;
 import de.fu_berlin.inf.dpp.net.upnp.IUPnPService;
 import de.fu_berlin.inf.dpp.net.util.NetworkingUtils;
 import de.fu_berlin.inf.dpp.util.Utils;
 
 /**
- * Class containing network layer components of Saros.
+ * This class is responsible for establishing XMPP connections and notifying
+ * registered listeners about the state of the current connection.
  */
+@Component(module = "net")
 public class SarosNet {
-    private static final Logger log = Logger.getLogger(SarosNet.class);
+    private static final Logger LOG = Logger.getLogger(SarosNet.class);
 
-    protected Connection connection;
+    private Connection connection;
 
-    protected String loginUsername;
-    protected String loginPassword;
-    protected ConnectionConfiguration prevConnectionConfiguration;
+    private String namespace;
+    private String resource;
+    private int proxyPort;
+    private boolean isProxyEnabled;
+    private String stunServer;
+    private int stunPort;
+    private boolean isPortMappingEnabled;
 
-    protected int proxyPort;
-    protected boolean proxyEnabled;
-    protected String stunServer;
-    protected int stunPort;
-    protected boolean autoPortMapping;
+    private JID localJID;
 
-    /**
-     * The RQ-JID of the local user or null if the user is
-     * {@link ConnectionState#NOT_CONNECTED}.
-     */
-    protected JID myJID;
+    private ConnectionState connectionState = ConnectionState.NOT_CONNECTED;
 
-    protected ConnectionState connectionState = ConnectionState.NOT_CONNECTED;
+    private Exception connectionError;
 
-    protected Exception connectionError;
-
-    protected final List<IConnectionListener> listeners = new CopyOnWriteArrayList<IConnectionListener>();
+    private final List<IConnectionListener> listeners = new CopyOnWriteArrayList<IConnectionListener>();
 
     // Smack (XMPP) connection listener
-    protected ConnectionListener smackConnectionListener;
+    private ConnectionListener smackConnectionListener;
 
-    protected IStunService stunService;
+    private final IStunService stunService;
 
-    protected IUPnPService upnpService;
+    private final IUPnPService upnpService;
 
     private int packetReplyTimeout;
 
     public SarosNet(@Nullable IUPnPService upnpService,
-        @Nullable IStunService stunHelper) {
+        @Nullable IStunService stunService) {
         this.upnpService = upnpService;
-        this.stunService = stunHelper;
+        this.stunService = stunService;
 
         packetReplyTimeout = Integer.getInteger(
             "de.fu_berlin.inf.dpp.net.smack.PACKET_REPLAY_TIMEOUT", 30000);
     }
 
     /**
-     * Configures this instance with debug, proxy, stun and UPnP settings.
+     * Configures the service. Must be at least called once before
+     * {@link #connect} is called.
      * 
+     * @param namespace
+     *            the namespace of the feature (plugin)
+     * @param resource
+     *            the resource qualifier for a running connection
      * @param enableDebug
-     *            boolean, true to show Smack Debug Window upon XMPP connection
+     *            true to show Smack Debug Window upon XMPP connection
      * @param proxyEnabled
-     *            boolean, true to enable Socks5Proxy
+     *            true to enable Socks5Proxy
      * @param proxyPort
-     *            int, sets the Socks5Proxy port
+     *            Socks5Proxy port
      * @param stunServer
-     *            String, STUN server (address)
+     *            STUN server (address)
      * @param stunPort
-     *            int, STUN server port
-     * @param autoPortMapping
-     *            boolean, true to enable UPnP port mapping
+     *            STUN server port
+     * @param enablePortMapping
+     *            true to enable UPnP port mapping
      */
-    public void setSettings(boolean enableDebug, boolean proxyEnabled,
-        int proxyPort, String stunServer, int stunPort, boolean autoPortMapping) {
+    public void configure(String namespace, String resource,
+        boolean enableDebug, boolean proxyEnabled, int proxyPort,
+        String stunServer, int stunPort, boolean enablePortMapping) {
         Connection.DEBUG_ENABLED = enableDebug;
+        this.namespace = namespace;
+        this.resource = resource;
         this.proxyPort = proxyPort;
-        this.proxyEnabled = proxyEnabled;
+        this.isProxyEnabled = proxyEnabled;
         this.stunServer = stunServer;
         this.stunPort = stunPort;
-        this.autoPortMapping = autoPortMapping;
-
-        setBytestreamConnectionProperties();
+        this.isPortMappingEnabled = enablePortMapping;
     }
 
     /**
-     * Performs one time initializations. (currently register a
-     * ConnectionCreationListener only)
+     * The {@linkplain JID resource qualified JID} of the local user if
+     * currently {@linkplain ConnectionState#CONNECTED connected} to a XMPP
+     * server.</br> The JID is also available in the states
+     * {@linkplain ConnectionState#ERROR error},
+     * {@linkplain ConnectionState#DISCONNECTING disconnecting} and
+     * {@linkplain ConnectionState#NOT_CONNECTED disconnected} during a
+     * {@linkplain IConnectionListener#connectionStateChanged listener}
+     * notification if and only if a successful login was performed before.
+     * 
+     * @return the resource qualified JID of the current connection or
+     *         <code>null</code> if not connected to a server
      */
-    public void initialize() {
+    public JID getMyJID() {
+        return localJID;
+    }
 
-        // Jingle has to be started once!
-        // JingleManager.setJingleServiceEnabled();
+    /**
+     * Returns the {@linkplain Roster roster} of the established connection or
+     * <code>null</code> if not connected.
+     */
+    public Roster getRoster() {
+        return isConnected() ? connection.getRoster() : null;
+    }
 
-        /*
-         * add Saros as XMPP feature once {@link Connection} is connected to the
-         * XMPP server
-         */
-        Connection
-            .addConnectionCreationListener(new ConnectionCreationListener() {
-                @Override
-                public void connectionCreated(Connection connection2) {
-                    if (connection != connection2) {
-                        // Ignore the connections created in createAccount.
-                        return;
-                    }
+    /**
+     * Connects the service to a XMPP server using the given configuration and
+     * credentials.
+     * 
+     * @param connectionConfiguration
+     *            {@link ConnectionConfiguration} Configuration for connecting
+     *            to the server.
+     * @param username
+     *            the username of the XMPP account
+     * @param password
+     *            the password of the XMPP Account
+     * 
+     * @blocking
+     */
+    public void connect(ConnectionConfiguration connectionConfiguration,
+        String username, String password) throws XMPPException {
 
-                    ServiceDiscoveryManager sdm = ServiceDiscoveryManager
-                        .getInstanceFor(connection);
-                    sdm.addFeature(Saros.NAMESPACE);
+        if (isConnected())
+            disconnect();
 
-                    setBytestreamConnectionProperties();
-                }
-            });
+        setBytestreamConnectionProperties();
+
+        Roster.setDefaultSubscriptionMode(Roster.SubscriptionMode.manual);
+
+        connection = new XMPPConnection(connectionConfiguration);
+
+        try {
+            setConnectionState(ConnectionState.CONNECTING, null);
+            connection.connect();
+
+            ServiceDiscoveryManager.getInstanceFor(connection).addFeature(
+                namespace);
+
+            // add connection listener so we get notified if it will be closed
+            if (smackConnectionListener == null)
+                smackConnectionListener = new XMPPConnectionListener();
+
+            /*
+             * BUG in Smack: should be possible to register the listener before
+             * call connect
+             */
+            connection.addConnectionListener(smackConnectionListener);
+
+            connection.login(username, password, resource);
+
+            localJID = new JID(connection.getUser());
+            setConnectionState(ConnectionState.CONNECTED, null);
+        } catch (IllegalArgumentException e) {
+            /*
+             * cleanup is handled in the listener callback as the connection can
+             * only be closed due to an error
+             */
+            throw new XMPPException("connection lost during login attempt");
+        } catch (XMPPException e) {
+            setConnectionState(ConnectionState.ERROR, e);
+            disconnectInternal();
+            setConnectionState(ConnectionState.NOT_CONNECTED, null);
+            localJID = null;
+            throw (e);
+        }
+    }
+
+    /**
+     * Disconnects the service from the current XMPP server if not already
+     * disconnected.
+     * 
+     * @blocking
+     */
+    public void disconnect() {
+        if (isConnected()) {
+            setConnectionState(ConnectionState.DISCONNECTING, null);
+
+            disconnectInternal();
+
+            setConnectionState(ConnectionState.NOT_CONNECTED, null);
+        }
+        localJID = null;
+    }
+
+    /**
+     * Returns whether the service is currently connected to a XMPP server.
+     */
+    public boolean isConnected() {
+        return connectionState == ConnectionState.CONNECTED;
+    }
+
+    /**
+     * Returns the current {@linkplain ConnectionState connection state} of the
+     * service.
+     */
+    public ConnectionState getConnectionState() {
+        return connectionState;
+    }
+
+    /**
+     * @return Exception that occurred during recent connection failure or
+     *         <code>null</code> if not applicable.
+     */
+    public Exception getConnectionError() {
+        return connectionError;
+    }
+
+    /**
+     * Returns the currently used connection.
+     * 
+     * @return the currently used connection or <code>null</code> if there is
+     *         none
+     * 
+     * @Note it is strictly forbidden to call
+     *       {@linkplain Connection#disconnect()} on the returned instance
+     */
+    public Connection getConnection() {
+        return connection;
+    }
+
+    public void addListener(IConnectionListener listener) {
+        listeners.add(listener);
+    }
+
+    public void removeListener(IConnectionListener listener) {
+        listeners.remove(listener);
+    }
+
+    private void disconnectInternal() {
+        if (connection == null)
+            return;
+
+        try {
+            connection.removeConnectionListener(smackConnectionListener);
+            connection.disconnect();
+        } catch (RuntimeException e) {
+            LOG.warn("could not disconnect from the current XMPPConnection", e);
+        } finally {
+            connection = null;
+        }
+    }
+
+    /**
+     * Sets a new connection state and notifies all connection listeners.
+     */
+    private void setConnectionState(ConnectionState state, Exception error) {
+
+        this.connectionState = state;
+        this.connectionError = error;
+
+        // Prefix the name of the user for which the state changed
+        String prefix = "";
+        if (connection != null) {
+            String user = connection.getUser();
+            if (user != null)
+                prefix = Utils.prefix(new JID(user));
+        }
+
+        if (error == null) {
+            LOG.debug(prefix + "new connection state == " + state);
+        } else {
+            LOG.error(prefix + "new connection state == " + state, error);
+        }
+
+        for (IConnectionListener listener : this.listeners) {
+            try {
+                listener.connectionStateChanged(this.connection, state);
+            } catch (Exception e) {
+                LOG.error("internal error in listener: " + listener, e);
+            }
+        }
     }
 
     /**
@@ -139,7 +301,7 @@ public class SarosNet {
      * Socks5Proxy configuration, look up streamhost address candiates for
      * Socks5Proxy, update UPnP settings on proxy setting change.
      */
-    protected void setBytestreamConnectionProperties() {
+    private void setBytestreamConnectionProperties() {
 
         /*
          * Setting the Smack timeout for packet replies. The default of 5000 can
@@ -161,9 +323,9 @@ public class SarosNet {
 
         Socks5Proxy proxy = NetworkingUtils.getSocks5ProxySafe();
 
-        if (proxyEnabled != SmackConfiguration.isLocalSocks5ProxyEnabled()) {
+        if (isProxyEnabled != SmackConfiguration.isLocalSocks5ProxyEnabled()) {
             settingsChanged = true;
-            SmackConfiguration.setLocalSocks5ProxyEnabled(proxyEnabled);
+            SmackConfiguration.setLocalSocks5ProxyEnabled(isProxyEnabled);
         }
 
         // Note: The proxy gets restarted on port change, too.
@@ -175,7 +337,7 @@ public class SarosNet {
 
         // Get & set all (useful) internal and external IP addresses as
         // potential connect addresses
-        if (proxyEnabled) {
+        if (isProxyEnabled) {
 
             try {
                 List<InetAddress> myAdresses = NetworkingUtils
@@ -190,7 +352,7 @@ public class SarosNet {
                 }
 
                 if (stunService != null) {
-                    Utils.runSafeAsync(log, new Runnable() {
+                    Utils.runSafeAsync(LOG, new Runnable() {
                         @Override
                         public void run() {
                             Collection<InetSocketAddress> addresses = stunService
@@ -203,11 +365,11 @@ public class SarosNet {
                     });
                 }
             } catch (Exception e) {
-                log.debug("Error while retrieving IP addresses", e);
+                LOG.debug("Error while retrieving IP addresses", e);
             }
         }
 
-        if (settingsChanged || proxy.isRunning() != proxyEnabled) {
+        if (settingsChanged || proxy.isRunning() != isProxyEnabled) {
             StringBuilder sb = new StringBuilder();
             if (settingsChanged)
                 sb.append("Socks5Proxy properties changed. ");
@@ -216,24 +378,25 @@ public class SarosNet {
                 proxy.stop();
                 sb.append("Socks5Proxy stopped. ");
             }
-            if (proxyEnabled) {
+            if (isProxyEnabled) {
                 proxy.start();
                 sb.append("Socks5Proxy started on port " + proxy.getPort()
                     + "...");
             }
-            log.debug(sb);
+            LOG.debug(sb);
 
             if (upnpService != null) {
                 // Update the mapped port on Socks5Proy port change
-                if (proxyEnabled && portChanged && upnpService.isMapped())
+                if (isProxyEnabled && portChanged && upnpService.isMapped())
                     upnpService.createSarosPortMapping();
 
                 // create UPnP port mapping if not existing
-                if (proxyEnabled && autoPortMapping && !upnpService.isMapped())
+                if (isProxyEnabled && isPortMappingEnabled
+                    && !upnpService.isMapped())
                     upnpService.createSarosPortMapping();
 
                 // remove UPnP port mapping if not required
-                if (!proxyEnabled && upnpService.isMapped())
+                if (!isProxyEnabled && upnpService.isMapped())
                     upnpService.removeSarosPortMapping();
 
                 if (upnpService.isMapped()) {
@@ -245,338 +408,39 @@ public class SarosNet {
         }
     }
 
-    /**
-     * The RQ-JID of the local user if connected, null otherwise
-     */
-    public JID getMyJID() {
-        return this.myJID;
-    }
-
-    /**
-     * Returns the {@code org.jivesoftware.smack.Roster} of the established XMPP
-     * connection. Or <code>null</code> if not connected.
-     */
-    public Roster getRoster() {
-        if (!isConnected()) {
-            return null;
-        }
-
-        return this.connection.getRoster();
-    }
-
-    /**
-     * Connects using the given credentials.
-     * 
-     * @param connectionConfiguration
-     *            {@link ConnectionConfiguration} Configuration for connecting
-     *            to the server.
-     * @param username
-     *            XMPP account name to login
-     * @param password
-     *            password to login with
-     * @param failSilently
-     *            true, if upon connection failure no feedback message is shown
-     * 
-     * @blocking
-     */
-    public void connect(ConnectionConfiguration connectionConfiguration,
-        String username, String password, boolean failSilently)
-        throws Exception {
-
-        if (isConnected()) {
-            disconnect();
-        }
-
-        prevConnectionConfiguration = connectionConfiguration;
-        loginUsername = username;
-        loginPassword = password;
-
-        Roster.setDefaultSubscriptionMode(Roster.SubscriptionMode.manual);
-
-        this.connection = new XMPPConnection(connectionConfiguration);
-
-        try {
-            this.setConnectionState(ConnectionState.CONNECTING, null);
-            this.connection.connect();
-
-            // add connection listener so we get notified if it will be closed
-            if (this.smackConnectionListener == null) {
-                this.smackConnectionListener = new SafeConnectionListener(log,
-                    new XMPPConnectionListener());
-            }
-            connection.addConnectionListener(this.smackConnectionListener);
-
-            /*
-             * TODO SS Possible race condition, as our packet listeners are
-             * registered only after the login (in CONNECTED Connection State),
-             * so we might for instance receive subscription requests even
-             * though we do not have a packet listener running yet!
-             */
-            this.connection.login(username, password, Saros.RESOURCE);
-            /* other people can now send invitations */
-
-            this.myJID = new JID(this.connection.getUser());
-            setConnectionState(ConnectionState.CONNECTED, null);
-        } catch (IllegalArgumentException e) {
-            setConnectionState(ConnectionState.ERROR, null);
-            throw (e);
-        } catch (XMPPException e) {
-            Throwable t = e.getWrappedThrowable();
-            Exception cause = (t != null) ? (Exception) t : e;
-
-            setConnectionState(ConnectionState.ERROR, cause);
-            throw (e);
-        } catch (Exception e) {
-            setConnectionState(ConnectionState.ERROR, e);
-            throw (e);
-        }
-    }
-
-    /**
-     * Disconnects (if currently connected)
-     * 
-     * @blocking
-     * 
-     * @post this.myjid == null && this.connection == null &&
-     *       this.connectionState == ConnectionState.NOT_CONNECTED
-     */
-    public void disconnect() {
-        if (isConnected()) {
-            setConnectionState(ConnectionState.DISCONNECTING, null);
-
-            disconnectInternal();
-
-            setConnectionState(ConnectionState.NOT_CONNECTED, null);
-        }
-        this.myJID = null;
-
-        // Make a sanity check on the connection and connection state
-        if (this.connectionState != ConnectionState.NOT_CONNECTED) {
-            log.warn("Connection state is out of sync");
-            this.connectionState = ConnectionState.NOT_CONNECTED;
-        }
-        if (this.connection != null) {
-            log.warn("Connection has not been closed");
-            this.connection = null;
-        }
-    }
-
-    protected void disconnectInternal() {
-        if (connection != null) {
-            try {
-                connection.removeConnectionListener(smackConnectionListener);
-                connection.disconnect();
-            } catch (RuntimeException e) {
-                log.warn("Could not disconnect old XMPPConnection: ", e);
-            } finally {
-                connection = null;
-            }
-        }
-    }
-
-    /**
-     * Returns whether this instance is currently connected to the XMPP network.
-     */
-    public boolean isConnected() {
-        return this.connectionState == ConnectionState.CONNECTED;
-    }
-
-    /**
-     * @return the current state of the connection.
-     */
-    public ConnectionState getConnectionState() {
-        return this.connectionState;
-    }
-
-    /**
-     * @return Exception that occurred during recent connection failure or
-     *         <code>null</code> if not applicable.
-     */
-    public Exception getConnectionError() {
-        return this.connectionError;
-    }
-
-    /**
-     * @return the currently established connection or <code>null</code> if
-     *         there is none.
-     */
-    public Connection getConnection() {
-        return this.connection;
-    }
-
-    public void addListener(IConnectionListener listener) {
-        if (!this.listeners.contains(listener)) {
-            this.listeners.add(listener);
-        }
-    }
-
-    public void removeListener(IConnectionListener listener) {
-        this.listeners.remove(listener);
-    }
-
-    protected void assertConnection() throws XMPPException {
-        if (!isConnected()) {
-            throw new XMPPException("No connection");
-        }
-    }
-
-    /**
-     * Sets a new connection state and notifies all connection listeners.
-     */
-    protected void setConnectionState(ConnectionState state, Exception error) {
-
-        this.connectionState = state;
-        this.connectionError = error;
-
-        // Prefix the name of the user for which the state changed
-        String prefix = "";
-        if (connection != null) {
-            String user = connection.getUser();
-            if (user != null)
-                prefix = Utils.prefix(new JID(user));
-        }
-
-        if (error == null) {
-            log.debug(prefix + "New Connection State == " + state);
-        } else {
-            log.error(prefix + "New Connection State == " + state, error);
-        }
-
-        for (IConnectionListener listener : this.listeners) {
-            try {
-                listener.connectionStateChanged(this.connection, state);
-            } catch (RuntimeException e) {
-                log.error("Internal error in setConnectionState:", e);
-            }
-        }
-    }
-
-    protected class XMPPConnectionListener implements ConnectionListener {
+    private class XMPPConnectionListener implements ConnectionListener {
 
         @Override
         public void connectionClosed() {
-            // self inflicted, controlled disconnect
-            setConnectionState(ConnectionState.NOT_CONNECTED, null);
+            /*
+             * see Smack Source: connectionClosed is called before
+             * connectionClosedOnError and so would violate the state transition
+             * described in the ConnectionState class
+             */
         }
 
         @Override
         public void connectionClosedOnError(Exception e) {
-
-            log.error("XMPP Connection Error: ", e);
-
-            if (e.toString().equals("stream:error (conflict)")) {
-
-                disconnect();
-                setConnectionState(ConnectionState.NOT_CONNECTED, e);
-
-                return;
-            }
-
-            if (e.toString().equals("stream:error (text)")) {
-                setConnectionState(ConnectionState.NOT_CONNECTED, e);
-                return;
-            }
-
-            // Only try to reconnect if we did achieve a connection...
-            if (getConnectionState() != ConnectionState.CONNECTED)
-                return;
-
+            LOG.error("XMPP connection error: ", e);
             setConnectionState(ConnectionState.ERROR, e);
-
             disconnectInternal();
-
-            Utils.runSafeAsync(log, new Runnable() {
-                @Override
-                public void run() {
-
-                    // HACK Improve this hack to stop an infinite reconnect
-                    int i = 0;
-                    final int CONNECTION_RETRIES = 15;
-
-                    while (!isConnected() && i++ < CONNECTION_RETRIES) {
-
-                        try {
-                            log.info("Reconnecting...("
-                                + InetAddress.getLocalHost().toString() + ")");
-
-                            reconnect(true);
-                            if (!isConnected())
-                                Thread.sleep(5000);
-
-                        } catch (InterruptedException e) {
-                            log.error("Code not designed to be interruptable",
-                                e);
-                            Thread.currentThread().interrupt();
-                            return;
-                        } catch (UnknownHostException e) {
-                            log.info("Could not get localhost, maybe the network interface is down.");
-                        } catch (XMPPException e) {
-                            log.info("Login failed:" + e.getMessage());
-                        } catch (Exception e) {
-                            log.info("Login failed:" + e.getMessage());
-                        }
-                    }
-
-                    if (isConnected()) {
-                        // sessionManager.onReconnect(expectedSequenceNumbers);
-                        log.debug("XMPP reconnected");
-                    }
-                }
-
-            });
+            setConnectionState(ConnectionState.NOT_CONNECTED, null);
+            localJID = null;
         }
 
         @Override
         public void reconnectingIn(int seconds) {
-            // TODO maybe using Smack reconnect is better
-            assert false : "Reconnecting is disabled";
-            // setConnectionState(ConnectionState.CONNECTING, null);
+            // NOP
         }
 
         @Override
         public void reconnectionFailed(Exception e) {
-            // TODO maybe using Smack reconnect is better
-            assert false : "Reconnecting is disabled";
-            // setConnectionState(ConnectionState.ERROR, e.getMessage());
+            // NOP
         }
 
         @Override
         public void reconnectionSuccessful() {
-            // TODO maybe using Smack reconnect is better
-            assert false : "Reconnecting is disabled";
-            // setConnectionState(ConnectionState.CONNECTED, null);
+            // NOP
         }
     }
-
-    private void reconnect(boolean failSilently) throws Exception {
-        if (connection.isConnected())
-            return;
-
-        connect(prevConnectionConfiguration, loginUsername, loginPassword,
-            failSilently);
-    }
-
-    /**
-     * Last resort of cleaning up, performing disconnect.
-     */
-    public void uninitialize() {
-        if (isConnected()) {
-            /*
-             * Need to fork because disconnect should not be run in the SWT
-             * thread.
-             */
-
-            /*
-             * FIXME Provide a unique thread context in which all
-             * connecting/disconnecting is done.
-             */
-            Utils.runSafeAsync(log, new Runnable() {
-                @Override
-                public void run() {
-                    disconnect();
-                }
-            });
-        }
-    }
-
 }

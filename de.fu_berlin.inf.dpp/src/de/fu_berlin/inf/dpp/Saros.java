@@ -278,8 +278,6 @@ public class Saros extends AbstractUIPlugin {
 
         isInitialized = true;
 
-        sarosNet.initialize();
-
         upnpService.init(new UPnPAccessImpl(), getPreferenceStore());
 
         // determine if auto-connect can and should be performed
@@ -321,15 +319,22 @@ public class Saros extends AbstractUIPlugin {
                 "Saros-Shutdown-Process", log, new Runnable() {
                     @Override
                     public void run() {
-                        sessionManager.stopSarosSession();
 
-                        getSarosNet().uninitialize();
-                        // Remove UPnP port mapping for Saros
+                        /*
+                         * Always remove UPnP port mapping for Saros first
+                         * because some routers have no lease duration and so
+                         * this mapping will still be present if something goes
+                         * wrong in the shutdown process
+                         */
                         IUPnPService upnpManager = sarosContext
                             .getComponent(IUPnPService.class);
 
                         if (upnpManager.isMapped())
                             upnpManager.removeSarosPortMapping();
+
+                        sessionManager.stopSarosSession();
+
+                        getSarosNet().disconnect();
 
                         /**
                          * This will cause dispose() to be called on all
@@ -653,7 +658,8 @@ public class Saros extends AbstractUIPlugin {
             username += "@" + domain;
         }
 
-        sarosNet.setSettings(preferenceUtils.isDebugEnabled(),
+        sarosNet.configure(NAMESPACE, RESOURCE,
+            preferenceUtils.isDebugEnabled(),
             preferenceUtils.isLocalSOCKS5ProxyEnabled(),
             preferenceUtils.getFileTransferPort(), preferenceUtils.getStunIP(),
             preferenceUtils.getStunPort(),
@@ -662,7 +668,7 @@ public class Saros extends AbstractUIPlugin {
         try {
             getSarosNet().connect(
                 createConnectionConfiguration(domain, server, port, useTLS,
-                    useSASL), username, password, failSilently);
+                    useSASL), username, password);
         } catch (XMPPException e) {
             Throwable t = e.getWrappedThrowable();
             Exception cause = (t != null) ? (Exception) t : e;

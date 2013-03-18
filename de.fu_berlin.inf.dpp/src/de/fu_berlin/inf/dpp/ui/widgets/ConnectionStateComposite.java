@@ -25,6 +25,16 @@ public class ConnectionStateComposite extends Composite {
     private static final Logger log = Logger
         .getLogger(ConnectionStateComposite.class);
 
+    @Inject
+    protected Saros saros;
+
+    @Inject
+    protected XMPPAccountStore accountStore;
+
+    protected CLabel stateLabel;
+
+    private ConnectionState lastConnectionState;
+
     protected final IConnectionListener connectionListener = new IConnectionListener() {
         @Override
         public void connectionStateChanged(Connection connection,
@@ -37,14 +47,6 @@ public class ConnectionStateComposite extends Composite {
             });
         }
     };
-
-    @Inject
-    protected Saros saros;
-
-    @Inject
-    protected XMPPAccountStore accountStore;
-
-    protected CLabel stateLabel;
 
     public ConnectionStateComposite(Composite parent, int style) {
         super(parent, style);
@@ -73,6 +75,14 @@ public class ConnectionStateComposite extends Composite {
     }
 
     protected void updateLabel(ConnectionState newState) {
+
+        // do not hide the latest error
+        if (lastConnectionState == ConnectionState.ERROR
+            && newState == ConnectionState.NOT_CONNECTED)
+            return;
+
+        lastConnectionState = newState;
+
         if (stateLabel != null && !stateLabel.isDisposed()) {
             stateLabel.setText(getDescription(newState));
 
