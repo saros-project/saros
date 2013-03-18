@@ -56,7 +56,6 @@ import de.fu_berlin.inf.dpp.ui.widgets.chatControl.parts.ChatDisplay;
 import de.fu_berlin.inf.dpp.ui.widgets.chatControl.parts.ChatInput;
 import de.fu_berlin.inf.dpp.ui.widgets.session.ChatRoomsComposite;
 import de.fu_berlin.inf.nebula.explanation.ExplanationComposite;
-import de.fu_berlin.inf.nebula.utils.ColorUtils;
 
 /**
  * This composite displays a chat conversation and the possibility to enter
@@ -453,11 +452,18 @@ public class ChatControl extends Composite {
                 }
 
                 if (user != null) {
-                    // add default lightness to cached color
-                    Color userColor = SarosAnnotation.getUserColor(user);
-                    color = ColorUtils.addLightness(userColor,
-                        SarosAnnotation.getLightnessScale());
-                    userColor.dispose();
+                    color = SarosAnnotation.getUserColor(user);
+
+                    /*
+                     * excluded until
+                     * http://saros-build.imp.fu-berlin.de/gerrit/#/c/253/ is
+                     * submitted
+                     */
+                    // add default lightness to the current user color
+                    // Color lightenedColor = ColorUtils.addLightness(color,
+                    // SarosAnnotation.getLightnessScale());
+                    // color.dispose();
+                    // color = lightenedColor;
 
                     colorCache.put(jid, color);
                 } else if (isOwnJID(jid)) {
