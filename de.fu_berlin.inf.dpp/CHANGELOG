@@ -1,3 +1,78 @@
+13.3.15
+=======
+
+[PERFORMANCE] Due to situations of high cpu usage when typing continuously, 
+              the user is now allowed to disable the contribution annotations 
+              to gain a better performance.
+
+[PERFORMANCE] Only the session host can invite other users. 
+              This regression was neccessary to gain more staibilty.
+
+[FEATURE] We introduced a new color management, 
+          which tries to ensure that you always get the same colors in your session, 
+          independent of who started the session in the first place. To achieve this, 
+          we had to restrict the freedom of choosing any RGB color to a strict five-color-mode,
+          which has been optimized for readability and distinguishability 
+          -- even for color blind users. However, you can still choose 
+          your preferred color in the Saros Preferences.
+
+[FEATURE] Saros has got a 1-to-1 chat enabling a direct communication without the need of opening a session
+
+
+[FEATURE] Change background color if input of text is disabled
+[FEATURE] #3088047 use the MUC service of the currently logged in XMPP
+[FEATURE] Visual notification about new Chat entries
+[UI] provide better error messages if MUC connection failed
+[FIX] #3589970 Session chat can be closed but never be reopened
+[FIX] #3588568 Chat contents get lost during session invitation
+[FIX] #3572488 Fix annoying chat replay
+[FIX] #3573784 Switching followee's active file moves
+[FIX] #3589495 Chat display does not properly update its contents
+
+[GUI] changed the progress report for an outgoing project negotiation
+[GUI] extended Saros configuration wizard
+      The configuration wizard now includes the selection of the
+      favorite session color.
+[GUI] session invitation no longer reports progress
+      Since synchronisation progress cannot be measured during the invitation process,
+      the report of it is useless and so it has been removed.
+[GUI] always show the exit session dialog if left alone in session
+[UI]  disabled copy feature
+      When choosing a local project as the incoming project's destination
+      an obsolete copy feature has been removed. Choose "new project" to make a copy.
+[UI]  Only SessionHost can invite other users
+[UI]  Show the configuration wizard when connecting with no account
+[FIX] #3390825 Sharing Large projects result in OOM Exception
+[FIX] user could edit files while the session is blocked
+[FIX] Fix repainting of SimpleRoundedComposite
+[FIX] #3439301 Trailing whitespaces break the session
+[FIX] #3512780 Getting Started not noticeable enough
+[FIX] #3572490 Not-so-smart pre-selection in "Add Projects" dialog
+[FIX] #3458952 File changes during Invitation corrupts session
+[FIX] Not all changed files were saved before the project archive was
+[FIX] #3572485 Buddy-independent actions are shown in context menu
+[FIX] #3511072 Leave session needs a different icon  as stop session
+[FIX] #3500362 No feedback if sync has finished
+[FIX] do not add a default nickname for new subscriptions
+[FIX] do not allow a resource qualified JID to be added as a roster
+[FIX] The block() and unblock() methods in the EditorManager. 
+      This patch prevents the sending of TextEditActivites while the session
+      is stopped via the StopManager.
+[FIX] #3572498: Deactivate "Add to Saros Session" for read-only users
+[FIX] send wrong presence type on subscription cancellation
+[FIX] do not allow to start and stop a session at the same time
+[FIX] fixed non modal dialog handling
+      The wizard for adding a project to a session had a bug i
+      causing the gui to crash occasionally.
+[FIX] canceling an invitation caused all outstanding invitations to abort
+[FIX] Wizard closing dialog
+      During the invitation a dialog opened up allowing the cancelation after
+      the invitation has already been accepted. The error messages have been shifted to show up after the wizard finished.
+[FIX] roster entry displayed wrong presence mode
+[FIX] #3503744 Naming of "You" in the SarosSession view might be misleading
+[FIX] Socks5 proxy was not disabled if IBB transfer is forced
+[INTERNAL] do not allow further proceeding if the Saros plugin does not match
+
 12.9.28
 =======
 [UI] Change of "Test data transfer connection..." label
