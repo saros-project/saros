@@ -164,13 +164,16 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
         prefs.setValue(PreferenceConstants.FAVORITE_SESSION_COLOR_ID,
             UserColorID.UNKNOWN);
 
+        // Hack for MARCH 2013 release
+
+        prefs.setValue("FAVORITE_COLOR_ID_HACK_CREATE_RANDOM_COLOR", true);
+
         /*
          * Editor stuff
          */
 
         prefs.setValue(PreferenceConstants.SHOW_CONTRIBUTION_ANNOTATIONS,
             "true");
-
     }
 
     private static interface PreferenceHolderWrapper {
