@@ -579,8 +579,10 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
             addIncomingProjectUI.cancelWizard(peer, errorMsg,
                 CancelLocation.REMOTE);
 
-        if (!running)
+        if (!running) {
+            projectExchangeProcesses.removeProjectExchangeProcess(this);
             terminateProcess(null);
+        }
 
         return true;
     }
@@ -595,8 +597,10 @@ public class IncomingProjectNegotiation extends ProjectNegotiation {
             addIncomingProjectUI.cancelWizard(peer, errorMsg,
                 CancelLocation.LOCAL);
 
-        if (!running)
+        if (!running) {
+            projectExchangeProcesses.removeProjectExchangeProcess(this);
             terminateProcess(null);
+        }
 
         return true;
     }

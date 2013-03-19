@@ -71,8 +71,10 @@ public class IncomingSessionNegotiation extends InvitationProcess {
         if (inInvitationUI != null)
             inInvitationUI.cancelWizard(peer, errorMsg, CancelLocation.REMOTE);
 
-        if (!running)
+        if (!running) {
+            invitationProcesses.removeInvitationProcess(this);
             terminateProcess(null);
+        }
 
         return true;
     }
@@ -86,8 +88,10 @@ public class IncomingSessionNegotiation extends InvitationProcess {
         if (inInvitationUI != null)
             inInvitationUI.cancelWizard(peer, errorMsg, CancelLocation.LOCAL);
 
-        if (!running)
+        if (!running) {
+            invitationProcesses.removeInvitationProcess(this);
             terminateProcess(null);
+        }
 
         return true;
     }
