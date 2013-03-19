@@ -29,8 +29,6 @@ import java.net.URLDecoder;
 import java.net.UnknownHostException;
 import java.util.Random;
 
-import javax.security.sasl.SaslException;
-
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 import org.apache.log4j.helpers.LogLog;
@@ -647,17 +645,6 @@ public class Saros extends AbstractUIPlugin {
         boolean useTLS = account.useTLS();
         boolean useSASL = account.useSASL();
 
-        /*
-         * Append domain name to avoid bug
-         * http://community.igniterealtime.org/message/218661#218661 (at least
-         * for google servers)
-         */
-
-        if ((domain.equalsIgnoreCase("gmail.com") || domain
-            .equalsIgnoreCase("googlemail.com")) && useSASL) {
-            username += "@" + domain;
-        }
-
         sarosNet.configure(NAMESPACE, RESOURCE,
             preferenceUtils.isDebugEnabled(),
             preferenceUtils.isLocalSOCKS5ProxyEnabled(),
@@ -665,43 +652,78 @@ public class Saros extends AbstractUIPlugin {
             preferenceUtils.getStunPort(),
             preferenceUtils.isAutoPortmappingEnabled());
 
+        Exception connectionError = null;
+
         try {
             getSarosNet().connect(
                 createConnectionConfiguration(domain, server, port, useTLS,
                     useSASL), username, password);
-        } catch (XMPPException e) {
-            Throwable t = e.getWrappedThrowable();
-            Exception cause = (t != null) ? (Exception) t : e;
+        } catch (Exception e) {
+            connectionError = e;
+        }
 
-            if (cause instanceof SaslException) {
-                DialogUtils.popUpFailureMessage(Messages.Saros_3,
-                    cause.getMessage(), failSilently);
-            } else {
-                String question;
-                if (cause instanceof UnknownHostException) {
-                    log.info("Unknown host: " + cause);
+        if (connectionError == null)
+            return;
 
-                    question = Messages.Saros_28 + Messages.Saros_29
-                        + Messages.Saros_30;
-                } else {
-                    log.info("xmpp: " + cause.getMessage(), cause);
+        try {
+            if (!(connectionError instanceof XMPPException))
+                throw connectionError;
 
-                    question = Messages.Saros_32 + Messages.Saros_33 + username
-                        + "\n\n" + Messages.Saros_30;
-                }
-                if (DialogUtils.popUpYesNoQuestion(Messages.Saros_36, question,
+            if (DialogUtils
+                .popUpYesNoQuestion(
+                    "Connecting Error",
+                    generateHumanReadableErrorMessage((XMPPException) connectionError),
                     failSilently)) {
-                    if (configureXMPPAccount())
-                        connect(failSilently);
-                }
+
+                if (configureXMPPAccount())
+                    connect(failSilently);
             }
         } catch (Exception e) {
             log.error("internal error while connecting to the XMPP server: "
                 + e.getMessage(), e);
-            DialogUtils.popUpFailureMessage(
-                Messages.Saros_36,
-                Messages.Saros_39 + username + Messages.Saros_40
-                    + e.getMessage(), failSilently);
+            DialogUtils.popUpFailureMessage("Connecting Error",
+                "Could not connect to XMPP server: " + e.getMessage(),
+                failSilently);
         }
+    }
+
+    // TODO externalize strings
+    private String generateHumanReadableErrorMessage(XMPPException e) {
+
+        Throwable cause = e.getWrappedThrowable();
+
+        if (cause instanceof UnknownHostException)
+            return "The XMPP server could not be found.\n\n"
+                + "Do you want to edit your current XMPP account now ?";
+
+        String question = null;
+
+        String errorMessage = e.getMessage();
+
+        if (errorMessage != null) {
+            if (errorMessage.toLowerCase().contains("invalid-authzid")) {
+                question = "Due to a bug in the current SMACK library the SASL authentication failed.\n"
+                    + "Please disable SASL for the current account in the account options and try again.\n\n"
+                    + "Do you want to edit your current XMPP account now?";
+            } else if (errorMessage.toLowerCase().contains("not-authorized") // SASL
+                || errorMessage.toLowerCase().contains("forbidden(403)")) { // non
+                                                                            // SASL
+
+                question = "Invalid username or password.\n\n"
+                    + "Do you want to edit your current XMPP account now ?";
+            } else if (errorMessage.toLowerCase().contains(
+                "service-unavailable(503)")) {
+                question = "The XMPP server only allows authentication via SASL.\n"
+                    + "Please enable SASL for the current account in the account options and try again.\n\n"
+                    + "Do you want to edit your current XMPP account now ?";
+            }
+        }
+
+        if (question == null)
+            question = "Could not connect to XMPP server.\n\n"
+                + "Do you want to edit your current XMPP account now ?";
+
+        return question;
+
     }
 }
