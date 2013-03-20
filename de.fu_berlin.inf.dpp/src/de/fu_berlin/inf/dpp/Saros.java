@@ -27,6 +27,7 @@ import java.net.URI;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.net.UnknownHostException;
+import java.text.MessageFormat;
 import java.util.Random;
 
 import org.apache.log4j.Logger;
@@ -194,19 +195,19 @@ public class Saros extends AbstractUIPlugin {
 
         try {
             InputStream sarosProperties = Saros.class.getClassLoader()
-                .getResourceAsStream("saros.properties");
+                .getResourceAsStream("saros.properties"); //$NON-NLS-1$ 
 
             if (sarosProperties == null) {
                 LogLog
-                    .warn("could not initialize Saros properties because the 'saros.properties'"
-                        + " file could not be found on the current JAVA class path");
+                    .warn("could not initialize Saros properties because the 'saros.properties'" //$NON-NLS-1$
+                        + " file could not be found on the current JAVA class path"); //$NON-NLS-1$
             } else {
                 System.getProperties().load(sarosProperties);
                 sarosProperties.close();
             }
         } catch (Exception e) {
             LogLog.error(
-                "could not load saros property file 'saros.properties'", e);
+                "could not load saros property file 'saros.properties'", e); //$NON-NLS-1$
         }
 
         // Only start a DotGraphMonitor if asserts are enabled (aka debug mode)
@@ -305,8 +306,8 @@ public class Saros extends AbstractUIPlugin {
         if (dotMonitor != null) {
             File file = ResourcesPlugin.getWorkspace().getRoot().getLocation()
                 .toFile();
-            file = new File(file, ".metadata");
-            file = new File(file, "saros-" + sarosFeatureID + ".dot");
+            file = new File(file, ".metadata"); //$NON-NLS-1$
+            file = new File(file, "saros-" + sarosFeatureID + ".dot"); //$NON-NLS-1$ //$NON-NLS-2$
             log.info("Saving Saros architecture diagram dot file: " //$NON-NLS-1$
                 + file.getAbsolutePath());
             dotMonitor.save(file);
@@ -314,7 +315,7 @@ public class Saros extends AbstractUIPlugin {
 
         try {
             Thread shutdownThread = Utils.runSafeAsync(
-                "Saros-Shutdown-Process", log, new Runnable() {
+                "Saros-Shutdown-Process", log, new Runnable() { //$NON-NLS-1$
                     @Override
                     public void run() {
 
@@ -345,7 +346,7 @@ public class Saros extends AbstractUIPlugin {
 
             shutdownThread.join(10000);
             if (shutdownThread.isAlive())
-                log.error("could not shutdown Saros gracefully");
+                log.error("could not shutdown Saros gracefully"); //$NON-NLS-1$
 
         } finally {
             super.stop(context);
@@ -453,7 +454,7 @@ public class Saros extends AbstractUIPlugin {
         try {
 
             PropertyConfigurator.configure(Saros.class.getClassLoader()
-                .getResource("saros.log4j.properties"));
+                .getResource("saros.log4j.properties")); //$NON-NLS-1$
 
             log = Logger.getLogger("de.fu_berlin.inf.dpp"); //$NON-NLS-1$
         } catch (SecurityException e) {
@@ -671,7 +672,7 @@ public class Saros extends AbstractUIPlugin {
 
             if (DialogUtils
                 .popUpYesNoQuestion(
-                    "Connecting Error",
+                    Messages.Saros_connecting_error_title,
                     generateHumanReadableErrorMessage((XMPPException) connectionError),
                     failSilently)) {
 
@@ -679,49 +680,49 @@ public class Saros extends AbstractUIPlugin {
                     connect(failSilently);
             }
         } catch (Exception e) {
-            log.error("internal error while connecting to the XMPP server: "
+            log.error("internal error while connecting to the XMPP server: " //$NON-NLS-1$
                 + e.getMessage(), e);
-            DialogUtils.popUpFailureMessage("Connecting Error",
-                "Could not connect to XMPP server: " + e.getMessage(),
+
+            String errorMessage = MessageFormat.format(
+                Messages.Saros_connecting_internal_error, e.getMessage());
+
+            DialogUtils.popUpFailureMessage(
+                Messages.Saros_connecting_error_title, errorMessage,
                 failSilently);
         }
     }
 
-    // TODO externalize strings
     private String generateHumanReadableErrorMessage(XMPPException e) {
 
         Throwable cause = e.getWrappedThrowable();
 
         if (cause instanceof UnknownHostException)
-            return "The XMPP server could not be found.\n\n"
-                + "Do you want to edit your current XMPP account now ?";
+            return Messages.Saros_connecting_unknown_host
+                + Messages.Saros_connecting_modify_account;
 
         String question = null;
 
         String errorMessage = e.getMessage();
 
         if (errorMessage != null) {
-            if (errorMessage.toLowerCase().contains("invalid-authzid")) {
-                question = "Due to a bug in the current SMACK library the SASL authentication failed.\n"
-                    + "Please disable SASL for the current account in the account options and try again.\n\n"
-                    + "Do you want to edit your current XMPP account now?";
-            } else if (errorMessage.toLowerCase().contains("not-authorized") // SASL
-                || errorMessage.toLowerCase().contains("forbidden(403)")) { // non
-                                                                            // SASL
+            if (errorMessage.toLowerCase().contains("invalid-authzid")) { //$NON-NLS-1$
+                question = Messages.Saros_connecting_smack_sasl_bug
+                    + Messages.Saros_connecting_modify_account;
+            } else if (errorMessage.toLowerCase().contains("not-authorized") // SASL //$NON-NLS-1$
+                || errorMessage.toLowerCase().contains("403") // non SASL //$NON-NLS-1$
+                || errorMessage.toLowerCase().contains("401")) { // non SASL //$NON-NLS-1$
 
-                question = "Invalid username or password.\n\n"
-                    + "Do you want to edit your current XMPP account now ?";
-            } else if (errorMessage.toLowerCase().contains(
-                "service-unavailable(503)")) {
-                question = "The XMPP server only allows authentication via SASL.\n"
-                    + "Please enable SASL for the current account in the account options and try again.\n\n"
-                    + "Do you want to edit your current XMPP account now ?";
+                question = Messages.Saros_connecting_invalid_username_password
+                    + Messages.Saros_connecting_modify_account;
+            } else if (errorMessage.toLowerCase().contains("503")) { //$NON-NLS-1$
+                question = Messages.Saros_connecting_sasl_required
+                    + Messages.Saros_connecting_modify_account;
             }
         }
 
         if (question == null)
-            question = "Could not connect to XMPP server.\n\n"
-                + "Do you want to edit your current XMPP account now ?";
+            question = Messages.Saros_connecting_failed
+                + Messages.Saros_connecting_modify_account;
 
         return question;
 
