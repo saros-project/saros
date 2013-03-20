@@ -32,8 +32,6 @@ public class Messages extends NLS {
     public static String AddXMPPAccountWizard_title;
 
     public static String AdvancedPreferencePage_description;
-    public static String AdvancedPreferencePage_interval_between_editings;
-    public static String AdvancedPreferencePage_peer_update;
     public static String AdvancedPreferencePage_ping_pong;
     public static String AdvancedPreferencePage_show_xmpp_debug;
     public static String AdvancedPreferencePage_enable_balloon_notifications;
@@ -83,9 +81,6 @@ public class Messages extends NLS {
     public static String CollaborationUtils_confirm_closing_text;
     public static String CollaborationUtils_confirm_leaving;
     public static String CollaborationUtils_confirm_leaving_text;
-    public static String CollaborationUtils_error_not_connected;
-    public static String CollaborationUtils_make_sure_connected_to;
-    public static String CollaborationUtils_offline;
     public static String CollaborationUtils_partial;
     public static String CollaborationUtils_project_plural_ending;
     public static String CollaborationUtils_project_singular_ending;
