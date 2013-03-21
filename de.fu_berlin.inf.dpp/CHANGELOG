@@ -1,25 +1,25 @@
+13.3.22
+=======
+
+[HACK] Ensure random color distribution for Saros upgraders
+
 13.3.15
 =======
 
-[PERFORMANCE] Due to situations of high cpu usage when typing continuously, 
-              the user is now allowed to disable the contribution annotations 
+[PERFORMANCE] Due to situations of high cpu usage when typing continuously,
+              the user is now allowed to disable the contribution annotations
               to gain a better performance.
 
-[PERFORMANCE] Only the session host can invite other users. 
-              This regression was neccessary to gain more staibilty.
+[REGRESSION] Only the session host can invite other users.
+             This was neccessary to gain more stability during the invitation process.
 
-[FEATURE] We introduced a new color management, 
-          which tries to ensure that you always get the same colors in your session, 
-          independent of who started the session in the first place. To achieve this, 
-          we had to restrict the freedom of choosing any RGB color to a strict five-color-mode,
-          which has been optimized for readability and distinguishability 
-          -- even for color blind users. However, you can still choose 
-          your preferred color in the Saros Preferences.
+[FEATURE] New color management which tries to ensure that users always get the same colors in their sessions,
+          independent of who started the session in the first place. To achieve this,
+          the freedom of choosing any RGB color was restricted to a five-color-mode.
 
 [FEATURE] Saros has got a 1-to-1 chat enabling a direct communication without the need of opening a session
 
-
-[FEATURE] Change background color if input of text is disabled
+[FEATURE] Change background color of chat input field if chat is not available
 [FEATURE] #3088047 use the MUC service of the currently logged in XMPP
 [FEATURE] Visual notification about new Chat entries
 [UI] provide better error messages if MUC connection failed
@@ -30,9 +30,6 @@
 [FIX] #3589495 Chat display does not properly update its contents
 
 [GUI] changed the progress report for an outgoing project negotiation
-[GUI] extended Saros configuration wizard
-      The configuration wizard now includes the selection of the
-      favorite session color.
 [GUI] session invitation no longer reports progress
       Since synchronisation progress cannot be measured during the invitation process,
       the report of it is useless and so it has been removed.
@@ -40,7 +37,6 @@
 [UI]  disabled copy feature
       When choosing a local project as the incoming project's destination
       an obsolete copy feature has been removed. Choose "new project" to make a copy.
-[UI]  Only SessionHost can invite other users
 [UI]  Show the configuration wizard when connecting with no account
 [FIX] #3390825 Sharing Large projects result in OOM Exception
 [FIX] user could edit files while the session is blocked
@@ -62,8 +58,8 @@
 [FIX] send wrong presence type on subscription cancellation
 [FIX] do not allow to start and stop a session at the same time
 [FIX] fixed non modal dialog handling
-      The wizard for adding a project to a session had a bug i
-      causing the gui to crash occasionally.
+      The wizard for adding a project to a session had a bug which
+      caused the GUI to crash occasionally.
 [FIX] canceling an invitation caused all outstanding invitations to abort
 [FIX] Wizard closing dialog
       During the invitation a dialog opened up allowing the cancelation after
