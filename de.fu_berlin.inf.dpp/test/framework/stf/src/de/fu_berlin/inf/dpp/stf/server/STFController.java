@@ -142,6 +142,11 @@ public class STFController {
                 "de.fu_berlin.inf.dpp.invitation.session.IGNORE_VERSION_COMPATIBILITY",
                 "true");
 
+        // Revert March 2013 color hack
+        if (preferenceStore != null)
+            preferenceStore
+                .setToDefault(PreferenceConstants.FAVORITE_SESSION_COLOR_ID);
+
         try {
             registry = LocateRegistry.createRegistry(port);
         } catch (RemoteException e) {
