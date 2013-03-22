@@ -46,6 +46,7 @@ import org.eclipse.jface.text.source.Annotation;
 import org.eclipse.jface.text.source.IAnnotationModel;
 import org.eclipse.jface.text.source.IAnnotationModelExtension;
 import org.eclipse.jface.text.source.ILineRange;
+import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.part.FileEditorInput;
@@ -1682,9 +1683,11 @@ public class EditorManager extends AbstractActivityProvider {
     }
 
     /**
-     * Removes and then re-adds all viewport and selection annotations.
+     * Removes and then re-adds all viewport, contribution and selection
+     * annotations for the given editor part.
      * 
-     * TODO This method does not deal with ContributionAnnotation.
+     * @param editorPart
+     *            the editor part to refresh
      */
     public void refreshAnnotations(IEditorPart editorPart) {
 
@@ -1694,7 +1697,11 @@ public class EditorManager extends AbstractActivityProvider {
             return;
         }
 
-        // Clear all annotations
+        /*
+         * contribution annotation must not be removed here otherwise the
+         * history in the ContributionAnnotationManager will get broken.
+         */
+
         removeAllAnnotations(editorPart, new Predicate<SarosAnnotation>() {
             @Override
             public boolean evaluate(SarosAnnotation annotation) {
@@ -1702,6 +1709,14 @@ public class EditorManager extends AbstractActivityProvider {
                     || annotation instanceof SelectionAnnotation;
             }
         });
+
+        ITextViewer viewer = EditorAPI.getViewer(editorPart);
+
+        if ((viewer instanceof ISourceViewer)) {
+            contributionAnnotationManager
+                .refreshAnnotations(((ISourceViewer) viewer)
+                    .getAnnotationModel());
+        }
 
         for (User user : sarosSession.getParticipants()) {
 

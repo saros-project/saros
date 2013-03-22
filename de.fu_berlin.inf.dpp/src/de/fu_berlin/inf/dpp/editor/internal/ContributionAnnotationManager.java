@@ -1,8 +1,11 @@
 package de.fu_berlin.inf.dpp.editor.internal;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 import java.util.Queue;
 
@@ -11,6 +14,7 @@ import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.text.Position;
 import org.eclipse.jface.text.source.Annotation;
 import org.eclipse.jface.text.source.IAnnotationModel;
+import org.eclipse.jface.text.source.IAnnotationModelExtension;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 
@@ -31,9 +35,9 @@ public class ContributionAnnotationManager {
     private static final Logger log = Logger
         .getLogger(ContributionAnnotationManager.class);
 
-    private static int MAX_HISTORY_LENGTH = 20;
+    static final int MAX_HISTORY_LENGTH = 20;
 
-    private final Map<User, Queue<ContributionAnnotation>> sourceToHistory = new HashMap<User, Queue<ContributionAnnotation>>();
+    private final Map<User, LinkedList<ContributionAnnotation>> sourceToHistory = new HashMap<User, LinkedList<ContributionAnnotation>>();
 
     private final ISarosSession sarosSession;
 
@@ -183,6 +187,69 @@ public class ContributionAnnotationManager {
         }
     }
 
+    /**
+     * Refreshes all contribution annotations in the model by removing and
+     * reinserting them.
+     * 
+     * @param model
+     *            the annotation model that should be refreshed
+     */
+    @SuppressWarnings("unchecked")
+    public void refreshAnnotations(IAnnotationModel model) {
+        List<Annotation> annotationsToRemove = new ArrayList<Annotation>();
+        Map<Annotation, Position> annotationsToAdd = new HashMap<Annotation, Position>();
+
+        for (Iterator<Annotation> it = model.getAnnotationIterator(); it
+            .hasNext();) {
+
+            Annotation annotation = it.next();
+
+            if (!(annotation instanceof ContributionAnnotation))
+                continue;
+
+            Position position = model.getPosition(annotation);
+
+            if (position == null) {
+                log.warn("annotation could not be found in the current model: "
+                    + annotation);
+                continue;
+            }
+
+            /*
+             * we rely on the fact the a user object is unique during a running
+             * session so that user.equals(user) <=> user == user otherwise just
+             * reinserting the annotations would not refresh the colors as the
+             * color id of the user has not changed
+             */
+            annotationsToRemove.add(annotation);
+            ContributionAnnotation annotationToAdd = new ContributionAnnotation(
+                ((ContributionAnnotation) annotation).getSource(), model);
+
+            annotationsToAdd.put(annotationToAdd, position);
+
+            replaceInHistory((ContributionAnnotation) annotation,
+                annotationToAdd);
+        }
+
+        if (annotationsToRemove.isEmpty())
+            return;
+
+        if (model instanceof IAnnotationModelExtension) {
+            ((IAnnotationModelExtension) model).replaceAnnotations(
+                annotationsToRemove.toArray(new Annotation[0]),
+                annotationsToAdd);
+
+            return;
+        }
+
+        for (Annotation annotation : annotationsToRemove)
+            model.removeAnnotation(annotation);
+
+        for (Map.Entry<Annotation, Position> entry : annotationsToAdd
+            .entrySet())
+            model.addAnnotation(entry.getKey(), entry.getValue());
+    }
+
     public void dispose() {
         sarosSession.removeListener(sharedProjectListener);
         preferenceStore.removePropertyChangeListener(propertyChangeListener);
@@ -197,7 +264,7 @@ public class ContributionAnnotationManager {
      * @return the history of source.
      */
     private Queue<ContributionAnnotation> getHistory(User source) {
-        Queue<ContributionAnnotation> result = sourceToHistory.get(source);
+        LinkedList<ContributionAnnotation> result = sourceToHistory.get(source);
         if (result == null) {
             result = new LinkedList<ContributionAnnotation>();
             sourceToHistory.put(source, result);
@@ -232,6 +299,40 @@ public class ContributionAnnotationManager {
     private void removeFromHistory(ContributionAnnotation annotation) {
         getHistory(annotation.getSource()).remove(annotation);
         annotation.getModel().removeAnnotation(annotation);
+    }
+
+    /**
+     * Replaces an existing annotation in the current history with a new
+     * annotation.
+     * 
+     * @param oldAnnotation
+     * @param newAnnotation
+     */
+    private void replaceInHistory(ContributionAnnotation oldAnnotation,
+        ContributionAnnotation newAnnotation) {
+        assert oldAnnotation.getSource().equals(newAnnotation.getSource());
+
+        LinkedList<ContributionAnnotation> list = sourceToHistory
+            .get(oldAnnotation.getSource());
+
+        if (list == null) {
+            log.warn("a annotation history for user "
+                + oldAnnotation.getSource() + " does not exists");
+
+            return;
+        }
+
+        for (ListIterator<ContributionAnnotation> it = list.listIterator(); it
+            .hasNext();) {
+            ContributionAnnotation annotation = it.next();
+            if (annotation.equals(oldAnnotation)) {
+                it.set(newAnnotation);
+                return;
+            }
+        }
+
+        log.warn("could not find annotation " + oldAnnotation
+            + " in the current history for user: " + oldAnnotation.getSource());
     }
 
     private void removeAllAnnotations() {
