@@ -300,8 +300,6 @@ public class SarosContext implements ISarosContext {
         Component.create(UserListRequestExtension.Provider.class),
         Component.create(UserListReceivedExtension.Provider.class),
 
-        Component.create(SarosLeaveExtension.Provider.class),
-
         // UI handlers
         Component.create(HostLeftAloneInSessionHandler.class),
 
@@ -352,6 +350,7 @@ public class SarosContext implements ISarosContext {
             Class.forName(FileListExtension.class.getName());
             Class.forName(KickUserExtension.class.getName());
             Class.forName(UserListExtension.class.getName());
+            Class.forName(SarosLeaveExtension.class.getName());
 
         } catch (ClassNotFoundException e) {
             throw new RuntimeException(e);

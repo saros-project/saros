@@ -33,21 +33,21 @@ public class LeaveAndKickHandler {
     private static final Logger log = Logger
         .getLogger(LeaveAndKickHandler.class.getName());
 
-    UISynchronizer synchronizer;
+    private final UISynchronizer synchronizer;
 
-    private ISarosSessionManager sessionManager;
+    private final ISarosSessionManager sessionManager;
 
-    private SessionIDObservable sessionIDObservable;
+    private final SessionIDObservable sessionIDObservable;
 
-    private IReceiver receiver;
-    private SarosLeaveExtension.Provider provider;
+    private final IReceiver receiver;
 
     private ISarosSessionListener sessionListener = new AbstractSarosSessionListener() {
 
         @Override
         public void sessionStarted(ISarosSession session) {
             receiver.addPacketListener(leaveExtensionListener,
-                provider.getPacketFilter(sessionIDObservable.getValue()));
+                SarosLeaveExtension.PROVIDER
+                    .getPacketFilter(sessionIDObservable.getValue()));
 
             receiver.addPacketListener(kickExtensionListener,
                 KickUserExtension.PROVIDER.getPacketFilter(sessionIDObservable
@@ -78,11 +78,9 @@ public class LeaveAndKickHandler {
     };
 
     public LeaveAndKickHandler(IReceiver receiver,
-        SarosLeaveExtension.Provider provider,
         ISarosSessionManager sessionManager,
         SessionIDObservable sessionIDObservable, UISynchronizer synchronizer) {
 
-        this.provider = provider;
         this.receiver = receiver;
 
         this.sessionManager = sessionManager;

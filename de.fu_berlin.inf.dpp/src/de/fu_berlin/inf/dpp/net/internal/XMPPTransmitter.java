@@ -99,9 +99,6 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
     private SarosSessionObservable sarosSessionObservable;
 
     @Inject
-    private SarosLeaveExtension.Provider leaveExtensionProvider;
-
-    @Inject
     private UserListReceivedExtension.Provider userListReceivedExtensionProvider;
 
     @Inject
@@ -185,7 +182,7 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
     @Override
     public void sendLeaveMessage(ISarosSession sarosSession) {
 
-        PacketExtension extension = leaveExtensionProvider
+        PacketExtension extension = SarosLeaveExtension.PROVIDER
             .create(new SarosLeaveExtension(sessionID.getValue()));
 
         /*
