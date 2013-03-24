@@ -5,25 +5,19 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InterruptedIOException;
-import java.io.NotSerializableException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.io.Writer;
-import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.zip.DataFormatException;
 import java.util.zip.Deflater;
 import java.util.zip.Inflater;
 
@@ -35,6 +29,7 @@ import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.net.URLCodec;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.ObjectUtils;
+import org.apache.commons.lang.SerializationUtils;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IFile;
@@ -43,10 +38,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Platform;
 import org.jivesoftware.smack.XMPPException;
-import org.jivesoftware.smack.filter.PacketFilter;
-import org.jivesoftware.smack.packet.Packet;
 import org.jivesoftware.smackx.bytestreams.BytestreamSession;
-import org.picocontainer.annotations.Nullable;
 
 import bmsi.util.Diff;
 import bmsi.util.DiffPrint;
@@ -56,18 +48,18 @@ import de.fu_berlin.inf.dpp.net.JID;
 /**
  * Static Utility functions
  */
-public class Utils {
+public final class Utils {
 
     private static final Logger log = Logger.getLogger(Utils.class);
+
+    private static final Base64 BASE64_CODEC = new Base64();
+    private static final URLCodec URL_CODEC = new URLCodec();
 
     private Utils() {
         // no instantiation allowed
     }
 
-    protected static final Base64 base64Codec = new Base64();
-    protected static final URLCodec urlCodec = new URLCodec();
-
-    protected static String escape(String toEscape, BinaryEncoder encoder) {
+    private static String escape(String toEscape, BinaryEncoder encoder) {
 
         byte[] toEncode;
         try {
@@ -90,7 +82,7 @@ public class Utils {
         }
     }
 
-    protected static String unescape(String toUnescape, BinaryDecoder decoder) {
+    private static String unescape(String toUnescape, BinaryDecoder decoder) {
 
         byte[] toDecode;
         try {
@@ -114,30 +106,19 @@ public class Utils {
     }
 
     public static String escapeBase64(String toEscape) {
-        return escape(toEscape, base64Codec);
+        return escape(toEscape, BASE64_CODEC);
     }
 
     public static String unescapeBase64(String toUnescape) {
-        return unescape(toUnescape, base64Codec);
+        return unescape(toUnescape, BASE64_CODEC);
     }
 
     public static String urlEscape(String toEscape) {
-        return escape(toEscape, urlCodec);
+        return escape(toEscape, URL_CODEC);
     }
 
     public static String urlUnescape(String toUnescape) {
-        return unescape(toUnescape, urlCodec);
-    }
-
-    public static void close(Socket socketToClose) {
-        if (socketToClose == null)
-            return;
-
-        try {
-            socketToClose.close();
-        } catch (IOException e) {
-            // ignore
-        }
+        return unescape(toUnescape, URL_CODEC);
     }
 
     /**
@@ -160,61 +141,6 @@ public class Utils {
                     return;
                 }
                 runnable.run();
-            }
-        };
-    }
-
-    /**
-     * Returns a callable that upon being called will wait the given time in
-     * milliseconds and then call the given callable.
-     * 
-     * The returned callable supports being interrupted upon which an
-     * InterruptedException is being thrown.
-     * 
-     */
-    public static <T> Callable<T> delay(final int milliseconds,
-        final Callable<T> callable) {
-        return new Callable<T>() {
-            @Override
-            public T call() throws Exception {
-
-                Thread.sleep(milliseconds);
-                return callable.call();
-            }
-        };
-    }
-
-    public static <T> Callable<T> retryEveryXms(final Callable<T> callable,
-        final int retryMillis) {
-        return new Callable<T>() {
-            @Override
-            public T call() {
-                T t = null;
-                while (t == null && !Thread.currentThread().isInterrupted()) {
-                    try {
-                        t = callable.call();
-                    } catch (InterruptedIOException e) {
-                        // Workaround for bug in Limewire RUDP
-                        // https://www.limewire.org/jira/browse/LWC-2838
-                        return null;
-                    } catch (InterruptedException e) {
-                        log.error("Code not designed to be interruptable", e);
-                        Thread.currentThread().interrupt();
-                        return null;
-                    } catch (Exception e) {
-                        // Log here for connection problems.
-                        t = null;
-                        try {
-                            Thread.sleep(retryMillis);
-                        } catch (InterruptedException e2) {
-                            log.error("Code not designed to be interruptable",
-                                e);
-                            Thread.currentThread().interrupt();
-                            return null;
-                        }
-                    }
-                }
-                return t;
             }
         };
     }
@@ -247,51 +173,13 @@ public class Utils {
         };
     }
 
-    public static PacketFilter orFilter(final PacketFilter... filters) {
-
-        return new PacketFilter() {
-
-            @Override
-            public boolean accept(Packet packet) {
-
-                for (PacketFilter filter : filters) {
-                    if (filter.accept(packet)) {
-                        return true;
-                    }
-                }
-                return false;
-            }
-        };
-    }
-
-    public static String read(InputStream input) throws IOException {
-
-        try {
-            byte[] content = IOUtils.toByteArray(input);
-
-            try {
-                return new String(content, "UTF-8");
-            } catch (UnsupportedEncodingException e) {
-                return new String(content);
-            }
-        } finally {
-            IOUtils.closeQuietly(input);
-        }
-    }
-
     /**
      * Utility method similar to {@link ObjectUtils#equals(Object, Object)},
      * which causes a compile error if the second parameter is not a subclass of
      * the first.
      */
     public static <V, K extends V> boolean equals(V object1, K object2) {
-        if (object1 == object2) {
-            return true;
-        }
-        if ((object1 == null) || (object2 == null)) {
-            return false;
-        }
-        return object1.equals(object2);
+        return ObjectUtils.equals(object1, object2);
     }
 
     /**
@@ -343,7 +231,7 @@ public class Utils {
      * 
      * @nonBlocking
      */
-    public static Thread runSafeAsync(@Nullable String name, final Logger log,
+    public static Thread runSafeAsync(String name, final Logger log,
         final Runnable runnable) {
 
         Thread t = new Thread(wrapSafe(log, runnable));
@@ -389,8 +277,8 @@ public class Utils {
     }
 
     /**
-     * Run the given runnable (in the current thread!) and log any
-     * RuntimeExceptions to the given log and block until the runnable returns.
+     * Run the given runnable in a new thread and log any RuntimeExceptions to
+     * the given log and blocks the current thread until the runnable returns.
      * 
      * @blocking
      */
@@ -401,6 +289,7 @@ public class Utils {
         } catch (InterruptedException e) {
             log.warn("Waiting for the forked thread in runSafeSyncFork was"
                 + " interrupted unexpectedly");
+            Thread.currentThread().interrupt();
         }
     }
 
@@ -445,6 +334,7 @@ public class Utils {
         return sb.toString();
     }
 
+    // should be moved to JID class
     public static String prefix(JID jid) {
         if (jid == null) {
             return "[Unknown] ";
@@ -476,6 +366,7 @@ public class Utils {
             return true;
     }
 
+    // only used by ConnectionTestAction
     public static String getMessage(Throwable e) {
         if (e instanceof XMPPException) {
             return e.toString();
@@ -544,7 +435,7 @@ public class Utils {
                 monitor.worked(1);
             }
             return bos.toByteArray();
-        } catch (java.util.zip.DataFormatException ex) {
+        } catch (DataFormatException ex) {
             log.error("Failed to inflate bytearray", ex);
             throw new IOException(ex);
         } finally {
@@ -553,6 +444,7 @@ public class Utils {
         }
     }
 
+    // NO LONGER USED
     /**
      * Print the difference between the contents of the given file and the given
      * inputBytes to the given log.
@@ -609,6 +501,7 @@ public class Utils {
         }
     }
 
+    // NO LONGER USED
     /**
      * Reads the given stream into an array of lines while retaining and
      * escaping the line delimiters.
@@ -694,29 +587,19 @@ public class Utils {
 
     /**
      * Serializes a {@link Serializable}. Errors are logged to {@link Utils#log}
-     * . .
+     * .
      * 
-     * @param o
+     * @param object
      *            {@link Serializable} to serialize
      * @return the serialized data or <code>null</code> (when not serializable)
      */
-    public static byte[] serialize(Serializable o) {
-        if (o == null) {
+    public static byte[] serialize(Serializable object) {
+        try {
+            return SerializationUtils.serialize(object);
+        } catch (RuntimeException e) {
+            log.error("could not serialize object: " + object, e);
             return null;
         }
-        byte[] data = null;
-        try {
-            ByteArrayOutputStream bos = new ByteArrayOutputStream();
-            ObjectOutputStream out = new ObjectOutputStream(bos);
-            out.writeObject(o);
-            out.close();
-            data = bos.toByteArray();
-        } catch (NotSerializableException e) {
-            log.error("'" + o + "' is not serializable: ", e);
-        } catch (IOException e) {
-            log.error("Unexpected error during serialization: ", e);
-        }
-        return data;
     }
 
     /**
@@ -728,21 +611,17 @@ public class Utils {
      * @return deserialized {@link Object} or <code>null</code>
      */
     public static Object deserialize(byte[] serialized) {
-        Object o = null;
         try {
-            ObjectInputStream in = new ObjectInputStream(
-                new ByteArrayInputStream(serialized));
-            o = in.readObject();
-            in.close();
-        } catch (IOException e) {
-            log.error("Unexpected error during deserialization: ", e);
-        } catch (ClassNotFoundException e) {
-            log.error("Class not found in system: ", e);
+            return SerializationUtils.deserialize(serialized);
+        } catch (RuntimeException e) {
+            log.error(
+                "could not deserialize object data: "
+                    + Arrays.toString(serialized), e);
+            return null;
         }
-
-        return o;
     }
 
+    // only used by Socks5Transport
     /**
      * Closes a bytestreamSession without error output.
      * 
@@ -756,56 +635,5 @@ public class Utils {
         } catch (Exception e) {
             //
         }
-    }
-
-    /**
-     * Concat <code>strings</code>. If <code>separator</code> is not
-     * <code><b>null</b></code> or empty the separator will be put between the
-     * strings but not after the last one
-     * 
-     * Example: <br />
-     * <code>
-     * separator = "-"; <br />
-     * strings = ['a','b','c']; <br />
-     * join(separator, strings) => 'a-b-c'</code>
-     * 
-     * @param separator
-     * @param objects
-     * @return
-     */
-    public static String join(String separator, Object... objects) {
-        return join(separator, Arrays.asList(objects));
-    }
-
-    /**
-     * Concatenates all elements of this collection. For each element the
-     * toString method will be invoked and the separator will be appended but
-     * not for the last element of the collection. The order of the output
-     * depends on the iterator that is returned by the collection.
-     * 
-     * @param separator
-     * @param objects
-     * @return
-     */
-
-    public static String join(String separator, Collection<?> objects) {
-        int length = objects.size();
-
-        if (length == 0)
-            return "";
-
-        if (separator == null)
-            separator = "";
-
-        StringBuilder result = new StringBuilder(512);
-
-        Iterator<?> it = objects.iterator();
-
-        for (int i = 0; i < length - 1; i++)
-            result.append(it.next()).append(separator);
-
-        result.append(it.next());
-
-        return result.toString();
     }
 }

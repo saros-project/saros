@@ -13,6 +13,7 @@ import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
@@ -48,7 +49,6 @@ import de.fu_berlin.inf.dpp.ui.preferencePages.GeneralPreferencePage;
 import de.fu_berlin.inf.dpp.ui.util.SWTUtils;
 import de.fu_berlin.inf.dpp.ui.views.SarosView;
 import de.fu_berlin.inf.dpp.ui.wizards.utils.EnterProjectNamePageUtils;
-import de.fu_berlin.inf.dpp.util.Utils;
 
 /**
  * A wizard page that allows to enter the new project name or to choose to
@@ -630,7 +630,7 @@ public class EnterProjectNamePage extends WizardPage {
         if (!dirtyProjectNames.isEmpty()) {
             warningMessage = MessageFormat.format(
                 Messages.EnterProjectNamePage_warning_project_artifacts_found,
-                Utils.join(", ", dirtyProjectNames));
+                StringUtils.join(dirtyProjectNames, ", "));
         }
 
         setMessage(warningMessage, WARNING);

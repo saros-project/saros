@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Callable;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
@@ -172,8 +173,8 @@ public class AddProjectToSessionWizard extends Wizard {
                                 Messages.AddProjectToSessionWizard_unsaved_changes_dialog_more,
                                 more));
 
-                    String allDirtyEditorNames = Utils.join(", ",
-                        dirtyEditorNames);
+                    String allDirtyEditorNames = StringUtils.join(
+                        dirtyEditorNames, ", ");
 
                     String dialogText = MessageFormat
                         .format(
@@ -277,7 +278,8 @@ public class AddProjectToSessionWizard extends Wizard {
                             MessageFormat
                                 .format(
                                     Messages.AddProjectToSessionWizard_synchronize_finished_notification_text,
-                                    Utils.join(", ", projectNames.values())));
+                                    StringUtils.join(projectNames.values(),
+                                        ", ")));
 
                 } catch (Exception e) {
                     log.error(

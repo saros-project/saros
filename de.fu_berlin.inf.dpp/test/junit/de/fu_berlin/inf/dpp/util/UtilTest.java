@@ -6,9 +6,7 @@ import static org.junit.Assert.assertTrue;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Random;
 
 import org.eclipse.core.runtime.NullProgressMonitor;
@@ -47,19 +45,5 @@ public class UtilTest {
         String[] expected = new String[] { "a\\n", "b\\r", "c\\r\\n", "d" };
         String[] actual = Utils.readLinesAndEscapeNewlines(stream);
         assertTrue(Arrays.equals(expected, actual));
-    }
-
-    @Test
-    public void joinTest() {
-        assertEquals("1|a|null", Utils.join("|", 1, 'a', null));
-        assertEquals("1anull", Utils.join(null, 1, 'a', null));
-        assertEquals("", Utils.join(null, new Object[0]));
-        assertEquals("", Utils.join("|", new Object[0]));
-        List<Object> list = new ArrayList<Object>();
-        list.add(1);
-        list.add('a');
-        list.add(null);
-        assertEquals("1|a|null", Utils.join("|", list));
-
     }
 }
