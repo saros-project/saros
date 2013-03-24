@@ -101,9 +101,6 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
     @Inject
     private UserListReceivedExtension.Provider userListReceivedExtensionProvider;
 
-    @Inject
-    private UserListRequestExtension.Provider userListRequestExtProv;
-
     public XMPPTransmitter(SessionIDObservable sessionID,
         DataTransferManager dataManager, SarosNet sarosNet, IReceiver receiver) {
         sarosNet.addListener(this);
@@ -223,8 +220,8 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
     @Override
     public void sendUserListRequest(JID user) {
         sendMessageToUser(user,
-            userListRequestExtProv.create(new UserListRequestExtension(
-                sessionID.getValue())));
+            UserListRequestExtension.PROVIDER
+                .create(new UserListRequestExtension(sessionID.getValue())));
     }
 
     /* Methods to remove from the IFACE END */
