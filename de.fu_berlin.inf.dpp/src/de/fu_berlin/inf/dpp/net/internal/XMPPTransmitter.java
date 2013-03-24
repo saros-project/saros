@@ -45,7 +45,6 @@ import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.SarosNet;
 import de.fu_berlin.inf.dpp.net.SarosPacketCollector;
-import de.fu_berlin.inf.dpp.net.internal.extensions.PacketExtensionUtils;
 import de.fu_berlin.inf.dpp.net.internal.extensions.SarosLeaveExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.SarosPacketExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.UserListReceivedExtension;
@@ -98,9 +97,6 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
     @Inject
     private SarosSessionObservable sarosSessionObservable;
 
-    @Inject
-    private UserListReceivedExtension.Provider userListReceivedExtensionProvider;
-
     public XMPPTransmitter(SessionIDObservable sessionID,
         DataTransferManager dataManager, SarosNet sarosNet, IReceiver receiver) {
         sarosNet.addListener(this);
@@ -112,7 +108,7 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
     public void sendUserListConfirmation(JID to) {
         log.trace("Sending buddy list confirmation to " + Utils.prefix(to));
         sendMessageToUser(to,
-            userListReceivedExtensionProvider
+            UserListReceivedExtension.PROVIDER
                 .create(new UserListReceivedExtension(sessionID.getValue())),
             true);
     }
@@ -126,8 +122,8 @@ public class XMPPTransmitter implements ITransmitter, IConnectionListener {
     @Override
     public SarosPacketCollector getUserListConfirmationCollector() {
 
-        PacketFilter filter = PacketExtensionUtils.getSessionIDFilter(
-            userListReceivedExtensionProvider, sessionID);
+        PacketFilter filter = UserListReceivedExtension.PROVIDER
+            .getPacketFilter(sessionID.getValue());
 
         return installReceiver(filter);
     }
