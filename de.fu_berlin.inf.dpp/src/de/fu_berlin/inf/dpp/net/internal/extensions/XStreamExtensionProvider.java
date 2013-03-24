@@ -170,7 +170,7 @@ public class XStreamExtensionProvider<T> implements PacketExtensionProvider,
     /**
      * PacketFilter for Packets which contain a PacketExtension matching the
      * {@link XStreamExtensionProvider#elementName} and
-     * {@link PacketExtensionUtils#NAMESPACE}.
+     * {@link XStreamExtensionProvider#NAMESPACE}.
      */
     public PacketFilter getPacketFilter() {
         return new PacketExtensionFilter(getElementName(), getNamespace());

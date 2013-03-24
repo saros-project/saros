@@ -21,12 +21,8 @@ package de.fu_berlin.inf.dpp.net.internal.extensions;
 
 import org.apache.log4j.Logger;
 import org.jivesoftware.smack.filter.AndFilter;
-import org.jivesoftware.smack.filter.MessageTypeFilter;
 import org.jivesoftware.smack.filter.PacketFilter;
-import org.jivesoftware.smack.packet.DefaultPacketExtension;
-import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.Packet;
-import org.jivesoftware.smack.packet.PacketExtension;
 
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 import de.fu_berlin.inf.dpp.util.Utils;
@@ -46,43 +42,6 @@ public class PacketExtensionUtils {
 
     private static final Logger log = Logger
         .getLogger(PacketExtensionUtils.class);
-
-    public static final String NAMESPACE = "de.fu_berlin.inf.dpp";
-
-    public static final String SESSION_ID = "sessionID";
-
-    /**
-     * Retrieves the SessionID from the given message by checking all supported
-     * PacketExtensions-types.
-     * 
-     * Returns null if no SessionID is found.
-     */
-    public static String getSessionID(Message message) {
-        PacketExtension extension = message
-            .getExtension(PacketExtensionUtils.NAMESPACE);
-        if (extension != null && extension instanceof DefaultPacketExtension) {
-            return ((DefaultPacketExtension) extension).getValue(SESSION_ID);
-        }
-        return null;
-    }
-
-    /**
-     * @return PacketFilter that only accepts Messages (!) which belong to the
-     *         current session
-     */
-    public static PacketFilter getSessionIDPacketFilter(
-        final SessionIDObservable sessionIDObservable) {
-
-        return new AndFilter(new MessageTypeFilter(Message.Type.chat),
-            new PacketFilter() {
-                @Override
-                public boolean accept(Packet arg0) {
-                    Message message = (Message) arg0;
-                    return sessionIDObservable.getValue().equals(
-                        getSessionID(message));
-                }
-            });
-    }
 
     /**
      * @return {@link PacketFilter} that only accepts messages which belong to
